@@ -49,7 +49,11 @@ import {
   selectSelectedDeviceFormatters,
   selectSelectedDevice,
 } from '@console/store/selectors/devices'
-import { selectDeviceRepoPayloadFromatters } from '@console/store/selectors/device-repository'
+import {
+  selectDeviceRepoPayloadFromatters,
+  selectDeviceRepoPayloadFromattersFetching,
+  selectDeviceRepoPayloadFromattersError,
+} from '@console/store/selectors/device-repository'
 
 import m from './messages'
 
@@ -63,6 +67,8 @@ import m from './messages'
     formatters: selectSelectedDeviceFormatters(state),
     decodeUplink: tts.As.decodeUplink,
     repositoryPayloadFormatters: selectDeviceRepoPayloadFromatters(state),
+    error: selectDeviceRepoPayloadFromattersError(state),
+    fetching: selectDeviceRepoPayloadFromattersFetching(state),
   }),
   {
     updateDevice: attachPromise(updateDevice),

@@ -162,10 +162,7 @@ const addHocs = pipe(
   withFeatureRequirement(mayEditBasicApplicationInfo, {
     redirect: ({ appId }) => `/applications/${appId}`,
   }),
-  withRequest(
-    ({ loadData }) => loadData(),
-    ({ fetching }) => fetching,
-  ),
+  withRequest(({ loadData }) => loadData()),
 )
 
 export default ApplicationGeneralSettings => addHocs(ApplicationGeneralSettings)

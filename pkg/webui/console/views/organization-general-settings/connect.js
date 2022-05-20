@@ -115,9 +115,4 @@ export default GeneralSettings =>
     mapStateToProps,
     mapDispatchToProps,
     mergeProps,
-  )(
-    withRequest(
-      ({ loadData }) => loadData(),
-      ({ fetching }) => fetching,
-    )(GeneralSettings),
-  )
+  )(withRequest(({ loadData }) => loadData())(GeneralSettings))

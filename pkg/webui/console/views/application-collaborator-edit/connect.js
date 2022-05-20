@@ -90,9 +90,4 @@ export default ApplicationCollaboratorEdit =>
     mapStateToProps,
     mapDispatchToProps,
     mergeProps,
-  )(
-    withRequest(
-      ({ getCollaborator }) => getCollaborator(),
-      ({ fetching, collaborator }) => fetching || !Boolean(collaborator),
-    )(ApplicationCollaboratorEdit),
-  )
+  )(withRequest(({ getCollaborator }) => getCollaborator())(ApplicationCollaboratorEdit))

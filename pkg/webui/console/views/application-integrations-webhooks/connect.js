@@ -72,9 +72,8 @@ export default ApplicationWebhooks =>
     withFeatureRequirement(mayViewApplicationEvents, {
       redirect: ({ appId }) => `/applications/${appId}`,
     })(
-      withRequest(
-        ({ listWebhookTemplates }) => listWebhookTemplates(selector),
-        ({ webhookTemplates, fetching }) => fetching || !Boolean(webhookTemplates),
-      )(ApplicationWebhooks),
+      withRequest(({ listWebhookTemplates }) => listWebhookTemplates(selector))(
+        ApplicationWebhooks,
+      ),
     ),
   )

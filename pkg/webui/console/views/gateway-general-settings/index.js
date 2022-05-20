@@ -134,7 +134,7 @@ import m from './messages'
 @withFeatureRequirement(mayEditBasicGatewayInformation, {
   redirect: ({ gtwId }) => `/gateways/${gtwId}`,
 })
-@withRequest(({ loadData }) => loadData(), ({ fetching }) => fetching)
+@withRequest(({ loadData }) => loadData())
 @withBreadcrumb('gateways.single.general-settings', props => {
   const { gtwId } = props
 

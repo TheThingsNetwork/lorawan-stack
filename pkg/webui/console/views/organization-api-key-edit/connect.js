@@ -74,9 +74,4 @@ export default OrganizationApiKeyEdit =>
       updateOrganizationApiKey: key =>
         dispatchProps.updateOrganizationApiKey(stateProps.orgId, stateProps.keyId, key),
     }),
-  )(
-    withRequest(
-      ({ getApiKey, orgId, keyId }) => getApiKey(orgId, keyId),
-      ({ fetching, apiKey }) => fetching || !Boolean(apiKey),
-    )(OrganizationApiKeyEdit),
-  )
+  )(withRequest(({ getApiKey, orgId, keyId }) => getApiKey(orgId, keyId))(OrganizationApiKeyEdit))

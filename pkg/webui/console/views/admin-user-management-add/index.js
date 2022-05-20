@@ -49,7 +49,7 @@ import {
     getConfiguration: () => getIsConfiguration(),
   },
 )
-@withRequest(({ getConfiguration }) => getConfiguration(), ({ fetching }) => fetching)
+@withRequest(({ getConfiguration }) => getConfiguration())
 @withBreadcrumb('admin.user-management.add', () => (
   <Breadcrumb path={`/admin/user-management/add`} content={sharedMessages.add} />
 ))

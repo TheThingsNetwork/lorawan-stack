@@ -89,9 +89,4 @@ export default TitleSection =>
     mapStateToProps,
     mapDispatchToProps,
     mergeProps,
-  )(
-    withRequest(
-      ({ loadData }) => loadData(),
-      () => false,
-    )(TitleSection),
-  )
+  )(withRequest(({ loadData }) => loadData())(TitleSection))

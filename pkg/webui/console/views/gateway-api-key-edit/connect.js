@@ -69,9 +69,4 @@ export default GatewayApiKeyEdit =>
       editGatewayApiKey: key => dispatchProps.editApiKey(stateProps.gtwId, stateProps.keyId, key),
       deleteSuccess: () => dispatchProps.deleteSuccess(stateProps.gtwId),
     }),
-  )(
-    withRequest(
-      ({ gtwId, keyId, getApiKey }) => getApiKey(gtwId, keyId),
-      ({ fetching, apiKey }) => fetching || !Boolean(apiKey),
-    )(GatewayApiKeyEdit),
-  )
+  )(withRequest(({ gtwId, keyId, getApiKey }) => getApiKey(gtwId, keyId))(GatewayApiKeyEdit))

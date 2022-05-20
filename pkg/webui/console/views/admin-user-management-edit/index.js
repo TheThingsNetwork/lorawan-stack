@@ -36,7 +36,11 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { getUser, updateUser, deleteUser } from '@console/store/actions/users'
 
-import { selectSelectedUser } from '@console/store/selectors/users'
+import {
+  selectSelectedUser,
+  selectUserError,
+  selectUserFetching,
+} from '@console/store/selectors/users'
 
 const m = defineMessages({
   updateSuccess: 'User updated',
@@ -47,6 +51,8 @@ const m = defineMessages({
   (state, props) => ({
     userId: props.match.params.userId,
     user: selectSelectedUser(state),
+    error: selectUserError(state),
+    fetching: selectUserFetching(state),
   }),
   {
     getUser,
@@ -55,10 +61,8 @@ const m = defineMessages({
     navigateToList: () => replace(`/admin/user-management`),
   },
 )
-@withRequest(
-  ({ userId, getUser }) =>
-    getUser(userId, ['name', 'primary_email_address', 'state', 'admin', 'description']),
-  ({ fetching, user }) => fetching || !Boolean(user),
+@withRequest(({ userId, getUser }) =>
+  getUser(userId, ['name', 'primary_email_address', 'state', 'admin', 'description']),
 )
 @withBreadcrumb('admin.user-management.edit', ({ userId }) => (
   <Breadcrumb path={`/admin/user-management/${userId}`} content={sharedMessages.edit} />

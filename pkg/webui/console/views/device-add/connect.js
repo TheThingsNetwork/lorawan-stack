@@ -37,12 +37,9 @@ export default DeviceAdd =>
     mapStateToProps,
     mapDispatchToProps,
   )(
-    withRequest(
-      ({ getPrefixes, jsEnabled }) => {
-        if (jsEnabled) {
-          return getPrefixes()
-        }
-      },
-      ({ fetching }) => fetching,
-    )(DeviceAdd),
+    withRequest(({ getPrefixes, jsEnabled }) => {
+      if (jsEnabled) {
+        return getPrefixes()
+      }
+    })(DeviceAdd),
   )
