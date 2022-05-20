@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -749,9 +749,6 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 				return nil
 			}
 
-			if err = pb.ValidateFields(sets...); err != nil {
-				return err
-			}
 			if stored == nil {
 				trace.Log(ctx, "ns:redis", "create end device")
 				if err := ttnpb.RequireFields(sets,
@@ -810,6 +807,9 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 			if updated.Session != nil && updated.MacState == nil ||
 				updated.PendingSession != nil && updated.PendingMacState == nil {
 				return errInvalidDevice.New()
+			}
+			if err := updated.ValidateFields(); err != nil {
+				return err
 			}
 
 			storedPendingSession := stored.GetPendingSession()

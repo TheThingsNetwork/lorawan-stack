@@ -3090,11 +3090,15 @@ func TestApplicationServerCleanup(t *testing.T) {
 			},
 			func(web *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
 				return &ttnpb.ApplicationWebhook{
-						Ids: webID,
+						Ids:     webID,
+						BaseUrl: "https://example.com",
+						Format:  "json",
 					},
 					[]string{
 						"ids.application_ids",
 						"ids.webhook_id",
+						"base_url",
+						"format",
 					}, nil
 			})
 		a.So(err, should.BeNil)
@@ -3109,10 +3113,18 @@ func TestApplicationServerCleanup(t *testing.T) {
 			func(ps *ttnpb.ApplicationPubSub) (*ttnpb.ApplicationPubSub, []string, error) {
 				return &ttnpb.ApplicationPubSub{
 						Ids: pubsubID,
+						Provider: &ttnpb.ApplicationPubSub_Mqtt{
+							Mqtt: &ttnpb.ApplicationPubSub_MQTTProvider{
+								ServerUrl: "mqtt://example.com",
+							},
+						},
+						Format: "json",
 					},
 					[]string{
 						"ids.application_ids",
 						"ids.pub_sub_id",
+						"provider",
+						"format",
 					},
 					nil
 			})
@@ -3128,12 +3140,14 @@ func TestApplicationServerCleanup(t *testing.T) {
 			},
 			func(as *ttnpb.ApplicationPackageAssociation) (*ttnpb.ApplicationPackageAssociation, []string, error) {
 				return &ttnpb.ApplicationPackageAssociation{
-						Ids: associationID,
+						Ids:         associationID,
+						PackageName: "example",
 					},
 					[]string{
 						"ids.end_device_ids.application_ids",
 						"ids.end_device_ids.device_id",
 						"ids.f_port",
+						"package_name",
 					},
 					nil
 			})
@@ -3148,11 +3162,13 @@ func TestApplicationServerCleanup(t *testing.T) {
 			},
 			func(as *ttnpb.ApplicationPackageDefaultAssociation) (*ttnpb.ApplicationPackageDefaultAssociation, []string, error) {
 				return &ttnpb.ApplicationPackageDefaultAssociation{
-						Ids: defaultAssociationID,
+						Ids:         defaultAssociationID,
+						PackageName: "example",
 					},
 					[]string{
 						"ids.application_ids",
 						"ids.f_port",
+						"package_name",
 					},
 					nil
 			})

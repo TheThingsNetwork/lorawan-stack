@@ -67,7 +67,7 @@ func TestGithubDeviceRepository(t *testing.T) {
 		go func() {
 			for model := range modelCh {
 				atomic.AddUint32(&totalModels, 1)
-				if err := model.ValidateFields(ttnpb.EndDeviceModelFieldPathsNested...); err != nil {
+				if err := model.ValidateFields(); err != nil {
 					fmt.Printf("Failed to validate model %s/%s: %v -- %v\n", model.BrandId, model.ModelId, err, model.DatasheetUrl)
 					atomic.AddUint32(&failures, 1)
 				}
@@ -91,7 +91,7 @@ func TestGithubDeviceRepository(t *testing.T) {
 								fmt.Printf("Failed to retrieve uplink decoder for %v: %v\n", ids, err)
 								atomic.AddUint32(&failures, 1)
 							}
-							if err := d.ValidateFields(ttnpb.MessagePayloadDecoderFieldPathsNested...); err != nil {
+							if err := d.ValidateFields(); err != nil {
 								fmt.Printf("Failed to validate uplink encoder for %v: %v\n", ids, err)
 								atomic.AddUint32(&failures, 1)
 							}
@@ -102,7 +102,7 @@ func TestGithubDeviceRepository(t *testing.T) {
 								fmt.Printf("Failed to retrieve downlink decoder for %v: %v\n", ids, err)
 								atomic.AddUint32(&failures, 1)
 							}
-							if err := d.ValidateFields(ttnpb.MessagePayloadDecoderFieldPathsNested...); err != nil {
+							if err := d.ValidateFields(); err != nil {
 								fmt.Printf("Failed to validate downlink decoder for %v: %v\n", ids, err)
 								atomic.AddUint32(&failures, 1)
 							}
@@ -113,7 +113,7 @@ func TestGithubDeviceRepository(t *testing.T) {
 								fmt.Printf("Failed to retrieve downlink encoder for %v: %v\n", ids, err)
 								atomic.AddUint32(&failures, 1)
 							}
-							if err := d.ValidateFields(ttnpb.MessagePayloadEncoderFieldPathsNested...); err != nil {
+							if err := d.ValidateFields(); err != nil {
 								fmt.Printf("Failed to validate downlink encoder for %v: %v\n", ids, err)
 								atomic.AddUint32(&failures, 1)
 							}
@@ -129,7 +129,7 @@ func TestGithubDeviceRepository(t *testing.T) {
 		brandWg.Add(1)
 		go func() {
 			for brand := range brandCh {
-				if err := brand.ValidateFields(ttnpb.EndDeviceBrandFieldPathsNested...); err != nil {
+				if err := brand.ValidateFields(); err != nil {
 					fmt.Printf("Failed to validate brand %s: %v\n", brand.BrandId, err)
 					atomic.AddUint32(&failures, 1)
 				}

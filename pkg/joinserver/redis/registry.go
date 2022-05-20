@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -267,7 +267,7 @@ func (r *DeviceRegistry) set(ctx context.Context, tx *redis.Tx, uid string, gets
 				return nil, err
 			}
 		}
-		if err := updated.ValidateFields(sets...); err != nil {
+		if err := updated.ValidateFields(); err != nil {
 			return nil, err
 		}
 
@@ -570,7 +570,7 @@ func (r *KeyRegistry) SetByID(ctx context.Context, joinEUI, devEUI types.EUI64, 
 				return err
 			}
 		}
-		if err := updated.ValidateFields(sets...); err != nil {
+		if err := updated.ValidateFields(); err != nil {
 			return err
 		}
 
@@ -745,7 +745,7 @@ func (r *ApplicationActivationSettingRegistry) SetByID(ctx context.Context, appI
 					return err
 				}
 			}
-			if err := updated.ValidateFields(sets...); err != nil {
+			if err := updated.ValidateFields(); err != nil {
 				return err
 			}
 
