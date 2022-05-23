@@ -19,7 +19,6 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	qrcodegen "github.com/skip2/go-qrcode"
-	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -34,11 +33,7 @@ type endDeviceQRCodeGeneratorServer struct {
 // GetFormat implements EndDeviceQRCodeGenerator.
 func (s *endDeviceQRCodeGeneratorServer) GetFormat(ctx context.Context, req *ttnpb.GetQRCodeFormatRequest) (*ttnpb.QRCodeFormat, error) {
 	_, err := rpcmetadata.WithForwardedAuth(ctx, s.QRG.AllowInsecureForCredentials())
-	if errors.IsUnauthenticated(err) {
-		if clusterauth.Authorized(ctx) != nil {
-			return nil, errUnauthenticated.New()
-		}
-	} else if err != nil {
+	if err != nil {
 		return nil, err
 	}
 	format := s.QRG.endDevices.GetEndDeviceFormat(req.FormatId)
@@ -51,11 +46,7 @@ func (s *endDeviceQRCodeGeneratorServer) GetFormat(ctx context.Context, req *ttn
 // ListFormats implements EndDeviceQRCodeGenerator.
 func (s *endDeviceQRCodeGeneratorServer) ListFormats(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.QRCodeFormats, error) {
 	_, err := rpcmetadata.WithForwardedAuth(ctx, s.QRG.AllowInsecureForCredentials())
-	if errors.IsUnauthenticated(err) {
-		if clusterauth.Authorized(ctx) != nil {
-			return nil, errUnauthenticated.New()
-		}
-	} else if err != nil {
+	if err != nil {
 		return nil, err
 	}
 	res := &ttnpb.QRCodeFormats{
@@ -70,11 +61,7 @@ func (s *endDeviceQRCodeGeneratorServer) ListFormats(ctx context.Context, _ *pbt
 // Generate implements EndDeviceQRCodeGenerator.
 func (s *endDeviceQRCodeGeneratorServer) Generate(ctx context.Context, req *ttnpb.GenerateEndDeviceQRCodeRequest) (*ttnpb.GenerateQRCodeResponse, error) {
 	_, err := rpcmetadata.WithForwardedAuth(ctx, s.QRG.AllowInsecureForCredentials())
-	if errors.IsUnauthenticated(err) {
-		if clusterauth.Authorized(ctx) != nil {
-			return nil, errUnauthenticated.New()
-		}
-	} else if err != nil {
+	if err != nil {
 		return nil, err
 	}
 	formatter := s.QRG.endDevices.GetEndDeviceFormat(req.FormatId)
