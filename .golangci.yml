@@ -1,0 +1,118 @@
+run:
+  skip-dirs:
+    - node_modules
+
+linters:
+  disable-all: true
+  enable:
+    # Enabled by default:
+    - deadcode # Finds unused code; similar to "unused" below.
+    - errcheck # Finds unchecked errors.
+    - gosimple # Finds potential simplifications. See also: https://staticcheck.io/docs/checks/#S.
+    - govet # See "go tool vet help".
+    - ineffassign # Finds assignments that are not used.
+    - staticcheck # See also: https://staticcheck.io/docs/checks/#SA.
+    - structcheck # Finds unused struct fields.
+    - typecheck # Parses and type-checks Go code.
+    - unused # Finds unused consts, vars, funcs and types.
+    - varcheck # Pretty much the same as "unused".
+
+    # Enabled manually:
+    - asciicheck # Finds non-ASCII identifiers.
+    - bodyclose # Finds HTTP response bodies that are not closed.
+    - errorlint # Finds problems with error wrapping.
+    - exportloopref # Finds pointers to range variables.
+    - goconst # Finds repeated strings that could be replaced by a const.
+    - gocyclo # Finds funcs with high cyclomatic complexity.
+    - godot # Finds comments that do not end with a period.
+    - gofumpt # Finds files that were not gofumpt-ed.
+    - gosec # Finds security problems.
+    - lll # Finds lines that exceed the line length limit.
+    - makezero # Finds combinations of `make([]T, n)` and `append()`.
+    - nakedret # Finds naked returns.
+    - nilnil # Finds `return nil, nil`.
+    - paralleltest # Finds tests that could be executed in parallel.
+    - prealloc # Finds slice declarations that could be pre-allocated.
+    - revive # Runs `revive` with our existing config.
+    - rowserrcheck # Finds incorrect error checking when working with sql.Rows.
+    - sqlclosecheck # Finds missing `Close()` when working with sql.Rows.
+    - stylecheck # See also: https://staticcheck.io/docs/checks/#ST.
+    - tenv # Finds incorrect use of `os.Setenv()` in tests.
+    - thelper # Finds test utilities witout `t.Helper()`.
+    - tparallel # Finds incorrect use of `t.Parallel()` in tests.
+    - unconvert # Finds unnecessary type conversions.
+    - unparam # Finds unused function parameters.
+
+linters-settings:
+  goconst:
+    min-len: 5
+    min-occurrences: 5
+
+  gocyclo:
+    min-complexity: 20
+
+  godot:
+    capital: true
+    period: true
+
+  gosec:
+    exclude-generated: true
+
+  lll:
+    line-length: 120
+    tab-width: 2
+
+  nakedret:
+    max-func-lines: 20
+
+  revive:
+    enable-all-rules: true
+    rules:
+      - name: add-constant
+        disabled: true # Already checked by goconst.
+      - name: argument-limit
+        arguments: [8] # We may want to lower this, because it's a lot.
+      - name: bare-return
+        disabled: true # Already checked by nakedret.
+      - name: banned-characters
+        disabled: true # We don't have any.
+      - name: cognitive-complexity
+        disabled: true # We may want to enable this in the future.
+      - name: confusing-naming
+        disabled: true # We do actually use methods that only differ by capitalization.
+      - name: cyclomatic
+        disabled: true # Already checked by gocyclo.
+      - name: file-header
+        arguments: ['The Things Network Foundation, The Things Industries B.V.']
+      - name: flag-parameter
+        disabled: true # We do actually take boolean parameters in funcs.
+      - name: function-length
+        disabled: true # We do actually have some very long funcs.
+      - name: function-result-limit
+        arguments: [3]
+      - name: line-length-limit
+        disabled: true # Already checked by lll.
+      - name: max-public-structs
+        disabled: true
+      - name: nested-structs
+        disabled: true
+      - name: unhandled-error
+        disabled: true # Already checked by errcheck.
+
+  stylecheck:
+    checks:
+      - all
+
+issues:
+  include:
+    - EXC0002 # golint: comments on exported things
+    - EXC0005 # staticcheck: unnecessary "break" in "switch"
+    - EXC0011 # stylecheck: comments on exported things
+    - EXC0012 # revive: comments on exported things
+    - EXC0013 # revive: package comments starting with package name
+    - EXC0014 # revive: exported thing comment starting with exported thing
+  exclude-rules:
+    # False positive: https://github.com/kunwardeep/paralleltest/issues/8.
+    - linters:
+        - paralleltest
+      text: 'does not use range value in test Run'
