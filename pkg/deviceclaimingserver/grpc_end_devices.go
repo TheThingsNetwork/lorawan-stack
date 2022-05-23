@@ -21,6 +21,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
@@ -115,9 +116,13 @@ func (edcs *endDeviceClaimingServer) Claim(ctx context.Context, req *ttnpb.Claim
 			return nil, err
 		}
 		qrg := ttnpb.NewEndDeviceQRCodeGeneratorClient(conn)
+		callOpt, err := rpcmetadata.WithForwardedAuth(ctx, edcs.DCS.AllowInsecureForCredentials())
+		if err != nil {
+			return nil, err
+		}
 		data, err := qrg.Parse(ctx, &ttnpb.ParseEndDeviceQRCodeRequest{
 			QrCode: qrCode,
-		}, edcs.DCS.WithClusterAuth())
+		}, callOpt)
 		dev := data.GetEndDeviceTemplate().GetEndDevice()
 		if dev == nil {
 			return nil, errParseQRCode.New()

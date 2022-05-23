@@ -117,11 +117,7 @@ func (s *endDeviceQRCodeGeneratorServer) Generate(ctx context.Context, req *ttnp
 // Parse implements EndDeviceQRCodeGenerator.
 func (s *endDeviceQRCodeGeneratorServer) Parse(ctx context.Context, req *ttnpb.ParseEndDeviceQRCodeRequest) (*ttnpb.ParseEndDeviceQRCodeResponse, error) {
 	_, err := rpcmetadata.WithForwardedAuth(ctx, s.QRG.AllowInsecureForCredentials())
-	if errors.IsUnauthenticated(err) {
-		if clusterauth.Authorized(ctx) != nil {
-			return nil, errUnauthenticated.New()
-		}
-	} else if err != nil {
+	if err != nil {
 		return nil, err
 	}
 	data, err := s.QRG.endDevices.Parse(req.FormatId, req.QrCode)
