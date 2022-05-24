@@ -64,7 +64,7 @@ func runGoFrom(dir string, args ...string) error {
 }
 
 func writeToFile(filename string, value []byte) error {
-	return os.WriteFile(filename, value, 0644)
+	return os.WriteFile(filename, value, 0o644)
 }
 
 func outputGo(cmd string, args ...string) (string, error) {
@@ -160,7 +160,7 @@ func (g Go) Fmt() error {
 	if mg.Verbose() {
 		fmt.Printf("Formatting and simplifying %d Go packages\n", len(dirs))
 	}
-	return sh.RunCmd("gofmt", "-w", "-s")(dirs...)
+	return runGoTool(append([]string{"mvdan.cc/gofumpt@latest", "-w"}, dirs...)...)
 }
 
 // Lint lints all Go files.
@@ -243,7 +243,7 @@ func (g Go) Coveralls() error {
 	if err != nil {
 		return err
 	}
-	outFile, err := os.OpenFile("coveralls_"+goCoverageFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	outFile, err := os.OpenFile("coveralls_"+goCoverageFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o644)
 	if err != nil {
 		return err
 	}
