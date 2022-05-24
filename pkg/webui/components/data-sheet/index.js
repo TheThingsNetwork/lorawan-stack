@@ -94,7 +94,7 @@ DataSheet.propTypes = {
           sensitive: PropTypes.bool,
           /** Optional subitems of this item (same shape as item, but no deeper.
            * hierarchies). */
-          subItems: PropTypes.arrayOf(PropTypes.object),
+          subItems: PropTypes.arrayOf(PropTypes.shape({})),
         }),
       ),
     }),
@@ -151,7 +151,7 @@ DataSheetRow.propTypes = {
     sensitive: PropTypes.bool,
     /** Optional subitems of this item (same shape as item, but no deeper.
      * hierarchies). */
-    subItems: PropTypes.arrayOf(PropTypes.object),
+    subItems: PropTypes.arrayOf(PropTypes.shape({})),
   }).isRequired,
   sub: PropTypes.bool,
 }

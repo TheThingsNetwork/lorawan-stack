@@ -39,7 +39,7 @@ class TagGroup extends React.Component {
   static propTypes = {
     className: PropTypes.string,
     tagMaxWidth: PropTypes.number.isRequired,
-    tags: PropTypes.arrayOf(PropTypes.any).isRequired,
+    tags: PropTypes.arrayOf(PropTypes.instanceOf(Tag)).isRequired,
   }
 
   static defaultProps = {

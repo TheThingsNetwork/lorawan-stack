@@ -66,4 +66,12 @@ const PortalledBreadcrumbs = ({ className, ...rest }) => {
   return null
 }
 
+PortalledBreadcrumbs.propTypes = {
+  className: PropTypes.string,
+}
+
+PortalledBreadcrumbs.defaultProps = {
+  className: undefined,
+}
+
 export { PortalledBreadcrumbs as default, Breadcrumbs }
