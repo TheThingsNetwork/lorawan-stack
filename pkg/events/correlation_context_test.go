@@ -24,6 +24,7 @@ import (
 )
 
 func TestCorrelationContext(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	ctx := test.Context()

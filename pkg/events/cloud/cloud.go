@@ -128,7 +128,9 @@ func (ps *PubSub) subscribeTask(ctx context.Context) error {
 }
 
 // Subscribe to events from Go Cloud.
-func (ps *PubSub) Subscribe(ctx context.Context, names []string, ids []*ttnpb.EntityIdentifiers, hdl events.Handler) error {
+func (ps *PubSub) Subscribe(
+	ctx context.Context, names []string, ids []*ttnpb.EntityIdentifiers, hdl events.Handler,
+) error {
 	ps.subOnce.Do(func() {
 		ps.taskStarter.StartTask(&task.Config{
 			Context: ps.ctx,

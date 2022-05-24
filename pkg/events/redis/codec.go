@@ -87,10 +87,11 @@ func encodeEventMeta(evt events.Event, id *ttnpb.EntityIdentifiers) ([]string, e
 
 func decodeEventMeta(values map[string]interface{}) (*ttnpb.Event, error) {
 	var (
-		pb ttnpb.Event
-		ok bool
+		sparseEvent string
+		pb          ttnpb.Event
+		ok          bool
 	)
-	if sparseEvent, ok := values[eventSparseKey].(string); ok {
+	if sparseEvent, ok = values[eventSparseKey].(string); ok {
 		b64, err := base64.StdEncoding.DecodeString(sparseEvent)
 		if err != nil {
 			return nil, err

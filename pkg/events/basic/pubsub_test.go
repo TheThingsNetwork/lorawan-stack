@@ -34,7 +34,7 @@ func Example() {
 
 var timeout = (1 << 10) * test.Delay
 
-func TestPubSub(t *testing.T) {
+func TestPubSub(t *testing.T) { //nolint:paralleltest
 	events.IncludeCaller = true
 
 	test.RunTest(t, test.TestConfig{

@@ -57,7 +57,7 @@ type mockComponent struct {
 	task.Starter
 }
 
-func (m mockComponent) FromRequestContext(ctx context.Context) context.Context {
+func (mockComponent) FromRequestContext(ctx context.Context) context.Context {
 	return ctx
 }
 
@@ -75,7 +75,7 @@ func Example() {
 
 var timeout = (1 << 11) * test.Delay
 
-func TestRedisPubSub(t *testing.T) {
+func TestRedisPubSub(t *testing.T) { //nolint:paralleltest
 	events.IncludeCaller = true
 	taskStarter := task.StartTaskFunc(task.DefaultStartTask)
 
@@ -95,7 +95,7 @@ func TestRedisPubSub(t *testing.T) {
 	})
 }
 
-func TestRedisPubSubStore(t *testing.T) {
+func TestRedisPubSubStore(t *testing.T) { //nolint:paralleltest
 	events.IncludeCaller = true
 	taskStarter := task.StartTaskFunc(task.DefaultStartTask)
 

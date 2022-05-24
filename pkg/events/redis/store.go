@@ -18,6 +18,7 @@ import (
 	"context"
 	"crypto/sha1"
 	"encoding/base32"
+	"errors"
 	"strconv"
 	"strings"
 	"time"
@@ -65,12 +66,12 @@ func (ps *PubSubStore) storeEvent(ctx context.Context, tx redis.Cmdable, evt eve
 	if err != nil {
 		return err
 	}
-	tx.Set(ps.ctx, ps.eventDataKey(evt.Context(), evt.UniqueID()), b, ps.historyTTL)
+	tx.Set(ctx, ps.eventDataKey(evt.Context(), evt.UniqueID()), b, ps.historyTTL)
 	for _, cid := range evt.CorrelationIDs() {
 		key := ps.eventIndexKey(evt.Context(), cid)
-		tx.LPush(ps.ctx, key, evt.UniqueID())
-		tx.LTrim(ps.ctx, key, 0, int64(ps.correlationIDHistoryCount))
-		tx.Expire(ps.ctx, key, ps.historyTTL)
+		tx.LPush(ctx, key, evt.UniqueID())
+		tx.LTrim(ctx, key, 0, int64(ps.correlationIDHistoryCount))
+		tx.Expire(ctx, key, ps.historyTTL)
 	}
 	return nil
 }
@@ -159,7 +160,9 @@ func reverseEvents(slice []*ttnpb.Event) {
 	}
 }
 
-func (ps *PubSubStore) tailStream(ctx context.Context, names []string, ids *ttnpb.EntityIdentifiers, start string, tail int) (events []*ttnpb.Event, nextStart string, err error) {
+func (ps *PubSubStore) tailStream(
+	ctx context.Context, names []string, ids *ttnpb.EntityIdentifiers, start string, tail int,
+) (eventPBs []*ttnpb.Event, nextStart string, err error) {
 	matchNames := xMessageHasEventName(names...)
 	if tail > 0 {
 		msgs, err := ps.client.XRevRangeN(ctx, ps.eventStream(ctx, ids), "+", start, int64(tail)).Result()
@@ -169,8 +172,8 @@ func (ps *PubSubStore) tailStream(ctx context.Context, names []string, ids *ttnp
 		if len(msgs) == 0 {
 			return nil, start, nil
 		}
-		events = eventsFromXMessages(msgs, matchNames)
-		reverseEvents(events)
+		eventPBs = eventsFromXMessages(msgs, matchNames)
+		reverseEvents(eventPBs)
 		nextStart = msgs[0].ID
 	} else {
 		msgs, err := ps.client.XRange(ctx, ps.eventStream(ctx, ids), start, "+").Result()
@@ -180,17 +183,20 @@ func (ps *PubSubStore) tailStream(ctx context.Context, names []string, ids *ttnp
 		if len(msgs) == 0 {
 			return nil, start, nil
 		}
-		events = eventsFromXMessages(msgs, matchNames)
+		eventPBs = eventsFromXMessages(msgs, matchNames)
 		nextStart = msgs[len(msgs)-1].ID
 	}
-	if err = ps.loadEventData(ctx, events...); err != nil {
+	if err = ps.loadEventData(ctx, eventPBs...); err != nil {
 		return nil, "", err
 	}
-	return events, nextStart, nil
+	return eventPBs, nextStart, nil
 }
 
-// FetchHistory fetches the tail (optional) of historical events matching the given names (optional) and identifiers (mandatory) after the given time (optional).
-func (ps *PubSubStore) FetchHistory(ctx context.Context, names []string, ids []*ttnpb.EntityIdentifiers, after *time.Time, tail int) ([]events.Event, error) {
+// FetchHistory fetches the tail (optional) of historical events matching the given
+// names (optional) and identifiers (mandatory) after the given time (optional).
+func (ps *PubSubStore) FetchHistory(
+	ctx context.Context, names []string, ids []*ttnpb.EntityIdentifiers, after *time.Time, tail int,
+) ([]events.Event, error) {
 	start := "-"
 	switch {
 	case after == nil:
@@ -211,7 +217,8 @@ func (ps *PubSubStore) FetchHistory(ctx context.Context, names []string, ids []*
 		}
 		for _, evtPB := range evtPBs {
 			if after != nil {
-				if evtTime := ttnpb.StdTime(evtPB.GetTime()); evtTime != nil && !evtTime.Truncate(time.Millisecond).After(*after) {
+				if evtTime := ttnpb.StdTime(evtPB.GetTime()); evtTime != nil &&
+					!evtTime.Truncate(time.Millisecond).After(*after) {
 					continue
 				}
 			}
@@ -225,8 +232,11 @@ func (ps *PubSubStore) FetchHistory(ctx context.Context, names []string, ids []*
 	return evts, nil
 }
 
-// SubscribeWithHistory is like FetchHistory, but after fetching historical events, this continues sending live events until the context is done.
-func (ps *PubSubStore) SubscribeWithHistory(ctx context.Context, names []string, ids []*ttnpb.EntityIdentifiers, after *time.Time, tail int, hdl events.Handler) error {
+// SubscribeWithHistory is like FetchHistory, but after fetching historical events,
+// this continues sending live events until the context is done.
+func (ps *PubSubStore) SubscribeWithHistory(
+	ctx context.Context, names []string, ids []*ttnpb.EntityIdentifiers, after *time.Time, tail int, hdl events.Handler,
+) error {
 	start := "0-0"
 	switch {
 	case after == nil:
@@ -272,7 +282,8 @@ func (ps *PubSubStore) SubscribeWithHistory(ctx context.Context, names []string,
 		}
 		for _, evtPB := range evtPBs {
 			if after != nil {
-				if evtTime := ttnpb.StdTime(evtPB.GetTime()); evtTime != nil && !evtTime.Truncate(time.Millisecond).After(*after) {
+				if evtTime := ttnpb.StdTime(evtPB.GetTime()); evtTime != nil &&
+					!evtTime.Truncate(time.Millisecond).After(*after) {
 					continue
 				}
 			}
@@ -304,7 +315,7 @@ func (ps *PubSubStore) SubscribeWithHistory(ctx context.Context, names []string,
 			}
 
 			streams, err := ps.client.XRead(ctx, args).Result()
-			if err != nil && err != redis.Nil {
+			if err != nil && !errors.Is(err, redis.Nil) {
 				return ttnredis.ConvertError(err)
 			}
 			for _, stream := range streams {

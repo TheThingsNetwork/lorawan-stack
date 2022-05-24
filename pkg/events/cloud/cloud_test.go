@@ -37,7 +37,7 @@ func Example() {
 
 	cloudPubSub, err := cloud.NewPubSub(context.TODO(), taskStarter, "mem://events", "mem://events")
 	if err != nil {
-		// Handle error.
+		panic(err)
 	}
 
 	// Replace the default pubsub so that we will now publish to a Go Cloud pub sub.
@@ -46,7 +46,7 @@ func Example() {
 
 var timeout = (1 << 10) * test.Delay
 
-func TestCloudPubSub(t *testing.T) {
+func TestCloudPubSub(t *testing.T) { //nolint:paralleltest
 	events.IncludeCaller = true
 
 	taskStarter := task.StartTaskFunc(task.DefaultStartTask)
@@ -55,6 +55,7 @@ func TestCloudPubSub(t *testing.T) {
 		Name:    "json",
 		Timeout: 10 * timeout,
 		Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+			t.Helper()
 			pubsub, err := cloud.NewPubSub(ctx, taskStarter, "mem://json_events_test", "mem://json_events_test")
 			a.So(err, should.BeNil)
 			defer pubsub.Close(ctx)
@@ -67,6 +68,7 @@ func TestCloudPubSub(t *testing.T) {
 		Name:    "protobuf",
 		Timeout: 10 * timeout,
 		Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+			t.Helper()
 			pubsub, err := cloud.NewPubSub(ctx, taskStarter, "mem://protobuf_events_test", "mem://protobuf_events_test")
 			a.So(err, should.BeNil)
 			defer pubsub.Close(ctx)

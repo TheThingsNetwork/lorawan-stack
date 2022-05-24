@@ -32,17 +32,8 @@ import (
 	"google.golang.org/grpc/peer"
 )
 
-type wrappedEvent struct {
-	events.Event
-}
-
-type testData struct{}
-
-func (testData) GetCorrelationIDs() []string {
-	return []string{"TestNew"}
-}
-
 func TestNew(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 	ctx := events.ContextWithCorrelationID(test.Context(), t.Name())
 	evt := events.New(ctx, "test.evt", "test event", events.WithAuthFromContext())
@@ -82,7 +73,9 @@ func TestNew(t *testing.T) {
 }
 
 func TestUnmarshalJSON(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
+
 	{
 		evt := events.New(
 			context.Background(), "name", "description",
@@ -90,9 +83,9 @@ func TestUnmarshalJSON(t *testing.T) {
 			events.WithData("data"),
 			events.WithVisibility(ttnpb.Right_RIGHT_ALL),
 		)
-		json, err := json.Marshal(evt)
+		evtJSON, err := json.Marshal(evt)
 		a.So(err, should.BeNil)
-		evt2, err := events.UnmarshalJSON(json)
+		evt2, err := events.UnmarshalJSON(evtJSON)
 		a.So(err, should.BeNil)
 		a.So(evt2, should.Resemble, evt)
 	}
@@ -105,9 +98,9 @@ func TestUnmarshalJSON(t *testing.T) {
 			events.WithData(fieldmask),
 			events.WithVisibility(ttnpb.Right_RIGHT_ALL),
 		)
-		json, err := json.Marshal(evt)
+		evtJSON, err := json.Marshal(evt)
 		a.So(err, should.BeNil)
-		evt2, err := events.UnmarshalJSON(json)
+		evt2, err := events.UnmarshalJSON(evtJSON)
 		a.So(err, should.BeNil)
 		a.So(evt2.Data(), should.BeNil)
 	}
@@ -118,17 +111,19 @@ func Example() {
 	ctx := test.Context()
 
 	// This is required for unit test to pass.
-	defer test.SetDefaultEventsPubSub(basic.NewPubSub())()
+	defer test.SetDefaultEventsPubSub(basic.NewPubSub())() //nolint:revive
 
 	// The WaitGroup is only for synchronizing the unit test
 	var wg sync.WaitGroup
 	wg.Add(1)
 
-	events.Subscribe(ctx, []string{"ns.mac.adr.send_req"}, nil, events.HandlerFunc(func(e events.Event) {
+	if err := events.Subscribe(ctx, []string{"ns.mac.adr.send_req"}, nil, events.HandlerFunc(func(e events.Event) {
 		fmt.Printf("Received event %s\n", e.Name())
 
 		wg.Done() // only for synchronizing the unit test
-	}))
+	})); err != nil {
+		panic(err)
+	}
 
 	// You can send any arbitrary event; you don't have to pass any identifiers or data.
 	events.Publish(events.New(test.Context(), "test.hello_world", "the events system says hello, world"))
@@ -137,7 +132,10 @@ func Example() {
 	// Event names are lowercase snake_case and can be dot-separated as component.subsystem.subsystem.event
 	// Event descriptions are short descriptions of what the event means.
 	// Visibility rights are optional. If no rights are supplied, then the _ALL right is assumed.
-	adrSendEvent := events.Define("ns.mac.adr.send_req", "send ADR request", events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ))
+	adrSendEvent := events.Define(
+		"ns.mac.adr.send_req", "send ADR request",
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
+	)
 
 	// These variables come from the request or you got them from the db or something.
 	var (
@@ -146,7 +144,8 @@ func Example() {
 	)
 
 	// It's nice to be able to correlate events; we use a Correlation ID for that.
-	// In most cases, there will already be a correlation ID in the context; this function will append a new one to the ones already in the context.
+	// In most cases, there will already be a correlation ID in the context;
+	// this function will append a new one to the ones already in the context.
 	ctx = events.ContextWithCorrelationID(ctx, events.NewCorrelationID())
 
 	// Publishing an event to the events package will dispatch it on the "global" event pubsub.
