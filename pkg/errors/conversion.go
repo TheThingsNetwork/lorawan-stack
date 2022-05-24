@@ -17,6 +17,7 @@ package errors
 import (
 	"context"
 	"crypto/x509"
+	"errors"
 	"net"
 	"net/url"
 
@@ -25,124 +26,153 @@ import (
 )
 
 var (
-	errNetInvalidAddr    = DefineInvalidArgument("net_invalid_addr", "{message}", "message", "temporary", "timeout")
-	errNetAddr           = DefineUnavailable("net_addr", "{message}", "message", "temporary", "timeout")
-	errNetDNS            = DefineUnavailable("net_dns", "{message}", "message", "temporary", "timeout", "not_found")
-	errNetUnknownNetwork = DefineNotFound("net_unknown_network", "{message}", "message", "temporary", "timeout")
-	errNetOperation      = DefineUnavailable("net_operation", "{message}", "message", "op", "net", "source", "address", "timeout", "temporary")
+	errNetInvalidAddr = DefineInvalidArgument(
+		"net_invalid_addr", "{message}", "timeout",
+	)
+	errNetAddr = DefineUnavailable(
+		"net_addr", "{message}", "timeout",
+	)
+	errNetDNS = DefineUnavailable(
+		"net_dns", "{message}", "timeout", "not_found",
+	)
+	errNetUnknownNetwork = DefineNotFound(
+		"net_unknown_network", "{message}", "timeout",
+	)
+	errNetOperation = DefineUnavailable(
+		"net_operation", "{message}", "op", "net", "source", "address", "timeout",
+	)
 
 	errRequest = Define("request", "request to `{url}` failed", "op")
 	errURL     = DefineInvalidArgument("url", "invalid url `{url}`", "op")
 
-	errX509UnknownAuthority   = DefineUnavailable("x509_unknown_authority", "unknown certificate authority")
-	errX509Hostname           = DefineUnavailable("x509_hostname", "certificate authorized names do not match the requested name", "host")
-	errX509CertificateInvalid = DefineUnavailable("x509_certificate_invalid", "certificate invalid", "detail", "reason")
+	errX509UnknownAuthority = DefineUnavailable(
+		"x509_unknown_authority", "unknown certificate authority",
+	)
+	errX509Hostname = DefineUnavailable(
+		"x509_hostname", "certificate authorized names do not match the requested name", "host",
+	)
+	errX509CertificateInvalid = DefineUnavailable(
+		"x509_certificate_invalid", "certificate invalid", "detail", "reason",
+	)
 
-	errContextCancelled        = DefineCanceled("context_canceled", "context canceled")
-	errContextDeadlineExceeded = DefineDeadlineExceeded("context_deadline_exceeded", "context deadline exceeded")
+	errContextCancelled = DefineCanceled(
+		"context_canceled", "context canceled",
+	)
+	errContextDeadlineExceeded = DefineDeadlineExceeded(
+		"context_deadline_exceeded", "context deadline exceeded",
+	)
 )
 
 // From returns an *Error if it can be derived from the given input.
 // For a nil error, false will be returned.
-func From(err error) (out *Error, ok bool) {
+func From(err error) (out *Error, ok bool) { //nolint:gocyclo
 	if err == nil {
 		return nil, false
 	}
 	defer func() {
 		if out != nil {
-			copy := *out
-			out = &copy
+			clone := *out
+			out = &clone
 		}
 	}()
-	// Do not refactor this into a map, as value-type
-	// errors are not usable as indices in a map.
-	switch {
-	case err == context.Canceled:
+	if errors.Is(err, context.Canceled) {
 		return build(errContextCancelled, 0), true
-	case err == context.DeadlineExceeded:
+	}
+	if errors.Is(err, context.DeadlineExceeded) {
 		return build(errContextDeadlineExceeded, 0), true
 	}
-	switch err := err.(type) {
-	case *Error:
-		if err == nil {
-			return nil, false // This is invalid.
+	if matched := (*Error)(nil); errors.As(err, &matched) {
+		if matched == nil {
+			return nil, false
 		}
-		return err, true
-	case *Definition:
-		if err == nil {
-			return nil, false // This is invalid.
+		return matched, true
+	}
+	if matched := (*Definition)(nil); errors.As(err, &matched) {
+		if matched == nil {
+			return nil, false
 		}
-		return build(err, 0), true
-	case ErrorDetails: // Received over an API.
+		return build(matched, 0), true
+	}
+	if matched := (ErrorDetails)(nil); errors.As(err, &matched) {
 		var e Error
-		setErrorDetails(&e, err)
+		setErrorDetails(&e, matched)
 		return &e, true
-	case interface{ GRPCStatus() *status.Status }:
-		return FromGRPCStatus(err.GRPCStatus()), true
-	case validationError:
+	}
+	if matched := (interface{ GRPCStatus() *status.Status })(nil); errors.As(err, &matched) {
+		return FromGRPCStatus(matched.GRPCStatus()), true
+	}
+	if matched := (validationError)(nil); errors.As(err, &matched) {
 		e := build(errValidation, 0).WithAttributes(
-			"field", err.Field(),
-			"reason", err.Reason(),
-			"name", err.ErrorName(),
+			"field", matched.Field(),
+			"reason", matched.Reason(),
+			"name", matched.ErrorName(),
 		)
-		if cause := err.Cause(); cause != nil {
+		if cause := matched.Cause(); cause != nil {
 			e = e.WithCause(cause)
 		}
 		return e, true
-	case *net.DNSError:
+	}
+	if matched := (*net.DNSError)(nil); errors.As(err, &matched) {
 		e := build(errNetDNS, 0).WithAttributes(
-			"not_found", err.IsNotFound,
+			"not_found", matched.IsNotFound,
 		).WithAttributes(
-			netErrorDetails(err)...,
+			netErrorDetails(matched)...,
 		)
 		return e, true
-	case *net.AddrError:
-		return build(errNetAddr, 0).WithAttributes(netErrorDetails(err)...), true
-	case net.InvalidAddrError:
-		return build(errNetInvalidAddr, 0).WithAttributes(netErrorDetails(err)...), true
-	case net.UnknownNetworkError:
-		return build(errNetUnknownNetwork, 0).WithAttributes(netErrorDetails(err)...), true
-	case *net.OpError:
+	}
+	if matched := (*net.AddrError)(nil); errors.As(err, &matched) {
+		return build(errNetAddr, 0).WithAttributes(netErrorDetails(matched)...), true
+	}
+	if matched := (net.InvalidAddrError)(""); errors.As(err, &matched) {
+		return build(errNetInvalidAddr, 0).WithAttributes(netErrorDetails(matched)...), true
+	}
+	if matched := (net.UnknownNetworkError)(""); errors.As(err, &matched) {
+		return build(errNetUnknownNetwork, 0).WithAttributes(netErrorDetails(matched)...), true
+	}
+	if matched := (*net.OpError)(nil); errors.As(err, &matched) {
 		// Do not use netErrorDetails(err) as err.Error() will panic if err.Err is nil.
 		e := build(errNetOperation, 0).WithAttributes(
-			"op", err.Op,
-			"net", err.Net,
-			"timeout", err.Timeout(),
-			"temporary", err.Temporary(),
+			"op", matched.Op,
+			"net", matched.Net,
+			"timeout", matched.Timeout(),
 		)
-		if err.Addr != nil {
-			e = e.WithAttributes("address", err.Addr.String())
+		if matched.Addr != nil {
+			e = e.WithAttributes("address", matched.Addr.String())
 		}
-		if err.Source != nil {
-			e = e.WithAttributes("source", err.Source.String())
+		if matched.Source != nil {
+			e = e.WithAttributes("source", matched.Source.String())
 		}
-		if err.Err != nil {
-			e = e.WithCause(err.Err)
+		if matched.Err != nil {
+			e = e.WithCause(matched.Err)
 		}
 		return e, true
-	case *url.Error:
+	}
+	if matched := (*url.Error)(nil); errors.As(err, &matched) {
 		definition := errRequest
-		if err.Op == "parse" {
+		if matched.Op == "parse" {
 			definition = errURL
 		}
 		e := build(definition, 0).WithAttributes(
-			"url", err.URL,
-			"op", err.Op,
+			"url", matched.URL,
+			"op", matched.Op,
 		)
-		if err.Err != nil {
-			e = e.WithCause(err.Err)
+		if matched.Err != nil {
+			e = e.WithCause(matched.Err)
 		}
 		return e, true
-	case x509.CertificateInvalidError:
+	}
+	if matched := (x509.CertificateInvalidError{}); errors.As(err, &matched) {
 		return build(errX509CertificateInvalid, 0).WithAttributes(
-			"detail", err.Detail,
-			"reason", err.Reason,
+			"detail", matched.Detail,
+			"reason", matched.Reason,
 		), true
-	case x509.UnknownAuthorityError:
+	}
+	if matched := (x509.UnknownAuthorityError{}); errors.As(err, &matched) {
 		return build(errX509UnknownAuthority, 0), true
-	case x509.HostnameError:
+	}
+	if matched := (x509.HostnameError{}); errors.As(err, &matched) {
 		return build(errX509Hostname, 0).WithAttributes(
-			"host", err.Host,
+			"host", matched.Host,
 		), true
 	}
 	return nil, false
@@ -197,7 +227,6 @@ func setErrorDetails(err *Error, details ErrorDetails) {
 func netErrorDetails(err net.Error) []interface{} {
 	return []interface{}{
 		"message", err.Error(),
-		"temporary", err.Temporary(),
 		"timeout", err.Timeout(),
 	}
 }

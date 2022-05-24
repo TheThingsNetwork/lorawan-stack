@@ -15,6 +15,7 @@
 package errors
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 )
@@ -152,18 +153,18 @@ nextAttr:
 }
 
 // Attributes are not present in the error definition, so this just returns nil.
-func (d *Definition) Attributes() map[string]interface{} { return nil }
+func (*Definition) Attributes() map[string]interface{} { return nil }
 
 // PublicAttributes are not present in the error definition, so this just returns nil.
-func (d *Definition) PublicAttributes() map[string]interface{} { return nil }
+func (*Definition) PublicAttributes() map[string]interface{} { return nil }
 
 // Attributes returns the attributes of the errors, if they implement Attributes().
 // If more than one error is passed, subsequent error attributes will be added if not set.
 func Attributes(err ...error) map[string]interface{} {
 	attributes := make(map[string]interface{})
 	for _, err := range err {
-		if err, ok := err.(attributer); ok {
-			for k, v := range err.Attributes() {
+		if attrErr := (attributer)(nil); errors.As(err, &attrErr) {
+			for k, v := range attrErr.Attributes() {
 				if _, ok := attributes[k]; !ok {
 					attributes[k] = v
 				}
@@ -178,8 +179,8 @@ func Attributes(err ...error) map[string]interface{} {
 func PublicAttributes(err ...error) map[string]interface{} {
 	attributes := make(map[string]interface{})
 	for _, err := range err {
-		if err, ok := err.(publicAttributer); ok {
-			for k, v := range err.PublicAttributes() {
+		if attrErr := (publicAttributer)(nil); errors.As(err, &attrErr) {
+			for k, v := range attrErr.PublicAttributes() {
 				if _, ok := attributes[k]; !ok {
 					attributes[k] = v
 				}

@@ -23,6 +23,7 @@ import (
 )
 
 func TestCause(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	cause := errors.New("cause")
@@ -34,9 +35,7 @@ func TestCause(t *testing.T) {
 
 	err1 := errInvalidFoo.WithCause(cause)
 
-	a.So(func() {
-		err1.WithCause(cause)
-	}, should.Panic)
+	a.So(func() { err1.WithCause(cause) }, should.Panic) //nolint:errcheck
 
 	a.So(err1, should.HaveSameErrorDefinitionAs, errInvalidFoo)
 	a.So(err1.Cause(), should.EqualErrorOrDefinition, cause)

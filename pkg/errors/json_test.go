@@ -25,6 +25,7 @@ import (
 )
 
 func TestJSONConversion(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	errDef := errors.Define("test_json_conversion_err_def", "JSON Conversion Error", "foo")

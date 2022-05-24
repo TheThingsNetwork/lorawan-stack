@@ -24,6 +24,7 @@ import (
 )
 
 func TestGRPCConversion(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	errCause := errors.Define("test_grpc_conversion_err_cause", "gRPC Conversion Error Cause")

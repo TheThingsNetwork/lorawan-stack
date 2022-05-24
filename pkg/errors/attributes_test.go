@@ -23,13 +23,14 @@ import (
 )
 
 func TestAttributesError(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
-	var errInvalidFoo = errors.DefineInvalidArgument("test_attributes_invalid_foo", "Invalid Foo: {foo}", "foo")
+	errInvalidFoo := errors.DefineInvalidArgument("test_attributes_invalid_foo", "Invalid Foo: {foo}", "foo")
 
 	a.So(errInvalidFoo.Attributes(), should.BeEmpty)
 
-	a.So(func() { errInvalidFoo.WithAttributes("only_key") }, should.Panic)
+	a.So(func() { errInvalidFoo.WithAttributes("only_key") }, should.Panic) //nolint:errcheck
 
 	err1 := errInvalidFoo.WithAttributes("foo", "bar")
 	err2 := err1.WithAttributes("bar", "baz")
@@ -45,7 +46,9 @@ func TestAttributesError(t *testing.T) {
 }
 
 func TestAttributes(t *testing.T) {
-	tt := []struct {
+	t.Parallel()
+
+	tcs := []struct {
 		Name   string
 		V      interface{}
 		Expect interface{}
@@ -59,9 +62,11 @@ func TestAttributes(t *testing.T) {
 		{"array", [5]int{1, 2, 3}, "[1 2 3 0 0]"},
 	}
 
-	for _, tt := range tt {
-		t.Run(tt.Name, func(t *testing.T) {
-			assertions.New(t).So(errors.Supported(tt.V), should.Equal, tt.Expect)
+	for _, tc := range tcs {
+		tc := tc // shadow range variable.
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+			assertions.New(t).So(errors.Supported(tc.V), should.Equal, tc.Expect)
 		})
 	}
 }

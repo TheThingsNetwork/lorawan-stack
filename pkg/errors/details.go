@@ -14,7 +14,11 @@
 
 package errors
 
-import "github.com/golang/protobuf/proto"
+import (
+	"errors"
+
+	"github.com/golang/protobuf/proto"
+)
 
 type detailer interface {
 	Details() []proto.Message
@@ -68,8 +72,8 @@ func (*Definition) Details() []proto.Message { return nil }
 
 // Details gets the details of the error.
 func Details(err error) []proto.Message {
-	if c, ok := err.(detailer); ok {
-		return c.Details()
+	if detailsErr := (detailer)(nil); errors.As(err, &detailsErr) {
+		return detailsErr.Details()
 	}
 	if ttnErr, ok := From(err); ok {
 		return ttnErr.Details()

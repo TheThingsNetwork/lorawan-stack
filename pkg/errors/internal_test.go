@@ -22,9 +22,12 @@ import (
 )
 
 func TestMessageFormat(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
-	args := messageFormatArguments("Application with ID {app_id} could not be found in namespace { ns } or namespace {   ns } does not exist")
+	args := messageFormatArguments(
+		"Application with ID {app_id} could not be found in namespace { ns } or namespace {   ns } does not exist",
+	)
 	a.So(args, should.HaveLength, 2) // no duplicates
 	a.So(args, should.Contain, "app_id")
 	a.So(args, should.Contain, "ns")

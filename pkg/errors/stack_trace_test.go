@@ -23,6 +23,7 @@ import (
 )
 
 func TestStackTrace(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	err := errors.New("err")

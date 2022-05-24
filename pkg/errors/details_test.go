@@ -35,9 +35,10 @@ func stringDetail(s string) *detail {
 }
 
 func TestDetails(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
-	var errInvalidFoo = errors.DefineInvalidArgument("test_details_invalid_foo", "Invalid Foo")
+	errInvalidFoo := errors.DefineInvalidArgument("test_details_invalid_foo", "Invalid Foo")
 
 	a.So(errInvalidFoo.Details(), should.BeEmpty)
 

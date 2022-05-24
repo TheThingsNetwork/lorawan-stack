@@ -64,6 +64,7 @@ func Example() {
 }
 
 func TestFields(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	errBack := stderrors.New("back")
@@ -79,6 +80,7 @@ func TestFields(t *testing.T) {
 }
 
 func TestContextCanceled(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -92,6 +94,7 @@ func TestContextCanceled(t *testing.T) {
 }
 
 func TestContextDeadlineExceeded(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(5*time.Millisecond))
@@ -107,6 +110,7 @@ func TestContextDeadlineExceeded(t *testing.T) {
 }
 
 func TestNetErrors(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	for _, tc := range []struct {
@@ -129,7 +133,6 @@ func TestNetErrors(t *testing.T) {
 				a.So(errors.IsUnavailable(e), should.BeTrue)
 				a.So(e.PublicAttributes(), should.Resemble, map[string]interface{}{
 					"message":   err.Error(),
-					"temporary": false,
 					"timeout":   false,
 					"not_found": true,
 				})
@@ -142,9 +145,8 @@ func TestNetErrors(t *testing.T) {
 				a.So(e.FullName(), should.Equal, "pkg/errors:net_unknown_network")
 				a.So(errors.IsNotFound(e), should.BeTrue)
 				a.So(e.PublicAttributes(), should.Resemble, map[string]interface{}{
-					"message":   err.Error(),
-					"temporary": false,
-					"timeout":   false,
+					"message": err.Error(),
+					"timeout": false,
 				})
 			},
 		},
@@ -155,9 +157,8 @@ func TestNetErrors(t *testing.T) {
 				a.So(e.FullName(), should.Equal, "pkg/errors:net_invalid_addr")
 				a.So(errors.IsInvalidArgument(e), should.BeTrue)
 				a.So(e.PublicAttributes(), should.Resemble, map[string]interface{}{
-					"message":   err.Error(),
-					"temporary": false,
-					"timeout":   false,
+					"message": err.Error(),
+					"timeout": false,
 				})
 			},
 		},
@@ -171,9 +172,8 @@ func TestNetErrors(t *testing.T) {
 				a.So(e.FullName(), should.Equal, "pkg/errors:net_addr")
 				a.So(errors.IsUnavailable(e), should.BeTrue)
 				a.So(e.PublicAttributes(), should.Resemble, map[string]interface{}{
-					"message":   err.Error(),
-					"temporary": false,
-					"timeout":   false,
+					"message": err.Error(),
+					"timeout": false,
 				})
 			},
 		},
@@ -186,16 +186,15 @@ func TestNetErrors(t *testing.T) {
 				Net:    "0.0.0.0",
 				Err:    nil,
 			},
-			Validate: func(err error, e *errors.Error, a *assertions.Assertion) {
+			Validate: func(_ error, e *errors.Error, a *assertions.Assertion) {
 				a.So(e.FullName(), should.Equal, "pkg/errors:net_operation")
 				a.So(errors.IsUnavailable(e), should.BeTrue)
 				a.So(e.PublicAttributes(), should.Resemble, map[string]interface{}{
-					"temporary": false,
-					"timeout":   false,
-					"address":   "1.1.1.1",
-					"source":    "2.2.2.2",
-					"net":       "0.0.0.0",
-					"op":        "read",
+					"timeout": false,
+					"address": "1.1.1.1",
+					"source":  "2.2.2.2",
+					"net":     "0.0.0.0",
+					"op":      "read",
 				})
 			},
 		},
@@ -208,22 +207,23 @@ func TestNetErrors(t *testing.T) {
 				Net:    "0.0.0.0",
 				Err:    fmt.Errorf("dummy"),
 			},
-			Validate: func(err error, e *errors.Error, a *assertions.Assertion) {
+			Validate: func(_ error, e *errors.Error, a *assertions.Assertion) {
 				a.So(e.FullName(), should.Equal, "pkg/errors:net_operation")
 				a.So(errors.IsUnavailable(e), should.BeTrue)
 				a.So(e.PublicAttributes(), should.Resemble, map[string]interface{}{
-					"temporary": false,
-					"timeout":   false,
-					"address":   "1.1.1.1",
-					"source":    "2.2.2.2",
-					"net":       "0.0.0.0",
-					"op":        "read",
+					"timeout": false,
+					"address": "1.1.1.1",
+					"source":  "2.2.2.2",
+					"net":     "0.0.0.0",
+					"op":      "read",
 				})
 				a.So(e.Cause(), should.Resemble, fmt.Errorf("dummy"))
 			},
 		},
 	} {
+		tc := tc // shadow range variable.
 		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
 			err, ok := errors.From(tc.Error)
 			a.So(ok, should.BeTrue)
 			tc.Validate(tc.Error, err, a)

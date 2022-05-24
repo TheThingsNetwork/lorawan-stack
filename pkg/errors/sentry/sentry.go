@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package sentry converts errors to Sentry events.
 package sentry
 
 import (
@@ -32,7 +33,7 @@ func NewEvent(err error) *sentry.Event {
 
 	errStack := errors.Stack(err)
 
-	var messages []string
+	messages := make([]string, 0, len(errStack))
 
 	for i, err := range errStack {
 		messages = append(messages, err.Error())
