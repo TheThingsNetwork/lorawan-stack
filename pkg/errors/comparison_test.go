@@ -23,6 +23,7 @@ import (
 )
 
 func TestResembles(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	a.So(errors.Resemble(nil, nil), should.BeTrue)
@@ -53,6 +54,12 @@ func TestResembles(t *testing.T) {
 
 	defWrapper := errors.Define("wrapper", "something went wrong")
 
-	a.So(errors.Resemble(defWrapper.WithCause(defPermissionDenied), defWrapper), should.BeTrue)
-	a.So(errors.Resemble(defWrapper.WithCause(defPermissionDenied), defWrapper.WithCause(defInvalidArgument)), should.BeTrue)
+	a.So(errors.Resemble(
+		defWrapper.WithCause(defPermissionDenied),
+		defWrapper,
+	), should.BeTrue)
+	a.So(errors.Resemble(
+		defWrapper.WithCause(defPermissionDenied),
+		defWrapper.WithCause(defInvalidArgument),
+	), should.BeTrue)
 }

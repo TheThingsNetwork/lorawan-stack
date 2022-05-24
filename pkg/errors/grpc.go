@@ -24,15 +24,15 @@ import (
 )
 
 // FromGRPCStatus converts the gRPC status message into an Error.
-func FromGRPCStatus(status *status.Status) *Error {
+func FromGRPCStatus(grpcStatus *status.Status) *Error {
 	err := build(&Definition{
-		code:          uint32(status.Code()),
-		messageFormat: status.Message(),
+		code:          uint32(grpcStatus.Code()),
+		messageFormat: grpcStatus.Message(),
 	}, 0)
 	if ErrorDetailsFromProto == nil {
 		return err
 	}
-	detailMsgs := status.Details()
+	detailMsgs := grpcStatus.Details()
 	detailProtos := make([]proto.Message, 0, len(detailMsgs))
 	for _, msg := range detailMsgs { // convert to []proto.Message
 		if msg, ok := msg.(proto.Message); ok {
@@ -112,7 +112,9 @@ func (e *Error) GRPCStatus() *status.Status {
 
 // UnaryServerInterceptor makes sure that returned TTN errors contain a CorrelationID.
 func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	return func(
+		ctx context.Context, req interface{}, _ *grpc.UnaryServerInfo, handler grpc.UnaryHandler,
+	) (interface{}, error) {
 		res, err := handler(ctx, req)
 		if ttnErr, ok := From(err); ok {
 			err = ttnErr
@@ -123,7 +125,9 @@ func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 
 // StreamServerInterceptor makes sure that returned TTN errors contain a CorrelationID.
 func StreamServerInterceptor() grpc.StreamServerInterceptor {
-	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+	return func(
+		srv interface{}, stream grpc.ServerStream, _ *grpc.StreamServerInfo, handler grpc.StreamHandler,
+	) error {
 		err := handler(srv, stream)
 		if ttnErr, ok := From(err); ok {
 			err = ttnErr
@@ -134,7 +138,14 @@ func StreamServerInterceptor() grpc.StreamServerInterceptor {
 
 // UnaryClientInterceptor converts gRPC errors to regular errors.
 func UnaryClientInterceptor() grpc.UnaryClientInterceptor {
-	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+	return func(
+		ctx context.Context,
+		method string,
+		req, reply interface{},
+		cc *grpc.ClientConn,
+		invoker grpc.UnaryInvoker,
+		opts ...grpc.CallOption,
+	) error {
 		err := invoker(ctx, method, req, reply, cc, opts...)
 		if ttnErr, ok := From(err); ok {
 			return ttnErr
@@ -165,7 +176,14 @@ func (w wrappedStream) RecvMsg(m interface{}) error {
 
 // StreamClientInterceptor converts gRPC errors to regular errors.
 func StreamClientInterceptor() grpc.StreamClientInterceptor {
-	return func(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
+	return func(
+		ctx context.Context,
+		desc *grpc.StreamDesc,
+		cc *grpc.ClientConn,
+		method string,
+		streamer grpc.Streamer,
+		opts ...grpc.CallOption,
+	) (grpc.ClientStream, error) {
 		s, err := streamer(ctx, desc, cc, method, opts...)
 		if ttnErr, ok := From(err); ok {
 			return nil, ttnErr

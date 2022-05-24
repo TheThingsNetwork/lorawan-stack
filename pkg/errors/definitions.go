@@ -152,7 +152,7 @@ func define(code uint32, name, messageFormat string, publicAttributes ...string)
 
 	parsedMessageFormat, err := formatter.Parse(messageFormat)
 	if err != nil {
-		panic(fmt.Errorf("could not parse message format `%s` for %s: %s", messageFormat, fullName, err))
+		panic(fmt.Errorf("could not parse message format `%s` for %s: %w", messageFormat, fullName, err))
 	}
 	def.parsedMessageFormat = parsedMessageFormat
 
@@ -249,7 +249,7 @@ func DefineAborted(name, messageFormat string, publicAttributes ...string) *Defi
 
 // OutOfRange - not used for now
 
-// Unimplemented defines a registered error of type Unimplemented.
+// DefineUnimplemented defines a registered error of type Unimplemented.
 func DefineUnimplemented(name, messageFormat string, publicAttributes ...string) *Definition {
 	def := define(uint32(codes.Unimplemented), name, messageFormat, publicAttributes...)
 	return def

@@ -16,6 +16,7 @@ package errors
 
 import (
 	"context"
+	"errors"
 
 	"google.golang.org/grpc/codes"
 )
@@ -41,14 +42,14 @@ func (e *Error) Code() uint32 {
 }
 
 func code(err error) uint32 {
-	switch err {
-	case context.Canceled:
+	switch {
+	case errors.Is(err, context.Canceled):
 		return uint32(codes.Canceled)
-	case context.DeadlineExceeded:
+	case errors.Is(err, context.DeadlineExceeded):
 		return uint32(codes.DeadlineExceeded)
 	}
-	if c, ok := err.(coder); ok {
-		return c.Code()
+	if codeErr := (coder)(nil); errors.As(err, &codeErr) {
+		return codeErr.Code()
 	}
 	if ttnErr, ok := From(err); ok {
 		return ttnErr.Code()

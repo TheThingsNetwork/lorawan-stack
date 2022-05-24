@@ -26,6 +26,7 @@ import (
 )
 
 func TestHTTP(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	errDef := errors.DefineInvalidArgument("test_http_conversion_err_def", "HTTP Conversion Error", "foo")
@@ -34,8 +35,9 @@ func TestHTTP(t *testing.T) {
 	errHello := errDef.WithAttributes("foo", "bar", "baz", "qux")
 	errHelloExpected := errDef.WithAttributes("foo", "bar")
 
-	handler := func(w http.ResponseWriter, r *http.Request) {
-		errors.ToHTTP(errHello, w)
+	handler := func(w http.ResponseWriter, _ *http.Request) {
+		err := errors.ToHTTP(errHello, w)
+		a.So(err, should.BeNil)
 	}
 
 	req := httptest.NewRequest("GET", "http://example.com/err", nil)

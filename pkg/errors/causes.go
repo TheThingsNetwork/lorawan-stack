@@ -14,6 +14,8 @@
 
 package errors
 
+import "errors"
+
 type causer interface {
 	Cause() error
 }
@@ -68,11 +70,10 @@ func (*Definition) Cause() error { return nil }
 
 // Cause returns the cause of the given error, if any.
 func Cause(err error) error {
-	c, ok := err.(causer)
-	if !ok {
-		return nil
+	if causeErr := (causer)(nil); errors.As(err, &causeErr) {
+		return causeErr.Cause()
 	}
-	return c.Cause()
+	return nil
 }
 
 // RootCause walks up the "error chain" until it finds the root cause of an error.
