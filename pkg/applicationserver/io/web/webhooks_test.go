@@ -76,7 +76,7 @@ func TestWebhooks(t *testing.T) {
 	}
 
 	// Use a dummy JWT for auth check.
-	var longAuthHeader = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoidGVzdHdocm9sZSIsIklzc3VlciI6Iklzc3VlciIsIlVzZXJuYW1lIjoidGVzdHVzZXIiLCJleHAiOjE2NDI0MjU3NDgsImlhdCI6MTY0MjQyNTc0OH0.imuGY_5xnhZYSqjPrc6EUoYV1eapswDBUIBXKVCIYSw"
+	longAuthHeader := "Bearer eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoidGVzdHdocm9sZSIsIklzc3VlciI6Iklzc3VlciIsIlVzZXJuYW1lIjoidGVzdHVzZXIiLCJleHAiOjE2NDI0MjU3NDgsImlhdCI6MTY0MjQyNTc0OH0.imuGY_5xnhZYSqjPrc6EUoYV1eapswDBUIBXKVCIYSw" //nolint:lll
 
 	for _, tc := range []struct {
 		prefix string

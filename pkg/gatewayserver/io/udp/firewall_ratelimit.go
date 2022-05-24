@@ -40,9 +40,7 @@ func NewRateLimitingFirewall(firewall Firewall, messages int, threshold time.Dur
 	}
 }
 
-var (
-	errRateExceeded = errors.DefineResourceExhausted("rate_exceeded", "gateway traffic exceeded allowed rate")
-)
+var errRateExceeded = errors.DefineResourceExhausted("rate_exceeded", "gateway traffic exceeded allowed rate")
 
 func (f *rateLimitingFirewall) Filter(packet encoding.Packet) error {
 	if packet.GatewayEUI == nil {

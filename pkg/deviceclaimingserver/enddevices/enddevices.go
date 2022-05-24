@@ -195,7 +195,6 @@ func (upstream *Upstream) Unclaim(ctx context.Context, in *ttnpb.EndDeviceIdenti
 		return nil, err
 	}
 	return &pbtypes.Empty{}, nil
-
 }
 
 // GetInfoByJoinEUI implements EndDeviceClaimingServer.

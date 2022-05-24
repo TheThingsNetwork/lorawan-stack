@@ -96,12 +96,14 @@ func TestNetworkServerCleanup(t *testing.T) {
 			"ids.application_ids",
 			"ids.dev_eui",
 			"ids.device_id",
-			"ids.join_eui"}, func(ctx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			"ids.join_eui",
+		}, func(ctx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			return dev, []string{
 				"ids.application_ids",
 				"ids.dev_eui",
 				"ids.device_id",
-				"ids.join_eui"}, nil
+				"ids.join_eui",
+			}, nil
 		})
 		if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
 			t.Fatalf("Failed to create device: %s", err)

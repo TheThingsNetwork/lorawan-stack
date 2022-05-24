@@ -31,9 +31,11 @@ var (
 	ErrReuseDevNonce     = errReuseDevNonce
 )
 
-type AsJsServer = asJsServer
-type NsJsServer = nsJsServer
-type JsDeviceServer = jsEndDeviceRegistryServer
+type (
+	AsJsServer     = asJsServer
+	NsJsServer     = nsJsServer
+	JsDeviceServer = jsEndDeviceRegistryServer
+)
 
 type MockDeviceRegistry struct {
 	GetByEUIFunc  func(context.Context, types.EUI64, types.EUI64, []string) (*ttnpb.ContextualEndDevice, error)

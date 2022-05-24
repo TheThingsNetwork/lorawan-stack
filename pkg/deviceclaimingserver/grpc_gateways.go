@@ -22,8 +22,7 @@ import (
 )
 
 // noopGCLS is a no-op GCLS.
-type noopGCLS struct {
-}
+type noopGCLS struct{}
 
 // Claim implements GatewayClaimingServer.
 func (noopGCLS) Claim(ctx context.Context, req *ttnpb.ClaimGatewayRequest) (ids *ttnpb.GatewayIdentifiers, retErr error) {

@@ -53,10 +53,8 @@ type ApplicationAccessAuthorizer interface {
 	RequireApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers, required ...ttnpb.Right) error
 }
 
-var (
-	// InteropAuthorizer authorizes the caller by proof of identity used with LoRaWAN Backend Interfaces.
-	InteropAuthorizer ExternalAuthorizer = new(interop.Authorizer)
-)
+// InteropAuthorizer authorizes the caller by proof of identity used with LoRaWAN Backend Interfaces.
+var InteropAuthorizer ExternalAuthorizer = new(interop.Authorizer)
 
 type clusterAuthorizer struct {
 	reqCtx context.Context

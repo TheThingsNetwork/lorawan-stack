@@ -1280,7 +1280,7 @@ This command may take end device identifiers from stdin.`,
 				ext = exts[0]
 			}
 			filename := path.Join(folder, device.Ids.DeviceId+ext)
-			if err := os.WriteFile(filename, res.Image.Embedded.Data, 0o644); err != nil {
+			if err := os.WriteFile(filename, res.Image.Embedded.Data, 0o644); err != nil { //nolint:gas
 				return err
 			}
 

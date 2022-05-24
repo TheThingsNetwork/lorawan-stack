@@ -75,9 +75,8 @@ func TestVerify(t *testing.T) {
 }
 
 func ExampleAuthorized() {
-	var ( // Assume this comes from a hypothetical inter-cluster RPC call.
-		ctx context.Context
-	)
+	// Assume this comes from a hypothetical inter-cluster RPC call.
+	var ctx context.Context
 
 	if err := cluster.Authorized(ctx); err != nil {
 		// return err

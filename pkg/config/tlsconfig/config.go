@@ -195,7 +195,7 @@ var (
 // This list can be passed to tls.Config
 func (c *ServerAuth) GetCipherSuites() ([]uint16, error) {
 	var cipherSuites []uint16
-	var cs = make(map[string]uint16)
+	cs := make(map[string]uint16)
 	for _, c := range tls.CipherSuites() {
 		cs[c.Name] = c.ID
 	}
@@ -203,7 +203,7 @@ func (c *ServerAuth) GetCipherSuites() ([]uint16, error) {
 		cs[c.Name] = c.ID
 	}
 	for _, c := range c.CipherSuites {
-		var cipher, got = cs[c]
+		cipher, got := cs[c]
 		if !got {
 			return nil, errInvalidCipherSuite.WithAttributes("cipher", c)
 		}

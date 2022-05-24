@@ -190,7 +190,7 @@ func TestConfigEnv(t *testing.T) {
 	a.So(settings, should.Resemble, &example{
 		Bool:      false,
 		Duration:  10 * time.Minute,
-		Time:      time.Date(2017, time.August, 12, 01, 02, 03, 0, time.UTC),
+		Time:      time.Date(2017, time.August, 12, 1, 2, 3, 0, time.UTC),
 		Float:     -112.45,
 		Int:       345,
 		String:    "bababa",
@@ -301,7 +301,7 @@ func TestConfigFlags(t *testing.T) {
 	a.So(settings, should.Resemble, &example{
 		Bool:      true,
 		Duration:  10 * time.Minute,
-		Time:      time.Date(2017, time.August, 12, 01, 02, 03, 0, time.UTC),
+		Time:      time.Date(2017, time.August, 12, 1, 2, 3, 0, time.UTC),
 		Float:     12.45,
 		Int:       345,
 		String:    "bababa",

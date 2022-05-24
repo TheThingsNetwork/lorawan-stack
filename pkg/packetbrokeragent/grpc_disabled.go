@@ -22,8 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-type disabledServer struct {
-}
+type disabledServer struct{}
 
 var errNotEnabled = errors.DefineFailedPrecondition("not_enabled", "Packet Broker is not enabled")
 

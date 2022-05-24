@@ -42,7 +42,7 @@ func GenManPages(root *cobra.Command) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			dir, _ := cmd.Flags().GetString("out")
 			if _, err := os.Stat(dir); os.IsNotExist(err) {
-				if err := os.MkdirAll(dir, 0755); err != nil {
+				if err := os.MkdirAll(dir, 0o755); err != nil {
 					return err
 				}
 			}
@@ -75,7 +75,7 @@ func GenMDDoc(root *cobra.Command) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			dir, _ := cmd.Flags().GetString("out")
 			if _, err := os.Stat(dir); os.IsNotExist(err) {
-				if err := os.MkdirAll(dir, 0755); err != nil {
+				if err := os.MkdirAll(dir, 0o755); err != nil {
 					return err
 				}
 			}
@@ -128,7 +128,6 @@ func GenJSONTree(root *cobra.Command) *cobra.Command {
 		Hidden: true,
 		Short:  fmt.Sprintf("Generate JSON tree for %s", root.Name()),
 		RunE: func(cmd *cobra.Command, args []string) error {
-
 			dir, _ := cmd.Flags().GetString("out")
 
 			out := filepath.Join(dir, root.Name()+".json")

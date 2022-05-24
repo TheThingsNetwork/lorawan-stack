@@ -82,11 +82,11 @@ func TestStatusRaw(t *testing.T) {
 
 	a.So(status.BootTime, should.NotBeNil)
 	a.So(status.Time, should.NotBeNil)
-	currentTime := time.Date(2017, 06, 8, 9, 40, 42, 0, time.UTC)
+	currentTime := time.Date(2017, 6, 8, 9, 40, 42, 0, time.UTC)
 	if a.So(status.Time, should.NotBeNil) {
 		a.So(*ttnpb.StdTime(status.Time), should.Equal, currentTime)
 	}
-	bootTime := time.Date(2017, 06, 7, 9, 40, 42, 0, time.UTC)
+	bootTime := time.Date(2017, 6, 7, 9, 40, 42, 0, time.UTC)
 	if a.So(status.BootTime, should.NotBeNil) {
 		a.So(*ttnpb.StdTime(status.BootTime), should.Equal, bootTime)
 	}

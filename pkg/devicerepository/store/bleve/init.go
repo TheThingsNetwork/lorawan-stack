@@ -233,7 +233,7 @@ func prepareWorkingDirectory(ctx context.Context, workingDirectory, lorawanDevic
 			return nil
 		}
 		destination := filepath.Join(workingDirectory, file)
-		if err := os.MkdirAll(path.Dir(destination), 0755); err != nil {
+		if err := os.MkdirAll(path.Dir(destination), 0o755); err != nil {
 			return err
 		}
 		b, err := os.ReadFile(fullPath)

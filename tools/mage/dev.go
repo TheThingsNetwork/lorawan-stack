@@ -107,14 +107,14 @@ func (Dev) SQLDump() error {
 	if mg.Verbose() {
 		fmt.Println("Saving sql database dump")
 	}
-	if err := os.MkdirAll(".cache", 0755); err != nil {
+	if err := os.MkdirAll(".cache", 0o755); err != nil {
 		return err
 	}
 	output, err := sh.Output("docker-compose", dockerComposeFlags("exec", "-T", "postgres", "pg_dump", devDatabaseName)...)
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(filepath.Join(".cache", "sqldump.sql"), []byte(output), 0644)
+	return os.WriteFile(filepath.Join(".cache", "sqldump.sql"), []byte(output), 0o644)
 }
 
 // SQLCreateSeedDB creates a database template from the current dump.
@@ -139,7 +139,6 @@ func (Dev) SQLRestore(ctx context.Context) error {
 		return fmt.Errorf("Dumpfile does not exist: %w", d)
 	}
 	return sh.Run(filepath.Join("tools", "mage", "scripts", "recreate-db-from-dump.sh"), devDatabaseName, d)
-
 }
 
 // RedisFlush deletes all keys from redis.
@@ -301,10 +300,10 @@ func (Dev) StartDevStack() error {
 	if mg.Verbose() {
 		fmt.Println("Starting the Stack")
 	}
-	if err := os.MkdirAll(".cache", 0755); err != nil {
+	if err := os.MkdirAll(".cache", 0o755); err != nil {
 		return err
 	}
-	logFile, err := os.OpenFile(filepath.Join(".cache", "devStack.log"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	logFile, err := os.OpenFile(filepath.Join(".cache", "devStack.log"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o644)
 	if err != nil {
 		return err
 	}

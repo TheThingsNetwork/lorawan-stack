@@ -19,8 +19,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-type json struct {
-}
+type json struct{}
 
 func (json) FromUp(msg *ttnpb.ApplicationUp) ([]byte, error) {
 	return jsonpb.TTN().Marshal(msg)

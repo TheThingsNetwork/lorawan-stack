@@ -79,7 +79,8 @@ func (js Js) runCypress(command string, args ...string) error {
 	return js.runYarnCommand("cypress", append([]string{
 		command,
 		"--config-file", filepath.Join("config", "cypress.json"),
-		"--config", fmt.Sprintf("baseUrl=%s", js.frontendURL())},
+		"--config", fmt.Sprintf("baseUrl=%s", js.frontendURL()),
+	},
 		args...)...)
 }
 
@@ -211,7 +212,7 @@ func (js Js) Messages() error {
 	if err = sh.Rm(filepath.Join(".cache", "messages")); err != nil {
 		return fmt.Errorf("failed to delete existing messages: %w", err)
 	}
-	if err = os.MkdirAll(filepath.Join("pkg", "webui", "locales"), 0755); err != nil {
+	if err = os.MkdirAll(filepath.Join("pkg", "webui", "locales"), 0o755); err != nil {
 		return fmt.Errorf("failed to create locale directory: %w", err)
 	}
 	return execYarn(nil, os.Stderr, "babel", filepath.Join("pkg", "webui"))

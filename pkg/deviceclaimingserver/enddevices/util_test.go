@@ -53,6 +53,7 @@ func (mockEDCS) GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, ids clu
 func (mockEDCS) AuthInfo(context.Context) (*ttnpb.AuthInfoResponse, error) {
 	return nil, nil
 }
+
 func (mockEDCS) AllowInsecureForCredentials() bool {
 	return true
 }

@@ -194,11 +194,11 @@ func saveCheck(result *Update) error {
 	}
 	_, err = os.Stat(filepath.Dir(cacheFile))
 	if os.IsNotExist(err) {
-		if err = os.MkdirAll(filepath.Dir(cacheFile), 0700); err != nil {
+		if err = os.MkdirAll(filepath.Dir(cacheFile), 0o700); err != nil {
 			return err
 		}
 	}
-	f, err := os.OpenFile(cacheFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	f, err := os.OpenFile(cacheFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
 	if err != nil {
 		return err
 	}

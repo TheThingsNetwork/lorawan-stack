@@ -85,7 +85,6 @@ func TestGRPC(t *testing.T) {
 	)
 
 	t.Run("UnaryServerInterceptor", func(t *testing.T) {
-
 		for _, tc := range []struct {
 			name    string
 			limiter *mockLimiter

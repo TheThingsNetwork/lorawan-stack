@@ -22,12 +22,9 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
-var (
-	Timeout = (1 << 8) * test.Delay
-)
+var Timeout = (1 << 8) * test.Delay
 
-type byteToSerialNumber struct {
-}
+type byteToSerialNumber struct{}
 
 func (p *byteToSerialNumber) UniqueID(entry *pbtypes.Struct) (string, error) {
 	return strconv.Itoa(int(entry.Fields["serial_number"].GetNumberValue())), nil

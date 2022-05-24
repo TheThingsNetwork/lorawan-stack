@@ -41,7 +41,8 @@ func fetchEntityRights(ctx context.Context, id string, f EntityFetcher) (res str
 	OrgErr    error
 	UsrRights *ttnpb.Rights
 	UsrErr    error
-}) {
+},
+) {
 	var wg sync.WaitGroup
 	wg.Add(5)
 	go func() {
