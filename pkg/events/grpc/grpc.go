@@ -39,8 +39,6 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-const workersPerCPU = 2
-
 // NewEventsServer returns a new EventsServer on the given PubSub.
 func NewEventsServer(ctx context.Context, pubsub events.PubSub) *EventsServer {
 	if _, ok := pubsub.(events.Store); ok {
@@ -131,7 +129,7 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 
 	ctx := stream.Context()
 
-	if err := rights.RequireAny(ctx, req.Identifiers...); err != nil {
+	if err = rights.RequireAny(ctx, req.Identifiers...); err != nil {
 		return err
 	}
 
@@ -160,12 +158,12 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 		if req.Tail > 0 || req.After != nil {
 			warning.Add(ctx, "Events storage is not enabled")
 		}
-		if err := srv.pubsub.Subscribe(ctx, names, req.Identifiers, handler); err != nil {
+		if err = srv.pubsub.Subscribe(ctx, names, req.Identifiers, handler); err != nil {
 			return err
 		}
 	}
 
-	if err := stream.SendHeader(metadata.MD{}); err != nil {
+	if err = stream.SendHeader(metadata.MD{}); err != nil {
 		return err
 	}
 
@@ -207,7 +205,7 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 		case evt := <-ch:
 			isVisible, err := rightsutil.EventIsVisible(ctx, evt)
 			if err != nil {
-				if err := rights.RequireAny(ctx, req.Identifiers...); err != nil {
+				if err = rights.RequireAny(ctx, req.Identifiers...); err != nil {
 					return err
 				}
 				log.FromContext(ctx).WithError(err).Warn("Failed to check event visibility")
@@ -231,7 +229,9 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 var errStorageDisabled = errors.DefineFailedPrecondition("storage_disabled", "events storage is not not enabled")
 
 // FindRelated implements the EventsServer interface.
-func (srv *EventsServer) FindRelated(ctx context.Context, req *ttnpb.FindRelatedEventsRequest) (*ttnpb.FindRelatedEventsResponse, error) {
+func (srv *EventsServer) FindRelated(
+	ctx context.Context, req *ttnpb.FindRelatedEventsRequest,
+) (*ttnpb.FindRelatedEventsResponse, error) {
 	store, hasStore := srv.pubsub.(events.Store)
 	if !hasStore {
 		return nil, errStorageDisabled.New()
@@ -282,7 +282,7 @@ func (srv *EventsServer) FindRelated(ctx context.Context, req *ttnpb.FindRelated
 }
 
 // Roles implements rpcserver.Registerer.
-func (srv *EventsServer) Roles() []ttnpb.ClusterRole {
+func (*EventsServer) Roles() []ttnpb.ClusterRole {
 	return nil
 }
 
@@ -293,5 +293,7 @@ func (srv *EventsServer) RegisterServices(s *grpc.Server) {
 
 // RegisterHandlers implements rpcserver.Registerer.
 func (srv *EventsServer) RegisterHandlers(s *grpc_runtime.ServeMux, conn *grpc.ClientConn) {
-	ttnpb.RegisterEventsHandler(srv.ctx, s, conn)
+	if err := ttnpb.RegisterEventsHandler(srv.ctx, s, conn); err != nil {
+		panic(err)
+	}
 }

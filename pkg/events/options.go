@@ -158,7 +158,8 @@ func WithErrorDataType() DefinitionOption {
 
 var updatedFieldsDataType, _ = marshalData([]string{"list.of", "updated.fields"})
 
-// WithUpdatedFieldsDataType is a convenience function that sets the data type of the event to a slice of updated fields.
+// WithUpdatedFieldsDataType is a convenience function that sets the data type
+// of the event to a slice of updated fields.
 func WithUpdatedFieldsDataType() DefinitionOption {
 	return definitionOptionFunc(func(d *definition) {
 		d.dataType = updatedFieldsDataType

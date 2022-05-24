@@ -33,7 +33,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-// Event interface
+// Event interface.
 type Event interface {
 	UniqueID() string
 	Context() context.Context
@@ -99,7 +99,7 @@ var pathPrefix = func() string {
 	return strings.TrimSuffix(file, filepath.Join("pkg", "events", "events.go"))
 }()
 
-// IncludeCaller indicates whether the caller of Publish should be included in the event
+// IncludeCaller indicates whether the caller of Publish should be included in the event.
 var IncludeCaller bool
 
 // withCaller returns an event with the Caller field populated, if configured to do so.
@@ -173,18 +173,23 @@ func New(ctx context.Context, name, description string, opts ...Option) Event {
 	return (&definition{name: name, description: description}).New(ctx, opts...)
 }
 
-func marshalData(data interface{}) (*pbtypes.Any, error) {
-	var (
-		any *pbtypes.Any
-		err error
-	)
+func marshalData(data interface{}) (anyPB *pbtypes.Any, err error) {
 	if protoMessage, ok := data.(proto.Message); ok {
-		any, err = pbtypes.MarshalAny(protoMessage)
+		anyPB, err = pbtypes.MarshalAny(protoMessage)
+		if err != nil {
+			return nil, err
+		}
 	} else if errData, ok := data.(error); ok {
 		if ttnErrData, ok := errors.From(errData); ok {
-			any, err = pbtypes.MarshalAny(ttnpb.ErrorDetailsToProto(ttnErrData))
+			anyPB, err = pbtypes.MarshalAny(ttnpb.ErrorDetailsToProto(ttnErrData))
+			if err != nil {
+				return nil, err
+			}
 		} else {
-			any, err = pbtypes.MarshalAny(&pbtypes.StringValue{Value: errData.Error()})
+			anyPB, err = pbtypes.MarshalAny(&pbtypes.StringValue{Value: errData.Error()})
+			if err != nil {
+				return nil, err
+			}
 		}
 	} else {
 		value, err := gogoproto.Value(data)
@@ -192,10 +197,13 @@ func marshalData(data interface{}) (*pbtypes.Any, error) {
 			return nil, err
 		}
 		if _, isNull := value.Kind.(*pbtypes.Value_NullValue); !isNull {
-			any, err = pbtypes.MarshalAny(value)
+			anyPB, err = pbtypes.MarshalAny(value)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
-	return any, err
+	return anyPB, nil
 }
 
 // Proto returns the protobuf representation of the event.
@@ -225,15 +233,15 @@ func FromProto(pb *ttnpb.Event) (Event, error) {
 	}
 	var data interface{}
 	if pb.Data != nil {
-		any, err := pbtypes.EmptyAny(pb.Data)
+		anyMsg, err := pbtypes.EmptyAny(pb.Data)
 		if err != nil {
 			return nil, err
 		}
-		if err = pbtypes.UnmarshalAny(pb.Data, any); err != nil {
+		if err = pbtypes.UnmarshalAny(pb.Data, anyMsg); err != nil {
 			return nil, err
 		}
-		data = any
-		v, ok := any.(*pbtypes.Value)
+		data = anyMsg
+		v, ok := anyMsg.(*pbtypes.Value)
 		if ok {
 			iface, err := gogoproto.Interface(v)
 			if err != nil {

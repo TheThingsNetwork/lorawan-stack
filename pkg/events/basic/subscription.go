@@ -31,7 +31,9 @@ type Subscription struct {
 }
 
 // NewSubscription creates a new basic PubSub subscription.
-func NewSubscription(ctx context.Context, names []string, identifiers []*ttnpb.EntityIdentifiers, hdl events.Handler) (*Subscription, error) {
+func NewSubscription(
+	ctx context.Context, names []string, identifiers []*ttnpb.EntityIdentifiers, hdl events.Handler,
+) (*Subscription, error) {
 	s := &Subscription{
 		ctx:         ctx,
 		names:       names,

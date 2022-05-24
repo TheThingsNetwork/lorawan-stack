@@ -24,26 +24,31 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
+type testContextKeyType string
+
+var testContextKey = testContextKeyType("ctx-test")
+
 type testContextMarshaler struct{}
 
 func (testContextMarshaler) MarshalContext(ctx context.Context) []byte {
-	if val, ok := ctx.Value("ctx-test").(string); ok {
+	if val, ok := ctx.Value(testContextKey).(string); ok {
 		return []byte(val)
 	}
 	return nil
 }
 
 func (testContextMarshaler) UnmarshalContext(ctx context.Context, b []byte) (context.Context, error) {
-	return context.WithValue(ctx, "ctx-test", string(b)), nil
+	return context.WithValue(ctx, testContextKey, string(b)), nil
 }
 
 func TestContextMarshaler(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	var m testContextMarshaler
 	events.RegisterContextMarshaler("test", m)
 
-	ctx := context.WithValue(context.Background(), "ctx-test", "foo")
+	ctx := context.WithValue(context.Background(), testContextKey, "foo")
 
 	evt := events.New(ctx, "test", "test")
 
@@ -54,7 +59,7 @@ func TestContextMarshaler(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(unmarshaled, should.Resemble, evt)
 
-	val, ok := unmarshaled.Context().Value("ctx-test").(string)
+	val, ok := unmarshaled.Context().Value(testContextKey).(string)
 	if a.So(ok, should.BeTrue) {
 		a.So(val, should.Equal, "foo")
 	}

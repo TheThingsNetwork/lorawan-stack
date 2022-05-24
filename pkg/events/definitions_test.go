@@ -25,6 +25,7 @@ import (
 )
 
 func TestDefinitions(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 	testEvent := events.Define("test", "Test Event", events.WithVisibility(ttnpb.Right_RIGHT_ALL))
 	evt := testEvent.New(test.Context())

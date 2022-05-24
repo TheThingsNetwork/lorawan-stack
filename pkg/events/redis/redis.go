@@ -209,7 +209,9 @@ func (ps *PubSub) eventChannelPatterns(ctx context.Context, names []string, ids 
 }
 
 // Subscribe implements the events.Subscriber interface.
-func (ps *PubSub) Subscribe(ctx context.Context, names []string, ids []*ttnpb.EntityIdentifiers, hdl events.Handler) error {
+func (ps *PubSub) Subscribe(
+	ctx context.Context, names []string, ids []*ttnpb.EntityIdentifiers, hdl events.Handler,
+) error {
 	ps.mu.Lock()
 	defer ps.mu.Unlock()
 
@@ -299,7 +301,7 @@ func (ps *PubSub) Publish(evs ...events.Event) {
 	}
 }
 
-func (ps *PubSub) runTransaction(ctx context.Context, item interface{}) {
+func (*PubSub) runTransaction(ctx context.Context, item interface{}) {
 	logger := log.FromContext(ctx)
 	tx := item.(redis.Pipeliner)
 	if _, err := tx.Exec(ctx); err != nil {

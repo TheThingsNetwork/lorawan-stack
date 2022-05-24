@@ -58,8 +58,5 @@ func marshalContext(ctx context.Context) (map[string][]byte, error) {
 		}
 		data[name] = payload
 	}
-	if len(data) == 0 {
-		return nil, nil
-	}
 	return data, nil
 }

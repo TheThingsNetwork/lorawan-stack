@@ -64,6 +64,7 @@ func (d *definition) New(ctx context.Context, opts ...Option) Event {
 	return d.With(defaultOptions...).New(ctx, opts...)
 }
 
+// EntityIdentifiers interface is for everything from which we can get entity identifiers.
 type EntityIdentifiers interface {
 	GetEntityIdentifiers() *ttnpb.EntityIdentifiers
 }
