@@ -54,10 +54,8 @@ func (j *GoGoJSONPb) marshalTo(w io.Writer, v interface{}) error {
 	return (*jsonpb.Marshaler)(j).Marshal(w, p)
 }
 
-var (
-	// protoMessageType is stored to prevent constant lookup of the same type at jsonpb.
-	protoMessageType = reflect.TypeOf((*proto.Message)(nil)).Elem()
-)
+// protoMessageType is stored to prevent constant lookup of the same type at jsonpb.
+var protoMessageType = reflect.TypeOf((*proto.Message)(nil)).Elem()
 
 // marshalNonProto marshals a non-message field of a protobuf message.
 // This function does not correctly marshals arbitrary data structure into JSON,

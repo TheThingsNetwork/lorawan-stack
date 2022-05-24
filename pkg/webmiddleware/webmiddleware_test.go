@@ -81,5 +81,4 @@ func TestConditional(t *testing.T) {
 	middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		a.So(flag, should.Equal, true)
 	})).ServeHTTP(rec, r)
-
 }

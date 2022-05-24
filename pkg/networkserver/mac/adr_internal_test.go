@@ -518,6 +518,7 @@ func TestClampDataRateRange(t *testing.T) {
 		})
 	}
 }
+
 func TestClampTxPowerRange(t *testing.T) {
 	for _, tc := range []struct {
 		Name     string

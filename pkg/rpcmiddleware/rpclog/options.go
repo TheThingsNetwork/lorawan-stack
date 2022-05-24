@@ -20,13 +20,11 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
-var (
-	defaultOptions = &options{
-		levelFunc:     DefaultCodeToLevel,
-		codeFunc:      grpc_logging.DefaultErrorToCode,
-		ignoreMethods: make(map[string]struct{}),
-	}
-)
+var defaultOptions = &options{
+	levelFunc:     DefaultCodeToLevel,
+	codeFunc:      grpc_logging.DefaultErrorToCode,
+	ignoreMethods: make(map[string]struct{}),
+}
 
 type options struct {
 	levelFunc     CodeToLevel

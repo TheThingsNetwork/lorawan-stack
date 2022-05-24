@@ -66,7 +66,7 @@ func TestLocal(t *testing.T) {
 	a := assertions.New(t)
 
 	tmpDir := filepath.Join(os.TempDir(), fmt.Sprintf("BlobTestLocal_%d", time.Now().UnixNano()/1000000))
-	if err := os.Mkdir(tmpDir, 0755); !a.So(err, should.BeNil) {
+	if err := os.Mkdir(tmpDir, 0o755); !a.So(err, should.BeNil) {
 		t.Fatalf("Failed to create temporary directory: %v", err)
 	}
 	defer os.RemoveAll(tmpDir)

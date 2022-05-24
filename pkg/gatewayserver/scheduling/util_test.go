@@ -35,18 +35,23 @@ type mockClock struct {
 func (c *mockClock) IsSynced() bool {
 	return c.t > 0
 }
+
 func (c *mockClock) SyncTime() (time.Time, bool) {
 	return time.Unix(0, 0).Add(time.Duration(c.t)), true
 }
+
 func (c *mockClock) FromServerTime(_ time.Time) (scheduling.ConcentratorTime, bool) {
 	return c.t, true
 }
+
 func (c *mockClock) ToServerTime(t scheduling.ConcentratorTime) time.Time {
 	return time.Unix(0, 0).Add(time.Duration(t - c.t))
 }
+
 func (c *mockClock) FromGatewayTime(t time.Time) (scheduling.ConcentratorTime, bool) {
 	return scheduling.ConcentratorTime(t.Sub(time.Unix(0, 0))), true
 }
+
 func (c *mockClock) FromTimestampTime(timestamp uint32) scheduling.ConcentratorTime {
 	return c.t + scheduling.ConcentratorTime(time.Duration(timestamp)*time.Microsecond)
 }

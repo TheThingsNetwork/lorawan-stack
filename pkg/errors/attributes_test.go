@@ -25,7 +25,7 @@ import (
 func TestAttributesError(t *testing.T) {
 	a := assertions.New(t)
 
-	var errInvalidFoo = errors.DefineInvalidArgument("test_attributes_invalid_foo", "Invalid Foo: {foo}", "foo")
+	errInvalidFoo := errors.DefineInvalidArgument("test_attributes_invalid_foo", "Invalid Foo: {foo}", "foo")
 
 	a.So(errInvalidFoo.Attributes(), should.BeEmpty)
 

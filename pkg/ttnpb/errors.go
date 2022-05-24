@@ -133,7 +133,8 @@ type valueErr func(interface{}) *errors.Error
 
 func unexpectedValue(err interface {
 	WithAttributes(kv ...interface{}) *errors.Error
-}) valueErr {
+},
+) valueErr {
 	return func(value interface{}) *errors.Error {
 		return err.WithAttributes(valueKey, value)
 	}

@@ -25,8 +25,10 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-var _ config.Configurable = &DevAddrPrefix{}
-var _ config.Stringer = DevAddrPrefix{}
+var (
+	_ config.Configurable = &DevAddrPrefix{}
+	_ config.Stringer     = DevAddrPrefix{}
+)
 
 func TestDevAddr(t *testing.T) {
 	for _, tc := range []struct {

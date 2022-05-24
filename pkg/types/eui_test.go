@@ -24,8 +24,10 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-var _ config.Configurable = &EUI64Prefix{}
-var _ config.Stringer = EUI64Prefix{}
+var (
+	_ config.Configurable = &EUI64Prefix{}
+	_ config.Stringer     = EUI64Prefix{}
+)
 
 func TestEUI64(t *testing.T) {
 	a := assertions.New(t)

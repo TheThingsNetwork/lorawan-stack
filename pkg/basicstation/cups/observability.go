@@ -88,7 +88,6 @@ func registerUpdateInfoRequestFailed(ctx context.Context, request string, err er
 	} else {
 		cupsMetrics.requestFailed.WithLabelValues(ctx, request, "unknown").Inc()
 	}
-
 }
 
 func init() {

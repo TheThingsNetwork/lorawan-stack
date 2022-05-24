@@ -44,8 +44,7 @@ type Fallback interface {
 }
 
 // noopEDCS is a no-op EDCS.
-type noopEDCS struct {
-}
+type noopEDCS struct{}
 
 // SupportsJoinEUI implements EndDeviceClaimingServer.
 func (noopEDCS) SupportsJoinEUI(types.EUI64) bool {

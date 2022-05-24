@@ -116,7 +116,7 @@ func TestRegistry(t *testing.T) {
 	t.Run("SetWithTTL", func(t *testing.T) {
 		a, ctx := test.New(t)
 		stats := &ttnpb.GatewayConnectionStats{
-			DisconnectedAt: ttnpb.ProtoTimePtr(time.Date(2021, 12, 02, 11, 24, 58, 0, time.UTC)),
+			DisconnectedAt: ttnpb.ProtoTimePtr(time.Date(2021, 12, 2, 11, 24, 58, 0, time.UTC)),
 		}
 
 		err := registry.Set(ctx, ids, stats, []string{"disconnected_at"}, Timeout)

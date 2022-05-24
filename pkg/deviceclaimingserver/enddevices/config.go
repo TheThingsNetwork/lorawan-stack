@@ -64,7 +64,6 @@ func (c Config) Fetcher(ctx context.Context, blobConf config.BlobConfig, httpCli
 	default:
 		return nil, nil
 	}
-
 }
 
 type baseConfig struct {

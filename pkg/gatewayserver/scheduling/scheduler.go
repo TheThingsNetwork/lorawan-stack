@@ -59,8 +59,7 @@ type TimeSource interface {
 	Now() time.Time
 }
 
-type systemTimeSource struct {
-}
+type systemTimeSource struct{}
 
 // Now implements TimeSource.
 func (systemTimeSource) Now() time.Time { return time.Now() }

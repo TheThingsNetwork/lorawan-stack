@@ -232,43 +232,44 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 		{
 			Name:   "ValidFrequencyPlan",
 			BandID: "US_902_928",
-			FrequencyPlans: map[string]*frequencyplans.FrequencyPlan{test.USFrequencyPlanID: {
-				BandID: "US_902_928",
-				Radios: []frequencyplans.Radio{
-					{
-						Enable:    true,
-						ChipType:  "SX1257",
-						Frequency: 924300000,
-						TxConfiguration: &frequencyplans.RadioTxConfiguration{
-							MinFrequency: 909000000,
-							MaxFrequency: 927000000,
+			FrequencyPlans: map[string]*frequencyplans.FrequencyPlan{
+				test.USFrequencyPlanID: {
+					BandID: "US_902_928",
+					Radios: []frequencyplans.Radio{
+						{
+							Enable:    true,
+							ChipType:  "SX1257",
+							Frequency: 924300000,
+							TxConfiguration: &frequencyplans.RadioTxConfiguration{
+								MinFrequency: 909000000,
+								MaxFrequency: 927000000,
+							},
+						},
+						{
+							Enable:    false,
+							ChipType:  "SX1257",
+							Frequency: 925000000,
 						},
 					},
-					{
-						Enable:    false,
-						ChipType:  "SX1257",
-						Frequency: 925000000,
-					},
-				},
-			}, "US_902_928_Custom": {
-				BandID: "US_902_928",
-				Radios: []frequencyplans.Radio{
-					{
-						Enable:    true,
-						ChipType:  "SX1257",
-						Frequency: 924300000,
-						TxConfiguration: &frequencyplans.RadioTxConfiguration{
-							MinFrequency: 900000000,
-							MaxFrequency: 925000000,
+				}, "US_902_928_Custom": {
+					BandID: "US_902_928",
+					Radios: []frequencyplans.Radio{
+						{
+							Enable:    true,
+							ChipType:  "SX1257",
+							Frequency: 924300000,
+							TxConfiguration: &frequencyplans.RadioTxConfiguration{
+								MinFrequency: 900000000,
+								MaxFrequency: 925000000,
+							},
+						},
+						{
+							Enable:    false,
+							ChipType:  "SX1257",
+							Frequency: 925000000,
 						},
 					},
-					{
-						Enable:    false,
-						ChipType:  "SX1257",
-						Frequency: 925000000,
-					},
 				},
-			},
 			},
 			Cfg: RouterConfig{
 				Region:         "US902",

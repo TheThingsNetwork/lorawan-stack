@@ -56,7 +56,7 @@ func (Version) Files() error {
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(goVersionFilePath, []byte(fmt.Sprintf(goVersionFile, version)), 0644)
+	err = os.WriteFile(goVersionFilePath, []byte(fmt.Sprintf(goVersionFile, version)), 0o644)
 	if err != nil {
 		return err
 	}

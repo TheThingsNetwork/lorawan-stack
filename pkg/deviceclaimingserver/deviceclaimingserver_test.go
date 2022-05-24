@@ -34,9 +34,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-var (
-	timeout = (1 << 5) * test.Delay
-)
+var timeout = (1 << 5) * test.Delay
 
 func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.ClusterRole) {
 	for i := 0; i < 20; i++ {
@@ -166,7 +164,6 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 var (
@@ -281,5 +278,4 @@ func TestGatewayClaimingServer(t *testing.T) {
 			}
 		})
 	}
-
 }

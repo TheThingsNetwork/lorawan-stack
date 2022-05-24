@@ -32,9 +32,7 @@ import (
 	"golang.org/x/oauth2/google"
 )
 
-var (
-	errInvalidConfig = errors.DefineInvalidArgument("invalid_config", "invalid blob store configuration")
-)
+var errInvalidConfig = errors.DefineInvalidArgument("invalid_config", "invalid blob store configuration")
 
 func Local(_ context.Context, bucket, path string) (*blob.Bucket, error) {
 	bucketPath, err := filepath.Abs(filepath.Join(path, bucket))
@@ -43,7 +41,7 @@ func Local(_ context.Context, bucket, path string) (*blob.Bucket, error) {
 	}
 	_, err = os.Stat(bucketPath)
 	if os.IsNotExist(err) {
-		err = os.MkdirAll(bucketPath, 0755)
+		err = os.MkdirAll(bucketPath, 0o755)
 		if err != nil {
 			return nil, errInvalidConfig.WithCause(err)
 		}

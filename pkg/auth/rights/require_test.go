@@ -32,7 +32,8 @@ import (
 func requireAuthInfo(ctx context.Context) (res struct {
 	UniversalErr error
 	IsAdminErr   error
-}) {
+},
+) {
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go func() {
@@ -53,7 +54,8 @@ func requireRights(ctx context.Context, id string) (res struct {
 	GtwErr error
 	OrgErr error
 	UsrErr error
-}) {
+},
+) {
 	var wg sync.WaitGroup
 	wg.Add(5)
 	go func() {

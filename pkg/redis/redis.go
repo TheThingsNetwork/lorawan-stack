@@ -538,7 +538,7 @@ func dispatchTask(ctx context.Context, r redis.Cmdable, group, consumer string, 
 // Pipeline is executed even if f returns an error.
 // Tasks are acked only if f returns without error.
 func popTask(ctx context.Context, r redis.Cmdable, group, consumer string, maxLen int64, f func(p redis.Pipeliner, payload string, startAt time.Time) error, k string) (err error) {
-	var readyStream = ReadyTaskKey(k)
+	readyStream := ReadyTaskKey(k)
 
 	processMessage := func(message redis.XMessage) error {
 		fields := make(map[string]string, len(message.Values))

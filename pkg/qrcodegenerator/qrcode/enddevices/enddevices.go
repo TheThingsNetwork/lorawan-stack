@@ -106,9 +106,7 @@ func (s *Server) RegisterEndDeviceFormat(id string, f Format) {
 	})
 }
 
-var (
-	errUnknownFormat = errors.DefineInvalidArgument("unknown_format", "format unknown")
-)
+var errUnknownFormat = errors.DefineInvalidArgument("unknown_format", "format unknown")
 
 // Parse attempts to parse the given QR code data.
 // It returns the parser and the format ID that successfully parsed the QR code.
