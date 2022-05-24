@@ -192,7 +192,7 @@ func (m MessageDescriptorMap) WriteFile(filename string) error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(filename, append(bytes, '\n'), 0o644)
+	return os.WriteFile(filename, append(bytes, '\n'), 0o644) //nolint:gas
 }
 
 // Define a message.
