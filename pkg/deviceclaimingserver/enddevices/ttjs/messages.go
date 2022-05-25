@@ -104,6 +104,7 @@ func (oui *OUI) UnmarshalText(data []byte) error {
 type claimRequest struct {
 	claimData
 	OwnerToken string `json:"ownerToken"`
+	Locked     bool   `json:"locked"`
 }
 
 // errorResponse is a message that may be returned by The Things Join Server in case of an error.
