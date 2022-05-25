@@ -29,5 +29,5 @@ type WebhookRegistry interface {
 	// Set creates, updates or deletes the webhook by its identifiers.
 	Set(ctx context.Context, ids *ttnpb.ApplicationWebhookIdentifiers, paths []string, f func(*ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error)) (*ttnpb.ApplicationWebhook, error)
 	// Range ranges over the webhooks and calls the callback function, until false is returned.
-	Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationWebhook) bool) error
+	Range(ctx context.Context, paths []string, f func(context.Context, *ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationWebhook) bool) error
 }

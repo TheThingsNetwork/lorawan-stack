@@ -18,6 +18,7 @@ package rights
 import (
 	"context"
 
+	"github.com/mohae/deepcopy"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -182,18 +183,19 @@ var authInfoCacheKey authInfoCacheKeyType
 // NewContextWithAuthInfoCache returns a derived context with an authentication info cache.
 // This should only be used for request contexts.
 func NewContextWithAuthInfoCache(ctx context.Context) context.Context {
-	return context.WithValue(ctx, authInfoCacheKey, &ttnpb.AuthInfoResponse{})
+	r := &ttnpb.AuthInfoResponse{}
+	return context.WithValue(ctx, authInfoCacheKey, &r)
 }
 
 func cacheAuthInfoInContext(ctx context.Context, res *ttnpb.AuthInfoResponse) {
-	if authInfo, ok := ctx.Value(authInfoCacheKey).(*ttnpb.AuthInfoResponse); ok {
-		*authInfo = *res
+	if authInfo, ok := ctx.Value(authInfoCacheKey).(**ttnpb.AuthInfoResponse); ok {
+		*authInfo = deepcopy.Copy(res).(*ttnpb.AuthInfoResponse)
 	}
 }
 
 func cacheAuthInfoFromContext(ctx context.Context) (*ttnpb.AuthInfoResponse, bool) {
-	if authInfo, ok := ctx.Value(authInfoCacheKey).(*ttnpb.AuthInfoResponse); ok {
-		return authInfo, true
+	if authInfo, ok := ctx.Value(authInfoCacheKey).(**ttnpb.AuthInfoResponse); ok {
+		return *authInfo, true
 	}
 	return nil, false
 }

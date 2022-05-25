@@ -128,7 +128,7 @@ func TestJoinRequest(t *testing.T) {
 		JoinRequest           JoinRequest
 		GatewayIds            *ttnpb.GatewayIdentifiers
 		BandID                string
-		ExpectedUplinkMessage ttnpb.UplinkMessage
+		ExpectedUplinkMessage *ttnpb.UplinkMessage
 		ErrorAssertion        func(err error) bool
 	}{
 		{
@@ -159,7 +159,7 @@ func TestJoinRequest(t *testing.T) {
 			JoinRequest: JoinRequest{},
 			GatewayIds:  gtwID,
 			BandID:      band.EU_863_870,
-			ExpectedUplinkMessage: ttnpb.UplinkMessage{
+			ExpectedUplinkMessage: &ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
 					Mic:  []byte{0, 0, 0, 0},
 					MHdr: &ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: ttnpb.Major_LORAWAN_R1},
@@ -202,7 +202,7 @@ func TestJoinRequest(t *testing.T) {
 			},
 			GatewayIds: gtwID,
 			BandID:     band.EU_863_870,
-			ExpectedUplinkMessage: ttnpb.UplinkMessage{
+			ExpectedUplinkMessage: &ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
 					MHdr: &ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: ttnpb.Major_LORAWAN_R1},
 					Mic:  []byte{0x4E, 0x61, 0xBC, 0x00},
@@ -250,10 +250,10 @@ func TestJoinRequest(t *testing.T) {
 				if !a.So(&payload, should.Resemble, msg.Payload) {
 					t.Fatalf("Invalid RawPayload: %v", msg.RawPayload)
 				}
-				expected := deepcopy.Copy(tc.ExpectedUplinkMessage).(ttnpb.UplinkMessage)
+				expected := deepcopy.Copy(tc.ExpectedUplinkMessage).(*ttnpb.UplinkMessage)
 				expected.RawPayload = msg.RawPayload
 				expected.ReceivedAt = msg.ReceivedAt
-				if !a.So(*msg, should.Resemble, expected) {
+				if !a.So(msg, should.Resemble, expected) {
 					t.Fatalf("Invalid UplinkMessage: %s", msg.RawPayload)
 				}
 			}
@@ -272,7 +272,7 @@ func TestUplinkDataFrame(t *testing.T) {
 		UplinkDataFrame       UplinkDataFrame
 		GatewayIds            *ttnpb.GatewayIdentifiers
 		FrequencyPlanID       string
-		ExpectedUplinkMessage ttnpb.UplinkMessage
+		ExpectedUplinkMessage *ttnpb.UplinkMessage
 		ErrorAssertion        func(err error) bool
 	}{
 		{
@@ -280,7 +280,7 @@ func TestUplinkDataFrame(t *testing.T) {
 			UplinkDataFrame:       UplinkDataFrame{},
 			GatewayIds:            gtwID,
 			FrequencyPlanID:       band.EU_863_870,
-			ExpectedUplinkMessage: ttnpb.UplinkMessage{},
+			ExpectedUplinkMessage: &ttnpb.UplinkMessage{},
 			ErrorAssertion: func(err error) bool {
 				return errors.Resemble(err, errMDHR)
 			},
@@ -309,7 +309,7 @@ func TestUplinkDataFrame(t *testing.T) {
 			},
 			GatewayIds:      gtwID,
 			FrequencyPlanID: band.EU_863_870,
-			ExpectedUplinkMessage: ttnpb.UplinkMessage{
+			ExpectedUplinkMessage: &ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
 					MHdr: &ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: ttnpb.Major_LORAWAN_R1},
 					Mic:  []byte{0x4E, 0x61, 0xBC, 0x00},
@@ -373,7 +373,7 @@ func TestUplinkDataFrame(t *testing.T) {
 			},
 			GatewayIds:      gtwID,
 			FrequencyPlanID: band.EU_863_870,
-			ExpectedUplinkMessage: ttnpb.UplinkMessage{
+			ExpectedUplinkMessage: &ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
 					MHdr: &ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: ttnpb.Major_LORAWAN_R1},
 					Mic:  []byte{0x4E, 0x61, 0xBC, 0x00},
@@ -424,10 +424,10 @@ func TestUplinkDataFrame(t *testing.T) {
 			} else if tc.ErrorAssertion != nil {
 				t.Fatalf("Expected error")
 			} else {
-				expected := deepcopy.Copy(tc.ExpectedUplinkMessage).(ttnpb.UplinkMessage)
+				expected := deepcopy.Copy(tc.ExpectedUplinkMessage).(*ttnpb.UplinkMessage)
 				expected.RawPayload = msg.RawPayload
 				expected.ReceivedAt = msg.ReceivedAt
-				if !a.So(*msg, should.Resemble, expected) {
+				if !a.So(msg, should.Resemble, expected) {
 					t.Fatalf("Invalid UplinkMessage: %s", msg.RawPayload)
 				}
 			}
@@ -443,8 +443,8 @@ func TestFromUplinkDataFrame(t *testing.T) {
 
 	for _, tc := range []struct {
 		Name                    string
-		UplinkMessage           ttnpb.UplinkMessage
-		GatewayIds              ttnpb.GatewayIdentifiers
+		UplinkMessage           *ttnpb.UplinkMessage
+		GatewayIds              *ttnpb.GatewayIdentifiers
 		FrequencyPlanID         string
 		ExpectedUplinkDataFrame UplinkDataFrame
 		ErrorAssertion          func(err error) bool
@@ -453,14 +453,14 @@ func TestFromUplinkDataFrame(t *testing.T) {
 			Name:                    "Empty",
 			ExpectedUplinkDataFrame: UplinkDataFrame{},
 			FrequencyPlanID:         band.EU_863_870,
-			UplinkMessage:           ttnpb.UplinkMessage{},
+			UplinkMessage:           &ttnpb.UplinkMessage{},
 			ErrorAssertion: func(err error) bool {
 				return errors.Resemble(err, errUplinkMessage)
 			},
 		},
 		{
 			Name: "ValidFrame",
-			UplinkMessage: ttnpb.UplinkMessage{
+			UplinkMessage: &ttnpb.UplinkMessage{
 				RawPayload: []byte{0x40, 0xff, 0xff, 0xff, 0x42, 0xb2, 0x42, 0xff, 0xfe, 0xff, 0x42, 0xfe, 0xff, 0x42, 0xff, 0xff, 0x0f},
 				Payload: &ttnpb.Message{
 					MHdr: &ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: 0},
@@ -526,7 +526,7 @@ func TestFromUplinkDataFrame(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 			var updf UplinkDataFrame
-			err := updf.FromUplinkMessage(&tc.UplinkMessage, tc.FrequencyPlanID)
+			err := updf.FromUplinkMessage(tc.UplinkMessage, tc.FrequencyPlanID)
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
@@ -550,7 +550,7 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 
 	for _, tc := range []struct {
 		Name                string
-		UplinkMessage       ttnpb.UplinkMessage
+		UplinkMessage       *ttnpb.UplinkMessage
 		FrequencyPlanID     string
 		ExpectedJoinRequest JoinRequest
 		ErrorAssertion      func(err error) bool
@@ -559,14 +559,14 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 			Name:                "Empty",
 			ExpectedJoinRequest: JoinRequest{},
 			FrequencyPlanID:     band.EU_863_870,
-			UplinkMessage:       ttnpb.UplinkMessage{},
+			UplinkMessage:       &ttnpb.UplinkMessage{},
 			ErrorAssertion: func(err error) bool {
 				return errors.Resemble(err, errUplinkMessage)
 			},
 		},
 		{
 			Name: "ValidFrame",
-			UplinkMessage: ttnpb.UplinkMessage{
+			UplinkMessage: &ttnpb.UplinkMessage{
 				RawPayload: []byte{0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0xff, 0x42, 0x42, 0xff, 0xff, 0x0f},
 				Payload: &ttnpb.Message{
 					MHdr: &ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: 0},
@@ -618,7 +618,7 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 			var jreq JoinRequest
-			err := jreq.FromUplinkMessage(&tc.UplinkMessage, tc.FrequencyPlanID)
+			err := jreq.FromUplinkMessage(tc.UplinkMessage, tc.FrequencyPlanID)
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)

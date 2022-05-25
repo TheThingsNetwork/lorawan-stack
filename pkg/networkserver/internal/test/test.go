@@ -694,7 +694,7 @@ type DataDownlinkConfig struct {
 	SessionKeys *ttnpb.SessionKeys
 }
 
-func MakeDataDownlink(conf DataDownlinkConfig) *ttnpb.DownlinkMessage {
+func MakeDataDownlink(conf *DataDownlinkConfig) *ttnpb.DownlinkMessage {
 	if conf.FCtrl == nil {
 		conf.FCtrl = &ttnpb.FCtrl{}
 	}

@@ -29,7 +29,7 @@ import (
 // newSubscriptionMap creates a mapping between application identifiers and subscription sets.
 // The timeout represents the period after which a set will shut down if empty. If the timeout
 // is zero, the sets never timeout.
-func newSubscriptionMap(ctx context.Context, rd RequestDecoupler, timeout time.Duration, setup func(*subscriptionSet, ttnpb.ApplicationIdentifiers) error, opts ...io.SubscriptionOption) *subscriptionMap {
+func newSubscriptionMap(ctx context.Context, rd RequestDecoupler, timeout time.Duration, setup func(*subscriptionSet, *ttnpb.ApplicationIdentifiers) error, opts ...io.SubscriptionOption) *subscriptionMap {
 	return &subscriptionMap{
 		ctx:     ctx,
 		rd:      rd,
@@ -43,7 +43,7 @@ type subscriptionMap struct {
 	ctx      context.Context
 	rd       RequestDecoupler
 	timeout  time.Duration
-	setup    func(*subscriptionSet, ttnpb.ApplicationIdentifiers) error
+	setup    func(*subscriptionSet, *ttnpb.ApplicationIdentifiers) error
 	decouple func(context.Context) context.Context
 	sets     sync.Map
 	subOpts  []io.SubscriptionOption
@@ -59,7 +59,7 @@ type subscriptionMapSet struct {
 var errSetNotFound = errors.DefineNotFound("set_not_found", "set not found")
 
 // Load loads the subscription set associated with the application identifiers.
-func (m *subscriptionMap) Load(ctx context.Context, ids ttnpb.ApplicationIdentifiers) (*subscriptionSet, error) {
+func (m *subscriptionMap) Load(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*subscriptionSet, error) {
 	uid := unique.ID(ctx, ids)
 	existing, ok := m.sets.Load(uid)
 	if !ok {
@@ -79,7 +79,7 @@ func (m *subscriptionMap) Load(ctx context.Context, ids ttnpb.ApplicationIdentif
 
 // LoadOrCreate loads the subscription set associated with the application identifiers.
 // If the subscription set does not exist, it is created.
-func (m *subscriptionMap) LoadOrCreate(ctx context.Context, ids ttnpb.ApplicationIdentifiers) (*subscriptionSet, error) {
+func (m *subscriptionMap) LoadOrCreate(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*subscriptionSet, error) {
 	uid := unique.ID(ctx, ids)
 	s := &subscriptionMapSet{
 		init: make(chan struct{}),
@@ -126,6 +126,6 @@ func (m *subscriptionMap) LoadOrCreate(ctx context.Context, ids ttnpb.Applicatio
 	return set, nil
 }
 
-func noSetup(*subscriptionSet, ttnpb.ApplicationIdentifiers) error {
+func noSetup(*subscriptionSet, *ttnpb.ApplicationIdentifiers) error {
 	return nil
 }

@@ -318,7 +318,7 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 					return err
 				}
 			case down := <-conn.Down():
-				dnmsg, err := s.formatter.FromDownlink(ctx, *down, conn.BandID(), scheduling.ConcentratorTime(down.GetScheduled().ConcentratorTimestamp), time.Now())
+				dnmsg, err := s.formatter.FromDownlink(ctx, down, conn.BandID(), scheduling.ConcentratorTime(down.GetScheduled().ConcentratorTimestamp), time.Now())
 				if err != nil {
 					logger.WithError(err).Warn("Failed to marshal downlink message")
 					continue

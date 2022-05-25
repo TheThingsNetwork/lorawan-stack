@@ -30,12 +30,12 @@ func TestLoRaAllianceTR005Draft2(t *testing.T) {
 	t.Run("Encode", func(t *testing.T) {
 		for _, tc := range []struct {
 			Name     string
-			Device   ttnpb.EndDevice
+			Device   *ttnpb.EndDevice
 			Expected LoRaAllianceTR005Draft2
 		}{
 			{
 				Name: "Simple",
-				Device: ttnpb.EndDevice{
+				Device: &ttnpb.EndDevice{
 					Ids: &ttnpb.EndDeviceIdentifiers{
 						JoinEui: eui64Ptr(types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00}),
 						DevEui:  eui64Ptr(types.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8}),
@@ -54,7 +54,7 @@ func TestLoRaAllianceTR005Draft2(t *testing.T) {
 			t.Run(tc.Name, func(t *testing.T) {
 				a := assertions.New(t)
 				var res LoRaAllianceTR005Draft2
-				err := res.Encode(&tc.Device)
+				err := res.Encode(tc.Device)
 				if !a.So(err, should.BeNil) {
 					t.FailNow()
 				}

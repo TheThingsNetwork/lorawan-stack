@@ -36,13 +36,13 @@ func TestFromDownlinkMessage(t *testing.T) {
 	for _, tc := range []struct {
 		BandID,
 		Name string
-		DownlinkMessage         ttnpb.DownlinkMessage
+		DownlinkMessage         *ttnpb.DownlinkMessage
 		ExpectedDownlinkMessage DownlinkMessage
 	}{
 		{
 			BandID: band.EU_863_870,
 			Name:   "SampleDownlink",
-			DownlinkMessage: ttnpb.DownlinkMessage{
+			DownlinkMessage: &ttnpb.DownlinkMessage{
 				RawPayload: []byte("Ymxhamthc25kJ3M=="),
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId: "testdevice",
@@ -82,7 +82,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 		{
 			BandID: band.EU_863_870,
 			Name:   "WithAbsoluteTime",
-			DownlinkMessage: ttnpb.DownlinkMessage{
+			DownlinkMessage: &ttnpb.DownlinkMessage{
 				RawPayload: []byte("Ymxhamthc25kJ3M=="),
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId: "testdevice",

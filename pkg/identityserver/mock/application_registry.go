@@ -70,7 +70,7 @@ func (is *mockISApplicationRegistry) ListRights(ctx context.Context, ids *ttnpb.
 		return
 	}
 
-	uid := unique.ID(ctx, *ids)
+	uid := unique.ID(ctx, ids)
 	auths, ok := is.applicationAuths[uid]
 	if !ok {
 		return

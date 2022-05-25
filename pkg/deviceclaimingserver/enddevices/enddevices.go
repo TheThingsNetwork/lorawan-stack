@@ -178,7 +178,7 @@ func (upstream *Upstream) Unclaim(ctx context.Context, in *ttnpb.EndDeviceIdenti
 	if in.DevEui == nil || in.JoinEui == nil {
 		return nil, errNoEUI.New()
 	}
-	err := upstream.requireRights(ctx, in, ttnpb.Rights{
+	err := upstream.requireRights(ctx, in, &ttnpb.Rights{
 		Rights: []ttnpb.Right{
 			ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 		},
@@ -212,7 +212,7 @@ func (upstream *Upstream) GetClaimStatus(ctx context.Context, in *ttnpb.EndDevic
 	if in.DevEui == nil || in.JoinEui == nil {
 		return nil, errNoEUI.New()
 	}
-	err := upstream.requireRights(ctx, in, ttnpb.Rights{
+	err := upstream.requireRights(ctx, in, &ttnpb.Rights{
 		Rights: []ttnpb.Right{
 			ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
 		},
@@ -227,7 +227,7 @@ func (upstream *Upstream) GetClaimStatus(ctx context.Context, in *ttnpb.EndDevic
 	return claimer.GetClaimStatus(ctx, in)
 }
 
-func (upstream *Upstream) requireRights(ctx context.Context, in *ttnpb.EndDeviceIdentifiers, appRights ttnpb.Rights) error {
+func (upstream *Upstream) requireRights(ctx context.Context, in *ttnpb.EndDeviceIdentifiers, appRights *ttnpb.Rights) error {
 	// Collaborator must have the required rights on the application.
 	if err := rights.RequireApplication(ctx, in.ApplicationIds,
 		appRights.Rights...,

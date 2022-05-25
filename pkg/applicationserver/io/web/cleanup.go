@@ -32,7 +32,7 @@ type RegistryCleaner struct {
 func (cleaner *RegistryCleaner) RangeToLocalSet(ctx context.Context) error {
 	cleaner.LocalSet = make(map[string]struct{})
 	err := cleaner.WebRegistry.Range(ctx, []string{"ids"},
-		func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, wh *ttnpb.ApplicationWebhook) bool {
+		func(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, wh *ttnpb.ApplicationWebhook) bool {
 			cleaner.LocalSet[unique.ID(ctx, ids)] = struct{}{}
 			return true
 		},

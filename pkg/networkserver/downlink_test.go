@@ -389,7 +389,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}),
 					},
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
-						MakeDataDownlink(DataDownlinkConfig{
+						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
 							MACVersion:    ttnpb.MACVersion_MAC_V1_0_3,
 						}),
@@ -420,7 +420,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					LorawanVersion:     ttnpb.MACVersion_MAC_V1_1,
 					RxWindowsAvailable: true,
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
-						MakeDataDownlink(DataDownlinkConfig{
+						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
 							MACVersion:    ttnpb.MACVersion_MAC_V1_0_3,
 						}),
@@ -500,7 +500,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}),
 					},
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
-						MakeDataDownlink(DataDownlinkConfig{
+						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
 							MACVersion:    ttnpb.MACVersion_MAC_V1_0_3,
 						}),
@@ -548,7 +548,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}),
 					},
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
-						MakeDataDownlink(DataDownlinkConfig{
+						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
 							MACVersion:    ttnpb.MACVersion_MAC_V1_0_3,
 						}),
@@ -597,7 +597,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}),
 					},
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
-						MakeDataDownlink(DataDownlinkConfig{
+						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
 							MACVersion:    ttnpb.MACVersion_MAC_V1_0_3,
 						}),
@@ -682,7 +682,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}),
 					},
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
-						MakeDataDownlink(DataDownlinkConfig{
+						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
 							MACVersion:    ttnpb.MACVersion_MAC_V1_0_3,
 						}),
@@ -767,7 +767,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}),
 					},
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
-						MakeDataDownlink(DataDownlinkConfig{
+						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
 							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
@@ -918,7 +918,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}),
 					},
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
-						MakeDataDownlink(DataDownlinkConfig{
+						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
 							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
@@ -1079,7 +1079,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}),
 					},
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
-						MakeDataDownlink(DataDownlinkConfig{
+						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
 							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
@@ -1234,7 +1234,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}),
 					},
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
-						MakeDataDownlink(DataDownlinkConfig{
+						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
 							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
@@ -1389,7 +1389,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}),
 					},
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
-						MakeDataDownlink(DataDownlinkConfig{
+						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
 							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
@@ -1540,7 +1540,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}),
 					},
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
-						MakeDataDownlink(DataDownlinkConfig{
+						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
 							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
@@ -1703,7 +1703,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}),
 					},
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
-						MakeDataDownlink(DataDownlinkConfig{
+						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
 							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
@@ -1832,7 +1832,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}),
 					},
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
-						MakeDataDownlink(DataDownlinkConfig{
+						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
 							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
@@ -1970,7 +1970,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}),
 					},
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
-						MakeDataDownlink(DataDownlinkConfig{
+						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
 							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
@@ -2130,7 +2130,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}),
 					},
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
-						MakeDataDownlink(DataDownlinkConfig{
+						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
 							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
@@ -2272,7 +2272,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}),
 					},
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
-						MakeDataDownlink(DataDownlinkConfig{
+						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
 							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
@@ -2334,7 +2334,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}),
 					},
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
-						MakeDataDownlink(DataDownlinkConfig{
+						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
 							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
@@ -2418,7 +2418,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}),
 					},
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
-						MakeDataDownlink(DataDownlinkConfig{
+						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
 							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),

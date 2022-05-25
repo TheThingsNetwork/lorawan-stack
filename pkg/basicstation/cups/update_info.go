@@ -72,7 +72,7 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 			Ids:                  ids,
 			GatewayServerAddress: s.defaultLNSURI,
 		},
-		Collaborator: &s.defaultOwner,
+		Collaborator: s.defaultOwner,
 	}, auth)
 	if err != nil {
 		return nil, err

@@ -29,7 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-func NewADRUplink(fCnt uint32, maxSNR float32, gtwCount uint, confirmed bool, tx ttnpb.TxSettings) *ttnpb.UplinkMessage {
+func NewADRUplink(fCnt uint32, maxSNR float32, gtwCount uint, confirmed bool, tx *ttnpb.TxSettings) *ttnpb.UplinkMessage {
 	if gtwCount == 0 {
 		gtwCount = 1 + uint(rand.Int()%100)
 	}
@@ -64,7 +64,7 @@ func NewADRUplink(fCnt uint32, maxSNR float32, gtwCount uint, confirmed bool, tx
 			},
 		},
 		RxMetadata: mds,
-		Settings:   &tx,
+		Settings:   tx,
 	}
 }
 
@@ -73,13 +73,17 @@ type ADRMatrixRow struct {
 	MaxSNR       float32
 	GtwDiversity uint
 	Confirmed    bool
-	TxSettings   ttnpb.TxSettings
+	TxSettings   *ttnpb.TxSettings
 }
 
 func ADRMatrixToUplinks(m []ADRMatrixRow) []*ttnpb.UplinkMessage {
 	ups := make([]*ttnpb.UplinkMessage, 0, len(m))
 	for _, r := range m {
-		ups = append(ups, NewADRUplink(r.FCnt, r.MaxSNR, r.GtwDiversity, r.Confirmed, r.TxSettings))
+		txSettings := r.TxSettings
+		if txSettings == nil {
+			txSettings = &ttnpb.TxSettings{}
+		}
+		ups = append(ups, NewADRUplink(r.FCnt, r.MaxSNR, r.GtwDiversity, r.Confirmed, txSettings))
 	}
 	return ups
 }

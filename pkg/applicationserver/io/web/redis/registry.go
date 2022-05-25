@@ -243,7 +243,7 @@ func (r WebhookRegistry) Set(ctx context.Context, ids *ttnpb.ApplicationWebhookI
 }
 
 // Range implements WebhookRegistry.
-func (r WebhookRegistry) Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationWebhook) bool) error {
+func (r WebhookRegistry) Range(ctx context.Context, paths []string, f func(context.Context, *ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationWebhook) bool) error {
 	webhookEntityRegex, err := webhookRegex(r.idKey(unique.GenericID(ctx, "*"), "*"))
 	if err != nil {
 		return err
@@ -260,7 +260,7 @@ func (r WebhookRegistry) Range(ctx context.Context, paths []string, f func(conte
 		if err != nil {
 			return false, err
 		}
-		if !f(ctx, *wh.GetIds().GetApplicationIds(), wh) {
+		if !f(ctx, wh.GetIds().GetApplicationIds(), wh) {
 			return false, nil
 		}
 		return true, nil

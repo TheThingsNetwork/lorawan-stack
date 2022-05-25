@@ -887,7 +887,7 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 	}
 
 	// Initial update, so that the gateway appears connected.
-	registerGatewayConnectionStats(ctx, *ids, stats)
+	registerGatewayConnectionStats(ctx, ids, stats)
 	if gs.statsRegistry != nil {
 		if err := gs.statsRegistry.Set(decoupledCtx, ids, stats, ttnpb.GatewayConnectionStatsFieldPathsTopLevel, gs.config.ConnectionStatsTTL); err != nil {
 			logger.WithError(err).Warn("Failed to initialize connection stats")
@@ -900,7 +900,7 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 			ConnectedAt:    nil,
 			DisconnectedAt: ttnpb.ProtoTimePtr(time.Now()),
 		}
-		registerGatewayConnectionStats(decoupledCtx, *ids, stats)
+		registerGatewayConnectionStats(decoupledCtx, ids, stats)
 		if gs.statsRegistry != nil {
 			if err := gs.statsRegistry.Set(
 				decoupledCtx, ids, stats,
@@ -942,7 +942,7 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 		lastUpdate = now
 
 		stats, paths := conn.Stats()
-		registerGatewayConnectionStats(decoupledCtx, *ids, stats)
+		registerGatewayConnectionStats(decoupledCtx, ids, stats)
 		if gs.statsRegistry != nil {
 			if err := gs.statsRegistry.Set(decoupledCtx, ids, stats, paths, gs.config.ConnectionStatsTTL); err != nil {
 				logger.WithError(err).Warn("Failed to update connection stats")

@@ -139,6 +139,6 @@ func (ps *PubSub) Delete(ctx context.Context, ids *ttnpb.ApplicationPubSubIdenti
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtDeletePubSub.NewWithIdentifiersAndData(ctx, ids.ApplicationIds, *ids))
+	events.Publish(evtDeletePubSub.NewWithIdentifiersAndData(ctx, ids.ApplicationIds, ids))
 	return ttnpb.Empty, nil
 }

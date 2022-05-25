@@ -917,22 +917,19 @@ func (spec MACCommandSpec) read(phy band.Band, r io.Reader, isUplink bool, cmd *
 		return err
 	}
 
-	ret := ttnpb.MACCommand{
-		Cid: ttnpb.MACCommandIdentifier(b[0]),
-	}
+	cid := ttnpb.MACCommandIdentifier(b[0])
 
-	desc, ok := spec[ret.Cid]
+	desc, ok := spec[cid]
 	if !ok || desc == nil {
 		b, err := io.ReadAll(r)
 		if err != nil {
 			return err
 		}
 
-		ret.Payload = &ttnpb.MACCommand_RawPayload{
+		payload := &ttnpb.MACCommand_RawPayload{
 			RawPayload: b,
 		}
-		*cmd = ret
-		return nil
+		return cmd.SetFields(&ttnpb.MACCommand{Payload: payload, Cid: cid}, ttnpb.MACCommandFieldPathsTopLevel...)
 	}
 
 	var n uint16
@@ -945,7 +942,7 @@ func (spec MACCommandSpec) read(phy band.Band, r io.Reader, isUplink bool, cmd *
 		unmarshaler = desc.UnmarshalDownlink
 	}
 	if unmarshaler == nil {
-		return errNoUnmarshaler.WithAttributes("cid", fmt.Sprintf("0x%X", int32(ret.Cid)))
+		return errNoUnmarshaler.WithAttributes("cid", fmt.Sprintf("0x%X", int32(cid)))
 	}
 
 	if n == 0 {
@@ -958,7 +955,7 @@ func (spec MACCommandSpec) read(phy band.Band, r io.Reader, isUplink bool, cmd *
 		}
 	}
 	if err := unmarshaler(phy, b, cmd); err != nil {
-		return errDecodingMACCommand.WithAttributes("cid", fmt.Sprintf("0x%X", int32(ret.Cid))).WithCause(err)
+		return errDecodingMACCommand.WithAttributes("cid", fmt.Sprintf("0x%X", int32(cid))).WithCause(err)
 	}
 	return nil
 }

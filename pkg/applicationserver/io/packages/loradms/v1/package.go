@@ -63,7 +63,7 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.Appli
 
 	defer func() {
 		if err != nil {
-			registerPackageFail(ctx, *up.EndDeviceIds, err)
+			registerPackageFail(ctx, up.EndDeviceIds, err)
 		}
 	}()
 

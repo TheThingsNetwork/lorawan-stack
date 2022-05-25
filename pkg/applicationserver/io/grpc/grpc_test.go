@@ -435,7 +435,7 @@ func TestSimulateUplink(t *testing.T) {
 		},
 	})
 
-	registeredDeviceID := ttnpb.EndDeviceIdentifiers{
+	registeredDeviceID := &ttnpb.EndDeviceIdentifiers{
 		DeviceId:       "dev1",
 		ApplicationIds: registeredApplicationID,
 		DevEui:         &types.EUI64{0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01},
@@ -475,7 +475,7 @@ func TestSimulateUplink(t *testing.T) {
 		name              string
 		up                *ttnpb.ApplicationUp
 		setup             func(f *mockFetcher)
-		expectIdentifiers ttnpb.EndDeviceIdentifiers
+		expectIdentifiers *ttnpb.EndDeviceIdentifiers
 	}{
 		{
 			name: "Fetch",
@@ -489,7 +489,7 @@ func TestSimulateUplink(t *testing.T) {
 				},
 			},
 			setup: func(f *mockFetcher) {
-				f.ids = &registeredDeviceID
+				f.ids = registeredDeviceID
 				f.err = nil
 			},
 			expectIdentifiers: registeredDeviceID,
@@ -509,7 +509,7 @@ func TestSimulateUplink(t *testing.T) {
 				f.ids = nil
 				f.err = fmt.Errorf("mock error")
 			},
-			expectIdentifiers: ttnpb.EndDeviceIdentifiers{
+			expectIdentifiers: &ttnpb.EndDeviceIdentifiers{
 				DeviceId:       registeredDeviceID.DeviceId,
 				ApplicationIds: registeredApplicationID,
 			},

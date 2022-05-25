@@ -48,7 +48,7 @@ type protobufv2 struct {
 	topics.Layout
 }
 
-func (protobufv2) FromDownlink(down *ttnpb.DownlinkMessage, _ ttnpb.GatewayIdentifiers) ([]byte, error) {
+func (protobufv2) FromDownlink(down *ttnpb.DownlinkMessage, _ *ttnpb.GatewayIdentifiers) ([]byte, error) {
 	settings := down.GetScheduled()
 	if settings == nil {
 		return nil, errNotScheduled.New()
@@ -85,7 +85,7 @@ func (protobufv2) FromDownlink(down *ttnpb.DownlinkMessage, _ ttnpb.GatewayIdent
 	return v2downlink.Marshal()
 }
 
-func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb.UplinkMessage, error) {
+func (protobufv2) ToUplink(message []byte, ids *ttnpb.GatewayIdentifiers) (*ttnpb.UplinkMessage, error) {
 	v2uplink := &ttnpbv2.UplinkMessage{}
 	err := v2uplink.Unmarshal(message)
 	if err != nil {
@@ -133,7 +133,7 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 				rssi = antenna.Rssi
 			}
 			uplink.RxMetadata = append(uplink.RxMetadata, &ttnpb.RxMetadata{
-				GatewayIds:            &ids,
+				GatewayIds:            ids,
 				AntennaIndex:          antenna.Antenna,
 				ChannelRssi:           rssi,
 				FrequencyOffset:       antenna.FrequencyOffset,
@@ -146,7 +146,7 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 		}
 	} else {
 		uplink.RxMetadata = append(uplink.RxMetadata, &ttnpb.RxMetadata{
-			GatewayIds:   &ids,
+			GatewayIds:   ids,
 			AntennaIndex: 0,
 			ChannelRssi:  gwMetadata.Rssi,
 			Rssi:         gwMetadata.Rssi,
@@ -161,7 +161,7 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 
 var ttkgPlatformRegex = regexp.MustCompile(`The Things Gateway v1 - BL (r[0-9]+\-[0-9a-f]+) \(([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)\) - Firmware (v[0-9]+.[0-9]+.[0-9]+\-[0-9a-f]+) \(([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)\)`)
 
-func (protobufv2) ToStatus(message []byte, _ ttnpb.GatewayIdentifiers) (*ttnpb.GatewayStatus, error) {
+func (protobufv2) ToStatus(message []byte, _ *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayStatus, error) {
 	v2status := &ttnpbv2.StatusMessage{}
 	err := v2status.Unmarshal(message)
 	if err != nil {
@@ -227,7 +227,7 @@ func (protobufv2) ToStatus(message []byte, _ ttnpb.GatewayIdentifiers) (*ttnpb.G
 	}, nil
 }
 
-func (protobufv2) ToTxAck(message []byte, _ ttnpb.GatewayIdentifiers) (*ttnpb.TxAcknowledgment, error) {
+func (protobufv2) ToTxAck(message []byte, _ *ttnpb.GatewayIdentifiers) (*ttnpb.TxAcknowledgment, error) {
 	return nil, errNotSupported.New()
 }
 

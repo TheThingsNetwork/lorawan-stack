@@ -388,23 +388,23 @@ var (
 // If the path contains an uplink token, the gateway antenna identifiers are taken from the uplink token, and the uplink token is returned.
 // If the path is fixed, the gateway antenna identifiers are taken from the fixed path.
 // Class A downlink requires the path to provide an uplink token, while class B and C downlink may use a fixed downlink path.
-func getDownlinkPath(path *ttnpb.DownlinkPath, class ttnpb.Class) (ttnpb.GatewayAntennaIdentifiers, *ttnpb.UplinkToken, error) {
+func getDownlinkPath(path *ttnpb.DownlinkPath, class ttnpb.Class) (*ttnpb.GatewayAntennaIdentifiers, *ttnpb.UplinkToken, error) {
 	if buf := path.GetUplinkToken(); len(buf) == 0 {
 		if class == ttnpb.Class_CLASS_A {
-			return ttnpb.GatewayAntennaIdentifiers{}, nil, errNoUplinkToken.New()
+			return nil, nil, errNoUplinkToken.New()
 		}
 	} else {
 		token, err := ParseUplinkToken(buf)
 		if err != nil {
-			return ttnpb.GatewayAntennaIdentifiers{}, nil, err
+			return nil, nil, err
 		}
-		return *token.Ids, token, err
+		return token.Ids, token, err
 	}
 	fixed := path.GetFixed()
 	if fixed == nil {
-		return ttnpb.GatewayAntennaIdentifiers{}, nil, errDownlinkPath.New()
+		return nil, nil, errDownlinkPath.New()
 	}
-	return *fixed, nil, nil
+	return fixed, nil, nil
 }
 
 // SendDown sends the downlink message directly on the downlink channel.

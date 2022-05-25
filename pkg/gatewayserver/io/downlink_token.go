@@ -21,6 +21,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/mohae/deepcopy"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -60,8 +61,7 @@ func (t DownlinkTokens) Get(token uint16, time time.Time) (*ttnpb.DownlinkMessag
 	if item.key != token || item.msg == nil || item.time.IsZero() {
 		return nil, 0, false
 	}
-	downMsg := *item.msg
-	return &downMsg, time.Sub(item.time), true
+	return deepcopy.Copy(item.msg).(*ttnpb.DownlinkMessage), time.Sub(item.time), true
 }
 
 var parseTokenRegex = regexp.MustCompile(`^gs:down:token:(\d+)$`)

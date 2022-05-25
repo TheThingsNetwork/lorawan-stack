@@ -26,7 +26,7 @@ type PubSub interface {
 	// Publish publishes traffic to the subscribers.
 	Publish(context.Context, *ttnpb.ApplicationUp) error
 	// Subscribe to the traffic of a specific application.
-	Subscribe(context.Context, ttnpb.ApplicationIdentifiers, func(context.Context, *ttnpb.ApplicationUp) error) error
+	Subscribe(context.Context, *ttnpb.ApplicationIdentifiers, func(context.Context, *ttnpb.ApplicationUp) error) error
 }
 
 // Distributor sends upstream traffic from publishers to subscribers.

@@ -551,7 +551,7 @@ func TestVersion(t *testing.T) {
 		Name                  string
 		VersionQuery          interface{}
 		ExpectedRouterConfig  interface{}
-		ExpectedStatusMessage ttnpb.GatewayStatus
+		ExpectedStatusMessage *ttnpb.GatewayStatus
 	}{
 		{
 			Name: "VersionProd",
@@ -606,7 +606,7 @@ func TestVersion(t *testing.T) {
 					},
 				},
 			},
-			ExpectedStatusMessage: ttnpb.GatewayStatus{
+			ExpectedStatusMessage: &ttnpb.GatewayStatus{
 				Versions: map[string]string{
 					"station":  "test-station",
 					"firmware": "1.0.0",
@@ -681,7 +681,7 @@ func TestVersion(t *testing.T) {
 					},
 				},
 			},
-			ExpectedStatusMessage: ttnpb.GatewayStatus{
+			ExpectedStatusMessage: &ttnpb.GatewayStatus{
 				Versions: map[string]string{
 					"station":  "test-station-rc1",
 					"firmware": "1.0.0",
@@ -745,7 +745,7 @@ func TestVersion(t *testing.T) {
 					a.So(time.Since(*ttnpb.StdTime(stat.Time)), should.BeLessThan, timeout)
 					stat.Time = nil
 				}
-				a.So(stat, should.Resemble, &tc.ExpectedStatusMessage)
+				a.So(stat, should.Resemble, tc.ExpectedStatusMessage)
 			case <-time.After(timeout):
 				t.Fatalf("Read message timeout")
 			}
@@ -839,7 +839,7 @@ func TestTraffic(t *testing.T) {
 					},
 				},
 			},
-			ExpectedNetworkUpstream: ttnpb.UplinkMessage{
+			ExpectedNetworkUpstream: &ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
 					MHdr: &ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: ttnpb.Major_LORAWAN_R1},
 					Mic:  []byte{0x4E, 0x61, 0xBC, 0x00},
@@ -889,7 +889,7 @@ func TestTraffic(t *testing.T) {
 					},
 				},
 			},
-			ExpectedNetworkUpstream: ttnpb.UplinkMessage{
+			ExpectedNetworkUpstream: &ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
 					MHdr: &ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: ttnpb.Major_LORAWAN_R1},
 					Mic:  []byte{0x4E, 0x61, 0xBC, 0x00},
@@ -989,7 +989,7 @@ func TestTraffic(t *testing.T) {
 				Diid:  1,
 				XTime: 1548059982,
 			},
-			ExpectedNetworkUpstream: ttnpb.TxAcknowledgment{
+			ExpectedNetworkUpstream: &ttnpb.TxAcknowledgment{
 				DownlinkMessage: &ttnpb.DownlinkMessage{
 					RawPayload: []byte("Ymxhamthc25kJ3M=="),
 					EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
@@ -1016,7 +1016,7 @@ func TestTraffic(t *testing.T) {
 				Diid:  1,
 				XTime: 1548059982,
 			},
-			ExpectedNetworkUpstream: ttnpb.TxAcknowledgment{
+			ExpectedNetworkUpstream: &ttnpb.TxAcknowledgment{
 				DownlinkMessage: &ttnpb.DownlinkMessage{
 					RawPayload: []byte("Ymxhamthc25kJ3M=="),
 					EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
@@ -1043,7 +1043,7 @@ func TestTraffic(t *testing.T) {
 				Diid:  2,
 				XTime: 1548059982,
 			},
-			ExpectedNetworkUpstream: ttnpb.TxAcknowledgment{},
+			ExpectedNetworkUpstream: &ttnpb.TxAcknowledgment{},
 		},
 		{
 			Name: "AbsoluteTimeDownlink",
@@ -1105,14 +1105,14 @@ func TestTraffic(t *testing.T) {
 					}
 					select {
 					case ack := <-gsConn.TxAck():
-						expected := tc.ExpectedNetworkUpstream.(ttnpb.TxAcknowledgment)
+						expected := tc.ExpectedNetworkUpstream.(*ttnpb.TxAcknowledgment)
 						if expected.DownlinkMessage.GetScheduled() != nil {
 							if !a.So(ack.DownlinkMessage.GetScheduled(), should.NotBeNil) {
 								t.Fatalf("Invalid downlink message settings: %v", ack.DownlinkMessage.Settings)
 							}
 							ack.DownlinkMessage.Settings = expected.DownlinkMessage.Settings
 						}
-						if !a.So(*ack, should.Resemble, expected) {
+						if !a.So(ack, should.Resemble, expected) {
 							t.Fatalf("Invalid TxAck: %v", ack)
 						}
 					case <-time.After(timeout):
@@ -1142,7 +1142,7 @@ func TestTraffic(t *testing.T) {
 							t.Fatalf("Invalid RawPayload: %v", up.Message.RawPayload)
 						}
 
-						expectedUp := deepcopy.Copy(tc.ExpectedNetworkUpstream).(ttnpb.UplinkMessage)
+						expectedUp := deepcopy.Copy(tc.ExpectedNetworkUpstream).(*ttnpb.UplinkMessage)
 						expectedUp.ReceivedAt = up.Message.ReceivedAt
 						expectedUp.RawPayload = up.Message.RawPayload
 						expectedUp.RxMetadata[0].UplinkToken = up.Message.RxMetadata[0].UplinkToken
@@ -1152,7 +1152,7 @@ func TestTraffic(t *testing.T) {
 						expectedUp.RxMetadata[0].Time = ttnpb.ProtoTime(&now)
 						expectedUp.Settings.Timestamp = timestamp
 						expectedUp.Settings.Time = ttnpb.ProtoTime(&now)
-						a.So(up.Message, should.Resemble, &expectedUp)
+						a.So(up.Message, should.Resemble, expectedUp)
 					case <-time.After(timeout):
 						t.Fatalf("Read message timeout")
 					}
@@ -1177,7 +1177,7 @@ func TestTraffic(t *testing.T) {
 							t.Fatalf("Invalid RawPayload: %v", up.Message.RawPayload)
 						}
 
-						expectedUp := deepcopy.Copy(tc.ExpectedNetworkUpstream).(ttnpb.UplinkMessage)
+						expectedUp := deepcopy.Copy(tc.ExpectedNetworkUpstream).(*ttnpb.UplinkMessage)
 						expectedUp.ReceivedAt = up.Message.ReceivedAt
 						expectedUp.RawPayload = up.Message.RawPayload
 						expectedUp.RxMetadata[0].UplinkToken = up.Message.RxMetadata[0].UplinkToken
@@ -1187,7 +1187,7 @@ func TestTraffic(t *testing.T) {
 						expectedUp.RxMetadata[0].Time = ttnpb.ProtoTime(&now)
 						expectedUp.Settings.Timestamp = timestamp
 						expectedUp.Settings.Time = ttnpb.ProtoTime(&now)
-						a.So(up.Message, should.Resemble, &expectedUp)
+						a.So(up.Message, should.Resemble, expectedUp)
 					case <-time.After(timeout):
 						t.Fatalf("Read message timeout")
 					}

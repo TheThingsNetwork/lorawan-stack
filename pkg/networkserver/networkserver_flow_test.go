@@ -266,7 +266,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			frmPayload = fOpts
 			fOpts = nil
 		}
-		down := MakeDataDownlink(DataDownlinkConfig{
+		down := MakeDataDownlink(&DataDownlinkConfig{
 			DecodePayload: true,
 
 			MACVersion: dev.MacState.LorawanVersion,

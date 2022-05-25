@@ -31,7 +31,6 @@ func TestNeedsRxParamSetupReq(t *testing.T) {
 	for _, tc := range []struct {
 		Name        string
 		InputDevice *ttnpb.EndDevice
-		Defaults    ttnpb.MACSettings
 		Needs       bool
 	}{
 		{

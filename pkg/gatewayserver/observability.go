@@ -313,8 +313,8 @@ func registerGatewayDisconnect(ctx context.Context, ids *ttnpb.GatewayIdentifier
 	gsMetrics.gatewaysConnected.WithLabelValues(ctx, protocol).Dec()
 }
 
-func registerGatewayConnectionStats(ctx context.Context, ids ttnpb.GatewayIdentifiers, stats *ttnpb.GatewayConnectionStats) {
-	events.Publish(evtGatewayConnectionStats.NewWithIdentifiersAndData(ctx, &ids, stats))
+func registerGatewayConnectionStats(ctx context.Context, ids *ttnpb.GatewayIdentifiers, stats *ttnpb.GatewayConnectionStats) {
+	events.Publish(evtGatewayConnectionStats.NewWithIdentifiersAndData(ctx, ids, stats))
 }
 
 func registerReceiveStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus, protocol string) {

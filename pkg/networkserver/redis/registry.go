@@ -71,7 +71,7 @@ func (r *DeviceRegistry) euiKey(joinEUI, devEUI types.EUI64) string {
 func (r *DeviceRegistry) GetByID(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error) {
 	defer trace.StartRegion(ctx, "get end device by id").End()
 
-	ids := ttnpb.EndDeviceIdentifiers{
+	ids := &ttnpb.EndDeviceIdentifiers{
 		ApplicationIds: appID,
 		DeviceId:       devID,
 	}
@@ -674,7 +674,7 @@ var errInvalidDevice = errors.DefineInvalidArgument("invalid_device", "device is
 
 // SetByID sets device by appID, devID.
 func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(ctx context.Context, pb *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
-	ids := ttnpb.EndDeviceIdentifiers{
+	ids := &ttnpb.EndDeviceIdentifiers{
 		ApplicationIds: appID,
 		DeviceId:       devID,
 	}

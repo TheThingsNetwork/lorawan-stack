@@ -106,7 +106,7 @@ func (ps *PubSub) startTask(ctx context.Context, ids *ttnpb.ApplicationPubSubIde
 }
 
 type integration struct {
-	ttnpb.ApplicationPubSub
+	*ttnpb.ApplicationPubSub
 	ctx    context.Context
 	cancel errorcontext.CancelFunc
 	closed chan struct{}
@@ -248,7 +248,7 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 	}()
 
 	i := &integration{
-		ApplicationPubSub: *pb,
+		ApplicationPubSub: pb,
 		ctx:               ctx,
 		cancel:            cancel,
 		closed:            make(chan struct{}),

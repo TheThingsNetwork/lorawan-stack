@@ -48,7 +48,9 @@ func (ps PubSub) Publish(ctx context.Context, up *ttnpb.ApplicationUp) error {
 var errChannelClosed = errors.DefineAborted("channel_closed", "channel closed")
 
 // Subscribe subscribes to the traffic of the provided application and processes it using the handler.
-func (ps PubSub) Subscribe(ctx context.Context, ids ttnpb.ApplicationIdentifiers, handler func(context.Context, *ttnpb.ApplicationUp) error) error {
+func (ps PubSub) Subscribe(
+	ctx context.Context, ids *ttnpb.ApplicationIdentifiers, handler func(context.Context, *ttnpb.ApplicationUp) error,
+) error {
 	uid := unique.ID(ctx, ids)
 	sub := ps.Redis.Subscribe(ctx, ps.uidUplinkKey(uid))
 	defer sub.Close()
