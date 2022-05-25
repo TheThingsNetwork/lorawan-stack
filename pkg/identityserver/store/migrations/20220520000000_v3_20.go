@@ -20,6 +20,7 @@ import (
 
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/migrate"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
 
 func init() {
@@ -29,7 +30,19 @@ func init() {
 		if exists, err := tableExists(ctx, db, "accounts"); err != nil {
 			return err
 		} else if !exists {
-			return migrate.NewSQLMigrationFunc(sqlMigrations, "20220520000000_v3_20.init.sql")(ctx, db)
+			_, err = db.Exec("CREATE EXTENSION IF NOT EXISTS pgcrypto;")
+			if err != nil {
+				log.FromContext(ctx).
+					WithError(err).
+					Warn("Failed to enable pgcrypto extension, but trying to continue without it")
+			}
+
+			err = migrate.NewSQLMigrationFunc(sqlMigrations, "20220520000000_v3_20.init.sql")(ctx, db)
+			if err != nil {
+				return fmt.Errorf("failed to run SQL migration: %w", err)
+			}
+
+			return nil
 		}
 
 		// If the notifications table does not exist, we're working with a pre-v3.19 database,
