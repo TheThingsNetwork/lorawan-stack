@@ -120,7 +120,7 @@ func TestTTJS(t *testing.T) {
 	// Invalid client API key.
 	unauthenticatedClient, err := ttJSConfig.NewClient(ctx, c)
 	test.Must(unauthenticatedClient, err)
-	err = unauthenticatedClient.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode, false)
+	err = unauthenticatedClient.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode)
 	a.So(errors.IsUnauthenticated(err), should.BeTrue)
 	err = unauthenticatedClient.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
 		DevEui:  &devEUI,
@@ -186,7 +186,7 @@ func TestTTJS(t *testing.T) {
 		},
 	} {
 		t.Run(fmt.Sprintf("Claim/%s", tc.Name), func(t *testing.T) {
-			err := client.Claim(ctx, tc.JoinEUI, tc.DevEUI, tc.AuthenticationCode, true)
+			err := client.Claim(ctx, tc.JoinEUI, tc.DevEUI, tc.AuthenticationCode)
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
@@ -216,7 +216,7 @@ func TestTTJS(t *testing.T) {
 	}
 	otherClient, err := otherClientConfig.NewClient(ctx, c)
 	test.Must(otherClient, err)
-	err = otherClient.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode, false)
+	err = otherClient.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode)
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 	ret, err = otherClient.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
 		DevEui:  &devEUI,
@@ -250,7 +250,7 @@ func TestTTJS(t *testing.T) {
 	a.So(errors.IsNotFound(err), should.BeTrue)
 
 	// Try to claim
-	err = client.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode, false)
+	err = client.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode)
 	a.So(err, should.BeNil)
 
 	// Get valid status

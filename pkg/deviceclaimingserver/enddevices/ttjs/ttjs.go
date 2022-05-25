@@ -114,12 +114,12 @@ var (
 )
 
 // Claim implements EndDeviceClaimer.
-func (client *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, claimAuthenticationCode string, lockClaim bool) error {
+func (client *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, claimAuthenticationCode string) error {
 	htenantID := client.config.TenantID
 
 	claimReq := &claimRequest{
 		OwnerToken: claimAuthenticationCode,
-		Locked:     lockClaim,
+		Locked:     true,
 		claimData: claimData{
 			HomeNetID: client.config.NetID.String(),
 			HomeNSID:  client.config.NetworkServer.HomeNSID.String(),

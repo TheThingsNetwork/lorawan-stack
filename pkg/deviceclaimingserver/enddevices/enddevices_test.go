@@ -62,7 +62,7 @@ func TestUpstream(t *testing.T) {
 	// Invalid JoinEUI.
 	err = upstream.Claim(ctx, *unsupportedJoinEUI,
 		types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30},
-		"secret", true)
+		"secret")
 	a.So(errors.IsAborted(err), should.BeTrue)
 
 	_, err = upstream.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
@@ -91,7 +91,7 @@ func TestUpstream(t *testing.T) {
 
 	err = upstream.Claim(ctx, *supportedJoinEUI,
 		types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30},
-		"secret", true)
+		"secret")
 	a.So(!errors.IsUnimplemented(err), should.BeTrue)
 
 	_, err = upstream.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
