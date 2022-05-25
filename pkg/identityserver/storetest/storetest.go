@@ -15,6 +15,7 @@
 package storetest
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"net/url"
@@ -95,7 +96,7 @@ func New(t *testing.T, newStore func(t *testing.T, dsn *url.URL) Store) *StoreTe
 }
 
 type Store interface {
-	Init() error
+	Init(ctx context.Context) error
 	Close() error
 }
 
@@ -125,7 +126,7 @@ func (s *StoreTest) PrepareDB(t *testing.T) Store {
 
 	store := s.newStore(t, GetSchemaDSN(s.dsn, schemaName))
 
-	if err := store.Init(); err != nil {
+	if err := store.Init(ctx); err != nil {
 		t.Fatal(err)
 	}
 

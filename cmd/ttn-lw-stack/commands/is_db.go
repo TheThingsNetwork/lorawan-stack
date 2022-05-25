@@ -15,14 +15,18 @@
 package commands
 
 import (
-	"context"
+	"database/sql"
+	"fmt"
 	"time"
 
-	"github.com/jinzhu/gorm"
 	"github.com/spf13/cobra"
+	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/dialect/pgdialect"
+	"github.com/uptrace/bun/driver/pgdriver"
+	"github.com/uptrace/bun/migrate"
 	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
-	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore/migrations"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	ismigrations "go.thethings.network/lorawan-stack/v3/pkg/identityserver/store/migrations"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	ttntypes "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
@@ -36,29 +40,7 @@ var (
 		Use:   "init",
 		Short: "Initialize the Identity Server database",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			logger.Info("Connecting to Identity Server database...")
-			db, err := gormstore.Open(ctx, config.IS.DatabaseURI)
-			if err != nil {
-				return err
-			}
-			defer db.Close()
-
-			if dbVersion, ok := db.Get("db:version"); ok {
-				logger.Infof("Detected database %s", dbVersion)
-			}
-
-			logger.Info("Initializing database...")
-			if err = gormstore.Initialize(db); err != nil {
-				return err
-			}
-
-			logger.Info("Creating tables...")
-			if err = gormstore.AutoMigrate(db).Error; err != nil {
-				return err
-			}
-
-			logger.Info("Successfully initialized")
-			return nil
+			return fmt.Errorf("init command deprecated, use migrate instead")
 		},
 	}
 	isDBMigrateCommand = &cobra.Command{
@@ -66,32 +48,65 @@ var (
 		Short: "Migrate the Identity Server database",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			logger.Info("Connecting to Identity Server database...")
-			db, err := gormstore.Open(ctx, config.IS.DatabaseURI)
-			if err != nil {
-				return err
-			}
-			defer db.Close()
 
-			if dbVersion, ok := db.Get("db:version"); ok {
-				logger.Infof("Detected database %s", dbVersion)
-			}
+			sqlDB := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(config.IS.DatabaseURI)))
+			defer sqlDB.Close()
 
-			err = gormstore.Transact(ctx, db, func(db *gorm.DB) error {
-				logger.Info("Migrating table structure...")
-				return gormstore.AutoMigrate(db).Error
-			})
-			if err != nil {
-				return err
-			}
-			logger.Info("Migrating table contents...")
-			err = migrations.Apply(ctx, func(ctx context.Context, f func(db *gorm.DB) error) error {
-				return gormstore.Transact(ctx, db, f)
-			}, migrations.All...)
+			bunDB := bun.NewDB(sqlDB, pgdialect.New())
+
+			migrator := migrate.NewMigrator(bunDB, ismigrations.Migrations)
+
+			err := migrator.Init(cmd.Context())
 			if err != nil {
 				return err
 			}
 
-			logger.Info("Successfully migrated")
+			status, err := migrator.MigrationsWithStatus(cmd.Context())
+			if err != nil {
+				return err
+			}
+			if migrations := status.Applied(); len(migrations) > 0 {
+				logger.Infof("Applied: %s", status)
+			}
+			if migrations := status.Unapplied(); len(migrations) > 0 {
+				logger.Infof("Unapplied: %s", status)
+			}
+
+			var group *migrate.MigrationGroup
+
+			rollback, _ := cmd.Flags().GetBool("rollback")
+
+			if rollback {
+				group, err = migrator.Rollback(cmd.Context())
+			} else {
+				group, err = migrator.Migrate(cmd.Context())
+			}
+			if err != nil {
+				return err
+			}
+
+			if group.IsZero() {
+				logger.Info("Database is up to date")
+				return nil
+			}
+
+			if rollback {
+				logger.WithField("group", group.ID).Info("Database rollback done")
+			} else {
+				logger.WithField("group", group.ID).Info("Database migration done")
+			}
+
+			status, err = migrator.MigrationsWithStatus(cmd.Context())
+			if err != nil {
+				return err
+			}
+			if migrations := status.Applied(); len(migrations) > 0 {
+				logger.Infof("Applied: %s", status)
+			}
+			if migrations := status.Unapplied(); len(migrations) > 0 {
+				logger.Infof("Unapplied: %s", status)
+			}
+
 			return nil
 		},
 	}
@@ -342,6 +357,7 @@ var (
 func init() {
 	Root.AddCommand(isDBCommand)
 	isDBCommand.AddCommand(isDBInitCommand)
+	isDBMigrateCommand.Flags().Bool("rollback", false, "Rollback most recent migration group")
 	isDBCommand.AddCommand(isDBMigrateCommand)
 	isDBCleanupCommand.Flags().Bool("dry-run", false, "Dry run")
 	isDBCommand.AddCommand(isDBCleanupCommand)

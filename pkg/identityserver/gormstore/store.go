@@ -491,7 +491,6 @@ func NewCombinedStore(db *gorm.DB) *CombinedStore {
 		contactInfoStore:  contactInfoStore{baseStore: baseStore},
 		euiStore:          euiStore{baseStore: baseStore},
 		notificationStore: notificationStore{baseStore: baseStore},
-		migrationStore:    migrationStore{baseStore: baseStore},
 	}
 }
 
@@ -518,7 +517,6 @@ type CombinedStore struct {
 	contactInfoStore
 	euiStore
 	notificationStore
-	migrationStore
 }
 
 // Transact implements the store.TransactionalStore interface.

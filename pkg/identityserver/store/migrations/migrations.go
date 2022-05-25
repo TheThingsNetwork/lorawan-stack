@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,15 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package store
+// Package migrations contains Identity Server store migrations.
+package migrations
 
-// Migration model.
-type Migration struct {
-	Model
+import (
+	"embed"
 
-	Name string `gorm:"type:VARCHAR;unique_index:migration_name_index"`
-}
+	"github.com/uptrace/bun/migrate"
+)
+
+// Migrations is the collection of schema migrations.
+var Migrations = migrate.NewMigrations()
+
+//go:embed *.sql
+var sqlMigrations embed.FS
 
 func init() {
-	registerModel(&Migration{})
+	if err := Migrations.Discover(sqlMigrations); err != nil {
+		panic(err)
+	}
 }

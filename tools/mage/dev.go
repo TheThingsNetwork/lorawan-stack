@@ -241,7 +241,7 @@ func (Dev) InitStack() error {
 	if mg.Verbose() {
 		fmt.Println("Initializing the Stack")
 	}
-	if err := runGo("./cmd/ttn-lw-stack", "is-db", "init"); err != nil {
+	if err := runGo("./cmd/ttn-lw-stack", "is-db", "migrate"); err != nil {
 		return err
 	}
 	if err := runGo("./cmd/ttn-lw-stack", "is-db", "create-admin-user",

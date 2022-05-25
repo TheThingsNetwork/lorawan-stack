@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,14 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package store
+package migrations
 
-import "context"
+import (
+	"context"
 
-// MigrationStore interface for migration history.
-type MigrationStore interface {
-	CreateMigration(ctx context.Context, migration *Migration) error
-	FindMigrations(ctx context.Context) ([]*Migration, error)
-	GetMigration(ctx context.Context, id string) (*Migration, error)
-	DeleteMigration(ctx context.Context, id string) error
+	"github.com/uptrace/bun"
+)
+
+func tableExists(ctx context.Context, db *bun.DB, tableName string) (bool, error) {
+	c, err := db.NewSelect().
+		TableExpr("INFORMATION_SCHEMA.tables").
+		Where("table_name = ?", tableName).
+		Where("table_type = 'BASE TABLE'").
+		Where("table_schema = CURRENT_SCHEMA()").
+		Count(ctx)
+	if err != nil {
+		return false, err
+	}
+	return c == 1, nil
 }
