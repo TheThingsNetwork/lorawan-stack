@@ -104,9 +104,15 @@ export default class Spinner extends React.PureComponent {
             </linearGradient>
           </defs>
           <g transform="translate(50, 50)">
-            <circle cx="0" cy="0" r="40" className={style.bar} stroke={`url(#${this.id})`} />
+            <circle
+              cx="0"
+              cy="0"
+              r={micro ? 35 : 40}
+              className={style.bar}
+              stroke={`url(#${this.id})`}
+            />
           </g>
-          <circle cx="50" cy="50" r="40" className={style.circle} />
+          <circle cx="50" cy="50" r={micro ? 35 : 40} className={style.circle} />
         </svg>
         <div className={style.message}>{children}</div>
       </div>
