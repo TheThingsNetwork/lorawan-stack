@@ -24,13 +24,16 @@ import (
 )
 
 func TestUnmarshal(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	mgr := Initialize("test", "test", defaults)
 	a.So(mgr, should.NotBeNil)
 
-	mgr.Parse()
-	err := mgr.MergeConfig(strings.NewReader(`file-only: 10`))
+	err := mgr.Parse()
+	a.So(err, should.BeNil)
+
+	err = mgr.MergeConfig(strings.NewReader(`file-only: 10`))
 	a.So(err, should.BeNil)
 
 	var res map[string]interface{}
@@ -41,13 +44,16 @@ func TestUnmarshal(t *testing.T) {
 }
 
 func TestUnmarshalKey(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	mgr := Initialize("test", "test", defaults)
 	a.So(mgr, should.NotBeNil)
 
-	mgr.Parse()
-	err := mgr.MergeConfig(strings.NewReader(`file-only: 10`))
+	err := mgr.Parse()
+	a.So(err, should.BeNil)
+
+	err = mgr.MergeConfig(strings.NewReader(`file-only: 10`))
 	a.So(err, should.BeNil)
 
 	var res int

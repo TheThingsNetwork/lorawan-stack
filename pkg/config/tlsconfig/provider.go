@@ -35,7 +35,11 @@ func (fn ConfigOptionFunc) apply(c *tls.Config) {
 }
 
 // WithTLSClientAuth sets TLS client authentication options.
-func WithTLSClientAuth(auth tls.ClientAuthType, cas *x509.CertPool, verify func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error) Option {
+func WithTLSClientAuth(
+	auth tls.ClientAuthType,
+	cas *x509.CertPool,
+	verify func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error,
+) Option {
 	return ConfigOptionFunc(func(c *tls.Config) {
 		c.ClientAuth = auth
 		c.ClientCAs = cas
@@ -68,7 +72,10 @@ func (p ConfigurationProvider) GetTLSServerConfig(ctx context.Context, opts ...O
 		return nil, err
 	}
 	if cipherSuites != nil {
-		log.FromContext(ctx).Warn("TLS is configured to use a custom set of cipher suites. Make sure that your list is up to date, or disable the custom cipher suites")
+		log.FromContext(ctx).Warn(
+			"TLS is configured to use a custom set of cipher suites.",
+			"Make sure that your list is up to date, or disable the custom cipher suites",
+		)
 	}
 	res := &tls.Config{
 		MinVersion:   tls.VersionTLS12,
@@ -88,7 +95,7 @@ func (p ConfigurationProvider) GetTLSClientConfig(ctx context.Context, opts ...O
 	conf := p(ctx)
 	res := &tls.Config{
 		MinVersion:         tls.VersionTLS12,
-		InsecureSkipVerify: conf.InsecureSkipVerify,
+		InsecureSkipVerify: conf.InsecureSkipVerify, //nolint:gosec
 	}
 	if err := conf.Client.ApplyTo(res); err != nil {
 		return nil, err

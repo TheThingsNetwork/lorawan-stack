@@ -45,7 +45,6 @@ type Manager struct {
 	defaults     interface{}
 	defaultPaths []string
 	configFlag   string
-	dataDirFlag  string
 }
 
 // Flags to be used in the command.
@@ -93,9 +92,12 @@ func (m *Manager) Get(key string) interface{} {
 // Option is the type of an option for the manager.
 type Option func(m *Manager)
 
+// WithDeprecatedFlag marks a flag as deprecated with the given message.
 func WithDeprecatedFlag(name, usageMessage string) Option {
 	return func(m *Manager) {
-		m.flags.MarkDeprecated(name, usageMessage)
+		if err := m.flags.MarkDeprecated(name, usageMessage); err != nil {
+			panic(err)
+		}
 	}
 }
 
@@ -106,36 +108,45 @@ var DefaultOptions = []Option{
 }
 
 // Initialize a new config manager with the given name and defaults.
-// defaults should be a struct wiath fields that define the possible config flags by setting the struct tags.
+//
+// The defaults should be a struct with fields that define the possible config
+// flags by setting the struct tags.
+//
 // Possible struct tags are:
 //
-//     `name:"<name>"`                Defines the name of the config flag, in the environment, on the command line and in the config files.
-//     `shorthand:"<n>"`              Defines a shorthand name for use on the command line.
-//     `description:"<description>"`  Add a description that will be printed in the command's help message.
-//     `file-only:"<true|false>"`     Denotes wether or not to attempt to parse this variable from the command line and environment or only from the
-//                                    config file. This can be used to allow complicated types to exist in the config file but not on the command line.
+// - `name:"<name>"`: Defines the name of the config flag, in the environment,
+//    on the command line and in the config files.
+// - `shorthand:"<n>"`: Defines a shorthand name for use on the command line.
+// - `description:"<description>"`: Add a description that will be printed in the
+//    command's help message.
+// - `file-only:"<true|false>"` Denotes wether or not to attempt to parse this
+//    variable from the command line and environment or only from the config file.
+//    This can be used to allow complicated types to exist in the config file
+//    but not on the command line.
 //
-// The type of the struct fields also defines their type when parsing the config file, command line arguments or environment
-// variables. Currently, the following types are supported:
+// The type of the struct fields also defines their type when parsing the config
+// file, command line arguments or environment variables.
+// Currently, the following types are supported:
 //
-//     bool
-//     int, int8, int16, int32, int64
-//     uint, uint8, uint16, uint32, uint64
-//     float32, float64
-//     string
-//     time.Time                           Parsed according to the TimeFormat variable set in this package
-//     time.Duration                       Parsed by time.ParseDuration
-//     []string                            Parsed by splitting on whitespace or by passing multiple flags
-//                                           VAR="a b c" or --var a --var b --var c
-//     map[string]string                   Parsed by key=val pairs
-//                                           VAR="k=v q=r" or --var k=v --var q=r
-//     map[string][]byte                   Parsed by key=val pairs, val must be hex
-//                                           VAR="k=0x01 q=0x02" or --var k=0x01 --var q=0x02
-//     map[string][]string                 Parsed by key=val pairs where keys are repeated
-//                                           VAR="k=v1 k=v2 q=r" or --var k=v1 --var k=v2 --var q=r
-//     Configurable                        Parsed by the UnmarshalConfigString method
-//     structs with fields of these types  The nested config names will be prefixed by the name of this struct, unless it is `name:",squash"`
-//                                         in which case the names are merged into the parent struct.
+// - `bool`
+// - `int`, `int8`, `int16`, `int32`, `int64`
+// - `uint`, `uint8`, `uint16`, `uint32`, `uint64`
+// - `float32`, `float64`
+// - `string`
+// - `time.Time`: Parsed according to the TimeFormat variable set in this package
+// - `time.Duration`: Parsed by `time.ParseDuration`
+// - `[]string``: Parsed by splitting on whitespace or by passing multiple flags
+//     VAR="a b c" or --var a --var b --var c
+// - `map[string]string``: Parsed by key=val pairs
+//     VAR="k=v q=r" or --var k=v --var q=r
+// - `map[string][]byte``: Parsed by key=val pairs, val must be hex
+//     VAR="k=0x01 q=0x02" or --var k=0x01 --var q=0x02
+// - `map[string][]string``: Parsed by key=val pairs where keys are repeated
+//     VAR="k=v1 k=v2 q=r" or --var k=v1 --var k=v2 --var q=r
+// - `Configurable``: Parsed by the UnmarshalConfigString method
+// - structs with fields of these types: The nested config names will be prefixed
+//     by the name of this struct, unless it is `name:",squash"` in which case
+//     the names are merged into the parent struct.
 func Initialize(name, envPrefix string, defaults interface{}, opts ...Option) *Manager {
 	m := &Manager{
 		name:      name,
@@ -202,7 +213,8 @@ func (m *Manager) Parse(flags ...string) error {
 	return m.flags.Parse(flags)
 }
 
-// Unmarshal unmarshals the available config keys into the result. It matches the names of fields based on the name struct tag.
+// Unmarshal unmarshals the available config keys into the result.
+// It matches the names of fields based on the name struct tag.
 func (m *Manager) Unmarshal(result interface{}) error {
 	d, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
 		TagName:          "name",
@@ -235,7 +247,6 @@ func (m *Manager) Unmarshal(result interface{}) error {
 	return d.Decode(m.viper.AllSettings())
 }
 
-// the path must be in default paths
 func (m *Manager) isDefault(path string) bool {
 	for _, def := range m.defaultPaths {
 		if def == path {

@@ -62,9 +62,12 @@ func stringSliceToStringMapHookFunc(f reflect.Type, t reflect.Type, data interfa
 }
 
 // stringSliceToStringMapSliceHookFunc is a hook for mapstructure that decodes []string to map[string][]string.
-// For example: [a=b a=c d=e] -> map[string][]string{a:[b c], d:[e]}
+// For example: [a=b a=c d=e] -> map[string][]string{a:[b c], d:[e]}.
 func stringSliceToStringMapStringSliceHookFunc(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
-	if (f.Kind() != reflect.String && (f.Kind() != reflect.Slice || f.Elem().Kind() != reflect.String)) || t.Kind() != reflect.Map || t.Elem().Kind() != reflect.Slice || t.Elem().Elem().Kind() != reflect.String {
+	if (f.Kind() != reflect.String && (f.Kind() != reflect.Slice || f.Elem().Kind() != reflect.String)) ||
+		t.Kind() != reflect.Map ||
+		t.Elem().Kind() != reflect.Slice ||
+		t.Elem().Elem().Kind() != reflect.String {
 		return data, nil
 	}
 
@@ -183,7 +186,10 @@ func configurableInterfaceHook(f reflect.Type, t reflect.Type, data interface{})
 }
 
 func configurableInterfaceSliceHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
-	if f.Kind() != reflect.Slice || f.Elem().Kind() != reflect.String || t.Kind() != reflect.Slice || !isConfigurableType(t.Elem()) {
+	if f.Kind() != reflect.Slice ||
+		f.Elem().Kind() != reflect.String ||
+		t.Kind() != reflect.Slice ||
+		!isConfigurableType(t.Elem()) {
 		return data, nil
 	}
 
@@ -219,7 +225,7 @@ func stringToByteSliceHook(f reflect.Type, t reflect.Type, data interface{}) (in
 	str := strings.TrimPrefix(data.(string), "0x")
 	slice, err := hex.DecodeString(str)
 	if err != nil {
-		return nil, fmt.Errorf("Could not decode hex: %s", err)
+		return nil, fmt.Errorf("could not decode hex: %w", err)
 	}
 
 	return slice, nil
@@ -233,10 +239,10 @@ func stringToByteArrayHook(f reflect.Type, t reflect.Type, data interface{}) (in
 	str := strings.TrimPrefix(data.(string), "0x")
 	slice, err := hex.DecodeString(str)
 	if err != nil {
-		return nil, fmt.Errorf("Could not decode hex: %s", err)
+		return nil, fmt.Errorf("could not decode hex: %w", err)
 	}
 	if len(slice) != t.Len() {
-		return nil, fmt.Errorf("Invalid length: expected %d, got %d", t.Len(), len(slice))
+		return nil, fmt.Errorf("invalid length: expected %d, got %d", t.Len(), len(slice))
 	}
 
 	rv := reflect.New(t).Elem()

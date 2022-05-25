@@ -32,6 +32,7 @@ type singleFileConfig struct {
 }
 
 func TestReadSingleConfig(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	_, filename, _, _ := runtime.Caller(0)
@@ -45,8 +46,10 @@ func TestReadSingleConfig(t *testing.T) {
 	mgr := InitializeWithDefaults("empty", "empty", defaults)
 	a.So(mgr, should.NotBeNil)
 
-	mgr.Parse("--config", first)
-	err := mgr.ReadInConfig()
+	err := mgr.Parse("--config", first)
+	a.So(err, should.BeNil)
+
+	err = mgr.ReadInConfig()
 	a.So(err, should.BeNil)
 
 	res := new(singleFileConfig)
@@ -67,6 +70,7 @@ type multiFileConfig struct {
 }
 
 func TestReadMultiConfig(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	_, filename, _, _ := runtime.Caller(0)
@@ -80,8 +84,10 @@ func TestReadMultiConfig(t *testing.T) {
 	mgr := InitializeWithDefaults("empty", "empty", defaults)
 	a.So(mgr, should.NotBeNil)
 
-	mgr.Parse("--config", first, "--config", second)
-	err := mgr.ReadInConfig()
+	err := mgr.Parse("--config", first, "--config", second)
+	a.So(err, should.BeNil)
+
+	err = mgr.ReadInConfig()
 	a.So(err, should.BeNil)
 
 	res := new(multiFileConfig)
