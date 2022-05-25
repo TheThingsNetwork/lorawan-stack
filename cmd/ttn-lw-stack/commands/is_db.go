@@ -85,18 +85,6 @@ var (
 				return err
 			}
 
-			if gorm, _ := cmd.Flags().GetBool("gorm"); gorm {
-				logger.Info("Applying GORM auto-migration")
-				gormDB, err := gormstore.Open(ctx, config.IS.DatabaseURI)
-				if err != nil {
-					return err
-				}
-				defer gormDB.Close()
-				if err = gormstore.AutoMigrate(gormDB).Error; err != nil {
-					return err
-				}
-			}
-
 			if group.IsZero() {
 				logger.Info("Database is up to date")
 				return nil
@@ -369,7 +357,6 @@ var (
 func init() {
 	Root.AddCommand(isDBCommand)
 	isDBCommand.AddCommand(isDBInitCommand)
-	isDBMigrateCommand.Flags().Bool("gorm", false, "Apply legacy GORM migrations")
 	isDBMigrateCommand.Flags().Bool("rollback", false, "Rollback most recent migration group")
 	isDBCommand.AddCommand(isDBMigrateCommand)
 	isDBCleanupCommand.Flags().Bool("dry-run", false, "Dry run")

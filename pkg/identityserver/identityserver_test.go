@@ -122,6 +122,8 @@ func testWithIdentityServer(t *testing.T, f func(*IdentityServer, *grpc.ClientCo
 		option(testOptions)
 	}
 
+	ctx := test.Context()
+
 	setupBaseDBOnce.Do(func() {
 		var db *gorm.DB
 		db, setupBaseDBErr = store.Open(context.Background(), baseDSN.String())
@@ -132,7 +134,7 @@ func testWithIdentityServer(t *testing.T, f func(*IdentityServer, *grpc.ClientCo
 		if setupBaseDBErr = store.Initialize(db); setupBaseDBErr != nil {
 			return
 		}
-		if setupBaseDBErr = store.AutoMigrate(db).Error; setupBaseDBErr != nil {
+		if setupBaseDBErr = store.Migrate(ctx, db); setupBaseDBErr != nil {
 			return
 		}
 	})
@@ -164,7 +166,7 @@ func testWithIdentityServer(t *testing.T, f func(*IdentityServer, *grpc.ClientCo
 		if err = store.Initialize(db); err != nil {
 			t.Fatal(err)
 		}
-		if err = store.AutoMigrate(db).Error; err != nil {
+		if err = store.Migrate(ctx, db); err != nil {
 			t.Fatal(err)
 		}
 	} else {

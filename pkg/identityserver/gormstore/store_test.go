@@ -15,6 +15,7 @@
 package store
 
 import (
+	"context"
 	"net/url"
 	"testing"
 
@@ -43,11 +44,8 @@ type testStore struct {
 	notificationStore
 }
 
-func (t testStore) Init() error {
-	if err := AutoMigrate(t.db).Error; err != nil {
-		return err
-	}
-	return nil
+func (t testStore) Init(ctx context.Context) error {
+	return Migrate(ctx, t.db)
 }
 
 func (t testStore) Close() error {

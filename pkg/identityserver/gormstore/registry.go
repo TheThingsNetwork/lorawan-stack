@@ -15,8 +15,14 @@
 package store
 
 import (
+	"context"
+
 	"github.com/jinzhu/gorm"
+	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/dialect/pgdialect"
+	"github.com/uptrace/bun/migrate"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	ismigrations "go.thethings.network/lorawan-stack/v3/pkg/identityserver/store/migrations"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
 
@@ -112,9 +118,16 @@ func Check(db *gorm.DB) error {
 	return nil
 }
 
-// AutoMigrate automatically migrates the database for the registered models.
-func AutoMigrate(db *gorm.DB) *gorm.DB {
-	return db.AutoMigrate(models...)
+// Migrate migrates the database.
+func Migrate(ctx context.Context, db *gorm.DB) error {
+	bunDB := bun.NewDB(db.DB(), pgdialect.New())
+	migrator := migrate.NewMigrator(bunDB, ismigrations.Migrations)
+	err := migrator.Init(ctx)
+	if err != nil {
+		return err
+	}
+	_, err = migrator.Migrate(ctx)
+	return err
 }
 
 // clear database tables for the given models.
