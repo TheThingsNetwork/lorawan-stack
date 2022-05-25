@@ -3230,15 +3230,6 @@
       "file": "listeners.go"
     }
   },
-  "error:pkg/config/tlsconfig:acme_already_initialized": {
-    "translations": {
-      "en": "ACME already initialized"
-    },
-    "description": {
-      "package": "pkg/config/tlsconfig",
-      "file": "config.go"
-    }
-  },
   "error:pkg/config/tlsconfig:missing_acme_dir": {
     "translations": {
       "en": "missing ACME storage directory"

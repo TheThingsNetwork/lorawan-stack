@@ -56,14 +56,14 @@ type Sentry struct {
 
 // GRPC represents gRPC listener configuration.
 type GRPC struct {
-	AllowInsecureForCredentials bool `name:"allow-insecure-for-credentials" description:"Allow transmission of credentials over insecure transport"`
+	AllowInsecureForCredentials bool `name:"allow-insecure-for-credentials" description:"Allow transmission of credentials over insecure transport"` //nolint:lll
 
 	Listen    string `name:"listen" description:"Address for the TCP gRPC server to listen on"`
 	ListenTLS string `name:"listen-tls" description:"Address for the TLS gRPC server to listen on"`
 
 	TrustedProxies []string `name:"trusted-proxies" description:"CIDRs of trusted reverse proxies"`
 
-	LogIgnoreMethods []string `name:"log-ignore-methods" description:"List of paths for which successful requests will not be logged"`
+	LogIgnoreMethods []string `name:"log-ignore-methods" description:"List of paths for which successful requests will not be logged"` //nolint:lll
 }
 
 // Cookie represents cookie configuration.
@@ -96,7 +96,7 @@ type Health struct {
 // HTTPStaticConfig represents the HTTP static file server configuration.
 type HTTPStaticConfig struct {
 	Mount      string   `name:"mount" description:"Path on the server where static assets will be served"`
-	SearchPath []string `name:"search-path" description:"List of paths for finding the directory to serve static assets from"`
+	SearchPath []string `name:"search-path" description:"List of paths for finding the directory to serve static assets from"` //nolint:lll
 }
 
 // HTTP represents the HTTP and HTTPS server configuration.
@@ -106,7 +106,7 @@ type HTTP struct {
 	TrustedProxies  []string         `name:"trusted-proxies" description:"CIDRs of trusted reverse proxies"`
 	RedirectToHost  string           `name:"redirect-to-host" description:"Redirect all requests to one host"`
 	RedirectToHTTPS bool             `name:"redirect-to-tls" description:"Redirect HTTP requests to HTTPS"`
-	LogIgnorePaths  []string         `name:"log-ignore-paths" description:"List of paths for which successful requests will not be logged"`
+	LogIgnorePaths  []string         `name:"log-ignore-paths" description:"List of paths for which successful requests will not be logged"` //nolint:lll
 	Static          HTTPStaticConfig `name:"static"`
 	Cookie          Cookie           `name:"cookie"`
 	PProf           PProf            `name:"pprof"`
@@ -134,12 +134,12 @@ type RedisEvents struct {
 		TTL                time.Duration `name:"ttl" description:"How long event payloads are retained"`
 		EntityCount        int           `name:"entity-count" description:"How many events are indexed for a entity ID"`
 		EntityTTL          time.Duration `name:"entity-ttl" description:"How long events are indexed for a entity ID"`
-		CorrelationIDCount int           `name:"correlation-id-count" description:"How many events are indexed for a correlation ID"`
+		CorrelationIDCount int           `name:"correlation-id-count" description:"How many events are indexed for a correlation ID"` //nolint:lll
 	} `name:"store"`
 	Workers int `name:"workers"`
 	Publish struct {
 		QueueSize  int `name:"queue-size" description:"The maximum number of events which may be queued for publication"`
-		MaxWorkers int `name:"max-workers" description:"The maximum number of workers which may publish events asynchronously"`
+		MaxWorkers int `name:"max-workers" description:"The maximum number of workers which may publish events asynchronously"` //nolint:lll
 	} `name:"publish"`
 }
 
@@ -171,9 +171,9 @@ type KeyVault struct {
 }
 
 // KeyVault returns an initialized crypto.KeyVault based on the configuration.
-func (v KeyVault) KeyVault(ctx context.Context, httpClientProvider httpclient.Provider) (crypto.KeyVault, error) {
+func (v KeyVault) KeyVault(context.Context, httpclient.Provider) (crypto.KeyVault, error) {
 	vault := cryptoutil.EmptyKeyVault
-	switch v.Provider {
+	switch v.Provider { //nolint:revive
 	case "static":
 		kv := cryptoutil.NewMemKeyVault(v.Static)
 		kv.Separator = ":"
@@ -187,8 +187,12 @@ func (v KeyVault) KeyVault(ctx context.Context, httpClientProvider httpclient.Pr
 }
 
 var (
-	errUnknownBlobProvider = errors.DefineInvalidArgument("unknown_blob_provider", "unknown blob store provider `{provider}`")
-	errMissingBlobConfig   = errors.DefineInvalidArgument("missing_blob_config", "missing blob store configuration")
+	errUnknownBlobProvider = errors.DefineInvalidArgument(
+		"unknown_blob_provider", "unknown blob store provider `{provider}`",
+	)
+	errMissingBlobConfig = errors.DefineInvalidArgument(
+		"missing_blob_config", "missing blob store configuration",
+	)
 )
 
 // BlobConfigLocal is the blob store configuration for the local filesystem provider.
@@ -235,7 +239,9 @@ func (c BlobConfig) IsZero() bool {
 }
 
 // Bucket returns the requested blob bucket using the config.
-func (c BlobConfig) Bucket(ctx context.Context, bucket string, httpClientProvider httpclient.Provider) (*blob.Bucket, error) {
+func (c BlobConfig) Bucket(
+	ctx context.Context, bucket string, httpClientProvider httpclient.Provider,
+) (*blob.Bucket, error) {
 	switch c.Provider {
 	case "local":
 		return ttnblob.Local(ctx, bucket, c.Local.Directory)
@@ -263,63 +269,66 @@ func (c BlobConfig) Bucket(ctx context.Context, bucket string, httpClientProvide
 		}
 		return ttnblob.Azure(ctx, c.Azure.AccountName, bucket)
 	case "gcp":
-		var jsonCreds []byte
 		if c.GCP.Credentials != "" {
-			jsonCreds = []byte(c.GCP.Credentials)
-		} else if c.GCP.CredentialsFile != "" {
-			var err error
-			jsonCreds, err = os.ReadFile(c.GCP.CredentialsFile)
+			return ttnblob.GCP(ctx, bucket, []byte(c.GCP.Credentials))
+		}
+		if c.GCP.CredentialsFile != "" {
+			jsonCreds, err := os.ReadFile(c.GCP.CredentialsFile)
 			if err != nil {
 				return nil, err
 			}
-		} else {
-			return nil, errMissingBlobConfig.New()
+			return ttnblob.GCP(ctx, bucket, jsonCreds)
 		}
-		return ttnblob.GCP(ctx, bucket, jsonCreds)
+		return nil, errMissingBlobConfig.New()
 	default:
 		return nil, errUnknownBlobProvider.WithAttributes("provider", c.Provider)
 	}
 }
 
+// BlobPathConfig configures the blob bucket and path.
 type BlobPathConfig struct {
 	Bucket string `name:"bucket" description:"Bucket to use"`
 	Path   string `name:"path" description:"Path to use"`
 }
 
+// IsZero returns whether conf is empty.
 func (c BlobPathConfig) IsZero() bool {
 	return c == BlobPathConfig{}
 }
 
 // FrequencyPlansConfig contains the source of the frequency plans.
 type FrequencyPlansConfig struct {
-	ConfigSource string            `name:"config-source" description:"Source of the frequency plans (static, directory, url, blob)"`
+	ConfigSource string            `name:"config-source" description:"Source of the frequency plans (static, directory, url, blob)"` //nolint:lll
 	Static       map[string][]byte `name:"-"`
-	Directory    string            `name:"directory" description:"OS filesystem directory, which contains frequency plans"`
+	Directory    string            `name:"directory" description:"OS filesystem directory, which contains frequency plans"` //nolint:lll
 	URL          string            `name:"url" description:"URL, which contains frequency plans"`
 	Blob         BlobPathConfig    `name:"blob"`
 }
 
 // Fetcher returns a fetch.Interface based on the configuration.
 // If no configuration source is set, this method returns nil, nil.
-func (c FrequencyPlansConfig) Fetcher(ctx context.Context, blobConf BlobConfig, httpClientProvider httpclient.Provider) (fetch.Interface, error) {
+func (c FrequencyPlansConfig) Fetcher(
+	ctx context.Context, blobConf BlobConfig, httpClientProvider httpclient.Provider,
+) (fetch.Interface, error) {
 	// TODO: Remove detection mechanism (https://github.com/TheThingsNetwork/lorawan-stack/issues/1450)
-	if c.ConfigSource == "" {
+	configSource := c.ConfigSource
+	if configSource == "" {
 		switch {
 		case c.Static != nil:
-			c.ConfigSource = "static"
+			configSource = "static"
 		case c.Directory != "":
 			if stat, err := os.Stat(c.Directory); err == nil && stat.IsDir() {
-				c.ConfigSource = "directory"
+				configSource = "directory"
 				break
 			}
 			fallthrough
 		case c.URL != "":
-			c.ConfigSource = "url"
+			configSource = "url"
 		case !c.Blob.IsZero():
-			c.ConfigSource = "blob"
+			configSource = "blob"
 		}
 	}
-	switch c.ConfigSource {
+	switch configSource {
 	case "static":
 		return fetch.NewMemFetcher(c.Static), nil
 	case "directory":
@@ -343,8 +352,8 @@ func (c FrequencyPlansConfig) Fetcher(ctx context.Context, blobConf BlobConfig, 
 
 // InteropClient represents the client-side interoperability through LoRaWAN Backend Interfaces configuration.
 type InteropClient struct {
-	ConfigSource string         `name:"config-source" description:"Source of the interoperability client configuration (directory, url, blob)"`
-	Directory    string         `name:"directory" description:"OS filesystem directory, which contains interoperability client configuration"`
+	ConfigSource string         `name:"config-source" description:"Source of the interoperability client configuration (directory, url, blob)"` //nolint:lll
+	Directory    string         `name:"directory" description:"OS filesystem directory, which contains interoperability client configuration"`  //nolint:lll
 	URL          string         `name:"url" description:"URL, which contains interoperability client configuration"`
 	Blob         BlobPathConfig `name:"blob"`
 
@@ -364,21 +373,22 @@ func (c InteropClient) IsZero() bool {
 // If no configuration source is set, this method returns nil, nil.
 func (c InteropClient) Fetcher(ctx context.Context, httpClientProvider httpclient.Provider) (fetch.Interface, error) {
 	// TODO: Remove detection mechanism (https://github.com/TheThingsNetwork/lorawan-stack/issues/1450)
-	if c.ConfigSource == "" {
+	configSource := c.ConfigSource
+	if configSource == "" {
 		switch {
 		case c.Directory != "":
 			if stat, err := os.Stat(c.Directory); err == nil && stat.IsDir() {
-				c.ConfigSource = "directory"
+				configSource = "directory"
 				break
 			}
 			fallthrough
 		case c.URL != "":
-			c.ConfigSource = "url"
+			configSource = "url"
 		case !c.Blob.IsZero():
-			c.ConfigSource = "blob"
+			configSource = "blob"
 		}
 	}
-	switch c.ConfigSource {
+	switch configSource {
 	case "directory":
 		return fetch.FromFilesystem(c.Directory), nil
 	case "url":
@@ -398,10 +408,11 @@ func (c InteropClient) Fetcher(ctx context.Context, httpClientProvider httpclien
 	}
 }
 
+// SenderClientCA is the sender client CA configuration.
 type SenderClientCA struct {
-	Source    string            `name:"source" description:"Source of the sender client CA configuration (static, directory, url, blob)"`
+	Source    string            `name:"source" description:"Source of the sender client CA configuration (static, directory, url, blob)"` //nolint:lll
 	Static    map[string][]byte `name:"-"`
-	Directory string            `name:"directory" description:"OS filesystem directory, which contains sender client CA configuration"`
+	Directory string            `name:"directory" description:"OS filesystem directory, which contains sender client CA configuration"` //nolint:lll
 	URL       string            `name:"url" description:"URL, which contains sender client CA configuration"`
 	Blob      BlobPathConfig    `name:"blob"`
 
@@ -431,7 +442,7 @@ func (c SenderClientCA) Fetcher(ctx context.Context, httpClientProvider httpclie
 	}
 }
 
-// PacketBrokerInteropAuth respresents authen
+// PacketBrokerInteropAuth respresents Packet Broker authentication configuration.
 type PacketBrokerInteropAuth struct {
 	Enabled     bool   `name:"enabled" description:"Enable Packet Broker to authenticate"`
 	TokenIssuer string `name:"token-issuer" description:"Required issuer of Packet Broker tokens"`
@@ -439,12 +450,12 @@ type PacketBrokerInteropAuth struct {
 
 // InteropServer represents the server-side interoperability through LoRaWAN Backend Interfaces configuration.
 type InteropServer struct {
-	Listen           string `name:"listen" description:"Address for the interop server for LoRaWAN Backend Interfaces to listen on"`
-	ListenTLS        string `name:"listen-tls" description:"TLS address for the interop server for LoRaWAN Backend Interfaces to listen on"`
-	PublicTLSAddress string `name:"public-tls-address" description:"Public address of the interop server for LoRaWAN Backend Interfaces"`
+	Listen           string `name:"listen" description:"Address for the interop server for LoRaWAN Backend Interfaces to listen on"`         //nolint:lll
+	ListenTLS        string `name:"listen-tls" description:"TLS address for the interop server for LoRaWAN Backend Interfaces to listen on"` //nolint:lll
+	PublicTLSAddress string `name:"public-tls-address" description:"Public address of the interop server for LoRaWAN Backend Interfaces"`    //nolint:lll
 
 	SenderClientCA           SenderClientCA    `name:"sender-client-ca"`
-	SenderClientCADeprecated map[string]string `name:"sender-client-cas" description:"Path to PEM encoded file with client CAs of sender IDs to trust; deprecated - use sender-client-ca instead"`
+	SenderClientCADeprecated map[string]string `name:"sender-client-cas" description:"Path to PEM encoded file with client CAs of sender IDs to trust; deprecated - use sender-client-ca instead"` //nolint:lll
 
 	PacketBroker PacketBrokerInteropAuth `name:"packet-broker"`
 }
@@ -466,12 +477,14 @@ type ServiceBase struct {
 	Rights           Rights               `name:"rights"`
 	KeyVault         KeyVault             `name:"key-vault"`
 	RateLimiting     RateLimiting         `name:"rate-limiting" description:"Rate limiting configuration"`
-	SkipVersionCheck bool                 `name:"skip-version-check" yaml:"skip-version-check" description:"Skip version checks"`
+	SkipVersionCheck bool                 `name:"skip-version-check" yaml:"skip-version-check" description:"Skip version checks"` //nolint:lll
 }
 
 // FrequencyPlansFetcher returns a fetch.Interface based on the frequency plans configuration.
 // If no configuration source is set, this method returns nil, nil.
-func (c ServiceBase) FrequencyPlansFetcher(ctx context.Context, httpClientProvider httpclient.Provider) (fetch.Interface, error) {
+func (c ServiceBase) FrequencyPlansFetcher(
+	ctx context.Context, httpClientProvider httpclient.Provider,
+) (fetch.Interface, error) {
 	return c.FrequencyPlans.Fetcher(ctx, c.Blob, httpClientProvider)
 }
 
@@ -512,7 +525,7 @@ type RateLimitingMemory struct {
 // RateLimiting represents configuration for rate limiting.
 type RateLimiting struct {
 	ConfigSource string         `name:"config-source" description:"Source of rate-limiting.yml (directory, url, blob)"`
-	Directory    string         `name:"directory" description:"OS filesystem directory, which contains rate limiting configuration"`
+	Directory    string         `name:"directory" description:"OS filesystem directory, which contains rate limiting configuration"` //nolint:lll
 	URL          string         `name:"url" description:"URL, which contains rate limiting configuration"`
 	Blob         BlobPathConfig `name:"blob"`
 
@@ -522,7 +535,9 @@ type RateLimiting struct {
 
 // Fetcher returns fetch.Interface defined by conf.
 // If no configuration source is set, this method returns nil, nil.
-func (c RateLimiting) Fetcher(ctx context.Context, blobConf BlobConfig, httpClientProvider httpclient.Provider) (fetch.Interface, error) {
+func (c RateLimiting) Fetcher(
+	ctx context.Context, blobConf BlobConfig, httpClientProvider httpclient.Provider,
+) (fetch.Interface, error) {
 	switch c.ConfigSource {
 	case "directory":
 		return fetch.FromFilesystem(c.Directory), nil

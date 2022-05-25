@@ -38,45 +38,41 @@ type SubConfig struct {
 }
 
 var (
-	// mgr is a configuration manager for the example program, initialized
+	// The mgr is a configuration manager for the example program, initialized
 	// with default config values.
 	mgr = config.InitializeWithDefaults("example", "example", &Config{
 		Int:    42,
 		String: "foo",
 	})
 
-	// cfg will be the config shared by all commands.
+	// The cfg will be the config shared by all commands.
 	cfg = new(Config)
 
-	// root is the root command.
 	root = &cobra.Command{
 		// PersistentPreRunE runs always, so we can use it to read in config files
 		// and parse the shared config.
-		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		PersistentPreRunE: func(*cobra.Command, []string) error {
 			err := mgr.ReadInConfig()
 			if err != nil {
 				return err
 			}
-
 			return mgr.Unmarshal(cfg)
 		},
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(*cobra.Command, []string) error {
 			return printYAML(cfg)
 		},
 	}
 
-	// sub is a sub command.
 	sub = &cobra.Command{
 		Use: "sub",
 
 		// RunE parses the sub config that is only relevant for this command.
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(*cobra.Command, []string) error {
 			cfg := new(SubConfig)
 			err := mgr.Unmarshal(cfg)
 			if err != nil {
 				return err
 			}
-
 			return printYAML(cfg)
 		},
 	}

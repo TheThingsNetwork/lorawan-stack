@@ -71,10 +71,15 @@ func genCert() (certPEM []byte, keyPEM []byte) {
 	if err != nil {
 		panic(err)
 	}
-	return pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: certBytes}), pem.EncodeToMemory(&pem.Block{Type: "PRIVATE KEY", Bytes: keyBytes})
+	return pem.EncodeToMemory(&pem.Block{
+			Type: "CERTIFICATE", Bytes: certBytes,
+		}), pem.EncodeToMemory(&pem.Block{
+			Type: "PRIVATE KEY", Bytes: keyBytes,
+		})
 }
 
 func TestApplyTLSClientConfig(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 	caCert, _ := genCert()
 	tlsConfig := &tls.Config{}
@@ -91,7 +96,7 @@ func TestApplyTLSClientConfig(t *testing.T) {
 
 	t.Run("Empty", func(t *testing.T) {
 		a := assertions.New(t)
-		tlsConfig := &tls.Config{}
+		tlsConfig := &tls.Config{} //nolint:gosec
 		err := (&Client{}).ApplyTo(tlsConfig)
 		a.So(err, should.BeNil)
 		a.So(tlsConfig.RootCAs, should.BeNil)
@@ -100,9 +105,10 @@ func TestApplyTLSClientConfig(t *testing.T) {
 }
 
 func TestApplyTLSServerAuth(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 	cert, key := genCert()
-	tlsConfig := &tls.Config{}
+	tlsConfig := &tls.Config{} //nolint:gosec
 	err := (&ServerAuth{
 		Source: "file",
 		FileReader: mockFileReader{
@@ -117,9 +123,10 @@ func TestApplyTLSServerAuth(t *testing.T) {
 }
 
 func TestApplyTLSClientAuth(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 	cert, key := genCert()
-	tlsConfig := &tls.Config{}
+	tlsConfig := &tls.Config{} //nolint:gosec
 	err := (&ClientAuth{
 		Source: "file",
 		FileReader: mockFileReader{

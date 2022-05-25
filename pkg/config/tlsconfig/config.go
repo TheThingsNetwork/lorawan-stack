@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package tlsconfig provides configuration for TLS clients and servers.
 package tlsconfig
 
 import (
@@ -32,7 +33,7 @@ type ACME struct {
 	manager *autocert.Manager
 
 	// TODO: Remove Enable (https://github.com/TheThingsNetwork/lorawan-stack/issues/1450)
-	Enable      bool     `name:"enable" description:"Enable automated certificate management (ACME). This setting is deprecated; set the TLS config source to acme instead"`
+	Enable      bool     `name:"enable" description:"Enable automated certificate management (ACME). This setting is deprecated; set the TLS config source to acme instead"` //nolint:lll
 	Endpoint    string   `name:"endpoint" description:"ACME endpoint"`
 	Dir         string   `name:"dir" description:"Location of ACME storage directory"`
 	Email       string   `name:"email" description:"Email address to register with the ACME account"`
@@ -41,9 +42,8 @@ type ACME struct {
 }
 
 var (
-	errACMEAlreadyInitialized = errors.Define("acme_already_initialized", "ACME already initialized")
-	errMissingACMEDir         = errors.Define("missing_acme_dir", "missing ACME storage directory")
-	errMissingACMEEndpoint    = errors.Define("missing_acme_endpoint", "missing ACME endpoint")
+	errMissingACMEDir      = errors.Define("missing_acme_dir", "missing ACME storage directory")
+	errMissingACMEEndpoint = errors.Define("missing_acme_endpoint", "missing ACME endpoint")
 )
 
 // Initialize initializes the autocert manager for the ACME configuration.
@@ -111,8 +111,8 @@ type Client struct {
 	loadRootCA         sync.Once
 	rootCABytes        []byte
 	rootCABytesError   error
-	RootCA             string `json:"root-ca" yaml:"root-ca" name:"root-ca" description:"Location of TLS root CA certificate (optional)"`
-	InsecureSkipVerify bool   `name:"insecure-skip-verify" description:"Skip verification of certificate chains (insecure)"`
+	RootCA             string `json:"root-ca" yaml:"root-ca" name:"root-ca" description:"Location of TLS root CA certificate (optional)"` //nolint:lll
+	InsecureSkipVerify bool   `name:"insecure-skip-verify" description:"Skip verification of certificate chains (insecure)"`              //nolint:lll
 }
 
 // Equals checks if the other configuration is equivalent to this.
@@ -177,31 +177,39 @@ func readCert(fileReader FileReader, certFile, keyFile string) (*tls.Certificate
 type ServerAuth struct {
 	Source       string     `name:"source" description:"Source of the TLS certificate (file, acme, key-vault)"`
 	FileReader   FileReader `json:"-" yaml:"-" name:"-"`
-	Certificate  string     `json:"certificate" yaml:"certificate" name:"certificate" description:"Location of TLS certificate"`
+	Certificate  string     `json:"certificate" yaml:"certificate" name:"certificate" description:"Location of TLS certificate"` //nolint:lll
 	Key          string     `json:"key" yaml:"key" name:"key" description:"Location of TLS private key"`
 	ACME         ACME       `name:"acme"`
 	KeyVault     KeyVault   `name:"key-vault"`
-	CipherSuites []string   `name:"cipher-suites" description:"DEPRECATED: List of IANA names of TLS cipher suites to use"`
+	CipherSuites []string   `name:"cipher-suites" description:"DEPRECATED: List of IANA names of TLS cipher suites to use"` //nolint:lll
 }
 
 var (
-	errInvalidTLSConfigSource = errors.DefineFailedPrecondition("tls_config_source_invalid", "invalid TLS configuration source `{source}`")
-	errEmptyTLSSource         = errors.DefineFailedPrecondition("tls_source_empty", "empty TLS source")
-	errTLSKeyVaultID          = errors.DefineFailedPrecondition("tls_key_vault_id", "invalid TLS key vault ID")
-	errInvalidCipherSuite     = errors.DefineFailedPrecondition("tls_cipher_suite_invalid", "invalid TLS cipher suite {cipher}")
+	errInvalidTLSConfigSource = errors.DefineFailedPrecondition(
+		"tls_config_source_invalid", "invalid TLS configuration source `{source}`",
+	)
+	errEmptyTLSSource = errors.DefineFailedPrecondition(
+		"tls_source_empty", "empty TLS source",
+	)
+	errTLSKeyVaultID = errors.DefineFailedPrecondition(
+		"tls_key_vault_id", "invalid TLS key vault ID",
+	)
+	errInvalidCipherSuite = errors.DefineFailedPrecondition(
+		"tls_cipher_suite_invalid", "invalid TLS cipher suite {cipher}",
+	)
 )
 
 // GetCipherSuites returns a list of IDs of cipher suites in configuration.
-// This list can be passed to tls.Config
+// This list can be passed to tls.Config.
 func (c *ServerAuth) GetCipherSuites() ([]uint16, error) {
-	var cipherSuites []uint16
-	cs := make(map[string]uint16)
+	cs := make(map[string]uint16, len(tls.CipherSuites())+len(tls.InsecureCipherSuites()))
 	for _, c := range tls.CipherSuites() {
 		cs[c.Name] = c.ID
 	}
 	for _, c := range tls.InsecureCipherSuites() {
 		cs[c.Name] = c.ID
 	}
+	cipherSuites := make([]uint16, 0, len(c.CipherSuites))
 	for _, c := range c.CipherSuites {
 		cipher, got := cs[c]
 		if !got {
@@ -232,7 +240,7 @@ func (c *ServerAuth) ApplyTo(tlsConfig *tls.Config) error {
 		}
 		atomicCert.Store(cert)
 		// TODO: Reload certificates on signal.
-		tlsConfig.GetCertificate = func(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
+		tlsConfig.GetCertificate = func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
 			cert := atomicCert.Load().(*tls.Certificate)
 			return cert, nil
 		}
@@ -265,7 +273,7 @@ func (c *ServerAuth) ApplyTo(tlsConfig *tls.Config) error {
 type ClientAuth struct {
 	Source      string     `name:"source" description:"Source of the TLS certificate (file, key-vault)"`
 	FileReader  FileReader `json:"-" yaml:"-" name:"-"`
-	Certificate string     `json:"certificate" yaml:"certificate" name:"certificate" description:"Location of TLS certificate"`
+	Certificate string     `json:"certificate" yaml:"certificate" name:"certificate" description:"Location of TLS certificate"` //nolint:lll
 	Key         string     `json:"key" yaml:"key" name:"key" description:"Location of TLS private key"`
 	KeyVault    KeyVault   `name:"key-vault"`
 }
@@ -287,7 +295,7 @@ func (c *ClientAuth) ApplyTo(tlsConfig *tls.Config) error {
 		}
 		atomicCert.Store(cert)
 		// TODO: Reload certificates on signal.
-		tlsConfig.GetClientCertificate = func(hello *tls.CertificateRequestInfo) (*tls.Certificate, error) {
+		tlsConfig.GetClientCertificate = func(*tls.CertificateRequestInfo) (*tls.Certificate, error) {
 			cert := atomicCert.Load().(*tls.Certificate)
 			return cert, nil
 		}
