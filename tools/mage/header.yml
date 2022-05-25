@@ -1,6 +1,6 @@
 rules:
 - include: [.go,.js,.make,Makefile,.styl,.proto]
-  exclude: [.snap,.json,.yml,testdata,third_party]
+  exclude: [.snap,.json,.yml,.sql,testdata,third_party]
   header:
     |
     Copyright © 20\d\d The Things Network Foundation, The Things Industries B\.V\.
