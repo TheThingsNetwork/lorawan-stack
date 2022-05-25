@@ -147,7 +147,7 @@ func (srv *mockTTJS) handleClaim(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if dev.claimedBy != "" && dev.claimedBy != client.asID && dev.locked == true {
+		if dev.claimedBy != "" && dev.claimedBy != client.asID && dev.locked {
 			writeResponse(w, http.StatusForbidden, "Client not allowed to claim")
 			return
 		}
