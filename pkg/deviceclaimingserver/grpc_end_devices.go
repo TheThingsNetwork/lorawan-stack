@@ -133,7 +133,7 @@ func (edcs *endDeviceClaimingServer) Claim(ctx context.Context, req *ttnpb.Claim
 		return nil, errNoJoinEUI.New()
 	}
 
-	err := edcs.DCS.endDeviceClaimingUpstream.Claim(ctx, joinEUI, devEUI, claimAuthenticationCode)
+	err := edcs.DCS.endDeviceClaimingUpstream.Claim(ctx, joinEUI, devEUI, claimAuthenticationCode, req.LockClaim)
 	if err != nil {
 		if errors.IsAborted(err) {
 			log.FromContext(ctx).Warn("No upstream supports JoinEUI, use fallback")
