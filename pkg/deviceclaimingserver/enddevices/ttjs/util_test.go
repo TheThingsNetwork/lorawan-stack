@@ -29,6 +29,7 @@ import (
 type device struct {
 	claimData
 	claimedBy               string // AS-ID.
+	locked                  bool
 	claimAuthenticationCode string
 }
 
@@ -110,6 +111,7 @@ func (srv *mockTTJS) handleClaim(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		dev.claimedBy = ""
+		dev.locked = false
 		srv.provisonedDevices[reqDevEUI] = dev
 
 	case http.MethodGet:
@@ -145,7 +147,7 @@ func (srv *mockTTJS) handleClaim(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if dev.claimedBy != "" && dev.claimedBy != client.asID {
+		if dev.claimedBy != "" && dev.claimedBy != client.asID && dev.locked == true {
 			writeResponse(w, http.StatusForbidden, "Client not allowed to claim")
 			return
 		}
@@ -157,6 +159,7 @@ func (srv *mockTTJS) handleClaim(w http.ResponseWriter, r *http.Request) {
 
 		dev.claimedBy = client.asID
 		dev.claimData = req.claimData
+		dev.locked = req.Locked
 
 		// Update
 		srv.provisonedDevices[reqDevEUI] = dev
