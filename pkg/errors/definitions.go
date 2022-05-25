@@ -138,7 +138,7 @@ func define(code uint32, name, messageFormat string, publicAttributes ...string)
 		code = uint32(codes.Unknown)
 	}
 
-	def := Definition{
+	def := &Definition{
 		namespace:              ns,
 		name:                   name,
 		messageFormat:          messageFormat,
@@ -168,46 +168,49 @@ nextArg:
 
 	def.setGRPCStatus() // store the (marshaled) gRPC status message.
 
-	definitionsMu.Lock()
-	if existing := definitions[fullName]; existing != nil {
-		if existing.code != def.code {
-			definitionsMu.Unlock()
-			panic(fmt.Errorf(
-				"error %s with code %d already defined with code %d",
-				fullName, def.code, existing.code,
-			))
-		}
-		if existing.messageFormat != def.messageFormat {
-			definitionsMu.Unlock()
-			panic(fmt.Errorf(
-				"error %s with message format %q already defined with message format %q",
-				fullName, def.messageFormat, existing.messageFormat,
-			))
-		}
-		if !reflect.DeepEqual(existing.publicAttributes, def.publicAttributes) {
-			definitionsMu.Unlock()
-			panic(fmt.Errorf(
-				"error %s with public attributes %q already defined with public attributes %q",
-				fullName, def.publicAttributes, existing.publicAttributes,
-			))
-		}
-		definitionsMu.Unlock()
-		return existing
+	if registered := registerDefinition(def); registered != def {
+		return registered
 	}
-
-	definitions[fullName] = &def
-	definitionsMu.Unlock()
 
 	desc := i18n.Define(fmt.Sprintf("error:%s", fullName), def.messageFormat)
 	desc.SetSource(2)
 
-	return &def
+	return def
 }
 
 var (
 	definitions   = make(map[string]*Definition)
 	definitionsMu sync.Mutex
 )
+
+func registerDefinition(def *Definition) *Definition {
+	definitionsMu.Lock()
+	defer definitionsMu.Unlock()
+	fullName := def.FullName()
+	if existing := definitions[fullName]; existing != nil {
+		if existing.code != def.code {
+			panic(fmt.Errorf(
+				"error %s with code %d already defined with code %d",
+				fullName, def.code, existing.code,
+			))
+		}
+		if existing.messageFormat != def.messageFormat {
+			panic(fmt.Errorf(
+				"error %s with message format %q already defined with message format %q",
+				fullName, def.messageFormat, existing.messageFormat,
+			))
+		}
+		if !reflect.DeepEqual(existing.publicAttributes, def.publicAttributes) {
+			panic(fmt.Errorf(
+				"error %s with public attributes %q already defined with public attributes %q",
+				fullName, def.publicAttributes, existing.publicAttributes,
+			))
+		}
+		return existing
+	}
+	definitions[fullName] = def
+	return def
+}
 
 // Define defines a registered error of type Unknown.
 func Define(name, messageFormat string, publicAttributes ...string) *Definition {
