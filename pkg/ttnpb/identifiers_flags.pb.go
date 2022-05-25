@@ -246,7 +246,7 @@ func (m *OrganizationIdentifiers) SetFromFlags(flags *pflag.FlagSet, prefix stri
 // AddSelectFlagsForUserIdentifiers adds flags to select fields in UserIdentifiers.
 func AddSelectFlagsForUserIdentifiers(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("user-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("user-id", prefix), false), flagsplugin.WithHidden(hidden)))
-	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("email", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("email", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("email", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("email", prefix), false), flagsplugin.WithHidden(true)))
 }
 
 // SelectFromFlags outputs the fieldmask paths forUserIdentifiers message from select flags.
@@ -267,7 +267,7 @@ func PathsFromSelectFlagsForUserIdentifiers(flags *pflag.FlagSet, prefix string)
 // AddSetFlagsForUserIdentifiers adds flags to select fields in UserIdentifiers.
 func AddSetFlagsForUserIdentifiers(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("user-id", prefix), "", flagsplugin.WithHidden(hidden)))
-	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("email", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("email", prefix), "", flagsplugin.WithHidden(true)))
 }
 
 // SetFromFlags sets the UserIdentifiers message from flags.
