@@ -70,7 +70,7 @@ const devices = (state = defaultState, { type, payload, event }) => {
     case GET_DEV_SUCCESS:
       const updatedState = { ...state }
       const id = getCombinedDeviceId(payload)
-      const lorawanVersion = getByPath(state.entities, `${id}.lorawan_version`)
+      const lorawanVersion = payload.lorawan_version
 
       const mergedDevice = mergeWith({}, state.entities[id], payload, (_, __, key, ___, source) => {
         // Always set location from the payload.

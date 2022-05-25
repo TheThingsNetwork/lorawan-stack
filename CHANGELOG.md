@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- End devices running on MAC versions lower than 1.1 showing network downlink frame counters instead of application downlink frame counters.
+
 ### Security
 
 ## [3.19.2] - 2022-05-25
