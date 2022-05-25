@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
+	"sync"
 
 	"github.com/gotnospirit/messageformat"
 	"go.thethings.network/lorawan-stack/v3/pkg/i18n"
@@ -167,29 +168,35 @@ nextArg:
 
 	def.setGRPCStatus() // store the (marshaled) gRPC status message.
 
-	if existing := Definitions[fullName]; existing != nil {
+	definitionsMu.Lock()
+	if existing := definitions[fullName]; existing != nil {
 		if existing.code != def.code {
+			definitionsMu.Unlock()
 			panic(fmt.Errorf(
 				"error %s with code %d already defined with code %d",
 				fullName, def.code, existing.code,
 			))
 		}
 		if existing.messageFormat != def.messageFormat {
+			definitionsMu.Unlock()
 			panic(fmt.Errorf(
 				"error %s with message format %q already defined with message format %q",
 				fullName, def.messageFormat, existing.messageFormat,
 			))
 		}
 		if !reflect.DeepEqual(existing.publicAttributes, def.publicAttributes) {
+			definitionsMu.Unlock()
 			panic(fmt.Errorf(
 				"error %s with public attributes %q already defined with public attributes %q",
 				fullName, def.publicAttributes, existing.publicAttributes,
 			))
 		}
+		definitionsMu.Unlock()
 		return existing
 	}
 
-	Definitions[fullName] = &def
+	definitions[fullName] = &def
+	definitionsMu.Unlock()
 
 	desc := i18n.Define(fmt.Sprintf("error:%s", fullName), def.messageFormat)
 	desc.SetSource(2)
@@ -197,9 +204,10 @@ nextArg:
 	return &def
 }
 
-// Definitions of registered errors.
-// Errors that are defined in init() funcs will be collected for translation.
-var Definitions = make(map[string]*Definition)
+var (
+	definitions   = make(map[string]*Definition)
+	definitionsMu sync.Mutex
+)
 
 // Define defines a registered error of type Unknown.
 func Define(name, messageFormat string, publicAttributes ...string) *Definition {
