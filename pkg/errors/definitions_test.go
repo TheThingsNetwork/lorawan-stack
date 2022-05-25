@@ -26,8 +26,6 @@ func TestDefinitions(t *testing.T) {
 	t.Parallel()
 	a := assertions.New(t)
 
-	errors.Define("test_definitions_unknown", "") //nolint:errcheck
-	a.So(func() {
-		errors.Define("test_definitions_unknown", "") //nolint:errcheck
-	}, should.Panic)
+	def := errors.Define("test_definitions_unknown", "")
+	a.So(errors.Define("test_definitions_unknown", ""), should.Equal, def)
 }
