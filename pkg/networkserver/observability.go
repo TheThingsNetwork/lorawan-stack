@@ -137,6 +137,17 @@ var (
 		events.WithErrorDataType(),
 		events.WithPropagateToParent(),
 	)
+	evtTransmissionSuccess = events.Define(
+		"ns.down.transmission.success", "downlink successfully transmitted",
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.DownlinkMessage{}),
+	)
+	evtTransmissionFail = events.Define(
+		"ns.down.transmission.fail", "failed to transmit downlink",
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithErrorDataType(),
+		events.WithPropagateToParent(),
+	)
 )
 
 const (
