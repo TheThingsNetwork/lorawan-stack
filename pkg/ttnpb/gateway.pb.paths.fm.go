@@ -360,12 +360,14 @@ var ListGatewayAPIKeysRequestFieldPathsNested = []string{
 	"gateway_ids.eui",
 	"gateway_ids.gateway_id",
 	"limit",
+	"order",
 	"page",
 }
 
 var ListGatewayAPIKeysRequestFieldPathsTopLevel = []string{
 	"gateway_ids",
 	"limit",
+	"order",
 	"page",
 }
 var GetGatewayAPIKeyRequestFieldPathsNested = []string{

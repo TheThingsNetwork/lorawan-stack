@@ -205,6 +205,13 @@
             "type": "string"
           },
           {
+            "name": "order",
+            "description": "Order the results by this field path.\nDefault ordering is by ID. Prepend with a minus (-) to reverse the order.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "limit",
             "description": "Limit the number of results per page.",
             "in": "query",
@@ -5291,6 +5298,13 @@
             "format": "byte"
           },
           {
+            "name": "order",
+            "description": "Order the results by this field path.\nDefault ordering is by ID. Prepend with a minus (-) to reverse the order.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "limit",
             "description": "Limit the number of results per page.",
             "in": "query",
@@ -7595,6 +7609,13 @@
             "description": "This ID shares namespace with user IDs.",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "order",
+            "description": "Order the results by this field path.\nDefault ordering is by ID. Prepend with a minus (-) to reverse the order.",
+            "in": "query",
+            "required": false,
             "type": "string"
           },
           {
@@ -10481,6 +10502,13 @@
           {
             "name": "user_ids.email",
             "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "order",
+            "description": "Order the results by this field path.\nDefault ordering is by ID. Prepend with a minus (-) to reverse the order.",
             "in": "query",
             "required": false,
             "type": "string"

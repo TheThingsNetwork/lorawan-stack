@@ -112,6 +112,7 @@ func (is *IdentityServer) listApplicationAPIKeys(ctx context.Context, req *ttnpb
 	if err = rights.RequireApplication(ctx, req.GetApplicationIds(), ttnpb.Right_RIGHT_APPLICATION_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
+	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
 	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
 	defer func() {

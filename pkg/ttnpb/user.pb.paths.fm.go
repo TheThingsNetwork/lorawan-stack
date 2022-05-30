@@ -182,6 +182,7 @@ var UpdateUserPasswordRequestFieldPathsTopLevel = []string{
 }
 var ListUserAPIKeysRequestFieldPathsNested = []string{
 	"limit",
+	"order",
 	"page",
 	"user_ids",
 	"user_ids.email",
@@ -190,6 +191,7 @@ var ListUserAPIKeysRequestFieldPathsNested = []string{
 
 var ListUserAPIKeysRequestFieldPathsTopLevel = []string{
 	"limit",
+	"order",
 	"page",
 	"user_ids",
 }
