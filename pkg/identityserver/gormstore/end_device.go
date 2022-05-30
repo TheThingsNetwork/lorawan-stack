@@ -58,6 +58,10 @@ type EndDevice struct {
 
 	ActivatedAt *time.Time `gorm:"default:null"`
 	LastSeenAt  *time.Time `gorm:"default:null"`
+
+	ClaimAuthenticationCodeSecret    []byte     `gorm:"type:BYTEA"`
+	ClaimAuthenticationCodeValidFrom *time.Time `gorm:"default:null"`
+	ClaimAuthenticationCodeValidTo   *time.Time `gorm:"default:null"`
 }
 
 func init() {
@@ -152,6 +156,13 @@ var devicePBSetters = map[string]func(*ttnpb.EndDevice, *EndDevice){
 	lastSeenAtField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
 		pb.LastSeenAt = ttnpb.ProtoTime(dev.LastSeenAt)
 	},
+	claimAuthenticationCodeField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
+		pb.ClaimAuthenticationCode = &ttnpb.EndDeviceAuthenticationCode{
+			Value:     string(dev.ClaimAuthenticationCodeSecret),
+			ValidFrom: ttnpb.ProtoTime(dev.ClaimAuthenticationCodeValidFrom),
+			ValidTo:   ttnpb.ProtoTime(dev.ClaimAuthenticationCodeValidTo),
+		}
+	},
 }
 
 // functions to set fields from the device proto into the device model.
@@ -221,6 +232,17 @@ var deviceModelSetters = map[string]func(*EndDevice, *ttnpb.EndDevice){
 	lastSeenAtField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
 		dev.LastSeenAt = ttnpb.StdTime(pb.LastSeenAt)
 	},
+	claimAuthenticationCodeField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
+		if pb.ClaimAuthenticationCode != nil {
+			dev.ClaimAuthenticationCodeSecret = []byte(pb.ClaimAuthenticationCode.Value)
+			if pb.ClaimAuthenticationCode.ValidFrom != nil {
+				dev.ClaimAuthenticationCodeValidFrom = ttnpb.StdTime(pb.ClaimAuthenticationCode.ValidFrom)
+			}
+			if pb.ClaimAuthenticationCode.ValidTo != nil {
+				dev.ClaimAuthenticationCodeValidTo = ttnpb.StdTime(pb.ClaimAuthenticationCode.ValidTo)
+			}
+		}
+	},
 }
 
 // fieldMask to use if a nil or empty fieldmask is passed.
@@ -256,6 +278,11 @@ var deviceColumnNames = map[string][]string{
 	locationsField:                {},
 	activatedAtField:              {activatedAtField},
 	lastSeenAtField:               {lastSeenAtField},
+	claimAuthenticationCodeField: {
+		"claim_authentication_code_secret",
+		"claim_authentication_code_valid_from",
+		"claim_authentication_code_valid_to",
+	},
 }
 
 func (dev EndDevice) toPB(pb *ttnpb.EndDevice, fieldMask store.FieldMask) {
