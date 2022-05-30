@@ -35,7 +35,7 @@ func (st *StoreTest) TestLoginTokenStore(t *T) {
 	defer st.DestroyDB(t, false)
 	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement LoginTokenStore")
+		t.Skip("Store does not implement LoginTokenStore")
 	}
 
 	start := time.Now().Truncate(time.Second)

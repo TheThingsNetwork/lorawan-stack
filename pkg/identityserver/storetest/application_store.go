@@ -37,7 +37,7 @@ func (st *StoreTest) TestApplicationStoreCRUD(t *T) {
 	defer st.DestroyDB(t, true)
 	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement ApplicationStore")
+		t.Skip("Store does not implement ApplicationStore")
 	}
 
 	mask := fieldMask(ttnpb.ApplicationFieldPathsTopLevel...)
@@ -302,7 +302,7 @@ func (st *StoreTest) TestApplicationStorePagination(t *T) {
 	defer st.DestroyDB(t, false)
 	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement ApplicationStore")
+		t.Skip("Store does not implement ApplicationStore")
 	}
 
 	t.Run("FindApplications_Paginated", func(t *T) {

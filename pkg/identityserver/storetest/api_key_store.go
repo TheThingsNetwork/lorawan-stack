@@ -50,7 +50,7 @@ func (st *StoreTest) TestAPIKeyStoreCRUD(t *T) {
 	defer st.DestroyDB(t, true, "applications", "clients", "gateways", "organizations", "users", "accounts")
 	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement APIKeyStore")
+		t.Skip("Store does not implement APIKeyStore")
 	}
 
 	someRights := map[string]*ttnpb.Rights{
@@ -241,7 +241,7 @@ func (st *StoreTest) TestAPIKeyStorePagination(t *T) {
 	defer st.DestroyDB(t, false)
 	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement APIKeyStore")
+		t.Skip("Store does not implement APIKeyStore")
 	}
 
 	t.Run("FindAPIKeys_Paginated", func(t *T) {

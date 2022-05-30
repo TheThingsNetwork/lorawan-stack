@@ -37,7 +37,7 @@ func (st *StoreTest) TestUserSessionStore(t *T) {
 	defer st.DestroyDB(t, true, "users", "accounts")
 	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement UserSessionStore")
+		t.Skip("Store does not implement UserSessionStore")
 	}
 
 	var created *ttnpb.UserSession
@@ -188,7 +188,7 @@ func (st *StoreTest) TestUserSessionStorePagination(t *T) {
 	defer st.DestroyDB(t, false)
 	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement UserSessionStore")
+		t.Skip("Store does not implement UserSessionStore")
 	}
 
 	var sessions []*ttnpb.UserSession

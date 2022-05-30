@@ -36,7 +36,7 @@ func (st *StoreTest) TestEUIStore(t *T) {
 	defer st.DestroyDB(t, false)
 	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement EUIStore")
+		t.Skip("Store does not implement EUIStore")
 	}
 
 	t.Run("InitializeDevEUIBlock", func(t *T) {

@@ -38,7 +38,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 	defer st.DestroyDB(t, true, "applications", "attributes", "end_device_locations", "pictures") // TODO: Make sure (at least) attributes and end_device_locations are deleted when deleting end devices.
 	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement ApplicationStore and EndDeviceStore")
+		t.Skip("Store does not implement ApplicationStore and EndDeviceStore")
 	}
 
 	application, err := s.CreateApplication(ctx, &ttnpb.Application{
@@ -436,7 +436,7 @@ func (st *StoreTest) TestEndDeviceStorePagination(t *T) {
 	defer st.DestroyDB(t, false)
 	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement EndDeviceStore")
+		t.Skip("Store does not implement EndDeviceStore")
 	}
 
 	t.Run("ListEndDevices_Paginated", func(t *T) {
@@ -483,7 +483,7 @@ func (st *StoreTest) TestEndDeviceBatchUpdate(t *T) {
 	defer st.DestroyDB(t, false)
 	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement EndDeviceStore")
+		t.Skip("Store does not implement EndDeviceStore")
 	}
 
 	t.Run("BatchUpdateEndDeviceLastSeen", func(t *T) {

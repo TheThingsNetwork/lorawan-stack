@@ -38,7 +38,7 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 	defer st.DestroyDB(t, true)
 	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement GatewayStore")
+		t.Skip("Store does not implement GatewayStore")
 	}
 
 	start := time.Now().Truncate(time.Second)
@@ -445,7 +445,7 @@ func (st *StoreTest) TestGatewayStorePagination(t *T) {
 	defer st.DestroyDB(t, false)
 	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement GatewayStore")
+		t.Skip("Store does not implement GatewayStore")
 	}
 
 	t.Run("FindGateways_Paginated", func(t *T) {
