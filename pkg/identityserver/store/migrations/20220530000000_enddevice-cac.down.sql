@@ -1,0 +1,3 @@
+ALTER TABLE end_devices DROP COLUMN claim_authentication_code_secret;
+ALTER TABLE end_devices DROP COLUMN claim_authentication_code_valid_from;
+ALTER TABLE end_devices DROP COLUMN claim_authentication_code_valid_to;
