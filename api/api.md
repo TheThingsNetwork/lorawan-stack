@@ -3306,7 +3306,7 @@ SDKs are responsible for combining (if desired) the three.
 | `provisioner_id` | [`string`](#string) |  | ID of the provisioner. Stored in Join Server. |
 | `provisioning_data` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  | Vendor-specific provisioning data. Stored in Join Server. |
 | `multicast` | [`bool`](#bool) |  | Indicates whether this device represents a multicast group. |
-| `claim_authentication_code` | [`EndDeviceAuthenticationCode`](#ttn.lorawan.v3.EndDeviceAuthenticationCode) |  | Authentication code to claim ownership of the end device. Stored in Join Server. |
+| `claim_authentication_code` | [`EndDeviceAuthenticationCode`](#ttn.lorawan.v3.EndDeviceAuthenticationCode) |  | Authentication code to claim ownership of the end device. Stored in the Identity Server. |
 | `skip_payload_crypto` | [`bool`](#bool) |  | Skip decryption of uplink payloads and encryption of downlink payloads. This field is deprecated, use skip_payload_crypto_override instead. |
 | `skip_payload_crypto_override` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  | Skip decryption of uplink payloads and encryption of downlink payloads. This field overrides the application-level setting. |
 | `activated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Timestamp when the device has been activated. Stored in the Entity Registry. This field is set by the Application Server when an end device sends its first uplink. The Application Server will use the field in order to avoid repeated calls to the Entity Registry. The field cannot be unset once set. |

@@ -13920,7 +13920,7 @@
             },
             {
               "name": "claim_authentication_code",
-              "description": "Authentication code to claim ownership of the end device. Stored in Join Server.",
+              "description": "Authentication code to claim ownership of the end device. Stored in the Identity Server.",
               "label": "",
               "type": "EndDeviceAuthenticationCode",
               "longType": "EndDeviceAuthenticationCode",

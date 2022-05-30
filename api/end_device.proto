@@ -750,7 +750,7 @@ message EndDevice {
   // Indicates whether this device represents a multicast group.
   bool multicast = 45;
 
-  // Authentication code to claim ownership of the end device. Stored in Join Server.
+  // Authentication code to claim ownership of the end device. Stored in the Identity Server.
   EndDeviceAuthenticationCode claim_authentication_code = 46;
 
   // Skip decryption of uplink payloads and encryption of downlink payloads.

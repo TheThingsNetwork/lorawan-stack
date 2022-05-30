@@ -2391,7 +2391,7 @@ type EndDevice struct {
 	ProvisioningData *types.Struct `protobuf:"bytes,43,opt,name=provisioning_data,json=provisioningData,proto3" json:"provisioning_data,omitempty"`
 	// Indicates whether this device represents a multicast group.
 	Multicast bool `protobuf:"varint,45,opt,name=multicast,proto3" json:"multicast,omitempty"`
-	// Authentication code to claim ownership of the end device. Stored in Join Server.
+	// Authentication code to claim ownership of the end device. Stored in the Identity Server.
 	ClaimAuthenticationCode *EndDeviceAuthenticationCode `protobuf:"bytes,46,opt,name=claim_authentication_code,json=claimAuthenticationCode,proto3" json:"claim_authentication_code,omitempty"`
 	// Skip decryption of uplink payloads and encryption of downlink payloads.
 	// This field is deprecated, use skip_payload_crypto_override instead.

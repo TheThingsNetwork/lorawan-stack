@@ -19328,7 +19328,7 @@
         },
         "claim_authentication_code": {
           "$ref": "#/definitions/v3EndDeviceAuthenticationCode",
-          "description": "Authentication code to claim ownership of the end device. Stored in Join Server."
+          "description": "Authentication code to claim ownership of the end device. Stored in the Identity Server."
         },
         "skip_payload_crypto": {
           "type": "boolean",
