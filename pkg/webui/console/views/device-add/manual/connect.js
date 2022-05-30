@@ -17,6 +17,7 @@ import { push } from 'connected-react-router'
 
 import tts from '@console/api/tts'
 
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { selectNsConfig, selectAsConfig, selectJsConfig } from '@ttn-lw/lib/selectors/env'
 
 import { checkFromState, mayEditApplicationDeviceKeys } from '@console/lib/feature-checks'
@@ -28,7 +29,6 @@ import {
   selectApplicationDevEUICount,
 } from '@console/store/selectors/applications'
 import { selectJoinEUIPrefixes } from '@console/store/selectors/join-server'
-import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 const mapStateToProps = state => ({
   appId: selectSelectedApplicationId(state),

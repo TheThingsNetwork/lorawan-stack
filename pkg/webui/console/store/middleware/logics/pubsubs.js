@@ -71,7 +71,7 @@ const deletePubsub = createRequestLogic({
     const { appId, pubsubId } = action.payload
 
     return tts.Applications.PubSubs.deleteById(appId, pubsubId)
-  }
+  },
 })
 
 export default [

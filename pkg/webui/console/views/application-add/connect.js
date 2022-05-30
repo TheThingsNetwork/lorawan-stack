@@ -16,10 +16,10 @@ import { connect as withConnect } from 'react-redux'
 import { push } from 'connected-react-router'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
-import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import pipe from '@ttn-lw/lib/pipe'
 
 import { mayCreateApplications } from '@console/lib/feature-checks'

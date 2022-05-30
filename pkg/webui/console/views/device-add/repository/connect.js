@@ -17,6 +17,7 @@ import { push } from 'connected-react-router'
 
 import tts from '@console/api/tts'
 
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import {
   selectNsConfig,
   selectAsConfig,
@@ -39,7 +40,6 @@ import {
   selectSelectedApplicationId,
 } from '@console/store/selectors/applications'
 import { selectJoinEUIPrefixes } from '@console/store/selectors/join-server'
-import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 const mapStateToProps = state => ({
   appId: selectSelectedApplicationId(state),

@@ -18,8 +18,6 @@ import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 
-import tts from '@console/api/tts'
-
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
@@ -29,14 +27,15 @@ import PubsubForm from '@console/components/pubsub-form'
 import { isNotFoundError } from '@ttn-lw/lib/errors/utils'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+
+import { createPubsub, getPubsub } from '@console/store/actions/pubsubs'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 import {
   selectMqttProviderDisabled,
   selectNatsProviderDisabled,
 } from '@console/store/selectors/application-server'
-import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
-import { createPubsub, getPubsub } from '@console/store/actions/pubsubs'
 
 @connect(
   state => ({

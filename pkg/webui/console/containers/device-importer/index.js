@@ -44,8 +44,9 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import randomByteString from '@console/lib/random-bytes'
 
-import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 import { convertTemplate } from '@console/store/actions/device-template-formats'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
 import style from './device-importer.styl'
 

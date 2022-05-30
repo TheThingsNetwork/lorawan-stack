@@ -18,8 +18,6 @@ import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 
-import tts from '@console/api/tts'
-
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
@@ -29,20 +27,21 @@ import Link from '@ttn-lw/components/link'
 
 import Message from '@ttn-lw/lib/components/message'
 import ErrorView from '@ttn-lw/lib/components/error-view'
-import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
 import SubViewError from '@console/views/sub-view-error'
 
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { mayViewMqttConnectionInfo } from '@console/lib/feature-checks'
 
-import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 import { createApplicationApiKey } from '@console/store/actions/api-keys'
 import { getMqttInfo } from '@console/store/actions/applications'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
 const m = defineMessages({
   publicAddress: 'Public address',

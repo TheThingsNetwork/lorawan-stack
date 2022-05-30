@@ -19,8 +19,6 @@ import { Container, Col, Row } from 'react-grid-system'
 import bind from 'autobind-decorator'
 import { push } from 'connected-react-router'
 
-import tts from '@console/api/tts'
-
 import PageTitle from '@ttn-lw/components/page-title'
 import FormSubmit from '@ttn-lw/components/form/submit'
 import SubmitButton from '@ttn-lw/components/submit-button'
@@ -35,16 +33,16 @@ import withFeatureRequirement from '@console/lib/components/with-feature-require
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import { selectGsConfig } from '@ttn-lw/lib/selectors/env'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { mapFormValueToAttributes } from '@console/lib/attributes'
 import { mayCreateGateways } from '@console/lib/feature-checks'
 
 import { getOrganizationsList } from '@console/store/actions/organizations'
+import { createGateway } from '@console/store/actions/gateways'
 
 import { selectOrganizationsFetching } from '@console/store/selectors/organizations'
 import { selectUserId } from '@console/store/selectors/user'
-import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
-import { createGateway } from '@console/store/actions/gateways'
 
 const m = defineMessages({
   createGateway: 'Create gateway',
