@@ -91,11 +91,53 @@ var notificationsListCommand = &cobra.Command{
 	},
 }
 
+var notificationsSetStatusCommand = &cobra.Command{
+	Use:     "set-status",
+	Aliases: []string{"update-status"},
+	Short:   "Set the status of notifications",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		req := &ttnpb.UpdateNotificationStatusRequest{
+			Status: ttnpb.NotificationStatus_NOTIFICATION_STATUS_SEEN,
+		}
+		_, err := req.SetFromFlags(cmd.Flags(), "")
+		if err != nil {
+			return err
+		}
+		if len(args) > 0 && req.GetReceiverIds().GetUserId() == "" {
+			if len(args) > 1 {
+				logger.Warn("Multiple IDs found in arguments, treating the first as user ID and the rest as notification IDs")
+			}
+			req.ReceiverIds = &ttnpb.UserIdentifiers{UserId: args[0]}
+			args = args[1:]
+		}
+		if len(args) > 0 && len(req.GetIds()) == 0 {
+			req.Ids = args
+		}
+
+		is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+		if err != nil {
+			return err
+		}
+		svc := ttnpb.NewNotificationServiceClient(is)
+
+		_, err = svc.UpdateStatus(ctx, req)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	},
+}
+
 func init() {
 	ttnpb.AddSetFlagsForListNotificationsRequest(notificationsListCommand.Flags(), "", false)
 	flagsplugin.AddAlias(notificationsListCommand.Flags(), "receiver-ids.user-id", "user-id", flagsplugin.WithHidden(false))
 	notificationsListCommand.Flags().Lookup("status").DefValue = ttnpb.NotificationStatus_NOTIFICATION_STATUS_UNSEEN.String()
 	notificationsListCommand.Flags().Bool("mark-as-seen", false, "Mark unseen notifications as seen")
 	notificationsCommand.AddCommand(notificationsListCommand)
+	ttnpb.AddSetFlagsForUpdateNotificationStatusRequest(notificationsSetStatusCommand.Flags(), "", false)
+	flagsplugin.AddAlias(notificationsSetStatusCommand.Flags(), "receiver-ids.user-id", "user-id", flagsplugin.WithHidden(false))
+	notificationsSetStatusCommand.Flags().Lookup("status").DefValue = ttnpb.NotificationStatus_NOTIFICATION_STATUS_SEEN.String()
+	notificationsCommand.AddCommand(notificationsSetStatusCommand)
 	Root.AddCommand(notificationsCommand)
 }
