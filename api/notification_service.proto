@@ -155,6 +155,8 @@ message ListNotificationsResponse {
 }
 
 message UpdateNotificationStatusRequest {
+  option (thethings.flags.message) = { select: false, set: true };
+
   // The IDs of the receiving user.
   UserIdentifiers receiver_ids = 1 [(validate.rules).message.required = true];
 
