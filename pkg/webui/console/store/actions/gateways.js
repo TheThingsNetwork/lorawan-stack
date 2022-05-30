@@ -48,6 +48,16 @@ import {
 
 export const SHARED_NAME = GATEWAY
 
+export const CREATE_GTW_BASE = 'CREATE_GTW'
+export const [
+  { request: CREATE_GTW, success: CREATE_GTW_SUCCESS, failure: CREATE_GTW_FAILURE },
+  { request: createGateway, success: createGatewaySuccess, failure: createGatewayFailure },
+] = createRequestActions(CREATE_GTW_BASE, (ownerId, gateway, isAdmin) => ({
+  ownerId,
+  gateway,
+  isAdmin,
+}))
+
 export const GET_GTW_BASE = 'GET_GATEWAY'
 export const [
   { request: GET_GTW, success: GET_GTW_SUCCESS, failure: GET_GTW_FAILURE },

@@ -19,7 +19,7 @@ import withRequest from '@ttn-lw/lib/components/with-request'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
-import { getPubsub, updatePubsub } from '@console/store/actions/pubsubs'
+import { deletePubsub, getPubsub, updatePubsub } from '@console/store/actions/pubsubs'
 
 import {
   selectSelectedPubsub,
@@ -68,6 +68,7 @@ const mapDispatchToProps = (dispatch, { match }) => {
     getPubsub: () => dispatch(getPubsub(appId, pubsubId, pubsubEntitySelector)),
     navigateToList: () => dispatch(replace(`/applications/${appId}/integrations/pubsubs`)),
     updatePubsub: patch => dispatch(promisifiedUpdatePubsub(appId, pubsubId, patch)),
+    deletePubsub: (appId, pubsubId) => dispatch(attachPromise(deletePubsub(appId, pubsubId))),
   }
 }
 

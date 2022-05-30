@@ -103,6 +103,15 @@ const getDeviceTemplateFormatsLogic = createRequestLogic({
   },
 })
 
+const convertTemplateLogic = createRequestLogic({
+  type: deviceTemplateFormats.CONVERT_TEMPLATE,
+  process: async ({ action }) => {
+    const { format_id, data } = action.payload
+    const convertedFormat = await tts.Applications.Devices.convertTemplate(format_id, data)
+    return convertedFormat
+  },
+})
+
 const getDeviceSessionLogic = createLogic({
   type: devices.GET_DEVICE_EVENT_MESSAGE_SUCCESS,
   process: async ({ action, getState }, dispatch, done) => {
@@ -139,6 +148,7 @@ const getDeviceSessionLogic = createLogic({
 export default [
   getDevicesListLogic,
   getDeviceTemplateFormatsLogic,
+  convertTemplateLogic,
   getDeviceLogic,
   resetDeviceLogic,
   updateDeviceLogic,

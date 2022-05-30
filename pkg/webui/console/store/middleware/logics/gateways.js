@@ -31,6 +31,15 @@ import {
 
 import createEventsConnectLogics from './events'
 
+const createGatewayLogic = createRequestLogic({
+  type: gateways.CREATE_GTW,
+  process: async ({ action }) => {
+    const { ownerId, gateway, isAdmin } = action.payload
+
+    return await tts.Gateways.create(ownerId, gateway, isAdmin)
+  },
+})
+
 const getGatewayLogic = createRequestLogic({
   type: gateways.GET_GTW,
   process: async ({ action }, dispatch) => {
@@ -238,6 +247,7 @@ const updateGatewayStatisticsLogic = createRequestLogic({
 })
 
 export default [
+  createGatewayLogic,
   getGatewayLogic,
   updateGatewayLogic,
   deleteGatewayLogic,

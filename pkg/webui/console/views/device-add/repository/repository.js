@@ -17,8 +17,6 @@ import { Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { merge, isEqual } from 'lodash'
 
-import tts from '@console/api/tts'
-
 import Form from '@ttn-lw/components/form'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
@@ -110,6 +108,7 @@ const DeviceRepository = props => {
     supportLink,
     fetchDevEUICounter,
     applicationDevEUICounter,
+    issueDevEUI,
   } = props
 
   const asEnabled = asConfig.enabled
@@ -227,10 +226,10 @@ const DeviceRepository = props => {
   }, [])
 
   const handleDevEUIRequest = React.useCallback(async () => {
-    const result = await tts.Applications.issueDevEUI(appId)
+    const result = issueDevEUI(appId)
     fetchDevEUICounter(appId)
     return result.dev_eui
-  }, [appId, fetchDevEUICounter])
+  }, [appId, fetchDevEUICounter, issueDevEUI])
 
   const hasTemplateError = Boolean(templateError)
   const hasSelectedOther = hasAnySelectedOther(state)
@@ -356,6 +355,7 @@ DeviceRepository.propTypes = {
   createDeviceSuccess: PropTypes.func.isRequired,
   fetchDevEUICounter: PropTypes.func.isRequired,
   getRegistrationTemplate: PropTypes.func.isRequired,
+  issueDevEUI: PropTypes.func.isRequired,
   jsConfig: PropTypes.stackComponent.isRequired,
   mayEditKeys: PropTypes.bool.isRequired,
   nsConfig: PropTypes.stackComponent.isRequired,

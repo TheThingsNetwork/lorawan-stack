@@ -47,6 +47,12 @@ import {
 
 export const SHARED_NAME = APPLICATION
 
+export const CREATE_APP_BASE = 'CREATE_APP'
+export const [
+  { request: CREATE_APP, success: CREATE_APP_SUCCESS, failure: CREATE_APP_FAILURE },
+  { request: createApp, succedd: createAppSuccess, failure: createAppFailure },
+] = createRequestActions(CREATE_APP_BASE, (ownerId, app, isAdmin) => ({ ownerId, app, isAdmin }))
+
 export const GET_APP_BASE = 'GET_APPLICATION'
 export const [
   { request: GET_APP, success: GET_APP_SUCCESS, failure: GET_APP_FAILURE },
@@ -56,6 +62,12 @@ export const [
   id => ({ id }),
   (id, selector) => ({ selector }),
 )
+
+export const ISSUE_DEV_EUI_BASE = 'ISSUE_DEV_EUI'
+export const [
+  { request: ISSUE_DEV_EUI, success: ISSUE_DEV_EUI_SUCCESS, failure: ISSUE_DEV_EUI_FAILURE },
+  { request: issueDevEUI, success: issueDevEUISuccess, failure: issueDevEUIFailure },
+] = createRequestActions(ISSUE_DEV_EUI_BASE, id => ({ id }))
 
 export const GET_APP_DEV_EUI_COUNT_BASE = 'GET_APP_DEV_EUI_COUNT'
 export const [
@@ -157,3 +169,9 @@ export const resumeApplicationEventsStream = resumeEventsStream(SHARED_NAME)
 export const stopApplicationEventsStream = stopEventsStream(SHARED_NAME)
 export const clearApplicationEventsStream = clearEvents(SHARED_NAME)
 export const setApplicationEventsFilter = setEventsFilter(SHARED_NAME)
+
+export const GET_MQTT_INFO_BASE = 'GET_MQTT_INFO'
+export const [
+  { request: GET_MQTT_INFO, success: GET_MQTT_INFO_SUCCESS, failure: GET_MQTT_INFO_FAILURE },
+  { request: getMqttInfo, success: getMqttInfoSuccess, failure: getMqttInfoFailure },
+] = createRequestActions(GET_MQTT_INFO_BASE, id => ({ id }))

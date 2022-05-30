@@ -19,6 +19,15 @@ import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 import * as pubsubs from '@console/store/actions/pubsubs'
 import * as pubsubFormats from '@console/store/actions/pubsub-formats'
 
+const createPubsubLogic = createRequestLogic({
+  type: pubsubs.CREATE_PUBSUB,
+  process: async ({ action }) => {
+    const { appId, pubsub } = action.payload
+
+    return tts.Applications.PubSubs.create(appId, pubsub)
+  },
+})
+
 const getPubsubLogic = createRequestLogic({
   type: pubsubs.GET_PUBSUB,
   process: async ({ action }) => {
@@ -56,4 +65,20 @@ const getPubsubFormatsLogic = createRequestLogic({
   },
 })
 
-export default [getPubsubLogic, getPubsubsLogic, updatePubsubsLogic, getPubsubFormatsLogic]
+const deletePubsub = createRequestLogic({
+  type: pubsubs.DELETE_PUBSUB,
+  process: async ({ action }) => {
+    const { appId, pubsubId } = action.payload
+
+    return tts.Applications.PubSubs.deleteById(appId, pubsubId)
+  }
+})
+
+export default [
+  createPubsubLogic,
+  getPubsubLogic,
+  getPubsubsLogic,
+  updatePubsubsLogic,
+  getPubsubFormatsLogic,
+  deletePubsub,
+]

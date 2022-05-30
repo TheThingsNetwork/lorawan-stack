@@ -27,7 +27,7 @@ import {
 import { checkFromState, mayEditApplicationDeviceKeys } from '@console/lib/feature-checks'
 
 import { getTemplate } from '@console/store/actions/device-repository'
-import { getApplicationDevEUICount } from '@console/store/actions/applications'
+import { getApplicationDevEUICount, issueDevEUI } from '@console/store/actions/applications'
 
 import {
   selectDeviceTemplate,
@@ -39,6 +39,7 @@ import {
   selectSelectedApplicationId,
 } from '@console/store/selectors/applications'
 import { selectJoinEUIPrefixes } from '@console/store/selectors/join-server'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 const mapStateToProps = state => ({
   appId: selectSelectedApplicationId(state),
@@ -60,6 +61,7 @@ const mapDispatchToProps = dispatch => ({
     dispatch(push(`/applications/${appId}/devices/${deviceId}`)),
   getRegistrationTemplate: (appId, version) => dispatch(getTemplate(appId, version)),
   fetchDevEUICounter: appId => dispatch(getApplicationDevEUICount(appId)),
+  issueDevEUI: appId => dispatch(attachPromise(issueDevEUI(appId))),
 })
 
 export default DeviceRepository => connect(mapStateToProps, mapDispatchToProps)(DeviceRepository)

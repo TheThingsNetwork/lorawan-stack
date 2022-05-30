@@ -43,6 +43,8 @@ import { getOrganizationsList } from '@console/store/actions/organizations'
 
 import { selectOrganizationsFetching } from '@console/store/selectors/organizations'
 import { selectUserId } from '@console/store/selectors/user'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+import { createGateway } from '@console/store/actions/gateways'
 
 const m = defineMessages({
   createGateway: 'Create gateway',
@@ -60,11 +62,14 @@ const m = defineMessages({
   dispatch => ({
     createSuccess: gtwId => dispatch(push(`/gateways/${gtwId}`)),
     getOrganizationsList: () => dispatch(getOrganizationsList()),
+    createGateway: (ownerId, gateway, isAdmin) =>
+      dispatch(attachPromise(createGateway(ownerId, gateway, isAdmin))),
   }),
 )
 @withRequest(({ getOrganizationsList }) => getOrganizationsList())
 export default class GatewayAdd extends React.Component {
   static propTypes = {
+    createGateway: PropTypes.func.isRequired,
     createSuccess: PropTypes.func.isRequired,
     env: PropTypes.env.isRequired,
     gsEnabled: PropTypes.bool.isRequired,
@@ -77,7 +82,7 @@ export default class GatewayAdd extends React.Component {
 
   @bind
   async handleSubmit(values, { resetForm }) {
-    const { userId, createSuccess } = this.props
+    const { userId, createSuccess, createGateway } = this.props
     const { owner_id, ...gateway } = values
     const {
       ids: { gateway_id },
@@ -88,7 +93,7 @@ export default class GatewayAdd extends React.Component {
 
     const gatewayValues = { ...gateway, attributes: mapFormValueToAttributes(attributes) }
     try {
-      await tts.Gateways.create(owner_id, gatewayValues, userId === owner_id)
+      await createGateway(owner_id, gatewayValues, userId === owner_id)
 
       createSuccess(gateway_id)
     } catch (error) {

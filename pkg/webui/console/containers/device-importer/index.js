@@ -40,10 +40,12 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import { createFrontendError, isFrontend } from '@ttn-lw/lib/errors/utils'
 import { selectNsConfig, selectJsConfig, selectAsConfig } from '@ttn-lw/lib/selectors/env'
 import { getDeviceId } from '@ttn-lw/lib/selectors/id'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import randomByteString from '@console/lib/random-bytes'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+import { convertTemplate } from '@console/store/actions/device-template-formats'
 
 import style from './device-importer.styl'
 
@@ -128,6 +130,7 @@ const docLinkValue = msg => (
   },
   dispatch => ({
     redirectToList: appId => dispatch(push(`/applications/${appId}/devices`)),
+    convertTemplate: (format_id, data) => dispatch(attachPromise(convertTemplate(format_id, data))),
   }),
   (stateProps, dispatchProps, ownProps) => ({
     ...stateProps,
@@ -141,6 +144,7 @@ export default class DeviceImporter extends Component {
     appId: PropTypes.string.isRequired,
     asConfig: PropTypes.stackComponent.isRequired,
     availableComponents: PropTypes.components.isRequired,
+    convertTemplate: PropTypes.func.isRequired,
     jsConfig: PropTypes.stackComponent.isRequired,
     nsConfig: PropTypes.stackComponent.isRequired,
     redirectToList: PropTypes.func.isRequired,
@@ -214,7 +218,7 @@ export default class DeviceImporter extends Component {
 
   @bind
   async handleSubmit(values) {
-    const { appId, jsConfig, nsConfig, asConfig } = this.props
+    const { appId, jsConfig, nsConfig, asConfig, convertTemplate } = this.props
     const {
       format_id,
       data,
@@ -230,7 +234,7 @@ export default class DeviceImporter extends Component {
       // Start template conversion.
       this.setState({ step: 'conversion', status: 'processing' })
       this.appendToLog('Converting end device templates…')
-      const templateStream = await tts.Applications.Devices.convertTemplate(format_id, data)
+      const templateStream = await convertTemplate(format_id, data)
       devices = await new Promise((resolve, reject) => {
         const chunks = []
 

@@ -16,8 +16,6 @@ import React, { useState, useCallback } from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
-import tts from '@console/api/tts'
-
 import PageTitle from '@ttn-lw/components/page-title'
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
@@ -57,7 +55,7 @@ const validationSchema = Yup.object().shape({
 })
 
 const ApplicationAdd = props => {
-  const { userId, navigateToApplication } = props
+  const { userId, navigateToApplication, createApp } = props
   const jsHost = getHostFromUrl(selectJsConfig().base_url)
   const nsHost = getHostFromUrl(selectNsConfig().base_url)
   const asHost = getHostFromUrl(selectAsConfig().base_url)
@@ -71,7 +69,7 @@ const ApplicationAdd = props => {
       setError(undefined)
 
       try {
-        const result = await tts.Applications.create(
+        const result = await createApp(
           owner_id,
           {
             ids: { application_id },
@@ -92,7 +90,7 @@ const ApplicationAdd = props => {
         setError(error)
       }
     },
-    [navigateToApplication, userId, nsHost, asHost, jsHost],
+    [createApp, navigateToApplication, userId, nsHost, asHost, jsHost],
   )
 
   const initialValues = {
@@ -147,6 +145,7 @@ const ApplicationAdd = props => {
 }
 
 ApplicationAdd.propTypes = {
+  createApp: PropTypes.func.isRequired,
   navigateToApplication: PropTypes.func.isRequired,
   userId: PropTypes.string.isRequired,
 }

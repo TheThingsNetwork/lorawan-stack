@@ -22,6 +22,15 @@ import * as link from '@console/store/actions/link'
 
 import createEventsConnectLogics from './events'
 
+const createApplicationLogic = createRequestLogic({
+  type: applications.CREATE_APP,
+  process: async ({ action }) => {
+    const { ownerId, app, isAdmin } = action.payload
+    const newApp = await tts.Applications.create(ownerId, app, isAdmin)
+    return newApp
+  },
+})
+
 const getApplicationLogic = createRequestLogic({
   type: applications.GET_APP,
   process: async ({ action }, dispatch) => {
@@ -32,6 +41,14 @@ const getApplicationLogic = createRequestLogic({
     const app = await tts.Applications.getById(id, selector)
     dispatch(applications.startApplicationEventsStream(id))
     return app
+  },
+})
+
+const issueDevEUILogic = createRequestLogic({
+  type: applications.ISSUE_DEV_EUI,
+  process: async ({ action }) => {
+    const { id } = action.payload
+    return await tts.Applications.issueDevEUI(id)
   },
 })
 
@@ -180,7 +197,19 @@ const updateApplicationLinkLogic = createRequestLogic(
   link.updateApplicationLinkSuccess,
 )
 
+const getMqttConnectionInfoLogic = createRequestLogic({
+  type: applications.GET_MQTT_INFO,
+  process: async ({ action }) => {
+    const { id } = action.payload
+
+    const mqttInfo = await tts.Applications.getMqttConnectionInfo(id)
+
+    return mqttInfo
+  },
+})
+
 export default [
+  createApplicationLogic,
   getApplicationLogic,
   getApplicationDeviceCountLogic,
   updateApplicationLogic,
@@ -190,7 +219,9 @@ export default [
   getApplicationsRightsLogic,
   getApplicationLinkLogic,
   updateApplicationLinkLogic,
+  issueDevEUILogic,
   getApplicationDevEUICountLogic,
+  getMqttConnectionInfoLogic,
   ...createEventsConnectLogics(
     applications.SHARED_NAME,
     'applications',
