@@ -350,7 +350,7 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 				return nil, err
 			}
 			// Store the encrypted value along with the ID of the key used to encrypt it.
-			req.EndDevice.ClaimAuthenticationCode.Value = fmt.Sprintf("%s:%s", is.config.EndDevices.EncryptionKeyID, encrypted)
+			req.EndDevice.ClaimAuthenticationCode.Value = fmt.Sprintf("%s%s%s", is.config.EndDevices.EncryptionKeyID, endDeviceAuthenticationCodeSeparator, hex.EncodeToString(encrypted))
 		} else {
 			log.FromContext(ctx).Debug("No encryption key defined, store End Device Claim Authentication Code directly in plaintext")
 		}

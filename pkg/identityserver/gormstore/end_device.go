@@ -59,9 +59,9 @@ type EndDevice struct {
 	ActivatedAt *time.Time `gorm:"default:null"`
 	LastSeenAt  *time.Time `gorm:"default:null"`
 
-	ClaimAuthenticationCodeSecret    []byte     `gorm:"type:BYTEA"`
-	ClaimAuthenticationCodeValidFrom *time.Time `gorm:"default:null"`
-	ClaimAuthenticationCodeValidTo   *time.Time `gorm:"default:null"`
+	ClaimAuthenticationCodeSecret    []byte `gorm:"type:BYTEA"`
+	ClaimAuthenticationCodeValidFrom *time.Time
+	ClaimAuthenticationCodeValidTo   *time.Time
 }
 
 func init() {
