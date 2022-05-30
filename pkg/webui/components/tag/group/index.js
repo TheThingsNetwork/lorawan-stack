@@ -16,6 +16,8 @@ import React from 'react'
 import classnames from 'classnames'
 import bind from 'autobind-decorator'
 
+import Tooltip from '@ttn-lw/components/tooltip'
+
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import Tag from '..'
@@ -104,11 +106,16 @@ class TagGroup extends React.Component {
     const { left } = this.state
 
     const ts = tags.slice(0, tags.length - left)
+    const leftGroup = <div className={style.leftGroup}>{tags.slice(tags.length - left)}</div>
 
     return (
       <div ref={this.element} className={classnames(className, style.group)}>
         {ts}
-        {left > 0 && <Tag content={`+${left}`} />}
+        {left > 0 && (
+          <Tooltip content={leftGroup}>
+            <Tag content={`+${left}`} />
+          </Tooltip>
+        )}
       </div>
     )
   }
