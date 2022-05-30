@@ -42,6 +42,7 @@ const headers = [
     name: 'ids.pub_sub_id',
     displayName: sharedMessages.id,
     width: 40,
+    sortable: true,
   },
   {
     getValue: row => {
@@ -60,6 +61,7 @@ const headers = [
     name: 'base_topic',
     displayName: sharedMessages.pubsubBaseTopic,
     width: 9,
+    sortable: true,
   },
   {
     getValue: row => {
@@ -77,6 +79,7 @@ const headers = [
     name: 'format',
     displayName: m.format,
     width: 9,
+    sortable: true,
   },
 ]
 
@@ -106,12 +109,15 @@ export default class PubsubsTable extends React.Component {
     return (
       <FetchTable
         entity="pubsubs"
+        defaultOrder="-ids.pub_sub_id"
         addMessage={sharedMessages.addPubsub}
         headers={headers}
         getItemsAction={this.getPubsubsList}
         baseDataSelector={this.baseDataSelector}
         tableTitle={<Message content={sharedMessages.pubsubs} />}
         getItemPathPrefix={getItemPathPrefix}
+        paginated={false}
+        handlesSorting
         {...this.props}
       />
     )
