@@ -33,7 +33,7 @@ const GatewayCollaboratorsList = props => {
         <IntlHelmet title={sharedMessages.collaborators} />
         <Col>
           <CollaboratorsTable
-            pageSize={PAGE_SIZES.REGULAR}
+            pageSize={PAGE_SIZES.MAX}
             baseDataSelector={selectTableData}
             getItemsAction={getCollaboratorsList}
           />
