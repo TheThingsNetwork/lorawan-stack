@@ -808,30 +808,6 @@ You can run `Cypress` in the interactive mode by running the following command:
 ```bash
 $ tools/bin/mage js:cypressInteractive
 ```
-
-#### Code coverage
-
-Code coverage can be used to verify that tests invoke code for handling edge cases.
-To generate code coverage report run:
-
-- Global text summary.
-
-```bash
-$ npx nyc report --reporter=text-summary
-```
-
-- Per file text.
-
-```bash
-$ npx nyc report --reporter=text
-```
-
-- Per file with UI. This command will generate `index.html` file in the `coverage/cypress` folder.
-
-```bash
-$ npx nyc report --reporter=html
-```
-
 #### JavaScript based tests
 
 We find the [JS Unit Testing Guide](https://github.com/mawrkus/js-unit-testing-guide) a good starting point for informing our testing guidelines and we recommend reading through this guide. Note, that we employ some different approaches regarding [Grammar and Capitalization](#Grammar-and-capitalization).
