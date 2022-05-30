@@ -19,6 +19,11 @@ For details about compatibility between different releases, see the **Commitment
 
 - Entities are now fully validated when updated in the stores.
   - Previously only the updated paths where validated. This lead to situations in which a partial update could cause the entity as a whole to reach an invalid state.
+- Application, gateway, end device and organization-tables in the Console are now sorted by creation time by default (newest first).
+- Collaborator and API Key tables can now be sorted in the Console.
+- The application table in the Console now shows the amount of end devices.
+- The organizations table in the Console now shows the amount of collaborators.
+- Table layouts for several entities have been improved on the Console.
 
 ### Deprecated
 
