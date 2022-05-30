@@ -371,6 +371,12 @@ func hasUpdateDeviceLocationFlags(flags *pflag.FlagSet) bool {
 		flags.Changed("location.accuracy")
 }
 
+func hasUpdateDeviceClaimAuthenticationCodeFlags(flags *pflag.FlagSet) bool {
+	return flags.Changed("claim_authentication_code.value") ||
+		flags.Changed("claim_authentication_code.valid_from") ||
+		flags.Changed("claim_authentication_code.valid_to")
+}
+
 func updateDeviceLocation(device *ttnpb.EndDevice, flags *pflag.FlagSet) {
 	if device.Locations == nil {
 		device.Locations = make(map[string]*ttnpb.Location)

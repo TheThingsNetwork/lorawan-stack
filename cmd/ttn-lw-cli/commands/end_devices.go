@@ -683,6 +683,10 @@ var (
 				paths = append(paths, "locations")
 			}
 
+			if hasUpdateDeviceClaimAuthenticationCodeFlags(cmd.Flags()) {
+				paths = append(paths, "claim_authentication_code")
+			}
+
 			if len(paths)+len(unsetPaths) == 0 {
 				logger.Warn("No fields selected, won't update anything")
 				return nil
