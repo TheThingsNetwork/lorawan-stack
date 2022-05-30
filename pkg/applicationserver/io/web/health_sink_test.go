@@ -49,8 +49,10 @@ func TestHealthStatusRegistry(t *testing.T) {
 
 	_, err := webhookRegistry.Set(ctx, registeredWebhookIDs, nil, func(wh *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
 		return &ttnpb.ApplicationWebhook{
-			Ids: registeredWebhookIDs,
-		}, []string{"ids"}, nil
+			Ids:     registeredWebhookIDs,
+			BaseUrl: "http://example.com",
+			Format:  "json",
+		}, []string{"ids", "base_url", "format"}, nil
 	})
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -206,8 +208,10 @@ func TestHealthCheckSink(t *testing.T) {
 
 	_, err := webhookRegistry.Set(ctx, registeredWebhookIDs, nil, func(wh *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
 		return &ttnpb.ApplicationWebhook{
-			Ids: registeredWebhookIDs,
-		}, []string{"ids"}, nil
+			Ids:     registeredWebhookIDs,
+			BaseUrl: "http://example.com",
+			Format:  "json",
+		}, []string{"ids", "base_url", "format"}, nil
 	})
 	if !a.So(err, should.BeNil) {
 		t.FailNow()

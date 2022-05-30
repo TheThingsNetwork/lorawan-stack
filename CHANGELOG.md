@@ -15,13 +15,16 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Entities are now fully validated when updated in the stores.
+  - Previously only the updated paths where validated. This lead to situations in which a partial update could cause the entity as a whole to reach an invalid state.
+
 ### Deprecated
 
 ### Removed
 
 ### Fixed
 
-- End devices running on MAC versions lower than 1.1 showing network downlink frame counters instead of application downlink frame counters.
+- End devices running on MAC versions higher or equal to 1.1 showing network downlink frame counters instead of application downlink frame counters.
 
 ### Security
 

@@ -36,7 +36,9 @@ describe('Application Webhook', () => {
         webhook_id: webhookId,
       },
     },
-    fieldMasks: ['base_url', 'format', 'ids', 'ids.application_ids', 'ids.webhook_id'],
+    field_mask: {
+      paths: ['base_url', 'format', 'ids', 'ids.application_ids', 'ids.webhook_id'],
+    },
   }
 
   before(() => {
@@ -63,7 +65,7 @@ describe('Application Webhook', () => {
     }
 
     cy.findByLabelText('Webhook format').selectOption(webhook.format)
-    cy.findByLabelText('Base URL').type(webhook.url)
+    cy.findByLabelText('Base URL').clear().type(webhook.url)
     cy.findByLabelText('Uplink message')
       .check()
       .parents('[data-test-id="form-field"]')

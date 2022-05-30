@@ -106,8 +106,9 @@ func TestWebhookRegistryRPC(t *testing.T) {
 					WebhookId:      registeredWebhookID,
 				},
 				BaseUrl: "http://localhost/test",
+				Format:  "json",
 			},
-			FieldMask: ttnpb.FieldMask("base_url"),
+			FieldMask: ttnpb.FieldMask("base_url", "format"),
 		}, creds)
 		a.So(err, should.BeNil)
 	}
