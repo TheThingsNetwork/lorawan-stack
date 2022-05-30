@@ -236,7 +236,7 @@ func TestTTJS(t *testing.T) {
 		JoinEui: &supportedJoinEUI,
 	})
 	a.So(err, should.BeNil)
-	ret, err = otherClient.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
+	_, err = otherClient.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
 		DevEui:  &devEUI,
 		JoinEui: &supportedJoinEUI,
 	})

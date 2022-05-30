@@ -119,6 +119,7 @@ func (client *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, clai
 
 	claimReq := &claimRequest{
 		OwnerToken: claimAuthenticationCode,
+		Locked:     true,
 		claimData: claimData{
 			HomeNetID: client.config.NetID.String(),
 			HomeNSID:  client.config.NetworkServer.HomeNSID.String(),

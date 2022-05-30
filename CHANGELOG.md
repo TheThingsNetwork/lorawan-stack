@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Support claim protection when claiming end devices on The Things Join Server.
+
 ### Changed
 
 ### Deprecated
