@@ -48,10 +48,10 @@ func (st *StoreTest) TestAPIKeyStoreCRUD(t *T) {
 		is.APIKeyStore
 	})
 	defer st.DestroyDB(t, true, "applications", "clients", "gateways", "organizations", "users", "accounts")
-	defer s.Close()
 	if !ok {
 		t.Skip("Store does not implement APIKeyStore")
 	}
+	defer s.Close()
 
 	someRights := map[string]*ttnpb.Rights{
 		app1.EntityType(): ttnpb.RightsFrom(ttnpb.Right_RIGHT_APPLICATION_ALL),
@@ -239,10 +239,10 @@ func (st *StoreTest) TestAPIKeyStorePagination(t *T) {
 		is.APIKeyStore
 	})
 	defer st.DestroyDB(t, false)
-	defer s.Close()
 	if !ok {
 		t.Skip("Store does not implement APIKeyStore")
 	}
+	defer s.Close()
 
 	t.Run("FindAPIKeys_Paginated", func(t *T) {
 		a, ctx := test.New(t)

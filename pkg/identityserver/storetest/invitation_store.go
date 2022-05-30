@@ -35,10 +35,10 @@ func (st *StoreTest) TestInvitationStore(t *T) {
 		is.InvitationStore
 	})
 	defer st.DestroyDB(t, false)
-	defer s.Close()
 	if !ok {
 		t.Skip("Store does not implement InvitationStore")
 	}
+	defer s.Close()
 
 	start := time.Now().Truncate(time.Second)
 
@@ -224,10 +224,10 @@ func (st *StoreTest) TestInvitationStorePagination(t *T) {
 		is.InvitationStore
 	})
 	defer st.DestroyDB(t, false)
-	defer s.Close()
 	if !ok {
 		t.Skip("Store does not implement InvitationStore")
 	}
+	defer s.Close()
 
 	var all []*ttnpb.Invitation
 	for i := 0; i < 7; i++ {

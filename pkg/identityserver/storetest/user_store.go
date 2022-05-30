@@ -32,10 +32,10 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 		is.UserStore
 	})
 	defer st.DestroyDB(t, true, "pictures")
-	defer s.Close()
 	if !ok {
 		t.Skip("Store does not implement UserStore")
 	}
+	defer s.Close()
 
 	mask := fieldMask(
 		"name",
@@ -402,10 +402,10 @@ func (st *StoreTest) TestUserStorePagination(t *T) {
 		is.UserStore
 	})
 	defer st.DestroyDB(t, false)
-	defer s.Close()
 	if !ok {
 		t.Skip("Store does not implement UserStore")
 	}
+	defer s.Close()
 
 	t.Run("FindUsers_Paginated", func(t *T) {
 		a, ctx := test.New(t)

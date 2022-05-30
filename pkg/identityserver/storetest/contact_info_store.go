@@ -42,10 +42,10 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 		is.ContactInfoStore
 	})
 	defer st.DestroyDB(t, false)
-	defer s.Close()
 	if !ok {
 		t.Skip("Store does not implement ContactInfoStore")
 	}
+	defer s.Close()
 
 	for _, ids := range []*ttnpb.EntityIdentifiers{
 		app1.GetEntityIdentifiers(),

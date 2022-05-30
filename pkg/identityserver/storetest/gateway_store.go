@@ -36,10 +36,10 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 		is.GatewayStore
 	})
 	defer st.DestroyDB(t, true)
-	defer s.Close()
 	if !ok {
 		t.Skip("Store does not implement GatewayStore")
 	}
+	defer s.Close()
 
 	start := time.Now().Truncate(time.Second)
 	mask := fieldMask(ttnpb.GatewayFieldPathsTopLevel...)
@@ -443,10 +443,10 @@ func (st *StoreTest) TestGatewayStorePagination(t *T) {
 		is.GatewayStore
 	})
 	defer st.DestroyDB(t, false)
-	defer s.Close()
 	if !ok {
 		t.Skip("Store does not implement GatewayStore")
 	}
+	defer s.Close()
 
 	t.Run("FindGateways_Paginated", func(t *T) {
 		a, ctx := test.New(t)

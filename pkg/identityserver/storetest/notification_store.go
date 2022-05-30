@@ -50,10 +50,10 @@ func (st *StoreTest) TestNotificationStore(t *T) {
 		is.NotificationStore
 	})
 	defer st.DestroyDB(t, true)
-	defer s.Close()
 	if !ok {
 		t.Skip("Store does not implement NotificationStore")
 	}
+	defer s.Close()
 
 	notificationData, _ := pbtypes.MarshalAny(&pbtypes.StringValue{Value: "test"})
 

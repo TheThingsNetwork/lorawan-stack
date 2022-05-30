@@ -34,10 +34,10 @@ func (st *StoreTest) TestEUIStore(t *T) {
 		is.EUIStore
 	})
 	defer st.DestroyDB(t, false)
-	defer s.Close()
 	if !ok {
 		t.Skip("Store does not implement EUIStore")
 	}
+	defer s.Close()
 
 	t.Run("InitializeDevEUIBlock", func(t *T) {
 		a, ctx := test.New(t)
