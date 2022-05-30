@@ -131,13 +131,19 @@ var notificationsSetStatusCommand = &cobra.Command{
 
 func init() {
 	ttnpb.AddSetFlagsForListNotificationsRequest(notificationsListCommand.Flags(), "", false)
-	flagsplugin.AddAlias(notificationsListCommand.Flags(), "receiver-ids.user-id", "user-id", flagsplugin.WithHidden(false))
-	notificationsListCommand.Flags().Lookup("status").DefValue = ttnpb.NotificationStatus_NOTIFICATION_STATUS_UNSEEN.String()
+	flagsplugin.AddAlias(
+		notificationsListCommand.Flags(), "receiver-ids.user-id", "user-id", flagsplugin.WithHidden(false),
+	)
+	notificationsListCommand.Flags().Lookup("status").
+		DefValue = ttnpb.NotificationStatus_NOTIFICATION_STATUS_UNSEEN.String()
 	notificationsListCommand.Flags().Bool("mark-as-seen", false, "Mark unseen notifications as seen")
 	notificationsCommand.AddCommand(notificationsListCommand)
 	ttnpb.AddSetFlagsForUpdateNotificationStatusRequest(notificationsSetStatusCommand.Flags(), "", false)
-	flagsplugin.AddAlias(notificationsSetStatusCommand.Flags(), "receiver-ids.user-id", "user-id", flagsplugin.WithHidden(false))
-	notificationsSetStatusCommand.Flags().Lookup("status").DefValue = ttnpb.NotificationStatus_NOTIFICATION_STATUS_SEEN.String()
+	flagsplugin.AddAlias(
+		notificationsSetStatusCommand.Flags(), "receiver-ids.user-id", "user-id", flagsplugin.WithHidden(false),
+	)
+	notificationsSetStatusCommand.Flags().Lookup("status").
+		DefValue = ttnpb.NotificationStatus_NOTIFICATION_STATUS_SEEN.String()
 	notificationsCommand.AddCommand(notificationsSetStatusCommand)
 	Root.AddCommand(notificationsCommand)
 }
