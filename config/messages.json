@@ -4060,7 +4060,16 @@
   },
   "error:pkg/errors:net_operation": {
     "translations": {
-      "en": "{message}"
+      "en": "net operation failed"
+    },
+    "description": {
+      "package": "pkg/errors",
+      "file": "conversion.go"
+    }
+  },
+  "error:pkg/errors:net_timeout": {
+    "translations": {
+      "en": "operation timed out"
     },
     "description": {
       "package": "pkg/errors",

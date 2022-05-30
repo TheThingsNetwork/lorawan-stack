@@ -20,6 +20,7 @@ import (
 	"errors"
 	"net"
 	"net/url"
+	"os"
 
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/status"
@@ -39,8 +40,9 @@ var (
 		"net_unknown_network", "{message}", "timeout",
 	)
 	errNetOperation = DefineUnavailable(
-		"net_operation", "{message}", "op", "net", "source", "address", "timeout",
+		"net_operation", "net operation failed", "op", "net", "source", "address", "timeout",
 	)
+	errNetTimeout = DefineUnavailable("net_timeout", "operation timed out")
 
 	errRequest = Define("request", "request to `{url}` failed", "op")
 	errURL     = DefineInvalidArgument("url", "invalid url `{url}`", "op")
@@ -78,7 +80,7 @@ func From(err error) (out *Error, ok bool) { //nolint:gocyclo
 	if errors.Is(err, context.Canceled) {
 		return build(errContextCancelled, 0), true
 	}
-	if errors.Is(err, context.DeadlineExceeded) {
+	if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, os.ErrDeadlineExceeded) {
 		return build(errContextDeadlineExceeded, 0), true
 	}
 	if matched := (*Error)(nil); errors.As(err, &matched) {
@@ -160,6 +162,9 @@ func From(err error) (out *Error, ok bool) { //nolint:gocyclo
 			e = e.WithCause(matched.Err)
 		}
 		return e, true
+	}
+	if matched := (net.Error)(nil); errors.As(err, &matched) && matched.Timeout() {
+		return build(errNetTimeout, 0), true
 	}
 	if matched := (x509.CertificateInvalidError{}); errors.As(err, &matched) {
 		return build(errX509CertificateInvalid, 0).WithAttributes(
