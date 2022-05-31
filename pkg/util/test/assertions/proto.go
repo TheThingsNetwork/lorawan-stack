@@ -48,6 +48,9 @@ const shouldHaveEmptyProtoDiff = "Expected:\n%v\nActual:\n%v\nDiff:\n%s\n(should
 
 // indentBlock indents a block of text with an indent string.
 func indentBlock(text, indent string) string {
+	if text == "" {
+		return indent
+	}
 	if text[len(text)-1:] == "\n" {
 		result := ""
 		for _, j := range strings.Split(text[:len(text)-1], "\n") {

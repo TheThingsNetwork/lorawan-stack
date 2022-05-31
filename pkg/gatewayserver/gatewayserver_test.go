@@ -1392,8 +1392,9 @@ func TestGatewayServer(t *testing.T) {
 									}
 									select {
 									case ack := <-ns.TxAck():
-										if a.So(ack, should.NotBeNil) {
-											a.So(ack.TxAck, should.Resemble, expected)
+										if txAck := ack.GetTxAck(); a.So(txAck, should.NotBeNil) {
+											a.So(txAck.Result, should.Resemble, expected.Result)
+											a.So(txAck.DownlinkMessage, should.Resemble, expected.DownlinkMessage)
 										}
 									case <-time.After(timeout):
 										t.Fatal("Expected Tx acknowledgment event timeout")

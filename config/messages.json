@@ -7390,7 +7390,7 @@
   },
   "error:pkg/networkserver:transmission": {
     "translations": {
-      "en": "downlink transsmission failed with result `{result}`"
+      "en": "downlink transmission failed with result `{result}`"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -9668,6 +9668,24 @@
   "event:ns.down.join.schedule.success": {
     "translations": {
       "en": "successfully scheduled join-accept for transmission on Gateway Server"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.down.transmission.fail": {
+    "translations": {
+      "en": "failed to transmit downlink"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.down.transmission.success": {
+    "translations": {
+      "en": "downlink successfully transmitted"
     },
     "description": {
       "package": "pkg/networkserver",

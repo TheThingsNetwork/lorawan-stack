@@ -1365,11 +1365,21 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	return ttnpb.Empty, nil
 }
 
-var errTransmission = errors.Define("transmission", "downlink transsmission failed with result `{result}`")
+var errTransmission = errors.Define("transmission", "downlink transmission failed with result `{result}`")
 
 // ReportTxAcknowledgment is called by the Gateway Server when a tx acknowledgment arrives.
-func (ns *NetworkServer) ReportTxAcknowledgment(ctx context.Context, txAck *ttnpb.GatewayTxAcknowledgment) (_ *pbtypes.Empty, err error) {
+func (ns *NetworkServer) ReportTxAcknowledgment(
+	ctx context.Context, txAck *ttnpb.GatewayTxAcknowledgment,
+) (*pbtypes.Empty, error) {
+	if err := clusterauth.Authorized(ctx); err != nil {
+		return nil, err
+	}
+
 	ack := txAck.GetTxAck()
+	ctx = events.ContextWithCorrelationID(
+		ctx, append(ack.CorrelationIds, fmt.Sprintf("ns:tx_ack:%s", events.NewCorrelationID()))...,
+	)
+
 	down, err := ns.scheduledDownlinkMatcher.Match(ctx, ack)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -1378,12 +1388,30 @@ func (ns *NetworkServer) ReportTxAcknowledgment(ctx context.Context, txAck *ttnp
 		}
 		return nil, err
 	}
+
+	ctx = events.ContextWithCorrelationID(ctx, down.CorrelationIds...)
+	ack.CorrelationIds = events.CorrelationIDsFromContext(ctx)
+	down.CorrelationIds = events.CorrelationIDsFromContext(ctx)
+
+	queuedEvents := make([]events.Event, 0, 1)
+	defer func() { events.Publish(queuedEvents...) }()
+
+	ids := down.GetEndDeviceIds()
+	var transmissionError *errors.Error
+	switch ack.Result {
+	case ttnpb.TxAcknowledgment_SUCCESS:
+		queuedEvents = append(queuedEvents, evtTransmissionSuccess.NewWithIdentifiersAndData(ctx, ids, down))
+	default:
+		transmissionError = errTransmission.WithAttributes("result", ack.GetResult().String())
+		queuedEvents = append(queuedEvents, evtTransmissionFail.NewWithIdentifiersAndData(ctx, ids, transmissionError))
+	}
+
 	macPayload := down.GetPayload().GetMacPayload()
 	if macPayload.GetFPort() == 0 {
 		return ttnpb.Empty, nil
 	}
 	appUp := &ttnpb.ApplicationUp{
-		EndDeviceIds:   down.GetEndDeviceIds(),
+		EndDeviceIds:   ids,
 		CorrelationIds: ack.GetCorrelationIds(),
 	}
 	appDown := &ttnpb.ApplicationDownlink{
@@ -1395,19 +1423,17 @@ func (ns *NetworkServer) ReportTxAcknowledgment(ctx context.Context, txAck *ttnp
 		Priority:       down.GetRequest().GetPriority(),
 		CorrelationIds: down.GetCorrelationIds(),
 	}
-	switch ack.Result {
-	case ttnpb.TxAcknowledgment_SUCCESS:
-		appUp.Up = &ttnpb.ApplicationUp_DownlinkSent{
-			DownlinkSent: appDown,
-		}
-	default:
+	if transmissionError != nil {
 		appUp.Up = &ttnpb.ApplicationUp_DownlinkFailed{
 			DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
 				Downlink: appDown,
-				Error:    ttnpb.ErrorDetailsToProto(errTransmission.WithAttributes("result", ack.GetResult().String())),
+				Error:    ttnpb.ErrorDetailsToProto(transmissionError),
 			},
 		}
+	} else {
+		appUp.Up = &ttnpb.ApplicationUp_DownlinkSent{DownlinkSent: appDown}
 	}
 	ns.submitApplicationUplinks(ctx, appUp)
+
 	return ttnpb.Empty, nil
 }

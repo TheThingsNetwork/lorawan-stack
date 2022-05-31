@@ -813,8 +813,11 @@ func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntr
 		case <-ctx.Done():
 			return
 		case msg := <-conn.Up():
-			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()))
-			msg.Message.CorrelationIds = append(msg.Message.CorrelationIds, events.CorrelationIDsFromContext(ctx)...)
+			correlationIDs := make([]string, 0, len(msg.Message.CorrelationIds)+1)
+			correlationIDs = append(correlationIDs, msg.Message.CorrelationIds...)
+			correlationIDs = append(correlationIDs, fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()))
+			ctx = events.ContextWithCorrelationID(ctx, correlationIDs...)
+			msg.Message.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 			if msg.Message.Payload == nil {
 				msg.Message.Payload = &ttnpb.Message{}
 				if err := lorawan.UnmarshalMessage(msg.Message.RawPayload, msg.Message.Payload); err != nil {
@@ -833,9 +836,14 @@ func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntr
 			val = msg
 			registerReceiveStatus(ctx, gtw, msg, protocol)
 		case msg := <-conn.TxAck():
-			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:tx_ack:%s", events.NewCorrelationID()))
+			correlationIDs := make([]string, 0, len(msg.CorrelationIds)+len(msg.DownlinkMessage.GetCorrelationIds())+1)
+			correlationIDs = append(correlationIDs, msg.CorrelationIds...)
+			correlationIDs = append(correlationIDs, msg.DownlinkMessage.GetCorrelationIds()...)
+			correlationIDs = append(correlationIDs, fmt.Sprintf("gs:tx_ack:%s", events.NewCorrelationID()))
+			ctx = events.ContextWithCorrelationID(ctx, correlationIDs...)
+			msg.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 			if d := msg.DownlinkMessage; d != nil {
-				d.CorrelationIds = append(d.CorrelationIds, events.CorrelationIDsFromContext(ctx)...)
+				d.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 			}
 			if msg.Result == ttnpb.TxAcknowledgment_SUCCESS {
 				registerSuccessDownlink(ctx, gtw, protocol)
