@@ -95,6 +95,7 @@ import m from './messages'
       mayViewApiKeys,
       mayViewCollaborators,
       fetching,
+      error,
       mayPurge: mayPurgeGtw,
       shouldConfirmDelete:
         !isPristine || !mayViewCollaborators || !mayViewApiKeys || Boolean(error),

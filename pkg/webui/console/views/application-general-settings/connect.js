@@ -107,6 +107,7 @@ const mapStateToProps = state => {
     mayViewCollaborators,
     mayViewLink,
     fetching,
+    error,
     mayPurge: mayPurgeApp,
     shouldConfirmDelete: !isPristine || !mayViewCollaborators || !mayViewApiKeys || Boolean(error),
     mayDeleteApplication: mayDeleteApp,

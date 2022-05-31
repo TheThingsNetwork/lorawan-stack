@@ -73,6 +73,7 @@ const mapStateToProps = state => {
     mayViewApiKeys,
     mayViewCollaborators,
     fetching,
+    error,
     mayPurge: mayPurgeOrg,
     shouldConfirmDelete: !isPristine || !mayViewCollaborators || !mayViewApiKeys || Boolean(error),
     mayDeleteOrganization: mayDeleteOrg,
