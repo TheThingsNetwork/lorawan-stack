@@ -19,7 +19,13 @@ import tts from '@console/api/tts'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
 
-import { getCollaborator } from '@console/store/actions/collaborators'
+import { getCollaborator } from '@ttn-lw/lib/store/actions/collaborators'
+import {
+  selectUserCollaborator,
+  selectOrganizationCollaborator,
+  selectCollaboratorFetching,
+  selectCollaboratorError,
+} from '@ttn-lw/lib/store/selectors/collaborators'
 
 import {
   selectSelectedGatewayId,
@@ -28,12 +34,6 @@ import {
   selectGatewayRightsFetching,
   selectGatewayRightsError,
 } from '@console/store/selectors/gateways'
-import {
-  selectUserCollaborator,
-  selectOrganizationCollaborator,
-  selectCollaboratorFetching,
-  selectCollaboratorError,
-} from '@console/store/selectors/collaborators'
 
 const mapStateToProps = (state, props) => {
   const gtwId = selectSelectedGatewayId(state, props)

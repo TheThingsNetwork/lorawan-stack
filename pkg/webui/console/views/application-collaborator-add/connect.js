@@ -17,6 +17,8 @@ import { connect } from 'react-redux'
 
 import tts from '@console/api/tts'
 
+import { selectCollaborators } from '@ttn-lw/lib/store/selectors/collaborators'
+
 import {
   selectSelectedApplicationId,
   selectApplicationRights,
@@ -24,7 +26,6 @@ import {
   selectApplicationRightsFetching,
   selectApplicationRightsError,
 } from '@console/store/selectors/applications'
-import { selectCollaborators } from '@console/store/selectors/collaborators'
 
 const mapStateToProps = state => ({
   appId: selectSelectedApplicationId(state),

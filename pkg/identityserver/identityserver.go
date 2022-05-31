@@ -93,6 +93,7 @@ func GenerateCSPString(config *oauth.Config, nonce string) string {
 			"'self'",
 			config.UI.AssetsBaseURL,
 			config.UI.BrandingBaseURL,
+			"'unsafe-inline'",
 		},
 		"script-src": {
 			"'self'",

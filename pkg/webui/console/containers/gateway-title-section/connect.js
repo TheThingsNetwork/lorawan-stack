@@ -16,13 +16,19 @@ import { connect } from 'react-redux'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
 
+import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
+import {
+  selectCollaboratorsTotalCount,
+  selectCollaboratorsFetching,
+  selectCollaboratorsError,
+} from '@ttn-lw/lib/store/selectors/collaborators'
+
 import {
   checkFromState,
   mayViewOrEditGatewayApiKeys,
   mayViewOrEditGatewayCollaborators,
 } from '@console/lib/feature-checks'
 
-import { getCollaboratorsList } from '@console/store/actions/collaborators'
 import { getApiKeysList } from '@console/store/actions/api-keys'
 
 import { selectGatewayById } from '@console/store/selectors/gateways'
@@ -31,11 +37,6 @@ import {
   selectApiKeysFetching,
   selectApiKeysError,
 } from '@console/store/selectors/api-keys'
-import {
-  selectCollaboratorsTotalCount,
-  selectCollaboratorsFetching,
-  selectCollaboratorsError,
-} from '@console/store/selectors/collaborators'
 
 const mapStateToProps = (state, props) => {
   const apiKeysTotalCount = selectApiKeysTotalCount(state)

@@ -22,10 +22,11 @@ import { selectUserById } from '@console/store/selectors/users'
 const isCollaboratorUser = collaborator => collaborator.ids && 'user_ids' in collaborator.ids
 
 export default CollaboratorForm =>
-  connect((state, { collaborator, update = false }) => {
+  connect((state, { collaborator, update = false, ...props }) => {
     const collaboratorId = getCollaboratorId(collaborator)
     const isUser = update && isCollaboratorUser(collaborator)
-    const isAdmin = isUser && Boolean(selectUserById(state, collaboratorId).admin)
+    const isAdmin =
+      props.isAdmin || (isUser && Boolean(selectUserById(state, collaboratorId).admin))
     const isCurrentUser = isUser && selectUserId(state) === collaboratorId
 
     return {

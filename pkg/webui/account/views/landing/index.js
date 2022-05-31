@@ -14,8 +14,11 @@
 
 import React from 'react'
 import { Switch, Route } from 'react-router-dom'
+import classnames from 'classnames'
 
 import authRoutes from '@account/constants/auth-routes'
+
+import sidebarStyle from '@ttn-lw/components/navigation/side/side.styl'
 
 import Footer from '@ttn-lw/containers/footer'
 
@@ -32,6 +35,8 @@ const Landing = () => (
     <Header />
     <main className={style.main}>
       <div className={style.stage} id="stage">
+        <div id="sidebar" className={sidebarStyle.container} />
+        <div className={classnames('breadcrumbs', style.desktopBreadcrumbs)} />
         <Switch>
           {authRoutes.map(route => (
             <Route {...route} key={route.path} />

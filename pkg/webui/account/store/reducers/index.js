@@ -15,18 +15,23 @@
 import { combineReducers } from 'redux'
 import { connectRouter } from 'connected-react-router'
 
+import { getClientId, getCollaboratorId } from '@ttn-lw/lib/selectors/id'
 import init from '@ttn-lw/lib/store/reducers/init'
 import status from '@ttn-lw/lib/store/reducers/status'
+import { createNamedPaginationReducer } from '@ttn-lw/lib/store/reducers/pagination'
 import fetching from '@ttn-lw/lib/store/reducers/ui/fetching'
 import error from '@ttn-lw/lib/store/reducers/ui/error'
+import collaborators from '@ttn-lw/lib/store/reducers/collaborators'
 
 import user from './user'
 import is from './identity-server'
 import session from './sessions'
+import clients from './clients'
 
 export default history =>
   combineReducers({
     init,
+    clients,
     user,
     session,
     is,
@@ -34,6 +39,11 @@ export default history =>
       fetching,
       error,
     }),
+    pagination: combineReducers({
+      clients: createNamedPaginationReducer('CLIENTS', getClientId),
+      collaborators: createNamedPaginationReducer('COLLABORATORS', getCollaboratorId),
+    }),
     status,
     router: connectRouter(history),
+    collaborators,
   })

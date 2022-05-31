@@ -17,6 +17,8 @@ import { push } from 'connected-react-router'
 
 import tts from '@console/api/tts'
 
+import { selectSelectedCollaborator } from '@ttn-lw/lib/store/selectors/collaborators'
+
 import { getGatewaysRightsList } from '@console/store/actions/gateways'
 
 import {
@@ -25,7 +27,6 @@ import {
   selectGatewayPseudoRights,
   selectGatewayRightsError,
 } from '@console/store/selectors/gateways'
-import { selectSelectedCollaborator } from '@console/store/selectors/collaborators'
 
 const mapStateToProps = state => ({
   gtwId: selectSelectedGatewayId(state),

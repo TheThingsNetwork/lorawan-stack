@@ -19,6 +19,12 @@ import { replace } from 'connected-react-router'
 import withRequest from '@ttn-lw/lib/components/with-request'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
+import {
+  selectCollaboratorsTotalCount,
+  selectCollaboratorsFetching,
+  selectCollaboratorsError,
+} from '@ttn-lw/lib/store/selectors/collaborators'
 
 import {
   checkFromState,
@@ -29,18 +35,12 @@ import {
 } from '@console/lib/feature-checks'
 
 import { updateOrganization, deleteOrganization } from '@console/store/actions/organizations'
-import { getCollaboratorsList } from '@console/store/actions/collaborators'
 import { getApiKeysList } from '@console/store/actions/api-keys'
 
 import {
   selectSelectedOrganization,
   selectSelectedOrganizationId,
 } from '@console/store/selectors/organizations'
-import {
-  selectCollaboratorsTotalCount,
-  selectCollaboratorsFetching,
-  selectCollaboratorsError,
-} from '@console/store/selectors/collaborators'
 import {
   selectApiKeysTotalCount,
   selectApiKeysFetching,

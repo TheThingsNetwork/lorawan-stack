@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,58 +13,7 @@
 // limitations under the License.
 
 import tts from '@console/api/tts'
-import { entitySdkServiceMap } from '@console/constants/entities'
 
-import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
-import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+import createCollaboratorLogics from '@ttn-lw/lib/store/middleware/collaborators'
 
-import * as collaborators from '@console/store/actions/collaborators'
-import { getUser } from '@console/store/actions/users'
-
-const validParentTypes = Object.keys(entitySdkServiceMap)
-
-const parentTypeValidator = ({ action }, allow) => {
-  if (!validParentTypes.includes(action.payload.parentType)) {
-    // Do not reject the action but throw an error, as this is an implementation
-    // error.
-    throw new Error(`Invalid parent entity type ${action.payload.parentType}`)
-  }
-  allow(action)
-}
-
-const getCollaboratorLogic = createRequestLogic({
-  type: collaborators.GET_COLLABORATOR,
-  validate: parentTypeValidator,
-  process: async ({ action }, dispatch) => {
-    const { parentType, parentId, collaboratorId, isUser } = action.payload
-
-    if (isUser) {
-      // Also retrieve the user to be able to determine whether
-      // it is an admin user.
-      try {
-        await dispatch(attachPromise(getUser(collaboratorId, 'admin')))
-      } catch {
-        // Do not fail the action if the user could not be fetched.
-      }
-    }
-
-    return isUser
-      ? tts[entitySdkServiceMap[parentType]].Collaborators.getByUserId(parentId, collaboratorId)
-      : tts[entitySdkServiceMap[parentType]].Collaborators.getByOrganizationId(
-          parentId,
-          collaboratorId,
-        )
-  },
-})
-
-const getCollaboratorsLogic = createRequestLogic({
-  type: collaborators.GET_COLLABORATORS_LIST,
-  validate: parentTypeValidator,
-  process: async ({ action }) => {
-    const { parentType, parentId, params } = action.payload
-    const res = await tts[entitySdkServiceMap[parentType]].Collaborators.getAll(parentId, params)
-    return { entities: res.collaborators, totalCount: res.totalCount }
-  },
-})
-
-export default [getCollaboratorLogic, getCollaboratorsLogic]
+export default createCollaboratorLogics(tts)

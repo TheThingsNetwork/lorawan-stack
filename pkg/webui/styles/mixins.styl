@@ -356,3 +356,19 @@ sidebar-transition($properties)
   transition-timing-function: cubic-bezier(.18,.71,.3,.99)
   transition-duration: 330ms
   transition-property: $properties
+
+// Global classes attached by the sidebar component.
+global-sidebar()
+  :global(.with-sidebar) .main
+    +media-query-min($bp.s)
+      padding-left: $sidebar-width
+    +media-query-between($bp.s, $bp.m)
+      padding-left: $sidebar-width-minimized
+
+  :global(.sidebar-minimized) .main
+    +media-query-min($bp.s)
+      padding-left: $sidebar-width-minimized
+
+  :global(.sidebar-transitioned) .main
+    +media-query-min($bp.s)
+      sidebar-transition(padding-left)

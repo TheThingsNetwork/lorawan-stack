@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -49,3 +49,24 @@ export const [
     failure: getCollaboratorsListFailure,
   },
 ] = createPaginationByParentRequestActions(SHARED_NAME)
+
+export const DELETE_COLLABORATOR_BASE = 'DELETE_COLLABORATOR'
+export const [
+  {
+    request: DELETE_COLLABORATOR,
+    success: DELETE_COLLABORATOR_SUCCESS,
+    failure: DELETE_COLLABORATOR_FAILURE,
+  },
+  {
+    request: deleteCollaborator,
+    success: deleteCollaboratorSuccess,
+    failure: deleteCollaboratorFailure,
+  },
+] = createRequestActions(
+  DELETE_COLLABORATOR_BASE,
+  (parentType, parentId) => ({
+    parentType,
+    parentId,
+  }),
+  (parentType, parentId, selector) => ({ selector }),
+)

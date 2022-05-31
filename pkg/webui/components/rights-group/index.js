@@ -258,6 +258,8 @@ class RightsGroup extends React.Component {
       />
     ))
 
+    const noRights = derivedPseudoRight.length === 0 || derivedRights.length === 0
+
     return (
       <div className={className}>
         {hasOutOfOwnScopePseudoRight && (
@@ -273,7 +275,7 @@ class RightsGroup extends React.Component {
           name="grant_type"
           value={grantType}
           onChange={this.handleGrantTypeChange}
-          disabled={derivedPseudoRight.length === 0}
+          disabled={noRights}
         >
           <Radio label={m.allCurrentAndFutureRights} value="pseudo" />
           <Radio label={m.selectIndividualRights} value="individual" />

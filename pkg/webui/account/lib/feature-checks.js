@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { selectUserIsAdmin } from '@account/store/selectors/user'
+import { selectUserIsAdmin, selectUserRights } from '@account/store/selectors/user'
 
 export const checkFromState = (featureCheck, state) =>
   featureCheck.check(featureCheck.rightsSelector(state))
@@ -21,6 +21,11 @@ export const checkFromState = (featureCheck, state) =>
 export const mayPerformAdminActions = {
   rightsSelector: selectUserIsAdmin,
   check: isAdmin => isAdmin,
+}
+
+export const mayPerformAllClientActions = {
+  rightsSelector: selectUserRights,
+  check: rights => rights.includes('RIGHT_CLIENT_ALL'),
 }
 
 export const mayPurgeEntities = mayPerformAdminActions

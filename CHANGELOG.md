@@ -8,6 +8,7 @@ with the exception that this project **does not** follow Semantic Versioning.
 For details about compatibility between different releases, see the **Commitments and Releases** section of our README.
 
 ## [Unreleased]
+- OAuth client management in the account app.
 
 ### Added
 

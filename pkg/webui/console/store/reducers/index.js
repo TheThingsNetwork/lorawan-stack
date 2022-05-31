@@ -32,9 +32,10 @@ import fetching from '@ttn-lw/lib/store/reducers/ui/fetching'
 import error from '@ttn-lw/lib/store/reducers/ui/error'
 import status from '@ttn-lw/lib/store/reducers/status'
 import init from '@ttn-lw/lib/store/reducers/init'
+import collaborators from '@ttn-lw/lib/store/reducers/collaborators'
+import { SHARED_NAME as COLLABORATORS_SHARED_NAME } from '@ttn-lw/lib/store/actions/collaborators'
 
 import { SHARED_NAME as API_KEYS_SHARED_NAME } from '@console/store/actions/api-keys'
-import { SHARED_NAME as COLLABORATORS_SHARED_NAME } from '@console/store/actions/collaborators'
 import { SHARED_NAME as PACKET_BROKER_NETWORKS_SHARED_NAME } from '@console/store/actions/packet-broker'
 
 import user from './user'
@@ -45,7 +46,6 @@ import gateways from './gateways'
 import configuration from './configuration'
 import apiKeys from './api-keys'
 import createNamedRightsReducer from './rights'
-import collaborators from './collaborators'
 import createNamedEventsReducer from './events'
 import link from './link'
 import webhooks from './webhooks'
@@ -69,6 +69,7 @@ export default history =>
     users,
     init,
     status,
+    collaborators,
     applications,
     link,
     devices,
@@ -83,7 +84,6 @@ export default history =>
     configuration,
     organizations,
     apiKeys,
-    collaborators,
     rights: combineReducers({
       applications: createNamedRightsReducer(APPLICATION),
       gateways: createNamedRightsReducer(GATEWAY),

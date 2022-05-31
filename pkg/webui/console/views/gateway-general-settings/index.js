@@ -34,6 +34,12 @@ import diff from '@ttn-lw/lib/diff'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
+import {
+  selectCollaboratorsTotalCount,
+  selectCollaboratorsFetching,
+  selectCollaboratorError,
+} from '@ttn-lw/lib/store/selectors/collaborators'
 
 import {
   checkFromState,
@@ -47,14 +53,8 @@ import {
 import { mapFormValueToAttributes } from '@console/lib/attributes'
 
 import { updateGateway, deleteGateway } from '@console/store/actions/gateways'
-import { getCollaboratorsList } from '@console/store/actions/collaborators'
 import { getApiKeysList } from '@console/store/actions/api-keys'
 
-import {
-  selectCollaboratorsTotalCount,
-  selectCollaboratorsFetching,
-  selectCollaboratorError,
-} from '@console/store/selectors/collaborators'
 import {
   selectApiKeysTotalCount,
   selectApiKeysFetching,

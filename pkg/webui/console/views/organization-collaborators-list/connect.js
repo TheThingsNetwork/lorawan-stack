@@ -14,15 +14,15 @@
 
 import { connect } from 'react-redux'
 
-import { getCollaboratorsList } from '@console/store/actions/collaborators'
-
-import { selectSelectedOrganizationId } from '@console/store/selectors/organizations'
+import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
 import {
   selectCollaborators,
   selectCollaboratorsTotalCount,
   selectCollaboratorsFetching,
   selectCollaboratorsError,
-} from '@console/store/selectors/collaborators'
+} from '@ttn-lw/lib/store/selectors/collaborators'
+
+import { selectSelectedOrganizationId } from '@console/store/selectors/organizations'
 
 export default OrganizationCollaboratorsList =>
   connect(

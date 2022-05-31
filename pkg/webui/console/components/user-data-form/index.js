@@ -29,8 +29,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import createPasswordValidationSchema from '@ttn-lw/lib/create-password-validation-schema'
 import { userId as userIdRegexp } from '@ttn-lw/lib/regexp'
-
-const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
+import capitalizeMessage from '@ttn-lw/lib/capitalize-message'
 
 const approvalStates = [
   'STATE_REQUESTED',
@@ -181,7 +180,7 @@ class UserForm extends React.Component {
 
     const approvalStateOptions = approvalStates.map(state => ({
       value: state,
-      label: capitalize(formatMessage({ id: `enum:${state}` })),
+      label: capitalizeMessage(formatMessage({ id: `enum:${state}` })),
     }))
 
     const initialValues = {
