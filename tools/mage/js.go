@@ -182,7 +182,7 @@ func (js Js) Build() error {
 
 // Serve runs webpack-dev-server.
 func (js Js) Serve() error {
-	mg.Deps(js.Deps, js.ExtractLocaleFiles, js.BackendTranslations, js.BuildDll)
+	mg.Deps(js.Deps, js.BackendTranslations, js.BuildDll)
 	if mg.Verbose() {
 		fmt.Println("Running Webpack for Main Bundle in watch mode")
 	}
@@ -215,13 +215,12 @@ func (js Js) Messages() error {
 	if err = os.MkdirAll(filepath.Join("pkg", "webui", "locales"), 0o755); err != nil {
 		return fmt.Errorf("failed to create locale directory: %w", err)
 	}
-	return execYarn(nil, os.Stderr, "babel", filepath.Join("pkg", "webui"))
+	return execYarn(nil, os.Stderr, "babel", "--ignore", "\"**/story.js\"", "--ignore", "\"**/*_test.js\"", filepath.Join("pkg", "webui"))
 }
 
 // Translations writes the babel message files and converts them into locale files.
 func (js Js) Translations() {
-	mg.Deps(js.Messages)
-	mg.Deps(js.ExtractLocaleFiles)
+	mg.SerialDeps(js.Messages, js.ExtractLocaleFiles)
 }
 
 // ExtractLocaleFiles extracts the locale files from the babel message files.
