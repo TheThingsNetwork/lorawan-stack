@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { hot } from 'react-hot-loader/root'
 import { useSelector, useDispatch } from 'react-redux'
 import React, { useEffect } from 'react'
 import { Switch, Route, Redirect } from 'react-router-dom'
@@ -30,7 +29,6 @@ import Landing from '@account/views/landing'
 import Authorize from '@account/views/authorize'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
-import dev from '@ttn-lw/lib/dev'
 import {
   selectApplicationSiteName,
   selectApplicationSiteTitle,
@@ -103,6 +101,4 @@ AccountApp.propTypes = {
   history: PropTypes.history.isRequired,
 }
 
-const ExportedApp = dev ? hot(AccountApp) : AccountApp
-
-export default ExportedApp
+export default AccountApp
