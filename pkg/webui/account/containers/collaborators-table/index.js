@@ -14,12 +14,14 @@
 
 import React from 'react'
 import { connect, useDispatch } from 'react-redux'
-import { defineMessages } from 'react-intl'
+import { defineMessages, useIntl } from 'react-intl'
 import { bindActionCreators } from 'redux'
 
 import Icon from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import toast from '@ttn-lw/components/toast'
+import Tag from '@ttn-lw/components/tag'
+import TagGroup from '@ttn-lw/components/tag/group'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
@@ -40,6 +42,10 @@ import {
 import { selectUserId } from '@account/store/selectors/user'
 import { selectSelectedClientId } from '@account/store/selectors/clients'
 
+import style from './client-collaborators.styl'
+
+const RIGHT_TAG_MAX_WIDTH = 140
+
 const m = defineMessages({
   id: 'User / Organization ID',
   addCollaborator: 'Add collaborator',
@@ -52,6 +58,7 @@ const m = defineMessages({
 const CollaboratorsTable = props => {
   const { clientId, currentUserId, handleDeleteCollaborator, ...rest } = props
   const dispatch = useDispatch()
+  const intl = useIntl()
 
   const deleteCollaborator = React.useCallback(
     async ids => {
@@ -121,14 +128,17 @@ const CollaboratorsTable = props => {
       {
         name: 'rights',
         displayName: sharedMessages.rights,
-        render: rights => {
-          for (let i = 0; i < rights.length; i++) {
-            if (rights[i].includes('_ALL')) {
-              return <Message content={sharedMessages.all} />
-            }
+        render: (rights = []) => {
+          if (rights.length === 0) {
+            return null
           }
+          const tags = rights.map(r => {
+            let rightLabel = intl.formatMessage({ id: `enum:${r}` })
+            rightLabel = rightLabel.charAt(0).toUpperCase() + rightLabel.slice(1)
+            return <Tag className={style.rightTag} content={rightLabel} key={r} />
+          })
 
-          return <span>{rights.length}</span>
+          return <TagGroup tagMaxWidth={RIGHT_TAG_MAX_WIDTH} tags={tags} />
         },
       },
       {
@@ -151,7 +161,7 @@ const CollaboratorsTable = props => {
     ]
 
     return baseHeaders
-  }, [currentUserId, deleteCollaborator])
+  }, [intl, currentUserId, deleteCollaborator])
 
   const baseDataSelector = React.useCallback(
     state => ({

@@ -26,6 +26,7 @@ import FetchTable from '@ttn-lw/containers/fetch-table'
 
 import Message from '@ttn-lw/lib/components/message'
 import withRequest from '@ttn-lw/lib/components/with-request'
+import DateTime from '@ttn-lw/lib/components/date-time'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -140,6 +141,12 @@ const ClientsTable = props => {
         displayName: sharedMessages.description,
         width: 50,
       },
+      {
+        name: 'state',
+        displayName: sharedMessages.state,
+        width: 50,
+        render: state => capitalizeMessage(formatMessage({ id: `enum:${state}` })),
+      },
     ]
 
     if (tab === DELETED_TAB) {
@@ -168,10 +175,12 @@ const ClientsTable = props => {
       })
     } else {
       baseHeaders.push({
-        name: 'state',
-        displayName: sharedMessages.state,
-        width: 50,
-        render: state => capitalizeMessage(formatMessage({ id: `enum:${state}` })),
+        name: 'created_at',
+        width: 15,
+        displayName: sharedMessages.createdAt,
+        align: 'right',
+        sortable: true,
+        render: date => <DateTime.Relative value={date} />,
       })
     }
 
@@ -201,7 +210,7 @@ const ClientsTable = props => {
   return (
     <FetchTable
       entity="clients"
-      defaultOrder="client_id"
+      defaultOrder="-created_at"
       addMessage={m.addClient}
       headers={headers}
       getItemsAction={getItems}
