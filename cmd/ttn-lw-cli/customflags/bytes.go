@@ -147,7 +147,7 @@ func New4BytesFlag(name, usage string, opts ...flagsplugin.FlagOption) *pflag.Fl
 	flag := &pflag.Flag{
 		Name:  name,
 		Usage: usage,
-		Value: &ExactBytesValue{length: 16},
+		Value: &ExactBytesValue{length: 4},
 	}
 	flagsplugin.ApplyOptions(flag, opts...)
 	return flag
