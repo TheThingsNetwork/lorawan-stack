@@ -39,6 +39,8 @@ const RelativeTime = props => {
     justNowMessage,
     relativeTimeStyle,
     noTitle,
+    showAbsoluteAfter,
+    dateTimeProps,
   } = props
 
   const from = new Date(value)
@@ -68,24 +70,28 @@ const RelativeTime = props => {
 
   return (
     <DateTime className={className} value={value} firstToLower={firstToLower} noTitle={noTitle}>
-      {dateTime => (
-        <FormattedRelativeTime
-          key={dateTime}
-          value={delta}
-          numeric="auto"
-          updateIntervalInSeconds={updateIntervalInSeconds}
-          unit={unit}
-          style={relativeTimeStyle}
-        >
-          {formattedRelativeTime =>
-            showLessThan ? (
-              <Message content={justNowMessage} values={{ count: updateIntervalInSeconds }} />
-            ) : (
-              children(formattedRelativeTime)
-            )
-          }
-        </FormattedRelativeTime>
-      )}
+      {dateTime =>
+        absDelta >= 60 * 60 * 24 * showAbsoluteAfter ? (
+          <DateTime value={dateTime} {...dateTimeProps} />
+        ) : (
+          <FormattedRelativeTime
+            key={dateTime}
+            value={delta}
+            numeric="auto"
+            updateIntervalInSeconds={updateIntervalInSeconds}
+            unit={unit}
+            style={relativeTimeStyle}
+          >
+            {formattedRelativeTime =>
+              showLessThan ? (
+                <Message content={justNowMessage} values={{ count: updateIntervalInSeconds }} />
+              ) : (
+                children(formattedRelativeTime)
+              )
+            }
+          </FormattedRelativeTime>
+        )
+      }
     </DateTime>
   )
 }
@@ -95,6 +101,8 @@ RelativeTime.propTypes = {
   className: PropTypes.string,
   /** A function to compute relative delta in specified time units in the `unit` prop. */
   computeDelta: PropTypes.func,
+  /** Passed `<DateTime />`-props for when the absolute date is rendered. */
+  dateTimeProps: PropTypes.shape({}),
   /** Whether to convert the first character of the resulting message to lowercase. */
   firstToLower: PropTypes.bool,
   /** Message to render when the delta is less than `updateIntervalInSeconds`. */
@@ -103,6 +111,8 @@ RelativeTime.propTypes = {
   noTitle: PropTypes.bool,
   /** The style of the relative time rendering. */
   relativeTimeStyle: PropTypes.oneOf(['long', 'short', 'narrow']),
+  /** After how many days the absolute date value is shown instead. */
+  showAbsoluteAfter: PropTypes.number,
   /** The unit to calculate relative date time. */
   unit: PropTypes.oneOf(['second', 'minute', 'hour', 'day', 'week', 'month', 'year']),
   /** The interval that the component will re-render in seconds. */
@@ -118,6 +128,7 @@ RelativeTime.propTypes = {
 RelativeTime.defaultProps = {
   children: dateTime => dateTime,
   className: undefined,
+  dateTimeProps: { time: false },
   firstToLower: true,
   updateIntervalInSeconds: 1,
   relativeTimeStyle: 'long',
@@ -125,6 +136,7 @@ RelativeTime.defaultProps = {
   computeDelta: formatInSeconds,
   justNowMessage: m.justNow,
   noTitle: false,
+  showAbsoluteAfter: 30,
 }
 
 export default RelativeTime
