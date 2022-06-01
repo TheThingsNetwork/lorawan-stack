@@ -135,6 +135,8 @@ jobs:
         uses: ./.github/actions/build-mage
       - name: Install Node and Dependencies
         uses: ./.github/actions/install-node-and-deps
+      - name: Fix chrome version
+        uses: browser-actions/setup-chrome@latest
       - uses: actions/download-artifact@v2
         name: Download build artifacts
         with:
