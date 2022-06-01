@@ -67,14 +67,14 @@ func WithOrder(ctx context.Context, spec string) context.Context {
 		return ctx
 	}
 	field := spec
-	order := "ASC"
+	direction := "ASC"
 	if strings.HasPrefix(spec, "-") {
 		field = strings.TrimPrefix(spec, "-")
-		order = "DESC"
+		direction = "DESC"
 	}
 	return context.WithValue(ctx, orderOptionsKey, OrderOptions{
-		field: field,
-		order: order,
+		Field:     field,
+		Direction: direction,
 	})
 }
 
@@ -84,28 +84,36 @@ var orderOptionsKey orderOptionsKeyType
 
 // OrderOptions stores the ordering options that are propagated in the context.
 type OrderOptions struct {
-	field string
-	order string
+	Field     string
+	Direction string
+}
+
+// OrderOptionsFromContext returns the ordering options for the query.
+func OrderOptionsFromContext(ctx context.Context) OrderOptions {
+	if opts, ok := ctx.Value(orderOptionsKey).(OrderOptions); ok {
+		return opts
+	}
+	return OrderOptions{}
 }
 
 // OrderFromContext returns the ordering string (field and direction) for the query.
 // If the context contains ordering options, those are used. Otherwise, the default
 // field and order are used.
-func OrderFromContext(ctx context.Context, table, defaultTableField, defaultOrder string) string {
-	if opts, ok := ctx.Value(orderOptionsKey).(OrderOptions); ok && opts.field != "" {
-		order := opts.order
-		if order == "" {
-			order = "ASC"
+func OrderFromContext(ctx context.Context, table, defaultTableField, defaultDirection string) string {
+	if opts, ok := ctx.Value(orderOptionsKey).(OrderOptions); ok && opts.Field != "" {
+		direction := opts.Direction
+		if direction == "" {
+			direction = "ASC"
 		}
-		if (table == "organizations" && opts.field == "organization_id") || (table == "users" && opts.field == "user_id") {
+		if (table == "organizations" && opts.Field == "organization_id") || (table == "users" && opts.Field == "user_id") {
 			table = "accounts"
-			opts.field = "uid"
+			opts.Field = "uid"
 		}
-		tableField := fmt.Sprintf(`"%s"."%s"`, table, opts.field)
-		if tableField != defaultTableField && opts.field != defaultTableField {
-			return fmt.Sprintf(`%s %s, %s %s`, tableField, order, defaultTableField, order)
+		tableField := fmt.Sprintf(`"%s"."%s"`, table, opts.Field)
+		if tableField != defaultTableField && opts.Field != defaultTableField {
+			return fmt.Sprintf(`%s %s, %s %s`, tableField, direction, defaultTableField, direction)
 		}
-		return fmt.Sprintf(`%s %s`, tableField, order)
+		return fmt.Sprintf(`%s %s`, tableField, direction)
 	}
-	return fmt.Sprintf("%s %s", defaultTableField, defaultOrder)
+	return fmt.Sprintf("%s %s", defaultTableField, defaultDirection)
 }
