@@ -78,6 +78,17 @@ func (a ContactInfoSlice) Less(i, j int) bool {
 	return a[i].ContactType < a[j].ContactType
 }
 
+type contactInfoProtoSlice []*ttnpb.ContactInfo
+
+func (a contactInfoProtoSlice) Len() int      { return len(a) }
+func (a contactInfoProtoSlice) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a contactInfoProtoSlice) Less(i, j int) bool {
+	if a[i].Value < a[j].Value {
+		return true
+	}
+	return a[i].ContactType < a[j].ContactType
+}
+
 func contactInfoSliceFromPB(pbs []*ttnpb.ContactInfo, entityType, entityID string) []*ContactInfo {
 	out := make([]*ContactInfo, len(pbs))
 	for i, pb := range pbs {

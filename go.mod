@@ -120,6 +120,8 @@ require (
 	github.com/uptrace/bun/driver/pgdriver v1.1.6
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	go.opencensus.io v0.23.0
+	go.opentelemetry.io/otel v1.7.0
+	go.opentelemetry.io/otel/trace v1.7.0
 	go.packetbroker.org/api/iam v1.5.26-tts
 	go.packetbroker.org/api/iam/v2 v2.7.7-tts
 	go.packetbroker.org/api/mapping/v2 v2.1.26-tts
@@ -180,6 +182,8 @@ require (
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/go-kit/log v0.2.0 // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
+	github.com/go-logr/logr v1.2.3 // indirect
+	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/golang-jwt/jwt/v4 v4.3.0 // indirect

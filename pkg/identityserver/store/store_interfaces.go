@@ -24,6 +24,16 @@ import (
 // FieldMask is used to specify applicable fields in SELECT or UPDATE queries.
 type FieldMask []string
 
+// Contains returns true if the given field is present in the field mask.
+func (fm FieldMask) Contains(search string) bool {
+	for _, f := range fm {
+		if f == search {
+			return true
+		}
+	}
+	return false
+}
+
 // ApplicationStore interface for storing Applications.
 //
 // All functions assume the input and fieldMask to be validated, and assume

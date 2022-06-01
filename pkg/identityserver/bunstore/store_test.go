@@ -36,7 +36,7 @@ type testStore struct {
 	// deviceStore
 	// gatewayStore
 	// organizationStore
-	// userStore
+	*userStore
 	// userSessionStore
 	// apiKeyStore
 	// membershipStore
@@ -70,7 +70,7 @@ func newTestStore(t *testing.T, dsn *url.URL) storetest.Store {
 
 	db.AddQueryHook(NewLoggerHook(test.GetLogger(t)))
 
-	// baseStore := newStore(db)
+	baseStore := newStore(db)
 	return &testStore{
 		db: db,
 
@@ -79,7 +79,7 @@ func newTestStore(t *testing.T, dsn *url.URL) storetest.Store {
 		// deviceStore:       deviceStore{baseStore: baseStore},
 		// gatewayStore:      gatewayStore{baseStore: baseStore},
 		// organizationStore: organizationStore{baseStore: baseStore},
-		// userStore:         userStore{baseStore: baseStore},
+		userStore: newUserStore(baseStore),
 		// userSessionStore:  userSessionStore{baseStore: baseStore},
 		// apiKeyStore:       apiKeyStore{baseStore: baseStore},
 		// membershipStore:   membershipStore{baseStore: baseStore},
