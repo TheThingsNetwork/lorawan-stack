@@ -219,7 +219,12 @@ func (s *Subscription) Up() <-chan *ContextualApplicationUp {
 }
 
 // Pipe pipes the output of the Subscription to the provided handler.
-func (s *Subscription) Pipe(ctx context.Context, ts task.Starter, name string, submit func(context.Context, interface{}) error) {
+func (s *Subscription) Pipe(
+	ctx context.Context,
+	ts task.Starter,
+	name string,
+	submit func(context.Context, *ttnpb.ApplicationUp) error,
+) {
 	f := func(ctx context.Context) error {
 		for {
 			select {

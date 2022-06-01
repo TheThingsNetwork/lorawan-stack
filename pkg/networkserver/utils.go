@@ -401,8 +401,7 @@ func (ns *NetworkServer) submitApplicationUplinks(ctx context.Context, ups ...*t
 	}
 }
 
-func (ns *NetworkServer) handleUplinkSubmission(ctx context.Context, item interface{}) {
-	ups := item.([]*ttnpb.ApplicationUp)
+func (ns *NetworkServer) handleUplinkSubmission(ctx context.Context, ups []*ttnpb.ApplicationUp) {
 	conn, err := ns.GetPeerConn(ctx, ttnpb.ClusterRole_APPLICATION_SERVER, nil)
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to get Application Server peer")

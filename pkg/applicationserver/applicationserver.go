@@ -87,9 +87,9 @@ type ApplicationServer struct {
 	interopClient InteropClient
 	interopID     string
 
-	activationPool     workerpool.WorkerPool
-	processingPool     workerpool.WorkerPool
-	deviceLastSeenPool workerpool.WorkerPool
+	activationPool     workerpool.WorkerPool[*ttnpb.EndDeviceIdentifiers]
+	processingPool     workerpool.WorkerPool[*ttnpb.ApplicationUp]
+	deviceLastSeenPool workerpool.WorkerPool[lastSeenAtInfo]
 }
 
 // Context returns the context of the Application Server.
@@ -145,20 +145,20 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		interopClient: interopCl,
 		interopID:     conf.Interop.ID,
 	}
-	as.activationPool = workerpool.NewWorkerPool(workerpool.Config{
+	as.activationPool = workerpool.NewWorkerPool(workerpool.Config[*ttnpb.EndDeviceIdentifiers]{
 		Component: c,
 		Context:   ctx,
 		Name:      "save_activation_status",
 		Handler:   as.saveActivationStatus,
 	})
-	as.processingPool = workerpool.NewWorkerPool(workerpool.Config{
+	as.processingPool = workerpool.NewWorkerPool(workerpool.Config[*ttnpb.ApplicationUp]{
 		Component: c,
 		Context:   ctx,
 		Name:      "process_application_uplinks",
 		Handler:   as.processUpAsync,
 	})
 
-	as.deviceLastSeenPool = workerpool.NewWorkerPool(workerpool.Config{
+	as.deviceLastSeenPool = workerpool.NewWorkerPool(workerpool.Config[lastSeenAtInfo]{
 		Component: c,
 		Context:   ctx,
 		Name:      "save_device_last_seen_from_uplink",
@@ -338,8 +338,7 @@ func (as *ApplicationServer) Publish(ctx context.Context, up *ttnpb.ApplicationU
 	return as.processingPool.Publish(ctx, up)
 }
 
-func (as *ApplicationServer) processUpAsync(ctx context.Context, item interface{}) {
-	up := item.(*ttnpb.ApplicationUp)
+func (as *ApplicationServer) processUpAsync(ctx context.Context, up *ttnpb.ApplicationUp) {
 	link, err := as.getLink(ctx, up.EndDeviceIds.ApplicationIds, []string{
 		"default_formatters",
 		"skip_payload_crypto",
@@ -360,8 +359,7 @@ type lastSeenAtInfo struct {
 	lastSeenAt *pbtypes.Timestamp
 }
 
-func (as *ApplicationServer) processDeviceLastSeenAsync(ctx context.Context, item interface{}) {
-	lastSeenEntry := item.(lastSeenAtInfo)
+func (as *ApplicationServer) processDeviceLastSeenAsync(ctx context.Context, lastSeenEntry lastSeenAtInfo) {
 	if err := as.deviceLastSeenProvider.PushLastSeenFromUplink(ctx, lastSeenEntry.ids, lastSeenEntry.lastSeenAt); err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to update device last seen timestamp")
 		return
@@ -997,7 +995,7 @@ func (as *ApplicationServer) storeUplink(ctx context.Context, ids *ttnpb.EndDevi
 // saveActivationStatus attempts to mark the end device as activated in the Entity Registry.
 // If the update succeeds, the end device will be updated in the Application Server end device registry
 // in order to avoid subsequent calls.
-func (as *ApplicationServer) saveActivationStatus(ctx context.Context, item interface{}) {
+func (as *ApplicationServer) saveActivationStatus(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) {
 	defer trace.StartRegion(ctx, "save activation status").End()
 
 	cc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
@@ -1005,7 +1003,6 @@ func (as *ApplicationServer) saveActivationStatus(ctx context.Context, item inte
 		log.FromContext(ctx).WithError(err).Warn("Failed to get Entity Registry peer")
 		return
 	}
-	ids := item.(*ttnpb.EndDeviceIdentifiers)
 	now := time.Now().UTC()
 	mask := []string{"activated_at"}
 	_, err = ttnpb.NewEndDeviceRegistryClient(cc).Update(ctx, &ttnpb.UpdateEndDeviceRequest{

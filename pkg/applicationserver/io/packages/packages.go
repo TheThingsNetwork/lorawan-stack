@@ -38,7 +38,7 @@ type server struct {
 	registry Registry
 
 	handlers map[string]ApplicationPackageHandler
-	pools    map[string]workerpool.WorkerPool
+	pools    map[string]workerpool.WorkerPool[*associatedApplicationUp]
 }
 
 // Server is an application packages frontend.
@@ -47,9 +47,10 @@ type Server interface {
 	web.Registerer
 }
 
-func createPackagePoolHandler(name string, handler ApplicationPackageHandler, timeout time.Duration) workerpool.Handler {
-	h := func(ctx context.Context, item interface{}) {
-		associatedUp := item.(*associatedApplicationUp)
+func createPackagePoolHandler(
+	name string, handler ApplicationPackageHandler, timeout time.Duration,
+) workerpool.Handler[*associatedApplicationUp] {
+	h := func(ctx context.Context, associatedUp *associatedApplicationUp) {
 		pair, up := associatedUp.pair, associatedUp.up
 
 		ctx, cancel := context.WithTimeout(ctx, timeout)
@@ -73,10 +74,10 @@ func New(ctx context.Context, as io.Server, registry Registry, handlers map[stri
 		server:   as,
 		registry: registry,
 		handlers: handlers,
-		pools:    make(map[string]workerpool.WorkerPool),
+		pools:    make(map[string]workerpool.WorkerPool[*associatedApplicationUp]),
 	}
 	for name, handler := range handlers {
-		s.pools[name] = workerpool.NewWorkerPool(workerpool.Config{
+		s.pools[name] = workerpool.NewWorkerPool(workerpool.Config[*associatedApplicationUp]{
 			Component:  as,
 			Context:    ctx,
 			Name:       fmt.Sprintf("application_packages_%v", name),
@@ -88,7 +89,7 @@ func New(ctx context.Context, as io.Server, registry Registry, handlers map[stri
 	if err != nil {
 		return nil, err
 	}
-	wp := workerpool.NewWorkerPool(workerpool.Config{
+	wp := workerpool.NewWorkerPool(workerpool.Config[*ttnpb.ApplicationUp]{
 		Component: as,
 		Context:   ctx,
 		Name:      "application_packages_fanout",

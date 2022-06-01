@@ -67,7 +67,7 @@ func NewPubSub(ctx context.Context, component workerpool.Component, conf config.
 		})
 	}
 
-	ps.transactionPool = workerpool.NewWorkerPool(workerpool.Config{
+	ps.transactionPool = workerpool.NewWorkerPool(workerpool.Config[redis.Pipeliner]{
 		Component:  component,
 		Context:    ctx,
 		Name:       "redis_events_transactions",
@@ -112,7 +112,7 @@ type PubSub struct {
 	mu              sync.RWMutex
 	sub             *redis.PubSub
 	subscriptions   map[string]int
-	transactionPool workerpool.WorkerPool
+	transactionPool workerpool.WorkerPool[redis.Pipeliner]
 }
 
 func (ps *PubSub) eventChannel(ctx context.Context, name string, ids *ttnpb.EntityIdentifiers) string {
@@ -301,9 +301,8 @@ func (ps *PubSub) Publish(evs ...events.Event) {
 	}
 }
 
-func (*PubSub) runTransaction(ctx context.Context, item interface{}) {
+func (*PubSub) runTransaction(ctx context.Context, tx redis.Pipeliner) {
 	logger := log.FromContext(ctx)
-	tx := item.(redis.Pipeliner)
 	if _, err := tx.Exec(ctx); err != nil {
 		logger.WithError(err).Warn("Failed to run transaction")
 	}
