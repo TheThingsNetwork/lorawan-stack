@@ -64,25 +64,25 @@ Cypress.Commands.add('loginConsole', credentials => {
       headers: {
         'X-CSRF-Token': headers['x-csrf-token'],
       },
-    })
-
-    // Do Account App round trip.
-    cy.request({
-      method: 'GET',
-      url: `${baseUrl}${consoleRootPath}/login/ttn-stack?next=/`,
-    })
-
-    // Obtain access token.
-    cy.request({
-      method: 'GET',
-      url: `${baseUrl}${consoleRootPath}/api/auth/token`,
-    }).then(resp => {
-      window.localStorage.setItem(
-        // We store local storage values with a hashed key based on the mount path
-        // to prevent clashes with other apps on the same domain.
-        `accessToken-${stringToHash('/console')}`,
-        JSON.stringify(resp.body),
-      )
+    }).then(() => {
+      // Do Account App round trip.
+      cy.request({
+        method: 'GET',
+        url: `${baseUrl}${consoleRootPath}/login/ttn-stack?next=/`,
+      }).then(() => {
+        // Obtain access token.
+        cy.request({
+          method: 'GET',
+          url: `${baseUrl}${consoleRootPath}/api/auth/token`,
+        }).then(resp => {
+          window.localStorage.setItem(
+            // We store local storage values with a hashed key based on the mount path
+            // to prevent clashes with other apps on the same domain.
+            `accessToken-${stringToHash('/console')}`,
+            JSON.stringify(resp.body),
+          )
+        })
+      })
     })
   })
 })
@@ -107,14 +107,14 @@ Cypress.Commands.add('visitConsoleAuthorizationScreen', credentials => {
       headers: {
         'X-CSRF-Token': headers['x-csrf-token'],
       },
-    })
-
-    // Do Account App round trip.
-    cy.request({
-      method: 'GET',
-      url: `${baseUrl}${consoleRootPath}/login/ttn-stack?next=/`,
-    }).then(({ allRequestResponses }) => {
-      cy.visit(allRequestResponses[allRequestResponses.length - 1]['Request URL'])
+    }).then(() => {
+      // Do Account App round trip.
+      cy.request({
+        method: 'GET',
+        url: `${baseUrl}${consoleRootPath}/login/ttn-stack?next=/`,
+      }).then(({ allRequestResponses }) => {
+        cy.visit(allRequestResponses[allRequestResponses.length - 1]['Request URL'])
+      })
     })
   })
 })
