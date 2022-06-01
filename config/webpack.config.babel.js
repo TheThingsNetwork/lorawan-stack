@@ -24,6 +24,7 @@ import AddAssetHtmlPlugin from 'add-asset-html-webpack-plugin'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import ShellPlugin from 'webpack-shell-plugin'
 import CopyWebpackPlugin from 'copy-webpack-plugin'
+import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import nib from 'nib'
 
 import pjson from '../package.json'
@@ -110,7 +111,6 @@ export const styleConfig = {
   test: /\.(styl|css)$/,
   include,
   use: [
-    'css-hot-loader',
     {
       loader: MiniCssExtractPlugin.loader,
       options: {
@@ -161,7 +161,6 @@ export default {
         '@assets': path.resolve(context, 'pkg/webui/assets'),
       },
       development: {
-        'react-dom': '@hot-loader/react-dom',
         'ttn-lw': path.resolve(context, 'sdk/js/src'),
       },
     }),
@@ -220,12 +219,18 @@ export default {
     rules: [
       {
         test: /\.js$/,
+        exclude: /node_modules/,
         loader: 'babel-loader',
         include,
         options: {
           cacheDirectory: path.resolve(context, CACHE_DIR, 'babel'),
           sourceMap: true,
           babelrc: true,
+          plugins: [
+            !WEBPACK_DEV_SERVER_DISABLE_HMR &&
+              !production &&
+              require.resolve('react-refresh/babel'),
+          ].filter(Boolean),
         },
       },
       {
@@ -305,7 +310,7 @@ export default {
         : []),
     ],
     development: [
-      new webpack.HotModuleReplacementPlugin(),
+      ...(!WEBPACK_DEV_SERVER_DISABLE_HMR ? [new ReactRefreshWebpackPlugin()] : []),
       new webpack.WatchIgnorePlugin([
         /node_modules/,
         /locales/,

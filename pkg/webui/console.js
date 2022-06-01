@@ -31,6 +31,8 @@ import WithLocale from '@ttn-lw/lib/components/with-locale'
 
 import Logo from '@console/containers/logo'
 
+import App from '@console/views/app'
+
 import env from '@ttn-lw/lib/env'
 import { selectApplicationRootPath, selectSentryDsnConfig } from '@ttn-lw/lib/selectors/env'
 
@@ -54,31 +56,19 @@ const errorRender = error => (
   <FullViewError error={error} header={<Header logo={<Logo safe />} />} safe />
 )
 
-const render = () => {
-  const App = require('./console/views/app').default
-
-  DOM.render(
-    <ErrorView errorRender={errorRender}>
-      <EnvProvider env={env}>
-        <Provider store={store}>
-          <WithLocale>
-            <Init>
-              <BreadcrumbsProvider>
-                <App history={history} />
-              </BreadcrumbsProvider>
-            </Init>
-          </WithLocale>
-        </Provider>
-      </EnvProvider>
-    </ErrorView>,
-    rootElement,
-  )
-}
-
-if (module.hot) {
-  module.hot.accept('./console/views/app', () => {
-    setTimeout(render)
-  })
-}
-
-render()
+DOM.render(
+  <ErrorView errorRender={errorRender}>
+    <EnvProvider env={env}>
+      <Provider store={store}>
+        <WithLocale>
+          <Init>
+            <BreadcrumbsProvider>
+              <App history={history} />
+            </BreadcrumbsProvider>
+          </Init>
+        </WithLocale>
+      </Provider>
+    </EnvProvider>
+  </ErrorView>,
+  rootElement,
+)

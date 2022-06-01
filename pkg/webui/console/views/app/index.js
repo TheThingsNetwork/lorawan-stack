@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { hot } from 'react-hot-loader/root'
 import React from 'react'
 import { connect } from 'react-redux'
 import { ConnectedRouter } from 'connected-react-router'
@@ -43,7 +42,6 @@ import Admin from '@console/views/admin'
 import User from '@console/views/user'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
-import dev from '@ttn-lw/lib/dev'
 import { setStatusOnline } from '@ttn-lw/lib/store/actions/status'
 import { selectStatusStore } from '@ttn-lw/lib/store/selectors/status'
 
@@ -74,7 +72,6 @@ const errorRender = error => <FullViewError error={error} header={<Header />} />
     setStatusOnline,
   },
 )
-@(Component => (dev ? hot(Component) : Component))
 class ConsoleApp extends React.PureComponent {
   static propTypes = {
     env: PropTypes.env.isRequired,
