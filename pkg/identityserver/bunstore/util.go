@@ -21,6 +21,7 @@ import (
 
 	"github.com/uptrace/bun"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 func equalTime(a, b *time.Time) bool {
@@ -31,6 +32,14 @@ func equalTime(a, b *time.Time) bool {
 		return false
 	}
 	return a.Equal(*b)
+}
+
+func idStrings[X ttnpb.IDStringer](in ...X) []string {
+	out := make([]string, len(in))
+	for i, x := range in {
+		out[i] = x.IDString()
+	}
+	return out
 }
 
 func noopSelectModifier(q *bun.SelectQuery) *bun.SelectQuery { return q }
