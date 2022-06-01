@@ -17,10 +17,21 @@ package store
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/uptrace/bun"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 )
+
+func equalTime(a, b *time.Time) bool {
+	if a == nil {
+		return b == nil
+	}
+	if b == nil {
+		return false
+	}
+	return a.Equal(*b)
+}
 
 func noopSelectModifier(q *bun.SelectQuery) *bun.SelectQuery { return q }
 
