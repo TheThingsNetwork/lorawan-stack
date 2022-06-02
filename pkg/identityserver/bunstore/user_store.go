@@ -323,7 +323,7 @@ func (s *userStore) FindUsers(
 	))
 	defer span.End()
 
-	return s.listUsersBy(ctx, selectWithAccountIDs(ctx, ids...), fieldMask)
+	return s.listUsersBy(ctx, selectWithEmbeddedAccountUIDs(ctx, ids...), fieldMask)
 }
 
 func (s *userStore) ListAdmins(
@@ -333,7 +333,7 @@ func (s *userStore) ListAdmins(
 	defer span.End()
 
 	return s.listUsersBy(ctx, func(q *bun.SelectQuery) *bun.SelectQuery {
-		return q.Where("admin = true")
+		return q.Where("?TableAlias.admin = true")
 	}, fieldMask)
 }
 
@@ -364,7 +364,7 @@ func (s *userStore) GetUser(
 	))
 	defer span.End()
 
-	model, err := s.getUserModelBy(ctx, selectWithAccountID(ctx, id), fieldMask)
+	model, err := s.getUserModelBy(ctx, selectWithEmbeddedAccountUID(ctx, id), fieldMask)
 	if err != nil {
 		return nil, err
 	}
@@ -413,7 +413,7 @@ func (s *userStore) UpdateUser( //nolint:gocyclo
 	))
 	defer span.End()
 
-	model, err := s.getUserModelBy(ctx, selectWithAccountID(ctx, pb.GetIds()), fieldMask)
+	model, err := s.getUserModelBy(ctx, selectWithEmbeddedAccountUID(ctx, pb.GetIds()), fieldMask)
 	if err != nil {
 		return nil, err
 	}
@@ -547,7 +547,7 @@ func (s *userStore) DeleteUser(ctx context.Context, id *ttnpb.UserIdentifiers) e
 	))
 	defer span.End()
 
-	model, err := s.getUserModelBy(ctx, selectWithAccountID(ctx, id), nil)
+	model, err := s.getUserModelBy(ctx, selectWithEmbeddedAccountUID(ctx, id), nil)
 	if err != nil {
 		return err
 	}
@@ -579,7 +579,7 @@ func (s *userStore) RestoreUser(ctx context.Context, id *ttnpb.UserIdentifiers) 
 	))
 	defer span.End()
 
-	model, err := s.getUserModelBy(store.WithSoftDeleted(ctx, true), selectWithAccountID(ctx, id), nil)
+	model, err := s.getUserModelBy(store.WithSoftDeleted(ctx, true), selectWithEmbeddedAccountUID(ctx, id), nil)
 	if err != nil {
 		return err
 	}
@@ -617,7 +617,7 @@ func (s *userStore) PurgeUser(ctx context.Context, id *ttnpb.UserIdentifiers) er
 
 	model, err := s.getUserModelBy(
 		store.WithSoftDeleted(ctx, false),
-		selectWithAccountID(ctx, id),
+		selectWithEmbeddedAccountUID(ctx, id),
 		store.FieldMask{"attributes", "contact_info"},
 	)
 	if err != nil {

@@ -55,19 +55,19 @@ type EmbeddedAccount struct {
 	UID string `bun:"uid,notnull,scanonly"`
 }
 
-func selectWithAccountID(ctx context.Context, id ttnpb.IDStringer) func(*bun.SelectQuery) *bun.SelectQuery {
+func selectWithEmbeddedAccountUID(ctx context.Context, id ttnpb.IDStringer) func(*bun.SelectQuery) *bun.SelectQuery {
 	return func(q *bun.SelectQuery) *bun.SelectQuery {
 		q = q.Apply(selectWithContext(ctx))
-		return q.Where("account_uid = ?", id.IDString())
+		return q.Where("?TableAlias.account_uid = ?", id.IDString())
 	}
 }
 
-func selectWithAccountIDs[X ttnpb.IDStringer](ctx context.Context, ids ...X) func(*bun.SelectQuery) *bun.SelectQuery {
+func selectWithEmbeddedAccountUIDs[X ttnpb.IDStringer](ctx context.Context, ids ...X) func(*bun.SelectQuery) *bun.SelectQuery {
 	return func(q *bun.SelectQuery) *bun.SelectQuery {
 		q = q.Apply(selectWithContext(ctx))
 		if len(ids) == 0 {
 			return q
 		}
-		return q.Where("account_uid IN (?)", idStrings(ids...))
+		return q.Where("?TableAlias.account_uid IN (?)", idStrings(ids...))
 	}
 }

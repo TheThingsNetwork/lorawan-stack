@@ -66,14 +66,14 @@ func selectWithSoftDeletedFromContext(ctx context.Context) func(*bun.SelectQuery
 			q = q.WhereAllWithDeleted()
 		}
 		if opts.OnlyDeleted {
-			q = q.WhereDeleted()
+			q = q.Where("?TableAlias.deleted_at IS NOT NULL")
 		}
 		if opts.DeletedBefore != nil || opts.DeletedAfter != nil {
 			if opts.DeletedBefore != nil {
-				q = q.Where("deleted_at < ?", opts.DeletedBefore)
+				q = q.Where("?TableAlias.deleted_at < ?", opts.DeletedBefore)
 			}
 			if opts.DeletedAfter != nil {
-				q = q.Where("deleted_at > ?", opts.DeletedAfter)
+				q = q.Where("?TableAlias.deleted_at > ?", opts.DeletedAfter)
 			}
 		}
 		return q
