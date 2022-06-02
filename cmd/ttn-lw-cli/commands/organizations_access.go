@@ -18,6 +18,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
@@ -184,19 +185,24 @@ var (
 		Aliases: []string{"ls"},
 		Short:   "List organization API keys",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			orgID := getOrganizationID(cmd.Flags(), args)
-			if orgID == nil {
-				return errNoOrganizationID.New()
+			req := &ttnpb.ListOrganizationAPIKeysRequest{Limit: 50, Page: 1}
+			_, err := req.SetFromFlags(cmd.Flags(), "")
+			if err != nil {
+				return err
+			}
+			if len(args) > 0 && req.GetOrganizationIds().GetOrganizationId() == "" {
+				if len(args) > 1 {
+					logger.Warn("Multiple IDs found in arguments, considering only the first")
+				}
+				req.OrganizationIds = &ttnpb.OrganizationIdentifiers{OrganizationId: args[0]}
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
-			limit, page, opt, getTotal := withPagination(cmd.Flags())
-			res, err := ttnpb.NewOrganizationAccessClient(is).ListAPIKeys(ctx, &ttnpb.ListOrganizationAPIKeysRequest{
-				OrganizationIds: orgID, Limit: limit, Page: page,
-			}, opt)
+			_, _, opt, getTotal := withPagination(cmd.Flags())
+			res, err := ttnpb.NewOrganizationAccessClient(is).ListAPIKeys(ctx, req, opt)
 			if err != nil {
 				return err
 			}
@@ -382,7 +388,10 @@ func init() {
 	organizationCollaborators.PersistentFlags().AddFlagSet(organizationIDFlags())
 	organizationsCommand.AddCommand(organizationCollaborators)
 
-	organizationAPIKeysList.Flags().AddFlagSet(paginationFlags())
+	ttnpb.AddSetFlagsForListOrganizationAPIKeysRequest(organizationAPIKeysList.Flags(), "", false)
+	organizationAPIKeysList.Flags().Lookup("limit").DefValue = "50"
+	organizationAPIKeysList.Flags().Lookup("page").DefValue = "1"
+	flagsplugin.AddAlias(organizationAPIKeysList.Flags(), "organization-ids.organization-id", "organization-id")
 	organizationAPIKeys.AddCommand(organizationAPIKeysList)
 	organizationAPIKeysGet.Flags().String("api-key-id", "", "")
 	organizationAPIKeys.AddCommand(organizationAPIKeysGet)

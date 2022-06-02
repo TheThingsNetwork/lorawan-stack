@@ -170,6 +170,8 @@ message UpdateUserPasswordRequest {
 }
 
 message ListUserAPIKeysRequest {
+  option (thethings.flags.message) = { select: false, set: true };
+
   UserIdentifiers user_ids = 1 [(validate.rules).message.required = true];
   // Order the results by this field path.
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.

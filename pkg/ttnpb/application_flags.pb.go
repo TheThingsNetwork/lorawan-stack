@@ -239,3 +239,44 @@ func (m *ListApplicationsRequest) SetFromFlags(flags *pflag.FlagSet, prefix stri
 	}
 	return paths, nil
 }
+
+// AddSetFlagsForListApplicationAPIKeysRequest adds flags to select fields in ListApplicationAPIKeysRequest.
+func AddSetFlagsForListApplicationAPIKeysRequest(flags *pflag.FlagSet, prefix string, hidden bool) {
+	AddSetFlagsForApplicationIdentifiers(flags, flagsplugin.Prefix("application-ids", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("order", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("limit", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("page", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the ListApplicationAPIKeysRequest message from flags.
+func (m *ListApplicationAPIKeysRequest) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("application_ids", prefix)); changed {
+		if m.ApplicationIds == nil {
+			m.ApplicationIds = &ApplicationIdentifiers{}
+		}
+		if setPaths, err := m.ApplicationIds.SetFromFlags(flags, flagsplugin.Prefix("application_ids", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("order", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Order = val
+		paths = append(paths, flagsplugin.Prefix("order", prefix))
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("limit", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Limit = val
+		paths = append(paths, flagsplugin.Prefix("limit", prefix))
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("page", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Page = val
+		paths = append(paths, flagsplugin.Prefix("page", prefix))
+	}
+	return paths, nil
+}

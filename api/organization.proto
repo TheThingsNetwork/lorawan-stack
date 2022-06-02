@@ -124,6 +124,8 @@ message UpdateOrganizationRequest {
 }
 
 message ListOrganizationAPIKeysRequest {
+  option (thethings.flags.message) = { select: false, set: true };
+
   OrganizationIdentifiers organization_ids = 1 [(validate.rules).message.required = true];
   // Order the results by this field path.
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.

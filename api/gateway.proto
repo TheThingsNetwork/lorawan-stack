@@ -261,6 +261,8 @@ message UpdateGatewayRequest {
 }
 
 message ListGatewayAPIKeysRequest {
+  option (thethings.flags.message) = { select: false, set: true };
+
   GatewayIdentifiers gateway_ids = 1 [(validate.rules).message.required = true];
   // Order the results by this field path.
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.

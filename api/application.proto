@@ -164,6 +164,8 @@ message UpdateApplicationRequest {
 }
 
 message ListApplicationAPIKeysRequest {
+  option (thethings.flags.message) = { select: false, set: true };
+
   ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
   // Order the results by this field path.
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.

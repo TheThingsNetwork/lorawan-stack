@@ -194,3 +194,44 @@ func (m *ListOrganizationsRequest) SetFromFlags(flags *pflag.FlagSet, prefix str
 	}
 	return paths, nil
 }
+
+// AddSetFlagsForListOrganizationAPIKeysRequest adds flags to select fields in ListOrganizationAPIKeysRequest.
+func AddSetFlagsForListOrganizationAPIKeysRequest(flags *pflag.FlagSet, prefix string, hidden bool) {
+	AddSetFlagsForOrganizationIdentifiers(flags, flagsplugin.Prefix("organization-ids", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("order", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("limit", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("page", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the ListOrganizationAPIKeysRequest message from flags.
+func (m *ListOrganizationAPIKeysRequest) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("organization_ids", prefix)); changed {
+		if m.OrganizationIds == nil {
+			m.OrganizationIds = &OrganizationIdentifiers{}
+		}
+		if setPaths, err := m.OrganizationIds.SetFromFlags(flags, flagsplugin.Prefix("organization_ids", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("order", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Order = val
+		paths = append(paths, flagsplugin.Prefix("order", prefix))
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("limit", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Limit = val
+		paths = append(paths, flagsplugin.Prefix("limit", prefix))
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("page", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Page = val
+		paths = append(paths, flagsplugin.Prefix("page", prefix))
+	}
+	return paths, nil
+}
