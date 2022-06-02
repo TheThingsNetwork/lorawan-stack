@@ -43,6 +43,21 @@ func (m *Account) BeforeAppendModel(ctx context.Context, query bun.Query) error 
 	return nil
 }
 
+// GetOrganizationOrUserIdentifiers returns organization or user identifiers for the account.
+func (m *Account) GetOrganizationOrUserIdentifiers() *ttnpb.OrganizationOrUserIdentifiers {
+	if m == nil {
+		return nil
+	}
+	switch m.AccountType {
+	default:
+		return nil
+	case "organization":
+		return (&ttnpb.OrganizationIdentifiers{OrganizationId: m.UID}).GetOrganizationOrUserIdentifiers()
+	case "user":
+		return (&ttnpb.UserIdentifiers{UserId: m.UID}).GetOrganizationOrUserIdentifiers()
+	}
+}
+
 // EmbeddedAccount contains the account fields that are embedded into User and Organization
 // when loading them through the user_accounts and organization_accounts views.
 type EmbeddedAccount struct {
@@ -55,14 +70,18 @@ type EmbeddedAccount struct {
 	UID string `bun:"uid,notnull,scanonly"`
 }
 
-func selectWithEmbeddedAccountUID(ctx context.Context, id ttnpb.IDStringer) func(*bun.SelectQuery) *bun.SelectQuery {
+func selectWithEmbeddedAccountUID(
+	ctx context.Context, id ttnpb.IDStringer,
+) func(*bun.SelectQuery) *bun.SelectQuery {
 	return func(q *bun.SelectQuery) *bun.SelectQuery {
 		q = q.Apply(selectWithContext(ctx))
 		return q.Where("?TableAlias.account_uid = ?", id.IDString())
 	}
 }
 
-func selectWithEmbeddedAccountUIDs[X ttnpb.IDStringer](ctx context.Context, ids ...X) func(*bun.SelectQuery) *bun.SelectQuery {
+func selectWithEmbeddedAccountUIDs[X ttnpb.IDStringer](
+	ctx context.Context, ids ...X,
+) func(*bun.SelectQuery) *bun.SelectQuery {
 	return func(q *bun.SelectQuery) *bun.SelectQuery {
 		q = q.Apply(selectWithContext(ctx))
 		if len(ids) == 0 {
@@ -70,4 +89,23 @@ func selectWithEmbeddedAccountUIDs[X ttnpb.IDStringer](ctx context.Context, ids 
 		}
 		return q.Where("?TableAlias.account_uid IN (?)", idStrings(ids...))
 	}
+}
+
+func (s *baseStore) getAccountModel(
+	ctx context.Context,
+	accountType, uid string,
+) (*Account, error) {
+	model := &Account{}
+	selectQuery := s.DB.NewSelect().
+		Model(model).
+		Apply(selectWithSoftDeletedFromContext(ctx)).
+		Apply(selectWithContext(ctx)).
+		Where("?TableAlias.account_type = ?", accountType).
+		Where("?TableAlias.uid = ?", uid)
+
+	if err := selectQuery.Scan(ctx); err != nil {
+		return nil, wrapDriverError(err)
+	}
+
+	return model, nil
 }
