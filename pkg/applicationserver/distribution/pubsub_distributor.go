@@ -51,15 +51,15 @@ func (d *pubSubDistributor) Subscribe(ctx context.Context, protocol string, ids 
 	if ids == nil {
 		return nil, errMissingIdentifiers.New()
 	}
-	s, err := d.subscriptions.LoadOrCreate(ctx, *ids)
+	s, err := d.subscriptions.LoadOrCreate(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
 	return s.Subscribe(ctx, protocol, ids)
 }
 
-func subscribeSetToPubSub(pubsub PubSub) func(*subscriptionSet, ttnpb.ApplicationIdentifiers) error {
-	return func(set *subscriptionSet, ids ttnpb.ApplicationIdentifiers) error {
+func subscribeSetToPubSub(pubsub PubSub) func(*subscriptionSet, *ttnpb.ApplicationIdentifiers) error {
+	return func(set *subscriptionSet, ids *ttnpb.ApplicationIdentifiers) error {
 		go func() {
 			ctx := set.Context()
 			if err := pubsub.Subscribe(ctx, ids, set.Publish); err != nil {

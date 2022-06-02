@@ -61,7 +61,7 @@ func (p *GeolocationPackage) HandleUp(ctx context.Context, def *ttnpb.Applicatio
 
 	defer func() {
 		if err != nil {
-			registerPackageFail(ctx, *up.EndDeviceIds, err)
+			registerPackageFail(ctx, up.EndDeviceIds, err)
 		}
 	}()
 
@@ -295,7 +295,7 @@ func (p *GeolocationPackage) sendLocationSolved(ctx context.Context, ids *ttnpb.
 		Up: &ttnpb.ApplicationUp_LocationSolved{
 			LocationSolved: &ttnpb.ApplicationLocation{
 				Service:  fmt.Sprintf("%v-%s", PackageName, result.Algorithm()),
-				Location: &loc,
+				Location: loc,
 			},
 		},
 	})

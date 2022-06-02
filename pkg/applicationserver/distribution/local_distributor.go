@@ -43,7 +43,7 @@ func (d *localDistributor) Publish(ctx context.Context, up *ttnpb.ApplicationUp)
 	if err := d.broadcast.Publish(ctx, up); err != nil {
 		return err
 	}
-	set, err := d.subscriptions.Load(ctx, *up.EndDeviceIds.ApplicationIds)
+	set, err := d.subscriptions.Load(ctx, up.EndDeviceIds.ApplicationIds)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	} else if err == nil {
@@ -58,7 +58,7 @@ func (d *localDistributor) Subscribe(ctx context.Context, protocol string, ids *
 	if ids == nil {
 		return d.broadcast.Subscribe(ctx, protocol, ids)
 	}
-	s, err := d.subscriptions.LoadOrCreate(ctx, *ids)
+	s, err := d.subscriptions.LoadOrCreate(ctx, ids)
 	if err != nil {
 		return nil, err
 	}

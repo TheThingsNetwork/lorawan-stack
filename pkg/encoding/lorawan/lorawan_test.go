@@ -759,7 +759,7 @@ func TestUnmarshalIdentifiers(t *testing.T) {
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
-			a.So(&ids, should.Resemble, tc.Identifiers)
+			a.So(ids, should.Resemble, tc.Identifiers)
 		})
 	}
 }

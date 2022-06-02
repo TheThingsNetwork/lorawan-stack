@@ -34,11 +34,11 @@ func (cleaner *RegistryCleaner) RangeToLocalSet(ctx context.Context) error {
 	cleaner.LocalDeviceSet = make(map[string]struct{})
 	cleaner.LocalApplicationSet = make(map[string]struct{})
 	err := cleaner.ApplicationPackagesRegistry.Range(ctx, []string{"ids"},
-		func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, pb *ttnpb.ApplicationPackageAssociation) bool {
+		func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, pb *ttnpb.ApplicationPackageAssociation) bool {
 			cleaner.LocalDeviceSet[unique.ID(ctx, ids)] = struct{}{}
 			return true
 		},
-		func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, pb *ttnpb.ApplicationPackageDefaultAssociation) bool {
+		func(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, pb *ttnpb.ApplicationPackageDefaultAssociation) bool {
 			cleaner.LocalApplicationSet[unique.ID(ctx, ids)] = struct{}{}
 			return true
 		},

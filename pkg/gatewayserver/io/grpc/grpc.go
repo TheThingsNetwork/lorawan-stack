@@ -215,7 +215,7 @@ func getMQTTConnectionProvider(ctx context.Context, ids *ttnpb.GatewayIdentifier
 	return &ttnpb.MQTTConnectionInfo{
 		PublicAddress:    config.PublicAddress,
 		PublicTlsAddress: config.PublicTLSAddress,
-		Username:         unique.ID(ctx, *ids),
+		Username:         unique.ID(ctx, ids),
 	}, nil
 }
 

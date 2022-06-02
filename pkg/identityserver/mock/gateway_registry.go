@@ -120,7 +120,7 @@ func (is *mockISGatewayRegistry) ListRights(ctx context.Context, ids *ttnpb.Gate
 		return
 	}
 
-	uid := unique.ID(ctx, *ids)
+	uid := unique.ID(ctx, ids)
 	auths, ok := is.gatewayAuths[uid]
 	if !ok {
 		return

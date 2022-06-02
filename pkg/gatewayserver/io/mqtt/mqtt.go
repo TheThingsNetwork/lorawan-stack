@@ -95,7 +95,7 @@ func setupConnection(ctx context.Context, mqttConn mqttnet.Conn, format Format, 
 				token := c.tokens.Next(down, time.Now())
 				down.CorrelationIds = append(down.CorrelationIds, c.tokens.FormatCorrelationID(token))
 
-				buf, err := format.FromDownlink(down, *c.io.Gateway().GetIds())
+				buf, err := format.FromDownlink(down, c.io.Gateway().GetIds())
 				if err != nil {
 					logger.WithError(err).Warn("Failed to marshal downlink message")
 					continue
@@ -225,7 +225,7 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 	case c.format.IsBirthTopic(pkt.TopicParts):
 	case c.format.IsLastWillTopic(pkt.TopicParts):
 	case c.format.IsUplinkTopic(pkt.TopicParts):
-		up, err := c.format.ToUplink(pkt.Message, *c.io.Gateway().GetIds())
+		up, err := c.format.ToUplink(pkt.Message, c.io.Gateway().GetIds())
 		if err != nil {
 			logger.WithError(err).Warn("Failed to unmarshal uplink message")
 			return
@@ -235,7 +235,7 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 			logger.WithError(err).Warn("Failed to handle uplink message")
 		}
 	case c.format.IsStatusTopic(pkt.TopicParts):
-		status, err := c.format.ToStatus(pkt.Message, *c.io.Gateway().GetIds())
+		status, err := c.format.ToStatus(pkt.Message, c.io.Gateway().GetIds())
 		if err != nil {
 			logger.WithError(err).Warn("Failed to unmarshal status message")
 			return
@@ -244,7 +244,7 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 			logger.WithError(err).Warn("Failed to handle status message")
 		}
 	case c.format.IsTxAckTopic(pkt.TopicParts):
-		ack, err := c.format.ToTxAck(pkt.Message, *c.io.Gateway().GetIds())
+		ack, err := c.format.ToTxAck(pkt.Message, c.io.Gateway().GetIds())
 		if err != nil {
 			logger.WithError(err).Warn("Failed to unmarshal Tx acknowledgment message")
 			return

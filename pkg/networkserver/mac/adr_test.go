@@ -51,7 +51,7 @@ func TestAdaptDataRate(t *testing.T) {
 		{FCnt: 30, MaxSNR: -9, GtwDiversity: 3},
 		{
 			FCnt: 31, MaxSNR: -7, GtwDiversity: 2,
-			TxSettings: ttnpb.TxSettings{
+			TxSettings: &ttnpb.TxSettings{
 				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
@@ -287,7 +287,7 @@ func TestIssue458(t *testing.T) {
 	issue458Uplinks := ADRMatrixToUplinks([]ADRMatrixRow{
 		{
 			FCnt: 1, MaxSNR: -7.2, GtwDiversity: 1,
-			TxSettings: ttnpb.TxSettings{
+			TxSettings: &ttnpb.TxSettings{
 				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{

@@ -285,7 +285,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						},
 					}},
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
-						MakeDataDownlink(DataDownlinkConfig{
+						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
 							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
@@ -354,7 +354,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 							},
 						}},
 						RecentDownlinks: []*ttnpb.DownlinkMessage{
-							MakeDataDownlink(DataDownlinkConfig{
+							MakeDataDownlink(&DataDownlinkConfig{
 								DecodePayload: true,
 								MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 							}),
@@ -903,7 +903,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						},
 					}},
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
-						MakeDataDownlink(DataDownlinkConfig{
+						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
 							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
@@ -985,7 +985,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 							},
 						}},
 						RecentDownlinks: []*ttnpb.DownlinkMessage{
-							MakeDataDownlink(DataDownlinkConfig{
+							MakeDataDownlink(&DataDownlinkConfig{
 								DecodePayload: true,
 								MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 							}),
@@ -1037,7 +1037,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						},
 					}},
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
-						MakeDataDownlink(DataDownlinkConfig{
+						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
 							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
@@ -1117,7 +1117,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 							},
 						}},
 						RecentDownlinks: []*ttnpb.DownlinkMessage{
-							MakeDataDownlink(DataDownlinkConfig{
+							MakeDataDownlink(&DataDownlinkConfig{
 								DecodePayload: true,
 								MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 							}),

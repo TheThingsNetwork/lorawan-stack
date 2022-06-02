@@ -196,7 +196,7 @@ const (
 	domainHeader = "X-Tts-Domain"
 )
 
-func (w *webhooks) createDownlinkURL(ctx context.Context, webhookID *ttnpb.ApplicationWebhookIdentifiers, devID ttnpb.EndDeviceIdentifiers, op string) string {
+func (w *webhooks) createDownlinkURL(ctx context.Context, webhookID *ttnpb.ApplicationWebhookIdentifiers, devID *ttnpb.EndDeviceIdentifiers, op string) string {
 	downlinks := w.downlinks
 	baseURL := downlinks.PublicTLSAddress
 	if baseURL == "" {
@@ -345,8 +345,8 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 	}
 	if hook.DownlinkApiKey != "" {
 		req.Header.Set(downlinkKeyHeader, hook.DownlinkApiKey)
-		req.Header.Set(downlinkPushHeader, w.createDownlinkURL(ctx, hook.Ids, *msg.EndDeviceIds, "push"))
-		req.Header.Set(downlinkReplaceHeader, w.createDownlinkURL(ctx, hook.Ids, *msg.EndDeviceIds, "replace"))
+		req.Header.Set(downlinkPushHeader, w.createDownlinkURL(ctx, hook.Ids, msg.EndDeviceIds, "push"))
+		req.Header.Set(downlinkReplaceHeader, w.createDownlinkURL(ctx, hook.Ids, msg.EndDeviceIds, "replace"))
 	}
 	if domain := w.createDomain(ctx); domain != "" {
 		req.Header.Set(domainHeader, domain)

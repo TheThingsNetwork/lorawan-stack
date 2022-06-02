@@ -28,6 +28,6 @@ var evtPackageFail = events.Define(
 	events.WithPropagateToParent(),
 )
 
-func registerPackageFail(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, err error) {
-	events.Publish(evtPackageFail.NewWithIdentifiersAndData(ctx, &ids, err))
+func registerPackageFail(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, err error) {
+	events.Publish(evtPackageFail.NewWithIdentifiersAndData(ctx, ids, err))
 }

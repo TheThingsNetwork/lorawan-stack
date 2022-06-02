@@ -439,7 +439,7 @@ func TestRemoteStore(t *testing.T) {
 		t.Run("Missing", func(t *testing.T) {
 			a := assertions.New(t)
 
-			for _, ids := range []ttnpb.EndDeviceVersionIdentifiers{
+			for _, ids := range []*ttnpb.EndDeviceVersionIdentifiers{
 				{
 					BrandId: "unknown-vendor",
 				},
@@ -459,7 +459,7 @@ func TestRemoteStore(t *testing.T) {
 					BandId:          "unknown-band",
 				},
 			} {
-				codec, err := s.GetDownlinkDecoder(&ttnpb.GetPayloadFormatterRequest{VersionIds: &ids})
+				codec, err := s.GetDownlinkDecoder(&ttnpb.GetPayloadFormatterRequest{VersionIds: ids})
 				a.So(errors.IsNotFound(err), should.BeTrue)
 				a.So(codec, should.Equal, nil)
 			}

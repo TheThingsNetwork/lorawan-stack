@@ -59,12 +59,12 @@ func (dnmsg *DownlinkMessage) unmarshalJSON(data []byte) error {
 }
 
 // FromDownlink implements Formatter.
-func (f *lbsLNS) FromDownlink(ctx context.Context, down ttnpb.DownlinkMessage, bandID string, concentratorTime scheduling.ConcentratorTime, dlTime time.Time) ([]byte, error) {
+func (f *lbsLNS) FromDownlink(ctx context.Context, down *ttnpb.DownlinkMessage, bandID string, concentratorTime scheduling.ConcentratorTime, dlTime time.Time) ([]byte, error) {
 	var dnmsg DownlinkMessage
 	settings := down.GetScheduled()
 	dnmsg.Pdu = hex.EncodeToString(down.GetRawPayload())
 	dnmsg.RCtx = int64(settings.Downlink.AntennaIndex)
-	dnmsg.Diid = int64(f.tokens.Next(&down, dlTime))
+	dnmsg.Diid = int64(f.tokens.Next(down, dlTime))
 
 	// Chosen fixed values.
 	dnmsg.Priority = 25

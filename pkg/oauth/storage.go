@@ -28,8 +28,10 @@ import (
 
 const redirectURISeparator = ";"
 
-// osinClient type is the same as ttnpb.Client, while implementing the osin.Client interface.
-type osinClient ttnpb.Client
+// osinClient type is just a pointer to ttnpb.Client, while implementing the osin.Client interface.
+type osinClient struct {
+	*ttnpb.Client
+}
 
 func (cli osinClient) GetId() string {
 	return cli.Ids.GetClientId()
@@ -79,12 +81,12 @@ func (s *storage) GetClient(id string) (osin.Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	return osinClient(*cli), nil
+	return osinClient{cli}, nil
 }
 
 func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
 	userSessionIDs := data.UserData.(userData).UserSessionIdentifiers
-	client := ttnpb.Client(data.Client.(osinClient))
+	client := data.Client.(osinClient).Client
 	rights := rightsFromScope(data.Scope)
 	_, err := s.oauth.Authorize(s.ctx, &ttnpb.OAuthClientAuthorization{
 		ClientIds: client.GetIds(),
@@ -192,7 +194,7 @@ func (s *storage) SaveAccess(data *osin.AccessData) error {
 		}
 	}
 	userSessionIDs := data.UserData.(userData).UserSessionIdentifiers
-	client := ttnpb.Client(data.Client.(osinClient))
+	client := data.Client.(osinClient).Client
 	rights := rightsFromScope(data.Scope)
 	if data.CreatedAt.IsZero() {
 		data.CreatedAt = time.Now()

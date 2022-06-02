@@ -48,7 +48,7 @@ type Server struct {
 
 	requireExplicitEnable bool
 	registerUnknown       bool
-	defaultOwner          ttnpb.OrganizationOrUserIdentifiers
+	defaultOwner          *ttnpb.OrganizationOrUserIdentifiers
 	defaultOwnerAuth      func(context.Context) grpc.CallOption
 	defaultLNSURI         string
 
@@ -102,9 +102,9 @@ type Option func(s *Server)
 func WithRegisterUnknown(owner *ttnpb.OrganizationOrUserIdentifiers, auth func(context.Context) grpc.CallOption) Option {
 	return func(s *Server) {
 		if owner != nil {
-			s.registerUnknown, s.defaultOwner, s.defaultOwnerAuth = true, *owner, auth
+			s.registerUnknown, s.defaultOwner, s.defaultOwnerAuth = true, owner, auth
 		} else {
-			s.registerUnknown, s.defaultOwner, s.defaultOwnerAuth = false, ttnpb.OrganizationOrUserIdentifiers{}, nil
+			s.registerUnknown, s.defaultOwner, s.defaultOwnerAuth = false, nil, nil
 		}
 	}
 }

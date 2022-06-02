@@ -82,7 +82,7 @@ func (r *DeviceRegistry) provisionerKey(provisionerID, pid string) string {
 
 // GetByID gets device by appID, devID.
 func (r *DeviceRegistry) GetByID(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
-	ids := ttnpb.EndDeviceIdentifiers{
+	ids := &ttnpb.EndDeviceIdentifiers{
 		ApplicationIds: appID,
 		DeviceId:       devID,
 	}
@@ -358,7 +358,7 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 
 // SetByID sets device by appID, devID.
 func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(pb *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-	ids := ttnpb.EndDeviceIdentifiers{
+	ids := &ttnpb.EndDeviceIdentifiers{
 		ApplicationIds: appID,
 		DeviceId:       devID,
 	}

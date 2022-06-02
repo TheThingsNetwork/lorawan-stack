@@ -545,8 +545,8 @@ func (r *ApplicationPackagesRegistry) EndDeviceTransaction(ctx context.Context, 
 // Range ranges over the application packages and calls the appropriate callback function, until false is returned.
 func (r ApplicationPackagesRegistry) Range(
 	ctx context.Context, paths []string,
-	devFunc func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.ApplicationPackageAssociation) bool,
-	appFunc func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationPackageDefaultAssociation) bool,
+	devFunc func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.ApplicationPackageAssociation) bool,
+	appFunc func(context.Context, *ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationPackageDefaultAssociation) bool,
 ) error {
 	associationEntityRegex, err := packagesRegex(r.uidKey(unique.GenericID(ctx, "*")))
 	if err != nil {
@@ -565,7 +565,7 @@ func (r ApplicationPackagesRegistry) Range(
 			if err != nil {
 				return false, err
 			}
-			if !devFunc(ctx, *assoc.GetIds().GetEndDeviceIds(), assoc) {
+			if !devFunc(ctx, assoc.GetIds().GetEndDeviceIds(), assoc) {
 				return false, nil
 			}
 		} else {
@@ -577,7 +577,7 @@ func (r ApplicationPackagesRegistry) Range(
 			if err != nil {
 				return false, err
 			}
-			if !appFunc(ctx, *defAssoc.GetIds().GetApplicationIds(), defAssoc) {
+			if !appFunc(ctx, defAssoc.GetIds().GetApplicationIds(), defAssoc) {
 				return false, nil
 			}
 		}

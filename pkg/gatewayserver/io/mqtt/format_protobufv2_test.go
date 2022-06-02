@@ -32,7 +32,7 @@ import (
 func TestProtobufV2Downlink(t *testing.T) {
 	a := assertions.New(t)
 	pld, _ := base64.RawStdEncoding.DecodeString("YHBhYUoAAgABj9/clY414A")
-	ids := ttnpb.GatewayIdentifiers{
+	ids := &ttnpb.GatewayIdentifiers{
 		GatewayId: "gateway-id",
 	}
 	input := &ttnpb.DownlinkMessage{
@@ -205,7 +205,7 @@ func TestProtobufV2Uplinks(t *testing.T) {
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
-			res, err := mqtt.NewProtobufV2(test.Context()).ToUplink(buf, ids)
+			res, err := mqtt.NewProtobufV2(test.Context()).ToUplink(buf, &ids)
 			if tc.ErrorAssertion != nil {
 				if !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.FailNow()
@@ -362,7 +362,7 @@ func TestProtobufV2Status(t *testing.T) {
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
-			res, err := mqtt.NewProtobufV2(test.Context()).ToStatus(buf, ids)
+			res, err := mqtt.NewProtobufV2(test.Context()).ToStatus(buf, &ids)
 			if tc.ErrorAssertion != nil {
 				if !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.FailNow()

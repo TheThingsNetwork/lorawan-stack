@@ -23,7 +23,7 @@ import (
 
 // AbstractLocationSolverResult provides a unified interface to the location solver results.
 type AbstractLocationSolverResult interface {
-	Location() ttnpb.Location
+	Location() *ttnpb.Location
 	Algorithm() string
 }
 
@@ -37,15 +37,19 @@ type AbstractLocationSolverResponse interface {
 }
 
 type abstractLocationSolverResult struct {
-	location  ttnpb.Location
+	location  *ttnpb.Location
 	algorithm string
 }
 
 // Location implements AbstractLocationSolverResult.
-func (r abstractLocationSolverResult) Location() ttnpb.Location { return r.location }
+func (r abstractLocationSolverResult) Location() *ttnpb.Location {
+	return r.location
+}
 
 // Algorithm implements AbstractLocationSolverResult.
-func (r abstractLocationSolverResult) Algorithm() string { return r.algorithm }
+func (r abstractLocationSolverResult) Algorithm() string {
+	return r.algorithm
+}
 
 type abstractLocationSolverResponse struct {
 	result   AbstractLocationSolverResult
@@ -77,9 +81,9 @@ func (r *LocationSolverResult) abstractResult() AbstractLocationSolverResult {
 	case Algorithm_TDOA, Algorithm_RSSITDOA:
 		source = ttnpb.LocationSource_SOURCE_LORA_TDOA_GEOLOCATION
 	}
-	return abstractLocationSolverResult{
+	return &abstractLocationSolverResult{
 		algorithm: strings.ToLower(r.Algorithm),
-		location: ttnpb.Location{
+		location: &ttnpb.Location{
 			Latitude:  r.Location.Latitude,
 			Longitude: r.Location.Longitude,
 			Accuracy:  int32(r.Location.Tolerance),
@@ -102,9 +106,9 @@ func (r *GNSSLocationSolverResult) abstractResult() AbstractLocationSolverResult
 	if r == nil || len(r.LLH) != 3 {
 		return nil
 	}
-	return abstractLocationSolverResult{
+	return &abstractLocationSolverResult{
 		algorithm: "gnss",
-		location: ttnpb.Location{
+		location: &ttnpb.Location{
 			Latitude:  r.LLH[0],
 			Longitude: r.LLH[1],
 			Altitude:  int32(r.LLH[2]),
@@ -128,9 +132,9 @@ func (r *WiFiLocationSolverResult) abstractResult() AbstractLocationSolverResult
 	if r == nil {
 		return nil
 	}
-	return abstractLocationSolverResult{
+	return &abstractLocationSolverResult{
 		algorithm: strings.ToLower(r.Algorithm),
-		location: ttnpb.Location{
+		location: &ttnpb.Location{
 			Latitude:  r.Latitude,
 			Longitude: r.Longitude,
 			Altitude:  int32(r.Altitude),

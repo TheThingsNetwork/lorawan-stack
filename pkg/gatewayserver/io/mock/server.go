@@ -45,7 +45,7 @@ type server struct {
 type Server interface {
 	io.Server
 
-	HasDownlinkClaim(context.Context, ttnpb.GatewayIdentifiers) bool
+	HasDownlinkClaim(context.Context, *ttnpb.GatewayIdentifiers) bool
 	RegisterGateway(ctx context.Context, ids *ttnpb.GatewayIdentifiers, gateway *ttnpb.Gateway)
 	GetConnection(ctx context.Context, ids *ttnpb.GatewayIdentifiers) *io.Connection
 	Connections() <-chan *io.Connection
@@ -142,7 +142,7 @@ func (s *server) StartTask(cfg *task.Config) {
 	task.DefaultStartTask(cfg)
 }
 
-func (s *server) HasDownlinkClaim(ctx context.Context, ids ttnpb.GatewayIdentifiers) bool {
+func (s *server) HasDownlinkClaim(ctx context.Context, ids *ttnpb.GatewayIdentifiers) bool {
 	_, ok := s.downlinkClaims.Load(unique.ID(ctx, ids))
 	return ok
 }
