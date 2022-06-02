@@ -279,6 +279,20 @@ func (s *organizationStore) listOrganizationsBy(
 	return pbs, nil
 }
 
+func (s *organizationStore) selectWithID(ctx context.Context, ids ...string) func(*bun.SelectQuery) *bun.SelectQuery {
+	return func(q *bun.SelectQuery) *bun.SelectQuery {
+		q = q.Apply(selectWithContext(ctx))
+		switch len(ids) {
+		case 0:
+			return q
+		case 1:
+			return q.Where("?TableAlias.account_uid = ?", ids[0])
+		default:
+			return q.Where("?TableAlias.account_uid IN (?)", ids)
+		}
+	}
+}
+
 func (s *organizationStore) FindOrganizations(
 	ctx context.Context, ids []*ttnpb.OrganizationIdentifiers, fieldMask store.FieldMask,
 ) ([]*ttnpb.Organization, error) {
@@ -287,7 +301,7 @@ func (s *organizationStore) FindOrganizations(
 	))
 	defer span.End()
 
-	return s.listOrganizationsBy(ctx, selectWithEmbeddedAccountUIDs(ctx, ids...), fieldMask)
+	return s.listOrganizationsBy(ctx, s.selectWithID(ctx, idStrings(ids...)...), fieldMask)
 }
 
 func (s *organizationStore) getOrganizationModelBy(
@@ -318,7 +332,7 @@ func (s *organizationStore) GetOrganization(
 	defer span.End()
 
 	model, err := s.getOrganizationModelBy(
-		ctx, selectWithEmbeddedAccountUID(ctx, id), fieldMask,
+		ctx, s.selectWithID(ctx, id.GetOrganizationId()), fieldMask,
 	)
 	if err != nil {
 		return nil, err
@@ -339,7 +353,7 @@ func (s *organizationStore) UpdateOrganization( //nolint:gocyclo
 	defer span.End()
 
 	model, err := s.getOrganizationModelBy(
-		ctx, selectWithEmbeddedAccountUID(ctx, pb.GetIds()), fieldMask,
+		ctx, s.selectWithID(ctx, pb.GetIds().GetOrganizationId()), fieldMask,
 	)
 	if err != nil {
 		return nil, err
@@ -427,7 +441,7 @@ func (s *organizationStore) DeleteOrganization(ctx context.Context, id *ttnpb.Or
 	))
 	defer span.End()
 
-	model, err := s.getOrganizationModelBy(ctx, selectWithEmbeddedAccountUID(ctx, id), nil)
+	model, err := s.getOrganizationModelBy(ctx, s.selectWithID(ctx, id.GetOrganizationId()), nil)
 	if err != nil {
 		return err
 	}
@@ -450,7 +464,7 @@ func (s *organizationStore) RestoreOrganization(ctx context.Context, id *ttnpb.O
 	defer span.End()
 
 	model, err := s.getOrganizationModelBy(
-		store.WithSoftDeleted(ctx, true), selectWithEmbeddedAccountUID(ctx, id), nil,
+		store.WithSoftDeleted(ctx, true), s.selectWithID(ctx, id.GetOrganizationId()), nil,
 	)
 	if err != nil {
 		return err
@@ -477,7 +491,7 @@ func (s *organizationStore) PurgeOrganization(ctx context.Context, id *ttnpb.Org
 
 	model, err := s.getOrganizationModelBy(
 		store.WithSoftDeleted(ctx, false),
-		selectWithEmbeddedAccountUID(ctx, id),
+		s.selectWithID(ctx, id.GetOrganizationId()),
 		store.FieldMask{"attributes", "contact_info"},
 	)
 	if err != nil {

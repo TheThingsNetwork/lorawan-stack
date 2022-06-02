@@ -315,6 +315,20 @@ func (s *userStore) listUsersBy(
 	return pbs, nil
 }
 
+func (s *userStore) selectWithID(ctx context.Context, ids ...string) func(*bun.SelectQuery) *bun.SelectQuery {
+	return func(q *bun.SelectQuery) *bun.SelectQuery {
+		q = q.Apply(selectWithContext(ctx))
+		switch len(ids) {
+		case 0:
+			return q
+		case 1:
+			return q.Where("?TableAlias.account_uid = ?", ids[0])
+		default:
+			return q.Where("?TableAlias.account_uid IN (?)", ids)
+		}
+	}
+}
+
 func (s *userStore) FindUsers(
 	ctx context.Context, ids []*ttnpb.UserIdentifiers, fieldMask store.FieldMask,
 ) ([]*ttnpb.User, error) {
@@ -323,7 +337,7 @@ func (s *userStore) FindUsers(
 	))
 	defer span.End()
 
-	return s.listUsersBy(ctx, selectWithEmbeddedAccountUIDs(ctx, ids...), fieldMask)
+	return s.listUsersBy(ctx, s.selectWithID(ctx, idStrings(ids...)...), fieldMask)
 }
 
 func (s *userStore) ListAdmins(
@@ -364,7 +378,7 @@ func (s *userStore) GetUser(
 	))
 	defer span.End()
 
-	model, err := s.getUserModelBy(ctx, selectWithEmbeddedAccountUID(ctx, id), fieldMask)
+	model, err := s.getUserModelBy(ctx, s.selectWithID(ctx, id.GetUserId()), fieldMask)
 	if err != nil {
 		return nil, err
 	}
@@ -413,7 +427,7 @@ func (s *userStore) UpdateUser( //nolint:gocyclo
 	))
 	defer span.End()
 
-	model, err := s.getUserModelBy(ctx, selectWithEmbeddedAccountUID(ctx, pb.GetIds()), fieldMask)
+	model, err := s.getUserModelBy(ctx, s.selectWithID(ctx, pb.GetIds().GetUserId()), fieldMask)
 	if err != nil {
 		return nil, err
 	}
@@ -547,7 +561,7 @@ func (s *userStore) DeleteUser(ctx context.Context, id *ttnpb.UserIdentifiers) e
 	))
 	defer span.End()
 
-	model, err := s.getUserModelBy(ctx, selectWithEmbeddedAccountUID(ctx, id), nil)
+	model, err := s.getUserModelBy(ctx, s.selectWithID(ctx, id.GetUserId()), nil)
 	if err != nil {
 		return err
 	}
@@ -579,7 +593,7 @@ func (s *userStore) RestoreUser(ctx context.Context, id *ttnpb.UserIdentifiers) 
 	))
 	defer span.End()
 
-	model, err := s.getUserModelBy(store.WithSoftDeleted(ctx, true), selectWithEmbeddedAccountUID(ctx, id), nil)
+	model, err := s.getUserModelBy(store.WithSoftDeleted(ctx, true), s.selectWithID(ctx, id.GetUserId()), nil)
 	if err != nil {
 		return err
 	}
@@ -617,7 +631,7 @@ func (s *userStore) PurgeUser(ctx context.Context, id *ttnpb.UserIdentifiers) er
 
 	model, err := s.getUserModelBy(
 		store.WithSoftDeleted(ctx, false),
-		selectWithEmbeddedAccountUID(ctx, id),
+		s.selectWithID(ctx, id.GetUserId()),
 		store.FieldMask{"attributes", "contact_info"},
 	)
 	if err != nil {

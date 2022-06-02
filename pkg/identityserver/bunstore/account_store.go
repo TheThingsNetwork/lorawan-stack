@@ -70,27 +70,6 @@ type EmbeddedAccount struct {
 	UID string `bun:"uid,notnull,scanonly"`
 }
 
-func selectWithEmbeddedAccountUID(
-	ctx context.Context, id ttnpb.IDStringer,
-) func(*bun.SelectQuery) *bun.SelectQuery {
-	return func(q *bun.SelectQuery) *bun.SelectQuery {
-		q = q.Apply(selectWithContext(ctx))
-		return q.Where("?TableAlias.account_uid = ?", id.IDString())
-	}
-}
-
-func selectWithEmbeddedAccountUIDs[X ttnpb.IDStringer](
-	ctx context.Context, ids ...X,
-) func(*bun.SelectQuery) *bun.SelectQuery {
-	return func(q *bun.SelectQuery) *bun.SelectQuery {
-		q = q.Apply(selectWithContext(ctx))
-		if len(ids) == 0 {
-			return q
-		}
-		return q.Where("?TableAlias.account_uid IN (?)", idStrings(ids...))
-	}
-}
-
 func (s *baseStore) getAccountModel(
 	ctx context.Context,
 	accountType, uid string,
