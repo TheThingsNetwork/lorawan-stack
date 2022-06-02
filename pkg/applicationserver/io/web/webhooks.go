@@ -91,12 +91,11 @@ func (s *HTTPClientSink) Process(req *http.Request) error {
 
 // pooledSink is a Sink with worker pool.
 type pooledSink struct {
-	pool workerpool.WorkerPool
+	pool workerpool.WorkerPool[*http.Request]
 }
 
-func createPoolHandler(sink Sink) workerpool.Handler {
-	h := func(ctx context.Context, item interface{}) {
-		req := item.(*http.Request)
+func createPoolHandler(sink Sink) workerpool.Handler[*http.Request] {
+	h := func(ctx context.Context, req *http.Request) {
 		if err := sink.Process(req); err != nil {
 			registerWebhookFailed(ctx, err)
 			log.FromContext(ctx).WithError(err).Warn("Failed to process message")
@@ -109,7 +108,7 @@ func createPoolHandler(sink Sink) workerpool.Handler {
 
 // NewPooledSink creates a Sink that queues requests and processes them in parallel workers.
 func NewPooledSink(ctx context.Context, c workerpool.Component, sink Sink, workers int, queueSize int) Sink {
-	wp := workerpool.NewWorkerPool(workerpool.Config{
+	wp := workerpool.NewWorkerPool(workerpool.Config[*http.Request]{
 		Component:  c,
 		Context:    ctx,
 		Name:       "webhooks",
@@ -160,7 +159,7 @@ func NewWebhooks(ctx context.Context, server io.Server, registry WebhookRegistry
 	if err != nil {
 		return nil, err
 	}
-	wp := workerpool.NewWorkerPool(workerpool.Config{
+	wp := workerpool.NewWorkerPool(workerpool.Config[*ttnpb.ApplicationUp]{
 		Component: server,
 		Context:   ctx,
 		Name:      "webhooks_fanout",

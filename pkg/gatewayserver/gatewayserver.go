@@ -696,12 +696,12 @@ var errHostHandle = errors.Define("host_handle", "host `{host}` failed to handle
 type upstreamHost struct {
 	name          string
 	handler       upstream.Handler
-	pool          workerpool.WorkerPool
+	pool          workerpool.WorkerPool[any]
 	gtw           *ttnpb.Gateway
 	correlationID string
 }
 
-func (host *upstreamHost) handlePacket(ctx context.Context, item interface{}) {
+func (host *upstreamHost) handlePacket(ctx context.Context, item any) {
 	ctx = events.ContextWithCorrelationID(ctx, host.correlationID)
 	logger := log.FromContext(ctx)
 	gtw := host.gtw
@@ -764,6 +764,8 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item interface{}) {
 		} else {
 			registerForwardTxAck(ctx, gtw, msg, host.name)
 		}
+	default:
+		panic(fmt.Sprintf("unknown type %T", msg))
 	}
 }
 
@@ -790,7 +792,7 @@ func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntr
 			gtw:           gtw,
 			correlationID: fmt.Sprintf("gs:up:host:%s", events.NewCorrelationID()),
 		}
-		wp := workerpool.NewWorkerPool(workerpool.Config{
+		wp := workerpool.NewWorkerPool(workerpool.Config[any]{
 			Component:  gs,
 			Context:    ctx,
 			Name:       fmt.Sprintf("upstream_handlers_%v", name),
@@ -807,7 +809,7 @@ func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntr
 	for {
 		var (
 			ctx = ctx
-			val interface{}
+			val any
 		)
 		select {
 		case <-ctx.Done():

@@ -132,7 +132,7 @@ type NetworkServer struct {
 
 	scheduledDownlinkMatcher ScheduledDownlinkMatcher
 
-	uplinkSubmissionPool workerpool.WorkerPool
+	uplinkSubmissionPool workerpool.WorkerPool[[]*ttnpb.ApplicationUp]
 }
 
 // Option configures the NetworkServer.
@@ -232,7 +232,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		downlinkQueueCapacity:    conf.DownlinkQueueCapacity,
 		scheduledDownlinkMatcher: conf.ScheduledDownlinkMatcher,
 	}
-	ns.uplinkSubmissionPool = workerpool.NewWorkerPool(workerpool.Config{
+	ns.uplinkSubmissionPool = workerpool.NewWorkerPool(workerpool.Config[[]*ttnpb.ApplicationUp]{
 		Component:  c,
 		Context:    ctx,
 		Name:       "uplink_submission",

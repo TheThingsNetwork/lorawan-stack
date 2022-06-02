@@ -161,7 +161,7 @@ type cachedEndDeviceLocationRegistry struct {
 	maxRefreshInterval time.Duration
 	ttl                time.Duration
 
-	replicationPool workerpool.WorkerPool
+	replicationPool workerpool.WorkerPool[*ttnpb.EndDeviceIdentifiers]
 }
 
 // Get implements EndDeviceLocationRegistry.
@@ -221,12 +221,11 @@ func NewCachedEndDeviceLocationRegistry(ctx context.Context, c workerpool.Compon
 		maxRefreshInterval: maxRefreshInterval,
 		ttl:                ttl,
 
-		replicationPool: workerpool.NewWorkerPool(workerpool.Config{
+		replicationPool: workerpool.NewWorkerPool(workerpool.Config[*ttnpb.EndDeviceIdentifiers]{
 			Component: c,
 			Context:   ctx,
 			Name:      "replicate_end_device_locations",
-			Handler: func(ctx context.Context, item interface{}) {
-				ids := item.(*ttnpb.EndDeviceIdentifiers)
+			Handler: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) {
 				locations, err := registry.Get(ctx, ids)
 				if err != nil {
 					log.FromContext(ctx).WithError(err).Warn("Failed to retrieve end device locations")

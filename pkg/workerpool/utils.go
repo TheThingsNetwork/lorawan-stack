@@ -22,10 +22,10 @@ import (
 )
 
 // HandlerFromUplinkHandler converts a static uplink handler to a Handler.
-func HandlerFromUplinkHandler(handler func(context.Context, *ttnpb.ApplicationUp) error) Handler {
-	h := func(ctx context.Context, item interface{}) {
-		up := item.(*ttnpb.ApplicationUp)
-
+func HandlerFromUplinkHandler(
+	handler func(context.Context, *ttnpb.ApplicationUp) error,
+) Handler[*ttnpb.ApplicationUp] {
+	h := func(ctx context.Context, up *ttnpb.ApplicationUp) {
 		if err := handler(ctx, up); err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to submit message")
 		}

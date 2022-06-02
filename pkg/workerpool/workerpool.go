@@ -42,14 +42,14 @@ type Component interface {
 }
 
 // Handler is a function that processes items published to the worker pool.
-type Handler func(ctx context.Context, item interface{})
+type Handler[T any] func(ctx context.Context, item T)
 
 // Config is the configuration of the worker pool.
-type Config struct {
+type Config[T any] struct {
 	Component
 	context.Context                 // The base context of the pool.
 	Name              string        // The name of the pool.
-	Handler           Handler       // The work handler.
+	Handler           Handler[T]    // The work handler.
 	MinWorkers        int           // The minimum number of workers in the pool. Use -1 to disable.
 	MaxWorkers        int           // The maximum number of workers in the pool.
 	QueueSize         int           // The size of the work queue. Use -1 to disable.
@@ -58,33 +58,33 @@ type Config struct {
 
 // WorkerPool is a dynamic pool of workers to which work items can be published.
 // The workers are created on demand and live as long as work is available.
-type WorkerPool interface {
+type WorkerPool[T any] interface {
 	// Publish publishes an item to the worker pool to be processed.
 	// Publish may spawn a worker in order to fullfil the work load.
 	// Publish does not block.
-	Publish(ctx context.Context, item interface{}) error
+	Publish(ctx context.Context, item T) error
 
 	// Wait blocks until all workers have been closed.
 	Wait()
 }
 
-type contextualItem struct {
+type contextualItem[T any] struct {
 	ctx      context.Context
-	item     interface{}
+	item     T
 	queuedAt time.Time
 }
 
-type workerPool struct {
-	Config
+type workerPool[T any] struct {
+	Config[T]
 
-	mainQueue chan *contextualItem // mainQueue allows items to be buffered between publishers and workers.
-	fastQueue chan *contextualItem // fastQueue allows direct communication between publishers and idle workers.
+	mainQueue chan *contextualItem[T] // mainQueue allows items to be buffered between publishers and workers.
+	fastQueue chan *contextualItem[T] // fastQueue allows direct communication between publishers and idle workers.
 
 	workers int32
 	wg      sync.WaitGroup
 }
 
-func (wp *workerPool) handle(it *contextualItem) {
+func (wp *workerPool[T]) handle(it *contextualItem[T]) {
 	registerWorkerBusy(wp.Name)
 	defer registerWorkerIdle(wp.Name)
 	defer registerWorkProcessed(it.ctx, wp.Name)
@@ -92,7 +92,7 @@ func (wp *workerPool) handle(it *contextualItem) {
 	wp.Handler(it.ctx, it.item)
 }
 
-func (wp *workerPool) workerBody(initialWork *contextualItem) func(context.Context) error {
+func (wp *workerPool[T]) workerBody(initialWork *contextualItem[T]) func(context.Context) error {
 	worker := func(ctx context.Context) error {
 		var timeout bool
 		defer func() {
@@ -149,7 +149,7 @@ func (wp *workerPool) workerBody(initialWork *contextualItem) func(context.Conte
 }
 
 // spawnWorker spawns a worker task, if a worker slot is available.
-func (wp *workerPool) spawnWorker(initialWork *contextualItem) bool {
+func (wp *workerPool[T]) spawnWorker(initialWork *contextualItem[T]) bool {
 	if !incrementIfSmallerThan(&wp.workers, int32(wp.MaxWorkers)) {
 		return false
 	}
@@ -176,7 +176,7 @@ var errPoolFull = errors.DefineResourceExhausted("pool_full", "the worker pool i
 // to spawn an extra worker.
 // If the work cannot be enqueued, the pool will attempt to spawn an extra worker
 // that will handle the work. If this fails, the work is dropped.
-func (wp *workerPool) enqueueSpawn(ctx context.Context, it *contextualItem) error {
+func (wp *workerPool[T]) enqueueSpawn(ctx context.Context, it *contextualItem[T]) error {
 	// select is fair, and as such if two possible communication paths are possible
 	// (both fastQueue, and mainQueue) the one which will proceed is chosen based
 	// on a uniform pseudo-random selection. As such, we initially attempt to submit
@@ -221,8 +221,8 @@ func (wp *workerPool) enqueueSpawn(ctx context.Context, it *contextualItem) erro
 }
 
 // Publish implements WorkerPool.
-func (wp *workerPool) Publish(ctx context.Context, item interface{}) error {
-	return wp.enqueueSpawn(ctx, &contextualItem{
+func (wp *workerPool[T]) Publish(ctx context.Context, item T) error {
+	return wp.enqueueSpawn(ctx, &contextualItem[T]{
 		ctx:      wp.FromRequestContext(ctx),
 		item:     item,
 		queuedAt: time.Now(),
@@ -230,12 +230,12 @@ func (wp *workerPool) Publish(ctx context.Context, item interface{}) error {
 }
 
 // Wait implements WorkerPool.
-func (wp *workerPool) Wait() {
+func (wp *workerPool[T]) Wait() {
 	wp.wg.Wait()
 }
 
 // NewWorkerPool creates a new WorkerPool with the provided configuration.
-func NewWorkerPool(cfg Config) WorkerPool {
+func NewWorkerPool[T any](cfg Config[T]) WorkerPool[T] {
 	if cfg.WorkerIdleTimeout == 0 {
 		cfg.WorkerIdleTimeout = defaultWorkerIdleTimeout
 	}
@@ -262,11 +262,11 @@ func NewWorkerPool(cfg Config) WorkerPool {
 		cfg.MaxWorkers = cfg.MinWorkers
 	}
 
-	wp := &workerPool{
+	wp := &workerPool[T]{
 		Config: cfg,
 
-		mainQueue: make(chan *contextualItem, cfg.QueueSize),
-		fastQueue: make(chan *contextualItem, 0),
+		mainQueue: make(chan *contextualItem[T], cfg.QueueSize),
+		fastQueue: make(chan *contextualItem[T]),
 	}
 
 	for i := 0; i < wp.MinWorkers; i++ {

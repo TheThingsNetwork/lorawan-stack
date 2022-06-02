@@ -423,7 +423,7 @@ func (a *Agent) publishUplink(ctx context.Context) error {
 	logger := log.FromContext(ctx)
 	logger.Info("Connected as Forwarder")
 
-	wp := workerpool.NewWorkerPool(workerpool.Config{
+	wp := workerpool.NewWorkerPool(workerpool.Config[*uplinkMessage]{
 		Component:  a,
 		Context:    ctx,
 		Name:       "pb_forwarder_publish",
@@ -444,10 +444,9 @@ func (a *Agent) publishUplink(ctx context.Context) error {
 	}
 }
 
-func (a *Agent) forwarderPublisher(conn *grpc.ClientConn) workerpool.Handler {
+func (a *Agent) forwarderPublisher(conn *grpc.ClientConn) workerpool.Handler[*uplinkMessage] {
 	client := routingpb.NewForwarderDataClient(conn)
-	h := func(ctx context.Context, item interface{}) {
-		up := item.(*uplinkMessage)
+	h := func(ctx context.Context, up *uplinkMessage) {
 		tenantID := a.tenantIDExtractor(up.Context)
 		msg := up.UplinkMessage
 		ctx = log.NewContextWithFields(ctx, log.Fields(
@@ -495,7 +494,7 @@ func (a *Agent) subscribeDownlink(ctx context.Context) error {
 
 	client := routingpb.NewForwarderDataClient(conn)
 
-	reportPool := workerpool.NewWorkerPool(workerpool.Config{
+	reportPool := workerpool.NewWorkerPool(workerpool.Config[*packetbroker.DownlinkMessageDeliveryStateChange]{
 		Component:  a,
 		Context:    ctx,
 		Name:       "pb_forwarder_subscribe_report",
@@ -504,7 +503,7 @@ func (a *Agent) subscribeDownlink(ctx context.Context) error {
 	})
 	defer reportPool.Wait()
 
-	downlinkPool := workerpool.NewWorkerPool(workerpool.Config{
+	downlinkPool := workerpool.NewWorkerPool(workerpool.Config[*packetbroker.RoutedDownlinkMessage]{
 		Component:  a,
 		Context:    ctx,
 		Name:       "pb_forwarder_subscribe",
@@ -531,7 +530,10 @@ func (a *Agent) subscribeDownlink(ctx context.Context) error {
 	return ctx.Err()
 }
 
-func (a *Agent) subscribeDownlinkStream(client routingpb.ForwarderDataClient, downlinkPool workerpool.WorkerPool) func(context.Context) error {
+func (a *Agent) subscribeDownlinkStream(
+	client routingpb.ForwarderDataClient,
+	downlinkPool workerpool.WorkerPool[*packetbroker.RoutedDownlinkMessage],
+) func(context.Context) error {
 	f := func(ctx context.Context) (err error) {
 		stream, err := client.Subscribe(ctx, &routingpb.SubscribeForwarderRequest{
 			ForwarderNetId:     a.netID.MarshalNumber(),
@@ -557,9 +559,10 @@ func (a *Agent) subscribeDownlinkStream(client routingpb.ForwarderDataClient, do
 	return f
 }
 
-func (a *Agent) handleDownlinkMessageDeliveryState(client routingpb.ForwarderDataClient) workerpool.Handler {
-	h := func(ctx context.Context, item interface{}) {
-		rep := item.(*packetbroker.DownlinkMessageDeliveryStateChange)
+func (*Agent) handleDownlinkMessageDeliveryState(
+	client routingpb.ForwarderDataClient,
+) workerpool.Handler[*packetbroker.DownlinkMessageDeliveryStateChange] {
+	h := func(ctx context.Context, rep *packetbroker.DownlinkMessageDeliveryStateChange) {
 		var homeNetworkNetID types.NetID
 		homeNetworkNetID.UnmarshalNumber(rep.HomeNetworkNetId)
 		var forwarderNetID types.NetID
@@ -590,9 +593,10 @@ func (a *Agent) handleDownlinkMessageDeliveryState(client routingpb.ForwarderDat
 	return h
 }
 
-func (a *Agent) handleDownlink(reportPool workerpool.WorkerPool) workerpool.Handler {
-	h := func(ctx context.Context, item interface{}) {
-		down := item.(*packetbroker.RoutedDownlinkMessage)
+func (a *Agent) handleDownlink(
+	reportPool workerpool.WorkerPool[*packetbroker.DownlinkMessageDeliveryStateChange],
+) workerpool.Handler[*packetbroker.RoutedDownlinkMessage] {
+	h := func(ctx context.Context, down *packetbroker.RoutedDownlinkMessage) {
 		if down.Message == nil {
 			return
 		}
@@ -612,7 +616,11 @@ func (a *Agent) handleDownlink(reportPool workerpool.WorkerPool) workerpool.Hand
 	return h
 }
 
-func (a *Agent) handleDownlinkMessage(ctx context.Context, down *packetbroker.RoutedDownlinkMessage, reportPool workerpool.WorkerPool) (err error) {
+func (a *Agent) handleDownlinkMessage(
+	ctx context.Context,
+	down *packetbroker.RoutedDownlinkMessage,
+	reportPool workerpool.WorkerPool[*packetbroker.DownlinkMessageDeliveryStateChange],
+) (err error) {
 	receivedAt := time.Now()
 	logger := log.FromContext(ctx)
 
@@ -808,7 +816,7 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 
 	client := routingpb.NewHomeNetworkDataClient(conn)
 
-	reportPool := workerpool.NewWorkerPool(workerpool.Config{
+	reportPool := workerpool.NewWorkerPool(workerpool.Config[*packetbroker.UplinkMessageDeliveryStateChange]{
 		Component:  a,
 		Context:    ctx,
 		Name:       "pb_homenetwork_subscribe_report",
@@ -817,7 +825,7 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 	})
 	defer reportPool.Wait()
 
-	uplinkPool := workerpool.NewWorkerPool(workerpool.Config{
+	uplinkPool := workerpool.NewWorkerPool(workerpool.Config[*packetbroker.RoutedUplinkMessage]{
 		Component:  a,
 		Context:    ctx,
 		Name:       "pb_homenetwork_subscribe",
@@ -844,7 +852,11 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 	return ctx.Err()
 }
 
-func (a *Agent) subscribeUplinkStream(client routingpb.HomeNetworkDataClient, uplinkPool workerpool.WorkerPool, filters []*packetbroker.RoutingFilter) func(context.Context) error {
+func (a *Agent) subscribeUplinkStream(
+	client routingpb.HomeNetworkDataClient,
+	uplinkPool workerpool.WorkerPool[*packetbroker.RoutedUplinkMessage],
+	filters []*packetbroker.RoutingFilter,
+) func(context.Context) error {
 	f := func(ctx context.Context) (err error) {
 		stream, err := client.Subscribe(ctx, &routingpb.SubscribeHomeNetworkRequest{
 			HomeNetworkNetId:     a.netID.MarshalNumber(),
@@ -871,9 +883,10 @@ func (a *Agent) subscribeUplinkStream(client routingpb.HomeNetworkDataClient, up
 	return f
 }
 
-func (a *Agent) handleUplinkMessageDeliveryState(client routingpb.HomeNetworkDataClient) workerpool.Handler {
-	h := func(ctx context.Context, item interface{}) {
-		rep := item.(*packetbroker.UplinkMessageDeliveryStateChange)
+func (*Agent) handleUplinkMessageDeliveryState(
+	client routingpb.HomeNetworkDataClient,
+) workerpool.Handler[*packetbroker.UplinkMessageDeliveryStateChange] {
+	h := func(ctx context.Context, rep *packetbroker.UplinkMessageDeliveryStateChange) {
 		var forwarderNetID types.NetID
 		forwarderNetID.UnmarshalNumber(rep.ForwarderNetId)
 		var homeNetworkNetID types.NetID
@@ -904,9 +917,10 @@ func (a *Agent) handleUplinkMessageDeliveryState(client routingpb.HomeNetworkDat
 	return h
 }
 
-func (a *Agent) handleUplink(reportPool workerpool.WorkerPool) workerpool.Handler {
-	h := func(ctx context.Context, item interface{}) {
-		up := item.(*packetbroker.RoutedUplinkMessage)
+func (a *Agent) handleUplink(
+	reportPool workerpool.WorkerPool[*packetbroker.UplinkMessageDeliveryStateChange],
+) workerpool.Handler[*packetbroker.RoutedUplinkMessage] {
+	h := func(ctx context.Context, up *packetbroker.RoutedUplinkMessage) {
 		if up.Message == nil {
 			return
 		}
@@ -928,7 +942,11 @@ func (a *Agent) handleUplink(reportPool workerpool.WorkerPool) workerpool.Handle
 
 var errMessageIdentifiers = errors.DefineFailedPrecondition("message_identifiers", "invalid message identifiers")
 
-func (a *Agent) handleUplinkMessage(ctx context.Context, up *packetbroker.RoutedUplinkMessage, reportPool workerpool.WorkerPool) (err error) {
+func (a *Agent) handleUplinkMessage(
+	ctx context.Context,
+	up *packetbroker.RoutedUplinkMessage,
+	reportPool workerpool.WorkerPool[*packetbroker.UplinkMessageDeliveryStateChange],
+) (err error) {
 	receivedAt := time.Now()
 	logger := log.FromContext(ctx)
 
@@ -1038,7 +1056,7 @@ func (a *Agent) publishDownlink(ctx context.Context) error {
 	logger := log.FromContext(ctx)
 	logger.Info("Connected as Home Network")
 
-	wp := workerpool.NewWorkerPool(workerpool.Config{
+	wp := workerpool.NewWorkerPool(workerpool.Config[*downlinkMessage]{
 		Component:  a,
 		Context:    ctx,
 		Name:       "pb_homenetwork_publish",
@@ -1059,10 +1077,9 @@ func (a *Agent) publishDownlink(ctx context.Context) error {
 	}
 }
 
-func (a *Agent) homeNetworkPublisher(conn *grpc.ClientConn) workerpool.Handler {
+func (a *Agent) homeNetworkPublisher(conn *grpc.ClientConn) workerpool.Handler[*downlinkMessage] {
 	client := routingpb.NewHomeNetworkDataClient(conn)
-	h := func(ctx context.Context, item interface{}) {
-		down := item.(*downlinkMessage)
+	h := func(ctx context.Context, down *downlinkMessage) {
 		tenantID := a.tenantIDExtractor(down.Context)
 		msg, token := down.DownlinkMessage, down.agentUplinkToken
 		ctx = log.NewContextWithFields(ctx, log.Fields(

@@ -133,7 +133,7 @@ func testWorkerPool(t *testing.T, minWorkers int, maxWorkers int, queueSize int,
 
 	var workToBeDone, workDone, workFailed, duplicatedWork sync.Map
 	handlerCalls := int32(0)
-	handler := func(ctx context.Context, item interface{}) {
+	handler := func(ctx context.Context, item int) {
 		atomic.AddInt32(&handlerCalls, 1)
 		a.So(ctx, should.HaveParentContextOrEqual, workCtx)
 		if item == -1 {
@@ -144,7 +144,7 @@ func testWorkerPool(t *testing.T, minWorkers int, maxWorkers int, queueSize int,
 		}
 	}
 
-	wp := workerpool.NewWorkerPool(workerpool.Config{
+	wp := workerpool.NewWorkerPool(workerpool.Config[int]{
 		Component:         &mockComponent{},
 		Context:           ctx,
 		Handler:           handler,
@@ -231,8 +231,7 @@ func benchmarkWorkerPool(b *testing.B, processingDelay time.Duration, publishing
 		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
 
-		handler := func(ctx context.Context, item interface{}) {
-			tm := item.(time.Time)
+		handler := func(ctx context.Context, tm time.Time) {
 			delay := time.Now().Sub(tm).Milliseconds()
 			atomic.AddInt64(&totalQueueDelayMS, delay)
 			atomic.AddInt64(&totalHandled, 1)
@@ -240,7 +239,7 @@ func benchmarkWorkerPool(b *testing.B, processingDelay time.Duration, publishing
 			time.Sleep(random.Jitter(processingDelay, 0.15))
 		}
 
-		wp := workerpool.NewWorkerPool(workerpool.Config{
+		wp := workerpool.NewWorkerPool(workerpool.Config[time.Time]{
 			Component: &mockComponent{},
 			Context:   ctx,
 			Handler:   handler,

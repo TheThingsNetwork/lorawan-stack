@@ -80,7 +80,7 @@ func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, config Conf
 
 		limitLogs: limitLogs,
 	}
-	wp := workerpool.NewWorkerPool(workerpool.Config{
+	wp := workerpool.NewWorkerPool(workerpool.Config[encoding.Packet]{
 		Component:  server,
 		Context:    ctx,
 		Name:       "udp",
@@ -96,7 +96,7 @@ func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, config Conf
 	return s.read(wp)
 }
 
-func (s *srv) read(wp workerpool.WorkerPool) error {
+func (s *srv) read(wp workerpool.WorkerPool[encoding.Packet]) error {
 	var buf [65507]byte
 	for {
 		n, addr, err := s.conn.ReadFromUDP(buf[:])
@@ -145,9 +145,7 @@ func (s *srv) read(wp workerpool.WorkerPool) error {
 	}
 }
 
-func (s *srv) handlePacket(ctx context.Context, pkt interface{}) {
-	packet := pkt.(encoding.Packet)
-
+func (s *srv) handlePacket(ctx context.Context, packet encoding.Packet) {
 	eui := *packet.GatewayEUI
 	ctx = log.NewContextWithField(ctx, "gateway_eui", eui)
 	logger := log.FromContext(ctx)
