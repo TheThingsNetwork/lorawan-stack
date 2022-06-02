@@ -70,3 +70,11 @@ func selectWithOrderFromContext(
 		return q.Order(fmt.Sprintf("%s ASC", defaultColumn))
 	}
 }
+
+func convertIntSlice[A, B int | ~int32](in []A) []B {
+	out := make([]B, len(in))
+	for i, el := range in {
+		out[i] = B(el)
+	}
+	return out
+}
