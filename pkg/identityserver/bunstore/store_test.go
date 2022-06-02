@@ -31,7 +31,7 @@ import (
 type testStore struct {
 	db *bun.DB
 
-	// applicationStore
+	*applicationStore
 	// clientStore
 	// deviceStore
 	// gatewayStore
@@ -74,7 +74,7 @@ func newTestStore(t *testing.T, dsn *url.URL) storetest.Store {
 	return &testStore{
 		db: db,
 
-		// applicationStore:  applicationStore{baseStore: baseStore},
+		applicationStore: newApplicationStore(baseStore),
 		// clientStore:       clientStore{baseStore: baseStore},
 		// deviceStore:       deviceStore{baseStore: baseStore},
 		// gatewayStore:      gatewayStore{baseStore: baseStore},
