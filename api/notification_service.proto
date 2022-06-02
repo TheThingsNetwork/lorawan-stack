@@ -16,6 +16,7 @@ syntax = "proto3";
 
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/TheThingsIndustries/protoc-gen-go-flags/annotations.proto";
 import "github.com/TheThingsIndustries/protoc-gen-go-json/annotations.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/any.proto";
@@ -129,6 +130,8 @@ message CreateNotificationResponse {
 }
 
 message ListNotificationsRequest {
+  option (thethings.flags.message) = { select: false, set: true };
+
   // The IDs of the receiving user.
   UserIdentifiers receiver_ids = 1 [(validate.rules).message.required = true];
 
@@ -152,6 +155,8 @@ message ListNotificationsResponse {
 }
 
 message UpdateNotificationStatusRequest {
+  option (thethings.flags.message) = { select: false, set: true };
+
   // The IDs of the receiving user.
   UserIdentifiers receiver_ids = 1 [(validate.rules).message.required = true];
 

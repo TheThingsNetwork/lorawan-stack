@@ -96,7 +96,7 @@ message UserIdentifiers {
   ];
 
   // Secondary identifier, which can only be used in specific requests.
-  string email = 2;
+  string email = 2 [(thethings.flags.field).hidden = true];
 }
 
 // OrganizationOrUserIdentifiers contains either organization or user identifiers.

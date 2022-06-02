@@ -13,6 +13,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - Support claim protection when claiming end devices on The Things Join Server.
+- CLI commands `notifications list` and `notifications set-status` to manage user notifications.
 
 ### Changed
 
