@@ -16,17 +16,21 @@ package commands
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/migrate"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	ismigrations "go.thethings.network/lorawan-stack/v3/pkg/identityserver/store/migrations"
+	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	ttntypes "go.thethings.network/lorawan-stack/v3/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
 var (
@@ -353,6 +357,68 @@ var (
 			return nil
 		},
 	}
+	isDBImportEndDeviceCACCommand = &cobra.Command{
+		Use:   "import-ed-cac",
+		Short: "Import End Device Claim Authentication Code data stored in the JS end device registry into the IS",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if config.Redis.IsZero() {
+				panic("Redis should be configured for this command")
+			}
+
+			logger.Info("Connecting to Identity Server database...")
+			isDB, err := gormstore.Open(ctx, config.IS.DatabaseURI)
+			if err != nil {
+				return err
+			}
+			defer isDB.Close()
+
+			logger.Info("Connecting to Redis database...")
+			devicesCl := NewJoinServerDeviceRegistryRedis(*config)
+
+			var devsWithCAC uint64
+			defer func() {
+				logger.Debugf("Claim Authentication Code of %d devices imported into the Identity Server", devsWithCAC)
+			}()
+
+			ignoreNotFound, err := cmd.Flags().GetBool("ignore-not-found")
+			if err != nil {
+				return err
+			}
+
+			return ttnredis.RangeRedisKeys(
+				ctx,
+				devicesCl,
+				devicesCl.Key(ttnredis.Key("uid", "*")),
+				ttnredis.DefaultRangeCount,
+				func(k string) (bool, error) {
+					logger := logger.WithField("key", k)
+					dev := &ttnpb.EndDevice{}
+					if err := ttnredis.GetProto(ctx, devicesCl, k).ScanProto(dev); err != nil {
+						logger.WithError(err).Error("Failed to get device proto")
+						return false, err
+					}
+					if dev.ClaimAuthenticationCode != nil {
+						devsWithCAC++
+						// Update the CAC in the IS database.
+						s := strings.Split(k, ":")
+						uid := s[len(s)-1]
+						ctx, err = unique.WithContext(ctx, uid)
+						if err != nil {
+							return false, nil
+						}
+						_, err := gormstore.GetEndDeviceStore(isDB).UpdateEndDevice(ctx, dev, []string{"claim_authentication_code"})
+						if err != nil {
+							if errors.IsNotFound(err) && ignoreNotFound {
+								return true, nil
+							}
+							return false, err
+						}
+					}
+					return true, nil
+				},
+			)
+		},
+	}
 )
 
 func init() {
@@ -362,6 +428,8 @@ func init() {
 	isDBCommand.AddCommand(isDBMigrateCommand)
 	isDBCleanupCommand.Flags().Bool("dry-run", false, "Dry run")
 	isDBCommand.AddCommand(isDBCleanupCommand)
+	isDBImportEndDeviceCACCommand.Flags().Bool("ignore-not-found", false, "Ignore devices if not found in the IS")
+	isDBCommand.AddCommand(isDBImportEndDeviceCACCommand)
 	isDBEUIBlockCreationCommand.Flags().Bool("use-config", false, "Create block using values from config")
 	isDBEUIBlockCreationCommand.Flags().String("eui-type", "dev_eui", "EUI block type")
 	isDBEUIBlockCreationCommand.Flags().String("prefix", "", "Block prefix (format: 1234567800000000/32)")
