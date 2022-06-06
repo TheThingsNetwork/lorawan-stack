@@ -161,14 +161,24 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 			return nil, err
 		}
 		if is.config.EndDevices.EncryptionKeyID != "" {
-			encrypted, err := is.KeyVault.Encrypt(ctx, []byte(req.EndDevice.ClaimAuthenticationCode.Value), is.config.EndDevices.EncryptionKeyID)
+			encrypted, err := is.KeyVault.Encrypt(
+				ctx,
+				[]byte(req.EndDevice.ClaimAuthenticationCode.Value),
+				is.config.EndDevices.EncryptionKeyID,
+			)
 			if err != nil {
 				return nil, err
 			}
 			// Store the encrypted value along with the ID of the key used to encrypt it.
-			req.EndDevice.ClaimAuthenticationCode.Value = fmt.Sprintf("%s%s%s", is.config.EndDevices.EncryptionKeyID, endDeviceAuthenticationCodeSeparator, hex.EncodeToString(encrypted))
+			req.EndDevice.ClaimAuthenticationCode.Value = fmt.Sprintf("%s%s%s",
+				is.config.EndDevices.EncryptionKeyID,
+				endDeviceAuthenticationCodeSeparator,
+				hex.EncodeToString(encrypted),
+			)
 		} else {
-			log.FromContext(ctx).Debug("No encryption key defined, store End Device Claim Authentication Code directly in plaintext")
+			log.FromContext(ctx).Debug(
+				"No encryption key defined, store End Device Claim Authentication Code directly in plaintext",
+			)
 		}
 	}
 
@@ -339,20 +349,31 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 	// Store plaintext value to return in the update response to clients.
 	var ptCACSecret string
 
-	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "claim_authentication_code") && req.EndDevice.ClaimAuthenticationCode != nil {
+	cacFieldPresent := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "claim_authentication_code")
+	if cacFieldPresent && req.EndDevice.ClaimAuthenticationCode != nil {
 		if err = validateEndDeviceAuthenticationCode(*req.EndDevice.ClaimAuthenticationCode); err != nil {
 			return nil, err
 		}
 		if is.config.EndDevices.EncryptionKeyID != "" {
 			ptCACSecret = req.EndDevice.ClaimAuthenticationCode.Value
-			encrypted, err := is.KeyVault.Encrypt(ctx, []byte(req.EndDevice.ClaimAuthenticationCode.Value), is.config.EndDevices.EncryptionKeyID)
+			encrypted, err := is.KeyVault.Encrypt(
+				ctx,
+				[]byte(req.EndDevice.ClaimAuthenticationCode.Value),
+				is.config.EndDevices.EncryptionKeyID,
+			)
 			if err != nil {
 				return nil, err
 			}
 			// Store the encrypted value along with the ID of the key used to encrypt it.
-			req.EndDevice.ClaimAuthenticationCode.Value = fmt.Sprintf("%s%s%s", is.config.EndDevices.EncryptionKeyID, endDeviceAuthenticationCodeSeparator, hex.EncodeToString(encrypted))
+			req.EndDevice.ClaimAuthenticationCode.Value = fmt.Sprintf("%s%s%s",
+				is.config.EndDevices.EncryptionKeyID,
+				endDeviceAuthenticationCodeSeparator,
+				hex.EncodeToString(encrypted),
+			)
 		} else {
-			log.FromContext(ctx).Debug("No encryption key defined, store End Device Claim Authentication Code directly in plaintext")
+			log.FromContext(ctx).Debug(
+				"No encryption key defined, store End Device Claim Authentication Code directly in plaintext",
+			)
 		}
 	}
 
@@ -403,7 +424,8 @@ func (is *IdentityServer) deleteEndDevice(ctx context.Context, ids *ttnpb.EndDev
 }
 
 func validateEndDeviceAuthenticationCode(authCode ttnpb.EndDeviceAuthenticationCode) error {
-	if validFrom, validTo := ttnpb.StdTime(authCode.ValidFrom), ttnpb.StdTime(authCode.ValidTo); validFrom != nil && validTo != nil {
+	validFrom, validTo := ttnpb.StdTime(authCode.ValidFrom), ttnpb.StdTime(authCode.ValidTo)
+	if validFrom != nil && validTo != nil {
 		if validTo.Before(*validFrom) {
 			return errClaimAuthenticationCode.New()
 		}

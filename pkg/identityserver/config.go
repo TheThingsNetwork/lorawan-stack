@@ -93,7 +93,7 @@ type Config struct {
 		Templates    emailTemplatesConfig `name:"templates"`
 	} `name:"email"`
 	EndDevices struct {
-		EncryptionKeyID string `name:"encryption-key-id" description:"ID of the key used to encrypt end device secrets at rest"`
+		EncryptionKeyID string `name:"encryption-key-id" description:"ID of the key used to encrypt end device secrets"`
 	} `name:"end-devices"`
 	Gateways struct {
 		EncryptionKeyID string `name:"encryption-key-id" description:"ID of the key used to encrypt gateway secrets at rest"`
