@@ -167,6 +167,7 @@ var startCommand = &cobra.Command{
 			start.QRCodeGenerator = true
 			start.PacketBrokerAgent = true
 			start.DeviceRepository = true
+			start.DeviceClaimingServer = true
 		}
 
 		logger.Info("Setting up core component")
