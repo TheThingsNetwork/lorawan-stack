@@ -24,6 +24,24 @@
     ],
     "read_only"
   ],
+  "claim_authentication_code": {
+    "_root": [
+      "is",
+      "is"
+    ],
+    "value": [
+      "is",
+      "is"
+    ],
+    "valid_to": [
+      "is",
+      "is"
+    ],
+    "valid_from": [
+      "is",
+      "is"
+    ]
+  },
   "description": [
     "is",
     "is"
@@ -1699,24 +1717,6 @@
     "js",
     "js"
   ],
-  "claim_authentication_code": {
-    "_root": [
-      "js",
-      "js"
-    ],
-    "value": [
-      "js",
-      "js"
-    ],
-    "valid_to": [
-      "js",
-      "js"
-    ],
-    "valid_from": [
-      "js",
-      "js"
-    ]
-  },
   "last_dev_nonce": [
     "js",
     "js"
