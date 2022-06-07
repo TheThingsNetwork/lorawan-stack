@@ -15,7 +15,11 @@
 import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
 import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
 
-import { GET_USER_ME_BASE, LOGOUT_BASE } from '@console/store/actions/user'
+import {
+  GET_USER_ME_BASE,
+  LOGOUT_BASE,
+  GET_USER_INVITATIONS_BASE,
+} from '@console/store/actions/user'
 
 const selectUserStore = state => state.user
 
@@ -52,3 +56,8 @@ export const selectUserIsAdmin = state => {
 }
 
 export const selectUserRights = state => selectUserStore(state).rights
+
+export const selectUserInvitations = state => selectUserStore(state).invitations
+export const selectUserInvitationsTotalCount = state => selectUserStore(state).invitationsTotalCount
+export const selectUserInvitationsFetching = createFetchingSelector(GET_USER_INVITATIONS_BASE)
+export const selectUserInvitationsError = createErrorSelector(GET_USER_INVITATIONS_BASE)

@@ -14,6 +14,8 @@
 
 import axios from 'axios'
 
+import tts from '@console/api/tts'
+
 import api from '@console/api'
 
 import * as accessToken from '@ttn-lw/lib/access-token'
@@ -29,31 +31,73 @@ const logoutSequence = async () => {
   window.location = response.data.op_logout_uri
 }
 
-export default [
-  createRequestLogic({
-    type: user.LOGOUT,
-    process: async () => {
-      try {
+const logoutLogic = createRequestLogic({
+  type: user.LOGOUT,
+  process: async () => {
+    try {
+      await logoutSequence()
+    } catch (err) {
+      if (isUnauthenticatedError(err)) {
+        // If there was an Unauthenticated Error, it either means that the
+        // console client or the OAuth app session is no longer valid.
+        // In this situation, it's best to try initializing the OAuth
+        // roundtrip again. This might provide a new console session cookie
+        // with which the propagated logout can be retried. If not, it can
+        // be assumed that both console and OAuth app sessions are already
+        // terminated, equalling a logged out state. In that case the request
+        // logic will perform a page refresh which will initialize the auth
+        // flow again.
+        await axios.get(
+          `${selectApplicationRootPath()}/login/ttn-stack?next=${window.location.pathname}`,
+        )
         await logoutSequence()
-      } catch (err) {
-        if (isUnauthenticatedError(err)) {
-          // If there was an Unauthenticated Error, it either means that the
-          // console client or the OAuth app session is no longer valid.
-          // In this situation, it's best to try initializing the OAuth
-          // roundtrip again. This might provide a new console session cookie
-          // with which the propagated logout can be retried. If not, it can
-          // be assumed that both console and OAuth app sessions are already
-          // terminated, equalling a logged out state. In that case the request
-          // logic will perform a page refresh which will initialize the auth
-          // flow again.
-          await axios.get(
-            `${selectApplicationRootPath()}/login/ttn-stack?next=${window.location.pathname}`,
-          )
-          await logoutSequence()
-        } else {
-          throw err
-        }
+      } else {
+        throw err
       }
-    },
-  }),
-]
+    }
+  },
+})
+
+const getUserInvitationsLogic = createRequestLogic({
+  type: user.GET_USER_INVITATIONS,
+  process: async ({ action }) => {
+    const {
+      params: { page, limit, query, order },
+    } = action.payload
+    const { selectors } = action.meta
+
+    const data = query
+      ? await tts.Users.search(
+          {
+            page,
+            limit,
+            query,
+            order,
+          },
+          selectors,
+        )
+      : await tts.Users.getAllInvitations({ page, limit, order }, selectors)
+
+    return data
+  },
+})
+
+const sendInviteLogic = createRequestLogic({
+  type: user.SEND_INVITE,
+  process: async ({ action }) => {
+    const { email } = action.payload
+
+    return await tts.Users.sendInvite(email)
+  },
+})
+
+const deleteInviteLogic = createRequestLogic({
+  type: user.DELETE_INVITE,
+  process: async ({ action }) => {
+    const { email } = action.payload
+
+    return await tts.Users.deleteInvite(email)
+  },
+})
+
+export default [logoutLogic, getUserInvitationsLogic, sendInviteLogic, deleteInviteLogic]
