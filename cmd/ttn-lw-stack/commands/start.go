@@ -54,30 +54,43 @@ import (
 
 const defaultLockTTL = 10 * time.Second
 
+// NewComponentDeviceRegistryRedis instantiates a new redis client with the Component Device Registry namespace.
 func NewComponentDeviceRegistryRedis(conf *Config, name string) *redis.Client {
 	return redis.New(conf.Redis.WithNamespace(name, "devices"))
 }
 
+// NewNetworkServerDeviceRegistryRedis instantiates a new redis client
+// with the Network Server Device Registry namespace.
 func NewNetworkServerDeviceRegistryRedis(conf *Config) *redis.Client {
 	return NewComponentDeviceRegistryRedis(conf, "ns")
 }
 
+// NewNetworkServerApplicationUplinkQueueRedis instantiates a new redis client
+// with the Network Server Application Uplink Queue namespace.
 func NewNetworkServerApplicationUplinkQueueRedis(conf *Config) *redis.Client {
 	return redis.New(conf.Redis.WithNamespace("ns", "application-uplinks"))
 }
 
+// NewNetworkServerDownlinkTaskRedis instantiates a new redis client
+// with the Network Server Downlink Task namespace.
 func NewNetworkServerDownlinkTaskRedis(conf *Config) *redis.Client {
 	return redis.New(conf.Redis.WithNamespace("ns", "tasks"))
 }
 
+// NewApplicationServerDeviceRegistryRedis instantiates a new redis client
+// with the Application Server Device Registry namespace.
 func NewApplicationServerDeviceRegistryRedis(conf *Config) *redis.Client {
 	return NewComponentDeviceRegistryRedis(conf, "as")
 }
 
+// NewJoinServerDeviceRegistryRedis instantiates a new redis client
+// with the Join Server Device Registry namespace.
 func NewJoinServerDeviceRegistryRedis(conf *Config) *redis.Client {
 	return NewComponentDeviceRegistryRedis(conf, "js")
 }
 
+// NewJoinServerSessionKeyRegistryRedis instantiates a new redis client
+// with the Join Server Session Key Registry namespace.
 func NewJoinServerSessionKeyRegistryRedis(conf *Config) *redis.Client {
 	return redis.New(conf.Redis.WithNamespace("js", "keys"))
 }
