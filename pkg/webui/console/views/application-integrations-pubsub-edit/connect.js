@@ -75,9 +75,4 @@ export default PubsubEdit =>
   connect(
     mapStateToProps,
     mapDispatchToProps,
-  )(
-    withRequest(
-      ({ getPubsub }) => getPubsub(),
-      ({ fetching, pubsub }) => fetching || !Boolean(pubsub),
-    )(PubsubEdit),
-  )
+  )(withRequest(({ getPubsub }) => getPubsub())(PubsubEdit))

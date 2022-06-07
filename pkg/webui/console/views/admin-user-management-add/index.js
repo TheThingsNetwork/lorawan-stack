@@ -36,12 +36,14 @@ import { getIsConfiguration } from '@console/store/actions/identity-server'
 import {
   selectPasswordRequirements,
   selectIsConfigurationFetching,
+  selectIsConfigurationError,
 } from '@console/store/selectors/identity-server'
 
 @connect(
   state => ({
     passwordRequirements: selectPasswordRequirements(state),
     fetching: selectIsConfigurationFetching(state),
+    error: selectIsConfigurationError(state),
   }),
   {
     createUser: attachPromise(createUser),
@@ -49,7 +51,7 @@ import {
     getConfiguration: () => getIsConfiguration(),
   },
 )
-@withRequest(({ getConfiguration }) => getConfiguration(), ({ fetching }) => fetching)
+@withRequest(({ getConfiguration }) => getConfiguration())
 @withBreadcrumb('admin.user-management.add', () => (
   <Breadcrumb path={`/admin/user-management/add`} content={sharedMessages.add} />
 ))

@@ -19,6 +19,7 @@ import {
   LIST_BRANDS_BASE,
   LIST_MODELS_BASE,
   GET_TEMPLATE_BASE,
+  GET_REPO_PF_BASE,
 } from '@console/store/actions/device-repository'
 
 const selectDRStore = store => store.deviceRepository
@@ -68,3 +69,5 @@ export const selectDeviceTemplateError = createErrorSelector(GET_TEMPLATE_BASE)
 
 export const selectDeviceRepoPayloadFromatters = state =>
   selectDRStore(state).repo_payload_formatters
+export const selectDeviceRepoPayloadFromattersFetching = createFetchingSelector(GET_REPO_PF_BASE)
+export const selectDeviceRepoPayloadFromattersError = createErrorSelector(GET_REPO_PF_BASE)

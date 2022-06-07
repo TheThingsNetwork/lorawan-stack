@@ -20,13 +20,17 @@ import { selectJsConfig } from '@ttn-lw/lib/selectors/env'
 
 import { getJoinEUIPrefixes } from '@console/store/actions/join-server'
 
-import { selectJoinEUIPrefixesFetching } from '@console/store/selectors/join-server'
+import {
+  selectJoinEUIPrefixesFetching,
+  selectJoinEUIPrefixesError,
+} from '@console/store/selectors/join-server'
 
 const mapStateToProps = state => {
   const { enabled: jsEnabled } = selectJsConfig()
 
   return {
     fetching: selectJoinEUIPrefixesFetching(state) && jsEnabled,
+    error: selectJoinEUIPrefixesError(state),
     jsEnabled,
   }
 }
@@ -37,12 +41,9 @@ export default DeviceAdd =>
     mapStateToProps,
     mapDispatchToProps,
   )(
-    withRequest(
-      ({ getPrefixes, jsEnabled }) => {
-        if (jsEnabled) {
-          return getPrefixes()
-        }
-      },
-      ({ fetching }) => fetching,
-    )(DeviceAdd),
+    withRequest(({ getPrefixes, jsEnabled }) => {
+      if (jsEnabled) {
+        return getPrefixes()
+      }
+    })(DeviceAdd),
   )

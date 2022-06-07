@@ -84,6 +84,12 @@ const withRequest =
           )
         }
 
+        // Prevent rendering the component when an error was received
+        // but not thrown yet via `componentDidUpdate()`.
+        if (mapPropsToError(this.props)) {
+          return null
+        }
+
         return <Component {...this.props} />
       }
     }

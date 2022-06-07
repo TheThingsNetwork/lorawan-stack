@@ -90,8 +90,7 @@ export default OrganizationCollaboratorEdit =>
         dispatchProps.removeOrganizationCollaborator(stateProps.orgId, collaborator),
     }),
   )(
-    withRequest(
-      ({ getOrganizationCollaborator }) => getOrganizationCollaborator(),
-      ({ fetching, collaborator }) => fetching || !Boolean(collaborator),
-    )(OrganizationCollaboratorEdit),
+    withRequest(({ getOrganizationCollaborator }) => getOrganizationCollaborator())(
+      OrganizationCollaboratorEdit,
+    ),
   )

@@ -76,9 +76,4 @@ export default WebhookEdit =>
   connect(
     mapStateToProps,
     mapDispatchToProps,
-  )(
-    withRequest(
-      ({ getWebhook }) => getWebhook(),
-      ({ fetching, webhook }) => fetching || !Boolean(webhook),
-    )(WebhookEdit),
-  )
+  )(withRequest(({ getWebhook }) => getWebhook())(WebhookEdit))

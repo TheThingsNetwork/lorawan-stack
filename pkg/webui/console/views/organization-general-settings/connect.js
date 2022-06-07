@@ -73,6 +73,7 @@ const mapStateToProps = state => {
     mayViewApiKeys,
     mayViewCollaborators,
     fetching,
+    error,
     mayPurge: mayPurgeOrg,
     shouldConfirmDelete: !isPristine || !mayViewCollaborators || !mayViewApiKeys || Boolean(error),
     mayDeleteOrganization: mayDeleteOrg,
@@ -115,9 +116,4 @@ export default GeneralSettings =>
     mapStateToProps,
     mapDispatchToProps,
     mergeProps,
-  )(
-    withRequest(
-      ({ loadData }) => loadData(),
-      ({ fetching }) => fetching,
-    )(GeneralSettings),
-  )
+  )(withRequest(({ loadData }) => loadData())(GeneralSettings))

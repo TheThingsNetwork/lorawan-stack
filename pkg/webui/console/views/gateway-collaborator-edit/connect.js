@@ -90,9 +90,4 @@ export default GatewayCollaboratorEdit =>
     mapStateToProps,
     mapDispatchToProps,
     mergeProps,
-  )(
-    withRequest(
-      ({ getGatewayCollaborator }) => getGatewayCollaborator(),
-      ({ fetching, collaborator }) => fetching || !Boolean(collaborator),
-    )(GatewayCollaboratorEdit),
-  )
+  )(withRequest(({ getGatewayCollaborator }) => getGatewayCollaborator())(GatewayCollaboratorEdit))

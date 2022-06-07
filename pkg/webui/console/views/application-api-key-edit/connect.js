@@ -70,9 +70,4 @@ export default ApplicationApiKeyEdit =>
       editApplicationKey: key => dispatchProps.editApiKey(stateProps.appId, stateProps.keyId, key),
       deleteSuccess: () => dispatchProps.deleteSuccess(stateProps.appId),
     }),
-  )(
-    withRequest(
-      ({ getApiKey, appId, keyId }) => getApiKey(appId, keyId),
-      ({ fetching, apiKey }) => fetching || !Boolean(apiKey),
-    )(ApplicationApiKeyEdit),
-  )
+  )(withRequest(({ getApiKey, appId, keyId }) => getApiKey(appId, keyId))(ApplicationApiKeyEdit))

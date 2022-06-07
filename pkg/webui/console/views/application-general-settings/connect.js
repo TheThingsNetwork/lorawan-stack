@@ -107,6 +107,7 @@ const mapStateToProps = state => {
     mayViewCollaborators,
     mayViewLink,
     fetching,
+    error,
     mayPurge: mayPurgeApp,
     shouldConfirmDelete: !isPristine || !mayViewCollaborators || !mayViewApiKeys || Boolean(error),
     mayDeleteApplication: mayDeleteApp,
@@ -162,10 +163,7 @@ const addHocs = pipe(
   withFeatureRequirement(mayEditBasicApplicationInfo, {
     redirect: ({ appId }) => `/applications/${appId}`,
   }),
-  withRequest(
-    ({ loadData }) => loadData(),
-    ({ fetching }) => fetching,
-  ),
+  withRequest(({ loadData }) => loadData()),
 )
 
 export default ApplicationGeneralSettings => addHocs(ApplicationGeneralSettings)
