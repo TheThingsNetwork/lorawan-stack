@@ -263,7 +263,7 @@ const UsersTable = props => {
       headers={headers}
       addMessage={isInvitationsTab ? m.invite : sharedMessages.userAdd}
       itemPathPrefix={isInvitationsTab ? '/invitations' : ''}
-      getItemPathPrefix={isInvitationsTab ? getItemPathPrefix : null}
+      getItemPathPrefix={isInvitationsTab ? getItemPathPrefix : undefined}
       tableTitle={<Message content={sharedMessages.users} />}
       getItemsAction={getItems}
       searchItemsAction={getItems}

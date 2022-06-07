@@ -62,21 +62,11 @@ const getUserInvitationsLogic = createRequestLogic({
   type: user.GET_USER_INVITATIONS,
   process: async ({ action }) => {
     const {
-      params: { page, limit, query, order },
+      params: { page, limit },
     } = action.payload
     const { selectors } = action.meta
 
-    const data = query
-      ? await tts.Users.search(
-          {
-            page,
-            limit,
-            query,
-            order,
-          },
-          selectors,
-        )
-      : await tts.Users.getAllInvitations({ page, limit, order }, selectors)
+    const data = await tts.Users.getAllInvitations({ page, limit }, selectors)
 
     return data
   },

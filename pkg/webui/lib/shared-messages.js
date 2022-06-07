@@ -233,6 +233,7 @@ export default defineMessages({
   import: 'Import',
   importDevices: 'Import end devices',
   integrations: 'Integrations',
+  invite: 'Invite',
   joinAccept: 'Join accept',
   insufficientAppKeyRights: 'Insufficient rights to set an AppKey',
   insufficientNwkKeyRights: 'Insufficient rights to set a NwkKey',
