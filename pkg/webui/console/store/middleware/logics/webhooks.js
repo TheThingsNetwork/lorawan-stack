@@ -27,6 +27,7 @@ const getWebhookLogic = createRequestLogic({
       payload: { appId, webhookId },
       meta: { selector },
     } = action
+
     return tts.Applications.Webhooks.getById(appId, webhookId, selector)
   },
 })
@@ -39,6 +40,7 @@ const getWebhooksLogic = createRequestLogic({
       meta: { selector },
     } = action
     const res = await tts.Applications.Webhooks.getAll(appId, selector)
+
     return { entities: res.webhooks, totalCount: res.totalCount }
   },
 })
@@ -56,6 +58,7 @@ const getWebhookFormatsLogic = createRequestLogic({
   type: webhookFormats.GET_WEBHOOK_FORMATS,
   process: async () => {
     const { formats } = await tts.Applications.Webhooks.getFormats()
+
     return formats
   },
 })
@@ -65,9 +68,8 @@ const getWebhookTemplateLogic = createRequestLogic({
   process: async ({ action }) => {
     const { id } = action.payload
     const { selector } = action.meta
-    const template = await tts.Applications.Webhooks.getTemplate(id, selector)
 
-    return template
+    return await tts.Applications.Webhooks.getTemplate(id, selector)
   },
 })
 

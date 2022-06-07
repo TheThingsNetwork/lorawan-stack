@@ -35,6 +35,7 @@ const getPubsubLogic = createRequestLogic({
       payload: { appId, pubsubId },
       meta: { selector },
     } = action
+
     return tts.Applications.PubSubs.getById(appId, pubsubId, selector)
   },
 })
@@ -44,6 +45,7 @@ const getPubsubsLogic = createRequestLogic({
   process: async ({ action }) => {
     const { appId } = action.payload
     const res = await tts.Applications.PubSubs.getAll(appId)
+
     return { entities: res.pubsubs, totalCount: res.totalCount }
   },
 })
@@ -61,6 +63,7 @@ const getPubsubFormatsLogic = createRequestLogic({
   type: pubsubFormats.GET_PUBSUB_FORMATS,
   process: async () => {
     const { formats } = await tts.Applications.PubSubs.getFormats()
+
     return formats
   },
 })

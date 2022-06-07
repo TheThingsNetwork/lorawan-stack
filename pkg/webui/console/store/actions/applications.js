@@ -51,7 +51,11 @@ export const CREATE_APP_BASE = 'CREATE_APP'
 export const [
   { request: CREATE_APP, success: CREATE_APP_SUCCESS, failure: CREATE_APP_FAILURE },
   { request: createApp, succedd: createAppSuccess, failure: createAppFailure },
-] = createRequestActions(CREATE_APP_BASE, (ownerId, app, isAdmin) => ({ ownerId, app, isAdmin }))
+] = createRequestActions(CREATE_APP_BASE, (ownerId, app, isUserOwner) => ({
+  ownerId,
+  app,
+  isUserOwner,
+}))
 
 export const GET_APP_BASE = 'GET_APPLICATION'
 export const [

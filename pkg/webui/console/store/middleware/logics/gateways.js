@@ -34,9 +34,9 @@ import createEventsConnectLogics from './events'
 const createGatewayLogic = createRequestLogic({
   type: gateways.CREATE_GTW,
   process: async ({ action }) => {
-    const { ownerId, gateway, isAdmin } = action.payload
+    const { ownerId, gateway, isUserOwner } = action.payload
 
-    return await tts.Gateways.create(ownerId, gateway, isAdmin)
+    return await tts.Gateways.create(ownerId, gateway, isUserOwner)
   },
 })
 
@@ -48,6 +48,7 @@ const getGatewayLogic = createRequestLogic({
     const selector = meta.selector || ''
     const gtw = await tts.Gateways.getById(id, selector)
     dispatch(gateways.startGatewayEventsStream(id))
+
     return gtw
   },
 })
@@ -164,6 +165,7 @@ const getGatewaysRightsLogic = createRequestLogic({
   process: async ({ action }) => {
     const { id } = action.payload
     const result = await tts.Gateways.getRightsById(id)
+
     return result.rights.sort()
   },
 })

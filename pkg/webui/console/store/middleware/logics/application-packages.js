@@ -36,6 +36,7 @@ const setApplicationPackagesDefaultAssociationLogic = createRequestLogic({
   process: ({ action }) => {
     const { appId, fPort, data } = action.payload
     const { selector } = action.meta
+
     return tts.Applications.Packages.setDefaultAssociation(appId, fPort, data, selector)
   },
 })

@@ -52,10 +52,10 @@ export const CREATE_GTW_BASE = 'CREATE_GTW'
 export const [
   { request: CREATE_GTW, success: CREATE_GTW_SUCCESS, failure: CREATE_GTW_FAILURE },
   { request: createGateway, success: createGatewaySuccess, failure: createGatewayFailure },
-] = createRequestActions(CREATE_GTW_BASE, (ownerId, gateway, isAdmin) => ({
+] = createRequestActions(CREATE_GTW_BASE, (ownerId, gateway, isUserOwner) => ({
   ownerId,
   gateway,
-  isAdmin,
+  isUserOwner,
 }))
 
 export const GET_GTW_BASE = 'GET_GATEWAY'

@@ -60,8 +60,8 @@ const m = defineMessages({
   dispatch => ({
     createSuccess: gtwId => dispatch(push(`/gateways/${gtwId}`)),
     getOrganizationsList: () => dispatch(getOrganizationsList()),
-    createGateway: (ownerId, gateway, isAdmin) =>
-      dispatch(attachPromise(createGateway(ownerId, gateway, isAdmin))),
+    createGateway: (ownerId, gateway, isUserOwner) =>
+      dispatch(attachPromise(createGateway(ownerId, gateway, isUserOwner))),
   }),
 )
 @withRequest(({ getOrganizationsList }) => getOrganizationsList())

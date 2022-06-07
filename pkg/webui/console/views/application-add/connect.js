@@ -39,7 +39,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   navigateToApplication: appId => dispatch(push(`/applications/${appId}`)),
   getOrganizationsList: () => dispatch(getOrganizationsList()),
-  createApp: (ownerId, app, isAdmin) => dispatch(attachPromise(createApp(ownerId, app, isAdmin))),
+  createApp: (ownerId, app, isUserOwner) =>
+    dispatch(attachPromise(createApp(ownerId, app, isUserOwner))),
 })
 
 const addHocs = pipe(

@@ -44,6 +44,7 @@ const getApiKeysLogic = createRequestLogic({
       page,
       order,
     })
+
     return { parentType, entities: data.api_keys, totalCount: data.totalCount }
   },
 })
@@ -53,6 +54,7 @@ const getApiKeyLogic = createRequestLogic({
   validate: parentTypeValidator,
   process: async ({ action }) => {
     const { parentType, parentId, keyId } = action.payload
+
     return tts[entitySdkServiceMap[parentType]].ApiKeys.getById(parentId, keyId)
   },
 })
