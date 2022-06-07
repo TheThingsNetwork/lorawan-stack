@@ -19,6 +19,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"os"
 	"regexp"
 	"sort"
 	"strings"
@@ -26,6 +27,7 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	"github.com/spf13/cobra"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/v3/pkg/cleanup"
 	js "go.thethings.network/lorawan-stack/v3/pkg/joinserver"
@@ -35,6 +37,11 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
+
+type cacData struct {
+	UID       string           `json:"uid"`
+	EndDevice *ttnpb.EndDevice `json:"end-device"`
+}
 
 // NewJSRegistryCleaner returns a new instance of Join Server RegistryCleaner with a local set
 // of devices and applications.
@@ -197,6 +204,53 @@ var (
 			return recordSchemaVersion(keysCl, jsredis.SchemaVersion)
 		},
 	}
+	jsDBDUMPEndDeviceCACCommand = &cobra.Command{
+		Use:   "dump-ed-cac",
+		Short: "Dump Claim Authentication Codes of End Devices stored in the Join Server Registry",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if config.Redis.IsZero() {
+				panic("Redis should be configured for this command")
+			}
+			logger.Info("Connecting to Redis database...")
+			devicesCl := NewJoinServerDeviceRegistryRedis(*config)
+
+			var devsWithCAC uint64
+			var cac []cacData
+
+			defer func() {
+				logger.Debugf("Found %d devices with Claim Authentication Code", devsWithCAC)
+				_ = io.Write(os.Stdout, config.OutputFormat, cac)
+			}()
+
+			return ttnredis.RangeRedisKeys(
+				ctx,
+				devicesCl,
+				devicesCl.Key(ttnredis.Key("uid", "*")),
+				ttnredis.DefaultRangeCount,
+				func(k string) (bool, error) {
+					logger := logger.WithField("key", k)
+					dev := &ttnpb.EndDevice{}
+					if err := ttnredis.GetProto(ctx, devicesCl, k).ScanProto(dev); err != nil {
+						logger.WithError(err).Error("Failed to get device proto")
+						return false, err
+					}
+					if dev.ClaimAuthenticationCode != nil {
+						devsWithCAC++
+						s := strings.Split(k, ":")
+						uid := s[len(s)-1]
+						cac = append(cac, cacData{
+							UID: uid,
+							EndDevice: &ttnpb.EndDevice{
+								Ids:                     dev.Ids,
+								ClaimAuthenticationCode: dev.ClaimAuthenticationCode,
+							},
+						})
+					}
+					return true, nil
+				},
+			)
+		},
+	}
 	jsDBCleanupCommand = &cobra.Command{
 		Use:   "cleanup",
 		Short: "Clean stale Join Server application and device data",
@@ -270,6 +324,7 @@ func init() {
 	Root.AddCommand(jsDBCommand)
 	jsDBMigrateCommand.Flags().Bool("force", false, "Force perform database migrations")
 	jsDBCommand.AddCommand(jsDBMigrateCommand)
+	jsDBCommand.AddCommand(jsDBDUMPEndDeviceCACCommand)
 	jsDBCleanupCommand.Flags().Bool("dry-run", false, "Dry run")
 	jsDBCleanupCommand.Flags().Duration("pagination-delay", 100, "Delay between batch requests")
 	jsDBCommand.AddCommand(jsDBCleanupCommand)
