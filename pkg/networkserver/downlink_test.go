@@ -88,11 +88,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 	}
 
 	assertScheduleGateways := func(ctx context.Context, env TestEnvironment, fixedPaths bool, payload []byte, makeTxRequest func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest, resps ...NsGsScheduleDownlinkResponse) (*ttnpb.DownlinkMessage, bool) {
-		if len(resps) < 1 || len(resps) > 3 {
+		if len(resps) < 1 || len(resps) > 2 {
 			panic("invalid response count specified")
 		}
 
-		_, a := test.MustNewTFromContext(ctx)
+		t, a := test.MustNewTFromContext(ctx)
 
 		var downlinkPaths []DownlinkPath
 		if !fixedPaths {
@@ -135,14 +135,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 									return []*ttnpb.DownlinkPath{
 										downlinkPaths[1].DownlinkPath,
 										downlinkPaths[2].DownlinkPath,
+										downlinkPaths[4].DownlinkPath,
 									}
 								case 1:
 									return []*ttnpb.DownlinkPath{
 										downlinkPaths[3].DownlinkPath,
-									}
-								case 2:
-									return []*ttnpb.DownlinkPath{
-										downlinkPaths[4].DownlinkPath,
 									}
 								default:
 									panic("invalid response count")
@@ -204,7 +201,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 						attempt.With(events.WithData(down)).New(ctx, evIDOpt),
 					),
 					a.So(env.Events, should.ReceiveEventFunc, makeFailEventEqual(t),
-						fail.With(events.WithData(err)).New(ctx, evIDOpt)),
+						fail.With(events.WithData(err)).New(ctx, evIDOpt),
+					),
 				) {
 					return false
 				}
@@ -862,7 +860,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 					},
 					testErrScheduleResponse,
 					testErrScheduleResponse,
-					testErrScheduleResponse,
 				)
 				if !a.So(ok, should.BeTrue) {
 					t.Error("Scheduling assertion failed")
@@ -873,7 +870,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
 						append(lastUp.CorrelationIds, dev.Session.QueuedApplicationDownlinks[0].CorrelationIds...),
 					),
-					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 3),
+					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 2),
 				)
 			},
 			DeviceDiffs: []DeviceDiffFunc{
@@ -1012,7 +1009,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}
 					},
 					testErrScheduleResponse,
-					testErrScheduleResponse,
 					oneSecondScheduleResponse,
 				)
 				if !a.So(ok, should.BeTrue) {
@@ -1023,7 +1019,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
 						append(lastUp.CorrelationIds, dev.Session.QueuedApplicationDownlinks[0].CorrelationIds...),
 					),
-					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 2),
+					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 1),
 					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.Ids, oneSecondScheduleResponse.Response,
 						mac.EvtEnqueueDevStatusRequest,
 					),
@@ -1167,7 +1163,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}
 					},
 					testErrScheduleResponse,
-					testErrScheduleResponse,
 					oneSecondScheduleResponse,
 				)
 				if !a.So(ok, should.BeTrue) {
@@ -1178,7 +1173,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
 						lastUp.CorrelationIds,
 					),
-					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 2),
+					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 1),
 					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.Ids, oneSecondScheduleResponse.Response,
 						mac.EvtEnqueueDevStatusRequest,
 					),
@@ -1326,7 +1321,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}
 					},
 					testErrScheduleResponse,
-					testErrScheduleResponse,
 					oneSecondScheduleResponse,
 				)
 				if !a.So(ok, should.BeTrue) {
@@ -1337,7 +1331,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
 						append(lastUp.CorrelationIds, dev.Session.QueuedApplicationDownlinks[0].CorrelationIds...),
 					),
-					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 2),
+					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 1),
 					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.Ids, oneSecondScheduleResponse.Response,
 						mac.EvtEnqueueDevStatusRequest,
 					),
@@ -1634,7 +1628,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}
 					},
 					testErrScheduleResponse,
-					testErrScheduleResponse,
 					oneSecondScheduleResponse,
 				)
 				if !a.So(ok, should.BeTrue) {
@@ -1645,7 +1638,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
 						append(lastUp.CorrelationIds, dev.Session.QueuedApplicationDownlinks[0].CorrelationIds...),
 					),
-					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 2),
+					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 1),
 					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.Ids, oneSecondScheduleResponse.Response,
 						mac.EvtEnqueueDevStatusRequest,
 					),
@@ -1777,7 +1770,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}
 					},
 					testErrScheduleResponse,
-					testErrScheduleResponse,
 					oneSecondScheduleResponse,
 				)
 				if !a.So(ok, should.BeTrue) {
@@ -1788,7 +1780,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
 						dev.Session.QueuedApplicationDownlinks[0].CorrelationIds,
 					),
-					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 2),
+					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 1),
 					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.Ids, oneSecondScheduleResponse.Response),
 				)
 			},
@@ -1917,7 +1909,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}
 					},
 					testErrScheduleResponse,
-					testErrScheduleResponse,
 					oneSecondScheduleResponse,
 				)
 				if !a.So(ok, should.BeTrue) {
@@ -1928,7 +1919,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
 						dev.Session.QueuedApplicationDownlinks[0].CorrelationIds,
 					),
-					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 2),
+					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 1),
 					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.Ids, oneSecondScheduleResponse.Response),
 				)
 			},
@@ -2061,13 +2052,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 							},
 						}),
 					},
-					NsGsScheduleDownlinkResponse{
-						Error: testErr.WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
-							PathErrors: []*ttnpb.ErrorDetails{
-								ttnpb.ErrorDetailsToProto(errors.DefineResourceExhausted(ulid.MustNew(0, rand.Reader).String(), "resource exhausted")),
-							},
-						}),
-					},
 				)
 				if !a.So(ok, should.BeTrue) {
 					t.Error("Scheduling assertion failed")
@@ -2077,7 +2061,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
 						dev.Session.QueuedApplicationDownlinks[0].CorrelationIds,
 					),
-					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 3),
+					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 2),
 				)
 			},
 			DeviceDiffs: []DeviceDiffFunc{
@@ -2220,13 +2204,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 							},
 						}),
 					},
-					NsGsScheduleDownlinkResponse{
-						Error: testErr.WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
-							PathErrors: []*ttnpb.ErrorDetails{
-								ttnpb.ErrorDetailsToProto(errors.DefineResourceExhausted(ulid.MustNew(0, rand.Reader).String(), "resource exhausted")),
-							},
-						}),
-					},
 				)
 				if !a.So(ok, should.BeTrue) {
 					t.Error("Scheduling assertion failed")
@@ -2236,7 +2213,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
 						dev.Session.QueuedApplicationDownlinks[0].CorrelationIds,
 					),
-					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 3),
+					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 2),
 				)
 			},
 		},
@@ -2468,7 +2445,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}
 					},
 					testErrScheduleResponse,
-					testErrScheduleResponse,
 					oneSecondScheduleResponse,
 				)
 				if !a.So(ok, should.BeTrue) {
@@ -2479,7 +2455,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
 						lastUp.CorrelationIds,
 					),
-					assertReceiveScheduleJoinFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 2),
+					assertReceiveScheduleJoinFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 1),
 					assertReceiveScheduleJoinSuccessAttemptEvents(ctx, env, lastDown, dev.Ids, oneSecondScheduleResponse.Response),
 				)
 			},

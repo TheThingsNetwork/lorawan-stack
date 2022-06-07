@@ -638,6 +638,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 type downlinkPath struct {
 	*ttnpb.GatewayIdentifiers
 	*ttnpb.DownlinkPath
+	GroupIndex uint32
 }
 
 func computeWantedRSSI(snr float32, channelRSSI float32) float32 {
@@ -851,11 +852,11 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *sched
 	logger := log.FromContext(ctx)
 
 	type attempt struct {
-		downlinkTarget
-		paths []*ttnpb.DownlinkPath
+		target     downlinkTarget
+		groupIndex uint32
+		paths      []*ttnpb.DownlinkPath
 	}
 
-	queuedEvents := make([]events.Event, 0, len(paths))
 	attempts := make([]*attempt, 0, len(paths))
 	for _, path := range paths {
 		var target downlinkTarget
@@ -881,14 +882,16 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *sched
 		}
 
 		var a *attempt
-		if len(attempts) > 0 {
-			if last := attempts[len(attempts)-1]; last.Equal(target) {
-				a = last
+		for _, attempt := range attempts {
+			if attempt.target.Equal(target) && attempt.groupIndex == path.GroupIndex {
+				a = attempt
+				break
 			}
 		}
 		if a == nil {
 			a = &attempt{
-				downlinkTarget: target,
+				target:     target,
+				groupIndex: path.GroupIndex,
 			}
 			attempts = append(attempts, a)
 		}
@@ -927,9 +930,17 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *sched
 		panic(fmt.Sprintf("attempt to schedule downlink with invalid MType '%s'", req.Payload.MHdr.MType))
 	}
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("ns:downlink:%s", events.NewCorrelationID()))
-	errs := make([]error, 0, len(attempts))
-	eventIDOpt := events.WithIdentifiers(req.EndDeviceIdentifiers)
+	var (
+		errs                  = make([]error, 0, len(attempts))
+		eventIDOpt            = events.WithIdentifiers(req.EndDeviceIdentifiers)
+		groupDone             = make(map[uint32]struct{}, len(attempts))
+		lastScheduledDownlink = (*scheduledDownlink)(nil)
+		queuedEvents          = make([]events.Event, 0, len(paths)+len(req.DownlinkEvents))
+	)
 	for _, a := range attempts {
+		if _, done := groupDone[a.groupIndex]; done {
+			continue
+		}
 		req.TxRequest.DownlinkPaths = a.paths
 		down := &ttnpb.DownlinkMessage{
 			RawPayload: req.RawPayload,
@@ -942,7 +953,7 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *sched
 		queuedEvents = append(queuedEvents, attemptEvent.New(ctx, eventIDOpt, events.WithData(down)))
 		registerAttempt(ctx)
 		logger.WithField("path_count", len(req.DownlinkPaths)).Debug("Schedule downlink")
-		delay, err := a.Schedule(ctx, &ttnpb.DownlinkMessage{
+		delay, err := a.target.Schedule(ctx, &ttnpb.DownlinkMessage{
 			RawPayload:     down.RawPayload,
 			Settings:       down.Settings,
 			CorrelationIds: down.CorrelationIds,
@@ -967,18 +978,23 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *sched
 			"transmit_at", transmitAt,
 			"absolute_time", ttnpb.StdTime(req.TxRequest.AbsoluteTime),
 		)).Debug("Scheduled downlink")
-		queuedEvents = append(queuedEvents, events.Builders(append([]events.Builder{
-			successEvent.With(
-				events.WithData(&ttnpb.ScheduleDownlinkResponse{
-					Delay: ttnpb.ProtoDurationPtr(delay),
-				}),
-			),
-		}, []events.Builder(req.DownlinkEvents)...)).New(ctx, eventIDOpt)...)
+		queuedEvents = append(queuedEvents, successEvent.With(
+			events.WithData(&ttnpb.ScheduleDownlinkResponse{
+				Delay: ttnpb.ProtoDurationPtr(delay),
+			}),
+		).New(ctx, eventIDOpt))
 		registerSuccess(ctx)
-		return &scheduledDownlink{
+		groupDone[a.groupIndex] = struct{}{}
+		if lastScheduledDownlink != nil && lastScheduledDownlink.TransmitAt.Sub(transmitAt) > 0 {
+			continue
+		}
+		lastScheduledDownlink = &scheduledDownlink{
 			Message:    down,
 			TransmitAt: transmitAt,
-		}, queuedEvents, nil
+		}
+	}
+	if lastScheduledDownlink != nil {
+		return lastScheduledDownlink, append(queuedEvents, req.DownlinkEvents.New(ctx, eventIDOpt)...), nil
 	}
 	return nil, queuedEvents, downlinkSchedulingError(errs)
 }
@@ -1427,17 +1443,18 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 	var paths []downlinkPath
 	if fixedPaths := genState.ApplicationDownlink.GetClassBC().GetGateways(); len(fixedPaths) > 0 {
 		paths = make([]downlinkPath, 0, len(fixedPaths))
-		for i := range fixedPaths {
+		for _, fixedPath := range fixedPaths {
 			paths = append(paths, downlinkPath{
-				GatewayIdentifiers: fixedPaths[i].GatewayIds,
+				GatewayIdentifiers: fixedPath.GatewayIds,
 				DownlinkPath: &ttnpb.DownlinkPath{
 					Path: &ttnpb.DownlinkPath_Fixed{
 						Fixed: &ttnpb.GatewayAntennaIdentifiers{
-							GatewayIds:   fixedPaths[i].GatewayIds,
-							AntennaIndex: fixedPaths[i].AntennaIndex,
+							GatewayIds:   fixedPath.GatewayIds,
+							AntennaIndex: fixedPath.AntennaIndex,
 						},
 					},
 				},
+				GroupIndex: fixedPath.GroupIndex,
 			})
 		}
 	} else {
@@ -1445,7 +1462,10 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 		if len(paths) == 0 {
 			log.FromContext(ctx).Error("No downlink path available, skip class B/C downlink slot")
 			if genState.ApplicationDownlink != nil && ttnpb.HasAnyField(sets, "session.queued_application_downlinks") {
-				dev.Session.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.Session.QueuedApplicationDownlinks...)
+				dev.Session.QueuedApplicationDownlinks = append(
+					[]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink},
+					dev.Session.QueuedApplicationDownlinks...,
+				)
 			}
 			return downlinkAttemptResult{
 				DownlinkTaskUpdateStrategy: noDownlinkTask,
