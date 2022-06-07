@@ -107,7 +107,7 @@
     "react-display-name": "^0.2.5",
     "react-dom": "^17.0.1",
     "react-focus-lock": "^2.8.1",
-    "react-grid-system": "^7.1.1",
+    "react-grid-system": "^8.1.5",
     "react-helmet": "^6.1.0",
     "react-intl": "^5.20.12",
     "react-leaflet": ">=3.1.0 <3.2.0",
