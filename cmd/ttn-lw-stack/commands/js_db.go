@@ -18,8 +18,8 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
-	"os"
 	"regexp"
 	"sort"
 	"strings"
@@ -27,7 +27,6 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	"github.com/spf13/cobra"
-	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/v3/pkg/cleanup"
 	js "go.thethings.network/lorawan-stack/v3/pkg/joinserver"
@@ -38,7 +37,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
-type cacData struct {
+// EndDeviceCACData is the Claim Authentication Code Data for End Devices.
+type EndDeviceCACData struct {
 	UID       string           `json:"uid"`
 	EndDevice *ttnpb.EndDevice `json:"end-device"`
 }
@@ -215,11 +215,15 @@ var (
 			devicesCl := NewJoinServerDeviceRegistryRedis(*config)
 
 			var devsWithCAC uint64
-			var cac []cacData
+			var cac []EndDeviceCACData
 
 			defer func() {
 				logger.Debugf("Found %d devices with Claim Authentication Code", devsWithCAC)
-				_ = io.Write(os.Stdout, config.OutputFormat, cac)
+				v, err := json.Marshal(cac)
+				if err != nil {
+					logger.WithError(err).Error("Failed to marshal Claim Authentication Codes")
+				}
+				fmt.Println(string(v))
 			}()
 
 			return ttnredis.RangeRedisKeys(
@@ -238,7 +242,7 @@ var (
 						devsWithCAC++
 						s := strings.Split(k, ":")
 						uid := s[len(s)-1]
-						cac = append(cac, cacData{
+						cac = append(cac, EndDeviceCACData{
 							UID: uid,
 							EndDevice: &ttnpb.EndDevice{
 								Ids:                     dev.Ids,

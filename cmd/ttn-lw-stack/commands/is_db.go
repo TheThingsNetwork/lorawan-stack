@@ -15,8 +15,8 @@
 package commands
 
 import (
+	"encoding/json"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -27,7 +27,6 @@ import (
 	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	ismigrations "go.thethings.network/lorawan-stack/v3/pkg/identityserver/store/migrations"
-	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	ttntypes "go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -372,12 +371,22 @@ var (
 			}
 			defer isDB.Close()
 
-			logger.Info("Connecting to Redis database...")
-			devicesCl := NewJoinServerDeviceRegistryRedis(*config)
+			cacDump, err := cmd.Flags().GetString("cac-dump")
+			if err != nil {
+				return err
+			}
 
-			var devsWithCAC uint64
+			var (
+				devsWithCAC uint64
+				cacData     []EndDeviceCACData
+			)
+			err = json.Unmarshal([]byte(cacDump), &cacData)
+			if err != nil {
+				return err
+			}
+
 			defer func() {
-				logger.Debugf("Claim Authentication Code of %d devices imported into the Identity Server", devsWithCAC)
+				logger.Debugf("Imported %d devices with Claim Authentication Code", devsWithCAC)
 			}()
 
 			ignoreNotFound, err := cmd.Flags().GetBool("ignore-not-found")
@@ -385,38 +394,23 @@ var (
 				return err
 			}
 
-			return ttnredis.RangeRedisKeys(
-				ctx,
-				devicesCl,
-				devicesCl.Key(ttnredis.Key("uid", "*")),
-				ttnredis.DefaultRangeCount,
-				func(k string) (bool, error) {
-					logger := logger.WithField("key", k)
-					dev := &ttnpb.EndDevice{}
-					if err := ttnredis.GetProto(ctx, devicesCl, k).ScanProto(dev); err != nil {
-						logger.WithError(err).Error("Failed to get device proto")
-						return false, err
+			for _, cac := range cacData {
+				devsWithCAC++
+				ctx, err = unique.WithContext(ctx, cac.UID)
+				if err != nil {
+					return err
+				}
+				_, err := gormstore.GetEndDeviceStore(isDB).UpdateEndDevice(
+					ctx, cac.EndDevice, []string{"claim_authentication_code"},
+				)
+				if err != nil {
+					if errors.IsNotFound(err) && ignoreNotFound {
+						continue
 					}
-					if dev.ClaimAuthenticationCode != nil {
-						devsWithCAC++
-						// Update the CAC in the IS database.
-						s := strings.Split(k, ":")
-						uid := s[len(s)-1]
-						ctx, err = unique.WithContext(ctx, uid)
-						if err != nil {
-							return false, nil
-						}
-						_, err := gormstore.GetEndDeviceStore(isDB).UpdateEndDevice(ctx, dev, []string{"claim_authentication_code"})
-						if err != nil {
-							if errors.IsNotFound(err) && ignoreNotFound {
-								return true, nil
-							}
-							return false, err
-						}
-					}
-					return true, nil
-				},
-			)
+					return err
+				}
+			}
+			return nil
 		},
 	}
 )
@@ -429,6 +423,8 @@ func init() {
 	isDBCleanupCommand.Flags().Bool("dry-run", false, "Dry run")
 	isDBCommand.AddCommand(isDBCleanupCommand)
 	isDBImportEndDeviceCACCommand.Flags().Bool("ignore-not-found", false, "Ignore devices if not found in the IS")
+	isDBImportEndDeviceCACCommand.Flags().String("cac-dump", "",
+		"Claim Authentication Code Data dump from the js-db dump-ed-cac command")
 	isDBCommand.AddCommand(isDBImportEndDeviceCACCommand)
 	isDBEUIBlockCreationCommand.Flags().Bool("use-config", false, "Create block using values from config")
 	isDBEUIBlockCreationCommand.Flags().String("eui-type", "dev_eui", "EUI block type")
