@@ -202,7 +202,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 		log.FromContext(ctx).WithError(err).Warn("Failed to get frequency plans store")
 		return nil, false, nil
 	}
-	phy, err := DeviceBand(dev, fps)
+	fp, phy, err := DeviceFrequencyPlanAndBand(dev, fps)
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to get device's versioned band")
 		return nil, false, nil
@@ -391,8 +391,9 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 		return nil, false, nil
 	}
 
-	// NOTE: We assume no dwell time if current value unknown.
-	if macspec.IgnoreUplinksExceedingLengthLimit(dev.MacState.LorawanVersion) && len(up.RawPayload)-5 > int(dr.MaxMACPayloadSize(dev.MacState.CurrentParameters.UplinkDwellTime.GetValue())) {
+	maxMACPayloadSize := dr.MaxMACPayloadSize(mac.DeviceExpectedUplinkDwellTime(dev.MacState, fp, phy))
+	if macspec.IgnoreUplinksExceedingLengthLimit(dev.MacState.LorawanVersion) &&
+		len(up.RawPayload)-5 > int(maxMACPayloadSize) {
 		log.FromContext(ctx).Debug("Uplink length exceeds maximum")
 		return nil, false, nil
 	}
