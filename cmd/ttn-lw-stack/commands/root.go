@@ -48,7 +48,7 @@ var (
 	versionUpdate       chan pkgversion.Update
 	versionCheckTimeout = 500 * time.Millisecond
 
-	// Root command is the entrypoint of the program
+	// Root command is the entrypoint of the program.
 	Root = &cobra.Command{
 		Use:           name,
 		SilenceErrors: true,

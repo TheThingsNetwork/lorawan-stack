@@ -54,31 +54,31 @@ import (
 
 const defaultLockTTL = 10 * time.Second
 
-func NewComponentDeviceRegistryRedis(conf Config, name string) *redis.Client {
+func NewComponentDeviceRegistryRedis(conf *Config, name string) *redis.Client {
 	return redis.New(conf.Redis.WithNamespace(name, "devices"))
 }
 
-func NewNetworkServerDeviceRegistryRedis(conf Config) *redis.Client {
+func NewNetworkServerDeviceRegistryRedis(conf *Config) *redis.Client {
 	return NewComponentDeviceRegistryRedis(conf, "ns")
 }
 
-func NewNetworkServerApplicationUplinkQueueRedis(conf Config) *redis.Client {
+func NewNetworkServerApplicationUplinkQueueRedis(conf *Config) *redis.Client {
 	return redis.New(conf.Redis.WithNamespace("ns", "application-uplinks"))
 }
 
-func NewNetworkServerDownlinkTaskRedis(conf Config) *redis.Client {
+func NewNetworkServerDownlinkTaskRedis(conf *Config) *redis.Client {
 	return redis.New(conf.Redis.WithNamespace("ns", "tasks"))
 }
 
-func NewApplicationServerDeviceRegistryRedis(conf Config) *redis.Client {
+func NewApplicationServerDeviceRegistryRedis(conf *Config) *redis.Client {
 	return NewComponentDeviceRegistryRedis(conf, "as")
 }
 
-func NewJoinServerDeviceRegistryRedis(conf Config) *redis.Client {
+func NewJoinServerDeviceRegistryRedis(conf *Config) *redis.Client {
 	return NewComponentDeviceRegistryRedis(conf, "js")
 }
 
-func NewJoinServerSessionKeyRegistryRedis(conf Config) *redis.Client {
+func NewJoinServerSessionKeyRegistryRedis(conf *Config) *redis.Client {
 	return redis.New(conf.Redis.WithNamespace("js", "keys"))
 }
 
@@ -251,7 +251,7 @@ var startCommand = &cobra.Command{
 				applicationUplinkQueueSize = math.MaxInt64
 			}
 			applicationUplinkQueue := nsredis.NewApplicationUplinkQueue(
-				NewNetworkServerApplicationUplinkQueueRedis(*config),
+				NewNetworkServerApplicationUplinkQueueRedis(config),
 				int64(applicationUplinkQueueSize), redisConsumerGroup, time.Minute,
 			)
 			if err := applicationUplinkQueue.Init(ctx); err != nil {
@@ -260,7 +260,7 @@ var startCommand = &cobra.Command{
 			defer applicationUplinkQueue.Close(ctx)
 			config.NS.ApplicationUplinkQueue.Queue = applicationUplinkQueue
 			devices := &nsredis.DeviceRegistry{
-				Redis:   NewNetworkServerDeviceRegistryRedis(*config),
+				Redis:   NewNetworkServerDeviceRegistryRedis(config),
 				LockTTL: defaultLockTTL,
 			}
 			if err := devices.Init(ctx); err != nil {
@@ -271,7 +271,7 @@ var startCommand = &cobra.Command{
 				Redis: redis.New(config.Cache.Redis.WithNamespace("ns", "uplink-deduplication")),
 			}
 			downlinkTasks := nsredis.NewDownlinkTaskQueue(
-				NewNetworkServerDownlinkTaskRedis(*config),
+				NewNetworkServerDownlinkTaskRedis(config),
 				100000, redisConsumerGroup,
 			)
 			if err := downlinkTasks.Init(ctx); err != nil {
@@ -300,7 +300,7 @@ var startCommand = &cobra.Command{
 			}
 			config.AS.Links = linkRegistry
 			deviceRegistry := &asredis.DeviceRegistry{
-				Redis:   NewApplicationServerDeviceRegistryRedis(*config),
+				Redis:   NewApplicationServerDeviceRegistryRedis(config),
 				LockTTL: defaultLockTTL,
 			}
 			if err := deviceRegistry.Init(ctx); err != nil {
@@ -365,7 +365,7 @@ var startCommand = &cobra.Command{
 		if start.JoinServer {
 			logger.Info("Setting up Join Server")
 			deviceRegistry := &jsredis.DeviceRegistry{
-				Redis:   NewJoinServerDeviceRegistryRedis(*config),
+				Redis:   NewJoinServerDeviceRegistryRedis(config),
 				LockTTL: defaultLockTTL,
 			}
 			if err := deviceRegistry.Init(ctx); err != nil {
@@ -373,7 +373,7 @@ var startCommand = &cobra.Command{
 			}
 			config.JS.Devices = deviceRegistry
 			keyRegistry := &jsredis.KeyRegistry{
-				Redis:   NewJoinServerSessionKeyRegistryRedis(*config),
+				Redis:   NewJoinServerSessionKeyRegistryRedis(config),
 				LockTTL: defaultLockTTL,
 				Limit:   config.JS.SessionKeyLimit,
 			}
