@@ -66,9 +66,7 @@ const getUserInvitationsLogic = createRequestLogic({
     } = action.payload
     const { selectors } = action.meta
 
-    const data = await tts.Users.getAllInvitations({ page, limit }, selectors)
-
-    return data
+    return await tts.Users.getAllInvitations({ page, limit }, selectors)
   },
 })
 
