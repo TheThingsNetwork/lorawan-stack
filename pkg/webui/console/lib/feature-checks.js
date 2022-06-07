@@ -56,6 +56,10 @@ export const mayViewOrEditApiKeys = {
   rightsSelector: selectUserRights,
   check: rights => rights.includes('RIGHT_USER_SETTINGS_API_KEYS'),
 }
+export const maySendInvites = {
+  rightsSelector: selectUserRights,
+  check: rights => rights.includes('RIGHT_SEND_INVITES'),
+}
 
 // Application related feature checks.
 export const mayViewApplicationInfo = {
