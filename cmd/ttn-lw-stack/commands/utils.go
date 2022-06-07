@@ -32,7 +32,12 @@ const defaultPaginationLimit = 1000
 // NewClusterComponentConnection connects returns a new cluster instance and a connection to a specified peer.
 // The connection to a cluster peer is retried specified number of times before returning an error in case
 // of connection not being ready.
-func NewClusterComponentConnection(ctx context.Context, config Config, delay time.Duration, maxRetries int, role ttnpb.ClusterRole) (*grpc.ClientConn, cluster.Cluster, error) {
+func NewClusterComponentConnection(ctx context.Context,
+	config *Config,
+	delay time.Duration,
+	maxRetries int,
+	role ttnpb.ClusterRole,
+) (*grpc.ClientConn, cluster.Cluster, error) {
 	clusterOpts := []cluster.Option{}
 	if config.Cluster.TLS {
 		tlsConf := config.TLS

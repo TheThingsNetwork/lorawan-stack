@@ -78,8 +78,8 @@ var (
 			}
 
 			logger.Info("Connecting to Redis database...")
-			devicesCl := NewJoinServerDeviceRegistryRedis(*config)
-			keysCl := NewJoinServerSessionKeyRegistryRedis(*config)
+			devicesCl := NewJoinServerDeviceRegistryRedis(config)
+			keysCl := NewJoinServerSessionKeyRegistryRedis(config)
 
 			schemaVersion, err := getSchemaVersion(keysCl)
 			if err != nil {
@@ -209,7 +209,7 @@ var (
 			// Define retry delay for obtaining cluster peer connection.
 			retryDelay := time.Duration(500) * time.Millisecond
 			// Create cluster and grpc connection with identity server.
-			conn, cl, err := NewClusterComponentConnection(ctx, *config, retryDelay, 5, ttnpb.ClusterRole_ENTITY_REGISTRY)
+			conn, cl, err := NewClusterComponentConnection(ctx, config, retryDelay, 5, ttnpb.ClusterRole_ENTITY_REGISTRY)
 			if err != nil {
 				return err
 			}

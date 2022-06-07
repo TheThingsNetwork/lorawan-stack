@@ -43,7 +43,7 @@ var (
 			}
 
 			logger.Info("Connecting to Redis database...")
-			cl := NewNetworkServerApplicationUplinkQueueRedis(*config)
+			cl := NewNetworkServerApplicationUplinkQueueRedis(config)
 			var deleted uint64
 			defer func() { logger.Debugf("%d processed stream entries deleted", deleted) }()
 			return ttnredis.RangeRedisKeys(ctx, cl, nsredis.ApplicationUplinkQueueUIDGenericUplinkKey(cl, "*"), ttnredis.DefaultRangeCount, func(k string) (bool, error) {
@@ -93,7 +93,7 @@ var (
 			}
 
 			logger.Info("Connecting to Redis database...")
-			cl := NewNetworkServerDeviceRegistryRedis(*config)
+			cl := NewNetworkServerDeviceRegistryRedis(config)
 
 			if force, _ := cmd.Flags().GetBool("force"); !force {
 				schemaVersion, err := getSchemaVersion(cl)
@@ -477,7 +477,7 @@ var (
 			// Define retry delay for obtaining cluster peer connection.
 			retryDelay := time.Duration(500) * time.Millisecond
 			// Create cluster and grpc connection with identity server.
-			conn, cl, err := NewClusterComponentConnection(ctx, *config, retryDelay, 5, ttnpb.ClusterRole_ENTITY_REGISTRY)
+			conn, cl, err := NewClusterComponentConnection(ctx, config, retryDelay, 5, ttnpb.ClusterRole_ENTITY_REGISTRY)
 			if err != nil {
 				return err
 			}
