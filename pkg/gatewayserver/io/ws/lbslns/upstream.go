@@ -550,11 +550,11 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids *ttnpb.GatewayIde
 			antennaGain = int(antennas[0].Gain)
 		}
 		ctx, msg, stat, err := f.GetRouterConfig(ctx, raw, conn.BandID(), conn.FrequencyPlans(), antennaGain, receivedAt)
-		logger = log.FromContext(ctx)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to generate router configuration")
 			return nil, err
 		}
+		logger = log.FromContext(ctx)
 		if err := conn.HandleStatus(stat); err != nil {
 			logger.WithError(err).Warn("Failed to handle status message")
 			return nil, err
