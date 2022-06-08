@@ -26,6 +26,14 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
+func mapSlice[X any, Y any](in []X, f func(X) Y) []Y {
+	out := make([]Y, len(in))
+	for i, x := range in {
+		out[i] = f(x)
+	}
+	return out
+}
+
 func equalTime(a, b *time.Time) bool {
 	if a == nil {
 		return b == nil
