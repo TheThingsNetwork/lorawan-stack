@@ -931,16 +931,25 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *sched
 	}
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("ns:downlink:%s", events.NewCorrelationID()))
 	var (
-		errs                  = make([]error, 0, len(attempts))
-		eventIDOpt            = events.WithIdentifiers(req.EndDeviceIdentifiers)
-		groupDone             = make(map[uint32]struct{}, len(attempts))
-		lastScheduledDownlink = (*scheduledDownlink)(nil)
-		queuedEvents          = make([]events.Event, 0, len(paths)+len(req.DownlinkEvents))
+		errs                    = make([]error, 0, len(attempts))
+		eventIDOpt              = events.WithIdentifiers(req.EndDeviceIdentifiers)
+		groupDone               = make(map[uint32]struct{}, len(attempts))
+		groupCorrelationID      = make(map[uint32]string, len(attempts))
+		latestScheduledDownlink = (*scheduledDownlink)(nil)
+		downlinkEvents          = ([]events.Event)(nil)
+		queuedEvents            = make([]events.Event, 0, len(paths)+len(req.DownlinkEvents))
 	)
 	for _, a := range attempts {
+		// Skip groups which had a successful transmission.
 		if _, done := groupDone[a.groupIndex]; done {
 			continue
 		}
+		// Each individual transmission (which maps one to one with a group) should have an individual
+		// correlation ID in order to be matchable with a transmission acknowledgement.
+		if _, ok := groupCorrelationID[a.groupIndex]; !ok {
+			groupCorrelationID[a.groupIndex] = fmt.Sprintf("ns:transmission:%s", events.NewCorrelationID())
+		}
+		ctx := events.ContextWithCorrelationID(ctx, groupCorrelationID[a.groupIndex])
 		req.TxRequest.DownlinkPaths = a.paths
 		down := &ttnpb.DownlinkMessage{
 			RawPayload: req.RawPayload,
@@ -984,17 +993,25 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *sched
 			}),
 		).New(ctx, eventIDOpt))
 		registerSuccess(ctx)
+		// Mark the group as having a successful transmission, in order to avoid
+		// subsequent re-attempts.
 		groupDone[a.groupIndex] = struct{}{}
-		if lastScheduledDownlink != nil && lastScheduledDownlink.TransmitAt.Sub(transmitAt) > 0 {
+		// Report to the upper layer only the latest (chronological) transmission
+		// for book keeping purposes (such as transmission times).
+		if latestScheduledDownlink != nil && latestScheduledDownlink.TransmitAt.Sub(transmitAt) > 0 {
 			continue
 		}
-		lastScheduledDownlink = &scheduledDownlink{
+		latestScheduledDownlink = &scheduledDownlink{
 			Message:    down,
 			TransmitAt: transmitAt,
 		}
+		downlinkEvents = req.DownlinkEvents.New(ctx, eventIDOpt)
 	}
-	if lastScheduledDownlink != nil {
-		return lastScheduledDownlink, append(queuedEvents, req.DownlinkEvents.New(ctx, eventIDOpt)...), nil
+	// NOTE: A singular successful scheduling attempt will render the downlink as a whole as
+	// being successfully transmitted, even if certain groups did not have a successful scheduling
+	// attempt.
+	if latestScheduledDownlink != nil {
+		return latestScheduledDownlink, append(queuedEvents, downlinkEvents...), nil
 	}
 	return nil, queuedEvents, downlinkSchedulingError(errs)
 }

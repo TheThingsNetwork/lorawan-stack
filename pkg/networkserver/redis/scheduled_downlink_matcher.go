@@ -38,9 +38,9 @@ func (m *ScheduledDownlinkMatcher) cidToKey(cid string) string {
 	return m.Redis.Key("cid", cid)
 }
 
-var parseDownlinkIDRegex = regexp.MustCompile(`^ns:downlink:([0-9a-zA-Z]+)$`)
+var parseDownlinkIDRegex = regexp.MustCompile(`^ns:transmission:([0-9a-zA-Z]+)$`)
 
-// parseDownlinkCorrelationID matches the ns:downlink:XXXXXXX correlation ID.
+// parseDownlinkCorrelationID matches the ns:transmission:XXXXXXX correlation ID.
 func parseDownlinkCorrelationID(cids []string) (string, bool) {
 	for _, cid := range cids {
 		matches := parseDownlinkIDRegex.FindStringSubmatch(cid)
