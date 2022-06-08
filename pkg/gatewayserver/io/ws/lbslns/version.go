@@ -67,7 +67,7 @@ func (v Version) IsProduction() bool {
 func (f *lbsLNS) GetRouterConfig(ctx context.Context, msg []byte, bandID string, fps map[string]*frequencyplans.FrequencyPlan, antennaGain int, receivedAt time.Time) (context.Context, []byte, *ttnpb.GatewayStatus, error) {
 	var version Version
 	if err := json.Unmarshal(msg, &version); err != nil {
-		return nil, nil, nil, err
+		return ctx, nil, nil, err
 	}
 	// We attempt to transfer time to all gateways by default.
 	// In the future, we should disable time transfers permanently
@@ -76,7 +76,7 @@ func (f *lbsLNS) GetRouterConfig(ctx context.Context, msg []byte, bandID string,
 	updateSessionTimeSync(ctx, true)
 	cfg, err := pfconfig.GetRouterConfig(bandID, fps, version.IsProduction(), time.Now(), antennaGain)
 	if err != nil {
-		return nil, nil, nil, err
+		return ctx, nil, nil, err
 	}
 	// The SX1301 configuration object should not specify a bandwidth field for the FSK channel.
 	// See https://doc.sm.tc/station/tcproto.html#router-config-message under the SX1301CONF section.
@@ -87,7 +87,7 @@ func (f *lbsLNS) GetRouterConfig(ctx context.Context, msg []byte, bandID string,
 	}
 	routerCfg, err := cfg.MarshalJSON()
 	if err != nil {
-		return nil, nil, nil, err
+		return ctx, nil, nil, err
 	}
 	// TODO: Revisit these fields for v3 events (https://github.com/TheThingsNetwork/lorawan-stack/issues/2629)
 	stat := &ttnpb.GatewayStatus{
