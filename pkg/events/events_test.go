@@ -37,7 +37,7 @@ func TestNew(t *testing.T) {
 	a := assertions.New(t)
 	ctx := events.ContextWithCorrelationID(test.Context(), t.Name())
 	evt := events.New(ctx, "test.evt", "test event", events.WithAuthFromContext())
-	a.So(evt.CorrelationIDs(), should.Resemble, []string{"TestNew"})
+	a.So(evt.CorrelationIds(), should.Resemble, []string{"TestNew"})
 	a.So(evt.Visibility().GetRights(), should.Contain, ttnpb.Right_RIGHT_ALL)
 	a.So(evt.AuthType(), should.Equal, "")
 	a.So(evt.AuthTokenType(), should.Equal, "")

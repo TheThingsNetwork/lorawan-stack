@@ -25,6 +25,7 @@ import (
 type correlationKey struct{}
 
 // ContextWithCorrelationID returns a derived context with the correlation IDs if they were not already in there.
+// NOTE: This function assumes that the provided correlation IDs do not contain any duplicates.
 func ContextWithCorrelationID(ctx context.Context, cids ...string) context.Context {
 	cids = append(cids[:0:0], cids...)
 	sort.Strings(cids)

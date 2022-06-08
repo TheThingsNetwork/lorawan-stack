@@ -67,7 +67,7 @@ func (ps *PubSubStore) storeEvent(ctx context.Context, tx redis.Cmdable, evt eve
 		return err
 	}
 	tx.Set(ctx, ps.eventDataKey(evt.Context(), evt.UniqueID()), b, ps.historyTTL)
-	for _, cid := range evt.CorrelationIDs() {
+	for _, cid := range evt.CorrelationIds() {
 		key := ps.eventIndexKey(evt.Context(), cid)
 		tx.LPush(ctx, key, evt.UniqueID())
 		tx.LTrim(ctx, key, 0, int64(ps.correlationIDHistoryCount))

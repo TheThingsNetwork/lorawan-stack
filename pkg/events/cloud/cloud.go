@@ -169,7 +169,7 @@ func (ps *PubSub) getMetadata(evt events.Event) map[string]string {
 	md := make(map[string]string, len(ids)+3)
 	md["content-type"] = ps.contentType
 	md["event"] = evt.Name()
-	md["correlation_ids"] = strings.Join(evt.CorrelationIDs(), ",")
+	md["correlation_ids"] = strings.Join(evt.CorrelationIds(), ",")
 	for k, v := range ids {
 		md[k] = strings.Join(v, ",")
 	}
