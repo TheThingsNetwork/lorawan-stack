@@ -113,11 +113,11 @@ func (ps *PubSubStore) LoadEvent(ctx context.Context, uid string) (*ttnpb.Event,
 	if err != nil {
 		return nil, ttnredis.ConvertError(err)
 	}
-	var evtPB ttnpb.Event
-	if err = decodeEventData(data, &evtPB); err != nil {
+	evtPB := &ttnpb.Event{}
+	if err = decodeEventData(data, evtPB); err != nil {
 		return nil, err
 	}
-	return &evtPB, nil
+	return evtPB, nil
 }
 
 func xMessageHasEventName(names ...string) func(msg redis.XMessage) bool {

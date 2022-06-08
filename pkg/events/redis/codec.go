@@ -47,8 +47,11 @@ func decodeEventData(enc string, evt *ttnpb.Event) error {
 	if err != nil {
 		return err
 	}
-	// NOTE: We're merging additional event data into an event that may already contain fields.
-	return proto.UnmarshalMerge(bpb, evt)
+	// NOTE: We override the contents of `evt` with the contents `enc` explicitly.
+	// proto.UnmarshalMerge has append semantics for slices, and as such identifiers
+	// and event visibility will be duplicated, as `evt` most likely contains them
+	// from the sparse event representation.
+	return proto.Unmarshal(bpb, evt)
 }
 
 const (
