@@ -48,7 +48,7 @@ func TestScheduledDownlinkMatcher(t *testing.T) {
 				Class: ttnpb.Class_CLASS_A,
 			},
 		},
-		CorrelationIds: []string{"corr1", "corr2", "ns:downlink:CORRELATIONID"},
+		CorrelationIds: []string{"corr1", "corr2", "ns:transmission:CORRELATIONID"},
 	}
 
 	ack := &ttnpb.TxAcknowledgment{
@@ -66,7 +66,7 @@ func TestScheduledDownlinkMatcher(t *testing.T) {
 					},
 				},
 			},
-			CorrelationIds: []string{"corr1", "corr2", "ns:downlink:CORRELATIONID"},
+			CorrelationIds: []string{"corr1", "corr2", "ns:transmission:CORRELATIONID"},
 		},
 	}
 
@@ -84,7 +84,7 @@ func TestScheduledDownlinkMatcher(t *testing.T) {
 		a, ctx := test.New(t)
 		down, err := m.Match(ctx, &ttnpb.TxAcknowledgment{
 			DownlinkMessage: &ttnpb.DownlinkMessage{
-				CorrelationIds: []string{"ns:downlink:OTHERCORRELATIONID"},
+				CorrelationIds: []string{"ns:transmission:OTHERCORRELATIONID"},
 			},
 		})
 		a.So(errors.IsNotFound(err), should.BeTrue)

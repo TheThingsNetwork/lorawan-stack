@@ -25822,6 +25822,62 @@
           ]
         },
         {
+          "name": "ClassBCGatewayIdentifiers",
+          "longName": "ClassBCGatewayIdentifiers",
+          "fullName": "ttn.lorawan.v3.ClassBCGatewayIdentifiers",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_ids",
+              "description": "",
+              "label": "",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "antenna_index",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "group_index",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "DLSettings",
           "longName": "DLSettings",
           "fullName": "ttn.lorawan.v3.DLSettings",
@@ -29478,11 +29534,11 @@
           "fields": [
             {
               "name": "gateways",
-              "description": "Possible gateway identifiers and antenna index to use for this downlink message.\nThe Network Server selects one of these gateways for downlink, based on connectivity, signal quality, channel utilization and an available slot.\nIf none of the gateways can be selected, the downlink message fails.\nIf empty, a gateway and antenna is selected automatically from the gateways seen in recent uplinks.",
+              "description": "Possible gateway identifiers, antenna index, and group index to use for this downlink message.\nThe Network Server selects one of these gateways for downlink, based on connectivity, signal quality, channel utilization and an available slot.\nIf none of the gateways can be selected, the downlink message fails.\nIf empty, a gateway and antenna is selected automatically from the gateways seen in recent uplinks.\nIf group index is set, gateways will be grouped by the index for the Network Server to select one gateway per group.",
               "label": "repeated",
-              "type": "GatewayAntennaIdentifiers",
-              "longType": "GatewayAntennaIdentifiers",
-              "fullType": "ttn.lorawan.v3.GatewayAntennaIdentifiers",
+              "type": "ClassBCGatewayIdentifiers",
+              "longType": "ClassBCGatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.ClassBCGatewayIdentifiers",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",

@@ -843,56 +843,67 @@ func (t *packetBrokerDownlinkTarget) Schedule(ctx context.Context, msg *ttnpb.Do
 // scheduleDownlinkByPaths attempts to schedule payload b using parameters in req using paths.
 // scheduleDownlinkByPaths discards req.TxRequest.DownlinkPaths and mutates it arbitrarily.
 // scheduleDownlinkByPaths returns the scheduled downlink or error.
-func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *scheduleRequest, paths ...downlinkPath) (*scheduledDownlink, []events.Event, error) {
-	if len(paths) == 0 {
+func (ns *NetworkServer) scheduleDownlinkByPaths(
+	ctx context.Context, req *scheduleRequest, groupedPaths map[uint32][]downlinkPath,
+) (*scheduledDownlink, []events.Event, error) {
+	if len(groupedPaths) == 0 {
 		return nil, nil, errNoPath.New()
 	}
 
 	logger := log.FromContext(ctx)
 
 	type attempt struct {
-		downlinkTarget
-		paths []*ttnpb.DownlinkPath
+		target downlinkTarget
+		paths  []*ttnpb.DownlinkPath
 	}
 
-	queuedEvents := make([]events.Event, 0, len(paths))
-	attempts := make([]*attempt, 0, len(paths))
-	for _, path := range paths {
-		var target downlinkTarget
-		if path.GatewayIdentifiers != nil {
-			logger := logger.WithFields(log.Fields(
-				"target", "gateway_server",
-				"gateway_uid", unique.ID(ctx, path.GatewayIdentifiers),
-			))
-			peer, err := ns.GetPeer(ctx, ttnpb.ClusterRole_GATEWAY_SERVER, path.GatewayIdentifiers)
-			if err != nil {
-				logger.WithError(err).Warn("Failed to get Gateway Server peer")
-				continue
-			}
-			target = &gatewayServerDownlinkTarget{peer: peer}
-		} else {
-			logger := logger.WithField("target", "packet_broker_agent")
-			peer, err := ns.GetPeer(ctx, ttnpb.ClusterRole_PACKET_BROKER_AGENT, nil)
-			if err != nil {
-				logger.WithError(err).Warn("Failed to get Packet Broker Agent peer")
-				continue
-			}
-			target = &packetBrokerDownlinkTarget{peer: peer}
+	groupedAttempts := make(map[uint32][]*attempt, len(groupedPaths))
+	totalAttempts := 0
+	for groupIdx, paths := range groupedPaths {
+		if len(paths) == 0 {
+			return nil, nil, errNoPath.New()
 		}
 
-		var a *attempt
-		if len(attempts) > 0 {
-			if last := attempts[len(attempts)-1]; last.Equal(target) {
-				a = last
+		attempts := groupedAttempts[groupIdx]
+		for _, path := range paths {
+			var target downlinkTarget
+			if path.GatewayIdentifiers != nil {
+				logger := logger.WithFields(log.Fields(
+					"target", "gateway_server",
+					"gateway_uid", unique.ID(ctx, path.GatewayIdentifiers),
+				))
+				peer, err := ns.GetPeer(ctx, ttnpb.ClusterRole_GATEWAY_SERVER, path.GatewayIdentifiers)
+				if err != nil {
+					logger.WithError(err).Warn("Failed to get Gateway Server peer")
+					continue
+				}
+				target = &gatewayServerDownlinkTarget{peer: peer}
+			} else {
+				logger := logger.WithField("target", "packet_broker_agent")
+				peer, err := ns.GetPeer(ctx, ttnpb.ClusterRole_PACKET_BROKER_AGENT, nil)
+				if err != nil {
+					logger.WithError(err).Warn("Failed to get Packet Broker Agent peer")
+					continue
+				}
+				target = &packetBrokerDownlinkTarget{peer: peer}
 			}
-		}
-		if a == nil {
-			a = &attempt{
-				downlinkTarget: target,
+
+			var a *attempt
+			if n := len(attempts); n > 0 {
+				if last := attempts[n-1]; last.target.Equal(target) {
+					a = last
+				}
 			}
-			attempts = append(attempts, a)
+			if a == nil {
+				a = &attempt{
+					target: target,
+				}
+				attempts = append(attempts, a)
+			}
+			a.paths = append(a.paths, path.DownlinkPath)
 		}
-		a.paths = append(a.paths, path.DownlinkPath)
+		groupedAttempts[groupIdx] = attempts
+		totalAttempts += len(attempts)
 	}
 
 	var (
@@ -927,58 +938,79 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *sched
 		panic(fmt.Sprintf("attempt to schedule downlink with invalid MType '%s'", req.Payload.MHdr.MType))
 	}
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("ns:downlink:%s", events.NewCorrelationID()))
-	errs := make([]error, 0, len(attempts))
-	eventIDOpt := events.WithIdentifiers(req.EndDeviceIdentifiers)
-	for _, a := range attempts {
-		req.TxRequest.DownlinkPaths = a.paths
-		down := &ttnpb.DownlinkMessage{
-			RawPayload: req.RawPayload,
-			Payload:    req.Payload,
-			Settings: &ttnpb.DownlinkMessage_Request{
-				Request: req.TxRequest,
-			},
-			CorrelationIds: events.CorrelationIDsFromContext(ctx),
-		}
-		queuedEvents = append(queuedEvents, attemptEvent.New(ctx, eventIDOpt, events.WithData(down)))
-		registerAttempt(ctx)
-		logger.WithField("path_count", len(req.DownlinkPaths)).Debug("Schedule downlink")
-		delay, err := a.Schedule(ctx, &ttnpb.DownlinkMessage{
-			RawPayload:     down.RawPayload,
-			Settings:       down.Settings,
-			CorrelationIds: down.CorrelationIds,
-		}, ns.WithClusterAuth())
-		if err != nil {
-			queuedEvents = append(queuedEvents, failEvent.New(ctx, eventIDOpt, events.WithData(err)))
-			errs = append(errs, err)
-			continue
-		}
-		transmitAt := time.Now().Add(delay)
-		if err := ns.scheduledDownlinkMatcher.Add(ctx, &ttnpb.DownlinkMessage{
-			Payload:        down.Payload,
-			EndDeviceIds:   req.EndDeviceIdentifiers,
-			Settings:       down.Settings,
-			CorrelationIds: down.CorrelationIds,
-			SessionKeyId:   req.SessionKeyID,
-		}); err != nil {
-			logger.WithError(err).Debug("Failed to store downlink metadata")
-		}
-		logger.WithFields(log.Fields(
-			"transmission_delay", delay,
-			"transmit_at", transmitAt,
-			"absolute_time", ttnpb.StdTime(req.TxRequest.AbsoluteTime),
-		)).Debug("Scheduled downlink")
-		queuedEvents = append(queuedEvents, events.Builders(append([]events.Builder{
-			successEvent.With(
+	var (
+		errs                    = make([]error, 0, totalAttempts)
+		eventIDOpt              = events.WithIdentifiers(req.EndDeviceIdentifiers)
+		latestScheduledDownlink = (*scheduledDownlink)(nil)
+		downlinkEvents          = ([]events.Event)(nil)
+		queuedEvents            = make([]events.Event, 0, totalAttempts+len(req.DownlinkEvents))
+	)
+	for _, attempts := range groupedAttempts {
+		// Each individual transmission (which maps one to one with a group) should have an individual
+		// correlation ID in order to be matchable with a transmission acknowledgement.
+		ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("ns:transmission:%s", events.NewCorrelationID()))
+		for _, a := range attempts {
+			req.TxRequest.DownlinkPaths = a.paths
+			down := &ttnpb.DownlinkMessage{
+				RawPayload: req.RawPayload,
+				Payload:    req.Payload,
+				Settings: &ttnpb.DownlinkMessage_Request{
+					Request: req.TxRequest,
+				},
+				CorrelationIds: events.CorrelationIDsFromContext(ctx),
+			}
+			queuedEvents = append(queuedEvents, attemptEvent.New(ctx, eventIDOpt, events.WithData(down)))
+			registerAttempt(ctx)
+			logger.WithField("path_count", len(req.DownlinkPaths)).Debug("Schedule downlink")
+			delay, err := a.target.Schedule(ctx, &ttnpb.DownlinkMessage{
+				RawPayload:     down.RawPayload,
+				Settings:       down.Settings,
+				CorrelationIds: down.CorrelationIds,
+			}, ns.WithClusterAuth())
+			if err != nil {
+				queuedEvents = append(queuedEvents, failEvent.New(ctx, eventIDOpt, events.WithData(err)))
+				errs = append(errs, err)
+				continue
+			}
+			transmitAt := time.Now().Add(delay)
+			if err := ns.scheduledDownlinkMatcher.Add(ctx, &ttnpb.DownlinkMessage{
+				Payload:        down.Payload,
+				EndDeviceIds:   req.EndDeviceIdentifiers,
+				Settings:       down.Settings,
+				CorrelationIds: down.CorrelationIds,
+				SessionKeyId:   req.SessionKeyID,
+			}); err != nil {
+				logger.WithError(err).Debug("Failed to store downlink metadata")
+			}
+			logger.WithFields(log.Fields(
+				"transmission_delay", delay,
+				"transmit_at", transmitAt,
+				"absolute_time", ttnpb.StdTime(req.TxRequest.AbsoluteTime),
+			)).Debug("Scheduled downlink")
+			queuedEvents = append(queuedEvents, successEvent.With(
 				events.WithData(&ttnpb.ScheduleDownlinkResponse{
 					Delay: ttnpb.ProtoDurationPtr(delay),
 				}),
-			),
-		}, []events.Builder(req.DownlinkEvents)...)).New(ctx, eventIDOpt)...)
-		registerSuccess(ctx)
-		return &scheduledDownlink{
-			Message:    down,
-			TransmitAt: transmitAt,
-		}, queuedEvents, nil
+			).New(ctx, eventIDOpt))
+			registerSuccess(ctx)
+			// Report to the upper layer only the latest (chronological) transmission
+			// for book keeping purposes (such as transmission times).
+			if latestScheduledDownlink == nil || transmitAt.Sub(latestScheduledDownlink.TransmitAt) > 0 {
+				latestScheduledDownlink = &scheduledDownlink{
+					Message:    down,
+					TransmitAt: transmitAt,
+				}
+				downlinkEvents = req.DownlinkEvents.New(ctx, eventIDOpt)
+			}
+			break
+		}
+	}
+	// NOTE: Downlink retransmission are not allowed per LoRaWAN specification section 4.3.1.3
+	// (Retransmission Procedure - Downlink frames). As such, if one scheduling attempt succeeds,
+	// we consider that the downlink, across all groups, has been transmitted. A corollary of this
+	// is that even if a group has no successful scheduling attempts, no retries will be made.
+	if latestScheduledDownlink != nil {
+		return latestScheduledDownlink, append(queuedEvents, downlinkEvents...), nil
 	}
 	return nil, queuedEvents, downlinkSchedulingError(errs)
 }
@@ -1303,7 +1335,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 			SessionKeyID:         genDown.SessionKeyID,
 			DownlinkEvents:       genState.EventBuilders,
 		},
-		paths...,
+		map[uint32][]downlinkPath{0: paths},
 	)
 	if err != nil {
 		if schedErr, ok := err.(downlinkSchedulingError); ok {
@@ -1424,25 +1456,32 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 		}
 	}
 
-	var paths []downlinkPath
+	groupedPaths := make(map[uint32][]downlinkPath)
 	if fixedPaths := genState.ApplicationDownlink.GetClassBC().GetGateways(); len(fixedPaths) > 0 {
-		paths = make([]downlinkPath, 0, len(fixedPaths))
-		for i := range fixedPaths {
-			paths = append(paths, downlinkPath{
-				GatewayIdentifiers: fixedPaths[i].GatewayIds,
-				DownlinkPath: &ttnpb.DownlinkPath{
-					Path: &ttnpb.DownlinkPath_Fixed{
-						Fixed: fixedPaths[i],
+		for _, fixedPath := range fixedPaths {
+			groupedPaths[fixedPath.GroupIndex] = append(groupedPaths[fixedPath.GroupIndex],
+				downlinkPath{
+					GatewayIdentifiers: fixedPath.GatewayIds,
+					DownlinkPath: &ttnpb.DownlinkPath{
+						Path: &ttnpb.DownlinkPath_Fixed{
+							Fixed: &ttnpb.GatewayAntennaIdentifiers{
+								GatewayIds:   fixedPath.GatewayIds,
+								AntennaIndex: fixedPath.AntennaIndex,
+							},
+						},
 					},
 				},
-			})
+			)
 		}
 	} else {
-		paths = downlinkPathsFromRecentUplinks(ctx, dev.MacState.RecentUplinks...)
+		paths := downlinkPathsFromRecentUplinks(ctx, dev.MacState.RecentUplinks...)
 		if len(paths) == 0 {
 			log.FromContext(ctx).Error("No downlink path available, skip class B/C downlink slot")
 			if genState.ApplicationDownlink != nil && ttnpb.HasAnyField(sets, "session.queued_application_downlinks") {
-				dev.Session.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.Session.QueuedApplicationDownlinks...)
+				dev.Session.QueuedApplicationDownlinks = append(
+					[]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink},
+					dev.Session.QueuedApplicationDownlinks...,
+				)
 			}
 			return downlinkAttemptResult{
 				DownlinkTaskUpdateStrategy: noDownlinkTask,
@@ -1450,6 +1489,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 				QueuedApplicationUplinks:   genState.appendApplicationUplinks(nil, false),
 			}
 		}
+		groupedPaths[0] = paths
 	}
 
 	req := &ttnpb.TxRequest{
@@ -1470,7 +1510,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 			DownlinkEvents:       genState.EventBuilders,
 			SessionKeyID:         dev.GetSession().GetKeys().GetSessionKeyId(),
 		},
-		paths...,
+		groupedPaths,
 	)
 	if err != nil {
 		logger := log.FromContext(ctx)
@@ -1729,7 +1769,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 								},
 							},
 						},
-						paths...,
+						map[uint32][]downlinkPath{0: paths},
 					)
 					queuedEvents = append(queuedEvents, downEvs...)
 					if err != nil {

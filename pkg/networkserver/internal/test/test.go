@@ -113,7 +113,7 @@ func Band(fpID string, phyVer ttnpb.PHYVersion) band.Band {
 }
 
 var (
-	DefaultGatewayAntennaIdentifiers = [...]*ttnpb.GatewayAntennaIdentifiers{
+	DefaultClassBCGatewayIdentifiers = [...]*ttnpb.ClassBCGatewayIdentifiers{
 		{
 			GatewayIds:   &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-0"},
 			AntennaIndex: 3,

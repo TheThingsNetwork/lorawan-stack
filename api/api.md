@@ -366,6 +366,7 @@
   - [Message `ADRAckLimitExponentValue`](#ttn.lorawan.v3.ADRAckLimitExponentValue)
   - [Message `AggregatedDutyCycleValue`](#ttn.lorawan.v3.AggregatedDutyCycleValue)
   - [Message `CFList`](#ttn.lorawan.v3.CFList)
+  - [Message `ClassBCGatewayIdentifiers`](#ttn.lorawan.v3.ClassBCGatewayIdentifiers)
   - [Message `DLSettings`](#ttn.lorawan.v3.DLSettings)
   - [Message `DataRate`](#ttn.lorawan.v3.DataRate)
   - [Message `DataRateIndexValue`](#ttn.lorawan.v3.DataRateIndexValue)
@@ -5399,6 +5400,20 @@ Only the components for which the keys were meant, will have the key-encryption-
 | ----- | ----------- |
 | `type` | <p>`enum.defined_only`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.ClassBCGatewayIdentifiers">Message `ClassBCGatewayIdentifiers`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
+| `antenna_index` | [`uint32`](#uint32) |  |  |
+| `group_index` | [`uint32`](#uint32) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `gateway_ids` | <p>`message.required`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.DLSettings">Message `DLSettings`</a>
 
 | Field | Type | Label | Description |
@@ -6525,7 +6540,7 @@ Transmission settings for downlink.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `gateways` | [`GatewayAntennaIdentifiers`](#ttn.lorawan.v3.GatewayAntennaIdentifiers) | repeated | Possible gateway identifiers and antenna index to use for this downlink message. The Network Server selects one of these gateways for downlink, based on connectivity, signal quality, channel utilization and an available slot. If none of the gateways can be selected, the downlink message fails. If empty, a gateway and antenna is selected automatically from the gateways seen in recent uplinks. |
+| `gateways` | [`ClassBCGatewayIdentifiers`](#ttn.lorawan.v3.ClassBCGatewayIdentifiers) | repeated | Possible gateway identifiers, antenna index, and group index to use for this downlink message. The Network Server selects one of these gateways for downlink, based on connectivity, signal quality, channel utilization and an available slot. If none of the gateways can be selected, the downlink message fails. If empty, a gateway and antenna is selected automatically from the gateways seen in recent uplinks. If group index is set, gateways will be grouped by the index for the Network Server to select one gateway per group. |
 | `absolute_time` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Absolute time when the downlink message should be transmitted. This requires the gateway to have GPS time synchronization. If the time is in the past or if there is a scheduling conflict, the downlink message fails. If null, the time is selected based on slot availability. This is recommended in class B mode. |
 
 ### <a name="ttn.lorawan.v3.ApplicationDownlinkFailed">Message `ApplicationDownlinkFailed`</a>

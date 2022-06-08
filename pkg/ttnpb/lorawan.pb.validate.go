@@ -1781,6 +1781,111 @@ var _ interface {
 	ErrorName() string
 } = GatewayAntennaIdentifiersValidationError{}
 
+// ValidateFields checks the field values on ClassBCGatewayIdentifiers with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ClassBCGatewayIdentifiers) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ClassBCGatewayIdentifiersFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "gateway_ids":
+
+			if m.GetGatewayIds() == nil {
+				return ClassBCGatewayIdentifiersValidationError{
+					field:  "gateway_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetGatewayIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ClassBCGatewayIdentifiersValidationError{
+						field:  "gateway_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "antenna_index":
+			// no validation rules for AntennaIndex
+		case "group_index":
+			// no validation rules for GroupIndex
+		default:
+			return ClassBCGatewayIdentifiersValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ClassBCGatewayIdentifiersValidationError is the validation error returned by
+// ClassBCGatewayIdentifiers.ValidateFields if the designated constraints
+// aren't met.
+type ClassBCGatewayIdentifiersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ClassBCGatewayIdentifiersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ClassBCGatewayIdentifiersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ClassBCGatewayIdentifiersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ClassBCGatewayIdentifiersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ClassBCGatewayIdentifiersValidationError) ErrorName() string {
+	return "ClassBCGatewayIdentifiersValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ClassBCGatewayIdentifiersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sClassBCGatewayIdentifiers.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ClassBCGatewayIdentifiersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ClassBCGatewayIdentifiersValidationError{}
+
 // ValidateFields checks the field values on UplinkToken with the rules defined
 // in the proto definition for this message. If any rules are violated, an
 // error is returned.
