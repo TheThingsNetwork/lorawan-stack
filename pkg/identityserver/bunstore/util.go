@@ -15,6 +15,7 @@
 package store
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"time"
@@ -22,6 +23,7 @@ import (
 	"github.com/uptrace/bun"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 func equalTime(a, b *time.Time) bool {
@@ -77,4 +79,48 @@ func convertIntSlice[A, B int | ~int32](in []A) []B {
 		out[i] = B(el)
 	}
 	return out
+}
+
+func secretFromBytes(b []byte) *ttnpb.Secret {
+	if len(b) == 0 {
+		return nil
+	}
+	blocks := bytes.SplitN(b, []byte(":"), 2)
+	if len(blocks) == 2 {
+		return &ttnpb.Secret{
+			KeyId: string(blocks[0]),
+			Value: blocks[1],
+		}
+	}
+	return nil
+}
+
+func secretToBytes(secret *ttnpb.Secret) []byte {
+	if secret == nil {
+		return nil
+	}
+	var buf bytes.Buffer
+	buf.WriteString(secret.KeyId)
+	buf.WriteByte(':')
+	buf.Write(secret.Value)
+	return buf.Bytes()
+}
+
+func eui64FromString(s *string) *types.EUI64 {
+	if s == nil {
+		return nil
+	}
+	var eui types.EUI64
+	if err := eui.UnmarshalText([]byte(*s)); err != nil {
+		return nil
+	}
+	return &eui
+}
+
+func eui64ToString(eui *types.EUI64) *string {
+	if eui == nil {
+		return nil
+	}
+	s := eui.String()
+	return &s
 }

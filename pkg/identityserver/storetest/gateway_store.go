@@ -290,7 +290,7 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 			a.So(updated.TargetCupsUri, should.Equal, "https://cups.example.com")
 			a.So(updated.TargetCupsKey, should.Resemble, updatedSecret)
 			a.So(updated.RequireAuthenticatedConnection, should.BeFalse)
-			a.So(updated.Lrfhss.Supported, should.BeFalse)
+			a.So(updated.Lrfhss.GetSupported(), should.BeFalse)
 			a.So(updated.DisablePacketBrokerForwarding, should.BeFalse)
 			a.So(*ttnpb.StdTime(updated.CreatedAt), should.Equal, *ttnpb.StdTime(created.CreatedAt))
 			a.So(*ttnpb.StdTime(updated.UpdatedAt), should.HappenWithin, 5*time.Second, start)
