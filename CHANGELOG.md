@@ -8,6 +8,20 @@ with the exception that this project **does not** follow Semantic Versioning.
 For details about compatibility between different releases, see the **Commitments and Releases** section of our README.
 
 ## [Unreleased]
+
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.20.0] - unreleased
 - OAuth client management in the account app.
 
 ### Added
@@ -26,15 +40,9 @@ For details about compatibility between different releases, see the **Commitment
 - The organizations table in the Console now shows the amount of collaborators.
 - Table layouts for several entities have been improved on the Console.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - End devices running on MAC versions higher or equal to 1.1 showing network downlink frame counters instead of application downlink frame counters.
-
-### Security
 
 ## [3.19.2] - 2022-05-25
 
@@ -2185,7 +2193,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.19.2...v3.19
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.20.0...v3.20
+[3.20.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.19.2...v3.20.0
 [3.19.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.19.1...v3.19.2
 [3.19.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.19.0...v3.19.1
 [3.19.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.18.2...v3.19.0
