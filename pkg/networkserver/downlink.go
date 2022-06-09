@@ -792,7 +792,7 @@ type scheduleRequest struct {
 
 type downlinkTarget interface {
 	Equal(downlinkTarget) bool
-	Schedule(context.Context, *ttnpb.DownlinkMessage, ...grpc.CallOption) (time.Duration, error)
+	Schedule(context.Context, *ttnpb.DownlinkMessage, ...grpc.CallOption) (*ttnpb.ScheduleDownlinkResponse, error)
 }
 
 type gatewayServerDownlinkTarget struct {
@@ -807,16 +807,14 @@ func (t *gatewayServerDownlinkTarget) Equal(target downlinkTarget) bool {
 	return other.peer == t.peer
 }
 
-func (t *gatewayServerDownlinkTarget) Schedule(ctx context.Context, msg *ttnpb.DownlinkMessage, callOpts ...grpc.CallOption) (time.Duration, error) {
+func (t *gatewayServerDownlinkTarget) Schedule(
+	ctx context.Context, msg *ttnpb.DownlinkMessage, callOpts ...grpc.CallOption,
+) (*ttnpb.ScheduleDownlinkResponse, error) {
 	conn, err := t.peer.Conn()
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
-	res, err := ttnpb.NewNsGsClient(conn).ScheduleDownlink(ctx, msg, callOpts...)
-	if err != nil {
-		return 0, err
-	}
-	return ttnpb.StdDurationOrZero(res.Delay), nil
+	return ttnpb.NewNsGsClient(conn).ScheduleDownlink(ctx, msg, callOpts...)
 }
 
 type packetBrokerDownlinkTarget struct {
@@ -828,16 +826,27 @@ func (t *packetBrokerDownlinkTarget) Equal(target downlinkTarget) bool {
 	return ok
 }
 
-func (t *packetBrokerDownlinkTarget) Schedule(ctx context.Context, msg *ttnpb.DownlinkMessage, callOpts ...grpc.CallOption) (time.Duration, error) {
+func (t *packetBrokerDownlinkTarget) Schedule(
+	ctx context.Context, msg *ttnpb.DownlinkMessage, callOpts ...grpc.CallOption,
+) (*ttnpb.ScheduleDownlinkResponse, error) {
 	conn, err := t.peer.Conn()
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 	_, err = ttnpb.NewNsPbaClient(conn).PublishDownlink(ctx, msg, callOpts...)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
-	return peeringScheduleDelay, nil
+	return &ttnpb.ScheduleDownlinkResponse{
+		Delay: ttnpb.ProtoDurationPtr(peeringScheduleDelay),
+		DownlinkPath: &ttnpb.DownlinkPath{
+			Path: &ttnpb.DownlinkPath_Fixed{
+				Fixed: &ttnpb.GatewayAntennaIdentifiers{
+					GatewayIds: cluster.PacketBrokerGatewayID,
+				},
+			},
+		},
+	}, nil
 }
 
 // scheduleDownlinkByPaths attempts to schedule payload b using parameters in req using paths.
@@ -962,7 +971,7 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(
 			queuedEvents = append(queuedEvents, attemptEvent.New(ctx, eventIDOpt, events.WithData(down)))
 			registerAttempt(ctx)
 			logger.WithField("path_count", len(req.DownlinkPaths)).Debug("Schedule downlink")
-			delay, err := a.target.Schedule(ctx, &ttnpb.DownlinkMessage{
+			res, err := a.target.Schedule(ctx, &ttnpb.DownlinkMessage{
 				RawPayload:     down.RawPayload,
 				Settings:       down.Settings,
 				CorrelationIds: down.CorrelationIds,
@@ -972,6 +981,7 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(
 				errs = append(errs, err)
 				continue
 			}
+			delay := ttnpb.StdDurationOrZero(res.Delay)
 			transmitAt := time.Now().Add(delay)
 			if err := ns.scheduledDownlinkMatcher.Add(ctx, &ttnpb.DownlinkMessage{
 				Payload:        down.Payload,
@@ -987,11 +997,7 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(
 				"transmit_at", transmitAt,
 				"absolute_time", ttnpb.StdTime(req.TxRequest.AbsoluteTime),
 			)).Debug("Scheduled downlink")
-			queuedEvents = append(queuedEvents, successEvent.With(
-				events.WithData(&ttnpb.ScheduleDownlinkResponse{
-					Delay: ttnpb.ProtoDurationPtr(delay),
-				}),
-			).New(ctx, eventIDOpt))
+			queuedEvents = append(queuedEvents, successEvent.With(events.WithData(res)).New(ctx, eventIDOpt))
 			registerSuccess(ctx)
 			// Report to the upper layer only the latest (chronological) transmission
 			// for book keeping purposes (such as transmission times).

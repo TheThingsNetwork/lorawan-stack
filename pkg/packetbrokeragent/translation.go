@@ -523,7 +523,7 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 		if md := gtwMd.GetPlainLocalization().GetTerrestrial(); md != nil {
 			for _, ant := range md.Antennas {
 				up.RxMetadata = append(up.RxMetadata, &ttnpb.RxMetadata{
-					GatewayIds:             &cluster.PacketBrokerGatewayID,
+					GatewayIds:             cluster.PacketBrokerGatewayID,
 					PacketBroker:           pbMD,
 					AntennaIndex:           ant.Index,
 					Time:                   receiveTime,
@@ -551,7 +551,7 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 				}
 				if md == nil {
 					md = &ttnpb.RxMetadata{
-						GatewayIds:             &cluster.PacketBrokerGatewayID,
+						GatewayIds:             cluster.PacketBrokerGatewayID,
 						PacketBroker:           pbMD,
 						AntennaIndex:           ant.Index,
 						Time:                   receiveTime,
