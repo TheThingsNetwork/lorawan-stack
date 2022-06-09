@@ -25,10 +25,10 @@ import (
 type correlationKey struct{}
 
 // ContextWithCorrelationID returns a derived context with the correlation IDs if they were not already in there.
-// NOTE: This function assumes that the provided correlation IDs do not contain any duplicates.
 func ContextWithCorrelationID(ctx context.Context, cids ...string) context.Context {
 	cids = append(cids[:0:0], cids...)
 	sort.Strings(cids)
+	cids = uniqueStrings(cids)
 
 	existing, ok := ctx.Value(correlationKey{}).([]string)
 	if !ok {
@@ -49,6 +49,26 @@ func CorrelationIDsFromContext(ctx context.Context) []string {
 // NewCorrelationID returns a new random correlation ID.
 func NewCorrelationID() string {
 	return ulid.MustNew(ulid.Now(), rand.Reader).String()
+}
+
+// uniqueStrings returns a slice with the unique elements of
+// the provided slice. The provided slice must be sorted,
+// and the returning slice will be sorted as well.
+// The provided slice will be modified in place, so it must
+// not be reused after uniqueStrings has been called.
+func uniqueStrings(s []string) []string {
+	if len(s) < 2 {
+		return s
+	}
+	u := 1
+	for i := 1; i < len(s); i++ {
+		if s[i] == s[i-1] {
+			continue
+		}
+		s[u] = s[i]
+		u++
+	}
+	return s[:u]
 }
 
 // mergeStrings merges 2 sorted string slices and returns the resulting slice
