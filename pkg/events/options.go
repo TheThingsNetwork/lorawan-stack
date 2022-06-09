@@ -49,13 +49,6 @@ func WithIdentifiers(identifiers ...EntityIdentifiers) Option {
 func WithData(data interface{}) Option {
 	return optionFunc(func(e *event) {
 		e.data = data
-		if data, ok := data.(interface{ GetCorrelationIDs() []string }); ok {
-			if cids := data.GetCorrelationIDs(); len(cids) > 0 {
-				cids = append(cids[:0:0], cids...)
-				sort.Strings(cids)
-				e.innerEvent.CorrelationIds = mergeStrings(e.innerEvent.CorrelationIds, cids)
-			}
-		}
 		if data, ok := data.(interface{ GetCorrelationIds() []string }); ok {
 			if cids := data.GetCorrelationIds(); len(cids) > 0 {
 				cids = append(cids[:0:0], cids...)

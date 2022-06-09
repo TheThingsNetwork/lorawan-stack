@@ -67,7 +67,7 @@ func (ps *PubSubStore) storeEvent(ctx context.Context, tx redis.Cmdable, evt eve
 		return err
 	}
 	tx.Set(ctx, ps.eventDataKey(evt.Context(), evt.UniqueID()), b, ps.historyTTL)
-	for _, cid := range evt.CorrelationIDs() {
+	for _, cid := range evt.CorrelationIds() {
 		key := ps.eventIndexKey(evt.Context(), cid)
 		tx.LPush(ctx, key, evt.UniqueID())
 		tx.LTrim(ctx, key, 0, int64(ps.correlationIDHistoryCount))
@@ -113,11 +113,11 @@ func (ps *PubSubStore) LoadEvent(ctx context.Context, uid string) (*ttnpb.Event,
 	if err != nil {
 		return nil, ttnredis.ConvertError(err)
 	}
-	var evtPB ttnpb.Event
-	if err = decodeEventData(data, &evtPB); err != nil {
+	evtPB := &ttnpb.Event{}
+	if err = decodeEventData(data, evtPB); err != nil {
 		return nil, err
 	}
-	return &evtPB, nil
+	return evtPB, nil
 }
 
 func xMessageHasEventName(names ...string) func(msg redis.XMessage) bool {

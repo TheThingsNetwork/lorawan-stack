@@ -41,7 +41,7 @@ type Event interface {
 	Time() time.Time
 	Identifiers() []*ttnpb.EntityIdentifiers
 	Data() interface{}
-	CorrelationIDs() []string
+	CorrelationIds() []string
 	Origin() string
 	Caller() string
 	Visibility() *ttnpb.Rights
@@ -63,7 +63,7 @@ func local(evt Event) *event {
 				Name:           evt.Name(),
 				Time:           ttnpb.ProtoTimePtr(t),
 				Identifiers:    evt.Identifiers(),
-				CorrelationIds: evt.CorrelationIDs(),
+				CorrelationIds: evt.CorrelationIds(),
 				Origin:         evt.Origin(),
 				Visibility:     evt.Visibility(),
 				UserAgent:      evt.UserAgent(),
@@ -150,7 +150,7 @@ func (e event) Time() time.Time {
 }
 func (e event) Identifiers() []*ttnpb.EntityIdentifiers { return e.innerEvent.Identifiers }
 func (e event) Data() interface{}                       { return e.data }
-func (e event) CorrelationIDs() []string                { return e.innerEvent.CorrelationIds }
+func (e event) CorrelationIds() []string                { return e.innerEvent.CorrelationIds }
 func (e event) Origin() string                          { return e.innerEvent.Origin }
 func (e event) Caller() string                          { return e.caller }
 func (e event) Visibility() *ttnpb.Rights               { return e.innerEvent.Visibility }

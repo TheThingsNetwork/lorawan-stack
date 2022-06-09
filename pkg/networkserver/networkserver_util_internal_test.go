@@ -600,7 +600,7 @@ func (env TestEnvironment) AssertSetDevice(ctx context.Context, create bool, req
 
 	case ev := <-env.Events:
 		if !a.So(ev.Event, should.ResembleEvent, expectedEvent.New(
-			events.ContextWithCorrelationID(reqCtx, ev.Event.CorrelationIDs()...),
+			events.ContextWithCorrelationID(reqCtx, ev.Event.CorrelationIds()...),
 			events.WithIdentifiers(req.EndDevice.Ids),
 		)) {
 			t.Errorf("Failed to assert device %s event", action)
