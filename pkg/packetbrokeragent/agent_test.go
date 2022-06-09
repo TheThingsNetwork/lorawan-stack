@@ -661,7 +661,7 @@ func TestHomeNetwork(t *testing.T) {
 					RawPayload: []byte{0x40, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
 					RxMetadata: []*ttnpb.RxMetadata{
 						{
-							GatewayIds:   &cluster.PacketBrokerGatewayID,
+							GatewayIds:   cluster.PacketBrokerGatewayID,
 							AntennaIndex: 0,
 							PacketBroker: &ttnpb.PacketBrokerMetadata{
 								MessageId:           "test",
@@ -691,7 +691,7 @@ func TestHomeNetwork(t *testing.T) {
 							})).([]byte),
 						},
 						{
-							GatewayIds:   &cluster.PacketBrokerGatewayID,
+							GatewayIds:   cluster.PacketBrokerGatewayID,
 							AntennaIndex: 1,
 							PacketBroker: &ttnpb.PacketBrokerMetadata{
 								MessageId:           "test",
@@ -804,7 +804,7 @@ func TestHomeNetwork(t *testing.T) {
 					RawPayload: []byte{0x40, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
 					RxMetadata: []*ttnpb.RxMetadata{
 						{
-							GatewayIds: &cluster.PacketBrokerGatewayID,
+							GatewayIds: cluster.PacketBrokerGatewayID,
 							PacketBroker: &ttnpb.PacketBrokerMetadata{
 								MessageId:           "test",
 								ForwarderNetId:      [3]byte{0x0, 0x0, 0x42},

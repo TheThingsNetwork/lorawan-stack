@@ -110,7 +110,7 @@ func TestCluster(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	// Test Packet Broker Agent override; Packet Broker Agent is not in the cluster.
-	pba, err := c.GetPeer(ctx, ttnpb.ClusterRole_GATEWAY_SERVER, &PacketBrokerGatewayID)
+	pba, err := c.GetPeer(ctx, ttnpb.ClusterRole_GATEWAY_SERVER, PacketBrokerGatewayID)
 	a.So(pba, should.BeNil)
 	a.So(err, should.NotBeNil)
 
