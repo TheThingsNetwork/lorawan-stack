@@ -17,6 +17,7 @@ import { defineMessages } from 'react-intl'
 import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 import classnames from 'classnames'
+import { orderBy as lodashOrderBy } from 'lodash'
 
 import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
 
@@ -31,6 +32,7 @@ import debounce from '@ttn-lw/lib/debounce'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+import getByPath from '@ttn-lw/lib/get-by-path'
 
 import style from './fetch-table.styl'
 
@@ -90,6 +92,7 @@ class FetchTable extends Component {
     getItemPathPrefix: PropTypes.func,
     getItemsAction: PropTypes.func.isRequired,
     handlesPagination: PropTypes.bool,
+    handlesSorting: PropTypes.bool,
     headers: PropTypes.arrayOf(
       PropTypes.shape({
         displayName: PropTypes.message.isRequired,
@@ -111,6 +114,7 @@ class FetchTable extends Component {
     mayAdd: PropTypes.bool,
     mayLink: PropTypes.bool,
     pageSize: PropTypes.number,
+    paginated: PropTypes.bool,
     pathname: PropTypes.string.isRequired,
     rowKeySelector: PropTypes.func,
     searchItemsAction: PropTypes.func,
@@ -140,7 +144,9 @@ class FetchTable extends Component {
     searchable: false,
     searchPlaceholderMessage: sharedMessages.search,
     searchQueryMaxLength: 50,
+    paginated: true,
     handlesPagination: false,
+    handlesSorting: false,
     fetching: false,
     totalCount: 0,
     items: [],
@@ -242,6 +248,9 @@ class FetchTable extends Component {
   @bind
   async onOrderChange(order, orderBy) {
     const filterOrder = `${order === 'desc' ? '-' : ''}${orderBy}`
+    const { handlesSorting, totalCount, pageSize } = this.props
+    const canHandleSorting = totalCount <= pageSize
+    const handleSorting = handlesSorting && canHandleSorting
 
     await this.setState(
       this.props.filterValidator({
@@ -250,7 +259,9 @@ class FetchTable extends Component {
       }),
     )
 
-    this.fetchItems()
+    if (!handleSorting) {
+      this.fetchItems()
+    }
   }
 
   @bind
@@ -297,7 +308,9 @@ class FetchTable extends Component {
       rowKeySelector,
       tabs,
       searchable,
+      paginated,
       handlesPagination,
+      handlesSorting,
       itemPathPrefix,
       pathname,
       actionItems,
@@ -318,6 +331,15 @@ class FetchTable extends Component {
     const filtersCls = classnames(style.filters, {
       [style.topRule]: tabs.length > 0,
     })
+
+    // Disable sorting when incoming data was long enough to be paginated.
+    const canHandleSorting = totalCount <= pageSize
+    const disableSorting = handlesSorting && !canHandleSorting
+    const handleSorting = handlesSorting && canHandleSorting && orderBy !== undefined
+
+    const preparedItems = handleSorting
+      ? lodashOrderBy(items, i => getByPath(i, orderBy), [orderDirection])
+      : items
 
     return (
       <div data-test-id={`${entity}-table`}>
@@ -378,7 +400,7 @@ class FetchTable extends Component {
             />
           )}
           <Tabular
-            paginated
+            paginated={paginated}
             page={page}
             totalCount={totalCount}
             pageSize={pageSize}
@@ -387,13 +409,14 @@ class FetchTable extends Component {
             headers={headers}
             rowKeySelector={rowKeySelector}
             rowHrefSelector={mayLink ? this.rowHrefSelector : undefined}
-            data={initialFetch ? [] : items}
+            data={initialFetch ? [] : preparedItems}
             emptyMessage={sharedMessages.noMatch}
             handlesPagination={handlesPagination}
             onSortRequest={this.onOrderChange}
             order={orderDirection}
             orderBy={orderBy}
             clickable={clickable}
+            disableSorting={disableSorting}
           />
         </Overlay>
       </div>

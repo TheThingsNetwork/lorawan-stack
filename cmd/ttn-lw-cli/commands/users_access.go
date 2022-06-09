@@ -18,6 +18,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
@@ -56,19 +57,24 @@ var (
 		Aliases: []string{"ls"},
 		Short:   "List user API keys",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			usrID := getUserID(cmd.Flags(), args)
-			if usrID == nil {
-				return errNoUserID.New()
+			req := &ttnpb.ListUserAPIKeysRequest{Limit: 50, Page: 1}
+			_, err := req.SetFromFlags(cmd.Flags(), "")
+			if err != nil {
+				return err
+			}
+			if len(args) > 0 && req.GetUserIds().GetUserId() == "" {
+				if len(args) > 1 {
+					logger.Warn("Multiple IDs found in arguments, considering only the first")
+				}
+				req.UserIds = &ttnpb.UserIdentifiers{UserId: args[0]}
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
-			limit, page, opt, getTotal := withPagination(cmd.Flags())
-			res, err := ttnpb.NewUserAccessClient(is).ListAPIKeys(ctx, &ttnpb.ListUserAPIKeysRequest{
-				UserIds: usrID, Limit: limit, Page: page,
-			}, opt)
+			_, _, opt, getTotal := withPagination(cmd.Flags())
+			res, err := ttnpb.NewUserAccessClient(is).ListAPIKeys(ctx, req, opt)
 			if err != nil {
 				return err
 			}
@@ -264,7 +270,10 @@ func init() {
 	userRights.Flags().AddFlagSet(userIDFlags())
 	usersCommand.AddCommand(userRights)
 
-	userAPIKeysList.Flags().AddFlagSet(paginationFlags())
+	ttnpb.AddSetFlagsForListUserAPIKeysRequest(userAPIKeysList.Flags(), "", false)
+	userAPIKeysList.Flags().Lookup("limit").DefValue = "50"
+	userAPIKeysList.Flags().Lookup("page").DefValue = "1"
+	flagsplugin.AddAlias(userAPIKeysList.Flags(), "user-ids.user-id", "user-id")
 	userAPIKeys.AddCommand(userAPIKeysList)
 	userAPIKeysGet.Flags().String("api-key-id", "", "")
 	userAPIKeys.AddCommand(userAPIKeysGet)

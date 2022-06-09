@@ -439,6 +439,16 @@ func (dst *ListOrganizationAPIKeysRequest) SetFields(src *ListOrganizationAPIKey
 					dst.OrganizationIds = nil
 				}
 			}
+		case "order":
+			if len(subs) > 0 {
+				return fmt.Errorf("'order' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Order = src.Order
+			} else {
+				var zero string
+				dst.Order = zero
+			}
 		case "limit":
 			if len(subs) > 0 {
 				return fmt.Errorf("'limit' has no subfields, but %s were specified", subs)

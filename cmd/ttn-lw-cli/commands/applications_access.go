@@ -18,6 +18,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
@@ -184,19 +185,24 @@ var (
 		Aliases: []string{"ls"},
 		Short:   "List application API keys",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			appID := getApplicationID(cmd.Flags(), args)
-			if appID == nil {
-				return errNoApplicationID.New()
+			req := &ttnpb.ListApplicationAPIKeysRequest{Limit: 50, Page: 1}
+			_, err := req.SetFromFlags(cmd.Flags(), "")
+			if err != nil {
+				return err
+			}
+			if len(args) > 0 && req.GetApplicationIds().GetApplicationId() == "" {
+				if len(args) > 1 {
+					logger.Warn("Multiple IDs found in arguments, considering only the first")
+				}
+				req.ApplicationIds = &ttnpb.ApplicationIdentifiers{ApplicationId: args[0]}
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
-			limit, page, opt, getTotal := withPagination(cmd.Flags())
-			res, err := ttnpb.NewApplicationAccessClient(is).ListAPIKeys(ctx, &ttnpb.ListApplicationAPIKeysRequest{
-				ApplicationIds: appID, Limit: limit, Page: page,
-			}, opt)
+			_, _, opt, getTotal := withPagination(cmd.Flags())
+			res, err := ttnpb.NewApplicationAccessClient(is).ListAPIKeys(ctx, req, opt)
 			if err != nil {
 				return err
 			}
@@ -376,7 +382,10 @@ func init() {
 	applicationCollaborators.PersistentFlags().AddFlagSet(applicationIDFlags())
 	applicationsCommand.AddCommand(applicationCollaborators)
 
-	applicationAPIKeysList.Flags().AddFlagSet(paginationFlags())
+	ttnpb.AddSetFlagsForListApplicationAPIKeysRequest(applicationAPIKeysList.Flags(), "", false)
+	applicationAPIKeysList.Flags().Lookup("limit").DefValue = "50"
+	applicationAPIKeysList.Flags().Lookup("page").DefValue = "1"
+	flagsplugin.AddAlias(applicationAPIKeysList.Flags(), "application-ids.application-id", "application-id")
 	applicationAPIKeys.AddCommand(applicationAPIKeysList)
 	applicationAPIKeysGet.Flags().String("api-key-id", "", "")
 	applicationAPIKeys.AddCommand(applicationAPIKeysGet)

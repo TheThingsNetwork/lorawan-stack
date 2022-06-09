@@ -112,6 +112,7 @@ func (is *IdentityServer) listOrganizationAPIKeys(ctx context.Context, req *ttnp
 	if err = rights.RequireOrganization(ctx, req.GetOrganizationIds(), ttnpb.Right_RIGHT_ORGANIZATION_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
+	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
 	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
 	defer func() {

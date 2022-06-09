@@ -33,6 +33,7 @@ describe('Applications reducer', () => {
     entities: {},
     derived: {},
     selectedApplication: null,
+    applicationDeviceCounts: {},
   }
 
   it('returns the initial state', () => {

@@ -685,6 +685,47 @@ func (m *ListGatewaysRequest) SetFromFlags(flags *pflag.FlagSet, prefix string) 
 	return paths, nil
 }
 
+// AddSetFlagsForListGatewayAPIKeysRequest adds flags to select fields in ListGatewayAPIKeysRequest.
+func AddSetFlagsForListGatewayAPIKeysRequest(flags *pflag.FlagSet, prefix string, hidden bool) {
+	AddSetFlagsForGatewayIdentifiers(flags, flagsplugin.Prefix("gateway-ids", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("order", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("limit", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("page", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the ListGatewayAPIKeysRequest message from flags.
+func (m *ListGatewayAPIKeysRequest) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("gateway_ids", prefix)); changed {
+		if m.GatewayIds == nil {
+			m.GatewayIds = &GatewayIdentifiers{}
+		}
+		if setPaths, err := m.GatewayIds.SetFromFlags(flags, flagsplugin.Prefix("gateway_ids", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("order", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Order = val
+		paths = append(paths, flagsplugin.Prefix("order", prefix))
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("limit", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Limit = val
+		paths = append(paths, flagsplugin.Prefix("limit", prefix))
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("page", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Page = val
+		paths = append(paths, flagsplugin.Prefix("page", prefix))
+	}
+	return paths, nil
+}
+
 // AddSelectFlagsForGatewayAntenna adds flags to select fields in GatewayAntenna.
 func AddSelectFlagsForGatewayAntenna(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("gain", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("gain", prefix), false), flagsplugin.WithHidden(hidden)))

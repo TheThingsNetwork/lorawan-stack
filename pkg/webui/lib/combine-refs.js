@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { isPlainObject } from 'lodash'
+
 /**
  * Combines multiple refs.
  *
@@ -20,8 +22,10 @@
  */
 const combineRefs = refs => val => {
   refs.forEach(ref => {
-    if (typeof ref === 'object') {
+    if (isPlainObject(ref)) {
       ref.current = val
+    } else if (typeof ref === 'function') {
+      ref(val)
     }
   })
 }

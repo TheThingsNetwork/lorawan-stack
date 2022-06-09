@@ -227,7 +227,7 @@ class DevicesTable extends React.Component {
     return (
       <FetchTable
         entity="devices"
-        defaultOrder="device_id"
+        defaultOrder="-created_at"
         headers={headers}
         addMessage={sharedMessages.addDevice}
         actionItems={this.importButton}

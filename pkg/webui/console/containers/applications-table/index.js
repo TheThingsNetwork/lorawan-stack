@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { defineMessages } from 'react-intl'
+import { defineMessages, FormattedNumber } from 'react-intl'
 import { bindActionCreators } from 'redux'
 
 import Icon from '@ttn-lw/components/icon'
@@ -24,10 +24,12 @@ import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
 import DocTooltip from '@ttn-lw/components/tooltip/doc'
 import Status from '@ttn-lw/components/status'
 import toast from '@ttn-lw/components/toast'
+import Spinner from '@ttn-lw/components/spinner'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
 import Message from '@ttn-lw/lib/components/message'
+import DateTime from '@ttn-lw/lib/components/date-time'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -47,6 +49,7 @@ import {
   selectApplications,
   selectApplicationsTotalCount,
   selectApplicationsFetching,
+  selectApplicationDeviceCount,
 } from '@console/store/selectors/applications'
 
 const m = defineMessages({
@@ -125,14 +128,14 @@ const ApplicationsTable = props => {
       {
         name: 'ids.application_id',
         displayName: sharedMessages.id,
-        width: 25,
+        width: 30,
         sortable: true,
         sortKey: 'application_id',
       },
       {
         name: 'name',
         displayName: sharedMessages.name,
-        width: 25,
+        width: 30,
         sortable: true,
       },
     ]
@@ -141,7 +144,7 @@ const ApplicationsTable = props => {
       baseHeaders.push({
         name: 'actions',
         displayName: sharedMessages.actions,
-        width: 50,
+        width: 45,
         getValue: row => ({
           id: row.ids.application_id,
           name: row.name,
@@ -164,14 +167,9 @@ const ApplicationsTable = props => {
     } else {
       baseHeaders.push(
         {
-          name: 'description',
-          displayName: sharedMessages.description,
-          width: 50,
-        },
-        {
           name: 'status',
           displayName: '',
-          width: 20,
+          width: 17,
           render: status => {
             if (status.otherCluster) {
               const host = status.host
@@ -199,6 +197,28 @@ const ApplicationsTable = props => {
             return null
           },
         },
+        {
+          name: '_devices',
+          width: 8,
+          displayName: sharedMessages.devices,
+          align: 'center',
+          render: deviceCount =>
+            typeof deviceCount !== 'number' ? (
+              <Spinner micro center inline after={100} className="c-subtle-gray" />
+            ) : (
+              <strong>
+                <FormattedNumber value={deviceCount} />
+              </strong>
+            ),
+        },
+        {
+          name: 'created_at',
+          width: 15,
+          displayName: sharedMessages.createdAt,
+          align: 'right',
+          sortable: true,
+          render: date => <DateTime.Relative value={date} />,
+        },
       )
     }
 
@@ -207,11 +227,13 @@ const ApplicationsTable = props => {
 
   const baseDataSelector = React.useCallback(state => {
     const applications = selectApplications(state)
+
     const decoratedApplications = []
 
     for (const app of applications) {
       decoratedApplications.push({
         ...app,
+        _devices: selectApplicationDeviceCount(state, app.ids.application_id),
         status: {
           otherCluster: isOtherClusterApp(app),
           host:
@@ -248,6 +270,7 @@ const ApplicationsTable = props => {
       ],
       {
         isSearch: tab === ALL_TAB || isDeletedTab || query.length > 0,
+        withDeviceCount: true,
       },
     )
   }, [])
@@ -255,7 +278,7 @@ const ApplicationsTable = props => {
   return (
     <FetchTable
       entity="applications"
-      defaultOrder="application_id"
+      defaultOrder="-created_at"
       headers={headers}
       addMessage={sharedMessages.addApplication}
       tableTitle={<Message content={sharedMessages.applications} />}

@@ -777,6 +777,7 @@ Stored in Entity Registry. The typical format of the address is "host:port". If 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| `order` | [`string`](#string) |  | Order the results by this field path. Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
 | `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
 | `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
 
@@ -785,6 +786,7 @@ Stored in Entity Registry. The typical format of the address is "host:port". If 
 | Field | Validations |
 | ----- | ----------- |
 | `application_ids` | <p>`message.required`: `true`</p> |
+| `order` | <p>`string.in`: `[ api_key_id -api_key_id name -name created_at -created_at expires_at -expires_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.ListApplicationCollaboratorsRequest">Message `ListApplicationCollaboratorsRequest`</a>
@@ -4297,6 +4299,7 @@ Identifies an end device model with version information.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
+| `order` | [`string`](#string) |  | Order the results by this field path. Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
 | `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
 | `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
 
@@ -4305,6 +4308,7 @@ Identifies an end device model with version information.
 | Field | Validations |
 | ----- | ----------- |
 | `gateway_ids` | <p>`message.required`: `true`</p> |
+| `order` | <p>`string.in`: `[ api_key_id -api_key_id name -name created_at -created_at expires_at -expires_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.ListGatewayCollaboratorsRequest">Message `ListGatewayCollaboratorsRequest`</a>
@@ -7411,6 +7415,7 @@ is used to manage OAuth client authorizations for users.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `organization_ids` | [`OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers) |  |  |
+| `order` | [`string`](#string) |  | Order the results by this field path. Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
 | `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
 | `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
 
@@ -7419,6 +7424,7 @@ is used to manage OAuth client authorizations for users.
 | Field | Validations |
 | ----- | ----------- |
 | `organization_ids` | <p>`message.required`: `true`</p> |
+| `order` | <p>`string.in`: `[ api_key_id -api_key_id name -name created_at -created_at expires_at -expires_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.ListOrganizationCollaboratorsRequest">Message `ListOrganizationCollaboratorsRequest`</a>
@@ -8718,6 +8724,7 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `user_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+| `order` | [`string`](#string) |  | Order the results by this field path. Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
 | `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
 | `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
 
@@ -8726,6 +8733,7 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 | Field | Validations |
 | ----- | ----------- |
 | `user_ids` | <p>`message.required`: `true`</p> |
+| `order` | <p>`string.in`: `[ api_key_id -api_key_id name -name created_at -created_at expires_at -expires_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.ListUserSessionsRequest">Message `ListUserSessionsRequest`</a>

@@ -21,6 +21,7 @@ import {
   GET_ORG_SUCCESS,
   UPDATE_ORG_SUCCESS,
   DELETE_ORG_SUCCESS,
+  GET_ORG_COLLABORATOR_COUNT_SUCCESS,
 } from '@console/store/actions/organizations'
 
 const organization = (state = {}, organization) => ({
@@ -31,6 +32,7 @@ const organization = (state = {}, organization) => ({
 const defaultState = {
   entities: {},
   selectedOrganization: null,
+  collaboratorCounts: {},
 }
 
 const organizations = (state = defaultState, { type, payload }) => {
@@ -65,6 +67,14 @@ const organizations = (state = defaultState, { type, payload }) => {
         entities: {
           ...state.entities,
           [id]: organization(state.entities[id], payload),
+        },
+      }
+    case GET_ORG_COLLABORATOR_COUNT_SUCCESS:
+      return {
+        ...state,
+        collaboratorCounts: {
+          ...state.collaboratorCounts,
+          [payload.id]: payload.collaboratorCount,
         },
       }
     case DELETE_ORG_SUCCESS:

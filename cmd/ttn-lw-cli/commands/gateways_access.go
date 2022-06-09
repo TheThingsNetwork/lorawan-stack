@@ -18,6 +18,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
@@ -184,19 +185,24 @@ var (
 		Aliases: []string{"ls"},
 		Short:   "List gateway API keys",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			gtwID, err := getGatewayID(cmd.Flags(), args, true)
+			req := &ttnpb.ListGatewayAPIKeysRequest{Limit: 50, Page: 1}
+			_, err := req.SetFromFlags(cmd.Flags(), "")
 			if err != nil {
 				return err
+			}
+			if len(args) > 0 && req.GetGatewayIds().GetGatewayId() == "" {
+				if len(args) > 1 {
+					logger.Warn("Multiple IDs found in arguments, considering only the first")
+				}
+				req.GatewayIds = &ttnpb.GatewayIdentifiers{GatewayId: args[0]}
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
-			limit, page, opt, getTotal := withPagination(cmd.Flags())
-			res, err := ttnpb.NewGatewayAccessClient(is).ListAPIKeys(ctx, &ttnpb.ListGatewayAPIKeysRequest{
-				GatewayIds: gtwID, Limit: limit, Page: page,
-			}, opt)
+			_, _, opt, getTotal := withPagination(cmd.Flags())
+			res, err := ttnpb.NewGatewayAccessClient(is).ListAPIKeys(ctx, req, opt)
 			if err != nil {
 				return err
 			}
@@ -376,7 +382,10 @@ func init() {
 	gatewayCollaborators.PersistentFlags().AddFlagSet(gatewayIDFlags())
 	gatewaysCommand.AddCommand(gatewayCollaborators)
 
-	gatewayAPIKeysList.Flags().AddFlagSet(paginationFlags())
+	ttnpb.AddSetFlagsForListGatewayAPIKeysRequest(gatewayAPIKeysList.Flags(), "", false)
+	gatewayAPIKeysList.Flags().Lookup("limit").DefValue = "50"
+	gatewayAPIKeysList.Flags().Lookup("page").DefValue = "1"
+	flagsplugin.AddAlias(gatewayAPIKeysList.Flags(), "gateway-ids.gateway-id", "gateway-id")
 	gatewayAPIKeys.AddCommand(gatewayAPIKeysList)
 	gatewayAPIKeysGet.Flags().String("api-key-id", "", "")
 	gatewayAPIKeys.AddCommand(gatewayAPIKeysGet)

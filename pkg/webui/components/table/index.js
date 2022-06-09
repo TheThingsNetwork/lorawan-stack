@@ -78,6 +78,7 @@ class Tabular extends React.Component {
       rowHrefSelector,
       emptyMessage,
       clickable,
+      disableSorting,
     } = this.props
 
     const columns = (
@@ -86,15 +87,19 @@ class Tabular extends React.Component {
           <Table.HeadCell
             key={key}
             align={header.align}
-            content={header.sortable ? undefined : header.displayName}
+            content={header.sortable && !disableSorting ? undefined : header.displayName}
             name={header.name}
             width={header.width}
           >
-            {header.sortable ? (
+            {header.sortable && !disableSorting ? (
               <Table.SortButton
                 title={header.displayName}
                 direction={order}
-                name={header.sortKey || header.name}
+                name={
+                  typeof header.sortKey === 'function'
+                    ? header.sortKey(header)
+                    : header.sortKey || header.name
+                }
                 active={header.sortKey ? orderBy === header.sortKey : orderBy === header.name}
                 onSort={this.onSortRequest}
               />
@@ -182,6 +187,8 @@ Tabular.propTypes = {
       }),
     }),
   ),
+  /** A flag to disable any sorting in the table altogether. */
+  disableSorting: PropTypes.bool,
   /** The empty message to be displayed when no data provided. */
   emptyMessage: PropTypes.message.isRequired,
   /**
@@ -199,6 +206,7 @@ Tabular.propTypes = {
       name: PropTypes.string,
       render: PropTypes.func,
       sortable: PropTypes.bool,
+      sortKey: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
       width: PropTypes.number,
     }),
   ).isRequired,
@@ -255,6 +263,7 @@ Tabular.defaultProps = {
   clickable: true,
   rowKeySelector: undefined,
   rowHrefSelector: undefined,
+  disableSorting: false,
 }
 
 export { Tabular as default, Table }

@@ -177,12 +177,14 @@ var ListApplicationAPIKeysRequestFieldPathsNested = []string{
 	"application_ids",
 	"application_ids.application_id",
 	"limit",
+	"order",
 	"page",
 }
 
 var ListApplicationAPIKeysRequestFieldPathsTopLevel = []string{
 	"application_ids",
 	"limit",
+	"order",
 	"page",
 }
 var GetApplicationAPIKeyRequestFieldPathsNested = []string{

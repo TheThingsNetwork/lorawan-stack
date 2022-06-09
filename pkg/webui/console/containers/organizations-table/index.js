@@ -21,14 +21,17 @@ import toast from '@ttn-lw/components/toast'
 import Button from '@ttn-lw/components/button'
 import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
 import ButtonGroup from '@ttn-lw/components/button/group'
+import Spinner from '@ttn-lw/components/spinner'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
+import DateTime from '@ttn-lw/lib/components/date-time'
 import Message from '@ttn-lw/lib/components/message'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+import { getOrganizationId } from '@ttn-lw/lib/selectors/id'
 
 import { checkFromState, mayCreateOrganizations } from '@console/lib/feature-checks'
 
@@ -43,6 +46,7 @@ import {
   selectOrganizations,
   selectOrganizationsTotalCount,
   selectOrganizationsFetching,
+  selectOrganizationCollaboratorCount,
 } from '@console/store/selectors/organizations'
 
 const m = defineMessages({
@@ -118,20 +122,20 @@ const OrganizationsTable = props => {
       {
         name: 'ids.organization_id',
         displayName: sharedMessages.id,
-        width: 25,
+        width: 20,
         sortable: true,
         sortKey: 'organization_id',
       },
       {
         name: 'name',
         displayName: sharedMessages.name,
-        width: 25,
+        width: 20,
         sortable: true,
       },
       {
         name: 'description',
         displayName: sharedMessages.description,
-        width: 50,
+        width: 30,
       },
     ]
 
@@ -139,7 +143,7 @@ const OrganizationsTable = props => {
       baseHeaders.push({
         name: 'actions',
         displayName: sharedMessages.actions,
-        width: 50,
+        width: 30,
         getValue: row => ({
           id: row.ids.organization_id,
           name: row.name,
@@ -160,25 +164,50 @@ const OrganizationsTable = props => {
         ),
       })
     } else {
-      baseHeaders.push({
-        name: 'description',
-        displayName: sharedMessages.description,
-        width: 50,
-      })
+      baseHeaders.push(
+        {
+          name: '_collaboratorCount',
+          displayName: sharedMessages.collaborators,
+          width: 10,
+          align: 'center',
+          render: deviceCount =>
+            typeof deviceCount !== 'number' ? (
+              <Spinner micro center inline after={100} className="c-subtle-gray" />
+            ) : (
+              deviceCount
+            ),
+        },
+        {
+          name: 'created_at',
+          displayName: sharedMessages.createdAt,
+          sortable: true,
+          width: 20,
+          render: date => <DateTime.Relative value={date} />,
+        },
+      )
     }
 
     return baseHeaders
   }, [handlePurge, handleRestore, isDeletedTab])
 
-  const baseDataSelector = React.useCallback(
-    state => ({
-      organizations: selectOrganizations(state),
+  const baseDataSelector = React.useCallback(state => {
+    const organizations = selectOrganizations(state)
+    const decoratedOrganizations = []
+
+    for (const org of organizations) {
+      decoratedOrganizations.push({
+        ...org,
+        _collaboratorCount: selectOrganizationCollaboratorCount(state, getOrganizationId(org)),
+      })
+    }
+
+    return {
+      organizations: decoratedOrganizations,
       totalCount: selectOrganizationsTotalCount(state),
       fetching: selectOrganizationsFetching(state),
       mayAdd: checkFromState(mayCreateOrganizations, state),
-    }),
-    [],
-  )
+    }
+  }, [])
 
   const getOrganizations = React.useCallback(filters => {
     const { tab, query } = filters
@@ -188,13 +217,14 @@ const OrganizationsTable = props => {
 
     return getOrganizationsList({ ...filters, deleted: isDeletedTab }, ['name', 'description'], {
       isSearch: tab === ALL_TAB || isDeletedTab || query.length > 0,
+      withCollaboratorCount: true,
     })
   }, [])
 
   return (
     <FetchTable
       entity="organizations"
-      defaultOrder="organization_id"
+      defaultOrder="-created_at"
       headers={headers}
       addMessage={sharedMessages.addOrganization}
       tableTitle={<Message content={sharedMessages.organizations} />}

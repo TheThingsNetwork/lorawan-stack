@@ -1742,6 +1742,15 @@ func (m *ListGatewayAPIKeysRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "order":
+
+			if _, ok := _ListGatewayAPIKeysRequest_Order_InLookup[m.GetOrder()]; !ok {
+				return ListGatewayAPIKeysRequestValidationError{
+					field:  "order",
+					reason: "value must be in list [ api_key_id -api_key_id name -name created_at -created_at expires_at -expires_at]",
+				}
+			}
+
 		case "limit":
 
 			if m.GetLimit() > 1000 {
@@ -1819,6 +1828,18 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ListGatewayAPIKeysRequestValidationError{}
+
+var _ListGatewayAPIKeysRequest_Order_InLookup = map[string]struct{}{
+	"":            {},
+	"api_key_id":  {},
+	"-api_key_id": {},
+	"name":        {},
+	"-name":       {},
+	"created_at":  {},
+	"-created_at": {},
+	"expires_at":  {},
+	"-expires_at": {},
+}
 
 // ValidateFields checks the field values on GetGatewayAPIKeyRequest with the
 // rules defined in the proto definition for this message. If any rules are

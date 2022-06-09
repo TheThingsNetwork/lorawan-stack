@@ -37,11 +37,12 @@ const getApiKeysLogic = createRequestLogic({
     const {
       parentType,
       parentId,
-      params: { page, limit },
+      params: { page, limit, order },
     } = action.payload
     const data = await tts[entitySdkServiceMap[parentType]].ApiKeys.getAll(parentId, {
       limit,
       page,
+      order,
     })
     return { parentType, entities: data.api_keys, totalCount: data.totalCount }
   },

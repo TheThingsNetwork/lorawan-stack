@@ -164,7 +164,14 @@ message UpdateApplicationRequest {
 }
 
 message ListApplicationAPIKeysRequest {
+  option (thethings.flags.message) = { select: false, set: true };
+
   ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
+  // Order the results by this field path.
+  // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
+  string order = 4 [
+    (validate.rules).string = { in: ["", "api_key_id", "-api_key_id", "name", "-name", "created_at", "-created_at", "expires_at", "-expires_at"] }
+  ];
   // Limit the number of results per page.
   uint32 limit = 2 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.

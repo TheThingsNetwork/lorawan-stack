@@ -21,6 +21,7 @@ import Status from '@ttn-lw/components/status'
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
 import Message from '@ttn-lw/lib/components/message'
+import DateTime from '@ttn-lw/lib/components/date-time'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -76,23 +77,21 @@ export default class WebhooksTable extends React.Component {
       {
         name: 'ids.webhook_id',
         displayName: sharedMessages.id,
-        width: 40,
+        width: 30,
+        sortable: true,
       },
       {
         name: 'base_url',
         displayName: m.baseUrl,
-        width: 37,
+        width: 40,
+        sortable: true,
       },
       {
         name: 'template_ids.template_id',
         displayName: m.templateId,
-        width: 15,
+        width: 12,
         render: value => value || <Message className={style.none} content={sharedMessages.none} />,
-      },
-      {
-        name: 'format',
-        displayName: m.format,
-        width: 6,
+        sortable: true,
       },
     ]
 
@@ -100,7 +99,7 @@ export default class WebhooksTable extends React.Component {
       headers.push({
         name: 'health_status',
         displayName: sharedMessages.status,
-        width: 10,
+        width: 8,
         render: value => {
           let indicator = 'unknown'
           let label = sharedMessages.unknown
@@ -121,14 +120,25 @@ export default class WebhooksTable extends React.Component {
       })
     }
 
+    headers.push({
+      name: 'created_at',
+      displayName: sharedMessages.createdAt,
+      width: 10,
+      sortable: true,
+      render: date => <DateTime.Relative value={date} />,
+    })
+
     return (
       <FetchTable
         entity="webhooks"
+        defaultOrder="-created_at"
         addMessage={sharedMessages.addWebhook}
         headers={headers}
         getItemsAction={this.getWebhooksList}
         baseDataSelector={this.baseDataSelector}
         tableTitle={<Message content={sharedMessages.webhooks} />}
+        paginated={false}
+        handlesSorting
         {...this.props}
       />
     )

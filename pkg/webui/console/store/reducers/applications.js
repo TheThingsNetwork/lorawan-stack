@@ -37,7 +37,7 @@ const defaultState = {
   entities: {},
   derived: {},
   selectedApplication: null,
-  applicationDeviceCount: undefined,
+  applicationDeviceCounts: {},
 }
 
 const applications = (state = defaultState, { type, payload, event }) => {
@@ -65,7 +65,10 @@ const applications = (state = defaultState, { type, payload, event }) => {
     case GET_APP_DEV_COUNT_SUCCESS:
       return {
         ...state,
-        applicationDeviceCount: payload.applicationDeviceCount,
+        applicationDeviceCounts: {
+          ...state.applicationDeviceCounts,
+          [payload.id]: payload.applicationDeviceCount,
+        },
       }
     case GET_APP_SUCCESS:
     case UPDATE_APP_SUCCESS:

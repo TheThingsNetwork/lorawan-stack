@@ -27,6 +27,7 @@ import SafeInspector from '@ttn-lw/components/safe-inspector'
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
 import Message from '@ttn-lw/lib/components/message'
+import DateTime from '@ttn-lw/lib/components/date-time'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -117,20 +118,20 @@ const GatewaysTable = props => {
       {
         name: 'ids.gateway_id',
         displayName: sharedMessages.id,
-        width: 24,
+        width: 25,
         sortable: true,
         sortKey: 'gateway_id',
       },
       {
         name: 'name',
         displayName: sharedMessages.name,
-        width: 22,
+        width: 33,
         sortable: true,
       },
       {
         name: 'ids.eui',
         displayName: sharedMessages.gatewayEUI,
-        width: 15,
+        width: 22,
         sortable: true,
         sortKey: 'gateway_eui',
         render: gatewayEui =>
@@ -151,7 +152,7 @@ const GatewaysTable = props => {
       baseHeaders.push({
         name: 'actions',
         displayName: sharedMessages.actions,
-        width: 34,
+        width: 25,
         getValue: row => ({
           id: row.ids.gateway_id,
           name: row.name,
@@ -172,31 +173,41 @@ const GatewaysTable = props => {
         ),
       })
     } else {
-      baseHeaders.push({
-        name: 'status',
-        width: 18,
-        displayName: sharedMessages.status,
-        render: status => {
-          let indicator = 'unknown'
-          let label = sharedMessages.unknown
+      baseHeaders.push(
+        {
+          name: 'status',
+          width: 10,
+          displayName: sharedMessages.status,
+          render: status => {
+            let indicator = 'unknown'
+            let label = sharedMessages.unknown
 
-          if (status === 'connected') {
-            indicator = 'good'
-            label = sharedMessages.connected
-          } else if (status === 'disconnected') {
-            indicator = 'bad'
-            label = sharedMessages.disconnected
-          } else if (status === 'other-cluster') {
-            indicator = 'unknown'
-            label = sharedMessages.otherCluster
-          } else if (status === 'unknown') {
-            indicator = 'mediocre'
-            label = sharedMessages.unknown
-          }
+            if (status === 'connected') {
+              indicator = 'good'
+              label = sharedMessages.connected
+            } else if (status === 'disconnected') {
+              indicator = 'bad'
+              label = sharedMessages.disconnected
+            } else if (status === 'other-cluster') {
+              indicator = 'unknown'
+              label = sharedMessages.otherCluster
+            } else if (status === 'unknown') {
+              indicator = 'mediocre'
+              label = sharedMessages.unknown
+            }
 
-          return <Status status={indicator} label={label} />
+            return <Status status={indicator} label={label} flipped />
+          },
         },
-      })
+        {
+          name: 'created_at',
+          width: 10,
+          displayName: sharedMessages.createdAt,
+          align: 'right',
+          sortable: true,
+          render: date => <DateTime.Relative value={date} />,
+        },
+      )
     }
 
     return baseHeaders
@@ -231,7 +242,7 @@ const GatewaysTable = props => {
   return (
     <FetchTable
       entity="gateways"
-      defaultOrder="gateway_id"
+      defaultOrder="-created_at"
       addMessage={sharedMessages.addGateway}
       headers={headers}
       getItemsAction={getGateways}

@@ -885,6 +885,15 @@ func (m *ListOrganizationAPIKeysRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "order":
+
+			if _, ok := _ListOrganizationAPIKeysRequest_Order_InLookup[m.GetOrder()]; !ok {
+				return ListOrganizationAPIKeysRequestValidationError{
+					field:  "order",
+					reason: "value must be in list [ api_key_id -api_key_id name -name created_at -created_at expires_at -expires_at]",
+				}
+			}
+
 		case "limit":
 
 			if m.GetLimit() > 1000 {
@@ -962,6 +971,18 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ListOrganizationAPIKeysRequestValidationError{}
+
+var _ListOrganizationAPIKeysRequest_Order_InLookup = map[string]struct{}{
+	"":            {},
+	"api_key_id":  {},
+	"-api_key_id": {},
+	"name":        {},
+	"-name":       {},
+	"created_at":  {},
+	"-created_at": {},
+	"expires_at":  {},
+	"-expires_at": {},
+}
 
 // ValidateFields checks the field values on GetOrganizationAPIKeyRequest with
 // the rules defined in the proto definition for this message. If any rules

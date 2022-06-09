@@ -15,8 +15,6 @@
 import React from 'react'
 import { Container, Row, Col } from 'react-grid-system'
 
-import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
-
 import PageTitle from '@ttn-lw/components/page-title'
 
 import WebhooksTable from '@console/containers/webhooks-table'
@@ -32,7 +30,7 @@ const ApplicationWebhooksList = props => {
       <PageTitle title={sharedMessages.webhooks} hideHeading />
       <Row>
         <Col>
-          <WebhooksTable pageSize={PAGE_SIZES.REGULAR} appId={appId} />
+          <WebhooksTable appId={appId} />
         </Col>
       </Row>
     </Container>
