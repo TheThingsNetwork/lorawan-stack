@@ -22,10 +22,10 @@ For details about compatibility between different releases, see the **Commitment
 ### Security
 
 ## [3.20.0] - unreleased
-- OAuth client management in the account app.
 
 ### Added
 
+- OAuth client management in the account app.
 - Support claim protection when claiming end devices on The Things Join Server.
 - CLI commands `notifications list` and `notifications set-status` to manage user notifications.
 - Support for class B and C downlink transmissions through multiple gateways simultaneously.
