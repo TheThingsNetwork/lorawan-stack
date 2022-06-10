@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Fix `last activity` not updating bug in the Console.
+
 ### Security
 
 ## [3.20.0] - unreleased
