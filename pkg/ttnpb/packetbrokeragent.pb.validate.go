@@ -2663,7 +2663,18 @@ func (m *PacketBrokerGateway_GatewayIdentifiers) ValidateFields(paths ...string)
 			}
 
 		case "eui":
-			// no validation rules for Eui
+
+			if len(m.GetEui()) > 0 {
+
+				if len(m.GetEui()) != 8 {
+					return PacketBrokerGateway_GatewayIdentifiersValidationError{
+						field:  "eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		default:
 			return PacketBrokerGateway_GatewayIdentifiersValidationError{
 				field:  name,

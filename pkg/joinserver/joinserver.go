@@ -306,7 +306,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 				if netID == nil {
 					appSettings, err := getAppSettings()
 					if err == nil {
-						netID = types.MustNetID(appSettings.HomeNetId)
+						netID = appSettings.HomeNetId
 					} else if !errors.IsNotFound(err) {
 						return nil, nil, errLookupNetID.WithCause(err)
 					}
@@ -314,10 +314,10 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 				if netID == nil {
 					return nil, nil, errNoNetID.New()
 				}
-				if !types.MustNetID(req.NetId).OrZero().Equal(*netID) {
+				if !bytes.Equal(req.NetId, netID) {
 					return nil, nil, errNetIDMismatch.WithAttributes("net_id", types.MustNetID(req.NetId).OrZero())
 				}
-				if err := externalAuth.RequireNetID(ctx, *netID); err != nil {
+				if err := externalAuth.RequireNetID(ctx, types.MustNetID(netID).OrZero()); err != nil {
 					return nil, nil, err
 				}
 				if dev.NetworkServerAddress != "" {
@@ -502,7 +502,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			)
 			nsKEKLabel, asKEKLabel := dev.NetworkServerKekLabel, dev.ApplicationServerKekLabel
 			if nsKEKLabel == "" {
-				nsKEKLabel = js.KeyVault.NsKEKLabel(ctx, dev.NetId, dev.NetworkServerAddress)
+				nsKEKLabel = js.KeyVault.NsKEKLabel(ctx, types.MustNetID(dev.NetId), dev.NetworkServerAddress)
 				nsPlaintextCond = errors.IsNotFound
 			}
 			fNwkSIntKeyEnvelope, err = wrapKeyWithVault(ctx, nwkSKeys.FNwkSIntKey, nsKEKLabel, js.KeyVault, nsPlaintextCond)
@@ -642,7 +642,7 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 				"kek",
 			})
 			if err == nil {
-				netID = types.MustNetID(appSettings.HomeNetId)
+				netID = appSettings.HomeNetId
 			} else if !errors.IsNotFound(err) {
 				return nil, errLookupNetID.WithCause(err)
 			}
@@ -650,7 +650,7 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 		if netID == nil {
 			return nil, errNoNetID.New()
 		}
-		if err := externalAuth.RequireNetID(ctx, *netID); err != nil {
+		if err := externalAuth.RequireNetID(ctx, types.MustNetID(netID).OrZero()); err != nil {
 			return nil, err
 		}
 		if dev.NetworkServerAddress != "" {
@@ -804,11 +804,11 @@ func (js *JoinServer) GetHomeNetwork(ctx context.Context, joinEUI, devEUI types.
 			}
 			return nil, nil
 		}
-		netID = types.MustNetID(sets.HomeNetId)
+		netID = sets.HomeNetId
 	}
 	// TODO: Return NSID (https://github.com/TheThingsNetwork/lorawan-stack/issues/4741).
 	return &EndDeviceHomeNetwork{
-		NetID:                netID,
+		NetID:                types.MustNetID(netID),
 		NetworkServerAddress: dev.NetworkServerAddress,
 	}, nil
 }

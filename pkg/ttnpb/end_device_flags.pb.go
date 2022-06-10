@@ -12,7 +12,6 @@ import (
 	types "github.com/gogo/protobuf/types"
 	pflag "github.com/spf13/pflag"
 	customflags "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags"
-	types1 "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // AddSelectFlagsForSession adds flags to select fields in Session.
@@ -1513,8 +1512,8 @@ func AddSetFlagsForMACState_JoinAccept(flags *pflag.FlagSet, prefix string, hidd
 	AddSetFlagsForMACState_JoinRequest(flags, flagsplugin.Prefix("request", prefix), hidden)
 	AddSetFlagsForSessionKeys(flags, flagsplugin.Prefix("keys", prefix), hidden)
 	flags.AddFlag(flagsplugin.NewStringSliceFlag(flagsplugin.Prefix("correlation-ids", prefix), "", flagsplugin.WithHidden(hidden)))
-	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("dev-addr", prefix), "", flagsplugin.WithHidden(hidden)))
-	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("net-id", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(customflags.New4BytesFlag(flagsplugin.Prefix("dev-addr", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(customflags.New3BytesFlag(flagsplugin.Prefix("net-id", prefix), "", flagsplugin.WithHidden(hidden)))
 }
 
 // SetFromFlags sets the MACState_JoinAccept message from flags.
@@ -1551,13 +1550,13 @@ func (m *MACState_JoinAccept) SetFromFlags(flags *pflag.FlagSet, prefix string) 
 		m.CorrelationIds = val
 		paths = append(paths, flagsplugin.Prefix("correlation_ids", prefix))
 	}
-	if val, changed, err := types1.GetDevAddrFromFlag(flags, flagsplugin.Prefix("dev_addr", prefix)); err != nil {
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("dev_addr", prefix)); err != nil {
 		return nil, err
 	} else if changed {
 		m.DevAddr = val
 		paths = append(paths, flagsplugin.Prefix("dev_addr", prefix))
 	}
-	if val, changed, err := types1.GetNetIDFromFlag(flags, flagsplugin.Prefix("net_id", prefix)); err != nil {
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("net_id", prefix)); err != nil {
 		return nil, err
 	} else if changed {
 		m.NetId = val
@@ -2617,10 +2616,10 @@ func (m *EndDevice) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []s
 			paths = append(paths, setPaths...)
 		}
 	}
-	if val, changed, err := types1.GetNetIDFromFlag(flags, flagsplugin.Prefix("net_id", prefix)); err != nil {
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("net_id", prefix)); err != nil {
 		return nil, err
 	} else if changed {
-		m.NetId = &val
+		m.NetId = val
 		paths = append(paths, flagsplugin.Prefix("net_id", prefix))
 	}
 	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("mac_settings", prefix)); changed {

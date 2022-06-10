@@ -1873,7 +1873,7 @@ func TestHandleJoin(t *testing.T) {
 					},
 				},
 				LorawanVersion:       ttnpb.MACVersion_MAC_V1_0,
-				NetId:                &types.NetID{0x42, 0xff, 0xff},
+				NetId:                types.NetID{0x42, 0xff, 0xff}.Bytes(),
 				NetworkServerAddress: nsAddr,
 			},
 			ApplicationActivationSettings: &ttnpb.ApplicationActivationSettings{},
@@ -1961,7 +1961,7 @@ func TestHandleJoin(t *testing.T) {
 					},
 				},
 				LorawanVersion:       ttnpb.MACVersion_MAC_V1_0,
-				NetId:                &types.NetID{0x42, 0xff, 0xff},
+				NetId:                types.NetID{0x42, 0xff, 0xff}.Bytes(),
 				NetworkServerAddress: nsAddr,
 			},
 			NextLastJoinNonce: 1,
@@ -2064,7 +2064,7 @@ func TestHandleJoin(t *testing.T) {
 					},
 				},
 				LorawanVersion:       ttnpb.MACVersion_MAC_V1_0,
-				NetId:                &types.NetID{0x42, 0xff, 0xff},
+				NetId:                types.NetID{0x42, 0xff, 0xff}.Bytes(),
 				NetworkServerAddress: nsAddr,
 			},
 			NextLastJoinNonce: 1,
@@ -3244,7 +3244,7 @@ func TestGetHomeNetID(t *testing.T) {
 				return &ttnpb.ContextualEndDevice{
 					Context: ctx,
 					EndDevice: &ttnpb.EndDevice{
-						NetId:                &types.NetID{0x42, 0xff, 0xff},
+						NetId:                types.NetID{0x42, 0xff, 0xff}.Bytes(),
 						NetworkServerAddress: nsAddr,
 					},
 				}, nil

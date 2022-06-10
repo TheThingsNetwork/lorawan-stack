@@ -115,7 +115,7 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids *ttnpb.GatewayIdentifi
 		Gateway: &ttnpb.PacketBrokerGateway{
 			Ids: &ttnpb.PacketBrokerGateway_GatewayIdentifiers{
 				GatewayId: ids.GatewayId,
-				Eui:       ids.Eui,
+				Eui:       ids.Eui.Bytes(),
 			},
 			Antennas:         antennas,
 			FrequencyPlanIds: gtw.FrequencyPlanIds,
@@ -163,7 +163,7 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids *ttnpb.GatewayIdentifi
 			Gateway: &ttnpb.PacketBrokerGateway{
 				Ids: &ttnpb.PacketBrokerGateway_GatewayIdentifiers{
 					GatewayId: ids.GatewayId,
-					Eui:       ids.Eui,
+					Eui:       ids.Eui.Bytes(),
 				},
 				Online:       true,
 				StatusPublic: gtw.StatusPublic,

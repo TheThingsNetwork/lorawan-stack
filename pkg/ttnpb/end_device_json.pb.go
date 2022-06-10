@@ -1616,12 +1616,12 @@ func (x *MACState_JoinAccept) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if len(x.DevAddr) > 0 || s.HasField("dev_addr") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("dev_addr")
-		x.DevAddr.MarshalProtoJSON(s.WithField("dev_addr"))
+		types.MarshalHEXBytes(s.WithField("dev_addr"), x.DevAddr)
 	}
 	if len(x.NetId) > 0 || s.HasField("net_id") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("net_id")
-		x.NetId.MarshalProtoJSON(s.WithField("net_id"))
+		types.MarshalHEXBytes(s.WithField("net_id"), x.NetId)
 	}
 	s.WriteObjectEnd()
 }
@@ -1669,10 +1669,10 @@ func (x *MACState_JoinAccept) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.CorrelationIds = s.ReadStringArray()
 		case "dev_addr", "devAddr":
 			s.AddField("dev_addr")
-			x.DevAddr.UnmarshalProtoJSON(s.WithField("dev_addr", false))
+			x.DevAddr = types.Unmarshal4Bytes(s.WithField("dev_addr", false))
 		case "net_id", "netId":
 			s.AddField("net_id")
-			x.NetId.UnmarshalProtoJSON(s.WithField("net_id", false))
+			x.NetId = types.Unmarshal3Bytes(s.WithField("net_id", false))
 		}
 	})
 }
@@ -2352,10 +2352,10 @@ func (x *EndDevice) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		// NOTE: RootKeys does not seem to implement MarshalProtoJSON.
 		gogo.MarshalMessage(s, x.RootKeys)
 	}
-	if x.NetId != nil || s.HasField("net_id") {
+	if len(x.NetId) > 0 || s.HasField("net_id") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("net_id")
-		x.NetId.MarshalProtoJSON(s.WithField("net_id"))
+		types.MarshalHEXBytes(s.WithField("net_id"), x.NetId)
 	}
 	if x.MacSettings != nil || s.HasField("mac_settings") {
 		s.WriteMoreIf(&wroteField)
@@ -2665,12 +2665,7 @@ func (x *EndDevice) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.RootKeys = &v
 		case "net_id", "netId":
 			s.AddField("net_id")
-			if s.ReadNil() {
-				x.NetId = nil
-				return
-			}
-			x.NetId = &types.NetID{}
-			x.NetId.UnmarshalProtoJSON(s.WithField("net_id", false))
+			x.NetId = types.Unmarshal3Bytes(s.WithField("net_id", false))
 		case "mac_settings", "macSettings":
 			if s.ReadNil() {
 				x.MacSettings = nil
@@ -2913,6 +2908,56 @@ func (x *EndDevices) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the DevAddrPrefix message to JSON.
+func (x *DevAddrPrefix) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.DevAddr) > 0 || s.HasField("dev_addr") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("dev_addr")
+		types.MarshalHEXBytes(s.WithField("dev_addr"), x.DevAddr)
+	}
+	if x.Length != 0 || s.HasField("length") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("length")
+		s.WriteUint32(x.Length)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the DevAddrPrefix to JSON.
+func (x DevAddrPrefix) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
+// UnmarshalProtoJSON unmarshals the DevAddrPrefix message from JSON.
+func (x *DevAddrPrefix) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "dev_addr", "devAddr":
+			s.AddField("dev_addr")
+			x.DevAddr = types.Unmarshal4Bytes(s.WithField("dev_addr", false))
+		case "length":
+			s.AddField("length")
+			x.Length = s.ReadUint32()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the DevAddrPrefix from JSON.
+func (x *DevAddrPrefix) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the CreateEndDeviceRequest message to JSON.
 func (x *CreateEndDeviceRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -3022,6 +3067,56 @@ func (x *UpdateEndDeviceRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 
 // UnmarshalJSON unmarshals the UpdateEndDeviceRequest from JSON.
 func (x *UpdateEndDeviceRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the GetEndDeviceIdentifiersForEUIsRequest message to JSON.
+func (x *GetEndDeviceIdentifiersForEUIsRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.JoinEui) > 0 || s.HasField("join_eui") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("join_eui")
+		types.MarshalHEXBytes(s.WithField("join_eui"), x.JoinEui)
+	}
+	if len(x.DevEui) > 0 || s.HasField("dev_eui") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("dev_eui")
+		types.MarshalHEXBytes(s.WithField("dev_eui"), x.DevEui)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the GetEndDeviceIdentifiersForEUIsRequest to JSON.
+func (x GetEndDeviceIdentifiersForEUIsRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
+// UnmarshalProtoJSON unmarshals the GetEndDeviceIdentifiersForEUIsRequest message from JSON.
+func (x *GetEndDeviceIdentifiersForEUIsRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "join_eui", "joinEui":
+			s.AddField("join_eui")
+			x.JoinEui = types.Unmarshal8Bytes(s.WithField("join_eui", false))
+		case "dev_eui", "devEui":
+			s.AddField("dev_eui")
+			x.DevEui = types.Unmarshal8Bytes(s.WithField("dev_eui", false))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the GetEndDeviceIdentifiersForEUIsRequest from JSON.
+func (x *GetEndDeviceIdentifiersForEUIsRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 

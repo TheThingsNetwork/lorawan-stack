@@ -51,7 +51,18 @@ func (m *GenerateDevAddrResponse) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "dev_addr":
-			// no validation rules for DevAddr
+
+			if len(m.GetDevAddr()) > 0 {
+
+				if len(m.GetDevAddr()) != 4 {
+					return GenerateDevAddrResponseValidationError{
+						field:  "dev_addr",
+						reason: "value length must be 4 bytes",
+					}
+				}
+
+			}
+
 		default:
 			return GenerateDevAddrResponseValidationError{
 				field:  name,

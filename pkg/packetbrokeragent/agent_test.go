@@ -462,7 +462,7 @@ func TestForwarder(t *testing.T) {
 			Gateway: &ttnpb.PacketBrokerGateway{
 				Ids: &ttnpb.PacketBrokerGateway_GatewayIdentifiers{
 					GatewayId: "foo-gateway",
-					Eui:       eui64Ptr(types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}),
+					Eui:       types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}.Bytes(),
 				},
 				ContactInfo: []*ttnpb.ContactInfo{
 					{

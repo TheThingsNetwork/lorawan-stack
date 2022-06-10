@@ -28,7 +28,7 @@ import (
 // range of the network server.
 func (ns *NetworkServer) GenerateDevAddr(ctx context.Context, req *pbtypes.Empty) (*ttnpb.GenerateDevAddrResponse, error) {
 	devAddr := ns.newDevAddr(ctx, nil)
-	return &ttnpb.GenerateDevAddrResponse{DevAddr: &devAddr}, nil
+	return &ttnpb.GenerateDevAddrResponse{DevAddr: devAddr.Bytes()}, nil
 }
 
 func (ns *NetworkServer) GetDefaultMACSettings(ctx context.Context, req *ttnpb.GetDefaultMACSettingsRequest) (*ttnpb.MACSettings, error) {

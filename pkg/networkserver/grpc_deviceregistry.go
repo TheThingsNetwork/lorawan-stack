@@ -2010,7 +2010,9 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			"pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key.key": st.Device.PendingMacState.QueuedJoinAccept.Keys.GetSNwkSIntKey().IsZero,
 			"pending_mac_state.queued_join_accept.keys.session_key_id":      func() bool { return len(st.Device.PendingMacState.QueuedJoinAccept.Keys.GetSessionKeyId()) == 0 },
 			"pending_mac_state.queued_join_accept.payload":                  func() bool { return len(st.Device.PendingMacState.QueuedJoinAccept.Payload) == 0 },
-			"pending_mac_state.queued_join_accept.dev_addr":                 st.Device.PendingMacState.QueuedJoinAccept.DevAddr.IsZero,
+			"pending_mac_state.queued_join_accept.dev_addr": types.MustDevAddr(
+				st.Device.PendingMacState.QueuedJoinAccept.DevAddr,
+			).IsZero,
 		} {
 			p, isZero := p, isZero
 			if err := st.ValidateSetField(func() bool { return !isZero() }, p); err != nil {

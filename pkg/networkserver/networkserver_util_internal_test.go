@@ -1194,8 +1194,8 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 							},
 							Payload: &ttnpb.Message_JoinAcceptPayload{
 								JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
-									NetId:      dev.PendingMacState.QueuedJoinAccept.NetId,
-									DevAddr:    dev.PendingMacState.QueuedJoinAccept.DevAddr,
+									NetId:      types.MustNetID(dev.PendingMacState.QueuedJoinAccept.NetId).OrZero(),
+									DevAddr:    types.MustDevAddr(dev.PendingMacState.QueuedJoinAccept.DevAddr).OrZero(),
 									DlSettings: dev.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
 									RxDelay:    dev.PendingMacState.QueuedJoinAccept.Request.RxDelay,
 									CfList:     dev.PendingMacState.QueuedJoinAccept.Request.CfList,
@@ -1213,7 +1213,7 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 				).New(events.ContextWithCorrelationID(ctx, scheduledDown.CorrelationIds...)),
 			)
 			dev.PendingSession = &ttnpb.Session{
-				DevAddr: dev.PendingMacState.QueuedJoinAccept.DevAddr.Bytes(),
+				DevAddr: dev.PendingMacState.QueuedJoinAccept.DevAddr,
 				Keys:    dev.PendingMacState.QueuedJoinAccept.Keys,
 			}
 			dev.PendingMacState.PendingJoinRequest = dev.PendingMacState.QueuedJoinAccept.Request
@@ -1628,8 +1628,8 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 				LorawanVersion: defaultLoRaWANVersion,
 				QueuedJoinAccept: &ttnpb.MACState_JoinAccept{
 					Payload: joinResp.RawPayload,
-					DevAddr: types.MustDevAddr(joinReq.DevAddr).OrZero(),
-					NetId:   types.MustNetID(joinReq.NetId).OrZero(),
+					DevAddr: joinReq.DevAddr,
+					NetId:   joinReq.NetId,
 					Request: &ttnpb.MACState_JoinRequest{
 						DownlinkSettings: joinReq.DownlinkSettings,
 						RxDelay:          joinReq.RxDelay,
@@ -2153,8 +2153,8 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults *ttnpb.MACSettings, w
 				CfList:  frequencyplans.CFList(*test.FrequencyPlan(x.FrequencyPlanId), x.LorawanPhyVersion),
 			},
 			Keys:           MakeSessionKeys(x.LorawanVersion, wrapKeys, true),
-			DevAddr:        test.DefaultDevAddr,
-			NetId:          test.DefaultNetID,
+			DevAddr:        test.DefaultDevAddr.Bytes(),
+			NetId:          test.DefaultNetID.Bytes(),
 			CorrelationIds: []string{"join-request"},
 		})(*macState)))(x)
 	}
@@ -2170,7 +2170,7 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 		}
 		return o.Compose(
 			o.WithPendingSession(&ttnpb.Session{
-				DevAddr: x.PendingMacState.QueuedJoinAccept.DevAddr.Bytes(),
+				DevAddr: x.PendingMacState.QueuedJoinAccept.DevAddr,
 				Keys: &ttnpb.SessionKeys{
 					SessionKeyId: x.PendingMacState.QueuedJoinAccept.Keys.SessionKeyId,
 					FNwkSIntKey:  x.PendingMacState.QueuedJoinAccept.Keys.FNwkSIntKey,
@@ -2191,8 +2191,8 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 						},
 						Payload: &ttnpb.Message_JoinAcceptPayload{
 							JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
-								NetId:      x.PendingMacState.QueuedJoinAccept.NetId,
-								DevAddr:    x.PendingMacState.QueuedJoinAccept.DevAddr,
+								NetId:      types.MustNetID(x.PendingMacState.QueuedJoinAccept.NetId).OrZero(),
+								DevAddr:    types.MustDevAddr(x.PendingMacState.QueuedJoinAccept.DevAddr).OrZero(),
 								DlSettings: x.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
 								RxDelay:    x.PendingMacState.QueuedJoinAccept.Request.RxDelay,
 								CfList:     x.PendingMacState.QueuedJoinAccept.Request.CfList,

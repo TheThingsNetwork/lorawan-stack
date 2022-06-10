@@ -100,7 +100,7 @@ func TestPba(t *testing.T) {
 						DevAddrBlocks: []*ttnpb.PacketBrokerDevAddrBlock{
 							{
 								DevAddrPrefix: &ttnpb.DevAddrPrefix{
-									DevAddr: devAddrPtr(types.DevAddr{0x26, 0x0, 0x0, 0x0}),
+									DevAddr: types.DevAddr{0x26, 0x0, 0x0, 0x0}.Bytes(),
 									Length:  24,
 								},
 								HomeNetworkClusterId: "test-cluster",
@@ -174,7 +174,7 @@ func TestPba(t *testing.T) {
 					DevAddrBlocks: []*ttnpb.PacketBrokerDevAddrBlock{
 						{
 							DevAddrPrefix: &ttnpb.DevAddrPrefix{
-								DevAddr: devAddrPtr(types.DevAddr{0x26, 0x0, 0x0, 0x0}),
+								DevAddr: types.DevAddr{0x26, 0x0, 0x0, 0x0}.Bytes(),
 								Length:  24,
 							},
 							HomeNetworkClusterId: "test-cluster",
@@ -265,7 +265,7 @@ func TestPba(t *testing.T) {
 					DevAddrBlocks: []*ttnpb.PacketBrokerDevAddrBlock{
 						{
 							DevAddrPrefix: &ttnpb.DevAddrPrefix{
-								DevAddr: devAddrPtr(types.DevAddr{0x26, 0x0, 0x0, 0x0}),
+								DevAddr: types.DevAddr{0x26, 0x0, 0x0, 0x0}.Bytes(),
 								Length:  24,
 							},
 							HomeNetworkClusterId: "test-cluster",

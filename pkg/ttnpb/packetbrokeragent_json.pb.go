@@ -9,8 +9,59 @@ package ttnpb
 import (
 	gogo "github.com/TheThingsIndustries/protoc-gen-go-json/gogo"
 	jsonplugin "github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
-	types "github.com/gogo/protobuf/types"
+	types1 "github.com/gogo/protobuf/types"
+	types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
+
+// MarshalProtoJSON marshals the PacketBrokerGateway_GatewayIdentifiers message to JSON.
+func (x *PacketBrokerGateway_GatewayIdentifiers) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.GatewayId != "" || s.HasField("gateway_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("gateway_id")
+		s.WriteString(x.GatewayId)
+	}
+	if len(x.Eui) > 0 || s.HasField("eui") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("eui")
+		types.MarshalHEXBytes(s.WithField("eui"), x.Eui)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the PacketBrokerGateway_GatewayIdentifiers to JSON.
+func (x PacketBrokerGateway_GatewayIdentifiers) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
+// UnmarshalProtoJSON unmarshals the PacketBrokerGateway_GatewayIdentifiers message from JSON.
+func (x *PacketBrokerGateway_GatewayIdentifiers) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "gateway_id", "gatewayId":
+			s.AddField("gateway_id")
+			x.GatewayId = s.ReadString()
+		case "eui":
+			s.AddField("eui")
+			x.Eui = types.Unmarshal8Bytes(s.WithField("eui", false))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the PacketBrokerGateway_GatewayIdentifiers from JSON.
+func (x *PacketBrokerGateway_GatewayIdentifiers) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
 
 // MarshalProtoJSON marshals the PacketBrokerGateway message to JSON.
 func (x *PacketBrokerGateway) MarshalProtoJSON(s *jsonplugin.MarshalState) {
@@ -23,8 +74,7 @@ func (x *PacketBrokerGateway) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.Ids != nil || s.HasField("ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("ids")
-		// NOTE: PacketBrokerGateway_GatewayIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.Ids)
+		x.Ids.MarshalProtoJSON(s.WithField("ids"))
 	}
 	if len(x.ContactInfo) > 0 || s.HasField("contact_info") {
 		s.WriteMoreIf(&wroteField)
@@ -121,15 +171,12 @@ func (x *PacketBrokerGateway) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		default:
 			s.ReadAny() // ignore unknown field
 		case "ids":
-			s.AddField("ids")
 			if s.ReadNil() {
 				x.Ids = nil
 				return
 			}
-			// NOTE: PacketBrokerGateway_GatewayIdentifiers does not seem to implement UnmarshalProtoJSON.
-			var v PacketBrokerGateway_GatewayIdentifiers
-			gogo.UnmarshalMessage(s, &v)
-			x.Ids = &v
+			x.Ids = &PacketBrokerGateway_GatewayIdentifiers{}
+			x.Ids.UnmarshalProtoJSON(s.WithField("ids", true))
 		case "contact_info", "contactInfo":
 			s.AddField("contact_info")
 			if s.ReadNil() {
@@ -215,7 +262,7 @@ func (x *PacketBrokerGateway) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			if s.Err() != nil {
 				return
 			}
-			x.RxRate = &types.FloatValue{Value: v}
+			x.RxRate = &types1.FloatValue{Value: v}
 		case "tx_rate", "txRate":
 			s.AddField("tx_rate")
 			if s.ReadNil() {
@@ -226,7 +273,7 @@ func (x *PacketBrokerGateway) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			if s.Err() != nil {
 				return
 			}
-			x.TxRate = &types.FloatValue{Value: v}
+			x.TxRate = &types1.FloatValue{Value: v}
 		}
 	})
 }
@@ -302,6 +349,60 @@ func (x *UpdatePacketBrokerGatewayRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the PacketBrokerDevAddrBlock message to JSON.
+func (x *PacketBrokerDevAddrBlock) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.DevAddrPrefix != nil || s.HasField("dev_addr_prefix") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("dev_addr_prefix")
+		x.DevAddrPrefix.MarshalProtoJSON(s.WithField("dev_addr_prefix"))
+	}
+	if x.HomeNetworkClusterId != "" || s.HasField("home_network_cluster_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("home_network_cluster_id")
+		s.WriteString(x.HomeNetworkClusterId)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the PacketBrokerDevAddrBlock to JSON.
+func (x PacketBrokerDevAddrBlock) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
+// UnmarshalProtoJSON unmarshals the PacketBrokerDevAddrBlock message from JSON.
+func (x *PacketBrokerDevAddrBlock) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "dev_addr_prefix", "devAddrPrefix":
+			if s.ReadNil() {
+				x.DevAddrPrefix = nil
+				return
+			}
+			x.DevAddrPrefix = &DevAddrPrefix{}
+			x.DevAddrPrefix.UnmarshalProtoJSON(s.WithField("dev_addr_prefix", true))
+		case "home_network_cluster_id", "homeNetworkClusterId":
+			s.AddField("home_network_cluster_id")
+			x.HomeNetworkClusterId = s.ReadString()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the PacketBrokerDevAddrBlock from JSON.
+func (x *PacketBrokerDevAddrBlock) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the PacketBrokerNetwork message to JSON.
 func (x *PacketBrokerNetwork) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -328,8 +429,7 @@ func (x *PacketBrokerNetwork) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		var wroteElement bool
 		for _, element := range x.DevAddrBlocks {
 			s.WriteMoreIf(&wroteElement)
-			// NOTE: PacketBrokerDevAddrBlock does not seem to implement MarshalProtoJSON.
-			gogo.MarshalMessage(s, element)
+			element.MarshalProtoJSON(s.WithField("dev_addr_blocks"))
 		}
 		s.WriteArrayEnd()
 	}
@@ -396,10 +496,16 @@ func (x *PacketBrokerNetwork) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				return
 			}
 			s.ReadArray(func() {
-				// NOTE: PacketBrokerDevAddrBlock does not seem to implement UnmarshalProtoJSON.
-				var v PacketBrokerDevAddrBlock
-				gogo.UnmarshalMessage(s, &v)
-				x.DevAddrBlocks = append(x.DevAddrBlocks, &v)
+				if s.ReadNil() {
+					x.DevAddrBlocks = append(x.DevAddrBlocks, nil)
+					return
+				}
+				v := &PacketBrokerDevAddrBlock{}
+				v.UnmarshalProtoJSON(s.WithField("dev_addr_blocks", false))
+				if s.Err() != nil {
+					return
+				}
+				x.DevAddrBlocks = append(x.DevAddrBlocks, v)
 			})
 		case "contact_info", "contactInfo":
 			s.AddField("contact_info")

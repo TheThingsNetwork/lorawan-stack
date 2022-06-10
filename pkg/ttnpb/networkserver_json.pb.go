@@ -8,7 +8,50 @@ package ttnpb
 
 import (
 	jsonplugin "github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
+	types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
+
+// MarshalProtoJSON marshals the GenerateDevAddrResponse message to JSON.
+func (x *GenerateDevAddrResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.DevAddr) > 0 || s.HasField("dev_addr") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("dev_addr")
+		types.MarshalHEXBytes(s.WithField("dev_addr"), x.DevAddr)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the GenerateDevAddrResponse to JSON.
+func (x GenerateDevAddrResponse) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
+// UnmarshalProtoJSON unmarshals the GenerateDevAddrResponse message from JSON.
+func (x *GenerateDevAddrResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "dev_addr", "devAddr":
+			s.AddField("dev_addr")
+			x.DevAddr = types.Unmarshal4Bytes(s.WithField("dev_addr", false))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the GenerateDevAddrResponse from JSON.
+func (x *GenerateDevAddrResponse) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
 
 // MarshalProtoJSON marshals the GetDefaultMACSettingsRequest message to JSON.
 func (x *GetDefaultMACSettingsRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
