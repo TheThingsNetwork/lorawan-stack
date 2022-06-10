@@ -1070,42 +1070,65 @@ func appendRecentDownlink(recent []*ttnpb.DownlinkMessage, down *ttnpb.DownlinkM
 	return recent
 }
 
-func rx1Parameters(phy *band.Band, fp *frequencyplans.FrequencyPlan, macState *ttnpb.MACState, up *ttnpb.UplinkMessage) (uint64, ttnpb.DataRateIndex, band.DataRate, error) {
+type rx1ParametersType struct {
+	Frequency          uint64
+	DataRate           band.DataRate
+	DwellTimeDependant bool
+}
+
+func rx1Parameters(
+	phy *band.Band, fp *frequencyplans.FrequencyPlan, macState *ttnpb.MACState, up *ttnpb.UplinkMessage,
+) (*rx1ParametersType, error) {
 	if up.DeviceChannelIndex > math.MaxUint8 {
-		return 0, 0, band.DataRate{}, errInvalidChannelIndex.New()
+		return nil, errInvalidChannelIndex.New()
 	}
 	chIdx, err := phy.Rx1Channel(uint8(up.DeviceChannelIndex))
 	if err != nil {
-		return 0, 0, band.DataRate{}, err
+		return nil, err
 	}
 	if uint(chIdx) >= uint(len(macState.CurrentParameters.Channels)) {
-		return 0, 0, band.DataRate{}, ErrCorruptedMACState.
+		return nil, ErrCorruptedMACState.
 			WithAttributes(
 				"channel_id", chIdx,
 				"channels_len", len(macState.CurrentParameters.Channels),
 			).
 			WithCause(ErrUnknownChannel)
 	}
-	if macState.CurrentParameters.Channels[int(chIdx)].GetDownlinkFrequency() == 0 {
-		return 0, 0, band.DataRate{}, ErrCorruptedMACState.
+	downlinkFrequency := macState.CurrentParameters.Channels[int(chIdx)].GetDownlinkFrequency()
+	if downlinkFrequency == 0 {
+		return nil, ErrCorruptedMACState.
 			WithAttributes(
 				"channel_id", chIdx,
 			).
 			WithCause(ErrUplinkChannel)
 	}
-	drIdx, _, ok := phy.FindUplinkDataRate(up.Settings.DataRate)
+	uplinkDRIdx, _, ok := phy.FindUplinkDataRate(up.Settings.DataRate)
 	if !ok {
-		return 0, 0, band.DataRate{}, errDataRateNotFound.New()
+		return nil, errDataRateNotFound.New()
 	}
-	drIdx, err = phy.Rx1DataRate(drIdx, macState.CurrentParameters.Rx1DataRateOffset, mac.DeviceExpectedDownlinkDwellTime(macState, fp, phy))
+	dataRateOffset := macState.CurrentParameters.Rx1DataRateOffset
+	downlinkDwellTime := mac.DeviceExpectedDownlinkDwellTime(macState, fp, phy)
+	downlinkDRIdx, err := phy.Rx1DataRate(
+		uplinkDRIdx,
+		dataRateOffset,
+		downlinkDwellTime,
+	)
 	if err != nil {
-		return 0, 0, band.DataRate{}, err
+		return nil, err
 	}
-	dr, ok := phy.DataRates[drIdx]
+	dwellTimeDependant := false
+	if drIdx, err := phy.Rx1DataRate(uplinkDRIdx, dataRateOffset, !downlinkDwellTime); err == nil {
+		dwellTimeDependant = drIdx != downlinkDRIdx
+	}
+	dr, ok := phy.DataRates[downlinkDRIdx]
 	if !ok {
-		return 0, 0, band.DataRate{}, errDataRateIndexNotFound.WithAttributes("index", drIdx)
+		return nil, errDataRateIndexNotFound.WithAttributes("index", downlinkDRIdx)
 	}
-	return macState.CurrentParameters.Channels[int(chIdx)].DownlinkFrequency, drIdx, dr, nil
+	return &rx1ParametersType{
+		Frequency:          downlinkFrequency,
+		DataRate:           dr,
+		DwellTimeDependant: dwellTimeDependant,
+	}, nil
 }
 
 // maximumUplinkLength returns the maximum length of the next uplink after ups.
@@ -1217,22 +1240,21 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 	}
 
 	var (
-		attemptRX1 bool
-		rx1Freq    uint64
-		rx1DR      band.DataRate
-		rx1DRIdx   ttnpb.DataRateIndex
+		attemptRX1            bool
+		rx1Freq               uint64
+		rx1DR                 band.DataRate
+		rx1DwellTimeDependant bool
 
 		attemptRX2 bool
 	)
 	if !slot.RX1().Before(now) {
-		freq, drIdx, dr, err := rx1Parameters(phy, fp, dev.MacState, slot.Uplink)
+		parameters, err := rx1Parameters(phy, fp, dev.MacState, slot.Uplink)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Error("Failed to compute RX1 parameters")
 		} else {
 			attemptRX1 = true
-			rx1Freq = freq
-			rx1DRIdx = drIdx
-			rx1DR = dr
+			rx1Freq, rx1DR = parameters.Frequency, parameters.DataRate
+			rx1DwellTimeDependant = parameters.DwellTimeDependant
 		}
 	}
 	rx2DR, ok := phy.DataRates[dev.MacState.CurrentParameters.Rx2DataRateIndex]
@@ -1252,22 +1274,49 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		}
 	}
 
+	// In bands in which the RX1 data rate depends on the dwell time status of the end device
+	// (i.e. AS923 and its variants), we may be in a position in which we do not know the
+	// status of the dwell time setting at device boot time. This renders the RX1 slot unavailable,
+	// as we cannot 'guess' the state. Both end devices which have it enabled at boot time
+	// and end devices which have it disabled at boot time have been observed in the wild.
+	if attemptRX1 && attemptRX2 && rx1DwellTimeDependant && dev.MacState.CurrentParameters.DownlinkDwellTime == nil {
+		attemptRX1 = false
+	}
+
+	var (
+		rx1MaxMACPayloadSize uint16 = 0xFFFF
+		rx2MaxMACPayloadSize uint16 = 0xFFFF
+	)
+	downDwellTime := mac.DeviceExpectedDownlinkDwellTime(dev.MacState, fp, phy)
+	if attemptRX1 {
+		rx1MaxMACPayloadSize = rx1DR.MaxMACPayloadSize(downDwellTime)
+	}
+	if attemptRX2 {
+		rx2MaxMACPayloadSize = rx2DR.MaxMACPayloadSize(downDwellTime)
+	}
+
 	var (
 		// transmitAt is the latest time.Time when downlink will be transmitted to the device.
-		transmitAt time.Time
-		maxDR      band.DataRate
+		transmitAt    time.Time
+		maxDownLength uint16 = 0xFFFF
 	)
-	if attemptRX1 && rx1DRIdx > dev.MacState.CurrentParameters.Rx2DataRateIndex || !attemptRX2 {
+	switch {
+	case attemptRX1 && attemptRX2 && rx1MaxMACPayloadSize >= rx2MaxMACPayloadSize,
+		attemptRX1 && !attemptRX2:
 		transmitAt = slot.RX1()
-		maxDR = rx1DR
-	} else {
+		maxDownLength = rx1MaxMACPayloadSize
+
+	case attemptRX2 && attemptRX1 && rx1MaxMACPayloadSize < rx2MaxMACPayloadSize,
+		!attemptRX1 && attemptRX2:
 		transmitAt = slot.RX2()
-		maxDR = rx2DR
+		maxDownLength = rx2MaxMACPayloadSize
+
+	default:
+		panic("unreachable") // Cannot be reached since at this point one of the two slots must be attemptable.
 	}
-	downDwellTime := mac.DeviceExpectedDownlinkDwellTime(dev.MacState, fp, phy)
 
 	genDown, genState, err := ns.generateDataDownlink(ctx, dev, phy, ttnpb.Class_CLASS_A, transmitAt,
-		maxDR.MaxMACPayloadSize(downDwellTime),
+		maxDownLength,
 		maxUpLength,
 	)
 	var sets []string
@@ -1293,8 +1342,8 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		// * MHDR - 1 byte
 		// * MACPayload - up to 250 bytes, actual value reported by band.DataRate.MaxMACPayloadSize
 		// * MIC - 4 bytes
-		attemptRX1 = len(genDown.RawPayload) <= int(rx1DR.MaxMACPayloadSize(downDwellTime))+5
-		attemptRX2 = len(genDown.RawPayload) <= int(rx2DR.MaxMACPayloadSize(downDwellTime))+5
+		attemptRX1 = len(genDown.RawPayload) <= int(rx1MaxMACPayloadSize)+5
+		attemptRX2 = len(genDown.RawPayload) <= int(rx2MaxMACPayloadSize)+5
 		if !attemptRX1 && !attemptRX2 {
 			log.FromContext(ctx).Error("Generated downlink payload size does not fit neither RX1, nor RX2, skip class A downlink slot")
 			dev.MacState.QueuedResponses = nil
@@ -1709,20 +1758,21 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 					}
 
 					var (
-						attemptRX1 bool
-						rx1Freq    uint64
-						rx1DR      band.DataRate
+						attemptRX1            bool
+						rx1Freq               uint64
+						rx1DR                 band.DataRate
+						rx1DwellTimeDependant bool
 
 						attemptRX2 bool
 					)
 					if !rx1.Before(now) {
-						freq, _, dr, err := rx1Parameters(phy, fp, dev.PendingMacState, up)
+						parameters, err := rx1Parameters(phy, fp, dev.PendingMacState, up)
 						if err != nil {
 							log.FromContext(ctx).WithError(err).Error("Failed to compute RX1 parameters")
 						} else {
 							attemptRX1 = true
-							rx1Freq = freq
-							rx1DR = dr
+							rx1Freq, rx1DR = parameters.Frequency, parameters.DataRate
+							rx1DwellTimeDependant = parameters.DwellTimeDependant
 						}
 					}
 					rx2DR, ok := phy.DataRates[dev.PendingMacState.CurrentParameters.Rx2DataRateIndex]
@@ -1737,6 +1787,11 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 						return dev, []string{
 							"pending_mac_state.rx_windows_available",
 						}, nil
+					}
+
+					if attemptRX1 && attemptRX2 && rx1DwellTimeDependant &&
+						dev.PendingMacState.CurrentParameters.DownlinkDwellTime == nil {
+						attemptRX1 = false
 					}
 
 					req := &ttnpb.TxRequest{

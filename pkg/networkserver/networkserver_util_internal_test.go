@@ -27,6 +27,7 @@ import (
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
@@ -1080,13 +1081,13 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 									txReq := &ttnpb.TxRequest{
 										Class:           conf.Class,
 										DownlinkPaths:   expectedAttempt.RequestPaths,
+										Rx1Delay:        conf.RX1Delay,
 										Priority:        conf.Priority,
 										FrequencyPlanId: conf.FrequencyPlanID,
 										AbsoluteTime:    ttnpb.ProtoTime(conf.AbsoluteTime),
 									}
 									if conf.SetRX1 {
 										drIdx, _, _ := phy.FindUplinkDataRate(conf.Uplink.Settings.DataRate)
-										txReq.Rx1Delay = conf.RX1Delay
 										rx1DRIdx := test.Must(phy.Rx1DataRate(
 											drIdx,
 											conf.MACState.CurrentParameters.Rx1DataRateOffset,
@@ -1909,6 +1910,23 @@ func StartTaskExclude(names ...string) task.StartTaskFunc {
 		}
 		task.DefaultStartTask(conf)
 	}
+}
+
+// SkipRX1Window computes if the RX1 window should be skipped because the RX1 data rate depends on the
+// downlink dwell time considered by the end device at boot time.
+func SkipRX1Window(uplinkDRIdx ttnpb.DataRateIndex, macState *ttnpb.MACState, phy *band.Band) bool {
+	if macState.CurrentParameters.DownlinkDwellTime != nil {
+		return false
+	}
+	downDRIdxT, err := phy.Rx1DataRate(uplinkDRIdx, macState.CurrentParameters.Rx1DataRateOffset, true)
+	if err != nil {
+		panic(err)
+	}
+	downDRIdxF, err := phy.Rx1DataRate(uplinkDRIdx, macState.CurrentParameters.Rx1DataRateOffset, false)
+	if err != nil {
+		panic(err)
+	}
+	return downDRIdxF != downDRIdxT
 }
 
 type TestConfig struct {
