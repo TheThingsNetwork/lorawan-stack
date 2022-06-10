@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Fix a bug that would show the "Status count periodicity"-field in the Console as `200` when actually set to `0`.
+
 ### Security
 
 ## [3.20.0] - unreleased
