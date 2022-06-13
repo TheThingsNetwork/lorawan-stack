@@ -48,6 +48,9 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 		return nil, errNotTxRequest.New()
 	}
 
+	ctx = events.ContextWithCorrelationID(ctx, down.CorrelationIds...)
+	down.CorrelationIds = events.CorrelationIDsFromContext(ctx)
+
 	var pathErrs []errors.ErrorDetails
 	logger := log.FromContext(ctx)
 	for _, path := range request.DownlinkPaths {
@@ -73,9 +76,10 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 			continue
 		}
 
+		ctx := events.ContextWithCorrelationID(ctx, events.CorrelationIDsFromContext(conn.Context())...)
 		connDown := deepcopy.Copy(down).(*ttnpb.DownlinkMessage) // Let the connection own the DownlinkMessage.
 		connDown.GetRequest().DownlinkPaths = nil                // And do not leak the downlink paths to the gateway.
-		connDown.CorrelationIds = append(down.CorrelationIds, events.CorrelationIDsFromContext(conn.Context())...)
+		connDown.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 
 		registerScheduleDownlinkAttempt(ctx, conn.Gateway(), connDown, conn.Frontend().Protocol())
 
