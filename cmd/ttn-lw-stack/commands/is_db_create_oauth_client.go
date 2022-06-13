@@ -90,6 +90,7 @@ var createOAuthClient = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		tieAccessToSession, err := cmd.Flags().GetBool("tie-access-to-session")
 
 		cliFieldMask := []string{
 			"name",
@@ -101,6 +102,7 @@ var createOAuthClient = &cobra.Command{
 			"endorsed",
 			"grants",
 			"rights",
+			"tie_access_to_session",
 		}
 		cli := &ttnpb.Client{
 			Ids: &ttnpb.ClientIdentifiers{ClientId: clientID},
@@ -122,6 +124,7 @@ var createOAuthClient = &cobra.Command{
 			cli.Endorsed = endorsed
 			cli.Grants = []ttnpb.GrantType{ttnpb.GrantType_GRANT_AUTHORIZATION_CODE, ttnpb.GrantType_GRANT_REFRESH_TOKEN}
 			cli.Rights = []ttnpb.Right{ttnpb.Right_RIGHT_ALL}
+			cli.TieAccessToSession = tieAccessToSession
 
 			if cliExists {
 				logger.Info("Updating OAuth client...")
@@ -171,6 +174,7 @@ func init() {
 	createOAuthClient.Flags().StringSlice("redirect-uri", []string{}, "Redirect URIs of the OAuth client")
 	createOAuthClient.Flags().StringSlice("logout-redirect-uri", []string{}, "Logout redirect URIs of the OAuth client")
 	createOAuthClient.Flags().Bool("authorized", true, "Mark OAuth client as pre-authorized")
-	createOAuthClient.Flags().Bool("endorsed", true, "Mark OAuth client as endorsed ")
+	createOAuthClient.Flags().Bool("endorsed", true, "Mark OAuth client as endorsed")
+	createOAuthClient.Flags().Bool("tie-access-to-session", true, "Whether the access tokens should invalidate when the session expires")
 	isDBCommand.AddCommand(createOAuthClient)
 }
