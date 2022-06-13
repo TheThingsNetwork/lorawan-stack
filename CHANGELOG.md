@@ -13,6 +13,11 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- In AS923 frequency plans, the Network Server will skip the RX1 window if the data rate is ambiguous.
+  - This change occurs in old Regional Parameters versions in which the initial downlink dwell time setting of the end device is not specified. The end device may have the downlink dwell time setting either enabled or disabled, and due to this the data rate of the RX1 window is ambiguous.
+  - This ambiguity exists until the Network Server is successful in negotiating the dwell time limitations using the TxParamSetupReq MAC command. This will occur automatically and does not require any external input.
+  - If you already know the boot dwell time settings of your end device, you may provide them via the `--mac-settings.downlink-dwell-time` and `--mac-settings.uplink-dwell-time` MAC settings. This will ensure that RX1 transmissions are available from the first uplink of the session.
+
 ### Deprecated
 
 ### Removed

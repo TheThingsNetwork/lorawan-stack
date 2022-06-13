@@ -282,7 +282,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			SessionKeys: dev.Session.Keys,
 		})
 		dev, ok = env.AssertScheduleDataDownlink(ctx, DataDownlinkAssertionConfig{
-			SetRX1:      true,
+			SetRX1:      !SkipRX1Window(ttnpb.DataRateIndex_DATA_RATE_1, dev.MacState, phy),
 			SetRX2:      true,
 			Device:      dev,
 			Class:       ttnpb.Class_CLASS_A,
