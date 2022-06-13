@@ -190,7 +190,10 @@ const devices = (state = defaultState, { type, payload, event }) => {
           const currentEndDevice = state.entities[id]
           if (currentEndDevice) {
             // Only update if the event was actually more recent than the current value.
-            if (currentEndDevice.last_seen_at && currentEndDevice.last_seen_at < receivedAt) {
+            if (
+              (currentEndDevice.last_seen_at && currentEndDevice.last_seen_at < receivedAt) ||
+              !currentEndDevice.last_seen_at
+            ) {
               currentEndDevice.last_seen_at = receivedAt
             }
           }
