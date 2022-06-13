@@ -622,7 +622,8 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids *ttnpb.End
 		return err
 	}
 	for _, item := range items {
-		item.CorrelationIds = append(item.CorrelationIds, events.CorrelationIDsFromContext(ctx)...)
+		ctx := events.ContextWithCorrelationID(ctx, item.CorrelationIds...)
+		item.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 	}
 	_, err = as.deviceRegistry.Set(ctx, ids,
 		[]string{
