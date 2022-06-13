@@ -373,7 +373,7 @@ const validationSchema = Yup.object()
             return Yup.string()
           }),
           status_count_periodicity: Yup.lazy(value => {
-            if (!Boolean(value)) {
+            if (value === undefined || value === '') {
               return Yup.number().strip()
             }
 
