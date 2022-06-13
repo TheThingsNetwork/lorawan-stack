@@ -20,13 +20,13 @@ import * as users from '@console/store/actions/users'
 
 const getUserLogic = createRequestLogic({
   type: users.GET_USER,
-  process: ({ action }) => {
+  process: async ({ action }) => {
     const {
       payload: { id },
       meta: { selector },
     } = action
 
-    return tts.Users.getById(id, selector)
+    return await tts.Users.getById(id, selector)
   },
 })
 
@@ -85,12 +85,12 @@ const getUsersLogic = createRequestLogic({
 
 const createUserLogic = createRequestLogic({
   type: users.CREATE_USER,
-  process: ({ action }) => {
+  process: async ({ action }) => {
     const {
       payload: { user },
     } = action
 
-    return tts.Users.create(user)
+    return await tts.Users.create(user)
   },
 })
 

@@ -19,8 +19,6 @@ import { Container, Col, Row } from 'react-grid-system'
 import bind from 'autobind-decorator'
 import { push } from 'connected-react-router'
 
-import tts from '@console/api/tts'
-
 import PageTitle from '@ttn-lw/components/page-title'
 import FormSubmit from '@ttn-lw/components/form/submit'
 import SubmitButton from '@ttn-lw/components/submit-button'
@@ -35,11 +33,13 @@ import withFeatureRequirement from '@console/lib/components/with-feature-require
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import { selectGsConfig } from '@ttn-lw/lib/selectors/env'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { mapFormValueToAttributes } from '@console/lib/attributes'
 import { mayCreateGateways } from '@console/lib/feature-checks'
 
 import { getOrganizationsList } from '@console/store/actions/organizations'
+import { createGateway } from '@console/store/actions/gateways'
 
 import { selectOrganizationsFetching } from '@console/store/selectors/organizations'
 import { selectUserId } from '@console/store/selectors/user'
@@ -60,11 +60,14 @@ const m = defineMessages({
   dispatch => ({
     createSuccess: gtwId => dispatch(push(`/gateways/${gtwId}`)),
     getOrganizationsList: () => dispatch(getOrganizationsList()),
+    createGateway: (ownerId, gateway, isUserOwner) =>
+      dispatch(attachPromise(createGateway(ownerId, gateway, isUserOwner))),
   }),
 )
 @withRequest(({ getOrganizationsList }) => getOrganizationsList())
 export default class GatewayAdd extends React.Component {
   static propTypes = {
+    createGateway: PropTypes.func.isRequired,
     createSuccess: PropTypes.func.isRequired,
     env: PropTypes.env.isRequired,
     gsEnabled: PropTypes.bool.isRequired,
@@ -77,7 +80,7 @@ export default class GatewayAdd extends React.Component {
 
   @bind
   async handleSubmit(values, { resetForm }) {
-    const { userId, createSuccess } = this.props
+    const { userId, createSuccess, createGateway } = this.props
     const { owner_id, ...gateway } = values
     const {
       ids: { gateway_id },
@@ -88,7 +91,7 @@ export default class GatewayAdd extends React.Component {
 
     const gatewayValues = { ...gateway, attributes: mapFormValueToAttributes(attributes) }
     try {
-      await tts.Gateways.create(owner_id, gatewayValues, userId === owner_id)
+      await createGateway(owner_id, gatewayValues, userId === owner_id)
 
       createSuccess(gateway_id)
     } catch (error) {

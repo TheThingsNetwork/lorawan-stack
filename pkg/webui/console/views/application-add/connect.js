@@ -19,11 +19,13 @@ import withRequest from '@ttn-lw/lib/components/with-request'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import pipe from '@ttn-lw/lib/pipe'
 
 import { mayCreateApplications } from '@console/lib/feature-checks'
 
 import { getOrganizationsList } from '@console/store/actions/organizations'
+import { createApp } from '@console/store/actions/applications'
 
 import { selectUserId, selectUserRights } from '@console/store/selectors/user'
 import { selectOrganizationFetching } from '@console/store/selectors/organizations'
@@ -37,6 +39,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   navigateToApplication: appId => dispatch(push(`/applications/${appId}`)),
   getOrganizationsList: () => dispatch(getOrganizationsList()),
+  createApp: (ownerId, app, isUserOwner) =>
+    dispatch(attachPromise(createApp(ownerId, app, isUserOwner))),
 })
 
 const addHocs = pipe(

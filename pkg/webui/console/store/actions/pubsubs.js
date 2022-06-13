@@ -14,6 +14,12 @@
 
 import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
 
+export const CREATE_PUBSUB_BASE = 'CREATE_PUBSUB'
+export const [
+  { request: CREATE_PUBSUB, success: CREATE_PUBSUB_PUBSUB, failure: CREATE_PUBSUB_FAILURE },
+  { request: createPubsub, success: createPubsubSuccess, failure: createPubsubFailure },
+] = createRequestActions(CREATE_PUBSUB_BASE, (appId, pubsub) => ({ appId, pubsub }))
+
 export const GET_PUBSUB_BASE = 'GET_PUBSUB'
 export const [
   { request: GET_PUBSUB, success: GET_PUBSUB_SUCCESS, failure: GET_PUBSUB_FAILURE },
@@ -43,3 +49,9 @@ export const [
   pubsubId,
   patch,
 }))
+
+export const DELETE_PUBSUB_BASE = 'DELETE_PUBSUB'
+export const [
+  { request: DELETE_PUBSUB, success: DELETE_PUBSUB_SUCCESS, failure: DELETE_PUBSUB_FAILURE },
+  { request: deletePubsub, success: deletePubsubSuccess, failure: deletePubsubFailure },
+] = createRequestActions(DELETE_PUBSUB_BASE, (appId, pubsubId) => ({ appId, pubsubId }))

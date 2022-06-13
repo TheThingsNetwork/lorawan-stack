@@ -17,11 +17,12 @@ import { push } from 'connected-react-router'
 
 import tts from '@console/api/tts'
 
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { selectNsConfig, selectAsConfig, selectJsConfig } from '@ttn-lw/lib/selectors/env'
 
 import { checkFromState, mayEditApplicationDeviceKeys } from '@console/lib/feature-checks'
 
-import { getApplicationDevEUICount } from '@console/store/actions/applications'
+import { getApplicationDevEUICount, issueDevEUI } from '@console/store/actions/applications'
 
 import {
   selectSelectedApplicationId,
@@ -46,6 +47,7 @@ const mapDispatchToProps = dispatch => ({
   createDeviceSuccess: (appId, deviceId) =>
     dispatch(push(`/applications/${appId}/devices/${deviceId}`)),
   fetchDevEUICounter: appId => dispatch(getApplicationDevEUICount(appId)),
+  issueDevEUI: appId => dispatch(attachPromise(issueDevEUI(appId))),
 })
 
 export default Manual => connect(mapStateToProps, mapDispatchToProps)(Manual)

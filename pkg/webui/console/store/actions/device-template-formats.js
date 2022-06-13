@@ -33,3 +33,13 @@ export const getDeviceTemplateFormatsFetching = createFetchingSelector(
   GET_DEVICE_TEMPLATE_FORMATS_BASE,
 )
 export const getDeviceTemplateFormatsError = createErrorSelector(GET_DEVICE_TEMPLATE_FORMATS_BASE)
+
+export const CONVERT_TEMPLATE_BASE = 'CONVERT_TEMPLATE'
+export const [
+  {
+    request: CONVERT_TEMPLATE,
+    success: CONVERT_TEMPLATE_SUCCESS,
+    failure: CONVERT_TEMPLATE_FAILURE,
+  },
+  { request: convertTemplate, success: convertTemplateSuccess, failure: convertTemplateFailure },
+] = createRequestActions(CONVERT_TEMPLATE_BASE, (format_id, data) => ({ format_id, data }))

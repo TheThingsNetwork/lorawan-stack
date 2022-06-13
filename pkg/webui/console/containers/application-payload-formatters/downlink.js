@@ -18,7 +18,6 @@ import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
 import PAYLOAD_FORMATTER_TYPES from '@console/constants/formatter-types'
-import tts from '@console/api/tts'
 
 import Notification from '@ttn-lw/components/notification'
 import PageTitle from '@ttn-lw/components/page-title'
@@ -32,10 +31,11 @@ import PayloadFormattersForm from '@console/components/payload-formatters-form'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import { isNotFoundError } from '@ttn-lw/lib/errors/utils'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { checkFromState, mayViewApplicationLink } from '@console/lib/feature-checks'
 
-import { updateApplicationLinkSuccess } from '@console/store/actions/link'
+import { updateApplicationLink, updateApplicationLinkSuccess } from '@console/store/actions/link'
 
 import {
   selectApplicationLinkError,
@@ -65,7 +65,10 @@ const m = defineMessages({
       linkError,
     }
   },
-  { updateLinkSuccess: updateApplicationLinkSuccess },
+  {
+    updateLinkSuccess: updateApplicationLinkSuccess,
+    submitPayloadFormatters: (id, pf) => attachPromise(updateApplicationLink(id, pf)),
+  },
 )
 @withBreadcrumb('apps.single.payload-formatters.downlink', props => {
   const { appId } = props
@@ -83,6 +86,7 @@ class ApplicationPayloadFormatters extends React.PureComponent {
     formatters: PropTypes.formatters.isRequired,
     linkError: PropTypes.error,
     mayViewLink: PropTypes.bool.isRequired,
+    submitPayloadFormatters: PropTypes.func.isRequired,
     updateLinkSuccess: PropTypes.func.isRequired,
   }
 
@@ -102,9 +106,9 @@ class ApplicationPayloadFormatters extends React.PureComponent {
 
   @bind
   async onSubmit(values) {
-    const { appId, formatters } = this.props
+    const { appId, formatters, submitPayloadFormatters } = this.props
 
-    return await tts.Applications.Link.set(appId, {
+    return await submitPayloadFormatters(appId, {
       default_formatters: {
         up_formatter: formatters.up_formatter || PAYLOAD_FORMATTER_TYPES.NONE,
         up_formatter_parameter: formatters.up_formatter_parameter || '',

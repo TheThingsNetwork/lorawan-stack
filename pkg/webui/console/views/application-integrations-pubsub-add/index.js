@@ -18,8 +18,6 @@ import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 
-import tts from '@console/api/tts'
-
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
@@ -29,6 +27,9 @@ import PubsubForm from '@console/components/pubsub-form'
 import { isNotFoundError } from '@ttn-lw/lib/errors/utils'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+
+import { createPubsub, getPubsub } from '@console/store/actions/pubsubs'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 import {
@@ -44,6 +45,9 @@ import {
   }),
   dispatch => ({
     navigateToList: appId => dispatch(push(`/applications/${appId}/integrations/pubsubs`)),
+    createPubsub: (appId, pubsub) => dispatch(attachPromise(createPubsub(appId, pubsub))),
+    getPubsub: (appId, pubsubId, selector) =>
+      dispatch(attachPromise(getPubsub(appId, pubsubId, selector))),
   }),
 )
 @withBreadcrumb('apps.single.integrations.add', props => {
@@ -55,6 +59,8 @@ import {
 export default class ApplicationPubsubAdd extends Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
+    createPubsub: PropTypes.func.isRequired,
+    getPubsub: PropTypes.func.isRequired,
     mqttDisabled: PropTypes.bool.isRequired,
     natsDisabled: PropTypes.bool.isRequired,
     navigateToList: PropTypes.func.isRequired,
@@ -62,10 +68,10 @@ export default class ApplicationPubsubAdd extends Component {
 
   @bind
   async existCheck(pubsubId) {
-    const { appId } = this.props
+    const { appId, getPubsub } = this.props
 
     try {
-      await tts.Applications.PubSubs.getById(appId, pubsubId, [])
+      await getPubsub(appId, pubsubId, [])
       return true
     } catch (error) {
       if (isNotFoundError(error)) {
@@ -78,9 +84,9 @@ export default class ApplicationPubsubAdd extends Component {
 
   @bind
   async handleSubmit(pubsub) {
-    const { appId } = this.props
+    const { appId, createPubsub } = this.props
 
-    await tts.Applications.PubSubs.create(appId, pubsub)
+    await createPubsub(appId, pubsub)
   }
 
   @bind

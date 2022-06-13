@@ -17,8 +17,6 @@ import { Container, Col, Row } from 'react-grid-system'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 
-import tts from '@console/api/tts'
-
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import PageTitle from '@ttn-lw/components/page-title'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
@@ -52,6 +50,7 @@ const m = defineMessages({
 export default class ApplicationPubsubEdit extends Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
+    deletePubsub: PropTypes.func.isRequired,
     match: PropTypes.match.isRequired,
     mqttDisabled: PropTypes.bool.isRequired,
     natsDisabled: PropTypes.bool.isRequired,
@@ -82,9 +81,10 @@ export default class ApplicationPubsubEdit extends Component {
       match: {
         params: { pubsubId },
       },
+      deletePubsub,
     } = this.props
 
-    await tts.Applications.PubSubs.deleteById(appId, pubsubId)
+    await deletePubsub(appId, pubsubId)
   }
 
   @bind

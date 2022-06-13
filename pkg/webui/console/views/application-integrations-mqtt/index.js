@@ -18,8 +18,6 @@ import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 
-import tts from '@console/api/tts'
-
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
@@ -34,10 +32,14 @@ import withFeatureRequirement from '@console/lib/components/with-feature-require
 
 import SubViewError from '@console/views/sub-view-error'
 
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { mayViewMqttConnectionInfo } from '@console/lib/feature-checks'
+
+import { createApplicationApiKey } from '@console/store/actions/api-keys'
+import { getMqttInfo } from '@console/store/actions/applications'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
@@ -56,9 +58,15 @@ const m = defineMessages({
   connectionInfo: 'Connection information',
 })
 
-@connect(state => ({
-  appId: selectSelectedApplicationId(state),
-}))
+@connect(
+  state => ({
+    appId: selectSelectedApplicationId(state),
+  }),
+  {
+    createApiKey: (appId, key) => attachPromise(createApplicationApiKey(appId, key)),
+    getMqttConnectionInfo: id => attachPromise(getMqttInfo(id)),
+  },
+)
 @withFeatureRequirement(mayViewMqttConnectionInfo, {
   redirect: ({ appId }) => `/applications/${appId}`,
 })
@@ -72,6 +80,8 @@ const m = defineMessages({
 export default class ApplicationMqtt extends React.Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
+    createApiKey: PropTypes.func.isRequired,
+    getMqttConnectionInfo: PropTypes.func.isRequired,
   }
 
   state = {
@@ -79,20 +89,20 @@ export default class ApplicationMqtt extends React.Component {
   }
 
   async componentDidMount() {
-    const { appId } = this.props
-    const connectionInfo = await tts.Applications.getMqttConnectionInfo(appId)
+    const { appId, getMqttConnectionInfo } = this.props
+    const connectionInfo = await getMqttConnectionInfo(appId)
 
     this.setState({ connectionInfo })
   }
 
   @bind
   async handleGeneratePasswordClick() {
-    const { appId } = this.props
+    const { appId, createApiKey } = this.props
     const key = {
       name: `mqtt-password-key-${Date.now()}`,
       rights: ['RIGHT_APPLICATION_TRAFFIC_READ', 'RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE'],
     }
-    const result = await tts.Applications.ApiKeys.create(appId, key)
+    const result = await createApiKey(appId, key)
 
     this.setState({
       key: result,

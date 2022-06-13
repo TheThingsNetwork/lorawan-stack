@@ -17,6 +17,7 @@ import { push } from 'connected-react-router'
 
 import tts from '@console/api/tts'
 
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import {
   selectNsConfig,
   selectAsConfig,
@@ -27,7 +28,7 @@ import {
 import { checkFromState, mayEditApplicationDeviceKeys } from '@console/lib/feature-checks'
 
 import { getTemplate } from '@console/store/actions/device-repository'
-import { getApplicationDevEUICount } from '@console/store/actions/applications'
+import { getApplicationDevEUICount, issueDevEUI } from '@console/store/actions/applications'
 
 import {
   selectDeviceTemplate,
@@ -60,6 +61,7 @@ const mapDispatchToProps = dispatch => ({
     dispatch(push(`/applications/${appId}/devices/${deviceId}`)),
   getRegistrationTemplate: (appId, version) => dispatch(getTemplate(appId, version)),
   fetchDevEUICounter: appId => dispatch(getApplicationDevEUICount(appId)),
+  issueDevEUI: appId => dispatch(attachPromise(issueDevEUI(appId))),
 })
 
 export default DeviceRepository => connect(mapStateToProps, mapDispatchToProps)(DeviceRepository)

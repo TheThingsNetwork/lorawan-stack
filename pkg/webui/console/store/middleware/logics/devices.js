@@ -41,6 +41,7 @@ const getDeviceLogic = createRequestLogic({
     } = action
     const dev = await tts.Applications.Devices.getById(appId, deviceId, selector)
     dispatch(devices.startDeviceEventsStream(dev.ids))
+
     return dev
   },
 })
@@ -91,15 +92,21 @@ const resetDeviceLogic = createRequestLogic({
   process: async ({ action }) => {
     const { appId, deviceId } = action.payload
 
-    return tts.Applications.Devices.resetById(appId, deviceId)
+    return await tts.Applications.Devices.resetById(appId, deviceId)
   },
 })
 
 const getDeviceTemplateFormatsLogic = createRequestLogic({
   type: deviceTemplateFormats.GET_DEVICE_TEMPLATE_FORMATS,
-  process: async () => {
-    const formats = await tts.Applications.Devices.listTemplateFormats()
-    return formats
+  process: async () => await tts.Applications.Devices.listTemplateFormats(),
+})
+
+const convertTemplateLogic = createRequestLogic({
+  type: deviceTemplateFormats.CONVERT_TEMPLATE,
+  process: async ({ action }) => {
+    const { format_id, data } = action.payload
+
+    return await tts.Applications.Devices.convertTemplate(format_id, data)
   },
 })
 
@@ -139,6 +146,7 @@ const getDeviceSessionLogic = createLogic({
 export default [
   getDevicesListLogic,
   getDeviceTemplateFormatsLogic,
+  convertTemplateLogic,
   getDeviceLogic,
   resetDeviceLogic,
   updateDeviceLogic,

@@ -17,8 +17,6 @@ import { defineMessages } from 'react-intl'
 import { merge, isUndefined } from 'lodash'
 import classnames from 'classnames'
 
-import tts from '@console/api/tts'
-
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import Radio from '@ttn-lw/components/radio-button'
@@ -131,6 +129,7 @@ const ManualForm = props => {
     applicationDevEUICounter,
     fetchDevEUICounter,
     getDefaultMacSettings,
+    issueDevEUI,
   } = props
 
   const asEnabled = asConfig.enabled
@@ -223,7 +222,7 @@ const ManualForm = props => {
 
   const handleGenerate = React.useCallback(async () => {
     try {
-      const result = await tts.Applications.issueDevEUI(appId)
+      const result = await issueDevEUI(appId)
       setDevEUIGenerated(true)
       fetchDevEUICounter(appId)
       euiInputRef.current.focus()
@@ -235,7 +234,7 @@ const ManualForm = props => {
       } else setErrorMessage(sharedMessages.unknownError)
       setDevEUIGenerated(true)
     }
-  }, [appId, fetchDevEUICounter])
+  }, [appId, fetchDevEUICounter, issueDevEUI])
 
   React.useEffect(() => {
     fetchDevEUICounter(appId)
@@ -778,6 +777,7 @@ ManualForm.propTypes = {
   createDeviceSuccess: PropTypes.func.isRequired,
   fetchDevEUICounter: PropTypes.func.isRequired,
   getDefaultMacSettings: PropTypes.func.isRequired,
+  issueDevEUI: PropTypes.func.isRequired,
   jsConfig: PropTypes.stackComponent.isRequired,
   mayEditKeys: PropTypes.bool.isRequired,
   nsConfig: PropTypes.stackComponent.isRequired,

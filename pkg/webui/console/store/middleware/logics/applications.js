@@ -22,6 +22,15 @@ import * as link from '@console/store/actions/link'
 
 import createEventsConnectLogics from './events'
 
+const createApplicationLogic = createRequestLogic({
+  type: applications.CREATE_APP,
+  process: async ({ action }) => {
+    const { ownerId, app, isUserOwner } = action.payload
+
+    return await tts.Applications.create(ownerId, app, isUserOwner)
+  },
+})
+
 const getApplicationLogic = createRequestLogic({
   type: applications.GET_APP,
   process: async ({ action }, dispatch) => {
@@ -31,7 +40,17 @@ const getApplicationLogic = createRequestLogic({
     } = action
     const app = await tts.Applications.getById(id, selector)
     dispatch(applications.startApplicationEventsStream(id))
+
     return app
+  },
+})
+
+const issueDevEUILogic = createRequestLogic({
+  type: applications.ISSUE_DEV_EUI,
+  process: async ({ action }) => {
+    const { id } = action.payload
+
+    return await tts.Applications.issueDevEUI(id)
   },
 })
 
@@ -42,6 +61,7 @@ const getApplicationDevEUICountLogic = createRequestLogic({
       payload: { id },
     } = action
     const result = await tts.Applications.getById(id, 'dev_eui_counter')
+
     return { id, dev_eui_counter: result.dev_eui_counter }
   },
 })
@@ -131,6 +151,7 @@ const getApplicationsRightsLogic = createRequestLogic({
   process: async ({ action }) => {
     const { id } = action.payload
     const result = await tts.Applications.getRightsById(id)
+
     return result.rights.sort()
   },
 })
@@ -180,7 +201,17 @@ const updateApplicationLinkLogic = createRequestLogic(
   link.updateApplicationLinkSuccess,
 )
 
+const getMqttConnectionInfoLogic = createRequestLogic({
+  type: applications.GET_MQTT_INFO,
+  process: async ({ action }) => {
+    const { id } = action.payload
+
+    return await tts.Applications.getMqttConnectionInfo(id)
+  },
+})
+
 export default [
+  createApplicationLogic,
   getApplicationLogic,
   getApplicationDeviceCountLogic,
   updateApplicationLogic,
@@ -190,7 +221,9 @@ export default [
   getApplicationsRightsLogic,
   getApplicationLinkLogic,
   updateApplicationLinkLogic,
+  issueDevEUILogic,
   getApplicationDevEUICountLogic,
+  getMqttConnectionInfoLogic,
   ...createEventsConnectLogics(
     applications.SHARED_NAME,
     'applications',
