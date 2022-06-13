@@ -19,7 +19,7 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
-- Fix `last activity` not updating bug in the Console.
+- Fix `last activity` not updating when an end device joins for the first time in the Console.
 
 ### Security
 
