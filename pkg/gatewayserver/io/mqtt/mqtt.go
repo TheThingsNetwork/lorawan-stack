@@ -27,6 +27,7 @@ import (
 	"github.com/TheThingsIndustries/mystique/pkg/session"
 	"github.com/TheThingsIndustries/mystique/pkg/topic"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/mqtt"
@@ -92,8 +93,11 @@ func setupConnection(ctx context.Context, mqttConn mqttnet.Conn, format Format, 
 			case <-ctx.Done():
 				return ctx.Err()
 			case down := <-c.io.Down():
-				token := c.tokens.Next(down, time.Now())
-				down.CorrelationIds = append(down.CorrelationIds, c.tokens.FormatCorrelationID(token))
+				correlationIDs := make([]string, 0, len(down.CorrelationIds)+1)
+				correlationIDs = append(correlationIDs, down.CorrelationIds...)
+				correlationIDs = append(correlationIDs, c.tokens.FormatCorrelationID(c.tokens.Next(down, time.Now())))
+				ctx := events.ContextWithCorrelationID(ctx, correlationIDs...)
+				down.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 
 				buf, err := format.FromDownlink(down, c.io.Gateway().GetIds())
 				if err != nil {

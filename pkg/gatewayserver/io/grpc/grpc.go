@@ -22,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -159,8 +160,11 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) error {
 		case <-conn.Context().Done():
 			return conn.Context().Err()
 		case down := <-conn.Down():
-			token := s.tokens.Next(down, time.Now())
-			down.CorrelationIds = append(down.CorrelationIds, s.tokens.FormatCorrelationID(token))
+			correlationIDs := make([]string, 0, len(down.CorrelationIds)+1)
+			correlationIDs = append(correlationIDs, down.CorrelationIds...)
+			correlationIDs = append(correlationIDs, s.tokens.FormatCorrelationID(s.tokens.Next(down, time.Now())))
+			ctx := events.ContextWithCorrelationID(ctx, correlationIDs...)
+			down.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 			msg := &ttnpb.GatewayDown{
 				DownlinkMessage: down,
 			}
