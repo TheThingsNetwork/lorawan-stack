@@ -46,6 +46,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - End devices running on MAC versions higher or equal to 1.1 showing network downlink frame counters instead of application downlink frame counters.
+- Wrong representation of time values between midnight and 1am (eg. 24:04:11) in the Console in some cases.
 
 ## [3.19.2] - 2022-05-25
 
