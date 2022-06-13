@@ -55,7 +55,7 @@ const getApiKeyLogic = createRequestLogic({
   process: async ({ action }) => {
     const { parentType, parentId, keyId } = action.payload
 
-    return tts[entitySdkServiceMap[parentType]].ApiKeys.getById(parentId, keyId)
+    return await tts[entitySdkServiceMap[parentType]].ApiKeys.getById(parentId, keyId)
   },
 })
 
@@ -64,7 +64,7 @@ const createApplicationApiKeyLogic = createRequestLogic({
   process: async ({ action }) => {
     const { id, key } = action.payload
 
-    return tts.Applications.ApiKeys.create(id, key)
+    return await tts.Applications.ApiKeys.create(id, key)
   },
 })
 

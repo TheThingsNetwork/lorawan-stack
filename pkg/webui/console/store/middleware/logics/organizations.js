@@ -85,7 +85,7 @@ const createOrganizationLogic = createRequestLogic({
   process: async ({ action, getState }) => {
     const userId = selectUserId(getState())
 
-    return tts.Organizations.create(userId, action.payload)
+    return await tts.Organizations.create(userId, action.payload)
   },
 })
 

@@ -24,7 +24,7 @@ const createPubsubLogic = createRequestLogic({
   process: async ({ action }) => {
     const { appId, pubsub } = action.payload
 
-    return tts.Applications.PubSubs.create(appId, pubsub)
+    return await tts.Applications.PubSubs.create(appId, pubsub)
   },
 })
 
@@ -36,7 +36,7 @@ const getPubsubLogic = createRequestLogic({
       meta: { selector },
     } = action
 
-    return tts.Applications.PubSubs.getById(appId, pubsubId, selector)
+    return await tts.Applications.PubSubs.getById(appId, pubsubId, selector)
   },
 })
 
@@ -55,7 +55,7 @@ const updatePubsubsLogic = createRequestLogic({
   process: async ({ action }) => {
     const { appId, pubsubId, patch } = action.payload
 
-    return tts.Applications.PubSubs.updateById(appId, pubsubId, patch)
+    return await tts.Applications.PubSubs.updateById(appId, pubsubId, patch)
   },
 })
 
@@ -73,7 +73,7 @@ const deletePubsub = createRequestLogic({
   process: async ({ action }) => {
     const { appId, pubsubId } = action.payload
 
-    return tts.Applications.PubSubs.deleteById(appId, pubsubId)
+    return await tts.Applications.PubSubs.deleteById(appId, pubsubId)
   },
 })
 

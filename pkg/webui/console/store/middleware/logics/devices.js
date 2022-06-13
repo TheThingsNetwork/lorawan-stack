@@ -92,7 +92,7 @@ const resetDeviceLogic = createRequestLogic({
   process: async ({ action }) => {
     const { appId, deviceId } = action.payload
 
-    return tts.Applications.Devices.resetById(appId, deviceId)
+    return await tts.Applications.Devices.resetById(appId, deviceId)
   },
 })
 

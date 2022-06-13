@@ -28,7 +28,7 @@ const getWebhookLogic = createRequestLogic({
       meta: { selector },
     } = action
 
-    return tts.Applications.Webhooks.getById(appId, webhookId, selector)
+    return await tts.Applications.Webhooks.getById(appId, webhookId, selector)
   },
 })
 
@@ -50,7 +50,7 @@ const updateWebhookLogic = createRequestLogic({
   process: async ({ action }) => {
     const { appId, webhookId, patch } = action.payload
 
-    return tts.Applications.Webhooks.updateById(appId, webhookId, patch)
+    return await tts.Applications.Webhooks.updateById(appId, webhookId, patch)
   },
 })
 
