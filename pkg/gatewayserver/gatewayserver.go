@@ -769,6 +769,25 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item any) {
 			registerForwardStatus(ctx, gtw, msg, host.name)
 		}
 	case *ttnpb.TxAcknowledgment:
+		correlationIDs := make([]string, 0, len(msg.CorrelationIds)+len(msg.DownlinkMessage.GetCorrelationIds()))
+		correlationIDs = append(correlationIDs, msg.CorrelationIds...)
+		correlationIDs = append(correlationIDs, msg.DownlinkMessage.GetCorrelationIds()...)
+		ctx := events.ContextWithCorrelationID(ctx, correlationIDs...)
+		msg = &ttnpb.TxAcknowledgment{
+			CorrelationIds:  events.CorrelationIDsFromContext(ctx),
+			Result:          msg.Result,
+			DownlinkMessage: msg.DownlinkMessage,
+		}
+		if down := msg.DownlinkMessage; down != nil {
+			msg.DownlinkMessage = &ttnpb.DownlinkMessage{
+				RawPayload:     down.RawPayload,
+				Payload:        down.Payload,
+				EndDeviceIds:   down.EndDeviceIds,
+				Settings:       down.Settings,
+				CorrelationIds: events.CorrelationIDsFromContext(ctx),
+				SessionKeyId:   down.SessionKeyId,
+			}
+		}
 		if err := host.handler.HandleTxAck(ctx, gtw.Ids, msg); err != nil {
 			registerDropTxAck(ctx, gtw, msg, host.name, err)
 		} else {
