@@ -54,4 +54,7 @@ export default defineMessages({
   grantTypeAndRights: 'Grant types and rights',
   stateDescriptionDesc:
     'You can use this field to save additional information about the state of this OAuth client, e.g. why it has been flagged',
+  tieAccessToSession: 'Tie access to session',
+  tieAccessToSessionDesc:
+    'If set, access tokens issued by this client will expire at the same time as the associated session',
 })

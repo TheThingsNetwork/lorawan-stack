@@ -72,6 +72,14 @@ const OAuthClientForm = props => {
     owner_id: userId,
     rights: [...pseudoRights],
     ...values,
+    ...(isAdmin
+      ? {
+          endorsed: false,
+          skip_authorization: false,
+          state: 'STATE_APPROVED',
+          state_description: '',
+        }
+      : {}),
   }
 
   return (
@@ -123,6 +131,12 @@ const OAuthClientForm = props => {
         description={m.logoutRedirectUrlsDescription}
         indexAsKey
       />
+      <Form.Field
+        label={m.tieAccessToSession}
+        name="tie_access_to_session"
+        component={Checkbox}
+        description={m.tieAccessToSessionDesc}
+      />
       {isAdmin && (
         <>
           <Form.SubTitle title={m.adminOptions} />
@@ -145,14 +159,12 @@ const OAuthClientForm = props => {
             name="skip_authorization"
             component={Checkbox}
             description={m.skipAuthorizationDesc}
-            disabled={!isAdmin}
           />
           <Form.Field
             label={m.endorsed}
             name="endorsed"
             component={Checkbox}
             description={m.endorsedDesc}
-            disabled={!isAdmin}
           />
         </>
       )}
@@ -212,6 +224,14 @@ OAuthClientForm.propTypes = {
     }).isRequired,
     name: PropTypes.string,
     description: PropTypes.string,
+    redirect_uris: PropTypes.arrayOf(PropTypes.string),
+    logout_redirect_uris: PropTypes.arrayOf(PropTypes.string),
+    skip_authorization: PropTypes.bool,
+    endorsed: PropTypes.bool,
+    grants: PropTypes.arrayOf(PropTypes.string),
+    state: PropTypes.string,
+    state_description: PropTypes.string,
+    tie_access_to_session: PropTypes.bool,
   }),
   isAdmin: PropTypes.bool.isRequired,
   onDelete: PropTypes.func,
@@ -236,6 +256,7 @@ OAuthClientForm.defaultProps = {
     grants: ['GRANT_AUTHORIZATION_CODE'],
     state: '',
     state_description: '',
+    tie_access_to_session: true,
   },
   update: false,
   rights: undefined,

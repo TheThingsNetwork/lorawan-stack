@@ -133,18 +133,13 @@ const ClientsTable = props => {
       {
         name: 'name',
         displayName: sharedMessages.name,
-        width: 25,
+        width: 35,
         sortable: true,
-      },
-      {
-        name: 'description',
-        displayName: sharedMessages.description,
-        width: 50,
       },
       {
         name: 'state',
         displayName: sharedMessages.state,
-        width: 50,
+        width: 20,
         render: state => capitalizeMessage(formatMessage({ id: `enum:${state}` })),
       },
     ]
@@ -153,7 +148,7 @@ const ClientsTable = props => {
       baseHeaders.push({
         name: 'actions',
         displayName: sharedMessages.actions,
-        width: 50,
+        width: 20,
         getValue: row => ({
           id: row.ids.client_id,
           name: row.name,
@@ -176,7 +171,7 @@ const ClientsTable = props => {
     } else {
       baseHeaders.push({
         name: 'created_at',
-        width: 15,
+        width: 20,
         displayName: sharedMessages.createdAt,
         align: 'right',
         sortable: true,

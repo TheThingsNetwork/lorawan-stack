@@ -17,6 +17,7 @@ describe('OAuth Client general settings', () => {
   const client = {
     ids: { client_id: clientId },
     grants: ['GRANT_AUTHORIZATION_CODE'],
+    tie_access_to_session: true,
   }
   const userId = '1-oauth-client-test-user'
   const user = {
@@ -45,6 +46,7 @@ describe('OAuth Client general settings', () => {
     cy.get(`[name="redirect_uris[0].value"]`).type('client-test-url')
     cy.findByRole('button', { name: /Add logout redirect URL/ }).click()
     cy.get(`[name="logout_redirect_uris[0].value"]`).type('client-test-url')
+    cy.findByLabelText('Tie access to session').uncheck()
 
     cy.findByRole('button', { name: 'Save changes' }).click()
 
@@ -66,6 +68,7 @@ describe('OAuth Client general settings', () => {
       .should('be.visible')
       .and('have.attr', 'value')
       .and('eq', 'client-test-url')
+    cy.findByLabelText('Tie access to session').should('not.be.checked')
   })
 
   it('succeeds deleting client', () => {

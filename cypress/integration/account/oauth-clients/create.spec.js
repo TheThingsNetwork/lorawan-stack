@@ -53,6 +53,7 @@ describe('OAuth Client create', () => {
         'The description is displayed to the user when authorizing the client. Use it to explain the purpose of your client.',
       )
       .and('be.visible')
+    cy.findByLabelText('Tie access to session').should('exist').and('be.checked')
     cy.findByRole('button', { name: 'Create OAuth Client' }).should('be.visible')
   })
 
@@ -72,7 +73,7 @@ describe('OAuth Client create', () => {
     )
   })
 
-  it('succeeds adding application', () => {
+  it('succeeds adding a client', () => {
     cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
     cy.visit(`${Cypress.config('accountAppRootPath')}/oauth-clients/add`)
     cy.findByLabelText('OAuth Client ID').type(clientId)

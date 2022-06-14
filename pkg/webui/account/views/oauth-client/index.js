@@ -143,6 +143,7 @@ export default connect(
           'endorsed',
           'grants',
           'rights',
+          'tie_access_to_session',
         ]),
       )
     },
