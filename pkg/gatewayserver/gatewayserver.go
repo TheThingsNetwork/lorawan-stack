@@ -705,15 +705,25 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item any) {
 	ctx = events.ContextWithCorrelationID(ctx, host.correlationID)
 	logger := log.FromContext(ctx)
 	gtw := host.gtw
+	// Each concurrent upstream host will receive the message and edit it in order
+	// to append the correlation IDs. This would be a concurrent write, so we are
+	// creating a shallow message copy in order to safely edit the correlation IDs.
 	switch msg := item.(type) {
 	case *ttnpb.GatewayUplinkMessage:
-		up := msg.Message
+		ctx := events.ContextWithCorrelationID(ctx, msg.Message.CorrelationIds...)
 		msg = &ttnpb.GatewayUplinkMessage{
-			BandId:  msg.BandId,
-			Message: up,
+			BandId: msg.BandId,
+			Message: &ttnpb.UplinkMessage{
+				RawPayload:         msg.Message.RawPayload,
+				Payload:            msg.Message.Payload,
+				Settings:           msg.Message.Settings,
+				RxMetadata:         msg.Message.RxMetadata,
+				ReceivedAt:         msg.Message.ReceivedAt,
+				CorrelationIds:     events.CorrelationIDsFromContext(ctx),
+				DeviceChannelIndex: msg.Message.DeviceChannelIndex,
+				ConsumedAirtime:    msg.Message.ConsumedAirtime,
+			},
 		}
-		msg.Message.CorrelationIds = append(make([]string, 0, len(msg.Message.CorrelationIds)+1), msg.Message.CorrelationIds...)
-		msg.Message.CorrelationIds = append(msg.Message.CorrelationIds, host.correlationID)
 		drop := func(ids *ttnpb.EndDeviceIdentifiers, err error) {
 			logger := logger.WithError(err)
 			if ids.JoinEui != nil {
@@ -728,7 +738,7 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item any) {
 			logger.Debug("Drop message")
 			registerDropUplink(ctx, gtw, msg, host.name, err)
 		}
-		ids := up.Payload.EndDeviceIdentifiers()
+		ids := msg.Message.Payload.EndDeviceIdentifiers()
 		var pass bool
 		switch {
 		case ids.DevAddr != nil:
@@ -759,6 +769,25 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item any) {
 			registerForwardStatus(ctx, gtw, msg, host.name)
 		}
 	case *ttnpb.TxAcknowledgment:
+		correlationIDs := make([]string, 0, len(msg.CorrelationIds)+len(msg.DownlinkMessage.GetCorrelationIds()))
+		correlationIDs = append(correlationIDs, msg.CorrelationIds...)
+		correlationIDs = append(correlationIDs, msg.DownlinkMessage.GetCorrelationIds()...)
+		ctx := events.ContextWithCorrelationID(ctx, correlationIDs...)
+		msg = &ttnpb.TxAcknowledgment{
+			CorrelationIds:  events.CorrelationIDsFromContext(ctx),
+			Result:          msg.Result,
+			DownlinkMessage: msg.DownlinkMessage,
+		}
+		if down := msg.DownlinkMessage; down != nil {
+			msg.DownlinkMessage = &ttnpb.DownlinkMessage{
+				RawPayload:     down.RawPayload,
+				Payload:        down.Payload,
+				EndDeviceIds:   down.EndDeviceIds,
+				Settings:       down.Settings,
+				CorrelationIds: events.CorrelationIDsFromContext(ctx),
+				SessionKeyId:   down.SessionKeyId,
+			}
+		}
 		if err := host.handler.HandleTxAck(ctx, gtw.Ids, msg); err != nil {
 			registerDropTxAck(ctx, gtw, msg, host.name, err)
 		} else {
