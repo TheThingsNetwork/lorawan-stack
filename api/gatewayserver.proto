@@ -96,12 +96,29 @@ service NsGs {
   rpc ScheduleDownlink(DownlinkMessage) returns (ScheduleDownlinkResponse);
 }
 
+message BatchGetGatewayConnectionStatsRequest{
+  repeated GatewayIdentifiers gateway_ids = 1 [(validate.rules).repeated.min_items = 1, (validate.rules).repeated.max_items = 100];
+}
+
+message BatchGetGatewayConnectionStatsResponse{
+  repeated GatewayConnectionStats gateway_connection_stats = 1;
+}
+
 service Gs {
   // Get statistics about the current gateway connection to the Gateway Server.
   // This is not persisted between reconnects.
   rpc GetGatewayConnectionStats(GatewayIdentifiers) returns (GatewayConnectionStats) {
     option (google.api.http) = {
       get: "/gs/gateways/{gateway_id}/connection/stats"
+    };
+  };
+
+  // Get statistics about gateway connections to the Gateway Server of a batch of gateways.
+  // This is not persisted between reconnects.
+  rpc BatchGetGatewayConnectionStats(BatchGetGatewayConnectionStatsRequest) returns (BatchGetGatewayConnectionStatsResponse) {
+    option (google.api.http) = {
+      post: "/gs/gateways/connection/stats"
+      body: "*"
     };
   };
 }

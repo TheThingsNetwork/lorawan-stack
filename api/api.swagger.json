@@ -6039,6 +6039,39 @@
         ]
       }
     },
+    "/gs/gateways/connection/stats": {
+      "post": {
+        "summary": "Get statistics about gateway connections to the Gateway Server of a batch of gateways.\nThis is not persisted between reconnects.",
+        "operationId": "Gs_BatchGetGatewayConnectionStats",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3BatchGetGatewayConnectionStatsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3BatchGetGatewayConnectionStatsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Gs"
+        ]
+      }
+    },
     "/gs/gateways/{gateway_id}/connection/stats": {
       "get": {
         "summary": "Get statistics about the current gateway connection to the Gateway Server.\nThis is not persisted between reconnects.",
@@ -14326,6 +14359,28 @@
         },
         "api_key": {
           "type": "string"
+        }
+      }
+    },
+    "v3BatchGetGatewayConnectionStatsRequest": {
+      "type": "object",
+      "properties": {
+        "gateway_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/lorawanv3GatewayIdentifiers"
+          }
+        }
+      }
+    },
+    "v3BatchGetGatewayConnectionStatsResponse": {
+      "type": "object",
+      "properties": {
+        "gateway_connection_stats": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3GatewayConnectionStats"
+          }
         }
       }
     },

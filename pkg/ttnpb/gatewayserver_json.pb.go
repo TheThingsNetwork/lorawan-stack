@@ -142,3 +142,66 @@ func (x *GatewayDown) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 func (x *GatewayDown) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
+
+// MarshalProtoJSON marshals the BatchGetGatewayConnectionStatsResponse message to JSON.
+func (x *BatchGetGatewayConnectionStatsResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.GatewayConnectionStats) > 0 || s.HasField("gateway_connection_stats") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("gateway_connection_stats")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.GatewayConnectionStats {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("gateway_connection_stats"))
+		}
+		s.WriteArrayEnd()
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the BatchGetGatewayConnectionStatsResponse to JSON.
+func (x BatchGetGatewayConnectionStatsResponse) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
+// UnmarshalProtoJSON unmarshals the BatchGetGatewayConnectionStatsResponse message from JSON.
+func (x *BatchGetGatewayConnectionStatsResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "gateway_connection_stats", "gatewayConnectionStats":
+			s.AddField("gateway_connection_stats")
+			if s.ReadNil() {
+				x.GatewayConnectionStats = nil
+				return
+			}
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.GatewayConnectionStats = append(x.GatewayConnectionStats, nil)
+					return
+				}
+				v := &GatewayConnectionStats{}
+				v.UnmarshalProtoJSON(s.WithField("gateway_connection_stats", false))
+				if s.Err() != nil {
+					return
+				}
+				x.GatewayConnectionStats = append(x.GatewayConnectionStats, v)
+			})
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the BatchGetGatewayConnectionStatsResponse from JSON.
+func (x *BatchGetGatewayConnectionStatsResponse) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}

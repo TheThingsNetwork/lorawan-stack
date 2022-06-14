@@ -299,6 +299,8 @@
   - [Service `GatewayConfigurator`](#ttn.lorawan.v3.GatewayConfigurator)
   - [Service `GatewayRegistry`](#ttn.lorawan.v3.GatewayRegistry)
 - [File `lorawan-stack/api/gatewayserver.proto`](#lorawan-stack/api/gatewayserver.proto)
+  - [Message `BatchGetGatewayConnectionStatsRequest`](#ttn.lorawan.v3.BatchGetGatewayConnectionStatsRequest)
+  - [Message `BatchGetGatewayConnectionStatsResponse`](#ttn.lorawan.v3.BatchGetGatewayConnectionStatsResponse)
   - [Message `GatewayDown`](#ttn.lorawan.v3.GatewayDown)
   - [Message `GatewayUp`](#ttn.lorawan.v3.GatewayUp)
   - [Message `ScheduleDownlinkErrorDetails`](#ttn.lorawan.v3.ScheduleDownlinkErrorDetails)
@@ -4658,6 +4660,24 @@ Deployment configuration may specify if, and for how long after deletion, entiti
 
 ## <a name="lorawan-stack/api/gatewayserver.proto">File `lorawan-stack/api/gatewayserver.proto`</a>
 
+### <a name="ttn.lorawan.v3.BatchGetGatewayConnectionStatsRequest">Message `BatchGetGatewayConnectionStatsRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `gateway_ids` | <p>`repeated.min_items`: `1`</p><p>`repeated.max_items`: `100`</p> |
+
+### <a name="ttn.lorawan.v3.BatchGetGatewayConnectionStatsResponse">Message `BatchGetGatewayConnectionStatsResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway_connection_stats` | [`GatewayConnectionStats`](#ttn.lorawan.v3.GatewayConnectionStats) | repeated |  |
+
 ### <a name="ttn.lorawan.v3.GatewayDown">Message `GatewayDown`</a>
 
 GatewayDown contains downlink messages for the gateway.
@@ -4702,12 +4722,14 @@ GatewayUp may contain zero or more uplink messages and/or a status message for t
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `GetGatewayConnectionStats` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`GatewayConnectionStats`](#ttn.lorawan.v3.GatewayConnectionStats) | Get statistics about the current gateway connection to the Gateway Server. This is not persisted between reconnects. |
+| `BatchGetGatewayConnectionStats` | [`BatchGetGatewayConnectionStatsRequest`](#ttn.lorawan.v3.BatchGetGatewayConnectionStatsRequest) | [`BatchGetGatewayConnectionStatsResponse`](#ttn.lorawan.v3.BatchGetGatewayConnectionStatsResponse) | Get statistics about gateway connections to the Gateway Server of a batch of gateways. This is not persisted between reconnects. |
 
 #### HTTP bindings
 
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
 | `GetGatewayConnectionStats` | `GET` | `/api/v3/gs/gateways/{gateway_id}/connection/stats` |  |
+| `BatchGetGatewayConnectionStats` | `POST` | `/api/v3/gs/gateways/connection/stats` | `*` |
 
 ### <a name="ttn.lorawan.v3.GtwGs">Service `GtwGs`</a>
 

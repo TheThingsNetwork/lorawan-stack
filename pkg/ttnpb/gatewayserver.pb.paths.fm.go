@@ -277,3 +277,17 @@ var ScheduleDownlinkErrorDetailsFieldPathsNested = []string{
 var ScheduleDownlinkErrorDetailsFieldPathsTopLevel = []string{
 	"path_errors",
 }
+var BatchGetGatewayConnectionStatsRequestFieldPathsNested = []string{
+	"gateway_ids",
+}
+
+var BatchGetGatewayConnectionStatsRequestFieldPathsTopLevel = []string{
+	"gateway_ids",
+}
+var BatchGetGatewayConnectionStatsResponseFieldPathsNested = []string{
+	"gateway_connection_stats",
+}
+
+var BatchGetGatewayConnectionStatsResponseFieldPathsTopLevel = []string{
+	"gateway_connection_stats",
+}
