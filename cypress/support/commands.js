@@ -144,19 +144,19 @@ Cypress.Commands.add('createUser', user => {
       headers: {
         'X-CSRF-Token': headers['x-csrf-token'],
       },
+    }).then(() => {
+      // Reset cookies and local storage to avoid csrf and session state inconsistencies within tests.
+      cy.clearCookies()
+      cy.clearLocalStorage()
     })
   })
-
-  // Reset cookies and local storage to avoid csrf and session state inconsistencies within tests.
-  cy.clearCookies()
-  cy.clearLocalStorage()
 })
 
 // Helper function to create a new client programmatically.
 Cypress.Commands.add('createClient', (client, userId) => {
   const baseUrl = Cypress.config('baseUrl')
   const adminApiKey = Cypress.config('adminApiKey')
-  cy.request({
+  return cy.request({
     method: 'POST',
     url: `${baseUrl}/api/v3/users/${userId}/clients`,
     body: { client },
