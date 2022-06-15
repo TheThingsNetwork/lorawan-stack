@@ -16,6 +16,7 @@ package commands
 
 import (
 	"os"
+	"strings"
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/spf13/cobra"
@@ -471,6 +472,44 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
+	gatewaysBatchConnectionStats = &cobra.Command{
+		Use:     "batch-get-connection-stats",
+		Aliases: []string{"batch-connection-stats", "batch-cnx-stats"},
+		Short:   "Get connection stats for a batch of gateways. This command does not check if all the gateways belong to the same cluster",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ids, err := cmd.Flags().GetString("gateway-ids")
+			if err != nil {
+				return err
+			}
+
+			s := strings.Split(ids, ",")
+			if len(s) == 0 {
+				return errNoGatewayID.New()
+			}
+
+			var gtwIDs []*ttnpb.GatewayIdentifiers
+			for _, id := range s {
+				gtwIDs = append(gtwIDs, &ttnpb.GatewayIdentifiers{
+					GatewayId: id,
+				})
+			}
+
+			gs, err := api.Dial(ctx, config.GatewayServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+
+			res, err := ttnpb.NewGsClient(gs).BatchGetGatewayConnectionStats(ctx,
+				&ttnpb.BatchGetGatewayConnectionStatsRequest{
+					GatewayIds: gtwIDs,
+				})
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.OutputFormat, res)
+		},
+	}
 	gatewaysContactInfoCommand = contactInfoCommands("gateway", func(cmd *cobra.Command, args []string) (*ttnpb.EntityIdentifiers, error) {
 		gtwID, err := getGatewayID(cmd.Flags(), args, true)
 		if err != nil {
@@ -548,6 +587,8 @@ func init() {
 	gatewaysCommand.AddCommand(gatewaysRestoreCommand)
 	gatewaysConnectionStats.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysCommand.AddCommand(gatewaysConnectionStats)
+	gatewaysCommand.AddCommand(gatewaysBatchConnectionStats)
+	gatewaysBatchConnectionStats.Flags().String("gateway-ids", "", "comma separated list of gateway IDs to batch get stats")
 	gatewaysContactInfoCommand.PersistentFlags().AddFlagSet(gatewayIDFlags())
 	gatewaysCommand.AddCommand(gatewaysContactInfoCommand)
 	gatewaysPurgeCommand.Flags().AddFlagSet(gatewayIDFlags())
