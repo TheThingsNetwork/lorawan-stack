@@ -550,6 +550,39 @@ var GatewayConnectionStatsFieldPathsTopLevel = []string{
 	"sub_bands",
 	"uplink_count",
 }
+var GatewayConnectionStatsEntryFieldPathsNested = []string{
+	"gateway_connection_stats",
+	"gateway_connection_stats.connected_at",
+	"gateway_connection_stats.disconnected_at",
+	"gateway_connection_stats.downlink_count",
+	"gateway_connection_stats.last_downlink_received_at",
+	"gateway_connection_stats.last_status",
+	"gateway_connection_stats.last_status.advanced",
+	"gateway_connection_stats.last_status.antenna_locations",
+	"gateway_connection_stats.last_status.boot_time",
+	"gateway_connection_stats.last_status.ip",
+	"gateway_connection_stats.last_status.metrics",
+	"gateway_connection_stats.last_status.time",
+	"gateway_connection_stats.last_status.versions",
+	"gateway_connection_stats.last_status_received_at",
+	"gateway_connection_stats.last_uplink_received_at",
+	"gateway_connection_stats.protocol",
+	"gateway_connection_stats.round_trip_times",
+	"gateway_connection_stats.round_trip_times.count",
+	"gateway_connection_stats.round_trip_times.max",
+	"gateway_connection_stats.round_trip_times.median",
+	"gateway_connection_stats.round_trip_times.min",
+	"gateway_connection_stats.sub_bands",
+	"gateway_connection_stats.uplink_count",
+	"gateway_ids",
+	"gateway_ids.eui",
+	"gateway_ids.gateway_id",
+}
+
+var GatewayConnectionStatsEntryFieldPathsTopLevel = []string{
+	"gateway_connection_stats",
+	"gateway_ids",
+}
 var GatewayRadio_TxConfigurationFieldPathsNested = []string{
 	"max_frequency",
 	"min_frequency",

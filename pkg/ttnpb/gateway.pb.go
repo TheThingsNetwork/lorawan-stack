@@ -1929,6 +1929,52 @@ func (m *GatewayConnectionStats_SubBand) GetDownlinkUtilization() float32 {
 	return 0
 }
 
+type GatewayConnectionStatsEntry struct {
+	GatewayIds             *GatewayIdentifiers     `protobuf:"bytes,1,opt,name=gateway_ids,json=gatewayIds,proto3" json:"gateway_ids,omitempty"`
+	GatewayConnectionStats *GatewayConnectionStats `protobuf:"bytes,2,opt,name=gateway_connection_stats,json=gatewayConnectionStats,proto3" json:"gateway_connection_stats,omitempty"`
+	XXX_NoUnkeyedLiteral   struct{}                `json:"-"`
+	XXX_unrecognized       []byte                  `json:"-"`
+	XXX_sizecache          int32                   `json:"-"`
+}
+
+func (m *GatewayConnectionStatsEntry) Reset()         { *m = GatewayConnectionStatsEntry{} }
+func (m *GatewayConnectionStatsEntry) String() string { return proto.CompactTextString(m) }
+func (*GatewayConnectionStatsEntry) ProtoMessage()    {}
+func (*GatewayConnectionStatsEntry) Descriptor() ([]byte, []int) {
+	return fileDescriptor_1df6bae1ac946b39, []int{22}
+}
+func (m *GatewayConnectionStatsEntry) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GatewayConnectionStatsEntry.Unmarshal(m, b)
+}
+func (m *GatewayConnectionStatsEntry) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GatewayConnectionStatsEntry.Marshal(b, m, deterministic)
+}
+func (m *GatewayConnectionStatsEntry) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GatewayConnectionStatsEntry.Merge(m, src)
+}
+func (m *GatewayConnectionStatsEntry) XXX_Size() int {
+	return xxx_messageInfo_GatewayConnectionStatsEntry.Size(m)
+}
+func (m *GatewayConnectionStatsEntry) XXX_DiscardUnknown() {
+	xxx_messageInfo_GatewayConnectionStatsEntry.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GatewayConnectionStatsEntry proto.InternalMessageInfo
+
+func (m *GatewayConnectionStatsEntry) GetGatewayIds() *GatewayIdentifiers {
+	if m != nil {
+		return m.GatewayIds
+	}
+	return nil
+}
+
+func (m *GatewayConnectionStatsEntry) GetGatewayConnectionStats() *GatewayConnectionStats {
+	if m != nil {
+		return m.GatewayConnectionStats
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterEnum("ttn.lorawan.v3.GatewayAntennaPlacement", GatewayAntennaPlacement_name, GatewayAntennaPlacement_value)
 	golang_proto.RegisterEnum("ttn.lorawan.v3.GatewayAntennaPlacement", GatewayAntennaPlacement_name, GatewayAntennaPlacement_value)
@@ -1994,6 +2040,8 @@ func init() {
 	golang_proto.RegisterType((*GatewayConnectionStats_RoundTripTimes)(nil), "ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes")
 	proto.RegisterType((*GatewayConnectionStats_SubBand)(nil), "ttn.lorawan.v3.GatewayConnectionStats.SubBand")
 	golang_proto.RegisterType((*GatewayConnectionStats_SubBand)(nil), "ttn.lorawan.v3.GatewayConnectionStats.SubBand")
+	proto.RegisterType((*GatewayConnectionStatsEntry)(nil), "ttn.lorawan.v3.GatewayConnectionStatsEntry")
+	golang_proto.RegisterType((*GatewayConnectionStatsEntry)(nil), "ttn.lorawan.v3.GatewayConnectionStatsEntry")
 }
 
 func init() { proto.RegisterFile("lorawan-stack/api/gateway.proto", fileDescriptor_1df6bae1ac946b39) }

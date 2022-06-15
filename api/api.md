@@ -269,6 +269,7 @@
   - [Message `GatewayConnectionStats`](#ttn.lorawan.v3.GatewayConnectionStats)
   - [Message `GatewayConnectionStats.RoundTripTimes`](#ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes)
   - [Message `GatewayConnectionStats.SubBand`](#ttn.lorawan.v3.GatewayConnectionStats.SubBand)
+  - [Message `GatewayConnectionStatsEntry`](#ttn.lorawan.v3.GatewayConnectionStatsEntry)
   - [Message `GatewayModel`](#ttn.lorawan.v3.GatewayModel)
   - [Message `GatewayRadio`](#ttn.lorawan.v3.GatewayRadio)
   - [Message `GatewayRadio.TxConfiguration`](#ttn.lorawan.v3.GatewayRadio.TxConfiguration)
@@ -4285,6 +4286,13 @@ Connection stats as monitored by the Gateway Server.
 | `downlink_utilization_limit` | [`float`](#float) |  | Duty-cycle limit of the sub-band as a fraction of time. |
 | `downlink_utilization` | [`float`](#float) |  | Utilization rate of the available duty-cycle. This value should not exceed downlink_utilization_limit. |
 
+### <a name="ttn.lorawan.v3.GatewayConnectionStatsEntry">Message `GatewayConnectionStatsEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
+| `gateway_connection_stats` | [`GatewayConnectionStats`](#ttn.lorawan.v3.GatewayConnectionStats) |  |  |
+
 ### <a name="ttn.lorawan.v3.GatewayModel">Message `GatewayModel`</a>
 
 | Field | Type | Label | Description |
@@ -4676,7 +4684,7 @@ Deployment configuration may specify if, and for how long after deletion, entiti
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `gateway_connection_stats` | [`GatewayConnectionStats`](#ttn.lorawan.v3.GatewayConnectionStats) | repeated |  |
+| `entries` | [`GatewayConnectionStatsEntry`](#ttn.lorawan.v3.GatewayConnectionStatsEntry) | repeated |  |
 
 ### <a name="ttn.lorawan.v3.GatewayDown">Message `GatewayDown`</a>
 
@@ -4722,7 +4730,7 @@ GatewayUp may contain zero or more uplink messages and/or a status message for t
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `GetGatewayConnectionStats` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`GatewayConnectionStats`](#ttn.lorawan.v3.GatewayConnectionStats) | Get statistics about the current gateway connection to the Gateway Server. This is not persisted between reconnects. |
-| `BatchGetGatewayConnectionStats` | [`BatchGetGatewayConnectionStatsRequest`](#ttn.lorawan.v3.BatchGetGatewayConnectionStatsRequest) | [`BatchGetGatewayConnectionStatsResponse`](#ttn.lorawan.v3.BatchGetGatewayConnectionStatsResponse) | Get statistics about gateway connections to the Gateway Server of a batch of gateways. This is not persisted between reconnects. |
+| `BatchGetGatewayConnectionStats` | [`BatchGetGatewayConnectionStatsRequest`](#ttn.lorawan.v3.BatchGetGatewayConnectionStatsRequest) | [`BatchGetGatewayConnectionStatsResponse`](#ttn.lorawan.v3.BatchGetGatewayConnectionStatsResponse) | Get statistics about gateway connections to the Gateway Server of a batch of gateways. This is not persisted between reconnects. Gateways that are not connected or are part of a different cluster are ignored. It's upto the client to make sure that the gateways are in the requested cluster. |
 
 #### HTTP bindings
 

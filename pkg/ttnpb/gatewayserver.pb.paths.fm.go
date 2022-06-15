@@ -285,9 +285,9 @@ var BatchGetGatewayConnectionStatsRequestFieldPathsTopLevel = []string{
 	"gateway_ids",
 }
 var BatchGetGatewayConnectionStatsResponseFieldPathsNested = []string{
-	"gateway_connection_stats",
+	"entries",
 }
 
 var BatchGetGatewayConnectionStatsResponseFieldPathsTopLevel = []string{
-	"gateway_connection_stats",
+	"entries",
 }

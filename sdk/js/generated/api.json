@@ -19225,6 +19225,42 @@
           ]
         },
         {
+          "name": "GatewayConnectionStatsEntry",
+          "longName": "GatewayConnectionStatsEntry",
+          "fullName": "ttn.lorawan.v3.GatewayConnectionStatsEntry",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_ids",
+              "description": "",
+              "label": "",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "gateway_connection_stats",
+              "description": "",
+              "label": "",
+              "type": "GatewayConnectionStats",
+              "longType": "GatewayConnectionStats",
+              "fullType": "ttn.lorawan.v3.GatewayConnectionStats",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "GatewayModel",
           "longName": "GatewayModel",
           "fullName": "ttn.lorawan.v3.GatewayModel",
@@ -21085,12 +21121,12 @@
           "extensions": [],
           "fields": [
             {
-              "name": "gateway_connection_stats",
+              "name": "entries",
               "description": "",
               "label": "repeated",
-              "type": "GatewayConnectionStats",
-              "longType": "GatewayConnectionStats",
-              "fullType": "ttn.lorawan.v3.GatewayConnectionStats",
+              "type": "GatewayConnectionStatsEntry",
+              "longType": "GatewayConnectionStatsEntry",
+              "fullType": "ttn.lorawan.v3.GatewayConnectionStatsEntry",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -21294,7 +21330,7 @@
             },
             {
               "name": "BatchGetGatewayConnectionStats",
-              "description": "Get statistics about gateway connections to the Gateway Server of a batch of gateways.\nThis is not persisted between reconnects.",
+              "description": "Get statistics about gateway connections to the Gateway Server of a batch of gateways.\nThis is not persisted between reconnects.\nGateways that are not connected or are part of a different cluster are ignored.\nIt's upto the client to make sure that the gateways are in the requested cluster.",
               "requestType": "BatchGetGatewayConnectionStatsRequest",
               "requestLongType": "BatchGetGatewayConnectionStatsRequest",
               "requestFullType": "ttn.lorawan.v3.BatchGetGatewayConnectionStatsRequest",

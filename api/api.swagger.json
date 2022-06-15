@@ -6041,7 +6041,7 @@
     },
     "/gs/gateways/connection/stats": {
       "post": {
-        "summary": "Get statistics about gateway connections to the Gateway Server of a batch of gateways.\nThis is not persisted between reconnects.",
+        "summary": "Get statistics about gateway connections to the Gateway Server of a batch of gateways.\nThis is not persisted between reconnects.\nGateways that are not connected or are part of a different cluster are ignored.\nIt's upto the client to make sure that the gateways are in the requested cluster.",
         "operationId": "Gs_BatchGetGatewayConnectionStats",
         "responses": {
           "200": {
@@ -14376,10 +14376,10 @@
     "v3BatchGetGatewayConnectionStatsResponse": {
       "type": "object",
       "properties": {
-        "gateway_connection_stats": {
+        "entries": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v3GatewayConnectionStats"
+            "$ref": "#/definitions/v3GatewayConnectionStatsEntry"
           }
         }
       }
@@ -16309,6 +16309,17 @@
         }
       },
       "description": "Connection stats as monitored by the Gateway Server."
+    },
+    "v3GatewayConnectionStatsEntry": {
+      "type": "object",
+      "properties": {
+        "gateway_ids": {
+          "$ref": "#/definitions/lorawanv3GatewayIdentifiers"
+        },
+        "gateway_connection_stats": {
+          "$ref": "#/definitions/v3GatewayConnectionStats"
+        }
+      }
     },
     "v3GatewayDown": {
       "type": "object",

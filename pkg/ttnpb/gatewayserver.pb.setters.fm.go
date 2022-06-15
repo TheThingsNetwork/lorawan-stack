@@ -218,14 +218,14 @@ func (dst *BatchGetGatewayConnectionStatsRequest) SetFields(src *BatchGetGateway
 func (dst *BatchGetGatewayConnectionStatsResponse) SetFields(src *BatchGetGatewayConnectionStatsResponse, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
-		case "gateway_connection_stats":
+		case "entries":
 			if len(subs) > 0 {
-				return fmt.Errorf("'gateway_connection_stats' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'entries' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.GatewayConnectionStats = src.GatewayConnectionStats
+				dst.Entries = src.Entries
 			} else {
-				dst.GatewayConnectionStats = nil
+				dst.Entries = nil
 			}
 
 		default:

@@ -151,14 +151,14 @@ func (x *BatchGetGatewayConnectionStatsResponse) MarshalProtoJSON(s *jsonplugin.
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if len(x.GatewayConnectionStats) > 0 || s.HasField("gateway_connection_stats") {
+	if len(x.Entries) > 0 || s.HasField("entries") {
 		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("gateway_connection_stats")
+		s.WriteObjectField("entries")
 		s.WriteArrayStart()
 		var wroteElement bool
-		for _, element := range x.GatewayConnectionStats {
+		for _, element := range x.Entries {
 			s.WriteMoreIf(&wroteElement)
-			element.MarshalProtoJSON(s.WithField("gateway_connection_stats"))
+			element.MarshalProtoJSON(s.WithField("entries"))
 		}
 		s.WriteArrayEnd()
 	}
@@ -179,23 +179,23 @@ func (x *BatchGetGatewayConnectionStatsResponse) UnmarshalProtoJSON(s *jsonplugi
 		switch key {
 		default:
 			s.ReadAny() // ignore unknown field
-		case "gateway_connection_stats", "gatewayConnectionStats":
-			s.AddField("gateway_connection_stats")
+		case "entries":
+			s.AddField("entries")
 			if s.ReadNil() {
-				x.GatewayConnectionStats = nil
+				x.Entries = nil
 				return
 			}
 			s.ReadArray(func() {
 				if s.ReadNil() {
-					x.GatewayConnectionStats = append(x.GatewayConnectionStats, nil)
+					x.Entries = append(x.Entries, nil)
 					return
 				}
-				v := &GatewayConnectionStats{}
-				v.UnmarshalProtoJSON(s.WithField("gateway_connection_stats", false))
+				v := &GatewayConnectionStatsEntry{}
+				v.UnmarshalProtoJSON(s.WithField("entries", false))
 				if s.Err() != nil {
 					return
 				}
-				x.GatewayConnectionStats = append(x.GatewayConnectionStats, v)
+				x.Entries = append(x.Entries, v)
 			})
 		}
 	})

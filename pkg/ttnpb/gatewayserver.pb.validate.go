@@ -573,15 +573,15 @@ func (m *BatchGetGatewayConnectionStatsResponse) ValidateFields(paths ...string)
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
-		case "gateway_connection_stats":
+		case "entries":
 
-			for idx, item := range m.GetGatewayConnectionStats() {
+			for idx, item := range m.GetEntries() {
 				_, _ = idx, item
 
 				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
 					if err := v.ValidateFields(subs...); err != nil {
 						return BatchGetGatewayConnectionStatsResponseValidationError{
-							field:  fmt.Sprintf("gateway_connection_stats[%v]", idx),
+							field:  fmt.Sprintf("entries[%v]", idx),
 							reason: "embedded message failed validation",
 							cause:  err,
 						}
