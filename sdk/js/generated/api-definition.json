@@ -3154,6 +3154,17 @@
           ]
         }
       ]
+    },
+    "BatchGetGatewayConnectionStats": {
+      "file": "lorawan-stack/api/gatewayserver.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/gs/gateways/connection/stats",
+          "body": "*",
+          "parameters": []
+        }
+      ]
     }
   },
   "GtwGs": {
