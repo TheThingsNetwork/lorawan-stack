@@ -86,3 +86,32 @@ func (r *GatewayConnectionStatsRegistry) Get(ctx context.Context, ids *ttnpb.Gat
 	}
 	return result, nil
 }
+
+// BatchGet returns the connection stats for a batch of gateways.
+// NotFound errors indicating that the gateway is either not connected
+// or is connected to a different cluster, are ignored.
+func (r *GatewayConnectionStatsRegistry) BatchGet(ctx context.Context,
+	ids []*ttnpb.GatewayIdentifiers,
+) ([]*ttnpb.GatewayConnectionStatsEntry, error) {
+	ret := make([]*ttnpb.GatewayConnectionStatsEntry, 0)
+	if _, err := r.Redis.TxPipelined(ctx, func(p redis.Pipeliner) error {
+		for _, gtwIDs := range ids {
+			uid := unique.ID(ctx, gtwIDs)
+			result := &ttnpb.GatewayConnectionStats{}
+			if err := ttnredis.GetProto(ctx, r.Redis, r.key(uid)).ScanProto(result); err != nil {
+				if errors.IsNotFound(err) {
+					continue
+				}
+				return err
+			}
+			ret = append(ret, &ttnpb.GatewayConnectionStatsEntry{
+				GatewayIds:             gtwIDs,
+				GatewayConnectionStats: result,
+			})
+		}
+		return nil
+	}); err != nil {
+		return nil, ttnredis.ConvertError(err)
+	}
+	return ret, nil
+}
