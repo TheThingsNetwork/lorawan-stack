@@ -48,3 +48,44 @@ func (gs *GatewayServer) GetGatewayConnectionStats(ctx context.Context, ids *ttn
 	stats, _ := val.(connectionEntry).Stats()
 	return stats, nil
 }
+
+// BatchGetGatewayConnectionStats gets statistics about gateway connections to the Gateway Server
+// of a batch of gateways.
+// This RPC skips unconnected gateways.
+func (gs *GatewayServer) BatchGetGatewayConnectionStats(ctx context.Context,
+	req *ttnpb.BatchGetGatewayConnectionStatsRequest,
+) (*ttnpb.BatchGetGatewayConnectionStatsResponse, error) {
+	for _, ids := range req.GatewayIds {
+		if err := gs.entityRegistry.AssertGatewayRights(ctx, ids, ttnpb.Right_RIGHT_GATEWAY_STATUS_READ); err != nil {
+			return nil, err
+		}
+	}
+
+	if gs.statsRegistry != nil {
+		entries, err := gs.statsRegistry.BatchGet(ctx, req.GatewayIds)
+		if err != nil {
+			return nil, err
+		}
+		return &ttnpb.BatchGetGatewayConnectionStatsResponse{
+			Entries: entries,
+		}, nil
+	}
+
+	// If there isn't a registry, load the (ephemeral) values stored in the Gateway Server connections.
+	entries := make([]*ttnpb.GatewayConnectionStatsEntry, 0)
+	for _, id := range req.GatewayIds {
+		uid := unique.ID(ctx, id)
+		val, ok := gs.connections.Load(uid)
+		if !ok {
+			continue
+		}
+		st, _ := val.(connectionEntry).Stats()
+		entries = append(entries, &ttnpb.GatewayConnectionStatsEntry{
+			GatewayIds:             id,
+			GatewayConnectionStats: st,
+		})
+	}
+	return &ttnpb.BatchGetGatewayConnectionStatsResponse{
+		Entries: entries,
+	}, nil
+}
