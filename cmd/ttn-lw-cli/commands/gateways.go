@@ -475,7 +475,7 @@ var (
 	gatewaysBatchConnectionStats = &cobra.Command{
 		Use:     "batch-get-connection-stats",
 		Aliases: []string{"batch-connection-stats", "batch-cnx-stats"},
-		Short:   "Get connection stats for a batch of gateways. This command does not check if all the gateways belong to the same cluster",
+		Short:   "Get connection stats for a batch of gateways",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ids, err := cmd.Flags().GetString("gateway-ids")
 			if err != nil {
@@ -588,7 +588,8 @@ func init() {
 	gatewaysConnectionStats.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysCommand.AddCommand(gatewaysConnectionStats)
 	gatewaysCommand.AddCommand(gatewaysBatchConnectionStats)
-	gatewaysBatchConnectionStats.Flags().String("gateway-ids", "", "comma separated list of gateway IDs to batch get stats")
+	gatewaysBatchConnectionStats.Flags().String("gateway-ids", "",
+		"comma separated list of gateway IDs to batch get stats")
 	gatewaysContactInfoCommand.PersistentFlags().AddFlagSet(gatewayIDFlags())
 	gatewaysCommand.AddCommand(gatewaysContactInfoCommand)
 	gatewaysPurgeCommand.Flags().AddFlagSet(gatewayIDFlags())

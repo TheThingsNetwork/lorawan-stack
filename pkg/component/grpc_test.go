@@ -71,6 +71,15 @@ func (gs *gsImplementation) GetGatewayConnectionStats(ctx context.Context, _ *tt
 	return &ttnpb.GatewayConnectionStats{}, nil
 }
 
+func (gs *gsImplementation) BatchGetGatewayConnectionStats(ctx context.Context,
+	req *ttnpb.BatchGetGatewayConnectionStatsRequest,
+) (*ttnpb.BatchGetGatewayConnectionStatsResponse, error) {
+	if err := clusterauth.Authorized(ctx); err != nil {
+		return nil, err
+	}
+	return &ttnpb.BatchGetGatewayConnectionStatsResponse{}, nil
+}
+
 func TestHooks(t *testing.T) {
 	a := assertions.New(t)
 
