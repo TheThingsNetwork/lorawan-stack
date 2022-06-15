@@ -26,6 +26,7 @@ describe('Account App forgot password', () => {
   })
 
   it('validates before submitting the form', () => {
+    cy.visit(`${Cypress.config('accountAppRootPath')}/forgot-password`)
     cy.findByRole('button', { name: 'Send' }).click()
     cy.findErrorByLabelText('User ID')
       .should('contain.text', 'User ID is required')
