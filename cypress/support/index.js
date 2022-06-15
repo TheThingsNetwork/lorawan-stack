@@ -31,6 +31,12 @@ afterEach(function () {
   if (this.currentTest.state === 'failed' && Cypress.env('FAIL_FAST')) {
     cy.log('Skipping rest of run due to test failure (fail fast)')
     cy.writeFile(failedSpecsFilename, this.currentTest.invocationDetails.relativeFile)
+  } else {
+    // Apply a workaround for requests spilling over to the subsequent test.
+    // See also https://github.com/cypress-io/cypress/issues/686.
+    cy.window().then(win => {
+      win.location.href = 'about:blank'
+    })
   }
 })
 
