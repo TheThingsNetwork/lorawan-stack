@@ -40,7 +40,7 @@ import DeviceOverview from '@console/views/device-overview'
 
 import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
 import PropTypes from '@ttn-lw/lib/prop-types'
-import { selectJsConfig, selectAsConfig } from '@ttn-lw/lib/selectors/env'
+import { selectJsConfig, selectAsConfig, selectNsConfig } from '@ttn-lw/lib/selectors/env'
 import { combineDeviceIds } from '@ttn-lw/lib/selectors/id'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -99,9 +99,13 @@ import style from './device.styl'
   },
   dispatch => ({
     loadDeviceData: (appId, devId, deviceSelector, linkSelector, mayViewLink) => {
-      dispatch(getDevice(appId, devId, deviceSelector, { ignoreNotFound: true }))
-      dispatch(getNsFrequencyPlans())
+      const nsEnabled = selectNsConfig().enabled
 
+      dispatch(getDevice(appId, devId, deviceSelector, { ignoreNotFound: true }))
+
+      if (nsEnabled) {
+        dispatch(getNsFrequencyPlans())
+      }
       if (mayViewLink) {
         dispatch(getApplicationLink(appId, linkSelector))
       }

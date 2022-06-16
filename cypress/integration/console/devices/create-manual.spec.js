@@ -816,6 +816,7 @@ describe('End device manual create', () => {
         `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/eui-${device.dev_eui}`,
       )
       cy.findByTestId('full-error-view').should('not.exist')
+      cy.findAllByText(`eui-${device.dev_eui}`).should('be.visible')
     })
 
     it('fails to select ABP', () => {
