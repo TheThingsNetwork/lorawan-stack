@@ -26,6 +26,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Fix `last activity` not updating when an end device joins for the first time in the Console.
 - Fix a bug that would show the "Status count periodicity"-field in the Console as `200` when actually set to `0`.
+- Fix location bug in the Console.
 
 ### Security
 
