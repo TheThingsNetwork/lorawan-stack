@@ -147,7 +147,7 @@ class LocationForm extends Component {
               resolve({
                 mapCenter: [
                   isNaN(position.coords.latitude) ? defaultLocation[0] : position.coords.latitude,
-                  isNaN(position.coords.longitude) ? defaultLocation[1] : position.coords.latitude,
+                  isNaN(position.coords.longitude) ? defaultLocation[1] : position.coords.longitude,
                 ],
                 loading: false,
               })
