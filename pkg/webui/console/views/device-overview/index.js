@@ -38,6 +38,7 @@ import Require from '@console/lib/components/require'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import { composeDataUri, downloadDataUriAsFile } from '@ttn-lw/lib/data-uri'
+import { selectStackConfig } from '@ttn-lw/lib/selectors/env'
 
 import {
   parseLorawanMacVersion,
@@ -148,11 +149,14 @@ class DeviceOverview extends React.Component {
     const session = actualSession || pending_session
     const { keys: sessionKeys = {}, dev_addr } = session || {}
 
-    const lorawanVersion = parseLorawanMacVersion(lorawan_version)
-    const frequencyPlan = frequencyPlans.find(f => f.id === frequency_plan_id).name
-    const lorawanVersionName = LORAWAN_VERSIONS.find(v => v.value === lorawan_version).label
-    const phyVersionName = LORAWAN_PHY_VERSIONS.find(v => v.value === lorawan_phy_version).label
-
+    const nsEnabled = selectStackConfig().ns.enabled
+    let lorawanVersion, frequencyPlan, lorawanVersionName, phyVersionName
+    if (nsEnabled) {
+      lorawanVersion = parseLorawanMacVersion(lorawan_version)
+      frequencyPlan = frequencyPlans.find(f => f.id === frequency_plan_id).name
+      lorawanVersionName = LORAWAN_VERSIONS.find(v => v.value === lorawan_version).label
+      phyVersionName = LORAWAN_PHY_VERSIONS.find(v => v.value === lorawan_phy_version).label
+    }
     const {
       f_nwk_s_int_key = { key: undefined },
       s_nwk_s_int_key = { key: undefined },

@@ -14,7 +14,6 @@
 
 /* eslint-disable no-invalid-this */
 
-import '@cypress/code-coverage/support'
 import '@testing-library/cypress/add-commands'
 import { configure } from '@testing-library/cypress'
 import './commands'
@@ -26,11 +25,17 @@ Cypress.SelectorPlayground.defaults({
   selectorPriority: ['data-test-id', 'id', 'class', 'tag', 'attributes', 'nth-child'],
 })
 
-// Enable fail early if set.
 afterEach(function () {
+  // Enable fail-early, if set.:
   if (this.currentTest.state === 'failed' && Cypress.env('FAIL_FAST')) {
     cy.log('Skipping rest of run due to test failure (fail fast)')
     cy.writeFile(failedSpecsFilename, this.currentTest.invocationDetails.relativeFile)
+  } else {
+    // Apply a workaround for requests spilling over to the subsequent test.
+    // See also https://github.com/cypress-io/cypress/issues/686.
+    cy.window().then(win => {
+      win.location.href = 'about:blank'
+    })
   }
 })
 
