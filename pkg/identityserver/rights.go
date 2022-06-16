@@ -141,13 +141,15 @@ func (is *IdentityServer) ClientRights(ctx context.Context, cliIDs *ttnpb.Client
 // GatewayRights returns the rights the caller has on the given gateway.
 // The query for the gateway only considers the Gateway ID and not the EUI (if provided).
 func (is *IdentityServer) GatewayRights(ctx context.Context, gtwIDs *ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
-	gtwIDs.Eui = nil
-	entity, universal, err := is.getRights(ctx, gtwIDs.GetEntityIdentifiers())
+	ids := &ttnpb.GatewayIdentifiers{
+		GatewayId: gtwIDs.GatewayId,
+	}
+	entity, universal, err := is.getRights(ctx, ids.GetEntityIdentifiers())
 	if err != nil {
 		return nil, err
 	}
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
-		gtw, err := st.GetGateway(ctx, gtwIDs, []string{"ids", "status_public", "location_public"})
+		gtw, err := st.GetGateway(ctx, ids, []string{"ids", "status_public", "location_public"})
 		if err != nil {
 			return err
 		}
