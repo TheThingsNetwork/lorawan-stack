@@ -205,7 +205,7 @@ func (is *IdentityServer) getEndDeviceIdentifiersForEUIs(ctx context.Context, re
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		dev, err := st.GetEndDevice(ctx, &ttnpb.EndDeviceIdentifiers{
 			JoinEui: types.MustEUI64(req.JoinEui),
-			DevEui:  types.MustEUI64(req.JoinEui),
+			DevEui:  types.MustEUI64(req.DevEui),
 		}, []string{"ids.application_ids.application_id", "ids.device_id", "ids.join_eui", "ids.dev_eui"})
 		if err != nil {
 			return err
