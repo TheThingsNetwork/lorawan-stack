@@ -58,7 +58,7 @@ describe('Send invite', () => {
       'eq',
       `${Cypress.config('consoleRootPath')}/admin/user-management`,
     )
-    cy.findByText('Invitations').click()
+    cy.findByText('User invitations').click()
     cy.findByRole('cell', { email: 'mail@example.com' }).should('not.exist')
   })
 })
