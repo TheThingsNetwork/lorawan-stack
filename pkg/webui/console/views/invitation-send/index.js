@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,36 +14,27 @@
 
 import React from 'react'
 import { Container, Col, Row } from 'react-grid-system'
-import { connect } from 'react-redux'
-import { push } from 'connected-react-router'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
-import InviteForm from '@console/components/invite-user-form'
+import InviteForm from '@console/containers/invite-user-form'
 
 import Require from '@console/lib/components/require'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
-import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { maySendInvites } from '@console/lib/feature-checks'
 
-import { sendInvite } from '@console/store/actions/user'
-
-const InvitationSend = props => {
-  const { navigateToList, sendInvite } = props
-
+const InvitationSend = () => {
   useBreadcrumbs(
-    'admin.user-management.invitations.add',
-    <Breadcrumb path={`/admin/user-management/invitations/add`} content={sharedMessages.add} />,
+    'admin.user-management.invitations.send',
+    <Breadcrumb
+      path={`/admin/user-management/invitations/send`}
+      content={sharedMessages.sendInvitation}
+    />,
   )
-
-  const onSubmit = React.useCallback(async email => sendInvite(email), [sendInvite])
-
-  const onSubmitSuccess = React.useCallback(() => navigateToList(), [navigateToList])
 
   return (
     <Require featureCheck={maySendInvites} otherwise={{ redirect: '/' }}>
@@ -51,7 +42,7 @@ const InvitationSend = props => {
         <PageTitle title={sharedMessages.invite} />
         <Row>
           <Col lg={8} md={12}>
-            <InviteForm onSubmit={onSubmit} onSubmitSuccess={onSubmitSuccess} />
+            <InviteForm />
           </Col>
         </Row>
       </Container>
@@ -59,12 +50,4 @@ const InvitationSend = props => {
   )
 }
 
-InvitationSend.propTypes = {
-  navigateToList: PropTypes.func.isRequired,
-  sendInvite: PropTypes.func.isRequired,
-}
-
-export default connect(null, {
-  sendInvite: email => attachPromise(sendInvite(email)),
-  navigateToList: () => push(`/admin/user-management`),
-})(InvitationSend)
+export default InvitationSend
