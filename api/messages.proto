@@ -342,11 +342,23 @@ message ApplicationInvalidatedDownlinks {
 }
 
 message DownlinkQueueOperationErrorDetails {
-  bytes dev_addr = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr"];
+  bytes dev_addr = 1 [
+    (validate.rules).bytes = { len: 4, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal4Bytes"
+    }
+  ];
   bytes session_key_id = 2 [(validate.rules).bytes.max_len = 2048];
   uint32 min_f_cnt_down = 3;
 
-  bytes pending_dev_addr = 4 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr"];
+  bytes pending_dev_addr = 4 [
+    (validate.rules).bytes = { len: 4, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal4Bytes"
+    }
+  ];
   bytes pending_session_key_id = 5 [(validate.rules).bytes.max_len = 2048];
   uint32 pending_min_f_cnt_down = 6;
 }

@@ -6742,7 +6742,9 @@ Downlink message from the network to the end device
 
 | Field | Validations |
 | ----- | ----------- |
+| `dev_addr` | <p>`bytes.len`: `4`</p> |
 | `session_key_id` | <p>`bytes.max_len`: `2048`</p> |
+| `pending_dev_addr` | <p>`bytes.len`: `4`</p> |
 | `pending_session_key_id` | <p>`bytes.max_len`: `2048`</p> |
 
 ### <a name="ttn.lorawan.v3.DownlinkQueueRequest">Message `DownlinkQueueRequest`</a>
@@ -6895,6 +6897,14 @@ More payload formatters can be added. |
 | `home_network_tenant_id` | [`string`](#string) |  | Tenant ID managed by the Packet Broker Home Network Member. This value is empty if it cannot be determined by the Packet Broker Router. |
 | `home_network_cluster_id` | [`string`](#string) |  | Home Network Cluster ID of the Packet Broker Home Network. |
 | `hops` | [`PacketBrokerRouteHop`](#ttn.lorawan.v3.PacketBrokerRouteHop) | repeated | Hops that the message passed. Each Packet Broker Router service appends an entry. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `forwarder_net_id` | <p>`bytes.len`: `3`</p> |
+| `forwarder_gateway_eui` | <p>`bytes.len`: `8`</p> |
+| `home_network_net_id` | <p>`bytes.len`: `3`</p> |
 
 ### <a name="ttn.lorawan.v3.PacketBrokerRouteHop">Message `PacketBrokerRouteHop`</a>
 

@@ -365,13 +365,35 @@ func (m *PacketBrokerMetadata) ValidateFields(paths ...string) error {
 		case "message_id":
 			// no validation rules for MessageId
 		case "forwarder_net_id":
-			// no validation rules for ForwarderNetId
+
+			if len(m.GetForwarderNetId()) > 0 {
+
+				if len(m.GetForwarderNetId()) != 3 {
+					return PacketBrokerMetadataValidationError{
+						field:  "forwarder_net_id",
+						reason: "value length must be 3 bytes",
+					}
+				}
+
+			}
+
 		case "forwarder_tenant_id":
 			// no validation rules for ForwarderTenantId
 		case "forwarder_cluster_id":
 			// no validation rules for ForwarderClusterId
 		case "forwarder_gateway_eui":
-			// no validation rules for ForwarderGatewayEui
+
+			if len(m.GetForwarderGatewayEui()) > 0 {
+
+				if len(m.GetForwarderGatewayEui()) != 8 {
+					return PacketBrokerMetadataValidationError{
+						field:  "forwarder_gateway_eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		case "forwarder_gateway_id":
 
 			if v, ok := interface{}(m.GetForwarderGatewayId()).(interface{ ValidateFields(...string) error }); ok {
@@ -385,7 +407,18 @@ func (m *PacketBrokerMetadata) ValidateFields(paths ...string) error {
 			}
 
 		case "home_network_net_id":
-			// no validation rules for HomeNetworkNetId
+
+			if len(m.GetHomeNetworkNetId()) > 0 {
+
+				if len(m.GetHomeNetworkNetId()) != 3 {
+					return PacketBrokerMetadataValidationError{
+						field:  "home_network_net_id",
+						reason: "value length must be 3 bytes",
+					}
+				}
+
+			}
+
 		case "home_network_tenant_id":
 			// no validation rules for HomeNetworkTenantId
 		case "home_network_cluster_id":

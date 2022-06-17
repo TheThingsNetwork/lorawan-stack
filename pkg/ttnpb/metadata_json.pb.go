@@ -10,6 +10,7 @@ import (
 	gogo "github.com/TheThingsIndustries/protoc-gen-go-json/gogo"
 	jsonplugin "github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
 	types "github.com/gogo/protobuf/types"
+	types1 "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // MarshalProtoJSON marshals the LocationSource to JSON.
@@ -82,8 +83,7 @@ func (x *RxMetadata) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.PacketBroker != nil || s.HasField("packet_broker") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("packet_broker")
-		// NOTE: PacketBrokerMetadata does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.PacketBroker)
+		x.PacketBroker.MarshalProtoJSON(s.WithField("packet_broker"))
 	}
 	if x.AntennaIndex != 0 || s.HasField("antenna_index") {
 		s.WriteMoreIf(&wroteField)
@@ -220,15 +220,12 @@ func (x *RxMetadata) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			gogo.UnmarshalMessage(s, &v)
 			x.GatewayIds = &v
 		case "packet_broker", "packetBroker":
-			s.AddField("packet_broker")
 			if s.ReadNil() {
 				x.PacketBroker = nil
 				return
 			}
-			// NOTE: PacketBrokerMetadata does not seem to implement UnmarshalProtoJSON.
-			var v PacketBrokerMetadata
-			gogo.UnmarshalMessage(s, &v)
-			x.PacketBroker = &v
+			x.PacketBroker = &PacketBrokerMetadata{}
+			x.PacketBroker.UnmarshalProtoJSON(s.WithField("packet_broker", true))
 		case "antenna_index", "antennaIndex":
 			s.AddField("antenna_index")
 			x.AntennaIndex = s.ReadUint32()
@@ -394,5 +391,147 @@ func (x *Location) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 
 // UnmarshalJSON unmarshals the Location from JSON.
 func (x *Location) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the PacketBrokerMetadata message to JSON.
+func (x *PacketBrokerMetadata) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.MessageId != "" || s.HasField("message_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("message_id")
+		s.WriteString(x.MessageId)
+	}
+	if len(x.ForwarderNetId) > 0 || s.HasField("forwarder_net_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("forwarder_net_id")
+		types1.MarshalHEXBytes(s.WithField("forwarder_net_id"), x.ForwarderNetId)
+	}
+	if x.ForwarderTenantId != "" || s.HasField("forwarder_tenant_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("forwarder_tenant_id")
+		s.WriteString(x.ForwarderTenantId)
+	}
+	if x.ForwarderClusterId != "" || s.HasField("forwarder_cluster_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("forwarder_cluster_id")
+		s.WriteString(x.ForwarderClusterId)
+	}
+	if len(x.ForwarderGatewayEui) > 0 || s.HasField("forwarder_gateway_eui") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("forwarder_gateway_eui")
+		types1.MarshalHEXBytes(s.WithField("forwarder_gateway_eui"), x.ForwarderGatewayEui)
+	}
+	if x.ForwarderGatewayId != nil || s.HasField("forwarder_gateway_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("forwarder_gateway_id")
+		if x.ForwarderGatewayId == nil {
+			s.WriteNil()
+		} else {
+			s.WriteString(x.ForwarderGatewayId.Value)
+		}
+	}
+	if len(x.HomeNetworkNetId) > 0 || s.HasField("home_network_net_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("home_network_net_id")
+		types1.MarshalHEXBytes(s.WithField("home_network_net_id"), x.HomeNetworkNetId)
+	}
+	if x.HomeNetworkTenantId != "" || s.HasField("home_network_tenant_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("home_network_tenant_id")
+		s.WriteString(x.HomeNetworkTenantId)
+	}
+	if x.HomeNetworkClusterId != "" || s.HasField("home_network_cluster_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("home_network_cluster_id")
+		s.WriteString(x.HomeNetworkClusterId)
+	}
+	if len(x.Hops) > 0 || s.HasField("hops") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("hops")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.Hops {
+			s.WriteMoreIf(&wroteElement)
+			// NOTE: PacketBrokerRouteHop does not seem to implement MarshalProtoJSON.
+			gogo.MarshalMessage(s, element)
+		}
+		s.WriteArrayEnd()
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the PacketBrokerMetadata to JSON.
+func (x PacketBrokerMetadata) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
+// UnmarshalProtoJSON unmarshals the PacketBrokerMetadata message from JSON.
+func (x *PacketBrokerMetadata) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "message_id", "messageId":
+			s.AddField("message_id")
+			x.MessageId = s.ReadString()
+		case "forwarder_net_id", "forwarderNetId":
+			s.AddField("forwarder_net_id")
+			x.ForwarderNetId = types1.Unmarshal3Bytes(s.WithField("forwarder_net_id", false))
+		case "forwarder_tenant_id", "forwarderTenantId":
+			s.AddField("forwarder_tenant_id")
+			x.ForwarderTenantId = s.ReadString()
+		case "forwarder_cluster_id", "forwarderClusterId":
+			s.AddField("forwarder_cluster_id")
+			x.ForwarderClusterId = s.ReadString()
+		case "forwarder_gateway_eui", "forwarderGatewayEui":
+			s.AddField("forwarder_gateway_eui")
+			x.ForwarderGatewayEui = types1.Unmarshal8Bytes(s.WithField("forwarder_gateway_eui", false))
+		case "forwarder_gateway_id", "forwarderGatewayId":
+			s.AddField("forwarder_gateway_id")
+			if s.ReadNil() {
+				x.ForwarderGatewayId = nil
+				return
+			}
+			v := s.ReadString()
+			if s.Err() != nil {
+				return
+			}
+			x.ForwarderGatewayId = &types.StringValue{Value: v}
+		case "home_network_net_id", "homeNetworkNetId":
+			s.AddField("home_network_net_id")
+			x.HomeNetworkNetId = types1.Unmarshal3Bytes(s.WithField("home_network_net_id", false))
+		case "home_network_tenant_id", "homeNetworkTenantId":
+			s.AddField("home_network_tenant_id")
+			x.HomeNetworkTenantId = s.ReadString()
+		case "home_network_cluster_id", "homeNetworkClusterId":
+			s.AddField("home_network_cluster_id")
+			x.HomeNetworkClusterId = s.ReadString()
+		case "hops":
+			s.AddField("hops")
+			if s.ReadNil() {
+				x.Hops = nil
+				return
+			}
+			s.ReadArray(func() {
+				// NOTE: PacketBrokerRouteHop does not seem to implement UnmarshalProtoJSON.
+				var v PacketBrokerRouteHop
+				gogo.UnmarshalMessage(s, &v)
+				x.Hops = append(x.Hops, &v)
+			})
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the PacketBrokerMetadata from JSON.
+func (x *PacketBrokerMetadata) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

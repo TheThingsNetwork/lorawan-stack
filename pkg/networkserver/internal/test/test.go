@@ -185,7 +185,7 @@ var (
 			ChannelRssi: -14.2,
 			UplinkToken: []byte("token-pb-1"),
 			PacketBroker: &ttnpb.PacketBrokerMetadata{
-				ForwarderNetId:     test.DefaultNetID,
+				ForwarderNetId:     test.DefaultNetID.Bytes(),
 				ForwarderClusterId: "test-cluster",
 			},
 			DownlinkPathConstraint: ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NEVER,
@@ -196,7 +196,7 @@ var (
 			ChannelRssi: -21.8,
 			UplinkToken: []byte("token-pb-2"),
 			PacketBroker: &ttnpb.PacketBrokerMetadata{
-				ForwarderNetId:     test.DefaultNetID,
+				ForwarderNetId:     test.DefaultNetID.Bytes(),
 				ForwarderClusterId: "other-cluster",
 			},
 			DownlinkPathConstraint: ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NEVER,

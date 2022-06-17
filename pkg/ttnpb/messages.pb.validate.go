@@ -1737,7 +1737,18 @@ func (m *DownlinkQueueOperationErrorDetails) ValidateFields(paths ...string) err
 		_ = subs
 		switch name {
 		case "dev_addr":
-			// no validation rules for DevAddr
+
+			if len(m.GetDevAddr()) > 0 {
+
+				if len(m.GetDevAddr()) != 4 {
+					return DownlinkQueueOperationErrorDetailsValidationError{
+						field:  "dev_addr",
+						reason: "value length must be 4 bytes",
+					}
+				}
+
+			}
+
 		case "session_key_id":
 
 			if len(m.GetSessionKeyId()) > 2048 {
@@ -1750,7 +1761,18 @@ func (m *DownlinkQueueOperationErrorDetails) ValidateFields(paths ...string) err
 		case "min_f_cnt_down":
 			// no validation rules for MinFCntDown
 		case "pending_dev_addr":
-			// no validation rules for PendingDevAddr
+
+			if len(m.GetPendingDevAddr()) > 0 {
+
+				if len(m.GetPendingDevAddr()) != 4 {
+					return DownlinkQueueOperationErrorDetailsValidationError{
+						field:  "pending_dev_addr",
+						reason: "value length must be 4 bytes",
+					}
+				}
+
+			}
+
 		case "pending_session_key_id":
 
 			if len(m.GetPendingSessionKeyId()) > 2048 {
