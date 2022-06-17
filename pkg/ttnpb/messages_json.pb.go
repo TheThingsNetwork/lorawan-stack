@@ -9,6 +9,7 @@ package ttnpb
 import (
 	gogo "github.com/TheThingsIndustries/protoc-gen-go-json/gogo"
 	jsonplugin "github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
+	types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // MarshalProtoJSON marshals the PayloadFormatter to JSON.
@@ -1370,6 +1371,88 @@ func (x *ApplicationInvalidatedDownlinks) UnmarshalProtoJSON(s *jsonplugin.Unmar
 
 // UnmarshalJSON unmarshals the ApplicationInvalidatedDownlinks from JSON.
 func (x *ApplicationInvalidatedDownlinks) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the DownlinkQueueOperationErrorDetails message to JSON.
+func (x *DownlinkQueueOperationErrorDetails) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.DevAddr) > 0 || s.HasField("dev_addr") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("dev_addr")
+		types.MarshalHEXBytes(s.WithField("dev_addr"), x.DevAddr)
+	}
+	if len(x.SessionKeyId) > 0 || s.HasField("session_key_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("session_key_id")
+		s.WriteBytes(x.SessionKeyId)
+	}
+	if x.MinFCntDown != 0 || s.HasField("min_f_cnt_down") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("min_f_cnt_down")
+		s.WriteUint32(x.MinFCntDown)
+	}
+	if len(x.PendingDevAddr) > 0 || s.HasField("pending_dev_addr") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("pending_dev_addr")
+		types.MarshalHEXBytes(s.WithField("pending_dev_addr"), x.PendingDevAddr)
+	}
+	if len(x.PendingSessionKeyId) > 0 || s.HasField("pending_session_key_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("pending_session_key_id")
+		s.WriteBytes(x.PendingSessionKeyId)
+	}
+	if x.PendingMinFCntDown != 0 || s.HasField("pending_min_f_cnt_down") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("pending_min_f_cnt_down")
+		s.WriteUint32(x.PendingMinFCntDown)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the DownlinkQueueOperationErrorDetails to JSON.
+func (x DownlinkQueueOperationErrorDetails) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
+// UnmarshalProtoJSON unmarshals the DownlinkQueueOperationErrorDetails message from JSON.
+func (x *DownlinkQueueOperationErrorDetails) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "dev_addr", "devAddr":
+			s.AddField("dev_addr")
+			x.DevAddr = types.Unmarshal4Bytes(s.WithField("dev_addr", false))
+		case "session_key_id", "sessionKeyId":
+			s.AddField("session_key_id")
+			x.SessionKeyId = s.ReadBytes()
+		case "min_f_cnt_down", "minFCntDown":
+			s.AddField("min_f_cnt_down")
+			x.MinFCntDown = s.ReadUint32()
+		case "pending_dev_addr", "pendingDevAddr":
+			s.AddField("pending_dev_addr")
+			x.PendingDevAddr = types.Unmarshal4Bytes(s.WithField("pending_dev_addr", false))
+		case "pending_session_key_id", "pendingSessionKeyId":
+			s.AddField("pending_session_key_id")
+			x.PendingSessionKeyId = s.ReadBytes()
+		case "pending_min_f_cnt_down", "pendingMinFCntDown":
+			s.AddField("pending_min_f_cnt_down")
+			x.PendingMinFCntDown = s.ReadUint32()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the DownlinkQueueOperationErrorDetails from JSON.
+func (x *DownlinkQueueOperationErrorDetails) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 

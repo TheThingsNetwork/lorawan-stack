@@ -2,10 +2,7 @@
 
 package ttnpb
 
-import (
-	fmt "fmt"
-	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
-)
+import fmt "fmt"
 
 func (dst *RxMetadata) SetFields(src *RxMetadata, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
@@ -349,8 +346,7 @@ func (dst *PacketBrokerMetadata) SetFields(src *PacketBrokerMetadata, paths ...s
 			if src != nil {
 				dst.ForwarderNetId = src.ForwarderNetId
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.NetID
-				dst.ForwarderNetId = zero
+				dst.ForwarderNetId = nil
 			}
 		case "forwarder_tenant_id":
 			if len(subs) > 0 {
@@ -397,8 +393,7 @@ func (dst *PacketBrokerMetadata) SetFields(src *PacketBrokerMetadata, paths ...s
 			if src != nil {
 				dst.HomeNetworkNetId = src.HomeNetworkNetId
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.NetID
-				dst.HomeNetworkNetId = zero
+				dst.HomeNetworkNetId = nil
 			}
 		case "home_network_tenant_id":
 			if len(subs) > 0 {

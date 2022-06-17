@@ -481,17 +481,18 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 	if gtwMd := msg.Message.GatewayMetadata; gtwMd != nil {
 		pbMD := &ttnpb.PacketBrokerMetadata{
 			MessageId:            msg.Id,
-			ForwarderNetId:       forwarderNetID,
+			ForwarderNetId:       forwarderNetID.Bytes(),
 			ForwarderTenantId:    msg.ForwarderTenantId,
 			ForwarderClusterId:   msg.ForwarderClusterId,
-			HomeNetworkNetId:     homeNetworkNetID,
+			HomeNetworkNetId:     homeNetworkNetID.Bytes(),
 			HomeNetworkTenantId:  msg.HomeNetworkTenantId,
 			HomeNetworkClusterId: msg.HomeNetworkClusterId,
 		}
 		if id := msg.GetMessage().GetGatewayId(); id != nil {
 			if eui := id.Eui; eui != nil {
-				pbMD.ForwarderGatewayEui = &types.EUI64{}
-				pbMD.ForwarderGatewayEui.UnmarshalNumber(eui.Value)
+				euiVal := types.EUI64{}
+				euiVal.UnmarshalNumber(eui.Value)
+				pbMD.ForwarderGatewayEui = euiVal.Bytes()
 			}
 			switch s := id.Id.(type) {
 			case *packetbroker.GatewayIdentifier_Hash:

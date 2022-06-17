@@ -30,7 +30,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
@@ -248,12 +247,12 @@ func matchQueuedApplicationDownlinks(ctx context.Context, dev *ttnpb.EndDevice, 
 	makeDownlinkQueueOperationErrorDetails := func() *ttnpb.DownlinkQueueOperationErrorDetails {
 		d := &ttnpb.DownlinkQueueOperationErrorDetails{}
 		if dev.Session != nil {
-			d.DevAddr = types.MustDevAddr(dev.Session.DevAddr)
+			d.DevAddr = dev.Session.DevAddr
 			d.SessionKeyId = dev.Session.Keys.SessionKeyId
 			d.MinFCntDown = minCurrentFCntDown
 		}
 		if dev.PendingSession != nil {
-			d.PendingDevAddr = types.MustDevAddr(dev.PendingSession.DevAddr)
+			d.PendingDevAddr = dev.PendingSession.DevAddr
 			d.PendingSessionKeyId = dev.PendingSession.Keys.SessionKeyId
 			d.PendingMinFCntDown = minPendingFCntDown
 		}

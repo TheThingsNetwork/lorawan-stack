@@ -484,11 +484,14 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 		// If the SessionKeyID and DevAddr did not change, just update the LastAFCntDown.
 		case dev.Session != nil &&
 			bytes.Equal(diagnostics.SessionKeyId, dev.Session.Keys.SessionKeyId) &&
-			types.MustDevAddr(dev.Session.DevAddr).OrZero().Equal(*diagnostics.DevAddr):
+			types.MustDevAddr(dev.Session.DevAddr).OrZero().Equal(types.MustDevAddr(diagnostics.DevAddr).OrZero()):
 			dev.Session.LastAFCntDown = lastAFCntDownFromMinFCnt(diagnostics.MinFCntDown)
 		// If there is a SessionKeyID on the Network Server side, rebuild the session.
 		case len(diagnostics.SessionKeyId) > 0:
-			session, err := reconstructSession(diagnostics.SessionKeyId, diagnostics.DevAddr, diagnostics.MinFCntDown)
+			session, err := reconstructSession(diagnostics.SessionKeyId,
+				types.MustDevAddr(diagnostics.DevAddr),
+				diagnostics.MinFCntDown,
+			)
 			if err != nil {
 				return nil, err
 			}
@@ -508,11 +511,15 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 		// If the SessionKeyID did not change, just update the LastAFcntDown.
 		case dev.PendingSession != nil &&
 			bytes.Equal(diagnostics.PendingSessionKeyId, dev.PendingSession.Keys.SessionKeyId) &&
-			types.MustDevAddr(dev.PendingSession.DevAddr).OrZero().Equal(*diagnostics.PendingDevAddr):
+			types.MustDevAddr(
+				dev.PendingSession.DevAddr).OrZero().Equal(types.MustDevAddr(diagnostics.PendingDevAddr).OrZero()):
 			dev.PendingSession.LastAFCntDown = lastAFCntDownFromMinFCnt(diagnostics.PendingMinFCntDown)
 		// If there is a SessionKeyID on the Network Server side, rebuild the session.
 		case len(diagnostics.PendingSessionKeyId) > 0:
-			session, err := reconstructSession(diagnostics.PendingSessionKeyId, diagnostics.PendingDevAddr, diagnostics.PendingMinFCntDown)
+			session, err := reconstructSession(diagnostics.PendingSessionKeyId,
+				types.MustDevAddr(diagnostics.PendingDevAddr),
+				diagnostics.PendingMinFCntDown,
+			)
 			if err != nil {
 				return nil, err
 			}

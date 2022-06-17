@@ -754,7 +754,7 @@ func (ns *NetworkServer) filterMetadata(ctx context.Context, up *ttnpb.UplinkMes
 	mds := make([]*ttnpb.RxMetadata, 0, len(up.RxMetadata))
 	for _, md := range up.RxMetadata {
 		if pbMD := md.GetPacketBroker(); pbMD != nil {
-			if pbMD.ForwarderNetId.Equal(ns.netID) &&
+			if types.MustNetID(pbMD.ForwarderNetId).OrZero().Equal(ns.netID) &&
 				pbMD.ForwarderClusterId == ns.clusterID {
 				continue
 			}

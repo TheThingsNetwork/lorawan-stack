@@ -30624,7 +30624,15 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 4
+                  }
+                ]
+              }
             },
             {
               "name": "session_key_id",
@@ -30668,7 +30676,15 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 4
+                  }
+                ]
+              }
             },
             {
               "name": "pending_session_key_id",
@@ -31328,7 +31344,15 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 3
+                  }
+                ]
+              }
             },
             {
               "name": "forwarder_tenant_id",
@@ -31364,7 +31388,15 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 8
+                  }
+                ]
+              }
             },
             {
               "name": "forwarder_gateway_id",
@@ -31388,7 +31420,15 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 3
+                  }
+                ]
+              }
             },
             {
               "name": "home_network_tenant_id",
