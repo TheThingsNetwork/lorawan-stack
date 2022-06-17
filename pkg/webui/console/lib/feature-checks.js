@@ -17,7 +17,7 @@ import { selectStackConfig } from '@ttn-lw/lib/selectors/env'
 import { selectApplicationRights } from '@console/store/selectors/applications'
 import { selectGatewayRights } from '@console/store/selectors/gateways'
 import { selectOrganizationRights } from '@console/store/selectors/organizations'
-import { selectUserRights, selectUserIsAdmin } from '@console/store/selectors/user'
+import { selectUserRights, selectUserIsAdmin } from '@console/store/selectors/logout'
 
 const stackConfig = selectStackConfig()
 const asEnabled = stackConfig.as.enabled

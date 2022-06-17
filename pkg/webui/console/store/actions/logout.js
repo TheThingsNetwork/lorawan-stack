@@ -13,10 +13,6 @@
 // limitations under the License.
 
 import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
-import {
-  createPaginationRequestActions,
-  createPaginationBaseActionType,
-} from '@ttn-lw/lib/store/actions/pagination'
 
 export const GET_USER_ME_BASE = 'GET_USER_ME'
 export const [
@@ -35,29 +31,3 @@ export const [
   { request: LOGOUT, success: LOGOUT_SUCCESS, failure: LOGOUT_FAILURE },
   { request: logout, success: logoutSuccess, failure: logoutFailure },
 ] = createRequestActions(LOGOUT_BASE)
-
-export const GET_USER_INVITATIONS_BASE = createPaginationBaseActionType('INVITATIONS')
-export const [
-  {
-    request: GET_USER_INVITATIONS,
-    success: GET_USER_INVITATIONS_SUCCESS,
-    failure: GET_USER_INVITATIONS_FAILURE,
-  },
-  {
-    request: getUserInvitations,
-    success: getUserInvitationsSuccess,
-    failure: getUserInvitationsFailure,
-  },
-] = createPaginationRequestActions('INVITATIONS')
-
-export const SEND_INVITE_BASE = 'SEND_INVITE'
-export const [
-  { request: SEND_INVITE, success: SEND_INVITE_SUCCESS, failure: SEND_INVITE_FAILURE },
-  { request: sendInvite, success: sendInviteSuccess, failure: sendInviteFailure },
-] = createRequestActions(SEND_INVITE_BASE, email => ({ email }))
-
-export const DELETE_INVITE_BASE = 'DELETE_INVITE'
-export const [
-  { request: DELETE_INVITE, success: DELETE_INVITE_SUCCESS, failure: DELETE_INVITE_FAILURE },
-  { request: deleteInvite, success: deleteInviteSuccess, failure: deleteInviteFailure },
-] = createRequestActions(DELETE_INVITE_BASE, email => ({ email }))

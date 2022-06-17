@@ -51,7 +51,7 @@ import {
   selectUserError,
   selectUserRights,
   selectUserIsAdmin,
-} from '@console/store/selectors/user'
+} from '@console/store/selectors/logout'
 
 import style from './app.styl'
 

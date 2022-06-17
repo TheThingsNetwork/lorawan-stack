@@ -21,11 +21,14 @@ import {
   GET_USER,
   DELETE_USER_SUCCESS,
   CREATE_USER_SUCCESS,
+  GET_USER_INVITATIONS_SUCCESS,
 } from '@console/store/actions/users'
 
 const initialState = {
   entities: {},
   selectedUser: null,
+  invitations: undefined,
+  invitationsTotalCount: undefined,
 }
 
 const user = (state = {}, user) => ({
@@ -73,6 +76,12 @@ const users = (state = initialState, { type, payload }) => {
       return {
         selectedUser: null,
         entities: rest,
+      }
+    case GET_USER_INVITATIONS_SUCCESS:
+      return {
+        ...state,
+        invitations: payload.invitations,
+        invitationsTotalCount: payload.totalCount,
       }
     default:
       return state

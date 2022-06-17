@@ -34,20 +34,16 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { checkFromState, mayManageUsers, maySendInvites } from '@console/lib/feature-checks'
 
-import { getUsersList } from '@console/store/actions/users'
-import { deleteInvite, getUserInvitations } from '@console/store/actions/user'
+import { getUsersList, deleteInvite, getUserInvitations } from '@console/store/actions/users'
 
-import {
-  selectUserId,
-  selectUserIsAdmin,
-  selectUserInvitations,
-  selectUserInvitationsTotalCount,
-  selectUserInvitationsFetching,
-} from '@console/store/selectors/user'
+import { selectUserId, selectUserIsAdmin } from '@console/store/selectors/logout'
 import {
   selectUsers,
   selectUsersTotalCount,
   selectUsersFetching,
+  selectUserInvitations,
+  selectUserInvitationsTotalCount,
+  selectUserInvitationsFetching,
 } from '@console/store/selectors/users'
 
 import style from './users-table.styl'
@@ -64,11 +60,11 @@ const USERS_TAB = 'users'
 const INVITATIONS_TAB = 'invitations'
 const tabs = [
   {
-    title: 'Users',
+    title: sharedMessages.users,
     name: 'users',
   },
   {
-    title: 'Invitations',
+    title: sharedMessages.userInvitations,
     name: 'invitations',
   },
 ]
@@ -154,7 +150,7 @@ const UsersTable = props => {
         {
           name: 'actions',
           displayName: sharedMessages.actions,
-          width: 50,
+          width: 42,
           getValue: row => ({
             email: row.email,
             delete: onDeleteInvite.bind(null, { email: row.email }),

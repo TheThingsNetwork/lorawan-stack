@@ -38,7 +38,7 @@ import { SHARED_NAME as COLLABORATORS_SHARED_NAME } from '@ttn-lw/lib/store/acti
 import { SHARED_NAME as API_KEYS_SHARED_NAME } from '@console/store/actions/api-keys'
 import { SHARED_NAME as PACKET_BROKER_NETWORKS_SHARED_NAME } from '@console/store/actions/packet-broker'
 
-import user from './user'
+import user from './logout'
 import users from './users'
 import applications from './applications'
 import devices from './devices'

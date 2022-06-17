@@ -42,7 +42,7 @@ import { getOrganizationsList } from '@console/store/actions/organizations'
 import { createGateway } from '@console/store/actions/gateways'
 
 import { selectOrganizationsFetching } from '@console/store/selectors/organizations'
-import { selectUserId } from '@console/store/selectors/user'
+import { selectUserId } from '@console/store/selectors/logout'
 
 const m = defineMessages({
   createGateway: 'Create gateway',

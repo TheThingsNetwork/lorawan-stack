@@ -20,7 +20,7 @@ import * as init from '@ttn-lw/lib/store/actions/init'
 import { TokenError } from '@ttn-lw/lib/errors/custom-errors'
 import { isPermissionDeniedError, isUnauthenticatedError } from '@ttn-lw/lib/errors/utils'
 
-import * as user from '@console/store/actions/user'
+import * as user from '@console/store/actions/logout'
 
 const consoleAppLogic = createRequestLogic({
   type: init.INITIALIZE,

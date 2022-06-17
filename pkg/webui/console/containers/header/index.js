@@ -34,9 +34,9 @@ import {
   mayConfigurePacketBroker,
 } from '@console/lib/feature-checks'
 
-import { logout } from '@console/store/actions/user'
+import { logout } from '@console/store/actions/logout'
 
-import { selectUser } from '@console/store/selectors/user'
+import { selectUser } from '@console/store/selectors/logout'
 
 import Logo from '../logo'
 

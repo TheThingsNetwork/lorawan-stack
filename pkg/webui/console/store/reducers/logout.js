@@ -18,15 +18,12 @@ import {
   GET_USER_ME,
   LOGOUT_FAILURE,
   GET_USER_RIGHTS_SUCCESS,
-  GET_USER_INVITATIONS_SUCCESS,
-} from '@console/store/actions/user'
+} from '@console/store/actions/logout'
 
 const defaultState = {
   user: undefined,
   error: undefined,
   rights: undefined,
-  invitations: undefined,
-  invitationsTotalCount: undefined,
 }
 
 const user = (state = defaultState, { type, payload }) => {
@@ -59,12 +56,6 @@ const user = (state = defaultState, { type, payload }) => {
       return {
         ...state,
         error: payload,
-      }
-    case GET_USER_INVITATIONS_SUCCESS:
-      return {
-        ...state,
-        invitations: payload.invitations,
-        invitationsTotalCount: payload.totalCount,
       }
     default:
       return state
