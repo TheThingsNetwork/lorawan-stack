@@ -100,7 +100,6 @@ jobs:
           args: release --config .goreleaser.release.yml --release-notes /tmp/release-notes.md --timeout 120m
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_LOGIN }}
-          SNAPCRAFT_MANAGED_MODE: n
           AWS_REGION: ${{ secrets.AWS_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
