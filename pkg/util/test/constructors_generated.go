@@ -805,7 +805,7 @@ func (EndDeviceOptionNamespace) WithRootKeys(v *ttnpb.RootKeys) EndDeviceOption 
 }
 
 // WithNetId returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with NetId set to v.
-func (EndDeviceOptionNamespace) WithNetId(v *types.NetID) EndDeviceOption {
+func (EndDeviceOptionNamespace) WithNetId(v []byte) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
 		x.NetId = v
 		return x

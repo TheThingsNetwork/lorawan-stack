@@ -2405,7 +2405,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							RxDelay: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B).Rx1Delay,
 							CfList:  frequencyplans.CFList(*test.FrequencyPlan(test.EUFrequencyPlanID), ttnpb.PHYVersion_RP001_V1_1_REV_B),
 						},
-						DevAddr: test.DefaultDevAddr,
+						DevAddr: test.DefaultDevAddr.Bytes(),
 					},
 					RxWindowsAvailable: true,
 					RecentUplinks: []*ttnpb.UplinkMessage{
@@ -2488,7 +2488,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					expected.PendingMacState.RxWindowsAvailable = false
 					expected.PendingMacState.PendingJoinRequest = created.PendingMacState.QueuedJoinAccept.Request
 					expected.PendingSession = &ttnpb.Session{
-						DevAddr: created.PendingMacState.QueuedJoinAccept.DevAddr.Bytes(),
+						DevAddr: created.PendingMacState.QueuedJoinAccept.DevAddr,
 						Keys:    created.PendingMacState.QueuedJoinAccept.Keys,
 					}
 					expected.PendingMacState.QueuedJoinAccept = nil
@@ -2503,7 +2503,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:       dev.Ids.DeviceId,
 					DevEui:         dev.Ids.DevEui,
 					JoinEui:        dev.Ids.JoinEui,
-					DevAddr:        &dev.PendingMacState.QueuedJoinAccept.DevAddr,
+					DevAddr:        types.MustDevAddr(dev.PendingMacState.QueuedJoinAccept.DevAddr),
 				}
 				cids := LastUplink(dev.PendingMacState.RecentUplinks...).CorrelationIds
 				recvAt := LastUplink(dev.PendingMacState.RecentUplinks...).ReceivedAt
@@ -2633,8 +2633,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 						case ttnpb.MType_JOIN_ACCEPT:
 							msg.Payload = &ttnpb.Message_JoinAcceptPayload{
 								JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
-									NetId:      created.PendingMacState.QueuedJoinAccept.NetId,
-									DevAddr:    created.PendingMacState.QueuedJoinAccept.DevAddr,
+									NetId:      types.MustNetID(created.PendingMacState.QueuedJoinAccept.NetId).OrZero(),
+									DevAddr:    types.MustDevAddr(created.PendingMacState.QueuedJoinAccept.DevAddr).OrZero(),
 									DlSettings: created.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
 									RxDelay:    created.PendingMacState.QueuedJoinAccept.Request.RxDelay,
 									CfList:     created.PendingMacState.QueuedJoinAccept.Request.CfList,

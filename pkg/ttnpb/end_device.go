@@ -480,7 +480,7 @@ func (v *MACState_JoinAccept) FieldIsZero(p string) bool {
 	case "correlation_ids":
 		return v.CorrelationIds == nil
 	case "dev_addr":
-		return v.DevAddr == types.DevAddr{}
+		return types.MustDevAddr(v.DevAddr).OrZero().IsZero()
 	case "keys":
 		return v.Keys == nil
 	case "keys.app_s_key":
@@ -518,7 +518,7 @@ func (v *MACState_JoinAccept) FieldIsZero(p string) bool {
 	case "keys.session_key_id":
 		return v.Keys.FieldIsZero("session_key_id")
 	case "net_id":
-		return v.NetId == types.NetID{}
+		return types.MustNetID(v.NetId).OrZero().IsZero()
 	case "payload":
 		return v.Payload == nil
 	case "request":
@@ -1242,7 +1242,7 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 	case "name":
 		return v.Name == ""
 	case "net_id":
-		return v.NetId == nil
+		return types.MustNetID(v.NetId).OrZero().IsZero()
 	case "network_server_address":
 		return v.NetworkServerAddress == ""
 	case "network_server_kek_label":

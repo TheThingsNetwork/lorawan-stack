@@ -1821,8 +1821,8 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 								},
 								Payload: &ttnpb.Message_JoinAcceptPayload{
 									JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
-										NetId:      dev.PendingMacState.QueuedJoinAccept.NetId,
-										DevAddr:    dev.PendingMacState.QueuedJoinAccept.DevAddr,
+										NetId:      types.MustNetID(dev.PendingMacState.QueuedJoinAccept.NetId).OrZero(),
+										DevAddr:    types.MustDevAddr(dev.PendingMacState.QueuedJoinAccept.DevAddr).OrZero(),
 										DlSettings: dev.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
 										RxDelay:    dev.PendingMacState.QueuedJoinAccept.Request.RxDelay,
 										CfList:     dev.PendingMacState.QueuedJoinAccept.Request.CfList,
@@ -1859,7 +1859,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 							DeviceId:       dev.Ids.DeviceId,
 							DevEui:         dev.Ids.DevEui,
 							JoinEui:        dev.Ids.JoinEui,
-							DevAddr:        &dev.PendingMacState.QueuedJoinAccept.DevAddr,
+							DevAddr:        types.MustDevAddr(dev.PendingMacState.QueuedJoinAccept.DevAddr),
 						},
 						CorrelationIds: events.CorrelationIDsFromContext(ctx),
 						Up: &ttnpb.ApplicationUp_JoinAccept{
@@ -1873,7 +1873,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 					})
 
 					dev.PendingSession = &ttnpb.Session{
-						DevAddr: dev.PendingMacState.QueuedJoinAccept.DevAddr.Bytes(),
+						DevAddr: dev.PendingMacState.QueuedJoinAccept.DevAddr,
 						Keys: &ttnpb.SessionKeys{
 							SessionKeyId: dev.PendingMacState.QueuedJoinAccept.Keys.SessionKeyId,
 							FNwkSIntKey:  dev.PendingMacState.QueuedJoinAccept.Keys.FNwkSIntKey,

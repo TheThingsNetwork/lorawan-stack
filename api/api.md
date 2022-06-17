@@ -3233,6 +3233,12 @@ Configuration options for static ADR.
 | `dev_addr` | [`bytes`](#bytes) |  | DevAddr base. |
 | `length` | [`uint32`](#uint32) |  | Number of most significant bits from dev_addr that are used as prefix. |
 
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `dev_addr` | <p>`bytes.len`: `4`</p> |
+
 ### <a name="ttn.lorawan.v3.EndDevice">Message `EndDevice`</a>
 
 Defines an End Device registration and its state on the network.
@@ -3312,6 +3318,7 @@ SDKs are responsible for combining (if desired) the three.
 | `lorawan_version` | <p>`enum.defined_only`: `true`</p> |
 | `lorawan_phy_version` | <p>`enum.defined_only`: `true`</p> |
 | `frequency_plan_id` | <p>`string.max_len`: `64`</p> |
+| `net_id` | <p>`bytes.len`: `3`</p> |
 | `power_state` | <p>`enum.defined_only`: `true`</p> |
 | `battery_percentage` | <p>`float.lte`: `1`</p><p>`float.gte`: `0`</p> |
 | `provisioner_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`</p> |
@@ -3439,6 +3446,13 @@ Template for creating end devices.
 | ----- | ---- | ----- | ----------- |
 | `join_eui` | [`bytes`](#bytes) |  |  |
 | `dev_eui` | [`bytes`](#bytes) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `join_eui` | <p>`bytes.len`: `8`</p> |
+| `dev_eui` | <p>`bytes.len`: `8`</p> |
 
 ### <a name="ttn.lorawan.v3.GetEndDeviceRequest">Message `GetEndDeviceRequest`</a>
 
@@ -3669,6 +3683,8 @@ This is used internally by the Network Server.
 | `request` | <p>`message.required`: `true`</p> |
 | `keys` | <p>`message.required`: `true`</p> |
 | `correlation_ids` | <p>`repeated.items.string.max_len`: `100`</p> |
+| `dev_addr` | <p>`bytes.len`: `4`</p> |
+| `net_id` | <p>`bytes.len`: `3`</p> |
 
 ### <a name="ttn.lorawan.v3.MACState.JoinRequest">Message `MACState.JoinRequest`</a>
 
@@ -6972,6 +6988,12 @@ Response of GenerateDevAddr.
 | ----- | ---- | ----- | ----------- |
 | `dev_addr` | [`bytes`](#bytes) |  |  |
 
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `dev_addr` | <p>`bytes.len`: `4`</p> |
+
 ### <a name="ttn.lorawan.v3.GetDefaultMACSettingsRequest">Message `GetDefaultMACSettingsRequest`</a>
 
 Request of GetDefaultMACSettings.
@@ -7724,6 +7746,7 @@ There is no (longer) wire compatibility needed; new fields may use any tag.
 | Field | Validations |
 | ----- | ----------- |
 | `gateway_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[_-]?[a-z0-9]){2,}$`</p> |
+| `eui` | <p>`bytes.len`: `8`</p> |
 
 ### <a name="ttn.lorawan.v3.PacketBrokerGatewayVisibility">Message `PacketBrokerGatewayVisibility`</a>
 

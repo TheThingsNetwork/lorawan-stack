@@ -2,10 +2,7 @@
 
 package ttnpb
 
-import (
-	fmt "fmt"
-	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
-)
+import fmt "fmt"
 
 func (dst *Session) SetFields(src *Session, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
@@ -2710,8 +2707,7 @@ func (dst *GetEndDeviceIdentifiersForEUIsRequest) SetFields(src *GetEndDeviceIde
 			if src != nil {
 				dst.JoinEui = src.JoinEui
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
-				dst.JoinEui = zero
+				dst.JoinEui = nil
 			}
 		case "dev_eui":
 			if len(subs) > 0 {
@@ -2720,8 +2716,7 @@ func (dst *GetEndDeviceIdentifiersForEUIsRequest) SetFields(src *GetEndDeviceIde
 			if src != nil {
 				dst.DevEui = src.DevEui
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
-				dst.DevEui = zero
+				dst.DevEui = nil
 			}
 
 		default:
@@ -3408,8 +3403,7 @@ func (dst *MACState_JoinAccept) SetFields(src *MACState_JoinAccept, paths ...str
 			if src != nil {
 				dst.DevAddr = src.DevAddr
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.DevAddr
-				dst.DevAddr = zero
+				dst.DevAddr = nil
 			}
 		case "net_id":
 			if len(subs) > 0 {
@@ -3418,8 +3412,7 @@ func (dst *MACState_JoinAccept) SetFields(src *MACState_JoinAccept, paths ...str
 			if src != nil {
 				dst.NetId = src.NetId
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.NetID
-				dst.NetId = zero
+				dst.NetId = nil
 			}
 
 		default:

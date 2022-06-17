@@ -413,9 +413,9 @@ var (
 					if err != nil {
 						return err
 					}
-					device.Ids.DevAddr = devAddrRes.DevAddr
+					device.Ids.DevAddr = types.MustDevAddr(devAddrRes.DevAddr)
 					device.Session = &ttnpb.Session{
-						DevAddr: devAddrRes.DevAddr.Bytes(),
+						DevAddr: devAddrRes.DevAddr,
 						Keys: &ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{Key: generateKey()},
 							AppSKey:     &ttnpb.KeyEnvelope{Key: generateKey()},

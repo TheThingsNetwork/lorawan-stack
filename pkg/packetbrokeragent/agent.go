@@ -226,7 +226,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 			for i, p := range devAddrPrefixes {
 				blocks[i] = &ttnpb.PacketBrokerDevAddrBlock{
 					DevAddrPrefix: &ttnpb.DevAddrPrefix{
-						DevAddr: &p.DevAddr,
+						DevAddr: p.DevAddr.Bytes(),
 						Length:  uint32(p.Length),
 					},
 					HomeNetworkClusterId: homeNetworkClusterID,

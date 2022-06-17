@@ -395,8 +395,28 @@ message MACState {
     // Network session keys associated with the join.
     SessionKeys keys = 3 [(validate.rules).message.required = true];
     repeated string correlation_ids = 4 [(validate.rules).repeated.items.string.max_len = 100];
-    bytes dev_addr = 5 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr"];
-    bytes net_id = 6 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID"];
+    bytes dev_addr = 5 [
+      (validate.rules).bytes = { len: 4, ignore_empty: true },
+      (thethings.json.field) = {
+        marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+        unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal4Bytes"
+      },
+      (thethings.flags.field) = {
+        set_flag_new_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.New4BytesFlag",
+        set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
+      }
+    ];
+    bytes net_id = 6 [
+      (validate.rules).bytes = { len: 3, ignore_empty: true },
+      (thethings.json.field) = {
+        marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+        unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal3Bytes"
+      },
+      (thethings.flags.field) = {
+        set_flag_new_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.New3BytesFlag",
+        set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
+      }
+    ];
   }
 
   // Queued join-accept.
@@ -573,7 +593,11 @@ message EndDevice {
 
   // Home NetID. Stored in Join Server.
   bytes net_id = 23 [
-    (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID",
+    (validate.rules).bytes = { len: 3, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal3Bytes"
+    },
     (thethings.flags.field) = {
       set_flag_new_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.New3BytesFlag",
       set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
@@ -679,7 +703,12 @@ message EndDevices {
 
 message DevAddrPrefix {
   // DevAddr base.
-  bytes dev_addr = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr"];
+  bytes dev_addr = 1 [
+    (validate.rules).bytes = { len: 4, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal4Bytes"
+    }];
   // Number of most significant bits from dev_addr that are used as prefix.
   uint32 length = 2;
 }
@@ -713,8 +742,20 @@ message GetEndDeviceRequest {
 }
 
 message GetEndDeviceIdentifiersForEUIsRequest {
-  bytes join_eui = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
-  bytes dev_eui = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
+  bytes join_eui = 1 [
+    (validate.rules).bytes = { len: 8, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal8Bytes"
+    }
+  ];
+  bytes dev_eui = 2 [
+    (validate.rules).bytes = { len: 8, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal8Bytes"
+    }
+  ];
 }
 
 message ListEndDevicesRequest {

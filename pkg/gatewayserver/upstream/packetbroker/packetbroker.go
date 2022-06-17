@@ -111,12 +111,17 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids *ttnpb.GatewayIdentifi
 	for i, ant := range gtw.Antennas {
 		antennas[i] = ant
 	}
+
+	pbIDs := &ttnpb.PacketBrokerGateway_GatewayIdentifiers{
+		GatewayId: ids.GatewayId,
+	}
+	if ids.Eui != nil {
+		pbIDs.Eui = ids.Eui.Bytes()
+	}
+
 	req := &ttnpb.UpdatePacketBrokerGatewayRequest{
 		Gateway: &ttnpb.PacketBrokerGateway{
-			Ids: &ttnpb.PacketBrokerGateway_GatewayIdentifiers{
-				GatewayId: ids.GatewayId,
-				Eui:       ids.Eui,
-			},
+			Ids:              pbIDs,
 			Antennas:         antennas,
 			FrequencyPlanIds: gtw.FrequencyPlanIds,
 			StatusPublic:     gtw.StatusPublic,
@@ -161,10 +166,7 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids *ttnpb.GatewayIdentifi
 
 		req := &ttnpb.UpdatePacketBrokerGatewayRequest{
 			Gateway: &ttnpb.PacketBrokerGateway{
-				Ids: &ttnpb.PacketBrokerGateway_GatewayIdentifiers{
-					GatewayId: ids.GatewayId,
-					Eui:       ids.Eui,
-				},
+				Ids:          pbIDs,
 				Online:       true,
 				StatusPublic: gtw.StatusPublic,
 			},

@@ -2096,7 +2096,18 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 			}
 
 		case "net_id":
-			// no validation rules for NetId
+
+			if len(m.GetNetId()) > 0 {
+
+				if len(m.GetNetId()) != 3 {
+					return EndDeviceValidationError{
+						field:  "net_id",
+						reason: "value length must be 3 bytes",
+					}
+				}
+
+			}
+
 		case "mac_settings":
 
 			if v, ok := interface{}(m.GetMacSettings()).(interface{ ValidateFields(...string) error }); ok {
@@ -2500,7 +2511,18 @@ func (m *DevAddrPrefix) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "dev_addr":
-			// no validation rules for DevAddr
+
+			if len(m.GetDevAddr()) > 0 {
+
+				if len(m.GetDevAddr()) != 4 {
+					return DevAddrPrefixValidationError{
+						field:  "dev_addr",
+						reason: "value length must be 4 bytes",
+					}
+				}
+
+			}
+
 		case "length":
 			// no validation rules for Length
 		default:
@@ -3006,9 +3028,31 @@ func (m *GetEndDeviceIdentifiersForEUIsRequest) ValidateFields(paths ...string) 
 		_ = subs
 		switch name {
 		case "join_eui":
-			// no validation rules for JoinEui
+
+			if len(m.GetJoinEui()) > 0 {
+
+				if len(m.GetJoinEui()) != 8 {
+					return GetEndDeviceIdentifiersForEUIsRequestValidationError{
+						field:  "join_eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		case "dev_eui":
-			// no validation rules for DevEui
+
+			if len(m.GetDevEui()) > 0 {
+
+				if len(m.GetDevEui()) != 8 {
+					return GetEndDeviceIdentifiersForEUIsRequestValidationError{
+						field:  "dev_eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		default:
 			return GetEndDeviceIdentifiersForEUIsRequestValidationError{
 				field:  name,
@@ -4574,9 +4618,31 @@ func (m *MACState_JoinAccept) ValidateFields(paths ...string) error {
 			}
 
 		case "dev_addr":
-			// no validation rules for DevAddr
+
+			if len(m.GetDevAddr()) > 0 {
+
+				if len(m.GetDevAddr()) != 4 {
+					return MACState_JoinAcceptValidationError{
+						field:  "dev_addr",
+						reason: "value length must be 4 bytes",
+					}
+				}
+
+			}
+
 		case "net_id":
-			// no validation rules for NetId
+
+			if len(m.GetNetId()) > 0 {
+
+				if len(m.GetNetId()) != 3 {
+					return MACState_JoinAcceptValidationError{
+						field:  "net_id",
+						reason: "value length must be 3 bytes",
+					}
+				}
+
+			}
+
 		default:
 			return MACState_JoinAcceptValidationError{
 				field:  name,

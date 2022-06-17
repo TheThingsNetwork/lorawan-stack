@@ -1211,8 +1211,8 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		CorrelationIds: resp.CorrelationIds,
 		Keys:           keys,
 		Payload:        resp.RawPayload,
-		DevAddr:        devAddr,
-		NetId:          ns.netID,
+		DevAddr:        devAddr.Bytes(),
+		NetId:          ns.netID.Bytes(),
 		Request: &ttnpb.MACState_JoinRequest{
 			RxDelay:          macState.DesiredParameters.Rx1Delay,
 			CfList:           cfList,

@@ -86,7 +86,8 @@ func TestGenerateDevAddr(t *testing.T) {
 
 				devAddr, err := ttnpb.NewNsClient(ns.LoopbackConn()).GenerateDevAddr(ctx, ttnpb.Empty)
 				if a.So(err, should.BeNil) {
-					a.So(devAddr.DevAddr.HasPrefix(tc.DevAddrPrefix), should.BeTrue)
+					devAddr := types.MustDevAddr(devAddr.DevAddr).OrZero()
+					a.So(devAddr.HasPrefix(tc.DevAddrPrefix), should.BeTrue)
 				}
 			},
 		})
@@ -186,7 +187,13 @@ func TestGenerateDevAddr(t *testing.T) {
 				for i := 0; i < 100; i++ {
 					devAddr, err := ttnpb.NewNsClient(ns.LoopbackConn()).GenerateDevAddr(ctx, ttnpb.Empty)
 					if a.So(err, should.BeNil) {
-						a.So(hasOneOfPrefixes(devAddr.DevAddr, seen, tc.DevAddrPrefixes[0], tc.DevAddrPrefixes[1], tc.DevAddrPrefixes[2]), should.BeTrue)
+						devAddr := types.MustDevAddr(devAddr.DevAddr)
+						a.So(hasOneOfPrefixes(devAddr,
+							seen,
+							tc.DevAddrPrefixes[0],
+							tc.DevAddrPrefixes[1],
+							tc.DevAddrPrefixes[2],
+						), should.BeTrue)
 					}
 				}
 				a.So(seen[tc.DevAddrPrefixes[0]], should.BeGreaterThan, 0)

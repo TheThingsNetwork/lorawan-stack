@@ -28,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/blocklist"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 var (
@@ -160,8 +161,8 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 	if err != nil {
 		if errors.IsAlreadyExists(err) && errors.Resemble(err, store.ErrEUITaken) {
 			if ids, err := is.getEndDeviceIdentifiersForEUIs(ctx, &ttnpb.GetEndDeviceIdentifiersForEUIsRequest{
-				JoinEui: *req.EndDevice.Ids.JoinEui,
-				DevEui:  *req.EndDevice.Ids.DevEui,
+				JoinEui: req.EndDevice.Ids.JoinEui.Bytes(),
+				DevEui:  req.EndDevice.Ids.DevEui.Bytes(),
 			}); err == nil {
 				return nil, errEndDeviceEUIsTaken.WithAttributes(
 					"join_eui", req.EndDevice.Ids.JoinEui.String(),
@@ -203,8 +204,8 @@ func (is *IdentityServer) getEndDeviceIdentifiersForEUIs(ctx context.Context, re
 	}
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		dev, err := st.GetEndDevice(ctx, &ttnpb.EndDeviceIdentifiers{
-			JoinEui: &req.JoinEui,
-			DevEui:  &req.DevEui,
+			JoinEui: types.MustEUI64(req.JoinEui),
+			DevEui:  types.MustEUI64(req.DevEui),
 		}, []string{"ids.application_ids.application_id", "ids.device_id", "ids.join_eui", "ids.dev_eui"})
 		if err != nil {
 			return err
