@@ -44,8 +44,6 @@ const validationSchema = Yup.object().shape({
 const InviteForm = props => {
   const { sendInvite, navigateToList } = props
 
-  const onSubmit = React.useCallback(async email => sendInvite(email), [sendInvite])
-
   const onSubmitSuccess = React.useCallback(() => navigateToList(), [navigateToList])
 
   const [error, setError] = useState()
@@ -53,7 +51,7 @@ const InviteForm = props => {
     async (values, { resetForm, setSubmitting }) => {
       setError(undefined)
       try {
-        const result = await onSubmit(values)
+        const result = await sendInvite(values)
         resetForm({ values })
         onSubmitSuccess(result)
       } catch (error) {
@@ -61,7 +59,7 @@ const InviteForm = props => {
         setError({ error })
       }
     },
-    [onSubmit, onSubmitSuccess],
+    [sendInvite, onSubmitSuccess],
   )
 
   const initialValues = {
