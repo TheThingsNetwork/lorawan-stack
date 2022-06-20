@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   postgres:
-    image: postgres
+    image: postgres:14
     restart: unless-stopped
     environment:
       - POSTGRES_PASSWORD=root
