@@ -46,14 +46,14 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v1
         with:
-          username: "${{ secrets.DOCKERHUB_USERNAME }}"
-          password: "${{ secrets.DOCKERHUB_PASSWORD }}"
+          username: '${{ secrets.DOCKERHUB_USERNAME }}'
+          password: '${{ secrets.DOCKERHUB_PASSWORD }}'
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
-          username: "${{ secrets.GHCR_USERNAME }}"
-          password: "${{ secrets.GHCR_PASSWORD }}"
+          username: '${{ secrets.GHCR_USERNAME }}'
+          password: '${{ secrets.GHCR_PASSWORD }}'
       - name: Update APT
         run: sudo apt-get -yq update
       - name: Install Snapcraft
@@ -96,7 +96,7 @@ jobs:
       - name: Run Goreleaser
         uses: goreleaser/goreleaser-action@v2
         with:
-          version: "v1.9.2"
+          version: 'v1.9.2'
           args: release --config .goreleaser.release.yml --release-notes /tmp/release-notes.md --timeout 120m
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_LOGIN }}
