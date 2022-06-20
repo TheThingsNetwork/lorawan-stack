@@ -168,18 +168,50 @@ func (Dev) DBStart() error {
 	if err := execDockerCompose(append([]string{"up", "-d"}, devDatabases...)...); err != nil {
 		return err
 	}
-	var cerr error
-	if os.Getenv("CI") != "true" {
-		flags := dockerComposeFlags(append([]string{"exec", "postgres", "pg_isready"})...)
-		for i := 0; i < 15; i++ {
-			if _, cerr = sh.Exec(nil, nil, nil, "docker-compose", flags...); cerr == nil {
-				break
-			}
-			time.Sleep(2 * time.Second)
-		}
-		return cerr
+
+	// When TimescaleDB starts for the first time, it restarts Postgres after initialization.
+	// Therefore, pg_isready may return a successful exit code during initialization, while the database shuts down
+	// shortly after. Therefore, the ready check goes in two cycles and only returns after 10 successive ready
+	// indications.
+	if mg.Verbose() {
+		fmt.Println("Waiting for Postgres to be ready")
 	}
-	return execDockerCompose("ps")
+	flags := dockerComposeFlags("exec", "-T", "postgres", "pg_isready")
+nextCycle:
+	for i := 0; i < 2; i++ {
+		var (
+			wasReady        bool
+			successiveReady int
+		)
+		for j := 0; j < 30; j++ {
+			time.Sleep(time.Second)
+			_, err := sh.Exec(nil, nil, nil, "docker-compose", flags...)
+			isReady := err == nil
+			switch {
+			case wasReady && !isReady:
+				if mg.Verbose() {
+					fmt.Println("Postgres is not ready anymore")
+				}
+				continue nextCycle
+			case !wasReady && isReady:
+				if mg.Verbose() {
+					fmt.Println("Postgres is ready, checking if it stays ready")
+				}
+				successiveReady = 1
+			case wasReady && isReady:
+				successiveReady++
+				if successiveReady == 10 {
+					if mg.Verbose() {
+						fmt.Println("Postgres ready state seems stable")
+					}
+					return nil
+				}
+			}
+			wasReady = isReady
+		}
+		return errors.New("No ready indication within 30 checks")
+	}
+	return errors.New("Postgres is not ready")
 }
 
 // DBStop stops the databases of the development environment.
