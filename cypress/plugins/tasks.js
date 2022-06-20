@@ -93,7 +93,7 @@ const sqlTask = on => {
     },
     dropAndSeedDatabase: () => {
       postgresContainer.stdin.write(
-        `dropdb --if-exists --force ${devDatabase}; psql template1 -c "CREATE DATABASE ${devDatabase} TEMPLATE ${seedDatabase};"\n`,
+        `dropdb --if-exists --force ${devDatabase}; createdb -T ${seedDatabase} ${devDatabase};\n`,
       )
       return Promise.all([
         new Promise(resolve => exec('tools/bin/mage dev:redisFlush', resolve)),
