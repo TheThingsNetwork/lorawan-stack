@@ -15,7 +15,6 @@
 package ttnmage
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -68,7 +67,6 @@ var (
 	devDataDir            = ".env/data"
 	devDir                = ".env"
 	devDatabaseName       = "ttn_lorawan_dev"
-	devSeedDatabaseName   = "tts_seed"
 	devDockerComposeFlags = []string{"-p", "lorawan-stack-dev"}
 	databaseURI           = fmt.Sprintf("postgresql://root:root@localhost:5432/%s?sslmode=disable", devDatabaseName)
 	testDatabaseNames     = []string{"ttn_lorawan_is_test", "ttn_lorawan_is_store_test"}
@@ -110,35 +108,28 @@ func (Dev) SQLDump() error {
 	if err := os.MkdirAll(".cache", 0o755); err != nil {
 		return err
 	}
-	output, err := sh.Output("docker-compose", dockerComposeFlags("exec", "-T", "postgres", "pg_dump", devDatabaseName)...)
-	if err != nil {
-		return err
-	}
-	return os.WriteFile(filepath.Join(".cache", "sqldump.sql"), []byte(output), 0o644)
-}
-
-// SQLCreateSeedDB creates a database template from the current dump.
-func (Dev) SQLCreateSeedDB() error {
-	if mg.Verbose() {
-		fmt.Println("Creating seed DB from dump")
-	}
-	d := filepath.Join(".cache", "sqldump.sql")
-	if _, err := os.Stat(d); errors.Is(err, os.ErrNotExist) {
-		return fmt.Errorf("Dumpfile does not exist: %s", d)
-	}
-	return sh.Run(filepath.Join("tools", "mage", "scripts", "recreate-db-from-dump.sh"), devSeedDatabaseName, d)
+	return execDockerCompose("exec", "-T", "postgres",
+		"pg_dump", "-Fc", "-f", "/var/lib/ttn-lorawan/cache/database.pgdump", devDatabaseName,
+	)
 }
 
 // SQLRestore restores the dev database using a previously generated dump.
-func (Dev) SQLRestore(ctx context.Context) error {
+func (Dev) SQLRestore() error {
 	if mg.Verbose() {
 		fmt.Println("Restoring database from dump")
 	}
-	d := filepath.Join(".cache", "sqldump.sql")
+	d := filepath.Join(".cache", "database.pgdump")
 	if _, err := os.Stat(d); errors.Is(err, os.ErrNotExist) {
 		return fmt.Errorf("Dumpfile does not exist: %w", d)
 	}
-	return sh.Run(filepath.Join("tools", "mage", "scripts", "recreate-db-from-dump.sh"), devDatabaseName, d)
+	return execDockerCompose("exec", "-T", "postgres", "/bin/bash", "-c",
+		fmt.Sprintf(
+			"dropdb --if-exists --force %[1]s && "+
+				"createdb %[1]s && "+
+				"pg_restore -Fc -d %[1]s %[2]s",
+			devDatabaseName, "/var/lib/ttn-lorawan/cache/database.pgdump",
+		),
+	)
 }
 
 // RedisFlush deletes all keys from redis.

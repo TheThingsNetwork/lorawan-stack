@@ -78,7 +78,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            .cache/sqldump.sql
+            .cache/database.pgdump
             .env/admin_api_key.txt
           key: db-cache-${{ hashFiles('pkg/identityserver/store/**/*.go', 'cmd/ttn-lw-stack/commands/is-db.go', '.github/workflows/e2e.yml', 'docker-compose.yml') }}
       - name: Initialize device repository index cache
@@ -105,7 +105,7 @@ jobs:
         if: steps.build-cache.outputs.cache-hit != 'true'
         run: go build ./cmd/ttn-lw-stack
       - name: Zip build artifacts
-        run: zip -r build.zip .cache/sqldump.sql .env/admin_api_key.txt data/lorawan-devices-index public ttn-lw-stack tools/bin/mage
+        run: zip -r build.zip .cache/database.pgdump .env/admin_api_key.txt data/lorawan-devices-index public ttn-lw-stack tools/bin/mage
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -162,7 +162,7 @@ jobs:
       - name: Generate certs
         run: tools/bin/mage dev:certificates
       - name: Restore initialized sql db
-        run: tools/bin/mage dev:dbStart dev:sqlRestore dev:sqlCreateSeedDb
+        run: tools/bin/mage -v dev:dbStart dev:sqlRestore
       - name: Run stack
         run: tools/bin/mage dev:startDevStack &
       - name: Run previously failed test first
@@ -242,7 +242,7 @@ jobs:
       - name: Generate certs
         run: tools/bin/mage dev:certificates
       - name: Restore initialized sql db
-        run: tools/bin/mage dev:dbStart dev:SQLRestore dev:SQLCreateSeedDB
+        run: tools/bin/mage dev:dbStart dev:sqlRestore
       - name: Run stack
         run: tools/bin/mage dev:startDevStack &
       - name: Run end-to-end smoke tests (Firefox)

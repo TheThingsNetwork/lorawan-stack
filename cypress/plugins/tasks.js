@@ -22,7 +22,6 @@ const codeCoverageTask = require('@cypress/code-coverage/task')
 
 const isCI = process.env.CI === 'true' || process.env.CI === '1'
 const devDatabase = 'ttn_lorawan_dev'
-const seedDatabase = 'tts_seed'
 
 const pgConfig = {
   user: 'root',
@@ -93,7 +92,9 @@ const sqlTask = on => {
     },
     dropAndSeedDatabase: () => {
       postgresContainer.stdin.write(
-        `dropdb --if-exists --force ${devDatabase}; createdb -T ${seedDatabase} ${devDatabase};\n`,
+        `dropdb --if-exists --force ${devDatabase} 2> /dev/null; ` +
+          `createdb ${devDatabase}; ` +
+          `pg_restore -Fc -d ${devDatabase} /var/lib/ttn-lorawan/cache/database.pgdump;\n`,
       )
       return Promise.all([
         new Promise(resolve => exec('tools/bin/mage dev:redisFlush', resolve)),
