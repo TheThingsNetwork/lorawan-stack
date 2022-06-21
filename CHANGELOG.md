@@ -22,11 +22,14 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Removed
 
+- Sorting on associated rights in the API keys table.
+
 ### Fixed
 
-- Fix `last activity` not updating when an end device joins for the first time in the Console.
-- Fix a bug that would show the "Status count periodicity"-field in the Console as `200` when actually set to `0`.
-- Fix location bug in the Console.
+- `last activity` not updating when an end device joins for the first time in the Console.
+- A bug that would show the "Status count periodicity"-field in the Console as `200` when actually set to `0`.
+- A bug causing map viewports to be set in odd locations when setting end device/gateway locations.
+- Console crashing when sorting by associated rights in the API keys table.
 
 ### Security
 
