@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const { execSync, exec, spawn } = require('child_process')
+const childProcess = require('child_process')
 const fs = require('fs')
 const path = require('path')
 
+const util = require('util')
 const { Client } = require('pg')
 const yaml = require('js-yaml')
 const codeCoverageTask = require('@cypress/code-coverage/task')
 
 const isCI = process.env.CI === 'true' || process.env.CI === '1'
-const devDatabase = 'ttn_lorawan_dev'
 
 const pgConfig = {
   user: 'root',
@@ -30,23 +30,10 @@ const pgConfig = {
   database: 'ttn_lorawan_dev',
   port: 5432,
 }
-let client
 
-// Spawn a bash session within the postgres container, so we can
-// reset the database repeatedly without the overhead of `docker-compose exec`.
-const postgresContainer = spawn('docker-compose', [
-  '-p',
-  'lorawan-stack-dev',
-  'exec',
-  '-T',
-  'postgres',
-  '/bin/bash',
-])
-
-// `stackConfigTask` sources stack configuration entires to `Cypress` configuration while preserving
-// all entries from `cypress.json`.
+// Sources stack configuration entries to Cypress configuration while preserving all entries from cypress.json.
 const stackConfigTask = (_, config) => {
-  const out = execSync(`${isCI ? './' : 'go run ./cmd/'}ttn-lw-stack config --yml`)
+  const out = childProcess.execSync(`${isCI ? './' : 'go run ./cmd/'}ttn-lw-stack config --yml`)
   const yml = yaml.load(out)
 
   // Cluster.
@@ -83,29 +70,26 @@ const stackConfigTask = (_, config) => {
 const sqlTask = on => {
   on('task', {
     execSql: async sql => {
-      client = new Client(pgConfig)
+      const client = new Client(pgConfig)
       await client.connect()
       const res = await client.query(sql)
       client.end()
-
       return res
     },
-    dropAndSeedDatabase: () => {
-      postgresContainer.stdin.write(
-        `dropdb --if-exists --force ${devDatabase} 2> /dev/null; ` +
-          `createdb ${devDatabase}; ` +
-          `pg_restore -Fc -d ${devDatabase} /var/lib/ttn-lorawan/cache/database.pgdump;\n`,
-      )
-      return Promise.all([
-        new Promise(resolve => exec('tools/bin/mage dev:redisFlush', resolve)),
-        new Promise(resolve => {
-          postgresContainer.stdout.on('data', resolve)
-          postgresContainer.stderr.on('data', data => {
-            throw new Error(data)
-          })
-          postgresContainer.on('close', resolve)
-        }),
+    dropAndSeedDatabase: async () => {
+      const exec = util.promisify(childProcess.exec)
+      const res = await Promise.all([
+        exec('tools/bin/mage dev:sqlRestore'),
+        exec('tools/bin/mage dev:redisFlush'),
       ])
+      const err = res
+        .filter(e => Boolean(e.stderr))
+        .map(e => e.stderr)
+        .join(', ')
+      if (err) {
+        throw new Error(err)
+      }
+      return null
     },
   })
 }
