@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gpstime"
@@ -30,6 +31,174 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
+
+func TestDeviceDefaultChannels(t *testing.T) {
+	t.Parallel()
+
+	preBand := band.AU_915_928_RP1_v1_0_2
+	au915928Pre102BUplinkChannels := preBand.UplinkChannels
+	au915928Pre102BDownlinkChannels := preBand.DownlinkChannels
+	au915928Pre102BChannels := make([]*ttnpb.MACParameters_Channel, 0, len(au915928Pre102BUplinkChannels))
+	for i, channel := range preBand.UplinkChannels {
+		minDataRate, maxDataRate := ttnpb.DataRateIndex_DATA_RATE_0, ttnpb.DataRateIndex_DATA_RATE_3
+		if i >= 64 {
+			minDataRate, maxDataRate = ttnpb.DataRateIndex_DATA_RATE_4, ttnpb.DataRateIndex_DATA_RATE_4
+		}
+		au915928Pre102BChannels = append(au915928Pre102BChannels, &ttnpb.MACParameters_Channel{
+			UplinkFrequency:   channel.Frequency,
+			DownlinkFrequency: au915928Pre102BDownlinkChannels[i%8].Frequency,
+			MinDataRateIndex:  minDataRate,
+			MaxDataRateIndex:  maxDataRate,
+			EnableUplink:      true,
+		})
+	}
+
+	postBand := band.AU_915_928_RP1_v1_0_2_RevB
+	au915928Post102BUplinkChannels := postBand.UplinkChannels
+	au915928Post102BDownlinkChannels := postBand.DownlinkChannels
+	au915928Post102BChannels := make([]*ttnpb.MACParameters_Channel, 0, len(au915928Post102BUplinkChannels))
+	for i, channel := range au915928Post102BUplinkChannels {
+		minDataRate, maxDataRate := ttnpb.DataRateIndex_DATA_RATE_0, ttnpb.DataRateIndex_DATA_RATE_5
+		if i >= 64 {
+			minDataRate, maxDataRate = ttnpb.DataRateIndex_DATA_RATE_6, ttnpb.DataRateIndex_DATA_RATE_6
+		}
+		au915928Post102BChannels = append(au915928Post102BChannels, &ttnpb.MACParameters_Channel{
+			UplinkFrequency:   channel.Frequency,
+			DownlinkFrequency: au915928Post102BDownlinkChannels[i%8].Frequency,
+			MinDataRateIndex:  minDataRate,
+			MaxDataRateIndex:  maxDataRate,
+			EnableUplink:      true,
+		})
+	}
+
+	for _, tc := range []struct {
+		Name          string
+		Device        *ttnpb.EndDevice
+		Band          *band.Band
+		FrequencyPlan *frequencyplans.FrequencyPlan
+		Channels      []*ttnpb.MACParameters_Channel
+	}{
+		{
+			Name:     "1.0.1/AU_915_928_FSB_2",
+			Device:   &ttnpb.EndDevice{},
+			Band:     &band.AU_915_928_TS1_v1_0_1,
+			Channels: au915928Pre102BChannels,
+		},
+		{
+			Name:     "1.0.2/AU_915_928_FSB_2",
+			Device:   &ttnpb.EndDevice{},
+			Band:     &band.AU_915_928_RP1_v1_0_2,
+			Channels: au915928Pre102BChannels,
+		},
+		{
+			Name:     "1.0.2B/AU_915_928_FSB_2",
+			Device:   &ttnpb.EndDevice{},
+			Band:     &band.AU_915_928_RP1_v1_0_2_RevB,
+			Channels: au915928Post102BChannels,
+		},
+	} {
+		tc := tc
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				t.Helper()
+
+				pb := CopyEndDevice(tc.Device)
+
+				deviceDefaultChannels := DeviceDefaultChannels(pb, tc.Band, &ttnpb.MACSettings{})
+				a.So(deviceDefaultChannels, should.Resemble, tc.Channels)
+				a.So(pb, should.Resemble, tc.Device)
+			},
+		})
+	}
+}
+
+func TestDeviceDesiredChannels(t *testing.T) {
+	t.Parallel()
+
+	preBand := band.AU_915_928_RP1_v1_0_2
+	au915928Pre102BUplinkChannels := preBand.UplinkChannels
+	au915928Pre102BDownlinkChannels := preBand.DownlinkChannels
+	au915928Pre102BChannels := make([]*ttnpb.MACParameters_Channel, 0, len(au915928Pre102BUplinkChannels))
+	for i, channel := range preBand.UplinkChannels {
+		minDataRate, maxDataRate := ttnpb.DataRateIndex_DATA_RATE_0, ttnpb.DataRateIndex_DATA_RATE_3
+		if i >= 64 {
+			minDataRate, maxDataRate = ttnpb.DataRateIndex_DATA_RATE_4, ttnpb.DataRateIndex_DATA_RATE_4
+		}
+		au915928Pre102BChannels = append(au915928Pre102BChannels, &ttnpb.MACParameters_Channel{
+			UplinkFrequency:   channel.Frequency,
+			DownlinkFrequency: au915928Pre102BDownlinkChannels[i%8].Frequency,
+			MinDataRateIndex:  minDataRate,
+			MaxDataRateIndex:  maxDataRate,
+			EnableUplink:      i >= 8 && i < 16, // FSB2
+		})
+	}
+
+	postBand := band.AU_915_928_RP1_v1_0_2_RevB
+	au915928Post102BUplinkChannels := postBand.UplinkChannels
+	au915928Post102BDownlinkChannels := postBand.DownlinkChannels
+	au915928Post102BChannels := make([]*ttnpb.MACParameters_Channel, 0, len(au915928Post102BUplinkChannels))
+	for i, channel := range postBand.UplinkChannels {
+		minDataRate, maxDataRate := ttnpb.DataRateIndex_DATA_RATE_0, ttnpb.DataRateIndex_DATA_RATE_5
+		if i >= 64 {
+			minDataRate, maxDataRate = ttnpb.DataRateIndex_DATA_RATE_6, ttnpb.DataRateIndex_DATA_RATE_6
+		}
+		au915928Post102BChannels = append(au915928Post102BChannels, &ttnpb.MACParameters_Channel{
+			UplinkFrequency:   channel.Frequency,
+			DownlinkFrequency: au915928Post102BDownlinkChannels[i%8].Frequency,
+			MinDataRateIndex:  minDataRate,
+			MaxDataRateIndex:  maxDataRate,
+			EnableUplink:      i >= 8 && i < 16, // FSB2
+		})
+	}
+
+	for _, tc := range []struct {
+		Name          string
+		Device        *ttnpb.EndDevice
+		Band          *band.Band
+		FrequencyPlan *frequencyplans.FrequencyPlan
+		Channels      []*ttnpb.MACParameters_Channel
+	}{
+		{
+			Name:          "1.0.1/AU_915_928_FSB_2",
+			Device:        &ttnpb.EndDevice{},
+			Band:          &band.AU_915_928_TS1_v1_0_1,
+			FrequencyPlan: test.FrequencyPlan(test.AUFrequencyPlanID),
+			Channels:      au915928Pre102BChannels,
+		},
+		{
+			Name:          "1.0.2/AU_915_928_FSB_2",
+			Device:        &ttnpb.EndDevice{},
+			Band:          &band.AU_915_928_RP1_v1_0_2,
+			FrequencyPlan: test.FrequencyPlan(test.AUFrequencyPlanID),
+			Channels:      au915928Pre102BChannels,
+		},
+		{
+			Name:          "1.0.2B/AU_915_928_FSB_2",
+			Device:        &ttnpb.EndDevice{},
+			Band:          &band.AU_915_928_RP1_v1_0_2_RevB,
+			FrequencyPlan: test.FrequencyPlan(test.AUFrequencyPlanID),
+			Channels:      au915928Post102BChannels,
+		},
+	} {
+		tc := tc
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				t.Helper()
+
+				pb := CopyEndDevice(tc.Device)
+
+				deviceDesiredChannels, err := DeviceDesiredChannels(pb, tc.Band, tc.FrequencyPlan, &ttnpb.MACSettings{})
+				a.So(err, should.BeNil)
+				a.So(deviceDesiredChannels, should.Resemble, tc.Channels)
+				a.So(pb, should.Resemble, tc.Device)
+			},
+		})
+	}
+}
 
 func TestNewState(t *testing.T) {
 	for _, tc := range []struct {

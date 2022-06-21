@@ -3050,6 +3050,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/band:data_rate_not_found": {
+    "translations": {
+      "en": "data rate `{data_rate_index}` not found"
+    },
+    "description": {
+      "package": "pkg/band",
+      "file": "mapping.go"
+    }
+  },
   "error:pkg/band:data_rate_offset_too_high": {
     "translations": {
       "en": "data rate offset must be lower or equal to {max}"
