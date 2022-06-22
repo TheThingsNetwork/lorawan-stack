@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 	"time"
@@ -105,7 +106,7 @@ func (Dev) SQLDump() error {
 	if mg.Verbose() {
 		fmt.Println("Saving sql database dump")
 	}
-	if err := os.MkdirAll(".cache", 0o755); err != nil {
+	if err := os.MkdirAll(path.Join(".env", "cache"), 0o755); err != nil {
 		return err
 	}
 	return execDockerCompose("exec", "-T", "postgres",
@@ -118,7 +119,7 @@ func (Dev) SQLRestore() error {
 	if mg.Verbose() {
 		fmt.Println("Restoring database from dump")
 	}
-	d := filepath.Join(".cache", "database.pgdump")
+	d := filepath.Join(".env", "cache", "database.pgdump")
 	if _, err := os.Stat(d); errors.Is(err, os.ErrNotExist) {
 		return fmt.Errorf("Dumpfile does not exist: %w", d)
 	}
