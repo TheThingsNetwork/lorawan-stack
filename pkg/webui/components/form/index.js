@@ -80,6 +80,8 @@ const InnerForm = props => {
       <FormContext.Provider
         value={{
           formError,
+          isSubmitting,
+          isValid,
           ...rest,
         }}
       >
@@ -147,6 +149,7 @@ const Form = props => {
     [onSubmit],
   )
 
+  // Recreate the validation hook to allow passing down validation contexts.
   const validate = useEffect(
     values => {
       if (!validationSchema) {

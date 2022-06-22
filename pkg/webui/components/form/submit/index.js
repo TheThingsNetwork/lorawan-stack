@@ -12,41 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useContext } from 'react'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import FormContext from '../context'
 
-class FormSubmit extends React.Component {
-  static contextType = FormContext
+const FormSubmit = props => {
+  const { component: Component, disabled, ...rest } = props
+  const formContext = useContext(FormContext)
 
-  static propTypes = {
-    component: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
-    disabled: PropTypes.bool,
+  const submitProps = {
+    isValid: context.isValid,
+    isSubmitting: formContext.isSubmitting,
+    isValidating: formContext.isValidating,
+    submitCount: formContext.submitCount,
+    dirty: formContext.dirty,
+    validateForm: formContext.validateForm,
+    validateField: formContext.validateField,
+    disabled: formContext.disabled || disabled,
   }
 
-  static defaultProps = {
-    component: 'button',
-    disabled: false,
-  }
+  return <Component {...rest} {...submitProps} />
+}
 
-  render() {
-    const { component: Component, disabled, ...rest } = this.props
+FormSubmit.propTypes = {
+  component: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
+  disabled: PropTypes.bool,
+}
 
-    const submitProps = {
-      isValid: this.context.isValid,
-      isSubmitting: this.context.isSubmitting,
-      isValidating: this.context.isValidating,
-      submitCount: this.context.submitCount,
-      dirty: this.context.dirty,
-      validateForm: this.context.validateForm,
-      validateField: this.context.validateField,
-      disabled: this.context.disabled || disabled,
-    }
-
-    return <Component {...rest} {...submitProps} />
-  }
+FormSubmit.defaultProps = {
+  component: 'button',
+  disabled: false,
 }
 
 export default FormSubmit

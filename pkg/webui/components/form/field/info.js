@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useContext } from 'react'
 import classnames from 'classnames'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -26,42 +26,38 @@ import Tooltip from './tooltip'
 
 import style from './field.styl'
 
-class InfoField extends React.Component {
-  static contextType = FormContext
+const InfoField = props => {
+  const { children, className, title, disabled: fieldDisabled, tooltipId } = props
+  const { disabled: formDisabled } = useContext(FormContext)
+  const disabled = formDisabled || fieldDisabled
+  const cls = classnames(className, style.field, from(style, { disabled }))
 
-  static propTypes = {
-    children: PropTypes.node.isRequired,
-    className: PropTypes.string,
-    disabled: PropTypes.bool,
-    title: PropTypes.message,
-    tooltipId: PropTypes.string,
-  }
+  return (
+    <div className={cls}>
+      {title && (
+        <div className={style.label}>
+          <Message content={title} className={style.title} />
+          {tooltipId && <Tooltip id={tooltipId} glossaryTerm={title} />}
+        </div>
+      )}
+      <div className={classnames(style.componentArea, style.infoArea)}>{children}</div>
+    </div>
+  )
+}
 
-  static defaultProps = {
-    className: undefined,
-    title: undefined,
-    disabled: false,
-    tooltipId: undefined,
-  }
+InfoField.propTypes = {
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string,
+  disabled: PropTypes.bool,
+  title: PropTypes.message,
+  tooltipId: PropTypes.string,
+}
 
-  render() {
-    const { children, className, title, disabled: fieldDisabled, tooltipId } = this.props
-    const { disabled: formDisabled } = this.context
-    const disabled = formDisabled || fieldDisabled
-    const cls = classnames(className, style.field, from(style, { disabled }))
-
-    return (
-      <div className={cls}>
-        {title && (
-          <div className={style.label}>
-            <Message content={title} className={style.title} />
-            {tooltipId && <Tooltip id={tooltipId} glossaryTerm={title} />}
-          </div>
-        )}
-        <div className={classnames(style.componentArea, style.infoArea)}>{children}</div>
-      </div>
-    )
-  }
+InfoField.defaultProps = {
+  className: undefined,
+  title: undefined,
+  disabled: false,
+  tooltipId: undefined,
 }
 
 export default InfoField
