@@ -3,7 +3,7 @@ name: Snapshot release
 on:
   push:
     branches:
-      - "v3.*"
+      - 'v3.*'
 
 env:
   NODE_ENV: production
@@ -26,8 +26,8 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v1
         with:
-          username: "${{ secrets.DOCKERHUB_USERNAME }}"
-          password: "${{ secrets.DOCKERHUB_PASSWORD }}"
+          username: '${{ secrets.DOCKERHUB_USERNAME }}'
+          password: '${{ secrets.DOCKERHUB_PASSWORD }}'
       - name: Install Go and Dependencies
         uses: ./.github/actions/install-go-and-deps
       - name: Build Mage
@@ -56,7 +56,7 @@ jobs:
       - name: Run Goreleaser
         uses: goreleaser/goreleaser-action@v2
         with:
-          version: "v1.2.5"
+          version: 'v1.2.5'
           args: release --config .goreleaser.snapshot.yml --snapshot --timeout 60m
         env:
           SIGN_KEY_NAME: ${{ secrets.SIGN_KEY_NAME }}

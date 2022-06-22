@@ -789,25 +789,26 @@ We use [Cypress](https://cypress.io) for running frontend-based end-to-end tests
 
 #### Running frontend end-to-end tests locally
 
-Make sure to [build the frontend assets](#building-the-frontend), [start The Things Stack](#starting-the-things-stack) and run `tools/bin/mage dev:initStack dev:sqlDump dev:sqlCreateSeedDb` to create a seed database which the tests can reset the database to in between runs. To run the stack when working on end-to-end tests, use the `tools/bin/mage dev:startDevStack` command. This will run the stack in proper configuration for the end-to-end tests, note that this is an endless process that essentially runs the The Things Stack process in the background so you don't have to wait for it to finish.
+Make sure to [build the frontend assets](#building-the-frontend) and run `tools/bin/mage dev:initStack dev:sqlDump` to create a seed database which the tests can reset the database to in between runs. To run the stack when working on end-to-end tests, use the `tools/bin/mage dev:startDevStack` command. This will run the runs The Things Stack with proper configuration for the end-to-end tests. Note: this command does not output anything, but logs are written to `.cache/devStack.log`.
 
-`Cypress` provides two modes for running tests: headless and interactive.
-- Headless mode - will not display any browser GUI and output test progress into your terminal instead. This is helpful when one just needs see the results of the tests.
-- Interactive mode - will run an `Electron` based application together with the full-fledged browser. This is helpful when developig frontend applications as it provides hot reload, time travelling, browser extensions and DOM access.
+[Cypress](https://www.cypress.io/) provides two modes for running tests: headless and interactive.
+- **Headless mode** will not display any browser GUI and output test progress into your terminal instead. This is helpful when one just needs see the results of the tests.
+- **Interactive mode** will run an Electron based application together with the full-fledged browser. This is helpful when developing frontend applications as it provides hot reload, time travelling, browser extensions and DOM access.
 
 > Note: Currently, we test our frontend only in Chromium based browsers.
 
-You can run `Cypress` in the headless mode by running the following command:
+You can run Cypress in the headless mode by running the following command:
 
 ```bash
 $ tools/bin/mage js:cypressHeadless
 ```
 
-You can run `Cypress` in the interactive mode by running the following command:
+You can run Cypress in the interactive mode by running the following command:
 
 ```bash
 $ tools/bin/mage js:cypressInteractive
 ```
+
 #### JavaScript based tests
 
 We find the [JS Unit Testing Guide](https://github.com/mawrkus/js-unit-testing-guide) a good starting point for informing our testing guidelines and we recommend reading through this guide. Note, that we employ some different approaches regarding [Grammar and Capitalization](#Grammar-and-capitalization).
@@ -985,7 +986,7 @@ In some cases it can be necessary to select DOM elements using a special selecti
 
 ##### Test runner globals
 
-`Cypress` uses [Mocha](https://mochajs.org/) as the test runner internally, while for unit tests we use [Jest](https://jestjs.io/). To keep our tests consistent we prefer using globals from `Jest` when possible.
+Cypress uses [Mocha](https://mochajs.org/) as the test runner internally, while for unit tests we use [Jest](https://jestjs.io/). To keep our tests consistent we prefer using globals from `Jest` when possible.
 
 
 Jest globals | Mocha globals | Used for
@@ -1020,7 +1021,7 @@ Jest globals | Mocha globals | Used for
   - One test file must have end-to-end tests dedicated only to a specific entity or view.
 2. `pkg/cypress/{console|oauth}/shared` contains all test specification not directly related to a single entity or a view. For example, `side-navigation.spec.js` or `header.spec.js` must be placed into the `cypress/console/shared` folder because both components are present on multiple views and are partially related to the stack entities. Make sure to scope cypress selections within the tested component using `cy.within`.
 3. `pkg/cypress/integration/smoke` contains tests that simulate a complete user story trying to do almost everything a typical user would do. For example, a typical smoke test can verify that the user is able to register, login, create application and register The Things Uno. For more details and diffeence between regular end-to-end and smoke tests see the [End-to-end tests structure](#organizing-end-to-end-tests) section.
-4. and 5. `Cypress` stores screenshots and videos to the appropriate folder after running end-to-end tests. These should not be added to the repository.
+4. and 5. Cypress stores screenshots and videos to the appropriate folder after running end-to-end tests. These should not be added to the repository.
 
 ##### Organizing end-to-end tests
 

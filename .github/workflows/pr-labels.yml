@@ -1,4 +1,4 @@
-name: "Pull Request Labels"
+name: 'Pull Request Labels'
 on: pull_request
 
 jobs:
@@ -9,4 +9,4 @@ jobs:
       - uses: actions/labeler@v3
         if: ${{ github.event.pull_request.head.repo.full_name == github.repository && !startsWith(github.actor, 'dependabot') }}
         with:
-          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          repo-token: '${{ secrets.GITHUB_TOKEN }}'

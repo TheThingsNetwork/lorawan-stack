@@ -3,17 +3,17 @@ name: Go Code
 on:
   pull_request:
     paths:
-      - ".github/workflows/go.yml"
-      - "*.go"
-      - ".revive.toml"
-      - "cmd/**"
-      - "go.mod"
-      - "go.sum"
-      - "Makefile"
-      - "pkg/**"
-      - "!pkg/webui/**"
-      - "pkg/webui/**.go"
-      - "tools/**"
+      - '.github/workflows/go.yml'
+      - '*.go'
+      - '.revive.toml'
+      - 'cmd/**'
+      - 'go.mod'
+      - 'go.sum'
+      - 'Makefile'
+      - 'pkg/**'
+      - '!pkg/webui/**'
+      - 'pkg/webui/**.go'
+      - 'tools/**'
 
 jobs:
   quality:
@@ -55,7 +55,7 @@ jobs:
       postgres:
         image: postgres
         ports:
-          - "5432/tcp"
+          - '5432/tcp'
         env:
           POSTGRES_USER: root
           POSTGRES_PASSWORD: root
@@ -64,7 +64,7 @@ jobs:
         # TODO: Support latest Redis (7.x is not supported, see https://github.com/TheThingsNetwork/lorawan-stack/issues/5416)
         image: redis:6.2
         ports:
-          - "6379/tcp"
+          - '6379/tcp'
     timeout-minutes: 15
     steps:
       - name: Create ttn_lorawan_is_test DB
@@ -92,10 +92,10 @@ jobs:
       - name: Test code
         env:
           SQL_DB_ADDRESS: localhost:${{ job.services.postgres.ports['5432'] }}
-          SQL_DB_AUTH: "root:root"
+          SQL_DB_AUTH: 'root:root'
           REDIS_ADDRESS: localhost:${{ job.services.redis.ports['6379'] }}
-          TEST_REDIS: "1"
-          TEST_SLOWDOWN: "8"
+          TEST_REDIS: '1'
+          TEST_SLOWDOWN: '8'
           AWS_REGION: ${{ secrets.AWS_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_TEST_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_TEST_SECRET_ACCESS_KEY }}
