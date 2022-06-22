@@ -58,7 +58,6 @@ const ApiKeysTable = props => {
       name: 'rights',
       displayName: m.grantedRights,
       width: 50,
-      sortable: true,
       render: (rights = []) => {
         if (rights.length === 0) {
           return <Message className={style.none} content={sharedMessages.none} lowercase />
