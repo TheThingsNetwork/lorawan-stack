@@ -27,7 +27,7 @@ import {
 const initialState = {
   entities: {},
   selectedUser: null,
-  invitations: undefined,
+  invitations: [],
   invitationsTotalCount: undefined,
 }
 
