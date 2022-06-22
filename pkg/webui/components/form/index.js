@@ -15,7 +15,6 @@
 /* eslint-disable react/sort-prop-types */
 import React, { useCallback, useEffect } from 'react'
 import { Formik, yupToFormErrors, useFormikContext, validateYupSchema } from 'formik'
-import bind from 'autobind-decorator'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import { defineMessages } from 'react-intl'
 
@@ -111,43 +110,27 @@ InnerForm.defaultProps = {
   formErrorTitle: m.submitFailed,
 }
 
-const formRenderer =
-  ({ children, ...rest }) =>
-  renderProps => {
-    const { className, error, errorTitle, info, infoTitle, disabled, id } = rest
-    const { handleSubmit, ...restFormikProps } = renderProps
-
-    return (
-      <InnerForm
-        className={className}
-        formError={error}
-        formErrorTitle={errorTitle}
-        formInfo={info}
-        formInfoTitle={infoTitle}
-        handleSubmit={handleSubmit}
-        disabled={disabled}
-        id={id}
-        {...restFormikProps}
-      >
-        {children}
-      </InnerForm>
-    )
-  }
-
 const Form = props => {
   const {
-    onReset,
+    children,
+    className,
+    disabled,
+    enableReinitialize,
+    error,
+    errorTitle,
+    formikRef,
+    id,
+    info,
+    infoTitle,
     initialValues,
+    onReset,
+    onSubmit,
     validateOnBlur,
     validateOnChange,
-    validationSchema,
-    validationContext,
     validateOnMount,
-    formikRef,
-    enableReinitialize,
-    onSubmit,
     validateSync,
-    ...rest
+    validationContext,
+    validationSchema,
   } = props
 
   const handleSubmit = useCallback(
@@ -175,9 +158,9 @@ const Form = props => {
           validateYupSchema(values, validationSchema, validateSync, validationContext)
 
           return {}
-        } catch (error) {
-          if (error.name === 'ValidationError') {
-            return yupToFormErrors(error)
+        } catch (err) {
+          if (err.name === 'ValidationError') {
+            return yupToFormErrors(err)
           }
 
           throw error
@@ -189,19 +172,19 @@ const Form = props => {
           () => {
             resolve({})
           },
-          error => {
+          err => {
             // Resolve yup errors, see https://jaredpalmer.com/formik/docs/migrating-v2#validate.
-            if (error.name === 'ValidationError') {
-              resolve(yupToFormErrors(error))
+            if (err.name === 'ValidationError') {
+              resolve(yupToFormErrors(err))
             } else {
               // Throw any other errors as it is not related to the validation process.
-              reject(error)
+              reject(err)
             }
           },
         )
       })
     },
-    [validationSchema, validateSync, validationContext],
+    [validationSchema, validateSync, validationContext, error],
   )
 
   return (
@@ -217,37 +200,66 @@ const Form = props => {
       validateOnChange={validateOnChange}
       enableReinitialize={enableReinitialize}
     >
-      {formRenderer(rest)}
+      {({ handleSubmit, ...restFormikProps }) => (
+        <InnerForm
+          className={className}
+          formError={error}
+          formErrorTitle={errorTitle}
+          formInfo={info}
+          formInfoTitle={infoTitle}
+          handleSubmit={handleSubmit}
+          disabled={disabled}
+          id={id}
+          {...restFormikProps}
+        >
+          {children}
+        </InnerForm>
+      )}
     </Formik>
   )
 }
 
 Form.propTypes = {
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string,
+  disabled: PropTypes.bool,
   enableReinitialize: PropTypes.bool,
+  error: PropTypes.error,
+  errorTitle: PropTypes.message,
+  info: PropTypes.message,
+  infoTitle: PropTypes.message,
   formikRef: PropTypes.shape({ current: PropTypes.shape({}) }),
+  id: PropTypes.string,
   initialValues: PropTypes.shape({}),
   onReset: PropTypes.func,
   onSubmit: PropTypes.func,
-  validateOnMount: PropTypes.bool,
   validateOnBlur: PropTypes.bool,
   validateOnChange: PropTypes.bool,
-  validationSchema: PropTypes.oneOfType([PropTypes.shape({}), PropTypes.func]),
-  validationContext: PropTypes.shape({}),
+  validateOnMount: PropTypes.bool,
   validateSync: PropTypes.bool,
+  validationContext: PropTypes.shape({}),
+  validationSchema: PropTypes.oneOfType([PropTypes.shape({}), PropTypes.func]),
 }
 
 Form.defaultProps = {
+  className: undefined,
+  disabled: false,
   enableReinitialize: false,
+  error: undefined,
+  errorTitle: m.submitFailed,
+  info: undefined,
+  infoTitle: undefined,
   formikRef: undefined,
+  id: undefined,
   initialValues: undefined,
   onReset: () => null,
-  validateOnBlur: true,
-  validateOnMount: false,
-  validateOnChange: false,
-  validationSchema: undefined,
-  validationContext: {},
-  validateSync: true,
   onSubmit: () => null,
+  validateOnBlur: true,
+  validateOnChange: false,
+  validateOnMount: false,
+  validateSync: true,
+  validationContext: {},
+  validationSchema: undefined,
 }
 
 Form.Field = FormField
