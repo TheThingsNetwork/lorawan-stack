@@ -78,7 +78,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            .cache/database.pgdump
+            .env/cache/database.pgdump
             .env/admin_api_key.txt
           key: db-cache-${{ hashFiles('pkg/identityserver/store/**/*.go', 'cmd/ttn-lw-stack/commands/is-db.go', '.github/workflows/e2e.yml', 'docker-compose.yml') }}
       - name: Initialize device repository index cache
@@ -105,7 +105,7 @@ jobs:
         if: steps.build-cache.outputs.cache-hit != 'true'
         run: go build ./cmd/ttn-lw-stack
       - name: Zip build artifacts
-        run: zip -r build.zip .cache/database.pgdump .env/admin_api_key.txt data/lorawan-devices-index public ttn-lw-stack tools/bin/mage
+        run: zip -r build.zip .env/cache/database.pgdump .env/admin_api_key.txt data/lorawan-devices-index public ttn-lw-stack tools/bin/mage
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
