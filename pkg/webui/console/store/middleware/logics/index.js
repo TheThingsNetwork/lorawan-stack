@@ -14,7 +14,7 @@
 
 import status from '@ttn-lw/lib/store/logics/status'
 
-import user from './user'
+import user from './logout'
 import users from './users'
 import init from './init'
 import applications from './applications'

@@ -16,7 +16,7 @@ import { connect } from 'react-redux'
 
 import { getCollaboratorId } from '@ttn-lw/lib/selectors/id'
 
-import { selectUserId } from '@console/store/selectors/user'
+import { selectUserId } from '@console/store/selectors/logout'
 import { selectUserById } from '@console/store/selectors/users'
 
 const isCollaboratorUser = collaborator => collaborator.ids && 'user_ids' in collaborator.ids

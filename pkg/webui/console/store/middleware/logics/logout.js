@@ -21,7 +21,7 @@ import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 import { isUnauthenticatedError } from '@ttn-lw/lib/errors/utils'
 import { selectApplicationRootPath } from '@ttn-lw/lib/selectors/env'
 
-import * as user from '@console/store/actions/user'
+import * as user from '@console/store/actions/logout'
 
 const logoutSequence = async () => {
   const response = await api.console.logout()

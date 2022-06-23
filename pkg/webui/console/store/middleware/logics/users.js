@@ -104,6 +104,36 @@ const getUsersRightsLogic = createRequestLogic({
   },
 })
 
+const getUserInvitationsLogic = createRequestLogic({
+  type: users.GET_USER_INVITATIONS,
+  process: async ({ action }) => {
+    const {
+      params: { page, limit },
+    } = action.payload
+    const { selectors } = action.meta
+
+    return await tts.Users.getAllInvitations({ page, limit }, selectors)
+  },
+})
+
+const sendInviteLogic = createRequestLogic({
+  type: users.SEND_INVITE,
+  process: async ({ action }) => {
+    const { email } = action.payload
+
+    return await tts.Users.sendInvite(email)
+  },
+})
+
+const deleteInviteLogic = createRequestLogic({
+  type: users.DELETE_INVITE,
+  process: async ({ action }) => {
+    const { email } = action.payload
+
+    return await tts.Users.deleteInvite(email)
+  },
+})
+
 export default [
   getUserLogic,
   getUsersLogic,
@@ -111,4 +141,7 @@ export default [
   deleteUserLogic,
   createUserLogic,
   getUsersRightsLogic,
+  getUserInvitationsLogic,
+  sendInviteLogic,
+  deleteInviteLogic,
 ]

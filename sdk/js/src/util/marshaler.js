@@ -122,6 +122,14 @@ class Marshaler {
     return this.payloadListResponse('policies', result)
   }
 
+  static unwrapInvitations(result) {
+    return this.payloadListResponse('invitations', result)
+  }
+
+  static unwrapInvitation(result) {
+    return this.payloadSingleResponse(result)
+  }
+
   static fieldMaskFromPatch(patch, whitelist, remaps) {
     let paths = []
 

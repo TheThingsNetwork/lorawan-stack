@@ -21,7 +21,7 @@ import withRequest from '@ttn-lw/lib/components/with-request'
 
 import { getUsersRightsList } from '@console/store/actions/users'
 
-import { selectUserId } from '@console/store/selectors/user'
+import { selectUserId } from '@console/store/selectors/logout'
 import {
   selectUserRights,
   selectUserRightsFetching,

@@ -27,7 +27,7 @@ import { mayCreateApplications } from '@console/lib/feature-checks'
 import { getOrganizationsList } from '@console/store/actions/organizations'
 import { createApp } from '@console/store/actions/applications'
 
-import { selectUserId, selectUserRights } from '@console/store/selectors/user'
+import { selectUserId, selectUserRights } from '@console/store/selectors/logout'
 import { selectOrganizationFetching } from '@console/store/selectors/organizations'
 
 const mapStateToProps = state => ({

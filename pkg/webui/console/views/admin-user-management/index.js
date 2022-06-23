@@ -26,6 +26,7 @@ import withFeatureRequirement from '@console/lib/components/with-feature-require
 
 import UserAdd from '@console/views/admin-user-management-add'
 import UserEdit from '@console/views/admin-user-management-edit'
+import InvitationSend from '@console/views/invitation-send'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -52,6 +53,7 @@ export default class UserManagementRouter extends Component {
         <Switch>
           <Route exact path={`${match.path}`} component={UserManagement} />
           <Route path={`${match.path}/add`} component={UserAdd} />
+          <Route path={`${match.path}/invitations/add`} component={InvitationSend} />
           <Route path={`${match.path}/:userId${pathIdRegexp}`} component={UserEdit} sensitive />
           <NotFoundRoute />
         </Switch>

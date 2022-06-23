@@ -49,7 +49,7 @@ import { getGatewaysList, GET_GTWS_LIST_BASE } from '@console/store/actions/gate
 
 import { selectApplicationsTotalCount } from '@console/store/selectors/applications'
 import { selectGatewaysTotalCount } from '@console/store/selectors/gateways'
-import { selectUserNameOrId, selectUserRights } from '@console/store/selectors/user'
+import { selectUserNameOrId, selectUserRights } from '@console/store/selectors/logout'
 
 import style from './overview.styl'
 

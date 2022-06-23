@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Support inviting users in the Console.
+
 ### Changed
 
 - In AS923 frequency plans, the Network Server will skip the RX1 window if the data rate is ambiguous.

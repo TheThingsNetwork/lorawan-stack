@@ -17,7 +17,7 @@ import { selectStackConfig } from '@ttn-lw/lib/selectors/env'
 import { selectApplicationRights } from '@console/store/selectors/applications'
 import { selectGatewayRights } from '@console/store/selectors/gateways'
 import { selectOrganizationRights } from '@console/store/selectors/organizations'
-import { selectUserRights, selectUserIsAdmin } from '@console/store/selectors/user'
+import { selectUserRights, selectUserIsAdmin } from '@console/store/selectors/logout'
 
 const stackConfig = selectStackConfig()
 const asEnabled = stackConfig.as.enabled
@@ -55,6 +55,10 @@ export const mayCreateOrganizations = {
 export const mayViewOrEditApiKeys = {
   rightsSelector: selectUserRights,
   check: rights => rights.includes('RIGHT_USER_SETTINGS_API_KEYS'),
+}
+export const maySendInvites = {
+  rightsSelector: selectUserRights,
+  check: rights => rights.includes('RIGHT_SEND_INVITES'),
 }
 
 // Application related feature checks.

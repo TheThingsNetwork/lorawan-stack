@@ -21,7 +21,7 @@ import {
   selectOrganizationsError,
   selectOrganizations,
 } from '@console/store/selectors/organizations'
-import { selectUser } from '@console/store/selectors/user'
+import { selectUser } from '@console/store/selectors/logout'
 
 export default OwnersSelect =>
   connect(
