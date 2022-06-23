@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Support inviting users in the Console.
+
 ### Changed
 
 - In AS923 frequency plans, the Network Server will skip the RX1 window if the data rate is ambiguous.
@@ -41,8 +43,6 @@ For details about compatibility between different releases, see the **Commitment
 - Support claim protection when claiming end devices on The Things Join Server.
 - CLI commands `notifications list` and `notifications set-status` to manage user notifications.
 - Support for class B and C downlink transmissions through multiple gateways simultaneously.
-- Support inviting users in the Console.
-- OAuth client management in the account app.
 
 ### Changed
 
