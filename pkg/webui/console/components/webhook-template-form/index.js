@@ -130,7 +130,6 @@ export default class WebhookTemplateForm extends Component {
           validationSchema={validationSchema}
           initialValues={initialValues}
           error={error}
-          formikRef={this.form}
         >
           <Form.Field
             name="webhook_id"
