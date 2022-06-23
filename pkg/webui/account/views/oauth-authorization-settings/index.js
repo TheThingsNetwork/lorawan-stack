@@ -45,10 +45,12 @@ const m = defineMessages({
 
 const AuthorizationSettings = props => {
   const {
-    authorization: { client_ids: client_id, user_ids: user_id, rights, created_at, updated_at },
+    authorization: { client_ids, user_ids, rights, created_at, updated_at },
     deleteAuthorization,
     navigateToList,
   } = props
+  const { client_id } = client_ids
+  const { user_id } = user_ids
   const intl = useIntl()
 
   const handleDeleteAuthorization = React.useCallback(async () => {
