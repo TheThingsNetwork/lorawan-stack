@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useContext } from 'react'
+import React from 'react'
 import classnames from 'classnames'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -20,7 +20,7 @@ import Message from '@ttn-lw/lib/components/message'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import from from '@ttn-lw/lib/from'
 
-import FormContext from '../context'
+import { useFormContext } from '..'
 
 import Tooltip from './tooltip'
 
@@ -28,7 +28,7 @@ import style from './field.styl'
 
 const InfoField = props => {
   const { children, className, title, disabled: fieldDisabled, tooltipId } = props
-  const { disabled: formDisabled } = useContext(FormContext)
+  const { disabled: formDisabled } = useFormContext()
   const disabled = formDisabled || fieldDisabled
   const cls = classnames(className, style.field, from(style, { disabled }))
 

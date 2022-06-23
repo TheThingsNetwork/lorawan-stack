@@ -12,11 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* eslint-disable react/sort-prop-types */
 import React, { useCallback, useEffect } from 'react'
-import { Formik, yupToFormErrors, useFormikContext, validateYupSchema } from 'formik'
+import {
+  yupToFormErrors,
+  useFormikContext,
+  validateYupSchema,
+  useFormik,
+  FormikProvider,
+} from 'formik'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import { defineMessages } from 'react-intl'
+import { isPlainObject } from 'lodash'
 
 import Notification from '@ttn-lw/components/notification'
 import ErrorNotification from '@ttn-lw/components/error-notification'
@@ -24,7 +30,6 @@ import ErrorNotification from '@ttn-lw/components/error-notification'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import { ingestError } from '@ttn-lw/lib/errors/utils'
 
-import FormContext from './context'
 import FormField from './field'
 import FormInfoField from './field/info'
 import FormSubmit from './submit'
@@ -35,82 +40,6 @@ import FormFieldContainer from './field/container'
 const m = defineMessages({
   submitFailed: 'Submit failed',
 })
-
-const InnerForm = props => {
-  const {
-    formError,
-    isSubmitting,
-    isValid,
-    className,
-    children,
-    formErrorTitle,
-    formInfo,
-    formInfoTitle,
-    handleSubmit,
-    id,
-    ...rest
-  } = props
-  const notificationRef = React.useRef()
-
-  useEffect(() => {
-    // Scroll form notification into view if needed.
-    if (formError) {
-      scrollIntoView(notificationRef.current, { behavior: 'smooth' })
-      notificationRef.current.focus({ preventScroll: true })
-    }
-
-    // Scroll invalid fields into view if needed and focus them.
-    if (!isSubmitting && !isValid) {
-      const firstErrorNode = document.querySelectorAll('[data-needs-focus="true"]')[0]
-      if (firstErrorNode) {
-        scrollIntoView(firstErrorNode, { behavior: 'smooth' })
-        firstErrorNode.querySelector('input,textarea,canvas,video').focus({ preventScroll: true })
-      }
-    }
-  }, [formError, isSubmitting, isValid])
-
-  return (
-    <form className={className} onSubmit={handleSubmit} id={id}>
-      {(formError || formInfo) && (
-        <div style={{ outline: 'none' }} ref={notificationRef} tabIndex="-1">
-          {formError && <ErrorNotification content={formError} title={formErrorTitle} small />}
-          {formInfo && <Notification content={formInfo} title={formInfoTitle} info small />}
-        </div>
-      )}
-      <FormContext.Provider
-        value={{
-          formError,
-          isSubmitting,
-          isValid,
-          ...rest,
-        }}
-      >
-        {children}
-      </FormContext.Provider>
-    </form>
-  )
-}
-InnerForm.propTypes = {
-  children: PropTypes.node.isRequired,
-  className: PropTypes.string,
-  id: PropTypes.string,
-  formError: PropTypes.error,
-  formErrorTitle: PropTypes.message,
-  formInfo: PropTypes.message,
-  formInfoTitle: PropTypes.message,
-  handleSubmit: PropTypes.func.isRequired,
-  isSubmitting: PropTypes.bool.isRequired,
-  isValid: PropTypes.bool.isRequired,
-}
-
-InnerForm.defaultProps = {
-  className: undefined,
-  id: undefined,
-  formInfo: undefined,
-  formInfoTitle: undefined,
-  formError: undefined,
-  formErrorTitle: m.submitFailed,
-}
 
 const Form = props => {
   const {
@@ -135,22 +64,10 @@ const Form = props => {
     validationSchema,
   } = props
 
-  const handleSubmit = useCallback(
-    async (...args) => {
-      try {
-        return await onSubmit(...args)
-      } catch (error) {
-        // Make sure all unhandled exceptions during submit are ingested.
-        ingestError(error, { ingestedBy: 'FormSubmit' })
-
-        throw error
-      }
-    },
-    [onSubmit],
-  )
+  const notificationRef = React.useRef()
 
   // Recreate the validation hook to allow passing down validation contexts.
-  const validate = useEffect(
+  const validate = useCallback(
     values => {
       if (!validationSchema) {
         return {}
@@ -190,35 +107,81 @@ const Form = props => {
     [validationSchema, validateSync, validationContext, error],
   )
 
+  const handleSubmit = useCallback(
+    async (...args) => {
+      try {
+        return await onSubmit(...args)
+      } catch (error) {
+        // Make sure all unhandled exceptions during submit are ingested.
+        ingestError(error, { ingestedBy: 'FormSubmit' })
+
+        throw error
+      }
+    },
+    [onSubmit],
+  )
+
+  // Initialize formik and get the formik context to provide to form children.
+  const formik = useFormik({
+    initialValues,
+    validate,
+    onSubmit: handleSubmit,
+    onReset,
+    validateOnMount,
+    validateOnBlur,
+    validateSync,
+    validateOnChange,
+    enableReinitialize,
+  })
+
+  const {
+    isSubmitting,
+    isValid,
+    handleSubmit: handleFormikSubmit,
+    handleReset: handleFormikReset,
+  } = formik
+
+  // Connect the ref with the formik context to ensure compatibility with older form components.
+  // NOTE: New components should not use the ref, but use the form context directly.
+  // TODO: Remove this once all forms have been refactored to use context.
+  if (isPlainObject(formikRef) && 'current' in formikRef) {
+    formikRef.current = formik
+  }
+
+  useEffect(() => {
+    // Scroll form notification into view if needed.
+    if (error) {
+      scrollIntoView(notificationRef.current, { behavior: 'smooth' })
+      notificationRef.current.focus({ preventScroll: true })
+    }
+
+    // Scroll invalid fields into view if needed and focus them.
+    if (!isSubmitting && !isValid) {
+      const firstErrorNode = document.querySelectorAll('[data-needs-focus="true"]')[0]
+      if (firstErrorNode) {
+        scrollIntoView(firstErrorNode, { behavior: 'smooth' })
+        firstErrorNode.querySelector('input,textarea,canvas,video').focus({ preventScroll: true })
+      }
+    }
+  }, [error, isSubmitting, isValid])
+
   return (
-    <Formik
-      innerRef={formikRef}
-      validate={validate}
-      onSubmit={handleSubmit}
-      onReset={onReset}
-      validateOnMount={validateOnMount}
-      initialValues={initialValues}
-      validateOnBlur={validateOnBlur}
-      validateSync={validateSync}
-      validateOnChange={validateOnChange}
-      enableReinitialize={enableReinitialize}
+    <FormikProvider
+      value={{
+        disabled,
+        ...formik,
+      }}
     >
-      {({ handleSubmit, ...restFormikProps }) => (
-        <InnerForm
-          className={className}
-          formError={error}
-          formErrorTitle={errorTitle}
-          formInfo={info}
-          formInfoTitle={infoTitle}
-          handleSubmit={handleSubmit}
-          disabled={disabled}
-          id={id}
-          {...restFormikProps}
-        >
-          {children}
-        </InnerForm>
-      )}
-    </Formik>
+      <form className={className} id={id} onSubmit={handleFormikSubmit} onReset={handleFormikReset}>
+        {(error || info) && (
+          <div style={{ outline: 'none' }} ref={notificationRef} tabIndex="-1">
+            {error && <ErrorNotification content={error} title={errorTitle} small />}
+            {info && <Notification content={info} title={infoTitle} info small />}
+          </div>
+        )}
+        {children}
+      </form>
+    </FormikProvider>
   )
 }
 
@@ -229,10 +192,10 @@ Form.propTypes = {
   enableReinitialize: PropTypes.bool,
   error: PropTypes.error,
   errorTitle: PropTypes.message,
-  info: PropTypes.message,
-  infoTitle: PropTypes.message,
   formikRef: PropTypes.shape({ current: PropTypes.shape({}) }),
   id: PropTypes.string,
+  info: PropTypes.message,
+  infoTitle: PropTypes.message,
   initialValues: PropTypes.shape({}),
   onReset: PropTypes.func,
   onSubmit: PropTypes.func,

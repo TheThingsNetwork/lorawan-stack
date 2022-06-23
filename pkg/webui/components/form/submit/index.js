@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useContext } from 'react'
+import React from 'react'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import FormContext from '../context'
+import { useFormContext } from '..'
 
 const FormSubmit = props => {
   const { component: Component, disabled, ...rest } = props
-  const formContext = useContext(FormContext)
+  const formContext = useFormContext()
 
   const submitProps = {
-    isValid: context.isValid,
+    isValid: formContext.isValid,
     isSubmitting: formContext.isSubmitting,
     isValidating: formContext.isValidating,
     submitCount: formContext.submitCount,

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useContext } from 'react'
+import React, { useCallback } from 'react'
 import classnames from 'classnames'
 import { useField } from 'formik'
 import { isPlainObject } from 'lodash'
@@ -22,7 +22,7 @@ import Message from '@ttn-lw/lib/components/message'
 import from from '@ttn-lw/lib/from'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import FormContext from '../context'
+import { useFormContext } from '..'
 
 import Tooltip from './tooltip'
 import FieldError from './error'
@@ -89,8 +89,16 @@ const FormField = props => {
     onChange,
     onBlur,
   } = props
-  const { disabled: formDisabled, validateOnBlur } = useContext(FormContext)
-  const [{ value: encodedValue }, { touched, error = false }, { setTouched, setValue }] = useField({
+
+  const {
+    disabled: formDisabled,
+    validateOnBlur,
+    setFieldValue,
+    setFieldTouched,
+  } = useFormContext()
+
+  // Initialize field, which also takes care of registering fields in formik's internal registry.
+  const [{ value: encodedValue }, { touched, error = false }] = useField({
     name,
     validate,
   })
@@ -111,27 +119,27 @@ const FormField = props => {
         }
       }
 
-      await setValue(newValue)
+      await setFieldValue(name, newValue)
 
       if (enforceValidation) {
-        setTouched(true, true)
+        setFieldTouched(name, true, true)
       }
 
       onChange(isSyntheticEvent ? value : encode(value))
     },
-    [setTouched, setValue, onChange, encode],
+    [encode, name, onChange, setFieldTouched, setFieldValue],
   )
 
   const handleBlur = useCallback(
     event => {
       if (validateOnBlur) {
         const value = extractValue(event)
-        setTouched(!isValueEmpty(value))
+        setFieldTouched(name, !isValueEmpty(value))
       }
 
       onBlur(event)
     },
-    [validateOnBlur, onBlur, setTouched],
+    [validateOnBlur, onBlur, setFieldTouched, name],
   )
 
   const value = decode(encodedValue)
@@ -142,7 +150,6 @@ const FormField = props => {
   const showWarning = !Boolean(error) && Boolean(warning)
   const showDescription = !showError && !showWarning && Boolean(description)
   const tooltipIcon = hasTooltip ? <Tooltip id={tooltipId} glossaryTerm={title} /> : null
-
   const describedBy = showError
     ? `${name}-field-error`
     : showWarning
