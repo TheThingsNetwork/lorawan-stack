@@ -36,6 +36,10 @@ const (
   name: Australia 923-925 MHz (AS923)
   base-frequency: 915
   file: AS_923_925_AU.yml
+- id: AU_915_928_FSB_2
+  name: Australia 915-928 MHz, FSB 2 (used by TTN)
+  base-frequency: 915
+  file: AU_915_928_FSB_2.yml
 - id: EXAMPLE
   name: Example 866.1 MHz
   base-frequency: 868
@@ -352,6 +356,60 @@ radios:
   rssi-offset: -166
 clock-source: 1`
 
+	// AUFrequencyPlanID is the identifier of the Australia 915-928 FSB 2 frequency plan.
+	AUFrequencyPlanID = "AU_915_928_FSB_2"
+	auFrequencyPlan   = `band-id: AU_915_928
+uplink-channels:
+- frequency: 916800000
+  min-data-rate: 0
+  max-data-rate: 5
+  radio: 0
+- frequency: 917000000
+  min-data-rate: 0
+  max-data-rate: 5
+  radio: 0
+- frequency: 917200000
+  min-data-rate: 0
+  max-data-rate: 5
+  radio: 0
+- frequency: 917400000
+  min-data-rate: 0
+  max-data-rate: 5
+  radio: 0
+- frequency: 917600000
+  min-data-rate: 0
+  max-data-rate: 5
+  radio: 1
+- frequency: 917800000
+  min-data-rate: 0
+  max-data-rate: 5
+  radio: 1
+- frequency: 918000000
+  min-data-rate: 0
+  max-data-rate: 5
+  radio: 1
+- frequency: 918200000
+  min-data-rate: 0
+  max-data-rate: 5
+  radio: 1
+lora-standard-channel:
+  frequency: 917500000
+  data-rate: 12
+  radio: 0
+radios:
+- enable: true
+  chip-type: SX1257
+  frequency: 917200000
+  rssi-offset: -166
+  tx:
+    min-frequency: 915000000
+    max-frequency: 928000000
+- enable: true
+  chip-type: SX1257
+  frequency: 917900000
+  rssi-offset: -166
+clock-source: 1`
+
 	// ExampleFrequencyPlanID is an example frequency plan.
 	ExampleFrequencyPlanID = "EXAMPLE"
 	exampleFrequencyPlan   = `band-id: EU_863_870
@@ -416,6 +474,7 @@ var (
 		"KR_920_923.yml":       []byte(krFrequencyPlan),
 		"US_902_928_FSB_2.yml": []byte(usFrequencyPlan),
 		"AS_923_925_AU.yml":    []byte(asAUFrequencyPlan),
+		"AU_915_928_FSB_2.yml": []byte(auFrequencyPlan),
 		"EXAMPLE.yml":          []byte(exampleFrequencyPlan),
 	}
 
