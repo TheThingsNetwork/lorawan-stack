@@ -16,12 +16,13 @@ import React from 'react'
 import classnames from 'classnames'
 import { defineMessages, useIntl } from 'react-intl'
 
-import { useFormContext } from '@ttn-lw/components/form'
 import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { useFormContext } from '..'
 
 import style from './section.styl'
 
