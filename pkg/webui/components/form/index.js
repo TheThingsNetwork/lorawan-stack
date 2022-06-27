@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
   yupToFormErrors,
   useFormikContext,
@@ -22,7 +22,7 @@ import {
 } from 'formik'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import { defineMessages } from 'react-intl'
-import { isPlainObject } from 'lodash'
+import { isPlainObject, isFunction, pick } from 'lodash'
 
 import Notification from '@ttn-lw/components/notification'
 import ErrorNotification from '@ttn-lw/components/error-notification'
@@ -62,9 +62,11 @@ const Form = props => {
     validateSync,
     validationContext,
     validationSchema,
+    stripUnusedFields,
   } = props
 
   const notificationRef = React.useRef()
+  const [fieldRegistry, setFieldRegistry] = useState([])
 
   // Recreate the validation hook to allow passing down validation contexts.
   const validate = useCallback(
@@ -107,25 +109,11 @@ const Form = props => {
     [validationSchema, validateSync, validationContext, error],
   )
 
-  const handleSubmit = useCallback(
-    async (...args) => {
-      try {
-        return await onSubmit(...args)
-      } catch (error) {
-        // Make sure all unhandled exceptions during submit are ingested.
-        ingestError(error, { ingestedBy: 'FormSubmit' })
-
-        throw error
-      }
-    },
-    [onSubmit],
-  )
-
   // Initialize formik and get the formik context to provide to form children.
   const formik = useFormik({
     initialValues,
     validate,
-    onSubmit: handleSubmit,
+    onSubmit,
     onReset,
     validateOnMount,
     validateOnBlur,
@@ -139,7 +127,58 @@ const Form = props => {
     isValid,
     handleSubmit: handleFormikSubmit,
     handleReset: handleFormikReset,
+    registerField: registerFormikField,
+    unregisterField: unregisterFormikField,
+    setValues,
   } = formik
+
+  // Recreate field registration, so the component can keep track of registered fields,
+  // allowing automatic removal of unused field values from the value set if wished.
+  const registerField = useCallback(
+    (name, validate) => {
+      registerFormikField(name, validate)
+      if (stripUnusedFields) {
+        setFieldRegistry(fieldRegistry => [...fieldRegistry, name])
+      }
+    },
+    [registerFormikField, stripUnusedFields],
+  )
+
+  // Recreate field registration, so the component can keep track of registered fields,
+  // allowing automatic removal of unused field values from the value set if wished.
+  const unregisterField = useCallback(
+    name => {
+      if (stripUnusedFields) {
+        unregisterFormikField(name)
+      }
+      setFieldRegistry(fieldRegistry => {
+        const newRegistry = [...fieldRegistry]
+        newRegistry.splice(newRegistry.indexOf(name), 1)
+
+        return newRegistry
+      })
+    },
+    [stripUnusedFields, unregisterFormikField],
+  )
+
+  // Recreate form submit handler to enable stripping values as well as error logging.
+  const handleFormSubmit = useCallback(
+    e => {
+      try {
+        if (stripUnusedFields) {
+          // Clean up fields that have been unmounted at the time of submitting, if wished.
+          setValues(values => pick(values, fieldRegistry))
+        }
+        handleFormikSubmit(e)
+      } catch (error) {
+        // Make sure all unhandled exceptions during submit are ingested.
+        ingestError(error, { ingestedBy: 'FormSubmit' })
+
+        throw error
+      }
+    },
+    [fieldRegistry, handleFormikSubmit, setValues, stripUnusedFields],
+  )
 
   // Connect the ref with the formik context to ensure compatibility with older form components.
   // NOTE: New components should not use the ref, but use the form context directly.
@@ -170,16 +209,18 @@ const Form = props => {
       value={{
         disabled,
         ...formik,
+        registerField,
+        unregisterField,
       }}
     >
-      <form className={className} id={id} onSubmit={handleFormikSubmit} onReset={handleFormikReset}>
+      <form className={className} id={id} onSubmit={handleFormSubmit} onReset={handleFormikReset}>
         {(error || info) && (
           <div style={{ outline: 'none' }} ref={notificationRef} tabIndex="-1">
             {error && <ErrorNotification content={error} title={errorTitle} small />}
             {info && <Notification content={info} title={infoTitle} info small />}
           </div>
         )}
-        {children}
+        {isFunction(children) ? children(formik) : children}
       </form>
     </FormikProvider>
   )
@@ -199,6 +240,7 @@ Form.propTypes = {
   initialValues: PropTypes.shape({}),
   onReset: PropTypes.func,
   onSubmit: PropTypes.func,
+  stripUnusedFields: PropTypes.bool,
   validateOnBlur: PropTypes.bool,
   validateOnChange: PropTypes.bool,
   validateOnMount: PropTypes.bool,
@@ -220,6 +262,7 @@ Form.defaultProps = {
   initialValues: undefined,
   onReset: () => null,
   onSubmit: () => null,
+  stripUnusedFields: false,
   validateOnBlur: true,
   validateOnChange: false,
   validateOnMount: false,
