@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import { merge } from 'lodash'
 
 import Radio from '@ttn-lw/components/radio-button'
@@ -20,24 +20,25 @@ import Form, { useFormContext } from '@ttn-lw/components/form'
 
 import m from '../messages'
 
-import DeviceTypeRepositoryFormSection from './device-type-repository-form-section'
-import DeviceTypeManualFormSection from './device-type-manual-form-section'
+import DeviceTypeRepositoryFormSection, {
+  initialValues as repositoryInitialValues,
+} from './device-type-repository-form-section'
+import DeviceTypeManualFormSection, {
+  initialValues as manualInitialValues,
+} from './device-type-manual-form-section'
 
-const initialValues = {
-  _inputMethod: 'device-repository',
-}
+const initialValues = merge(
+  {
+    _inputMethod: 'device-repository',
+  },
+  manualInitialValues,
+  repositoryInitialValues,
+)
 
 const DeviceTypeFormSection = props => {
-  const { getValues } = props
   const {
     values: { _inputMethod },
-    setValues,
   } = useFormContext()
-
-  useEffect(() => {
-    // Set the section's initial values on mount.
-    setValues(values => merge(values, initialValues))
-  }, [getValues, setValues])
 
   return (
     <>
@@ -51,4 +52,4 @@ const DeviceTypeFormSection = props => {
   )
 }
 
-export default DeviceTypeFormSection
+export { DeviceTypeFormSection as default, initialValues }

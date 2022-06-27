@@ -12,27 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect } from 'react'
-import { merge } from 'lodash'
+import React from 'react'
 
-import { useFormContext } from '@ttn-lw/components/form'
+const initialValues = {}
 
-import { subtractObject } from '../../utils'
+const DeviceTypeManualFormSection = props => <span>Device Type Manual Form Section</span>
 
-const initialValues = { foo: 'bar' }
-
-const DeviceTypeManualFormSection = props => {
-  const { setValues } = useFormContext()
-
-  useEffect(() => {
-    // Set the section's initial values on mount.
-    setTimeout(() => setValues(values => merge(values, initialValues)))
-
-    // Remove initial values on on mount (on next tick).
-    return () => setValues(values => subtractObject(values, initialValues))
-  }, [setValues])
-
-  return <span>Device Type Manual Form Section</span>
-}
-
-export default DeviceTypeManualFormSection
+export { DeviceTypeManualFormSection as default, initialValues }

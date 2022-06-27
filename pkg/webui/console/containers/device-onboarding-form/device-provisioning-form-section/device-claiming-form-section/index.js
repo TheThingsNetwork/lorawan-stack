@@ -13,26 +13,9 @@
 // limitations under the License.
 
 import React from 'react'
-import { merge } from 'lodash'
-
-import { useFormContext } from '@ttn-lw/components/form'
-
-import { subtractObject } from '../../utils'
 
 const initialValues = {}
 
-const DeviceClaimingFormSection = props => {
-  const { setValues } = useFormContext()
+const DeviceClaimingFormSection = props => <span>Device Type Repository Form Section</span>
 
-  useEffect(() => {
-    // Set the section's initial values on mount.
-    setValues(values => merge(values, initialValues))
-
-    // Remove initial values on onmount.
-    return () => setValues(values => subtractObject(values, initialValues))
-  }, [setValues])
-
-  return <span>Device Type Repository Form Section</span>
-}
-
-export default DeviceClaimingFormSection
+export { DeviceClaimingFormSection as default, initialValues }

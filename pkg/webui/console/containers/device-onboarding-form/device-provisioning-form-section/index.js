@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { merge } from 'lodash'
 
 import Input from '@ttn-lw/components/input'
-import Form, { useFormContext } from '@ttn-lw/components/form'
+import Form from '@ttn-lw/components/form'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
 
@@ -25,28 +25,30 @@ import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
 import m from '../messages'
 
-import DeviceClaimingFormSection from './device-claiming-form-section'
-import DeviceRegistrationFormSection from './device-registration-form-section'
+import DeviceClaimingFormSection, {
+  initialValues as claimingInitialValues,
+} from './device-claiming-form-section'
+import DeviceRegistrationFormSection, {
+  initialValues as registrationInitialValues,
+} from './device-registration-form-section'
 
-const initialValues = {
-  ids: {
-    join_eui: '',
+const initialValues = merge(
+  {
+    ids: {
+      join_eui: '',
+    },
   },
-}
+  claimingInitialValues,
+  registrationInitialValues,
+)
 
 const DeviceTypeFormSection = props => {
-  const { setValues } = useFormContext()
   const [isClaiming, setIsClaiming] = useState(undefined)
 
   const onIdPrefill = useCallback(() => {
     // Reminder that DevEUI is used as id default (on blur).
     console.log('blur')
   })
-
-  useEffect(() => {
-    // Set the section's initial values on mount.
-    setValues(values => merge(values, initialValues))
-  }, [setValues])
 
   return (
     <>
@@ -75,4 +77,4 @@ const DeviceTypeFormSection = props => {
   )
 }
 
-export default DeviceTypeFormSection
+export { DeviceTypeFormSection as default, initialValues }

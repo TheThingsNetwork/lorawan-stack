@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { isPlainObject } from 'lodash'
-
 import { ACTIVATION_MODES } from '@console/lib/device-utils'
 
 // End device selectors.
@@ -51,32 +49,3 @@ export const REGISTRATION_TYPES = Object.freeze({
   SINGLE: 'single',
   MULTIPLE: 'multiple',
 })
-
-// Misc utilities.
-
-const recursiveRemove = (dest, src) => {
-  for (const key in src) {
-    if (isPlainObject(dest[key])) {
-      return recursiveRemove(dest[key], src[key])
-    }
-    if (key in dest) {
-      delete dest[key]
-    }
-  }
-}
-
-/** .
- * Recursively removes all common props of `dest` and `src` from `src`.
- * This is useful e.g. To remove initial props of a form section from the form values when it unmounts.
- *
- * @param {object} dest - The destination object from which the props are removed.
- * @param {object} src - The source object with the props that will be removed from the `dest`.
- * @returns {object} A new `dest` object that has all props of `src` deleted.
- */
-export const subtractObject = (dest, src) => {
-  const res = { ...dest }
-  recursiveRemove(res, src)
-  console.log(JSON.stringify(dest), JSON.stringify(src), JSON.stringify(res))
-
-  return res
-}
