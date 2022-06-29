@@ -453,8 +453,8 @@
     },
     "10": {
       "MaxMACPayloadSize": {
-        "false": 230,
-        "true": 230
+        "false": 250,
+        "true": 250
       },
       "Rate": {
         "lora": {
@@ -465,8 +465,8 @@
     },
     "11": {
       "MaxMACPayloadSize": {
-        "false": 230,
-        "true": 230
+        "false": 250,
+        "true": 250
       },
       "Rate": {
         "lora": {
@@ -477,8 +477,8 @@
     },
     "12": {
       "MaxMACPayloadSize": {
-        "false": 230,
-        "true": 230
+        "false": 250,
+        "true": 250
       },
       "Rate": {
         "lora": {
@@ -489,8 +489,8 @@
     },
     "13": {
       "MaxMACPayloadSize": {
-        "false": 230,
-        "true": 230
+        "false": 250,
+        "true": 250
       },
       "Rate": {
         "lora": {
