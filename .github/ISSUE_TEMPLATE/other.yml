@@ -1,0 +1,32 @@
+name: Other Issue
+description: Report another issue
+labels: ["needs/triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to submit this issue.
+        Please fill the template below.
+  - type: textarea
+    attributes:
+      label: Summary
+      description: Describe the issue in one or two sentences.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Current Situation
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Desired Situation
+    validations:
+      required: true
+  - type: checkboxes
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow The Things Network's Community Code of Conduct.
+      options:
+        - label: I agree to follow TTN's [Community Code of Conduct](https://github.com/TheThingsNetwork/Manifesto/blob/master/CodeOfConduct.md).
+          required: true
