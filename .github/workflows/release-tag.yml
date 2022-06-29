@@ -97,7 +97,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v2
         with:
           version: 'v1.9.2'
-          args: release --config .goreleaser.release.yml --release-notes /tmp/release-notes.md --timeout 120m
+          args: release --config .goreleaser.release.yml --release-notes /tmp/release-notes.md --timeout 120m --parallelism 1
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_LOGIN }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
