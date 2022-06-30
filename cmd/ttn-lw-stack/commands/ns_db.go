@@ -164,7 +164,6 @@ var (
 								return err
 							}
 							p := tx.TxPipeline()
-							defer p.Close()
 							if dev.Session != nil && types.MustDevAddr(dev.Session.DevAddr).OrZero().Equal(devAddr) {
 								if dev.MacState == nil {
 									logger.Error("Device is missing MAC state, skip migrating current session")
@@ -173,7 +172,7 @@ var (
 									if err != nil {
 										return err
 									}
-									p.ZAdd(ctx, currentKey, &redis.Z{
+									p.ZAdd(ctx, currentKey, redis.Z{
 										Score:  float64(dev.Session.LastFCntUp & 0xffff),
 										Member: uid,
 									})
@@ -188,7 +187,7 @@ var (
 									if err != nil {
 										return err
 									}
-									p.ZAdd(ctx, pendingKey, &redis.Z{
+									p.ZAdd(ctx, pendingKey, redis.Z{
 										Score:  pendingScore,
 										Member: uid,
 									})
@@ -232,7 +231,7 @@ var (
 								return err
 							}
 							_, err = tx.TxPipelined(ctx, func(p redis.Pipeliner) error {
-								p.ZAdd(ctx, currentKey, &redis.Z{
+								p.ZAdd(ctx, currentKey, redis.Z{
 									Score:  float64(uint32(v) & 0xffff),
 									Member: uid,
 								})
@@ -268,7 +267,6 @@ var (
 					score := float64(time.Now().UnixNano())
 					if err := cl.Watch(ctx, func(tx *redis.Tx) error {
 						p := tx.TxPipeline()
-						defer p.Close()
 						if err := ttnredis.RangeRedisSet(ctx, tx, k, "*", ttnredis.DefaultRangeCount, func(uid string) (bool, error) {
 							logger := logger.WithField("uid", uid)
 							uk := nsredis.UIDKey(cl, uid)
@@ -289,7 +287,7 @@ var (
 							if err != nil {
 								return false, err
 							}
-							p.ZAdd(ctx, tmpKey, &redis.Z{
+							p.ZAdd(ctx, tmpKey, redis.Z{
 								Score:  score,
 								Member: uid,
 							})

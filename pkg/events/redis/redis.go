@@ -313,7 +313,4 @@ func (*PubSub) runTransaction(ctx context.Context, tx redis.Pipeliner) {
 	if _, err := tx.Exec(ctx); err != nil {
 		logger.WithError(err).Warn("Failed to run transaction")
 	}
-	if err := tx.Close(); err != nil {
-		logger.WithError(err).Warn("Failed to close transaction")
-	}
 }

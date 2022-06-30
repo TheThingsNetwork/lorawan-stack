@@ -192,22 +192,22 @@ func debugLogFunc(ctx context.Context, format string, v ...interface{}) {
 func newRedisClient(conf *Config) *redis.Client {
 	if conf.Failover.Enable {
 		return redis.NewFailoverClient(&redis.FailoverOptions{
-			Dialer:        conf.makeDialer(),
-			MasterName:    conf.Failover.MasterName,
-			SentinelAddrs: conf.Failover.Addresses,
-			Password:      conf.Password,
-			DB:            conf.Database,
-			PoolSize:      conf.PoolSize,
-			IdleTimeout:   conf.IdleTimeout,
+			Dialer:          conf.makeDialer(),
+			MasterName:      conf.Failover.MasterName,
+			SentinelAddrs:   conf.Failover.Addresses,
+			Password:        conf.Password,
+			DB:              conf.Database,
+			PoolSize:        conf.PoolSize,
+			ConnMaxIdleTime: conf.IdleTimeout,
 		})
 	}
 	return redis.NewClient(&redis.Options{
-		Dialer:      conf.makeDialer(),
-		Addr:        conf.Address,
-		Password:    conf.Password,
-		DB:          conf.Database,
-		PoolSize:    conf.PoolSize,
-		IdleTimeout: conf.IdleTimeout,
+		Dialer:          conf.makeDialer(),
+		Addr:            conf.Address,
+		Password:        conf.Password,
+		DB:              conf.Database,
+		PoolSize:        conf.PoolSize,
+		ConnMaxIdleTime: conf.IdleTimeout,
 	})
 }
 
@@ -461,9 +461,10 @@ func addTask(ctx context.Context, r redis.Cmdable, k string, maxLen int64, paylo
 		m[startAtKey] = startAt.UnixNano()
 	}
 	return ConvertError(r.XAdd(ctx, &redis.XAddArgs{
-		Stream:       InputTaskKey(k),
-		MaxLenApprox: maxLen,
-		Values:       m,
+		Stream: InputTaskKey(k),
+		MaxLen: maxLen,
+		Approx: true,
+		Values: m,
 	}).Err())
 }
 
@@ -562,7 +563,6 @@ func popTask(ctx context.Context, r redis.Cmdable, group, consumer string, maxLe
 			if err == nil && pErr != nil {
 				err = ConvertError(pErr)
 			}
-			p.Close()
 		}()
 
 		if err = f(p, fields[payloadKey], startAt); err != nil {
@@ -697,7 +697,9 @@ func milliseconds(d time.Duration) int64 {
 }
 
 // DeduplicateProtos deduplicates protos using key k. It stores a lock at LockKey(k) and the list of collected protos at ListKey(k).
-func DeduplicateProtos(ctx context.Context, r Scripter, k string, window time.Duration, msgs ...proto.Message) (bool, error) {
+func DeduplicateProtos(
+	ctx context.Context, r redis.Scripter, k string, window time.Duration, msgs ...proto.Message,
+) (bool, error) {
 	args := make([]interface{}, 0, 1+len(msgs))
 	args = append(args, milliseconds(window))
 	for _, msg := range msgs {

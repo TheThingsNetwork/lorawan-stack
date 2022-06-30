@@ -108,8 +108,9 @@ func (q *ApplicationUplinkQueue) Add(ctx context.Context, ups ...*ttnpb.Applicat
 				uidStreamID = q.uidGenericUplinkKey(uid)
 			}
 			p.XAdd(ctx, &redis.XAddArgs{
-				Stream:       uidStreamID,
-				MaxLenApprox: q.maxLen,
+				Stream: uidStreamID,
+				MaxLen: q.maxLen,
+				Approx: true,
 				Values: map[string]interface{}{
 					payloadKey: s,
 				},

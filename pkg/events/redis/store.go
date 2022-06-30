@@ -482,17 +482,19 @@ func (ps *PubSubStore) Publish(evs ...events.Event) {
 			}
 			eventStream := ps.eventStream(evt.Context(), id)
 			tx.XAdd(ps.ctx, &redis.XAddArgs{
-				Stream:       eventStream,
-				MaxLenApprox: int64(ps.entityHistoryCount),
-				Values:       streamValues,
+				Stream: eventStream,
+				MaxLen: int64(ps.entityHistoryCount),
+				Approx: true,
+				Values: streamValues,
 			})
 			tx.PExpire(ps.ctx, eventStream, ttl)
 			if devID := id.GetDeviceIds(); devID != nil && definition != nil && definition.PropagateToParent() {
 				eventStream := ps.eventStream(evt.Context(), devID.ApplicationIds.GetEntityIdentifiers())
 				tx.XAdd(ps.ctx, &redis.XAddArgs{
-					Stream:       eventStream,
-					MaxLenApprox: int64(ps.entityHistoryCount),
-					Values:       streamValues,
+					Stream: eventStream,
+					MaxLen: int64(ps.entityHistoryCount),
+					Approx: true,
+					Values: streamValues,
 				})
 				tx.PExpire(ps.ctx, eventStream, ttl)
 			}
