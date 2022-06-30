@@ -38,9 +38,9 @@ import { selectSelectedAuthorization } from '@account/store/selectors/authorizat
 const RIGHT_TAG_MAX_WIDTH = 140
 
 const m = defineMessages({
-  deleteButton: 'De-authorize this client',
-  deleteSuccess: 'This oauth client was successfully de-authorized',
-  deleteFailure: 'There was an error and this client could not be de-authorized',
+  deleteButton: 'Revoke authorization',
+  deleteSuccess: 'This authorization was successfully revoked',
+  deleteFailure: 'There was an error and this authorization could not be revoked',
 })
 
 const AuthorizationSettings = props => {
