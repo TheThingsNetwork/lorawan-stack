@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
+import { connect } from 'react-redux'
 import { merge } from 'lodash'
 
 import Form from '@ttn-lw/components/form'
@@ -20,6 +21,11 @@ import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { getTemplate } from '@console/store/actions/device-repository'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
 import DeviceProvisioningFormSection, {
   initialValues as provisioningInitialValues,
@@ -32,6 +38,7 @@ import validationSchema from './validation-schema'
 const initialValues = merge({}, provisioningInitialValues, typeInitialValues)
 
 const DeviceOnboardingForm = props => {
+  const { appId, getRegistrationTemplate } = props
   const handleSubmit = useCallback(async values => {
     console.log(values)
   }, [])
@@ -43,7 +50,7 @@ const DeviceOnboardingForm = props => {
       validationSchema={validationSchema}
       stripUnusedFields
     >
-      <DeviceTypeFormSection />
+      <DeviceTypeFormSection appId={appId} getRegistrationTemplate={getRegistrationTemplate} />
       <DeviceProvisioningFormSection />
       <SubmitBar>
         <Form.Submit message={sharedMessages.addDevice} component={SubmitButton} />
@@ -52,7 +59,21 @@ const DeviceOnboardingForm = props => {
   )
 }
 
-DeviceOnboardingForm.propTypes = {}
-DeviceOnboardingForm.defaultProps = {}
+DeviceOnboardingForm.propTypes = {
+  appId: PropTypes.string,
+  getRegistrationTemplate: PropTypes.func,
+}
 
-export default DeviceOnboardingForm
+DeviceOnboardingForm.defaultProps = {
+  appId: undefined,
+  getRegistrationTemplate: () => null,
+}
+
+export default connect(
+  state => ({
+    appId: selectSelectedApplicationId(state),
+  }),
+  dispatch => ({
+    getRegistrationTemplate: (appId, version) => dispatch(getTemplate(appId, version)),
+  }),
+)(DeviceOnboardingForm)

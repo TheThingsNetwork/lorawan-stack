@@ -18,6 +18,8 @@ import { merge } from 'lodash'
 import Radio from '@ttn-lw/components/radio-button'
 import Form, { useFormContext } from '@ttn-lw/components/form'
 
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import m from '../messages'
 
 import DeviceTypeRepositoryFormSection, {
@@ -36,20 +38,36 @@ const initialValues = merge(
 )
 
 const DeviceTypeFormSection = props => {
+  const { getRegistrationTemplate, appId } = props
   const {
     values: { _inputMethod },
   } = useFormContext()
 
   return (
     <>
+      <Form.SubTitle title={m.endDeviceType} />
       <Form.Field title={m.inputMethod} name="_inputMethod" component={Radio.Group}>
         <Radio label={m.inputMethodDeviceRepo} value="device-repository" />
         <Radio label={m.inputMethodManual} value="manual" />
       </Form.Field>
-      {_inputMethod === 'device-repository' && <DeviceTypeRepositoryFormSection />}
+      {_inputMethod === 'device-repository' && (
+        <DeviceTypeRepositoryFormSection
+          getRegistrationTemplate={getRegistrationTemplate}
+          appId={appId}
+        />
+      )}
       {_inputMethod === 'manual' && <DeviceTypeManualFormSection />}
     </>
   )
+}
+
+DeviceTypeFormSection.propTypes = {
+  appId: PropTypes.string,
+  getRegistrationTemplate: PropTypes.func,
+}
+DeviceTypeFormSection.defaultProps = {
+  appId: undefined,
+  getRegistrationTemplate: () => null,
 }
 
 export { DeviceTypeFormSection as default, initialValues }
