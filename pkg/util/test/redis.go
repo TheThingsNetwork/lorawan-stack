@@ -24,8 +24,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/go-redis/redis/v8"
 	ulid "github.com/oklog/ulid/v2"
+	"github.com/redis/go-redis/v9"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 )
 

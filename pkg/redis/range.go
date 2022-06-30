@@ -20,7 +20,7 @@ import (
 	"runtime/trace"
 	"strconv"
 
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 )
 
 func rangeScanIteration(cmd *redis.ScanCmd, f func(...string) (bool, error)) (uint64, error) {

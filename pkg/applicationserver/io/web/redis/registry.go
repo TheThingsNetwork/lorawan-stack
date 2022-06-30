@@ -20,8 +20,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-redis/redis/v8"
 	"github.com/gogo/protobuf/proto"
+	"github.com/redis/go-redis/v9"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"

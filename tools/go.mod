@@ -85,7 +85,7 @@ require (
 	github.com/blevesearch/zap/v14 v14.0.5 // indirect
 	github.com/blevesearch/zap/v15 v15.0.3 // indirect
 	github.com/bluele/gcache v0.0.2 // indirect
-	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/couchbase/vellum v1.0.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
@@ -103,7 +103,6 @@ require (
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/go-redis/redis/v8 v8.11.4 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-jwt/jwt/v4 v4.3.0 // indirect
@@ -175,6 +174,7 @@ require (
 	github.com/prometheus/common v0.32.1 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
 	github.com/prometheus/statsd_exporter v0.22.4 // indirect
+	github.com/redis/go-redis/v9 v9.0.1 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect

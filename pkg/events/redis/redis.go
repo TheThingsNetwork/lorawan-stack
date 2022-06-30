@@ -22,7 +22,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
