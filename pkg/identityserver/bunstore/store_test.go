@@ -50,7 +50,6 @@ type testStore struct {
 
 	// authenticationProviderStore
 	// externalUserStore
-	// tenantStore
 }
 
 func (t testStore) Init(ctx context.Context) error {
@@ -74,8 +73,8 @@ func newTestStore(t *testing.T, dsn *url.URL) storetest.Store {
 	return &testStore{
 		db: db,
 
-		applicationStore: newApplicationStore(baseStore),
-		clientStore:      newClientStore(baseStore),
+		applicationStore:  newApplicationStore(baseStore),
+		clientStore:       newClientStore(baseStore),
 		endDeviceStore:    newEndDeviceStore(baseStore),
 		gatewayStore:      newGatewayStore(baseStore),
 		organizationStore: newOrganizationStore(baseStore),
@@ -93,7 +92,6 @@ func newTestStore(t *testing.T, dsn *url.URL) storetest.Store {
 
 		// authenticationProviderStore: authenticationProviderStore{baseStore: baseStore},
 		// externalUserStore:           externalUserStore{baseStore: baseStore},
-		// tenantStore:                 tenantStore{baseStore: baseStore},
 	}
 }
 
