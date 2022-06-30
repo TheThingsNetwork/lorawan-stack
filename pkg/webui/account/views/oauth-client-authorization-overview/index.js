@@ -20,6 +20,9 @@ import { Switch, Route } from 'react-router-dom'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Tabs from '@ttn-lw/components/tabs'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
@@ -54,6 +57,11 @@ const AuthorizationOverview = props => {
     siteName,
   } = props
 
+  useBreadcrumbs(
+    'client-authorizations.single',
+    <Breadcrumb path={`/client-authorizations/${clientId}`} content={clientId} />,
+  )
+
   const basePath = `/client-authorizations/${clientId}`
 
   const tabs = [
@@ -68,6 +76,7 @@ const AuthorizationOverview = props => {
   return (
     <React.Fragment>
       <IntlHelmet titleTemplate={`%s - ${clientId} - ${siteName}`} />
+      <Breadcrumbs />
       <div className={style.titleSection}>
         <Container>
           <Row>
