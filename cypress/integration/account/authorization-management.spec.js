@@ -53,10 +53,10 @@ describe('Account App authorization management', () => {
     })
   })
 
-  it('succeeds de-authorizing clients', () => {
+  it('succeeds revoking authorizations', () => {
     cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
     cy.visit(`${Cypress.config('accountAppRootPath')}/client-authorizations/console`)
-    cy.findByRole('button', { name: /De-authorize this client/ }).click()
+    cy.findByRole('button', { name: /Revoke authorization/ }).click()
     cy.findByTestId('error-notification').should('not.exist')
 
     cy.location('pathname').should(
