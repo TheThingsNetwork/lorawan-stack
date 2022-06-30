@@ -15,7 +15,12 @@
 import { defineMessages } from 'react-intl'
 
 export default defineMessages({
+  endDeviceType: 'End device type information',
+  provisioningTitle: 'Provisioning information',
   inputMethod: 'Input Method',
   inputMethodDeviceRepo: 'Select the end device in the LoRaWAN Device Repository',
   inputMethodManual: 'Enter end device specifics manually',
+  otherOption: 'Other…',
+  typeToSearch: 'Type to search…',
+  unknownHwOption: 'Unknown ver.',
 })
