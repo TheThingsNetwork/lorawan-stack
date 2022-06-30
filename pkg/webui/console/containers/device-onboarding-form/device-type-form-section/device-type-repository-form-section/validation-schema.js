@@ -20,6 +20,14 @@ import Yup from '@ttn-lw/lib/yup'
 //    Consider all values as backend values. Exceptions may apply in consideration.
 // 2. Comment each individual validation prop and use whitespace to structure visually.
 // 3. Do not use ternary assignments but use plain if statements to ensure clarity.
-const validationSchema = Yup.object({})
+const validationSchema = Yup.object({
+  version_ids: Yup.object({
+    brand_id: Yup.string(),
+    model_id: Yup.string(),
+    hardware_version: Yup.string(),
+    firmware_version: Yup.string(),
+    band_id: Yup.string(),
+  }),
+})
 
 export default validationSchema
