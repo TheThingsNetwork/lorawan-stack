@@ -21,7 +21,6 @@ import Button from '@ttn-lw/components/button'
 import SafeInspector from '@ttn-lw/components/safe-inspector'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
-import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
