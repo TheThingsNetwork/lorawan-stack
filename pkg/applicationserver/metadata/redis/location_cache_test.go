@@ -73,7 +73,7 @@ func TestLocationCache(t *testing.T) {
 	locations, storedAt, err := cache.Get(ctx, registeredEndDeviceIDs)
 	if a.So(err, should.BeNil) {
 		if a.So(storedAt, should.NotBeNil) {
-			a.So(*storedAt, should.HappenAfter, storeTime)
+			a.So(*storedAt, should.HappenOnOrAfter, storeTime)
 		}
 		a.So(len(locations), should.Equal, len(locationA))
 		for k, v := range locations {
@@ -88,7 +88,7 @@ func TestLocationCache(t *testing.T) {
 	locations, storedAt, err = cache.Get(ctx, registeredEndDeviceIDs)
 	if a.So(err, should.BeNil) {
 		if a.So(storedAt, should.NotBeNil) {
-			a.So(*storedAt, should.HappenAfter, storeTime)
+			a.So(*storedAt, should.HappenOnOrAfter, storeTime)
 		}
 		a.So(len(locations), should.Equal, len(locationB))
 		for k, v := range locations {
@@ -110,7 +110,7 @@ func TestLocationCache(t *testing.T) {
 	locations, storedAt, err = cache.Get(ctx, registeredEndDeviceIDs)
 	if a.So(err, should.BeNil) {
 		if a.So(storedAt, should.NotBeNil) {
-			a.So(*storedAt, should.HappenAfter, storeTime)
+			a.So(*storedAt, should.HappenOnOrAfter, storeTime)
 		}
 		a.So(len(locations), should.Equal, len(locationA))
 		for k, v := range locations {

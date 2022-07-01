@@ -26,7 +26,7 @@ import env from '@ttn-lw/lib/env'
 import dev from '@ttn-lw/lib/dev'
 import requestPromiseMiddleware from '@ttn-lw/lib/store/middleware/request-promise-middleware'
 
-import { selectUserId } from '@console/store/selectors/user'
+import { selectUserId } from '@console/store/selectors/logout'
 
 import createRootReducer from './reducers'
 import logics from './middleware/logics'

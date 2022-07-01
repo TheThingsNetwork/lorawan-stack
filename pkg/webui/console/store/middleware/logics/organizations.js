@@ -19,7 +19,7 @@ import { getOrganizationId } from '@ttn-lw/lib/selectors/id'
 
 import * as organizations from '@console/store/actions/organizations'
 
-import { selectUserId } from '@console/store/selectors/user'
+import { selectUserId } from '@console/store/selectors/logout'
 
 import createEventsConnectLogics from './events'
 

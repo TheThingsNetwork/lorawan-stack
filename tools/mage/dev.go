@@ -15,10 +15,10 @@
 package ttnmage
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 	"time"
@@ -68,7 +68,6 @@ var (
 	devDataDir            = ".env/data"
 	devDir                = ".env"
 	devDatabaseName       = "ttn_lorawan_dev"
-	devSeedDatabaseName   = "tts_seed"
 	devDockerComposeFlags = []string{"-p", "lorawan-stack-dev"}
 	databaseURI           = fmt.Sprintf("postgresql://root:root@localhost:5432/%s?sslmode=disable", devDatabaseName)
 	testDatabaseNames     = []string{"ttn_lorawan_is_test", "ttn_lorawan_is_store_test"}
@@ -107,38 +106,31 @@ func (Dev) SQLDump() error {
 	if mg.Verbose() {
 		fmt.Println("Saving sql database dump")
 	}
-	if err := os.MkdirAll(".cache", 0o755); err != nil {
+	if err := os.MkdirAll(path.Join(".env", "cache"), 0o755); err != nil {
 		return err
 	}
-	output, err := sh.Output("docker-compose", dockerComposeFlags("exec", "-T", "postgres", "pg_dump", devDatabaseName)...)
-	if err != nil {
-		return err
-	}
-	return os.WriteFile(filepath.Join(".cache", "sqldump.sql"), []byte(output), 0o644)
-}
-
-// SQLCreateSeedDB creates a database template from the current dump.
-func (Dev) SQLCreateSeedDB() error {
-	if mg.Verbose() {
-		fmt.Println("Creating seed DB from dump")
-	}
-	d := filepath.Join(".cache", "sqldump.sql")
-	if _, err := os.Stat(d); errors.Is(err, os.ErrNotExist) {
-		return fmt.Errorf("Dumpfile does not exist: %s", d)
-	}
-	return sh.Run(filepath.Join("tools", "mage", "scripts", "recreate-db-from-dump.sh"), devSeedDatabaseName, d)
+	return execDockerCompose("exec", "-T", "postgres",
+		"pg_dump", "-Fc", "-f", "/var/lib/ttn-lorawan/cache/database.pgdump", devDatabaseName,
+	)
 }
 
 // SQLRestore restores the dev database using a previously generated dump.
-func (Dev) SQLRestore(ctx context.Context) error {
+func (Dev) SQLRestore() error {
 	if mg.Verbose() {
 		fmt.Println("Restoring database from dump")
 	}
-	d := filepath.Join(".cache", "sqldump.sql")
+	d := filepath.Join(".env", "cache", "database.pgdump")
 	if _, err := os.Stat(d); errors.Is(err, os.ErrNotExist) {
 		return fmt.Errorf("Dumpfile does not exist: %w", d)
 	}
-	return sh.Run(filepath.Join("tools", "mage", "scripts", "recreate-db-from-dump.sh"), devDatabaseName, d)
+	return execDockerCompose("exec", "-T", "postgres", "/bin/bash", "-c",
+		fmt.Sprintf(
+			"dropdb --if-exists --force %[1]s && "+
+				"createdb %[1]s && "+
+				"pg_restore -Fc -d %[1]s %[2]s",
+			devDatabaseName, "/var/lib/ttn-lorawan/cache/database.pgdump",
+		),
+	)
 }
 
 // RedisFlush deletes all keys from redis.
@@ -168,18 +160,50 @@ func (Dev) DBStart() error {
 	if err := execDockerCompose(append([]string{"up", "-d"}, devDatabases...)...); err != nil {
 		return err
 	}
-	var cerr error
-	if os.Getenv("CI") != "true" {
-		flags := dockerComposeFlags(append([]string{"exec", "postgres", "pg_isready"})...)
-		for i := 0; i < 15; i++ {
-			if _, cerr = sh.Exec(nil, nil, nil, "docker-compose", flags...); cerr == nil {
-				break
-			}
-			time.Sleep(2 * time.Second)
-		}
-		return cerr
+
+	// When TimescaleDB starts for the first time, it restarts Postgres after initialization.
+	// Therefore, pg_isready may return a successful exit code during initialization, while the database shuts down
+	// shortly after. Therefore, the ready check goes in two cycles and only returns after 10 successive ready
+	// indications.
+	if mg.Verbose() {
+		fmt.Println("Waiting for Postgres to be ready")
 	}
-	return execDockerCompose("ps")
+	flags := dockerComposeFlags("exec", "-T", "postgres", "pg_isready")
+nextCycle:
+	for i := 0; i < 2; i++ {
+		var (
+			wasReady        bool
+			successiveReady int
+		)
+		for j := 0; j < 30; j++ {
+			time.Sleep(time.Second)
+			_, err := sh.Exec(nil, nil, nil, "docker-compose", flags...)
+			isReady := err == nil
+			switch {
+			case wasReady && !isReady:
+				if mg.Verbose() {
+					fmt.Println("Postgres is not ready anymore")
+				}
+				continue nextCycle
+			case !wasReady && isReady:
+				if mg.Verbose() {
+					fmt.Println("Postgres is ready, checking if it stays ready")
+				}
+				successiveReady = 1
+			case wasReady && isReady:
+				successiveReady++
+				if successiveReady == 10 {
+					if mg.Verbose() {
+						fmt.Println("Postgres ready state seems stable")
+					}
+					return nil
+				}
+			}
+			wasReady = isReady
+		}
+		return errors.New("No ready indication within 30 checks")
+	}
+	return errors.New("Postgres is not ready")
 }
 
 // DBStop stops the databases of the development environment.

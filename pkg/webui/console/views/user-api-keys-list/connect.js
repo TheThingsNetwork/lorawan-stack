@@ -14,7 +14,7 @@
 
 import { connect } from 'react-redux'
 
-import { selectUserId } from '@console/store/selectors/user'
+import { selectUserId } from '@console/store/selectors/logout'
 
 const mapStateToProps = state => ({
   userId: selectUserId(state),

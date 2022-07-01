@@ -18,7 +18,7 @@ import {
   GET_USER_ME,
   LOGOUT_FAILURE,
   GET_USER_RIGHTS_SUCCESS,
-} from '@console/store/actions/user'
+} from '@console/store/actions/logout'
 
 const defaultState = {
   user: undefined,

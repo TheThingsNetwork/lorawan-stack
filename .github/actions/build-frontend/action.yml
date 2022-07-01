@@ -9,27 +9,21 @@ runs:
   using: composite
   steps:
     - name: Initialize public folder cache
-      id: public-cache
+      id: cache
       uses: actions/cache@v3
       with:
-        path: public
-        key: ${{ runner.os }}-public-${{ hashFiles('pkg/webui/**', 'sdk/js/**/*.js', 'sdk/js/generated/*.json', 'config/babel.config.json', 'config/webpack.config.babel.js', 'package.json', 'yarn.lock', 'sdk/js/yarn.lock')}}
-    - name: Initialize Babel cache
-      if: steps.public-cache.outputs.cache-hit != 'true'
-      uses: actions/cache@v3
-      with:
-        path: .cache/babel
-        key: ${{ runner.os }}-babel-cache-${{ hashFiles('pkg/webui/**', 'sdk/js/**/*.js', 'sdk/js/generated/*.json', 'config/babel.config.json', 'config/webpack.config.babel.js', 'package.json', 'yarn.lock', 'sdk/js/yarn.lock')}}
-        restore-keys: |
-          ${{ runner.os }}-babel-cache-
+        path: |
+          public
+          .cache/babel
+        key: ${{ runner.os }}-build-frontend-${{ hashFiles('pkg/webui/**', 'sdk/js/**/*.js', 'sdk/js/generated/*.json', 'config/babel.config.json', 'config/webpack.config.babel.js', 'package.json', 'yarn.lock', 'sdk/js/yarn.lock')}}
     - name: Build DLLs
-      if: steps.public-cache.outputs.cache-hit != 'true'
+      if: steps.cache.outputs.cache-hit != 'true'
       shell: bash
       run: tools/bin/mage js:buildDll
       env:
         WEBPACK_GENERATE_PRODUCTION_SOURCEMAPS: ${{ inputs.production-sourcemaps }}
     - name: Build Frontend
-      if: steps.public-cache.outputs.cache-hit != 'true'
+      if: steps.cache.outputs.cache-hit != 'true'
       shell: bash
       run: tools/bin/mage js:build
       env:

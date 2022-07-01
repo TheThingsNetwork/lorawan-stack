@@ -41,7 +41,7 @@ import {
   restoreOrganization,
 } from '@console/store/actions/organizations'
 
-import { selectUserIsAdmin } from '@console/store/selectors/user'
+import { selectUserIsAdmin } from '@console/store/selectors/logout'
 import {
   selectOrganizations,
   selectOrganizationsTotalCount,

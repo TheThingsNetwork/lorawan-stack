@@ -1617,7 +1617,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 					RejoinCountPeriodicity:     ttnpb.RejoinCountExponent_REJOIN_COUNT_16,
 					PingSlotFrequency:          mac.DeviceDesiredPingSlotFrequency(dev, phy, fp, defaultMACSettings),
 					BeaconFrequency:            mac.DeviceDesiredBeaconFrequency(dev, defaultMACSettings),
-					Channels:                   mac.DeviceDesiredChannels(dev, phy, fp, defaultMACSettings),
+					Channels:                   test.Must(mac.DeviceDesiredChannels(dev, phy, fp, defaultMACSettings)).([]*ttnpb.MACParameters_Channel),
 					UplinkDwellTime:            mac.DeviceDesiredUplinkDwellTime(phy, fp),
 					DownlinkDwellTime:          mac.DeviceDesiredDownlinkDwellTime(phy, fp),
 					AdrAckLimitExponent:        mac.DeviceDesiredADRAckLimitExponent(dev, phy, defaultMACSettings),

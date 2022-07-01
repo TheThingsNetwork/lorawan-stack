@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   postgres:
-    image: postgres
+    image: postgres:14
     restart: unless-stopped
     environment:
       - POSTGRES_PASSWORD=root
@@ -9,6 +9,7 @@ services:
       - POSTGRES_DB=ttn_lorawan_dev
     volumes:
       - ${DEV_DATA_DIR:-.env/data}/postgres:/var/lib/postgresql/data
+      - .env/cache:/var/lib/ttn-lorawan/cache
     ports:
       - "127.0.0.1:5432:5432"
 

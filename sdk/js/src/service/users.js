@@ -166,6 +166,31 @@ class Users {
       },
     })
   }
+
+  // Invitations.
+  async sendInvite(email) {
+    const response = await this._api.UserInvitationRegistry.Send(undefined, email)
+
+    return Marshaler.unwrapInvitation(response)
+  }
+
+  async getAllInvitations(params, selector) {
+    const fieldMask = Marshaler.selectorToFieldMask(selector)
+    const result = await this._api.UserInvitationRegistry.List(undefined, {
+      ...params,
+      ...fieldMask,
+    })
+    const invitations = Marshaler.payloadListResponse('invitations', result)
+    invitations.invitations.map(i => this._addState(fieldMask, i))
+
+    return invitations
+  }
+
+  async deleteInvite(email) {
+    const response = await this._api.UserInvitationRegistry.Delete(undefined, email)
+
+    return Marshaler.unwrapInvitation(response)
+  }
 }
 
 export default Users

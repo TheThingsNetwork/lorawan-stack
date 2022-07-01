@@ -23,6 +23,7 @@ import {
   GET_USERS_LIST_BASE,
   GET_USER_BASE,
   GET_USER_RIGHTS_LIST_BASE,
+  GET_USER_INVITATIONS_BASE,
 } from '@console/store/actions/users'
 
 import { createRightsSelector, createPseudoRightsSelector } from './rights'
@@ -55,3 +56,9 @@ export const selectUserRights = createRightsSelector(ENTITY)
 export const selectUserPseudoRights = createPseudoRightsSelector(ENTITY)
 export const selectUserRightsError = createErrorSelector(GET_USER_RIGHTS_LIST_BASE)
 export const selectUserRightsFetching = createFetchingSelector(GET_USER_RIGHTS_LIST_BASE)
+
+// Invitations.
+export const selectUserInvitations = state => selectUserStore(state).invitations
+export const selectUserInvitationsTotalCount = state => selectUserStore(state).invitationsTotalCount
+export const selectUserInvitationsFetching = createFetchingSelector(GET_USER_INVITATIONS_BASE)
+export const selectUserInvitationsError = createErrorSelector(GET_USER_INVITATIONS_BASE)

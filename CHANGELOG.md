@@ -13,22 +13,37 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
-- In AS923 frequency plans, the Network Server will skip the RX1 window if the data rate is ambiguous.
-  - This change occurs in old Regional Parameters versions in which the initial downlink dwell time setting of the end device is not specified. The end device may have the downlink dwell time setting either enabled or disabled, and due to this the data rate of the RX1 window is ambiguous.
-  - This ambiguity exists until the Network Server is successful in negotiating the dwell time limitations using the TxParamSetupReq MAC command. This will occur automatically and does not require any external input.
-  - If you already know the boot dwell time settings of your end device, you may provide them via the `--mac-settings.downlink-dwell-time` and `--mac-settings.uplink-dwell-time` MAC settings. This will ensure that RX1 transmissions are available from the first uplink of the session.
-
 ### Deprecated
 
 ### Removed
 
 ### Fixed
 
-- Fix `last activity` not updating when an end device joins for the first time in the Console.
-- Fix a bug that would show the "Status count periodicity"-field in the Console as `200` when actually set to `0`.
-- Fix location bug in the Console.
-
 ### Security
+
+## [3.20.1] - 2022-06-29
+
+### Added
+
+- Support inviting users in the Console.
+
+### Changed
+
+- In AS923 frequency plans, the Network Server will skip the RX1 window if the data rate is ambiguous.
+  - This change occurs in old Regional Parameters versions in which the initial downlink dwell time setting of the end device is not specified. The end device may have the downlink dwell time setting either enabled or disabled, and due to this the data rate of the RX1 window is ambiguous.
+  - This ambiguity exists until the Network Server is successful in negotiating the dwell time limitations using the TxParamSetupReq MAC command. This will occur automatically and does not require any external input.
+  - If you already know the boot dwell time settings of your end device, you may provide them via the `--mac-settings.downlink-dwell-time` and `--mac-settings.uplink-dwell-time` MAC settings. This will ensure that RX1 transmissions are available from the first uplink of the session.
+
+### Removed
+
+- Sorting on associated rights in the API keys table.
+
+### Fixed
+
+- `last activity` not updating when an end device joins for the first time in the Console.
+- A bug that would show the "Status count periodicity"-field in the Console as `200` when actually set to `0`.
+- A bug causing map viewports to be set in odd locations when setting end device/gateway locations.
+- Console crashing when sorting by associated rights in the API keys table.
 
 ## [3.20.0] - 2022-06-15
 
@@ -2203,7 +2218,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.20.0...v3.20
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.20.1...v3.20
+[3.20.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.20.0...v3.20.1
 [3.20.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.19.2...v3.20.0
 [3.19.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.19.1...v3.19.2
 [3.19.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.19.0...v3.19.1
