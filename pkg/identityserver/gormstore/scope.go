@@ -186,9 +186,14 @@ func withPrimaryEmailAddress(emails ...string) func(*gorm.DB) *gorm.DB {
 		case 0:
 			return db
 		case 1:
-			return db.Where("users.primary_email_address = ?", emails[0])
+			email := strings.ToLower(emails[0])
+			return db.Where("LOWER(users.primary_email_address) = ?", email)
 		default:
-			return db.Where("users.primary_email_address IN (?)", emails)
+			emails := append(make([]string, 0, len(emails)), emails...)
+			for i := range emails {
+				emails[i] = strings.ToLower(emails[i])
+			}
+			return db.Where("LOWER(users.primary_email_address) IN (?)", emails)
 		}
 	}
 }
