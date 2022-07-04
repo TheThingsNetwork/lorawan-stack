@@ -13,6 +13,9 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Deleted users are no longer included in primary email addresses uniqueness checks. This allows a user to create a new account which uses the email address of a deleted account.
+  - This requires a database schema migration (`ttn-lw-stack is-db migrate`) due to updated indices.
+
 ### Deprecated
 
 ### Removed

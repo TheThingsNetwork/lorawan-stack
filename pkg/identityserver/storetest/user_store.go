@@ -126,6 +126,14 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsAlreadyExists(err), should.BeTrue)
 		}
+
+		_, err = s.CreateUser(ctx, &ttnpb.User{
+			Ids:                 &ttnpb.UserIdentifiers{UserId: "other"},
+			PrimaryEmailAddress: "Foo@example.com",
+		})
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsAlreadyExists(err), should.BeTrue)
+		}
 	})
 
 	t.Run("GetUser", func(t *T) {
@@ -152,6 +160,11 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 	t.Run("GetUserByPrimaryEmailAddress", func(t *T) {
 		a, ctx := test.New(t)
 		got, err := s.GetUserByPrimaryEmailAddress(ctx, "foo@example.com", mask)
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.Resemble, created)
+		}
+
+		got, err = s.GetUserByPrimaryEmailAddress(ctx, "Foo@example.com", mask)
 		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
 			a.So(got, should.Resemble, created)
 		}
@@ -306,6 +319,21 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 			}
 			a.So(got[0], should.Resemble, updated)
 		}
+	})
+
+	t.Run("CreateDuplicatePrimaryEmailAddress", func(t *T) {
+		a, ctx := test.New(t)
+		_, err := s.CreateUser(ctx, &ttnpb.User{
+			Ids:                 &ttnpb.UserIdentifiers{UserId: "bar"},
+			PrimaryEmailAddress: "foo@example.com",
+		})
+		// The returned user is not checked as the `CreateUser` test
+		// already covers this.
+		a.So(err, should.BeNil)
+		err = s.DeleteUser(ctx, &ttnpb.UserIdentifiers{UserId: "bar"})
+		a.So(err, should.BeNil)
+		err = s.PurgeUser(ctx, &ttnpb.UserIdentifiers{UserId: "bar"})
+		a.So(err, should.BeNil)
 	})
 
 	t.Run("RestoreUser", func(t *T) {
