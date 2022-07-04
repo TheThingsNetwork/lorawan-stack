@@ -185,6 +185,14 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 		// }
 	})
 
+	t.Run("CountGateways", func(t *T) {
+		a, ctx := test.New(t)
+		got, err := s.CountGateways(ctx)
+		if a.So(err, should.BeNil) {
+			a.So(got, should.Equal, 1)
+		}
+	})
+
 	t.Run("FindGateways", func(t *T) {
 		a, ctx := test.New(t)
 		got, err := s.FindGateways(ctx, nil, mask)

@@ -30,6 +30,7 @@ type FieldMask []string
 // sufficient rights to perform the action.
 type ApplicationStore interface {
 	CreateApplication(ctx context.Context, app *ttnpb.Application) (*ttnpb.Application, error)
+	CountApplications(ctx context.Context) (uint64, error)
 	FindApplications(
 		ctx context.Context, ids []*ttnpb.ApplicationIdentifiers, fieldMask FieldMask,
 	) ([]*ttnpb.Application, error)
@@ -50,6 +51,7 @@ type ApplicationStore interface {
 // sufficient rights to perform the action.
 type ClientStore interface {
 	CreateClient(ctx context.Context, cli *ttnpb.Client) (*ttnpb.Client, error)
+	CountClients(ctx context.Context) (uint64, error)
 	FindClients(
 		ctx context.Context, ids []*ttnpb.ClientIdentifiers, fieldMask FieldMask,
 	) ([]*ttnpb.Client, error)
@@ -96,6 +98,7 @@ type EndDeviceStore interface {
 // sufficient rights to perform the action.
 type GatewayStore interface {
 	CreateGateway(ctx context.Context, gtw *ttnpb.Gateway) (*ttnpb.Gateway, error)
+	CountGateways(ctx context.Context) (uint64, error)
 	FindGateways(
 		ctx context.Context, ids []*ttnpb.GatewayIdentifiers, fieldMask FieldMask,
 	) ([]*ttnpb.Gateway, error)
@@ -118,6 +121,7 @@ type OrganizationStore interface {
 	CreateOrganization(
 		ctx context.Context, org *ttnpb.Organization,
 	) (*ttnpb.Organization, error)
+	CountOrganizations(ctx context.Context) (uint64, error)
 	FindOrganizations(
 		ctx context.Context, ids []*ttnpb.OrganizationIdentifiers, fieldMask FieldMask,
 	) ([]*ttnpb.Organization, error)
@@ -138,6 +142,7 @@ type OrganizationStore interface {
 // sufficient rights to perform the action.
 type UserStore interface {
 	CreateUser(ctx context.Context, usr *ttnpb.User) (*ttnpb.User, error)
+	CountUsers(ctx context.Context) (uint64, error)
 	FindUsers(
 		ctx context.Context, ids []*ttnpb.UserIdentifiers, fieldMask FieldMask,
 	) ([]*ttnpb.User, error)
@@ -181,6 +186,9 @@ type UserSessionStore interface {
 // As the operations in this store may be quite expensive, the results of FindXXX
 // operations should typically be cached. The recommended cache behavior is:
 type MembershipStore interface {
+	// Count direct memberships of the organization or user.
+	CountMemberships(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityType string) (uint64, error)
+
 	// Find direct and optionally also indirect memberships of the organization or user.
 	FindMemberships(
 		ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityType string, includeIndirect bool,

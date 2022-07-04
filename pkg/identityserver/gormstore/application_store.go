@@ -94,6 +94,16 @@ func (s *applicationStore) CreateApplication(ctx context.Context, app *ttnpb.App
 	return &appProto, nil
 }
 
+func (s *applicationStore) CountApplications(ctx context.Context) (uint64, error) {
+	defer trace.StartRegion(ctx, "count applications").End()
+
+	var total uint64
+	if err := s.query(ctx, Application{}, withApplicationID()).Count(&total).Error; err != nil {
+		return 0, err
+	}
+	return total, nil
+}
+
 func (s *applicationStore) FindApplications(
 	ctx context.Context, ids []*ttnpb.ApplicationIdentifiers, fieldMask store.FieldMask,
 ) ([]*ttnpb.Application, error) {

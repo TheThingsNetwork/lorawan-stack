@@ -107,6 +107,14 @@ func (st *StoreTest) TestApplicationStoreCRUD(t *T) {
 		// }
 	})
 
+	t.Run("CountApplications", func(t *T) {
+		a, ctx := test.New(t)
+		got, err := s.CountApplications(ctx)
+		if a.So(err, should.BeNil) {
+			a.So(got, should.Equal, 1)
+		}
+	})
+
 	t.Run("FindApplications", func(t *T) {
 		a, ctx := test.New(t)
 		got, err := s.FindApplications(ctx, nil, mask)

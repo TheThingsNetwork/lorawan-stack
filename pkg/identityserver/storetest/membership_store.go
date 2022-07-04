@@ -104,6 +104,14 @@ func (st *StoreTest) TestMembershipStoreCRUD(t *T) {
 				}
 			})
 
+			t.Run("CountMemberships", func(t *T) {
+				a, ctx := test.New(t)
+				got, err := s.CountMemberships(ctx, usr1.GetOrganizationOrUserIdentifiers(), ids.EntityType())
+				if a.So(err, should.BeNil) {
+					a.So(got, should.Equal, 1)
+				}
+			})
+
 			t.Run("FindMemberships", func(t *T) {
 				a, ctx := test.New(t)
 				res, err := s.FindMemberships(ctx, usr1.GetOrganizationOrUserIdentifiers(), ids.EntityType(), false)

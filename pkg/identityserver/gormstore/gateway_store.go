@@ -98,6 +98,16 @@ func (s *gatewayStore) CreateGateway(ctx context.Context, gtw *ttnpb.Gateway) (*
 	return &gtwProto, nil
 }
 
+func (s *gatewayStore) CountGateways(ctx context.Context) (uint64, error) {
+	defer trace.StartRegion(ctx, "count gateways").End()
+
+	var total uint64
+	if err := s.query(ctx, Gateway{}, withGatewayID()).Count(&total).Error; err != nil {
+		return 0, err
+	}
+	return total, nil
+}
+
 func (s *gatewayStore) FindGateways(
 	ctx context.Context, ids []*ttnpb.GatewayIdentifiers, fieldMask store.FieldMask,
 ) ([]*ttnpb.Gateway, error) {

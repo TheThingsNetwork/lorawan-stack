@@ -85,6 +85,16 @@ func (s *userStore) CreateUser(ctx context.Context, usr *ttnpb.User) (*ttnpb.Use
 	return &userProto, nil
 }
 
+func (s *userStore) CountUsers(ctx context.Context) (uint64, error) {
+	defer trace.StartRegion(ctx, "count users").End()
+
+	var total uint64
+	if err := s.query(ctx, User{}, withUserID()).Count(&total).Error; err != nil {
+		return 0, err
+	}
+	return total, nil
+}
+
 func (s *userStore) FindUsers(
 	ctx context.Context, ids []*ttnpb.UserIdentifiers, fieldMask store.FieldMask,
 ) ([]*ttnpb.User, error) {

@@ -101,6 +101,14 @@ func (st *StoreTest) TestOrganizationStoreCRUD(t *T) {
 		// }
 	})
 
+	t.Run("CountOrganizations", func(t *T) {
+		a, ctx := test.New(t)
+		got, err := s.CountOrganizations(ctx)
+		if a.So(err, should.BeNil) {
+			a.So(got, should.Equal, 1)
+		}
+	})
+
 	t.Run("FindOrganizations", func(t *T) {
 		a, ctx := test.New(t)
 		got, err := s.FindOrganizations(ctx, nil, mask)
