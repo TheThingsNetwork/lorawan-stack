@@ -86,6 +86,13 @@ func (is *IdentityServer) listInvitations(ctx context.Context, req *ttnpb.ListIn
 	if !authInfo.GetUniversalRights().IncludesAll(ttnpb.Right_RIGHT_SEND_INVITES) {
 		return nil, errNoInviteRights.New()
 	}
+	var total uint64
+	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
+	defer func() {
+		if err == nil {
+			setTotalHeader(ctx, total)
+		}
+	}()
 	invitations = &ttnpb.Invitations{}
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		invitations.Invitations, err = st.FindInvitations(ctx)
