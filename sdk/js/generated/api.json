@@ -18642,6 +18642,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "gateway_ip_address",
+              "description": "Gateway IP Address.",
+              "label": "",
+              "type": "GatewayIPAddress",
+              "longType": "GatewayIPAddress",
+              "fullType": "ttn.lorawan.v3.GatewayIPAddress",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -18782,6 +18794,42 @@
               "type": "float",
               "longType": "float",
               "fullType": "float",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "GatewayIPAddress",
+          "longName": "GatewayIPAddress",
+          "fullName": "ttn.lorawan.v3.GatewayIPAddress",
+          "description": "IP Address of the Gateway, as seen by the Gateway Server.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "value",
+              "description": "IPv4 or IPv6.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "transport",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",

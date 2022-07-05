@@ -2952,6 +2952,89 @@ var _GatewayStatus_Versions_Pattern = regexp.MustCompile("^[a-z0-9](?:[_-]?[a-z0
 
 var _GatewayStatus_Metrics_Pattern = regexp.MustCompile("^[a-z0-9](?:[_-]?[a-z0-9]){2,}$")
 
+// ValidateFields checks the field values on GatewayIPAddress with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *GatewayIPAddress) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GatewayIPAddressFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "value":
+			// no validation rules for Value
+		case "transport":
+			// no validation rules for Transport
+		default:
+			return GatewayIPAddressValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// GatewayIPAddressValidationError is the validation error returned by
+// GatewayIPAddress.ValidateFields if the designated constraints aren't met.
+type GatewayIPAddressValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GatewayIPAddressValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GatewayIPAddressValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GatewayIPAddressValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GatewayIPAddressValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GatewayIPAddressValidationError) ErrorName() string { return "GatewayIPAddressValidationError" }
+
+// Error satisfies the builtin error interface
+func (e GatewayIPAddressValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGatewayIPAddress.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GatewayIPAddressValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GatewayIPAddressValidationError{}
+
 // ValidateFields checks the field values on GatewayConnectionStats with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -3072,6 +3155,18 @@ func (m *GatewayConnectionStats) ValidateFields(paths ...string) error {
 					}
 				}
 
+			}
+
+		case "gateway_ip_address":
+
+			if v, ok := interface{}(m.GetGatewayIpAddress()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GatewayConnectionStatsValidationError{
+						field:  "gateway_ip_address",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
 			}
 
 		default:

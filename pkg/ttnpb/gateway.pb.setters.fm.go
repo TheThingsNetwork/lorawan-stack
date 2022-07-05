@@ -1548,6 +1548,37 @@ func (dst *GatewayStatus) SetFields(src *GatewayStatus, paths ...string) error {
 	return nil
 }
 
+func (dst *GatewayIPAddress) SetFields(src *GatewayIPAddress, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "value":
+			if len(subs) > 0 {
+				return fmt.Errorf("'value' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Value = src.Value
+			} else {
+				var zero string
+				dst.Value = zero
+			}
+		case "transport":
+			if len(subs) > 0 {
+				return fmt.Errorf("'transport' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Transport = src.Transport
+			} else {
+				var zero string
+				dst.Transport = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *GatewayConnectionStats) SetFields(src *GatewayConnectionStats, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
@@ -1684,6 +1715,31 @@ func (dst *GatewayConnectionStats) SetFields(src *GatewayConnectionStats, paths 
 				dst.SubBands = src.SubBands
 			} else {
 				dst.SubBands = nil
+			}
+		case "gateway_ip_address":
+			if len(subs) > 0 {
+				var newDst, newSrc *GatewayIPAddress
+				if (src == nil || src.GatewayIpAddress == nil) && dst.GatewayIpAddress == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.GatewayIpAddress
+				}
+				if dst.GatewayIpAddress != nil {
+					newDst = dst.GatewayIpAddress
+				} else {
+					newDst = &GatewayIPAddress{}
+					dst.GatewayIpAddress = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.GatewayIpAddress = src.GatewayIpAddress
+				} else {
+					dst.GatewayIpAddress = nil
+				}
 			}
 
 		default:

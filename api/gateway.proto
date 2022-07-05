@@ -391,6 +391,12 @@ message GatewayStatus {
   google.protobuf.Struct advanced = 99;
 }
 
+// IP Address of the Gateway, as seen by the Gateway Server.
+message GatewayIPAddress {
+  string value = 1; // IPv4 or IPv6.
+  string transport = 2;
+}
+
 // Connection stats as monitored by the Gateway Server.
 message GatewayConnectionStats {
   google.protobuf.Timestamp connected_at = 1;
@@ -422,5 +428,8 @@ message GatewayConnectionStats {
   // Statistics for each sub band.
   repeated SubBand sub_bands = 10;
 
-  // next: 12
+  // Gateway IP Address.
+  GatewayIPAddress gateway_ip_address = 12;
+
+  // next: 13
 }

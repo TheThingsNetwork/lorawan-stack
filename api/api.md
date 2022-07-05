@@ -261,6 +261,7 @@
   - [Message `GatewayConnectionStats`](#ttn.lorawan.v3.GatewayConnectionStats)
   - [Message `GatewayConnectionStats.RoundTripTimes`](#ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes)
   - [Message `GatewayConnectionStats.SubBand`](#ttn.lorawan.v3.GatewayConnectionStats.SubBand)
+  - [Message `GatewayIPAddress`](#ttn.lorawan.v3.GatewayIPAddress)
   - [Message `GatewayModel`](#ttn.lorawan.v3.GatewayModel)
   - [Message `GatewayRadio`](#ttn.lorawan.v3.GatewayRadio)
   - [Message `GatewayRadio.TxConfiguration`](#ttn.lorawan.v3.GatewayRadio.TxConfiguration)
@@ -4137,6 +4138,7 @@ Connection stats as monitored by the Gateway Server.
 | `downlink_count` | [`uint64`](#uint64) |  |  |
 | `round_trip_times` | [`GatewayConnectionStats.RoundTripTimes`](#ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes) |  |  |
 | `sub_bands` | [`GatewayConnectionStats.SubBand`](#ttn.lorawan.v3.GatewayConnectionStats.SubBand) | repeated | Statistics for each sub band. |
+| `gateway_ip_address` | [`GatewayIPAddress`](#ttn.lorawan.v3.GatewayIPAddress) |  | Gateway IP Address. |
 
 ### <a name="ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes">Message `GatewayConnectionStats.RoundTripTimes`</a>
 
@@ -4163,6 +4165,15 @@ Connection stats as monitored by the Gateway Server.
 | `max_frequency` | [`uint64`](#uint64) |  |  |
 | `downlink_utilization_limit` | [`float`](#float) |  | Duty-cycle limit of the sub-band as a fraction of time. |
 | `downlink_utilization` | [`float`](#float) |  | Utilization rate of the available duty-cycle. This value should not exceed downlink_utilization_limit. |
+
+### <a name="ttn.lorawan.v3.GatewayIPAddress">Message `GatewayIPAddress`</a>
+
+IP Address of the Gateway, as seen by the Gateway Server.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `value` | [`string`](#string) |  | IPv4 or IPv6. |
+| `transport` | [`string`](#string) |  |  |
 
 ### <a name="ttn.lorawan.v3.GatewayModel">Message `GatewayModel`</a>
 
