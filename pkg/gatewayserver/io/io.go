@@ -149,7 +149,10 @@ var (
 )
 
 // NewConnection instantiates a new gateway connection.
-func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gateway, fps *frequencyplans.Store, enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration, ipAddr *ttnpb.GatewayIPAddress) (*Connection, error) {
+func NewConnection(
+	ctx context.Context, frontend Frontend, gateway *ttnpb.Gateway, fps *frequencyplans.Store,
+	enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration, ipAddr *ttnpb.GatewayIPAddress,
+) (*Connection, error) {
 	gatewayFPs := make(map[string]*frequencyplans.FrequencyPlan, len(gateway.FrequencyPlanIds))
 	fp0ID := gateway.FrequencyPlanId
 	fp0, err := fps.GetByID(fp0ID)
