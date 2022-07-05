@@ -28,6 +28,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - Support inviting users in the Console.
+- Gateway IP address to gateway connection statistics.
 
 ### Changed
 
