@@ -96,12 +96,16 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) error {
 		return err
 	}
 
-	if peer, ok := peer.FromContext(ctx); ok {
-		ctx = log.NewContextWithField(ctx, "remote_addr", peer.Addr.String())
+	if p, ok := peer.FromContext(ctx); ok {
+		ctx = log.NewContextWithField(ctx, "remote_addr", p.Addr.String())
+		ctx = io.NewContextWithGatewayIPAddress(ctx, &ttnpb.GatewayIPAddress{
+			Value: p.Addr.String(),
+		})
 	}
 	uid := unique.ID(ctx, ids)
 	ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
 	logger := log.FromContext(ctx)
+
 	conn, err := s.server.Connect(ctx, s, ids)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to connect")
