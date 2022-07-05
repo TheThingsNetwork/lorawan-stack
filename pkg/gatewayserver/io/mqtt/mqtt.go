@@ -159,6 +159,16 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 
 	uid := unique.ID(ctx, ids)
 	ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
+
+	addr, _, err := net.SplitHostPort(info.RemoteAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx = io.NewContextWithGatewayIPAddress(ctx, &ttnpb.GatewayIPAddress{
+		Value: addr,
+	})
+
 	c.io, err = c.server.Connect(ctx, c, ids)
 	if err != nil {
 		return nil, err
