@@ -4985,6 +4985,15 @@
       "file": "gatewayserver.go"
     }
   },
+  "error:pkg/gatewayserver:no_ip_address_in_connection": {
+    "translations": {
+      "en": "no IP address found in connection"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "gatewayserver.go"
+    }
+  },
   "error:pkg/gatewayserver:not_connected": {
     "translations": {
       "en": "gateway `{gateway_uid}` not connected"
