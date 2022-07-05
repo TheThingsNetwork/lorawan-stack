@@ -410,6 +410,10 @@ var (
 		"new_connection",
 		"new connection from same gateway",
 	)
+	errNoIPAddressInConnection = errors.DefineAborted(
+		"no_ip_address_in_connection",
+		"no IP address found in connection",
+	)
 )
 
 type connectionEntry struct {
@@ -424,10 +428,17 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		return nil, err
 	}
 
+	ipAddr := io.GatewayIPaddressFromContext(ctx)
+	if ipAddr == nil {
+		return nil, errNoIPAddressInConnection.New()
+	}
+
 	uid := unique.ID(ctx, ids)
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"protocol", frontend.Protocol(),
 		"gateway_uid", uid,
+		"ip_address", ipAddr.Value,
+		"transport", ipAddr.Transport,
 	))
 	ctx = log.NewContext(ctx, logger)
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:conn:%s", events.NewCorrelationID()))
@@ -485,7 +496,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		return nil, err
 	}
 
-	conn, err := io.NewConnection(ctx, frontend, gtw, fps, gtw.EnforceDutyCycle, ttnpb.StdDuration(gtw.ScheduleAnytimeDelay))
+	conn, err := io.NewConnection(ctx, frontend, gtw, fps, gtw.EnforceDutyCycle, ttnpb.StdDuration(gtw.ScheduleAnytimeDelay), ipAddr)
 	if err != nil {
 		return nil, err
 	}
@@ -505,7 +516,11 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		existingConnEntry.tasksDone.Wait()
 	}
 
-	registerGatewayConnect(ctx, ids, frontend.Protocol())
+	registerGatewayConnect(ctx, ids, frontend.Protocol(), &ttnpb.GatewayConnectionStats{
+		ConnectedAt:      ttnpb.ProtoTimePtr(conn.ConnectTime()),
+		Protocol:         conn.Frontend().Protocol(),
+		GatewayIpAddress: ipAddr,
+	})
 	logger.Info("Connected")
 
 	gs.startDisconnectOnChangeTask(connEntry)
@@ -910,12 +925,13 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 
 	ids := conn.Connection.Gateway().GetIds()
 	connectTime := conn.Connection.ConnectTime()
-	stats := &ttnpb.GatewayConnectionStats{
-		ConnectedAt: ttnpb.ProtoTimePtr(connectTime),
-		Protocol:    conn.Connection.Frontend().Protocol(),
-	}
 
 	// Initial update, so that the gateway appears connected.
+	stats := &ttnpb.GatewayConnectionStats{
+		ConnectedAt:      ttnpb.ProtoTimePtr(connectTime),
+		Protocol:         conn.Connection.Frontend().Protocol(),
+		GatewayIpAddress: conn.Connection.GatewayIPAddress(),
+	}
 	registerGatewayConnectionStats(ctx, ids, stats)
 	if gs.statsRegistry != nil {
 		if err := gs.statsRegistry.Set(decoupledCtx, ids, stats, ttnpb.GatewayConnectionStatsFieldPathsTopLevel, gs.config.ConnectionStatsTTL); err != nil {

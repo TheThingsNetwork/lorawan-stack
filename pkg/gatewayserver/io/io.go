@@ -35,6 +35,23 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
+type gatewayIPAddrContextKeyType struct{}
+
+var gatewayIPAddrContextKey gatewayIPAddrContextKeyType
+
+// NewContextWithGatewayIPAddress returns a context derived from parent that contains the Gateway IP address.
+func NewContextWithGatewayIPAddress(parent context.Context, ipAddr *ttnpb.GatewayIPAddress) context.Context {
+	return context.WithValue(parent, gatewayIPAddrContextKey, ipAddr)
+}
+
+// GatewayIPaddressFromContext returns the Gateway IP address from the context if present. Otherwise it returns nil.
+func GatewayIPaddressFromContext(ctx context.Context) *ttnpb.GatewayIPAddress {
+	if ipAddr, ok := ctx.Value(gatewayIPAddrContextKey).(*ttnpb.GatewayIPAddress); ok {
+		return ipAddr
+	}
+	return nil
+}
+
 const (
 	bufferSize = 1 << 4
 
@@ -110,6 +127,8 @@ type Connection struct {
 
 	lastUplink            *uplinkMessage
 	lastRepeatUpEventTime time.Time
+
+	ipAddr *ttnpb.GatewayIPAddress
 }
 
 type uplinkMessage struct {
@@ -130,7 +149,7 @@ var (
 )
 
 // NewConnection instantiates a new gateway connection.
-func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gateway, fps *frequencyplans.Store, enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration) (*Connection, error) {
+func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gateway, fps *frequencyplans.Store, enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration, ipAddr *ttnpb.GatewayIPAddress) (*Connection, error) {
 	gatewayFPs := make(map[string]*frequencyplans.FrequencyPlan, len(gateway.FrequencyPlanIds))
 	fp0ID := gateway.FrequencyPlanId
 	fp0, err := fps.GetByID(fp0ID)
@@ -172,6 +191,7 @@ func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gatewa
 		bandID:           bandID,
 		fps:              fps,
 		scheduler:        scheduler,
+		ipAddr:           ipAddr,
 		rtts:             newRTTs(maxRTTs, rttTTL),
 		upCh:             make(chan *ttnpb.GatewayUplinkMessage, bufferSize),
 		downCh:           make(chan *ttnpb.DownlinkMessage, bufferSize),
@@ -676,6 +696,9 @@ func (c *Connection) VersionInfoChanged() <-chan struct{} {
 // ConnectTime returns the time the gateway connected.
 func (c *Connection) ConnectTime() time.Time { return time.Unix(0, c.connectTime) }
 
+// GatewayIPAddress returns the time the IP address of the gateway as seen by the server.
+func (c *Connection) GatewayIPAddress() *ttnpb.GatewayIPAddress { return c.ipAddr }
+
 // StatusStats returns the status statistics.
 func (c *Connection) StatusStats() (last *ttnpb.GatewayStatus, t time.Time, ok bool) {
 	if last, ok = c.lastStatus.Load().(*ttnpb.GatewayStatus); ok {
@@ -711,11 +734,12 @@ func (c *Connection) RTTStats(percentile int, t time.Time) (min, max, median, np
 func (c *Connection) Stats() (*ttnpb.GatewayConnectionStats, []string) {
 	ct := c.ConnectTime()
 	stats := &ttnpb.GatewayConnectionStats{
-		ConnectedAt: ttnpb.ProtoTimePtr(ct),
-		Protocol:    c.Frontend().Protocol(),
+		ConnectedAt:      ttnpb.ProtoTimePtr(ct),
+		Protocol:         c.Frontend().Protocol(),
+		GatewayIpAddress: c.GatewayIPAddress(),
 	}
 	paths := make([]string, 0, len(ttnpb.GatewayConnectionStatsFieldPathsTopLevel))
-	paths = append(paths, "connected_at", "disconnected_at", "protocol")
+	paths = append(paths, "connected_at", "disconnected_at", "protocol", "gateway_ip_address")
 
 	if s, t, ok := c.StatusStats(); ok {
 		stats.LastStatusReceivedAt = ttnpb.ProtoTimePtr(t)
