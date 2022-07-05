@@ -230,6 +230,17 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 	}
 
 	logger := log.FromContext(ctx)
+	addr, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		return err
+	}
+	if xRealIP := r.Header[http.CanonicalHeaderKey("X-Real-IP")]; len(xRealIP) == 1 {
+		addr = xRealIP[0]
+	}
+
+	ctx = io.NewContextWithGatewayIPAddress(ctx, &ttnpb.GatewayIPAddress{
+		Value: addr,
+	})
 
 	conn, err := s.server.Connect(ctx, s, ids)
 	if err != nil {
