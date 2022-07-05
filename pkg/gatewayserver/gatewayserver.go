@@ -437,8 +437,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"protocol", frontend.Protocol(),
 		"gateway_uid", uid,
-		"ip_address", ipAddr.Value,
-		"transport", ipAddr.Transport,
+		"gateway_ip_address", ipAddr.Value,
 	))
 	ctx = log.NewContext(ctx, logger)
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:conn:%s", events.NewCorrelationID()))

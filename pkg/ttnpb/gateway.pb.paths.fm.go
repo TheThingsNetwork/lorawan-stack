@@ -503,12 +503,10 @@ var GatewayStatusFieldPathsTopLevel = []string{
 	"versions",
 }
 var GatewayIPAddressFieldPathsNested = []string{
-	"transport",
 	"value",
 }
 
 var GatewayIPAddressFieldPathsTopLevel = []string{
-	"transport",
 	"value",
 }
 var GatewayConnectionStatsFieldPathsNested = []string{
@@ -516,7 +514,6 @@ var GatewayConnectionStatsFieldPathsNested = []string{
 	"disconnected_at",
 	"downlink_count",
 	"gateway_ip_address",
-	"gateway_ip_address.transport",
 	"gateway_ip_address.value",
 	"last_downlink_received_at",
 	"last_status",

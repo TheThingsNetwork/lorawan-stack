@@ -394,7 +394,6 @@ message GatewayStatus {
 // IP Address of the Gateway, as seen by the Gateway Server.
 message GatewayIPAddress {
   string value = 1; // IPv4 or IPv6.
-  string transport = 2;
 }
 
 // Connection stats as monitored by the Gateway Server.

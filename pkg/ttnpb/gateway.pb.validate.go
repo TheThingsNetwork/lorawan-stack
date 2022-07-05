@@ -2969,8 +2969,6 @@ func (m *GatewayIPAddress) ValidateFields(paths ...string) error {
 		switch name {
 		case "value":
 			// no validation rules for Value
-		case "transport":
-			// no validation rules for Transport
 		default:
 			return GatewayIPAddressValidationError{
 				field:  name,

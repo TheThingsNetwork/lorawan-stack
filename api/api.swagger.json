@@ -15931,9 +15931,6 @@
       "properties": {
         "value": {
           "type": "string"
-        },
-        "transport": {
-          "type": "string"
         }
       },
       "description": "IP Address of the Gateway, as seen by the Gateway Server."

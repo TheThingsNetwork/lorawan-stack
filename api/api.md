@@ -4173,7 +4173,6 @@ IP Address of the Gateway, as seen by the Gateway Server.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `value` | [`string`](#string) |  | IPv4 or IPv6. |
-| `transport` | [`string`](#string) |  |  |
 
 ### <a name="ttn.lorawan.v3.GatewayModel">Message `GatewayModel`</a>
 

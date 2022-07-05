@@ -1561,16 +1561,6 @@ func (dst *GatewayIPAddress) SetFields(src *GatewayIPAddress, paths ...string) e
 				var zero string
 				dst.Value = zero
 			}
-		case "transport":
-			if len(subs) > 0 {
-				return fmt.Errorf("'transport' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Transport = src.Transport
-			} else {
-				var zero string
-				dst.Transport = zero
-			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
