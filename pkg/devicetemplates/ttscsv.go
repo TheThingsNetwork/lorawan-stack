@@ -18,6 +18,7 @@ import (
 	"context"
 	"encoding/csv"
 	"io"
+	"strconv"
 	"strings"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -93,6 +94,10 @@ var csvFieldSetters = map[string]csvFieldSetterFunc{
 	"name": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
 		dst.Name = val
 		return []string{"name"}, nil
+	},
+	"description": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
+		dst.Description = val
+		return []string{"description"}, nil
 	},
 	"frequency_plan_id": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
 		dst.FrequencyPlanId = val
@@ -176,6 +181,114 @@ var csvFieldSetters = map[string]csvFieldSetterFunc{
 		}
 		dst.SupportsJoin = true
 		return []string{"root_keys.nwk_key.key", "supports_join"}, nil
+	},
+	"rx1_delay": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
+		var rx1Delay ttnpb.RxDelay
+		if err := rx1Delay.UnmarshalText([]byte(val)); err != nil {
+			return nil, err
+		}
+		if dst.MacSettings == nil {
+			dst.MacSettings = &ttnpb.MACSettings{}
+		}
+		dst.MacSettings.Rx1Delay = &ttnpb.RxDelayValue{
+			Value: rx1Delay,
+		}
+		return []string{"mac_settings.rx1_delay"}, nil
+	},
+	"supports_32_bit_f_cnt": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
+		var supports32BitFCnt ttnpb.BoolValue
+		if err := supports32BitFCnt.UnmarshalText([]byte(val)); err != nil {
+			return nil, err
+		}
+		if dst.MacSettings == nil {
+			dst.MacSettings = &ttnpb.MACSettings{}
+		}
+		dst.MacSettings.Supports_32BitFCnt = &supports32BitFCnt
+		return []string{"mac_settings.supports_32_bit_f_cnt"}, nil
+	},
+	"dev_addr": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
+		var devAddr types.DevAddr
+		if dst.Session == nil {
+			dst.Session = &ttnpb.Session{}
+		}
+		if err := devAddr.UnmarshalText([]byte(val)); err != nil {
+			return nil, err
+		}
+		dst.Session.DevAddr = devAddr[:]
+		return []string{"session.dev_addr"}, nil
+	},
+	"app_s_key": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
+		key := &types.AES128Key{}
+		if err := key.UnmarshalText([]byte(val)); err != nil {
+			return nil, err
+		}
+		if dst.Session == nil {
+			dst.Session = &ttnpb.Session{}
+		}
+		if dst.Session.Keys == nil {
+			dst.Session.Keys = &ttnpb.SessionKeys{}
+		}
+		dst.Session.Keys.AppSKey = &ttnpb.KeyEnvelope{
+			Key: key,
+		}
+		return []string{"session.keys.app_s_key.key"}, nil
+	},
+	"f_nwk_s_int_key": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
+		key := &types.AES128Key{}
+		if err := key.UnmarshalText([]byte(val)); err != nil {
+			return nil, err
+		}
+		if dst.Session == nil {
+			dst.Session = &ttnpb.Session{}
+		}
+		if dst.Session.Keys == nil {
+			dst.Session.Keys = &ttnpb.SessionKeys{}
+		}
+		dst.Session.Keys.FNwkSIntKey = &ttnpb.KeyEnvelope{
+			Key: key,
+		}
+		return []string{"session.keys.f_nwk_s_int_key.key"}, nil
+	},
+	"last_f_cnt_up": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
+		if dst.Session == nil {
+			dst.Session = &ttnpb.Session{}
+		}
+		s, err := strconv.ParseUint(val, 10, 32)
+		if err != nil {
+			return nil, err
+		}
+		dst.Session.LastFCntUp = uint32(s)
+		return []string{"session.last_f_cnt_up"}, nil
+	},
+	"last_n_f_cnt_down": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
+		if dst.Session == nil {
+			dst.Session = &ttnpb.Session{}
+		}
+		s, err := strconv.ParseUint(val, 10, 32)
+		if err != nil {
+			return nil, err
+		}
+		dst.Session.LastNFCntDown = uint32(s)
+		return []string{"session.last_n_f_cnt_down"}, nil
+	},
+	"last_a_f_cnt_down": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
+		if dst.Session == nil {
+			dst.Session = &ttnpb.Session{}
+		}
+		s, err := strconv.ParseUint(val, 10, 32)
+		if err != nil {
+			return nil, err
+		}
+		dst.Session.LastAFCntDown = uint32(s)
+		return []string{"session.last_a_f_cnt_down"}, nil
+	},
+	"supports_class_c": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
+		var err error
+		dst.SupportsClassC, err = strconv.ParseBool(val)
+		if err != nil {
+			return nil, err
+		}
+		return []string{"supports_class_c"}, nil
 	},
 }
 
