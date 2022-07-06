@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- More fields were added to the csv end-device migration procedure. The details on which fields were added can be found [here](https://www.thethingsindustries.com/docs/getting-started/migrating/device-csv/).
+
 ### Changed
 
 ### Deprecated
