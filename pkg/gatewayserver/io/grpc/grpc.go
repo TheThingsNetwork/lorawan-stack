@@ -98,7 +98,11 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) error {
 	}
 
 	if p, ok := peer.FromContext(ctx); ok {
-		addr, _, err := net.SplitHostPort(p.Addr.String())
+		remoteAddr := p.Addr.String()
+		if remoteAddr == "pipe" {
+			remoteAddr = "127.0.0.0:0"
+		}
+		addr, _, err := net.SplitHostPort(remoteAddr)
 		if err != nil {
 			return err
 		}
