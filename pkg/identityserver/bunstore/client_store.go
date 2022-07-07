@@ -16,6 +16,7 @@ package store
 
 import (
 	"context"
+	"fmt"
 	"sort"
 
 	"github.com/uptrace/bun"
@@ -226,29 +227,49 @@ func (s *clientStore) CreateClient(
 	return pb, nil
 }
 
-func (*clientStore) selectWithFields(fieldMask store.FieldMask) func(*bun.SelectQuery) *bun.SelectQuery {
-	return func(q *bun.SelectQuery) *bun.SelectQuery {
-		// TODO: Instead of selecting everything, select only columns that are part of the field mask.
-		q = q.
-			ExcludeColumn()
-		if fieldMask.Contains("attributes") {
-			q = q.Relation("Attributes")
+func (*clientStore) selectWithFields(q *bun.SelectQuery, fieldMask store.FieldMask) (*bun.SelectQuery, error) {
+	if fieldMask == nil {
+		q = q.ExcludeColumn()
+	} else {
+		columns := []string{
+			"id",
+			"created_at",
+			"updated_at",
+			"deleted_at",
+			"client_id",
 		}
-		if fieldMask.Contains("contact_info") {
-			q = q.Relation("ContactInfo")
+		for _, f := range fieldMask.TopLevel() {
+			switch f {
+			default:
+				return nil, fmt.Errorf("unknown field %q", f)
+			case "ids", "created_at", "updated_at", "deleted_at":
+				// Always selected.
+			case "name", "description",
+				"redirect_uris", "logout_redirect_uris",
+				"state", "state_description",
+				"skip_authorization", "endorsed",
+				"grants", "rights":
+				// Proto name equals model name.
+				columns = append(columns, f)
+			case "secret":
+				columns = append(columns, "client_secret")
+			case "attributes":
+				q = q.Relation("Attributes")
+			case "contact_info":
+				q = q.Relation("ContactInfo")
+			case "administrative_contact":
+				q = q.Relation("AdministrativeContact", func(q *bun.SelectQuery) *bun.SelectQuery {
+					return q.Column("uid", "account_type")
+				})
+			case "technical_contact":
+				q = q.Relation("TechnicalContact", func(q *bun.SelectQuery) *bun.SelectQuery {
+					return q.Column("uid", "account_type")
+				})
+			}
 		}
-		if fieldMask.Contains("administrative_contact") {
-			q = q.Relation("AdministrativeContact", func(q *bun.SelectQuery) *bun.SelectQuery {
-				return q.Column("uid", "account_type")
-			})
-		}
-		if fieldMask.Contains("technical_contact") {
-			q = q.Relation("TechnicalContact", func(q *bun.SelectQuery) *bun.SelectQuery {
-				return q.Column("uid", "account_type")
-			})
-		}
-		return q
+		q = q.Column(columns...)
 	}
+	return q, nil
 }
 
 func (s *clientStore) listClientsBy(
@@ -276,8 +297,12 @@ func (s *clientStore) listClientsBy(
 			"name":       "name",
 			"created_at": "created_at",
 		})).
-		Apply(selectWithLimitAndOffsetFromContext(ctx)).
-		Apply(s.selectWithFields(fieldMask))
+		Apply(selectWithLimitAndOffsetFromContext(ctx))
+
+	selectQuery, err = s.selectWithFields(selectQuery, fieldMask)
+	if err != nil {
+		return nil, err
+	}
 
 	// Scan the results.
 	err = selectQuery.Scan(ctx)
@@ -332,8 +357,12 @@ func (s *clientStore) getClientModelBy(
 	selectQuery := s.DB.NewSelect().
 		Model(model).
 		Apply(selectWithSoftDeletedFromContext(ctx)).
-		Apply(by).
-		Apply(s.selectWithFields(fieldMask))
+		Apply(by)
+
+	selectQuery, err := s.selectWithFields(selectQuery, fieldMask)
+	if err != nil {
+		return nil, err
+	}
 
 	if err := selectQuery.Scan(ctx); err != nil {
 		return nil, wrapDriverError(err)
@@ -492,7 +521,7 @@ func (s *clientStore) DeleteClient(ctx context.Context, id *ttnpb.ClientIdentifi
 	))
 	defer span.End()
 
-	model, err := s.getClientModelBy(ctx, s.selectWithID(ctx, id.GetClientId()), nil)
+	model, err := s.getClientModelBy(ctx, s.selectWithID(ctx, id.GetClientId()), store.FieldMask{"ids"})
 	if err != nil {
 		return err
 	}
@@ -515,7 +544,9 @@ func (s *clientStore) RestoreClient(ctx context.Context, id *ttnpb.ClientIdentif
 	defer span.End()
 
 	model, err := s.getClientModelBy(
-		store.WithSoftDeleted(ctx, true), s.selectWithID(ctx, id.GetClientId()), nil,
+		store.WithSoftDeleted(ctx, true),
+		s.selectWithID(ctx, id.GetClientId()),
+		store.FieldMask{"ids"},
 	)
 	if err != nil {
 		return err

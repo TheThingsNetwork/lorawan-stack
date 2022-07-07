@@ -16,6 +16,7 @@ package store
 
 import (
 	"context"
+	"fmt"
 	"sort"
 
 	"github.com/uptrace/bun"
@@ -206,30 +207,43 @@ func (s *organizationStore) CreateOrganization(
 	return pb, nil
 }
 
-func (*organizationStore) selectWithFields(fieldMask store.FieldMask) func(*bun.SelectQuery) *bun.SelectQuery {
-	return func(q *bun.SelectQuery) *bun.SelectQuery {
-		// TODO: Instead of selecting everything, select only columns that are part of the field mask.
-		q = q.
-			ExcludeColumn().
-			Column("account_uid")
-		if fieldMask.Contains("attributes") {
-			q = q.Relation("Attributes")
+func (*organizationStore) selectWithFields(q *bun.SelectQuery, fieldMask store.FieldMask) (*bun.SelectQuery, error) {
+	if fieldMask == nil {
+		q = q.ExcludeColumn()
+	} else {
+		columns := []string{
+			"id",
+			"created_at",
+			"updated_at",
+			"deleted_at",
+			"account_uid",
 		}
-		if fieldMask.Contains("contact_info") {
-			q = q.Relation("ContactInfo")
+		for _, f := range fieldMask.TopLevel() {
+			switch f {
+			default:
+				return nil, fmt.Errorf("unknown field %q", f)
+			case "ids", "created_at", "updated_at", "deleted_at":
+				// Always selected.
+			case "name", "description":
+				// Proto name equals model name.
+				columns = append(columns, f)
+			case "attributes":
+				q = q.Relation("Attributes")
+			case "contact_info":
+				q = q.Relation("ContactInfo")
+			case "administrative_contact":
+				q = q.Relation("AdministrativeContact", func(q *bun.SelectQuery) *bun.SelectQuery {
+					return q.Column("uid", "account_type")
+				})
+			case "technical_contact":
+				q = q.Relation("TechnicalContact", func(q *bun.SelectQuery) *bun.SelectQuery {
+					return q.Column("uid", "account_type")
+				})
+			}
 		}
-		if fieldMask.Contains("administrative_contact") {
-			q = q.Relation("AdministrativeContact", func(q *bun.SelectQuery) *bun.SelectQuery {
-				return q.Column("uid", "account_type")
-			})
-		}
-		if fieldMask.Contains("technical_contact") {
-			q = q.Relation("TechnicalContact", func(q *bun.SelectQuery) *bun.SelectQuery {
-				return q.Column("uid", "account_type")
-			})
-		}
-		return q
+		q = q.Column(columns...)
 	}
+	return q, nil
 }
 
 func (s *organizationStore) listOrganizationsBy(
@@ -257,8 +271,12 @@ func (s *organizationStore) listOrganizationsBy(
 			"name":            "name",
 			"created_at":      "created_at",
 		})).
-		Apply(selectWithLimitAndOffsetFromContext(ctx)).
-		Apply(s.selectWithFields(fieldMask))
+		Apply(selectWithLimitAndOffsetFromContext(ctx))
+
+	selectQuery, err = s.selectWithFields(selectQuery, fieldMask)
+	if err != nil {
+		return nil, err
+	}
 
 	// Scan the results.
 	err = selectQuery.Scan(ctx)
@@ -313,8 +331,12 @@ func (s *organizationStore) getOrganizationModelBy(
 	selectQuery := s.DB.NewSelect().
 		Model(model).
 		Apply(selectWithSoftDeletedFromContext(ctx)).
-		Apply(by).
-		Apply(s.selectWithFields(fieldMask))
+		Apply(by)
+
+	selectQuery, err := s.selectWithFields(selectQuery, fieldMask)
+	if err != nil {
+		return nil, err
+	}
 
 	if err := selectQuery.Scan(ctx); err != nil {
 		return nil, wrapDriverError(err)
@@ -441,7 +463,7 @@ func (s *organizationStore) DeleteOrganization(ctx context.Context, id *ttnpb.Or
 	))
 	defer span.End()
 
-	model, err := s.getOrganizationModelBy(ctx, s.selectWithID(ctx, id.GetOrganizationId()), nil)
+	model, err := s.getOrganizationModelBy(ctx, s.selectWithID(ctx, id.GetOrganizationId()), store.FieldMask{"ids"})
 	if err != nil {
 		return err
 	}
@@ -464,7 +486,9 @@ func (s *organizationStore) RestoreOrganization(ctx context.Context, id *ttnpb.O
 	defer span.End()
 
 	model, err := s.getOrganizationModelBy(
-		store.WithSoftDeleted(ctx, true), s.selectWithID(ctx, id.GetOrganizationId()), nil,
+		store.WithSoftDeleted(ctx, true),
+		s.selectWithID(ctx, id.GetOrganizationId()),
+		store.FieldMask{"ids"},
 	)
 	if err != nil {
 		return err

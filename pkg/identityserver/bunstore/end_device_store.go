@@ -242,22 +242,46 @@ func (s *endDeviceStore) CreateEndDevice(
 	return pb, nil
 }
 
-func (*endDeviceStore) selectWithFields(fieldMask store.FieldMask) func(*bun.SelectQuery) *bun.SelectQuery {
-	return func(q *bun.SelectQuery) *bun.SelectQuery {
-		// TODO: Instead of selecting everything, select only columns that are part of the field mask.
-		q = q.
-			ExcludeColumn()
-		if fieldMask.Contains("attributes") {
-			q = q.Relation("Attributes")
+func (*endDeviceStore) selectWithFields(q *bun.SelectQuery, fieldMask store.FieldMask) (*bun.SelectQuery, error) {
+	if fieldMask == nil {
+		q = q.ExcludeColumn()
+	} else {
+		columns := []string{
+			"id",
+			"created_at",
+			"updated_at",
+			"application_id",
+			"device_id",
+			"join_eui",
+			"dev_eui",
 		}
-		if fieldMask.Contains("locations") {
-			q = q.Relation("Locations")
+		for _, f := range fieldMask.TopLevel() {
+			switch f {
+			default:
+				return nil, fmt.Errorf("unknown field %q", f)
+			case "ids", "created_at", "updated_at":
+				// Always selected.
+			case "name", "description",
+				"network_server_address", "application_server_address", "join_server_address",
+				"service_profile_id",
+				"activated_at", "last_seen_at":
+				// Proto name equals model name.
+				columns = append(columns, f)
+			case "version_ids":
+				columns = append(columns, "brand_id", "model_id", "hardware_version", "firmware_version", "band_id")
+			case "attributes":
+				q = q.Relation("Attributes")
+			case "contact_info":
+				q = q.Relation("ContactInfo")
+			case "locations":
+				q = q.Relation("Locations")
+			case "picture":
+				q = q.Relation("Picture")
+			}
 		}
-		if fieldMask.Contains("picture") {
-			q = q.Relation("Picture")
-		}
-		return q
+		q = q.Column(columns...)
 	}
+	return q, nil
 }
 
 func (s *endDeviceStore) listEndDevicesBy(
@@ -285,8 +309,12 @@ func (s *endDeviceStore) listEndDevicesBy(
 			"name":       "name",
 			"created_at": "created_at",
 		})).
-		Apply(selectWithLimitAndOffsetFromContext(ctx)).
-		Apply(s.selectWithFields(fieldMask))
+		Apply(selectWithLimitAndOffsetFromContext(ctx))
+
+	selectQuery, err = s.selectWithFields(selectQuery, fieldMask)
+	if err != nil {
+		return nil, err
+	}
 
 	// Scan the results.
 	err = selectQuery.Scan(ctx)
@@ -404,8 +432,12 @@ func (s *endDeviceStore) getEndDeviceModelBy(
 	selectQuery := s.DB.NewSelect().
 		Model(model).
 		Apply(selectWithSoftDeletedFromContext(ctx)).
-		Apply(by).
-		Apply(s.selectWithFields(fieldMask))
+		Apply(by)
+
+	selectQuery, err := s.selectWithFields(selectQuery, fieldMask)
+	if err != nil {
+		return nil, err
+	}
 
 	if err := selectQuery.Scan(ctx); err != nil {
 		return nil, wrapDriverError(err)
@@ -606,7 +638,7 @@ func (s *endDeviceStore) DeleteEndDevice(ctx context.Context, id *ttnpb.EndDevic
 		ctx,
 		id.GetApplicationIds().GetApplicationId(),
 		id.GetDeviceId(),
-	), nil)
+	), store.FieldMask{"ids", "attributes", "locations"})
 	if err != nil {
 		return err
 	}

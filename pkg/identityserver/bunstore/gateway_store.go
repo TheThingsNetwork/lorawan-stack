@@ -16,6 +16,7 @@ package store
 
 import (
 	"context"
+	"fmt"
 	"sort"
 	"strings"
 	"time"
@@ -336,34 +337,75 @@ func (s *gatewayStore) CreateGateway(
 	return pb, nil
 }
 
-func (*gatewayStore) selectWithFields(fieldMask store.FieldMask) func(*bun.SelectQuery) *bun.SelectQuery {
-	return func(q *bun.SelectQuery) *bun.SelectQuery {
-		// TODO: Instead of selecting everything, select only columns that are part of the field mask.
-		q = q.
-			ExcludeColumn()
-		if fieldMask.Contains("attributes") {
-			q = q.Relation("Attributes")
+func (*gatewayStore) selectWithFields(q *bun.SelectQuery, fieldMask store.FieldMask) (*bun.SelectQuery, error) {
+	if fieldMask == nil {
+		q = q.ExcludeColumn()
+	} else {
+		columns := []string{
+			"id",
+			"created_at",
+			"updated_at",
+			"deleted_at",
+			"gateway_id",
+			"gateway_eui",
 		}
-		if fieldMask.Contains("contact_info") {
-			q = q.Relation("ContactInfo")
+		for _, f := range fieldMask.TopLevel() {
+			switch f {
+			default:
+				return nil, fmt.Errorf("unknown field %q", f)
+			case "ids", "created_at", "updated_at", "deleted_at":
+				// Always selected.
+			case "name", "description",
+				"gateway_server_address",
+				"auto_update", "update_channel",
+				"status_public", "location_public",
+				"schedule_downlink_late",
+				"enforce_duty_cycle",
+				"downlink_path_constraint",
+				"schedule_anytime_delay",
+				"update_location_from_status",
+				"lbs_lns_secret",
+				"target_cups_uri", "target_cups_key",
+				"require_authenticated_connection",
+				"disable_packet_broker_forwarding":
+				// Proto name equals model name.
+				columns = append(columns, f)
+			case "version_ids":
+				columns = append(columns, "brand_id", "model_id", "hardware_version", "firmware_version")
+			case "frequency_plan_id":
+				// Ignore deprecated field.
+			case "frequency_plan_ids":
+				columns = append(columns, "frequency_plan_id")
+			case "claim_authentication_code":
+				columns = append(
+					columns,
+					"claim_authentication_code_secret",
+					"claim_authentication_code_valid_from",
+					"claim_authentication_code_valid_to",
+				)
+			case "lrfhss":
+				columns = append(columns, "supports_lrfhss")
+			case "attributes":
+				q = q.Relation("Attributes")
+			case "contact_info":
+				q = q.Relation("ContactInfo")
+			case "administrative_contact":
+				q = q.Relation("AdministrativeContact", func(q *bun.SelectQuery) *bun.SelectQuery {
+					return q.Column("uid", "account_type")
+				})
+			case "technical_contact":
+				q = q.Relation("TechnicalContact", func(q *bun.SelectQuery) *bun.SelectQuery {
+					return q.Column("uid", "account_type")
+				})
+			case "antennas":
+				q = q.Relation("Antennas", func(q *bun.SelectQuery) *bun.SelectQuery {
+					return q.Order("index")
+				})
+			}
 		}
-		if fieldMask.Contains("administrative_contact") {
-			q = q.Relation("AdministrativeContact", func(q *bun.SelectQuery) *bun.SelectQuery {
-				return q.Column("uid", "account_type")
-			})
-		}
-		if fieldMask.Contains("technical_contact") {
-			q = q.Relation("TechnicalContact", func(q *bun.SelectQuery) *bun.SelectQuery {
-				return q.Column("uid", "account_type")
-			})
-		}
-		if fieldMask.Contains("antennas") {
-			q = q.Relation("Antennas", func(q *bun.SelectQuery) *bun.SelectQuery {
-				return q.Order("index")
-			})
-		}
-		return q
+		q = q.Column(columns...)
 	}
+	return q, nil
 }
 
 func (s *gatewayStore) listGatewaysBy(
@@ -391,8 +433,12 @@ func (s *gatewayStore) listGatewaysBy(
 			"name":       "name",
 			"created_at": "created_at",
 		})).
-		Apply(selectWithLimitAndOffsetFromContext(ctx)).
-		Apply(s.selectWithFields(fieldMask))
+		Apply(selectWithLimitAndOffsetFromContext(ctx))
+
+	selectQuery, err = s.selectWithFields(selectQuery, fieldMask)
+	if err != nil {
+		return nil, err
+	}
 
 	// Scan the results.
 	err = selectQuery.Scan(ctx)
@@ -461,8 +507,12 @@ func (s *gatewayStore) getGatewayModelBy(
 	selectQuery := s.DB.NewSelect().
 		Model(model).
 		Apply(selectWithSoftDeletedFromContext(ctx)).
-		Apply(by).
-		Apply(s.selectWithFields(fieldMask))
+		Apply(by)
+
+	selectQuery, err := s.selectWithFields(selectQuery, fieldMask)
+	if err != nil {
+		return nil, err
+	}
 
 	if err := selectQuery.Scan(ctx); err != nil {
 		return nil, wrapDriverError(err)
@@ -707,7 +757,7 @@ func (s *gatewayStore) DeleteGateway(ctx context.Context, id *ttnpb.GatewayIdent
 	))
 	defer span.End()
 
-	model, err := s.getGatewayModelBy(ctx, s.selectWithID(ctx, id.GetGatewayId()), nil)
+	model, err := s.getGatewayModelBy(ctx, s.selectWithID(ctx, id.GetGatewayId()), store.FieldMask{"ids"})
 	if err != nil {
 		return err
 	}
@@ -741,7 +791,9 @@ func (s *gatewayStore) RestoreGateway(ctx context.Context, id *ttnpb.GatewayIden
 	defer span.End()
 
 	model, err := s.getGatewayModelBy(
-		store.WithSoftDeleted(ctx, true), s.selectWithID(ctx, id.GetGatewayId()), nil,
+		store.WithSoftDeleted(ctx, true),
+		s.selectWithID(ctx, id.GetGatewayId()),
+		store.FieldMask{"ids"},
 	)
 	if err != nil {
 		return err

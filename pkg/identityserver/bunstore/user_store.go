@@ -16,6 +16,7 @@ package store
 
 import (
 	"context"
+	"fmt"
 	"sort"
 	"time"
 
@@ -246,23 +247,50 @@ func (s *userStore) CreateUser(ctx context.Context, pb *ttnpb.User) (*ttnpb.User
 	return pb, nil
 }
 
-func (*userStore) selectWithFields(fieldMask store.FieldMask) func(*bun.SelectQuery) *bun.SelectQuery {
-	return func(q *bun.SelectQuery) *bun.SelectQuery {
-		// TODO: Instead of selecting everything, select only columns that are part of the field mask.
-		q = q.
-			ExcludeColumn().
-			Column("account_uid")
-		if fieldMask.Contains("attributes") {
-			q = q.Relation("Attributes")
+func (*userStore) selectWithFields(q *bun.SelectQuery, fieldMask store.FieldMask) (*bun.SelectQuery, error) {
+	if fieldMask == nil {
+		q = q.ExcludeColumn()
+	} else {
+		columns := []string{
+			"id",
+			"created_at",
+			"updated_at",
+			"deleted_at",
+			"account_uid",
 		}
-		if fieldMask.Contains("contact_info") {
-			q = q.Relation("ContactInfo")
+		for _, f := range fieldMask.TopLevel() {
+			switch f {
+			default:
+				return nil, fmt.Errorf("unknown field %q", f)
+			case "ids", "created_at", "updated_at", "deleted_at":
+				// Always selected.
+			case "name", "description",
+				"primary_email_address", "primary_email_address_validated_at",
+				"password", "password_updated_at", "require_password_update",
+				"state", "state_description",
+				"admin",
+				"temporary_password", "temporary_password_created_at", "temporary_password_expires_at":
+				// Proto name equals model name.
+				columns = append(columns, f)
+			case "attributes":
+				q = q.Relation("Attributes")
+			case "contact_info":
+				q = q.Relation("ContactInfo")
+			case "administrative_contact":
+				q = q.Relation("AdministrativeContact", func(q *bun.SelectQuery) *bun.SelectQuery {
+					return q.Column("uid", "account_type")
+				})
+			case "technical_contact":
+				q = q.Relation("TechnicalContact", func(q *bun.SelectQuery) *bun.SelectQuery {
+					return q.Column("uid", "account_type")
+				})
+			case "profile_picture":
+				q = q.Relation("ProfilePicture")
+			}
 		}
-		if fieldMask.Contains("profile_picture") {
-			q = q.Relation("ProfilePicture")
-		}
-		return q
+		q = q.Column(columns...)
 	}
+	return q, nil
 }
 
 func (s *userStore) listUsersBy(
@@ -293,8 +321,12 @@ func (s *userStore) listUsersBy(
 			"admin":                 "admin",
 			"created_at":            "created_at",
 		})).
-		Apply(selectWithLimitAndOffsetFromContext(ctx)).
-		Apply(s.selectWithFields(fieldMask))
+		Apply(selectWithLimitAndOffsetFromContext(ctx))
+
+	selectQuery, err = s.selectWithFields(selectQuery, fieldMask)
+	if err != nil {
+		return nil, err
+	}
 
 	// Scan the results.
 	err = selectQuery.Scan(ctx)
@@ -360,8 +392,12 @@ func (s *userStore) getUserModelBy(
 	selectQuery := s.DB.NewSelect().
 		Model(model).
 		Apply(selectWithSoftDeletedFromContext(ctx)).
-		Apply(by).
-		Apply(s.selectWithFields(fieldMask))
+		Apply(by)
+
+	selectQuery, err := s.selectWithFields(selectQuery, fieldMask)
+	if err != nil {
+		return nil, err
+	}
 
 	if err := selectQuery.Scan(ctx); err != nil {
 		return nil, wrapDriverError(err)
@@ -561,7 +597,7 @@ func (s *userStore) DeleteUser(ctx context.Context, id *ttnpb.UserIdentifiers) e
 	))
 	defer span.End()
 
-	model, err := s.getUserModelBy(ctx, s.selectWithID(ctx, id.GetUserId()), nil)
+	model, err := s.getUserModelBy(ctx, s.selectWithID(ctx, id.GetUserId()), store.FieldMask{"ids"})
 	if err != nil {
 		return err
 	}
@@ -593,7 +629,11 @@ func (s *userStore) RestoreUser(ctx context.Context, id *ttnpb.UserIdentifiers) 
 	))
 	defer span.End()
 
-	model, err := s.getUserModelBy(store.WithSoftDeleted(ctx, true), s.selectWithID(ctx, id.GetUserId()), nil)
+	model, err := s.getUserModelBy(
+		store.WithSoftDeleted(ctx, true),
+		s.selectWithID(ctx, id.GetUserId()),
+		store.FieldMask{"ids"},
+	)
 	if err != nil {
 		return err
 	}
