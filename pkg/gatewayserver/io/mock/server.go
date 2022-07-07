@@ -99,10 +99,10 @@ func (s *server) Connect(ctx context.Context, frontend io.Frontend, ids *ttnpb.G
 
 	ipAddr := io.GatewayIPaddressFromContext(ctx)
 	if ipAddr == nil {
-		return nil, errNoIPAddressInConnection.New()
+		panic("No IP address found in connection")
 	}
 
-	conn, err := io.NewConnection(ctx, frontend, gtw, fps, true, nil, ipAddr)
+	conn, err := io.NewConnection(ctx, frontend, gtw, fps, true, nil)
 	if err != nil {
 		return nil, err
 	}

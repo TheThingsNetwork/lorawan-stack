@@ -410,10 +410,6 @@ var (
 		"new_connection",
 		"new connection from same gateway",
 	)
-	errNoIPAddressInConnection = errors.DefineAborted(
-		"no_ip_address_in_connection",
-		"no IP address found in connection",
-	)
 )
 
 type connectionEntry struct {
@@ -430,7 +426,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 
 	ipAddr := io.GatewayIPaddressFromContext(ctx)
 	if ipAddr == nil {
-		return nil, errNoIPAddressInConnection.New()
+		panic("No IP address found in connection")
 	}
 
 	uid := unique.ID(ctx, ids)
@@ -496,7 +492,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	}
 
 	conn, err := io.NewConnection(
-		ctx, frontend, gtw, fps, gtw.EnforceDutyCycle, ttnpb.StdDuration(gtw.ScheduleAnytimeDelay), ipAddr,
+		ctx, frontend, gtw, fps, gtw.EnforceDutyCycle, ttnpb.StdDuration(gtw.ScheduleAnytimeDelay),
 	)
 	if err != nil {
 		return nil, err
@@ -520,7 +516,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	registerGatewayConnect(ctx, ids, frontend.Protocol(), &ttnpb.GatewayConnectionStats{
 		ConnectedAt:      ttnpb.ProtoTimePtr(conn.ConnectTime()),
 		Protocol:         conn.Frontend().Protocol(),
-		GatewayIpAddress: ipAddr,
+		GatewayIpAddress: conn.GatewayIPAddress(),
 	})
 	logger.Info("Connected")
 

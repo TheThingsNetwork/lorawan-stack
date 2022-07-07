@@ -151,7 +151,7 @@ var (
 // NewConnection instantiates a new gateway connection.
 func NewConnection(
 	ctx context.Context, frontend Frontend, gateway *ttnpb.Gateway, fps *frequencyplans.Store,
-	enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration, ipAddr *ttnpb.GatewayIPAddress,
+	enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration,
 ) (*Connection, error) {
 	gatewayFPs := make(map[string]*frequencyplans.FrequencyPlan, len(gateway.FrequencyPlanIds))
 	fp0ID := gateway.FrequencyPlanId
@@ -194,7 +194,7 @@ func NewConnection(
 		bandID:           bandID,
 		fps:              fps,
 		scheduler:        scheduler,
-		ipAddr:           ipAddr,
+		ipAddr:           GatewayIPaddressFromContext(ctx),
 		rtts:             newRTTs(maxRTTs, rttTTL),
 		upCh:             make(chan *ttnpb.GatewayUplinkMessage, bufferSize),
 		downCh:           make(chan *ttnpb.DownlinkMessage, bufferSize),

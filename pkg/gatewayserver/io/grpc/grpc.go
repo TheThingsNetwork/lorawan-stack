@@ -16,6 +16,7 @@ package grpc
 
 import (
 	"context"
+	"net"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -97,9 +98,13 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) error {
 	}
 
 	if p, ok := peer.FromContext(ctx); ok {
+		addr, _, err := net.SplitHostPort(p.Addr.String())
+		if err != nil {
+			return err
+		}
 		ctx = log.NewContextWithField(ctx, "remote_addr", p.Addr.String())
 		ctx = io.NewContextWithGatewayIPAddress(ctx, &ttnpb.GatewayIPAddress{
-			Value: p.Addr.String(),
+			Value: addr,
 		})
 	}
 	uid := unique.ID(ctx, ids)

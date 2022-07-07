@@ -220,7 +220,7 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64, addr *net.UDPAddr) (
 		})
 
 		ctx = io.NewContextWithGatewayIPAddress(ctx, &ttnpb.GatewayIPAddress{
-			Value: addr.String(),
+			Value: addr.IP.String(),
 		})
 		conn, err = s.server.Connect(ctx, s, ids)
 		if err != nil {
