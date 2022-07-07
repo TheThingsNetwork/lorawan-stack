@@ -75,11 +75,6 @@ func (s *server) FillGatewayContext(ctx context.Context, ids *ttnpb.GatewayIdent
 	return ctx, ids, nil
 }
 
-var errNoIPAddressInConnection = errors.DefineAborted(
-	"no_ip_address_in_connection",
-	"no IP address found in connection",
-)
-
 // Connect implements io.Server.
 func (s *server) Connect(ctx context.Context, frontend io.Frontend, ids *ttnpb.GatewayIdentifiers) (*io.Connection, error) {
 	if err := rights.RequireGateway(ctx, ids, ttnpb.Right_RIGHT_GATEWAY_LINK); err != nil {
