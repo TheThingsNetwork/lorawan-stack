@@ -46,8 +46,8 @@ func TestMarshalers(t *testing.T) {
 	var vals [][]interface{}
 
 	vals = append(vals, []interface{}{
-		BoolValue{},
-		BoolValue{Value: true},
+		&BoolValue{},
+		&BoolValue{Value: true},
 	})
 
 	var mTypes []interface{}
@@ -82,7 +82,7 @@ func TestMarshalers(t *testing.T) {
 
 	var drIdxVals []interface{}
 	for i := range DataRateIndex_name {
-		drIdxVals = append(drIdxVals, DataRateIndexValue{
+		drIdxVals = append(drIdxVals, &DataRateIndexValue{
 			Value: DataRateIndex(i),
 		})
 	}
@@ -96,16 +96,16 @@ func TestMarshalers(t *testing.T) {
 
 	var drOffsetVals []interface{}
 	for i := range DataRateOffset_name {
-		drOffsetVals = append(drOffsetVals, DataRateOffsetValue{
+		drOffsetVals = append(drOffsetVals, &DataRateOffsetValue{
 			Value: DataRateOffset(i),
 		})
 	}
 	vals = append(vals, drOffsetVals)
 
 	vals = append(vals, []interface{}{
-		FrequencyValue{Value: 100000},
-		FrequencyValue{Value: 2000000},
-		FrequencyValue{Value: 30000000},
+		&FrequencyValue{Value: 100000},
+		&FrequencyValue{Value: 2000000},
+		&FrequencyValue{Value: 30000000},
 	})
 
 	var joinRequestTypes []interface{}
@@ -152,7 +152,7 @@ func TestMarshalers(t *testing.T) {
 
 	var dutyCycleVals []interface{}
 	for i := range AggregatedDutyCycle_name {
-		dutyCycleVals = append(dutyCycleVals, AggregatedDutyCycleValue{
+		dutyCycleVals = append(dutyCycleVals, &AggregatedDutyCycleValue{
 			Value: AggregatedDutyCycle(i),
 		})
 	}
@@ -166,7 +166,7 @@ func TestMarshalers(t *testing.T) {
 
 	var pingSlotVals []interface{}
 	for i := range PingSlotPeriod_name {
-		pingSlotVals = append(pingSlotVals, PingSlotPeriodValue{
+		pingSlotVals = append(pingSlotVals, &PingSlotPeriodValue{
 			Value: PingSlotPeriod(i),
 		})
 	}
@@ -198,7 +198,7 @@ func TestMarshalers(t *testing.T) {
 
 	var deviceEIRPVals []interface{}
 	for i := range DeviceEIRP_name {
-		deviceEIRPVals = append(deviceEIRPVals, DeviceEIRPValue{
+		deviceEIRPVals = append(deviceEIRPVals, &DeviceEIRPValue{
 			Value: DeviceEIRP(i),
 		})
 	}
@@ -212,7 +212,7 @@ func TestMarshalers(t *testing.T) {
 
 	var ackLimitExponentVals []interface{}
 	for i := range ADRAckLimitExponent_name {
-		ackLimitExponentVals = append(ackLimitExponentVals, ADRAckLimitExponentValue{
+		ackLimitExponentVals = append(ackLimitExponentVals, &ADRAckLimitExponentValue{
 			Value: ADRAckLimitExponent(i),
 		})
 	}
@@ -226,7 +226,7 @@ func TestMarshalers(t *testing.T) {
 
 	var ackDelayExponentVals []interface{}
 	for i := range ADRAckDelayExponent_name {
-		ackDelayExponentVals = append(ackDelayExponentVals, ADRAckDelayExponentValue{
+		ackDelayExponentVals = append(ackDelayExponentVals, &ADRAckDelayExponentValue{
 			Value: ADRAckDelayExponent(i),
 		})
 	}
@@ -240,7 +240,7 @@ func TestMarshalers(t *testing.T) {
 
 	var rxDelayVals []interface{}
 	for i := range RxDelay_name {
-		rxDelayVals = append(rxDelayVals, RxDelayValue{
+		rxDelayVals = append(rxDelayVals, &RxDelayValue{
 			Value: RxDelay(i),
 		})
 	}
@@ -291,16 +291,19 @@ func TestMarshalers(t *testing.T) {
 	var outLines []string
 	for _, vs := range vals {
 		typ := reflect.TypeOf(vs[0])
-		newV := func() interface{} { return reflect.New(typ).Interface() }
+		typName := typ.String()
+		if typ.Kind() == reflect.Pointer {
+			typName = typ.Elem().String()
+		}
+		newV := func() interface{} {
+			if typ.Kind() == reflect.Pointer {
+				return reflect.New(typ.Elem()).Interface()
+			}
+			return reflect.New(typ).Interface()
+		}
 
-		t.Run(typ.String(), func(t *testing.T) {
+		t.Run(typName, func(t *testing.T) {
 			for _, v := range vs {
-				vPtr := func() interface{} {
-					vPtr := reflect.New(typ)
-					vPtr.Elem().Set(reflect.ValueOf(v))
-					return vPtr.Interface()
-				}
-
 				t.Run(fmt.Sprint(v), func(t *testing.T) {
 					if m, ok := v.(encoding.TextMarshaler); ok {
 						t.Run("Text", func(t *testing.T) {
@@ -309,7 +312,7 @@ func TestMarshalers(t *testing.T) {
 							if !a.So(err, should.BeNil) {
 								t.Error(test.FormatError(err))
 							}
-							outLines = append(outLines, fmt.Sprintf(`Text | %s | %v | %s`, typ, v, b))
+							outLines = append(outLines, fmt.Sprintf(`Text | %s | %v | %s`, typName, v, b))
 
 							got, ok := newV().(encoding.TextUnmarshaler)
 							if !ok {
@@ -347,7 +350,7 @@ func TestMarshalers(t *testing.T) {
 							if !a.So(err, should.BeNil) {
 								t.Error(test.FormatError(err))
 							}
-							outLines = append(outLines, fmt.Sprintf(`Binary | %s | %v | %v`, typ, v, b))
+							outLines = append(outLines, fmt.Sprintf(`Binary | %s | %v | %v`, typName, v, b))
 
 							got, ok := newV().(encoding.BinaryUnmarshaler)
 							if !ok {
@@ -369,7 +372,7 @@ func TestMarshalers(t *testing.T) {
 							if !a.So(err, should.BeNil) {
 								t.Error(test.FormatError(err))
 							}
-							outLines = append(outLines, fmt.Sprintf(`JSON | %s | %v | %s`, typ, v, b))
+							outLines = append(outLines, fmt.Sprintf(`JSON | %s | %v | %s`, typName, v, b))
 
 							got, ok := newV().(json.Unmarshaler)
 							if !ok {
@@ -391,12 +394,12 @@ func TestMarshalers(t *testing.T) {
 							if !a.So(err, should.BeNil) {
 								t.Error(test.FormatError(err))
 							}
-							outLines = append(outLines, fmt.Sprintf(`JSONPB | %s | %v | %s`, typ, v, b))
+							outLines = append(outLines, fmt.Sprintf(`JSONPB | %s | %v | %s`, typName, v, b))
 
 							{
 								got, ok := newV().(jsonpb.JSONPBUnmarshaler)
 								if !ok {
-									t.Fatal("Does not implement JSONPBUnmarshaler")
+									t.Fatalf("%T does not implement JSONPBUnmarshaler", newV())
 								}
 
 								err = got.UnmarshalJSONPB(&jsonpb.Unmarshaler{}, b)
@@ -417,7 +420,7 @@ func TestMarshalers(t *testing.T) {
 						})
 					}
 
-					if m, ok := vPtr().(jsonplugin.Marshaler); ok {
+					if m, ok := v.(jsonplugin.Marshaler); ok {
 						t.Run("ProtoJSON", func(t *testing.T) {
 							a := assertions.New(t)
 
@@ -425,7 +428,7 @@ func TestMarshalers(t *testing.T) {
 							if !a.So(err, should.BeNil) {
 								t.Error(test.FormatError(err))
 							}
-							outLines = append(outLines, fmt.Sprintf(`ProtoJSON | %s | %v | %s`, typ, v, b))
+							outLines = append(outLines, fmt.Sprintf(`ProtoJSON | %s | %v | %s`, typName, v, b))
 
 							{
 								got, ok := newV().(jsonplugin.Unmarshaler)
