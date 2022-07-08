@@ -27,17 +27,11 @@ func TestIdentifiersIsZero(t *testing.T) {
 	a := assertions.New(t)
 
 	for _, ids := range []interface{ IsZero() bool }{
-		ApplicationIdentifiers{},
 		&ApplicationIdentifiers{},
-		ClientIdentifiers{},
 		&ClientIdentifiers{},
-		EndDeviceIdentifiers{},
 		&EndDeviceIdentifiers{},
-		GatewayIdentifiers{},
 		&GatewayIdentifiers{},
-		OrganizationIdentifiers{},
 		&OrganizationIdentifiers{},
-		UserIdentifiers{},
 		&UserIdentifiers{},
 	} {
 		a.So(ids.IsZero(), should.BeTrue)
@@ -47,16 +41,16 @@ func TestIdentifiersIsZero(t *testing.T) {
 	devAddr := types.DevAddr{1, 2, 3, 4}
 
 	for _, ids := range []interface{ IsZero() bool }{
-		ApplicationIdentifiers{ApplicationId: "foo"},
-		ClientIdentifiers{ClientId: "foo"},
-		EndDeviceIdentifiers{ApplicationIds: &ApplicationIdentifiers{ApplicationId: "foo"}, DeviceId: "foo"},
-		EndDeviceIdentifiers{JoinEui: &eui, DevEui: &eui},
-		EndDeviceIdentifiers{DevAddr: &devAddr},
-		GatewayIdentifiers{GatewayId: "foo"},
-		GatewayIdentifiers{Eui: &eui},
-		OrganizationIdentifiers{OrganizationId: "foo"},
-		UserIdentifiers{UserId: "foo"},
-		UserIdentifiers{Email: "foo@example.com"},
+		&ApplicationIdentifiers{ApplicationId: "foo"},
+		&ClientIdentifiers{ClientId: "foo"},
+		&EndDeviceIdentifiers{ApplicationIds: &ApplicationIdentifiers{ApplicationId: "foo"}, DeviceId: "foo"},
+		&EndDeviceIdentifiers{JoinEui: &eui, DevEui: &eui},
+		&EndDeviceIdentifiers{DevAddr: &devAddr},
+		&GatewayIdentifiers{GatewayId: "foo"},
+		&GatewayIdentifiers{Eui: &eui},
+		&OrganizationIdentifiers{OrganizationId: "foo"},
+		&UserIdentifiers{UserId: "foo"},
+		&UserIdentifiers{Email: "foo@example.com"},
 	} {
 		a.So(ids.IsZero(), should.BeFalse)
 	}

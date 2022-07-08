@@ -30,7 +30,7 @@ import (
 )
 
 func TestV3AcceptedTopic(t *testing.T) {
-	uid := unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"})
+	uid := unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"})
 	for i, tc := range []struct {
 		Requested,
 		Accepted string
@@ -75,7 +75,7 @@ func TestV3AcceptedTopic(t *testing.T) {
 }
 
 func TestV3Topics(t *testing.T) {
-	appUID := unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"})
+	appUID := unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"})
 	devID := "foo-device"
 
 	for _, tc := range []struct {

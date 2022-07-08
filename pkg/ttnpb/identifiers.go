@@ -23,8 +23,8 @@ import (
 )
 
 // IsZero returns true if all identifiers have zero-values.
-func (ids ApplicationIdentifiers) IsZero() bool {
-	return ids.ApplicationId == ""
+func (ids *ApplicationIdentifiers) IsZero() bool {
+	return ids == nil || ids.ApplicationId == ""
 }
 
 // FieldIsZero returns whether path p is zero.
@@ -40,12 +40,15 @@ func (v *ApplicationIdentifiers) FieldIsZero(p string) bool {
 }
 
 // IsZero returns true if all identifiers have zero-values.
-func (ids ClientIdentifiers) IsZero() bool {
-	return ids.ClientId == ""
+func (ids *ClientIdentifiers) IsZero() bool {
+	return ids == nil || ids.ClientId == ""
 }
 
 // IsZero reports whether ids represent zero identifiers.
-func (ids EndDeviceIdentifiers) IsZero() bool {
+func (ids *EndDeviceIdentifiers) IsZero() bool {
+	if ids == nil {
+		return true
+	}
 	return ids.DeviceId == "" &&
 		ids.ApplicationIds == nil &&
 		(ids.DevAddr == nil || ids.DevAddr.IsZero()) &&
@@ -76,17 +79,23 @@ func (v *EndDeviceIdentifiers) FieldIsZero(p string) bool {
 }
 
 // IsZero returns true if all identifiers have zero-values.
-func (ids GatewayIdentifiers) IsZero() bool {
+func (ids *GatewayIdentifiers) IsZero() bool {
+	if ids == nil {
+		return true
+	}
 	return ids.GatewayId == "" && ids.Eui == nil
 }
 
 // IsZero returns true if all identifiers have zero-values.
-func (ids OrganizationIdentifiers) IsZero() bool {
-	return ids.OrganizationId == ""
+func (ids *OrganizationIdentifiers) IsZero() bool {
+	return ids == nil || ids.OrganizationId == ""
 }
 
 // IsZero returns true if all identifiers have zero-values.
-func (ids UserIdentifiers) IsZero() bool {
+func (ids *UserIdentifiers) IsZero() bool {
+	if ids == nil {
+		return true
+	}
 	return ids.GetUserId() == "" && ids.GetEmail() == ""
 }
 
@@ -108,29 +117,6 @@ func (ids *UserIdentifiers) GetOrganizationOrUserIdentifiers() *OrganizationOrUs
 	return &OrganizationOrUserIdentifiers{Ids: &OrganizationOrUserIdentifiers_UserIds{
 		UserIds: ids,
 	}}
-}
-
-// Copy stores a copy of ids in x and returns it.
-func (ids EndDeviceIdentifiers) Copy(x *EndDeviceIdentifiers) *EndDeviceIdentifiers {
-	*x = EndDeviceIdentifiers{
-		DeviceId:      ids.DeviceId,
-		XXX_sizecache: ids.XXX_sizecache,
-	}
-	if ids.ApplicationIds != nil {
-		x.ApplicationIds = &ApplicationIdentifiers{
-			ApplicationId: ids.GetApplicationIds().GetApplicationId(),
-		}
-	}
-	if ids.DevEui != nil {
-		x.DevEui = ids.DevEui.Copy(&types.EUI64{})
-	}
-	if ids.JoinEui != nil {
-		x.JoinEui = ids.JoinEui.Copy(&types.EUI64{})
-	}
-	if ids.DevAddr != nil {
-		x.DevAddr = ids.DevAddr.Copy(&types.DevAddr{})
-	}
-	return x
 }
 
 var errIdentifiers = errors.DefineInvalidArgument("identifiers", "invalid identifiers")

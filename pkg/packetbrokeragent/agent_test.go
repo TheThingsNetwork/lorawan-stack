@@ -366,7 +366,7 @@ func TestForwarder(t *testing.T) {
 		a := assertions.New(t)
 
 		token := test.Must(json.Marshal(GatewayUplinkToken{
-			GatewayUID: unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}),
+			GatewayUID: unique.ID(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}),
 			Token:      []byte{0x1, 0x2, 0x3, 0x4},
 		})).([]byte)
 		tokenObj := test.Must(tokenEncrypter.Encrypt(token)).(*jose.JSONWebEncryption)

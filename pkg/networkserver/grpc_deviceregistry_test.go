@@ -55,7 +55,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
+						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.Right_RIGHT_GATEWAY_SETTINGS_BASIC,
 							},
@@ -89,7 +89,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
+						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
 							},
@@ -134,7 +134,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
+						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
 								ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS,
@@ -201,7 +201,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
+						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
 								ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS,
@@ -263,7 +263,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
+						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
 								ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS,
@@ -1219,7 +1219,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
+						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.Right_RIGHT_GATEWAY_SETTINGS_BASIC,
 							},
@@ -1250,7 +1250,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
+						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 							},
@@ -1285,7 +1285,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
+						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 							},

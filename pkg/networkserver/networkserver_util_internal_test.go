@@ -795,7 +795,7 @@ func (env TestEnvironment) AssertLegacyScheduleDownlink(ctx context.Context, pat
 				if len(peerSequence) == 0 || peerSequence[len(peerSequence)-1] != path.PeerIndex {
 					peerSequence = append(peerSequence, path.PeerIndex)
 				}
-				uid := unique.ID(ctx, *path.GatewayIdentifiers)
+				uid := unique.ID(ctx, path.GatewayIdentifiers)
 				peer, ok := peerByIdx[path.PeerIndex]
 				if ok {
 					peerByIDs[uid] = peer
@@ -845,7 +845,7 @@ func (env TestEnvironment) AssertLegacyScheduleDownlink(ctx context.Context, pat
 						}, false
 					}
 					reqIDs = append(reqIDs, gtwIDs)
-					peer, ok := peerByIDs[unique.ID(ctx, *gtwIDs)]
+					peer, ok := peerByIDs[unique.ID(ctx, gtwIDs)]
 					if !ok {
 						return test.ClusterGetPeerResponse{
 							Error: errPeerNotFound.New(),
