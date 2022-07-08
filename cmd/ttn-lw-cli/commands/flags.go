@@ -58,9 +58,9 @@ func getCollaborator(flagSet *pflag.FlagSet) *ttnpb.OrganizationOrUserIdentifier
 		logger.Warn("Don't set organization ID and user ID at the same time, assuming user ID")
 	}
 	if userID != "" {
-		return ttnpb.UserIdentifiers{UserId: userID}.OrganizationOrUserIdentifiers()
+		return (&ttnpb.UserIdentifiers{UserId: userID}).GetOrganizationOrUserIdentifiers()
 	}
-	return ttnpb.OrganizationIdentifiers{OrganizationId: organizationID}.OrganizationOrUserIdentifiers()
+	return (&ttnpb.OrganizationIdentifiers{OrganizationId: organizationID}).GetOrganizationOrUserIdentifiers()
 }
 
 func forceFlags() *pflag.FlagSet {

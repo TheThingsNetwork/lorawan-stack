@@ -62,20 +62,20 @@ func TestIdentifiersIsZero(t *testing.T) {
 	}
 }
 
-func TestOrganizationOrUserIdentifiers(t *testing.T) {
+func TestGetOrganizationOrUserIdentifiers(t *testing.T) {
 	a := assertions.New(t)
 
 	usrID := UserIdentifiers{
 		UserId: "foo-user",
 	}
-	ouID := usrID.OrganizationOrUserIdentifiers()
+	ouID := usrID.GetOrganizationOrUserIdentifiers()
 	a.So(ouID, should.NotBeNil)
 	a.So(ouID.GetUserIds(), should.Resemble, usrID)
 
 	orgID := OrganizationIdentifiers{
 		OrganizationId: "foo-org",
 	}
-	ouID = orgID.OrganizationOrUserIdentifiers()
+	ouID = orgID.GetOrganizationOrUserIdentifiers()
 	a.So(ouID, should.NotBeNil)
 	a.So(ouID.GetOrganizationIds(), should.Resemble, orgID)
 }
@@ -118,7 +118,7 @@ func TestEntityIdentifiers(t *testing.T) {
 	a.So(eID, should.NotBeNil)
 	a.So(eID.GetOrganizationIds(), should.Resemble, orgID)
 
-	ouID := orgID.OrganizationOrUserIdentifiers()
+	ouID := orgID.GetOrganizationOrUserIdentifiers()
 	eID = ouID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
 	a.So(eID.GetOrganizationIds(), should.Resemble, orgID)
@@ -130,7 +130,7 @@ func TestEntityIdentifiers(t *testing.T) {
 	a.So(eID, should.NotBeNil)
 	a.So(eID.GetUserIds(), should.Resemble, usrID)
 
-	ouID = usrID.OrganizationOrUserIdentifiers()
+	ouID = usrID.GetOrganizationOrUserIdentifiers()
 	eID = ouID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
 	a.So(eID.GetUserIds(), should.Resemble, usrID)

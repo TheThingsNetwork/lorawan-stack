@@ -95,13 +95,8 @@ func (ids *OrganizationIdentifiers) GetOrganizationOrUserIdentifiers() *Organiza
 	if ids == nil {
 		return nil
 	}
-	return ids.OrganizationOrUserIdentifiers()
-}
-
-// OrganizationOrUserIdentifiers returns the OrganizationIdentifiers as *OrganizationOrUserIdentifiers.
-func (ids OrganizationIdentifiers) OrganizationOrUserIdentifiers() *OrganizationOrUserIdentifiers {
 	return &OrganizationOrUserIdentifiers{Ids: &OrganizationOrUserIdentifiers_OrganizationIds{
-		OrganizationIds: &ids,
+		OrganizationIds: ids,
 	}}
 }
 
@@ -110,13 +105,8 @@ func (ids *UserIdentifiers) GetOrganizationOrUserIdentifiers() *OrganizationOrUs
 	if ids == nil {
 		return nil
 	}
-	return ids.OrganizationOrUserIdentifiers()
-}
-
-// OrganizationOrUserIdentifiers returns the UserIdentifiers as *OrganizationOrUserIdentifiers.
-func (ids UserIdentifiers) OrganizationOrUserIdentifiers() *OrganizationOrUserIdentifiers {
 	return &OrganizationOrUserIdentifiers{Ids: &OrganizationOrUserIdentifiers_UserIds{
-		UserIds: &ids,
+		UserIds: ids,
 	}}
 }
 

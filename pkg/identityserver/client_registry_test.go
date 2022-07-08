@@ -210,7 +210,7 @@ func TestClientsCRUD(t *testing.T) {
 			a.So(got.StateDescription, should.Equal, "")
 		}
 
-		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{nil, usr1.OrganizationOrUserIdentifiers()} {
+		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{nil, usr1.GetOrganizationOrUserIdentifiers()} {
 			list, err := reg.List(ctx, &ttnpb.ListClientsRequest{
 				FieldMask:    ttnpb.FieldMask("name"),
 				Collaborator: collaborator,
@@ -261,7 +261,7 @@ func TestClientsPagination(t *testing.T) {
 
 		list, err := reg.List(ctx, &ttnpb.ListClientsRequest{
 			FieldMask:    ttnpb.FieldMask("name"),
-			Collaborator: usr1.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         1,
 		}, creds, grpc.Header(&md))
@@ -272,7 +272,7 @@ func TestClientsPagination(t *testing.T) {
 
 		list, err = reg.List(ctx, &ttnpb.ListClientsRequest{
 			FieldMask:    ttnpb.FieldMask("name"),
-			Collaborator: usr1.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         2,
 		}, creds)
@@ -282,7 +282,7 @@ func TestClientsPagination(t *testing.T) {
 
 		list, err = reg.List(ctx, &ttnpb.ListClientsRequest{
 			FieldMask:    ttnpb.FieldMask("name"),
-			Collaborator: usr1.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         3,
 		}, creds)

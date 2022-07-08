@@ -198,20 +198,10 @@ func (m *CreateLoginTokenRequest) ExtractRequestFields(dst map[string]interface{
 
 // Wrap methods of m.UserIdentifiers.
 
-func (m User) OrganizationOrUserIdentifiers() *OrganizationOrUserIdentifiers {
-	return m.Ids.OrganizationOrUserIdentifiers()
-}
-
 func (m *User) GetEntityIdentifiers() *EntityIdentifiers {
-	if m == nil {
-		return nil
-	}
-	return m.Ids.GetEntityIdentifiers()
+	return m.GetIds().GetEntityIdentifiers()
 }
 
 func (m *User) GetOrganizationOrUserIdentifiers() *OrganizationOrUserIdentifiers {
-	if m == nil {
-		return nil
-	}
-	return m.Ids.OrganizationOrUserIdentifiers()
+	return m.GetIds().GetOrganizationOrUserIdentifiers()
 }
