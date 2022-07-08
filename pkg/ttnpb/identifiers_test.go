@@ -65,14 +65,14 @@ func TestIdentifiersIsZero(t *testing.T) {
 func TestGetOrganizationOrUserIdentifiers(t *testing.T) {
 	a := assertions.New(t)
 
-	usrID := UserIdentifiers{
+	usrID := &UserIdentifiers{
 		UserId: "foo-user",
 	}
 	ouID := usrID.GetOrganizationOrUserIdentifiers()
 	a.So(ouID, should.NotBeNil)
 	a.So(ouID.GetUserIds(), should.Resemble, usrID)
 
-	orgID := OrganizationIdentifiers{
+	orgID := &OrganizationIdentifiers{
 		OrganizationId: "foo-org",
 	}
 	ouID = orgID.GetOrganizationOrUserIdentifiers()
@@ -83,35 +83,35 @@ func TestGetOrganizationOrUserIdentifiers(t *testing.T) {
 func TestEntityIdentifiers(t *testing.T) {
 	a := assertions.New(t)
 
-	appID := ApplicationIdentifiers{
+	appID := &ApplicationIdentifiers{
 		ApplicationId: "foo-app",
 	}
 	eID := appID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
 	a.So(eID.GetApplicationIds(), should.Resemble, appID)
 
-	cliID := ClientIdentifiers{
+	cliID := &ClientIdentifiers{
 		ClientId: "foo-client",
 	}
 	eID = cliID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
 	a.So(eID.GetClientIds(), should.Resemble, cliID)
 
-	devID := EndDeviceIdentifiers{
+	devID := &EndDeviceIdentifiers{
 		DeviceId: "foo-device",
 	}
 	eID = devID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
 	a.So(eID.GetDeviceIds(), should.Resemble, devID)
 
-	gtwID := GatewayIdentifiers{
+	gtwID := &GatewayIdentifiers{
 		GatewayId: "foo-gateway",
 	}
 	eID = gtwID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
 	a.So(eID.GetGatewayIds(), should.Resemble, gtwID)
 
-	orgID := OrganizationIdentifiers{
+	orgID := &OrganizationIdentifiers{
 		OrganizationId: "foo-org",
 	}
 	eID = orgID.GetEntityIdentifiers()
@@ -123,7 +123,7 @@ func TestEntityIdentifiers(t *testing.T) {
 	a.So(eID, should.NotBeNil)
 	a.So(eID.GetOrganizationIds(), should.Resemble, orgID)
 
-	usrID := UserIdentifiers{
+	usrID := &UserIdentifiers{
 		UserId: "foo-user",
 	}
 	eID = usrID.GetEntityIdentifiers()
