@@ -35,7 +35,7 @@ type ClientAuthorization struct {
 
 func (a ClientAuthorization) toPB() *ttnpb.OAuthClientAuthorization {
 	pb := &ttnpb.OAuthClientAuthorization{
-		Rights:    a.Rights.Rights,
+		Rights:    a.Rights,
 		CreatedAt: ttnpb.ProtoTimePtr(cleanTime(a.CreatedAt)),
 		UpdatedAt: ttnpb.ProtoTimePtr(cleanTime(a.UpdatedAt)),
 	}
@@ -70,7 +70,7 @@ type AuthorizationCode struct {
 
 func (a AuthorizationCode) toPB() *ttnpb.OAuthAuthorizationCode {
 	pb := &ttnpb.OAuthAuthorizationCode{
-		Rights:      a.Rights.Rights,
+		Rights:      a.Rights,
 		Code:        a.Code,
 		RedirectUri: a.RedirectURI,
 		State:       a.State,
@@ -116,7 +116,7 @@ type AccessToken struct {
 
 func (a AccessToken) toPB() *ttnpb.OAuthAccessToken {
 	pb := &ttnpb.OAuthAccessToken{
-		Rights:       a.Rights.Rights,
+		Rights:       a.Rights,
 		Id:           a.TokenID,
 		AccessToken:  a.AccessToken,
 		RefreshToken: a.RefreshToken,

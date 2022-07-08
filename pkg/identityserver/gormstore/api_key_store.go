@@ -73,7 +73,7 @@ func (s *apiKeyStore) CreateAPIKey(
 	model := &APIKey{
 		APIKeyID:   key.Id,
 		Key:        key.Key,
-		Rights:     Rights{Rights: key.Rights},
+		Rights:     key.Rights,
 		Name:       key.Name,
 		EntityID:   entity.PrimaryKey(),
 		EntityType: entityTypeForID(entityID),
@@ -194,7 +194,7 @@ func (s *apiKeyStore) UpdateAPIKey(
 	}
 	query = selectAPIKeyFields(ctx, query, fieldMask)
 	if ttnpb.HasAnyField(fieldMask, "rights") {
-		keyModel.Rights = Rights{Rights: key.Rights}
+		keyModel.Rights = key.Rights
 	}
 	if ttnpb.HasAnyField(fieldMask, "expires_at") {
 		keyModel.ExpiresAt = ttnpb.StdTime(key.ExpiresAt)
