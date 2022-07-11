@@ -37,23 +37,7 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 	}
 	defer s.Close()
 
-	mask := fieldMask(
-		"name",
-		"description",
-		"attributes",
-		"primary_email_address",
-		"primary_email_address_validated_at",
-		"password",
-		"password_updated_at",
-		"require_password_update",
-		"state",
-		"state_description",
-		"admin",
-		"temporary_password",
-		"temporary_password_created_at",
-		"temporary_password_expires_at",
-		"profile_picture",
-	)
+	mask := fieldMask(ttnpb.UserFieldPathsTopLevel...)
 
 	picture := &ttnpb.Picture{
 		Embedded: &ttnpb.Picture_Embedded{

@@ -15,10 +15,11 @@
 package storetest
 
 import (
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-func fieldMask(paths ...string) []string {
+func fieldMask(paths ...string) store.FieldMask {
 	return ttnpb.ExcludeFields(
 		paths,
 		"ids",
