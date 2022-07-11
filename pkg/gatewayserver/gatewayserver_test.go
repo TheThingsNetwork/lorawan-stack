@@ -71,7 +71,8 @@ var (
 )
 
 func TestGatewayServer(t *testing.T) {
-	for _, rtc := range []struct {
+	// The component's gRPC address is bound for each iteration and cannot be used in parallel.
+	for _, rtc := range []struct { //nolint:paralleltest
 		Name                   string
 		Setup                  func(context.Context, string, string, gatewayserver.GatewayConnectionStatsRegistry) (*component.Component, *gatewayserver.GatewayServer, error)
 		PostSetup              func(context.Context, *component.Component, *mockis.MockDefinition)
@@ -1810,7 +1811,7 @@ func TestGatewayServer(t *testing.T) {
 	}
 }
 
-func TestUpdateVersionInfo(t *testing.T) {
+func TestUpdateVersionInfo(t *testing.T) { //nolint:paralleltest
 	a, ctx := test.New(t)
 
 	ctx, cancel := context.WithCancel(ctx)
@@ -1999,8 +2000,9 @@ func TestUpdateVersionInfo(t *testing.T) {
 
 func TestBatchGetStatus(t *testing.T) {
 	a, ctx := test.New(t)
+	t.Parallel()
 
-	for _, tc := range []struct {
+	for _, tc := range []struct { //nolint:paralleltest
 		Name      string
 		WithRedis bool
 	}{
@@ -2114,7 +2116,6 @@ func TestBatchGetStatus(t *testing.T) {
 								cancel(token.Error())
 								return
 							}
-
 						}
 					}
 				}()
