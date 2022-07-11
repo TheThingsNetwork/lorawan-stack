@@ -2009,6 +2009,7 @@ func TestBatchGetStatus(t *testing.T) {
 		},
 	} {
 		t.Run(fmt.Sprintf("BatchGetStatus/%s", tc.Name), func(t *testing.T) {
+			t.Parallel()
 			ctx, cancel := context.WithCancel(ctx)
 			defer cancel()
 
@@ -2018,7 +2019,7 @@ func TestBatchGetStatus(t *testing.T) {
 			c := componenttest.NewComponent(t, &component.Config{
 				ServiceBase: config.ServiceBase{
 					GRPC: config.GRPC{
-						Listen:                      ":9187",
+						Listen:                      ":9188",
 						AllowInsecureForCredentials: true,
 					},
 					Cluster: cluster.Config{
@@ -2073,7 +2074,9 @@ func TestBatchGetStatus(t *testing.T) {
 
 			mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 
-			linkFn := func(ctx context.Context, t *testing.T, ids *ttnpb.GatewayIdentifiers, key string, statCh <-chan *ttnpbv2.StatusMessage) error {
+			linkFn := func(ctx context.Context, t *testing.T,
+				ids *ttnpb.GatewayIdentifiers, key string, statCh <-chan *ttnpbv2.StatusMessage,
+			) error {
 				ctx, cancel := errorcontext.New(ctx)
 				clientOpts := mqtt.NewClientOptions()
 				clientOpts.AddBroker("tcp://0.0.0.0:1881")
@@ -2101,7 +2104,8 @@ func TestBatchGetStatus(t *testing.T) {
 								cancel(err)
 								return
 							}
-							if token := client.Publish(fmt.Sprintf("%v/status", unique.ID(ctx, ids)), 1, false, buf); token.Wait() && token.Error() != nil {
+							if token := client.Publish(
+								fmt.Sprintf("%v/status", unique.ID(ctx, ids)), 1, false, buf); token.Wait() && token.Error() != nil {
 								cancel(token.Error())
 								return
 							}
@@ -2122,7 +2126,7 @@ func TestBatchGetStatus(t *testing.T) {
 				GatewayId: "eui-aaee000000000001",
 			}
 
-			statsConn, err := grpc.Dial(":9187",
+			statsConn, err := grpc.Dial(":9188",
 				append(rpcclient.DefaultDialOptions(test.Context()), grpc.WithInsecure(), grpc.WithBlock())...)
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
