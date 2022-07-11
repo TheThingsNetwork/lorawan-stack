@@ -182,6 +182,7 @@ func TestGatewayServer(t *testing.T) {
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Failed to setup server :%v", err)
 			}
+			defer c.Close()
 			roles := gs.Roles()
 			a.So(len(roles), should.Equal, 1)
 			a.So(roles[0], should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER)
@@ -1837,6 +1838,7 @@ func TestUpdateVersionInfo(t *testing.T) {
 			},
 		},
 	})
+	defer c.Close()
 
 	gatewayFetchInterval := test.Delay
 
@@ -1990,6 +1992,9 @@ func TestUpdateVersionInfo(t *testing.T) {
 	stat, err = statsClient.GetGatewayConnectionStats(statsCtx, gtwIDs)
 	a.So(errors.IsNotFound(err), should.BeTrue)
 	a.So(stat, should.BeNil)
+
+	gs.Close()
+	time.Sleep(timeout)
 }
 
 func TestBatchGetStatus(t *testing.T) {
@@ -2029,6 +2034,7 @@ func TestBatchGetStatus(t *testing.T) {
 					},
 				},
 			})
+			defer c.Close()
 
 			gatewayFetchInterval := test.Delay
 
