@@ -15951,7 +15951,7 @@
     "v3GatewayRemoteAddress": {
       "type": "object",
       "properties": {
-        "IP": {
+        "ip": {
           "type": "string"
         }
       },

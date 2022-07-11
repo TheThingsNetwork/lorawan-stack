@@ -433,7 +433,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"protocol", frontend.Protocol(),
 		"gateway_uid", uid,
-		"gateway_ip_address", addr.IP,
+		"gateway_ip_address", addr.Ip,
 	))
 	ctx = log.NewContext(ctx, logger)
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:conn:%s", events.NewCorrelationID()))
@@ -513,7 +513,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		existingConnEntry.tasksDone.Wait()
 	}
 
-	registerGatewayConnect(ctx, ids, frontend.Protocol(), &ttnpb.GatewayConnectionStats{
+	registerGatewayConnect(ctx, ids, &ttnpb.GatewayConnectionStats{
 		ConnectedAt:          ttnpb.ProtoTimePtr(conn.ConnectTime()),
 		Protocol:             conn.Frontend().Protocol(),
 		GatewayRemoteAddress: conn.GatewayRemoteAddress(),

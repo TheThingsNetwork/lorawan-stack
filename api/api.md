@@ -4205,7 +4205,7 @@ Remote Address of the Gateway, as seen by the Gateway Server.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `IP` | [`string`](#string) |  | IPv4 or IPv6 address. |
+| `ip` | [`string`](#string) |  | IPv4 or IPv6 address. |
 
 ### <a name="ttn.lorawan.v3.GatewayStatus">Message `GatewayStatus`</a>
 

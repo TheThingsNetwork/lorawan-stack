@@ -108,7 +108,7 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) error {
 		}
 		ctx = log.NewContextWithField(ctx, "remote_addr", p.Addr.String())
 		ctx = io.NewContextWithGatewayRemoteAddress(ctx, &ttnpb.GatewayRemoteAddress{
-			IP: addr,
+			Ip: addr,
 		})
 	}
 	uid := unique.ID(ctx, ids)

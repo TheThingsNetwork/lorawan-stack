@@ -19004,7 +19004,7 @@
           "extensions": [],
           "fields": [
             {
-              "name": "IP",
+              "name": "ip",
               "description": "IPv4 or IPv6 address.",
               "label": "",
               "type": "string",

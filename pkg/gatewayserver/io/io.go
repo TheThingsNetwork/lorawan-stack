@@ -44,7 +44,8 @@ func NewContextWithGatewayRemoteAddress(parent context.Context, addr *ttnpb.Gate
 	return context.WithValue(parent, gatewayRemoteAddrContextKey, addr)
 }
 
-// GatewayRemoteAddressFromContext returns the Gateway remote address from the context if present. Otherwise it returns nil.
+// GatewayRemoteAddressFromContext returns the Gateway remote address from the context if present.
+// Otherwise it returns nil.
 func GatewayRemoteAddressFromContext(ctx context.Context) *ttnpb.GatewayRemoteAddress {
 	if addr, ok := ctx.Value(gatewayRemoteAddrContextKey).(*ttnpb.GatewayRemoteAddress); ok {
 		return addr
@@ -742,7 +743,7 @@ func (c *Connection) Stats() (*ttnpb.GatewayConnectionStats, []string) {
 		GatewayRemoteAddress: c.GatewayRemoteAddress(),
 	}
 	paths := make([]string, 0, len(ttnpb.GatewayConnectionStatsFieldPathsTopLevel))
-	paths = append(paths, "connected_at", "disconnected_at", "protocol", "gateway_ip_address")
+	paths = append(paths, "connected_at", "disconnected_at", "protocol", "gateway_remote_address")
 
 	if s, t, ok := c.StatusStats(); ok {
 		stats.LastStatusReceivedAt = ttnpb.ProtoTimePtr(t)

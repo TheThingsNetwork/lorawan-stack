@@ -239,7 +239,7 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 	}
 
 	ctx = io.NewContextWithGatewayRemoteAddress(ctx, &ttnpb.GatewayRemoteAddress{
-		IP: addr,
+		Ip: addr,
 	})
 
 	conn, err := s.server.Connect(ctx, s, ids)

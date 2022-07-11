@@ -393,7 +393,7 @@ message GatewayStatus {
 
 // Remote Address of the Gateway, as seen by the Gateway Server.
 message GatewayRemoteAddress {
-  string IP = 1; // IPv4 or IPv6 address.
+  string ip = 1; // IPv4 or IPv6 address.
 }
 
 // Connection stats as monitored by the Gateway Server.

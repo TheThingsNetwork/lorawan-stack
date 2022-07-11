@@ -1551,15 +1551,15 @@ func (dst *GatewayStatus) SetFields(src *GatewayStatus, paths ...string) error {
 func (dst *GatewayRemoteAddress) SetFields(src *GatewayRemoteAddress, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
-		case "IP":
+		case "ip":
 			if len(subs) > 0 {
-				return fmt.Errorf("'IP' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'ip' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.IP = src.IP
+				dst.Ip = src.Ip
 			} else {
 				var zero string
-				dst.IP = zero
+				dst.Ip = zero
 			}
 
 		default:

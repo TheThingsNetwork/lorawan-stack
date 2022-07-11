@@ -2967,8 +2967,8 @@ func (m *GatewayRemoteAddress) ValidateFields(paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
-		case "IP":
-			// no validation rules for IP
+		case "ip":
+			// no validation rules for Ip
 		default:
 			return GatewayRemoteAddressValidationError{
 				field:  name,
