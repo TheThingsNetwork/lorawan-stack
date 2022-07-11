@@ -468,7 +468,7 @@ func (s *gatewayStore) selectWithID(ctx context.Context, ids ...string) func(*bu
 		case 1:
 			return q.Where("?TableAlias.gateway_id = ?", ids[0])
 		default:
-			return q.Where("?TableAlias.gateway_id IN (?)", ids)
+			return q.Where("?TableAlias.gateway_id IN (?)", bun.In(ids))
 		}
 	}
 }
@@ -482,7 +482,7 @@ func (s *gatewayStore) selectWithEUI(ctx context.Context, euis ...string) func(*
 		case 1:
 			return q.Where("?TableAlias.gateway_eui = ?", euis[0])
 		default:
-			return q.Where("?TableAlias.gateway_eui IN (?)", euis)
+			return q.Where("?TableAlias.gateway_eui IN (?)", bun.In(euis))
 		}
 	}
 }

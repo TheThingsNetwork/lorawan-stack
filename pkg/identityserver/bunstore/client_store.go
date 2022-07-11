@@ -332,7 +332,7 @@ func (s *clientStore) selectWithID(ctx context.Context, ids ...string) func(*bun
 		case 1:
 			return q.Where("?TableAlias.client_id = ?", ids[0])
 		default:
-			return q.Where("?TableAlias.client_id IN (?)", ids)
+			return q.Where("?TableAlias.client_id IN (?)", bun.In(ids))
 		}
 	}
 }

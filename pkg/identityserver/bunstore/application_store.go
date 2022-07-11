@@ -304,7 +304,7 @@ func (s *applicationStore) selectWithID(ctx context.Context, ids ...string) func
 		case 1:
 			return q.Where("?TableAlias.application_id = ?", ids[0])
 		default:
-			return q.Where("?TableAlias.application_id IN (?)", ids)
+			return q.Where("?TableAlias.application_id IN (?)", bun.In(ids))
 		}
 	}
 }

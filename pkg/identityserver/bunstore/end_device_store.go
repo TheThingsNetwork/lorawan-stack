@@ -345,7 +345,7 @@ func (s *endDeviceStore) selectWithID(ctx context.Context, applicationID string,
 		case 1:
 			return q.Where("?TableAlias.device_id = ?", deviceIDs[0])
 		default:
-			return q.Where("?TableAlias.device_id IN (?)", deviceIDs)
+			return q.Where("?TableAlias.device_id IN (?)", bun.In(deviceIDs))
 		}
 	}
 }

@@ -306,7 +306,7 @@ func (s *organizationStore) selectWithID(ctx context.Context, ids ...string) fun
 		case 1:
 			return q.Where("?TableAlias.account_uid = ?", ids[0])
 		default:
-			return q.Where("?TableAlias.account_uid IN (?)", ids)
+			return q.Where("?TableAlias.account_uid IN (?)", bun.In(ids))
 		}
 	}
 }
