@@ -37,7 +37,7 @@ type testStore struct {
 	*gatewayStore
 	*organizationStore
 	*userStore
-	// userSessionStore
+	*userSessionStore
 	*apiKeyStore
 	*membershipStore
 	// contactInfoStore
@@ -79,9 +79,9 @@ func newTestStore(t *testing.T, dsn *url.URL) storetest.Store {
 		gatewayStore:      newGatewayStore(baseStore),
 		organizationStore: newOrganizationStore(baseStore),
 		userStore:         newUserStore(baseStore),
-		// userSessionStore:  userSessionStore{baseStore: baseStore},
-		apiKeyStore:     newAPIKeyStore(baseStore),
-		membershipStore: newMembershipStore(baseStore),
+		userSessionStore:  newUserSessionStore(baseStore),
+		apiKeyStore:       newAPIKeyStore(baseStore),
+		membershipStore:   newMembershipStore(baseStore),
 		// contactInfoStore:  contactInfoStore{baseStore: baseStore},
 		// invitationStore:   invitationStore{baseStore: baseStore},
 		// loginTokenStore:   loginTokenStore{baseStore: baseStore},
