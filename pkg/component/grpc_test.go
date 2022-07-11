@@ -71,8 +71,8 @@ func (gs *gsImplementation) GetGatewayConnectionStats(ctx context.Context, _ *tt
 	return &ttnpb.GatewayConnectionStats{}, nil
 }
 
-func (gs *gsImplementation) BatchGetGatewayConnectionStats(ctx context.Context,
-	req *ttnpb.BatchGetGatewayConnectionStatsRequest,
+func (*gsImplementation) BatchGetGatewayConnectionStats(ctx context.Context,
+	_ *ttnpb.BatchGetGatewayConnectionStatsRequest,
 ) (*ttnpb.BatchGetGatewayConnectionStatsResponse, error) {
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err

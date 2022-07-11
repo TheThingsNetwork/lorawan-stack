@@ -1993,7 +1993,6 @@ func TestUpdateVersionInfo(t *testing.T) {
 }
 
 func TestBatchGetStatus(t *testing.T) {
-	t.Parallel()
 	a, ctx := test.New(t)
 
 	for _, tc := range []struct {
@@ -2009,7 +2008,6 @@ func TestBatchGetStatus(t *testing.T) {
 		},
 	} {
 		t.Run(fmt.Sprintf("BatchGetStatus/%s", tc.Name), func(t *testing.T) {
-			t.Parallel()
 			ctx, cancel := context.WithCancel(ctx)
 			defer cancel()
 
@@ -2019,7 +2017,7 @@ func TestBatchGetStatus(t *testing.T) {
 			c := componenttest.NewComponent(t, &component.Config{
 				ServiceBase: config.ServiceBase{
 					GRPC: config.GRPC{
-						Listen:                      ":9188",
+						Listen:                      ":9187",
 						AllowInsecureForCredentials: true,
 					},
 					Cluster: cluster.Config{
@@ -2077,6 +2075,7 @@ func TestBatchGetStatus(t *testing.T) {
 			linkFn := func(ctx context.Context, t *testing.T,
 				ids *ttnpb.GatewayIdentifiers, key string, statCh <-chan *ttnpbv2.StatusMessage,
 			) error {
+				t.Helper()
 				ctx, cancel := errorcontext.New(ctx)
 				clientOpts := mqtt.NewClientOptions()
 				clientOpts.AddBroker("tcp://0.0.0.0:1881")
@@ -2126,7 +2125,7 @@ func TestBatchGetStatus(t *testing.T) {
 				GatewayId: "eui-aaee000000000001",
 			}
 
-			statsConn, err := grpc.Dial(":9188",
+			statsConn, err := grpc.Dial(":9187",
 				append(rpcclient.DefaultDialOptions(test.Context()), grpc.WithInsecure(), grpc.WithBlock())...)
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
