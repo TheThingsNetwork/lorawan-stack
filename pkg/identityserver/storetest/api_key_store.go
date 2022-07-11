@@ -153,6 +153,7 @@ func (st *StoreTest) TestAPIKeyStoreCRUD(t *T) {
 				start := time.Now().Truncate(time.Second)
 
 				updated, err = s.UpdateAPIKey(ctx, ids, &ttnpb.APIKey{
+					Id:        id,
 					Name:      "Updated Name",
 					Rights:    allRights.GetRights(),
 					ExpiresAt: ttnpb.ProtoTimePtr(start.Add(5 * time.Minute)),
@@ -180,6 +181,7 @@ func (st *StoreTest) TestAPIKeyStoreCRUD(t *T) {
 			t.Run("UpdateAPIKey_Delete", func(t *T) {
 				a, ctx := test.New(t)
 				_, err := s.UpdateAPIKey(ctx, ids, &ttnpb.APIKey{
+					Id:     id,
 					Rights: nil,
 				}, fieldMask("rights"))
 				a.So(err, should.BeNil)

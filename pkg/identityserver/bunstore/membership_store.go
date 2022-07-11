@@ -189,21 +189,6 @@ func (*membershipStore) getOrganizationOrUserIdentifiers(
 	}
 }
 
-func (s *membershipStore) getEntityIdentifiers(entityType string, friendlyID string) *ttnpb.EntityIdentifiers {
-	switch entityType {
-	default:
-		panic(fmt.Errorf("invalid membership entity type: %s", entityType))
-	case "application":
-		return (&ttnpb.ApplicationIdentifiers{ApplicationId: friendlyID}).GetEntityIdentifiers()
-	case "client":
-		return (&ttnpb.ClientIdentifiers{ClientId: friendlyID}).GetEntityIdentifiers()
-	case "gateway":
-		return (&ttnpb.GatewayIdentifiers{GatewayId: friendlyID}).GetEntityIdentifiers()
-	case "organization":
-		return (&ttnpb.OrganizationIdentifiers{OrganizationId: friendlyID}).GetEntityIdentifiers()
-	}
-}
-
 func (s *membershipStore) FindAccountMembershipChains(
 	ctx context.Context, accountID *ttnpb.OrganizationOrUserIdentifiers, entityType string, entityIDs ...string,
 ) ([]*store.MembershipChain, error) {

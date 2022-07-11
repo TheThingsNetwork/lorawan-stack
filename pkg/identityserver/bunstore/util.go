@@ -26,6 +26,15 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
+func combineApply[Q bun.Query](f ...func(Q) Q) func(Q) Q {
+	return func(q Q) Q {
+		for _, f := range f {
+			q = f(q)
+		}
+		return q
+	}
+}
+
 func mapSlice[X any, Y any](in []X, f func(X) Y) []Y {
 	out := make([]Y, len(in))
 	for i, x := range in {

@@ -16,8 +16,10 @@ package store
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/uptrace/bun"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 type entityStore struct {
@@ -62,4 +64,36 @@ func (s *entityStore) getEntityUUID(ctx context.Context, entityType, entityID st
 		return "", wrapDriverError(err)
 	}
 	return uuid, nil
+}
+
+func (s *entityStore) getEntityID(ctx context.Context, entityType, entityUUID string) (string, error) {
+	var friendlyID string
+	err := s.DB.NewSelect().
+		Model(&entityFriendlyIDs{}).
+		Column("friendly_id").
+		Apply(selectWithContext(ctx)).
+		Where("entity_type = ?", entityType).
+		Where("entity_id = ?", entityUUID).
+		Scan(ctx, &friendlyID)
+	if err != nil {
+		return "", wrapDriverError(err)
+	}
+	return friendlyID, nil
+}
+
+func (*entityStore) getEntityIdentifiers(entityType string, friendlyID string) *ttnpb.EntityIdentifiers {
+	switch entityType {
+	default:
+		panic(fmt.Errorf("invalid entity type: %s", entityType))
+	case "application":
+		return (&ttnpb.ApplicationIdentifiers{ApplicationId: friendlyID}).GetEntityIdentifiers()
+	case "client":
+		return (&ttnpb.ClientIdentifiers{ClientId: friendlyID}).GetEntityIdentifiers()
+	case "gateway":
+		return (&ttnpb.GatewayIdentifiers{GatewayId: friendlyID}).GetEntityIdentifiers()
+	case "organization":
+		return (&ttnpb.OrganizationIdentifiers{OrganizationId: friendlyID}).GetEntityIdentifiers()
+	case "user":
+		return (&ttnpb.UserIdentifiers{UserId: friendlyID}).GetEntityIdentifiers()
+	}
 }
