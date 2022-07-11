@@ -108,12 +108,12 @@ func (g *Grants) Scan(src interface{}) error {
 }
 
 // Rights adds methods on a ttnpb.Rights so that it can be stored in an SQL database.
-type Rights ttnpb.Rights
+type Rights []ttnpb.Right
 
 // Value returns the value to store in the database.
 func (r Rights) Value() (driver.Value, error) {
-	ints := make([]int64, len(r.Rights))
-	for i, right := range r.Rights {
+	ints := make([]int64, len(r))
+	for i, right := range r {
 		ints[i] = int64(right)
 	}
 	return pq.Int64Array(ints).Value()
@@ -129,7 +129,7 @@ func (r *Rights) Scan(src interface{}) error {
 	for i, right := range ints {
 		rights[i] = ttnpb.Right(right)
 	}
-	*r = Rights{Rights: rights}
+	*r = rights
 	return nil
 }
 

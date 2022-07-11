@@ -18,6 +18,7 @@ import (
 	"context"
 	"runtime/trace"
 
+	"github.com/gogo/protobuf/proto"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -46,9 +47,9 @@ func (s *userSessionStore) CreateSession(ctx context.Context, sess *ttnpb.UserSe
 	if err = s.createEntity(ctx, &sessionModel); err != nil {
 		return nil, err
 	}
-	sessionProto := *sess
-	sessionModel.toPB(&sessionProto)
-	return &sessionProto, nil
+	sessionProto := proto.Clone(sess).(*ttnpb.UserSession)
+	sessionModel.toPB(sessionProto)
+	return sessionProto, nil
 }
 
 func (s *userSessionStore) FindSessions(

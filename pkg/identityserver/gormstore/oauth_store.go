@@ -124,7 +124,7 @@ func (s *oauthStore) Authorize(
 		}
 		authModel.SetContext(ctx)
 	}
-	authModel.Rights = Rights{Rights: authorization.Rights}
+	authModel.Rights = authorization.Rights
 	query := s.query(ctx, ClientAuthorization{}).Save(&authModel)
 	if query.Error != nil {
 		return nil, query.Error
@@ -215,7 +215,7 @@ func (s *oauthStore) CreateAuthorizationCode(
 	codeModel := AuthorizationCode{
 		ClientID:    client.PrimaryKey(),
 		UserID:      user.PrimaryKey(),
-		Rights:      Rights{Rights: code.Rights},
+		Rights:      code.Rights,
 		Code:        code.Code,
 		RedirectURI: code.RedirectUri,
 		State:       code.State,
@@ -285,7 +285,7 @@ func (s *oauthStore) CreateAccessToken(
 	tokenModel := AccessToken{
 		ClientID:     client.PrimaryKey(),
 		UserID:       user.PrimaryKey(),
-		Rights:       Rights{Rights: token.Rights},
+		Rights:       token.Rights,
 		TokenID:      token.Id,
 		PreviousID:   previousID,
 		AccessToken:  token.AccessToken,
