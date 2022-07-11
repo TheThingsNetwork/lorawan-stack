@@ -18644,12 +18644,12 @@
               "defaultValue": ""
             },
             {
-              "name": "gateway_ip_address",
-              "description": "Gateway IP Address.",
+              "name": "gateway_remote_address",
+              "description": "Gateway Remote Address.",
               "label": "",
-              "type": "GatewayIPAddress",
-              "longType": "GatewayIPAddress",
-              "fullType": "ttn.lorawan.v3.GatewayIPAddress",
+              "type": "GatewayRemoteAddress",
+              "longType": "GatewayRemoteAddress",
+              "fullType": "ttn.lorawan.v3.GatewayRemoteAddress",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -18794,30 +18794,6 @@
               "type": "float",
               "longType": "float",
               "fullType": "float",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
-          "name": "GatewayIPAddress",
-          "longName": "GatewayIPAddress",
-          "fullName": "ttn.lorawan.v3.GatewayIPAddress",
-          "description": "IP Address of the Gateway, as seen by the Gateway Server.",
-          "hasExtensions": false,
-          "hasFields": true,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "value",
-              "description": "IPv4 or IPv6.",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -19010,6 +18986,30 @@
               "type": "uint64",
               "longType": "uint64",
               "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "GatewayRemoteAddress",
+          "longName": "GatewayRemoteAddress",
+          "fullName": "ttn.lorawan.v3.GatewayRemoteAddress",
+          "description": "Remote Address of the Gateway, as seen by the Gateway Server.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "IP",
+              "description": "IPv4 or IPv6 address.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",

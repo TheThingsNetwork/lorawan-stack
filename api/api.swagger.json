@@ -15909,9 +15909,9 @@
           },
           "description": "Statistics for each sub band."
         },
-        "gateway_ip_address": {
-          "$ref": "#/definitions/v3GatewayIPAddress",
-          "description": "Gateway IP Address."
+        "gateway_remote_address": {
+          "$ref": "#/definitions/v3GatewayRemoteAddress",
+          "description": "Gateway Remote Address."
         }
       },
       "description": "Connection stats as monitored by the Gateway Server."
@@ -15925,15 +15925,6 @@
         }
       },
       "description": "GatewayDown contains downlink messages for the gateway."
-    },
-    "v3GatewayIPAddress": {
-      "type": "object",
-      "properties": {
-        "value": {
-          "type": "string"
-        }
-      },
-      "description": "IP Address of the Gateway, as seen by the Gateway Server."
     },
     "v3GatewayRadio": {
       "type": "object",
@@ -15956,6 +15947,15 @@
           "$ref": "#/definitions/GatewayRadioTxConfiguration"
         }
       }
+    },
+    "v3GatewayRemoteAddress": {
+      "type": "object",
+      "properties": {
+        "IP": {
+          "type": "string"
+        }
+      },
+      "description": "Remote Address of the Gateway, as seen by the Gateway Server."
     },
     "v3GatewayStatus": {
       "type": "object",

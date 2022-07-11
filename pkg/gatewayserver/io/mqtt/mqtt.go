@@ -165,8 +165,8 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 		return nil, err
 	}
 
-	ctx = io.NewContextWithGatewayIPAddress(ctx, &ttnpb.GatewayIPAddress{
-		Value: addr,
+	ctx = io.NewContextWithGatewayRemoteAddress(ctx, &ttnpb.GatewayRemoteAddress{
+		IP: addr,
 	})
 
 	c.io, err = c.server.Connect(ctx, c, ids)

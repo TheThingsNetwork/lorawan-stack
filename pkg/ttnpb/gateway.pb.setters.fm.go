@@ -1548,18 +1548,18 @@ func (dst *GatewayStatus) SetFields(src *GatewayStatus, paths ...string) error {
 	return nil
 }
 
-func (dst *GatewayIPAddress) SetFields(src *GatewayIPAddress, paths ...string) error {
+func (dst *GatewayRemoteAddress) SetFields(src *GatewayRemoteAddress, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
-		case "value":
+		case "IP":
 			if len(subs) > 0 {
-				return fmt.Errorf("'value' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'IP' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.Value = src.Value
+				dst.IP = src.IP
 			} else {
 				var zero string
-				dst.Value = zero
+				dst.IP = zero
 			}
 
 		default:
@@ -1706,29 +1706,29 @@ func (dst *GatewayConnectionStats) SetFields(src *GatewayConnectionStats, paths 
 			} else {
 				dst.SubBands = nil
 			}
-		case "gateway_ip_address":
+		case "gateway_remote_address":
 			if len(subs) > 0 {
-				var newDst, newSrc *GatewayIPAddress
-				if (src == nil || src.GatewayIpAddress == nil) && dst.GatewayIpAddress == nil {
+				var newDst, newSrc *GatewayRemoteAddress
+				if (src == nil || src.GatewayRemoteAddress == nil) && dst.GatewayRemoteAddress == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.GatewayIpAddress
+					newSrc = src.GatewayRemoteAddress
 				}
-				if dst.GatewayIpAddress != nil {
-					newDst = dst.GatewayIpAddress
+				if dst.GatewayRemoteAddress != nil {
+					newDst = dst.GatewayRemoteAddress
 				} else {
-					newDst = &GatewayIPAddress{}
-					dst.GatewayIpAddress = newDst
+					newDst = &GatewayRemoteAddress{}
+					dst.GatewayRemoteAddress = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.GatewayIpAddress = src.GatewayIpAddress
+					dst.GatewayRemoteAddress = src.GatewayRemoteAddress
 				} else {
-					dst.GatewayIpAddress = nil
+					dst.GatewayRemoteAddress = nil
 				}
 			}
 

@@ -261,10 +261,10 @@
   - [Message `GatewayConnectionStats`](#ttn.lorawan.v3.GatewayConnectionStats)
   - [Message `GatewayConnectionStats.RoundTripTimes`](#ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes)
   - [Message `GatewayConnectionStats.SubBand`](#ttn.lorawan.v3.GatewayConnectionStats.SubBand)
-  - [Message `GatewayIPAddress`](#ttn.lorawan.v3.GatewayIPAddress)
   - [Message `GatewayModel`](#ttn.lorawan.v3.GatewayModel)
   - [Message `GatewayRadio`](#ttn.lorawan.v3.GatewayRadio)
   - [Message `GatewayRadio.TxConfiguration`](#ttn.lorawan.v3.GatewayRadio.TxConfiguration)
+  - [Message `GatewayRemoteAddress`](#ttn.lorawan.v3.GatewayRemoteAddress)
   - [Message `GatewayStatus`](#ttn.lorawan.v3.GatewayStatus)
   - [Message `GatewayStatus.MetricsEntry`](#ttn.lorawan.v3.GatewayStatus.MetricsEntry)
   - [Message `GatewayStatus.VersionsEntry`](#ttn.lorawan.v3.GatewayStatus.VersionsEntry)
@@ -4138,7 +4138,7 @@ Connection stats as monitored by the Gateway Server.
 | `downlink_count` | [`uint64`](#uint64) |  |  |
 | `round_trip_times` | [`GatewayConnectionStats.RoundTripTimes`](#ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes) |  |  |
 | `sub_bands` | [`GatewayConnectionStats.SubBand`](#ttn.lorawan.v3.GatewayConnectionStats.SubBand) | repeated | Statistics for each sub band. |
-| `gateway_ip_address` | [`GatewayIPAddress`](#ttn.lorawan.v3.GatewayIPAddress) |  | Gateway IP Address. |
+| `gateway_remote_address` | [`GatewayRemoteAddress`](#ttn.lorawan.v3.GatewayRemoteAddress) |  | Gateway Remote Address. |
 
 ### <a name="ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes">Message `GatewayConnectionStats.RoundTripTimes`</a>
 
@@ -4165,14 +4165,6 @@ Connection stats as monitored by the Gateway Server.
 | `max_frequency` | [`uint64`](#uint64) |  |  |
 | `downlink_utilization_limit` | [`float`](#float) |  | Duty-cycle limit of the sub-band as a fraction of time. |
 | `downlink_utilization` | [`float`](#float) |  | Utilization rate of the available duty-cycle. This value should not exceed downlink_utilization_limit. |
-
-### <a name="ttn.lorawan.v3.GatewayIPAddress">Message `GatewayIPAddress`</a>
-
-IP Address of the Gateway, as seen by the Gateway Server.
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `value` | [`string`](#string) |  | IPv4 or IPv6. |
 
 ### <a name="ttn.lorawan.v3.GatewayModel">Message `GatewayModel`</a>
 
@@ -4206,6 +4198,14 @@ IP Address of the Gateway, as seen by the Gateway Server.
 | `min_frequency` | [`uint64`](#uint64) |  |  |
 | `max_frequency` | [`uint64`](#uint64) |  |  |
 | `notch_frequency` | [`uint64`](#uint64) |  |  |
+
+### <a name="ttn.lorawan.v3.GatewayRemoteAddress">Message `GatewayRemoteAddress`</a>
+
+Remote Address of the Gateway, as seen by the Gateway Server.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `IP` | [`string`](#string) |  | IPv4 or IPv6 address. |
 
 ### <a name="ttn.lorawan.v3.GatewayStatus">Message `GatewayStatus`</a>
 

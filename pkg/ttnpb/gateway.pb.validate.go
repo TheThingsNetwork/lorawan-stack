@@ -2952,25 +2952,25 @@ var _GatewayStatus_Versions_Pattern = regexp.MustCompile("^[a-z0-9](?:[_-]?[a-z0
 
 var _GatewayStatus_Metrics_Pattern = regexp.MustCompile("^[a-z0-9](?:[_-]?[a-z0-9]){2,}$")
 
-// ValidateFields checks the field values on GatewayIPAddress with the rules
-// defined in the proto definition for this message. If any rules are
+// ValidateFields checks the field values on GatewayRemoteAddress with the
+// rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
-func (m *GatewayIPAddress) ValidateFields(paths ...string) error {
+func (m *GatewayRemoteAddress) ValidateFields(paths ...string) error {
 	if m == nil {
 		return nil
 	}
 
 	if len(paths) == 0 {
-		paths = GatewayIPAddressFieldPathsNested
+		paths = GatewayRemoteAddressFieldPathsNested
 	}
 
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
-		case "value":
-			// no validation rules for Value
+		case "IP":
+			// no validation rules for IP
 		default:
-			return GatewayIPAddressValidationError{
+			return GatewayRemoteAddressValidationError{
 				field:  name,
 				reason: "invalid field path",
 			}
@@ -2979,9 +2979,9 @@ func (m *GatewayIPAddress) ValidateFields(paths ...string) error {
 	return nil
 }
 
-// GatewayIPAddressValidationError is the validation error returned by
-// GatewayIPAddress.ValidateFields if the designated constraints aren't met.
-type GatewayIPAddressValidationError struct {
+// GatewayRemoteAddressValidationError is the validation error returned by
+// GatewayRemoteAddress.ValidateFields if the designated constraints aren't met.
+type GatewayRemoteAddressValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -2989,22 +2989,24 @@ type GatewayIPAddressValidationError struct {
 }
 
 // Field function returns field value.
-func (e GatewayIPAddressValidationError) Field() string { return e.field }
+func (e GatewayRemoteAddressValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e GatewayIPAddressValidationError) Reason() string { return e.reason }
+func (e GatewayRemoteAddressValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e GatewayIPAddressValidationError) Cause() error { return e.cause }
+func (e GatewayRemoteAddressValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e GatewayIPAddressValidationError) Key() bool { return e.key }
+func (e GatewayRemoteAddressValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e GatewayIPAddressValidationError) ErrorName() string { return "GatewayIPAddressValidationError" }
+func (e GatewayRemoteAddressValidationError) ErrorName() string {
+	return "GatewayRemoteAddressValidationError"
+}
 
 // Error satisfies the builtin error interface
-func (e GatewayIPAddressValidationError) Error() string {
+func (e GatewayRemoteAddressValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -3016,14 +3018,14 @@ func (e GatewayIPAddressValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sGatewayIPAddress.%s: %s%s",
+		"invalid %sGatewayRemoteAddress.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = GatewayIPAddressValidationError{}
+var _ error = GatewayRemoteAddressValidationError{}
 
 var _ interface {
 	Field() string
@@ -3031,7 +3033,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = GatewayIPAddressValidationError{}
+} = GatewayRemoteAddressValidationError{}
 
 // ValidateFields checks the field values on GatewayConnectionStats with the
 // rules defined in the proto definition for this message. If any rules are
@@ -3155,12 +3157,12 @@ func (m *GatewayConnectionStats) ValidateFields(paths ...string) error {
 
 			}
 
-		case "gateway_ip_address":
+		case "gateway_remote_address":
 
-			if v, ok := interface{}(m.GetGatewayIpAddress()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetGatewayRemoteAddress()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GatewayConnectionStatsValidationError{
-						field:  "gateway_ip_address",
+						field:  "gateway_remote_address",
 						reason: "embedded message failed validation",
 						cause:  err,
 					}

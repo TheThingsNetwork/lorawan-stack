@@ -92,9 +92,9 @@ func (s *server) Connect(ctx context.Context, frontend io.Frontend, ids *ttnpb.G
 		return nil, err
 	}
 
-	ipAddr := io.GatewayIPaddressFromContext(ctx)
-	if ipAddr == nil {
-		panic("No IP address found in connection")
+	addr := io.GatewayRemoteAddressFromContext(ctx)
+	if addr == nil {
+		panic("No remote address found in connection")
 	}
 
 	conn, err := io.NewConnection(ctx, frontend, gtw, fps, true, nil)

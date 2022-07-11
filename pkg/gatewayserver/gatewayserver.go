@@ -424,16 +424,16 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		return nil, err
 	}
 
-	ipAddr := io.GatewayIPaddressFromContext(ctx)
-	if ipAddr == nil {
-		panic("No IP address found in connection")
+	addr := io.GatewayRemoteAddressFromContext(ctx)
+	if addr == nil {
+		panic("No remote address found in connection")
 	}
 
 	uid := unique.ID(ctx, ids)
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"protocol", frontend.Protocol(),
 		"gateway_uid", uid,
-		"gateway_ip_address", ipAddr.Value,
+		"gateway_ip_address", addr.IP,
 	))
 	ctx = log.NewContext(ctx, logger)
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:conn:%s", events.NewCorrelationID()))
@@ -514,9 +514,9 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	}
 
 	registerGatewayConnect(ctx, ids, frontend.Protocol(), &ttnpb.GatewayConnectionStats{
-		ConnectedAt:      ttnpb.ProtoTimePtr(conn.ConnectTime()),
-		Protocol:         conn.Frontend().Protocol(),
-		GatewayIpAddress: conn.GatewayIPAddress(),
+		ConnectedAt:          ttnpb.ProtoTimePtr(conn.ConnectTime()),
+		Protocol:             conn.Frontend().Protocol(),
+		GatewayRemoteAddress: conn.GatewayRemoteAddress(),
 	})
 	logger.Info("Connected")
 
@@ -925,9 +925,9 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 
 	// Initial update, so that the gateway appears connected.
 	stats := &ttnpb.GatewayConnectionStats{
-		ConnectedAt:      ttnpb.ProtoTimePtr(connectTime),
-		Protocol:         conn.Connection.Frontend().Protocol(),
-		GatewayIpAddress: conn.Connection.GatewayIPAddress(),
+		ConnectedAt:          ttnpb.ProtoTimePtr(connectTime),
+		Protocol:             conn.Connection.Frontend().Protocol(),
+		GatewayRemoteAddress: conn.Connection.GatewayRemoteAddress(),
 	}
 	registerGatewayConnectionStats(ctx, ids, stats)
 	if gs.statsRegistry != nil {

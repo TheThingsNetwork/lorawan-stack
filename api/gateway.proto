@@ -391,9 +391,9 @@ message GatewayStatus {
   google.protobuf.Struct advanced = 99;
 }
 
-// IP Address of the Gateway, as seen by the Gateway Server.
-message GatewayIPAddress {
-  string value = 1; // IPv4 or IPv6.
+// Remote Address of the Gateway, as seen by the Gateway Server.
+message GatewayRemoteAddress {
+  string IP = 1; // IPv4 or IPv6 address.
 }
 
 // Connection stats as monitored by the Gateway Server.
@@ -427,8 +427,8 @@ message GatewayConnectionStats {
   // Statistics for each sub band.
   repeated SubBand sub_bands = 10;
 
-  // Gateway IP Address.
-  GatewayIPAddress gateway_ip_address = 12;
+  // Gateway Remote Address.
+  GatewayRemoteAddress gateway_remote_address = 12;
 
   // next: 13
 }

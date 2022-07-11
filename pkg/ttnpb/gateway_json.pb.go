@@ -1342,11 +1342,11 @@ func (x *GatewayConnectionStats) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		}
 		s.WriteArrayEnd()
 	}
-	if x.GatewayIpAddress != nil || s.HasField("gateway_ip_address") {
+	if x.GatewayRemoteAddress != nil || s.HasField("gateway_remote_address") {
 		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("gateway_ip_address")
-		// NOTE: GatewayIPAddress does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.GatewayIpAddress)
+		s.WriteObjectField("gateway_remote_address")
+		// NOTE: GatewayRemoteAddress does not seem to implement MarshalProtoJSON.
+		gogo.MarshalMessage(s, x.GatewayRemoteAddress)
 	}
 	s.WriteObjectEnd()
 }
@@ -1458,16 +1458,16 @@ func (x *GatewayConnectionStats) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 				gogo.UnmarshalMessage(s, &v)
 				x.SubBands = append(x.SubBands, &v)
 			})
-		case "gateway_ip_address", "gatewayIpAddress":
-			s.AddField("gateway_ip_address")
+		case "gateway_remote_address", "gatewayRemoteAddress":
+			s.AddField("gateway_remote_address")
 			if s.ReadNil() {
-				x.GatewayIpAddress = nil
+				x.GatewayRemoteAddress = nil
 				return
 			}
-			// NOTE: GatewayIPAddress does not seem to implement UnmarshalProtoJSON.
-			var v GatewayIPAddress
+			// NOTE: GatewayRemoteAddress does not seem to implement UnmarshalProtoJSON.
+			var v GatewayRemoteAddress
 			gogo.UnmarshalMessage(s, &v)
-			x.GatewayIpAddress = &v
+			x.GatewayRemoteAddress = &v
 		}
 	})
 }
