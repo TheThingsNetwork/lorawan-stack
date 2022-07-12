@@ -33,6 +33,7 @@ var (
 		),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
+		events.WithDataType(&ttnpb.GatewayConnectionStats{}),
 	)
 	evtGatewayDisconnect = events.Define(
 		"gs.gateway.disconnect", "disconnect gateway",
@@ -118,7 +119,6 @@ const (
 	subsystem = "gs"
 	unknown   = "unknown"
 	protocol  = "protocol"
-	gatewayID = "gateway_id"
 	host      = "host"
 )
 
@@ -303,9 +303,13 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.txAckDropped.Collect(ch)
 }
 
-func registerGatewayConnect(ctx context.Context, ids *ttnpb.GatewayIdentifiers, protocol string) {
-	events.Publish(evtGatewayConnect.NewWithIdentifiersAndData(ctx, ids, nil))
-	gsMetrics.gatewaysConnected.WithLabelValues(ctx, protocol).Inc()
+func registerGatewayConnect(
+	ctx context.Context,
+	ids *ttnpb.GatewayIdentifiers,
+	stats *ttnpb.GatewayConnectionStats,
+) {
+	events.Publish(evtGatewayConnect.NewWithIdentifiersAndData(ctx, ids, stats))
+	gsMetrics.gatewaysConnected.WithLabelValues(ctx, stats.Protocol).Inc()
 }
 
 func registerGatewayDisconnect(ctx context.Context, ids *ttnpb.GatewayIdentifiers, protocol string, err error) {
