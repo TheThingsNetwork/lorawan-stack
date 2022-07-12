@@ -136,8 +136,12 @@ var (
 
 // NewConnection instantiates a new gateway connection.
 func NewConnection(
-	ctx context.Context, frontend Frontend, gateway *ttnpb.Gateway, fps *frequencyplans.Store,
-	enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration,
+	ctx context.Context,
+	frontend Frontend,
+	gateway *ttnpb.Gateway,
+	fps *frequencyplans.Store,
+	enforceDutyCycle bool,
+	scheduleAnytimeDelay *time.Duration,
 	addr *ttnpb.GatewayRemoteAddress,
 ) (*Connection, error) {
 	gatewayFPs := make(map[string]*frequencyplans.FrequencyPlan, len(gateway.FrequencyPlanIds))

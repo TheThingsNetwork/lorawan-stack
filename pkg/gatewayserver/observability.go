@@ -303,7 +303,9 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.txAckDropped.Collect(ch)
 }
 
-func registerGatewayConnect(ctx context.Context, ids *ttnpb.GatewayIdentifiers,
+func registerGatewayConnect(
+	ctx context.Context,
+	ids *ttnpb.GatewayIdentifiers,
 	stats *ttnpb.GatewayConnectionStats,
 ) {
 	events.Publish(evtGatewayConnect.NewWithIdentifiersAndData(ctx, ids, stats))
