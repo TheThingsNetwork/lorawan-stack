@@ -314,6 +314,28 @@ var csvFieldSetters = map[string]csvFieldSetterFunc{
 		}
 		return []string{"supports_class_c"}, nil
 	},
+	"vendor_id": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
+		if dst.VersionIds == nil {
+			dst.VersionIds = &ttnpb.EndDeviceVersionIdentifiers{}
+		}
+		s, err := strconv.ParseUint(val, 10, 32)
+		if err != nil {
+			return nil, err
+		}
+		dst.VersionIds.VendorId = uint32(s)
+		return []string{"version_ids.vendor_id"}, nil
+	},
+	"vendor_profile_id": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
+		if dst.VersionIds == nil {
+			dst.VersionIds = &ttnpb.EndDeviceVersionIdentifiers{}
+		}
+		s, err := strconv.ParseUint(val, 10, 32)
+		if err != nil {
+			return nil, err
+		}
+		dst.VersionIds.VendorProfileId = uint32(s)
+		return []string{"version_ids.vendor_profile_id"}, nil
+	},
 }
 
 func determineComma(head []byte) (rune, bool) {
