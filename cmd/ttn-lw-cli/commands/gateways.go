@@ -16,7 +16,6 @@ package commands
 
 import (
 	"os"
-	"strings"
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/spf13/cobra"
@@ -477,18 +476,12 @@ var (
 		Aliases: []string{"batch-connection-stats", "batch-cnx-stats"},
 		Short:   "Get connection stats for a batch of gateways",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ids, err := cmd.Flags().GetString("gateway-ids")
+			ids, err := cmd.Flags().GetStringSlice("gateway-ids")
 			if err != nil {
 				return err
 			}
-
-			s := strings.Split(ids, ",")
-			if len(s) == 0 {
-				return errNoGatewayID.New()
-			}
-
 			var gtwIDs []*ttnpb.GatewayIdentifiers
-			for _, id := range s {
+			for _, id := range ids {
 				gtwIDs = append(gtwIDs, &ttnpb.GatewayIdentifiers{
 					GatewayId: id,
 				})
@@ -588,7 +581,7 @@ func init() {
 	gatewaysConnectionStats.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysCommand.AddCommand(gatewaysConnectionStats)
 	gatewaysCommand.AddCommand(gatewaysBatchConnectionStats)
-	gatewaysBatchConnectionStats.Flags().String("gateway-ids", "",
+	gatewaysBatchConnectionStats.Flags().StringSlice("gateway-ids", []string{},
 		"comma separated list of gateway IDs to batch get stats")
 	gatewaysContactInfoCommand.PersistentFlags().AddFlagSet(gatewayIDFlags())
 	gatewaysCommand.AddCommand(gatewaysContactInfoCommand)
