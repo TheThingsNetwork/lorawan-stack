@@ -82,7 +82,7 @@ func (s *userSessionStore) CreateSession(
 	))
 	defer span.End()
 
-	userUUID, err := s.getEntityUUID(ctx, "user", pb.GetUserIds().GetUserId())
+	_, userUUID, err := s.getEntity(ctx, pb.GetUserIds())
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +176,7 @@ func (s *userSessionStore) FindSessions(
 	))
 	defer span.End()
 
-	userUUID, err := s.getEntityUUID(ctx, "user", userIDs.GetUserId())
+	_, userUUID, err := s.getEntity(ctx, userIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -218,7 +218,7 @@ func (s *userSessionStore) GetSession(
 	))
 	defer span.End()
 
-	userUUID, err := s.getEntityUUID(ctx, "user", userIDs.GetUserId())
+	_, userUUID, err := s.getEntity(ctx, userIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -270,7 +270,7 @@ func (s *userSessionStore) DeleteSession(ctx context.Context, userIDs *ttnpb.Use
 	))
 	defer span.End()
 
-	userUUID, err := s.getEntityUUID(ctx, "user", userIDs.GetUserId())
+	_, userUUID, err := s.getEntity(ctx, userIDs)
 	if err != nil {
 		return err
 	}
@@ -299,7 +299,7 @@ func (s *userSessionStore) DeleteAllUserSessions(ctx context.Context, userIDs *t
 	))
 	defer span.End()
 
-	userUUID, err := s.getEntityUUID(ctx, "user", userIDs.GetUserId())
+	_, userUUID, err := s.getEntity(ctx, userIDs)
 	if err != nil {
 		return err
 	}

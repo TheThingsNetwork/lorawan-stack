@@ -233,7 +233,7 @@ func (s *invitationStore) SetInvitationAcceptedBy(
 		return errInvitationAlreadyAccepted.New()
 	}
 
-	userUUID, err := s.getEntityUUID(ctx, "user", accepter.GetUserId())
+	_, userUUID, err := s.getEntity(ctx, accepter)
 	if err != nil {
 		return err
 	}

@@ -85,7 +85,7 @@ func (s *apiKeyStore) CreateAPIKey(
 	))
 	defer span.End()
 
-	entityUUID, err := s.getEntityUUID(ctx, entityID.EntityType(), entityID.IDString())
+	entityType, entityUUID, err := s.getEntity(ctx, entityID)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +95,7 @@ func (s *apiKeyStore) CreateAPIKey(
 		Key:        pb.Key,
 		Rights:     convertIntSlice[ttnpb.Right, int](pb.Rights),
 		Name:       pb.Name,
-		EntityType: entityID.EntityType(),
+		EntityType: entityType,
 		EntityID:   entityUUID,
 		ExpiresAt:  ttnpb.StdTime(pb.ExpiresAt),
 	}
@@ -185,12 +185,12 @@ func (s *apiKeyStore) FindAPIKeys(
 	))
 	defer span.End()
 
-	entityUUID, err := s.getEntityUUID(ctx, entityID.EntityType(), entityID.IDString())
+	entityType, entityUUID, err := s.getEntity(ctx, entityID)
 	if err != nil {
 		return nil, err
 	}
 
-	return s.listAPIKeysBy(ctx, s.selectWithEntityIDs(ctx, entityID.EntityType(), entityUUID))
+	return s.listAPIKeysBy(ctx, s.selectWithEntityIDs(ctx, entityType, entityUUID))
 }
 
 func (s *apiKeyStore) getAPIKeyModelBy(
@@ -219,13 +219,13 @@ func (s *apiKeyStore) GetAPIKey(
 	))
 	defer span.End()
 
-	entityUUID, err := s.getEntityUUID(ctx, entityID.EntityType(), entityID.IDString())
+	entityType, entityUUID, err := s.getEntity(ctx, entityID)
 	if err != nil {
 		return nil, err
 	}
 
 	model, err := s.getAPIKeyModelBy(ctx, combineApply(
-		s.selectWithEntityIDs(ctx, entityID.EntityType(), entityUUID),
+		s.selectWithEntityIDs(ctx, entityType, entityUUID),
 		s.selectWithAPIKeyID(ctx, id),
 	))
 	if err != nil {
@@ -259,7 +259,7 @@ func (s *apiKeyStore) GetAPIKeyByID(
 	if err != nil {
 		return nil, nil, err
 	}
-	ids := s.getEntityIdentifiers(model.EntityType, friendlyID)
+	ids := getEntityIdentifiers(model.EntityType, friendlyID)
 
 	return ids, pb, nil
 }
@@ -274,13 +274,13 @@ func (s *apiKeyStore) UpdateAPIKey(
 	))
 	defer span.End()
 
-	entityUUID, err := s.getEntityUUID(ctx, entityID.EntityType(), entityID.IDString())
+	entityType, entityUUID, err := s.getEntity(ctx, entityID)
 	if err != nil {
 		return nil, err
 	}
 
 	model, err := s.getAPIKeyModelBy(ctx, combineApply(
-		s.selectWithEntityIDs(ctx, entityID.EntityType(), entityUUID),
+		s.selectWithEntityIDs(ctx, entityType, entityUUID),
 		s.selectWithAPIKeyID(ctx, pb.Id),
 	))
 	if err != nil {
@@ -344,14 +344,14 @@ func (s *apiKeyStore) DeleteEntityAPIKeys(ctx context.Context, entityID *ttnpb.E
 	))
 	defer span.End()
 
-	entityUUID, err := s.getEntityUUID(ctx, entityID.EntityType(), entityID.IDString())
+	entityType, entityUUID, err := s.getEntity(ctx, entityID)
 	if err != nil {
 		return err
 	}
 
 	_, err = s.DB.NewDelete().
 		Model(&APIKey{}).
-		Where("entity_type = ? AND entity_id = ?", entityID.EntityType(), entityUUID).
+		Where("entity_type = ? AND entity_id = ?", entityType, entityUUID).
 		Exec(ctx)
 	if err != nil {
 		return wrapDriverError(err)

@@ -250,12 +250,12 @@ func (s *contactInfoStore) GetContactInfo(
 	))
 	defer span.End()
 
-	entityUUID, err := s.getEntityUUID(ctx, entityID.EntityType(), entityID.IDString())
+	entityType, entityUUID, err := s.getEntity(ctx, entityID)
 	if err != nil {
 		return nil, err
 	}
 
-	models, err := s.getContactInfoModelsBy(ctx, s.selectWithEntityIDs(ctx, entityID.EntityType(), entityUUID))
+	models, err := s.getContactInfoModelsBy(ctx, s.selectWithEntityIDs(ctx, entityType, entityUUID))
 	if err != nil {
 		return nil, err
 	}
@@ -278,17 +278,17 @@ func (s *contactInfoStore) SetContactInfo(
 	))
 	defer span.End()
 
-	entityUUID, err := s.getEntityUUID(ctx, entityID.EntityType(), entityID.IDString())
+	entityType, entityUUID, err := s.getEntity(ctx, entityID)
 	if err != nil {
 		return nil, err
 	}
 
-	models, err := s.getContactInfoModelsBy(ctx, s.selectWithEntityIDs(ctx, entityID.EntityType(), entityUUID))
+	models, err := s.getContactInfoModelsBy(ctx, s.selectWithEntityIDs(ctx, entityType, entityUUID))
 	if err != nil {
 		return nil, err
 	}
 
-	models, err = s.replaceContactInfo(ctx, models, pbs, entityID.EntityType(), entityUUID)
+	models, err = s.replaceContactInfo(ctx, models, pbs, entityType, entityUUID)
 	if err != nil {
 		return nil, err
 	}
@@ -331,14 +331,14 @@ func (s *contactInfoStore) CreateValidation(
 		}
 	}
 
-	entityUUID, err := s.getEntityUUID(ctx, pb.GetEntity().EntityType(), pb.GetEntity().IDString())
+	entityType, entityUUID, err := s.getEntity(ctx, pb.GetEntity())
 	if err != nil {
 		return nil, err
 	}
 
 	n, err := s.DB.NewSelect().
 		Model(&ContactInfoValidation{}).
-		Where("entity_type = ? AND entity_id = ?", pb.GetEntity().EntityType(), entityUUID).
+		Where("entity_type = ? AND entity_id = ?", entityType, entityUUID).
 		Where("contact_method = ? AND LOWER(value) = LOWER(?)", contactMethod, value).
 		Where("expires_at IS NULL OR expires_at > NOW()").
 		Count(ctx)
@@ -352,7 +352,7 @@ func (s *contactInfoStore) CreateValidation(
 	model := &ContactInfoValidation{
 		Reference:     pb.Id,
 		Token:         pb.Token,
-		EntityType:    pb.GetEntity().EntityType(),
+		EntityType:    entityType,
 		EntityID:      entityUUID,
 		ContactMethod: int(contactMethod),
 		Value:         value,
@@ -454,14 +454,14 @@ func (s *contactInfoStore) DeleteEntityContactInfo(ctx context.Context, entityID
 	))
 	defer span.End()
 
-	entityUUID, err := s.getEntityUUID(ctx, entityID.EntityType(), entityID.IDString())
+	entityType, entityUUID, err := s.getEntity(ctx, entityID)
 	if err != nil {
 		return err
 	}
 
 	_, err = s.DB.NewDelete().
 		Model(&ContactInfo{}).
-		Where("entity_type = ? AND entity_id = ?", entityID.EntityType(), entityUUID).
+		Where("entity_type = ? AND entity_id = ?", entityType, entityUUID).
 		Exec(ctx)
 	if err != nil {
 		return wrapDriverError(err)

@@ -83,7 +83,7 @@ func (s *loginTokenStore) FindActiveLoginTokens(
 	))
 	defer span.End()
 
-	userUUID, err := s.getEntityUUID(ctx, "user", userIDs.GetUserId())
+	_, userUUID, err := s.getEntity(ctx, userIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +117,7 @@ func (s *loginTokenStore) CreateLoginToken(ctx context.Context, pb *ttnpb.LoginT
 	))
 	defer span.End()
 
-	userUUID, err := s.getEntityUUID(ctx, "user", pb.GetUserIds().GetUserId())
+	_, userUUID, err := s.getEntity(ctx, pb.GetUserIds())
 	if err != nil {
 		return nil, err
 	}

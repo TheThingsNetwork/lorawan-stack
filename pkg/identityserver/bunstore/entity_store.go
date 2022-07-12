@@ -17,8 +17,10 @@ package store
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/uptrace/bun"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -26,6 +28,7 @@ type entityStore struct {
 	*baseStore
 	*applicationStore
 	*clientStore
+	*endDeviceStore
 	*gatewayStore
 	*organizationStore
 	*userStore
@@ -36,6 +39,7 @@ func newEntityStore(baseStore *baseStore) *entityStore {
 		baseStore:         baseStore,
 		applicationStore:  &applicationStore{baseStore},
 		clientStore:       &clientStore{baseStore},
+		endDeviceStore:    &endDeviceStore{baseStore},
 		gatewayStore:      &gatewayStore{baseStore},
 		organizationStore: &organizationStore{baseStore},
 		userStore:         &userStore{baseStore},
@@ -51,19 +55,63 @@ type entityFriendlyIDs struct {
 	FriendlyID string `bun:"friendly_id,notnull"`
 }
 
-func (s *entityStore) getEntityUUID(ctx context.Context, entityType, entityID string) (string, error) {
+type identifiers interface {
+	GetEntityIdentifiers() *ttnpb.EntityIdentifiers
+}
+
+var entityTypeReplacer = strings.NewReplacer(" ", "_")
+
+func getEntityType(ids ttnpb.IDStringer) string {
+	return entityTypeReplacer.Replace(ids.EntityType())
+}
+
+func (s *entityStore) getEntity(ctx context.Context, ids ttnpb.IDStringer) (entityType, entityUUID string, err error) {
+	entityType = getEntityType(ids)
+
+	if entityType == "end_device" {
+		entityIDs, ok := ids.(identifiers)
+		if !ok {
+			entityIDs = getEntityIdentifiers(entityType, ids.IDString())
+		}
+		devIDs := entityIDs.GetEntityIdentifiers().GetDeviceIds()
+		model, err := s.getEndDeviceModelBy(
+			ctx,
+			s.endDeviceStore.selectWithID(ctx, devIDs.GetApplicationIds().GetApplicationId(), devIDs.GetDeviceId()),
+			store.FieldMask{"ids"},
+		)
+		if err != nil {
+			return "", "", err
+		}
+		return entityType, model.ID, nil
+	}
+
 	var uuid string
+	err = s.DB.NewSelect().
+		Model(&entityFriendlyIDs{}).
+		Column("entity_id").
+		Apply(selectWithContext(ctx)).
+		Where("entity_type = ?", strings.ReplaceAll(ids.EntityType(), " ", "_")).
+		Where("friendly_id = ?", ids.IDString()).
+		Scan(ctx, &uuid)
+	if err != nil {
+		return "", "", wrapDriverError(err)
+	}
+	return entityType, uuid, nil
+}
+
+func (s *entityStore) getEntityUUIDs(ctx context.Context, entityType string, entityIDs ...string) ([]string, error) {
+	var uuids []string
 	err := s.DB.NewSelect().
 		Model(&entityFriendlyIDs{}).
 		Column("entity_id").
 		Apply(selectWithContext(ctx)).
 		Where("entity_type = ?", entityType).
-		Where("friendly_id = ?", entityID).
-		Scan(ctx, &uuid)
+		Where("friendly_id IN (?)", bun.In(entityIDs)).
+		Scan(ctx, &uuids)
 	if err != nil {
-		return "", wrapDriverError(err)
+		return nil, wrapDriverError(err)
 	}
-	return uuid, nil
+	return uuids, nil
 }
 
 func (s *entityStore) getEntityID(ctx context.Context, entityType, entityUUID string) (string, error) {
@@ -81,7 +129,7 @@ func (s *entityStore) getEntityID(ctx context.Context, entityType, entityUUID st
 	return friendlyID, nil
 }
 
-func (*entityStore) getEntityIdentifiers(entityType string, friendlyID string) *ttnpb.EntityIdentifiers {
+func getEntityIdentifiers(entityType string, friendlyID string) *ttnpb.EntityIdentifiers {
 	switch entityType {
 	default:
 		panic(fmt.Errorf("invalid entity type: %s", entityType))
@@ -89,6 +137,14 @@ func (*entityStore) getEntityIdentifiers(entityType string, friendlyID string) *
 		return (&ttnpb.ApplicationIdentifiers{ApplicationId: friendlyID}).GetEntityIdentifiers()
 	case "client":
 		return (&ttnpb.ClientIdentifiers{ClientId: friendlyID}).GetEntityIdentifiers()
+	case "end_device", "end device":
+		parts := strings.SplitN(friendlyID, ".", 2)
+		return (&ttnpb.EndDeviceIdentifiers{
+			ApplicationIds: &ttnpb.ApplicationIdentifiers{
+				ApplicationId: parts[0],
+			},
+			DeviceId: parts[1],
+		}).GetEntityIdentifiers()
 	case "gateway":
 		return (&ttnpb.GatewayIdentifiers{GatewayId: friendlyID}).GetEntityIdentifiers()
 	case "organization":

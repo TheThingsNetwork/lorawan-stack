@@ -242,7 +242,7 @@ func (s *membershipStore) FindAccountMembershipChains(
 			RightsOnEntity: &ttnpb.Rights{
 				Rights: convertIntSlice[int, ttnpb.Right](directMembership.Rights),
 			},
-			EntityIdentifiers: s.getEntityIdentifiers(
+			EntityIdentifiers: getEntityIdentifiers(
 				directMembership.EntityType, directMembership.EntityFriendlyID,
 			),
 		})
@@ -262,7 +262,7 @@ func (s *membershipStore) FindAccountMembershipChains(
 			RightsOnEntity: &ttnpb.Rights{
 				Rights: convertIntSlice[int, ttnpb.Right](indirectMembership.EntityRights),
 			},
-			EntityIdentifiers: s.getEntityIdentifiers(
+			EntityIdentifiers: getEntityIdentifiers(
 				indirectMembership.EntityType, indirectMembership.EntityFriendlyID,
 			),
 		})
@@ -284,7 +284,7 @@ func (s *membershipStore) FindMembers(
 	selectQuery := s.DB.NewSelect().
 		Model(&models).
 		Apply(selectWithContext(ctx)).
-		Where("entity_type = ?", entityID.EntityType()).
+		Where("entity_type = ?", getEntityType(entityID)).
 		Where("entity_friendly_id = ?", entityID.IDString())
 
 	count, err := selectQuery.Count(ctx)
@@ -329,9 +329,9 @@ func (s *membershipStore) GetMember(
 	err := s.DB.NewSelect().
 		Model(&model).
 		Apply(selectWithContext(ctx)).
-		Where("account_type = ?", accountID.EntityType()).
+		Where("account_type = ?", getEntityType(accountID)).
 		Where("account_friendly_id = ?", accountID.IDString()).
-		Where("entity_type = ?", entityID.EntityType()).
+		Where("entity_type = ?", getEntityType(entityID)).
 		Where("entity_friendly_id = ?", entityID.IDString()).
 		Scan(ctx)
 	if err != nil {
@@ -361,7 +361,7 @@ func (s *membershipStore) SetMember(
 	if err != nil {
 		return err
 	}
-	entityUUID, err := s.getEntityUUID(ctx, entityID.EntityType(), entityID.IDString())
+	entityType, entityUUID, err := s.getEntity(ctx, entityID)
 	if err != nil {
 		return err
 	}
@@ -369,7 +369,7 @@ func (s *membershipStore) SetMember(
 	err = s.DB.NewSelect().
 		Model(model).
 		Where("account_id = ?", account.ID).
-		Where("entity_type = ?", entityID.EntityType()).
+		Where("entity_type = ?", entityType).
 		Where("entity_id = ?", entityUUID).
 		Scan(ctx)
 	if err != nil {
@@ -381,7 +381,7 @@ func (s *membershipStore) SetMember(
 					Account:    account,
 					Rights:     convertIntSlice[ttnpb.Right, int](rights.GetRights()),
 					EntityID:   entityUUID,
-					EntityType: entityID.EntityType(),
+					EntityType: entityType,
 				}).
 				Exec(ctx)
 			if err != nil {
@@ -428,7 +428,7 @@ func (s *membershipStore) DeleteEntityMembers(
 	))
 	defer span.End()
 
-	entityUUID, err := s.getEntityUUID(store.WithSoftDeleted(ctx, false), entityID.EntityType(), entityID.IDString())
+	entityType, entityUUID, err := s.getEntity(store.WithSoftDeleted(ctx, false), entityID)
 	if err != nil {
 		return err
 	}
@@ -436,7 +436,7 @@ func (s *membershipStore) DeleteEntityMembers(
 	model := &Membership{}
 	deleteQuery := s.DB.NewDelete().
 		Model(model).
-		Where("entity_type = ?", entityID.EntityType()).
+		Where("entity_type = ?", entityType).
 		Where("entity_id = ?", entityUUID)
 	if _, err = deleteQuery.Exec(ctx); err != nil {
 		return wrapDriverError(err)
