@@ -21,6 +21,7 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -94,24 +95,37 @@ func (r *GatewayConnectionStatsRegistry) BatchGet(ctx context.Context,
 	ids []*ttnpb.GatewayIdentifiers,
 ) ([]*ttnpb.GatewayConnectionStatsEntry, error) {
 	ret := make([]*ttnpb.GatewayConnectionStatsEntry, 0)
-	if _, err := r.Redis.TxPipelined(ctx, func(p redis.Pipeliner) error {
-		for _, gtwIDs := range ids {
-			uid := unique.ID(ctx, gtwIDs)
-			result := &ttnpb.GatewayConnectionStats{}
-			if err := ttnredis.GetProto(ctx, r.Redis, r.key(uid)).ScanProto(result); err != nil {
-				if errors.IsNotFound(err) {
-					continue
-				}
-				return err
-			}
-			ret = append(ret, &ttnpb.GatewayConnectionStatsEntry{
-				GatewayIds:             gtwIDs,
-				GatewayConnectionStats: result,
-			})
-		}
-		return nil
-	}); err != nil {
+	keys := make([]string, 0)
+	for _, gtwIDs := range ids {
+		uid := unique.ID(ctx, gtwIDs)
+		keys = append(keys, r.key(uid))
+	}
+	rawValues, err := r.Redis.MGet(ctx, keys...).Result()
+	if err != nil {
 		return nil, ttnredis.ConvertError(err)
+	}
+
+	for i, val := range rawValues {
+		switch val := val.(type) {
+		case nil:
+			continue
+		case string:
+			stats := &ttnpb.GatewayConnectionStats{}
+			if err := ttnredis.UnmarshalProto(val, stats); err != nil {
+				log.FromContext(ctx).WithError(err).Warnf("Failed to decode stats payload")
+				continue
+			}
+			// The result of MGet is in the same order as the input keys passed to it.
+			// MGet inserts "nil" values for keys that don't have values, thereby maintaining the order.
+			// So we can use the index of the result to correlate the gateway IDs.
+			ret = append(ret, &ttnpb.GatewayConnectionStatsEntry{
+				GatewayIds:             ids[i],
+				GatewayConnectionStats: stats,
+			})
+		default:
+			log.FromContext(ctx).Warnf("Invalid %T element in stats payloads", val)
+			continue
+		}
 	}
 	return ret, nil
 }
