@@ -46,9 +46,13 @@ func (conf ServerConfig) NewServer(c *component.Component, customOpts ...Option)
 	var registerUnknownTo *ttnpb.OrganizationOrUserIdentifiers
 	switch conf.RegisterUnknown.Type {
 	case "user":
-		registerUnknownTo = (&ttnpb.UserIdentifiers{UserId: conf.RegisterUnknown.ID}).GetOrganizationOrUserIdentifiers()
+		registerUnknownTo = (&ttnpb.UserIdentifiers{
+			UserId: conf.RegisterUnknown.ID,
+		}).GetOrganizationOrUserIdentifiers()
 	case "organization":
-		registerUnknownTo = (&ttnpb.OrganizationIdentifiers{OrganizationId: conf.RegisterUnknown.ID}).GetOrganizationOrUserIdentifiers()
+		registerUnknownTo = (&ttnpb.OrganizationIdentifiers{
+			OrganizationId: conf.RegisterUnknown.ID,
+		}).GetOrganizationOrUserIdentifiers()
 	}
 	if registerUnknownTo != nil && conf.RegisterUnknown.APIKey != "" {
 		opts = append(opts,

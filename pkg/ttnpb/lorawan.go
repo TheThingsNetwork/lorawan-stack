@@ -286,7 +286,7 @@ func (v *FrequencyValue) MarshalText() ([]byte, error) {
 }
 
 // MarshalJSONPB implements jsonpb.JSONPBMarshaler interface.
-func (v *FrequencyValue) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
+func (v *FrequencyValue) MarshalJSONPB(*jsonpb.Marshaler) ([]byte, error) {
 	return v.MarshalJSON()
 }
 
