@@ -555,6 +555,8 @@ var GatewayConnectionStatsEntryFieldPathsNested = []string{
 	"gateway_connection_stats.connected_at",
 	"gateway_connection_stats.disconnected_at",
 	"gateway_connection_stats.downlink_count",
+	"gateway_connection_stats.gateway_remote_address",
+	"gateway_connection_stats.gateway_remote_address.ip",
 	"gateway_connection_stats.last_downlink_received_at",
 	"gateway_connection_stats.last_status",
 	"gateway_connection_stats.last_status.advanced",
