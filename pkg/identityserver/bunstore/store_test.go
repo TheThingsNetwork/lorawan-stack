@@ -46,7 +46,7 @@ type testStore struct {
 	// oauthStore
 	// euiStore
 	// entitySearch
-	// notificationStore
+	*notificationStore
 
 	// authenticationProviderStore
 	// externalUserStore
@@ -88,7 +88,7 @@ func newTestStore(t *testing.T, dsn *url.URL) storetest.Store {
 		// oauthStore:        oauthStore{baseStore: baseStore},
 		// euiStore:          euiStore{baseStore: baseStore},
 		// entitySearch:      entitySearch{baseStore: baseStore},
-		// notificationStore: notificationStore{baseStore: baseStore},
+		notificationStore: newNotificationStore(baseStore),
 
 		// authenticationProviderStore: authenticationProviderStore{baseStore: baseStore},
 		// externalUserStore:           externalUserStore{baseStore: baseStore},
