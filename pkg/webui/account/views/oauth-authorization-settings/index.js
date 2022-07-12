@@ -20,7 +20,7 @@ import { bindActionCreators } from 'redux'
 import { push } from 'connected-react-router'
 
 import toast from '@ttn-lw/components/toast'
-import Button from '@ttn-lw/components/button'
+import ModalButton from '@ttn-lw/components/button/modal-button'
 import DataSheet from '@ttn-lw/components/data-sheet'
 import Tag from '@ttn-lw/components/tag'
 import TagGroup from '@ttn-lw/components/tag/group'
@@ -41,6 +41,8 @@ const m = defineMessages({
   deleteButton: 'Revoke authorization',
   deleteSuccess: 'This authorization was successfully revoked',
   deleteFailure: 'There was an error and this authorization could not be revoked',
+  deleteMessage:
+    'Are you sure you want to unauthorize this client? The client will not be able to perform any actions on your behalf if the authorization is revoked. You can always choose to authorize the client again if wished.',
 })
 
 const AuthorizationSettings = props => {
@@ -55,7 +57,7 @@ const AuthorizationSettings = props => {
 
   const handleDeleteAuthorization = React.useCallback(async () => {
     try {
-      await deleteAuthorization(user_id, client_id)
+      await deleteAuthorization()
       toast({
         title: client_id,
         message: m.deleteSuccess,
@@ -69,7 +71,7 @@ const AuthorizationSettings = props => {
         type: toast.types.ERROR,
       })
     }
-  }, [navigateToList, deleteAuthorization, client_id, user_id])
+  }, [navigateToList, deleteAuthorization, client_id])
 
   const tags = rights.map(r => {
     let rightLabel = intl.formatMessage({ id: `enum:${r}` })
@@ -102,12 +104,14 @@ const AuthorizationSettings = props => {
         items: [
           {
             value: (
-              <Button
-                type="button"
-                onClick={handleDeleteAuthorization}
+              <ModalButton
+                modalData={{
+                  message: m.deleteMessage,
+                }}
+                onApprove={handleDeleteAuthorization}
                 message={m.deleteButton}
+                type="button"
                 icon="delete"
-                danger
               />
             ),
           },
@@ -163,6 +167,10 @@ export default connect(
     ...stateProps,
     ...dispatchProps,
     ...ownProps,
-    deleteAuthorization: (userId, clientId) => dispatchProps.deleteAuthorization(userId, clientId),
+    deleteAuthorization: () =>
+      dispatchProps.deleteAuthorization(
+        stateProps.authorization.user_ids.user_id,
+        stateProps.authorization.client_ids.client_id,
+      ),
   }),
 )(AuthorizationSettings)

@@ -40,7 +40,7 @@ describe('Account App authorization management', () => {
     cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
     cy.visit(`${Cypress.config('accountAppRootPath')}/client-authorizations/console`)
     cy.findByText('Authorization settings').should('be.visible')
-    cy.findByText('Active authorization tokens').should('be.visible')
+    cy.findByText('Active access tokens').should('be.visible')
     cy.findByText('General information').should('be.visible')
     cy.findByText('Actions').should('be.visible')
   })
@@ -57,6 +57,12 @@ describe('Account App authorization management', () => {
     cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
     cy.visit(`${Cypress.config('accountAppRootPath')}/client-authorizations/console`)
     cy.findByRole('button', { name: /Revoke authorization/ }).click()
+    cy.findByTestId('modal-window')
+      .should('be.visible')
+      .within(() => {
+        cy.findByText('Revoke authorization', { selector: 'h1' }).should('be.visible')
+        cy.findByRole('button', { name: /Revoke authorization/ }).click()
+      })
     cy.findByTestId('error-notification').should('not.exist')
 
     cy.location('pathname').should(
@@ -70,7 +76,7 @@ describe('Account App authorization management', () => {
   it('succeeds invalidating all tokens', () => {
     cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
     cy.visit(`${Cypress.config('accountAppRootPath')}/client-authorizations/console/tokens`)
-    cy.findByRole('button', { name: /Invalidate all tokens/ }).click()
+    cy.findByRole('button', { name: /Invalidate all access tokens/ }).click()
     cy.findByTestId('error-notification').should('not.exist')
 
     cy.location('pathname').should(
@@ -85,7 +91,7 @@ describe('Account App authorization management', () => {
   it('succeeds invalidating one token', () => {
     cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
     cy.visit(`${Cypress.config('accountAppRootPath')}/client-authorizations/console/tokens`)
-    cy.findByRole('button', { name: /Invalidate this token/ }).click()
+    cy.findByRole('button', { name: /Invalidate this access token/ }).click()
     cy.findByTestId('error-notification').should('not.exist')
 
     cy.location('pathname').should(

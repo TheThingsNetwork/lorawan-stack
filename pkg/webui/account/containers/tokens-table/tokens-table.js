@@ -38,12 +38,12 @@ import {
 } from '@account/store/selectors/authorizations'
 
 const m = defineMessages({
-  deleteSuccess: 'Token invalidated',
-  deleteFail: 'There was an error and the token could not be invalidated',
-  deleteButton: 'Invalidate this token',
-  deleteAllSuccess: 'All tokens invalidated',
-  deleteAllFail: 'There was an error and the tokens could not be invalidated',
-  deleteAllButton: 'Invalidate all tokens',
+  deleteSuccess: 'Access token invalidated',
+  deleteFail: 'There was an error and the access token could not be invalidated',
+  deleteButton: 'Invalidate this access token',
+  deleteAllSuccess: 'All access tokens invalidated',
+  deleteAllFail: 'There was an error and the access tokens could not be invalidated',
+  deleteAllButton: 'Invalidate all access tokens',
   expires: 'Expires',
 })
 
@@ -59,7 +59,7 @@ const TokensTable = props => {
   const handleDeleteToken = React.useCallback(
     async id => {
       try {
-        await deleteToken(userId, clientId, id)
+        await deleteToken(id)
         toast({
           title: clientId,
           message: m.deleteSuccess,
@@ -74,12 +74,12 @@ const TokensTable = props => {
         })
       }
     },
-    [deleteToken, userId, clientId, navigateToList],
+    [deleteToken, clientId, navigateToList],
   )
 
   const handleDeleteAllTokens = React.useCallback(async () => {
     try {
-      await deleteAllTokens(userId, clientId, tokenIds)
+      await deleteAllTokens(tokenIds)
       toast({
         title: clientId,
         message: m.deleteAllSuccess,
@@ -93,7 +93,7 @@ const TokensTable = props => {
         type: toast.types.ERROR,
       })
     }
-  }, [deleteAllTokens, userId, clientId, tokenIds, navigateToList])
+  }, [deleteAllTokens, clientId, tokenIds, navigateToList])
 
   const headers = React.useMemo(() => {
     const baseHeaders = [

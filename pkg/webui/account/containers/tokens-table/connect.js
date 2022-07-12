@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,8 +44,9 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
   ...stateProps,
   ...dispatchProps,
   ...ownProps,
-  deleteToken: (userId, clientId, id) => dispatchProps.deleteToken(userId, clientId, id),
-  deleteAllTokens: (userId, clientId, ids) => dispatchProps.deleteAllTokens(userId, clientId, ids),
+  deleteToken: id => dispatchProps.deleteToken(stateProps.userId, stateProps.clientId, id),
+  deleteAllTokens: ids =>
+    dispatchProps.deleteAllTokens(stateProps.userId, stateProps.clientId, ids),
 })
 
 export default Tokens => connect(mapStateToProps, mapDispatchToProps, mergeProps)(Tokens)

@@ -47,7 +47,7 @@ import style from './authorization.styl'
 
 const m = defineMessages({
   authorizationSettings: 'Authorization settings',
-  authorizationTokens: 'Active authorization tokens',
+  accessTokens: 'Active access tokens',
 })
 
 const AuthorizationOverview = props => {
@@ -70,7 +70,7 @@ const AuthorizationOverview = props => {
       name: 'overview',
       link: `${basePath}`,
     },
-    { title: m.authorizationTokens, name: 'tokens', link: `${basePath}/tokens` },
+    { title: m.accessTokens, name: 'tokens', link: `${basePath}/tokens` },
   ]
 
   return (
