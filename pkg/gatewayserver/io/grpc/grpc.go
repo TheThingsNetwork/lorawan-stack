@@ -97,24 +97,25 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) error {
 		return err
 	}
 
+	var addr string
 	if p, ok := peer.FromContext(ctx); ok {
 		remoteAddr := p.Addr.String()
 		if remoteAddr == "pipe" {
 			remoteAddr = "127.0.0.0:0"
 		}
-		addr, _, err := net.SplitHostPort(remoteAddr)
+		addr, _, err = net.SplitHostPort(remoteAddr)
 		if err != nil {
 			return err
 		}
 		ctx = log.NewContextWithField(ctx, "remote_addr", p.Addr.String())
-		ctx = io.NewContextWithGatewayRemoteAddress(ctx, &ttnpb.GatewayRemoteAddress{
-			Ip: addr,
-		})
 	}
 	uid := unique.ID(ctx, ids)
 	ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
 	logger := log.FromContext(ctx)
-	conn, err := s.server.Connect(ctx, s, ids)
+
+	conn, err := s.server.Connect(ctx, s, ids, &ttnpb.GatewayRemoteAddress{
+		Ip: addr,
+	})
 	if err != nil {
 		logger.WithError(err).Warn("Failed to connect")
 		return errConnect.WithCause(err).WithAttributes("gateway_uid", uid)

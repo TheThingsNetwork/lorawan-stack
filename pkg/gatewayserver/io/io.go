@@ -35,24 +35,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-type gatewayRemoteAddrContextKeyType struct{}
-
-var gatewayRemoteAddrContextKey gatewayRemoteAddrContextKeyType
-
-// NewContextWithGatewayRemoteAddress returns a context derived from parent that contains the Gateway remote address.
-func NewContextWithGatewayRemoteAddress(parent context.Context, addr *ttnpb.GatewayRemoteAddress) context.Context {
-	return context.WithValue(parent, gatewayRemoteAddrContextKey, addr)
-}
-
-// GatewayRemoteAddressFromContext returns the Gateway remote address from the context if present.
-// Otherwise it returns nil.
-func GatewayRemoteAddressFromContext(ctx context.Context) *ttnpb.GatewayRemoteAddress {
-	if addr, ok := ctx.Value(gatewayRemoteAddrContextKey).(*ttnpb.GatewayRemoteAddress); ok {
-		return addr
-	}
-	return nil
-}
-
 const (
 	bufferSize = 1 << 4
 
@@ -74,12 +56,15 @@ type Server interface {
 	GetBaseConfig(ctx context.Context) config.ServiceBase
 	// FillGatewayContext fills the given context and identifiers.
 	// This method should only be used for request contexts.
-	FillGatewayContext(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (context.Context, *ttnpb.GatewayIdentifiers, error)
+	FillGatewayContext(ctx context.Context,
+		ids *ttnpb.GatewayIdentifiers) (context.Context, *ttnpb.GatewayIdentifiers, error)
 	// Connect connects a gateway by its identifiers to the Gateway Server, and returns a Connection for traffic and
 	// control.
-	Connect(ctx context.Context, frontend Frontend, ids *ttnpb.GatewayIdentifiers) (*Connection, error)
+	Connect(ctx context.Context,
+		frontend Frontend, ids *ttnpb.GatewayIdentifiers, addr *ttnpb.GatewayRemoteAddress) (*Connection, error)
 	// GetFrequencyPlans gets the frequency plans by the gateway identifiers.
-	GetFrequencyPlans(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (map[string]*frequencyplans.FrequencyPlan, error)
+	GetFrequencyPlans(ctx context.Context,
+		ids *ttnpb.GatewayIdentifiers) (map[string]*frequencyplans.FrequencyPlan, error)
 	// ClaimDownlink claims the downlink path for the given gateway.
 	ClaimDownlink(ctx context.Context, ids *ttnpb.GatewayIdentifiers) error
 	// UnclaimDownlink releases the claim of the downlink path for the given gateway.
@@ -153,6 +138,7 @@ var (
 func NewConnection(
 	ctx context.Context, frontend Frontend, gateway *ttnpb.Gateway, fps *frequencyplans.Store,
 	enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration,
+	addr *ttnpb.GatewayRemoteAddress,
 ) (*Connection, error) {
 	gatewayFPs := make(map[string]*frequencyplans.FrequencyPlan, len(gateway.FrequencyPlanIds))
 	fp0ID := gateway.FrequencyPlanId
@@ -195,7 +181,7 @@ func NewConnection(
 		bandID:           bandID,
 		fps:              fps,
 		scheduler:        scheduler,
-		addr:             GatewayRemoteAddressFromContext(ctx),
+		addr:             addr,
 		rtts:             newRTTs(maxRTTs, rttTTL),
 		upCh:             make(chan *ttnpb.GatewayUplinkMessage, bufferSize),
 		downCh:           make(chan *ttnpb.DownlinkMessage, bufferSize),

@@ -419,14 +419,11 @@ type connectionEntry struct {
 
 // Connect connects a gateway by its identifiers to the Gateway Server, and returns a io.Connection for traffic and
 // control.
-func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids *ttnpb.GatewayIdentifiers) (*io.Connection, error) {
+func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids *ttnpb.GatewayIdentifiers,
+	addr *ttnpb.GatewayRemoteAddress,
+) (*io.Connection, error) {
 	if err := gs.entityRegistry.AssertGatewayRights(ctx, ids, ttnpb.Right_RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
-	}
-
-	addr := io.GatewayRemoteAddressFromContext(ctx)
-	if addr == nil {
-		panic("No remote address found in connection")
 	}
 
 	uid := unique.ID(ctx, ids)
@@ -492,7 +489,9 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	}
 
 	conn, err := io.NewConnection(
-		ctx, frontend, gtw, fps, gtw.EnforceDutyCycle, ttnpb.StdDuration(gtw.ScheduleAnytimeDelay),
+		ctx, frontend, gtw, fps, gtw.EnforceDutyCycle,
+		ttnpb.StdDuration(gtw.ScheduleAnytimeDelay),
+		addr,
 	)
 	if err != nil {
 		return nil, err
