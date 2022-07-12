@@ -14,6 +14,8 @@ For details about compatibility between different releases, see the **Commitment
 - Component selector for Join Server interoperability configuration. This allows administrators to declare separate Network Server and Application Server configuration for the same JoinEUI ranges in the same interoperability configuration. See [documentation](https://www.thethingsindustries.com/docs/reference/interop-repository/).
 - More fields were added to the csv end-device migration procedure. The details on which fields were added can be found [here](https://www.thethingsindustries.com/docs/getting-started/migrating/device-csv/).
 - Authorization management in the Account app.
+- `BatchGetGatewayConnectionStats` RPC to fetch Gateway Connection Stats for a batch of gateways.
+- Gateway remote address to gateway connection statistics.
 
 ### Changed
 
