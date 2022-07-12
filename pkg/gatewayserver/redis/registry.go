@@ -91,11 +91,12 @@ func (r *GatewayConnectionStatsRegistry) Get(ctx context.Context, ids *ttnpb.Gat
 // BatchGet returns the connection stats for a batch of gateways.
 // NotFound errors indicating that the gateway is either not connected
 // or is connected to a different cluster, are ignored.
-func (r *GatewayConnectionStatsRegistry) BatchGet(ctx context.Context,
+func (r *GatewayConnectionStatsRegistry) BatchGet(
+	ctx context.Context,
 	ids []*ttnpb.GatewayIdentifiers,
 ) ([]*ttnpb.GatewayConnectionStatsEntry, error) {
-	ret := make([]*ttnpb.GatewayConnectionStatsEntry, 0)
-	keys := make([]string, 0)
+	ret := make([]*ttnpb.GatewayConnectionStatsEntry, 0, len(ids))
+	keys := make([]string, 0, len(ids))
 	for _, gtwIDs := range ids {
 		uid := unique.ID(ctx, gtwIDs)
 		keys = append(keys, r.key(uid))
