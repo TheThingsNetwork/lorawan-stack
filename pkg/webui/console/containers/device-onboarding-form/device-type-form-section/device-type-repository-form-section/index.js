@@ -111,7 +111,7 @@ const DeviceTypeRepositoryFormSection = props => {
 
   React.useEffect(() => {
     // Fetch template after completing the selection step (select band, model, hw/fw versions and band).
-    if (values && hasCompleted && !hasSelectedOther) {
+    if (values && hasCompleted && !hasSelectedOther && values._isClaiming === undefined) {
       const {
         version_ids: { hardware_version, ...v },
       } = values
