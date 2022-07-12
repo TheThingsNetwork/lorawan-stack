@@ -13,9 +13,236 @@
 // limitations under the License.
 
 import React from 'react'
+import { useSelector } from 'react-redux'
 
-const initialValues = {}
+import Input from '@ttn-lw/components/input'
+import Form, { useFormContext } from '@ttn-lw/components/form'
 
-const DeviceRegistrationFormSection = props => <span>Device Type Repository Form Section</span>
+import DevEUIComponent from '@console/components/dev-eui-component'
+
+import FreqPlansSelect from '@console/containers/device-freq-plans-select'
+import DevAddrInput from '@console/containers/dev-addr-input'
+
+import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+import { selectNsConfig, selectAsConfig, selectJsConfig } from '@ttn-lw/lib/selectors/env'
+
+import { parseLorawanMacVersion, generate16BytesKey } from '@console/lib/device-utils'
+
+import { selectDeviceTemplate } from '@console/store/selectors/device-repository'
+
+import messages from '../../messages'
+
+import { devEUISchema, initialValues } from './validation-schema'
+
+const DeviceRegistrationFormSection = props => {
+  const { mayEditKeys, appId, issueDevEUI, fetchDevEUICounter } = props
+  const { values, setFieldValue } = useFormContext()
+
+  const jsConfig = useSelector(selectJsConfig)
+  const nsConfig = useSelector(selectNsConfig)
+  const asConfig = useSelector(selectAsConfig)
+  const asEnabled = asConfig.enabled
+  const jsEnabled = jsConfig.enabled
+  const nsEnabled = nsConfig.enabled
+
+  const template = useSelector(selectDeviceTemplate)
+  const idInputRef = React.useRef(null)
+
+  const generateDeviceId = (device = {}) => {
+    const { ids: idsValues = {} } = device
+
+    try {
+      devEUISchema.validateSync(idsValues.dev_eui)
+      return `eui-${idsValues.dev_eui.toLowerCase()}`
+    } catch (e) {
+      // We dont want to use invalid `dev_eui` as `device_id`.
+    }
+
+    return initialValues.ids.device_id || ''
+  }
+
+  const handleIdTextSelect = React.useCallback(
+    idInputRef => {
+      if (idInputRef.current && values) {
+        const { setSelectionRange } = idInputRef.current
+
+        const generatedId = generateDeviceId(values)
+        if (generatedId.length > 0 && generatedId === values.ids.device_id) {
+          setSelectionRange.call(idInputRef.current, 0, generatedId.length)
+        }
+      }
+    },
+    [values],
+  )
+
+  const { end_device } = template
+  const { supports_join, lorawan_version } = end_device
+
+  const isOTAA = supports_join
+  const lwVersion = parseLorawanMacVersion(lorawan_version)
+
+  let appKeyPlaceholder = undefined
+  let nwkKeyPlaceholder = undefined
+  if (!mayEditKeys) {
+    appKeyPlaceholder = sharedMessages.insufficientAppKeyRights
+    nwkKeyPlaceholder = sharedMessages.insufficientNwkKeyRights
+  }
+
+  return (
+    <div data-test-id="device-registration">
+      {isOTAA && (
+        <>
+          <DevEUIComponent
+            appId={appId}
+            issueDevEUI={issueDevEUI}
+            fetchDevEUICounter={fetchDevEUICounter}
+            values={values}
+            setFieldValue={setFieldValue}
+            initialValues={initialValues}
+            devEUISchema={devEUISchema}
+          />
+          {jsEnabled && (
+            <>
+              <Form.Field
+                required
+                title={sharedMessages.appKey}
+                name="root_keys.app_key.key"
+                type="byte"
+                min={16}
+                max={16}
+                component={Input.Generate}
+                disabled={!mayEditKeys}
+                mayGenerateValue={mayEditKeys}
+                onGenerateValue={generate16BytesKey}
+                tooltipId={tooltipIds.APP_KEY}
+                placeholder={appKeyPlaceholder}
+              />
+              {lwVersion >= 110 && (
+                <Form.Field
+                  required
+                  title={sharedMessages.nwkKey}
+                  name="root_keys.nwk_key.key"
+                  type="byte"
+                  min={16}
+                  max={16}
+                  component={Input.Generate}
+                  disabled={!mayEditKeys}
+                  mayGenerateValue={mayEditKeys}
+                  onGenerateValue={generate16BytesKey}
+                  placeholder={nwkKeyPlaceholder}
+                  tooltipId={tooltipIds.NETWORK_KEY}
+                />
+              )}
+            </>
+          )}
+        </>
+      )}
+      {!isOTAA && (
+        <>
+          {nsEnabled && (
+            <DevAddrInput title={sharedMessages.devAddr} name="session.dev_addr" required />
+          )}
+          {lwVersion === 104 && (
+            <DevEUIComponent
+              appId={appId}
+              issueDevEUI={issueDevEUI}
+              fetchDevEUICounter={fetchDevEUICounter}
+              values={values}
+              setFieldValue={setFieldValue}
+              initialValues={initialValues}
+              devEUISchema={devEUISchema}
+            />
+          )}
+          {asEnabled && (
+            <Form.Field
+              required={mayEditKeys}
+              title={sharedMessages.appSKey}
+              name="session.keys.app_s_key.key"
+              type="byte"
+              min={16}
+              max={16}
+              component={Input.Generate}
+              mayGenerateValue={mayEditKeys}
+              onGenerateValue={generate16BytesKey}
+              tooltipId={tooltipIds.APP_SESSION_KEY}
+            />
+          )}
+          {nsEnabled && (
+            <>
+              <Form.Field
+                mayGenerateValue
+                title={lwVersion >= 110 ? sharedMessages.fNwkSIntKey : sharedMessages.nwkSKey}
+                name="session.keys.f_nwk_s_int_key.key"
+                type="byte"
+                min={16}
+                max={16}
+                required
+                component={Input.Generate}
+                onGenerateValue={generate16BytesKey}
+                tooltipId={lwVersion >= 110 ? undefined : tooltipIds.NETWORK_SESSION_KEY}
+              />
+              {lwVersion >= 110 && (
+                <Form.Field
+                  mayGenerateValue
+                  title={sharedMessages.sNwkSIKey}
+                  name="session.keys.s_nwk_s_int_key.key"
+                  type="byte"
+                  min={16}
+                  max={16}
+                  required
+                  description={sharedMessages.sNwkSIKeyDescription}
+                  component={Input.Generate}
+                  onGenerateValue={generate16BytesKey}
+                />
+              )}
+              {lwVersion >= 110 && (
+                <Form.Field
+                  mayGenerateValue
+                  title={sharedMessages.nwkSEncKey}
+                  name="session.keys.nwk_s_enc_key.key"
+                  type="byte"
+                  min={16}
+                  max={16}
+                  required
+                  description={sharedMessages.nwkSEncKeyDescription}
+                  component={Input.Generate}
+                  onGenerateValue={generate16BytesKey}
+                />
+              )}
+            </>
+          )}
+        </>
+      )}
+      {nsEnabled && (
+        <FreqPlansSelect
+          required
+          tooltipId={tooltipIds.FREQUENCY_PLAN}
+          name="frequency_plan_id"
+          bandId={values.version_ids.band_id}
+        />
+      )}
+      <Form.Field
+        required
+        title={sharedMessages.devID}
+        name="ids.device_id"
+        placeholder={sharedMessages.deviceIdPlaceholder}
+        component={Input}
+        onFocus={handleIdTextSelect}
+        inputRef={idInputRef}
+        tooltipId={tooltipIds.DEVICE_ID}
+        description={messages.deviceIdDescription}
+      />
+    </div>
+  )
+}
+
+DeviceRegistrationFormSection.propTypes = {
+  appId: PropTypes.string.isRequired,
+  fetchDevEUICounter: PropTypes.func.isRequired,
+  issueDevEUI: PropTypes.func.isRequired,
+  mayEditKeys: PropTypes.bool.isRequired,
+}
 
 export { DeviceRegistrationFormSection as default, initialValues }

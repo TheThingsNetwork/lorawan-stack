@@ -27,6 +27,7 @@ import Sessions from './service/sessions'
 import ContactInfo from './service/contact-info'
 import PacketBrokerAgent from './service/packet-broker-agent'
 import Clients from './service/clients'
+import DeviceClaim from './service/claim'
 import EventHandler from './util/events'
 import StackConfiguration from './util/stack-configuration'
 import { STACK_COMPONENTS_MAP, AUTHORIZATION_MODES } from './util/constants'
@@ -58,6 +59,9 @@ class TTS {
     this.ContactInfo = new ContactInfo(this.api.ContactInfoRegistry)
     this.PacketBrokerAgent = new PacketBrokerAgent(this.api.Pba)
     this.Clients = new Clients(this.api)
+    this.DeviceClaim = new DeviceClaim(this.api, {
+      stackConfig: stackConfiguration,
+    })
 
     this.subscribe = EventHandler.subscribe
     this.unsubscribe = EventHandler.unsubscribe

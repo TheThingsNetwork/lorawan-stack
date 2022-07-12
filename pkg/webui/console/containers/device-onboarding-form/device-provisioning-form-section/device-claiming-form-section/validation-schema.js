@@ -12,8 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Yup from '@ttn-lw/lib/yup'
+import { defineMessages } from 'react-intl'
 
-const validationSchema = Yup.object({})
+import Yup from '@ttn-lw/lib/yup'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+const m = defineMessages({
+  validateCode: 'Claim authentication code must consist only of numbers and letters',
+})
+
+const validationSchema = Yup.object({
+  ids: Yup.object().shape({
+    dev_eui: Yup.lazy(value => {
+      if (!value) {
+        return Yup.string().strip()
+      }
+      return Yup.string()
+        .length(8 * 2, Yup.passValues(sharedMessages.validateLength))
+        .required(sharedMessages.validateRequired)
+    }),
+  }),
+  authentication_code: Yup.lazy(value => {
+    if (!value) {
+      return Yup.string().strip()
+    }
+
+    return Yup.string()
+      .matches(/^[A-Z0-9]{1,32}$/, Yup.passValues(m.validateCode))
+      .required(sharedMessages.validateRequired)
+  }),
+})
 
 export default validationSchema
