@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useState } from 'react'
 import { merge } from 'lodash'
 
 import Radio from '@ttn-lw/components/radio-button'
 import Form, { useFormContext } from '@ttn-lw/components/form'
+import Modal from '@ttn-lw/components/modal'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -40,13 +41,37 @@ const initialValues = merge(
 const DeviceTypeFormSection = props => {
   const { getRegistrationTemplate, appId } = props
   const {
-    values: { _inputMethod },
+    values: { _inputMethod, _isClaiming },
+    resetForm,
   } = useFormContext()
+  const [showModal, setShowModal] = useState(false)
+
+  const handleMethodChange = React.useCallback(() => {
+    setShowModal(true)
+  }, [])
+
+  const handleComplete = React.useCallback(() => {
+    setShowModal(false)
+    resetForm({ values: { ...initialValues, _inputMethod } })
+  }, [resetForm, _inputMethod])
 
   return (
     <>
+      {showModal && _isClaiming !== undefined && (
+        <Modal
+          buttonMessage={m.changeDeviceTypeButton}
+          message={m.changeDeviceType}
+          title={m.changeDeviceTypeButton}
+          onComplete={handleComplete}
+        />
+      )}
       <Form.SubTitle title={m.endDeviceType} />
-      <Form.Field title={m.inputMethod} name="_inputMethod" component={Radio.Group}>
+      <Form.Field
+        title={m.inputMethod}
+        name="_inputMethod"
+        component={Radio.Group}
+        onChange={handleMethodChange}
+      >
         <Radio label={m.inputMethodDeviceRepo} value="device-repository" />
         <Radio label={m.inputMethodManual} value="manual" />
       </Form.Field>
