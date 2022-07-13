@@ -21,6 +21,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Encoding of DevAddr, EUI and similar fields in `text/event-stream` responses.
+
 ### Security
 
 ## [3.20.1] - 2022-06-29
