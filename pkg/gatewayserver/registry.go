@@ -26,7 +26,7 @@ type GatewayConnectionStatsRegistry interface {
 	// Get returns connection stats for a gateway.
 	Get(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayConnectionStats, error)
 	// BatchGet returns connection stats for a batch of gateways.
-	BatchGet(ctx context.Context, ids []*ttnpb.GatewayIdentifiers) ([]*ttnpb.GatewayConnectionStatsEntry, error)
+	BatchGet(ctx context.Context, ids []*ttnpb.GatewayIdentifiers) (map[string]*ttnpb.GatewayConnectionStats, error)
 	// Set sets, updates or clears the connection stats for a gateway. Only fields specified in the field mask paths are set.
 	Set(ctx context.Context, ids *ttnpb.GatewayIdentifiers, stats *ttnpb.GatewayConnectionStats, paths []string, ttl time.Duration) error
 }

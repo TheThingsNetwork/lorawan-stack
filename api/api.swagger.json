@@ -14377,9 +14377,9 @@
       "type": "object",
       "properties": {
         "entries": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v3GatewayConnectionStatsEntry"
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v3GatewayConnectionStats"
           }
         }
       }
@@ -16309,17 +16309,6 @@
         }
       },
       "description": "Connection stats as monitored by the Gateway Server."
-    },
-    "v3GatewayConnectionStatsEntry": {
-      "type": "object",
-      "properties": {
-        "gateway_ids": {
-          "$ref": "#/definitions/lorawanv3GatewayIdentifiers"
-        },
-        "gateway_connection_stats": {
-          "$ref": "#/definitions/v3GatewayConnectionStats"
-        }
-      }
     },
     "v3GatewayDown": {
       "type": "object",

@@ -101,7 +101,7 @@ message BatchGetGatewayConnectionStatsRequest {
 }
 
 message BatchGetGatewayConnectionStatsResponse {
-  repeated GatewayConnectionStatsEntry entries = 1;
+  map<string,GatewayConnectionStats> entries = 1;
 }
 
 service Gs {

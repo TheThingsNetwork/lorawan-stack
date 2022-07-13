@@ -94,8 +94,8 @@ func (r *GatewayConnectionStatsRegistry) Get(ctx context.Context, ids *ttnpb.Gat
 func (r *GatewayConnectionStatsRegistry) BatchGet(
 	ctx context.Context,
 	ids []*ttnpb.GatewayIdentifiers,
-) ([]*ttnpb.GatewayConnectionStatsEntry, error) {
-	ret := make([]*ttnpb.GatewayConnectionStatsEntry, 0, len(ids))
+) (map[string]*ttnpb.GatewayConnectionStats, error) {
+	ret := make(map[string]*ttnpb.GatewayConnectionStats, len(ids))
 	keys := make([]string, 0, len(ids))
 	for _, gtwIDs := range ids {
 		uid := unique.ID(ctx, gtwIDs)
@@ -119,10 +119,7 @@ func (r *GatewayConnectionStatsRegistry) BatchGet(
 			// The result of MGet is in the same order as the input keys passed to it.
 			// MGet inserts "nil" values for keys that don't have values, thereby maintaining the order.
 			// So we can use the index of the result to correlate the gateway IDs.
-			ret = append(ret, &ttnpb.GatewayConnectionStatsEntry{
-				GatewayIds:             ids[i],
-				GatewayConnectionStats: stats,
-			})
+			ret[unique.ID(ctx, ids[i])] = stats
 		default:
 			log.FromContext(ctx).Warnf("Invalid %T element in stats payloads", val)
 			continue

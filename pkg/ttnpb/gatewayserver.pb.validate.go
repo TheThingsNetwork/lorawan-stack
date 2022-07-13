@@ -575,13 +575,15 @@ func (m *BatchGetGatewayConnectionStatsResponse) ValidateFields(paths ...string)
 		switch name {
 		case "entries":
 
-			for idx, item := range m.GetEntries() {
-				_, _ = idx, item
+			for key, val := range m.GetEntries() {
+				_ = val
 
-				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+				// no validation rules for Entries[key]
+
+				if v, ok := interface{}(val).(interface{ ValidateFields(...string) error }); ok {
 					if err := v.ValidateFields(subs...); err != nil {
 						return BatchGetGatewayConnectionStatsResponseValidationError{
-							field:  fmt.Sprintf("entries[%v]", idx),
+							field:  fmt.Sprintf("entries[%v]", key),
 							reason: "embedded message failed validation",
 							cause:  err,
 						}

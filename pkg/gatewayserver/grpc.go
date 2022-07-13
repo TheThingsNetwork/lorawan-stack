@@ -72,7 +72,7 @@ func (gs *GatewayServer) BatchGetGatewayConnectionStats(ctx context.Context,
 	}
 
 	// If there isn't a registry, load the (ephemeral) values stored in the Gateway Server connections.
-	entries := make([]*ttnpb.GatewayConnectionStatsEntry, 0)
+	entries := make(map[string]*ttnpb.GatewayConnectionStats, len(req.GatewayIds))
 	for _, id := range req.GatewayIds {
 		uid := unique.ID(ctx, id)
 		val, ok := gs.connections.Load(uid)
@@ -80,10 +80,7 @@ func (gs *GatewayServer) BatchGetGatewayConnectionStats(ctx context.Context,
 			continue
 		}
 		st, _ := val.(connectionEntry).Stats()
-		entries = append(entries, &ttnpb.GatewayConnectionStatsEntry{
-			GatewayIds:             id,
-			GatewayConnectionStats: st,
-		})
+		entries[uid] = st
 	}
 	return &ttnpb.BatchGetGatewayConnectionStatsResponse{
 		Entries: entries,

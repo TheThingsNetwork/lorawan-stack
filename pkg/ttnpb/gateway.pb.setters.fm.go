@@ -1739,67 +1739,6 @@ func (dst *GatewayConnectionStats) SetFields(src *GatewayConnectionStats, paths 
 	return nil
 }
 
-func (dst *GatewayConnectionStatsEntry) SetFields(src *GatewayConnectionStatsEntry, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
-		switch name {
-		case "gateway_ids":
-			if len(subs) > 0 {
-				var newDst, newSrc *GatewayIdentifiers
-				if (src == nil || src.GatewayIds == nil) && dst.GatewayIds == nil {
-					continue
-				}
-				if src != nil {
-					newSrc = src.GatewayIds
-				}
-				if dst.GatewayIds != nil {
-					newDst = dst.GatewayIds
-				} else {
-					newDst = &GatewayIdentifiers{}
-					dst.GatewayIds = newDst
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
-			} else {
-				if src != nil {
-					dst.GatewayIds = src.GatewayIds
-				} else {
-					dst.GatewayIds = nil
-				}
-			}
-		case "gateway_connection_stats":
-			if len(subs) > 0 {
-				var newDst, newSrc *GatewayConnectionStats
-				if (src == nil || src.GatewayConnectionStats == nil) && dst.GatewayConnectionStats == nil {
-					continue
-				}
-				if src != nil {
-					newSrc = src.GatewayConnectionStats
-				}
-				if dst.GatewayConnectionStats != nil {
-					newDst = dst.GatewayConnectionStats
-				} else {
-					newDst = &GatewayConnectionStats{}
-					dst.GatewayConnectionStats = newDst
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
-			} else {
-				if src != nil {
-					dst.GatewayConnectionStats = src.GatewayConnectionStats
-				} else {
-					dst.GatewayConnectionStats = nil
-				}
-			}
-
-		default:
-			return fmt.Errorf("invalid field: '%s'", name)
-		}
-	}
-	return nil
-}
-
 func (dst *GatewayRadio_TxConfiguration) SetFields(src *GatewayRadio_TxConfiguration, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {

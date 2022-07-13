@@ -19225,42 +19225,6 @@
           ]
         },
         {
-          "name": "GatewayConnectionStatsEntry",
-          "longName": "GatewayConnectionStatsEntry",
-          "fullName": "ttn.lorawan.v3.GatewayConnectionStatsEntry",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "gateway_ids",
-              "description": "",
-              "label": "",
-              "type": "GatewayIdentifiers",
-              "longType": "GatewayIdentifiers",
-              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "gateway_connection_stats",
-              "description": "",
-              "label": "",
-              "type": "GatewayConnectionStats",
-              "longType": "GatewayConnectionStats",
-              "fullType": "ttn.lorawan.v3.GatewayConnectionStats",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
           "name": "GatewayModel",
           "longName": "GatewayModel",
           "fullName": "ttn.lorawan.v3.GatewayModel",
@@ -21124,9 +21088,45 @@
               "name": "entries",
               "description": "",
               "label": "repeated",
-              "type": "GatewayConnectionStatsEntry",
-              "longType": "GatewayConnectionStatsEntry",
-              "fullType": "ttn.lorawan.v3.GatewayConnectionStatsEntry",
+              "type": "EntriesEntry",
+              "longType": "BatchGetGatewayConnectionStatsResponse.EntriesEntry",
+              "fullType": "ttn.lorawan.v3.BatchGetGatewayConnectionStatsResponse.EntriesEntry",
+              "ismap": true,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "EntriesEntry",
+          "longName": "BatchGetGatewayConnectionStatsResponse.EntriesEntry",
+          "fullName": "ttn.lorawan.v3.BatchGetGatewayConnectionStatsResponse.EntriesEntry",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "key",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "GatewayConnectionStats",
+              "longType": "GatewayConnectionStats",
+              "fullType": "ttn.lorawan.v3.GatewayConnectionStats",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",

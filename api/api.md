@@ -269,7 +269,6 @@
   - [Message `GatewayConnectionStats`](#ttn.lorawan.v3.GatewayConnectionStats)
   - [Message `GatewayConnectionStats.RoundTripTimes`](#ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes)
   - [Message `GatewayConnectionStats.SubBand`](#ttn.lorawan.v3.GatewayConnectionStats.SubBand)
-  - [Message `GatewayConnectionStatsEntry`](#ttn.lorawan.v3.GatewayConnectionStatsEntry)
   - [Message `GatewayModel`](#ttn.lorawan.v3.GatewayModel)
   - [Message `GatewayRadio`](#ttn.lorawan.v3.GatewayRadio)
   - [Message `GatewayRadio.TxConfiguration`](#ttn.lorawan.v3.GatewayRadio.TxConfiguration)
@@ -302,6 +301,7 @@
 - [File `lorawan-stack/api/gatewayserver.proto`](#lorawan-stack/api/gatewayserver.proto)
   - [Message `BatchGetGatewayConnectionStatsRequest`](#ttn.lorawan.v3.BatchGetGatewayConnectionStatsRequest)
   - [Message `BatchGetGatewayConnectionStatsResponse`](#ttn.lorawan.v3.BatchGetGatewayConnectionStatsResponse)
+  - [Message `BatchGetGatewayConnectionStatsResponse.EntriesEntry`](#ttn.lorawan.v3.BatchGetGatewayConnectionStatsResponse.EntriesEntry)
   - [Message `GatewayDown`](#ttn.lorawan.v3.GatewayDown)
   - [Message `GatewayUp`](#ttn.lorawan.v3.GatewayUp)
   - [Message `ScheduleDownlinkErrorDetails`](#ttn.lorawan.v3.ScheduleDownlinkErrorDetails)
@@ -4286,13 +4286,6 @@ Connection stats as monitored by the Gateway Server.
 | `downlink_utilization_limit` | [`float`](#float) |  | Duty-cycle limit of the sub-band as a fraction of time. |
 | `downlink_utilization` | [`float`](#float) |  | Utilization rate of the available duty-cycle. This value should not exceed downlink_utilization_limit. |
 
-### <a name="ttn.lorawan.v3.GatewayConnectionStatsEntry">Message `GatewayConnectionStatsEntry`</a>
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
-| `gateway_connection_stats` | [`GatewayConnectionStats`](#ttn.lorawan.v3.GatewayConnectionStats) |  |  |
-
 ### <a name="ttn.lorawan.v3.GatewayModel">Message `GatewayModel`</a>
 
 | Field | Type | Label | Description |
@@ -4684,7 +4677,14 @@ Deployment configuration may specify if, and for how long after deletion, entiti
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `entries` | [`GatewayConnectionStatsEntry`](#ttn.lorawan.v3.GatewayConnectionStatsEntry) | repeated |  |
+| `entries` | [`BatchGetGatewayConnectionStatsResponse.EntriesEntry`](#ttn.lorawan.v3.BatchGetGatewayConnectionStatsResponse.EntriesEntry) | repeated |  |
+
+### <a name="ttn.lorawan.v3.BatchGetGatewayConnectionStatsResponse.EntriesEntry">Message `BatchGetGatewayConnectionStatsResponse.EntriesEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`string`](#string) |  |  |
+| `value` | [`GatewayConnectionStats`](#ttn.lorawan.v3.GatewayConnectionStats) |  |  |
 
 ### <a name="ttn.lorawan.v3.GatewayDown">Message `GatewayDown`</a>
 
