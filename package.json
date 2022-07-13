@@ -60,7 +60,7 @@
     "mkdirp": "^1.0.4",
     "nib": "^1.2.0",
     "pg": "^8.7.3",
-    "prettier": "^2.4.1",
+    "prettier": "^2.7.1",
     "react-refresh": "^0.13.0",
     "stylint": "^2.0.0",
     "stylus": "^0.55.0",
