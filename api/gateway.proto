@@ -433,7 +433,7 @@ message GatewayConnectionStats {
   // next: 13
 }
 
-message GatewayConnectionStatsEntry{
+message GatewayConnectionStatsEntry {
   GatewayIdentifiers gateway_ids = 1;
   GatewayConnectionStats gateway_connection_stats = 2;
 }

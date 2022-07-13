@@ -96,11 +96,11 @@ service NsGs {
   rpc ScheduleDownlink(DownlinkMessage) returns (ScheduleDownlinkResponse);
 }
 
-message BatchGetGatewayConnectionStatsRequest{
+message BatchGetGatewayConnectionStatsRequest {
   repeated GatewayIdentifiers gateway_ids = 1 [(validate.rules).repeated.min_items = 1, (validate.rules).repeated.max_items = 100];
 }
 
-message BatchGetGatewayConnectionStatsResponse{
+message BatchGetGatewayConnectionStatsResponse {
   repeated GatewayConnectionStatsEntry entries = 1;
 }
 

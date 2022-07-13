@@ -461,7 +461,7 @@ var (
 				return err
 			}
 
-			var result interface{}
+			var result any
 			if len(ids) > 0 {
 				var gtwIDs []*ttnpb.GatewayIdentifiers
 				for _, id := range ids {
