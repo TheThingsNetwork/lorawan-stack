@@ -18,9 +18,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
+	"sort"
 
 	"github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
+	"github.com/gogo/protobuf/proto"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"golang.org/x/exp/maps"
 )
 
 // TTN returns the default JSONPb marshaler of The Things Stack.
@@ -42,7 +45,22 @@ type TTNMarshaler struct {
 func (*TTNMarshaler) ContentType() string { return "application/json" }
 
 // Marshal marshals v to JSON.
-func (m *TTNMarshaler) Marshal(v interface{}) ([]byte, error) {
+func (m *TTNMarshaler) Marshal(v any) ([]byte, error) {
+	b, err := marshalAny(v, m.GoGoJSONPb)
+	if err != nil {
+		return nil, err
+	}
+	if m.GoGoJSONPb.Indent == "" {
+		return b, nil
+	}
+	var buf bytes.Buffer
+	if err = json.Indent(&buf, b, "", m.GoGoJSONPb.Indent); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}
+
+func marshalAny(v any, fallback runtime.Marshaler) ([]byte, error) {
 	if marshaler, ok := v.(jsonplugin.Marshaler); ok {
 		b, err := jsonplugin.MarshalerConfig{
 			EnumsAsInts: true,
@@ -50,16 +68,37 @@ func (m *TTNMarshaler) Marshal(v interface{}) ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		if m.GoGoJSONPb.Indent == "" {
-			return b, nil
-		}
-		var buf bytes.Buffer
-		if err = json.Indent(&buf, b, "", m.GoGoJSONPb.Indent); err != nil {
+		return b, nil
+	}
+	if kv, ok := v.(map[string]any); ok {
+		return marshalMap(kv, fallback)
+	}
+	if kv, ok := v.(map[string]proto.Message); ok {
+		return marshalMap(kv, fallback)
+	}
+	return fallback.Marshal(v)
+}
+
+func marshalMap[X any](kv map[string]X, fallback runtime.Marshaler) ([]byte, error) {
+	keys := maps.Keys(kv)
+	sort.Strings(keys)
+	pluginMarshaler := jsonplugin.NewMarshalState(jsonplugin.MarshalerConfig{
+		EnumsAsInts: true,
+	})
+	pluginMarshaler.WriteObjectStart()
+	for _, k := range keys {
+		pluginMarshaler.WriteObjectField(k)
+		b, err := marshalAny(kv[k], fallback)
+		if err != nil {
 			return nil, err
 		}
-		return buf.Bytes(), nil
+		_, err = pluginMarshaler.Write(b)
+		if err != nil {
+			return nil, err
+		}
 	}
-	return m.GoGoJSONPb.Marshal(v)
+	pluginMarshaler.WriteObjectEnd()
+	return pluginMarshaler.Bytes()
 }
 
 // NewEncoder returns a new JSON encoder that writes values to w.
@@ -74,30 +113,25 @@ type TTNEncoder struct {
 }
 
 // Encode marshals v to JSON and writes it to the writer.
-func (e *TTNEncoder) Encode(v interface{}) error {
-	if marshaler, ok := v.(jsonplugin.Marshaler); ok {
-		b, err := jsonplugin.MarshalerConfig{
-			EnumsAsInts: true,
-		}.Marshal(marshaler)
-		if err != nil {
-			return err
-		}
-		if e.gogo.Indent == "" {
-			_, err = e.w.Write(b)
-		} else {
-			var buf bytes.Buffer
-			if err = json.Indent(&buf, b, "", e.gogo.Indent); err != nil {
-				return err
-			}
-			io.Copy(e.w, &buf)
-		}
+func (e *TTNEncoder) Encode(v any) error {
+	b, err := marshalAny(v, e.gogo)
+	if err != nil {
 		return err
 	}
-	return e.gogo.NewEncoder(e.w).Encode(v)
+	if e.gogo.Indent == "" {
+		_, err = e.w.Write(b)
+		return err
+	}
+	var buf bytes.Buffer
+	if err = json.Indent(&buf, b, "", e.gogo.Indent); err != nil {
+		return err
+	}
+	_, err = io.Copy(e.w, &buf)
+	return err
 }
 
 // Unmarshal unmarshals v from JSON data.
-func (m *TTNMarshaler) Unmarshal(data []byte, v interface{}) error {
+func (m *TTNMarshaler) Unmarshal(data []byte, v any) error {
 	if unmarshaler, ok := v.(jsonplugin.Unmarshaler); ok {
 		return jsonplugin.UnmarshalerConfig{}.Unmarshal(data, unmarshaler)
 	}
@@ -116,7 +150,7 @@ type TTNDecoder struct {
 }
 
 // Decode reads a value from the reader and unmarshals v from JSON.
-func (d *TTNDecoder) Decode(v interface{}) error {
+func (d *TTNDecoder) Decode(v any) error {
 	if unmarshaler, ok := v.(jsonplugin.Unmarshaler); ok {
 		var data json.RawMessage
 		err := d.d.Decode(&data)
@@ -138,6 +172,6 @@ type ttnEventStream struct {
 	*TTNMarshaler
 }
 
-func (s *ttnEventStream) ContentType() string { return "text/event-stream" }
+func (*ttnEventStream) ContentType() string { return "text/event-stream" }
 
-func (s *ttnEventStream) Delimiter() []byte { return []byte{'\n', '\n'} }
+func (*ttnEventStream) Delimiter() []byte { return []byte{'\n', '\n'} }

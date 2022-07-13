@@ -56,12 +56,15 @@ type Server interface {
 	GetBaseConfig(ctx context.Context) config.ServiceBase
 	// FillGatewayContext fills the given context and identifiers.
 	// This method should only be used for request contexts.
-	FillGatewayContext(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (context.Context, *ttnpb.GatewayIdentifiers, error)
+	FillGatewayContext(ctx context.Context,
+		ids *ttnpb.GatewayIdentifiers) (context.Context, *ttnpb.GatewayIdentifiers, error)
 	// Connect connects a gateway by its identifiers to the Gateway Server, and returns a Connection for traffic and
 	// control.
-	Connect(ctx context.Context, frontend Frontend, ids *ttnpb.GatewayIdentifiers) (*Connection, error)
+	Connect(ctx context.Context,
+		frontend Frontend, ids *ttnpb.GatewayIdentifiers, addr *ttnpb.GatewayRemoteAddress) (*Connection, error)
 	// GetFrequencyPlans gets the frequency plans by the gateway identifiers.
-	GetFrequencyPlans(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (map[string]*frequencyplans.FrequencyPlan, error)
+	GetFrequencyPlans(ctx context.Context,
+		ids *ttnpb.GatewayIdentifiers) (map[string]*frequencyplans.FrequencyPlan, error)
 	// ClaimDownlink claims the downlink path for the given gateway.
 	ClaimDownlink(ctx context.Context, ids *ttnpb.GatewayIdentifiers) error
 	// UnclaimDownlink releases the claim of the downlink path for the given gateway.
@@ -110,6 +113,8 @@ type Connection struct {
 
 	lastUplink            *uplinkMessage
 	lastRepeatUpEventTime time.Time
+
+	addr *ttnpb.GatewayRemoteAddress
 }
 
 type uplinkMessage struct {
@@ -130,7 +135,15 @@ var (
 )
 
 // NewConnection instantiates a new gateway connection.
-func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gateway, fps *frequencyplans.Store, enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration) (*Connection, error) {
+func NewConnection(
+	ctx context.Context,
+	frontend Frontend,
+	gateway *ttnpb.Gateway,
+	fps *frequencyplans.Store,
+	enforceDutyCycle bool,
+	scheduleAnytimeDelay *time.Duration,
+	addr *ttnpb.GatewayRemoteAddress,
+) (*Connection, error) {
 	gatewayFPs := make(map[string]*frequencyplans.FrequencyPlan, len(gateway.FrequencyPlanIds))
 	fp0ID := gateway.FrequencyPlanId
 	fp0, err := fps.GetByID(fp0ID)
@@ -172,6 +185,7 @@ func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gatewa
 		bandID:           bandID,
 		fps:              fps,
 		scheduler:        scheduler,
+		addr:             addr,
 		rtts:             newRTTs(maxRTTs, rttTTL),
 		upCh:             make(chan *ttnpb.GatewayUplinkMessage, bufferSize),
 		downCh:           make(chan *ttnpb.DownlinkMessage, bufferSize),
@@ -676,6 +690,9 @@ func (c *Connection) VersionInfoChanged() <-chan struct{} {
 // ConnectTime returns the time the gateway connected.
 func (c *Connection) ConnectTime() time.Time { return time.Unix(0, c.connectTime) }
 
+// GatewayRemoteAddress returns the time the remote address of the gateway as seen by the server.
+func (c *Connection) GatewayRemoteAddress() *ttnpb.GatewayRemoteAddress { return c.addr }
+
 // StatusStats returns the status statistics.
 func (c *Connection) StatusStats() (last *ttnpb.GatewayStatus, t time.Time, ok bool) {
 	if last, ok = c.lastStatus.Load().(*ttnpb.GatewayStatus); ok {
@@ -711,11 +728,12 @@ func (c *Connection) RTTStats(percentile int, t time.Time) (min, max, median, np
 func (c *Connection) Stats() (*ttnpb.GatewayConnectionStats, []string) {
 	ct := c.ConnectTime()
 	stats := &ttnpb.GatewayConnectionStats{
-		ConnectedAt: ttnpb.ProtoTimePtr(ct),
-		Protocol:    c.Frontend().Protocol(),
+		ConnectedAt:          ttnpb.ProtoTimePtr(ct),
+		Protocol:             c.Frontend().Protocol(),
+		GatewayRemoteAddress: c.GatewayRemoteAddress(),
 	}
 	paths := make([]string, 0, len(ttnpb.GatewayConnectionStatsFieldPathsTopLevel))
-	paths = append(paths, "connected_at", "disconnected_at", "protocol")
+	paths = append(paths, "connected_at", "disconnected_at", "protocol", "gateway_remote_address")
 
 	if s, t, ok := c.StatusStats(); ok {
 		stats.LastStatusReceivedAt = ttnpb.ProtoTimePtr(t)

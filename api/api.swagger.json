@@ -15908,6 +15908,10 @@
             "$ref": "#/definitions/GatewayConnectionStatsSubBand"
           },
           "description": "Statistics for each sub band."
+        },
+        "gateway_remote_address": {
+          "$ref": "#/definitions/v3GatewayRemoteAddress",
+          "description": "Gateway Remote Address."
         }
       },
       "description": "Connection stats as monitored by the Gateway Server."
@@ -15943,6 +15947,15 @@
           "$ref": "#/definitions/GatewayRadioTxConfiguration"
         }
       }
+    },
+    "v3GatewayRemoteAddress": {
+      "type": "object",
+      "properties": {
+        "ip": {
+          "type": "string"
+        }
+      },
+      "description": "Remote Address of the Gateway, as seen by the Gateway Server."
     },
     "v3GatewayStatus": {
       "type": "object",

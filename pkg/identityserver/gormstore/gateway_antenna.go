@@ -56,13 +56,13 @@ func (a GatewayAntenna) toPB() *ttnpb.GatewayAntenna {
 	}
 }
 
-func (a *GatewayAntenna) fromPB(pb ttnpb.GatewayAntenna) {
+func (a *GatewayAntenna) fromPB(pb *ttnpb.GatewayAntenna) {
 	a.Gain = pb.Gain
 	a.Location = Location{
-		Latitude:  pb.Location.GetLatitude(),
-		Longitude: pb.Location.GetLongitude(),
-		Altitude:  pb.Location.GetAltitude(),
-		Accuracy:  pb.Location.GetAccuracy(),
+		Latitude:  pb.GetLocation().GetLatitude(),
+		Longitude: pb.GetLocation().GetLongitude(),
+		Altitude:  pb.GetLocation().GetAltitude(),
+		Accuracy:  pb.GetLocation().GetAccuracy(),
 	}
 	a.Attributes = attributes(a.Attributes).updateFromMap(pb.Attributes)
 	a.Placement = int(pb.Placement)

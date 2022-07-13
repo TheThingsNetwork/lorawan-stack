@@ -104,7 +104,7 @@ var clientPBSetters = map[string]func(*ttnpb.Client, *Client){
 		pb.Grants = cli.Grants
 	},
 	rightsField: func(pb *ttnpb.Client, cli *Client) {
-		pb.Rights = cli.Rights.Rights
+		pb.Rights = cli.Rights
 	},
 }
 
@@ -164,7 +164,7 @@ var clientModelSetters = map[string]func(*Client, *ttnpb.Client){
 		cli.Grants = pb.Grants
 	},
 	rightsField: func(cli *Client, pb *ttnpb.Client) {
-		cli.Rights = Rights{Rights: pb.Rights}
+		cli.Rights = pb.Rights
 	},
 }
 

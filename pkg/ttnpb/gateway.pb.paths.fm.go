@@ -502,10 +502,19 @@ var GatewayStatusFieldPathsTopLevel = []string{
 	"time",
 	"versions",
 }
+var GatewayRemoteAddressFieldPathsNested = []string{
+	"ip",
+}
+
+var GatewayRemoteAddressFieldPathsTopLevel = []string{
+	"ip",
+}
 var GatewayConnectionStatsFieldPathsNested = []string{
 	"connected_at",
 	"disconnected_at",
 	"downlink_count",
+	"gateway_remote_address",
+	"gateway_remote_address.ip",
 	"last_downlink_received_at",
 	"last_status",
 	"last_status.advanced",
@@ -531,6 +540,7 @@ var GatewayConnectionStatsFieldPathsTopLevel = []string{
 	"connected_at",
 	"disconnected_at",
 	"downlink_count",
+	"gateway_remote_address",
 	"last_downlink_received_at",
 	"last_status",
 	"last_status_received_at",
