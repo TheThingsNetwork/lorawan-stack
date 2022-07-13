@@ -12,9 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import DeviceOnboardingForm from './device-onboarding-form'
-import connect from './connect'
+import { connect } from 'react-redux'
 
-const ConnectedDeviceOnboardingForm = connect(DeviceOnboardingForm)
+import { getTemplate } from '@console/store/actions/device-repository'
 
-export { ConnectedDeviceOnboardingForm as default, DeviceOnboardingForm }
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+
+const mapStateToProps = state => ({
+  appId: selectSelectedApplicationId(state),
+})
+
+const mapDispatchToProps = dispatch => ({
+  getRegistrationTemplate: (appId, version) => dispatch(getTemplate(appId, version)),
+})
+
+export default DeviceOnboardingForm =>
+  connect(mapStateToProps, mapDispatchToProps)(DeviceOnboardingForm)
