@@ -45,7 +45,7 @@ type testStore struct {
 	*loginTokenStore
 	*oauthStore
 	// euiStore
-	// entitySearch
+	*entitySearch
 	*notificationStore
 
 	// authenticationProviderStore
@@ -63,13 +63,24 @@ func (t testStore) Close() error {
 func newTestStore(t *testing.T, dsn *url.URL) storetest.Store {
 	t.Helper()
 
+	ctx := test.Context()
+	if dl, ok := t.Deadline(); ok {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithDeadline(test.Context(), dl)
+		defer cancel()
+	}
+
 	t.Logf("Connecting to %s", dsn.String())
 	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn.String())))
 	db := bun.NewDB(sqldb, pgdialect.New())
 
 	db.AddQueryHook(NewLoggerHook(test.GetLogger(t)))
 
-	baseStore := newStore(db)
+	baseStore, err := newStore(ctx, db)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	return &testStore{
 		db: db,
 
@@ -87,7 +98,7 @@ func newTestStore(t *testing.T, dsn *url.URL) storetest.Store {
 		loginTokenStore:   newLoginTokenStore(baseStore),
 		oauthStore:        newOAuthStore(baseStore),
 		// euiStore:          euiStore{baseStore: baseStore},
-		// entitySearch:      entitySearch{baseStore: baseStore},
+		entitySearch:      newEntitySearch(baseStore),
 		notificationStore: newNotificationStore(baseStore),
 
 		// authenticationProviderStore: authenticationProviderStore{baseStore: baseStore},

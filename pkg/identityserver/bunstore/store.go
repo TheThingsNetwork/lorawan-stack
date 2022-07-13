@@ -20,16 +20,50 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"io"
+	"strconv"
+	"strings"
 
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/driver/pgdriver"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
-func newStore(db bun.IDB) *baseStore { return &baseStore{DB: db} }
+func newStore(ctx context.Context, db bun.IDB) (*baseStore, error) {
+	s := &baseStore{DB: db}
+
+	var version string
+	res, err := db.QueryContext(ctx, "SELECT VERSION()")
+	if err != nil {
+		return nil, wrapDriverError(err)
+	}
+	res.Next()
+	if err = res.Scan(&version); err != nil {
+		return nil, wrapDriverError(err)
+	}
+
+	s.server, _, _ = strings.Cut(version, " ")
+
+	var serverVersion string
+	res, err = db.QueryContext(ctx, "SHOW SERVER_VERSION")
+	if err != nil {
+		return nil, wrapDriverError(err)
+	}
+	res.Next()
+	if err = res.Scan(&serverVersion); err != nil {
+		return nil, wrapDriverError(err)
+	}
+
+	major, _, _ := strings.Cut(serverVersion, ".")
+	s.major, _ = strconv.Atoi(major)
+
+	return s, nil
+}
 
 type baseStore struct {
 	DB bun.IDB
+
+	server string
+	major  int
 }
 
 var (
