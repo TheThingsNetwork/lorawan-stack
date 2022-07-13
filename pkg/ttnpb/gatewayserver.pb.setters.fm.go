@@ -207,6 +207,15 @@ func (dst *BatchGetGatewayConnectionStatsRequest) SetFields(src *BatchGetGateway
 			} else {
 				dst.GatewayIds = nil
 			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				dst.FieldMask = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

@@ -960,6 +960,12 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 		Set: true,
 	},
 
+	// Gateway Connection Statistics:
+	"/ttn.lorawan.v3.Gs/BatchGetGatewayConnectionStats": {
+		All:     GatewayConnectionStatsFieldPathsNested,
+		Allowed: GatewayConnectionStatsFieldPathsNested,
+	},
+
 	// Gateway API Keys:
 	"/ttn.lorawan.v3.GatewayAccess/UpdateAPIKey": {All: APIKeyFieldPathsNested, Allowed: APIKeyFieldPathsNested, Set: true},
 

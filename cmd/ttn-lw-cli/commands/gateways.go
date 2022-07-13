@@ -18,6 +18,7 @@ import (
 	"os"
 
 	"github.com/gogo/protobuf/proto"
+	"github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
@@ -463,6 +464,11 @@ var (
 
 			var result any
 			if len(ids) > 0 {
+				paths, err := cmd.Flags().GetStringSlice("paths")
+				if err != nil {
+					return err
+				}
+
 				var gtwIDs []*ttnpb.GatewayIdentifiers
 				for _, id := range ids {
 					gtwIDs = append(gtwIDs, &ttnpb.GatewayIdentifiers{
@@ -472,6 +478,9 @@ var (
 				res, err := ttnpb.NewGsClient(gs).BatchGetGatewayConnectionStats(ctx,
 					&ttnpb.BatchGetGatewayConnectionStatsRequest{
 						GatewayIds: gtwIDs,
+						FieldMask: &types.FieldMask{
+							Paths: paths,
+						},
 					})
 				if err != nil {
 					return err
@@ -578,6 +587,10 @@ func init() {
 		"gateway-ids",
 		[]string{},
 		"comma separated list of gateway IDs to batch get stats")
+	gatewaysConnectionStats.Flags().StringSlice(
+		"paths",
+		[]string{},
+		"comma separated list of paths to filter on a batch of stats")
 	gatewaysCommand.AddCommand(gatewaysConnectionStats)
 	gatewaysContactInfoCommand.PersistentFlags().AddFlagSet(gatewayIDFlags())
 	gatewaysCommand.AddCommand(gatewaysContactInfoCommand)

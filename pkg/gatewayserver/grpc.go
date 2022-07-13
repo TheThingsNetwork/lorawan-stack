@@ -49,10 +49,22 @@ func (gs *GatewayServer) GetGatewayConnectionStats(ctx context.Context, ids *ttn
 	return stats, nil
 }
 
+func applyGatewayConnectionStatsFieldMask(
+	dst, src *ttnpb.GatewayConnectionStats,
+	paths ...string,
+) (*ttnpb.GatewayConnectionStats, error) {
+	if dst == nil {
+		dst = &ttnpb.GatewayConnectionStats{}
+	}
+	return dst, dst.SetFields(src, paths...)
+}
+
 // BatchGetGatewayConnectionStats gets statistics about gateway connections to the Gateway Server
 // of a batch of gateways.
 // This RPC skips unconnected gateways.
-func (gs *GatewayServer) BatchGetGatewayConnectionStats(ctx context.Context,
+// FieldMask paths can be used directly since they are sanitized by the middleware.
+func (gs *GatewayServer) BatchGetGatewayConnectionStats(
+	ctx context.Context,
 	req *ttnpb.BatchGetGatewayConnectionStatsRequest,
 ) (*ttnpb.BatchGetGatewayConnectionStatsResponse, error) {
 	for _, ids := range req.GatewayIds {
@@ -62,7 +74,7 @@ func (gs *GatewayServer) BatchGetGatewayConnectionStats(ctx context.Context,
 	}
 
 	if gs.statsRegistry != nil {
-		entries, err := gs.statsRegistry.BatchGet(ctx, req.GatewayIds)
+		entries, err := gs.statsRegistry.BatchGet(ctx, req.GatewayIds, req.FieldMask.Paths)
 		if err != nil {
 			return nil, err
 		}
@@ -80,6 +92,13 @@ func (gs *GatewayServer) BatchGetGatewayConnectionStats(ctx context.Context,
 			continue
 		}
 		st, _ := val.(connectionEntry).Stats()
+		if len(req.FieldMask.Paths) > 0 {
+			selected, err := applyGatewayConnectionStatsFieldMask(nil, st, req.FieldMask.Paths...)
+			if err != nil {
+				return nil, err
+			}
+			st = selected
+		}
 		entries[uid] = st
 	}
 	return &ttnpb.BatchGetGatewayConnectionStatsResponse{

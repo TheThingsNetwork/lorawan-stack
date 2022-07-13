@@ -278,10 +278,12 @@ var ScheduleDownlinkErrorDetailsFieldPathsTopLevel = []string{
 	"path_errors",
 }
 var BatchGetGatewayConnectionStatsRequestFieldPathsNested = []string{
+	"field_mask",
 	"gateway_ids",
 }
 
 var BatchGetGatewayConnectionStatsRequestFieldPathsTopLevel = []string{
+	"field_mask",
 	"gateway_ids",
 }
 var BatchGetGatewayConnectionStatsResponseFieldPathsNested = []string{

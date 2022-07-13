@@ -14370,6 +14370,10 @@
           "items": {
             "$ref": "#/definitions/lorawanv3GatewayIdentifiers"
           }
+        },
+        "field_mask": {
+          "$ref": "#/definitions/protobufFieldMask",
+          "description": "The names of the gateway stats fields that should be returned.\nThis mask will be applied on each entry returned."
         }
       }
     },

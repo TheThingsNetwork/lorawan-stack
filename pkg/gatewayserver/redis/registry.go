@@ -88,12 +88,23 @@ func (r *GatewayConnectionStatsRegistry) Get(ctx context.Context, ids *ttnpb.Gat
 	return result, nil
 }
 
+func applyGatewayConnectionStatsFieldMask(
+	dst, src *ttnpb.GatewayConnectionStats,
+	paths ...string,
+) (*ttnpb.GatewayConnectionStats, error) {
+	if dst == nil {
+		dst = &ttnpb.GatewayConnectionStats{}
+	}
+	return dst, dst.SetFields(src, paths...)
+}
+
 // BatchGet returns the connection stats for a batch of gateways.
 // NotFound errors indicating that the gateway is either not connected
 // or is connected to a different cluster, are ignored.
 func (r *GatewayConnectionStatsRegistry) BatchGet(
 	ctx context.Context,
 	ids []*ttnpb.GatewayIdentifiers,
+	paths []string,
 ) (map[string]*ttnpb.GatewayConnectionStats, error) {
 	ret := make(map[string]*ttnpb.GatewayConnectionStats, len(ids))
 	keys := make([]string, 0, len(ids))
@@ -116,6 +127,14 @@ func (r *GatewayConnectionStatsRegistry) BatchGet(
 				log.FromContext(ctx).WithError(err).Warnf("Failed to decode stats payload")
 				continue
 			}
+			// Copy only the requested paths.
+			if len(paths) > 0 {
+				stats, err = applyGatewayConnectionStatsFieldMask(nil, stats, paths...)
+				if err != nil {
+					return nil, err
+				}
+			}
+
 			// The result of MGet is in the same order as the input keys passed to it.
 			// MGet inserts "nil" values for keys that don't have values, thereby maintaining the order.
 			// So we can use the index of the result to correlate the gateway IDs.

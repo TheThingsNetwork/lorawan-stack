@@ -4666,6 +4666,7 @@ Deployment configuration may specify if, and for how long after deletion, entiti
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | repeated |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the gateway stats fields that should be returned. This mask will be applied on each entry returned. |
 
 #### Field Rules
 

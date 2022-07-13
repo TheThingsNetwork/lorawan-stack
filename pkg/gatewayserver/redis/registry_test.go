@@ -70,7 +70,7 @@ func TestRegistry(t *testing.T) {
 		a.So(errors.IsNotFound(err), should.BeTrue)
 		batchStats, err := registry.BatchGet(ctx, []*ttnpb.GatewayIdentifiers{
 			ids,
-		})
+		}, nil)
 		a.So(err, should.BeNil)
 		a.So(len(batchStats), should.Equal, 0)
 	})
@@ -84,7 +84,7 @@ func TestRegistry(t *testing.T) {
 		a.So(errors.IsNotFound(err), should.BeTrue)
 		batchStats, err := registry.BatchGet(ctx, []*ttnpb.GatewayIdentifiers{
 			ids3,
-		})
+		}, nil)
 		a.So(err, should.BeNil)
 		a.So(len(batchStats), should.Equal, 0)
 	})
@@ -114,7 +114,7 @@ func TestRegistry(t *testing.T) {
 			ids,
 			ids2,
 			ids3,
-		})
+		}, nil)
 		a.So(err, should.BeNil)
 		a.So(len(batchStats), should.Equal, 1)
 

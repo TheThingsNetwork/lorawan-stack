@@ -20,6 +20,7 @@ import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
 import "lorawan-stack/api/error.proto";
+import "google/protobuf/field_mask.proto";
 import "lorawan-stack/api/gateway.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/lorawan.proto";
@@ -98,6 +99,9 @@ service NsGs {
 
 message BatchGetGatewayConnectionStatsRequest {
   repeated GatewayIdentifiers gateway_ids = 1 [(validate.rules).repeated.min_items = 1, (validate.rules).repeated.max_items = 100];
+  // The names of the gateway stats fields that should be returned.
+  // This mask will be applied on each entry returned.
+  google.protobuf.FieldMask field_mask = 2;
 }
 
 message BatchGetGatewayConnectionStatsResponse {
