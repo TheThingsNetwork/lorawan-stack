@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import Message from '@ttn-lw/lib/components/message'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { LORAWAN_VERSIONS, LORAWAN_PHY_VERSIONS } from '@console/lib/device-utils'
+import { getLorawanVersionLabel, getLorawanPhyVersionLabel } from '../../../utils'
 
 import style from './device-card.styl'
 
@@ -35,19 +35,6 @@ const m = defineMessages({
   classB: 'Class B',
   classC: 'Class C',
 })
-
-const getLorawanVersionLabel = ({ lorawan_version }) => {
-  const { label } = LORAWAN_VERSIONS.find(version => version.value === lorawan_version) || {}
-
-  return label
-}
-
-const getLorawanPhyVersionLabel = ({ lorawan_phy_version }) => {
-  const { label } =
-    LORAWAN_PHY_VERSIONS.find(version => version.value === lorawan_phy_version) || {}
-
-  return label
-}
 
 const DeviceCard = props => {
   const { model, template } = props
