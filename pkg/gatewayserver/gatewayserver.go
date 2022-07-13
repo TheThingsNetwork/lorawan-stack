@@ -419,7 +419,12 @@ type connectionEntry struct {
 
 // Connect connects a gateway by its identifiers to the Gateway Server, and returns a io.Connection for traffic and
 // control.
-func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids *ttnpb.GatewayIdentifiers) (*io.Connection, error) {
+func (gs *GatewayServer) Connect(
+	ctx context.Context,
+	frontend io.Frontend,
+	ids *ttnpb.GatewayIdentifiers,
+	addr *ttnpb.GatewayRemoteAddress,
+) (*io.Connection, error) {
 	if err := gs.entityRegistry.AssertGatewayRights(ctx, ids, ttnpb.Right_RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
 	}
@@ -428,6 +433,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"protocol", frontend.Protocol(),
 		"gateway_uid", uid,
+		"gateway_ip_address", addr.Ip,
 	))
 	ctx = log.NewContext(ctx, logger)
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:conn:%s", events.NewCorrelationID()))
@@ -485,7 +491,9 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		return nil, err
 	}
 
-	conn, err := io.NewConnection(ctx, frontend, gtw, fps, gtw.EnforceDutyCycle, ttnpb.StdDuration(gtw.ScheduleAnytimeDelay))
+	conn, err := io.NewConnection(
+		ctx, frontend, gtw, fps, gtw.EnforceDutyCycle, ttnpb.StdDuration(gtw.ScheduleAnytimeDelay), addr,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -505,7 +513,11 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		existingConnEntry.tasksDone.Wait()
 	}
 
-	registerGatewayConnect(ctx, ids, frontend.Protocol())
+	registerGatewayConnect(ctx, ids, &ttnpb.GatewayConnectionStats{
+		ConnectedAt:          ttnpb.ProtoTimePtr(conn.ConnectTime()),
+		Protocol:             conn.Frontend().Protocol(),
+		GatewayRemoteAddress: conn.GatewayRemoteAddress(),
+	})
 	logger.Info("Connected")
 
 	gs.startDisconnectOnChangeTask(connEntry)
@@ -910,12 +922,13 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 
 	ids := conn.Connection.Gateway().GetIds()
 	connectTime := conn.Connection.ConnectTime()
-	stats := &ttnpb.GatewayConnectionStats{
-		ConnectedAt: ttnpb.ProtoTimePtr(connectTime),
-		Protocol:    conn.Connection.Frontend().Protocol(),
-	}
 
 	// Initial update, so that the gateway appears connected.
+	stats := &ttnpb.GatewayConnectionStats{
+		ConnectedAt:          ttnpb.ProtoTimePtr(connectTime),
+		Protocol:             conn.Connection.Frontend().Protocol(),
+		GatewayRemoteAddress: conn.Connection.GatewayRemoteAddress(),
+	}
 	registerGatewayConnectionStats(ctx, ids, stats)
 	if gs.statsRegistry != nil {
 		if err := gs.statsRegistry.Set(decoupledCtx, ids, stats, ttnpb.GatewayConnectionStatsFieldPathsTopLevel, gs.config.ConnectionStatsTTL); err != nil {

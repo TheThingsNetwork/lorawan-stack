@@ -166,7 +166,7 @@ func (s *srv) handlePacket(ctx context.Context, packet encoding.Packet) {
 		}
 	}
 
-	cs, err := s.connect(ctx, eui)
+	cs, err := s.connect(ctx, eui, packet.GatewayAddr)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to connect")
 		return
@@ -179,7 +179,7 @@ func (s *srv) handlePacket(ctx context.Context, packet encoding.Packet) {
 
 var errConnectionNotReady = errors.DefineUnavailable("connection_not_ready", "connection is not ready")
 
-func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
+func (s *srv) connect(ctx context.Context, eui types.EUI64, addr *net.UDPAddr) (*state, error) {
 	cs := &state{
 		ioWait:           make(chan struct{}),
 		downlinkTaskDone: &sync.WaitGroup{},
@@ -190,7 +190,7 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 	val, loaded := s.connections.LoadOrStore(eui, cs)
 	cs = val.(*state)
 	if !loaded {
-		var io *io.Connection
+		var conn *io.Connection
 		var err error
 		defer func() {
 			if err != nil {
@@ -201,7 +201,7 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 					delete()
 				}
 			}
-			cs.io, cs.ioErr = io, err
+			cs.io, cs.ioErr = conn, err
 			close(cs.ioWait)
 		}()
 		ids := &ttnpb.GatewayIdentifiers{Eui: &eui}
@@ -218,7 +218,10 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 				},
 			},
 		})
-		io, err = s.server.Connect(ctx, s, ids)
+
+		conn, err = s.server.Connect(ctx, s, ids, &ttnpb.GatewayRemoteAddress{
+			Ip: addr.IP.String(),
+		})
 		if err != nil {
 			return nil, err
 		}

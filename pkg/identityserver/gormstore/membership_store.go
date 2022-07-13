@@ -185,10 +185,10 @@ type membershipChain struct {
 }
 
 func (m membershipChain) GetMembershipChain() *store.MembershipChain {
-	indirectAccountRights := ttnpb.Rights(m.IndirectAccountRights)
-	directAccountRights := ttnpb.Rights(m.DirectAccountRights)
+	indirectAccountRights := &ttnpb.Rights{Rights: m.IndirectAccountRights}
+	directAccountRights := &ttnpb.Rights{Rights: m.DirectAccountRights}
 	c := &store.MembershipChain{
-		RightsOnEntity:    &directAccountRights,
+		RightsOnEntity:    directAccountRights,
 		EntityIdentifiers: buildIdentifiers(m.EntityType, m.EntityFriendlyID),
 	}
 	switch m.DirectAccountType {
@@ -201,7 +201,7 @@ func (m membershipChain) GetMembershipChain() *store.MembershipChain {
 			c.UserIdentifiers = &ttnpb.UserIdentifiers{
 				UserId: m.IndirectAccountFriendlyID,
 			}
-			c.RightsOnOrganization = &indirectAccountRights
+			c.RightsOnOrganization = indirectAccountRights
 		}
 		c.OrganizationIdentifiers = &ttnpb.OrganizationIdentifiers{
 			OrganizationId: m.DirectAccountFriendlyID,
@@ -357,7 +357,7 @@ func (s *membershipStore) SetMember(
 	if len(rights.Rights) == 0 {
 		return upsertQuery.Delete(&membership).Error
 	}
-	membership.Rights = Rights(*rights)
+	membership.Rights = rights.Rights
 	return upsertQuery.Save(&membership).Error
 }
 

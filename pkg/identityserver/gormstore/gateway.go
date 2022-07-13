@@ -374,7 +374,7 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 		gtw.Antennas = antennas
 		for i, pb := range pb.Antennas {
 			antenna := gtw.Antennas[i]
-			antenna.fromPB(*pb)
+			antenna.fromPB(pb)
 			antenna.Index = i
 			gtw.Antennas[i] = antenna
 		}

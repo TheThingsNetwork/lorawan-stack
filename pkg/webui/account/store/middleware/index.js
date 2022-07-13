@@ -20,6 +20,7 @@ import identityServer from './identity-server'
 import sessions from './sessions'
 import clients from './clients'
 import collaborators from './collaborators'
+import authorizations from './authorizations'
 
 export default [
   ...status,
@@ -29,4 +30,5 @@ export default [
   ...sessions,
   ...clients,
   ...collaborators,
+  ...authorizations,
 ]

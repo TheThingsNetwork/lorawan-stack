@@ -45,7 +45,7 @@ func (k APIKey) toPB() *ttnpb.APIKey {
 		Id:        k.APIKeyID,
 		Key:       k.Key,
 		Name:      k.Name,
-		Rights:    k.Rights.Rights,
+		Rights:    k.Rights,
 		CreatedAt: ttnpb.ProtoTimePtr(cleanTime(k.CreatedAt)),
 		UpdatedAt: ttnpb.ProtoTimePtr(cleanTime(k.UpdatedAt)),
 		ExpiresAt: ttnpb.ProtoTime(cleanTimePtr(k.ExpiresAt)),

@@ -41,7 +41,6 @@ var leaps = [...]int64{
 	1025136015,
 	1119744016,
 	1167264017,
-	1341118800,
 }
 
 func seconds(d time.Duration) int64 {

@@ -242,7 +242,7 @@ func (p *Population) NewUserSession(user *ttnpb.UserIdentifiers) *ttnpb.UserSess
 
 // Populate creates the population in the database.
 // After calling Populate, the entities in the population should no longer be modified.
-func (p *Population) Populate(ctx context.Context, st interface{}) error {
+func (p *Population) Populate(ctx context.Context, st interface{}) error { //nolint:gocyclo
 	if len(p.Users) > 0 {
 		s, ok := st.(store.UserStore)
 		if !ok {
@@ -262,7 +262,9 @@ func (p *Population) Populate(ctx context.Context, st interface{}) error {
 			if err != nil {
 				return err
 			}
-			*usr = *created
+			if err = usr.SetFields(created, ttnpb.UserFieldPathsTopLevel...); err != nil {
+				return err
+			}
 		}
 	}
 	if len(p.Organizations) > 0 {
@@ -275,7 +277,9 @@ func (p *Population) Populate(ctx context.Context, st interface{}) error {
 			if err != nil {
 				return err
 			}
-			*org = *created
+			if err = org.SetFields(created, ttnpb.OrganizationFieldPathsTopLevel...); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -289,7 +293,9 @@ func (p *Population) Populate(ctx context.Context, st interface{}) error {
 			if err != nil {
 				return err
 			}
-			*app = *created
+			if err = app.SetFields(created, ttnpb.ApplicationFieldPathsTopLevel...); err != nil {
+				return err
+			}
 		}
 	}
 	if len(p.EndDevices) > 0 {
@@ -302,7 +308,9 @@ func (p *Population) Populate(ctx context.Context, st interface{}) error {
 			if err != nil {
 				return err
 			}
-			*dev = *created
+			if err = dev.SetFields(created, ttnpb.EndDeviceFieldPathsTopLevel...); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -316,7 +324,9 @@ func (p *Population) Populate(ctx context.Context, st interface{}) error {
 			if err != nil {
 				return err
 			}
-			*cli = *created
+			if err = cli.SetFields(created, ttnpb.ClientFieldPathsTopLevel...); err != nil {
+				return err
+			}
 		}
 	}
 	if len(p.Gateways) > 0 {
@@ -329,7 +339,9 @@ func (p *Population) Populate(ctx context.Context, st interface{}) error {
 			if err != nil {
 				return err
 			}
-			*gtw = *created
+			if err = gtw.SetFields(created, ttnpb.GatewayFieldPathsTopLevel...); err != nil {
+				return err
+			}
 		}
 	}
 	if len(p.UserSessions) > 0 {
@@ -342,7 +354,9 @@ func (p *Population) Populate(ctx context.Context, st interface{}) error {
 			if err != nil {
 				return err
 			}
-			*sess = *created
+			if err = sess.SetFields(created, ttnpb.UserSessionFieldPathsTopLevel...); err != nil {
+				return err
+			}
 		}
 	}
 	if len(p.APIKeys) > 0 {
@@ -355,7 +369,9 @@ func (p *Population) Populate(ctx context.Context, st interface{}) error {
 			if err != nil {
 				return err
 			}
-			*apiKey.APIKey = *created
+			if err = apiKey.APIKey.SetFields(created, ttnpb.APIKeyFieldPathsTopLevel...); err != nil {
+				return err
+			}
 		}
 	}
 	if len(p.Memberships) > 0 {
@@ -364,7 +380,12 @@ func (p *Population) Populate(ctx context.Context, st interface{}) error {
 			return fmt.Errorf("store of type %T does not implement MembershipStore", st)
 		}
 		for _, collaborator := range p.Memberships {
-			err := s.SetMember(ctx, collaborator.Collaborator.Ids, collaborator.EntityIdentifiers, &ttnpb.Rights{Rights: collaborator.Collaborator.GetRights()})
+			err := s.SetMember(
+				ctx,
+				collaborator.Collaborator.Ids,
+				collaborator.EntityIdentifiers,
+				&ttnpb.Rights{Rights: collaborator.Collaborator.GetRights()},
+			)
 			if err != nil {
 				return err
 			}

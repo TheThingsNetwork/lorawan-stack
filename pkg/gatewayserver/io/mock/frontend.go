@@ -42,7 +42,8 @@ func ConnectFrontend(ctx context.Context, ids *ttnpb.GatewayIdentifiers, server 
 		TxAck:  make(chan *ttnpb.TxAcknowledgment, 1),
 		Down:   make(chan *ttnpb.DownlinkMessage, 1),
 	}
-	conn, err := server.Connect(ctx, f, ids)
+
+	conn, err := server.Connect(ctx, f, ids, &ttnpb.GatewayRemoteAddress{Ip: "127.0.0.1"})
 	if err != nil {
 		return nil, err
 	}

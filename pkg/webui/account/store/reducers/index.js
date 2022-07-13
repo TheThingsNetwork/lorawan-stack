@@ -27,11 +27,13 @@ import user from './user'
 import is from './identity-server'
 import session from './sessions'
 import clients from './clients'
+import authorizations from './authorizations'
 
 export default history =>
   combineReducers({
     init,
     clients,
+    authorizations,
     user,
     session,
     is,
