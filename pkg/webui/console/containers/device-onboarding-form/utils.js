@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ACTIVATION_MODES } from '@console/lib/device-utils'
+import { ACTIVATION_MODES, LORAWAN_VERSIONS, LORAWAN_PHY_VERSIONS } from '@console/lib/device-utils'
 
 // End device selectors.
 
@@ -49,3 +49,16 @@ export const REGISTRATION_TYPES = Object.freeze({
   SINGLE: 'single',
   MULTIPLE: 'multiple',
 })
+
+export const getLorawanVersionLabel = ({ lorawan_version }) => {
+  const { label } = LORAWAN_VERSIONS.find(version => version.value === lorawan_version) || {}
+
+  return label
+}
+
+export const getLorawanPhyVersionLabel = ({ lorawan_phy_version }) => {
+  const { label } =
+    LORAWAN_PHY_VERSIONS.find(version => version.value === lorawan_phy_version) || {}
+
+  return label
+}
