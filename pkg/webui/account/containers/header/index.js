@@ -56,8 +56,13 @@ const Header = ({ handleSearchRequest, searchable }) => {
     },
     {
       title: sharedMessages.oauthClients,
-      icon: 'recent_actors',
+      icon: 'oauth_clients',
       path: '/oauth-clients',
+    },
+    {
+      title: sharedMessages.authorizations,
+      icon: 'access',
+      path: '/client-authorizations',
     },
   ]
 
