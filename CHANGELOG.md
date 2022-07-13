@@ -22,6 +22,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Encoding of DevAddr, EUI and similar fields in `text/event-stream` responses.
+- GPS time leap second calculations taking a new leap second into consideration for 6th of July 2022.
 
 ### Security
 
