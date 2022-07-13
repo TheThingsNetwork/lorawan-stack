@@ -16,7 +16,9 @@ package commands
 
 import (
 	"os"
+	"strings"
 
+	"github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	"github.com/gogo/protobuf/proto"
 	"github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
@@ -433,23 +435,28 @@ var (
 		},
 	}
 	gatewaysConnectionStats = &cobra.Command{
-		Use:     "get-connection-stats [gateway-id]",
+		Use:     "get-connection-stats [gateway-ids]",
 		Aliases: []string{"connection-stats", "cnx-stats", "stats"},
 		Short:   "Get connection stats for a (group of) gateway(s).",
 		Long: `Get connection stats for a (group of) gateway(s).
-		Use the --gateway-ids flag for multiple gateways.
-		If both the parameter and the flag are provided, the parameter is ignored.`,
+The command arguments support multiple gateway IDs.
+Alternatively use the --gateway-ids flag.
+If both the parameter and the flag are provided, the flag is ignored.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ids, err := cmd.Flags().GetStringSlice("gateway-ids")
-			if err != nil {
-				return err
-			}
-
-			gtwID, err := getGatewayID(cmd.Flags(), args, true)
-			if err != nil {
-				if !errors.IsInvalidArgument(err) || len(ids) == 0 {
+			var (
+				ids = args
+				err error
+			)
+			if len(ids) == 0 {
+				raw, err := cmd.Flags().GetString("gateway-ids")
+				if err != nil {
 					return err
 				}
+				s := strings.Split(raw, ",")
+				if len(s) < 2 {
+					return errNoGatewayID.New()
+				}
+				ids = append(ids, s...)
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -462,8 +469,7 @@ var (
 				return err
 			}
 
-			var result any
-			if len(ids) > 0 {
+			if len(ids) > 1 {
 				paths, err := cmd.Flags().GetStringSlice("paths")
 				if err != nil {
 					return err
@@ -485,26 +491,26 @@ var (
 				if err != nil {
 					return err
 				}
-				result = res
-			} else {
-				gateway, err := ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{
-					GatewayIds: gtwID,
-					FieldMask:  ttnpb.FieldMask("gateway_server_address"),
-				})
-				if err != nil {
-					return err
-				}
-				if gsMismatch := compareServerAddressGateway(gateway, config); gsMismatch {
-					return errAddressMismatchGateway.New()
-				}
-				res, err := ttnpb.NewGsClient(gs).GetGatewayConnectionStats(ctx, gtwID)
-				if err != nil {
-					return err
-				}
-				result = res
+				return io.Write(os.Stdout, config.OutputFormat, res)
 			}
-
-			return io.Write(os.Stdout, config.OutputFormat, result)
+			gtwIDs := &ttnpb.GatewayIdentifiers{
+				GatewayId: ids[0],
+			}
+			gateway, err := ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{
+				GatewayIds: gtwIDs,
+				FieldMask:  ttnpb.FieldMask("gateway_server_address"),
+			})
+			if err != nil {
+				return err
+			}
+			if gsMismatch := compareServerAddressGateway(gateway, config); gsMismatch {
+				return errAddressMismatchGateway.New()
+			}
+			res, err := ttnpb.NewGsClient(gs).GetGatewayConnectionStats(ctx, gtwIDs)
+			if err != nil {
+				return err
+			}
+			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
 	gatewaysContactInfoCommand = contactInfoCommands("gateway", func(cmd *cobra.Command, args []string) (*ttnpb.EntityIdentifiers, error) {
@@ -584,13 +590,14 @@ func init() {
 	gatewaysCommand.AddCommand(gatewaysRestoreCommand)
 	gatewaysConnectionStats.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysConnectionStats.Flags().StringSlice(
-		"gateway-ids",
-		[]string{},
-		"comma separated list of gateway IDs to batch get stats")
-	gatewaysConnectionStats.Flags().StringSlice(
 		"paths",
 		[]string{},
 		"comma separated list of paths to filter on a batch of stats")
+	flagsplugin.AddAlias(
+		gatewaysConnectionStats.Flags(),
+		"gateway-id",
+		"gateway-ids",
+	)
 	gatewaysCommand.AddCommand(gatewaysConnectionStats)
 	gatewaysContactInfoCommand.PersistentFlags().AddFlagSet(gatewayIDFlags())
 	gatewaysCommand.AddCommand(gatewaysContactInfoCommand)
