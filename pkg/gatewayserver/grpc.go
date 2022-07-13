@@ -74,7 +74,7 @@ func (gs *GatewayServer) BatchGetGatewayConnectionStats(
 	}
 
 	if gs.statsRegistry != nil {
-		entries, err := gs.statsRegistry.BatchGet(ctx, req.GatewayIds, req.FieldMask.Paths)
+		entries, err := gs.statsRegistry.BatchGet(ctx, req.GatewayIds, req.FieldMask.GetPaths())
 		if err != nil {
 			return nil, err
 		}
@@ -92,8 +92,8 @@ func (gs *GatewayServer) BatchGetGatewayConnectionStats(
 			continue
 		}
 		st, _ := val.(connectionEntry).Stats()
-		if len(req.FieldMask.Paths) > 0 {
-			selected, err := applyGatewayConnectionStatsFieldMask(nil, st, req.FieldMask.Paths...)
+		if len(req.FieldMask.GetPaths()) > 0 {
+			selected, err := applyGatewayConnectionStatsFieldMask(nil, st, req.FieldMask.GetPaths()...)
 			if err != nil {
 				return nil, err
 			}
