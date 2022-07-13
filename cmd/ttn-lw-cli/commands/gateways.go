@@ -434,11 +434,21 @@ var (
 	gatewaysConnectionStats = &cobra.Command{
 		Use:     "get-connection-stats [gateway-id]",
 		Aliases: []string{"connection-stats", "cnx-stats", "stats"},
-		Short:   "Get connection stats for a gateway",
+		Short:   "Get connection stats for a (group of) gateway(s).",
+		Long: `Get connection stats for a (group of) gateway(s).
+		Use the --gateway-ids flag for multiple gateways.
+		If both the parameter and the flag are provided, the parameter is ignored.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			gtwID, err := getGatewayID(cmd.Flags(), args, true)
+			ids, err := cmd.Flags().GetStringSlice("gateway-ids")
 			if err != nil {
 				return err
+			}
+
+			gtwID, err := getGatewayID(cmd.Flags(), args, true)
+			if err != nil {
+				if !errors.IsInvalidArgument(err) || len(ids) == 0 {
+					return err
+				}
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -446,61 +456,46 @@ var (
 				return err
 			}
 
-			gateway, err := ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{
-				GatewayIds: gtwID,
-				FieldMask:  ttnpb.FieldMask("gateway_server_address"),
-			})
-			if err != nil {
-				return err
-			}
-
-			if gsMismatch := compareServerAddressGateway(gateway, config); gsMismatch {
-				return errAddressMismatchGateway.New()
-			}
-
 			gs, err := api.Dial(ctx, config.GatewayServerGRPCAddress)
 			if err != nil {
 				return err
 			}
 
-			res, err := ttnpb.NewGsClient(gs).GetGatewayConnectionStats(ctx, gtwID)
-			if err != nil {
-				return err
-			}
-
-			return io.Write(os.Stdout, config.OutputFormat, res)
-		},
-	}
-	gatewaysBatchConnectionStats = &cobra.Command{
-		Use:     "batch-get-connection-stats",
-		Aliases: []string{"batch-connection-stats", "batch-cnx-stats"},
-		Short:   "Get connection stats for a batch of gateways",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			ids, err := cmd.Flags().GetStringSlice("gateway-ids")
-			if err != nil {
-				return err
-			}
-			var gtwIDs []*ttnpb.GatewayIdentifiers
-			for _, id := range ids {
-				gtwIDs = append(gtwIDs, &ttnpb.GatewayIdentifiers{
-					GatewayId: id,
+			var result interface{}
+			if len(ids) > 0 {
+				var gtwIDs []*ttnpb.GatewayIdentifiers
+				for _, id := range ids {
+					gtwIDs = append(gtwIDs, &ttnpb.GatewayIdentifiers{
+						GatewayId: id,
+					})
+				}
+				res, err := ttnpb.NewGsClient(gs).BatchGetGatewayConnectionStats(ctx,
+					&ttnpb.BatchGetGatewayConnectionStatsRequest{
+						GatewayIds: gtwIDs,
+					})
+				if err != nil {
+					return err
+				}
+				result = res
+			} else {
+				gateway, err := ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{
+					GatewayIds: gtwID,
+					FieldMask:  ttnpb.FieldMask("gateway_server_address"),
 				})
+				if err != nil {
+					return err
+				}
+				if gsMismatch := compareServerAddressGateway(gateway, config); gsMismatch {
+					return errAddressMismatchGateway.New()
+				}
+				res, err := ttnpb.NewGsClient(gs).GetGatewayConnectionStats(ctx, gtwID)
+				if err != nil {
+					return err
+				}
+				result = res
 			}
 
-			gs, err := api.Dial(ctx, config.GatewayServerGRPCAddress)
-			if err != nil {
-				return err
-			}
-
-			res, err := ttnpb.NewGsClient(gs).BatchGetGatewayConnectionStats(ctx,
-				&ttnpb.BatchGetGatewayConnectionStatsRequest{
-					GatewayIds: gtwIDs,
-				})
-			if err != nil {
-				return err
-			}
-
-			return io.Write(os.Stdout, config.OutputFormat, res)
+			return io.Write(os.Stdout, config.OutputFormat, result)
 		},
 	}
 	gatewaysContactInfoCommand = contactInfoCommands("gateway", func(cmd *cobra.Command, args []string) (*ttnpb.EntityIdentifiers, error) {
@@ -579,10 +574,11 @@ func init() {
 	gatewaysRestoreCommand.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysCommand.AddCommand(gatewaysRestoreCommand)
 	gatewaysConnectionStats.Flags().AddFlagSet(gatewayIDFlags())
-	gatewaysCommand.AddCommand(gatewaysConnectionStats)
-	gatewaysCommand.AddCommand(gatewaysBatchConnectionStats)
-	gatewaysBatchConnectionStats.Flags().StringSlice("gateway-ids", []string{},
+	gatewaysConnectionStats.Flags().StringSlice(
+		"gateway-ids",
+		[]string{},
 		"comma separated list of gateway IDs to batch get stats")
+	gatewaysCommand.AddCommand(gatewaysConnectionStats)
 	gatewaysContactInfoCommand.PersistentFlags().AddFlagSet(gatewayIDFlags())
 	gatewaysCommand.AddCommand(gatewaysContactInfoCommand)
 	gatewaysPurgeCommand.Flags().AddFlagSet(gatewayIDFlags())
