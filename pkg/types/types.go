@@ -128,7 +128,8 @@ func unmarshalNBytes(s *jsonplugin.UnmarshalState, n int) []byte {
 	if s.Err() != nil {
 		return nil
 	}
-	trimmed := strings.TrimSuffix(enc, "=")
+	trimmed := strings.TrimRight(enc, "=")
+
 	switch len(trimmed) {
 	case 0:
 		b := make([]byte, n)
