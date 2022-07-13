@@ -105,7 +105,14 @@ const TokensTable = props => {
           id: row.id,
         }),
         render: details => (
-          <SafeInspector data={details.id} noTransform noCopyPopup small hideable={false} />
+          <SafeInspector
+            data={details.id}
+            noTransform
+            noCopyPopup
+            small
+            hideable={false}
+            isBytes={false}
+          />
         ),
       },
       {

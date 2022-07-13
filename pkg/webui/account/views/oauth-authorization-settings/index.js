@@ -112,6 +112,7 @@ const AuthorizationSettings = props => {
                 message={m.deleteButton}
                 type="button"
                 icon="delete"
+                danger
               />
             ),
           },
