@@ -31,7 +31,7 @@ import (
 const (
 	protocOut             = "/out"
 	gogoProtoImage        = "ghcr.io/thethingsindustries/protoc:gen-gogo-1.3.1"
-	jsonProtoImage        = "ghcr.io/thethingsindustries/protoc:3.9.1-gen-go-json-1.3.1"
+	jsonProtoImage        = "ghcr.io/thethingsindustries/protoc:3.9.1-gen-go-json-1.3.3"
 	fieldMaskProtoImage   = "ghcr.io/thethingsindustries/protoc:3.9.1-gen-fieldmask-0.6.0"
 	grpcGatewayProtoImage = "ghcr.io/thethingsindustries/protoc:gen-grpc-gateway-1.16.0"
 	swaggerProtoImage     = "ghcr.io/thethingsindustries/protoc:gen-grpc-gateway-1.16.0"

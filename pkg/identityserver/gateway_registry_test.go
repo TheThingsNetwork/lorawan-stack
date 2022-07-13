@@ -258,7 +258,7 @@ func TestGatewaysPagination(t *testing.T) {
 
 		list, err := reg.List(ctx, &ttnpb.ListGatewaysRequest{
 			FieldMask:    ttnpb.FieldMask("name"),
-			Collaborator: usr1.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         1,
 		}, creds, grpc.Header(&md))
@@ -269,7 +269,7 @@ func TestGatewaysPagination(t *testing.T) {
 
 		list, err = reg.List(ctx, &ttnpb.ListGatewaysRequest{
 			FieldMask:    ttnpb.FieldMask("name"),
-			Collaborator: usr1.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         2,
 		}, creds)
@@ -279,7 +279,7 @@ func TestGatewaysPagination(t *testing.T) {
 
 		list, err = reg.List(ctx, &ttnpb.ListGatewaysRequest{
 			FieldMask:    ttnpb.FieldMask("name"),
-			Collaborator: usr1.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         3,
 		}, creds)

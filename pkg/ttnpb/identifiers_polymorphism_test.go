@@ -56,8 +56,6 @@ func TestEntityType(t *testing.T) {
 	a.So(organizationID.IDString(), should.Equal, "foo")
 	a.So(organizationID.GetEntityIdentifiers().EntityType(), should.Equal, "organization")
 	a.So(organizationID.GetEntityIdentifiers().IDString(), should.Equal, "foo")
-	a.So(organizationID.OrganizationOrUserIdentifiers().EntityType(), should.Equal, "organization")
-	a.So(organizationID.OrganizationOrUserIdentifiers().IDString(), should.Equal, "foo")
 	a.So(organizationID.GetOrganizationOrUserIdentifiers().EntityType(), should.Equal, "organization")
 	a.So(organizationID.GetOrganizationOrUserIdentifiers().IDString(), should.Equal, "foo")
 
@@ -65,8 +63,6 @@ func TestEntityType(t *testing.T) {
 	a.So(userID.IDString(), should.Equal, "foo")
 	a.So(userID.GetEntityIdentifiers().EntityType(), should.Equal, "user")
 	a.So(userID.GetEntityIdentifiers().IDString(), should.Equal, "foo")
-	a.So(userID.OrganizationOrUserIdentifiers().EntityType(), should.Equal, "user")
-	a.So(userID.OrganizationOrUserIdentifiers().IDString(), should.Equal, "foo")
 	a.So(userID.GetOrganizationOrUserIdentifiers().EntityType(), should.Equal, "user")
 	a.So(userID.GetOrganizationOrUserIdentifiers().IDString(), should.Equal, "foo")
 }

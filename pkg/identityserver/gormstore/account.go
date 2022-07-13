@@ -39,9 +39,9 @@ func init() {
 func (a Account) OrganizationOrUserIdentifiers() *ttnpb.OrganizationOrUserIdentifiers {
 	switch a.AccountType {
 	case user:
-		return ttnpb.UserIdentifiers{UserId: a.UID}.OrganizationOrUserIdentifiers()
+		return (&ttnpb.UserIdentifiers{UserId: a.UID}).GetOrganizationOrUserIdentifiers()
 	case organization:
-		return ttnpb.OrganizationIdentifiers{OrganizationId: a.UID}.OrganizationOrUserIdentifiers()
+		return (&ttnpb.OrganizationIdentifiers{OrganizationId: a.UID}).GetOrganizationOrUserIdentifiers()
 	default:
 		panic("account is neither user nor organization")
 	}

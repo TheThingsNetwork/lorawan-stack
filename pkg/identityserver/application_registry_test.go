@@ -187,7 +187,7 @@ func TestApplicationsCRUD(t *testing.T) {
 			a.So(updated.Name, should.Equal, "Updated Name")
 		}
 
-		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{nil, usr1.OrganizationOrUserIdentifiers()} {
+		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{nil, usr1.GetOrganizationOrUserIdentifiers()} {
 			list, err := reg.List(ctx, &ttnpb.ListApplicationsRequest{
 				FieldMask:    ttnpb.FieldMask("name"),
 				Collaborator: collaborator,
@@ -249,7 +249,7 @@ func TestApplicationsPagination(t *testing.T) {
 
 		list, err = reg.List(ctx, &ttnpb.ListApplicationsRequest{
 			FieldMask:    ttnpb.FieldMask("name"),
-			Collaborator: usr1.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         2,
 		}, creds)
@@ -259,7 +259,7 @@ func TestApplicationsPagination(t *testing.T) {
 
 		list, err = reg.List(ctx, &ttnpb.ListApplicationsRequest{
 			FieldMask:    ttnpb.FieldMask("name"),
-			Collaborator: usr1.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         3,
 		}, creds)

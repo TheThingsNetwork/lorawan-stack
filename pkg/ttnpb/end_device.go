@@ -27,8 +27,8 @@ func (v *BoolValue) XXX_WellKnownType() string {
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
-func (v BoolValue) MarshalText() ([]byte, error) {
-	if !v.Value {
+func (v *BoolValue) MarshalText() ([]byte, error) {
+	if !v.GetValue() {
 		return []byte("false"), nil
 	}
 	return []byte("true"), nil

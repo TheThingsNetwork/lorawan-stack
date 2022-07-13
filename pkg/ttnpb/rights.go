@@ -122,11 +122,11 @@ func (s rightsSet) rights() *Rights {
 	return &Rights{Rights: res}
 }
 
-type rightsByString Rights
+type rightsByString []Right
 
-func (r rightsByString) Len() int           { return len(r.Rights) }
-func (r rightsByString) Less(i, j int) bool { return r.Rights[i].String() < r.Rights[j].String() }
-func (r rightsByString) Swap(i, j int)      { r.Rights[i], r.Rights[j] = r.Rights[j], r.Rights[i] }
+func (r rightsByString) Len() int           { return len(r) }
+func (r rightsByString) Less(i, j int) bool { return r[i].String() < r[j].String() }
+func (r rightsByString) Swap(i, j int)      { r[i], r[j] = r[j], r[i] }
 
 // Sorted returns a sorted rights list by string value.
 // The original rights list is not mutated.
@@ -134,10 +134,10 @@ func (r *Rights) Sorted() *Rights {
 	if r == nil {
 		return &Rights{}
 	}
-	res := Rights{Rights: make([]Right, len(r.Rights))}
+	res := &Rights{Rights: make([]Right, len(r.Rights))}
 	copy(res.Rights, r.Rights)
-	sort.Sort(rightsByString(res))
-	return &res
+	sort.Sort(rightsByString(res.Rights))
+	return res
 }
 
 // Unique removes all duplicate rights from the rights list.

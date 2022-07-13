@@ -31,7 +31,7 @@ const gatewayID = "test"
 func TestDefaultTopics(t *testing.T) {
 	ctx := test.Context()
 	v3 := topics.New(ctx)
-	uid := unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayId: gatewayID})
+	uid := unique.ID(ctx, &ttnpb.GatewayIdentifiers{GatewayId: gatewayID})
 	for _, tc := range []struct {
 		UID      string
 		Func     func(string) []string
