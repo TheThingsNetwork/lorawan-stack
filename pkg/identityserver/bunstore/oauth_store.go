@@ -204,8 +204,8 @@ func newOAuthStore(baseStore *baseStore) *oauthStore {
 	}
 }
 
-func (s *oauthStore) selectWithUserIDs(
-	ctx context.Context, uuid string,
+func (*oauthStore) selectWithUserIDs(
+	_ context.Context, uuid string,
 ) func(*bun.SelectQuery) *bun.SelectQuery {
 	return func(q *bun.SelectQuery) *bun.SelectQuery {
 		return q.Where("user_id = ?", uuid)
@@ -270,8 +270,22 @@ func (s *oauthStore) ListAuthorizations(
 	return pbs, nil
 }
 
-func (s *oauthStore) selectWithClientIDs(
-	ctx context.Context, uuid string,
+func (s *oauthStore) getClientUUID(
+	ctx context.Context, clientIDs *ttnpb.ClientIdentifiers,
+) (string, error) {
+	clientModel, err := s.getClientModelBy(
+		ctx,
+		s.clientStore.selectWithID(ctx, clientIDs.GetClientId()),
+		store.FieldMask{"ids"},
+	)
+	if err != nil {
+		return "", err
+	}
+	return clientModel.ID, nil
+}
+
+func (*oauthStore) selectWithClientIDs(
+	_ context.Context, uuid string,
 ) func(*bun.SelectQuery) *bun.SelectQuery {
 	return func(q *bun.SelectQuery) *bun.SelectQuery {
 		return q.Where("client_id = ?", uuid)
@@ -292,7 +306,7 @@ func (s *oauthStore) GetAuthorization(
 		return nil, err
 	}
 
-	_, clientUUID, err := s.getEntity(ctx, clientIDs)
+	clientUUID, err := s.getClientUUID(ctx, clientIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -329,7 +343,7 @@ func (s *oauthStore) Authorize(
 		return nil, err
 	}
 
-	_, clientUUID, err := s.getEntity(ctx, pb.GetClientIds())
+	clientUUID, err := s.getClientUUID(ctx, pb.GetClientIds())
 	if err != nil {
 		return nil, err
 	}
@@ -390,7 +404,7 @@ func (s *oauthStore) DeleteAuthorization(
 		return err
 	}
 
-	_, clientUUID, err := s.getEntity(ctx, clientIDs)
+	clientUUID, err := s.getClientUUID(ctx, clientIDs)
 	if err != nil {
 		return err
 	}
@@ -430,7 +444,7 @@ func (s *oauthStore) CreateAuthorizationCode(
 		return nil, err
 	}
 
-	_, clientUUID, err := s.getEntity(ctx, pb.GetClientIds())
+	clientUUID, err := s.getClientUUID(ctx, pb.GetClientIds())
 	if err != nil {
 		return nil, err
 	}
@@ -534,7 +548,7 @@ func (s *oauthStore) CreateAccessToken(
 		return nil, err
 	}
 
-	_, clientUUID, err := s.getEntity(ctx, pb.GetClientIds())
+	clientUUID, err := s.getClientUUID(ctx, pb.GetClientIds())
 	if err != nil {
 		return nil, err
 	}
@@ -580,7 +594,7 @@ func (s *oauthStore) ListAccessTokens(
 		return nil, err
 	}
 
-	_, clientUUID, err := s.getEntity(ctx, clientIDs)
+	clientUUID, err := s.getClientUUID(ctx, clientIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -728,7 +742,7 @@ func (s *oauthStore) DeleteClientAuthorizations(ctx context.Context, clientIDs *
 	))
 	defer span.End()
 
-	_, clientUUID, err := s.getEntity(ctx, clientIDs)
+	clientUUID, err := s.getClientUUID(ctx, clientIDs)
 	if err != nil {
 		return err
 	}

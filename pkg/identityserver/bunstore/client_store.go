@@ -395,7 +395,7 @@ func (s *clientStore) GetClient(
 func (s *clientStore) updateClientModel( //nolint:gocyclo
 	ctx context.Context, model *Client, pb *ttnpb.Client, fieldMask store.FieldMask,
 ) (err error) {
-	columns := []string{"updated_at"}
+	columns := store.FieldMask{"updated_at"}
 
 	for _, field := range fieldMask {
 		switch field {
