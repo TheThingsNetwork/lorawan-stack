@@ -91,7 +91,7 @@ func LastUplink(ups ...*ttnpb.MACState_UplinkMessage) *ttnpb.MACState_UplinkMess
 	return ups[len(ups)-1]
 }
 
-func LastDownlink(downs ...*ttnpb.DownlinkMessage) *ttnpb.DownlinkMessage {
+func LastDownlink(downs ...*ttnpb.MACState_DownlinkMessage) *ttnpb.MACState_DownlinkMessage {
 	return downs[len(downs)-1]
 }
 

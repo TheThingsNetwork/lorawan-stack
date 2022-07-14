@@ -44,49 +44,91 @@ import (
 )
 
 func TestAppendRecentDownlink(t *testing.T) {
-	downs := [...]*ttnpb.DownlinkMessage{
+	downs := [...]*ttnpb.MACState_DownlinkMessage{
 		{
-			RawPayload: []byte("test1"),
+			Payload: &ttnpb.MACState_DownlinkMessage_Message{
+				MHdr: &ttnpb.MACState_DownlinkMessage_Message_MHDR{
+					MType: 0x01,
+				},
+			},
 		},
 		{
-			RawPayload: []byte("test2"),
+			Payload: &ttnpb.MACState_DownlinkMessage_Message{
+				MHdr: &ttnpb.MACState_DownlinkMessage_Message_MHDR{
+					MType: 0x02,
+				},
+			},
 		},
 		{
-			RawPayload: []byte("test3"),
+			Payload: &ttnpb.MACState_DownlinkMessage_Message{
+				MHdr: &ttnpb.MACState_DownlinkMessage_Message_MHDR{
+					MType: 0x03,
+				},
+			},
 		},
 	}
 	for _, tc := range []struct {
-		Recent   []*ttnpb.DownlinkMessage
+		Recent   []*ttnpb.MACState_DownlinkMessage
 		Down     *ttnpb.DownlinkMessage
 		Window   int
-		Expected []*ttnpb.DownlinkMessage
+		Expected []*ttnpb.MACState_DownlinkMessage
 	}{
 		{
-			Down:     downs[0],
+			Down: &ttnpb.DownlinkMessage{
+				Payload: &ttnpb.Message{
+					MHdr: &ttnpb.MHDR{
+						MType: 0x01,
+					},
+				},
+			},
 			Window:   1,
 			Expected: downs[:1],
 		},
 		{
-			Recent:   downs[:1],
-			Down:     downs[1],
+			Recent: downs[:1],
+			Down: &ttnpb.DownlinkMessage{
+				Payload: &ttnpb.Message{
+					MHdr: &ttnpb.MHDR{
+						MType: 0x02,
+					},
+				},
+			},
 			Window:   1,
 			Expected: downs[1:2],
 		},
 		{
-			Recent:   downs[:2],
-			Down:     downs[2],
+			Recent: downs[:2],
+			Down: &ttnpb.DownlinkMessage{
+				Payload: &ttnpb.Message{
+					MHdr: &ttnpb.MHDR{
+						MType: 0x03,
+					},
+				},
+			},
 			Window:   1,
 			Expected: downs[2:3],
 		},
 		{
-			Recent:   downs[:1],
-			Down:     downs[1],
+			Recent: downs[:1],
+			Down: &ttnpb.DownlinkMessage{
+				Payload: &ttnpb.Message{
+					MHdr: &ttnpb.MHDR{
+						MType: 0x02,
+					},
+				},
+			},
 			Window:   2,
 			Expected: downs[:2],
 		},
 		{
-			Recent:   downs[:2],
-			Down:     downs[2],
+			Recent: downs[:2],
+			Down: &ttnpb.DownlinkMessage{
+				Payload: &ttnpb.Message{
+					MHdr: &ttnpb.MHDR{
+						MType: 0x03,
+					},
+				},
+			},
 			Window:   2,
 			Expected: downs[1:3],
 		},
@@ -96,7 +138,7 @@ func TestAppendRecentDownlink(t *testing.T) {
 			Name:     fmt.Sprintf("recent_length:%d,window:%v", len(tc.Recent), tc.Window),
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				recent := CopyDownlinkMessages(tc.Recent...)
+				recent := deepcopy.Copy(tc.Recent).([]*ttnpb.MACState_DownlinkMessage)
 				down := CopyDownlinkMessage(tc.Down)
 				ret := appendRecentDownlink(recent, down, tc.Window)
 				a.So(recent, should.Resemble, tc.Recent)
@@ -284,12 +326,12 @@ func TestGenerateDataDownlink(t *testing.T) {
 							},
 						},
 					}},
-					RecentDownlinks: []*ttnpb.DownlinkMessage{
+					RecentDownlinks: ToMACStateDownlinkMessages(
 						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
 							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
-					},
+					),
 					RxWindowsAvailable: true,
 				},
 				Session: &ttnpb.Session{
@@ -353,12 +395,12 @@ func TestGenerateDataDownlink(t *testing.T) {
 								},
 							},
 						}},
-						RecentDownlinks: []*ttnpb.DownlinkMessage{
+						RecentDownlinks: ToMACStateDownlinkMessages(
 							MakeDataDownlink(&DataDownlinkConfig{
 								DecodePayload: true,
 								MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 							}),
-						},
+						),
 						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
@@ -902,12 +944,12 @@ func TestGenerateDataDownlink(t *testing.T) {
 							}},
 						},
 					}},
-					RecentDownlinks: []*ttnpb.DownlinkMessage{
+					RecentDownlinks: ToMACStateDownlinkMessages(
 						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
 							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
-					},
+					),
 				},
 				Session: &ttnpb.Session{
 					DevAddr:       devAddr.Bytes(),
@@ -984,12 +1026,12 @@ func TestGenerateDataDownlink(t *testing.T) {
 								}},
 							},
 						}},
-						RecentDownlinks: []*ttnpb.DownlinkMessage{
+						RecentDownlinks: ToMACStateDownlinkMessages(
 							MakeDataDownlink(&DataDownlinkConfig{
 								DecodePayload: true,
 								MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 							}),
-						},
+						),
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr.Bytes(),
@@ -1036,12 +1078,12 @@ func TestGenerateDataDownlink(t *testing.T) {
 							}},
 						},
 					}},
-					RecentDownlinks: []*ttnpb.DownlinkMessage{
+					RecentDownlinks: ToMACStateDownlinkMessages(
 						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
 							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
-					},
+					),
 				},
 				Session: &ttnpb.Session{
 					DevAddr:       devAddr.Bytes(),
@@ -1116,12 +1158,12 @@ func TestGenerateDataDownlink(t *testing.T) {
 								}},
 							},
 						}},
-						RecentDownlinks: []*ttnpb.DownlinkMessage{
+						RecentDownlinks: ToMACStateDownlinkMessages(
 							MakeDataDownlink(&DataDownlinkConfig{
 								DecodePayload: true,
 								MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 							}),
-						},
+						),
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr.Bytes(),

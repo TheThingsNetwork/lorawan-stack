@@ -62,6 +62,7 @@ const (
 )
 
 var (
+	ToMACStateDownlinkMessages          = toMACStateDownlinkMessages
 	AppendRecentDownlink                = appendRecentDownlink
 	ToMACStateRxMetadata                = toMACStateRxMetadata
 	ToMACStateUplinkMessages            = toMACStateUplinkMessages
@@ -2184,41 +2185,10 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 				MACStateOptions.WithPendingJoinRequest(x.PendingMacState.QueuedJoinAccept.Request),
 				MACStateOptions.WithQueuedJoinAccept(nil),
 				MACStateOptions.WithRxWindowsAvailable(false),
-				MACStateOptions.AppendRecentDownlinks(&ttnpb.DownlinkMessage{
-					RawPayload: x.PendingMacState.QueuedJoinAccept.Payload,
-					Payload: &ttnpb.Message{
-						MHdr: &ttnpb.MHDR{
+				MACStateOptions.AppendRecentDownlinks(&ttnpb.MACState_DownlinkMessage{
+					Payload: &ttnpb.MACState_DownlinkMessage_Message{
+						MHdr: &ttnpb.MACState_DownlinkMessage_Message_MHDR{
 							MType: ttnpb.MType_JOIN_ACCEPT,
-							Major: ttnpb.Major_LORAWAN_R1,
-						},
-						Payload: &ttnpb.Message_JoinAcceptPayload{
-							JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
-								NetId:      types.MustNetID(x.PendingMacState.QueuedJoinAccept.NetId).OrZero(),
-								DevAddr:    types.MustDevAddr(x.PendingMacState.QueuedJoinAccept.DevAddr).OrZero(),
-								DlSettings: x.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
-								RxDelay:    x.PendingMacState.QueuedJoinAccept.Request.RxDelay,
-								CfList:     x.PendingMacState.QueuedJoinAccept.Request.CfList,
-							},
-						},
-					},
-					EndDeviceIds: x.Ids,
-					Settings: &ttnpb.DownlinkMessage_Request{
-						Request: &ttnpb.TxRequest{
-							Class:           ttnpb.Class_CLASS_A,
-							Priority:        priority,
-							FrequencyPlanId: x.FrequencyPlanId,
-							Rx1Delay:        ttnpb.RxDelay(Band(x.FrequencyPlanId, x.LorawanPhyVersion).JoinAcceptDelay1 / time.Second),
-							Rx2DataRate: &ttnpb.DataRate{
-								Modulation: &ttnpb.DataRate_Lora{
-									Lora: &ttnpb.LoRaDataRate{
-										Bandwidth:       125000,
-										SpreadingFactor: 12 - uint32(x.PendingMacState.CurrentParameters.Rx2DataRateIndex),
-									},
-								},
-							},
-							Rx2Frequency: x.PendingMacState.CurrentParameters.Rx2Frequency,
-							// TODO: Generate RX1 transmission parameters if necessary.
-							// https://github.com/TheThingsNetwork/lorawan-stack/issues/3142
 						},
 					},
 					CorrelationIds: []string{"join-accept"},

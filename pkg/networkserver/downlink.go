@@ -1065,11 +1065,65 @@ func loggerWithDownlinkSchedulingErrorFields(logger log.Interface, errs downlink
 	return logger.WithFields(log.Fields(pairs...))
 }
 
-func appendRecentDownlink(recent []*ttnpb.DownlinkMessage, down *ttnpb.DownlinkMessage, window int) []*ttnpb.DownlinkMessage {
+func toMACStateMHDr(mhdr *ttnpb.MHDR) *ttnpb.MACState_DownlinkMessage_Message_MHDR {
+	if mhdr == nil {
+		return nil
+	}
+	return &ttnpb.MACState_DownlinkMessage_Message_MHDR{
+		MType: mhdr.MType,
+	}
+}
+
+func toMACStateFHDR(fhdr *ttnpb.FHDR) *ttnpb.MACState_DownlinkMessage_Message_MACPayload_FHDR {
+	if fhdr == nil {
+		return nil
+	}
+	return &ttnpb.MACState_DownlinkMessage_Message_MACPayload_FHDR{
+		FCnt: fhdr.FCnt,
+	}
+}
+
+func toMACStateMACPayload(macPayload *ttnpb.MACPayload) *ttnpb.MACState_DownlinkMessage_Message_MACPayload {
+	if macPayload == nil {
+		return nil
+	}
+	return &ttnpb.MACState_DownlinkMessage_Message_MACPayload{
+		FHdr:  toMACStateFHDR(macPayload.FHdr),
+		FPort: macPayload.FPort,
+	}
+}
+
+func toMACStateMessage(payload *ttnpb.Message) *ttnpb.MACState_DownlinkMessage_Message {
+	if payload == nil {
+		return nil
+	}
+	return &ttnpb.MACState_DownlinkMessage_Message{
+		MHdr:       toMACStateMHDr(payload.MHdr),
+		MacPayload: toMACStateMACPayload(payload.GetMacPayload()),
+	}
+}
+
+func toMACStateDownlinkMessages(downs ...*ttnpb.DownlinkMessage) []*ttnpb.MACState_DownlinkMessage {
+	if len(downs) == 0 {
+		return nil
+	}
+	recentDowns := make([]*ttnpb.MACState_DownlinkMessage, 0, len(downs))
+	for _, down := range downs {
+		recentDowns = append(recentDowns, &ttnpb.MACState_DownlinkMessage{
+			Payload:        toMACStateMessage(down.Payload),
+			CorrelationIds: down.CorrelationIds,
+		})
+	}
+	return recentDowns
+}
+
+func appendRecentDownlink(
+	recent []*ttnpb.MACState_DownlinkMessage, down *ttnpb.DownlinkMessage, window int,
+) []*ttnpb.MACState_DownlinkMessage {
 	if n := len(recent); n > 0 {
 		recent[n-1].CorrelationIds = nil
 	}
-	recent = append(recent, down)
+	recent = append(recent, toMACStateDownlinkMessages(down)...)
 	if extra := len(recent) - window; extra > 0 {
 		recent = recent[extra:]
 	}
@@ -1195,11 +1249,7 @@ func recordDataDownlink(dev *ttnpb.EndDevice, genState generateDownlinkState, ne
 		dev.MacState.PendingApplicationDownlink = genState.ApplicationDownlink
 		dev.Session.LastConfFCntDown = macPayload.FullFCnt
 	}
-	dev.MacState.RecentDownlinks = appendRecentDownlink(dev.MacState.RecentDownlinks, &ttnpb.DownlinkMessage{
-		Payload:        down.Message.Payload,
-		Settings:       down.Message.Settings,
-		CorrelationIds: down.Message.CorrelationIds,
-	}, recentDownlinkCount)
+	dev.MacState.RecentDownlinks = appendRecentDownlink(dev.MacState.RecentDownlinks, down.Message, recentDownlinkCount)
 	dev.MacState.RxWindowsAvailable = false
 }
 
