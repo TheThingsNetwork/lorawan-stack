@@ -392,21 +392,9 @@ func (s *clientStore) GetClient(
 	return pb, nil
 }
 
-func (s *clientStore) UpdateClient( //nolint:gocyclo
-	ctx context.Context, pb *ttnpb.Client, fieldMask store.FieldMask,
-) (*ttnpb.Client, error) {
-	ctx, span := tracer.Start(ctx, "UpdateClient", trace.WithAttributes(
-		attribute.String("client_id", pb.GetIds().GetClientId()),
-	))
-	defer span.End()
-
-	model, err := s.getClientModelBy(
-		ctx, s.selectWithID(ctx, pb.GetIds().GetClientId()), fieldMask,
-	)
-	if err != nil {
-		return nil, err
-	}
-
+func (s *clientStore) updateClientModel( //nolint:gocyclo
+	ctx context.Context, model *Client, pb *ttnpb.Client, fieldMask store.FieldMask,
+) (err error) {
 	columns := []string{"updated_at"}
 
 	for _, field := range fieldMask {
@@ -424,7 +412,7 @@ func (s *clientStore) UpdateClient( //nolint:gocyclo
 				ctx, model.Attributes, pb.Attributes, "client", model.ID,
 			)
 			if err != nil {
-				return nil, err
+				return err
 			}
 
 		case "contact_info":
@@ -432,14 +420,14 @@ func (s *clientStore) UpdateClient( //nolint:gocyclo
 				ctx, model.ContactInfo, pb.ContactInfo, "client", model.ID,
 			)
 			if err != nil {
-				return nil, err
+				return err
 			}
 
 		case "administrative_contact":
 			if contact := pb.AdministrativeContact; contact != nil {
 				account, err := s.getAccountModel(ctx, contact.EntityType(), contact.IDString())
 				if err != nil {
-					return nil, err
+					return err
 				}
 				model.AdministrativeContact = account
 				model.AdministrativeContactID = &account.ID
@@ -453,7 +441,7 @@ func (s *clientStore) UpdateClient( //nolint:gocyclo
 			if contact := pb.TechnicalContact; contact != nil {
 				account, err := s.getAccountModel(ctx, contact.EntityType(), contact.IDString())
 				if err != nil {
-					return nil, err
+					return err
 				}
 				model.TechnicalContact = account
 				model.TechnicalContactID = &account.ID
@@ -503,7 +491,29 @@ func (s *clientStore) UpdateClient( //nolint:gocyclo
 		Column(columns...).
 		Exec(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return wrapDriverError(err)
+	}
+
+	return nil
+}
+
+func (s *clientStore) UpdateClient(
+	ctx context.Context, pb *ttnpb.Client, fieldMask store.FieldMask,
+) (*ttnpb.Client, error) {
+	ctx, span := tracer.Start(ctx, "UpdateClient", trace.WithAttributes(
+		attribute.String("client_id", pb.GetIds().GetClientId()),
+	))
+	defer span.End()
+
+	model, err := s.getClientModelBy(
+		ctx, s.selectWithID(ctx, pb.GetIds().GetClientId()), fieldMask,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = s.updateClientModel(ctx, model, pb, fieldMask); err != nil {
+		return nil, err
 	}
 
 	// Convert the result to protobuf.

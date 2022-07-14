@@ -468,27 +468,10 @@ func (s *endDeviceStore) GetEndDevice(
 	return pb, nil
 }
 
-func (s *endDeviceStore) UpdateEndDevice( //nolint:gocyclo
-	ctx context.Context, pb *ttnpb.EndDevice, fieldMask store.FieldMask,
-) (*ttnpb.EndDevice, error) {
-	ctx, span := tracer.Start(ctx, "UpdateEndDevice", trace.WithAttributes(
-		attribute.String("application_id", pb.GetIds().GetApplicationIds().GetApplicationId()),
-		attribute.String("device_id", pb.GetIds().GetDeviceId()),
-	))
-	defer span.End()
-
-	model, err := s.getEndDeviceModelBy(
-		ctx, s.selectWithID(
-			ctx,
-			pb.GetIds().GetApplicationIds().GetApplicationId(),
-			pb.GetIds().GetDeviceId(),
-		), fieldMask,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	columns := []string{"updated_at"}
+func (s *endDeviceStore) updateEndDeviceModel( //nolint:gocyclo
+	ctx context.Context, model *EndDevice, pb *ttnpb.EndDevice, fieldMask store.FieldMask,
+) (err error) {
+	columns := store.FieldMask{"updated_at"}
 
 	for _, field := range fieldMask {
 		switch field {
@@ -513,7 +496,7 @@ func (s *endDeviceStore) UpdateEndDevice( //nolint:gocyclo
 				ctx, model.Attributes, pb.Attributes, "device", model.ID,
 			)
 			if err != nil {
-				return nil, err
+				return err
 			}
 
 		case "version_ids":
@@ -565,7 +548,7 @@ func (s *endDeviceStore) UpdateEndDevice( //nolint:gocyclo
 				ctx, model.Locations, pb.Locations, model.ID,
 			)
 			if err != nil {
-				return nil, err
+				return err
 			}
 
 		case "picture":
@@ -575,20 +558,20 @@ func (s *endDeviceStore) UpdateEndDevice( //nolint:gocyclo
 					WherePK().
 					Exec(ctx)
 				if err != nil {
-					return nil, wrapDriverError(err)
+					return wrapDriverError(err)
 				}
 			}
 			if pb.Picture != nil {
 				model.Picture, err = pictureFromPB(ctx, pb.Picture)
 				if err != nil {
-					return nil, err
+					return err
 				}
 
 				_, err = s.DB.NewInsert().
 					Model(model.Picture).
 					Exec(ctx)
 				if err != nil {
-					return nil, wrapDriverError(err)
+					return wrapDriverError(err)
 				}
 
 				model.PictureID = &model.Picture.ID
@@ -615,7 +598,34 @@ func (s *endDeviceStore) UpdateEndDevice( //nolint:gocyclo
 		Column(columns...).
 		Exec(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return wrapDriverError(err)
+	}
+
+	return nil
+}
+
+func (s *endDeviceStore) UpdateEndDevice(
+	ctx context.Context, pb *ttnpb.EndDevice, fieldMask store.FieldMask,
+) (*ttnpb.EndDevice, error) {
+	ctx, span := tracer.Start(ctx, "UpdateEndDevice", trace.WithAttributes(
+		attribute.String("application_id", pb.GetIds().GetApplicationIds().GetApplicationId()),
+		attribute.String("device_id", pb.GetIds().GetDeviceId()),
+	))
+	defer span.End()
+
+	model, err := s.getEndDeviceModelBy(
+		ctx, s.selectWithID(
+			ctx,
+			pb.GetIds().GetApplicationIds().GetApplicationId(),
+			pb.GetIds().GetDeviceId(),
+		), fieldMask,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = s.updateEndDeviceModel(ctx, model, pb, fieldMask); err != nil {
+		return nil, err
 	}
 
 	// Convert the result to protobuf.

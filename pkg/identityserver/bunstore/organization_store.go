@@ -366,22 +366,10 @@ func (s *organizationStore) GetOrganization(
 	return pb, nil
 }
 
-func (s *organizationStore) UpdateOrganization( //nolint:gocyclo
-	ctx context.Context, pb *ttnpb.Organization, fieldMask store.FieldMask,
-) (*ttnpb.Organization, error) {
-	ctx, span := tracer.Start(ctx, "UpdateOrganization", trace.WithAttributes(
-		attribute.String("organization_id", pb.GetIds().GetOrganizationId()),
-	))
-	defer span.End()
-
-	model, err := s.getOrganizationModelBy(
-		ctx, s.selectWithID(ctx, pb.GetIds().GetOrganizationId()), fieldMask,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	columns := []string{"updated_at"}
+func (s *organizationStore) updateOrganizationModel( //nolint:gocyclo
+	ctx context.Context, model *Organization, pb *ttnpb.Organization, fieldMask store.FieldMask,
+) (err error) {
+	columns := store.FieldMask{"updated_at"}
 
 	for _, field := range fieldMask {
 		switch field {
@@ -398,7 +386,7 @@ func (s *organizationStore) UpdateOrganization( //nolint:gocyclo
 				ctx, model.Attributes, pb.Attributes, "organization", model.ID,
 			)
 			if err != nil {
-				return nil, err
+				return err
 			}
 
 		case "contact_info":
@@ -406,14 +394,14 @@ func (s *organizationStore) UpdateOrganization( //nolint:gocyclo
 				ctx, model.ContactInfo, pb.ContactInfo, "organization", model.ID,
 			)
 			if err != nil {
-				return nil, err
+				return err
 			}
 
 		case "administrative_contact":
 			if contact := pb.AdministrativeContact; contact != nil {
 				account, err := s.getAccountModel(ctx, contact.EntityType(), contact.IDString())
 				if err != nil {
-					return nil, err
+					return err
 				}
 				model.AdministrativeContact = account
 				model.AdministrativeContactID = &account.ID
@@ -427,7 +415,7 @@ func (s *organizationStore) UpdateOrganization( //nolint:gocyclo
 			if contact := pb.TechnicalContact; contact != nil {
 				account, err := s.getAccountModel(ctx, contact.EntityType(), contact.IDString())
 				if err != nil {
-					return nil, err
+					return err
 				}
 				model.TechnicalContact = account
 				model.TechnicalContactID = &account.ID
@@ -445,7 +433,29 @@ func (s *organizationStore) UpdateOrganization( //nolint:gocyclo
 		Column(columns...).
 		Exec(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return wrapDriverError(err)
+	}
+
+	return nil
+}
+
+func (s *organizationStore) UpdateOrganization(
+	ctx context.Context, pb *ttnpb.Organization, fieldMask store.FieldMask,
+) (*ttnpb.Organization, error) {
+	ctx, span := tracer.Start(ctx, "UpdateOrganization", trace.WithAttributes(
+		attribute.String("organization_id", pb.GetIds().GetOrganizationId()),
+	))
+	defer span.End()
+
+	model, err := s.getOrganizationModelBy(
+		ctx, s.selectWithID(ctx, pb.GetIds().GetOrganizationId()), fieldMask,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = s.updateOrganizationModel(ctx, model, pb, fieldMask); err != nil {
+		return nil, err
 	}
 
 	// Convert the result to protobuf.

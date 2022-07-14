@@ -364,22 +364,10 @@ func (s *applicationStore) GetApplication(
 	return pb, nil
 }
 
-func (s *applicationStore) UpdateApplication( //nolint:gocyclo
-	ctx context.Context, pb *ttnpb.Application, fieldMask store.FieldMask,
-) (*ttnpb.Application, error) {
-	ctx, span := tracer.Start(ctx, "UpdateApplication", trace.WithAttributes(
-		attribute.String("application_id", pb.GetIds().GetApplicationId()),
-	))
-	defer span.End()
-
-	model, err := s.getApplicationModelBy(
-		ctx, s.selectWithID(ctx, pb.GetIds().GetApplicationId()), fieldMask,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	columns := []string{"updated_at"}
+func (s *applicationStore) updateApplicationModel( //nolint:gocyclo
+	ctx context.Context, model *Application, pb *ttnpb.Application, fieldMask store.FieldMask,
+) (err error) {
+	columns := store.FieldMask{"updated_at"}
 
 	for _, field := range fieldMask {
 		switch field {
@@ -396,7 +384,7 @@ func (s *applicationStore) UpdateApplication( //nolint:gocyclo
 				ctx, model.Attributes, pb.Attributes, "application", model.ID,
 			)
 			if err != nil {
-				return nil, err
+				return err
 			}
 
 		case "contact_info":
@@ -404,14 +392,14 @@ func (s *applicationStore) UpdateApplication( //nolint:gocyclo
 				ctx, model.ContactInfo, pb.ContactInfo, "application", model.ID,
 			)
 			if err != nil {
-				return nil, err
+				return err
 			}
 
 		case "administrative_contact":
 			if contact := pb.AdministrativeContact; contact != nil {
 				account, err := s.getAccountModel(ctx, contact.EntityType(), contact.IDString())
 				if err != nil {
-					return nil, err
+					return err
 				}
 				model.AdministrativeContact = account
 				model.AdministrativeContactID = &account.ID
@@ -425,7 +413,7 @@ func (s *applicationStore) UpdateApplication( //nolint:gocyclo
 			if contact := pb.TechnicalContact; contact != nil {
 				account, err := s.getAccountModel(ctx, contact.EntityType(), contact.IDString())
 				if err != nil {
-					return nil, err
+					return err
 				}
 				model.TechnicalContact = account
 				model.TechnicalContactID = &account.ID
@@ -458,7 +446,29 @@ func (s *applicationStore) UpdateApplication( //nolint:gocyclo
 		Column(columns...).
 		Exec(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return wrapDriverError(err)
+	}
+
+	return nil
+}
+
+func (s *applicationStore) UpdateApplication(
+	ctx context.Context, pb *ttnpb.Application, fieldMask store.FieldMask,
+) (*ttnpb.Application, error) {
+	ctx, span := tracer.Start(ctx, "UpdateApplication", trace.WithAttributes(
+		attribute.String("application_id", pb.GetIds().GetApplicationId()),
+	))
+	defer span.End()
+
+	model, err := s.getApplicationModelBy(
+		ctx, s.selectWithID(ctx, pb.GetIds().GetApplicationId()), fieldMask,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = s.updateApplicationModel(ctx, model, pb, fieldMask); err != nil {
+		return nil, err
 	}
 
 	// Convert the result to protobuf.

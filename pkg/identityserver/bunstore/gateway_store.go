@@ -545,22 +545,10 @@ func (s *gatewayStore) GetGateway(
 	return pb, nil
 }
 
-func (s *gatewayStore) UpdateGateway( //nolint:gocyclo
-	ctx context.Context, pb *ttnpb.Gateway, fieldMask store.FieldMask,
-) (*ttnpb.Gateway, error) {
-	ctx, span := tracer.Start(ctx, "UpdateGateway", trace.WithAttributes(
-		attribute.String("gateway_id", pb.GetIds().GetGatewayId()),
-	))
-	defer span.End()
-
-	model, err := s.getGatewayModelBy(
-		ctx, s.selectWithID(ctx, pb.GetIds().GetGatewayId()), fieldMask,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	columns := []string{"updated_at"}
+func (s *gatewayStore) updateGatewayModel( //nolint:gocyclo
+	ctx context.Context, model *Gateway, pb *ttnpb.Gateway, fieldMask store.FieldMask,
+) (err error) {
+	columns := store.FieldMask{"updated_at"}
 
 	for _, field := range fieldMask {
 		switch field {
@@ -581,7 +569,7 @@ func (s *gatewayStore) UpdateGateway( //nolint:gocyclo
 				ctx, model.Attributes, pb.Attributes, "gateway", model.ID,
 			)
 			if err != nil {
-				return nil, err
+				return err
 			}
 
 		case "contact_info":
@@ -589,14 +577,14 @@ func (s *gatewayStore) UpdateGateway( //nolint:gocyclo
 				ctx, model.ContactInfo, pb.ContactInfo, "gateway", model.ID,
 			)
 			if err != nil {
-				return nil, err
+				return err
 			}
 
 		case "administrative_contact":
 			if contact := pb.AdministrativeContact; contact != nil {
 				account, err := s.getAccountModel(ctx, contact.EntityType(), contact.IDString())
 				if err != nil {
-					return nil, err
+					return err
 				}
 				model.AdministrativeContact = account
 				model.AdministrativeContactID = &account.ID
@@ -610,7 +598,7 @@ func (s *gatewayStore) UpdateGateway( //nolint:gocyclo
 			if contact := pb.TechnicalContact; contact != nil {
 				account, err := s.getAccountModel(ctx, contact.EntityType(), contact.IDString())
 				if err != nil {
-					return nil, err
+					return err
 				}
 				model.TechnicalContact = account
 				model.TechnicalContactID = &account.ID
@@ -692,7 +680,7 @@ func (s *gatewayStore) UpdateGateway( //nolint:gocyclo
 				ctx, model.Antennas, pb.Antennas, model.ID,
 			)
 			if err != nil {
-				return nil, err
+				return err
 			}
 
 		case "lbs_lns_secret":
@@ -739,7 +727,29 @@ func (s *gatewayStore) UpdateGateway( //nolint:gocyclo
 		Column(columns...).
 		Exec(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return wrapDriverError(err)
+	}
+
+	return nil
+}
+
+func (s *gatewayStore) UpdateGateway(
+	ctx context.Context, pb *ttnpb.Gateway, fieldMask store.FieldMask,
+) (*ttnpb.Gateway, error) {
+	ctx, span := tracer.Start(ctx, "UpdateGateway", trace.WithAttributes(
+		attribute.String("gateway_id", pb.GetIds().GetGatewayId()),
+	))
+	defer span.End()
+
+	model, err := s.getGatewayModelBy(
+		ctx, s.selectWithID(ctx, pb.GetIds().GetGatewayId()), fieldMask,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = s.updateGatewayModel(ctx, model, pb, fieldMask); err != nil {
+		return nil, err
 	}
 
 	// Convert the result to protobuf.

@@ -455,20 +455,10 @@ func (s *userStore) GetUserByPrimaryEmailAddress(
 	return pb, nil
 }
 
-func (s *userStore) UpdateUser( //nolint:gocyclo
-	ctx context.Context, pb *ttnpb.User, fieldMask store.FieldMask,
-) (*ttnpb.User, error) {
-	ctx, span := tracer.Start(ctx, "UpdateUser", trace.WithAttributes(
-		attribute.String("user_id", pb.GetIds().GetUserId()),
-	))
-	defer span.End()
-
-	model, err := s.getUserModelBy(ctx, s.selectWithID(ctx, pb.GetIds().GetUserId()), fieldMask)
-	if err != nil {
-		return nil, err
-	}
-
-	columns := []string{"updated_at"}
+func (s *userStore) updateUserModel( //nolint:gocyclo
+	ctx context.Context, model *User, pb *ttnpb.User, fieldMask store.FieldMask,
+) (err error) {
+	columns := store.FieldMask{"updated_at"}
 
 	for _, field := range fieldMask {
 		switch field {
@@ -485,7 +475,7 @@ func (s *userStore) UpdateUser( //nolint:gocyclo
 				ctx, model.Attributes, pb.Attributes, "user", model.ID,
 			)
 			if err != nil {
-				return nil, err
+				return err
 			}
 
 		case "contact_info":
@@ -493,7 +483,7 @@ func (s *userStore) UpdateUser( //nolint:gocyclo
 				ctx, model.ContactInfo, pb.ContactInfo, "user", model.ID,
 			)
 			if err != nil {
-				return nil, err
+				return err
 			}
 
 		case "primary_email_address":
@@ -547,20 +537,20 @@ func (s *userStore) UpdateUser( //nolint:gocyclo
 					WherePK().
 					Exec(ctx)
 				if err != nil {
-					return nil, wrapDriverError(err)
+					return wrapDriverError(err)
 				}
 			}
 			if pb.ProfilePicture != nil {
 				model.ProfilePicture, err = pictureFromPB(ctx, pb.ProfilePicture)
 				if err != nil {
-					return nil, err
+					return err
 				}
 
 				_, err = s.DB.NewInsert().
 					Model(model.ProfilePicture).
 					Exec(ctx)
 				if err != nil {
-					return nil, wrapDriverError(err)
+					return wrapDriverError(err)
 				}
 
 				model.ProfilePictureID = &model.ProfilePicture.ID
@@ -579,7 +569,27 @@ func (s *userStore) UpdateUser( //nolint:gocyclo
 		Column(columns...).
 		Exec(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return wrapDriverError(err)
+	}
+
+	return nil
+}
+
+func (s *userStore) UpdateUser(
+	ctx context.Context, pb *ttnpb.User, fieldMask store.FieldMask,
+) (*ttnpb.User, error) {
+	ctx, span := tracer.Start(ctx, "UpdateUser", trace.WithAttributes(
+		attribute.String("user_id", pb.GetIds().GetUserId()),
+	))
+	defer span.End()
+
+	model, err := s.getUserModelBy(ctx, s.selectWithID(ctx, pb.GetIds().GetUserId()), fieldMask)
+	if err != nil {
+		return nil, err
+	}
+
+	if s.updateUserModel(ctx, model, pb, fieldMask) != nil {
+		return nil, err
 	}
 
 	// Convert the result to protobuf.

@@ -301,7 +301,7 @@ func (s *apiKeyStore) UpdateAPIKey(
 		return nil, nil
 	}
 
-	columns := []string{"updated_at"}
+	columns := store.FieldMask{"updated_at"}
 
 	for _, field := range fieldMask {
 		switch field {
