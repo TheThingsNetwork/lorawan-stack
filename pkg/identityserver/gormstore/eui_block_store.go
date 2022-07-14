@@ -40,11 +40,11 @@ func getMaxCounter(addressBlock types.EUI64Prefix) int64 {
 }
 
 var (
-	errMaxGlobalEUILimitReached = errors.DefineInvalidArgument(
+	errMaxGlobalEUILimitReached = errors.DefineFailedPrecondition(
 		"global_eui_limit_reached",
 		"global eui limit from address block reached",
 	)
-	errAppDevEUILimitReached = errors.DefineInvalidArgument(
+	errAppDevEUILimitReached = errors.DefineFailedPrecondition(
 		"application_dev_eui_limit_reached",
 		"application issued DevEUI limit ({dev_eui_limit}) reached",
 	)

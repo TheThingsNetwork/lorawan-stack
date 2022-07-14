@@ -44,7 +44,7 @@ type testStore struct {
 	*invitationStore
 	*loginTokenStore
 	*oauthStore
-	// euiStore
+	*euiStore
 	*entitySearch
 	*notificationStore
 }
@@ -94,7 +94,7 @@ func newTestStore(t *testing.T, dsn *url.URL) storetest.Store {
 		invitationStore:   newInvitationStore(baseStore),
 		loginTokenStore:   newLoginTokenStore(baseStore),
 		oauthStore:        newOAuthStore(baseStore),
-		// euiStore:          euiStore{baseStore: baseStore},
+		euiStore:          newEUIStore(baseStore),
 		entitySearch:      newEntitySearch(baseStore),
 		notificationStore: newNotificationStore(baseStore),
 	}
