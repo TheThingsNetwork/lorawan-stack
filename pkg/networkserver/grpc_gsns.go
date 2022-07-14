@@ -701,11 +701,61 @@ macLoop:
 	}, true, nil
 }
 
-func appendRecentUplink(recent []*ttnpb.UplinkMessage, up *ttnpb.UplinkMessage, window int) []*ttnpb.UplinkMessage {
+func toMACStateRxMetadata(mds ...*ttnpb.RxMetadata) []*ttnpb.MACState_UplinkMessage_RxMetadata {
+	if len(mds) == 0 {
+		return nil
+	}
+	recentMDs := make([]*ttnpb.MACState_UplinkMessage_RxMetadata, 0, len(mds))
+	for _, md := range mds {
+		var pbMD *ttnpb.MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata
+		if md.PacketBroker != nil {
+			pbMD = &ttnpb.MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata{}
+		}
+		recentMDs = append(recentMDs, &ttnpb.MACState_UplinkMessage_RxMetadata{
+			GatewayIds:             md.GatewayIds,
+			PacketBroker:           pbMD,
+			ChannelRssi:            md.ChannelRssi,
+			Snr:                    md.Snr,
+			DownlinkPathConstraint: md.DownlinkPathConstraint,
+			UplinkToken:            md.UplinkToken,
+		})
+	}
+	return recentMDs
+}
+
+func toMACStateUplinkMessages(ups ...*ttnpb.UplinkMessage) []*ttnpb.MACState_UplinkMessage {
+	if len(ups) == 0 {
+		return nil
+	}
+	recentUps := make([]*ttnpb.MACState_UplinkMessage, 0, len(ups))
+	for _, up := range ups {
+		var settings *ttnpb.MACState_UplinkMessage_TxSettings
+		if up.Settings != nil {
+			settings = &ttnpb.MACState_UplinkMessage_TxSettings{
+				DataRate: up.Settings.DataRate,
+			}
+		}
+		recentUps = append(recentUps, &ttnpb.MACState_UplinkMessage{
+			Payload:            up.Payload,
+			Settings:           settings,
+			RxMetadata:         toMACStateRxMetadata(up.RxMetadata...),
+			ReceivedAt:         up.ReceivedAt,
+			CorrelationIds:     up.CorrelationIds,
+			DeviceChannelIndex: up.DeviceChannelIndex,
+		})
+	}
+	return recentUps
+}
+
+func appendRecentUplink(
+	recent []*ttnpb.MACState_UplinkMessage,
+	up *ttnpb.UplinkMessage,
+	window int,
+) []*ttnpb.MACState_UplinkMessage {
 	if n := len(recent); n > 0 {
 		recent[n-1].CorrelationIds = nil
 	}
-	recent = append(recent, up)
+	recent = append(recent, toMACStateUplinkMessages(up)...)
 	if extra := len(recent) - window; extra > 0 {
 		recent = recent[extra:]
 	}
@@ -938,15 +988,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			paths := ttnpb.AddFields(matched.SetPaths,
 				"mac_state.recent_uplinks",
 			)
-			stored.MacState.RecentUplinks = appendRecentUplink(stored.MacState.RecentUplinks, &ttnpb.UplinkMessage{
-				Payload:            up.Payload,
-				Settings:           up.Settings,
-				RxMetadata:         up.RxMetadata,
-				ReceivedAt:         up.ReceivedAt,
-				CorrelationIds:     up.CorrelationIds,
-				DeviceChannelIndex: up.DeviceChannelIndex,
-				ConsumedAirtime:    up.ConsumedAirtime,
-			}, recentUplinkCount)
+			stored.MacState.RecentUplinks = appendRecentUplink(stored.MacState.RecentUplinks, up, recentUplinkCount)
 
 			if matched.DataRateIndex < stored.MacState.CurrentParameters.AdrDataRateIndex {
 				// Device lowers TX power index before lowering data rate index according to the spec.
@@ -1232,15 +1274,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	}
 	ns.mergeMetadata(ctx, up, initialDeduplicationRound)
 	ns.filterMetadata(ctx, up)
-	macState.RecentUplinks = []*ttnpb.UplinkMessage{{
-		Payload:            up.Payload,
-		Settings:           up.Settings,
-		RxMetadata:         up.RxMetadata,
-		ReceivedAt:         up.ReceivedAt,
-		CorrelationIds:     up.CorrelationIds,
-		DeviceChannelIndex: up.DeviceChannelIndex,
-		ConsumedAirtime:    up.ConsumedAirtime,
-	}}
+	macState.RecentUplinks = appendRecentUplink(nil, up, recentUplinkCount)
 
 	logger := log.FromContext(ctx)
 	stored, storedCtx, err := ns.devices.SetByID(ctx, matched.Ids.ApplicationIds, matched.Ids.DeviceId,

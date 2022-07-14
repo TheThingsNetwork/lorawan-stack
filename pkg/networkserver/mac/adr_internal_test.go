@@ -29,13 +29,19 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-func NewADRUplink(fCnt uint32, maxSNR float32, gtwCount uint, confirmed bool, tx *ttnpb.TxSettings) *ttnpb.UplinkMessage {
+func NewADRUplink(
+	fCnt uint32,
+	maxSNR float32,
+	gtwCount uint,
+	confirmed bool,
+	tx *ttnpb.MACState_UplinkMessage_TxSettings,
+) *ttnpb.MACState_UplinkMessage {
 	if gtwCount == 0 {
 		gtwCount = 1 + uint(rand.Int()%100)
 	}
-	mds := make([]*ttnpb.RxMetadata, 0, gtwCount)
+	mds := make([]*ttnpb.MACState_UplinkMessage_RxMetadata, 0, gtwCount)
 	for i := uint(0); i < gtwCount; i++ {
-		mds = append(mds, &ttnpb.RxMetadata{
+		mds = append(mds, &ttnpb.MACState_UplinkMessage_RxMetadata{
 			Snr: float32(-rand.Int31n(math.MaxInt32+int32(maxSNR)-1)) - rand.Float32() + maxSNR,
 		})
 	}
@@ -46,7 +52,7 @@ func NewADRUplink(fCnt uint32, maxSNR float32, gtwCount uint, confirmed bool, tx
 		mType = ttnpb.MType_CONFIRMED_UP
 	}
 
-	return &ttnpb.UplinkMessage{
+	return &ttnpb.MACState_UplinkMessage{
 		Payload: &ttnpb.Message{
 			MHdr: &ttnpb.MHDR{
 				MType: mType,
@@ -76,14 +82,14 @@ type ADRMatrixRow struct {
 	TxSettings   *ttnpb.TxSettings
 }
 
-func ADRMatrixToUplinks(m []ADRMatrixRow) []*ttnpb.UplinkMessage {
-	ups := make([]*ttnpb.UplinkMessage, 0, len(m))
+func ADRMatrixToUplinks(m []ADRMatrixRow) []*ttnpb.MACState_UplinkMessage {
+	ups := make([]*ttnpb.MACState_UplinkMessage, 0, len(m))
 	for _, r := range m {
-		txSettings := r.TxSettings
-		if txSettings == nil {
-			txSettings = &ttnpb.TxSettings{}
-		}
-		ups = append(ups, NewADRUplink(r.FCnt, r.MaxSNR, r.GtwDiversity, r.Confirmed, txSettings))
+		ups = append(ups,
+			NewADRUplink(r.FCnt, r.MaxSNR, r.GtwDiversity, r.Confirmed, &ttnpb.MACState_UplinkMessage_TxSettings{
+				DataRate: r.TxSettings.GetDataRate(),
+			}),
+		)
 	}
 	return ups
 }
@@ -91,7 +97,7 @@ func ADRMatrixToUplinks(m []ADRMatrixRow) []*ttnpb.UplinkMessage {
 func TestADRLossRate(t *testing.T) {
 	for _, tc := range []struct {
 		Name    string
-		Uplinks []*ttnpb.UplinkMessage
+		Uplinks []*ttnpb.MACState_UplinkMessage
 		Rate    float32
 	}{
 		{

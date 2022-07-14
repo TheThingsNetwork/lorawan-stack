@@ -49,7 +49,7 @@ type downlinkSlot interface {
 }
 
 type classADownlinkSlot struct {
-	Uplink  *ttnpb.UplinkMessage
+	Uplink  *ttnpb.MACState_UplinkMessage
 	RxDelay time.Duration
 }
 

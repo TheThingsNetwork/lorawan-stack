@@ -307,7 +307,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	}
 
 	var needsDownlink bool
-	var up *ttnpb.UplinkMessage
+	var up *ttnpb.MACState_UplinkMessage
 	if dev.MacState.RxWindowsAvailable && len(dev.MacState.RecentUplinks) > 0 {
 		up = LastUplink(dev.MacState.RecentUplinks...)
 		switch up.Payload.MHdr.MType {
@@ -650,14 +650,16 @@ func computeWantedRSSI(snr float32, channelRSSI float32) float32 {
 	return wantedRSSI
 }
 
-func wantedRSSIMetadataComparator(mds []*ttnpb.RxMetadata) func(int, int) bool {
+func wantedRSSIMetadataComparator(mds []*ttnpb.MACState_UplinkMessage_RxMetadata) func(int, int) bool {
 	wantedRSSI := func(k int) float32 { return computeWantedRSSI(mds[k].Snr, mds[k].ChannelRssi) }
 	return func(i, j int) bool {
 		return wantedRSSI(i) >= wantedRSSI(j)
 	}
 }
 
-func buildMetadataComparator(ctx context.Context, mds []*ttnpb.RxMetadata) func(int, int) bool {
+func buildMetadataComparator(
+	ctx context.Context, mds []*ttnpb.MACState_UplinkMessage_RxMetadata,
+) func(int, int) bool {
 	comparator := wantedRSSIMetadataComparator(mds)
 	invalidMD := func(k int) bool { return mds[k].Snr == 0.0 || mds[k].ChannelRssi == 0.0 }
 	return func(i, j int) bool {
@@ -669,7 +671,9 @@ func buildMetadataComparator(ctx context.Context, mds []*ttnpb.RxMetadata) func(
 	}
 }
 
-func downlinkPathsFromMetadata(ctx context.Context, mds ...*ttnpb.RxMetadata) []downlinkPath {
+func downlinkPathsFromMetadata(
+	ctx context.Context, mds ...*ttnpb.MACState_UplinkMessage_RxMetadata,
+) []downlinkPath {
 	mds = append(mds[:0:0], mds...)
 	sort.SliceStable(mds, buildMetadataComparator(ctx, mds))
 	head := make([]downlinkPath, 0, len(mds))
@@ -703,7 +707,9 @@ func downlinkPathsFromMetadata(ctx context.Context, mds ...*ttnpb.RxMetadata) []
 	return res
 }
 
-func downlinkPathsFromRecentUplinks(ctx context.Context, ups ...*ttnpb.UplinkMessage) []downlinkPath {
+func downlinkPathsFromRecentUplinks(
+	ctx context.Context, ups ...*ttnpb.MACState_UplinkMessage,
+) []downlinkPath {
 	for i := len(ups) - 1; i >= 0; i-- {
 		if paths := downlinkPathsFromMetadata(ctx, ups[i].RxMetadata...); len(paths) > 0 {
 			return paths
@@ -1077,7 +1083,10 @@ type rx1ParametersType struct {
 }
 
 func rx1Parameters(
-	phy *band.Band, fp *frequencyplans.FrequencyPlan, macState *ttnpb.MACState, up *ttnpb.UplinkMessage,
+	phy *band.Band,
+	fp *frequencyplans.FrequencyPlan,
+	macState *ttnpb.MACState,
+	up *ttnpb.MACState_UplinkMessage,
 ) (*rx1ParametersType, error) {
 	if up.DeviceChannelIndex > math.MaxUint8 {
 		return nil, errInvalidChannelIndex.New()
@@ -1132,7 +1141,12 @@ func rx1Parameters(
 }
 
 // maximumUplinkLength returns the maximum length of the next uplink after ups.
-func maximumUplinkLength(macState *ttnpb.MACState, fp *frequencyplans.FrequencyPlan, phy *band.Band, ups ...*ttnpb.UplinkMessage) (uint16, error) {
+func maximumUplinkLength(
+	macState *ttnpb.MACState,
+	fp *frequencyplans.FrequencyPlan,
+	phy *band.Band,
+	ups ...*ttnpb.MACState_UplinkMessage,
+) (uint16, error) {
 	// NOTE: If no data uplink is found, we assume ADR is off on the device and, hence, data rate index 0 is used in computation.
 	maxUpDRIdx := ttnpb.DataRateIndex_DATA_RATE_0
 loop:

@@ -96,7 +96,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 		var downlinkPaths []DownlinkPath
 		if !fixedPaths {
-			downlinkPaths = DownlinkPathsFromMetadata(ctx, DefaultRxMetadata[:]...)
+			downlinkPaths = DownlinkPathsFromMetadata(ctx, ToMACStateRxMetadata(DefaultRxMetadata[:]...)...)
 		} else {
 			for i, ids := range DefaultClassBCGatewayIdentifiers {
 				ids := ids
@@ -376,7 +376,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DesiredParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
 					DeviceClass:       ttnpb.Class_CLASS_A,
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
-					RecentUplinks: []*ttnpb.UplinkMessage{
+					RecentUplinks: ToMACStateUplinkMessages(
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
@@ -390,7 +390,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							RxMetadata:    DefaultRxMetadata[:],
 							ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
 						}),
-					},
+					),
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
@@ -452,7 +452,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DesiredParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
 					DeviceClass:       ttnpb.Class_CLASS_A,
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
-					RecentUplinks: []*ttnpb.UplinkMessage{
+					RecentUplinks: ToMACStateUplinkMessages(
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
@@ -466,7 +466,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							RxMetadata:    DefaultRxMetadata[:],
 							ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
 						}),
-					},
+					),
 				},
 			},
 		},
@@ -487,7 +487,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceClass:        ttnpb.Class_CLASS_A,
 					LorawanVersion:     ttnpb.MACVersion_MAC_V1_1,
 					RxWindowsAvailable: true,
-					RecentUplinks: []*ttnpb.UplinkMessage{
+					RecentUplinks: ToMACStateUplinkMessages(
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
@@ -501,7 +501,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							RxMetadata:    DefaultRxMetadata[:],
 							ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() - time.Second - time.Nanosecond),
 						}),
-					},
+					),
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
@@ -536,7 +536,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DesiredParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
 					DeviceClass:       ttnpb.Class_CLASS_A,
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
-					RecentUplinks: []*ttnpb.UplinkMessage{
+					RecentUplinks: ToMACStateUplinkMessages(
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
@@ -549,7 +549,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							RxMetadata:    DefaultRxMetadata[:],
 							ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
 						}),
-					},
+					),
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
@@ -585,7 +585,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DesiredParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					DeviceClass:       ttnpb.Class_CLASS_A,
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_3,
-					RecentUplinks: []*ttnpb.UplinkMessage{
+					RecentUplinks: ToMACStateUplinkMessages(
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
@@ -598,7 +598,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							RxMetadata:    DefaultRxMetadata[:],
 							ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
 						}),
-					},
+					),
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
@@ -670,7 +670,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DesiredParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					DeviceClass:       ttnpb.Class_CLASS_A,
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_3,
-					RecentUplinks: []*ttnpb.UplinkMessage{
+					RecentUplinks: ToMACStateUplinkMessages(
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
@@ -683,7 +683,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							RxMetadata:    DefaultRxMetadata[:],
 							ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
 						}),
-					},
+					),
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
@@ -755,7 +755,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							GatewayCount: 5,
 						}).MACCommand(),
 					},
-					RecentUplinks: []*ttnpb.UplinkMessage{
+					RecentUplinks: ToMACStateUplinkMessages(
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
@@ -768,7 +768,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							RxMetadata:    DefaultRxMetadata[:],
 							ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
 						}),
-					},
+					),
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
@@ -906,7 +906,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							GatewayCount: 5,
 						}).MACCommand(),
 					},
-					RecentUplinks: []*ttnpb.UplinkMessage{
+					RecentUplinks: ToMACStateUplinkMessages(
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
@@ -919,7 +919,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							RxMetadata:    DefaultRxMetadata[:],
 							ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
 						}),
-					},
+					),
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
@@ -1067,7 +1067,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							GatewayCount: 5,
 						}).MACCommand(),
 					},
-					RecentUplinks: []*ttnpb.UplinkMessage{
+					RecentUplinks: ToMACStateUplinkMessages(
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
@@ -1080,7 +1080,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							RxMetadata:    DefaultRxMetadata[:],
 							ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
 						}),
-					},
+					),
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
@@ -1222,7 +1222,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							GatewayCount: 5,
 						}).MACCommand(),
 					},
-					RecentUplinks: []*ttnpb.UplinkMessage{
+					RecentUplinks: ToMACStateUplinkMessages(
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
@@ -1235,7 +1235,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							RxMetadata:    DefaultRxMetadata[:],
 							ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
 						}),
-					},
+					),
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
@@ -1375,7 +1375,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceClass:         ttnpb.Class_CLASS_B,
 					LorawanVersion:      ttnpb.MACVersion_MAC_V1_1,
 					PingSlotPeriodicity: pingSlotPeriodicity,
-					RecentUplinks: []*ttnpb.UplinkMessage{
+					RecentUplinks: ToMACStateUplinkMessages(
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
@@ -1390,7 +1390,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								ClassB: true,
 							},
 						}),
-					},
+					),
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
@@ -1529,7 +1529,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							GatewayCount: 5,
 						}).MACCommand(),
 					},
-					RecentUplinks: []*ttnpb.UplinkMessage{
+					RecentUplinks: ToMACStateUplinkMessages(
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
@@ -1541,7 +1541,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							RxMetadata:    DefaultRxMetadata[:],
 							ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() / 10),
 						}),
-					},
+					),
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
@@ -1692,7 +1692,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							GatewayCount: 5,
 						}).MACCommand(),
 					},
-					RecentUplinks: []*ttnpb.UplinkMessage{
+					RecentUplinks: ToMACStateUplinkMessages(
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
@@ -1704,7 +1704,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							RxMetadata:    DefaultRxMetadata[:],
 							ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() - time.Second - time.Nanosecond),
 						}),
-					},
+					),
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
@@ -1821,7 +1821,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DesiredParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
 					DeviceClass:       ttnpb.Class_CLASS_C,
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
-					RecentUplinks: []*ttnpb.UplinkMessage{
+					RecentUplinks: ToMACStateUplinkMessages(
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
@@ -1833,7 +1833,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							RxMetadata:    DefaultRxMetadata[:],
 							ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() - time.Second),
 						}),
-					},
+					),
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
@@ -1959,7 +1959,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DesiredParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
 					DeviceClass:       ttnpb.Class_CLASS_C,
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
-					RecentUplinks: []*ttnpb.UplinkMessage{
+					RecentUplinks: ToMACStateUplinkMessages(
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
@@ -1971,7 +1971,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							RxMetadata:    DefaultRxMetadata[:],
 							ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration()),
 						}),
-					},
+					),
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
@@ -2119,7 +2119,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DesiredParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
 					DeviceClass:       ttnpb.Class_CLASS_C,
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
-					RecentUplinks: []*ttnpb.UplinkMessage{
+					RecentUplinks: ToMACStateUplinkMessages(
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
@@ -2131,7 +2131,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							RxMetadata:    DefaultRxMetadata[:],
 							ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() - time.Second),
 						}),
-					},
+					),
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
@@ -2261,7 +2261,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DesiredParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
 					DeviceClass:       ttnpb.Class_CLASS_C,
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
-					RecentUplinks: []*ttnpb.UplinkMessage{
+					RecentUplinks: ToMACStateUplinkMessages(
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
@@ -2273,7 +2273,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							RxMetadata:    DefaultRxMetadata[:],
 							ReceivedAt:    now.Add(-time.Second),
 						}),
-					},
+					),
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
@@ -2323,7 +2323,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DesiredParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
 					DeviceClass:       ttnpb.Class_CLASS_C,
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
-					RecentUplinks: []*ttnpb.UplinkMessage{
+					RecentUplinks: ToMACStateUplinkMessages(
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
@@ -2335,7 +2335,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							RxMetadata:    DefaultRxMetadata[:],
 							ReceivedAt:    now.Add(-time.Second),
 						}),
-					},
+					),
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,
@@ -2408,7 +2408,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DevAddr: test.DefaultDevAddr.Bytes(),
 					},
 					RxWindowsAvailable: true,
-					RecentUplinks: []*ttnpb.UplinkMessage{
+					RecentUplinks: ToMACStateUplinkMessages(
 						MakeJoinRequest(JoinRequestConfig{
 							DecodePayload: true,
 							JoinEUI:       types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
@@ -2419,7 +2419,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							RxMetadata:    DefaultRxMetadata[:],
 							ReceivedAt:    now.Add(-time.Second),
 						}),
-					},
+					),
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(&DataDownlinkConfig{
 							DecodePayload: true,

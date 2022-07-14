@@ -63,6 +63,8 @@ const (
 
 var (
 	AppendRecentDownlink                = appendRecentDownlink
+	ToMACStateRxMetadata                = toMACStateRxMetadata
+	ToMACStateUplinkMessages            = toMACStateUplinkMessages
 	AppendRecentUplink                  = appendRecentUplink
 	ApplicationJoinAcceptWithoutAppSKey = applicationJoinAcceptWithoutAppSKey
 	ApplyCFList                         = applyCFList
@@ -914,7 +916,7 @@ type DownlinkSchedulingAssertionConfig struct {
 	Session         *ttnpb.Session
 	Class           ttnpb.Class
 	RX1Delay        ttnpb.RxDelay
-	Uplink          *ttnpb.UplinkMessage
+	Uplink          *ttnpb.MACState_UplinkMessage
 	Priority        ttnpb.TxSchedulePriority
 	AbsoluteTime    *time.Time
 	FixedPaths      []*ttnpb.GatewayAntennaIdentifiers
@@ -1651,9 +1653,9 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 					CorrelationIds: joinResp.CorrelationIds,
 				},
 				RxWindowsAvailable: true,
-				RecentUplinks: []*ttnpb.UplinkMessage{
+				RecentUplinks: ToMACStateUplinkMessages(
 					MakeJoinRequest(deduplicatedUpConf),
-				},
+				),
 			}
 			return a.So(assertEvents(events.Builders(func() []events.Builder {
 				evBuilders := []events.Builder{
@@ -2128,7 +2130,7 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults *ttnpb.MACSettings, w
 		}()
 		macState := MakeMACState(&x, defaults,
 			MACStateOptions.WithRxWindowsAvailable(true),
-			MACStateOptions.WithRecentUplinks(
+			MACStateOptions.WithRecentUplinks(ToMACStateUplinkMessages(
 				MakeJoinRequest(JoinRequestConfig{
 					DecodePayload:  true,
 					JoinEUI:        *x.Ids.JoinEui,
@@ -2139,7 +2141,7 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults *ttnpb.MACSettings, w
 					DataRate:       phy.DataRates[drIdx].Rate, // TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/3997)
 					Frequency:      phy.UplinkChannels[0].Frequency,
 				}),
-			),
+			)...),
 		)
 		return o.WithPendingMacState(MACStatePtr(MACStateOptions.WithQueuedJoinAccept(&ttnpb.MACState_JoinAccept{
 			Payload: bytes.Repeat([]byte{0xff}, 17),

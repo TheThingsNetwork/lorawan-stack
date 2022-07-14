@@ -165,7 +165,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					CurrentParameters: &ttnpb.MACParameters{},
 					DesiredParameters: &ttnpb.MACParameters{},
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
-					RecentUplinks: []*ttnpb.UplinkMessage{{
+					RecentUplinks: []*ttnpb.MACState_UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHdr: &ttnpb.MHDR{
 								MType: ttnpb.MType_UNCONFIRMED_UP,
@@ -200,7 +200,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DesiredParameters:   &ttnpb.MACParameters{},
 					LorawanVersion:      ttnpb.MACVersion_MAC_V1_1,
 					LastDevStatusFCntUp: 2,
-					RecentUplinks: []*ttnpb.UplinkMessage{{
+					RecentUplinks: []*ttnpb.MACState_UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHdr: &ttnpb.MHDR{
 								MType: ttnpb.MType_UNCONFIRMED_UP,
@@ -237,7 +237,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					CurrentParameters: &ttnpb.MACParameters{},
 					DesiredParameters: &ttnpb.MACParameters{},
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
-					RecentUplinks: []*ttnpb.UplinkMessage{{
+					RecentUplinks: []*ttnpb.MACState_UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHdr: &ttnpb.MHDR{
 								MType: ttnpb.MType_UNCONFIRMED_UP,
@@ -269,7 +269,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					CurrentParameters: &ttnpb.MACParameters{},
 					DesiredParameters: &ttnpb.MACParameters{},
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
-					RecentUplinks: []*ttnpb.UplinkMessage{{
+					RecentUplinks: []*ttnpb.MACState_UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHdr: &ttnpb.MHDR{
 								MType: ttnpb.MType_CONFIRMED_UP,
@@ -338,7 +338,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						CurrentParameters: &ttnpb.MACParameters{},
 						DesiredParameters: &ttnpb.MACParameters{},
 						LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
-						RecentUplinks: []*ttnpb.UplinkMessage{{
+						RecentUplinks: []*ttnpb.MACState_UplinkMessage{{
 							Payload: &ttnpb.Message{
 								MHdr: &ttnpb.MHDR{
 									MType: ttnpb.MType_CONFIRMED_UP,
@@ -390,7 +390,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					CurrentParameters: &ttnpb.MACParameters{},
 					DesiredParameters: &ttnpb.MACParameters{},
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
-					RecentUplinks: []*ttnpb.UplinkMessage{{
+					RecentUplinks: []*ttnpb.MACState_UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHdr: &ttnpb.MHDR{
 								MType: ttnpb.MType_UNCONFIRMED_UP,
@@ -466,7 +466,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						CurrentParameters: &ttnpb.MACParameters{},
 						DesiredParameters: &ttnpb.MACParameters{},
 						LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
-						RecentUplinks: []*ttnpb.UplinkMessage{{
+						RecentUplinks: []*ttnpb.MACState_UplinkMessage{{
 							Payload: &ttnpb.Message{
 								MHdr: &ttnpb.MHDR{
 									MType: ttnpb.MType_UNCONFIRMED_UP,
@@ -509,7 +509,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					CurrentParameters: &ttnpb.MACParameters{},
 					DesiredParameters: &ttnpb.MACParameters{},
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
-					RecentUplinks: []*ttnpb.UplinkMessage{{
+					RecentUplinks: []*ttnpb.MACState_UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHdr: &ttnpb.MHDR{
 								MType: ttnpb.MType_CONFIRMED_UP,
@@ -589,7 +589,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						CurrentParameters: &ttnpb.MACParameters{},
 						DesiredParameters: &ttnpb.MACParameters{},
 						LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
-						RecentUplinks: []*ttnpb.UplinkMessage{{
+						RecentUplinks: []*ttnpb.MACState_UplinkMessage{{
 							Payload: &ttnpb.Message{
 								MHdr: &ttnpb.MHDR{
 									MType: ttnpb.MType_CONFIRMED_UP,
@@ -635,7 +635,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					CurrentParameters: &ttnpb.MACParameters{},
 					DesiredParameters: &ttnpb.MACParameters{},
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
-					RecentUplinks: []*ttnpb.UplinkMessage{{
+					RecentUplinks: []*ttnpb.MACState_UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHdr: &ttnpb.MHDR{
 								MType: ttnpb.MType_UNCONFIRMED_UP,
@@ -714,7 +714,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						CurrentParameters: &ttnpb.MACParameters{},
 						DesiredParameters: &ttnpb.MACParameters{},
 						LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
-						RecentUplinks: []*ttnpb.UplinkMessage{{
+						RecentUplinks: []*ttnpb.MACState_UplinkMessage{{
 							Payload: &ttnpb.Message{
 								MHdr: &ttnpb.MHDR{
 									MType: ttnpb.MType_UNCONFIRMED_UP,
@@ -756,7 +756,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					CurrentParameters: &ttnpb.MACParameters{},
 					DesiredParameters: &ttnpb.MACParameters{},
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
-					RecentUplinks: []*ttnpb.UplinkMessage{{
+					RecentUplinks: []*ttnpb.MACState_UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHdr: &ttnpb.MHDR{
 								MType: ttnpb.MType_CONFIRMED_UP,
@@ -840,7 +840,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						CurrentParameters: &ttnpb.MACParameters{},
 						DesiredParameters: &ttnpb.MACParameters{},
 						LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
-						RecentUplinks: []*ttnpb.UplinkMessage{{
+						RecentUplinks: []*ttnpb.MACState_UplinkMessage{{
 							Payload: &ttnpb.Message{
 								MHdr: &ttnpb.MHDR{
 									MType: ttnpb.MType_CONFIRMED_UP,
@@ -890,7 +890,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DesiredParameters:   &ttnpb.MACParameters{},
 					LorawanVersion:      ttnpb.MACVersion_MAC_V1_1,
 					LastDevStatusFCntUp: 4,
-					RecentUplinks: []*ttnpb.UplinkMessage{{
+					RecentUplinks: []*ttnpb.MACState_UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHdr: &ttnpb.MHDR{
 								MType: ttnpb.MType_UNCONFIRMED_UP,
@@ -972,7 +972,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						PendingRequests: []*ttnpb.MACCommand{
 							ttnpb.MACCommandIdentifier_CID_DEV_STATUS.MACCommand(),
 						},
-						RecentUplinks: []*ttnpb.UplinkMessage{{
+						RecentUplinks: []*ttnpb.MACState_UplinkMessage{{
 							Payload: &ttnpb.Message{
 								MHdr: &ttnpb.MHDR{
 									MType: ttnpb.MType_UNCONFIRMED_UP,
@@ -1024,7 +1024,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					CurrentParameters: &ttnpb.MACParameters{},
 					DesiredParameters: &ttnpb.MACParameters{},
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
-					RecentUplinks: []*ttnpb.UplinkMessage{{
+					RecentUplinks: []*ttnpb.MACState_UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHdr: &ttnpb.MHDR{
 								MType: ttnpb.MType_UNCONFIRMED_UP,
@@ -1104,7 +1104,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						PendingRequests: []*ttnpb.MACCommand{
 							ttnpb.MACCommandIdentifier_CID_DEV_STATUS.MACCommand(),
 						},
-						RecentUplinks: []*ttnpb.UplinkMessage{{
+						RecentUplinks: []*ttnpb.MACState_UplinkMessage{{
 							Payload: &ttnpb.Message{
 								MHdr: &ttnpb.MHDR{
 									MType: ttnpb.MType_UNCONFIRMED_UP,

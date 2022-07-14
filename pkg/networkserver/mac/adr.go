@@ -173,7 +173,7 @@ func DeviceADRMargin(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings) float32 
 	return legacyDeviceADRMargin(dev, defaults)
 }
 
-func adrLossRate(ups ...*ttnpb.UplinkMessage) float32 {
+func adrLossRate(ups ...*ttnpb.MACState_UplinkMessage) float32 {
 	if len(ups) < 2 {
 		return 0
 	}
@@ -194,7 +194,7 @@ func adrLossRate(ups ...*ttnpb.UplinkMessage) float32 {
 	return float32(lost) / float32(1+internal.LastUplink(ups...).GetPayload().GetMacPayload().GetFullFCnt()-min)
 }
 
-func maxSNRFromMetadata(mds ...*ttnpb.RxMetadata) (float32, bool) {
+func maxSNRFromMetadata(mds ...*ttnpb.MACState_UplinkMessage_RxMetadata) (float32, bool) {
 	if len(mds) == 0 {
 		return 0, false
 	}
@@ -207,8 +207,8 @@ func maxSNRFromMetadata(mds ...*ttnpb.RxMetadata) (float32, bool) {
 	return maxSNR, true
 }
 
-func uplinkMetadata(ups ...*ttnpb.UplinkMessage) []*ttnpb.RxMetadata {
-	mds := make([]*ttnpb.RxMetadata, 0, len(ups))
+func uplinkMetadata(ups ...*ttnpb.MACState_UplinkMessage) []*ttnpb.MACState_UplinkMessage_RxMetadata {
+	mds := make([]*ttnpb.MACState_UplinkMessage_RxMetadata, 0, len(ups))
 	for _, up := range ups {
 		mds = append(mds, up.RxMetadata...)
 	}
@@ -307,7 +307,7 @@ func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 	macState := dev.MacState
 	currentParameters, desiredParameters := macState.CurrentParameters, macState.DesiredParameters
 
-	adrUplinks := func() []*ttnpb.UplinkMessage {
+	adrUplinks := func() []*ttnpb.MACState_UplinkMessage {
 		for i := len(macState.RecentUplinks) - 1; i >= 0; i-- {
 			up := macState.RecentUplinks[i]
 			drIdx, _, ok := phy.FindUplinkDataRate(up.Settings.DataRate)

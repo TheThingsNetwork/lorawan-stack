@@ -87,7 +87,7 @@ func DeviceBand(dev *ttnpb.EndDevice, fps *frequencyplans.Store) (*band.Band, er
 	return phy, err
 }
 
-func LastUplink(ups ...*ttnpb.UplinkMessage) *ttnpb.UplinkMessage {
+func LastUplink(ups ...*ttnpb.MACState_UplinkMessage) *ttnpb.MACState_UplinkMessage {
 	return ups[len(ups)-1]
 }
 
