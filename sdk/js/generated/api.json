@@ -16212,26 +16212,6 @@
           "extensions": [],
           "fields": [
             {
-              "name": "f_hdr",
-              "description": "",
-              "label": "",
-              "type": "FHDR",
-              "longType": "MACState.DownlinkMessage.Message.MACPayload.FHDR",
-              "fullType": "ttn.lorawan.v3.MACState.DownlinkMessage.Message.MACPayload.FHDR",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "message.required",
-                    "value": true
-                  }
-                ]
-              }
-            },
-            {
               "name": "f_port",
               "description": "",
               "label": "",
@@ -16250,21 +16230,9 @@
                   }
                 ]
               }
-            }
-          ]
-        },
-        {
-          "name": "FHDR",
-          "longName": "MACState.DownlinkMessage.Message.MACPayload.FHDR",
-          "fullName": "ttn.lorawan.v3.MACState.DownlinkMessage.Message.MACPayload.FHDR",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": [
+            },
             {
-              "name": "f_cnt",
+              "name": "full_f_cnt",
               "description": "",
               "label": "",
               "type": "uint32",
@@ -16273,15 +16241,7 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "uint32.lte",
-                    "value": 65535
-                  }
-                ]
-              }
+              "defaultValue": ""
             }
           ]
         },

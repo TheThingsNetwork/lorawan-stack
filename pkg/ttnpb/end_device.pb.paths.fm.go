@@ -3249,9 +3249,8 @@ var MACState_DownlinkMessageFieldPathsNested = []string{
 	"payload.m_hdr",
 	"payload.m_hdr.m_type",
 	"payload.mac_payload",
-	"payload.mac_payload.f_hdr",
-	"payload.mac_payload.f_hdr.f_cnt",
 	"payload.mac_payload.f_port",
+	"payload.mac_payload.full_f_cnt",
 }
 
 var MACState_DownlinkMessageFieldPathsTopLevel = []string{
@@ -3316,9 +3315,8 @@ var MACState_DownlinkMessage_MessageFieldPathsNested = []string{
 	"m_hdr",
 	"m_hdr.m_type",
 	"mac_payload",
-	"mac_payload.f_hdr",
-	"mac_payload.f_hdr.f_cnt",
 	"mac_payload.f_port",
+	"mac_payload.full_f_cnt",
 }
 
 var MACState_DownlinkMessage_MessageFieldPathsTopLevel = []string{
@@ -3333,21 +3331,13 @@ var MACState_DownlinkMessage_Message_MHDRFieldPathsTopLevel = []string{
 	"m_type",
 }
 var MACState_DownlinkMessage_Message_MACPayloadFieldPathsNested = []string{
-	"f_hdr",
-	"f_hdr.f_cnt",
 	"f_port",
+	"full_f_cnt",
 }
 
 var MACState_DownlinkMessage_Message_MACPayloadFieldPathsTopLevel = []string{
-	"f_hdr",
 	"f_port",
-}
-var MACState_DownlinkMessage_Message_MACPayload_FHDRFieldPathsNested = []string{
-	"f_cnt",
-}
-
-var MACState_DownlinkMessage_Message_MACPayload_FHDRFieldPathsTopLevel = []string{
-	"f_cnt",
+	"full_f_cnt",
 }
 var BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdateFieldPathsNested = []string{
 	"ids",

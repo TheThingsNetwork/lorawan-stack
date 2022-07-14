@@ -226,7 +226,6 @@
   - [Message `MACState.DownlinkMessage`](#ttn.lorawan.v3.MACState.DownlinkMessage)
   - [Message `MACState.DownlinkMessage.Message`](#ttn.lorawan.v3.MACState.DownlinkMessage.Message)
   - [Message `MACState.DownlinkMessage.Message.MACPayload`](#ttn.lorawan.v3.MACState.DownlinkMessage.Message.MACPayload)
-  - [Message `MACState.DownlinkMessage.Message.MACPayload.FHDR`](#ttn.lorawan.v3.MACState.DownlinkMessage.Message.MACPayload.FHDR)
   - [Message `MACState.DownlinkMessage.Message.MHDR`](#ttn.lorawan.v3.MACState.DownlinkMessage.Message.MHDR)
   - [Message `MACState.JoinAccept`](#ttn.lorawan.v3.MACState.JoinAccept)
   - [Message `MACState.JoinRequest`](#ttn.lorawan.v3.MACState.JoinRequest)
@@ -3707,27 +3706,14 @@ Used for type safe recent downlink storage.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `f_hdr` | [`MACState.DownlinkMessage.Message.MACPayload.FHDR`](#ttn.lorawan.v3.MACState.DownlinkMessage.Message.MACPayload.FHDR) |  |  |
 | `f_port` | [`uint32`](#uint32) |  |  |
+| `full_f_cnt` | [`uint32`](#uint32) |  |  |
 
 #### Field Rules
 
 | Field | Validations |
 | ----- | ----------- |
-| `f_hdr` | <p>`message.required`: `true`</p> |
 | `f_port` | <p>`uint32.lte`: `255`</p> |
-
-### <a name="ttn.lorawan.v3.MACState.DownlinkMessage.Message.MACPayload.FHDR">Message `MACState.DownlinkMessage.Message.MACPayload.FHDR`</a>
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `f_cnt` | [`uint32`](#uint32) |  |  |
-
-#### Field Rules
-
-| Field | Validations |
-| ----- | ----------- |
-| `f_cnt` | <p>`uint32.lte`: `65535`</p> |
 
 ### <a name="ttn.lorawan.v3.MACState.DownlinkMessage.Message.MHDR">Message `MACState.DownlinkMessage.Message.MHDR`</a>
 

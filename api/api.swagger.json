@@ -11608,10 +11608,11 @@
     "DownlinkMessageMessageMACPayload": {
       "type": "object",
       "properties": {
-        "f_hdr": {
-          "$ref": "#/definitions/MessageMACPayloadFHDR"
-        },
         "f_port": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "full_f_cnt": {
           "type": "integer",
           "format": "int64"
         }
@@ -12504,15 +12505,6 @@
       ],
       "default": "AT_MOST_ONCE"
     },
-    "MessageMACPayloadFHDR": {
-      "type": "object",
-      "properties": {
-        "f_cnt": {
-          "type": "integer",
-          "format": "int64"
-        }
-      }
-    },
     "OperatingConditionsLimits": {
       "type": "object",
       "properties": {
@@ -12740,26 +12732,6 @@
       },
       "title": "Downlink message from the network to the end device"
     },
-    "lorawanv3FHDR": {
-      "type": "object",
-      "properties": {
-        "dev_addr": {
-          "type": "string",
-          "format": "byte"
-        },
-        "f_ctrl": {
-          "$ref": "#/definitions/v3FCtrl"
-        },
-        "f_cnt": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "f_opts": {
-          "type": "string",
-          "format": "byte"
-        }
-      }
-    },
     "lorawanv3GatewayIdentifiers": {
       "type": "object",
       "properties": {
@@ -12836,7 +12808,7 @@
       "type": "object",
       "properties": {
         "f_hdr": {
-          "$ref": "#/definitions/lorawanv3FHDR"
+          "$ref": "#/definitions/v3FHDR"
         },
         "f_port": {
           "type": "integer",
@@ -15957,6 +15929,26 @@
         },
         "class_b": {
           "type": "boolean"
+        }
+      }
+    },
+    "v3FHDR": {
+      "type": "object",
+      "properties": {
+        "dev_addr": {
+          "type": "string",
+          "format": "byte"
+        },
+        "f_ctrl": {
+          "$ref": "#/definitions/v3FCtrl"
+        },
+        "f_cnt": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "f_opts": {
+          "type": "string",
+          "format": "byte"
         }
       }
     },

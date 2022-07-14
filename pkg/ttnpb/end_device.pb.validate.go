@@ -5717,25 +5717,6 @@ func (m *MACState_DownlinkMessage_Message_MACPayload) ValidateFields(paths ...st
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
-		case "f_hdr":
-
-			if m.GetFHdr() == nil {
-				return MACState_DownlinkMessage_Message_MACPayloadValidationError{
-					field:  "f_hdr",
-					reason: "value is required",
-				}
-			}
-
-			if v, ok := interface{}(m.GetFHdr()).(interface{ ValidateFields(...string) error }); ok {
-				if err := v.ValidateFields(subs...); err != nil {
-					return MACState_DownlinkMessage_Message_MACPayloadValidationError{
-						field:  "f_hdr",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
-				}
-			}
-
 		case "f_port":
 
 			if m.GetFPort() > 255 {
@@ -5745,6 +5726,8 @@ func (m *MACState_DownlinkMessage_Message_MACPayload) ValidateFields(paths ...st
 				}
 			}
 
+		case "full_f_cnt":
+			// no validation rules for FullFCnt
 		default:
 			return MACState_DownlinkMessage_Message_MACPayloadValidationError{
 				field:  name,
@@ -5812,105 +5795,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = MACState_DownlinkMessage_Message_MACPayloadValidationError{}
-
-// ValidateFields checks the field values on
-// MACState_DownlinkMessage_Message_MACPayload_FHDR with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
-func (m *MACState_DownlinkMessage_Message_MACPayload_FHDR) ValidateFields(paths ...string) error {
-	if m == nil {
-		return nil
-	}
-
-	if len(paths) == 0 {
-		paths = MACState_DownlinkMessage_Message_MACPayload_FHDRFieldPathsNested
-	}
-
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
-		_ = subs
-		switch name {
-		case "f_cnt":
-
-			if m.GetFCnt() > 65535 {
-				return MACState_DownlinkMessage_Message_MACPayload_FHDRValidationError{
-					field:  "f_cnt",
-					reason: "value must be less than or equal to 65535",
-				}
-			}
-
-		default:
-			return MACState_DownlinkMessage_Message_MACPayload_FHDRValidationError{
-				field:  name,
-				reason: "invalid field path",
-			}
-		}
-	}
-	return nil
-}
-
-// MACState_DownlinkMessage_Message_MACPayload_FHDRValidationError is the
-// validation error returned by
-// MACState_DownlinkMessage_Message_MACPayload_FHDR.ValidateFields if the
-// designated constraints aren't met.
-type MACState_DownlinkMessage_Message_MACPayload_FHDRValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e MACState_DownlinkMessage_Message_MACPayload_FHDRValidationError) Field() string {
-	return e.field
-}
-
-// Reason function returns reason value.
-func (e MACState_DownlinkMessage_Message_MACPayload_FHDRValidationError) Reason() string {
-	return e.reason
-}
-
-// Cause function returns cause value.
-func (e MACState_DownlinkMessage_Message_MACPayload_FHDRValidationError) Cause() error {
-	return e.cause
-}
-
-// Key function returns key value.
-func (e MACState_DownlinkMessage_Message_MACPayload_FHDRValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e MACState_DownlinkMessage_Message_MACPayload_FHDRValidationError) ErrorName() string {
-	return "MACState_DownlinkMessage_Message_MACPayload_FHDRValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e MACState_DownlinkMessage_Message_MACPayload_FHDRValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sMACState_DownlinkMessage_Message_MACPayload_FHDR.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = MACState_DownlinkMessage_Message_MACPayload_FHDRValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = MACState_DownlinkMessage_Message_MACPayload_FHDRValidationError{}
 
 // ValidateFields checks the field values on
 // BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate with the rules

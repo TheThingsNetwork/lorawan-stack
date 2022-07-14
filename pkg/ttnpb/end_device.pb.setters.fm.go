@@ -3847,31 +3847,6 @@ func (dst *MACState_DownlinkMessage_Message_MHDR) SetFields(src *MACState_Downli
 func (dst *MACState_DownlinkMessage_Message_MACPayload) SetFields(src *MACState_DownlinkMessage_Message_MACPayload, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
-		case "f_hdr":
-			if len(subs) > 0 {
-				var newDst, newSrc *MACState_DownlinkMessage_Message_MACPayload_FHDR
-				if (src == nil || src.FHdr == nil) && dst.FHdr == nil {
-					continue
-				}
-				if src != nil {
-					newSrc = src.FHdr
-				}
-				if dst.FHdr != nil {
-					newDst = dst.FHdr
-				} else {
-					newDst = &MACState_DownlinkMessage_Message_MACPayload_FHDR{}
-					dst.FHdr = newDst
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
-			} else {
-				if src != nil {
-					dst.FHdr = src.FHdr
-				} else {
-					dst.FHdr = nil
-				}
-			}
 		case "f_port":
 			if len(subs) > 0 {
 				return fmt.Errorf("'f_port' has no subfields, but %s were specified", subs)
@@ -3882,26 +3857,15 @@ func (dst *MACState_DownlinkMessage_Message_MACPayload) SetFields(src *MACState_
 				var zero uint32
 				dst.FPort = zero
 			}
-
-		default:
-			return fmt.Errorf("invalid field: '%s'", name)
-		}
-	}
-	return nil
-}
-
-func (dst *MACState_DownlinkMessage_Message_MACPayload_FHDR) SetFields(src *MACState_DownlinkMessage_Message_MACPayload_FHDR, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
-		switch name {
-		case "f_cnt":
+		case "full_f_cnt":
 			if len(subs) > 0 {
-				return fmt.Errorf("'f_cnt' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'full_f_cnt' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.FCnt = src.FCnt
+				dst.FullFCnt = src.FullFCnt
 			} else {
 				var zero uint32
-				dst.FCnt = zero
+				dst.FullFCnt = zero
 			}
 
 		default:
