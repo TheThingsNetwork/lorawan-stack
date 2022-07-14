@@ -3520,6 +3520,51 @@ func (dst *MACState_UplinkMessage) SetFields(src *MACState_UplinkMessage, paths 
 	return nil
 }
 
+func (dst *MACState_DownlinkMessage) SetFields(src *MACState_DownlinkMessage, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "payload":
+			if len(subs) > 0 {
+				var newDst, newSrc *MACState_DownlinkMessage_Message
+				if (src == nil || src.Payload == nil) && dst.Payload == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Payload
+				}
+				if dst.Payload != nil {
+					newDst = dst.Payload
+				} else {
+					newDst = &MACState_DownlinkMessage_Message{}
+					dst.Payload = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Payload = src.Payload
+				} else {
+					dst.Payload = nil
+				}
+			}
+		case "correlation_ids":
+			if len(subs) > 0 {
+				return fmt.Errorf("'correlation_ids' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CorrelationIds = src.CorrelationIds
+			} else {
+				dst.CorrelationIds = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *MACState_DataRateRange) SetFields(src *MACState_DataRateRange, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
@@ -3713,6 +3758,155 @@ func (dst *MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata) SetFields(src
 	}
 	if src != nil {
 		*dst = *src
+	}
+	return nil
+}
+
+func (dst *MACState_DownlinkMessage_Message) SetFields(src *MACState_DownlinkMessage_Message, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "m_hdr":
+			if len(subs) > 0 {
+				var newDst, newSrc *MACState_DownlinkMessage_Message_MHDR
+				if (src == nil || src.MHdr == nil) && dst.MHdr == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.MHdr
+				}
+				if dst.MHdr != nil {
+					newDst = dst.MHdr
+				} else {
+					newDst = &MACState_DownlinkMessage_Message_MHDR{}
+					dst.MHdr = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.MHdr = src.MHdr
+				} else {
+					dst.MHdr = nil
+				}
+			}
+		case "mac_payload":
+			if len(subs) > 0 {
+				var newDst, newSrc *MACState_DownlinkMessage_Message_MACPayload
+				if (src == nil || src.MacPayload == nil) && dst.MacPayload == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.MacPayload
+				}
+				if dst.MacPayload != nil {
+					newDst = dst.MacPayload
+				} else {
+					newDst = &MACState_DownlinkMessage_Message_MACPayload{}
+					dst.MacPayload = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.MacPayload = src.MacPayload
+				} else {
+					dst.MacPayload = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *MACState_DownlinkMessage_Message_MHDR) SetFields(src *MACState_DownlinkMessage_Message_MHDR, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "m_type":
+			if len(subs) > 0 {
+				return fmt.Errorf("'m_type' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MType = src.MType
+			} else {
+				var zero MType
+				dst.MType = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *MACState_DownlinkMessage_Message_MACPayload) SetFields(src *MACState_DownlinkMessage_Message_MACPayload, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "f_hdr":
+			if len(subs) > 0 {
+				var newDst, newSrc *MACState_DownlinkMessage_Message_MACPayload_FHDR
+				if (src == nil || src.FHdr == nil) && dst.FHdr == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.FHdr
+				}
+				if dst.FHdr != nil {
+					newDst = dst.FHdr
+				} else {
+					newDst = &MACState_DownlinkMessage_Message_MACPayload_FHDR{}
+					dst.FHdr = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.FHdr = src.FHdr
+				} else {
+					dst.FHdr = nil
+				}
+			}
+		case "f_port":
+			if len(subs) > 0 {
+				return fmt.Errorf("'f_port' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FPort = src.FPort
+			} else {
+				var zero uint32
+				dst.FPort = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *MACState_DownlinkMessage_Message_MACPayload_FHDR) SetFields(src *MACState_DownlinkMessage_Message_MACPayload_FHDR, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "f_cnt":
+			if len(subs) > 0 {
+				return fmt.Errorf("'f_cnt' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FCnt = src.FCnt
+			} else {
+				var zero uint32
+				dst.FCnt = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
 	}
 	return nil
 }

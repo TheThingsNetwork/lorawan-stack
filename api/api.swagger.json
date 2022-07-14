@@ -11605,6 +11605,26 @@
         }
       }
     },
+    "DownlinkMessageMessageMACPayload": {
+      "type": "object",
+      "properties": {
+        "f_hdr": {
+          "$ref": "#/definitions/MessageMACPayloadFHDR"
+        },
+        "f_port": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "DownlinkMessageMessageMHDR": {
+      "type": "object",
+      "properties": {
+        "m_type": {
+          "$ref": "#/definitions/v3MType"
+        }
+      }
+    },
     "EndDeviceModelBattery": {
       "type": "object",
       "properties": {
@@ -12399,6 +12419,17 @@
         }
       }
     },
+    "MACStateDownlinkMessageMessage": {
+      "type": "object",
+      "properties": {
+        "m_hdr": {
+          "$ref": "#/definitions/DownlinkMessageMessageMHDR"
+        },
+        "mac_payload": {
+          "$ref": "#/definitions/DownlinkMessageMessageMACPayload"
+        }
+      }
+    },
     "MACStateJoinAccept": {
       "type": "object",
       "properties": {
@@ -12472,6 +12503,15 @@
         "EXACTLY_ONCE"
       ],
       "default": "AT_MOST_ONCE"
+    },
+    "MessageMACPayloadFHDR": {
+      "type": "object",
+      "properties": {
+        "f_cnt": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
     },
     "OperatingConditionsLimits": {
       "type": "object",
@@ -12668,6 +12708,58 @@
         }
       }
     },
+    "lorawanv3DownlinkMessage": {
+      "type": "object",
+      "properties": {
+        "raw_payload": {
+          "type": "string",
+          "format": "byte"
+        },
+        "payload": {
+          "$ref": "#/definitions/lorawanv3Message"
+        },
+        "end_device_ids": {
+          "$ref": "#/definitions/v3EndDeviceIdentifiers"
+        },
+        "request": {
+          "$ref": "#/definitions/v3TxRequest"
+        },
+        "scheduled": {
+          "$ref": "#/definitions/lorawanv3TxSettings"
+        },
+        "correlation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "session_key_id": {
+          "type": "string",
+          "format": "byte"
+        }
+      },
+      "title": "Downlink message from the network to the end device"
+    },
+    "lorawanv3FHDR": {
+      "type": "object",
+      "properties": {
+        "dev_addr": {
+          "type": "string",
+          "format": "byte"
+        },
+        "f_ctrl": {
+          "$ref": "#/definitions/v3FCtrl"
+        },
+        "f_cnt": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "f_opts": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
     "lorawanv3GatewayIdentifiers": {
       "type": "object",
       "properties": {
@@ -12740,18 +12832,53 @@
         }
       }
     },
+    "lorawanv3MACPayload": {
+      "type": "object",
+      "properties": {
+        "f_hdr": {
+          "$ref": "#/definitions/lorawanv3FHDR"
+        },
+        "f_port": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "frm_payload": {
+          "type": "string",
+          "format": "byte"
+        },
+        "decoded_payload": {
+          "type": "object"
+        },
+        "full_f_cnt": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Full 32-bit FCnt value. Used internally by Network Server."
+        }
+      }
+    },
+    "lorawanv3MHDR": {
+      "type": "object",
+      "properties": {
+        "m_type": {
+          "$ref": "#/definitions/v3MType"
+        },
+        "major": {
+          "$ref": "#/definitions/v3Major"
+        }
+      }
+    },
     "lorawanv3Message": {
       "type": "object",
       "properties": {
         "m_hdr": {
-          "$ref": "#/definitions/v3MHDR"
+          "$ref": "#/definitions/lorawanv3MHDR"
         },
         "mic": {
           "type": "string",
           "format": "byte"
         },
         "mac_payload": {
-          "$ref": "#/definitions/v3MACPayload"
+          "$ref": "#/definitions/lorawanv3MACPayload"
         },
         "join_request_payload": {
           "$ref": "#/definitions/v3JoinRequestPayload"
@@ -15080,38 +15207,6 @@
         }
       }
     },
-    "v3DownlinkMessage": {
-      "type": "object",
-      "properties": {
-        "raw_payload": {
-          "type": "string",
-          "format": "byte"
-        },
-        "payload": {
-          "$ref": "#/definitions/lorawanv3Message"
-        },
-        "end_device_ids": {
-          "$ref": "#/definitions/v3EndDeviceIdentifiers"
-        },
-        "request": {
-          "$ref": "#/definitions/v3TxRequest"
-        },
-        "scheduled": {
-          "$ref": "#/definitions/lorawanv3TxSettings"
-        },
-        "correlation_ids": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "session_key_id": {
-          "type": "string",
-          "format": "byte"
-        }
-      },
-      "title": "Downlink message from the network to the end device"
-    },
     "v3DownlinkPath": {
       "type": "object",
       "properties": {
@@ -15865,26 +15960,6 @@
         }
       }
     },
-    "v3FHDR": {
-      "type": "object",
-      "properties": {
-        "dev_addr": {
-          "type": "string",
-          "format": "byte"
-        },
-        "f_ctrl": {
-          "$ref": "#/definitions/v3FCtrl"
-        },
-        "f_cnt": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "f_opts": {
-          "type": "string",
-          "format": "byte"
-        }
-      }
-    },
     "v3FSKDataRate": {
       "type": "object",
       "properties": {
@@ -16192,7 +16267,7 @@
       "type": "object",
       "properties": {
         "downlink_message": {
-          "$ref": "#/definitions/v3DownlinkMessage",
+          "$ref": "#/definitions/lorawanv3DownlinkMessage",
           "description": "DownlinkMessage for the gateway."
         }
       },
@@ -17006,30 +17081,6 @@
         }
       }
     },
-    "v3MACPayload": {
-      "type": "object",
-      "properties": {
-        "f_hdr": {
-          "$ref": "#/definitions/v3FHDR"
-        },
-        "f_port": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "frm_payload": {
-          "type": "string",
-          "format": "byte"
-        },
-        "decoded_payload": {
-          "type": "object"
-        },
-        "full_f_cnt": {
-          "type": "integer",
-          "format": "int64",
-          "description": "Full 32-bit FCnt value. Used internally by Network Server."
-        }
-      }
-    },
     "v3MACSettings": {
       "type": "object",
       "properties": {
@@ -17246,7 +17297,7 @@
         "recent_downlinks": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v3DownlinkMessage"
+            "$ref": "#/definitions/v3MACStateDownlinkMessage"
           },
           "description": "Recent data downlink messages sorted by time.\nThe number of messages stored may depend on configuration."
         },
@@ -17297,6 +17348,21 @@
         }
       },
       "description": "MACState represents the state of MAC layer of the device.\nMACState is reset on each join for OTAA or ResetInd for ABP devices.\nThis is used internally by the Network Server."
+    },
+    "v3MACStateDownlinkMessage": {
+      "type": "object",
+      "properties": {
+        "payload": {
+          "$ref": "#/definitions/MACStateDownlinkMessageMessage"
+        },
+        "correlation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "A minimal DownlinkMessage definition which is binary compatible with the top level DownlinkMessage message.\nUsed for type safe recent downlink storage."
     },
     "v3MACStateJoinRequest": {
       "type": "object",
@@ -17356,17 +17422,6 @@
         "MAC_V1_0_4"
       ],
       "default": "MAC_UNKNOWN"
-    },
-    "v3MHDR": {
-      "type": "object",
-      "properties": {
-        "m_type": {
-          "$ref": "#/definitions/v3MType"
-        },
-        "major": {
-          "$ref": "#/definitions/v3Major"
-        }
-      }
     },
     "v3MQTTConnectionInfo": {
       "type": "object",
@@ -18879,7 +18934,7 @@
           "$ref": "#/definitions/TxAcknowledgmentResult"
         },
         "downlink_message": {
-          "$ref": "#/definitions/v3DownlinkMessage",
+          "$ref": "#/definitions/lorawanv3DownlinkMessage",
           "description": "The acknowledged downlink message. Set by the Gateway Server."
         }
       }

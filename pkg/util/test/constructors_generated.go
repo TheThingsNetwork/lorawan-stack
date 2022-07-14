@@ -399,7 +399,7 @@ func (MACStateOptionNamespace) WithRecentUplinks(vs ...*ttnpb.MACState_UplinkMes
 }
 
 // WithRecentDownlinks returns a MACStateOption, which returns a copy of ttnpb.MACState with RecentDownlinks set to vs.
-func (MACStateOptionNamespace) WithRecentDownlinks(vs ...*ttnpb.DownlinkMessage) MACStateOption {
+func (MACStateOptionNamespace) WithRecentDownlinks(vs ...*ttnpb.MACState_DownlinkMessage) MACStateOption {
 	return func(x ttnpb.MACState) ttnpb.MACState {
 		x.RecentDownlinks = vs
 		return x

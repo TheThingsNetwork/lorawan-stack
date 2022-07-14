@@ -3243,6 +3243,21 @@ var MACState_UplinkMessageFieldPathsTopLevel = []string{
 	"rx_metadata",
 	"settings",
 }
+var MACState_DownlinkMessageFieldPathsNested = []string{
+	"correlation_ids",
+	"payload",
+	"payload.m_hdr",
+	"payload.m_hdr.m_type",
+	"payload.mac_payload",
+	"payload.mac_payload.f_hdr",
+	"payload.mac_payload.f_hdr.f_cnt",
+	"payload.mac_payload.f_port",
+}
+
+var MACState_DownlinkMessageFieldPathsTopLevel = []string{
+	"correlation_ids",
+	"payload",
+}
 var MACState_DataRateRangeFieldPathsNested = []string{
 	"max_data_rate_index",
 	"min_data_rate_index",
@@ -3297,6 +3312,43 @@ var MACState_UplinkMessage_RxMetadataFieldPathsTopLevel = []string{
 }
 var MACState_UplinkMessage_RxMetadata_PacketBrokerMetadataFieldPathsNested []string
 var MACState_UplinkMessage_RxMetadata_PacketBrokerMetadataFieldPathsTopLevel []string
+var MACState_DownlinkMessage_MessageFieldPathsNested = []string{
+	"m_hdr",
+	"m_hdr.m_type",
+	"mac_payload",
+	"mac_payload.f_hdr",
+	"mac_payload.f_hdr.f_cnt",
+	"mac_payload.f_port",
+}
+
+var MACState_DownlinkMessage_MessageFieldPathsTopLevel = []string{
+	"m_hdr",
+	"mac_payload",
+}
+var MACState_DownlinkMessage_Message_MHDRFieldPathsNested = []string{
+	"m_type",
+}
+
+var MACState_DownlinkMessage_Message_MHDRFieldPathsTopLevel = []string{
+	"m_type",
+}
+var MACState_DownlinkMessage_Message_MACPayloadFieldPathsNested = []string{
+	"f_hdr",
+	"f_hdr.f_cnt",
+	"f_port",
+}
+
+var MACState_DownlinkMessage_Message_MACPayloadFieldPathsTopLevel = []string{
+	"f_hdr",
+	"f_port",
+}
+var MACState_DownlinkMessage_Message_MACPayload_FHDRFieldPathsNested = []string{
+	"f_cnt",
+}
+
+var MACState_DownlinkMessage_Message_MACPayload_FHDRFieldPathsTopLevel = []string{
+	"f_cnt",
+}
 var BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdateFieldPathsNested = []string{
 	"ids",
 	"ids.application_ids",

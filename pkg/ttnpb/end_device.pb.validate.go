@@ -4880,6 +4880,114 @@ var _ interface {
 	ErrorName() string
 } = MACState_UplinkMessageValidationError{}
 
+// ValidateFields checks the field values on MACState_DownlinkMessage with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *MACState_DownlinkMessage) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = MACState_DownlinkMessageFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "payload":
+
+			if v, ok := interface{}(m.GetPayload()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACState_DownlinkMessageValidationError{
+						field:  "payload",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "correlation_ids":
+
+			for idx, item := range m.GetCorrelationIds() {
+				_, _ = idx, item
+
+				if utf8.RuneCountInString(item) > 100 {
+					return MACState_DownlinkMessageValidationError{
+						field:  fmt.Sprintf("correlation_ids[%v]", idx),
+						reason: "value length must be at most 100 runes",
+					}
+				}
+
+			}
+
+		default:
+			return MACState_DownlinkMessageValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// MACState_DownlinkMessageValidationError is the validation error returned by
+// MACState_DownlinkMessage.ValidateFields if the designated constraints
+// aren't met.
+type MACState_DownlinkMessageValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MACState_DownlinkMessageValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MACState_DownlinkMessageValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MACState_DownlinkMessageValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MACState_DownlinkMessageValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MACState_DownlinkMessageValidationError) ErrorName() string {
+	return "MACState_DownlinkMessageValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MACState_DownlinkMessageValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMACState_DownlinkMessage.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MACState_DownlinkMessageValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MACState_DownlinkMessageValidationError{}
+
 // ValidateFields checks the field values on MACState_DataRateRange with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -5389,6 +5497,420 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = MACState_UplinkMessage_RxMetadata_PacketBrokerMetadataValidationError{}
+
+// ValidateFields checks the field values on MACState_DownlinkMessage_Message
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *MACState_DownlinkMessage_Message) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = MACState_DownlinkMessage_MessageFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "m_hdr":
+
+			if m.GetMHdr() == nil {
+				return MACState_DownlinkMessage_MessageValidationError{
+					field:  "m_hdr",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetMHdr()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACState_DownlinkMessage_MessageValidationError{
+						field:  "m_hdr",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "mac_payload":
+
+			if v, ok := interface{}(m.GetMacPayload()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACState_DownlinkMessage_MessageValidationError{
+						field:  "mac_payload",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return MACState_DownlinkMessage_MessageValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// MACState_DownlinkMessage_MessageValidationError is the validation error
+// returned by MACState_DownlinkMessage_Message.ValidateFields if the
+// designated constraints aren't met.
+type MACState_DownlinkMessage_MessageValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MACState_DownlinkMessage_MessageValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MACState_DownlinkMessage_MessageValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MACState_DownlinkMessage_MessageValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MACState_DownlinkMessage_MessageValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MACState_DownlinkMessage_MessageValidationError) ErrorName() string {
+	return "MACState_DownlinkMessage_MessageValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MACState_DownlinkMessage_MessageValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMACState_DownlinkMessage_Message.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MACState_DownlinkMessage_MessageValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MACState_DownlinkMessage_MessageValidationError{}
+
+// ValidateFields checks the field values on
+// MACState_DownlinkMessage_Message_MHDR with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *MACState_DownlinkMessage_Message_MHDR) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = MACState_DownlinkMessage_Message_MHDRFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "m_type":
+
+			if _, ok := MType_name[int32(m.GetMType())]; !ok {
+				return MACState_DownlinkMessage_Message_MHDRValidationError{
+					field:  "m_type",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
+		default:
+			return MACState_DownlinkMessage_Message_MHDRValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// MACState_DownlinkMessage_Message_MHDRValidationError is the validation error
+// returned by MACState_DownlinkMessage_Message_MHDR.ValidateFields if the
+// designated constraints aren't met.
+type MACState_DownlinkMessage_Message_MHDRValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MACState_DownlinkMessage_Message_MHDRValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MACState_DownlinkMessage_Message_MHDRValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MACState_DownlinkMessage_Message_MHDRValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MACState_DownlinkMessage_Message_MHDRValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MACState_DownlinkMessage_Message_MHDRValidationError) ErrorName() string {
+	return "MACState_DownlinkMessage_Message_MHDRValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MACState_DownlinkMessage_Message_MHDRValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMACState_DownlinkMessage_Message_MHDR.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MACState_DownlinkMessage_Message_MHDRValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MACState_DownlinkMessage_Message_MHDRValidationError{}
+
+// ValidateFields checks the field values on
+// MACState_DownlinkMessage_Message_MACPayload with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *MACState_DownlinkMessage_Message_MACPayload) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = MACState_DownlinkMessage_Message_MACPayloadFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "f_hdr":
+
+			if m.GetFHdr() == nil {
+				return MACState_DownlinkMessage_Message_MACPayloadValidationError{
+					field:  "f_hdr",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetFHdr()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACState_DownlinkMessage_Message_MACPayloadValidationError{
+						field:  "f_hdr",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "f_port":
+
+			if m.GetFPort() > 255 {
+				return MACState_DownlinkMessage_Message_MACPayloadValidationError{
+					field:  "f_port",
+					reason: "value must be less than or equal to 255",
+				}
+			}
+
+		default:
+			return MACState_DownlinkMessage_Message_MACPayloadValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// MACState_DownlinkMessage_Message_MACPayloadValidationError is the validation
+// error returned by
+// MACState_DownlinkMessage_Message_MACPayload.ValidateFields if the
+// designated constraints aren't met.
+type MACState_DownlinkMessage_Message_MACPayloadValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MACState_DownlinkMessage_Message_MACPayloadValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MACState_DownlinkMessage_Message_MACPayloadValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MACState_DownlinkMessage_Message_MACPayloadValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MACState_DownlinkMessage_Message_MACPayloadValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MACState_DownlinkMessage_Message_MACPayloadValidationError) ErrorName() string {
+	return "MACState_DownlinkMessage_Message_MACPayloadValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MACState_DownlinkMessage_Message_MACPayloadValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMACState_DownlinkMessage_Message_MACPayload.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MACState_DownlinkMessage_Message_MACPayloadValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MACState_DownlinkMessage_Message_MACPayloadValidationError{}
+
+// ValidateFields checks the field values on
+// MACState_DownlinkMessage_Message_MACPayload_FHDR with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *MACState_DownlinkMessage_Message_MACPayload_FHDR) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = MACState_DownlinkMessage_Message_MACPayload_FHDRFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "f_cnt":
+
+			if m.GetFCnt() > 65535 {
+				return MACState_DownlinkMessage_Message_MACPayload_FHDRValidationError{
+					field:  "f_cnt",
+					reason: "value must be less than or equal to 65535",
+				}
+			}
+
+		default:
+			return MACState_DownlinkMessage_Message_MACPayload_FHDRValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// MACState_DownlinkMessage_Message_MACPayload_FHDRValidationError is the
+// validation error returned by
+// MACState_DownlinkMessage_Message_MACPayload_FHDR.ValidateFields if the
+// designated constraints aren't met.
+type MACState_DownlinkMessage_Message_MACPayload_FHDRValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MACState_DownlinkMessage_Message_MACPayload_FHDRValidationError) Field() string {
+	return e.field
+}
+
+// Reason function returns reason value.
+func (e MACState_DownlinkMessage_Message_MACPayload_FHDRValidationError) Reason() string {
+	return e.reason
+}
+
+// Cause function returns cause value.
+func (e MACState_DownlinkMessage_Message_MACPayload_FHDRValidationError) Cause() error {
+	return e.cause
+}
+
+// Key function returns key value.
+func (e MACState_DownlinkMessage_Message_MACPayload_FHDRValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MACState_DownlinkMessage_Message_MACPayload_FHDRValidationError) ErrorName() string {
+	return "MACState_DownlinkMessage_Message_MACPayload_FHDRValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MACState_DownlinkMessage_Message_MACPayload_FHDRValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMACState_DownlinkMessage_Message_MACPayload_FHDR.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MACState_DownlinkMessage_Message_MACPayload_FHDRValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MACState_DownlinkMessage_Message_MACPayload_FHDRValidationError{}
 
 // ValidateFields checks the field values on
 // BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate with the rules

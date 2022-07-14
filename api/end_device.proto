@@ -492,6 +492,44 @@ message MACState {
     reserved 10; // consumed_airtime
   }
 
+  // A minimal DownlinkMessage definition which is binary compatible with the top level DownlinkMessage message.
+  // Used for type safe recent downlink storage.
+  message DownlinkMessage {
+    reserved 1; // raw_payload
+    message Message {
+      message MHDR {
+        MType m_type = 1 [(validate.rules).enum.defined_only = true];
+        reserved 2; // major
+      }
+      MHDR m_hdr = 1 [(validate.rules).message.required = true];
+      reserved 2; // mic
+      message MACPayload {
+        message FHDR {
+          reserved 1; // dev_addr
+          reserved 2; // f_ctrl
+          uint32 f_cnt = 3 [(validate.rules).uint32.lte = 65535];
+          reserved 4; // f_opts
+        }
+        FHDR f_hdr = 1 [(validate.rules).message.required = true];
+        uint32 f_port = 2 [(validate.rules).uint32.lte = 255];
+        reserved 3; // frm_payload
+        reserved 4; // decoded_payload
+        reserved 5; // full_f_cnt
+      }
+      MACPayload mac_payload = 3;
+      reserved 4; // join_request_payload
+      reserved 5; // join_accept_payload
+      reserved 6; // rejoin_request_payload
+      reserved 7;
+    }
+    Message payload = 2;
+    reserved 3; // end_device_ids
+    reserved 4; // request
+    reserved 5; // scheduled
+    repeated string correlation_ids = 6 [(validate.rules).repeated.items.string.max_len = 100];
+    reserved 7; // session_key_id
+  }
+
   // Recent data uplink messages sorted by time.
   // The number of messages stored may depend on configuration.
   repeated UplinkMessage recent_uplinks = 14;

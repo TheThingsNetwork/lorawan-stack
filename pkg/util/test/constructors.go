@@ -109,7 +109,7 @@ func (o MACStateOptionNamespace) AppendRecentUplinks(ups ...*ttnpb.MACState_Upli
 	}
 }
 
-func (o MACStateOptionNamespace) AppendRecentDownlinks(downs ...*ttnpb.DownlinkMessage) MACStateOption {
+func (o MACStateOptionNamespace) AppendRecentDownlinks(downs ...*ttnpb.MACState_DownlinkMessage) MACStateOption {
 	return func(x ttnpb.MACState) ttnpb.MACState {
 		x.RecentDownlinks = append(x.RecentDownlinks, downs...)
 		return x

@@ -15904,8 +15904,8 @@
               "description": "Recent data downlink messages sorted by time.\nThe number of messages stored may depend on configuration.",
               "label": "repeated",
               "type": "DownlinkMessage",
-              "longType": "DownlinkMessage",
-              "fullType": "ttn.lorawan.v3.DownlinkMessage",
+              "longType": "MACState.DownlinkMessage",
+              "fullType": "ttn.lorawan.v3.MACState.DownlinkMessage",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -16107,6 +16107,210 @@
                   {
                     "name": "repeated.min_items",
                     "value": 1
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DownlinkMessage",
+          "longName": "MACState.DownlinkMessage",
+          "fullName": "ttn.lorawan.v3.MACState.DownlinkMessage",
+          "description": "A minimal DownlinkMessage definition which is binary compatible with the top level DownlinkMessage message.\nUsed for type safe recent downlink storage.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "payload",
+              "description": "",
+              "label": "",
+              "type": "Message",
+              "longType": "MACState.DownlinkMessage.Message",
+              "fullType": "ttn.lorawan.v3.MACState.DownlinkMessage.Message",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "correlation_ids",
+              "description": "",
+              "label": "repeated",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.items.string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Message",
+          "longName": "MACState.DownlinkMessage.Message",
+          "fullName": "ttn.lorawan.v3.MACState.DownlinkMessage.Message",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "m_hdr",
+              "description": "",
+              "label": "",
+              "type": "MHDR",
+              "longType": "MACState.DownlinkMessage.Message.MHDR",
+              "fullType": "ttn.lorawan.v3.MACState.DownlinkMessage.Message.MHDR",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "mac_payload",
+              "description": "",
+              "label": "",
+              "type": "MACPayload",
+              "longType": "MACState.DownlinkMessage.Message.MACPayload",
+              "fullType": "ttn.lorawan.v3.MACState.DownlinkMessage.Message.MACPayload",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MACPayload",
+          "longName": "MACState.DownlinkMessage.Message.MACPayload",
+          "fullName": "ttn.lorawan.v3.MACState.DownlinkMessage.Message.MACPayload",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "f_hdr",
+              "description": "",
+              "label": "",
+              "type": "FHDR",
+              "longType": "MACState.DownlinkMessage.Message.MACPayload.FHDR",
+              "fullType": "ttn.lorawan.v3.MACState.DownlinkMessage.Message.MACPayload.FHDR",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "f_port",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 255
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "FHDR",
+          "longName": "MACState.DownlinkMessage.Message.MACPayload.FHDR",
+          "fullName": "ttn.lorawan.v3.MACState.DownlinkMessage.Message.MACPayload.FHDR",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "f_cnt",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 65535
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "MHDR",
+          "longName": "MACState.DownlinkMessage.Message.MHDR",
+          "fullName": "ttn.lorawan.v3.MACState.DownlinkMessage.Message.MHDR",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "m_type",
+              "description": "",
+              "label": "",
+              "type": "MType",
+              "longType": "MType",
+              "fullType": "ttn.lorawan.v3.MType",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
                   }
                 ]
               }
