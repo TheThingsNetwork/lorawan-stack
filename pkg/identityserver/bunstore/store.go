@@ -23,6 +23,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/jackc/pgerrcode"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/driver/pgdriver"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -112,11 +113,11 @@ var (
 // driverErrorcodes maps PostgreSQL error codes to the corresponding error definition.
 // See https://www.postgresql.org/docs/current/errcodes-appendix.html for more information.
 var driverErrorCodes = map[string]*errors.Definition{
-	"23505": errors.DefineAlreadyExists("already_exists", "already exists"), // unique_violation
-	"57014": errors.DefineCanceled("query_canceled", "query canceled"),      // query_canceled
-	"57P01": errUnavailable,                                                 // admin_shutdown
-	"57P02": errUnavailable,                                                 // crash_shutdown
-	"57P03": errUnavailable,                                                 // cannot_connect_now
+	pgerrcode.UniqueViolation:  errors.DefineAlreadyExists("already_exists", "already exists"),
+	pgerrcode.QueryCanceled:    errors.DefineCanceled("query_canceled", "query canceled"),
+	pgerrcode.AdminShutdown:    errUnavailable,
+	pgerrcode.CrashShutdown:    errUnavailable,
+	pgerrcode.CannotConnectNow: errUnavailable,
 }
 
 // driverErrorDetails maps PostgreSQL error codes to attributes.
