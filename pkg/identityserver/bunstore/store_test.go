@@ -29,32 +29,15 @@ import (
 )
 
 type testStore struct {
-	db *bun.DB
-
-	*applicationStore
-	*clientStore
-	*endDeviceStore
-	*gatewayStore
-	*organizationStore
-	*userStore
-	*userSessionStore
-	*apiKeyStore
-	*membershipStore
-	*contactInfoStore
-	*invitationStore
-	*loginTokenStore
-	*oauthStore
-	*euiStore
-	*entitySearch
-	*notificationStore
+	*Store
 }
 
 func (t testStore) Init(ctx context.Context) error {
-	return Migrate(ctx, t.db.DB)
+	return Migrate(ctx, t.Store.baseStore.baseDB.DB.DB)
 }
 
 func (t testStore) Close() error {
-	return t.db.Close()
+	return t.Store.baseStore.baseDB.DB.Close()
 }
 
 func newTestStore(t *testing.T, dsn *url.URL) storetest.Store {
@@ -73,31 +56,12 @@ func newTestStore(t *testing.T, dsn *url.URL) storetest.Store {
 
 	db.AddQueryHook(NewLoggerHook(test.GetLogger(t)))
 
-	baseStore, err := newStore(ctx, db)
+	store, err := NewStore(ctx, db)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	return &testStore{
-		db: db,
-
-		applicationStore:  newApplicationStore(baseStore),
-		clientStore:       newClientStore(baseStore),
-		endDeviceStore:    newEndDeviceStore(baseStore),
-		gatewayStore:      newGatewayStore(baseStore),
-		organizationStore: newOrganizationStore(baseStore),
-		userStore:         newUserStore(baseStore),
-		userSessionStore:  newUserSessionStore(baseStore),
-		apiKeyStore:       newAPIKeyStore(baseStore),
-		membershipStore:   newMembershipStore(baseStore),
-		contactInfoStore:  newContactInfoStore(baseStore),
-		invitationStore:   newInvitationStore(baseStore),
-		loginTokenStore:   newLoginTokenStore(baseStore),
-		oauthStore:        newOAuthStore(baseStore),
-		euiStore:          newEUIStore(baseStore),
-		entitySearch:      newEntitySearch(baseStore),
-		notificationStore: newNotificationStore(baseStore),
-	}
+	return &testStore{Store: store}
 }
 
 func TestApplicationStore(t *testing.T) {

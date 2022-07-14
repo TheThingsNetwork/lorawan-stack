@@ -26,10 +26,18 @@ import (
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/driver/pgdriver"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 )
 
-func newStore(ctx context.Context, db bun.IDB) (*baseStore, error) {
-	s := &baseStore{DB: db}
+type baseDB struct {
+	DB *bun.DB
+
+	server string
+	major  int
+}
+
+func newDB(ctx context.Context, db *bun.DB) (*baseDB, error) {
+	s := &baseDB{DB: db}
 
 	var version string
 	res, err := db.QueryContext(ctx, "SELECT VERSION()")
@@ -59,11 +67,40 @@ func newStore(ctx context.Context, db bun.IDB) (*baseStore, error) {
 	return s, nil
 }
 
+func (db *baseDB) baseStore() *baseStore {
+	return &baseStore{DB: db.DB, baseDB: db}
+}
+
 type baseStore struct {
 	DB bun.IDB
+	*baseDB
+}
 
-	server string
-	major  int
+func (s *baseStore) transact(ctx context.Context, fc func(context.Context, bun.IDB) error) error {
+	db, ok := s.DB.(*bun.DB)
+	if !ok { // Probably already in a transaction, just call the func.
+		return fc(ctx, s.DB)
+	}
+	tx, err := db.BeginTx(ctx, &sql.TxOptions{})
+	if err != nil {
+		return wrapDriverError(err)
+	}
+	var done bool
+	defer func() {
+		if !done {
+			tx.Rollback() //nolint:errcheck
+		}
+	}()
+	err = fc(ctx, tx)
+	if err != nil {
+		return err
+	}
+	done = true
+	err = tx.Commit()
+	if err != nil {
+		return wrapDriverError(err)
+	}
+	return nil
 }
 
 var (
@@ -125,29 +162,67 @@ func wrapDriverError(err error) error {
 	return err
 }
 
-func (s *baseStore) transact(ctx context.Context, fc func(context.Context, bun.IDB) error) error {
-	db, ok := s.DB.(*bun.DB)
-	if !ok { // Probably already in a transaction, just call the func.
-		return fc(ctx, s.DB)
+func newStore(baseStore *baseStore) *Store {
+	return &Store{
+		baseStore: baseStore,
+
+		applicationStore:  newApplicationStore(baseStore),
+		clientStore:       newClientStore(baseStore),
+		endDeviceStore:    newEndDeviceStore(baseStore),
+		gatewayStore:      newGatewayStore(baseStore),
+		organizationStore: newOrganizationStore(baseStore),
+		userStore:         newUserStore(baseStore),
+		userSessionStore:  newUserSessionStore(baseStore),
+		apiKeyStore:       newAPIKeyStore(baseStore),
+		membershipStore:   newMembershipStore(baseStore),
+		contactInfoStore:  newContactInfoStore(baseStore),
+		invitationStore:   newInvitationStore(baseStore),
+		loginTokenStore:   newLoginTokenStore(baseStore),
+		oauthStore:        newOAuthStore(baseStore),
+		euiStore:          newEUIStore(baseStore),
+		entitySearch:      newEntitySearch(baseStore),
+		notificationStore: newNotificationStore(baseStore),
 	}
-	tx, err := db.BeginTx(ctx, &sql.TxOptions{})
+}
+
+// NewStore returns a new store that implements store.TransactionalStore.
+func NewStore(ctx context.Context, db *bun.DB) (*Store, error) {
+	baseDB, err := newDB(ctx, db)
 	if err != nil {
-		return wrapDriverError(err)
+		return nil, err
 	}
-	var done bool
-	defer func() {
-		if !done {
-			tx.Rollback() //nolint:errcheck
-		}
-	}()
-	err = fc(ctx, tx)
-	if err != nil {
-		return err
-	}
-	done = true
-	err = tx.Commit()
-	if err != nil {
-		return wrapDriverError(err)
-	}
-	return nil
+	return newStore(baseDB.baseStore()), nil
+}
+
+type Store struct {
+	TxOptions sql.TxOptions
+
+	*baseStore
+
+	*applicationStore
+	*clientStore
+	*endDeviceStore
+	*gatewayStore
+	*organizationStore
+	*userStore
+	*userSessionStore
+	*apiKeyStore
+	*membershipStore
+	*contactInfoStore
+	*invitationStore
+	*loginTokenStore
+	*oauthStore
+	*euiStore
+	*entitySearch
+	*notificationStore
+}
+
+// Transact implements the store.TransactionalStore interface.
+func (s *Store) Transact(ctx context.Context, fc func(context.Context, store.Store) error) (err error) {
+	return s.baseStore.transact(ctx, func(ctx context.Context, idb bun.IDB) error {
+		baseStore := s.baseDB.baseStore()
+		baseStore.DB = idb
+
+		return fc(ctx, newStore(baseStore))
+	})
 }
