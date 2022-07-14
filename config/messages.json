@@ -5066,6 +5066,159 @@
       "file": "blocklist.go"
     }
   },
+  "error:pkg/identityserver/bunstore:already_exists": {
+    "translations": {
+      "en": "already exists"
+    },
+    "description": {
+      "package": "pkg/identityserver/bunstore",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/bunstore:application_dev_eui_limit_reached": {
+    "translations": {
+      "en": "application issued DevEUI limit ({dev_eui_limit}) reached"
+    },
+    "description": {
+      "package": "pkg/identityserver/bunstore",
+      "file": "eui_store.go"
+    }
+  },
+  "error:pkg/identityserver/bunstore:database_unavailable": {
+    "translations": {
+      "en": "database unavailable"
+    },
+    "description": {
+      "package": "pkg/identityserver/bunstore",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/bunstore:driver": {
+    "translations": {
+      "en": "driver error"
+    },
+    "description": {
+      "package": "pkg/identityserver/bunstore",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/bunstore:invitation_already_accepted": {
+    "translations": {
+      "en": "invitation already accepted"
+    },
+    "description": {
+      "package": "pkg/identityserver/bunstore",
+      "file": "invitation_store.go"
+    }
+  },
+  "error:pkg/identityserver/bunstore:invitation_already_sent": {
+    "translations": {
+      "en": "invitation already sent"
+    },
+    "description": {
+      "package": "pkg/identityserver/bunstore",
+      "file": "invitation_store.go"
+    }
+  },
+  "error:pkg/identityserver/bunstore:invitation_expired": {
+    "translations": {
+      "en": "invitation expired"
+    },
+    "description": {
+      "package": "pkg/identityserver/bunstore",
+      "file": "invitation_store.go"
+    }
+  },
+  "error:pkg/identityserver/bunstore:login_token_already_used": {
+    "translations": {
+      "en": "login token already used"
+    },
+    "description": {
+      "package": "pkg/identityserver/bunstore",
+      "file": "login_token_store.go"
+    }
+  },
+  "error:pkg/identityserver/bunstore:login_token_expired": {
+    "translations": {
+      "en": "login token expired"
+    },
+    "description": {
+      "package": "pkg/identityserver/bunstore",
+      "file": "login_token_store.go"
+    }
+  },
+  "error:pkg/identityserver/bunstore:login_token_not_found": {
+    "translations": {
+      "en": "login token not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/bunstore",
+      "file": "login_token_store.go"
+    }
+  },
+  "error:pkg/identityserver/bunstore:no_eui_or_block_available": {
+    "translations": {
+      "en": "no EUI or EUI block available"
+    },
+    "description": {
+      "package": "pkg/identityserver/bunstore",
+      "file": "eui_store.go"
+    }
+  },
+  "error:pkg/identityserver/bunstore:not_found": {
+    "translations": {
+      "en": "no results found"
+    },
+    "description": {
+      "package": "pkg/identityserver/bunstore",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/bunstore:query_canceled": {
+    "translations": {
+      "en": "query canceled"
+    },
+    "description": {
+      "package": "pkg/identityserver/bunstore",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/bunstore:validation_already_exists": {
+    "translations": {
+      "en": "contact info validation already exists"
+    },
+    "description": {
+      "package": "pkg/identityserver/bunstore",
+      "file": "contact_info_store.go"
+    }
+  },
+  "error:pkg/identityserver/bunstore:validation_token": {
+    "translations": {
+      "en": "validation token not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/bunstore",
+      "file": "contact_info_store.go"
+    }
+  },
+  "error:pkg/identityserver/bunstore:validation_token_expired": {
+    "translations": {
+      "en": "validation token expired"
+    },
+    "description": {
+      "package": "pkg/identityserver/bunstore",
+      "file": "contact_info_store.go"
+    }
+  },
+  "error:pkg/identityserver/bunstore:validation_token_used": {
+    "translations": {
+      "en": "validation token already used"
+    },
+    "description": {
+      "package": "pkg/identityserver/bunstore",
+      "file": "contact_info_store.go"
+    }
+  },
   "error:pkg/identityserver/gormstore:access_token_not_found": {
     "translations": {
       "en": "access token `{access_token_id}` not found"
