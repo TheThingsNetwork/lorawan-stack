@@ -197,18 +197,26 @@ func convertUplink(rx RxPacket, md UpstreamMetadata) (ttnpb.UplinkMessage, error
 		}
 	}
 
-	var goTime time.Time
+	var goTime, goGpsTime time.Time
 	switch {
 	case rx.Tmms != nil:
-		goTime = gpstime.Parse(time.Duration(*rx.Tmms) * time.Millisecond)
+		goGpsTime = gpstime.Parse(time.Duration(*rx.Tmms) * time.Millisecond)
+		goTime = goGpsTime
 	case rx.Time != nil:
 		goTime = time.Time(*rx.Time)
 	}
 	if !goTime.IsZero() {
+		protoTime := ttnpb.ProtoTimePtr(goTime)
 		for _, md := range up.RxMetadata {
-			md.Time = ttnpb.ProtoTimePtr(goTime)
+			md.Time = protoTime
 		}
-		up.Settings.Time = ttnpb.ProtoTimePtr(goTime)
+		up.Settings.Time = protoTime
+	}
+	if !goGpsTime.IsZero() {
+		protoTime := ttnpb.ProtoTimePtr(goGpsTime)
+		for _, md := range up.RxMetadata {
+			md.GpsTime = protoTime
+		}
 	}
 
 	switch up.Settings.DataRate.Modulation.(type) {

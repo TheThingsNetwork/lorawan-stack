@@ -80,15 +80,15 @@ func fromPBDataRate(dataRate *packetbroker.DataRate) (dr *ttnpb.DataRate, coding
 	// TODO: Support LR-FHSS (https://github.com/TheThingsNetwork/lorawan-stack/issues/3806)
 	// TODO: Set coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466)
 	// case *packetbroker.DataRate_Lrfhss:
-	// 	return &ttnpb.DataRate{
-	// 		Modulation: &ttnpb.DataRate_Lrfhss{
-	// 			Lrfhss: &ttnpb.LRFHSSDataRate{
-	// 				ModulationType:        mod.Lrfhss.ModulationType,
-	// 				OperatingChannelWidth: mod.Lrfhss.OperatingChannelWidth,
-	//  			CodingRate:            mod.Lrfhss.CodingRate,
-	// 			},
-	// 		},
-	// 	}, mod.Lrfhss.CodingRate, true
+	//	return &ttnpb.DataRate{
+	//		Modulation: &ttnpb.DataRate_Lrfhss{
+	//			Lrfhss: &ttnpb.LRFHSSDataRate{
+	//				ModulationType:        mod.Lrfhss.ModulationType,
+	//				OperatingChannelWidth: mod.Lrfhss.OperatingChannelWidth,
+	//				CodingRate:            mod.Lrfhss.CodingRate,
+	//			},
+	//		},
+	//	}, mod.Lrfhss.CodingRate, true
 	default:
 		return nil, "", false
 	}
@@ -121,15 +121,15 @@ func toPBDataRate(dataRate *ttnpb.DataRate, codingRate string) (*packetbroker.Da
 	// TODO: Support LR-FHSS (https://github.com/TheThingsNetwork/lorawan-stack/issues/3806)
 	// TODO: Get coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466)
 	// case *ttnpb.DataRate_Lrfhss:
-	// 	return &packetbroker.DataRate{
-	// 		Modulation: &packetbroker.DataRate_Lrfhss{
-	// 			Lrfhss: &packetbroker.LRFHSSDataRate{
-	// 				ModulationType:        mod.Lrfhss.ModulationType,
-	// 				OperatingChannelWidth: mod.Lrfhss.OperatingChannelWidth,
-	// 				CodingRate:            mod.Lrfhss.CodingRate,
-	// 			},
-	// 		},
-	// 	}, true
+	//	return &packetbroker.DataRate{
+	//		Modulation: &packetbroker.DataRate_Lrfhss{
+	//			Lrfhss: &packetbroker.LRFHSSDataRate{
+	//				ModulationType:        mod.Lrfhss.ModulationType,
+	//				OperatingChannelWidth: mod.Lrfhss.OperatingChannelWidth,
+	//				CodingRate:            mod.Lrfhss.CodingRate,
+	//			},
+	//		},
+	//	}, true
 	default:
 		return nil, false
 	}
@@ -373,11 +373,17 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 				localization.Antennas = append(localization.Antennas, locAnt)
 			}
 
-			if md.Time != nil {
-				t := ttnpb.StdTime(md.Time)
-				if gatewayReceiveTime == nil || t.Before(*gatewayReceiveTime) {
-					gatewayReceiveTime = t
-				}
+			var t *time.Time
+			switch {
+			case md.GpsTime != nil:
+				t = ttnpb.StdTime(md.GpsTime)
+			case md.Time != nil:
+				t = ttnpb.StdTime(md.Time)
+			default:
+				t = ttnpb.StdTime(md.ReceivedAt)
+			}
+			if gatewayReceiveTime == nil || t.Before(*gatewayReceiveTime) {
+				gatewayReceiveTime = t
 			}
 
 			if md.DownlinkPathConstraint == ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NEVER {
@@ -538,6 +544,7 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 					Location:               fromPBLocation(ant.Location),
 					DownlinkPathConstraint: downlinkPathConstraint,
 					UplinkToken:            uplinkToken,
+					ReceivedAt:             msg.Message.ForwarderReceiveTime,
 				})
 			}
 		}
@@ -558,6 +565,7 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 						Time:                   receiveTime,
 						DownlinkPathConstraint: downlinkPathConstraint,
 						UplinkToken:            uplinkToken,
+						ReceivedAt:             msg.Message.ForwarderReceiveTime,
 					}
 					up.RxMetadata = append(up.RxMetadata, md)
 				}

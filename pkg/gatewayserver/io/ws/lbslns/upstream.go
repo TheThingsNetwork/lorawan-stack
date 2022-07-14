@@ -214,10 +214,12 @@ func (req *JoinRequest) toUplinkMessage(ids *ttnpb.GatewayIdentifiers, bandID st
 
 	timestamp := TimestampFromXTime(req.RadioMetaData.UpInfo.XTime)
 	tm := TimePtrFromUpInfo(req.UpInfo.GPSTime, req.UpInfo.RxTime, receivedAt)
+	gpsTime := TimePtrFromGPSTime(req.UpInfo.GPSTime)
 	up.RxMetadata = []*ttnpb.RxMetadata{
 		{
 			GatewayIds:   ids,
 			Time:         ttnpb.ProtoTime(tm),
+			GpsTime:      ttnpb.ProtoTime(gpsTime),
 			Timestamp:    timestamp,
 			Rssi:         req.RadioMetaData.UpInfo.RSSI,
 			ChannelRssi:  req.RadioMetaData.UpInfo.RSSI,
