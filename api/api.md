@@ -7101,6 +7101,8 @@ a message corresponds to one RxMetadata.
 | `channel_index` | [`uint32`](#uint32) |  | Index of the gateway channel that received the message. |
 | `hopping_width` | [`uint32`](#uint32) |  | Hopping width; a number describing the number of steps of the LR-FHSS grid. |
 | `frequency_drift` | [`int32`](#int32) |  | Frequency drift in Hz between start and end of an LR-FHSS packet (signed). |
+| `gps_time` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | GPS sourced timestamp at the end of the transmission. |
+| `received_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Time when the service received the message. |
 | `advanced` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  | Advanced metadata fields - can be used for advanced information or experimental features that are not yet formally defined in the API - field names are written in snake_case |
 
 #### Field Rules

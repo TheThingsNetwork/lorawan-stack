@@ -161,6 +161,30 @@ func (m *RxMetadata) ValidateFields(paths ...string) error {
 			// no validation rules for HoppingWidth
 		case "frequency_drift":
 			// no validation rules for FrequencyDrift
+		case "gps_time":
+
+			if v, ok := interface{}(m.GetGpsTime()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return RxMetadataValidationError{
+						field:  "gps_time",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "received_at":
+
+			if v, ok := interface{}(m.GetReceivedAt()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return RxMetadataValidationError{
+						field:  "received_at",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		case "advanced":
 
 			if v, ok := interface{}(m.GetAdvanced()).(interface{ ValidateFields(...string) error }); ok {

@@ -72,12 +72,16 @@ message RxMetadata {
   uint32 hopping_width = 19;
   // Frequency drift in Hz between start and end of an LR-FHSS packet (signed).
   int32 frequency_drift = 20;
+  // GPS sourced timestamp at the end of the transmission.
+  google.protobuf.Timestamp gps_time = 21;
+  // Time when the service received the message.
+  google.protobuf.Timestamp received_at = 22;
   // Advanced metadata fields
   // - can be used for advanced information or experimental features that are not yet formally defined in the API
   // - field names are written in snake_case
   google.protobuf.Struct advanced = 99;
 
-  // next: 21
+  // next: 23
 }
 
 message Location {

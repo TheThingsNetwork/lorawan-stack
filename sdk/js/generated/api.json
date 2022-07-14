@@ -32405,6 +32405,30 @@
               "defaultValue": ""
             },
             {
+              "name": "gps_time",
+              "description": "GPS sourced timestamp at the end of the transmission.",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "received_at",
+              "description": "Time when the service received the message.",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
               "name": "advanced",
               "description": "Advanced metadata fields\n- can be used for advanced information or experimental features that are not yet formally defined in the API\n- field names are written in snake_case",
               "label": "",

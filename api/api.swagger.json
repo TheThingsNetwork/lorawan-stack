@@ -17112,6 +17112,16 @@
           "format": "int32",
           "description": "Frequency drift in Hz between start and end of an LR-FHSS packet (signed)."
         },
+        "gps_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "GPS sourced timestamp at the end of the transmission."
+        },
+        "received_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Time when the service received the message."
+        },
         "advanced": {
           "type": "object",
           "title": "Advanced metadata fields\n- can be used for advanced information or experimental features that are not yet formally defined in the API\n- field names are written in snake_case"

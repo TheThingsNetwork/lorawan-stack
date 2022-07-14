@@ -183,6 +183,24 @@ func (x *RxMetadata) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("frequency_drift")
 		s.WriteInt32(x.FrequencyDrift)
 	}
+	if x.GpsTime != nil || s.HasField("gps_time") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("gps_time")
+		if x.GpsTime == nil {
+			s.WriteNil()
+		} else {
+			gogo.MarshalTimestamp(s, x.GpsTime)
+		}
+	}
+	if x.ReceivedAt != nil || s.HasField("received_at") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("received_at")
+		if x.ReceivedAt == nil {
+			s.WriteNil()
+		} else {
+			gogo.MarshalTimestamp(s, x.ReceivedAt)
+		}
+	}
 	if x.Advanced != nil || s.HasField("advanced") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("advanced")
@@ -300,6 +318,28 @@ func (x *RxMetadata) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		case "frequency_drift", "frequencyDrift":
 			s.AddField("frequency_drift")
 			x.FrequencyDrift = s.ReadInt32()
+		case "gps_time", "gpsTime":
+			s.AddField("gps_time")
+			if s.ReadNil() {
+				x.GpsTime = nil
+				return
+			}
+			v := gogo.UnmarshalTimestamp(s)
+			if s.Err() != nil {
+				return
+			}
+			x.GpsTime = v
+		case "received_at", "receivedAt":
+			s.AddField("received_at")
+			if s.ReadNil() {
+				x.ReceivedAt = nil
+				return
+			}
+			v := gogo.UnmarshalTimestamp(s)
+			if s.Err() != nil {
+				return
+			}
+			x.ReceivedAt = v
 		case "advanced":
 			s.AddField("advanced")
 			if s.ReadNil() {
