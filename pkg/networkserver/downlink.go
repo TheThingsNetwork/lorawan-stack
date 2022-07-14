@@ -1074,22 +1074,13 @@ func toMACStateMHDr(mhdr *ttnpb.MHDR) *ttnpb.MACState_DownlinkMessage_Message_MH
 	}
 }
 
-func toMACStateFHDR(fhdr *ttnpb.FHDR) *ttnpb.MACState_DownlinkMessage_Message_MACPayload_FHDR {
-	if fhdr == nil {
-		return nil
-	}
-	return &ttnpb.MACState_DownlinkMessage_Message_MACPayload_FHDR{
-		FCnt: fhdr.FCnt,
-	}
-}
-
 func toMACStateMACPayload(macPayload *ttnpb.MACPayload) *ttnpb.MACState_DownlinkMessage_Message_MACPayload {
 	if macPayload == nil {
 		return nil
 	}
 	return &ttnpb.MACState_DownlinkMessage_Message_MACPayload{
-		FHdr:  toMACStateFHDR(macPayload.FHdr),
-		FPort: macPayload.FPort,
+		FPort:    macPayload.FPort,
+		FullFCnt: macPayload.FullFCnt,
 	}
 }
 
