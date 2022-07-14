@@ -4678,7 +4678,7 @@ Deployment configuration may specify if, and for how long after deletion, entiti
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `entries` | [`BatchGetGatewayConnectionStatsResponse.EntriesEntry`](#ttn.lorawan.v3.BatchGetGatewayConnectionStatsResponse.EntriesEntry) | repeated |  |
+| `entries` | [`BatchGetGatewayConnectionStatsResponse.EntriesEntry`](#ttn.lorawan.v3.BatchGetGatewayConnectionStatsResponse.EntriesEntry) | repeated | The map key is the gateway identifier. |
 
 ### <a name="ttn.lorawan.v3.BatchGetGatewayConnectionStatsResponse.EntriesEntry">Message `BatchGetGatewayConnectionStatsResponse.EntriesEntry`</a>
 

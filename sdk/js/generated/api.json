@@ -21098,7 +21098,7 @@
           "fields": [
             {
               "name": "entries",
-              "description": "",
+              "description": "The map key is the gateway identifier.",
               "label": "repeated",
               "type": "EntriesEntry",
               "longType": "BatchGetGatewayConnectionStatsResponse.EntriesEntry",

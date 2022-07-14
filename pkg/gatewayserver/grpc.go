@@ -99,7 +99,7 @@ func (gs *GatewayServer) BatchGetGatewayConnectionStats(
 			}
 			st = selected
 		}
-		entries[uid] = st
+		entries[id.GatewayId] = st
 	}
 	return &ttnpb.BatchGetGatewayConnectionStatsResponse{
 		Entries: entries,

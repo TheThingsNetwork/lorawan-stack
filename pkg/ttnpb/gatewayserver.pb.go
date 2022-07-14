@@ -284,6 +284,7 @@ func (m *BatchGetGatewayConnectionStatsRequest) GetFieldMask() *types.FieldMask 
 }
 
 type BatchGetGatewayConnectionStatsResponse struct {
+	// The map key is the gateway identifier.
 	Entries              map[string]*GatewayConnectionStats `protobuf:"bytes,1,rep,name=entries,proto3" json:"entries,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	XXX_NoUnkeyedLiteral struct{}                           `json:"-"`
 	XXX_unrecognized     []byte                             `json:"-"`

@@ -138,7 +138,7 @@ func (r *GatewayConnectionStatsRegistry) BatchGet(
 			// The result of MGet is in the same order as the input keys passed to it.
 			// MGet inserts "nil" values for keys that don't have values, thereby maintaining the order.
 			// So we can use the index of the result to correlate the gateway IDs.
-			ret[unique.ID(ctx, ids[i])] = stats
+			ret[ids[i].GatewayId] = stats
 		default:
 			log.FromContext(ctx).WithField("element", val).Warn("Invalid element in stats payloads")
 			continue

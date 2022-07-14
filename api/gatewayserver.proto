@@ -105,6 +105,7 @@ message BatchGetGatewayConnectionStatsRequest {
 }
 
 message BatchGetGatewayConnectionStatsResponse {
+  // The map key is the gateway identifier.
   map<string,GatewayConnectionStats> entries = 1;
 }
 

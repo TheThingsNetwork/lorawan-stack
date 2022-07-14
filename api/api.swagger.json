@@ -14384,7 +14384,8 @@
           "type": "object",
           "additionalProperties": {
             "$ref": "#/definitions/v3GatewayConnectionStats"
-          }
+          },
+          "description": "The map key is the gateway identifier."
         }
       }
     },
