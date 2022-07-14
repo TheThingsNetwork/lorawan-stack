@@ -78,6 +78,7 @@ message UplinkMessage {
 
   bytes raw_payload = 1;
   Message payload = 2;
+  reserved 3; // end_device_ids (obsolete).
   TxSettings settings = 4 [(validate.rules).message.required = true];
   repeated RxMetadata rx_metadata = 5;
   // Server time when a component received the message.

@@ -391,7 +391,7 @@ func (MACStateOptionNamespace) WithRxWindowsAvailable(v bool) MACStateOption {
 }
 
 // WithRecentUplinks returns a MACStateOption, which returns a copy of ttnpb.MACState with RecentUplinks set to vs.
-func (MACStateOptionNamespace) WithRecentUplinks(vs ...*ttnpb.UplinkMessage) MACStateOption {
+func (MACStateOptionNamespace) WithRecentUplinks(vs ...*ttnpb.MACState_UplinkMessage) MACStateOption {
 	return func(x ttnpb.MACState) ttnpb.MACState {
 		x.RecentUplinks = vs
 		return x

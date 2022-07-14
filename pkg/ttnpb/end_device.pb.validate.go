@@ -4709,6 +4709,177 @@ var _ interface {
 	ErrorName() string
 } = MACState_JoinAcceptValidationError{}
 
+// ValidateFields checks the field values on MACState_UplinkMessage with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *MACState_UplinkMessage) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = MACState_UplinkMessageFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "payload":
+
+			if m.GetPayload() == nil {
+				return MACState_UplinkMessageValidationError{
+					field:  "payload",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetPayload()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACState_UplinkMessageValidationError{
+						field:  "payload",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "settings":
+
+			if m.GetSettings() == nil {
+				return MACState_UplinkMessageValidationError{
+					field:  "settings",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetSettings()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACState_UplinkMessageValidationError{
+						field:  "settings",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "rx_metadata":
+
+			for idx, item := range m.GetRxMetadata() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return MACState_UplinkMessageValidationError{
+							field:  fmt.Sprintf("rx_metadata[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		case "received_at":
+
+			if v, ok := interface{}(m.GetReceivedAt()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACState_UplinkMessageValidationError{
+						field:  "received_at",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "correlation_ids":
+
+			for idx, item := range m.GetCorrelationIds() {
+				_, _ = idx, item
+
+				if utf8.RuneCountInString(item) > 100 {
+					return MACState_UplinkMessageValidationError{
+						field:  fmt.Sprintf("correlation_ids[%v]", idx),
+						reason: "value length must be at most 100 runes",
+					}
+				}
+
+			}
+
+		case "device_channel_index":
+
+			if m.GetDeviceChannelIndex() > 255 {
+				return MACState_UplinkMessageValidationError{
+					field:  "device_channel_index",
+					reason: "value must be less than or equal to 255",
+				}
+			}
+
+		default:
+			return MACState_UplinkMessageValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// MACState_UplinkMessageValidationError is the validation error returned by
+// MACState_UplinkMessage.ValidateFields if the designated constraints aren't met.
+type MACState_UplinkMessageValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MACState_UplinkMessageValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MACState_UplinkMessageValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MACState_UplinkMessageValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MACState_UplinkMessageValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MACState_UplinkMessageValidationError) ErrorName() string {
+	return "MACState_UplinkMessageValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MACState_UplinkMessageValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMACState_UplinkMessage.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MACState_UplinkMessageValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MACState_UplinkMessageValidationError{}
+
 // ValidateFields checks the field values on MACState_DataRateRange with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -4912,6 +5083,312 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = MACState_DataRateRangesValidationError{}
+
+// ValidateFields checks the field values on MACState_UplinkMessage_TxSettings
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *MACState_UplinkMessage_TxSettings) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = MACState_UplinkMessage_TxSettingsFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "data_rate":
+
+			if m.GetDataRate() == nil {
+				return MACState_UplinkMessage_TxSettingsValidationError{
+					field:  "data_rate",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetDataRate()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACState_UplinkMessage_TxSettingsValidationError{
+						field:  "data_rate",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return MACState_UplinkMessage_TxSettingsValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// MACState_UplinkMessage_TxSettingsValidationError is the validation error
+// returned by MACState_UplinkMessage_TxSettings.ValidateFields if the
+// designated constraints aren't met.
+type MACState_UplinkMessage_TxSettingsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MACState_UplinkMessage_TxSettingsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MACState_UplinkMessage_TxSettingsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MACState_UplinkMessage_TxSettingsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MACState_UplinkMessage_TxSettingsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MACState_UplinkMessage_TxSettingsValidationError) ErrorName() string {
+	return "MACState_UplinkMessage_TxSettingsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MACState_UplinkMessage_TxSettingsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMACState_UplinkMessage_TxSettings.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MACState_UplinkMessage_TxSettingsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MACState_UplinkMessage_TxSettingsValidationError{}
+
+// ValidateFields checks the field values on MACState_UplinkMessage_RxMetadata
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *MACState_UplinkMessage_RxMetadata) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = MACState_UplinkMessage_RxMetadataFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "gateway_ids":
+
+			if m.GetGatewayIds() == nil {
+				return MACState_UplinkMessage_RxMetadataValidationError{
+					field:  "gateway_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetGatewayIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACState_UplinkMessage_RxMetadataValidationError{
+						field:  "gateway_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "channel_rssi":
+			// no validation rules for ChannelRssi
+		case "snr":
+			// no validation rules for Snr
+		case "downlink_path_constraint":
+
+			if _, ok := DownlinkPathConstraint_name[int32(m.GetDownlinkPathConstraint())]; !ok {
+				return MACState_UplinkMessage_RxMetadataValidationError{
+					field:  "downlink_path_constraint",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
+		case "uplink_token":
+			// no validation rules for UplinkToken
+		case "packet_broker":
+
+			if v, ok := interface{}(m.GetPacketBroker()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACState_UplinkMessage_RxMetadataValidationError{
+						field:  "packet_broker",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return MACState_UplinkMessage_RxMetadataValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// MACState_UplinkMessage_RxMetadataValidationError is the validation error
+// returned by MACState_UplinkMessage_RxMetadata.ValidateFields if the
+// designated constraints aren't met.
+type MACState_UplinkMessage_RxMetadataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MACState_UplinkMessage_RxMetadataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MACState_UplinkMessage_RxMetadataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MACState_UplinkMessage_RxMetadataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MACState_UplinkMessage_RxMetadataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MACState_UplinkMessage_RxMetadataValidationError) ErrorName() string {
+	return "MACState_UplinkMessage_RxMetadataValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MACState_UplinkMessage_RxMetadataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMACState_UplinkMessage_RxMetadata.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MACState_UplinkMessage_RxMetadataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MACState_UplinkMessage_RxMetadataValidationError{}
+
+// ValidateFields checks the field values on
+// MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata) ValidateFields(paths ...string) error {
+	if len(paths) > 0 {
+		return fmt.Errorf("message MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata has no fields, but paths %s were specified", paths)
+	}
+	return nil
+}
+
+// MACState_UplinkMessage_RxMetadata_PacketBrokerMetadataValidationError is the
+// validation error returned by
+// MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata.ValidateFields if
+// the designated constraints aren't met.
+type MACState_UplinkMessage_RxMetadata_PacketBrokerMetadataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MACState_UplinkMessage_RxMetadata_PacketBrokerMetadataValidationError) Field() string {
+	return e.field
+}
+
+// Reason function returns reason value.
+func (e MACState_UplinkMessage_RxMetadata_PacketBrokerMetadataValidationError) Reason() string {
+	return e.reason
+}
+
+// Cause function returns cause value.
+func (e MACState_UplinkMessage_RxMetadata_PacketBrokerMetadataValidationError) Cause() error {
+	return e.cause
+}
+
+// Key function returns key value.
+func (e MACState_UplinkMessage_RxMetadata_PacketBrokerMetadataValidationError) Key() bool {
+	return e.key
+}
+
+// ErrorName returns error name.
+func (e MACState_UplinkMessage_RxMetadata_PacketBrokerMetadataValidationError) ErrorName() string {
+	return "MACState_UplinkMessage_RxMetadata_PacketBrokerMetadataValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MACState_UplinkMessage_RxMetadata_PacketBrokerMetadataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMACState_UplinkMessage_RxMetadata_PacketBrokerMetadata.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MACState_UplinkMessage_RxMetadata_PacketBrokerMetadataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MACState_UplinkMessage_RxMetadata_PacketBrokerMetadataValidationError{}
 
 // ValidateFields checks the field values on
 // BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate with the rules

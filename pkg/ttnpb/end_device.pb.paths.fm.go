@@ -3171,6 +3171,78 @@ var MACState_JoinAcceptFieldPathsTopLevel = []string{
 	"payload",
 	"request",
 }
+var MACState_UplinkMessageFieldPathsNested = []string{
+	"correlation_ids",
+	"device_channel_index",
+	"payload",
+	"payload.Payload",
+	"payload.Payload.join_accept_payload",
+	"payload.Payload.join_accept_payload.cf_list",
+	"payload.Payload.join_accept_payload.cf_list.ch_masks",
+	"payload.Payload.join_accept_payload.cf_list.freq",
+	"payload.Payload.join_accept_payload.cf_list.type",
+	"payload.Payload.join_accept_payload.dev_addr",
+	"payload.Payload.join_accept_payload.dl_settings",
+	"payload.Payload.join_accept_payload.dl_settings.opt_neg",
+	"payload.Payload.join_accept_payload.dl_settings.rx1_dr_offset",
+	"payload.Payload.join_accept_payload.dl_settings.rx2_dr",
+	"payload.Payload.join_accept_payload.encrypted",
+	"payload.Payload.join_accept_payload.join_nonce",
+	"payload.Payload.join_accept_payload.net_id",
+	"payload.Payload.join_accept_payload.rx_delay",
+	"payload.Payload.join_request_payload",
+	"payload.Payload.join_request_payload.dev_eui",
+	"payload.Payload.join_request_payload.dev_nonce",
+	"payload.Payload.join_request_payload.join_eui",
+	"payload.Payload.mac_payload",
+	"payload.Payload.mac_payload.decoded_payload",
+	"payload.Payload.mac_payload.f_hdr",
+	"payload.Payload.mac_payload.f_hdr.dev_addr",
+	"payload.Payload.mac_payload.f_hdr.f_cnt",
+	"payload.Payload.mac_payload.f_hdr.f_ctrl",
+	"payload.Payload.mac_payload.f_hdr.f_ctrl.ack",
+	"payload.Payload.mac_payload.f_hdr.f_ctrl.adr",
+	"payload.Payload.mac_payload.f_hdr.f_ctrl.adr_ack_req",
+	"payload.Payload.mac_payload.f_hdr.f_ctrl.class_b",
+	"payload.Payload.mac_payload.f_hdr.f_ctrl.f_pending",
+	"payload.Payload.mac_payload.f_hdr.f_opts",
+	"payload.Payload.mac_payload.f_port",
+	"payload.Payload.mac_payload.frm_payload",
+	"payload.Payload.mac_payload.full_f_cnt",
+	"payload.Payload.rejoin_request_payload",
+	"payload.Payload.rejoin_request_payload.dev_eui",
+	"payload.Payload.rejoin_request_payload.join_eui",
+	"payload.Payload.rejoin_request_payload.net_id",
+	"payload.Payload.rejoin_request_payload.rejoin_cnt",
+	"payload.Payload.rejoin_request_payload.rejoin_type",
+	"payload.m_hdr",
+	"payload.m_hdr.m_type",
+	"payload.m_hdr.major",
+	"payload.mic",
+	"received_at",
+	"rx_metadata",
+	"settings",
+	"settings.data_rate",
+	"settings.data_rate.modulation",
+	"settings.data_rate.modulation.fsk",
+	"settings.data_rate.modulation.fsk.bit_rate",
+	"settings.data_rate.modulation.lora",
+	"settings.data_rate.modulation.lora.bandwidth",
+	"settings.data_rate.modulation.lora.spreading_factor",
+	"settings.data_rate.modulation.lrfhss",
+	"settings.data_rate.modulation.lrfhss.coding_rate",
+	"settings.data_rate.modulation.lrfhss.modulation_type",
+	"settings.data_rate.modulation.lrfhss.operating_channel_width",
+}
+
+var MACState_UplinkMessageFieldPathsTopLevel = []string{
+	"correlation_ids",
+	"device_channel_index",
+	"payload",
+	"received_at",
+	"rx_metadata",
+	"settings",
+}
 var MACState_DataRateRangeFieldPathsNested = []string{
 	"max_data_rate_index",
 	"min_data_rate_index",
@@ -3187,6 +3259,44 @@ var MACState_DataRateRangesFieldPathsNested = []string{
 var MACState_DataRateRangesFieldPathsTopLevel = []string{
 	"ranges",
 }
+var MACState_UplinkMessage_TxSettingsFieldPathsNested = []string{
+	"data_rate",
+	"data_rate.modulation",
+	"data_rate.modulation.fsk",
+	"data_rate.modulation.fsk.bit_rate",
+	"data_rate.modulation.lora",
+	"data_rate.modulation.lora.bandwidth",
+	"data_rate.modulation.lora.spreading_factor",
+	"data_rate.modulation.lrfhss",
+	"data_rate.modulation.lrfhss.coding_rate",
+	"data_rate.modulation.lrfhss.modulation_type",
+	"data_rate.modulation.lrfhss.operating_channel_width",
+}
+
+var MACState_UplinkMessage_TxSettingsFieldPathsTopLevel = []string{
+	"data_rate",
+}
+var MACState_UplinkMessage_RxMetadataFieldPathsNested = []string{
+	"channel_rssi",
+	"downlink_path_constraint",
+	"gateway_ids",
+	"gateway_ids.eui",
+	"gateway_ids.gateway_id",
+	"packet_broker",
+	"snr",
+	"uplink_token",
+}
+
+var MACState_UplinkMessage_RxMetadataFieldPathsTopLevel = []string{
+	"channel_rssi",
+	"downlink_path_constraint",
+	"gateway_ids",
+	"packet_broker",
+	"snr",
+	"uplink_token",
+}
+var MACState_UplinkMessage_RxMetadata_PacketBrokerMetadataFieldPathsNested []string
+var MACState_UplinkMessage_RxMetadata_PacketBrokerMetadataFieldPathsTopLevel []string
 var BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdateFieldPathsNested = []string{
 	"ids",
 	"ids.application_ids",

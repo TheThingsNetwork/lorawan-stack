@@ -23,6 +23,7 @@ import "google/protobuf/field_mask.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
+import "lorawan-stack/api/enums.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/keys.proto";
 import "lorawan-stack/api/lorawan.proto";
@@ -429,6 +430,67 @@ message MACState {
   // Set to true every time an uplink is received.
   // Set to false every time a successful downlink scheduling attempt is made.
   bool rx_windows_available = 13;
+
+  // A minimal UplinkMessage definition which is binary compatible with the top level UplinkMessage message.
+  // Used for type safe recent uplink storage.
+  message UplinkMessage {
+    reserved 1; // raw_payload
+    Message payload = 2 [(validate.rules).message.required = true];
+    reserved 3; // end_device_ids
+    message TxSettings {
+      DataRate data_rate = 1 [(validate.rules).message.required = true];
+      reserved 2; // data_rate_index
+      reserved 3; // coding_Rate
+      reserved 4; // frequency
+      reserved 5; // enable_crc
+      reserved 6; // timestamp
+      reserved 7; // time
+      reserved 8; // downlink
+      reserved 9; // concentrator_timestamp
+    }
+    TxSettings settings = 4 [(validate.rules).message.required = true];
+    message RxMetadata {
+      GatewayIdentifiers gateway_ids = 1 [(validate.rules).message.required = true];
+      reserved 2; // antenna_index
+      reserved 3; // time
+      reserved 4; // timestamp
+      reserved 5; // fine_timestamp
+      reserved 6; // encrypted_fine_timestamp
+      reserved 7; // encrypted_fine_timestamp_key_id
+      reserved 8; // rssi
+      float channel_rssi = 9;
+      reserved 10; // rssi_standard_deviation
+      float snr = 11;
+      reserved 12; // frequency_offset
+      reserved 13; // location
+      DownlinkPathConstraint downlink_path_constraint = 14 [(validate.rules).enum.defined_only = true];
+      bytes uplink_token = 15;
+      reserved 16; // signal_rssi
+      reserved 17; // channel_index
+      message PacketBrokerMetadata {
+        reserved 1; // message_id
+        reserved 2; // forwarder_net_id
+        reserved 3; // forwarder_tenant_id
+        reserved 4; // forwarder_cluster_id
+        reserved 5; // forwarder_gateway_eui
+        reserved 6; // home_network_tenant_id
+        reserved 7; // hops
+        reserved 8; // home_network_cluster_id
+        reserved 9; // forwarder_gateway_eui
+        reserved 10; // forwarder_gateway_id
+      }
+      PacketBrokerMetadata packet_broker = 18;
+      reserved 19; // hopping_width
+      reserved 20; // frequency_drift
+      reserved 99; // advanced
+    }
+    repeated RxMetadata rx_metadata = 5;
+    google.protobuf.Timestamp received_at = 6;
+    repeated string correlation_ids = 7 [(validate.rules).repeated.items.string.max_len = 100];
+    reserved 8; // gateway_channel_index
+    uint32 device_channel_index = 9 [(validate.rules).uint32 = {lte: 255}];
+    reserved 10; // consumed_airtime
+  }
 
   // Recent data uplink messages sorted by time.
   // The number of messages stored may depend on configuration.
