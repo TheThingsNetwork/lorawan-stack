@@ -96,11 +96,11 @@ func (ps *PubSubStore) loadEventData(ctx context.Context, evts ...*ttnpb.Event) 
 			continue // Event data deleted/expired.
 		case string:
 			if err = decodeEventData(b, evts[i]); err != nil {
-				log.FromContext(ctx).WithError(err).Warnf("Failed to decode event payload")
+				log.FromContext(ctx).WithError(err).Warn("Failed to decode event payload")
 				continue
 			}
 		default:
-			log.FromContext(ctx).Warnf("Invalid %T element in event payloads", b)
+			log.FromContext(ctx).WithField("element", b).Warn("Invalid element in event payloads")
 			continue
 		}
 	}

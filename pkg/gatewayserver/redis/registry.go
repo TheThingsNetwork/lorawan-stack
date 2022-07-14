@@ -140,7 +140,7 @@ func (r *GatewayConnectionStatsRegistry) BatchGet(
 			// So we can use the index of the result to correlate the gateway IDs.
 			ret[unique.ID(ctx, ids[i])] = stats
 		default:
-			log.FromContext(ctx).Warnf("Invalid %T element in stats payloads", val)
+			log.FromContext(ctx).WithField("element", val).Warn("Invalid element in stats payloads")
 			continue
 		}
 	}
