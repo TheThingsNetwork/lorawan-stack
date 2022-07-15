@@ -110,7 +110,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		interopConf := conf.Interop.InteropClient
 		interopConf.BlobConfig = baseConf.Blob
 
-		interopCl, err = interop.NewClient(ctx, interopConf, c)
+		interopCl, err = interop.NewClient(ctx, interopConf, c, interop.SelectorApplicationServer)
 		if err != nil {
 			return nil, err
 		}

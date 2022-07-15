@@ -77,6 +77,7 @@ func makeServerCertificates() []tls.Certificate {
 
 func makeClientTLSConfig() *tls.Config {
 	return &tls.Config{
+		MinVersion:   tls.VersionTLS12,
 		Certificates: makeClientCertificates(),
 		RootCAs:      makeCertPool(),
 	}
@@ -84,6 +85,7 @@ func makeClientTLSConfig() *tls.Config {
 
 func makeServerTLSConfig() *tls.Config {
 	return &tls.Config{
+		MinVersion:   tls.VersionTLS12,
 		Certificates: makeServerCertificates(),
 		ClientAuth:   tls.VerifyClientCertIfGiven,
 		ClientCAs:    makeCertPool(),
@@ -127,7 +129,7 @@ func makePacketBrokerTokenIssuer(ctx context.Context, subject string) (iss strin
 	router := mux.NewRouter()
 	router.Handle("/.well-known/jwks.json", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(&jose.JSONWebKeySet{
+		json.NewEncoder(w).Encode(&jose.JSONWebKeySet{ //nolint:errcheck
 			Keys: []jose.JSONWebKey{publicJWK},
 		})
 	}))

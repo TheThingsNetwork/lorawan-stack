@@ -21,7 +21,7 @@ import (
 	ttnerrors "go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
-func writeError(w http.ResponseWriter, r *http.Request, header MessageHeader, err error) {
+func writeError(w http.ResponseWriter, _ *http.Request, header MessageHeader, err error) {
 	answerHeader, headerErr := header.AnswerHeader()
 	if headerErr != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -50,5 +50,5 @@ func writeError(w http.ResponseWriter, r *http.Request, header MessageHeader, er
 			Description: desc,
 		},
 	}
-	json.NewEncoder(w).Encode(msg)
+	json.NewEncoder(w).Encode(msg) //nolint:errcheck
 }

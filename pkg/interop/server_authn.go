@@ -38,7 +38,7 @@ type NetworkServerAuthInfo struct {
 func (n NetworkServerAuthInfo) addressPatterns() []string { return n.Addresses }
 
 // Require returns an error if the given NetID or NSID does not match.
-func (n NetworkServerAuthInfo) Require(netID types.NetID, nsID *EUI64) error {
+func (n NetworkServerAuthInfo) Require(netID types.NetID, _ *EUI64) error {
 	if !n.NetID.Equal(netID) {
 		return errUnauthenticated.New()
 	}
@@ -76,7 +76,9 @@ var asAuthInfoKey asAuthInfoKeyType
 
 // NewContextWithApplicationServerAuthInfo returns a derived context with the given authentication information of the
 // Application Server.
-func NewContextWithApplicationServerAuthInfo(parent context.Context, authInfo *ApplicationServerAuthInfo) context.Context {
+func NewContextWithApplicationServerAuthInfo(
+	parent context.Context, authInfo *ApplicationServerAuthInfo,
+) context.Context {
 	return context.WithValue(parent, asAuthInfoKey, authInfo)
 }
 
@@ -114,7 +116,7 @@ func (s *Server) authenticateNS(ctx context.Context, r *http.Request, data []byt
 		// Verify TLS client certificate.
 		func(ctx context.Context) (*NetworkServerAuthInfo, error) {
 			if r.TLS == nil || len(r.TLS.PeerCertificates) == 0 {
-				return nil, nil
+				return nil, nil //nolint:nilnil
 			}
 			addrs, err := s.verifySenderCertificate(ctx, types.NetID(header.SenderID).String(), r.TLS)
 			if err != nil {
@@ -130,18 +132,18 @@ func (s *Server) authenticateNS(ctx context.Context, r *http.Request, data []byt
 			logger := log.FromContext(ctx).WithField("authenticator", "packetbroker")
 			authz := strings.SplitN(r.Header.Get("Authorization"), " ", 2)
 			if len(authz) < 2 || strings.ToLower(authz[0]) != "bearer" {
-				return nil, nil
+				return nil, nil //nolint:nilnil
 			}
 			token, err := jwt.ParseSigned(authz[1])
 			if err != nil {
 				logger.WithError(err).Debug("Failed to parse token")
-				return nil, nil
+				return nil, nil //nolint:nilnil
 			}
 			var claims jwt.Claims
 			err = token.UnsafeClaimsWithoutVerification(&claims)
 			if err != nil {
 				logger.WithError(err).Debug("Failed to parse claims")
-				return nil, nil
+				return nil, nil //nolint:nilnil
 			}
 			if tokenVerifier, ok := s.tokenVerifiers[claims.Issuer]; ok {
 				authInfo, err := tokenVerifier.VerifyNetworkServer(ctx, token)
@@ -151,7 +153,7 @@ func (s *Server) authenticateNS(ctx context.Context, r *http.Request, data []byt
 				return authInfo, nil
 			}
 			logger.WithError(err).WithField("issuer", claims.Issuer).Debug("Unknown token issuer")
-			return nil, nil
+			return nil, nil //nolint:nilnil
 		},
 	} {
 		authInfo, err := authFunc(ctx)
@@ -191,7 +193,9 @@ func (s *Server) authenticateAS(ctx context.Context, r *http.Request, data []byt
 
 type senderAuthenticatorFunc func(ctx context.Context, r *http.Request, data []byte) (context.Context, error)
 
-func (f senderAuthenticatorFunc) Authenticate(ctx context.Context, r *http.Request, data []byte) (context.Context, error) {
+func (f senderAuthenticatorFunc) Authenticate(
+	ctx context.Context, r *http.Request, data []byte,
+) (context.Context, error) {
 	return f(ctx, r, data)
 }
 

@@ -81,7 +81,9 @@ const (
 	SenderClientCAsConfigurationName = "config.yml"
 )
 
-func fetchSenderClientCAs(ctx context.Context, conf config.InteropServer, httpClientProvider httpclient.Provider) (map[string][]*x509.Certificate, error) {
+func fetchSenderClientCAs( //nolint:gocyclo
+	ctx context.Context, conf config.InteropServer, httpClientProvider httpclient.Provider,
+) (map[string][]*x509.Certificate, error) {
 	decodeCerts := func(b []byte) (res []*x509.Certificate, err error) {
 		for len(b) > 0 {
 			var block *pem.Block

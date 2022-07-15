@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Component selector for Join Server interoperability configuration. This allows administrators to declare separate Network Server and Application Server configuration for the same JoinEUI ranges in the same interoperability configuration. See [documentation](https://www.thethingsindustries.com/docs/reference/interop-repository/).
+
 ### Changed
 
 - Deleted users are no longer included in primary email addresses uniqueness checks. This allows a user to create a new account which uses the email address of a deleted account.

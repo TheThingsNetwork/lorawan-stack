@@ -193,6 +193,7 @@ func (m MessageType) ToJoinServer() bool {
 // ResultCode is the result of an answer message.
 type ResultCode string
 
+// LoRaWAN Backend Interfaces 1.0 result codes.
 const (
 	ResultSuccess              ResultCode = "Success"
 	ResultNoAction             ResultCode = "NoAction"
@@ -360,7 +361,7 @@ func (k *KeyEnvelope) UnmarshalJSON(data []byte) error {
 // NetID is a LoRaWAN NetID.
 type NetID types.NetID
 
-// MarshalJSON marshals the NetID to text.
+// MarshalText marshals the NetID to text.
 func (n NetID) MarshalText() ([]byte, error) {
 	return Buffer(n[:]).MarshalText()
 }

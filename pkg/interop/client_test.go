@@ -32,20 +32,19 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-func TestGetAppSKey(t *testing.T) {
-	for _, tc := range []struct {
+func TestGetAppSKey(t *testing.T) { //nolint:paralleltest
+	for _, tc := range []struct { //nolint:paralleltest
 		Name              string
-		NewServer         func(*testing.T) *httptest.Server
+		NewServer         func(*assertions.Assertion) *httptest.Server
 		AsID              string
 		Request           *ttnpb.SessionKeyRequest
-		ResponseAssertion func(*testing.T, *ttnpb.AppSKeyResponse) bool
-		ErrorAssertion    func(*testing.T, error) bool
+		ResponseAssertion func(*assertions.Assertion, *ttnpb.AppSKeyResponse) bool
+		ErrorAssertion    func(*assertions.Assertion, error) bool
 	}{
 		{
 			Name: "Backend Interfaces 1.0/UnknownDevEUI",
-			NewServer: func(t *testing.T) *httptest.Server {
+			NewServer: func(a *assertions.Assertion) *httptest.Server {
 				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					a := assertions.New(t)
 					a.So(r.Method, should.Equal, http.MethodPost)
 					b := test.Must(io.ReadAll(r.Body)).([]byte)
 					var req map[string]interface{}
@@ -75,20 +74,20 @@ func TestGetAppSKey(t *testing.T) {
 			Request: &ttnpb.SessionKeyRequest{
 				JoinEui:      types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00}.Bytes(),
 				DevEui:       types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}.Bytes(),
-				SessionKeyId: []byte{0x01, 0x6b, 0xfa, 0x7b, 0xad, 0x47, 0x56, 0x34, 0x6a, 0x67, 0x49, 0x81, 0xe7, 0x5c, 0xdb, 0xdc},
+				SessionKeyId: []byte{0x01, 0x6b, 0xfa, 0x7b, 0xad, 0x47, 0x56, 0x34, 0x6a, 0x67, 0x49, 0x81, 0xe7, 0x5c, 0xdb, 0xdc}, //nolint:lll
 			},
-			ResponseAssertion: func(t *testing.T, resp *ttnpb.AppSKeyResponse) bool {
-				return assertions.New(t).So(resp, should.BeNil)
+			ResponseAssertion: func(a *assertions.Assertion, resp *ttnpb.AppSKeyResponse) bool {
+				return a.So(resp, should.BeNil)
 			},
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, ErrUnknownDevEUI)
+			ErrorAssertion: func(a *assertions.Assertion, err error) bool {
+				return a.So(err, should.HaveSameErrorDefinitionAs, ErrUnknownDevEUI)
 			},
 		},
 		{
 			Name: "Backend Interfaces 1.1/UnknownDevEUI",
-			NewServer: func(t *testing.T) *httptest.Server {
+			NewServer: func(a *assertions.Assertion) *httptest.Server {
 				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					a := assertions.New(t)
+					a := a
 					a.So(r.Method, should.Equal, http.MethodPost)
 					b := test.Must(io.ReadAll(r.Body)).([]byte)
 					var req map[string]interface{}
@@ -118,20 +117,20 @@ func TestGetAppSKey(t *testing.T) {
 			Request: &ttnpb.SessionKeyRequest{
 				JoinEui:      types.EUI64{0xec, 0x65, 0x6e, 0x00, 0x00, 0x00, 0x00, 0x00}.Bytes(),
 				DevEui:       types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}.Bytes(),
-				SessionKeyId: []byte{0x01, 0x6b, 0xfa, 0x7b, 0xad, 0x47, 0x56, 0x34, 0x6a, 0x67, 0x49, 0x81, 0xe7, 0x5c, 0xdb, 0xdc},
+				SessionKeyId: []byte{0x01, 0x6b, 0xfa, 0x7b, 0xad, 0x47, 0x56, 0x34, 0x6a, 0x67, 0x49, 0x81, 0xe7, 0x5c, 0xdb, 0xdc}, //nolint:lll
 			},
-			ResponseAssertion: func(t *testing.T, resp *ttnpb.AppSKeyResponse) bool {
-				return assertions.New(t).So(resp, should.BeNil)
+			ResponseAssertion: func(a *assertions.Assertion, resp *ttnpb.AppSKeyResponse) bool {
+				return a.So(resp, should.BeNil)
 			},
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, ErrUnknownDevEUI)
+			ErrorAssertion: func(a *assertions.Assertion, err error) bool {
+				return a.So(err, should.HaveSameErrorDefinitionAs, ErrUnknownDevEUI)
 			},
 		},
 		{
 			Name: "Backend Interfaces 1.0/Success",
-			NewServer: func(t *testing.T) *httptest.Server {
+			NewServer: func(a *assertions.Assertion) *httptest.Server {
 				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					a := assertions.New(t)
+					a := a
 					a.So(r.Method, should.Equal, http.MethodPost)
 					b := test.Must(io.ReadAll(r.Body)).([]byte)
 					var req map[string]interface{}
@@ -167,25 +166,25 @@ func TestGetAppSKey(t *testing.T) {
 			Request: &ttnpb.SessionKeyRequest{
 				JoinEui:      types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00}.Bytes(),
 				DevEui:       types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}.Bytes(),
-				SessionKeyId: []byte{0x01, 0x6b, 0xfa, 0x7b, 0xad, 0x47, 0x56, 0x34, 0x6a, 0x67, 0x49, 0x81, 0xe7, 0x5c, 0xdb, 0xdc},
+				SessionKeyId: []byte{0x01, 0x6b, 0xfa, 0x7b, 0xad, 0x47, 0x56, 0x34, 0x6a, 0x67, 0x49, 0x81, 0xe7, 0x5c, 0xdb, 0xdc}, //nolint:lll
 			},
-			ResponseAssertion: func(t *testing.T, resp *ttnpb.AppSKeyResponse) bool {
-				return assertions.New(t).So(resp, should.Resemble, &ttnpb.AppSKeyResponse{
+			ResponseAssertion: func(a *assertions.Assertion, resp *ttnpb.AppSKeyResponse) bool {
+				return a.So(resp, should.Resemble, &ttnpb.AppSKeyResponse{
 					AppSKey: &ttnpb.KeyEnvelope{
 						KekLabel:     "as:010042",
-						EncryptedKey: []byte{0x2a, 0x19, 0x5c, 0xc9, 0x3c, 0xa5, 0x4a, 0xd8, 0x2c, 0xfb, 0x36, 0xc8, 0x3d, 0x91, 0x45, 0x0f, 0x3d, 0x2d, 0x52, 0x35, 0x56, 0xf1, 0x3e, 0x69},
+						EncryptedKey: []byte{0x2a, 0x19, 0x5c, 0xc9, 0x3c, 0xa5, 0x4a, 0xd8, 0x2c, 0xfb, 0x36, 0xc8, 0x3d, 0x91, 0x45, 0x0f, 0x3d, 0x2d, 0x52, 0x35, 0x56, 0xf1, 0x3e, 0x69}, //nolint:lll
 					},
 				})
 			},
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				return assertions.New(t).So(err, should.BeNil)
+			ErrorAssertion: func(a *assertions.Assertion, err error) bool {
+				return a.So(err, should.BeNil)
 			},
 		},
 		{
 			Name: "Backend Interfaces 1.1/Success",
-			NewServer: func(t *testing.T) *httptest.Server {
+			NewServer: func(a *assertions.Assertion) *httptest.Server {
 				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					a := assertions.New(t)
+					a := a
 					a.So(r.Method, should.Equal, http.MethodPost)
 					b := test.Must(io.ReadAll(r.Body)).([]byte)
 					var req map[string]interface{}
@@ -221,41 +220,42 @@ func TestGetAppSKey(t *testing.T) {
 			Request: &ttnpb.SessionKeyRequest{
 				JoinEui:      types.EUI64{0xec, 0x65, 0x6e, 0x00, 0x00, 0x00, 0x00, 0x00}.Bytes(),
 				DevEui:       types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}.Bytes(),
-				SessionKeyId: []byte{0x01, 0x6b, 0xfa, 0x7b, 0xad, 0x47, 0x56, 0x34, 0x6a, 0x67, 0x49, 0x81, 0xe7, 0x5c, 0xdb, 0xdc},
+				SessionKeyId: []byte{0x01, 0x6b, 0xfa, 0x7b, 0xad, 0x47, 0x56, 0x34, 0x6a, 0x67, 0x49, 0x81, 0xe7, 0x5c, 0xdb, 0xdc}, //nolint:lll
 			},
-			ResponseAssertion: func(t *testing.T, resp *ttnpb.AppSKeyResponse) bool {
-				return assertions.New(t).So(resp, should.Resemble, &ttnpb.AppSKeyResponse{
+			ResponseAssertion: func(a *assertions.Assertion, resp *ttnpb.AppSKeyResponse) bool {
+				return a.So(resp, should.Resemble, &ttnpb.AppSKeyResponse{
 					AppSKey: &ttnpb.KeyEnvelope{
 						KekLabel:     "as:010042",
-						EncryptedKey: []byte{0x2a, 0x19, 0x5c, 0xc9, 0x3c, 0xa5, 0x4a, 0xd8, 0x2c, 0xfb, 0x36, 0xc8, 0x3d, 0x91, 0x45, 0x0f, 0x3d, 0x2d, 0x52, 0x35, 0x56, 0xf1, 0x3e, 0x69},
+						EncryptedKey: []byte{0x2a, 0x19, 0x5c, 0xc9, 0x3c, 0xa5, 0x4a, 0xd8, 0x2c, 0xfb, 0x36, 0xc8, 0x3d, 0x91, 0x45, 0x0f, 0x3d, 0x2d, 0x52, 0x35, 0x56, 0xf1, 0x3e, 0x69}, //nolint:lll
 					},
 				})
 			},
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				return assertions.New(t).So(err, should.BeNil)
+			ErrorAssertion: func(a *assertions.Assertion, err error) bool {
+				return a.So(err, should.BeNil)
 			},
 		},
 	} {
+		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
 			ctx := test.Context()
 			ctx = log.NewContext(ctx, test.GetLogger(t))
 
-			srv := tc.NewServer(t)
+			srv := tc.NewServer(a)
 			defer srv.Close()
 
 			cl, err := NewClient(ctx, config.InteropClient{
 				ConfigSource: "directory",
 				Directory:    "testdata/client",
-			}, test.HTTPClientProvider)
+			}, test.HTTPClientProvider, SelectorApplicationServer)
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Failed to create new client: %s", err)
 			}
 
 			res, err := cl.GetAppSKey(ctx, tc.AsID, tc.Request)
-			if a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
-				a.So(tc.ResponseAssertion(t, res), should.BeTrue)
+			if a.So(tc.ErrorAssertion(a, err), should.BeTrue) {
+				a.So(tc.ResponseAssertion(a, res), should.BeTrue)
 			} else if err != nil {
 				t.Errorf("Received unexpected error: %v", errors.Stack(err))
 			}
@@ -263,20 +263,20 @@ func TestGetAppSKey(t *testing.T) {
 	}
 }
 
-func TestHandleJoinRequest(t *testing.T) {
-	for _, tc := range []struct {
+func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
+	for _, tc := range []struct { //nolint:paralleltest
 		Name              string
-		NewServer         func(*testing.T) *httptest.Server
+		NewServer         func(*assertions.Assertion) *httptest.Server
 		NetID             types.NetID
 		Request           *ttnpb.JoinRequest
-		ResponseAssertion func(*testing.T, *ttnpb.JoinResponse) bool
-		ErrorAssertion    func(*testing.T, error) bool
+		ResponseAssertion func(*assertions.Assertion, *ttnpb.JoinResponse) bool
+		ErrorAssertion    func(*assertions.Assertion, error) bool
 	}{
 		{
 			Name: "Backend Interfaces 1.0/MICFailed",
-			NewServer: func(t *testing.T) *httptest.Server {
+			NewServer: func(a *assertions.Assertion) *httptest.Server {
 				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					a := assertions.New(t)
+					a := a
 					a.So(r.Method, should.Equal, http.MethodPost)
 					b := test.Must(io.ReadAll(r.Body)).([]byte)
 					var req map[string]interface{}
@@ -321,20 +321,20 @@ func TestHandleJoinRequest(t *testing.T) {
 						},
 					},
 				},
-				RawPayload: []byte{0x00, 0x00, 0x00, 0x00, 0xd0, 0x7e, 0xd5, 0xb3, 0x70, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00, 0x00, 0x38, 0x51, 0xf0, 0xb6},
+				RawPayload: []byte{0x00, 0x00, 0x00, 0x00, 0xd0, 0x7e, 0xd5, 0xb3, 0x70, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00, 0x00, 0x38, 0x51, 0xf0, 0xb6}, //nolint:lll
 			},
-			ResponseAssertion: func(t *testing.T, resp *ttnpb.JoinResponse) bool {
-				return assertions.New(t).So(resp, should.BeNil)
+			ResponseAssertion: func(a *assertions.Assertion, resp *ttnpb.JoinResponse) bool {
+				return a.So(resp, should.BeNil)
 			},
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, ErrMIC)
+			ErrorAssertion: func(a *assertions.Assertion, err error) bool {
+				return a.So(err, should.HaveSameErrorDefinitionAs, ErrMIC)
 			},
 		},
 		{
 			Name: "Backend Interfaces 1.1/MICFailed",
-			NewServer: func(t *testing.T) *httptest.Server {
+			NewServer: func(a *assertions.Assertion) *httptest.Server {
 				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					a := assertions.New(t)
+					a := a
 					a.So(r.Method, should.Equal, http.MethodPost)
 					b := test.Must(io.ReadAll(r.Body)).([]byte)
 					var req map[string]interface{}
@@ -381,20 +381,20 @@ func TestHandleJoinRequest(t *testing.T) {
 						},
 					},
 				},
-				RawPayload: []byte{0x00, 0x00, 0x00, 0x00, 0xd0, 0x7e, 0xd5, 0xb3, 0x70, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00, 0x00, 0x38, 0x51, 0xf0, 0xb6},
+				RawPayload: []byte{0x00, 0x00, 0x00, 0x00, 0xd0, 0x7e, 0xd5, 0xb3, 0x70, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00, 0x00, 0x38, 0x51, 0xf0, 0xb6}, //nolint:lll
 			},
-			ResponseAssertion: func(t *testing.T, resp *ttnpb.JoinResponse) bool {
-				return assertions.New(t).So(resp, should.BeNil)
+			ResponseAssertion: func(a *assertions.Assertion, resp *ttnpb.JoinResponse) bool {
+				return a.So(resp, should.BeNil)
 			},
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, ErrMIC)
+			ErrorAssertion: func(a *assertions.Assertion, err error) bool {
+				return a.So(err, should.HaveSameErrorDefinitionAs, ErrMIC)
 			},
 		},
 		{
 			Name: "Backend Interfaces 1.0/Success",
-			NewServer: func(t *testing.T) *httptest.Server {
+			NewServer: func(a *assertions.Assertion) *httptest.Server {
 				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					a := assertions.New(t)
+					a := a
 					a.So(r.Method, should.Equal, http.MethodPost)
 					b := test.Must(io.ReadAll(r.Body)).([]byte)
 					var req map[string]interface{}
@@ -451,34 +451,34 @@ func TestHandleJoinRequest(t *testing.T) {
 						},
 					},
 				},
-				RawPayload: []byte{0x00, 0x00, 0x00, 0x00, 0xd0, 0x7e, 0xd5, 0xb3, 0x70, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00, 0x00, 0x38, 0x51, 0xf0, 0xb6},
+				RawPayload: []byte{0x00, 0x00, 0x00, 0x00, 0xd0, 0x7e, 0xd5, 0xb3, 0x70, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00, 0x00, 0x38, 0x51, 0xf0, 0xb6}, //nolint:lll
 			},
-			ResponseAssertion: func(t *testing.T, resp *ttnpb.JoinResponse) bool {
-				return assertions.New(t).So(resp, should.Resemble, &ttnpb.JoinResponse{
-					RawPayload: []byte{0x20, 0x4d, 0x67, 0x50, 0x73, 0xbb, 0x41, 0x53, 0xb2, 0x36, 0x53, 0xef, 0xa8, 0x2c, 0x1f, 0x3a, 0x49, 0xe1, 0x9c, 0x2a, 0x86, 0x96, 0xc9, 0xa3, 0x4b, 0xf4, 0x92, 0x67, 0x47, 0x79, 0xe4, 0xbe, 0xfa},
+			ResponseAssertion: func(a *assertions.Assertion, resp *ttnpb.JoinResponse) bool {
+				return a.So(resp, should.Resemble, &ttnpb.JoinResponse{
+					RawPayload: []byte{0x20, 0x4d, 0x67, 0x50, 0x73, 0xbb, 0x41, 0x53, 0xb2, 0x36, 0x53, 0xef, 0xa8, 0x2c, 0x1f, 0x3a, 0x49, 0xe1, 0x9c, 0x2a, 0x86, 0x96, 0xc9, 0xa3, 0x4b, 0xf4, 0x92, 0x67, 0x47, 0x79, 0xe4, 0xbe, 0xfa}, //nolint:lll
 					SessionKeys: &ttnpb.SessionKeys{
-						SessionKeyId: []byte{0x01, 0x6b, 0xfa, 0x7b, 0xad, 0x47, 0x56, 0x34, 0x6a, 0x67, 0x49, 0x81, 0xe7, 0x5c, 0xdb, 0xdc},
+						SessionKeyId: []byte{0x01, 0x6b, 0xfa, 0x7b, 0xad, 0x47, 0x56, 0x34, 0x6a, 0x67, 0x49, 0x81, 0xe7, 0x5c, 0xdb, 0xdc}, //nolint:lll
 						FNwkSIntKey: &ttnpb.KeyEnvelope{
 							KekLabel:     "ns:42ffff",
-							EncryptedKey: []byte{0xeb, 0x56, 0xfe, 0x66, 0x81, 0x99, 0x9f, 0x25, 0xd5, 0x48, 0xcf, 0xed, 0xd4, 0xa6, 0x52, 0x8b, 0x33, 0x1b, 0xb5, 0xad, 0xe1, 0xca, 0xf1, 0x7f},
+							EncryptedKey: []byte{0xeb, 0x56, 0xfe, 0x66, 0x81, 0x99, 0x9f, 0x25, 0xd5, 0x48, 0xcf, 0xed, 0xd4, 0xa6, 0x52, 0x8b, 0x33, 0x1b, 0xb5, 0xad, 0xe1, 0xca, 0xf1, 0x7f}, //nolint:lll
 						},
 						AppSKey: &ttnpb.KeyEnvelope{
 							KekLabel:     "as:010042",
-							EncryptedKey: []byte{0x2a, 0x19, 0x5c, 0xc9, 0x3c, 0xa5, 0x4a, 0xd8, 0x2c, 0xfb, 0x36, 0xc8, 0x3d, 0x91, 0x45, 0x0f, 0x3d, 0x2d, 0x52, 0x35, 0x56, 0xf1, 0x3e, 0x69},
+							EncryptedKey: []byte{0x2a, 0x19, 0x5c, 0xc9, 0x3c, 0xa5, 0x4a, 0xd8, 0x2c, 0xfb, 0x36, 0xc8, 0x3d, 0x91, 0x45, 0x0f, 0x3d, 0x2d, 0x52, 0x35, 0x56, 0xf1, 0x3e, 0x69}, //nolint:lll
 						},
 					},
 					Lifetime: ttnpb.ProtoDurationPtr(0),
 				})
 			},
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				return assertions.New(t).So(err, should.BeNil)
+			ErrorAssertion: func(a *assertions.Assertion, err error) bool {
+				return a.So(err, should.BeNil)
 			},
 		},
 		{
 			Name: "Backend Interfaces 1.1/Success/With Session Key ID",
-			NewServer: func(t *testing.T) *httptest.Server {
+			NewServer: func(a *assertions.Assertion) *httptest.Server {
 				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					a := assertions.New(t)
+					a := a
 					a.So(r.Method, should.Equal, http.MethodPost)
 					b := test.Must(io.ReadAll(r.Body)).([]byte)
 					var req map[string]interface{}
@@ -537,34 +537,34 @@ func TestHandleJoinRequest(t *testing.T) {
 						},
 					},
 				},
-				RawPayload: []byte{0x00, 0x00, 0x00, 0x00, 0xd0, 0x7e, 0xd5, 0xb3, 0x70, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00, 0x00, 0x38, 0x51, 0xf0, 0xb6},
+				RawPayload: []byte{0x00, 0x00, 0x00, 0x00, 0xd0, 0x7e, 0xd5, 0xb3, 0x70, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00, 0x00, 0x38, 0x51, 0xf0, 0xb6}, //nolint:lll
 			},
-			ResponseAssertion: func(t *testing.T, resp *ttnpb.JoinResponse) bool {
-				return assertions.New(t).So(resp, should.Resemble, &ttnpb.JoinResponse{
-					RawPayload: []byte{0x20, 0x4d, 0x67, 0x50, 0x73, 0xbb, 0x41, 0x53, 0xb2, 0x36, 0x53, 0xef, 0xa8, 0x2c, 0x1f, 0x3a, 0x49, 0xe1, 0x9c, 0x2a, 0x86, 0x96, 0xc9, 0xa3, 0x4b, 0xf4, 0x92, 0x67, 0x47, 0x79, 0xe4, 0xbe, 0xfa},
+			ResponseAssertion: func(a *assertions.Assertion, resp *ttnpb.JoinResponse) bool {
+				return a.So(resp, should.Resemble, &ttnpb.JoinResponse{
+					RawPayload: []byte{0x20, 0x4d, 0x67, 0x50, 0x73, 0xbb, 0x41, 0x53, 0xb2, 0x36, 0x53, 0xef, 0xa8, 0x2c, 0x1f, 0x3a, 0x49, 0xe1, 0x9c, 0x2a, 0x86, 0x96, 0xc9, 0xa3, 0x4b, 0xf4, 0x92, 0x67, 0x47, 0x79, 0xe4, 0xbe, 0xfa}, //nolint:lll
 					SessionKeys: &ttnpb.SessionKeys{
-						SessionKeyId: []byte{0x01, 0x6b, 0xfa, 0x7b, 0xad, 0x47, 0x56, 0x34, 0x6a, 0x67, 0x49, 0x81, 0xe7, 0x5c, 0xdb, 0xdc},
+						SessionKeyId: []byte{0x01, 0x6b, 0xfa, 0x7b, 0xad, 0x47, 0x56, 0x34, 0x6a, 0x67, 0x49, 0x81, 0xe7, 0x5c, 0xdb, 0xdc}, //nolint:lll
 						FNwkSIntKey: &ttnpb.KeyEnvelope{
 							KekLabel:     "ns:42ffff",
-							EncryptedKey: []byte{0xeb, 0x56, 0xfe, 0x66, 0x81, 0x99, 0x9f, 0x25, 0xd5, 0x48, 0xcf, 0xed, 0xd4, 0xa6, 0x52, 0x8b, 0x33, 0x1b, 0xb5, 0xad, 0xe1, 0xca, 0xf1, 0x7f},
+							EncryptedKey: []byte{0xeb, 0x56, 0xfe, 0x66, 0x81, 0x99, 0x9f, 0x25, 0xd5, 0x48, 0xcf, 0xed, 0xd4, 0xa6, 0x52, 0x8b, 0x33, 0x1b, 0xb5, 0xad, 0xe1, 0xca, 0xf1, 0x7f}, //nolint:lll
 						},
 						AppSKey: &ttnpb.KeyEnvelope{
 							KekLabel:     "as:010042",
-							EncryptedKey: []byte{0x2a, 0x19, 0x5c, 0xc9, 0x3c, 0xa5, 0x4a, 0xd8, 0x2c, 0xfb, 0x36, 0xc8, 0x3d, 0x91, 0x45, 0x0f, 0x3d, 0x2d, 0x52, 0x35, 0x56, 0xf1, 0x3e, 0x69},
+							EncryptedKey: []byte{0x2a, 0x19, 0x5c, 0xc9, 0x3c, 0xa5, 0x4a, 0xd8, 0x2c, 0xfb, 0x36, 0xc8, 0x3d, 0x91, 0x45, 0x0f, 0x3d, 0x2d, 0x52, 0x35, 0x56, 0xf1, 0x3e, 0x69}, //nolint:lll
 						},
 					},
 					Lifetime: ttnpb.ProtoDurationPtr(0),
 				})
 			},
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				return assertions.New(t).So(err, should.BeNil)
+			ErrorAssertion: func(a *assertions.Assertion, err error) bool {
+				return a.So(err, should.BeNil)
 			},
 		},
 		{
 			Name: "Backend Interfaces 1.1/Success/Without Session Key ID",
-			NewServer: func(t *testing.T) *httptest.Server {
+			NewServer: func(a *assertions.Assertion) *httptest.Server {
 				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					a := assertions.New(t)
+					a := a
 					a.So(r.Method, should.Equal, http.MethodPost)
 					b := test.Must(io.ReadAll(r.Body)).([]byte)
 					var req map[string]interface{}
@@ -622,54 +622,54 @@ func TestHandleJoinRequest(t *testing.T) {
 						},
 					},
 				},
-				RawPayload: []byte{0x00, 0x00, 0x00, 0x00, 0xd0, 0x7e, 0xd5, 0xb3, 0x70, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00, 0x00, 0x38, 0x51, 0xf0, 0xb6},
+				RawPayload: []byte{0x00, 0x00, 0x00, 0x00, 0xd0, 0x7e, 0xd5, 0xb3, 0x70, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00, 0x00, 0x38, 0x51, 0xf0, 0xb6}, //nolint:lll
 			},
-			ResponseAssertion: func(t *testing.T, resp *ttnpb.JoinResponse) bool {
-				a := assertions.New(t)
+			ResponseAssertion: func(a *assertions.Assertion, resp *ttnpb.JoinResponse) bool {
 				if !a.So(GeneratedSessionKeyID(resp.SessionKeys.SessionKeyId), should.BeTrue) {
 					return false
 				}
 				return a.So(resp, should.Resemble, &ttnpb.JoinResponse{
-					RawPayload: []byte{0x20, 0x4d, 0x67, 0x50, 0x73, 0xbb, 0x41, 0x53, 0xb2, 0x36, 0x53, 0xef, 0xa8, 0x2c, 0x1f, 0x3a, 0x49, 0xe1, 0x9c, 0x2a, 0x86, 0x96, 0xc9, 0xa3, 0x4b, 0xf4, 0x92, 0x67, 0x47, 0x79, 0xe4, 0xbe, 0xfa},
+					RawPayload: []byte{0x20, 0x4d, 0x67, 0x50, 0x73, 0xbb, 0x41, 0x53, 0xb2, 0x36, 0x53, 0xef, 0xa8, 0x2c, 0x1f, 0x3a, 0x49, 0xe1, 0x9c, 0x2a, 0x86, 0x96, 0xc9, 0xa3, 0x4b, 0xf4, 0x92, 0x67, 0x47, 0x79, 0xe4, 0xbe, 0xfa}, //nolint:lll
 					SessionKeys: &ttnpb.SessionKeys{
 						SessionKeyId: resp.SessionKeys.SessionKeyId,
 						FNwkSIntKey: &ttnpb.KeyEnvelope{
 							KekLabel:     "ns:42ffff",
-							EncryptedKey: []byte{0xeb, 0x56, 0xfe, 0x66, 0x81, 0x99, 0x9f, 0x25, 0xd5, 0x48, 0xcf, 0xed, 0xd4, 0xa6, 0x52, 0x8b, 0x33, 0x1b, 0xb5, 0xad, 0xe1, 0xca, 0xf1, 0x7f},
+							EncryptedKey: []byte{0xeb, 0x56, 0xfe, 0x66, 0x81, 0x99, 0x9f, 0x25, 0xd5, 0x48, 0xcf, 0xed, 0xd4, 0xa6, 0x52, 0x8b, 0x33, 0x1b, 0xb5, 0xad, 0xe1, 0xca, 0xf1, 0x7f}, //nolint:lll
 						},
 						AppSKey: &ttnpb.KeyEnvelope{
 							KekLabel:     "as:010042",
-							EncryptedKey: []byte{0x2a, 0x19, 0x5c, 0xc9, 0x3c, 0xa5, 0x4a, 0xd8, 0x2c, 0xfb, 0x36, 0xc8, 0x3d, 0x91, 0x45, 0x0f, 0x3d, 0x2d, 0x52, 0x35, 0x56, 0xf1, 0x3e, 0x69},
+							EncryptedKey: []byte{0x2a, 0x19, 0x5c, 0xc9, 0x3c, 0xa5, 0x4a, 0xd8, 0x2c, 0xfb, 0x36, 0xc8, 0x3d, 0x91, 0x45, 0x0f, 0x3d, 0x2d, 0x52, 0x35, 0x56, 0xf1, 0x3e, 0x69}, //nolint:lll
 						},
 					},
 					Lifetime: ttnpb.ProtoDurationPtr(0),
 				})
 			},
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				return assertions.New(t).So(err, should.BeNil)
+			ErrorAssertion: func(a *assertions.Assertion, err error) bool {
+				return a.So(err, should.BeNil)
 			},
 		},
 	} {
+		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
 			ctx := test.Context()
 			ctx = log.NewContext(ctx, test.GetLogger(t))
 
-			srv := tc.NewServer(t)
+			srv := tc.NewServer(a)
 			defer srv.Close()
 
 			cl, err := NewClient(ctx, config.InteropClient{
 				ConfigSource: "directory",
 				Directory:    "testdata/client",
-			}, test.HTTPClientProvider)
+			}, test.HTTPClientProvider, SelectorNetworkServer)
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Failed to create new client: %s", err)
 			}
 
 			res, err := cl.HandleJoinRequest(ctx, tc.NetID, tc.Request)
-			if a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
-				a.So(tc.ResponseAssertion(t, res), should.BeTrue)
+			if a.So(tc.ErrorAssertion(a, err), should.BeTrue) {
+				a.So(tc.ResponseAssertion(a, res), should.BeTrue)
 			} else if err != nil {
 				t.Errorf("Received unexpected error: %v", errors.Stack(err))
 			}

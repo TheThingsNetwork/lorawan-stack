@@ -167,8 +167,9 @@ func (s *Server) ClientCAPool() *x509.CertPool {
 }
 
 // SenderClientCAs returns the client certificate authorities that are trusted for the given SenderID.
-// The SenderID is typically a NetID, but an AS-ID or JoinEUI can also be used to trust Application Servers and Join Servers respectively.
-func (s *Server) SenderClientCAs(ctx context.Context, senderID string) ([]*x509.Certificate, error) {
+// The SenderID is typically a NetID, but an AS-ID or JoinEUI can also be used to trust Application Servers
+// and Join Servers respectively.
+func (s *Server) SenderClientCAs(_ context.Context, senderID string) ([]*x509.Certificate, error) {
 	// TODO: Lookup partner CA by SenderID with DNS (https://github.com/TheThingsNetwork/lorawan-stack/issues/718).
 	return s.senderClientCAs[senderID], nil
 }
@@ -267,6 +268,6 @@ func (s *Server) handle() http.Handler {
 			return
 		}
 
-		json.NewEncoder(w).Encode(ans)
+		json.NewEncoder(w).Encode(ans) //nolint:errcheck
 	})
 }
