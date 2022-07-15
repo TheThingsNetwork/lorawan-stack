@@ -46,7 +46,7 @@ func TestOrganizationsNestedError(t *testing.T) {
 			Organization: &ttnpb.Organization{
 				Ids: &ttnpb.OrganizationIdentifiers{OrganizationId: "foo-org"},
 			},
-			Collaborator: org.OrganizationOrUserIdentifiers(),
+			Collaborator: org.GetOrganizationOrUserIdentifiers(),
 		}, usrCreds)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsInvalidArgument(err), should.BeTrue)
@@ -54,7 +54,7 @@ func TestOrganizationsNestedError(t *testing.T) {
 
 		_, err = reg.List(ctx, &ttnpb.ListOrganizationsRequest{
 			FieldMask:    ttnpb.FieldMask("name"),
-			Collaborator: org.OrganizationOrUserIdentifiers(),
+			Collaborator: org.GetOrganizationOrUserIdentifiers(),
 		}, usrCreds)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsInvalidArgument(err), should.BeTrue)
@@ -264,7 +264,7 @@ func TestOrganizationsPagination(t *testing.T) {
 
 		list, err := reg.List(ctx, &ttnpb.ListOrganizationsRequest{
 			FieldMask:    ttnpb.FieldMask("name"),
-			Collaborator: usr1.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         1,
 		}, creds, grpc.Header(&md))
@@ -275,7 +275,7 @@ func TestOrganizationsPagination(t *testing.T) {
 
 		list, err = reg.List(ctx, &ttnpb.ListOrganizationsRequest{
 			FieldMask:    ttnpb.FieldMask("name"),
-			Collaborator: usr1.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         2,
 		}, creds)
@@ -285,7 +285,7 @@ func TestOrganizationsPagination(t *testing.T) {
 
 		list, err = reg.List(ctx, &ttnpb.ListOrganizationsRequest{
 			FieldMask:    ttnpb.FieldMask("name"),
-			Collaborator: usr1.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         3,
 		}, creds)

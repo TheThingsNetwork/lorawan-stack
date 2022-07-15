@@ -54,7 +54,7 @@ func TestWrapGatewayUplinkToken(t *testing.T) {
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	a.So(uid, should.Resemble, unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}))
+	a.So(uid, should.Resemble, unique.ID(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}))
 	a.So(gtwToken, should.Resemble, []byte{0x1, 0x2, 0x3})
 }
 

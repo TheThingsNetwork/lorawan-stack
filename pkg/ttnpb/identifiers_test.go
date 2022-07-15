@@ -27,17 +27,11 @@ func TestIdentifiersIsZero(t *testing.T) {
 	a := assertions.New(t)
 
 	for _, ids := range []interface{ IsZero() bool }{
-		ApplicationIdentifiers{},
 		&ApplicationIdentifiers{},
-		ClientIdentifiers{},
 		&ClientIdentifiers{},
-		EndDeviceIdentifiers{},
 		&EndDeviceIdentifiers{},
-		GatewayIdentifiers{},
 		&GatewayIdentifiers{},
-		OrganizationIdentifiers{},
 		&OrganizationIdentifiers{},
-		UserIdentifiers{},
 		&UserIdentifiers{},
 	} {
 		a.So(ids.IsZero(), should.BeTrue)
@@ -47,35 +41,35 @@ func TestIdentifiersIsZero(t *testing.T) {
 	devAddr := types.DevAddr{1, 2, 3, 4}
 
 	for _, ids := range []interface{ IsZero() bool }{
-		ApplicationIdentifiers{ApplicationId: "foo"},
-		ClientIdentifiers{ClientId: "foo"},
-		EndDeviceIdentifiers{ApplicationIds: &ApplicationIdentifiers{ApplicationId: "foo"}, DeviceId: "foo"},
-		EndDeviceIdentifiers{JoinEui: &eui, DevEui: &eui},
-		EndDeviceIdentifiers{DevAddr: &devAddr},
-		GatewayIdentifiers{GatewayId: "foo"},
-		GatewayIdentifiers{Eui: &eui},
-		OrganizationIdentifiers{OrganizationId: "foo"},
-		UserIdentifiers{UserId: "foo"},
-		UserIdentifiers{Email: "foo@example.com"},
+		&ApplicationIdentifiers{ApplicationId: "foo"},
+		&ClientIdentifiers{ClientId: "foo"},
+		&EndDeviceIdentifiers{ApplicationIds: &ApplicationIdentifiers{ApplicationId: "foo"}, DeviceId: "foo"},
+		&EndDeviceIdentifiers{JoinEui: &eui, DevEui: &eui},
+		&EndDeviceIdentifiers{DevAddr: &devAddr},
+		&GatewayIdentifiers{GatewayId: "foo"},
+		&GatewayIdentifiers{Eui: &eui},
+		&OrganizationIdentifiers{OrganizationId: "foo"},
+		&UserIdentifiers{UserId: "foo"},
+		&UserIdentifiers{Email: "foo@example.com"},
 	} {
 		a.So(ids.IsZero(), should.BeFalse)
 	}
 }
 
-func TestOrganizationOrUserIdentifiers(t *testing.T) {
+func TestGetOrganizationOrUserIdentifiers(t *testing.T) {
 	a := assertions.New(t)
 
-	usrID := UserIdentifiers{
+	usrID := &UserIdentifiers{
 		UserId: "foo-user",
 	}
-	ouID := usrID.OrganizationOrUserIdentifiers()
+	ouID := usrID.GetOrganizationOrUserIdentifiers()
 	a.So(ouID, should.NotBeNil)
 	a.So(ouID.GetUserIds(), should.Resemble, usrID)
 
-	orgID := OrganizationIdentifiers{
+	orgID := &OrganizationIdentifiers{
 		OrganizationId: "foo-org",
 	}
-	ouID = orgID.OrganizationOrUserIdentifiers()
+	ouID = orgID.GetOrganizationOrUserIdentifiers()
 	a.So(ouID, should.NotBeNil)
 	a.So(ouID.GetOrganizationIds(), should.Resemble, orgID)
 }
@@ -83,54 +77,54 @@ func TestOrganizationOrUserIdentifiers(t *testing.T) {
 func TestEntityIdentifiers(t *testing.T) {
 	a := assertions.New(t)
 
-	appID := ApplicationIdentifiers{
+	appID := &ApplicationIdentifiers{
 		ApplicationId: "foo-app",
 	}
 	eID := appID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
 	a.So(eID.GetApplicationIds(), should.Resemble, appID)
 
-	cliID := ClientIdentifiers{
+	cliID := &ClientIdentifiers{
 		ClientId: "foo-client",
 	}
 	eID = cliID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
 	a.So(eID.GetClientIds(), should.Resemble, cliID)
 
-	devID := EndDeviceIdentifiers{
+	devID := &EndDeviceIdentifiers{
 		DeviceId: "foo-device",
 	}
 	eID = devID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
 	a.So(eID.GetDeviceIds(), should.Resemble, devID)
 
-	gtwID := GatewayIdentifiers{
+	gtwID := &GatewayIdentifiers{
 		GatewayId: "foo-gateway",
 	}
 	eID = gtwID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
 	a.So(eID.GetGatewayIds(), should.Resemble, gtwID)
 
-	orgID := OrganizationIdentifiers{
+	orgID := &OrganizationIdentifiers{
 		OrganizationId: "foo-org",
 	}
 	eID = orgID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
 	a.So(eID.GetOrganizationIds(), should.Resemble, orgID)
 
-	ouID := orgID.OrganizationOrUserIdentifiers()
+	ouID := orgID.GetOrganizationOrUserIdentifiers()
 	eID = ouID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
 	a.So(eID.GetOrganizationIds(), should.Resemble, orgID)
 
-	usrID := UserIdentifiers{
+	usrID := &UserIdentifiers{
 		UserId: "foo-user",
 	}
 	eID = usrID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
 	a.So(eID.GetUserIds(), should.Resemble, usrID)
 
-	ouID = usrID.OrganizationOrUserIdentifiers()
+	ouID = usrID.GetOrganizationOrUserIdentifiers()
 	eID = ouID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
 	a.So(eID.GetUserIds(), should.Resemble, usrID)

@@ -265,7 +265,7 @@ $ tools/bin/mage proto:clean proto:all jsSDK:definitions
 
 ### Documentation
 
-The documentation site for The Things Stack is built from the [`lorawan-stack-docs`(https://github.com/TheThingsIndustries/lorawan-stack-docs) repository.
+The documentation site for The Things Stack is built from the [`lorawan-stack-docs`](https://github.com/TheThingsIndustries/lorawan-stack-docs) repository.
 
 ### Web UI
 

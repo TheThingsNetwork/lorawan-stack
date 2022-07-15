@@ -103,32 +103,36 @@ func (ids *OrganizationOrUserIdentifiers) GetEntityIdentifiers() *EntityIdentifi
 }
 
 // IDString returns the ID string of this Identifier.
-func (ids ApplicationIdentifiers) IDString() string { return ids.ApplicationId }
+func (ids *ApplicationIdentifiers) IDString() string { return ids.GetApplicationId() }
 
 // IDString returns the ID string of this Identifier.
-func (ids ClientIdentifiers) IDString() string { return ids.ClientId }
+func (ids *ClientIdentifiers) IDString() string { return ids.GetClientId() }
 
 // IDString returns the ID string of this Identifier.
-func (ids EndDeviceIdentifiers) IDString() string {
-	var appID string
-	if ids.ApplicationIds != nil {
-		appID = ids.ApplicationIds.IDString()
+func (ids *EndDeviceIdentifiers) IDString() string {
+	if ids == nil {
+		return ""
 	}
-	return fmt.Sprintf("%s.%s", appID, ids.DeviceId)
+	return fmt.Sprintf("%s.%s", ids.GetApplicationIds().IDString(), ids.GetDeviceId())
 }
 
 // IDString returns the ID string of this Identifier.
-func (ids GatewayIdentifiers) IDString() string { return ids.GatewayId }
+func (ids *GatewayIdentifiers) IDString() string { return ids.GetGatewayId() }
 
 // IDString returns the ID string of this Identifier.
-func (ids OrganizationIdentifiers) IDString() string { return ids.OrganizationId }
+func (ids *OrganizationIdentifiers) IDString() string { return ids.GetOrganizationId() }
 
 // IDString returns the ID string of this Identifier.
-func (ids UserIdentifiers) IDString() string { return ids.GetUserId() }
+func (ids *UserIdentifiers) IDString() string { return ids.GetUserId() }
 
 // IDString returns the ID string of the Identifiers inside the oneof.
-func (ids EntityIdentifiers) IDString() string {
+func (ids *EntityIdentifiers) IDString() string {
+	if ids == nil {
+		return ""
+	}
 	switch oneof := ids.Ids.(type) {
+	case nil:
+		return ""
 	case *EntityIdentifiers_ApplicationIds:
 		return oneof.ApplicationIds.IDString()
 	case *EntityIdentifiers_ClientIds:
@@ -147,8 +151,13 @@ func (ids EntityIdentifiers) IDString() string {
 }
 
 // IDString returns the ID string of the Identifiers inside the oneof.
-func (ids OrganizationOrUserIdentifiers) IDString() string {
+func (ids *OrganizationOrUserIdentifiers) IDString() string {
+	if ids == nil {
+		return ""
+	}
 	switch oneof := ids.Ids.(type) {
+	case nil:
+		return ""
 	case *OrganizationOrUserIdentifiers_OrganizationIds:
 		return oneof.OrganizationIds.IDString()
 	case *OrganizationOrUserIdentifiers_UserIds:
@@ -159,26 +168,31 @@ func (ids OrganizationOrUserIdentifiers) IDString() string {
 }
 
 // EntityType returns the entity type for this ID (application).
-func (ApplicationIdentifiers) EntityType() string { return "application" }
+func (*ApplicationIdentifiers) EntityType() string { return "application" }
 
 // EntityType returns the entity type for this ID (client).
-func (ClientIdentifiers) EntityType() string { return "client" }
+func (*ClientIdentifiers) EntityType() string { return "client" }
 
 // EntityType returns the entity type for this ID (end device).
-func (EndDeviceIdentifiers) EntityType() string { return "end device" }
+func (*EndDeviceIdentifiers) EntityType() string { return "end device" }
 
 // EntityType returns the entity type for this ID (gateway).
-func (GatewayIdentifiers) EntityType() string { return "gateway" }
+func (*GatewayIdentifiers) EntityType() string { return "gateway" }
 
 // EntityType returns the entity type for this ID (organization).
-func (OrganizationIdentifiers) EntityType() string { return "organization" }
+func (*OrganizationIdentifiers) EntityType() string { return "organization" }
 
 // EntityType returns the entity type for this ID (user).
-func (UserIdentifiers) EntityType() string { return "user" }
+func (*UserIdentifiers) EntityType() string { return "user" }
 
 // EntityType returns the entity type for the Identifiers inside the oneof.
-func (ids EntityIdentifiers) EntityType() string {
+func (ids *EntityIdentifiers) EntityType() string {
+	if ids == nil {
+		return ""
+	}
 	switch oneof := ids.Ids.(type) {
+	case nil:
+		return ""
 	case *EntityIdentifiers_ApplicationIds:
 		return oneof.ApplicationIds.EntityType()
 	case *EntityIdentifiers_ClientIds:
@@ -197,8 +211,13 @@ func (ids EntityIdentifiers) EntityType() string {
 }
 
 // EntityType returns the entity type for the Identifiers inside the oneof.
-func (ids OrganizationOrUserIdentifiers) EntityType() string {
+func (ids *OrganizationOrUserIdentifiers) EntityType() string {
+	if ids == nil {
+		return ""
+	}
 	switch oneof := ids.Ids.(type) {
+	case nil:
+		return ""
 	case *OrganizationOrUserIdentifiers_OrganizationIds:
 		return oneof.OrganizationIds.EntityType()
 	case *OrganizationOrUserIdentifiers_UserIds:

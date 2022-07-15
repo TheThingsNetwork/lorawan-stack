@@ -11,9 +11,6 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
-- More fields were added to the csv end-device migration procedure. The details on which fields were added can be found [here](https://www.thethingsindustries.com/docs/getting-started/migrating/device-csv/).
-- Authorization management in the Account app.
-
 ### Changed
 
 - Deleted users are no longer included in primary email addresses uniqueness checks. This allows a user to create a new account which uses the email address of a deleted account.
@@ -25,17 +22,26 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+### Security
+
+## [3.20.2] - unreleased
+
+### Added
+
+- More fields were added to the csv end-device migration procedure. The details on which fields were added can be found [here](https://www.thethingsindustries.com/docs/getting-started/migrating/device-csv/).
+- Authorization management in the Account app.
+- Gateway remote address to gateway connection statistics.
+
+### Fixed
+
 - Encoding of DevAddr, EUI and similar fields in `text/event-stream` responses.
 - GPS time leap second calculations taking a new leap second into consideration for 6th of July 2022.
-
-### Security
 
 ## [3.20.1] - 2022-06-29
 
 ### Added
 
 - Support inviting users in the Console.
-- Gateway remote address to gateway connection statistics.
 
 ### Changed
 
@@ -2228,7 +2234,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.20.1...v3.20
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.20.2...v3.20
+[3.20.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.20.1...v3.20.2
 [3.20.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.20.0...v3.20.1
 [3.20.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.19.2...v3.20.0
 [3.19.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.19.1...v3.19.2
