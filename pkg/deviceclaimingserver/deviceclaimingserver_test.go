@@ -222,7 +222,7 @@ func TestGatewayClaimingServer(t *testing.T) {
 		{
 			Name: "Claim/EmptyRequest",
 			Req: &ttnpb.ClaimGatewayRequest{
-				Collaborator: userID.OrganizationOrUserIdentifiers(),
+				Collaborator: userID.GetOrganizationOrUserIdentifiers(),
 			},
 			ErrorAssertion: errors.IsInvalidArgument,
 		},

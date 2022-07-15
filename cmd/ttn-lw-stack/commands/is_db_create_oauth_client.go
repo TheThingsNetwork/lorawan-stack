@@ -142,7 +142,7 @@ var createOAuthClient = &cobra.Command{
 				memberStore := store.GetMembershipStore(db)
 				err = memberStore.SetMember(
 					ctx,
-					ttnpb.UserIdentifiers{UserId: owner}.OrganizationOrUserIdentifiers(),
+					(&ttnpb.UserIdentifiers{UserId: owner}).GetOrganizationOrUserIdentifiers(),
 					cli.GetIds().GetEntityIdentifiers(),
 					ttnpb.RightsFrom(ttnpb.Right_RIGHT_CLIENT_ALL),
 				)

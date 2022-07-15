@@ -32,31 +32,31 @@ func TestValidity(t *testing.T) {
 	for _, tc := range []ttnpb.IDStringer{
 		nil,
 		(*ttnpb.ApplicationIdentifiers)(nil),
-		ttnpb.ApplicationIdentifiers{},
+		&ttnpb.ApplicationIdentifiers{},
 		(*ttnpb.ClientIdentifiers)(nil),
-		ttnpb.ClientIdentifiers{},
+		&ttnpb.ClientIdentifiers{},
 		(*ttnpb.EndDeviceIdentifiers)(nil),
-		ttnpb.EndDeviceIdentifiers{},
+		&ttnpb.EndDeviceIdentifiers{},
 		&ttnpb.EndDeviceIdentifiers{
 			ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
 			DevEui:         &eui,
 		},
-		ttnpb.EndDeviceIdentifiers{
+		&ttnpb.EndDeviceIdentifiers{
 			ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
 			DevEui:         &eui,
 		},
 		(*ttnpb.GatewayIdentifiers)(nil),
-		ttnpb.GatewayIdentifiers{},
+		&ttnpb.GatewayIdentifiers{},
 		&ttnpb.GatewayIdentifiers{
 			Eui: &eui,
 		},
-		ttnpb.GatewayIdentifiers{
+		&ttnpb.GatewayIdentifiers{
 			Eui: &eui,
 		},
 		(*ttnpb.OrganizationIdentifiers)(nil),
-		ttnpb.OrganizationIdentifiers{},
+		&ttnpb.OrganizationIdentifiers{},
 		(*ttnpb.UserIdentifiers)(nil),
-		ttnpb.UserIdentifiers{},
+		&ttnpb.UserIdentifiers{},
 	} {
 		t.Run(fmt.Sprintf("%T", tc), func(t *testing.T) {
 			a := assertions.New(t)
@@ -72,34 +72,14 @@ func TestRoundtrip(t *testing.T) {
 		Parser   func(string) (ttnpb.IDStringer, error)
 	}{
 		{
-			ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
-			"foo",
-			func(uid string) (ttnpb.IDStringer, error) { return ToApplicationID(uid) },
-		},
-		{
 			&ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
 			"foo",
 			func(uid string) (ttnpb.IDStringer, error) { return ToApplicationID(uid) },
 		},
 		{
-			ttnpb.ClientIdentifiers{ClientId: "foo"},
-			"foo",
-			func(uid string) (ttnpb.IDStringer, error) { return ToClientID(uid) },
-		},
-		{
 			&ttnpb.ClientIdentifiers{ClientId: "foo"},
 			"foo",
 			func(uid string) (ttnpb.IDStringer, error) { return ToClientID(uid) },
-		},
-		{
-			ttnpb.EndDeviceIdentifiers{
-				ApplicationIds: &ttnpb.ApplicationIdentifiers{
-					ApplicationId: "foo-app",
-				},
-				DeviceId: "foo-device",
-			},
-			"foo-app.foo-device",
-			func(uid string) (ttnpb.IDStringer, error) { return ToDeviceID(uid) },
 		},
 		{
 			&ttnpb.EndDeviceIdentifiers{
@@ -112,29 +92,14 @@ func TestRoundtrip(t *testing.T) {
 			func(uid string) (ttnpb.IDStringer, error) { return ToDeviceID(uid) },
 		},
 		{
-			ttnpb.GatewayIdentifiers{GatewayId: "foo"},
-			"foo",
-			func(uid string) (ttnpb.IDStringer, error) { return ToGatewayID(uid) },
-		},
-		{
 			&ttnpb.GatewayIdentifiers{GatewayId: "foo"},
 			"foo",
 			func(uid string) (ttnpb.IDStringer, error) { return ToGatewayID(uid) },
 		},
 		{
-			ttnpb.OrganizationIdentifiers{OrganizationId: "foo"},
-			"foo",
-			func(uid string) (ttnpb.IDStringer, error) { return ToOrganizationID(uid) },
-		},
-		{
 			&ttnpb.OrganizationIdentifiers{OrganizationId: "foo"},
 			"foo",
 			func(uid string) (ttnpb.IDStringer, error) { return ToOrganizationID(uid) },
-		},
-		{
-			ttnpb.UserIdentifiers{UserId: "foo"},
-			"foo",
-			func(uid string) (ttnpb.IDStringer, error) { return ToUserID(uid) },
 		},
 		{
 			&ttnpb.UserIdentifiers{UserId: "foo"},
@@ -150,7 +115,6 @@ func TestRoundtrip(t *testing.T) {
 			}); ok {
 				wrapped := id.GetEntityIdentifiers()
 				a.So(ID(test.Context(), wrapped), should.Equal, tc.Expected)
-				a.So(ID(test.Context(), *wrapped), should.Equal, tc.Expected)
 			}
 			a.So(ID(test.Context(), tc.ID), should.Equal, tc.Expected)
 			if tc.Parser != nil {
@@ -173,27 +137,27 @@ func TestValidatorForIdentifiers(t *testing.T) {
 	}{
 		{
 			"ApplicationID",
-			func(uid string) ttnpb.IDStringer { return ttnpb.ApplicationIdentifiers{ApplicationId: uid} },
+			func(uid string) ttnpb.IDStringer { return &ttnpb.ApplicationIdentifiers{ApplicationId: uid} },
 			func(uid string) (ttnpb.IDStringer, error) { return ToApplicationID(uid) },
 		},
 		{
 			"ClientId",
-			func(uid string) ttnpb.IDStringer { return ttnpb.ClientIdentifiers{ClientId: uid} },
+			func(uid string) ttnpb.IDStringer { return &ttnpb.ClientIdentifiers{ClientId: uid} },
 			func(uid string) (ttnpb.IDStringer, error) { return ToClientID(uid) },
 		},
 		{
 			"GatewayID",
-			func(uid string) ttnpb.IDStringer { return ttnpb.GatewayIdentifiers{GatewayId: uid} },
+			func(uid string) ttnpb.IDStringer { return &ttnpb.GatewayIdentifiers{GatewayId: uid} },
 			func(uid string) (ttnpb.IDStringer, error) { return ToGatewayID(uid) },
 		},
 		{
 			"OrganizationID",
-			func(uid string) ttnpb.IDStringer { return ttnpb.OrganizationIdentifiers{OrganizationId: uid} },
+			func(uid string) ttnpb.IDStringer { return &ttnpb.OrganizationIdentifiers{OrganizationId: uid} },
 			func(uid string) (ttnpb.IDStringer, error) { return ToOrganizationID(uid) },
 		},
 		{
 			"UserID",
-			func(uid string) ttnpb.IDStringer { return ttnpb.UserIdentifiers{UserId: uid} },
+			func(uid string) ttnpb.IDStringer { return &ttnpb.UserIdentifiers{UserId: uid} },
 			func(uid string) (ttnpb.IDStringer, error) { return ToUserID(uid) },
 		},
 	} {

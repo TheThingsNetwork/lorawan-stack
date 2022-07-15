@@ -129,18 +129,18 @@ func (v *DataRateIndex) UnmarshalJSONPB(_ *jsonpb.Unmarshaler, b []byte) error {
 }
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
-func (v DataRateIndexValue) MarshalBinary() ([]byte, error) {
-	return v.Value.MarshalBinary()
+func (v *DataRateIndexValue) MarshalBinary() ([]byte, error) {
+	return v.GetValue().MarshalBinary()
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
-func (v DataRateIndexValue) MarshalText() ([]byte, error) {
-	return v.Value.MarshalText()
+func (v *DataRateIndexValue) MarshalText() ([]byte, error) {
+	return v.GetValue().MarshalText()
 }
 
 // MarshalJSONPB implements jsonpb.JSONPBMarshaler interface.
-func (v DataRateIndexValue) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
-	return v.Value.MarshalJSONPB(m)
+func (v *DataRateIndexValue) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
+	return v.GetValue().MarshalJSONPB(m)
 }
 
 // UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
@@ -218,18 +218,18 @@ func (v *DataRateOffset) UnmarshalJSONPB(_ *jsonpb.Unmarshaler, b []byte) error 
 }
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
-func (v DataRateOffsetValue) MarshalBinary() ([]byte, error) {
-	return v.Value.MarshalBinary()
+func (v *DataRateOffsetValue) MarshalBinary() ([]byte, error) {
+	return v.GetValue().MarshalBinary()
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
-func (v DataRateOffsetValue) MarshalText() ([]byte, error) {
-	return v.Value.MarshalText()
+func (v *DataRateOffsetValue) MarshalText() ([]byte, error) {
+	return v.GetValue().MarshalText()
 }
 
 // MarshalJSONPB implements jsonpb.JSONPBMarshaler interface.
-func (v DataRateOffsetValue) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
-	return v.Value.MarshalJSONPB(m)
+func (v *DataRateOffsetValue) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
+	return v.GetValue().MarshalJSONPB(m)
 }
 
 // UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
@@ -281,12 +281,12 @@ func (v *DataRateOffsetValue) FieldIsZero(p string) bool {
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
-func (v FrequencyValue) MarshalText() ([]byte, error) {
-	return []byte(strconv.FormatUint(v.Value, 10)), nil
+func (v *FrequencyValue) MarshalText() ([]byte, error) {
+	return []byte(strconv.FormatUint(v.GetValue(), 10)), nil
 }
 
 // MarshalJSONPB implements jsonpb.JSONPBMarshaler interface.
-func (v FrequencyValue) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
+func (v *FrequencyValue) MarshalJSONPB(*jsonpb.Marshaler) ([]byte, error) {
 	return v.MarshalJSON()
 }
 
@@ -434,18 +434,18 @@ func (v *AggregatedDutyCycle) UnmarshalJSONPB(_ *jsonpb.Unmarshaler, b []byte) e
 }
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
-func (v AggregatedDutyCycleValue) MarshalBinary() ([]byte, error) {
-	return v.Value.MarshalBinary()
+func (v *AggregatedDutyCycleValue) MarshalBinary() ([]byte, error) {
+	return v.GetValue().MarshalBinary()
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
-func (v AggregatedDutyCycleValue) MarshalText() ([]byte, error) {
-	return v.Value.MarshalText()
+func (v *AggregatedDutyCycleValue) MarshalText() ([]byte, error) {
+	return v.GetValue().MarshalText()
 }
 
 // MarshalJSONPB implements jsonpb.JSONPBMarshaler interface.
-func (v AggregatedDutyCycleValue) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
-	return v.Value.MarshalJSONPB(m)
+func (v *AggregatedDutyCycleValue) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
+	return v.GetValue().MarshalJSONPB(m)
 }
 
 // UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
@@ -522,18 +522,18 @@ func (v *PingSlotPeriod) UnmarshalJSONPB(_ *jsonpb.Unmarshaler, b []byte) error 
 }
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
-func (v PingSlotPeriodValue) MarshalBinary() ([]byte, error) {
-	return v.Value.MarshalBinary()
+func (v *PingSlotPeriodValue) MarshalBinary() ([]byte, error) {
+	return v.GetValue().MarshalBinary()
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
-func (v PingSlotPeriodValue) MarshalText() ([]byte, error) {
-	return v.Value.MarshalText()
+func (v *PingSlotPeriodValue) MarshalText() ([]byte, error) {
+	return v.GetValue().MarshalText()
 }
 
 // MarshalJSONPB implements jsonpb.JSONPBMarshaler interface.
-func (v PingSlotPeriodValue) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
-	return v.Value.MarshalJSONPB(m)
+func (v *PingSlotPeriodValue) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
+	return v.GetValue().MarshalJSONPB(m)
 }
 
 // UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
@@ -681,18 +681,18 @@ func (v *ADRAckLimitExponent) UnmarshalJSONPB(_ *jsonpb.Unmarshaler, b []byte) e
 }
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
-func (v ADRAckLimitExponentValue) MarshalBinary() ([]byte, error) {
-	return v.Value.MarshalBinary()
+func (v *ADRAckLimitExponentValue) MarshalBinary() ([]byte, error) {
+	return v.GetValue().MarshalBinary()
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
-func (v ADRAckLimitExponentValue) MarshalText() ([]byte, error) {
-	return v.Value.MarshalText()
+func (v *ADRAckLimitExponentValue) MarshalText() ([]byte, error) {
+	return v.GetValue().MarshalText()
 }
 
 // MarshalJSONPB implements jsonpb.JSONPBMarshaler interface.
-func (v ADRAckLimitExponentValue) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
-	return v.Value.MarshalJSONPB(m)
+func (v *ADRAckLimitExponentValue) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
+	return v.GetValue().MarshalJSONPB(m)
 }
 
 // UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
@@ -769,18 +769,18 @@ func (v *ADRAckDelayExponent) UnmarshalJSONPB(_ *jsonpb.Unmarshaler, b []byte) e
 }
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
-func (v ADRAckDelayExponentValue) MarshalBinary() ([]byte, error) {
-	return v.Value.MarshalBinary()
+func (v *ADRAckDelayExponentValue) MarshalBinary() ([]byte, error) {
+	return v.GetValue().MarshalBinary()
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
-func (v ADRAckDelayExponentValue) MarshalText() ([]byte, error) {
-	return v.Value.MarshalText()
+func (v *ADRAckDelayExponentValue) MarshalText() ([]byte, error) {
+	return v.GetValue().MarshalText()
 }
 
 // MarshalJSONPB implements jsonpb.JSONPBMarshaler interface.
-func (v ADRAckDelayExponentValue) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
-	return v.Value.MarshalJSONPB(m)
+func (v *ADRAckDelayExponentValue) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
+	return v.GetValue().MarshalJSONPB(m)
 }
 
 // UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
@@ -858,18 +858,18 @@ func (v *RxDelay) UnmarshalJSONPB(_ *jsonpb.Unmarshaler, b []byte) error {
 }
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
-func (v RxDelayValue) MarshalBinary() ([]byte, error) {
-	return v.Value.MarshalBinary()
+func (v *RxDelayValue) MarshalBinary() ([]byte, error) {
+	return v.GetValue().MarshalBinary()
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
-func (v RxDelayValue) MarshalText() ([]byte, error) {
-	return v.Value.MarshalText()
+func (v *RxDelayValue) MarshalText() ([]byte, error) {
+	return v.GetValue().MarshalText()
 }
 
 // MarshalJSONPB implements jsonpb.JSONPBMarshaler interface.
-func (v RxDelayValue) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
-	return v.Value.MarshalJSONPB(m)
+func (v *RxDelayValue) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
+	return v.GetValue().MarshalJSONPB(m)
 }
 
 // UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
@@ -1296,18 +1296,18 @@ func (v *Message) FieldIsZero(p string) bool {
 }
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
-func (v DeviceEIRPValue) MarshalBinary() ([]byte, error) {
-	return v.Value.MarshalBinary()
+func (v *DeviceEIRPValue) MarshalBinary() ([]byte, error) {
+	return v.GetValue().MarshalBinary()
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
-func (v DeviceEIRPValue) MarshalText() ([]byte, error) {
-	return v.Value.MarshalText()
+func (v *DeviceEIRPValue) MarshalText() ([]byte, error) {
+	return v.GetValue().MarshalText()
 }
 
 // MarshalJSONPB implements jsonpb.JSONPBMarshaler interface.
-func (v DeviceEIRPValue) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
-	return v.Value.MarshalJSONPB(m)
+func (v *DeviceEIRPValue) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
+	return v.GetValue().MarshalJSONPB(m)
 }
 
 // UnmarshalBinary implements encoding.BinaryUnmarshaler interface.

@@ -146,20 +146,10 @@ func (m *GetOrganizationCollaboratorRequest) ExtractRequestFields(dst map[string
 
 // Wrap methods of m.OrganizationIdentifiers.
 
-func (m Organization) OrganizationOrUserIdentifiers() *OrganizationOrUserIdentifiers {
-	return m.GetIds().OrganizationOrUserIdentifiers()
-}
-
 func (m *Organization) GetEntityIdentifiers() *EntityIdentifiers {
-	if m == nil {
-		return nil
-	}
 	return m.GetIds().GetEntityIdentifiers()
 }
 
 func (m *Organization) GetOrganizationOrUserIdentifiers() *OrganizationOrUserIdentifiers {
-	if m == nil {
-		return nil
-	}
-	return m.GetIds().OrganizationOrUserIdentifiers()
+	return m.GetIds().GetOrganizationOrUserIdentifiers()
 }
