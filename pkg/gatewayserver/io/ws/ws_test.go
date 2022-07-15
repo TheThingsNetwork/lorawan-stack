@@ -1145,11 +1145,14 @@ func TestTraffic(t *testing.T) {
 						expectedUp := deepcopy.Copy(tc.ExpectedNetworkUpstream).(*ttnpb.UplinkMessage)
 						expectedUp.ReceivedAt = up.Message.ReceivedAt
 						expectedUp.RawPayload = up.Message.RawPayload
-						expectedUp.RxMetadata[0].UplinkToken = up.Message.RxMetadata[0].UplinkToken
 
 						// Set the correct xtime and timestamps for the assertion.
-						expectedUp.RxMetadata[0].Timestamp = timestamp
-						expectedUp.RxMetadata[0].Time = ttnpb.ProtoTime(&now)
+						for i, md := range expectedUp.RxMetadata {
+							md.UplinkToken = up.Message.RxMetadata[i].UplinkToken
+							md.Timestamp = timestamp
+							md.Time = ttnpb.ProtoTimePtr(now)
+							md.ReceivedAt = expectedUp.ReceivedAt
+						}
 						expectedUp.Settings.Timestamp = timestamp
 						expectedUp.Settings.Time = ttnpb.ProtoTime(&now)
 						a.So(up.Message, should.Resemble, expectedUp)
@@ -1180,11 +1183,15 @@ func TestTraffic(t *testing.T) {
 						expectedUp := deepcopy.Copy(tc.ExpectedNetworkUpstream).(*ttnpb.UplinkMessage)
 						expectedUp.ReceivedAt = up.Message.ReceivedAt
 						expectedUp.RawPayload = up.Message.RawPayload
-						expectedUp.RxMetadata[0].UplinkToken = up.Message.RxMetadata[0].UplinkToken
 
 						// Set the correct xtime and timestamps for the assertion.
-						expectedUp.RxMetadata[0].Timestamp = timestamp
-						expectedUp.RxMetadata[0].Time = ttnpb.ProtoTime(&now)
+						for i, md := range expectedUp.RxMetadata {
+							md.UplinkToken = up.Message.RxMetadata[i].UplinkToken
+							md.Timestamp = timestamp
+							md.Time = ttnpb.ProtoTimePtr(now)
+							md.GpsTime = ttnpb.ProtoTimePtr(now)
+							md.ReceivedAt = expectedUp.ReceivedAt
+						}
 						expectedUp.Settings.Timestamp = timestamp
 						expectedUp.Settings.Time = ttnpb.ProtoTime(&now)
 						a.So(up.Message, should.Resemble, expectedUp)

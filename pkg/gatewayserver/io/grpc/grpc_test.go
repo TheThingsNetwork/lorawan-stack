@@ -362,14 +362,17 @@ func TestTraffic(t *testing.T) {
 				upCh <- tc
 
 				var ups int
-				var needStatus bool = tc.GatewayStatus != nil
-				var needTxAck bool = tc.TxAcknowledgment != nil
+				needStatus := tc.GatewayStatus != nil
+				needTxAck := tc.TxAcknowledgment != nil
 				for ups != len(tc.UplinkMessages) || needStatus || needTxAck {
 					select {
 					case up := <-conn.Up():
 						expected := deepcopy.Copy(tc.UplinkMessages[ups]).(*ttnpb.UplinkMessage)
 						expected.ReceivedAt = up.Message.ReceivedAt
-						expected.RxMetadata[0].UplinkToken = up.Message.RxMetadata[0].UplinkToken
+						for i, md := range expected.RxMetadata {
+							md.UplinkToken = up.Message.RxMetadata[i].UplinkToken
+							md.ReceivedAt = up.Message.ReceivedAt
+						}
 						a.So(up.Message, should.Resemble, expected)
 						ups++
 					case status := <-conn.Status():

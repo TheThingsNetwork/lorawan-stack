@@ -861,6 +861,9 @@ func TestHomeNetwork(t *testing.T) {
 				expected := deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
 				expected.CorrelationIds = nsMsg.CorrelationIds
 				expected.ReceivedAt = nsMsg.ReceivedAt
+				for _, md := range expected.RxMetadata {
+					md.ReceivedAt = tc.RoutedUplinkMessage.Message.GetForwarderReceiveTime()
+				}
 
 				a.So(nsMsg, should.Resemble, expected)
 
