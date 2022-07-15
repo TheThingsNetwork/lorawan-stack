@@ -650,32 +650,21 @@ func computeWantedRSSI(snr float32, channelRSSI float32) float32 {
 	return wantedRSSI
 }
 
-func wantedRSSIMetadataComparator(mds []*ttnpb.MACState_UplinkMessage_RxMetadata) func(int, int) bool {
-	wantedRSSI := func(k int) float32 { return computeWantedRSSI(mds[k].Snr, mds[k].ChannelRssi) }
-	return func(i, j int) bool {
-		return wantedRSSI(i) >= wantedRSSI(j)
-	}
-}
-
-func buildMetadataComparator(
-	ctx context.Context, mds []*ttnpb.MACState_UplinkMessage_RxMetadata,
-) func(int, int) bool {
-	comparator := wantedRSSIMetadataComparator(mds)
+func buildMetadataComparator(mds []*ttnpb.MACState_UplinkMessage_RxMetadata) func(int, int) bool {
 	invalidMD := func(k int) bool { return mds[k].Snr == 0.0 || mds[k].ChannelRssi == 0.0 }
+	wantedRSSI := func(k int) float32 { return computeWantedRSSI(mds[k].Snr, mds[k].ChannelRssi) }
 	return func(i, j int) bool {
 		lhsInvalid, rhsInvalid := invalidMD(i), invalidMD(j)
 		if lhsInvalid {
 			return lhsInvalid == rhsInvalid
 		}
-		return comparator(i, j)
+		return wantedRSSI(i) >= wantedRSSI(j)
 	}
 }
 
-func downlinkPathsFromMetadata(
-	ctx context.Context, mds ...*ttnpb.MACState_UplinkMessage_RxMetadata,
-) []downlinkPath {
+func downlinkPathsFromMetadata(mds ...*ttnpb.MACState_UplinkMessage_RxMetadata) []downlinkPath {
 	mds = append(mds[:0:0], mds...)
-	sort.SliceStable(mds, buildMetadataComparator(ctx, mds))
+	sort.SliceStable(mds, buildMetadataComparator(mds))
 	head := make([]downlinkPath, 0, len(mds))
 	body := make([]downlinkPath, 0, len(mds))
 	tail := make([]downlinkPath, 0, len(mds))
@@ -707,11 +696,9 @@ func downlinkPathsFromMetadata(
 	return res
 }
 
-func downlinkPathsFromRecentUplinks(
-	ctx context.Context, ups ...*ttnpb.MACState_UplinkMessage,
-) []downlinkPath {
+func downlinkPathsFromRecentUplinks(ups ...*ttnpb.MACState_UplinkMessage) []downlinkPath {
 	for i := len(ups) - 1; i >= 0; i-- {
-		if paths := downlinkPathsFromMetadata(ctx, ups[i].RxMetadata...); len(paths) > 0 {
+		if paths := downlinkPathsFromMetadata(ups[i].RxMetadata...); len(paths) > 0 {
 			return paths
 		}
 	}
@@ -1273,7 +1260,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		}
 	}
 
-	paths := downlinkPathsFromRecentUplinks(ctx, dev.MacState.RecentUplinks...)
+	paths := downlinkPathsFromRecentUplinks(dev.MacState.RecentUplinks...)
 	if len(paths) == 0 {
 		log.FromContext(ctx).Error("No downlink path available, skip class A downlink slot")
 		return downlinkAttemptResult{
@@ -1584,7 +1571,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 			)
 		}
 	} else {
-		paths := downlinkPathsFromRecentUplinks(ctx, dev.MacState.RecentUplinks...)
+		paths := downlinkPathsFromRecentUplinks(dev.MacState.RecentUplinks...)
 		if len(paths) == 0 {
 			log.FromContext(ctx).Error("No downlink path available, skip class B/C downlink slot")
 			if genState.ApplicationDownlink != nil && ttnpb.HasAnyField(sets, "session.queued_application_downlinks") {
@@ -1791,7 +1778,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 					ctx := events.ContextWithCorrelationID(ctx, up.CorrelationIds...)
 					ctx = events.ContextWithCorrelationID(ctx, dev.PendingMacState.QueuedJoinAccept.CorrelationIds...)
 
-					paths := downlinkPathsFromRecentUplinks(ctx, up)
+					paths := downlinkPathsFromRecentUplinks(up)
 					if len(paths) == 0 {
 						logger.Warn("No downlink path available, skip join-accept downlink slot")
 						dev.PendingMacState.RxWindowsAvailable = false

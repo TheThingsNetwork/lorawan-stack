@@ -941,7 +941,7 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 
 			var downlinkPaths []DownlinkPath
 			if conf.Uplink != nil {
-				downlinkPaths = DownlinkPathsFromMetadata(ctx, conf.Uplink.RxMetadata...)
+				downlinkPaths = DownlinkPathsFromMetadata(conf.Uplink.RxMetadata...)
 			} else {
 				for i := range conf.FixedPaths {
 					downlinkPaths = append(downlinkPaths, DownlinkPath{
