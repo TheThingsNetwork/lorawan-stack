@@ -323,9 +323,18 @@ var (
 	errDNSLookupNotSupported = errors.DefineFailedPrecondition("dns_lookup_not_supported", "DNS lookup is not supported")
 )
 
+// ComponentSelector is a component selector.
+type ComponentSelector string
+
+// Component selectors.
+const (
+	SelectorNetworkServer     ComponentSelector = "ns"
+	SelectorApplicationServer ComponentSelector = "as"
+)
+
 // NewClient return new interop client.
 func NewClient(
-	ctx context.Context, conf config.InteropClient, httpClientProvider httpclient.Provider,
+	ctx context.Context, conf config.InteropClient, httpClientProvider httpclient.Provider, selector ComponentSelector,
 ) (*Client, error) {
 	fetcher, err := conf.Fetcher(ctx, httpClientProvider)
 	if err != nil {
@@ -341,8 +350,9 @@ func NewClient(
 
 	var yamlConf struct {
 		JoinServers []struct {
-			File     string              `yaml:"file"`
-			JoinEUIs []types.EUI64Prefix `yaml:"join-euis"`
+			File       string              `yaml:"file"`
+			Components []ComponentSelector `yaml:"components"`
+			JoinEUIs   []types.EUI64Prefix `yaml:"join-euis"`
 		} `yaml:"join-servers"`
 	}
 	if err := yaml.UnmarshalStrict(confFileBytes, &yamlConf); err != nil {
@@ -364,6 +374,20 @@ func NewClient(
 
 	jss := make([]prefixJoinServerClient, 0, len(yamlConf.JoinServers))
 	for _, jsEntry := range yamlConf.JoinServers {
+		// Skip Join Servers with unmatching component selector.
+		if len(jsEntry.Components) > 0 {
+			var found bool
+			for _, c := range jsEntry.Components {
+				if c == selector {
+					found = true
+					break
+				}
+			}
+			if !found {
+				continue
+			}
+		}
+
 		fileParts := strings.Split(filepath.ToSlash(jsEntry.File), "/")
 		fetcher := fetch.WithBasePath(fetcher, fileParts[:len(fileParts)-1]...)
 		jsFileBytes, err := fetcher.File(fileParts[len(fileParts)-1])

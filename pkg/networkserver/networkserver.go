@@ -206,7 +206,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		interopConf := conf.Interop
 		interopConf.BlobConfig = c.GetBaseConfig(ctx).Blob
 
-		interopCl, err = interop.NewClient(ctx, interopConf, c)
+		interopCl, err = interop.NewClient(ctx, interopConf, c, interop.SelectorNetworkServer)
 		if err != nil {
 			return nil, err
 		}

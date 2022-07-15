@@ -248,7 +248,7 @@ func TestGetAppSKey(t *testing.T) { //nolint:paralleltest
 			cl, err := NewClient(ctx, config.InteropClient{
 				ConfigSource: "directory",
 				Directory:    "testdata/client",
-			}, test.HTTPClientProvider)
+			}, test.HTTPClientProvider, SelectorApplicationServer)
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Failed to create new client: %s", err)
 			}
@@ -662,7 +662,7 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 			cl, err := NewClient(ctx, config.InteropClient{
 				ConfigSource: "directory",
 				Directory:    "testdata/client",
-			}, test.HTTPClientProvider)
+			}, test.HTTPClientProvider, SelectorNetworkServer)
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Failed to create new client: %s", err)
 			}

@@ -14,5 +14,6 @@ join-servers:
       - 70b3d83ed0000000/30
 
   - file: test-js-4.yml
+    components: [ns, as]
     join-euis:
       - ec656e0000000000/24
