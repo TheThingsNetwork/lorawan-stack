@@ -27,6 +27,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - More fields were added to the csv end-device migration procedure. The details on which fields were added can be found [here](https://www.thethingsindustries.com/docs/getting-started/migrating/device-csv/).
 - Authorization management in the Account app.
+- Gateway remote address to gateway connection statistics.
 
 ### Fixed
 
@@ -38,7 +39,6 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - Support inviting users in the Console.
-- Gateway remote address to gateway connection statistics.
 
 ### Changed
 
