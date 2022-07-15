@@ -23,7 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-func TestExtensions(t *testing.T) {
+func TestExtensions(t *testing.T) { //nolint:paralleltest
 	a := assertions.New(t)
 
 	actual := TTIHomeNSAns{

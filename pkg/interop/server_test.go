@@ -42,11 +42,11 @@ func (c *mockComponent) Context() context.Context {
 	return c.ctx
 }
 
-func (c *mockComponent) RateLimiter() ratelimit.Interface {
+func (*mockComponent) RateLimiter() ratelimit.Interface {
 	return &ratelimit.NoopRateLimiter{}
 }
 
-func (c *mockComponent) HTTPClient(context.Context, ...httpclient.Option) (*http.Client, error) {
+func (*mockComponent) HTTPClient(context.Context, ...httpclient.Option) (*http.Client, error) {
 	return http.DefaultClient, nil
 }
 
@@ -77,7 +77,9 @@ func (m mockTarget) HomeNSRequest(ctx context.Context, req *interop.HomeNSReq) (
 	panic("HomeNSRequest called but not registered")
 }
 
-func TestServer(t *testing.T) {
+func TestServer(t *testing.T) { //nolint:gocyclo
+	t.Parallel()
+
 	authorizer := interop.Authorizer{}
 
 	for _, tc := range []struct {
@@ -86,13 +88,12 @@ func TestServer(t *testing.T) {
 		ClientTLSConfig   *tls.Config
 		PacketBrokerToken bool
 		RequestBody       interface{}
-		ResponseAssertion func(*testing.T, *http.Response) bool
+		ResponseAssertion func(*assertions.Assertion, *http.Response) bool
 	}{
 		{
 			Name:            "ClientTLS/Empty",
 			ClientTLSConfig: makeClientTLSConfig(),
-			ResponseAssertion: func(t *testing.T, res *http.Response) bool {
-				a := assertions.New(t)
+			ResponseAssertion: func(a *assertions.Assertion, res *http.Response) bool {
 				return a.So(res.StatusCode, should.Equal, http.StatusBadRequest)
 			},
 		},
@@ -110,8 +111,7 @@ func TestServer(t *testing.T) {
 				},
 				MACVersion: interop.MACVersion(ttnpb.MACVersion_MAC_V1_0_3),
 			},
-			ResponseAssertion: func(t *testing.T, res *http.Response) bool {
-				a := assertions.New(t)
+			ResponseAssertion: func(a *assertions.Assertion, res *http.Response) bool {
 				if !a.So(res.StatusCode, should.Equal, http.StatusOK) {
 					return false
 				}
@@ -137,8 +137,7 @@ func TestServer(t *testing.T) {
 				},
 				MACVersion: interop.MACVersion(ttnpb.MACVersion_MAC_V1_0_3),
 			},
-			ResponseAssertion: func(t *testing.T, res *http.Response) bool {
-				a := assertions.New(t)
+			ResponseAssertion: func(a *assertions.Assertion, res *http.Response) bool {
 				if !a.So(res.StatusCode, should.Equal, http.StatusOK) {
 					return false
 				}
@@ -172,8 +171,7 @@ func TestServer(t *testing.T) {
 				},
 				MACVersion: interop.MACVersion(ttnpb.MACVersion_MAC_V1_0_3),
 			},
-			ResponseAssertion: func(t *testing.T, res *http.Response) bool {
-				a := assertions.New(t)
+			ResponseAssertion: func(a *assertions.Assertion, res *http.Response) bool {
 				if !a.So(res.StatusCode, should.Equal, http.StatusOK) {
 					return false
 				}
@@ -234,8 +232,7 @@ func TestServer(t *testing.T) {
 				MACVersion: interop.MACVersion(ttnpb.MACVersion_MAC_V1_0_3),
 				DevEUI:     interop.EUI64{0x42, 0xff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 			},
-			ResponseAssertion: func(t *testing.T, res *http.Response) bool {
-				a := assertions.New(t)
+			ResponseAssertion: func(a *assertions.Assertion, res *http.Response) bool {
 				if !a.So(res.StatusCode, should.Equal, http.StatusOK) {
 					return false
 				}
@@ -294,8 +291,7 @@ func TestServer(t *testing.T) {
 				},
 				DevEUI: interop.EUI64{0x42, 0xff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 			},
-			ResponseAssertion: func(t *testing.T, res *http.Response) bool {
-				a := assertions.New(t)
+			ResponseAssertion: func(a *assertions.Assertion, res *http.Response) bool {
 				if !a.So(res.StatusCode, should.Equal, http.StatusOK) {
 					return false
 				}
@@ -314,7 +310,7 @@ func TestServer(t *testing.T) {
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
-			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) { //nolint:thelper
 				ctx, cancel := context.WithCancel(ctx)
 				defer cancel()
 
@@ -360,7 +356,7 @@ func TestServer(t *testing.T) {
 				if !a.So(err, should.BeNil) {
 					t.Fatal("Request failed")
 				}
-				if !tc.ResponseAssertion(t, res) {
+				if !tc.ResponseAssertion(a, res) {
 					t.FailNow()
 				}
 			},

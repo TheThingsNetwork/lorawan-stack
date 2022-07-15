@@ -26,8 +26,9 @@ import (
 // Authorizer authorizes requests handled by the interop server.
 type Authorizer struct{}
 
-// RequireAuthorized returns an error if the given context is not authorized as neither Network Server nor Application Server.
-func (a Authorizer) RequireAuthorized(ctx context.Context) error {
+// RequireAuthorized returns an error if the given context is not authorized as neither Network Server
+// nor Application Server.
+func (Authorizer) RequireAuthorized(ctx context.Context) error {
 	if ctx.Value(nsAuthInfoKey) != nil || ctx.Value(asAuthInfoKey) != nil {
 		return nil
 	}
@@ -35,14 +36,14 @@ func (a Authorizer) RequireAuthorized(ctx context.Context) error {
 }
 
 // RequireAddress returns an error if the given address is not authorized in the context.
-func (a Authorizer) RequireAddress(ctx context.Context, addr string) error {
+func (Authorizer) RequireAddress(ctx context.Context, addr string) error {
 	var authInfo authInfo
 	if nsAuthInfo, ok := NetworkServerAuthInfoFromContext(ctx); ok {
 		authInfo = nsAuthInfo
-	} else if asAuthInfo, ok := ApplicationServerAuthInfoFromContext(ctx); ok {
-		authInfo = asAuthInfo
-	} else {
+	} else if asAuthInfo, ok := ApplicationServerAuthInfoFromContext(ctx); !ok {
 		return errUnauthenticated.New()
+	} else {
+		authInfo = asAuthInfo
 	}
 
 	patterns := authInfo.addressPatterns()
@@ -51,8 +52,8 @@ func (a Authorizer) RequireAddress(ctx context.Context, addr string) error {
 	}
 
 	host := addr
-	if url, err := url.Parse(addr); err == nil && url.Host != "" {
-		host = url.Host
+	if hostURL, err := url.Parse(addr); err == nil && hostURL.Host != "" {
+		host = hostURL.Host
 	}
 	if h, _, err := net.SplitHostPort(addr); err == nil {
 		host = h
@@ -81,8 +82,8 @@ nextPattern:
 	return errCallerNotAuthorized.WithAttributes("target", addr)
 }
 
-// RequireID returns an error if the given NetID is not authorized in the context.
-func (a Authorizer) RequireNetID(ctx context.Context, netID types.NetID) error {
+// RequireNetID returns an error if the given NetID is not authorized in the context.
+func (Authorizer) RequireNetID(ctx context.Context, netID types.NetID) error {
 	nsAuthInfo, ok := NetworkServerAuthInfoFromContext(ctx)
 	if !ok {
 		return errCallerNotAuthorized.WithAttributes("target", netID.String())
@@ -93,8 +94,8 @@ func (a Authorizer) RequireNetID(ctx context.Context, netID types.NetID) error {
 	return nil
 }
 
-// RequireID returns an error if the given AS-ID is not authorized in the context.
-func (a Authorizer) RequireASID(ctx context.Context, id string) error {
+// RequireASID returns an error if the given AS-ID is not authorized in the context.
+func (Authorizer) RequireASID(ctx context.Context, id string) error {
 	asAuthInfo, ok := ApplicationServerAuthInfoFromContext(ctx)
 	if !ok {
 		return errCallerNotAuthorized.WithAttributes("target", id)

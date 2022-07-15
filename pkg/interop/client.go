@@ -65,7 +65,9 @@ func serverURL(scheme, fqdn, path string, port uint32) string {
 	return fmt.Sprintf("%s://%s:%d%s", scheme, fqdn, port, path)
 }
 
-func newHTTPRequest(url string, pld interface{}, headers map[string]string, username, password string) (*http.Request, error) {
+func newHTTPRequest(
+	url string, pld interface{}, headers map[string]string, username, password string,
+) (*http.Request, error) {
 	buf := &bytes.Buffer{}
 	if err := json.NewEncoder(buf).Encode(pld); err != nil {
 		return nil, err
@@ -84,7 +86,9 @@ func newHTTPRequest(url string, pld interface{}, headers map[string]string, user
 	return req, nil
 }
 
-func httpExchange(ctx context.Context, httpReq *http.Request, res interface{}, do func(*http.Request) (*http.Response, error)) error {
+func httpExchange(
+	ctx context.Context, httpReq *http.Request, res interface{}, do func(*http.Request) (*http.Response, error),
+) error {
 	logger := log.FromContext(ctx).WithField("url", httpReq.URL)
 
 	logger.Debug("Send interop HTTP request")
@@ -133,7 +137,9 @@ type joinServerHTTPClient struct {
 	senderNSID         *types.EUI64
 }
 
-func (cl joinServerHTTPClient) exchange(ctx context.Context, joinEUI types.EUI64, pathFunc func(jsRPCPaths) string, pld, res interface{}) error {
+func (cl joinServerHTTPClient) exchange(
+	ctx context.Context, pathFunc func(jsRPCPaths) string, pld, res interface{},
+) error {
 	client, err := cl.clientProvider.HTTPClient(ctx, cl.clientOpts...)
 	if err != nil {
 		return err
@@ -173,9 +179,11 @@ func parseResult(r Result) error {
 }
 
 // GetAppSKey performs AppSKey request according to LoRaWAN Backend Interfaces specification.
-func (cl joinServerHTTPClient) GetAppSKey(ctx context.Context, asID string, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
+func (cl joinServerHTTPClient) GetAppSKey(
+	ctx context.Context, asID string, req *ttnpb.SessionKeyRequest,
+) (*ttnpb.AppSKeyResponse, error) {
 	interopAns := &AppSKeyAns{}
-	if err := cl.exchange(ctx, types.MustEUI64(req.JoinEui).OrZero(), jsRPCPaths.appSKey, &AppSKeyReq{
+	if err := cl.exchange(ctx, jsRPCPaths.appSKey, &AppSKeyReq{
 		AsJsMessageHeader: AsJsMessageHeader{
 			MessageHeader: MessageHeader{
 				ProtocolVersion: cl.protocol,
@@ -208,7 +216,9 @@ var (
 )
 
 // HandleJoinRequest performs Join request according to LoRaWAN Backend Interfaces specification.
-func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID types.NetID, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
+func (cl joinServerHTTPClient) HandleJoinRequest(
+	ctx context.Context, netID types.NetID, req *ttnpb.JoinRequest,
+) (*ttnpb.JoinResponse, error) {
 	if cl.protocol.RequiresNSID() && cl.senderNSID == nil {
 		return nil, errMissingNSID.New()
 	}
@@ -235,7 +245,7 @@ func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID type
 	}
 
 	interopAns := &JoinAns{}
-	if err := cl.exchange(ctx, pld.JoinEui, jsRPCPaths.join, &JoinReq{
+	if err := cl.exchange(ctx, jsRPCPaths.join, &JoinReq{
 		NsJsMessageHeader: NsJsMessageHeader{
 			MessageHeader: MessageHeader{
 				ProtocolVersion: cl.protocol,
@@ -303,6 +313,7 @@ type prefixJoinServerClient struct {
 	prefix types.EUI64Prefix
 }
 
+// Client is an interop client.
 type Client struct {
 	joinServers []prefixJoinServerClient // Sorted by JoinEUI prefix range length.
 }
@@ -313,7 +324,9 @@ var (
 )
 
 // NewClient return new interop client.
-func NewClient(ctx context.Context, conf config.InteropClient, httpClientProvider httpclient.Provider) (*Client, error) {
+func NewClient(
+	ctx context.Context, conf config.InteropClient, httpClientProvider httpclient.Provider,
+) (*Client, error) {
 	fetcher, err := conf.Fetcher(ctx, httpClientProvider)
 	if err != nil {
 		return nil, err
@@ -419,7 +432,8 @@ func NewClient(ctx context.Context, conf config.InteropClient, httpClientProvide
 }
 
 func (cl Client) joinServer(joinEUI types.EUI64) (joinServerClient, bool) {
-	// NOTE: joinServers slice is sorted by prefix length and the range start decreasing, hence the first match is the most specific one.
+	// NOTE: joinServers slice is sorted by prefix length and the range start decreasing,
+	// hence the first match is the most specific one.
 	for _, js := range cl.joinServers {
 		if js.prefix.Matches(joinEUI) {
 			return js.joinServerClient, true
@@ -429,7 +443,9 @@ func (cl Client) joinServer(joinEUI types.EUI64) (joinServerClient, bool) {
 }
 
 // GetAppSKey performs AppSKey request to Join Server associated with req.JoinEUI.
-func (cl Client) GetAppSKey(ctx context.Context, asID string, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
+func (cl Client) GetAppSKey(
+	ctx context.Context, asID string, req *ttnpb.SessionKeyRequest,
+) (*ttnpb.AppSKeyResponse, error) {
 	js, ok := cl.joinServer(types.MustEUI64(req.JoinEui).OrZero())
 	if !ok {
 		return nil, errNotRegistered.New()
@@ -438,7 +454,9 @@ func (cl Client) GetAppSKey(ctx context.Context, asID string, req *ttnpb.Session
 }
 
 // HandleJoinRequest performs Join request to Join Server associated with req.JoinEUI.
-func (cl Client) HandleJoinRequest(ctx context.Context, netID types.NetID, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
+func (cl Client) HandleJoinRequest(
+	ctx context.Context, netID types.NetID, req *ttnpb.JoinRequest,
+) (*ttnpb.JoinResponse, error) {
 	pld := req.Payload.GetJoinRequestPayload()
 	if pld == nil {
 		return nil, errNoJoinRequestPayload.New()

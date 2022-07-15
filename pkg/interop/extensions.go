@@ -26,7 +26,7 @@ var TTIVendorID = VendorID{0xec, 0x65, 0x6e}
 type TTIVendorIDType VendorID
 
 // MarshalText returns the vendor ID of The Things Industries.
-func (v TTIVendorIDType) MarshalText() ([]byte, error) {
+func (TTIVendorIDType) MarshalText() ([]byte, error) {
 	return TTIVendorID.MarshalText()
 }
 

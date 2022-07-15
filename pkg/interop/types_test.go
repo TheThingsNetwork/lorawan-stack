@@ -35,7 +35,7 @@ func aes128KeyPtr(key types.AES128Key) *types.AES128Key {
 	return &key
 }
 
-func TestMarshalTypes(t *testing.T) {
+func TestMarshalTypes(t *testing.T) { //nolint:paralleltest
 	a := assertions.New(t)
 
 	{
@@ -44,12 +44,12 @@ func TestMarshalTypes(t *testing.T) {
 			Buffer:     interop.Buffer([]byte{0x1, 0x2, 0x3}),
 			Key: interop.KeyEnvelope{
 				KekLabel: "",
-				Key:      aes128KeyPtr(types.AES128Key{0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf}),
+				Key:      aes128KeyPtr(types.AES128Key{0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf}), //nolint:lll
 			},
 		}
 		data, err := json.Marshal(msg)
 		if a.So(err, should.BeNil) {
-			a.So(string(data), should.Equal, `{"MACVersion":"1.0.2","Buffer":"010203","Key":{"KEKLabel":"","AESKey":"000102030405060708090A0B0C0D0E0F"}}`)
+			a.So(string(data), should.Equal, `{"MACVersion":"1.0.2","Buffer":"010203","Key":{"KEKLabel":"","AESKey":"000102030405060708090A0B0C0D0E0F"}}`) //nolint:lll
 		}
 	}
 
@@ -63,12 +63,12 @@ func TestMarshalTypes(t *testing.T) {
 		}
 		data, err := json.Marshal(msg)
 		if a.So(err, should.BeNil) {
-			a.So(string(data), should.Equal, `{"MACVersion":"1.1","Key":{"KEKLabel":"test","AESKey":"000102030405060708090A0B0C0D0E0F"}}`)
+			a.So(string(data), should.Equal, `{"MACVersion":"1.1","Key":{"KEKLabel":"test","AESKey":"000102030405060708090A0B0C0D0E0F"}}`) //nolint:lll
 		}
 	}
 }
 
-func TestUnmarshalTypes(t *testing.T) {
+func TestUnmarshalTypes(t *testing.T) { //nolint:paralleltest
 	a := assertions.New(t)
 
 	{
