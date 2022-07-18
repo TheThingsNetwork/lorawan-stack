@@ -223,9 +223,17 @@
   - [Message `MACState`](#ttn.lorawan.v3.MACState)
   - [Message `MACState.DataRateRange`](#ttn.lorawan.v3.MACState.DataRateRange)
   - [Message `MACState.DataRateRanges`](#ttn.lorawan.v3.MACState.DataRateRanges)
+  - [Message `MACState.DownlinkMessage`](#ttn.lorawan.v3.MACState.DownlinkMessage)
+  - [Message `MACState.DownlinkMessage.Message`](#ttn.lorawan.v3.MACState.DownlinkMessage.Message)
+  - [Message `MACState.DownlinkMessage.Message.MACPayload`](#ttn.lorawan.v3.MACState.DownlinkMessage.Message.MACPayload)
+  - [Message `MACState.DownlinkMessage.Message.MHDR`](#ttn.lorawan.v3.MACState.DownlinkMessage.Message.MHDR)
   - [Message `MACState.JoinAccept`](#ttn.lorawan.v3.MACState.JoinAccept)
   - [Message `MACState.JoinRequest`](#ttn.lorawan.v3.MACState.JoinRequest)
   - [Message `MACState.RejectedDataRateRangesEntry`](#ttn.lorawan.v3.MACState.RejectedDataRateRangesEntry)
+  - [Message `MACState.UplinkMessage`](#ttn.lorawan.v3.MACState.UplinkMessage)
+  - [Message `MACState.UplinkMessage.RxMetadata`](#ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata)
+  - [Message `MACState.UplinkMessage.RxMetadata.PacketBrokerMetadata`](#ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.PacketBrokerMetadata)
+  - [Message `MACState.UplinkMessage.TxSettings`](#ttn.lorawan.v3.MACState.UplinkMessage.TxSettings)
   - [Message `ResetAndGetEndDeviceRequest`](#ttn.lorawan.v3.ResetAndGetEndDeviceRequest)
   - [Message `Session`](#ttn.lorawan.v3.Session)
   - [Message `SetEndDeviceRequest`](#ttn.lorawan.v3.SetEndDeviceRequest)
@@ -3617,8 +3625,8 @@ This is used internally by the Network Server.
 | `queued_join_accept` | [`MACState.JoinAccept`](#ttn.lorawan.v3.MACState.JoinAccept) |  | Queued join-accept. Set each time a (re-)join request accept is received from Join Server and removed each time a downlink is scheduled. |
 | `pending_join_request` | [`MACState.JoinRequest`](#ttn.lorawan.v3.MACState.JoinRequest) |  | Pending join request. Set each time a join-accept is scheduled and removed each time an uplink is received from the device. |
 | `rx_windows_available` | [`bool`](#bool) |  | Whether or not Rx windows are expected to be open. Set to true every time an uplink is received. Set to false every time a successful downlink scheduling attempt is made. |
-| `recent_uplinks` | [`UplinkMessage`](#ttn.lorawan.v3.UplinkMessage) | repeated | Recent data uplink messages sorted by time. The number of messages stored may depend on configuration. |
-| `recent_downlinks` | [`DownlinkMessage`](#ttn.lorawan.v3.DownlinkMessage) | repeated | Recent data downlink messages sorted by time. The number of messages stored may depend on configuration. |
+| `recent_uplinks` | [`MACState.UplinkMessage`](#ttn.lorawan.v3.MACState.UplinkMessage) | repeated | Recent data uplink messages sorted by time. The number of messages stored may depend on configuration. |
+| `recent_downlinks` | [`MACState.DownlinkMessage`](#ttn.lorawan.v3.MACState.DownlinkMessage) | repeated | Recent data downlink messages sorted by time. The number of messages stored may depend on configuration. |
 | `last_network_initiated_downlink_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Time when the last network-initiated downlink message was scheduled. |
 | `rejected_adr_data_rate_indexes` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) | repeated | ADR Data rate index values rejected by the device. Reset each time `current_parameters.channels` change. Elements are sorted in ascending order. |
 | `rejected_adr_tx_power_indexes` | [`uint32`](#uint32) | repeated | ADR TX output power index values rejected by the device. Elements are sorted in ascending order. |
@@ -3665,6 +3673,60 @@ This is used internally by the Network Server.
 | ----- | ----------- |
 | `ranges` | <p>`repeated.min_items`: `1`</p> |
 
+### <a name="ttn.lorawan.v3.MACState.DownlinkMessage">Message `MACState.DownlinkMessage`</a>
+
+A minimal DownlinkMessage definition which is binary compatible with the top level DownlinkMessage message.
+Used for type safe recent downlink storage.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `payload` | [`MACState.DownlinkMessage.Message`](#ttn.lorawan.v3.MACState.DownlinkMessage.Message) |  |  |
+| `correlation_ids` | [`string`](#string) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `correlation_ids` | <p>`repeated.items.string.max_len`: `100`</p> |
+
+### <a name="ttn.lorawan.v3.MACState.DownlinkMessage.Message">Message `MACState.DownlinkMessage.Message`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `m_hdr` | [`MACState.DownlinkMessage.Message.MHDR`](#ttn.lorawan.v3.MACState.DownlinkMessage.Message.MHDR) |  |  |
+| `mac_payload` | [`MACState.DownlinkMessage.Message.MACPayload`](#ttn.lorawan.v3.MACState.DownlinkMessage.Message.MACPayload) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `m_hdr` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.MACState.DownlinkMessage.Message.MACPayload">Message `MACState.DownlinkMessage.Message.MACPayload`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `f_port` | [`uint32`](#uint32) |  |  |
+| `full_f_cnt` | [`uint32`](#uint32) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `f_port` | <p>`uint32.lte`: `255`</p> |
+
+### <a name="ttn.lorawan.v3.MACState.DownlinkMessage.Message.MHDR">Message `MACState.DownlinkMessage.Message.MHDR`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `m_type` | [`MType`](#ttn.lorawan.v3.MType) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `m_type` | <p>`enum.defined_only`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.MACState.JoinAccept">Message `MACState.JoinAccept`</a>
 
 | Field | Type | Label | Description |
@@ -3708,6 +3770,61 @@ This is used internally by the Network Server.
 | ----- | ---- | ----- | ----------- |
 | `key` | [`uint64`](#uint64) |  |  |
 | `value` | [`MACState.DataRateRanges`](#ttn.lorawan.v3.MACState.DataRateRanges) |  |  |
+
+### <a name="ttn.lorawan.v3.MACState.UplinkMessage">Message `MACState.UplinkMessage`</a>
+
+A minimal UplinkMessage definition which is binary compatible with the top level UplinkMessage message.
+Used for type safe recent uplink storage.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `payload` | [`Message`](#ttn.lorawan.v3.Message) |  |  |
+| `settings` | [`MACState.UplinkMessage.TxSettings`](#ttn.lorawan.v3.MACState.UplinkMessage.TxSettings) |  |  |
+| `rx_metadata` | [`MACState.UplinkMessage.RxMetadata`](#ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata) | repeated |  |
+| `received_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `correlation_ids` | [`string`](#string) | repeated |  |
+| `device_channel_index` | [`uint32`](#uint32) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `payload` | <p>`message.required`: `true`</p> |
+| `settings` | <p>`message.required`: `true`</p> |
+| `correlation_ids` | <p>`repeated.items.string.max_len`: `100`</p> |
+| `device_channel_index` | <p>`uint32.lte`: `255`</p> |
+
+### <a name="ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata">Message `MACState.UplinkMessage.RxMetadata`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
+| `channel_rssi` | [`float`](#float) |  |  |
+| `snr` | [`float`](#float) |  |  |
+| `downlink_path_constraint` | [`DownlinkPathConstraint`](#ttn.lorawan.v3.DownlinkPathConstraint) |  |  |
+| `uplink_token` | [`bytes`](#bytes) |  |  |
+| `packet_broker` | [`MACState.UplinkMessage.RxMetadata.PacketBrokerMetadata`](#ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.PacketBrokerMetadata) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `gateway_ids` | <p>`message.required`: `true`</p> |
+| `downlink_path_constraint` | <p>`enum.defined_only`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.PacketBrokerMetadata">Message `MACState.UplinkMessage.RxMetadata.PacketBrokerMetadata`</a>
+
+### <a name="ttn.lorawan.v3.MACState.UplinkMessage.TxSettings">Message `MACState.UplinkMessage.TxSettings`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `data_rate` | [`DataRate`](#ttn.lorawan.v3.DataRate) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `data_rate` | <p>`message.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.ResetAndGetEndDeviceRequest">Message `ResetAndGetEndDeviceRequest`</a>
 

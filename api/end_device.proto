@@ -23,6 +23,7 @@ import "google/protobuf/field_mask.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
+import "lorawan-stack/api/enums.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/keys.proto";
 import "lorawan-stack/api/lorawan.proto";
@@ -429,6 +430,56 @@ message MACState {
   // Set to true every time an uplink is received.
   // Set to false every time a successful downlink scheduling attempt is made.
   bool rx_windows_available = 13;
+
+  // A minimal UplinkMessage definition which is binary compatible with the top level UplinkMessage message.
+  // Used for type safe recent uplink storage.
+  message UplinkMessage {
+    Message payload = 2 [(validate.rules).message.required = true];
+    message TxSettings {
+      DataRate data_rate = 1 [(validate.rules).message.required = true];
+      reserved 2 to 9;
+    }
+    TxSettings settings = 4 [(validate.rules).message.required = true];
+    message RxMetadata {
+      GatewayIdentifiers gateway_ids = 1 [(validate.rules).message.required = true];
+      float channel_rssi = 9;
+      float snr = 11;
+      DownlinkPathConstraint downlink_path_constraint = 14 [(validate.rules).enum.defined_only = true];
+      bytes uplink_token = 15;
+      message PacketBrokerMetadata {
+        reserved 1 to 10;
+      }
+      PacketBrokerMetadata packet_broker = 18;
+      reserved 2 to 8, 10, 12, 13, 16, 17, 19, 20, 99;
+    }
+    repeated RxMetadata rx_metadata = 5;
+    google.protobuf.Timestamp received_at = 6;
+    repeated string correlation_ids = 7 [(validate.rules).repeated.items.string.max_len = 100];
+    uint32 device_channel_index = 9 [(validate.rules).uint32 = {lte: 255}];
+    reserved 1, 3, 8, 10;
+  }
+
+  // A minimal DownlinkMessage definition which is binary compatible with the top level DownlinkMessage message.
+  // Used for type safe recent downlink storage.
+  message DownlinkMessage {
+    message Message {
+      message MHDR {
+        MType m_type = 1 [(validate.rules).enum.defined_only = true];
+        reserved 2;
+      }
+      MHDR m_hdr = 1 [(validate.rules).message.required = true];
+      message MACPayload {
+        uint32 f_port = 2 [(validate.rules).uint32.lte = 255];
+        uint32 full_f_cnt = 5;
+        reserved 1, 3, 4;
+      }
+      MACPayload mac_payload = 3;
+      reserved 2, 4 to 7;
+    }
+    Message payload = 2;
+    repeated string correlation_ids = 6 [(validate.rules).repeated.items.string.max_len = 100];
+    reserved 1, 3 to 5, 7;
+  }
 
   // Recent data uplink messages sorted by time.
   // The number of messages stored may depend on configuration.

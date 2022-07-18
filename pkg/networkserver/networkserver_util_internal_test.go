@@ -62,7 +62,10 @@ const (
 )
 
 var (
+	ToMACStateDownlinkMessages          = toMACStateDownlinkMessages
 	AppendRecentDownlink                = appendRecentDownlink
+	ToMACStateRxMetadata                = toMACStateRxMetadata
+	ToMACStateUplinkMessages            = toMACStateUplinkMessages
 	AppendRecentUplink                  = appendRecentUplink
 	ApplicationJoinAcceptWithoutAppSKey = applicationJoinAcceptWithoutAppSKey
 	ApplyCFList                         = applyCFList
@@ -914,7 +917,7 @@ type DownlinkSchedulingAssertionConfig struct {
 	Session         *ttnpb.Session
 	Class           ttnpb.Class
 	RX1Delay        ttnpb.RxDelay
-	Uplink          *ttnpb.UplinkMessage
+	Uplink          *ttnpb.MACState_UplinkMessage
 	Priority        ttnpb.TxSchedulePriority
 	AbsoluteTime    *time.Time
 	FixedPaths      []*ttnpb.GatewayAntennaIdentifiers
@@ -938,7 +941,7 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 
 			var downlinkPaths []DownlinkPath
 			if conf.Uplink != nil {
-				downlinkPaths = DownlinkPathsFromMetadata(ctx, conf.Uplink.RxMetadata...)
+				downlinkPaths = DownlinkPathsFromMetadata(conf.Uplink.RxMetadata...)
 			} else {
 				for i := range conf.FixedPaths {
 					downlinkPaths = append(downlinkPaths, DownlinkPath{
@@ -1651,9 +1654,9 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 					CorrelationIds: joinResp.CorrelationIds,
 				},
 				RxWindowsAvailable: true,
-				RecentUplinks: []*ttnpb.UplinkMessage{
+				RecentUplinks: ToMACStateUplinkMessages(
 					MakeJoinRequest(deduplicatedUpConf),
-				},
+				),
 			}
 			return a.So(assertEvents(events.Builders(func() []events.Builder {
 				evBuilders := []events.Builder{
@@ -2128,7 +2131,7 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults *ttnpb.MACSettings, w
 		}()
 		macState := MakeMACState(&x, defaults,
 			MACStateOptions.WithRxWindowsAvailable(true),
-			MACStateOptions.WithRecentUplinks(
+			MACStateOptions.WithRecentUplinks(ToMACStateUplinkMessages(
 				MakeJoinRequest(JoinRequestConfig{
 					DecodePayload:  true,
 					JoinEUI:        *x.Ids.JoinEui,
@@ -2139,7 +2142,7 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults *ttnpb.MACSettings, w
 					DataRate:       phy.DataRates[drIdx].Rate, // TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/3997)
 					Frequency:      phy.UplinkChannels[0].Frequency,
 				}),
-			),
+			)...),
 		)
 		return o.WithPendingMacState(MACStatePtr(MACStateOptions.WithQueuedJoinAccept(&ttnpb.MACState_JoinAccept{
 			Payload: bytes.Repeat([]byte{0xff}, 17),
@@ -2182,41 +2185,10 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 				MACStateOptions.WithPendingJoinRequest(x.PendingMacState.QueuedJoinAccept.Request),
 				MACStateOptions.WithQueuedJoinAccept(nil),
 				MACStateOptions.WithRxWindowsAvailable(false),
-				MACStateOptions.AppendRecentDownlinks(&ttnpb.DownlinkMessage{
-					RawPayload: x.PendingMacState.QueuedJoinAccept.Payload,
-					Payload: &ttnpb.Message{
-						MHdr: &ttnpb.MHDR{
+				MACStateOptions.AppendRecentDownlinks(&ttnpb.MACState_DownlinkMessage{
+					Payload: &ttnpb.MACState_DownlinkMessage_Message{
+						MHdr: &ttnpb.MACState_DownlinkMessage_Message_MHDR{
 							MType: ttnpb.MType_JOIN_ACCEPT,
-							Major: ttnpb.Major_LORAWAN_R1,
-						},
-						Payload: &ttnpb.Message_JoinAcceptPayload{
-							JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
-								NetId:      types.MustNetID(x.PendingMacState.QueuedJoinAccept.NetId).OrZero(),
-								DevAddr:    types.MustDevAddr(x.PendingMacState.QueuedJoinAccept.DevAddr).OrZero(),
-								DlSettings: x.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
-								RxDelay:    x.PendingMacState.QueuedJoinAccept.Request.RxDelay,
-								CfList:     x.PendingMacState.QueuedJoinAccept.Request.CfList,
-							},
-						},
-					},
-					EndDeviceIds: x.Ids,
-					Settings: &ttnpb.DownlinkMessage_Request{
-						Request: &ttnpb.TxRequest{
-							Class:           ttnpb.Class_CLASS_A,
-							Priority:        priority,
-							FrequencyPlanId: x.FrequencyPlanId,
-							Rx1Delay:        ttnpb.RxDelay(Band(x.FrequencyPlanId, x.LorawanPhyVersion).JoinAcceptDelay1 / time.Second),
-							Rx2DataRate: &ttnpb.DataRate{
-								Modulation: &ttnpb.DataRate_Lora{
-									Lora: &ttnpb.LoRaDataRate{
-										Bandwidth:       125000,
-										SpreadingFactor: 12 - uint32(x.PendingMacState.CurrentParameters.Rx2DataRateIndex),
-									},
-								},
-							},
-							Rx2Frequency: x.PendingMacState.CurrentParameters.Rx2Frequency,
-							// TODO: Generate RX1 transmission parameters if necessary.
-							// https://github.com/TheThingsNetwork/lorawan-stack/issues/3142
 						},
 					},
 					CorrelationIds: []string{"join-accept"},

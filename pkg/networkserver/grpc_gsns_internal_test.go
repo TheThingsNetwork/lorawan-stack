@@ -19,58 +19,68 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
-	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func TestAppendRecentUplink(t *testing.T) {
-	ups := [...]*ttnpb.UplinkMessage{
+	ups := [...]*ttnpb.MACState_UplinkMessage{
 		{
-			RawPayload: []byte("test1"),
+			DeviceChannelIndex: 1,
 		},
 		{
-			RawPayload: []byte("test2"),
+			DeviceChannelIndex: 2,
 		},
 		{
-			RawPayload: []byte("test3"),
+			DeviceChannelIndex: 3,
 		},
 	}
 	for _, tc := range []struct {
-		Recent   []*ttnpb.UplinkMessage
+		Recent   []*ttnpb.MACState_UplinkMessage
 		Up       *ttnpb.UplinkMessage
 		Window   int
-		Expected []*ttnpb.UplinkMessage
+		Expected []*ttnpb.MACState_UplinkMessage
 	}{
 		{
-			Up:       ups[0],
+			Up: &ttnpb.UplinkMessage{
+				DeviceChannelIndex: 1,
+			},
 			Window:   1,
 			Expected: ups[:1],
 		},
 		{
-			Recent:   ups[:1],
-			Up:       ups[1],
+			Recent: ups[:1],
+			Up: &ttnpb.UplinkMessage{
+				DeviceChannelIndex: 2,
+			},
 			Window:   1,
 			Expected: ups[1:2],
 		},
 		{
-			Recent:   ups[:2],
-			Up:       ups[2],
+			Recent: ups[:2],
+			Up: &ttnpb.UplinkMessage{
+				DeviceChannelIndex: 3,
+			},
 			Window:   1,
 			Expected: ups[2:3],
 		},
 		{
-			Recent:   ups[:1],
-			Up:       ups[1],
+			Recent: ups[:1],
+			Up: &ttnpb.UplinkMessage{
+				DeviceChannelIndex: 2,
+			},
 			Window:   2,
 			Expected: ups[:2],
 		},
 		{
-			Recent:   ups[:2],
-			Up:       ups[2],
+			Recent: ups[:2],
+			Up: &ttnpb.UplinkMessage{
+				DeviceChannelIndex: 3,
+			},
 			Window:   2,
 			Expected: ups[1:3],
 		},
@@ -80,7 +90,7 @@ func TestAppendRecentUplink(t *testing.T) {
 			Name:     fmt.Sprintf("recent_length:%d,window:%v", len(tc.Recent), tc.Window),
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				recent := CopyUplinkMessages(tc.Recent...)
+				recent := deepcopy.Copy(tc.Recent).([]*ttnpb.MACState_UplinkMessage)
 				up := CopyUplinkMessage(tc.Up)
 				ret := appendRecentUplink(recent, up, tc.Window)
 				a.So(recent, should.Resemble, tc.Recent)

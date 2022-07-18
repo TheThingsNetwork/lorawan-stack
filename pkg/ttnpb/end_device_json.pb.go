@@ -1682,6 +1682,397 @@ func (x *MACState_JoinAccept) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the MACState_UplinkMessage_RxMetadata message to JSON.
+func (x *MACState_UplinkMessage_RxMetadata) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.GatewayIds != nil || s.HasField("gateway_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("gateway_ids")
+		// NOTE: GatewayIdentifiers does not seem to implement MarshalProtoJSON.
+		gogo.MarshalMessage(s, x.GatewayIds)
+	}
+	if x.ChannelRssi != 0 || s.HasField("channel_rssi") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("channel_rssi")
+		s.WriteFloat32(x.ChannelRssi)
+	}
+	if x.Snr != 0 || s.HasField("snr") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("snr")
+		s.WriteFloat32(x.Snr)
+	}
+	if x.DownlinkPathConstraint != 0 || s.HasField("downlink_path_constraint") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("downlink_path_constraint")
+		x.DownlinkPathConstraint.MarshalProtoJSON(s)
+	}
+	if len(x.UplinkToken) > 0 || s.HasField("uplink_token") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("uplink_token")
+		s.WriteBytes(x.UplinkToken)
+	}
+	if x.PacketBroker != nil || s.HasField("packet_broker") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("packet_broker")
+		// NOTE: MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata does not seem to implement MarshalProtoJSON.
+		gogo.MarshalMessage(s, x.PacketBroker)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the MACState_UplinkMessage_RxMetadata to JSON.
+func (x *MACState_UplinkMessage_RxMetadata) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the MACState_UplinkMessage_RxMetadata message from JSON.
+func (x *MACState_UplinkMessage_RxMetadata) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "gateway_ids", "gatewayIds":
+			s.AddField("gateway_ids")
+			if s.ReadNil() {
+				x.GatewayIds = nil
+				return
+			}
+			// NOTE: GatewayIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v GatewayIdentifiers
+			gogo.UnmarshalMessage(s, &v)
+			x.GatewayIds = &v
+		case "channel_rssi", "channelRssi":
+			s.AddField("channel_rssi")
+			x.ChannelRssi = s.ReadFloat32()
+		case "snr":
+			s.AddField("snr")
+			x.Snr = s.ReadFloat32()
+		case "downlink_path_constraint", "downlinkPathConstraint":
+			s.AddField("downlink_path_constraint")
+			x.DownlinkPathConstraint.UnmarshalProtoJSON(s)
+		case "uplink_token", "uplinkToken":
+			s.AddField("uplink_token")
+			x.UplinkToken = s.ReadBytes()
+		case "packet_broker", "packetBroker":
+			s.AddField("packet_broker")
+			if s.ReadNil() {
+				x.PacketBroker = nil
+				return
+			}
+			// NOTE: MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata does not seem to implement UnmarshalProtoJSON.
+			var v MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata
+			gogo.UnmarshalMessage(s, &v)
+			x.PacketBroker = &v
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the MACState_UplinkMessage_RxMetadata from JSON.
+func (x *MACState_UplinkMessage_RxMetadata) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the MACState_UplinkMessage message to JSON.
+func (x *MACState_UplinkMessage) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Payload != nil || s.HasField("payload") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("payload")
+		x.Payload.MarshalProtoJSON(s.WithField("payload"))
+	}
+	if x.Settings != nil || s.HasField("settings") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("settings")
+		// NOTE: MACState_UplinkMessage_TxSettings does not seem to implement MarshalProtoJSON.
+		gogo.MarshalMessage(s, x.Settings)
+	}
+	if len(x.RxMetadata) > 0 || s.HasField("rx_metadata") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("rx_metadata")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.RxMetadata {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("rx_metadata"))
+		}
+		s.WriteArrayEnd()
+	}
+	if x.ReceivedAt != nil || s.HasField("received_at") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("received_at")
+		if x.ReceivedAt == nil {
+			s.WriteNil()
+		} else {
+			gogo.MarshalTimestamp(s, x.ReceivedAt)
+		}
+	}
+	if len(x.CorrelationIds) > 0 || s.HasField("correlation_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("correlation_ids")
+		s.WriteStringArray(x.CorrelationIds)
+	}
+	if x.DeviceChannelIndex != 0 || s.HasField("device_channel_index") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("device_channel_index")
+		s.WriteUint32(x.DeviceChannelIndex)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the MACState_UplinkMessage to JSON.
+func (x *MACState_UplinkMessage) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the MACState_UplinkMessage message from JSON.
+func (x *MACState_UplinkMessage) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "payload":
+			if s.ReadNil() {
+				x.Payload = nil
+				return
+			}
+			x.Payload = &Message{}
+			x.Payload.UnmarshalProtoJSON(s.WithField("payload", true))
+		case "settings":
+			s.AddField("settings")
+			if s.ReadNil() {
+				x.Settings = nil
+				return
+			}
+			// NOTE: MACState_UplinkMessage_TxSettings does not seem to implement UnmarshalProtoJSON.
+			var v MACState_UplinkMessage_TxSettings
+			gogo.UnmarshalMessage(s, &v)
+			x.Settings = &v
+		case "rx_metadata", "rxMetadata":
+			s.AddField("rx_metadata")
+			if s.ReadNil() {
+				x.RxMetadata = nil
+				return
+			}
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.RxMetadata = append(x.RxMetadata, nil)
+					return
+				}
+				v := &MACState_UplinkMessage_RxMetadata{}
+				v.UnmarshalProtoJSON(s.WithField("rx_metadata", false))
+				if s.Err() != nil {
+					return
+				}
+				x.RxMetadata = append(x.RxMetadata, v)
+			})
+		case "received_at", "receivedAt":
+			s.AddField("received_at")
+			if s.ReadNil() {
+				x.ReceivedAt = nil
+				return
+			}
+			v := gogo.UnmarshalTimestamp(s)
+			if s.Err() != nil {
+				return
+			}
+			x.ReceivedAt = v
+		case "correlation_ids", "correlationIds":
+			s.AddField("correlation_ids")
+			if s.ReadNil() {
+				x.CorrelationIds = nil
+				return
+			}
+			x.CorrelationIds = s.ReadStringArray()
+		case "device_channel_index", "deviceChannelIndex":
+			s.AddField("device_channel_index")
+			x.DeviceChannelIndex = s.ReadUint32()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the MACState_UplinkMessage from JSON.
+func (x *MACState_UplinkMessage) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the MACState_DownlinkMessage_Message_MHDR message to JSON.
+func (x *MACState_DownlinkMessage_Message_MHDR) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.MType != 0 || s.HasField("m_type") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("m_type")
+		x.MType.MarshalProtoJSON(s)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the MACState_DownlinkMessage_Message_MHDR to JSON.
+func (x *MACState_DownlinkMessage_Message_MHDR) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the MACState_DownlinkMessage_Message_MHDR message from JSON.
+func (x *MACState_DownlinkMessage_Message_MHDR) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "m_type", "mType":
+			s.AddField("m_type")
+			x.MType.UnmarshalProtoJSON(s)
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the MACState_DownlinkMessage_Message_MHDR from JSON.
+func (x *MACState_DownlinkMessage_Message_MHDR) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the MACState_DownlinkMessage_Message message to JSON.
+func (x *MACState_DownlinkMessage_Message) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.MHdr != nil || s.HasField("m_hdr") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("m_hdr")
+		x.MHdr.MarshalProtoJSON(s.WithField("m_hdr"))
+	}
+	if x.MacPayload != nil || s.HasField("mac_payload") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("mac_payload")
+		// NOTE: MACState_DownlinkMessage_Message_MACPayload does not seem to implement MarshalProtoJSON.
+		gogo.MarshalMessage(s, x.MacPayload)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the MACState_DownlinkMessage_Message to JSON.
+func (x *MACState_DownlinkMessage_Message) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the MACState_DownlinkMessage_Message message from JSON.
+func (x *MACState_DownlinkMessage_Message) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "m_hdr", "mHdr":
+			if s.ReadNil() {
+				x.MHdr = nil
+				return
+			}
+			x.MHdr = &MACState_DownlinkMessage_Message_MHDR{}
+			x.MHdr.UnmarshalProtoJSON(s.WithField("m_hdr", true))
+		case "mac_payload", "macPayload":
+			s.AddField("mac_payload")
+			if s.ReadNil() {
+				x.MacPayload = nil
+				return
+			}
+			// NOTE: MACState_DownlinkMessage_Message_MACPayload does not seem to implement UnmarshalProtoJSON.
+			var v MACState_DownlinkMessage_Message_MACPayload
+			gogo.UnmarshalMessage(s, &v)
+			x.MacPayload = &v
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the MACState_DownlinkMessage_Message from JSON.
+func (x *MACState_DownlinkMessage_Message) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the MACState_DownlinkMessage message to JSON.
+func (x *MACState_DownlinkMessage) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Payload != nil || s.HasField("payload") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("payload")
+		x.Payload.MarshalProtoJSON(s.WithField("payload"))
+	}
+	if len(x.CorrelationIds) > 0 || s.HasField("correlation_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("correlation_ids")
+		s.WriteStringArray(x.CorrelationIds)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the MACState_DownlinkMessage to JSON.
+func (x *MACState_DownlinkMessage) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the MACState_DownlinkMessage message from JSON.
+func (x *MACState_DownlinkMessage) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "payload":
+			if s.ReadNil() {
+				x.Payload = nil
+				return
+			}
+			x.Payload = &MACState_DownlinkMessage_Message{}
+			x.Payload.UnmarshalProtoJSON(s.WithField("payload", true))
+		case "correlation_ids", "correlationIds":
+			s.AddField("correlation_ids")
+			if s.ReadNil() {
+				x.CorrelationIds = nil
+				return
+			}
+			x.CorrelationIds = s.ReadStringArray()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the MACState_DownlinkMessage from JSON.
+func (x *MACState_DownlinkMessage) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the MACState_DataRateRange message to JSON.
 func (x *MACState_DataRateRange) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -2092,7 +2483,7 @@ func (x *MACState) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 					x.RecentUplinks = append(x.RecentUplinks, nil)
 					return
 				}
-				v := &UplinkMessage{}
+				v := &MACState_UplinkMessage{}
 				v.UnmarshalProtoJSON(s.WithField("recent_uplinks", false))
 				if s.Err() != nil {
 					return
@@ -2110,7 +2501,7 @@ func (x *MACState) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 					x.RecentDownlinks = append(x.RecentDownlinks, nil)
 					return
 				}
-				v := &DownlinkMessage{}
+				v := &MACState_DownlinkMessage{}
 				v.UnmarshalProtoJSON(s.WithField("recent_downlinks", false))
 				if s.Err() != nil {
 					return

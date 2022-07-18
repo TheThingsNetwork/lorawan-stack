@@ -11605,6 +11605,27 @@
         }
       }
     },
+    "DownlinkMessageMessageMACPayload": {
+      "type": "object",
+      "properties": {
+        "f_port": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "full_f_cnt": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "DownlinkMessageMessageMHDR": {
+      "type": "object",
+      "properties": {
+        "m_type": {
+          "$ref": "#/definitions/v3MType"
+        }
+      }
+    },
     "EndDeviceModelBattery": {
       "type": "object",
       "properties": {
@@ -12399,6 +12420,17 @@
         }
       }
     },
+    "MACStateDownlinkMessageMessage": {
+      "type": "object",
+      "properties": {
+        "m_hdr": {
+          "$ref": "#/definitions/DownlinkMessageMessageMHDR"
+        },
+        "mac_payload": {
+          "$ref": "#/definitions/DownlinkMessageMessageMACPayload"
+        }
+      }
+    },
     "MACStateJoinAccept": {
       "type": "object",
       "properties": {
@@ -12427,6 +12459,40 @@
         "net_id": {
           "type": "string",
           "format": "byte"
+        }
+      }
+    },
+    "MACStateUplinkMessageRxMetadata": {
+      "type": "object",
+      "properties": {
+        "gateway_ids": {
+          "$ref": "#/definitions/lorawanv3GatewayIdentifiers"
+        },
+        "channel_rssi": {
+          "type": "number",
+          "format": "float"
+        },
+        "snr": {
+          "type": "number",
+          "format": "float"
+        },
+        "downlink_path_constraint": {
+          "$ref": "#/definitions/v3DownlinkPathConstraint"
+        },
+        "uplink_token": {
+          "type": "string",
+          "format": "byte"
+        },
+        "packet_broker": {
+          "$ref": "#/definitions/UplinkMessageRxMetadataPacketBrokerMetadata"
+        }
+      }
+    },
+    "MACStateUplinkMessageTxSettings": {
+      "type": "object",
+      "properties": {
+        "data_rate": {
+          "$ref": "#/definitions/v3DataRate"
         }
       }
     },
@@ -12562,6 +12628,9 @@
       },
       "description": "Transmission settings for downlink."
     },
+    "UplinkMessageRxMetadataPacketBrokerMetadata": {
+      "type": "object"
+    },
     "UserRegistrationAdminApproval": {
       "type": "object",
       "properties": {
@@ -12630,6 +12699,38 @@
           "format": "date-time"
         }
       }
+    },
+    "lorawanv3DownlinkMessage": {
+      "type": "object",
+      "properties": {
+        "raw_payload": {
+          "type": "string",
+          "format": "byte"
+        },
+        "payload": {
+          "$ref": "#/definitions/lorawanv3Message"
+        },
+        "end_device_ids": {
+          "$ref": "#/definitions/v3EndDeviceIdentifiers"
+        },
+        "request": {
+          "$ref": "#/definitions/v3TxRequest"
+        },
+        "scheduled": {
+          "$ref": "#/definitions/lorawanv3TxSettings"
+        },
+        "correlation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "session_key_id": {
+          "type": "string",
+          "format": "byte"
+        }
+      },
+      "title": "Downlink message from the network to the end device"
     },
     "lorawanv3GatewayIdentifiers": {
       "type": "object",
@@ -12703,18 +12804,53 @@
         }
       }
     },
+    "lorawanv3MACPayload": {
+      "type": "object",
+      "properties": {
+        "f_hdr": {
+          "$ref": "#/definitions/v3FHDR"
+        },
+        "f_port": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "frm_payload": {
+          "type": "string",
+          "format": "byte"
+        },
+        "decoded_payload": {
+          "type": "object"
+        },
+        "full_f_cnt": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Full 32-bit FCnt value. Used internally by Network Server."
+        }
+      }
+    },
+    "lorawanv3MHDR": {
+      "type": "object",
+      "properties": {
+        "m_type": {
+          "$ref": "#/definitions/v3MType"
+        },
+        "major": {
+          "$ref": "#/definitions/v3Major"
+        }
+      }
+    },
     "lorawanv3Message": {
       "type": "object",
       "properties": {
         "m_hdr": {
-          "$ref": "#/definitions/v3MHDR"
+          "$ref": "#/definitions/lorawanv3MHDR"
         },
         "mic": {
           "type": "string",
           "format": "byte"
         },
         "mac_payload": {
-          "$ref": "#/definitions/v3MACPayload"
+          "$ref": "#/definitions/lorawanv3MACPayload"
         },
         "join_request_payload": {
           "$ref": "#/definitions/v3JoinRequestPayload"
@@ -12727,6 +12863,241 @@
         }
       },
       "title": "Message represents a LoRaWAN message"
+    },
+    "lorawanv3PacketBrokerMetadata": {
+      "type": "object",
+      "properties": {
+        "message_id": {
+          "type": "string",
+          "description": "Message identifier generated by Packet Broker Router."
+        },
+        "forwarder_net_id": {
+          "type": "string",
+          "format": "byte",
+          "description": "LoRa Alliance NetID of the Packet Broker Forwarder Member."
+        },
+        "forwarder_tenant_id": {
+          "type": "string",
+          "description": "Tenant ID managed by the Packet Broker Forwarder Member."
+        },
+        "forwarder_cluster_id": {
+          "type": "string",
+          "description": "Forwarder Cluster ID of the Packet Broker Forwarder."
+        },
+        "forwarder_gateway_eui": {
+          "type": "string",
+          "format": "byte",
+          "description": "Forwarder gateway EUI."
+        },
+        "forwarder_gateway_id": {
+          "type": "string",
+          "description": "Forwarder gateway ID."
+        },
+        "home_network_net_id": {
+          "type": "string",
+          "format": "byte",
+          "description": "LoRa Alliance NetID of the Packet Broker Home Network Member."
+        },
+        "home_network_tenant_id": {
+          "type": "string",
+          "description": "Tenant ID managed by the Packet Broker Home Network Member.\nThis value is empty if it cannot be determined by the Packet Broker Router."
+        },
+        "home_network_cluster_id": {
+          "type": "string",
+          "description": "Home Network Cluster ID of the Packet Broker Home Network."
+        },
+        "hops": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3PacketBrokerRouteHop"
+          },
+          "description": "Hops that the message passed. Each Packet Broker Router service appends an entry."
+        }
+      }
+    },
+    "lorawanv3RxMetadata": {
+      "type": "object",
+      "properties": {
+        "gateway_ids": {
+          "$ref": "#/definitions/lorawanv3GatewayIdentifiers"
+        },
+        "packet_broker": {
+          "$ref": "#/definitions/lorawanv3PacketBrokerMetadata"
+        },
+        "antenna_index": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Gateway concentrator timestamp when the Rx finished (microseconds)."
+        },
+        "fine_timestamp": {
+          "type": "string",
+          "format": "uint64",
+          "description": "Gateway's internal fine timestamp when the Rx finished (nanoseconds)."
+        },
+        "encrypted_fine_timestamp": {
+          "type": "string",
+          "format": "byte",
+          "description": "Encrypted gateway's internal fine timestamp when the Rx finished (nanoseconds)."
+        },
+        "encrypted_fine_timestamp_key_id": {
+          "type": "string"
+        },
+        "rssi": {
+          "type": "number",
+          "format": "float",
+          "description": "Received signal strength indicator (dBm).\nThis value equals `channel_rssi`."
+        },
+        "signal_rssi": {
+          "type": "number",
+          "format": "float",
+          "description": "Received signal strength indicator of the signal (dBm)."
+        },
+        "channel_rssi": {
+          "type": "number",
+          "format": "float",
+          "description": "Received signal strength indicator of the channel (dBm)."
+        },
+        "rssi_standard_deviation": {
+          "type": "number",
+          "format": "float",
+          "description": "Standard deviation of the RSSI during preamble."
+        },
+        "snr": {
+          "type": "number",
+          "format": "float",
+          "description": "Signal-to-noise ratio (dB)."
+        },
+        "frequency_offset": {
+          "type": "string",
+          "format": "int64",
+          "description": "Frequency offset (Hz)."
+        },
+        "location": {
+          "$ref": "#/definitions/lorawanv3Location",
+          "description": "Antenna location; injected by the Gateway Server."
+        },
+        "downlink_path_constraint": {
+          "$ref": "#/definitions/v3DownlinkPathConstraint",
+          "description": "Gateway downlink path constraint; injected by the Gateway Server."
+        },
+        "uplink_token": {
+          "type": "string",
+          "format": "byte",
+          "description": "Uplink token to be included in the Tx request in class A downlink; injected by gateway, Gateway Server or fNS."
+        },
+        "channel_index": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Index of the gateway channel that received the message."
+        },
+        "hopping_width": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Hopping width; a number describing the number of steps of the LR-FHSS grid."
+        },
+        "frequency_drift": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Frequency drift in Hz between start and end of an LR-FHSS packet (signed)."
+        },
+        "advanced": {
+          "type": "object",
+          "title": "Advanced metadata fields\n- can be used for advanced information or experimental features that are not yet formally defined in the API\n- field names are written in snake_case"
+        }
+      },
+      "description": "Contains metadata for a received message. Each antenna that receives\na message corresponds to one RxMetadata."
+    },
+    "lorawanv3TxSettings": {
+      "type": "object",
+      "properties": {
+        "data_rate": {
+          "$ref": "#/definitions/v3DataRate",
+          "description": "Data rate."
+        },
+        "coding_rate": {
+          "type": "string",
+          "description": "LoRa coding rate."
+        },
+        "frequency": {
+          "type": "string",
+          "format": "uint64",
+          "description": "Frequency (Hz)."
+        },
+        "enable_crc": {
+          "type": "boolean",
+          "description": "Send a CRC in the packet; only on uplink; on downlink, CRC should not be enabled."
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Timestamp of the gateway concentrator when the uplink message was received, or when the downlink message should be transmitted (microseconds).\nOn downlink, set timestamp to 0 and time to null to use immediate scheduling."
+        },
+        "time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Time of the gateway when the uplink message was received, or when the downlink message should be transmitted.\nFor downlink, this requires the gateway to have GPS time synchronization."
+        },
+        "downlink": {
+          "$ref": "#/definitions/TxSettingsDownlink",
+          "description": "Transmission settings for downlink."
+        },
+        "concentrator_timestamp": {
+          "type": "string",
+          "format": "int64",
+          "description": "Concentrator timestamp for the downlink as calculated by the Gateway Server scheduler.\nThis value takes into account necessary offsets such as the RTT (Round Trip Time) and TOA (Time Of Arrival).\nThis field is set and used only by the Gateway Server."
+        }
+      },
+      "description": "TxSettings contains the settings for a transmission.\nThis message is used on both uplink and downlink.\nOn downlink, this is a scheduled transmission."
+    },
+    "lorawanv3UplinkMessage": {
+      "type": "object",
+      "properties": {
+        "raw_payload": {
+          "type": "string",
+          "format": "byte"
+        },
+        "payload": {
+          "$ref": "#/definitions/lorawanv3Message"
+        },
+        "settings": {
+          "$ref": "#/definitions/lorawanv3TxSettings"
+        },
+        "rx_metadata": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/lorawanv3RxMetadata"
+          }
+        },
+        "received_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server time when a component received the message.\nThe Gateway Server and Network Server set this value to their local server time of reception."
+        },
+        "correlation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "device_channel_index": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Index of the device channel that received the message.\nSet by Network Server."
+        },
+        "consumed_airtime": {
+          "type": "string",
+          "description": "Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings."
+        }
+      },
+      "title": "Uplink message from the end device to the network"
     },
     "protobufAny": {
       "type": "object",
@@ -13583,12 +13954,12 @@
         "rx_metadata": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v3RxMetadata"
+            "$ref": "#/definitions/lorawanv3RxMetadata"
           },
           "description": "A list of metadata for each antenna of each gateway that received this message."
         },
         "settings": {
-          "$ref": "#/definitions/v3TxSettings",
+          "$ref": "#/definitions/lorawanv3TxSettings",
           "description": "Settings for the transmission."
         },
         "received_at": {
@@ -14808,38 +15179,6 @@
         }
       }
     },
-    "v3DownlinkMessage": {
-      "type": "object",
-      "properties": {
-        "raw_payload": {
-          "type": "string",
-          "format": "byte"
-        },
-        "payload": {
-          "$ref": "#/definitions/lorawanv3Message"
-        },
-        "end_device_ids": {
-          "$ref": "#/definitions/v3EndDeviceIdentifiers"
-        },
-        "request": {
-          "$ref": "#/definitions/v3TxRequest"
-        },
-        "scheduled": {
-          "$ref": "#/definitions/v3TxSettings"
-        },
-        "correlation_ids": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "session_key_id": {
-          "type": "string",
-          "format": "byte"
-        }
-      },
-      "title": "Downlink message from the network to the end device"
-    },
     "v3DownlinkPath": {
       "type": "object",
       "properties": {
@@ -15920,7 +16259,7 @@
       "type": "object",
       "properties": {
         "downlink_message": {
-          "$ref": "#/definitions/v3DownlinkMessage",
+          "$ref": "#/definitions/lorawanv3DownlinkMessage",
           "description": "DownlinkMessage for the gateway."
         }
       },
@@ -16734,30 +17073,6 @@
         }
       }
     },
-    "v3MACPayload": {
-      "type": "object",
-      "properties": {
-        "f_hdr": {
-          "$ref": "#/definitions/v3FHDR"
-        },
-        "f_port": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "frm_payload": {
-          "type": "string",
-          "format": "byte"
-        },
-        "decoded_payload": {
-          "type": "object"
-        },
-        "full_f_cnt": {
-          "type": "integer",
-          "format": "int64",
-          "description": "Full 32-bit FCnt value. Used internally by Network Server."
-        }
-      }
-    },
     "v3MACSettings": {
       "type": "object",
       "properties": {
@@ -16967,14 +17282,14 @@
         "recent_uplinks": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v3UplinkMessage"
+            "$ref": "#/definitions/v3MACStateUplinkMessage"
           },
           "description": "Recent data uplink messages sorted by time.\nThe number of messages stored may depend on configuration."
         },
         "recent_downlinks": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v3DownlinkMessage"
+            "$ref": "#/definitions/v3MACStateDownlinkMessage"
           },
           "description": "Recent data downlink messages sorted by time.\nThe number of messages stored may depend on configuration."
         },
@@ -17026,6 +17341,21 @@
       },
       "description": "MACState represents the state of MAC layer of the device.\nMACState is reset on each join for OTAA or ResetInd for ABP devices.\nThis is used internally by the Network Server."
     },
+    "v3MACStateDownlinkMessage": {
+      "type": "object",
+      "properties": {
+        "payload": {
+          "$ref": "#/definitions/MACStateDownlinkMessageMessage"
+        },
+        "correlation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "A minimal DownlinkMessage definition which is binary compatible with the top level DownlinkMessage message.\nUsed for type safe recent downlink storage."
+    },
     "v3MACStateJoinRequest": {
       "type": "object",
       "properties": {
@@ -17040,6 +17370,38 @@
         }
       }
     },
+    "v3MACStateUplinkMessage": {
+      "type": "object",
+      "properties": {
+        "payload": {
+          "$ref": "#/definitions/lorawanv3Message"
+        },
+        "settings": {
+          "$ref": "#/definitions/MACStateUplinkMessageTxSettings"
+        },
+        "rx_metadata": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MACStateUplinkMessageRxMetadata"
+          }
+        },
+        "received_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "correlation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "device_channel_index": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "description": "A minimal UplinkMessage definition which is binary compatible with the top level UplinkMessage message.\nUsed for type safe recent uplink storage."
+    },
     "v3MACVersion": {
       "type": "string",
       "enum": [
@@ -17052,17 +17414,6 @@
         "MAC_V1_0_4"
       ],
       "default": "MAC_UNKNOWN"
-    },
-    "v3MHDR": {
-      "type": "object",
-      "properties": {
-        "m_type": {
-          "$ref": "#/definitions/v3MType"
-        },
-        "major": {
-          "$ref": "#/definitions/v3Major"
-        }
-      }
     },
     "v3MQTTConnectionInfo": {
       "type": "object",
@@ -17693,57 +18044,6 @@
         }
       }
     },
-    "v3PacketBrokerMetadata": {
-      "type": "object",
-      "properties": {
-        "message_id": {
-          "type": "string",
-          "description": "Message identifier generated by Packet Broker Router."
-        },
-        "forwarder_net_id": {
-          "type": "string",
-          "format": "byte",
-          "description": "LoRa Alliance NetID of the Packet Broker Forwarder Member."
-        },
-        "forwarder_tenant_id": {
-          "type": "string",
-          "description": "Tenant ID managed by the Packet Broker Forwarder Member."
-        },
-        "forwarder_cluster_id": {
-          "type": "string",
-          "description": "Forwarder Cluster ID of the Packet Broker Forwarder."
-        },
-        "forwarder_gateway_eui": {
-          "type": "string",
-          "format": "byte",
-          "description": "Forwarder gateway EUI."
-        },
-        "forwarder_gateway_id": {
-          "type": "string",
-          "description": "Forwarder gateway ID."
-        },
-        "home_network_net_id": {
-          "type": "string",
-          "format": "byte",
-          "description": "LoRa Alliance NetID of the Packet Broker Home Network Member."
-        },
-        "home_network_tenant_id": {
-          "type": "string",
-          "description": "Tenant ID managed by the Packet Broker Home Network Member.\nThis value is empty if it cannot be determined by the Packet Broker Router."
-        },
-        "home_network_cluster_id": {
-          "type": "string",
-          "description": "Home Network Cluster ID of the Packet Broker Home Network."
-        },
-        "hops": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v3PacketBrokerRouteHop"
-          },
-          "description": "Hops that the message passed. Each Packet Broker Router service appends an entry."
-        }
-      }
-    },
     "v3PacketBrokerNetwork": {
       "type": "object",
       "properties": {
@@ -18291,106 +18591,6 @@
         }
       }
     },
-    "v3RxMetadata": {
-      "type": "object",
-      "properties": {
-        "gateway_ids": {
-          "$ref": "#/definitions/lorawanv3GatewayIdentifiers"
-        },
-        "packet_broker": {
-          "$ref": "#/definitions/v3PacketBrokerMetadata"
-        },
-        "antenna_index": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "time": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "timestamp": {
-          "type": "integer",
-          "format": "int64",
-          "description": "Gateway concentrator timestamp when the Rx finished (microseconds)."
-        },
-        "fine_timestamp": {
-          "type": "string",
-          "format": "uint64",
-          "description": "Gateway's internal fine timestamp when the Rx finished (nanoseconds)."
-        },
-        "encrypted_fine_timestamp": {
-          "type": "string",
-          "format": "byte",
-          "description": "Encrypted gateway's internal fine timestamp when the Rx finished (nanoseconds)."
-        },
-        "encrypted_fine_timestamp_key_id": {
-          "type": "string"
-        },
-        "rssi": {
-          "type": "number",
-          "format": "float",
-          "description": "Received signal strength indicator (dBm).\nThis value equals `channel_rssi`."
-        },
-        "signal_rssi": {
-          "type": "number",
-          "format": "float",
-          "description": "Received signal strength indicator of the signal (dBm)."
-        },
-        "channel_rssi": {
-          "type": "number",
-          "format": "float",
-          "description": "Received signal strength indicator of the channel (dBm)."
-        },
-        "rssi_standard_deviation": {
-          "type": "number",
-          "format": "float",
-          "description": "Standard deviation of the RSSI during preamble."
-        },
-        "snr": {
-          "type": "number",
-          "format": "float",
-          "description": "Signal-to-noise ratio (dB)."
-        },
-        "frequency_offset": {
-          "type": "string",
-          "format": "int64",
-          "description": "Frequency offset (Hz)."
-        },
-        "location": {
-          "$ref": "#/definitions/lorawanv3Location",
-          "description": "Antenna location; injected by the Gateway Server."
-        },
-        "downlink_path_constraint": {
-          "$ref": "#/definitions/v3DownlinkPathConstraint",
-          "description": "Gateway downlink path constraint; injected by the Gateway Server."
-        },
-        "uplink_token": {
-          "type": "string",
-          "format": "byte",
-          "description": "Uplink token to be included in the Tx request in class A downlink; injected by gateway, Gateway Server or fNS."
-        },
-        "channel_index": {
-          "type": "integer",
-          "format": "int64",
-          "description": "Index of the gateway channel that received the message."
-        },
-        "hopping_width": {
-          "type": "integer",
-          "format": "int64",
-          "description": "Hopping width; a number describing the number of steps of the LR-FHSS grid."
-        },
-        "frequency_drift": {
-          "type": "integer",
-          "format": "int32",
-          "description": "Frequency drift in Hz between start and end of an LR-FHSS packet (signed)."
-        },
-        "advanced": {
-          "type": "object",
-          "title": "Advanced metadata fields\n- can be used for advanced information or experimental features that are not yet formally defined in the API\n- field names are written in snake_case"
-        }
-      },
-      "description": "Contains metadata for a received message. Each antenna that receives\na message corresponds to one RxMetadata."
-    },
     "v3ScheduleDownlinkResponse": {
       "type": "object",
       "properties": {
@@ -18726,7 +18926,7 @@
           "$ref": "#/definitions/TxAcknowledgmentResult"
         },
         "downlink_message": {
-          "$ref": "#/definitions/v3DownlinkMessage",
+          "$ref": "#/definitions/lorawanv3DownlinkMessage",
           "description": "The acknowledged downlink message. Set by the Gateway Server."
         }
       }
@@ -18798,48 +18998,6 @@
         "HIGHEST"
       ],
       "default": "LOWEST"
-    },
-    "v3TxSettings": {
-      "type": "object",
-      "properties": {
-        "data_rate": {
-          "$ref": "#/definitions/v3DataRate",
-          "description": "Data rate."
-        },
-        "coding_rate": {
-          "type": "string",
-          "description": "LoRa coding rate."
-        },
-        "frequency": {
-          "type": "string",
-          "format": "uint64",
-          "description": "Frequency (Hz)."
-        },
-        "enable_crc": {
-          "type": "boolean",
-          "description": "Send a CRC in the packet; only on uplink; on downlink, CRC should not be enabled."
-        },
-        "timestamp": {
-          "type": "integer",
-          "format": "int64",
-          "description": "Timestamp of the gateway concentrator when the uplink message was received, or when the downlink message should be transmitted (microseconds).\nOn downlink, set timestamp to 0 and time to null to use immediate scheduling."
-        },
-        "time": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Time of the gateway when the uplink message was received, or when the downlink message should be transmitted.\nFor downlink, this requires the gateway to have GPS time synchronization."
-        },
-        "downlink": {
-          "$ref": "#/definitions/TxSettingsDownlink",
-          "description": "Transmission settings for downlink."
-        },
-        "concentrator_timestamp": {
-          "type": "string",
-          "format": "int64",
-          "description": "Concentrator timestamp for the downlink as calculated by the Gateway Server scheduler.\nThis value takes into account necessary offsets such as the RTT (Round Trip Time) and TOA (Time Of Arrival).\nThis field is set and used only by the Gateway Server."
-        }
-      },
-      "description": "TxSettings contains the settings for a transmission.\nThis message is used on both uplink and downlink.\nOn downlink, this is a scheduled transmission."
     },
     "v3UpdateApplicationAPIKeyRequest": {
       "type": "object",
@@ -19019,48 +19177,6 @@
           "description": "The names of the user fields that should be updated."
         }
       }
-    },
-    "v3UplinkMessage": {
-      "type": "object",
-      "properties": {
-        "raw_payload": {
-          "type": "string",
-          "format": "byte"
-        },
-        "payload": {
-          "$ref": "#/definitions/lorawanv3Message"
-        },
-        "settings": {
-          "$ref": "#/definitions/v3TxSettings"
-        },
-        "rx_metadata": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v3RxMetadata"
-          }
-        },
-        "received_at": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Server time when a component received the message.\nThe Gateway Server and Network Server set this value to their local server time of reception."
-        },
-        "correlation_ids": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "device_channel_index": {
-          "type": "integer",
-          "format": "int64",
-          "description": "Index of the device channel that received the message.\nSet by Network Server."
-        },
-        "consumed_airtime": {
-          "type": "string",
-          "description": "Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings."
-        }
-      },
-      "title": "Uplink message from the end device to the network"
     },
     "v3User": {
       "type": "object",

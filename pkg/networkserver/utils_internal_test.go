@@ -44,7 +44,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 
 	beaconTime := gpstime.Parse(mac.BeaconPeriod)
 
-	up := &ttnpb.UplinkMessage{
+	up := &ttnpb.MACState_UplinkMessage{
 		Payload: &ttnpb.Message{
 			MHdr: &ttnpb.MHDR{
 				MType: ttnpb.MType_UNCONFIRMED_UP,
@@ -57,10 +57,10 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 				},
 			},
 		},
-		RxMetadata: DefaultRxMetadata[:],
+		RxMetadata: ToMACStateRxMetadata(DefaultRxMetadata[:]...),
 		ReceivedAt: ttnpb.ProtoTimePtr(beaconTime),
 	}
-	ups := []*ttnpb.UplinkMessage{up}
+	ups := []*ttnpb.MACState_UplinkMessage{up}
 
 	rxDelay := ttnpb.RxDelay_RX_DELAY_4
 	rx1 := ttnpb.StdTime(up.ReceivedAt).Add(rxDelay.Duration())

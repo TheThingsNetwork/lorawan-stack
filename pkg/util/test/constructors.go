@@ -102,14 +102,14 @@ func (o SessionOptionNamespace) WithDefaultAppSKey() SessionOption {
 	return o.WithSessionKeysOptions(SessionKeysOptions.WithDefaultAppSKey())
 }
 
-func (o MACStateOptionNamespace) AppendRecentUplinks(ups ...*ttnpb.UplinkMessage) MACStateOption {
+func (o MACStateOptionNamespace) AppendRecentUplinks(ups ...*ttnpb.MACState_UplinkMessage) MACStateOption {
 	return func(x ttnpb.MACState) ttnpb.MACState {
 		x.RecentUplinks = append(x.RecentUplinks, ups...)
 		return x
 	}
 }
 
-func (o MACStateOptionNamespace) AppendRecentDownlinks(downs ...*ttnpb.DownlinkMessage) MACStateOption {
+func (o MACStateOptionNamespace) AppendRecentDownlinks(downs ...*ttnpb.MACState_DownlinkMessage) MACStateOption {
 	return func(x ttnpb.MACState) ttnpb.MACState {
 		x.RecentDownlinks = append(x.RecentDownlinks, downs...)
 		return x

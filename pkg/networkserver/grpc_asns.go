@@ -139,10 +139,10 @@ func minAFCntDown(session *ttnpb.Session, macState *ttnpb.MACState) (uint32, err
 				if macPayload == nil {
 					return 0, errInvalidPayload.New()
 				}
-				if macPayload.FPort > 0 && macPayload.FHdr.FCnt >= minFCnt {
+				if macPayload.FPort > 0 && macPayload.FullFCnt >= minFCnt {
 					// NOTE: In an unlikely case all len(recentDowns) downlinks are FPort==0 or something unmatched in the switch (e.g. a proprietary downlink) minFCnt will
 					// not reflect the correct AFCntDown - that is fine, because this is AS's responsibility and FCnt checking here is essentially just a sanity check.
-					minFCnt = macPayload.FHdr.FCnt + 1
+					minFCnt = macPayload.FullFCnt + 1
 					break outer
 				}
 			case ttnpb.MType_JOIN_ACCEPT:
