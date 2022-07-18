@@ -6041,7 +6041,7 @@
     },
     "/gs/gateways/connection/stats": {
       "post": {
-        "summary": "Get statistics about gateway connections to the Gateway Server of a batch of gateways.\nThis is not persisted between reconnects.\nGateways that are not connected or are part of a different cluster are ignored.\nIt is upto the client to make sure that the gateways are in the requested cluster.",
+        "summary": "Get statistics about gateway connections to the Gateway Server of a batch of gateways.\nThis is not persisted between reconnects.\nGateways that are not connected or are part of a different cluster are ignored.\nIt is up to the client to make sure that the gateways are in the requested cluster.",
         "operationId": "Gs_BatchGetGatewayConnectionStats",
         "responses": {
           "200": {

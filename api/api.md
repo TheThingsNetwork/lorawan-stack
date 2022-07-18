@@ -4731,7 +4731,7 @@ GatewayUp may contain zero or more uplink messages and/or a status message for t
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `GetGatewayConnectionStats` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`GatewayConnectionStats`](#ttn.lorawan.v3.GatewayConnectionStats) | Get statistics about the current gateway connection to the Gateway Server. This is not persisted between reconnects. |
-| `BatchGetGatewayConnectionStats` | [`BatchGetGatewayConnectionStatsRequest`](#ttn.lorawan.v3.BatchGetGatewayConnectionStatsRequest) | [`BatchGetGatewayConnectionStatsResponse`](#ttn.lorawan.v3.BatchGetGatewayConnectionStatsResponse) | Get statistics about gateway connections to the Gateway Server of a batch of gateways. This is not persisted between reconnects. Gateways that are not connected or are part of a different cluster are ignored. It is upto the client to make sure that the gateways are in the requested cluster. |
+| `BatchGetGatewayConnectionStats` | [`BatchGetGatewayConnectionStatsRequest`](#ttn.lorawan.v3.BatchGetGatewayConnectionStatsRequest) | [`BatchGetGatewayConnectionStatsResponse`](#ttn.lorawan.v3.BatchGetGatewayConnectionStatsResponse) | Get statistics about gateway connections to the Gateway Server of a batch of gateways. This is not persisted between reconnects. Gateways that are not connected or are part of a different cluster are ignored. It is up to the client to make sure that the gateways are in the requested cluster. |
 
 #### HTTP bindings
 
