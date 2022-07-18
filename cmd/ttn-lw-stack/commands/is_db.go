@@ -15,7 +15,6 @@
 package commands
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -23,13 +22,11 @@ import (
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/migrate"
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	ismigrations "go.thethings.network/lorawan-stack/v3/pkg/identityserver/store/migrations"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	ttntypes "go.thethings.network/lorawan-stack/v3/pkg/types"
-	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
 var (
@@ -356,63 +353,6 @@ var (
 			return nil
 		},
 	}
-	isDBImportEndDeviceCACCommand = &cobra.Command{
-		Use:   "import-ed-cac",
-		Short: "Import End Device Claim Authentication Code data stored in the JS end device registry into the IS",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if config.Redis.IsZero() {
-				panic("Redis should be configured for this command")
-			}
-
-			logger.Info("Connecting to Identity Server database...")
-			isDB, err := gormstore.Open(ctx, config.IS.DatabaseURI)
-			if err != nil {
-				return err
-			}
-			defer isDB.Close()
-
-			cacDump, err := cmd.Flags().GetString("cac-dump")
-			if err != nil {
-				return err
-			}
-
-			var (
-				devsWithCAC uint64
-				cacData     []EndDeviceCACData
-			)
-			err = json.Unmarshal([]byte(cacDump), &cacData)
-			if err != nil {
-				return err
-			}
-
-			defer func() {
-				logger.Debugf("Imported %d devices with Claim Authentication Code", devsWithCAC)
-			}()
-
-			ignoreNotFound, err := cmd.Flags().GetBool("ignore-not-found")
-			if err != nil {
-				return err
-			}
-
-			for _, cac := range cacData {
-				devsWithCAC++
-				ctx, err = unique.WithContext(ctx, cac.UID)
-				if err != nil {
-					return err
-				}
-				_, err := gormstore.GetEndDeviceStore(isDB).UpdateEndDevice(
-					ctx, cac.EndDevice, []string{"claim_authentication_code"},
-				)
-				if err != nil {
-					if errors.IsNotFound(err) && ignoreNotFound {
-						continue
-					}
-					return err
-				}
-			}
-			return nil
-		},
-	}
 )
 
 func init() {
@@ -422,10 +362,6 @@ func init() {
 	isDBCommand.AddCommand(isDBMigrateCommand)
 	isDBCleanupCommand.Flags().Bool("dry-run", false, "Dry run")
 	isDBCommand.AddCommand(isDBCleanupCommand)
-	isDBImportEndDeviceCACCommand.Flags().Bool("ignore-not-found", false, "Ignore devices if not found in the IS")
-	isDBImportEndDeviceCACCommand.Flags().String("cac-dump", "",
-		"Claim Authentication Code Data dump from the js-db dump-ed-cac command")
-	isDBCommand.AddCommand(isDBImportEndDeviceCACCommand)
 	isDBEUIBlockCreationCommand.Flags().Bool("use-config", false, "Create block using values from config")
 	isDBEUIBlockCreationCommand.Flags().String("eui-type", "dev_eui", "EUI block type")
 	isDBEUIBlockCreationCommand.Flags().String("prefix", "", "Block prefix (format: 1234567800000000/32)")
