@@ -1367,7 +1367,7 @@ func TestGatewayServer(t *testing.T) {
 										for i, md := range msg.RxMetadata {
 											a.So(md.UplinkToken, should.NotBeEmpty)
 											md.UplinkToken = nil
-											expected.RxMetadata[i].ReceivedAt = md.ReceivedAt
+											md.ReceivedAt = nil
 											a.So(md, should.Resemble, expected.RxMetadata[i])
 										}
 										a.So(msg.RawPayload, should.Resemble, expected.RawPayload)

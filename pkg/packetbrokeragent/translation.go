@@ -79,16 +79,15 @@ func fromPBDataRate(dataRate *packetbroker.DataRate) (dr *ttnpb.DataRate, coding
 		}, "", true
 	// TODO: Support LR-FHSS (https://github.com/TheThingsNetwork/lorawan-stack/issues/3806)
 	// TODO: Set coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466)
-	// case *packetbroker.DataRate_Lrfhss:
-	//	return &ttnpb.DataRate{
-	//		Modulation: &ttnpb.DataRate_Lrfhss{
-	//			Lrfhss: &ttnpb.LRFHSSDataRate{
-	//				ModulationType:        mod.Lrfhss.ModulationType,
-	//				OperatingChannelWidth: mod.Lrfhss.OperatingChannelWidth,
-	//				CodingRate:            mod.Lrfhss.CodingRate,
-	//			},
-	//		},
-	//	}, mod.Lrfhss.CodingRate, true
+	// 	return &ttnpb.DataRate{
+	// 		Modulation: &ttnpb.DataRate_Lrfhss{
+	// 			Lrfhss: &ttnpb.LRFHSSDataRate{
+	// 				ModulationType:        mod.Lrfhss.ModulationType,
+	// 				OperatingChannelWidth: mod.Lrfhss.OperatingChannelWidth,
+	//  			CodingRate:            mod.Lrfhss.CodingRate,
+	// 			},
+	// 		},
+	// 	}, mod.Lrfhss.CodingRate, true
 	default:
 		return nil, "", false
 	}
@@ -121,15 +120,15 @@ func toPBDataRate(dataRate *ttnpb.DataRate, codingRate string) (*packetbroker.Da
 	// TODO: Support LR-FHSS (https://github.com/TheThingsNetwork/lorawan-stack/issues/3806)
 	// TODO: Get coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466)
 	// case *ttnpb.DataRate_Lrfhss:
-	//	return &packetbroker.DataRate{
-	//		Modulation: &packetbroker.DataRate_Lrfhss{
-	//			Lrfhss: &packetbroker.LRFHSSDataRate{
-	//				ModulationType:        mod.Lrfhss.ModulationType,
-	//				OperatingChannelWidth: mod.Lrfhss.OperatingChannelWidth,
-	//				CodingRate:            mod.Lrfhss.CodingRate,
-	//			},
-	//		},
-	//	}, true
+	// 	return &packetbroker.DataRate{
+	// 		Modulation: &packetbroker.DataRate_Lrfhss{
+	// 			Lrfhss: &packetbroker.LRFHSSDataRate{
+	// 				ModulationType:        mod.Lrfhss.ModulationType,
+	// 				OperatingChannelWidth: mod.Lrfhss.OperatingChannelWidth,
+	// 				CodingRate:            mod.Lrfhss.CodingRate,
+	// 			},
+	// 		},
+	// 	}, true
 	default:
 		return nil, false
 	}
@@ -382,9 +381,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 			default:
 				t = ttnpb.StdTime(md.ReceivedAt)
 			}
-			if gatewayReceiveTime == nil || t.Before(*gatewayReceiveTime) {
-				gatewayReceiveTime = t
-			}
+			gatewayReceiveTime = t
 
 			if md.DownlinkPathConstraint == ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NEVER {
 				continue
