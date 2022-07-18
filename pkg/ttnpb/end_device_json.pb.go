@@ -2920,6 +2920,12 @@ func (x *EndDevice) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 			gogo.MarshalTimestamp(s, x.LastSeenAt)
 		}
 	}
+	if x.EndDeviceCac != nil || s.HasField("end_device_cac") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("end_device_cac")
+		// NOTE: EndDeviceClaimAuthenticationCode does not seem to implement MarshalProtoJSON.
+		gogo.MarshalMessage(s, x.EndDeviceCac)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -3242,6 +3248,16 @@ func (x *EndDevice) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				return
 			}
 			x.LastSeenAt = v
+		case "end_device_cac", "endDeviceCac":
+			s.AddField("end_device_cac")
+			if s.ReadNil() {
+				x.EndDeviceCac = nil
+				return
+			}
+			// NOTE: EndDeviceClaimAuthenticationCode does not seem to implement UnmarshalProtoJSON.
+			var v EndDeviceClaimAuthenticationCode
+			gogo.UnmarshalMessage(s, &v)
+			x.EndDeviceCac = &v
 		}
 	})
 }

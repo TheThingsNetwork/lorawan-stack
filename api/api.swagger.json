@@ -19328,7 +19328,7 @@
         },
         "claim_authentication_code": {
           "$ref": "#/definitions/v3EndDeviceAuthenticationCode",
-          "description": "Authentication code to claim ownership of the end device. Stored in the Identity Server."
+          "description": "Authentication code to claim ownership of the end device. Stored in the Join Server.\nThis field is deprecated, use end_device_cac instead."
         },
         "skip_payload_crypto": {
           "type": "boolean",
@@ -19347,6 +19347,10 @@
           "type": "string",
           "format": "date-time",
           "description": "Timestamp when a device uplink has been last observed.\nThis field is set by the Application Server and stored in the Identity Server."
+        },
+        "end_device_cac": {
+          "$ref": "#/definitions/v3EndDeviceClaimAuthenticationCode",
+          "description": "Code to claim ownership of the end device. Stored in the Identity Server.\nThis field replaces the claim_authentication_code field."
         }
       },
       "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -19366,7 +19370,7 @@
           "format": "date-time"
         }
       },
-      "description": "Authentication code for end devices."
+      "description": "Authentication code for end devices.\nThis message is deprecated. Use EndDeviceClaimAuthenticationCode instead."
     },
     "v3EndDeviceBrand": {
       "type": "object",
@@ -19409,6 +19413,23 @@
           "description": "Path to brand logo."
         }
       }
+    },
+    "v3EndDeviceClaimAuthenticationCode": {
+      "type": "object",
+      "properties": {
+        "secret": {
+          "$ref": "#/definitions/v3Secret"
+        },
+        "valid_from": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "valid_to": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "Code for claiming end devices."
     },
     "v3EndDeviceIdentifiers": {
       "type": "object",

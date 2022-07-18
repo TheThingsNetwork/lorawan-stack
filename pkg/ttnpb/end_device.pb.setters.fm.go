@@ -1865,6 +1865,60 @@ func (dst *EndDeviceAuthenticationCode) SetFields(src *EndDeviceAuthenticationCo
 	return nil
 }
 
+func (dst *EndDeviceClaimAuthenticationCode) SetFields(src *EndDeviceClaimAuthenticationCode, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "secret":
+			if len(subs) > 0 {
+				var newDst, newSrc *Secret
+				if (src == nil || src.Secret == nil) && dst.Secret == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Secret
+				}
+				if dst.Secret != nil {
+					newDst = dst.Secret
+				} else {
+					newDst = &Secret{}
+					dst.Secret = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Secret = src.Secret
+				} else {
+					dst.Secret = nil
+				}
+			}
+		case "valid_from":
+			if len(subs) > 0 {
+				return fmt.Errorf("'valid_from' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ValidFrom = src.ValidFrom
+			} else {
+				dst.ValidFrom = nil
+			}
+		case "valid_to":
+			if len(subs) > 0 {
+				return fmt.Errorf("'valid_to' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ValidTo = src.ValidTo
+			} else {
+				dst.ValidTo = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
@@ -2529,6 +2583,31 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 				dst.LastSeenAt = src.LastSeenAt
 			} else {
 				dst.LastSeenAt = nil
+			}
+		case "end_device_cac":
+			if len(subs) > 0 {
+				var newDst, newSrc *EndDeviceClaimAuthenticationCode
+				if (src == nil || src.EndDeviceCac == nil) && dst.EndDeviceCac == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.EndDeviceCac
+				}
+				if dst.EndDeviceCac != nil {
+					newDst = dst.EndDeviceCac
+				} else {
+					newDst = &EndDeviceClaimAuthenticationCode{}
+					dst.EndDeviceCac = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EndDeviceCac = src.EndDeviceCac
+				} else {
+					dst.EndDeviceCac = nil
+				}
 			}
 
 		default:

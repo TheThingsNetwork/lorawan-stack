@@ -2415,6 +2415,73 @@ func (m *EndDeviceAuthenticationCode) SetFromFlags(flags *pflag.FlagSet, prefix 
 	return paths, nil
 }
 
+// AddSelectFlagsForEndDeviceClaimAuthenticationCode adds flags to select fields in EndDeviceClaimAuthenticationCode.
+func AddSelectFlagsForEndDeviceClaimAuthenticationCode(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("secret", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("secret", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForSecret(flags, flagsplugin.Prefix("secret", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("valid-from", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("valid-from", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("valid-to", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("valid-to", prefix), false), flagsplugin.WithHidden(hidden)))
+}
+
+// SelectFromFlags outputs the fieldmask paths forEndDeviceClaimAuthenticationCode message from select flags.
+func PathsFromSelectFlagsForEndDeviceClaimAuthenticationCode(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("secret", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("secret", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForSecret(flags, flagsplugin.Prefix("secret", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("valid_from", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("valid_from", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("valid_to", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("valid_to", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForEndDeviceClaimAuthenticationCode adds flags to select fields in EndDeviceClaimAuthenticationCode.
+func AddSetFlagsForEndDeviceClaimAuthenticationCode(flags *pflag.FlagSet, prefix string, hidden bool) {
+	AddSetFlagsForSecret(flags, flagsplugin.Prefix("secret", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewTimestampFlag(flagsplugin.Prefix("valid-from", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewTimestampFlag(flagsplugin.Prefix("valid-to", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the EndDeviceClaimAuthenticationCode message from flags.
+func (m *EndDeviceClaimAuthenticationCode) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("secret", prefix)); changed {
+		if m.Secret == nil {
+			m.Secret = &Secret{}
+		}
+		if setPaths, err := m.Secret.SetFromFlags(flags, flagsplugin.Prefix("secret", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if val, changed, err := flagsplugin.GetTimestamp(flags, flagsplugin.Prefix("valid_from", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.ValidFrom = gogo.SetTimestamp(val)
+		paths = append(paths, flagsplugin.Prefix("valid_from", prefix))
+	}
+	if val, changed, err := flagsplugin.GetTimestamp(flags, flagsplugin.Prefix("valid_to", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.ValidTo = gogo.SetTimestamp(val)
+		paths = append(paths, flagsplugin.Prefix("valid_to", prefix))
+	}
+	return paths, nil
+}
+
 // AddSelectFlagsForEndDevice adds flags to select fields in EndDevice.
 func AddSelectFlagsForEndDevice(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("name", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("name", prefix), false), flagsplugin.WithHidden(hidden)))
@@ -2475,6 +2542,8 @@ func AddSelectFlagsForEndDevice(flags *pflag.FlagSet, prefix string, hidden bool
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("skip-payload-crypto-override", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("skip-payload-crypto-override", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("activated-at", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("activated-at", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("last-seen-at", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("last-seen-at", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("end-device-cac", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("end-device-cac", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForEndDeviceClaimAuthenticationCode(flags, flagsplugin.Prefix("end-device-cac", prefix), hidden)
 }
 
 // SelectFromFlags outputs the fieldmask paths forEndDevice message from select flags.
@@ -2765,6 +2834,16 @@ func PathsFromSelectFlagsForEndDevice(flags *pflag.FlagSet, prefix string) (path
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("last_seen_at", prefix))
 	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("end_device_cac", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("end_device_cac", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForEndDeviceClaimAuthenticationCode(flags, flagsplugin.Prefix("end_device_cac", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
 	return paths, nil
 }
 
@@ -2818,6 +2897,7 @@ func AddSetFlagsForEndDevice(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("skip-payload-crypto-override", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewTimestampFlag(flagsplugin.Prefix("activated-at", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewTimestampFlag(flagsplugin.Prefix("last-seen-at", prefix), "", flagsplugin.WithHidden(hidden)))
+	AddSetFlagsForEndDeviceClaimAuthenticationCode(flags, flagsplugin.Prefix("end-device-cac", prefix), hidden)
 }
 
 // SetFromFlags sets the EndDevice message from flags.
@@ -3137,6 +3217,16 @@ func (m *EndDevice) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []s
 	} else if changed {
 		m.LastSeenAt = gogo.SetTimestamp(val)
 		paths = append(paths, flagsplugin.Prefix("last_seen_at", prefix))
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("end_device_cac", prefix)); changed {
+		if m.EndDeviceCac == nil {
+			m.EndDeviceCac = &EndDeviceClaimAuthenticationCode{}
+		}
+		if setPaths, err := m.EndDeviceCac.SetFromFlags(flags, flagsplugin.Prefix("end_device_cac", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
 	}
 	return paths, nil
 }
