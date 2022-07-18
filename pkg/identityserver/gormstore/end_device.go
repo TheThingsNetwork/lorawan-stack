@@ -15,6 +15,7 @@
 package store
 
 import (
+	"bytes"
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
@@ -59,9 +60,9 @@ type EndDevice struct {
 	ActivatedAt *time.Time `gorm:"default:null"`
 	LastSeenAt  *time.Time `gorm:"default:null"`
 
-	ClaimAuthenticationCodeSecret    []byte `gorm:"type:BYTEA"`
-	ClaimAuthenticationCodeValidFrom *time.Time
-	ClaimAuthenticationCodeValidTo   *time.Time
+	EndDeviceCACSecret    []byte `gorm:"type:BYTEA"`
+	EndDeviceCACValidFrom *time.Time
+	EndDeviceCACValidTo   *time.Time
 }
 
 func init() {
@@ -156,11 +157,19 @@ var devicePBSetters = map[string]func(*ttnpb.EndDevice, *EndDevice){
 	lastSeenAtField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
 		pb.LastSeenAt = ttnpb.ProtoTime(dev.LastSeenAt)
 	},
-	claimAuthenticationCodeField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
-		pb.ClaimAuthenticationCode = &ttnpb.EndDeviceAuthenticationCode{
-			Value:     string(dev.ClaimAuthenticationCodeSecret),
-			ValidFrom: ttnpb.ProtoTime(dev.ClaimAuthenticationCodeValidFrom),
-			ValidTo:   ttnpb.ProtoTime(dev.ClaimAuthenticationCodeValidTo),
+	endDeviceCACField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
+		blocks := bytes.SplitN(dev.EndDeviceCACSecret, secretFieldSeparator, 2)
+		var secret *ttnpb.Secret
+		if len(blocks) == 2 {
+			secret = &ttnpb.Secret{
+				KeyId: string(blocks[0]),
+				Value: blocks[1],
+			}
+		}
+		pb.EndDeviceCac = &ttnpb.EndDeviceClaimAuthenticationCode{
+			Secret:    secret,
+			ValidFrom: ttnpb.ProtoTime(dev.EndDeviceCACValidFrom),
+			ValidTo:   ttnpb.ProtoTime(dev.EndDeviceCACValidTo),
 		}
 	},
 }
@@ -232,14 +241,21 @@ var deviceModelSetters = map[string]func(*EndDevice, *ttnpb.EndDevice){
 	lastSeenAtField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
 		dev.LastSeenAt = ttnpb.StdTime(pb.LastSeenAt)
 	},
-	claimAuthenticationCodeField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
-		if pb.ClaimAuthenticationCode != nil {
-			dev.ClaimAuthenticationCodeSecret = []byte(pb.ClaimAuthenticationCode.Value)
-			if pb.ClaimAuthenticationCode.ValidFrom != nil {
-				dev.ClaimAuthenticationCodeValidFrom = ttnpb.StdTime(pb.ClaimAuthenticationCode.ValidFrom)
+	endDeviceCACField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
+		// This allows the setting of individual fields while retaining values of other fields.
+		if pb.EndDeviceCac != nil {
+			if pb.EndDeviceCac.Secret != nil {
+				var secretBuffer bytes.Buffer
+				secretBuffer.WriteString(pb.EndDeviceCac.Secret.KeyId)
+				secretBuffer.Write(secretFieldSeparator)
+				secretBuffer.Write(pb.EndDeviceCac.Secret.Value)
+				dev.EndDeviceCACSecret = secretBuffer.Bytes()
 			}
-			if pb.ClaimAuthenticationCode.ValidTo != nil {
-				dev.ClaimAuthenticationCodeValidTo = ttnpb.StdTime(pb.ClaimAuthenticationCode.ValidTo)
+			if pb.EndDeviceCac.ValidFrom != nil {
+				dev.EndDeviceCACValidFrom = ttnpb.StdTime(pb.EndDeviceCac.ValidFrom)
+			}
+			if pb.EndDeviceCac.ValidTo != nil {
+				dev.EndDeviceCACValidTo = ttnpb.StdTime(pb.EndDeviceCac.ValidTo)
 			}
 		}
 	},
@@ -278,10 +294,10 @@ var deviceColumnNames = map[string][]string{
 	locationsField:                {},
 	activatedAtField:              {activatedAtField},
 	lastSeenAtField:               {lastSeenAtField},
-	claimAuthenticationCodeField: {
-		"claim_authentication_code_secret",
-		"claim_authentication_code_valid_from",
-		"claim_authentication_code_valid_to",
+	endDeviceCACField: {
+		"end_device_cac_secret",
+		"end_device_cac_valid_from",
+		"end_device_cac_valid_to",
 	},
 }
 
