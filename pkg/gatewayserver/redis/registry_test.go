@@ -68,6 +68,11 @@ func TestRegistry(t *testing.T) {
 		stats, err := registry.Get(ctx, ids)
 		a.So(stats, should.BeNil)
 		a.So(errors.IsNotFound(err), should.BeTrue)
+		batchStats, err := registry.BatchGet(ctx, []*ttnpb.GatewayIdentifiers{
+			ids,
+		}, nil)
+		a.So(err, should.BeNil)
+		a.So(len(batchStats), should.Equal, 0)
 	})
 
 	t.Run("EmptyStats", func(t *testing.T) {
@@ -77,6 +82,11 @@ func TestRegistry(t *testing.T) {
 		retrieved, err := registry.Get(ctx, ids3)
 		a.So(retrieved, should.BeNil)
 		a.So(errors.IsNotFound(err), should.BeTrue)
+		batchStats, err := registry.BatchGet(ctx, []*ttnpb.GatewayIdentifiers{
+			ids3,
+		}, nil)
+		a.So(err, should.BeNil)
+		a.So(len(batchStats), should.Equal, 0)
 	})
 
 	t.Run("SetAndClear", func(t *testing.T) {
@@ -98,6 +108,15 @@ func TestRegistry(t *testing.T) {
 		stats, err := registry.Get(ctx, ids2)
 		a.So(stats, should.BeNil)
 		a.So(errors.IsNotFound(err), should.BeTrue)
+
+		// Batch
+		batchStats, err := registry.BatchGet(ctx, []*ttnpb.GatewayIdentifiers{
+			ids,
+			ids2,
+			ids3,
+		}, nil)
+		a.So(err, should.BeNil)
+		a.So(len(batchStats), should.Equal, 1)
 
 		// Unset
 		err = registry.Set(ctx, ids, nil, nil, 0)

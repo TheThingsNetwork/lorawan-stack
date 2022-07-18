@@ -71,7 +71,8 @@ var (
 )
 
 func TestGatewayServer(t *testing.T) {
-	for _, rtc := range []struct {
+	// The component's gRPC address is bound for each iteration and cannot be used in parallel.
+	for _, rtc := range []struct { //nolint:paralleltest
 		Name                   string
 		Setup                  func(context.Context, string, string, gatewayserver.GatewayConnectionStatsRegistry) (*component.Component, *gatewayserver.GatewayServer, error)
 		PostSetup              func(context.Context, *component.Component, *mockis.MockDefinition)
@@ -182,6 +183,7 @@ func TestGatewayServer(t *testing.T) {
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Failed to setup server :%v", err)
 			}
+			defer c.Close()
 			roles := gs.Roles()
 			a.So(len(roles), should.Equal, 1)
 			a.So(roles[0], should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER)
@@ -1809,7 +1811,7 @@ func TestGatewayServer(t *testing.T) {
 	}
 }
 
-func TestUpdateVersionInfo(t *testing.T) {
+func TestUpdateVersionInfo(t *testing.T) { //nolint:paralleltest
 	a, ctx := test.New(t)
 
 	ctx, cancel := context.WithCancel(ctx)
@@ -1837,6 +1839,7 @@ func TestUpdateVersionInfo(t *testing.T) {
 			},
 		},
 	})
+	defer c.Close()
 
 	gatewayFetchInterval := test.Delay
 
@@ -1990,4 +1993,237 @@ func TestUpdateVersionInfo(t *testing.T) {
 	stat, err = statsClient.GetGatewayConnectionStats(statsCtx, gtwIDs)
 	a.So(errors.IsNotFound(err), should.BeTrue)
 	a.So(stat, should.BeNil)
+
+	gs.Close()
+	time.Sleep(timeout)
+}
+
+func TestBatchGetStatus(t *testing.T) {
+	a, ctx := test.New(t)
+	t.Parallel()
+
+	for _, tc := range []struct { //nolint:paralleltest
+		Name      string
+		WithRedis bool
+	}{
+		{
+			Name:      "Redis",
+			WithRedis: true,
+		},
+		{
+			Name: "NilRegistry",
+		},
+	} {
+		t.Run(fmt.Sprintf("BatchGetStatus/%s", tc.Name), func(t *testing.T) {
+			ctx, cancel := context.WithCancel(ctx)
+			defer cancel()
+
+			is, isAddr, closeIS := mockis.New(ctx)
+			defer closeIS()
+
+			c := componenttest.NewComponent(t, &component.Config{
+				ServiceBase: config.ServiceBase{
+					GRPC: config.GRPC{
+						Listen:                      ":9187",
+						AllowInsecureForCredentials: true,
+					},
+					Cluster: cluster.Config{
+						IdentityServer: isAddr,
+					},
+					FrequencyPlans: config.FrequencyPlansConfig{
+						ConfigSource: "static",
+						Static:       test.StaticFrequencyPlans,
+					},
+				},
+			})
+			defer c.Close()
+
+			gatewayFetchInterval := test.Delay
+
+			gsConfig := &gatewayserver.Config{
+				FetchGatewayInterval:   gatewayFetchInterval,
+				FetchGatewayJitter:     1,
+				UpdateVersionInfoDelay: test.Delay,
+				MQTTV2: config.MQTT{
+					Listen: ":1881",
+				},
+			}
+
+			if tc.WithRedis && os.Getenv("TEST_REDIS") == "1" {
+				statsRedisClient, statsFlush := test.NewRedis(ctx, "gatewayserver_test")
+				defer statsFlush()
+				defer statsRedisClient.Close()
+				registry := &gsredis.GatewayConnectionStatsRegistry{
+					Redis:   statsRedisClient,
+					LockTTL: 5 * test.Delay,
+				}
+				if err := registry.Init(ctx); err != nil {
+					t.Fatalf("Failed to setup stats registry :%v", err)
+				}
+				gsConfig.Stats = registry
+			}
+
+			er := gatewayserver.NewIS(c)
+			gs, err := gatewayserver.New(c, gsConfig,
+				gatewayserver.WithRegistry(er),
+			)
+			if !a.So(err, should.BeNil) {
+				t.Fatalf("Failed to setup server :%v", err)
+			}
+			roles := gs.Roles()
+			a.So(len(roles), should.Equal, 1)
+			a.So(roles[0], should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER)
+			a.So(err, should.BeNil)
+
+			componenttest.StartComponent(t, c)
+			time.Sleep(timeout) // Wait for component to start.
+
+			mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
+
+			linkFn := func(ctx context.Context, t *testing.T,
+				ids *ttnpb.GatewayIdentifiers, key string, statCh <-chan *ttnpbv2.StatusMessage,
+			) error {
+				t.Helper()
+				ctx, cancel := errorcontext.New(ctx)
+				clientOpts := mqtt.NewClientOptions()
+				clientOpts.AddBroker("tcp://0.0.0.0:1881")
+				clientOpts.SetUsername(unique.ID(ctx, ids))
+				clientOpts.SetPassword(key)
+				clientOpts.SetAutoReconnect(false)
+				clientOpts.SetConnectionLostHandler(func(_ mqtt.Client, err error) {
+					cancel(err)
+				})
+				client := mqtt.NewClient(clientOpts)
+				if token := client.Connect(); !token.WaitTimeout(timeout) {
+					return context.DeadlineExceeded
+				} else if err := token.Error(); err != nil {
+					return err
+				}
+				defer client.Disconnect(uint(timeout / time.Millisecond))
+				go func() {
+					for {
+						select {
+						case <-ctx.Done():
+							return
+						case stat := <-statCh:
+							buf, err := stat.Marshal()
+							if err != nil {
+								cancel(err)
+								return
+							}
+							if token := client.Publish(
+								fmt.Sprintf("%v/status", unique.ID(ctx, ids)), 1, false, buf); token.Wait() && token.Error() != nil {
+								cancel(token.Error())
+								return
+							}
+						}
+					}
+				}()
+				<-ctx.Done()
+				return ctx.Err()
+			}
+
+			gtwIDs1 := &ttnpb.GatewayIdentifiers{
+				GatewayId: registeredGatewayID,
+				Eui:       &registeredGatewayEUI,
+			}
+
+			gtwIDs2 := &ttnpb.GatewayIdentifiers{
+				GatewayId: "eui-aaee000000000001",
+			}
+
+			statsConn, err := grpc.Dial(":9187",
+				append(rpcclient.DefaultDialOptions(test.Context()), grpc.WithInsecure(), grpc.WithBlock())...)
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+			defer statsConn.Close()
+			statsClient := ttnpb.NewGsClient(statsConn)
+			statsCtx := metadata.AppendToOutgoingContext(test.Context(),
+				"id", gtwIDs1.GatewayId,
+				"authorization", fmt.Sprintf("Bearer %v", registeredGatewayKey),
+			)
+
+			request := &ttnpb.BatchGetGatewayConnectionStatsRequest{
+				GatewayIds: []*ttnpb.GatewayIdentifiers{
+					gtwIDs1,
+					gtwIDs2,
+				},
+			}
+
+			// Get Stats before creation.
+			res, err := statsClient.BatchGetGatewayConnectionStats(statsCtx, request)
+			a.So(err, should.NotBeNil)
+			a.So(res, should.BeNil)
+
+			mockGtw1 := mockis.DefaultGateway(gtwIDs1, true, true)
+			is.GatewayRegistry().Add(ctx, gtwIDs1, registeredGatewayKey, mockGtw1, testRights...)
+			time.Sleep(timeout) // Wait for setup to be completed.
+
+			mockGtw2 := mockis.DefaultGateway(gtwIDs2, true, true)
+			is.GatewayRegistry().Add(ctx, gtwIDs2, registeredGatewayKey, mockGtw2, testRights...)
+			time.Sleep(timeout) // Wait for setup to be completed.
+
+			// Get Stats before connection.
+			res, err = statsClient.BatchGetGatewayConnectionStats(statsCtx, request)
+			a.So(err, should.BeNil)
+			a.So(res, should.NotBeNil)
+			a.So(len(res.Entries), should.Equal, 0)
+
+			// Connect first gateway.
+			statCh1 := make(chan *ttnpbv2.StatusMessage)
+			go func() {
+				_ = linkFn(ctx, t, gtwIDs1, registeredGatewayKey, statCh1)
+			}()
+			time.Sleep(timeout) // Wait for connection to be completed.
+
+			// Get Stats
+			res, err = statsClient.BatchGetGatewayConnectionStats(statsCtx, request)
+			a.So(err, should.BeNil)
+			a.So(res, should.NotBeNil)
+			a.So(len(res.Entries), should.Equal, 1)
+			a.So(res.Entries[unique.ID(ctx, gtwIDs1)], should.NotBeNil)
+
+			// Connect second gateway.
+			ctxWithCancel, gtwConnCancel := context.WithCancel(ctx)
+			statCh2 := make(chan *ttnpbv2.StatusMessage)
+			go func() {
+				_ = linkFn(ctxWithCancel, t, gtwIDs2, registeredGatewayKey, statCh2)
+			}()
+			time.Sleep(timeout) // Wait for connection to be completed.
+
+			// Get Stats
+			res, err = statsClient.BatchGetGatewayConnectionStats(statsCtx, request)
+			a.So(err, should.BeNil)
+			a.So(res, should.NotBeNil)
+			a.So(len(res.Entries), should.Equal, 2)
+			a.So(res.Entries[unique.ID(ctx, gtwIDs1)], should.NotBeNil)
+			a.So(res.Entries[unique.ID(ctx, gtwIDs2)], should.NotBeNil)
+
+			// Disconnect second gateway.
+			gtwConnCancel()
+
+			cfg, err := gs.GetConfig(ctx)
+			if !a.So(err, should.BeNil) {
+				t.Fatalf("Failed to get Gateway Server configuration :%v", err)
+			}
+			res, err = statsClient.BatchGetGatewayConnectionStats(statsCtx, request)
+			a.So(err, should.BeNil)
+			a.So(res, should.NotBeNil)
+
+			if cfg.Stats != nil {
+				// Only stats entries in the registry are persisted until Redis TTL after disconnection.
+				// These entries will have the `disconnected_at` field set.
+				a.So(len(res.Entries), should.Equal, 2)
+				a.So(res.Entries[unique.ID(ctx, gtwIDs1)], should.NotBeNil)
+				a.So(res.Entries[unique.ID(ctx, gtwIDs2)], should.NotBeNil)
+			} else {
+				a.So(len(res.Entries), should.Equal, 1)
+				a.So(res.Entries[unique.ID(ctx, gtwIDs1)], should.NotBeNil)
+			}
+			// Close the Gateway Server.
+			gs.Close()
+			time.Sleep(timeout)
+		})
+	}
 }

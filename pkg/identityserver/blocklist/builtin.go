@@ -127,6 +127,7 @@ var builtin = New(
 	"config",
 	"configuration",
 	"connect",
+	"connection",
 	"console",
 	"contact",
 	"contact-us",

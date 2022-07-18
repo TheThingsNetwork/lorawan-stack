@@ -3154,6 +3154,43 @@
           ]
         }
       ]
+    },
+    "BatchGetGatewayConnectionStats": {
+      "file": "lorawan-stack/api/gatewayserver.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/gs/gateways/connection/stats",
+          "body": "*",
+          "parameters": []
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "connected_at",
+        "disconnected_at",
+        "downlink_count",
+        "gateway_remote_address",
+        "gateway_remote_address.ip",
+        "last_downlink_received_at",
+        "last_status",
+        "last_status.advanced",
+        "last_status.antenna_locations",
+        "last_status.boot_time",
+        "last_status.ip",
+        "last_status.metrics",
+        "last_status.time",
+        "last_status.versions",
+        "last_status_received_at",
+        "last_uplink_received_at",
+        "protocol",
+        "round_trip_times",
+        "round_trip_times.count",
+        "round_trip_times.max",
+        "round_trip_times.median",
+        "round_trip_times.min",
+        "sub_bands",
+        "uplink_count"
+      ]
     }
   },
   "GtwGs": {

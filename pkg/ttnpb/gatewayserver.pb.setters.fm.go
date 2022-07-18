@@ -194,3 +194,52 @@ func (dst *ScheduleDownlinkErrorDetails) SetFields(src *ScheduleDownlinkErrorDet
 	}
 	return nil
 }
+
+func (dst *BatchGetGatewayConnectionStatsRequest) SetFields(src *BatchGetGatewayConnectionStatsRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "gateway_ids":
+			if len(subs) > 0 {
+				return fmt.Errorf("'gateway_ids' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.GatewayIds = src.GatewayIds
+			} else {
+				dst.GatewayIds = nil
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				dst.FieldMask = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *BatchGetGatewayConnectionStatsResponse) SetFields(src *BatchGetGatewayConnectionStatsResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "entries":
+			if len(subs) > 0 {
+				return fmt.Errorf("'entries' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Entries = src.Entries
+			} else {
+				dst.Entries = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}

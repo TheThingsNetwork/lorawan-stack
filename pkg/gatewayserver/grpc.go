@@ -48,3 +48,60 @@ func (gs *GatewayServer) GetGatewayConnectionStats(ctx context.Context, ids *ttn
 	stats, _ := val.(connectionEntry).Stats()
 	return stats, nil
 }
+
+func applyGatewayConnectionStatsFieldMask(
+	dst, src *ttnpb.GatewayConnectionStats,
+	paths ...string,
+) (*ttnpb.GatewayConnectionStats, error) {
+	if dst == nil {
+		dst = &ttnpb.GatewayConnectionStats{}
+	}
+	return dst, dst.SetFields(src, paths...)
+}
+
+// BatchGetGatewayConnectionStats gets statistics about gateway connections to the Gateway Server
+// of a batch of gateways.
+// This RPC skips unconnected gateways.
+// FieldMask paths can be used directly since they are sanitized by the middleware.
+func (gs *GatewayServer) BatchGetGatewayConnectionStats(
+	ctx context.Context,
+	req *ttnpb.BatchGetGatewayConnectionStatsRequest,
+) (*ttnpb.BatchGetGatewayConnectionStatsResponse, error) {
+	for _, ids := range req.GatewayIds {
+		if err := gs.entityRegistry.AssertGatewayRights(ctx, ids, ttnpb.Right_RIGHT_GATEWAY_STATUS_READ); err != nil {
+			return nil, err
+		}
+	}
+
+	if gs.statsRegistry != nil {
+		entries, err := gs.statsRegistry.BatchGet(ctx, req.GatewayIds, req.FieldMask.GetPaths())
+		if err != nil {
+			return nil, err
+		}
+		return &ttnpb.BatchGetGatewayConnectionStatsResponse{
+			Entries: entries,
+		}, nil
+	}
+
+	// If there isn't a registry, load the (ephemeral) values stored in the Gateway Server connections.
+	entries := make(map[string]*ttnpb.GatewayConnectionStats, len(req.GatewayIds))
+	for _, id := range req.GatewayIds {
+		uid := unique.ID(ctx, id)
+		val, ok := gs.connections.Load(uid)
+		if !ok {
+			continue
+		}
+		st, _ := val.(connectionEntry).Stats()
+		if len(req.FieldMask.GetPaths()) > 0 {
+			selected, err := applyGatewayConnectionStatsFieldMask(nil, st, req.FieldMask.GetPaths()...)
+			if err != nil {
+				return nil, err
+			}
+			st = selected
+		}
+		entries[id.GatewayId] = st
+	}
+	return &ttnpb.BatchGetGatewayConnectionStatsResponse{
+		Entries: entries,
+	}, nil
+}

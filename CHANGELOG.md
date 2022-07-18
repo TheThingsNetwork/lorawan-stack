@@ -12,6 +12,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - Component selector for Join Server interoperability configuration. This allows administrators to declare separate Network Server and Application Server configuration for the same JoinEUI ranges in the same interoperability configuration. See [documentation](https://www.thethingsindustries.com/docs/reference/interop-repository/).
+- `BatchGetGatewayConnectionStats` RPC to fetch Gateway Connection Stats for a batch of gateways.
 
 ### Changed
 
