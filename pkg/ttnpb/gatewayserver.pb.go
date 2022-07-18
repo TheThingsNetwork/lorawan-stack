@@ -729,7 +729,7 @@ type GsClient interface {
 	// Get statistics about gateway connections to the Gateway Server of a batch of gateways.
 	// This is not persisted between reconnects.
 	// Gateways that are not connected or are part of a different cluster are ignored.
-	// It's upto the client to make sure that the gateways are in the requested cluster.
+	// It is upto the client to make sure that the gateways are in the requested cluster.
 	BatchGetGatewayConnectionStats(ctx context.Context, in *BatchGetGatewayConnectionStatsRequest, opts ...grpc.CallOption) (*BatchGetGatewayConnectionStatsResponse, error)
 }
 
@@ -767,7 +767,7 @@ type GsServer interface {
 	// Get statistics about gateway connections to the Gateway Server of a batch of gateways.
 	// This is not persisted between reconnects.
 	// Gateways that are not connected or are part of a different cluster are ignored.
-	// It's upto the client to make sure that the gateways are in the requested cluster.
+	// It is upto the client to make sure that the gateways are in the requested cluster.
 	BatchGetGatewayConnectionStats(context.Context, *BatchGetGatewayConnectionStatsRequest) (*BatchGetGatewayConnectionStatsResponse, error)
 }
 
