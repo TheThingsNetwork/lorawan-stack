@@ -89,7 +89,8 @@ type RxMetadata struct {
 	GatewayIds   *GatewayIdentifiers   `protobuf:"bytes,1,opt,name=gateway_ids,json=gatewayIds,proto3" json:"gateway_ids,omitempty"`
 	PacketBroker *PacketBrokerMetadata `protobuf:"bytes,18,opt,name=packet_broker,json=packetBroker,proto3" json:"packet_broker,omitempty"`
 	AntennaIndex uint32                `protobuf:"varint,2,opt,name=antenna_index,json=antennaIndex,proto3" json:"antenna_index,omitempty"`
-	Time         *types.Timestamp      `protobuf:"bytes,3,opt,name=time,proto3" json:"time,omitempty"`
+	// Timestamp at the end of the transmission, provided by the gateway. The accuracy is undefined.
+	Time *types.Timestamp `protobuf:"bytes,3,opt,name=time,proto3" json:"time,omitempty"`
 	// Gateway concentrator timestamp when the Rx finished (microseconds).
 	Timestamp uint32 `protobuf:"varint,4,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	// Gateway's internal fine timestamp when the Rx finished (nanoseconds).
@@ -122,9 +123,10 @@ type RxMetadata struct {
 	HoppingWidth uint32 `protobuf:"varint,19,opt,name=hopping_width,json=hoppingWidth,proto3" json:"hopping_width,omitempty"`
 	// Frequency drift in Hz between start and end of an LR-FHSS packet (signed).
 	FrequencyDrift int32 `protobuf:"varint,20,opt,name=frequency_drift,json=frequencyDrift,proto3" json:"frequency_drift,omitempty"`
-	// GPS sourced timestamp at the end of the transmission.
+	// Timestamp at the end of the transmission, provided by the gateway.
+	// Guaranteed to be based on a GPS PPS signal, with an accuracy of 1 millisecond.
 	GpsTime *types.Timestamp `protobuf:"bytes,21,opt,name=gps_time,json=gpsTime,proto3" json:"gps_time,omitempty"`
-	// Time when the service received the message.
+	// Timestamp at which the Gateway Server has received the message.
 	ReceivedAt *types.Timestamp `protobuf:"bytes,22,opt,name=received_at,json=receivedAt,proto3" json:"received_at,omitempty"`
 	// Advanced metadata fields
 	// - can be used for advanced information or experimental features that are not yet formally defined in the API

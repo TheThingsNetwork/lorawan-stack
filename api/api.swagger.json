@@ -17034,7 +17034,8 @@
         },
         "time": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "Timestamp at the end of the transmission, provided by the gateway. The accuracy is undefined."
         },
         "timestamp": {
           "type": "integer",
@@ -17115,12 +17116,12 @@
         "gps_time": {
           "type": "string",
           "format": "date-time",
-          "description": "GPS sourced timestamp at the end of the transmission."
+          "description": "Timestamp at the end of the transmission, provided by the gateway.\nGuaranteed to be based on a GPS PPS signal, with an accuracy of 1 millisecond."
         },
         "received_at": {
           "type": "string",
           "format": "date-time",
-          "description": "Time when the service received the message."
+          "description": "Timestamp at which the Gateway Server has received the message."
         },
         "advanced": {
           "type": "object",

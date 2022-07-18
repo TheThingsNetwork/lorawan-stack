@@ -32186,7 +32186,7 @@
             },
             {
               "name": "time",
-              "description": "",
+              "description": "Timestamp at the end of the transmission, provided by the gateway. The accuracy is undefined.",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
@@ -32406,7 +32406,7 @@
             },
             {
               "name": "gps_time",
-              "description": "GPS sourced timestamp at the end of the transmission.",
+              "description": "Timestamp at the end of the transmission, provided by the gateway.\nGuaranteed to be based on a GPS PPS signal, with an accuracy of 1 millisecond.",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
@@ -32418,7 +32418,7 @@
             },
             {
               "name": "received_at",
-              "description": "Time when the service received the message.",
+              "description": "Timestamp at which the Gateway Server has received the message.",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",

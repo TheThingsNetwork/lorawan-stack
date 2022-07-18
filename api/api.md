@@ -7084,7 +7084,7 @@ a message corresponds to one RxMetadata.
 | `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
 | `packet_broker` | [`PacketBrokerMetadata`](#ttn.lorawan.v3.PacketBrokerMetadata) |  |  |
 | `antenna_index` | [`uint32`](#uint32) |  |  |
-| `time` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `time` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Timestamp at the end of the transmission, provided by the gateway. The accuracy is undefined. |
 | `timestamp` | [`uint32`](#uint32) |  | Gateway concentrator timestamp when the Rx finished (microseconds). |
 | `fine_timestamp` | [`uint64`](#uint64) |  | Gateway's internal fine timestamp when the Rx finished (nanoseconds). |
 | `encrypted_fine_timestamp` | [`bytes`](#bytes) |  | Encrypted gateway's internal fine timestamp when the Rx finished (nanoseconds). |
@@ -7101,8 +7101,8 @@ a message corresponds to one RxMetadata.
 | `channel_index` | [`uint32`](#uint32) |  | Index of the gateway channel that received the message. |
 | `hopping_width` | [`uint32`](#uint32) |  | Hopping width; a number describing the number of steps of the LR-FHSS grid. |
 | `frequency_drift` | [`int32`](#int32) |  | Frequency drift in Hz between start and end of an LR-FHSS packet (signed). |
-| `gps_time` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | GPS sourced timestamp at the end of the transmission. |
-| `received_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Time when the service received the message. |
+| `gps_time` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Timestamp at the end of the transmission, provided by the gateway. Guaranteed to be based on a GPS PPS signal, with an accuracy of 1 millisecond. |
+| `received_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Timestamp at which the Gateway Server has received the message. |
 | `advanced` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  | Advanced metadata fields - can be used for advanced information or experimental features that are not yet formally defined in the API - field names are written in snake_case |
 
 #### Field Rules
