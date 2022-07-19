@@ -296,7 +296,7 @@ func (s *membershipStore) FindMembers(
 	// Apply ordering and paging.
 	selectQuery = selectQuery.
 		Apply(selectWithOrderFromContext(ctx, "account_friendly_id", map[string]string{
-			// TODO: Support custom ordering.
+			// TODO: Support custom ordering (https://github.com/TheThingsNetwork/lorawan-stack/issues/5616).
 		})).
 		Apply(selectWithLimitAndOffsetFromContext(ctx))
 

@@ -806,6 +806,7 @@ func (s *gatewayStore) DeleteGateway(ctx context.Context, id *ttnpb.GatewayIdent
 	}
 
 	// TODO: Replace unique constraint to only check EUI for deleted_at = NULL.
+	// https://github.com/TheThingsNetwork/lorawan-stack/issues/5615
 	// _, err = s.DB.NewDelete().
 	// 	Model(model).
 	// 	WherePK().

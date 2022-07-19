@@ -94,7 +94,7 @@ func (s *loginTokenStore) FindActiveLoginTokens(
 		Model(&models).
 		Where("user_id = ?", userUUID).
 		Where("expires_at > NOW()").
-		Where("used = FALSE OR used IS NULL"). // TODO: Make "used" column NOT NULL.
+		Where("used = FALSE OR used IS NULL"). // TODO: Make "used" column NOT NULL (https://github.com/TheThingsNetwork/lorawan-stack/issues/5613).
 		Scan(ctx)
 	if err != nil {
 		return nil, wrapDriverError(err)

@@ -33,6 +33,7 @@ type EUIBlock struct {
 	Model
 
 	// TODO: The database schema allows NULL for the fields below. We should fix the schema.
+	// https://github.com/TheThingsNetwork/lorawan-stack/issues/5613
 	Type           string `bun:"type,notnull"`
 	StartEUI       string `bun:"start_eui,notnull"`
 	EndCounter     int64  `bun:"end_counter,notnull"`
