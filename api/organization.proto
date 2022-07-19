@@ -71,7 +71,11 @@ message Organization {
   OrganizationOrUserIdentifiers administrative_contact = 9;
   OrganizationOrUserIdentifiers technical_contact = 10;
 
-  // next: 11
+  reserved 11; reserved "application_limit";
+  reserved 12; reserved "client_limit";
+  reserved 13; reserved "gateway_limit";
+
+  // next: 14
 }
 
 message Organizations {
