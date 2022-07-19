@@ -42,12 +42,12 @@ const unauthenticatedError = createFrontendError(
 
 const fetchThroughPagination = async (endpoint, additionalArgs, process, shouldStop) => {
   let page = 1
-  const limit = 1000
+  const limit = 100
   let totalCount = Infinity
   let stop = false
   let acc
 
-  while (page * limit <= totalCount && !stop) {
+  while ((page - 1) * limit < totalCount && !stop) {
     // eslint-disable-next-line no-await-in-loop
     const result = await endpoint({ page, limit, ...additionalArgs })
 
