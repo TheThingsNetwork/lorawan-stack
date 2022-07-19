@@ -79,6 +79,7 @@ func fromPBDataRate(dataRate *packetbroker.DataRate) (dr *ttnpb.DataRate, coding
 		}, "", true
 	// TODO: Support LR-FHSS (https://github.com/TheThingsNetwork/lorawan-stack/issues/3806)
 	// TODO: Set coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466)
+	// case *packetbroker.DataRate_Lrfhss:
 	// 	return &ttnpb.DataRate{
 	// 		Modulation: &ttnpb.DataRate_Lrfhss{
 	// 			Lrfhss: &ttnpb.LRFHSSDataRate{
@@ -331,6 +332,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 		md := msg.Message.RxMetadata[0]
 		up.GatewayId = toPBGatewayIdentifier(md.GatewayIds, config)
 
+		var hasGPSTime bool
 		var teaser packetbroker.GatewayMetadataTeaser_Terrestrial
 		var signalQuality packetbroker.GatewayMetadataSignalQuality_Terrestrial
 		var localization *packetbroker.GatewayMetadataLocalization_Terrestrial
@@ -372,16 +374,20 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 				localization.Antennas = append(localization.Antennas, locAnt)
 			}
 
-			var t *time.Time
-			switch {
-			case md.GpsTime != nil:
-				t = ttnpb.StdTime(md.GpsTime)
-			case md.Time != nil:
-				t = ttnpb.StdTime(md.Time)
-			default:
-				t = ttnpb.StdTime(md.ReceivedAt)
+			timestampCase := func(t *pbtypes.Timestamp) bool {
+				g := gatewayReceiveTime
+				return g == nil || t != nil && ttnpb.StdTime(t).Before(*g)
 			}
-			gatewayReceiveTime = t
+			switch {
+			case hasGPSTime:
+			case md.GpsTime != nil:
+				gatewayReceiveTime = ttnpb.StdTime(md.GpsTime)
+				hasGPSTime = true
+			case timestampCase(md.Time):
+				gatewayReceiveTime = ttnpb.StdTime(md.Time)
+			case timestampCase(md.ReceivedAt):
+				gatewayReceiveTime = ttnpb.StdTime(md.ReceivedAt)
+			}
 
 			if md.DownlinkPathConstraint == ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NEVER {
 				continue
