@@ -2182,7 +2182,7 @@ func TestBatchGetStatus(t *testing.T) {
 			a.So(err, should.BeNil)
 			a.So(res, should.NotBeNil)
 			a.So(len(res.Entries), should.Equal, 1)
-			a.So(res.Entries[unique.ID(ctx, gtwIDs1)], should.NotBeNil)
+			a.So(res.Entries[gtwIDs1.GatewayId], should.NotBeNil)
 
 			// Connect second gateway.
 			ctxWithCancel, gtwConnCancel := context.WithCancel(ctx)
@@ -2197,8 +2197,8 @@ func TestBatchGetStatus(t *testing.T) {
 			a.So(err, should.BeNil)
 			a.So(res, should.NotBeNil)
 			a.So(len(res.Entries), should.Equal, 2)
-			a.So(res.Entries[unique.ID(ctx, gtwIDs1)], should.NotBeNil)
-			a.So(res.Entries[unique.ID(ctx, gtwIDs2)], should.NotBeNil)
+			a.So(res.Entries[gtwIDs1.GatewayId], should.NotBeNil)
+			a.So(res.Entries[gtwIDs2.GatewayId], should.NotBeNil)
 
 			// Disconnect second gateway.
 			gtwConnCancel()
@@ -2215,11 +2215,11 @@ func TestBatchGetStatus(t *testing.T) {
 				// Only stats entries in the registry are persisted until Redis TTL after disconnection.
 				// These entries will have the `disconnected_at` field set.
 				a.So(len(res.Entries), should.Equal, 2)
-				a.So(res.Entries[unique.ID(ctx, gtwIDs1)], should.NotBeNil)
-				a.So(res.Entries[unique.ID(ctx, gtwIDs2)], should.NotBeNil)
+				a.So(res.Entries[gtwIDs1.GatewayId], should.NotBeNil)
+				a.So(res.Entries[gtwIDs2.GatewayId], should.NotBeNil)
 			} else {
 				a.So(len(res.Entries), should.Equal, 1)
-				a.So(res.Entries[unique.ID(ctx, gtwIDs1)], should.NotBeNil)
+				a.So(res.Entries[gtwIDs1.GatewayId], should.NotBeNil)
 			}
 			// Close the Gateway Server.
 			gs.Close()
