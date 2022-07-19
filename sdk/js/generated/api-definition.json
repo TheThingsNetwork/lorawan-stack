@@ -624,7 +624,9 @@
         "version_ids.brand_id",
         "version_ids.firmware_version",
         "version_ids.hardware_version",
-        "version_ids.model_id"
+        "version_ids.model_id",
+        "version_ids.vendor_id",
+        "version_ids.vendor_profile_id"
       ]
     },
     "Delete": {
@@ -4354,6 +4356,8 @@
         "supports_class_c",
         "supports_join",
         "version_ids",
+        "version_ids.vendor_id",
+        "version_ids.vendor_profile_id",
         "version_ids.band_id",
         "version_ids.brand_id",
         "version_ids.firmware_version",
