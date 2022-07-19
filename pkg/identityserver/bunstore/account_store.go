@@ -19,6 +19,8 @@ import (
 	"time"
 
 	"github.com/uptrace/bun"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -83,7 +85,14 @@ func (s *baseStore) getAccountModel(
 		Where("?TableAlias.uid = ?", uid)
 
 	if err := selectQuery.Scan(ctx); err != nil {
-		return nil, wrapDriverError(err)
+		err = wrapDriverError(err)
+		if errors.IsNotFound(err) {
+			return nil, store.ErrAccountNotFound.WithAttributes(
+				"account_type", accountType,
+				"account_id", uid,
+			)
+		}
+		return nil, err
 	}
 
 	return model, nil

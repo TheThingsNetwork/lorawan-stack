@@ -98,16 +98,6 @@ func (s *euiStore) CreateEUIBlock(
 	return nil
 }
 
-var errAppDevEUILimitReached = errors.DefineFailedPrecondition(
-	"application_dev_eui_limit_reached",
-	"application issued DevEUI limit ({dev_eui_limit}) reached",
-)
-
-var errNoEUIBlockAvailable = errors.DefineFailedPrecondition(
-	"no_eui_or_block_available",
-	"no EUI or EUI block available",
-)
-
 func (s *euiStore) IssueDevEUIForApplication(
 	ctx context.Context, id *ttnpb.ApplicationIdentifiers, applicationLimit int,
 ) (*types.EUI64, error) {
@@ -132,7 +122,9 @@ func (s *euiStore) IssueDevEUIForApplication(
 		}
 
 		if applicationLimit > 0 && applicationModel.DevEUICounter >= applicationLimit {
-			return errAppDevEUILimitReached.WithAttributes("dev_eui_limit", applicationLimit)
+			return store.ErrApplicationDevEUILimitReached.WithAttributes(
+				"dev_eui_limit", applicationLimit,
+			)
 		}
 
 		_, err = s.DB.NewUpdate().
@@ -146,7 +138,9 @@ func (s *euiStore) IssueDevEUIForApplication(
 		}
 
 		if applicationLimit > 0 && applicationModel.DevEUICounter > applicationLimit {
-			return errAppDevEUILimitReached.WithAttributes("dev_eui_limit", applicationLimit)
+			return store.ErrApplicationDevEUILimitReached.WithAttributes(
+				"dev_eui_limit", applicationLimit,
+			)
 		}
 
 		selectQuery := s.DB.NewSelect().
@@ -159,7 +153,7 @@ func (s *euiStore) IssueDevEUIForApplication(
 		if err := selectQuery.Scan(ctx); err != nil {
 			err = wrapDriverError(err)
 			if errors.IsNotFound(err) {
-				return errNoEUIBlockAvailable.New()
+				return store.ErrNoEUIBlockAvailable.New()
 			}
 			return err
 		}

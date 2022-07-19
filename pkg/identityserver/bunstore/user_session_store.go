@@ -21,6 +21,7 @@ import (
 	"github.com/uptrace/bun"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -228,6 +229,12 @@ func (s *userSessionStore) GetSession(
 		s.selectWithSessionID(ctx, sessionID),
 	))
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return nil, store.ErrUserSessionNotFound.WithAttributes(
+				"user_id", userIDs.GetUserId(),
+				"session_id", sessionID,
+			)
+		}
 		return nil, err
 	}
 
@@ -247,6 +254,11 @@ func (s *userSessionStore) GetSessionByID(ctx context.Context, sessionID string)
 
 	model, err := s.getUserSessionModelBy(ctx, s.selectWithSessionID(ctx, sessionID))
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return nil, store.ErrUserSessionNotFound.WithAttributes(
+				"session_id", sessionID,
+			)
+		}
 		return nil, err
 	}
 	pb, err := userSessionToPB(model, nil)
@@ -280,6 +292,12 @@ func (s *userSessionStore) DeleteSession(ctx context.Context, userIDs *ttnpb.Use
 		s.selectWithSessionID(ctx, sessionID),
 	))
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrUserSessionNotFound.WithAttributes(
+				"user_id", userIDs.GetUserId(),
+				"session_id", sessionID,
+			)
+		}
 		return err
 	}
 

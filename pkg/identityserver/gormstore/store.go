@@ -330,63 +330,25 @@ func modelForID(id ttnpb.IDStringer) modelInterface {
 	return modelForEntityType(entityTypeForID(id))
 }
 
-var (
-	errApplicationNotFound = errors.DefineNotFound(
-		"application_not_found", "application `{application_id}` not found",
-	)
-	errClientNotFound = errors.DefineNotFound(
-		"client_not_found", "client `{client_id}` not found",
-	)
-	errGatewayNotFound = errors.DefineNotFound(
-		"gateway_not_found", "gateway `{gateway_id}` not found",
-	)
-	errEndDeviceNotFound = errors.DefineNotFound(
-		"end_device_not_found", "end device `{application_id}:{device_id}` not found",
-	)
-	errOrganizationNotFound = errors.DefineNotFound(
-		"organization_not_found", "organization `{organization_id}` not found",
-	)
-	errUserNotFound = errors.DefineNotFound(
-		"user_not_found", "user `{user_id}` not found",
-	)
-	errSessionNotFound = errors.DefineNotFound(
-		"session_not_found", "session `{session_id}` for user `{user_id}` not found",
-	)
-
-	errAuthorizationNotFound = errors.DefineNotFound(
-		"authorization_not_found", "authorization of `{user_id}` for `{client_id}` not found",
-	)
-	errAuthorizationCodeNotFound = errors.DefineNotFound(
-		"authorization_code_not_found", "authorization code not found",
-	)
-	errAccessTokenNotFound = errors.DefineNotFound(
-		"access_token_not_found", "access token `{access_token_id}` not found",
-	)
-
-	errAPIKeyNotFound = errors.DefineNotFound(
-		"api_key_not_found", "API key not found",
-	)
-
-	errMigrationNotFound = errors.DefineNotFound(
-		"migration_not_found", "migration not found",
-	)
+var errMigrationNotFound = errors.DefineNotFound(
+	"migration_not_found", "migration not found",
 )
 
 func errNotFoundForID(id ttnpb.IDStringer) error {
 	switch t := entityTypeForID(id); t {
 	case application:
-		return errApplicationNotFound.WithAttributes("application_id", id.IDString())
+		return store.ErrApplicationNotFound.WithAttributes("application_id", id.IDString())
 	case client:
-		return errClientNotFound.WithAttributes("client_id", id.IDString())
+		return store.ErrClientNotFound.WithAttributes("client_id", id.IDString())
 	case "end_device":
 		appID, devID := splitEndDeviceIDString(id.IDString())
-		return errEndDeviceNotFound.WithAttributes("application_id", appID, "device_id", devID)
+		return store.ErrEndDeviceNotFound.WithAttributes("application_id", appID, "device_id", devID)
 	case gateway:
-		return errGatewayNotFound.WithAttributes("gateway_id", id.IDString())
+		return store.ErrGatewayNotFound.WithAttributes("gateway_id", id.IDString())
 	case organization:
-		return errOrganizationNotFound.WithAttributes("organization_id", id.IDString())
+		return store.ErrOrganizationNotFound.WithAttributes("organization_id", id.IDString())
 	case user:
-		return errUserNotFound.WithAttributes("user_id", id.IDString())
+		return store.ErrUserNotFound.WithAttributes("user_id", id.IDString())
 	default:
 		panic(fmt.Sprintf("can't find errNotFound for entity type %s", t))
 	}

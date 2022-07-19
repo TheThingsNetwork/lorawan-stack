@@ -24,6 +24,7 @@ import (
 	"github.com/uptrace/bun"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -529,15 +530,33 @@ func (s *gatewayStore) GetGateway(
 	))
 	defer span.End()
 
-	by := s.selectWithID(ctx, id.GetGatewayId())
+	var (
+		model *Gateway
+		err   error
+	)
+
 	if euiString := eui64ToString(id.GetEui()); euiString != nil {
-		by = s.selectWithEUI(ctx, *euiString)
+		model, err = s.getGatewayModelBy(ctx, s.selectWithEUI(ctx, *euiString), fieldMask)
+		if err != nil {
+			if errors.IsNotFound(err) {
+				return nil, store.ErrGatewayNotFoundByEUI.WithAttributes(
+					"gateway_eui", id.GetEui().String(),
+				)
+			}
+			return nil, err
+		}
+	} else {
+		model, err = s.getGatewayModelBy(ctx, s.selectWithID(ctx, id.GetGatewayId()), fieldMask)
+		if err != nil {
+			if errors.IsNotFound(err) {
+				return nil, store.ErrGatewayNotFound.WithAttributes(
+					"gateway_id", id.GetGatewayId(),
+				)
+			}
+			return nil, err
+		}
 	}
 
-	model, err := s.getGatewayModelBy(ctx, by, fieldMask)
-	if err != nil {
-		return nil, err
-	}
 	pb, err := gatewayToPB(model, fieldMask...)
 	if err != nil {
 		return nil, err
@@ -745,6 +764,11 @@ func (s *gatewayStore) UpdateGateway(
 		ctx, s.selectWithID(ctx, pb.GetIds().GetGatewayId()), fieldMask,
 	)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return nil, store.ErrGatewayNotFound.WithAttributes(
+				"gateway_id", pb.GetIds().GetGatewayId(),
+			)
+		}
 		return nil, err
 	}
 
@@ -769,6 +793,11 @@ func (s *gatewayStore) DeleteGateway(ctx context.Context, id *ttnpb.GatewayIdent
 
 	model, err := s.getGatewayModelBy(ctx, s.selectWithID(ctx, id.GetGatewayId()), store.FieldMask{"ids"})
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrGatewayNotFound.WithAttributes(
+				"gateway_id", id.GetGatewayId(),
+			)
+		}
 		return err
 	}
 
@@ -806,6 +835,11 @@ func (s *gatewayStore) RestoreGateway(ctx context.Context, id *ttnpb.GatewayIden
 		store.FieldMask{"ids"},
 	)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrGatewayNotFound.WithAttributes(
+				"gateway_id", id.GetGatewayId(),
+			)
+		}
 		return err
 	}
 
@@ -834,6 +868,11 @@ func (s *gatewayStore) PurgeGateway(ctx context.Context, id *ttnpb.GatewayIdenti
 		store.FieldMask{"attributes", "contact_info", "antennas"},
 	)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrGatewayNotFound.WithAttributes(
+				"gateway_id", id.GetGatewayId(),
+			)
+		}
 		return err
 	}
 

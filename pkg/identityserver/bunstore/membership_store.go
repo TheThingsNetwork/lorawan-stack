@@ -335,7 +335,16 @@ func (s *membershipStore) GetMember(
 		Where("entity_friendly_id = ?", entityID.IDString()).
 		Scan(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		err = wrapDriverError(err)
+		if errors.IsNotFound(err) {
+			return nil, store.ErrMembershipNotFound.WithAttributes(
+				"account_type", accountID.EntityType(),
+				"account_id", accountID.IDString(),
+				"entity_type", entityID.EntityType(),
+				"entity_id", entityID.IDString(),
+			)
+		}
+		return nil, err
 	}
 
 	return &ttnpb.Rights{

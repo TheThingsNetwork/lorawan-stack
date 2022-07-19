@@ -24,6 +24,7 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -302,11 +303,6 @@ func (s *contactInfoStore) SetContactInfo(
 	return pbs, nil
 }
 
-var errValidationAlreadyExists = errors.DefineAlreadyExists(
-	"validation_already_exists",
-	"contact info validation already exists",
-)
-
 func (s *contactInfoStore) CreateValidation(
 	ctx context.Context, pb *ttnpb.ContactInfoValidation,
 ) (*ttnpb.ContactInfoValidation, error) {
@@ -346,7 +342,7 @@ func (s *contactInfoStore) CreateValidation(
 		return nil, wrapDriverError(err)
 	}
 	if n > 0 {
-		return nil, errValidationAlreadyExists.New()
+		return nil, store.ErrValidationAlreadySent.New()
 	}
 
 	model := &ContactInfoValidation{
@@ -376,12 +372,6 @@ func (s *contactInfoStore) CreateValidation(
 	}, nil
 }
 
-var (
-	errValidationTokenNotFound = errors.DefineNotFound("validation_token", "validation token not found")
-	errValidationTokenUsed     = errors.DefineAlreadyExists("validation_token_used", "validation token already used")
-	errValidationTokenExpired  = errors.DefineNotFound("validation_token_expired", "validation token expired")
-)
-
 func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.ContactInfoValidation) error {
 	ctx, span := tracer.Start(ctx, "Validate")
 	defer span.End()
@@ -398,17 +388,23 @@ func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.Conta
 	if err != nil {
 		err = wrapDriverError(err)
 		if errors.IsNotFound(err) {
-			return errValidationTokenNotFound.New()
+			return store.ErrValidationTokenNotFound.WithAttributes(
+				"validation_id", validation.Id,
+			)
 		}
 		return err
 	}
 
 	if model.Used {
-		return errValidationTokenUsed.New()
+		return store.ErrValidationTokenAlreadyUsed.WithAttributes(
+			"validation_id", validation.Id,
+		)
 	}
 
 	if model.ExpiresAt != nil && model.ExpiresAt.Before(time.Now()) {
-		return errValidationTokenExpired.New()
+		return store.ErrValidationTokenExpired.WithAttributes(
+			"validation_id", validation.Id,
+		)
 	}
 
 	now := time.Now()

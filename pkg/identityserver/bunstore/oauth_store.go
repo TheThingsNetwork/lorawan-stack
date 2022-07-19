@@ -318,7 +318,14 @@ func (s *oauthStore) GetAuthorization(
 		Apply(s.selectWithClientIDs(ctx, clientUUID))
 
 	if err := selectQuery.Scan(ctx); err != nil {
-		return nil, wrapDriverError(err)
+		err = wrapDriverError(err)
+		if errors.IsNotFound(err) {
+			return nil, store.ErrAuthorizationNotFound.WithAttributes(
+				"user_id", userIDs.GetUserId(),
+				"client_id", clientIDs.GetClientId(),
+			)
+		}
+		return nil, err
 	}
 
 	pb, err := clientAuthorizationToPB(model, userIDs, clientIDs)
@@ -416,7 +423,14 @@ func (s *oauthStore) DeleteAuthorization(
 		Apply(s.selectWithClientIDs(ctx, clientUUID))
 
 	if err := selectQuery.Scan(ctx); err != nil {
-		return wrapDriverError(err)
+		err = wrapDriverError(err)
+		if errors.IsNotFound(err) {
+			return store.ErrAuthorizationNotFound.WithAttributes(
+				"user_id", userIDs.GetUserId(),
+				"client_id", clientIDs.GetClientId(),
+			)
+		}
+		return err
 	}
 
 	_, err = s.DB.NewDelete().
@@ -498,7 +512,11 @@ func (s *oauthStore) GetAuthorizationCode(ctx context.Context, code string) (*tt
 		})
 
 	if err := selectQuery.Scan(ctx); err != nil {
-		return nil, wrapDriverError(err)
+		err = wrapDriverError(err)
+		if errors.IsNotFound(err) {
+			return nil, store.ErrAuthorizationCodeNotFound.New()
+		}
+		return nil, err
 	}
 
 	pb, err := authorizationCodeToPB(model, nil, nil)
@@ -520,7 +538,11 @@ func (s *oauthStore) DeleteAuthorizationCode(ctx context.Context, code string) e
 		Where("code = ?", code)
 
 	if err := selectQuery.Scan(ctx); err != nil {
-		return wrapDriverError(err)
+		err = wrapDriverError(err)
+		if errors.IsNotFound(err) {
+			return store.ErrAuthorizationCodeNotFound.New()
+		}
+		return err
 	}
 
 	_, err := s.DB.NewDelete().
@@ -662,7 +684,13 @@ func (s *oauthStore) GetAccessToken(ctx context.Context, id string) (*ttnpb.OAut
 		})
 
 	if err := selectQuery.Scan(ctx); err != nil {
-		return nil, wrapDriverError(err)
+		err = wrapDriverError(err)
+		if errors.IsNotFound(err) {
+			return nil, store.ErrAccessTokenNotFound.WithAttributes(
+				"access_token_id", id,
+			)
+		}
+		return nil, err
 	}
 
 	pb, err := accessTokenToPB(model, nil, nil)
@@ -684,7 +712,13 @@ func (s *oauthStore) DeleteAccessToken(ctx context.Context, id string) error {
 		Where("token_id = ?", id)
 
 	if err := selectQuery.Scan(ctx); err != nil {
-		return wrapDriverError(err)
+		err = wrapDriverError(err)
+		if errors.IsNotFound(err) {
+			return store.ErrAccessTokenNotFound.WithAttributes(
+				"access_token_id", id,
+			)
+		}
+		return err
 	}
 
 	_, err := s.DB.NewDelete().

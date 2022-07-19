@@ -22,6 +22,7 @@ import (
 	"github.com/uptrace/bun"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -355,6 +356,11 @@ func (s *applicationStore) GetApplication(
 		ctx, s.selectWithID(ctx, id.GetApplicationId()), fieldMask,
 	)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return nil, store.ErrApplicationNotFound.WithAttributes(
+				"application_id", id.GetApplicationId(),
+			)
+		}
 		return nil, err
 	}
 	pb, err := applicationToPB(model, fieldMask...)
@@ -464,6 +470,11 @@ func (s *applicationStore) UpdateApplication(
 		ctx, s.selectWithID(ctx, pb.GetIds().GetApplicationId()), fieldMask,
 	)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return nil, store.ErrApplicationNotFound.WithAttributes(
+				"application_id", pb.GetIds().GetApplicationId(),
+			)
+		}
 		return nil, err
 	}
 
@@ -488,6 +499,11 @@ func (s *applicationStore) DeleteApplication(ctx context.Context, id *ttnpb.Appl
 
 	model, err := s.getApplicationModelBy(ctx, s.selectWithID(ctx, id.GetApplicationId()), store.FieldMask{"ids"})
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrApplicationNotFound.WithAttributes(
+				"application_id", id.GetApplicationId(),
+			)
+		}
 		return err
 	}
 
@@ -514,6 +530,11 @@ func (s *applicationStore) RestoreApplication(ctx context.Context, id *ttnpb.App
 		store.FieldMask{"ids"},
 	)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrApplicationNotFound.WithAttributes(
+				"application_id", id.GetApplicationId(),
+			)
+		}
 		return err
 	}
 
@@ -542,6 +563,11 @@ func (s *applicationStore) PurgeApplication(ctx context.Context, id *ttnpb.Appli
 		store.FieldMask{"attributes", "contact_info"},
 	)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrApplicationNotFound.WithAttributes(
+				"application_id", id.GetApplicationId(),
+			)
+		}
 		return err
 	}
 

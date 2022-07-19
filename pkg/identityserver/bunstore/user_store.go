@@ -23,6 +23,7 @@ import (
 	"github.com/uptrace/bun"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -416,6 +417,11 @@ func (s *userStore) GetUser(
 
 	model, err := s.getUserModelBy(ctx, s.selectWithID(ctx, id.GetUserId()), fieldMask)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return nil, store.ErrUserNotFound.WithAttributes(
+				"user_id", id.GetUserId(),
+			)
+		}
 		return nil, err
 	}
 	pb, err := userToPB(model, fieldMask...)
@@ -446,6 +452,9 @@ func (s *userStore) GetUserByPrimaryEmailAddress(
 		ctx, s.selectWithPrimaryEmailAddress(ctx, primaryEmailAddress), fieldMask,
 	)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return nil, store.ErrUserNotFoundByPrimaryEmailAddress.New()
+		}
 		return nil, err
 	}
 	pb, err := userToPB(model, fieldMask...)
@@ -585,6 +594,11 @@ func (s *userStore) UpdateUser(
 
 	model, err := s.getUserModelBy(ctx, s.selectWithID(ctx, pb.GetIds().GetUserId()), fieldMask)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return nil, store.ErrUserNotFound.WithAttributes(
+				"user_id", pb.GetIds().GetUserId(),
+			)
+		}
 		return nil, err
 	}
 
@@ -609,6 +623,11 @@ func (s *userStore) DeleteUser(ctx context.Context, id *ttnpb.UserIdentifiers) e
 
 	model, err := s.getUserModelBy(ctx, s.selectWithID(ctx, id.GetUserId()), store.FieldMask{"ids"})
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrUserNotFound.WithAttributes(
+				"user_id", id.GetUserId(),
+			)
+		}
 		return err
 	}
 
@@ -645,6 +664,11 @@ func (s *userStore) RestoreUser(ctx context.Context, id *ttnpb.UserIdentifiers) 
 		store.FieldMask{"ids"},
 	)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrUserNotFound.WithAttributes(
+				"user_id", id.GetUserId(),
+			)
+		}
 		return err
 	}
 
@@ -685,6 +709,11 @@ func (s *userStore) PurgeUser(ctx context.Context, id *ttnpb.UserIdentifiers) er
 		store.FieldMask{"attributes", "contact_info"},
 	)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrUserNotFound.WithAttributes(
+				"user_id", id.GetUserId(),
+			)
+		}
 		return err
 	}
 

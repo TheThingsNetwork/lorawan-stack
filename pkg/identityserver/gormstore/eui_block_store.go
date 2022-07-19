@@ -20,7 +20,6 @@ import (
 	"runtime/trace"
 
 	"github.com/jinzhu/gorm"
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -38,17 +37,6 @@ type euiStore struct {
 func getMaxCounter(addressBlock types.EUI64Prefix) int64 {
 	return int64(^(uint64(0)) >> (addressBlock.Length))
 }
-
-var (
-	errMaxGlobalEUILimitReached = errors.DefineFailedPrecondition(
-		"global_eui_limit_reached",
-		"global eui limit from address block reached",
-	)
-	errAppDevEUILimitReached = errors.DefineFailedPrecondition(
-		"application_dev_eui_limit_reached",
-		"application issued DevEUI limit ({dev_eui_limit}) reached",
-	)
-)
 
 func (s *euiStore) incrementApplicationDevEUICounter(
 	ctx context.Context, ids *ttnpb.ApplicationIdentifiers, applicationLimit int,
@@ -76,7 +64,7 @@ func (s *euiStore) incrementApplicationDevEUICounter(
 	}
 	// If application DevEUI counter not updated, the limit was reached.
 	if result.RowsAffected == 0 {
-		return errAppDevEUILimitReached.WithAttributes("dev_eui_limit", fmt.Sprint(applicationLimit))
+		return store.ErrApplicationDevEUILimitReached.WithAttributes("dev_eui_limit", fmt.Sprint(applicationLimit))
 	}
 	return nil
 }
@@ -104,7 +92,7 @@ func (s *euiStore) issueDevEUIAddressFromBlock(ctx context.Context) (*types.EUI6
 			return nil, err
 		}
 		if len(euiResult) == 0 {
-			return nil, errMaxGlobalEUILimitReached.New()
+			return nil, store.ErrNoEUIBlockAvailable.New()
 		}
 		var devEUIResult types.EUI64
 		devEUIResult.UnmarshalNumber(

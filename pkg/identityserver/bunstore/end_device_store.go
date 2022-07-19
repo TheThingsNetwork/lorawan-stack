@@ -23,6 +23,7 @@ import (
 	"github.com/uptrace/bun"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -459,6 +460,12 @@ func (s *endDeviceStore) GetEndDevice(
 		ctx, s.selectWithID(ctx, id.ApplicationIds.GetApplicationId(), id.GetDeviceId()), fieldMask,
 	)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return nil, store.ErrEndDeviceNotFound.WithAttributes(
+				"application_id", id.GetApplicationIds().GetApplicationId(),
+				"device_id", id.GetDeviceId(),
+			)
+		}
 		return nil, err
 	}
 	pb, err := endDeviceToPB(model, fieldMask...)
@@ -621,6 +628,12 @@ func (s *endDeviceStore) UpdateEndDevice(
 		), fieldMask,
 	)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return nil, store.ErrEndDeviceNotFound.WithAttributes(
+				"application_id", pb.GetIds().GetApplicationIds().GetApplicationId(),
+				"device_id", pb.GetIds().GetDeviceId(),
+			)
+		}
 		return nil, err
 	}
 
@@ -650,6 +663,12 @@ func (s *endDeviceStore) DeleteEndDevice(ctx context.Context, id *ttnpb.EndDevic
 		id.GetDeviceId(),
 	), store.FieldMask{"ids", "attributes", "locations"})
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrEndDeviceNotFound.WithAttributes(
+				"application_id", id.GetApplicationIds().GetApplicationId(),
+				"device_id", id.GetDeviceId(),
+			)
+		}
 		return err
 	}
 

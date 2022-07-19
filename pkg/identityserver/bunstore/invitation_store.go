@@ -77,8 +77,6 @@ func newInvitationStore(baseStore *baseStore) *invitationStore {
 	}
 }
 
-var errInvitationAlreadySent = errors.DefineAlreadyExists("invitation_already_sent", "invitation already sent")
-
 func (s *invitationStore) CreateInvitation(
 	ctx context.Context, pb *ttnpb.Invitation,
 ) (*ttnpb.Invitation, error) {
@@ -97,7 +95,7 @@ func (s *invitationStore) CreateInvitation(
 	if err != nil {
 		err = wrapDriverError(err)
 		if errors.IsAlreadyExists(err) {
-			return nil, errInvitationAlreadySent.New()
+			return nil, store.ErrInvitationAlreadySent.New()
 		}
 		return nil, err
 	}
@@ -191,6 +189,11 @@ func (s *invitationStore) GetInvitation(ctx context.Context, token string) (*ttn
 			})
 	})
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return nil, store.ErrInvitationNotFound.WithAttributes(
+				"invitation_token", token,
+			)
+		}
 		return nil, err
 	}
 
@@ -201,13 +204,6 @@ func (s *invitationStore) GetInvitation(ctx context.Context, token string) (*ttn
 
 	return pb, nil
 }
-
-var (
-	errInvitationExpired         = errors.DefineFailedPrecondition("invitation_expired", "invitation expired")
-	errInvitationAlreadyAccepted = errors.DefineFailedPrecondition(
-		"invitation_already_accepted", "invitation already accepted",
-	)
-)
 
 func (s *invitationStore) SetInvitationAcceptedBy(
 	ctx context.Context, token string, accepter *ttnpb.UserIdentifiers,
@@ -222,15 +218,20 @@ func (s *invitationStore) SetInvitationAcceptedBy(
 		return q.Where("token = ?", token)
 	})
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrInvitationNotFound.WithAttributes(
+				"invitation_token", token,
+			)
+		}
 		return err
 	}
 
 	if model.ExpiresAt != nil && model.ExpiresAt.Before(time.Now()) {
-		return errInvitationExpired.New()
+		return store.ErrInvitationExpired.WithAttributes("invitation_token", token)
 	}
 
 	if model.AcceptedByID != nil {
-		return errInvitationAlreadyAccepted.New()
+		return store.ErrInvitationAlreadyUsed.WithAttributes("invitation_token", token)
 	}
 
 	_, userUUID, err := s.getEntity(ctx, accepter)
@@ -258,6 +259,9 @@ func (s *invitationStore) DeleteInvitation(ctx context.Context, email string) er
 		return q.Where("LOWER(email) = lower(?)", email)
 	})
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrInvitationNotFound.New()
+		}
 		return err
 	}
 

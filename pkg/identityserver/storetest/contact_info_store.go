@@ -140,7 +140,7 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 					Token: "EXPIRED_TOKEN",
 				})
 				if a.So(err, should.NotBeNil) {
-					a.So(errors.IsNotFound(err), should.BeTrue)
+					a.So(errors.IsFailedPrecondition(err), should.BeTrue)
 				}
 			})
 
@@ -160,7 +160,7 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 					Token: "TOKEN",
 				})
 				if a.So(err, should.NotBeNil) {
-					a.So(errors.IsAlreadyExists(err), should.BeTrue)
+					a.So(errors.IsFailedPrecondition(err), should.BeTrue)
 				}
 			})
 

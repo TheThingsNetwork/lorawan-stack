@@ -21,6 +21,7 @@ import (
 	"github.com/uptrace/bun"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -229,6 +230,13 @@ func (s *apiKeyStore) GetAPIKey(
 		s.selectWithAPIKeyID(ctx, id),
 	))
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return nil, store.ErrAPIKeyNotFound.WithAttributes(
+				"entity_type", entityType,
+				"entity_id", entityID.IDString(),
+				"api_key_id", id,
+			)
+		}
 		return nil, err
 	}
 	pb, err := apiKeyToPB(model)
@@ -249,6 +257,11 @@ func (s *apiKeyStore) GetAPIKeyByID(
 
 	model, err := s.getAPIKeyModelBy(ctx, s.selectWithAPIKeyID(ctx, id))
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return nil, nil, store.ErrAPIKeyNotFound.WithAttributes(
+				"api_key_id", id,
+			)
+		}
 		return nil, nil, err
 	}
 	pb, err := apiKeyToPB(model)
@@ -284,6 +297,13 @@ func (s *apiKeyStore) UpdateAPIKey(
 		s.selectWithAPIKeyID(ctx, pb.Id),
 	))
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return nil, store.ErrAPIKeyNotFound.WithAttributes(
+				"entity_type", entityType,
+				"entity_id", entityID.IDString(),
+				"api_key_id", pb.Id,
+			)
+		}
 		return nil, err
 	}
 

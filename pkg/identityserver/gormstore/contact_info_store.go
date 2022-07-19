@@ -20,7 +20,6 @@ import (
 	"time"
 
 	"github.com/jinzhu/gorm"
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -154,11 +153,6 @@ func (s *contactInfoStore) SetContactInfo(
 	return pb, nil
 }
 
-var errValidationAlreadyExists = errors.DefineAlreadyExists(
-	"validation_already_exists",
-	"contact info validation already exists",
-)
-
 func (s *contactInfoStore) CreateValidation(
 	ctx context.Context, validation *ttnpb.ContactInfoValidation,
 ) (*ttnpb.ContactInfoValidation, error) {
@@ -197,7 +191,7 @@ func (s *contactInfoStore) CreateValidation(
 	}).Where("expires_at > ?", cleanTime(time.Now())).First(&existing).Error
 	switch {
 	case err == nil:
-		return nil, errValidationAlreadyExists.New()
+		return nil, store.ErrValidationAlreadySent.New()
 	case gorm.IsRecordNotFoundError(err):
 	default:
 		return nil, err
@@ -213,12 +207,6 @@ func (s *contactInfoStore) CreateValidation(
 	return pb, nil
 }
 
-var (
-	errValidationTokenNotFound = errors.DefineNotFound("validation_token", "validation token not found")
-	errValidationTokenUsed     = errors.DefineAlreadyExists("validation_token_used", "validation token already used")
-	errValidationTokenExpired  = errors.DefineNotFound("validation_token_expired", "validation token expired")
-)
-
 func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.ContactInfoValidation) error {
 	defer trace.StartRegion(ctx, "validate contact info").End()
 	now := cleanTime(time.Now())
@@ -230,17 +218,23 @@ func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.Conta
 	}).Find(&model).Error
 	if err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return errValidationTokenNotFound.New()
+			return store.ErrValidationTokenNotFound.WithAttributes(
+				"validation_id", validation.Id,
+			)
 		}
 		return err
 	}
 
 	if model.Used {
-		return errValidationTokenUsed.New()
+		return store.ErrValidationTokenAlreadyUsed.WithAttributes(
+			"validation_id", validation.Id,
+		)
 	}
 
 	if model.ExpiresAt != nil && model.ExpiresAt.Before(time.Now()) {
-		return errValidationTokenExpired.New()
+		return store.ErrValidationTokenExpired.WithAttributes(
+			"validation_id", validation.Id,
+		)
 	}
 
 	err = s.query(ctx, ContactInfo{}).Where(ContactInfo{

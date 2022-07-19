@@ -20,6 +20,7 @@ import (
 	"strings"
 
 	"github.com/uptrace/bun"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -94,7 +95,14 @@ func (s *entityStore) getEntity(ctx context.Context, ids ttnpb.IDStringer) (enti
 		Where("friendly_id = ?", ids.IDString()).
 		Scan(ctx, &uuid)
 	if err != nil {
-		return "", "", wrapDriverError(err)
+		err = wrapDriverError(err)
+		if errors.IsNotFound(err) {
+			return "", "", store.ErrEntityNotFound.WithAttributes(
+				"entity_type", ids.EntityType(),
+				"entity_id", ids.IDString(),
+			)
+		}
+		return "", "", err
 	}
 	return entityType, uuid, nil
 }

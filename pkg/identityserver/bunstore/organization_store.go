@@ -22,6 +22,7 @@ import (
 	"github.com/uptrace/bun"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -357,6 +358,11 @@ func (s *organizationStore) GetOrganization(
 		ctx, s.selectWithID(ctx, id.GetOrganizationId()), fieldMask,
 	)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return nil, store.ErrOrganizationNotFound.WithAttributes(
+				"organization_id", id.GetOrganizationId(),
+			)
+		}
 		return nil, err
 	}
 	pb, err := organizationToPB(model, fieldMask...)
@@ -451,6 +457,11 @@ func (s *organizationStore) UpdateOrganization(
 		ctx, s.selectWithID(ctx, pb.GetIds().GetOrganizationId()), fieldMask,
 	)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return nil, store.ErrOrganizationNotFound.WithAttributes(
+				"organization_id", pb.GetIds().GetOrganizationId(),
+			)
+		}
 		return nil, err
 	}
 
@@ -475,6 +486,11 @@ func (s *organizationStore) DeleteOrganization(ctx context.Context, id *ttnpb.Or
 
 	model, err := s.getOrganizationModelBy(ctx, s.selectWithID(ctx, id.GetOrganizationId()), store.FieldMask{"ids"})
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrOrganizationNotFound.WithAttributes(
+				"organization_id", id.GetOrganizationId(),
+			)
+		}
 		return err
 	}
 
@@ -501,6 +517,11 @@ func (s *organizationStore) RestoreOrganization(ctx context.Context, id *ttnpb.O
 		store.FieldMask{"ids"},
 	)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrOrganizationNotFound.WithAttributes(
+				"organization_id", id.GetOrganizationId(),
+			)
+		}
 		return err
 	}
 
@@ -529,6 +550,11 @@ func (s *organizationStore) PurgeOrganization(ctx context.Context, id *ttnpb.Org
 		store.FieldMask{"attributes", "contact_info"},
 	)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrOrganizationNotFound.WithAttributes(
+				"organization_id", id.GetOrganizationId(),
+			)
+		}
 		return err
 	}
 

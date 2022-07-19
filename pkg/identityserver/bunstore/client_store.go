@@ -22,6 +22,7 @@ import (
 	"github.com/uptrace/bun"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -383,6 +384,11 @@ func (s *clientStore) GetClient(
 		ctx, s.selectWithID(ctx, id.GetClientId()), fieldMask,
 	)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return nil, store.ErrClientNotFound.WithAttributes(
+				"client_id", id.GetClientId(),
+			)
+		}
 		return nil, err
 	}
 	pb, err := clientToPB(model, fieldMask...)
@@ -509,6 +515,11 @@ func (s *clientStore) UpdateClient(
 		ctx, s.selectWithID(ctx, pb.GetIds().GetClientId()), fieldMask,
 	)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return nil, store.ErrClientNotFound.WithAttributes(
+				"client_id", pb.GetIds().GetClientId(),
+			)
+		}
 		return nil, err
 	}
 
@@ -533,6 +544,11 @@ func (s *clientStore) DeleteClient(ctx context.Context, id *ttnpb.ClientIdentifi
 
 	model, err := s.getClientModelBy(ctx, s.selectWithID(ctx, id.GetClientId()), store.FieldMask{"ids"})
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrClientNotFound.WithAttributes(
+				"client_id", id.GetClientId(),
+			)
+		}
 		return err
 	}
 
@@ -559,6 +575,11 @@ func (s *clientStore) RestoreClient(ctx context.Context, id *ttnpb.ClientIdentif
 		store.FieldMask{"ids"},
 	)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrClientNotFound.WithAttributes(
+				"client_id", id.GetClientId(),
+			)
+		}
 		return err
 	}
 
@@ -587,6 +608,11 @@ func (s *clientStore) PurgeClient(ctx context.Context, id *ttnpb.ClientIdentifie
 		store.FieldMask{"attributes", "contact_info"},
 	)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrClientNotFound.WithAttributes(
+				"client_id", id.GetClientId(),
+			)
+		}
 		return err
 	}
 
