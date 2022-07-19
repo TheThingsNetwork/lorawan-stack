@@ -348,7 +348,9 @@ func (s *userStore) listUsersBy(
 	return pbs, nil
 }
 
-func (s *userStore) selectWithID(ctx context.Context, ids ...string) func(*bun.SelectQuery) *bun.SelectQuery {
+func (*userStore) selectWithID(
+	ctx context.Context, ids ...string,
+) func(*bun.SelectQuery) *bun.SelectQuery {
 	return func(q *bun.SelectQuery) *bun.SelectQuery {
 		q = q.Apply(selectWithContext(ctx))
 		switch len(ids) {

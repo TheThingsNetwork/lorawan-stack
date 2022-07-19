@@ -153,15 +153,15 @@ func (s *userSessionStore) listUserSessionsBy(
 	return pbs, nil
 }
 
-func (s *userSessionStore) selectWithUserIDs(
-	ctx context.Context, uuid string,
+func (*userSessionStore) selectWithUserIDs(
+	_ context.Context, uuid string,
 ) func(*bun.SelectQuery) *bun.SelectQuery {
 	return func(q *bun.SelectQuery) *bun.SelectQuery {
 		return q.Where("user_id = ?", uuid)
 	}
 }
 
-func (s *userSessionStore) selectWithSessionID(
+func (*userSessionStore) selectWithSessionID(
 	_ context.Context, sessionID string,
 ) func(*bun.SelectQuery) *bun.SelectQuery {
 	return func(q *bun.SelectQuery) *bun.SelectQuery {

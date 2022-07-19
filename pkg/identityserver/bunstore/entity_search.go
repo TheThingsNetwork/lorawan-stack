@@ -71,7 +71,7 @@ func (s *entitySearch) queryStringQuery(
 }
 
 func (s *entitySearch) selectWithMetaFields(
-	ctx context.Context, entityType string, req metaFields,
+	_ context.Context, entityType string, req metaFields,
 ) func(*bun.SelectQuery) *bun.SelectQuery {
 	return func(q *bun.SelectQuery) *bun.SelectQuery {
 		if v := req.GetIdContains(); v != "" {

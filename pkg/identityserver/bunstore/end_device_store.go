@@ -336,7 +336,9 @@ func (s *endDeviceStore) listEndDevicesBy(
 	return pbs, nil
 }
 
-func (s *endDeviceStore) selectWithID(ctx context.Context, applicationID string, deviceIDs ...string) func(*bun.SelectQuery) *bun.SelectQuery {
+func (*endDeviceStore) selectWithID(
+	ctx context.Context, applicationID string, deviceIDs ...string,
+) func(*bun.SelectQuery) *bun.SelectQuery {
 	return func(q *bun.SelectQuery) *bun.SelectQuery {
 		q = q.Apply(selectWithContext(ctx))
 		q = q.Where("?TableAlias.application_id = ?", applicationID)

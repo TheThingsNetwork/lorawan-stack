@@ -296,7 +296,9 @@ func (s *applicationStore) listApplicationsBy(
 	return pbs, nil
 }
 
-func (s *applicationStore) selectWithID(ctx context.Context, ids ...string) func(*bun.SelectQuery) *bun.SelectQuery {
+func (*applicationStore) selectWithID(
+	ctx context.Context, ids ...string,
+) func(*bun.SelectQuery) *bun.SelectQuery {
 	return func(q *bun.SelectQuery) *bun.SelectQuery {
 		q = q.Apply(selectWithContext(ctx))
 		switch len(ids) {

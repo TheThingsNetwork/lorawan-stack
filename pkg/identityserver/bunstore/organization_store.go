@@ -298,7 +298,9 @@ func (s *organizationStore) listOrganizationsBy(
 	return pbs, nil
 }
 
-func (s *organizationStore) selectWithID(ctx context.Context, ids ...string) func(*bun.SelectQuery) *bun.SelectQuery {
+func (*organizationStore) selectWithID(
+	ctx context.Context, ids ...string,
+) func(*bun.SelectQuery) *bun.SelectQuery {
 	return func(q *bun.SelectQuery) *bun.SelectQuery {
 		q = q.Apply(selectWithContext(ctx))
 		switch len(ids) {

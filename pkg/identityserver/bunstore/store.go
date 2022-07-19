@@ -195,6 +195,7 @@ func NewStore(ctx context.Context, db *bun.DB) (*Store, error) {
 	return newStore(baseDB.baseStore()), nil
 }
 
+// Store is the combined store of all the individual stores.
 type Store struct {
 	TxOptions sql.TxOptions
 

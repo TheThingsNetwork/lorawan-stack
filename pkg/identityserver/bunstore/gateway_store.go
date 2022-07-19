@@ -460,7 +460,9 @@ func (s *gatewayStore) listGatewaysBy(
 	return pbs, nil
 }
 
-func (s *gatewayStore) selectWithID(ctx context.Context, ids ...string) func(*bun.SelectQuery) *bun.SelectQuery {
+func (*gatewayStore) selectWithID(
+	ctx context.Context, ids ...string,
+) func(*bun.SelectQuery) *bun.SelectQuery {
 	return func(q *bun.SelectQuery) *bun.SelectQuery {
 		q = q.Apply(selectWithContext(ctx))
 		switch len(ids) {
@@ -474,7 +476,9 @@ func (s *gatewayStore) selectWithID(ctx context.Context, ids ...string) func(*bu
 	}
 }
 
-func (s *gatewayStore) selectWithEUI(ctx context.Context, euis ...string) func(*bun.SelectQuery) *bun.SelectQuery {
+func (*gatewayStore) selectWithEUI(
+	ctx context.Context, euis ...string,
+) func(*bun.SelectQuery) *bun.SelectQuery {
 	return func(q *bun.SelectQuery) *bun.SelectQuery {
 		q = q.Apply(selectWithContext(ctx))
 		switch len(euis) {

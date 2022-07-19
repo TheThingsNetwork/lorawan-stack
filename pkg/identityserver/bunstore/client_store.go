@@ -324,7 +324,9 @@ func (s *clientStore) listClientsBy(
 	return pbs, nil
 }
 
-func (s *clientStore) selectWithID(ctx context.Context, ids ...string) func(*bun.SelectQuery) *bun.SelectQuery {
+func (*clientStore) selectWithID(
+	ctx context.Context, ids ...string,
+) func(*bun.SelectQuery) *bun.SelectQuery {
 	return func(q *bun.SelectQuery) *bun.SelectQuery {
 		q = q.Apply(selectWithContext(ctx))
 		switch len(ids) {

@@ -161,15 +161,15 @@ func (s *apiKeyStore) listAPIKeysBy(
 	return pbs, nil
 }
 
-func (s *apiKeyStore) selectWithEntityIDs(
-	ctx context.Context, entityType, entityUUID string,
+func (*apiKeyStore) selectWithEntityIDs(
+	_ context.Context, entityType, entityUUID string,
 ) func(*bun.SelectQuery) *bun.SelectQuery {
 	return func(q *bun.SelectQuery) *bun.SelectQuery {
 		return q.Where("entity_type = ? AND entity_id = ?", entityType, entityUUID)
 	}
 }
 
-func (s *apiKeyStore) selectWithAPIKeyID(
+func (*apiKeyStore) selectWithAPIKeyID(
 	_ context.Context, apiKeyID string,
 ) func(*bun.SelectQuery) *bun.SelectQuery {
 	return func(q *bun.SelectQuery) *bun.SelectQuery {
@@ -318,14 +318,13 @@ func (s *apiKeyStore) UpdateAPIKey(
 		if err != nil {
 			return nil, wrapDriverError(err)
 		}
-		return nil, nil
+		return nil, nil //nolint:nilnil // This will be fixed by the refactor mentioned above.
 	}
 
 	columns := store.FieldMask{"updated_at"}
 
 	for _, field := range fieldMask {
 		switch field {
-
 		case "rights":
 			model.Rights = convertIntSlice[ttnpb.Right, int](pb.Rights)
 			columns = append(columns, "rights")

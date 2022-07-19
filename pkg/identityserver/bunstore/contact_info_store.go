@@ -234,7 +234,7 @@ func (s *contactInfoStore) getContactInfoModelsBy(
 	return models, nil
 }
 
-func (s *contactInfoStore) selectWithEntityIDs(
+func (*contactInfoStore) selectWithEntityIDs(
 	_ context.Context, entityType, entityUUID string,
 ) func(*bun.SelectQuery) *bun.SelectQuery {
 	return func(q *bun.SelectQuery) *bun.SelectQuery {
