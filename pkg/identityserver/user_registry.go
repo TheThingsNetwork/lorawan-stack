@@ -377,9 +377,8 @@ func (is *IdentityServer) listUsers(ctx context.Context, req *ttnpb.ListUsersReq
 	return users, nil
 }
 
-var (
-	errUpdateUserPasswordRequest = errors.DefineInvalidArgument("password_in_update", "can not update password with regular user update request")
-	errUpdateUserAdminField      = errors.DefinePermissionDenied("user_update_admin_field", "only admins can update the `{field}` field")
+var errUpdateUserPasswordRequest = errors.DefineInvalidArgument(
+	"password_in_update", "can not update password with regular user update request",
 )
 
 func (is *IdentityServer) setFullProfilePictureURL(ctx context.Context, usr *ttnpb.User) {
@@ -416,16 +415,16 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 		return nil, err
 	}
 
+	if err = is.RequireAdminForFieldUpdate(ctx, req.GetFieldMask().GetPaths(), []string{
+		"primary_email_address_validated_at",
+		"require_password_update",
+		"state", "state_description", "admin",
+		"temporary_password", "temporary_password_created_at", "temporary_password_expires_at",
+	}); err != nil {
+		return nil, err
+	}
+
 	if !updatedByAdmin {
-		for _, path := range req.FieldMask.Paths {
-			switch path {
-			case "primary_email_address_validated_at",
-				"require_password_update",
-				"state", "state_description", "admin",
-				"temporary_password", "temporary_password_created_at", "temporary_password_expires_at":
-				return nil, errUpdateUserAdminField.WithAttributes("field", path)
-			}
-		}
 		req.User.PrimaryEmailAddressValidatedAt = nil
 		cleanContactInfo(req.User.ContactInfo)
 	}

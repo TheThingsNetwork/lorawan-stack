@@ -5921,6 +5921,15 @@
       "file": "entity_access.go"
     }
   },
+  "error:pkg/identityserver:update_admin_field": {
+    "translations": {
+      "en": "only admins can update the `{field}` field"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "entity_access.go"
+    }
+  },
   "error:pkg/identityserver:user_registration_disabled": {
     "translations": {
       "en": "user registration disabled"
@@ -5955,15 +5964,6 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "entity_access.go"
-    }
-  },
-  "error:pkg/identityserver:user_update_admin_field": {
-    "translations": {
-      "en": "only admins can update the `{field}` field"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "user_registry.go"
     }
   },
   "error:pkg/identityserver:validations_already_sent": {
