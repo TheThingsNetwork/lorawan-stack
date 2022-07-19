@@ -33,6 +33,8 @@ import Message from '@ttn-lw/lib/components/message'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 
+import SubViewErrorComponent from '@console/views/sub-view-error'
+
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -288,6 +290,7 @@ const PacketBroker = ({ match }) => {
                   getHomeNetworkDefaultRoutingPolicy(),
                   getHomeNetworkDefaultGatewayVisibility(),
                 ]}
+                errorRenderFunction={SubViewErrorComponent}
               >
                 <RouteSwitch>
                   <Route path={url} exact component={DefaultRoutingPolicyView} />

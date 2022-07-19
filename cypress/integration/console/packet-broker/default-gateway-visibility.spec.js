@@ -26,6 +26,7 @@ describe('Packet Broker routing policies', () => {
   })
 
   it('succeeds setting default gateway visibility configuration', () => {
+    cy.intercept('GET', '/api/v3/pba/home-networks/policies/default', { statusCode: 404 })
     cy.intercept('PUT', '/api/v3/pba/home-networks/gateway-visibilities/default', {}).as('putCall')
     cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker/default-gateway-visibility`)
 
@@ -44,6 +45,7 @@ describe('Packet Broker routing policies', () => {
   })
 
   it('succeeds unsetting default gateway visibility configuration', () => {
+    cy.intercept('GET', '/api/v3/pba/home-networks/policies/default', { statusCode: 404 })
     cy.intercept('GET', '/api/v3/pba/home-networks/gateway-visibilities/default', {
       fixture: 'console/packet-broker/default-gateway-visibility.json',
     })

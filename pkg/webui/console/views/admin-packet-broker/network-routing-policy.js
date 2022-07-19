@@ -27,7 +27,6 @@ import Link from '@ttn-lw/components/link'
 import Message from '@ttn-lw/lib/components/message'
 import DateTime from '@ttn-lw/lib/components/date-time'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
-import { FullViewErrorInner } from '@ttn-lw/lib/components/full-view-error'
 
 import RoutingPolicy from '@console/components/routing-policy'
 import RoutingPolicyForm from '@console/components/routing-policy-form'
@@ -53,7 +52,6 @@ import {
   selectPacketBrokerNetworkById,
   selectHomeNetworkDefaultRoutingPolicy,
   selectRegistered,
-  selectPacketBrokerNetworkError,
 } from '@console/store/selectors/packet-broker'
 
 import m from './messages'
@@ -236,11 +234,6 @@ const NetworkRoutingPolicyView = props => {
   const tenantId = props.match.params.tenantId
   const combinedId = tenantId ? `${netId}/${tenantId}` : netId
   const registered = useSelector(selectRegistered)
-  const networkError = useSelector(selectPacketBrokerNetworkError)
-
-  if (networkError) {
-    return <FullViewErrorInner error={networkError} />
-  }
 
   return (
     <Require condition={registered} otherwise={{ redirect: '/admin/packet-broker' }}>

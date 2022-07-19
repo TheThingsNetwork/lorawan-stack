@@ -79,11 +79,15 @@ describe('Packet Broker registration', () => {
   })
 
   it('succeeds registering with Packet Broker', () => {
-    cy.loginConsole({ user_id: 'admin', password: 'admin' })
-    cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker`)
-
+    cy.intercept('GET', '/api/v3/pba/home-networks/gateway-visibilities/default', {
+      statusCode: 404,
+    })
+    cy.intercept('GET', '/api/v3/pba/home-networks/policies/default', { statusCode: 404 })
     cy.intercept('/api/v3/pba/registration', { fixture: 'console/packet-broker/registration.json' })
     cy.intercept('/api/v3/pba/info', { fixture: 'console/packet-broker/info.json' })
+
+    cy.loginConsole({ user_id: 'admin', password: 'admin' })
+    cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker`)
 
     cy.findByText('Register network').click().next().findByTestId('switch').should('be.checked')
     cy.findByText('List network publicly')

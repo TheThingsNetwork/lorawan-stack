@@ -22,11 +22,18 @@ import useRequest from '@ttn-lw/lib/hooks/use-request'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
+import { FullViewErrorInner } from './full-view-error'
+
 // `<RequireRequest />` is a utility component that can wrap a component tree
 // and dispatch a request action, rendering a loading spinner until the request
-// has been resolved.
-const RequireRequest = ({ requestAction, children }) => {
-  const [fetching] = useRequest(requestAction)
+// has been resolved. It also takes care of rendering possible errors if wished.
+const RequireRequest = ({
+  requestAction,
+  children,
+  handleErrors,
+  errorRenderFunction: ErrorRenderFunction,
+}) => {
+  const [fetching, error] = useRequest(requestAction)
   if (fetching) {
     return (
       <Spinner inline center>
@@ -35,13 +42,24 @@ const RequireRequest = ({ requestAction, children }) => {
     )
   }
 
+  if (error && handleErrors) {
+    return <ErrorRenderFunction error={error} />
+  }
+
   return children
 }
 
 RequireRequest.propTypes = {
   children: PropTypes.node.isRequired,
+  errorRenderFunction: PropTypes.func,
+  handleErrors: PropTypes.bool,
   requestAction: PropTypes.oneOfType([PropTypes.shape({}), PropTypes.arrayOf(PropTypes.shape({}))])
     .isRequired,
+}
+
+RequireRequest.defaultProps = {
+  errorRenderFunction: FullViewErrorInner,
+  handleErrors: true,
 }
 
 export default RequireRequest
