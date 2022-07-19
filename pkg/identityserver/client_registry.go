@@ -287,15 +287,11 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 		}
 	}
 	req.FieldMask.Paths = ttnpb.FlattenPaths(req.FieldMask.Paths, []string{"administrative_contact", "technical_contact"})
-	updatedByAdmin := is.IsAdmin(ctx)
 
-	if !updatedByAdmin {
-		for _, path := range req.FieldMask.Paths {
-			switch path {
-			case "state", "state_description", "skip_authorization", "endorsed", "grants":
-				return nil, errUpdateUserAdminField.WithAttributes("field", path)
-			}
-		}
+	if err = is.RequireAdminForFieldUpdate(ctx, req.GetFieldMask().GetPaths(), []string{
+		"state", "state_description", "skip_authorization", "endorsed", "grants",
+	}); err != nil {
+		return nil, err
 	}
 
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "state") {

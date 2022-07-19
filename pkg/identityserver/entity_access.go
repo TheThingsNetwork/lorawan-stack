@@ -395,6 +395,29 @@ func (is *IdentityServer) RequireAdmin(ctx context.Context) error {
 	return nil
 }
 
+var errUpdateAdminField = errors.DefinePermissionDenied("update_admin_field", "only admins can update the `{field}` field")
+
+// RequireAdminForFieldUpdate returns an error when the caller tries to update an admin-only field.
+func (is *IdentityServer) RequireAdminForFieldUpdate(ctx context.Context, fields, adminFields []string) error {
+	if is.IsAdmin(ctx) {
+		return nil
+	}
+	isAdminField := func(field string) bool {
+		for _, adminField := range adminFields {
+			if field == adminField {
+				return true
+			}
+		}
+		return false
+	}
+	for _, field := range fields {
+		if isAdminField(field) {
+			return errUpdateAdminField.WithAttributes("field", field)
+		}
+	}
+	return nil
+}
+
 func restrictRights(info *ttnpb.AuthInfoResponse, rights *ttnpb.Rights) {
 	if apiKey := info.GetApiKey().GetApiKey(); apiKey != nil {
 		apiKey.Rights = ttnpb.RightsFrom(apiKey.Rights...).Intersect(rights).GetRights()
