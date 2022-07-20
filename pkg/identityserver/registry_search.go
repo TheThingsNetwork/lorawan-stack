@@ -449,13 +449,19 @@ func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchUser
 func (rs *registrySearch) SearchAccounts(
 	ctx context.Context, req *ttnpb.SearchAccountsRequest,
 ) (*ttnpb.SearchAccountsResponse, error) {
-	err := rs.RequireAuthenticated(ctx)
+	authInfo, err := rs.authInfo(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	if req.CollaboratorOf == nil {
-		// Limit to 10 accounts to make enumerating all accounts more difficult.
+	// Limit the amount of data we provide to non-admin users when searching across all accounts.
+	if req.CollaboratorOf == nil && !authInfo.IsAdmin {
+		// Require a search query of at least 2 characters.
+		if len(req.Query) < 2 {
+			return &ttnpb.SearchAccountsResponse{}, nil
+		}
+
+		// Limit the number of results to 10.
 		var total uint64
 		ctx = store.WithPagination(ctx, 10, 1, &total)
 		defer func() {
