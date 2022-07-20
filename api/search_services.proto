@@ -262,6 +262,29 @@ message SearchUsersRequest {
   bool deleted = 10;
 }
 
+message SearchAccountsRequest {
+  option (thethings.flags.message) = { select: false, set: true };
+
+  string query = 1 [
+    (validate.rules).string = { max_len: 50 }
+  ];
+
+  bool only_users = 2;
+
+  oneof collaborator_of {
+    ApplicationIdentifiers application_ids = 3;
+    ClientIdentifiers client_ids = 4;
+    GatewayIdentifiers gateway_ids = 5;
+    OrganizationIdentifiers organization_ids = 6;
+  }
+
+  // NOTE: This request intentionally does not support pagination.
+}
+
+message SearchAccountsResponse {
+  repeated OrganizationOrUserIdentifiers account_ids = 1;
+}
+
 // The EntityRegistrySearch service indexes entities in the various registries
 // and enables searching for them.
 // This service is not implemented on all deployments.
@@ -303,6 +326,25 @@ service EntityRegistrySearch {
   rpc SearchUsers(SearchUsersRequest) returns (Users) {
     option (google.api.http) = {
       get: "/search/users"
+    };
+  }
+
+  // Search for accounts that match the conditions specified in the request.
+  rpc SearchAccounts(SearchAccountsRequest) returns (SearchAccountsResponse) {
+    option (google.api.http) = {
+      get: "/search/accounts"
+      additional_bindings {
+        get: "/applications/{application_ids.application_id}/collaborators/search"
+      }
+      additional_bindings {
+        get: "/clients/{client_ids.client_id}/collaborators/search"
+      }
+      additional_bindings {
+        get: "/gateways/{gateway_ids.gateway_id}/collaborators/search"
+      }
+      additional_bindings {
+        get: "/organizations/{organization_ids.organization_id}/collaborators/search"
+      }
     };
   }
 }

@@ -5556,6 +5556,44 @@
         "temporary_password_expires_at",
         "updated_at"
       ]
+    },
+    "SearchAccounts": {
+      "file": "lorawan-stack/api/search_services.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/search/accounts",
+          "parameters": []
+        },
+        {
+          "method": "get",
+          "pattern": "/applications/{application_ids.application_id}/collaborators/search",
+          "parameters": [
+            "application_ids.application_id"
+          ]
+        },
+        {
+          "method": "get",
+          "pattern": "/clients/{client_ids.client_id}/collaborators/search",
+          "parameters": [
+            "client_ids.client_id"
+          ]
+        },
+        {
+          "method": "get",
+          "pattern": "/gateways/{gateway_ids.gateway_id}/collaborators/search",
+          "parameters": [
+            "gateway_ids.gateway_id"
+          ]
+        },
+        {
+          "method": "get",
+          "pattern": "/organizations/{organization_ids.organization_id}/collaborators/search",
+          "parameters": [
+            "organization_ids.organization_id"
+          ]
+        }
+      ]
     }
   },
   "UserAccess": {

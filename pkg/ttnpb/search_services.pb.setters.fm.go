@@ -577,6 +577,222 @@ func (dst *SearchUsersRequest) SetFields(src *SearchUsersRequest, paths ...strin
 	return nil
 }
 
+func (dst *SearchAccountsRequest) SetFields(src *SearchAccountsRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "query":
+			if len(subs) > 0 {
+				return fmt.Errorf("'query' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Query = src.Query
+			} else {
+				var zero string
+				dst.Query = zero
+			}
+		case "only_users":
+			if len(subs) > 0 {
+				return fmt.Errorf("'only_users' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.OnlyUsers = src.OnlyUsers
+			} else {
+				var zero bool
+				dst.OnlyUsers = zero
+			}
+
+		case "collaborator_of":
+			if len(subs) == 0 && src == nil {
+				dst.CollaboratorOf = nil
+				continue
+			} else if len(subs) == 0 {
+				dst.CollaboratorOf = src.CollaboratorOf
+				continue
+			}
+
+			subPathMap := _processPaths(subs)
+			if len(subPathMap) > 1 {
+				return fmt.Errorf("more than one field specified for oneof field '%s'", name)
+			}
+			for oneofName, oneofSubs := range subPathMap {
+				switch oneofName {
+				case "application_ids":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.CollaboratorOf.(*SearchAccountsRequest_ApplicationIds)
+					}
+					if srcValid := srcTypeOk || src == nil || src.CollaboratorOf == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'application_ids', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.CollaboratorOf.(*SearchAccountsRequest_ApplicationIds)
+					if dstValid := dstTypeOk || dst.CollaboratorOf == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'application_ids', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *ApplicationIdentifiers
+						if srcTypeOk {
+							newSrc = src.CollaboratorOf.(*SearchAccountsRequest_ApplicationIds).ApplicationIds
+						}
+						if dstTypeOk {
+							newDst = dst.CollaboratorOf.(*SearchAccountsRequest_ApplicationIds).ApplicationIds
+						} else if srcTypeOk {
+							newDst = &ApplicationIdentifiers{}
+							dst.CollaboratorOf = &SearchAccountsRequest_ApplicationIds{ApplicationIds: newDst}
+						} else {
+							dst.CollaboratorOf = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.CollaboratorOf = src.CollaboratorOf
+						} else {
+							dst.CollaboratorOf = nil
+						}
+					}
+				case "client_ids":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.CollaboratorOf.(*SearchAccountsRequest_ClientIds)
+					}
+					if srcValid := srcTypeOk || src == nil || src.CollaboratorOf == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'client_ids', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.CollaboratorOf.(*SearchAccountsRequest_ClientIds)
+					if dstValid := dstTypeOk || dst.CollaboratorOf == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'client_ids', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *ClientIdentifiers
+						if srcTypeOk {
+							newSrc = src.CollaboratorOf.(*SearchAccountsRequest_ClientIds).ClientIds
+						}
+						if dstTypeOk {
+							newDst = dst.CollaboratorOf.(*SearchAccountsRequest_ClientIds).ClientIds
+						} else if srcTypeOk {
+							newDst = &ClientIdentifiers{}
+							dst.CollaboratorOf = &SearchAccountsRequest_ClientIds{ClientIds: newDst}
+						} else {
+							dst.CollaboratorOf = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.CollaboratorOf = src.CollaboratorOf
+						} else {
+							dst.CollaboratorOf = nil
+						}
+					}
+				case "gateway_ids":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.CollaboratorOf.(*SearchAccountsRequest_GatewayIds)
+					}
+					if srcValid := srcTypeOk || src == nil || src.CollaboratorOf == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'gateway_ids', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.CollaboratorOf.(*SearchAccountsRequest_GatewayIds)
+					if dstValid := dstTypeOk || dst.CollaboratorOf == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'gateway_ids', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *GatewayIdentifiers
+						if srcTypeOk {
+							newSrc = src.CollaboratorOf.(*SearchAccountsRequest_GatewayIds).GatewayIds
+						}
+						if dstTypeOk {
+							newDst = dst.CollaboratorOf.(*SearchAccountsRequest_GatewayIds).GatewayIds
+						} else if srcTypeOk {
+							newDst = &GatewayIdentifiers{}
+							dst.CollaboratorOf = &SearchAccountsRequest_GatewayIds{GatewayIds: newDst}
+						} else {
+							dst.CollaboratorOf = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.CollaboratorOf = src.CollaboratorOf
+						} else {
+							dst.CollaboratorOf = nil
+						}
+					}
+				case "organization_ids":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.CollaboratorOf.(*SearchAccountsRequest_OrganizationIds)
+					}
+					if srcValid := srcTypeOk || src == nil || src.CollaboratorOf == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'organization_ids', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.CollaboratorOf.(*SearchAccountsRequest_OrganizationIds)
+					if dstValid := dstTypeOk || dst.CollaboratorOf == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'organization_ids', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *OrganizationIdentifiers
+						if srcTypeOk {
+							newSrc = src.CollaboratorOf.(*SearchAccountsRequest_OrganizationIds).OrganizationIds
+						}
+						if dstTypeOk {
+							newDst = dst.CollaboratorOf.(*SearchAccountsRequest_OrganizationIds).OrganizationIds
+						} else if srcTypeOk {
+							newDst = &OrganizationIdentifiers{}
+							dst.CollaboratorOf = &SearchAccountsRequest_OrganizationIds{OrganizationIds: newDst}
+						} else {
+							dst.CollaboratorOf = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.CollaboratorOf = src.CollaboratorOf
+						} else {
+							dst.CollaboratorOf = nil
+						}
+					}
+
+				default:
+					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *SearchAccountsResponse) SetFields(src *SearchAccountsResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "account_ids":
+			if len(subs) > 0 {
+				return fmt.Errorf("'account_ids' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.AccountIds = src.AccountIds
+			} else {
+				dst.AccountIds = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *SearchEndDevicesRequest) SetFields(src *SearchEndDevicesRequest, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {

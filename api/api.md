@@ -595,6 +595,8 @@
   - [Message `Rights`](#ttn.lorawan.v3.Rights)
   - [Enum `Right`](#ttn.lorawan.v3.Right)
 - [File `lorawan-stack/api/search_services.proto`](#lorawan-stack/api/search_services.proto)
+  - [Message `SearchAccountsRequest`](#ttn.lorawan.v3.SearchAccountsRequest)
+  - [Message `SearchAccountsResponse`](#ttn.lorawan.v3.SearchAccountsResponse)
   - [Message `SearchApplicationsRequest`](#ttn.lorawan.v3.SearchApplicationsRequest)
   - [Message `SearchApplicationsRequest.AttributesContainEntry`](#ttn.lorawan.v3.SearchApplicationsRequest.AttributesContainEntry)
   - [Message `SearchClientsRequest`](#ttn.lorawan.v3.SearchClientsRequest)
@@ -8503,6 +8505,29 @@ Right is the enum that defines all the different rights to do something in the n
 
 ## <a name="lorawan-stack/api/search_services.proto">File `lorawan-stack/api/search_services.proto`</a>
 
+### <a name="ttn.lorawan.v3.SearchAccountsRequest">Message `SearchAccountsRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `query` | [`string`](#string) |  |  |
+| `only_users` | [`bool`](#bool) |  |  |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| `client_ids` | [`ClientIdentifiers`](#ttn.lorawan.v3.ClientIdentifiers) |  |  |
+| `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
+| `organization_ids` | [`OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `query` | <p>`string.max_len`: `50`</p> |
+
+### <a name="ttn.lorawan.v3.SearchAccountsResponse">Message `SearchAccountsResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `account_ids` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) | repeated |  |
+
 ### <a name="ttn.lorawan.v3.SearchApplicationsRequest">Message `SearchApplicationsRequest`</a>
 
 This message is used for finding applications in the EntityRegistrySearch service.
@@ -8759,6 +8784,7 @@ This service is not implemented on all deployments.
 | `SearchGateways` | [`SearchGatewaysRequest`](#ttn.lorawan.v3.SearchGatewaysRequest) | [`Gateways`](#ttn.lorawan.v3.Gateways) | Search for gateways that match the conditions specified in the request. Non-admin users will only match gateways that they have rights on. |
 | `SearchOrganizations` | [`SearchOrganizationsRequest`](#ttn.lorawan.v3.SearchOrganizationsRequest) | [`Organizations`](#ttn.lorawan.v3.Organizations) | Search for organizations that match the conditions specified in the request. Non-admin users will only match organizations that they have rights on. |
 | `SearchUsers` | [`SearchUsersRequest`](#ttn.lorawan.v3.SearchUsersRequest) | [`Users`](#ttn.lorawan.v3.Users) | Search for users that match the conditions specified in the request. This is only available to admin users. |
+| `SearchAccounts` | [`SearchAccountsRequest`](#ttn.lorawan.v3.SearchAccountsRequest) | [`SearchAccountsResponse`](#ttn.lorawan.v3.SearchAccountsResponse) | Search for accounts that match the conditions specified in the request. |
 
 #### HTTP bindings
 
@@ -8769,6 +8795,11 @@ This service is not implemented on all deployments.
 | `SearchGateways` | `GET` | `/api/v3/search/gateways` |  |
 | `SearchOrganizations` | `GET` | `/api/v3/search/organizations` |  |
 | `SearchUsers` | `GET` | `/api/v3/search/users` |  |
+| `SearchAccounts` | `GET` | `/api/v3/search/accounts` |  |
+| `SearchAccounts` | `GET` | `/api/v3/applications/{application_ids.application_id}/collaborators/search` |  |
+| `SearchAccounts` | `GET` | `/api/v3/clients/{client_ids.client_id}/collaborators/search` |  |
+| `SearchAccounts` | `GET` | `/api/v3/gateways/{gateway_ids.gateway_id}/collaborators/search` |  |
+| `SearchAccounts` | `GET` | `/api/v3/organizations/{organization_ids.organization_id}/collaborators/search` |  |
 
 ## <a name="lorawan-stack/api/secrets.proto">File `lorawan-stack/api/secrets.proto`</a>
 
