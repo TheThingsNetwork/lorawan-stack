@@ -316,6 +316,9 @@ type EntitySearch interface {
 	SearchUsers(
 		ctx context.Context, req *ttnpb.SearchUsersRequest,
 	) ([]*ttnpb.UserIdentifiers, error)
+	SearchAccounts(
+		ctx context.Context, req *ttnpb.SearchAccountsRequest,
+	) ([]*ttnpb.OrganizationOrUserIdentifiers, error)
 }
 
 // ContactInfoStore interface for contact info validation.

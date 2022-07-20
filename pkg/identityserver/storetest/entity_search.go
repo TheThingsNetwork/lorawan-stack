@@ -500,6 +500,79 @@ func (st *StoreTest) TestEntitySearch(t *T) {
 			}
 		})
 	})
+
+	t.Run("Accounts", func(t *T) {
+		t.Run("Query", func(t *T) {
+			a, ctx := test.New(t)
+			ids, err := s.SearchAccounts(ctx, &ttnpb.SearchAccountsRequest{
+				Query: "-01",
+			})
+			if a.So(err, should.BeNil) && a.So(ids, should.NotBeNil) && a.So(ids, should.HaveLength, 2) {
+				for _, id := range ids {
+					if id.EntityType() == "organization" {
+						a.So(id, should.Resemble, org1.GetIds().GetOrganizationOrUserIdentifiers())
+					} else {
+						a.So(id, should.Resemble, usr1.GetIds().GetOrganizationOrUserIdentifiers())
+					}
+				}
+			}
+		})
+
+		t.Run("OnlyUsers", func(t *T) {
+			a, ctx := test.New(t)
+			ids, err := s.SearchAccounts(ctx, &ttnpb.SearchAccountsRequest{
+				Query:     "-01",
+				OnlyUsers: true,
+			})
+			if a.So(err, should.BeNil) && a.So(ids, should.NotBeNil) && a.So(ids, should.HaveLength, 1) {
+				a.So(ids[0], should.Resemble, usr1.GetIds().GetOrganizationOrUserIdentifiers())
+			}
+		})
+
+		t.Run("Application", func(t *T) {
+			a, ctx := test.New(t)
+			ids, err := s.SearchAccounts(ctx, &ttnpb.SearchAccountsRequest{
+				Query:          "-01",
+				CollaboratorOf: &ttnpb.SearchAccountsRequest_ApplicationIds{ApplicationIds: app1.GetIds()},
+			})
+			if a.So(err, should.BeNil) && a.So(ids, should.NotBeNil) && a.So(ids, should.HaveLength, 1) {
+				a.So(ids[0], should.Resemble, usr1.GetIds().GetOrganizationOrUserIdentifiers())
+			}
+		})
+
+		t.Run("Client", func(t *T) {
+			a, ctx := test.New(t)
+			ids, err := s.SearchAccounts(ctx, &ttnpb.SearchAccountsRequest{
+				Query:          "-01",
+				CollaboratorOf: &ttnpb.SearchAccountsRequest_ClientIds{ClientIds: cli1.GetIds()},
+			})
+			if a.So(err, should.BeNil) && a.So(ids, should.NotBeNil) && a.So(ids, should.HaveLength, 1) {
+				a.So(ids[0], should.Resemble, usr1.GetIds().GetOrganizationOrUserIdentifiers())
+			}
+		})
+
+		t.Run("Gateway", func(t *T) {
+			a, ctx := test.New(t)
+			ids, err := s.SearchAccounts(ctx, &ttnpb.SearchAccountsRequest{
+				Query:          "-01",
+				CollaboratorOf: &ttnpb.SearchAccountsRequest_GatewayIds{GatewayIds: gtw1.GetIds()},
+			})
+			if a.So(err, should.BeNil) && a.So(ids, should.NotBeNil) && a.So(ids, should.HaveLength, 1) {
+				a.So(ids[0], should.Resemble, usr1.GetIds().GetOrganizationOrUserIdentifiers())
+			}
+		})
+
+		t.Run("Organization", func(t *T) {
+			a, ctx := test.New(t)
+			ids, err := s.SearchAccounts(ctx, &ttnpb.SearchAccountsRequest{
+				Query:          "-01",
+				CollaboratorOf: &ttnpb.SearchAccountsRequest_OrganizationIds{OrganizationIds: org1.GetIds()},
+			})
+			if a.So(err, should.BeNil) && a.So(ids, should.NotBeNil) && a.So(ids, should.HaveLength, 1) {
+				a.So(ids[0], should.Resemble, usr1.GetIds().GetOrganizationOrUserIdentifiers())
+			}
+		})
+	})
 }
 
 func (st *StoreTest) TestEntitySearchPagination(t *T) {

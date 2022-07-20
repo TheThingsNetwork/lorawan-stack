@@ -295,6 +295,75 @@ func (s *entitySearch) SearchUsers(
 	return identifiers, nil
 }
 
+func (s *entitySearch) SearchAccounts(
+	ctx context.Context, req *ttnpb.SearchAccountsRequest,
+) ([]*ttnpb.OrganizationOrUserIdentifiers, error) {
+	defer trace.StartRegion(ctx, "find accounts").End()
+
+	var query *gorm.DB
+
+	if entityID := req.GetEntityIdentifiers(); entityID != nil {
+		query = (&membershipStore{baseStore: s.baseStore}).queryWithDirectMemberships(
+			ctx, entityID.EntityType(), entityID.IDString(),
+		)
+	} else {
+		query = s.query(ctx, &Account{}).
+			Table(`accounts AS direct_accounts`).
+			Select([]string{
+				`"direct_accounts"."account_type" "direct_account_type"`,
+				`"direct_accounts"."uid" "direct_account_friendly_id"`,
+			})
+	}
+
+	if req.OnlyUsers {
+		query = query.Where(`"direct_accounts"."account_type" = 'user'`)
+	}
+
+	query = query.Order("direct_account_friendly_id")
+
+	if q := req.GetQuery(); q != "" {
+		query = query.Where(`"direct_accounts"."uid" ILIKE ?`, likePattern(q))
+	}
+
+	page := query
+	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 {
+		page = query.Limit(limit).Offset(offset)
+	}
+
+	var results []struct {
+		DirectAccountType       string
+		DirectAccountFriendlyID string
+	}
+	if err := page.Scan(&results).Error; err != nil {
+		return nil, err
+	}
+
+	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 && (offset > 0 || len(results) == int(limit)) {
+		var total uint64
+		query.Count(&total)
+		store.SetTotal(ctx, total)
+	} else {
+		store.SetTotal(ctx, uint64(len(results)))
+	}
+
+	identifiers := make([]*ttnpb.OrganizationOrUserIdentifiers, len(results))
+
+	for i, m := range results {
+		switch m.DirectAccountType {
+		case user:
+			identifiers[i] = (&ttnpb.UserIdentifiers{
+				UserId: m.DirectAccountFriendlyID,
+			}).GetOrganizationOrUserIdentifiers()
+		case organization:
+			identifiers[i] = (&ttnpb.OrganizationIdentifiers{
+				OrganizationId: m.DirectAccountFriendlyID,
+			}).GetOrganizationOrUserIdentifiers()
+		}
+	}
+
+	return identifiers, nil
+}
+
 func (s *entitySearch) SearchEndDevices(
 	ctx context.Context, req *ttnpb.SearchEndDevicesRequest,
 ) ([]*ttnpb.EndDeviceIdentifiers, error) {
