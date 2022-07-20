@@ -185,8 +185,10 @@ message EndDeviceVersion {
 
 // Adaptive Data Rate settings.
 message ADRSettings {
+  option (thethings.flags.message) = { select: true, set: true };
   // Configuration options for static ADR.
   message StaticMode {
+    option (thethings.flags.message) = { select: true, set: true };
     // Data rate index to use.
     DataRateIndex data_rate_index = 1 [(validate.rules).enum.defined_only = true];
     // Transmission power index to use.
@@ -197,6 +199,7 @@ message ADRSettings {
 
   // Configuration options for dynamic ADR.
   message DynamicMode {
+    option (thethings.flags.message) = { select: true, set: true };
     // The ADR margin (dB) tells the network server how much margin it should add in ADR requests.
     // A bigger margin is less efficient, but gives a better chance of successful reception.
     // If unset, the default value from Network Server configuration will be used.
@@ -227,6 +230,7 @@ message ADRSettings {
   // Configuration options for cases in which ADR is to be disabled
   // completely.
   message DisabledMode {
+    option (thethings.flags.message) = { select: true, set: true };
   }
 
   oneof mode {

@@ -649,6 +649,309 @@ func (m *MACParameters) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths
 	return paths, nil
 }
 
+// AddSelectFlagsForADRSettings_StaticMode adds flags to select fields in ADRSettings_StaticMode.
+func AddSelectFlagsForADRSettings_StaticMode(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("data-rate-index", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("data-rate-index", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("tx-power-index", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("tx-power-index", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("nb-trans", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("nb-trans", prefix), false), flagsplugin.WithHidden(hidden)))
+}
+
+// SelectFromFlags outputs the fieldmask paths forADRSettings_StaticMode message from select flags.
+func PathsFromSelectFlagsForADRSettings_StaticMode(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("data_rate_index", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("data_rate_index", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("tx_power_index", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("tx_power_index", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("nb_trans", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("nb_trans", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForADRSettings_StaticMode adds flags to select fields in ADRSettings_StaticMode.
+func AddSetFlagsForADRSettings_StaticMode(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("data-rate-index", prefix), flagsplugin.EnumValueDesc(DataRateIndex_value, DataRateIndex_customvalue), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("tx-power-index", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("nb-trans", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the ADRSettings_StaticMode message from flags.
+func (m *ADRSettings_StaticMode) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("data_rate_index", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		enumValue, err := flagsplugin.SetEnumString(val, DataRateIndex_value, DataRateIndex_customvalue)
+		if err != nil {
+			return nil, err
+		}
+		m.DataRateIndex = DataRateIndex(enumValue)
+		paths = append(paths, flagsplugin.Prefix("data_rate_index", prefix))
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("tx_power_index", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.TxPowerIndex = val
+		paths = append(paths, flagsplugin.Prefix("tx_power_index", prefix))
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("nb_trans", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.NbTrans = val
+		paths = append(paths, flagsplugin.Prefix("nb_trans", prefix))
+	}
+	return paths, nil
+}
+
+// AddSelectFlagsForADRSettings_DynamicMode adds flags to select fields in ADRSettings_DynamicMode.
+func AddSelectFlagsForADRSettings_DynamicMode(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("margin", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("margin", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("min-data-rate-index", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("min-data-rate-index", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForDataRateIndexValue(flags, flagsplugin.Prefix("min-data-rate-index", prefix), true)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("max-data-rate-index", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("max-data-rate-index", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForDataRateIndexValue(flags, flagsplugin.Prefix("max-data-rate-index", prefix), true)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("min-tx-power-index", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("min-tx-power-index", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("max-tx-power-index", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("max-tx-power-index", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("min-nb-trans", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("min-nb-trans", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("max-nb-trans", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("max-nb-trans", prefix), false), flagsplugin.WithHidden(hidden)))
+}
+
+// SelectFromFlags outputs the fieldmask paths forADRSettings_DynamicMode message from select flags.
+func PathsFromSelectFlagsForADRSettings_DynamicMode(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("margin", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("margin", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("min_data_rate_index", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("min_data_rate_index", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForDataRateIndexValue(flags, flagsplugin.Prefix("min_data_rate_index", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("max_data_rate_index", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("max_data_rate_index", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForDataRateIndexValue(flags, flagsplugin.Prefix("max_data_rate_index", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("min_tx_power_index", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("min_tx_power_index", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("max_tx_power_index", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("max_tx_power_index", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("min_nb_trans", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("min_nb_trans", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("max_nb_trans", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("max_nb_trans", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForADRSettings_DynamicMode adds flags to select fields in ADRSettings_DynamicMode.
+func AddSetFlagsForADRSettings_DynamicMode(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewFloat32Flag(flagsplugin.Prefix("margin", prefix), "", flagsplugin.WithHidden(hidden)))
+	AddSetFlagsForDataRateIndexValue(flags, flagsplugin.Prefix("min-data-rate-index", prefix), true)
+	flagsplugin.AddAlias(flags, flagsplugin.Prefix("min-data-rate-index.value", prefix), flagsplugin.Prefix("min-data-rate-index", prefix), flagsplugin.WithHidden(hidden))
+	AddSetFlagsForDataRateIndexValue(flags, flagsplugin.Prefix("max-data-rate-index", prefix), true)
+	flagsplugin.AddAlias(flags, flagsplugin.Prefix("max-data-rate-index.value", prefix), flagsplugin.Prefix("max-data-rate-index", prefix), flagsplugin.WithHidden(hidden))
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("min-tx-power-index", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("max-tx-power-index", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("min-nb-trans", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("max-nb-trans", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the ADRSettings_DynamicMode message from flags.
+func (m *ADRSettings_DynamicMode) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := flagsplugin.GetFloat32(flags, flagsplugin.Prefix("margin", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Margin = &types.FloatValue{Value: val}
+		paths = append(paths, flagsplugin.Prefix("margin", prefix))
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("min_data_rate_index", prefix)); changed {
+		if m.MinDataRateIndex == nil {
+			m.MinDataRateIndex = &DataRateIndexValue{}
+		}
+		if setPaths, err := m.MinDataRateIndex.SetFromFlags(flags, flagsplugin.Prefix("min_data_rate_index", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("max_data_rate_index", prefix)); changed {
+		if m.MaxDataRateIndex == nil {
+			m.MaxDataRateIndex = &DataRateIndexValue{}
+		}
+		if setPaths, err := m.MaxDataRateIndex.SetFromFlags(flags, flagsplugin.Prefix("max_data_rate_index", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("min_tx_power_index", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.MinTxPowerIndex = &types.UInt32Value{Value: val}
+		paths = append(paths, flagsplugin.Prefix("min_tx_power_index", prefix))
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("max_tx_power_index", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.MaxTxPowerIndex = &types.UInt32Value{Value: val}
+		paths = append(paths, flagsplugin.Prefix("max_tx_power_index", prefix))
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("min_nb_trans", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.MinNbTrans = &types.UInt32Value{Value: val}
+		paths = append(paths, flagsplugin.Prefix("min_nb_trans", prefix))
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("max_nb_trans", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.MaxNbTrans = &types.UInt32Value{Value: val}
+		paths = append(paths, flagsplugin.Prefix("max_nb_trans", prefix))
+	}
+	return paths, nil
+}
+
+// AddSelectFlagsForADRSettings_DisabledMode adds flags to select fields in ADRSettings_DisabledMode.
+func AddSelectFlagsForADRSettings_DisabledMode(flags *pflag.FlagSet, prefix string, hidden bool) {
+}
+
+// SelectFromFlags outputs the fieldmask paths forADRSettings_DisabledMode message from select flags.
+func PathsFromSelectFlagsForADRSettings_DisabledMode(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	return paths, nil
+}
+
+// AddSetFlagsForADRSettings_DisabledMode adds flags to select fields in ADRSettings_DisabledMode.
+func AddSetFlagsForADRSettings_DisabledMode(flags *pflag.FlagSet, prefix string, hidden bool) {
+}
+
+// SetFromFlags sets the ADRSettings_DisabledMode message from flags.
+func (m *ADRSettings_DisabledMode) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	return paths, nil
+}
+
+// AddSelectFlagsForADRSettings adds flags to select fields in ADRSettings.
+func AddSelectFlagsForADRSettings(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("mode.static", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("mode.static", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForADRSettings_StaticMode(flags, flagsplugin.Prefix("mode.static", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("mode.dynamic", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("mode.dynamic", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForADRSettings_DynamicMode(flags, flagsplugin.Prefix("mode.dynamic", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("mode.disabled", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("mode.disabled", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForADRSettings_DisabledMode(flags, flagsplugin.Prefix("mode.disabled", prefix), hidden)
+}
+
+// SelectFromFlags outputs the fieldmask paths forADRSettings message from select flags.
+func PathsFromSelectFlagsForADRSettings(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("mode.static", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("mode.static", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForADRSettings_StaticMode(flags, flagsplugin.Prefix("mode.static", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("mode.dynamic", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("mode.dynamic", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForADRSettings_DynamicMode(flags, flagsplugin.Prefix("mode.dynamic", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("mode.disabled", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("mode.disabled", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForADRSettings_DisabledMode(flags, flagsplugin.Prefix("mode.disabled", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForADRSettings adds flags to select fields in ADRSettings.
+func AddSetFlagsForADRSettings(flags *pflag.FlagSet, prefix string, hidden bool) {
+	AddSetFlagsForADRSettings_StaticMode(flags, flagsplugin.Prefix("mode.static", prefix), hidden)
+	AddSetFlagsForADRSettings_DynamicMode(flags, flagsplugin.Prefix("mode.dynamic", prefix), hidden)
+	AddSetFlagsForADRSettings_DisabledMode(flags, flagsplugin.Prefix("mode.disabled", prefix), hidden)
+}
+
+// SetFromFlags sets the ADRSettings message from flags.
+func (m *ADRSettings) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("mode.static", prefix)); changed {
+		ov := &ADRSettings_Static{}
+		if ov.Static == nil {
+			ov.Static = &ADRSettings_StaticMode{}
+		}
+		if setPaths, err := ov.Static.SetFromFlags(flags, flagsplugin.Prefix("mode.static", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+		m.Mode = ov
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("mode.dynamic", prefix)); changed {
+		ov := &ADRSettings_Dynamic{}
+		if ov.Dynamic == nil {
+			ov.Dynamic = &ADRSettings_DynamicMode{}
+		}
+		if setPaths, err := ov.Dynamic.SetFromFlags(flags, flagsplugin.Prefix("mode.dynamic", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+		m.Mode = ov
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("mode.disabled", prefix)); changed {
+		ov := &ADRSettings_Disabled{}
+		if ov.Disabled == nil {
+			ov.Disabled = &ADRSettings_DisabledMode{}
+		}
+		if setPaths, err := ov.Disabled.SetFromFlags(flags, flagsplugin.Prefix("mode.disabled", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+		m.Mode = ov
+	}
+	return paths, nil
+}
+
 // AddSelectFlagsForMACSettings adds flags to select fields in MACSettings.
 func AddSelectFlagsForMACSettings(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("class-b-timeout", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("class-b-timeout", prefix), false), flagsplugin.WithHidden(hidden)))
@@ -709,7 +1012,7 @@ func AddSelectFlagsForMACSettings(flags *pflag.FlagSet, prefix string, hidden bo
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("downlink-dwell-time", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("downlink-dwell-time", prefix), true), flagsplugin.WithHidden(hidden)))
 	AddSelectFlagsForBoolValue(flags, flagsplugin.Prefix("downlink-dwell-time", prefix), true)
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("adr", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("adr", prefix), true), flagsplugin.WithHidden(hidden)))
-	// NOTE: adr (ADRSettings) does not seem to have select flags.
+	AddSelectFlagsForADRSettings(flags, flagsplugin.Prefix("adr", prefix), hidden)
 }
 
 // SelectFromFlags outputs the fieldmask paths forMACSettings message from select flags.
@@ -1004,7 +1307,11 @@ func PathsFromSelectFlagsForMACSettings(flags *pflag.FlagSet, prefix string) (pa
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("adr", prefix))
 	}
-	// NOTE: adr (ADRSettings) does not seem to have select flags.
+	if selectPaths, err := PathsFromSelectFlagsForADRSettings(flags, flagsplugin.Prefix("adr", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
 	return paths, nil
 }
 
@@ -1067,7 +1374,7 @@ func AddSetFlagsForMACSettings(flags *pflag.FlagSet, prefix string, hidden bool)
 	flagsplugin.AddAlias(flags, flagsplugin.Prefix("uplink-dwell-time.value", prefix), flagsplugin.Prefix("uplink-dwell-time", prefix), flagsplugin.WithHidden(hidden))
 	AddSetFlagsForBoolValue(flags, flagsplugin.Prefix("downlink-dwell-time", prefix), true)
 	flagsplugin.AddAlias(flags, flagsplugin.Prefix("downlink-dwell-time.value", prefix), flagsplugin.Prefix("downlink-dwell-time", prefix), flagsplugin.WithHidden(hidden))
-	// FIXME: Skipping Adr because it does not seem to implement AddSetFlags.
+	AddSetFlagsForADRSettings(flags, flagsplugin.Prefix("adr", prefix), hidden)
 }
 
 // SetFromFlags sets the MACSettings message from flags.
@@ -1364,7 +1671,16 @@ func (m *MACSettings) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths [
 			paths = append(paths, setPaths...)
 		}
 	}
-	// FIXME: Skipping Adr because it does not seem to implement AddSetFlags.
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("adr", prefix)); changed {
+		if m.Adr == nil {
+			m.Adr = &ADRSettings{}
+		}
+		if setPaths, err := m.Adr.SetFromFlags(flags, flagsplugin.Prefix("adr", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
 	return paths, nil
 }
 
