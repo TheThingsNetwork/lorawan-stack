@@ -31,7 +31,7 @@ var (
 	defaultOAuthServerAddress        = defaultOAuthServerBaseAddress + "/oauth"
 	defaultRetryConfig               = RetryConfig{
 		DefaultTimeout: 100 * time.Millisecond,
-		EnableMetatada: true,
+		EnableMetadata: true,
 	}
 )
 
@@ -66,8 +66,8 @@ type Config struct {
 // RetryConfig defines the values for the retry behaviour in the cli
 type RetryConfig struct {
 	Max            uint          `name:"max" yaml:"max" description:"Maximum amount of times that a request can be reattempted"`
-	DefaultTimeout time.Duration `name:"default_timeout" yaml:"default_timeout" description:"Default timeout between retry attempts"`
-	EnableMetatada bool          `name:"enable_metadata" yaml:"enable_metadata" description:"Use request response metadata to dynamically calculate timeout between retry attempts"`
+	DefaultTimeout time.Duration `name:"default-timeout" yaml:"default-timeout" description:"Default timeout between retry attempts"`
+	EnableMetadata bool          `name:"enable-metadata" yaml:"enable-metadata" description:"Use request response metadata to dynamically calculate timeout between retry attempts"`
 	Jitter         float64       `name:"jitter" yaml:"jitter" description:"Fraction that creates a deviation of the timeout used between retry attempts"`
 }
 
