@@ -16,6 +16,8 @@ package identityserver
 
 import (
 	"context"
+	"encoding/hex"
+	"fmt"
 	"net"
 	"net/url"
 	"strings"
@@ -57,19 +59,16 @@ var (
 	)
 )
 
-var (
-	errEndDeviceEUIsTaken = errors.DefineAlreadyExists(
-		"end_device_euis_taken",
-		"an end device with JoinEUI `{join_eui}` and DevEUI `{dev_eui}` is already registered as `{device_id}` in application `{application_id}`",
-	)
-	errEndDeviceCAC = errors.DefineInvalidArgument("end_device_cac", "invalid end device claim authentication code")
+var errEndDeviceEUIsTaken = errors.DefineAlreadyExists(
+	"end_device_euis_taken",
+	"an end device with JoinEUI `{join_eui}` and DevEUI `{dev_eui}` is already registered as `{device_id}` in application `{application_id}`",
 )
 
 func getHost(address string) string {
 	if strings.Contains(address, "://") {
-		url, err := url.Parse(address)
+		u, err := url.Parse(address)
 		if err == nil {
-			address = url.Host
+			address = u.Host
 		}
 	}
 	if strings.Contains(address, ":") {
@@ -160,26 +159,30 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 	// Store plaintext value to return in the update response to clients.
 	var ptCACSecret string
 
-	if edCAC := req.GetEndDevice().GetEndDeviceCac(); edCAC != nil {
-		var (
-			edCAC = req.EndDevice.EndDeviceCac
-			value = edCAC.Secret.Value
-			keyID = is.config.EndDevices.EncryptionKeyID
-		)
-		if err = validateEndDeviceCAC(edCAC); err != nil {
+	if req.EndDevice.ClaimAuthenticationCode != nil {
+		ptCACSecret = req.EndDevice.ClaimAuthenticationCode.Value
+		if err = validateEndDeviceAuthenticationCode(*req.EndDevice.ClaimAuthenticationCode); err != nil {
 			return nil, err
 		}
-		if keyID != "" {
-			value, err = is.KeyVault.Encrypt(ctx, value, keyID)
+		if is.config.EndDevices.EncryptionKeyID != "" {
+			encrypted, err := is.KeyVault.Encrypt(
+				ctx,
+				[]byte(req.EndDevice.ClaimAuthenticationCode.Value),
+				is.config.EndDevices.EncryptionKeyID,
+			)
 			if err != nil {
 				return nil, err
 			}
+			// Store the encrypted value along with the ID of the key used to encrypt it.
+			req.EndDevice.ClaimAuthenticationCode.Value = fmt.Sprintf(
+				"%s%s%s",
+				is.config.EndDevices.EncryptionKeyID,
+				endDeviceAuthenticationCodeSeparator,
+				hex.EncodeToString(encrypted),
+			)
 		} else {
-			logger := log.FromContext(ctx)
-			logger.Warn("No encryption key defined, store end device CAC in plaintext")
+			log.FromContext(ctx).Debug("No encryption key defined, store end device claim authentication code directly in plaintext")
 		}
-		req.EndDevice.EndDeviceCac.Secret.Value = value
-		req.EndDevice.EndDeviceCac.Secret.KeyId = keyID
 	}
 
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
@@ -231,21 +234,21 @@ func (is *IdentityServer) getEndDevice(ctx context.Context, req *ttnpb.GetEndDev
 	if err != nil {
 		return nil, err
 	}
-	if dev.EndDeviceCac != nil && dev.EndDeviceCac.Secret != nil {
-		var (
-			value = dev.EndDeviceCac.Secret.Value
-			key   = dev.EndDeviceCac.Secret.KeyId
-		)
-		if key != "" {
-			value, err = is.KeyVault.Decrypt(ctx, value, key)
+	if dev.ClaimAuthenticationCode != nil && dev.ClaimAuthenticationCode.Value != "" {
+		s := strings.Split(dev.ClaimAuthenticationCode.Value, endDeviceAuthenticationCodeSeparator)
+		if len(s) == 2 {
+			v, err := hex.DecodeString(s[1])
 			if err != nil {
 				return nil, err
 			}
+			value, err := is.KeyVault.Decrypt(ctx, v, s[0])
+			if err != nil {
+				return nil, err
+			}
+			dev.ClaimAuthenticationCode.Value = string(value)
 		} else {
-			log.FromContext(ctx).Debug("No encryption key defined, return stored end device cac value")
+			log.FromContext(ctx).Debug("No encryption key defined, return stored end device claim authentication code")
 		}
-		dev.EndDeviceCac.Secret.Value = value
-		dev.EndDeviceCac.Secret.KeyId = is.config.Gateways.EncryptionKeyID
 	}
 	return dev, nil
 }
@@ -350,28 +353,30 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 	// Store plaintext value to return in the update response to clients.
 	var ptCACSecret string
 
-	cacFieldPresent := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "end_device_cac")
-	if cacFieldPresent && req.EndDevice.EndDeviceCac != nil {
-		var (
-			edCAC = req.EndDevice.EndDeviceCac
-			value = edCAC.Secret.Value
-			keyID = is.config.EndDevices.EncryptionKeyID
-		)
-		ptCACSecret = string(value)
-		if err = validateEndDeviceCAC(edCAC); err != nil {
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "claim_authentication_code") && req.EndDevice.ClaimAuthenticationCode != nil {
+		if err = validateEndDeviceAuthenticationCode(*req.EndDevice.ClaimAuthenticationCode); err != nil {
 			return nil, err
 		}
-		if keyID != "" {
-			value, err = is.KeyVault.Encrypt(ctx, value, keyID)
+		if is.config.EndDevices.EncryptionKeyID != "" {
+			ptCACSecret = req.EndDevice.ClaimAuthenticationCode.Value
+			encrypted, err := is.KeyVault.Encrypt(
+				ctx,
+				[]byte(req.EndDevice.ClaimAuthenticationCode.Value),
+				is.config.EndDevices.EncryptionKeyID,
+			)
 			if err != nil {
 				return nil, err
 			}
+			// Store the encrypted value along with the ID of the key used to encrypt it.
+			req.EndDevice.ClaimAuthenticationCode.Value = fmt.Sprintf(
+				"%s:%s:%s",
+				is.config.EndDevices.EncryptionKeyID,
+				endDeviceAuthenticationCodeSeparator,
+				encrypted,
+			)
 		} else {
-			logger := log.FromContext(ctx)
-			logger.Warn("No encryption key defined, store end device CAC in plaintext")
+			log.FromContext(ctx).Debug("No encryption key defined, store end device claim authentication code directly in plaintext")
 		}
-		req.EndDevice.EndDeviceCac.Secret.Value = value
-		req.EndDevice.EndDeviceCac.Secret.KeyId = keyID
 	}
 
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
@@ -420,14 +425,10 @@ func (is *IdentityServer) deleteEndDevice(ctx context.Context, ids *ttnpb.EndDev
 	return ttnpb.Empty, nil
 }
 
-func validateEndDeviceCAC(cac *ttnpb.EndDeviceClaimAuthenticationCode) error {
-	if cac.Secret == nil {
-		return errEndDeviceCAC.New()
-	}
-	validFrom, validTo := ttnpb.StdTime(cac.ValidFrom), ttnpb.StdTime(cac.ValidTo)
-	if validFrom != nil && validTo != nil {
+func validateEndDeviceAuthenticationCode(authCode ttnpb.EndDeviceAuthenticationCode) error {
+	if validFrom, validTo := ttnpb.StdTime(authCode.ValidFrom), ttnpb.StdTime(authCode.ValidTo); validFrom != nil && validTo != nil {
 		if validTo.Before(*validFrom) {
-			return errEndDeviceCAC.New()
+			return errClaimAuthenticationCode.New()
 		}
 	}
 	return nil

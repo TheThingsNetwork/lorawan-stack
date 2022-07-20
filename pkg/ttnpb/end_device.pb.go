@@ -2200,7 +2200,6 @@ func (m *MACState_DataRateRanges) GetRanges() []*MACState_DataRateRange {
 }
 
 // Authentication code for end devices.
-// This message is deprecated. Use EndDeviceClaimAuthenticationCode instead.
 type EndDeviceAuthenticationCode struct {
 	Value                string           `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
 	ValidFrom            *types.Timestamp `protobuf:"bytes,2,opt,name=valid_from,json=validFrom,proto3" json:"valid_from,omitempty"`
@@ -2249,61 +2248,6 @@ func (m *EndDeviceAuthenticationCode) GetValidFrom() *types.Timestamp {
 }
 
 func (m *EndDeviceAuthenticationCode) GetValidTo() *types.Timestamp {
-	if m != nil {
-		return m.ValidTo
-	}
-	return nil
-}
-
-// Code for claiming end devices.
-type EndDeviceClaimAuthenticationCode struct {
-	Secret               *Secret          `protobuf:"bytes,1,opt,name=secret,proto3" json:"secret,omitempty"`
-	ValidFrom            *types.Timestamp `protobuf:"bytes,2,opt,name=valid_from,json=validFrom,proto3" json:"valid_from,omitempty"`
-	ValidTo              *types.Timestamp `protobuf:"bytes,3,opt,name=valid_to,json=validTo,proto3" json:"valid_to,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
-	XXX_unrecognized     []byte           `json:"-"`
-	XXX_sizecache        int32            `json:"-"`
-}
-
-func (m *EndDeviceClaimAuthenticationCode) Reset()         { *m = EndDeviceClaimAuthenticationCode{} }
-func (m *EndDeviceClaimAuthenticationCode) String() string { return proto.CompactTextString(m) }
-func (*EndDeviceClaimAuthenticationCode) ProtoMessage()    {}
-func (*EndDeviceClaimAuthenticationCode) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a656ee0551c94a80, []int{8}
-}
-func (m *EndDeviceClaimAuthenticationCode) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_EndDeviceClaimAuthenticationCode.Unmarshal(m, b)
-}
-func (m *EndDeviceClaimAuthenticationCode) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_EndDeviceClaimAuthenticationCode.Marshal(b, m, deterministic)
-}
-func (m *EndDeviceClaimAuthenticationCode) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_EndDeviceClaimAuthenticationCode.Merge(m, src)
-}
-func (m *EndDeviceClaimAuthenticationCode) XXX_Size() int {
-	return xxx_messageInfo_EndDeviceClaimAuthenticationCode.Size(m)
-}
-func (m *EndDeviceClaimAuthenticationCode) XXX_DiscardUnknown() {
-	xxx_messageInfo_EndDeviceClaimAuthenticationCode.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_EndDeviceClaimAuthenticationCode proto.InternalMessageInfo
-
-func (m *EndDeviceClaimAuthenticationCode) GetSecret() *Secret {
-	if m != nil {
-		return m.Secret
-	}
-	return nil
-}
-
-func (m *EndDeviceClaimAuthenticationCode) GetValidFrom() *types.Timestamp {
-	if m != nil {
-		return m.ValidFrom
-	}
-	return nil
-}
-
-func (m *EndDeviceClaimAuthenticationCode) GetValidTo() *types.Timestamp {
 	if m != nil {
 		return m.ValidTo
 	}
@@ -2447,8 +2391,10 @@ type EndDevice struct {
 	ProvisioningData *types.Struct `protobuf:"bytes,43,opt,name=provisioning_data,json=provisioningData,proto3" json:"provisioning_data,omitempty"`
 	// Indicates whether this device represents a multicast group.
 	Multicast bool `protobuf:"varint,45,opt,name=multicast,proto3" json:"multicast,omitempty"`
-	// Authentication code to claim ownership of the end device. Stored in the Join Server.
-	// This field is deprecated, use end_device_cac instead.
+	// Authentication code to claim ownership of the end device.
+	// From TTS v3.21.0 this field is stored in the Identity Server.
+	// For TTS versions < 3.21.0, this field is stored in the Join Server.
+	// The value stored on the Identity Server gets preference.
 	ClaimAuthenticationCode *EndDeviceAuthenticationCode `protobuf:"bytes,46,opt,name=claim_authentication_code,json=claimAuthenticationCode,proto3" json:"claim_authentication_code,omitempty"`
 	// Skip decryption of uplink payloads and encryption of downlink payloads.
 	// This field is deprecated, use skip_payload_crypto_override instead.
@@ -2465,20 +2411,17 @@ type EndDevice struct {
 	ActivatedAt *types.Timestamp `protobuf:"bytes,53,opt,name=activated_at,json=activatedAt,proto3" json:"activated_at,omitempty"`
 	// Timestamp when a device uplink has been last observed.
 	// This field is set by the Application Server and stored in the Identity Server.
-	LastSeenAt *types.Timestamp `protobuf:"bytes,54,opt,name=last_seen_at,json=lastSeenAt,proto3" json:"last_seen_at,omitempty"`
-	// Code to claim ownership of the end device. Stored in the Identity Server.
-	// This field replaces the claim_authentication_code field.
-	EndDeviceCac         *EndDeviceClaimAuthenticationCode `protobuf:"bytes,55,opt,name=end_device_cac,json=endDeviceCac,proto3" json:"end_device_cac,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                          `json:"-"`
-	XXX_unrecognized     []byte                            `json:"-"`
-	XXX_sizecache        int32                             `json:"-"`
+	LastSeenAt           *types.Timestamp `protobuf:"bytes,54,opt,name=last_seen_at,json=lastSeenAt,proto3" json:"last_seen_at,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
+	XXX_unrecognized     []byte           `json:"-"`
+	XXX_sizecache        int32            `json:"-"`
 }
 
 func (m *EndDevice) Reset()         { *m = EndDevice{} }
 func (m *EndDevice) String() string { return proto.CompactTextString(m) }
 func (*EndDevice) ProtoMessage()    {}
 func (*EndDevice) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a656ee0551c94a80, []int{9}
+	return fileDescriptor_a656ee0551c94a80, []int{8}
 }
 func (m *EndDevice) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_EndDevice.Unmarshal(m, b)
@@ -2855,13 +2798,6 @@ func (m *EndDevice) GetLastSeenAt() *types.Timestamp {
 	return nil
 }
 
-func (m *EndDevice) GetEndDeviceCac() *EndDeviceClaimAuthenticationCode {
-	if m != nil {
-		return m.EndDeviceCac
-	}
-	return nil
-}
-
 type EndDevices struct {
 	EndDevices           []*EndDevice `protobuf:"bytes,1,rep,name=end_devices,json=endDevices,proto3" json:"end_devices,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
@@ -2873,7 +2809,7 @@ func (m *EndDevices) Reset()         { *m = EndDevices{} }
 func (m *EndDevices) String() string { return proto.CompactTextString(m) }
 func (*EndDevices) ProtoMessage()    {}
 func (*EndDevices) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a656ee0551c94a80, []int{10}
+	return fileDescriptor_a656ee0551c94a80, []int{9}
 }
 func (m *EndDevices) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_EndDevices.Unmarshal(m, b)
@@ -2914,7 +2850,7 @@ func (m *DevAddrPrefix) Reset()         { *m = DevAddrPrefix{} }
 func (m *DevAddrPrefix) String() string { return proto.CompactTextString(m) }
 func (*DevAddrPrefix) ProtoMessage()    {}
 func (*DevAddrPrefix) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a656ee0551c94a80, []int{11}
+	return fileDescriptor_a656ee0551c94a80, []int{10}
 }
 func (m *DevAddrPrefix) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DevAddrPrefix.Unmarshal(m, b)
@@ -2959,7 +2895,7 @@ func (m *CreateEndDeviceRequest) Reset()         { *m = CreateEndDeviceRequest{}
 func (m *CreateEndDeviceRequest) String() string { return proto.CompactTextString(m) }
 func (*CreateEndDeviceRequest) ProtoMessage()    {}
 func (*CreateEndDeviceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a656ee0551c94a80, []int{12}
+	return fileDescriptor_a656ee0551c94a80, []int{11}
 }
 func (m *CreateEndDeviceRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateEndDeviceRequest.Unmarshal(m, b)
@@ -3000,7 +2936,7 @@ func (m *UpdateEndDeviceRequest) Reset()         { *m = UpdateEndDeviceRequest{}
 func (m *UpdateEndDeviceRequest) String() string { return proto.CompactTextString(m) }
 func (*UpdateEndDeviceRequest) ProtoMessage()    {}
 func (*UpdateEndDeviceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a656ee0551c94a80, []int{13}
+	return fileDescriptor_a656ee0551c94a80, []int{12}
 }
 func (m *UpdateEndDeviceRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdateEndDeviceRequest.Unmarshal(m, b)
@@ -3046,7 +2982,7 @@ func (m *BatchUpdateEndDeviceLastSeenRequest) Reset()         { *m = BatchUpdate
 func (m *BatchUpdateEndDeviceLastSeenRequest) String() string { return proto.CompactTextString(m) }
 func (*BatchUpdateEndDeviceLastSeenRequest) ProtoMessage()    {}
 func (*BatchUpdateEndDeviceLastSeenRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a656ee0551c94a80, []int{14}
+	return fileDescriptor_a656ee0551c94a80, []int{13}
 }
 func (m *BatchUpdateEndDeviceLastSeenRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_BatchUpdateEndDeviceLastSeenRequest.Unmarshal(m, b)
@@ -3089,7 +3025,7 @@ func (m *BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate) String() s
 }
 func (*BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate) ProtoMessage() {}
 func (*BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a656ee0551c94a80, []int{14, 0}
+	return fileDescriptor_a656ee0551c94a80, []int{13, 0}
 }
 func (m *BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate.Unmarshal(m, b)
@@ -3137,7 +3073,7 @@ func (m *GetEndDeviceRequest) Reset()         { *m = GetEndDeviceRequest{} }
 func (m *GetEndDeviceRequest) String() string { return proto.CompactTextString(m) }
 func (*GetEndDeviceRequest) ProtoMessage()    {}
 func (*GetEndDeviceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a656ee0551c94a80, []int{15}
+	return fileDescriptor_a656ee0551c94a80, []int{14}
 }
 func (m *GetEndDeviceRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetEndDeviceRequest.Unmarshal(m, b)
@@ -3183,7 +3119,7 @@ func (m *GetEndDeviceIdentifiersForEUIsRequest) Reset()         { *m = GetEndDev
 func (m *GetEndDeviceIdentifiersForEUIsRequest) String() string { return proto.CompactTextString(m) }
 func (*GetEndDeviceIdentifiersForEUIsRequest) ProtoMessage()    {}
 func (*GetEndDeviceIdentifiersForEUIsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a656ee0551c94a80, []int{16}
+	return fileDescriptor_a656ee0551c94a80, []int{15}
 }
 func (m *GetEndDeviceIdentifiersForEUIsRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetEndDeviceIdentifiersForEUIsRequest.Unmarshal(m, b)
@@ -3238,7 +3174,7 @@ func (m *ListEndDevicesRequest) Reset()         { *m = ListEndDevicesRequest{} }
 func (m *ListEndDevicesRequest) String() string { return proto.CompactTextString(m) }
 func (*ListEndDevicesRequest) ProtoMessage()    {}
 func (*ListEndDevicesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a656ee0551c94a80, []int{17}
+	return fileDescriptor_a656ee0551c94a80, []int{16}
 }
 func (m *ListEndDevicesRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListEndDevicesRequest.Unmarshal(m, b)
@@ -3307,7 +3243,7 @@ func (m *SetEndDeviceRequest) Reset()         { *m = SetEndDeviceRequest{} }
 func (m *SetEndDeviceRequest) String() string { return proto.CompactTextString(m) }
 func (*SetEndDeviceRequest) ProtoMessage()    {}
 func (*SetEndDeviceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a656ee0551c94a80, []int{18}
+	return fileDescriptor_a656ee0551c94a80, []int{17}
 }
 func (m *SetEndDeviceRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SetEndDeviceRequest.Unmarshal(m, b)
@@ -3355,7 +3291,7 @@ func (m *ResetAndGetEndDeviceRequest) Reset()         { *m = ResetAndGetEndDevic
 func (m *ResetAndGetEndDeviceRequest) String() string { return proto.CompactTextString(m) }
 func (*ResetAndGetEndDeviceRequest) ProtoMessage()    {}
 func (*ResetAndGetEndDeviceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a656ee0551c94a80, []int{19}
+	return fileDescriptor_a656ee0551c94a80, []int{18}
 }
 func (m *ResetAndGetEndDeviceRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ResetAndGetEndDeviceRequest.Unmarshal(m, b)
@@ -3402,7 +3338,7 @@ func (m *EndDeviceTemplate) Reset()         { *m = EndDeviceTemplate{} }
 func (m *EndDeviceTemplate) String() string { return proto.CompactTextString(m) }
 func (*EndDeviceTemplate) ProtoMessage()    {}
 func (*EndDeviceTemplate) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a656ee0551c94a80, []int{20}
+	return fileDescriptor_a656ee0551c94a80, []int{19}
 }
 func (m *EndDeviceTemplate) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_EndDeviceTemplate.Unmarshal(m, b)
@@ -3456,7 +3392,7 @@ func (m *EndDeviceTemplateFormat) Reset()         { *m = EndDeviceTemplateFormat
 func (m *EndDeviceTemplateFormat) String() string { return proto.CompactTextString(m) }
 func (*EndDeviceTemplateFormat) ProtoMessage()    {}
 func (*EndDeviceTemplateFormat) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a656ee0551c94a80, []int{21}
+	return fileDescriptor_a656ee0551c94a80, []int{20}
 }
 func (m *EndDeviceTemplateFormat) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_EndDeviceTemplateFormat.Unmarshal(m, b)
@@ -3508,7 +3444,7 @@ func (m *EndDeviceTemplateFormats) Reset()         { *m = EndDeviceTemplateForma
 func (m *EndDeviceTemplateFormats) String() string { return proto.CompactTextString(m) }
 func (*EndDeviceTemplateFormats) ProtoMessage()    {}
 func (*EndDeviceTemplateFormats) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a656ee0551c94a80, []int{22}
+	return fileDescriptor_a656ee0551c94a80, []int{21}
 }
 func (m *EndDeviceTemplateFormats) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_EndDeviceTemplateFormats.Unmarshal(m, b)
@@ -3549,7 +3485,7 @@ func (m *ConvertEndDeviceTemplateRequest) Reset()         { *m = ConvertEndDevic
 func (m *ConvertEndDeviceTemplateRequest) String() string { return proto.CompactTextString(m) }
 func (*ConvertEndDeviceTemplateRequest) ProtoMessage()    {}
 func (*ConvertEndDeviceTemplateRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a656ee0551c94a80, []int{23}
+	return fileDescriptor_a656ee0551c94a80, []int{22}
 }
 func (m *ConvertEndDeviceTemplateRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ConvertEndDeviceTemplateRequest.Unmarshal(m, b)
@@ -3636,8 +3572,6 @@ func init() {
 	golang_proto.RegisterType((*MACState_DataRateRanges)(nil), "ttn.lorawan.v3.MACState.DataRateRanges")
 	proto.RegisterType((*EndDeviceAuthenticationCode)(nil), "ttn.lorawan.v3.EndDeviceAuthenticationCode")
 	golang_proto.RegisterType((*EndDeviceAuthenticationCode)(nil), "ttn.lorawan.v3.EndDeviceAuthenticationCode")
-	proto.RegisterType((*EndDeviceClaimAuthenticationCode)(nil), "ttn.lorawan.v3.EndDeviceClaimAuthenticationCode")
-	golang_proto.RegisterType((*EndDeviceClaimAuthenticationCode)(nil), "ttn.lorawan.v3.EndDeviceClaimAuthenticationCode")
 	proto.RegisterType((*EndDevice)(nil), "ttn.lorawan.v3.EndDevice")
 	golang_proto.RegisterType((*EndDevice)(nil), "ttn.lorawan.v3.EndDevice")
 	proto.RegisterMapType((map[string]string)(nil), "ttn.lorawan.v3.EndDevice.AttributesEntry")

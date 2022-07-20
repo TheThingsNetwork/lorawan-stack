@@ -31,7 +31,6 @@ import "lorawan-stack/api/messages.proto";
 import "lorawan-stack/api/metadata.proto";
 import "lorawan-stack/api/picture.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
-import "lorawan-stack/api/secrets.proto";
 
 package ttn.lorawan.v3;
 
@@ -556,22 +555,12 @@ enum PowerState {
 }
 
 // Authentication code for end devices.
-// This message is deprecated. Use EndDeviceClaimAuthenticationCode instead.
 message EndDeviceAuthenticationCode {
   option (thethings.flags.message) = { select: true, set: true };
   string value = 1 [(validate.rules).string.pattern = "^[A-Z0-9]{1,32}$"];
   google.protobuf.Timestamp valid_from = 2;
   google.protobuf.Timestamp valid_to = 3;
 }
-
-// Code for claiming end devices.
-message EndDeviceClaimAuthenticationCode {
-  option (thethings.flags.message) = { select: true, set: true };
-  Secret secret = 1;
-  google.protobuf.Timestamp valid_from = 2;
-  google.protobuf.Timestamp valid_to = 3;
-}
-
 
 // Defines an End Device registration and its state on the network.
 // The persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.
@@ -761,8 +750,10 @@ message EndDevice {
   // Indicates whether this device represents a multicast group.
   bool multicast = 45;
 
-  // Authentication code to claim ownership of the end device. Stored in the Join Server.
-  // This field is deprecated, use end_device_cac instead.
+  // Authentication code to claim ownership of the end device.
+  // From TTS v3.21.0 this field is stored in the Identity Server.
+  // For TTS versions < 3.21.0, this field is stored in the Join Server.
+  // The value stored on the Identity Server gets preference.
   EndDeviceAuthenticationCode claim_authentication_code = 46;
 
   // Skip decryption of uplink payloads and encryption of downlink payloads.
@@ -784,11 +775,7 @@ message EndDevice {
   // This field is set by the Application Server and stored in the Identity Server.
   google.protobuf.Timestamp last_seen_at = 54;
 
-  // Code to claim ownership of the end device. Stored in the Identity Server.
-  // This field replaces the claim_authentication_code field.
-  EndDeviceClaimAuthenticationCode end_device_cac = 55;
-
-  // next: 56;
+  // next: 55;
 }
 
 message EndDevices {

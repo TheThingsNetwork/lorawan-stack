@@ -31,7 +31,6 @@ const (
 	devEuiCounterField                  = "dev_eui_counter"
 	disablePacketBrokerForwardingField  = "disable_packet_broker_forwarding"
 	downlinkPathConstraintField         = "downlink_path_constraint"
-	endDeviceCACField                   = "end_device_cac"
 	endorsedField                       = "endorsed"
 	enforceDutyCycleField               = "enforce_duty_cycle"
 	firmwareVersionField                = "version_ids.firmware_version"

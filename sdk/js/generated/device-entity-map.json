@@ -24,38 +24,52 @@
     ],
     "read_only"
   ],
+  "claim_authentication_code": {
+    "_root": [
+      [
+        "is",
+        "js"
+      ],
+      [
+        "is",
+        "js"
+      ]
+    ],
+    "value": [
+      [
+        "is",
+        "js"
+      ],
+      [
+        "is",
+        "js"
+      ]
+    ],
+    "valid_to": [
+      [
+        "is",
+        "js"
+      ],
+      [
+        "is",
+        "js"
+      ]
+    ],
+    "valid_from": [
+      [
+        "is",
+        "js"
+      ],
+      [
+        "is",
+        "js"
+      ]
+    ]
+  },
   "description": [
     "is",
     "is"
   ],
-  "end_device_cac": {
-    "_root": [
-      "is",
-      "is"
-    ],
-    "secret": {
-      "_root": [
-        "is",
-        "is"
-      ],
-      "key_id": [
-        "is",
-        "is"
-      ],
-      "value": [
-        "is",
-        "is"
-      ]
-    },
-    "valid_from": [
-      "is",
-      "is"
-    ],
-    "valid_to": [
-      "is",
-      "is"
-    ]
-  },
   "ids": {
     "_root": [
       [
@@ -1727,24 +1741,6 @@
     "js",
     "js"
   ],
-  "claim_authentication_code": {
-    "_root": [
-      "js",
-      "js"
-    ],
-    "value": [
-      "js",
-      "js"
-    ],
-    "valid_to": [
-      "js",
-      "js"
-    ],
-    "valid_from": [
-      "js",
-      "js"
-    ]
-  },
   "last_dev_nonce": [
     "js",
     "js"

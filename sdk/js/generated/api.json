@@ -13920,7 +13920,7 @@
             },
             {
               "name": "claim_authentication_code",
-              "description": "Authentication code to claim ownership of the end device. Stored in the Join Server.\nThis field is deprecated, use end_device_cac instead.",
+              "description": "Authentication code to claim ownership of the end device.\nFrom TTS v3.21.0 this field is stored in the Identity Server.\nFor TTS versions \u003c 3.21.0, this field is stored in the Join Server.\nThe value stored on the Identity Server gets preference.",
               "label": "",
               "type": "EndDeviceAuthenticationCode",
               "longType": "EndDeviceAuthenticationCode",
@@ -13973,18 +13973,6 @@
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
               "fullType": "google.protobuf.Timestamp",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "end_device_cac",
-              "description": "Code to claim ownership of the end device. Stored in the Identity Server.\nThis field replaces the claim_authentication_code field.",
-              "label": "",
-              "type": "EndDeviceClaimAuthenticationCode",
-              "longType": "EndDeviceClaimAuthenticationCode",
-              "fullType": "ttn.lorawan.v3.EndDeviceClaimAuthenticationCode",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -14068,7 +14056,7 @@
           "name": "EndDeviceAuthenticationCode",
           "longName": "EndDeviceAuthenticationCode",
           "fullName": "ttn.lorawan.v3.EndDeviceAuthenticationCode",
-          "description": "Authentication code for end devices.\nThis message is deprecated. Use EndDeviceClaimAuthenticationCode instead.",
+          "description": "Authentication code for end devices.",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
@@ -14093,54 +14081,6 @@
                   }
                 ]
               }
-            },
-            {
-              "name": "valid_from",
-              "description": "",
-              "label": "",
-              "type": "Timestamp",
-              "longType": "google.protobuf.Timestamp",
-              "fullType": "google.protobuf.Timestamp",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "valid_to",
-              "description": "",
-              "label": "",
-              "type": "Timestamp",
-              "longType": "google.protobuf.Timestamp",
-              "fullType": "google.protobuf.Timestamp",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
-          "name": "EndDeviceClaimAuthenticationCode",
-          "longName": "EndDeviceClaimAuthenticationCode",
-          "fullName": "ttn.lorawan.v3.EndDeviceClaimAuthenticationCode",
-          "description": "Code for claiming end devices.",
-          "hasExtensions": false,
-          "hasFields": true,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "secret",
-              "description": "",
-              "label": "",
-              "type": "Secret",
-              "longType": "Secret",
-              "fullType": "ttn.lorawan.v3.Secret",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
             },
             {
               "name": "valid_from",

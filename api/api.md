@@ -208,7 +208,6 @@
   - [Message `EndDevice.AttributesEntry`](#ttn.lorawan.v3.EndDevice.AttributesEntry)
   - [Message `EndDevice.LocationsEntry`](#ttn.lorawan.v3.EndDevice.LocationsEntry)
   - [Message `EndDeviceAuthenticationCode`](#ttn.lorawan.v3.EndDeviceAuthenticationCode)
-  - [Message `EndDeviceClaimAuthenticationCode`](#ttn.lorawan.v3.EndDeviceClaimAuthenticationCode)
   - [Message `EndDeviceTemplate`](#ttn.lorawan.v3.EndDeviceTemplate)
   - [Message `EndDeviceTemplateFormat`](#ttn.lorawan.v3.EndDeviceTemplateFormat)
   - [Message `EndDeviceTemplateFormats`](#ttn.lorawan.v3.EndDeviceTemplateFormats)
@@ -3307,12 +3306,11 @@ SDKs are responsible for combining (if desired) the three.
 | `provisioner_id` | [`string`](#string) |  | ID of the provisioner. Stored in Join Server. |
 | `provisioning_data` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  | Vendor-specific provisioning data. Stored in Join Server. |
 | `multicast` | [`bool`](#bool) |  | Indicates whether this device represents a multicast group. |
-| `claim_authentication_code` | [`EndDeviceAuthenticationCode`](#ttn.lorawan.v3.EndDeviceAuthenticationCode) |  | Authentication code to claim ownership of the end device. Stored in the Join Server. This field is deprecated, use end_device_cac instead. |
+| `claim_authentication_code` | [`EndDeviceAuthenticationCode`](#ttn.lorawan.v3.EndDeviceAuthenticationCode) |  | Authentication code to claim ownership of the end device. From TTS v3.21.0 this field is stored in the Identity Server. For TTS versions < 3.21.0, this field is stored in the Join Server. The value stored on the Identity Server gets preference. |
 | `skip_payload_crypto` | [`bool`](#bool) |  | Skip decryption of uplink payloads and encryption of downlink payloads. This field is deprecated, use skip_payload_crypto_override instead. |
 | `skip_payload_crypto_override` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  | Skip decryption of uplink payloads and encryption of downlink payloads. This field overrides the application-level setting. |
 | `activated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Timestamp when the device has been activated. Stored in the Entity Registry. This field is set by the Application Server when an end device sends its first uplink. The Application Server will use the field in order to avoid repeated calls to the Entity Registry. The field cannot be unset once set. |
 | `last_seen_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Timestamp when a device uplink has been last observed. This field is set by the Application Server and stored in the Identity Server. |
-| `end_device_cac` | [`EndDeviceClaimAuthenticationCode`](#ttn.lorawan.v3.EndDeviceClaimAuthenticationCode) |  | Code to claim ownership of the end device. Stored in the Identity Server. This field replaces the claim_authentication_code field. |
 
 #### Field Rules
 
@@ -3355,7 +3353,6 @@ SDKs are responsible for combining (if desired) the three.
 ### <a name="ttn.lorawan.v3.EndDeviceAuthenticationCode">Message `EndDeviceAuthenticationCode`</a>
 
 Authentication code for end devices.
-This message is deprecated. Use EndDeviceClaimAuthenticationCode instead.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -3368,16 +3365,6 @@ This message is deprecated. Use EndDeviceClaimAuthenticationCode instead.
 | Field | Validations |
 | ----- | ----------- |
 | `value` | <p>`string.pattern`: `^[A-Z0-9]{1,32}$`</p> |
-
-### <a name="ttn.lorawan.v3.EndDeviceClaimAuthenticationCode">Message `EndDeviceClaimAuthenticationCode`</a>
-
-Code for claiming end devices.
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `secret` | [`Secret`](#ttn.lorawan.v3.Secret) |  |  |
-| `valid_from` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
-| `valid_to` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 
 ### <a name="ttn.lorawan.v3.EndDeviceTemplate">Message `EndDeviceTemplate`</a>
 
