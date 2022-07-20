@@ -11566,12 +11566,7 @@
               "oneofdecl": "",
               "defaultValue": "",
               "options": {
-                "validate.rules": [
-                  {
-                    "name": "message.required",
-                    "value": true
-                  }
-                ]
+                "deprecated": true
               }
             },
             {
@@ -11634,12 +11629,7 @@
               "oneofdecl": "",
               "defaultValue": "",
               "options": {
-                "validate.rules": [
-                  {
-                    "name": "message.required",
-                    "value": true
-                  }
-                ]
+                "deprecated": true
               }
             },
             {
@@ -11726,12 +11716,7 @@
               "oneofdecl": "",
               "defaultValue": "",
               "options": {
-                "validate.rules": [
-                  {
-                    "name": "message.required",
-                    "value": true
-                  }
-                ]
+                "deprecated": true
               }
             },
             {
@@ -11782,12 +11767,7 @@
               "oneofdecl": "",
               "defaultValue": "",
               "options": {
-                "validate.rules": [
-                  {
-                    "name": "message.required",
-                    "value": true
-                  }
-                ]
+                "deprecated": true
               }
             },
             {
@@ -11882,12 +11862,7 @@
               "oneofdecl": "",
               "defaultValue": "",
               "options": {
-                "validate.rules": [
-                  {
-                    "name": "message.required",
-                    "value": true
-                  }
-                ]
+                "deprecated": true
               }
             },
             {
@@ -12028,12 +12003,7 @@
               "oneofdecl": "",
               "defaultValue": "",
               "options": {
-                "validate.rules": [
-                  {
-                    "name": "message.required",
-                    "value": true
-                  }
-                ]
+                "deprecated": true
               }
             },
             {
