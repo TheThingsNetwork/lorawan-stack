@@ -86,7 +86,7 @@ func (s *invitationStore) CreateInvitation(
 	model := &Invitation{
 		Email:     pb.Email,
 		Token:     pb.Token,
-		ExpiresAt: ttnpb.StdTime(pb.ExpiresAt),
+		ExpiresAt: cleanTimePtr(ttnpb.StdTime(pb.ExpiresAt)),
 	}
 
 	_, err := s.DB.NewInsert().
@@ -226,7 +226,7 @@ func (s *invitationStore) SetInvitationAcceptedBy(
 		return err
 	}
 
-	if model.ExpiresAt != nil && model.ExpiresAt.Before(time.Now()) {
+	if model.ExpiresAt != nil && model.ExpiresAt.Before(s.now()) {
 		return store.ErrInvitationExpired.WithAttributes("invitation_token", token)
 	}
 

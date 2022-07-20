@@ -22,6 +22,7 @@ import (
 	"io"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/jackc/pgerrcode"
 	"github.com/uptrace/bun"
@@ -76,6 +77,8 @@ type baseStore struct {
 	DB bun.IDB
 	*baseDB
 }
+
+func (*baseStore) now() time.Time { return now() }
 
 func (s *baseStore) transact(ctx context.Context, fc func(context.Context, bun.IDB) error) error {
 	db, ok := s.DB.(*bun.DB)

@@ -266,8 +266,8 @@ func (s *gatewayStore) CreateGateway(
 		LBSLNSSecret: secretToBytes(pb.LbsLnsSecret),
 
 		ClaimAuthenticationCodeSecret:    secretToBytes(pb.ClaimAuthenticationCode.GetSecret()),
-		ClaimAuthenticationCodeValidFrom: ttnpb.StdTime(pb.ClaimAuthenticationCode.GetValidFrom()),
-		ClaimAuthenticationCodeValidTo:   ttnpb.StdTime(pb.ClaimAuthenticationCode.GetValidTo()),
+		ClaimAuthenticationCodeValidFrom: cleanTimePtr(ttnpb.StdTime(pb.ClaimAuthenticationCode.GetValidFrom())),
+		ClaimAuthenticationCodeValidTo:   cleanTimePtr(ttnpb.StdTime(pb.ClaimAuthenticationCode.GetValidTo())),
 
 		TargetCUPSURI: pb.TargetCupsUri,
 		TargetCUPSKey: secretToBytes(pb.TargetCupsKey),
@@ -728,8 +728,8 @@ func (s *gatewayStore) updateGatewayModel( //nolint:gocyclo
 		case "claim_authentication_code":
 			// NOTE: The old implementation didn't allow for updating the sub-fields, so we don't either.
 			model.ClaimAuthenticationCodeSecret = secretToBytes(pb.ClaimAuthenticationCode.GetSecret())
-			model.ClaimAuthenticationCodeValidFrom = ttnpb.StdTime(pb.ClaimAuthenticationCode.GetValidFrom())
-			model.ClaimAuthenticationCodeValidTo = ttnpb.StdTime(pb.ClaimAuthenticationCode.GetValidTo())
+			model.ClaimAuthenticationCodeValidFrom = cleanTimePtr(ttnpb.StdTime(pb.ClaimAuthenticationCode.GetValidFrom()))
+			model.ClaimAuthenticationCodeValidTo = cleanTimePtr(ttnpb.StdTime(pb.ClaimAuthenticationCode.GetValidTo()))
 			columns = append(
 				columns,
 				"claim_authentication_code_secret",
@@ -833,7 +833,7 @@ func (s *gatewayStore) DeleteGateway(ctx context.Context, id *ttnpb.GatewayIdent
 	_, err = s.DB.NewUpdate().
 		Model(model).
 		WherePK().
-		Set("deleted_at = ?", time.Now().UTC()).
+		Set("deleted_at = ?", s.now()).
 		Set("gateway_eui = NULL").
 		Exec(ctx)
 	if err != nil {

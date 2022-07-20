@@ -40,13 +40,13 @@ func (m *Model) BeforeAppendModel(_ context.Context, query bun.Query) error {
 	switch query.(type) {
 	case *bun.InsertQuery:
 		if m.CreatedAt.IsZero() {
-			m.CreatedAt = time.Now().Truncate(time.Microsecond)
+			m.CreatedAt = now()
 		}
 		if m.UpdatedAt.IsZero() {
-			m.UpdatedAt = time.Now().Truncate(time.Microsecond)
+			m.UpdatedAt = now()
 		}
 	case *bun.UpdateQuery:
-		m.UpdatedAt = time.Now().Truncate(time.Microsecond)
+		m.UpdatedAt = now()
 	}
 	return nil
 }

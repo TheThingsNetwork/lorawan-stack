@@ -56,7 +56,7 @@ func contactInfoFromPB(pb *ttnpb.ContactInfo, entityType, entityID string) *Cont
 		ContactMethod: int(pb.ContactMethod),
 		Value:         pb.Value,
 		Public:        pb.Public,
-		ValidatedAt:   ttnpb.StdTime(pb.ValidatedAt),
+		ValidatedAt:   cleanTimePtr(ttnpb.StdTime(pb.ValidatedAt)),
 	}
 }
 
@@ -352,7 +352,7 @@ func (s *contactInfoStore) CreateValidation(
 		EntityID:      entityUUID,
 		ContactMethod: int(contactMethod),
 		Value:         value,
-		ExpiresAt:     ttnpb.StdTime(pb.ExpiresAt),
+		ExpiresAt:     cleanTimePtr(ttnpb.StdTime(pb.ExpiresAt)),
 	}
 
 	_, err = s.DB.NewInsert().
@@ -401,13 +401,13 @@ func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.Conta
 		)
 	}
 
-	if model.ExpiresAt != nil && model.ExpiresAt.Before(time.Now()) {
+	if model.ExpiresAt != nil && model.ExpiresAt.Before(s.now()) {
 		return store.ErrValidationTokenExpired.WithAttributes(
 			"validation_id", validation.Id,
 		)
 	}
 
-	now := time.Now()
+	now := s.now()
 
 	_, err = s.DB.NewUpdate().
 		Model(&ContactInfo{}).

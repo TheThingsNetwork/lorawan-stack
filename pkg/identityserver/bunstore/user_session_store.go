@@ -91,7 +91,7 @@ func (s *userSessionStore) CreateSession(
 	model := &UserSession{
 		UserID:        userUUID,
 		SessionSecret: pb.SessionSecret,
-		ExpiresAt:     ttnpb.StdTime(pb.ExpiresAt),
+		ExpiresAt:     cleanTimePtr(ttnpb.StdTime(pb.ExpiresAt)),
 	}
 
 	_, err = s.DB.NewInsert().

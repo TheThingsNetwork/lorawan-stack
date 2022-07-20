@@ -471,7 +471,7 @@ func (s *oauthStore) CreateAuthorizationCode(
 		Code:          pb.Code,
 		RedirectURI:   pb.RedirectUri,
 		State:         pb.State,
-		ExpiresAt:     ttnpb.StdTime(pb.ExpiresAt),
+		ExpiresAt:     cleanTimePtr(ttnpb.StdTime(pb.ExpiresAt)),
 	}
 
 	_, err = s.DB.NewInsert().
@@ -584,7 +584,7 @@ func (s *oauthStore) CreateAccessToken(
 		PreviousID:    previousID,
 		AccessToken:   pb.AccessToken,
 		RefreshToken:  pb.RefreshToken,
-		ExpiresAt:     ttnpb.StdTime(pb.ExpiresAt),
+		ExpiresAt:     cleanTimePtr(ttnpb.StdTime(pb.ExpiresAt)),
 	}
 
 	_, err = s.DB.NewInsert().

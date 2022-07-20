@@ -26,6 +26,29 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
+const timePrecision = time.Microsecond
+
+func cleanTime(t time.Time) time.Time {
+	return t.Truncate(timePrecision)
+}
+
+func cleanTimePtr(t *time.Time) *time.Time {
+	if t == nil {
+		return nil
+	}
+	clean := cleanTime(*t)
+	return &clean
+}
+
+var nowFunc func() time.Time
+
+func now() time.Time {
+	if nowFunc != nil {
+		return cleanTime(nowFunc())
+	}
+	return cleanTime(time.Now())
+}
+
 func combineApply[Q bun.Query](f ...func(Q) Q) func(Q) Q {
 	return func(q Q) Q {
 		for _, f := range f {

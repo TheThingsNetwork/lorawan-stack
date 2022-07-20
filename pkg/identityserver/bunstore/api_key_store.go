@@ -98,7 +98,7 @@ func (s *apiKeyStore) CreateAPIKey(
 		Name:       pb.Name,
 		EntityType: entityType,
 		EntityID:   entityUUID,
-		ExpiresAt:  ttnpb.StdTime(pb.ExpiresAt),
+		ExpiresAt:  cleanTimePtr(ttnpb.StdTime(pb.ExpiresAt)),
 	}
 
 	_, err = s.DB.NewInsert().
@@ -334,7 +334,7 @@ func (s *apiKeyStore) UpdateAPIKey(
 			columns = append(columns, "name")
 
 		case "expires_at":
-			model.ExpiresAt = ttnpb.StdTime(pb.ExpiresAt)
+			model.ExpiresAt = cleanTimePtr(ttnpb.StdTime(pb.ExpiresAt))
 			columns = append(columns, "expires_at")
 		}
 	}

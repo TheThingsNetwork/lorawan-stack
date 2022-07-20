@@ -189,8 +189,8 @@ func (s *endDeviceStore) CreateEndDevice(
 
 		ServiceProfileID: pb.ServiceProfileId,
 
-		ActivatedAt: ttnpb.StdTime(pb.ActivatedAt),
-		LastSeenAt:  ttnpb.StdTime(pb.LastSeenAt),
+		ActivatedAt: cleanTimePtr(ttnpb.StdTime(pb.ActivatedAt)),
+		LastSeenAt:  cleanTimePtr(ttnpb.StdTime(pb.LastSeenAt)),
 	}
 
 	if pb.Picture != nil {
@@ -592,11 +592,11 @@ func (s *endDeviceStore) updateEndDeviceModel( //nolint:gocyclo
 			}
 
 		case "activated_at":
-			model.ActivatedAt = ttnpb.StdTime(pb.ActivatedAt)
+			model.ActivatedAt = cleanTimePtr(ttnpb.StdTime(pb.ActivatedAt))
 			columns = append(columns, "activated_at")
 
 		case "last_seen_at":
-			model.LastSeenAt = ttnpb.StdTime(pb.LastSeenAt)
+			model.LastSeenAt = cleanTimePtr(ttnpb.StdTime(pb.LastSeenAt))
 			columns = append(columns, "last_seen_at")
 		}
 	}
@@ -730,7 +730,7 @@ func (s *endDeviceStore) BatchUpdateEndDeviceLastSeen(
 		lastSeenUpdates[i] = &lastSeenUpdate{
 			ApplicationID: dev.Ids.GetApplicationIds().GetApplicationId(),
 			DeviceID:      dev.Ids.GetDeviceId(),
-			LastSeenAt:    ttnpb.StdTime(dev.GetLastSeenAt()),
+			LastSeenAt:    cleanTimePtr(ttnpb.StdTime(dev.GetLastSeenAt())),
 		}
 	}
 

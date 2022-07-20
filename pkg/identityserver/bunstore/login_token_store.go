@@ -126,7 +126,7 @@ func (s *loginTokenStore) CreateLoginToken(ctx context.Context, pb *ttnpb.LoginT
 	model := &LoginToken{
 		UserID:    userUUID,
 		Token:     pb.Token,
-		ExpiresAt: ttnpb.StdTime(pb.ExpiresAt),
+		ExpiresAt: cleanTimePtr(ttnpb.StdTime(pb.ExpiresAt)),
 	}
 
 	_, err = s.DB.NewInsert().
@@ -164,7 +164,7 @@ func (s *loginTokenStore) ConsumeLoginToken(ctx context.Context, token string) (
 		return nil, err
 	}
 
-	if model.ExpiresAt != nil && model.ExpiresAt.Before(time.Now()) {
+	if model.ExpiresAt != nil && model.ExpiresAt.Before(s.now()) {
 		return nil, store.ErrLoginTokenExpired.New()
 	}
 

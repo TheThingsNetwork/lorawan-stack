@@ -166,16 +166,16 @@ func (s *userStore) CreateUser(ctx context.Context, pb *ttnpb.User) (*ttnpb.User
 		Name:                           pb.Name,
 		Description:                    pb.Description,
 		PrimaryEmailAddress:            pb.PrimaryEmailAddress,
-		PrimaryEmailAddressValidatedAt: ttnpb.StdTime(pb.PrimaryEmailAddressValidatedAt),
+		PrimaryEmailAddressValidatedAt: cleanTimePtr(ttnpb.StdTime(pb.PrimaryEmailAddressValidatedAt)),
 		Password:                       pb.Password,
-		PasswordUpdatedAt:              ttnpb.StdTimeOrZero(pb.PasswordUpdatedAt),
+		PasswordUpdatedAt:              cleanTime(ttnpb.StdTimeOrZero(pb.PasswordUpdatedAt)),
 		RequirePasswordUpdate:          pb.RequirePasswordUpdate,
 		State:                          int(pb.State),
 		StateDescription:               pb.StateDescription,
 		Admin:                          pb.Admin,
 		TemporaryPassword:              pb.TemporaryPassword,
-		TemporaryPasswordCreatedAt:     ttnpb.StdTime(pb.TemporaryPasswordCreatedAt),
-		TemporaryPasswordExpiresAt:     ttnpb.StdTime(pb.TemporaryPasswordExpiresAt),
+		TemporaryPasswordCreatedAt:     cleanTimePtr(ttnpb.StdTime(pb.TemporaryPasswordCreatedAt)),
+		TemporaryPasswordExpiresAt:     cleanTimePtr(ttnpb.StdTime(pb.TemporaryPasswordExpiresAt)),
 	}
 
 	if pb.ProfilePicture != nil {
@@ -517,7 +517,7 @@ func (s *userStore) updateUserModel( //nolint:gocyclo
 			columns = append(columns, "primary_email_address")
 
 		case "primary_email_address_validated_at":
-			model.PrimaryEmailAddressValidatedAt = ttnpb.StdTime(pb.PrimaryEmailAddressValidatedAt)
+			model.PrimaryEmailAddressValidatedAt = cleanTimePtr(ttnpb.StdTime(pb.PrimaryEmailAddressValidatedAt))
 			columns = append(columns, "primary_email_address_validated_at")
 
 		case "password":
@@ -525,7 +525,7 @@ func (s *userStore) updateUserModel( //nolint:gocyclo
 			columns = append(columns, "password")
 
 		case "password_updated_at":
-			model.PasswordUpdatedAt = ttnpb.StdTimeOrZero(pb.PasswordUpdatedAt)
+			model.PasswordUpdatedAt = cleanTime(ttnpb.StdTimeOrZero(pb.PasswordUpdatedAt))
 			columns = append(columns, "password_updated_at")
 
 		case "require_password_update":
@@ -549,11 +549,11 @@ func (s *userStore) updateUserModel( //nolint:gocyclo
 			columns = append(columns, "temporary_password")
 
 		case "temporary_password_created_at":
-			model.TemporaryPasswordCreatedAt = ttnpb.StdTime(pb.TemporaryPasswordCreatedAt)
+			model.TemporaryPasswordCreatedAt = cleanTimePtr(ttnpb.StdTime(pb.TemporaryPasswordCreatedAt))
 			columns = append(columns, "temporary_password_created_at")
 
 		case "temporary_password_expires_at":
-			model.TemporaryPasswordExpiresAt = ttnpb.StdTime(pb.TemporaryPasswordExpiresAt)
+			model.TemporaryPasswordExpiresAt = cleanTimePtr(ttnpb.StdTime(pb.TemporaryPasswordExpiresAt))
 			columns = append(columns, "temporary_password_expires_at")
 
 		case "profile_picture":
