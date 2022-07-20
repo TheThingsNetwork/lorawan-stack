@@ -60,10 +60,10 @@ type Config struct {
 	CA                                 string      `name:"ca" yaml:"ca" description:"CA certificate file"`
 	DumpRequests                       bool        `name:"dump-requests" yaml:"dump-requests" description:"When log level is set to debug, also dump request payload as JSON"`
 	SkipVersionCheck                   bool        `name:"skip-version-check" yaml:"skip-version-check" description:"Do not perform version checks"`
-	Retry                              RetryConfig `name:"retry-config" yaml:"retry-config"`
+	Retry                              RetryConfig `name:"retry" yaml:"retry"`
 }
 
-// RetryConfig defines the values for the retry behaviour in the cli
+// RetryConfig defines the values for the retry behavior in the CLI.
 type RetryConfig struct {
 	Max            uint          `name:"max" yaml:"max" description:"Maximum amount of times that a request can be reattempted"`
 	DefaultTimeout time.Duration `name:"default-timeout" yaml:"default-timeout" description:"Default timeout between retry attempts"`
