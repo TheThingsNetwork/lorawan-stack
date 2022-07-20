@@ -83,6 +83,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.0.0-00010101000000-000000000000
 	github.com/heptiolabs/healthcheck v0.0.0-20211123025425-613501dd5deb
 	github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef
 	github.com/iancoleman/strcase v0.2.0
@@ -114,9 +115,9 @@ require (
 	github.com/spf13/viper v1.10.1
 	github.com/throttled/throttled v2.2.5+incompatible
 	github.com/throttled/throttled/v2 v2.7.1
-	github.com/uptrace/bun v1.1.5
-	github.com/uptrace/bun/dialect/pgdialect v1.1.5
-	github.com/uptrace/bun/driver/pgdriver v1.1.5
+	github.com/uptrace/bun v1.1.6
+	github.com/uptrace/bun/dialect/pgdialect v1.1.6
+	github.com/uptrace/bun/driver/pgdriver v1.1.6
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	go.opencensus.io v0.23.0
 	go.packetbroker.org/api/iam v1.5.26-tts
@@ -131,7 +132,7 @@ require (
 	gocloud.dev v0.20.0
 	// NOTE: gocloud.dev/pubsub/natspubsub is actually a different version (see above).
 	gocloud.dev/pubsub/natspubsub v0.19.0
-	golang.org/x/crypto v0.0.0-20220511200225-c6db032c6c88
+	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
 	golang.org/x/exp v0.0.0-20220706164943-b4a6d9510983
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
@@ -140,7 +141,6 @@ require (
 	google.golang.org/genproto v0.0.0-20220519153652-3a47de7e79bd
 	// NOTE: google.golang.org/grpc is actually a different version (see above).
 	google.golang.org/grpc v1.46.2
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.0.0-00010101000000-000000000000
 	gopkg.in/mail.v2 v2.3.1
 	gopkg.in/square/go-jose.v2 v2.6.0
 	gopkg.in/yaml.v2 v2.4.0
@@ -246,7 +246,7 @@ require (
 	golang.org/x/image v0.0.0-20211028202545-6944b10bf410 // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
-	golang.org/x/sys v0.0.0-20220503163025-988cb79eb6c6 // indirect
+	golang.org/x/sys v0.0.0-20220708085239-5a0f0661e09d // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20220210224613-90d013bbcef8 // indirect
