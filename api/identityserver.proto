@@ -120,6 +120,10 @@ message IsConfiguration {
     google.protobuf.BoolValue all = 1;
   }
   AdminRights admin_rights = 8;
+  reserved 9; reserved "network_limits";
+  reserved 10; reserved "application_limits";
+  reserved 11; reserved "organization_limits";
+  reserved 12; reserved "user_limits";
 }
 
 message GetIsConfigurationResponse {

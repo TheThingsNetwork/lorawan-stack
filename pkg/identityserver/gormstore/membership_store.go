@@ -126,6 +126,30 @@ func (s *membershipStore) queryMemberships(
 	)
 }
 
+func (s *membershipStore) CountMemberships(
+	ctx context.Context, accountID *ttnpb.OrganizationOrUserIdentifiers, entityType string,
+) (uint64, error) {
+	defer trace.StartRegion(ctx, fmt.Sprintf("count %s memberships of %s", entityType, accountID.IDString())).End()
+
+	membershipsQuery := s.queryMemberships(ctx, accountID, entityType, nil, false).
+		Select(`"direct_memberships"."entity_id"`).
+		QueryExpr()
+	query := s.query(ctx, modelForEntityType(entityType)).
+		Where(fmt.Sprintf(`"%[1]ss"."id" IN (?)`, entityType), membershipsQuery)
+	if entityType == organization {
+		query = query.
+			Joins(
+				`JOIN "accounts" ON "accounts"."account_type" = 'organization' AND "accounts"."account_id" = "organizations"."id"`, //nolint:lll
+			)
+	}
+
+	var total uint64
+	if err := query.Count(&total).Error; err != nil {
+		return 0, err
+	}
+	return total, nil
+}
+
 func (s *membershipStore) FindMemberships(
 	ctx context.Context, accountID *ttnpb.OrganizationOrUserIdentifiers, entityType string, includeIndirect bool,
 ) ([]*ttnpb.EntityIdentifiers, error) {

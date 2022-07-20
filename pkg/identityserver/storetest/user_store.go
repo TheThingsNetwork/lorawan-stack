@@ -170,6 +170,14 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 		}
 	})
 
+	t.Run("CountUsers", func(t *T) {
+		a, ctx := test.New(t)
+		got, err := s.CountUsers(ctx)
+		if a.So(err, should.BeNil) {
+			a.So(got, should.Equal, 1)
+		}
+	})
+
 	t.Run("FindUsers", func(t *T) {
 		a, ctx := test.New(t)
 		got, err := s.FindUsers(ctx, nil, mask)

@@ -94,6 +94,16 @@ func (s *clientStore) CreateClient(ctx context.Context, cli *ttnpb.Client) (*ttn
 	return &cliProto, nil
 }
 
+func (s *clientStore) CountClients(ctx context.Context) (uint64, error) {
+	defer trace.StartRegion(ctx, "count clients").End()
+
+	var total uint64
+	if err := s.query(ctx, Client{}, withClientID()).Count(&total).Error; err != nil {
+		return 0, err
+	}
+	return total, nil
+}
+
 func (s *clientStore) FindClients(
 	ctx context.Context, ids []*ttnpb.ClientIdentifiers, fieldMask store.FieldMask,
 ) ([]*ttnpb.Client, error) {

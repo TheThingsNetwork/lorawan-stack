@@ -105,7 +105,9 @@ message Application {
 
   uint32 dev_eui_counter = 9 [(thethings.flags.field) = { select: true, set: false }];
 
-  // next: 15
+  reserved 15; reserved "end_device_limit";
+
+  // next: 16
 }
 
 message Applications {

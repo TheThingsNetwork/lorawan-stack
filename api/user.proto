@@ -115,7 +115,12 @@ message User {
   // This information is public and can be seen by any authenticated user in the network.
   Picture profile_picture = 18;
 
-  // next: 21
+  reserved 21; reserved "application_limit";
+  reserved 22; reserved "client_limit";
+  reserved 23; reserved "gateway_limit";
+  reserved 24; reserved "organization_limit";
+
+  // next: 25
 }
 
 message Users {

@@ -101,6 +101,14 @@ func (st *StoreTest) TestClientStoreCRUD(t *T) {
 		// }
 	})
 
+	t.Run("CountClients", func(t *T) {
+		a, ctx := test.New(t)
+		got, err := s.CountClients(ctx)
+		if a.So(err, should.BeNil) {
+			a.So(got, should.Equal, 1)
+		}
+	})
+
 	t.Run("FindClients", func(t *T) {
 		a, ctx := test.New(t)
 		got, err := s.FindClients(ctx, nil, mask)

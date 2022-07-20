@@ -98,6 +98,16 @@ func (s *organizationStore) CreateOrganization(
 	return &orgProto, nil
 }
 
+func (s *organizationStore) CountOrganizations(ctx context.Context) (uint64, error) {
+	defer trace.StartRegion(ctx, "count organizations").End()
+
+	var total uint64
+	if err := s.query(ctx, Organization{}, withOrganizationID()).Count(&total).Error; err != nil {
+		return 0, err
+	}
+	return total, nil
+}
+
 func (s *organizationStore) FindOrganizations(
 	ctx context.Context, ids []*ttnpb.OrganizationIdentifiers, fieldMask store.FieldMask,
 ) ([]*ttnpb.Organization, error) {
