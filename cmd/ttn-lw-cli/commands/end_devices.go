@@ -361,7 +361,7 @@ var (
 				device.ClaimAuthenticationCode.Value != "" &&
 				ttnpb.HasAnyField(jsPaths, claimAuthenticationCodePaths...) {
 				logger.Warn(
-					`Storage of claim authentication code in the Join Server registry is deprecated. Use the Identity Server registry instead`,
+					`Storage of claim authentication code in the Join Server registry is deprecated. Use the Identity Server registry instead`, //nolint:lll
 				)
 			}
 			return io.Write(os.Stdout, config.OutputFormat, device)
@@ -1297,7 +1297,7 @@ This command may take end device identifiers from stdin.`,
 				device.ClaimAuthenticationCode.Value != "" &&
 				ttnpb.HasAnyField(jsPaths, claimAuthenticationCodePaths...) {
 				logger.Warn(
-					`Storage of claim authentication code in the Join Server registry is deprecated. Use the Identity Server registry instead`,
+					`Storage of claim authentication code in the Join Server registry is deprecated. Use the Identity Server registry instead`, //nolint:lll
 				)
 			}
 

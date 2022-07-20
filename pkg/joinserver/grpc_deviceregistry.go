@@ -198,7 +198,7 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 		"claim_authentication_code.value_to",
 	) {
 		log.FromContext(ctx).Warn(
-			`Storage of claim authentication code in the Join Server registry is deprecated. Use the Identity Server registry instead`, // nolint:lll
+			`Storage of claim authentication code in the Join Server registry is deprecated. Use the Identity Server registry instead`, //nolint:lll
 		)
 	}
 
