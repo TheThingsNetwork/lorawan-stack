@@ -329,7 +329,7 @@ var (
 			}
 
 			if len(jsPaths) > 0 {
-				if device.ClaimAuthenticationCode.Value != "" {
+				if device.ClaimAuthenticationCode != nil && device.ClaimAuthenticationCode.Value != "" {
 					// ClaimAuthenticationCode is already retrieved from the IS. We can unset the related JS paths.
 					jsPaths = ttnpb.ExcludeFields(jsPaths, claimAuthenticationCodePaths...)
 				}
@@ -357,10 +357,11 @@ var (
 				device.UpdatedAt = res.UpdatedAt
 			}
 
-			if device.ClaimAuthenticationCode.Value != "" && ttnpb.HasAnyField(jsPaths, claimAuthenticationCodePaths...) {
+			if device.ClaimAuthenticationCode != nil &&
+				device.ClaimAuthenticationCode.Value != "" &&
+				ttnpb.HasAnyField(jsPaths, claimAuthenticationCodePaths...) {
 				logger.Warn(
-					`Storage of claim authentication code in the Join Server registry is deprecated.
-Use the Identity Server registry instead`,
+					`Storage of claim authentication code in the Join Server registry is deprecated. Use the Identity Server registry instead`,
 				)
 			}
 			return io.Write(os.Stdout, config.OutputFormat, device)
@@ -1245,7 +1246,6 @@ This command may take end device identifiers from stdin.`,
 			}
 
 			isPaths, nsPaths, asPaths, jsPaths := splitEndDeviceGetPaths(format.FieldMask.GetPaths()...)
-
 			if len(nsPaths) > 0 {
 				isPaths = append(isPaths, "network_server_address")
 			}
@@ -1276,16 +1276,29 @@ This command may take end device identifiers from stdin.`,
 			if len(asPaths) > 0 && asMismatch {
 				return errAddressMismatchEndDevice.New()
 			}
-			if len(jsPaths) > 0 && jsMismatch {
-				return errAddressMismatchEndDevice.New()
+			if len(jsPaths) > 0 {
+				if device.ClaimAuthenticationCode != nil && device.ClaimAuthenticationCode.Value != "" {
+					// ClaimAuthenticationCode is already retrieved from the IS. We can unset the related JS paths.
+					jsPaths = ttnpb.ExcludeFields(jsPaths, claimAuthenticationCodePaths...)
+				}
+				if jsMismatch {
+					return errAddressMismatchEndDevice.New()
+				}
 			}
-
 			dev, err := getEndDevice(device.Ids, nsPaths, asPaths, jsPaths, true)
 			if err != nil {
 				return err
 			}
 			if err := device.SetFields(dev, append(append(nsPaths, asPaths...), jsPaths...)...); err != nil {
 				return err
+			}
+
+			if device.ClaimAuthenticationCode != nil &&
+				device.ClaimAuthenticationCode.Value != "" &&
+				ttnpb.HasAnyField(jsPaths, claimAuthenticationCodePaths...) {
+				logger.Warn(
+					`Storage of claim authentication code in the Join Server registry is deprecated. Use the Identity Server registry instead`,
+				)
 			}
 
 			size, _ := cmd.Flags().GetUint32("size")

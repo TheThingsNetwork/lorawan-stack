@@ -229,6 +229,10 @@ func (is *IdentityServer) getEndDevice(ctx context.Context, req *ttnpb.GetEndDev
 		defer func() { is.setFullEndDevicePictureURL(ctx, dev) }()
 	}
 
+	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.GetPaths()), "claim_authentication_code") {
+		req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "claim_authentication_code")
+	}
+
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		dev, err = st.GetEndDevice(ctx, req.EndDeviceIds, req.FieldMask.GetPaths())
 		return err
