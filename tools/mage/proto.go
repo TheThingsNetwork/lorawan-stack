@@ -34,7 +34,7 @@ const (
 	jsonProtoImage        = "ghcr.io/thethingsindustries/protoc:3.9.1-gen-go-json-1.4.0"
 	fieldMaskProtoImage   = "ghcr.io/thethingsindustries/protoc:3.9.1-gen-fieldmask-0.6.0"
 	grpcGatewayProtoImage = "ghcr.io/thethingsindustries/protoc:gen-grpc-gateway-1.16.0"
-	swaggerProtoImage     = "ghcr.io/thethingsindustries/protoc:gen-grpc-gateway-1.16.0"
+	openAPIv2ProtoImage   = "ghcr.io/thethingsindustries/protoc:gen-grpc-gateway-2.10.3"
 	docProtoImage         = "ghcr.io/thethingsindustries/protoc:gen-doc-1.4.1"
 	flagProtoImage        = "ghcr.io/thethingsindustries/protoc:3.9.1-gen-go-flags-1.0.3"
 )
@@ -212,9 +212,10 @@ func (p Proto) Swagger(context.Context) error {
 	if !ok {
 		return nil
 	}
-	return withProtoc(swaggerProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
+	return withProtoc(openAPIv2ProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
-			fmt.Sprintf("--swagger_out=allow_merge,merge_file_name=api:%s/api", pCtx.WorkingDirectory),
+			"--openapiv2_opt=json_names_for_fields=false",
+			fmt.Sprintf("--openapiv2_out=allow_merge,merge_file_name=api:%s/api", pCtx.WorkingDirectory),
 			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
 			return fmt.Errorf("failed to generate protos: %w", err)

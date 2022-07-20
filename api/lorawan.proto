@@ -21,6 +21,7 @@ import "github.com/TheThingsIndustries/protoc-gen-go-json/annotations.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "lorawan-stack/api/identifiers.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 package ttn.lorawan.v3;
 
@@ -161,7 +162,13 @@ message MACPayload {
 }
 
 message FHDR {
-  bytes dev_addr = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr"];
+  bytes dev_addr = 1 [
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr",
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"2600ABCD\""
+    }
+  ];
   FCtrl f_ctrl = 2 [(validate.rules).message.required = true];
   uint32 f_cnt = 3 [(validate.rules).uint32.lte = 65535];
   bytes f_opts = 4 [(validate.rules).bytes.max_len = 15];
@@ -176,9 +183,27 @@ message FCtrl {
 }
 
 message JoinRequestPayload {
-  bytes join_eui = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
-  bytes dev_eui = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
-  bytes dev_nonce = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevNonce"];
+  bytes join_eui = 1 [
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64",
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"70B3D57ED000ABCD\""
+    }
+  ];
+  bytes dev_eui = 2 [
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64",
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"70B3D57ED000ABCD\""
+    }
+  ];
+  bytes dev_nonce = 3 [
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevNonce",
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"ABCD\""
+    }
+  ];
 }
 
 enum JoinRequestType {
@@ -200,17 +225,53 @@ enum RejoinRequestType {
 
 message RejoinRequestPayload {
   RejoinRequestType rejoin_type = 1 [(validate.rules).enum.defined_only = true];
-  bytes net_id = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID"];
-  bytes join_eui = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
-  bytes dev_eui = 4 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
+  bytes net_id = 2 [
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID",
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"000013\""
+    }
+  ];
+  bytes join_eui = 3 [
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64",
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"70B3D57ED000ABCD\""
+    }
+  ];
+  bytes dev_eui = 4 [
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64",
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"70B3D57ED000ABCD\""
+    }
+  ];
   uint32 rejoin_cnt = 5; // Contains RJCount0 or RJCount1 depending on rejoin_type.
 }
 
 message JoinAcceptPayload {
   bytes encrypted = 1;
-  bytes join_nonce = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.JoinNonce"];
-  bytes net_id = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID"];
-  bytes dev_addr = 4 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr"];
+  bytes join_nonce = 2 [
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.JoinNonce",
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"ABCDEF\""
+    }
+  ];
+  bytes net_id = 3 [
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID",
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"000013\""
+    }
+  ];
+  bytes dev_addr = 4 [
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr",
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"2600ABCD\""
+    }
+  ];
   DLSettings dl_settings = 5 [(validate.rules).message.required = true];
   RxDelay rx_delay = 6 [(validate.rules).enum.defined_only = true];
   CFList cf_list = 7;

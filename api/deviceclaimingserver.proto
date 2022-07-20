@@ -21,6 +21,7 @@ import "google/protobuf/struct.proto";
 import "google/protobuf/empty.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "github.com/TheThingsIndustries/protoc-gen-go-json/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 package ttn.lorawan.v3;
 
@@ -37,6 +38,9 @@ message ClaimEndDeviceRequest {
       (thethings.json.field) = {
         marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
         unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal8Bytes"
+      },
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        type: STRING, format: "string", example: "\"70B3D57ED000ABCD\""
       }
     ];
     // DevEUI of the device to claim.
@@ -45,6 +49,9 @@ message ClaimEndDeviceRequest {
       (thethings.json.field) = {
         marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
         unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal8Bytes"
+      },
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        type: STRING, format: "string", example: "\"70B3D57ED000ABCD\""
       }
     ];
     // Authentication code to prove ownership.
@@ -85,6 +92,9 @@ message ClaimEndDeviceRequest {
     (thethings.json.field) = {
       marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
       unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal3Bytes"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"000013\""
     }
   ];
 
@@ -105,6 +115,9 @@ message GetInfoByJoinEUIRequest {
     (thethings.json.field) = {
       marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
       unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal8Bytes"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"70B3D57ED000ABCD\""
     }
   ];
 }
@@ -115,6 +128,9 @@ message GetInfoByJoinEUIResponse {
     (thethings.json.field) = {
       marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
       unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal8Bytes"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"70B3D57ED000ABCD\""
     }
   ];
   // If set, this Join EUI is available for claiming on one of the configured Join Servers.
@@ -128,6 +144,9 @@ message GetClaimStatusResponse {
     (thethings.json.field) = {
       marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
       unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal3Bytes"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"000013\""
     }
   ];
   bytes home_ns_id = 3 [
@@ -135,6 +154,9 @@ message GetClaimStatusResponse {
     (thethings.json.field) = {
       marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
       unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal8Bytes"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"70B3D57ED000ABCD\""
     }
   ];
 
@@ -231,6 +253,9 @@ message ClaimGatewayRequest {
       (thethings.json.field) = {
         marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
         unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal8Bytes"
+      },
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        type: STRING, format: "string", example: "\"70B3D57ED000ABCD\""
       }
     ];
     bytes authentication_code = 2 [(validate.rules).bytes.max_len = 2048];
