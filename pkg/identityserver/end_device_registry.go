@@ -156,7 +156,7 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 	}
 	defer func() { is.setFullEndDevicePictureURL(ctx, dev) }()
 
-	// Store plaintext value to return in the update response to clients.
+	// Store plaintext value to return in the response to clients.
 	var ptCACSecret string
 
 	if req.EndDevice.ClaimAuthenticationCode != nil {
@@ -350,7 +350,7 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 		defer func() { is.setFullEndDevicePictureURL(ctx, dev) }()
 	}
 
-	// Store plaintext value to return in the update response to clients.
+	// Store plaintext value to return in the response to clients.
 	var ptCACSecret string
 
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "claim_authentication_code") && req.EndDevice.ClaimAuthenticationCode != nil {
@@ -369,10 +369,10 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 			}
 			// Store the encrypted value along with the ID of the key used to encrypt it.
 			req.EndDevice.ClaimAuthenticationCode.Value = fmt.Sprintf(
-				"%s:%s:%s",
+				"%s%s%s",
 				is.config.EndDevices.EncryptionKeyID,
 				endDeviceAuthenticationCodeSeparator,
-				encrypted,
+				hex.EncodeToString(encrypted),
 			)
 		} else {
 			log.FromContext(ctx).Debug("No encryption key defined, store end device claim authentication code directly in plaintext")

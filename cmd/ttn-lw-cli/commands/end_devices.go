@@ -53,6 +53,13 @@ var (
 
 	selectAllEndDeviceFlags = util.SelectAllFlagSet("end devices")
 	toUnderscore            = strings.NewReplacer("-", "_")
+
+	claimAuthenticationCodePaths = []string{
+		"claim_authentication_code",
+		"claim_authentication_code.value",
+		"claim_authentication_code.valid_from",
+		"claim_authentication_code.valid_to",
+	}
 )
 
 func selectEndDeviceIDFlags() *pflag.FlagSet {
@@ -320,9 +327,16 @@ var (
 				logger.WithField("paths", asPaths).Warn("Deselecting Application Server paths")
 				asPaths = nil
 			}
-			if len(jsPaths) > 0 && jsMismatch {
-				logger.WithField("paths", jsPaths).Warn("Deselecting Join Server paths")
-				jsPaths = nil
+
+			if len(jsPaths) > 0 {
+				if device.ClaimAuthenticationCode != nil {
+					// ClaimAuthenticationCode is already retrieved from the IS. We can unset the related JS paths.
+					jsPaths = ttnpb.ExcludeFields(jsPaths, claimAuthenticationCodePaths...)
+				}
+				if jsMismatch {
+					logger.WithField("paths", jsPaths).Warn("Deselecting Join Server paths")
+					jsPaths = nil
+				}
 			}
 
 			res, err := getEndDevice(device.Ids, nsPaths, asPaths, jsPaths, true)
@@ -622,10 +636,16 @@ var (
 				}
 			}
 
-			// Require EUIs for devices that need to be added to the Join Server.
-			if len(jsPaths) > 0 && (device.Ids.JoinEui == nil || device.Ids.DevEui == nil) {
-				return errNoEndDeviceEUI.New()
+			if len(jsPaths) > 0 {
+				// Remove Claim Authentication Code related paths from the call to the JS registry.
+				jsPaths = ttnpb.ExcludeFields(jsPaths, claimAuthenticationCodePaths...)
+
+				// Require EUIs for devices that need to be added to the Join Server.
+				if device.Ids.JoinEui == nil || device.Ids.DevEui == nil {
+					return errNoEndDeviceEUI.New()
+				}
 			}
+
 			isDevice := &ttnpb.EndDevice{}
 			logger.WithField("paths", isPaths).Debug("Create end device on Identity Server")
 			if err := isDevice.SetFields(device, append(isPaths, "ids")...); err != nil {
@@ -728,6 +748,8 @@ var (
 				isPaths = append(isPaths, "application_server_address")
 			}
 			if len(jsPaths) > 0 && config.JoinServerEnabled {
+				// Remove Claim Authentication Code related paths from the call to the JS registry.
+				jsPaths = ttnpb.ExcludeFields(jsPaths, claimAuthenticationCodePaths...)
 				if device.JoinServerAddress == "" {
 					device.JoinServerAddress = getHost(config.JoinServerGRPCAddress)
 				}
