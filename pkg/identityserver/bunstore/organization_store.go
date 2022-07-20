@@ -247,6 +247,21 @@ func (*organizationStore) selectWithFields(q *bun.SelectQuery, fieldMask store.F
 	return q, nil
 }
 
+func (s *organizationStore) CountOrganizations(ctx context.Context) (uint64, error) {
+	selectQuery := s.DB.NewSelect().
+		Model(&Organization{}).
+		Apply(selectWithSoftDeletedFromContext(ctx)).
+		Apply(selectWithContext(ctx))
+
+	// Count the total number of results.
+	count, err := selectQuery.Count(ctx)
+	if err != nil {
+		return 0, wrapDriverError(err)
+	}
+
+	return uint64(count), nil
+}
+
 func (s *organizationStore) listOrganizationsBy(
 	ctx context.Context,
 	by func(*bun.SelectQuery) *bun.SelectQuery,

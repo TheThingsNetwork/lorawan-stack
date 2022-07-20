@@ -273,6 +273,21 @@ func (*clientStore) selectWithFields(q *bun.SelectQuery, fieldMask store.FieldMa
 	return q, nil
 }
 
+func (s *clientStore) CountClients(ctx context.Context) (uint64, error) {
+	selectQuery := s.DB.NewSelect().
+		Model(&Client{}).
+		Apply(selectWithSoftDeletedFromContext(ctx)).
+		Apply(selectWithContext(ctx))
+
+	// Count the total number of results.
+	count, err := selectQuery.Count(ctx)
+	if err != nil {
+		return 0, wrapDriverError(err)
+	}
+
+	return uint64(count), nil
+}
+
 func (s *clientStore) listClientsBy(
 	ctx context.Context,
 	by func(*bun.SelectQuery) *bun.SelectQuery,

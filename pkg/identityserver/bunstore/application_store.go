@@ -245,6 +245,21 @@ func (*applicationStore) selectWithFields(q *bun.SelectQuery, fieldMask store.Fi
 	return q, nil
 }
 
+func (s *applicationStore) CountApplications(ctx context.Context) (uint64, error) {
+	selectQuery := s.DB.NewSelect().
+		Model(&Application{}).
+		Apply(selectWithSoftDeletedFromContext(ctx)).
+		Apply(selectWithContext(ctx))
+
+	// Count the total number of results.
+	count, err := selectQuery.Count(ctx)
+	if err != nil {
+		return 0, wrapDriverError(err)
+	}
+
+	return uint64(count), nil
+}
+
 func (s *applicationStore) listApplicationsBy(
 	ctx context.Context,
 	by func(*bun.SelectQuery) *bun.SelectQuery,

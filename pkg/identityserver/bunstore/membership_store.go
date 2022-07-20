@@ -131,6 +131,29 @@ func (s *membershipStore) selectWithUUIDsInMemberships(
 	}, nil
 }
 
+func (s *membershipStore) CountMemberships(
+	ctx context.Context, accountID *ttnpb.OrganizationOrUserIdentifiers, entityType string,
+) (uint64, error) {
+	account, err := s.getAccountModel(ctx, accountID.EntityType(), accountID.IDString())
+	if err != nil {
+		return 0, err
+	}
+
+	selectQuery := s.DB.NewSelect().
+		Table("direct_entity_memberships").
+		Column("entity_id").
+		Where("account_id = ?", account.ID).
+		Where("entity_type = ?", entityType)
+
+	// Count the total number of results.
+	count, err := selectQuery.Count(ctx)
+	if err != nil {
+		return 0, wrapDriverError(err)
+	}
+
+	return uint64(count), nil
+}
+
 func (s *membershipStore) FindMemberships(
 	ctx context.Context, accountID *ttnpb.OrganizationOrUserIdentifiers, entityType string, includeIndirect bool,
 ) ([]*ttnpb.EntityIdentifiers, error) {

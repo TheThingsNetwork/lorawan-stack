@@ -409,6 +409,21 @@ func (*gatewayStore) selectWithFields(q *bun.SelectQuery, fieldMask store.FieldM
 	return q, nil
 }
 
+func (s *gatewayStore) CountGateways(ctx context.Context) (uint64, error) {
+	selectQuery := s.DB.NewSelect().
+		Model(&Gateway{}).
+		Apply(selectWithSoftDeletedFromContext(ctx)).
+		Apply(selectWithContext(ctx))
+
+	// Count the total number of results.
+	count, err := selectQuery.Count(ctx)
+	if err != nil {
+		return 0, wrapDriverError(err)
+	}
+
+	return uint64(count), nil
+}
+
 func (s *gatewayStore) listGatewaysBy(
 	ctx context.Context,
 	by func(*bun.SelectQuery) *bun.SelectQuery,
