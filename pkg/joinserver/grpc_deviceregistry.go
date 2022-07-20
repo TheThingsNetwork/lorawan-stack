@@ -191,8 +191,19 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 		return nil, errNoDevEUI.New()
 	}
 
+	if ttnpb.HasAnyField(
+		req.FieldMask.GetPaths(),
+		"claim_authentication_code.value",
+		"claim_authentication_code.valid_from",
+		"claim_authentication_code.value_to",
+	) {
+		log.FromContext(ctx).Warn(
+			`Storage of claim authentication code in the Join Server registry is deprecated. Use the Identity Server registry instead`, // nolint:lll
+		)
+	}
+
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "root_keys.app_key.key") &&
-		types.MustAES128Key(req.EndDevice.GetRootKeys().GetAppKey().GetKey()).OrZero().IsZero() {
+		types.MustAES128Key(req.EndDevice.GetRootKeys().GetAppKey().GetKey()).OrZero().IsZero() { {
 		return nil, errInvalidFieldValue.WithAttributes("field", "root_keys.app_key.key")
 	}
 

@@ -181,7 +181,9 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 				hex.EncodeToString(encrypted),
 			)
 		} else {
-			log.FromContext(ctx).Debug("No encryption key defined, store end device claim authentication code directly in plaintext")
+			log.FromContext(ctx).Debug(
+				"No encryption key defined, store end device claim authentication code directly in plaintext",
+			)
 		}
 	}
 
@@ -353,7 +355,10 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 	// Store plaintext value to return in the response to clients.
 	var ptCACSecret string
 
-	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "claim_authentication_code") && req.EndDevice.ClaimAuthenticationCode != nil {
+	if ttnpb.HasAnyField(
+		req.FieldMask.GetPaths(),
+		"claim_authentication_code",
+	) && req.EndDevice.ClaimAuthenticationCode != nil {
 		if err = validateEndDeviceAuthenticationCode(*req.EndDevice.ClaimAuthenticationCode); err != nil {
 			return nil, err
 		}
@@ -375,7 +380,9 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 				hex.EncodeToString(encrypted),
 			)
 		} else {
-			log.FromContext(ctx).Debug("No encryption key defined, store end device claim authentication code directly in plaintext")
+			log.FromContext(ctx).Debug(
+				"No encryption key defined, store end device claim authentication code directly in plaintext",
+			)
 		}
 	}
 
@@ -426,8 +433,9 @@ func (is *IdentityServer) deleteEndDevice(ctx context.Context, ids *ttnpb.EndDev
 }
 
 func validateEndDeviceAuthenticationCode(authCode ttnpb.EndDeviceAuthenticationCode) error {
-	if validFrom, validTo := ttnpb.StdTime(authCode.ValidFrom), ttnpb.StdTime(authCode.ValidTo); validFrom != nil && validTo != nil {
-		if validTo.Before(*validFrom) {
+	if validFrom, validTo := ttnpb.StdTime(authCode.ValidFrom), ttnpb.StdTime(authCode.ValidTo); validFrom != nil &&
+		validTo != nil {
+		if validTo.Before(*validFrom) || authCode.Value == "" {
 			return errClaimAuthenticationCode.New()
 		}
 	}

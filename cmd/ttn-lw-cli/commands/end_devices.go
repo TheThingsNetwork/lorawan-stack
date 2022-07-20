@@ -329,7 +329,7 @@ var (
 			}
 
 			if len(jsPaths) > 0 {
-				if device.ClaimAuthenticationCode != nil {
+				if device.ClaimAuthenticationCode.Value != "" {
 					// ClaimAuthenticationCode is already retrieved from the IS. We can unset the related JS paths.
 					jsPaths = ttnpb.ExcludeFields(jsPaths, claimAuthenticationCodePaths...)
 				}
@@ -357,6 +357,12 @@ var (
 				device.UpdatedAt = res.UpdatedAt
 			}
 
+			if device.ClaimAuthenticationCode.Value != "" && ttnpb.HasAnyField(jsPaths, claimAuthenticationCodePaths...) {
+				logger.Warn(
+					`Storage of claim authentication code in the Join Server registry is deprecated.
+Use the Identity Server registry instead`,
+				)
+			}
 			return io.Write(os.Stdout, config.OutputFormat, device)
 		},
 	}
