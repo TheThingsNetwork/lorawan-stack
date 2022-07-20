@@ -23,6 +23,7 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 import "lorawan-stack/api/enums.proto";
 import "lorawan-stack/api/identifiers.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 package ttn.lorawan.v3;
 
@@ -129,6 +130,9 @@ message PacketBrokerMetadata {
     (thethings.json.field) = {
       marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
       unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal3Bytes"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"000013\""
     }
   ];
   // Tenant ID managed by the Packet Broker Forwarder Member.
@@ -141,6 +145,9 @@ message PacketBrokerMetadata {
     (thethings.json.field) = {
       marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
       unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal8Bytes"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"70B3D57ED000ABCD\""
     }
   ];
   // Forwarder gateway ID.
@@ -151,6 +158,9 @@ message PacketBrokerMetadata {
     (thethings.json.field) = {
       marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
       unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal3Bytes"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"000013\""
     }
   ];
   // Tenant ID managed by the Packet Broker Home Network Member.

@@ -945,7 +945,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "join_eui",
@@ -953,7 +953,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "dev_addr",
@@ -961,7 +961,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           }
         ],
         "tags": [
@@ -1175,17 +1175,20 @@
                         },
                         "dev_eui": {
                           "type": "string",
-                          "format": "byte",
+                          "format": "string",
+                          "example": "70B3D57ED000ABCD",
                           "description": "The LoRaWAN DevEUI."
                         },
                         "join_eui": {
                           "type": "string",
-                          "format": "byte",
+                          "format": "string",
+                          "example": "70B3D57ED000ABCD",
                           "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices)."
                         },
                         "dev_addr": {
                           "type": "string",
-                          "format": "byte",
+                          "format": "string",
+                          "example": "2600ABCD",
                           "description": "The LoRaWAN DevAddr."
                         }
                       }
@@ -1300,7 +1303,8 @@
                     },
                     "net_id": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "000013",
                       "description": "Home NetID. Stored in Join Server."
                     },
                     "mac_settings": {
@@ -1476,17 +1480,20 @@
                         },
                         "dev_eui": {
                           "type": "string",
-                          "format": "byte",
+                          "format": "string",
+                          "example": "70B3D57ED000ABCD",
                           "description": "The LoRaWAN DevEUI."
                         },
                         "join_eui": {
                           "type": "string",
-                          "format": "byte",
+                          "format": "string",
+                          "example": "70B3D57ED000ABCD",
                           "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices)."
                         },
                         "dev_addr": {
                           "type": "string",
-                          "format": "byte",
+                          "format": "string",
+                          "example": "2600ABCD",
                           "description": "The LoRaWAN DevAddr."
                         }
                       }
@@ -1601,7 +1608,8 @@
                     },
                     "net_id": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "000013",
                       "description": "Home NetID. Stored in Join Server."
                     },
                     "mac_settings": {
@@ -1769,7 +1777,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "end_device_ids.join_eui",
@@ -1777,7 +1785,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "end_device_ids.dev_addr",
@@ -1785,7 +1793,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "field_mask",
@@ -1838,7 +1846,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "join_eui",
@@ -1846,7 +1854,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "dev_addr",
@@ -1854,7 +1862,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           }
         ],
         "tags": [
@@ -1899,7 +1907,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "join_eui",
@@ -1907,7 +1915,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "dev_addr",
@@ -1915,7 +1923,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           }
         ],
         "tags": [
@@ -1960,7 +1968,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "join_eui",
@@ -1968,7 +1976,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "dev_addr",
@@ -1976,7 +1984,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           }
         ],
         "tags": [
@@ -2161,7 +2169,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "end_device_ids.join_eui",
@@ -2169,7 +2177,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "end_device_ids.dev_addr",
@@ -2177,7 +2185,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "limit",
@@ -2282,7 +2290,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "end_device_ids.join_eui",
@@ -2290,7 +2298,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "end_device_ids.dev_addr",
@@ -2298,7 +2306,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "after",
@@ -2490,17 +2498,20 @@
                             },
                             "dev_eui": {
                               "type": "string",
-                              "format": "byte",
+                              "format": "string",
+                              "example": "70B3D57ED000ABCD",
                               "description": "The LoRaWAN DevEUI."
                             },
                             "join_eui": {
                               "type": "string",
-                              "format": "byte",
+                              "format": "string",
+                              "example": "70B3D57ED000ABCD",
                               "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices)."
                             },
                             "dev_addr": {
                               "type": "string",
-                              "format": "byte",
+                              "format": "string",
+                              "example": "2600ABCD",
                               "description": "The LoRaWAN DevAddr."
                             }
                           }
@@ -2659,17 +2670,20 @@
                         },
                         "dev_eui": {
                           "type": "string",
-                          "format": "byte",
+                          "format": "string",
+                          "example": "70B3D57ED000ABCD",
                           "description": "The LoRaWAN DevEUI."
                         },
                         "join_eui": {
                           "type": "string",
-                          "format": "byte",
+                          "format": "string",
+                          "example": "70B3D57ED000ABCD",
                           "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices)."
                         },
                         "dev_addr": {
                           "type": "string",
-                          "format": "byte",
+                          "format": "string",
+                          "example": "2600ABCD",
                           "description": "The LoRaWAN DevAddr."
                         }
                       }
@@ -2784,7 +2798,8 @@
                     },
                     "net_id": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "000013",
                       "description": "Home NetID. Stored in Join Server."
                     },
                     "mac_settings": {
@@ -2964,17 +2979,20 @@
                         },
                         "dev_eui": {
                           "type": "string",
-                          "format": "byte",
+                          "format": "string",
+                          "example": "70B3D57ED000ABCD",
                           "description": "The LoRaWAN DevEUI."
                         },
                         "join_eui": {
                           "type": "string",
-                          "format": "byte",
+                          "format": "string",
+                          "example": "70B3D57ED000ABCD",
                           "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices)."
                         },
                         "dev_addr": {
                           "type": "string",
-                          "format": "byte",
+                          "format": "string",
+                          "example": "2600ABCD",
                           "description": "The LoRaWAN DevAddr."
                         }
                       }
@@ -3089,7 +3107,8 @@
                     },
                     "net_id": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "000013",
                       "description": "Home NetID. Stored in Join Server."
                     },
                     "mac_settings": {
@@ -3257,7 +3276,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "end_device_ids.join_eui",
@@ -3265,7 +3284,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "end_device_ids.dev_addr",
@@ -3273,7 +3292,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "field_mask",
@@ -3333,17 +3352,20 @@
                     },
                     "dev_eui": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "70B3D57ED000ABCD",
                       "description": "The LoRaWAN DevEUI."
                     },
                     "join_eui": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "70B3D57ED000ABCD",
                       "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices)."
                     },
                     "dev_addr": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "2600ABCD",
                       "description": "The LoRaWAN DevAddr."
                     }
                   }
@@ -3414,17 +3436,20 @@
                     },
                     "dev_eui": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "70B3D57ED000ABCD",
                       "description": "The LoRaWAN DevEUI."
                     },
                     "join_eui": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "70B3D57ED000ABCD",
                       "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices)."
                     },
                     "dev_addr": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "2600ABCD",
                       "description": "The LoRaWAN DevAddr."
                     }
                   }
@@ -3497,17 +3522,20 @@
                     },
                     "dev_eui": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "70B3D57ED000ABCD",
                       "description": "The LoRaWAN DevEUI."
                     },
                     "join_eui": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "70B3D57ED000ABCD",
                       "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices)."
                     },
                     "dev_addr": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "2600ABCD",
                       "description": "The LoRaWAN DevAddr."
                     }
                   }
@@ -3574,17 +3602,20 @@
                     },
                     "dev_eui": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "70B3D57ED000ABCD",
                       "description": "The LoRaWAN DevEUI."
                     },
                     "join_eui": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "70B3D57ED000ABCD",
                       "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices)."
                     },
                     "dev_addr": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "2600ABCD",
                       "description": "The LoRaWAN DevAddr."
                     }
                   }
@@ -3649,7 +3680,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "end_device_ids.join_eui",
@@ -3657,7 +3688,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "end_device_ids.dev_addr",
@@ -3665,7 +3696,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           }
         ],
         "tags": [
@@ -3726,7 +3757,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "end_device_ids.join_eui",
@@ -3734,7 +3765,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "end_device_ids.dev_addr",
@@ -3742,7 +3773,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "limit",
@@ -3847,7 +3878,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "end_device_ids.join_eui",
@@ -3855,7 +3886,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "end_device_ids.dev_addr",
@@ -3863,7 +3894,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "after",
@@ -3947,17 +3978,20 @@
                     },
                     "dev_eui": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "70B3D57ED000ABCD",
                       "description": "The LoRaWAN DevEUI."
                     },
                     "join_eui": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "70B3D57ED000ABCD",
                       "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices)."
                     },
                     "dev_addr": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "2600ABCD",
                       "description": "The LoRaWAN DevAddr."
                     }
                   }
@@ -4030,17 +4064,20 @@
                     },
                     "dev_eui": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "70B3D57ED000ABCD",
                       "description": "The LoRaWAN DevEUI."
                     },
                     "join_eui": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "70B3D57ED000ABCD",
                       "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices)."
                     },
                     "dev_addr": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "2600ABCD",
                       "description": "The LoRaWAN DevAddr."
                     }
                   }
@@ -4137,7 +4174,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "ids.join_eui",
@@ -4145,7 +4182,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "ids.dev_addr",
@@ -4153,7 +4190,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "limit",
@@ -4324,7 +4361,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "ids.end_device_ids.join_eui",
@@ -4332,7 +4369,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "ids.end_device_ids.dev_addr",
@@ -4340,7 +4377,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "field_mask",
@@ -6927,7 +6964,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "join_eui",
@@ -6935,7 +6972,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "dev_addr",
@@ -6943,7 +6980,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           }
         ],
         "tags": [
@@ -6987,7 +7024,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "join_eui",
@@ -6995,7 +7032,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "dev_addr",
@@ -7003,7 +7040,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           }
         ],
         "tags": [
@@ -7271,7 +7308,8 @@
                       "properties": {
                         "eui": {
                           "type": "string",
-                          "format": "byte",
+                          "format": "string",
+                          "example": "70B3D57ED000ABCD",
                           "description": "Secondary identifier, which can only be used in specific requests."
                         }
                       },
@@ -7452,7 +7490,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "field_mask",
@@ -7498,7 +7536,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "order",
@@ -7564,7 +7602,8 @@
                   "properties": {
                     "eui": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "70B3D57ED000ABCD",
                       "description": "Secondary identifier, which can only be used in specific requests."
                     }
                   }
@@ -7635,7 +7674,8 @@
                   "properties": {
                     "eui": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "70B3D57ED000ABCD",
                       "description": "Secondary identifier, which can only be used in specific requests."
                     }
                   }
@@ -7723,7 +7763,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           }
         ],
         "tags": [
@@ -7769,7 +7809,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "collaborator.user_ids.user_id",
@@ -7829,7 +7869,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "collaborator.organization_ids.organization_id",
@@ -7882,7 +7922,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "limit",
@@ -7942,7 +7982,8 @@
                   "properties": {
                     "eui": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "70B3D57ED000ABCD",
                       "description": "Secondary identifier, which can only be used in specific requests."
                     }
                   }
@@ -7991,7 +8032,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           }
         ],
         "tags": [
@@ -8031,7 +8072,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           }
         ],
         "tags": [
@@ -8072,7 +8113,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           }
         ],
         "tags": [
@@ -8111,7 +8152,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           }
         ],
         "tags": [
@@ -8190,7 +8231,8 @@
                   "properties": {
                     "eui": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "70B3D57ED000ABCD",
                       "description": "Secondary identifier, which can only be used in specific requests."
                     }
                   }
@@ -8239,7 +8281,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           }
         ],
         "tags": [
@@ -8289,7 +8331,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "type",
@@ -8351,7 +8393,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           }
         ],
         "tags": [
@@ -8423,7 +8465,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           }
         ],
         "tags": [
@@ -8462,7 +8504,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           }
         ],
         "tags": [
@@ -8501,7 +8543,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           }
         ],
         "tags": [
@@ -8672,7 +8714,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "join_eui",
@@ -8680,7 +8722,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "dev_addr",
@@ -8688,7 +8730,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           }
         ],
         "tags": [
@@ -8931,17 +8973,20 @@
                         },
                         "dev_eui": {
                           "type": "string",
-                          "format": "byte",
+                          "format": "string",
+                          "example": "70B3D57ED000ABCD",
                           "description": "The LoRaWAN DevEUI."
                         },
                         "join_eui": {
                           "type": "string",
-                          "format": "byte",
+                          "format": "string",
+                          "example": "70B3D57ED000ABCD",
                           "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices)."
                         },
                         "dev_addr": {
                           "type": "string",
-                          "format": "byte",
+                          "format": "string",
+                          "example": "2600ABCD",
                           "description": "The LoRaWAN DevAddr."
                         }
                       }
@@ -9056,7 +9101,8 @@
                     },
                     "net_id": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "000013",
                       "description": "Home NetID. Stored in Join Server."
                     },
                     "mac_settings": {
@@ -9236,17 +9282,20 @@
                         },
                         "dev_eui": {
                           "type": "string",
-                          "format": "byte",
+                          "format": "string",
+                          "example": "70B3D57ED000ABCD",
                           "description": "The LoRaWAN DevEUI."
                         },
                         "join_eui": {
                           "type": "string",
-                          "format": "byte",
+                          "format": "string",
+                          "example": "70B3D57ED000ABCD",
                           "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices)."
                         },
                         "dev_addr": {
                           "type": "string",
-                          "format": "byte",
+                          "format": "string",
+                          "example": "2600ABCD",
                           "description": "The LoRaWAN DevAddr."
                         }
                       }
@@ -9361,7 +9410,8 @@
                     },
                     "net_id": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "000013",
                       "description": "Home NetID. Stored in Join Server."
                     },
                     "mac_settings": {
@@ -9529,7 +9579,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "end_device_ids.join_eui",
@@ -9537,7 +9587,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "end_device_ids.dev_addr",
@@ -9545,7 +9595,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "field_mask",
@@ -9644,7 +9694,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "join_eui",
@@ -9652,7 +9702,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "dev_addr",
@@ -9660,7 +9710,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           }
         ],
         "tags": [
@@ -9714,17 +9764,20 @@
                         },
                         "dev_eui": {
                           "type": "string",
-                          "format": "byte",
+                          "format": "string",
+                          "example": "70B3D57ED000ABCD",
                           "description": "The LoRaWAN DevEUI."
                         },
                         "join_eui": {
                           "type": "string",
-                          "format": "byte",
+                          "format": "string",
+                          "example": "70B3D57ED000ABCD",
                           "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices)."
                         },
                         "dev_addr": {
                           "type": "string",
-                          "format": "byte",
+                          "format": "string",
+                          "example": "2600ABCD",
                           "description": "The LoRaWAN DevAddr."
                         }
                       }
@@ -9839,7 +9892,8 @@
                     },
                     "net_id": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "000013",
                       "description": "Home NetID. Stored in Join Server."
                     },
                     "mac_settings": {
@@ -10019,17 +10073,20 @@
                         },
                         "dev_eui": {
                           "type": "string",
-                          "format": "byte",
+                          "format": "string",
+                          "example": "70B3D57ED000ABCD",
                           "description": "The LoRaWAN DevEUI."
                         },
                         "join_eui": {
                           "type": "string",
-                          "format": "byte",
+                          "format": "string",
+                          "example": "70B3D57ED000ABCD",
                           "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices)."
                         },
                         "dev_addr": {
                           "type": "string",
-                          "format": "byte",
+                          "format": "string",
+                          "example": "2600ABCD",
                           "description": "The LoRaWAN DevAddr."
                         }
                       }
@@ -10144,7 +10201,8 @@
                     },
                     "net_id": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "000013",
                       "description": "Home NetID. Stored in Join Server."
                     },
                     "mac_settings": {
@@ -10312,7 +10370,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "end_device_ids.join_eui",
@@ -10320,7 +10378,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "end_device_ids.dev_addr",
@@ -10328,7 +10386,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "format": "byte"
+            "format": "string"
           },
           {
             "name": "field_mask",
@@ -10387,17 +10445,20 @@
                     },
                     "dev_eui": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "70B3D57ED000ABCD",
                       "description": "The LoRaWAN DevEUI."
                     },
                     "join_eui": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "70B3D57ED000ABCD",
                       "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices)."
                     },
                     "dev_addr": {
                       "type": "string",
-                      "format": "byte",
+                      "format": "string",
+                      "example": "2600ABCD",
                       "description": "The LoRaWAN DevAddr."
                     }
                   }
@@ -16469,11 +16530,13 @@
         },
         "dev_addr": {
           "type": "string",
-          "format": "byte"
+          "format": "string",
+          "example": "2600ABCD"
         },
         "net_id": {
           "type": "string",
-          "format": "byte"
+          "format": "string",
+          "example": "000013"
         }
       }
     },
@@ -16554,7 +16617,8 @@
       "properties": {
         "join_eui": {
           "type": "string",
-          "format": "byte"
+          "format": "string",
+          "example": "70B3D57ED000ABCD"
         }
       }
     },
@@ -16563,7 +16627,8 @@
       "properties": {
         "join_eui": {
           "type": "string",
-          "format": "byte"
+          "format": "string",
+          "example": "70B3D57ED000ABCD"
         },
         "end_device_ids": {
           "type": "array",
@@ -16578,11 +16643,13 @@
       "properties": {
         "join_eui": {
           "type": "string",
-          "format": "byte"
+          "format": "string",
+          "example": "70B3D57ED000ABCD"
         },
         "start_dev_eui": {
           "type": "string",
-          "format": "byte",
+          "format": "string",
+          "example": "70B3D57ED000ABCD",
           "description": "DevEUI to start issuing from."
         }
       }
@@ -16773,7 +16840,8 @@
         },
         "eui": {
           "type": "string",
-          "format": "byte",
+          "format": "string",
+          "example": "70B3D57ED000ABCD",
           "description": "Secondary identifier, which can only be used in specific requests."
         }
       }
@@ -16906,7 +16974,8 @@
         },
         "forwarder_net_id": {
           "type": "string",
-          "format": "byte",
+          "format": "string",
+          "example": "000013",
           "description": "LoRa Alliance NetID of the Packet Broker Forwarder Member."
         },
         "forwarder_tenant_id": {
@@ -16919,7 +16988,8 @@
         },
         "forwarder_gateway_eui": {
           "type": "string",
-          "format": "byte",
+          "format": "string",
+          "example": "70B3D57ED000ABCD",
           "description": "Forwarder gateway EUI."
         },
         "forwarder_gateway_id": {
@@ -16928,7 +16998,8 @@
         },
         "home_network_net_id": {
           "type": "string",
-          "format": "byte",
+          "format": "string",
+          "example": "000013",
           "description": "LoRa Alliance NetID of the Packet Broker Home Network Member."
         },
         "home_network_tenant_id": {
@@ -17394,7 +17465,8 @@
         },
         "home_net_id": {
           "type": "string",
-          "format": "byte",
+          "format": "string",
+          "example": "000013",
           "description": "Home NetID."
         },
         "application_server_id": {
@@ -18402,7 +18474,8 @@
         },
         "target_net_id": {
           "type": "string",
-          "format": "byte",
+          "format": "string",
+          "example": "000013",
           "description": "Home NetID."
         },
         "invalidate_authentication_code": {
@@ -18416,12 +18489,14 @@
       "properties": {
         "join_eui": {
           "type": "string",
-          "format": "byte",
+          "format": "string",
+          "example": "70B3D57ED000ABCD",
           "description": "JoinEUI (or AppEUI) of the device to claim."
         },
         "dev_eui": {
           "type": "string",
-          "format": "byte",
+          "format": "string",
+          "example": "70B3D57ED000ABCD",
           "description": "DevEUI of the device to claim."
         },
         "authentication_code": {
@@ -18467,7 +18542,8 @@
       "properties": {
         "gateway_eui": {
           "type": "string",
-          "format": "byte"
+          "format": "string",
+          "example": "70B3D57ED000ABCD"
         },
         "authentication_code": {
           "type": "string",
@@ -18933,7 +19009,8 @@
       "properties": {
         "dev_addr": {
           "type": "string",
-          "format": "byte",
+          "format": "string",
+          "example": "2600ABCD",
           "description": "DevAddr base."
         },
         "length": {
@@ -19144,7 +19221,8 @@
         },
         "net_id": {
           "type": "string",
-          "format": "byte",
+          "format": "string",
+          "example": "000013",
           "description": "Home NetID. Stored in Join Server."
         },
         "mac_settings": {
@@ -19332,17 +19410,20 @@
         },
         "dev_eui": {
           "type": "string",
-          "format": "byte",
+          "format": "string",
+          "example": "70B3D57ED000ABCD",
           "description": "The LoRaWAN DevEUI."
         },
         "join_eui": {
           "type": "string",
-          "format": "byte",
+          "format": "string",
+          "example": "70B3D57ED000ABCD",
           "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices)."
         },
         "dev_addr": {
           "type": "string",
-          "format": "byte",
+          "format": "string",
+          "example": "2600ABCD",
           "description": "The LoRaWAN DevAddr."
         }
       }
@@ -19697,7 +19778,8 @@
       "properties": {
         "dev_addr": {
           "type": "string",
-          "format": "byte"
+          "format": "string",
+          "example": "2600ABCD"
         },
         "f_ctrl": {
           "$ref": "#/definitions/v3FCtrl"
@@ -20138,7 +20220,8 @@
       "properties": {
         "dev_addr": {
           "type": "string",
-          "format": "byte"
+          "format": "string",
+          "example": "2600ABCD"
         }
       },
       "description": "Response of GenerateDevAddr."
@@ -20189,11 +20272,13 @@
         },
         "home_net_id": {
           "type": "string",
-          "format": "byte"
+          "format": "string",
+          "example": "000013"
         },
         "home_ns_id": {
           "type": "string",
-          "format": "byte"
+          "format": "string",
+          "example": "70B3D57ED000ABCD"
         },
         "vendor_specific": {
           "$ref": "#/definitions/GetClaimStatusResponseVendorSpecific"
@@ -20219,7 +20304,8 @@
       "properties": {
         "join_eui": {
           "type": "string",
-          "format": "byte"
+          "format": "string",
+          "example": "70B3D57ED000ABCD"
         }
       }
     },
@@ -20237,7 +20323,8 @@
       "properties": {
         "join_eui": {
           "type": "string",
-          "format": "byte"
+          "format": "string",
+          "example": "70B3D57ED000ABCD"
         }
       }
     },
@@ -20246,7 +20333,8 @@
       "properties": {
         "join_eui": {
           "type": "string",
-          "format": "byte"
+          "format": "string",
+          "example": "70B3D57ED000ABCD"
         },
         "supports_claiming": {
           "type": "boolean",
@@ -20335,7 +20423,8 @@
       "properties": {
         "dev_eui": {
           "type": "string",
-          "format": "byte"
+          "format": "string",
+          "example": "70B3D57ED000ABCD"
         }
       }
     },
@@ -20348,15 +20437,18 @@
         },
         "join_nonce": {
           "type": "string",
-          "format": "byte"
+          "format": "string",
+          "example": "ABCDEF"
         },
         "net_id": {
           "type": "string",
-          "format": "byte"
+          "format": "string",
+          "example": "000013"
         },
         "dev_addr": {
           "type": "string",
-          "format": "byte"
+          "format": "string",
+          "example": "2600ABCD"
         },
         "dl_settings": {
           "$ref": "#/definitions/v3DLSettings"
@@ -20374,7 +20466,8 @@
       "properties": {
         "join_eui": {
           "type": "string",
-          "format": "byte"
+          "format": "string",
+          "example": "70B3D57ED000ABCD"
         },
         "length": {
           "type": "integer",
@@ -20398,15 +20491,18 @@
       "properties": {
         "join_eui": {
           "type": "string",
-          "format": "byte"
+          "format": "string",
+          "example": "70B3D57ED000ABCD"
         },
         "dev_eui": {
           "type": "string",
-          "format": "byte"
+          "format": "string",
+          "example": "70B3D57ED000ABCD"
         },
         "dev_nonce": {
           "type": "string",
-          "format": "byte"
+          "format": "string",
+          "example": "ABCD"
         }
       }
     },
@@ -20446,7 +20542,8 @@
       "properties": {
         "key": {
           "type": "string",
-          "format": "byte",
+          "format": "string",
+          "example": "0123456789ABCDEF0123456789ABCDEF",
           "description": "The unencrypted AES key."
         },
         "kek_label": {
@@ -21334,7 +21431,8 @@
       "properties": {
         "net_id": {
           "type": "string",
-          "format": "byte",
+          "format": "string",
+          "example": "000013",
           "description": "LoRa Alliance NetID."
         },
         "tenant_id": {
@@ -21742,7 +21840,8 @@
         },
         "eui": {
           "type": "string",
-          "format": "byte"
+          "format": "string",
+          "example": "70B3D57ED000ABCD"
         }
       }
     },
@@ -22137,15 +22236,18 @@
         },
         "net_id": {
           "type": "string",
-          "format": "byte"
+          "format": "string",
+          "example": "000013"
         },
         "join_eui": {
           "type": "string",
-          "format": "byte"
+          "format": "string",
+          "example": "70B3D57ED000ABCD"
         },
         "dev_eui": {
           "type": "string",
-          "format": "byte"
+          "format": "string",
+          "example": "70B3D57ED000ABCD"
         },
         "rejoin_cnt": {
           "type": "integer",
@@ -22358,7 +22460,8 @@
       "properties": {
         "dev_addr": {
           "type": "string",
-          "format": "byte",
+          "format": "string",
+          "example": "2600ABCD",
           "description": "Device Address, issued by the Network Server or chosen by device manufacturer in case of testing range (beginning with 00-03).\nKnown by Network Server, Application Server and Join Server. Owned by Network Server."
         },
         "keys": {

@@ -26,6 +26,7 @@ import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/keys.proto";
 import "lorawan-stack/api/lorawan.proto";
 import "lorawan-stack/api/metadata.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 package ttn.lorawan.v3;
 
@@ -348,6 +349,9 @@ message DownlinkQueueOperationErrorDetails {
     (thethings.json.field) = {
       marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
       unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal4Bytes"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"2600ABCD\""
     }
   ];
   bytes session_key_id = 2 [(validate.rules).bytes.max_len = 2048];
@@ -358,6 +362,9 @@ message DownlinkQueueOperationErrorDetails {
     (thethings.json.field) = {
       marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
       unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal4Bytes"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"2600ABCD\""
     }
   ];
   bytes pending_session_key_id = 5 [(validate.rules).bytes.max_len = 2048];
