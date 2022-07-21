@@ -27,10 +27,13 @@ const units = [
   { label: sharedMessages.hours, value: 'h' },
 ]
 
-const encoder = (value, unit) => (value ? `${value}${unit}` : unit)
+const encoder = (value, unit) => (value ? `${value}${unit}` : null)
 const decoder = (rawValue = '') => {
+  if (rawValue === null) {
+    return { value: '', unit: null }
+  }
   const value = rawValue.split(unitRegexp)[0]
-  const unit = rawValue.split(value)[1] || rawValue
+  const unit = rawValue.split(value)[1] || null
   return {
     value: value ? Number(value) : undefined,
     unit,

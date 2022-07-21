@@ -12,27 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import UnitInput from './unit-input'
 
 const EncodedUnitInput = props => {
-  const { onChange, encode, decode, value, ...rest } = props
+  const { onChange, encode, decode, value, units, ...rest } = props
 
   const decodedValue = decode(value)
   const { unit } = decodedValue
+  const [storedUnit, setStoredUnit] = useState(unit || units[0].value)
+  decodedValue.unit = decodedValue.unit || storedUnit
 
   const handleInputChange = useCallback(
     inputValue => {
-      onChange(encode(inputValue, unit))
+      onChange(encode(inputValue, unit || storedUnit))
     },
-    [unit, encode, onChange],
+    [onChange, encode, unit, storedUnit],
   )
 
   const handleUnitChange = useCallback(
     unit => {
+      setStoredUnit(unit)
       onChange(encode(decodedValue.value, unit), true)
     },
     [onChange, encode, decodedValue.value],
@@ -44,6 +47,8 @@ const EncodedUnitInput = props => {
       onInputChange={handleInputChange}
       onUnitChange={handleUnitChange}
       value={decodedValue}
+      storedUnit={storedUnit}
+      units={units}
     />
   )
 }
