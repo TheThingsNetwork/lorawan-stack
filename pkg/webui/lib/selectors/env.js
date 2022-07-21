@@ -40,16 +40,22 @@ export const selectCSRFToken = () => configSelector().CSRF_TOKEN
 export const selectStackConfig = () => selectApplicationConfig().stack_config
 
 export const selectGsConfig = () => selectStackConfig().gs
+export const selectGsEnabled = () => selectGsConfig().enabled
 
 export const selectIsConfig = () => selectStackConfig().is
+export const selectIsEnabled = () => selectIsConfig().enabled
 
 export const selectNsConfig = () => selectStackConfig().ns
+export const selectNsEnabled = () => selectNsConfig().enabled
 
 export const selectJsConfig = () => selectStackConfig().js
+export const selectJsEnabled = () => selectJsConfig().enabled
 
 export const selectAsConfig = () => selectStackConfig().as
+export const selectAsEnabled = () => selectAsConfig().enabled
 
 export const selectGcsConfig = () => selectStackConfig().gcs
+export const selectGcsEnabled = () => selectGcsConfig().enabled
 
 export const selectLanguageConfig = () => selectApplicationConfig().language
 
