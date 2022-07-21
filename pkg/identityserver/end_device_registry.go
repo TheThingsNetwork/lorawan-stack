@@ -240,7 +240,7 @@ func (is *IdentityServer) getEndDevice(ctx context.Context, req *ttnpb.GetEndDev
 	if err != nil {
 		return nil, err
 	}
-	if dev.ClaimAuthenticationCode != nil && dev.ClaimAuthenticationCode.Value != "" {
+	if dev.GetClaimAuthenticationCode().GetValue() != "" {
 		s := strings.Split(dev.ClaimAuthenticationCode.Value, endDeviceAuthenticationCodeSeparator)
 		if len(s) == 2 {
 			v, err := hex.DecodeString(s[1])

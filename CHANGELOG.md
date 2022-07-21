@@ -26,6 +26,12 @@ For details about compatibility between different releases, see the **Commitment
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) due to updated indices.
 - The CLI settings fields `retry-config.enable_metadata` and `retry-config.default_timeout` have been renamed to `retry.enable-metadata` and `retry.default-timeout` for consistency reasons.
 - Generated device ID based on a DevEUI from an imported CSV file is now prepended by `eui-`. This is consistent with generated device IDs by the Console.
+- The Claim Authentication Code (CAC) field is stored in the Identity Server instead of the Join Server.
+  - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added columns.
+  - CAC values stored currently in the Join Server should be migrated to the Identity Server. One method is to run the following CLI commands on each device with a CAC.
+    - Read the current values using `ttn-lw-cli dev get <application-id> <device-id> --claim-authentication-code`. This will fetch the value stored in the Join Server as a fallback.
+    - Write back the value read `ttn-lw-cli dev set  <application-id> <device-id> --claim-authentication-code.valid_from [xxx] --claim-authentication-code.valid_to [xxx] --claim-authentication-code.value <xxx>`. This will by default write to the Identity Server.
+    - Note that this requires a minimum CLI version of 3.21.0.
 
 ### Deprecated
 
