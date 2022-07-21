@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import classnames from 'classnames'
 import { useField } from 'formik'
 import { isPlainObject } from 'lodash'
@@ -79,6 +79,7 @@ const FormField = props => {
     encode,
     fieldWidth,
     name,
+    connectedFields,
     readOnly,
     required,
     title,
@@ -95,6 +96,8 @@ const FormField = props => {
     validateOnBlur,
     setFieldValue,
     setFieldTouched,
+    addToFieldRegistry,
+    removeFromFieldRegistry,
   } = useFormContext()
 
   // Initialize field, which also takes care of registering fields in formik's internal registry.
@@ -102,6 +105,19 @@ const FormField = props => {
     name,
     validate,
   })
+
+  // Apply any connected names to the field registry.
+  useEffect(() => {
+    if (connectedFields) {
+      addToFieldRegistry(connectedFields)
+      return () => {
+        removeFromFieldRegistry(connectedFields)
+      }
+    }
+    // Using a custom comparator for the array to avoid infinite render loops.
+    // Solution as per https://github.com/facebook/react/issues/14476#issuecomment-471199055
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addToFieldRegistry, JSON.stringify(connectedFields), removeFromFieldRegistry])
 
   const handleChange = useCallback(
     async (value, enforceValidation = false) => {
@@ -232,6 +248,7 @@ FormField.propTypes = {
       render: PropTypes.func.isRequired,
     }),
   ]).isRequired,
+  connectedFields: PropTypes.arrayOf(PropTypes.string),
   decode: PropTypes.func,
   description: PropTypes.message,
   disabled: PropTypes.bool,
@@ -263,6 +280,7 @@ FormField.propTypes = {
 
 FormField.defaultProps = {
   className: undefined,
+  connectedFields: undefined,
   decode: value => value,
   description: '',
   disabled: false,
