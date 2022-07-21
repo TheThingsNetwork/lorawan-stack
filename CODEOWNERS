@@ -1,5 +1,5 @@
 # Root
-/** @johanstokking @htdvisser
+/** @johanstokking
 /CODEOWNERS @johanstokking
 /LICENSE @johanstokking
 /CHANGELOG.md
@@ -8,65 +8,65 @@
 /pkg
 
 # Dependencies
-/go.mod @johanstokking @htdvisser
-/go.sum @johanstokking @htdvisser
+/go.mod @johanstokking
+/go.sum @johanstokking
 /package.json @kschiffer @ryaplots
 /yarn.lock @kschiffer @ryaplots
 /sdk/js/package.json @kschiffer @ryaplots
 /sdk/js/yarn.lock @kschiffer @ryaplots
 
 # Build pipeline and tooling
-/Makefile @htdvisser @adriansmares @michalborkowski96
-/tools @htdvisser @adriansmares @michalborkowski96
-/.github/workflows @htdvisser @adriansmares @michalborkowski96
+/Makefile @adriansmares
+/tools @adriansmares
+/.github/workflows @adriansmares
 /config @kschiffer @ryaplots
 /config/stack @benolayinka @KrishnaIyer
 /cypress @kschiffer @ryaplots
 
 # API, configuration, CLI and storage compatibility
-/api/*.proto @johanstokking @htdvisser
-/cmd @adriansmares @htdvisser
-/pkg/**/config.go @adriansmares @htdvisser
-/pkg/**/registry.go @adriansmares @htdvisser
-/pkg/config/shared.go @adriansmares @htdvisser
-/pkg/gogoproto @johanstokking @htdvisser
-/pkg/goproto @johanstokking @htdvisser
-/pkg/identityserver/store @johanstokking @htdvisser
-/pkg/jsonpb @johanstokking @htdvisser
-/pkg/ttnpb @johanstokking @htdvisser
+/api/*.proto @johanstokking
+/cmd @adriansmares
+/pkg/**/config.go @adriansmares
+/pkg/**/registry.go @adriansmares
+/pkg/config/shared.go @adriansmares
+/pkg/gogoproto @johanstokking
+/pkg/goproto @johanstokking
+/pkg/identityserver/store @johanstokking
+/pkg/jsonpb @johanstokking
+/pkg/ttnpb @johanstokking
 
 # Security
-/pkg/auth @johanstokking @htdvisser
-/pkg/crypto @johanstokking @htdvisser
+/pkg/auth @johanstokking
+/pkg/crypto @johanstokking
 
 # Shared components
-/pkg/band @johanstokking @htdvisser @KrishnaIyer
-/pkg/cluster @htdvisser @johanstokking @adriansmares
-/pkg/component @johanstokking @htdvisser
-/pkg/errors @johanstokking @htdvisser
-/pkg/events @htdvisser @adriansmares
-/pkg/frequencyplans @johanstokking @htdvisser @KrishnaIyer
+/pkg/band @johanstokking @KrishnaIyer
+/pkg/cluster @johanstokking @adriansmares
+/pkg/component @johanstokking
+/pkg/errors @johanstokking
+/pkg/events @adriansmares
+/pkg/frequencyplans @johanstokking @KrishnaIyer
 /pkg/interop @johanstokking @adriansmares
-/pkg/rpcmiddleware @htdvisser @johanstokking @adriansmares
-/pkg/rpcserver @htdvisser @johanstokking @adriansmares
-/pkg/types @johanstokking @htdvisser
+/pkg/rpcmiddleware @johanstokking @adriansmares
+/pkg/rpcserver @johanstokking @adriansmares
+/pkg/types @johanstokking
 /pkg/web @kschiffer @ryaplots
-/pkg/webmiddleware @htdvisser @kschiffer
+/pkg/webmiddleware @KrishnaIyer @kschiffer
 /pkg/webui @kschiffer @ryaplots
-/pkg/ratelimit @johanstokking @htdvisser @KrishnaIyer
+/pkg/ratelimit @johanstokking @KrishnaIyer
 
 # Subsystems
 
-/pkg/identityserver @htdvisser @kschiffer @nicholaspcr
-/pkg/email @htdvisser @kschiffer
-/pkg/oauth @htdvisser @kschiffer
-/pkg/account @htdvisser @kschiffer
-/pkg/web/oauthclient @htdvisser @kschiffer
+/pkg/identityserver @kschiffer @nicholaspcr
+/pkg/email @kschiffer @nicholaspcr
+/pkg/oauth @kschiffer @nicholaspcr
+/pkg/account @kschiffer @nicholaspcr
+/pkg/web/oauthclient @kschiffer @nicholaspcr
 
 /pkg/gatewayserver @johanstokking @KrishnaIyer @adriansmares
-/pkg/gatewayconfigurationserver @KrishnaIyer @htdvisser
-/pkg/pfconfig @KrishnaIyer @htdvisser
-/pkg/basicstation @KrishnaIyer @htdvisser
+/pkg/gatewayconfigurationserver @KrishnaIyer
+/pkg/pfconfig @KrishnaIyer
+/pkg/basicstation @KrishnaIyer
 
 /pkg/networkserver @johanstokking @adriansmares
 /pkg/specification/macspec @johanstokking @adriansmares
