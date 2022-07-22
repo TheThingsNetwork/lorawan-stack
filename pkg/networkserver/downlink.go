@@ -1738,6 +1738,11 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 					return nil, nil, nil
 				}
 
+				if !mac.DeviceScheduleDownlinks(dev, ns.defaultMACSettings) {
+					logger.Debug("Downlink slot skipped since scheduling is disabled")
+					return dev, nil, nil
+				}
+
 				fps, err := ns.FrequencyPlansStore(ctx)
 				if err != nil {
 					logger.WithError(err).Error("Failed to get frequency plan store")

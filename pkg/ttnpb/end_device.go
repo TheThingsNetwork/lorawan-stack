@@ -355,6 +355,10 @@ func (v *MACSettings) FieldIsZero(p string) bool {
 		return v.Rx2Frequency == nil
 	case "rx2_frequency.value":
 		return v.Rx2Frequency.FieldIsZero("value")
+	case "schedule_downlinks":
+		return v.ScheduleDownlinks == nil
+	case "schedule_downlinks.value":
+		return v.ScheduleDownlinks.FieldIsZero("value")
 	case "status_count_periodicity":
 		return v.StatusCountPeriodicity == nil
 	case "status_time_periodicity":
@@ -1211,6 +1215,10 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 		return v.MacSettings.FieldIsZero("rx2_frequency")
 	case "mac_settings.rx2_frequency.value":
 		return v.MacSettings.FieldIsZero("rx2_frequency.value")
+	case "mac_settings.schedule_downlinks":
+		return v.MacSettings.FieldIsZero("schedule_downlinks")
+	case "mac_settings.schedule_downlinks.value":
+		return v.MacSettings.FieldIsZero("schedule_downlinks.value")
 	case "mac_settings.status_count_periodicity":
 		return v.MacSettings.FieldIsZero("status_count_periodicity")
 	case "mac_settings.status_time_periodicity":

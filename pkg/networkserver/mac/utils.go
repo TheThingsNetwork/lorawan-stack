@@ -711,6 +711,19 @@ func DeviceExpectedDownlinkDwellTime(macState *ttnpb.MACState, fp *frequencyplan
 	}
 }
 
+// DeviceScheduleDownlinks checks if the Network Server should schedule downlinks
+// for the provided end device.
+func DeviceScheduleDownlinks(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings) bool {
+	switch {
+	case dev.GetMacSettings().GetScheduleDownlinks() != nil:
+		return dev.MacSettings.ScheduleDownlinks.Value
+	case defaults.GetScheduleDownlinks() != nil:
+		return defaults.ScheduleDownlinks.Value
+	default:
+		return true
+	}
+}
+
 // mapDataRateIndices maps the provided data rate indices from the latest version
 // of the band to the provided target band. If the minimum data rate index is not
 // available, ttnpb.DataRateIndex_DATA_RATE_0 will be used.
