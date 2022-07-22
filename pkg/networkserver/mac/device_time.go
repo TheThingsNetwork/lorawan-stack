@@ -17,6 +17,8 @@ package mac
 import (
 	"context"
 
+	pbtypes "github.com/gogo/protobuf/types"
+
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -33,11 +35,27 @@ var (
 
 func HandleDeviceTimeReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.UplinkMessage) (events.Builders, error) {
 	ans := &ttnpb.MACCommand_DeviceTimeAns{
-		Time: msg.ReceivedAt,
+		Time: messageTimestamp(msg),
 	}
 	dev.MacState.QueuedResponses = append(dev.MacState.QueuedResponses, ans.MACCommand())
 	return events.Builders{
 		EvtReceiveDeviceTimeRequest,
 		EvtEnqueueDeviceTimeAnswer.With(events.WithData(ans)),
 	}, nil
+}
+
+func messageTimestamp(msg *ttnpb.UplinkMessage) *pbtypes.Timestamp {
+	var ts *pbtypes.Timestamp
+	for _, md := range msg.RxMetadata {
+		if t := md.GpsTime; t != nil {
+			return t
+		}
+		if ts == nil && md.ReceivedAt != nil {
+			ts = md.ReceivedAt
+		}
+	}
+	if ts != nil {
+		return ts
+	}
+	return msg.ReceivedAt
 }
