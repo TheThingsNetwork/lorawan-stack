@@ -776,6 +776,16 @@
         "ns"
       ]
     },
+    "schedule_downlinks": {
+      "_root": [
+        "ns",
+        "ns"
+      ],
+      "value": [
+        "ns",
+        "ns"
+      ]
+    },
     "status_count_periodicity": [
       "ns",
       "ns"

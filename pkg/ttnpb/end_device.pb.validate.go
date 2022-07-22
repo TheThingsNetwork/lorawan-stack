@@ -1266,6 +1266,18 @@ func (m *MACSettings) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "schedule_downlinks":
+
+			if v, ok := interface{}(m.GetScheduleDownlinks()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACSettingsValidationError{
+						field:  "schedule_downlinks",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return MACSettingsValidationError{
 				field:  name,

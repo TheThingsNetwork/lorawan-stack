@@ -355,6 +355,11 @@ message MACSettings {
   // Adaptive Data Rate settings.
   // If unset, the default value from Network Server configuration or regional parameters specification will be used.
   ADRSettings adr = 34;
+
+  // Whether or not downlink messages should be scheduled.
+  // This option can be used in order to disable any downlink interaction with the end device. It will affect all types
+  // of downlink messages: data and MAC downlinks, and join accepts.
+  BoolValue schedule_downlinks = 35;
 }
 
 // MACState represents the state of MAC layer of the device.

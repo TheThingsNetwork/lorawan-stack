@@ -1013,6 +1013,8 @@ func AddSelectFlagsForMACSettings(flags *pflag.FlagSet, prefix string, hidden bo
 	AddSelectFlagsForBoolValue(flags, flagsplugin.Prefix("downlink-dwell-time", prefix), true)
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("adr", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("adr", prefix), true), flagsplugin.WithHidden(hidden)))
 	AddSelectFlagsForADRSettings(flags, flagsplugin.Prefix("adr", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("schedule-downlinks", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("schedule-downlinks", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForBoolValue(flags, flagsplugin.Prefix("schedule-downlinks", prefix), true)
 }
 
 // SelectFromFlags outputs the fieldmask paths forMACSettings message from select flags.
@@ -1312,6 +1314,16 @@ func PathsFromSelectFlagsForMACSettings(flags *pflag.FlagSet, prefix string) (pa
 	} else {
 		paths = append(paths, selectPaths...)
 	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("schedule_downlinks", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("schedule_downlinks", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForBoolValue(flags, flagsplugin.Prefix("schedule_downlinks", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
 	return paths, nil
 }
 
@@ -1375,6 +1387,8 @@ func AddSetFlagsForMACSettings(flags *pflag.FlagSet, prefix string, hidden bool)
 	AddSetFlagsForBoolValue(flags, flagsplugin.Prefix("downlink-dwell-time", prefix), true)
 	flagsplugin.AddAlias(flags, flagsplugin.Prefix("downlink-dwell-time.value", prefix), flagsplugin.Prefix("downlink-dwell-time", prefix), flagsplugin.WithHidden(hidden))
 	AddSetFlagsForADRSettings(flags, flagsplugin.Prefix("adr", prefix), hidden)
+	AddSetFlagsForBoolValue(flags, flagsplugin.Prefix("schedule-downlinks", prefix), true)
+	flagsplugin.AddAlias(flags, flagsplugin.Prefix("schedule-downlinks.value", prefix), flagsplugin.Prefix("schedule-downlinks", prefix), flagsplugin.WithHidden(hidden))
 }
 
 // SetFromFlags sets the MACSettings message from flags.
@@ -1676,6 +1690,16 @@ func (m *MACSettings) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths [
 			m.Adr = &ADRSettings{}
 		}
 		if setPaths, err := m.Adr.SetFromFlags(flags, flagsplugin.Prefix("adr", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("schedule_downlinks", prefix)); changed {
+		if m.ScheduleDownlinks == nil {
+			m.ScheduleDownlinks = &BoolValue{}
+		}
+		if setPaths, err := m.ScheduleDownlinks.SetFromFlags(flags, flagsplugin.Prefix("schedule_downlinks", prefix)); err != nil {
 			return nil, err
 		} else {
 			paths = append(paths, setPaths...)

@@ -3600,6 +3600,7 @@ This is used internally by the Network Server.
 | `uplink_dwell_time` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether uplink dwell time is set (400ms). If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | `downlink_dwell_time` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether downlink dwell time is set (400ms). If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | `adr` | [`ADRSettings`](#ttn.lorawan.v3.ADRSettings) |  | Adaptive Data Rate settings. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
+| `schedule_downlinks` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether or not downlink messages should be scheduled. This option can be used in order to disable any downlink interaction with the end device. It will affect all types of downlink messages: data and MAC downlinks, and join accepts. |
 
 #### Field Rules
 

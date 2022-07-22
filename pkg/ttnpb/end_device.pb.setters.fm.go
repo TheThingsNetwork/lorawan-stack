@@ -1471,6 +1471,31 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 					dst.Adr = nil
 				}
 			}
+		case "schedule_downlinks":
+			if len(subs) > 0 {
+				var newDst, newSrc *BoolValue
+				if (src == nil || src.ScheduleDownlinks == nil) && dst.ScheduleDownlinks == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.ScheduleDownlinks
+				}
+				if dst.ScheduleDownlinks != nil {
+					newDst = dst.ScheduleDownlinks
+				} else {
+					newDst = &BoolValue{}
+					dst.ScheduleDownlinks = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ScheduleDownlinks = src.ScheduleDownlinks
+				} else {
+					dst.ScheduleDownlinks = nil
+				}
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

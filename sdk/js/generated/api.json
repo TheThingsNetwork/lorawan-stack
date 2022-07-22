@@ -15686,6 +15686,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "schedule_downlinks",
+              "description": "Whether or not downlink messages should be scheduled.\nThis option can be used in order to disable any downlink interaction with the end device. It will affect all types\nof downlink messages: data and MAC downlinks, and join accepts.",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "BoolValue",
+              "fullType": "ttn.lorawan.v3.BoolValue",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },

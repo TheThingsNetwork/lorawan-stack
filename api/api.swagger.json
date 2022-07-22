@@ -21070,6 +21070,10 @@
         "adr": {
           "$ref": "#/definitions/v3ADRSettings",
           "description": "Adaptive Data Rate settings.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used."
+        },
+        "schedule_downlinks": {
+          "$ref": "#/definitions/lorawanv3BoolValue",
+          "description": "Whether or not downlink messages should be scheduled.\nThis option can be used in order to disable any downlink interaction with the end device. It will affect all types\nof downlink messages: data and MAC downlinks, and join accepts."
         }
       }
     },
