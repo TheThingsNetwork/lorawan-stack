@@ -5048,6 +5048,15 @@
       "file": "gatewayserver.go"
     }
   },
+  "error:pkg/gogoproto:stack_depth_exceeded": {
+    "translations": {
+      "en": "stack depth exceeded"
+    },
+    "description": {
+      "package": "pkg/gogoproto",
+      "file": "struct.go"
+    }
+  },
   "error:pkg/identityserver/blocklist:forbidden_id": {
     "translations": {
       "en": "the ID `{id}` can not be registered"
