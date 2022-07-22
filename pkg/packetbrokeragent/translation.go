@@ -332,6 +332,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 		md := msg.Message.RxMetadata[0]
 		up.GatewayId = toPBGatewayIdentifier(md.GatewayIds, config)
 
+		var hasGPSTime bool
 		var teaser packetbroker.GatewayMetadataTeaser_Terrestrial
 		var signalQuality packetbroker.GatewayMetadataSignalQuality_Terrestrial
 		var localization *packetbroker.GatewayMetadataLocalization_Terrestrial
@@ -373,11 +374,19 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 				localization.Antennas = append(localization.Antennas, locAnt)
 			}
 
-			if md.Time != nil {
-				t := ttnpb.StdTime(md.Time)
-				if gatewayReceiveTime == nil || t.Before(*gatewayReceiveTime) {
-					gatewayReceiveTime = t
-				}
+			earlierGatewayReceiveTime := func(t *pbtypes.Timestamp) bool {
+				g := gatewayReceiveTime
+				return g == nil || t != nil && ttnpb.StdTime(t).Before(*g)
+			}
+			switch {
+			case hasGPSTime:
+			case md.GpsTime != nil:
+				gatewayReceiveTime = ttnpb.StdTime(md.GpsTime)
+				hasGPSTime = true
+			case earlierGatewayReceiveTime(md.Time):
+				gatewayReceiveTime = ttnpb.StdTime(md.Time)
+			case earlierGatewayReceiveTime(md.ReceivedAt):
+				gatewayReceiveTime = ttnpb.StdTime(md.ReceivedAt)
 			}
 
 			if md.DownlinkPathConstraint == ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NEVER {
@@ -538,6 +547,7 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 					Location:               fromPBLocation(ant.Location),
 					DownlinkPathConstraint: downlinkPathConstraint,
 					UplinkToken:            uplinkToken,
+					ReceivedAt:             msg.Message.ForwarderReceiveTime,
 				})
 			}
 		}
@@ -558,6 +568,7 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 						Time:                   receiveTime,
 						DownlinkPathConstraint: downlinkPathConstraint,
 						UplinkToken:            uplinkToken,
+						ReceivedAt:             msg.Message.ForwarderReceiveTime,
 					}
 					up.RxMetadata = append(up.RxMetadata, md)
 				}

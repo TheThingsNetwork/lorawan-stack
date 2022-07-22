@@ -248,6 +248,24 @@ func (dst *RxMetadata) SetFields(src *RxMetadata, paths ...string) error {
 				var zero int32
 				dst.FrequencyDrift = zero
 			}
+		case "gps_time":
+			if len(subs) > 0 {
+				return fmt.Errorf("'gps_time' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.GpsTime = src.GpsTime
+			} else {
+				dst.GpsTime = nil
+			}
+		case "received_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'received_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ReceivedAt = src.ReceivedAt
+			} else {
+				dst.ReceivedAt = nil
+			}
 		case "advanced":
 			if len(subs) > 0 {
 				return fmt.Errorf("'advanced' has no subfields, but %s were specified", subs)

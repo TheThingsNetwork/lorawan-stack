@@ -273,7 +273,13 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 		panic("unreachable")
 	}
 
+	receivedAtGateway := receivedAt
+	if _, _, median, _, count := c.RTTStats(100, receivedAt); count > 0 {
+		receivedAtGateway = receivedAt.Add(-median / 2)
+	}
 	for _, md := range up.RxMetadata {
+		md.ReceivedAt = ttnpb.ProtoTimePtr(receivedAtGateway)
+
 		if md.AntennaIndex != 0 {
 			// TODO: Support downlink path to multiple antennas (https://github.com/TheThingsNetwork/lorawan-stack/issues/48)
 			md.DownlinkPathConstraint = ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NEVER

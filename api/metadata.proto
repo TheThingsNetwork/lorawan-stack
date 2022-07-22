@@ -39,6 +39,7 @@ message RxMetadata {
   PacketBrokerMetadata packet_broker = 18;
 
   uint32 antenna_index = 2;
+  // Timestamp at the end of the transmission, provided by the gateway. The accuracy is undefined.
   google.protobuf.Timestamp time = 3;
   // Gateway concentrator timestamp when the Rx finished (microseconds).
   uint32 timestamp = 4;
@@ -72,12 +73,17 @@ message RxMetadata {
   uint32 hopping_width = 19;
   // Frequency drift in Hz between start and end of an LR-FHSS packet (signed).
   int32 frequency_drift = 20;
+  // Timestamp at the end of the transmission, provided by the gateway.
+  // Guaranteed to be based on a GPS PPS signal, with an accuracy of 1 millisecond.
+  google.protobuf.Timestamp gps_time = 21;
+  // Timestamp at which the Gateway Server has received the message.
+  google.protobuf.Timestamp received_at = 22;
   // Advanced metadata fields
   // - can be used for advanced information or experimental features that are not yet formally defined in the API
   // - field names are written in snake_case
   google.protobuf.Struct advanced = 99;
 
-  // next: 21
+  // next: 23
 }
 
 message Location {

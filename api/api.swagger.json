@@ -17034,7 +17034,8 @@
         },
         "time": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "Timestamp at the end of the transmission, provided by the gateway. The accuracy is undefined."
         },
         "timestamp": {
           "type": "integer",
@@ -17111,6 +17112,16 @@
           "type": "integer",
           "format": "int32",
           "description": "Frequency drift in Hz between start and end of an LR-FHSS packet (signed)."
+        },
+        "gps_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp at the end of the transmission, provided by the gateway.\nGuaranteed to be based on a GPS PPS signal, with an accuracy of 1 millisecond."
+        },
+        "received_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp at which the Gateway Server has received the message."
         },
         "advanced": {
           "type": "object",
