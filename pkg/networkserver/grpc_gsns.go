@@ -560,6 +560,11 @@ macLoop:
 		case ttnpb.MACCommandIdentifier_CID_ADR_PARAM_SETUP:
 			evs, err = mac.HandleADRParamSetupAns(ctx, dev)
 		case ttnpb.MACCommandIdentifier_CID_DEVICE_TIME:
+			if !deduplicated {
+				m := makeDeferredMACHandler(dev, mac.HandleDeviceTimeReq)
+				deferredMACHandlers = append(deferredMACHandlers, m)
+				continue macLoop
+			}
 			evs, err = mac.HandleDeviceTimeReq(ctx, dev, up)
 		case ttnpb.MACCommandIdentifier_CID_REJOIN_PARAM_SETUP:
 			evs, err = mac.HandleRejoinParamSetupAns(ctx, dev, cmd.GetRejoinParamSetupAns())
