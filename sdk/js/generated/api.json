@@ -13920,7 +13920,7 @@
             },
             {
               "name": "claim_authentication_code",
-              "description": "Authentication code to claim ownership of the end device.\nFrom TTS v3.21.0 this field is stored in the Identity Server.\nFor TTS versions \u003c 3.21.0, this field is stored in the Join Server.\nThe value stored on the Identity Server gets preference.",
+              "description": "Authentication code to claim ownership of the end device.\nFrom TTS v3.21.0 this field is stored in the Identity Server.\nFor TTS versions \u003c 3.21.0, this field is stored in the Join Server.\nThe value stored on the Identity Server takes precedence.",
               "label": "",
               "type": "EndDeviceAuthenticationCode",
               "longType": "EndDeviceAuthenticationCode",

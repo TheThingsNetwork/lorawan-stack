@@ -753,7 +753,7 @@ message EndDevice {
   // Authentication code to claim ownership of the end device.
   // From TTS v3.21.0 this field is stored in the Identity Server.
   // For TTS versions < 3.21.0, this field is stored in the Join Server.
-  // The value stored on the Identity Server gets preference.
+  // The value stored on the Identity Server takes precedence.
   EndDeviceAuthenticationCode claim_authentication_code = 46;
 
   // Skip decryption of uplink payloads and encryption of downlink payloads.

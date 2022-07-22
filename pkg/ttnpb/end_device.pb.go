@@ -2394,7 +2394,7 @@ type EndDevice struct {
 	// Authentication code to claim ownership of the end device.
 	// From TTS v3.21.0 this field is stored in the Identity Server.
 	// For TTS versions < 3.21.0, this field is stored in the Join Server.
-	// The value stored on the Identity Server gets preference.
+	// The value stored on the Identity Server takes precedence.
 	ClaimAuthenticationCode *EndDeviceAuthenticationCode `protobuf:"bytes,46,opt,name=claim_authentication_code,json=claimAuthenticationCode,proto3" json:"claim_authentication_code,omitempty"`
 	// Skip decryption of uplink payloads and encryption of downlink payloads.
 	// This field is deprecated, use skip_payload_crypto_override instead.
