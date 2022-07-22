@@ -374,7 +374,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 				localization.Antennas = append(localization.Antennas, locAnt)
 			}
 
-			timestampCase := func(t *pbtypes.Timestamp) bool {
+			earlierGatewayReceiveTime := func(t *pbtypes.Timestamp) bool {
 				g := gatewayReceiveTime
 				return g == nil || t != nil && ttnpb.StdTime(t).Before(*g)
 			}
@@ -383,9 +383,9 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 			case md.GpsTime != nil:
 				gatewayReceiveTime = ttnpb.StdTime(md.GpsTime)
 				hasGPSTime = true
-			case timestampCase(md.Time):
+			case earlierGatewayReceiveTime(md.Time):
 				gatewayReceiveTime = ttnpb.StdTime(md.Time)
-			case timestampCase(md.ReceivedAt):
+			case earlierGatewayReceiveTime(md.ReceivedAt):
 				gatewayReceiveTime = ttnpb.StdTime(md.ReceivedAt)
 			}
 
