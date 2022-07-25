@@ -1151,6 +1151,7 @@ func TestTraffic(t *testing.T) {
 							md.UplinkToken = up.Message.RxMetadata[i].UplinkToken
 							md.Timestamp = timestamp
 							md.Time = ttnpb.ProtoTimePtr(now)
+							md.GpsTime = ttnpb.ProtoTimePtr(now)
 							md.ReceivedAt = expectedUp.ReceivedAt
 						}
 						expectedUp.Settings.Timestamp = timestamp
