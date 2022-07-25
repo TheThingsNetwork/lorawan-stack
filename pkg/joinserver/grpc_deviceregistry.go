@@ -94,6 +94,20 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 			)
 		}
 	}
+
+	// TODO: Reject writing Claim Authentication Code (https://github.com/TheThingsNetwork/lorawan-stack/issues/5631).
+	if ttnpb.HasAnyField(
+		req.FieldMask.GetPaths(),
+		"claim_authentication_code.value",
+		"claim_authentication_code.valid_from",
+		"claim_authentication_code.value_to",
+	) {
+		warning.Add(
+			ctx,
+			"Storage of claim authentication code in the Join Server registry is deprecated. Use the Identity Server registry instead", //nolint:lll
+		)
+	}
+
 	logger := log.FromContext(ctx)
 	dev, err := srv.JS.devices.GetByID(ctx, req.EndDeviceIds.ApplicationIds, req.EndDeviceIds.DeviceId, gets)
 	if errors.IsNotFound(err) {
@@ -192,6 +206,7 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 		return nil, errNoDevEUI.New()
 	}
 
+	// TODO: Reject writing Claim Authentication Code (https://github.com/TheThingsNetwork/lorawan-stack/issues/5631).
 	if ttnpb.HasAnyField(
 		req.FieldMask.GetPaths(),
 		"claim_authentication_code.value",

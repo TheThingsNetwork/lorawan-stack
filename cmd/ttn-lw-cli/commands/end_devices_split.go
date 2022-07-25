@@ -66,6 +66,11 @@ func splitEndDeviceSetPaths(supportsJoin bool, paths ...string) (is, ns, as, js 
 	if supportsJoin {
 		js = ttnpb.AllowedFields(nonImplicitPaths, setEndDeviceToJS)
 	}
+	if len(js) > 0 {
+		// Remove Claim Authentication Code related paths from the call to the JS registry.
+		// TODO: Remove this check when CAC usage in the JS is removed (https://github.com/TheThingsNetwork/lorawan-stack/issues/5631)
+		js = ttnpb.ExcludeFields(js, claimAuthenticationCodePaths...)
+	}
 	return
 }
 

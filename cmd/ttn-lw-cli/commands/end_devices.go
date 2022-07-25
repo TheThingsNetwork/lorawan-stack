@@ -329,7 +329,7 @@ var (
 			}
 
 			if len(jsPaths) > 0 {
-				if device.ClaimAuthenticationCode != nil && device.ClaimAuthenticationCode.Value != "" {
+				if device.ClaimAuthenticationCode.GetValue() != "" {
 					// ClaimAuthenticationCode is already retrieved from the IS. We can unset the related JS paths.
 					jsPaths = ttnpb.ExcludeFields(jsPaths, claimAuthenticationCodePaths...)
 				}
@@ -644,9 +644,6 @@ var (
 			}
 
 			if len(jsPaths) > 0 {
-				// Remove Claim Authentication Code related paths from the call to the JS registry.
-				jsPaths = ttnpb.ExcludeFields(jsPaths, claimAuthenticationCodePaths...)
-
 				// Require EUIs for devices that need to be added to the Join Server.
 				if device.Ids.JoinEui == nil || device.Ids.DevEui == nil {
 					return errNoEndDeviceEUI.New()
@@ -751,8 +748,6 @@ var (
 				isPaths = append(isPaths, "application_server_address")
 			}
 			if len(jsPaths) > 0 && config.JoinServerEnabled {
-				// Remove Claim Authentication Code related paths from the call to the JS registry.
-				jsPaths = ttnpb.ExcludeFields(jsPaths, claimAuthenticationCodePaths...)
 				if device.JoinServerAddress == "" {
 					device.JoinServerAddress = getHost(config.JoinServerGRPCAddress)
 				}
@@ -1265,6 +1260,11 @@ This command may take end device identifiers from stdin.`,
 				return err
 			}
 
+			if device.ClaimAuthenticationCode.GetValue() != "" {
+				// ClaimAuthenticationCode is already retrieved from the IS. We can unset the related JS paths.
+				jsPaths = ttnpb.ExcludeFields(jsPaths, claimAuthenticationCodePaths...)
+			}
+
 			nsMismatch, asMismatch, jsMismatch := compareServerAddressesEndDevice(device, config)
 			if len(nsPaths) > 0 && nsMismatch {
 				return errAddressMismatchEndDevice.New()
@@ -1272,14 +1272,8 @@ This command may take end device identifiers from stdin.`,
 			if len(asPaths) > 0 && asMismatch {
 				return errAddressMismatchEndDevice.New()
 			}
-			if len(jsPaths) > 0 {
-				if device.ClaimAuthenticationCode != nil && device.ClaimAuthenticationCode.Value != "" {
-					// ClaimAuthenticationCode is already retrieved from the IS. We can unset the related JS paths.
-					jsPaths = ttnpb.ExcludeFields(jsPaths, claimAuthenticationCodePaths...)
-				}
-				if jsMismatch {
-					return errAddressMismatchEndDevice.New()
-				}
+			if len(jsPaths) > 0 && jsMismatch {
+				return errAddressMismatchEndDevice.New()
 			}
 			dev, err := getEndDevice(device.Ids, nsPaths, asPaths, jsPaths, true)
 			if err != nil {
@@ -1289,8 +1283,7 @@ This command may take end device identifiers from stdin.`,
 				return err
 			}
 
-			if device.ClaimAuthenticationCode != nil &&
-				device.ClaimAuthenticationCode.Value != "" &&
+			if device.ClaimAuthenticationCode.GetValue() != "" &&
 				ttnpb.HasAnyField(jsPaths, claimAuthenticationCodePaths...) {
 				logger.Warn(
 					`Storage of claim authentication code in the Join Server registry is deprecated. Use the Identity Server registry instead`, //nolint:lll
