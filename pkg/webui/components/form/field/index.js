@@ -121,7 +121,8 @@ const FormField = props => {
 
   const handleChange = useCallback(
     async (value, enforceValidation = false) => {
-      const newValue = encode(extractValue(value))
+      const oldValue = encodedValue
+      const newValue = encode(extractValue(value), oldValue)
       let isSyntheticEvent = false
 
       if (isPlainObject(value)) {
@@ -141,9 +142,9 @@ const FormField = props => {
         setFieldTouched(name, true, true)
       }
 
-      onChange(isSyntheticEvent ? value : encode(value))
+      onChange(isSyntheticEvent ? value : encode(value, oldValue))
     },
-    [encode, name, onChange, setFieldTouched, setFieldValue],
+    [encode, encodedValue, name, onChange, setFieldTouched, setFieldValue],
   )
 
   const handleBlur = useCallback(
