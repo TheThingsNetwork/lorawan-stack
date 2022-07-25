@@ -14,8 +14,58 @@
 
 import React from 'react'
 
-const initialValues = {}
+import Form, { useFormContext } from '@ttn-lw/components/form'
 
-const DeviceTypeManualFormSection = props => <span>Device Type Manual Form Section</span>
+import LorawanVersionInput from '@console/components/lorawan-version-input'
+import PhyVersionInput from '@console/components/phy-version-input'
+
+import { NsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
+
+import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import AdvancedSettingsSection, {
+  initialValues as advancedSettingsInitialValues,
+} from './advanced-settings-section'
+
+const initialValues = {
+  lorawan_version: '',
+  lorawan_phy_version: '',
+  frequency_plan_id: '',
+  ...advancedSettingsInitialValues,
+}
+
+const DeviceTypeManualFormSection = () => {
+  const { frequency_plan_id, lorawan_version } = useFormContext()
+
+  return (
+    <>
+      <NsFrequencyPlansSelect
+        required
+        tooltipId={tooltipIds.FREQUENCY_PLAN}
+        name="frequency_plan_id"
+      />
+      <Form.Field
+        required
+        title={sharedMessages.macVersion}
+        name="lorawan_version"
+        component={LorawanVersionInput}
+        tooltipId={tooltipIds.LORAWAN_VERSION}
+        frequencyPlan={frequency_plan_id}
+      />
+      <Form.Field
+        required
+        title={sharedMessages.phyVersion}
+        name="lorawan_phy_version"
+        component={PhyVersionInput}
+        tooltipId={tooltipIds.REGIONAL_PARAMETERS}
+        lorawanVersion={lorawan_version}
+      />
+      <hr />
+      <AdvancedSettingsSection />
+      <hr />
+    </>
+  )
+}
 
 export { DeviceTypeManualFormSection as default, initialValues }

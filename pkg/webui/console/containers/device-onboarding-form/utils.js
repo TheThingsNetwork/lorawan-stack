@@ -35,6 +35,14 @@ export const getJoinServerAddress = device => device.join_server_address
 
 export const SELECT_OTHER_OPTION = '_other_'
 export const isOtherOption = option => option === SELECT_OTHER_OPTION
+export const hasSelectedDeviceRepositoryOther = version =>
+  version && Object.values(version).some(value => isOtherOption(value))
+export const hasCompletedDeviceRepositorySelection = version =>
+  version && Object.values(version).every(value => value)
+export const hasValidDeviceRepositoryType = (version, template) =>
+  !hasSelectedDeviceRepositoryOther(version) &&
+  hasCompletedDeviceRepositorySelection(version) &&
+  Boolean(template)
 
 /*
   `hardware_version` is not required when registering an end device in the device repository, so for 
