@@ -1212,6 +1212,11 @@ func (x *MACSettings) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("adr")
 		x.Adr.MarshalProtoJSON(s.WithField("adr"))
 	}
+	if x.ScheduleDownlinks != nil || s.HasField("schedule_downlinks") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("schedule_downlinks")
+		x.ScheduleDownlinks.MarshalProtoJSON(s.WithField("schedule_downlinks"))
+	}
 	s.WriteObjectEnd()
 }
 
@@ -1509,6 +1514,14 @@ func (x *MACSettings) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			}
 			x.Adr = &ADRSettings{}
 			x.Adr.UnmarshalProtoJSON(s.WithField("adr", true))
+		case "schedule_downlinks", "scheduleDownlinks":
+			s.AddField("schedule_downlinks")
+			if s.ReadNil() {
+				x.ScheduleDownlinks = nil
+				return
+			}
+			x.ScheduleDownlinks = &BoolValue{}
+			x.ScheduleDownlinks.UnmarshalProtoJSON(s.WithField("schedule_downlinks", false))
 		}
 	})
 }

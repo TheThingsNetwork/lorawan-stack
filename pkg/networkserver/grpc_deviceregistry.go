@@ -685,6 +685,7 @@ var (
 
 	ifNotZeroThenZeroFields = map[string][]string{
 		"multicast": {
+			"mac_settings.schedule_downlinks.value",
 			"mac_state.last_adr_change_f_cnt_up",
 			"mac_state.last_confirmed_downlink_at",
 			"mac_state.last_dev_status_f_cnt_up",
@@ -876,6 +877,7 @@ var (
 	// downlinkInfluencingSetFields contains fields that can influence downlink scheduling, e.g. trigger one or make a scheduled slot obsolete.
 	downlinkInfluencingSetFields = [...]string{
 		"last_dev_status_received_at",
+		"mac_settings.schedule_downlinks.value",
 		"mac_state.current_parameters.adr_ack_delay_exponent.value",
 		"mac_state.current_parameters.adr_ack_limit_exponent.value",
 		"mac_state.current_parameters.adr_data_rate_index",

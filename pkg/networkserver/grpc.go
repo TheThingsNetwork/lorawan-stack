@@ -76,6 +76,7 @@ func (ns *NetworkServer) GetDefaultMACSettings(ctx context.Context, req *ttnpb.G
 		DesiredMaxEirp:               &ttnpb.DeviceEIRPValue{Value: lorawan.Float32ToDeviceEIRP(mac.DeviceDesiredMaxEIRP(nil, phy, fp, ns.defaultMACSettings))},
 		UplinkDwellTime:              mac.DeviceUplinkDwellTime(nil, phy, ns.defaultMACSettings),
 		DownlinkDwellTime:            mac.DeviceDownlinkDwellTime(nil, phy, ns.defaultMACSettings),
+		ScheduleDownlinks:            &ttnpb.BoolValue{Value: mac.DeviceScheduleDownlinks(nil, ns.defaultMACSettings)},
 	}
 	return settings, nil
 }

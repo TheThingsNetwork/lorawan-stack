@@ -13,6 +13,8 @@ For details about compatibility between different releases, see the **Commitment
 
 - Component selector for Join Server interoperability configuration. This allows administrators to declare separate Network Server and Application Server configuration for the same JoinEUI ranges in the same interoperability configuration. See [documentation](https://www.thethingsindustries.com/docs/reference/interop-repository/).
 - `BatchGetGatewayConnectionStats` RPC to fetch Gateway Connection Stats for a batch of gateways.
+- The ability to disable the downlink scheduling mechanism for individual end devices (`mac-settings.schedule-downlinks`).
+  - This option is useful during a migration procedure in order to force the end device to join the new network. The Network Server will no longer schedule any data downlinks or MAC commands, and will stop answering potential join requests.
 
 ### Changed
 
