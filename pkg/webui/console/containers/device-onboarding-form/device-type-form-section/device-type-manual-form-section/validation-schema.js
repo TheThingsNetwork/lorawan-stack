@@ -12,14 +12,148 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { isUndefined } from 'lodash'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 import Yup from '@ttn-lw/lib/yup'
 
-// Validation schema of the device type manual form section.
+import { ACTIVATION_MODES } from '@console/lib/device-utils'
+
+import { DEVICE_CLASS_MAP } from '../../utils'
+
+// Validation schemas of the device type manual form section.
 // Please observe the following rules to keep the validation schemas maintainable:
 // 1. DO NOT USE ANY TYPE CONVERSIONS HERE. Use decocer/encoder on field level instead.
 //    Consider all values as backend values. Exceptions may apply in consideration.
 // 2. Comment each individual validation prop and use whitespace to structure visually.
 // 3. Do not use ternary assignments but use plain if statements to ensure clarity.
-const validationSchema = Yup.object({})
+
+const factoryPresetFreqRequiredTest = frequencies =>
+  frequencies.every(freq => typeof freq !== 'undefined' && freq !== '')
+
+const factoryPresetFreqNumericTest = frequencies =>
+  frequencies.every(freq => {
+    if (typeof freq !== 'undefined') {
+      return !isNaN(parseInt(freq))
+    }
+
+    return true
+  })
+
+const advancedSettingsSchema = Yup.object({
+  supports_class_b: Yup.boolean(),
+  supports_class_c: Yup.boolean(),
+  supports_join: Yup.boolean(),
+  multicast: Yup.boolean(),
+  _device_class: Yup.string().when(['_activation_mode'], (mode, schema) => {
+    // The additional device classes (B and/or C) have to be set when using multicast.
+    if (mode === ACTIVATION_MODES.MULTICAST) {
+      return schema.required(sharedMessages.validateRequired)
+    }
+
+    return schema.oneOf(Object.values(DEVICE_CLASS_MAP))
+  }),
+  _default_ns_settings: Yup.bool(),
+  _activation_mode: Yup.mixed().when(['$mayEditKeys'], (mayEditKeys, schema) => {
+    // If the user may not set any root keys, the only activation option is OTAA.
+    if (!mayEditKeys) {
+      return schema.oneOf([ACTIVATION_MODES.OTAA]).required(sharedMessages.validateRequired)
+    }
+
+    return schema.oneOf(Object.values(ACTIVATION_MODES)).required(sharedMessages.validateRequired)
+  }),
+  _skip_js_registration: Yup.bool(),
+})
+
+const macSettingsSchema = Yup.object({
+  mac_settings: Yup.lazy(macSettings =>
+    Yup.object().when(
+      ['_activation_mode', '$defaultMacSettings'],
+      (mode, defaultMacSettings, schema) => {
+        if (!defaultMacSettings || !macSettings) {
+          return schema
+        }
+
+        const shape = {
+          resets_f_cnt: Yup.boolean(),
+          rx1_data_rate_offset: Yup.number()
+            .min(0, Yup.passValues(sharedMessages.validateNumberGte))
+            .max(7, Yup.passValues(sharedMessages.validateNumberLte)),
+          rx1_delay: Yup.number()
+            .min(1, Yup.passValues(sharedMessages.validateNumberGte))
+            .max(15, Yup.passValues(sharedMessages.validateNumberLte)),
+          factory_preset_frequencies: Yup.array()
+            .default([])
+            .test(
+              'is-valid-frequency',
+              sharedMessages.validateFreqNumeric,
+              factoryPresetFreqNumericTest,
+            )
+            .test(
+              'is-empty-frequency',
+              sharedMessages.validateFreqRequired,
+              factoryPresetFreqRequiredTest,
+            ),
+          rx2_frequency: Yup.number().min(100000, Yup.passValues(sharedMessages.validateNumberGte)),
+          beacon_frequency: Yup.number().min(
+            100000,
+            Yup.passValues(sharedMessages.validateNumberGte),
+          ),
+          ping_slot_frequency: Yup.number().min(
+            100000,
+            Yup.passValues(sharedMessages.validateNumberGte),
+          ),
+          rx2_data_rate_index: Yup.number()
+            .min(0, Yup.passValues(sharedMessages.validateNumberGte))
+            .max(15, Yup.passValues(sharedMessages.validateNumberLte)),
+          ping_slot_data_rate_index: Yup.number()
+            .min(0, Yup.passValues(sharedMessages.validateNumberGte))
+            .max(15, Yup.passValues(sharedMessages.validateNumberLte)),
+          ping_slot_periodicity: Yup.lazy(() => {
+            // Ping slot periodicity does not have a default value, so it has to be
+            // set explicitly when not using OTAA.
+            if (mode === ACTIVATION_MODES.MULTICAST || mode === ACTIVATION_MODES.ABP) {
+              return Yup.string().default(null).typeError(sharedMessages.validateRequired)
+            }
+
+            return Yup.string().default(null).nullable()
+          }),
+          class_b_timeout: Yup.string(),
+          class_c_timeout: Yup.string(),
+        }
+
+        // Each MAC setting that does have a corresponding default setting is required.
+        // We can use the default MAC settings object to cycle through the list of
+        // values and make them required.
+        for (const key of Object.keys(shape)) {
+          if (!(key in macSettings)) {
+            delete shape[key]
+          } else if (!isUndefined(defaultMacSettings[key]) && shape[key].type !== 'lazy') {
+            // Compose a new schema that makes the field mandatory unless it was
+            // already stripped. Due to the way Yup works, we need to convert empty strings
+            // to `null` as they would otherwise be converted to `undefined` and automatically
+            // stripped by formik.
+            // See https://github.com/jaredpalmer/formik/issues/805
+            const oldSchema = shape[key].clone()
+            shape[key] = oldSchema
+              .default(null)
+              .typeError(sharedMessages.validateRequired)
+              .required(sharedMessages.validateRequired)
+          }
+        }
+
+        return schema.shape(shape)
+      },
+    ),
+  ),
+})
+
+const validationSchema = Yup.object({
+  lorawan_version: Yup.string().required(sharedMessages.validateRequired),
+  lorawan_phy_version: Yup.string().required(sharedMessages.validateRequired),
+  frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
+})
+  .concat(advancedSettingsSchema)
+  .concat(macSettingsSchema)
 
 export default validationSchema

@@ -12,20 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import { useSelector } from 'react-redux'
+import React, { useCallback } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { Col, Row } from 'react-grid-system'
 import classnames from 'classnames'
 
 import { useFormContext } from '@ttn-lw/components/form'
 
-import PropTypes from '@ttn-lw/lib/prop-types'
+import FreqPlansSelect from '@console/containers/device-freq-plans-select'
+
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import { selectSupportLinkConfig } from '@ttn-lw/lib/selectors/env'
 
-import { selectDeviceTemplate } from '@console/store/selectors/device-repository'
+import { getTemplate } from '@console/store/actions/device-repository'
 
-import { isOtherOption } from '../../utils'
+import { selectDeviceTemplate } from '@console/store/selectors/device-repository'
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+
+import {
+  hasCompletedDeviceRepositorySelection,
+  hasSelectedDeviceRepositoryOther,
+  hasValidDeviceRepositoryType,
+  isOtherOption,
+} from '../../utils'
 
 import ProgressHint from './hints/progress-hint'
 import OtherHint from './hints/other-hint'
@@ -38,6 +48,24 @@ import BandSelect from './device-selection/band-select'
 
 import style from './repository.styl'
 
+const brandValueSetter = ({ setValues }, { value }) =>
+  setValues(values => ({
+    ...values,
+    version_ids: {
+      ...initialValues.version_ids,
+      brand_id: value,
+    },
+  }))
+const modelValueSetter = ({ setValues }, { value }) =>
+  setValues(values => ({
+    ...values,
+    version_ids: {
+      ...initialValues.version_ids,
+      brand_id: values.version_ids.brand_id,
+      model_id: value,
+    },
+  }))
+
 const initialValues = {
   version_ids: {
     brand_id: undefined,
@@ -48,8 +76,13 @@ const initialValues = {
   },
 }
 
-const DeviceTypeRepositoryFormSection = props => {
-  const { appId, getRegistrationTemplate } = props
+const DeviceTypeRepositoryFormSection = () => {
+  const appId = useSelector(selectSelectedApplicationId)
+  const dispatch = useDispatch()
+  const getRegistrationTemplate = useCallback(
+    (appId, version) => dispatch(attachPromise(getTemplate(appId, version))),
+    [dispatch],
+  )
 
   const { values, setValues } = useFormContext()
   const { version_ids } = values
@@ -59,6 +92,7 @@ const DeviceTypeRepositoryFormSection = props => {
   const model = version_ids?.model_id
   const hardwareVersion = version_ids?.hardware_version
   const firmwareVersion = version_ids?.firmware_version
+  const band = version_ids?.band_id
   const template = useSelector(selectDeviceTemplate)
   const supportLink = useSelector(selectSupportLinkConfig)
 
@@ -67,58 +101,46 @@ const DeviceTypeRepositoryFormSection = props => {
   const hasHwVersion = Boolean(hardwareVersion) && !isOtherOption(hardwareVersion)
   const hasFwVersion = Boolean(firmwareVersion) && !isOtherOption(firmwareVersion)
 
-  const hasSelectedOther = version && Object.values(version).some(value => isOtherOption(value))
-  const hasCompleted = version && Object.values(version).every(value => value)
+  const hasSelectedOther = hasSelectedDeviceRepositoryOther(version)
+  const hasCompleted = hasCompletedDeviceRepositorySelection(version)
+  const hasValidType = hasValidDeviceRepositoryType(version, template)
   const showProgressHint = !hasSelectedOther && !hasCompleted
-  const showDeviceCard = !hasSelectedOther && hasCompleted && Boolean(template)
+  const showDeviceCard = hasValidType
+  const showFrequencyPlanSelector = hasValidType
   const showOtherHint = hasSelectedOther
 
-  const handleBrandChange = React.useCallback(
-    value => {
-      if (Boolean(model) || Boolean(hardwareVersion) || Boolean(firmwareVersion)) {
-        setValues({
-          ...values,
-          version_ids: {
-            brand_id: value,
-            model_id: undefined,
-            hardware_version: undefined,
-            firmware_version: undefined,
-            band_id: undefined,
-          },
-        })
-      }
-    },
-    [setValues, values, firmwareVersion, hardwareVersion, model],
-  )
-
-  const handleModelChange = React.useCallback(
-    value => {
-      if (Boolean(hardwareVersion) || Boolean(firmwareVersion)) {
-        setValues({
-          ...values,
-          version_ids: {
-            ...values.version_ids,
-            model_id: value,
-            hardware_version: undefined,
-            firmware_version: undefined,
-            band_id: undefined,
-          },
-        })
-      }
-    },
-    [setValues, values, hardwareVersion, firmwareVersion],
-  )
-
+  // Apply template once it is fetched.
   React.useEffect(() => {
-    // Fetch template after completing the selection step (select band, model, hw/fw versions and band).
-    if (values && hasCompleted && !hasSelectedOther && values._isClaiming === undefined) {
-      const {
-        version_ids: { hardware_version, ...v },
-      } = values
-
-      getRegistrationTemplate(appId, v)
+    if (template && hasCompleted) {
+      setValues(values => ({
+        ...values,
+        ...template.end_device,
+        version_ids: values.version_ids,
+      }))
     }
-  }, [appId, getRegistrationTemplate, hasCompleted, hasSelectedOther, values])
+  }, [hasCompleted, setValues, template])
+
+  // Fetch template after completing the selection step (select band, model, hw/fw versions and band).
+  React.useEffect(() => {
+    if (hasCompleted && !hasSelectedOther && values._isClaiming === undefined) {
+      getRegistrationTemplate(appId, {
+        brand_id: brand,
+        model_id: model,
+        firmware_version: firmwareVersion,
+        band_id: band,
+      })
+    }
+  }, [
+    appId,
+    band,
+    brand,
+    firmwareVersion,
+    getRegistrationTemplate,
+    hasCompleted,
+    hasSelectedOther,
+    model,
+    values._isClaiming,
+  ])
 
   return (
     <Row>
@@ -128,8 +150,8 @@ const DeviceTypeRepositoryFormSection = props => {
             className={classnames(style.select, style.selectS)}
             name="version_ids.brand_id"
             required
-            onChange={handleBrandChange}
             tooltipId={tooltipIds.DEVICE_BRAND}
+            valueSetter={brandValueSetter}
           />
           {hasBrand && (
             <ModelSelect
@@ -137,8 +159,8 @@ const DeviceTypeRepositoryFormSection = props => {
               name="version_ids.model_id"
               required
               brandId={brand}
-              onChange={handleModelChange}
               tooltipId={tooltipIds.DEVICE_MODEL}
+              valueSetter={modelValueSetter}
             />
           )}
           {hasModel && (
@@ -175,15 +197,20 @@ const DeviceTypeRepositoryFormSection = props => {
         </div>
         {showProgressHint && <ProgressHint supportLink={supportLink} />}
         {showOtherHint && <OtherHint manualGuideDocsPath="/devices/adding-devices/" />}
+        {!showDeviceCard && <hr />}
         {showDeviceCard && <Card brandId={brand} modelId={model} template={template} />}
+        {showFrequencyPlanSelector && (
+          <FreqPlansSelect
+            required
+            className="mt-ls-xxs"
+            tooltipId={tooltipIds.FREQUENCY_PLAN}
+            name="frequency_plan_id"
+            bandId={band}
+          />
+        )}
       </Col>
     </Row>
   )
-}
-
-DeviceTypeRepositoryFormSection.propTypes = {
-  appId: PropTypes.string.isRequired,
-  getRegistrationTemplate: PropTypes.func.isRequired,
 }
 
 export { DeviceTypeRepositoryFormSection as default, initialValues }

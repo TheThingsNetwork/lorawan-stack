@@ -21,8 +21,6 @@ import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import style from './hints.styl'
-
 const m = defineMessages({
   hintMessage:
     'Cannot find your exact end device? <SupportLink>Get help here</SupportLink> and try <b>enter end device specifics manually</b> option above.',
@@ -35,7 +33,8 @@ const ProgressHint = React.memo(props => {
 
   return (
     <Message
-      className={style.progressMessage}
+      className="mb-ls-xs"
+      component="div"
       content={Boolean(supportLink) ? m.hintMessage : m.hintNoSupportMessage}
       values={{
         SupportLink: msg => (

@@ -19,9 +19,8 @@ import Radio from '@ttn-lw/components/radio-button'
 import Form, { useFormContext } from '@ttn-lw/components/form'
 import Modal from '@ttn-lw/components/modal'
 
-import PropTypes from '@ttn-lw/lib/prop-types'
-
 import m from '../messages'
+import { hasCompletedDeviceRepositorySelection, hasSelectedDeviceRepositoryOther } from '../utils'
 
 import DeviceTypeRepositoryFormSection, {
   initialValues as repositoryInitialValues,
@@ -38,61 +37,74 @@ const initialValues = merge(
   repositoryInitialValues,
 )
 
-const DeviceTypeFormSection = props => {
-  const { getRegistrationTemplate, appId } = props
+const DeviceTypeFormSection = () => {
   const {
-    values: { _inputMethod, _isClaiming },
+    values: { version_ids, frequency_plan_id, lorawan_version, lorawan_phy_version, _inputMethod },
     resetForm,
+    initialValues,
   } = useFormContext()
+
+  const isPristineForm =
+    (!hasCompletedDeviceRepositorySelection(version_ids) ||
+      hasSelectedDeviceRepositoryOther(version_ids)) &&
+    !Boolean(frequency_plan_id) &&
+    !Boolean(lorawan_phy_version) &&
+    !Boolean(lorawan_version)
+
   const [showModal, setShowModal] = useState(false)
 
-  const handleMethodChange = React.useCallback(() => {
-    setShowModal(true)
-  }, [])
+  const handleMethodChange = React.useCallback(
+    value => {
+      if (!isPristineForm) {
+        setShowModal(true)
+      } else {
+        resetForm({ values: { ...initialValues, _inputMethod: value } })
+      }
+    },
+    [initialValues, isPristineForm, resetForm],
+  )
 
-  const handleComplete = React.useCallback(() => {
-    setShowModal(false)
-    resetForm({ values: { ...initialValues, _inputMethod } })
-  }, [resetForm, _inputMethod])
+  const handleMethodModalComplete = React.useCallback(
+    approved => {
+      setShowModal(false)
+      if (approved) {
+        resetForm({
+          values: {
+            ...initialValues,
+            _inputMethod: _inputMethod === 'device-repository' ? 'manual' : 'device-repository',
+          },
+        })
+      }
+    },
+    [_inputMethod, initialValues, resetForm],
+  )
 
   return (
     <>
-      {showModal && _isClaiming !== undefined && (
+      {showModal && (
         <Modal
           buttonMessage={m.changeDeviceTypeButton}
           message={m.changeDeviceType}
           title={m.changeDeviceTypeButton}
-          onComplete={handleComplete}
+          onComplete={handleMethodModalComplete}
         />
       )}
       <Form.SubTitle title={m.endDeviceType} />
       <Form.Field
         title={m.inputMethod}
-        name="_inputMethod"
         component={Radio.Group}
         onChange={handleMethodChange}
+        value={_inputMethod}
+        name="__inputMethod"
+        connectedFields={['_inputMethod']}
       >
         <Radio label={m.inputMethodDeviceRepo} value="device-repository" />
         <Radio label={m.inputMethodManual} value="manual" />
       </Form.Field>
-      {_inputMethod === 'device-repository' && (
-        <DeviceTypeRepositoryFormSection
-          getRegistrationTemplate={getRegistrationTemplate}
-          appId={appId}
-        />
-      )}
+      {_inputMethod === 'device-repository' && <DeviceTypeRepositoryFormSection />}
       {_inputMethod === 'manual' && <DeviceTypeManualFormSection />}
     </>
   )
-}
-
-DeviceTypeFormSection.propTypes = {
-  appId: PropTypes.string,
-  getRegistrationTemplate: PropTypes.func,
-}
-DeviceTypeFormSection.defaultProps = {
-  appId: undefined,
-  getRegistrationTemplate: () => null,
 }
 
 export { DeviceTypeFormSection as default, initialValues }
