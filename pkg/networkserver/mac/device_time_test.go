@@ -30,6 +30,7 @@ import (
 
 func TestHandleDeviceTimeReq(t *testing.T) {
 	recvAt := time.Unix(42, 42).UTC()
+	mdRecvAt, gpsTime := recvAt.Add(-250), recvAt.Add(-500)
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
@@ -124,6 +125,74 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 				EvtReceiveDeviceTimeRequest,
 				EvtEnqueueDeviceTimeAnswer.With(events.WithData(&ttnpb.MACCommand_DeviceTimeAns{
 					Time: ttnpb.ProtoTimePtr(recvAt),
+				})),
+			},
+		},
+		{
+			Name: "time from rx_metadata",
+			Device: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{},
+			},
+			Expected: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					QueuedResponses: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_DeviceTimeAns{
+							Time: ttnpb.ProtoTimePtr(mdRecvAt),
+						}).MACCommand(),
+					},
+				},
+			},
+			Message: &ttnpb.UplinkMessage{
+				ReceivedAt: ttnpb.ProtoTimePtr(recvAt),
+				RxMetadata: []*ttnpb.RxMetadata{
+					{
+						ReceivedAt: ttnpb.ProtoTimePtr(mdRecvAt),
+					},
+					{
+						ReceivedAt: ttnpb.ProtoTimePtr(mdRecvAt.Add(200)),
+					},
+				},
+			},
+			Events: events.Builders{
+				EvtReceiveDeviceTimeRequest,
+				EvtEnqueueDeviceTimeAnswer.With(events.WithData(&ttnpb.MACCommand_DeviceTimeAns{
+					Time: ttnpb.ProtoTimePtr(mdRecvAt),
+				})),
+			},
+		},
+		{
+			Name: "gps_time from rx_metadata",
+			Device: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{},
+			},
+			Expected: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					QueuedResponses: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_DeviceTimeAns{
+							Time: ttnpb.ProtoTimePtr(gpsTime),
+						}).MACCommand(),
+					},
+				},
+			},
+			Message: &ttnpb.UplinkMessage{
+				ReceivedAt: ttnpb.ProtoTimePtr(recvAt),
+				RxMetadata: []*ttnpb.RxMetadata{
+					{
+						GpsTime:    ttnpb.ProtoTimePtr(gpsTime),
+						ReceivedAt: ttnpb.ProtoTimePtr(mdRecvAt),
+					},
+					{
+						ReceivedAt: ttnpb.ProtoTimePtr(mdRecvAt.Add(200)),
+					},
+					{
+						GpsTime: ttnpb.ProtoTimePtr(gpsTime.Add(150)),
+					},
+				},
+			},
+			Events: events.Builders{
+				EvtReceiveDeviceTimeRequest,
+				EvtEnqueueDeviceTimeAnswer.With(events.WithData(&ttnpb.MACCommand_DeviceTimeAns{
+					Time: ttnpb.ProtoTimePtr(gpsTime),
 				})),
 			},
 		},
