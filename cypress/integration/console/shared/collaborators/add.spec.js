@@ -248,10 +248,7 @@ describe('Collaborators', () => {
       cy.findByLabelText('Grant all current and future rights').check()
       cy.findByRole('button', { name: 'Add collaborator' }).click()
 
-      cy.findByTestId('error-notification')
-        .should('be.visible')
-        .findByText(orgNotExist)
-        .should('be.visible')
+      cy.findByTestId('error-notification').should('be.visible')
       cy.visit(`${Cypress.config('consoleRootPath')}/organizations/${testOrgId}/collaborators/add`)
     })
   })
