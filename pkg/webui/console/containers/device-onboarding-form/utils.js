@@ -70,3 +70,10 @@ export const getLorawanPhyVersionLabel = ({ lorawan_phy_version }) => {
 
   return label
 }
+
+export const DEVICE_CLASS_MAP = {
+  CLASS_A: 'class-a',
+  CLASS_B: 'class-b',
+  CLASS_C: 'class-c',
+  CLASS_B_C: 'class-b-c',
+}

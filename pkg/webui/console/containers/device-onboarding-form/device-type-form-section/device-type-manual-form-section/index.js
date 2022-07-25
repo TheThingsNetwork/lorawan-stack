@@ -35,8 +35,31 @@ const initialValues = {
   ...advancedSettingsInitialValues,
 }
 
+// Always reset LW and PHY version when changing FP do avoid invalid
+// version combinations that can otherwise occur.
+const frequencyPlanValueSetter = ({ setValues, setFieldTouched }, { value }) => {
+  setFieldTouched('lorawan_version', false)
+  setFieldTouched('lorawan_phy_version', false)
+  return setValues(values => ({
+    ...values,
+    frequency_plan_id: value,
+    lorawan_version: '',
+    lorawan_phy_version: '',
+  }))
+}
+
+// Always reset the PHY version when setting the lorawan version to avoid
+// invalid version combinations that would otherwise briefly occur until
+// the PHY version is set by the field itself.
+const lorawanVersionValueSetter = ({ setValues, setFieldTouched }, { value }) => {
+  setFieldTouched('lorawan_phy_version', false)
+  return setValues(values => ({ ...values, lorawan_version: value, lorawan_phy_version: '' }))
+}
+
 const DeviceTypeManualFormSection = () => {
-  const { frequency_plan_id, lorawan_version } = useFormContext()
+  const {
+    values: { frequency_plan_id, lorawan_version },
+  } = useFormContext()
 
   return (
     <>
@@ -44,6 +67,7 @@ const DeviceTypeManualFormSection = () => {
         required
         tooltipId={tooltipIds.FREQUENCY_PLAN}
         name="frequency_plan_id"
+        valueSetter={frequencyPlanValueSetter}
       />
       <Form.Field
         required
@@ -52,6 +76,7 @@ const DeviceTypeManualFormSection = () => {
         component={LorawanVersionInput}
         tooltipId={tooltipIds.LORAWAN_VERSION}
         frequencyPlan={frequency_plan_id}
+        valueSetter={lorawanVersionValueSetter}
       />
       <Form.Field
         required

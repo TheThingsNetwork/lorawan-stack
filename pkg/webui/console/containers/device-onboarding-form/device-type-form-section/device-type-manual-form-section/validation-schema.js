@@ -17,10 +17,6 @@ import { isUndefined } from 'lodash'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import Yup from '@ttn-lw/lib/yup'
 
-import { ACTIVATION_MODES } from '@console/lib/device-utils'
-
-import { DEVICE_CLASS_MAP } from '../../utils'
-
 // Validation schemas of the device type manual form section.
 // Please observe the following rules to keep the validation schemas maintainable:
 // 1. DO NOT USE ANY TYPE CONVERSIONS HERE. Use decocer/encoder on field level instead.
@@ -41,35 +37,25 @@ const factoryPresetFreqNumericTest = frequencies =>
   })
 
 const advancedSettingsSchema = Yup.object({
-  supports_class_b: Yup.boolean(),
-  supports_class_c: Yup.boolean(),
-  supports_join: Yup.boolean(),
-  multicast: Yup.boolean(),
-  _device_class: Yup.string().when(['_activation_mode'], (mode, schema) => {
-    // The additional device classes (B and/or C) have to be set when using multicast.
-    if (mode === ACTIVATION_MODES.MULTICAST) {
-      return schema.required(sharedMessages.validateRequired)
-    }
-
-    return schema.oneOf(Object.values(DEVICE_CLASS_MAP))
+  supports_class_b: Yup.boolean().required(sharedMessages.validateRequired),
+  supports_class_c: Yup.boolean().required(sharedMessages.validateRequired),
+  supports_join: Yup.boolean().when('$mayEditKeys', {
+    is: false,
+    then: schema => schema.oneOf([true]),
+  }),
+  multicast: Yup.boolean().when('$mayEditKeys', {
+    is: false,
+    then: schema => schema.oneOf([false]),
   }),
   _default_ns_settings: Yup.bool(),
-  _activation_mode: Yup.mixed().when(['$mayEditKeys'], (mayEditKeys, schema) => {
-    // If the user may not set any root keys, the only activation option is OTAA.
-    if (!mayEditKeys) {
-      return schema.oneOf([ACTIVATION_MODES.OTAA]).required(sharedMessages.validateRequired)
-    }
-
-    return schema.oneOf(Object.values(ACTIVATION_MODES)).required(sharedMessages.validateRequired)
-  }),
   _skip_js_registration: Yup.bool(),
 })
 
 const macSettingsSchema = Yup.object({
   mac_settings: Yup.lazy(macSettings =>
     Yup.object().when(
-      ['_activation_mode', '$defaultMacSettings'],
-      (mode, defaultMacSettings, schema) => {
+      ['multicast', 'supports_join', '$defaultMacSettings'],
+      (multicast, supports_join, defaultMacSettings, schema) => {
         if (!defaultMacSettings || !macSettings) {
           return schema
         }
@@ -112,7 +98,7 @@ const macSettingsSchema = Yup.object({
           ping_slot_periodicity: Yup.lazy(() => {
             // Ping slot periodicity does not have a default value, so it has to be
             // set explicitly when not using OTAA.
-            if (mode === ACTIVATION_MODES.MULTICAST || mode === ACTIVATION_MODES.ABP) {
+            if (multicast || !supports_join) {
               return Yup.string().default(null).typeError(sharedMessages.validateRequired)
             }
 
