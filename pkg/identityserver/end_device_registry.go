@@ -344,6 +344,10 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 		req.FieldMask = cleanFieldMaskPaths(ttnpb.EndDeviceFieldPathsNested, req.FieldMask, nil, []string{"activated_at"})
 	}
 
+	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.GetPaths()), "claim_authentication_code") {
+		req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "claim_authentication_code")
+	}
+
 	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.GetPaths()), "picture") {
 		if !ttnpb.HasAnyField(req.FieldMask.GetPaths(), "picture") {
 			req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "picture")
