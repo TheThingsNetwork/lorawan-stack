@@ -19,7 +19,9 @@ import (
 	"time"
 
 	"github.com/uptrace/bun"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"google.golang.org/grpc/codes"
 )
 
 var _ bun.QueryHook = (*LoggerHook)(nil)
@@ -66,8 +68,17 @@ func (h *LoggerHook) AfterQuery(_ context.Context, event *bun.QueryEvent) {
 		}
 	}
 	if event.Err != nil {
-		logFields = logFields.WithError(wrapDriverError(event.Err))
+		err := wrapDriverError(event.Err)
+		logFields = logFields.WithError(err)
+		switch errors.Code(err) {
+		case uint32(codes.Canceled),
+			uint32(codes.DeadlineExceeded),
+			uint32(codes.NotFound),
+			uint32(codes.AlreadyExists):
+		default:
+			h.logger.WithFields(logFields).Debug("Database error")
+			return
+		}
 	}
-
 	h.logger.WithFields(logFields).Debug("Run database query")
 }
