@@ -373,11 +373,13 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids *ttnpb.GatewayIdentifiers, band
 	}
 
 	timestamp := TimestampFromXTime(updf.RadioMetaData.UpInfo.XTime)
+	gpsTime := TimePtrFromGPSTime(updf.UpInfo.GPSTime)
 	tm := TimePtrFromUpInfo(updf.UpInfo.GPSTime, updf.UpInfo.RxTime, receivedAt)
 	up.RxMetadata = []*ttnpb.RxMetadata{
 		{
 			GatewayIds:   ids,
 			Time:         ttnpb.ProtoTime(tm),
+			GpsTime:      ttnpb.ProtoTime(gpsTime),
 			Timestamp:    timestamp,
 			Rssi:         updf.RadioMetaData.UpInfo.RSSI,
 			ChannelRssi:  updf.RadioMetaData.UpInfo.RSSI,
