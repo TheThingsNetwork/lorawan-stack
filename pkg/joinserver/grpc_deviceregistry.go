@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
@@ -197,8 +198,9 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 		"claim_authentication_code.valid_from",
 		"claim_authentication_code.value_to",
 	) {
-		log.FromContext(ctx).Warn(
-			`Storage of claim authentication code in the Join Server registry is deprecated. Use the Identity Server registry instead`, //nolint:lll
+		warning.Add(
+			ctx,
+			"Storage of claim authentication code in the Join Server registry is deprecated. Use the Identity Server registry instead", //nolint:lll
 		)
 	}
 
