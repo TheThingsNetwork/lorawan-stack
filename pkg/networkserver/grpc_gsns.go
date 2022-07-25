@@ -428,6 +428,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 	if matchType == currentRetransmissionMatch {
 		dev.MacState.PendingRequests = nil
 	}
+	var queuedEventBuilders []events.Builder
 	var cmds []*ttnpb.MACCommand
 	for r := bytes.NewReader(cmdBuf); r.Len() > 0; {
 		cmd := &ttnpb.MACCommand{}
@@ -435,7 +436,8 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 			log.FromContext(ctx).WithFields(log.Fields(
 				"bytes_left", r.Len(),
 				"mac_count", len(cmds),
-			)).WithError(err).Warn("Failed to read MAC command")
+			)).WithError(err).Debug("Failed to read MAC command")
+			queuedEventBuilders = append(queuedEventBuilders, mac.EvtParseMACCommandFail.BindData(err))
 			break
 		}
 		logger := logger.WithField("command", cmd)
@@ -458,7 +460,6 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 	trace.Logf(ctx, "ns", "read %d MAC commands", len(cmds))
 	ctx = log.NewContext(ctx, logger)
 
-	var queuedEventBuilders []events.Builder
 	if pld.FHdr.FCtrl.ClassB {
 		switch {
 		case !dev.SupportsClassB:
@@ -579,17 +580,23 @@ macLoop:
 		case ttnpb.MACCommandIdentifier_CID_DEVICE_MODE:
 			evs, err = mac.HandleDeviceModeInd(ctx, dev, cmd.GetDeviceModeInd())
 		default:
-			logger.Warn("Unknown MAC command received, skip the rest")
+			_, known := lorawan.DefaultMACCommands[cmd.Cid]
+			logger.WithField("known", known).Debug("Unknown MAC command received")
+			queuedEventBuilders = append(queuedEventBuilders, mac.EvtUnknownMACCommand.BindData(cmd))
 			break macLoop
 		}
 		if err != nil {
 			logger.WithError(err).Debug("Failed to process MAC command")
+			queuedEventBuilders = append(queuedEventBuilders, mac.EvtProcessMACCommandFail.BindData(err))
 			break macLoop
 		}
 		queuedEventBuilders = append(queuedEventBuilders, evs...)
 	}
 	if n := len(dev.MacState.PendingRequests); n > 0 {
-		logger.WithField("unanswered_request_count", n).Warn("MAC command buffer not fully answered")
+		logger.WithField("unanswered_request_count", n).Debug("MAC command buffer not fully answered")
+		queuedEventBuilders = append(queuedEventBuilders, mac.EvtUnansweredMACCommand.BindData(
+			append(dev.MacState.PendingRequests[:0:0], dev.MacState.PendingRequests...),
+		))
 		dev.MacState.PendingRequests = dev.MacState.PendingRequests[:0]
 	}
 
@@ -955,7 +962,10 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	for _, f := range matched.DeferredMACHandlers {
 		evs, err := f(ctx, matched.Device, up)
 		if err != nil {
-			log.FromContext(ctx).WithError(err).Warn("Failed to process MAC command after deduplication")
+			log.FromContext(ctx).WithError(err).Debug("Failed to process MAC command after deduplication")
+			matched.QueuedEventBuilders = append(
+				matched.QueuedEventBuilders, mac.EvtProcessMACCommandFail.BindData(err),
+			)
 			break
 		}
 		matched.QueuedEventBuilders = append(matched.QueuedEventBuilders, evs...)
