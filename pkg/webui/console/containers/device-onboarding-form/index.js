@@ -12,9 +12,78 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import DeviceOnboardingForm from './device-onboarding-form'
-import connect from './connect'
+import React, { useCallback } from 'react'
+import { merge } from 'lodash'
+import { useSelector } from 'react-redux'
 
-const ConnectedDeviceOnboardingForm = connect(DeviceOnboardingForm)
+import Form, { useFormContext } from '@ttn-lw/components/form'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import SubmitButton from '@ttn-lw/components/submit-button'
 
-export { ConnectedDeviceOnboardingForm as default, DeviceOnboardingForm }
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { checkFromState } from '@account/lib/feature-checks'
+import { mayEditApplicationDeviceKeys } from '@console/lib/feature-checks'
+
+import DeviceProvisioningFormSection, {
+  initialValues as provisioningInitialValues,
+} from './device-provisioning-form-section'
+import DeviceTypeFormSection, {
+  initialValues as typeInitialValues,
+} from './device-type-form-section'
+import validationSchema from './validation-schema'
+
+const initialValues = merge({}, provisioningInitialValues, typeInitialValues)
+
+const DeviceOnboardingFormInner = () => {
+  const {
+    values: {
+      frequency_plan_id,
+      lorawan_version,
+      lorawan_phy_version,
+      ids: { join_eui },
+    },
+  } = useFormContext()
+  const maySubmit =
+    Boolean(frequency_plan_id) &&
+    Boolean(lorawan_version) &&
+    Boolean(lorawan_phy_version) &&
+    join_eui.length === 16
+
+  return (
+    <>
+      <DeviceTypeFormSection />
+      <DeviceProvisioningFormSection />
+      {maySubmit && (
+        <SubmitBar>
+          <Form.Submit message={sharedMessages.addDevice} component={SubmitButton} />
+        </SubmitBar>
+      )}
+    </>
+  )
+}
+
+const DeviceOnboardingForm = () => {
+  const mayEditKeys = useSelector(state => checkFromState(mayEditApplicationDeviceKeys, state))
+  const validationContext = React.useMemo(() => ({ mayEditKeys }), [mayEditKeys])
+
+  const handleSubmit = useCallback((values, formikBag, cleanedValues) => {
+    console.log(values, cleanedValues)
+    return Promise.resolve()
+  }, [])
+
+  return (
+    <Form
+      onSubmit={handleSubmit}
+      initialValues={initialValues}
+      hiddenFields={['network_server_address', 'application_server_address', 'join_server_address']}
+      validationSchema={validationSchema}
+      validationContext={validationContext}
+      validateAgainstCleanedValues
+    >
+      <DeviceOnboardingFormInner />
+    </Form>
+  )
+}
+
+export default DeviceOnboardingForm

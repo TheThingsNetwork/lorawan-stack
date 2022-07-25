@@ -14,15 +14,21 @@
 
 import React, { useCallback, useState } from 'react'
 import { merge } from 'lodash'
+import { useSelector } from 'react-redux'
 
 import Input from '@ttn-lw/components/input'
-import Form from '@ttn-lw/components/form'
-import SubmitBar from '@ttn-lw/components/submit-bar'
-import SubmitButton from '@ttn-lw/components/submit-button'
+import Form, { useFormContext } from '@ttn-lw/components/form'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import messages from '@account/containers/profile-settings-form/messages'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
+import { selectDeviceTemplate } from '@console/store/selectors/device-repository'
+
+import { hasValidDeviceRepositoryType } from '../utils'
 import m from '../messages'
 
 import DeviceClaimingFormSection, {
@@ -42,8 +48,21 @@ const initialValues = merge(
   registrationInitialValues,
 )
 
-const DeviceTypeFormSection = props => {
+const DeviceTypeFormSection = () => {
   const [isClaiming, setIsClaiming] = useState(undefined)
+  const {
+    values: {
+      _inputMethod,
+      version_ids: version,
+      frequency_plan_id,
+      lorawan_version,
+      lorawan_phy_version,
+    },
+  } = useFormContext()
+  const template = useSelector(selectDeviceTemplate)
+  const mayProvisionDevice =
+    (Boolean(frequency_plan_id) && Boolean(lorawan_version) && Boolean(lorawan_phy_version)) ||
+    (_inputMethod === 'device-repository' && hasValidDeviceRepositoryType(version, template))
 
   const onIdPrefill = useCallback(() => {
     // Reminder that DevEUI is used as id default (on blur).
@@ -52,27 +71,27 @@ const DeviceTypeFormSection = props => {
 
   return (
     <>
-      <Form.Field
-        title={sharedMessages.joinEUI}
-        name="ids.join_eui"
-        type="byte"
-        min={8}
-        max={8}
-        required
-        component={Input}
-        tooltipId={tooltipIds.JOIN_EUI}
-        onBlur={onIdPrefill}
-      />
+      {mayProvisionDevice ? (
+        <Form.Field
+          title={sharedMessages.joinEUI}
+          name="ids.join_eui"
+          type="byte"
+          min={8}
+          max={8}
+          required
+          component={Input}
+          tooltipId={tooltipIds.JOIN_EUI}
+          onBlur={onIdPrefill}
+        />
+      ) : (
+        <Message
+          content={_inputMethod === 'device-repository' ? m.continueDeviceRepo : m.continueManual}
+          className="mt-ls-m mb-ls-m"
+          component="div"
+        />
+      )}
       {isClaiming === true && <DeviceClaimingFormSection />}
       {isClaiming === false && <DeviceRegistrationFormSection />}
-      {isClaiming !== undefined && (
-        <SubmitBar>
-          <Form.Submit
-            component={SubmitButton}
-            message={isClaiming === true ? m.claimEndDevice : m.registerEndDevice}
-          />
-        </SubmitBar>
-      )}
     </>
   )
 }

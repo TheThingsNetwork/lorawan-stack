@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { merge } from 'lodash'
 
 import Radio from '@ttn-lw/components/radio-button'
@@ -41,7 +41,6 @@ const DeviceTypeFormSection = () => {
   const {
     values: { version_ids, frequency_plan_id, lorawan_version, lorawan_phy_version, _inputMethod },
     resetForm,
-    initialValues,
   } = useFormContext()
 
   const isPristineForm =
@@ -53,31 +52,32 @@ const DeviceTypeFormSection = () => {
 
   const [showModal, setShowModal] = useState(false)
 
-  const handleMethodChange = React.useCallback(
-    value => {
+  const modalResolver = useRef()
+
+  const handleInputMethodChange = useCallback(
+    async ({ setFieldValue }, { name, value }) => {
       if (!isPristineForm) {
         setShowModal(true)
+        const approved = await new Promise(resolve => {
+          modalResolver.current = resolve
+        })
+        setShowModal(false)
+        if (approved) {
+          resetForm()
+          return setFieldValue(name, value)
+        }
       } else {
-        resetForm({ values: { ...initialValues, _inputMethod: value } })
+        return setFieldValue(name, value)
       }
     },
-    [initialValues, isPristineForm, resetForm],
+    [isPristineForm, resetForm],
   )
 
-  const handleMethodModalComplete = React.useCallback(
-    approved => {
-      setShowModal(false)
-      if (approved) {
-        resetForm({
-          values: {
-            ...initialValues,
-            _inputMethod: _inputMethod === 'device-repository' ? 'manual' : 'device-repository',
-          },
-        })
-      }
-    },
-    [_inputMethod, initialValues, resetForm],
-  )
+  const handleMethodModalComplete = React.useCallback(approved => {
+    if (modalResolver && modalResolver.current) {
+      modalResolver.current(approved)
+    }
+  }, [])
 
   return (
     <>
@@ -93,10 +93,9 @@ const DeviceTypeFormSection = () => {
       <Form.Field
         title={m.inputMethod}
         component={Radio.Group}
-        onChange={handleMethodChange}
         value={_inputMethod}
-        name="__inputMethod"
-        connectedFields={['_inputMethod']}
+        name="_inputMethod"
+        valueSetter={handleInputMethodChange}
       >
         <Radio label={m.inputMethodDeviceRepo} value="device-repository" />
         <Radio label={m.inputMethodManual} value="manual" />

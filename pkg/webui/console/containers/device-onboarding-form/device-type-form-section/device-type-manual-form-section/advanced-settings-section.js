@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect, useState } from 'react'
-import { isEmpty, isUndefined, merge, omitBy } from 'lodash'
+import React, { useEffect } from 'react'
+import { isEmpty, isPlainObject, isUndefined, merge } from 'lodash'
 import { defineMessages } from 'react-intl'
-import { useSelector } from 'react-redux'
-
-import tts from '@console/api/tts'
+import { useDispatch, useSelector } from 'react-redux'
 
 import toast from '@ttn-lw/components/toast'
 import Form, { useFormContext } from '@ttn-lw/components/form'
@@ -37,12 +35,17 @@ import { selectAsConfig, selectJsConfig, selectNsConfig } from '@ttn-lw/lib/sele
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import { getBackendErrorName, isBackend } from '@ttn-lw/lib/errors/utils'
 import getHostFromUrl from '@ttn-lw/lib/host-from-url'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { ACTIVATION_MODES, hasCFListTypeChMask } from '@console/lib/device-utils'
 import { checkFromState } from '@account/lib/feature-checks'
 import { mayEditApplicationDeviceKeys } from '@console/lib/feature-checks'
 
-import { REGISTRATION_TYPES, DEVICE_CLASS_MAP } from '../../utils'
+import { getDefaultMacSettings } from '@console/store/actions/network-server'
+
+import { selectDefaultMacSettings } from '@console/store/selectors/network-server'
+
+import { DEVICE_CLASS_MAP } from '../../utils'
 import messages from '../../messages'
 
 const m = defineMessages({
@@ -64,6 +67,8 @@ const m = defineMessages({
     'Please select frequency plan and LoRaWAN versions to manage MAC settings',
 })
 
+const emptyDefaultMacSettings = {}
+
 const allClassOptions = [
   { label: m.classA, value: DEVICE_CLASS_MAP.CLASS_A },
   { label: m.classB, value: DEVICE_CLASS_MAP.CLASS_B },
@@ -82,6 +87,66 @@ const asHost = getHostFromUrl(asUrl)
 
 const factoryPresetFreqEncoder = value => (isEmpty(value) ? undefined : value)
 const factoryPresetFreqDecoder = value => (value === undefined ? [] : value)
+
+const activationModeEncoder = activationMode => ({
+  supports_join: activationMode === ACTIVATION_MODES.OTAA,
+  multicast: activationMode === ACTIVATION_MODES.MULTICAST,
+})
+const activationModeDecoder = ({ supports_join, multicast }) => {
+  if (multicast) {
+    return ACTIVATION_MODES.MULTICAST
+  } else if (supports_join) {
+    return ACTIVATION_MODES.OTAA
+  }
+  return ACTIVATION_MODES.ABP
+}
+
+const activationModeValueSetter = ({ setValues }, { value, value: { multicast } }) => {
+  setValues(({ supports_class_b, supports_class_c, ...values }) => {
+    const isClassA = supports_class_b === false && supports_class_c === false
+    return {
+      ...values,
+      ...value,
+      // (Re)set class capabilities when choosing multicast while
+      // retaining the last value if possible.
+      supports_class_b:
+        multicast && isClassA
+          ? undefined
+          : !multicast && supports_class_b === undefined
+          ? false
+          : supports_class_b,
+      supports_class_c:
+        multicast && isClassA
+          ? undefined
+          : !multicast && supports_class_c === undefined
+          ? false
+          : supports_class_c,
+    }
+  })
+}
+const deviceClassEncoder = deviceClass => ({
+  supports_class_b:
+    deviceClass === DEVICE_CLASS_MAP.CLASS_B || deviceClass === DEVICE_CLASS_MAP.CLASS_B_C,
+  supports_class_c:
+    deviceClass === DEVICE_CLASS_MAP.CLASS_C || deviceClass === DEVICE_CLASS_MAP.CLASS_B_C,
+})
+
+const deviceClassDecoder = ({ supports_class_b, supports_class_c }) => {
+  if (isUndefined(supports_class_b || supports_class_c)) {
+    return ''
+  }
+  if (supports_class_b && supports_class_c) {
+    return DEVICE_CLASS_MAP.CLASS_B_C
+  } else if (supports_class_b) {
+    return DEVICE_CLASS_MAP.CLASS_B
+  } else if (supports_class_c) {
+    return DEVICE_CLASS_MAP.CLASS_C
+  }
+  return DEVICE_CLASS_MAP.CLASS_A
+}
+
+const skipJsRegistrationEncoder = skip => (skip ? undefined : jsHost)
+const skipJsRegistrationDecoder = isUndefined
 
 const pingSlotPeriodicityOptions = Array.from({ length: 8 }, (_, index) => {
   const value = Math.pow(2, index)
@@ -105,11 +170,7 @@ const initialValues = {
   network_server_address: nsHost,
   application_server_address: asHost,
   supports_join: true,
-  _device_class: DEVICE_CLASS_MAP.CLASS_A,
-  _activation_mode: ACTIVATION_MODES.OTAA,
-  _registration: REGISTRATION_TYPES.SINGLE,
   _default_ns_settings: true,
-  _skip_js_registration: false,
 }
 
 const AdvancedSettingsSection = () => {
@@ -118,24 +179,20 @@ const AdvancedSettingsSection = () => {
     setValidationContext,
     values: {
       mac_settings,
-      _activation_mode,
       _default_ns_settings,
-      _device_class,
-      _skip_js_registration,
       frequency_plan_id,
       lorawan_phy_version,
       lorawan_version,
+      multicast: isMulticast,
+      supports_join,
+      supports_class_b: isClassB,
+      supports_class_c: isClassC,
     },
   } = useFormContext()
 
   // Set common flags based on current form fields.
-  const isOTAA = _activation_mode === ACTIVATION_MODES.OTAA
-  const isABP = _activation_mode === ACTIVATION_MODES.ABP
-  const isMulticast = _activation_mode === ACTIVATION_MODES.MULTICAST
-  const isClassB =
-    _device_class === DEVICE_CLASS_MAP.CLASS_B_C || _device_class === DEVICE_CLASS_MAP.CLASS_B
-  const isClassC =
-    _device_class === DEVICE_CLASS_MAP.CLASS_B_C || _device_class === DEVICE_CLASS_MAP.CLASS_C
+  const isOTAA = supports_join
+  const isABP = !supports_join && !isMulticast
   // Network settings should not be modified when the type context is not yet known.
   const canManageNetworkSettings =
     Boolean(frequency_plan_id) && Boolean(lorawan_phy_version) && Boolean(lorawan_version)
@@ -150,8 +207,11 @@ const AdvancedSettingsSection = () => {
   // so it requires bands with a CFList type of Frequencies.
   const disableFactoryPresetFreq = hasCFListTypeChMask(frequency_plan_id)
 
-  const [defaultMacSettings, setDefaultMacSettings] = useState(initialValues.mac_settings)
+  const dispatch = useDispatch()
 
+  const defaultMacSettings =
+    useSelector(state => selectDefaultMacSettings(state, frequency_plan_id, lorawan_phy_version)) ||
+    emptyDefaultMacSettings
   const mayEditKeys = useSelector(state => checkFromState(mayEditApplicationDeviceKeys, state))
 
   // Fetch and apply default MAC settings, when FP or PHY version changes.
@@ -159,9 +219,11 @@ const AdvancedSettingsSection = () => {
     let isMounted = true
     const updateMacSettings = async () => {
       try {
-        const settings = await tts.Ns.getDefaultMacSettings(frequency_plan_id, lorawan_phy_version)
-        if (isMounted) {
-          setDefaultMacSettings(settings)
+        const result = await dispatch(
+          attachPromise(getDefaultMacSettings(frequency_plan_id, lorawan_phy_version)),
+        )
+        if (isMounted && isPlainObject(result) && 'defaultMacSettings' in result) {
+          const { defaultMacSettings: settings } = result
           setValidationContext(context => ({ ...context, defaultMacSettings: settings }))
 
           setValues(values => ({
@@ -175,8 +237,8 @@ const AdvancedSettingsSection = () => {
             type: toast.types.ERROR,
             message: m.fpNotFoundError,
             messageValues: {
-              lorawan_phy_version,
-              frequency_plan_id,
+              lorawanVersion: lorawan_phy_version,
+              freqPlan: frequency_plan_id,
               code: msg => <code>{msg}</code>,
             },
           })
@@ -185,21 +247,16 @@ const AdvancedSettingsSection = () => {
             type: toast.types.ERROR,
             message: m.macSettingsError,
             messageValues: {
-              frequency_plan_id,
+              freqPlan: frequency_plan_id,
               code: msg => <code>{msg}</code>,
             },
           })
         }
       }
     }
-    const resetMacSettings = () => {
-      setDefaultMacSettings({})
-    }
 
     if (frequency_plan_id && lorawan_phy_version) {
       updateMacSettings()
-    } else {
-      resetMacSettings()
     }
     return () => {
       isMounted = false
@@ -208,63 +265,35 @@ const AdvancedSettingsSection = () => {
     frequency_plan_id,
     lorawan_version,
     setValues,
-    setDefaultMacSettings,
     lorawan_phy_version,
     setValidationContext,
+    dispatch,
+    defaultMacSettings,
   ])
 
-  // Apply field inter-dependent modifications.
-  // Note: Values set to `undefined`` will be stripped.
+  // Manage mac settings in form.
   useEffect(() => {
-    setValues(values =>
-      omitBy(
-        {
-          ...values,
-          // Map device class selector to class flags.
-          supports_class_b: isClassB,
-          supports_class_c: isClassC,
-          // Map activation mode selector to support join and multicast flag.
-          supports_join: !_skip_js_registration ? isOTAA : undefined,
-          multicast: isMulticast,
-          // Reset mac settings to defaults when toggled.
-          mac_settings: _default_ns_settings
-            ? merge({}, initialValues.mac_settings, values.mac_settings, defaultMacSettings)
-            : merge({}, initialValues.mac_settings, values.mac_settings),
-          // Strip join server address when opting to skip JS registration.
-          join_server_address: !_skip_js_registration ? jsHost : undefined,
-          // Unset default settings when required field is present (`ping_slot_periodicity`).
-          _default_ns_settings: mayChangeToDefaultSettings ? _default_ns_settings : false,
-          // Reset device class selector, if multicast and set to class A.
-          _device_class: isMulticast
-            ? values._device_class === DEVICE_CLASS_MAP.CLASS_A
-              ? ''
-              : _device_class
-            : _device_class,
-        },
-        isUndefined,
-      ),
-    )
-  }, [
-    _default_ns_settings,
-    _device_class,
-    _skip_js_registration,
-    defaultMacSettings,
-    isClassB,
-    isClassC,
-    isMulticast,
-    isOTAA,
-    mayChangeToDefaultSettings,
-    setValues,
-  ])
+    setValues(values => ({
+      ...values,
+      // Reset mac settings to defaults when toggled.
+      mac_settings: _default_ns_settings
+        ? merge({}, initialValues.mac_settings, values.mac_settings, defaultMacSettings)
+        : merge({}, initialValues.mac_settings, values.mac_settings),
+      // Unset default settings when required field is present (`ping_slot_periodicity`).
+      _default_ns_settings: mayChangeToDefaultSettings ? _default_ns_settings : false,
+    }))
+  }, [_default_ns_settings, defaultMacSettings, mayChangeToDefaultSettings, setValues])
 
   return (
     <Form.CollapseSection id="advanced-settings" title={m.advancedSectionTitle}>
       <Form.Field
         title={sharedMessages.activationMode}
-        name="_activation_mode"
-        connectedFields={['supports_class_b', 'supports_class_c', 'multicast']}
+        name="supports_join,multicast"
         component={Radio.Group}
         tooltipId={tooltipIds.ACTIVATION_MODE}
+        encode={activationModeEncoder}
+        decode={activationModeDecoder}
+        valueSetter={activationModeValueSetter}
         required
       >
         <Radio label={sharedMessages.otaa} value={ACTIVATION_MODES.OTAA} />
@@ -278,11 +307,12 @@ const AdvancedSettingsSection = () => {
       <Form.Field
         title={isMulticast ? m.multicastClassCapabilities : messages.classCapabilities}
         required={isMulticast}
-        name="_device_class"
-        connectedFields={['supports_join']}
+        name="supports_class_b,supports_class_c"
         component={Select}
         options={isMulticast ? multicastClassOptions : allClassOptions}
         tooltipId={tooltipIds.CLASSES}
+        encode={deviceClassEncoder}
+        decode={deviceClassDecoder}
       />
       <Form.Field
         title={messages.networkDefaults}
@@ -505,12 +535,9 @@ const AdvancedSettingsSection = () => {
       <Form.Field
         title={messages.clusterSettings}
         label={m.skipJsRegistration}
-        name="_skip_js_registration"
-        connectedFields={[
-          'network_server_address',
-          'application_server_address',
-          'join_server_address',
-        ]}
+        name="join_server_address"
+        encode={skipJsRegistrationEncoder}
+        decode={skipJsRegistrationDecoder}
         component={Checkbox}
         tooltipId={tooltipIds.SKIP_JOIN_SERVER_REGISTRATION}
       />
