@@ -47,8 +47,6 @@ type testStore struct {
 	// euiStore
 	*entitySearch
 	*notificationStore
-
-	// externalUserStore
 }
 
 func (t testStore) Init(ctx context.Context) error {
@@ -99,8 +97,6 @@ func newTestStore(t *testing.T, dsn *url.URL) storetest.Store {
 		// euiStore:          euiStore{baseStore: baseStore},
 		entitySearch:      newEntitySearch(baseStore),
 		notificationStore: newNotificationStore(baseStore),
-
-		// externalUserStore:           externalUserStore{baseStore: baseStore},
 	}
 }
 
