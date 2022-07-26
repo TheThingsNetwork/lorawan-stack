@@ -19,6 +19,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/csv"
+	"fmt"
 	"io"
 	"strconv"
 	"strings"
@@ -384,7 +385,7 @@ func (*ttsCSV) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDev
 			paths = ttnpb.AddFields(paths, fieldPaths...)
 		}
 		if !ttnpb.HasAnyField(paths, "ids.device_id") && ttnpb.HasAnyField(paths, "ids.dev_eui") {
-			dev.Ids.DeviceId = strings.ToLower(dev.Ids.DevEui.String())
+			dev.Ids.DeviceId = fmt.Sprintf("eui-%s", strings.ToLower(dev.Ids.DevEui.String()))
 			paths = ttnpb.AddFields(paths, "ids.device_id")
 		}
 
