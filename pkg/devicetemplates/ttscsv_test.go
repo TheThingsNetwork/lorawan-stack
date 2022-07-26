@@ -183,8 +183,8 @@ func TestTTSCSVConverter(t *testing.T) {
 				wg.Done()
 			}()
 			go func() {
-				for i := 0; i < tc.nExpect; i++ {
-					templates = append(templates, <-ch)
+				for t := range ch {
+					templates = append(templates, t)
 				}
 				wg.Done()
 			}()
