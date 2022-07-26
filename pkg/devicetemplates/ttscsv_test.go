@@ -44,6 +44,8 @@ var (
 )
 
 func TestTTSCSVConverter(t *testing.T) {
+	t.Parallel()
+
 	tts := GetConverter("the-things-stack-csv")
 	a := assertions.New(t)
 	if !a.So(tts, should.NotBeNil) {
@@ -53,18 +55,17 @@ func TestTTSCSVConverter(t *testing.T) {
 	for _, tc := range []struct {
 		name           string
 		reader         io.Reader
-		validateError  func(t *testing.T, err error)
-		validateResult func(t *testing.T, templates []*ttnpb.EndDeviceTemplate, count int)
+		validateError  func(a *assertions.Assertion, err error)
+		validateResult func(a *assertions.Assertion, templates []*ttnpb.EndDeviceTemplate, count int)
 		nExpect        int
 	}{
 		{
 			name:   "AllColumns",
 			reader: bytes.NewBufferString(csvAllColumns),
-			validateError: func(t *testing.T, err error) {
-				assertions.New(t).So(err, should.BeNil)
+			validateError: func(a *assertions.Assertion, err error) {
+				a.So(err, should.BeNil)
 			},
-			validateResult: func(t *testing.T, templates []*ttnpb.EndDeviceTemplate, count int) {
-				a := assertions.New(t)
+			validateResult: func(a *assertions.Assertion, templates []*ttnpb.EndDeviceTemplate, count int) {
 				if !a.So(len(templates), should.Equal, count) {
 					t.FailNow()
 				}
@@ -101,11 +102,10 @@ func TestTTSCSVConverter(t *testing.T) {
 		{
 			name:   "ExtraColumns",
 			reader: bytes.NewBufferString(csvExtraColumns),
-			validateError: func(t *testing.T, err error) {
-				assertions.New(t).So(err, should.BeNil)
+			validateError: func(a *assertions.Assertion, err error) {
+				a.So(err, should.BeNil)
 			},
-			validateResult: func(t *testing.T, templates []*ttnpb.EndDeviceTemplate, count int) {
-				a := assertions.New(t)
+			validateResult: func(a *assertions.Assertion, templates []*ttnpb.EndDeviceTemplate, count int) {
 				if !a.So(len(templates), should.Equal, count) {
 					t.FailNow()
 				}
@@ -119,27 +119,26 @@ func TestTTSCSVConverter(t *testing.T) {
 		{
 			name:   "EmptyString",
 			reader: bytes.NewBufferString(""),
-			validateError: func(t *testing.T, err error) {
-				assertions.New(t).So(err, should.NotBeNil)
+			validateError: func(a *assertions.Assertion, err error) {
+				a.So(err, should.NotBeNil)
 			},
 			nExpect: 0,
 		},
 		{
 			name:   "InvalidDevEUI",
 			reader: bytes.NewBufferString(csvInvalidDevEUI),
-			validateError: func(t *testing.T, err error) {
-				assertions.New(t).So(err, should.NotBeNil)
+			validateError: func(a *assertions.Assertion, err error) {
+				a.So(err, should.NotBeNil)
 			},
 			nExpect: 0,
 		},
 		{
 			name:   "GenerateDeviceID",
 			reader: bytes.NewBufferString(csvGenerateDeviceID),
-			validateError: func(t *testing.T, err error) {
-				assertions.New(t).So(err, should.BeNil)
+			validateError: func(a *assertions.Assertion, err error) {
+				a.So(err, should.BeNil)
 			},
-			validateResult: func(t *testing.T, templates []*ttnpb.EndDeviceTemplate, count int) {
-				a := assertions.New(t)
+			validateResult: func(a *assertions.Assertion, templates []*ttnpb.EndDeviceTemplate, count int) {
 				if !a.So(len(templates), should.Equal, count) {
 					t.FailNow()
 				}
@@ -151,11 +150,10 @@ func TestTTSCSVConverter(t *testing.T) {
 		{
 			name:   "AppEUI",
 			reader: bytes.NewBufferString(csvAppEUI),
-			validateError: func(t *testing.T, err error) {
-				assertions.New(t).So(err, should.BeNil)
+			validateError: func(a *assertions.Assertion, err error) {
+				a.So(err, should.BeNil)
 			},
-			validateResult: func(t *testing.T, templates []*ttnpb.EndDeviceTemplate, count int) {
-				a := assertions.New(t)
+			validateResult: func(a *assertions.Assertion, templates []*ttnpb.EndDeviceTemplate, count int) {
 				if !a.So(len(templates), should.Equal, count) {
 					t.FailNow()
 				}
@@ -169,7 +167,10 @@ func TestTTSCSVConverter(t *testing.T) {
 			nExpect: 1,
 		},
 	} {
+		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
 			ctx := test.Context()
 			ch := make(chan *ttnpb.EndDeviceTemplate)
 
@@ -203,9 +204,10 @@ func TestTTSCSVConverter(t *testing.T) {
 				t.FailNow()
 			}
 
-			tc.validateError(t, err)
+			a := assertions.New(t)
+			tc.validateError(a, err)
 			if tc.validateResult != nil {
-				tc.validateResult(t, templates, tc.nExpect)
+				tc.validateResult(a, templates, tc.nExpect)
 			}
 		})
 	}

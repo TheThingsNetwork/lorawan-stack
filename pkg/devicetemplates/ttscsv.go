@@ -33,7 +33,7 @@ const TTSCSV = "the-things-stack-csv"
 type ttsCSV struct{}
 
 // Format implements the devicetemplates.Converter interface.
-func (t *ttsCSV) Format() *ttnpb.EndDeviceTemplateFormat {
+func (*ttsCSV) Format() *ttnpb.EndDeviceTemplateFormat {
 	return &ttnpb.EndDeviceTemplateFormat{
 		Name:           "The Things Stack CSV",
 		Description:    "File containing end devices in The Things Stack CSV format.",
@@ -42,9 +42,13 @@ func (t *ttsCSV) Format() *ttnpb.EndDeviceTemplateFormat {
 }
 
 var (
-	errParseCSV      = errors.DefineInvalidArgument("parse_csv", "parse CSV at line `{line}` column `{column}`: {message}", "start_line")
+	errParseCSV = errors.DefineInvalidArgument("parse_csv",
+		"parse CSV at line `{line}` column `{column}`: {message}", "start_line",
+	)
 	errCSVHeader     = errors.DefineInvalidArgument("csv_header", "no known columns in CSV header")
-	errParseCSVField = errors.DefineInvalidArgument("parse_csv_field", "parse CSV field at line `{line}` column `{column}`")
+	errParseCSVField = errors.DefineInvalidArgument("parse_csv_field",
+		"parse CSV field at line `{line}` column `{column}`",
+	)
 )
 
 func convertCSVErr(err error) error {
@@ -293,7 +297,7 @@ var csvFieldSetters = map[string]csvFieldSetterFunc{
 }
 
 // Convert implements the devicetemplates.Converter interface.
-func (t *ttsCSV) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDeviceTemplate) error {
+func (*ttsCSV) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDeviceTemplate) error {
 	defer close(ch)
 
 	r, err := charset.NewReader(r, "text/csv")
@@ -309,7 +313,7 @@ func (t *ttsCSV) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndD
 	fieldSetters := make(map[int]csvFieldSetterFunc)
 	header, err := dec.Read()
 	if err != nil {
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			return errCSVHeader.WithCause(err)
 		}
 		return convertCSVErr(err)
@@ -329,7 +333,7 @@ func (t *ttsCSV) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndD
 	for {
 		record, err := dec.Read()
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				return nil
 			}
 			return convertCSVErr(err)
