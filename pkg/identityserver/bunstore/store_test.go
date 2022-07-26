@@ -48,7 +48,6 @@ type testStore struct {
 	*entitySearch
 	*notificationStore
 
-	// authenticationProviderStore
 	// externalUserStore
 }
 
@@ -101,7 +100,6 @@ func newTestStore(t *testing.T, dsn *url.URL) storetest.Store {
 		entitySearch:      newEntitySearch(baseStore),
 		notificationStore: newNotificationStore(baseStore),
 
-		// authenticationProviderStore: authenticationProviderStore{baseStore: baseStore},
 		// externalUserStore:           externalUserStore{baseStore: baseStore},
 	}
 }
