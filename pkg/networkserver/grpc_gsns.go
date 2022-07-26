@@ -541,7 +541,7 @@ macLoop:
 		case ttnpb.MACCommandIdentifier_CID_DEV_STATUS:
 			evs, err = mac.HandleDevStatusAns(ctx, dev, cmd.GetDevStatusAns(), cmacFMatchResult.FullFCnt, *ttnpb.StdTime(up.ReceivedAt))
 			if err == nil {
-				setPaths = append(setPaths,
+				setPaths = ttnpb.AddFields(setPaths,
 					"battery_percentage",
 					"downlink_margin",
 					"last_dev_status_received_at",
@@ -608,7 +608,7 @@ macLoop:
 			logger.Debug("No RekeyInd received for LoRaWAN 1.1+ device")
 			return nil, false, nil
 		}
-		setPaths = append(setPaths, "ids.dev_addr")
+		setPaths = ttnpb.AddFields(setPaths, "ids.dev_addr")
 	} else if dev.PendingSession != nil || dev.PendingMacState != nil {
 		// TODO: Notify AS of session recovery(https://github.com/TheThingsNetwork/lorawan-stack/issues/594)
 	}
@@ -704,7 +704,7 @@ macLoop:
 		IsRetransmission:         matchType == currentRetransmissionMatch,
 		QueuedApplicationUplinks: queuedApplicationUplinks,
 		QueuedEventBuilders:      queuedEventBuilders,
-		SetPaths: append(setPaths,
+		SetPaths: ttnpb.AddFields(setPaths,
 			"mac_state",
 			"pending_mac_state",
 			"pending_session",
