@@ -28,7 +28,7 @@ import ApplicationCollaboratorAdd from '@console/views/application-collaborator-
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
+import { userPathId as userPathIdRegexp } from '@ttn-lw/lib/regexp'
 
 const ApplicationCollaborators = props => {
   const { appId, match } = props
@@ -47,7 +47,7 @@ const ApplicationCollaborators = props => {
         <Route exact path={`${match.path}`} component={ApplicationCollaboratorsList} />
         <Route exact path={`${match.path}/add`} component={ApplicationCollaboratorAdd} />
         <Route
-          path={`${match.path}/:collaboratorType(user|organization)/:collaboratorId${pathIdRegexp}`}
+          path={`${match.path}/:collaboratorType(user|organization)/:collaboratorId${userPathIdRegexp}`}
           component={ApplicationCollaboratorEdit}
           sensitive
         />

@@ -30,7 +30,7 @@ import InvitationSend from '@console/views/invitation-send'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
-import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
+import { userPathId as userPathIdRegexp } from '@ttn-lw/lib/regexp'
 
 import { mayManageUsers } from '@console/lib/feature-checks'
 
@@ -54,7 +54,7 @@ export default class UserManagementRouter extends Component {
           <Route exact path={`${match.path}`} component={UserManagement} />
           <Route path={`${match.path}/add`} component={UserAdd} />
           <Route path={`${match.path}/invitations/add`} component={InvitationSend} />
-          <Route path={`${match.path}/:userId${pathIdRegexp}`} component={UserEdit} sensitive />
+          <Route path={`${match.path}/:userId${userPathIdRegexp}`} component={UserEdit} sensitive />
           <NotFoundRoute />
         </Switch>
       </React.Fragment>

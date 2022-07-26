@@ -28,6 +28,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Console showing `404 Not Found` errors for pages containing user IDs in the path, when the user ID has a length of two.
+
 ### Security
 
 ## [3.20.2] - 2022-07-20

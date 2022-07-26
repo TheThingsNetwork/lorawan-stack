@@ -28,7 +28,7 @@ import SubViewError from '@console/views/sub-view-error'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
+import { userPathId as userPathIdRegexp } from '@ttn-lw/lib/regexp'
 
 const GatewayCollaborators = props => {
   const { match, gtwId } = props
@@ -44,7 +44,7 @@ const GatewayCollaborators = props => {
         <Route exact path={`${match.path}`} component={GatewayCollaboratorsList} />
         <Route exact path={`${match.path}/add`} component={GatewayCollaboratorAdd} />
         <Route
-          path={`${match.path}/:collaboratorType(user|organization)/:collaboratorId${pathIdRegexp}`}
+          path={`${match.path}/:collaboratorType(user|organization)/:collaboratorId${userPathIdRegexp}`}
           component={GatewayCollaboratorEdit}
         />
         <NotFoundRoute />

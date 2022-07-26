@@ -28,7 +28,7 @@ import OrganizationCollaboratorEdit from '@console/views/organization-collaborat
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
-import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
+import { userPathId as userPathIdRegexp } from '@ttn-lw/lib/regexp'
 
 const OrganizationCollaborators = props => {
   const { orgId, match } = props
@@ -47,7 +47,7 @@ const OrganizationCollaborators = props => {
         <Route exact path={`${match.path}`} component={OrganizationCollaboratorsList} />
         <Route exact path={`${match.path}/add`} component={OrganizationCollaboratorAdd} />
         <Route
-          path={`${match.path}/:collaboratorType(user|organization)/:collaboratorId${pathIdRegexp}`}
+          path={`${match.path}/:collaboratorType(user|organization)/:collaboratorId${userPathIdRegexp}`}
           component={OrganizationCollaboratorEdit}
         />
         <NotFoundRoute />
