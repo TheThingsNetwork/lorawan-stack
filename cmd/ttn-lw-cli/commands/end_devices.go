@@ -1004,7 +1004,7 @@ var (
 				return errAddressMismatchEndDevice.New()
 			}
 
-			if existingDevice.JoinServerAddress == "" {
+			if existingDevice.JoinServerAddress == "" && devID.GetJoinEui() != nil {
 				// Attempt to unclaim device via the DCS.
 				dcs, err := api.Dial(ctx, config.DeviceClaimingServerGRPCAddress)
 				if err != nil {
