@@ -16,6 +16,7 @@ package store
 
 import (
 	"context"
+	"strings"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -32,6 +33,20 @@ func (fm FieldMask) Contains(search string) bool {
 		}
 	}
 	return false
+}
+
+// TrimPrefix returns a field mask with all fields of fm that contain prefix, but then having that prefix removed.
+func (fm FieldMask) TrimPrefix(prefix string) FieldMask {
+	if !strings.HasSuffix(prefix, ".") {
+		prefix += "."
+	}
+	out := make([]string, 0, len(fm))
+	for _, f := range fm {
+		if strings.HasPrefix(f, prefix) {
+			out = append(out, strings.TrimPrefix(f, prefix))
+		}
+	}
+	return out
 }
 
 // ApplicationStore interface for storing Applications.
