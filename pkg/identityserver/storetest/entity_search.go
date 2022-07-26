@@ -67,10 +67,10 @@ func (st *StoreTest) TestEntitySearch(t *T) {
 		is.EntitySearch
 	})
 	defer st.DestroyDB(t, false)
-	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement EntitySearch")
+		t.Skip("Store does not implement EntitySearch")
 	}
+	defer s.Close()
 
 	t.Run("Applications", func(t *T) {
 		t.Run("WithoutUser", func(t *T) {
@@ -535,10 +535,10 @@ func (st *StoreTest) TestEntitySearchPagination(t *T) {
 		is.EntitySearch
 	})
 	defer st.DestroyDB(t, false)
-	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement EntitySearch")
+		t.Skip("Store does not implement EntitySearch")
 	}
+	defer s.Close()
 
 	t.Run("Applications_Paginated", func(t *T) {
 		a, ctx := test.New(t)

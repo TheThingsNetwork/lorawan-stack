@@ -36,10 +36,10 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 		is.GatewayStore
 	})
 	defer st.DestroyDB(t, true)
-	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement GatewayStore")
+		t.Skip("Store does not implement GatewayStore")
 	}
+	defer s.Close()
 
 	start := time.Now().Truncate(time.Second)
 	mask := fieldMask(ttnpb.GatewayFieldPathsTopLevel...)
@@ -290,7 +290,7 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 			a.So(updated.TargetCupsUri, should.Equal, "https://cups.example.com")
 			a.So(updated.TargetCupsKey, should.Resemble, updatedSecret)
 			a.So(updated.RequireAuthenticatedConnection, should.BeFalse)
-			a.So(updated.Lrfhss.Supported, should.BeFalse)
+			a.So(updated.Lrfhss.GetSupported(), should.BeFalse)
 			a.So(updated.DisablePacketBrokerForwarding, should.BeFalse)
 			a.So(*ttnpb.StdTime(updated.CreatedAt), should.Equal, *ttnpb.StdTime(created.CreatedAt))
 			a.So(*ttnpb.StdTime(updated.UpdatedAt), should.HappenWithin, 5*time.Second, start)
@@ -443,10 +443,10 @@ func (st *StoreTest) TestGatewayStorePagination(t *T) {
 		is.GatewayStore
 	})
 	defer st.DestroyDB(t, false)
-	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement GatewayStore")
+		t.Skip("Store does not implement GatewayStore")
 	}
+	defer s.Close()
 
 	t.Run("FindGateways_Paginated", func(t *T) {
 		a, ctx := test.New(t)

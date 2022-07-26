@@ -34,8 +34,6 @@ type invitationStore struct {
 	*baseStore
 }
 
-var errInvitationAlreadySent = errors.DefineAlreadyExists("invitation_already_sent", "invitation already sent")
-
 func (s *invitationStore) CreateInvitation(
 	ctx context.Context, invitation *ttnpb.Invitation,
 ) (*ttnpb.Invitation, error) {
@@ -48,7 +46,7 @@ func (s *invitationStore) CreateInvitation(
 	if err := s.createEntity(ctx, &model); err != nil {
 		err = convertError(err)
 		if errors.IsAlreadyExists(err) {
-			return nil, errInvitationAlreadySent.New()
+			return nil, store.ErrInvitationAlreadySent.New()
 		}
 		return nil, err
 	}
@@ -77,8 +75,6 @@ func (s *invitationStore) FindInvitations(ctx context.Context) ([]*ttnpb.Invitat
 	return invitationProtos, nil
 }
 
-var errInvitationNotFound = errors.DefineNotFound("invitation_not_found", "invitation not found")
-
 func (s *invitationStore) GetInvitation(ctx context.Context, token string) (*ttnpb.Invitation, error) {
 	defer trace.StartRegion(ctx, "get invitation").End()
 	var invitationModel Invitation
@@ -88,19 +84,12 @@ func (s *invitationStore) GetInvitation(ctx context.Context, token string) (*ttn
 		First(&invitationModel).
 		Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errInvitationNotFound.New()
+			return nil, store.ErrInvitationNotFound.WithAttributes("invitation_token", token)
 		}
 		return nil, err
 	}
 	return invitationModel.toPB(), nil
 }
-
-var (
-	errInvitationExpired         = errors.DefineFailedPrecondition("invitation_expired", "invitation expired")
-	errInvitationAlreadyAccepted = errors.DefineFailedPrecondition(
-		"invitation_already_accepted", "invitation already accepted",
-	)
-)
 
 func (s *invitationStore) SetInvitationAcceptedBy(
 	ctx context.Context, token string, acceptedByID *ttnpb.UserIdentifiers,
@@ -112,13 +101,13 @@ func (s *invitationStore) SetInvitationAcceptedBy(
 		First(&invitationModel).
 		Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return errInvitationNotFound.New()
+			return store.ErrInvitationNotFound.WithAttributes("invitation_token", token)
 		}
 		return err
 	}
 
 	if invitationModel.ExpiresAt != nil && invitationModel.ExpiresAt.Before(time.Now()) {
-		return errInvitationExpired.New()
+		return store.ErrInvitationExpired.WithAttributes("invitation_token", token)
 	}
 
 	user, err := s.findEntity(ctx, acceptedByID, "id")
@@ -126,7 +115,7 @@ func (s *invitationStore) SetInvitationAcceptedBy(
 		return err
 	}
 	if invitationModel.AcceptedByID != nil {
-		return errInvitationAlreadyAccepted.New()
+		return store.ErrInvitationAlreadyUsed.WithAttributes("invitation_token", token)
 	}
 	id := user.PrimaryKey()
 	invitationModel.AcceptedByID = &id
@@ -145,7 +134,7 @@ func (s *invitationStore) DeleteInvitation(ctx context.Context, email string) er
 		First(&invitationModel).
 		Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return errInvitationNotFound.New()
+			return store.ErrInvitationNotFound.New()
 		}
 		return err
 	}

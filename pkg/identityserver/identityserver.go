@@ -16,10 +16,10 @@ package identityserver
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // Postgres database driver.
 	"go.thethings.network/lorawan-stack/v3/pkg/account"
 	account_store "go.thethings.network/lorawan-stack/v3/pkg/account/store"
@@ -27,7 +27,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/interop"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -48,7 +47,7 @@ type IdentityServer struct {
 	*component.Component
 	ctx    context.Context
 	config *Config
-	db     *gorm.DB
+	db     *sql.DB
 
 	store store.TransactionalStore
 
@@ -131,32 +130,14 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		ctx:       log.NewContextWithField(c.Context(), "namespace", "identityserver"),
 		config:    config,
 	}
-	is.db, err = gormstore.Open(is.Context(), is.config.DatabaseURI)
-	if err != nil {
+
+	if err := is.setupStore(); err != nil {
 		return nil, err
 	}
-	if c.LogDebug() {
-		is.db = is.db.Debug()
-	}
-	if err = gormstore.Check(is.db); err != nil {
-		return nil, errDBNeedsMigration.WithCause(err)
-	}
-	st := gormstore.NewCombinedStore(is.db)
-	is.store = st
 
 	is.config.OAuth.CSRFAuthKey = is.GetBaseConfig(is.Context()).HTTP.Cookie.HashKey
 	is.config.OAuth.UI.FrontendConfig.EnableUserRegistration = is.config.UserRegistration.Enabled
-	is.oauth, err = oauth.NewServer(c, struct {
-		store.UserStore
-		store.UserSessionStore
-		store.ClientStore
-		store.OAuthStore
-	}{
-		UserStore:        gormstore.GetUserStore(is.db),
-		UserSessionStore: gormstore.GetUserSessionStore(is.db),
-		ClientStore:      gormstore.GetClientStore(is.db),
-		OAuthStore:       gormstore.GetOAuthStore(is.db),
-	}, is.config.OAuth, GenerateCSPString)
+	is.oauth, err = oauth.NewServer(c, is.store, is.config.OAuth, GenerateCSPString)
 
 	is.account, err = account.NewServer(c, &accountAppStore{is.store}, is.config.OAuth, GenerateCSPString)
 	if err != nil {
@@ -267,6 +248,6 @@ var softDeleteFieldMask = []string{"deleted_at"}
 var errRestoreWindowExpired = errors.DefineFailedPrecondition("restore_window_expired", "this entity can no longer be restored")
 
 func (is *IdentityServer) Close() {
-	is.db.DB().Close()
+	is.db.Close()
 	is.Component.Close()
 }

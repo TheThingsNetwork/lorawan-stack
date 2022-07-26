@@ -130,7 +130,11 @@ func (s *apiKeyStore) GetAPIKey(
 		EntityType: entityTypeForID(entityID),
 	}).First(&keyModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errAPIKeyNotFound.New()
+			return nil, store.ErrAPIKeyNotFound.WithAttributes(
+				"entity_type", entityID.EntityType(),
+				"entity_id", entityID.IDString(),
+				"api_key_id", id,
+			)
 		}
 		return nil, err
 	}
@@ -148,7 +152,9 @@ func (s *apiKeyStore) GetAPIKeyByID(ctx context.Context, id string) (*ttnpb.Enti
 	var keyModel APIKey
 	if err := query.Where(APIKey{APIKeyID: id}).First(&keyModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, nil, errAPIKeyNotFound.New()
+			return nil, nil, store.ErrAPIKeyNotFound.WithAttributes(
+				"api_key_id", id,
+			)
 		}
 		return nil, nil, err
 	}
@@ -184,7 +190,11 @@ func (s *apiKeyStore) UpdateAPIKey(
 	}).First(&keyModel).Error
 	if err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errAPIKeyNotFound.New()
+			return nil, store.ErrAPIKeyNotFound.WithAttributes(
+				"entity_type", entityID.EntityType(),
+				"entity_id", entityID.IDString(),
+				"api_key_id", key.Id,
+			)
 		}
 		return nil, err
 	}

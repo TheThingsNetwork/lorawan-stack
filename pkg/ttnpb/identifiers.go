@@ -145,6 +145,20 @@ func (ids *GatewayIdentifiers) ValidateContext(context.Context) error {
 	return nil
 }
 
+func (ids *EndDeviceIdentifiers) GetDevEui() *types.EUI64 {
+	if ids == nil {
+		return nil
+	}
+	return ids.DevEui
+}
+
+func (ids *EndDeviceIdentifiers) GetJoinEui() *types.EUI64 {
+	if ids == nil {
+		return nil
+	}
+	return ids.JoinEui
+}
+
 func (ids *GatewayIdentifiers) GetEui() *types.EUI64 {
 	if ids == nil {
 		return nil

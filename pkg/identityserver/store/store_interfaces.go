@@ -21,9 +21,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
-// FieldMask is used to specify applicable fields in SELECT or UPDATE queries.
-type FieldMask []string
-
 // ApplicationStore interface for storing Applications.
 //
 // All functions assume the input and fieldMask to be validated, and assume

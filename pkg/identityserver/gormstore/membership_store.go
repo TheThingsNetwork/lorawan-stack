@@ -286,11 +286,6 @@ func (s *membershipStore) FindMembers(
 	return membershipRights, nil
 }
 
-var errMembershipNotFound = errors.DefineNotFound(
-	"membership_not_found",
-	"account `{account_id}` is not a member of `{entity_type}` `{entity_id}`",
-)
-
 func (s *membershipStore) GetMember(
 	ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID *ttnpb.EntityIdentifiers,
 ) (*ttnpb.Rights, error) {
@@ -305,7 +300,8 @@ func (s *membershipStore) GetMember(
 		return nil, err
 	}
 	if len(results) != 1 {
-		return nil, errMembershipNotFound.WithAttributes(
+		return nil, store.ErrMembershipNotFound.WithAttributes(
+			"account_type", id.EntityType(),
 			"account_id", id.IDString(),
 			"entity_type", entityID.EntityType(),
 			"entity_id", entityID.IDString(),

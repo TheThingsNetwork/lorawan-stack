@@ -34,6 +34,16 @@ func StdTime(protoTime *pbtypes.Timestamp) *time.Time {
 	return &stdTime
 }
 
+// StdTimeOrZero converts a protobuf time to a standard library time.
+// If protoTime is nil, it returns a zero time.
+func StdTimeOrZero(protoTime *pbtypes.Timestamp) time.Time {
+	stdTime := StdTime(protoTime)
+	if stdTime == nil {
+		return time.Time{}
+	}
+	return *stdTime
+}
+
 // ProtoTime converts a standard library time to a protobuf timestamp.
 //
 // ProtoTime panics if the time is invalid.

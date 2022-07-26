@@ -182,7 +182,7 @@ func (s *userStore) GetUserByPrimaryEmailAddress(
 	var userModel userWithUID
 	if err := query.First(&userModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errUserNotFound.WithAttributes("user_id", email)
+			return nil, store.ErrUserNotFoundByPrimaryEmailAddress.New()
 		}
 		return nil, err
 	}

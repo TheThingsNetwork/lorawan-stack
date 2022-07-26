@@ -27,6 +27,12 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
+var endDeviceMask = fieldMask(
+	"name", "description", "attributes", "version_ids",
+	"network_server_address", "application_server_address", "join_server_address",
+	"service_profile_id", "locations", "picture", "activated_at", "last_seen_at",
+)
+
 func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 	a, ctx := test.New(t)
 
@@ -36,10 +42,10 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 		is.EndDeviceStore
 	})
 	defer st.DestroyDB(t, true, "applications", "attributes", "end_device_locations", "pictures") // TODO: Make sure (at least) attributes and end_device_locations are deleted when deleting end devices.
-	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement ApplicationStore and EndDeviceStore")
+		t.Skip("Store does not implement ApplicationStore and EndDeviceStore")
 	}
+	defer s.Close()
 
 	application, err := s.CreateApplication(ctx, &ttnpb.Application{
 		Ids: &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
@@ -47,12 +53,6 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-
-	mask := fieldMask(
-		"name", "description", "attributes", "version_ids",
-		"network_server_address", "application_server_address", "join_server_address",
-		"service_profile_id", "locations", "picture", "activated_at", "last_seen_at",
-	)
 
 	location := &ttnpb.Location{
 		Latitude:  12.34,
@@ -157,7 +157,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 		got, err := s.GetEndDevice(ctx, &ttnpb.EndDeviceIdentifiers{
 			ApplicationIds: application.GetIds(),
 			DeviceId:       "foo",
-		}, mask)
+		}, endDeviceMask)
 		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
 			a.So(got, should.Resemble, created)
 		}
@@ -168,7 +168,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 		_, err := s.GetEndDevice(ctx, &ttnpb.EndDeviceIdentifiers{
 			ApplicationIds: application.GetIds(),
 			DeviceId:       "other",
-		}, mask)
+		}, endDeviceMask)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
@@ -206,11 +206,11 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 
 	t.Run("ListEndDevices", func(t *T) {
 		a, ctx := test.New(t)
-		got, err := s.ListEndDevices(ctx, nil, mask)
+		got, err := s.ListEndDevices(ctx, nil, endDeviceMask)
 		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) && a.So(got, should.HaveLength, 1) {
 			a.So(got[0], should.Resemble, created)
 		}
-		got, err = s.ListEndDevices(ctx, application.GetIds(), mask)
+		got, err = s.ListEndDevices(ctx, application.GetIds(), endDeviceMask)
 		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) && a.So(got, should.HaveLength, 1) {
 			a.So(got[0], should.Resemble, created)
 		}
@@ -220,7 +220,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 		a, ctx := test.New(t)
 		got, err := s.ListEndDevices(ctx, &ttnpb.ApplicationIdentifiers{
 			ApplicationId: "other",
-		}, mask)
+		}, endDeviceMask)
 		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
 			a.So(got, should.BeEmpty)
 		}
@@ -228,7 +228,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 
 	t.Run("FindEndDevices", func(t *T) {
 		a, ctx := test.New(t)
-		got, err := s.FindEndDevices(ctx, nil, mask)
+		got, err := s.FindEndDevices(ctx, nil, endDeviceMask)
 		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) && a.So(got, should.HaveLength, 1) {
 			a.So(got[0], should.Resemble, created)
 		}
@@ -285,7 +285,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 			Picture:     updatedPicture,
 			ActivatedAt: ttnpb.ProtoTimePtr(stamp),
 			LastSeenAt:  ttnpb.ProtoTimePtr(stamp),
-		}, mask)
+		}, endDeviceMask)
 		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
 			a.So(updated.GetIds().GetDeviceId(), should.Equal, "foo")
 			a.So(updated.Name, should.Equal, "New Foo Name")
@@ -321,7 +321,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 				ApplicationIds: application.GetIds(),
 				DeviceId:       "other",
 			},
-		}, mask)
+		}, endDeviceMask)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
@@ -342,7 +342,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 		got, err := s.GetEndDevice(ctx, &ttnpb.EndDeviceIdentifiers{
 			ApplicationIds: application.GetIds(),
 			DeviceId:       "foo",
-		}, mask)
+		}, endDeviceMask)
 		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
 			a.So(got, should.Resemble, updated)
 		}
@@ -381,7 +381,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 		_, err := s.GetEndDevice(ctx, &ttnpb.EndDeviceIdentifiers{
 			ApplicationIds: application.GetIds(),
 			DeviceId:       "foo",
-		}, mask)
+		}, endDeviceMask)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
@@ -401,11 +401,11 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 
 	t.Run("ListEndDevices", func(t *T) {
 		a, ctx := test.New(t)
-		got, err := s.ListEndDevices(ctx, nil, mask)
+		got, err := s.ListEndDevices(ctx, nil, endDeviceMask)
 		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
 			a.So(got, should.BeEmpty)
 		}
-		got, err = s.ListEndDevices(ctx, application.GetIds(), mask)
+		got, err = s.ListEndDevices(ctx, application.GetIds(), endDeviceMask)
 		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
 			a.So(got, should.BeEmpty)
 		}
@@ -413,7 +413,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 
 	t.Run("FindEndDevices_AfterDelete", func(t *T) {
 		a, ctx := test.New(t)
-		got, err := s.FindEndDevices(ctx, nil, mask)
+		got, err := s.FindEndDevices(ctx, nil, endDeviceMask)
 		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
 			a.So(got, should.BeEmpty)
 		}
@@ -434,10 +434,10 @@ func (st *StoreTest) TestEndDeviceStorePagination(t *T) {
 		is.EndDeviceStore
 	})
 	defer st.DestroyDB(t, false)
-	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement EndDeviceStore")
+		t.Skip("Store does not implement EndDeviceStore")
 	}
+	defer s.Close()
 
 	t.Run("ListEndDevices_Paginated", func(t *T) {
 		a, ctx := test.New(t)
@@ -446,7 +446,7 @@ func (st *StoreTest) TestEndDeviceStorePagination(t *T) {
 		for _, page := range []uint32{1, 2, 3, 4} {
 			paginateCtx := store.WithPagination(ctx, 2, page, &total)
 
-			got, err := s.ListEndDevices(paginateCtx, app1.GetIds(), fieldMask(ttnpb.EndDeviceFieldPathsTopLevel...))
+			got, err := s.ListEndDevices(paginateCtx, app1.GetIds(), endDeviceMask)
 			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
 				if page == 4 {
 					a.So(got, should.HaveLength, 1)
@@ -481,10 +481,10 @@ func (st *StoreTest) TestEndDeviceBatchUpdate(t *T) {
 		is.EndDeviceStore
 	})
 	defer st.DestroyDB(t, false)
-	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement EndDeviceStore")
+		t.Skip("Store does not implement EndDeviceStore")
 	}
+	defer s.Close()
 
 	t.Run("BatchUpdateEndDeviceLastSeen", func(t *T) {
 		a, ctx := test.New(t)

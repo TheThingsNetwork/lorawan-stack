@@ -42,10 +42,10 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 		is.ContactInfoStore
 	})
 	defer st.DestroyDB(t, false)
-	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement ContactInfoStore")
+		t.Skip("Store does not implement ContactInfoStore")
 	}
+	defer s.Close()
 
 	for _, ids := range []*ttnpb.EntityIdentifiers{
 		app1.GetEntityIdentifiers(),
@@ -140,7 +140,7 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 					Token: "EXPIRED_TOKEN",
 				})
 				if a.So(err, should.NotBeNil) {
-					a.So(errors.IsNotFound(err), should.BeTrue)
+					a.So(errors.IsFailedPrecondition(err), should.BeTrue)
 				}
 			})
 
@@ -160,7 +160,7 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 					Token: "TOKEN",
 				})
 				if a.So(err, should.NotBeNil) {
-					a.So(errors.IsAlreadyExists(err), should.BeTrue)
+					a.So(errors.IsFailedPrecondition(err), should.BeTrue)
 				}
 			})
 

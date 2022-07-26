@@ -95,7 +95,7 @@ func (s *userSessionStore) findSession(
 	var sessionModel UserSession
 	if err = query.Find(&sessionModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errSessionNotFound.WithAttributes("user_id", userIDs.GetUserId(), "session_id", sessionID)
+			return nil, store.ErrUserSessionNotFound.WithAttributes("user_id", userIDs.GetUserId(), "session_id", sessionID)
 		}
 		return nil, err
 	}
@@ -122,7 +122,7 @@ func (s *userSessionStore) GetSessionByID(ctx context.Context, sessionID string)
 	var sessionModel UserSession
 	if err := query.Find(&sessionModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errSessionNotFound.WithAttributes("session_id", sessionID)
+			return nil, store.ErrUserSessionNotFound.WithAttributes("session_id", sessionID)
 		}
 		return nil, err
 	}
@@ -133,7 +133,7 @@ func (s *userSessionStore) GetSessionByID(ctx context.Context, sessionID string)
 	var accountModel Account
 	if err := query.Find(&accountModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errSessionNotFound.WithAttributes("user_id", sessionModel.UserID)
+			return nil, store.ErrUserSessionNotFound.WithAttributes("user_id", sessionModel.UserID)
 		}
 		return nil, err
 	}

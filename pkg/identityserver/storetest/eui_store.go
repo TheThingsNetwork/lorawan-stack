@@ -15,7 +15,6 @@
 package storetest
 
 import (
-	"log"
 	. "testing"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -34,10 +33,10 @@ func (st *StoreTest) TestEUIStore(t *T) {
 		is.EUIStore
 	})
 	defer st.DestroyDB(t, false)
-	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement EUIStore")
+		t.Skip("Store does not implement EUIStore")
 	}
+	defer s.Close()
 
 	t.Run("InitializeDevEUIBlock", func(t *T) {
 		a, ctx := test.New(t)
@@ -68,7 +67,7 @@ func (st *StoreTest) TestEUIStore(t *T) {
 		a, ctx := test.New(t)
 		_, err := s.IssueDevEUIForApplication(ctx, app1.GetIds(), 1)
 		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsInvalidArgument(err), should.BeTrue)
+			a.So(errors.IsFailedPrecondition(err), should.BeTrue)
 		}
 	})
 
@@ -80,8 +79,7 @@ func (st *StoreTest) TestEUIStore(t *T) {
 		}
 		_, err = s.IssueDevEUIForApplication(ctx, app1.GetIds(), 3)
 		if a.So(err, should.NotBeNil) {
-			log.Println(err)
-			a.So(errors.IsInvalidArgument(err), should.BeTrue)
+			a.So(errors.IsFailedPrecondition(err), should.BeTrue)
 		}
 	})
 

@@ -15,6 +15,8 @@ For details about compatibility between different releases, see the **Commitment
 - `BatchGetGatewayConnectionStats` RPC to fetch Gateway Connection Stats for a batch of gateways.
 - The ability to disable the downlink scheduling mechanism for individual end devices (`mac-settings.schedule-downlinks`).
   - This option is useful during a migration procedure in order to force the end device to join the new network. The Network Server will no longer schedule any data downlinks or MAC commands, and will stop answering potential join requests.
+- A new implementation of the Identity Server storage layer. In v3.21.0 the new implementation is not yet used by default, but it can be enabled with the `is.bunstore` feature flag.
+  - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of added columns and views.
 
 ### Changed
 

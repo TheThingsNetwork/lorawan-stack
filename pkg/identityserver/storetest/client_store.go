@@ -35,10 +35,10 @@ func (st *StoreTest) TestClientStoreCRUD(t *T) {
 		is.ClientStore
 	})
 	defer st.DestroyDB(t, true)
-	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement ClientStore")
+		t.Skip("Store does not implement ClientStore")
 	}
+	defer s.Close()
 
 	mask := fieldMask(ttnpb.ClientFieldPathsTopLevel...)
 
@@ -288,10 +288,10 @@ func (st *StoreTest) TestClientStorePagination(t *T) {
 		is.ClientStore
 	})
 	defer st.DestroyDB(t, false)
-	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement ClientStore")
+		t.Skip("Store does not implement ClientStore")
 	}
+	defer s.Close()
 
 	t.Run("FindClients_Paginated", func(t *T) {
 		a, ctx := test.New(t)

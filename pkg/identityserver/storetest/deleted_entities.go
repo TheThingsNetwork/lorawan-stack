@@ -52,10 +52,10 @@ func (st *StoreTest) TestDeletedEntities(t *T) {
 		is.UserStore
 	})
 	defer st.DestroyDB(t, false)
-	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement entity store interfaces")
+		t.Skip("Store does not implement entity store interfaces")
 	}
+	defer s.Close()
 
 	start := time.Now().UTC().Truncate(time.Millisecond)
 	time.Sleep(10 * test.Delay)

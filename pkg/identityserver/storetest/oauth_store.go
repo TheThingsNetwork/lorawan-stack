@@ -37,10 +37,10 @@ func (st *StoreTest) TestOAuthStore(t *T) {
 		is.OAuthStore
 	})
 	defer st.DestroyDB(t, true, "users", "accounts", "user_sessions", "clients")
-	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement OAuthStore")
+		t.Skip("Store does not implement OAuthStore")
 	}
+	defer s.Close()
 
 	var createdAuthorization *ttnpb.OAuthClientAuthorization
 
@@ -370,10 +370,10 @@ func (st *StoreTest) TestOAuthStorePagination(t *T) {
 		is.OAuthStore
 	})
 	defer st.DestroyDB(t, false)
-	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement OAuthStore")
+		t.Skip("Store does not implement OAuthStore")
 	}
+	defer s.Close()
 
 	var authorizations []*ttnpb.OAuthClientAuthorization
 	for i := 0; i < 7; i++ {

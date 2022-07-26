@@ -35,10 +35,10 @@ func (st *StoreTest) TestOrganizationStoreCRUD(t *T) {
 		is.OrganizationStore
 	})
 	defer st.DestroyDB(t, true)
-	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement OrganizationStore")
+		t.Skip("Store does not implement OrganizationStore")
 	}
+	defer s.Close()
 
 	mask := fieldMask(ttnpb.OrganizationFieldPathsTopLevel...)
 
@@ -288,10 +288,10 @@ func (st *StoreTest) TestOrganizationStorePagination(t *T) {
 		is.OrganizationStore
 	})
 	defer st.DestroyDB(t, false)
-	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement OrganizationStore")
+		t.Skip("Store does not implement OrganizationStore")
 	}
+	defer s.Close()
 
 	t.Run("FindOrganizations_Paginated", func(t *T) {
 		a, ctx := test.New(t)

@@ -20,7 +20,6 @@ import (
 	"time"
 
 	"github.com/jinzhu/gorm"
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -81,12 +80,6 @@ func (s *loginTokenStore) CreateLoginToken(
 	return pb, nil
 }
 
-var (
-	errLoginTokenNotFound    = errors.DefineNotFound("login_token_not_found", "login token not found")
-	errLoginTokenAlreadyUsed = errors.DefineFailedPrecondition("login_token_already_used", "login token already used")
-	errLoginTokenExpired     = errors.DefineFailedPrecondition("login_token_expired", "login token expired")
-)
-
 func (s *loginTokenStore) ConsumeLoginToken(ctx context.Context, token string) (*ttnpb.LoginToken, error) {
 	defer trace.StartRegion(ctx, "consume login token").End()
 	var loginTokenModel LoginToken
@@ -96,15 +89,15 @@ func (s *loginTokenStore) ConsumeLoginToken(ctx context.Context, token string) (
 		First(&loginTokenModel).
 		Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errLoginTokenNotFound.New()
+			return nil, store.ErrLoginTokenNotFound.New()
 		}
 		return nil, err
 	}
 	if loginTokenModel.Used {
-		return nil, errLoginTokenAlreadyUsed.New()
+		return nil, store.ErrLoginTokenAlreadyUsed.New()
 	}
 	if loginTokenModel.ExpiresAt.Before(time.Now()) {
-		return nil, errLoginTokenExpired.New()
+		return nil, store.ErrLoginTokenExpired.New()
 	}
 	loginTokenModel.Used = true
 	if err := s.updateEntity(ctx, &loginTokenModel, "used"); err != nil {

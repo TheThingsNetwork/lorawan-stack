@@ -54,10 +54,10 @@ func (st *StoreTest) TestMembershipStoreCRUD(t *T) {
 		is.MembershipStore
 	})
 	defer st.DestroyDB(t, true, "applications", "clients", "gateways", "organizations", "users", "accounts")
-	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement MembershipStore")
+		t.Skip("Store does not implement MembershipStore")
 	}
+	defer s.Close()
 
 	someRights := map[string]*ttnpb.Rights{
 		app1.EntityType(): ttnpb.RightsFrom(ttnpb.Right_RIGHT_APPLICATION_ALL),
@@ -281,10 +281,10 @@ func (st *StoreTest) TestMembershipStorePagination(t *T) {
 		is.MembershipStore
 	})
 	defer st.DestroyDB(t, false)
-	defer s.Close()
 	if !ok {
-		t.Fatal("Store does not implement MembershipStore")
+		t.Skip("Store does not implement MembershipStore")
 	}
+	defer s.Close()
 
 	t.Run("FindMembers_Paginated", func(t *T) {
 		a, ctx := test.New(t)
