@@ -17,12 +17,14 @@ For details about compatibility between different releases, see the **Commitment
   - This option is useful during a migration procedure in order to force the end device to join the new network. The Network Server will no longer schedule any data downlinks or MAC commands, and will stop answering potential join requests.
 - A new implementation of the Identity Server storage layer. In v3.21.0 the new implementation is not yet used by default, but it can be enabled with the `is.bunstore` feature flag.
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of added columns and views.
+- Support for comma-separated (`,`) values in The Things Stack CSV file format for importing end devices.
 
 ### Changed
 
 - Deleted users are no longer included in primary email addresses uniqueness checks. This allows a user to create a new account which uses the email address of a deleted account.
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) due to updated indices.
 - The CLI settings fields `retry-config.enable_metadata` and `retry-config.default_timeout` have been renamed to `retry.enable-metadata` and `retry.default-timeout` for consistency reasons.
+- Generated device ID based on a DevEUI from an imported CSV file is now prepended by `eui-`. This is consistent with generated device IDs by the Console.
 
 ### Deprecated
 
