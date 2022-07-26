@@ -15,6 +15,8 @@
 package devicetemplates
 
 import (
+	"bufio"
+	"bytes"
 	"context"
 	"encoding/csv"
 	"io"
@@ -296,6 +298,20 @@ var csvFieldSetters = map[string]csvFieldSetterFunc{
 	},
 }
 
+func determineComma(head []byte) (rune, bool) {
+	scanner := bufio.NewScanner(bytes.NewReader(head))
+	if !scanner.Scan() {
+		return 0, false
+	}
+	header := scanner.Text()
+	for _, c := range []rune{';', ','} {
+		if strings.ContainsRune(header, c) {
+			return c, true
+		}
+	}
+	return 0, false
+}
+
 // Convert implements the devicetemplates.Converter interface.
 func (*ttsCSV) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDeviceTemplate) error {
 	defer close(ch)
@@ -305,8 +321,18 @@ func (*ttsCSV) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDev
 		return err
 	}
 
-	dec := csv.NewReader(r)
-	dec.Comma = ';'
+	// Best effort detection of the comma by peeking the first kilobyte and looking at a separator on the first line.
+	comma := ';'
+	const maxHeaderLength = 1024
+	buf := bufio.NewReaderSize(r, maxHeaderLength)
+	if head, _ := buf.Peek(maxHeaderLength); len(head) > 0 {
+		if c, ok := determineComma(head); ok {
+			comma = c
+		}
+	}
+
+	dec := csv.NewReader(buf)
+	dec.Comma = comma
 	dec.TrimLeadingSpace = true
 
 	// Populate the mapping of column index to a field setter function based on known header column names.

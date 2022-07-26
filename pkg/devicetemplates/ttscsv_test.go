@@ -41,6 +41,8 @@ var (
 	csvGenerateDeviceID string
 	//go:embed testdata/appeui.csv
 	csvAppEUI string
+	//go:embed testdata/comma_separated.csv
+	csvCommaSeparated string
 )
 
 func TestTTSCSVConverter(t *testing.T) {
@@ -165,6 +167,27 @@ func TestTTSCSVConverter(t *testing.T) {
 				), should.BeNil)
 			},
 			nExpect: 1,
+		},
+		{
+			name:   "CommaSeparated",
+			reader: bytes.NewBufferString(csvCommaSeparated),
+			validateError: func(a *assertions.Assertion, err error) {
+				a.So(err, should.BeNil)
+			},
+			validateResult: func(a *assertions.Assertion, templates []*ttnpb.EndDeviceTemplate, count int) {
+				if !a.So(len(templates), should.Equal, count) {
+					t.FailNow()
+				}
+				dev := templates[0]
+				a.So(ttnpb.RequireFields(dev.FieldMask.Paths,
+					"ids.device_id",
+					"ids.dev_eui",
+					"ids.join_eui",
+					"root_keys.app_key.key",
+					"root_keys.nwk_key.key",
+				), should.BeNil)
+			},
+			nExpect: 3,
 		},
 	} {
 		tc := tc
