@@ -440,7 +440,7 @@ export default class DeviceImporter extends Component {
                   {deviceErrors.map(({ deviceId, error }) => (
                     <li key={deviceId} className={style.deviceErrorEntry}>
                       <pre>{deviceId}</pre>
-                      <ErrorMessage content={error} />
+                      <ErrorMessage useTopmost content={error} />
                     </li>
                   ))}
                 </ul>
