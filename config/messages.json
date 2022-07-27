@@ -5246,15 +5246,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/identityserver/store:authentication_provider_not_found": {
-    "translations": {
-      "en": "authentication provider with id `{provider_id}` not found"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "errors.tti.go"
-    }
-  },
   "error:pkg/identityserver/store:authorization_code_not_found": {
     "translations": {
       "en": "authorization code not found"
@@ -5307,15 +5298,6 @@
     "description": {
       "package": "pkg/identityserver/store",
       "file": "errors.go"
-    }
-  },
-  "error:pkg/identityserver/store:external_user_not_found": {
-    "translations": {
-      "en": "external user not found"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "errors.tti.go"
     }
   },
   "error:pkg/identityserver/store:gateway_not_found": {
@@ -5433,24 +5415,6 @@
     "description": {
       "package": "pkg/identityserver/store",
       "file": "errors.go"
-    }
-  },
-  "error:pkg/identityserver/store:tenant_not_found": {
-    "translations": {
-      "en": "tenant with id `{tenant_id}` not found"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "errors.tti.go"
-    }
-  },
-  "error:pkg/identityserver/store:tenant_not_found_by_billing_identifiers": {
-    "translations": {
-      "en": "tenant not found by billing identifiers `{billing_identifiers}`"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "errors.tti.go"
     }
   },
   "error:pkg/identityserver/store:user_not_found": {
