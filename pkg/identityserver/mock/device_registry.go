@@ -18,42 +18,45 @@ import (
 	"context"
 	"sync"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
+var errFetchDevice = errors.DefineInternal("fetch_device", "failed to fetch device")
+
 type mockISEndDeviceRegistry struct {
 	ttnpb.EndDeviceRegistryServer
-
-	endDevicesMu sync.RWMutex
-	endDevices   map[string]*ttnpb.EndDevice
+	endDevices sync.Map
 }
 
 func (m *mockISEndDeviceRegistry) Add(ctx context.Context, dev *ttnpb.EndDevice) {
-	m.endDevicesMu.Lock()
-	defer m.endDevicesMu.Unlock()
-	m.endDevices[unique.ID(ctx, dev.Ids)] = dev
+	m.endDevices.Store(unique.ID(ctx, dev.Ids), dev)
 }
 
-func (m *mockISEndDeviceRegistry) Get(ctx context.Context, in *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	m.endDevicesMu.RLock()
-	defer m.endDevicesMu.RUnlock()
-	if dev, ok := m.endDevices[unique.ID(ctx, in.EndDeviceIds)]; ok {
-		return dev, nil
-	}
-	return nil, errNotFound.New()
-}
-
-func (m *mockISEndDeviceRegistry) Update(ctx context.Context, in *ttnpb.UpdateEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	m.endDevicesMu.Lock()
-	defer m.endDevicesMu.Unlock()
-	dev, ok := m.endDevices[unique.ID(ctx, in.EndDevice.Ids)]
+func (m *mockISEndDeviceRegistry) load(id string) (*ttnpb.EndDevice, error) {
+	v, ok := m.endDevices.Load(id)
 	if !ok {
 		return nil, errNotFound.New()
 	}
-	if err := dev.SetFields(in.EndDevice, in.GetFieldMask().GetPaths()...); err != nil {
+	dev, ok := v.(*ttnpb.EndDevice)
+	if !ok {
+		return nil, errFetchDevice.New()
+	}
+	return dev, nil
+}
+
+func (m *mockISEndDeviceRegistry) Get(ctx context.Context, in *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
+	return m.load(unique.ID(ctx, in.GetEndDeviceIds()))
+}
+
+func (m *mockISEndDeviceRegistry) Update(
+	ctx context.Context,
+	in *ttnpb.UpdateEndDeviceRequest,
+) (*ttnpb.EndDevice, error) {
+	if err := in.EndDevice.SetFields(in.EndDevice, in.GetFieldMask().GetPaths()...); err != nil {
 		return nil, err
 	}
-	m.endDevices[unique.ID(ctx, in.EndDevice.Ids)] = dev
-	return dev, nil
+	m.Add(ctx, in.EndDevice)
+	return m.load(unique.ID(ctx, in.GetEndDevice().GetIds()))
 }

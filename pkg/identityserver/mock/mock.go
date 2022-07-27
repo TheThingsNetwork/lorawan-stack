@@ -51,9 +51,7 @@ func New(ctx context.Context) (*MockDefinition, string, closeMock) {
 			gatewayAuths:  make(map[string][]string),
 			gatewayRights: make(map[string]authKeyToRights),
 		},
-		endDeviceRegistry: &mockISEndDeviceRegistry{
-			endDevices: make(map[string]*ttnpb.EndDevice),
-		},
+		endDeviceRegistry: &mockISEndDeviceRegistry{},
 	}
 	srv := rpcserver.New(ctx)
 
@@ -65,11 +63,11 @@ func New(ctx context.Context) (*MockDefinition, string, closeMock) {
 
 	ttnpb.RegisterEndDeviceRegistryServer(srv.Server, is.endDeviceRegistry)
 
-	lis, err := net.Listen("tcp", ":0")
+	lis, err := net.Listen("tcp", "")
 	if err != nil {
 		panic(err)
 	}
-	go srv.Serve(lis)
+	go srv.Serve(lis) //nolint:errcheck
 	return is, lis.Addr().String(), func() {
 		lis.Close()
 		srv.GracefulStop()

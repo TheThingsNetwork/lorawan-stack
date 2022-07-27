@@ -17,6 +17,7 @@ package mockis
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -30,9 +31,19 @@ type mockISApplicationRegistry struct {
 	applications      map[string]*ttnpb.Application
 	applicationAuths  map[string][]string
 	applicationRights map[string]authKeyToRights
+
+	mu sync.Mutex
 }
 
-func (is *mockISApplicationRegistry) Add(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, key string, rights ...ttnpb.Right) {
+func (is *mockISApplicationRegistry) Add(
+	ctx context.Context,
+	ids *ttnpb.ApplicationIdentifiers,
+	key string,
+	rights ...ttnpb.Right,
+) {
+	is.mu.Lock()
+	defer is.mu.Unlock()
+
 	uid := unique.ID(ctx, ids)
 	is.applications[uid] = &ttnpb.Application{
 		Ids: ids,
@@ -50,7 +61,13 @@ func (is *mockISApplicationRegistry) Add(ctx context.Context, ids *ttnpb.Applica
 	is.applicationRights[uid][bearerKey] = rights
 }
 
-func (is *mockISApplicationRegistry) Get(ctx context.Context, req *ttnpb.GetApplicationRequest) (*ttnpb.Application, error) {
+func (is *mockISApplicationRegistry) Get(
+	ctx context.Context,
+	req *ttnpb.GetApplicationRequest,
+) (*ttnpb.Application, error) {
+	is.mu.Lock()
+	defer is.mu.Unlock()
+
 	uid := unique.ID(ctx, req.GetApplicationIds())
 	app, ok := is.applications[uid]
 	if !ok {
@@ -59,26 +76,32 @@ func (is *mockISApplicationRegistry) Get(ctx context.Context, req *ttnpb.GetAppl
 	return app, nil
 }
 
-func (is *mockISApplicationRegistry) ListRights(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (res *ttnpb.Rights, err error) {
+func (is *mockISApplicationRegistry) ListRights(
+	ctx context.Context,
+	ids *ttnpb.ApplicationIdentifiers,
+) (res *ttnpb.Rights, err error) {
+	is.mu.Lock()
+	defer is.mu.Unlock()
+
 	res = &ttnpb.Rights{}
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return
+		return res, err
 	}
 	authorization, ok := md["authorization"]
 	if !ok || len(authorization) == 0 {
-		return
+		return res, err
 	}
 
 	uid := unique.ID(ctx, ids)
 	auths, ok := is.applicationAuths[uid]
 	if !ok {
-		return
+		return res, err
 	}
 	for _, auth := range auths {
 		if auth == authorization[0] && is.applicationRights[uid] != nil {
 			res.Rights = append(res.Rights, is.applicationRights[uid][auth]...)
 		}
 	}
-	return
+	return res, err
 }
