@@ -61,10 +61,16 @@ describe('End device messaging', () => {
   })
 
   it('fails adding devices with existant ids', () => {
-    const devicesFile = 'failed-devices.json'
     cy.findByLabelText('File format').selectOption('The Things Stack JSON')
-    cy.findByLabelText('File').attachFile(devicesFile)
+    cy.findByLabelText('File').attachFile('duplicate-devices-a.json')
     cy.findByRole('button', { name: 'Import end devices' }).click()
+    cy.findByText('Operation finished').should('be.visible')
+    cy.reload()
+
+    cy.findByLabelText('File format').selectOption('The Things Stack JSON')
+    cy.findByLabelText('File').attachFile('duplicate-devices-b.json')
+    cy.findByRole('button', { name: 'Import end devices' }).click()
+
     cy.findByText('Operation finished').should('be.visible')
     cy.findByText('3 of 3 (100.00% finished)').should('be.visible')
     cy.findByText('Successfully converted 1 of 3 end devices').should('be.visible')
@@ -77,9 +83,10 @@ describe('End device messaging', () => {
       .closest('div')
       .within(() => {
         cy.findByText(/ID already taken/).should('be.visible')
-        cy.findByText(/an end device with/, /is already registered/).should('be.visible')
+        cy.findByText(/EUI already taken/).should('be.visible')
       })
     cy.visit(`${Cypress.config('consoleRootPath')}/applications/${appId}/devices`)
+    cy.findByText(/End devices \(\d+\)/).should('be.visible')
     cy.findByText('some-fail-id').should('not.exist')
   })
 

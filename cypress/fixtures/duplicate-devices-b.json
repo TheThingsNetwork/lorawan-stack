@@ -1,0 +1,109 @@
+[
+  {
+    "ids": {
+      "device_id": "one",
+      "dev_eui": "0000000000000004",
+      "join_eui": "70B3D57ED0042F52"
+    },
+    "created_at": "0001-01-01T00:00:00Z",
+    "updated_at": "0001-01-01T00:00:00Z",
+    "name": "Test Device",
+    "lorawan_version": "MAC_V1_0_2",
+    "lorawan_phy_version": "PHY_V1_0_2_REV_B",
+    "frequency_plan_id": "EU_863_870_TTN",
+    "supports_join": true,
+    "root_keys": {
+      "app_key": {
+        "key": "EFE35B55F8B394A68567F8A36F5AC44A"
+      }
+    },
+    "mac_settings": {
+      "supports_32_bit_f_cnt": true,
+      "status_time_periodicity": "0s",
+      "status_count_periodicity": 0
+    },
+    "session": {
+      "dev_addr": "26012F9D",
+      "keys": {
+        "session_key_id": "eVNOD7hXFrwVAnqypet9Og==",
+        "f_nwk_s_int_key": {
+          "key": "E276C2B1A158B29C85996EEEDDDEC551"
+        },
+        "app_s_key": {
+          "key": "E82B8166DFB4DA501E169D6380792512"
+        }
+      },
+      "last_f_cnt_up": 64,
+      "last_n_f_cnt_down": 1,
+      "started_at": "2021-05-21T11:38:08.078114300Z"
+    }
+  },
+  {
+    "ids": {
+      "device_id": "two-same-eui",
+      "dev_eui": "0000000000000002",
+      "join_eui": "70B3D57ED0042F53"
+    },
+    "name": "LoRa Device",
+    "lorawan_version": "MAC_V1_0_3",
+    "lorawan_phy_version": "PHY_V1_0_3_REV_A",
+    "frequency_plan_id": "EU_863_870_TTN",
+    "supports_join": true,
+    "root_keys": {
+      "app_key": {
+        "key": "EFE35B55F8B394A68567F8A36F5AC44A"
+      },
+      "nwk_key": {
+        "key": "EFE35B55F8B394A68567F8A36F5AC44A"
+      }
+    },
+    "session": {
+      "last_f_cnt_up": 15,
+      "dev_addr": "26012F9D",
+      "keys": {
+        "session_key_id": "eVNOD7hXFrwVAnqypet9Og==",
+        "f_nwk_s_int_key": {
+          "key": "E276C2B1A158B29C85996EEEDDDEC551"
+        },
+        "app_s_key": {
+          "key": "E82B8166DFB4DA501E169D6380792512"
+        }
+      }
+    }
+  },
+  {
+    "ids": {
+      "device_id": "four",
+      "dev_eui": "0000000000000004",
+      "join_eui": "0000000000000000"
+    },
+    "name": "Test Device",
+    "lorawan_version": "MAC_V1_0_3",
+    "lorawan_phy_version": "PHY_V1_0_3_REV_A",
+    "frequency_plan_id": "EU_863_870_TTN",
+    "supports_join": true,
+    "root_keys": {
+      "app_key": {
+        "key": "755812F8CCFFB2F878B1ECAE8B6A33D0"
+      },
+      "nwk_key": {
+        "key": "755812F8CCFFB2F878B1ECAE8B6A33D0"
+      }
+    },
+    "session": {
+      "last_f_cnt_up": 15,
+      "dev_addr": "0182DE4C",
+      "keys": {
+        "session_key_id": "eVNOD7hXFrwVAnqypet10g==",
+        "f_nwk_s_int_key": {
+          "key": "6F028A1E7DC2A8E90FCAC3A5691B1264"
+        },
+        "app_s_key": {
+          "key": "93784E38DB3632044EE135AEE847DE97"
+        }
+      }
+    }
+  }
+]
+
+
