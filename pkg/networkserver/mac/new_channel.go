@@ -160,7 +160,9 @@ func HandleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 				})
 			}
 			if !pld.FrequencyAck {
-				if i := searchUint64(req.Frequency, dev.MacState.RejectedFrequencies...); i == len(dev.MacState.RejectedFrequencies) || dev.MacState.RejectedFrequencies[i] != req.Frequency {
+				i := searchUint64(req.Frequency, dev.MacState.RejectedFrequencies...)
+				if i == len(dev.MacState.RejectedFrequencies) ||
+					dev.MacState.RejectedFrequencies[i] != req.Frequency {
 					dev.MacState.RejectedFrequencies = append(dev.MacState.RejectedFrequencies, 0)
 					copy(dev.MacState.RejectedFrequencies[i+1:], dev.MacState.RejectedFrequencies[i:])
 					dev.MacState.RejectedFrequencies[i] = req.Frequency
@@ -171,7 +173,13 @@ func HandleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 			}
 
 			if uint(req.ChannelIndex) >= uint(len(dev.MacState.CurrentParameters.Channels)) {
-				dev.MacState.CurrentParameters.Channels = append(dev.MacState.CurrentParameters.Channels, make([]*ttnpb.MACParameters_Channel, 1+int(req.ChannelIndex-uint32(len(dev.MacState.CurrentParameters.Channels))))...)
+				dev.MacState.CurrentParameters.Channels = append(
+					dev.MacState.CurrentParameters.Channels,
+					make(
+						[]*ttnpb.MACParameters_Channel,
+						1+int(req.ChannelIndex-uint32(len(dev.MacState.CurrentParameters.Channels))),
+					)...,
+				)
 			}
 			ch := dev.MacState.CurrentParameters.Channels[req.ChannelIndex]
 			if ch == nil {

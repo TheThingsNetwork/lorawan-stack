@@ -117,8 +117,9 @@ func HandleADRParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (events.B
 		func(cmd *ttnpb.MACCommand) error {
 			req := cmd.GetAdrParamSetupReq()
 
-			dev.MacState.CurrentParameters.AdrAckLimitExponent = &ttnpb.ADRAckLimitExponentValue{Value: req.AdrAckLimitExponent}
-			dev.MacState.CurrentParameters.AdrAckDelayExponent = &ttnpb.ADRAckDelayExponentValue{Value: req.AdrAckDelayExponent}
+			currentParameters := dev.MacState.CurrentParameters
+			currentParameters.AdrAckLimitExponent = &ttnpb.ADRAckLimitExponentValue{Value: req.AdrAckLimitExponent}
+			currentParameters.AdrAckDelayExponent = &ttnpb.ADRAckDelayExponentValue{Value: req.AdrAckDelayExponent}
 
 			return nil
 		},

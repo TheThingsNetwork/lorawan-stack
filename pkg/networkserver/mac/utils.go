@@ -753,8 +753,8 @@ func containsMACCommandIdentifier(cid ttnpb.MACCommandIdentifier) func(...ttnpb.
 
 func consumeMACCommandIdentifier(
 	cid ttnpb.MACCommandIdentifier,
-) func(...ttnpb.MACCommandIdentifier) ([]ttnpb.MACCommandIdentifier, bool) {
-	return func(cmds ...ttnpb.MACCommandIdentifier) ([]ttnpb.MACCommandIdentifier, bool) {
+) func(...ttnpb.MACCommandIdentifier) (rest []ttnpb.MACCommandIdentifier, found bool) {
+	return func(cmds ...ttnpb.MACCommandIdentifier) (rest []ttnpb.MACCommandIdentifier, found bool) {
 		if i := slices.Index(cmds, cid); i >= 0 {
 			return append(cmds[:i], cmds[i+1:]...), true
 		}

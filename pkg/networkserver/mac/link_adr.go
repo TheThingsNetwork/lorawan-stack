@@ -331,9 +331,7 @@ func HandleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 				return nil
 			}
 			var mask [16]bool
-			for i, v := range req.ChannelMask {
-				mask[i] = v
-			}
+			copy(mask[:], req.ChannelMask)
 			m, err := phy.ParseChMask(mask, uint8(req.ChannelMaskControl))
 			if err != nil {
 				return err
@@ -361,14 +359,20 @@ func HandleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 	}
 
 	if !pld.DataRateIndexAck {
-		if i := searchDataRateIndex(req.DataRateIndex, dev.MacState.RejectedAdrDataRateIndexes...); i == len(dev.MacState.RejectedAdrDataRateIndexes) || dev.MacState.RejectedAdrDataRateIndexes[i] != req.DataRateIndex {
-			dev.MacState.RejectedAdrDataRateIndexes = append(dev.MacState.RejectedAdrDataRateIndexes, ttnpb.DataRateIndex_DATA_RATE_0)
+		i := searchDataRateIndex(req.DataRateIndex, dev.MacState.RejectedAdrDataRateIndexes...)
+		if i == len(dev.MacState.RejectedAdrDataRateIndexes) ||
+			dev.MacState.RejectedAdrDataRateIndexes[i] != req.DataRateIndex {
+			dev.MacState.RejectedAdrDataRateIndexes = append(
+				dev.MacState.RejectedAdrDataRateIndexes, ttnpb.DataRateIndex_DATA_RATE_0,
+			)
 			copy(dev.MacState.RejectedAdrDataRateIndexes[i+1:], dev.MacState.RejectedAdrDataRateIndexes[i:])
 			dev.MacState.RejectedAdrDataRateIndexes[i] = req.DataRateIndex
 		}
 	}
 	if !pld.TxPowerIndexAck {
-		if i := searchUint32(req.TxPowerIndex, dev.MacState.RejectedAdrTxPowerIndexes...); i == len(dev.MacState.RejectedAdrTxPowerIndexes) || dev.MacState.RejectedAdrTxPowerIndexes[i] != req.TxPowerIndex {
+		i := searchUint32(req.TxPowerIndex, dev.MacState.RejectedAdrTxPowerIndexes...)
+		if i == len(dev.MacState.RejectedAdrTxPowerIndexes) ||
+			dev.MacState.RejectedAdrTxPowerIndexes[i] != req.TxPowerIndex {
 			dev.MacState.RejectedAdrTxPowerIndexes = append(dev.MacState.RejectedAdrTxPowerIndexes, 0)
 			copy(dev.MacState.RejectedAdrTxPowerIndexes[i+1:], dev.MacState.RejectedAdrTxPowerIndexes[i:])
 			dev.MacState.RejectedAdrTxPowerIndexes[i] = req.TxPowerIndex
