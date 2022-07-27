@@ -37,6 +37,9 @@ var (
 		"dl_channel", "downlink Rx1 channel frequency modification",
 		events.WithDataType(&ttnpb.MACCommand_DLChannelAns{}),
 	)()
+
+	containsDlChannel = containsMACCommandIdentifier(ttnpb.MACCommandIdentifier_CID_DL_CHANNEL)
+	consumeDlChannel  = consumeMACCommandIdentifier(ttnpb.MACCommandIdentifier_CID_DL_CHANNEL)
 )
 
 func DeviceNeedsDLChannelReqAtIndex(dev *ttnpb.EndDevice, i int) bool {
@@ -60,19 +63,17 @@ func DeviceNeedsDLChannelReqAtIndex(dev *ttnpb.EndDevice, i int) bool {
 	return desiredCh.DownlinkFrequency != currentParameters.Channels[i].DownlinkFrequency
 }
 
-var containsDLChannelReq = containsMACCommandIdentifier(ttnpb.MACCommandIdentifier_CID_DL_CHANNEL)
-
 func DeviceNeedsDLChannelReq(dev *ttnpb.EndDevice) bool {
 	if dev.GetMulticast() ||
 		dev.GetMacState() == nil {
 		return false
 	}
 	macState := dev.MacState
-	if !macspec.UseDLChannelReq(dev.MacState.LorawanVersion) ||
-		containsDLChannelReq(macState.RecentMacCommandIdentifiers...) {
+	if !macspec.UseDLChannelReq(macState.LorawanVersion) ||
+		containsDlChannel(macState.RecentMacCommandIdentifiers...) { // See sticky.go.
 		return false
 	}
-	for i := range dev.MacState.DesiredParameters.Channels {
+	for i := range macState.DesiredParameters.Channels {
 		if DeviceNeedsDLChannelReqAtIndex(dev, i) {
 			return true
 		}
@@ -128,38 +129,48 @@ func HandleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 		log.FromContext(ctx).Warn("Network Server attempted to configure downlink frequency for a channel, for which uplink frequency is not defined or device is malfunctioning.")
 	}
 
-	var err error
-	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.MACCommandIdentifier_CID_DL_CHANNEL, func(cmd *ttnpb.MACCommand) error {
-		req := cmd.GetDlChannelReq()
-		if !pld.FrequencyAck {
-			if i := searchUint64(req.Frequency, dev.MacState.RejectedFrequencies...); i == len(dev.MacState.RejectedFrequencies) || dev.MacState.RejectedFrequencies[i] != req.Frequency {
-				dev.MacState.RejectedFrequencies = append(dev.MacState.RejectedFrequencies, 0)
-				copy(dev.MacState.RejectedFrequencies[i+1:], dev.MacState.RejectedFrequencies[i:])
-				dev.MacState.RejectedFrequencies[i] = req.Frequency
-			}
-		}
-		if !pld.FrequencyAck || !pld.ChannelIndexAck {
-			return nil
-		}
+	var allowMissing bool // See sticky.go
+	dev.MacState.RecentMacCommandIdentifiers, allowMissing = consumeDlChannel(
+		dev.MacState.RecentMacCommandIdentifiers...,
+	)
 
-		if uint(req.ChannelIndex) >= uint(len(dev.MacState.CurrentParameters.Channels)) {
-			return internal.ErrCorruptedMACState.
-				WithAttributes(
-					"request_channel_id", req.ChannelIndex,
-					"channels_len", len(dev.MacState.CurrentParameters.Channels),
-				).
-				WithCause(internal.ErrUnknownChannel)
-		}
-		if dev.MacState.CurrentParameters.Channels[req.ChannelIndex] == nil {
-			return internal.ErrCorruptedMACState.
-				WithAttributes(
-					"request_channel_id", req.ChannelIndex,
-				).
-				WithCause(internal.ErrUnknownChannel)
-		}
-		dev.MacState.CurrentParameters.Channels[req.ChannelIndex].DownlinkFrequency = req.Frequency
-		return nil
-	}, dev.MacState.PendingRequests...)
+	var err error
+	dev.MacState.PendingRequests, err = handleMACResponse(
+		ttnpb.MACCommandIdentifier_CID_DL_CHANNEL,
+		allowMissing,
+		func(cmd *ttnpb.MACCommand) error {
+			req := cmd.GetDlChannelReq()
+			if !pld.FrequencyAck {
+				if i := searchUint64(req.Frequency, dev.MacState.RejectedFrequencies...); i == len(dev.MacState.RejectedFrequencies) || dev.MacState.RejectedFrequencies[i] != req.Frequency {
+					dev.MacState.RejectedFrequencies = append(dev.MacState.RejectedFrequencies, 0)
+					copy(dev.MacState.RejectedFrequencies[i+1:], dev.MacState.RejectedFrequencies[i:])
+					dev.MacState.RejectedFrequencies[i] = req.Frequency
+				}
+			}
+			if !pld.FrequencyAck || !pld.ChannelIndexAck {
+				return nil
+			}
+
+			if uint(req.ChannelIndex) >= uint(len(dev.MacState.CurrentParameters.Channels)) {
+				return internal.ErrCorruptedMACState.
+					WithAttributes(
+						"request_channel_id", req.ChannelIndex,
+						"channels_len", len(dev.MacState.CurrentParameters.Channels),
+					).
+					WithCause(internal.ErrUnknownChannel)
+			}
+			if dev.MacState.CurrentParameters.Channels[req.ChannelIndex] == nil {
+				return internal.ErrCorruptedMACState.
+					WithAttributes(
+						"request_channel_id", req.ChannelIndex,
+					).
+					WithCause(internal.ErrUnknownChannel)
+			}
+			dev.MacState.CurrentParameters.Channels[req.ChannelIndex].DownlinkFrequency = req.Frequency
+			return nil
+		},
+		dev.MacState.PendingRequests...,
+	)
 	ev := EvtReceiveDLChannelAccept
 	if !pld.ChannelIndexAck || !pld.FrequencyAck {
 		ev = EvtReceiveDLChannelReject

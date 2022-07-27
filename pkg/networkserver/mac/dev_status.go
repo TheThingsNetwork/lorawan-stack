@@ -117,23 +117,28 @@ func HandleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 	}
 
 	var err error
-	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.MACCommandIdentifier_CID_DEV_STATUS, func(*ttnpb.MACCommand) error {
-		switch pld.Battery {
-		case 0:
-			dev.PowerState = ttnpb.PowerState_POWER_EXTERNAL
-			dev.BatteryPercentage = nil
-		case 255:
-			dev.PowerState = ttnpb.PowerState_POWER_UNKNOWN
-			dev.BatteryPercentage = nil
-		default:
-			dev.PowerState = ttnpb.PowerState_POWER_BATTERY
-			dev.BatteryPercentage = &pbtypes.FloatValue{Value: float32(pld.Battery-1) / 253}
-		}
-		dev.DownlinkMargin = pld.Margin
-		dev.LastDevStatusReceivedAt = ttnpb.ProtoTimePtr(recvAt)
-		dev.MacState.LastDevStatusFCntUp = fCntUp
-		return nil
-	}, dev.MacState.PendingRequests...)
+	dev.MacState.PendingRequests, err = handleMACResponse(
+		ttnpb.MACCommandIdentifier_CID_DEV_STATUS,
+		false,
+		func(*ttnpb.MACCommand) error {
+			switch pld.Battery {
+			case 0:
+				dev.PowerState = ttnpb.PowerState_POWER_EXTERNAL
+				dev.BatteryPercentage = nil
+			case 255:
+				dev.PowerState = ttnpb.PowerState_POWER_UNKNOWN
+				dev.BatteryPercentage = nil
+			default:
+				dev.PowerState = ttnpb.PowerState_POWER_BATTERY
+				dev.BatteryPercentage = &pbtypes.FloatValue{Value: float32(pld.Battery-1) / 253}
+			}
+			dev.DownlinkMargin = pld.Margin
+			dev.LastDevStatusReceivedAt = ttnpb.ProtoTimePtr(recvAt)
+			dev.MacState.LastDevStatusFCntUp = fCntUp
+			return nil
+		},
+		dev.MacState.PendingRequests...,
+	)
 	return events.Builders{
 		EvtReceiveDevStatusAnswer.With(events.WithData(pld)),
 	}, err

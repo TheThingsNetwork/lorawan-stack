@@ -314,43 +314,48 @@ func HandleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 	}
 	var n uint
 	var req *ttnpb.MACCommand_LinkADRReq
-	dev.MacState.PendingRequests, err = handler(ttnpb.MACCommandIdentifier_CID_LINK_ADR, func(cmd *ttnpb.MACCommand) error {
-		if allowDuplicateLinkADRAns && n > dupCount+1 {
-			return internal.ErrInvalidPayload.New()
-		}
-		n++
-
-		req = cmd.GetLinkAdrReq()
-		if req.NbTrans > 15 || len(req.ChannelMask) != 16 || req.ChannelMaskControl > 7 {
-			panic("Network Server scheduled an invalid LinkADR command")
-		}
-		if !pld.ChannelMaskAck || !pld.DataRateIndexAck || !pld.TxPowerIndexAck {
-			return nil
-		}
-		var mask [16]bool
-		for i, v := range req.ChannelMask {
-			mask[i] = v
-		}
-		m, err := phy.ParseChMask(mask, uint8(req.ChannelMaskControl))
-		if err != nil {
-			return err
-		}
-		for i, masked := range m {
-			if int(i) >= len(dev.MacState.CurrentParameters.Channels) || dev.MacState.CurrentParameters.Channels[i] == nil {
-				if !masked {
-					continue
-				}
-				return internal.ErrCorruptedMACState.
-					WithAttributes(
-						"i", i,
-						"channels_len", len(dev.MacState.CurrentParameters.Channels),
-					).
-					WithCause(internal.ErrUnknownChannel)
+	dev.MacState.PendingRequests, err = handler(
+		ttnpb.MACCommandIdentifier_CID_LINK_ADR,
+		false,
+		func(cmd *ttnpb.MACCommand) error {
+			if allowDuplicateLinkADRAns && n > dupCount+1 {
+				return internal.ErrInvalidPayload.New()
 			}
-			dev.MacState.CurrentParameters.Channels[i].EnableUplink = masked
-		}
-		return nil
-	}, dev.MacState.PendingRequests...)
+			n++
+
+			req = cmd.GetLinkAdrReq()
+			if req.NbTrans > 15 || len(req.ChannelMask) != 16 || req.ChannelMaskControl > 7 {
+				panic("Network Server scheduled an invalid LinkADR command")
+			}
+			if !pld.ChannelMaskAck || !pld.DataRateIndexAck || !pld.TxPowerIndexAck {
+				return nil
+			}
+			var mask [16]bool
+			for i, v := range req.ChannelMask {
+				mask[i] = v
+			}
+			m, err := phy.ParseChMask(mask, uint8(req.ChannelMaskControl))
+			if err != nil {
+				return err
+			}
+			for i, masked := range m {
+				if int(i) >= len(dev.MacState.CurrentParameters.Channels) || dev.MacState.CurrentParameters.Channels[i] == nil {
+					if !masked {
+						continue
+					}
+					return internal.ErrCorruptedMACState.
+						WithAttributes(
+							"i", i,
+							"channels_len", len(dev.MacState.CurrentParameters.Channels),
+						).
+						WithCause(internal.ErrUnknownChannel)
+				}
+				dev.MacState.CurrentParameters.Channels[i].EnableUplink = masked
+			}
+			return nil
+		},
+		dev.MacState.PendingRequests...,
+	)
 	if err != nil || req == nil {
 		return evs, err
 	}

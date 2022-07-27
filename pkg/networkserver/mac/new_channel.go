@@ -138,51 +138,56 @@ func HandleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 	}
 
 	var err error
-	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.MACCommandIdentifier_CID_NEW_CHANNEL, func(cmd *ttnpb.MACCommand) error {
-		req := cmd.GetNewChannelReq()
-		if !pld.DataRateAck {
-			if dev.MacState.RejectedDataRateRanges == nil {
-				dev.MacState.RejectedDataRateRanges = make(map[uint64]*ttnpb.MACState_DataRateRanges, 1)
-			}
-			r, ok := dev.MacState.RejectedDataRateRanges[req.Frequency]
-			if !ok {
-				r = &ttnpb.MACState_DataRateRanges{
-					Ranges: make([]*ttnpb.MACState_DataRateRange, 0, 1),
+	dev.MacState.PendingRequests, err = handleMACResponse(
+		ttnpb.MACCommandIdentifier_CID_NEW_CHANNEL,
+		false,
+		func(cmd *ttnpb.MACCommand) error {
+			req := cmd.GetNewChannelReq()
+			if !pld.DataRateAck {
+				if dev.MacState.RejectedDataRateRanges == nil {
+					dev.MacState.RejectedDataRateRanges = make(map[uint64]*ttnpb.MACState_DataRateRanges, 1)
 				}
-				dev.MacState.RejectedDataRateRanges[req.Frequency] = r
+				r, ok := dev.MacState.RejectedDataRateRanges[req.Frequency]
+				if !ok {
+					r = &ttnpb.MACState_DataRateRanges{
+						Ranges: make([]*ttnpb.MACState_DataRateRange, 0, 1),
+					}
+					dev.MacState.RejectedDataRateRanges[req.Frequency] = r
+				}
+				r.Ranges = append(r.Ranges, &ttnpb.MACState_DataRateRange{
+					MinDataRateIndex: req.MinDataRateIndex,
+					MaxDataRateIndex: req.MaxDataRateIndex,
+				})
 			}
-			r.Ranges = append(r.Ranges, &ttnpb.MACState_DataRateRange{
-				MinDataRateIndex: req.MinDataRateIndex,
-				MaxDataRateIndex: req.MaxDataRateIndex,
-			})
-		}
-		if !pld.FrequencyAck {
-			if i := searchUint64(req.Frequency, dev.MacState.RejectedFrequencies...); i == len(dev.MacState.RejectedFrequencies) || dev.MacState.RejectedFrequencies[i] != req.Frequency {
-				dev.MacState.RejectedFrequencies = append(dev.MacState.RejectedFrequencies, 0)
-				copy(dev.MacState.RejectedFrequencies[i+1:], dev.MacState.RejectedFrequencies[i:])
-				dev.MacState.RejectedFrequencies[i] = req.Frequency
+			if !pld.FrequencyAck {
+				if i := searchUint64(req.Frequency, dev.MacState.RejectedFrequencies...); i == len(dev.MacState.RejectedFrequencies) || dev.MacState.RejectedFrequencies[i] != req.Frequency {
+					dev.MacState.RejectedFrequencies = append(dev.MacState.RejectedFrequencies, 0)
+					copy(dev.MacState.RejectedFrequencies[i+1:], dev.MacState.RejectedFrequencies[i:])
+					dev.MacState.RejectedFrequencies[i] = req.Frequency
+				}
 			}
-		}
-		if !pld.DataRateAck || !pld.FrequencyAck {
-			return nil
-		}
+			if !pld.DataRateAck || !pld.FrequencyAck {
+				return nil
+			}
 
-		if uint(req.ChannelIndex) >= uint(len(dev.MacState.CurrentParameters.Channels)) {
-			dev.MacState.CurrentParameters.Channels = append(dev.MacState.CurrentParameters.Channels, make([]*ttnpb.MACParameters_Channel, 1+int(req.ChannelIndex-uint32(len(dev.MacState.CurrentParameters.Channels))))...)
-		}
-		ch := dev.MacState.CurrentParameters.Channels[req.ChannelIndex]
-		if ch == nil {
-			ch = &ttnpb.MACParameters_Channel{
-				DownlinkFrequency: req.Frequency,
+			if uint(req.ChannelIndex) >= uint(len(dev.MacState.CurrentParameters.Channels)) {
+				dev.MacState.CurrentParameters.Channels = append(dev.MacState.CurrentParameters.Channels, make([]*ttnpb.MACParameters_Channel, 1+int(req.ChannelIndex-uint32(len(dev.MacState.CurrentParameters.Channels))))...)
 			}
-			dev.MacState.CurrentParameters.Channels[req.ChannelIndex] = ch
-		}
-		ch.UplinkFrequency = req.Frequency
-		ch.MinDataRateIndex = req.MinDataRateIndex
-		ch.MaxDataRateIndex = req.MaxDataRateIndex
-		ch.EnableUplink = req.Frequency > 0
-		return nil
-	}, dev.MacState.PendingRequests...)
+			ch := dev.MacState.CurrentParameters.Channels[req.ChannelIndex]
+			if ch == nil {
+				ch = &ttnpb.MACParameters_Channel{
+					DownlinkFrequency: req.Frequency,
+				}
+				dev.MacState.CurrentParameters.Channels[req.ChannelIndex] = ch
+			}
+			ch.UplinkFrequency = req.Frequency
+			ch.MinDataRateIndex = req.MinDataRateIndex
+			ch.MaxDataRateIndex = req.MaxDataRateIndex
+			ch.EnableUplink = req.Frequency > 0
+			return nil
+		},
+		dev.MacState.PendingRequests...,
+	)
 	ev := EvtReceiveNewChannelAccept
 	if !pld.DataRateAck || !pld.FrequencyAck {
 		ev = EvtReceiveNewChannelReject

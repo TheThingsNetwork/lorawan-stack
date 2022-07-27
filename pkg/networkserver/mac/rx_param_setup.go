@@ -35,16 +35,17 @@ var (
 		"rx_param_setup", "Rx parameter setup",
 		events.WithDataType(&ttnpb.MACCommand_RxParamSetupAns{}),
 	)()
-)
 
-var containsRxParamSetup = containsMACCommandIdentifier(ttnpb.MACCommandIdentifier_CID_RX_PARAM_SETUP)
+	containsRxParamSetup = containsMACCommandIdentifier(ttnpb.MACCommandIdentifier_CID_RX_PARAM_SETUP)
+	consumeRxParamSetup  = consumeMACCommandIdentifier(ttnpb.MACCommandIdentifier_CID_RX_PARAM_SETUP)
+)
 
 func DeviceNeedsRxParamSetupReq(dev *ttnpb.EndDevice) bool {
 	if dev.GetMulticast() || dev.GetMacState() == nil {
 		return false
 	}
 	macState := dev.MacState
-	if containsRxParamSetup(macState.RecentMacCommandIdentifiers...) {
+	if containsRxParamSetup(macState.RecentMacCommandIdentifiers...) { // See sticky.go.
 		return false
 	}
 	currentParameters, desiredParameters := macState.CurrentParameters, macState.DesiredParameters
@@ -94,19 +95,29 @@ func HandleRxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb
 		return nil, ErrNoPayload.New()
 	}
 
+	var allowMissing bool // See sticky.go.
+	dev.MacState.RecentMacCommandIdentifiers, allowMissing = consumeRxParamSetup(
+		dev.MacState.RecentMacCommandIdentifiers...,
+	)
+
 	var err error
-	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.MACCommandIdentifier_CID_RX_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
-		if !pld.Rx1DataRateOffsetAck || !pld.Rx2DataRateIndexAck || !pld.Rx2FrequencyAck {
+	dev.MacState.PendingRequests, err = handleMACResponse(
+		ttnpb.MACCommandIdentifier_CID_RX_PARAM_SETUP,
+		allowMissing,
+		func(cmd *ttnpb.MACCommand) error {
+			if !pld.Rx1DataRateOffsetAck || !pld.Rx2DataRateIndexAck || !pld.Rx2FrequencyAck {
+				return nil
+			}
+
+			req := cmd.GetRxParamSetupReq()
+
+			dev.MacState.CurrentParameters.Rx1DataRateOffset = req.Rx1DataRateOffset
+			dev.MacState.CurrentParameters.Rx2DataRateIndex = req.Rx2DataRateIndex
+			dev.MacState.CurrentParameters.Rx2Frequency = req.Rx2Frequency
 			return nil
-		}
-
-		req := cmd.GetRxParamSetupReq()
-
-		dev.MacState.CurrentParameters.Rx1DataRateOffset = req.Rx1DataRateOffset
-		dev.MacState.CurrentParameters.Rx2DataRateIndex = req.Rx2DataRateIndex
-		dev.MacState.CurrentParameters.Rx2Frequency = req.Rx2Frequency
-		return nil
-	}, dev.MacState.PendingRequests...)
+		},
+		dev.MacState.PendingRequests...,
+	)
 	ev := EvtReceiveRxParamSetupAccept
 	if !pld.Rx1DataRateOffsetAck || !pld.Rx2DataRateIndexAck || !pld.Rx2FrequencyAck {
 		ev = EvtReceiveRxParamSetupReject

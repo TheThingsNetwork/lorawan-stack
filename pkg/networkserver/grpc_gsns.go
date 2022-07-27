@@ -506,11 +506,11 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 
 	var deferredMACHandlers []macHandler
 	if len(cmds) > 0 && !deduplicated {
-		deferredMACHandlers = make([]macHandler, 0, 1)
+		deferredMACHandlers = make([]macHandler, 0, 2)
 	}
 	var setPaths []string
+	recentMACCommandIdentifiers := make([]ttnpb.MACCommandIdentifier, 0, 1)
 	dev.MacState.QueuedResponses = dev.MacState.QueuedResponses[:0]
-	dev.MacState.RecentMacCommandIdentifiers = dev.MacState.RecentMacCommandIdentifiers[:0]
 macLoop:
 	for len(cmds) > 0 {
 		var cmd *ttnpb.MACCommand
@@ -607,10 +607,9 @@ macLoop:
 			break macLoop
 		}
 		queuedEventBuilders = append(queuedEventBuilders, evs...)
-		dev.MacState.RecentMacCommandIdentifiers = appendRecentMACCommandIdentifier(
-			cmd.Cid, dev.MacState.RecentMacCommandIdentifiers...,
-		)
+		recentMACCommandIdentifiers = appendRecentMACCommandIdentifier(cmd.Cid, recentMACCommandIdentifiers...)
 	}
+	dev.MacState.RecentMacCommandIdentifiers = recentMACCommandIdentifiers
 	if n := len(dev.MacState.PendingRequests); n > 0 {
 		logger.WithField("unanswered_request_count", n).Debug("MAC command buffer not fully answered")
 		queuedEventBuilders = append(queuedEventBuilders, mac.EvtUnansweredMACCommand.BindData(

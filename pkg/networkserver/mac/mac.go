@@ -50,8 +50,13 @@ func enqueueMACCommand(cid ttnpb.MACCommandIdentifier, maxDownLen, maxUpLen uint
 
 // handleMACResponse searches for first command in cmds with CID equal to cid and calls f with found value as argument.
 // handleMACResponse returns cmds with first MAC command with CID equal to cid removed or
-// cmds passed and error if f returned non-nil error or if command with CID cid is not found in cmds.
-func handleMACResponse(cid ttnpb.MACCommandIdentifier, f func(*ttnpb.MACCommand) error, cmds ...*ttnpb.MACCommand) ([]*ttnpb.MACCommand, error) {
+// cmds passed and error if f returned non-nil error or if command with CID cid is not found in cmds
+// and allowMissing is false.
+func handleMACResponse(
+	cid ttnpb.MACCommandIdentifier,
+	allowMissing bool,
+	f func(*ttnpb.MACCommand) error, cmds ...*ttnpb.MACCommand,
+) ([]*ttnpb.MACCommand, error) {
 	for i, cmd := range cmds {
 		if cmd.Cid != cid {
 			continue
@@ -61,13 +66,21 @@ func handleMACResponse(cid ttnpb.MACCommandIdentifier, f func(*ttnpb.MACCommand)
 		}
 		return append(cmds[:i], cmds[i+1:]...), nil
 	}
+	if allowMissing {
+		return cmds, nil
+	}
 	return cmds, ErrRequestNotFound.New()
 }
 
 // handleMACResponse searches for first MAC command block in cmds with CID equal to cid and calls f for each found value as argument.
 // handleMACResponse returns cmds with first MAC command block with CID equal to cid removed or
-// cmds passed and error if f returned non-nil error or if command with CID cid is not found in cmds.
-func handleMACResponseBlock(cid ttnpb.MACCommandIdentifier, f func(*ttnpb.MACCommand) error, cmds ...*ttnpb.MACCommand) ([]*ttnpb.MACCommand, error) {
+// cmds passed and error if f returned non-nil error or if command with CID cid is not found in cmds
+// and allowMissing is false.
+func handleMACResponseBlock(
+	cid ttnpb.MACCommandIdentifier,
+	allowMissing bool,
+	f func(*ttnpb.MACCommand) error, cmds ...*ttnpb.MACCommand,
+) ([]*ttnpb.MACCommand, error) {
 	first := -1
 	last := -1
 
@@ -87,11 +100,14 @@ outer:
 			return cmds, err
 		}
 	}
-
-	if first < 0 {
+	switch {
+	case first < 0 && allowMissing:
+		return cmds, nil
+	case first < 0 && !allowMissing:
 		return cmds, ErrRequestNotFound.New()
+	default:
+		return append(cmds[:first], cmds[last+1:]...), nil
 	}
-	return append(cmds[:first], cmds[last+1:]...), nil
 }
 
 func searchDataRateIndex(v ttnpb.DataRateIndex, vs ...ttnpb.DataRateIndex) int {
