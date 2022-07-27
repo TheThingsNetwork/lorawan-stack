@@ -3638,6 +3638,7 @@ This is used internally by the Network Server.
 | `last_downlink_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Time when the last downlink message was scheduled. |
 | `rejected_data_rate_ranges` | [`MACState.RejectedDataRateRangesEntry`](#ttn.lorawan.v3.MACState.RejectedDataRateRangesEntry) | repeated | Data rate ranges rejected by the device per frequency. |
 | `last_adr_change_f_cnt_up` | [`uint32`](#uint32) |  | Frame counter of uplink, which confirmed the last ADR parameter change. |
+| `recent_mac_command_identifiers` | [`MACCommandIdentifier`](#ttn.lorawan.v3.MACCommandIdentifier) | repeated | MAC command identifiers sent by the end device in the last received uplink. The Network Server may choose to store only certain types of MAC command identifiers in the underlying implementation. |
 
 #### Field Rules
 

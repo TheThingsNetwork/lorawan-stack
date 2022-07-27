@@ -2366,6 +2366,17 @@ func (x *MACState) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("last_adr_change_f_cnt_up")
 		s.WriteUint32(x.LastAdrChangeFCntUp)
 	}
+	if len(x.RecentMacCommandIdentifiers) > 0 || s.HasField("recent_mac_command_identifiers") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("recent_mac_command_identifiers")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.RecentMacCommandIdentifiers {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s)
+		}
+		s.WriteArrayEnd()
+	}
 	s.WriteObjectEnd()
 }
 
@@ -2583,6 +2594,17 @@ func (x *MACState) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		case "last_adr_change_f_cnt_up", "lastAdrChangeFCntUp":
 			s.AddField("last_adr_change_f_cnt_up")
 			x.LastAdrChangeFCntUp = s.ReadUint32()
+		case "recent_mac_command_identifiers", "recentMacCommandIdentifiers":
+			s.AddField("recent_mac_command_identifiers")
+			if s.ReadNil() {
+				x.RecentMacCommandIdentifiers = nil
+				return
+			}
+			s.ReadArray(func() {
+				var v MACCommandIdentifier
+				v.UnmarshalProtoJSON(s)
+				x.RecentMacCommandIdentifiers = append(x.RecentMacCommandIdentifiers, v)
+			})
 		}
 	})
 }

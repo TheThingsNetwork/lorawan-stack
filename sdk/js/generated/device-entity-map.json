@@ -1162,6 +1162,10 @@
       "ns",
       "ns"
     ],
+    "recent_mac_command_identifiers": [
+      "ns",
+      "ns"
+    ],
     "recent_uplinks": [
       "ns",
       "ns"
@@ -1639,6 +1643,10 @@
       }
     },
     "recent_downlinks": [
+      "ns",
+      "ns"
+    ],
+    "recent_mac_command_identifiers": [
       "ns",
       "ns"
     ],

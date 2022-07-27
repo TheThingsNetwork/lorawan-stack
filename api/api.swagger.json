@@ -21209,6 +21209,13 @@
           "type": "integer",
           "format": "int64",
           "description": "Frame counter of uplink, which confirmed the last ADR parameter change."
+        },
+        "recent_mac_command_identifiers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3MACCommandIdentifier"
+          },
+          "description": "MAC command identifiers sent by the end device in the last received uplink.\nThe Network Server may choose to store only certain types of MAC\ncommand identifiers in the underlying implementation."
         }
       },
       "description": "MACState represents the state of MAC layer of the device.\nMACState is reset on each join for OTAA or ResetInd for ABP devices.\nThis is used internally by the Network Server."

@@ -905,6 +905,8 @@ func (v *MACState) FieldIsZero(p string) bool {
 		return v.QueuedResponses == nil
 	case "recent_downlinks":
 		return v.RecentDownlinks == nil
+	case "recent_mac_command_identifiers":
+		return v.RecentMacCommandIdentifiers == nil
 	case "recent_uplinks":
 		return v.RecentUplinks == nil
 	case "rejected_adr_data_rate_indexes":

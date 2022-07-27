@@ -1806,6 +1806,15 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 				var zero uint32
 				dst.LastAdrChangeFCntUp = zero
 			}
+		case "recent_mac_command_identifiers":
+			if len(subs) > 0 {
+				return fmt.Errorf("'recent_mac_command_identifiers' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RecentMacCommandIdentifiers = src.RecentMacCommandIdentifiers
+			} else {
+				dst.RecentMacCommandIdentifiers = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

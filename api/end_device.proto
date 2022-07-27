@@ -539,6 +539,11 @@ message MACState {
 
   // Frame counter of uplink, which confirmed the last ADR parameter change.
   uint32 last_adr_change_f_cnt_up = 22;
+
+  // MAC command identifiers sent by the end device in the last received uplink.
+  // The Network Server may choose to store only certain types of MAC
+  // command identifiers in the underlying implementation.
+  repeated MACCommandIdentifier recent_mac_command_identifiers = 23;
 }
 
 // Power state of the device.
