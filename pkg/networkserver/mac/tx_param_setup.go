@@ -35,6 +35,8 @@ var (
 	)()
 )
 
+var containsTxParamSetup = containsMACCommandIdentifier(ttnpb.MACCommandIdentifier_CID_TX_PARAM_SETUP)
+
 func DeviceNeedsTxParamSetupReq(dev *ttnpb.EndDevice, phy *band.Band) bool {
 	if !phy.TxParamSetupReqSupport ||
 		dev.GetMulticast() ||
@@ -42,17 +44,22 @@ func DeviceNeedsTxParamSetupReq(dev *ttnpb.EndDevice, phy *band.Band) bool {
 		!macspec.UseTxParamSetupReq(dev.MacState.LorawanVersion) {
 		return false
 	}
-	if dev.MacState.DesiredParameters.MaxEirp != dev.MacState.CurrentParameters.MaxEirp {
+	macState := dev.MacState
+	if containsTxParamSetup(macState.RecentMacCommandIdentifiers...) {
+		return false
+	}
+	currentParameters, desiredParameters := macState.CurrentParameters, macState.DesiredParameters
+	if desiredParameters.MaxEirp != currentParameters.MaxEirp {
 		return true
 	}
-	if dev.MacState.DesiredParameters.UplinkDwellTime != nil &&
-		(dev.MacState.CurrentParameters.UplinkDwellTime == nil ||
-			dev.MacState.DesiredParameters.UplinkDwellTime.Value != dev.MacState.CurrentParameters.UplinkDwellTime.Value) {
+	if desiredParameters.UplinkDwellTime != nil &&
+		(currentParameters.UplinkDwellTime == nil ||
+			desiredParameters.UplinkDwellTime.Value != currentParameters.UplinkDwellTime.Value) {
 		return true
 	}
-	if dev.MacState.DesiredParameters.DownlinkDwellTime != nil &&
-		(dev.MacState.CurrentParameters.DownlinkDwellTime == nil ||
-			dev.MacState.DesiredParameters.DownlinkDwellTime.Value != dev.MacState.CurrentParameters.DownlinkDwellTime.Value) {
+	if desiredParameters.DownlinkDwellTime != nil &&
+		(currentParameters.DownlinkDwellTime == nil ||
+			desiredParameters.DownlinkDwellTime.Value != currentParameters.DownlinkDwellTime.Value) {
 		return true
 	}
 	return false

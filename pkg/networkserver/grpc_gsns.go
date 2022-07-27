@@ -39,6 +39,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"golang.org/x/exp/slices"
 )
 
 const (
@@ -191,6 +192,20 @@ func applyCFList(cfList *ttnpb.CFList, phy *band.Band, chs ...*ttnpb.MACParamete
 		}
 	}
 	return chs, true
+}
+
+func appendRecentMACCommandIdentifier(
+	cid ttnpb.MACCommandIdentifier, cids ...ttnpb.MACCommandIdentifier,
+) []ttnpb.MACCommandIdentifier {
+	switch cid {
+	case ttnpb.MACCommandIdentifier_CID_RX_PARAM_SETUP,
+		ttnpb.MACCommandIdentifier_CID_RX_TIMING_SETUP,
+		ttnpb.MACCommandIdentifier_CID_TX_PARAM_SETUP,
+		ttnpb.MACCommandIdentifier_CID_DL_CHANNEL:
+		return append(cids, cid)
+	default:
+		return cids
+	}
 }
 
 // matchAndHandleDataUplink handles and matches a device prematched by CMACF check.
@@ -495,6 +510,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 	}
 	var setPaths []string
 	dev.MacState.QueuedResponses = dev.MacState.QueuedResponses[:0]
+	dev.MacState.RecentMacCommandIdentifiers = dev.MacState.RecentMacCommandIdentifiers[:0]
 macLoop:
 	for len(cmds) > 0 {
 		var cmd *ttnpb.MACCommand
@@ -591,11 +607,14 @@ macLoop:
 			break macLoop
 		}
 		queuedEventBuilders = append(queuedEventBuilders, evs...)
+		dev.MacState.RecentMacCommandIdentifiers = appendRecentMACCommandIdentifier(
+			cmd.Cid, dev.MacState.RecentMacCommandIdentifiers...,
+		)
 	}
 	if n := len(dev.MacState.PendingRequests); n > 0 {
 		logger.WithField("unanswered_request_count", n).Debug("MAC command buffer not fully answered")
 		queuedEventBuilders = append(queuedEventBuilders, mac.EvtUnansweredMACCommand.BindData(
-			append(dev.MacState.PendingRequests[:0:0], dev.MacState.PendingRequests...),
+			slices.Clone(dev.MacState.PendingRequests),
 		))
 		dev.MacState.PendingRequests = dev.MacState.PendingRequests[:0]
 	}

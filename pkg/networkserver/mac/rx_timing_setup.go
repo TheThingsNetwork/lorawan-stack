@@ -32,10 +32,18 @@ var (
 	)()
 )
 
+var containsRxTimingSetup = containsMACCommandIdentifier(ttnpb.MACCommandIdentifier_CID_RX_TIMING_SETUP)
+
 func DeviceNeedsRxTimingSetupReq(dev *ttnpb.EndDevice) bool {
-	return !dev.GetMulticast() &&
-		dev.GetMacState() != nil &&
-		dev.MacState.DesiredParameters.Rx1Delay != dev.MacState.CurrentParameters.Rx1Delay
+	if dev.GetMulticast() || dev.GetMacState() == nil {
+		return false
+	}
+	macState := dev.MacState
+	if containsRxTimingSetup(macState.RecentMacCommandIdentifiers...) {
+		return false
+	}
+	currentParameters, desiredParameters := macState.CurrentParameters, macState.DesiredParameters
+	return desiredParameters.Rx1Delay != currentParameters.Rx1Delay
 }
 
 func EnqueueRxTimingSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) EnqueueState {

@@ -37,12 +37,20 @@ var (
 	)()
 )
 
+var containsRxParamSetup = containsMACCommandIdentifier(ttnpb.MACCommandIdentifier_CID_RX_PARAM_SETUP)
+
 func DeviceNeedsRxParamSetupReq(dev *ttnpb.EndDevice) bool {
-	return !dev.GetMulticast() &&
-		dev.GetMacState() != nil &&
-		(dev.MacState.DesiredParameters.Rx1DataRateOffset != dev.MacState.CurrentParameters.Rx1DataRateOffset ||
-			dev.MacState.DesiredParameters.Rx2DataRateIndex != dev.MacState.CurrentParameters.Rx2DataRateIndex ||
-			dev.MacState.DesiredParameters.Rx2Frequency != dev.MacState.CurrentParameters.Rx2Frequency)
+	if dev.GetMulticast() || dev.GetMacState() == nil {
+		return false
+	}
+	macState := dev.MacState
+	if containsRxParamSetup(macState.RecentMacCommandIdentifiers...) {
+		return false
+	}
+	currentParameters, desiredParameters := macState.CurrentParameters, macState.DesiredParameters
+	return desiredParameters.Rx1DataRateOffset != currentParameters.Rx1DataRateOffset ||
+		desiredParameters.Rx2DataRateIndex != currentParameters.Rx2DataRateIndex ||
+		desiredParameters.Rx2Frequency != currentParameters.Rx2Frequency
 }
 
 func EnqueueRxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) EnqueueState {
