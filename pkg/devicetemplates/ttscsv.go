@@ -15,8 +15,11 @@
 package devicetemplates
 
 import (
+	"bufio"
+	"bytes"
 	"context"
 	"encoding/csv"
+	"fmt"
 	"io"
 	"strconv"
 	"strings"
@@ -33,7 +36,7 @@ const TTSCSV = "the-things-stack-csv"
 type ttsCSV struct{}
 
 // Format implements the devicetemplates.Converter interface.
-func (t *ttsCSV) Format() *ttnpb.EndDeviceTemplateFormat {
+func (*ttsCSV) Format() *ttnpb.EndDeviceTemplateFormat {
 	return &ttnpb.EndDeviceTemplateFormat{
 		Name:           "The Things Stack CSV",
 		Description:    "File containing end devices in The Things Stack CSV format.",
@@ -42,9 +45,13 @@ func (t *ttsCSV) Format() *ttnpb.EndDeviceTemplateFormat {
 }
 
 var (
-	errParseCSV      = errors.DefineInvalidArgument("parse_csv", "parse CSV at line `{line}` column `{column}`: {message}", "start_line")
+	errParseCSV = errors.DefineInvalidArgument("parse_csv",
+		"parse CSV at line `{line}` column `{column}`: {message}", "start_line",
+	)
 	errCSVHeader     = errors.DefineInvalidArgument("csv_header", "no known columns in CSV header")
-	errParseCSVField = errors.DefineInvalidArgument("parse_csv_field", "parse CSV field at line `{line}` column `{column}`")
+	errParseCSVField = errors.DefineInvalidArgument("parse_csv_field",
+		"parse CSV field at line `{line}` column `{column}`",
+	)
 )
 
 func convertCSVErr(err error) error {
@@ -292,8 +299,22 @@ var csvFieldSetters = map[string]csvFieldSetterFunc{
 	},
 }
 
+func determineComma(head []byte) (rune, bool) {
+	scanner := bufio.NewScanner(bytes.NewReader(head))
+	if !scanner.Scan() {
+		return 0, false
+	}
+	header := scanner.Text()
+	for _, c := range []rune{';', ','} {
+		if strings.ContainsRune(header, c) {
+			return c, true
+		}
+	}
+	return 0, false
+}
+
 // Convert implements the devicetemplates.Converter interface.
-func (t *ttsCSV) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDeviceTemplate) error {
+func (*ttsCSV) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDeviceTemplate) error {
 	defer close(ch)
 
 	r, err := charset.NewReader(r, "text/csv")
@@ -301,15 +322,25 @@ func (t *ttsCSV) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndD
 		return err
 	}
 
-	dec := csv.NewReader(r)
-	dec.Comma = ';'
+	// Best effort detection of the comma by peeking the first kilobyte and looking at a separator on the first line.
+	comma := ';'
+	const maxHeaderLength = 1024
+	buf := bufio.NewReaderSize(r, maxHeaderLength)
+	if head, _ := buf.Peek(maxHeaderLength); len(head) > 0 {
+		if c, ok := determineComma(head); ok {
+			comma = c
+		}
+	}
+
+	dec := csv.NewReader(buf)
+	dec.Comma = comma
 	dec.TrimLeadingSpace = true
 
 	// Populate the mapping of column index to a field setter function based on known header column names.
 	fieldSetters := make(map[int]csvFieldSetterFunc)
 	header, err := dec.Read()
 	if err != nil {
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			return errCSVHeader.WithCause(err)
 		}
 		return convertCSVErr(err)
@@ -329,7 +360,7 @@ func (t *ttsCSV) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndD
 	for {
 		record, err := dec.Read()
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				return nil
 			}
 			return convertCSVErr(err)
@@ -354,7 +385,7 @@ func (t *ttsCSV) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndD
 			paths = ttnpb.AddFields(paths, fieldPaths...)
 		}
 		if !ttnpb.HasAnyField(paths, "ids.device_id") && ttnpb.HasAnyField(paths, "ids.dev_eui") {
-			dev.Ids.DeviceId = strings.ToLower(dev.Ids.DevEui.String())
+			dev.Ids.DeviceId = fmt.Sprintf("eui-%s", strings.ToLower(dev.Ids.DevEui.String()))
 			paths = ttnpb.AddFields(paths, "ids.device_id")
 		}
 

@@ -41,9 +41,13 @@ var (
 	csvGenerateDeviceID string
 	//go:embed testdata/appeui.csv
 	csvAppEUI string
+	//go:embed testdata/comma_separated.csv
+	csvCommaSeparated string
 )
 
 func TestTTSCSVConverter(t *testing.T) {
+	t.Parallel()
+
 	tts := GetConverter("the-things-stack-csv")
 	a := assertions.New(t)
 	if !a.So(tts, should.NotBeNil) {
@@ -53,18 +57,17 @@ func TestTTSCSVConverter(t *testing.T) {
 	for _, tc := range []struct {
 		name           string
 		reader         io.Reader
-		validateError  func(t *testing.T, err error)
-		validateResult func(t *testing.T, templates []*ttnpb.EndDeviceTemplate, count int)
+		validateError  func(a *assertions.Assertion, err error)
+		validateResult func(a *assertions.Assertion, templates []*ttnpb.EndDeviceTemplate, count int)
 		nExpect        int
 	}{
 		{
 			name:   "AllColumns",
 			reader: bytes.NewBufferString(csvAllColumns),
-			validateError: func(t *testing.T, err error) {
-				assertions.New(t).So(err, should.BeNil)
+			validateError: func(a *assertions.Assertion, err error) {
+				a.So(err, should.BeNil)
 			},
-			validateResult: func(t *testing.T, templates []*ttnpb.EndDeviceTemplate, count int) {
-				a := assertions.New(t)
+			validateResult: func(a *assertions.Assertion, templates []*ttnpb.EndDeviceTemplate, count int) {
 				if !a.So(len(templates), should.Equal, count) {
 					t.FailNow()
 				}
@@ -101,11 +104,10 @@ func TestTTSCSVConverter(t *testing.T) {
 		{
 			name:   "ExtraColumns",
 			reader: bytes.NewBufferString(csvExtraColumns),
-			validateError: func(t *testing.T, err error) {
-				assertions.New(t).So(err, should.BeNil)
+			validateError: func(a *assertions.Assertion, err error) {
+				a.So(err, should.BeNil)
 			},
-			validateResult: func(t *testing.T, templates []*ttnpb.EndDeviceTemplate, count int) {
-				a := assertions.New(t)
+			validateResult: func(a *assertions.Assertion, templates []*ttnpb.EndDeviceTemplate, count int) {
 				if !a.So(len(templates), should.Equal, count) {
 					t.FailNow()
 				}
@@ -119,43 +121,41 @@ func TestTTSCSVConverter(t *testing.T) {
 		{
 			name:   "EmptyString",
 			reader: bytes.NewBufferString(""),
-			validateError: func(t *testing.T, err error) {
-				assertions.New(t).So(err, should.NotBeNil)
+			validateError: func(a *assertions.Assertion, err error) {
+				a.So(err, should.NotBeNil)
 			},
 			nExpect: 0,
 		},
 		{
 			name:   "InvalidDevEUI",
 			reader: bytes.NewBufferString(csvInvalidDevEUI),
-			validateError: func(t *testing.T, err error) {
-				assertions.New(t).So(err, should.NotBeNil)
+			validateError: func(a *assertions.Assertion, err error) {
+				a.So(err, should.NotBeNil)
 			},
 			nExpect: 0,
 		},
 		{
 			name:   "GenerateDeviceID",
 			reader: bytes.NewBufferString(csvGenerateDeviceID),
-			validateError: func(t *testing.T, err error) {
-				assertions.New(t).So(err, should.BeNil)
+			validateError: func(a *assertions.Assertion, err error) {
+				a.So(err, should.BeNil)
 			},
-			validateResult: func(t *testing.T, templates []*ttnpb.EndDeviceTemplate, count int) {
-				a := assertions.New(t)
+			validateResult: func(a *assertions.Assertion, templates []*ttnpb.EndDeviceTemplate, count int) {
 				if !a.So(len(templates), should.Equal, count) {
 					t.FailNow()
 				}
 				dev := templates[0]
-				a.So(dev.EndDevice.Ids.DeviceId, should.Equal, "111111111111111a")
+				a.So(dev.EndDevice.Ids.DeviceId, should.Equal, "eui-111111111111111a")
 			},
 			nExpect: 1,
 		},
 		{
 			name:   "AppEUI",
 			reader: bytes.NewBufferString(csvAppEUI),
-			validateError: func(t *testing.T, err error) {
-				assertions.New(t).So(err, should.BeNil)
+			validateError: func(a *assertions.Assertion, err error) {
+				a.So(err, should.BeNil)
 			},
-			validateResult: func(t *testing.T, templates []*ttnpb.EndDeviceTemplate, count int) {
-				a := assertions.New(t)
+			validateResult: func(a *assertions.Assertion, templates []*ttnpb.EndDeviceTemplate, count int) {
 				if !a.So(len(templates), should.Equal, count) {
 					t.FailNow()
 				}
@@ -168,8 +168,32 @@ func TestTTSCSVConverter(t *testing.T) {
 			},
 			nExpect: 1,
 		},
+		{
+			name:   "CommaSeparated",
+			reader: bytes.NewBufferString(csvCommaSeparated),
+			validateError: func(a *assertions.Assertion, err error) {
+				a.So(err, should.BeNil)
+			},
+			validateResult: func(a *assertions.Assertion, templates []*ttnpb.EndDeviceTemplate, count int) {
+				if !a.So(len(templates), should.Equal, count) {
+					t.FailNow()
+				}
+				dev := templates[0]
+				a.So(ttnpb.RequireFields(dev.FieldMask.Paths,
+					"ids.device_id",
+					"ids.dev_eui",
+					"ids.join_eui",
+					"root_keys.app_key.key",
+					"root_keys.nwk_key.key",
+				), should.BeNil)
+			},
+			nExpect: 3,
+		},
 	} {
+		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
 			ctx := test.Context()
 			ch := make(chan *ttnpb.EndDeviceTemplate)
 
@@ -182,8 +206,8 @@ func TestTTSCSVConverter(t *testing.T) {
 				wg.Done()
 			}()
 			go func() {
-				for i := 0; i < tc.nExpect; i++ {
-					templates = append(templates, <-ch)
+				for t := range ch {
+					templates = append(templates, t)
 				}
 				wg.Done()
 			}()
@@ -203,9 +227,10 @@ func TestTTSCSVConverter(t *testing.T) {
 				t.FailNow()
 			}
 
-			tc.validateError(t, err)
+			a := assertions.New(t)
+			tc.validateError(a, err)
 			if tc.validateResult != nil {
-				tc.validateResult(t, templates, tc.nExpect)
+				tc.validateResult(a, templates, tc.nExpect)
 			}
 		})
 	}
