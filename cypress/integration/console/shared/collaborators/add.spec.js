@@ -237,7 +237,7 @@ describe('Collaborators', () => {
 
       cy.findByTestId('error-notification')
         .should('be.visible')
-        .findByText(/can not collaborate/i)
+        .findByText(/organizations can not be nested/i)
         .should('be.visible')
       cy.visit(`${Cypress.config('consoleRootPath')}/organizations/${testOrgId}/collaborators/add`)
     })
