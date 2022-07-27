@@ -47,6 +47,7 @@ func TestNeedsTxParamSetupReq(t *testing.T) {
 	for _, conf := range []struct {
 		Suffix                               string
 		CurrentParameters, DesiredParameters *ttnpb.MACParameters
+		RecentMacCommandIdentifiers          []ttnpb.MACCommandIdentifier
 		Needs                                bool
 	}{
 		{
@@ -120,6 +121,22 @@ func TestNeedsTxParamSetupReq(t *testing.T) {
 			},
 			Needs: true,
 		},
+		{
+			Suffix: "current(EIRP:24,downlink:true,uplink:false),desired(EIRP:26,downlink:true,uplink:false),recent",
+			CurrentParameters: &ttnpb.MACParameters{
+				MaxEirp:           24,
+				DownlinkDwellTime: &ttnpb.BoolValue{Value: true},
+				UplinkDwellTime:   &ttnpb.BoolValue{Value: false},
+			},
+			DesiredParameters: &ttnpb.MACParameters{
+				MaxEirp:           26,
+				DownlinkDwellTime: &ttnpb.BoolValue{Value: true},
+				UplinkDwellTime:   &ttnpb.BoolValue{Value: false},
+			},
+			RecentMacCommandIdentifiers: []ttnpb.MACCommandIdentifier{
+				ttnpb.MACCommandIdentifier_CID_TX_PARAM_SETUP,
+			},
+		},
 	} {
 		ForEachBandMACVersion(t, func(makeName func(parts ...string) string, phy *band.Band, phyVersion ttnpb.PHYVersion, macVersion ttnpb.MACVersion) {
 			tcs = append(tcs,
@@ -129,9 +146,10 @@ func TestNeedsTxParamSetupReq(t *testing.T) {
 						LorawanVersion:    macVersion,
 						LorawanPhyVersion: phyVersion,
 						MacState: &ttnpb.MACState{
-							LorawanVersion:    macVersion,
-							CurrentParameters: conf.CurrentParameters,
-							DesiredParameters: conf.DesiredParameters,
+							LorawanVersion:              macVersion,
+							CurrentParameters:           conf.CurrentParameters,
+							DesiredParameters:           conf.DesiredParameters,
+							RecentMacCommandIdentifiers: conf.RecentMacCommandIdentifiers,
 						},
 					},
 					Band:  phy,
