@@ -52,7 +52,11 @@ func New(c *component.Component, conf *Config) (*DeviceRepository, error) {
 
 	c.RegisterGRPC(dr)
 
-	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.DeviceRepository", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("devicerepository"))
+	c.GRPC.RegisterUnaryHook(
+		"/ttn.lorawan.v3.DeviceRepository",
+		rpclog.NamespaceHook,
+		rpclog.UnaryNamespaceHook("devicerepository"),
+	)
 	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.DeviceRepository", cluster.HookName, c.ClusterAuthUnaryHook())
 	return dr, nil
 }
@@ -63,7 +67,7 @@ func (dr *DeviceRepository) Context() context.Context {
 }
 
 // Roles returns the roles that the Device Repository fulfills.
-func (dr *DeviceRepository) Roles() []ttnpb.ClusterRole {
+func (*DeviceRepository) Roles() []ttnpb.ClusterRole {
 	return []ttnpb.ClusterRole{ttnpb.ClusterRole_DEVICE_REPOSITORY}
 }
 
@@ -74,5 +78,5 @@ func (dr *DeviceRepository) RegisterServices(s *grpc.Server) {
 
 // RegisterHandlers registers gRPC handlers.
 func (dr *DeviceRepository) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
-	ttnpb.RegisterDeviceRepositoryHandler(dr.Context(), s, conn)
+	ttnpb.RegisterDeviceRepositoryHandler(dr.Context(), s, conn) //nolint:errcheck
 }

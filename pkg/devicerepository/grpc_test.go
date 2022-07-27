@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -531,6 +532,19 @@ func TestGRPC(t *testing.T) {
 			a.So(err, should.BeNil)
 			a.So(c, should.Resemble, st.uplinkDecoder)
 		})
+		t.Run("ClusterAuth", func(t *testing.T) {
+			codec, err := cl.GetUplinkDecoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
+				VersionIds: ids,
+			})
+			a := assertions.New(t)
+			a.So(errors.IsUnauthenticated(err), should.BeTrue)
+			a.So(codec, should.BeNil)
+
+			_, err = cl.GetUplinkDecoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
+				VersionIds: ids,
+			}, c.WithClusterAuth())
+			a.So(err, should.BeNil)
+		})
 	})
 
 	t.Run("GetDownlinkDecoder", func(t *testing.T) {
@@ -561,6 +575,19 @@ func TestGRPC(t *testing.T) {
 			a.So(err, should.BeNil)
 			a.So(c, should.Resemble, st.downlinkDecoder)
 		})
+		t.Run("ClusterAuth", func(t *testing.T) {
+			codec, err := cl.GetDownlinkDecoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
+				VersionIds: ids,
+			})
+			a := assertions.New(t)
+			a.So(errors.IsUnauthenticated(err), should.BeTrue)
+			a.So(codec, should.BeNil)
+
+			_, err = cl.GetDownlinkDecoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
+				VersionIds: ids,
+			}, c.WithClusterAuth())
+			a.So(err, should.BeNil)
+		})
 	})
 
 	t.Run("GetDownlinkEncoder", func(t *testing.T) {
@@ -590,6 +617,19 @@ func TestGRPC(t *testing.T) {
 			})
 			a.So(err, should.BeNil)
 			a.So(c, should.Resemble, st.downlinkEncoder)
+		})
+		t.Run("ClusterAuth", func(t *testing.T) {
+			codec, err := cl.GetDownlinkEncoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
+				VersionIds: ids,
+			})
+			a := assertions.New(t)
+			a.So(errors.IsUnauthenticated(err), should.BeTrue)
+			a.So(codec, should.BeNil)
+
+			_, err = cl.GetDownlinkEncoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
+				VersionIds: ids,
+			}, c.WithClusterAuth())
+			a.So(err, should.BeNil)
 		})
 	})
 }
