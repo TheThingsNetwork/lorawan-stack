@@ -377,11 +377,12 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 			dev.Session.Keys.NwkSEncKey = &ttnpb.KeyEnvelope{Key: nwkSEncKey.Bytes()}
 			logger.Infof("Derived NwkSEncKey %X (%s)", nwkSEncKey[:], base64.StdEncoding.EncodeToString(nwkSEncKey[:]))
 		} else {
-			appSKey := crypto.DeriveLegacyAppSKey(key, joinNonce, joinAcceptPayload.NetId, devNonce)
+			netID := types.MustNetID(joinAcceptPayload.NetId).OrZero()
+			appSKey := crypto.DeriveLegacyAppSKey(key, joinNonce, netID, devNonce)
 			dev.Session.Keys.AppSKey = &ttnpb.KeyEnvelope{Key: appSKey.Bytes()}
 			logger.Infof("Derived AppSKey %X (%s)", appSKey[:], base64.StdEncoding.EncodeToString(appSKey[:]))
 
-			nwkSKey := crypto.DeriveLegacyNwkSKey(key, joinNonce, joinAcceptPayload.NetId, devNonce)
+			nwkSKey := crypto.DeriveLegacyNwkSKey(key, joinNonce, netID, devNonce)
 			dev.Session.Keys.FNwkSIntKey = &ttnpb.KeyEnvelope{Key: nwkSKey.Bytes()}
 			dev.Session.Keys.SNwkSIntKey = &ttnpb.KeyEnvelope{Key: nwkSKey.Bytes()}
 			dev.Session.Keys.NwkSEncKey = &ttnpb.KeyEnvelope{Key: nwkSKey.Bytes()}

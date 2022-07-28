@@ -1868,7 +1868,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 								},
 								Payload: &ttnpb.Message_JoinAcceptPayload{
 									JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
-										NetId:      types.MustNetID(dev.PendingMacState.QueuedJoinAccept.NetId).OrZero(),
+										NetId:      dev.PendingMacState.QueuedJoinAccept.NetId,
 										DevAddr:    types.MustDevAddr(dev.PendingMacState.QueuedJoinAccept.DevAddr).OrZero(),
 										DlSettings: dev.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
 										RxDelay:    dev.PendingMacState.QueuedJoinAccept.Request.RxDelay,

@@ -833,7 +833,7 @@ func TestMessageEncodingSymmetricityJoinAcceptPayload(t *testing.T) {
 			Name: "JoinAcceptPayload/CFList",
 			Message: &ttnpb.JoinAcceptPayload{
 				JoinNonce: test.DefaultJoinNonce.Bytes(),
-				NetId:     test.DefaultNetID,
+				NetId:     test.DefaultNetID.Bytes(),
 				DevAddr:   test.DefaultDevAddr,
 				DlSettings: &ttnpb.DLSettings{
 					Rx1DrOffset: ttnpb.DataRateOffset_DATA_RATE_OFFSET_2,
@@ -857,7 +857,7 @@ func TestMessageEncodingSymmetricityJoinAcceptPayload(t *testing.T) {
 			Name: "JoinAcceptPayload/NoCFList",
 			Message: &ttnpb.JoinAcceptPayload{
 				JoinNonce: test.DefaultJoinNonce.Bytes(),
-				NetId:     test.DefaultNetID,
+				NetId:     test.DefaultNetID.Bytes(),
 				DevAddr:   test.DefaultDevAddr,
 				DlSettings: &ttnpb.DLSettings{
 					Rx1DrOffset: ttnpb.DataRateOffset_DATA_RATE_OFFSET_2,
@@ -899,7 +899,7 @@ func TestLoRaWANEncodingRawJoinAcceptPayload(t *testing.T) {
 			"JoinAcceptPayload/NoCFList",
 			&ttnpb.JoinAcceptPayload{
 				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff}.Bytes(),
-				NetId:     types.NetID{0x42, 0xff, 0xff},
+				NetId:     types.NetID{0x42, 0xff, 0xff}.Bytes(),
 				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				DlSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
@@ -925,7 +925,7 @@ func TestLoRaWANEncodingRawJoinAcceptPayload(t *testing.T) {
 			"JoinAcceptPayload/CFListFreq",
 			&ttnpb.JoinAcceptPayload{
 				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff}.Bytes(),
-				NetId:     types.NetID{0x42, 0xff, 0xff},
+				NetId:     types.NetID{0x42, 0xff, 0xff}.Bytes(),
 				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				DlSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
@@ -959,7 +959,7 @@ func TestLoRaWANEncodingRawJoinAcceptPayload(t *testing.T) {
 			"JoinAcceptPayload/CFListChMask",
 			&ttnpb.JoinAcceptPayload{
 				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff}.Bytes(),
-				NetId:     types.NetID{0x42, 0xff, 0xff},
+				NetId:     types.NetID{0x42, 0xff, 0xff}.Bytes(),
 				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				DlSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
