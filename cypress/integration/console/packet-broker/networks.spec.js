@@ -30,6 +30,9 @@ describe('Packet Broker networks', () => {
     cy.intercept('GET', '/api/v3/pba/home-networks/policies/default', {
       fixture: 'console/packet-broker/default-policy.json',
     })
+    cy.intercept('GET', '/api/v3/pba/home-networks/gateway-visibilities/default', {
+      statusCode: 404,
+    })
     cy.intercept('GET', '/api/v3/pba/home-networks/policies/19/johan', {
       statusCode: 404,
       fixture: '404-body.json',
