@@ -316,7 +316,7 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 				Payload: &ttnpb.Message{
 					Payload: &ttnpb.Message_JoinRequestPayload{
 						JoinRequestPayload: &ttnpb.JoinRequestPayload{
-							JoinEui: types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00},
+							JoinEui: types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00}.Bytes(),
 							DevEui:  types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08},
 						},
 					},
@@ -376,7 +376,7 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 				Payload: &ttnpb.Message{
 					Payload: &ttnpb.Message_JoinRequestPayload{
 						JoinRequestPayload: &ttnpb.JoinRequestPayload{
-							JoinEui: types.EUI64{0xec, 0x65, 0x6e, 0x00, 0x00, 0x00, 0x00, 0x00},
+							JoinEui: types.EUI64{0xec, 0x65, 0x6e, 0x00, 0x00, 0x00, 0x00, 0x00}.Bytes(),
 							DevEui:  types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08},
 						},
 					},
@@ -446,7 +446,7 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 				Payload: &ttnpb.Message{
 					Payload: &ttnpb.Message_JoinRequestPayload{
 						JoinRequestPayload: &ttnpb.JoinRequestPayload{
-							JoinEui: types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00},
+							JoinEui: types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00}.Bytes(),
 							DevEui:  types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08},
 						},
 					},
@@ -532,7 +532,7 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 				Payload: &ttnpb.Message{
 					Payload: &ttnpb.Message_JoinRequestPayload{
 						JoinRequestPayload: &ttnpb.JoinRequestPayload{
-							JoinEui: types.EUI64{0xec, 0x65, 0x6e, 0x00, 0x00, 0x00, 0x00, 0x00},
+							JoinEui: types.EUI64{0xec, 0x65, 0x6e, 0x00, 0x00, 0x00, 0x00, 0x00}.Bytes(),
 							DevEui:  types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08},
 						},
 					},
@@ -617,7 +617,7 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 				Payload: &ttnpb.Message{
 					Payload: &ttnpb.Message_JoinRequestPayload{
 						JoinRequestPayload: &ttnpb.JoinRequestPayload{
-							JoinEui: types.EUI64{0xec, 0x65, 0x6e, 0x00, 0x00, 0x00, 0x00, 0x00},
+							JoinEui: types.EUI64{0xec, 0x65, 0x6e, 0x00, 0x00, 0x00, 0x00, 0x00}.Bytes(),
 							DevEui:  types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08},
 						},
 					},

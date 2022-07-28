@@ -53,7 +53,7 @@ func randomJoinRequestPayload(joinEUI, devEUI types.EUI64) []byte {
 			},
 			Payload: &ttnpb.Message_JoinRequestPayload{
 				JoinRequestPayload: &ttnpb.JoinRequestPayload{
-					JoinEui:  joinEUI,
+					JoinEui:  joinEUI.Bytes(),
 					DevEui:   devEUI,
 					DevNonce: devNonce,
 				},

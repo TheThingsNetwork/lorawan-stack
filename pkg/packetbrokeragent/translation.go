@@ -304,9 +304,10 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 
 	switch pld := msg.Message.Payload.Payload.(type) {
 	case *ttnpb.Message_JoinRequestPayload:
+		joinEUI := types.MustEUI64(pld.JoinRequestPayload.JoinEui)
 		up.PhyPayload.Teaser.Payload = &packetbroker.PHYPayloadTeaser_JoinRequest{
 			JoinRequest: &packetbroker.PHYPayloadTeaser_JoinRequestTeaser{
-				JoinEui:  pld.JoinRequestPayload.JoinEui.MarshalNumber(),
+				JoinEui:  joinEUI.MarshalNumber(),
 				DevEui:   pld.JoinRequestPayload.DevEui.MarshalNumber(),
 				DevNonce: uint32(pld.JoinRequestPayload.DevNonce.MarshalNumber()),
 			},
