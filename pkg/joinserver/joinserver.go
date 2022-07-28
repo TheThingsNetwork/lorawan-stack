@@ -241,15 +241,16 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 	if pld == nil {
 		return nil, errNoJoinRequest.New()
 	}
-	if pld.DevEui.IsZero() {
+	devEUI := types.MustEUI64(pld.DevEui).OrZero()
+	if devEUI.IsZero() {
 		return nil, errNoDevEUI.New()
 	}
+	joinEUI := types.MustEUI64(pld.JoinEui).OrZero()
 	logger = logger.WithFields(log.Fields(
-		"join_eui", pld.JoinEui,
-		"dev_eui", pld.DevEui,
+		"join_eui", joinEUI,
+		"dev_eui", devEUI,
 	))
 
-	joinEUI := types.MustEUI64(pld.JoinEui).OrZero()
 	var match bool
 	for _, p := range js.euiPrefixes {
 		if p.Matches(joinEUI) {
@@ -262,7 +263,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 	}
 
 	var handled bool
-	dev, err := js.devices.SetByEUI(ctx, joinEUI, pld.DevEui,
+	dev, err := js.devices.SetByEUI(ctx, joinEUI, devEUI,
 		[]string{
 			"application_server_address",
 			"application_server_id",

@@ -1175,8 +1175,8 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		"join_eui", pld.JoinEui,
 	))
 
-	joinEUI := types.MustEUI64(pld.JoinEui).OrZero()
-	matched, matchedCtx, err := ns.devices.GetByEUI(ctx, joinEUI, pld.DevEui,
+	joinEUI, devEUI := types.MustEUI64(pld.JoinEui).OrZero(), types.MustEUI64(pld.DevEui).OrZero()
+	matched, matchedCtx, err := ns.devices.GetByEUI(ctx, joinEUI, devEUI,
 		[]string{
 			"frequency_plan_id",
 			"lorawan_phy_version",

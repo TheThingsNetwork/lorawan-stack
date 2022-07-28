@@ -145,7 +145,7 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 				Payload: &ttnpb.Message_JoinRequestPayload{
 					JoinRequestPayload: &ttnpb.JoinRequestPayload{
 						JoinEui:  test.DefaultJoinEUI.Bytes(),
-						DevEui:   test.DefaultDevEUI,
+						DevEui:   test.DefaultDevEUI.Bytes(),
 						DevNonce: test.DefaultDevNonce,
 					},
 				},
@@ -257,7 +257,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 				MHdr: &ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: 0},
 				Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{
 					JoinEui:  types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
-					DevEui:   types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					DevEui:   types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
 					DevNonce: types.DevNonce{0x42, 0xff},
 				}},
 				Mic: []byte{0x42, 0xff, 0xff, 0xff},

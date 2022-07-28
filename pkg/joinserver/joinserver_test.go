@@ -2291,7 +2291,7 @@ func TestHandleJoin(t *testing.T) {
 					},
 					Payload: &ttnpb.Message_JoinRequestPayload{
 						JoinRequestPayload: &ttnpb.JoinRequestPayload{
-							DevEui: types.EUI64{0x27, 0x00, 0x00, 0x00, 0x00, 0xab, 0xaa, 0x00},
+							DevEui: types.EUI64{0x27, 0x00, 0x00, 0x00, 0x00, 0xab, 0xaa, 0x00}.Bytes(),
 						},
 					},
 				},
@@ -2374,7 +2374,7 @@ func TestHandleJoin(t *testing.T) {
 					},
 					Payload: &ttnpb.Message_JoinRequestPayload{
 						JoinRequestPayload: &ttnpb.JoinRequestPayload{
-							DevEui:  types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+							DevEui:  types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
 							JoinEui: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
 						},
 					},

@@ -145,7 +145,7 @@ func MakeJoinRequestDecodedPayload(joinEUI, devEUI types.EUI64, devNonce types.D
 		Payload: &ttnpb.Message_JoinRequestPayload{
 			JoinRequestPayload: &ttnpb.JoinRequestPayload{
 				JoinEui:  joinEUI.Bytes(),
-				DevEui:   *devEUI.Copy(&types.EUI64{}),
+				DevEui:   devEUI.Bytes(),
 				DevNonce: deepcopy.Copy(devNonce).(types.DevNonce),
 			},
 		},

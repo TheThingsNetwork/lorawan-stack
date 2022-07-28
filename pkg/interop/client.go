@@ -257,7 +257,7 @@ func (cl joinServerHTTPClient) HandleJoinRequest(
 		},
 		MACVersion: MACVersion(req.SelectedMacVersion),
 		PHYPayload: Buffer(req.RawPayload),
-		DevEUI:     EUI64(pld.DevEui),
+		DevEUI:     EUI64(types.MustEUI64(pld.DevEui).OrZero()),
 		DevAddr:    DevAddr(types.MustDevAddr(req.DevAddr).OrZero()),
 		DLSettings: Buffer(dlSettings),
 		RxDelay:    req.RxDelay,
