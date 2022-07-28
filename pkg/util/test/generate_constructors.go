@@ -61,9 +61,10 @@ func main() {
 			numFields := typ.NumField()
 			for i := 0; i < numFields; i++ {
 				f := typ.Field(i)
-				if f.Name == "XXX_NoUnkeyedLiteral" || f.Name == "XXX_sizecache" {
-					// internal protobuf fields
-					continue
+				switch f.Name {
+				case "XXX_NoUnkeyedLiteral", "XXX_sizecache", "XXX_unrecognized",
+					"NoUnkeyedLiterals", "DoNotCompare", "DoNotCopy":
+					continue // internal protobuf fields
 				}
 
 				var pName, pType string
@@ -103,7 +104,7 @@ import (
 type (
 	// {{ $optionType }} transforms {{ $typeString }} and returns it.
 	// Implemetations must be pure functions with no side-effects.
-	{{ $optionType }} func({{ $typeString }}) {{ $typeString }}
+	{{ $optionType }} func(*{{ $typeString }}) *{{ $typeString }}
 
 	// {{ $optionsType }} represents the namespace, on which various {{ $optionType }} are defined.
 	{{ $optionsType }} struct{}
@@ -111,15 +112,16 @@ type (
 {{ range fields $type }}
 // With{{ .FieldName }} returns a {{ $optionType }}, which returns a copy of {{ $typeString }} with {{ .FieldName }} set to {{ .ParameterName }}.
 func ({{ $optionsType }}) With{{ .FieldName }}({{ .ParameterName }} {{ .ParameterType }}) {{ $optionType }} {
-	return func(x {{ $typeString }}) {{ $typeString }} {
-		x.{{ .FieldName }} = {{ .ParameterName }}
-		return x
+	return func(x *{{ $typeString }}) *{{ $typeString }} {
+		copy := ttnpb.Clone(x)
+		copy.{{ .FieldName }} = {{ .ParameterName }}
+		return copy
 	}
 }
 {{ end }}
 // Compose returns a functional composition of opts as a singular {{ $optionType }}.
 func ({{ $optionsType }}) Compose(opts ...{{ $optionType }}) {{ $optionType }} {
-	return func(x {{ $typeString }}) {{ $typeString }} {
+	return func(x *{{ $typeString }}) *{{ $typeString }} {
 		for _, opt := range opts {
 			x = opt(x)
 		}
@@ -127,9 +129,9 @@ func ({{ $optionsType }}) Compose(opts ...{{ $optionType }}) {{ $optionType }} {
 	}
 }
 
-// Compose returns a functional composition of f and opts as a singular {{ $optionType }}.
+// Compose returns a functional composition of f and opts as a singular {*{{ $typeString }}{ $optionType }}.
 func (f {{ $optionType }}) Compose(opts ...{{ $optionType }}) {{ $optionType }} {
-	return func(x {{ $typeString }}) {{ $typeString }} {
+	return func(x *{{ $typeString }}) *{{ $typeString }} {
 		x = f(x)
 		for _, opt := range opts {
 			x = opt(x)
@@ -144,8 +146,7 @@ var {{ $optionsVar }} {{ $optionsType }}
 
 // Make{{ $type.Name }} constructs a new {{ $typeString }}.
 func Make{{ $type.Name }}(opts ...{{ $optionType }}) *{{ $typeString }} {
-	v := {{ $optionsVar }}.Compose(opts...)(base{{ $type.Name }})
-	return &v
+	return {{ $optionsVar }}.Compose(opts...)(base{{ $type.Name }})
 }
 {{ end -}}
 {{ end -}}

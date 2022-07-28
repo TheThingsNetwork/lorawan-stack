@@ -23,28 +23,28 @@ import (
 //go:generate go run ./generate_constructors.go
 
 var (
-	baseRootKeys = ttnpb.RootKeys{
+	baseRootKeys = &ttnpb.RootKeys{
 		RootKeyId: DefaultRootKeyID,
 	}
 
-	baseSessionKeys = ttnpb.SessionKeys{}
+	baseSessionKeys = &ttnpb.SessionKeys{}
 
-	baseSession = ttnpb.Session{
+	baseSession = &ttnpb.Session{
 		DevAddr: DefaultDevAddr.Bytes(),
-		Keys:    &baseSessionKeys,
+		Keys:    baseSessionKeys,
 	}
 
-	baseEndDeviceIdentifiers = ttnpb.EndDeviceIdentifiers{
-		ApplicationIds: &DefaultApplicationIdentifiers,
+	baseEndDeviceIdentifiers = &ttnpb.EndDeviceIdentifiers{
+		ApplicationIds: DefaultApplicationIdentifiers,
 		DeviceId:       DefaultDeviceID,
 	}
 
-	baseMACState = ttnpb.MACState{
+	baseMACState = &ttnpb.MACState{
 		LorawanVersion: DefaultMACVersion,
 	}
 
-	baseEndDevice = ttnpb.EndDevice{
-		Ids: &baseEndDeviceIdentifiers,
+	baseEndDevice = &ttnpb.EndDevice{
+		Ids: baseEndDeviceIdentifiers,
 	}
 )
 
@@ -87,10 +87,10 @@ func (o SessionKeysOptionNamespace) WithDefaultSessionKeyID() SessionKeysOption 
 }
 
 func (o SessionOptionNamespace) WithSessionKeysOptions(opts ...SessionKeysOption) SessionOption {
-	return func(x ttnpb.Session) ttnpb.Session {
-		keys := SessionKeysOptions.Compose(opts...)(*x.Keys)
-		x.Keys = &keys
-		return x
+	return func(x *ttnpb.Session) *ttnpb.Session {
+		copy := ttnpb.Clone(x)
+		copy.Keys = SessionKeysOptions.Compose(opts...)(x.Keys)
+		return copy
 	}
 }
 
@@ -103,16 +103,20 @@ func (o SessionOptionNamespace) WithDefaultAppSKey() SessionOption {
 }
 
 func (o MACStateOptionNamespace) AppendRecentUplinks(ups ...*ttnpb.MACState_UplinkMessage) MACStateOption {
-	return func(x ttnpb.MACState) ttnpb.MACState {
-		x.RecentUplinks = append(x.RecentUplinks, ups...)
-		return x
+	return func(x *ttnpb.MACState) *ttnpb.MACState {
+		copy := ttnpb.Clone(x)
+		copy.RecentUplinks = append(copy.RecentUplinks, x.RecentUplinks...)
+		copy.RecentUplinks = append(copy.RecentUplinks, ups...)
+		return copy
 	}
 }
 
 func (o MACStateOptionNamespace) AppendRecentDownlinks(downs ...*ttnpb.MACState_DownlinkMessage) MACStateOption {
-	return func(x ttnpb.MACState) ttnpb.MACState {
-		x.RecentDownlinks = append(x.RecentDownlinks, downs...)
-		return x
+	return func(x *ttnpb.MACState) *ttnpb.MACState {
+		copy := ttnpb.Clone(x)
+		copy.RecentDownlinks = append(copy.RecentDownlinks, x.RecentDownlinks...)
+		copy.RecentDownlinks = append(copy.RecentDownlinks, downs...)
+		return copy
 	}
 }
 
@@ -125,10 +129,10 @@ func (o EndDeviceIdentifiersOptionNamespace) WithDefaultDevEUI() EndDeviceIdenti
 }
 
 func (o EndDeviceOptionNamespace) WithEndDeviceIdentifiersOptions(opts ...EndDeviceIdentifiersOption) EndDeviceOption {
-	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
-		ids := EndDeviceIdentifiersOptions.Compose(opts...)(*x.Ids)
-		x.Ids = &ids
-		return x
+	return func(x *ttnpb.EndDevice) *ttnpb.EndDevice {
+		copy := ttnpb.Clone(x)
+		copy.Ids = EndDeviceIdentifiersOptions.Compose(opts...)(x.Ids)
+		return copy
 	}
 }
 
@@ -161,23 +165,23 @@ func (o EndDeviceOptionNamespace) WithDefaultLoRaWANPHYVersion() EndDeviceOption
 }
 
 func (o EndDeviceOptionNamespace) WithMACStateOptions(opts ...MACStateOption) EndDeviceOption {
-	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
+	return func(x *ttnpb.EndDevice) *ttnpb.EndDevice {
 		if x.MacState == nil {
 			panic("MACState is nil")
 		}
-		v := MACStateOptions.Compose(opts...)(*x.MacState)
-		x.MacState = &v
-		return x
+		copy := ttnpb.Clone(x)
+		copy.MacState = MACStateOptions.Compose(opts...)(x.MacState)
+		return copy
 	}
 }
 
 func (o EndDeviceOptionNamespace) WithPendingMACStateOptions(opts ...MACStateOption) EndDeviceOption {
-	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
+	return func(x *ttnpb.EndDevice) *ttnpb.EndDevice {
 		if x.PendingMacState == nil {
 			panic("PendingMACState is nil")
 		}
-		v := MACStateOptions.Compose(opts...)(*x.PendingMacState)
-		x.PendingMacState = &v
-		return x
+		copy := ttnpb.Clone(x)
+		copy.PendingMacState = MACStateOptions.Compose(opts...)(x.PendingMacState)
+		return copy
 	}
 }
