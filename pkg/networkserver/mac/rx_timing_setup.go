@@ -40,7 +40,7 @@ func DeviceNeedsRxTimingSetupReq(dev *ttnpb.EndDevice) bool {
 		return false
 	}
 	macState := dev.MacState
-	if containsRxTimingSetup(macState.RecentMacCommandIdentifiers...) { // See sticky.go.
+	if containsRxTimingSetup(macState.RecentMacCommandIdentifiers...) { // See STICKY.md.
 		return false
 	}
 	currentParameters, desiredParameters := macState.CurrentParameters, macState.DesiredParameters
@@ -80,7 +80,7 @@ func EnqueueRxTimingSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownL
 }
 
 func HandleRxTimingSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (events.Builders, error) {
-	var allowMissing bool // See sticky.go.
+	var allowMissing bool // See STICKY.md.
 	dev.MacState.RecentMacCommandIdentifiers, allowMissing = consumeRxTimingSetup(
 		dev.MacState.RecentMacCommandIdentifiers...,
 	)

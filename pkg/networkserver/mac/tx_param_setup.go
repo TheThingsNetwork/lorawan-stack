@@ -46,7 +46,7 @@ func DeviceNeedsTxParamSetupReq(dev *ttnpb.EndDevice, phy *band.Band) bool {
 		return false
 	}
 	macState := dev.MacState
-	if containsTxParamSetup(macState.RecentMacCommandIdentifiers...) { // See sticky.go.
+	if containsTxParamSetup(macState.RecentMacCommandIdentifiers...) { // See STICKY.md.
 		return false
 	}
 	currentParameters, desiredParameters := macState.CurrentParameters, macState.DesiredParameters
@@ -103,7 +103,7 @@ func EnqueueTxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLe
 }
 
 func HandleTxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (events.Builders, error) {
-	var allowMissing bool // See sticky.go.
+	var allowMissing bool // See STICKY.md.
 	dev.MacState.RecentMacCommandIdentifiers, allowMissing = consumeTxParamSetup(
 		dev.MacState.RecentMacCommandIdentifiers...,
 	)

@@ -70,7 +70,7 @@ func DeviceNeedsDLChannelReq(dev *ttnpb.EndDevice) bool {
 	}
 	macState := dev.MacState
 	if !macspec.UseDLChannelReq(macState.LorawanVersion) ||
-		containsDlChannel(macState.RecentMacCommandIdentifiers...) { // See sticky.go.
+		containsDlChannel(macState.RecentMacCommandIdentifiers...) { // See STICKY.md.
 		return false
 	}
 	for i := range macState.DesiredParameters.Channels {
@@ -129,7 +129,7 @@ func HandleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 		log.FromContext(ctx).Warn("Network Server attempted to configure downlink frequency for a channel, for which uplink frequency is not defined or device is malfunctioning.")
 	}
 
-	var allowMissing bool // See sticky.go
+	var allowMissing bool // See STICKY.md
 	dev.MacState.RecentMacCommandIdentifiers, allowMissing = consumeDlChannel(
 		dev.MacState.RecentMacCommandIdentifiers...,
 	)

@@ -195,7 +195,8 @@ func applyCFList(cfList *ttnpb.CFList, phy *band.Band, chs ...*ttnpb.MACParamete
 }
 
 func appendRecentMACCommandIdentifier(
-	cid ttnpb.MACCommandIdentifier, cids ...ttnpb.MACCommandIdentifier,
+	cids []ttnpb.MACCommandIdentifier,
+	cid ttnpb.MACCommandIdentifier,
 ) []ttnpb.MACCommandIdentifier {
 	switch cid {
 	case ttnpb.MACCommandIdentifier_CID_RX_PARAM_SETUP,
@@ -607,7 +608,7 @@ macLoop:
 			break macLoop
 		}
 		queuedEventBuilders = append(queuedEventBuilders, evs...)
-		recentMACCommandIdentifiers = appendRecentMACCommandIdentifier(cmd.Cid, recentMACCommandIdentifiers...)
+		recentMACCommandIdentifiers = appendRecentMACCommandIdentifier(recentMACCommandIdentifiers, cmd.Cid)
 	}
 	dev.MacState.RecentMacCommandIdentifiers = recentMACCommandIdentifiers
 	if n := len(dev.MacState.PendingRequests); n > 0 {

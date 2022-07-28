@@ -45,7 +45,7 @@ func DeviceNeedsRxParamSetupReq(dev *ttnpb.EndDevice) bool {
 		return false
 	}
 	macState := dev.MacState
-	if containsRxParamSetup(macState.RecentMacCommandIdentifiers...) { // See sticky.go.
+	if containsRxParamSetup(macState.RecentMacCommandIdentifiers...) { // See STICKY.md.
 		return false
 	}
 	currentParameters, desiredParameters := macState.CurrentParameters, macState.DesiredParameters
@@ -95,7 +95,7 @@ func HandleRxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb
 		return nil, ErrNoPayload.New()
 	}
 
-	var allowMissing bool // See sticky.go.
+	var allowMissing bool // See STICKY.md.
 	dev.MacState.RecentMacCommandIdentifiers, allowMissing = consumeRxParamSetup(
 		dev.MacState.RecentMacCommandIdentifiers...,
 	)
