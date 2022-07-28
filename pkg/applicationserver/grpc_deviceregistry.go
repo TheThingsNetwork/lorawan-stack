@@ -172,10 +172,12 @@ var (
 
 // Set implements ttnpb.AsEndDeviceRegistryServer.
 func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {
-	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "session.dev_addr") && types.MustDevAddr(req.GetEndDevice().GetSession().GetDevAddr()).OrZero().IsZero() {
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "session.dev_addr") &&
+		types.MustDevAddr(req.GetEndDevice().GetSession().GetDevAddr()).OrZero().IsZero() {
 		return nil, errInvalidFieldValue.WithAttributes("field", "session.dev_addr")
 	}
-	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "session.keys.app_s_key.key") && (req.EndDevice.GetSession().GetKeys().GetAppSKey().GetKey().IsZero()) {
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "session.keys.app_s_key.key") &&
+		types.MustAES128Key(req.EndDevice.GetSession().GetKeys().GetAppSKey().GetKey()).OrZero().IsZero() {
 		return nil, errInvalidFieldValue.WithAttributes("field", "session.keys.app_s_key.key")
 	}
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "formatters.up_formatter_parameter") {
@@ -206,7 +208,9 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 
 	sets := append(req.FieldMask.GetPaths()[:0:0], req.FieldMask.GetPaths()...)
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "session.keys.app_s_key.key") {
-		appSKey, err := cryptoutil.WrapAES128Key(ctx, *req.EndDevice.Session.Keys.AppSKey.Key, r.kekLabel, r.AS.KeyVault)
+		appSKey, err := cryptoutil.WrapAES128Key(
+			ctx, *types.MustAES128Key(req.EndDevice.Session.Keys.AppSKey.Key), r.kekLabel, r.AS.KeyVault,
+		)
 		if err != nil {
 			return nil, err
 		}
