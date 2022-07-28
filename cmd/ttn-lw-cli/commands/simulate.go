@@ -307,11 +307,14 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 			devNonce = types.DevNonce{byte(rejoinReq.RejoinCnt), byte(rejoinReq.RejoinCnt >> 8)}
 		}
 
+		appKey := types.MustAES128Key(dev.GetRootKeys().GetAppKey().GetKey()).OrZero()
+		nwkKey := types.MustAES128Key(dev.GetRootKeys().GetNwkKey().GetKey()).OrZero()
+
 		var key types.AES128Key
 		if macspec.UseNwkKey(dev.LorawanVersion) {
-			key = *dev.GetRootKeys().GetNwkKey().Key
+			key = nwkKey
 		} else {
-			key = *dev.GetRootKeys().GetAppKey().Key
+			key = appKey
 		}
 
 		payload, err := crypto.DecryptJoinAccept(key, joinAcceptPayload.GetEncrypted())
@@ -354,30 +357,30 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 		dev.Session.Keys = &ttnpb.SessionKeys{}
 
 		if macspec.UseNwkKey(dev.LorawanVersion) && joinAcceptPayload.DlSettings.OptNeg {
-			appSKey := crypto.DeriveAppSKey(*dev.GetRootKeys().GetAppKey().Key, joinAcceptPayload.JoinNonce, joinEUI, devNonce)
-			dev.Session.Keys.AppSKey = &ttnpb.KeyEnvelope{Key: &appSKey}
+			appSKey := crypto.DeriveAppSKey(appKey, joinAcceptPayload.JoinNonce, joinEUI, devNonce)
+			dev.Session.Keys.AppSKey = &ttnpb.KeyEnvelope{Key: appSKey.Bytes()}
 			logger.Infof("Derived AppSKey %X (%s)", appSKey[:], base64.StdEncoding.EncodeToString(appSKey[:]))
 
-			fNwkSIntKey := crypto.DeriveFNwkSIntKey(*dev.GetRootKeys().GetNwkKey().Key, joinAcceptPayload.JoinNonce, joinEUI, devNonce)
-			dev.Session.Keys.FNwkSIntKey = &ttnpb.KeyEnvelope{Key: &fNwkSIntKey}
+			fNwkSIntKey := crypto.DeriveFNwkSIntKey(nwkKey, joinAcceptPayload.JoinNonce, joinEUI, devNonce)
+			dev.Session.Keys.FNwkSIntKey = &ttnpb.KeyEnvelope{Key: fNwkSIntKey.Bytes()}
 			logger.Infof("Derived FNwkSIntKey %X (%s)", fNwkSIntKey[:], base64.StdEncoding.EncodeToString(fNwkSIntKey[:]))
 
-			sNwkSIntKey := crypto.DeriveSNwkSIntKey(*dev.GetRootKeys().GetNwkKey().Key, joinAcceptPayload.JoinNonce, joinEUI, devNonce)
-			dev.Session.Keys.SNwkSIntKey = &ttnpb.KeyEnvelope{Key: &sNwkSIntKey}
+			sNwkSIntKey := crypto.DeriveSNwkSIntKey(nwkKey, joinAcceptPayload.JoinNonce, joinEUI, devNonce)
+			dev.Session.Keys.SNwkSIntKey = &ttnpb.KeyEnvelope{Key: sNwkSIntKey.Bytes()}
 			logger.Infof("Derived SNwkSIntKey %X (%s)", sNwkSIntKey[:], base64.StdEncoding.EncodeToString(sNwkSIntKey[:]))
 
-			nwkSEncKey := crypto.DeriveNwkSEncKey(*dev.GetRootKeys().GetNwkKey().Key, joinAcceptPayload.JoinNonce, joinEUI, devNonce)
-			dev.Session.Keys.NwkSEncKey = &ttnpb.KeyEnvelope{Key: &nwkSEncKey}
+			nwkSEncKey := crypto.DeriveNwkSEncKey(nwkKey, joinAcceptPayload.JoinNonce, joinEUI, devNonce)
+			dev.Session.Keys.NwkSEncKey = &ttnpb.KeyEnvelope{Key: nwkSEncKey.Bytes()}
 			logger.Infof("Derived NwkSEncKey %X (%s)", nwkSEncKey[:], base64.StdEncoding.EncodeToString(nwkSEncKey[:]))
 		} else {
 			appSKey := crypto.DeriveLegacyAppSKey(key, joinAcceptPayload.JoinNonce, joinAcceptPayload.NetId, devNonce)
-			dev.Session.Keys.AppSKey = &ttnpb.KeyEnvelope{Key: &appSKey}
+			dev.Session.Keys.AppSKey = &ttnpb.KeyEnvelope{Key: appSKey.Bytes()}
 			logger.Infof("Derived AppSKey %X (%s)", appSKey[:], base64.StdEncoding.EncodeToString(appSKey[:]))
 
 			nwkSKey := crypto.DeriveLegacyNwkSKey(key, joinAcceptPayload.JoinNonce, joinAcceptPayload.NetId, devNonce)
-			dev.Session.Keys.FNwkSIntKey = &ttnpb.KeyEnvelope{Key: &nwkSKey}
-			dev.Session.Keys.SNwkSIntKey = &ttnpb.KeyEnvelope{Key: &nwkSKey}
-			dev.Session.Keys.NwkSEncKey = &ttnpb.KeyEnvelope{Key: &nwkSKey}
+			dev.Session.Keys.FNwkSIntKey = &ttnpb.KeyEnvelope{Key: nwkSKey.Bytes()}
+			dev.Session.Keys.SNwkSIntKey = &ttnpb.KeyEnvelope{Key: nwkSKey.Bytes()}
+			dev.Session.Keys.NwkSEncKey = &ttnpb.KeyEnvelope{Key: nwkSKey.Bytes()}
 			logger.Infof("Derived NwkSKey %X (%s)", nwkSKey[:], base64.StdEncoding.EncodeToString(nwkSKey[:]))
 		}
 	case ttnpb.MType_UNCONFIRMED_DOWN, ttnpb.MType_CONFIRMED_DOWN:
@@ -385,13 +388,13 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 
 		var expectedMIC [4]byte
 		if macspec.UseLegacyMIC(dev.LorawanVersion) {
-			expectedMIC, err = crypto.ComputeLegacyDownlinkMIC(*dev.Session.Keys.GetFNwkSIntKey().Key, macPayload.FHdr.DevAddr, macPayload.FHdr.FCnt, downMsg.RawPayload[:len(downMsg.RawPayload)-4])
+			expectedMIC, err = crypto.ComputeLegacyDownlinkMIC(types.MustAES128Key(dev.Session.Keys.GetFNwkSIntKey().GetKey()).OrZero(), macPayload.FHdr.DevAddr, macPayload.FHdr.FCnt, downMsg.RawPayload[:len(downMsg.RawPayload)-4])
 		} else {
 			var confFCnt uint32
 			if lastUpMsg.MHdr.MType == ttnpb.MType_CONFIRMED_UP {
 				confFCnt = lastUpMsg.GetMacPayload().FHdr.FCnt
 			}
-			expectedMIC, err = crypto.ComputeDownlinkMIC(*dev.Session.Keys.GetSNwkSIntKey().Key, macPayload.FHdr.DevAddr, confFCnt, macPayload.FHdr.FCnt, downMsg.RawPayload[:len(downMsg.RawPayload)-4])
+			expectedMIC, err = crypto.ComputeDownlinkMIC(types.MustAES128Key(dev.Session.Keys.GetSNwkSIntKey().GetKey()).OrZero(), macPayload.FHdr.DevAddr, confFCnt, macPayload.FHdr.FCnt, downMsg.RawPayload[:len(downMsg.RawPayload)-4])
 		}
 		if err != nil {
 			return err
@@ -402,16 +405,16 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 
 		var payloadKey types.AES128Key
 		if macPayload.FPort == 0 {
-			payloadKey = *dev.Session.Keys.GetNwkSEncKey().Key
+			payloadKey = types.MustAES128Key(dev.Session.Keys.GetNwkSEncKey().GetKey()).OrZero()
 		} else {
-			payloadKey = *dev.Session.Keys.GetAppSKey().Key
+			payloadKey = types.MustAES128Key(dev.Session.Keys.GetAppSKey().GetKey()).OrZero()
 			if cmdsInFOpts := len(macPayload.FHdr.FOpts) > 0; cmdsInFOpts && macspec.EncryptFOpts(dev.LorawanVersion) {
 				fCnt := dev.Session.LastNFCntDown
 				if macPayload.FPort != 0 {
 					fCnt = dev.Session.LastAFCntDown
 				}
 				encOpts := macspec.EncryptionOptions(dev.LorawanVersion, macspec.DownlinkFrame, macPayload.FPort, cmdsInFOpts)
-				fOpts, err := crypto.DecryptDownlink(*dev.Session.Keys.GetNwkSEncKey().Key, macPayload.FHdr.DevAddr, fCnt, macPayload.FHdr.FOpts, encOpts...)
+				fOpts, err := crypto.DecryptDownlink(types.MustAES128Key(dev.Session.Keys.GetNwkSEncKey().GetKey()).OrZero(), macPayload.FHdr.DevAddr, fCnt, macPayload.FHdr.FOpts, encOpts...)
 				if err != nil {
 					return err
 				}
@@ -520,8 +523,8 @@ var (
 							DevEui:  &joinParams.DevEUI,
 						},
 						RootKeys: &ttnpb.RootKeys{
-							NwkKey: &ttnpb.KeyEnvelope{Key: &joinParams.NwkKey},
-							AppKey: &ttnpb.KeyEnvelope{Key: &joinParams.AppKey},
+							NwkKey: &ttnpb.KeyEnvelope{Key: joinParams.NwkKey.Bytes()},
+							AppKey: &ttnpb.KeyEnvelope{Key: joinParams.AppKey.Bytes()},
 						},
 						Session: &ttnpb.Session{},
 					}, joinRequest, downMsg); err != nil {
@@ -663,10 +666,10 @@ var (
 							LastNFCntDown: lastNFCntDown,
 							LastFCntUp:    lastAFCntDown,
 							Keys: &ttnpb.SessionKeys{
-								FNwkSIntKey: &ttnpb.KeyEnvelope{Key: &dataUplinkParams.FNwkSIntKey},
-								SNwkSIntKey: &ttnpb.KeyEnvelope{Key: &dataUplinkParams.SNwkSIntKey},
-								NwkSEncKey:  &ttnpb.KeyEnvelope{Key: &dataUplinkParams.NwkSEncKey},
-								AppSKey:     &ttnpb.KeyEnvelope{Key: &dataUplinkParams.AppSKey},
+								FNwkSIntKey: &ttnpb.KeyEnvelope{Key: dataUplinkParams.FNwkSIntKey.Bytes()},
+								SNwkSIntKey: &ttnpb.KeyEnvelope{Key: dataUplinkParams.SNwkSIntKey.Bytes()},
+								NwkSEncKey:  &ttnpb.KeyEnvelope{Key: dataUplinkParams.NwkSEncKey.Bytes()},
+								AppSKey:     &ttnpb.KeyEnvelope{Key: dataUplinkParams.AppSKey.Bytes()},
 							},
 						},
 					}, dataUplink, downMsg); err != nil {

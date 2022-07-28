@@ -353,7 +353,7 @@ var (
 							}
 							b, err := msgpack.Marshal(&nsredis.UplinkMatchSession{
 								FNwkSIntKey: &ttnpb.KeyEnvelope{
-									Key:          key,
+									Key:          key.Bytes(),
 									KekLabel:     stored.FNwkSIntKey.KEKLabel,
 									EncryptedKey: stored.FNwkSIntKey.EncryptedKey,
 								},
@@ -407,7 +407,7 @@ var (
 							}
 							b, err := msgpack.Marshal(&nsredis.UplinkMatchSession{
 								FNwkSIntKey: &ttnpb.KeyEnvelope{
-									Key:          key,
+									Key:          key.Bytes(),
 									KekLabel:     stored.FNwkSIntKey.KEKLabel,
 									EncryptedKey: stored.FNwkSIntKey.EncryptedKey,
 								},

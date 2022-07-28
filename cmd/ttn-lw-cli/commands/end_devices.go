@@ -417,8 +417,8 @@ var (
 					device.Session = &ttnpb.Session{
 						DevAddr: devAddrRes.DevAddr,
 						Keys: &ttnpb.SessionKeys{
-							FNwkSIntKey: &ttnpb.KeyEnvelope{Key: generateKey()},
-							AppSKey:     &ttnpb.KeyEnvelope{Key: generateKey()},
+							FNwkSIntKey: &ttnpb.KeyEnvelope{Key: generateKey().Bytes()},
+							AppSKey:     &ttnpb.KeyEnvelope{Key: generateKey().Bytes()},
 						},
 					}
 					paths = append(paths,
@@ -439,8 +439,8 @@ var (
 						return errInvalidMACVersion.WithCause(err)
 					}
 					if macspec.UseNwkKey(macVersion) {
-						device.Session.Keys.SNwkSIntKey = &ttnpb.KeyEnvelope{Key: generateKey()}
-						device.Session.Keys.NwkSEncKey = &ttnpb.KeyEnvelope{Key: generateKey()}
+						device.Session.Keys.SNwkSIntKey = &ttnpb.KeyEnvelope{Key: generateKey().Bytes()}
+						device.Session.Keys.NwkSEncKey = &ttnpb.KeyEnvelope{Key: generateKey().Bytes()}
 						paths = append(paths,
 							"session.keys.s_nwk_s_int_key.key",
 							"session.keys.nwk_s_enc_key.key",
@@ -481,7 +481,7 @@ var (
 					}
 					device.RootKeys = &ttnpb.RootKeys{
 						RootKeyId: "ttn-lw-cli-generated",
-						AppKey:    &ttnpb.KeyEnvelope{Key: generateKey()},
+						AppKey:    &ttnpb.KeyEnvelope{Key: generateKey().Bytes()},
 					}
 					if s, err := setEndDeviceFlags.GetString("lorawan_version"); err == nil && s != "" {
 						var macVersion ttnpb.MACVersion
@@ -492,7 +492,7 @@ var (
 							return errInvalidMACVersion.WithCause(err)
 						}
 						if macspec.UseNwkKey(macVersion) {
-							device.RootKeys.NwkKey = &ttnpb.KeyEnvelope{Key: generateKey()}
+							device.RootKeys.NwkKey = &ttnpb.KeyEnvelope{Key: generateKey().Bytes()}
 						}
 					}
 					paths = append(paths,
