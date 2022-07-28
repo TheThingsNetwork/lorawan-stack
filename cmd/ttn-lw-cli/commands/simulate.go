@@ -304,7 +304,7 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 			joinEUI = types.MustEUI64(joinReq.JoinEui).OrZero()
 			devNonce = types.MustDevNonce(joinReq.DevNonce).OrZero()
 		} else if rejoinReq := lastUpMsg.GetRejoinRequestPayload(); rejoinReq != nil {
-			devEUI, joinEUI = rejoinReq.DevEui, rejoinReq.JoinEui
+			devEUI, joinEUI = rejoinReq.DevEui, types.MustEUI64(rejoinReq.JoinEui).OrZero()
 			devNonce = types.DevNonce{byte(rejoinReq.RejoinCnt), byte(rejoinReq.RejoinCnt >> 8)}
 		}
 

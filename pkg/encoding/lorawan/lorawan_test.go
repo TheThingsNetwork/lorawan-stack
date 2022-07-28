@@ -180,7 +180,7 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 				Payload: &ttnpb.Message_RejoinRequestPayload{
 					RejoinRequestPayload: &ttnpb.RejoinRequestPayload{
 						RejoinType: ttnpb.RejoinRequestType_SESSION,
-						JoinEui:    test.DefaultJoinEUI,
+						JoinEui:    test.DefaultJoinEUI.Bytes(),
 						DevEui:     test.DefaultDevEUI,
 						RejoinCnt:  0x42,
 					},
@@ -561,7 +561,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 				MHdr: &ttnpb.MHDR{MType: ttnpb.MType_REJOIN_REQUEST, Major: 0},
 				Payload: &ttnpb.Message_RejoinRequestPayload{RejoinRequestPayload: &ttnpb.RejoinRequestPayload{
 					RejoinType: 1,
-					JoinEui:    types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					JoinEui:    types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
 					DevEui:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					RejoinCnt:  0xff42,
 				}},
