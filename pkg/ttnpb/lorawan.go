@@ -1188,7 +1188,7 @@ func (v *RejoinRequestPayload) FieldIsZero(p string) bool {
 	case "join_eui":
 		return v.JoinEui == types.EUI64{}
 	case "net_id":
-		return v.NetId == types.NetID{}
+		return types.MustNetID(v.NetId).OrZero().IsZero()
 	case "rejoin_cnt":
 		return v.RejoinCnt == 0
 	case "rejoin_type":

@@ -804,7 +804,18 @@ func (m *RejoinRequestPayload) ValidateFields(paths ...string) error {
 			}
 
 		case "net_id":
-			// no validation rules for NetId
+
+			if len(m.GetNetId()) > 0 {
+
+				if len(m.GetNetId()) != 3 {
+					return RejoinRequestPayloadValidationError{
+						field:  "net_id",
+						reason: "value length must be 3 bytes",
+					}
+				}
+
+			}
+
 		case "join_eui":
 			// no validation rules for JoinEui
 		case "dev_eui":

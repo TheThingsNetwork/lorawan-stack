@@ -10,6 +10,7 @@ import (
 	flagsplugin "github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	pflag "github.com/spf13/pflag"
 	customflags "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags"
+	types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // AddSelectFlagsForFHDR adds flags to select fields in FHDR.
@@ -132,6 +133,93 @@ func (m *JoinRequestPayload) SetFromFlags(flags *pflag.FlagSet, prefix string) (
 	} else if changed {
 		m.DevNonce = val
 		paths = append(paths, flagsplugin.Prefix("dev_nonce", prefix))
+	}
+	return paths, nil
+}
+
+// AddSelectFlagsForRejoinRequestPayload adds flags to select fields in RejoinRequestPayload.
+func AddSelectFlagsForRejoinRequestPayload(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("rejoin-type", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("rejoin-type", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("net-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("net-id", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("join-eui", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("join-eui", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("dev-eui", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("dev-eui", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("rejoin-cnt", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("rejoin-cnt", prefix), false), flagsplugin.WithHidden(hidden)))
+}
+
+// SelectFromFlags outputs the fieldmask paths forRejoinRequestPayload message from select flags.
+func PathsFromSelectFlagsForRejoinRequestPayload(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("rejoin_type", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("rejoin_type", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("net_id", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("net_id", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("join_eui", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("join_eui", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("dev_eui", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("dev_eui", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("rejoin_cnt", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("rejoin_cnt", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForRejoinRequestPayload adds flags to select fields in RejoinRequestPayload.
+func AddSetFlagsForRejoinRequestPayload(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("rejoin-type", prefix), flagsplugin.EnumValueDesc(RejoinRequestType_value), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(customflags.New3BytesFlag(flagsplugin.Prefix("net-id", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("join-eui", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("dev-eui", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("rejoin-cnt", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the RejoinRequestPayload message from flags.
+func (m *RejoinRequestPayload) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("rejoin_type", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		enumValue, err := flagsplugin.SetEnumString(val, RejoinRequestType_value)
+		if err != nil {
+			return nil, err
+		}
+		m.RejoinType = RejoinRequestType(enumValue)
+		paths = append(paths, flagsplugin.Prefix("rejoin_type", prefix))
+	}
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("net_id", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.NetId = val
+		paths = append(paths, flagsplugin.Prefix("net_id", prefix))
+	}
+	if val, changed, err := types.GetEUI64FromFlag(flags, flagsplugin.Prefix("join_eui", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.JoinEui = val
+		paths = append(paths, flagsplugin.Prefix("join_eui", prefix))
+	}
+	if val, changed, err := types.GetEUI64FromFlag(flags, flagsplugin.Prefix("dev_eui", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.DevEui = val
+		paths = append(paths, flagsplugin.Prefix("dev_eui", prefix))
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("rejoin_cnt", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.RejoinCnt = val
+		paths = append(paths, flagsplugin.Prefix("rejoin_cnt", prefix))
 	}
 	return paths, nil
 }

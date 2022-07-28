@@ -1588,7 +1588,7 @@ func (x *RejoinRequestPayload) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if len(x.NetId) > 0 || s.HasField("net_id") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("net_id")
-		x.NetId.MarshalProtoJSON(s.WithField("net_id"))
+		types.MarshalHEXBytes(s.WithField("net_id"), x.NetId)
 	}
 	if len(x.JoinEui) > 0 || s.HasField("join_eui") {
 		s.WriteMoreIf(&wroteField)
@@ -1627,7 +1627,7 @@ func (x *RejoinRequestPayload) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) 
 			x.RejoinType.UnmarshalProtoJSON(s)
 		case "net_id", "netId":
 			s.AddField("net_id")
-			x.NetId.UnmarshalProtoJSON(s.WithField("net_id", false))
+			x.NetId = types.Unmarshal3Bytes(s.WithField("net_id", false))
 		case "join_eui", "joinEui":
 			s.AddField("join_eui")
 			x.JoinEui.UnmarshalProtoJSON(s.WithField("join_eui", false))
