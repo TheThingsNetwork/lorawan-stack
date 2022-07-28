@@ -122,9 +122,9 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 
 		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "root_keys.nwk_key.key") {
 			switch {
-			case !rootKeysEnc.GetNwkKey().GetKey().IsZero():
+			case !types.MustAES128Key(rootKeysEnc.GetNwkKey().GetKey()).OrZero().IsZero():
 				dev.RootKeys.NwkKey = &ttnpb.KeyEnvelope{
-					Key: rootKeysEnc.GetNwkKey().GetKey(),
+					Key: rootKeysEnc.NwkKey.Key,
 				}
 			case len(rootKeysEnc.GetNwkKey().GetEncryptedKey()) > 0:
 				nwkKey, err := cryptoutil.UnwrapAES128Key(ctx, rootKeysEnc.NwkKey, srv.JS.KeyVault)
@@ -132,7 +132,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 					return nil, err
 				}
 				dev.RootKeys.NwkKey = &ttnpb.KeyEnvelope{
-					Key: &nwkKey,
+					Key: nwkKey.Bytes(),
 				}
 			case cc != nil && dev.ProvisionerId != "":
 				nwkKey, err := cryptoservices.NewNetworkRPCClient(cc, srv.JS.KeyVault, srv.JS.WithClusterAuth()).GetNwkKey(ctx, dev)
@@ -141,7 +141,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 				}
 				if nwkKey != nil {
 					dev.RootKeys.NwkKey = &ttnpb.KeyEnvelope{
-						Key: nwkKey,
+						Key: nwkKey.Bytes(),
 					}
 				}
 			}
@@ -149,7 +149,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 
 		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "root_keys.app_key.key") {
 			switch {
-			case !rootKeysEnc.GetAppKey().GetKey().IsZero():
+			case !types.MustAES128Key(rootKeysEnc.GetAppKey().GetKey()).OrZero().IsZero():
 				dev.RootKeys.AppKey = &ttnpb.KeyEnvelope{
 					Key: rootKeysEnc.GetAppKey().GetKey(),
 				}
@@ -159,7 +159,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 					return nil, err
 				}
 				dev.RootKeys.AppKey = &ttnpb.KeyEnvelope{
-					Key: &appKey,
+					Key: appKey.Bytes(),
 				}
 			case cc != nil && dev.ProvisionerId != "":
 				appKey, err := cryptoservices.NewApplicationRPCClient(cc, srv.JS.KeyVault, srv.JS.WithClusterAuth()).GetAppKey(ctx, dev)
@@ -168,7 +168,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 				}
 				if appKey != nil {
 					dev.RootKeys.AppKey = &ttnpb.KeyEnvelope{
-						Key: appKey,
+						Key: appKey.Bytes(),
 					}
 				}
 			}
@@ -191,7 +191,8 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 		return nil, errNoDevEUI.New()
 	}
 
-	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "root_keys.app_key.key") && req.EndDevice.GetRootKeys().GetAppKey().GetKey().IsZero() {
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "root_keys.app_key.key") &&
+		types.MustAES128Key(req.EndDevice.GetRootKeys().GetAppKey().GetKey()).OrZero().IsZero() {
 		return nil, errInvalidFieldValue.WithAttributes("field", "root_keys.app_key.key")
 	}
 
@@ -210,7 +211,9 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 
 	sets := append(req.FieldMask.GetPaths()[:0:0], req.FieldMask.GetPaths()...)
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "root_keys.app_key.key") {
-		appKey, err := cryptoutil.WrapAES128Key(ctx, *req.EndDevice.RootKeys.AppKey.Key, srv.kekLabel, srv.JS.KeyVault)
+		appKey, err := cryptoutil.WrapAES128Key(
+			ctx, *types.MustAES128Key(req.EndDevice.RootKeys.AppKey.Key), srv.kekLabel, srv.JS.KeyVault,
+		)
 		if err != nil {
 			return nil, err
 		}
@@ -226,8 +229,10 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 		)
 	}
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "root_keys.nwk_key.key") {
-		if !req.EndDevice.GetRootKeys().GetNwkKey().GetKey().IsZero() {
-			nwkKey, err := cryptoutil.WrapAES128Key(ctx, *req.EndDevice.RootKeys.NwkKey.Key, srv.kekLabel, srv.JS.KeyVault)
+		if !types.MustAES128Key(req.EndDevice.GetRootKeys().GetNwkKey().GetKey()).OrZero().IsZero() {
+			nwkKey, err := cryptoutil.WrapAES128Key(
+				ctx, *types.MustAES128Key(req.EndDevice.RootKeys.NwkKey.Key), srv.kekLabel, srv.JS.KeyVault,
+			)
 			if err != nil {
 				return nil, err
 			}

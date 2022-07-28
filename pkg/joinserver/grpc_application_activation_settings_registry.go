@@ -22,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 type applicationActivationSettingsRegistryServer struct {
@@ -64,7 +65,7 @@ func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, 
 
 	reqKEK := req.Settings.Kek
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "kek.key") && reqKEK != nil {
-		if reqKEK.Key.IsZero() {
+		if types.MustAES128Key(reqKEK.Key).OrZero().IsZero() {
 			return nil, errInvalidFieldValue.WithAttributes("field", "kek.key")
 		}
 		if err := ttnpb.RequireFields(req.FieldMask.GetPaths(), "kek_label"); err != nil {
@@ -80,8 +81,8 @@ func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, 
 	}
 
 	sets := req.FieldMask.GetPaths()
-	if ttnpb.HasAnyField(sets, "kek.key") && reqKEK != nil {
-		kek, err := cryptoutil.WrapAES128Key(ctx, *reqKEK.Key, srv.kekLabel, srv.JS.KeyVault)
+	if ttnpb.HasAnyField(sets, "kek.key") && !types.MustAES128Key(reqKEK.GetKey()).OrZero().IsZero() {
+		kek, err := cryptoutil.WrapAES128Key(ctx, *types.MustAES128Key(reqKEK.Key), srv.kekLabel, srv.JS.KeyVault)
 		if err != nil {
 			return nil, errWrapKey.WithCause(err)
 		}

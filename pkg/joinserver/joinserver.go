@@ -166,14 +166,14 @@ var supportedMACVersions = [...]ttnpb.MACVersion{
 func wrapKeyWithVault(ctx context.Context, key types.AES128Key, kekLabel string, kv crypto.KeyVault, plaintextCond func(error) bool) (*ttnpb.KeyEnvelope, error) {
 	if kekLabel == "" {
 		return &ttnpb.KeyEnvelope{
-			Key: &key,
+			Key: key.Bytes(),
 		}, nil
 	}
 	ke, err := cryptoutil.WrapAES128Key(ctx, key, kekLabel, kv)
 	if err != nil {
 		if plaintextCond != nil && plaintextCond(err) {
 			return &ttnpb.KeyEnvelope{
-				Key: &key,
+				Key: key.Bytes(),
 			}, nil
 		}
 		return nil, errWrapKey.WithAttributes("label", kekLabel).WithCause(err)
@@ -186,7 +186,7 @@ func wrapKeyWithVault(ctx context.Context, key types.AES128Key, kekLabel string,
 func wrapKeyWithKEK(ctx context.Context, key types.AES128Key, kekLabel string, kek types.AES128Key) (*ttnpb.KeyEnvelope, error) {
 	if kekLabel == "" {
 		return &ttnpb.KeyEnvelope{
-			Key: &key,
+			Key: key.Bytes(),
 		}, nil
 	}
 	ke, err := cryptoutil.WrapAES128KeyWithKEK(ctx, key, kekLabel, kek)
