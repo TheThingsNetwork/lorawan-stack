@@ -954,7 +954,18 @@ func (m *JoinAcceptPayload) ValidateFields(paths ...string) error {
 			}
 
 		case "dev_addr":
-			// no validation rules for DevAddr
+
+			if len(m.GetDevAddr()) > 0 {
+
+				if len(m.GetDevAddr()) != 4 {
+					return JoinAcceptPayloadValidationError{
+						field:  "dev_addr",
+						reason: "value length must be 4 bytes",
+					}
+				}
+
+			}
+
 		case "dl_settings":
 
 			if m.GetDlSettings() == nil {

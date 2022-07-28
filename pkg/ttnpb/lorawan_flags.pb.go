@@ -10,7 +10,6 @@ import (
 	flagsplugin "github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	pflag "github.com/spf13/pflag"
 	customflags "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags"
-	types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // AddSelectFlagsForFHDR adds flags to select fields in FHDR.
@@ -292,7 +291,7 @@ func AddSetFlagsForJoinAcceptPayload(flags *pflag.FlagSet, prefix string, hidden
 	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("encrypted", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(customflags.New3BytesFlag(flagsplugin.Prefix("join-nonce", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(customflags.New3BytesFlag(flagsplugin.Prefix("net-id", prefix), "", flagsplugin.WithHidden(hidden)))
-	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("dev-addr", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(customflags.New4BytesFlag(flagsplugin.Prefix("dev-addr", prefix), "", flagsplugin.WithHidden(hidden)))
 	AddSetFlagsForDLSettings(flags, flagsplugin.Prefix("dl-settings", prefix), hidden)
 	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("rx-delay", prefix), flagsplugin.EnumValueDesc(RxDelay_value, RxDelay_customvalue), flagsplugin.WithHidden(hidden)))
 	AddSetFlagsForCFList(flags, flagsplugin.Prefix("cf-list", prefix), hidden)
@@ -318,7 +317,7 @@ func (m *JoinAcceptPayload) SetFromFlags(flags *pflag.FlagSet, prefix string) (p
 		m.NetId = val
 		paths = append(paths, flagsplugin.Prefix("net_id", prefix))
 	}
-	if val, changed, err := types.GetDevAddrFromFlag(flags, flagsplugin.Prefix("dev_addr", prefix)); err != nil {
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("dev_addr", prefix)); err != nil {
 		return nil, err
 	} else if changed {
 		m.DevAddr = val

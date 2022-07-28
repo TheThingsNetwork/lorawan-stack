@@ -5738,6 +5738,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 | ----- | ----------- |
 | `join_nonce` | <p>`bytes.len`: `3`</p> |
 | `net_id` | <p>`bytes.len`: `3`</p> |
+| `dev_addr` | <p>`bytes.len`: `4`</p> |
 | `dl_settings` | <p>`message.required`: `true`</p> |
 | `rx_delay` | <p>`enum.defined_only`: `true`</p> |
 
