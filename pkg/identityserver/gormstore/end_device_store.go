@@ -271,7 +271,7 @@ func (s *deviceStore) BatchUpdateEndDeviceLastSeen(
 	valueArgs := []interface{}{}
 
 	for _, dev := range devsLastSeen {
-		valueStrings = append(valueStrings, "(?, ?, ?::timestamptz)")
+		valueStrings = append(valueStrings, "(?::varchar, ?::varchar, ?::timestamptz)")
 		valueArgs = append(valueArgs,
 			dev.Ids.ApplicationIds.ApplicationId,
 			dev.Ids.DeviceId,
