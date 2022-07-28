@@ -24,7 +24,6 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
@@ -146,7 +145,7 @@ func MakeJoinRequestDecodedPayload(joinEUI, devEUI types.EUI64, devNonce types.D
 			JoinRequestPayload: &ttnpb.JoinRequestPayload{
 				JoinEui:  joinEUI.Bytes(),
 				DevEui:   devEUI.Bytes(),
-				DevNonce: deepcopy.Copy(devNonce).(types.DevNonce),
+				DevNonce: devNonce.Bytes(),
 			},
 		},
 	}

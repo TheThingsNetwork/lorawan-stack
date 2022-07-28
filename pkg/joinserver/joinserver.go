@@ -476,7 +476,8 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			if !bytes.Equal(reqMIC[:], req.RawPayload[19:]) {
 				return nil, nil, errMICMismatch.New()
 			}
-			resMIC, err := networkCryptoService.JoinAcceptMIC(ctx, cryptoDev, req.SelectedMacVersion, 0xff, pld.DevNonce, b)
+			devNonce := types.MustDevNonce(pld.DevNonce).OrZero()
+			resMIC, err := networkCryptoService.JoinAcceptMIC(ctx, cryptoDev, req.SelectedMacVersion, 0xff, devNonce, b)
 			if err != nil {
 				return nil, nil, errComputeMIC.WithCause(err)
 			}
@@ -484,11 +485,12 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			if err != nil {
 				return nil, nil, errEncryptPayload.WithCause(err)
 			}
-			nwkSKeys, err := networkCryptoService.DeriveNwkSKeys(ctx, cryptoDev, req.SelectedMacVersion, jn, pld.DevNonce, types.MustNetID(req.NetId).OrZero())
+			netID := types.MustNetID(req.NetId).OrZero()
+			nwkSKeys, err := networkCryptoService.DeriveNwkSKeys(ctx, cryptoDev, req.SelectedMacVersion, jn, devNonce, netID)
 			if err != nil {
 				return nil, nil, errDeriveNwkSKeys.WithCause(err)
 			}
-			appSKey, err := applicationCryptoService.DeriveAppSKey(ctx, cryptoDev, req.SelectedMacVersion, jn, pld.DevNonce, types.MustNetID(req.NetId).OrZero())
+			appSKey, err := applicationCryptoService.DeriveAppSKey(ctx, cryptoDev, req.SelectedMacVersion, jn, devNonce, netID)
 			if err != nil {
 				return nil, nil, errDeriveAppSKey.WithCause(err)
 			}

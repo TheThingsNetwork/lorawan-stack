@@ -166,7 +166,7 @@ func TestJoinRequest(t *testing.T) {
 					Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{
 						JoinEui:  types.EUI64{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}.Bytes(),
 						DevEui:   types.EUI64{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}.Bytes(),
-						DevNonce: [2]byte{0x00, 0x00},
+						DevNonce: []byte{0x00, 0x00},
 					}},
 				},
 				RxMetadata: []*ttnpb.RxMetadata{{
@@ -209,7 +209,7 @@ func TestJoinRequest(t *testing.T) {
 					Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{
 						JoinEui:  types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}.Bytes(),
 						DevEui:   types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}.Bytes(),
-						DevNonce: [2]byte{0x46, 0x50},
+						DevNonce: []byte{0x46, 0x50},
 					}},
 				},
 				RxMetadata: []*ttnpb.RxMetadata{
@@ -573,7 +573,7 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 					Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{
 						JoinEui:  types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
 						DevEui:   types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
-						DevNonce: types.DevNonce{0x42, 0xff},
+						DevNonce: types.DevNonce{0x42, 0xff}.Bytes(),
 					}},
 					Mic: []byte{0x42, 0xff, 0xff, 0x0f},
 				},

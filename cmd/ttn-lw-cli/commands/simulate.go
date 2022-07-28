@@ -302,7 +302,7 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 		if joinReq := lastUpMsg.GetJoinRequestPayload(); joinReq != nil {
 			devEUI = types.MustEUI64(joinReq.DevEui).OrZero()
 			joinEUI = types.MustEUI64(joinReq.JoinEui).OrZero()
-			devNonce = joinReq.DevNonce
+			devNonce = types.MustDevNonce(joinReq.DevNonce).OrZero()
 		} else if rejoinReq := lastUpMsg.GetRejoinRequestPayload(); rejoinReq != nil {
 			devEUI, joinEUI = rejoinReq.DevEui, rejoinReq.JoinEui
 			devNonce = types.DevNonce{byte(rejoinReq.RejoinCnt), byte(rejoinReq.RejoinCnt >> 8)}
@@ -333,12 +333,13 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 		var expectedMIC [4]byte
 		if macspec.UseNwkKey(dev.LorawanVersion) && joinAcceptPayload.DlSettings.OptNeg {
 			jsIntKey := crypto.DeriveJSIntKey(key, devEUI)
+			devNonce := types.MustDevNonce(lastUpMsg.GetJoinRequestPayload().DevNonce).OrZero()
 			// TODO: Support RejoinRequest (https://github.com/TheThingsNetwork/lorawan-stack/issues/536)
 			expectedMIC, err = crypto.ComputeJoinAcceptMIC(
 				jsIntKey,
 				0xFF,
 				*dev.Ids.JoinEui,
-				lastUpMsg.GetJoinRequestPayload().DevNonce,
+				devNonce,
 				append([]byte{downMsg.RawPayload[0]}, joinAcceptBytes...),
 			)
 		} else {
@@ -509,7 +510,7 @@ var (
 							JoinRequestPayload: &ttnpb.JoinRequestPayload{
 								JoinEui:  joinParams.JoinEUI.Bytes(),
 								DevEui:   joinParams.DevEUI.Bytes(),
-								DevNonce: joinParams.DevNonce,
+								DevNonce: joinParams.DevNonce.Bytes(),
 							},
 						},
 					}
