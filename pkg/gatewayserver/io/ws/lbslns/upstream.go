@@ -359,7 +359,7 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids *ttnpb.GatewayIdentifiers, band
 			FPort:      fPort,
 			FrmPayload: decFRMPayload,
 			FHdr: &ttnpb.FHDR{
-				DevAddr: devAddr,
+				DevAddr: devAddr.Bytes(),
 				FCtrl:   fctrl,
 				FCnt:    uint32(updf.FCnt),
 				FOpts:   decFOpts,
@@ -447,7 +447,7 @@ func (updf *UplinkDataFrame) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID s
 
 	updf.FPort = int(macPayload.GetFPort())
 
-	updf.DevAddr = int32(macPayload.FHdr.DevAddr.MarshalNumber())
+	updf.DevAddr = int32(types.MustDevAddr(macPayload.FHdr.DevAddr).OrZero().MarshalNumber())
 	updf.FOpts = hex.EncodeToString(macPayload.FHdr.FOpts)
 
 	updf.FCtrl = getFCtrlAsUint(macPayload.FHdr.FCtrl)

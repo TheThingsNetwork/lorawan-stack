@@ -385,16 +385,28 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 		}
 	case ttnpb.MType_UNCONFIRMED_DOWN, ttnpb.MType_CONFIRMED_DOWN:
 		macPayload := downMsg.Payload.GetMacPayload()
+		devAddr := types.MustDevAddr(macPayload.FHdr.DevAddr).OrZero()
 
 		var expectedMIC [4]byte
 		if macspec.UseLegacyMIC(dev.LorawanVersion) {
-			expectedMIC, err = crypto.ComputeLegacyDownlinkMIC(types.MustAES128Key(dev.Session.Keys.GetFNwkSIntKey().GetKey()).OrZero(), macPayload.FHdr.DevAddr, macPayload.FHdr.FCnt, downMsg.RawPayload[:len(downMsg.RawPayload)-4])
+			expectedMIC, err = crypto.ComputeLegacyDownlinkMIC(
+				types.MustAES128Key(dev.Session.Keys.GetFNwkSIntKey().GetKey()).OrZero(),
+				devAddr,
+				macPayload.FHdr.FCnt,
+				downMsg.RawPayload[:len(downMsg.RawPayload)-4],
+			)
 		} else {
 			var confFCnt uint32
 			if lastUpMsg.MHdr.MType == ttnpb.MType_CONFIRMED_UP {
 				confFCnt = lastUpMsg.GetMacPayload().FHdr.FCnt
 			}
-			expectedMIC, err = crypto.ComputeDownlinkMIC(types.MustAES128Key(dev.Session.Keys.GetSNwkSIntKey().GetKey()).OrZero(), macPayload.FHdr.DevAddr, confFCnt, macPayload.FHdr.FCnt, downMsg.RawPayload[:len(downMsg.RawPayload)-4])
+			expectedMIC, err = crypto.ComputeDownlinkMIC(
+				types.MustAES128Key(dev.Session.Keys.GetSNwkSIntKey().GetKey()).OrZero(),
+				devAddr,
+				confFCnt,
+				macPayload.FHdr.FCnt,
+				downMsg.RawPayload[:len(downMsg.RawPayload)-4],
+			)
 		}
 		if err != nil {
 			return err
@@ -414,14 +426,20 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 					fCnt = dev.Session.LastAFCntDown
 				}
 				encOpts := macspec.EncryptionOptions(dev.LorawanVersion, macspec.DownlinkFrame, macPayload.FPort, cmdsInFOpts)
-				fOpts, err := crypto.DecryptDownlink(types.MustAES128Key(dev.Session.Keys.GetNwkSEncKey().GetKey()).OrZero(), macPayload.FHdr.DevAddr, fCnt, macPayload.FHdr.FOpts, encOpts...)
+				fOpts, err := crypto.DecryptDownlink(
+					types.MustAES128Key(dev.Session.Keys.GetNwkSEncKey().GetKey()).OrZero(),
+					devAddr,
+					fCnt,
+					macPayload.FHdr.FOpts,
+					encOpts...,
+				)
 				if err != nil {
 					return err
 				}
 				macPayload.FHdr.FOpts = fOpts
 			}
 		}
-		macPayload.FrmPayload, err = crypto.DecryptDownlink(payloadKey, macPayload.FHdr.DevAddr, macPayload.FHdr.FCnt, macPayload.FrmPayload)
+		macPayload.FrmPayload, err = crypto.DecryptDownlink(payloadKey, devAddr, macPayload.FHdr.FCnt, macPayload.FrmPayload)
 		if err != nil {
 			return err
 		}
@@ -609,7 +627,7 @@ var (
 						Payload: &ttnpb.Message_MacPayload{
 							MacPayload: &ttnpb.MACPayload{
 								FHdr: &ttnpb.FHDR{
-									DevAddr: dataUplinkParams.DevAddr,
+									DevAddr: dataUplinkParams.DevAddr.Bytes(),
 									FCtrl: &ttnpb.FCtrl{
 										Adr:       dataUplinkParams.ADR,
 										AdrAckReq: dataUplinkParams.ADRAckReq,

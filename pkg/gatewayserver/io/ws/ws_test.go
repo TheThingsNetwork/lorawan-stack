@@ -897,7 +897,7 @@ func TestTraffic(t *testing.T) {
 						FPort:      0,
 						FrmPayload: []byte{0x5F, 0xCC},
 						FHdr: &ttnpb.FHDR{
-							DevAddr: [4]byte{0x11, 0x22, 0x33, 0x44},
+							DevAddr: []byte{0x11, 0x22, 0x33, 0x44},
 							FCtrl: &ttnpb.FCtrl{
 								Ack:    true,
 								ClassB: true,

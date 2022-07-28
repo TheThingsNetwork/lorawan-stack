@@ -179,7 +179,13 @@ func TestGenerateDataDownlink(t *testing.T) {
 			panic(fmt.Errorf("unknown version %s", ver))
 		}
 
-		mic, err := crypto.ComputeDownlinkMIC(key, pld.FHdr.DevAddr, confFCnt, pld.FHdr.FCnt, b)
+		mic, err := crypto.ComputeDownlinkMIC(
+			key,
+			types.MustDevAddr(pld.FHdr.DevAddr).OrZero(),
+			confFCnt,
+			pld.FHdr.FCnt,
+			b,
+		)
 		if err != nil {
 			t.Fatal("Failed to compute MIC")
 		}
@@ -357,7 +363,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				Payload: &ttnpb.Message_MacPayload{
 					MacPayload: &ttnpb.MACPayload{
 						FHdr: &ttnpb.FHDR{
-							DevAddr: devAddr,
+							DevAddr: devAddr.Bytes(),
 							FCtrl: &ttnpb.FCtrl{
 								Ack: true,
 								Adr: true,
@@ -476,7 +482,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				Payload: &ttnpb.Message_MacPayload{
 					MacPayload: &ttnpb.MACPayload{
 						FHdr: &ttnpb.FHDR{
-							DevAddr: devAddr,
+							DevAddr: devAddr.Bytes(),
 							FCtrl: &ttnpb.FCtrl{
 								Ack: false,
 								Adr: true,
@@ -598,7 +604,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				Payload: &ttnpb.Message_MacPayload{
 					MacPayload: &ttnpb.MACPayload{
 						FHdr: &ttnpb.FHDR{
-							DevAddr: devAddr,
+							DevAddr: devAddr.Bytes(),
 							FCtrl: &ttnpb.FCtrl{
 								Ack: true,
 								Adr: true,
@@ -720,7 +726,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				Payload: &ttnpb.Message_MacPayload{
 					MacPayload: &ttnpb.MACPayload{
 						FHdr: &ttnpb.FHDR{
-							DevAddr: devAddr,
+							DevAddr: devAddr.Bytes(),
 							FCtrl: &ttnpb.FCtrl{
 								Ack: false,
 								Adr: true,
@@ -845,7 +851,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				Payload: &ttnpb.Message_MacPayload{
 					MacPayload: &ttnpb.MACPayload{
 						FHdr: &ttnpb.FHDR{
-							DevAddr: devAddr,
+							DevAddr: devAddr.Bytes(),
 							FCtrl: &ttnpb.FCtrl{
 								Ack: true,
 								Adr: true,
@@ -975,7 +981,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				Payload: &ttnpb.Message_MacPayload{
 					MacPayload: &ttnpb.MACPayload{
 						FHdr: &ttnpb.FHDR{
-							DevAddr: devAddr,
+							DevAddr: devAddr.Bytes(),
 							FCtrl: &ttnpb.FCtrl{
 								Ack: false,
 								Adr: true,
@@ -1108,7 +1114,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				Payload: &ttnpb.Message_MacPayload{
 					MacPayload: &ttnpb.MACPayload{
 						FHdr: &ttnpb.FHDR{
-							DevAddr: devAddr,
+							DevAddr: devAddr.Bytes(),
 							FCtrl: &ttnpb.FCtrl{
 								Ack: false,
 								Adr: true,

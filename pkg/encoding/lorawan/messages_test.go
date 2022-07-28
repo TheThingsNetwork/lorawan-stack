@@ -129,7 +129,7 @@ func TestAppendFHDR(t *testing.T) {
 		{
 			Bytes: []byte{0xff, 0xff, 0xff, 0x42, 0b1_0_1_0_0000, 0xfe, 0xff},
 			FHDR: &ttnpb.FHDR{
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				FCnt:    math.MaxUint16 - 1,
 				FCtrl:   fCtrl,
 			},
@@ -137,7 +137,7 @@ func TestAppendFHDR(t *testing.T) {
 		{
 			Bytes: []byte{0xff, 0xff, 0xff, 0x42, 0b1_0_1_0_0000, 0xfe, 0xff},
 			FHDR: &ttnpb.FHDR{
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				FCnt:    math.MaxUint16 - 1,
 				FCtrl:   fCtrl,
 			},
@@ -146,7 +146,7 @@ func TestAppendFHDR(t *testing.T) {
 		{
 			Bytes: []byte{0xff, 0xff, 0xff, 0x42, 0b1_0_1_0_0000, 0xff, 0xff},
 			FHDR: &ttnpb.FHDR{
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				FCnt:    math.MaxUint16,
 				FCtrl:   fCtrl,
 			},
@@ -154,7 +154,7 @@ func TestAppendFHDR(t *testing.T) {
 		{
 			Bytes: []byte{0xff, 0xff, 0xff, 0x42, 0b1_0_1_0_0000, 0xff, 0xff},
 			FHDR: &ttnpb.FHDR{
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				FCnt:    math.MaxUint16,
 				FCtrl:   fCtrl,
 			},
@@ -163,7 +163,7 @@ func TestAppendFHDR(t *testing.T) {
 		{
 			Bytes: []byte{0xff, 0xff, 0xff, 0x42, 0b1_0_1_0_0000, 0x00, 0x00},
 			FHDR: &ttnpb.FHDR{
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				FCnt:    math.MaxUint16 + 1,
 				FCtrl:   fCtrl,
 			},
@@ -171,7 +171,7 @@ func TestAppendFHDR(t *testing.T) {
 		{
 			Bytes: []byte{0xff, 0xff, 0xff, 0x42, 0b1_0_1_0_0000, 0x00, 0x00},
 			FHDR: &ttnpb.FHDR{
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				FCnt:    math.MaxUint16 + 1,
 				FCtrl:   fCtrl,
 			},
@@ -180,7 +180,7 @@ func TestAppendFHDR(t *testing.T) {
 		{
 			Bytes: []byte{0xff, 0xff, 0xff, 0x42, 0b1_0_1_0_0000, 0x01, 0x00},
 			FHDR: &ttnpb.FHDR{
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				FCnt:    math.MaxUint16 + 2,
 				FCtrl:   fCtrl,
 			},
@@ -188,7 +188,7 @@ func TestAppendFHDR(t *testing.T) {
 		{
 			Bytes: []byte{0xff, 0xff, 0xff, 0x42, 0b1_0_1_0_0000, 0x01, 0x00},
 			FHDR: &ttnpb.FHDR{
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				FCnt:    math.MaxUint16 + 2,
 				FCtrl:   fCtrl,
 			},

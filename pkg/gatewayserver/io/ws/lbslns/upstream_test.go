@@ -317,7 +317,7 @@ func TestUplinkDataFrame(t *testing.T) {
 						FPort:      0,
 						FrmPayload: []byte{0x5F, 0xCC},
 						FHdr: &ttnpb.FHDR{
-							DevAddr: [4]byte{0x11, 0x22, 0x33, 0x44},
+							DevAddr: []byte{0x11, 0x22, 0x33, 0x44},
 							FCtrl: &ttnpb.FCtrl{
 								Ack:    true,
 								ClassB: true,
@@ -381,7 +381,7 @@ func TestUplinkDataFrame(t *testing.T) {
 						FPort:      0,
 						FrmPayload: []byte{0x5F, 0xCC},
 						FHdr: &ttnpb.FHDR{
-							DevAddr: [4]byte{0x11, 0x22, 0x33, 0x44},
+							DevAddr: []byte{0x11, 0x22, 0x33, 0x44},
 							FCtrl: &ttnpb.FCtrl{
 								Ack:    true,
 								ClassB: true,
@@ -466,7 +466,7 @@ func TestFromUplinkDataFrame(t *testing.T) {
 					MHdr: &ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: 0},
 					Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
 						FHdr: &ttnpb.FHDR{
-							DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+							DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 							FCtrl: &ttnpb.FCtrl{
 								Adr:       true,
 								AdrAckReq: false,

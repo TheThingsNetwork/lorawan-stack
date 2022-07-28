@@ -330,7 +330,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 
 	pld := &ttnpb.MACPayload{
 		FHdr: &ttnpb.FHDR{
-			DevAddr: types.MustDevAddr(dev.Session.DevAddr).OrZero(),
+			DevAddr: dev.Session.DevAddr,
 			FCtrl: &ttnpb.FCtrl{
 				Ack: up != nil && up.Payload.MHdr.MType == ttnpb.MType_CONFIRMED_UP,
 				Adr: mac.DeviceUseADR(dev, ns.defaultMACSettings, phy),

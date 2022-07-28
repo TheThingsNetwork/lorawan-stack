@@ -44,7 +44,7 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 				Payload: &ttnpb.Message_MacPayload{
 					MacPayload: &ttnpb.MACPayload{
 						FHdr: &ttnpb.FHDR{
-							DevAddr: test.DefaultDevAddr,
+							DevAddr: test.DefaultDevAddr.Bytes(),
 							FCtrl: &ttnpb.FCtrl{
 								Adr:       true,
 								AdrAckReq: true,
@@ -70,7 +70,7 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 				Payload: &ttnpb.Message_MacPayload{
 					MacPayload: &ttnpb.MACPayload{
 						FHdr: &ttnpb.FHDR{
-							DevAddr: test.DefaultDevAddr,
+							DevAddr: test.DefaultDevAddr.Bytes(),
 							FCtrl: &ttnpb.FCtrl{
 								Adr:       true,
 								AdrAckReq: true,
@@ -97,7 +97,7 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 				Payload: &ttnpb.Message_MacPayload{
 					MacPayload: &ttnpb.MACPayload{
 						FHdr: &ttnpb.FHDR{
-							DevAddr: test.DefaultDevAddr,
+							DevAddr: test.DefaultDevAddr.Bytes(),
 							FCtrl: &ttnpb.FCtrl{
 								FPending: true,
 							},
@@ -121,7 +121,7 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 				Payload: &ttnpb.Message_MacPayload{
 					MacPayload: &ttnpb.MACPayload{
 						FHdr: &ttnpb.FHDR{
-							DevAddr: test.DefaultDevAddr,
+							DevAddr: test.DefaultDevAddr.Bytes(),
 							FCtrl: &ttnpb.FCtrl{
 								Ack: true,
 							},
@@ -299,7 +299,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 				MHdr: &ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: 0},
 				Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
 					FHdr: &ttnpb.FHDR{
-						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 						FCtrl: &ttnpb.FCtrl{
 							Adr:       true,
 							AdrAckReq: false,
@@ -347,7 +347,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 				MHdr: &ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_DOWN, Major: 0},
 				Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
 					FHdr: &ttnpb.FHDR{
-						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 						FCtrl: &ttnpb.FCtrl{
 							Adr:       true,
 							AdrAckReq: false,
@@ -395,7 +395,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 				MHdr: &ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_DOWN, Major: 0},
 				Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
 					FHdr: &ttnpb.FHDR{
-						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 						FCtrl: &ttnpb.FCtrl{
 							Adr:       true,
 							AdrAckReq: false,
@@ -435,7 +435,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 				MHdr: &ttnpb.MHDR{MType: ttnpb.MType_CONFIRMED_UP, Major: 0},
 				Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
 					FHdr: &ttnpb.FHDR{
-						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 						FCtrl: &ttnpb.FCtrl{
 							Adr:       true,
 							AdrAckReq: false,
@@ -483,7 +483,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 				MHdr: &ttnpb.MHDR{MType: ttnpb.MType_CONFIRMED_DOWN, Major: 0},
 				Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
 					FHdr: &ttnpb.FHDR{
-						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 						FCtrl: &ttnpb.FCtrl{
 							Adr:       true,
 							AdrAckReq: false,

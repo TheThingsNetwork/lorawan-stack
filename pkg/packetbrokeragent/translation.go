@@ -315,7 +315,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 		up.PhyPayload.Teaser.Payload = &packetbroker.PHYPayloadTeaser_Mac{
 			Mac: &packetbroker.PHYPayloadTeaser_MACPayloadTeaser{
 				Confirmed:        pld.MacPayload.FHdr.FCtrl.Ack,
-				DevAddr:          pld.MacPayload.FHdr.DevAddr.MarshalNumber(),
+				DevAddr:          types.MustDevAddr(pld.MacPayload.FHdr.DevAddr).OrZero().MarshalNumber(),
 				FOpts:            len(pld.MacPayload.FHdr.FOpts) > 0,
 				FCnt:             pld.MacPayload.FHdr.FCnt,
 				FPort:            pld.MacPayload.FPort,
