@@ -153,3 +153,89 @@ func (x *JoinRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 func (x *JoinRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
+
+// MarshalProtoJSON marshals the JoinResponse message to JSON.
+func (x *JoinResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.RawPayload) > 0 || s.HasField("raw_payload") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("raw_payload")
+		s.WriteBytes(x.RawPayload)
+	}
+	if x.SessionKeys != nil || s.HasField("session_keys") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("session_keys")
+		x.SessionKeys.MarshalProtoJSON(s.WithField("session_keys"))
+	}
+	if x.Lifetime != nil || s.HasField("lifetime") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("lifetime")
+		if x.Lifetime == nil {
+			s.WriteNil()
+		} else {
+			gogo.MarshalDuration(s, x.Lifetime)
+		}
+	}
+	if len(x.CorrelationIds) > 0 || s.HasField("correlation_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("correlation_ids")
+		s.WriteStringArray(x.CorrelationIds)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the JoinResponse to JSON.
+func (x *JoinResponse) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the JoinResponse message from JSON.
+func (x *JoinResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "raw_payload", "rawPayload":
+			s.AddField("raw_payload")
+			x.RawPayload = s.ReadBytes()
+		case "session_keys", "sessionKeys":
+			if s.ReadNil() {
+				x.SessionKeys = nil
+				return
+			}
+			x.SessionKeys = &SessionKeys{}
+			x.SessionKeys.UnmarshalProtoJSON(s.WithField("session_keys", true))
+		case "lifetime":
+			s.AddField("lifetime")
+			if s.ReadNil() {
+				x.Lifetime = nil
+				return
+			}
+			v := gogo.UnmarshalDuration(s)
+			if s.Err() != nil {
+				return
+			}
+			x.Lifetime = v
+		case "correlation_ids", "correlationIds":
+			s.AddField("correlation_ids")
+			if s.ReadNil() {
+				x.CorrelationIds = nil
+				return
+			}
+			x.CorrelationIds = s.ReadStringArray()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the JoinResponse from JSON.
+func (x *JoinResponse) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}

@@ -5489,6 +5489,7 @@ The NsJs service connects a Network Server to a Join Server.
 
 | Field | Validations |
 | ----- | ----------- |
+| `key` | <p>`bytes.len`: `16`</p> |
 | `kek_label` | <p>`string.max_len`: `2048`</p> |
 | `encrypted_key` | <p>`bytes.max_len`: `1024`</p> |
 

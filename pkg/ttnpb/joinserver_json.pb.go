@@ -70,6 +70,122 @@ func (x *SessionKeyRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the NwkSKeysResponse message to JSON.
+func (x *NwkSKeysResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.FNwkSIntKey != nil || s.HasField("f_nwk_s_int_key") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("f_nwk_s_int_key")
+		x.FNwkSIntKey.MarshalProtoJSON(s.WithField("f_nwk_s_int_key"))
+	}
+	if x.SNwkSIntKey != nil || s.HasField("s_nwk_s_int_key") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("s_nwk_s_int_key")
+		x.SNwkSIntKey.MarshalProtoJSON(s.WithField("s_nwk_s_int_key"))
+	}
+	if x.NwkSEncKey != nil || s.HasField("nwk_s_enc_key") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("nwk_s_enc_key")
+		x.NwkSEncKey.MarshalProtoJSON(s.WithField("nwk_s_enc_key"))
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the NwkSKeysResponse to JSON.
+func (x *NwkSKeysResponse) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the NwkSKeysResponse message from JSON.
+func (x *NwkSKeysResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "f_nwk_s_int_key", "fNwkSIntKey":
+			if s.ReadNil() {
+				x.FNwkSIntKey = nil
+				return
+			}
+			x.FNwkSIntKey = &KeyEnvelope{}
+			x.FNwkSIntKey.UnmarshalProtoJSON(s.WithField("f_nwk_s_int_key", true))
+		case "s_nwk_s_int_key", "sNwkSIntKey":
+			if s.ReadNil() {
+				x.SNwkSIntKey = nil
+				return
+			}
+			x.SNwkSIntKey = &KeyEnvelope{}
+			x.SNwkSIntKey.UnmarshalProtoJSON(s.WithField("s_nwk_s_int_key", true))
+		case "nwk_s_enc_key", "nwkSEncKey":
+			if s.ReadNil() {
+				x.NwkSEncKey = nil
+				return
+			}
+			x.NwkSEncKey = &KeyEnvelope{}
+			x.NwkSEncKey.UnmarshalProtoJSON(s.WithField("nwk_s_enc_key", true))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the NwkSKeysResponse from JSON.
+func (x *NwkSKeysResponse) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the AppSKeyResponse message to JSON.
+func (x *AppSKeyResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.AppSKey != nil || s.HasField("app_s_key") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("app_s_key")
+		x.AppSKey.MarshalProtoJSON(s.WithField("app_s_key"))
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the AppSKeyResponse to JSON.
+func (x *AppSKeyResponse) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the AppSKeyResponse message from JSON.
+func (x *AppSKeyResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "app_s_key", "appSKey":
+			if s.ReadNil() {
+				x.AppSKey = nil
+				return
+			}
+			x.AppSKey = &KeyEnvelope{}
+			x.AppSKey.UnmarshalProtoJSON(s.WithField("app_s_key", true))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the AppSKeyResponse from JSON.
+func (x *AppSKeyResponse) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the CryptoServicePayloadRequest message to JSON.
 func (x *CryptoServicePayloadRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -619,8 +735,7 @@ func (x *ApplicationActivationSettings) MarshalProtoJSON(s *jsonplugin.MarshalSt
 	if x.Kek != nil || s.HasField("kek") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("kek")
-		// NOTE: KeyEnvelope does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.Kek)
+		x.Kek.MarshalProtoJSON(s.WithField("kek"))
 	}
 	if len(x.HomeNetId) > 0 || s.HasField("home_net_id") {
 		s.WriteMoreIf(&wroteField)
@@ -653,15 +768,12 @@ func (x *ApplicationActivationSettings) UnmarshalProtoJSON(s *jsonplugin.Unmarsh
 			s.AddField("kek_label")
 			x.KekLabel = s.ReadString()
 		case "kek":
-			s.AddField("kek")
 			if s.ReadNil() {
 				x.Kek = nil
 				return
 			}
-			// NOTE: KeyEnvelope does not seem to implement UnmarshalProtoJSON.
-			var v KeyEnvelope
-			gogo.UnmarshalMessage(s, &v)
-			x.Kek = &v
+			x.Kek = &KeyEnvelope{}
+			x.Kek.UnmarshalProtoJSON(s.WithField("kek", true))
 		case "home_net_id", "homeNetId":
 			s.AddField("home_net_id")
 			x.HomeNetId = types.Unmarshal3Bytes(s.WithField("home_net_id", false))
