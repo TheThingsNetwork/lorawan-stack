@@ -388,10 +388,10 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			copy(jn[:], nb[1:])
 
 			b, err = lorawan.AppendJoinAcceptPayload(b, &ttnpb.JoinAcceptPayload{
-				NetId:      types.MustNetID(req.NetId).OrZero().Bytes(),
+				NetId:      req.NetId,
 				JoinNonce:  jn.Bytes(),
 				CfList:     req.CfList,
-				DevAddr:    types.MustDevAddr(req.DevAddr).OrZero(),
+				DevAddr:    req.DevAddr,
 				DlSettings: req.DownlinkSettings,
 				RxDelay:    req.RxDelay,
 			})

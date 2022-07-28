@@ -834,7 +834,7 @@ func TestMessageEncodingSymmetricityJoinAcceptPayload(t *testing.T) {
 			Message: &ttnpb.JoinAcceptPayload{
 				JoinNonce: test.DefaultJoinNonce.Bytes(),
 				NetId:     test.DefaultNetID.Bytes(),
-				DevAddr:   test.DefaultDevAddr,
+				DevAddr:   test.DefaultDevAddr.Bytes(),
 				DlSettings: &ttnpb.DLSettings{
 					Rx1DrOffset: ttnpb.DataRateOffset_DATA_RATE_OFFSET_2,
 					Rx2Dr:       ttnpb.DataRateIndex_DATA_RATE_1,
@@ -858,7 +858,7 @@ func TestMessageEncodingSymmetricityJoinAcceptPayload(t *testing.T) {
 			Message: &ttnpb.JoinAcceptPayload{
 				JoinNonce: test.DefaultJoinNonce.Bytes(),
 				NetId:     test.DefaultNetID.Bytes(),
-				DevAddr:   test.DefaultDevAddr,
+				DevAddr:   test.DefaultDevAddr.Bytes(),
 				DlSettings: &ttnpb.DLSettings{
 					Rx1DrOffset: ttnpb.DataRateOffset_DATA_RATE_OFFSET_2,
 					Rx2Dr:       ttnpb.DataRateIndex_DATA_RATE_1,
@@ -900,7 +900,7 @@ func TestLoRaWANEncodingRawJoinAcceptPayload(t *testing.T) {
 			&ttnpb.JoinAcceptPayload{
 				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff}.Bytes(),
 				NetId:     types.NetID{0x42, 0xff, 0xff}.Bytes(),
-				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				DlSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x6,
@@ -926,7 +926,7 @@ func TestLoRaWANEncodingRawJoinAcceptPayload(t *testing.T) {
 			&ttnpb.JoinAcceptPayload{
 				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff}.Bytes(),
 				NetId:     types.NetID{0x42, 0xff, 0xff}.Bytes(),
-				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				DlSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x6,
@@ -960,7 +960,7 @@ func TestLoRaWANEncodingRawJoinAcceptPayload(t *testing.T) {
 			&ttnpb.JoinAcceptPayload{
 				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff}.Bytes(),
 				NetId:     types.NetID{0x42, 0xff, 0xff}.Bytes(),
-				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				DlSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x6,

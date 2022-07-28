@@ -1054,7 +1054,7 @@ func (v *JoinAcceptPayload) FieldIsZero(p string) bool {
 	case "cf_list.type":
 		return v.CfList.FieldIsZero("type")
 	case "dev_addr":
-		return v.DevAddr == types.DevAddr{}
+		return types.MustDevAddr(v.DevAddr).OrZero().IsZero()
 	case "dl_settings":
 		return v.DlSettings == nil
 	case "dl_settings.opt_neg":
@@ -1375,8 +1375,9 @@ func (m *Message) EndDeviceIdentifiers() *EndDeviceIdentifiers {
 		}
 	}
 	if p := m.GetJoinAcceptPayload(); p != nil {
+		devAddr := types.MustDevAddr(p.DevAddr).OrZero()
 		return &EndDeviceIdentifiers{
-			DevAddr: &p.DevAddr,
+			DevAddr: &devAddr,
 		}
 	}
 	if p := m.GetRejoinRequestPayload(); p != nil {

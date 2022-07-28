@@ -356,7 +356,8 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 			logger.Warnf("Expected MIC %x but got %x", expectedMIC, downMsg.Payload.Mic)
 		}
 
-		dev.Ids.DevAddr, dev.Session.DevAddr = &joinAcceptPayload.DevAddr, joinAcceptPayload.DevAddr.Bytes()
+		devAddr := types.MustDevAddr(joinAcceptPayload.DevAddr).OrZero()
+		dev.Ids.DevAddr, dev.Session.DevAddr = &devAddr, joinAcceptPayload.DevAddr
 		dev.Session.Keys = &ttnpb.SessionKeys{}
 
 		joinNonce := types.MustJoinNonce(joinAcceptPayload.JoinNonce).OrZero()

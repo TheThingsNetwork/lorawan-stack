@@ -1197,7 +1197,7 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 							Payload: &ttnpb.Message_JoinAcceptPayload{
 								JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
 									NetId:      dev.PendingMacState.QueuedJoinAccept.NetId,
-									DevAddr:    types.MustDevAddr(dev.PendingMacState.QueuedJoinAccept.DevAddr).OrZero(),
+									DevAddr:    dev.PendingMacState.QueuedJoinAccept.DevAddr,
 									DlSettings: dev.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
 									RxDelay:    dev.PendingMacState.QueuedJoinAccept.Request.RxDelay,
 									CfList:     dev.PendingMacState.QueuedJoinAccept.Request.CfList,
