@@ -163,7 +163,7 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 					RejoinRequestPayload: &ttnpb.RejoinRequestPayload{
 						RejoinType: ttnpb.RejoinRequestType_CONTEXT,
 						NetId:      test.DefaultNetID.Bytes(),
-						DevEui:     test.DefaultDevEUI,
+						DevEui:     test.DefaultDevEUI.Bytes(),
 						RejoinCnt:  0xff42,
 					},
 				},
@@ -181,7 +181,7 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 					RejoinRequestPayload: &ttnpb.RejoinRequestPayload{
 						RejoinType: ttnpb.RejoinRequestType_SESSION,
 						JoinEui:    test.DefaultJoinEUI.Bytes(),
-						DevEui:     test.DefaultDevEUI,
+						DevEui:     test.DefaultDevEUI.Bytes(),
 						RejoinCnt:  0x42,
 					},
 				},
@@ -199,7 +199,7 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 					RejoinRequestPayload: &ttnpb.RejoinRequestPayload{
 						RejoinType: ttnpb.RejoinRequestType_KEYS,
 						NetId:      test.DefaultNetID.Bytes(),
-						DevEui:     test.DefaultDevEUI,
+						DevEui:     test.DefaultDevEUI.Bytes(),
 						RejoinCnt:  0x42ff,
 					},
 				},
@@ -532,7 +532,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 				Payload: &ttnpb.Message_RejoinRequestPayload{RejoinRequestPayload: &ttnpb.RejoinRequestPayload{
 					RejoinType: 0,
 					NetId:      types.NetID{0x42, 0xff, 0xff}.Bytes(),
-					DevEui:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					DevEui:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
 					RejoinCnt:  0xff42,
 				}},
 				Mic: []byte{0x42, 0xff, 0xff, 0xff},
@@ -562,7 +562,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 				Payload: &ttnpb.Message_RejoinRequestPayload{RejoinRequestPayload: &ttnpb.RejoinRequestPayload{
 					RejoinType: 1,
 					JoinEui:    types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
-					DevEui:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					DevEui:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
 					RejoinCnt:  0xff42,
 				}},
 				Mic: []byte{0x42, 0xff, 0xff, 0xff},
@@ -592,7 +592,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 				Payload: &ttnpb.Message_RejoinRequestPayload{RejoinRequestPayload: &ttnpb.RejoinRequestPayload{
 					RejoinType: 2,
 					NetId:      types.NetID{0x42, 0xff, 0xff}.Bytes(),
-					DevEui:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					DevEui:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
 					RejoinCnt:  0xff42,
 				}},
 				Mic: []byte{0x42, 0xff, 0xff, 0xff},
