@@ -35,6 +35,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Console showing `404 Not Found` errors for pages containing user IDs in the path, when the user ID has a length of two.
 - CLI no longer panics when deleting a device without JoinEUI, this scenario only occurred when deleting a device that uses ABP.
+- The batch update query for `EndDevice.LastSeenAt` field now specifies the data type of the placeholders.
 
 ### Security
 
