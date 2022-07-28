@@ -9872,6 +9872,42 @@
       "file": "beacon_freq.go"
     }
   },
+  "event:ns.mac.command.parse.fail": {
+    "translations": {
+      "en": "failed to parse MAC command"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.mac.command.process.fail": {
+    "translations": {
+      "en": "failed to process MAC command"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.mac.command.unanswered": {
+    "translations": {
+      "en": "MAC command answer missing"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.mac.command.unknown": {
+    "translations": {
+      "en": "unknown MAC command"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "observability.go"
+    }
+  },
   "event:ns.mac.dev_status.answer": {
     "translations": {
       "en": "device status answer received"

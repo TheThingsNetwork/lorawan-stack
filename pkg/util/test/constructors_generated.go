@@ -462,6 +462,14 @@ func (MACStateOptionNamespace) WithLastAdrChangeFCntUp(v uint32) MACStateOption 
 	}
 }
 
+// WithRecentMacCommandIdentifiers returns a MACStateOption, which returns a copy of ttnpb.MACState with RecentMacCommandIdentifiers set to vs.
+func (MACStateOptionNamespace) WithRecentMacCommandIdentifiers(vs ...ttnpb.MACCommandIdentifier) MACStateOption {
+	return func(x ttnpb.MACState) ttnpb.MACState {
+		x.RecentMacCommandIdentifiers = vs
+		return x
+	}
+}
+
 // WithXXX_unrecognized returns a MACStateOption, which returns a copy of ttnpb.MACState with XXX_unrecognized set to v.
 func (MACStateOptionNamespace) WithXXX_unrecognized(v []byte) MACStateOption {
 	return func(x ttnpb.MACState) ttnpb.MACState {

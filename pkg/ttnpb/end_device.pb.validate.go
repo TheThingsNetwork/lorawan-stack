@@ -1646,6 +1646,8 @@ func (m *MACState) ValidateFields(paths ...string) error {
 
 		case "last_adr_change_f_cnt_up":
 			// no validation rules for LastAdrChangeFCntUp
+		case "recent_mac_command_identifiers":
+
 		default:
 			return MACStateValidationError{
 				field:  name,

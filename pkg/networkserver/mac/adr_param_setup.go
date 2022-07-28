@@ -111,14 +111,20 @@ func EnqueueADRParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownL
 
 func HandleADRParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (events.Builders, error) {
 	var err error
-	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.MACCommandIdentifier_CID_ADR_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
-		req := cmd.GetAdrParamSetupReq()
+	dev.MacState.PendingRequests, err = handleMACResponse(
+		ttnpb.MACCommandIdentifier_CID_ADR_PARAM_SETUP,
+		false,
+		func(cmd *ttnpb.MACCommand) error {
+			req := cmd.GetAdrParamSetupReq()
 
-		dev.MacState.CurrentParameters.AdrAckLimitExponent = &ttnpb.ADRAckLimitExponentValue{Value: req.AdrAckLimitExponent}
-		dev.MacState.CurrentParameters.AdrAckDelayExponent = &ttnpb.ADRAckDelayExponentValue{Value: req.AdrAckDelayExponent}
+			currentParameters := dev.MacState.CurrentParameters
+			currentParameters.AdrAckLimitExponent = &ttnpb.ADRAckLimitExponentValue{Value: req.AdrAckLimitExponent}
+			currentParameters.AdrAckDelayExponent = &ttnpb.ADRAckDelayExponentValue{Value: req.AdrAckDelayExponent}
 
-		return nil
-	}, dev.MacState.PendingRequests...)
+			return nil
+		},
+		dev.MacState.PendingRequests...,
+	)
 	return events.Builders{
 		EvtReceiveADRParamSetupAnswer,
 	}, err

@@ -64,6 +64,22 @@ func TestNeedsRxTimingSetupReq(t *testing.T) {
 			},
 			Needs: true,
 		},
+		{
+			Name: "current(delay:1),desired(delay:5),recent",
+			InputDevice: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{
+						Rx1Delay: ttnpb.RxDelay_RX_DELAY_1,
+					},
+					DesiredParameters: &ttnpb.MACParameters{
+						Rx1Delay: ttnpb.RxDelay_RX_DELAY_5,
+					},
+					RecentMacCommandIdentifiers: []ttnpb.MACCommandIdentifier{
+						ttnpb.MACCommandIdentifier_CID_RX_TIMING_SETUP,
+					},
+				},
+			},
+		},
 	} {
 		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{

@@ -31,6 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"golang.org/x/exp/slices"
 )
 
 func channelDataRateRange(chs ...*ttnpb.MACParameters_Channel) (min, max ttnpb.DataRateIndex, ok bool) {
@@ -742,4 +743,21 @@ func mapDataRateIndices(
 		return 0, 0, err
 	}
 	return targetMinDataRateIndex, targetMaxDataRateIndex, nil
+}
+
+func containsMACCommandIdentifier(cid ttnpb.MACCommandIdentifier) func(...ttnpb.MACCommandIdentifier) bool {
+	return func(cmds ...ttnpb.MACCommandIdentifier) bool {
+		return slices.Contains(cmds, cid)
+	}
+}
+
+func consumeMACCommandIdentifier(
+	cid ttnpb.MACCommandIdentifier,
+) func(...ttnpb.MACCommandIdentifier) (rest []ttnpb.MACCommandIdentifier, found bool) {
+	return func(cmds ...ttnpb.MACCommandIdentifier) (rest []ttnpb.MACCommandIdentifier, found bool) {
+		if i := slices.Index(cmds, cid); i >= 0 {
+			return append(cmds[:i], cmds[i+1:]...), true
+		}
+		return cmds, false
+	}
 }

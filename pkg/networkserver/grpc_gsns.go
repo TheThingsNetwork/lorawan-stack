@@ -39,6 +39,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"golang.org/x/exp/slices"
 )
 
 const (
@@ -191,6 +192,21 @@ func applyCFList(cfList *ttnpb.CFList, phy *band.Band, chs ...*ttnpb.MACParamete
 		}
 	}
 	return chs, true
+}
+
+func appendRecentMACCommandIdentifier(
+	cids []ttnpb.MACCommandIdentifier,
+	cid ttnpb.MACCommandIdentifier,
+) []ttnpb.MACCommandIdentifier {
+	switch cid {
+	case ttnpb.MACCommandIdentifier_CID_RX_PARAM_SETUP,
+		ttnpb.MACCommandIdentifier_CID_RX_TIMING_SETUP,
+		ttnpb.MACCommandIdentifier_CID_TX_PARAM_SETUP,
+		ttnpb.MACCommandIdentifier_CID_DL_CHANNEL:
+		return append(cids, cid)
+	default:
+		return cids
+	}
 }
 
 // matchAndHandleDataUplink handles and matches a device prematched by CMACF check.
@@ -428,6 +444,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 	if matchType == currentRetransmissionMatch {
 		dev.MacState.PendingRequests = nil
 	}
+	var queuedEventBuilders []events.Builder
 	var cmds []*ttnpb.MACCommand
 	for r := bytes.NewReader(cmdBuf); r.Len() > 0; {
 		cmd := &ttnpb.MACCommand{}
@@ -435,7 +452,8 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 			log.FromContext(ctx).WithFields(log.Fields(
 				"bytes_left", r.Len(),
 				"mac_count", len(cmds),
-			)).WithError(err).Warn("Failed to read MAC command")
+			)).WithError(err).Debug("Failed to read MAC command")
+			queuedEventBuilders = append(queuedEventBuilders, mac.EvtParseMACCommandFail.BindData(err))
 			break
 		}
 		logger := logger.WithField("command", cmd)
@@ -458,7 +476,6 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 	trace.Logf(ctx, "ns", "read %d MAC commands", len(cmds))
 	ctx = log.NewContext(ctx, logger)
 
-	var queuedEventBuilders []events.Builder
 	if pld.FHdr.FCtrl.ClassB {
 		switch {
 		case !dev.SupportsClassB:
@@ -490,9 +507,10 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 
 	var deferredMACHandlers []macHandler
 	if len(cmds) > 0 && !deduplicated {
-		deferredMACHandlers = make([]macHandler, 0, 1)
+		deferredMACHandlers = make([]macHandler, 0, 2)
 	}
 	var setPaths []string
+	recentMACCommandIdentifiers := make([]ttnpb.MACCommandIdentifier, 0, 1)
 	dev.MacState.QueuedResponses = dev.MacState.QueuedResponses[:0]
 macLoop:
 	for len(cmds) > 0 {
@@ -540,7 +558,7 @@ macLoop:
 		case ttnpb.MACCommandIdentifier_CID_DEV_STATUS:
 			evs, err = mac.HandleDevStatusAns(ctx, dev, cmd.GetDevStatusAns(), cmacFMatchResult.FullFCnt, *ttnpb.StdTime(up.ReceivedAt))
 			if err == nil {
-				setPaths = append(setPaths,
+				setPaths = ttnpb.AddFields(setPaths,
 					"battery_percentage",
 					"downlink_margin",
 					"last_dev_status_received_at",
@@ -579,17 +597,25 @@ macLoop:
 		case ttnpb.MACCommandIdentifier_CID_DEVICE_MODE:
 			evs, err = mac.HandleDeviceModeInd(ctx, dev, cmd.GetDeviceModeInd())
 		default:
-			logger.Warn("Unknown MAC command received, skip the rest")
+			_, known := lorawan.DefaultMACCommands[cmd.Cid]
+			logger.WithField("known", known).Debug("Unknown MAC command received")
+			queuedEventBuilders = append(queuedEventBuilders, mac.EvtUnknownMACCommand.BindData(cmd))
 			break macLoop
 		}
 		if err != nil {
 			logger.WithError(err).Debug("Failed to process MAC command")
+			queuedEventBuilders = append(queuedEventBuilders, mac.EvtProcessMACCommandFail.BindData(err))
 			break macLoop
 		}
 		queuedEventBuilders = append(queuedEventBuilders, evs...)
+		recentMACCommandIdentifiers = appendRecentMACCommandIdentifier(recentMACCommandIdentifiers, cmd.Cid)
 	}
+	dev.MacState.RecentMacCommandIdentifiers = recentMACCommandIdentifiers
 	if n := len(dev.MacState.PendingRequests); n > 0 {
-		logger.WithField("unanswered_request_count", n).Warn("MAC command buffer not fully answered")
+		logger.WithField("unanswered_request_count", n).Debug("MAC command buffer not fully answered")
+		queuedEventBuilders = append(queuedEventBuilders, mac.EvtUnansweredMACCommand.BindData(
+			slices.Clone(dev.MacState.PendingRequests),
+		))
 		dev.MacState.PendingRequests = dev.MacState.PendingRequests[:0]
 	}
 
@@ -601,7 +627,7 @@ macLoop:
 			logger.Debug("No RekeyInd received for LoRaWAN 1.1+ device")
 			return nil, false, nil
 		}
-		setPaths = append(setPaths, "ids.dev_addr")
+		setPaths = ttnpb.AddFields(setPaths, "ids.dev_addr")
 	} else if dev.PendingSession != nil || dev.PendingMacState != nil {
 		// TODO: Notify AS of session recovery(https://github.com/TheThingsNetwork/lorawan-stack/issues/594)
 	}
@@ -697,7 +723,7 @@ macLoop:
 		IsRetransmission:         matchType == currentRetransmissionMatch,
 		QueuedApplicationUplinks: queuedApplicationUplinks,
 		QueuedEventBuilders:      queuedEventBuilders,
-		SetPaths: append(setPaths,
+		SetPaths: ttnpb.AddFields(setPaths,
 			"mac_state",
 			"pending_mac_state",
 			"pending_session",
@@ -955,7 +981,10 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	for _, f := range matched.DeferredMACHandlers {
 		evs, err := f(ctx, matched.Device, up)
 		if err != nil {
-			log.FromContext(ctx).WithError(err).Warn("Failed to process MAC command after deduplication")
+			log.FromContext(ctx).WithError(err).Debug("Failed to process MAC command after deduplication")
+			matched.QueuedEventBuilders = append(
+				matched.QueuedEventBuilders, mac.EvtProcessMACCommandFail.BindData(err),
+			)
 			break
 		}
 		matched.QueuedEventBuilders = append(matched.QueuedEventBuilders, evs...)

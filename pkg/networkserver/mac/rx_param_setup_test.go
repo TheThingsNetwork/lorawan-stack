@@ -108,6 +108,26 @@ func TestNeedsRxParamSetupReq(t *testing.T) {
 			},
 			Needs: true,
 		},
+		{
+			Name: "current(data-rate-offset:1,data-rate-index:2,frequency:123),desired(data-rate-offset:2,data-rate-index:2,frequency:123),recent", //nolint:lll
+			InputDevice: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{
+						Rx1DataRateOffset: 1,
+						Rx2DataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_2,
+						Rx2Frequency:      123,
+					},
+					DesiredParameters: &ttnpb.MACParameters{
+						Rx1DataRateOffset: 2,
+						Rx2DataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_2,
+						Rx2Frequency:      123,
+					},
+					RecentMacCommandIdentifiers: []ttnpb.MACCommandIdentifier{
+						ttnpb.MACCommandIdentifier_CID_RX_PARAM_SETUP,
+					},
+				},
+			},
+		},
 	} {
 		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{

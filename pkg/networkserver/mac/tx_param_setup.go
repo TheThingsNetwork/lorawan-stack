@@ -33,6 +33,9 @@ var (
 	EvtReceiveTxParamSetupAnswer = defineReceiveMACAnswerEvent(
 		"tx_param_setup", "Tx parameter setup",
 	)()
+
+	containsTxParamSetup = containsMACCommandIdentifier(ttnpb.MACCommandIdentifier_CID_TX_PARAM_SETUP)
+	consumeTxParamSetup  = consumeMACCommandIdentifier(ttnpb.MACCommandIdentifier_CID_TX_PARAM_SETUP)
 )
 
 func DeviceNeedsTxParamSetupReq(dev *ttnpb.EndDevice, phy *band.Band) bool {
@@ -42,17 +45,22 @@ func DeviceNeedsTxParamSetupReq(dev *ttnpb.EndDevice, phy *band.Band) bool {
 		!macspec.UseTxParamSetupReq(dev.MacState.LorawanVersion) {
 		return false
 	}
-	if dev.MacState.DesiredParameters.MaxEirp != dev.MacState.CurrentParameters.MaxEirp {
+	macState := dev.MacState
+	if containsTxParamSetup(macState.RecentMacCommandIdentifiers...) { // See STICKY.md.
+		return false
+	}
+	currentParameters, desiredParameters := macState.CurrentParameters, macState.DesiredParameters
+	if desiredParameters.MaxEirp != currentParameters.MaxEirp {
 		return true
 	}
-	if dev.MacState.DesiredParameters.UplinkDwellTime != nil &&
-		(dev.MacState.CurrentParameters.UplinkDwellTime == nil ||
-			dev.MacState.DesiredParameters.UplinkDwellTime.Value != dev.MacState.CurrentParameters.UplinkDwellTime.Value) {
+	if desiredParameters.UplinkDwellTime != nil &&
+		(currentParameters.UplinkDwellTime == nil ||
+			desiredParameters.UplinkDwellTime.Value != currentParameters.UplinkDwellTime.Value) {
 		return true
 	}
-	if dev.MacState.DesiredParameters.DownlinkDwellTime != nil &&
-		(dev.MacState.CurrentParameters.DownlinkDwellTime == nil ||
-			dev.MacState.DesiredParameters.DownlinkDwellTime.Value != dev.MacState.CurrentParameters.DownlinkDwellTime.Value) {
+	if desiredParameters.DownlinkDwellTime != nil &&
+		(currentParameters.DownlinkDwellTime == nil ||
+			desiredParameters.DownlinkDwellTime.Value != currentParameters.DownlinkDwellTime.Value) {
 		return true
 	}
 	return false
@@ -95,19 +103,28 @@ func EnqueueTxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLe
 }
 
 func HandleTxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (events.Builders, error) {
+	var allowMissing bool // See STICKY.md.
+	dev.MacState.RecentMacCommandIdentifiers, allowMissing = consumeTxParamSetup(
+		dev.MacState.RecentMacCommandIdentifiers...,
+	)
 	var err error
-	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.MACCommandIdentifier_CID_TX_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
-		req := cmd.GetTxParamSetupReq()
+	dev.MacState.PendingRequests, err = handleMACResponse(
+		ttnpb.MACCommandIdentifier_CID_TX_PARAM_SETUP,
+		allowMissing,
+		func(cmd *ttnpb.MACCommand) error {
+			req := cmd.GetTxParamSetupReq()
 
-		dev.MacState.CurrentParameters.MaxEirp = lorawan.DeviceEIRPToFloat32(req.MaxEirpIndex)
-		dev.MacState.CurrentParameters.DownlinkDwellTime = &ttnpb.BoolValue{Value: req.DownlinkDwellTime}
-		dev.MacState.CurrentParameters.UplinkDwellTime = &ttnpb.BoolValue{Value: req.UplinkDwellTime}
+			dev.MacState.CurrentParameters.MaxEirp = lorawan.DeviceEIRPToFloat32(req.MaxEirpIndex)
+			dev.MacState.CurrentParameters.DownlinkDwellTime = &ttnpb.BoolValue{Value: req.DownlinkDwellTime}
+			dev.MacState.CurrentParameters.UplinkDwellTime = &ttnpb.BoolValue{Value: req.UplinkDwellTime}
 
-		if lorawan.Float32ToDeviceEIRP(dev.MacState.DesiredParameters.MaxEirp) == req.MaxEirpIndex {
-			dev.MacState.DesiredParameters.MaxEirp = dev.MacState.CurrentParameters.MaxEirp
-		}
-		return nil
-	}, dev.MacState.PendingRequests...)
+			if lorawan.Float32ToDeviceEIRP(dev.MacState.DesiredParameters.MaxEirp) == req.MaxEirpIndex {
+				dev.MacState.DesiredParameters.MaxEirp = dev.MacState.CurrentParameters.MaxEirp
+			}
+			return nil
+		},
+		dev.MacState.PendingRequests...,
+	)
 	return events.Builders{
 		EvtReceiveTxParamSetupAnswer,
 	}, err

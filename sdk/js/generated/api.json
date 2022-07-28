@@ -16038,6 +16038,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "recent_mac_command_identifiers",
+              "description": "MAC command identifiers sent by the end device in the last received uplink.\nThe Network Server may choose to store only certain types of MAC\ncommand identifiers in the underlying implementation.",
+              "label": "repeated",
+              "type": "MACCommandIdentifier",
+              "longType": "MACCommandIdentifier",
+              "fullType": "ttn.lorawan.v3.MACCommandIdentifier",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },

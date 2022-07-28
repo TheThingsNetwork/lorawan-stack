@@ -87,15 +87,20 @@ func HandleBeaconFreqAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 	}
 
 	var err error
-	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.MACCommandIdentifier_CID_BEACON_FREQ, func(cmd *ttnpb.MACCommand) error {
-		if !pld.FrequencyAck {
-			return nil
-		}
-		req := cmd.GetBeaconFreqReq()
+	dev.MacState.PendingRequests, err = handleMACResponse(
+		ttnpb.MACCommandIdentifier_CID_BEACON_FREQ,
+		false,
+		func(cmd *ttnpb.MACCommand) error {
+			if !pld.FrequencyAck {
+				return nil
+			}
+			req := cmd.GetBeaconFreqReq()
 
-		dev.MacState.CurrentParameters.BeaconFrequency = req.Frequency
-		return nil
-	}, dev.MacState.PendingRequests...)
+			dev.MacState.CurrentParameters.BeaconFrequency = req.Frequency
+			return nil
+		},
+		dev.MacState.PendingRequests...,
+	)
 	return events.Builders{
 		ev.With(events.WithData(pld)),
 	}, err

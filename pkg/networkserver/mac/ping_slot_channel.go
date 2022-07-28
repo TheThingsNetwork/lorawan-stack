@@ -89,13 +89,18 @@ func HandlePingSlotChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *tt
 	}
 
 	var err error
-	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.MACCommandIdentifier_CID_PING_SLOT_CHANNEL, func(cmd *ttnpb.MACCommand) error {
-		req := cmd.GetPingSlotChannelReq()
+	dev.MacState.PendingRequests, err = handleMACResponse(
+		ttnpb.MACCommandIdentifier_CID_PING_SLOT_CHANNEL,
+		false,
+		func(cmd *ttnpb.MACCommand) error {
+			req := cmd.GetPingSlotChannelReq()
 
-		dev.MacState.CurrentParameters.PingSlotFrequency = req.Frequency
-		dev.MacState.CurrentParameters.PingSlotDataRateIndexValue = &ttnpb.DataRateIndexValue{Value: req.DataRateIndex}
-		return nil
-	}, dev.MacState.PendingRequests...)
+			dev.MacState.CurrentParameters.PingSlotFrequency = req.Frequency
+			dev.MacState.CurrentParameters.PingSlotDataRateIndexValue = &ttnpb.DataRateIndexValue{Value: req.DataRateIndex}
+			return nil
+		},
+		dev.MacState.PendingRequests...,
+	)
 	return events.Builders{
 		EvtReceivePingSlotChannelAnswer.With(events.WithData(pld)),
 	}, err

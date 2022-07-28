@@ -83,15 +83,20 @@ func HandleRejoinParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *t
 	}
 
 	var err error
-	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.MACCommandIdentifier_CID_REJOIN_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
-		req := cmd.GetRejoinParamSetupReq()
+	dev.MacState.PendingRequests, err = handleMACResponse(
+		ttnpb.MACCommandIdentifier_CID_REJOIN_PARAM_SETUP,
+		false,
+		func(cmd *ttnpb.MACCommand) error {
+			req := cmd.GetRejoinParamSetupReq()
 
-		dev.MacState.CurrentParameters.RejoinCountPeriodicity = req.MaxCountExponent
-		if pld.MaxTimeExponentAck {
-			dev.MacState.CurrentParameters.RejoinTimePeriodicity = req.MaxTimeExponent
-		}
-		return nil
-	}, dev.MacState.PendingRequests...)
+			dev.MacState.CurrentParameters.RejoinCountPeriodicity = req.MaxCountExponent
+			if pld.MaxTimeExponentAck {
+				dev.MacState.CurrentParameters.RejoinTimePeriodicity = req.MaxTimeExponent
+			}
+			return nil
+		},
+		dev.MacState.PendingRequests...,
+	)
 	return events.Builders{
 		EvtReceiveRejoinParamSetupAnswer.With(events.WithData(pld)),
 	}, err

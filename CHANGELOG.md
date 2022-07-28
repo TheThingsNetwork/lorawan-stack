@@ -18,6 +18,7 @@ For details about compatibility between different releases, see the **Commitment
 - A new implementation of the Identity Server storage layer. In v3.21.0 the new implementation is not yet used by default, but it can be enabled with the `is.bunstore` feature flag.
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of added columns and views.
 - Support for comma-separated (`,`) values in The Things Stack CSV file format for importing end devices.
+- Support for the `RxParamSetup`, `RxTimingSetup`, `TxParamSetup`, and `DlChannel` sticky answer mechanism. The commands were supported previously, but subsequent sticky responses would cause the Network Server to drop the MAC command buffer in certain situations.
 
 ### Changed
 

@@ -314,56 +314,65 @@ func HandleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 	}
 	var n uint
 	var req *ttnpb.MACCommand_LinkADRReq
-	dev.MacState.PendingRequests, err = handler(ttnpb.MACCommandIdentifier_CID_LINK_ADR, func(cmd *ttnpb.MACCommand) error {
-		if allowDuplicateLinkADRAns && n > dupCount+1 {
-			return internal.ErrInvalidPayload.New()
-		}
-		n++
-
-		req = cmd.GetLinkAdrReq()
-		if req.NbTrans > 15 || len(req.ChannelMask) != 16 || req.ChannelMaskControl > 7 {
-			panic("Network Server scheduled an invalid LinkADR command")
-		}
-		if !pld.ChannelMaskAck || !pld.DataRateIndexAck || !pld.TxPowerIndexAck {
-			return nil
-		}
-		var mask [16]bool
-		for i, v := range req.ChannelMask {
-			mask[i] = v
-		}
-		m, err := phy.ParseChMask(mask, uint8(req.ChannelMaskControl))
-		if err != nil {
-			return err
-		}
-		for i, masked := range m {
-			if int(i) >= len(dev.MacState.CurrentParameters.Channels) || dev.MacState.CurrentParameters.Channels[i] == nil {
-				if !masked {
-					continue
-				}
-				return internal.ErrCorruptedMACState.
-					WithAttributes(
-						"i", i,
-						"channels_len", len(dev.MacState.CurrentParameters.Channels),
-					).
-					WithCause(internal.ErrUnknownChannel)
+	dev.MacState.PendingRequests, err = handler(
+		ttnpb.MACCommandIdentifier_CID_LINK_ADR,
+		false,
+		func(cmd *ttnpb.MACCommand) error {
+			if allowDuplicateLinkADRAns && n > dupCount+1 {
+				return internal.ErrInvalidPayload.New()
 			}
-			dev.MacState.CurrentParameters.Channels[i].EnableUplink = masked
-		}
-		return nil
-	}, dev.MacState.PendingRequests...)
+			n++
+
+			req = cmd.GetLinkAdrReq()
+			if req.NbTrans > 15 || len(req.ChannelMask) != 16 || req.ChannelMaskControl > 7 {
+				panic("Network Server scheduled an invalid LinkADR command")
+			}
+			if !pld.ChannelMaskAck || !pld.DataRateIndexAck || !pld.TxPowerIndexAck {
+				return nil
+			}
+			var mask [16]bool
+			copy(mask[:], req.ChannelMask)
+			m, err := phy.ParseChMask(mask, uint8(req.ChannelMaskControl))
+			if err != nil {
+				return err
+			}
+			for i, masked := range m {
+				if int(i) >= len(dev.MacState.CurrentParameters.Channels) || dev.MacState.CurrentParameters.Channels[i] == nil {
+					if !masked {
+						continue
+					}
+					return internal.ErrCorruptedMACState.
+						WithAttributes(
+							"i", i,
+							"channels_len", len(dev.MacState.CurrentParameters.Channels),
+						).
+						WithCause(internal.ErrUnknownChannel)
+				}
+				dev.MacState.CurrentParameters.Channels[i].EnableUplink = masked
+			}
+			return nil
+		},
+		dev.MacState.PendingRequests...,
+	)
 	if err != nil || req == nil {
 		return evs, err
 	}
 
 	if !pld.DataRateIndexAck {
-		if i := searchDataRateIndex(req.DataRateIndex, dev.MacState.RejectedAdrDataRateIndexes...); i == len(dev.MacState.RejectedAdrDataRateIndexes) || dev.MacState.RejectedAdrDataRateIndexes[i] != req.DataRateIndex {
-			dev.MacState.RejectedAdrDataRateIndexes = append(dev.MacState.RejectedAdrDataRateIndexes, ttnpb.DataRateIndex_DATA_RATE_0)
+		i := searchDataRateIndex(req.DataRateIndex, dev.MacState.RejectedAdrDataRateIndexes...)
+		if i == len(dev.MacState.RejectedAdrDataRateIndexes) ||
+			dev.MacState.RejectedAdrDataRateIndexes[i] != req.DataRateIndex {
+			dev.MacState.RejectedAdrDataRateIndexes = append(
+				dev.MacState.RejectedAdrDataRateIndexes, ttnpb.DataRateIndex_DATA_RATE_0,
+			)
 			copy(dev.MacState.RejectedAdrDataRateIndexes[i+1:], dev.MacState.RejectedAdrDataRateIndexes[i:])
 			dev.MacState.RejectedAdrDataRateIndexes[i] = req.DataRateIndex
 		}
 	}
 	if !pld.TxPowerIndexAck {
-		if i := searchUint32(req.TxPowerIndex, dev.MacState.RejectedAdrTxPowerIndexes...); i == len(dev.MacState.RejectedAdrTxPowerIndexes) || dev.MacState.RejectedAdrTxPowerIndexes[i] != req.TxPowerIndex {
+		i := searchUint32(req.TxPowerIndex, dev.MacState.RejectedAdrTxPowerIndexes...)
+		if i == len(dev.MacState.RejectedAdrTxPowerIndexes) ||
+			dev.MacState.RejectedAdrTxPowerIndexes[i] != req.TxPowerIndex {
 			dev.MacState.RejectedAdrTxPowerIndexes = append(dev.MacState.RejectedAdrTxPowerIndexes, 0)
 			copy(dev.MacState.RejectedAdrTxPowerIndexes[i+1:], dev.MacState.RejectedAdrTxPowerIndexes[i:])
 			dev.MacState.RejectedAdrTxPowerIndexes[i] = req.TxPowerIndex

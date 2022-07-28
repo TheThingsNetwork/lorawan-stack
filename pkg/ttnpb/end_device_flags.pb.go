@@ -2013,6 +2013,7 @@ func AddSelectFlagsForMACState(flags *pflag.FlagSet, prefix string, hidden bool)
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("last-downlink-at", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("last-downlink-at", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("rejected-data-rate-ranges", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("rejected-data-rate-ranges", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("last-adr-change-f-cnt-up", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("last-adr-change-f-cnt-up", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("recent-mac-command-identifiers", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("recent-mac-command-identifiers", prefix), false), flagsplugin.WithHidden(hidden)))
 }
 
 // SelectFromFlags outputs the fieldmask paths forMACState message from select flags.
@@ -2157,6 +2158,11 @@ func PathsFromSelectFlagsForMACState(flags *pflag.FlagSet, prefix string) (paths
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("last_adr_change_f_cnt_up", prefix))
 	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("recent_mac_command_identifiers", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("recent_mac_command_identifiers", prefix))
+	}
 	return paths, nil
 }
 
@@ -2185,6 +2191,7 @@ func AddSetFlagsForMACState(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewTimestampFlag(flagsplugin.Prefix("last-downlink-at", prefix), "", flagsplugin.WithHidden(hidden)))
 	// FIXME: Skipping RejectedDataRateRanges because maps with uint64 key types are currently not supported.
 	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("last-adr-change-f-cnt-up", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewStringSliceFlag(flagsplugin.Prefix("recent-mac-command-identifiers", prefix), flagsplugin.EnumValueDesc(MACCommandIdentifier_value), flagsplugin.WithHidden(hidden)))
 }
 
 // SetFromFlags sets the MACState message from flags.
@@ -2334,6 +2341,19 @@ func (m *MACState) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []st
 	} else if changed {
 		m.LastAdrChangeFCntUp = val
 		paths = append(paths, flagsplugin.Prefix("last_adr_change_f_cnt_up", prefix))
+	}
+	if val, changed, err := flagsplugin.GetStringSlice(flags, flagsplugin.Prefix("recent_mac_command_identifiers", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.RecentMacCommandIdentifiers = make([]MACCommandIdentifier, len(val))
+		for i, v := range val {
+			enumValue, err := flagsplugin.SetEnumString(v, MACCommandIdentifier_value)
+			if err != nil {
+				return nil, err
+			}
+			m.RecentMacCommandIdentifiers[i] = MACCommandIdentifier(enumValue)
+		}
+		paths = append(paths, flagsplugin.Prefix("recent_mac_command_identifiers", prefix))
 	}
 	return paths, nil
 }
