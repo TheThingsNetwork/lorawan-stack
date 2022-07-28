@@ -23,7 +23,6 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
@@ -138,8 +137,8 @@ func TestAppendRecentDownlink(t *testing.T) {
 			Name:     fmt.Sprintf("recent_length:%d,window:%v", len(tc.Recent), tc.Window),
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				recent := deepcopy.Copy(tc.Recent).([]*ttnpb.MACState_DownlinkMessage)
-				down := CopyDownlinkMessage(tc.Down)
+				recent := ttnpb.CloneSlice(tc.Recent)
+				down := ttnpb.Clone(tc.Down)
 				ret := appendRecentDownlink(recent, down, tc.Window)
 				a.So(recent, should.Resemble, tc.Recent)
 				a.So(down, should.Resemble, tc.Down)
@@ -161,7 +160,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 	sNwkSIntKey := types.AES128Key{0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 
 	encodeMessage := func(msg *ttnpb.Message, ver ttnpb.MACVersion, confFCnt uint32) []byte {
-		msg = deepcopy.Copy(msg).(*ttnpb.Message)
+		msg = ttnpb.Clone(msg)
 		pld := msg.GetMacPayload()
 
 		b, err := lorawan.MarshalMessage(msg)
@@ -1222,7 +1221,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					},
 				}
 
-				dev := CopyEndDevice(tc.Device)
+				dev := ttnpb.Clone(tc.Device)
 				fps, err := ns.FrequencyPlansStore(ctx)
 				if !a.So(err, should.BeNil) {
 					t.Fail()
@@ -1250,7 +1249,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 
 				b := encodeMessage(tc.Payload, dev.MacState.LorawanVersion, tc.ConfFCnt)
 				a.So(genDown.RawPayload, should.Resemble, b)
-				pld := CopyMessage(tc.Payload)
+				pld := ttnpb.Clone(tc.Payload)
 				pld.Mic = b[len(b)-4:]
 				a.So(genDown.Payload, should.Resemble, pld)
 				if tc.ApplicationDownlinkAssertion != nil {

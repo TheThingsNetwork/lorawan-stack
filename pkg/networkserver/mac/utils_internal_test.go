@@ -24,7 +24,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gpstime"
-	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -104,7 +103,7 @@ func TestDeviceDefaultChannels(t *testing.T) {
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				t.Helper()
 
-				pb := CopyEndDevice(tc.Device)
+				pb := ttnpb.Clone(tc.Device)
 
 				deviceDefaultChannels := DeviceDefaultChannels(pb, tc.Band, &ttnpb.MACSettings{})
 				a.So(deviceDefaultChannels, should.Resemble, tc.Channels)
@@ -189,7 +188,7 @@ func TestDeviceDesiredChannels(t *testing.T) {
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				t.Helper()
 
-				pb := CopyEndDevice(tc.Device)
+				pb := ttnpb.Clone(tc.Device)
 
 				deviceDesiredChannels, err := DeviceDesiredChannels(pb, tc.Band, tc.FrequencyPlan, &ttnpb.MACSettings{})
 				a.So(err, should.BeNil)
@@ -647,7 +646,7 @@ func TestNewState(t *testing.T) {
 			Name:     tc.Name,
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				pb := CopyEndDevice(tc.Device)
+				pb := ttnpb.Clone(tc.Device)
 
 				macState, err := NewState(pb, tc.FrequencyPlanStore, &ttnpb.MACSettings{})
 				if tc.ErrorAssertion != nil {

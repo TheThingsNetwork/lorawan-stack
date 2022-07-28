@@ -19,7 +19,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/mohae/deepcopy"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
@@ -118,20 +117,6 @@ func RXMetadataStats(ctx context.Context, mds []*ttnpb.RxMetadata) (gateways int
 
 func TimePtr(v time.Time) *time.Time {
 	return &v
-}
-
-func EndDevicePtr(v ttnpb.EndDevice) *ttnpb.EndDevice {
-	return &v
-}
-
-// CopyEndDevice returns a deep copy of ttnpb.EndDevice pb.
-func CopyEndDevice(pb *ttnpb.EndDevice) *ttnpb.EndDevice {
-	return deepcopy.Copy(pb).(*ttnpb.EndDevice)
-}
-
-// CopyUplinkMessage returns a deep copy of ttnpb.UplinkMessage pb.
-func CopyUplinkMessage(pb *ttnpb.UplinkMessage) *ttnpb.UplinkMessage {
-	return deepcopy.Copy(pb).(*ttnpb.UplinkMessage)
 }
 
 // FullFCnt returns full FCnt given fCnt, lastFCnt and whether or not 32-bit FCnts are supported.

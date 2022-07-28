@@ -327,7 +327,7 @@ func TestLinkADRReq(t *testing.T) {
 			),
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				makeDevice := func() *ttnpb.EndDevice {
-					return CopyEndDevice(&ttnpb.EndDevice{
+					return ttnpb.Clone(&ttnpb.EndDevice{
 						MacState: &ttnpb.MACState{
 							LorawanVersion: tc.LoRaWANVersion,
 							CurrentParameters: &ttnpb.MACParameters{
@@ -915,7 +915,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Name:     tc.Name,
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				dev := CopyEndDevice(tc.Device)
+				dev := ttnpb.Clone(tc.Device)
 
 				evs, err := HandleLinkADRAns(ctx, dev, tc.Payload, tc.DupCount, fCntUp, frequencyplans.NewStore(test.FrequencyPlansFetcher))
 				if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||

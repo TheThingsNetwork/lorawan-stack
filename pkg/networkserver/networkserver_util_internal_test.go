@@ -1152,7 +1152,7 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, bool) {
 	t, a := test.MustNewTFromContext(ctx)
 	t.Helper()
-	dev = CopyEndDevice(dev)
+	dev = ttnpb.Clone(dev)
 	return dev, a.So(test.RunSubtestFromContext(ctx, test.SubtestConfig{
 		Name: "Join-accept",
 		Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
@@ -1244,7 +1244,7 @@ type DataDownlinkAssertionConfig struct {
 func (env TestEnvironment) AssertScheduleDataDownlink(ctx context.Context, conf DataDownlinkAssertionConfig) (*ttnpb.EndDevice, bool) {
 	t, a := test.MustNewTFromContext(ctx)
 	t.Helper()
-	dev := CopyEndDevice(conf.Device)
+	dev := ttnpb.Clone(conf.Device)
 	return dev, a.So(test.RunSubtestFromContext(ctx, test.SubtestConfig{
 		Name: "Data downlink",
 		Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
@@ -1584,7 +1584,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 				return false
 			}
 
-			dev = CopyEndDevice(conf.Device)
+			dev = ttnpb.Clone(conf.Device)
 			dev.PendingMacState = &ttnpb.MACState{
 				CurrentParameters: &ttnpb.MACParameters{
 					MaxEirp:                    phy.DefaultMaxEIRP,
@@ -1772,7 +1772,7 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 	t, a := test.MustNewTFromContext(ctx)
 	t.Helper()
 
-	dev := CopyEndDevice(conf.Device)
+	dev := ttnpb.Clone(conf.Device)
 	return dev, a.So(test.RunSubtestFromContext(ctx, test.SubtestConfig{
 		Name: "Data uplink",
 		Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
@@ -2090,15 +2090,15 @@ func LogEvents(t *testing.T, ch <-chan test.EventPubSubPublishRequest) {
 var MACStateOptions = test.MACStateOptions
 
 func MakeMACState(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings, opts ...test.MACStateOption) *ttnpb.MACState {
-	v := MACStateOptions.Compose(opts...)(*test.Must(mac.NewState(dev, test.FrequencyPlanStore, defaults)).(*ttnpb.MACState))
-	return &v
+	return MACStateOptions.Compose(opts...)(test.Must(mac.NewState(dev, test.FrequencyPlanStore, defaults)).(*ttnpb.MACState))
 }
 
 type SessionOptionNamespace struct{ test.SessionOptionNamespace }
 
 func (o SessionOptionNamespace) WithDefaultQueuedApplicationDownlinks() test.SessionOption {
-	return func(x ttnpb.Session) ttnpb.Session {
-		x.QueuedApplicationDownlinks = DefaultApplicationDownlinkQueue[:]
+	return func(x *ttnpb.Session) *ttnpb.Session {
+		x = ttnpb.Clone(x)
+		x.QueuedApplicationDownlinks = ttnpb.CloneSlice(DefaultApplicationDownlinkQueue)
 		return x
 	}
 }
@@ -2115,7 +2115,7 @@ func MakeSession(macVersion ttnpb.MACVersion, wrapKeys, withID bool, opts ...tes
 type EndDeviceOptionNamespace struct{ test.EndDeviceOptionNamespace }
 
 func (o EndDeviceOptionNamespace) SendJoinRequest(defaults *ttnpb.MACSettings, wrapKeys bool) test.EndDeviceOption {
-	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
+	return func(x *ttnpb.EndDevice) *ttnpb.EndDevice {
 		if !x.SupportsJoin {
 			panic("join request requested for non-OTAA device")
 		}
@@ -2128,7 +2128,7 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults *ttnpb.MACSettings, w
 			}
 			panic("no data rates")
 		}()
-		macState := MakeMACState(&x, defaults,
+		macState := MakeMACState(x, defaults,
 			MACStateOptions.WithRxWindowsAvailable(true),
 			MACStateOptions.WithRecentUplinks(ToMACStateUplinkMessages(
 				MakeJoinRequest(JoinRequestConfig{
@@ -2143,7 +2143,7 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults *ttnpb.MACSettings, w
 				}),
 			)...),
 		)
-		return o.WithPendingMacState(MACStatePtr(MACStateOptions.WithQueuedJoinAccept(&ttnpb.MACState_JoinAccept{
+		return o.WithPendingMacState(MACStateOptions.WithQueuedJoinAccept(&ttnpb.MACState_JoinAccept{
 			Payload: bytes.Repeat([]byte{0xff}, 17),
 			Request: &ttnpb.MACState_JoinRequest{
 				DownlinkSettings: &ttnpb.DLSettings{
@@ -2158,12 +2158,12 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults *ttnpb.MACSettings, w
 			DevAddr:        test.DefaultDevAddr.Bytes(),
 			NetId:          test.DefaultNetID.Bytes(),
 			CorrelationIds: []string{"join-request"},
-		})(*macState)))(x)
+		})(macState))(x)
 	}
 }
 
 func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriority) test.EndDeviceOption {
-	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
+	return func(x *ttnpb.EndDevice) *ttnpb.EndDevice {
 		if !x.SupportsJoin {
 			panic("join accept requested for non-OTAA device")
 		}
@@ -2198,9 +2198,9 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 }
 
 func (o EndDeviceOptionNamespace) Activate(defaults *ttnpb.MACSettings, wrapKeys bool, sessionOpts []test.SessionOption, macStateOpts ...test.MACStateOption) test.EndDeviceOption {
-	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
+	return func(x *ttnpb.EndDevice) *ttnpb.EndDevice {
 		if !x.SupportsJoin {
-			macState := MakeMACState(&x, defaults, macStateOpts...)
+			macState := MakeMACState(x, defaults, macStateOpts...)
 			ses := MakeSession(macState.LorawanVersion, wrapKeys, false, sessionOpts...)
 			return o.Compose(
 				o.WithMacState(macState),
@@ -2215,7 +2215,7 @@ func (o EndDeviceOptionNamespace) Activate(defaults *ttnpb.MACSettings, wrapKeys
 			o.SendJoinAccept(ttnpb.TxSchedulePriority_HIGHEST),
 			// TODO: Send uplink including MAC commands depending on the version.
 			// https://github.com/TheThingsNetwork/lorawan-stack/issues/3142
-			func(x ttnpb.EndDevice) ttnpb.EndDevice {
+			func(x *ttnpb.EndDevice) *ttnpb.EndDevice {
 				return o.Compose(
 					o.WithEndDeviceIdentifiersOptions(
 						test.EndDeviceIdentifiersOptions.WithDevAddr(x.PendingSession.DevAddr),
@@ -2254,7 +2254,7 @@ func MakeOTAAEndDevice(opts ...test.EndDeviceOption) *ttnpb.EndDevice {
 func MakeABPEndDevice(defaults *ttnpb.MACSettings, wrapKeys bool, sessionOpts []test.SessionOption, macStateOpts []test.MACStateOption, opts ...test.EndDeviceOption) *ttnpb.EndDevice {
 	return MakeEndDevice(
 		EndDeviceOptions.Compose(opts...),
-		func(x ttnpb.EndDevice) ttnpb.EndDevice {
+		func(x *ttnpb.EndDevice) *ttnpb.EndDevice {
 			if x.Multicast ||
 				!types.MustEUI64(x.Ids.DevEui).OrZero().IsZero() ||
 				!macspec.RequireDevEUIForABP(x.LorawanVersion) {

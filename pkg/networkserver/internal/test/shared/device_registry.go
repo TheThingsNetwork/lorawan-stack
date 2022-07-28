@@ -26,7 +26,6 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
-	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -361,7 +360,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 		t.Fatal("pb pending session uplink matching assertion failed with non-empty registry")
 	}
 
-	pbOther := CopyEndDevice(pb)
+	pbOther := ttnpb.Clone(pb)
 	pbOther.Session.LastFCntUp = pbCurrentUp.Payload.GetMacPayload().FHdr.FCnt
 	pbOther.Session.Keys.FNwkSIntKey.Key = types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe}.Bytes() //nolint:lll
 	pbOther.PendingSession = nil

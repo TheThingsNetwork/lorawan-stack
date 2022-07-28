@@ -165,7 +165,7 @@ func TestNeedsTxParamSetupReq(t *testing.T) {
 			Name:     tc.Name,
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				dev := CopyEndDevice(tc.InputDevice)
+				dev := ttnpb.Clone(tc.InputDevice)
 				res := DeviceNeedsTxParamSetupReq(dev, tc.Band)
 				if tc.Needs {
 					a.So(res, should.BeTrue)
@@ -342,7 +342,7 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			Name:     tc.Name,
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				dev := CopyEndDevice(tc.InputDevice)
+				dev := ttnpb.Clone(tc.InputDevice)
 
 				st := EnqueueTxParamSetupReq(ctx, dev, tc.MaxDownlinkLength, tc.MaxUplinkLength, LoRaWANBands[band.AS_923][ttnpb.PHYVersion_RP001_V1_1_REV_B])
 				a.So(dev, should.Resemble, tc.ExpectedDevice)
@@ -416,7 +416,7 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 			Name:     tc.Name,
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				dev := CopyEndDevice(tc.InputDevice)
+				dev := ttnpb.Clone(tc.InputDevice)
 
 				evs, err := HandleTxParamSetupAns(ctx, dev)
 				if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||

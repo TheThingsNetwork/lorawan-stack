@@ -22,7 +22,6 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
-	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -307,7 +306,7 @@ func TestNewChannelReq(t *testing.T) {
 			}(),
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				makeDevice := func() *ttnpb.EndDevice {
-					return CopyEndDevice(&ttnpb.EndDevice{
+					return ttnpb.Clone(&ttnpb.EndDevice{
 						MacState: &ttnpb.MACState{
 							CurrentParameters: &ttnpb.MACParameters{
 								Channels: tc.CurrentChannels,
@@ -579,7 +578,7 @@ func TestHandleNewChannelAns(t *testing.T) {
 			Name:     tc.Name,
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				dev := CopyEndDevice(tc.Device)
+				dev := ttnpb.Clone(tc.Device)
 
 				evs, err := HandleNewChannelAns(ctx, dev, tc.Payload)
 				if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
