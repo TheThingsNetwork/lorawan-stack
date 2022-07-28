@@ -34,6 +34,7 @@ const formatOptions = (brands = []) =>
     .map(brand => ({
       value: brand.brand_id,
       label: brand.name || brand.brand_id,
+      profileID: brand.brand_id,
     }))
     .concat([{ value: SELECT_OTHER_OPTION, label: messages.otherOption }])
 
@@ -42,7 +43,7 @@ const BrandSelect = props => {
   const { formatMessage } = useIntl()
 
   React.useEffect(() => {
-    listBrands(appId, {}, ['name'])
+    listBrands(appId, {}, ['name', 'lora_alliance_vendor_id'])
   }, [appId, listBrands])
 
   const options = React.useMemo(() => formatOptions(brands), [brands])

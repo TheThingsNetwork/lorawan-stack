@@ -15,7 +15,7 @@
 import React from 'react'
 
 import Input from '@ttn-lw/components/input'
-import Form from '@ttn-lw/components/form'
+import Form, { useFormContext } from '@ttn-lw/components/form'
 
 import DevEUIComponent from '@console/containers/dev-eui-component'
 
@@ -35,12 +35,17 @@ const initialValues = {
 const DeviceClaimingFormSection = () => {
   const idInputRef = React.useRef(null)
 
+  const {
+    values: { _withQRdata },
+  } = useFormContext()
+
   return (
     <>
       <DevEUIComponent name="authenticated_identifiers.dev_eui" />
       <Form.Field
         title={sharedMessages.claimAuthCode}
         name="authenticated_identifiers.authentication_code"
+        disabled={_withQRdata}
         component={Input}
         sensitive
       />
