@@ -210,7 +210,8 @@ func (s *organizationStore) CreateOrganization(
 
 func (*organizationStore) selectWithFields(q *bun.SelectQuery, fieldMask store.FieldMask) (*bun.SelectQuery, error) {
 	if fieldMask == nil {
-		q = q.ExcludeColumn()
+		q = q.ExcludeColumn().
+			Column("account_uid") // NOTE: not selected by default because it's not in the table, only in the view.
 	} else {
 		columns := []string{
 			"id",

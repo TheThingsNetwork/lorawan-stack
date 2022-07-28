@@ -242,6 +242,10 @@ func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *
 		return nil, err
 	}
 
+	if req.GetCollaborator().GetIds().EntityType() == "organization" {
+		return nil, errNestedOrganizations.New()
+	}
+
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
 		existingRights, err := st.GetMember(
 			ctx,

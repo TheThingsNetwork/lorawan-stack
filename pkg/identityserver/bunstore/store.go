@@ -150,7 +150,17 @@ func wrapDriverError(err error) error {
 			}
 		}
 		if def, ok := driverErrorCodes[pgdriverErr.Field('C')]; ok {
-			return def.WithAttributes(attributes...)
+			err := def.WithAttributes(attributes...)
+			if def.Name() == "already_exists" {
+				constraint := pgdriverErr.Field('n')
+				switch {
+				case strings.HasSuffix(constraint, "_id_index"):
+					return store.ErrIDTaken.WithCause(err)
+				case strings.HasSuffix(constraint, "_eui_index"):
+					return store.ErrEUITaken.WithCause(err)
+				}
+			}
+			return err
 		}
 		return errDriver.WithAttributes(attributes...)
 	}

@@ -420,7 +420,7 @@ func (s *endDeviceStore) FindEndDevices(
 			deviceIDs[i] = id.GetDeviceId()
 		}
 
-		s.selectWithID(ctx, applicationID, deviceIDs...)
+		by = s.selectWithID(ctx, applicationID, deviceIDs...)
 	}
 
 	return s.listEndDevicesBy(ctx, by, fieldMask)
