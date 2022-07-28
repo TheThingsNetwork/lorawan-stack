@@ -5684,6 +5684,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 | Field | Validations |
 | ----- | ----------- |
+| `dev_addr` | <p>`bytes.len`: `4`</p> |
 | `f_ctrl` | <p>`message.required`: `true`</p> |
 | `f_cnt` | <p>`uint32.lte`: `65535`</p> |
 | `f_opts` | <p>`bytes.max_len`: `15`</p> |

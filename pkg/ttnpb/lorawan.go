@@ -1118,7 +1118,7 @@ func (v *FHDR) FieldIsZero(p string) bool {
 	}
 	switch p {
 	case "dev_addr":
-		return v.DevAddr == types.DevAddr{}
+		return types.MustDevAddr(v.DevAddr).OrZero().IsZero()
 	case "f_cnt":
 		return v.FCnt == 0
 	case "f_ctrl":
@@ -1362,8 +1362,9 @@ func (v *DeviceEIRPValue) FieldIsZero(p string) bool {
 // Note that if the payload is nil, the end device identifiers will be nil.
 func (m *Message) EndDeviceIdentifiers() *EndDeviceIdentifiers {
 	if h := m.GetMacPayload().GetFHdr(); h != nil {
+		devAddr := types.MustDevAddr(h.DevAddr).OrZero()
 		return &EndDeviceIdentifiers{
-			DevAddr: &h.DevAddr,
+			DevAddr: &devAddr,
 		}
 	}
 	if p := m.GetJoinRequestPayload(); p != nil {

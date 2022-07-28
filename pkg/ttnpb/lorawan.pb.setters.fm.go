@@ -328,8 +328,7 @@ func (dst *FHDR) SetFields(src *FHDR, paths ...string) error {
 			if src != nil {
 				dst.DevAddr = src.DevAddr
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.DevAddr
-				dst.DevAddr = zero
+				dst.DevAddr = nil
 			}
 		case "f_ctrl":
 			if len(subs) > 0 {

@@ -14,11 +14,15 @@
 
 package ttnpb
 
-import "context"
+import (
+	"context"
+
+	types "go.thethings.network/lorawan-stack/v3/pkg/types"
+)
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (p MACPayload) ValidateContext(context.Context) error {
-	if h := p.GetFHdr(); h == nil || h.DevAddr.IsZero() {
+	if h := p.GetFHdr(); h == nil || types.MustDevAddr(h.DevAddr).OrZero().IsZero() {
 		return errMissing("DevAddr")
 	}
 	return p.ValidateFields()

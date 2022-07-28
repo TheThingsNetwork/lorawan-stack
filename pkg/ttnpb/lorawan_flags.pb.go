@@ -9,7 +9,75 @@ package ttnpb
 import (
 	flagsplugin "github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	pflag "github.com/spf13/pflag"
+	customflags "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags"
 )
+
+// AddSelectFlagsForFHDR adds flags to select fields in FHDR.
+func AddSelectFlagsForFHDR(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("dev-addr", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("dev-addr", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("f-ctrl", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("f-ctrl", prefix), true), flagsplugin.WithHidden(hidden)))
+	// NOTE: f_ctrl (FCtrl) does not seem to have select flags.
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("f-cnt", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("f-cnt", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("f-opts", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("f-opts", prefix), false), flagsplugin.WithHidden(hidden)))
+}
+
+// SelectFromFlags outputs the fieldmask paths forFHDR message from select flags.
+func PathsFromSelectFlagsForFHDR(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("dev_addr", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("dev_addr", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("f_ctrl", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("f_ctrl", prefix))
+	}
+	// NOTE: f_ctrl (FCtrl) does not seem to have select flags.
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("f_cnt", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("f_cnt", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("f_opts", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("f_opts", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForFHDR adds flags to select fields in FHDR.
+func AddSetFlagsForFHDR(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(customflags.New4BytesFlag(flagsplugin.Prefix("dev-addr", prefix), "", flagsplugin.WithHidden(hidden)))
+	// FIXME: Skipping FCtrl because it does not seem to implement AddSetFlags.
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("f-cnt", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("f-opts", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the FHDR message from flags.
+func (m *FHDR) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("dev_addr", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.DevAddr = val
+		paths = append(paths, flagsplugin.Prefix("dev_addr", prefix))
+	}
+	// FIXME: Skipping FCtrl because it does not seem to implement AddSetFlags.
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("f_cnt", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.FCnt = val
+		paths = append(paths, flagsplugin.Prefix("f_cnt", prefix))
+	}
+	if val, changed, err := flagsplugin.GetBytes(flags, flagsplugin.Prefix("f_opts", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.FOpts = val
+		paths = append(paths, flagsplugin.Prefix("f_opts", prefix))
+	}
+	return paths, nil
+}
 
 // AddSelectFlagsForDLSettings adds flags to select fields in DLSettings.
 func AddSelectFlagsForDLSettings(flags *pflag.FlagSet, prefix string, hidden bool) {
