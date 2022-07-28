@@ -510,8 +510,7 @@ func (dst *RejoinRequestPayload) SetFields(src *RejoinRequestPayload, paths ...s
 			if src != nil {
 				dst.JoinEui = src.JoinEui
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
-				dst.JoinEui = zero
+				dst.JoinEui = nil
 			}
 		case "dev_eui":
 			if len(subs) > 0 {

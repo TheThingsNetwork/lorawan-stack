@@ -6257,6 +6257,7 @@ Message represents a LoRaWAN message
 | ----- | ----------- |
 | `rejoin_type` | <p>`enum.defined_only`: `true`</p> |
 | `net_id` | <p>`bytes.len`: `3`</p> |
+| `join_eui` | <p>`bytes.len`: `8`</p> |
 
 ### <a name="ttn.lorawan.v3.RxDelayValue">Message `RxDelayValue`</a>
 

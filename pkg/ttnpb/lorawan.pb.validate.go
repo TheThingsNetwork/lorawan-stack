@@ -817,7 +817,18 @@ func (m *RejoinRequestPayload) ValidateFields(paths ...string) error {
 			}
 
 		case "join_eui":
-			// no validation rules for JoinEui
+
+			if len(m.GetJoinEui()) > 0 {
+
+				if len(m.GetJoinEui()) != 8 {
+					return RejoinRequestPayloadValidationError{
+						field:  "join_eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		case "dev_eui":
 			// no validation rules for DevEui
 		case "rejoin_cnt":
