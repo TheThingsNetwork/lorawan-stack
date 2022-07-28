@@ -490,7 +490,14 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			if err != nil {
 				return nil, nil, errDeriveNwkSKeys.WithCause(err)
 			}
-			appSKey, err := applicationCryptoService.DeriveAppSKey(ctx, cryptoDev, req.SelectedMacVersion, jn, devNonce, netID)
+			appSKey, err := applicationCryptoService.DeriveAppSKey(
+				ctx,
+				cryptoDev,
+				req.SelectedMacVersion,
+				jn,
+				devNonce,
+				netID,
+			)
 			if err != nil {
 				return nil, nil, errDeriveAppSKey.WithCause(err)
 			}

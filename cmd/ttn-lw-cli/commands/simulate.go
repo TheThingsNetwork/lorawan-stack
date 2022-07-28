@@ -445,7 +445,12 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 				macPayload.FHdr.FOpts = fOpts
 			}
 		}
-		macPayload.FrmPayload, err = crypto.DecryptDownlink(payloadKey, devAddr, macPayload.FHdr.FCnt, macPayload.FrmPayload)
+		macPayload.FrmPayload, err = crypto.DecryptDownlink(
+			payloadKey,
+			devAddr,
+			macPayload.FHdr.FCnt,
+			macPayload.FrmPayload,
+		)
 		if err != nil {
 			return err
 		}
