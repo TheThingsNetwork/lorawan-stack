@@ -359,28 +359,29 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 		dev.Ids.DevAddr, dev.Session.DevAddr = &joinAcceptPayload.DevAddr, joinAcceptPayload.DevAddr.Bytes()
 		dev.Session.Keys = &ttnpb.SessionKeys{}
 
+		joinNonce := types.MustJoinNonce(joinAcceptPayload.JoinNonce).OrZero()
 		if macspec.UseNwkKey(dev.LorawanVersion) && joinAcceptPayload.DlSettings.OptNeg {
-			appSKey := crypto.DeriveAppSKey(appKey, joinAcceptPayload.JoinNonce, joinEUI, devNonce)
+			appSKey := crypto.DeriveAppSKey(appKey, joinNonce, joinEUI, devNonce)
 			dev.Session.Keys.AppSKey = &ttnpb.KeyEnvelope{Key: appSKey.Bytes()}
 			logger.Infof("Derived AppSKey %X (%s)", appSKey[:], base64.StdEncoding.EncodeToString(appSKey[:]))
 
-			fNwkSIntKey := crypto.DeriveFNwkSIntKey(nwkKey, joinAcceptPayload.JoinNonce, joinEUI, devNonce)
+			fNwkSIntKey := crypto.DeriveFNwkSIntKey(nwkKey, joinNonce, joinEUI, devNonce)
 			dev.Session.Keys.FNwkSIntKey = &ttnpb.KeyEnvelope{Key: fNwkSIntKey.Bytes()}
 			logger.Infof("Derived FNwkSIntKey %X (%s)", fNwkSIntKey[:], base64.StdEncoding.EncodeToString(fNwkSIntKey[:]))
 
-			sNwkSIntKey := crypto.DeriveSNwkSIntKey(nwkKey, joinAcceptPayload.JoinNonce, joinEUI, devNonce)
+			sNwkSIntKey := crypto.DeriveSNwkSIntKey(nwkKey, joinNonce, joinEUI, devNonce)
 			dev.Session.Keys.SNwkSIntKey = &ttnpb.KeyEnvelope{Key: sNwkSIntKey.Bytes()}
 			logger.Infof("Derived SNwkSIntKey %X (%s)", sNwkSIntKey[:], base64.StdEncoding.EncodeToString(sNwkSIntKey[:]))
 
-			nwkSEncKey := crypto.DeriveNwkSEncKey(nwkKey, joinAcceptPayload.JoinNonce, joinEUI, devNonce)
+			nwkSEncKey := crypto.DeriveNwkSEncKey(nwkKey, joinNonce, joinEUI, devNonce)
 			dev.Session.Keys.NwkSEncKey = &ttnpb.KeyEnvelope{Key: nwkSEncKey.Bytes()}
 			logger.Infof("Derived NwkSEncKey %X (%s)", nwkSEncKey[:], base64.StdEncoding.EncodeToString(nwkSEncKey[:]))
 		} else {
-			appSKey := crypto.DeriveLegacyAppSKey(key, joinAcceptPayload.JoinNonce, joinAcceptPayload.NetId, devNonce)
+			appSKey := crypto.DeriveLegacyAppSKey(key, joinNonce, joinAcceptPayload.NetId, devNonce)
 			dev.Session.Keys.AppSKey = &ttnpb.KeyEnvelope{Key: appSKey.Bytes()}
 			logger.Infof("Derived AppSKey %X (%s)", appSKey[:], base64.StdEncoding.EncodeToString(appSKey[:]))
 
-			nwkSKey := crypto.DeriveLegacyNwkSKey(key, joinAcceptPayload.JoinNonce, joinAcceptPayload.NetId, devNonce)
+			nwkSKey := crypto.DeriveLegacyNwkSKey(key, joinNonce, joinAcceptPayload.NetId, devNonce)
 			dev.Session.Keys.FNwkSIntKey = &ttnpb.KeyEnvelope{Key: nwkSKey.Bytes()}
 			dev.Session.Keys.SNwkSIntKey = &ttnpb.KeyEnvelope{Key: nwkSKey.Bytes()}
 			dev.Session.Keys.NwkSEncKey = &ttnpb.KeyEnvelope{Key: nwkSKey.Bytes()}

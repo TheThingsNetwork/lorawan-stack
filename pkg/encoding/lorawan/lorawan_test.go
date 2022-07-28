@@ -832,7 +832,7 @@ func TestMessageEncodingSymmetricityJoinAcceptPayload(t *testing.T) {
 		{
 			Name: "JoinAcceptPayload/CFList",
 			Message: &ttnpb.JoinAcceptPayload{
-				JoinNonce: test.DefaultJoinNonce,
+				JoinNonce: test.DefaultJoinNonce.Bytes(),
 				NetId:     test.DefaultNetID,
 				DevAddr:   test.DefaultDevAddr,
 				DlSettings: &ttnpb.DLSettings{
@@ -856,7 +856,7 @@ func TestMessageEncodingSymmetricityJoinAcceptPayload(t *testing.T) {
 		{
 			Name: "JoinAcceptPayload/NoCFList",
 			Message: &ttnpb.JoinAcceptPayload{
-				JoinNonce: test.DefaultJoinNonce,
+				JoinNonce: test.DefaultJoinNonce.Bytes(),
 				NetId:     test.DefaultNetID,
 				DevAddr:   test.DefaultDevAddr,
 				DlSettings: &ttnpb.DLSettings{
@@ -898,7 +898,7 @@ func TestLoRaWANEncodingRawJoinAcceptPayload(t *testing.T) {
 		{
 			"JoinAcceptPayload/NoCFList",
 			&ttnpb.JoinAcceptPayload{
-				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff},
+				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff}.Bytes(),
 				NetId:     types.NetID{0x42, 0xff, 0xff},
 				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				DlSettings: &ttnpb.DLSettings{
@@ -924,7 +924,7 @@ func TestLoRaWANEncodingRawJoinAcceptPayload(t *testing.T) {
 		{
 			"JoinAcceptPayload/CFListFreq",
 			&ttnpb.JoinAcceptPayload{
-				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff},
+				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff}.Bytes(),
 				NetId:     types.NetID{0x42, 0xff, 0xff},
 				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				DlSettings: &ttnpb.DLSettings{
@@ -958,7 +958,7 @@ func TestLoRaWANEncodingRawJoinAcceptPayload(t *testing.T) {
 		{
 			"JoinAcceptPayload/CFListChMask",
 			&ttnpb.JoinAcceptPayload{
-				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff},
+				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff}.Bytes(),
 				NetId:     types.NetID{0x42, 0xff, 0xff},
 				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				DlSettings: &ttnpb.DLSettings{
