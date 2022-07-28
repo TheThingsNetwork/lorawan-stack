@@ -5752,6 +5752,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 | Field | Validations |
 | ----- | ----------- |
 | `join_eui` | <p>`bytes.len`: `8`</p> |
+| `dev_eui` | <p>`bytes.len`: `8`</p> |
 
 ### <a name="ttn.lorawan.v3.LRFHSSDataRate">Message `LRFHSSDataRate`</a>
 

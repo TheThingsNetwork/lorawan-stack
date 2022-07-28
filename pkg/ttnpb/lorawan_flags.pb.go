@@ -110,7 +110,7 @@ func PathsFromSelectFlagsForJoinRequestPayload(flags *pflag.FlagSet, prefix stri
 // AddSetFlagsForJoinRequestPayload adds flags to select fields in JoinRequestPayload.
 func AddSetFlagsForJoinRequestPayload(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(customflags.New8BytesFlag(flagsplugin.Prefix("join-eui", prefix), "", flagsplugin.WithHidden(hidden)))
-	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("dev-eui", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(customflags.New8BytesFlag(flagsplugin.Prefix("dev-eui", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("dev-nonce", prefix), "", flagsplugin.WithHidden(hidden)))
 }
 
@@ -122,7 +122,7 @@ func (m *JoinRequestPayload) SetFromFlags(flags *pflag.FlagSet, prefix string) (
 		m.JoinEui = val
 		paths = append(paths, flagsplugin.Prefix("join_eui", prefix))
 	}
-	if val, changed, err := types.GetEUI64FromFlag(flags, flagsplugin.Prefix("dev_eui", prefix)); err != nil {
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("dev_eui", prefix)); err != nil {
 		return nil, err
 	} else if changed {
 		m.DevEui = val

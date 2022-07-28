@@ -1530,7 +1530,7 @@ func (x *JoinRequestPayload) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if len(x.DevEui) > 0 || s.HasField("dev_eui") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("dev_eui")
-		x.DevEui.MarshalProtoJSON(s.WithField("dev_eui"))
+		types.MarshalHEXBytes(s.WithField("dev_eui"), x.DevEui)
 	}
 	if len(x.DevNonce) > 0 || s.HasField("dev_nonce") {
 		s.WriteMoreIf(&wroteField)
@@ -1559,7 +1559,7 @@ func (x *JoinRequestPayload) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.JoinEui = types.Unmarshal8Bytes(s.WithField("join_eui", false))
 		case "dev_eui", "devEui":
 			s.AddField("dev_eui")
-			x.DevEui.UnmarshalProtoJSON(s.WithField("dev_eui", false))
+			x.DevEui = types.Unmarshal8Bytes(s.WithField("dev_eui", false))
 		case "dev_nonce", "devNonce":
 			s.AddField("dev_nonce")
 			x.DevNonce.UnmarshalProtoJSON(s.WithField("dev_nonce", false))

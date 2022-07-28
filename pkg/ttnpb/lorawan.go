@@ -1082,7 +1082,7 @@ func (v *JoinRequestPayload) FieldIsZero(p string) bool {
 	}
 	switch p {
 	case "dev_eui":
-		return v.DevEui == types.EUI64{}
+		return types.MustEUI64(v.DevEui).OrZero().IsZero()
 	case "dev_nonce":
 		return v.DevNonce == types.DevNonce{}
 	case "join_eui":
@@ -1368,9 +1368,9 @@ func (m *Message) EndDeviceIdentifiers() *EndDeviceIdentifiers {
 		}
 	}
 	if p := m.GetJoinRequestPayload(); p != nil {
-		joinEUI := types.MustEUI64(p.JoinEui).OrZero()
+		devEUI, joinEUI := types.MustEUI64(p.DevEui).OrZero(), types.MustEUI64(p.JoinEui).OrZero()
 		return &EndDeviceIdentifiers{
-			DevEui:  &p.DevEui,
+			DevEui:  &devEUI,
 			JoinEui: &joinEUI,
 		}
 	}

@@ -205,8 +205,15 @@ message JoinRequestPayload {
     }
   ];
   bytes dev_eui = 2 [
-    (gogoproto.nullable) = false,
-    (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64",
+    (validate.rules).bytes = { len: 8, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal8Bytes"
+    },
+    (thethings.flags.field) = {
+      set_flag_new_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.New8BytesFlag",
+      set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
+    },
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       type: STRING, format: "string", example: "\"70B3D57ED000ABCD\""
     }

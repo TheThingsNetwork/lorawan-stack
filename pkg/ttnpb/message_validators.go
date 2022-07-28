@@ -30,7 +30,7 @@ func (p MACPayload) ValidateContext(context.Context) error {
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (p JoinRequestPayload) ValidateContext(context.Context) error {
-	if p.DevEui.IsZero() {
+	if devEUI := types.MustEUI64(p.DevEui).OrZero(); devEUI.IsZero() {
 		return errMissing("DevEUI")
 	}
 	return p.ValidateFields()
