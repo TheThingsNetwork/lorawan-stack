@@ -170,7 +170,7 @@ var csvFieldSetters = map[string]csvFieldSetterFunc{
 			dst.RootKeys = &ttnpb.RootKeys{}
 		}
 		dst.RootKeys.AppKey = &ttnpb.KeyEnvelope{
-			Key: &key,
+			Key: key.Bytes(),
 		}
 		dst.SupportsJoin = true
 		return []string{"root_keys.app_key.key", "supports_join"}, nil
@@ -184,7 +184,7 @@ var csvFieldSetters = map[string]csvFieldSetterFunc{
 			dst.RootKeys = &ttnpb.RootKeys{}
 		}
 		dst.RootKeys.NwkKey = &ttnpb.KeyEnvelope{
-			Key: &key,
+			Key: key.Bytes(),
 		}
 		dst.SupportsJoin = true
 		return []string{"root_keys.nwk_key.key", "supports_join"}, nil
@@ -236,7 +236,7 @@ var csvFieldSetters = map[string]csvFieldSetterFunc{
 			dst.Session.Keys = &ttnpb.SessionKeys{}
 		}
 		dst.Session.Keys.AppSKey = &ttnpb.KeyEnvelope{
-			Key: key,
+			Key: key.Bytes(),
 		}
 		return []string{"session.keys.app_s_key.key"}, nil
 	},
@@ -252,7 +252,7 @@ var csvFieldSetters = map[string]csvFieldSetterFunc{
 			dst.Session.Keys = &ttnpb.SessionKeys{}
 		}
 		dst.Session.Keys.FNwkSIntKey = &ttnpb.KeyEnvelope{
-			Key: key,
+			Key: key.Bytes(),
 		}
 		return []string{"session.keys.f_nwk_s_int_key.key"}, nil
 	},

@@ -19,10 +19,11 @@ import (
 	"fmt"
 
 	"github.com/vmihailenco/msgpack/v5"
+	types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 func (m *KeyEnvelope) IsZero() bool {
-	return m == nil || len(m.Key) == 0 && m.KekLabel == "" && len(m.EncryptedKey) == 0
+	return m == nil || types.MustAES128Key(m.Key).OrZero().IsZero() && m.KekLabel == "" && len(m.EncryptedKey) == 0
 }
 
 // FieldIsZero returns whether path p is zero.

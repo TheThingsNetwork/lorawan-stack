@@ -75,7 +75,7 @@ var errInvalidLength = errors.DefineInvalidArgument("invalid_length", "invalid s
 func UnwrapAES128Key(ctx context.Context, wrapped *ttnpb.KeyEnvelope, v crypto.KeyVault) (key types.AES128Key, err error) {
 	defer trace.StartRegion(ctx, "unwrap AES-128 key").End()
 	if wrapped.Key != nil {
-		return *wrapped.Key, nil
+		return *types.MustAES128Key(wrapped.Key), nil
 	}
 	if wrapped.KekLabel == "" {
 		if len(wrapped.EncryptedKey) != 16 {
@@ -99,7 +99,7 @@ func UnwrapAES128Key(ctx context.Context, wrapped *ttnpb.KeyEnvelope, v crypto.K
 // returns the result as a key envelope.
 // NOTE: UnwrapKeyEnvelope returns ke if unwrapping is not necessary.
 func UnwrapKeyEnvelope(ctx context.Context, ke *ttnpb.KeyEnvelope, v crypto.KeyVault) (*ttnpb.KeyEnvelope, error) {
-	if !ke.GetKey().IsZero() || len(ke.GetEncryptedKey()) == 0 {
+	if !types.MustAES128Key(ke.GetKey()).OrZero().IsZero() || len(ke.GetEncryptedKey()) == 0 {
 		return ke, nil
 	}
 	k, err := UnwrapAES128Key(ctx, ke, v)
@@ -107,7 +107,7 @@ func UnwrapKeyEnvelope(ctx context.Context, ke *ttnpb.KeyEnvelope, v crypto.KeyV
 		return nil, err
 	}
 	return &ttnpb.KeyEnvelope{
-		Key: &k,
+		Key: k.Bytes(),
 	}, nil
 }
 

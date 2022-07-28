@@ -143,7 +143,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Name: "decrypted AppSKey/no prefix/no paths",
 			SessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
-					Key: &key,
+					Key: key.Bytes(),
 				},
 			},
 			ExpectedSessionKeys: &ttnpb.SessionKeys{},
@@ -153,7 +153,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Name: "decrypted AppSKey/no prefix/paths(nwk_s_enc_key)",
 			SessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
-					Key: &key,
+					Key: key.Bytes(),
 				},
 			},
 			Paths: []string{
@@ -166,7 +166,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Name: "decrypted AppSKey/no prefix/paths(app_s_key)",
 			SessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
-					Key: &key,
+					Key: key.Bytes(),
 				},
 			},
 			Paths: []string{
@@ -174,7 +174,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			},
 			ExpectedSessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
-					Key: &key,
+					Key: key.Bytes(),
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
@@ -183,7 +183,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Name: "decrypted AppSKey/no prefix/paths(app_s_key.key)",
 			SessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
-					Key: &key,
+					Key: key.Bytes(),
 				},
 			},
 			Paths: []string{
@@ -191,7 +191,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			},
 			ExpectedSessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
-					Key: &key,
+					Key: key.Bytes(),
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
@@ -209,7 +209,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			},
 			ExpectedSessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
-					Key: &key,
+					Key: key.Bytes(),
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
@@ -227,7 +227,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			},
 			ExpectedSessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
-					Key: &key,
+					Key: key.Bytes(),
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
@@ -240,13 +240,13 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 					EncryptedKey: cipherKey,
 				},
 				FNwkSIntKey: &ttnpb.KeyEnvelope{
-					Key: &types.AES128Key{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01},
+					Key: types.AES128Key{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01}.Bytes(),
 				},
 				NwkSEncKey: &ttnpb.KeyEnvelope{
-					Key: &types.AES128Key{0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02},
+					Key: types.AES128Key{0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02}.Bytes(),
 				},
 				SNwkSIntKey: &ttnpb.KeyEnvelope{
-					Key: &types.AES128Key{0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03},
+					Key: types.AES128Key{0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03}.Bytes(),
 				},
 			},
 			Paths: []string{
@@ -257,16 +257,16 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			},
 			ExpectedSessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
-					Key: &key,
+					Key: key.Bytes(),
 				},
 				FNwkSIntKey: &ttnpb.KeyEnvelope{
-					Key: &types.AES128Key{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01},
+					Key: types.AES128Key{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01}.Bytes(),
 				},
 				NwkSEncKey: &ttnpb.KeyEnvelope{
-					Key: &types.AES128Key{0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02},
+					Key: types.AES128Key{0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02}.Bytes(),
 				},
 				SNwkSIntKey: &ttnpb.KeyEnvelope{
-					Key: &types.AES128Key{0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03},
+					Key: types.AES128Key{0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03}.Bytes(),
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
@@ -275,7 +275,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Name: "decrypted AppSKey/prefix(test)/no paths",
 			SessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
-					Key: &key,
+					Key: key.Bytes(),
 				},
 			},
 			Prefix:              "test",
@@ -286,7 +286,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Name: "decrypted AppSKey/prefix(test)/paths(app_s_key)",
 			SessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
-					Key: &key,
+					Key: key.Bytes(),
 				},
 			},
 			Prefix: "test",
@@ -300,7 +300,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Name: "decrypted AppSKey/prefix(test)/paths(app_s_key.key)",
 			SessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
-					Key: &key,
+					Key: key.Bytes(),
 				},
 			},
 			Prefix: "test",
@@ -314,7 +314,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Name: "decrypted AppSKey/prefix(test)/paths(test.nwk_s_enc_key)",
 			SessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
-					Key: &key,
+					Key: key.Bytes(),
 				},
 			},
 			Prefix: "test",
@@ -328,7 +328,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Name: "decrypted AppSKey/prefix(test)/paths(test.app_s_key)",
 			SessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
-					Key: &key,
+					Key: key.Bytes(),
 				},
 			},
 			Prefix: "test",
@@ -337,7 +337,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			},
 			ExpectedSessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
-					Key: &key,
+					Key: key.Bytes(),
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
@@ -346,7 +346,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Name: "decrypted AppSKey/prefix(test)/paths(test.app_s_key.key)",
 			SessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
-					Key: &key,
+					Key: key.Bytes(),
 				},
 			},
 			Prefix: "test",
@@ -355,7 +355,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			},
 			ExpectedSessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
-					Key: &key,
+					Key: key.Bytes(),
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
@@ -374,7 +374,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			},
 			ExpectedSessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
-					Key: &key,
+					Key: key.Bytes(),
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
@@ -393,7 +393,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			},
 			ExpectedSessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
-					Key: &key,
+					Key: key.Bytes(),
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
@@ -406,13 +406,13 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 					EncryptedKey: cipherKey,
 				},
 				FNwkSIntKey: &ttnpb.KeyEnvelope{
-					Key: &types.AES128Key{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01},
+					Key: types.AES128Key{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01}.Bytes(),
 				},
 				NwkSEncKey: &ttnpb.KeyEnvelope{
-					Key: &types.AES128Key{0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02},
+					Key: types.AES128Key{0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02}.Bytes(),
 				},
 				SNwkSIntKey: &ttnpb.KeyEnvelope{
-					Key: &types.AES128Key{0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03},
+					Key: types.AES128Key{0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03}.Bytes(),
 				},
 			},
 			Prefix: "test",
@@ -421,16 +421,16 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			},
 			ExpectedSessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
-					Key: &key,
+					Key: key.Bytes(),
 				},
 				FNwkSIntKey: &ttnpb.KeyEnvelope{
-					Key: &types.AES128Key{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01},
+					Key: types.AES128Key{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01}.Bytes(),
 				},
 				NwkSEncKey: &ttnpb.KeyEnvelope{
-					Key: &types.AES128Key{0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02},
+					Key: types.AES128Key{0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02}.Bytes(),
 				},
 				SNwkSIntKey: &ttnpb.KeyEnvelope{
-					Key: &types.AES128Key{0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03},
+					Key: types.AES128Key{0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03}.Bytes(),
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },

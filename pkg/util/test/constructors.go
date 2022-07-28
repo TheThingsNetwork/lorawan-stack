@@ -78,7 +78,7 @@ func (o SessionKeysOptionNamespace) WithDefaultNwkKeysWrapped(macVersion ttnpb.M
 
 func (o SessionKeysOptionNamespace) WithDefaultAppSKey() SessionKeysOption {
 	return o.WithAppSKey(&ttnpb.KeyEnvelope{
-		Key: &DefaultAppSKey,
+		Key: DefaultAppSKey.Bytes(),
 	})
 }
 
