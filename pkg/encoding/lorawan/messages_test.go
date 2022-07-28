@@ -15,6 +15,7 @@
 package lorawan_test
 
 import (
+	"encoding/hex"
 	"fmt"
 	"math"
 	"testing"
@@ -119,11 +120,15 @@ func TestAppendFHDR(t *testing.T) {
 	}{
 		{
 			Bytes: []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-			FHDR:  &ttnpb.FHDR{},
+			FHDR: &ttnpb.FHDR{
+				DevAddr: types.DevAddr{0x00, 0x00, 0x00, 0x00}.Bytes(),
+			},
 		},
 		{
-			Bytes:    []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-			FHDR:     &ttnpb.FHDR{},
+			Bytes: []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			FHDR: &ttnpb.FHDR{
+				DevAddr: types.DevAddr{0x00, 0x00, 0x00, 0x00}.Bytes(),
+			},
 			IsUplink: true,
 		},
 		{
@@ -199,15 +204,23 @@ func TestAppendFHDR(t *testing.T) {
 		if tc.IsUplink {
 			dirStr = "uplink"
 		}
-		t.Run(fmt.Sprintf("%s/DevAddr:%v,FCnt:%v,FOpts:(%s)", dirStr, tc.FHDR.DevAddr, tc.FHDR.FCnt, tc.FHDR.FOpts), func(t *testing.T) {
-			a := assertions.New(t)
+		t.Run(
+			fmt.Sprintf("%s/DevAddr:%v,FCnt:%v,FOpts:(%s)",
+				dirStr,
+				types.MustDevAddr(tc.FHDR.DevAddr).OrZero(),
+				tc.FHDR.FCnt,
+				hex.EncodeToString(tc.FHDR.FOpts),
+			),
+			func(t *testing.T) {
+				a := assertions.New(t)
 
-			dst := append([]byte{}, baseBytes[:]...)
-			b, err := AppendFHDR(dst, tc.FHDR, tc.IsUplink)
-			if a.So(err, should.BeNil) {
-				a.So(b, should.Resemble, append(baseBytes[:], tc.Bytes...))
-			}
-			a.So(dst, should.Resemble, baseBytes[:])
-		})
+				dst := append([]byte{}, baseBytes[:]...)
+				b, err := AppendFHDR(dst, tc.FHDR, tc.IsUplink)
+				if a.So(err, should.BeNil) {
+					a.So(b, should.Resemble, append(baseBytes[:], tc.Bytes...))
+				}
+				a.So(dst, should.Resemble, baseBytes[:])
+			},
+		)
 	}
 }
