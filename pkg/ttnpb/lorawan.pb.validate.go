@@ -701,7 +701,18 @@ func (m *JoinRequestPayload) ValidateFields(paths ...string) error {
 			}
 
 		case "dev_nonce":
-			// no validation rules for DevNonce
+
+			if len(m.GetDevNonce()) > 0 {
+
+				if len(m.GetDevNonce()) != 2 {
+					return JoinRequestPayloadValidationError{
+						field:  "dev_nonce",
+						reason: "value length must be 2 bytes",
+					}
+				}
+
+			}
+
 		default:
 			return JoinRequestPayloadValidationError{
 				field:  name,

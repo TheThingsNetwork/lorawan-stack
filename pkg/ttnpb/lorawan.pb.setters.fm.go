@@ -471,8 +471,7 @@ func (dst *JoinRequestPayload) SetFields(src *JoinRequestPayload, paths ...strin
 			if src != nil {
 				dst.DevNonce = src.DevNonce
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.DevNonce
-				dst.DevNonce = zero
+				dst.DevNonce = nil
 			}
 
 		default:

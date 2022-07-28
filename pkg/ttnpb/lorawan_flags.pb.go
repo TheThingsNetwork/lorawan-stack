@@ -10,7 +10,6 @@ import (
 	flagsplugin "github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	pflag "github.com/spf13/pflag"
 	customflags "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags"
-	types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // AddSelectFlagsForFHDR adds flags to select fields in FHDR.
@@ -111,7 +110,7 @@ func PathsFromSelectFlagsForJoinRequestPayload(flags *pflag.FlagSet, prefix stri
 func AddSetFlagsForJoinRequestPayload(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(customflags.New8BytesFlag(flagsplugin.Prefix("join-eui", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(customflags.New8BytesFlag(flagsplugin.Prefix("dev-eui", prefix), "", flagsplugin.WithHidden(hidden)))
-	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("dev-nonce", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(customflags.New2BytesFlag(flagsplugin.Prefix("dev-nonce", prefix), "", flagsplugin.WithHidden(hidden)))
 }
 
 // SetFromFlags sets the JoinRequestPayload message from flags.
@@ -128,7 +127,7 @@ func (m *JoinRequestPayload) SetFromFlags(flags *pflag.FlagSet, prefix string) (
 		m.DevEui = val
 		paths = append(paths, flagsplugin.Prefix("dev_eui", prefix))
 	}
-	if val, changed, err := types.GetDevNonceFromFlag(flags, flagsplugin.Prefix("dev_nonce", prefix)); err != nil {
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("dev_nonce", prefix)); err != nil {
 		return nil, err
 	} else if changed {
 		m.DevNonce = val

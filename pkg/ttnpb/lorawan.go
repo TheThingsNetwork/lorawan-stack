@@ -1084,7 +1084,7 @@ func (v *JoinRequestPayload) FieldIsZero(p string) bool {
 	case "dev_eui":
 		return types.MustEUI64(v.DevEui).OrZero().IsZero()
 	case "dev_nonce":
-		return v.DevNonce == types.DevNonce{}
+		return types.MustDevNonce(v.DevNonce).OrZero().IsZero()
 	case "join_eui":
 		return types.MustEUI64(v.JoinEui).OrZero().IsZero()
 	}
