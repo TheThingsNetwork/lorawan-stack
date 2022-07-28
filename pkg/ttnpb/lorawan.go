@@ -1086,7 +1086,7 @@ func (v *JoinRequestPayload) FieldIsZero(p string) bool {
 	case "dev_nonce":
 		return v.DevNonce == types.DevNonce{}
 	case "join_eui":
-		return v.JoinEui == types.EUI64{}
+		return types.MustEUI64(v.JoinEui).OrZero().IsZero()
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }
@@ -1368,9 +1368,10 @@ func (m *Message) EndDeviceIdentifiers() *EndDeviceIdentifiers {
 		}
 	}
 	if p := m.GetJoinRequestPayload(); p != nil {
+		joinEUI := types.MustEUI64(p.JoinEui).OrZero()
 		return &EndDeviceIdentifiers{
 			DevEui:  &p.DevEui,
-			JoinEui: &p.JoinEui,
+			JoinEui: &joinEUI,
 		}
 	}
 	if p := m.GetJoinAcceptPayload(); p != nil {

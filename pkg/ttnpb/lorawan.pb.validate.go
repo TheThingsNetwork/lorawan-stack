@@ -675,7 +675,18 @@ func (m *JoinRequestPayload) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "join_eui":
-			// no validation rules for JoinEui
+
+			if len(m.GetJoinEui()) > 0 {
+
+				if len(m.GetJoinEui()) != 8 {
+					return JoinRequestPayloadValidationError{
+						field:  "join_eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		case "dev_eui":
 			// no validation rules for DevEui
 		case "dev_nonce":

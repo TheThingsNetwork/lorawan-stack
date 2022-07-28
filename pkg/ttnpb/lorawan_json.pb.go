@@ -1217,8 +1217,7 @@ func (x *Message) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		case *Message_JoinRequestPayload:
 			s.WriteMoreIf(&wroteField)
 			s.WriteObjectField("join_request_payload")
-			// NOTE: JoinRequestPayload does not seem to implement MarshalProtoJSON.
-			gogo.MarshalMessage(s, ov.JoinRequestPayload)
+			ov.JoinRequestPayload.MarshalProtoJSON(s.WithField("join_request_payload"))
 		case *Message_JoinAcceptPayload:
 			s.WriteMoreIf(&wroteField)
 			s.WriteObjectField("join_accept_payload")
@@ -1266,17 +1265,14 @@ func (x *Message) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			ov.MacPayload = &MACPayload{}
 			ov.MacPayload.UnmarshalProtoJSON(s.WithField("mac_payload", true))
 		case "join_request_payload", "joinRequestPayload":
-			s.AddField("join_request_payload")
 			ov := &Message_JoinRequestPayload{}
 			x.Payload = ov
 			if s.ReadNil() {
 				ov.JoinRequestPayload = nil
 				return
 			}
-			// NOTE: JoinRequestPayload does not seem to implement UnmarshalProtoJSON.
-			var v JoinRequestPayload
-			gogo.UnmarshalMessage(s, &v)
-			ov.JoinRequestPayload = &v
+			ov.JoinRequestPayload = &JoinRequestPayload{}
+			ov.JoinRequestPayload.UnmarshalProtoJSON(s.WithField("join_request_payload", true))
 		case "join_accept_payload", "joinAcceptPayload":
 			ov := &Message_JoinAcceptPayload{}
 			x.Payload = ov
@@ -1515,6 +1511,64 @@ func (x *FHDR) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 
 // UnmarshalJSON unmarshals the FHDR from JSON.
 func (x *FHDR) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the JoinRequestPayload message to JSON.
+func (x *JoinRequestPayload) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.JoinEui) > 0 || s.HasField("join_eui") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("join_eui")
+		types.MarshalHEXBytes(s.WithField("join_eui"), x.JoinEui)
+	}
+	if len(x.DevEui) > 0 || s.HasField("dev_eui") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("dev_eui")
+		x.DevEui.MarshalProtoJSON(s.WithField("dev_eui"))
+	}
+	if len(x.DevNonce) > 0 || s.HasField("dev_nonce") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("dev_nonce")
+		x.DevNonce.MarshalProtoJSON(s.WithField("dev_nonce"))
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the JoinRequestPayload to JSON.
+func (x *JoinRequestPayload) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the JoinRequestPayload message from JSON.
+func (x *JoinRequestPayload) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "join_eui", "joinEui":
+			s.AddField("join_eui")
+			x.JoinEui = types.Unmarshal8Bytes(s.WithField("join_eui", false))
+		case "dev_eui", "devEui":
+			s.AddField("dev_eui")
+			x.DevEui.UnmarshalProtoJSON(s.WithField("dev_eui", false))
+		case "dev_nonce", "devNonce":
+			s.AddField("dev_nonce")
+			x.DevNonce.UnmarshalProtoJSON(s.WithField("dev_nonce", false))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the JoinRequestPayload from JSON.
+func (x *JoinRequestPayload) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
