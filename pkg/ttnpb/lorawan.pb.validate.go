@@ -928,7 +928,18 @@ func (m *JoinAcceptPayload) ValidateFields(paths ...string) error {
 		case "encrypted":
 			// no validation rules for Encrypted
 		case "join_nonce":
-			// no validation rules for JoinNonce
+
+			if len(m.GetJoinNonce()) > 0 {
+
+				if len(m.GetJoinNonce()) != 3 {
+					return JoinAcceptPayloadValidationError{
+						field:  "join_nonce",
+						reason: "value length must be 3 bytes",
+					}
+				}
+
+			}
+
 		case "net_id":
 			// no validation rules for NetId
 		case "dev_addr":

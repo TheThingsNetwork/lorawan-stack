@@ -1066,7 +1066,7 @@ func (v *JoinAcceptPayload) FieldIsZero(p string) bool {
 	case "encrypted":
 		return v.Encrypted == nil
 	case "join_nonce":
-		return v.JoinNonce == types.JoinNonce{}
+		return types.MustJoinNonce(v.JoinNonce).OrZero().IsZero()
 	case "net_id":
 		return v.NetId == types.NetID{}
 	case "rx_delay":

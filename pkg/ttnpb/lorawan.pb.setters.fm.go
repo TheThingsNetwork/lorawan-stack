@@ -558,8 +558,7 @@ func (dst *JoinAcceptPayload) SetFields(src *JoinAcceptPayload, paths ...string)
 			if src != nil {
 				dst.JoinNonce = src.JoinNonce
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.JoinNonce
-				dst.JoinNonce = zero
+				dst.JoinNonce = nil
 			}
 		case "net_id":
 			if len(subs) > 0 {

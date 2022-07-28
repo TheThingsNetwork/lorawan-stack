@@ -301,8 +301,15 @@ message RejoinRequestPayload {
 message JoinAcceptPayload {
   bytes encrypted = 1;
   bytes join_nonce = 2 [
-    (gogoproto.nullable) = false,
-    (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.JoinNonce",
+    (validate.rules).bytes = { len: 3, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal3Bytes"
+    },
+    (thethings.flags.field) = {
+      set_flag_new_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.New3BytesFlag",
+      set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
+    },
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       type: STRING, format: "string", example: "\"ABCDEF\""
     }
