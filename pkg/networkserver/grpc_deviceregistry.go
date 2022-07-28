@@ -554,7 +554,7 @@ func newSetDeviceState(dev *ttnpb.EndDevice, paths ...string) *setDeviceState {
 
 func setKeyIsZero(m map[string]*ttnpb.EndDevice, get func(*ttnpb.EndDevice) *ttnpb.KeyEnvelope, path string) bool {
 	if dev, ok := m[path+".key"]; ok {
-		if ke := get(dev); !ke.GetKey().IsZero() {
+		if ke := get(dev); !types.MustAES128Key(ke.GetKey()).OrZero().IsZero() {
 			return false
 		}
 	}
@@ -567,7 +567,9 @@ func setKeyIsZero(m map[string]*ttnpb.EndDevice, get func(*ttnpb.EndDevice) *ttn
 }
 
 func setKeyEqual(m map[string]*ttnpb.EndDevice, getA, getB func(*ttnpb.EndDevice) *ttnpb.KeyEnvelope, pathA, pathB string) bool {
-	if a, b := getA(m[pathA+".key"]).GetKey(), getB(m[pathB+".key"]).GetKey(); a == nil && b != nil || a != nil && b == nil || a != nil && b != nil && !a.Equal(*b) {
+	if a, b := getA(m[pathA+".key"]).GetKey(), getB(m[pathB+".key"]).GetKey(); a == nil && b != nil ||
+		a != nil && b == nil ||
+		a != nil && b != nil && !types.MustAES128Key(a).Equal(*types.MustAES128Key(b)) {
 		return false
 	}
 	if a, b := getA(m[pathA+".encrypted_key"]).GetEncryptedKey(), getB(m[pathB+".encrypted_key"]).GetEncryptedKey(); !bytes.Equal(a, b) {
@@ -1893,7 +1895,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 		if st.HasSetField("session.keys.f_nwk_s_int_key.key") {
 			k := st.Device.Session.Keys.FNwkSIntKey.Key
-			fNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, *k, ns.deviceKEKLabel, ns.KeyVault)
+			fNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, types.MustAES128Key(k).OrZero(), ns.deviceKEKLabel, ns.KeyVault)
 			if err != nil {
 				return nil, err
 			}
@@ -1909,7 +1911,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			})
 		}
 		if k := st.Device.Session.Keys.GetNwkSEncKey().GetKey(); k != nil && st.HasSetField("session.keys.nwk_s_enc_key.key") {
-			nwkSEncKey, err := cryptoutil.WrapAES128Key(ctx, *k, ns.deviceKEKLabel, ns.KeyVault)
+			nwkSEncKey, err := cryptoutil.WrapAES128Key(ctx, types.MustAES128Key(k).OrZero(), ns.deviceKEKLabel, ns.KeyVault)
 			if err != nil {
 				return nil, err
 			}
@@ -1925,7 +1927,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			})
 		}
 		if k := st.Device.Session.Keys.GetSNwkSIntKey().GetKey(); k != nil && st.HasSetField("session.keys.s_nwk_s_int_key.key") {
-			sNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, *k, ns.deviceKEKLabel, ns.KeyVault)
+			sNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, types.MustAES128Key(k).OrZero(), ns.deviceKEKLabel, ns.KeyVault)
 			if err != nil {
 				return nil, err
 			}
@@ -1958,7 +1960,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 		if st.HasSetField("pending_session.keys.f_nwk_s_int_key.key") {
 			k := st.Device.PendingSession.Keys.FNwkSIntKey.Key
-			fNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, *k, ns.deviceKEKLabel, ns.KeyVault)
+			fNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, types.MustAES128Key(k).OrZero(), ns.deviceKEKLabel, ns.KeyVault)
 			if err != nil {
 				return nil, err
 			}
@@ -1975,7 +1977,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 		if st.HasSetField("pending_session.keys.nwk_s_enc_key.key") {
 			k := st.Device.PendingSession.Keys.NwkSEncKey.Key
-			nwkSEncKey, err := cryptoutil.WrapAES128Key(ctx, *k, ns.deviceKEKLabel, ns.KeyVault)
+			nwkSEncKey, err := cryptoutil.WrapAES128Key(ctx, types.MustAES128Key(k).OrZero(), ns.deviceKEKLabel, ns.KeyVault)
 			if err != nil {
 				return nil, err
 			}
@@ -1992,7 +1994,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 		if st.HasSetField("pending_session.keys.s_nwk_s_int_key.key") {
 			k := st.Device.PendingSession.Keys.SNwkSIntKey.Key
-			sNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, *k, ns.deviceKEKLabel, ns.KeyVault)
+			sNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, types.MustAES128Key(k).OrZero(), ns.deviceKEKLabel, ns.KeyVault)
 			if err != nil {
 				return nil, err
 			}
@@ -2026,7 +2028,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 		if st.HasSetField("pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.key") {
 			k := st.Device.PendingMacState.QueuedJoinAccept.Keys.FNwkSIntKey.Key
-			fNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, *k, ns.deviceKEKLabel, ns.KeyVault)
+			fNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, types.MustAES128Key(k).OrZero(), ns.deviceKEKLabel, ns.KeyVault)
 			if err != nil {
 				return nil, err
 			}
@@ -2043,7 +2045,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 		if st.HasSetField("pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.key") {
 			k := st.Device.PendingMacState.QueuedJoinAccept.Keys.NwkSEncKey.Key
-			nwkSEncKey, err := cryptoutil.WrapAES128Key(ctx, *k, ns.deviceKEKLabel, ns.KeyVault)
+			nwkSEncKey, err := cryptoutil.WrapAES128Key(ctx, types.MustAES128Key(k).OrZero(), ns.deviceKEKLabel, ns.KeyVault)
 			if err != nil {
 				return nil, err
 			}
@@ -2060,7 +2062,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 		if st.HasSetField("pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key.key") {
 			k := st.Device.PendingMacState.QueuedJoinAccept.Keys.SNwkSIntKey.Key
-			sNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, *k, ns.deviceKEKLabel, ns.KeyVault)
+			sNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, types.MustAES128Key(k).OrZero(), ns.deviceKEKLabel, ns.KeyVault)
 			if err != nil {
 				return nil, err
 			}
