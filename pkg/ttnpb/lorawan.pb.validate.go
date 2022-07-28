@@ -941,7 +941,18 @@ func (m *JoinAcceptPayload) ValidateFields(paths ...string) error {
 			}
 
 		case "net_id":
-			// no validation rules for NetId
+
+			if len(m.GetNetId()) > 0 {
+
+				if len(m.GetNetId()) != 3 {
+					return JoinAcceptPayloadValidationError{
+						field:  "net_id",
+						reason: "value length must be 3 bytes",
+					}
+				}
+
+			}
+
 		case "dev_addr":
 			// no validation rules for DevAddr
 		case "dl_settings":

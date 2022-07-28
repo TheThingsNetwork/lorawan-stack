@@ -1667,7 +1667,7 @@ func (x *JoinAcceptPayload) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if len(x.NetId) > 0 || s.HasField("net_id") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("net_id")
-		x.NetId.MarshalProtoJSON(s.WithField("net_id"))
+		types.MarshalHEXBytes(s.WithField("net_id"), x.NetId)
 	}
 	if len(x.DevAddr) > 0 || s.HasField("dev_addr") {
 		s.WriteMoreIf(&wroteField)
@@ -1714,7 +1714,7 @@ func (x *JoinAcceptPayload) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.JoinNonce = types.Unmarshal3Bytes(s.WithField("join_nonce", false))
 		case "net_id", "netId":
 			s.AddField("net_id")
-			x.NetId.UnmarshalProtoJSON(s.WithField("net_id", false))
+			x.NetId = types.Unmarshal3Bytes(s.WithField("net_id", false))
 		case "dev_addr", "devAddr":
 			s.AddField("dev_addr")
 			x.DevAddr.UnmarshalProtoJSON(s.WithField("dev_addr", false))

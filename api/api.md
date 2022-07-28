@@ -5737,6 +5737,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 | Field | Validations |
 | ----- | ----------- |
 | `join_nonce` | <p>`bytes.len`: `3`</p> |
+| `net_id` | <p>`bytes.len`: `3`</p> |
 | `dl_settings` | <p>`message.required`: `true`</p> |
 | `rx_delay` | <p>`enum.defined_only`: `true`</p> |
 

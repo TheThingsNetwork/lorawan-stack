@@ -291,7 +291,7 @@ func PathsFromSelectFlagsForJoinAcceptPayload(flags *pflag.FlagSet, prefix strin
 func AddSetFlagsForJoinAcceptPayload(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("encrypted", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(customflags.New3BytesFlag(flagsplugin.Prefix("join-nonce", prefix), "", flagsplugin.WithHidden(hidden)))
-	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("net-id", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(customflags.New3BytesFlag(flagsplugin.Prefix("net-id", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("dev-addr", prefix), "", flagsplugin.WithHidden(hidden)))
 	AddSetFlagsForDLSettings(flags, flagsplugin.Prefix("dl-settings", prefix), hidden)
 	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("rx-delay", prefix), flagsplugin.EnumValueDesc(RxDelay_value, RxDelay_customvalue), flagsplugin.WithHidden(hidden)))
@@ -312,7 +312,7 @@ func (m *JoinAcceptPayload) SetFromFlags(flags *pflag.FlagSet, prefix string) (p
 		m.JoinNonce = val
 		paths = append(paths, flagsplugin.Prefix("join_nonce", prefix))
 	}
-	if val, changed, err := types.GetNetIDFromFlag(flags, flagsplugin.Prefix("net_id", prefix)); err != nil {
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("net_id", prefix)); err != nil {
 		return nil, err
 	} else if changed {
 		m.NetId = val
