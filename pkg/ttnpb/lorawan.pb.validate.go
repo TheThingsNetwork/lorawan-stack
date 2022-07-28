@@ -830,7 +830,18 @@ func (m *RejoinRequestPayload) ValidateFields(paths ...string) error {
 			}
 
 		case "dev_eui":
-			// no validation rules for DevEui
+
+			if len(m.GetDevEui()) > 0 {
+
+				if len(m.GetDevEui()) != 8 {
+					return RejoinRequestPayloadValidationError{
+						field:  "dev_eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		case "rejoin_cnt":
 			// no validation rules for RejoinCnt
 		default:

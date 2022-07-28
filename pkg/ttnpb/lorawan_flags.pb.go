@@ -10,7 +10,6 @@ import (
 	flagsplugin "github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	pflag "github.com/spf13/pflag"
 	customflags "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags"
-	types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // AddSelectFlagsForFHDR adds flags to select fields in FHDR.
@@ -181,7 +180,7 @@ func AddSetFlagsForRejoinRequestPayload(flags *pflag.FlagSet, prefix string, hid
 	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("rejoin-type", prefix), flagsplugin.EnumValueDesc(RejoinRequestType_value), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(customflags.New3BytesFlag(flagsplugin.Prefix("net-id", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(customflags.New8BytesFlag(flagsplugin.Prefix("join-eui", prefix), "", flagsplugin.WithHidden(hidden)))
-	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("dev-eui", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(customflags.New8BytesFlag(flagsplugin.Prefix("dev-eui", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("rejoin-cnt", prefix), "", flagsplugin.WithHidden(hidden)))
 }
 
@@ -209,7 +208,7 @@ func (m *RejoinRequestPayload) SetFromFlags(flags *pflag.FlagSet, prefix string)
 		m.JoinEui = val
 		paths = append(paths, flagsplugin.Prefix("join_eui", prefix))
 	}
-	if val, changed, err := types.GetEUI64FromFlag(flags, flagsplugin.Prefix("dev_eui", prefix)); err != nil {
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("dev_eui", prefix)); err != nil {
 		return nil, err
 	} else if changed {
 		m.DevEui = val
