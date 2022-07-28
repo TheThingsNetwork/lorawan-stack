@@ -1,0 +1,2 @@
+id;dev_eui;join_eui;name;frequency_plan_id;lorawan_version
+test-vendor;1111111111111111;1111111111111111;Device with vendorID;EU_863_870_TTN;MAC_V1_0_4

@@ -1,0 +1,2 @@
+id;dev_eui;join_eui;name;frequency_plan_id;lorawan_version;brand_id;model_id;hardware_version;firmware_version;band_id;vendor_id
+test-vendor;1111111111111111;1111111111111111;Device with vendorID;EU_863_870_TTN;MAC_V1_0_4;the-things-industries;generic-node-sensor-edition;1.1;1.0;EU_863_870;1AC
