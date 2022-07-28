@@ -42,11 +42,10 @@ export const hasValidDetails = object =>
  * @returns {boolean} `true` if `error` is a well known backend error object.
  */
 export const isBackend = error =>
-  Boolean(error) &&
-  typeof error === 'object' &&
+  isPlainObject(error) &&
   !('id' in error) &&
   error.message &&
-  (error.code || error.grpc_code)
+  (typeof error.code === 'number' || typeof error.grpc_code === 'number')
 
 /**
  * Returns whether the error is a frontend defined error object.
