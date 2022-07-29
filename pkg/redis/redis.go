@@ -153,25 +153,22 @@ func (c FailoverConfig) Equals(other FailoverConfig) bool {
 
 func (c Config) makeDialer() func(ctx context.Context, network, addr string) (net.Conn, error) {
 	var (
-		tlsConfig    *tls.Config
+		dialer interface {
+			DialContext(ctx context.Context, network, addr string) (net.Conn, error)
+		} = &net.Dialer{}
 		tlsConfigErr error
 	)
 	if c.TLS.Require {
-		tlsConfig = &tls.Config{
+		tlsConfig := &tls.Config{
 			MinVersion: tls.VersionTLS12,
 		}
+		dialer = &tls.Dialer{NetDialer: dialer.(*net.Dialer), Config: tlsConfig}
 		tlsConfigErr = c.TLS.Client.ApplyTo(tlsConfig)
 	}
 	return func(ctx context.Context, network, addr string) (net.Conn, error) {
 		defer trace.StartRegion(ctx, "dial redis").End()
-		var dialer interface {
-			DialContext(ctx context.Context, network, addr string) (net.Conn, error)
-		} = &net.Dialer{}
-		if c.TLS.Require {
-			if tlsConfigErr != nil {
-				return nil, tlsConfigErr
-			}
-			dialer = &tls.Dialer{NetDialer: dialer.(*net.Dialer), Config: tlsConfig}
+		if tlsConfigErr != nil {
+			return nil, tlsConfigErr
 		}
 		conn, err := dialer.DialContext(ctx, network, addr)
 		if err != nil {
