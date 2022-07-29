@@ -41,13 +41,13 @@ var (
 	ttnVersions = map[string]string{
 		"ttn-lw-gateway-server": version.TTN,
 	}
-	invalidLocations = []ttnpb.Location{
+	invalidLocations = []*ttnpb.Location{
 		{Latitude: 0.0, Longitude: 0.0},
 		{Latitude: 10.0, Longitude: 20.0},
 	}
 )
 
-func validLocation(loc ttnpb.Location) bool {
+func validLocation(loc *ttnpb.Location) bool {
 	for _, invalidLoc := range invalidLocations {
 		if (loc.Latitude > invalidLoc.Latitude-delta && loc.Latitude < invalidLoc.Latitude+delta) &&
 			(loc.Longitude > invalidLoc.Longitude-delta && loc.Longitude < invalidLoc.Longitude+delta) {
@@ -59,7 +59,7 @@ func validLocation(loc ttnpb.Location) bool {
 
 // UpstreamMetadata related to an uplink.
 type UpstreamMetadata struct {
-	ID ttnpb.GatewayIdentifiers
+	ID *ttnpb.GatewayIdentifiers
 	IP string
 }
 
@@ -75,7 +75,7 @@ func ToGatewayUp(data Data, md UpstreamMetadata) (*ttnpb.GatewayUp, error) {
 		if err != nil {
 			return nil, err
 		}
-		up.UplinkMessages = append(up.UplinkMessages, &convertedRx)
+		up.UplinkMessages = append(up.UplinkMessages, convertedRx)
 	}
 	if data.Stat != nil {
 		up.GatewayStatus = convertStatus(*data.Stat, md)
@@ -115,9 +115,9 @@ var (
 	}
 )
 
-func v1Metadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*ttnpb.RxMetadata {
+func v1Metadata(rx RxPacket, gatewayID *ttnpb.GatewayIdentifiers) []*ttnpb.RxMetadata {
 	md := &ttnpb.RxMetadata{
-		GatewayIds:   &gatewayID,
+		GatewayIds:   gatewayID,
 		AntennaIndex: 0,
 		ChannelIndex: uint32(rx.Chan),
 		Timestamp:    rx.Tmst,
@@ -135,11 +135,11 @@ func v1Metadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*ttnpb.RxMeta
 	return []*ttnpb.RxMetadata{md}
 }
 
-func v2Metadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*ttnpb.RxMetadata {
+func v2Metadata(rx RxPacket, gatewayID *ttnpb.GatewayIdentifiers) []*ttnpb.RxMetadata {
 	md := make([]*ttnpb.RxMetadata, 0)
 	for _, signal := range rx.RSig {
 		signalMetadata := &ttnpb.RxMetadata{
-			GatewayIds:      &gatewayID,
+			GatewayIds:      gatewayID,
 			AntennaIndex:    uint32(signal.Ant),
 			ChannelIndex:    uint32(signal.Chan),
 			Timestamp:       rx.Tmst,
@@ -172,8 +172,8 @@ func v2Metadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*ttnpb.RxMeta
 	return md
 }
 
-func convertUplink(rx RxPacket, md UpstreamMetadata) (ttnpb.UplinkMessage, error) {
-	up := ttnpb.UplinkMessage{
+func convertUplink(rx RxPacket, md UpstreamMetadata) (*ttnpb.UplinkMessage, error) {
+	up := &ttnpb.UplinkMessage{
 		Settings: &ttnpb.TxSettings{
 			Frequency: uint64(rx.Freq * 1000000),
 			DataRate:  rx.DatR.DataRate,
@@ -275,7 +275,7 @@ func convertStatus(stat Stat, md UpstreamMetadata) *ttnpb.GatewayStatus {
 		if stat.Alti != nil {
 			loc.Altitude = *stat.Alti
 		}
-		if validLocation(*loc) {
+		if validLocation(loc) {
 			status.AntennaLocations = []*ttnpb.Location{loc}
 		}
 	}

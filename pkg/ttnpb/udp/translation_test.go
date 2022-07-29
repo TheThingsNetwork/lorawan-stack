@@ -32,7 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/version"
 )
 
-var ids = ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}
+var ids = &ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}
 
 func uint32Ptr(v uint32) *uint32 { return &v }
 func int32Ptr(v int32) *int32    { return &v }
@@ -191,7 +191,7 @@ func TestToGatewayUpLRFHSS(t *testing.T) {
 
 func TestToGatewayUpRoundtrip(t *testing.T) {
 	expectedMd := udp.UpstreamMetadata{
-		ID: ttnpb.GatewayIdentifiers{
+		ID: &ttnpb.GatewayIdentifiers{
 			Eui: &types.EUI64{0xAA, 0xEE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 		},
 		IP: "1.1.1.1",
