@@ -3364,7 +3364,7 @@ Authentication code for end devices.
 
 | Field | Validations |
 | ----- | ----------- |
-| `value` | <p>`string.pattern`: `^[A-Z0-9]{1,32}$`</p> |
+| `value` | <p>`string.pattern`: `^[a-zA-Z0-9]{1,32}$`</p> |
 
 ### <a name="ttn.lorawan.v3.EndDeviceTemplate">Message `EndDeviceTemplate`</a>
 

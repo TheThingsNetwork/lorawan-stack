@@ -557,7 +557,7 @@ enum PowerState {
 // Authentication code for end devices.
 message EndDeviceAuthenticationCode {
   option (thethings.flags.message) = { select: true, set: true };
-  string value = 1 [(validate.rules).string.pattern = "^[A-Z0-9]{1,32}$"];
+  string value = 1 [(validate.rules).string.pattern = "^[a-zA-Z0-9]{1,32}$"];
   google.protobuf.Timestamp valid_from = 2;
   google.protobuf.Timestamp valid_to = 3;
 }

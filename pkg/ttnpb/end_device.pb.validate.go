@@ -1732,7 +1732,7 @@ func (m *EndDeviceAuthenticationCode) ValidateFields(paths ...string) error {
 			if !_EndDeviceAuthenticationCode_Value_Pattern.MatchString(m.GetValue()) {
 				return EndDeviceAuthenticationCodeValidationError{
 					field:  "value",
-					reason: "value does not match regex pattern \"^[A-Z0-9]{1,32}$\"",
+					reason: "value does not match regex pattern \"^[a-zA-Z0-9]{1,32}$\"",
 				}
 			}
 
@@ -1827,7 +1827,7 @@ var _ interface {
 	ErrorName() string
 } = EndDeviceAuthenticationCodeValidationError{}
 
-var _EndDeviceAuthenticationCode_Value_Pattern = regexp.MustCompile("^[A-Z0-9]{1,32}$")
+var _EndDeviceAuthenticationCode_Value_Pattern = regexp.MustCompile("^[a-zA-Z0-9]{1,32}$")
 
 // ValidateFields checks the field values on EndDevice with the rules defined
 // in the proto definition for this message. If any rules are violated, an

@@ -14077,7 +14077,7 @@
                 "validate.rules": [
                   {
                     "name": "string.pattern",
-                    "value": "^[A-Z0-9]{1,32}$"
+                    "value": "^[a-zA-Z0-9]{1,32}$"
                   }
                 ]
               }
