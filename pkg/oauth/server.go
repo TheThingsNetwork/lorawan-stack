@@ -27,8 +27,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/account/session"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	oauth_store "go.thethings.network/lorawan-stack/v3/pkg/oauth/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
@@ -48,30 +48,28 @@ type server struct {
 	c             *component.Component
 	config        Config
 	osinConfig    *osin.ServerConfig
-	store         Store
+	store         oauth_store.TransactionalInterface
 	session       session.Session
 	generateCSP   func(config *Config, nonce string) string
 	schemaDecoder *schema.Decoder
 }
 
-// Store used by the OAuth server.
-type Store interface {
-	// UserStore and UserSessionStore are needed for user login/logout.
-	store.UserStore
-	store.UserSessionStore
-	// ClientStore is needed for getting the OAuth client.
-	store.ClientStore
-	// OAuth is needed for OAuth authorizations.
-	store.OAuthStore
+type sessionStore struct {
+	oauth_store.TransactionalInterface
+}
+
+// Transact implements oauth_store.Interface.
+func (s *sessionStore) Transact(ctx context.Context, f func(ctx context.Context, st session.Store) error) error {
+	return s.TransactionalInterface.Transact(ctx, func(ctx context.Context, st oauth_store.Interface) error { return f(ctx, st) })
 }
 
 // NewServer returns a new OAuth server on top of the given store.
-func NewServer(c *component.Component, store Store, config Config, cspFunc func(config *Config, nonce string) string) (Server, error) {
+func NewServer(c *component.Component, store oauth_store.TransactionalInterface, config Config, cspFunc func(config *Config, nonce string) string) (Server, error) {
 	s := &server{
 		c:             c,
 		config:        config,
 		store:         store,
-		session:       session.Session{Store: store},
+		session:       session.Session{Store: &sessionStore{store}},
 		generateCSP:   cspFunc,
 		schemaDecoder: schema.NewDecoder(),
 	}
@@ -117,9 +115,8 @@ func (s *server) now() time.Time { return time.Now().UTC() }
 
 func (s *server) oauth2(ctx context.Context) *osin.Server {
 	oauth2 := osin.NewServer(s.osinConfig, &storage{
-		ctx:     ctx,
-		clients: s.store,
-		oauth:   s.store,
+		ctx:   ctx,
+		store: s.store,
 	})
 	oauth2.AuthorizeTokenGen = s
 	oauth2.AccessTokenGen = s
