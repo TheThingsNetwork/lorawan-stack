@@ -21,6 +21,7 @@ import (
 	"strings"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/account/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/pbkdf2"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -163,7 +164,11 @@ func (s *server) TokenLogin(w http.ResponseWriter, r *http.Request) {
 		webhandlers.Error(w, r, err)
 		return
 	}
-	loginToken, err := s.store.ConsumeLoginToken(ctx, tokenLoginRequest.Token)
+	var loginToken *ttnpb.LoginToken
+	err := s.store.Transact(ctx, func(ctx context.Context, st store.Interface) (err error) {
+		loginToken, err = st.ConsumeLoginToken(ctx, tokenLoginRequest.Token)
+		return err
+	})
 	if err != nil {
 		webhandlers.Error(w, r, err)
 		return
@@ -185,9 +190,13 @@ func (s *server) CreateUserSession(w http.ResponseWriter, r *http.Request, userI
 	if err != nil {
 		return err
 	}
-	session, err := s.store.CreateSession(ctx, &ttnpb.UserSession{
-		UserIds:       userIDs,
-		SessionSecret: hashedSecret,
+	var session *ttnpb.UserSession
+	err = s.store.Transact(ctx, func(ctx context.Context, st store.Interface) error {
+		session, err = st.CreateSession(ctx, &ttnpb.UserSession{
+			UserIds:       userIDs,
+			SessionSecret: hashedSecret,
+		})
+		return err
 	})
 	if err != nil {
 		return err
@@ -209,7 +218,10 @@ func (s *server) Logout(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx := r.Context()
 	events.Publish(oauth.EvtUserLogout.NewWithIdentifiersAndData(ctx, session.GetUserIds(), nil))
-	if err := s.store.DeleteSession(ctx, session.GetUserIds(), session.SessionId); err != nil {
+	err = s.store.Transact(ctx, func(ctx context.Context, st store.Interface) error {
+		return st.DeleteSession(ctx, session.GetUserIds(), session.SessionId)
+	})
+	if err != nil {
 		webhandlers.Error(w, r, err)
 		return
 	}

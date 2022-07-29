@@ -110,7 +110,7 @@ func (Dev) SQLDump() error {
 		return err
 	}
 	return execDockerCompose("exec", "-T", "postgres",
-		"pg_dump", "--clean", "--if-exists", "-Fc", "-f", "/var/lib/ttn-lorawan/cache/database.pgdump", devDatabaseName,
+		"pg_dump", "-Fc", "-f", "/var/lib/ttn-lorawan/cache/database.pgdump", devDatabaseName,
 	)
 }
 
@@ -123,8 +123,12 @@ func (Dev) SQLRestore() error {
 	if _, err := os.Stat(d); errors.Is(err, os.ErrNotExist) {
 		return fmt.Errorf("Dumpfile does not exist: %w", d)
 	}
-	return execDockerCompose("exec", "-T", "postgres",
-		"pg_restore", "--clean", "--if-exists", "-d", devDatabaseName, "-Fc", "/var/lib/ttn-lorawan/cache/database.pgdump",
+	return execDockerCompose("exec", "-T", "postgres", "/bin/bash", "-c",
+		strings.Join([]string{
+			fmt.Sprintf("dropdb --if-exists --force %s", devDatabaseName),
+			fmt.Sprintf("createdb %s", devDatabaseName),
+			fmt.Sprintf("pg_restore -d %s -Fc /var/lib/ttn-lorawan/cache/database.pgdump", devDatabaseName),
+		}, " && "),
 	)
 }
 

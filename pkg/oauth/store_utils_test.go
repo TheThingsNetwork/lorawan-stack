@@ -18,6 +18,7 @@ import (
 	"context"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	oauth_store "go.thethings.network/lorawan-stack/v3/pkg/oauth/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -154,4 +155,8 @@ func (s *mockStore) DeleteAccessToken(ctx context.Context, tokenID string) error
 	}
 	s.calls = append(s.calls, "DeleteAccessToken")
 	return s.err.deleteAccessToken
+}
+
+func (s *mockStore) Transact(ctx context.Context, f func(context.Context, oauth_store.Interface) error) error {
+	return f(ctx, s)
 }

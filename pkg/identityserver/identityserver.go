@@ -31,6 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/interop"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/oauth"
+	oauth_store "go.thethings.network/lorawan-stack/v3/pkg/oauth/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
@@ -121,6 +122,15 @@ func (as *accountAppStore) Transact(ctx context.Context, f func(context.Context,
 	return as.TransactionalStore.Transact(ctx, func(ctx context.Context, st store.Store) error { return f(ctx, st) })
 }
 
+type oauthAppStore struct {
+	store.TransactionalStore
+}
+
+// Transact implements oauth_store.Interface.
+func (as *oauthAppStore) Transact(ctx context.Context, f func(context.Context, oauth_store.Interface) error) error {
+	return as.TransactionalStore.Transact(ctx, func(ctx context.Context, st store.Store) error { return f(ctx, st) })
+}
+
 var errDBNeedsMigration = errors.Define("db_needs_migration", "the database needs to be migrated")
 
 // New returns new *IdentityServer.
@@ -137,7 +147,10 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 
 	is.config.OAuth.CSRFAuthKey = is.GetBaseConfig(is.Context()).HTTP.Cookie.HashKey
 	is.config.OAuth.UI.FrontendConfig.EnableUserRegistration = is.config.UserRegistration.Enabled
-	is.oauth, err = oauth.NewServer(c, is.store, is.config.OAuth, GenerateCSPString)
+	is.oauth, err = oauth.NewServer(c, &oauthAppStore{is.store}, is.config.OAuth, GenerateCSPString)
+	if err != nil {
+		return nil, err
+	}
 
 	is.account, err = account.NewServer(c, &accountAppStore{is.store}, is.config.OAuth, GenerateCSPString)
 	if err != nil {

@@ -15,12 +15,15 @@
 package oauth
 
 import (
+	"context"
 	"net/http"
 	"net/url"
 
-	osin "github.com/openshift/osin"
+	"github.com/openshift/osin"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/oauth/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 )
 
@@ -43,57 +46,60 @@ func (s *server) ClientLogout(w http.ResponseWriter, r *http.Request) {
 		webhandlers.Error(w, r, errMissingAccessTokenIDParam.New())
 		return
 	}
-	at, err := s.store.GetAccessToken(ctx, accessTokenID)
-	if err != nil && !errors.IsNotFound(err) {
-		webhandlers.Error(w, r, err)
-		return
-	}
-	if at != nil {
-		client, err := s.store.GetClient(ctx, at.ClientIds, []string{"logout_redirect_uris"})
-		if err != nil {
-			webhandlers.Error(w, r, err)
-			return
-		}
-		if err = s.store.DeleteAccessToken(ctx, accessTokenID); err != nil {
-			webhandlers.Error(w, r, err)
-			return
-		}
-		events.Publish(evtAccessTokenDeleted.NewWithIdentifiersAndData(ctx, at.UserIds, nil))
-		err = s.store.DeleteSession(ctx, at.UserIds, at.UserSessionId)
+	err := s.store.Transact(ctx, func(ctx context.Context, st store.Interface) error {
+		at, err := st.GetAccessToken(ctx, accessTokenID)
 		if err != nil && !errors.IsNotFound(err) {
-			webhandlers.Error(w, r, err)
-			return
+			return err
 		}
-		events.Publish(EvtUserLogout.NewWithIdentifiersAndData(ctx, at.UserIds, nil))
-		redirectParam := r.URL.Query().Get("post_logout_redirect_uri")
-		if redirectParam == "" {
-			if len(client.LogoutRedirectUris) != 0 {
-				redirectURI = client.LogoutRedirectUris[0]
+		if at != nil {
+			client, err := st.GetClient(ctx, at.ClientIds, []string{"logout_redirect_uris"})
+			if err != nil {
+				return err
 			}
-		} else {
-			for _, uri := range client.LogoutRedirectUris {
-				redirectURI, err = osin.ValidateUri(uri, redirectParam)
-				if err == nil {
-					break
+			if err = st.DeleteAccessToken(ctx, accessTokenID); err != nil {
+				return err
+			}
+			events.Publish(evtAccessTokenDeleted.NewWithIdentifiersAndData(ctx, at.UserIds, nil))
+			err = st.DeleteSession(ctx, at.UserIds, at.UserSessionId)
+			if err != nil && !errors.IsNotFound(err) {
+				return err
+			}
+			events.Publish(EvtUserLogout.NewWithIdentifiersAndData(ctx, at.UserIds, nil))
+			redirectParam := r.URL.Query().Get("post_logout_redirect_uri")
+			if redirectParam == "" {
+				if len(client.LogoutRedirectUris) != 0 {
+					redirectURI = client.LogoutRedirectUris[0]
+				}
+			} else {
+				for _, uri := range client.LogoutRedirectUris {
+					redirectURI, err = osin.ValidateUri(uri, redirectParam)
+					if err == nil {
+						break
+					}
+				}
+				if err != nil {
+					return errInvalidLogoutRedirectURI.WithCause(err)
 				}
 			}
-			if err != nil {
-				webhandlers.Error(w, r, errInvalidLogoutRedirectURI.WithCause(err))
-				return
+		}
+		var session *ttnpb.UserSession
+		r, session, err = s.session.Get(w, r)
+		if err != nil && !errors.IsUnauthenticated(err) && !errors.IsNotFound(err) {
+			return err
+		}
+		if session != nil {
+			events.Publish(evtUserSessionTerminated.NewWithIdentifiersAndData(ctx, session.GetUserIds(), nil))
+			if session.GetSessionId() != at.GetUserSessionId() {
+				if err = st.DeleteSession(ctx, session.GetUserIds(), session.SessionId); err != nil {
+					return err
+				}
 			}
 		}
-	}
-	r, session, err := s.session.Get(w, r)
-	if err != nil && !errors.IsUnauthenticated(err) && !errors.IsNotFound(err) {
+		return nil
+	})
+	if err != nil {
 		webhandlers.Error(w, r, err)
 		return
-	}
-	if session != nil {
-		events.Publish(evtUserSessionTerminated.NewWithIdentifiersAndData(ctx, session.GetUserIds(), nil))
-		if err = s.store.DeleteSession(ctx, session.GetUserIds(), session.SessionId); err != nil {
-			webhandlers.Error(w, r, err)
-			return
-		}
 	}
 	s.session.RemoveAuthCookie(w, r)
 	url, err := url.Parse(redirectURI)

@@ -42,19 +42,22 @@ type Server interface {
 	Logout(w http.ResponseWriter, r *http.Request)
 }
 
-// Component represents the Component to the Account app.
-type Component interface {
-	Context() context.Context
-	RateLimiter() ratelimit.Interface
-}
-
 type server struct {
-	c             Component
+	c             *component.Component
 	config        oauth.Config
 	store         account_store.TransactionalInterface
 	session       sess.Session
 	generateCSP   func(config *oauth.Config, nonce string) string
 	schemaDecoder *schema.Decoder
+}
+
+type sessionStore struct {
+	account_store.TransactionalInterface
+}
+
+// Transact implements oauth_store.Interface.
+func (s *sessionStore) Transact(ctx context.Context, f func(ctx context.Context, st sess.Store) error) error {
+	return s.TransactionalInterface.Transact(ctx, func(ctx context.Context, st account_store.Interface) error { return f(ctx, st) })
 }
 
 // NewServer returns a new account app on top of the given store.
@@ -63,7 +66,7 @@ func NewServer(c *component.Component, store account_store.TransactionalInterfac
 		c:             c,
 		config:        config,
 		store:         store,
-		session:       sess.Session{Store: store},
+		session:       sess.Session{Store: &sessionStore{store}},
 		generateCSP:   cspFunc,
 		schemaDecoder: schema.NewDecoder(),
 	}

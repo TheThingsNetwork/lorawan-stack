@@ -29,6 +29,7 @@ import (
 	"github.com/uptrace/bun/driver/pgdriver"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
 
 type baseDB struct {
@@ -232,12 +233,29 @@ type Store struct {
 	*notificationStore
 }
 
+const (
+	initialDelayOnUnavailable = 50 * time.Millisecond
+	maxAttempts               = 3
+)
+
 // Transact implements the store.TransactionalStore interface.
 func (s *Store) Transact(ctx context.Context, fc func(context.Context, store.Store) error) (err error) {
-	return s.baseStore.transact(ctx, func(ctx context.Context, idb bun.IDB) error {
-		baseStore := s.baseDB.baseStore()
-		baseStore.DB = idb
-
-		return fc(ctx, newStore(baseStore))
-	})
+	delayOnUnavailable := initialDelayOnUnavailable
+	for i := 0; i < maxAttempts; i++ {
+		err = s.baseStore.transact(ctx, func(ctx context.Context, idb bun.IDB) error {
+			baseStore := s.baseDB.baseStore()
+			baseStore.DB = idb
+			return fc(ctx, newStore(baseStore))
+		})
+		if !errors.Is(err, errUnavailable) {
+			break
+		}
+		log.FromContext(ctx).WithError(err).WithFields(log.Fields(
+			"delay", delayOnUnavailable,
+			"attempt", i+1,
+		)).Warn("Database unavailable, retrying transaction...")
+		time.Sleep(delayOnUnavailable)
+		delayOnUnavailable *= 2
+	}
+	return err
 }

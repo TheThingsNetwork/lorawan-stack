@@ -34,7 +34,7 @@ var errIncorrectPasswordOrUserID = errors.DefineInvalidArgument("no_user_id_pass
 
 // Session is the session helper.
 type Session struct {
-	Store Store
+	Store TransactionalStore
 }
 
 // Store used by the account app server.
@@ -42,6 +42,14 @@ type Store interface {
 	// UserStore and UserSessionStore are needed for user login/logout.
 	store.UserStore
 	store.UserSessionStore
+}
+
+// TransactionalStore is Store, but with a method that uses a transaction.
+type TransactionalStore interface {
+	Store
+
+	// Transact runs a transaction using the store.
+	Transact(context.Context, func(context.Context, Store) error) error
 }
 
 func (s *Session) authCookie() *cookie.Cookie {
@@ -99,11 +107,15 @@ func (s *Session) Get(w http.ResponseWriter, r *http.Request) (*http.Request, *t
 	if err != nil {
 		return r, nil, err
 	}
-	session, err := s.Store.GetSession(
-		ctx,
-		&ttnpb.UserIdentifiers{UserId: cookie.UserID},
-		cookie.SessionID,
-	)
+	var session *ttnpb.UserSession
+	err = s.Store.Transact(ctx, func(ctx context.Context, st Store) (err error) {
+		session, err = st.GetSession(
+			ctx,
+			&ttnpb.UserIdentifiers{UserId: cookie.UserID},
+			cookie.SessionID,
+		)
+		return err
+	})
 	if err != nil {
 		if errors.IsNotFound(err) {
 			s.RemoveAuthCookie(w, r)
@@ -131,11 +143,15 @@ func (s *Session) GetUser(w http.ResponseWriter, r *http.Request) (*http.Request
 		return r, nil, err
 	}
 	ctx := r.Context()
-	user, err := s.Store.GetUser(
-		ctx,
-		&ttnpb.UserIdentifiers{UserId: session.GetUserIds().GetUserId()},
-		nil,
-	)
+	var user *ttnpb.User
+	err = s.Store.Transact(ctx, func(ctx context.Context, st Store) (err error) {
+		user, err = st.GetUser(
+			ctx,
+			&ttnpb.UserIdentifiers{UserId: session.GetUserIds().GetUserId()},
+			nil,
+		)
+		return err
+	})
 	if err != nil {
 		return r, nil, err
 	}
@@ -148,11 +164,15 @@ func (s *Session) DoLogin(ctx context.Context, userID, password string) error {
 	if err := ids.ValidateContext(ctx); err != nil {
 		return err
 	}
-	user, err := s.Store.GetUser(
-		ctx,
-		ids,
-		[]string{"password"},
-	)
+	var user *ttnpb.User
+	err := s.Store.Transact(ctx, func(ctx context.Context, st Store) (err error) {
+		user, err = st.GetUser(
+			ctx,
+			ids,
+			[]string{"password"},
+		)
+		return err
+	})
 	if err != nil {
 		if errors.IsNotFound(err) {
 			return errIncorrectPasswordOrUserID.New()
