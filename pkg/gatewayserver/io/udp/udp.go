@@ -247,7 +247,7 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64, addr *net.UDPAddr) (
 func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet) error {
 	logger := log.FromContext(ctx)
 	md := encoding.UpstreamMetadata{
-		ID: *state.io.Gateway().GetIds(),
+		ID: state.io.Gateway().GetIds(),
 		IP: packet.GatewayAddr.IP.String(),
 	}
 
