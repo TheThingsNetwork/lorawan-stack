@@ -220,7 +220,7 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 	}
 
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "root_keys.app_key.key") &&
-		types.MustAES128Key(req.EndDevice.GetRootKeys().GetAppKey().GetKey()).OrZero().IsZero() { {
+		types.MustAES128Key(req.EndDevice.GetRootKeys().GetAppKey().GetKey()).OrZero().IsZero() {
 		return nil, errInvalidFieldValue.WithAttributes("field", "root_keys.app_key.key")
 	}
 
