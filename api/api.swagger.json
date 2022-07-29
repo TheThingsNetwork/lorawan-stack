@@ -19371,6 +19371,9 @@
         },
         "service_data": {
           "$ref": "#/definitions/v3ApplicationWebhookTemplateMessage"
+        },
+        "field_mask": {
+          "type": "string"
         }
       }
     },
