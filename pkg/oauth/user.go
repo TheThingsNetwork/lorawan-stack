@@ -89,8 +89,10 @@ func (s *server) ClientLogout(w http.ResponseWriter, r *http.Request) {
 		}
 		if session != nil {
 			events.Publish(evtUserSessionTerminated.NewWithIdentifiersAndData(ctx, session.GetUserIds(), nil))
-			if err = st.DeleteSession(ctx, session.GetUserIds(), session.SessionId); err != nil {
-				return err
+			if session.GetSessionId() != at.GetUserSessionId() {
+				if err = st.DeleteSession(ctx, session.GetUserIds(), session.SessionId); err != nil {
+					return err
+				}
 			}
 		}
 		return nil
