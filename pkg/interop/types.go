@@ -342,17 +342,16 @@ func (k *KeyEnvelope) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &aux); err != nil {
 		return err
 	}
-	var key *types.AES128Key
-	var encryptedKey []byte
+	var keyBytes,
+		encryptedKey []byte
 	if aux.KEKLabel != "" {
 		encryptedKey = aux.AESKey
 	} else {
-		key = new(types.AES128Key)
-		copy(key[:], aux.AESKey)
+		keyBytes = aux.AESKey
 	}
 	*k = KeyEnvelope{
 		KekLabel:     aux.KEKLabel,
-		Key:          key,
+		Key:          keyBytes,
 		EncryptedKey: encryptedKey,
 	}
 	return nil

@@ -60,13 +60,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 	sessionKeys := &ttnpb.SessionKeys{
 		FNwkSIntKey: &ttnpb.KeyEnvelope{
-			Key: &test.DefaultFNwkSIntKey,
+			Key: test.DefaultFNwkSIntKey.Bytes(),
 		},
 		NwkSEncKey: &ttnpb.KeyEnvelope{
-			Key: &test.DefaultNwkSEncKey,
+			Key: test.DefaultNwkSEncKey.Bytes(),
 		},
 		SNwkSIntKey: &ttnpb.KeyEnvelope{
-			Key: &test.DefaultSNwkSIntKey,
+			Key: test.DefaultSNwkSIntKey.Bytes(),
 		},
 		SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 	}

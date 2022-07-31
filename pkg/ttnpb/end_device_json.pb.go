@@ -76,8 +76,7 @@ func (x *Session) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.Keys != nil || s.HasField("keys") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("keys")
-		// NOTE: SessionKeys does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.Keys)
+		x.Keys.MarshalProtoJSON(s.WithField("keys"))
 	}
 	if x.LastFCntUp != 0 || s.HasField("last_f_cnt_up") {
 		s.WriteMoreIf(&wroteField)
@@ -140,15 +139,12 @@ func (x *Session) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			s.AddField("dev_addr")
 			x.DevAddr = types.Unmarshal4Bytes(s.WithField("dev_addr", false))
 		case "keys":
-			s.AddField("keys")
 			if s.ReadNil() {
 				x.Keys = nil
 				return
 			}
-			// NOTE: SessionKeys does not seem to implement UnmarshalProtoJSON.
-			var v SessionKeys
-			gogo.UnmarshalMessage(s, &v)
-			x.Keys = &v
+			x.Keys = &SessionKeys{}
+			x.Keys.UnmarshalProtoJSON(s.WithField("keys", true))
 		case "last_f_cnt_up", "lastFCntUp":
 			s.AddField("last_f_cnt_up")
 			x.LastFCntUp = s.ReadUint32()
@@ -1618,8 +1614,7 @@ func (x *MACState_JoinAccept) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.Keys != nil || s.HasField("keys") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("keys")
-		// NOTE: SessionKeys does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.Keys)
+		x.Keys.MarshalProtoJSON(s.WithField("keys"))
 	}
 	if len(x.CorrelationIds) > 0 || s.HasField("correlation_ids") {
 		s.WriteMoreIf(&wroteField)
@@ -1664,15 +1659,12 @@ func (x *MACState_JoinAccept) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.Request = &MACState_JoinRequest{}
 			x.Request.UnmarshalProtoJSON(s.WithField("request", true))
 		case "keys":
-			s.AddField("keys")
 			if s.ReadNil() {
 				x.Keys = nil
 				return
 			}
-			// NOTE: SessionKeys does not seem to implement UnmarshalProtoJSON.
-			var v SessionKeys
-			gogo.UnmarshalMessage(s, &v)
-			x.Keys = &v
+			x.Keys = &SessionKeys{}
+			x.Keys.UnmarshalProtoJSON(s.WithField("keys", true))
 		case "correlation_ids", "correlationIds":
 			s.AddField("correlation_ids")
 			if s.ReadNil() {
@@ -2775,8 +2767,7 @@ func (x *EndDevice) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.RootKeys != nil || s.HasField("root_keys") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("root_keys")
-		// NOTE: RootKeys does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.RootKeys)
+		x.RootKeys.MarshalProtoJSON(s.WithField("root_keys"))
 	}
 	if len(x.NetId) > 0 || s.HasField("net_id") {
 		s.WriteMoreIf(&wroteField)
@@ -3080,15 +3071,12 @@ func (x *EndDevice) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			s.AddField("resets_join_nonces")
 			x.ResetsJoinNonces = s.ReadBool()
 		case "root_keys", "rootKeys":
-			s.AddField("root_keys")
 			if s.ReadNil() {
 				x.RootKeys = nil
 				return
 			}
-			// NOTE: RootKeys does not seem to implement UnmarshalProtoJSON.
-			var v RootKeys
-			gogo.UnmarshalMessage(s, &v)
-			x.RootKeys = &v
+			x.RootKeys = &RootKeys{}
+			x.RootKeys.UnmarshalProtoJSON(s.WithField("root_keys", true))
 		case "net_id", "netId":
 			s.AddField("net_id")
 			x.NetId = types.Unmarshal3Bytes(s.WithField("net_id", false))

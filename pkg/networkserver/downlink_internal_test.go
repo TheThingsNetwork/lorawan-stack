@@ -339,10 +339,10 @@ func TestGenerateDataDownlink(t *testing.T) {
 					LastNFCntDown: 41,
 					Keys: &ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: &nwkSEncKey,
+							Key: nwkSEncKey.Bytes(),
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: &sNwkSIntKey,
+							Key: sNwkSIntKey.Bytes(),
 						},
 					},
 				},
@@ -408,10 +408,10 @@ func TestGenerateDataDownlink(t *testing.T) {
 						LastNFCntDown: 41,
 						Keys: &ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: &nwkSEncKey,
+								Key: nwkSEncKey.Bytes(),
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &sNwkSIntKey,
+								Key: sNwkSIntKey.Bytes(),
 							},
 						},
 					},
@@ -450,10 +450,10 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DevAddr: devAddr.Bytes(),
 					Keys: &ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: &nwkSEncKey,
+							Key: nwkSEncKey.Bytes(),
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: &sNwkSIntKey,
+							Key: sNwkSIntKey.Bytes(),
 						},
 					},
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -526,10 +526,10 @@ func TestGenerateDataDownlink(t *testing.T) {
 						DevAddr: devAddr.Bytes(),
 						Keys: &ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: &nwkSEncKey,
+								Key: nwkSEncKey.Bytes(),
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &sNwkSIntKey,
+								Key: sNwkSIntKey.Bytes(),
 							},
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{},
@@ -572,10 +572,10 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DevAddr: devAddr.Bytes(),
 					Keys: &ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: &nwkSEncKey,
+							Key: nwkSEncKey.Bytes(),
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: &sNwkSIntKey,
+							Key: sNwkSIntKey.Bytes(),
 						},
 					},
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -652,10 +652,10 @@ func TestGenerateDataDownlink(t *testing.T) {
 						DevAddr: devAddr.Bytes(),
 						Keys: &ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: &nwkSEncKey,
+								Key: nwkSEncKey.Bytes(),
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &sNwkSIntKey,
+								Key: sNwkSIntKey.Bytes(),
 							},
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{},
@@ -694,10 +694,10 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DevAddr: devAddr.Bytes(),
 					Keys: &ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: &nwkSEncKey,
+							Key: nwkSEncKey.Bytes(),
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: &sNwkSIntKey,
+							Key: sNwkSIntKey.Bytes(),
 						},
 					},
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -773,10 +773,10 @@ func TestGenerateDataDownlink(t *testing.T) {
 						DevAddr: devAddr.Bytes(),
 						Keys: &ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: &nwkSEncKey,
+								Key: nwkSEncKey.Bytes(),
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &sNwkSIntKey,
+								Key: sNwkSIntKey.Bytes(),
 							},
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{},
@@ -819,10 +819,10 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DevAddr: devAddr.Bytes(),
 					Keys: &ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: &nwkSEncKey,
+							Key: nwkSEncKey.Bytes(),
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: &sNwkSIntKey,
+							Key: sNwkSIntKey.Bytes(),
 						},
 					},
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -903,10 +903,10 @@ func TestGenerateDataDownlink(t *testing.T) {
 						DevAddr: devAddr.Bytes(),
 						Keys: &ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: &nwkSEncKey,
+								Key: nwkSEncKey.Bytes(),
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &sNwkSIntKey,
+								Key: sNwkSIntKey.Bytes(),
 							},
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{},
@@ -957,10 +957,10 @@ func TestGenerateDataDownlink(t *testing.T) {
 					LastNFCntDown: 41,
 					Keys: &ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: &nwkSEncKey,
+							Key: nwkSEncKey.Bytes(),
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: &sNwkSIntKey,
+							Key: sNwkSIntKey.Bytes(),
 						},
 					},
 				},
@@ -1039,10 +1039,10 @@ func TestGenerateDataDownlink(t *testing.T) {
 						LastNFCntDown: 41,
 						Keys: &ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: &nwkSEncKey,
+								Key: nwkSEncKey.Bytes(),
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &sNwkSIntKey,
+								Key: sNwkSIntKey.Bytes(),
 							},
 						},
 					},
@@ -1090,10 +1090,10 @@ func TestGenerateDataDownlink(t *testing.T) {
 					LastNFCntDown: 41,
 					Keys: &ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: &nwkSEncKey,
+							Key: nwkSEncKey.Bytes(),
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: &sNwkSIntKey,
+							Key: sNwkSIntKey.Bytes(),
 						},
 					},
 				},
@@ -1170,10 +1170,10 @@ func TestGenerateDataDownlink(t *testing.T) {
 						LastNFCntDown: 41,
 						Keys: &ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: &nwkSEncKey,
+								Key: nwkSEncKey.Bytes(),
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &sNwkSIntKey,
+								Key: sNwkSIntKey.Bytes(),
 							},
 						},
 					},
@@ -1271,19 +1271,19 @@ func generateSession() *ttnpb.Session {
 		SessionKeyId: []byte{0x01, 0x02, 0x03, 0x04},
 		FNwkSIntKey: &ttnpb.KeyEnvelope{
 			KekLabel: "FNwkSIntKey",
-			Key:      &key,
+			Key:      key.Bytes(),
 		},
 		SNwkSIntKey: &ttnpb.KeyEnvelope{
 			KekLabel: "SNwkSIntKey",
-			Key:      &key,
+			Key:      key.Bytes(),
 		},
 		NwkSEncKey: &ttnpb.KeyEnvelope{
 			KekLabel: "NwkSEncKey",
-			Key:      &key,
+			Key:      key.Bytes(),
 		},
 		AppSKey: &ttnpb.KeyEnvelope{
 			KekLabel: "AppSKey",
-			Key:      &key,
+			Key:      key.Bytes(),
 		},
 	}
 	queuedDownlinks := make([]*ttnpb.ApplicationDownlink, randomVal%5)

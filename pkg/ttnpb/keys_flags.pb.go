@@ -10,7 +10,6 @@ import (
 	flagsplugin "github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	pflag "github.com/spf13/pflag"
 	customflags "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags"
-	types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // AddSelectFlagsForKeyEnvelope adds flags to select fields in KeyEnvelope.
@@ -49,10 +48,10 @@ func AddSetFlagsForKeyEnvelope(flags *pflag.FlagSet, prefix string, hidden bool)
 
 // SetFromFlags sets the KeyEnvelope message from flags.
 func (m *KeyEnvelope) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
-	if val, changed, err := types.GetAES128KeyFromFlag(flags, flagsplugin.Prefix("key", prefix)); err != nil {
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("key", prefix)); err != nil {
 		return nil, err
 	} else if changed {
-		m.Key = &val
+		m.Key = val
 		paths = append(paths, flagsplugin.Prefix("key", prefix))
 	}
 	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("kek_label", prefix)); err != nil {

@@ -936,11 +936,11 @@ func equalKeys(a, b *ttnpb.KeyEnvelope) bool {
 	if !bytes.Equal(a.EncryptedKey, b.EncryptedKey) || a.KekLabel != b.KekLabel {
 		return false
 	}
-	if a.Key == b.Key {
+	if a.Key == nil && b.Key == nil {
 		return true
 	}
 	if a.Key == nil || b.Key == nil {
 		return false
 	}
-	return a.Key.Equal(*b.Key)
+	return bytes.Equal(a.Key, b.Key)
 }

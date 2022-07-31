@@ -74,7 +74,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 		sessionKEKLabel: sessionKEK[:],
 	})
 	jsKEKEnvelopeUnwrapped := &ttnpb.KeyEnvelope{
-		Key: &jsKEK,
+		Key: jsKEK.Bytes(),
 	}
 
 	credOpt := grpc.PerRPCCredentials(rpcmetadata.MD{
@@ -287,7 +287,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 				Settings: &ttnpb.ApplicationActivationSettings{
 					KekLabel: sessionKEKLabel,
 					Kek: &ttnpb.KeyEnvelope{
-						Key: &types.AES128Key{},
+						Key: types.AES128Key{}.Bytes(),
 					},
 				},
 				FieldMask: ttnpb.FieldMask("kek_label", "kek"),

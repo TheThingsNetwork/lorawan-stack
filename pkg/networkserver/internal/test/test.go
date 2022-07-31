@@ -100,10 +100,6 @@ func DurationPtr(v time.Duration) *time.Duration {
 	return &v
 }
 
-func AES128KeyPtr(key types.AES128Key) *types.AES128Key {
-	return &key
-}
-
 func MACStatePtr(v ttnpb.MACState) *ttnpb.MACState {
 	return &v
 }
@@ -498,16 +494,16 @@ func messageGenerationKeys(sk *ttnpb.SessionKeys, macVersion ttnpb.MACVersion) t
 	if sk == nil {
 		return *MakeSessionKeys(macVersion, false, false)
 	}
-	decrypt := func(ke *ttnpb.KeyEnvelope) *types.AES128Key {
+	decrypt := func(ke *ttnpb.KeyEnvelope) []byte {
 		switch {
 		case ke == nil:
 			return nil
-		case ke.Key != nil:
-			return ke.Key
+		case len(ke.Key) > 0:
+			return types.MustAES128Key(ke.Key).Bytes()
 		case len(ke.EncryptedKey) > 0:
 			k := &types.AES128Key{}
 			test.Must(nil, k.UnmarshalBinary(ke.EncryptedKey))
-			return k
+			return k.Bytes()
 		default:
 			return nil
 		}
@@ -590,10 +586,10 @@ func MakeDataUplink(conf DataUplinkConfig) *ttnpb.UplinkMessage {
 	frmPayload := conf.FRMPayload
 	fOpts := conf.FOpts
 	if len(frmPayload) > 0 && conf.FPort == 0 {
-		frmPayload = MustEncryptUplink(*keys.NwkSEncKey.Key, devAddr, conf.FCnt, nil, frmPayload...)
+		frmPayload = MustEncryptUplink(*types.MustAES128Key(keys.NwkSEncKey.Key), devAddr, conf.FCnt, nil, frmPayload...)
 	} else if len(fOpts) > 0 && macspec.EncryptFOpts(conf.MACVersion) {
 		encOpts := macspec.EncryptionOptions(conf.MACVersion, macspec.UplinkFrame, uint32(conf.FPort), true)
-		fOpts = MustEncryptUplink(*keys.NwkSEncKey.Key, devAddr, conf.FCnt, encOpts, fOpts...)
+		fOpts = MustEncryptUplink(*types.MustAES128Key(keys.NwkSEncKey.Key), devAddr, conf.FCnt, encOpts, fOpts...)
 	}
 	mType := ttnpb.MType_UNCONFIRMED_UP
 	if conf.Confirmed {
@@ -622,9 +618,14 @@ func MakeDataUplink(conf DataUplinkConfig) *ttnpb.UplinkMessage {
 	var mic [4]byte
 	switch {
 	case macspec.UseLegacyMIC(conf.MACVersion):
-		mic = test.Must(crypto.ComputeLegacyUplinkMIC(*keys.FNwkSIntKey.Key, devAddr, conf.FCnt, phyPayload)).([4]byte)
+		mic = test.Must(
+			crypto.ComputeLegacyUplinkMIC(*types.MustAES128Key(keys.FNwkSIntKey.Key), devAddr, conf.FCnt, phyPayload),
+		).([4]byte)
 	default:
-		mic = test.Must(crypto.ComputeUplinkMIC(*keys.SNwkSIntKey.Key, *keys.FNwkSIntKey.Key, conf.ConfFCntDown, uint8(conf.DataRateIndex), conf.ChannelIndex, devAddr, conf.FCnt, phyPayload)).([4]byte)
+		mic = test.Must(
+			crypto.ComputeUplinkMIC(*types.MustAES128Key(keys.SNwkSIntKey.Key), *types.MustAES128Key(keys.FNwkSIntKey.Key),
+				conf.ConfFCntDown, uint8(conf.DataRateIndex), conf.ChannelIndex, devAddr, conf.FCnt, phyPayload),
+		).([4]byte)
 	}
 
 	phyPayload = append(phyPayload, mic[:]...)
@@ -706,10 +707,10 @@ func MakeDataDownlink(conf *DataDownlinkConfig) *ttnpb.DownlinkMessage {
 	frmPayload := conf.FRMPayload
 	fOpts := conf.FOpts
 	if len(frmPayload) > 0 && conf.FPort == 0 {
-		frmPayload = MustEncryptDownlink(*keys.NwkSEncKey.Key, devAddr, conf.FCnt, nil, frmPayload...)
+		frmPayload = MustEncryptDownlink(*types.MustAES128Key(keys.NwkSEncKey.Key), devAddr, conf.FCnt, nil, frmPayload...)
 	} else if len(fOpts) > 0 && macspec.EncryptFOpts(conf.MACVersion) {
 		encOpts := macspec.EncryptionOptions(conf.MACVersion, macspec.DownlinkFrame, uint32(conf.FPort), true)
-		fOpts = MustEncryptDownlink(*keys.NwkSEncKey.Key, devAddr, conf.FCnt, encOpts, fOpts...)
+		fOpts = MustEncryptDownlink(*types.MustAES128Key(keys.NwkSEncKey.Key), devAddr, conf.FCnt, encOpts, fOpts...)
 	}
 	mType := ttnpb.MType_UNCONFIRMED_DOWN
 	if conf.Confirmed {
@@ -738,9 +739,14 @@ func MakeDataDownlink(conf *DataDownlinkConfig) *ttnpb.DownlinkMessage {
 	var mic [4]byte
 	switch {
 	case macspec.UseLegacyMIC(conf.MACVersion):
-		mic = test.Must(crypto.ComputeLegacyDownlinkMIC(*keys.FNwkSIntKey.Key, devAddr, conf.FCnt, phyPayload)).([4]byte)
+		mic = test.Must(
+			crypto.ComputeLegacyDownlinkMIC(*types.MustAES128Key(keys.FNwkSIntKey.Key), devAddr, conf.FCnt, phyPayload),
+		).([4]byte)
 	default:
-		mic = test.Must(crypto.ComputeDownlinkMIC(*keys.SNwkSIntKey.Key, devAddr, conf.ConfFCntUp, conf.FCnt, phyPayload)).([4]byte)
+		mic = test.Must(
+			crypto.ComputeDownlinkMIC(*types.MustAES128Key(keys.SNwkSIntKey.Key),
+				devAddr, conf.ConfFCntUp, conf.FCnt, phyPayload),
+		).([4]byte)
 	}
 	msg.Mic = mic[:]
 	return &ttnpb.DownlinkMessage{

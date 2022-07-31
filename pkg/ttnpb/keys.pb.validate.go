@@ -51,7 +51,18 @@ func (m *KeyEnvelope) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "key":
-			// no validation rules for Key
+
+			if len(m.GetKey()) > 0 {
+
+				if len(m.GetKey()) != 16 {
+					return KeyEnvelopeValidationError{
+						field:  "key",
+						reason: "value length must be 16 bytes",
+					}
+				}
+
+			}
+
 		case "kek_label":
 
 			if utf8.RuneCountInString(m.GetKekLabel()) > 2048 {

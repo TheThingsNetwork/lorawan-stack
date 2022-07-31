@@ -22,7 +22,6 @@ import (
 	"github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	"github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
 	"github.com/spf13/pflag"
-	"github.com/vmihailenco/msgpack/v5"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
@@ -33,7 +32,7 @@ var errInvalidAESKey = errors.DefineInvalidArgument("invalid_aes_key", "invalid 
 type AES128Key [16]byte
 
 // IsZero returns true iff the type is zero.
-func (key *AES128Key) IsZero() bool { return key == nil || *key == [16]byte{} }
+func (key AES128Key) IsZero() bool { return key == [16]byte{} }
 
 func (key AES128Key) String() string { return strings.ToUpper(hex.EncodeToString(key[:])) }
 
@@ -150,28 +149,6 @@ func (key *AES128Key) UnmarshalText(data []byte) error {
 	if err := unmarshalTextBytes(key[:], data); err != nil {
 		return errInvalidAESKey.WithCause(err)
 	}
-	return nil
-}
-
-// EncodeMsgpack implements msgpack.CustomEncoder interface.
-func (key AES128Key) EncodeMsgpack(enc *msgpack.Encoder) error {
-	return enc.EncodeString(hex.EncodeToString(key[:]))
-}
-
-// DecodeMsgpack implements msgpack.CustomDecoder interface.
-func (key *AES128Key) DecodeMsgpack(dec *msgpack.Decoder) error {
-	s, err := dec.DecodeString()
-	if err != nil {
-		return err
-	}
-	b, err := hex.DecodeString(s)
-	if err != nil {
-		return err
-	}
-	if len(b) != 16 {
-		return errInvalidLength.WithAttributes("want", 16, "got", len(b))
-	}
-	copy(key[:], b[:])
 	return nil
 }
 

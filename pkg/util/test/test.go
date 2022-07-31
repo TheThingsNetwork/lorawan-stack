@@ -72,16 +72,16 @@ var (
 	DefaultSNwkSIntKey = crypto.DeriveSNwkSIntKey(DefaultNwkKey, DefaultJoinNonce, DefaultJoinEUI, DefaultDevNonce)
 
 	DefaultAppSKeyEnvelope = &ttnpb.KeyEnvelope{
-		Key: &DefaultAppSKey,
+		Key: DefaultAppSKey.Bytes(),
 	}
 	DefaultFNwkSIntKeyEnvelope = &ttnpb.KeyEnvelope{
-		Key: &DefaultFNwkSIntKey,
+		Key: DefaultFNwkSIntKey.Bytes(),
 	}
 	DefaultNwkSEncKeyEnvelope = &ttnpb.KeyEnvelope{
-		Key: &DefaultNwkSEncKey,
+		Key: DefaultNwkSEncKey.Bytes(),
 	}
 	DefaultSNwkSIntKeyEnvelope = &ttnpb.KeyEnvelope{
-		Key: &DefaultSNwkSIntKey,
+		Key: DefaultSNwkSIntKey.Bytes(),
 	}
 
 	DefaultAppSKeyEnvelopeWrapped     = Must(cryptoutil.WrapAES128KeyWithKEK(Context(), DefaultAppSKey, DefaultKEKLabel, DefaultKEK)).(*ttnpb.KeyEnvelope)

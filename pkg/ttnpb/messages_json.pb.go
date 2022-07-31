@@ -637,8 +637,7 @@ func (x *ApplicationUplink) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.AppSKey != nil || s.HasField("app_s_key") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("app_s_key")
-		// NOTE: KeyEnvelope does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.AppSKey)
+		x.AppSKey.MarshalProtoJSON(s.WithField("app_s_key"))
 	}
 	if x.LastAFCntDown != 0 || s.HasField("last_a_f_cnt_down") {
 		s.WriteMoreIf(&wroteField)
@@ -770,15 +769,12 @@ func (x *ApplicationUplink) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			}
 			x.ReceivedAt = v
 		case "app_s_key", "appSKey":
-			s.AddField("app_s_key")
 			if s.ReadNil() {
 				x.AppSKey = nil
 				return
 			}
-			// NOTE: KeyEnvelope does not seem to implement UnmarshalProtoJSON.
-			var v KeyEnvelope
-			gogo.UnmarshalMessage(s, &v)
-			x.AppSKey = &v
+			x.AppSKey = &KeyEnvelope{}
+			x.AppSKey.UnmarshalProtoJSON(s.WithField("app_s_key", true))
 		case "last_a_f_cnt_down", "lastAFCntDown":
 			s.AddField("last_a_f_cnt_down")
 			x.LastAFCntDown = s.ReadUint32()
@@ -929,8 +925,7 @@ func (x *ApplicationJoinAccept) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.AppSKey != nil || s.HasField("app_s_key") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("app_s_key")
-		// NOTE: KeyEnvelope does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.AppSKey)
+		x.AppSKey.MarshalProtoJSON(s.WithField("app_s_key"))
 	}
 	if len(x.InvalidatedDownlinks) > 0 || s.HasField("invalidated_downlinks") {
 		s.WriteMoreIf(&wroteField)
@@ -978,15 +973,12 @@ func (x *ApplicationJoinAccept) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState)
 			s.AddField("session_key_id")
 			x.SessionKeyId = s.ReadBytes()
 		case "app_s_key", "appSKey":
-			s.AddField("app_s_key")
 			if s.ReadNil() {
 				x.AppSKey = nil
 				return
 			}
-			// NOTE: KeyEnvelope does not seem to implement UnmarshalProtoJSON.
-			var v KeyEnvelope
-			gogo.UnmarshalMessage(s, &v)
-			x.AppSKey = &v
+			x.AppSKey = &KeyEnvelope{}
+			x.AppSKey.UnmarshalProtoJSON(s.WithField("app_s_key", true))
 		case "invalidated_downlinks", "invalidatedDownlinks":
 			s.AddField("invalidated_downlinks")
 			if s.ReadNil() {
