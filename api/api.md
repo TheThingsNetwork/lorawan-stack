@@ -1777,6 +1777,7 @@ The NATS provider settings.
 | `location_solved` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
 | `service_data` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
 | `health_status` | [`ApplicationWebhookHealth`](#ttn.lorawan.v3.ApplicationWebhookHealth) |  |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
 
 #### Field Rules
 

@@ -8,6 +8,7 @@ package ttnpb
 
 import (
 	flagsplugin "github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
+	gogo "github.com/TheThingsIndustries/protoc-gen-go-flags/gogo"
 	pflag "github.com/spf13/pflag"
 )
 
@@ -229,6 +230,7 @@ func AddSelectFlagsForApplicationWebhook(flags *pflag.FlagSet, prefix string, hi
 	AddSelectFlagsForApplicationWebhook_Message(flags, flagsplugin.Prefix("service-data", prefix), hidden)
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("health-status", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("health-status", prefix), true), flagsplugin.WithHidden(hidden)))
 	AddSelectFlagsForApplicationWebhookHealth(flags, flagsplugin.Prefix("health-status", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("field-mask", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("field-mask", prefix), false), flagsplugin.WithHidden(hidden)))
 }
 
 // SelectFromFlags outputs the fieldmask paths forApplicationWebhook message from select flags.
@@ -378,6 +380,11 @@ func PathsFromSelectFlagsForApplicationWebhook(flags *pflag.FlagSet, prefix stri
 	} else {
 		paths = append(paths, selectPaths...)
 	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("field_mask", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("field_mask", prefix))
+	}
 	return paths, nil
 }
 
@@ -401,6 +408,7 @@ func AddSetFlagsForApplicationWebhook(flags *pflag.FlagSet, prefix string, hidde
 	AddSetFlagsForApplicationWebhook_Message(flags, flagsplugin.Prefix("location-solved", prefix), hidden)
 	AddSetFlagsForApplicationWebhook_Message(flags, flagsplugin.Prefix("service-data", prefix), hidden)
 	// FIXME: Skipping HealthStatus because it does not seem to implement AddSetFlags.
+	flags.AddFlag(flagsplugin.NewStringSliceFlag(flagsplugin.Prefix("field-mask", prefix), "", flagsplugin.WithHidden(hidden)))
 }
 
 // SetFromFlags sets the ApplicationWebhook message from flags.
@@ -556,5 +564,11 @@ func (m *ApplicationWebhook) SetFromFlags(flags *pflag.FlagSet, prefix string) (
 		}
 	}
 	// FIXME: Skipping HealthStatus because it does not seem to implement AddSetFlags.
+	if val, changed, err := flagsplugin.GetStringSlice(flags, flagsplugin.Prefix("field_mask", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.FieldMask = gogo.SetFieldMask(val)
+		paths = append(paths, flagsplugin.Prefix("field_mask", prefix))
+	}
 	return paths, nil
 }
