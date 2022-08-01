@@ -20,7 +20,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"os"
-	"sync"
 	"sync/atomic"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -108,11 +107,8 @@ type FileReader interface {
 // Client is client-side configuration for server TLS.
 type Client struct {
 	FileReader         FileReader `json:"-" yaml:"-" name:"-"`
-	loadRootCA         sync.Once
-	rootCABytes        []byte
-	rootCABytesError   error
-	RootCA             string `json:"root-ca" yaml:"root-ca" name:"root-ca" description:"Location of TLS root CA certificate (optional)"` //nolint:lll
-	InsecureSkipVerify bool   `name:"insecure-skip-verify" description:"Skip verification of certificate chains (insecure)"`              //nolint:lll
+	RootCA             string     `json:"root-ca" yaml:"root-ca" name:"root-ca" description:"Location of TLS root CA certificate (optional)"` //nolint:lll
+	InsecureSkipVerify bool       `name:"insecure-skip-verify" description:"Skip verification of certificate chains (insecure)"`              //nolint:lll
 }
 
 // Equals checks if the other configuration is equivalent to this.
@@ -123,31 +119,33 @@ func (c Client) Equals(other Client) bool {
 
 // ApplyTo applies the client configuration options to the given TLS configuration.
 // If tlsConfig is nil, this is a no-op.
-func (c *Client) ApplyTo(tlsConfig *tls.Config) error {
+func (c Client) ApplyTo(tlsConfig *tls.Config) error {
 	if tlsConfig == nil {
 		return nil
 	}
-	c.loadRootCA.Do(func() {
-		if c.RootCA != "" {
-			readFile := os.ReadFile
-			if c.FileReader != nil {
-				readFile = c.FileReader.ReadFile
-			}
-			c.rootCABytes, c.rootCABytesError = readFile(c.RootCA)
+
+	var (
+		rootCABytes []byte
+		err         error
+	)
+	if c.RootCA != "" {
+		readFile := os.ReadFile
+		if c.FileReader != nil {
+			readFile = c.FileReader.ReadFile
 		}
-	})
-	if c.rootCABytesError != nil {
-		return c.rootCABytesError
+		rootCABytes, err = readFile(c.RootCA)
+		if err != nil {
+			return err
+		}
 	}
 
-	if len(c.rootCABytes) > 0 {
-		var err error
+	if len(rootCABytes) > 0 {
 		if tlsConfig.RootCAs == nil {
 			if tlsConfig.RootCAs, err = x509.SystemCertPool(); err != nil {
 				tlsConfig.RootCAs = x509.NewCertPool()
 			}
 		}
-		tlsConfig.RootCAs.AppendCertsFromPEM(c.rootCABytes)
+		tlsConfig.RootCAs.AppendCertsFromPEM(rootCABytes)
 	}
 	tlsConfig.InsecureSkipVerify = c.InsecureSkipVerify
 	return nil
