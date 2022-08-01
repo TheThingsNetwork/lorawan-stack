@@ -36,9 +36,11 @@ func main() {
 	if err != nil && !os.IsNotExist(err) {
 		panic(err)
 	}
-	i18n.Global.Merge(messages)
 
-	updated := i18n.Global.Updated()
+	global := i18n.CloneGlobal()
+	global.Merge(messages)
+
+	updated := global.Updated()
 	if len(updated) > 0 {
 		fmt.Println("Updated the following messages:")
 		for _, updated := range updated {
@@ -46,7 +48,7 @@ func main() {
 		}
 	}
 
-	deleted := i18n.Global.Cleanup()
+	deleted := global.Cleanup()
 	if len(deleted) > 0 {
 		fmt.Println("Deleted the following messages:")
 		for _, deleted := range deleted {
@@ -55,17 +57,17 @@ func main() {
 	}
 
 	count := make(map[string]int)
-	for _, msg := range i18n.Global {
+	for _, msg := range global {
 		for lang := range msg.Translations {
 			count[lang] = count[lang] + 1
 		}
 	}
 
 	for lang, count := range count {
-		fmt.Printf("Language: %s\tTranslations: %5d\tMissing: %5d\n", lang, count, len(i18n.Global)-count)
+		fmt.Printf("Language: %s\tTranslations: %5d\tMissing: %5d\n", lang, count, len(global)-count)
 	}
 
-	err = i18n.Global.WriteFile(messagesFile)
+	err = global.WriteFile(messagesFile)
 	if err != nil {
 		panic(err)
 	}
