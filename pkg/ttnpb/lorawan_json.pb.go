@@ -9,6 +9,7 @@ package ttnpb
 import (
 	gogo "github.com/TheThingsIndustries/protoc-gen-go-json/gogo"
 	jsonplugin "github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
+	types "go.thethings.network/lorawan-stack/v3/pkg/types"
 	strconv "strconv"
 )
 
@@ -1212,13 +1213,11 @@ func (x *Message) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		case *Message_MacPayload:
 			s.WriteMoreIf(&wroteField)
 			s.WriteObjectField("mac_payload")
-			// NOTE: MACPayload does not seem to implement MarshalProtoJSON.
-			gogo.MarshalMessage(s, ov.MacPayload)
+			ov.MacPayload.MarshalProtoJSON(s.WithField("mac_payload"))
 		case *Message_JoinRequestPayload:
 			s.WriteMoreIf(&wroteField)
 			s.WriteObjectField("join_request_payload")
-			// NOTE: JoinRequestPayload does not seem to implement MarshalProtoJSON.
-			gogo.MarshalMessage(s, ov.JoinRequestPayload)
+			ov.JoinRequestPayload.MarshalProtoJSON(s.WithField("join_request_payload"))
 		case *Message_JoinAcceptPayload:
 			s.WriteMoreIf(&wroteField)
 			s.WriteObjectField("join_accept_payload")
@@ -1257,29 +1256,23 @@ func (x *Message) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			s.AddField("mic")
 			x.Mic = s.ReadBytes()
 		case "mac_payload", "macPayload":
-			s.AddField("mac_payload")
 			ov := &Message_MacPayload{}
 			x.Payload = ov
 			if s.ReadNil() {
 				ov.MacPayload = nil
 				return
 			}
-			// NOTE: MACPayload does not seem to implement UnmarshalProtoJSON.
-			var v MACPayload
-			gogo.UnmarshalMessage(s, &v)
-			ov.MacPayload = &v
+			ov.MacPayload = &MACPayload{}
+			ov.MacPayload.UnmarshalProtoJSON(s.WithField("mac_payload", true))
 		case "join_request_payload", "joinRequestPayload":
-			s.AddField("join_request_payload")
 			ov := &Message_JoinRequestPayload{}
 			x.Payload = ov
 			if s.ReadNil() {
 				ov.JoinRequestPayload = nil
 				return
 			}
-			// NOTE: JoinRequestPayload does not seem to implement UnmarshalProtoJSON.
-			var v JoinRequestPayload
-			gogo.UnmarshalMessage(s, &v)
-			ov.JoinRequestPayload = &v
+			ov.JoinRequestPayload = &JoinRequestPayload{}
+			ov.JoinRequestPayload.UnmarshalProtoJSON(s.WithField("join_request_payload", true))
 		case "join_accept_payload", "joinAcceptPayload":
 			ov := &Message_JoinAcceptPayload{}
 			x.Payload = ov
@@ -1357,6 +1350,228 @@ func (x *MHDR) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the MACPayload message to JSON.
+func (x *MACPayload) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.FHdr != nil || s.HasField("f_hdr") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("f_hdr")
+		x.FHdr.MarshalProtoJSON(s.WithField("f_hdr"))
+	}
+	if x.FPort != 0 || s.HasField("f_port") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("f_port")
+		s.WriteUint32(x.FPort)
+	}
+	if len(x.FrmPayload) > 0 || s.HasField("frm_payload") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("frm_payload")
+		s.WriteBytes(x.FrmPayload)
+	}
+	if x.DecodedPayload != nil || s.HasField("decoded_payload") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("decoded_payload")
+		if x.DecodedPayload == nil {
+			s.WriteNil()
+		} else {
+			gogo.MarshalStruct(s, x.DecodedPayload)
+		}
+	}
+	if x.FullFCnt != 0 || s.HasField("full_f_cnt") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("full_f_cnt")
+		s.WriteUint32(x.FullFCnt)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the MACPayload to JSON.
+func (x *MACPayload) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the MACPayload message from JSON.
+func (x *MACPayload) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "f_hdr", "fHdr":
+			if s.ReadNil() {
+				x.FHdr = nil
+				return
+			}
+			x.FHdr = &FHDR{}
+			x.FHdr.UnmarshalProtoJSON(s.WithField("f_hdr", true))
+		case "f_port", "fPort":
+			s.AddField("f_port")
+			x.FPort = s.ReadUint32()
+		case "frm_payload", "frmPayload":
+			s.AddField("frm_payload")
+			x.FrmPayload = s.ReadBytes()
+		case "decoded_payload", "decodedPayload":
+			s.AddField("decoded_payload")
+			if s.ReadNil() {
+				x.DecodedPayload = nil
+				return
+			}
+			v := gogo.UnmarshalStruct(s)
+			if s.Err() != nil {
+				return
+			}
+			x.DecodedPayload = v
+		case "full_f_cnt", "fullFCnt":
+			s.AddField("full_f_cnt")
+			x.FullFCnt = s.ReadUint32()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the MACPayload from JSON.
+func (x *MACPayload) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the FHDR message to JSON.
+func (x *FHDR) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.DevAddr) > 0 || s.HasField("dev_addr") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("dev_addr")
+		types.MarshalHEXBytes(s.WithField("dev_addr"), x.DevAddr)
+	}
+	if x.FCtrl != nil || s.HasField("f_ctrl") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("f_ctrl")
+		// NOTE: FCtrl does not seem to implement MarshalProtoJSON.
+		gogo.MarshalMessage(s, x.FCtrl)
+	}
+	if x.FCnt != 0 || s.HasField("f_cnt") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("f_cnt")
+		s.WriteUint32(x.FCnt)
+	}
+	if len(x.FOpts) > 0 || s.HasField("f_opts") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("f_opts")
+		s.WriteBytes(x.FOpts)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the FHDR to JSON.
+func (x *FHDR) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the FHDR message from JSON.
+func (x *FHDR) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "dev_addr", "devAddr":
+			s.AddField("dev_addr")
+			x.DevAddr = types.Unmarshal4Bytes(s.WithField("dev_addr", false))
+		case "f_ctrl", "fCtrl":
+			s.AddField("f_ctrl")
+			if s.ReadNil() {
+				x.FCtrl = nil
+				return
+			}
+			// NOTE: FCtrl does not seem to implement UnmarshalProtoJSON.
+			var v FCtrl
+			gogo.UnmarshalMessage(s, &v)
+			x.FCtrl = &v
+		case "f_cnt", "fCnt":
+			s.AddField("f_cnt")
+			x.FCnt = s.ReadUint32()
+		case "f_opts", "fOpts":
+			s.AddField("f_opts")
+			x.FOpts = s.ReadBytes()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the FHDR from JSON.
+func (x *FHDR) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the JoinRequestPayload message to JSON.
+func (x *JoinRequestPayload) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.JoinEui) > 0 || s.HasField("join_eui") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("join_eui")
+		types.MarshalHEXBytes(s.WithField("join_eui"), x.JoinEui)
+	}
+	if len(x.DevEui) > 0 || s.HasField("dev_eui") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("dev_eui")
+		types.MarshalHEXBytes(s.WithField("dev_eui"), x.DevEui)
+	}
+	if len(x.DevNonce) > 0 || s.HasField("dev_nonce") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("dev_nonce")
+		types.MarshalHEXBytes(s.WithField("dev_nonce"), x.DevNonce)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the JoinRequestPayload to JSON.
+func (x *JoinRequestPayload) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the JoinRequestPayload message from JSON.
+func (x *JoinRequestPayload) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "join_eui", "joinEui":
+			s.AddField("join_eui")
+			x.JoinEui = types.Unmarshal8Bytes(s.WithField("join_eui", false))
+		case "dev_eui", "devEui":
+			s.AddField("dev_eui")
+			x.DevEui = types.Unmarshal8Bytes(s.WithField("dev_eui", false))
+		case "dev_nonce", "devNonce":
+			s.AddField("dev_nonce")
+			x.DevNonce = types.Unmarshal2Bytes(s.WithField("dev_nonce", false))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the JoinRequestPayload from JSON.
+func (x *JoinRequestPayload) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the RejoinRequestPayload message to JSON.
 func (x *RejoinRequestPayload) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -1373,17 +1588,17 @@ func (x *RejoinRequestPayload) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if len(x.NetId) > 0 || s.HasField("net_id") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("net_id")
-		x.NetId.MarshalProtoJSON(s.WithField("net_id"))
+		types.MarshalHEXBytes(s.WithField("net_id"), x.NetId)
 	}
 	if len(x.JoinEui) > 0 || s.HasField("join_eui") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("join_eui")
-		x.JoinEui.MarshalProtoJSON(s.WithField("join_eui"))
+		types.MarshalHEXBytes(s.WithField("join_eui"), x.JoinEui)
 	}
 	if len(x.DevEui) > 0 || s.HasField("dev_eui") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("dev_eui")
-		x.DevEui.MarshalProtoJSON(s.WithField("dev_eui"))
+		types.MarshalHEXBytes(s.WithField("dev_eui"), x.DevEui)
 	}
 	if x.RejoinCnt != 0 || s.HasField("rejoin_cnt") {
 		s.WriteMoreIf(&wroteField)
@@ -1412,13 +1627,13 @@ func (x *RejoinRequestPayload) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) 
 			x.RejoinType.UnmarshalProtoJSON(s)
 		case "net_id", "netId":
 			s.AddField("net_id")
-			x.NetId.UnmarshalProtoJSON(s.WithField("net_id", false))
+			x.NetId = types.Unmarshal3Bytes(s.WithField("net_id", false))
 		case "join_eui", "joinEui":
 			s.AddField("join_eui")
-			x.JoinEui.UnmarshalProtoJSON(s.WithField("join_eui", false))
+			x.JoinEui = types.Unmarshal8Bytes(s.WithField("join_eui", false))
 		case "dev_eui", "devEui":
 			s.AddField("dev_eui")
-			x.DevEui.UnmarshalProtoJSON(s.WithField("dev_eui", false))
+			x.DevEui = types.Unmarshal8Bytes(s.WithField("dev_eui", false))
 		case "rejoin_cnt", "rejoinCnt":
 			s.AddField("rejoin_cnt")
 			x.RejoinCnt = s.ReadUint32()
@@ -1447,17 +1662,17 @@ func (x *JoinAcceptPayload) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if len(x.JoinNonce) > 0 || s.HasField("join_nonce") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("join_nonce")
-		x.JoinNonce.MarshalProtoJSON(s.WithField("join_nonce"))
+		types.MarshalHEXBytes(s.WithField("join_nonce"), x.JoinNonce)
 	}
 	if len(x.NetId) > 0 || s.HasField("net_id") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("net_id")
-		x.NetId.MarshalProtoJSON(s.WithField("net_id"))
+		types.MarshalHEXBytes(s.WithField("net_id"), x.NetId)
 	}
 	if len(x.DevAddr) > 0 || s.HasField("dev_addr") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("dev_addr")
-		x.DevAddr.MarshalProtoJSON(s.WithField("dev_addr"))
+		types.MarshalHEXBytes(s.WithField("dev_addr"), x.DevAddr)
 	}
 	if x.DlSettings != nil || s.HasField("dl_settings") {
 		s.WriteMoreIf(&wroteField)
@@ -1496,13 +1711,13 @@ func (x *JoinAcceptPayload) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.Encrypted = s.ReadBytes()
 		case "join_nonce", "joinNonce":
 			s.AddField("join_nonce")
-			x.JoinNonce.UnmarshalProtoJSON(s.WithField("join_nonce", false))
+			x.JoinNonce = types.Unmarshal3Bytes(s.WithField("join_nonce", false))
 		case "net_id", "netId":
 			s.AddField("net_id")
-			x.NetId.UnmarshalProtoJSON(s.WithField("net_id", false))
+			x.NetId = types.Unmarshal3Bytes(s.WithField("net_id", false))
 		case "dev_addr", "devAddr":
 			s.AddField("dev_addr")
-			x.DevAddr.UnmarshalProtoJSON(s.WithField("dev_addr", false))
+			x.DevAddr = types.Unmarshal4Bytes(s.WithField("dev_addr", false))
 		case "dl_settings", "dlSettings":
 			if s.ReadNil() {
 				x.DlSettings = nil

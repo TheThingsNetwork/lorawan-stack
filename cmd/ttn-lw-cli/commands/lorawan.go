@@ -80,6 +80,7 @@ func decodeJoinRequest(msg ttnpb.Message, config lorawanConfig) (*lorawanDecoded
 
 func decodeUplink(msg ttnpb.Message, config lorawanConfig) (*lorawanDecodedFrame, error) {
 	pld := msg.GetMacPayload()
+	devAddr := types.MustDevAddr(pld.FHdr.DevAddr).OrZero()
 	macBuf := getMacBuffer(pld)
 	cmdsInFOpts := len(pld.FHdr.FOpts) > 0
 	if len(macBuf) > 0 && (!cmdsInFOpts || macspec.EncryptFOpts(config.MACVersion)) {
@@ -90,7 +91,7 @@ func decodeUplink(msg ttnpb.Message, config lorawanConfig) (*lorawanDecodedFrame
 			encOpts := macspec.EncryptionOptions(config.MACVersion, macspec.UplinkFrame, pld.FPort, cmdsInFOpts)
 			for msb := uint32(0); msb < 0xff; msb++ {
 				fCnt := msb<<8 | pld.FHdr.FCnt
-				macBuf, err := crypto.DecryptUplink(config.NwkSEncKey, pld.FHdr.DevAddr, fCnt, macBuf, encOpts...)
+				macBuf, err := crypto.DecryptUplink(config.NwkSEncKey, devAddr, fCnt, macBuf, encOpts...)
 				if err == nil {
 					setMacBuffer(pld, macBuf)
 					break
@@ -113,7 +114,7 @@ func decodeUplink(msg ttnpb.Message, config lorawanConfig) (*lorawanDecodedFrame
 			logger.Warn("No AppSKey provided, skipping application payload decryption")
 		} else {
 			logger.Debug("Decrypting application payload")
-			buf, err := crypto.DecryptUplink(config.AppSKey, pld.FHdr.DevAddr, pld.FHdr.FCnt, pld.FrmPayload)
+			buf, err := crypto.DecryptUplink(config.AppSKey, devAddr, pld.FHdr.FCnt, pld.FrmPayload)
 			if err != nil {
 				logger.WithField("f_cnt", pld.FHdr.FCnt).Debug("Failed attempt to decrypt FrmPayload")
 			} else {
@@ -165,6 +166,7 @@ func decodeJoinAccept(msg ttnpb.Message, config lorawanConfig) (*lorawanDecodedF
 
 func decodeDownlink(msg ttnpb.Message, config lorawanConfig) (*lorawanDecodedFrame, error) {
 	pld := msg.GetMacPayload()
+	devAddr := types.MustDevAddr(pld.FHdr.DevAddr).OrZero()
 	macBuf := getMacBuffer(pld)
 	cmdsInFOpts := len(pld.FHdr.FOpts) > 0
 	if len(macBuf) > 0 && (!cmdsInFOpts || macspec.EncryptFOpts(config.MACVersion)) && !config.NwkSKey.IsZero() {
@@ -172,7 +174,7 @@ func decodeDownlink(msg ttnpb.Message, config lorawanConfig) (*lorawanDecodedFra
 		encOpts := macspec.EncryptionOptions(config.MACVersion, macspec.DownlinkFrame, pld.FPort, cmdsInFOpts)
 		for msb := uint32(0); msb < 0xffff; msb++ {
 			fCnt := msb<<16 | pld.FHdr.FCnt
-			macBuf, err := crypto.DecryptDownlink(config.NwkSKey, pld.FHdr.DevAddr, fCnt, macBuf, encOpts...)
+			macBuf, err := crypto.DecryptDownlink(config.NwkSKey, devAddr, fCnt, macBuf, encOpts...)
 			if err == nil {
 				setMacBuffer(pld, macBuf)
 				break
@@ -194,7 +196,7 @@ func decodeDownlink(msg ttnpb.Message, config lorawanConfig) (*lorawanDecodedFra
 			logger.Warn("No AppSKey provided, skipping application payload decryption")
 		} else {
 			logger.Debug("Decrypting application payload")
-			buf, err := crypto.DecryptDownlink(config.AppSKey, pld.FHdr.DevAddr, pld.FHdr.FCnt, pld.FrmPayload)
+			buf, err := crypto.DecryptDownlink(config.AppSKey, devAddr, pld.FHdr.FCnt, pld.FrmPayload)
 			if err != nil {
 				logger.WithField("f_cnt", pld.FHdr.FCnt).Debug("Failed attempt to decrypt FrmPayload")
 			} else {

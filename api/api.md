@@ -5684,6 +5684,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 | Field | Validations |
 | ----- | ----------- |
+| `dev_addr` | <p>`bytes.len`: `4`</p> |
 | `f_ctrl` | <p>`message.required`: `true`</p> |
 | `f_cnt` | <p>`uint32.lte`: `65535`</p> |
 | `f_opts` | <p>`bytes.max_len`: `15`</p> |
@@ -5735,6 +5736,9 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 | Field | Validations |
 | ----- | ----------- |
+| `join_nonce` | <p>`bytes.len`: `3`</p> |
+| `net_id` | <p>`bytes.len`: `3`</p> |
+| `dev_addr` | <p>`bytes.len`: `4`</p> |
 | `dl_settings` | <p>`message.required`: `true`</p> |
 | `rx_delay` | <p>`enum.defined_only`: `true`</p> |
 
@@ -5745,6 +5749,14 @@ Only the components for which the keys were meant, will have the key-encryption-
 | `join_eui` | [`bytes`](#bytes) |  |  |
 | `dev_eui` | [`bytes`](#bytes) |  |  |
 | `dev_nonce` | [`bytes`](#bytes) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `join_eui` | <p>`bytes.len`: `8`</p> |
+| `dev_eui` | <p>`bytes.len`: `8`</p> |
+| `dev_nonce` | <p>`bytes.len`: `2`</p> |
 
 ### <a name="ttn.lorawan.v3.LRFHSSDataRate">Message `LRFHSSDataRate`</a>
 
@@ -6247,6 +6259,9 @@ Message represents a LoRaWAN message
 | Field | Validations |
 | ----- | ----------- |
 | `rejoin_type` | <p>`enum.defined_only`: `true`</p> |
+| `net_id` | <p>`bytes.len`: `3`</p> |
+| `join_eui` | <p>`bytes.len`: `8`</p> |
+| `dev_eui` | <p>`bytes.len`: `8`</p> |
 
 ### <a name="ttn.lorawan.v3.RxDelayValue">Message `RxDelayValue`</a>
 

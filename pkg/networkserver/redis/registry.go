@@ -530,7 +530,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 	ackFlag := pld.FHdr.FCtrl.Ack
 	lsb := uint16(pld.FHdr.FCnt)
 
-	addrKey := r.addrKey(pld.FHdr.DevAddr)
+	addrKey := r.addrKey(types.MustDevAddr(pld.FHdr.DevAddr).OrZero())
 	addrKeyCurrent := CurrentAddrKey(addrKey)
 	addrKeyPending := PendingAddrKey(addrKey)
 	fieldKeyCurrent := FieldKey(addrKeyCurrent)

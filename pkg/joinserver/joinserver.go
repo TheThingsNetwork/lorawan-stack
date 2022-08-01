@@ -241,17 +241,19 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 	if pld == nil {
 		return nil, errNoJoinRequest.New()
 	}
-	if pld.DevEui.IsZero() {
+	devEUI := types.MustEUI64(pld.DevEui).OrZero()
+	if devEUI.IsZero() {
 		return nil, errNoDevEUI.New()
 	}
+	joinEUI := types.MustEUI64(pld.JoinEui).OrZero()
 	logger = logger.WithFields(log.Fields(
-		"join_eui", pld.JoinEui,
-		"dev_eui", pld.DevEui,
+		"join_eui", joinEUI,
+		"dev_eui", devEUI,
 	))
 
 	var match bool
 	for _, p := range js.euiPrefixes {
-		if p.Matches(pld.JoinEui) {
+		if p.Matches(joinEUI) {
 			match = true
 			break
 		}
@@ -261,7 +263,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 	}
 
 	var handled bool
-	dev, err := js.devices.SetByEUI(ctx, pld.JoinEui, pld.DevEui,
+	dev, err := js.devices.SetByEUI(ctx, joinEUI, devEUI,
 		[]string{
 			"application_server_address",
 			"application_server_id",
@@ -386,10 +388,10 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			copy(jn[:], nb[1:])
 
 			b, err = lorawan.AppendJoinAcceptPayload(b, &ttnpb.JoinAcceptPayload{
-				NetId:      types.MustNetID(req.NetId).OrZero(),
-				JoinNonce:  jn,
+				NetId:      req.NetId,
+				JoinNonce:  jn.Bytes(),
 				CfList:     req.CfList,
-				DevAddr:    types.MustDevAddr(req.DevAddr).OrZero(),
+				DevAddr:    req.DevAddr,
 				DlSettings: req.DownlinkSettings,
 				RxDelay:    req.RxDelay,
 			})
@@ -474,7 +476,8 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			if !bytes.Equal(reqMIC[:], req.RawPayload[19:]) {
 				return nil, nil, errMICMismatch.New()
 			}
-			resMIC, err := networkCryptoService.JoinAcceptMIC(ctx, cryptoDev, req.SelectedMacVersion, 0xff, pld.DevNonce, b)
+			devNonce := types.MustDevNonce(pld.DevNonce).OrZero()
+			resMIC, err := networkCryptoService.JoinAcceptMIC(ctx, cryptoDev, req.SelectedMacVersion, 0xff, devNonce, b)
 			if err != nil {
 				return nil, nil, errComputeMIC.WithCause(err)
 			}
@@ -482,11 +485,19 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			if err != nil {
 				return nil, nil, errEncryptPayload.WithCause(err)
 			}
-			nwkSKeys, err := networkCryptoService.DeriveNwkSKeys(ctx, cryptoDev, req.SelectedMacVersion, jn, pld.DevNonce, types.MustNetID(req.NetId).OrZero())
+			netID := types.MustNetID(req.NetId).OrZero()
+			nwkSKeys, err := networkCryptoService.DeriveNwkSKeys(ctx, cryptoDev, req.SelectedMacVersion, jn, devNonce, netID)
 			if err != nil {
 				return nil, nil, errDeriveNwkSKeys.WithCause(err)
 			}
-			appSKey, err := applicationCryptoService.DeriveAppSKey(ctx, cryptoDev, req.SelectedMacVersion, jn, pld.DevNonce, types.MustNetID(req.NetId).OrZero())
+			appSKey, err := applicationCryptoService.DeriveAppSKey(
+				ctx,
+				cryptoDev,
+				req.SelectedMacVersion,
+				jn,
+				devNonce,
+				netID,
+			)
 			if err != nil {
 				return nil, nil, errDeriveAppSKey.WithCause(err)
 			}

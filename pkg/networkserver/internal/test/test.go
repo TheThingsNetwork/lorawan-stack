@@ -600,7 +600,7 @@ func MakeDataUplink(conf DataUplinkConfig) *ttnpb.UplinkMessage {
 		Major: ttnpb.Major_LORAWAN_R1,
 	}
 	fhdr := &ttnpb.FHDR{
-		DevAddr: devAddr,
+		DevAddr: devAddr.Bytes(),
 		FCtrl:   conf.FCtrl,
 		FCnt:    conf.FCnt & 0xffff,
 		FOpts:   CopyBytes(fOpts),
@@ -724,7 +724,7 @@ func MakeDataDownlink(conf *DataDownlinkConfig) *ttnpb.DownlinkMessage {
 		Payload: &ttnpb.Message_MacPayload{
 			MacPayload: &ttnpb.MACPayload{
 				FHdr: &ttnpb.FHDR{
-					DevAddr: devAddr,
+					DevAddr: devAddr.Bytes(),
 					FCtrl:   conf.FCtrl,
 					FCnt:    conf.FCnt & 0xffff,
 					FOpts:   fOpts,

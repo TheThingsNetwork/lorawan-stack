@@ -44,7 +44,7 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 				Payload: &ttnpb.Message_MacPayload{
 					MacPayload: &ttnpb.MACPayload{
 						FHdr: &ttnpb.FHDR{
-							DevAddr: test.DefaultDevAddr,
+							DevAddr: test.DefaultDevAddr.Bytes(),
 							FCtrl: &ttnpb.FCtrl{
 								Adr:       true,
 								AdrAckReq: true,
@@ -70,7 +70,7 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 				Payload: &ttnpb.Message_MacPayload{
 					MacPayload: &ttnpb.MACPayload{
 						FHdr: &ttnpb.FHDR{
-							DevAddr: test.DefaultDevAddr,
+							DevAddr: test.DefaultDevAddr.Bytes(),
 							FCtrl: &ttnpb.FCtrl{
 								Adr:       true,
 								AdrAckReq: true,
@@ -97,7 +97,7 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 				Payload: &ttnpb.Message_MacPayload{
 					MacPayload: &ttnpb.MACPayload{
 						FHdr: &ttnpb.FHDR{
-							DevAddr: test.DefaultDevAddr,
+							DevAddr: test.DefaultDevAddr.Bytes(),
 							FCtrl: &ttnpb.FCtrl{
 								FPending: true,
 							},
@@ -121,7 +121,7 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 				Payload: &ttnpb.Message_MacPayload{
 					MacPayload: &ttnpb.MACPayload{
 						FHdr: &ttnpb.FHDR{
-							DevAddr: test.DefaultDevAddr,
+							DevAddr: test.DefaultDevAddr.Bytes(),
 							FCtrl: &ttnpb.FCtrl{
 								Ack: true,
 							},
@@ -144,9 +144,9 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 				Mic: []byte{0x1, 0x2, 0x3, 0x4},
 				Payload: &ttnpb.Message_JoinRequestPayload{
 					JoinRequestPayload: &ttnpb.JoinRequestPayload{
-						JoinEui:  test.DefaultJoinEUI,
-						DevEui:   test.DefaultDevEUI,
-						DevNonce: test.DefaultDevNonce,
+						JoinEui:  test.DefaultJoinEUI.Bytes(),
+						DevEui:   test.DefaultDevEUI.Bytes(),
+						DevNonce: test.DefaultDevNonce.Bytes(),
 					},
 				},
 			},
@@ -162,8 +162,8 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 				Payload: &ttnpb.Message_RejoinRequestPayload{
 					RejoinRequestPayload: &ttnpb.RejoinRequestPayload{
 						RejoinType: ttnpb.RejoinRequestType_CONTEXT,
-						NetId:      test.DefaultNetID,
-						DevEui:     test.DefaultDevEUI,
+						NetId:      test.DefaultNetID.Bytes(),
+						DevEui:     test.DefaultDevEUI.Bytes(),
 						RejoinCnt:  0xff42,
 					},
 				},
@@ -180,8 +180,8 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 				Payload: &ttnpb.Message_RejoinRequestPayload{
 					RejoinRequestPayload: &ttnpb.RejoinRequestPayload{
 						RejoinType: ttnpb.RejoinRequestType_SESSION,
-						JoinEui:    test.DefaultJoinEUI,
-						DevEui:     test.DefaultDevEUI,
+						JoinEui:    test.DefaultJoinEUI.Bytes(),
+						DevEui:     test.DefaultDevEUI.Bytes(),
 						RejoinCnt:  0x42,
 					},
 				},
@@ -198,8 +198,8 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 				Payload: &ttnpb.Message_RejoinRequestPayload{
 					RejoinRequestPayload: &ttnpb.RejoinRequestPayload{
 						RejoinType: ttnpb.RejoinRequestType_KEYS,
-						NetId:      test.DefaultNetID,
-						DevEui:     test.DefaultDevEUI,
+						NetId:      test.DefaultNetID.Bytes(),
+						DevEui:     test.DefaultDevEUI.Bytes(),
 						RejoinCnt:  0x42ff,
 					},
 				},
@@ -256,9 +256,9 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 			&ttnpb.Message{
 				MHdr: &ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: 0},
 				Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{
-					JoinEui:  types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					DevEui:   types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					DevNonce: types.DevNonce{0x42, 0xff},
+					JoinEui:  types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
+					DevEui:   types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
+					DevNonce: types.DevNonce{0x42, 0xff}.Bytes(),
 				}},
 				Mic: []byte{0x42, 0xff, 0xff, 0xff},
 			},
@@ -299,7 +299,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 				MHdr: &ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: 0},
 				Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
 					FHdr: &ttnpb.FHDR{
-						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 						FCtrl: &ttnpb.FCtrl{
 							Adr:       true,
 							AdrAckReq: false,
@@ -347,7 +347,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 				MHdr: &ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_DOWN, Major: 0},
 				Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
 					FHdr: &ttnpb.FHDR{
-						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 						FCtrl: &ttnpb.FCtrl{
 							Adr:       true,
 							AdrAckReq: false,
@@ -395,7 +395,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 				MHdr: &ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_DOWN, Major: 0},
 				Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
 					FHdr: &ttnpb.FHDR{
-						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 						FCtrl: &ttnpb.FCtrl{
 							Adr:       true,
 							AdrAckReq: false,
@@ -435,7 +435,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 				MHdr: &ttnpb.MHDR{MType: ttnpb.MType_CONFIRMED_UP, Major: 0},
 				Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
 					FHdr: &ttnpb.FHDR{
-						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 						FCtrl: &ttnpb.FCtrl{
 							Adr:       true,
 							AdrAckReq: false,
@@ -483,7 +483,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 				MHdr: &ttnpb.MHDR{MType: ttnpb.MType_CONFIRMED_DOWN, Major: 0},
 				Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
 					FHdr: &ttnpb.FHDR{
-						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 						FCtrl: &ttnpb.FCtrl{
 							Adr:       true,
 							AdrAckReq: false,
@@ -531,8 +531,8 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 				MHdr: &ttnpb.MHDR{MType: ttnpb.MType_REJOIN_REQUEST, Major: 0},
 				Payload: &ttnpb.Message_RejoinRequestPayload{RejoinRequestPayload: &ttnpb.RejoinRequestPayload{
 					RejoinType: 0,
-					NetId:      types.NetID{0x42, 0xff, 0xff},
-					DevEui:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					NetId:      types.NetID{0x42, 0xff, 0xff}.Bytes(),
+					DevEui:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
 					RejoinCnt:  0xff42,
 				}},
 				Mic: []byte{0x42, 0xff, 0xff, 0xff},
@@ -561,8 +561,8 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 				MHdr: &ttnpb.MHDR{MType: ttnpb.MType_REJOIN_REQUEST, Major: 0},
 				Payload: &ttnpb.Message_RejoinRequestPayload{RejoinRequestPayload: &ttnpb.RejoinRequestPayload{
 					RejoinType: 1,
-					JoinEui:    types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					DevEui:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					JoinEui:    types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
+					DevEui:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
 					RejoinCnt:  0xff42,
 				}},
 				Mic: []byte{0x42, 0xff, 0xff, 0xff},
@@ -591,8 +591,8 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 				MHdr: &ttnpb.MHDR{MType: ttnpb.MType_REJOIN_REQUEST, Major: 0},
 				Payload: &ttnpb.Message_RejoinRequestPayload{RejoinRequestPayload: &ttnpb.RejoinRequestPayload{
 					RejoinType: 2,
-					NetId:      types.NetID{0x42, 0xff, 0xff},
-					DevEui:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					NetId:      types.NetID{0x42, 0xff, 0xff}.Bytes(),
+					DevEui:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
 					RejoinCnt:  0xff42,
 				}},
 				Mic: []byte{0x42, 0xff, 0xff, 0xff},
@@ -832,9 +832,9 @@ func TestMessageEncodingSymmetricityJoinAcceptPayload(t *testing.T) {
 		{
 			Name: "JoinAcceptPayload/CFList",
 			Message: &ttnpb.JoinAcceptPayload{
-				JoinNonce: test.DefaultJoinNonce,
-				NetId:     test.DefaultNetID,
-				DevAddr:   test.DefaultDevAddr,
+				JoinNonce: test.DefaultJoinNonce.Bytes(),
+				NetId:     test.DefaultNetID.Bytes(),
+				DevAddr:   test.DefaultDevAddr.Bytes(),
 				DlSettings: &ttnpb.DLSettings{
 					Rx1DrOffset: ttnpb.DataRateOffset_DATA_RATE_OFFSET_2,
 					Rx2Dr:       ttnpb.DataRateIndex_DATA_RATE_1,
@@ -856,9 +856,9 @@ func TestMessageEncodingSymmetricityJoinAcceptPayload(t *testing.T) {
 		{
 			Name: "JoinAcceptPayload/NoCFList",
 			Message: &ttnpb.JoinAcceptPayload{
-				JoinNonce: test.DefaultJoinNonce,
-				NetId:     test.DefaultNetID,
-				DevAddr:   test.DefaultDevAddr,
+				JoinNonce: test.DefaultJoinNonce.Bytes(),
+				NetId:     test.DefaultNetID.Bytes(),
+				DevAddr:   test.DefaultDevAddr.Bytes(),
 				DlSettings: &ttnpb.DLSettings{
 					Rx1DrOffset: ttnpb.DataRateOffset_DATA_RATE_OFFSET_2,
 					Rx2Dr:       ttnpb.DataRateIndex_DATA_RATE_1,
@@ -898,9 +898,9 @@ func TestLoRaWANEncodingRawJoinAcceptPayload(t *testing.T) {
 		{
 			"JoinAcceptPayload/NoCFList",
 			&ttnpb.JoinAcceptPayload{
-				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff},
-				NetId:     types.NetID{0x42, 0xff, 0xff},
-				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff}.Bytes(),
+				NetId:     types.NetID{0x42, 0xff, 0xff}.Bytes(),
+				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				DlSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x6,
@@ -924,9 +924,9 @@ func TestLoRaWANEncodingRawJoinAcceptPayload(t *testing.T) {
 		{
 			"JoinAcceptPayload/CFListFreq",
 			&ttnpb.JoinAcceptPayload{
-				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff},
-				NetId:     types.NetID{0x42, 0xff, 0xff},
-				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff}.Bytes(),
+				NetId:     types.NetID{0x42, 0xff, 0xff}.Bytes(),
+				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				DlSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x6,
@@ -958,9 +958,9 @@ func TestLoRaWANEncodingRawJoinAcceptPayload(t *testing.T) {
 		{
 			"JoinAcceptPayload/CFListChMask",
 			&ttnpb.JoinAcceptPayload{
-				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff},
-				NetId:     types.NetID{0x42, 0xff, 0xff},
-				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff}.Bytes(),
+				NetId:     types.NetID{0x42, 0xff, 0xff}.Bytes(),
+				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				DlSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x6,

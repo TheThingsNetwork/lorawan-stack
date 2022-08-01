@@ -53,9 +53,9 @@ func randomJoinRequestPayload(joinEUI, devEUI types.EUI64) []byte {
 			},
 			Payload: &ttnpb.Message_JoinRequestPayload{
 				JoinRequestPayload: &ttnpb.JoinRequestPayload{
-					JoinEui:  joinEUI,
-					DevEui:   devEUI,
-					DevNonce: devNonce,
+					JoinEui:  joinEUI.Bytes(),
+					DevEui:   devEUI.Bytes(),
+					DevNonce: devNonce.Bytes(),
 				},
 			},
 		},
@@ -79,7 +79,7 @@ func randomUpDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
 
 	pld := &ttnpb.MACPayload{
 		FHdr: &ttnpb.FHDR{
-			DevAddr: devAddr,
+			DevAddr: devAddr.Bytes(),
 			FCnt:    42,
 		},
 		FPort:      fPort,
@@ -120,7 +120,7 @@ func randomDownDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte
 
 	pld := &ttnpb.MACPayload{
 		FHdr: &ttnpb.FHDR{
-			DevAddr: devAddr,
+			DevAddr: devAddr.Bytes(),
 			FCnt:    42,
 		},
 		FPort:      fPort,

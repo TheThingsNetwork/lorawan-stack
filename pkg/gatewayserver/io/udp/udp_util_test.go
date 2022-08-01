@@ -168,7 +168,7 @@ func randomUpDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
 
 	pld := &ttnpb.MACPayload{
 		FHdr: &ttnpb.FHDR{
-			DevAddr: devAddr,
+			DevAddr: devAddr.Bytes(),
 			FCnt:    42,
 		},
 		FPort:      fPort,

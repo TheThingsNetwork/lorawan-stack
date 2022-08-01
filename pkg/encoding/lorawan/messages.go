@@ -97,7 +97,10 @@ func UnmarshalFCtrl(b []byte, msg *ttnpb.FCtrl, isUplink bool) error {
 
 // AppendFHDR appends encoded msg to dst.
 func AppendFHDR(dst []byte, msg *ttnpb.FHDR, isUplink bool) ([]byte, error) {
-	dst = appendReverse(dst, msg.DevAddr[:]...)
+	if n := len(msg.DevAddr); n != 4 {
+		return nil, errExpectedLengthEqual("DevAddr", 4)(n)
+	}
+	dst = appendReverse(dst, msg.DevAddr...)
 	fOptsLen := uint8(len(msg.GetFOpts()))
 	if fOptsLen > 15 {
 		return nil, errExpectedLowerOrEqual("FOptsLen", 15)(fOptsLen)
@@ -117,7 +120,8 @@ func UnmarshalFHDR(b []byte, msg *ttnpb.FHDR, isUplink bool) error {
 	if n < 7 || n > 23 {
 		return errExpectedLengthEncodedBound("FHDR", 7, 23)(n)
 	}
-	copyReverse(msg.DevAddr[:], b[0:4])
+	msg.DevAddr = make([]byte, 4)
+	copyReverse(msg.DevAddr, b[0:4])
 	msg.FCtrl = &ttnpb.FCtrl{}
 	if err := UnmarshalFCtrl(b[4:5], msg.FCtrl, isUplink); err != nil {
 		return errFailedDecoding("FCtrl").WithCause(err)
@@ -299,9 +303,18 @@ func UnmarshalCFList(b []byte, msg *ttnpb.CFList) error {
 
 // AppendJoinAcceptPayload appends encoded msg to dst.
 func AppendJoinAcceptPayload(dst []byte, msg *ttnpb.JoinAcceptPayload) ([]byte, error) {
-	dst = appendReverse(dst, msg.JoinNonce[:]...)
-	dst = appendReverse(dst, msg.NetId[:]...)
-	dst = appendReverse(dst, msg.DevAddr[:]...)
+	if n := len(msg.JoinNonce); n != 3 {
+		return nil, errExpectedLengthEqual("JoinNonce", 3)(n)
+	}
+	dst = appendReverse(dst, msg.JoinNonce...)
+	if n := len(msg.NetId); n != 3 {
+		return nil, errExpectedLengthEqual("NetID", 3)(n)
+	}
+	dst = appendReverse(dst, msg.NetId...)
+	if n := len(msg.DevAddr); n != 4 {
+		return nil, errExpectedLengthEqual("DevAddr", 4)(n)
+	}
+	dst = appendReverse(dst, msg.DevAddr...)
 	dst, err := AppendDLSettings(dst, msg.DlSettings)
 	if err != nil {
 		return nil, errFailedEncoding("DLSettings").WithCause(err)
@@ -333,9 +346,10 @@ func UnmarshalJoinAcceptPayload(b []byte, msg *ttnpb.JoinAcceptPayload) error {
 	if n != 12 && n != 28 {
 		return errExpectedLengthEncodedTwoChoices("JoinAcceptPayload", 12, 28)(n)
 	}
-	copyReverse(msg.JoinNonce[:], b[0:3])
-	copyReverse(msg.NetId[:], b[3:6])
-	copyReverse(msg.DevAddr[:], b[6:10])
+	msg.JoinNonce, msg.NetId, msg.DevAddr = make([]byte, 3), make([]byte, 3), make([]byte, 4)
+	copyReverse(msg.JoinNonce, b[0:3])
+	copyReverse(msg.NetId, b[3:6])
+	copyReverse(msg.DevAddr, b[6:10])
 	msg.DlSettings = &ttnpb.DLSettings{}
 	if err := UnmarshalDLSettings(b[10:11], msg.DlSettings); err != nil {
 		return errFailedDecoding("DLSettings").WithCause(err)
@@ -354,9 +368,18 @@ func UnmarshalJoinAcceptPayload(b []byte, msg *ttnpb.JoinAcceptPayload) error {
 
 // AppendJoinRequestPayload appends encoded msg to dst.
 func AppendJoinRequestPayload(dst []byte, msg *ttnpb.JoinRequestPayload) ([]byte, error) {
-	dst = appendReverse(dst, msg.JoinEui[:]...)
-	dst = appendReverse(dst, msg.DevEui[:]...)
-	dst = appendReverse(dst, msg.DevNonce[:]...)
+	if n := len(msg.JoinEui); n != 8 {
+		return nil, errExpectedLengthEqual("JoinEUI", 8)(n)
+	}
+	dst = appendReverse(dst, msg.JoinEui...)
+	if n := len(msg.DevEui); n != 8 {
+		return nil, errExpectedLengthEqual("DevEUI", 8)(n)
+	}
+	dst = appendReverse(dst, msg.DevEui...)
+	if n := len(msg.DevNonce); n != 2 {
+		return nil, errExpectedLengthEqual("DevNonce", 2)(n)
+	}
+	dst = appendReverse(dst, msg.DevNonce...)
 	return dst, nil
 }
 
@@ -370,9 +393,10 @@ func UnmarshalJoinRequestPayload(b []byte, msg *ttnpb.JoinRequestPayload) error 
 	if len(b) != 18 {
 		return errExpectedLengthEncodedEqual("JoinRequestPayload", 18)(len(b))
 	}
-	copyReverse(msg.JoinEui[:], b[0:8])
-	copyReverse(msg.DevEui[:], b[8:16])
-	copyReverse(msg.DevNonce[:], b[16:18])
+	msg.JoinEui, msg.DevEui, msg.DevNonce = make([]byte, 8), make([]byte, 8), make([]byte, 2)
+	copyReverse(msg.JoinEui, b[0:8])
+	copyReverse(msg.DevEui, b[8:16])
+	copyReverse(msg.DevNonce, b[16:18])
 	return nil
 }
 
@@ -381,11 +405,23 @@ func AppendRejoinRequestPayload(dst []byte, msg *ttnpb.RejoinRequestPayload) ([]
 	dst = append(dst, byte(msg.RejoinType))
 	switch msg.RejoinType {
 	case 0, 2:
-		dst = appendReverse(dst, msg.NetId[:]...)
-		dst = appendReverse(dst, msg.DevEui[:]...)
+		if n := len(msg.NetId); n != 3 {
+			return nil, errExpectedLengthEqual("NetID", 3)(n)
+		}
+		dst = appendReverse(dst, msg.NetId...)
+		if n := len(msg.DevEui); n != 8 {
+			return nil, errExpectedLengthEqual("DevEUI", 8)(n)
+		}
+		dst = appendReverse(dst, msg.DevEui...)
 	case 1:
-		dst = appendReverse(dst, msg.JoinEui[:]...)
-		dst = appendReverse(dst, msg.DevEui[:]...)
+		if n := len(msg.JoinEui); n != 8 {
+			return nil, errExpectedLengthEqual("JoinEUI", 8)(n)
+		}
+		dst = appendReverse(dst, msg.JoinEui...)
+		if n := len(msg.DevEui); n != 8 {
+			return nil, errExpectedLengthEqual("DevEUI", 8)(n)
+		}
+		dst = appendReverse(dst, msg.DevEui...)
 	default:
 		return nil, errUnknown("RejoinType")(msg.RejoinType)
 	}
@@ -416,15 +452,17 @@ func UnmarshalRejoinRequestPayload(b []byte, msg *ttnpb.RejoinRequestPayload) er
 		if len(b) != 14 {
 			return errExpectedLengthEqual("RejoinRequestPayload", 14)(len(b))
 		}
-		copyReverse(msg.NetId[:], b[1:4])
-		copyReverse(msg.DevEui[:], b[4:12])
+		msg.NetId, msg.DevEui = make([]byte, 3), make([]byte, 8)
+		copyReverse(msg.NetId, b[1:4])
+		copyReverse(msg.DevEui, b[4:12])
 		msg.RejoinCnt = byteutil.ParseUint32(b[12:14])
 	case 1:
 		if len(b) != 19 {
 			return errExpectedLengthEqual("RejoinRequestPayload", 19)(len(b))
 		}
-		copyReverse(msg.JoinEui[:], b[1:9])
-		copyReverse(msg.DevEui[:], b[9:17])
+		msg.JoinEui, msg.DevEui = make([]byte, 8), make([]byte, 8)
+		copyReverse(msg.JoinEui, b[1:9])
+		copyReverse(msg.DevEui, b[9:17])
 		msg.RejoinCnt = byteutil.ParseUint32(b[17:19])
 	default:
 		return errUnknown("RejoinType")(msg.RejoinType.String())

@@ -92,7 +92,12 @@ func maxRetransmissionDelay(rxDelay ttnpb.RxDelay) time.Duration {
 func matchCmacF(ctx context.Context, fNwkSIntKey types.AES128Key, macVersion ttnpb.MACVersion, fCnt uint32, up *ttnpb.UplinkMessage) ([4]byte, bool) {
 	trace.Log(ctx, "ns", "compute mic")
 	registerMICComputation(ctx)
-	cmacF, err := crypto.ComputeLegacyUplinkMIC(fNwkSIntKey, up.Payload.GetMacPayload().FHdr.DevAddr, fCnt, up.RawPayload[:len(up.RawPayload)-4])
+	cmacF, err := crypto.ComputeLegacyUplinkMIC(
+		fNwkSIntKey,
+		types.MustDevAddr(up.Payload.GetMacPayload().FHdr.DevAddr).OrZero(),
+		fCnt,
+		up.RawPayload[:len(up.RawPayload)-4],
+	)
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Error("Failed to compute cmacF")
 		return [4]byte{}, false
@@ -234,6 +239,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 	))
 
 	pld := up.Payload.GetMacPayload()
+	devAddr := types.MustDevAddr(pld.FHdr.DevAddr).OrZero()
 	pendingAppDown := dev.MacState.GetPendingApplicationDownlink()
 
 	// NOTE: Device might have changed session since the CMACF match.
@@ -253,7 +259,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 		cmacFMatchResult.IsPending &&
 		dev.PendingSession != nil &&
 		dev.PendingMacState != nil &&
-		pld.FHdr.DevAddr.Equal(types.MustDevAddr(dev.PendingSession.DevAddr).OrZero()) &&
+		devAddr.Equal(types.MustDevAddr(dev.PendingSession.DevAddr).OrZero()) &&
 		macspec.UseLegacyMIC(cmacFMatchResult.LoRaWANVersion) == macspec.UseLegacyMIC(dev.PendingMacState.LorawanVersion) {
 		fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.PendingSession.Keys.FNwkSIntKey, ns.KeyVault)
 		if err != nil {
@@ -292,7 +298,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 	if matchType != pendingMatch &&
 		dev.Session != nil &&
 		dev.MacState != nil &&
-		pld.FHdr.DevAddr.Equal(types.MustDevAddr(dev.Session.DevAddr).OrZero()) &&
+		devAddr.Equal(types.MustDevAddr(dev.Session.DevAddr).OrZero()) &&
 		macspec.UseLegacyMIC(cmacFMatchResult.LoRaWANVersion) == macspec.UseLegacyMIC(dev.MacState.LorawanVersion) &&
 		(cmacFMatchResult.FullFCnt == FullFCnt(uint16(pld.FHdr.FCnt), dev.Session.LastFCntUp, mac.DeviceSupports32BitFCnt(dev, ns.defaultMACSettings)) ||
 			cmacFMatchResult.FullFCnt == pld.FHdr.FCnt) {
@@ -433,7 +439,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 			return nil, false, nil
 		}
 		encOpts := macspec.EncryptionOptions(dev.MacState.LorawanVersion, macspec.UplinkFrame, pld.FPort, cmdsInFOpts)
-		cmdBuf, err = crypto.DecryptUplink(key, pld.FHdr.DevAddr, cmacFMatchResult.FullFCnt, cmdBuf, encOpts...)
+		cmdBuf, err = crypto.DecryptUplink(key, devAddr, cmacFMatchResult.FullFCnt, cmdBuf, encOpts...)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to decrypt uplink")
 			return nil, false, nil
@@ -574,7 +580,7 @@ macLoop:
 		case ttnpb.MACCommandIdentifier_CID_DL_CHANNEL:
 			evs, err = mac.HandleDLChannelAns(ctx, dev, cmd.GetDlChannelAns())
 		case ttnpb.MACCommandIdentifier_CID_REKEY:
-			evs, err = mac.HandleRekeyInd(ctx, dev, cmd.GetRekeyInd(), pld.FHdr.DevAddr)
+			evs, err = mac.HandleRekeyInd(ctx, dev, cmd.GetRekeyInd(), devAddr)
 		case ttnpb.MACCommandIdentifier_CID_ADR_PARAM_SETUP:
 			evs, err = mac.HandleADRParamSetupAns(ctx, dev)
 		case ttnpb.MACCommandIdentifier_CID_DEVICE_TIME:
@@ -621,7 +627,7 @@ macLoop:
 
 	if matchType == pendingMatch {
 		if !macspec.UseRekeyInd(dev.MacState.LorawanVersion) {
-			dev.Ids.DevAddr = &pld.FHdr.DevAddr
+			dev.Ids.DevAddr = &devAddr
 			dev.Session = dev.PendingSession
 		} else if dev.PendingSession != nil || dev.PendingMacState != nil || dev.MacState.PendingJoinRequest != nil {
 			logger.Debug("No RekeyInd received for LoRaWAN 1.1+ device")
@@ -663,7 +669,7 @@ macLoop:
 			confFCnt,
 			uint8(drIdx),
 			chIdx,
-			pld.FHdr.DevAddr,
+			devAddr,
 			cmacFMatchResult.FullFCnt,
 			up.RawPayload[:len(up.RawPayload)-4],
 		)
@@ -1169,7 +1175,8 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		"join_eui", pld.JoinEui,
 	))
 
-	matched, matchedCtx, err := ns.devices.GetByEUI(ctx, pld.JoinEui, pld.DevEui,
+	joinEUI, devEUI := types.MustEUI64(pld.JoinEui).OrZero(), types.MustEUI64(pld.DevEui).OrZero()
+	matched, matchedCtx, err := ns.devices.GetByEUI(ctx, joinEUI, devEUI,
 		[]string{
 			"frequency_plan_id",
 			"lorawan_phy_version",

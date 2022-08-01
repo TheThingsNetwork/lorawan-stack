@@ -2,10 +2,7 @@
 
 package ttnpb
 
-import (
-	fmt "fmt"
-	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
-)
+import fmt "fmt"
 
 func (dst *Message) SetFields(src *Message, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
@@ -328,8 +325,7 @@ func (dst *FHDR) SetFields(src *FHDR, paths ...string) error {
 			if src != nil {
 				dst.DevAddr = src.DevAddr
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.DevAddr
-				dst.DevAddr = zero
+				dst.DevAddr = nil
 			}
 		case "f_ctrl":
 			if len(subs) > 0 {
@@ -454,8 +450,7 @@ func (dst *JoinRequestPayload) SetFields(src *JoinRequestPayload, paths ...strin
 			if src != nil {
 				dst.JoinEui = src.JoinEui
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
-				dst.JoinEui = zero
+				dst.JoinEui = nil
 			}
 		case "dev_eui":
 			if len(subs) > 0 {
@@ -464,8 +459,7 @@ func (dst *JoinRequestPayload) SetFields(src *JoinRequestPayload, paths ...strin
 			if src != nil {
 				dst.DevEui = src.DevEui
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
-				dst.DevEui = zero
+				dst.DevEui = nil
 			}
 		case "dev_nonce":
 			if len(subs) > 0 {
@@ -474,8 +468,7 @@ func (dst *JoinRequestPayload) SetFields(src *JoinRequestPayload, paths ...strin
 			if src != nil {
 				dst.DevNonce = src.DevNonce
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.DevNonce
-				dst.DevNonce = zero
+				dst.DevNonce = nil
 			}
 
 		default:
@@ -505,8 +498,7 @@ func (dst *RejoinRequestPayload) SetFields(src *RejoinRequestPayload, paths ...s
 			if src != nil {
 				dst.NetId = src.NetId
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.NetID
-				dst.NetId = zero
+				dst.NetId = nil
 			}
 		case "join_eui":
 			if len(subs) > 0 {
@@ -515,8 +507,7 @@ func (dst *RejoinRequestPayload) SetFields(src *RejoinRequestPayload, paths ...s
 			if src != nil {
 				dst.JoinEui = src.JoinEui
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
-				dst.JoinEui = zero
+				dst.JoinEui = nil
 			}
 		case "dev_eui":
 			if len(subs) > 0 {
@@ -525,8 +516,7 @@ func (dst *RejoinRequestPayload) SetFields(src *RejoinRequestPayload, paths ...s
 			if src != nil {
 				dst.DevEui = src.DevEui
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
-				dst.DevEui = zero
+				dst.DevEui = nil
 			}
 		case "rejoin_cnt":
 			if len(subs) > 0 {
@@ -565,8 +555,7 @@ func (dst *JoinAcceptPayload) SetFields(src *JoinAcceptPayload, paths ...string)
 			if src != nil {
 				dst.JoinNonce = src.JoinNonce
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.JoinNonce
-				dst.JoinNonce = zero
+				dst.JoinNonce = nil
 			}
 		case "net_id":
 			if len(subs) > 0 {
@@ -575,8 +564,7 @@ func (dst *JoinAcceptPayload) SetFields(src *JoinAcceptPayload, paths ...string)
 			if src != nil {
 				dst.NetId = src.NetId
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.NetID
-				dst.NetId = zero
+				dst.NetId = nil
 			}
 		case "dev_addr":
 			if len(subs) > 0 {
@@ -585,8 +573,7 @@ func (dst *JoinAcceptPayload) SetFields(src *JoinAcceptPayload, paths ...string)
 			if src != nil {
 				dst.DevAddr = src.DevAddr
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.DevAddr
-				dst.DevAddr = zero
+				dst.DevAddr = nil
 			}
 		case "dl_settings":
 			if len(subs) > 0 {

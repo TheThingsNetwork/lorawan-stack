@@ -24,7 +24,6 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
@@ -144,9 +143,9 @@ func MakeJoinRequestDecodedPayload(joinEUI, devEUI types.EUI64, devNonce types.D
 		Mic: CopyBytes(mic[:]),
 		Payload: &ttnpb.Message_JoinRequestPayload{
 			JoinRequestPayload: &ttnpb.JoinRequestPayload{
-				JoinEui:  *joinEUI.Copy(&types.EUI64{}),
-				DevEui:   *devEUI.Copy(&types.EUI64{}),
-				DevNonce: deepcopy.Copy(devNonce).(types.DevNonce),
+				JoinEui:  joinEUI.Bytes(),
+				DevEui:   devEUI.Bytes(),
+				DevNonce: devNonce.Bytes(),
 			},
 		},
 	}
@@ -1197,8 +1196,8 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 							},
 							Payload: &ttnpb.Message_JoinAcceptPayload{
 								JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
-									NetId:      types.MustNetID(dev.PendingMacState.QueuedJoinAccept.NetId).OrZero(),
-									DevAddr:    types.MustDevAddr(dev.PendingMacState.QueuedJoinAccept.DevAddr).OrZero(),
+									NetId:      dev.PendingMacState.QueuedJoinAccept.NetId,
+									DevAddr:    dev.PendingMacState.QueuedJoinAccept.DevAddr,
 									DlSettings: dev.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
 									RxDelay:    dev.PendingMacState.QueuedJoinAccept.Request.RxDelay,
 									CfList:     dev.PendingMacState.QueuedJoinAccept.Request.CfList,

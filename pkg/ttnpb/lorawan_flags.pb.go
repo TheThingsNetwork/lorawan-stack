@@ -9,7 +9,352 @@ package ttnpb
 import (
 	flagsplugin "github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	pflag "github.com/spf13/pflag"
+	customflags "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags"
 )
+
+// AddSelectFlagsForFHDR adds flags to select fields in FHDR.
+func AddSelectFlagsForFHDR(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("dev-addr", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("dev-addr", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("f-ctrl", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("f-ctrl", prefix), true), flagsplugin.WithHidden(hidden)))
+	// NOTE: f_ctrl (FCtrl) does not seem to have select flags.
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("f-cnt", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("f-cnt", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("f-opts", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("f-opts", prefix), false), flagsplugin.WithHidden(hidden)))
+}
+
+// SelectFromFlags outputs the fieldmask paths forFHDR message from select flags.
+func PathsFromSelectFlagsForFHDR(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("dev_addr", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("dev_addr", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("f_ctrl", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("f_ctrl", prefix))
+	}
+	// NOTE: f_ctrl (FCtrl) does not seem to have select flags.
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("f_cnt", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("f_cnt", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("f_opts", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("f_opts", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForFHDR adds flags to select fields in FHDR.
+func AddSetFlagsForFHDR(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(customflags.New4BytesFlag(flagsplugin.Prefix("dev-addr", prefix), "", flagsplugin.WithHidden(hidden)))
+	// FIXME: Skipping FCtrl because it does not seem to implement AddSetFlags.
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("f-cnt", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("f-opts", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the FHDR message from flags.
+func (m *FHDR) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("dev_addr", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.DevAddr = val
+		paths = append(paths, flagsplugin.Prefix("dev_addr", prefix))
+	}
+	// FIXME: Skipping FCtrl because it does not seem to implement AddSetFlags.
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("f_cnt", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.FCnt = val
+		paths = append(paths, flagsplugin.Prefix("f_cnt", prefix))
+	}
+	if val, changed, err := flagsplugin.GetBytes(flags, flagsplugin.Prefix("f_opts", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.FOpts = val
+		paths = append(paths, flagsplugin.Prefix("f_opts", prefix))
+	}
+	return paths, nil
+}
+
+// AddSelectFlagsForJoinRequestPayload adds flags to select fields in JoinRequestPayload.
+func AddSelectFlagsForJoinRequestPayload(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("join-eui", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("join-eui", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("dev-eui", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("dev-eui", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("dev-nonce", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("dev-nonce", prefix), false), flagsplugin.WithHidden(hidden)))
+}
+
+// SelectFromFlags outputs the fieldmask paths forJoinRequestPayload message from select flags.
+func PathsFromSelectFlagsForJoinRequestPayload(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("join_eui", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("join_eui", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("dev_eui", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("dev_eui", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("dev_nonce", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("dev_nonce", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForJoinRequestPayload adds flags to select fields in JoinRequestPayload.
+func AddSetFlagsForJoinRequestPayload(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(customflags.New8BytesFlag(flagsplugin.Prefix("join-eui", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(customflags.New8BytesFlag(flagsplugin.Prefix("dev-eui", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(customflags.New2BytesFlag(flagsplugin.Prefix("dev-nonce", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the JoinRequestPayload message from flags.
+func (m *JoinRequestPayload) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("join_eui", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.JoinEui = val
+		paths = append(paths, flagsplugin.Prefix("join_eui", prefix))
+	}
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("dev_eui", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.DevEui = val
+		paths = append(paths, flagsplugin.Prefix("dev_eui", prefix))
+	}
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("dev_nonce", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.DevNonce = val
+		paths = append(paths, flagsplugin.Prefix("dev_nonce", prefix))
+	}
+	return paths, nil
+}
+
+// AddSelectFlagsForRejoinRequestPayload adds flags to select fields in RejoinRequestPayload.
+func AddSelectFlagsForRejoinRequestPayload(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("rejoin-type", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("rejoin-type", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("net-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("net-id", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("join-eui", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("join-eui", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("dev-eui", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("dev-eui", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("rejoin-cnt", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("rejoin-cnt", prefix), false), flagsplugin.WithHidden(hidden)))
+}
+
+// SelectFromFlags outputs the fieldmask paths forRejoinRequestPayload message from select flags.
+func PathsFromSelectFlagsForRejoinRequestPayload(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("rejoin_type", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("rejoin_type", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("net_id", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("net_id", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("join_eui", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("join_eui", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("dev_eui", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("dev_eui", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("rejoin_cnt", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("rejoin_cnt", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForRejoinRequestPayload adds flags to select fields in RejoinRequestPayload.
+func AddSetFlagsForRejoinRequestPayload(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("rejoin-type", prefix), flagsplugin.EnumValueDesc(RejoinRequestType_value), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(customflags.New3BytesFlag(flagsplugin.Prefix("net-id", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(customflags.New8BytesFlag(flagsplugin.Prefix("join-eui", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(customflags.New8BytesFlag(flagsplugin.Prefix("dev-eui", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("rejoin-cnt", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the RejoinRequestPayload message from flags.
+func (m *RejoinRequestPayload) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("rejoin_type", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		enumValue, err := flagsplugin.SetEnumString(val, RejoinRequestType_value)
+		if err != nil {
+			return nil, err
+		}
+		m.RejoinType = RejoinRequestType(enumValue)
+		paths = append(paths, flagsplugin.Prefix("rejoin_type", prefix))
+	}
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("net_id", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.NetId = val
+		paths = append(paths, flagsplugin.Prefix("net_id", prefix))
+	}
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("join_eui", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.JoinEui = val
+		paths = append(paths, flagsplugin.Prefix("join_eui", prefix))
+	}
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("dev_eui", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.DevEui = val
+		paths = append(paths, flagsplugin.Prefix("dev_eui", prefix))
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("rejoin_cnt", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.RejoinCnt = val
+		paths = append(paths, flagsplugin.Prefix("rejoin_cnt", prefix))
+	}
+	return paths, nil
+}
+
+// AddSelectFlagsForJoinAcceptPayload adds flags to select fields in JoinAcceptPayload.
+func AddSelectFlagsForJoinAcceptPayload(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("encrypted", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("encrypted", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("join-nonce", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("join-nonce", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("net-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("net-id", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("dev-addr", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("dev-addr", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("dl-settings", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("dl-settings", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForDLSettings(flags, flagsplugin.Prefix("dl-settings", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("rx-delay", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("rx-delay", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("cf-list", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("cf-list", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForCFList(flags, flagsplugin.Prefix("cf-list", prefix), hidden)
+}
+
+// SelectFromFlags outputs the fieldmask paths forJoinAcceptPayload message from select flags.
+func PathsFromSelectFlagsForJoinAcceptPayload(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("encrypted", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("encrypted", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("join_nonce", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("join_nonce", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("net_id", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("net_id", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("dev_addr", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("dev_addr", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("dl_settings", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("dl_settings", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForDLSettings(flags, flagsplugin.Prefix("dl_settings", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("rx_delay", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("rx_delay", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("cf_list", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("cf_list", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForCFList(flags, flagsplugin.Prefix("cf_list", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForJoinAcceptPayload adds flags to select fields in JoinAcceptPayload.
+func AddSetFlagsForJoinAcceptPayload(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("encrypted", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(customflags.New3BytesFlag(flagsplugin.Prefix("join-nonce", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(customflags.New3BytesFlag(flagsplugin.Prefix("net-id", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(customflags.New4BytesFlag(flagsplugin.Prefix("dev-addr", prefix), "", flagsplugin.WithHidden(hidden)))
+	AddSetFlagsForDLSettings(flags, flagsplugin.Prefix("dl-settings", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("rx-delay", prefix), flagsplugin.EnumValueDesc(RxDelay_value, RxDelay_customvalue), flagsplugin.WithHidden(hidden)))
+	AddSetFlagsForCFList(flags, flagsplugin.Prefix("cf-list", prefix), hidden)
+}
+
+// SetFromFlags sets the JoinAcceptPayload message from flags.
+func (m *JoinAcceptPayload) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := flagsplugin.GetBytes(flags, flagsplugin.Prefix("encrypted", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Encrypted = val
+		paths = append(paths, flagsplugin.Prefix("encrypted", prefix))
+	}
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("join_nonce", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.JoinNonce = val
+		paths = append(paths, flagsplugin.Prefix("join_nonce", prefix))
+	}
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("net_id", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.NetId = val
+		paths = append(paths, flagsplugin.Prefix("net_id", prefix))
+	}
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("dev_addr", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.DevAddr = val
+		paths = append(paths, flagsplugin.Prefix("dev_addr", prefix))
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("dl_settings", prefix)); changed {
+		if m.DlSettings == nil {
+			m.DlSettings = &DLSettings{}
+		}
+		if setPaths, err := m.DlSettings.SetFromFlags(flags, flagsplugin.Prefix("dl_settings", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("rx_delay", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		enumValue, err := flagsplugin.SetEnumString(val, RxDelay_value, RxDelay_customvalue)
+		if err != nil {
+			return nil, err
+		}
+		m.RxDelay = RxDelay(enumValue)
+		paths = append(paths, flagsplugin.Prefix("rx_delay", prefix))
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("cf_list", prefix)); changed {
+		if m.CfList == nil {
+			m.CfList = &CFList{}
+		}
+		if setPaths, err := m.CfList.SetFromFlags(flags, flagsplugin.Prefix("cf_list", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	return paths, nil
+}
 
 // AddSelectFlagsForDLSettings adds flags to select fields in DLSettings.
 func AddSelectFlagsForDLSettings(flags *pflag.FlagSet, prefix string, hidden bool) {

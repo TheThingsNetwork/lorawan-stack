@@ -162,3 +162,13 @@ func New3BytesFlag(name, usage string, opts ...flagsplugin.FlagOption) *pflag.Fl
 	flagsplugin.ApplyOptions(flag, opts...)
 	return flag
 }
+
+func New2BytesFlag(name, usage string, opts ...flagsplugin.FlagOption) *pflag.Flag {
+	flag := &pflag.Flag{
+		Name:  name,
+		Usage: usage,
+		Value: &ExactBytesValue{length: 2},
+	}
+	flagsplugin.ApplyOptions(flag, opts...)
+	return flag
+}

@@ -26943,7 +26943,15 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 4
+                  }
+                ]
+              }
             },
             {
               "name": "f_ctrl",
@@ -27139,7 +27147,15 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 3
+                  }
+                ]
+              }
             },
             {
               "name": "net_id",
@@ -27151,7 +27167,15 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 3
+                  }
+                ]
+              }
             },
             {
               "name": "dev_addr",
@@ -27163,7 +27187,15 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 4
+                  }
+                ]
+              }
             },
             {
               "name": "dl_settings",
@@ -27239,7 +27271,15 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 8
+                  }
+                ]
+              }
             },
             {
               "name": "dev_eui",
@@ -27251,7 +27291,15 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 8
+                  }
+                ]
+              }
             },
             {
               "name": "dev_nonce",
@@ -27263,7 +27311,15 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 2
+                  }
+                ]
+              }
             }
           ]
         },
@@ -29497,7 +29553,15 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 3
+                  }
+                ]
+              }
             },
             {
               "name": "join_eui",
@@ -29509,7 +29573,15 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 8
+                  }
+                ]
+              }
             },
             {
               "name": "dev_eui",
@@ -29521,7 +29593,15 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 8
+                  }
+                ]
+              }
             },
             {
               "name": "rejoin_cnt",

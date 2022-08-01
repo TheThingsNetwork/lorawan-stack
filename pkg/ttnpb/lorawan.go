@@ -1054,7 +1054,7 @@ func (v *JoinAcceptPayload) FieldIsZero(p string) bool {
 	case "cf_list.type":
 		return v.CfList.FieldIsZero("type")
 	case "dev_addr":
-		return v.DevAddr == types.DevAddr{}
+		return types.MustDevAddr(v.DevAddr).OrZero().IsZero()
 	case "dl_settings":
 		return v.DlSettings == nil
 	case "dl_settings.opt_neg":
@@ -1066,9 +1066,9 @@ func (v *JoinAcceptPayload) FieldIsZero(p string) bool {
 	case "encrypted":
 		return v.Encrypted == nil
 	case "join_nonce":
-		return v.JoinNonce == types.JoinNonce{}
+		return types.MustJoinNonce(v.JoinNonce).OrZero().IsZero()
 	case "net_id":
-		return v.NetId == types.NetID{}
+		return types.MustNetID(v.NetId).OrZero().IsZero()
 	case "rx_delay":
 		return v.RxDelay == 0
 	}
@@ -1082,11 +1082,11 @@ func (v *JoinRequestPayload) FieldIsZero(p string) bool {
 	}
 	switch p {
 	case "dev_eui":
-		return v.DevEui == types.EUI64{}
+		return types.MustEUI64(v.DevEui).OrZero().IsZero()
 	case "dev_nonce":
-		return v.DevNonce == types.DevNonce{}
+		return types.MustDevNonce(v.DevNonce).OrZero().IsZero()
 	case "join_eui":
-		return v.JoinEui == types.EUI64{}
+		return types.MustEUI64(v.JoinEui).OrZero().IsZero()
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }
@@ -1118,7 +1118,7 @@ func (v *FHDR) FieldIsZero(p string) bool {
 	}
 	switch p {
 	case "dev_addr":
-		return v.DevAddr == types.DevAddr{}
+		return types.MustDevAddr(v.DevAddr).OrZero().IsZero()
 	case "f_cnt":
 		return v.FCnt == 0
 	case "f_ctrl":
@@ -1184,11 +1184,11 @@ func (v *RejoinRequestPayload) FieldIsZero(p string) bool {
 	}
 	switch p {
 	case "dev_eui":
-		return v.DevEui == types.EUI64{}
+		return types.MustEUI64(v.DevEui).OrZero().IsZero()
 	case "join_eui":
-		return v.JoinEui == types.EUI64{}
+		return types.MustEUI64(v.JoinEui).OrZero().IsZero()
 	case "net_id":
-		return v.NetId == types.NetID{}
+		return types.MustNetID(v.NetId).OrZero().IsZero()
 	case "rejoin_cnt":
 		return v.RejoinCnt == 0
 	case "rejoin_type":
@@ -1362,25 +1362,29 @@ func (v *DeviceEIRPValue) FieldIsZero(p string) bool {
 // Note that if the payload is nil, the end device identifiers will be nil.
 func (m *Message) EndDeviceIdentifiers() *EndDeviceIdentifiers {
 	if h := m.GetMacPayload().GetFHdr(); h != nil {
+		devAddr := types.MustDevAddr(h.DevAddr).OrZero()
 		return &EndDeviceIdentifiers{
-			DevAddr: &h.DevAddr,
+			DevAddr: &devAddr,
 		}
 	}
 	if p := m.GetJoinRequestPayload(); p != nil {
+		devEUI, joinEUI := types.MustEUI64(p.DevEui).OrZero(), types.MustEUI64(p.JoinEui).OrZero()
 		return &EndDeviceIdentifiers{
-			DevEui:  &p.DevEui,
-			JoinEui: &p.JoinEui,
+			DevEui:  &devEUI,
+			JoinEui: &joinEUI,
 		}
 	}
 	if p := m.GetJoinAcceptPayload(); p != nil {
+		devAddr := types.MustDevAddr(p.DevAddr).OrZero()
 		return &EndDeviceIdentifiers{
-			DevAddr: &p.DevAddr,
+			DevAddr: &devAddr,
 		}
 	}
 	if p := m.GetRejoinRequestPayload(); p != nil {
+		devEUI, joinEUI := types.MustEUI64(p.DevEui).OrZero(), types.MustEUI64(p.JoinEui).OrZero()
 		return &EndDeviceIdentifiers{
-			DevEui:  &p.DevEui,
-			JoinEui: &p.JoinEui,
+			DevEui:  &devEUI,
+			JoinEui: &joinEUI,
 		}
 	}
 	return nil

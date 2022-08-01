@@ -330,7 +330,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 
 	pld := &ttnpb.MACPayload{
 		FHdr: &ttnpb.FHDR{
-			DevAddr: types.MustDevAddr(dev.Session.DevAddr).OrZero(),
+			DevAddr: dev.Session.DevAddr,
 			FCtrl: &ttnpb.FCtrl{
 				Ack: up != nil && up.Payload.MHdr.MType == ttnpb.MType_CONFIRMED_UP,
 				Adr: mac.DeviceUseADR(dev, ns.defaultMACSettings, phy),
@@ -1868,8 +1868,8 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 								},
 								Payload: &ttnpb.Message_JoinAcceptPayload{
 									JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
-										NetId:      types.MustNetID(dev.PendingMacState.QueuedJoinAccept.NetId).OrZero(),
-										DevAddr:    types.MustDevAddr(dev.PendingMacState.QueuedJoinAccept.DevAddr).OrZero(),
+										NetId:      dev.PendingMacState.QueuedJoinAccept.NetId,
+										DevAddr:    dev.PendingMacState.QueuedJoinAccept.DevAddr,
 										DlSettings: dev.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
 										RxDelay:    dev.PendingMacState.QueuedJoinAccept.Request.RxDelay,
 										CfList:     dev.PendingMacState.QueuedJoinAccept.Request.CfList,

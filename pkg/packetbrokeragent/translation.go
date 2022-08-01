@@ -304,18 +304,21 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 
 	switch pld := msg.Message.Payload.Payload.(type) {
 	case *ttnpb.Message_JoinRequestPayload:
+		joinEUI := types.MustEUI64(pld.JoinRequestPayload.JoinEui).OrZero()
+		devEUI := types.MustEUI64(pld.JoinRequestPayload.DevEui).OrZero()
+		devNonce := types.MustDevNonce(pld.JoinRequestPayload.DevNonce).OrZero()
 		up.PhyPayload.Teaser.Payload = &packetbroker.PHYPayloadTeaser_JoinRequest{
 			JoinRequest: &packetbroker.PHYPayloadTeaser_JoinRequestTeaser{
-				JoinEui:  pld.JoinRequestPayload.JoinEui.MarshalNumber(),
-				DevEui:   pld.JoinRequestPayload.DevEui.MarshalNumber(),
-				DevNonce: uint32(pld.JoinRequestPayload.DevNonce.MarshalNumber()),
+				JoinEui:  joinEUI.MarshalNumber(),
+				DevEui:   devEUI.MarshalNumber(),
+				DevNonce: uint32(devNonce.MarshalNumber()),
 			},
 		}
 	case *ttnpb.Message_MacPayload:
 		up.PhyPayload.Teaser.Payload = &packetbroker.PHYPayloadTeaser_Mac{
 			Mac: &packetbroker.PHYPayloadTeaser_MACPayloadTeaser{
 				Confirmed:        pld.MacPayload.FHdr.FCtrl.Ack,
-				DevAddr:          pld.MacPayload.FHdr.DevAddr.MarshalNumber(),
+				DevAddr:          types.MustDevAddr(pld.MacPayload.FHdr.DevAddr).OrZero().MarshalNumber(),
 				FOpts:            len(pld.MacPayload.FHdr.FOpts) > 0,
 				FCnt:             pld.MacPayload.FHdr.FCnt,
 				FPort:            pld.MacPayload.FPort,

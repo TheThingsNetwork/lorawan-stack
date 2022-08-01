@@ -457,7 +457,18 @@ func (m *FHDR) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "dev_addr":
-			// no validation rules for DevAddr
+
+			if len(m.GetDevAddr()) > 0 {
+
+				if len(m.GetDevAddr()) != 4 {
+					return FHDRValidationError{
+						field:  "dev_addr",
+						reason: "value length must be 4 bytes",
+					}
+				}
+
+			}
+
 		case "f_ctrl":
 
 			if m.GetFCtrl() == nil {
@@ -664,11 +675,44 @@ func (m *JoinRequestPayload) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "join_eui":
-			// no validation rules for JoinEui
+
+			if len(m.GetJoinEui()) > 0 {
+
+				if len(m.GetJoinEui()) != 8 {
+					return JoinRequestPayloadValidationError{
+						field:  "join_eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		case "dev_eui":
-			// no validation rules for DevEui
+
+			if len(m.GetDevEui()) > 0 {
+
+				if len(m.GetDevEui()) != 8 {
+					return JoinRequestPayloadValidationError{
+						field:  "dev_eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		case "dev_nonce":
-			// no validation rules for DevNonce
+
+			if len(m.GetDevNonce()) > 0 {
+
+				if len(m.GetDevNonce()) != 2 {
+					return JoinRequestPayloadValidationError{
+						field:  "dev_nonce",
+						reason: "value length must be 2 bytes",
+					}
+				}
+
+			}
+
 		default:
 			return JoinRequestPayloadValidationError{
 				field:  name,
@@ -760,11 +804,44 @@ func (m *RejoinRequestPayload) ValidateFields(paths ...string) error {
 			}
 
 		case "net_id":
-			// no validation rules for NetId
+
+			if len(m.GetNetId()) > 0 {
+
+				if len(m.GetNetId()) != 3 {
+					return RejoinRequestPayloadValidationError{
+						field:  "net_id",
+						reason: "value length must be 3 bytes",
+					}
+				}
+
+			}
+
 		case "join_eui":
-			// no validation rules for JoinEui
+
+			if len(m.GetJoinEui()) > 0 {
+
+				if len(m.GetJoinEui()) != 8 {
+					return RejoinRequestPayloadValidationError{
+						field:  "join_eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		case "dev_eui":
-			// no validation rules for DevEui
+
+			if len(m.GetDevEui()) > 0 {
+
+				if len(m.GetDevEui()) != 8 {
+					return RejoinRequestPayloadValidationError{
+						field:  "dev_eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		case "rejoin_cnt":
 			// no validation rules for RejoinCnt
 		default:
@@ -851,11 +928,44 @@ func (m *JoinAcceptPayload) ValidateFields(paths ...string) error {
 		case "encrypted":
 			// no validation rules for Encrypted
 		case "join_nonce":
-			// no validation rules for JoinNonce
+
+			if len(m.GetJoinNonce()) > 0 {
+
+				if len(m.GetJoinNonce()) != 3 {
+					return JoinAcceptPayloadValidationError{
+						field:  "join_nonce",
+						reason: "value length must be 3 bytes",
+					}
+				}
+
+			}
+
 		case "net_id":
-			// no validation rules for NetId
+
+			if len(m.GetNetId()) > 0 {
+
+				if len(m.GetNetId()) != 3 {
+					return JoinAcceptPayloadValidationError{
+						field:  "net_id",
+						reason: "value length must be 3 bytes",
+					}
+				}
+
+			}
+
 		case "dev_addr":
-			// no validation rules for DevAddr
+
+			if len(m.GetDevAddr()) > 0 {
+
+				if len(m.GetDevAddr()) != 4 {
+					return JoinAcceptPayloadValidationError{
+						field:  "dev_addr",
+						reason: "value length must be 4 bytes",
+					}
+				}
+
+			}
+
 		case "dl_settings":
 
 			if m.GetDlSettings() == nil {

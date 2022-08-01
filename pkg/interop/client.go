@@ -253,11 +253,11 @@ func (cl joinServerHTTPClient) HandleJoinRequest(
 			},
 			SenderID:   NetID(netID),
 			SenderNSID: (*EUI64)(cl.senderNSID),
-			ReceiverID: EUI64(pld.JoinEui),
+			ReceiverID: EUI64(types.MustEUI64(pld.JoinEui).OrZero()),
 		},
 		MACVersion: MACVersion(req.SelectedMacVersion),
 		PHYPayload: Buffer(req.RawPayload),
-		DevEUI:     EUI64(pld.DevEui),
+		DevEUI:     EUI64(types.MustEUI64(pld.DevEui).OrZero()),
 		DevAddr:    DevAddr(types.MustDevAddr(req.DevAddr).OrZero()),
 		DLSettings: Buffer(dlSettings),
 		RxDelay:    req.RxDelay,
@@ -485,7 +485,7 @@ func (cl Client) HandleJoinRequest(
 	if pld == nil {
 		return nil, errNoJoinRequestPayload.New()
 	}
-	js, ok := cl.joinServer(pld.JoinEui)
+	js, ok := cl.joinServer(types.MustEUI64(pld.JoinEui).OrZero())
 	if !ok {
 		return nil, errNotRegistered.New()
 	}

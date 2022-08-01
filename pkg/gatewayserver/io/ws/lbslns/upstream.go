@@ -201,9 +201,9 @@ func (req *JoinRequest) toUplinkMessage(ids *ttnpb.GatewayIdentifiers, bandID st
 		MHdr: parsedMHDR,
 		Mic:  micBytes,
 		Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{
-			JoinEui:  req.JoinEUI.EUI64,
-			DevEui:   req.DevEUI.EUI64,
-			DevNonce: [2]byte{byte(req.DevNonce >> 8), byte(req.DevNonce)},
+			JoinEui:  req.JoinEUI.EUI64.Bytes(),
+			DevEui:   req.DevEUI.EUI64.Bytes(),
+			DevNonce: []byte{byte(req.DevNonce >> 8), byte(req.DevNonce)},
 		}},
 	}
 
@@ -270,14 +270,14 @@ func (req *JoinRequest) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string
 	}
 
 	req.DevEUI = basicstation.EUI{
-		EUI64: jreqPayload.DevEui,
+		EUI64: types.MustEUI64(jreqPayload.DevEui).OrZero(),
 	}
 
 	req.JoinEUI = basicstation.EUI{
-		EUI64: jreqPayload.JoinEui,
+		EUI64: types.MustEUI64(jreqPayload.JoinEui).OrZero(),
 	}
 
-	devNonce, err := jreqPayload.DevNonce.Marshal()
+	devNonce, err := types.MustDevNonce(jreqPayload.DevNonce).OrZero().Marshal()
 	if err != nil {
 		return err
 	}
@@ -359,7 +359,7 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids *ttnpb.GatewayIdentifiers, band
 			FPort:      fPort,
 			FrmPayload: decFRMPayload,
 			FHdr: &ttnpb.FHDR{
-				DevAddr: devAddr,
+				DevAddr: devAddr.Bytes(),
 				FCtrl:   fctrl,
 				FCnt:    uint32(updf.FCnt),
 				FOpts:   decFOpts,
@@ -447,7 +447,7 @@ func (updf *UplinkDataFrame) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID s
 
 	updf.FPort = int(macPayload.GetFPort())
 
-	updf.DevAddr = int32(macPayload.FHdr.DevAddr.MarshalNumber())
+	updf.DevAddr = int32(types.MustDevAddr(macPayload.FHdr.DevAddr).OrZero().MarshalNumber())
 	updf.FOpts = hex.EncodeToString(macPayload.FHdr.FOpts)
 
 	updf.FCtrl = getFCtrlAsUint(macPayload.FHdr.FCtrl)

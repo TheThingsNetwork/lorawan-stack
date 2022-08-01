@@ -844,9 +844,9 @@ func TestTraffic(t *testing.T) {
 					MHdr: &ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: ttnpb.Major_LORAWAN_R1},
 					Mic:  []byte{0x4E, 0x61, 0xBC, 0x00},
 					Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{
-						JoinEui:  types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22},
-						DevEui:   types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11},
-						DevNonce: [2]byte{0x46, 0x50},
+						JoinEui:  types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}.Bytes(),
+						DevEui:   types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}.Bytes(),
+						DevNonce: []byte{0x46, 0x50},
 					}},
 				},
 				RxMetadata: []*ttnpb.RxMetadata{{
@@ -897,7 +897,7 @@ func TestTraffic(t *testing.T) {
 						FPort:      0,
 						FrmPayload: []byte{0x5F, 0xCC},
 						FHdr: &ttnpb.FHDR{
-							DevAddr: [4]byte{0x11, 0x22, 0x33, 0x44},
+							DevAddr: []byte{0x11, 0x22, 0x33, 0x44},
 							FCtrl: &ttnpb.FCtrl{
 								Ack:    true,
 								ClassB: true,
