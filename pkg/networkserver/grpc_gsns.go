@@ -429,7 +429,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 		if matchType == pendingMatch {
 			session = dev.PendingSession
 		}
-		if types.MustAES128Key(session.GetKeys().GetNwkSEncKey().GetKey()).OrZero().IsZero() {
+		if session.GetKeys().GetNwkSEncKey() == nil {
 			log.FromContext(ctx).Warn("Device missing NwkSEncKey in registry")
 			return nil, false, nil
 		}
