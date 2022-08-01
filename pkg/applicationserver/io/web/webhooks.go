@@ -244,6 +244,7 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 			"service_data",
 			"uplink_message",
 			"health_status",
+			"field_mask",
 		},
 	)
 	if err != nil {
@@ -332,6 +333,13 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 	format, ok := formats[hook.Format]
 	if !ok {
 		return nil, errFormatNotFound.WithAttributes("format", hook.Format)
+	}
+	if paths := hook.FieldMask.GetPaths(); len(paths) > 0 {
+		up := &ttnpb.ApplicationUp{}
+		if err := up.SetFields(msg, paths...); err != nil {
+			return nil, err
+		}
+		msg = up
 	}
 	buf, err := format.FromUp(msg)
 	if err != nil {
