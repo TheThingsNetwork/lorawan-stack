@@ -163,6 +163,17 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 		}
 	})
 
+	t.Run("GetEndDevice_ByEUIs", func(t *T) {
+		a, ctx := test.New(t)
+		got, err := s.GetEndDevice(ctx, &ttnpb.EndDeviceIdentifiers{
+			DevEui:  &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8},
+			JoinEui: &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8},
+		}, endDeviceMask)
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.Resemble, created)
+		}
+	})
+
 	t.Run("GetEndDevice_Other", func(t *T) {
 		a, ctx := test.New(t)
 		_, err := s.GetEndDevice(ctx, &ttnpb.EndDeviceIdentifiers{
