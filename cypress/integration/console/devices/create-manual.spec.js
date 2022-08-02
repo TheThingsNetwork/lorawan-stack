@@ -19,7 +19,7 @@ import {
   disableApplicationServer,
 } from '../../../support/utils'
 
-describe('End device manual create', () => {
+describe.skip('End device manual create', () => {
   const user = {
     ids: { user_id: 'create-manual-test-user' },
     primary_email_address: 'create-manual-test-user@example.com',
