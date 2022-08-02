@@ -193,7 +193,7 @@ func (r *DeviceRegistry) set(ctx context.Context, tx *redis.Tx, uid string, gets
 		pipelined = func(p redis.Pipeliner) error {
 			p.Del(ctx, uk)
 			if stored.Ids.JoinEui != nil && stored.Ids.DevEui != nil {
-				p.Del(ctx, r.euiKey(*stored.Ids.JoinEui, *stored.Ids.DevEui))
+				p.Del(ctx, r.euiKey(types.MustEUI64(stored.Ids.JoinEui).OrZero(), types.MustEUI64(stored.Ids.DevEui).OrZero()))
 			}
 			pid, err := provisionerUniqueID(stored)
 			if err != nil {
@@ -237,7 +237,7 @@ func (r *DeviceRegistry) set(ctx context.Context, tx *redis.Tx, uid string, gets
 			if err != nil {
 				return nil, err
 			}
-			if updated.Ids.JoinEui == nil || updated.Ids.DevEui == nil || updated.Ids.DevEui.IsZero() {
+			if updated.Ids.JoinEui == nil || types.MustEUI64(updated.Ids.DevEui).OrZero().IsZero() {
 				return nil, errInvalidIdentifiers.New()
 			}
 		} else {
@@ -247,10 +247,10 @@ func (r *DeviceRegistry) set(ctx context.Context, tx *redis.Tx, uid string, gets
 			if ttnpb.HasAnyField(sets, "ids.device_id") && pb.Ids.DeviceId != stored.Ids.DeviceId {
 				return nil, errReadOnlyField.WithAttributes("field", "ids.device_id")
 			}
-			if ttnpb.HasAnyField(sets, "ids.join_eui") && !equalEUI64(pb.Ids.JoinEui, stored.Ids.JoinEui) {
+			if ttnpb.HasAnyField(sets, "ids.join_eui") && !bytes.Equal(pb.Ids.JoinEui, stored.Ids.JoinEui) {
 				return nil, errReadOnlyField.WithAttributes("field", "ids.join_eui")
 			}
-			if ttnpb.HasAnyField(sets, "ids.dev_eui") && !equalEUI64(pb.Ids.DevEui, stored.Ids.DevEui) {
+			if ttnpb.HasAnyField(sets, "ids.dev_eui") && !bytes.Equal(pb.Ids.DevEui, stored.Ids.DevEui) {
 				return nil, errReadOnlyField.WithAttributes("field", "ids.dev_eui")
 			}
 			if ttnpb.HasAnyField(sets, "provisioner_id") && pb.ProvisionerId != stored.ProvisionerId {
@@ -273,7 +273,7 @@ func (r *DeviceRegistry) set(ctx context.Context, tx *redis.Tx, uid string, gets
 
 		pipelined = func(p redis.Pipeliner) error {
 			if stored == nil {
-				ek := r.euiKey(*updated.Ids.JoinEui, *updated.Ids.DevEui)
+				ek := r.euiKey(types.MustEUI64(updated.Ids.JoinEui).OrZero(), types.MustEUI64(updated.Ids.DevEui).OrZero())
 				if err := tx.Watch(ctx, ek).Err(); err != nil {
 					return err
 				}

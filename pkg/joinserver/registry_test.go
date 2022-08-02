@@ -41,10 +41,13 @@ func CopyEndDevice(pb *ttnpb.EndDevice) *ttnpb.EndDevice {
 func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a, ctx := test.New(t)
 
+	joinEUI := types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	devEUI := types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+
 	pb := &ttnpb.EndDevice{
 		Ids: &ttnpb.EndDeviceIdentifiers{
-			JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-			DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+			JoinEui:        joinEUI.Bytes(),
+			DevEui:         devEUI.Bytes(),
 			ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 			DeviceId:       "test-dev",
 		},
@@ -60,7 +63,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 		},
 	}
 
-	retCtx, err := reg.GetByEUI(ctx, *pb.Ids.JoinEui, *pb.Ids.DevEui, ttnpb.EndDeviceFieldPathsTopLevel)
+	retCtx, err := reg.GetByEUI(ctx, joinEUI, devEUI, ttnpb.EndDeviceFieldPathsTopLevel)
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
@@ -97,7 +100,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	pb.UpdatedAt = ret.UpdatedAt
 	a.So(ret, should.HaveEmptyDiff, pb)
 
-	retCtx, err = reg.GetByEUI(ctx, *pb.Ids.JoinEui, *pb.Ids.DevEui, ttnpb.EndDeviceFieldPathsTopLevel)
+	retCtx, err = reg.GetByEUI(ctx, joinEUI, devEUI, ttnpb.EndDeviceFieldPathsTopLevel)
 	if !a.So(err, should.BeNil) {
 		t.Fatalf("Failed to get device: %s", err)
 	}
@@ -105,9 +108,12 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 
 	pbOther := CopyEndDevice(pb)
 	pbOther.Ids.DeviceId = "other-device"
-	pbOther.Ids.DevEui = &types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	pbOther.Ids.DevEui = types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes()
 
-	retCtx, err = reg.GetByEUI(ctx, *pbOther.Ids.JoinEui, *pbOther.Ids.DevEui, ttnpb.EndDeviceFieldPathsTopLevel)
+	retCtx, err = reg.GetByEUI(ctx,
+		types.MustEUI64(pbOther.Ids.JoinEui).OrZero(),
+		types.MustEUI64(pbOther.Ids.DevEui).OrZero(),
+		ttnpb.EndDeviceFieldPathsTopLevel)
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
@@ -141,7 +147,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 		t.FailNow()
 	}
 
-	retCtx, err = reg.GetByEUI(ctx, *pb.Ids.JoinEui, *pb.Ids.DevEui, ttnpb.EndDeviceFieldPathsTopLevel)
+	retCtx, err = reg.GetByEUI(ctx, joinEUI, devEUI, ttnpb.EndDeviceFieldPathsTopLevel)
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
@@ -177,7 +183,12 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	pbOther.UpdatedAt = ret.UpdatedAt
 	a.So(ret, should.HaveEmptyDiff, pbOther)
 
-	retCtx, err = reg.GetByEUI(ctx, *pbOther.Ids.JoinEui, *pbOther.Ids.DevEui, ttnpb.EndDeviceFieldPathsTopLevel)
+	retCtx, err = reg.GetByEUI(
+		ctx,
+		types.MustEUI64(pbOther.Ids.JoinEui).OrZero(),
+		types.MustEUI64(pbOther.Ids.DevEui).OrZero(),
+		ttnpb.EndDeviceFieldPathsTopLevel,
+	)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -188,7 +199,12 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 		t.FailNow()
 	}
 
-	retCtx, err = reg.GetByEUI(ctx, *pbOther.Ids.JoinEui, *pbOther.Ids.DevEui, ttnpb.EndDeviceFieldPathsTopLevel)
+	retCtx, err = reg.GetByEUI(
+		ctx,
+		types.MustEUI64(pbOther.Ids.JoinEui).OrZero(),
+		types.MustEUI64(pbOther.Ids.DevEui).OrZero(),
+		ttnpb.EndDeviceFieldPathsTopLevel,
+	)
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}

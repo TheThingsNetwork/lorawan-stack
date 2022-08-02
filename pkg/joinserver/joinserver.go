@@ -569,7 +569,10 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 				SNwkSIntKey:  sNwkSIntKeyEnvelope,
 				AppSKey:      appSKeyEnvelope,
 			}
-			_, err = js.keys.SetByID(ctx, *dev.Ids.JoinEui, *dev.Ids.DevEui, sk.SessionKeyId,
+			_, err = js.keys.SetByID(ctx,
+				types.MustEUI64(dev.Ids.JoinEui).OrZero(),
+				types.MustEUI64(dev.Ids.DevEui).OrZero(),
+				sk.SessionKeyId,
 				[]string{
 					"session_key_id",
 					"f_nwk_s_int_key",
@@ -599,7 +602,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 				DevAddr:   req.DevAddr,
 				Keys:      sk,
 			}
-			dev.Ids.DevAddr = types.MustDevAddr(req.DevAddr)
+			dev.Ids.DevAddr = req.DevAddr
 			paths = append(paths, "session", "ids.dev_addr")
 
 			handled = true
