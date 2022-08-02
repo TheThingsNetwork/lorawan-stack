@@ -566,14 +566,15 @@ func (dst *ApplicationWebhookHealth) SetFields(src *ApplicationWebhookHealth, pa
 			for oneofName, oneofSubs := range subPathMap {
 				switch oneofName {
 				case "healthy":
-					_, srcTypeOk := src.Status.(*ApplicationWebhookHealth_Healthy)
-					srcValid := srcTypeOk || src.Status == nil || len(oneofSubs) == 0
-					if !srcValid {
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Status.(*ApplicationWebhookHealth_Healthy)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Status == nil || len(oneofSubs) == 0; !srcValid {
 						return fmt.Errorf("attempt to set oneof 'healthy', while different oneof is set in source")
 					}
 					_, dstTypeOk := dst.Status.(*ApplicationWebhookHealth_Healthy)
-					dstValid := dstTypeOk || dst.Status == nil || len(oneofSubs) == 0
-					if !dstValid {
+					if dstValid := dstTypeOk || dst.Status == nil || len(oneofSubs) == 0; !dstValid {
 						return fmt.Errorf("attempt to set oneof 'healthy', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
@@ -601,14 +602,15 @@ func (dst *ApplicationWebhookHealth) SetFields(src *ApplicationWebhookHealth, pa
 						}
 					}
 				case "unhealthy":
-					_, srcTypeOk := src.Status.(*ApplicationWebhookHealth_Unhealthy)
-					srcValid := srcTypeOk || src.Status == nil || len(oneofSubs) == 0
-					if !srcValid {
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Status.(*ApplicationWebhookHealth_Unhealthy)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Status == nil || len(oneofSubs) == 0; !srcValid {
 						return fmt.Errorf("attempt to set oneof 'unhealthy', while different oneof is set in source")
 					}
 					_, dstTypeOk := dst.Status.(*ApplicationWebhookHealth_Unhealthy)
-					dstValid := dstTypeOk || dst.Status == nil || len(oneofSubs) == 0
-					if !dstValid {
+					if dstValid := dstTypeOk || dst.Status == nil || len(oneofSubs) == 0; !dstValid {
 						return fmt.Errorf("attempt to set oneof 'unhealthy', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {

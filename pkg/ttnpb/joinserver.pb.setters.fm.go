@@ -524,14 +524,15 @@ func (dst *ProvisionEndDevicesRequest) SetFields(src *ProvisionEndDevicesRequest
 			for oneofName, oneofSubs := range subPathMap {
 				switch oneofName {
 				case "list":
-					_, srcTypeOk := src.EndDevices.(*ProvisionEndDevicesRequest_List)
-					srcValid := srcTypeOk || src.EndDevices == nil || len(oneofSubs) == 0
-					if !srcValid {
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.EndDevices.(*ProvisionEndDevicesRequest_List)
+					}
+					if srcValid := srcTypeOk || src == nil || src.EndDevices == nil || len(oneofSubs) == 0; !srcValid {
 						return fmt.Errorf("attempt to set oneof 'list', while different oneof is set in source")
 					}
 					_, dstTypeOk := dst.EndDevices.(*ProvisionEndDevicesRequest_List)
-					dstValid := dstTypeOk || dst.EndDevices == nil || len(oneofSubs) == 0
-					if !dstValid {
+					if dstValid := dstTypeOk || dst.EndDevices == nil || len(oneofSubs) == 0; !dstValid {
 						return fmt.Errorf("attempt to set oneof 'list', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
@@ -559,14 +560,15 @@ func (dst *ProvisionEndDevicesRequest) SetFields(src *ProvisionEndDevicesRequest
 						}
 					}
 				case "range":
-					_, srcTypeOk := src.EndDevices.(*ProvisionEndDevicesRequest_Range)
-					srcValid := srcTypeOk || src.EndDevices == nil || len(oneofSubs) == 0
-					if !srcValid {
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.EndDevices.(*ProvisionEndDevicesRequest_Range)
+					}
+					if srcValid := srcTypeOk || src == nil || src.EndDevices == nil || len(oneofSubs) == 0; !srcValid {
 						return fmt.Errorf("attempt to set oneof 'range', while different oneof is set in source")
 					}
 					_, dstTypeOk := dst.EndDevices.(*ProvisionEndDevicesRequest_Range)
-					dstValid := dstTypeOk || dst.EndDevices == nil || len(oneofSubs) == 0
-					if !dstValid {
+					if dstValid := dstTypeOk || dst.EndDevices == nil || len(oneofSubs) == 0; !dstValid {
 						return fmt.Errorf("attempt to set oneof 'range', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
@@ -594,14 +596,15 @@ func (dst *ProvisionEndDevicesRequest) SetFields(src *ProvisionEndDevicesRequest
 						}
 					}
 				case "from_data":
-					_, srcTypeOk := src.EndDevices.(*ProvisionEndDevicesRequest_FromData)
-					srcValid := srcTypeOk || src.EndDevices == nil || len(oneofSubs) == 0
-					if !srcValid {
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.EndDevices.(*ProvisionEndDevicesRequest_FromData)
+					}
+					if srcValid := srcTypeOk || src == nil || src.EndDevices == nil || len(oneofSubs) == 0; !srcValid {
 						return fmt.Errorf("attempt to set oneof 'from_data', while different oneof is set in source")
 					}
 					_, dstTypeOk := dst.EndDevices.(*ProvisionEndDevicesRequest_FromData)
-					dstValid := dstTypeOk || dst.EndDevices == nil || len(oneofSubs) == 0
-					if !dstValid {
+					if dstValid := dstTypeOk || dst.EndDevices == nil || len(oneofSubs) == 0; !dstValid {
 						return fmt.Errorf("attempt to set oneof 'from_data', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
