@@ -159,14 +159,16 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 		return nil
 	})
 	if err != nil {
+		joinEUI := types.MustEUI64(req.EndDevice.Ids.JoinEui)
+		devEUI := types.MustEUI64(req.EndDevice.Ids.DevEui)
 		if errors.IsAlreadyExists(err) && errors.Resemble(err, store.ErrEUITaken) {
 			if ids, err := is.getEndDeviceIdentifiersForEUIs(ctx, &ttnpb.GetEndDeviceIdentifiersForEUIsRequest{
-				JoinEui: req.EndDevice.Ids.JoinEui.Bytes(),
-				DevEui:  req.EndDevice.Ids.DevEui.Bytes(),
+				JoinEui: req.EndDevice.Ids.JoinEui,
+				DevEui:  req.EndDevice.Ids.DevEui,
 			}); err == nil {
 				return nil, errEndDeviceEUIsTaken.WithAttributes(
-					"join_eui", req.EndDevice.Ids.JoinEui.String(),
-					"dev_eui", req.EndDevice.Ids.DevEui.String(),
+					"join_eui", joinEUI.String(),
+					"dev_eui", devEUI.String(),
 					"device_id", ids.GetDeviceId(),
 					"application_id", ids.GetApplicationIds().GetApplicationId(),
 				)
@@ -204,8 +206,8 @@ func (is *IdentityServer) getEndDeviceIdentifiersForEUIs(ctx context.Context, re
 	}
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		dev, err := st.GetEndDevice(ctx, &ttnpb.EndDeviceIdentifiers{
-			JoinEui: types.MustEUI64(req.JoinEui),
-			DevEui:  types.MustEUI64(req.DevEui),
+			JoinEui: req.JoinEui,
+			DevEui:  req.DevEui,
 		}, []string{"ids.application_ids.application_id", "ids.device_id", "ids.join_eui", "ids.dev_eui"})
 		if err != nil {
 			return err

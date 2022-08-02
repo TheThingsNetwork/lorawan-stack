@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // GetEndDeviceStore returns an EndDeviceStore on the given db (or transaction).
@@ -167,10 +168,10 @@ func (s *deviceStore) GetEndDevice(
 		withDeviceID(id.GetDeviceId()),
 	)
 	if id.JoinEui != nil {
-		query = query.Scopes(withJoinEUI(EUI64(*id.JoinEui)))
+		query = query.Scopes(withJoinEUI(EUI64(types.MustEUI64(id.JoinEui).OrZero())))
 	}
 	if id.DevEui != nil {
-		query = query.Scopes(withDevEUI(EUI64(*id.DevEui)))
+		query = query.Scopes(withDevEUI(EUI64(types.MustEUI64(id.DevEui).OrZero())))
 	}
 	query = selectEndDeviceFields(ctx, query, fieldMask)
 	var devModel EndDevice

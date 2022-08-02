@@ -182,7 +182,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 				return err
 			}); err == nil {
 				attributes := []interface{}{
-					"gateway_eui", reqGtw.GetIds().GetEui().String(),
+					"gateway_eui", types.MustEUI64(reqGtw.GetIds().GetEui()).OrZero().String(),
 					"gateway_id", existing.GetIds().GetGatewayId(),
 				}
 				if existing.AdministrativeContact != nil {
@@ -297,7 +297,7 @@ func (is *IdentityServer) getGatewayIdentifiersForEUI(ctx context.Context, req *
 	}
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		gtw, err := st.GetGateway(ctx, &ttnpb.GatewayIdentifiers{
-			Eui: types.MustEUI64(req.Eui),
+			Eui: req.Eui,
 		}, []string{"ids.gateway_id", "ids.eui"})
 		if err != nil {
 			return err

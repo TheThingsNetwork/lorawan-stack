@@ -86,8 +86,8 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 			Ids: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIds: application.GetIds(),
 				DeviceId:       "foo",
-				JoinEui:        &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8},
-				DevEui:         &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8},
+				JoinEui:        types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}.Bytes(),
+				DevEui:         types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}.Bytes(),
 			},
 			Name:        "Foo Name",
 			Description: "Foo Description",

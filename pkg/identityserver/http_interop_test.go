@@ -46,8 +46,8 @@ func TestInteropServer(t *testing.T) {
 				ApplicationId: "test-app-id",
 			},
 			DeviceId: "test-device-id",
-			JoinEui:  &joinEUI,
-			DevEui:   &devEUI,
+			JoinEui:  joinEUI.Bytes(),
+			DevEui:   devEUI.Bytes(),
 		}
 
 		_, err := is.store.CreateEndDevice(ctx, &ttnpb.EndDevice{

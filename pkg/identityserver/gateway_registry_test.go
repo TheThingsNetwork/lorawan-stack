@@ -127,7 +127,7 @@ func TestGatewaysCRUD(t *testing.T) {
 			Gateway: &ttnpb.Gateway{
 				Ids: &ttnpb.GatewayIdentifiers{
 					GatewayId: "foo",
-					Eui:       eui,
+					Eui:       eui.Bytes(),
 				},
 				Name: "Foo Gateway",
 			},
@@ -141,14 +141,14 @@ func TestGatewaysCRUD(t *testing.T) {
 			Gateway: &ttnpb.Gateway{
 				Ids: &ttnpb.GatewayIdentifiers{
 					GatewayId: "foo",
-					Eui:       eui,
+					Eui:       eui.Bytes(),
 				},
 				Name: "Foo Gateway",
 			},
 			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
 		}, creds)
 		if a.So(err, should.BeNil) && a.So(created, should.NotBeNil) {
-			a.So(created.GetIds().GetEui(), should.Resemble, eui)
+			a.So(created.GetIds().GetEui(), should.Resemble, eui.Bytes())
 			a.So(created.Name, should.Equal, "Foo Gateway")
 		}
 
@@ -172,7 +172,7 @@ func TestGatewaysCRUD(t *testing.T) {
 			Gateway: &ttnpb.Gateway{
 				Ids: &ttnpb.GatewayIdentifiers{
 					GatewayId: "bar",
-					Eui:       eui,
+					Eui:       eui.Bytes(),
 				},
 				Name: "Bar Gateway",
 			},

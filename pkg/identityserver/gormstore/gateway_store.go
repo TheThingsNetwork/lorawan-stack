@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // GetGatewayStore returns an GatewayStore on the given db (or transaction).
@@ -146,7 +147,7 @@ func (s *gatewayStore) GetGateway(
 	defer trace.StartRegion(ctx, "get gateway").End()
 	query := s.query(ctx, Gateway{}, withGatewayID(id.GetGatewayId()))
 	if id.Eui != nil {
-		query = query.Scopes(withGatewayEUI(EUI64(*id.Eui)))
+		query = query.Scopes(withGatewayEUI(EUI64(types.MustEUI64(id.Eui).OrZero())))
 	}
 	query = selectGatewayFields(ctx, query, fieldMask)
 	var gtwModel Gateway

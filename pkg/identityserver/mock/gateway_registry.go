@@ -137,7 +137,7 @@ func (is *mockISGatewayRegistry) GetIdentifiersForEUI(ctx context.Context, req *
 	if is.registeredGateway == nil {
 		return nil, errNotFound.New()
 	}
-	if types.MustEUI64(req.Eui).OrZero().Equal(*is.registeredGateway.Eui) {
+	if types.MustEUI64(req.Eui).OrZero().Equal(types.MustEUI64(is.registeredGateway.Eui).OrZero()) {
 		return is.registeredGateway, nil
 	}
 	return nil, errNotFound.New()

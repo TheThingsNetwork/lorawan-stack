@@ -66,7 +66,7 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 		start := time.Now().Truncate(time.Second)
 
 		created, err = s.CreateGateway(ctx, &ttnpb.Gateway{
-			Ids:                   &ttnpb.GatewayIdentifiers{GatewayId: "foo", Eui: eui},
+			Ids:                   &ttnpb.GatewayIdentifiers{GatewayId: "foo", Eui: eui.Bytes()},
 			Name:                  "Foo Name",
 			Description:           "Foo Description",
 			Attributes:            attributes,
@@ -149,7 +149,7 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 		}
 
 		_, err = s.CreateGateway(ctx, &ttnpb.Gateway{
-			Ids: &ttnpb.GatewayIdentifiers{GatewayId: "other", Eui: eui},
+			Ids: &ttnpb.GatewayIdentifiers{GatewayId: "other", Eui: eui.Bytes()},
 		})
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsAlreadyExists(err), should.BeTrue)
@@ -166,7 +166,7 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 
 	t.Run("GetGateway_ByEUI", func(t *T) {
 		a, ctx := test.New(t)
-		got, err := s.GetGateway(ctx, &ttnpb.GatewayIdentifiers{Eui: eui}, mask)
+		got, err := s.GetGateway(ctx, &ttnpb.GatewayIdentifiers{Eui: eui.Bytes()}, mask)
 		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
 			a.So(got, should.Resemble, created)
 		}
@@ -224,7 +224,7 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 		start := time.Now().Truncate(time.Second)
 
 		updated, err = s.UpdateGateway(ctx, &ttnpb.Gateway{
-			Ids:                   &ttnpb.GatewayIdentifiers{GatewayId: "foo", Eui: updatedEUI},
+			Ids:                   &ttnpb.GatewayIdentifiers{GatewayId: "foo", Eui: updatedEUI.Bytes()},
 			Name:                  "New Foo Name",
 			Description:           "New Foo Description",
 			Attributes:            updatedAttributes,
@@ -258,7 +258,7 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 		}, append(mask, "ids.eui"))
 		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
 			a.So(updated.GetIds().GetGatewayId(), should.Equal, "foo")
-			a.So(updated.GetIds().GetEui(), should.Resemble, updatedEUI)
+			a.So(updated.GetIds().GetEui(), should.Resemble, updatedEUI.Bytes())
 			a.So(updated.Name, should.Equal, "New Foo Name")
 			a.So(updated.Description, should.Equal, "New Foo Description")
 			a.So(updated.Attributes, should.Resemble, updatedAttributes)
