@@ -87,6 +87,7 @@ const FormField = props => {
     tooltipId,
     warning,
     validate,
+    valueSetter,
     onChange,
     onBlur,
   } = props
@@ -96,6 +97,7 @@ const FormField = props => {
     validateOnBlur,
     setFieldValue,
     setFieldTouched,
+    setValues,
     addToFieldRegistry,
     removeFromFieldRegistry,
   } = useFormContext()
@@ -136,7 +138,13 @@ const FormField = props => {
         }
       }
 
-      await setFieldValue(name, newValue)
+      // This middleware takes care of updating the form values  and allows for more control
+      // over how the form values are changed if needed. See the default prop to understand
+      // how the value is set by default.
+      await valueSetter(
+        { setFieldValue, setValues, setFieldTouched },
+        { name, value: newValue, oldValue },
+      )
 
       if (enforceValidation) {
         setFieldTouched(name, true, true)
@@ -144,7 +152,7 @@ const FormField = props => {
 
       onChange(isSyntheticEvent ? value : encode(value, oldValue))
     },
-    [encode, encodedValue, name, onChange, setFieldTouched, setFieldValue],
+    [encode, encodedValue, name, onChange, setFieldTouched, setFieldValue, setValues, valueSetter],
   )
 
   const handleBlur = useCallback(
@@ -276,6 +284,7 @@ FormField.propTypes = {
   titleChildren: PropTypes.oneOfType([PropTypes.node, PropTypes.arrayOf(PropTypes.node)]),
   tooltipId: PropTypes.string,
   validate: PropTypes.func,
+  valueSetter: PropTypes.func,
   warning: PropTypes.message,
 }
 
@@ -295,6 +304,7 @@ FormField.defaultProps = {
   titleChildren: null,
   tooltipId: '',
   validate: undefined,
+  valueSetter: ({ setFieldValue }, { name, value }) => setFieldValue(name, value),
   warning: '',
 }
 
