@@ -195,7 +195,7 @@ func (client *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, clai
 
 // Unclaim implements EndDeviceClaimer.
 func (client *TTJS) Unclaim(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) error {
-	devEUI := *ids.DevEui
+	devEUI := types.MustEUI64(ids.DevEui)
 	path := fmt.Sprintf("%s/%s/claim/%s", client.baseURL.String(), client.config.ClaimingAPIVersion, devEUI.String())
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"dev_eui", devEUI,
@@ -249,7 +249,7 @@ func (client *TTJS) Unclaim(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers
 
 // GetClaimStatus implements EndDeviceClaimer.
 func (client *TTJS) GetClaimStatus(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*ttnpb.GetClaimStatusResponse, error) {
-	devEUI := ids.DevEui
+	devEUI := types.MustEUI64(ids.DevEui)
 	path := fmt.Sprintf("%s/%s/claim/%s", client.baseURL.String(), client.config.ClaimingAPIVersion, devEUI.String())
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"dev_eui", devEUI,

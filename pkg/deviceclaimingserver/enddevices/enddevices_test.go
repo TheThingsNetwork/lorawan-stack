@@ -70,8 +70,8 @@ func TestUpstream(t *testing.T) {
 		ApplicationIds: &ttnpb.ApplicationIdentifiers{
 			ApplicationId: "test-app",
 		},
-		JoinEui: unsupportedJoinEUI,
-		DevEui:  &types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30},
+		JoinEui: unsupportedJoinEUI.Bytes(),
+		DevEui:  types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30}.Bytes(),
 	})
 	a.So(errors.IsUnauthenticated(err), should.BeTrue)
 
@@ -99,8 +99,8 @@ func TestUpstream(t *testing.T) {
 		ApplicationIds: &ttnpb.ApplicationIdentifiers{
 			ApplicationId: "test-app",
 		},
-		JoinEui: supportedJoinEUI,
-		DevEui:  &types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30},
+		JoinEui: supportedJoinEUI.Bytes(),
+		DevEui:  types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30}.Bytes(),
 	})
 	a.So(!errors.IsUnavailable(err), should.BeTrue)
 }

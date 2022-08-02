@@ -126,8 +126,8 @@ func (edcs *endDeviceClaimingServer) Claim(ctx context.Context, req *ttnpb.Claim
 		if dev == nil {
 			return nil, errParseQRCode.New()
 		}
-		joinEUI = *dev.GetIds().JoinEui
-		devEUI = *dev.GetIds().DevEui
+		joinEUI = types.MustEUI64(dev.GetIds().JoinEui).OrZero()
+		devEUI = types.MustEUI64(dev.GetIds().DevEui).OrZero()
 		claimAuthenticationCode = dev.ClaimAuthenticationCode.Value
 	} else {
 		return nil, errNoJoinEUI.New()
@@ -146,8 +146,8 @@ func (edcs *endDeviceClaimingServer) Claim(ctx context.Context, req *ttnpb.Claim
 	return &ttnpb.EndDeviceIdentifiers{
 		DeviceId:       req.TargetDeviceId,
 		ApplicationIds: req.TargetApplicationIds,
-		DevEui:         &devEUI,
-		JoinEui:        &joinEUI,
+		DevEui:         devEUI.Bytes(),
+		JoinEui:        joinEUI.Bytes(),
 	}, nil
 }
 

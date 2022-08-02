@@ -51,8 +51,8 @@ var (
 	}
 	devEUI            = types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30}
 	validEndDeviceIds = &ttnpb.EndDeviceIdentifiers{
-		DevEui:  &devEUI,
-		JoinEui: &types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0C},
+		DevEui:  devEUI.Bytes(),
+		JoinEui: types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0C}.Bytes(),
 	}
 	tenantID     = "test-os"
 	targetAppIDs = &ttnpb.ApplicationIdentifiers{
@@ -123,13 +123,13 @@ func TestTTJS(t *testing.T) {
 	err = unauthenticatedClient.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode)
 	a.So(errors.IsUnauthenticated(err), should.BeTrue)
 	err = unauthenticatedClient.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
-		DevEui:  &devEUI,
-		JoinEui: &supportedJoinEUI,
+		DevEui:  devEUI.Bytes(),
+		JoinEui: supportedJoinEUI.Bytes(),
 	})
 	a.So(errors.IsUnauthenticated(err), should.BeTrue)
 	ret, err := unauthenticatedClient.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
-		DevEui:  &devEUI,
-		JoinEui: &supportedJoinEUI,
+		DevEui:  devEUI.Bytes(),
+		JoinEui: supportedJoinEUI.Bytes(),
 	})
 	a.So(errors.IsUnauthenticated(err), should.BeTrue)
 	a.So(ret, should.BeNil)
@@ -219,33 +219,33 @@ func TestTTJS(t *testing.T) {
 	err = otherClient.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode)
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 	ret, err = otherClient.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
-		DevEui:  &devEUI,
-		JoinEui: &supportedJoinEUI,
+		DevEui:  devEUI.Bytes(),
+		JoinEui: supportedJoinEUI.Bytes(),
 	})
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 	a.So(ret, should.BeNil)
 	err = otherClient.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
-		DevEui:  &devEUI,
-		JoinEui: &supportedJoinEUI,
+		DevEui:  devEUI.Bytes(),
+		JoinEui: supportedJoinEUI.Bytes(),
 	})
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
 	// Unclaim
 	err = client.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
-		DevEui:  &devEUI,
-		JoinEui: &supportedJoinEUI,
+		DevEui:  devEUI.Bytes(),
+		JoinEui: supportedJoinEUI.Bytes(),
 	})
 	a.So(err, should.BeNil)
 	_, err = otherClient.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
-		DevEui:  &devEUI,
-		JoinEui: &supportedJoinEUI,
+		DevEui:  devEUI.Bytes(),
+		JoinEui: supportedJoinEUI.Bytes(),
 	})
 	a.So(errors.IsNotFound(err), should.BeTrue)
 
 	// Try to unclaim again
 	err = client.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
-		DevEui:  &devEUI,
-		JoinEui: &supportedJoinEUI,
+		DevEui:  devEUI.Bytes(),
+		JoinEui: supportedJoinEUI.Bytes(),
 	})
 	a.So(errors.IsNotFound(err), should.BeTrue)
 

@@ -79,7 +79,7 @@ var csvFieldSetters = map[string]csvFieldSetterFunc{
 		if err := devEUI.UnmarshalText([]byte(val)); err != nil {
 			return nil, err
 		}
-		dst.Ids.DevEui = &devEUI
+		dst.Ids.DevEui = devEUI.Bytes()
 		return []string{"ids.dev_eui"}, nil
 	},
 	"join_eui": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
@@ -87,7 +87,7 @@ var csvFieldSetters = map[string]csvFieldSetterFunc{
 		if err := joinEUI.UnmarshalText([]byte(val)); err != nil {
 			return nil, err
 		}
-		dst.Ids.JoinEui = &joinEUI
+		dst.Ids.JoinEui = joinEUI.Bytes()
 		return []string{"ids.join_eui"}, nil
 	},
 	"app_eui": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
@@ -95,7 +95,7 @@ var csvFieldSetters = map[string]csvFieldSetterFunc{
 		if err := joinEUI.UnmarshalText([]byte(val)); err != nil {
 			return nil, err
 		}
-		dst.Ids.JoinEui = &joinEUI
+		dst.Ids.JoinEui = joinEUI.Bytes()
 		return []string{"ids.join_eui"}, nil
 	},
 	"name": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
@@ -385,7 +385,7 @@ func (*ttsCSV) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDev
 			paths = ttnpb.AddFields(paths, fieldPaths...)
 		}
 		if !ttnpb.HasAnyField(paths, "ids.device_id") && ttnpb.HasAnyField(paths, "ids.dev_eui") {
-			dev.Ids.DeviceId = fmt.Sprintf("eui-%s", strings.ToLower(dev.Ids.DevEui.String()))
+			dev.Ids.DeviceId = fmt.Sprintf("eui-%s", strings.ToLower(types.MustEUI64(dev.Ids.DevEui).String()))
 			paths = ttnpb.AddFields(paths, "ids.device_id")
 		}
 
