@@ -429,7 +429,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 		if matchType == pendingMatch {
 			session = dev.PendingSession
 		}
-		if types.MustAES128Key(session.GetKeys().GetNwkSEncKey().GetKey()).OrZero().IsZero() {
+		if session.GetKeys().GetNwkSEncKey() == nil {
 			log.FromContext(ctx).Warn("Device missing NwkSEncKey in registry")
 			return nil, false, nil
 		}
@@ -1286,9 +1286,24 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	registerForwardJoinRequest(ctx, up)
 
 	keys := resp.SessionKeys
+	keyEnvelopes := []*ttnpb.KeyEnvelope{keys.FNwkSIntKey, keys.NwkSEncKey, keys.SNwkSIntKey}
 	if !dlSettings.OptNeg {
 		keys.NwkSEncKey = keys.FNwkSIntKey
 		keys.SNwkSIntKey = keys.FNwkSIntKey
+		keyEnvelopes = keyEnvelopes[:1]
+	}
+	for _, keyEnvelope := range keyEnvelopes {
+		unwrappedKey, err := cryptoutil.UnwrapAES128Key(ctx, keyEnvelope, ns.KeyVault)
+		if err != nil {
+			return err
+		}
+		wrappedEnvelope, err := cryptoutil.WrapAES128Key(ctx, unwrappedKey, ns.deviceKEKLabel, ns.KeyVault)
+		if err != nil {
+			return err
+		}
+		if err := keyEnvelope.SetFields(wrappedEnvelope, ttnpb.KeyEnvelopeFieldPathsTopLevel...); err != nil {
+			return err
+		}
 	}
 	macState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
 		CorrelationIds: resp.CorrelationIds,

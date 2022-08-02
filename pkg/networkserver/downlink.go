@@ -504,7 +504,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	ctx = log.NewContext(ctx, logger)
 
 	if len(cmdBuf) > 0 && (!cmdsInFOpts || macspec.EncryptFOpts(dev.MacState.LorawanVersion)) {
-		if types.MustAES128Key(dev.GetSession().GetKeys().GetNwkSEncKey().GetKey()).OrZero().IsZero() {
+		if dev.GetSession().GetKeys().GetNwkSEncKey() == nil {
 			return nil, genState, errUnknownNwkSEncKey.New()
 		}
 		key, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.Keys.NwkSEncKey, ns.KeyVault)
@@ -575,7 +575,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	}
 	// NOTE: It is assumed, that b does not contain MIC.
 
-	if types.MustAES128Key(dev.Session.GetKeys().GetSNwkSIntKey().GetKey()).OrZero().IsZero() {
+	if dev.Session.GetKeys().GetSNwkSIntKey() == nil {
 		return nil, genState, errUnknownSNwkSIntKey.New()
 	}
 	key, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.Keys.SNwkSIntKey, ns.KeyVault)
