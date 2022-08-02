@@ -88,7 +88,7 @@ A PEM encoded CUPS trust may be included in the claim request.
 			req := &ttnpb.ClaimGatewayRequest{
 				SourceGateway: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers_{
 					AuthenticatedIdentifiers: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers{
-						GatewayEui:         gtwIDs.Eui.Bytes(),
+						GatewayEui:         gtwIDs.Eui,
 						AuthenticationCode: []byte(authenticationCode),
 					},
 				},
