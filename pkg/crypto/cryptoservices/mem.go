@@ -55,7 +55,7 @@ func (d *mem) JoinAcceptMIC(ctx context.Context, dev *ttnpb.EndDevice, version t
 	if dev.Ids == nil || dev.Ids.JoinEui == nil {
 		return [4]byte{}, errNoJoinEUI.New()
 	}
-	if dev.Ids.DevEui == nil || dev.Ids.DevEui.IsZero() {
+	if types.MustEUI64(dev.Ids.DevEui).OrZero().IsZero() {
 		return [4]byte{}, errNoDevEUI.New()
 	}
 	if d.nwkKey == nil {
@@ -63,8 +63,8 @@ func (d *mem) JoinAcceptMIC(ctx context.Context, dev *ttnpb.EndDevice, version t
 	}
 	switch {
 	case macspec.UseNwkKey(version):
-		jsIntKey := crypto.DeriveJSIntKey(*d.nwkKey, *dev.Ids.DevEui)
-		return crypto.ComputeJoinAcceptMIC(jsIntKey, joinReqType, *dev.Ids.JoinEui, dn, payload)
+		jsIntKey := crypto.DeriveJSIntKey(*d.nwkKey, types.MustEUI64(dev.Ids.DevEui).OrZero())
+		return crypto.ComputeJoinAcceptMIC(jsIntKey, joinReqType, types.MustEUI64(dev.Ids.JoinEui).OrZero(), dn, payload)
 	default:
 		return crypto.ComputeLegacyJoinAcceptMIC(*d.nwkKey, payload)
 	}
@@ -84,13 +84,13 @@ func (d *mem) EncryptRejoinAccept(ctx context.Context, dev *ttnpb.EndDevice, ver
 	if dev.Ids == nil || dev.Ids.JoinEui == nil {
 		return nil, errNoJoinEUI.New()
 	}
-	if dev.Ids.DevEui == nil || dev.Ids.DevEui.IsZero() {
+	if types.MustEUI64(dev.Ids.DevEui).OrZero().IsZero() {
 		return nil, errNoDevEUI.New()
 	}
 	if d.nwkKey == nil {
 		return nil, errNoNwkKey.New()
 	}
-	jsEncKey := crypto.DeriveJSEncKey(*d.nwkKey, *dev.Ids.DevEui)
+	jsEncKey := crypto.DeriveJSEncKey(*d.nwkKey, types.MustEUI64(dev.Ids.DevEui).OrZero())
 	return crypto.EncryptJoinAccept(jsEncKey, payload)
 }
 
@@ -98,7 +98,7 @@ func (d *mem) DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDevice, version 
 	if dev.Ids == nil || dev.Ids.JoinEui == nil {
 		return NwkSKeys{}, errNoJoinEUI.New()
 	}
-	if dev.Ids.DevEui == nil || dev.Ids.DevEui.IsZero() {
+	if types.MustEUI64(dev.Ids.DevEui).OrZero().IsZero() {
 		return NwkSKeys{}, errNoDevEUI.New()
 	}
 	if d.nwkKey == nil {
@@ -107,9 +107,9 @@ func (d *mem) DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDevice, version 
 	switch {
 	case macspec.UseNwkKey(version):
 		return NwkSKeys{
-			FNwkSIntKey: crypto.DeriveFNwkSIntKey(*d.nwkKey, jn, *dev.Ids.JoinEui, dn),
-			SNwkSIntKey: crypto.DeriveSNwkSIntKey(*d.nwkKey, jn, *dev.Ids.JoinEui, dn),
-			NwkSEncKey:  crypto.DeriveNwkSEncKey(*d.nwkKey, jn, *dev.Ids.JoinEui, dn),
+			FNwkSIntKey: crypto.DeriveFNwkSIntKey(*d.nwkKey, jn, types.MustEUI64(dev.Ids.JoinEui).OrZero(), dn),
+			SNwkSIntKey: crypto.DeriveSNwkSIntKey(*d.nwkKey, jn, types.MustEUI64(dev.Ids.JoinEui).OrZero(), dn),
+			NwkSEncKey:  crypto.DeriveNwkSEncKey(*d.nwkKey, jn, types.MustEUI64(dev.Ids.JoinEui).OrZero(), dn),
 		}, nil
 	default:
 		return NwkSKeys{
@@ -131,7 +131,7 @@ func (d *mem) DeriveAppSKey(ctx context.Context, dev *ttnpb.EndDevice, version t
 	if dev.Ids == nil || dev.Ids.JoinEui == nil {
 		return types.AES128Key{}, errNoJoinEUI.New()
 	}
-	if dev.Ids.DevEui == nil || dev.Ids.DevEui.IsZero() {
+	if types.MustEUI64(dev.Ids.DevEui).OrZero().IsZero() {
 		return types.AES128Key{}, errNoDevEUI.New()
 	}
 	if d.appKey == nil {
@@ -140,7 +140,7 @@ func (d *mem) DeriveAppSKey(ctx context.Context, dev *ttnpb.EndDevice, version t
 
 	switch {
 	case macspec.UseNwkKey(version):
-		return crypto.DeriveAppSKey(*d.appKey, jn, *dev.Ids.JoinEui, dn), nil
+		return crypto.DeriveAppSKey(*d.appKey, jn, types.MustEUI64(dev.Ids.JoinEui).OrZero(), dn), nil
 	default:
 		return crypto.DeriveLegacyAppSKey(*d.appKey, jn, nid, dn), nil
 	}
