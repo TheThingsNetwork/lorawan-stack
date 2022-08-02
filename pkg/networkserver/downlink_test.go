@@ -354,7 +354,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &test.DefaultDevAddr,
+					DevAddr:        test.DefaultDevAddr.Bytes(),
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
@@ -367,7 +367,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &test.DefaultDevAddr,
+					DevAddr:        test.DefaultDevAddr.Bytes(),
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
@@ -412,7 +412,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &test.DefaultDevAddr,
+					DevAddr:        test.DefaultDevAddr.Bytes(),
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
@@ -443,7 +443,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &test.DefaultDevAddr,
+					DevAddr:        test.DefaultDevAddr.Bytes(),
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
@@ -477,7 +477,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &test.DefaultDevAddr,
+					DevAddr:        test.DefaultDevAddr.Bytes(),
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
@@ -527,7 +527,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &test.DefaultDevAddr,
+					DevAddr:        test.DefaultDevAddr.Bytes(),
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
@@ -576,7 +576,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &test.DefaultDevAddr,
+					DevAddr:        test.DefaultDevAddr.Bytes(),
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_3_REV_A,
@@ -661,7 +661,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &test.DefaultDevAddr,
+					DevAddr:        test.DefaultDevAddr.Bytes(),
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_3_REV_A,
@@ -737,7 +737,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &test.DefaultDevAddr,
+					DevAddr:        test.DefaultDevAddr.Bytes(),
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
@@ -888,7 +888,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &test.DefaultDevAddr,
+					DevAddr:        test.DefaultDevAddr.Bytes(),
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
@@ -1049,7 +1049,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &test.DefaultDevAddr,
+					DevAddr:        test.DefaultDevAddr.Bytes(),
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
@@ -1204,7 +1204,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &test.DefaultDevAddr,
+					DevAddr:        test.DefaultDevAddr.Bytes(),
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
@@ -1362,7 +1362,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &test.DefaultDevAddr,
+					DevAddr:        test.DefaultDevAddr.Bytes(),
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
@@ -1508,7 +1508,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &test.DefaultDevAddr,
+					DevAddr:        test.DefaultDevAddr.Bytes(),
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
@@ -1671,7 +1671,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &test.DefaultDevAddr,
+					DevAddr:        test.DefaultDevAddr.Bytes(),
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
@@ -1807,7 +1807,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &test.DefaultDevAddr,
+					DevAddr:        test.DefaultDevAddr.Bytes(),
 				},
 				FrequencyPlanId:         test.EUFrequencyPlanID,
 				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(now),
@@ -1947,7 +1947,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &test.DefaultDevAddr,
+					DevAddr:        test.DefaultDevAddr.Bytes(),
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
@@ -2107,7 +2107,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &test.DefaultDevAddr,
+					DevAddr:        test.DefaultDevAddr.Bytes(),
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
@@ -2247,7 +2247,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &test.DefaultDevAddr,
+					DevAddr:        test.DefaultDevAddr.Bytes(),
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
@@ -2309,7 +2309,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &test.DefaultDevAddr,
+					DevAddr:        test.DefaultDevAddr.Bytes(),
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
@@ -2382,9 +2382,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &types.DevAddr{0x42, 0xff, 0xff, 0xff},
-					JoinEui:        &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-					DevEui:         &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					DevAddr:        types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
+					JoinEui:        types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}.Bytes(),
+					DevEui:         types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}.Bytes(),
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
@@ -2503,7 +2503,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:       dev.Ids.DeviceId,
 					DevEui:         dev.Ids.DevEui,
 					JoinEui:        dev.Ids.JoinEui,
-					DevAddr:        types.MustDevAddr(dev.PendingMacState.QueuedJoinAccept.DevAddr),
+					DevAddr:        dev.PendingMacState.QueuedJoinAccept.DevAddr,
 				}
 				cids := LastUplink(dev.PendingMacState.RecentUplinks...).CorrelationIds
 				recvAt := LastUplink(dev.PendingMacState.RecentUplinks...).ReceivedAt

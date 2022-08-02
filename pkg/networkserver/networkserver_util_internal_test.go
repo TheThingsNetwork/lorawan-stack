@@ -1495,8 +1495,8 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 	start := time.Now().UTC()
 
 	upConf := JoinRequestConfig{
-		JoinEUI:        *conf.Device.Ids.JoinEui,
-		DevEUI:         *conf.Device.Ids.DevEui,
+		JoinEUI:        types.MustEUI64(conf.Device.Ids.JoinEui).OrZero(),
+		DevEUI:         types.MustEUI64(conf.Device.Ids.DevEui).OrZero(),
 		DevNonce:       devNonce,
 		DataRate:       upDR,
 		Frequency:      upCh.Frequency,
@@ -1554,8 +1554,8 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 							a.So(netID, should.Resemble, env.Config.NetID),
 							a.So(req.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual, ups[0].CorrelationIds),
 							a.So(req, should.Resemble, MakeNsJsJoinRequest(NsJsJoinRequestConfig{
-								JoinEUI:            *conf.Device.Ids.JoinEui,
-								DevEUI:             *conf.Device.Ids.DevEui,
+								JoinEUI:            types.MustEUI64(conf.Device.Ids.JoinEui).OrZero(),
+								DevEUI:             types.MustEUI64(conf.Device.Ids.DevEui).OrZero(),
 								DevNonce:           devNonce,
 								MIC:                mic,
 								DevAddr:            types.MustDevAddr(req.DevAddr).OrZero(),
@@ -1699,7 +1699,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 		t.Error("Failed to set identifiers")
 		return nil, false
 	}
-	idsWithDevAddr.DevAddr = types.MustDevAddr(joinReq.DevAddr)
+	idsWithDevAddr.DevAddr = joinReq.DevAddr
 
 	var appUp *ttnpb.ApplicationUp
 	if !a.So(env.AssertNsAsHandleUplink(ctx, conf.Device.Ids.ApplicationIds, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
@@ -2133,8 +2133,8 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults *ttnpb.MACSettings, w
 			MACStateOptions.WithRecentUplinks(ToMACStateUplinkMessages(
 				MakeJoinRequest(JoinRequestConfig{
 					DecodePayload:  true,
-					JoinEUI:        *x.Ids.JoinEui,
-					DevEUI:         *x.Ids.DevEui,
+					JoinEUI:        types.MustEUI64(x.Ids.JoinEui).OrZero(),
+					DevEUI:         types.MustEUI64(x.Ids.DevEui).OrZero(),
 					CorrelationIDs: []string{"join-request"},
 					MIC:            [4]byte{0x42, 0xff, 0xff, 0xff},
 					DataRateIndex:  drIdx,
@@ -2255,7 +2255,9 @@ func MakeABPEndDevice(defaults *ttnpb.MACSettings, wrapKeys bool, sessionOpts []
 	return MakeEndDevice(
 		EndDeviceOptions.Compose(opts...),
 		func(x ttnpb.EndDevice) ttnpb.EndDevice {
-			if x.Multicast || x.Ids.DevEui != nil && !x.Ids.DevEui.IsZero() || !macspec.RequireDevEUIForABP(x.LorawanVersion) {
+			if x.Multicast ||
+				!types.MustEUI64(x.Ids.DevEui).OrZero().IsZero() ||
+				!macspec.RequireDevEUIForABP(x.LorawanVersion) {
 				return x
 			}
 			return EndDeviceOptions.WithDefaultDevEUI()(x)

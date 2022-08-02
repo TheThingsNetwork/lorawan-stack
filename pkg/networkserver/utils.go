@@ -420,7 +420,7 @@ func (ns *NetworkServer) handleUplinkSubmission(ctx context.Context, ups []*ttnp
 func (ns *NetworkServer) networkIdentifiers(ctx context.Context) *ttnpb.NetworkIdentifiers {
 	clusterID := ns.clusterID
 	networkIDs := &ttnpb.NetworkIdentifiers{
-		NetId:     &ns.netID,
+		NetId:     ns.netID.Bytes(),
 		ClusterId: clusterID,
 	}
 	return networkIDs

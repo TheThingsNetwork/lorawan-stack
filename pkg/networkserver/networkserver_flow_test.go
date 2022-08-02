@@ -230,7 +230,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			return
 		}
 		dev.PendingMacState.CurrentParameters.Channels = deviceChannels
-		dev.Ids.DevAddr = types.MustDevAddr(dev.PendingSession.DevAddr)
+		dev.Ids.DevAddr = dev.PendingSession.DevAddr
 		dev, ok = env.AssertHandleDataUplink(ctx, DataUplinkAssertionConfig{
 			Device:        dev,
 			ChannelIndex:  2,

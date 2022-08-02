@@ -65,7 +65,7 @@ func TestHandleRekeyInd(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				SupportsJoin: true,
 				Ids: &ttnpb.EndDeviceIdentifiers{
-					DevAddr: &test.DefaultDevAddr,
+					DevAddr: test.DefaultDevAddr.Bytes(),
 				},
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr.Bytes(),
@@ -98,7 +98,7 @@ func TestHandleRekeyInd(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				SupportsJoin: true,
 				Ids: &ttnpb.EndDeviceIdentifiers{
-					DevAddr: &test.DefaultDevAddr,
+					DevAddr: test.DefaultDevAddr.Bytes(),
 				},
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr.Bytes(),
@@ -119,7 +119,7 @@ func TestHandleRekeyInd(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				SupportsJoin: true,
 				Ids: &ttnpb.EndDeviceIdentifiers{
-					DevAddr: &test.DefaultDevAddr,
+					DevAddr: test.DefaultDevAddr.Bytes(),
 				},
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr.Bytes(),
@@ -152,7 +152,7 @@ func TestHandleRekeyInd(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				SupportsJoin: true,
 				Ids: &ttnpb.EndDeviceIdentifiers{
-					DevAddr: &test.DefaultDevAddr,
+					DevAddr: test.DefaultDevAddr.Bytes(),
 				},
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr.Bytes(),
@@ -164,7 +164,7 @@ func TestHandleRekeyInd(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				SupportsJoin: true,
 				Ids: &ttnpb.EndDeviceIdentifiers{
-					DevAddr: &test.DefaultDevAddr,
+					DevAddr: test.DefaultDevAddr.Bytes(),
 				},
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr.Bytes(),
@@ -215,7 +215,7 @@ func TestHandleRekeyInd(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				SupportsJoin: true,
 				Ids: &ttnpb.EndDeviceIdentifiers{
-					DevAddr: &test.DefaultDevAddr,
+					DevAddr: test.DefaultDevAddr.Bytes(),
 				},
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr.Bytes(),

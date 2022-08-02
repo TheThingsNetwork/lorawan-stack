@@ -1906,7 +1906,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 							DeviceId:       dev.Ids.DeviceId,
 							DevEui:         dev.Ids.DevEui,
 							JoinEui:        dev.Ids.JoinEui,
-							DevAddr:        types.MustDevAddr(dev.PendingMacState.QueuedJoinAccept.DevAddr),
+							DevAddr:        dev.PendingMacState.QueuedJoinAccept.DevAddr,
 						},
 						CorrelationIds: events.CorrelationIDsFromContext(ctx),
 						Up: &ttnpb.ApplicationUp_JoinAccept{

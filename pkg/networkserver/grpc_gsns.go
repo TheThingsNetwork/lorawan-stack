@@ -627,7 +627,7 @@ macLoop:
 
 	if matchType == pendingMatch {
 		if !macspec.UseRekeyInd(dev.MacState.LorawanVersion) {
-			dev.Ids.DevAddr = &devAddr
+			dev.Ids.DevAddr = devAddr.Bytes()
 			dev.Session = dev.PendingSession
 		} else if dev.PendingSession != nil || dev.PendingMacState != nil || dev.MacState.PendingJoinRequest != nil {
 			logger.Debug("No RekeyInd received for LoRaWAN 1.1+ device")

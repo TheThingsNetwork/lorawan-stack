@@ -38,7 +38,7 @@ func TestLegacyEncodeDownlink(t *testing.T) {
 			ApplicationId: "foo-app",
 		},
 		DeviceId: "foo-device",
-		DevEui:   &eui,
+		DevEui:   eui.Bytes(),
 	}
 
 	message := &ttnpb.ApplicationDownlink{
@@ -107,7 +107,7 @@ func TestEncodeDownlink(t *testing.T) {
 			ApplicationId: "foo-app",
 		},
 		DeviceId: "foo-device",
-		DevEui:   &eui,
+		DevEui:   eui.Bytes(),
 	}
 
 	message := &ttnpb.ApplicationDownlink{
@@ -242,7 +242,7 @@ func TestLegacyDecodeUplink(t *testing.T) {
 			ApplicationId: "foo-app",
 		},
 		DeviceId: "foo-device",
-		DevEui:   &eui,
+		DevEui:   eui.Bytes(),
 	}
 
 	message := &ttnpb.ApplicationUplink{
@@ -320,7 +320,7 @@ func TestDecodeUplink(t *testing.T) {
 			ApplicationId: "foo-app",
 		},
 		DeviceId: "foo-device",
-		DevEui:   &eui,
+		DevEui:   eui.Bytes(),
 	}
 
 	message := &ttnpb.ApplicationUplink{
@@ -455,7 +455,7 @@ func TestDecodeDownlink(t *testing.T) {
 			ApplicationId: "foo-app",
 		},
 		DeviceId: "foo-device",
-		DevEui:   &eui,
+		DevEui:   eui.Bytes(),
 	}
 
 	message := &ttnpb.ApplicationDownlink{
