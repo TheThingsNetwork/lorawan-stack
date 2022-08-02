@@ -284,11 +284,44 @@ func (m *EndDeviceIdentifiers) ValidateFields(paths ...string) error {
 			}
 
 		case "dev_eui":
-			// no validation rules for DevEui
+
+			if len(m.GetDevEui()) > 0 {
+
+				if len(m.GetDevEui()) != 8 {
+					return EndDeviceIdentifiersValidationError{
+						field:  "dev_eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		case "join_eui":
-			// no validation rules for JoinEui
+
+			if len(m.GetJoinEui()) > 0 {
+
+				if len(m.GetJoinEui()) != 8 {
+					return EndDeviceIdentifiersValidationError{
+						field:  "join_eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		case "dev_addr":
-			// no validation rules for DevAddr
+
+			if len(m.GetDevAddr()) > 0 {
+
+				if len(m.GetDevAddr()) != 4 {
+					return EndDeviceIdentifiersValidationError{
+						field:  "dev_addr",
+						reason: "value length must be 4 bytes",
+					}
+				}
+
+			}
+
 		default:
 			return EndDeviceIdentifiersValidationError{
 				field:  name,
@@ -389,7 +422,18 @@ func (m *GatewayIdentifiers) ValidateFields(paths ...string) error {
 			}
 
 		case "eui":
-			// no validation rules for Eui
+
+			if len(m.GetEui()) > 0 {
+
+				if len(m.GetEui()) != 8 {
+					return GatewayIdentifiersValidationError{
+						field:  "eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		default:
 			return GatewayIdentifiersValidationError{
 				field:  name,
@@ -1176,7 +1220,18 @@ func (m *NetworkIdentifiers) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "net_id":
-			// no validation rules for NetId
+
+			if len(m.GetNetId()) > 0 {
+
+				if len(m.GetNetId()) != 3 {
+					return NetworkIdentifiersValidationError{
+						field:  "net_id",
+						reason: "value length must be 3 bytes",
+					}
+				}
+
+			}
+
 		case "tenant_id":
 
 			if utf8.RuneCountInString(m.GetTenantId()) > 36 {

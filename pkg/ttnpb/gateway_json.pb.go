@@ -68,8 +68,7 @@ func (x *Gateway) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.Ids != nil || s.HasField("ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("ids")
-		// NOTE: GatewayIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.Ids)
+		x.Ids.MarshalProtoJSON(s.WithField("ids"))
 	}
 	if x.CreatedAt != nil || s.HasField("created_at") {
 		s.WriteMoreIf(&wroteField)
@@ -281,15 +280,12 @@ func (x *Gateway) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		default:
 			s.ReadAny() // ignore unknown field
 		case "ids":
-			s.AddField("ids")
 			if s.ReadNil() {
 				x.Ids = nil
 				return
 			}
-			// NOTE: GatewayIdentifiers does not seem to implement UnmarshalProtoJSON.
-			var v GatewayIdentifiers
-			gogo.UnmarshalMessage(s, &v)
-			x.Ids = &v
+			x.Ids = &GatewayIdentifiers{}
+			x.Ids.UnmarshalProtoJSON(s.WithField("ids", true))
 		case "created_at", "createdAt":
 			s.AddField("created_at")
 			if s.ReadNil() {
@@ -574,6 +570,72 @@ func (x *Gateways) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the GetGatewayRequest message to JSON.
+func (x *GetGatewayRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.GatewayIds != nil || s.HasField("gateway_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("gateway_ids")
+		x.GatewayIds.MarshalProtoJSON(s.WithField("gateway_ids"))
+	}
+	if x.FieldMask != nil || s.HasField("field_mask") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("field_mask")
+		if x.FieldMask == nil {
+			s.WriteNil()
+		} else {
+			gogo.MarshalFieldMask(s, x.FieldMask)
+		}
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the GetGatewayRequest to JSON.
+func (x *GetGatewayRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the GetGatewayRequest message from JSON.
+func (x *GetGatewayRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "gateway_ids", "gatewayIds":
+			if s.ReadNil() {
+				x.GatewayIds = nil
+				return
+			}
+			x.GatewayIds = &GatewayIdentifiers{}
+			x.GatewayIds.UnmarshalProtoJSON(s.WithField("gateway_ids", true))
+		case "field_mask", "fieldMask":
+			s.AddField("field_mask")
+			if s.ReadNil() {
+				x.FieldMask = nil
+				return
+			}
+			v := gogo.UnmarshalFieldMask(s)
+			if s.Err() != nil {
+				return
+			}
+			x.FieldMask = v
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the GetGatewayRequest from JSON.
+func (x *GetGatewayRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the GetGatewayIdentifiersForEUIRequest message to JSON.
 func (x *GetGatewayIdentifiersForEUIRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -744,6 +806,130 @@ func (x *UpdateGatewayRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the ListGatewayAPIKeysRequest message to JSON.
+func (x *ListGatewayAPIKeysRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.GatewayIds != nil || s.HasField("gateway_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("gateway_ids")
+		x.GatewayIds.MarshalProtoJSON(s.WithField("gateway_ids"))
+	}
+	if x.Order != "" || s.HasField("order") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("order")
+		s.WriteString(x.Order)
+	}
+	if x.Limit != 0 || s.HasField("limit") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("limit")
+		s.WriteUint32(x.Limit)
+	}
+	if x.Page != 0 || s.HasField("page") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("page")
+		s.WriteUint32(x.Page)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ListGatewayAPIKeysRequest to JSON.
+func (x *ListGatewayAPIKeysRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ListGatewayAPIKeysRequest message from JSON.
+func (x *ListGatewayAPIKeysRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "gateway_ids", "gatewayIds":
+			if s.ReadNil() {
+				x.GatewayIds = nil
+				return
+			}
+			x.GatewayIds = &GatewayIdentifiers{}
+			x.GatewayIds.UnmarshalProtoJSON(s.WithField("gateway_ids", true))
+		case "order":
+			s.AddField("order")
+			x.Order = s.ReadString()
+		case "limit":
+			s.AddField("limit")
+			x.Limit = s.ReadUint32()
+		case "page":
+			s.AddField("page")
+			x.Page = s.ReadUint32()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ListGatewayAPIKeysRequest from JSON.
+func (x *ListGatewayAPIKeysRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the GetGatewayAPIKeyRequest message to JSON.
+func (x *GetGatewayAPIKeyRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.GatewayIds != nil || s.HasField("gateway_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("gateway_ids")
+		x.GatewayIds.MarshalProtoJSON(s.WithField("gateway_ids"))
+	}
+	if x.KeyId != "" || s.HasField("key_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("key_id")
+		s.WriteString(x.KeyId)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the GetGatewayAPIKeyRequest to JSON.
+func (x *GetGatewayAPIKeyRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the GetGatewayAPIKeyRequest message from JSON.
+func (x *GetGatewayAPIKeyRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "gateway_ids", "gatewayIds":
+			if s.ReadNil() {
+				x.GatewayIds = nil
+				return
+			}
+			x.GatewayIds = &GatewayIdentifiers{}
+			x.GatewayIds.UnmarshalProtoJSON(s.WithField("gateway_ids", true))
+		case "key_id", "keyId":
+			s.AddField("key_id")
+			x.KeyId = s.ReadString()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the GetGatewayAPIKeyRequest from JSON.
+func (x *GetGatewayAPIKeyRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the CreateGatewayAPIKeyRequest message to JSON.
 func (x *CreateGatewayAPIKeyRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -755,8 +941,7 @@ func (x *CreateGatewayAPIKeyRequest) MarshalProtoJSON(s *jsonplugin.MarshalState
 	if x.GatewayIds != nil || s.HasField("gateway_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("gateway_ids")
-		// NOTE: GatewayIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.GatewayIds)
+		x.GatewayIds.MarshalProtoJSON(s.WithField("gateway_ids"))
 	}
 	if x.Name != "" || s.HasField("name") {
 		s.WriteMoreIf(&wroteField)
@@ -801,15 +986,12 @@ func (x *CreateGatewayAPIKeyRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalS
 		default:
 			s.ReadAny() // ignore unknown field
 		case "gateway_ids", "gatewayIds":
-			s.AddField("gateway_ids")
 			if s.ReadNil() {
 				x.GatewayIds = nil
 				return
 			}
-			// NOTE: GatewayIdentifiers does not seem to implement UnmarshalProtoJSON.
-			var v GatewayIdentifiers
-			gogo.UnmarshalMessage(s, &v)
-			x.GatewayIds = &v
+			x.GatewayIds = &GatewayIdentifiers{}
+			x.GatewayIds.UnmarshalProtoJSON(s.WithField("gateway_ids", true))
 		case "name":
 			s.AddField("name")
 			x.Name = s.ReadString()
@@ -855,8 +1037,7 @@ func (x *UpdateGatewayAPIKeyRequest) MarshalProtoJSON(s *jsonplugin.MarshalState
 	if x.GatewayIds != nil || s.HasField("gateway_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("gateway_ids")
-		// NOTE: GatewayIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.GatewayIds)
+		x.GatewayIds.MarshalProtoJSON(s.WithField("gateway_ids"))
 	}
 	if x.ApiKey != nil || s.HasField("api_key") {
 		s.WriteMoreIf(&wroteField)
@@ -890,15 +1071,12 @@ func (x *UpdateGatewayAPIKeyRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalS
 		default:
 			s.ReadAny() // ignore unknown field
 		case "gateway_ids", "gatewayIds":
-			s.AddField("gateway_ids")
 			if s.ReadNil() {
 				x.GatewayIds = nil
 				return
 			}
-			// NOTE: GatewayIdentifiers does not seem to implement UnmarshalProtoJSON.
-			var v GatewayIdentifiers
-			gogo.UnmarshalMessage(s, &v)
-			x.GatewayIds = &v
+			x.GatewayIds = &GatewayIdentifiers{}
+			x.GatewayIds.UnmarshalProtoJSON(s.WithField("gateway_ids", true))
 		case "api_key", "apiKey":
 			if s.ReadNil() {
 				x.ApiKey = nil
@@ -926,6 +1104,130 @@ func (x *UpdateGatewayAPIKeyRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the ListGatewayCollaboratorsRequest message to JSON.
+func (x *ListGatewayCollaboratorsRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.GatewayIds != nil || s.HasField("gateway_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("gateway_ids")
+		x.GatewayIds.MarshalProtoJSON(s.WithField("gateway_ids"))
+	}
+	if x.Limit != 0 || s.HasField("limit") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("limit")
+		s.WriteUint32(x.Limit)
+	}
+	if x.Page != 0 || s.HasField("page") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("page")
+		s.WriteUint32(x.Page)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ListGatewayCollaboratorsRequest to JSON.
+func (x *ListGatewayCollaboratorsRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ListGatewayCollaboratorsRequest message from JSON.
+func (x *ListGatewayCollaboratorsRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "gateway_ids", "gatewayIds":
+			if s.ReadNil() {
+				x.GatewayIds = nil
+				return
+			}
+			x.GatewayIds = &GatewayIdentifiers{}
+			x.GatewayIds.UnmarshalProtoJSON(s.WithField("gateway_ids", true))
+		case "limit":
+			s.AddField("limit")
+			x.Limit = s.ReadUint32()
+		case "page":
+			s.AddField("page")
+			x.Page = s.ReadUint32()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ListGatewayCollaboratorsRequest from JSON.
+func (x *ListGatewayCollaboratorsRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the GetGatewayCollaboratorRequest message to JSON.
+func (x *GetGatewayCollaboratorRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.GatewayIds != nil || s.HasField("gateway_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("gateway_ids")
+		x.GatewayIds.MarshalProtoJSON(s.WithField("gateway_ids"))
+	}
+	if x.Collaborator != nil || s.HasField("collaborator") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("collaborator")
+		// NOTE: OrganizationOrUserIdentifiers does not seem to implement MarshalProtoJSON.
+		gogo.MarshalMessage(s, x.Collaborator)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the GetGatewayCollaboratorRequest to JSON.
+func (x *GetGatewayCollaboratorRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the GetGatewayCollaboratorRequest message from JSON.
+func (x *GetGatewayCollaboratorRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "gateway_ids", "gatewayIds":
+			if s.ReadNil() {
+				x.GatewayIds = nil
+				return
+			}
+			x.GatewayIds = &GatewayIdentifiers{}
+			x.GatewayIds.UnmarshalProtoJSON(s.WithField("gateway_ids", true))
+		case "collaborator":
+			s.AddField("collaborator")
+			if s.ReadNil() {
+				x.Collaborator = nil
+				return
+			}
+			// NOTE: OrganizationOrUserIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v OrganizationOrUserIdentifiers
+			gogo.UnmarshalMessage(s, &v)
+			x.Collaborator = &v
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the GetGatewayCollaboratorRequest from JSON.
+func (x *GetGatewayCollaboratorRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the SetGatewayCollaboratorRequest message to JSON.
 func (x *SetGatewayCollaboratorRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -937,8 +1239,7 @@ func (x *SetGatewayCollaboratorRequest) MarshalProtoJSON(s *jsonplugin.MarshalSt
 	if x.GatewayIds != nil || s.HasField("gateway_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("gateway_ids")
-		// NOTE: GatewayIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.GatewayIds)
+		x.GatewayIds.MarshalProtoJSON(s.WithField("gateway_ids"))
 	}
 	if x.Collaborator != nil || s.HasField("collaborator") {
 		s.WriteMoreIf(&wroteField)
@@ -963,15 +1264,12 @@ func (x *SetGatewayCollaboratorRequest) UnmarshalProtoJSON(s *jsonplugin.Unmarsh
 		default:
 			s.ReadAny() // ignore unknown field
 		case "gateway_ids", "gatewayIds":
-			s.AddField("gateway_ids")
 			if s.ReadNil() {
 				x.GatewayIds = nil
 				return
 			}
-			// NOTE: GatewayIdentifiers does not seem to implement UnmarshalProtoJSON.
-			var v GatewayIdentifiers
-			gogo.UnmarshalMessage(s, &v)
-			x.GatewayIds = &v
+			x.GatewayIds = &GatewayIdentifiers{}
+			x.GatewayIds.UnmarshalProtoJSON(s.WithField("gateway_ids", true))
 		case "collaborator":
 			if s.ReadNil() {
 				x.Collaborator = nil

@@ -7,6 +7,7 @@
 package ttnpb
 
 import (
+	gogo "github.com/TheThingsIndustries/protoc-gen-go-json/gogo"
 	jsonplugin "github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
 )
 
@@ -140,5 +141,170 @@ func (x *GatewayDown) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 
 // UnmarshalJSON unmarshals the GatewayDown from JSON.
 func (x *GatewayDown) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ScheduleDownlinkResponse message to JSON.
+func (x *ScheduleDownlinkResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Delay != nil || s.HasField("delay") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("delay")
+		if x.Delay == nil {
+			s.WriteNil()
+		} else {
+			gogo.MarshalDuration(s, x.Delay)
+		}
+	}
+	if x.DownlinkPath != nil || s.HasField("downlink_path") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("downlink_path")
+		x.DownlinkPath.MarshalProtoJSON(s.WithField("downlink_path"))
+	}
+	if x.Rx1 || s.HasField("rx1") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("rx1")
+		s.WriteBool(x.Rx1)
+	}
+	if x.Rx2 || s.HasField("rx2") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("rx2")
+		s.WriteBool(x.Rx2)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ScheduleDownlinkResponse to JSON.
+func (x *ScheduleDownlinkResponse) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ScheduleDownlinkResponse message from JSON.
+func (x *ScheduleDownlinkResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "delay":
+			s.AddField("delay")
+			if s.ReadNil() {
+				x.Delay = nil
+				return
+			}
+			v := gogo.UnmarshalDuration(s)
+			if s.Err() != nil {
+				return
+			}
+			x.Delay = v
+		case "downlink_path", "downlinkPath":
+			if s.ReadNil() {
+				x.DownlinkPath = nil
+				return
+			}
+			x.DownlinkPath = &DownlinkPath{}
+			x.DownlinkPath.UnmarshalProtoJSON(s.WithField("downlink_path", true))
+		case "rx1":
+			s.AddField("rx1")
+			x.Rx1 = s.ReadBool()
+		case "rx2":
+			s.AddField("rx2")
+			x.Rx2 = s.ReadBool()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ScheduleDownlinkResponse from JSON.
+func (x *ScheduleDownlinkResponse) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the BatchGetGatewayConnectionStatsRequest message to JSON.
+func (x *BatchGetGatewayConnectionStatsRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.GatewayIds) > 0 || s.HasField("gateway_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("gateway_ids")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.GatewayIds {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("gateway_ids"))
+		}
+		s.WriteArrayEnd()
+	}
+	if x.FieldMask != nil || s.HasField("field_mask") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("field_mask")
+		if x.FieldMask == nil {
+			s.WriteNil()
+		} else {
+			gogo.MarshalFieldMask(s, x.FieldMask)
+		}
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the BatchGetGatewayConnectionStatsRequest to JSON.
+func (x *BatchGetGatewayConnectionStatsRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the BatchGetGatewayConnectionStatsRequest message from JSON.
+func (x *BatchGetGatewayConnectionStatsRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "gateway_ids", "gatewayIds":
+			s.AddField("gateway_ids")
+			if s.ReadNil() {
+				x.GatewayIds = nil
+				return
+			}
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.GatewayIds = append(x.GatewayIds, nil)
+					return
+				}
+				v := &GatewayIdentifiers{}
+				v.UnmarshalProtoJSON(s.WithField("gateway_ids", false))
+				if s.Err() != nil {
+					return
+				}
+				x.GatewayIds = append(x.GatewayIds, v)
+			})
+		case "field_mask", "fieldMask":
+			s.AddField("field_mask")
+			if s.ReadNil() {
+				x.FieldMask = nil
+				return
+			}
+			v := gogo.UnmarshalFieldMask(s)
+			if s.Err() != nil {
+				return
+			}
+			x.FieldMask = v
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the BatchGetGatewayConnectionStatsRequest from JSON.
+func (x *BatchGetGatewayConnectionStatsRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

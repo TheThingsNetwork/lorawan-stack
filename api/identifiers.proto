@@ -17,6 +17,7 @@ syntax = "proto3";
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/TheThingsIndustries/protoc-gen-go-flags/annotations.proto";
+import "github.com/TheThingsIndustries/protoc-gen-go-json/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
 package ttn.lorawan.v3;
@@ -42,7 +43,11 @@ message EndDeviceIdentifiers {
   ApplicationIdentifiers application_ids = 2 [(validate.rules).message.required = true];
   // The LoRaWAN DevEUI.
   bytes dev_eui = 4 [
-    (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64",
+    (validate.rules).bytes = { len: 8, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal8Bytes"
+    },
     (thethings.flags.field) = {
       set_flag_new_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.New8BytesFlag",
       set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
@@ -53,7 +58,11 @@ message EndDeviceIdentifiers {
   ];
   // The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).
   bytes join_eui = 5 [
-    (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64",
+    (validate.rules).bytes = { len: 8, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal8Bytes"
+    },
     (thethings.flags.field) = {
       set_flag_new_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.New8BytesFlag",
       set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
@@ -64,7 +73,11 @@ message EndDeviceIdentifiers {
   ];
   // The LoRaWAN DevAddr.
   bytes dev_addr = 6 [
-    (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr",
+    (validate.rules).bytes = { len: 4, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal4Bytes"
+    },
     (thethings.flags.field) = {
       set_flag_new_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.New4BytesFlag",
       set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
@@ -81,7 +94,11 @@ message GatewayIdentifiers {
 
   // Secondary identifier, which can only be used in specific requests.
   bytes eui = 2 [
-    (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64",
+    (validate.rules).bytes = { len: 8, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal8Bytes"
+    },
     (thethings.flags.field) = {
       set_flag_new_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.New8BytesFlag",
       set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
@@ -155,9 +172,17 @@ message NetworkIdentifiers {
   option (thethings.flags.message) = { select: true, set: false };
   // LoRa Alliance NetID.
   bytes net_id = 1 [
-    (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID",
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       type: STRING, format: "string", example: "\"000013\""
+    },
+    (validate.rules).bytes = { len: 3, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal3Bytes"
+    },
+    (thethings.flags.field) = {
+      set_flag_new_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.New3BytesFlag",
+      set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
     }
   ];
   // Optional tenant identifier for multi-tenant deployments.

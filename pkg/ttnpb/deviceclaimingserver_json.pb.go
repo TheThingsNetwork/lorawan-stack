@@ -313,8 +313,7 @@ func (x *GetClaimStatusResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.EndDeviceIds != nil || s.HasField("end_device_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("end_device_ids")
-		// NOTE: EndDeviceIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.EndDeviceIds)
+		x.EndDeviceIds.MarshalProtoJSON(s.WithField("end_device_ids"))
 	}
 	if len(x.HomeNetId) > 0 || s.HasField("home_net_id") {
 		s.WriteMoreIf(&wroteField)
@@ -350,15 +349,12 @@ func (x *GetClaimStatusResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 		default:
 			s.ReadAny() // ignore unknown field
 		case "end_device_ids", "endDeviceIds":
-			s.AddField("end_device_ids")
 			if s.ReadNil() {
 				x.EndDeviceIds = nil
 				return
 			}
-			// NOTE: EndDeviceIdentifiers does not seem to implement UnmarshalProtoJSON.
-			var v EndDeviceIdentifiers
-			gogo.UnmarshalMessage(s, &v)
-			x.EndDeviceIds = &v
+			x.EndDeviceIds = &EndDeviceIdentifiers{}
+			x.EndDeviceIds.UnmarshalProtoJSON(s.WithField("end_device_ids", true))
 		case "home_net_id", "homeNetId":
 			s.AddField("home_net_id")
 			x.HomeNetId = types.Unmarshal3Bytes(s.WithField("home_net_id", false))
@@ -547,5 +543,59 @@ func (x *ClaimGatewayRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 
 // UnmarshalJSON unmarshals the ClaimGatewayRequest from JSON.
 func (x *ClaimGatewayRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the AuthorizeGatewayRequest message to JSON.
+func (x *AuthorizeGatewayRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.GatewayIds != nil || s.HasField("gateway_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("gateway_ids")
+		x.GatewayIds.MarshalProtoJSON(s.WithField("gateway_ids"))
+	}
+	if x.ApiKey != "" || s.HasField("api_key") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("api_key")
+		s.WriteString(x.ApiKey)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the AuthorizeGatewayRequest to JSON.
+func (x *AuthorizeGatewayRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the AuthorizeGatewayRequest message from JSON.
+func (x *AuthorizeGatewayRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "gateway_ids", "gatewayIds":
+			if s.ReadNil() {
+				x.GatewayIds = nil
+				return
+			}
+			x.GatewayIds = &GatewayIdentifiers{}
+			x.GatewayIds.UnmarshalProtoJSON(s.WithField("gateway_ids", true))
+		case "api_key", "apiKey":
+			s.AddField("api_key")
+			x.ApiKey = s.ReadString()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the AuthorizeGatewayRequest from JSON.
+func (x *AuthorizeGatewayRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

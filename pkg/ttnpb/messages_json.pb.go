@@ -241,8 +241,7 @@ func (x *DownlinkMessage) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.EndDeviceIds != nil || s.HasField("end_device_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("end_device_ids")
-		// NOTE: EndDeviceIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.EndDeviceIds)
+		x.EndDeviceIds.MarshalProtoJSON(s.WithField("end_device_ids"))
 	}
 	if x.Settings != nil {
 		switch ov := x.Settings.(type) {
@@ -295,15 +294,12 @@ func (x *DownlinkMessage) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.Payload = &Message{}
 			x.Payload.UnmarshalProtoJSON(s.WithField("payload", true))
 		case "end_device_ids", "endDeviceIds":
-			s.AddField("end_device_ids")
 			if s.ReadNil() {
 				x.EndDeviceIds = nil
 				return
 			}
-			// NOTE: EndDeviceIdentifiers does not seem to implement UnmarshalProtoJSON.
-			var v EndDeviceIdentifiers
-			gogo.UnmarshalMessage(s, &v)
-			x.EndDeviceIds = &v
+			x.EndDeviceIds = &EndDeviceIdentifiers{}
+			x.EndDeviceIds.UnmarshalProtoJSON(s.WithField("end_device_ids", true))
 		case "request":
 			ov := &DownlinkMessage_Request{}
 			x.Settings = ov
@@ -461,8 +457,7 @@ func (x *GatewayTxAcknowledgment) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.GatewayIds != nil || s.HasField("gateway_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("gateway_ids")
-		// NOTE: GatewayIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.GatewayIds)
+		x.GatewayIds.MarshalProtoJSON(s.WithField("gateway_ids"))
 	}
 	if x.TxAck != nil || s.HasField("tx_ack") {
 		s.WriteMoreIf(&wroteField)
@@ -487,15 +482,12 @@ func (x *GatewayTxAcknowledgment) UnmarshalProtoJSON(s *jsonplugin.UnmarshalStat
 		default:
 			s.ReadAny() // ignore unknown field
 		case "gateway_ids", "gatewayIds":
-			s.AddField("gateway_ids")
 			if s.ReadNil() {
 				x.GatewayIds = nil
 				return
 			}
-			// NOTE: GatewayIdentifiers does not seem to implement UnmarshalProtoJSON.
-			var v GatewayIdentifiers
-			gogo.UnmarshalMessage(s, &v)
-			x.GatewayIds = &v
+			x.GatewayIds = &GatewayIdentifiers{}
+			x.GatewayIds.UnmarshalProtoJSON(s.WithField("gateway_ids", true))
 		case "tx_ack", "txAck":
 			if s.ReadNil() {
 				x.TxAck = nil
@@ -679,8 +671,7 @@ func (x *ApplicationUplink) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.NetworkIds != nil || s.HasField("network_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("network_ids")
-		// NOTE: NetworkIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.NetworkIds)
+		x.NetworkIds.MarshalProtoJSON(s.WithField("network_ids"))
 	}
 	s.WriteObjectEnd()
 }
@@ -815,15 +806,12 @@ func (x *ApplicationUplink) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			gogo.UnmarshalMessage(s, &v)
 			x.VersionIds = &v
 		case "network_ids", "networkIds":
-			s.AddField("network_ids")
 			if s.ReadNil() {
 				x.NetworkIds = nil
 				return
 			}
-			// NOTE: NetworkIdentifiers does not seem to implement UnmarshalProtoJSON.
-			var v NetworkIdentifiers
-			gogo.UnmarshalMessage(s, &v)
-			x.NetworkIds = &v
+			x.NetworkIds = &NetworkIdentifiers{}
+			x.NetworkIds.UnmarshalProtoJSON(s.WithField("network_ids", true))
 		}
 	})
 }
@@ -1020,6 +1008,89 @@ func (x *ApplicationJoinAccept) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the ApplicationDownlink_ClassBC message to JSON.
+func (x *ApplicationDownlink_ClassBC) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.Gateways) > 0 || s.HasField("gateways") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("gateways")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.Gateways {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("gateways"))
+		}
+		s.WriteArrayEnd()
+	}
+	if x.AbsoluteTime != nil || s.HasField("absolute_time") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("absolute_time")
+		if x.AbsoluteTime == nil {
+			s.WriteNil()
+		} else {
+			gogo.MarshalTimestamp(s, x.AbsoluteTime)
+		}
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ApplicationDownlink_ClassBC to JSON.
+func (x *ApplicationDownlink_ClassBC) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ApplicationDownlink_ClassBC message from JSON.
+func (x *ApplicationDownlink_ClassBC) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "gateways":
+			s.AddField("gateways")
+			if s.ReadNil() {
+				x.Gateways = nil
+				return
+			}
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.Gateways = append(x.Gateways, nil)
+					return
+				}
+				v := &ClassBCGatewayIdentifiers{}
+				v.UnmarshalProtoJSON(s.WithField("gateways", false))
+				if s.Err() != nil {
+					return
+				}
+				x.Gateways = append(x.Gateways, v)
+			})
+		case "absolute_time", "absoluteTime":
+			s.AddField("absolute_time")
+			if s.ReadNil() {
+				x.AbsoluteTime = nil
+				return
+			}
+			v := gogo.UnmarshalTimestamp(s)
+			if s.Err() != nil {
+				return
+			}
+			x.AbsoluteTime = v
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ApplicationDownlink_ClassBC from JSON.
+func (x *ApplicationDownlink_ClassBC) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the ApplicationDownlink message to JSON.
 func (x *ApplicationDownlink) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -1070,8 +1141,7 @@ func (x *ApplicationDownlink) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.ClassBC != nil || s.HasField("class_b_c") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("class_b_c")
-		// NOTE: ApplicationDownlink_ClassBC does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.ClassBC)
+		x.ClassBC.MarshalProtoJSON(s.WithField("class_b_c"))
 	}
 	if x.Priority != 0 || s.HasField("priority") {
 		s.WriteMoreIf(&wroteField)
@@ -1134,15 +1204,12 @@ func (x *ApplicationDownlink) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			s.AddField("confirmed")
 			x.Confirmed = s.ReadBool()
 		case "class_b_c", "classBC":
-			s.AddField("class_b_c")
 			if s.ReadNil() {
 				x.ClassBC = nil
 				return
 			}
-			// NOTE: ApplicationDownlink_ClassBC does not seem to implement UnmarshalProtoJSON.
-			var v ApplicationDownlink_ClassBC
-			gogo.UnmarshalMessage(s, &v)
-			x.ClassBC = &v
+			x.ClassBC = &ApplicationDownlink_ClassBC{}
+			x.ClassBC.UnmarshalProtoJSON(s.WithField("class_b_c", true))
 		case "priority":
 			s.AddField("priority")
 			x.Priority.UnmarshalProtoJSON(s)
@@ -1459,8 +1526,7 @@ func (x *ApplicationUp) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.EndDeviceIds != nil || s.HasField("end_device_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("end_device_ids")
-		// NOTE: EndDeviceIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.EndDeviceIds)
+		x.EndDeviceIds.MarshalProtoJSON(s.WithField("end_device_ids"))
 	}
 	if len(x.CorrelationIds) > 0 || s.HasField("correlation_ids") {
 		s.WriteMoreIf(&wroteField)
@@ -1544,15 +1610,12 @@ func (x *ApplicationUp) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		default:
 			s.ReadAny() // ignore unknown field
 		case "end_device_ids", "endDeviceIds":
-			s.AddField("end_device_ids")
 			if s.ReadNil() {
 				x.EndDeviceIds = nil
 				return
 			}
-			// NOTE: EndDeviceIdentifiers does not seem to implement UnmarshalProtoJSON.
-			var v EndDeviceIdentifiers
-			gogo.UnmarshalMessage(s, &v)
-			x.EndDeviceIds = &v
+			x.EndDeviceIds = &EndDeviceIdentifiers{}
+			x.EndDeviceIds.UnmarshalProtoJSON(s.WithField("end_device_ids", true))
 		case "correlation_ids", "correlationIds":
 			s.AddField("correlation_ids")
 			if s.ReadNil() {
@@ -1753,8 +1816,7 @@ func (x *DownlinkQueueRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.EndDeviceIds != nil || s.HasField("end_device_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("end_device_ids")
-		// NOTE: EndDeviceIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.EndDeviceIds)
+		x.EndDeviceIds.MarshalProtoJSON(s.WithField("end_device_ids"))
 	}
 	if len(x.Downlinks) > 0 || s.HasField("downlinks") {
 		s.WriteMoreIf(&wroteField)
@@ -1785,15 +1847,12 @@ func (x *DownlinkQueueRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) 
 		default:
 			s.ReadAny() // ignore unknown field
 		case "end_device_ids", "endDeviceIds":
-			s.AddField("end_device_ids")
 			if s.ReadNil() {
 				x.EndDeviceIds = nil
 				return
 			}
-			// NOTE: EndDeviceIdentifiers does not seem to implement UnmarshalProtoJSON.
-			var v EndDeviceIdentifiers
-			gogo.UnmarshalMessage(s, &v)
-			x.EndDeviceIds = &v
+			x.EndDeviceIds = &EndDeviceIdentifiers{}
+			x.EndDeviceIds.UnmarshalProtoJSON(s.WithField("end_device_ids", true))
 		case "downlinks":
 			s.AddField("downlinks")
 			if s.ReadNil() {
