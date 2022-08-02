@@ -146,7 +146,7 @@ func TestGatewayServer(t *testing.T) {
 
 				ids := &ttnpb.GatewayIdentifiers{
 					GatewayId: registeredGatewayID,
-					Eui:       &registeredGatewayEUI,
+					Eui:       registeredGatewayEUI.Bytes(),
 				}
 				gtw := mockis.DefaultGateway(ids, true, true)
 				is.GatewayRegistry().Add(ctx, ids, registeredGatewayKey, gtw, testRights...)
@@ -390,7 +390,7 @@ func TestGatewayServer(t *testing.T) {
 								case up := <-upCh:
 									token++
 									packet := encoding.Packet{
-										GatewayEUI:      ids.Eui,
+										GatewayEUI:      types.MustEUI64(ids.Eui),
 										ProtocolVersion: encoding.Version1,
 										Token:           [2]byte{0x00, token},
 										PacketType:      encoding.PushData,
@@ -436,7 +436,7 @@ func TestGatewayServer(t *testing.T) {
 								case <-ticker.C:
 									token++
 									pull := encoding.Packet{
-										GatewayEUI:      ids.Eui,
+										GatewayEUI:      types.MustEUI64(ids.Eui),
 										ProtocolVersion: encoding.Version1,
 										Token:           [2]byte{0x01, token},
 										PacketType:      encoding.PullData,
@@ -623,11 +623,11 @@ func TestGatewayServer(t *testing.T) {
 						},
 						{
 							Name: "RegisteredEUI",
-							ID:   &ttnpb.GatewayIdentifiers{Eui: &registeredGatewayEUI},
+							ID:   &ttnpb.GatewayIdentifiers{Eui: registeredGatewayEUI.Bytes()},
 						},
 						{
 							Name: "UnregisteredEUI",
-							ID:   &ttnpb.GatewayIdentifiers{Eui: &unregisteredGatewayEUI},
+							ID:   &ttnpb.GatewayIdentifiers{Eui: unregisteredGatewayEUI.Bytes()},
 						},
 					} {
 						t.Run(ctc.Name, func(t *testing.T) {
@@ -697,7 +697,7 @@ func TestGatewayServer(t *testing.T) {
 
 					id := &ttnpb.GatewayIdentifiers{
 						GatewayId: registeredGatewayID,
-						Eui:       &registeredGatewayEUI,
+						Eui:       registeredGatewayEUI.Bytes(),
 					}
 
 					ctx1, fail1 := errorcontext.New(ctx)
@@ -741,7 +741,7 @@ func TestGatewayServer(t *testing.T) {
 					downCh := make(chan *ttnpb.GatewayDown)
 					ids := &ttnpb.GatewayIdentifiers{
 						GatewayId: registeredGatewayID,
-						Eui:       &registeredGatewayEUI,
+						Eui:       registeredGatewayEUI.Bytes(),
 					}
 					// Setup a stats client with independent context to query whether the gateway is connected and statistics on
 					// upstream and downstream.
@@ -1783,7 +1783,7 @@ func TestGatewayServer(t *testing.T) {
 
 				ids := &ttnpb.GatewayIdentifiers{
 					GatewayId: registeredGatewayID,
-					Eui:       &registeredGatewayEUI,
+					Eui:       registeredGatewayEUI.Bytes(),
 				}
 
 				conn, err := grpc.Dial(":9187", append(rpcclient.DefaultDialOptions(ctx), grpc.WithInsecure(), grpc.WithBlock())...)
@@ -1822,7 +1822,7 @@ func TestUpdateVersionInfo(t *testing.T) { //nolint:paralleltest
 	defer closeIS()
 	is.GatewayRegistry().SetRegisteredGateway(&ttnpb.GatewayIdentifiers{
 		GatewayId: registeredGatewayID,
-		Eui:       &registeredGatewayEUI,
+		Eui:       registeredGatewayEUI.Bytes(),
 	})
 
 	c := componenttest.NewComponent(t, &component.Config{
@@ -1872,7 +1872,7 @@ func TestUpdateVersionInfo(t *testing.T) { //nolint:paralleltest
 
 	gtwIDs := &ttnpb.GatewayIdentifiers{
 		GatewayId: registeredGatewayID,
-		Eui:       &registeredGatewayEUI,
+		Eui:       registeredGatewayEUI.Bytes(),
 	}
 
 	mockGtw := mockis.DefaultGateway(gtwIDs, true, true)
@@ -1922,7 +1922,7 @@ func TestUpdateVersionInfo(t *testing.T) { //nolint:paralleltest
 	statCh := make(chan *ttnpbv2.StatusMessage)
 	ids := &ttnpb.GatewayIdentifiers{
 		GatewayId: registeredGatewayID,
-		Eui:       &registeredGatewayEUI,
+		Eui:       registeredGatewayEUI.Bytes(),
 	}
 	go func() {
 		linkFn(ctx, t, ids, registeredGatewayKey, statCh)
@@ -2126,7 +2126,7 @@ func TestBatchGetStatus(t *testing.T) {
 
 			gtwIDs1 := &ttnpb.GatewayIdentifiers{
 				GatewayId: registeredGatewayID,
-				Eui:       &registeredGatewayEUI,
+				Eui:       registeredGatewayEUI.Bytes(),
 			}
 
 			gtwIDs2 := &ttnpb.GatewayIdentifiers{

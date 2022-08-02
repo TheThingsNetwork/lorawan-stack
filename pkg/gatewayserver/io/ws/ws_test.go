@@ -852,7 +852,7 @@ func TestTraffic(t *testing.T) {
 				RxMetadata: []*ttnpb.RxMetadata{{
 					GatewayIds: &ttnpb.GatewayIdentifiers{
 						GatewayId: "eui-0101010101010101",
-						Eui:       &types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01},
+						Eui:       types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01}.Bytes(),
 					},
 					Rssi:        89,
 					ChannelRssi: 89,
@@ -911,7 +911,7 @@ func TestTraffic(t *testing.T) {
 					{
 						GatewayIds: &ttnpb.GatewayIdentifiers{
 							GatewayId: "eui-0101010101010101",
-							Eui:       &types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01},
+							Eui:       types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01}.Bytes(),
 						},
 						Time:        ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
 						Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
@@ -947,7 +947,7 @@ func TestTraffic(t *testing.T) {
 				RawPayload: []byte("Ymxhamthc25kJ3M=="),
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId: "testdevice",
-					DevEui:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
+					DevEui:   types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}.Bytes(),
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{
 						ApplicationId: "testapp",
 					},
@@ -994,7 +994,7 @@ func TestTraffic(t *testing.T) {
 					RawPayload: []byte("Ymxhamthc25kJ3M=="),
 					EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 						DeviceId: "testdevice",
-						DevEui:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
+						DevEui:   types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}.Bytes(),
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{
 							ApplicationId: "testapp",
 						},
@@ -1021,7 +1021,7 @@ func TestTraffic(t *testing.T) {
 					RawPayload: []byte("Ymxhamthc25kJ3M=="),
 					EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 						DeviceId: "testdevice",
-						DevEui:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
+						DevEui:   types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}.Bytes(),
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{
 							ApplicationId: "testapp",
 						},
@@ -1051,7 +1051,7 @@ func TestTraffic(t *testing.T) {
 				RawPayload: []byte("Ymxhamthc25kJ3M=="),
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId: "testdevice",
-					DevEui:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
+					DevEui:   types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}.Bytes(),
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{
 						ApplicationId: "testapp",
 					},
@@ -1452,7 +1452,7 @@ func TestRTT(t *testing.T) {
 				RawPayload: []byte("Ymxhamthc25kJ3M=="),
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId: "testdevice",
-					DevEui:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
+					DevEui:   types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}.Bytes(),
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{
 						ApplicationId: "testapp",
 					},

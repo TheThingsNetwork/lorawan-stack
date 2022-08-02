@@ -19,7 +19,6 @@ import (
 	"fmt"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // IsZero returns true if all identifiers have zero-values.
@@ -143,27 +142,6 @@ func (ids *GatewayIdentifiers) ValidateContext(context.Context) error {
 		return errIdentifiers.WithCause(err)
 	}
 	return nil
-}
-
-func (ids *EndDeviceIdentifiers) GetDevEui() *types.EUI64 {
-	if ids == nil {
-		return nil
-	}
-	return ids.DevEui
-}
-
-func (ids *EndDeviceIdentifiers) GetJoinEui() *types.EUI64 {
-	if ids == nil {
-		return nil
-	}
-	return ids.JoinEui
-}
-
-func (ids *GatewayIdentifiers) GetEui() *types.EUI64 {
-	if ids == nil {
-		return nil
-	}
-	return ids.Eui
 }
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.

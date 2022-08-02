@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 var errEmptyGatewayEUI = errors.DefineFailedPrecondition("empty_gateway_eui", "empty gateway EUI")
@@ -42,7 +43,7 @@ func (f *lbsLNS) HandleConnectionInfo(ctx context.Context, raw []byte, server io
 	}
 
 	ids := &ttnpb.GatewayIdentifiers{
-		Eui: &req.EUI.EUI64,
+		Eui: req.EUI.EUI64.Bytes(),
 	}
 
 	filledCtx, ids, err := server.FillGatewayContext(ctx, ids)
@@ -51,7 +52,7 @@ func (f *lbsLNS) HandleConnectionInfo(ctx context.Context, raw []byte, server io
 	}
 	ctx = filledCtx
 
-	euiWithPrefix := fmt.Sprintf("eui-%s", ids.Eui.String())
+	euiWithPrefix := fmt.Sprintf("eui-%s", types.MustEUI64(ids.Eui).OrZero().String())
 	res := DiscoverResponse{
 		EUI: req.EUI,
 		Muxs: basicstation.EUI{
