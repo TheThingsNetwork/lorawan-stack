@@ -122,7 +122,7 @@ func BuildLorafwd(gtw *ttnpb.Gateway) (*LorafwdConfig, error) {
 	}
 	return &LorafwdConfig{
 		Gateway: LorafwdGatewayConfig{
-			ID: gtw.GetIds().GetEui(),
+			ID: types.MustEUI64(gtw.GetIds().GetEui()),
 		},
 		GWMP: LorafwdGWMPConfig{
 			Node:            host,

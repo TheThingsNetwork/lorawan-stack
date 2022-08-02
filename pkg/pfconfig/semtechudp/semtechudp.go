@@ -19,6 +19,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/pfconfig/shared"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // Config represents the full configuration for Semtech's UDP Packet Forwarder.
@@ -47,7 +48,7 @@ func Build(gateway *ttnpb.Gateway, store *frequencyplans.Store) (*Config, error)
 	}
 
 	if gateway.GetIds().GetEui() != nil {
-		c.GatewayConf.GatewayID = gateway.GetIds().GetEui().String()
+		c.GatewayConf.GatewayID = types.MustEUI64(gateway.GetIds().GetEui()).String()
 	}
 	c.GatewayConf.ServerAddress, c.GatewayConf.ServerPortUp, c.GatewayConf.ServerPortDown = host, uint32(port), uint32(port)
 	server := c.GatewayConf

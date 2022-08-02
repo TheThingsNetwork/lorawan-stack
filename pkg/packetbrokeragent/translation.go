@@ -229,15 +229,16 @@ func unwrapGatewayUplinkToken(token, key []byte) (string, []byte, error) {
 
 type gatewayIdentifier interface {
 	GetGatewayId() string
-	GetEui() *types.EUI64
+	GetEui() []byte
 }
 
 func toPBGatewayIdentifier(ids gatewayIdentifier, config ForwarderConfig) *packetbroker.GatewayIdentifier {
 	var res *packetbroker.GatewayIdentifier
 	if config.IncludeGatewayEUI && ids.GetEui() != nil {
+		eui := types.MustEUI64(ids.GetEui())
 		res = &packetbroker.GatewayIdentifier{
 			Eui: &pbtypes.UInt64Value{
-				Value: ids.GetEui().MarshalNumber(),
+				Value: eui.MarshalNumber(),
 			},
 		}
 	}

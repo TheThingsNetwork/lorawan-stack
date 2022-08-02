@@ -224,7 +224,7 @@ func TestBuildLorafwd(t *testing.T) {
 			Name: "EUI set/address:host",
 			Gateway: &ttnpb.Gateway{
 				Ids: &ttnpb.GatewayIdentifiers{
-					Eui: &eui,
+					Eui: eui.Bytes(),
 				},
 				GatewayServerAddress: host,
 			},
@@ -246,7 +246,7 @@ func TestBuildLorafwd(t *testing.T) {
 			Name: "EUI set/address:'host:port'",
 			Gateway: &ttnpb.Gateway{
 				Ids: &ttnpb.GatewayIdentifiers{
-					Eui: &eui,
+					Eui: eui.Bytes(),
 				},
 				GatewayServerAddress: fmt.Sprintf("%s:%d", host, 42),
 			},

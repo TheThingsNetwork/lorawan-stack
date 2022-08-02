@@ -108,7 +108,7 @@ func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacket
 
 	id := toPBGatewayIdentifier(&ttnpb.GatewayIdentifiers{
 		GatewayId: req.Gateway.Ids.GatewayId,
-		Eui:       types.MustEUI64(req.Gateway.Ids.Eui),
+		Eui:       req.Gateway.Ids.Eui,
 	}, s.config)
 	if id == nil {
 		return nil, errNoGatewayID.New()

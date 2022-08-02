@@ -27,8 +27,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-func eui64Ptr(v types.EUI64) *types.EUI64 { return &v }
-
 func TestParseEndDeviceAuthenticationCodes(t *testing.T) {
 	for i, tc := range []struct {
 		FormatID string
@@ -68,8 +66,8 @@ func TestParseEndDeviceAuthenticationCodes(t *testing.T) {
 			a.So(endDevice, should.NotBeEmpty)
 			ids := endDevice.GetIds()
 			a.So(ids, should.NotBeEmpty)
-			a.So(*ids.JoinEui, should.Resemble, tc.ExpectedJoinEUI)
-			a.So(*ids.DevEui, should.Resemble, tc.ExpectedDevEUI)
+			a.So(ids.JoinEui, should.Resemble, tc.ExpectedJoinEUI.Bytes())
+			a.So(ids.DevEui, should.Resemble, tc.ExpectedDevEUI.Bytes())
 			a.So(endDevice.ClaimAuthenticationCode, should.NotBeEmpty)
 			a.So(endDevice.ClaimAuthenticationCode.Value, should.Resemble, tc.ExpectedAuthenticationCode)
 		})
