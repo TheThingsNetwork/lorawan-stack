@@ -117,11 +117,11 @@ func (o MACStateOptionNamespace) AppendRecentDownlinks(downs ...*ttnpb.MACState_
 }
 
 func (o EndDeviceIdentifiersOptionNamespace) WithDefaultJoinEUI() EndDeviceIdentifiersOption {
-	return o.WithJoinEui(&DefaultJoinEUI)
+	return o.WithJoinEui(DefaultJoinEUI.Bytes())
 }
 
 func (o EndDeviceIdentifiersOptionNamespace) WithDefaultDevEUI() EndDeviceIdentifiersOption {
-	return o.WithDevEui(&DefaultDevEUI)
+	return o.WithDevEui(DefaultDevEUI.Bytes())
 }
 
 func (o EndDeviceOptionNamespace) WithEndDeviceIdentifiersOptions(opts ...EndDeviceIdentifiersOption) EndDeviceOption {
@@ -133,7 +133,7 @@ func (o EndDeviceOptionNamespace) WithEndDeviceIdentifiersOptions(opts ...EndDev
 }
 
 func (o EndDeviceOptionNamespace) WithJoinEUI(v *types.EUI64) EndDeviceOption {
-	return o.WithEndDeviceIdentifiersOptions(EndDeviceIdentifiersOptions.WithJoinEui(v))
+	return o.WithEndDeviceIdentifiersOptions(EndDeviceIdentifiersOptions.WithJoinEui(v.Bytes()))
 }
 
 func (o EndDeviceOptionNamespace) WithDefaultJoinEUI() EndDeviceOption {
@@ -141,7 +141,7 @@ func (o EndDeviceOptionNamespace) WithDefaultJoinEUI() EndDeviceOption {
 }
 
 func (o EndDeviceOptionNamespace) WithDevEUI(v *types.EUI64) EndDeviceOption {
-	return o.WithEndDeviceIdentifiersOptions(EndDeviceIdentifiersOptions.WithDevEui(v))
+	return o.WithEndDeviceIdentifiersOptions(EndDeviceIdentifiersOptions.WithDevEui(v.Bytes()))
 }
 
 func (o EndDeviceOptionNamespace) WithDefaultDevEUI() EndDeviceOption {

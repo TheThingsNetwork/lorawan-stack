@@ -93,7 +93,6 @@ package test
 
 import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	pbtypes "github.com/gogo/protobuf/types"
 )
 {{ range . }}

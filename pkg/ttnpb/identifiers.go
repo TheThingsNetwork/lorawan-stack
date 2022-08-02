@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // IsZero returns true if all identifiers have zero-values.
@@ -50,8 +51,8 @@ func (ids *EndDeviceIdentifiers) IsZero() bool {
 	}
 	return ids.DeviceId == "" &&
 		ids.ApplicationIds == nil &&
-		(ids.DevAddr == nil || ids.DevAddr.IsZero()) &&
-		(ids.DevEui == nil || ids.DevEui.IsZero()) &&
+		types.MustDevAddr(ids.DevAddr).OrZero().IsZero() &&
+		types.MustEUI64(ids.DevEui).OrZero().IsZero() &&
 		ids.JoinEui == nil
 }
 

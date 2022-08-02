@@ -5,7 +5,6 @@ package test
 import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 type (
@@ -534,7 +533,7 @@ func (EndDeviceIdentifiersOptionNamespace) WithApplicationIds(v *ttnpb.Applicati
 }
 
 // WithDevEui returns a EndDeviceIdentifiersOption, which returns a copy of ttnpb.EndDeviceIdentifiers with DevEui set to v.
-func (EndDeviceIdentifiersOptionNamespace) WithDevEui(v *types.EUI64) EndDeviceIdentifiersOption {
+func (EndDeviceIdentifiersOptionNamespace) WithDevEui(v []byte) EndDeviceIdentifiersOption {
 	return func(x ttnpb.EndDeviceIdentifiers) ttnpb.EndDeviceIdentifiers {
 		x.DevEui = v
 		return x
@@ -542,7 +541,7 @@ func (EndDeviceIdentifiersOptionNamespace) WithDevEui(v *types.EUI64) EndDeviceI
 }
 
 // WithJoinEui returns a EndDeviceIdentifiersOption, which returns a copy of ttnpb.EndDeviceIdentifiers with JoinEui set to v.
-func (EndDeviceIdentifiersOptionNamespace) WithJoinEui(v *types.EUI64) EndDeviceIdentifiersOption {
+func (EndDeviceIdentifiersOptionNamespace) WithJoinEui(v []byte) EndDeviceIdentifiersOption {
 	return func(x ttnpb.EndDeviceIdentifiers) ttnpb.EndDeviceIdentifiers {
 		x.JoinEui = v
 		return x
@@ -550,7 +549,7 @@ func (EndDeviceIdentifiersOptionNamespace) WithJoinEui(v *types.EUI64) EndDevice
 }
 
 // WithDevAddr returns a EndDeviceIdentifiersOption, which returns a copy of ttnpb.EndDeviceIdentifiers with DevAddr set to v.
-func (EndDeviceIdentifiersOptionNamespace) WithDevAddr(v *types.DevAddr) EndDeviceIdentifiersOption {
+func (EndDeviceIdentifiersOptionNamespace) WithDevAddr(v []byte) EndDeviceIdentifiersOption {
 	return func(x ttnpb.EndDeviceIdentifiers) ttnpb.EndDeviceIdentifiers {
 		x.DevAddr = v
 		return x

@@ -16,7 +16,9 @@ package qrcodegenerator_test
 
 import (
 	"context"
+	"encoding/hex"
 	"fmt"
+	"strings"
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
@@ -54,7 +56,11 @@ func (*mock) FormatID() string {
 }
 
 func (m mock) MarshalText() ([]byte, error) {
-	return []byte(fmt.Sprintf("%s:%s", m.ids.JoinEui, m.ids.DevEui)), nil
+	return []byte(fmt.Sprintf(
+		"%s:%s",
+		strings.ToUpper(hex.EncodeToString(m.ids.JoinEui)),
+		strings.ToUpper(hex.EncodeToString(m.ids.DevEui))),
+	), nil
 }
 
 func (*mock) UnmarshalText([]byte) error { return nil }

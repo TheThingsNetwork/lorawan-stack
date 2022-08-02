@@ -192,7 +192,7 @@ func TestToGatewayUpLRFHSS(t *testing.T) {
 func TestToGatewayUpRoundtrip(t *testing.T) {
 	expectedMd := udp.UpstreamMetadata{
 		ID: &ttnpb.GatewayIdentifiers{
-			Eui: &types.EUI64{0xAA, 0xEE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			Eui: types.EUI64{0xAA, 0xEE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}.Bytes(),
 		},
 		IP: "1.1.1.1",
 	}
