@@ -1,5 +1,10 @@
-CREATE
-OR REPLACE VIEW entity_friendly_ids AS
+DROP VIEW IF EXISTS direct_entity_memberships CASCADE;
+DROP VIEW IF EXISTS indirect_entity_memberships CASCADE;
+DROP VIEW IF EXISTS entity_friendly_ids CASCADE;
+
+--bun:split
+
+CREATE VIEW entity_friendly_ids AS
 SELECT
   'application' AS entity_type,
   id AS entity_id,
@@ -41,8 +46,7 @@ WHERE
 
 --bun:split
 
-CREATE
-OR REPLACE VIEW direct_entity_memberships AS
+CREATE VIEW direct_entity_memberships AS
 SELECT
   acc.account_type AS account_type,
   acc.id AS account_id,
@@ -55,12 +59,13 @@ FROM
   accounts AS acc
   JOIN memberships AS mem ON mem.account_id = acc.id
   JOIN entity_friendly_ids AS ids ON ids.entity_type = mem.entity_type
-  AND ids.entity_id = mem.entity_id;
+  AND ids.entity_id = mem.entity_id
+WHERE
+  acc.deleted_at IS NULL;
 
 --bun:split
 
-CREATE
-OR REPLACE VIEW indirect_entity_memberships AS
+CREATE VIEW indirect_entity_memberships AS
 SELECT
   usr_acc.id AS user_account_id,
   usr_acc.uid AS user_account_friendly_id,
@@ -80,6 +85,7 @@ FROM
   JOIN entity_friendly_ids AS ids ON ids.entity_type = imem.entity_type
   AND ids.entity_id = imem.entity_id
 WHERE
-  usr_acc.account_type = 'user'
+  usr_acc.deleted_at IS NULL
+  AND usr_acc.account_type = 'user'
   AND dmem.entity_type = 'organization'
   AND org_acc.deleted_at IS NULL;
