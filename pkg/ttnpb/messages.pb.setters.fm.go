@@ -217,14 +217,15 @@ func (dst *DownlinkMessage) SetFields(src *DownlinkMessage, paths ...string) err
 			for oneofName, oneofSubs := range subPathMap {
 				switch oneofName {
 				case "request":
-					_, srcTypeOk := src.Settings.(*DownlinkMessage_Request)
-					srcValid := srcTypeOk || src.Settings == nil || len(oneofSubs) == 0
-					if !srcValid {
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Settings.(*DownlinkMessage_Request)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Settings == nil || len(oneofSubs) == 0; !srcValid {
 						return fmt.Errorf("attempt to set oneof 'request', while different oneof is set in source")
 					}
 					_, dstTypeOk := dst.Settings.(*DownlinkMessage_Request)
-					dstValid := dstTypeOk || dst.Settings == nil || len(oneofSubs) == 0
-					if !dstValid {
+					if dstValid := dstTypeOk || dst.Settings == nil || len(oneofSubs) == 0; !dstValid {
 						return fmt.Errorf("attempt to set oneof 'request', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
@@ -252,14 +253,15 @@ func (dst *DownlinkMessage) SetFields(src *DownlinkMessage, paths ...string) err
 						}
 					}
 				case "scheduled":
-					_, srcTypeOk := src.Settings.(*DownlinkMessage_Scheduled)
-					srcValid := srcTypeOk || src.Settings == nil || len(oneofSubs) == 0
-					if !srcValid {
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Settings.(*DownlinkMessage_Scheduled)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Settings == nil || len(oneofSubs) == 0; !srcValid {
 						return fmt.Errorf("attempt to set oneof 'scheduled', while different oneof is set in source")
 					}
 					_, dstTypeOk := dst.Settings.(*DownlinkMessage_Scheduled)
-					dstValid := dstTypeOk || dst.Settings == nil || len(oneofSubs) == 0
-					if !dstValid {
+					if dstValid := dstTypeOk || dst.Settings == nil || len(oneofSubs) == 0; !dstValid {
 						return fmt.Errorf("attempt to set oneof 'scheduled', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
@@ -1223,14 +1225,15 @@ func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 			for oneofName, oneofSubs := range subPathMap {
 				switch oneofName {
 				case "uplink_message":
-					_, srcTypeOk := src.Up.(*ApplicationUp_UplinkMessage)
-					srcValid := srcTypeOk || src.Up == nil || len(oneofSubs) == 0
-					if !srcValid {
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Up.(*ApplicationUp_UplinkMessage)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Up == nil || len(oneofSubs) == 0; !srcValid {
 						return fmt.Errorf("attempt to set oneof 'uplink_message', while different oneof is set in source")
 					}
 					_, dstTypeOk := dst.Up.(*ApplicationUp_UplinkMessage)
-					dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0
-					if !dstValid {
+					if dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0; !dstValid {
 						return fmt.Errorf("attempt to set oneof 'uplink_message', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
@@ -1258,14 +1261,15 @@ func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 						}
 					}
 				case "join_accept":
-					_, srcTypeOk := src.Up.(*ApplicationUp_JoinAccept)
-					srcValid := srcTypeOk || src.Up == nil || len(oneofSubs) == 0
-					if !srcValid {
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Up.(*ApplicationUp_JoinAccept)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Up == nil || len(oneofSubs) == 0; !srcValid {
 						return fmt.Errorf("attempt to set oneof 'join_accept', while different oneof is set in source")
 					}
 					_, dstTypeOk := dst.Up.(*ApplicationUp_JoinAccept)
-					dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0
-					if !dstValid {
+					if dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0; !dstValid {
 						return fmt.Errorf("attempt to set oneof 'join_accept', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
@@ -1293,14 +1297,15 @@ func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 						}
 					}
 				case "downlink_ack":
-					_, srcTypeOk := src.Up.(*ApplicationUp_DownlinkAck)
-					srcValid := srcTypeOk || src.Up == nil || len(oneofSubs) == 0
-					if !srcValid {
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Up.(*ApplicationUp_DownlinkAck)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Up == nil || len(oneofSubs) == 0; !srcValid {
 						return fmt.Errorf("attempt to set oneof 'downlink_ack', while different oneof is set in source")
 					}
 					_, dstTypeOk := dst.Up.(*ApplicationUp_DownlinkAck)
-					dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0
-					if !dstValid {
+					if dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0; !dstValid {
 						return fmt.Errorf("attempt to set oneof 'downlink_ack', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
@@ -1328,14 +1333,15 @@ func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 						}
 					}
 				case "downlink_nack":
-					_, srcTypeOk := src.Up.(*ApplicationUp_DownlinkNack)
-					srcValid := srcTypeOk || src.Up == nil || len(oneofSubs) == 0
-					if !srcValid {
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Up.(*ApplicationUp_DownlinkNack)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Up == nil || len(oneofSubs) == 0; !srcValid {
 						return fmt.Errorf("attempt to set oneof 'downlink_nack', while different oneof is set in source")
 					}
 					_, dstTypeOk := dst.Up.(*ApplicationUp_DownlinkNack)
-					dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0
-					if !dstValid {
+					if dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0; !dstValid {
 						return fmt.Errorf("attempt to set oneof 'downlink_nack', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
@@ -1363,14 +1369,15 @@ func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 						}
 					}
 				case "downlink_sent":
-					_, srcTypeOk := src.Up.(*ApplicationUp_DownlinkSent)
-					srcValid := srcTypeOk || src.Up == nil || len(oneofSubs) == 0
-					if !srcValid {
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Up.(*ApplicationUp_DownlinkSent)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Up == nil || len(oneofSubs) == 0; !srcValid {
 						return fmt.Errorf("attempt to set oneof 'downlink_sent', while different oneof is set in source")
 					}
 					_, dstTypeOk := dst.Up.(*ApplicationUp_DownlinkSent)
-					dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0
-					if !dstValid {
+					if dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0; !dstValid {
 						return fmt.Errorf("attempt to set oneof 'downlink_sent', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
@@ -1398,14 +1405,15 @@ func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 						}
 					}
 				case "downlink_failed":
-					_, srcTypeOk := src.Up.(*ApplicationUp_DownlinkFailed)
-					srcValid := srcTypeOk || src.Up == nil || len(oneofSubs) == 0
-					if !srcValid {
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Up.(*ApplicationUp_DownlinkFailed)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Up == nil || len(oneofSubs) == 0; !srcValid {
 						return fmt.Errorf("attempt to set oneof 'downlink_failed', while different oneof is set in source")
 					}
 					_, dstTypeOk := dst.Up.(*ApplicationUp_DownlinkFailed)
-					dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0
-					if !dstValid {
+					if dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0; !dstValid {
 						return fmt.Errorf("attempt to set oneof 'downlink_failed', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
@@ -1433,14 +1441,15 @@ func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 						}
 					}
 				case "downlink_queued":
-					_, srcTypeOk := src.Up.(*ApplicationUp_DownlinkQueued)
-					srcValid := srcTypeOk || src.Up == nil || len(oneofSubs) == 0
-					if !srcValid {
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Up.(*ApplicationUp_DownlinkQueued)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Up == nil || len(oneofSubs) == 0; !srcValid {
 						return fmt.Errorf("attempt to set oneof 'downlink_queued', while different oneof is set in source")
 					}
 					_, dstTypeOk := dst.Up.(*ApplicationUp_DownlinkQueued)
-					dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0
-					if !dstValid {
+					if dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0; !dstValid {
 						return fmt.Errorf("attempt to set oneof 'downlink_queued', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
@@ -1468,14 +1477,15 @@ func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 						}
 					}
 				case "downlink_queue_invalidated":
-					_, srcTypeOk := src.Up.(*ApplicationUp_DownlinkQueueInvalidated)
-					srcValid := srcTypeOk || src.Up == nil || len(oneofSubs) == 0
-					if !srcValid {
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Up.(*ApplicationUp_DownlinkQueueInvalidated)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Up == nil || len(oneofSubs) == 0; !srcValid {
 						return fmt.Errorf("attempt to set oneof 'downlink_queue_invalidated', while different oneof is set in source")
 					}
 					_, dstTypeOk := dst.Up.(*ApplicationUp_DownlinkQueueInvalidated)
-					dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0
-					if !dstValid {
+					if dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0; !dstValid {
 						return fmt.Errorf("attempt to set oneof 'downlink_queue_invalidated', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
@@ -1503,14 +1513,15 @@ func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 						}
 					}
 				case "location_solved":
-					_, srcTypeOk := src.Up.(*ApplicationUp_LocationSolved)
-					srcValid := srcTypeOk || src.Up == nil || len(oneofSubs) == 0
-					if !srcValid {
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Up.(*ApplicationUp_LocationSolved)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Up == nil || len(oneofSubs) == 0; !srcValid {
 						return fmt.Errorf("attempt to set oneof 'location_solved', while different oneof is set in source")
 					}
 					_, dstTypeOk := dst.Up.(*ApplicationUp_LocationSolved)
-					dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0
-					if !dstValid {
+					if dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0; !dstValid {
 						return fmt.Errorf("attempt to set oneof 'location_solved', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
@@ -1538,14 +1549,15 @@ func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 						}
 					}
 				case "service_data":
-					_, srcTypeOk := src.Up.(*ApplicationUp_ServiceData)
-					srcValid := srcTypeOk || src.Up == nil || len(oneofSubs) == 0
-					if !srcValid {
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Up.(*ApplicationUp_ServiceData)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Up == nil || len(oneofSubs) == 0; !srcValid {
 						return fmt.Errorf("attempt to set oneof 'service_data', while different oneof is set in source")
 					}
 					_, dstTypeOk := dst.Up.(*ApplicationUp_ServiceData)
-					dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0
-					if !dstValid {
+					if dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0; !dstValid {
 						return fmt.Errorf("attempt to set oneof 'service_data', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {

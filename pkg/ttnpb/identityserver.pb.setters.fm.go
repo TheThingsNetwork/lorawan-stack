@@ -59,14 +59,15 @@ func (dst *AuthInfoResponse) SetFields(src *AuthInfoResponse, paths ...string) e
 			for oneofName, oneofSubs := range subPathMap {
 				switch oneofName {
 				case "api_key":
-					_, srcTypeOk := src.AccessMethod.(*AuthInfoResponse_ApiKey)
-					srcValid := srcTypeOk || src.AccessMethod == nil || len(oneofSubs) == 0
-					if !srcValid {
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.AccessMethod.(*AuthInfoResponse_ApiKey)
+					}
+					if srcValid := srcTypeOk || src == nil || src.AccessMethod == nil || len(oneofSubs) == 0; !srcValid {
 						return fmt.Errorf("attempt to set oneof 'api_key', while different oneof is set in source")
 					}
 					_, dstTypeOk := dst.AccessMethod.(*AuthInfoResponse_ApiKey)
-					dstValid := dstTypeOk || dst.AccessMethod == nil || len(oneofSubs) == 0
-					if !dstValid {
+					if dstValid := dstTypeOk || dst.AccessMethod == nil || len(oneofSubs) == 0; !dstValid {
 						return fmt.Errorf("attempt to set oneof 'api_key', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
@@ -94,14 +95,15 @@ func (dst *AuthInfoResponse) SetFields(src *AuthInfoResponse, paths ...string) e
 						}
 					}
 				case "oauth_access_token":
-					_, srcTypeOk := src.AccessMethod.(*AuthInfoResponse_OauthAccessToken)
-					srcValid := srcTypeOk || src.AccessMethod == nil || len(oneofSubs) == 0
-					if !srcValid {
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.AccessMethod.(*AuthInfoResponse_OauthAccessToken)
+					}
+					if srcValid := srcTypeOk || src == nil || src.AccessMethod == nil || len(oneofSubs) == 0; !srcValid {
 						return fmt.Errorf("attempt to set oneof 'oauth_access_token', while different oneof is set in source")
 					}
 					_, dstTypeOk := dst.AccessMethod.(*AuthInfoResponse_OauthAccessToken)
-					dstValid := dstTypeOk || dst.AccessMethod == nil || len(oneofSubs) == 0
-					if !dstValid {
+					if dstValid := dstTypeOk || dst.AccessMethod == nil || len(oneofSubs) == 0; !dstValid {
 						return fmt.Errorf("attempt to set oneof 'oauth_access_token', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
@@ -129,14 +131,15 @@ func (dst *AuthInfoResponse) SetFields(src *AuthInfoResponse, paths ...string) e
 						}
 					}
 				case "user_session":
-					_, srcTypeOk := src.AccessMethod.(*AuthInfoResponse_UserSession)
-					srcValid := srcTypeOk || src.AccessMethod == nil || len(oneofSubs) == 0
-					if !srcValid {
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.AccessMethod.(*AuthInfoResponse_UserSession)
+					}
+					if srcValid := srcTypeOk || src == nil || src.AccessMethod == nil || len(oneofSubs) == 0; !srcValid {
 						return fmt.Errorf("attempt to set oneof 'user_session', while different oneof is set in source")
 					}
 					_, dstTypeOk := dst.AccessMethod.(*AuthInfoResponse_UserSession)
-					dstValid := dstTypeOk || dst.AccessMethod == nil || len(oneofSubs) == 0
-					if !dstValid {
+					if dstValid := dstTypeOk || dst.AccessMethod == nil || len(oneofSubs) == 0; !dstValid {
 						return fmt.Errorf("attempt to set oneof 'user_session', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {

@@ -433,14 +433,15 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 			for oneofName, oneofSubs := range subPathMap {
 				switch oneofName {
 				case "nats":
-					_, srcTypeOk := src.Provider.(*ApplicationPubSub_Nats)
-					srcValid := srcTypeOk || src.Provider == nil || len(oneofSubs) == 0
-					if !srcValid {
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Provider.(*ApplicationPubSub_Nats)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Provider == nil || len(oneofSubs) == 0; !srcValid {
 						return fmt.Errorf("attempt to set oneof 'nats', while different oneof is set in source")
 					}
 					_, dstTypeOk := dst.Provider.(*ApplicationPubSub_Nats)
-					dstValid := dstTypeOk || dst.Provider == nil || len(oneofSubs) == 0
-					if !dstValid {
+					if dstValid := dstTypeOk || dst.Provider == nil || len(oneofSubs) == 0; !dstValid {
 						return fmt.Errorf("attempt to set oneof 'nats', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
@@ -468,14 +469,15 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 						}
 					}
 				case "mqtt":
-					_, srcTypeOk := src.Provider.(*ApplicationPubSub_Mqtt)
-					srcValid := srcTypeOk || src.Provider == nil || len(oneofSubs) == 0
-					if !srcValid {
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Provider.(*ApplicationPubSub_Mqtt)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Provider == nil || len(oneofSubs) == 0; !srcValid {
 						return fmt.Errorf("attempt to set oneof 'mqtt', while different oneof is set in source")
 					}
 					_, dstTypeOk := dst.Provider.(*ApplicationPubSub_Mqtt)
-					dstValid := dstTypeOk || dst.Provider == nil || len(oneofSubs) == 0
-					if !dstValid {
+					if dstValid := dstTypeOk || dst.Provider == nil || len(oneofSubs) == 0; !dstValid {
 						return fmt.Errorf("attempt to set oneof 'mqtt', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
@@ -503,14 +505,15 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 						}
 					}
 				case "aws_iot":
-					_, srcTypeOk := src.Provider.(*ApplicationPubSub_AwsIot)
-					srcValid := srcTypeOk || src.Provider == nil || len(oneofSubs) == 0
-					if !srcValid {
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Provider.(*ApplicationPubSub_AwsIot)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Provider == nil || len(oneofSubs) == 0; !srcValid {
 						return fmt.Errorf("attempt to set oneof 'aws_iot', while different oneof is set in source")
 					}
 					_, dstTypeOk := dst.Provider.(*ApplicationPubSub_AwsIot)
-					dstValid := dstTypeOk || dst.Provider == nil || len(oneofSubs) == 0
-					if !dstValid {
+					if dstValid := dstTypeOk || dst.Provider == nil || len(oneofSubs) == 0; !dstValid {
 						return fmt.Errorf("attempt to set oneof 'aws_iot', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
@@ -953,14 +956,15 @@ func (dst *ApplicationPubSub_AWSIoTProvider) SetFields(src *ApplicationPubSub_AW
 			for oneofName, oneofSubs := range subPathMap {
 				switch oneofName {
 				case "default":
-					_, srcTypeOk := src.Deployment.(*ApplicationPubSub_AWSIoTProvider_Default)
-					srcValid := srcTypeOk || src.Deployment == nil || len(oneofSubs) == 0
-					if !srcValid {
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Deployment.(*ApplicationPubSub_AWSIoTProvider_Default)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Deployment == nil || len(oneofSubs) == 0; !srcValid {
 						return fmt.Errorf("attempt to set oneof 'default', while different oneof is set in source")
 					}
 					_, dstTypeOk := dst.Deployment.(*ApplicationPubSub_AWSIoTProvider_Default)
-					dstValid := dstTypeOk || dst.Deployment == nil || len(oneofSubs) == 0
-					if !dstValid {
+					if dstValid := dstTypeOk || dst.Deployment == nil || len(oneofSubs) == 0; !dstValid {
 						return fmt.Errorf("attempt to set oneof 'default', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {

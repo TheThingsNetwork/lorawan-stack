@@ -638,14 +638,15 @@ func (dst *ADRSettings) SetFields(src *ADRSettings, paths ...string) error {
 			for oneofName, oneofSubs := range subPathMap {
 				switch oneofName {
 				case "static":
-					_, srcTypeOk := src.Mode.(*ADRSettings_Static)
-					srcValid := srcTypeOk || src.Mode == nil || len(oneofSubs) == 0
-					if !srcValid {
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Mode.(*ADRSettings_Static)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Mode == nil || len(oneofSubs) == 0; !srcValid {
 						return fmt.Errorf("attempt to set oneof 'static', while different oneof is set in source")
 					}
 					_, dstTypeOk := dst.Mode.(*ADRSettings_Static)
-					dstValid := dstTypeOk || dst.Mode == nil || len(oneofSubs) == 0
-					if !dstValid {
+					if dstValid := dstTypeOk || dst.Mode == nil || len(oneofSubs) == 0; !dstValid {
 						return fmt.Errorf("attempt to set oneof 'static', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
@@ -673,14 +674,15 @@ func (dst *ADRSettings) SetFields(src *ADRSettings, paths ...string) error {
 						}
 					}
 				case "dynamic":
-					_, srcTypeOk := src.Mode.(*ADRSettings_Dynamic)
-					srcValid := srcTypeOk || src.Mode == nil || len(oneofSubs) == 0
-					if !srcValid {
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Mode.(*ADRSettings_Dynamic)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Mode == nil || len(oneofSubs) == 0; !srcValid {
 						return fmt.Errorf("attempt to set oneof 'dynamic', while different oneof is set in source")
 					}
 					_, dstTypeOk := dst.Mode.(*ADRSettings_Dynamic)
-					dstValid := dstTypeOk || dst.Mode == nil || len(oneofSubs) == 0
-					if !dstValid {
+					if dstValid := dstTypeOk || dst.Mode == nil || len(oneofSubs) == 0; !dstValid {
 						return fmt.Errorf("attempt to set oneof 'dynamic', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
@@ -708,14 +710,15 @@ func (dst *ADRSettings) SetFields(src *ADRSettings, paths ...string) error {
 						}
 					}
 				case "disabled":
-					_, srcTypeOk := src.Mode.(*ADRSettings_Disabled)
-					srcValid := srcTypeOk || src.Mode == nil || len(oneofSubs) == 0
-					if !srcValid {
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Mode.(*ADRSettings_Disabled)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Mode == nil || len(oneofSubs) == 0; !srcValid {
 						return fmt.Errorf("attempt to set oneof 'disabled', while different oneof is set in source")
 					}
 					_, dstTypeOk := dst.Mode.(*ADRSettings_Disabled)
-					dstValid := dstTypeOk || dst.Mode == nil || len(oneofSubs) == 0
-					if !dstValid {
+					if dstValid := dstTypeOk || dst.Mode == nil || len(oneofSubs) == 0; !dstValid {
 						return fmt.Errorf("attempt to set oneof 'disabled', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
