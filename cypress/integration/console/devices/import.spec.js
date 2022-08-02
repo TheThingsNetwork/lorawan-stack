@@ -83,7 +83,7 @@ describe('End device messaging', () => {
       .closest('div')
       .within(() => {
         cy.findByText(/ID already taken/).should('be.visible')
-        cy.findByText(/EUI already taken/).should('be.visible')
+        cy.findByText(/an end device with/, /is already registered/).should('be.visible')
       })
     cy.visit(`${Cypress.config('consoleRootPath')}/applications/${appId}/devices`)
     cy.findByText(/End devices \(\d+\)/).should('be.visible')
