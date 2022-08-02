@@ -230,7 +230,7 @@ func (is *IdentityServer) getEndDevice(ctx context.Context, req *ttnpb.GetEndDev
 	}
 
 	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.GetPaths()), "claim_authentication_code") {
-		req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "claim_authentication_code")
+		req.FieldMask.Paths = ttnpb.AddFields(req.FieldMask.GetPaths(), "claim_authentication_code")
 	}
 
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
@@ -345,12 +345,12 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 	}
 
 	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.GetPaths()), "claim_authentication_code") {
-		req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "claim_authentication_code")
+		req.FieldMask.Paths = ttnpb.AddFields(req.FieldMask.GetPaths(), "claim_authentication_code")
 	}
 
 	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.GetPaths()), "picture") {
 		if !ttnpb.HasAnyField(req.FieldMask.GetPaths(), "picture") {
-			req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "picture")
+			req.FieldMask.Paths = ttnpb.AddFields(req.FieldMask.GetPaths(), "picture")
 		}
 		if req.EndDevice.Picture != nil {
 			if err = is.processEndDevicePicture(ctx, req.EndDevice); err != nil {
