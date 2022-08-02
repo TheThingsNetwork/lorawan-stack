@@ -15,7 +15,7 @@ For details about compatibility between different releases, see the **Commitment
 - `BatchGetGatewayConnectionStats` RPC to fetch Gateway Connection Stats for a batch of gateways.
 - The ability to disable the downlink scheduling mechanism for individual end devices (`mac-settings.schedule-downlinks`).
   - This option is useful during a migration procedure in order to force the end device to join the new network. The Network Server will no longer schedule any data downlinks or MAC commands, and will stop answering potential join requests.
-- A new implementation of the Identity Server storage layer. In v3.21.0 the new implementation is not yet used by default, but it can be enabled with the `is.bunstore` feature flag.
+- A new implementation of the Identity Server storage layer. In v3.21.0 the new implementation is not yet used by default, but it can be enabled with the `is.bunstore` feature flag. A new database driver can be enabled with the `is.pgdriver` feature flag.
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of added columns and views.
 - Support for comma-separated (`,`) values in The Things Stack CSV file format for importing end devices.
 - Support for the `RxParamSetup`, `RxTimingSetup`, `TxParamSetup`, and `DlChannel` sticky answer mechanism. The commands were supported previously, but subsequent sticky responses would cause the Network Server to drop the MAC command buffer in certain situations.

@@ -16,14 +16,13 @@ package store
 
 import (
 	"context"
-	"database/sql"
 	"net/url"
 	"testing"
 
 	_ "github.com/lib/pq" // PostgreSQL driver.
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
-	"github.com/uptrace/bun/driver/pgdriver"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/storetest"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
@@ -51,7 +50,10 @@ func newTestStore(t *testing.T, dsn *url.URL) storetest.Store {
 	}
 
 	t.Logf("Connecting to %s", dsn.String())
-	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn.String())))
+	sqldb, err := store.OpenDB(ctx, dsn.String())
+	if err != nil {
+		t.Fatal(err)
+	}
 	db := bun.NewDB(sqldb, pgdialect.New())
 
 	db.AddQueryHook(NewLoggerHook(test.GetLogger(t)))

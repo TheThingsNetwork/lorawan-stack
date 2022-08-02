@@ -15,14 +15,12 @@
 package identityserver
 
 import (
-	"database/sql"
-
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
-	"github.com/uptrace/bun/driver/pgdriver"
 	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
 	bunstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/bunstore"
 	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
 
@@ -53,8 +51,11 @@ func (is *IdentityServer) setupGormStore() error {
 	return nil
 }
 
-func (is *IdentityServer) setupBunStore() error {
-	is.db = sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(is.config.DatabaseURI)))
+func (is *IdentityServer) setupBunStore() (err error) {
+	is.db, err = store.OpenDB(is.Context(), is.config.DatabaseURI)
+	if err != nil {
+		return err
+	}
 	bunDB := bun.NewDB(is.db, pgdialect.New())
 	if is.LogDebug() {
 		bunDB.AddQueryHook(bunstore.NewLoggerHook(log.FromContext(is.Context()).WithField("namespace", "db")))

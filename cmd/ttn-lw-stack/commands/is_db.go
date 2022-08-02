@@ -15,14 +15,12 @@
 package commands
 
 import (
-	"database/sql"
 	"fmt"
 	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
-	"github.com/uptrace/bun/driver/pgdriver"
 	"github.com/uptrace/bun/migrate"
 	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
@@ -49,14 +47,17 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			logger.Info("Connecting to Identity Server database...")
 
-			sqlDB := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(config.IS.DatabaseURI)))
+			sqlDB, err := store.OpenDB(cmd.Context(), config.IS.DatabaseURI)
+			if err != nil {
+				return err
+			}
 			defer sqlDB.Close()
 
 			bunDB := bun.NewDB(sqlDB, pgdialect.New())
 
 			migrator := migrate.NewMigrator(bunDB, ismigrations.Migrations)
 
-			err := migrator.Init(cmd.Context())
+			err = migrator.Init(cmd.Context())
 			if err != nil {
 				return err
 			}

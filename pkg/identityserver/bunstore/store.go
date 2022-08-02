@@ -24,6 +24,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jackc/pgconn"
 	"github.com/jackc/pgerrcode"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/driver/pgdriver"
@@ -124,18 +125,53 @@ var driverErrorCodes = map[string]*errors.Definition{
 	pgerrcode.CannotConnectNow: errUnavailable,
 }
 
-// driverErrorDetails maps PostgreSQL error codes to attributes.
-// See https://www.postgresql.org/docs/current/protocol-error-fields.html for more information.
-var driverErrorDetails = []struct {
-	field     byte
-	attribute string
-}{
-	{'C', "driver_code"},
-	{'M', "driver_message"},
-	{'D', "driver_detail"},
-	{'t', "driver_table"},
-	{'c', "driver_column"},
-	{'n', "driver_constraint"},
+type driverError struct {
+	Code       string
+	Message    string
+	Detail     string
+	Table      string
+	Column     string
+	Constraint string
+}
+
+func (e *driverError) Attributes() []any {
+	var attributes []any
+	if e.Code != "" {
+		attributes = append(attributes, "driver_code", e.Code)
+	}
+	if e.Message != "" {
+		attributes = append(attributes, "driver_message", e.Message)
+	}
+	if e.Detail != "" {
+		attributes = append(attributes, "driver_detail", e.Detail)
+	}
+	if e.Table != "" {
+		attributes = append(attributes, "driver_table", e.Table)
+	}
+	if e.Column != "" {
+		attributes = append(attributes, "driver_column", e.Column)
+	}
+	if e.Constraint != "" {
+		attributes = append(attributes, "driver_constraint", e.Constraint)
+	}
+	return attributes
+}
+
+func (e *driverError) GetError() error {
+	attributes := e.Attributes()
+	if def, ok := driverErrorCodes[e.Code]; ok {
+		err := def.WithAttributes(attributes...)
+		if def.Name() == "already_exists" {
+			switch {
+			case strings.HasSuffix(e.Constraint, "_id_index"):
+				return store.ErrIDTaken.WithCause(err)
+			case strings.HasSuffix(e.Constraint, "_eui_index"):
+				return store.ErrEUITaken.WithCause(err)
+			}
+		}
+		return err
+	}
+	return errDriver.WithAttributes(attributes...)
 }
 
 // wrapDriverError wraps a driver error with the corresponding error definition.
@@ -143,27 +179,25 @@ func wrapDriverError(err error) error {
 	if errors.Is(err, sql.ErrNoRows) {
 		return errNotFound.WithCause(err)
 	}
+	var driverError driverError
+	if pgconnErr := (*pgconn.PgError)(nil); errors.As(err, &pgconnErr) {
+		driverError.Code = pgconnErr.Code
+		driverError.Message = pgconnErr.Message
+		driverError.Detail = pgconnErr.Detail
+		driverError.Table = pgconnErr.TableName
+		driverError.Column = pgconnErr.ColumnName
+		driverError.Constraint = pgconnErr.ConstraintName
+		return driverError.GetError()
+	}
 	if pgdriverErr := (pgdriver.Error{}); errors.As(err, &pgdriverErr) {
-		attributes := make([]interface{}, 0, len(driverErrorDetails)*2)
-		for _, detail := range driverErrorDetails {
-			if value := pgdriverErr.Field(detail.field); value != "" {
-				attributes = append(attributes, detail.attribute, value)
-			}
-		}
-		if def, ok := driverErrorCodes[pgdriverErr.Field('C')]; ok {
-			err := def.WithAttributes(attributes...)
-			if def.Name() == "already_exists" {
-				constraint := pgdriverErr.Field('n')
-				switch {
-				case strings.HasSuffix(constraint, "_id_index"):
-					return store.ErrIDTaken.WithCause(err)
-				case strings.HasSuffix(constraint, "_eui_index"):
-					return store.ErrEUITaken.WithCause(err)
-				}
-			}
-			return err
-		}
-		return errDriver.WithAttributes(attributes...)
+		// See https://www.postgresql.org/docs/current/protocol-error-fields.html for more information.
+		driverError.Code = pgdriverErr.Field('C')
+		driverError.Message = pgdriverErr.Field('M')
+		driverError.Detail = pgdriverErr.Field('D')
+		driverError.Table = pgdriverErr.Field('t')
+		driverError.Column = pgdriverErr.Field('c')
+		driverError.Constraint = pgdriverErr.Field('n')
+		return driverError.GetError()
 	}
 	if errors.Is(err, io.EOF) {
 		return errUnavailable.WithCause(err)
