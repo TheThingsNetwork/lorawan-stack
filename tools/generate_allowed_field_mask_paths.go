@@ -54,7 +54,10 @@ func main() {
 }
 
 func init() {
-	var claimAuthenticationCodePaths = []string{
+	// This prevents the console from accessing the JS for CAC related operations.
+	// TODO: Remove this logic when CAC usage in the JS is removed.
+	// (https://github.com/TheThingsNetwork/lorawan-stack/issues/5631)
+	claimAuthenticationCodePaths := []string{
 		"claim_authentication_code",
 		"claim_authentication_code.value",
 		"claim_authentication_code.valid_from",
