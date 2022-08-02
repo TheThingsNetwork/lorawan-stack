@@ -32,6 +32,7 @@ import is from './identity-server'
 import as from './application-server'
 import deviceRepository from './device-repository'
 import packetBroker from './packet-broker'
+import networkServer from './network-server'
 
 export default [
   ...status,
@@ -53,4 +54,5 @@ export default [
   ...deviceRepository,
   ...packetBroker,
   ...collaborators,
+  ...networkServer,
 ]
