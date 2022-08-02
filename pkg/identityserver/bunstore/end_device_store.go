@@ -353,6 +353,22 @@ func (*endDeviceStore) selectWithID(
 	}
 }
 
+func (*endDeviceStore) selectWithJoinEUI(
+	_ context.Context, joinEUI string,
+) func(*bun.SelectQuery) *bun.SelectQuery {
+	return func(q *bun.SelectQuery) *bun.SelectQuery {
+		return q.Where("?TableAlias.join_eui = ?", joinEUI)
+	}
+}
+
+func (*endDeviceStore) selectWithDevEUI(
+	_ context.Context, devEUI string,
+) func(*bun.SelectQuery) *bun.SelectQuery {
+	return func(q *bun.SelectQuery) *bun.SelectQuery {
+		return q.Where("?TableAlias.dev_eui = ?", devEUI)
+	}
+}
+
 func (s *endDeviceStore) CountEndDevices(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (uint64, error) {
 	ctx, span := tracer.Start(ctx, "CountEndDevices", trace.WithAttributes(
 		attribute.String("application_id", ids.GetApplicationId()),
@@ -458,9 +474,22 @@ func (s *endDeviceStore) GetEndDevice(
 	))
 	defer span.End()
 
-	model, err := s.getEndDeviceModelBy(
-		ctx, s.selectWithID(ctx, id.ApplicationIds.GetApplicationId(), id.GetDeviceId()), fieldMask,
-	)
+	var by []func(*bun.SelectQuery) *bun.SelectQuery
+	if id.GetApplicationIds().GetApplicationId() != "" {
+		if id.GetDeviceId() != "" {
+			by = append(by, s.selectWithID(ctx, id.GetApplicationIds().GetApplicationId(), id.GetDeviceId()))
+		} else {
+			by = append(by, s.selectWithID(ctx, id.GetApplicationIds().GetApplicationId()))
+		}
+	}
+	if euiString := eui64ToString(id.GetDevEui()); euiString != nil {
+		by = append(by, s.selectWithDevEUI(ctx, *euiString))
+	}
+	if euiString := eui64ToString(id.GetJoinEui()); euiString != nil {
+		by = append(by, s.selectWithJoinEUI(ctx, *euiString))
+	}
+
+	model, err := s.getEndDeviceModelBy(ctx, combineApply(by...), fieldMask)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			return nil, store.ErrEndDeviceNotFound.WithAttributes(
