@@ -19,7 +19,7 @@ import {
   disableJoinServer,
 } from '../../../support/utils'
 
-describe('End device repository create', () => {
+describe.skip('End device repository create', () => {
   const user = {
     ids: { user_id: 'create-dr-test-user' },
     primary_email_address: 'create-dr-test-user@example.com',
