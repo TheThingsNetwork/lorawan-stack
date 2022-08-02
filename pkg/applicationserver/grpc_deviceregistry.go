@@ -15,6 +15,7 @@
 package applicationserver
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 
@@ -236,7 +237,7 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 				return nil, nil, errInvalidFieldMask.WithCause(err)
 			}
 			if ttnpb.HasAnyField(sets, "session.dev_addr") {
-				req.EndDevice.Ids.DevAddr = types.MustDevAddr(req.EndDevice.Session.DevAddr)
+				req.EndDevice.Ids.DevAddr = req.EndDevice.Session.DevAddr
 				sets = ttnpb.AddFields(sets,
 					"ids.dev_addr",
 				)
@@ -247,7 +248,10 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 		evt = evtCreateEndDevice.NewWithIdentifiersAndData(ctx, req.EndDevice.Ids, nil)
 
 		if req.EndDevice.Ids.DevAddr != nil {
-			if !ttnpb.HasAnyField(sets, "session.dev_addr") || !req.EndDevice.Ids.DevAddr.Equal(types.MustDevAddr(req.EndDevice.Session.DevAddr).OrZero()) {
+			if !ttnpb.HasAnyField(sets, "session.dev_addr") || !bytes.Equal(
+				req.EndDevice.Ids.DevAddr,
+				req.EndDevice.Session.DevAddr,
+			) {
 				return nil, nil, errInvalidFieldValue.WithAttributes("field", "ids.dev_addr")
 			}
 		}
@@ -261,7 +265,7 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 				"ids.join_eui",
 			)
 		}
-		if req.EndDevice.Ids.DevEui != nil && !req.EndDevice.Ids.DevEui.IsZero() {
+		if !types.MustEUI64(req.EndDevice.Ids.DevEui).OrZero().IsZero() {
 			sets = ttnpb.AddFields(sets,
 				"ids.dev_eui",
 			)

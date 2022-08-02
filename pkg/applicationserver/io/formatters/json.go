@@ -34,11 +34,11 @@ func (json) ToDownlinks(data []byte) (*ttnpb.ApplicationDownlinks, error) {
 }
 
 func (json) ToDownlinkQueueRequest(data []byte) (*ttnpb.DownlinkQueueRequest, error) {
-	res := &ttnpb.DownlinkQueueRequest{}
+	res := ttnpb.DownlinkQueueRequest{}
 	if err := jsonpb.TTN().Unmarshal(data, &res); err != nil {
 		return nil, err
 	}
-	return res, nil
+	return &res, nil
 }
 
 // JSON is a formatter that uses JSON marshaling.

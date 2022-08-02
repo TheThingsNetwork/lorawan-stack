@@ -15,6 +15,7 @@
 package redis
 
 import (
+	"bytes"
 	"context"
 	"runtime/trace"
 	"time"
@@ -143,7 +144,13 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids *ttnpb.EndDeviceIdentifier
 			pipelined = func(p redis.Pipeliner) error {
 				p.Del(ctx, uk)
 				if stored.Ids.JoinEui != nil && stored.Ids.DevEui != nil {
-					p.Del(ctx, r.euiKey(*stored.Ids.JoinEui, *stored.Ids.DevEui))
+					p.Del(
+						ctx,
+						r.euiKey(
+							types.MustEUI64(stored.Ids.JoinEui).OrZero(),
+							types.MustEUI64(stored.Ids.DevEui).OrZero(),
+						),
+					)
 				}
 				return nil
 			}
@@ -187,10 +194,10 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids *ttnpb.EndDeviceIdentifier
 				if ttnpb.HasAnyField(sets, "ids.device_id") && pb.Ids.DeviceId != stored.Ids.DeviceId {
 					return errReadOnlyField.WithAttributes("field", "ids.device_id")
 				}
-				if ttnpb.HasAnyField(sets, "ids.join_eui") && !equalEUI64(pb.Ids.JoinEui, stored.Ids.JoinEui) {
+				if ttnpb.HasAnyField(sets, "ids.join_eui") && !bytes.Equal(pb.Ids.JoinEui, stored.Ids.JoinEui) {
 					return errReadOnlyField.WithAttributes("field", "ids.join_eui")
 				}
-				if ttnpb.HasAnyField(sets, "ids.dev_eui") && !equalEUI64(pb.Ids.DevEui, stored.Ids.DevEui) {
+				if ttnpb.HasAnyField(sets, "ids.dev_eui") && !bytes.Equal(pb.Ids.DevEui, stored.Ids.DevEui) {
 					return errReadOnlyField.WithAttributes("field", "ids.dev_eui")
 				}
 				if err := cmd.ScanProto(updated); err != nil {
@@ -207,7 +214,7 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids *ttnpb.EndDeviceIdentifier
 
 			pipelined = func(p redis.Pipeliner) error {
 				if stored == nil && updated.Ids.JoinEui != nil && updated.Ids.DevEui != nil {
-					ek := r.euiKey(*updated.Ids.JoinEui, *updated.Ids.DevEui)
+					ek := r.euiKey(types.MustEUI64(updated.Ids.JoinEui).OrZero(), types.MustEUI64(updated.Ids.DevEui).OrZero())
 					if err := tx.Watch(ctx, ek).Err(); err != nil {
 						return err
 					}

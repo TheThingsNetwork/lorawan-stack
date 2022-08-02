@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loradms/v1/api"
@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	urlutil "go.thethings.network/lorawan-stack/v3/pkg/util/url"
 )
 
@@ -56,7 +57,7 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.Appli
 		return errNoAssociation.New()
 	}
 
-	if up.EndDeviceIds.DevEui == nil || up.EndDeviceIds.DevEui.IsZero() {
+	if types.MustEUI64(up.EndDeviceIds.DevEui).OrZero().IsZero() {
 		logger.Debug("Package configured for end device with no device EUI")
 		return nil
 	}
@@ -104,7 +105,7 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.Appli
 func (p *DeviceManagementPackage) sendUplink(ctx context.Context, up *ttnpb.ApplicationUp, loraUp *objects.LoRaUplink, data *packageData) error {
 	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIds, fmt.Sprintf("as:packages:loraclouddmsv1:%s", events.NewCorrelationID()))...)
 	logger := log.FromContext(ctx)
-	eui := objects.EUI(*up.EndDeviceIds.DevEui)
+	eui := objects.EUI(types.MustEUI64(up.EndDeviceIds.DevEui).OrZero())
 
 	httpClient, err := p.server.HTTPClient(ctx)
 	if err != nil {
@@ -174,7 +175,11 @@ func (p *DeviceManagementPackage) sendDownlink(ctx context.Context, ids *ttnpb.E
 	}})
 }
 
-func (p *DeviceManagementPackage) sendServiceData(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, data *types.Struct) error {
+func (p *DeviceManagementPackage) sendServiceData(
+	ctx context.Context,
+	ids *ttnpb.EndDeviceIdentifiers,
+	data *pbtypes.Struct,
+) error {
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIds:   ids,
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
@@ -321,7 +326,7 @@ func uint32Ptr(x uint32) *uint32 {
 	return &x
 }
 
-func float64PtrOfTimestamp(x *types.Timestamp) *float64 {
+func float64PtrOfTimestamp(x *pbtypes.Timestamp) *float64 {
 	if x == nil {
 		return nil
 	}
@@ -333,12 +338,12 @@ func hexPtr(x objects.Hex) *objects.Hex {
 	return &x
 }
 
-func toStruct(i interface{}) (*types.Struct, error) {
+func toStruct(i interface{}) (*pbtypes.Struct, error) {
 	b, err := jsonpb.TTN().Marshal(i)
 	if err != nil {
 		return nil, err
 	}
-	var st types.Struct
+	var st pbtypes.Struct
 	err = jsonpb.TTN().Unmarshal(b, &st)
 	if err != nil {
 		return nil, err

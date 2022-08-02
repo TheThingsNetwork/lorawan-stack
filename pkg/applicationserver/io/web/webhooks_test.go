@@ -23,7 +23,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/formatters"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/mock"
@@ -36,6 +36,7 @@ import (
 	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
@@ -204,7 +205,7 @@ func TestWebhooks(t *testing.T) {
 									},
 								},
 								OK:  true,
-								URL: fmt.Sprintf("%s/up?devEUI=%s", baseURL, registeredDeviceID.DevEui),
+								URL: fmt.Sprintf("%s/up?devEUI=%s", baseURL, types.MustEUI64(registeredDeviceID.DevEui)),
 							},
 							{
 								Name: "UplinkMessage/UnregisteredDevice",
@@ -232,7 +233,7 @@ func TestWebhooks(t *testing.T) {
 									},
 								},
 								OK:  true,
-								URL: fmt.Sprintf("%s/join?joinEUI=%s", baseURL, registeredDeviceID.JoinEui),
+								URL: fmt.Sprintf("%s/join?joinEUI=%s", baseURL, types.MustEUI64(registeredDeviceID.JoinEui)),
 							},
 							{
 								Name: "DownlinkMessage/Ack",
@@ -365,10 +366,10 @@ func TestWebhooks(t *testing.T) {
 									EndDeviceIds: registeredDeviceID,
 									Up: &ttnpb.ApplicationUp_ServiceData{
 										ServiceData: &ttnpb.ApplicationServiceData{
-											Data: &types.Struct{
-												Fields: map[string]*types.Value{
+											Data: &pbtypes.Struct{
+												Fields: map[string]*pbtypes.Value{
 													"battery": {
-														Kind: &types.Value_NumberValue{
+														Kind: &pbtypes.Value_NumberValue{
 															NumberValue: 42.0,
 														},
 													},

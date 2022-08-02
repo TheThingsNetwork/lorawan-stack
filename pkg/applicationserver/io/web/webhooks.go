@@ -32,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	ttnweb "go.thethings.network/lorawan-stack/v3/pkg/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 	"go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
@@ -414,13 +415,13 @@ func (w *webhooks) handleDown(op func(io.Server, context.Context, *ttnpb.EndDevi
 func expandVariables(u string, up *ttnpb.ApplicationUp) (*url.URL, error) {
 	var joinEUI, devEUI, devAddr string
 	if up.EndDeviceIds.JoinEui != nil {
-		joinEUI = up.EndDeviceIds.JoinEui.String()
+		joinEUI = types.MustEUI64(up.EndDeviceIds.JoinEui).String()
 	}
 	if up.EndDeviceIds.DevEui != nil {
-		devEUI = up.EndDeviceIds.DevEui.String()
+		devEUI = types.MustEUI64(up.EndDeviceIds.DevEui).String()
 	}
 	if up.EndDeviceIds.DevAddr != nil {
-		devAddr = up.EndDeviceIds.DevAddr.String()
+		devAddr = types.MustDevAddr(up.EndDeviceIds.DevAddr).String()
 	}
 	tmpl, err := uritemplates.Parse(u)
 	if err != nil {
