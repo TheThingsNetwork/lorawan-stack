@@ -26,44 +26,20 @@
   ],
   "claim_authentication_code": {
     "_root": [
-      [
-        "is",
-        "js"
-      ],
-      [
-        "is",
-        "js"
-      ]
+      "is",
+      "is"
     ],
     "value": [
-      [
-        "is",
-        "js"
-      ],
-      [
-        "is",
-        "js"
-      ]
+      "is",
+      "is"
     ],
     "valid_to": [
-      [
-        "is",
-        "js"
-      ],
-      [
-        "is",
-        "js"
-      ]
+      "is",
+      "is"
     ],
     "valid_from": [
-      [
-        "is",
-        "js"
-      ],
-      [
-        "is",
-        "js"
-      ]
+      "is",
+      "is"
     ]
   },
   "description": [
