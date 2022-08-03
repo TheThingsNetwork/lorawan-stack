@@ -28,7 +28,7 @@ import (
 type testMessage struct {
 	MACVersion interop.MACVersion
 	Buffer     interop.Buffer `json:",omitempty"`
-	Key        interop.KeyEnvelope
+	Key        *interop.KeyEnvelope
 }
 
 func TestMarshalTypes(t *testing.T) { //nolint:paralleltest
@@ -38,7 +38,7 @@ func TestMarshalTypes(t *testing.T) { //nolint:paralleltest
 		msg := &testMessage{
 			MACVersion: interop.MACVersion(ttnpb.MACVersion_MAC_V1_0_2),
 			Buffer:     interop.Buffer([]byte{0x1, 0x2, 0x3}),
-			Key: interop.KeyEnvelope{
+			Key: &interop.KeyEnvelope{
 				KekLabel: "",
 				Key:      types.AES128Key{0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf}.Bytes(), //nolint:lll
 			},
@@ -52,7 +52,7 @@ func TestMarshalTypes(t *testing.T) { //nolint:paralleltest
 	{
 		msg := &testMessage{
 			MACVersion: interop.MACVersion(ttnpb.MACVersion_MAC_V1_1),
-			Key: interop.KeyEnvelope{
+			Key: &interop.KeyEnvelope{
 				KekLabel:     "test",
 				EncryptedKey: []byte{0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf},
 			},

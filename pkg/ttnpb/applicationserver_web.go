@@ -15,9 +15,11 @@
 package ttnpb
 
 // IsZero reports whether ids represent zero identifiers.
-func (ids ApplicationWebhookIdentifiers) IsZero() bool {
-	return ids.GetWebhookId() == "" &&
-		ids.GetApplicationIds().GetApplicationId() == ""
+func (ids *ApplicationWebhookIdentifiers) IsZero() bool {
+	if ids == nil {
+		return true
+	}
+	return ids.WebhookId == "" && ids.ApplicationIds.IsZero()
 }
 
 // All EntityType methods implement the IDStringer interface.
