@@ -32,7 +32,7 @@ import (
 )
 
 type lorawanDecodedFrame struct {
-	Message     ttnpb.Message       `json:"message"`
+	Message     *ttnpb.Message      `json:"message"`
 	MACCommands []*ttnpb.MACCommand `json:"mac_commands,omitempty"`
 }
 
@@ -72,13 +72,13 @@ func setMacBuffer(p *ttnpb.MACPayload, buf []byte) {
 	}
 }
 
-func decodeJoinRequest(msg ttnpb.Message, config lorawanConfig) (*lorawanDecodedFrame, error) {
+func decodeJoinRequest(msg *ttnpb.Message, config lorawanConfig) (*lorawanDecodedFrame, error) {
 	return &lorawanDecodedFrame{
 		Message: msg,
 	}, nil
 }
 
-func decodeUplink(msg ttnpb.Message, config lorawanConfig) (*lorawanDecodedFrame, error) {
+func decodeUplink(msg *ttnpb.Message, config lorawanConfig) (*lorawanDecodedFrame, error) {
 	pld := msg.GetMacPayload()
 	devAddr := types.MustDevAddr(pld.FHdr.DevAddr).OrZero()
 	macBuf := getMacBuffer(pld)
@@ -134,7 +134,7 @@ func decodeUplink(msg ttnpb.Message, config lorawanConfig) (*lorawanDecodedFrame
 	}, nil
 }
 
-func decodeJoinAccept(msg ttnpb.Message, config lorawanConfig) (*lorawanDecodedFrame, error) {
+func decodeJoinAccept(msg *ttnpb.Message, config lorawanConfig) (*lorawanDecodedFrame, error) {
 	pld := msg.GetJoinAcceptPayload()
 	key, keyName := config.getJoinAcceptDecodeKey()
 	if key.IsZero() {
@@ -164,7 +164,7 @@ func decodeJoinAccept(msg ttnpb.Message, config lorawanConfig) (*lorawanDecodedF
 	return &lorawanDecodedFrame{Message: msg}, nil
 }
 
-func decodeDownlink(msg ttnpb.Message, config lorawanConfig) (*lorawanDecodedFrame, error) {
+func decodeDownlink(msg *ttnpb.Message, config lorawanConfig) (*lorawanDecodedFrame, error) {
 	pld := msg.GetMacPayload()
 	devAddr := types.MustDevAddr(pld.FHdr.DevAddr).OrZero()
 	macBuf := getMacBuffer(pld)
@@ -218,7 +218,7 @@ func decodeDownlink(msg ttnpb.Message, config lorawanConfig) (*lorawanDecodedFra
 	}, nil
 }
 
-func decodeFrame(msg ttnpb.Message, config lorawanConfig) (*lorawanDecodedFrame, error) {
+func decodeFrame(msg *ttnpb.Message, config lorawanConfig) (*lorawanDecodedFrame, error) {
 	switch msg.MHdr.MType {
 	case ttnpb.MType_JOIN_REQUEST:
 		return decodeJoinRequest(msg, config)
@@ -326,7 +326,7 @@ var (
 					return fmt.Errorf("failed to decode LoRaWAN frame: %w", err)
 				}
 
-				decoded, err := decodeFrame(frame, lorawanConfig)
+				decoded, err := decodeFrame(&frame, lorawanConfig)
 				if err != nil {
 					return err
 				}
