@@ -122,6 +122,6 @@ var (
 	EvtUnansweredMACCommand = events.Define(
 		"ns.mac.command.unanswered", "MAC command answer missing",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
-		events.WithDataType(make([]*ttnpb.MACCommand, 0)),
+		events.WithDataType(&ttnpb.MACCommands{}),
 	)
 )
