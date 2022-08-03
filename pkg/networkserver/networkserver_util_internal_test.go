@@ -2206,7 +2206,7 @@ func (o EndDeviceOptionNamespace) Activate(defaults *ttnpb.MACSettings, wrapKeys
 				o.WithMacState(macState),
 				o.WithSession(ses),
 				o.WithEndDeviceIdentifiersOptions(
-					test.EndDeviceIdentifiersOptions.WithDevAddr(types.MustDevAddr(ses.DevAddr)),
+					test.EndDeviceIdentifiersOptions.WithDevAddr(ses.DevAddr),
 				),
 			)(x)
 		}
@@ -2218,7 +2218,7 @@ func (o EndDeviceOptionNamespace) Activate(defaults *ttnpb.MACSettings, wrapKeys
 			func(x ttnpb.EndDevice) ttnpb.EndDevice {
 				return o.Compose(
 					o.WithEndDeviceIdentifiersOptions(
-						test.EndDeviceIdentifiersOptions.WithDevAddr(types.MustDevAddr(x.PendingSession.DevAddr)),
+						test.EndDeviceIdentifiersOptions.WithDevAddr(x.PendingSession.DevAddr),
 					),
 					o.WithMacState(x.PendingMacState),
 					o.WithSession(x.PendingSession),

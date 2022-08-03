@@ -163,7 +163,7 @@ func (ps *PubSub) getMetadata(evt events.Event) map[string]string {
 				ids["join_eui"] = append(ids["join_eui"], types.MustEUI64(devID.JoinEui).String())
 			}
 			if devID.DevAddr != nil {
-				ids["dev_addr"] = append(ids["dev_addr"], types.MustEUI64(devID.DevAddr).String())
+				ids["dev_addr"] = append(ids["dev_addr"], types.MustDevAddr(devID.DevAddr).String())
 			}
 		}
 	}
