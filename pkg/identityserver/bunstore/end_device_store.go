@@ -491,10 +491,10 @@ func (s *endDeviceStore) GetEndDevice(
 			by = append(by, s.selectWithID(ctx, id.GetApplicationIds().GetApplicationId()))
 		}
 	}
-	if euiString := eui64ToString(id.GetDevEui()); euiString != nil {
+	if euiString := eui64ToString(types.MustEUI64(id.GetDevEui())); euiString != nil {
 		by = append(by, s.selectWithDevEUI(ctx, *euiString))
 	}
-	if euiString := eui64ToString(id.GetJoinEui()); euiString != nil {
+	if euiString := eui64ToString(types.MustEUI64(id.GetJoinEui())); euiString != nil {
 		by = append(by, s.selectWithJoinEUI(ctx, *euiString))
 	}
 

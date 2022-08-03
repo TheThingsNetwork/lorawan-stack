@@ -101,7 +101,7 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 
 		if a.So(err, should.BeNil) && a.So(created, should.NotBeNil) {
 			a.So(created.GetIds().GetGatewayId(), should.Equal, "foo")
-			a.So(created.GetIds().GetEui(), should.Resemble, eui)
+			a.So(created.GetIds().GetEui(), should.Resemble, eui.Bytes())
 			a.So(created.Name, should.Equal, "Foo Name")
 			a.So(created.Description, should.Equal, "Foo Description")
 			a.So(created.Attributes, should.Resemble, attributes)
