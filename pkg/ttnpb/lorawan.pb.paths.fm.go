@@ -471,6 +471,13 @@ var MACCommandFieldPathsTopLevel = []string{
 	"cid",
 	"payload",
 }
+var MACCommandsFieldPathsNested = []string{
+	"commands",
+}
+
+var MACCommandsFieldPathsTopLevel = []string{
+	"commands",
+}
 var FrequencyValueFieldPathsNested = []string{
 	"value",
 }

@@ -29238,6 +29238,30 @@
           ]
         },
         {
+          "name": "MACCommands",
+          "longName": "MACCommands",
+          "fullName": "ttn.lorawan.v3.MACCommands",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "commands",
+              "description": "",
+              "label": "repeated",
+              "type": "MACCommand",
+              "longType": "MACCommand",
+              "fullType": "ttn.lorawan.v3.MACCommand",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "MACPayload",
           "longName": "MACPayload",
           "fullName": "ttn.lorawan.v3.MACPayload",
