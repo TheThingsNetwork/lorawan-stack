@@ -1079,10 +1079,13 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 	} else if st.HasSetField("session.dev_addr") {
 		var devAddr *types.DevAddr
+		st.Device.Ids.DevAddr = nil
 		if st.Device.Session != nil {
 			devAddr = types.MustDevAddr(st.Device.Session.DevAddr)
 		}
-		st.Device.Ids.DevAddr = devAddr.Bytes()
+		if devAddr != nil {
+			st.Device.Ids.DevAddr = devAddr.Bytes()
+		}
 		st.AddSetFields(
 			"ids.dev_addr",
 		)
