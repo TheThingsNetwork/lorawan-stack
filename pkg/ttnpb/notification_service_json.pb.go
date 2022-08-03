@@ -131,8 +131,7 @@ func (x *Notification) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.EntityIds != nil || s.HasField("entity_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("entity_ids")
-		// NOTE: EntityIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.EntityIds)
+		x.EntityIds.MarshalProtoJSON(s.WithField("entity_ids"))
 	}
 	if x.NotificationType != "" || s.HasField("notification_type") {
 		s.WriteMoreIf(&wroteField)
@@ -216,15 +215,12 @@ func (x *Notification) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			}
 			x.CreatedAt = v
 		case "entity_ids", "entityIds":
-			s.AddField("entity_ids")
 			if s.ReadNil() {
 				x.EntityIds = nil
 				return
 			}
-			// NOTE: EntityIdentifiers does not seem to implement UnmarshalProtoJSON.
-			var v EntityIdentifiers
-			gogo.UnmarshalMessage(s, &v)
-			x.EntityIds = &v
+			x.EntityIds = &EntityIdentifiers{}
+			x.EntityIds.UnmarshalProtoJSON(s.WithField("entity_ids", true))
 		case "notification_type", "notificationType":
 			s.AddField("notification_type")
 			x.NotificationType = s.ReadString()
@@ -297,8 +293,7 @@ func (x *CreateNotificationRequest) MarshalProtoJSON(s *jsonplugin.MarshalState)
 	if x.EntityIds != nil || s.HasField("entity_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("entity_ids")
-		// NOTE: EntityIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.EntityIds)
+		x.EntityIds.MarshalProtoJSON(s.WithField("entity_ids"))
 	}
 	if x.NotificationType != "" || s.HasField("notification_type") {
 		s.WriteMoreIf(&wroteField)
@@ -354,15 +349,12 @@ func (x *CreateNotificationRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalSt
 		default:
 			s.ReadAny() // ignore unknown field
 		case "entity_ids", "entityIds":
-			s.AddField("entity_ids")
 			if s.ReadNil() {
 				x.EntityIds = nil
 				return
 			}
-			// NOTE: EntityIdentifiers does not seem to implement UnmarshalProtoJSON.
-			var v EntityIdentifiers
-			gogo.UnmarshalMessage(s, &v)
-			x.EntityIds = &v
+			x.EntityIds = &EntityIdentifiers{}
+			x.EntityIds.UnmarshalProtoJSON(s.WithField("entity_ids", true))
 		case "notification_type", "notificationType":
 			s.AddField("notification_type")
 			x.NotificationType = s.ReadString()

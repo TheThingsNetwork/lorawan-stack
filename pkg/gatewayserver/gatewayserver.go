@@ -372,20 +372,24 @@ var (
 // This method should only be used for request contexts.
 func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (context.Context, *ttnpb.GatewayIdentifiers, error) {
 	ctx = gs.FillContext(ctx)
-	if ids.IsZero() || ids.Eui != nil && ids.Eui.IsZero() {
+	if ids.IsZero() {
 		return nil, nil, errEmptyIdentifiers.New()
 	}
 	if ids.GatewayId == "" {
+		eui := types.MustEUI64(ids.Eui)
+		if eui.OrZero().IsZero() {
+			return nil, nil, errEmptyIdentifiers.New()
+		}
 		extIDs, err := gs.entityRegistry.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
-			Eui: ids.Eui.Bytes(),
+			Eui: eui.Bytes(),
 		})
 		if err == nil {
 			ids = extIDs
 		} else if errors.IsNotFound(err) {
 			if gs.requireRegisteredGateways {
-				return nil, nil, errGatewayEUINotRegistered.WithAttributes("eui", *ids.Eui).WithCause(err)
+				return nil, nil, errGatewayEUINotRegistered.WithAttributes("eui", eui).WithCause(err)
 			}
-			ids.GatewayId = fmt.Sprintf("eui-%v", strings.ToLower(ids.Eui.String()))
+			ids.GatewayId = fmt.Sprintf("eui-%v", strings.ToLower(eui.String()))
 		} else {
 			return nil, nil, err
 		}
@@ -738,14 +742,14 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item any) {
 		}
 		drop := func(ids *ttnpb.EndDeviceIdentifiers, err error) {
 			logger := logger.WithError(err)
-			if ids.JoinEui != nil {
-				logger = logger.WithField("join_eui", *ids.JoinEui)
+			if joinEUI := types.MustEUI64(ids.JoinEui).OrZero(); !joinEUI.IsZero() {
+				logger = logger.WithField("join_eui", joinEUI)
 			}
-			if ids.DevEui != nil && !ids.DevEui.IsZero() {
-				logger = logger.WithField("dev_eui", *ids.DevEui)
+			if devEUI := types.MustEUI64(ids.DevEui).OrZero(); !devEUI.IsZero() {
+				logger = logger.WithField("dev_eui", devEUI)
 			}
-			if ids.DevAddr != nil && !ids.DevAddr.IsZero() {
-				logger = logger.WithField("dev_addr", *ids.DevAddr)
+			if devAddr := types.MustDevAddr(ids.DevAddr).OrZero(); !devAddr.IsZero() {
+				logger = logger.WithField("dev_addr", devAddr)
 			}
 			logger.Debug("Drop message")
 			registerDropUplink(ctx, gtw, msg, host.name, err)
@@ -755,7 +759,7 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item any) {
 		switch {
 		case ids.DevAddr != nil:
 			for _, prefix := range host.handler.DevAddrPrefixes() {
-				if ids.DevAddr.HasPrefix(prefix) {
+				if types.MustDevAddr(ids.DevAddr).HasPrefix(prefix) {
 					pass = true
 					break
 				}

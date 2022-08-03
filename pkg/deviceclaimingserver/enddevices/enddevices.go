@@ -186,7 +186,7 @@ func (upstream *Upstream) Unclaim(ctx context.Context, in *ttnpb.EndDeviceIdenti
 	if err != nil {
 		return nil, err
 	}
-	claimer := upstream.joinEUIClaimer(ctx, *in.JoinEui)
+	claimer := upstream.joinEUIClaimer(ctx, types.MustEUI64(in.JoinEui).OrZero())
 	if claimer == nil {
 		return nil, errClaimingNotSupported.WithAttributes("eui", in.JoinEui)
 	}
@@ -220,7 +220,7 @@ func (upstream *Upstream) GetClaimStatus(ctx context.Context, in *ttnpb.EndDevic
 	if err != nil {
 		return nil, err
 	}
-	claimer := upstream.joinEUIClaimer(ctx, *in.JoinEui)
+	claimer := upstream.joinEUIClaimer(ctx, types.MustEUI64(in.JoinEui).OrZero())
 	if claimer == nil {
 		return nil, errClaimingNotSupported.WithAttributes("eui", in.JoinEui)
 	}

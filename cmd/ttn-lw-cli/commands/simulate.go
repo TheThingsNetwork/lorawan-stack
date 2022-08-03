@@ -339,7 +339,7 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 			expectedMIC, err = crypto.ComputeJoinAcceptMIC(
 				jsIntKey,
 				0xFF,
-				*dev.Ids.JoinEui,
+				types.MustEUI64(dev.Ids.JoinEui).OrZero(),
 				devNonce,
 				append([]byte{downMsg.RawPayload[0]}, joinAcceptBytes...),
 			)
@@ -357,7 +357,7 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 		}
 
 		devAddr := types.MustDevAddr(joinAcceptPayload.DevAddr).OrZero()
-		dev.Ids.DevAddr, dev.Session.DevAddr = &devAddr, joinAcceptPayload.DevAddr
+		dev.Ids.DevAddr, dev.Session.DevAddr = devAddr.Bytes(), devAddr.Bytes()
 		dev.Session.Keys = &ttnpb.SessionKeys{}
 
 		joinNonce := types.MustJoinNonce(joinAcceptPayload.JoinNonce).OrZero()
@@ -548,8 +548,8 @@ var (
 						LorawanPhyVersion: uplinkParams.LoRaWANPHYVersion,
 						FrequencyPlanId:   uplinkParams.BandID,
 						Ids: &ttnpb.EndDeviceIdentifiers{
-							JoinEui: &joinParams.JoinEUI,
-							DevEui:  &joinParams.DevEUI,
+							JoinEui: joinParams.JoinEUI.Bytes(),
+							DevEui:  joinParams.DevEUI.Bytes(),
 						},
 						RootKeys: &ttnpb.RootKeys{
 							NwkKey: &ttnpb.KeyEnvelope{Key: joinParams.NwkKey.Bytes()},

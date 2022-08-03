@@ -1364,27 +1364,27 @@ func (m *Message) EndDeviceIdentifiers() *EndDeviceIdentifiers {
 	if h := m.GetMacPayload().GetFHdr(); h != nil {
 		devAddr := types.MustDevAddr(h.DevAddr).OrZero()
 		return &EndDeviceIdentifiers{
-			DevAddr: &devAddr,
+			DevAddr: devAddr.Bytes(),
 		}
 	}
 	if p := m.GetJoinRequestPayload(); p != nil {
 		devEUI, joinEUI := types.MustEUI64(p.DevEui).OrZero(), types.MustEUI64(p.JoinEui).OrZero()
 		return &EndDeviceIdentifiers{
-			DevEui:  &devEUI,
-			JoinEui: &joinEUI,
+			DevEui:  devEUI.Bytes(),
+			JoinEui: joinEUI.Bytes(),
 		}
 	}
 	if p := m.GetJoinAcceptPayload(); p != nil {
 		devAddr := types.MustDevAddr(p.DevAddr).OrZero()
 		return &EndDeviceIdentifiers{
-			DevAddr: &devAddr,
+			DevAddr: devAddr.Bytes(),
 		}
 	}
 	if p := m.GetRejoinRequestPayload(); p != nil {
 		devEUI, joinEUI := types.MustEUI64(p.DevEui).OrZero(), types.MustEUI64(p.JoinEui).OrZero()
 		return &EndDeviceIdentifiers{
-			DevEui:  &devEUI,
-			JoinEui: &joinEUI,
+			DevEui:  devEUI.Bytes(),
+			JoinEui: joinEUI.Bytes(),
 		}
 	}
 	return nil

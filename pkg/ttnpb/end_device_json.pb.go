@@ -1698,8 +1698,7 @@ func (x *MACState_UplinkMessage_RxMetadata) MarshalProtoJSON(s *jsonplugin.Marsh
 	if x.GatewayIds != nil || s.HasField("gateway_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("gateway_ids")
-		// NOTE: GatewayIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.GatewayIds)
+		x.GatewayIds.MarshalProtoJSON(s.WithField("gateway_ids"))
 	}
 	if x.ChannelRssi != 0 || s.HasField("channel_rssi") {
 		s.WriteMoreIf(&wroteField)
@@ -1745,15 +1744,12 @@ func (x *MACState_UplinkMessage_RxMetadata) UnmarshalProtoJSON(s *jsonplugin.Unm
 		default:
 			s.ReadAny() // ignore unknown field
 		case "gateway_ids", "gatewayIds":
-			s.AddField("gateway_ids")
 			if s.ReadNil() {
 				x.GatewayIds = nil
 				return
 			}
-			// NOTE: GatewayIdentifiers does not seem to implement UnmarshalProtoJSON.
-			var v GatewayIdentifiers
-			gogo.UnmarshalMessage(s, &v)
-			x.GatewayIds = &v
+			x.GatewayIds = &GatewayIdentifiers{}
+			x.GatewayIds.UnmarshalProtoJSON(s.WithField("gateway_ids", true))
 		case "channel_rssi", "channelRssi":
 			s.AddField("channel_rssi")
 			x.ChannelRssi = s.ReadFloat32()
@@ -2617,8 +2613,7 @@ func (x *EndDevice) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.Ids != nil || s.HasField("ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("ids")
-		// NOTE: EndDeviceIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.Ids)
+		x.Ids.MarshalProtoJSON(s.WithField("ids"))
 	}
 	if x.CreatedAt != nil || s.HasField("created_at") {
 		s.WriteMoreIf(&wroteField)
@@ -2943,15 +2938,12 @@ func (x *EndDevice) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		default:
 			s.ReadAny() // ignore unknown field
 		case "ids":
-			s.AddField("ids")
 			if s.ReadNil() {
 				x.Ids = nil
 				return
 			}
-			// NOTE: EndDeviceIdentifiers does not seem to implement UnmarshalProtoJSON.
-			var v EndDeviceIdentifiers
-			gogo.UnmarshalMessage(s, &v)
-			x.Ids = &v
+			x.Ids = &EndDeviceIdentifiers{}
+			x.Ids.UnmarshalProtoJSON(s.WithField("ids", true))
 		case "created_at", "createdAt":
 			s.AddField("created_at")
 			if s.ReadNil() {
@@ -3484,6 +3476,201 @@ func (x *UpdateEndDeviceRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate message to JSON.
+func (x *BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Ids != nil || s.HasField("ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("ids")
+		x.Ids.MarshalProtoJSON(s.WithField("ids"))
+	}
+	if x.LastSeenAt != nil || s.HasField("last_seen_at") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("last_seen_at")
+		if x.LastSeenAt == nil {
+			s.WriteNil()
+		} else {
+			gogo.MarshalTimestamp(s, x.LastSeenAt)
+		}
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate to JSON.
+func (x *BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate message from JSON.
+func (x *BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "ids":
+			if s.ReadNil() {
+				x.Ids = nil
+				return
+			}
+			x.Ids = &EndDeviceIdentifiers{}
+			x.Ids.UnmarshalProtoJSON(s.WithField("ids", true))
+		case "last_seen_at", "lastSeenAt":
+			s.AddField("last_seen_at")
+			if s.ReadNil() {
+				x.LastSeenAt = nil
+				return
+			}
+			v := gogo.UnmarshalTimestamp(s)
+			if s.Err() != nil {
+				return
+			}
+			x.LastSeenAt = v
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate from JSON.
+func (x *BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the BatchUpdateEndDeviceLastSeenRequest message to JSON.
+func (x *BatchUpdateEndDeviceLastSeenRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.Updates) > 0 || s.HasField("updates") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("updates")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.Updates {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("updates"))
+		}
+		s.WriteArrayEnd()
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the BatchUpdateEndDeviceLastSeenRequest to JSON.
+func (x *BatchUpdateEndDeviceLastSeenRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the BatchUpdateEndDeviceLastSeenRequest message from JSON.
+func (x *BatchUpdateEndDeviceLastSeenRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "updates":
+			s.AddField("updates")
+			if s.ReadNil() {
+				x.Updates = nil
+				return
+			}
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.Updates = append(x.Updates, nil)
+					return
+				}
+				v := &BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate{}
+				v.UnmarshalProtoJSON(s.WithField("updates", false))
+				if s.Err() != nil {
+					return
+				}
+				x.Updates = append(x.Updates, v)
+			})
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the BatchUpdateEndDeviceLastSeenRequest from JSON.
+func (x *BatchUpdateEndDeviceLastSeenRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the GetEndDeviceRequest message to JSON.
+func (x *GetEndDeviceRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.EndDeviceIds != nil || s.HasField("end_device_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("end_device_ids")
+		x.EndDeviceIds.MarshalProtoJSON(s.WithField("end_device_ids"))
+	}
+	if x.FieldMask != nil || s.HasField("field_mask") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("field_mask")
+		if x.FieldMask == nil {
+			s.WriteNil()
+		} else {
+			gogo.MarshalFieldMask(s, x.FieldMask)
+		}
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the GetEndDeviceRequest to JSON.
+func (x *GetEndDeviceRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the GetEndDeviceRequest message from JSON.
+func (x *GetEndDeviceRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "end_device_ids", "endDeviceIds":
+			if s.ReadNil() {
+				x.EndDeviceIds = nil
+				return
+			}
+			x.EndDeviceIds = &EndDeviceIdentifiers{}
+			x.EndDeviceIds.UnmarshalProtoJSON(s.WithField("end_device_ids", true))
+		case "field_mask", "fieldMask":
+			s.AddField("field_mask")
+			if s.ReadNil() {
+				x.FieldMask = nil
+				return
+			}
+			v := gogo.UnmarshalFieldMask(s)
+			if s.Err() != nil {
+				return
+			}
+			x.FieldMask = v
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the GetEndDeviceRequest from JSON.
+func (x *GetEndDeviceRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the GetEndDeviceIdentifiersForEUIsRequest message to JSON.
 func (x *GetEndDeviceIdentifiersForEUIsRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -3597,6 +3784,72 @@ func (x *SetEndDeviceRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 
 // UnmarshalJSON unmarshals the SetEndDeviceRequest from JSON.
 func (x *SetEndDeviceRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ResetAndGetEndDeviceRequest message to JSON.
+func (x *ResetAndGetEndDeviceRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.EndDeviceIds != nil || s.HasField("end_device_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("end_device_ids")
+		x.EndDeviceIds.MarshalProtoJSON(s.WithField("end_device_ids"))
+	}
+	if x.FieldMask != nil || s.HasField("field_mask") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("field_mask")
+		if x.FieldMask == nil {
+			s.WriteNil()
+		} else {
+			gogo.MarshalFieldMask(s, x.FieldMask)
+		}
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ResetAndGetEndDeviceRequest to JSON.
+func (x *ResetAndGetEndDeviceRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ResetAndGetEndDeviceRequest message from JSON.
+func (x *ResetAndGetEndDeviceRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "end_device_ids", "endDeviceIds":
+			if s.ReadNil() {
+				x.EndDeviceIds = nil
+				return
+			}
+			x.EndDeviceIds = &EndDeviceIdentifiers{}
+			x.EndDeviceIds.UnmarshalProtoJSON(s.WithField("end_device_ids", true))
+		case "field_mask", "fieldMask":
+			s.AddField("field_mask")
+			if s.ReadNil() {
+				x.FieldMask = nil
+				return
+			}
+			v := gogo.UnmarshalFieldMask(s)
+			if s.Err() != nil {
+				return
+			}
+			x.FieldMask = v
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ResetAndGetEndDeviceRequest from JSON.
+func (x *ResetAndGetEndDeviceRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 

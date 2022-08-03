@@ -15,6 +15,7 @@
 package commands
 
 import (
+	"bytes"
 	"encoding/binary"
 	"fmt"
 	stdio "io"
@@ -254,8 +255,8 @@ This command takes end device templates from stdin.`,
 
 					res.EndDevice.Ids = &ttnpb.EndDeviceIdentifiers{
 						DeviceId: fmt.Sprintf("eui-%s", strings.ToLower(devEUI.String())),
-						JoinEui:  &joinEUI,
-						DevEui:   &devEUI,
+						JoinEui:  joinEUI.Bytes(),
+						DevEui:   devEUI.Bytes(),
 					}
 					res.FieldMask = ttnpb.FieldMask(
 						ttnpb.BottomLevelFields(append(res.FieldMask.GetPaths(),
@@ -410,7 +411,7 @@ command to assign EUIs to map to end device templates.`,
 						e.EndDevice.Ids.DeviceId != "" && e.EndDevice.Ids.DeviceId == inputEntry.EndDevice.Ids.DeviceId:
 					case e.EndDevice.Ids != nil && e.EndDevice.Ids.DevEui != nil &&
 						inputEntry.EndDevice.Ids != nil && inputEntry.EndDevice.Ids.DevEui != nil &&
-						e.EndDevice.Ids.DevEui.Equal(*inputEntry.EndDevice.Ids.DevEui):
+						bytes.Equal(e.EndDevice.Ids.DevEui, inputEntry.EndDevice.Ids.DevEui):
 					case e.EndDevice.Ids.IsZero():
 					default:
 						continue

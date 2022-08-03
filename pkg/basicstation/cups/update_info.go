@@ -59,7 +59,7 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 	logger := log.FromContext(ctx)
 	ids := &ttnpb.GatewayIdentifiers{
 		GatewayId: fmt.Sprintf("eui-%s", strings.ToLower(req.Router.EUI64.String())),
-		Eui:       &req.Router.EUI64,
+		Eui:       req.Router.EUI64.Bytes(),
 	}
 	logger = logger.WithField("gateway_uid", unique.ID(ctx, ids))
 	registry, err := s.getRegistry(ctx, ids)

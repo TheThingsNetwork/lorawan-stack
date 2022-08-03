@@ -662,8 +662,8 @@ func TestUnmarshalIdentifiers(t *testing.T) {
 				0x42, 0xff, 0xff, 0xff,
 			},
 			&ttnpb.EndDeviceIdentifiers{
-				JoinEui: &joinEUI,
-				DevEui:  &devEUI,
+				JoinEui: joinEUI.Bytes(),
+				DevEui:  devEUI.Bytes(),
 			},
 		},
 		{
@@ -688,7 +688,7 @@ func TestUnmarshalIdentifiers(t *testing.T) {
 				0x42, 0xff, 0xff, 0xff,
 			},
 			&ttnpb.EndDeviceIdentifiers{
-				DevAddr: &devAddr,
+				DevAddr: devAddr.Bytes(),
 			},
 		},
 		{
@@ -708,7 +708,7 @@ func TestUnmarshalIdentifiers(t *testing.T) {
 				0x42, 0xff, 0xff, 0xff,
 			},
 			&ttnpb.EndDeviceIdentifiers{
-				DevEui: &devEUI,
+				DevEui: devEUI.Bytes(),
 			},
 		},
 		{
@@ -728,8 +728,8 @@ func TestUnmarshalIdentifiers(t *testing.T) {
 				0x42, 0xff, 0xff, 0xff,
 			},
 			&ttnpb.EndDeviceIdentifiers{
-				JoinEui: &joinEUI,
-				DevEui:  &devEUI,
+				JoinEui: joinEUI.Bytes(),
+				DevEui:  devEUI.Bytes(),
 			},
 		},
 		{
@@ -749,7 +749,7 @@ func TestUnmarshalIdentifiers(t *testing.T) {
 				0x42, 0xff, 0xff, 0xff,
 			},
 			&ttnpb.EndDeviceIdentifiers{
-				DevEui: &devEUI,
+				DevEui: devEUI.Bytes(),
 			},
 		},
 	} {

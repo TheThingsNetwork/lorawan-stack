@@ -496,7 +496,7 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 				return nil, err
 			}
 			dev.Session = session
-			dev.Ids.DevAddr = types.MustDevAddr(session.DevAddr)
+			dev.Ids.DevAddr = session.DevAddr
 		default:
 			return nil, errRebuild.New()
 		}
@@ -763,8 +763,8 @@ func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids *ttnpb.EndDev
 	}
 	req := &ttnpb.SessionKeyRequest{
 		SessionKeyId: sessionKeyID,
-		DevEui:       ids.DevEui.Bytes(),
-		JoinEui:      ids.JoinEui.Bytes(),
+		DevEui:       ids.DevEui,
+		JoinEui:      ids.JoinEui,
 	}
 	if js, err := as.GetPeer(ctx, ttnpb.ClusterRole_JOIN_SERVER, nil); err == nil {
 		cc, err := js.Conn()
@@ -788,7 +788,7 @@ func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids *ttnpb.EndDev
 			return nil, err
 		}
 	}
-	return nil, errJSUnavailable.WithAttributes("join_eui", *ids.JoinEui)
+	return nil, errJSUnavailable.WithAttributes("join_eui", types.MustEUI64(ids.JoinEui).OrZero())
 }
 
 func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.ApplicationUp, link *ttnpb.ApplicationLink) (pass bool, err error) {
@@ -871,7 +871,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids *ttnpb.En
 			}
 			previousSession := dev.PendingSession
 			dev.PendingSession = &ttnpb.Session{
-				DevAddr: ids.DevAddr.Bytes(),
+				DevAddr: ids.DevAddr,
 				Keys: &ttnpb.SessionKeys{
 					SessionKeyId: joinAccept.SessionKeyId,
 					AppSKey:      joinAccept.AppSKey,
@@ -958,7 +958,7 @@ func (as *ApplicationServer) matchSession(ctx context.Context, ids *ttnpb.EndDev
 			return nil, errFetchAppSKey.WithCause(err)
 		}
 		dev.Session = &ttnpb.Session{
-			DevAddr: ids.DevAddr.Bytes(),
+			DevAddr: ids.DevAddr,
 			Keys: &ttnpb.SessionKeys{
 				SessionKeyId: sessionKeyID,
 				AppSKey:      appSKey,

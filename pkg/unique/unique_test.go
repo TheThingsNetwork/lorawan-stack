@@ -39,19 +39,19 @@ func TestValidity(t *testing.T) {
 		&ttnpb.EndDeviceIdentifiers{},
 		&ttnpb.EndDeviceIdentifiers{
 			ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
-			DevEui:         &eui,
+			DevEui:         eui.Bytes(),
 		},
 		&ttnpb.EndDeviceIdentifiers{
 			ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
-			DevEui:         &eui,
+			DevEui:         eui.Bytes(),
 		},
 		(*ttnpb.GatewayIdentifiers)(nil),
 		&ttnpb.GatewayIdentifiers{},
 		&ttnpb.GatewayIdentifiers{
-			Eui: &eui,
+			Eui: eui.Bytes(),
 		},
 		&ttnpb.GatewayIdentifiers{
-			Eui: &eui,
+			Eui: eui.Bytes(),
 		},
 		(*ttnpb.OrganizationIdentifiers)(nil),
 		&ttnpb.OrganizationIdentifiers{},

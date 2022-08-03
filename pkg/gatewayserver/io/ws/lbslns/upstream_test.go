@@ -120,7 +120,7 @@ func TestMarshalJSON(t *testing.T) {
 func TestJoinRequest(t *testing.T) {
 	gtwID := &ttnpb.GatewayIdentifiers{
 		GatewayId: "eui-1122334455667788",
-		Eui:       &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
+		Eui:       types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}.Bytes(),
 	}
 
 	for _, tc := range []struct {
@@ -264,7 +264,7 @@ func TestJoinRequest(t *testing.T) {
 func TestUplinkDataFrame(t *testing.T) {
 	gtwID := &ttnpb.GatewayIdentifiers{
 		GatewayId: "eui-1122334455667788",
-		Eui:       &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
+		Eui:       types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}.Bytes(),
 	}
 
 	for _, tc := range []struct {
@@ -438,7 +438,7 @@ func TestUplinkDataFrame(t *testing.T) {
 func TestFromUplinkDataFrame(t *testing.T) {
 	gtwID := ttnpb.GatewayIdentifiers{
 		GatewayId: "eui-1122334455667788",
-		Eui:       &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
+		Eui:       types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}.Bytes(),
 	}
 
 	for _, tc := range []struct {
@@ -545,7 +545,7 @@ func TestFromUplinkDataFrame(t *testing.T) {
 func TestJreqFromUplinkDataFrame(t *testing.T) {
 	gtwID := ttnpb.GatewayIdentifiers{
 		GatewayId: "eui-1122334455667788",
-		Eui:       &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
+		Eui:       types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}.Bytes(),
 	}
 
 	for _, tc := range []struct {

@@ -212,7 +212,7 @@ func (m *microchipATECC608AMAHTNT) Convert(ctx context.Context, r io.Reader, ch 
 		tmpl := &ttnpb.EndDeviceTemplate{
 			EndDevice: &ttnpb.EndDevice{
 				Ids: &ttnpb.EndDeviceIdentifiers{
-					JoinEui: &joinEUI,
+					JoinEui: joinEUI.Bytes(),
 				},
 				ProvisionerId:    provisioning.Microchip,
 				ProvisioningData: s,
@@ -372,8 +372,8 @@ func (m *microchipATECC608TNGLORA) Convert(ctx context.Context, r io.Reader, ch 
 			EndDevice: &ttnpb.EndDevice{
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					DeviceId: strings.ToLower(fmt.Sprintf("eui-%s", devEUI)),
-					JoinEui:  &joinEUI,
-					DevEui:   &devEUI,
+					JoinEui:  joinEUI.Bytes(),
+					DevEui:   devEUI.Bytes(),
 				},
 				ProvisionerId:    provisioning.Microchip,
 				ProvisioningData: s,

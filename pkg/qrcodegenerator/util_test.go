@@ -16,13 +16,14 @@ package qrcodegenerator_test
 
 import (
 	"context"
+	"encoding/hex"
 	"fmt"
+	"strings"
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator/qrcode/enddevices"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.ClusterRole) {
@@ -34,8 +35,6 @@ func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.Cluste
 	}
 	panic("could not connect to peer")
 }
-
-func eui64Ptr(v types.EUI64) *types.EUI64 { return &v }
 
 type mock struct {
 	ids *ttnpb.EndDeviceIdentifiers
@@ -57,7 +56,11 @@ func (*mock) FormatID() string {
 }
 
 func (m mock) MarshalText() ([]byte, error) {
-	return []byte(fmt.Sprintf("%s:%s", m.ids.JoinEui, m.ids.DevEui)), nil
+	return []byte(fmt.Sprintf(
+		"%s:%s",
+		strings.ToUpper(hex.EncodeToString(m.ids.JoinEui)),
+		strings.ToUpper(hex.EncodeToString(m.ids.DevEui))),
+	), nil
 }
 
 func (*mock) UnmarshalText([]byte) error { return nil }

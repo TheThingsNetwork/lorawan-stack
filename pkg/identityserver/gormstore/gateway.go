@@ -22,6 +22,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // Gateway model.
@@ -97,7 +98,10 @@ var secretFieldSeparator = []byte(":")
 // functions to set fields from the gateway model into the gateway proto.
 var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 	"ids.eui": func(pb *ttnpb.Gateway, gtw *Gateway) {
-		pb.Ids.Eui = gtw.GatewayEUI.toPB() // NOTE: pb.Ids is initialized by toPB.
+		pb.Ids.Eui = nil
+		if eui := gtw.GatewayEUI.toPB(); eui != nil {
+			pb.Ids.Eui = gtw.GatewayEUI.toPB().Bytes() // NOTE: pb.Ids is initialized by toPB.
+		}
 	},
 	nameField: func(pb *ttnpb.Gateway, gtw *Gateway) {
 		pb.Name = gtw.Name
@@ -270,7 +274,7 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 // functions to set fields from the gateway proto into the gateway model.
 var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 	"ids.eui": func(gtw *Gateway, pb *ttnpb.Gateway) {
-		gtw.GatewayEUI = eui(pb.GetIds().GetEui())
+		gtw.GatewayEUI = eui(types.MustEUI64(pb.GetIds().GetEui()))
 	},
 	nameField: func(gtw *Gateway, pb *ttnpb.Gateway) {
 		gtw.Name = pb.Name
@@ -491,7 +495,10 @@ var gatewayColumnNames = map[string][]string{
 
 func (gtw Gateway) toPB(pb *ttnpb.Gateway, fieldMask store.FieldMask) {
 	pb.Ids = &ttnpb.GatewayIdentifiers{GatewayId: gtw.GatewayID}
-	pb.Ids.Eui = gtw.GatewayEUI.toPB() // Always present.
+	pb.Ids.Eui = nil
+	if eui := gtw.GatewayEUI.toPB(); eui != nil {
+		pb.Ids.Eui = eui.Bytes()
+	}
 	pb.CreatedAt = ttnpb.ProtoTimePtr(cleanTime(gtw.CreatedAt))
 	pb.UpdatedAt = ttnpb.ProtoTimePtr(cleanTime(gtw.UpdatedAt))
 	pb.DeletedAt = ttnpb.ProtoTime(cleanTimePtr(gtw.DeletedAt))

@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // Gateway is the gateway model in the database.
@@ -102,10 +103,14 @@ func (m *Gateway) BeforeAppendModel(ctx context.Context, query bun.Query) error 
 }
 
 func gatewayToPB(m *Gateway, fieldMask ...string) (*ttnpb.Gateway, error) {
+	var eui []byte
+	if euiFromString := eui64FromString(m.GatewayEUI); euiFromString != nil {
+		eui = euiFromString.Bytes()
+	}
 	pb := &ttnpb.Gateway{
 		Ids: &ttnpb.GatewayIdentifiers{
 			GatewayId: m.GatewayID,
-			Eui:       eui64FromString(m.GatewayEUI),
+			Eui:       eui,
 		},
 
 		CreatedAt: ttnpb.ProtoTimePtr(m.CreatedAt),
@@ -236,7 +241,7 @@ func (s *gatewayStore) CreateGateway(
 
 	gatewayModel := &Gateway{
 		GatewayID:   pb.GetIds().GetGatewayId(),
-		GatewayEUI:  eui64ToString(pb.GetIds().GetEui()),
+		GatewayEUI:  eui64ToString(types.MustEUI64(pb.GetIds().GetEui())),
 		Name:        pb.Name,
 		Description: pb.Description,
 
@@ -554,12 +559,12 @@ func (s *gatewayStore) GetGateway(
 		err   error
 	)
 
-	if euiString := eui64ToString(id.GetEui()); euiString != nil {
+	if euiString := eui64ToString(types.MustEUI64(id.GetEui())); euiString != nil {
 		model, err = s.getGatewayModelBy(ctx, s.selectWithEUI(ctx, *euiString), fieldMask)
 		if err != nil {
 			if errors.IsNotFound(err) {
 				return nil, store.ErrGatewayNotFoundByEUI.WithAttributes(
-					"gateway_eui", id.GetEui().String(),
+					"gateway_eui", types.MustEUI64(id.GetEui()).String(),
 				)
 			}
 			return nil, err
@@ -591,7 +596,7 @@ func (s *gatewayStore) updateGatewayModel( //nolint:gocyclo
 	for _, field := range fieldMask {
 		switch field {
 		case "ids.eui":
-			model.GatewayEUI = eui64ToString(pb.GetIds().GetEui())
+			model.GatewayEUI = eui64ToString(types.MustEUI64(pb.GetIds().GetEui()))
 			columns = append(columns, "gateway_eui")
 
 		case "name":

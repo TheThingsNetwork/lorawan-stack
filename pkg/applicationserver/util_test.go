@@ -59,7 +59,7 @@ func withDevAddr(ids *ttnpb.EndDeviceIdentifiers, devAddr types.DevAddr) *ttnpb.
 	if err := newIds.SetFields(ids, ttnpb.EndDeviceIdentifiersFieldPathsNested...); err != nil {
 		panic(err)
 	}
-	newIds.DevAddr = &devAddr
+	newIds.DevAddr = devAddr.Bytes()
 	return newIds
 }
 

@@ -36,7 +36,7 @@ func TestDiscover(t *testing.T) {
 	mockServer := mockServer{
 		ids: &ttnpb.GatewayIdentifiers{
 			GatewayId: "eui-1111111111111111",
-			Eui:       &eui,
+			Eui:       eui.Bytes(),
 		},
 	}
 	info := ws.ServerInfo{

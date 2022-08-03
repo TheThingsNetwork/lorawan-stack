@@ -19,6 +19,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // EndDevice model.
@@ -76,13 +77,19 @@ var devicePBSetters = map[string]func(*ttnpb.EndDevice, *EndDevice){
 		if pb.Ids == nil {
 			pb.Ids = &ttnpb.EndDeviceIdentifiers{}
 		}
-		pb.Ids.JoinEui = dev.JoinEUI.toPB()
+		pb.Ids.JoinEui = nil
+		if joinEUI := dev.JoinEUI.toPB(); joinEUI != nil {
+			pb.Ids.JoinEui = joinEUI.Bytes()
+		}
 	},
 	"ids.dev_eui": func(pb *ttnpb.EndDevice, dev *EndDevice) {
 		if pb.Ids == nil {
 			pb.Ids = &ttnpb.EndDeviceIdentifiers{}
 		}
-		pb.Ids.DevEui = dev.DevEUI.toPB()
+		pb.Ids.DevEui = nil
+		if devEUI := dev.DevEUI.toPB(); devEUI != nil {
+			pb.Ids.DevEui = devEUI.Bytes()
+		}
 	},
 	nameField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
 		pb.Name = dev.Name
@@ -150,10 +157,10 @@ var devicePBSetters = map[string]func(*ttnpb.EndDevice, *EndDevice){
 // functions to set fields from the device proto into the device model.
 var deviceModelSetters = map[string]func(*EndDevice, *ttnpb.EndDevice){
 	"ids.join_eui": func(dev *EndDevice, pb *ttnpb.EndDevice) {
-		dev.JoinEUI = eui(pb.Ids.JoinEui)
+		dev.JoinEUI = eui(types.MustEUI64(pb.GetIds().GetJoinEui()))
 	},
 	"ids.dev_eui": func(dev *EndDevice, pb *ttnpb.EndDevice) {
-		dev.DevEUI = eui(pb.Ids.DevEui)
+		dev.DevEUI = eui(types.MustEUI64(pb.GetIds().GetDevEui()))
 	},
 	nameField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
 		dev.Name = pb.Name
@@ -259,8 +266,15 @@ func (dev EndDevice) toPB(pb *ttnpb.EndDevice, fieldMask store.FieldMask) {
 		ApplicationId: dev.ApplicationID,
 	}
 	pb.Ids.DeviceId = dev.DeviceID
-	pb.Ids.JoinEui = dev.JoinEUI.toPB() // Always present.
-	pb.Ids.DevEui = dev.DevEUI.toPB()   // Always present.
+	pb.Ids.JoinEui = nil
+	pb.Ids.DevEui = nil
+
+	if joinEui := dev.JoinEUI.toPB(); joinEui != nil {
+		pb.Ids.JoinEui = joinEui.Bytes()
+	}
+	if devEui := dev.DevEUI.toPB(); devEui != nil {
+		pb.Ids.DevEui = devEui.Bytes()
+	}
 	pb.CreatedAt = ttnpb.ProtoTimePtr(cleanTime(dev.CreatedAt))
 	pb.UpdatedAt = ttnpb.ProtoTimePtr(cleanTime(dev.UpdatedAt))
 	if len(fieldMask) == 0 {

@@ -40,8 +40,7 @@ func (x *Event) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		var wroteElement bool
 		for _, element := range x.Identifiers {
 			s.WriteMoreIf(&wroteElement)
-			// NOTE: EntityIdentifiers does not seem to implement MarshalProtoJSON.
-			gogo.MarshalMessage(s, element)
+			element.MarshalProtoJSON(s.WithField("identifiers"))
 		}
 		s.WriteArrayEnd()
 	}
@@ -140,10 +139,16 @@ func (x *Event) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				return
 			}
 			s.ReadArray(func() {
-				// NOTE: EntityIdentifiers does not seem to implement UnmarshalProtoJSON.
-				var v EntityIdentifiers
-				gogo.UnmarshalMessage(s, &v)
-				x.Identifiers = append(x.Identifiers, &v)
+				if s.ReadNil() {
+					x.Identifiers = append(x.Identifiers, nil)
+					return
+				}
+				v := &EntityIdentifiers{}
+				v.UnmarshalProtoJSON(s.WithField("identifiers", false))
+				if s.Err() != nil {
+					return
+				}
+				x.Identifiers = append(x.Identifiers, v)
 			})
 		case "data":
 			s.AddField("data")
@@ -208,6 +213,109 @@ func (x *Event) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 
 // UnmarshalJSON unmarshals the Event from JSON.
 func (x *Event) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the StreamEventsRequest message to JSON.
+func (x *StreamEventsRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.Identifiers) > 0 || s.HasField("identifiers") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("identifiers")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.Identifiers {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("identifiers"))
+		}
+		s.WriteArrayEnd()
+	}
+	if x.Tail != 0 || s.HasField("tail") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("tail")
+		s.WriteUint32(x.Tail)
+	}
+	if x.After != nil || s.HasField("after") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("after")
+		if x.After == nil {
+			s.WriteNil()
+		} else {
+			gogo.MarshalTimestamp(s, x.After)
+		}
+	}
+	if len(x.Names) > 0 || s.HasField("names") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("names")
+		s.WriteStringArray(x.Names)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the StreamEventsRequest to JSON.
+func (x *StreamEventsRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the StreamEventsRequest message from JSON.
+func (x *StreamEventsRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "identifiers":
+			s.AddField("identifiers")
+			if s.ReadNil() {
+				x.Identifiers = nil
+				return
+			}
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.Identifiers = append(x.Identifiers, nil)
+					return
+				}
+				v := &EntityIdentifiers{}
+				v.UnmarshalProtoJSON(s.WithField("identifiers", false))
+				if s.Err() != nil {
+					return
+				}
+				x.Identifiers = append(x.Identifiers, v)
+			})
+		case "tail":
+			s.AddField("tail")
+			x.Tail = s.ReadUint32()
+		case "after":
+			s.AddField("after")
+			if s.ReadNil() {
+				x.After = nil
+				return
+			}
+			v := gogo.UnmarshalTimestamp(s)
+			if s.Err() != nil {
+				return
+			}
+			x.After = v
+		case "names":
+			s.AddField("names")
+			if s.ReadNil() {
+				x.Names = nil
+				return
+			}
+			x.Names = s.ReadStringArray()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the StreamEventsRequest from JSON.
+func (x *StreamEventsRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 

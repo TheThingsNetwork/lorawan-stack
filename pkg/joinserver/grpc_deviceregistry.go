@@ -187,7 +187,7 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 	if req.EndDevice.Ids == nil || req.EndDevice.Ids.JoinEui == nil {
 		return nil, errNoJoinEUI.New()
 	}
-	if req.EndDevice.Ids.DevEui == nil || req.EndDevice.Ids.DevEui.IsZero() {
+	if types.MustEUI64(req.EndDevice.Ids.DevEui).OrZero().IsZero() {
 		return nil, errNoDevEUI.New()
 	}
 
@@ -264,7 +264,7 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 		}
 
 		evt = evtCreateEndDevice.NewWithIdentifiersAndData(ctx, req.EndDevice.Ids, nil)
-		if req.EndDevice.Ids != nil && req.EndDevice.Ids.DevAddr != nil && !req.EndDevice.Ids.DevAddr.IsZero() {
+		if req.EndDevice.Ids != nil && !types.MustDevAddr(req.EndDevice.Ids.DevAddr).OrZero().IsZero() {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "ids.dev_addr")
 		}
 		return req.EndDevice, ttnpb.AddFields(sets,
@@ -306,7 +306,7 @@ func (srv jsEndDeviceRegistryServer) Delete(ctx context.Context, ids *ttnpb.EndD
 			return nil, nil, errDeviceNotFound.New()
 		}
 		evt = evtDeleteEndDevice.NewWithIdentifiersAndData(ctx, ids, nil)
-		joinEUI, devEUI = dev.Ids.JoinEui, dev.Ids.DevEui
+		joinEUI, devEUI = types.MustEUI64(dev.Ids.JoinEui), types.MustEUI64(dev.Ids.DevEui)
 		return nil, nil, nil
 	})
 	if err != nil {

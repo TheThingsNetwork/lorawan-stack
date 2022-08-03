@@ -164,7 +164,12 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 			return false
 		}
 
-		stored, storedCtx, err = reg.GetByEUI(ctx, *pb.Ids.JoinEui, *pb.Ids.DevEui, ttnpb.EndDeviceFieldPathsTopLevel)
+		stored, storedCtx, err = reg.GetByEUI(
+			ctx,
+			types.MustEUI64(pb.Ids.JoinEui).OrZero(),
+			types.MustEUI64(pb.Ids.DevEui).OrZero(),
+			ttnpb.EndDeviceFieldPathsTopLevel,
+		)
 		if !test.AllTrue(
 			a.So(err, should.NotBeNil),
 			a.So(errors.IsNotFound(err), should.BeTrue),
@@ -231,7 +236,12 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 		}
 		ctx = storedCtx
 
-		stored, storedCtx, err = reg.GetByEUI(ctx, *pb.Ids.JoinEui, *pb.Ids.DevEui, ttnpb.EndDeviceFieldPathsTopLevel)
+		stored, storedCtx, err = reg.GetByEUI(
+			ctx,
+			types.MustEUI64(pb.Ids.JoinEui).OrZero(),
+			types.MustEUI64(pb.Ids.DevEui).OrZero(),
+			ttnpb.EndDeviceFieldPathsTopLevel,
+		)
 		if !test.AllTrue(
 			a.So(err, should.BeNil) || a.So(errors.Stack(err), should.BeEmpty),
 			a.So(storedCtx, should.HaveParentContextOrEqual, ctx),
@@ -267,8 +277,8 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 		LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_3,
 		LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_3_REV_A,
 		Ids: &ttnpb.EndDeviceIdentifiers{
-			JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-			DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+			JoinEui:        types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
+			DevEui:         types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
 			ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 			DeviceId:       "test-dev",
 		},
@@ -356,7 +366,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 	pbOther.Session.Keys.FNwkSIntKey.Key = types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe}.Bytes() //nolint:lll
 	pbOther.PendingSession = nil
 	pbOther.Ids.DeviceId = "test-dev-other"
-	pbOther.Ids.DevEui = &types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	pbOther.Ids.DevEui = types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes()
 
 	pbOtherCurrentUp := MakeDataUplink(WithDeviceDataUplinkConfig(pbOther, false, ttnpb.DataRateIndex_DATA_RATE_2, 1, 0)(DataUplinkConfig{
 		DecodePayload: true,

@@ -77,8 +77,7 @@ func (x *RxMetadata) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.GatewayIds != nil || s.HasField("gateway_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("gateway_ids")
-		// NOTE: GatewayIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.GatewayIds)
+		x.GatewayIds.MarshalProtoJSON(s.WithField("gateway_ids"))
 	}
 	if x.PacketBroker != nil || s.HasField("packet_broker") {
 		s.WriteMoreIf(&wroteField)
@@ -228,15 +227,12 @@ func (x *RxMetadata) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		default:
 			s.ReadAny() // ignore unknown field
 		case "gateway_ids", "gatewayIds":
-			s.AddField("gateway_ids")
 			if s.ReadNil() {
 				x.GatewayIds = nil
 				return
 			}
-			// NOTE: GatewayIdentifiers does not seem to implement UnmarshalProtoJSON.
-			var v GatewayIdentifiers
-			gogo.UnmarshalMessage(s, &v)
-			x.GatewayIds = &v
+			x.GatewayIds = &GatewayIdentifiers{}
+			x.GatewayIds.UnmarshalProtoJSON(s.WithField("gateway_ids", true))
 		case "packet_broker", "packetBroker":
 			if s.ReadNil() {
 				x.PacketBroker = nil

@@ -109,7 +109,7 @@ func TestAuthentication(t *testing.T) {
 			OK:  false,
 		},
 		{
-			ID:  &ttnpb.GatewayIdentifiers{Eui: &eui},
+			ID:  &ttnpb.GatewayIdentifiers{Eui: eui.Bytes()},
 			Key: "invalid-key",
 			OK:  false,
 		},

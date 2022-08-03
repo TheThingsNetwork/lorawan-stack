@@ -207,7 +207,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &devAddr,
+					DevAddr:        devAddr.Bytes(),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{},
@@ -238,7 +238,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &devAddr,
+					DevAddr:        devAddr.Bytes(),
 				},
 				MacSettings: &ttnpb.MACSettings{
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 3},
@@ -276,7 +276,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &devAddr,
+					DevAddr:        devAddr.Bytes(),
 				},
 				MacSettings: &ttnpb.MACSettings{
 					StatusTimePeriodicity: ttnpb.ProtoDurationPtr(24 * time.Hour),
@@ -311,7 +311,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &devAddr,
+					DevAddr:        devAddr.Bytes(),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{},
@@ -380,7 +380,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					Ids: &ttnpb.EndDeviceIdentifiers{
 						ApplicationIds: appID,
 						DeviceId:       devID,
-						DevAddr:        &devAddr,
+						DevAddr:        devAddr.Bytes(),
 					},
 					MacState: &ttnpb.MACState{
 						CurrentParameters: &ttnpb.MACParameters{},
@@ -432,7 +432,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &devAddr,
+					DevAddr:        devAddr.Bytes(),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{},
@@ -508,7 +508,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					Ids: &ttnpb.EndDeviceIdentifiers{
 						ApplicationIds: appID,
 						DeviceId:       devID,
-						DevAddr:        &devAddr,
+						DevAddr:        devAddr.Bytes(),
 					},
 					MacState: &ttnpb.MACState{
 						CurrentParameters: &ttnpb.MACParameters{},
@@ -551,7 +551,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &devAddr,
+					DevAddr:        devAddr.Bytes(),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{},
@@ -631,7 +631,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					Ids: &ttnpb.EndDeviceIdentifiers{
 						ApplicationIds: appID,
 						DeviceId:       devID,
-						DevAddr:        &devAddr,
+						DevAddr:        devAddr.Bytes(),
 					},
 					MacState: &ttnpb.MACState{
 						CurrentParameters: &ttnpb.MACParameters{},
@@ -677,7 +677,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &devAddr,
+					DevAddr:        devAddr.Bytes(),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{},
@@ -756,7 +756,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					Ids: &ttnpb.EndDeviceIdentifiers{
 						ApplicationIds: appID,
 						DeviceId:       devID,
-						DevAddr:        &devAddr,
+						DevAddr:        devAddr.Bytes(),
 					},
 					MacState: &ttnpb.MACState{
 						CurrentParameters: &ttnpb.MACParameters{},
@@ -798,7 +798,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &devAddr,
+					DevAddr:        devAddr.Bytes(),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{},
@@ -882,7 +882,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					Ids: &ttnpb.EndDeviceIdentifiers{
 						ApplicationIds: appID,
 						DeviceId:       devID,
-						DevAddr:        &devAddr,
+						DevAddr:        devAddr.Bytes(),
 					},
 					MacState: &ttnpb.MACState{
 						CurrentParameters: &ttnpb.MACParameters{},
@@ -928,7 +928,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &devAddr,
+					DevAddr:        devAddr.Bytes(),
 				},
 				MacSettings: &ttnpb.MACSettings{
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 3},
@@ -1007,7 +1007,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					Ids: &ttnpb.EndDeviceIdentifiers{
 						ApplicationIds: appID,
 						DeviceId:       devID,
-						DevAddr:        &devAddr,
+						DevAddr:        devAddr.Bytes(),
 					},
 					MacSettings: &ttnpb.MACSettings{
 						StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 3},
@@ -1063,7 +1063,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
-					DevAddr:        &devAddr,
+					DevAddr:        devAddr.Bytes(),
 				},
 				MacSettings: &ttnpb.MACSettings{
 					StatusTimePeriodicity: ttnpb.ProtoDurationPtr(time.Nanosecond),
@@ -1140,7 +1140,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					Ids: &ttnpb.EndDeviceIdentifiers{
 						ApplicationIds: appID,
 						DeviceId:       devID,
-						DevAddr:        &devAddr,
+						DevAddr:        devAddr.Bytes(),
 					},
 					MacSettings: &ttnpb.MACSettings{
 						StatusTimePeriodicity: ttnpb.ProtoDurationPtr(time.Nanosecond),

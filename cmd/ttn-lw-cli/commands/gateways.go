@@ -77,7 +77,7 @@ func getGatewayID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttnpb
 		if err := gatewayEUI.UnmarshalText([]byte(gatewayEUIHex)); err != nil {
 			return nil, errInvalidGatewayEUI.WithCause(err)
 		}
-		ids.Eui = &gatewayEUI
+		ids.Eui = gatewayEUI.Bytes()
 	}
 	return ids, nil
 }
@@ -101,7 +101,7 @@ func getGatewayEUI(flagSet *pflag.FlagSet, args []string, requireEUI bool) (*ttn
 		if err := gatewayEUI.UnmarshalText([]byte(gatewayEUIHex)); err != nil {
 			return nil, errInvalidGatewayEUI.WithCause(err)
 		}
-		ids.Eui = &gatewayEUI
+		ids.Eui = gatewayEUI.Bytes()
 	}
 	return ids, nil
 }
@@ -218,7 +218,7 @@ var (
 
 			if gtwID.GatewayId == "" && gtwID.Eui != nil {
 				gtwID, err = cli.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
-					Eui: gtwID.Eui.Bytes(),
+					Eui: gtwID.Eui,
 				})
 				if err != nil {
 					return err

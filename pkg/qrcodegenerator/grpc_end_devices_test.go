@@ -70,8 +70,8 @@ func TestGenerateEndDeviceQRCode(t *testing.T) {
 				ApplicationId: "test",
 			},
 			DeviceId: "test",
-			JoinEui:  eui64Ptr(types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00}),
-			DevEui:   eui64Ptr(types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}),
+			JoinEui:  types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00}.Bytes(),
+			DevEui:   types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}.Bytes(),
 		},
 	}
 
@@ -193,8 +193,8 @@ func TestGenerateEndDeviceQRCodeParsing(t *testing.T) {
 
 				endDeviceIDs := endDevice.Ids.GetEntityIdentifiers().GetDeviceIds()
 				a.So(endDeviceIDs, should.NotBeNil)
-				a.So(*endDeviceIDs.JoinEui, should.Equal, types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11})
-				a.So(*endDeviceIDs.DevEui, should.Equal, types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22})
+				a.So(endDeviceIDs.JoinEui, should.Resemble, types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}.Bytes())
+				a.So(endDeviceIDs.DevEui, should.Resemble, types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}.Bytes())
 
 				a.So(endDevice.ClaimAuthenticationCode, should.NotBeNil)
 				a.So(endDevice.ClaimAuthenticationCode.Value, should.Equal, "123456")
@@ -227,8 +227,8 @@ func TestGenerateEndDeviceQRCodeParsing(t *testing.T) {
 
 				endDeviceIDs := endDevice.GetIds()
 				a.So(endDeviceIDs, should.NotBeNil)
-				a.So(*endDeviceIDs.JoinEui, should.Equal, types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11})
-				a.So(*endDeviceIDs.DevEui, should.Equal, types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22})
+				a.So(endDeviceIDs.JoinEui, should.Resemble, types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}.Bytes())
+				a.So(endDeviceIDs.DevEui, should.Resemble, types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}.Bytes())
 
 				a.So(endDevice.ClaimAuthenticationCode, should.NotBeNil)
 				a.So(endDevice.ClaimAuthenticationCode.Value, should.Equal, "123456")
@@ -251,8 +251,8 @@ func TestGenerateEndDeviceQRCodeParsing(t *testing.T) {
 							ApplicationIds: &ttnpb.ApplicationIdentifiers{
 								ApplicationId: "test-app",
 							},
-							DevEui:  &types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22},
-							JoinEui: &types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11},
+							DevEui:  types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}.Bytes(),
+							JoinEui: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}.Bytes(),
 						},
 						ClaimAuthenticationCode: &ttnpb.EndDeviceAuthenticationCode{
 							Value: "123456",
@@ -279,8 +279,8 @@ func TestGenerateEndDeviceQRCodeParsing(t *testing.T) {
 
 				endDeviceIDs := endDevice.GetIds()
 				a.So(endDeviceIDs, should.NotBeNil)
-				a.So(*endDeviceIDs.JoinEui, should.Equal, types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11})
-				a.So(*endDeviceIDs.DevEui, should.Equal, types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22})
+				a.So(endDeviceIDs.JoinEui, should.Resemble, types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}.Bytes())
+				a.So(endDeviceIDs.DevEui, should.Resemble, types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}.Bytes())
 
 				a.So(endDevice.ClaimAuthenticationCode, should.NotBeNil)
 				a.So(endDevice.ClaimAuthenticationCode.Value, should.Equal, "123456")

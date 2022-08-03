@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"gocloud.dev/pubsub"
 )
 
@@ -148,21 +149,21 @@ func (ps *PubSub) getMetadata(evt events.Event) map[string]string {
 	for _, id := range evt.Identifiers() {
 		k := id.EntityType() + "_id"
 		ids[k] = append(ids[k], id.IDString())
-		if gtwID := id.GetGatewayIds(); gtwID != nil {
-			ids["gateway_eui"] = append(ids["gateway_eui"], gtwID.Eui.String())
+		if gtwEUI := types.MustEUI64(id.GetGatewayIds().GetEui()); gtwEUI != nil {
+			ids["gateway_eui"] = append(ids["gateway_eui"], gtwEUI.String())
 		}
 		if devID := id.GetDeviceIds(); devID != nil {
 			if devID.ApplicationIds != nil {
 				ids["application_id"] = append(ids["application_id"], devID.GetApplicationIds().GetApplicationId())
 			}
 			if devID.DevEui != nil {
-				ids["dev_eui"] = append(ids["dev_eui"], devID.DevEui.String())
+				ids["dev_eui"] = append(ids["dev_eui"], types.MustEUI64(devID.DevEui).String())
 			}
 			if devID.JoinEui != nil {
-				ids["join_eui"] = append(ids["join_eui"], devID.JoinEui.String())
+				ids["join_eui"] = append(ids["join_eui"], types.MustEUI64(devID.JoinEui).String())
 			}
 			if devID.DevAddr != nil {
-				ids["dev_addr"] = append(ids["dev_addr"], devID.DevAddr.String())
+				ids["dev_addr"] = append(ids["dev_addr"], types.MustDevAddr(devID.DevAddr).String())
 			}
 		}
 	}

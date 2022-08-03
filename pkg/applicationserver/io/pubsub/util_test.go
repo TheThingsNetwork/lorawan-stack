@@ -36,23 +36,19 @@ var (
 	registeredDeviceID        = &ttnpb.EndDeviceIdentifiers{
 		ApplicationIds: registeredApplicationID,
 		DeviceId:       "foo-device",
-		DevAddr:        devAddrPtr(types.DevAddr{0x42, 0xff, 0xff, 0xff}),
+		DevAddr:        types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 	}
 	unregisteredDeviceID = ttnpb.EndDeviceIdentifiers{
 		ApplicationIds: &ttnpb.ApplicationIdentifiers{
 			ApplicationId: "bar-app",
 		},
 		DeviceId: "bar-device",
-		DevAddr:  devAddrPtr(types.DevAddr{0x42, 0x42, 0x42, 0x42}),
+		DevAddr:  types.DevAddr{0x42, 0x42, 0x42, 0x42}.Bytes(),
 	}
 	registeredPubSubID = "foo-integration"
 
 	timeout = (1 << 8) * test.Delay
 )
-
-func devAddrPtr(addr types.DevAddr) *types.DevAddr {
-	return &addr
-}
 
 type mockRegisterer struct {
 	*pubsub.PubSub

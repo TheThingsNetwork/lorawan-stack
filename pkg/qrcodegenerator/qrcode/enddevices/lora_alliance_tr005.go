@@ -51,8 +51,8 @@ func (m *LoRaAllianceTR005) Encode(dev *ttnpb.EndDevice) error {
 		return errNoDevEUI.New()
 	}
 	*m = LoRaAllianceTR005{
-		JoinEUI:    *dev.Ids.JoinEui,
-		DevEUI:     *dev.Ids.DevEui,
+		JoinEUI:    types.MustEUI64(dev.Ids.JoinEui).OrZero(),
+		DevEUI:     types.MustEUI64(dev.Ids.DevEui).OrZero(),
 		OwnerToken: dev.GetClaimAuthenticationCode().GetValue(),
 	}
 	return nil
@@ -168,8 +168,8 @@ func (m *LoRaAllianceTR005) EndDeviceTemplate() *ttnpb.EndDeviceTemplate {
 	return &ttnpb.EndDeviceTemplate{
 		EndDevice: &ttnpb.EndDevice{
 			Ids: &ttnpb.EndDeviceIdentifiers{
-				DevEui:  &m.DevEUI,
-				JoinEui: &m.JoinEUI,
+				DevEui:  m.DevEUI.Bytes(),
+				JoinEui: m.JoinEUI.Bytes(),
 			},
 			ClaimAuthenticationCode: &ttnpb.EndDeviceAuthenticationCode{
 				Value: m.OwnerToken,

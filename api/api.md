@@ -4810,6 +4810,9 @@ The NsGs service connects a Network Server to a Gateway Server.
 | ----- | ----------- |
 | `device_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 | `application_ids` | <p>`message.required`: `true`</p> |
+| `dev_eui` | <p>`bytes.len`: `8`</p> |
+| `join_eui` | <p>`bytes.len`: `8`</p> |
+| `dev_addr` | <p>`bytes.len`: `4`</p> |
 
 ### <a name="ttn.lorawan.v3.EndDeviceVersionIdentifiers">Message `EndDeviceVersionIdentifiers`</a>
 
@@ -4862,6 +4865,7 @@ EntityIdentifiers contains one of the possible entity identifiers.
 | Field | Validations |
 | ----- | ----------- |
 | `gateway_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `eui` | <p>`bytes.len`: `8`</p> |
 
 ### <a name="ttn.lorawan.v3.NetworkIdentifiers">Message `NetworkIdentifiers`</a>
 
@@ -4879,6 +4883,7 @@ Identifies a Network Server.
 
 | Field | Validations |
 | ----- | ----------- |
+| `net_id` | <p>`bytes.len`: `3`</p> |
 | `tenant_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`</p> |
 | `cluster_id` | <p>`string.max_len`: `64`</p> |
 | `cluster_address` | <p>`string.max_len`: `256`</p> |

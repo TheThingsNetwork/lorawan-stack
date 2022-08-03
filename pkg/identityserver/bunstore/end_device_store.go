@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // EndDevice is the end_device model in the database.
@@ -75,14 +76,22 @@ func (m *EndDevice) BeforeAppendModel(ctx context.Context, query bun.Query) erro
 }
 
 func endDeviceToPB(m *EndDevice, fieldMask ...string) (*ttnpb.EndDevice, error) {
+	var devEUI, joinEUI []byte
+	if euiFromString := eui64FromString(m.DevEUI); euiFromString != nil {
+		devEUI = euiFromString.Bytes()
+	}
+	if euiFromString := eui64FromString(m.JoinEUI); euiFromString != nil {
+		joinEUI = euiFromString.Bytes()
+	}
+
 	pb := &ttnpb.EndDevice{
 		Ids: &ttnpb.EndDeviceIdentifiers{
 			ApplicationIds: &ttnpb.ApplicationIdentifiers{
 				ApplicationId: m.ApplicationID,
 			},
 			DeviceId: m.DeviceID,
-			DevEui:   eui64FromString(m.DevEUI),
-			JoinEui:  eui64FromString(m.JoinEUI),
+			DevEui:   devEUI,
+			JoinEui:  joinEUI,
 		},
 
 		CreatedAt: ttnpb.ProtoTimePtr(m.CreatedAt),
@@ -172,8 +181,8 @@ func (s *endDeviceStore) CreateEndDevice(
 	model := &EndDevice{
 		ApplicationID: pb.GetIds().GetApplicationIds().GetApplicationId(),
 		DeviceID:      pb.GetIds().GetDeviceId(),
-		DevEUI:        eui64ToString(pb.GetIds().GetDevEui()),
-		JoinEUI:       eui64ToString(pb.GetIds().GetJoinEui()),
+		DevEUI:        eui64ToString(types.MustEUI64(pb.GetIds().GetDevEui())),
+		JoinEUI:       eui64ToString(types.MustEUI64(pb.GetIds().GetJoinEui())),
 		Name:          pb.Name,
 		Description:   pb.Description,
 
@@ -482,10 +491,10 @@ func (s *endDeviceStore) GetEndDevice(
 			by = append(by, s.selectWithID(ctx, id.GetApplicationIds().GetApplicationId()))
 		}
 	}
-	if euiString := eui64ToString(id.GetDevEui()); euiString != nil {
+	if euiString := eui64ToString(types.MustEUI64(id.GetDevEui())); euiString != nil {
 		by = append(by, s.selectWithDevEUI(ctx, *euiString))
 	}
-	if euiString := eui64ToString(id.GetJoinEui()); euiString != nil {
+	if euiString := eui64ToString(types.MustEUI64(id.GetJoinEui())); euiString != nil {
 		by = append(by, s.selectWithJoinEUI(ctx, *euiString))
 	}
 
@@ -514,11 +523,11 @@ func (s *endDeviceStore) updateEndDeviceModel( //nolint:gocyclo
 	for _, field := range fieldMask {
 		switch field {
 		case "ids.join_eui":
-			model.JoinEUI = eui64ToString(pb.GetIds().GetJoinEui())
+			model.JoinEUI = eui64ToString(types.MustEUI64(pb.GetIds().GetJoinEui()))
 			columns = append(columns, "join_eui")
 
 		case "ids.dev_eui":
-			model.DevEUI = eui64ToString(pb.GetIds().GetDevEui())
+			model.DevEUI = eui64ToString(types.MustEUI64(pb.GetIds().GetDevEui()))
 			columns = append(columns, "dev_eui")
 
 		case "name":

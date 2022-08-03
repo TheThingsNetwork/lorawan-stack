@@ -16,6 +16,7 @@ package commands
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"crypto/rand"
 	"encoding/hex"
@@ -139,14 +140,14 @@ func getEndDeviceID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttn
 		if err := joinEUI.UnmarshalText([]byte(joinEUIHex)); err != nil {
 			return nil, errInvalidJoinEUI.WithCause(err)
 		}
-		ids.JoinEui = &joinEUI
+		ids.JoinEui = joinEUI.Bytes()
 	}
 	if devEUIHex, _ := flagSet.GetString("dev-eui"); devEUIHex != "" {
 		var devEUI types.EUI64
 		if err := devEUI.UnmarshalText([]byte(devEUIHex)); err != nil {
 			return nil, errInvalidDevEUI.WithCause(err)
 		}
-		ids.DevEui = &devEUI
+		ids.DevEui = devEUI.Bytes()
 	}
 	return ids, nil
 }
@@ -413,7 +414,7 @@ var (
 					if err != nil {
 						return err
 					}
-					device.Ids.DevAddr = types.MustDevAddr(devAddrRes.DevAddr)
+					device.Ids.DevAddr = devAddrRes.DevAddr
 					device.Session = &ttnpb.Session{
 						DevAddr: devAddrRes.DevAddr,
 						Keys: &ttnpb.SessionKeys{
@@ -471,7 +472,7 @@ var (
 							}
 							joinEUI := types.MustEUI64(res.JoinEui)
 							logger.WithField("default_join_eui", joinEUI).Info("Successfully obtained Join Server's default JoinEUI")
-							device.Ids.JoinEui = joinEUI
+							device.Ids.JoinEui = joinEUI.Bytes()
 						}
 					}
 				}
@@ -565,7 +566,7 @@ var (
 				devEUI := types.MustEUI64(devEUIResponse.DevEui).OrZero()
 				logger.WithField("dev_eui", devEUI.String()).
 					Info("Successfully obtained DevEUI")
-				device.Ids.DevEui = &devEUI
+				device.Ids.DevEui = devEUI.Bytes()
 			}
 			newPaths, err := parsePayloadFormatterParameterFlags("formatters", device.Formatters, cmd.Flags())
 			if err != nil {
@@ -589,7 +590,7 @@ var (
 					return err
 				}
 				claimInfoResp, err := ttnpb.NewEndDeviceClaimingServerClient(dcs).GetInfoByJoinEUI(ctx, &ttnpb.GetInfoByJoinEUIRequest{
-					JoinEui: device.Ids.JoinEui.Bytes(),
+					JoinEui: device.Ids.JoinEui,
 				})
 				if err != nil {
 					return errEndDeviceClaimInfo.WithCause(err)
@@ -600,8 +601,8 @@ var (
 						TargetDeviceId:       device.Ids.DeviceId,
 						SourceDevice: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers_{
 							AuthenticatedIdentifiers: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers{
-								JoinEui:            device.Ids.JoinEui.Bytes(),
-								DevEui:             device.Ids.DevEui.Bytes(),
+								JoinEui:            device.Ids.JoinEui,
+								DevEui:             device.Ids.DevEui,
 								AuthenticationCode: device.ClaimAuthenticationCode.Value,
 							},
 						},
@@ -755,14 +756,14 @@ var (
 
 			// EUIs can not be updated, so we only accept EUI flags if they are equal to the existing ones.
 			if device.Ids.JoinEui != nil {
-				if existingDevice.Ids.JoinEui != nil && *device.Ids.JoinEui != *existingDevice.Ids.JoinEui {
+				if existingDevice.Ids.JoinEui != nil && !bytes.Equal(device.Ids.JoinEui, existingDevice.Ids.JoinEui) {
 					return errEndDeviceEUIUpdate.New()
 				}
 			} else {
 				device.Ids.JoinEui = existingDevice.Ids.JoinEui
 			}
 			if device.Ids.DevEui != nil {
-				if existingDevice.Ids.DevEui != nil && *device.Ids.DevEui != *existingDevice.Ids.DevEui {
+				if existingDevice.Ids.DevEui != nil && !bytes.Equal(device.Ids.DevEui, existingDevice.Ids.DevEui) {
 					return errEndDeviceEUIUpdate.New()
 				}
 			} else {
@@ -983,14 +984,14 @@ var (
 
 			// EUIs must match registered EUIs if set.
 			if devID.JoinEui != nil {
-				if existingDevice.Ids.JoinEui != nil && *devID.JoinEui != *existingDevice.Ids.JoinEui {
+				if existingDevice.Ids.JoinEui != nil && !bytes.Equal(devID.JoinEui, existingDevice.Ids.JoinEui) {
 					return errInconsistentEndDeviceEUI.New()
 				}
 			} else {
 				devID.JoinEui = existingDevice.Ids.JoinEui
 			}
 			if devID.DevEui != nil {
-				if existingDevice.Ids.DevEui != nil && *devID.DevEui != *existingDevice.Ids.DevEui {
+				if existingDevice.Ids.DevEui != nil && !bytes.Equal(devID.DevEui, existingDevice.Ids.DevEui) {
 					return errInconsistentEndDeviceEUI.New()
 				}
 			} else {
@@ -1011,7 +1012,7 @@ var (
 					return err
 				}
 				claimInfoResp, err := ttnpb.NewEndDeviceClaimingServerClient(dcs).GetInfoByJoinEUI(ctx, &ttnpb.GetInfoByJoinEUIRequest{
-					JoinEui: devID.JoinEui.Bytes(),
+					JoinEui: devID.JoinEui,
 				})
 				if err != nil {
 					return errEndDeviceClaimInfo.WithCause(err)

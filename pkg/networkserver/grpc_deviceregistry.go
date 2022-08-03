@@ -719,7 +719,7 @@ var (
 		"supports_join": {
 			{
 				Func: func(m map[string]*ttnpb.EndDevice) (bool, string) {
-					if dev, ok := m["ids.dev_eui"]; ok && dev.Ids.DevEui != nil && !dev.Ids.DevEui.IsZero() {
+					if dev, ok := m["ids.dev_eui"]; ok && !types.MustEUI64(dev.Ids.DevEui).OrZero().IsZero() {
 						return true, ""
 					}
 					if m["lorawan_version"].GetLorawanVersion() == ttnpb.MACVersion_MAC_UNKNOWN {
@@ -1073,16 +1073,15 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			if st.Device.Ids.DevAddr == nil {
 				return dev.GetSession() == nil
 			}
-			return dev.GetSession() != nil && types.MustDevAddr(dev.Session.DevAddr).OrZero().Equal(*st.Device.Ids.DevAddr)
+			return dev.GetSession() != nil && bytes.Equal(dev.Session.DevAddr, st.Device.Ids.DevAddr)
 		}, "session.dev_addr"); err != nil {
 			return nil, err
 		}
 	} else if st.HasSetField("session.dev_addr") {
-		var devAddr *types.DevAddr
-		if st.Device.Session != nil {
-			devAddr = types.MustDevAddr(st.Device.Session.DevAddr)
+		st.Device.Ids.DevAddr = nil
+		if devAddr := types.MustDevAddr(st.Device.GetSession().GetDevAddr()); devAddr != nil {
+			st.Device.Ids.DevAddr = devAddr.Bytes()
 		}
-		st.Device.Ids.DevAddr = devAddr
 		st.AddSetFields(
 			"ids.dev_addr",
 		)

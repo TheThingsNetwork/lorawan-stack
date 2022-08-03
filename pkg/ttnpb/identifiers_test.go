@@ -44,10 +44,10 @@ func TestIdentifiersIsZero(t *testing.T) {
 		&ApplicationIdentifiers{ApplicationId: "foo"},
 		&ClientIdentifiers{ClientId: "foo"},
 		&EndDeviceIdentifiers{ApplicationIds: &ApplicationIdentifiers{ApplicationId: "foo"}, DeviceId: "foo"},
-		&EndDeviceIdentifiers{JoinEui: &eui, DevEui: &eui},
-		&EndDeviceIdentifiers{DevAddr: &devAddr},
+		&EndDeviceIdentifiers{JoinEui: eui.Bytes(), DevEui: eui.Bytes()},
+		&EndDeviceIdentifiers{DevAddr: devAddr.Bytes()},
 		&GatewayIdentifiers{GatewayId: "foo"},
-		&GatewayIdentifiers{Eui: &eui},
+		&GatewayIdentifiers{Eui: eui.Bytes()},
 		&OrganizationIdentifiers{OrganizationId: "foo"},
 		&UserIdentifiers{UserId: "foo"},
 		&UserIdentifiers{Email: "foo@example.com"},
@@ -171,7 +171,7 @@ func TestGatewayIdentifiersValidate(t *testing.T) {
 
 	ids := GatewayIdentifiers{
 		GatewayId: "foo-gtw",
-		Eui:       &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
+		Eui:       types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42}.Bytes(),
 	}
 	a.So(ids.ValidateFields(), should.BeNil)
 
@@ -181,7 +181,7 @@ func TestGatewayIdentifiersValidate(t *testing.T) {
 	a.So(ids.ValidateFields(), should.BeNil)
 
 	ids = GatewayIdentifiers{
-		Eui: &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
+		Eui: types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42}.Bytes(),
 	}
 	a.So(ids.ValidateFields(), should.NotBeNil)
 
@@ -191,18 +191,18 @@ func TestGatewayIdentifiersValidate(t *testing.T) {
 
 	ids = GatewayIdentifiers{
 		GatewayId: "_foo-gtw",
-		Eui:       &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
+		Eui:       types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42}.Bytes(),
 	}
 	a.So(ids.ValidateFields(), should.NotBeNil)
 
 	ids = GatewayIdentifiers{
 		GatewayId: "foo-gtw",
-		Eui:       &types.EUI64{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+		Eui:       types.EUI64{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}.Bytes(),
 	}
 	a.So(ids.ValidateFields(), should.BeNil)
 
 	ids = GatewayIdentifiers{
-		Eui: new(types.EUI64),
+		Eui: new(types.EUI64).Bytes(),
 	}
 	a.So(ids.ValidateFields(), should.NotBeNil)
 }

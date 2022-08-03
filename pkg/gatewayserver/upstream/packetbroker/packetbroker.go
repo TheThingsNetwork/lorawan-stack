@@ -114,9 +114,7 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids *ttnpb.GatewayIdentifi
 
 	pbIDs := &ttnpb.PacketBrokerGateway_GatewayIdentifiers{
 		GatewayId: ids.GatewayId,
-	}
-	if ids.Eui != nil {
-		pbIDs.Eui = ids.Eui.Bytes()
+		Eui:       ids.Eui,
 	}
 
 	req := &ttnpb.UpdatePacketBrokerGatewayRequest{

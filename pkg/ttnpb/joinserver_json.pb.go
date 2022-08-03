@@ -197,8 +197,7 @@ func (x *CryptoServicePayloadRequest) MarshalProtoJSON(s *jsonplugin.MarshalStat
 	if x.Ids != nil || s.HasField("ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("ids")
-		// NOTE: EndDeviceIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.Ids)
+		x.Ids.MarshalProtoJSON(s.WithField("ids"))
 	}
 	if x.LorawanVersion != 0 || s.HasField("lorawan_version") {
 		s.WriteMoreIf(&wroteField)
@@ -242,15 +241,12 @@ func (x *CryptoServicePayloadRequest) UnmarshalProtoJSON(s *jsonplugin.Unmarshal
 		default:
 			s.ReadAny() // ignore unknown field
 		case "ids":
-			s.AddField("ids")
 			if s.ReadNil() {
 				x.Ids = nil
 				return
 			}
-			// NOTE: EndDeviceIdentifiers does not seem to implement UnmarshalProtoJSON.
-			var v EndDeviceIdentifiers
-			gogo.UnmarshalMessage(s, &v)
-			x.Ids = &v
+			x.Ids = &EndDeviceIdentifiers{}
+			x.Ids.UnmarshalProtoJSON(s.WithField("ids", true))
 		case "lorawan_version", "lorawanVersion":
 			s.AddField("lorawan_version")
 			x.LorawanVersion.UnmarshalProtoJSON(s)
@@ -353,8 +349,7 @@ func (x *DeriveSessionKeysRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) 
 	if x.Ids != nil || s.HasField("ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("ids")
-		// NOTE: EndDeviceIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.Ids)
+		x.Ids.MarshalProtoJSON(s.WithField("ids"))
 	}
 	if x.LorawanVersion != 0 || s.HasField("lorawan_version") {
 		s.WriteMoreIf(&wroteField)
@@ -408,15 +403,12 @@ func (x *DeriveSessionKeysRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalSta
 		default:
 			s.ReadAny() // ignore unknown field
 		case "ids":
-			s.AddField("ids")
 			if s.ReadNil() {
 				x.Ids = nil
 				return
 			}
-			// NOTE: EndDeviceIdentifiers does not seem to implement UnmarshalProtoJSON.
-			var v EndDeviceIdentifiers
-			gogo.UnmarshalMessage(s, &v)
-			x.Ids = &v
+			x.Ids = &EndDeviceIdentifiers{}
+			x.Ids.UnmarshalProtoJSON(s.WithField("ids", true))
 		case "lorawan_version", "lorawanVersion":
 			s.AddField("lorawan_version")
 			x.LorawanVersion.UnmarshalProtoJSON(s)
@@ -452,6 +444,80 @@ func (x *DeriveSessionKeysRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the GetRootKeysRequest message to JSON.
+func (x *GetRootKeysRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Ids != nil || s.HasField("ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("ids")
+		x.Ids.MarshalProtoJSON(s.WithField("ids"))
+	}
+	if x.ProvisionerId != "" || s.HasField("provisioner_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("provisioner_id")
+		s.WriteString(x.ProvisionerId)
+	}
+	if x.ProvisioningData != nil || s.HasField("provisioning_data") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("provisioning_data")
+		if x.ProvisioningData == nil {
+			s.WriteNil()
+		} else {
+			gogo.MarshalStruct(s, x.ProvisioningData)
+		}
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the GetRootKeysRequest to JSON.
+func (x *GetRootKeysRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the GetRootKeysRequest message from JSON.
+func (x *GetRootKeysRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "ids":
+			if s.ReadNil() {
+				x.Ids = nil
+				return
+			}
+			x.Ids = &EndDeviceIdentifiers{}
+			x.Ids.UnmarshalProtoJSON(s.WithField("ids", true))
+		case "provisioner_id", "provisionerId":
+			s.AddField("provisioner_id")
+			x.ProvisionerId = s.ReadString()
+		case "provisioning_data", "provisioningData":
+			s.AddField("provisioning_data")
+			if s.ReadNil() {
+				x.ProvisioningData = nil
+				return
+			}
+			v := gogo.UnmarshalStruct(s)
+			if s.Err() != nil {
+				return
+			}
+			x.ProvisioningData = v
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the GetRootKeysRequest from JSON.
+func (x *GetRootKeysRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the ProvisionEndDevicesRequest_IdentifiersList message to JSON.
 func (x *ProvisionEndDevicesRequest_IdentifiersList) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -472,8 +538,7 @@ func (x *ProvisionEndDevicesRequest_IdentifiersList) MarshalProtoJSON(s *jsonplu
 		var wroteElement bool
 		for _, element := range x.EndDeviceIds {
 			s.WriteMoreIf(&wroteElement)
-			// NOTE: EndDeviceIdentifiers does not seem to implement MarshalProtoJSON.
-			gogo.MarshalMessage(s, element)
+			element.MarshalProtoJSON(s.WithField("end_device_ids"))
 		}
 		s.WriteArrayEnd()
 	}
@@ -504,10 +569,16 @@ func (x *ProvisionEndDevicesRequest_IdentifiersList) UnmarshalProtoJSON(s *jsonp
 				return
 			}
 			s.ReadArray(func() {
-				// NOTE: EndDeviceIdentifiers does not seem to implement UnmarshalProtoJSON.
-				var v EndDeviceIdentifiers
-				gogo.UnmarshalMessage(s, &v)
-				x.EndDeviceIds = append(x.EndDeviceIds, &v)
+				if s.ReadNil() {
+					x.EndDeviceIds = append(x.EndDeviceIds, nil)
+					return
+				}
+				v := &EndDeviceIdentifiers{}
+				v.UnmarshalProtoJSON(s.WithField("end_device_ids", false))
+				if s.Err() != nil {
+					return
+				}
+				x.EndDeviceIds = append(x.EndDeviceIds, v)
 			})
 		}
 	})

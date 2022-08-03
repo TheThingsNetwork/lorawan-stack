@@ -984,13 +984,13 @@ func (a *Agent) handleUplinkMessage(
 	}
 
 	if ids.JoinEui != nil {
-		logger = logger.WithField("join_eui", *ids.JoinEui)
+		logger = logger.WithField("join_eui", types.MustEUI64(ids.JoinEui))
 	}
-	if ids.DevEui != nil && !ids.DevEui.IsZero() {
-		logger = logger.WithField("dev_eui", *ids.DevEui)
+	if devEUI := types.MustEUI64(ids.DevEui).OrZero(); !devEUI.IsZero() {
+		logger = logger.WithField("dev_eui", devEUI)
 	}
-	if ids.DevAddr != nil && !ids.DevAddr.IsZero() {
-		logger = logger.WithField("dev_addr", *ids.DevAddr)
+	if devAddr := types.MustDevAddr(ids.DevAddr).OrZero(); !devAddr.IsZero() {
+		logger = logger.WithField("dev_addr", devAddr)
 	}
 
 	msg, err := fromPBUplink(ctx, up, receivedAt, a.homeNetworkConfig.IncludeHops)

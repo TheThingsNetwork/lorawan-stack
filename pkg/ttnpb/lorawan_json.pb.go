@@ -1868,6 +1868,284 @@ func (x *CFList) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the GatewayAntennaIdentifiers message to JSON.
+func (x *GatewayAntennaIdentifiers) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.GatewayIds != nil || s.HasField("gateway_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("gateway_ids")
+		x.GatewayIds.MarshalProtoJSON(s.WithField("gateway_ids"))
+	}
+	if x.AntennaIndex != 0 || s.HasField("antenna_index") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("antenna_index")
+		s.WriteUint32(x.AntennaIndex)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the GatewayAntennaIdentifiers to JSON.
+func (x *GatewayAntennaIdentifiers) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the GatewayAntennaIdentifiers message from JSON.
+func (x *GatewayAntennaIdentifiers) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "gateway_ids", "gatewayIds":
+			if s.ReadNil() {
+				x.GatewayIds = nil
+				return
+			}
+			x.GatewayIds = &GatewayIdentifiers{}
+			x.GatewayIds.UnmarshalProtoJSON(s.WithField("gateway_ids", true))
+		case "antenna_index", "antennaIndex":
+			s.AddField("antenna_index")
+			x.AntennaIndex = s.ReadUint32()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the GatewayAntennaIdentifiers from JSON.
+func (x *GatewayAntennaIdentifiers) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ClassBCGatewayIdentifiers message to JSON.
+func (x *ClassBCGatewayIdentifiers) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.GatewayIds != nil || s.HasField("gateway_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("gateway_ids")
+		x.GatewayIds.MarshalProtoJSON(s.WithField("gateway_ids"))
+	}
+	if x.AntennaIndex != 0 || s.HasField("antenna_index") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("antenna_index")
+		s.WriteUint32(x.AntennaIndex)
+	}
+	if x.GroupIndex != 0 || s.HasField("group_index") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("group_index")
+		s.WriteUint32(x.GroupIndex)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ClassBCGatewayIdentifiers to JSON.
+func (x *ClassBCGatewayIdentifiers) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ClassBCGatewayIdentifiers message from JSON.
+func (x *ClassBCGatewayIdentifiers) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "gateway_ids", "gatewayIds":
+			if s.ReadNil() {
+				x.GatewayIds = nil
+				return
+			}
+			x.GatewayIds = &GatewayIdentifiers{}
+			x.GatewayIds.UnmarshalProtoJSON(s.WithField("gateway_ids", true))
+		case "antenna_index", "antennaIndex":
+			s.AddField("antenna_index")
+			x.AntennaIndex = s.ReadUint32()
+		case "group_index", "groupIndex":
+			s.AddField("group_index")
+			x.GroupIndex = s.ReadUint32()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ClassBCGatewayIdentifiers from JSON.
+func (x *ClassBCGatewayIdentifiers) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the UplinkToken message to JSON.
+func (x *UplinkToken) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Ids != nil || s.HasField("ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("ids")
+		x.Ids.MarshalProtoJSON(s.WithField("ids"))
+	}
+	if x.Timestamp != 0 || s.HasField("timestamp") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("timestamp")
+		s.WriteUint32(x.Timestamp)
+	}
+	if x.ServerTime != nil || s.HasField("server_time") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("server_time")
+		if x.ServerTime == nil {
+			s.WriteNil()
+		} else {
+			gogo.MarshalTimestamp(s, x.ServerTime)
+		}
+	}
+	if x.ConcentratorTime != 0 || s.HasField("concentrator_time") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("concentrator_time")
+		s.WriteInt64(x.ConcentratorTime)
+	}
+	if x.GatewayTime != nil || s.HasField("gateway_time") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("gateway_time")
+		if x.GatewayTime == nil {
+			s.WriteNil()
+		} else {
+			gogo.MarshalTimestamp(s, x.GatewayTime)
+		}
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the UplinkToken to JSON.
+func (x *UplinkToken) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the UplinkToken message from JSON.
+func (x *UplinkToken) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "ids":
+			if s.ReadNil() {
+				x.Ids = nil
+				return
+			}
+			x.Ids = &GatewayAntennaIdentifiers{}
+			x.Ids.UnmarshalProtoJSON(s.WithField("ids", true))
+		case "timestamp":
+			s.AddField("timestamp")
+			x.Timestamp = s.ReadUint32()
+		case "server_time", "serverTime":
+			s.AddField("server_time")
+			if s.ReadNil() {
+				x.ServerTime = nil
+				return
+			}
+			v := gogo.UnmarshalTimestamp(s)
+			if s.Err() != nil {
+				return
+			}
+			x.ServerTime = v
+		case "concentrator_time", "concentratorTime":
+			s.AddField("concentrator_time")
+			x.ConcentratorTime = s.ReadInt64()
+		case "gateway_time", "gatewayTime":
+			s.AddField("gateway_time")
+			if s.ReadNil() {
+				x.GatewayTime = nil
+				return
+			}
+			v := gogo.UnmarshalTimestamp(s)
+			if s.Err() != nil {
+				return
+			}
+			x.GatewayTime = v
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the UplinkToken from JSON.
+func (x *UplinkToken) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the DownlinkPath message to JSON.
+func (x *DownlinkPath) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Path != nil {
+		switch ov := x.Path.(type) {
+		case *DownlinkPath_UplinkToken:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("uplink_token")
+			s.WriteBytes(ov.UplinkToken)
+		case *DownlinkPath_Fixed:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("fixed")
+			ov.Fixed.MarshalProtoJSON(s.WithField("fixed"))
+		}
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the DownlinkPath to JSON.
+func (x *DownlinkPath) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the DownlinkPath message from JSON.
+func (x *DownlinkPath) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "uplink_token", "uplinkToken":
+			s.AddField("uplink_token")
+			ov := &DownlinkPath_UplinkToken{}
+			x.Path = ov
+			ov.UplinkToken = s.ReadBytes()
+		case "fixed":
+			ov := &DownlinkPath_Fixed{}
+			x.Path = ov
+			if s.ReadNil() {
+				ov.Fixed = nil
+				return
+			}
+			ov.Fixed = &GatewayAntennaIdentifiers{}
+			ov.Fixed.UnmarshalProtoJSON(s.WithField("fixed", true))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the DownlinkPath from JSON.
+func (x *DownlinkPath) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the TxRequest message to JSON.
 func (x *TxRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -1888,8 +2166,7 @@ func (x *TxRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		var wroteElement bool
 		for _, element := range x.DownlinkPaths {
 			s.WriteMoreIf(&wroteElement)
-			// NOTE: DownlinkPath does not seem to implement MarshalProtoJSON.
-			gogo.MarshalMessage(s, element)
+			element.MarshalProtoJSON(s.WithField("downlink_paths"))
 		}
 		s.WriteArrayEnd()
 	}
@@ -1975,10 +2252,16 @@ func (x *TxRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				return
 			}
 			s.ReadArray(func() {
-				// NOTE: DownlinkPath does not seem to implement UnmarshalProtoJSON.
-				var v DownlinkPath
-				gogo.UnmarshalMessage(s, &v)
-				x.DownlinkPaths = append(x.DownlinkPaths, &v)
+				if s.ReadNil() {
+					x.DownlinkPaths = append(x.DownlinkPaths, nil)
+					return
+				}
+				v := &DownlinkPath{}
+				v.UnmarshalProtoJSON(s.WithField("downlink_paths", false))
+				if s.Err() != nil {
+					return
+				}
+				x.DownlinkPaths = append(x.DownlinkPaths, v)
 			})
 		case "rx1_delay", "rx1Delay":
 			s.AddField("rx1_delay")

@@ -160,7 +160,11 @@ func TestTTSCSVConverter(t *testing.T) {
 					t.FailNow()
 				}
 				dev := templates[0]
-				a.So(dev.EndDevice.Ids.JoinEui, should.Resemble, &types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11})
+				a.So(
+					dev.EndDevice.Ids.JoinEui,
+					should.Resemble,
+					types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}.Bytes(),
+				)
 				a.So(ttnpb.RequireFields(dev.FieldMask.Paths,
 					"ids.dev_eui",
 					"ids.join_eui",

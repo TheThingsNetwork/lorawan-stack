@@ -213,8 +213,7 @@ func (x *ContactInfoValidation) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.Entity != nil || s.HasField("entity") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("entity")
-		// NOTE: EntityIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.Entity)
+		x.Entity.MarshalProtoJSON(s.WithField("entity"))
 	}
 	if len(x.ContactInfo) > 0 || s.HasField("contact_info") {
 		s.WriteMoreIf(&wroteField)
@@ -269,15 +268,12 @@ func (x *ContactInfoValidation) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState)
 			s.AddField("token")
 			x.Token = s.ReadString()
 		case "entity":
-			s.AddField("entity")
 			if s.ReadNil() {
 				x.Entity = nil
 				return
 			}
-			// NOTE: EntityIdentifiers does not seem to implement UnmarshalProtoJSON.
-			var v EntityIdentifiers
-			gogo.UnmarshalMessage(s, &v)
-			x.Entity = &v
+			x.Entity = &EntityIdentifiers{}
+			x.Entity.UnmarshalProtoJSON(s.WithField("entity", true))
 		case "contact_info", "contactInfo":
 			s.AddField("contact_info")
 			if s.ReadNil() {

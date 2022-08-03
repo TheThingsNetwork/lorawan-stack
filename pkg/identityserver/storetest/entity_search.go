@@ -38,8 +38,8 @@ func (st *StoreTest) TestEntitySearch(t *T) {
 	app2 := st.population.NewApplication(nil)
 
 	dev1 := st.population.NewEndDevice(app1.GetIds())
-	dev1.Ids.JoinEui = &types.EUI64{1, 1, 1, 1, 1, 1, 1, 1}
-	dev1.Ids.DevEui = &types.EUI64{2, 2, 2, 2, 2, 2, 2, 2}
+	dev1.Ids.JoinEui = types.EUI64{1, 1, 1, 1, 1, 1, 1, 1}.Bytes()
+	dev1.Ids.DevEui = types.EUI64{2, 2, 2, 2, 2, 2, 2, 2}.Bytes()
 	dev1.Description = "This is the description of " + dev1.Name
 	dev1.Attributes = attributes
 	st.population.NewEndDevice(app2.GetIds())
@@ -51,7 +51,7 @@ func (st *StoreTest) TestEntitySearch(t *T) {
 	st.population.NewClient(nil)
 
 	gtw1 := st.population.NewGateway(usr1.GetOrganizationOrUserIdentifiers())
-	gtw1.Ids.Eui = &types.EUI64{3, 3, 3, 3, 3, 3, 3, 3}
+	gtw1.Ids.Eui = types.EUI64{3, 3, 3, 3, 3, 3, 3, 3}.Bytes()
 	gtw1.Description = "This is the description of " + gtw1.Name
 	gtw1.Attributes = attributes
 	st.population.NewGateway(nil)

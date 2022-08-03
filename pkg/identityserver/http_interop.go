@@ -37,8 +37,8 @@ func (srv *interopServer) HomeNSRequest(ctx context.Context, in *interop.HomeNSR
 	}
 
 	ids := &ttnpb.EndDeviceIdentifiers{
-		JoinEui: (*types.EUI64)(&in.ReceiverID),
-		DevEui:  (*types.EUI64)(&in.DevEUI),
+		JoinEui: (*types.EUI64)(&in.ReceiverID).Bytes(),
+		DevEui:  (*types.EUI64)(&in.DevEUI).Bytes(),
 	}
 
 	var dev *ttnpb.EndDevice

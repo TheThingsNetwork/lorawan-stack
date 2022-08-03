@@ -204,7 +204,7 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64, addr *net.UDPAddr) (
 			cs.io, cs.ioErr = conn, err
 			close(cs.ioWait)
 		}()
-		ids := &ttnpb.GatewayIdentifiers{Eui: &eui}
+		ids := &ttnpb.GatewayIdentifiers{Eui: eui.Bytes()}
 		ctx, ids, err = s.server.FillGatewayContext(ctx, ids)
 		if err != nil {
 			return nil, err

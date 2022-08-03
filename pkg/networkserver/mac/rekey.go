@@ -46,7 +46,7 @@ func HandleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 		return evs, nil
 	}
 	if dev.PendingSession != nil && dev.MacState.PendingJoinRequest != nil && types.MustDevAddr(dev.PendingSession.DevAddr).OrZero().Equal(devAddr) {
-		dev.Ids.DevAddr = types.MustDevAddr(dev.PendingSession.DevAddr)
+		dev.Ids.DevAddr = dev.PendingSession.DevAddr
 		dev.Session = dev.PendingSession
 	}
 

@@ -28,6 +28,7 @@ import (
 	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
@@ -71,7 +72,7 @@ func (s *server) FillGatewayContext(ctx context.Context, ids *ttnpb.GatewayIdent
 	if ids.GatewayId != "" {
 		return ctx, ids, nil
 	}
-	ids.GatewayId = fmt.Sprintf("eui-%v", strings.ToLower(ids.Eui.String()))
+	ids.GatewayId = fmt.Sprintf("eui-%v", strings.ToLower(types.MustEUI64(ids.Eui).String()))
 	return ctx, ids, nil
 }
 

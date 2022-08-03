@@ -10,7 +10,6 @@ import (
 	flagsplugin "github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	pflag "github.com/spf13/pflag"
 	customflags "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags"
-	types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // AddSelectFlagsForApplicationIdentifiers adds flags to select fields in ApplicationIdentifiers.
@@ -147,22 +146,22 @@ func (m *EndDeviceIdentifiers) SetFromFlags(flags *pflag.FlagSet, prefix string)
 			paths = append(paths, setPaths...)
 		}
 	}
-	if val, changed, err := types.GetEUI64FromFlag(flags, flagsplugin.Prefix("dev_eui", prefix)); err != nil {
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("dev_eui", prefix)); err != nil {
 		return nil, err
 	} else if changed {
-		m.DevEui = &val
+		m.DevEui = val
 		paths = append(paths, flagsplugin.Prefix("dev_eui", prefix))
 	}
-	if val, changed, err := types.GetEUI64FromFlag(flags, flagsplugin.Prefix("join_eui", prefix)); err != nil {
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("join_eui", prefix)); err != nil {
 		return nil, err
 	} else if changed {
-		m.JoinEui = &val
+		m.JoinEui = val
 		paths = append(paths, flagsplugin.Prefix("join_eui", prefix))
 	}
-	if val, changed, err := types.GetDevAddrFromFlag(flags, flagsplugin.Prefix("dev_addr", prefix)); err != nil {
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("dev_addr", prefix)); err != nil {
 		return nil, err
 	} else if changed {
-		m.DevAddr = &val
+		m.DevAddr = val
 		paths = append(paths, flagsplugin.Prefix("dev_addr", prefix))
 	}
 	return paths, nil
@@ -203,10 +202,10 @@ func (m *GatewayIdentifiers) SetFromFlags(flags *pflag.FlagSet, prefix string) (
 		m.GatewayId = val
 		paths = append(paths, flagsplugin.Prefix("gateway_id", prefix))
 	}
-	if val, changed, err := types.GetEUI64FromFlag(flags, flagsplugin.Prefix("eui", prefix)); err != nil {
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("eui", prefix)); err != nil {
 		return nil, err
 	} else if changed {
-		m.Eui = &val
+		m.Eui = val
 		paths = append(paths, flagsplugin.Prefix("eui", prefix))
 	}
 	return paths, nil
