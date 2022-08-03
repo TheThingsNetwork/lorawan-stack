@@ -3680,6 +3680,69 @@ func (x *MACCommand) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the MACCommands message to JSON.
+func (x *MACCommands) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.Commands) > 0 || s.HasField("commands") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("commands")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.Commands {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("commands"))
+		}
+		s.WriteArrayEnd()
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the MACCommands to JSON.
+func (x *MACCommands) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the MACCommands message from JSON.
+func (x *MACCommands) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "commands":
+			s.AddField("commands")
+			if s.ReadNil() {
+				x.Commands = nil
+				return
+			}
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.Commands = append(x.Commands, nil)
+					return
+				}
+				v := &MACCommand{}
+				v.UnmarshalProtoJSON(s.WithField("commands", false))
+				if s.Err() != nil {
+					return
+				}
+				x.Commands = append(x.Commands, v)
+			})
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the MACCommands from JSON.
+func (x *MACCommands) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the FrequencyValue message to JSON.
 func (x *FrequencyValue) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {

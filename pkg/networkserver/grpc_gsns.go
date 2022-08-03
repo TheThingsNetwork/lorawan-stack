@@ -619,9 +619,9 @@ macLoop:
 	dev.MacState.RecentMacCommandIdentifiers = recentMACCommandIdentifiers
 	if n := len(dev.MacState.PendingRequests); n > 0 {
 		logger.WithField("unanswered_request_count", n).Debug("MAC command buffer not fully answered")
-		queuedEventBuilders = append(queuedEventBuilders, mac.EvtUnansweredMACCommand.BindData(
-			slices.Clone(dev.MacState.PendingRequests),
-		))
+		queuedEventBuilders = append(queuedEventBuilders, mac.EvtUnansweredMACCommand.BindData(&ttnpb.MACCommands{
+			Commands: slices.Clone(dev.MacState.PendingRequests),
+		}))
 		dev.MacState.PendingRequests = dev.MacState.PendingRequests[:0]
 	}
 

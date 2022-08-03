@@ -739,6 +739,10 @@ message MACCommand {
   }
 }
 
+message MACCommands {
+  repeated MACCommand commands = 1;
+}
+
 enum AggregatedDutyCycle {
   option (thethings.json.enum) = { marshal_as_string: true, prefix: "DUTY_CYCLE" };
 

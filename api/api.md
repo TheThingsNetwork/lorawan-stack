@@ -425,6 +425,7 @@
   - [Message `MACCommand.RxParamSetupReq`](#ttn.lorawan.v3.MACCommand.RxParamSetupReq)
   - [Message `MACCommand.RxTimingSetupReq`](#ttn.lorawan.v3.MACCommand.RxTimingSetupReq)
   - [Message `MACCommand.TxParamSetupReq`](#ttn.lorawan.v3.MACCommand.TxParamSetupReq)
+  - [Message `MACCommands`](#ttn.lorawan.v3.MACCommands)
   - [Message `MACPayload`](#ttn.lorawan.v3.MACPayload)
   - [Message `MHDR`](#ttn.lorawan.v3.MHDR)
   - [Message `Message`](#ttn.lorawan.v3.Message)
@@ -6185,6 +6186,12 @@ Only the components for which the keys were meant, will have the key-encryption-
 | Field | Validations |
 | ----- | ----------- |
 | `max_eirp_index` | <p>`enum.defined_only`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.MACCommands">Message `MACCommands`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `commands` | [`MACCommand`](#ttn.lorawan.v3.MACCommand) | repeated |  |
 
 ### <a name="ttn.lorawan.v3.MACPayload">Message `MACPayload`</a>
 

@@ -2634,6 +2634,26 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 	return nil
 }
 
+func (dst *MACCommands) SetFields(src *MACCommands, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "commands":
+			if len(subs) > 0 {
+				return fmt.Errorf("'commands' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Commands = src.Commands
+			} else {
+				dst.Commands = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *FrequencyValue) SetFields(src *FrequencyValue, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
