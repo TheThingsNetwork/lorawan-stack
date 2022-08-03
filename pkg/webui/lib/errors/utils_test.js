@@ -171,6 +171,45 @@ const frontendError = createFrontendError(
   undefined,
   500,
 )
+
+const timeoutError = {
+  code: 'ECONNABORTED',
+  columnNumber: '[undefined]',
+  config: {
+    adapter: '[Function: <anonymous>]',
+    baseURL: 'https://au1.cloud.thethings.network/api/v3',
+    data: '[undefined]',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      Authorization: '[Filtered]',
+    },
+    maxBodyLength: -1,
+    maxContentLength: -1,
+    method: 'get',
+    timeout: 10000,
+    transformRequest: ['[Function: <anonymous>]'],
+    transformResponse: ['[Function: <anonymous>]'],
+    transitional: {
+      clarifyTimeoutError: false,
+      forcedJSONParsing: true,
+      silentJSONParsing: true,
+    },
+    url: '/edtc/formats',
+    validateStatus: '[Function: validateStatus]',
+    xsrfCookieName: 'XSRF-TOKEN',
+    xsrfHeaderName: 'X-XSRF-TOKEN',
+  },
+  description: '[undefined]',
+  fileName: '[undefined]',
+  lineNumber: '[undefined]',
+  message: 'timeout of 10000ms exceeded',
+  name: 'Error',
+  number: '[undefined]',
+  stack:
+    'Error: timeout of 10000ms exceeded\n    at e.exports (https://assets.cloud.thethings.network/console.57b1ac5a73941623bdf2.js:1:1709004)',
+  status: null,
+}
+
 const plainFrontendError = createFrontendError(errorMessages.unknownErrorTitle)
 const codeError = { code: 'ECONNABORTED' }
 const statusCodeError = { statusCode: 404 }
@@ -178,7 +217,6 @@ const emptyError = {}
 const undefinedError = undefined
 const errorInstance = new Error('There was an unknown error')
 const networkError = new Error('Network Error')
-const timeoutError = { code: 'ECONNABORTED' }
 const tokenTimeoutError = new TokenError('Could not fetch token', timeoutError)
 const tokenNetworkError = new TokenError('Could not fetch token', networkError)
 const tokenError = new TokenError('Token error', backendErrorWithDetails)
