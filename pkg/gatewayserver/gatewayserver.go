@@ -742,8 +742,8 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item any) {
 		}
 		drop := func(ids *ttnpb.EndDeviceIdentifiers, err error) {
 			logger := logger.WithError(err)
-			if ids.JoinEui != nil {
-				logger = logger.WithField("join_eui", types.MustEUI64(ids.JoinEui).OrZero())
+			if joinEUI := types.MustEUI64(ids.JoinEui).OrZero(); !joinEUI.IsZero() {
+				logger = logger.WithField("join_eui", joinEUI)
 			}
 			if devEUI := types.MustEUI64(ids.DevEui).OrZero(); !devEUI.IsZero() {
 				logger = logger.WithField("dev_eui", devEUI)
