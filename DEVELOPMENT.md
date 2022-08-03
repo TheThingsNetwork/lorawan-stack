@@ -269,7 +269,7 @@ The documentation site for The Things Stack is built from the [`lorawan-stack-do
 
 ### Web UI
 
-The Things Stack for LoRaWAN includes two frontend applications: the **Console** and **OAuth Provider**. Both applications use [React](https://reactjs.org/) as frontend framework. The `console` and `oauth` packages of the backend expose their respective web servers and handle all logic that cannot be done in the browser. Otherwise both applications are single page applications (SPA) that run entirely in the browser.
+The Things Stack for LoRaWAN includes two frontend applications: the **Console** and **Account App**. Both applications use [React](https://reactjs.org/) as frontend framework. The `console` and `account` packages of the backend expose their respective web servers and handle all logic that cannot be done in the browser. Otherwise both applications are single page applications (SPA) that run entirely in the browser.
 
 The folder structure of the frontend looks as follows:
 
@@ -310,20 +310,23 @@ The development server runs on `http://localhost:8080` and will proxy all api ca
 In order to set up The Things Stack to support running the frontend via `webpack-dev-server`, the following environment setup is needed:
 
 ```bash
-NODE_ENV="development"
-TTN_LW_LOG_LEVEL="debug"
-TTN_LW_IS_OAUTH_UI_JS_FILE="libs.bundle.js account.js"
-TTN_LW_CONSOLE_UI_JS_FILE="libs.bundle.js console.js"
-TTN_LW_CONSOLE_UI_CANONICAL_URL="http://localhost:8080/console"
-TTN_LW_CONSOLE_OAUTH_AUTHORIZE_URL="http://localhost:8080/oauth/authorize"
-TTN_LW_CONSOLE_OAUTH_LOGOUT_URL="http://localhost:8080/oauth/logout"
-TTN_LW_CONSOLE_OAUTH_TOKEN_URL="http://localhost:8080/oauth/token"
-TTN_LW_IS_OAUTH_UI_CANONICAL_URL="http://localhost:8080/oauth"
-TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL="http://localhost:8080/oauth.js"
-TTN_LW_CONSOLE_UI_ASSETS_BASE_URL="http://localhost:8080/assets"
-TTN_LW_IS_EMAIL_PROVIDER="dir"
-TTN_LW_IS_EMAIL_DIR=".dev/email"
+# .dev.env
+export NODE_ENV="development"
+export TTN_LW_LOG_LEVEL="debug"
+export TTN_LW_CONSOLE_UI_CANONICAL_URL="http://localhost:8080/console"
+export TTN_LW_CONSOLE_OAUTH_AUTHORIZE_URL="http://localhost:8080/oauth/authorize"
+export TTN_LW_CONSOLE_OAUTH_LOGOUT_URL="http://localhost:8080/oauth/logout"
+export TTN_LW_CONSOLE_OAUTH_TOKEN_URL="http://localhost:8080/oauth/token"
+export TTN_LW_IS_OAUTH_UI_CANONICAL_URL="http://localhost:8080/oauth"
+export TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL="http://localhost:8080/oauth"
+export TTN_LW_IS_EMAIL_PROVIDER="dir"
+export TTN_LW_IS_EMAIL_DIR=".dev/email"
+export TTN_LW_CONSOLE_UI_ASSETS_BASE_URL="http://localhost:8080/assets"
+export TTN_LW_IS_OAUTH_UI_CONSOLE_URL="http://localhost:8080/console"
+export TTN_LW_CONSOLE_UI_ACCOUNT_URL="http://localhost:8080/oauth"
 ```
+
+We recommend saving this configuration as an `.dev.env` file and sourcing it like `source .dev.env`. This allows you to easily apply development configuration when needed.
 
 > Note: It is important to **source these environment variables in all terminal sessions** that run The Things Stack or the `tools/bin/mage` commands. Failing to do so will result in erros such as blank page renders. See also [troubleshooting](#troubleshooting).
 
