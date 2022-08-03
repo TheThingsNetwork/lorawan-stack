@@ -16,6 +16,8 @@ package identityserver
 
 import (
 	"context"
+	"encoding/hex"
+	"fmt"
 	"net"
 	"net/url"
 	"strings"
@@ -27,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/blocklist"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
@@ -63,9 +66,9 @@ var errEndDeviceEUIsTaken = errors.DefineAlreadyExists(
 
 func getHost(address string) string {
 	if strings.Contains(address, "://") {
-		url, err := url.Parse(address)
+		u, err := url.Parse(address)
 		if err == nil {
-			address = url.Host
+			address = u.Host
 		}
 	}
 	if strings.Contains(address, ":") {
@@ -76,6 +79,8 @@ func getHost(address string) string {
 	}
 	return address
 }
+
+var endDeviceAuthenticationCodeSeparator = ":"
 
 var (
 	errNetworkServerAddressMismatch = errors.DefineInvalidArgument(
@@ -151,6 +156,37 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 	}
 	defer func() { is.setFullEndDevicePictureURL(ctx, dev) }()
 
+	// Store plaintext value to return in the response to clients.
+	var ptCACSecret string
+
+	if req.EndDevice.ClaimAuthenticationCode != nil {
+		ptCACSecret = req.EndDevice.ClaimAuthenticationCode.Value
+		if err = validateEndDeviceAuthenticationCode(*req.EndDevice.ClaimAuthenticationCode); err != nil {
+			return nil, err
+		}
+		if is.config.EndDevices.EncryptionKeyID != "" {
+			encrypted, err := is.KeyVault.Encrypt(
+				ctx,
+				[]byte(req.EndDevice.ClaimAuthenticationCode.Value),
+				is.config.EndDevices.EncryptionKeyID,
+			)
+			if err != nil {
+				return nil, err
+			}
+			// Store the encrypted value along with the ID of the key used to encrypt it.
+			req.EndDevice.ClaimAuthenticationCode.Value = fmt.Sprintf(
+				"%s%s%s",
+				is.config.EndDevices.EncryptionKeyID,
+				endDeviceAuthenticationCodeSeparator,
+				hex.EncodeToString(encrypted),
+			)
+		} else {
+			log.FromContext(ctx).Debug(
+				"No encryption key defined, store end device claim authentication code directly in plaintext",
+			)
+		}
+	}
+
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		dev, err = st.CreateEndDevice(ctx, req.EndDevice)
 		if err != nil {
@@ -176,6 +212,9 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 		}
 		return nil, err
 	}
+	if ptCACSecret != "" {
+		dev.ClaimAuthenticationCode.Value = ptCACSecret
+	}
 	events.Publish(evtCreateEndDevice.NewWithIdentifiersAndData(ctx, req.EndDevice.Ids, nil))
 	return dev, nil
 }
@@ -190,12 +229,32 @@ func (is *IdentityServer) getEndDevice(ctx context.Context, req *ttnpb.GetEndDev
 		defer func() { is.setFullEndDevicePictureURL(ctx, dev) }()
 	}
 
+	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.GetPaths()), "claim_authentication_code") {
+		req.FieldMask.Paths = ttnpb.AddFields(req.FieldMask.GetPaths(), "claim_authentication_code")
+	}
+
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		dev, err = st.GetEndDevice(ctx, req.EndDeviceIds, req.FieldMask.GetPaths())
 		return err
 	})
 	if err != nil {
 		return nil, err
+	}
+	if dev.GetClaimAuthenticationCode().GetValue() != "" {
+		s := strings.Split(dev.ClaimAuthenticationCode.Value, endDeviceAuthenticationCodeSeparator)
+		if len(s) == 2 {
+			v, err := hex.DecodeString(s[1])
+			if err != nil {
+				return nil, err
+			}
+			value, err := is.KeyVault.Decrypt(ctx, v, s[0])
+			if err != nil {
+				return nil, err
+			}
+			dev.ClaimAuthenticationCode.Value = string(value)
+		} else {
+			log.FromContext(ctx).Debug("No encryption key defined, return stored end device claim authentication code")
+		}
 	}
 	return dev, nil
 }
@@ -285,9 +344,13 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 		req.FieldMask = cleanFieldMaskPaths(ttnpb.EndDeviceFieldPathsNested, req.FieldMask, nil, []string{"activated_at"})
 	}
 
+	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.GetPaths()), "claim_authentication_code") {
+		req.FieldMask.Paths = ttnpb.AddFields(req.FieldMask.GetPaths(), "claim_authentication_code")
+	}
+
 	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.GetPaths()), "picture") {
 		if !ttnpb.HasAnyField(req.FieldMask.GetPaths(), "picture") {
-			req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "picture")
+			req.FieldMask.Paths = ttnpb.AddFields(req.FieldMask.GetPaths(), "picture")
 		}
 		if req.EndDevice.Picture != nil {
 			if err = is.processEndDevicePicture(ctx, req.EndDevice); err != nil {
@@ -295,6 +358,40 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 			}
 		}
 		defer func() { is.setFullEndDevicePictureURL(ctx, dev) }()
+	}
+
+	// Store plaintext value to return in the response to clients.
+	var ptCACSecret string
+
+	if ttnpb.HasAnyField(
+		req.FieldMask.GetPaths(),
+		"claim_authentication_code",
+	) && req.EndDevice.ClaimAuthenticationCode != nil {
+		if err = validateEndDeviceAuthenticationCode(*req.EndDevice.ClaimAuthenticationCode); err != nil {
+			return nil, err
+		}
+		if is.config.EndDevices.EncryptionKeyID != "" {
+			ptCACSecret = req.EndDevice.ClaimAuthenticationCode.Value
+			encrypted, err := is.KeyVault.Encrypt(
+				ctx,
+				[]byte(req.EndDevice.ClaimAuthenticationCode.Value),
+				is.config.EndDevices.EncryptionKeyID,
+			)
+			if err != nil {
+				return nil, err
+			}
+			// Store the encrypted value along with the ID of the key used to encrypt it.
+			req.EndDevice.ClaimAuthenticationCode.Value = fmt.Sprintf(
+				"%s%s%s",
+				is.config.EndDevices.EncryptionKeyID,
+				endDeviceAuthenticationCodeSeparator,
+				hex.EncodeToString(encrypted),
+			)
+		} else {
+			log.FromContext(ctx).Debug(
+				"No encryption key defined, store end device claim authentication code directly in plaintext",
+			)
+		}
 	}
 
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
@@ -305,6 +402,11 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 		return nil, err
 	}
 	events.Publish(evtUpdateEndDevice.NewWithIdentifiersAndData(ctx, req.EndDevice.Ids, req.FieldMask.GetPaths()))
+
+	if ptCACSecret != "" {
+		dev.ClaimAuthenticationCode.Value = ptCACSecret
+	}
+
 	return dev, nil
 }
 
@@ -336,6 +438,16 @@ func (is *IdentityServer) deleteEndDevice(ctx context.Context, ids *ttnpb.EndDev
 	}
 	events.Publish(evtDeleteEndDevice.NewWithIdentifiersAndData(ctx, ids, nil))
 	return ttnpb.Empty, nil
+}
+
+func validateEndDeviceAuthenticationCode(authCode ttnpb.EndDeviceAuthenticationCode) error {
+	if validFrom, validTo := ttnpb.StdTime(authCode.ValidFrom), ttnpb.StdTime(authCode.ValidTo); validFrom != nil &&
+		validTo != nil {
+		if validTo.Before(*validFrom) || authCode.Value == "" {
+			return errClaimAuthenticationCode.New()
+		}
+	}
+	return nil
 }
 
 type endDeviceRegistry struct {

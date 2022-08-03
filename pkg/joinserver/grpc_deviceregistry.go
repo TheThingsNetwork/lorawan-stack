@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
@@ -93,6 +94,20 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 			)
 		}
 	}
+
+	// TODO: Reject writing Claim Authentication Code (https://github.com/TheThingsNetwork/lorawan-stack/issues/5631).
+	if ttnpb.HasAnyField(
+		req.FieldMask.GetPaths(),
+		"claim_authentication_code.value",
+		"claim_authentication_code.valid_from",
+		"claim_authentication_code.value_to",
+	) {
+		warning.Add(
+			ctx,
+			"Storage of claim authentication code in the Join Server registry is deprecated. Use the Identity Server registry instead", //nolint:lll
+		)
+	}
+
 	logger := log.FromContext(ctx)
 	dev, err := srv.JS.devices.GetByID(ctx, req.EndDeviceIds.ApplicationIds, req.EndDeviceIds.DeviceId, gets)
 	if errors.IsNotFound(err) {
@@ -189,6 +204,19 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 	}
 	if types.MustEUI64(req.EndDevice.Ids.DevEui).OrZero().IsZero() {
 		return nil, errNoDevEUI.New()
+	}
+
+	// TODO: Reject writing Claim Authentication Code (https://github.com/TheThingsNetwork/lorawan-stack/issues/5631).
+	if ttnpb.HasAnyField(
+		req.FieldMask.GetPaths(),
+		"claim_authentication_code.value",
+		"claim_authentication_code.valid_from",
+		"claim_authentication_code.value_to",
+	) {
+		warning.Add(
+			ctx,
+			"Storage of claim authentication code in the Join Server registry is deprecated. Use the Identity Server registry instead", //nolint:lll
+		)
 	}
 
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "root_keys.app_key.key") &&

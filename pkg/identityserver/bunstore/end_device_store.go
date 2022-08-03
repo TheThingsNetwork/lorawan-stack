@@ -65,6 +65,10 @@ type EndDevice struct {
 
 	ActivatedAt *time.Time `bun:"activated_at"`
 	LastSeenAt  *time.Time `bun:"last_seen_at"`
+
+	ClaimAuthenticationCodeSecret    []byte     `bun:"claim_authentication_code_secret"`
+	ClaimAuthenticationCodeValidFrom *time.Time `bun:"claim_authentication_code_valid_from"`
+	ClaimAuthenticationCodeValidTo   *time.Time `bun:"claim_authentication_code_valid_to"`
 }
 
 // BeforeAppendModel is a hook that modifies the model on SELECT and UPDATE queries.
@@ -111,6 +115,14 @@ func endDeviceToPB(m *EndDevice, fieldMask ...string) (*ttnpb.EndDevice, error) 
 		NetworkServerAddress:     m.NetworkServerAddress,
 		ApplicationServerAddress: m.ApplicationServerAddress,
 		JoinServerAddress:        m.JoinServerAddress,
+
+		ClaimAuthenticationCode: func() *ttnpb.EndDeviceAuthenticationCode {
+			return &ttnpb.EndDeviceAuthenticationCode{
+				Value:     string(m.ClaimAuthenticationCodeSecret),
+				ValidFrom: ttnpb.ProtoTime(m.ClaimAuthenticationCodeValidFrom),
+				ValidTo:   ttnpb.ProtoTime(m.ClaimAuthenticationCodeValidTo),
+			}
+		}(),
 
 		ServiceProfileId: m.ServiceProfileID,
 
@@ -195,6 +207,10 @@ func (s *endDeviceStore) CreateEndDevice(
 		NetworkServerAddress:     pb.NetworkServerAddress,
 		ApplicationServerAddress: pb.ApplicationServerAddress,
 		JoinServerAddress:        pb.JoinServerAddress,
+
+		ClaimAuthenticationCodeSecret:    []byte(pb.ClaimAuthenticationCode.GetValue()),
+		ClaimAuthenticationCodeValidFrom: cleanTimePtr(ttnpb.StdTime(pb.ClaimAuthenticationCode.GetValidFrom())),
+		ClaimAuthenticationCodeValidTo:   cleanTimePtr(ttnpb.StdTime(pb.ClaimAuthenticationCode.GetValidTo())),
 
 		ServiceProfileID: pb.ServiceProfileId,
 
@@ -287,6 +303,13 @@ func (*endDeviceStore) selectWithFields(q *bun.SelectQuery, fieldMask store.Fiel
 				q = q.Relation("Locations")
 			case "picture":
 				q = q.Relation("Picture")
+			case "claim_authentication_code":
+				columns = append(
+					columns,
+					"claim_authentication_code_secret",
+					"claim_authentication_code_valid_from",
+					"claim_authentication_code_valid_to",
+				)
 			}
 		}
 		q = q.Column(columns...)
@@ -636,6 +659,18 @@ func (s *endDeviceStore) updateEndDeviceModel( //nolint:gocyclo
 		case "last_seen_at":
 			model.LastSeenAt = cleanTimePtr(ttnpb.StdTime(pb.LastSeenAt))
 			columns = append(columns, "last_seen_at")
+
+		case "claim_authentication_code":
+			// NOTE: The old implementation didn't allow for updating the sub-fields, so we don't either.
+			model.ClaimAuthenticationCodeSecret = []byte(pb.ClaimAuthenticationCode.GetValue())
+			model.ClaimAuthenticationCodeValidFrom = cleanTimePtr(ttnpb.StdTime(pb.ClaimAuthenticationCode.GetValidFrom()))
+			model.ClaimAuthenticationCodeValidTo = cleanTimePtr(ttnpb.StdTime(pb.ClaimAuthenticationCode.GetValidTo()))
+			columns = append(
+				columns,
+				"claim_authentication_code_secret",
+				"claim_authentication_code_valid_from",
+				"claim_authentication_code_valid_to",
+			)
 		}
 	}
 

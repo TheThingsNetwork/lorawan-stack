@@ -53,6 +53,13 @@ var (
 
 	selectAllEndDeviceFlags = util.SelectAllFlagSet("end devices")
 	toUnderscore            = strings.NewReplacer("-", "_")
+
+	claimAuthenticationCodePaths = []string{
+		"claim_authentication_code",
+		"claim_authentication_code.value",
+		"claim_authentication_code.valid_from",
+		"claim_authentication_code.valid_to",
+	}
 )
 
 func selectEndDeviceIDFlags() *pflag.FlagSet {
@@ -325,6 +332,11 @@ var (
 				jsPaths = nil
 			}
 
+			if len(jsPaths) > 0 && device.ClaimAuthenticationCode.GetValue() != "" {
+				// ClaimAuthenticationCode is already retrieved from the IS. We can unset the related JS paths.
+				jsPaths = ttnpb.ExcludeFields(jsPaths, claimAuthenticationCodePaths...)
+			}
+
 			res, err := getEndDevice(device.Ids, nsPaths, asPaths, jsPaths, true)
 			if err != nil {
 				return err
@@ -342,7 +354,6 @@ var (
 			if res.UpdatedAt != nil && ttnpb.StdTime(res.UpdatedAt).After(*ttnpb.StdTime(device.UpdatedAt)) {
 				device.UpdatedAt = res.UpdatedAt
 			}
-
 			return io.Write(os.Stdout, config.OutputFormat, device)
 		},
 	}
@@ -621,7 +632,6 @@ var (
 					logger.Info("Device not configured for claiming, register in the cluster Join Server")
 				}
 			}
-
 			// Require EUIs for devices that need to be added to the Join Server.
 			if len(jsPaths) > 0 && (device.Ids.JoinEui == nil || device.Ids.DevEui == nil) {
 				return errNoEndDeviceEUI.New()
@@ -1213,7 +1223,6 @@ This command may take end device identifiers from stdin.`,
 			}
 
 			isPaths, nsPaths, asPaths, jsPaths := splitEndDeviceGetPaths(format.FieldMask.GetPaths()...)
-
 			if len(nsPaths) > 0 {
 				isPaths = append(isPaths, "network_server_address")
 			}
@@ -1237,6 +1246,11 @@ This command may take end device identifiers from stdin.`,
 				return err
 			}
 
+			if device.ClaimAuthenticationCode.GetValue() != "" {
+				// ClaimAuthenticationCode is already retrieved from the IS. We can unset the related JS paths.
+				jsPaths = ttnpb.ExcludeFields(jsPaths, claimAuthenticationCodePaths...)
+			}
+
 			nsMismatch, asMismatch, jsMismatch := compareServerAddressesEndDevice(device, config)
 			if len(nsPaths) > 0 && nsMismatch {
 				return errAddressMismatchEndDevice.New()
@@ -1247,7 +1261,6 @@ This command may take end device identifiers from stdin.`,
 			if len(jsPaths) > 0 && jsMismatch {
 				return errAddressMismatchEndDevice.New()
 			}
-
 			dev, err := getEndDevice(device.Ids, nsPaths, asPaths, jsPaths, true)
 			if err != nil {
 				return err
@@ -1255,7 +1268,6 @@ This command may take end device identifiers from stdin.`,
 			if err := device.SetFields(dev, append(append(nsPaths, asPaths...), jsPaths...)...); err != nil {
 				return err
 			}
-
 			size, _ := cmd.Flags().GetUint32("size")
 			res, err := client.Generate(ctx, &ttnpb.GenerateEndDeviceQRCodeRequest{
 				FormatId:  formatID,
