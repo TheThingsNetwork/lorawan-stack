@@ -19,9 +19,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
-	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -90,8 +88,8 @@ func TestAppendRecentUplink(t *testing.T) {
 			Name:     fmt.Sprintf("recent_length:%d,window:%v", len(tc.Recent), tc.Window),
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				recent := deepcopy.Copy(tc.Recent).([]*ttnpb.MACState_UplinkMessage)
-				up := CopyUplinkMessage(tc.Up)
+				recent := ttnpb.CloneSlice(tc.Recent)
+				up := ttnpb.Clone(tc.Up)
 				ret := appendRecentUplink(recent, up, tc.Window)
 				a.So(recent, should.Resemble, tc.Recent)
 				a.So(up, should.Resemble, tc.Up)

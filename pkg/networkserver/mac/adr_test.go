@@ -267,13 +267,13 @@ func TestAdaptDataRate(t *testing.T) {
 			Name:     tc.Name,
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				dev := CopyEndDevice(tc.Device)
+				dev := ttnpb.Clone(tc.Device)
 				fp := test.FrequencyPlan(dev.FrequencyPlanId)
 				err := AdaptDataRate(ctx, dev, LoRaWANBands[fp.BandID][dev.LorawanPhyVersion], nil)
 				if !a.So(err, should.Equal, tc.Error) {
 					t.Fatalf("ADR failed with: %s", err)
 				}
-				expected := CopyEndDevice(tc.Device)
+				expected := ttnpb.Clone(tc.Device)
 				if tc.DeviceDiff != nil {
 					tc.DeviceDiff(expected)
 				}
@@ -369,13 +369,13 @@ func TestIssue458(t *testing.T) {
 			Name:     tc.Name,
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				dev := CopyEndDevice(tc.Device)
+				dev := ttnpb.Clone(tc.Device)
 				fp := test.FrequencyPlan(dev.FrequencyPlanId)
 				err := AdaptDataRate(ctx, dev, LoRaWANBands[fp.BandID][dev.LorawanPhyVersion], &ttnpb.MACSettings{})
 				if !a.So(err, should.Equal, tc.Error) {
 					t.Fatalf("ADR failed with: %s", err)
 				}
-				expected := CopyEndDevice(tc.Device)
+				expected := ttnpb.Clone(tc.Device)
 				if tc.DeviceDiff != nil {
 					tc.DeviceDiff(expected)
 				}

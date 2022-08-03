@@ -20,13 +20,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
-	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -232,12 +230,12 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					},
 				}
 
-				dev, sets, err := f(ctx, CopyEndDevice(getDevice))
+				dev, sets, err := f(ctx, ttnpb.Clone(getDevice))
 				if !a.So(err, should.BeNil) {
 					return nil, ctx, err
 				}
 
-				setDevice := CopyEndDevice(getDevice)
+				setDevice := ttnpb.Clone(getDevice)
 				setDevice.Session.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{
 					{SessionKeyId: []byte("testSession"), FPort: 42},
 					{SessionKeyId: []byte("testSession"), FPort: 42, FCnt: 42},
@@ -328,12 +326,12 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					},
 				}
 
-				dev, sets, err := f(ctx, CopyEndDevice(getDevice))
+				dev, sets, err := f(ctx, ttnpb.Clone(getDevice))
 				if !a.So(err, should.BeNil) {
 					return nil, ctx, err
 				}
 
-				setDevice := CopyEndDevice(getDevice)
+				setDevice := ttnpb.Clone(getDevice)
 				setDevice.Session.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{
 					{SessionKeyId: []byte("testSession"), FPort: 42},
 					{SessionKeyId: []byte("testSession"), FPort: 42, FCnt: 42},
@@ -420,12 +418,12 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					},
 				}
 
-				dev, sets, err := f(ctx, CopyEndDevice(getDevice))
+				dev, sets, err := f(ctx, ttnpb.Clone(getDevice))
 				if !a.So(err, should.BeNil) {
 					return nil, ctx, err
 				}
 
-				setDevice := CopyEndDevice(getDevice)
+				setDevice := ttnpb.Clone(getDevice)
 				setDevice.Session.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{
 					{SessionKeyId: []byte("testSession"), FPort: 42},
 					{SessionKeyId: []byte("testSession"), FPort: 42, FCnt: 42},
@@ -500,12 +498,12 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					},
 				}
 
-				dev, sets, err := f(ctx, CopyEndDevice(getDevice))
+				dev, sets, err := f(ctx, ttnpb.Clone(getDevice))
 				if !a.So(err, should.BeNil) {
 					return nil, ctx, err
 				}
 
-				setDevice := CopyEndDevice(getDevice)
+				setDevice := ttnpb.Clone(getDevice)
 				setDevice.Session.QueuedApplicationDownlinks = nil
 				setDevice.PendingSession.QueuedApplicationDownlinks = nil
 
@@ -580,12 +578,12 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					},
 				}
 
-				dev, sets, err := f(ctx, CopyEndDevice(getDevice))
+				dev, sets, err := f(ctx, ttnpb.Clone(getDevice))
 				if !a.So(err, should.BeNil) {
 					return nil, ctx, err
 				}
 
-				setDevice := CopyEndDevice(getDevice)
+				setDevice := ttnpb.Clone(getDevice)
 				setDevice.Session.QueuedApplicationDownlinks = nil
 				setDevice.PendingSession.QueuedApplicationDownlinks = nil
 
@@ -660,12 +658,12 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					},
 				}
 
-				dev, sets, err := f(ctx, CopyEndDevice(getDevice))
+				dev, sets, err := f(ctx, ttnpb.Clone(getDevice))
 				if !a.So(err, should.BeNil) {
 					return nil, ctx, err
 				}
 
-				setDevice := CopyEndDevice(getDevice)
+				setDevice := ttnpb.Clone(getDevice)
 				setDevice.Session.QueuedApplicationDownlinks = nil
 				setDevice.PendingSession.QueuedApplicationDownlinks = nil
 
@@ -740,7 +738,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					clock := test.NewMockClock(tc.Time)
 					defer SetMockClock(clock)()
 				}
-				req := deepcopy.Copy(tc.Request).(*ttnpb.DownlinkQueueRequest)
+				req := ttnpb.Clone(tc.Request)
 				res, err := ttnpb.NewAsNsClient(ns.LoopbackConn()).DownlinkQueueReplace(ctx, req)
 				if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
 					a.So(res, should.BeNil)
@@ -954,12 +952,12 @@ func TestDownlinkQueuePush(t *testing.T) {
 					},
 				}
 
-				dev, sets, err := f(ctx, CopyEndDevice(getDevice))
+				dev, sets, err := f(ctx, ttnpb.Clone(getDevice))
 				if !a.So(err, should.BeNil) {
 					return nil, ctx, err
 				}
 
-				setDevice := CopyEndDevice(getDevice)
+				setDevice := ttnpb.Clone(getDevice)
 				setDevice.Session.QueuedApplicationDownlinks = append(setDevice.Session.QueuedApplicationDownlinks,
 					&ttnpb.ApplicationDownlink{SessionKeyId: []byte("testSession"), FPort: 42, FCnt: 6},
 					&ttnpb.ApplicationDownlink{SessionKeyId: []byte("testSession"), FPort: 42, FCnt: 42},
@@ -1046,12 +1044,12 @@ func TestDownlinkQueuePush(t *testing.T) {
 					},
 				}
 
-				dev, sets, err := f(ctx, CopyEndDevice(getDevice))
+				dev, sets, err := f(ctx, ttnpb.Clone(getDevice))
 				if !a.So(err, should.BeNil) {
 					return nil, ctx, err
 				}
 
-				setDevice := CopyEndDevice(getDevice)
+				setDevice := ttnpb.Clone(getDevice)
 				setDevice.Session.QueuedApplicationDownlinks = append(setDevice.Session.QueuedApplicationDownlinks,
 					&ttnpb.ApplicationDownlink{SessionKeyId: []byte("testSession"), FPort: 42, FCnt: 6},
 					&ttnpb.ApplicationDownlink{SessionKeyId: []byte("testSession"), FPort: 42, FCnt: 42},
@@ -1330,7 +1328,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					return test.ContextWithTB(ctx, t)
 				})
 
-				req := deepcopy.Copy(tc.Request).(*ttnpb.DownlinkQueueRequest)
+				req := ttnpb.Clone(tc.Request)
 				res, err := ttnpb.NewAsNsClient(ns.LoopbackConn()).DownlinkQueuePush(ctx, req)
 				if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
 					a.So(res, should.BeNil)
@@ -1560,7 +1558,7 @@ func TestDownlinkQueueList(t *testing.T) {
 					return test.ContextWithTB(ctx, t)
 				})
 
-				req := deepcopy.Copy(tc.Request).(*ttnpb.EndDeviceIdentifiers)
+				req := ttnpb.Clone(tc.Request)
 				res, err := ttnpb.NewAsNsClient(ns.LoopbackConn()).DownlinkQueueList(ctx, req)
 				if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
 					a.So(res, should.BeNil)

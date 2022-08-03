@@ -975,7 +975,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 
 	publishEvents(ctx, queuedEvents...)
 	queuedEvents = nil
-	up = CopyUplinkMessage(up)
+	up = ttnpb.Clone(up)
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
@@ -1322,7 +1322,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 
 	publishEvents(ctx, queuedEvents...)
 	queuedEvents = nil
-	up = CopyUplinkMessage(up)
+	up = ttnpb.Clone(up)
 	select {
 	case <-ctx.Done():
 		return ctx.Err()

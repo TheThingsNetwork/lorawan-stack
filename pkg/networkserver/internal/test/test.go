@@ -22,7 +22,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mohae/deepcopy"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
@@ -69,31 +68,6 @@ func CopyStrings(ss []string) []string {
 		return nil
 	}
 	return append([]string{}, ss...)
-}
-
-// CopySession returns a deep copy of *ttnpb.Session pb.
-func CopySession(pb *ttnpb.Session) *ttnpb.Session {
-	return deepcopy.Copy(pb).(*ttnpb.Session)
-}
-
-// CopyMessage returns a deep copy of *ttnpb.Message pb.
-func CopyMessage(pb *ttnpb.Message) *ttnpb.Message {
-	return deepcopy.Copy(pb).(*ttnpb.Message)
-}
-
-// CopyUplinkMessages returns a deep copy of ...*ttnpb.UplinkMessage pbs.
-func CopyUplinkMessages(pbs ...*ttnpb.UplinkMessage) []*ttnpb.UplinkMessage {
-	return deepcopy.Copy(pbs).([]*ttnpb.UplinkMessage)
-}
-
-// CopyDownlinkMessage returns a deep copy of ttnpb.DownlinkMessage pb.
-func CopyDownlinkMessage(pb *ttnpb.DownlinkMessage) *ttnpb.DownlinkMessage {
-	return deepcopy.Copy(pb).(*ttnpb.DownlinkMessage)
-}
-
-// CopyDownlinkMessages returns a deep copy of ...*ttnpb.DownlinkMessage pbs.
-func CopyDownlinkMessages(pbs ...*ttnpb.DownlinkMessage) []*ttnpb.DownlinkMessage {
-	return deepcopy.Copy(pbs).([]*ttnpb.DownlinkMessage)
 }
 
 func DurationPtr(v time.Duration) *time.Duration {
@@ -250,7 +224,7 @@ var DefaultEU868Channels = [...]*ttnpb.MACParameters_Channel{
 }
 
 func MakeDefaultEU868CurrentChannels() []*ttnpb.MACParameters_Channel {
-	return deepcopy.Copy(DefaultEU868Channels[:]).([]*ttnpb.MACParameters_Channel)
+	return ttnpb.CloneSlice(DefaultEU868Channels[:])
 }
 
 func MakeDefaultEU868CurrentMACParameters(phyVersion ttnpb.PHYVersion) *ttnpb.MACParameters {
@@ -351,7 +325,7 @@ var DefaultUS915Channels = func() []*ttnpb.MACParameters_Channel {
 }()
 
 func MakeDefaultUS915CurrentChannels() []*ttnpb.MACParameters_Channel {
-	return deepcopy.Copy(DefaultUS915Channels[:]).([]*ttnpb.MACParameters_Channel)
+	return ttnpb.CloneSlice(DefaultUS915Channels[:])
 }
 
 func MakeDefaultUS915CurrentMACParameters(ver ttnpb.PHYVersion) *ttnpb.MACParameters {
@@ -407,7 +381,7 @@ func MakeDefaultUS915FSB2MACState(class ttnpb.Class, macVersion ttnpb.MACVersion
 
 func MakeUplinkSettings(dr *ttnpb.DataRate, drIdx ttnpb.DataRateIndex, freq uint64) ttnpb.TxSettings {
 	return ttnpb.TxSettings{
-		DataRate:  deepcopy.Copy(dr).(*ttnpb.DataRate),
+		DataRate:  ttnpb.Clone(dr),
 		EnableCrc: true,
 		Frequency: freq,
 		Timestamp: 42,
@@ -432,7 +406,7 @@ func MakeUplinkMessage(conf UplinkMessageConfig) *ttnpb.UplinkMessage {
 		RawPayload:         conf.RawPayload,
 		Payload:            conf.Payload,
 		Settings:           &settings,
-		RxMetadata:         deepcopy.Copy(conf.RxMetadata).([]*ttnpb.RxMetadata),
+		RxMetadata:         ttnpb.CloneSlice(conf.RxMetadata),
 		ReceivedAt:         ttnpb.ProtoTimePtr(conf.ReceivedAt),
 		CorrelationIds:     CopyStrings(conf.CorrelationIDs),
 		DeviceChannelIndex: uint32(conf.ChannelIndex),
@@ -690,7 +664,7 @@ type DataDownlinkConfig struct {
 	FRMPayload []byte
 	FOpts      []byte
 
-	Request ttnpb.TxRequest
+	Request *ttnpb.TxRequest
 
 	SessionKeys *ttnpb.SessionKeys
 }
@@ -751,7 +725,7 @@ func MakeDataDownlink(conf *DataDownlinkConfig) *ttnpb.DownlinkMessage {
 	msg.Mic = mic[:]
 	return &ttnpb.DownlinkMessage{
 		Settings: &ttnpb.DownlinkMessage_Request{
-			Request: deepcopy.Copy(&conf.Request).(*ttnpb.TxRequest),
+			Request: ttnpb.Clone(conf.Request),
 		},
 		RawPayload: append(phyPayload, mic[:]...),
 		Payload: func() *ttnpb.Message {

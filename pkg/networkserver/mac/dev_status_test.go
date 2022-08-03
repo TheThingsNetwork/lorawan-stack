@@ -20,10 +20,8 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
-	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -171,8 +169,8 @@ func TestNeedsDevStatusReq(t *testing.T) {
 			Name:     tc.Name,
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				dev := CopyEndDevice(tc.InputDevice)
-				defaults := deepcopy.Copy(tc.Defaults).(*ttnpb.MACSettings)
+				dev := ttnpb.Clone(tc.InputDevice)
+				defaults := ttnpb.Clone(tc.Defaults)
 				res := DeviceNeedsDevStatusReq(dev, tc.Defaults, scheduleAt)
 				if tc.Needs {
 					a.So(res, should.BeTrue)
@@ -336,7 +334,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 			Name:     tc.Name,
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				dev := CopyEndDevice(tc.Device)
+				dev := ttnpb.Clone(tc.Device)
 
 				evs, err := HandleDevStatusAns(ctx, dev, tc.Payload, tc.FCntUp, tc.ReceivedAt)
 				if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||

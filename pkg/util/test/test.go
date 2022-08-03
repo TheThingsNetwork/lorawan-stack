@@ -41,7 +41,7 @@ var (
 	ErrInternal = errors.DefineInternal("test_internal", "test error")
 	ErrNotFound = errors.DefineNotFound("test_not_found", "test error")
 
-	DefaultApplicationIdentifiers = ttnpb.ApplicationIdentifiers{
+	DefaultApplicationIdentifiers = &ttnpb.ApplicationIdentifiers{
 		ApplicationId: DefaultApplicationID,
 	}
 

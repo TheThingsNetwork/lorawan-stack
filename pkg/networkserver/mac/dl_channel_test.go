@@ -237,7 +237,7 @@ func TestDLChannelReq(t *testing.T) {
 			}(),
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				makeDevice := func() *ttnpb.EndDevice {
-					return CopyEndDevice(&ttnpb.EndDevice{
+					return ttnpb.Clone(&ttnpb.EndDevice{
 						MacState: &ttnpb.MACState{
 							CurrentParameters: &ttnpb.MACParameters{
 								Channels: tc.CurrentChannels,
@@ -610,7 +610,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 			Name:     tc.Name,
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				dev := CopyEndDevice(tc.InputDevice)
+				dev := ttnpb.Clone(tc.InputDevice)
 
 				evs, err := HandleDLChannelAns(ctx, dev, tc.Payload)
 				if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||

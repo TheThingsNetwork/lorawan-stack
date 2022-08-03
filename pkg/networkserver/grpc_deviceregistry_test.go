@@ -22,14 +22,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
-	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -361,7 +359,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					return test.ContextWithTB(ctx, t)
 				})
 
-				req := deepcopy.Copy(tc.Request).(*ttnpb.GetEndDeviceRequest)
+				req := ttnpb.Clone(tc.Request)
 				dev, err := ttnpb.NewNsEndDeviceRegistryClient(ns.LoopbackConn()).Get(ctx, req)
 				if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
 					a.So(dev, should.BeNil)
@@ -391,12 +389,14 @@ func TestDeviceRegistrySet(t *testing.T) {
 
 	multicastClassBMACSettingsOpt := EndDeviceOptions.WithMacSettings(multicastClassBMACSettings)
 
-	currentMACStateOverrideOpt := func(macState ttnpb.MACState) ttnpb.MACState {
+	currentMACStateOverrideOpt := func(macState *ttnpb.MACState) *ttnpb.MACState {
+		macState = ttnpb.Clone(macState)
 		macState.CurrentParameters.Rx1Delay = ttnpb.RxDelay_RX_DELAY_3
 		macState.CurrentParameters.Rx1DataRateOffset = ttnpb.DataRateOffset_DATA_RATE_OFFSET_1
 		return macState
 	}
-	desiredMACStateOverrideOpt := func(macState ttnpb.MACState) ttnpb.MACState {
+	desiredMACStateOverrideOpt := func(macState *ttnpb.MACState) *ttnpb.MACState {
+		macState = ttnpb.Clone(macState)
 		macState.DesiredParameters.Rx1Delay = ttnpb.RxDelay_RX_DELAY_4
 		macState.DesiredParameters.Rx1DataRateOffset = ttnpb.DataRateOffset_DATA_RATE_OFFSET_2
 		return macState
@@ -415,7 +415,8 @@ func TestDeviceRegistrySet(t *testing.T) {
 
 	activateOpt := EndDeviceOptions.Activate(customMACSettings, false, activeSessionOpts, activeMACStateOpts...)
 
-	macStateWithoutRX1DelayOpt := func(dev ttnpb.EndDevice) ttnpb.EndDevice {
+	macStateWithoutRX1DelayOpt := func(dev *ttnpb.EndDevice) *ttnpb.EndDevice {
+		dev = ttnpb.Clone(dev)
 		dev.MacState.CurrentParameters.Rx1Delay = 0
 		return dev
 	}
@@ -755,8 +756,8 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"mac_settings",
 				),
 
-				ReturnedDevice: EndDevicePtr(customMACSettingsOpt(*MakeABPEndDevice(defaultMACSettings, false, activeSessionOptsWithStartedAt, nil))),
-				StoredDevice:   EndDevicePtr(customMACSettingsOpt(*MakeABPEndDevice(defaultMACSettings, true, activeSessionOptsWithStartedAt, nil))),
+				ReturnedDevice: customMACSettingsOpt(MakeABPEndDevice(defaultMACSettings, false, activeSessionOptsWithStartedAt, nil)),
+				StoredDevice:   customMACSettingsOpt(MakeABPEndDevice(defaultMACSettings, true, activeSessionOptsWithStartedAt, nil)),
 			},
 
 			{
@@ -769,8 +770,8 @@ func TestDeviceRegistrySet(t *testing.T) {
 					ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS, // `pending_mac_state` requires key write rights
 				},
 
-				ReturnedDevice: EndDevicePtr(macStateWithoutRX1DelayOpt(*MakeABPEndDevice(defaultMACSettings, false, activeSessionOptsWithStartedAt, nil))),
-				StoredDevice:   EndDevicePtr(macStateWithoutRX1DelayOpt(*MakeABPEndDevice(defaultMACSettings, true, activeSessionOptsWithStartedAt, nil))),
+				ReturnedDevice: macStateWithoutRX1DelayOpt(MakeABPEndDevice(defaultMACSettings, false, activeSessionOptsWithStartedAt, nil)),
+				StoredDevice:   macStateWithoutRX1DelayOpt(MakeABPEndDevice(defaultMACSettings, true, activeSessionOptsWithStartedAt, nil)),
 			},
 		},
 
@@ -783,8 +784,8 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"mac_settings",
 				),
 
-				ReturnedDevice: EndDevicePtr(multicastClassBMACSettingsOpt(*MakeMulticastEndDevice(ttnpb.Class_CLASS_B, defaultMACSettings, false, activeSessionOptsWithStartedAt, nil))),
-				StoredDevice:   EndDevicePtr(multicastClassBMACSettingsOpt(*MakeMulticastEndDevice(ttnpb.Class_CLASS_B, defaultMACSettings, true, activeSessionOptsWithStartedAt, nil))),
+				ReturnedDevice: multicastClassBMACSettingsOpt(MakeMulticastEndDevice(ttnpb.Class_CLASS_B, defaultMACSettings, false, activeSessionOptsWithStartedAt, nil)),
+				StoredDevice:   multicastClassBMACSettingsOpt(MakeMulticastEndDevice(ttnpb.Class_CLASS_B, defaultMACSettings, true, activeSessionOptsWithStartedAt, nil)),
 			},
 		},
 	} {
@@ -858,9 +859,9 @@ func TestDeviceRegistrySet(t *testing.T) {
 					now := clock.Now()
 					withTimestamps := withCreatedAt.Compose(
 						test.EndDeviceOptions.WithUpdatedAt(ttnpb.ProtoTimePtr(now)),
-						func(dev ttnpb.EndDevice) ttnpb.EndDevice {
+						func(dev *ttnpb.EndDevice) *ttnpb.EndDevice {
+							dev = ttnpb.Clone(dev)
 							if dev.Session != nil && dev.Session.StartedAt == nil {
-								dev.Session = CopySession(dev.Session)
 								dev.Session.StartedAt = ttnpb.ProtoTimePtr(now)
 							}
 							return dev
@@ -896,7 +897,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					rights := append([]ttnpb.Right{
 						ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 					}, tc.RequiredRights...)
-					expectedReturn := test.Must(ttnpb.ApplyEndDeviceFieldMask(nil, EndDevicePtr(withTimestamps(*tc.ReturnedDevice)), ttnpb.AddImplicitEndDeviceGetFields(tc.SetDevice.Paths...)...)).(*ttnpb.EndDevice)
+					expectedReturn := test.Must(ttnpb.ApplyEndDeviceFieldMask(nil, withTimestamps(tc.ReturnedDevice), ttnpb.AddImplicitEndDeviceGetFields(tc.SetDevice.Paths...)...)).(*ttnpb.EndDevice)
 
 					dev, err, ok = env.AssertSetDevice(ctx, createDevice == nil, req, rights...)
 					if !a.So(ok, should.BeTrue) || !a.So(err, should.BeNil) || !a.So(dev, should.NotBeNil) {
@@ -914,7 +915,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 						}
 						return
 					}
-					a.So(dev, should.Resemble, EndDevicePtr(withTimestamps(*tc.StoredDevice)))
+					a.So(dev, should.Resemble, withTimestamps(tc.StoredDevice))
 
 					now = clock.Add(time.Nanosecond)
 					dev, err, ok = env.AssertSetDevice(ctx, false, &ttnpb.SetEndDeviceRequest{
@@ -924,7 +925,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					if !a.So(ok, should.BeTrue) || !a.So(err, should.BeNil) || !a.So(dev, should.NotBeNil) {
 						return
 					}
-					a.So(dev, should.Resemble, EndDevicePtr(EndDeviceOptions.WithUpdatedAt(ttnpb.ProtoTimePtr(now))(*expectedReturn)))
+					a.So(dev, should.Resemble, EndDeviceOptions.WithUpdatedAt(ttnpb.ProtoTimePtr(now))(expectedReturn))
 				},
 			})
 		}
@@ -1182,7 +1183,7 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 						return
 					}
 
-					expected := CopyEndDevice(created)
+					expected := ttnpb.Clone(created)
 					expected.BatteryPercentage = nil
 					expected.DownlinkMargin = 0
 					expected.LastDevStatusReceivedAt = nil
@@ -1352,7 +1353,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 					return test.ContextWithTB(ctx, t)
 				})
 
-				req := deepcopy.Copy(tc.Request).(*ttnpb.EndDeviceIdentifiers)
+				req := ttnpb.Clone(tc.Request)
 				res, err := ttnpb.NewNsEndDeviceRegistryClient(ns.LoopbackConn()).Delete(ctx, req)
 				a.So(setByIDCalls, should.Equal, tc.SetByIDCalls)
 				if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {

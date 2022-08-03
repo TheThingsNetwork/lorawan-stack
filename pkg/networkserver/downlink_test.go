@@ -24,7 +24,6 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/mohae/deepcopy"
 	"github.com/oklog/ulid/v2"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
@@ -83,7 +82,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		if len(params.Channels) != customChIdx {
 			panic(fmt.Sprintf("invalid EU868 default channel count, expected %d, got %d", customChIdx, len(params.Channels)))
 		}
-		params.Channels = append(params.Channels, deepcopy.Copy(customCh).(*ttnpb.MACParameters_Channel))
+		params.Channels = append(params.Channels, ttnpb.Clone(customCh))
 		return params
 	}
 
@@ -2621,7 +2620,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				if len(tc.DeviceDiffs) == 0 {
 					a.So(updated, should.Resemble, created)
 				} else {
-					expected := CopyEndDevice(created)
+					expected := ttnpb.Clone(created)
 					expected.UpdatedAt = ttnpb.ProtoTimePtr(now)
 					if down != nil {
 						msg := &ttnpb.Message{}
