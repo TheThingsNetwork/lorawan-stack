@@ -74,10 +74,6 @@ func DurationPtr(v time.Duration) *time.Duration {
 	return &v
 }
 
-func MACStatePtr(v ttnpb.MACState) *ttnpb.MACState {
-	return &v
-}
-
 func Band(fpID string, phyVer ttnpb.PHYVersion) band.Band {
 	return *internal.LoRaWANBands[test.FrequencyPlan(fpID).BandID][phyVer]
 }

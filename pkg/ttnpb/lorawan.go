@@ -969,26 +969,35 @@ func (v RxDelay) Validate() error {
 	return nil
 }
 
-func (v LoRaDataRate) DataRate() *DataRate {
+func (v *LoRaDataRate) DataRate() *DataRate {
+	if v == nil {
+		return nil
+	}
 	return &DataRate{
 		Modulation: &DataRate_Lora{
-			Lora: &v,
+			Lora: v,
 		},
 	}
 }
 
-func (v FSKDataRate) DataRate() *DataRate {
+func (v *FSKDataRate) DataRate() *DataRate {
+	if v == nil {
+		return nil
+	}
 	return &DataRate{
 		Modulation: &DataRate_Fsk{
-			Fsk: &v,
+			Fsk: v,
 		},
 	}
 }
 
-func (v LRFHSSDataRate) DataRate() *DataRate {
+func (v *LRFHSSDataRate) DataRate() *DataRate {
+	if v == nil {
+		return nil
+	}
 	return &DataRate{
 		Modulation: &DataRate_Lrfhss{
-			Lrfhss: &v,
+			Lrfhss: v,
 		},
 	}
 }

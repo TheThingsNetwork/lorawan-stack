@@ -297,9 +297,6 @@ func (dst *GetAsConfigurationRequest) SetFields(src *GetAsConfigurationRequest, 
 	if len(paths) != 0 {
 		return fmt.Errorf("message GetAsConfigurationRequest has no fields, but paths %s were specified", paths)
 	}
-	if src != nil {
-		*dst = *src
-	}
 	return nil
 }
 
