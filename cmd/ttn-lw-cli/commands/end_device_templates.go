@@ -247,7 +247,7 @@ This command takes end device templates from stdin.`,
 				}
 
 				for i := 0; i < count; i++ {
-					res := template
+					res := ttnpb.Clone(&template)
 
 					var devEUI types.EUI64
 					binary.BigEndian.PutUint64(devEUI[:], devEUIInt)
@@ -367,7 +367,7 @@ command to assign EUIs to map to end device templates.`,
 					return err
 				}
 			}
-			var input []ttnpb.EndDeviceTemplate
+			var input []*ttnpb.EndDeviceTemplate
 			for {
 				var entry ttnpb.EndDeviceTemplate
 				_, err := inputDecoder.Decode(&entry)
@@ -377,10 +377,10 @@ command to assign EUIs to map to end device templates.`,
 					}
 					return err
 				}
-				input = append(input, entry)
+				input = append(input, &entry)
 			}
 
-			var mapping []ttnpb.EndDeviceTemplate
+			var mapping []*ttnpb.EndDeviceTemplate
 			reader, err := getDataReader("mapping", cmd.Flags())
 			if err != nil {
 				return err
@@ -397,7 +397,7 @@ command to assign EUIs to map to end device templates.`,
 					}
 					return err
 				}
-				mapping = append(mapping, entry)
+				mapping = append(mapping, &entry)
 			}
 
 			for _, inputEntry := range input {
@@ -416,7 +416,7 @@ command to assign EUIs to map to end device templates.`,
 					default:
 						continue
 					}
-					mappedEntry = &e
+					mappedEntry = ttnpb.Clone(e)
 					break
 				}
 				if mappedEntry == nil {
