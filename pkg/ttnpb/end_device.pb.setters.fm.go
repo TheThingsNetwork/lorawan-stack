@@ -3285,9 +3285,6 @@ func (dst *ADRSettings_DisabledMode) SetFields(src *ADRSettings_DisabledMode, pa
 	if len(paths) != 0 {
 		return fmt.Errorf("message ADRSettings_DisabledMode has no fields, but paths %s were specified", paths)
 	}
-	if src != nil {
-		*dst = *src
-	}
 	return nil
 }
 
@@ -3792,9 +3789,6 @@ func (dst *MACState_UplinkMessage_RxMetadata) SetFields(src *MACState_UplinkMess
 func (dst *MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata) SetFields(src *MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata, paths ...string) error {
 	if len(paths) != 0 {
 		return fmt.Errorf("message MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata has no fields, but paths %s were specified", paths)
-	}
-	if src != nil {
-		*dst = *src
 	}
 	return nil
 }

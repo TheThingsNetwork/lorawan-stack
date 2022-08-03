@@ -1317,9 +1317,6 @@ func (dst *ApplicationWebhookHealth_WebhookHealthStatusHealthy) SetFields(src *A
 	if len(paths) != 0 {
 		return fmt.Errorf("message ApplicationWebhookHealth_WebhookHealthStatusHealthy has no fields, but paths %s were specified", paths)
 	}
-	if src != nil {
-		*dst = *src
-	}
 	return nil
 }
 
