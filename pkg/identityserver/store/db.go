@@ -31,6 +31,11 @@ func OpenDB(ctx context.Context, databaseURI string) (*sql.DB, error) {
 	if pgdriverFeatureFlag.GetValue(ctx) {
 		return sql.OpenDB(pgdriver.NewConnector(
 			pgdriver.WithDSN(databaseURI),
+			// TODO: Enable ResetSessionFunc once a new pgdriver release is available
+			// (https://github.com/TheThingsNetwork/lorawan-stack/issues/5673).
+			// pgdriver.WithResetSessionFunc(func(ctx context.Context, cn *pgdriver.Conn) error {
+			// 	return checkConn(cn.Conn())
+			// }),
 		)), nil
 	}
 	config, err := pgx.ParseConfig(databaseURI)
@@ -38,5 +43,7 @@ func OpenDB(ctx context.Context, databaseURI string) (*sql.DB, error) {
 		return nil, err
 	}
 	config.PreferSimpleProtocol = true
-	return stdlib.OpenDB(*config), nil
+	return stdlib.OpenDB(*config, stdlib.OptionResetSession(func(ctx context.Context, cn *pgx.Conn) error {
+		return checkConn(cn.PgConn().Conn())
+	})), nil
 }
