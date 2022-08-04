@@ -46,6 +46,7 @@ For details about compatibility between different releases, see the **Commitment
     - Read the current values using `ttn-lw-cli dev get <application-id> <device-id> --claim-authentication-code`. This will fetch the value stored in the Join Server as a fallback.
     - Write back the value read `ttn-lw-cli dev set  <application-id> <device-id> --claim-authentication-code.valid_from [xxx] --claim-authentication-code.valid_to [xxx] --claim-authentication-code.value <xxx>`. This will by default write to the Identity Server.
     - Note that this requires a minimum CLI version of 3.21.0.
+- Device Repository no longer uses the `ApplicationID` for validating requests. Authentication is still necessary, but the `ApplicationID` field has been deprecated in the Device Repository API.
 
 ### Fixed
 
@@ -111,7 +112,6 @@ For details about compatibility between different releases, see the **Commitment
 - The application table in the Console now shows the amount of end devices.
 - The organizations table in the Console now shows the amount of collaborators.
 - Table layouts for several entities have been improved on the Console.
-- Device Repository no longer uses the `ApplicationID` for validating requests. Authentication is still necessary, but the `ApplicationID` field has been deprecated in the Device Repository API.
 
 ### Fixed
 
