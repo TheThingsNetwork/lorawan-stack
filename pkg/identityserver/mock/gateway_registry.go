@@ -17,6 +17,7 @@ package mockis
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -56,13 +57,27 @@ type mockISGatewayRegistry struct {
 	gatewayRights map[string]authKeyToRights
 
 	registeredGateway *ttnpb.GatewayIdentifiers
+
+	mu sync.Mutex
 }
 
 func (is *mockISGatewayRegistry) SetRegisteredGateway(gtwIDs *ttnpb.GatewayIdentifiers) {
+	is.mu.Lock()
+	defer is.mu.Unlock()
+
 	is.registeredGateway = gtwIDs
 }
 
-func (is *mockISGatewayRegistry) Add(ctx context.Context, ids *ttnpb.GatewayIdentifiers, key string, gtw *ttnpb.Gateway, rights ...ttnpb.Right) {
+func (is *mockISGatewayRegistry) Add(
+	ctx context.Context,
+	ids *ttnpb.GatewayIdentifiers,
+	key string,
+	gtw *ttnpb.Gateway,
+	rights ...ttnpb.Right,
+) {
+	is.mu.Lock()
+	defer is.mu.Unlock()
+
 	uid := unique.ID(ctx, ids)
 	is.gateways[uid] = gtw
 
@@ -78,6 +93,9 @@ func (is *mockISGatewayRegistry) Add(ctx context.Context, ids *ttnpb.GatewayIden
 }
 
 func (is *mockISGatewayRegistry) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error) {
+	is.mu.Lock()
+	defer is.mu.Unlock()
+
 	uid := unique.ID(ctx, req.GetGatewayIds())
 	gtw, ok := is.gateways[uid]
 	if !ok {
@@ -90,50 +108,70 @@ func (is *mockISGatewayRegistry) Get(ctx context.Context, req *ttnpb.GetGatewayR
 }
 
 func (is *mockISGatewayRegistry) Update(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error) {
+	is.mu.Lock()
+	defer is.mu.Unlock()
+
 	uid := unique.ID(ctx, req.Gateway.GetIds())
 	gtw, ok := is.gateways[uid]
 	if !ok {
 		return nil, errNotFound.New()
 	}
-	gtw.SetFields(req.Gateway, req.FieldMask.GetPaths()...)
+	if err := gtw.SetFields(req.Gateway, req.FieldMask.GetPaths()...); err != nil {
+		return nil, err
+	}
 	return gtw, nil
 }
 
 func (is *mockISGatewayRegistry) Delete(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
+	is.mu.Lock()
+	defer is.mu.Unlock()
+
 	uid := unique.ID(ctx, ids)
 	_, ok := is.gateways[uid]
 	if !ok {
 		return nil, errNotFound.New()
 	}
 	is.gateways[uid] = nil
-	return nil, nil
+	return &pbtypes.Empty{}, nil
 }
 
-func (is *mockISGatewayRegistry) ListRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (res *ttnpb.Rights, err error) {
+func (is *mockISGatewayRegistry) ListRights(
+	ctx context.Context,
+	ids *ttnpb.GatewayIdentifiers,
+) (res *ttnpb.Rights, err error) {
+	is.mu.Lock()
+	defer is.mu.Unlock()
+
 	res = &ttnpb.Rights{}
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return
+		return res, err
 	}
 	authorization, ok := md["authorization"]
 	if !ok || len(authorization) == 0 {
-		return
+		return res, err
 	}
 
 	uid := unique.ID(ctx, ids)
 	auths, ok := is.gatewayAuths[uid]
 	if !ok {
-		return
+		return res, err
 	}
 	for _, auth := range auths {
 		if auth == authorization[0] && is.gatewayRights[uid] != nil {
 			res.Rights = append(res.Rights, is.gatewayRights[uid][auth]...)
 		}
 	}
-	return
+	return res, err
 }
 
-func (is *mockISGatewayRegistry) GetIdentifiersForEUI(ctx context.Context, req *ttnpb.GetGatewayIdentifiersForEUIRequest) (*ttnpb.GatewayIdentifiers, error) {
+func (is *mockISGatewayRegistry) GetIdentifiersForEUI(
+	_ context.Context,
+	req *ttnpb.GetGatewayIdentifiersForEUIRequest,
+) (*ttnpb.GatewayIdentifiers, error) {
+	is.mu.Lock()
+	defer is.mu.Unlock()
+
 	if is.registeredGateway == nil {
 		return nil, errNotFound.New()
 	}

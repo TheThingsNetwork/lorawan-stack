@@ -631,13 +631,6 @@ func (m *GetEndDeviceBrandRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "application_ids":
 
-			if m.GetApplicationIds() == nil {
-				return GetEndDeviceBrandRequestValidationError{
-					field:  "application_ids",
-					reason: "value is required",
-				}
-			}
-
 			if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetEndDeviceBrandRequestValidationError{
@@ -761,13 +754,6 @@ func (m *ListEndDeviceBrandsRequest) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "application_ids":
-
-			if m.GetApplicationIds() == nil {
-				return ListEndDeviceBrandsRequestValidationError{
-					field:  "application_ids",
-					reason: "value is required",
-				}
-			}
 
 			if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
@@ -912,13 +898,6 @@ func (m *GetEndDeviceModelRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "application_ids":
 
-			if m.GetApplicationIds() == nil {
-				return GetEndDeviceModelRequestValidationError{
-					field:  "application_ids",
-					reason: "value is required",
-				}
-			}
-
 			if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetEndDeviceModelRequestValidationError{
@@ -1060,13 +1039,6 @@ func (m *ListEndDeviceModelsRequest) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "application_ids":
-
-			if m.GetApplicationIds() == nil {
-				return ListEndDeviceModelsRequestValidationError{
-					field:  "application_ids",
-					reason: "value is required",
-				}
-			}
 
 			if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
@@ -1231,13 +1203,6 @@ func (m *GetTemplateRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "application_ids":
 
-			if m.GetApplicationIds() == nil {
-				return GetTemplateRequestValidationError{
-					field:  "application_ids",
-					reason: "value is required",
-				}
-			}
-
 			if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetTemplateRequestValidationError{
@@ -1354,13 +1319,6 @@ func (m *GetPayloadFormatterRequest) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "application_ids":
-
-			if m.GetApplicationIds() == nil {
-				return GetPayloadFormatterRequestValidationError{
-					field:  "application_ids",
-					reason: "value is required",
-				}
-			}
 
 			if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {

@@ -103,6 +103,7 @@ For details about compatibility between different releases, see the **Commitment
 - The application table in the Console now shows the amount of end devices.
 - The organizations table in the Console now shows the amount of collaborators.
 - Table layouts for several entities have been improved on the Console.
+- Device Repository no longer uses the `ApplicationID` for validating requests. Authentication is still necessary, but the `ApplicationID` field has been deprecated in the Device Repository API.
 
 ### Fixed
 
