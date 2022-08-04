@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.21.0] - unreleased
+
+### Added
+
 - Component selector for Join Server interoperability configuration. This allows administrators to declare separate Network Server and Application Server configuration for the same JoinEUI ranges in the same interoperability configuration. See [documentation](https://www.thethingsindustries.com/docs/reference/interop-repository/).
 - `BatchGetGatewayConnectionStats` RPC to fetch Gateway Connection Stats for a batch of gateways.
 - The ability to disable the downlink scheduling mechanism for individual end devices (`mac-settings.schedule-downlinks`).
@@ -33,10 +47,6 @@ For details about compatibility between different releases, see the **Commitment
     - Write back the value read `ttn-lw-cli dev set  <application-id> <device-id> --claim-authentication-code.valid_from [xxx] --claim-authentication-code.valid_to [xxx] --claim-authentication-code.value <xxx>`. This will by default write to the Identity Server.
     - Note that this requires a minimum CLI version of 3.21.0.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Console showing `404 Not Found` errors for pages containing user IDs in the path, when the user ID has a length of two.
@@ -45,8 +55,6 @@ For details about compatibility between different releases, see the **Commitment
 - Packet Broker network pages becoming inaccessible until refreshing after a user navigates to a non-existing network.
 - The batch update query for `EndDevice.LastSeenAt` field now specifies the data type of the placeholders.
   - This resolves an issue in the Console where `Last activity` values were inconsistent.
-
-### Security
 
 ## [3.20.2] - 2022-07-20
 
@@ -2259,7 +2267,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.20.2...v3.20
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.21.0...v3.21
+[3.21.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.20.2...v3.21.0
 [3.20.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.20.1...v3.20.2
 [3.20.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.20.0...v3.20.1
 [3.20.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.19.2...v3.20.0
