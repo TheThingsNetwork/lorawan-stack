@@ -34,6 +34,7 @@ type MockDefinition struct {
 	applicationRegistry *mockISApplicationRegistry
 	gatewayRegistry     *mockISGatewayRegistry
 	endDeviceRegistry   *mockISEndDeviceRegistry
+	entityAccess        *mockEntityAccess
 }
 
 type closeMock func()
@@ -52,7 +53,9 @@ func New(ctx context.Context) (*MockDefinition, string, closeMock) {
 			gatewayRights: make(map[string]authKeyToRights),
 		},
 		endDeviceRegistry: &mockISEndDeviceRegistry{},
+		entityAccess:      &mockEntityAccess{},
 	}
+
 	srv := rpcserver.New(ctx)
 
 	ttnpb.RegisterApplicationRegistryServer(srv.Server, is.applicationRegistry)
@@ -62,6 +65,8 @@ func New(ctx context.Context) (*MockDefinition, string, closeMock) {
 	ttnpb.RegisterGatewayAccessServer(srv.Server, is.gatewayRegistry)
 
 	ttnpb.RegisterEndDeviceRegistryServer(srv.Server, is.endDeviceRegistry)
+
+	ttnpb.RegisterEntityAccessServer(srv.Server, is.entityAccess)
 
 	lis, err := net.Listen("tcp", "")
 	if err != nil {
@@ -87,4 +92,9 @@ func (m *MockDefinition) ApplicationRegistry() *mockISApplicationRegistry {
 // GatewayRegistry returns the methods related to the gateway registry.
 func (m *MockDefinition) GatewayRegistry() *mockISGatewayRegistry {
 	return m.gatewayRegistry
+}
+
+// EntityAccess returns the methods related to the access entity.
+func (m *MockDefinition) EntityAccess() *mockEntityAccess {
+	return m.entityAccess
 }

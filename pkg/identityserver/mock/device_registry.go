@@ -36,7 +36,7 @@ func (m *mockISEndDeviceRegistry) Add(ctx context.Context, dev *ttnpb.EndDevice)
 
 func (m *mockISEndDeviceRegistry) load(id string) (*ttnpb.EndDevice, error) {
 	v, ok := m.endDevices.Load(id)
-	if !ok {
+	if !ok || v == nil {
 		return nil, errNotFound.New()
 	}
 	dev, ok := v.(*ttnpb.EndDevice)
@@ -54,9 +54,13 @@ func (m *mockISEndDeviceRegistry) Update(
 	ctx context.Context,
 	in *ttnpb.UpdateEndDeviceRequest,
 ) (*ttnpb.EndDevice, error) {
-	if err := in.EndDevice.SetFields(in.EndDevice, in.GetFieldMask().GetPaths()...); err != nil {
+	dev, err := m.load(unique.ID(ctx, in.GetEndDevice().GetIds()))
+	if err != nil {
 		return nil, err
 	}
-	m.Add(ctx, in.EndDevice)
-	return m.load(unique.ID(ctx, in.GetEndDevice().GetIds()))
+	if err := dev.SetFields(in.EndDevice, in.GetFieldMask().GetPaths()...); err != nil {
+		return nil, err
+	}
+	m.Add(ctx, dev)
+	return dev, nil
 }
