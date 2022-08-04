@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import classnames from 'classnames'
-import { useField } from 'formik'
-import { isPlainObject } from 'lodash'
+import { isPlainObject, pick, isEmpty, at, compact, get } from 'lodash'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -69,6 +68,9 @@ const extractValue = value => {
   return newValue
 }
 
+const defaultValueSetter = ({ setFieldValue, setValues }, { name, names, value }) =>
+  names.length > 1 ? setValues(values => ({ ...values, ...value })) : setFieldValue(name, value)
+
 const FormField = props => {
   const {
     className,
@@ -79,7 +81,6 @@ const FormField = props => {
     encode,
     fieldWidth,
     name,
-    connectedFields,
     readOnly,
     required,
     title,
@@ -98,28 +99,33 @@ const FormField = props => {
     setFieldValue,
     setFieldTouched,
     setValues,
-    addToFieldRegistry,
-    removeFromFieldRegistry,
+    values,
+    errors: formErrors,
+    registerField,
+    unregisterField,
+    touched: formTouched,
   } = useFormContext()
 
-  // Initialize field, which also takes care of registering fields in formik's internal registry.
-  const [{ value: encodedValue }, { touched, error = false }] = useField({
-    name,
-    validate,
-  })
+  // Generate streamlined `names` variable to handle both composite and simple fields.
+  const names = useMemo(() => name.split(','), [name])
+  const isCompositeField = names.length > 1
 
-  // Apply any connected names to the field registry.
+  // Extract field state.
+  const errors = compact(at(formErrors, names))
+  const touched = at(formTouched, names).some(Boolean)
+  const encodedValue = isCompositeField ? pick(values, names) : get(values, name)
+
+  // Register field(s) in formiks internal field registry.
   useEffect(() => {
-    if (connectedFields) {
-      addToFieldRegistry(connectedFields)
-      return () => {
-        removeFromFieldRegistry(connectedFields)
+    for (const name of names) {
+      registerField(name, { validate })
+    }
+    return () => {
+      for (const name of names) {
+        unregisterField(name)
       }
     }
-    // Using a custom comparator for the array to avoid infinite render loops.
-    // Solution as per https://github.com/facebook/react/issues/14476#issuecomment-471199055
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [addToFieldRegistry, JSON.stringify(connectedFields), removeFromFieldRegistry])
+  }, [names, registerField, unregisterField, validate])
 
   const handleChange = useCallback(
     async (value, enforceValidation = false) => {
@@ -138,41 +144,56 @@ const FormField = props => {
         }
       }
 
-      // This middleware takes care of updating the form values  and allows for more control
+      // This middleware takes care of updating the form values and allows for more control
       // over how the form values are changed if needed. See the default prop to understand
       // how the value is set by default.
       await valueSetter(
         { setFieldValue, setValues, setFieldTouched },
-        { name, value: newValue, oldValue },
+        { name, names, value: newValue, oldValue },
       )
 
       if (enforceValidation) {
-        setFieldTouched(name, true, true)
+        for (const name of names) {
+          setFieldTouched(name, true, true)
+        }
       }
 
       onChange(isSyntheticEvent ? value : encode(value, oldValue))
     },
-    [encode, encodedValue, name, onChange, setFieldTouched, setFieldValue, setValues, valueSetter],
+    [
+      encode,
+      encodedValue,
+      name,
+      names,
+      onChange,
+      setFieldTouched,
+      setFieldValue,
+      setValues,
+      valueSetter,
+    ],
   )
 
   const handleBlur = useCallback(
     event => {
       if (validateOnBlur) {
         const value = extractValue(event)
-        setFieldTouched(name, !isValueEmpty(value))
+        for (const name of names) {
+          setFieldTouched(name, !isValueEmpty(value))
+        }
       }
 
       onBlur(event)
     },
-    [validateOnBlur, onBlur, setFieldTouched, name],
+    [validateOnBlur, onBlur, names, setFieldTouched],
   )
 
   const value = decode(encodedValue)
   const disabled = inputDisabled || formDisabled
   const hasTooltip = Boolean(tooltipId)
   const hasTitle = Boolean(title)
-  const showError = touched && Boolean(error)
-  const showWarning = !Boolean(error) && Boolean(warning)
+  const showError = touched && !isEmpty(errors)
+  const showWarning = !isEmpty(errors) && Boolean(warning)
+  const error = showError && errors[0]
   const showDescription = !showError && !showWarning && Boolean(description)
   const tooltipIcon = hasTooltip ? <Tooltip id={tooltipId} glossaryTerm={title} /> : null
   const describedBy = showError
@@ -257,7 +278,6 @@ FormField.propTypes = {
       render: PropTypes.func.isRequired,
     }),
   ]).isRequired,
-  connectedFields: PropTypes.arrayOf(PropTypes.string),
   decode: PropTypes.func,
   description: PropTypes.message,
   disabled: PropTypes.bool,
@@ -290,7 +310,6 @@ FormField.propTypes = {
 
 FormField.defaultProps = {
   className: undefined,
-  connectedFields: undefined,
   decode: value => value,
   description: '',
   disabled: false,
@@ -304,7 +323,7 @@ FormField.defaultProps = {
   titleChildren: null,
   tooltipId: '',
   validate: undefined,
-  valueSetter: ({ setFieldValue }, { name, value }) => setFieldValue(name, value),
+  valueSetter: defaultValueSetter,
   warning: '',
 }
 
