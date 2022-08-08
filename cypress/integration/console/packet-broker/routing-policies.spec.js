@@ -25,14 +25,14 @@ describe('Packet Broker routing policies', () => {
     cy.intercept('/api/v3/pba/forwarders/policies*', {
       fixture: 'console/packet-broker/policies-forwarder.json',
     })
+    cy.intercept('GET', '/api/v3/pba/home-networks/gateway-visibilities/default', {
+      statusCode: 404,
+    })
 
     cy.loginConsole({ user_id: 'admin', password: 'admin' })
   })
 
   it('succeeds setting a default routing policy', () => {
-    cy.intercept('GET', '/api/v3/pba/home-networks/gateway-visibilities/default', {
-      statusCode: 404,
-    })
     cy.intercept('GET', '/api/v3/pba/home-networks/policies/default', { statusCode: 404 })
     cy.intercept('PUT', '/api/v3/pba/home-networks/policies/default', {})
     cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker`)
@@ -66,9 +66,6 @@ describe('Packet Broker routing policies', () => {
   })
 
   it('succeeds unsetting a default routing policy', () => {
-    cy.intercept('GET', '/api/v3/pba/home-networks/gateway-visibilities/default', {
-      statusCode: 404,
-    })
     cy.intercept('GET', '/api/v3/pba/home-networks/policies/default', {
       fixture: 'console/packet-broker/default-policy.json',
     })
@@ -87,9 +84,6 @@ describe('Packet Broker routing policies', () => {
   })
 
   it('succeeds setting individual per-network routing policy', () => {
-    cy.intercept('GET', '/api/v3/pba/home-networks/gateway-visibilities/default', {
-      statusCode: 404,
-    })
     cy.intercept('GET', '/api/v3/pba/home-networks/policies/default', {
       fixture: 'console/packet-broker/default-policy.json',
     })
@@ -142,9 +136,6 @@ describe('Packet Broker routing policies', () => {
       statusCode: 404,
       fixture: '404-body.json',
     })
-    cy.intercept('GET', '/api/v3/pba/home-networks/gateway-visibilities/default', {
-      statusCode: 404,
-    })
     cy.intercept('DELETE', '/api/v3/pba/home-networks/policies/19', {})
 
     cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker/networks/19`)
@@ -167,9 +158,6 @@ describe('Packet Broker routing policies', () => {
     )
     cy.intercept('GET', '/api/v3/pba/home-networks/policies/default', {
       fixture: 'console/packet-broker/default-policy.json',
-    })
-    cy.intercept('GET', '/api/v3/pba/home-networks/gateway-visibilities/default', {
-      statusCode: 404,
     })
     cy.intercept('DELETE', '/api/v3/pba/home-networks/policies/19', {})
 
