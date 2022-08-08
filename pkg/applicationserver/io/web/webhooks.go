@@ -279,30 +279,64 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 	return nil
 }
 
-func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hook *ttnpb.ApplicationWebhook) (*http.Request, error) {
-	var cfg *ttnpb.ApplicationWebhook_Message
+func activeWebhookUplinkMessage(
+	msg *ttnpb.ApplicationUp, hook *ttnpb.ApplicationWebhook,
+) *ttnpb.ApplicationWebhook_Message {
 	switch msg.Up.(type) {
 	case *ttnpb.ApplicationUp_UplinkMessage:
-		cfg = hook.UplinkMessage
+		return hook.UplinkMessage
 	case *ttnpb.ApplicationUp_JoinAccept:
-		cfg = hook.JoinAccept
+		return hook.JoinAccept
 	case *ttnpb.ApplicationUp_DownlinkAck:
-		cfg = hook.DownlinkAck
+		return hook.DownlinkAck
 	case *ttnpb.ApplicationUp_DownlinkNack:
-		cfg = hook.DownlinkNack
+		return hook.DownlinkNack
 	case *ttnpb.ApplicationUp_DownlinkSent:
-		cfg = hook.DownlinkSent
+		return hook.DownlinkSent
 	case *ttnpb.ApplicationUp_DownlinkFailed:
-		cfg = hook.DownlinkFailed
+		return hook.DownlinkFailed
 	case *ttnpb.ApplicationUp_DownlinkQueued:
-		cfg = hook.DownlinkQueued
+		return hook.DownlinkQueued
 	case *ttnpb.ApplicationUp_DownlinkQueueInvalidated:
-		cfg = hook.DownlinkQueueInvalidated
+		return hook.DownlinkQueueInvalidated
 	case *ttnpb.ApplicationUp_LocationSolved:
-		cfg = hook.LocationSolved
+		return hook.LocationSolved
 	case *ttnpb.ApplicationUp_ServiceData:
-		cfg = hook.ServiceData
+		return hook.ServiceData
 	}
+	return nil
+}
+
+func webhookUplinkMessageMask(msg *ttnpb.ApplicationUp) string {
+	switch msg.Up.(type) {
+	case *ttnpb.ApplicationUp_UplinkMessage:
+		return "up.uplink_message"
+	case *ttnpb.ApplicationUp_JoinAccept:
+		return "up.join_accept"
+	case *ttnpb.ApplicationUp_DownlinkAck:
+		return "up.downlink_ack"
+	case *ttnpb.ApplicationUp_DownlinkNack:
+		return "up.downlink_nack"
+	case *ttnpb.ApplicationUp_DownlinkSent:
+		return "up.downlink_sent"
+	case *ttnpb.ApplicationUp_DownlinkFailed:
+		return "up.downlink_failed"
+	case *ttnpb.ApplicationUp_DownlinkQueued:
+		return "up.downlink_queued"
+	case *ttnpb.ApplicationUp_DownlinkQueueInvalidated:
+		return "up.downlink_queue_invalidated"
+	case *ttnpb.ApplicationUp_LocationSolved:
+		return "up.location_solved"
+	case *ttnpb.ApplicationUp_ServiceData:
+		return "up.service_data"
+	}
+	return ""
+}
+
+func (w *webhooks) newRequest(
+	ctx context.Context, msg *ttnpb.ApplicationUp, hook *ttnpb.ApplicationWebhook,
+) (*http.Request, error) {
+	cfg := activeWebhookUplinkMessage(msg, hook)
 	if cfg == nil {
 		return nil, nil
 	}
@@ -335,6 +369,11 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 		return nil, errFormatNotFound.WithAttributes("format", hook.Format)
 	}
 	if paths := hook.FieldMask.GetPaths(); len(paths) > 0 {
+		mask := webhookUplinkMessageMask(msg)
+		included := ttnpb.IncludeFields(paths, mask)
+		// Filter active oneof field paths by removing all `up` fields
+		// and appending paths related to the active oneof `up` field
+		paths = append(ttnpb.ExcludeSubFields(paths, "up"), included...)
 		up := &ttnpb.ApplicationUp{}
 		if err := up.SetFields(msg, paths...); err != nil {
 			return nil, err
