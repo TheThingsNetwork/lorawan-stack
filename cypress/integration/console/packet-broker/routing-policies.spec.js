@@ -25,14 +25,14 @@ describe('Packet Broker routing policies', () => {
     cy.intercept('/api/v3/pba/forwarders/policies*', {
       fixture: 'console/packet-broker/policies-forwarder.json',
     })
+    cy.intercept('GET', '/api/v3/pba/home-networks/gateway-visibilities/default', {
+      statusCode: 404,
+    })
 
     cy.loginConsole({ user_id: 'admin', password: 'admin' })
   })
 
   it('succeeds setting a default routing policy', () => {
-    cy.intercept('GET', '/api/v3/pba/home-networks/gateway-visibilities/default', {
-      statusCode: 404,
-    })
     cy.intercept('GET', '/api/v3/pba/home-networks/policies/default', { statusCode: 404 })
     cy.intercept('PUT', '/api/v3/pba/home-networks/policies/default', {})
     cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker`)
@@ -66,9 +66,6 @@ describe('Packet Broker routing policies', () => {
   })
 
   it('succeeds unsetting a default routing policy', () => {
-    cy.intercept('GET', '/api/v3/pba/home-networks/gateway-visibilities/default', {
-      statusCode: 404,
-    })
     cy.intercept('GET', '/api/v3/pba/home-networks/policies/default', {
       fixture: 'console/packet-broker/default-policy.json',
     })
