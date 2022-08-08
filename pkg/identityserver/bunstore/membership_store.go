@@ -119,7 +119,7 @@ func (s *membershipStore) selectWithUUIDsInMemberships(
 	if includeIndirect {
 		return func(q *bun.SelectQuery) *bun.SelectQuery {
 			return q.Where(
-				"?TableAlias.id IN (?) OR ?TableAlias.id IN (?)",
+				"?TableAlias.id IN (? UNION ?)",
 				directMembershipSelectQuery,
 				indirectMembershipSelectQuery,
 			)
