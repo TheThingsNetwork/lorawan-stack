@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- New `SearchAccounts` RPC on the `EntityRegistrySearch` service.
+
 ### Changed
 
 ### Deprecated
