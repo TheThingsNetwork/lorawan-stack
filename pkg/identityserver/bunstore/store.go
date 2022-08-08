@@ -104,6 +104,10 @@ func (s *baseStore) transact(ctx context.Context, fc func(context.Context, bun.I
 	done = true
 	err = tx.Commit()
 	if err != nil {
+		// tx.Commit returns an error if the context provided to BeginTx is canceled.
+		if ctxErr := ctx.Err(); ctxErr != nil && errors.Is(err, sql.ErrTxDone) {
+			return ctxErr
+		}
 		return wrapDriverError(err)
 	}
 	return nil
