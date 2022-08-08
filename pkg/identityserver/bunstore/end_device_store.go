@@ -141,6 +141,11 @@ func endDeviceToPB(m *EndDevice, fieldMask ...string) (*ttnpb.EndDevice, error) 
 		pb.Locations = make(map[string]*ttnpb.Location, len(m.Locations))
 		for _, location := range m.Locations {
 			locationPB := locationToPB(location.Location)
+			if locationPB == nil {
+				// Unfortunately it's relatively common to have nil or zero locations in the database.
+				// If that's the case, we still need to set the source on a zero location.
+				locationPB = &ttnpb.Location{}
+			}
 			locationPB.Source = ttnpb.LocationSource(location.Source)
 			pb.Locations[location.Service] = locationPB
 		}
