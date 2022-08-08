@@ -164,7 +164,9 @@ func (s *membershipStore) FindMemberships(
 	))
 	defer span.End()
 
-	selectWithUUID, err := s.selectWithUUIDsInMemberships(ctx, accountID, entityType, includeIndirect)
+	selectWithUUID, err := s.selectWithUUIDsInMemberships(
+		ctx, accountID, entityType, includeIndirect && accountID.EntityType() == "user",
+	)
 	if err != nil {
 		return nil, err
 	}

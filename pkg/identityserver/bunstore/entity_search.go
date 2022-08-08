@@ -133,7 +133,7 @@ func (s *entitySearch) SearchApplications(
 			attribute.String("member_type", accountID.EntityType()),
 			attribute.String("member_id", accountID.IDString()),
 		)
-		selectWithUUID, err := s.selectWithUUIDsInMemberships(ctx, accountID, "application", true)
+		selectWithUUID, err := s.selectWithUUIDsInMemberships(ctx, accountID, "application", accountID.EntityType() == "user")
 		if err != nil {
 			return nil, err
 		}
@@ -169,7 +169,7 @@ func (s *entitySearch) SearchClients(
 			attribute.String("member_type", accountID.EntityType()),
 			attribute.String("member_id", accountID.IDString()),
 		)
-		selectWithUUID, err := s.selectWithUUIDsInMemberships(ctx, accountID, "client", true)
+		selectWithUUID, err := s.selectWithUUIDsInMemberships(ctx, accountID, "client", accountID.EntityType() == "user")
 		if err != nil {
 			return nil, err
 		}
@@ -247,7 +247,7 @@ func (s *entitySearch) SearchGateways(
 			attribute.String("member_type", accountID.EntityType()),
 			attribute.String("member_id", accountID.IDString()),
 		)
-		selectWithUUID, err := s.selectWithUUIDsInMemberships(ctx, accountID, "gateway", true)
+		selectWithUUID, err := s.selectWithUUIDsInMemberships(ctx, accountID, "gateway", accountID.EntityType() == "user")
 		if err != nil {
 			return nil, err
 		}
