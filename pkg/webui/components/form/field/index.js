@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import classnames from 'classnames'
-import { useField } from 'formik'
-import { isPlainObject } from 'lodash'
+import { isPlainObject, pick, isEmpty, at, compact, get } from 'lodash'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -69,6 +68,9 @@ const extractValue = value => {
   return newValue
 }
 
+const defaultValueSetter = ({ setFieldValue, setValues }, { name, names, value }) =>
+  names.length > 1 ? setValues(values => ({ ...values, ...value })) : setFieldValue(name, value)
+
 const FormField = props => {
   const {
     className,
@@ -86,6 +88,7 @@ const FormField = props => {
     tooltipId,
     warning,
     validate,
+    valueSetter,
     onChange,
     onBlur,
   } = props
@@ -95,17 +98,39 @@ const FormField = props => {
     validateOnBlur,
     setFieldValue,
     setFieldTouched,
+    setValues,
+    values,
+    errors: formErrors,
+    registerField,
+    unregisterField,
+    touched: formTouched,
   } = useFormContext()
 
-  // Initialize field, which also takes care of registering fields in formik's internal registry.
-  const [{ value: encodedValue }, { touched, error = false }] = useField({
-    name,
-    validate,
-  })
+  // Generate streamlined `names` variable to handle both composite and simple fields.
+  const names = useMemo(() => name.split(','), [name])
+  const isCompositeField = names.length > 1
+
+  // Extract field state.
+  const errors = compact(at(formErrors, names))
+  const touched = at(formTouched, names).some(Boolean)
+  const encodedValue = isCompositeField ? pick(values, names) : get(values, name)
+
+  // Register field(s) in formiks internal field registry.
+  useEffect(() => {
+    for (const name of names) {
+      registerField(name, { validate })
+    }
+    return () => {
+      for (const name of names) {
+        unregisterField(name)
+      }
+    }
+  }, [names, registerField, unregisterField, validate])
 
   const handleChange = useCallback(
     async (value, enforceValidation = false) => {
-      const newValue = encode(extractValue(value))
+      const oldValue = encodedValue
+      const newValue = encode(extractValue(value), oldValue)
       let isSyntheticEvent = false
 
       if (isPlainObject(value)) {
@@ -119,35 +144,56 @@ const FormField = props => {
         }
       }
 
-      await setFieldValue(name, newValue)
+      // This middleware takes care of updating the form values and allows for more control
+      // over how the form values are changed if needed. See the default prop to understand
+      // how the value is set by default.
+      await valueSetter(
+        { setFieldValue, setValues, setFieldTouched },
+        { name, names, value: newValue, oldValue },
+      )
 
       if (enforceValidation) {
-        setFieldTouched(name, true, true)
+        for (const name of names) {
+          setFieldTouched(name, true, true)
+        }
       }
 
-      onChange(isSyntheticEvent ? value : encode(value))
+      onChange(isSyntheticEvent ? value : encode(value, oldValue))
     },
-    [encode, name, onChange, setFieldTouched, setFieldValue],
+    [
+      encode,
+      encodedValue,
+      name,
+      names,
+      onChange,
+      setFieldTouched,
+      setFieldValue,
+      setValues,
+      valueSetter,
+    ],
   )
 
   const handleBlur = useCallback(
     event => {
       if (validateOnBlur) {
         const value = extractValue(event)
-        setFieldTouched(name, !isValueEmpty(value))
+        for (const name of names) {
+          setFieldTouched(name, !isValueEmpty(value))
+        }
       }
 
       onBlur(event)
     },
-    [validateOnBlur, onBlur, setFieldTouched, name],
+    [validateOnBlur, onBlur, names, setFieldTouched],
   )
 
   const value = decode(encodedValue)
   const disabled = inputDisabled || formDisabled
   const hasTooltip = Boolean(tooltipId)
   const hasTitle = Boolean(title)
-  const showError = touched && Boolean(error)
-  const showWarning = !Boolean(error) && Boolean(warning)
+  const showError = touched && !isEmpty(errors)
+  const showWarning = !isEmpty(errors) && Boolean(warning)
+  const error = showError && errors[0]
   const showDescription = !showError && !showWarning && Boolean(description)
   const tooltipIcon = hasTooltip ? <Tooltip id={tooltipId} glossaryTerm={title} /> : null
   const describedBy = showError
@@ -258,6 +304,7 @@ FormField.propTypes = {
   titleChildren: PropTypes.oneOfType([PropTypes.node, PropTypes.arrayOf(PropTypes.node)]),
   tooltipId: PropTypes.string,
   validate: PropTypes.func,
+  valueSetter: PropTypes.func,
   warning: PropTypes.message,
 }
 
@@ -276,6 +323,7 @@ FormField.defaultProps = {
   titleChildren: null,
   tooltipId: '',
   validate: undefined,
+  valueSetter: defaultValueSetter,
   warning: '',
 }
 

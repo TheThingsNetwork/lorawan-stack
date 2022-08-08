@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
   yupToFormErrors,
   useFormikContext,
@@ -22,7 +22,7 @@ import {
 } from 'formik'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import { defineMessages } from 'react-intl'
-import { isPlainObject } from 'lodash'
+import { isPlainObject, isFunction, pick, omitBy, pull } from 'lodash'
 
 import Notification from '@ttn-lw/components/notification'
 import ErrorNotification from '@ttn-lw/components/error-notification'
@@ -50,6 +50,7 @@ const Form = props => {
     error,
     errorTitle,
     formikRef,
+    hiddenFields,
     id,
     info,
     infoTitle,
@@ -60,11 +61,14 @@ const Form = props => {
     validateOnChange,
     validateOnMount,
     validateSync,
-    validationContext,
+    validationContext: initialValidationContext,
     validationSchema,
+    validateAgainstCleanedValues,
   } = props
 
   const notificationRef = React.useRef()
+  const [fieldRegistry, setFieldRegistry] = useState(hiddenFields)
+  const [validationContext, setValidationContext] = useState(initialValidationContext)
 
   // Recreate the validation hook to allow passing down validation contexts.
   const validate = useCallback(
@@ -73,9 +77,14 @@ const Form = props => {
         return {}
       }
 
+      // If wished, validate against cleaned values. This flag is used solely for backwards
+      // compatibility and new forms should always validate against cleaned values.
+      // TODO: Refactor forms so that cleaned values can be used always.
+      const validateValues = validateAgainstCleanedValues ? pick(values, fieldRegistry) : values
+
       if (validateSync) {
         try {
-          validateYupSchema(values, validationSchema, validateSync, validationContext)
+          validateYupSchema(validateValues, validationSchema, validateSync, validationContext)
 
           return {}
         } catch (err) {
@@ -88,7 +97,7 @@ const Form = props => {
       }
 
       return new Promise((resolve, reject) => {
-        validateYupSchema(values, validationSchema, validateSync, validationContext).then(
+        validateYupSchema(validateValues, validationSchema, validateSync, validationContext).then(
           () => {
             resolve({})
           },
@@ -104,13 +113,24 @@ const Form = props => {
         )
       })
     },
-    [validationSchema, validateSync, validationContext, error],
+    [
+      validationSchema,
+      validateAgainstCleanedValues,
+      fieldRegistry,
+      validateSync,
+      validationContext,
+      error,
+    ],
   )
 
+  // Recreate form submit handler to enable stripping values as well as error logging.
   const handleSubmit = useCallback(
-    async (...args) => {
+    (values, formikBag) => {
       try {
-        return await onSubmit(...args)
+        // Compose clean values as well, which do not contain values of unmounted
+        // fields, as well as pseudo values (starting with `_`).
+        const cleanedValues = omitBy(pick(values, fieldRegistry), (_, key) => key.startsWith('_'))
+        return onSubmit(values, formikBag, cleanedValues)
       } catch (error) {
         // Make sure all unhandled exceptions during submit are ingested.
         ingestError(error, { ingestedBy: 'FormSubmit' })
@@ -118,7 +138,7 @@ const Form = props => {
         throw error
       }
     },
-    [onSubmit],
+    [fieldRegistry, onSubmit],
   )
 
   // Initialize formik and get the formik context to provide to form children.
@@ -139,7 +159,37 @@ const Form = props => {
     isValid,
     handleSubmit: handleFormikSubmit,
     handleReset: handleFormikReset,
+    registerField: registerFormikField,
+    unregisterField: unregisterFormikField,
   } = formik
+
+  const addToFieldRegistry = useCallback(name => {
+    setFieldRegistry(fieldRegistry => [...fieldRegistry, name])
+  }, [])
+
+  const removeFromFieldRegistry = useCallback(name => {
+    setFieldRegistry(fieldRegistry => pull([...fieldRegistry], name))
+  }, [])
+
+  // Recreate field registration, so the component can keep track of registered fields,
+  // allowing automatic removal of unused field values from the value set if wished.
+  const registerField = useCallback(
+    (name, validate) => {
+      registerFormikField(name, validate)
+      addToFieldRegistry(name)
+    },
+    [addToFieldRegistry, registerFormikField],
+  )
+
+  // Recreate field registration, so the component can keep track of registered fields,
+  // allowing automatic removal of unused field values from the value set if wished.
+  const unregisterField = useCallback(
+    name => {
+      unregisterFormikField(name)
+      removeFromFieldRegistry(name)
+    },
+    [removeFromFieldRegistry, unregisterFormikField],
+  )
 
   // Connect the ref with the formik context to ensure compatibility with older form components.
   // NOTE: New components should not use the ref, but use the form context directly.
@@ -169,7 +219,12 @@ const Form = props => {
     <FormikProvider
       value={{
         disabled,
+        addToFieldRegistry,
+        removeFromFieldRegistry,
         ...formik,
+        registerField,
+        unregisterField,
+        setValidationContext,
       }}
     >
       <form className={className} id={id} onSubmit={handleFormikSubmit} onReset={handleFormikReset}>
@@ -179,7 +234,7 @@ const Form = props => {
             {info && <Notification content={info} title={infoTitle} info small />}
           </div>
         )}
-        {children}
+        {isFunction(children) ? children(formik) : children}
       </form>
     </FormikProvider>
   )
@@ -193,12 +248,14 @@ Form.propTypes = {
   error: PropTypes.error,
   errorTitle: PropTypes.message,
   formikRef: PropTypes.shape({ current: PropTypes.shape({}) }),
+  hiddenFields: PropTypes.arrayOf(PropTypes.string),
   id: PropTypes.string,
   info: PropTypes.message,
   infoTitle: PropTypes.message,
   initialValues: PropTypes.shape({}),
   onReset: PropTypes.func,
   onSubmit: PropTypes.func,
+  validateAgainstCleanedValues: PropTypes.bool,
   validateOnBlur: PropTypes.bool,
   validateOnChange: PropTypes.bool,
   validateOnMount: PropTypes.bool,
@@ -213,6 +270,7 @@ Form.defaultProps = {
   enableReinitialize: false,
   error: undefined,
   errorTitle: m.submitFailed,
+  hiddenFields: [],
   info: undefined,
   infoTitle: undefined,
   formikRef: undefined,
@@ -220,6 +278,7 @@ Form.defaultProps = {
   initialValues: undefined,
   onReset: () => null,
   onSubmit: () => null,
+  validateAgainstCleanedValues: false,
   validateOnBlur: true,
   validateOnChange: false,
   validateOnMount: false,
