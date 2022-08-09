@@ -136,8 +136,11 @@ jobs:
         uses: ./.github/actions/build-mage
       - name: Install Node and Dependencies
         uses: ./.github/actions/install-node-and-deps
-      - name: Fix chrome version
-        uses: browser-actions/setup-chrome@latest
+      - name: Upgrade Google Chrome
+        run: |
+          sudo apt-get update
+          sudo apt-get --only-upgrade install google-chrome-stable
+          google-chrome --version
       - uses: actions/download-artifact@v2
         name: Download build artifacts
         with:
