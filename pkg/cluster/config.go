@@ -27,8 +27,9 @@ type Config struct {
 	CryptoServer               string   `name:"crypto-server" description:"Address for the Crypto Server"`
 	PacketBrokerAgent          string   `name:"packet-broker-agent" description:"Address of the Packet Broker Agent"`
 	DeviceRepository           string   `name:"device-repository" description:"Address for the Device Repository"`
-	GatewayConfigurationServer string   `name:"gateway-configuration-server" description:"Address for the Gateway Configuration Server"`
+	GatewayConfigurationServer string   `name:"gateway-configuration-server" description:"Address for the Gateway Configuration Server"` //nolint:lll
+	DeviceClaimingServer       string   `name:"device-claiming-server" description:"Address for the Device Claiming Server"`             //nolint:lll
 	TLS                        bool     `name:"tls" description:"Do cluster gRPC over TLS"`
-	TLSServerName              string   `name:"tls-server-name" description:"Server name to use in TLS handshake to cluster peers"`
-	Keys                       []string `name:"keys" description:"Keys used to communicate between components of the cluster. The first one will be used by the cluster to identify itself"`
+	TLSServerName              string   `name:"tls-server-name" description:"Server name to use in TLS handshake to cluster peers"`                                                          //nolint:lll
+	Keys                       []string `name:"keys" description:"Keys used to communicate between components of the cluster. The first one will be used by the cluster to identify itself"` //nolint:lll
 }
