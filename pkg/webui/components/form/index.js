@@ -163,12 +163,12 @@ const Form = props => {
     unregisterField: unregisterFormikField,
   } = formik
 
-  const addToFieldRegistry = useCallback(name => {
-    setFieldRegistry(fieldRegistry => [...fieldRegistry, name])
+  const addToFieldRegistry = useCallback((...name) => {
+    setFieldRegistry(fieldRegistry => [...fieldRegistry, ...name])
   }, [])
 
-  const removeFromFieldRegistry = useCallback(name => {
-    setFieldRegistry(fieldRegistry => pull([...fieldRegistry], name))
+  const removeFromFieldRegistry = useCallback((...name) => {
+    setFieldRegistry(fieldRegistry => pull([...fieldRegistry], ...name))
   }, [])
 
   // Recreate field registration, so the component can keep track of registered fields,
