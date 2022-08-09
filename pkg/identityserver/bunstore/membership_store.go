@@ -229,14 +229,19 @@ func (s *membershipStore) FindAccountMembershipChains(
 		return nil, err
 	}
 
+	entityUUIDs, err := s.getEntityUUIDs(ctx, entityType, entityIDs...)
+	if err != nil {
+		return nil, err
+	}
+
 	var directMemberships []*directEntityMembership
 	directSelectQuery := s.DB.NewSelect().
 		Model(&directMemberships).
 		Where("account_id = ?", account.ID).
 		Where("entity_type = ?", entityType)
 
-	if len(entityIDs) > 0 {
-		directSelectQuery = directSelectQuery.Where("entity_friendly_id IN (?)", bun.In(entityIDs))
+	if len(entityUUIDs) > 0 {
+		directSelectQuery = directSelectQuery.Where("entity_id IN (?)", bun.In(entityUUIDs))
 	}
 
 	if err = directSelectQuery.Scan(ctx); err != nil {
@@ -249,8 +254,8 @@ func (s *membershipStore) FindAccountMembershipChains(
 		Where("user_account_id = ?", account.ID).
 		Where("entity_type = ?", entityType)
 
-	if len(entityIDs) > 0 {
-		indirectSelectQuery = indirectSelectQuery.Where("entity_friendly_id IN (?)", bun.In(entityIDs))
+	if len(entityUUIDs) > 0 {
+		indirectSelectQuery = indirectSelectQuery.Where("entity_id IN (?)", bun.In(entityUUIDs))
 	}
 
 	if err = indirectSelectQuery.Scan(ctx); err != nil {
@@ -305,12 +310,17 @@ func (s *membershipStore) FindMembers(
 	))
 	defer span.End()
 
+	entityType, entityUUID, err := s.getEntity(ctx, entityID)
+	if err != nil {
+		return nil, err
+	}
+
 	var models []*directEntityMembership
 	selectQuery := s.DB.NewSelect().
 		Model(&models).
 		Apply(selectWithContext(ctx)).
-		Where("entity_type = ?", getEntityType(entityID)).
-		Where("entity_friendly_id = ?", entityID.IDString())
+		Where("entity_type = ?", entityType).
+		Where("entity_id = ?", entityUUID)
 
 	count, err := selectQuery.Count(ctx)
 	if err != nil {
@@ -350,14 +360,23 @@ func (s *membershipStore) GetMember(
 	))
 	defer span.End()
 
+	account, err := s.getAccountModel(ctx, accountID.EntityType(), accountID.IDString())
+	if err != nil {
+		return nil, err
+	}
+	entityType, entityUUID, err := s.getEntity(ctx, entityID)
+	if err != nil {
+		return nil, err
+	}
+
 	var model directEntityMembership
-	err := s.DB.NewSelect().
+	err = s.DB.NewSelect().
 		Model(&model).
 		Apply(selectWithContext(ctx)).
 		Where("account_type = ?", getEntityType(accountID)).
-		Where("account_friendly_id = ?", accountID.IDString()).
-		Where("entity_type = ?", getEntityType(entityID)).
-		Where("entity_friendly_id = ?", entityID.IDString()).
+		Where("account_id = ?", account.ID).
+		Where("entity_type = ?", entityType).
+		Where("entity_id = ?", entityUUID).
 		Scan(ctx)
 	if err != nil {
 		err = wrapDriverError(err)
@@ -399,6 +418,7 @@ func (s *membershipStore) SetMember(
 	if err != nil {
 		return err
 	}
+
 	model := &Membership{}
 	err = s.DB.NewSelect().
 		Model(model).
