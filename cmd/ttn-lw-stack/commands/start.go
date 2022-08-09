@@ -120,22 +120,14 @@ var startCommand = &cobra.Command{
 			switch strings.ToLower(arg) {
 			case "is", "identityserver":
 				start.IdentityServer = true
-				start.DeviceTemplateConverter = true
-				start.QRCodeGenerator = true
 			case "gs", "gatewayserver":
 				start.GatewayServer = true
 			case "ns", "networkserver":
 				start.NetworkServer = true
-				start.DeviceTemplateConverter = true
-				start.QRCodeGenerator = true
 			case "as", "applicationserver":
 				start.ApplicationServer = true
-				start.DeviceTemplateConverter = true
-				start.QRCodeGenerator = true
 			case "js", "joinserver":
 				start.JoinServer = true
-				start.DeviceTemplateConverter = true
-				start.QRCodeGenerator = true
 			case "console":
 				start.Console = true
 			case "gcs":
@@ -150,6 +142,9 @@ var startCommand = &cobra.Command{
 				start.DeviceRepository = true
 			case "dcs":
 				start.DeviceClaimingServer = true
+				start.DeviceTemplateConverter = true
+				start.QRCodeGenerator = true
+
 			case "all":
 				start.IdentityServer = true
 				start.GatewayServer = true

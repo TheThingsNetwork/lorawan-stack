@@ -174,6 +174,13 @@ func defaultNew(ctx context.Context, config *Config, options ...Option) (Cluster
 	c.addPeer("pba", config.PacketBrokerAgent, ttnpb.ClusterRole_PACKET_BROKER_AGENT)
 	c.addPeer("dr", config.DeviceRepository, ttnpb.ClusterRole_DEVICE_REPOSITORY)
 	c.addPeer("gcs", config.GatewayConfigurationServer, ttnpb.ClusterRole_GATEWAY_CONFIGURATION_SERVER)
+	c.addPeer(
+		"dcs",
+		config.DeviceClaimingServer,
+		ttnpb.ClusterRole_DEVICE_CLAIMING_SERVER,
+		ttnpb.ClusterRole_QR_CODE_GENERATOR,
+		ttnpb.ClusterRole_DEVICE_TEMPLATE_CONVERTER,
+	)
 
 	for _, join := range config.Join {
 		c.peers[join] = &peer{
