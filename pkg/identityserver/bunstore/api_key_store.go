@@ -170,10 +170,10 @@ func (*apiKeyStore) selectWithEntityIDs(
 }
 
 func (*apiKeyStore) selectWithAPIKeyID(
-	_ context.Context, apiKeyID string,
+	ctx context.Context, apiKeyID string,
 ) func(*bun.SelectQuery) *bun.SelectQuery {
 	return func(q *bun.SelectQuery) *bun.SelectQuery {
-		return q.Where("api_key_id = ?", apiKeyID)
+		return q.Apply(selectWithContext(ctx)).Where("api_key_id = ?", apiKeyID)
 	}
 }
 
