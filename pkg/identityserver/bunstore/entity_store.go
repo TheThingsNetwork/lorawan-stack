@@ -47,13 +47,43 @@ func newEntityStore(baseStore *baseStore) *entityStore {
 	}
 }
 
-// entityFriendlyIDs is the model for the entity_friendly_ids view in the database.
-type entityFriendlyIDs struct {
-	bun.BaseModel `bun:"table:entity_friendly_ids,alias:ids"`
+func (s *entityStore) query(ctx context.Context, entityType string, entityIDs ...string) *bun.SelectQuery {
+	query := s.DB.NewSelect()
 
-	EntityType string `bun:"entity_type,notnull"`
-	EntityID   string `bun:"entity_id,notnull"`
-	FriendlyID string `bun:"friendly_id,notnull"`
+	switch entityType {
+	case "application":
+		query = query.
+			Model(&Application{}).
+			Column("id").
+			Apply(s.applicationStore.selectWithID(ctx, entityIDs...))
+	case "client":
+		query = query.
+			Model(&Client{}).
+			Column("id").
+			Apply(s.clientStore.selectWithID(ctx, entityIDs...))
+	case "gateway":
+		query = query.
+			Model(&Gateway{}).
+			Column("id").
+			Apply(s.gatewayStore.selectWithID(ctx, entityIDs...))
+	case "organization", "user":
+		query = query.
+			Model(&Account{}).
+			Apply(selectWithContext(ctx)).
+			Column("account_id").
+			Where("?TableAlias.account_type = ?", entityType)
+		switch len(entityIDs) {
+		case 0:
+		case 1:
+			query = query.Where("?TableAlias.uid = (?)", entityIDs[0])
+		default:
+			query = query.Where("?TableAlias.uid IN (?)", bun.In(entityIDs))
+		}
+	}
+
+	query = query.Apply(selectWithSoftDeletedFromContext(ctx))
+
+	return query
 }
 
 type identifiers interface {
@@ -87,13 +117,7 @@ func (s *entityStore) getEntity(ctx context.Context, ids ttnpb.IDStringer) (enti
 	}
 
 	var uuid string
-	err = s.DB.NewSelect().
-		Model(&entityFriendlyIDs{}).
-		Column("entity_id").
-		Apply(selectWithContext(ctx)).
-		Where("entity_type = ?", strings.ReplaceAll(ids.EntityType(), " ", "_")).
-		Where("friendly_id = ?", ids.IDString()).
-		Scan(ctx, &uuid)
+	err = s.query(ctx, entityType, ids.IDString()).Scan(ctx, &uuid)
 	if err != nil {
 		err = wrapDriverError(err)
 		if errors.IsNotFound(err) {
@@ -109,13 +133,7 @@ func (s *entityStore) getEntity(ctx context.Context, ids ttnpb.IDStringer) (enti
 
 func (s *entityStore) getEntityUUIDs(ctx context.Context, entityType string, entityIDs ...string) ([]string, error) {
 	var uuids []string
-	err := s.DB.NewSelect().
-		Model(&entityFriendlyIDs{}).
-		Column("entity_id").
-		Apply(selectWithContext(ctx)).
-		Where("entity_type = ?", entityType).
-		Where("friendly_id IN (?)", bun.In(entityIDs)).
-		Scan(ctx, &uuids)
+	err := s.query(ctx, entityType, entityIDs...).Scan(ctx, &uuids)
 	if err != nil {
 		return nil, wrapDriverError(err)
 	}
@@ -123,17 +141,42 @@ func (s *entityStore) getEntityUUIDs(ctx context.Context, entityType string, ent
 }
 
 func (s *entityStore) getEntityID(ctx context.Context, entityType, entityUUID string) (string, error) {
-	var friendlyID string
-	err := s.DB.NewSelect().
-		Model(&entityFriendlyIDs{}).
-		Column("friendly_id").
+	query := s.DB.NewSelect()
+
+	switch entityType {
+	case "application":
+		query = query.
+			Model(&Application{}).
+			Column("application_id").
+			Where("id = ?", entityUUID)
+	case "client":
+		query = query.
+			Model(&Client{}).
+			Column("client_id").
+			Where("id = ?", entityUUID)
+	case "gateway":
+		query = query.
+			Model(&Gateway{}).
+			Column("gateway_id").
+			Where("id = ?", entityUUID)
+	case "organization", "user":
+		query = query.
+			Model(&Account{}).
+			Column("uid").
+			Where("account_id = ?", entityUUID).
+			Where("?TableAlias.account_type = ?", entityType)
+	}
+
+	query = query.
 		Apply(selectWithContext(ctx)).
-		Where("entity_type = ?", entityType).
-		Where("entity_id = ?", entityUUID).
-		Scan(ctx, &friendlyID)
+		Apply(selectWithSoftDeletedFromContext(ctx))
+
+	var friendlyID string
+	err := query.Scan(ctx, &friendlyID)
 	if err != nil {
 		return "", wrapDriverError(err)
 	}
+
 	return friendlyID, nil
 }
 
