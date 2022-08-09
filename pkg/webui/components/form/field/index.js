@@ -14,7 +14,7 @@
 
 import React, { useCallback, useEffect, useMemo } from 'react'
 import classnames from 'classnames'
-import { isPlainObject, pick, isEmpty, at, compact, get } from 'lodash'
+import { isPlainObject, pick, isEmpty, at, compact, get, merge } from 'lodash'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -69,7 +69,7 @@ const extractValue = value => {
 }
 
 const defaultValueSetter = ({ setFieldValue, setValues }, { name, names, value }) =>
-  names.length > 1 ? setValues(values => ({ ...values, ...value })) : setFieldValue(name, value)
+  names.length > 1 ? setValues(values => merge({}, values, value)) : setFieldValue(name, value)
 
 const FormField = props => {
   const {
