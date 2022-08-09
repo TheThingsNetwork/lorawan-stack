@@ -22,7 +22,7 @@ import {
 } from 'formik'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import { defineMessages } from 'react-intl'
-import { isPlainObject, isFunction, pick, omitBy, pull } from 'lodash'
+import { isPlainObject, isFunction, pick, omitBy, pull, merge } from 'lodash'
 
 import Notification from '@ttn-lw/components/notification'
 import ErrorNotification from '@ttn-lw/components/error-notification'
@@ -61,14 +61,14 @@ const Form = props => {
     validateOnChange,
     validateOnMount,
     validateSync,
-    validationContext: initialValidationContext,
+    validationContext: passedValidationContext,
     validationSchema,
     validateAgainstCleanedValues,
   } = props
 
   const notificationRef = React.useRef()
   const [fieldRegistry, setFieldRegistry] = useState(hiddenFields)
-  const [validationContext, setValidationContext] = useState(initialValidationContext)
+  const [validationContext, setValidationContext] = useState({})
 
   // Recreate the validation hook to allow passing down validation contexts.
   const validate = useCallback(
@@ -81,10 +81,13 @@ const Form = props => {
       // compatibility and new forms should always validate against cleaned values.
       // TODO: Refactor forms so that cleaned values can be used always.
       const validateValues = validateAgainstCleanedValues ? pick(values, fieldRegistry) : values
+      // The validation context is merged from the passed prop and state value, which can be
+      // set through the setter passed to the context. The state source values take precedence.
+      const context = merge({}, passedValidationContext, validationContext)
 
       if (validateSync) {
         try {
-          validateYupSchema(validateValues, validationSchema, validateSync, validationContext)
+          validateYupSchema(validateValues, validationSchema, validateSync, context)
 
           return {}
         } catch (err) {
@@ -97,7 +100,7 @@ const Form = props => {
       }
 
       return new Promise((resolve, reject) => {
-        validateYupSchema(validateValues, validationSchema, validateSync, validationContext).then(
+        validateYupSchema(validateValues, validationSchema, validateSync, context).then(
           () => {
             resolve({})
           },
@@ -117,8 +120,9 @@ const Form = props => {
       validationSchema,
       validateAgainstCleanedValues,
       fieldRegistry,
-      validateSync,
+      passedValidationContext,
       validationContext,
+      validateSync,
       error,
     ],
   )
