@@ -334,3 +334,121 @@ func (x *SearchUsersRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 func (x *SearchUsersRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
+
+// MarshalProtoJSON marshals the SearchAccountsRequest message to JSON.
+func (x *SearchAccountsRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Query != "" || s.HasField("query") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("query")
+		s.WriteString(x.Query)
+	}
+	if x.OnlyUsers || s.HasField("only_users") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("only_users")
+		s.WriteBool(x.OnlyUsers)
+	}
+	if x.CollaboratorOf != nil {
+		switch ov := x.CollaboratorOf.(type) {
+		case *SearchAccountsRequest_ApplicationIds:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("application_ids")
+			// NOTE: ApplicationIdentifiers does not seem to implement MarshalProtoJSON.
+			gogo.MarshalMessage(s, ov.ApplicationIds)
+		case *SearchAccountsRequest_ClientIds:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("client_ids")
+			// NOTE: ClientIdentifiers does not seem to implement MarshalProtoJSON.
+			gogo.MarshalMessage(s, ov.ClientIds)
+		case *SearchAccountsRequest_GatewayIds:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("gateway_ids")
+			ov.GatewayIds.MarshalProtoJSON(s.WithField("gateway_ids"))
+		case *SearchAccountsRequest_OrganizationIds:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("organization_ids")
+			// NOTE: OrganizationIdentifiers does not seem to implement MarshalProtoJSON.
+			gogo.MarshalMessage(s, ov.OrganizationIds)
+		}
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the SearchAccountsRequest to JSON.
+func (x *SearchAccountsRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the SearchAccountsRequest message from JSON.
+func (x *SearchAccountsRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "query":
+			s.AddField("query")
+			x.Query = s.ReadString()
+		case "only_users", "onlyUsers":
+			s.AddField("only_users")
+			x.OnlyUsers = s.ReadBool()
+		case "application_ids", "applicationIds":
+			s.AddField("application_ids")
+			ov := &SearchAccountsRequest_ApplicationIds{}
+			x.CollaboratorOf = ov
+			if s.ReadNil() {
+				ov.ApplicationIds = nil
+				return
+			}
+			// NOTE: ApplicationIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v ApplicationIdentifiers
+			gogo.UnmarshalMessage(s, &v)
+			ov.ApplicationIds = &v
+		case "client_ids", "clientIds":
+			s.AddField("client_ids")
+			ov := &SearchAccountsRequest_ClientIds{}
+			x.CollaboratorOf = ov
+			if s.ReadNil() {
+				ov.ClientIds = nil
+				return
+			}
+			// NOTE: ClientIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v ClientIdentifiers
+			gogo.UnmarshalMessage(s, &v)
+			ov.ClientIds = &v
+		case "gateway_ids", "gatewayIds":
+			ov := &SearchAccountsRequest_GatewayIds{}
+			x.CollaboratorOf = ov
+			if s.ReadNil() {
+				ov.GatewayIds = nil
+				return
+			}
+			ov.GatewayIds = &GatewayIdentifiers{}
+			ov.GatewayIds.UnmarshalProtoJSON(s.WithField("gateway_ids", true))
+		case "organization_ids", "organizationIds":
+			s.AddField("organization_ids")
+			ov := &SearchAccountsRequest_OrganizationIds{}
+			x.CollaboratorOf = ov
+			if s.ReadNil() {
+				ov.OrganizationIds = nil
+				return
+			}
+			// NOTE: OrganizationIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v OrganizationIdentifiers
+			gogo.UnmarshalMessage(s, &v)
+			ov.OrganizationIds = &v
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the SearchAccountsRequest from JSON.
+func (x *SearchAccountsRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}

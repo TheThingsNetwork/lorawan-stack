@@ -133,6 +133,33 @@ var SearchUsersRequestFieldPathsTopLevel = []string{
 	"query",
 	"state",
 }
+var SearchAccountsRequestFieldPathsNested = []string{
+	"collaborator_of",
+	"collaborator_of.application_ids",
+	"collaborator_of.application_ids.application_id",
+	"collaborator_of.client_ids",
+	"collaborator_of.client_ids.client_id",
+	"collaborator_of.gateway_ids",
+	"collaborator_of.gateway_ids.eui",
+	"collaborator_of.gateway_ids.gateway_id",
+	"collaborator_of.organization_ids",
+	"collaborator_of.organization_ids.organization_id",
+	"only_users",
+	"query",
+}
+
+var SearchAccountsRequestFieldPathsTopLevel = []string{
+	"collaborator_of",
+	"only_users",
+	"query",
+}
+var SearchAccountsResponseFieldPathsNested = []string{
+	"account_ids",
+}
+
+var SearchAccountsResponseFieldPathsTopLevel = []string{
+	"account_ids",
+}
 var SearchEndDevicesRequestFieldPathsNested = []string{
 	"application_ids",
 	"application_ids.application_id",

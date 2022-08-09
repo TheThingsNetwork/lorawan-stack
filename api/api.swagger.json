@@ -845,6 +845,76 @@
         ]
       }
     },
+    "/applications/{application_ids.application_id}/collaborators/search": {
+      "get": {
+        "summary": "Search for accounts that match the conditions specified in the request.",
+        "operationId": "EntityRegistrySearch_SearchAccounts2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3SearchAccountsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "only_users",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "client_ids.client_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.gateway_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EntityRegistrySearch"
+        ]
+      }
+    },
     "/applications/{application_ids.application_id}/devices": {
       "get": {
         "summary": "List end devices in the given application.\nSimilar to Get, this selects the fields given by the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
@@ -5751,6 +5821,76 @@
         ]
       }
     },
+    "/clients/{client_ids.client_id}/collaborators/search": {
+      "get": {
+        "summary": "Search for accounts that match the conditions specified in the request.",
+        "operationId": "EntityRegistrySearch_SearchAccounts3",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3SearchAccountsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "client_ids.client_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "only_users",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "application_ids.application_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.gateway_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EntityRegistrySearch"
+        ]
+      }
+    },
     "/clients/{client_id}": {
       "delete": {
         "summary": "Delete the OAuth client. This may not release the client ID for reuse.",
@@ -7997,6 +8137,76 @@
         ],
         "tags": [
           "GatewayAccess"
+        ]
+      }
+    },
+    "/gateways/{gateway_ids.gateway_id}/collaborators/search": {
+      "get": {
+        "summary": "Search for accounts that match the conditions specified in the request.",
+        "operationId": "EntityRegistrySearch_SearchAccounts4",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3SearchAccountsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_ids.gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "only_users",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "application_ids.application_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "client_ids.client_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EntityRegistrySearch"
         ]
       }
     },
@@ -11574,6 +11784,76 @@
         ]
       }
     },
+    "/organizations/{organization_ids.organization_id}/collaborators/search": {
+      "get": {
+        "summary": "Search for accounts that match the conditions specified in the request.",
+        "operationId": "EntityRegistrySearch_SearchAccounts5",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3SearchAccountsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "only_users",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "application_ids.application_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "client_ids.client_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.gateway_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "tags": [
+          "EntityRegistrySearch"
+        ]
+      }
+    },
     "/organizations/{organization_id}": {
       "delete": {
         "summary": "Delete the organization. This may not release the organization ID for reuse.",
@@ -12820,6 +13100,76 @@
         ],
         "tags": [
           "EndDeviceQRCodeGenerator"
+        ]
+      }
+    },
+    "/search/accounts": {
+      "get": {
+        "summary": "Search for accounts that match the conditions specified in the request.",
+        "operationId": "EntityRegistrySearch_SearchAccounts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3SearchAccountsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "only_users",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "application_ids.application_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "client_ids.client_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.gateway_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EntityRegistrySearch"
         ]
       }
     },
@@ -22452,6 +22802,17 @@
         "rx2": {
           "type": "boolean",
           "description": "Whether RX2 has been chosen for the downlink message.\nBoth RX1 and RX2 can be used for transmitting the same message by the same gateway."
+        }
+      }
+    },
+    "v3SearchAccountsResponse": {
+      "type": "object",
+      "properties": {
+        "account_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3OrganizationOrUserIdentifiers"
+          }
         }
       }
     },

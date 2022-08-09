@@ -39373,6 +39373,122 @@
       "extensions": [],
       "messages": [
         {
+          "name": "SearchAccountsRequest",
+          "longName": "SearchAccountsRequest",
+          "fullName": "ttn.lorawan.v3.SearchAccountsRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "query",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 50
+                  }
+                ]
+              }
+            },
+            {
+              "name": "only_users",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "application_ids",
+              "description": "",
+              "label": "",
+              "type": "ApplicationIdentifiers",
+              "longType": "ApplicationIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "collaborator_of",
+              "defaultValue": ""
+            },
+            {
+              "name": "client_ids",
+              "description": "",
+              "label": "",
+              "type": "ClientIdentifiers",
+              "longType": "ClientIdentifiers",
+              "fullType": "ttn.lorawan.v3.ClientIdentifiers",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "collaborator_of",
+              "defaultValue": ""
+            },
+            {
+              "name": "gateway_ids",
+              "description": "",
+              "label": "",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "collaborator_of",
+              "defaultValue": ""
+            },
+            {
+              "name": "organization_ids",
+              "description": "",
+              "label": "",
+              "type": "OrganizationIdentifiers",
+              "longType": "OrganizationIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationIdentifiers",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "collaborator_of",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "SearchAccountsResponse",
+          "longName": "SearchAccountsResponse",
+          "fullName": "ttn.lorawan.v3.SearchAccountsResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "account_ids",
+              "description": "",
+              "label": "repeated",
+              "type": "OrganizationOrUserIdentifiers",
+              "longType": "OrganizationOrUserIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "SearchApplicationsRequest",
           "longName": "SearchApplicationsRequest",
           "fullName": "ttn.lorawan.v3.SearchApplicationsRequest",
@@ -41129,6 +41245,44 @@
                     {
                       "method": "GET",
                       "pattern": "/search/users"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "SearchAccounts",
+              "description": "Search for accounts that match the conditions specified in the request.",
+              "requestType": "SearchAccountsRequest",
+              "requestLongType": "SearchAccountsRequest",
+              "requestFullType": "ttn.lorawan.v3.SearchAccountsRequest",
+              "requestStreaming": false,
+              "responseType": "SearchAccountsResponse",
+              "responseLongType": "SearchAccountsResponse",
+              "responseFullType": "ttn.lorawan.v3.SearchAccountsResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/search/accounts"
+                    },
+                    {
+                      "method": "GET",
+                      "pattern": "/applications/{application_ids.application_id}/collaborators/search"
+                    },
+                    {
+                      "method": "GET",
+                      "pattern": "/clients/{client_ids.client_id}/collaborators/search"
+                    },
+                    {
+                      "method": "GET",
+                      "pattern": "/gateways/{gateway_ids.gateway_id}/collaborators/search"
+                    },
+                    {
+                      "method": "GET",
+                      "pattern": "/organizations/{organization_ids.organization_id}/collaborators/search"
                     }
                   ]
                 }

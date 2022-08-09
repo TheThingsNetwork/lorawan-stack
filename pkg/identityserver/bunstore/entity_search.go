@@ -345,3 +345,80 @@ func (s *entitySearch) SearchUsers(
 
 	return getIDs[*ttnpb.User, *ttnpb.UserIdentifiers](pbs), nil
 }
+
+func (s *entitySearch) SearchAccounts(
+	ctx context.Context, req *ttnpb.SearchAccountsRequest,
+) ([]*ttnpb.OrganizationOrUserIdentifiers, error) {
+	ctx, span := tracer.Start(ctx, "SearchAccounts")
+	defer span.End()
+
+	selectQuery := s.DB.NewSelect()
+
+	if entityID := req.GetEntityIdentifiers(); entityID != nil {
+		selectQuery = selectQuery.
+			Model(&directEntityMembership{}).
+			ColumnExpr("account_type, account_friendly_id").
+			Apply(selectWithContext(ctx)).
+			Where("entity_type = ?", getEntityType(entityID)).
+			Where("entity_friendly_id = ?", entityID.IDString()).
+			Order("account_friendly_id")
+		if req.OnlyUsers {
+			selectQuery = selectQuery.Where(`account_type = 'user'`)
+		}
+		if q := req.GetQuery(); q != "" {
+			selectQuery = selectQuery.Where(ilike("account_friendly_id"), q)
+		}
+	} else {
+		selectQuery = selectQuery.
+			Model(&Account{}).
+			ColumnExpr("account_type, uid AS account_friendly_id").
+			Apply(selectWithContext(ctx)).
+			Order("uid")
+		if req.OnlyUsers {
+			selectQuery = selectQuery.Where(`account_type = 'user'`)
+		}
+		if q := req.GetQuery(); q != "" {
+			selectQuery = selectQuery.Where(ilike("uid"), q)
+		}
+	}
+
+	// Count the total number of results.
+	count, err := selectQuery.Count(ctx)
+	if err != nil {
+		return nil, wrapDriverError(err)
+	}
+	store.SetTotal(ctx, uint64(count))
+
+	// Apply paging.
+	selectQuery = selectQuery.
+		Apply(selectWithLimitAndOffsetFromContext(ctx))
+
+	var results []struct {
+		AccountType       string
+		AccountFriendlyID string
+	}
+
+	// Scan the results.
+	err = selectQuery.Scan(ctx, &results)
+	if err != nil {
+		return nil, wrapDriverError(err)
+	}
+
+	// Convert the results to protobuf.
+	identifiers := make([]*ttnpb.OrganizationOrUserIdentifiers, len(results))
+
+	for i, m := range results {
+		switch m.AccountType {
+		case "organization":
+			identifiers[i] = (&ttnpb.OrganizationIdentifiers{
+				OrganizationId: m.AccountFriendlyID,
+			}).GetOrganizationOrUserIdentifiers()
+		case "user":
+			identifiers[i] = (&ttnpb.UserIdentifiers{
+				UserId: m.AccountFriendlyID,
+			}).GetOrganizationOrUserIdentifiers()
+		}
+	}
+
+	return identifiers, nil
+}

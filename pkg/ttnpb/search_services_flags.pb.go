@@ -442,6 +442,81 @@ func (m *SearchUsersRequest) SetFromFlags(flags *pflag.FlagSet, prefix string) (
 	return paths, nil
 }
 
+// AddSetFlagsForSearchAccountsRequest adds flags to select fields in SearchAccountsRequest.
+func AddSetFlagsForSearchAccountsRequest(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("query", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("only-users", prefix), "", flagsplugin.WithHidden(hidden)))
+	AddSetFlagsForApplicationIdentifiers(flags, flagsplugin.Prefix("collaborator-of.application-ids", prefix), hidden)
+	AddSetFlagsForClientIdentifiers(flags, flagsplugin.Prefix("collaborator-of.client-ids", prefix), hidden)
+	AddSetFlagsForGatewayIdentifiers(flags, flagsplugin.Prefix("collaborator-of.gateway-ids", prefix), hidden)
+	AddSetFlagsForOrganizationIdentifiers(flags, flagsplugin.Prefix("collaborator-of.organization-ids", prefix), hidden)
+}
+
+// SetFromFlags sets the SearchAccountsRequest message from flags.
+func (m *SearchAccountsRequest) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("query", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Query = val
+		paths = append(paths, flagsplugin.Prefix("query", prefix))
+	}
+	if val, changed, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("only_users", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.OnlyUsers = val
+		paths = append(paths, flagsplugin.Prefix("only_users", prefix))
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("collaborator_of.application_ids", prefix)); changed {
+		ov := &SearchAccountsRequest_ApplicationIds{}
+		if ov.ApplicationIds == nil {
+			ov.ApplicationIds = &ApplicationIdentifiers{}
+		}
+		if setPaths, err := ov.ApplicationIds.SetFromFlags(flags, flagsplugin.Prefix("collaborator_of.application_ids", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+		m.CollaboratorOf = ov
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("collaborator_of.client_ids", prefix)); changed {
+		ov := &SearchAccountsRequest_ClientIds{}
+		if ov.ClientIds == nil {
+			ov.ClientIds = &ClientIdentifiers{}
+		}
+		if setPaths, err := ov.ClientIds.SetFromFlags(flags, flagsplugin.Prefix("collaborator_of.client_ids", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+		m.CollaboratorOf = ov
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("collaborator_of.gateway_ids", prefix)); changed {
+		ov := &SearchAccountsRequest_GatewayIds{}
+		if ov.GatewayIds == nil {
+			ov.GatewayIds = &GatewayIdentifiers{}
+		}
+		if setPaths, err := ov.GatewayIds.SetFromFlags(flags, flagsplugin.Prefix("collaborator_of.gateway_ids", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+		m.CollaboratorOf = ov
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("collaborator_of.organization_ids", prefix)); changed {
+		ov := &SearchAccountsRequest_OrganizationIds{}
+		if ov.OrganizationIds == nil {
+			ov.OrganizationIds = &OrganizationIdentifiers{}
+		}
+		if setPaths, err := ov.OrganizationIds.SetFromFlags(flags, flagsplugin.Prefix("collaborator_of.organization_ids", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+		m.CollaboratorOf = ov
+	}
+	return paths, nil
+}
+
 // AddSetFlagsForSearchEndDevicesRequest adds flags to select fields in SearchEndDevicesRequest.
 func AddSetFlagsForSearchEndDevicesRequest(flags *pflag.FlagSet, prefix string, hidden bool) {
 	AddSetFlagsForApplicationIdentifiers(flags, flagsplugin.Prefix("application-ids", prefix), hidden)

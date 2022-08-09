@@ -446,6 +446,47 @@ func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchUser
 	return res, nil
 }
 
+func (rs *registrySearch) SearchAccounts(
+	ctx context.Context, req *ttnpb.SearchAccountsRequest,
+) (*ttnpb.SearchAccountsResponse, error) {
+	authInfo, err := rs.authInfo(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// Limit the amount of data we provide to non-admin users when searching across all accounts.
+	if req.CollaboratorOf == nil && !authInfo.IsAdmin {
+		// Require a search query of at least 2 characters.
+		if len(req.Query) < 2 {
+			return &ttnpb.SearchAccountsResponse{}, nil
+		}
+
+		// Limit the number of results to 10.
+		var total uint64
+		ctx = store.WithPagination(ctx, 10, 1, &total)
+		defer func() {
+			if err == nil {
+				setTotalHeader(ctx, total)
+			}
+		}()
+	}
+
+	res := &ttnpb.SearchAccountsResponse{}
+	err = rs.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		ids, err := st.SearchAccounts(ctx, req)
+		if err != nil {
+			return err
+		}
+		res.AccountIds = ids
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
 func (rs *registrySearch) SearchEndDevices(ctx context.Context, req *ttnpb.SearchEndDevicesRequest) (*ttnpb.EndDevices, error) {
 	err := rights.RequireApplication(ctx, req.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ)
 	if err != nil {

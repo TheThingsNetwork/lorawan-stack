@@ -1094,6 +1094,271 @@ var _SearchUsersRequest_Order_InLookup = map[string]struct{}{
 	"-created_at":            {},
 }
 
+// ValidateFields checks the field values on SearchAccountsRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *SearchAccountsRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = SearchAccountsRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "query":
+
+			if utf8.RuneCountInString(m.GetQuery()) > 50 {
+				return SearchAccountsRequestValidationError{
+					field:  "query",
+					reason: "value length must be at most 50 runes",
+				}
+			}
+
+		case "only_users":
+			// no validation rules for OnlyUsers
+		case "collaborator_of":
+			if len(subs) == 0 {
+				subs = []string{
+					"application_ids", "client_ids", "gateway_ids", "organization_ids",
+				}
+			}
+			for name, subs := range _processPaths(subs) {
+				_ = subs
+				switch name {
+				case "application_ids":
+					w, ok := m.CollaboratorOf.(*SearchAccountsRequest_ApplicationIds)
+					if !ok || w == nil {
+						continue
+					}
+
+					if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
+						if err := v.ValidateFields(subs...); err != nil {
+							return SearchAccountsRequestValidationError{
+								field:  "application_ids",
+								reason: "embedded message failed validation",
+								cause:  err,
+							}
+						}
+					}
+
+				case "client_ids":
+					w, ok := m.CollaboratorOf.(*SearchAccountsRequest_ClientIds)
+					if !ok || w == nil {
+						continue
+					}
+
+					if v, ok := interface{}(m.GetClientIds()).(interface{ ValidateFields(...string) error }); ok {
+						if err := v.ValidateFields(subs...); err != nil {
+							return SearchAccountsRequestValidationError{
+								field:  "client_ids",
+								reason: "embedded message failed validation",
+								cause:  err,
+							}
+						}
+					}
+
+				case "gateway_ids":
+					w, ok := m.CollaboratorOf.(*SearchAccountsRequest_GatewayIds)
+					if !ok || w == nil {
+						continue
+					}
+
+					if v, ok := interface{}(m.GetGatewayIds()).(interface{ ValidateFields(...string) error }); ok {
+						if err := v.ValidateFields(subs...); err != nil {
+							return SearchAccountsRequestValidationError{
+								field:  "gateway_ids",
+								reason: "embedded message failed validation",
+								cause:  err,
+							}
+						}
+					}
+
+				case "organization_ids":
+					w, ok := m.CollaboratorOf.(*SearchAccountsRequest_OrganizationIds)
+					if !ok || w == nil {
+						continue
+					}
+
+					if v, ok := interface{}(m.GetOrganizationIds()).(interface{ ValidateFields(...string) error }); ok {
+						if err := v.ValidateFields(subs...); err != nil {
+							return SearchAccountsRequestValidationError{
+								field:  "organization_ids",
+								reason: "embedded message failed validation",
+								cause:  err,
+							}
+						}
+					}
+
+				}
+			}
+		default:
+			return SearchAccountsRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// SearchAccountsRequestValidationError is the validation error returned by
+// SearchAccountsRequest.ValidateFields if the designated constraints aren't met.
+type SearchAccountsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SearchAccountsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SearchAccountsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SearchAccountsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SearchAccountsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SearchAccountsRequestValidationError) ErrorName() string {
+	return "SearchAccountsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SearchAccountsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSearchAccountsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SearchAccountsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SearchAccountsRequestValidationError{}
+
+// ValidateFields checks the field values on SearchAccountsResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *SearchAccountsResponse) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = SearchAccountsResponseFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "account_ids":
+
+			for idx, item := range m.GetAccountIds() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return SearchAccountsResponseValidationError{
+							field:  fmt.Sprintf("account_ids[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		default:
+			return SearchAccountsResponseValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// SearchAccountsResponseValidationError is the validation error returned by
+// SearchAccountsResponse.ValidateFields if the designated constraints aren't met.
+type SearchAccountsResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SearchAccountsResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SearchAccountsResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SearchAccountsResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SearchAccountsResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SearchAccountsResponseValidationError) ErrorName() string {
+	return "SearchAccountsResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SearchAccountsResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSearchAccountsResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SearchAccountsResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SearchAccountsResponseValidationError{}
+
 // ValidateFields checks the field values on SearchEndDevicesRequest with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
