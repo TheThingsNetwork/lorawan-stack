@@ -19,6 +19,7 @@ import users from './users'
 import init from './init'
 import applications from './applications'
 import collaborators from './collaborators'
+import claim from './claim'
 import devices from './devices'
 import gateways from './gateways'
 import configuration from './configuration'
@@ -40,6 +41,7 @@ export default [
   ...users,
   ...init,
   ...applications,
+  ...claim,
   ...devices,
   ...gateways,
   ...configuration,

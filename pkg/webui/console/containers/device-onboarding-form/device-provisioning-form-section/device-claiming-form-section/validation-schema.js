@@ -12,14 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Yup from '@ttn-lw/lib/yup'
+import { defineMessages } from 'react-intl'
 
-// Validation schema of the device claiming form section.
-// Please observe the following rules to keep the validation schemas maintainable:
-// 1. DO NOT USE ANY TYPE CONVERSIONS HERE. Use decocer/encoder on field level instead.
-//    Consider all values as backend values. Exceptions may apply in consideration.
-// 2. Comment each individual validation prop and use whitespace to structure visually.
-// 3. Do not use ternary assignments but use plain if statements to ensure clarity.
-const validationSchema = Yup.object({})
+import Yup from '@ttn-lw/lib/yup'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+const m = defineMessages({
+  validateCode: 'Claim authentication code must consist only of numbers and letters',
+})
+
+const validationSchema = Yup.object({
+  ids: Yup.object().shape({
+    dev_eui: Yup.string()
+      .length(8 * 2, Yup.passValues(sharedMessages.validateLength))
+      .required(sharedMessages.validateRequired),
+  }),
+  authentication_code: Yup.string()
+    .matches(/^[A-Z0-9]{1,32}$/, Yup.passValues(m.validateCode))
+    .required(sharedMessages.validateRequired),
+})
 
 export default validationSchema

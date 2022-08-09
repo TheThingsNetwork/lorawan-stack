@@ -14,8 +14,30 @@
 
 import React from 'react'
 
-const initialValues = {}
+import Input from '@ttn-lw/components/input'
+import Form from '@ttn-lw/components/form'
 
-const DeviceClaimingFormSection = props => <span>Device Type Repository Form Section</span>
+import DevEUIComponent from '@console/components/dev-eui-component'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+const initialValues = {
+  ids: {
+    dev_eui: '',
+  },
+  authentication_code: '',
+}
+
+const DeviceClaimingFormSection = () => (
+  <>
+    <DevEUIComponent />
+    <Form.Field
+      title={sharedMessages.claimAuthCode}
+      name="authentication_code"
+      component={Input}
+      sensitive
+    />
+  </>
+)
 
 export { DeviceClaimingFormSection as default, initialValues }

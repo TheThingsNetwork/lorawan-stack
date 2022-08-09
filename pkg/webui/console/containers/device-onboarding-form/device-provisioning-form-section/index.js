@@ -12,19 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useState } from 'react'
+import React, { useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { defineMessages } from 'react-intl'
 import { merge } from 'lodash'
-import { useSelector } from 'react-redux'
 
 import Input from '@ttn-lw/components/input'
 import Form, { useFormContext } from '@ttn-lw/components/form'
 
 import Message from '@ttn-lw/lib/components/message'
 
-import messages from '@account/containers/profile-settings-form/messages'
-
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+
+import { getInfoByJoinEUI } from '@console/store/actions/claim'
 
 import { selectDeviceTemplate } from '@console/store/selectors/device-repository'
 
@@ -38,36 +40,59 @@ import DeviceRegistrationFormSection, {
   initialValues as registrationInitialValues,
 } from './device-registration-form-section'
 
+const msg = defineMessages({
+  joinEUIDesc:
+    'To continue, please enter the JoinEUI of the end device so we can determine onboarding options',
+  confirm: 'Confirm',
+  reset: 'Reset',
+})
+
 const initialValues = merge(
   {
     ids: {
-      join_eui: '',
+      join_eui: undefined,
     },
   },
   claimingInitialValues,
   registrationInitialValues,
 )
 
-const DeviceTypeFormSection = () => {
+const DeviceProvisioningFormSection = () => {
+  const dispatch = useDispatch()
   const [isClaiming, setIsClaiming] = useState(undefined)
+  const { values, setFieldValue, setValues } = useFormContext()
   const {
-    values: {
-      _inputMethod,
-      version_ids: version,
-      frequency_plan_id,
-      lorawan_version,
-      lorawan_phy_version,
-    },
-  } = useFormContext()
+    _inputMethod,
+    version_ids: version,
+    frequency_plan_id,
+    lorawan_version,
+    lorawan_phy_version,
+    ids,
+  } = values
+
   const template = useSelector(selectDeviceTemplate)
   const mayProvisionDevice =
     (Boolean(frequency_plan_id) && Boolean(lorawan_version) && Boolean(lorawan_phy_version)) ||
     (_inputMethod === 'device-repository' && hasValidDeviceRepositoryType(version, template))
 
-  const onIdPrefill = useCallback(() => {
-    // Reminder that DevEUI is used as id default (on blur).
-    console.log('blur')
-  })
+  const isClaimable = React.useCallback(async () => {
+    if (isClaiming !== undefined) {
+      setFieldValue('ids.join_eui', undefined)
+      setIsClaiming(undefined)
+    } else {
+      const claim = await dispatch(attachPromise(getInfoByJoinEUI({ join_eui: ids.join_eui })))
+      const supportsClaiming = claim.supports_claiming ?? false
+      setIsClaiming(supportsClaiming)
+    }
+  }, [ids, setFieldValue, isClaiming, setIsClaiming, dispatch])
+
+  React.useEffect(() => {
+    // Merge the new device template with other form values.
+    if (template && hasValidDeviceRepositoryType && _inputMethod === 'device-repository') {
+      const { end_device } = template
+      setValues(merge(values, end_device), false)
+    }
+  }, [template, _inputMethod, setValues, values])
 
   return (
     <>
@@ -80,8 +105,16 @@ const DeviceTypeFormSection = () => {
           max={8}
           required
           component={Input}
+          actionDisable={!Boolean(ids.join_eui)}
+          action={{
+            type: 'button',
+            disable: !Boolean(ids.join_eui),
+            title: isClaiming === undefined ? msg.confirm : msg.reset,
+            message: isClaiming === undefined ? msg.confirm : msg.reset,
+            onClick: isClaimable,
+            raw: true,
+          }}
           tooltipId={tooltipIds.JOIN_EUI}
-          onBlur={onIdPrefill}
         />
       ) : (
         <Message
@@ -96,4 +129,4 @@ const DeviceTypeFormSection = () => {
   )
 }
 
-export { DeviceTypeFormSection as default, initialValues }
+export { DeviceProvisioningFormSection as default, initialValues }

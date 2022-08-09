@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import Yup from '@ttn-lw/lib/yup'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 // Validation schema of the device registration form section.
 // Please observe the following rules to keep the validation schemas maintainable:
@@ -20,6 +21,81 @@ import Yup from '@ttn-lw/lib/yup'
 //    Consider all values as backend values. Exceptions may apply in consideration.
 // 2. Comment each individual validation prop and use whitespace to structure visually.
 // 3. Do not use ternary assignments but use plain if statements to ensure clarity.
-const validationSchema = Yup.object({})
 
-export default validationSchema
+const devEUISchema = Yup.string().length(8 * 2, Yup.passValues(sharedMessages.validateLength))
+
+const validationSchema = Yup.object({
+  ids: Yup.object().shape({
+    dev_eui: devEUISchema.required(sharedMessages.validateRequired),
+  }),
+  root_keys: Yup.object().shape({
+    nwk_key: Yup.object().shape({
+      key: Yup.string()
+        .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+        .required(sharedMessages.validateRequired),
+    }),
+    app_key: Yup.object().shape({
+      key: Yup.string()
+        .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+        .required(sharedMessages.validateRequired),
+    }),
+  }),
+  session: Yup.object().shape({
+    dev_addr: Yup.string()
+      .length(4 * 2, Yup.passValues(sharedMessages.validateLength))
+      .required(sharedMessages.validateRequired),
+    keys: Yup.object().shape({
+      app_s_key: Yup.object().shape({
+        key: Yup.string()
+          .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+          .required(sharedMessages.validateRequired),
+      }),
+      f_nwk_s_int_key: Yup.object().shape({
+        key: Yup.string()
+          .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+          .required(sharedMessages.validateRequired),
+      }),
+      s_nwk_s_int_key: Yup.object().shape({
+        key: Yup.string()
+          .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+          .required(sharedMessages.validateRequired),
+      }),
+      nwk_s_enc_key: Yup.object().shape({
+        key: Yup.string()
+          .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+          .required(sharedMessages.validateRequired),
+      }),
+    }),
+  }),
+  lorawan_version: Yup.string(),
+})
+
+const initialValues = {
+  ids: {
+    device_id: '',
+    dev_eui: '',
+  },
+  root_keys: {
+    app_key: { key: '' },
+    nwk_key: { key: '' },
+  },
+  session: {
+    dev_addr: '',
+    keys: {
+      app_s_key: {
+        key: '',
+      },
+      f_nwk_s_int_key: {
+        key: '',
+      },
+      s_nwk_s_int_key: {
+        key: '',
+      },
+      nwk_s_enc_key: {
+        key: '',
+      },
+    },
+  },
+}
+
+export { validationSchema as default, devEUISchema, initialValues }
