@@ -78,6 +78,8 @@ type NotificationReceiver struct {
 	StatusUpdatedAt time.Time `bun:"status_updated_at,notnull"`
 }
 
+func (NotificationReceiver) _isModel() {} // It doesn't embed Model, but it's still a model.
+
 func notificationToPB(m *Notification, r *NotificationReceiver) (*ttnpb.Notification, error) {
 	pb := &ttnpb.Notification{
 		Id:               m.ID,
@@ -218,8 +220,7 @@ func (s *notificationStore) ListNotifications(
 	}
 
 	models := []*NotificationReceiver{}
-	selectQuery := s.DB.NewSelect().
-		Model(&models).
+	selectQuery := newSelectModels(ctx, s.DB, &models).
 		Where("receiver_id = ?", receiverUUID)
 
 	if len(statuses) > 0 {

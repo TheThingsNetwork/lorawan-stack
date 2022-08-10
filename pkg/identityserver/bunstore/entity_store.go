@@ -48,28 +48,23 @@ func newEntityStore(baseStore *baseStore) *entityStore {
 }
 
 func (s *entityStore) query(ctx context.Context, entityType string, entityIDs ...string) *bun.SelectQuery {
-	query := s.DB.NewSelect()
+	var query *bun.SelectQuery
 
 	switch entityType {
 	case "application":
-		query = query.
-			Model(&Application{}).
+		query = s.newSelectModel(ctx, &Application{}).
 			Column("id").
 			Apply(s.applicationStore.selectWithID(ctx, entityIDs...))
 	case "client":
-		query = query.
-			Model(&Client{}).
+		query = s.newSelectModel(ctx, &Client{}).
 			Column("id").
 			Apply(s.clientStore.selectWithID(ctx, entityIDs...))
 	case "gateway":
-		query = query.
-			Model(&Gateway{}).
+		query = s.newSelectModel(ctx, &Gateway{}).
 			Column("id").
 			Apply(s.gatewayStore.selectWithID(ctx, entityIDs...))
 	case "organization", "user":
-		query = query.
-			Model(&Account{}).
-			Apply(selectWithContext(ctx)).
+		query = s.newSelectModel(ctx, &Account{}).
 			Column("account_id").
 			Where("?TableAlias.account_type = ?", entityType)
 		switch len(entityIDs) {
@@ -80,8 +75,6 @@ func (s *entityStore) query(ctx context.Context, entityType string, entityIDs ..
 			query = query.Where("?TableAlias.uid IN (?)", bun.In(entityIDs))
 		}
 	}
-
-	query = query.Apply(selectWithSoftDeletedFromContext(ctx))
 
 	return query
 }
@@ -141,35 +134,27 @@ func (s *entityStore) getEntityUUIDs(ctx context.Context, entityType string, ent
 }
 
 func (s *entityStore) getEntityID(ctx context.Context, entityType, entityUUID string) (string, error) {
-	query := s.DB.NewSelect()
+	var query *bun.SelectQuery
 
 	switch entityType {
 	case "application":
-		query = query.
-			Model(&Application{}).
+		query = s.newSelectModel(ctx, &Application{}).
 			Column("application_id").
 			Where("id = ?", entityUUID)
 	case "client":
-		query = query.
-			Model(&Client{}).
+		query = s.newSelectModel(ctx, &Client{}).
 			Column("client_id").
 			Where("id = ?", entityUUID)
 	case "gateway":
-		query = query.
-			Model(&Gateway{}).
+		query = s.newSelectModel(ctx, &Gateway{}).
 			Column("gateway_id").
 			Where("id = ?", entityUUID)
 	case "organization", "user":
-		query = query.
-			Model(&Account{}).
+		query = s.newSelectModel(ctx, &Account{}).
 			Column("uid").
 			Where("account_id = ?", entityUUID).
 			Where("?TableAlias.account_type = ?", entityType)
 	}
-
-	query = query.
-		Apply(selectWithContext(ctx)).
-		Apply(selectWithSoftDeletedFromContext(ctx))
 
 	var friendlyID string
 	err := query.Scan(ctx, &friendlyID)

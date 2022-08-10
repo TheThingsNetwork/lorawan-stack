@@ -48,6 +48,8 @@ type ContactInfo struct {
 	ValidatedAt *time.Time `bun:"validated_at"`
 }
 
+func (ContactInfo) _isModel() {} // It doesn't embed Model, but it's still a model.
+
 func contactInfoFromPB(pb *ttnpb.ContactInfo, entityType, entityID string) *ContactInfo {
 	return &ContactInfo{
 		EntityType:    entityType,
@@ -223,8 +225,7 @@ func (s *contactInfoStore) getContactInfoModelsBy(
 	by func(*bun.SelectQuery) *bun.SelectQuery,
 ) ([]*ContactInfo, error) {
 	models := []*ContactInfo{}
-	selectQuery := s.DB.NewSelect().
-		Model(&models).
+	selectQuery := newSelectModels(ctx, s.DB, &models).
 		Apply(by)
 
 	err := selectQuery.Scan(ctx)
@@ -332,8 +333,7 @@ func (s *contactInfoStore) CreateValidation(
 		return nil, err
 	}
 
-	n, err := s.DB.NewSelect().
-		Model(&ContactInfoValidation{}).
+	n, err := s.newSelectModel(ctx, &ContactInfoValidation{}).
 		Where("entity_type = ? AND entity_id = ?", entityType, entityUUID).
 		Where("contact_method = ? AND LOWER(value) = LOWER(?)", contactMethod, value).
 		Where("expires_at IS NULL OR expires_at > NOW()").
@@ -381,8 +381,7 @@ func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.Conta
 
 	model := &ContactInfoValidation{}
 
-	err := s.DB.NewSelect().
-		Model(model).
+	err := s.newSelectModel(ctx, model).
 		Where("reference = ? AND token = ?", validation.Id, validation.Token).
 		Scan(ctx)
 	if err != nil {

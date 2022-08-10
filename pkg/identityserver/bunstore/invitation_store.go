@@ -113,9 +113,7 @@ func (s *invitationStore) FindInvitations(ctx context.Context) ([]*ttnpb.Invitat
 	defer span.End()
 
 	models := []*Invitation{}
-	selectQuery := s.DB.NewSelect().
-		Model(&models).
-		Apply(selectWithContext(ctx))
+	selectQuery := newSelectModels(ctx, s.DB, &models)
 
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
@@ -164,9 +162,7 @@ func (s *invitationStore) getInvitationModelBy(
 	by func(*bun.SelectQuery) *bun.SelectQuery,
 ) (*Invitation, error) {
 	model := &Invitation{}
-	selectQuery := s.DB.NewSelect().
-		Model(model).
-		Apply(by)
+	selectQuery := s.newSelectModel(ctx, model).Apply(by)
 
 	if err := selectQuery.Scan(ctx); err != nil {
 		return nil, wrapDriverError(err)

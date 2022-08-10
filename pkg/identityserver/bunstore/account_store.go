@@ -77,10 +77,7 @@ func (s *baseStore) getAccountModel(
 	accountType, uid string,
 ) (*Account, error) {
 	model := &Account{}
-	selectQuery := s.DB.NewSelect().
-		Model(model).
-		Apply(selectWithSoftDeletedFromContext(ctx)).
-		Apply(selectWithContext(ctx)).
+	selectQuery := s.newSelectModel(ctx, model).
 		Where("?TableAlias.account_type = ?", accountType).
 		Where("?TableAlias.uid = ?", uid)
 

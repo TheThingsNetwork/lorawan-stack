@@ -415,10 +415,7 @@ func (*gatewayStore) selectWithFields(q *bun.SelectQuery, fieldMask store.FieldM
 }
 
 func (s *gatewayStore) CountGateways(ctx context.Context) (uint64, error) {
-	selectQuery := s.DB.NewSelect().
-		Model(&Gateway{}).
-		Apply(selectWithSoftDeletedFromContext(ctx)).
-		Apply(selectWithContext(ctx))
+	selectQuery := s.newSelectModel(ctx, &Gateway{})
 
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
@@ -435,10 +432,7 @@ func (s *gatewayStore) listGatewaysBy(
 	fieldMask store.FieldMask,
 ) ([]*ttnpb.Gateway, error) {
 	models := []*Gateway{}
-	selectQuery := s.DB.NewSelect().
-		Model(&models).
-		Apply(selectWithSoftDeletedFromContext(ctx)).
-		Apply(by)
+	selectQuery := newSelectModels(ctx, s.DB, &models).Apply(by)
 
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
@@ -481,10 +475,9 @@ func (s *gatewayStore) listGatewaysBy(
 }
 
 func (*gatewayStore) selectWithID(
-	ctx context.Context, ids ...string,
+	_ context.Context, ids ...string,
 ) func(*bun.SelectQuery) *bun.SelectQuery {
 	return func(q *bun.SelectQuery) *bun.SelectQuery {
-		q = q.Apply(selectWithContext(ctx))
 		switch len(ids) {
 		case 0:
 			return q
@@ -497,10 +490,9 @@ func (*gatewayStore) selectWithID(
 }
 
 func (*gatewayStore) selectWithEUI(
-	ctx context.Context, euis ...string,
+	_ context.Context, euis ...string,
 ) func(*bun.SelectQuery) *bun.SelectQuery {
 	return func(q *bun.SelectQuery) *bun.SelectQuery {
-		q = q.Apply(selectWithContext(ctx))
 		switch len(euis) {
 		case 0:
 			return q
@@ -529,10 +521,7 @@ func (s *gatewayStore) getGatewayModelBy(
 	fieldMask store.FieldMask,
 ) (*Gateway, error) {
 	model := &Gateway{}
-	selectQuery := s.DB.NewSelect().
-		Model(model).
-		Apply(selectWithSoftDeletedFromContext(ctx)).
-		Apply(by)
+	selectQuery := s.newSelectModel(ctx, model).Apply(by)
 
 	selectQuery, err := s.selectWithFields(selectQuery, fieldMask)
 	if err != nil {

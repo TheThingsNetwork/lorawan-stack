@@ -62,6 +62,8 @@ type directEntityMembership struct {
 	EntityFriendlyID  string `bun:"entity_friendly_id,notnull"`
 }
 
+func (directEntityMembership) _isModel() {} // Just a view in the database, but we can treat it as a model.
+
 // indirectEntityMembership is the model for the indirect_entity_memberships view in the database.
 type indirectEntityMembership struct {
 	bun.BaseModel `bun:"table:indirect_entity_memberships,alias:mem"`
@@ -76,6 +78,8 @@ type indirectEntityMembership struct {
 	EntityID                      string `bun:"entity_id,notnull"`
 	EntityFriendlyID              string `bun:"entity_friendly_id,notnull"`
 }
+
+func (indirectEntityMembership) _isModel() {} // Just a view in the database, but we can treat it as a model.
 
 type membershipStore struct {
 	*entityStore
@@ -104,14 +108,12 @@ func (s *membershipStore) selectWithUUIDsInMemberships(
 		return nil, err
 	}
 
-	directMembershipSelectQuery := s.DB.NewSelect().
-		Table("direct_entity_memberships").
+	directMembershipSelectQuery := s.newSelectModel(ctx, &directEntityMembership{}).
 		Column("entity_id").
 		Where("account_id = ?", account.ID).
 		Where("entity_type = ?", entityType)
 
-	indirectMembershipSelectQuery := s.DB.NewSelect().
-		Table("indirect_entity_memberships").
+	indirectMembershipSelectQuery := s.newSelectModel(ctx, &indirectEntityMembership{}).
 		Column("entity_id").
 		Where("user_account_id = ?", account.ID).
 		Where("entity_type = ?", entityType)
@@ -119,7 +121,7 @@ func (s *membershipStore) selectWithUUIDsInMemberships(
 	if includeIndirect {
 		return func(q *bun.SelectQuery) *bun.SelectQuery {
 			return q.Where(
-				"?TableAlias.id IN (? UNION ?)",
+				"id IN (? UNION ?)",
 				directMembershipSelectQuery,
 				indirectMembershipSelectQuery,
 			)
@@ -127,7 +129,7 @@ func (s *membershipStore) selectWithUUIDsInMemberships(
 	}
 
 	return func(q *bun.SelectQuery) *bun.SelectQuery {
-		return q.Where("?TableAlias.id IN (?)", directMembershipSelectQuery)
+		return q.Where("id IN (?)", directMembershipSelectQuery)
 	}, nil
 }
 
@@ -139,8 +141,7 @@ func (s *membershipStore) CountMemberships(
 		return 0, err
 	}
 
-	selectQuery := s.DB.NewSelect().
-		Table("direct_entity_memberships").
+	selectQuery := s.newSelectModel(ctx, &directEntityMembership{}).
 		Column("entity_id").
 		Where("account_id = ?", account.ID).
 		Where("entity_type = ?", entityType)
@@ -235,8 +236,7 @@ func (s *membershipStore) FindAccountMembershipChains(
 	}
 
 	var directMemberships []*directEntityMembership
-	directSelectQuery := s.DB.NewSelect().
-		Model(&directMemberships).
+	directSelectQuery := newSelectModels(ctx, s.DB, &directMemberships).
 		Where("account_id = ?", account.ID).
 		Where("entity_type = ?", entityType)
 
@@ -249,8 +249,7 @@ func (s *membershipStore) FindAccountMembershipChains(
 	}
 
 	var indirectMemberships []*indirectEntityMembership
-	indirectSelectQuery := s.DB.NewSelect().
-		Model(&indirectMemberships).
+	indirectSelectQuery := newSelectModels(ctx, s.DB, &indirectMemberships).
 		Where("user_account_id = ?", account.ID).
 		Where("entity_type = ?", entityType)
 
@@ -316,9 +315,7 @@ func (s *membershipStore) FindMembers(
 	}
 
 	var models []*directEntityMembership
-	selectQuery := s.DB.NewSelect().
-		Model(&models).
-		Apply(selectWithContext(ctx)).
+	selectQuery := newSelectModels(ctx, s.DB, &models).
 		Where("entity_type = ?", entityType).
 		Where("entity_id = ?", entityUUID)
 
@@ -370,9 +367,7 @@ func (s *membershipStore) GetMember(
 	}
 
 	var model directEntityMembership
-	err = s.DB.NewSelect().
-		Model(&model).
-		Apply(selectWithContext(ctx)).
+	err = s.newSelectModel(ctx, &model).
 		Where("account_type = ?", getEntityType(accountID)).
 		Where("account_id = ?", account.ID).
 		Where("entity_type = ?", entityType).
@@ -420,8 +415,7 @@ func (s *membershipStore) SetMember(
 	}
 
 	model := &Membership{}
-	err = s.DB.NewSelect().
-		Model(model).
+	err = s.newSelectModel(ctx, model).
 		Where("account_id = ?", account.ID).
 		Where("entity_type = ?", entityType).
 		Where("entity_id = ?", entityUUID).
