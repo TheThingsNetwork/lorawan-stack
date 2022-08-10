@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { isUndefined, omitBy } from 'lodash'
+
 import {
   GET_APP_PKG_DEFAULT_ASSOC_SUCCESS,
   SET_APP_PKG_DEFAULT_ASSOC_SUCCESS,
@@ -28,10 +30,13 @@ const applicationPackages = (state = defaultState, { type, payload }) => {
     case SET_APP_PKG_DEFAULT_ASSOC_SUCCESS:
       return {
         ...state,
-        default: {
-          ...state.default,
-          [payload.ids.f_port]: payload,
-        },
+        default: omitBy(
+          {
+            ...state.default,
+            [payload.ids.f_port]: 'created_at' in payload ? payload : undefined,
+          },
+          isUndefined,
+        ),
       }
     case DELETE_APP_PKG_DEFAULT_ASSOC_SUCCESS:
       const { [payload.fPort]: deleted, ...rest } = state.default
