@@ -67,8 +67,7 @@ func (s *euiStore) CreateEUIBlock(
 	defer span.End()
 
 	model := &EUIBlock{}
-	selectQuery := s.DB.NewSelect().
-		Model(model).
+	selectQuery := s.newSelectModel(ctx, model).
 		Where("type = ?", euiType).
 		Where("LOWER(start_eui) = LOWER(?)", prefix.EUI64.String())
 
@@ -144,8 +143,7 @@ func (s *euiStore) IssueDevEUIForApplication(
 			)
 		}
 
-		selectQuery := s.DB.NewSelect().
-			Model(euiBlockModel).
+		selectQuery := s.newSelectModel(ctx, euiBlockModel).
 			For("UPDATE").
 			Where("type = ?", "dev_eui").
 			Where("current_counter <= end_counter").

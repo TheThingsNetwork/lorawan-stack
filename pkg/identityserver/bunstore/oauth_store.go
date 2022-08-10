@@ -226,8 +226,7 @@ func (s *oauthStore) ListAuthorizations(
 	}
 
 	models := []*ClientAuthorization{}
-	selectQuery := s.DB.NewSelect().
-		Model(&models).
+	selectQuery := newSelectModels(ctx, s.DB, &models).
 		Apply(s.selectWithUserIDs(ctx, userUUID))
 
 	// Count the total number of results.
@@ -312,8 +311,7 @@ func (s *oauthStore) GetAuthorization(
 	}
 
 	model := &ClientAuthorization{}
-	selectQuery := s.DB.NewSelect().
-		Model(model).
+	selectQuery := s.newSelectModel(ctx, model).
 		Apply(s.selectWithUserIDs(ctx, userUUID)).
 		Apply(s.selectWithClientIDs(ctx, clientUUID))
 
@@ -356,8 +354,7 @@ func (s *oauthStore) Authorize(
 	}
 
 	model := &ClientAuthorization{}
-	selectQuery := s.DB.NewSelect().
-		Model(model).
+	selectQuery := s.newSelectModel(ctx, model).
 		Apply(s.selectWithUserIDs(ctx, userUUID)).
 		Apply(s.selectWithClientIDs(ctx, clientUUID))
 
@@ -417,8 +414,7 @@ func (s *oauthStore) DeleteAuthorization(
 	}
 
 	model := &ClientAuthorization{}
-	selectQuery := s.DB.NewSelect().
-		Model(model).
+	selectQuery := s.newSelectModel(ctx, model).
 		Apply(s.selectWithUserIDs(ctx, userUUID)).
 		Apply(s.selectWithClientIDs(ctx, clientUUID))
 
@@ -494,9 +490,7 @@ func (s *oauthStore) GetAuthorizationCode(ctx context.Context, code string) (*tt
 	defer span.End()
 
 	model := &AuthorizationCode{}
-	selectQuery := s.DB.NewSelect().
-		Model(model).
-		Apply(selectWithContext(ctx)).
+	selectQuery := s.newSelectModel(ctx, model).
 		Where("code = ?", code)
 
 	// Include the user identifiers.
@@ -532,9 +526,7 @@ func (s *oauthStore) DeleteAuthorizationCode(ctx context.Context, code string) e
 	defer span.End()
 
 	model := &AuthorizationCode{}
-	selectQuery := s.DB.NewSelect().
-		Model(model).
-		Apply(selectWithContext(ctx)).
+	selectQuery := s.newSelectModel(ctx, model).
 		Where("code = ?", code)
 
 	if err := selectQuery.Scan(ctx); err != nil {
@@ -622,8 +614,7 @@ func (s *oauthStore) ListAccessTokens(
 	}
 
 	models := []*AccessToken{}
-	selectQuery := s.DB.NewSelect().
-		Model(&models).
+	selectQuery := newSelectModels(ctx, s.DB, &models).
 		Apply(s.selectWithUserIDs(ctx, userUUID)).
 		Apply(s.selectWithClientIDs(ctx, clientUUID))
 
@@ -666,9 +657,7 @@ func (s *oauthStore) GetAccessToken(ctx context.Context, id string) (*ttnpb.OAut
 	defer span.End()
 
 	model := &AccessToken{}
-	selectQuery := s.DB.NewSelect().
-		Model(model).
-		Apply(selectWithContext(ctx)).
+	selectQuery := s.newSelectModel(ctx, model).
 		Where("token_id = ?", id)
 
 	// Include the user identifiers.
@@ -706,9 +695,7 @@ func (s *oauthStore) DeleteAccessToken(ctx context.Context, id string) error {
 	defer span.End()
 
 	model := &AccessToken{}
-	selectQuery := s.DB.NewSelect().
-		Model(model).
-		Apply(selectWithContext(ctx)).
+	selectQuery := s.newSelectModel(ctx, model).
 		Where("token_id = ?", id)
 
 	if err := selectQuery.Scan(ctx); err != nil {

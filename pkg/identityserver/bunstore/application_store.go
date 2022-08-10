@@ -246,10 +246,7 @@ func (*applicationStore) selectWithFields(q *bun.SelectQuery, fieldMask store.Fi
 }
 
 func (s *applicationStore) CountApplications(ctx context.Context) (uint64, error) {
-	selectQuery := s.DB.NewSelect().
-		Model(&Application{}).
-		Apply(selectWithSoftDeletedFromContext(ctx)).
-		Apply(selectWithContext(ctx))
+	selectQuery := s.newSelectModel(ctx, &Application{})
 
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
@@ -266,10 +263,7 @@ func (s *applicationStore) listApplicationsBy(
 	fieldMask store.FieldMask,
 ) ([]*ttnpb.Application, error) {
 	models := []*Application{}
-	selectQuery := s.DB.NewSelect().
-		Model(&models).
-		Apply(selectWithSoftDeletedFromContext(ctx)).
-		Apply(by)
+	selectQuery := newSelectModels(ctx, s.DB, &models).Apply(by)
 
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
@@ -312,10 +306,9 @@ func (s *applicationStore) listApplicationsBy(
 }
 
 func (*applicationStore) selectWithID(
-	ctx context.Context, ids ...string,
+	_ context.Context, ids ...string,
 ) func(*bun.SelectQuery) *bun.SelectQuery {
 	return func(q *bun.SelectQuery) *bun.SelectQuery {
-		q = q.Apply(selectWithContext(ctx))
 		switch len(ids) {
 		case 0:
 			return q
@@ -344,10 +337,7 @@ func (s *applicationStore) getApplicationModelBy(
 	fieldMask store.FieldMask,
 ) (*Application, error) {
 	model := &Application{}
-	selectQuery := s.DB.NewSelect().
-		Model(model).
-		Apply(selectWithSoftDeletedFromContext(ctx)).
-		Apply(by)
+	selectQuery := s.newSelectModel(ctx, model).Apply(by)
 
 	selectQuery, err := s.selectWithFields(selectQuery, fieldMask)
 	if err != nil {

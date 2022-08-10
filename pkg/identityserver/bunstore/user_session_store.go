@@ -114,9 +114,7 @@ func (s *userSessionStore) listUserSessionsBy(
 	by func(*bun.SelectQuery) *bun.SelectQuery,
 ) ([]*ttnpb.UserSession, error) {
 	models := []*UserSession{}
-	selectQuery := s.DB.NewSelect().
-		Model(&models).
-		Apply(by)
+	selectQuery := newSelectModels(ctx, s.DB, &models).Apply(by)
 
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
@@ -199,9 +197,7 @@ func (s *userSessionStore) getUserSessionModelBy(
 	by func(*bun.SelectQuery) *bun.SelectQuery,
 ) (*UserSession, error) {
 	model := &UserSession{}
-	selectQuery := s.DB.NewSelect().
-		Model(model).
-		Apply(by)
+	selectQuery := s.newSelectModel(ctx, model).Apply(by)
 
 	if err := selectQuery.Scan(ctx); err != nil {
 		return nil, wrapDriverError(err)

@@ -249,10 +249,7 @@ func (*organizationStore) selectWithFields(q *bun.SelectQuery, fieldMask store.F
 }
 
 func (s *organizationStore) CountOrganizations(ctx context.Context) (uint64, error) {
-	selectQuery := s.DB.NewSelect().
-		Model(&Organization{}).
-		Apply(selectWithSoftDeletedFromContext(ctx)).
-		Apply(selectWithContext(ctx))
+	selectQuery := s.newSelectModel(ctx, &Organization{})
 
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
@@ -269,10 +266,7 @@ func (s *organizationStore) listOrganizationsBy(
 	fieldMask store.FieldMask,
 ) ([]*ttnpb.Organization, error) {
 	models := []*Organization{}
-	selectQuery := s.DB.NewSelect().
-		Model(&models).
-		Apply(selectWithSoftDeletedFromContext(ctx)).
-		Apply(by)
+	selectQuery := newSelectModels(ctx, s.DB, &models).Apply(by)
 
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
@@ -315,10 +309,9 @@ func (s *organizationStore) listOrganizationsBy(
 }
 
 func (*organizationStore) selectWithID(
-	ctx context.Context, ids ...string,
+	_ context.Context, ids ...string,
 ) func(*bun.SelectQuery) *bun.SelectQuery {
 	return func(q *bun.SelectQuery) *bun.SelectQuery {
-		q = q.Apply(selectWithContext(ctx))
 		switch len(ids) {
 		case 0:
 			return q
@@ -347,10 +340,7 @@ func (s *organizationStore) getOrganizationModelBy(
 	fieldMask store.FieldMask,
 ) (*Organization, error) {
 	model := &Organization{}
-	selectQuery := s.DB.NewSelect().
-		Model(model).
-		Apply(selectWithSoftDeletedFromContext(ctx)).
-		Apply(by)
+	selectQuery := s.newSelectModel(ctx, model).Apply(by)
 
 	selectQuery, err := s.selectWithFields(selectQuery, fieldMask)
 	if err != nil {
