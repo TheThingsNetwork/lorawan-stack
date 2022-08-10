@@ -18,6 +18,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Gateway registration in the Console has been updated to simplify the onboarding experience.
+
 ### Deprecated
 
 ### Removed
