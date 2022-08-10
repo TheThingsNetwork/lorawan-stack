@@ -824,7 +824,7 @@
   "console.views.device-general-settings.messages.asDescription": "Application-layer behavior and session",
   "console.views.device-general-settings.messages.asDescriptionMissing": "Application Server is not available",
   "console.views.device-general-settings.messages.asDescriptionOTAA": "Only keys of joined OTAA end devices are stored on the Application Server",
-  "console.views.device-general-settings.messages.jsTitle": "Join Settings",
+  "console.views.device-general-settings.messages.jsTitle": "Join settings",
   "console.views.device-general-settings.messages.jsDescription": "Root keys and network settings for end device activation",
   "console.views.device-general-settings.messages.jsDescriptionMissing": "Join Server is not available",
   "console.views.device-general-settings.messages.jsDescriptionOTAA": "ABP/multicast end devices are not stored on the Join Server",
