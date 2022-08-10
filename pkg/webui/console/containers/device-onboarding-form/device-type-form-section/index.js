@@ -38,10 +38,9 @@ const initialValues = merge(
 )
 
 const DeviceTypeFormSection = () => {
-  const {
-    values: { version_ids, frequency_plan_id, lorawan_version, lorawan_phy_version, _inputMethod },
-    resetForm,
-  } = useFormContext()
+  const { values, resetForm } = useFormContext()
+  const { version_ids, frequency_plan_id, lorawan_version, lorawan_phy_version, _inputMethod } =
+    values
 
   const isPristineForm =
     (!hasCompletedDeviceRepositorySelection(version_ids) ||
@@ -63,8 +62,12 @@ const DeviceTypeFormSection = () => {
         })
         setShowModal(false)
         if (approved) {
-          resetForm()
-          return setFieldValue(name, value)
+          return resetForm({
+            errors: {},
+            values: {
+              [name]: value,
+            },
+          })
         }
       } else {
         return setFieldValue(name, value)

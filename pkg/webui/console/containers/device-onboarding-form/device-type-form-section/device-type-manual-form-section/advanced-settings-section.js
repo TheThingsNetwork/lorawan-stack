@@ -328,7 +328,7 @@ const AdvancedSettingsSection = () => {
           <>
             <Form.FieldContainer horizontal>
               <Form.Field
-                required={!isUndefined(mac_settings.rx1_data_rate_offset)}
+                required={!isUndefined(mac_settings?.rx1_data_rate_offset)}
                 title={messages.rx1DataRateOffsetTitle}
                 type="number"
                 name="mac_settings.rx1_data_rate_offset"
@@ -341,7 +341,7 @@ const AdvancedSettingsSection = () => {
                 titleChildren={
                   <WarningTooltip
                     desiredValue={defaultMacSettings.desired_rx1_data_rate_offset}
-                    currentValue={mac_settings.rx1_data_rate_offset}
+                    currentValue={mac_settings?.rx1_data_rate_offset}
                   />
                 }
               />
@@ -360,14 +360,14 @@ const AdvancedSettingsSection = () => {
                 titleChildren={
                   <WarningTooltip
                     desiredValue={defaultMacSettings.desired_rx1_delay}
-                    currentValue={mac_settings.rx1_delay}
+                    currentValue={mac_settings?.rx1_delay}
                   />
                 }
               />
               <Form.Field
                 title={sharedMessages.resetsFCnt}
                 tooltipId={tooltipIds.RESETS_F_CNT}
-                warning={mac_settings.resets_f_cnt ? sharedMessages.resetWarning : undefined}
+                warning={mac_settings?.resets_f_cnt ? sharedMessages.resetWarning : undefined}
                 name="mac_settings.resets_f_cnt"
                 component={Checkbox}
               />
@@ -389,7 +389,7 @@ const AdvancedSettingsSection = () => {
                 titleChildren={
                   <WarningTooltip
                     desiredValue={defaultMacSettings.desired_class_b_timeout}
-                    currentValue={mac_settings.class_b_timeout}
+                    currentValue={mac_settings?.class_b_timeout}
                   />
                 }
               />
@@ -416,7 +416,7 @@ const AdvancedSettingsSection = () => {
                 titleChildren={
                   <WarningTooltip
                     desiredValue={defaultMacSettings.desired_ping_slot_data_rate_index}
-                    currentValue={mac_settings.ping_slot_data_rate_index}
+                    currentValue={mac_settings?.ping_slot_data_rate_index}
                   />
                 }
               />
@@ -435,7 +435,7 @@ const AdvancedSettingsSection = () => {
                 titleChildren={
                   <WarningTooltip
                     desiredValue={defaultMacSettings.desired_beacon_frequency}
-                    currentValue={mac_settings.beacon_frequency}
+                    currentValue={mac_settings?.beacon_frequency}
                   />
                 }
               />
@@ -452,7 +452,7 @@ const AdvancedSettingsSection = () => {
                 titleChildren={
                   <WarningTooltip
                     desiredValue={defaultMacSettings.desired_ping_slot_frequency}
-                    currentValue={mac_settings.ping_slot_frequency}
+                    currentValue={mac_settings?.ping_slot_frequency}
                   />
                 }
               />
@@ -474,7 +474,7 @@ const AdvancedSettingsSection = () => {
               titleChildren={
                 <WarningTooltip
                   desiredValue={defaultMacSettings.desired_class_c_timeout}
-                  currentValue={mac_settings.class_c_timeout}
+                  currentValue={mac_settings?.class_c_timeout}
                 />
               }
             />
@@ -493,7 +493,7 @@ const AdvancedSettingsSection = () => {
             titleChildren={
               <WarningTooltip
                 desiredValue={defaultMacSettings.desired_rx2_data_rate_index}
-                currentValue={mac_settings.rx2_data_rate_index}
+                currentValue={mac_settings?.rx2_data_rate_index}
               />
             }
           />
@@ -511,7 +511,7 @@ const AdvancedSettingsSection = () => {
             titleChildren={
               <WarningTooltip
                 desiredValue={defaultMacSettings.desired_rx2_frequency}
-                currentValue={mac_settings.rx2_frequency}
+                currentValue={mac_settings?.rx2_frequency}
               />
             }
           />

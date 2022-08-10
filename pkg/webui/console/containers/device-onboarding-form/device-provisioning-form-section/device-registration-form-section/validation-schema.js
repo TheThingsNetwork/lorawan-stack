@@ -15,6 +15,8 @@
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
+import { parseLorawanMacVersion } from '@console/lib/device-utils'
+
 // Validation schema of the device registration form section.
 // Please observe the following rules to keep the validation schemas maintainable:
 // 1. DO NOT USE ANY TYPE CONVERSIONS HERE. Use decocer/encoder on field level instead.
@@ -28,44 +30,107 @@ const validationSchema = Yup.object({
   ids: Yup.object().shape({
     dev_eui: devEUISchema.required(sharedMessages.validateRequired),
   }),
-  root_keys: Yup.object().shape({
-    nwk_key: Yup.object().shape({
-      key: Yup.string()
-        .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
-        .required(sharedMessages.validateRequired),
-    }),
-    app_key: Yup.object().shape({
-      key: Yup.string()
-        .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
-        .required(sharedMessages.validateRequired),
-    }),
-  }),
-  session: Yup.object().shape({
-    dev_addr: Yup.string()
-      .length(4 * 2, Yup.passValues(sharedMessages.validateLength))
-      .required(sharedMessages.validateRequired),
-    keys: Yup.object().shape({
-      app_s_key: Yup.object().shape({
-        key: Yup.string()
-          .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
-          .required(sharedMessages.validateRequired),
+
+  root_keys: Yup.object().when(
+    ['supports_join', 'lorawan_version', '$mayEditKeys'],
+    (isOTAA, version, mayEditKeys, schema) => {
+      const notRequiredKeySchema = Yup.object().shape({
+        key: Yup.string(),
+      })
+      const requiredKeySchema = Yup.lazy(() => {
+        if (mayEditKeys) {
+          return Yup.object().shape({
+            key: Yup.string()
+              .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+              .required(sharedMessages.validateRequired),
+          })
+        }
+
+        return Yup.object().shape({
+          key: Yup.string(),
+        })
+      })
+
+      if (!mayEditKeys || !isOTAA) {
+        return schema.shape({
+          nwk_key: notRequiredKeySchema,
+          app_key: notRequiredKeySchema,
+        })
+      }
+
+      if (parseLorawanMacVersion(version) < 110) {
+        return schema.shape({
+          nwk_key: notRequiredKeySchema,
+          app_key: requiredKeySchema,
+        })
+      }
+
+      return schema.shape({
+        nwk_key: requiredKeySchema,
+        app_key: requiredKeySchema,
+      })
+    },
+  ),
+  session: Yup.object().when(['lorawan_version', 'supports_join'], (version, isOTAA, schema) => {
+    const lwVersion = parseLorawanMacVersion(version)
+
+    return schema.shape({
+      dev_addr: Yup.lazy(() => {
+        if (isOTAA) {
+          return Yup.string()
+            .length(4 * 2, Yup.passValues(sharedMessages.validateLength))
+            .required(sharedMessages.validateRequired)
+        }
+
+        return Yup.string().default(null).nullable()
       }),
-      f_nwk_s_int_key: Yup.object().shape({
-        key: Yup.string()
-          .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
-          .required(sharedMessages.validateRequired),
+      keys: Yup.object().shape({
+        app_s_key: Yup.lazy(() => {
+          if (isOTAA) {
+            return Yup.object().shape({
+              key: Yup.string()
+                .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+                .required(sharedMessages.validateRequired),
+            })
+          }
+
+          return Yup.object().default(null).nullable()
+        }),
+        f_nwk_s_int_key: Yup.lazy(() => {
+          if (isOTAA) {
+            return Yup.object().shape({
+              key: Yup.string()
+                .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+                .required(sharedMessages.validateRequired),
+            })
+          }
+
+          return Yup.object().default(null).nullable()
+        }),
+        s_nwk_s_int_key: Yup.lazy(() => {
+          if (isOTAA || lwVersion >= 110) {
+            return Yup.object().shape({
+              key: Yup.string()
+                .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+                .required(sharedMessages.validateRequired),
+            })
+          }
+
+          return Yup.object().default(null).nullable()
+        }),
+        nwk_s_enc_key: Yup.lazy(() => {
+          if (isOTAA || lwVersion >= 110) {
+            return Yup.object().shape({
+              key: Yup.string()
+                .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+                .required(sharedMessages.validateRequired),
+            })
+          }
+
+          return Yup.object().default(null).nullable()
+        }),
       }),
-      s_nwk_s_int_key: Yup.object().shape({
-        key: Yup.string()
-          .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
-          .required(sharedMessages.validateRequired),
-      }),
-      nwk_s_enc_key: Yup.object().shape({
-        key: Yup.string()
-          .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
-          .required(sharedMessages.validateRequired),
-      }),
-    }),
+    })
   }),
   lorawan_version: Yup.string(),
 })

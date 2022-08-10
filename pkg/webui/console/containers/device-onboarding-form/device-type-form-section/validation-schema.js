@@ -17,8 +17,10 @@ import Yup from '@ttn-lw/lib/yup'
 import repositoryValidationSchema from './device-type-repository-form-section/validation-schema'
 import manualValidationSchema from './device-type-manual-form-section/validation-schema'
 
-const validationSchema = Yup.object({})
-  .concat(repositoryValidationSchema)
-  .concat(manualValidationSchema)
+const validationSchema = Yup.object({}).when(['_inputMethod'], {
+  is: 'device-repository',
+  then: schema => schema.concat(repositoryValidationSchema),
+  otherwise: schema => schema.concat(manualValidationSchema),
+})
 
 export default validationSchema

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState } from 'react'
+import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { merge } from 'lodash'
@@ -41,17 +41,20 @@ import DeviceRegistrationFormSection, {
 } from './device-registration-form-section'
 
 const msg = defineMessages({
-  joinEUIDesc:
+  continue:
     'To continue, please enter the JoinEUI of the end device so we can determine onboarding options',
   confirm: 'Confirm',
   reset: 'Reset',
+  registration: '✔ This end device can be registered on the network',
+  claiming: '✔ This end device can be claimed from its current owner',
 })
 
 const initialValues = merge(
   {
     ids: {
-      join_eui: undefined,
+      join_eui: '',
     },
+    _claim: '',
   },
   claimingInitialValues,
   registrationInitialValues,
@@ -59,9 +62,9 @@ const initialValues = merge(
 
 const DeviceProvisioningFormSection = () => {
   const dispatch = useDispatch()
-  const [isClaiming, setIsClaiming] = useState(undefined)
   const { values, setFieldValue, setValues } = useFormContext()
   const {
+    _claim,
     _inputMethod,
     version_ids: version,
     frequency_plan_id,
@@ -76,15 +79,22 @@ const DeviceProvisioningFormSection = () => {
     (_inputMethod === 'device-repository' && hasValidDeviceRepositoryType(version, template))
 
   const isClaimable = React.useCallback(async () => {
-    if (isClaiming !== undefined) {
-      setFieldValue('ids.join_eui', undefined)
-      setIsClaiming(undefined)
+    if (_claim !== '') {
+      setValues(values => ({
+        ...values,
+        ids: {
+          ...values.ids,
+          join_eui: '',
+        },
+        _claim: '',
+      }))
     } else {
       const claim = await dispatch(attachPromise(getInfoByJoinEUI({ join_eui: ids.join_eui })))
       const supportsClaiming = claim.supports_claiming ?? false
-      setIsClaiming(supportsClaiming)
+
+      setFieldValue('_claim', supportsClaiming)
     }
-  }, [ids, setFieldValue, isClaiming, setIsClaiming, dispatch])
+  }, [ids, setFieldValue, _claim, dispatch, setValues])
 
   React.useEffect(() => {
     // Merge the new device template with other form values.
@@ -109,8 +119,8 @@ const DeviceProvisioningFormSection = () => {
           action={{
             type: 'button',
             disable: !Boolean(ids.join_eui),
-            title: isClaiming === undefined ? msg.confirm : msg.reset,
-            message: isClaiming === undefined ? msg.confirm : msg.reset,
+            title: _claim === '' ? msg.confirm : msg.reset,
+            message: _claim === '' ? msg.confirm : msg.reset,
             onClick: isClaimable,
             raw: true,
           }}
@@ -123,8 +133,21 @@ const DeviceProvisioningFormSection = () => {
           component="div"
         />
       )}
-      {isClaiming === true && <DeviceClaimingFormSection />}
-      {isClaiming === false && <DeviceRegistrationFormSection />}
+      {mayProvisionDevice && _claim === '' && (
+        <Message content={msg.continue} className="mt-ls-m mb-ls-m" component="div" />
+      )}
+      {_claim === true && (
+        <>
+          <Message content={msg.claiming} className="mb-ls-s" component="div" />
+          <DeviceClaimingFormSection />
+        </>
+      )}
+      {_claim === false && (
+        <>
+          <Message content={msg.registration} className="mb-ls-s" component="div" />
+          <DeviceRegistrationFormSection />
+        </>
+      )}
     </>
   )
 }

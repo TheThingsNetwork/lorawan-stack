@@ -20,12 +20,10 @@ import Form, { useFormContext } from '@ttn-lw/components/form'
 
 import DevEUIComponent from '@console/components/dev-eui-component'
 
-import FreqPlansSelect from '@console/containers/device-freq-plans-select'
 import DevAddrInput from '@console/containers/dev-addr-input'
 
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import { selectNsConfig, selectAsConfig, selectJsConfig } from '@ttn-lw/lib/selectors/env'
 
 import { parseLorawanMacVersion, generate16BytesKey } from '@console/lib/device-utils'
 import { checkFromState, mayEditApplicationDeviceKeys } from '@console/lib/feature-checks'
@@ -40,12 +38,6 @@ const DeviceRegistrationFormSection = () => {
   const { values, setFieldValue } = useFormContext()
 
   const mayEditKeys = useSelector(state => checkFromState(mayEditApplicationDeviceKeys, state))
-  const jsConfig = useSelector(selectJsConfig)
-  const nsConfig = useSelector(selectNsConfig)
-  const asConfig = useSelector(selectAsConfig)
-  const asEnabled = asConfig.enabled
-  const jsEnabled = jsConfig.enabled
-  const nsEnabled = nsConfig.enabled
 
   const template = useSelector(selectDeviceTemplate)
   const idInputRef = React.useRef(null)
@@ -100,47 +92,41 @@ const DeviceRegistrationFormSection = () => {
             initialValues={initialValues}
             devEUISchema={devEUISchema}
           />
-          {jsEnabled && (
-            <>
-              <Form.Field
-                required
-                title={sharedMessages.appKey}
-                name="root_keys.app_key.key"
-                type="byte"
-                min={16}
-                max={16}
-                component={Input.Generate}
-                disabled={!mayEditKeys}
-                mayGenerateValue={mayEditKeys}
-                onGenerateValue={generate16BytesKey}
-                tooltipId={tooltipIds.APP_KEY}
-                placeholder={appKeyPlaceholder}
-              />
-              {lwVersion >= 110 && (
-                <Form.Field
-                  required
-                  title={sharedMessages.nwkKey}
-                  name="root_keys.nwk_key.key"
-                  type="byte"
-                  min={16}
-                  max={16}
-                  component={Input.Generate}
-                  disabled={!mayEditKeys}
-                  mayGenerateValue={mayEditKeys}
-                  onGenerateValue={generate16BytesKey}
-                  placeholder={nwkKeyPlaceholder}
-                  tooltipId={tooltipIds.NETWORK_KEY}
-                />
-              )}
-            </>
+          <Form.Field
+            required
+            title={sharedMessages.appKey}
+            name="root_keys.app_key.key"
+            type="byte"
+            min={16}
+            max={16}
+            component={Input.Generate}
+            disabled={!mayEditKeys}
+            mayGenerateValue={mayEditKeys}
+            onGenerateValue={generate16BytesKey}
+            tooltipId={tooltipIds.APP_KEY}
+            placeholder={appKeyPlaceholder}
+          />
+          {lwVersion >= 110 && (
+            <Form.Field
+              required
+              title={sharedMessages.nwkKey}
+              name="root_keys.nwk_key.key"
+              type="byte"
+              min={16}
+              max={16}
+              component={Input.Generate}
+              disabled={!mayEditKeys}
+              mayGenerateValue={mayEditKeys}
+              onGenerateValue={generate16BytesKey}
+              placeholder={nwkKeyPlaceholder}
+              tooltipId={tooltipIds.NETWORK_KEY}
+            />
           )}
         </>
       )}
       {!isOTAA && (
         <>
-          {nsEnabled && (
-            <DevAddrInput title={sharedMessages.devAddr} name="session.dev_addr" required />
-          )}
+          <DevAddrInput title={sharedMessages.devAddr} name="session.dev_addr" required />
           {lwVersion === 104 && (
             <DevEUIComponent
               values={values}
@@ -149,73 +135,59 @@ const DeviceRegistrationFormSection = () => {
               devEUISchema={devEUISchema}
             />
           )}
-          {asEnabled && (
+          <Form.Field
+            required={mayEditKeys}
+            title={sharedMessages.appSKey}
+            name="session.keys.app_s_key.key"
+            type="byte"
+            min={16}
+            max={16}
+            component={Input.Generate}
+            mayGenerateValue={mayEditKeys}
+            onGenerateValue={generate16BytesKey}
+            tooltipId={tooltipIds.APP_SESSION_KEY}
+          />
+          <Form.Field
+            mayGenerateValue
+            title={lwVersion >= 110 ? sharedMessages.fNwkSIntKey : sharedMessages.nwkSKey}
+            name="session.keys.f_nwk_s_int_key.key"
+            type="byte"
+            min={16}
+            max={16}
+            required
+            component={Input.Generate}
+            onGenerateValue={generate16BytesKey}
+            tooltipId={lwVersion >= 110 ? undefined : tooltipIds.NETWORK_SESSION_KEY}
+          />
+          {lwVersion >= 110 && (
             <Form.Field
-              required={mayEditKeys}
-              title={sharedMessages.appSKey}
-              name="session.keys.app_s_key.key"
+              mayGenerateValue
+              title={sharedMessages.sNwkSIKey}
+              name="session.keys.s_nwk_s_int_key.key"
               type="byte"
               min={16}
               max={16}
+              required
+              description={sharedMessages.sNwkSIKeyDescription}
               component={Input.Generate}
-              mayGenerateValue={mayEditKeys}
               onGenerateValue={generate16BytesKey}
-              tooltipId={tooltipIds.APP_SESSION_KEY}
             />
           )}
-          {nsEnabled && (
-            <>
-              <Form.Field
-                mayGenerateValue
-                title={lwVersion >= 110 ? sharedMessages.fNwkSIntKey : sharedMessages.nwkSKey}
-                name="session.keys.f_nwk_s_int_key.key"
-                type="byte"
-                min={16}
-                max={16}
-                required
-                component={Input.Generate}
-                onGenerateValue={generate16BytesKey}
-                tooltipId={lwVersion >= 110 ? undefined : tooltipIds.NETWORK_SESSION_KEY}
-              />
-              {lwVersion >= 110 && (
-                <Form.Field
-                  mayGenerateValue
-                  title={sharedMessages.sNwkSIKey}
-                  name="session.keys.s_nwk_s_int_key.key"
-                  type="byte"
-                  min={16}
-                  max={16}
-                  required
-                  description={sharedMessages.sNwkSIKeyDescription}
-                  component={Input.Generate}
-                  onGenerateValue={generate16BytesKey}
-                />
-              )}
-              {lwVersion >= 110 && (
-                <Form.Field
-                  mayGenerateValue
-                  title={sharedMessages.nwkSEncKey}
-                  name="session.keys.nwk_s_enc_key.key"
-                  type="byte"
-                  min={16}
-                  max={16}
-                  required
-                  description={sharedMessages.nwkSEncKeyDescription}
-                  component={Input.Generate}
-                  onGenerateValue={generate16BytesKey}
-                />
-              )}
-            </>
+          {lwVersion >= 110 && (
+            <Form.Field
+              mayGenerateValue
+              title={sharedMessages.nwkSEncKey}
+              name="session.keys.nwk_s_enc_key.key"
+              type="byte"
+              min={16}
+              max={16}
+              required
+              description={sharedMessages.nwkSEncKeyDescription}
+              component={Input.Generate}
+              onGenerateValue={generate16BytesKey}
+            />
           )}
         </>
-      )}
-      {nsEnabled && (
-        <FreqPlansSelect
-          required
-          tooltipId={tooltipIds.FREQUENCY_PLAN}
-          name="frequency_plan_id"
-          bandId={values.version_ids.band_id}
-        />
       )}
       <Form.Field
         required

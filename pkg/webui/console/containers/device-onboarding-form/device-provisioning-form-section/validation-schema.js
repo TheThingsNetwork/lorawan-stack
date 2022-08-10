@@ -34,8 +34,10 @@ const validationSchema = Yup.object({
     }
   }),
   supports_join: Yup.bool().default(false),
+}).when(['_claim'], {
+  is: true,
+  then: schema => schema.concat(claimValidationSchema),
+  otherwise: schema => schema.concat(registrationValidationSchema),
 })
-  .concat(claimValidationSchema)
-  .concat(registrationValidationSchema)
 
 export default validationSchema

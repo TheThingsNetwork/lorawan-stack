@@ -68,11 +68,11 @@ const modelValueSetter = ({ setValues }, { value }) =>
 
 const initialValues = {
   version_ids: {
-    brand_id: undefined,
-    model_id: undefined,
-    hardware_version: undefined,
-    firmware_version: undefined,
-    band_id: undefined,
+    brand_id: '',
+    model_id: '',
+    hardware_version: '',
+    firmware_version: '',
+    band_id: '',
   },
 }
 

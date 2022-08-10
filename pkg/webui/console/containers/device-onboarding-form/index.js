@@ -21,11 +21,10 @@ import Form, { useFormContext } from '@ttn-lw/components/form'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import toast from '@ttn-lw/components/toast'
+import Radio from '@ttn-lw/components/radio-button'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import { selectAsConfig, selectJsConfig, selectNsConfig } from '@ttn-lw/lib/selectors/env'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
-import getHostFromUrl from '@ttn-lw/lib/host-from-url'
 
 import { checkFromState } from '@account/lib/feature-checks'
 import { mayEditApplicationDeviceKeys } from '@console/lib/feature-checks'
@@ -49,27 +48,28 @@ const initialValues = merge({}, provisioningInitialValues, typeInitialValues)
 
 const DeviceOnboardingFormInner = () => {
   const {
-    values: {
-      frequency_plan_id,
-      lorawan_version,
-      lorawan_phy_version,
-      ids: { join_eui },
-    },
+    values: { frequency_plan_id, lorawan_version, lorawan_phy_version, ids },
   } = useFormContext()
   const maySubmit =
     Boolean(frequency_plan_id) &&
     Boolean(lorawan_version) &&
     Boolean(lorawan_phy_version) &&
-    join_eui?.length === 16
+    ids?.join_eui?.length === 16
 
   return (
     <>
       <DeviceTypeFormSection />
       <DeviceProvisioningFormSection />
       {maySubmit && (
-        <SubmitBar>
-          <Form.Submit message={sharedMessages.addDevice} component={SubmitButton} />
-        </SubmitBar>
+        <>
+          <Form.Field title={m.afterRegistration} name="_registration" component={Radio.Group}>
+            <Radio label={m.singleRegistration} value={REGISTRATION_TYPES.SINGLE} />
+            <Radio label={m.multipleRegistration} value={REGISTRATION_TYPES.MULTIPLE} />
+          </Form.Field>
+          <SubmitBar>
+            <Form.Submit message={sharedMessages.addDevice} component={SubmitButton} />
+          </SubmitBar>
+        </>
       )}
     </>
   )
@@ -79,24 +79,15 @@ const DeviceOnboardingForm = () => {
   const dispatch = useDispatch()
   const mayEditKeys = useSelector(state => checkFromState(mayEditApplicationDeviceKeys, state))
   const appId = useSelector(state => selectSelectedApplicationId(state))
-  const jsConfig = useSelector(selectJsConfig)
-  const nsConfig = useSelector(selectNsConfig)
-  const asConfig = useSelector(selectAsConfig)
-  const asEnabled = asConfig.enabled
-  const jsEnabled = jsConfig.enabled
-  const nsEnabled = nsConfig.enabled
-  const asUrl = asEnabled ? asConfig.base_url : undefined
-  const jsUrl = jsEnabled ? jsConfig.base_url : undefined
-  const nsUrl = nsEnabled ? nsConfig.base_url : undefined
   const validationContext = React.useMemo(() => ({ mayEditKeys }), [mayEditKeys])
 
   const navigateToDevice = useCallback(
-    deviceId => dispatch(push(`/applications/${appId}/devices/${deviceId}`)),
-    [appId, dispatch],
+    (appId, deviceId) => dispatch(push(`/applications/${appId}/devices/${deviceId}`)),
+    [dispatch],
   )
 
   const handleClaim = useCallback(
-    async (values, setSubmitting, cleanedValues) => {
+    async (values, setSubmitting) => {
       const { ids, authentication_code, qr_code } = values
 
       let authenticatedIdentifiers
@@ -113,7 +104,7 @@ const DeviceOnboardingForm = () => {
           attachPromise(claimDevice(appId, qr_code, authenticatedIdentifiers)),
         )
         const { ids } = device
-        await navigateToDevice(appId, ids.device_id)
+        navigateToDevice(appId, ids.device_id)
       } catch (error) {
         setSubmitting(false)
       }
@@ -124,9 +115,7 @@ const DeviceOnboardingForm = () => {
   const handleRegister = useCallback(
     async (values, setSubmitting, resetForm, setErrors, cleanedValues) => {
       try {
-        const { _registration, _inputMethod, ...allValues } = values
-
-        const { ids, supports_join, mac_state = {} } = allValues
+        const { ids, _registration, supports_join, mac_state = {} } = values
         ids.application_ids = { application_id: appId }
 
         //  Do not attempt to set empty current_parameters on device creation.
@@ -137,18 +126,7 @@ const DeviceOnboardingForm = () => {
           delete mac_state.current_parameters
         }
 
-        // Add derived server values
-        if (asUrl && asEnabled) {
-          allValues.application_server_address = getHostFromUrl(asUrl)
-        }
-        if (nsUrl && nsEnabled && mayEditKeys) {
-          allValues.network_server_address = getHostFromUrl(nsUrl)
-        }
-        if (jsEnabled) {
-          allValues.join_server_address = getHostFromUrl(jsUrl)
-        }
-
-        await dispatch(attachPromise(createDevice(appId, allValues)))
+        await dispatch(attachPromise(createDevice(appId, cleanedValues)))
         switch (_registration) {
           case REGISTRATION_TYPES.MULTIPLE:
             toast({
@@ -158,13 +136,13 @@ const DeviceOnboardingForm = () => {
             resetForm({
               errors: {},
               values: {
-                ...allValues,
+                ...values,
                 ...initialValues,
                 ids: {
                   ...initialValues.ids,
-                  join_eui: supports_join ? allValues.ids.join_eui : undefined,
+                  join_eui: supports_join ? values.ids.join_eui : undefined,
                 },
-                frequency_plan_id: allValues.frequency_plan_id,
+                frequency_plan_id: values.frequency_plan_id,
                 version_ids: values.version_ids,
                 _registration: REGISTRATION_TYPES.MULTIPLE,
               },
@@ -184,13 +162,13 @@ const DeviceOnboardingForm = () => {
         setSubmitting(false)
       }
     },
-    [],
+    [appId, dispatch, navigateToDevice],
   )
 
   const handleSubmit = useCallback(
     async (values, { setSubmitting, resetForm, setErrors }, cleanedValues) => {
-      if (Boolean(values.authentication_code)) {
-        return handleClaim(values, setSubmitting, cleanedValues)
+      if (values._claim) {
+        return handleClaim(cleanedValues, setSubmitting)
       }
 
       return handleRegister(values, setSubmitting, resetForm, setErrors, cleanedValues)
@@ -202,7 +180,14 @@ const DeviceOnboardingForm = () => {
     <Form
       onSubmit={handleSubmit}
       initialValues={initialValues}
-      hiddenFields={['network_server_address', 'application_server_address', 'join_server_address']}
+      hiddenFields={[
+        'network_server_address',
+        'application_server_address',
+        'join_server_address',
+        'frequency_plan_id',
+        'lorawan_phy_version',
+        'lorawan_version',
+      ]}
       validationSchema={validationSchema}
       validationContext={validationContext}
       validateAgainstCleanedValues
