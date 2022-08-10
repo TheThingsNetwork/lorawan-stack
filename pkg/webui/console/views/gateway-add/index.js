@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,135 +12,77 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import { defineMessages } from 'react-intl'
-import { connect } from 'react-redux'
+import React, { useCallback } from 'react'
 import { Container, Col, Row } from 'react-grid-system'
-import bind from 'autobind-decorator'
+import { defineMessages } from 'react-intl'
+import { useDispatch } from 'react-redux'
 import { push } from 'connected-react-router'
 
 import PageTitle from '@ttn-lw/components/page-title'
-import FormSubmit from '@ttn-lw/components/form/submit'
-import SubmitButton from '@ttn-lw/components/submit-button'
+import Link from '@ttn-lw/components/link'
 
-import { withEnv } from '@ttn-lw/lib/components/env'
-import withRequest from '@ttn-lw/lib/components/with-request'
+import Message from '@ttn-lw/lib/components/message'
+import RequireRequest from '@ttn-lw/lib/components/require-request'
 
-import GatewayDataForm from '@console/components/gateway-data-form'
+import GatewayOnboardingForm from '@console/containers/gateway-onboarding-form'
 
-import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+import Require from '@console/lib/components/require'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
-import { selectGsConfig } from '@ttn-lw/lib/selectors/env'
-import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
-import { mapFormValueToAttributes } from '@console/lib/attributes'
 import { mayCreateGateways } from '@console/lib/feature-checks'
 
 import { getOrganizationsList } from '@console/store/actions/organizations'
-import { createGateway } from '@console/store/actions/gateways'
-
-import { selectOrganizationsFetching } from '@console/store/selectors/organizations'
-import { selectUserId } from '@console/store/selectors/logout'
 
 const m = defineMessages({
-  createGateway: 'Create gateway',
+  gtwOnboardingDescription:
+    'Register your gateway to enable data traffic between nearby end devices and the network. {break} Learn more in our {gatewayGuideURL}.',
 })
 
-@withEnv
-@withFeatureRequirement(mayCreateGateways, { redirect: '/gateways' })
-@connect(
-  state => {
-    const userId = selectUserId(state)
-    const { enabled: gsEnabled } = selectGsConfig()
-
-    return { userId, gsEnabled, fetching: selectOrganizationsFetching(state) }
-  },
-  dispatch => ({
-    createSuccess: gtwId => dispatch(push(`/gateways/${gtwId}`)),
-    getOrganizationsList: () => dispatch(getOrganizationsList()),
-    createGateway: (ownerId, gateway, isUserOwner) =>
-      dispatch(attachPromise(createGateway(ownerId, gateway, isUserOwner))),
-  }),
+const GatewayGuideLink = (
+  <Link.Anchor
+    external
+    secondary
+    href="https://www.thethingsindustries.com/docs/gateways/adding-gateways/"
+  >
+    Gateway Guide
+  </Link.Anchor>
 )
-@withRequest(({ getOrganizationsList }) => getOrganizationsList())
-export default class GatewayAdd extends React.Component {
-  static propTypes = {
-    createGateway: PropTypes.func.isRequired,
-    createSuccess: PropTypes.func.isRequired,
-    env: PropTypes.env.isRequired,
-    gsEnabled: PropTypes.bool.isRequired,
-    userId: PropTypes.string.isRequired,
-  }
 
-  state = {
-    error: '',
-  }
+const GatewayAdd = () => {
+  const dispatch = useDispatch()
+  const handleSuccess = useCallback(
+    gtwId => {
+      dispatch(push(`/gateways/${gtwId}`))
+    },
+    [dispatch],
+  )
 
-  @bind
-  async handleSubmit(values, { resetForm }) {
-    const { userId, createSuccess, createGateway } = this.props
-    const { owner_id, ...gateway } = values
-    const {
-      ids: { gateway_id },
-      attributes,
-    } = gateway
-
-    await this.setState({ error: '' })
-
-    const gatewayValues = { ...gateway, attributes: mapFormValueToAttributes(attributes) }
-    try {
-      await createGateway(owner_id, gatewayValues, userId === owner_id)
-
-      createSuccess(gateway_id)
-    } catch (error) {
-      resetForm({ values })
-
-      await this.setState({ error })
-    }
-  }
-
-  render() {
-    const { error } = this.state
-    const {
-      env: {
-        config: { stack },
-      },
-      userId,
-      gsEnabled,
-    } = this.props
-
-    const initialValues = {
-      ids: {
-        gateway_id: undefined,
-      },
-      status_public: true,
-      location_public: true,
-      enforce_duty_cycle: true,
-      gateway_server_address: stack.gs.enabled ? new URL(stack.gs.base_url).hostname : '',
-      frequency_plan_id: undefined,
-      owner_id: userId,
-      schedule_anytime_delay: '530ms',
-    }
-
-    return (
-      <Container>
-        <PageTitle tall title={sharedMessages.addGateway} />
-        <Row>
-          <Col md={10} lg={9}>
-            <GatewayDataForm
-              error={error}
-              onSubmit={this.handleSubmit}
-              initialValues={initialValues}
-              update={false}
-              gsEnabled={gsEnabled}
-            >
-              <FormSubmit component={SubmitButton} message={m.createGateway} />
-            </GatewayDataForm>
-          </Col>
-        </Row>
-      </Container>
-    )
-  }
+  return (
+    <Require featureCheck={mayCreateGateways} otherwise={{ redirect: '/gateways' }}>
+      <RequireRequest requestAction={getOrganizationsList()}>
+        <Container>
+          <PageTitle
+            colProps={{ md: 10, lg: 9 }}
+            className="mb-cs-s"
+            title={sharedMessages.registerGateway}
+          >
+            <Message
+              component="p"
+              content={m.gtwOnboardingDescription}
+              values={{ gatewayGuideURL: GatewayGuideLink, break: <br /> }}
+            />
+            <hr className="mb-ls-s" />
+          </PageTitle>
+          <Row>
+            <Col md={10} lg={9}>
+              <GatewayOnboardingForm onSuccess={handleSuccess} />
+            </Col>
+          </Row>
+        </Container>
+      </RequireRequest>
+    </Require>
+  )
 }
+
+export default GatewayAdd

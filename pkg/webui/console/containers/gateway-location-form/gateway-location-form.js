@@ -201,9 +201,9 @@ const GatewayLocationForm = ({ gateway, gatewayId, updateGateway }) => {
         title={m.locationPrivacy}
         name="location_public"
         component={Checkbox}
-        label={sharedMessages.public}
+        label={sharedMessages.gatewayLocationPublic}
         description={sharedMessages.locationDescription}
-        tooltipId={tooltipIds.GATEWAY_LOCATION}
+        tooltipId={tooltipIds.GATEWAY_LOCATION_PUBLIC}
       />
       <Form.Field
         title={m.locationSource}

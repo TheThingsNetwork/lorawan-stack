@@ -157,10 +157,14 @@ const m = defineMessages({
   requireAuthenticatedConnectionDescription:
     'This will only allow a gateway to connect if it uses a TLS enabled Basic Station or MQTT connection. It will not allow connections from UDP packet forwarders.',
 
-  gatewayStatusDescription:
-    'Setting your gateway status to public allows status information about the gateway to be shared with other users in the network, and with Packet Broker if enabled by the network operator.',
-  gatewayLocationDescription:
-    'Setting your gateway location to public allows location information about the gateway to be shared with other users in the network, and with Packet Broker if enabled by the network operator.',
+  gatewayGenerateApiKeyCUPS:
+    'Use this option if you plan to use your gateway with LoRa Basics™ Station CUPS (Configuration and Update Server) to check for configuration and software updates. When checked, an appropriate API key for the CUPS service is automatically generated, so you can authorize the gateway right away.',
+  gatewayGenerateApiKeyLNS:
+    'Use this option if you plan to use your gateway with LoRa Basics™ Station. LNS is used to establish a connection between your gateway and LoRa Basics™ Station. If checked, an appropriate API key for LNS is automatically generated, so you can authorize the gateway for LNS usage right away.',
+  gatewayStatusPublicDescription:
+    "If this option is checked, the gateway status can be retrieved by other network participants as well as by peering network participants through Packet Broker (if enabled). This is useful if you would like others to benefit from your gateway's coverage by providing them with useful information to do so.",
+  gatewayLocationPublicDescription:
+    "If this option is checked, the gateway location can be retrieved by other network participants as well as by peering network participants through Packet Broker (if enabled). This is useful if you would like others to benefit from your gateway's coverage by providing them with the exact location.",
 
   gatewayAttributesDescription:
     'Attributes can be used to set arbitrary information about the entity, to be used by scripts, or simply for your own organization.',
@@ -404,14 +408,20 @@ const descriptions = Object.freeze({
   [TOOLTIP_IDS.GATEWAY_DESCRIPTION]: {
     description: m.gatewayDescDescription,
   },
+  [TOOLTIP_IDS.GATEWAY_GENERATE_API_KEY_CUPS]: {
+    description: m.gatewayGenerateApiKeyCUPS,
+  },
+  [TOOLTIP_IDS.GATEWAY_GENERATE_API_KEY_LNS]: {
+    description: m.gatewayGenerateApiKeyLNS,
+  },
   [TOOLTIP_IDS.REQUIRE_AUTHENTICATED_CONNECTION]: {
     description: m.requireAuthenticatedConnectionDescription,
   },
-  [TOOLTIP_IDS.GATEWAY_STATUS]: {
-    description: m.gatewayStatusDescription,
+  [TOOLTIP_IDS.GATEWAY_STATUS_PUBLIC]: {
+    description: m.gatewayStatusPublicDescription,
   },
-  [TOOLTIP_IDS.GATEWAY_LOCATION]: {
-    description: m.gatewayLocationDescription,
+  [TOOLTIP_IDS.GATEWAY_LOCATION_PUBLIC]: {
+    description: m.gatewayLocationPublicDescription,
   },
   [TOOLTIP_IDS.GATEWAY_ATTRIBUTES]: {
     description: m.gatewayAttributesDescription,
@@ -523,6 +533,12 @@ const links = Object.freeze({
   },
   [TOOLTIP_IDS.GATEWAY_EUI]: {
     documentationPath: '/reference/id-eui-constraints',
+  },
+  [TOOLTIP_IDS.GATEWAY_GENERATE_API_KEY_CUPS]: {
+    documentationPath: '/gateways/lora-basics-station/cups/',
+  },
+  [TOOLTIP_IDS.GATEWAY_GENERATE_API_KEY_LNS]: {
+    documentationPath: '/gateways/lora-basics-station/lns/',
   },
   [TOOLTIP_IDS.DEVICE_ID]: {
     documentationPath: '/reference/id-eui-constraints',
