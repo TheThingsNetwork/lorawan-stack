@@ -14,10 +14,13 @@
 
 import Yup from '@ttn-lw/lib/yup'
 
+import { REGISTRATION_TYPES } from './utils'
 import typeValidationSchema from './device-type-form-section/validation-schema'
 import provisioningValidationSchema from './device-provisioning-form-section/validation-schema'
 
-const validationSchema = Yup.object({})
+const validationSchema = Yup.object({
+  _registration: Yup.mixed().oneOf([REGISTRATION_TYPES.SINGLE, REGISTRATION_TYPES.MULTIPLE]),
+})
   .concat(typeValidationSchema)
   .concat(provisioningValidationSchema)
 

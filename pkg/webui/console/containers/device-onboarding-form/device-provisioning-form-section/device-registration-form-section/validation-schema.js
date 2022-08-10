@@ -28,14 +28,27 @@ const devEUISchema = Yup.string().length(8 * 2, Yup.passValues(sharedMessages.va
 
 const validationSchema = Yup.object({
   ids: Yup.object().shape({
-    dev_eui: devEUISchema.required(sharedMessages.validateRequired),
+    dev_eui: devEUISchema.when('supports_join', supports_joins => {
+      if (supports_joins) {
+        return devEUISchema.required(sharedMessages.validateRequired)
+      }
+
+      return devEUISchema.default(null).nullable()
+    }),
+    device_id: Yup.string().when('_claim', claim => {
+      if (!claim) {
+        return Yup.string().required(sharedMessages.validateRequired)
+      }
+
+      return Yup.string().default(null).nullable()
+    }),
   }),
 
   root_keys: Yup.object().when(
-    ['supports_join', 'lorawan_version', '$mayEditKeys'],
-    (isOTAA, version, mayEditKeys, schema) => {
+    ['supports_join', 'lorawan_version', '_inputMethod', '$mayEditKeys'],
+    (isOTAA, version, inputMethod, mayEditKeys, schema) => {
       const notRequiredKeySchema = Yup.object().shape({
-        key: Yup.string(),
+        key: Yup.string().default('').nullable(),
       })
       const requiredKeySchema = Yup.lazy(() => {
         if (mayEditKeys) {
@@ -46,12 +59,10 @@ const validationSchema = Yup.object({
           })
         }
 
-        return Yup.object().shape({
-          key: Yup.string(),
-        })
+        return notRequiredKeySchema
       })
 
-      if (!mayEditKeys || !isOTAA) {
+      if (!mayEditKeys || !isOTAA || inputMethod === 'manual') {
         return schema.shape({
           nwk_key: notRequiredKeySchema,
           app_key: notRequiredKeySchema,
@@ -73,20 +84,23 @@ const validationSchema = Yup.object({
   ),
   session: Yup.object().when(['lorawan_version', 'supports_join'], (version, isOTAA, schema) => {
     const lwVersion = parseLorawanMacVersion(version)
+    const notRequiredKeySchema = Yup.object().shape({
+      key: Yup.string().default('').nullable(),
+    })
 
     return schema.shape({
       dev_addr: Yup.lazy(() => {
-        if (isOTAA) {
+        if (!isOTAA) {
           return Yup.string()
             .length(4 * 2, Yup.passValues(sharedMessages.validateLength))
             .required(sharedMessages.validateRequired)
         }
 
-        return Yup.string().default(null).nullable()
+        return notRequiredKeySchema
       }),
       keys: Yup.object().shape({
         app_s_key: Yup.lazy(() => {
-          if (isOTAA) {
+          if (!isOTAA) {
             return Yup.object().shape({
               key: Yup.string()
                 .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
@@ -94,10 +108,10 @@ const validationSchema = Yup.object({
             })
           }
 
-          return Yup.object().default(null).nullable()
+          return notRequiredKeySchema
         }),
         f_nwk_s_int_key: Yup.lazy(() => {
-          if (isOTAA) {
+          if (!isOTAA) {
             return Yup.object().shape({
               key: Yup.string()
                 .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
@@ -105,10 +119,10 @@ const validationSchema = Yup.object({
             })
           }
 
-          return Yup.object().default(null).nullable()
+          return notRequiredKeySchema
         }),
         s_nwk_s_int_key: Yup.lazy(() => {
-          if (isOTAA || lwVersion >= 110) {
+          if (!isOTAA && lwVersion >= 110) {
             return Yup.object().shape({
               key: Yup.string()
                 .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
@@ -116,10 +130,10 @@ const validationSchema = Yup.object({
             })
           }
 
-          return Yup.object().default(null).nullable()
+          return notRequiredKeySchema
         }),
         nwk_s_enc_key: Yup.lazy(() => {
-          if (isOTAA || lwVersion >= 110) {
+          if (!isOTAA && lwVersion >= 110) {
             return Yup.object().shape({
               key: Yup.string()
                 .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
@@ -127,12 +141,12 @@ const validationSchema = Yup.object({
             })
           }
 
-          return Yup.object().default(null).nullable()
+          return notRequiredKeySchema
         }),
       }),
     })
   }),
-  lorawan_version: Yup.string(),
+  lorawan_version: Yup.string().default(null).nullable(),
 })
 
 const initialValues = {

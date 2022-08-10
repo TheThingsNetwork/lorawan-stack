@@ -77,6 +77,7 @@ const DeviceProvisioningFormSection = () => {
   const mayProvisionDevice =
     (Boolean(frequency_plan_id) && Boolean(lorawan_version) && Boolean(lorawan_phy_version)) ||
     (_inputMethod === 'device-repository' && hasValidDeviceRepositoryType(version, template))
+  const mayConfirm = _claim === '' || _claim === undefined
 
   const isClaimable = React.useCallback(async () => {
     if (_claim !== '') {
@@ -89,7 +90,7 @@ const DeviceProvisioningFormSection = () => {
         _claim: '',
       }))
     } else {
-      const claim = await dispatch(attachPromise(getInfoByJoinEUI({ join_eui: ids.join_eui })))
+      const claim = await dispatch(attachPromise(getInfoByJoinEUI({ join_eui: ids?.join_eui })))
       const supportsClaiming = claim.supports_claiming ?? false
 
       setFieldValue('_claim', supportsClaiming)
@@ -115,12 +116,12 @@ const DeviceProvisioningFormSection = () => {
           max={8}
           required
           component={Input}
-          actionDisable={!Boolean(ids.join_eui)}
+          actionDisable={!Boolean(ids?.join_eui)}
           action={{
             type: 'button',
-            disable: !Boolean(ids.join_eui),
-            title: _claim === '' ? msg.confirm : msg.reset,
-            message: _claim === '' ? msg.confirm : msg.reset,
+            disable: !Boolean(ids?.join_eui),
+            title: mayConfirm ? msg.confirm : msg.reset,
+            message: mayConfirm ? msg.confirm : msg.reset,
             onClick: isClaimable,
             raw: true,
           }}
@@ -136,13 +137,13 @@ const DeviceProvisioningFormSection = () => {
       {mayProvisionDevice && _claim === '' && (
         <Message content={msg.continue} className="mt-ls-m mb-ls-m" component="div" />
       )}
-      {_claim === true && (
+      {mayProvisionDevice && _claim === true && (
         <>
           <Message content={msg.claiming} className="mb-ls-s" component="div" />
           <DeviceClaimingFormSection />
         </>
       )}
-      {_claim === false && (
+      {mayProvisionDevice && _claim === false && (
         <>
           <Message content={msg.registration} className="mb-ls-s" component="div" />
           <DeviceRegistrationFormSection />

@@ -34,6 +34,7 @@ const validationSchema = Yup.object({
     }
   }),
   supports_join: Yup.bool().default(false),
+  _claim: Yup.mixed().oneOf(['', true, false]),
 }).when(['_claim'], {
   is: true,
   then: schema => schema.concat(claimValidationSchema),

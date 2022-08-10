@@ -27,13 +27,14 @@ const validationSchema = Yup.object({
       .length(8 * 2, Yup.passValues(sharedMessages.validateLength))
       .required(sharedMessages.validateRequired),
   }),
-  authentication_code: Yup.string().when(['_claim'], {
-    is: 'true',
-    then: schema =>
-      schema
+  authentication_code: Yup.string().when('_claim', claim => {
+    if (claim) {
+      return Yup.string()
         .matches(/^[A-Z0-9]{1,32}$/, Yup.passValues(m.validateCode))
-        .required(sharedMessages.validateRequired),
-    otherwise: schema => schema.strip(),
+        .required(sharedMessages.validateRequired)
+    }
+
+    return Yup.string().default(null).nullable()
   }),
 })
 

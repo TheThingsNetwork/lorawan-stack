@@ -44,12 +44,19 @@ import DeviceTypeFormSection, {
 } from './device-type-form-section'
 import validationSchema from './validation-schema'
 
-const initialValues = merge({}, provisioningInitialValues, typeInitialValues)
+const initialValues = merge(
+  {
+    _registration: REGISTRATION_TYPES.SINGLE,
+  },
+  provisioningInitialValues,
+  typeInitialValues,
+)
 
 const DeviceOnboardingFormInner = () => {
   const {
     values: { frequency_plan_id, lorawan_version, lorawan_phy_version, ids },
   } = useFormContext()
+
   const maySubmit =
     Boolean(frequency_plan_id) &&
     Boolean(lorawan_version) &&
@@ -115,7 +122,8 @@ const DeviceOnboardingForm = () => {
   const handleRegister = useCallback(
     async (values, setSubmitting, resetForm, setErrors, cleanedValues) => {
       try {
-        const { ids, _registration, supports_join, mac_state = {} } = values
+        const { _registration } = values
+        const { ids, supports_join, mac_state = {} } = cleanedValues
         ids.application_ids = { application_id: appId }
 
         //  Do not attempt to set empty current_parameters on device creation.
@@ -187,6 +195,7 @@ const DeviceOnboardingForm = () => {
         'frequency_plan_id',
         'lorawan_phy_version',
         'lorawan_version',
+        'supports_join',
       ]}
       validationSchema={validationSchema}
       validationContext={validationContext}

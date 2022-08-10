@@ -69,12 +69,6 @@ const DeviceRegistrationFormSection = () => {
     [values],
   )
 
-  const { end_device } = template
-  const { supports_join, lorawan_version } = end_device
-
-  const isOTAA = supports_join
-  const lwVersion = parseLorawanMacVersion(lorawan_version)
-
   let appKeyPlaceholder = undefined
   let nwkKeyPlaceholder = undefined
   if (!mayEditKeys) {
@@ -82,16 +76,34 @@ const DeviceRegistrationFormSection = () => {
     nwkKeyPlaceholder = sharedMessages.insufficientNwkKeyRights
   }
 
+  const isOTAA = template?.end_device?.supports_join
+  const isMulticast = values.multicast
+  const isABP = !values.supports_join && !values.multicast
+  const isManualOTAA = values.supports_join
+  const lwVersion =
+    parseLorawanMacVersion(template?.end_device?.lorawan_version) ||
+    parseLorawanMacVersion(values.lorawan_version)
+
+  const showDevEUI =
+    (!isMulticast && values._inputMethod === 'manual') ||
+    (isOTAA && values._inputMethod === 'device-repository')
+
+  const showSessionKeys =
+    ((isABP || isMulticast) && values._inputMethod === 'manual') ||
+    (!isOTAA && values._inputMethod === 'device-repository')
+
   return (
     <div data-test-id="device-registration">
-      {isOTAA && (
+      {showDevEUI && (
+        <DevEUIComponent
+          values={values}
+          setFieldValue={setFieldValue}
+          initialValues={initialValues}
+          devEUISchema={devEUISchema}
+        />
+      )}
+      {(isOTAA || isManualOTAA) && (
         <>
-          <DevEUIComponent
-            values={values}
-            setFieldValue={setFieldValue}
-            initialValues={initialValues}
-            devEUISchema={devEUISchema}
-          />
           <Form.Field
             required
             title={sharedMessages.appKey}
@@ -124,7 +136,7 @@ const DeviceRegistrationFormSection = () => {
           )}
         </>
       )}
-      {!isOTAA && (
+      {showSessionKeys && (
         <>
           <DevAddrInput title={sharedMessages.devAddr} name="session.dev_addr" required />
           {lwVersion === 104 && (
