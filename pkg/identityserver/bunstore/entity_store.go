@@ -51,6 +51,8 @@ func (s *entityStore) query(ctx context.Context, entityType string, entityIDs ..
 	var query *bun.SelectQuery
 
 	switch entityType {
+	default:
+		panic(fmt.Errorf("invalid entity type: %s", entityType))
 	case "application":
 		query = s.newSelectModel(ctx, &Application{}).
 			Column("id").
@@ -137,6 +139,8 @@ func (s *entityStore) getEntityID(ctx context.Context, entityType, entityUUID st
 	var query *bun.SelectQuery
 
 	switch entityType {
+	default:
+		panic(fmt.Errorf("invalid entity type: %s", entityType))
 	case "application":
 		query = s.newSelectModel(ctx, &Application{}).
 			Column("application_id").
