@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import { defineSmokeTest } from '../utils'
+import { generateHexValue } from '../../../support/utils'
 
 const gatewayCreate = defineSmokeTest('succeeds creating gateway', () => {
   const user = {
@@ -27,31 +28,27 @@ const gatewayCreate = defineSmokeTest('succeeds creating gateway', () => {
   cy.visit(Cypress.config('consoleRootPath'))
 
   const gateway = {
+    eui: generateHexValue(16),
     gateway_id: 'gateway-create-test',
     name: 'Gateway Create Test',
-    description: 'Gateway used in smoke test to verify gateway creation',
-    gateway_server_address: 'test-address',
     frequency_plan_id: 'EU_863_870',
   }
 
   cy.get('header').within(() => {
     cy.findByRole('link', { name: /Gateways/ }).click()
   })
-  cy.findByRole('link', { name: /Add gateway/ }).click()
-  cy.findByLabelText('Gateway ID').type(gateway.gateway_id)
+  cy.findByRole('link', { name: /Register gateway/ }).click()
+  cy.findByLabelText('Gateway EUI').type(gateway.eui)
   cy.findByLabelText('Gateway name').type(gateway.name)
-  cy.findByLabelText('Gateway description').type(gateway.description)
-  cy.findByLabelText('Gateway Server address').type(gateway.gateway_server_address)
   cy.findByLabelText('Frequency plan').selectOption(gateway.frequency_plan_id)
-  cy.findByRole('button', { name: 'Create gateway' }).click()
+  cy.findByRole('button', { name: 'Register gateway' }).click()
 
   cy.location('pathname').should(
     'eq',
-    `${Cypress.config('consoleRootPath')}/gateways/${gateway.gateway_id}`,
+    `${Cypress.config('consoleRootPath')}/gateways/eui-${gateway.eui}`,
   )
-
+  cy.findByRole('heading', { name: gateway.name })
   cy.findByTestId('error-notification').should('not.exist')
-  cy.findByTestId('full-error-view').should('not.exist')
 })
 
 export default [gatewayCreate]

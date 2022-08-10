@@ -105,7 +105,7 @@ describe('Gateway location create', () => {
 
   it('succeeds saving location', () => {
     cy.visit(`${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/location`)
-    cy.findByLabelText('Make location public').check()
+    cy.findByLabelText('Share location within network').check()
     cy.findByLabelText('Indoor').check()
     cy.findByLabelText('Latitude').type(coordinates.latitude)
     cy.findByLabelText('Longitude').type(coordinates.longitude)
