@@ -12,6 +12,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - New `SearchAccounts` RPC on the `EntityRegistrySearch` service.
+- Prompt user to confirm navigation when changes have not been saved in the payload formatter form to prevent big change-drafts from getting lost.
 
 ### Changed
 

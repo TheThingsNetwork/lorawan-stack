@@ -335,6 +335,8 @@
   "console.components.payload-formatters-form.index.learnMoreAboutPayloadFormatters": "Learn more about payload formatters",
   "console.components.payload-formatters-form.index.learnMoreAboutCayenne": "What is CayenneLPP?",
   "console.components.payload-formatters-form.index.noRepositoryWarning": "The application formatter is set to `Repository` but this device does not have an associated formatter in the LoRaWAN Device repository. Messages for this end device will hence not be formatted.",
+  "console.components.payload-formatters-form.index.confirmNavigationTitle": "Confirm navigation",
+  "console.components.payload-formatters-form.index.confirmNavigationMessage": "Are you sure you want to leave this page? Your current changes have not been saved yet.",
   "console.components.payload-formatters-form.test-form.index.validResult": "Payload is valid",
   "console.components.payload-formatters-form.test-form.index.noResult": "No test result generated yet",
   "console.components.payload-formatters-form.test-form.index.testDecoder": "Test decoder",
