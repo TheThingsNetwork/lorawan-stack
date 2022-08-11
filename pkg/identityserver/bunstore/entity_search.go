@@ -351,13 +351,11 @@ func (s *entitySearch) SearchAccounts(
 	ctx, span := tracer.Start(ctx, "SearchAccounts")
 	defer span.End()
 
-	selectQuery := s.DB.NewSelect()
+	var selectQuery *bun.SelectQuery
 
 	if entityID := req.GetEntityIdentifiers(); entityID != nil {
-		selectQuery = selectQuery.
-			Model(&directEntityMembership{}).
+		selectQuery = s.newSelectModel(ctx, &directEntityMembership{}).
 			ColumnExpr("account_type, account_friendly_id").
-			Apply(selectWithContext(ctx)).
 			Where("entity_type = ?", getEntityType(entityID)).
 			Where("entity_friendly_id = ?", entityID.IDString()).
 			Order("account_friendly_id")
@@ -368,10 +366,8 @@ func (s *entitySearch) SearchAccounts(
 			selectQuery = selectQuery.Where(ilike("account_friendly_id"), q)
 		}
 	} else {
-		selectQuery = selectQuery.
-			Model(&Account{}).
+		selectQuery = s.newSelectModel(ctx, &Account{}).
 			ColumnExpr("account_type, uid AS account_friendly_id").
-			Apply(selectWithContext(ctx)).
 			Order("uid")
 		if req.OnlyUsers {
 			selectQuery = selectQuery.Where(`account_type = 'user'`)
