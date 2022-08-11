@@ -131,10 +131,23 @@
   - [Message `PeerInfo`](#ttn.lorawan.v3.PeerInfo)
   - [Message `PeerInfo.TagsEntry`](#ttn.lorawan.v3.PeerInfo.TagsEntry)
 - [File `lorawan-stack/api/configuration_services.proto`](#lorawan-stack/api/configuration_services.proto)
+  - [Message `BandDescription`](#ttn.lorawan.v3.BandDescription)
+  - [Message `BandDescription.BandDataRate`](#ttn.lorawan.v3.BandDescription.BandDataRate)
+  - [Message `BandDescription.Beacon`](#ttn.lorawan.v3.BandDescription.Beacon)
+  - [Message `BandDescription.Channel`](#ttn.lorawan.v3.BandDescription.Channel)
+  - [Message `BandDescription.DataRatesEntry`](#ttn.lorawan.v3.BandDescription.DataRatesEntry)
+  - [Message `BandDescription.DwellTime`](#ttn.lorawan.v3.BandDescription.DwellTime)
+  - [Message `BandDescription.Rx2Parameters`](#ttn.lorawan.v3.BandDescription.Rx2Parameters)
+  - [Message `BandDescription.SubBandParameters`](#ttn.lorawan.v3.BandDescription.SubBandParameters)
   - [Message `FrequencyPlanDescription`](#ttn.lorawan.v3.FrequencyPlanDescription)
   - [Message `GetPhyVersionsRequest`](#ttn.lorawan.v3.GetPhyVersionsRequest)
   - [Message `GetPhyVersionsResponse`](#ttn.lorawan.v3.GetPhyVersionsResponse)
   - [Message `GetPhyVersionsResponse.VersionInfo`](#ttn.lorawan.v3.GetPhyVersionsResponse.VersionInfo)
+  - [Message `ListBandsRequest`](#ttn.lorawan.v3.ListBandsRequest)
+  - [Message `ListBandsResponse`](#ttn.lorawan.v3.ListBandsResponse)
+  - [Message `ListBandsResponse.DescriptionsEntry`](#ttn.lorawan.v3.ListBandsResponse.DescriptionsEntry)
+  - [Message `ListBandsResponse.VersionedBandDescription`](#ttn.lorawan.v3.ListBandsResponse.VersionedBandDescription)
+  - [Message `ListBandsResponse.VersionedBandDescription.BandEntry`](#ttn.lorawan.v3.ListBandsResponse.VersionedBandDescription.BandEntry)
   - [Message `ListFrequencyPlansRequest`](#ttn.lorawan.v3.ListFrequencyPlansRequest)
   - [Message `ListFrequencyPlansResponse`](#ttn.lorawan.v3.ListFrequencyPlansResponse)
   - [Service `Configuration`](#ttn.lorawan.v3.Configuration)
@@ -2302,6 +2315,87 @@ PeerInfo
 
 ## <a name="lorawan-stack/api/configuration_services.proto">File `lorawan-stack/api/configuration_services.proto`</a>
 
+### <a name="ttn.lorawan.v3.BandDescription">Message `BandDescription`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `id` | [`string`](#string) |  |  |
+| `beacon` | [`BandDescription.Beacon`](#ttn.lorawan.v3.BandDescription.Beacon) |  |  |
+| `ping_slot_frequency` | [`google.protobuf.UInt64Value`](#google.protobuf.UInt64Value) |  |  |
+| `max_uplink_channels` | [`uint32`](#uint32) |  |  |
+| `uplink_channels` | [`BandDescription.Channel`](#ttn.lorawan.v3.BandDescription.Channel) | repeated |  |
+| `max_downlink_channels` | [`uint32`](#uint32) |  |  |
+| `downlink_channels` | [`BandDescription.Channel`](#ttn.lorawan.v3.BandDescription.Channel) | repeated |  |
+| `sub_bands` | [`BandDescription.SubBandParameters`](#ttn.lorawan.v3.BandDescription.SubBandParameters) | repeated |  |
+| `data_rates` | [`BandDescription.DataRatesEntry`](#ttn.lorawan.v3.BandDescription.DataRatesEntry) | repeated |  |
+| `freq_multiplier` | [`uint64`](#uint64) |  |  |
+| `implements_cf_list` | [`bool`](#bool) |  |  |
+| `cf_list_type` | [`CFListType`](#ttn.lorawan.v3.CFListType) |  |  |
+| `receive_delay_1` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
+| `receive_delay_2` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
+| `join_accept_delay_1` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
+| `join_accept_delay_2` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
+| `max_fcnt_gap` | [`uint64`](#uint64) |  |  |
+| `supports_dynamic_adr` | [`bool`](#bool) |  |  |
+| `adr_ack_limit` | [`ADRAckLimitExponent`](#ttn.lorawan.v3.ADRAckLimitExponent) |  |  |
+| `tx_param_setup_req_support` | [`bool`](#bool) |  |  |
+| `default_max_eirp` | [`float`](#float) |  |  |
+| `lora_coding_rate` | [`string`](#string) |  |  |
+| `default_rx2_parameters` | [`BandDescription.Rx2Parameters`](#ttn.lorawan.v3.BandDescription.Rx2Parameters) |  |  |
+| `boot_dwell_time` | [`BandDescription.DwellTime`](#ttn.lorawan.v3.BandDescription.DwellTime) |  |  |
+
+### <a name="ttn.lorawan.v3.BandDescription.BandDataRate">Message `BandDescription.BandDataRate`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `rate` | [`DataRate`](#ttn.lorawan.v3.DataRate) |  |  |
+
+### <a name="ttn.lorawan.v3.BandDescription.Beacon">Message `BandDescription.Beacon`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  |  |
+| `coding_rate` | [`string`](#string) |  |  |
+| `inverted_polarity` | [`bool`](#bool) |  |  |
+
+### <a name="ttn.lorawan.v3.BandDescription.Channel">Message `BandDescription.Channel`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `frequency` | [`uint64`](#uint64) |  |  |
+| `min_data_rate` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  |  |
+| `max_data_rate` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  |  |
+
+### <a name="ttn.lorawan.v3.BandDescription.DataRatesEntry">Message `BandDescription.DataRatesEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`uint32`](#uint32) |  |  |
+| `value` | [`BandDescription.BandDataRate`](#ttn.lorawan.v3.BandDescription.BandDataRate) |  |  |
+
+### <a name="ttn.lorawan.v3.BandDescription.DwellTime">Message `BandDescription.DwellTime`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `uplinks` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  |  |
+| `downlinks` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  |  |
+
+### <a name="ttn.lorawan.v3.BandDescription.Rx2Parameters">Message `BandDescription.Rx2Parameters`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  |  |
+| `frequency` | [`uint64`](#uint64) |  |  |
+
+### <a name="ttn.lorawan.v3.BandDescription.SubBandParameters">Message `BandDescription.SubBandParameters`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `min_frequency` | [`uint64`](#uint64) |  |  |
+| `max_frequency` | [`uint64`](#uint64) |  |  |
+| `duty_cycle` | [`float`](#float) |  |  |
+| `max_eirp` | [`float`](#float) |  |  |
+
 ### <a name="ttn.lorawan.v3.FrequencyPlanDescription">Message `FrequencyPlanDescription`</a>
 
 | Field | Type | Label | Description |
@@ -2330,6 +2424,39 @@ PeerInfo
 | `band_id` | [`string`](#string) |  |  |
 | `phy_versions` | [`PHYVersion`](#ttn.lorawan.v3.PHYVersion) | repeated |  |
 
+### <a name="ttn.lorawan.v3.ListBandsRequest">Message `ListBandsRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `band_id` | [`string`](#string) |  | Optional Band ID to filter the results. If unused, all supported Bands are returned. |
+| `phy_version` | [`PHYVersion`](#ttn.lorawan.v3.PHYVersion) |  | Optional PHY version to filter the results. If unused, all supported versions are returned. |
+
+### <a name="ttn.lorawan.v3.ListBandsResponse">Message `ListBandsResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `descriptions` | [`ListBandsResponse.DescriptionsEntry`](#ttn.lorawan.v3.ListBandsResponse.DescriptionsEntry) | repeated |  |
+
+### <a name="ttn.lorawan.v3.ListBandsResponse.DescriptionsEntry">Message `ListBandsResponse.DescriptionsEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`string`](#string) |  |  |
+| `value` | [`ListBandsResponse.VersionedBandDescription`](#ttn.lorawan.v3.ListBandsResponse.VersionedBandDescription) |  |  |
+
+### <a name="ttn.lorawan.v3.ListBandsResponse.VersionedBandDescription">Message `ListBandsResponse.VersionedBandDescription`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `band` | [`ListBandsResponse.VersionedBandDescription.BandEntry`](#ttn.lorawan.v3.ListBandsResponse.VersionedBandDescription.BandEntry) | repeated | map<PHYVersion, BandDescription> |
+
+### <a name="ttn.lorawan.v3.ListBandsResponse.VersionedBandDescription.BandEntry">Message `ListBandsResponse.VersionedBandDescription.BandEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`string`](#string) |  |  |
+| `value` | [`BandDescription`](#ttn.lorawan.v3.BandDescription) |  |  |
+
 ### <a name="ttn.lorawan.v3.ListFrequencyPlansRequest">Message `ListFrequencyPlansRequest`</a>
 
 | Field | Type | Label | Description |
@@ -2348,6 +2475,7 @@ PeerInfo
 | ----------- | ------------ | ------------- | ------------|
 | `ListFrequencyPlans` | [`ListFrequencyPlansRequest`](#ttn.lorawan.v3.ListFrequencyPlansRequest) | [`ListFrequencyPlansResponse`](#ttn.lorawan.v3.ListFrequencyPlansResponse) |  |
 | `GetPhyVersions` | [`GetPhyVersionsRequest`](#ttn.lorawan.v3.GetPhyVersionsRequest) | [`GetPhyVersionsResponse`](#ttn.lorawan.v3.GetPhyVersionsResponse) | Returns a list of supported LoRaWAN PHY Versions for the given Band ID. |
+| `ListBands` | [`ListBandsRequest`](#ttn.lorawan.v3.ListBandsRequest) | [`ListBandsResponse`](#ttn.lorawan.v3.ListBandsResponse) |  |
 
 #### HTTP bindings
 
@@ -2355,6 +2483,9 @@ PeerInfo
 | ----------- | ------ | ------- | ---- |
 | `ListFrequencyPlans` | `GET` | `/api/v3/configuration/frequency-plans` |  |
 | `GetPhyVersions` | `GET` | `/api/v3/configuration/phy-versions` |  |
+| `ListBands` | `GET` | `/api/v3/configuration/bands` |  |
+| `ListBands` | `GET` | `/api/v3/configuration/bands/{band_id}` |  |
+| `ListBands` | `GET` | `/api/v3/configuration/bands/{band_id}/{phy_version}` |  |
 
 ## <a name="lorawan-stack/api/contact_info.proto">File `lorawan-stack/api/contact_info.proto`</a>
 

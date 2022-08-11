@@ -489,6 +489,458 @@ var _ interface {
 	ErrorName() string
 } = GetPhyVersionsResponseValidationError{}
 
+// ValidateFields checks the field values on ListBandsRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ListBandsRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ListBandsRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "band_id":
+			// no validation rules for BandId
+		case "phy_version":
+			// no validation rules for PhyVersion
+		default:
+			return ListBandsRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ListBandsRequestValidationError is the validation error returned by
+// ListBandsRequest.ValidateFields if the designated constraints aren't met.
+type ListBandsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListBandsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListBandsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListBandsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListBandsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListBandsRequestValidationError) ErrorName() string { return "ListBandsRequestValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ListBandsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListBandsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListBandsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListBandsRequestValidationError{}
+
+// ValidateFields checks the field values on BandDescription with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *BandDescription) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = BandDescriptionFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "id":
+			// no validation rules for Id
+		case "beacon":
+
+			if v, ok := interface{}(m.GetBeacon()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return BandDescriptionValidationError{
+						field:  "beacon",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "ping_slot_frequency":
+
+			if v, ok := interface{}(m.GetPingSlotFrequency()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return BandDescriptionValidationError{
+						field:  "ping_slot_frequency",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "max_uplink_channels":
+			// no validation rules for MaxUplinkChannels
+		case "uplink_channels":
+
+			for idx, item := range m.GetUplinkChannels() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return BandDescriptionValidationError{
+							field:  fmt.Sprintf("uplink_channels[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		case "max_downlink_channels":
+			// no validation rules for MaxDownlinkChannels
+		case "downlink_channels":
+
+			for idx, item := range m.GetDownlinkChannels() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return BandDescriptionValidationError{
+							field:  fmt.Sprintf("downlink_channels[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		case "sub_bands":
+
+			for idx, item := range m.GetSubBands() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return BandDescriptionValidationError{
+							field:  fmt.Sprintf("sub_bands[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		case "data_rates":
+
+			for key, val := range m.GetDataRates() {
+				_ = val
+
+				// no validation rules for DataRates[key]
+
+				if v, ok := interface{}(val).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return BandDescriptionValidationError{
+							field:  fmt.Sprintf("data_rates[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		case "freq_multiplier":
+			// no validation rules for FreqMultiplier
+		case "implements_cf_list":
+			// no validation rules for ImplementsCfList
+		case "cf_list_type":
+			// no validation rules for CfListType
+		case "receive_delay_1":
+
+			if v, ok := interface{}(m.GetReceiveDelay_1()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return BandDescriptionValidationError{
+						field:  "receive_delay_1",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "receive_delay_2":
+
+			if v, ok := interface{}(m.GetReceiveDelay_2()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return BandDescriptionValidationError{
+						field:  "receive_delay_2",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "join_accept_delay_1":
+
+			if v, ok := interface{}(m.GetJoinAcceptDelay_1()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return BandDescriptionValidationError{
+						field:  "join_accept_delay_1",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "join_accept_delay_2":
+
+			if v, ok := interface{}(m.GetJoinAcceptDelay_2()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return BandDescriptionValidationError{
+						field:  "join_accept_delay_2",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "max_fcnt_gap":
+			// no validation rules for MaxFcntGap
+		case "supports_dynamic_adr":
+			// no validation rules for SupportsDynamicAdr
+		case "adr_ack_limit":
+			// no validation rules for AdrAckLimit
+		case "tx_param_setup_req_support":
+			// no validation rules for TxParamSetupReqSupport
+		case "default_max_eirp":
+			// no validation rules for DefaultMaxEirp
+		case "lora_coding_rate":
+			// no validation rules for LoraCodingRate
+		case "default_rx2_parameters":
+
+			if v, ok := interface{}(m.GetDefaultRx2Parameters()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return BandDescriptionValidationError{
+						field:  "default_rx2_parameters",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "boot_dwell_time":
+
+			if v, ok := interface{}(m.GetBootDwellTime()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return BandDescriptionValidationError{
+						field:  "boot_dwell_time",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return BandDescriptionValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// BandDescriptionValidationError is the validation error returned by
+// BandDescription.ValidateFields if the designated constraints aren't met.
+type BandDescriptionValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BandDescriptionValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BandDescriptionValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BandDescriptionValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BandDescriptionValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BandDescriptionValidationError) ErrorName() string { return "BandDescriptionValidationError" }
+
+// Error satisfies the builtin error interface
+func (e BandDescriptionValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBandDescription.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BandDescriptionValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BandDescriptionValidationError{}
+
+// ValidateFields checks the field values on ListBandsResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ListBandsResponse) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ListBandsResponseFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "descriptions":
+
+			for key, val := range m.GetDescriptions() {
+				_ = val
+
+				// no validation rules for Descriptions[key]
+
+				if v, ok := interface{}(val).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return ListBandsResponseValidationError{
+							field:  fmt.Sprintf("descriptions[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		default:
+			return ListBandsResponseValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ListBandsResponseValidationError is the validation error returned by
+// ListBandsResponse.ValidateFields if the designated constraints aren't met.
+type ListBandsResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListBandsResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListBandsResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListBandsResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListBandsResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListBandsResponseValidationError) ErrorName() string {
+	return "ListBandsResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListBandsResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListBandsResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListBandsResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListBandsResponseValidationError{}
+
 // ValidateFields checks the field values on GetPhyVersionsResponse_VersionInfo
 // with the rules defined in the proto definition for this message. If any
 // rules are violated, an error is returned.
@@ -574,3 +1026,654 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GetPhyVersionsResponse_VersionInfoValidationError{}
+
+// ValidateFields checks the field values on BandDescription_Beacon with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *BandDescription_Beacon) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = BandDescription_BeaconFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "data_rate_index":
+			// no validation rules for DataRateIndex
+		case "coding_rate":
+			// no validation rules for CodingRate
+		case "inverted_polarity":
+			// no validation rules for InvertedPolarity
+		default:
+			return BandDescription_BeaconValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// BandDescription_BeaconValidationError is the validation error returned by
+// BandDescription_Beacon.ValidateFields if the designated constraints aren't met.
+type BandDescription_BeaconValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BandDescription_BeaconValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BandDescription_BeaconValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BandDescription_BeaconValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BandDescription_BeaconValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BandDescription_BeaconValidationError) ErrorName() string {
+	return "BandDescription_BeaconValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e BandDescription_BeaconValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBandDescription_Beacon.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BandDescription_BeaconValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BandDescription_BeaconValidationError{}
+
+// ValidateFields checks the field values on BandDescription_Channel with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *BandDescription_Channel) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = BandDescription_ChannelFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "frequency":
+			// no validation rules for Frequency
+		case "min_data_rate":
+			// no validation rules for MinDataRate
+		case "max_data_rate":
+			// no validation rules for MaxDataRate
+		default:
+			return BandDescription_ChannelValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// BandDescription_ChannelValidationError is the validation error returned by
+// BandDescription_Channel.ValidateFields if the designated constraints aren't met.
+type BandDescription_ChannelValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BandDescription_ChannelValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BandDescription_ChannelValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BandDescription_ChannelValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BandDescription_ChannelValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BandDescription_ChannelValidationError) ErrorName() string {
+	return "BandDescription_ChannelValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e BandDescription_ChannelValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBandDescription_Channel.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BandDescription_ChannelValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BandDescription_ChannelValidationError{}
+
+// ValidateFields checks the field values on BandDescription_SubBandParameters
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *BandDescription_SubBandParameters) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = BandDescription_SubBandParametersFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "min_frequency":
+			// no validation rules for MinFrequency
+		case "max_frequency":
+			// no validation rules for MaxFrequency
+		case "duty_cycle":
+			// no validation rules for DutyCycle
+		case "max_eirp":
+			// no validation rules for MaxEirp
+		default:
+			return BandDescription_SubBandParametersValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// BandDescription_SubBandParametersValidationError is the validation error
+// returned by BandDescription_SubBandParameters.ValidateFields if the
+// designated constraints aren't met.
+type BandDescription_SubBandParametersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BandDescription_SubBandParametersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BandDescription_SubBandParametersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BandDescription_SubBandParametersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BandDescription_SubBandParametersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BandDescription_SubBandParametersValidationError) ErrorName() string {
+	return "BandDescription_SubBandParametersValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e BandDescription_SubBandParametersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBandDescription_SubBandParameters.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BandDescription_SubBandParametersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BandDescription_SubBandParametersValidationError{}
+
+// ValidateFields checks the field values on BandDescription_BandDataRate with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *BandDescription_BandDataRate) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = BandDescription_BandDataRateFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "rate":
+
+			if v, ok := interface{}(m.GetRate()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return BandDescription_BandDataRateValidationError{
+						field:  "rate",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return BandDescription_BandDataRateValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// BandDescription_BandDataRateValidationError is the validation error returned
+// by BandDescription_BandDataRate.ValidateFields if the designated
+// constraints aren't met.
+type BandDescription_BandDataRateValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BandDescription_BandDataRateValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BandDescription_BandDataRateValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BandDescription_BandDataRateValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BandDescription_BandDataRateValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BandDescription_BandDataRateValidationError) ErrorName() string {
+	return "BandDescription_BandDataRateValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e BandDescription_BandDataRateValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBandDescription_BandDataRate.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BandDescription_BandDataRateValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BandDescription_BandDataRateValidationError{}
+
+// ValidateFields checks the field values on BandDescription_Rx2Parameters with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *BandDescription_Rx2Parameters) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = BandDescription_Rx2ParametersFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "data_rate_index":
+			// no validation rules for DataRateIndex
+		case "frequency":
+			// no validation rules for Frequency
+		default:
+			return BandDescription_Rx2ParametersValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// BandDescription_Rx2ParametersValidationError is the validation error
+// returned by BandDescription_Rx2Parameters.ValidateFields if the designated
+// constraints aren't met.
+type BandDescription_Rx2ParametersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BandDescription_Rx2ParametersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BandDescription_Rx2ParametersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BandDescription_Rx2ParametersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BandDescription_Rx2ParametersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BandDescription_Rx2ParametersValidationError) ErrorName() string {
+	return "BandDescription_Rx2ParametersValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e BandDescription_Rx2ParametersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBandDescription_Rx2Parameters.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BandDescription_Rx2ParametersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BandDescription_Rx2ParametersValidationError{}
+
+// ValidateFields checks the field values on BandDescription_DwellTime with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *BandDescription_DwellTime) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = BandDescription_DwellTimeFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "uplinks":
+
+			if v, ok := interface{}(m.GetUplinks()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return BandDescription_DwellTimeValidationError{
+						field:  "uplinks",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "downlinks":
+
+			if v, ok := interface{}(m.GetDownlinks()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return BandDescription_DwellTimeValidationError{
+						field:  "downlinks",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return BandDescription_DwellTimeValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// BandDescription_DwellTimeValidationError is the validation error returned by
+// BandDescription_DwellTime.ValidateFields if the designated constraints
+// aren't met.
+type BandDescription_DwellTimeValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BandDescription_DwellTimeValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BandDescription_DwellTimeValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BandDescription_DwellTimeValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BandDescription_DwellTimeValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BandDescription_DwellTimeValidationError) ErrorName() string {
+	return "BandDescription_DwellTimeValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e BandDescription_DwellTimeValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBandDescription_DwellTime.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BandDescription_DwellTimeValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BandDescription_DwellTimeValidationError{}
+
+// ValidateFields checks the field values on
+// ListBandsResponse_VersionedBandDescription with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *ListBandsResponse_VersionedBandDescription) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ListBandsResponse_VersionedBandDescriptionFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "band":
+
+			for key, val := range m.GetBand() {
+				_ = val
+
+				// no validation rules for Band[key]
+
+				if v, ok := interface{}(val).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return ListBandsResponse_VersionedBandDescriptionValidationError{
+							field:  fmt.Sprintf("band[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		default:
+			return ListBandsResponse_VersionedBandDescriptionValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ListBandsResponse_VersionedBandDescriptionValidationError is the validation
+// error returned by ListBandsResponse_VersionedBandDescription.ValidateFields
+// if the designated constraints aren't met.
+type ListBandsResponse_VersionedBandDescriptionValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListBandsResponse_VersionedBandDescriptionValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListBandsResponse_VersionedBandDescriptionValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListBandsResponse_VersionedBandDescriptionValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListBandsResponse_VersionedBandDescriptionValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListBandsResponse_VersionedBandDescriptionValidationError) ErrorName() string {
+	return "ListBandsResponse_VersionedBandDescriptionValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListBandsResponse_VersionedBandDescriptionValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListBandsResponse_VersionedBandDescription.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListBandsResponse_VersionedBandDescriptionValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListBandsResponse_VersionedBandDescriptionValidationError{}

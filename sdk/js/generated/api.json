@@ -8382,6 +8382,594 @@
       "extensions": [],
       "messages": [
         {
+          "name": "BandDescription",
+          "longName": "BandDescription",
+          "fullName": "ttn.lorawan.v3.BandDescription",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "beacon",
+              "description": "",
+              "label": "",
+              "type": "Beacon",
+              "longType": "BandDescription.Beacon",
+              "fullType": "ttn.lorawan.v3.BandDescription.Beacon",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "ping_slot_frequency",
+              "description": "",
+              "label": "",
+              "type": "UInt64Value",
+              "longType": "google.protobuf.UInt64Value",
+              "fullType": "google.protobuf.UInt64Value",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "max_uplink_channels",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "uplink_channels",
+              "description": "",
+              "label": "repeated",
+              "type": "Channel",
+              "longType": "BandDescription.Channel",
+              "fullType": "ttn.lorawan.v3.BandDescription.Channel",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "max_downlink_channels",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "downlink_channels",
+              "description": "",
+              "label": "repeated",
+              "type": "Channel",
+              "longType": "BandDescription.Channel",
+              "fullType": "ttn.lorawan.v3.BandDescription.Channel",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "sub_bands",
+              "description": "",
+              "label": "repeated",
+              "type": "SubBandParameters",
+              "longType": "BandDescription.SubBandParameters",
+              "fullType": "ttn.lorawan.v3.BandDescription.SubBandParameters",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "data_rates",
+              "description": "",
+              "label": "repeated",
+              "type": "DataRatesEntry",
+              "longType": "BandDescription.DataRatesEntry",
+              "fullType": "ttn.lorawan.v3.BandDescription.DataRatesEntry",
+              "ismap": true,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "freq_multiplier",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "implements_cf_list",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cf_list_type",
+              "description": "",
+              "label": "",
+              "type": "CFListType",
+              "longType": "CFListType",
+              "fullType": "ttn.lorawan.v3.CFListType",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "receive_delay_1",
+              "description": "",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "receive_delay_2",
+              "description": "",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "join_accept_delay_1",
+              "description": "",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "join_accept_delay_2",
+              "description": "",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "max_fcnt_gap",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "supports_dynamic_adr",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "adr_ack_limit",
+              "description": "",
+              "label": "",
+              "type": "ADRAckLimitExponent",
+              "longType": "ADRAckLimitExponent",
+              "fullType": "ttn.lorawan.v3.ADRAckLimitExponent",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "tx_param_setup_req_support",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "default_max_eirp",
+              "description": "",
+              "label": "",
+              "type": "float",
+              "longType": "float",
+              "fullType": "float",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "lora_coding_rate",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "default_rx2_parameters",
+              "description": "",
+              "label": "",
+              "type": "Rx2Parameters",
+              "longType": "BandDescription.Rx2Parameters",
+              "fullType": "ttn.lorawan.v3.BandDescription.Rx2Parameters",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "boot_dwell_time",
+              "description": "",
+              "label": "",
+              "type": "DwellTime",
+              "longType": "BandDescription.DwellTime",
+              "fullType": "ttn.lorawan.v3.BandDescription.DwellTime",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "BandDataRate",
+          "longName": "BandDescription.BandDataRate",
+          "fullName": "ttn.lorawan.v3.BandDescription.BandDataRate",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "rate",
+              "description": "",
+              "label": "",
+              "type": "DataRate",
+              "longType": "DataRate",
+              "fullType": "ttn.lorawan.v3.DataRate",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Beacon",
+          "longName": "BandDescription.Beacon",
+          "fullName": "ttn.lorawan.v3.BandDescription.Beacon",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "data_rate_index",
+              "description": "",
+              "label": "",
+              "type": "DataRateIndex",
+              "longType": "DataRateIndex",
+              "fullType": "ttn.lorawan.v3.DataRateIndex",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "coding_rate",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "inverted_polarity",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Channel",
+          "longName": "BandDescription.Channel",
+          "fullName": "ttn.lorawan.v3.BandDescription.Channel",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "frequency",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "min_data_rate",
+              "description": "",
+              "label": "",
+              "type": "DataRateIndex",
+              "longType": "DataRateIndex",
+              "fullType": "ttn.lorawan.v3.DataRateIndex",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "max_data_rate",
+              "description": "",
+              "label": "",
+              "type": "DataRateIndex",
+              "longType": "DataRateIndex",
+              "fullType": "ttn.lorawan.v3.DataRateIndex",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "DataRatesEntry",
+          "longName": "BandDescription.DataRatesEntry",
+          "fullName": "ttn.lorawan.v3.BandDescription.DataRatesEntry",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "key",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "BandDataRate",
+              "longType": "BandDescription.BandDataRate",
+              "fullType": "ttn.lorawan.v3.BandDescription.BandDataRate",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "DwellTime",
+          "longName": "BandDescription.DwellTime",
+          "fullName": "ttn.lorawan.v3.BandDescription.DwellTime",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "uplinks",
+              "description": "",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "downlinks",
+              "description": "",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Rx2Parameters",
+          "longName": "BandDescription.Rx2Parameters",
+          "fullName": "ttn.lorawan.v3.BandDescription.Rx2Parameters",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "data_rate_index",
+              "description": "",
+              "label": "",
+              "type": "DataRateIndex",
+              "longType": "DataRateIndex",
+              "fullType": "ttn.lorawan.v3.DataRateIndex",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "frequency",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "SubBandParameters",
+          "longName": "BandDescription.SubBandParameters",
+          "fullName": "ttn.lorawan.v3.BandDescription.SubBandParameters",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "min_frequency",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "max_frequency",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "duty_cycle",
+              "description": "",
+              "label": "",
+              "type": "float",
+              "longType": "float",
+              "fullType": "float",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "max_eirp",
+              "description": "",
+              "label": "",
+              "type": "float",
+              "longType": "float",
+              "fullType": "float",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "FrequencyPlanDescription",
           "longName": "FrequencyPlanDescription",
           "fullName": "ttn.lorawan.v3.FrequencyPlanDescription",
@@ -8526,6 +9114,162 @@
           ]
         },
         {
+          "name": "ListBandsRequest",
+          "longName": "ListBandsRequest",
+          "fullName": "ttn.lorawan.v3.ListBandsRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "band_id",
+              "description": "Optional Band ID to filter the results.\nIf unused, all supported Bands are returned.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "phy_version",
+              "description": "Optional PHY version to filter the results.\nIf unused, all supported versions are returned.",
+              "label": "",
+              "type": "PHYVersion",
+              "longType": "PHYVersion",
+              "fullType": "ttn.lorawan.v3.PHYVersion",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ListBandsResponse",
+          "longName": "ListBandsResponse",
+          "fullName": "ttn.lorawan.v3.ListBandsResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "descriptions",
+              "description": "",
+              "label": "repeated",
+              "type": "DescriptionsEntry",
+              "longType": "ListBandsResponse.DescriptionsEntry",
+              "fullType": "ttn.lorawan.v3.ListBandsResponse.DescriptionsEntry",
+              "ismap": true,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "DescriptionsEntry",
+          "longName": "ListBandsResponse.DescriptionsEntry",
+          "fullName": "ttn.lorawan.v3.ListBandsResponse.DescriptionsEntry",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "key",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "VersionedBandDescription",
+              "longType": "ListBandsResponse.VersionedBandDescription",
+              "fullType": "ttn.lorawan.v3.ListBandsResponse.VersionedBandDescription",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "VersionedBandDescription",
+          "longName": "ListBandsResponse.VersionedBandDescription",
+          "fullName": "ttn.lorawan.v3.ListBandsResponse.VersionedBandDescription",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "band",
+              "description": "map\u003cPHYVersion, BandDescription\u003e",
+              "label": "repeated",
+              "type": "BandEntry",
+              "longType": "ListBandsResponse.VersionedBandDescription.BandEntry",
+              "fullType": "ttn.lorawan.v3.ListBandsResponse.VersionedBandDescription.BandEntry",
+              "ismap": true,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "BandEntry",
+          "longName": "ListBandsResponse.VersionedBandDescription.BandEntry",
+          "fullName": "ttn.lorawan.v3.ListBandsResponse.VersionedBandDescription.BandEntry",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "key",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "BandDescription",
+              "longType": "BandDescription",
+              "fullType": "ttn.lorawan.v3.BandDescription",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "ListFrequencyPlansRequest",
           "longName": "ListFrequencyPlansRequest",
           "fullName": "ttn.lorawan.v3.ListFrequencyPlansRequest",
@@ -8620,6 +9364,36 @@
                     {
                       "method": "GET",
                       "pattern": "/configuration/phy-versions"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "ListBands",
+              "description": "",
+              "requestType": "ListBandsRequest",
+              "requestLongType": "ListBandsRequest",
+              "requestFullType": "ttn.lorawan.v3.ListBandsRequest",
+              "requestStreaming": false,
+              "responseType": "ListBandsResponse",
+              "responseLongType": "ListBandsResponse",
+              "responseFullType": "ttn.lorawan.v3.ListBandsResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/configuration/bands"
+                    },
+                    {
+                      "method": "GET",
+                      "pattern": "/configuration/bands/{band_id}"
+                    },
+                    {
+                      "method": "GET",
+                      "pattern": "/configuration/bands/{band_id}/{phy_version}"
                     }
                   ]
                 }
