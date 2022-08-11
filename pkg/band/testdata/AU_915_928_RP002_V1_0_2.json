@@ -966,7 +966,19 @@
     "6_4_false": 10,
     "6_4_true": 10,
     "6_5_false": 9,
-    "6_5_true": 9
+    "6_5_true": 9,
+    "7_0_false": 9,
+    "7_0_true": 9,
+    "7_1_false": 8,
+    "7_1_true": 8,
+    "7_2_false": 8,
+    "7_2_true": 8,
+    "7_3_false": 8,
+    "7_3_true": 8,
+    "7_4_false": 8,
+    "7_4_true": 8,
+    "7_5_false": 8,
+    "7_5_true": 8
   },
   "DefaultRx2Parameters": {
     "DataRateIndex": 8,

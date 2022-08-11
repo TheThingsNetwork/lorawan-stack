@@ -93,8 +93,8 @@ var AU_915_928_RP2_v1_0_2 = Band{
 
 	Rx1Channel: channelIndexModulo(8),
 	Rx1DataRate: func(idx ttnpb.DataRateIndex, offset ttnpb.DataRateOffset, _ bool) (ttnpb.DataRateIndex, error) {
-		if idx > ttnpb.DataRateIndex_DATA_RATE_6 {
-			return 0, errDataRateIndexTooHigh.WithAttributes("max", 6)
+		if idx > ttnpb.DataRateIndex_DATA_RATE_7 {
+			return 0, errDataRateIndexTooHigh.WithAttributes("max", 7)
 		}
 		if offset > 5 {
 			return 0, errDataRateOffsetTooHigh.WithAttributes("max", 5)
