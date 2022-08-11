@@ -354,10 +354,15 @@ func (s *entitySearch) SearchAccounts(
 	var selectQuery *bun.SelectQuery
 
 	if entityID := req.GetEntityIdentifiers(); entityID != nil {
+		entityType, entityUUID, err := s.getEntity(ctx, entityID)
+		if err != nil {
+			return nil, err
+		}
+
 		selectQuery = s.newSelectModel(ctx, &directEntityMembership{}).
 			ColumnExpr("account_type, account_friendly_id").
-			Where("entity_type = ?", getEntityType(entityID)).
-			Where("entity_friendly_id = ?", entityID.IDString()).
+			Where("entity_type = ?", entityType).
+			Where("entity_id = ?", entityUUID).
 			Order("account_friendly_id")
 		if req.OnlyUsers {
 			selectQuery = selectQuery.Where(`account_type = 'user'`)
