@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { Prompt as RouterPrompt } from 'react-router-dom'
+import { Prompt as RouterPrompt, useHistory } from 'react-router-dom'
 
 import PortalledModal from '@ttn-lw/components/modal/portalled'
 
@@ -26,6 +26,8 @@ import PropTypes from '@ttn-lw/lib/prop-types'
  */
 const Prompt = props => {
   const { modal, children, when, shouldBlockNavigation, onApprove, onCancel } = props
+
+  const history = useHistory()
 
   const [state, setState] = React.useState({
     showModal: false,
@@ -65,11 +67,11 @@ const Prompt = props => {
 
   React.useEffect(() => {
     if (confirmedLocationChange) {
-      onApprove(nextLocation)
+      onApprove(nextLocation, history)
     } else {
-      onCancel(nextLocation)
+      onCancel(nextLocation, history)
     }
-  }, [confirmedLocationChange, nextLocation, onApprove, onCancel])
+  }, [confirmedLocationChange, history, nextLocation, onApprove, onCancel])
 
   return (
     <>
@@ -82,12 +84,21 @@ const Prompt = props => {
 }
 
 Prompt.propTypes = {
-  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
+  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
   modal: PropTypes.shape({ ...PortalledModal.Modal.propTypes }).isRequired,
-  onApprove: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired,
-  shouldBlockNavigation: PropTypes.func.isRequired,
+  onApprove: PropTypes.func,
+  onCancel: PropTypes.func,
+  shouldBlockNavigation: PropTypes.func,
   when: PropTypes.bool.isRequired,
+}
+
+Prompt.defaultProps = {
+  children: undefined,
+  shouldBlockNavigation: () => true,
+  onApprove: (location, history) => {
+    history.push(location)
+  },
+  onCancel: () => null,
 }
 
 export default Prompt
