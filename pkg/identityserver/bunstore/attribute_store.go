@@ -36,6 +36,8 @@ type Attribute struct {
 	Value string `bun:"value,notnull"`
 }
 
+func (Attribute) _isModel() {} // It doesn't embed Model, but it's still a model.
+
 // AttributeSlice is a slice of Attributes.
 type AttributeSlice []*Attribute
 

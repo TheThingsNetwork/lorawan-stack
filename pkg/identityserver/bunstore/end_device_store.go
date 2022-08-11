@@ -328,10 +328,7 @@ func (s *endDeviceStore) listEndDevicesBy(
 	fieldMask store.FieldMask,
 ) ([]*ttnpb.EndDevice, error) {
 	models := []*EndDevice{}
-	selectQuery := s.DB.NewSelect().
-		Model(&models).
-		Apply(selectWithSoftDeletedFromContext(ctx)).
-		Apply(by)
+	selectQuery := newSelectModels(ctx, s.DB, &models).Apply(by)
 
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
@@ -374,10 +371,9 @@ func (s *endDeviceStore) listEndDevicesBy(
 }
 
 func (*endDeviceStore) selectWithID(
-	ctx context.Context, applicationID string, deviceIDs ...string,
+	_ context.Context, applicationID string, deviceIDs ...string,
 ) func(*bun.SelectQuery) *bun.SelectQuery {
 	return func(q *bun.SelectQuery) *bun.SelectQuery {
-		q = q.Apply(selectWithContext(ctx))
 		q = q.Where("?TableAlias.application_id = ?", applicationID)
 		switch len(deviceIDs) {
 		case 0:
@@ -417,11 +413,7 @@ func (s *endDeviceStore) CountEndDevices(ctx context.Context, ids *ttnpb.Applica
 		by = s.selectWithID(ctx, ids.GetApplicationId())
 	}
 
-	models := []*EndDevice{}
-	selectQuery := s.DB.NewSelect().
-		Model(&models).
-		Apply(selectWithSoftDeletedFromContext(ctx)).
-		Apply(by)
+	selectQuery := s.newSelectModel(ctx, &EndDevice{}).Apply(by)
 
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
@@ -485,10 +477,7 @@ func (s *endDeviceStore) getEndDeviceModelBy(
 	fieldMask store.FieldMask,
 ) (*EndDevice, error) {
 	model := &EndDevice{}
-	selectQuery := s.DB.NewSelect().
-		Model(model).
-		Apply(selectWithSoftDeletedFromContext(ctx)).
-		Apply(by)
+	selectQuery := s.newSelectModel(ctx, model).Apply(by)
 
 	selectQuery, err := s.selectWithFields(selectQuery, fieldMask)
 	if err != nil {

@@ -71,7 +71,7 @@ func (s *entitySearch) queryStringQuery(
 }
 
 func (s *entitySearch) selectWithMetaFields(
-	_ context.Context, entityType string, req metaFields,
+	ctx context.Context, entityType string, req metaFields,
 ) func(*bun.SelectQuery) *bun.SelectQuery {
 	return func(q *bun.SelectQuery) *bun.SelectQuery {
 		if v := req.GetIdContains(); v != "" {
@@ -91,8 +91,7 @@ func (s *entitySearch) selectWithMetaFields(
 			q = q.Where(s.ftsQuery("description"), v)
 		}
 		if kv := req.GetAttributesContain(); len(kv) > 0 {
-			attrQuery := s.DB.NewSelect().
-				Model(&Attribute{}).
+			attrQuery := s.newSelectModel(ctx, &Attribute{}).
 				Column("entity_id")
 			switch entityType {
 			case "end_device":

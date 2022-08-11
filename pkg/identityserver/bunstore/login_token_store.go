@@ -90,8 +90,7 @@ func (s *loginTokenStore) FindActiveLoginTokens(
 	}
 
 	models := []*LoginToken{}
-	err = s.DB.NewSelect().
-		Model(&models).
+	err = newSelectModels(ctx, s.DB, &models).
 		Where("user_id = ?", userUUID).
 		Where("expires_at > NOW()").
 		Where("used = FALSE OR used IS NULL"). // TODO: Make "used" column NOT NULL (https://github.com/TheThingsNetwork/lorawan-stack/issues/5613).
@@ -149,8 +148,7 @@ func (s *loginTokenStore) ConsumeLoginToken(ctx context.Context, token string) (
 	defer span.End()
 
 	model := &LoginToken{}
-	err := s.DB.NewSelect().
-		Model(model).
+	err := s.newSelectModel(ctx, model).
 		Where("token = ?", token).
 		Relation("User", func(q *bun.SelectQuery) *bun.SelectQuery {
 			return q.Column("account_uid")

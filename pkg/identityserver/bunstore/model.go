@@ -35,6 +35,8 @@ type Model struct {
 	UpdatedAt time.Time `bun:"updated_at,notnull"`
 }
 
+func (Model) _isModel() {}
+
 // BeforeAppendModel is a hook that modifies the model on SELECT and UPDATE queries.
 func (m *Model) BeforeAppendModel(_ context.Context, query bun.Query) error {
 	switch query.(type) {
@@ -55,6 +57,8 @@ func (m *Model) BeforeAppendModel(_ context.Context, query bun.Query) error {
 type SoftDelete struct {
 	DeletedAt *time.Time `bun:"deleted_at,soft_delete"`
 }
+
+func (SoftDelete) _isSoftDelete() {}
 
 func selectWithSoftDeletedFromContext(ctx context.Context) func(*bun.SelectQuery) *bun.SelectQuery {
 	opts := store.SoftDeletedFromContext(ctx)
