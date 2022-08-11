@@ -683,12 +683,7 @@ macLoop:
 			return nil, false, nil
 		}
 	}
-	if isLRFHSS := up.GetSettings().GetDataRate().GetLrfhss() != nil; isLRFHSS {
-		dev.MacState.RxWindowsAvailable = false
-		dev.MacState.QueuedResponses = nil
-	} else {
-		dev.MacState.RxWindowsAvailable = true
-	}
+	dev.MacState.RxWindowsAvailable = true
 	dev.Session.LastFCntUp = cmacFMatchResult.FullFCnt
 
 	var queuedApplicationUplinks []*ttnpb.ApplicationUp
