@@ -23,7 +23,7 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Security
 
-## [3.21.0] - unreleased
+## [3.21.0] - 2022-08-11
 
 ### Added
 
