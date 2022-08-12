@@ -191,6 +191,38 @@ func MakeJoinRequest(conf JoinRequestConfig) *ttnpb.UplinkMessage {
 	})
 }
 
+type CFListConfig struct {
+	FrequencyPlanID string
+	PHYVersion      ttnpb.PHYVersion
+	DataRateIndex   ttnpb.DataRateIndex
+	DataRateOffset  ttnpb.DataRateOffset
+	MACState        *ttnpb.MACState
+}
+
+func MakeCFList(conf CFListConfig) *ttnpb.CFList {
+	fp := test.FrequencyPlan(conf.FrequencyPlanID)
+	phy, err := band.Get(fp.BandID, conf.PHYVersion)
+	if err != nil {
+		panic(fmt.Sprintf("Band %v@%v not found: %v", fp.BandID, conf.PHYVersion, err))
+	}
+	downlinkDwellTime := mac.DeviceExpectedDownlinkDwellTime(conf.MACState, fp, &phy)
+	if conf.MACState != nil {
+		conf.DataRateOffset = conf.MACState.CurrentParameters.Rx1DataRateOffset
+	}
+	drIdx, err := phy.Rx1DataRate(conf.DataRateIndex, conf.DataRateOffset, downlinkDwellTime)
+	if err != nil {
+		panic(fmt.Sprintf("Cannot compute RX1 data rate: %v", err))
+	}
+	dr, ok := phy.DataRates[drIdx]
+	if !ok {
+		panic(fmt.Sprintf("Cannot find data rate index %v in %v@%v", drIdx, phy.ID, conf.PHYVersion))
+	}
+	if dr.MaxMACPayloadSize(downlinkDwellTime)+5 < lorawan.JoinAcceptWithCFListLength {
+		return nil
+	}
+	return frequencyplans.CFList(fp, conf.PHYVersion)
+}
+
 type NsJsJoinRequestConfig struct {
 	JoinEUI            types.EUI64
 	DevEUI             types.EUI64
@@ -205,6 +237,7 @@ type NsJsJoinRequestConfig struct {
 	FrequencyPlanID    string
 	PHYVersion         ttnpb.PHYVersion
 	CorrelationIDs     []string
+	CFList             *ttnpb.CFList
 }
 
 func MakeNsJsJoinRequest(conf NsJsJoinRequestConfig) *ttnpb.JoinRequest {
@@ -220,7 +253,7 @@ func MakeNsJsJoinRequest(conf NsJsJoinRequestConfig) *ttnpb.JoinRequest {
 			OptNeg:      macspec.UseRekeyInd(conf.SelectedMACVersion),
 		},
 		RxDelay: conf.RXDelay,
-		CfList:  frequencyplans.CFList(test.FrequencyPlan(conf.FrequencyPlanID), conf.PHYVersion),
+		CfList:  conf.CFList,
 		CorrelationIds: CopyStrings(func() []string {
 			if len(conf.CorrelationIDs) == 0 {
 				return JoinRequestCorrelationIDs[:]
@@ -1567,6 +1600,12 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 								FrequencyPlanID:    conf.Device.FrequencyPlanId,
 								PHYVersion:         conf.Device.LorawanPhyVersion,
 								CorrelationIDs:     req.CorrelationIds,
+								CFList: MakeCFList(CFListConfig{
+									FrequencyPlanID: conf.Device.FrequencyPlanId,
+									PHYVersion:      conf.Device.LorawanPhyVersion,
+									DataRateIndex:   conf.DataRateIndex,
+									DataRateOffset:  defaultRX1DROffset,
+								}),
 							})),
 						)
 					},
@@ -2152,7 +2191,12 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults *ttnpb.MACSettings, w
 					OptNeg:      macspec.UseRekeyInd(x.LorawanVersion),
 				},
 				RxDelay: macState.DesiredParameters.Rx1Delay,
-				CfList:  frequencyplans.CFList(test.FrequencyPlan(x.FrequencyPlanId), x.LorawanPhyVersion),
+				CfList: MakeCFList(CFListConfig{
+					FrequencyPlanID: x.FrequencyPlanId,
+					PHYVersion:      x.LorawanPhyVersion,
+					DataRateIndex:   drIdx,
+					MACState:        macState,
+				}),
 			},
 			Keys:           MakeSessionKeys(x.LorawanVersion, wrapKeys, true),
 			DevAddr:        test.DefaultDevAddr.Bytes(),

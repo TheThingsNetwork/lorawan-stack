@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
@@ -100,6 +101,17 @@ func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYV
 			Frequency:        924600000,
 			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 		}
+		// The boot time settings of RP001-1.0.2B devices enable downlink dwell time, which disables the
+		// ability to include a CFList as part of the JoinAccept. This causes the non-default channels to be
+		// included via NewChannelReq.
+		if phyVersion == ttnpb.PHYVersion_PHY_V1_0_2_REV_B {
+			newChannelReq = &ttnpb.MACCommand_NewChannelReq{
+				ChannelIndex:     2,
+				Frequency:        923600000,
+				MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+			}
+		}
+
 		macCommanders := []MACCommander{newChannelReq}
 		evBuilders := []events.Builder{mac.EvtEnqueueNewChannelRequest.With(events.WithData(newChannelReq))}
 
@@ -167,6 +179,10 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 		a.So([]time.Time{start, *ttnpb.StdTime(dev.CreatedAt), time.Now()}, should.BeChronological)
 		a.So(dev, should.ResembleFields, conf.CreateDevice.EndDevice, conf.CreateDevice.FieldMask.GetPaths())
 
+		responseLen := lorawan.JoinAcceptWithCFListLength
+		if dev.GetPendingMacState().GetPendingJoinRequest().GetCfList() == nil {
+			responseLen = lorawan.JoinAcceptWithoutCFListLength
+		}
 		dev, ok = env.AssertJoin(ctx, JoinAssertionConfig{
 			Device:        dev,
 			ChannelIndex:  1,
@@ -183,7 +199,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 
 			ClusterResponse: &NsJsHandleJoinResponse{
 				Response: &ttnpb.JoinResponse{
-					RawPayload: bytes.Repeat([]byte{0x42}, 33),
+					RawPayload: bytes.Repeat([]byte{0x42}, responseLen),
 					SessionKeys: test.MakeSessionKeys(
 						test.SessionKeysOptions.WithDefaultNwkKeys(dev.LorawanVersion),
 					),
@@ -233,7 +249,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 		dev.Ids.DevAddr = dev.PendingSession.DevAddr
 		dev, ok = env.AssertHandleDataUplink(ctx, DataUplinkAssertionConfig{
 			Device:        dev,
-			ChannelIndex:  2,
+			ChannelIndex:  1,
 			DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
 			RxMetadatas: [][]*ttnpb.RxMetadata{
 				DefaultRxMetadata[:2],

@@ -1263,6 +1263,34 @@ func computeRxParameters(
 	return res, nil
 }
 
+func computeMaxMACDownlinkPayloadSize(
+	macState *ttnpb.MACState,
+	phy *band.Band,
+	fp *frequencyplans.FrequencyPlan,
+	uplinkChannelIndex uint32,
+	uplinkDataRate *ttnpb.DataRate,
+) (uint16, error) {
+	rx1Parameters, err := computeRx1Parameters(phy, fp, macState, uplinkChannelIndex, uplinkDataRate)
+	if err != nil {
+		return 0, err
+	}
+	rx1DR := rx1Parameters.DataRate
+	rx2DR, ok := phy.DataRates[macState.CurrentParameters.Rx2DataRateIndex]
+	if !ok {
+		return 0, errDataRateIndexNotFound.WithAttributes(
+			"index",
+			macState.CurrentParameters.Rx2DataRateIndex,
+		)
+	}
+	downDwellTime := mac.DeviceExpectedDownlinkDwellTime(macState, fp, phy)
+	rx1MaxMACPayloadSize := rx1DR.MaxMACPayloadSize(downDwellTime)
+	rx2MaxMACPayloadSize := rx2DR.MaxMACPayloadSize(downDwellTime)
+	if rx1MaxMACPayloadSize >= rx2MaxMACPayloadSize {
+		return rx1MaxMACPayloadSize, nil
+	}
+	return rx2MaxMACPayloadSize, nil
+}
+
 // maximumUplinkLength returns the maximum length of the next uplink after ups.
 func maximumUplinkLength(
 	macState *ttnpb.MACState,
@@ -1871,8 +1899,9 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 					}
 
 					var (
-						attemptRX1 = rxParameters.attemptRX1
-						attemptRX2 = rxParameters.attemptRX2
+						rawPayloadLen = len(dev.PendingMacState.QueuedJoinAccept.Payload)
+						attemptRX1    = rxParameters.attemptRX1 && rawPayloadLen <= int(rxParameters.rx1MaxMACPayloadSize)+5
+						attemptRX2    = rxParameters.attemptRX2 && rawPayloadLen <= int(rxParameters.rx2MaxMACPayloadSize)+5
 					)
 					if !attemptRX1 && !attemptRX2 {
 						dev.PendingMacState.RxWindowsAvailable = false
