@@ -132,7 +132,12 @@ func (s *entitySearch) SearchApplications(
 			attribute.String("member_type", accountID.EntityType()),
 			attribute.String("member_id", accountID.IDString()),
 		)
-		selectWithUUID, err := s.selectWithUUIDsInMemberships(ctx, accountID, "application", accountID.EntityType() == "user")
+		selectWithUUID, err := s.selectWithUUIDsInMemberships(
+			ctx,
+			accountID,
+			"application",
+			accountID.EntityType() == "user",
+		)
 		if err != nil {
 			return nil, err
 		}
