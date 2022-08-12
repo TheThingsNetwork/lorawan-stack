@@ -306,24 +306,27 @@ func (s *entitySearch) SearchAccounts(
 		query = (&membershipStore{baseStore: s.baseStore}).queryWithDirectMemberships(
 			ctx, entityID.EntityType(), entityID.IDString(),
 		)
+		if req.OnlyUsers {
+			query = query.Where(`"direct_accounts"."account_type" = 'user'`)
+		}
+		if q := req.GetQuery(); q != "" {
+			query = query.Where(`"direct_accounts"."uid" ILIKE ?`, likePattern(q))
+		}
 	} else {
 		query = s.query(ctx, &Account{}).
-			Table(`accounts AS direct_accounts`).
 			Select([]string{
-				`"direct_accounts"."account_type" "direct_account_type"`,
-				`"direct_accounts"."uid" "direct_account_friendly_id"`,
+				`"accounts"."account_type" "direct_account_type"`,
+				`"accounts"."uid" "direct_account_friendly_id"`,
 			})
-	}
-
-	if req.OnlyUsers {
-		query = query.Where(`"direct_accounts"."account_type" = 'user'`)
+		if req.OnlyUsers {
+			query = query.Where(`"accounts"."account_type" = 'user'`)
+		}
+		if q := req.GetQuery(); q != "" {
+			query = query.Where(`"accounts"."uid" ILIKE ?`, likePattern(q))
+		}
 	}
 
 	query = query.Order("direct_account_friendly_id")
-
-	if q := req.GetQuery(); q != "" {
-		query = query.Where(`"direct_accounts"."uid" ILIKE ?`, likePattern(q))
-	}
 
 	page := query
 	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 {
