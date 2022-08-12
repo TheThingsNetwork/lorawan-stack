@@ -1178,9 +1178,21 @@ func maximumUplinkLength(
 	fp *frequencyplans.FrequencyPlan,
 	phy *band.Band,
 	ups ...*ttnpb.MACState_UplinkMessage,
-) (uint16, error) {
-	// NOTE: If no data uplink is found, we assume ADR is off on the device and, hence, data rate index 0 is used in computation.
-	maxUpDRIdx := ttnpb.DataRateIndex_DATA_RATE_0
+) uint16 {
+	uplinkDwellTime := mac.DeviceExpectedUplinkDwellTime(macState, fp, phy)
+	// NOTE: If no data uplink is found, we assume ADR is off on the device and, hence, data rate index 0
+	// is used in computation.
+	// NOTE: When uplink dwell time is enabled, data rate index 0 may not be usable at all. In such situations,
+	// the first data rate with non-zero limitations is used. We assume such a data rate always exists.
+	var maxUpDR *band.DataRate
+	for idx := ttnpb.DataRateIndex_DATA_RATE_0; idx <= ttnpb.DataRateIndex_DATA_RATE_15; idx++ {
+		dr, ok := phy.DataRates[idx]
+		if !ok || dr.MaxMACPayloadSize(uplinkDwellTime) == 0 {
+			continue
+		}
+		maxUpDR = &dr
+		break
+	}
 loop:
 	for i := len(ups) - 1; i >= 0; i-- {
 		switch ups[i].Payload.MHdr.MType {
@@ -1188,20 +1200,16 @@ loop:
 			break loop
 		case ttnpb.MType_UNCONFIRMED_UP, ttnpb.MType_CONFIRMED_UP:
 			if ups[i].Payload.GetMacPayload().FHdr.FCtrl.Adr {
-				drIdx, _, ok := phy.FindUplinkDataRate(ups[i].Settings.DataRate)
+				_, dr, ok := phy.FindUplinkDataRate(ups[i].Settings.DataRate)
 				if !ok {
 					continue
 				}
-				maxUpDRIdx = drIdx
+				maxUpDR = &dr
 			}
 			break loop
 		}
 	}
-	dr, ok := phy.DataRates[maxUpDRIdx]
-	if !ok {
-		return 0, errDataRateIndexNotFound.WithAttributes("index", maxUpDRIdx)
-	}
-	return dr.MaxMACPayloadSize(mac.DeviceExpectedUplinkDwellTime(macState, fp, phy)), nil
+	return maxUpDR.MaxMACPayloadSize(uplinkDwellTime)
 }
 
 // downlinkRetryInterval is the time interval, which defines the interval between downlink task retries.
@@ -1965,11 +1973,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 
 				var maxUpLength uint16 = math.MaxUint16
 				if !dev.Multicast && macspec.ValidateUplinkPayloadSize(dev.MacState.LorawanVersion) {
-					maxUpLength, err = maximumUplinkLength(dev.MacState, fp, phy, dev.MacState.RecentUplinks...)
-					if err != nil {
-						logger.WithError(err).Error("Failed to determine maximum uplink length")
-						return dev, nil, nil
-					}
+					maxUpLength = maximumUplinkLength(dev.MacState, fp, phy, dev.MacState.RecentUplinks...)
 				}
 				var earliestAt time.Time
 				for {
