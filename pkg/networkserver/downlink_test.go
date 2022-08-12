@@ -2402,7 +2402,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								OptNeg:      true,
 							},
 							RxDelay: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B).Rx1Delay,
-							CfList:  frequencyplans.CFList(*test.FrequencyPlan(test.EUFrequencyPlanID), ttnpb.PHYVersion_RP001_V1_1_REV_B),
+							CfList:  frequencyplans.CFList(test.FrequencyPlan(test.EUFrequencyPlanID), ttnpb.PHYVersion_RP001_V1_1_REV_B),
 						},
 						DevAddr: test.DefaultDevAddr.Bytes(),
 					},

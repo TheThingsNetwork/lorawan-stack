@@ -220,7 +220,7 @@ func MakeNsJsJoinRequest(conf NsJsJoinRequestConfig) *ttnpb.JoinRequest {
 			OptNeg:      macspec.UseRekeyInd(conf.SelectedMACVersion),
 		},
 		RxDelay: conf.RXDelay,
-		CfList:  frequencyplans.CFList(*test.FrequencyPlan(conf.FrequencyPlanID), conf.PHYVersion),
+		CfList:  frequencyplans.CFList(test.FrequencyPlan(conf.FrequencyPlanID), conf.PHYVersion),
 		CorrelationIds: CopyStrings(func() []string {
 			if len(conf.CorrelationIDs) == 0 {
 				return JoinRequestCorrelationIDs[:]
@@ -2152,7 +2152,7 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults *ttnpb.MACSettings, w
 					OptNeg:      macspec.UseRekeyInd(x.LorawanVersion),
 				},
 				RxDelay: macState.DesiredParameters.Rx1Delay,
-				CfList:  frequencyplans.CFList(*test.FrequencyPlan(x.FrequencyPlanId), x.LorawanPhyVersion),
+				CfList:  frequencyplans.CFList(test.FrequencyPlan(x.FrequencyPlanId), x.LorawanPhyVersion),
 			},
 			Keys:           MakeSessionKeys(x.LorawanVersion, wrapKeys, true),
 			DevAddr:        test.DefaultDevAddr.Bytes(),

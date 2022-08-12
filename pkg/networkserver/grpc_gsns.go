@@ -1254,7 +1254,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		log.FromContext(ctx).Error("Reusing the DevAddr used for current session")
 	}
 
-	cfList := frequencyplans.CFList(*fp, matched.LorawanPhyVersion)
+	cfList := frequencyplans.CFList(fp, matched.LorawanPhyVersion)
 	dlSettings := &ttnpb.DLSettings{
 		Rx1DrOffset: macState.DesiredParameters.Rx1DataRateOffset,
 		Rx2Dr:       macState.DesiredParameters.Rx2DataRateIndex,
