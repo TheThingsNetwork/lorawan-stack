@@ -25,7 +25,7 @@ var (
 	errComputeMIC                         = errors.DefineInvalidArgument("compute_mic", "failed to compute MIC")
 	errConfirmedDownlinkTooSoon           = errors.DefineUnavailable("confirmed_too_soon", "confirmed downlink is scheduled too soon")
 	errConfirmedMulticastDownlink         = errors.DefineInvalidArgument("confirmed_multicast_downlink", "confirmed downlink queued for multicast device")
-	errDataRateNotFound                   = errors.DefineNotFound("data_rate_not_found", "data rate not found")
+	errDataRateNotFound                   = errors.DefineNotFound("data_rate_not_found", "data rate not found", "data_rate")
 	errDataRateIndexNotFound              = errors.DefineNotFound("data_rate_index_not_found", "data rate with index `{index}` not found")
 	errDecodePayload                      = errors.DefineInvalidArgument("decode_payload", "failed to decode payload")
 	errDeviceNotFound                     = errors.DefineNotFound("device_not_found", "device not found")

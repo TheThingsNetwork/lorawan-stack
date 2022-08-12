@@ -1429,7 +1429,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			"ocw", dr.Lrfhss.GetOperatingChannelWidth(),
 		))
 	default:
-		return nil, errDataRateNotFound.New()
+		return nil, errDataRateNotFound.WithAttributes("data_rate", up.Settings.DataRate)
 	}
 	ctx = log.NewContext(ctx, logger)
 
