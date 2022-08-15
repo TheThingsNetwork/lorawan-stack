@@ -19,6 +19,7 @@ import { Col, Row } from 'react-grid-system'
 
 import TYPES from '@console/constants/formatter-types'
 
+import Prompt from '@ttn-lw/components/prompt'
 import Select from '@ttn-lw/components/select'
 import Form from '@ttn-lw/components/form'
 import SubmitButton from '@ttn-lw/components/submit-button'
@@ -65,6 +66,9 @@ const m = defineMessages({
   learnMoreAboutCayenne: 'What is CayenneLPP?',
   noRepositoryWarning:
     'The application formatter is set to `Repository` but this device does not have an associated formatter in the LoRaWAN Device repository. Messages for this end device will hence not be formatted.',
+  confirmNavigationTitle: 'Confirm navigation',
+  confirmNavigationMessage:
+    'Are you sure you want to leave this page? Your current changes have not been saved yet.',
 })
 
 const FIELD_NAMES = {
@@ -383,38 +387,50 @@ class PayloadFormattersForm extends React.Component {
               formikRef={this.formRef}
               id="payload-formatter-form"
             >
-              <Form.SubTitle title={m.setupSubTitle} />
-              <Form.Field
-                name={FIELD_NAMES.SELECT}
-                title={m.formatterType}
-                component={Select}
-                options={options}
-                onChange={this.onTypeChange}
-                warning={type === TYPES.DEFAULT ? m.appFormatterWarning : undefined}
-                inputWidth="m"
-                required
-              />
-              {isDefaultType && (
-                <Notification
-                  small
-                  info
-                  content={m.defaultFormatter}
-                  convertBackticks
-                  messageValues={{
-                    Link: msg => (
-                      <Link
-                        secondary
-                        key="manual-link"
-                        to={`/applications/${appId}/payload-formatters/uplink`}
-                      >
-                        {msg}
-                      </Link>
-                    ),
-                    defaultFormatter,
-                  }}
-                />
+              {({ touched }) => (
+                <>
+                  <Form.SubTitle title={m.setupSubTitle} />
+                  <Form.Field
+                    name={FIELD_NAMES.SELECT}
+                    title={m.formatterType}
+                    component={Select}
+                    options={options}
+                    onChange={this.onTypeChange}
+                    warning={type === TYPES.DEFAULT ? m.appFormatterWarning : undefined}
+                    inputWidth="m"
+                    required
+                  />
+                  {isDefaultType && (
+                    <Notification
+                      small
+                      info
+                      content={m.defaultFormatter}
+                      convertBackticks
+                      messageValues={{
+                        Link: msg => (
+                          <Link
+                            secondary
+                            key="manual-link"
+                            to={`/applications/${appId}/payload-formatters/uplink`}
+                          >
+                            {msg}
+                          </Link>
+                        ),
+                        defaultFormatter,
+                      }}
+                    />
+                  )}
+                  {this.formatter}
+                  <Prompt
+                    when={Boolean(touched['javascript-formatter'] || touched['grpc-formatter'])}
+                    modal={{
+                      title: m.confirmNavigationTitle,
+                      message: m.confirmNavigationMessage,
+                      buttonMessage: m.confirmNavigationTitle,
+                    }}
+                  />
+                </>
               )}
-              {this.formatter}
             </Form>
           </Col>
           {this._showTestSection() && (
