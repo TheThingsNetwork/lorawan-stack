@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import classnames from 'classnames'
 
 import Input from '@ttn-lw/components/input'
-import Form from '@ttn-lw/components/form'
+import Form, { useFormContext } from '@ttn-lw/components/form'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -26,6 +26,7 @@ import env from '@ttn-lw/lib/env'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+import { getBackendErrorName } from '@ttn-lw/lib/errors/utils'
 
 import { getApplicationDevEUICount, issueDevEUI } from '@console/store/actions/applications'
 
@@ -37,7 +38,9 @@ import {
 import style from './dev-eui.styl'
 
 const DevEUIComponent = props => {
-  const { values, setFieldValue, initialValues, devEUISchema } = props
+  const { name } = props
+  const { values, setFieldValue } = useFormContext()
+
   const dispatch = useDispatch()
   const appId = useSelector(selectSelectedApplicationId)
   const promisifiedIssueDevEUI = attachPromise(issueDevEUI)
@@ -47,18 +50,16 @@ const DevEUIComponent = props => {
   const [errorMessage, setErrorMessage] = React.useState(undefined)
   const applicationDevEUICounter = useSelector(selectApplicationDevEUICount)
 
-  const indicatorContent = Boolean(errorMessage)
-    ? errorMessage
-    : {
-        ...sharedMessages.used,
-        values: {
-          currentValue: applicationDevEUICounter,
-          maxValue: env.devEUIConfig.applicationLimit,
-        },
-      }
+  const indicatorContent = errorMessage || {
+    ...sharedMessages.used,
+    values: {
+      currentValue: applicationDevEUICounter,
+      maxValue: env.devEUIConfig.applicationLimit,
+    },
+  }
 
   const indicatorCls = classnames(style.indicator, {
-    [style.error]:
+    'tc-error':
       applicationDevEUICounter === env.devEUIConfig.applicationLimit || Boolean(errorMessage),
   })
 
@@ -76,38 +77,35 @@ const DevEUIComponent = props => {
       setErrorMessage(undefined)
       return result
     } catch (error) {
-      if (error.details[0].name === 'global_eui_limit_reached') {
+      if (getBackendErrorName(error) === 'global_eui_limit_reached') {
         setErrorMessage(sharedMessages.devEUIBlockLimitReached)
       } else setErrorMessage(sharedMessages.unknownError)
       setDevEUIGenerated(true)
     }
   }, [handleDevEUIRequest])
 
-  const generateDeviceId = React.useCallback(
-    (device = {}) => {
-      const { ids: idsValues = {} } = device
-
-      try {
-        devEUISchema.validateSync(idsValues.dev_eui)
-        return `eui-${idsValues.dev_eui.toLowerCase()}`
-      } catch (e) {
-        // We dont want to use invalid `dev_eui` as `device_id`.
-      }
-
-      return initialValues.ids.device_id || undefined
-    },
-    [initialValues.ids.device_id, devEUISchema],
-  )
-
   const handleIdPrefill = React.useCallback(() => {
     if (values) {
-      // Do not overwrite a value that the user has already set.
-      if (values.ids.device_id === initialValues.ids.device_id) {
-        const generatedId = generateDeviceId(values)
+      if (values._claim) {
+        // Do not overwrite a value that the user has already set unless it is already in the EUI format.
+        if (
+          values?.authenticated_identifiers?.dev_eui?.length === 16 &&
+          (values?.target_device_id === '' || /eui-\d{16}/.test(values?.target_device_id))
+        ) {
+          const generatedId = `eui-${values.authenticated_identifiers.dev_eui.toLowerCase()}`
+          setFieldValue('target_device_id', generatedId)
+        }
+      }
+
+      if (
+        values?.ids?.dev_eui.length === 16 &&
+        (!Boolean(values?.ids?.device_id) || /eui-\d{16}/.test(values?.ids?.device_id))
+      ) {
+        const generatedId = `eui-${values.ids.dev_eui.toLowerCase()}`
         setFieldValue('ids.device_id', generatedId)
       }
     }
-  }, [values, setFieldValue, initialValues, generateDeviceId])
+  }, [values, setFieldValue])
 
   const devEUIGenerateDisabled =
     applicationDevEUICounter === env.devEUIConfig.applicationLimit ||
@@ -117,7 +115,7 @@ const DevEUIComponent = props => {
   return env.devEUIConfig.devEUIIssuingEnabled ? (
     <Form.Field
       title={sharedMessages.devEUI}
-      name="ids.dev_eui"
+      name={name}
       type="byte"
       min={8}
       max={8}
@@ -134,7 +132,7 @@ const DevEUIComponent = props => {
   ) : (
     <Form.Field
       title={sharedMessages.devEUI}
-      name="ids.dev_eui"
+      name={name}
       type="byte"
       min={8}
       max={8}
@@ -147,15 +145,7 @@ const DevEUIComponent = props => {
 }
 
 DevEUIComponent.propTypes = {
-  devEUISchema: PropTypes.shape({
-    validateSync: PropTypes.func,
-  }),
-  initialValues: PropTypes.shape({
-    ids: PropTypes.shape({
-      device_id: PropTypes.string,
-    }),
-  }),
-  setFieldValue: PropTypes.func,
+  name: PropTypes.string.isRequired,
   values: PropTypes.shape({
     ids: PropTypes.shape({
       device_id: PropTypes.string,
@@ -164,16 +154,7 @@ DevEUIComponent.propTypes = {
 }
 
 DevEUIComponent.defaultProps = {
-  devEUISchema: {
-    validateSync: () => null,
-  },
-  setFieldValue: () => null,
   values: {
-    ids: {
-      device_id: undefined,
-    },
-  },
-  initialValues: {
     ids: {
       device_id: undefined,
     },
