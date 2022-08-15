@@ -57,6 +57,7 @@ class Toggled extends Component {
               value={isEnabled}
               id={checkboxId}
               label={enabledMessage}
+              labelAsTitle
             />
           </label>
           {children}
