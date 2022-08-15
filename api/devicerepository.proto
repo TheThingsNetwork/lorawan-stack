@@ -385,34 +385,55 @@ message MessagePayloadEncoder {
 service DeviceRepository {
   rpc ListBrands(ListEndDeviceBrandsRequest) returns (ListEndDeviceBrandsResponse) {
     option (google.api.http) = {
-      get: "/dr/applications/{application_ids.application_id}/brands"
+      get: "/dr/brands"
+      additional_bindings {
+        get: "/dr/applications/{application_ids.application_id}/brands"
+      }
     };
   };
 
   rpc GetBrand(GetEndDeviceBrandRequest) returns (EndDeviceBrand) {
     option (google.api.http) = {
-      get: "/dr/applications/{application_ids.application_id}/brands/{brand_id}"
+      get: "/dr/brands/{brand_id}"
+      additional_bindings {
+        get: "/dr/applications/{application_ids.application_id}/brands/{brand_id}"
+      }
     };
   }
 
   rpc ListModels(ListEndDeviceModelsRequest) returns (ListEndDeviceModelsResponse) {
     option (google.api.http) = {
-      get: "/dr/applications/{application_ids.application_id}/brands/{brand_id}/models"
+      get: "/dr/models"
+      additional_bindings {
+        get:  "/dr/brands/{brand_id}/models"
+      }
       additional_bindings {
         get: "/dr/applications/{application_ids.application_id}/models"
+      }
+      additional_bindings {
+        get:  "/dr/applications/{application_ids.application_id}/brands/{brand_id}/models"
       }
     };
   };
 
   rpc GetModel(GetEndDeviceModelRequest) returns (EndDeviceModel) {
     option (google.api.http) = {
-      get: "/dr/applications/{application_ids.application_id}/brands/{brand_id}/models/{model_id}"
+      get: "/dr/brands/{brand_id}/models/{model_id}"
+      additional_bindings {
+        get: "/dr/applications/{application_ids.application_id}/brands/{brand_id}/models/{model_id}"
+      }
     };
   }
 
   rpc GetTemplate(GetTemplateRequest) returns (EndDeviceTemplate) {
     option (google.api.http) = {
-      get: "/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/template"
+      get: "/dr/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/template"
+      additional_bindings {
+        get: "/dr/vendors/{end_device_profile_ids.vendor_id}/profiles/{end_device_profile_ids.vendor_profile_id}/template"
+      }
+      additional_bindings {
+        get: "/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/template"
+      }
       additional_bindings {
         get: "/dr/applications/{application_ids.application_id}/vendors/{end_device_profile_ids.vendor_id}/profiles/{end_device_profile_ids.vendor_profile_id}/template"
       }
@@ -421,19 +442,28 @@ service DeviceRepository {
 
   rpc GetUplinkDecoder(GetPayloadFormatterRequest) returns (MessagePayloadDecoder) {
     option (google.api.http) = {
-      get: "/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/uplink/decoder"
+      get: "/dr/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/uplink/decoder"
+      additional_bindings {
+          get: "/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/uplink/decoder"
+      }
     };
   };
 
   rpc GetDownlinkDecoder(GetPayloadFormatterRequest) returns (MessagePayloadDecoder) {
     option (google.api.http) = {
-      get: "/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/decoder"
+      get: "/dr/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/decoder"
+      additional_bindings {
+          get: "/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/decoder"
+      }
     };
   };
 
   rpc GetDownlinkEncoder(GetPayloadFormatterRequest) returns (MessagePayloadEncoder) {
     option (google.api.http) = {
-      get: "/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/encoder"
+      get: "/dr/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/encoder"
+      additional_bindings {
+          get: "/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/encoder"
+      }
     };
   };
 }

@@ -2240,6 +2240,11 @@
       "http": [
         {
           "method": "get",
+          "pattern": "/dr/brands",
+          "parameters": []
+        },
+        {
+          "method": "get",
           "pattern": "/dr/applications/{application_ids.application_id}/brands",
           "parameters": [
             "application_ids.application_id"
@@ -2260,6 +2265,13 @@
     "GetBrand": {
       "file": "lorawan-stack/api/devicerepository.proto",
       "http": [
+        {
+          "method": "get",
+          "pattern": "/dr/brands/{brand_id}",
+          "parameters": [
+            "brand_id"
+          ]
+        },
         {
           "method": "get",
           "pattern": "/dr/applications/{application_ids.application_id}/brands/{brand_id}",
@@ -2285,9 +2297,13 @@
       "http": [
         {
           "method": "get",
-          "pattern": "/dr/applications/{application_ids.application_id}/brands/{brand_id}/models",
+          "pattern": "/dr/models",
+          "parameters": []
+        },
+        {
+          "method": "get",
+          "pattern": "/dr/brands/{brand_id}/models",
           "parameters": [
-            "application_ids.application_id",
             "brand_id"
           ]
         },
@@ -2296,6 +2312,14 @@
           "pattern": "/dr/applications/{application_ids.application_id}/models",
           "parameters": [
             "application_ids.application_id"
+          ]
+        },
+        {
+          "method": "get",
+          "pattern": "/dr/applications/{application_ids.application_id}/brands/{brand_id}/models",
+          "parameters": [
+            "application_ids.application_id",
+            "brand_id"
           ]
         }
       ],
@@ -2344,6 +2368,14 @@
     "GetModel": {
       "file": "lorawan-stack/api/devicerepository.proto",
       "http": [
+        {
+          "method": "get",
+          "pattern": "/dr/brands/{brand_id}/models/{model_id}",
+          "parameters": [
+            "brand_id",
+            "model_id"
+          ]
+        },
         {
           "method": "get",
           "pattern": "/dr/applications/{application_ids.application_id}/brands/{brand_id}/models/{model_id}",
@@ -2401,6 +2433,24 @@
       "http": [
         {
           "method": "get",
+          "pattern": "/dr/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/template",
+          "parameters": [
+            "version_ids.brand_id",
+            "version_ids.model_id",
+            "version_ids.firmware_version",
+            "version_ids.band_id"
+          ]
+        },
+        {
+          "method": "get",
+          "pattern": "/dr/vendors/{end_device_profile_ids.vendor_id}/profiles/{end_device_profile_ids.vendor_profile_id}/template",
+          "parameters": [
+            "end_device_profile_ids.vendor_id",
+            "end_device_profile_ids.vendor_profile_id"
+          ]
+        },
+        {
+          "method": "get",
           "pattern": "/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/template",
           "parameters": [
             "application_ids.application_id",
@@ -2426,6 +2476,16 @@
       "http": [
         {
           "method": "get",
+          "pattern": "/dr/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/uplink/decoder",
+          "parameters": [
+            "version_ids.brand_id",
+            "version_ids.model_id",
+            "version_ids.firmware_version",
+            "version_ids.band_id"
+          ]
+        },
+        {
+          "method": "get",
           "pattern": "/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/uplink/decoder",
           "parameters": [
             "application_ids.application_id",
@@ -2448,6 +2508,16 @@
       "http": [
         {
           "method": "get",
+          "pattern": "/dr/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/decoder",
+          "parameters": [
+            "version_ids.brand_id",
+            "version_ids.model_id",
+            "version_ids.firmware_version",
+            "version_ids.band_id"
+          ]
+        },
+        {
+          "method": "get",
           "pattern": "/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/decoder",
           "parameters": [
             "application_ids.application_id",
@@ -2468,6 +2538,16 @@
     "GetDownlinkEncoder": {
       "file": "lorawan-stack/api/devicerepository.proto",
       "http": [
+        {
+          "method": "get",
+          "pattern": "/dr/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/encoder",
+          "parameters": [
+            "version_ids.brand_id",
+            "version_ids.model_id",
+            "version_ids.firmware_version",
+            "version_ids.band_id"
+          ]
+        },
         {
           "method": "get",
           "pattern": "/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/encoder",
