@@ -15,29 +15,77 @@
 import React from 'react'
 
 import Input from '@ttn-lw/components/input'
-import Form from '@ttn-lw/components/form'
+import Form, { useFormContext } from '@ttn-lw/components/form'
 
-import DevEUIComponent from '@console/components/dev-eui-component'
+import DevEUIComponent from '@console/containers/dev-eui-component'
 
+import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
+import m from '../../messages'
+
+import { devEUISchema } from './validation-schema'
+
 const initialValues = {
-  ids: {
+  authenticated_identifiers: {
     dev_eui: '',
   },
+  target_device_id: '',
   authentication_code: '',
 }
 
-const DeviceClaimingFormSection = () => (
-  <>
-    <DevEUIComponent />
-    <Form.Field
-      title={sharedMessages.claimAuthCode}
-      name="authentication_code"
-      component={Input}
-      sensitive
-    />
-  </>
-)
+const DeviceClaimingFormSection = () => {
+  const { values } = useFormContext()
+  const idInputRef = React.useRef(null)
+
+  const generateDeviceId = values => {
+    const { authenticated_identifiers } = values
+
+    try {
+      devEUISchema.validateSync(authenticated_identifiers.dev_eui)
+      return `eui-${authenticated_identifiers.dev_eui.toLowerCase()}`
+    } catch (e) {
+      // We dont want to use invalid `dev_eui` as `device_id`.
+    }
+
+    return initialValues.target_device_id || ''
+  }
+
+  const handleIdTextSelect = React.useCallback(
+    idInputRef => {
+      if (idInputRef.current && values) {
+        const { setSelectionRange } = idInputRef.current
+
+        const generatedId = generateDeviceId(values)
+        if (generatedId.length > 0 && generatedId === values.target_device_id) {
+          setSelectionRange.call(idInputRef.current, 0, generatedId.length)
+        }
+      }
+    },
+    [values],
+  )
+  return (
+    <>
+      <DevEUIComponent name="authenticated_identifiers.dev_eui" />
+      <Form.Field
+        title={sharedMessages.claimAuthCode}
+        name="authentication_code"
+        component={Input}
+        sensitive
+      />
+      <Form.Field
+        required
+        title={sharedMessages.devID}
+        name="target_device_id"
+        placeholder={sharedMessages.deviceIdPlaceholder}
+        component={Input}
+        onFocus={handleIdTextSelect}
+        inputRef={idInputRef}
+        tooltipId={tooltipIds.DEVICE_ID}
+        description={m.deviceIdDescription}
+      />
+    </>
+  )
+}
 
 export { DeviceClaimingFormSection as default, initialValues }
