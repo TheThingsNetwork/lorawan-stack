@@ -37,6 +37,7 @@ class Checkbox extends React.PureComponent {
     id: PropTypes.string,
     indeterminate: PropTypes.bool,
     label: PropTypes.message,
+    labelAsTitle: PropTypes.bool,
     name: PropTypes.string.isRequired,
     onBlur: PropTypes.func,
     onChange: PropTypes.func,
@@ -50,6 +51,7 @@ class Checkbox extends React.PureComponent {
     children: null,
     className: undefined,
     label: sharedMessages.enabled,
+    labelAsTitle: false,
     disabled: false,
     id: undefined,
     readOnly: false,
@@ -131,6 +133,7 @@ class Checkbox extends React.PureComponent {
       indeterminate,
       id,
       children,
+      labelAsTitle,
       ...rest
     } = this.props
     const { checked } = this.state
@@ -156,6 +159,10 @@ class Checkbox extends React.PureComponent {
       [style.indeterminate]: indeterminate,
     })
 
+    const labelCls = classnames(style.label, {
+      [style.labelAsTitle]: labelAsTitle,
+    })
+
     return (
       <label className={cls}>
         <span className={style.checkbox}>
@@ -173,7 +180,7 @@ class Checkbox extends React.PureComponent {
           />
           <span className={style.checkmark} />
         </span>
-        {label && <Message className={style.label} content={label} />}
+        {label && <Message className={labelCls} content={label} />}
         {children}
       </label>
     )
