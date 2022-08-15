@@ -17,10 +17,10 @@ package fetch_test
 import (
 	"testing"
 
-	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"golang.org/x/exp/slices"
 )
 
 type MockInterface struct {
@@ -138,8 +138,8 @@ func TestWithBasePath(t *testing.T) {
 				},
 			}
 
-			basePath := deepcopy.Copy(tc.BasePath).([]string)
-			path := deepcopy.Copy(tc.Path).([]string)
+			basePath := slices.Clone(tc.BasePath)
+			path := slices.Clone(tc.Path)
 			b, err := fetch.WithBasePath(m, basePath...).File(path...)
 			if a.So(tc.AssertError(t, err), should.BeTrue) {
 				a.So(tc.AssertBytes(t, b), should.BeTrue)

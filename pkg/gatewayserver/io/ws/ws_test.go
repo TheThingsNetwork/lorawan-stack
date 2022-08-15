@@ -25,9 +25,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gogo/protobuf/proto"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/gorilla/websocket"
-	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
@@ -820,7 +820,7 @@ func TestTraffic(t *testing.T) {
 		InputBSUpstream         interface{}
 		InputNetworkDownstream  *ttnpb.DownlinkMessage
 		ExpectedBSDownstream    interface{}
-		ExpectedNetworkUpstream interface{}
+		ExpectedNetworkUpstream proto.Message
 	}{
 		{
 			Name: "JoinRequest",
@@ -1142,7 +1142,7 @@ func TestTraffic(t *testing.T) {
 							t.Fatalf("Invalid RawPayload: %v", up.Message.RawPayload)
 						}
 
-						expectedUp := deepcopy.Copy(tc.ExpectedNetworkUpstream).(*ttnpb.UplinkMessage)
+						expectedUp := ttnpb.Clone(tc.ExpectedNetworkUpstream).(*ttnpb.UplinkMessage)
 						expectedUp.ReceivedAt = up.Message.ReceivedAt
 						expectedUp.RawPayload = up.Message.RawPayload
 
@@ -1181,7 +1181,7 @@ func TestTraffic(t *testing.T) {
 							t.Fatalf("Invalid RawPayload: %v", up.Message.RawPayload)
 						}
 
-						expectedUp := deepcopy.Copy(tc.ExpectedNetworkUpstream).(*ttnpb.UplinkMessage)
+						expectedUp := ttnpb.Clone(tc.ExpectedNetworkUpstream).(*ttnpb.UplinkMessage)
 						expectedUp.ReceivedAt = up.Message.ReceivedAt
 						expectedUp.RawPayload = up.Message.RawPayload
 

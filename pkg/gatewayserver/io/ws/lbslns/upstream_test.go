@@ -19,7 +19,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
@@ -250,7 +249,7 @@ func TestJoinRequest(t *testing.T) {
 				if !a.So(&payload, should.Resemble, msg.Payload) {
 					t.Fatalf("Invalid RawPayload: %v", msg.RawPayload)
 				}
-				expected := deepcopy.Copy(tc.ExpectedUplinkMessage).(*ttnpb.UplinkMessage)
+				expected := ttnpb.Clone(tc.ExpectedUplinkMessage)
 				expected.RawPayload = msg.RawPayload
 				expected.ReceivedAt = msg.ReceivedAt
 				if !a.So(msg, should.Resemble, expected) {
@@ -424,7 +423,7 @@ func TestUplinkDataFrame(t *testing.T) {
 			} else if tc.ErrorAssertion != nil {
 				t.Fatalf("Expected error")
 			} else {
-				expected := deepcopy.Copy(tc.ExpectedUplinkMessage).(*ttnpb.UplinkMessage)
+				expected := ttnpb.Clone(tc.ExpectedUplinkMessage)
 				expected.RawPayload = msg.RawPayload
 				expected.ReceivedAt = msg.ReceivedAt
 				if !a.So(msg, should.Resemble, expected) {

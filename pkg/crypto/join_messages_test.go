@@ -23,6 +23,7 @@ import (
 	. "go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"golang.org/x/exp/slices"
 )
 
 func TestJoinAcceptEncryption(t *testing.T) {
@@ -60,7 +61,7 @@ func TestJoinAcceptEncryption(t *testing.T) {
 			a := assertions.New(t)
 
 			key := deepcopy.Copy(tc.Key).(types.AES128Key)
-			dec := deepcopy.Copy(tc.Decrypted).([]byte)
+			dec := slices.Clone(tc.Decrypted)
 			enc, err := EncryptJoinAccept(key, dec)
 			a.So(err, should.BeNil)
 			a.So(dec, should.Resemble, tc.Decrypted)
@@ -68,7 +69,7 @@ func TestJoinAcceptEncryption(t *testing.T) {
 			a.So(key, should.Resemble, tc.Key)
 
 			key = deepcopy.Copy(tc.Key).(types.AES128Key)
-			enc = deepcopy.Copy(tc.Encrypted).([]byte)
+			enc = slices.Clone(tc.Encrypted)
 			dec, err = DecryptJoinAccept(tc.Key, tc.Encrypted)
 			a.So(err, should.BeNil)
 			a.So(dec, should.Resemble, tc.Decrypted)
@@ -109,7 +110,7 @@ func TestComputeJoinRequestMIC(t *testing.T) {
 			a := assertions.New(t)
 
 			key := deepcopy.Copy(tc.Key).(types.AES128Key)
-			pld := deepcopy.Copy(tc.Payload).([]byte)
+			pld := slices.Clone(tc.Payload)
 			mic, err := ComputeJoinRequestMIC(key, pld)
 			a.So(err, should.BeNil)
 			a.So(mic, should.Equal, tc.MIC)
@@ -185,7 +186,7 @@ func TestComputeRejoinRequestMIC(t *testing.T) {
 			a := assertions.New(t)
 
 			key := deepcopy.Copy(tc.Key).(types.AES128Key)
-			pld := deepcopy.Copy(tc.Payload).([]byte)
+			pld := slices.Clone(tc.Payload)
 			mic, err := ComputeRejoinRequestMIC(key, pld)
 			a.So(err, should.BeNil)
 			a.So(mic, should.Equal, tc.MIC)
@@ -228,7 +229,7 @@ func TestComputeLegacyJoinAcceptMIC(t *testing.T) {
 			a := assertions.New(t)
 
 			key := deepcopy.Copy(tc.Key).(types.AES128Key)
-			pld := deepcopy.Copy(tc.Payload).([]byte)
+			pld := slices.Clone(tc.Payload)
 			mic, err := ComputeLegacyJoinAcceptMIC(key, pld)
 			a.So(err, should.BeNil)
 			a.So(mic, should.Equal, tc.MIC)
@@ -281,7 +282,7 @@ func TestComputeJoinAcceptMIC(t *testing.T) {
 			key := deepcopy.Copy(tc.Key).(types.AES128Key)
 			joinEUI := deepcopy.Copy(tc.JoinEUI).(types.EUI64)
 			devNonce := deepcopy.Copy(tc.DevNonce).(types.DevNonce)
-			pld := deepcopy.Copy(tc.Payload).([]byte)
+			pld := slices.Clone(tc.Payload)
 			mic, err := ComputeJoinAcceptMIC(key, tc.Type, joinEUI, devNonce, pld)
 			a.So(err, should.BeNil)
 			a.So(mic, should.Equal, tc.MIC)

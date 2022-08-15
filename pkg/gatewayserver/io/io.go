@@ -22,7 +22,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/mohae/deepcopy"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
@@ -338,7 +337,7 @@ func (c *Connection) HandleStatus(status *ttnpb.GatewayStatus) (err error) {
 	case <-c.ctx.Done():
 		return c.ctx.Err()
 	case c.statusCh <- status:
-		c.lastStatus.Store(deepcopy.Copy(status))
+		c.lastStatus.Store(ttnpb.Clone(status))
 		atomic.StoreInt64(&c.lastStatusTime, time.Now().UnixNano())
 		c.notifyStatsChanged()
 

@@ -18,7 +18,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/mohae/deepcopy"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -77,8 +76,8 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 		}
 
 		ctx := events.ContextWithCorrelationID(ctx, events.CorrelationIDsFromContext(conn.Context())...)
-		connDown := deepcopy.Copy(down).(*ttnpb.DownlinkMessage) // Let the connection own the DownlinkMessage.
-		connDown.GetRequest().DownlinkPaths = nil                // And do not leak the downlink paths to the gateway.
+		connDown := ttnpb.Clone(down)             // Let the connection own the DownlinkMessage.
+		connDown.GetRequest().DownlinkPaths = nil // And do not leak the downlink paths to the gateway.
 		connDown.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 
 		registerScheduleDownlinkAttempt(ctx, conn.Gateway(), connDown, conn.Frontend().Protocol())

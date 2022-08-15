@@ -22,7 +22,6 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	. "go.thethings.network/lorawan-stack/v3/pkg/joinserver"
@@ -32,10 +31,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
-
-func CopyEndDevice(pb *ttnpb.EndDevice) *ttnpb.EndDevice {
-	return deepcopy.Copy(pb).(*ttnpb.EndDevice)
-}
 
 // handleDeviceRegistryTest runs a test suite on reg.
 func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
@@ -80,7 +75,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 			if !a.So(stored, should.BeNil) {
 				t.Fatal("Registry is not empty")
 			}
-			return CopyEndDevice(pb), []string{
+			return ttnpb.Clone(pb), []string{
 				"ids.application_ids",
 				"ids.dev_eui",
 				"ids.device_id",
@@ -106,7 +101,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	}
 	a.So(retCtx.EndDevice, should.HaveEmptyDiff, pb)
 
-	pbOther := CopyEndDevice(pb)
+	pbOther := ttnpb.Clone(pb)
 	pbOther.Ids.DeviceId = "other-device"
 	pbOther.Ids.DevEui = types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes()
 
@@ -128,7 +123,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 			if !a.So(stored, should.BeNil) {
 				t.Fatal("Registry is not empty")
 			}
-			return CopyEndDevice(pbOther), []string{
+			return ttnpb.Clone(pbOther), []string{
 				"ids.application_ids",
 				"ids.dev_eui",
 				"ids.device_id",
@@ -162,7 +157,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 			if !a.So(stored, should.BeNil) {
 				t.Fatal("Registry is not empty")
 			}
-			return CopyEndDevice(pbOther), []string{
+			return ttnpb.Clone(pbOther), []string{
 				"ids.application_ids",
 				"ids.dev_eui",
 				"ids.device_id",
@@ -209,10 +204,6 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 		t.Fatalf("Error received: %v", err)
 	}
 	a.So(retCtx, should.BeNil)
-}
-
-func CopySessionKeys(pb *ttnpb.SessionKeys) *ttnpb.SessionKeys {
-	return deepcopy.Copy(pb).(*ttnpb.SessionKeys)
 }
 
 func TestDeviceRegistries(t *testing.T) {
@@ -307,7 +298,7 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 			if !a.So(stored, should.BeNil) {
 				t.Fatal("Registry is not empty")
 			}
-			return CopySessionKeys(pb), []string{
+			return ttnpb.Clone(pb), []string{
 				"app_s_key",
 				"f_nwk_s_int_key",
 				"nwk_s_enc_key",
@@ -325,7 +316,7 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 	a.So(err, should.BeNil)
 	a.So(ret, should.HaveEmptyDiff, pb)
 
-	pbOther := CopySessionKeys(pb)
+	pbOther := ttnpb.Clone(pb)
 	joinEUIOther := types.EUI64{0x43, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 	devEUIOther := types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 
@@ -346,7 +337,7 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 			if !a.So(stored, should.BeNil) {
 				t.Fatal("Registry is not empty")
 			}
-			return CopySessionKeys(pbOther), []string{
+			return ttnpb.Clone(pbOther), []string{
 				"app_s_key",
 				"f_nwk_s_int_key",
 				"nwk_s_enc_key",
