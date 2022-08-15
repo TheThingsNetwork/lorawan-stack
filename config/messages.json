@@ -9791,6 +9791,15 @@
       "file": "observability.go"
     }
   },
+  "event:ns.down.rx.parameters.fail": {
+    "translations": {
+      "en": "failed to compute RX parameters"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
   "event:ns.down.transmission.fail": {
     "translations": {
       "en": "failed to transmit downlink"

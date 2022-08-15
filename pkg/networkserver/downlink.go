@@ -1189,6 +1189,8 @@ type rxParameters struct {
 }
 
 func computeRxParameters(
+	ctx context.Context,
+	ids *ttnpb.EndDeviceIdentifiers,
 	macState *ttnpb.MACState,
 	uplinkChannelIndex uint32,
 	uplinkDataRate *ttnpb.DataRate,
@@ -1197,7 +1199,7 @@ func computeRxParameters(
 	rx2SlotTime time.Time,
 	phy *band.Band,
 	fp *frequencyplans.FrequencyPlan,
-) (res rxParameters, err error) {
+) (res rxParameters, evs []events.Event, err error) {
 	var (
 		rx1DR, rx2DR          band.DataRate
 		rx1DwellTimeDependant bool
@@ -1205,26 +1207,31 @@ func computeRxParameters(
 	if now.Before(rx1SlotTime) {
 		parameters, err := computeRx1Parameters(phy, fp, macState, uplinkChannelIndex, uplinkDataRate)
 		if err != nil {
-			return res, err
+			evs = append(evs, evtRXParametersFail.NewWithIdentifiersAndData(ctx, ids, err))
+		} else {
+			res.attemptRX1 = true
+			res.rx1Frequency, rx1DR = parameters.Frequency, parameters.DataRate
+			res.rx1DataRate = rx1DR.Rate
+			rx1DwellTimeDependant = parameters.DwellTimeDependant
 		}
-		res.attemptRX1 = true
-		res.rx1Frequency, rx1DR = parameters.Frequency, parameters.DataRate
-		res.rx1DataRate = rx1DR.Rate
-		rx1DwellTimeDependant = parameters.DwellTimeDependant
 	}
 	rx2DR, ok := phy.DataRates[macState.CurrentParameters.Rx2DataRateIndex]
 	if !ok {
-		return res, errDataRateIndexNotFound.WithAttributes(
-			"index",
-			macState.CurrentParameters.Rx2DataRateIndex,
-		)
+		evs = append(evs, evtRXParametersFail.NewWithIdentifiersAndData(
+			ctx,
+			ids,
+			errDataRateIndexNotFound.WithAttributes(
+				"index",
+				macState.CurrentParameters.Rx2DataRateIndex,
+			),
+		))
 	} else if now.Before(rx2SlotTime) {
 		res.attemptRX2 = true
 		res.rx2Frequency = macState.CurrentParameters.Rx2Frequency
 		res.rx2DataRate = rx2DR.Rate
 	}
 	if !res.attemptRX1 && !res.attemptRX2 {
-		return res, nil
+		return res, evs, nil
 	}
 
 	// In bands in which the RX1 data rate depends on the dwell time status of the end device
@@ -1260,7 +1267,7 @@ func computeRxParameters(
 	default:
 		panic("unreachable") // Cannot be reached since at this point one of the two slots must be attemptable.
 	}
-	return res, nil
+	return res, evs, nil
 }
 
 func computeMaxMACDownlinkPayloadSize(
@@ -1396,7 +1403,10 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 	}
 
 	now := time.Now()
-	rxParameters, err := computeRxParameters(
+	queuedEvents := []events.Event{}
+	rxParameters, rxParametersEvents, err := computeRxParameters(
+		ctx,
+		dev.Ids,
 		dev.MacState,
 		slot.Uplink.DeviceChannelIndex,
 		slot.Uplink.Settings.DataRate,
@@ -1406,8 +1416,8 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		phy,
 		fp,
 	)
+	queuedEvents = append(queuedEvents, rxParametersEvents...)
 	if err != nil {
-		log.FromContext(ctx).WithError(err).Error("Failed to compute RX parameters")
 		dev.MacState.QueuedResponses = nil
 		dev.MacState.RxWindowsAvailable = false
 		return downlinkAttemptResult{
@@ -1415,6 +1425,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 				"mac_state.queued_responses",
 				"mac_state.rx_windows_available",
 			},
+			QueuedEvents: queuedEvents,
 		}
 	}
 
@@ -1430,6 +1441,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 				"mac_state.queued_responses",
 				"mac_state.rx_windows_available",
 			},
+			QueuedEvents: queuedEvents,
 		}
 	}
 
@@ -1457,6 +1469,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 			DownlinkTaskUpdateStrategy: noDownlinkTask,
 			SetPaths:                   sets,
 			QueuedApplicationUplinks:   genState.appendApplicationUplinks(nil, false),
+			QueuedEvents:               queuedEvents,
 		}
 	}
 
@@ -1478,6 +1491,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 					"mac_state.rx_windows_available",
 				),
 				QueuedApplicationUplinks: genState.appendApplicationUplinks(nil, false),
+				QueuedEvents:             queuedEvents,
 			}
 		}
 		// NOTE: It may be possible that RX1 is dropped at this point and DevStatusReq can be scheduled in RX2 due to the downlink being
@@ -1503,7 +1517,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		req.Rx2Frequency = rxParameters.rx2Frequency
 		req.Rx2DataRate = rxParameters.rx2DataRate
 	}
-	down, queuedEvents, err := ns.scheduleDownlinkByPaths(
+	down, scheduleEvents, err := ns.scheduleDownlinkByPaths(
 		log.NewContext(ctx, loggerWithTxRequestFields(logger, req, attemptRX1, attemptRX2).WithField("rx1_delay", req.Rx1Delay)),
 		&scheduleRequest{
 			TxRequest:            req,
@@ -1515,6 +1529,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		},
 		map[uint32][]downlinkPath{0: paths},
 	)
+	queuedEvents = append(queuedEvents, scheduleEvents...)
 	if err != nil {
 		if schedErr, ok := err.(downlinkSchedulingError); ok {
 			logger = loggerWithDownlinkSchedulingErrorFields(logger, schedErr)
@@ -1580,11 +1595,20 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 	default:
 		panic(fmt.Sprintf("unmatched downlink class: '%s'", slot.Class))
 	}
+	var queuedEvents []events.Event
 	dr, ok := phy.DataRates[drIdx]
 	if !ok {
-		log.FromContext(ctx).WithField("data_rate_index", drIdx).Error("RX2 data rate not found")
+		queuedEvents = append(queuedEvents, evtRXParametersFail.NewWithIdentifiersAndData(
+			ctx,
+			dev.Ids,
+			errDataRateIndexNotFound.WithAttributes(
+				"index",
+				drIdx,
+			),
+		))
 		return downlinkAttemptResult{
 			DownlinkTaskUpdateStrategy: noDownlinkTask,
+			QueuedEvents:               queuedEvents,
 		}
 	}
 
@@ -1605,6 +1629,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 			DownlinkTaskUpdateStrategy: noDownlinkTask,
 			SetPaths:                   sets,
 			QueuedApplicationUplinks:   genState.appendApplicationUplinks(nil, false),
+			QueuedEvents:               queuedEvents,
 		}
 	}
 	if genState.ApplicationDownlink != nil {
@@ -1620,6 +1645,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 		return downlinkAttemptResult{
 			SetPaths:                 sets,
 			QueuedApplicationUplinks: genState.appendApplicationUplinks(nil, false),
+			QueuedEvents:             queuedEvents,
 		}
 
 	case slot.Time.After(time.Now()):
@@ -1631,6 +1657,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 		return downlinkAttemptResult{
 			SetPaths:                 sets,
 			QueuedApplicationUplinks: genState.appendApplicationUplinks(nil, false),
+			QueuedEvents:             queuedEvents,
 		}
 	}
 
@@ -1665,6 +1692,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 				DownlinkTaskUpdateStrategy: noDownlinkTask,
 				SetPaths:                   sets,
 				QueuedApplicationUplinks:   genState.appendApplicationUplinks(nil, false),
+				QueuedEvents:               queuedEvents,
 			}
 		}
 		groupedPaths[0] = paths
@@ -1678,7 +1706,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 		Rx2Frequency:    freq,
 		AbsoluteTime:    absTime,
 	}
-	down, queuedEvents, err := ns.scheduleDownlinkByPaths(
+	down, scheduleEvents, err := ns.scheduleDownlinkByPaths(
 		log.NewContext(ctx, loggerWithTxRequestFields(log.FromContext(ctx), req, false, true)),
 		&scheduleRequest{
 			TxRequest:            req,
@@ -1690,6 +1718,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 		},
 		groupedPaths,
 	)
+	queuedEvents = append(queuedEvents, scheduleEvents...)
 	if err != nil {
 		logger := log.FromContext(ctx)
 		schedErr, ok := err.(downlinkSchedulingError)
@@ -1879,7 +1908,9 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 						rx2 = rx1.Add(time.Second)
 						now = time.Now()
 					)
-					rxParameters, err := computeRxParameters(
+					rxParameters, rxParametersEvents, err := computeRxParameters(
+						ctx,
+						dev.Ids,
 						dev.PendingMacState,
 						up.DeviceChannelIndex,
 						up.Settings.DataRate,
@@ -1889,8 +1920,8 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 						phy,
 						fp,
 					)
+					queuedEvents = append(queuedEvents, rxParametersEvents...)
 					if err != nil {
-						log.FromContext(ctx).WithError(err).Error("Failed to compute RX parameters")
 						dev.PendingMacState.RxWindowsAvailable = false
 						taskUpdateStrategy = nextDownlinkTask
 						return dev, []string{
