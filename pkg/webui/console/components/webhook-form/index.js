@@ -17,6 +17,8 @@ import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
 import { uniq } from 'lodash'
 
+import tts from '@console/api/tts'
+
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import SubmitBar from '@ttn-lw/components/submit-bar'
@@ -28,6 +30,7 @@ import ModalButton from '@ttn-lw/components/button/modal-button'
 import PortalledModal from '@ttn-lw/components/modal/portalled'
 import Checkbox from '@ttn-lw/components/checkbox'
 import Link from '@ttn-lw/components/link'
+import Select from '@ttn-lw/components/select'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -85,7 +88,19 @@ const m = defineMessages({
     'There must be no duplicate headers. Please remove or merge headers with the same key.',
   webhooksDescription:
     'The Webhooks feature allows The Things Stack to send application related messages to specific HTTP(S) endpoints. You can also use webhooks to schedule downlinks to an end device. Learn more in our <Link>Webhooks guide</Link>.',
+  filterEventData: 'Filter event data',
+  fieldMaskPlaceholder: 'Select a filter path',
+  filtersAdd: 'Add filter path',
 })
+
+// We can use the allowed field masks of the `ApplicationUpStorage` API as
+// options for the webhook field mask paths.
+const filterOptions = uniq(
+  tts.api.ApplicationUpStorage.GetStoredApplicationUpAllowedFieldMaskPaths,
+).map(v => ({
+  value: v,
+  label: v,
+}))
 
 const isReadOnly = value => value.readOnly
 
@@ -113,6 +128,9 @@ const validationSchema = Yup.object().shape({
       .required(sharedMessages.validateRequired),
   }),
   format: Yup.string().required(sharedMessages.validateRequired),
+  field_mask: Yup.object().shape({
+    paths: Yup.array().of(Yup.string()).compact(),
+  }),
   _headers: Yup.array()
     .of(
       Yup.object({
@@ -208,7 +226,7 @@ const validationSchema = Yup.object().shape({
 
 export default class WebhookForm extends Component {
   static propTypes = {
-    error: PropTypes.string,
+    error: PropTypes.error,
     existCheck: PropTypes.func,
     healthStatusEnabled: PropTypes.bool,
     initialWebhookValue: PropTypes.shape({
@@ -252,7 +270,7 @@ export default class WebhookForm extends Component {
 
   constructor(props) {
     super(props)
-    const { initialWebhookValue, error } = this.props
+    const { initialWebhookValue } = this.props
 
     this.state = {
       shouldShowCredentialsInput: Boolean(
@@ -260,7 +278,7 @@ export default class WebhookForm extends Component {
       ),
       displayOverwriteModal: false,
       existingId: undefined,
-      error,
+      error: undefined,
     }
   }
 
@@ -336,7 +354,7 @@ export default class WebhookForm extends Component {
   }
 
   render() {
-    const { update, initialWebhookValue, webhookTemplate, healthStatusEnabled } = this.props
+    const { update, initialWebhookValue, webhookTemplate, healthStatusEnabled, error } = this.props
     let initialValues = blankValues
     if (update && initialWebhookValue) {
       initialValues = decodeValues({ ...blankValues, ...initialWebhookValue })
@@ -407,7 +425,7 @@ export default class WebhookForm extends Component {
           onSubmit={this.handleSubmit}
           validationSchema={validationSchema}
           initialValues={initialValues}
-          error={this.state.error}
+          error={this.state.error || error}
           errorTitle={update ? m.updateErrorTitle : m.createErrorTitle}
           formikRef={this.form}
         >
@@ -474,6 +492,17 @@ export default class WebhookForm extends Component {
             component={KeyValueMap}
             isReadOnly={isReadOnly}
             onChange={this.handleHeadersChange}
+          />
+          <Form.Field
+            name="field_mask.paths"
+            title={m.filterEventData}
+            valuePlaceholder={m.fieldMaskPlaceholder}
+            component={KeyValueMap}
+            tooltipId={tooltipIds.FILTER_EVENT_DATA}
+            inputElement={Select}
+            addMessage={m.filtersAdd}
+            additionalInputProps={{ options: filterOptions }}
+            indexAsKey
           />
           <Form.SubTitle title={sharedMessages.eventEnabledTypes} className="mb-0" />
           <Message component="p" content={m.messageInfo} className="mt-0 mb-ls-xxs" />
