@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import { merge } from 'lodash'
 import { push } from 'connected-react-router'
 import { useDispatch, useSelector } from 'react-redux'
@@ -54,14 +54,14 @@ const initialValues = merge(
 
 const DeviceOnboardingFormInner = () => {
   const {
-    values: { frequency_plan_id, lorawan_version, lorawan_phy_version, ids },
+    values: { frequency_plan_id, lorawan_version, lorawan_phy_version, _claim },
   } = useFormContext()
 
   const maySubmit =
     Boolean(frequency_plan_id) &&
     Boolean(lorawan_version) &&
     Boolean(lorawan_phy_version) &&
-    ids?.join_eui?.length === 16
+    typeof _claim === 'boolean'
 
   return (
     <>
@@ -87,6 +87,7 @@ const DeviceOnboardingForm = () => {
   const mayEditKeys = useSelector(state => checkFromState(mayEditApplicationDeviceKeys, state))
   const appId = useSelector(state => selectSelectedApplicationId(state))
   const validationContext = React.useMemo(() => ({ mayEditKeys }), [mayEditKeys])
+  const [error, setError] = useState(undefined)
 
   const navigateToDevice = useCallback(
     (appId, deviceId) => dispatch(push(`/applications/${appId}/devices/${deviceId}`)),
@@ -94,9 +95,8 @@ const DeviceOnboardingForm = () => {
   )
 
   const handleClaim = useCallback(
-    async (values, setSubmitting) => {
+    async values => {
       const { ids, authentication_code, qr_code } = values
-
       let authenticatedIdentifiers
       if (!qr_code) {
         authenticatedIdentifiers = {
@@ -105,81 +105,75 @@ const DeviceOnboardingForm = () => {
           authentication_code,
         }
       }
-
-      try {
-        const device = await dispatch(
-          attachPromise(claimDevice(appId, qr_code, authenticatedIdentifiers)),
-        )
-        const { ids } = device
-        navigateToDevice(appId, ids.device_id)
-      } catch (error) {
-        setSubmitting(false)
-      }
+      const device = await dispatch(
+        attachPromise(claimDevice(appId, qr_code, authenticatedIdentifiers)),
+      )
+      const { deviceIds } = device
+      navigateToDevice(appId, deviceIds.device_id)
     },
     [appId, navigateToDevice, dispatch],
   )
 
   const handleRegister = useCallback(
-    async (values, setSubmitting, resetForm, setErrors, cleanedValues) => {
-      try {
-        const { _registration } = values
-        const { ids, supports_join, mac_state = {} } = cleanedValues
-        ids.application_ids = { application_id: appId }
+    async (values, resetForm, { authenticated_identifiers, ...cleanedValues }) => {
+      const { _registration } = values
+      const { ids, supports_join, mac_state = {} } = cleanedValues
+      ids.application_ids = { application_id: appId }
 
-        //  Do not attempt to set empty current_parameters on device creation.
-        if (
-          mac_state.current_parameters &&
-          Object.keys(mac_state.current_parameters).length === 0
-        ) {
-          delete mac_state.current_parameters
-        }
+      //  Do not attempt to set empty current_parameters on device creation.
+      if (mac_state.current_parameters && Object.keys(mac_state.current_parameters).length === 0) {
+        delete mac_state.current_parameters
+      }
 
-        await dispatch(attachPromise(createDevice(appId, cleanedValues)))
-        switch (_registration) {
-          case REGISTRATION_TYPES.MULTIPLE:
-            toast({
-              type: toast.types.SUCCESS,
-              message: m.createSuccess,
-            })
-            resetForm({
-              errors: {},
-              values: {
-                ...values,
-                ...initialValues,
-                ids: {
-                  ...initialValues.ids,
-                  join_eui: supports_join ? values.ids.join_eui : undefined,
-                },
-                frequency_plan_id: values.frequency_plan_id,
-                version_ids: values.version_ids,
-                _registration: REGISTRATION_TYPES.MULTIPLE,
+      await dispatch(attachPromise(createDevice(appId, cleanedValues)))
+      switch (_registration) {
+        case REGISTRATION_TYPES.MULTIPLE:
+          toast({
+            type: toast.types.SUCCESS,
+            message: m.createSuccess,
+          })
+          resetForm({
+            errors: {},
+            values: {
+              ...values,
+              ...initialValues,
+              ids: {
+                ...initialValues.ids,
+                join_eui: supports_join ? values.ids.join_eui : undefined,
               },
-            })
-            break
-          case REGISTRATION_TYPES.SINGLE:
-            resetForm({ values: initialValues })
-            toast({
-              type: toast.types.SUCCESS,
-              message: m.createSuccess,
-            })
-          default:
-            navigateToDevice(appId, ids.device_id)
-        }
-      } catch (error) {
-        setErrors(error)
-        setSubmitting(false)
+              frequency_plan_id: values.frequency_plan_id,
+              version_ids: values.version_ids,
+              _registration: REGISTRATION_TYPES.MULTIPLE,
+            },
+          })
+          break
+        case REGISTRATION_TYPES.SINGLE:
+          resetForm({ values: initialValues })
+          toast({
+            type: toast.types.SUCCESS,
+            message: m.createSuccess,
+          })
+        default:
+          navigateToDevice(appId, ids.device_id)
       }
     },
     [appId, dispatch, navigateToDevice],
   )
 
   const handleSubmit = useCallback(
-    async (values, { setSubmitting, resetForm, setErrors }, cleanedValues) => {
-      if (values._claim) {
-        return handleClaim(cleanedValues, setSubmitting)
-      }
+    async (values, { resetForm }, cleanedValues) => {
+      try {
+        let result
+        if (values._claim) {
+          result = handleClaim(cleanedValues)
+        } else {
+          result = handleRegister(values, resetForm, cleanedValues)
+        }
 
-      return handleRegister(values, setSubmitting, resetForm, setErrors, cleanedValues)
+        return result
+      } catch (error) {
+        setError(error)
+      }
     },
     [handleClaim, handleRegister],
   )
@@ -187,6 +181,7 @@ const DeviceOnboardingForm = () => {
   return (
     <Form
       onSubmit={handleSubmit}
+      error={error}
       initialValues={initialValues}
       hiddenFields={[
         'network_server_address',
