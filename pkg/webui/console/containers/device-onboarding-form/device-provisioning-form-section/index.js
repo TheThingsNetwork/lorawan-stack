@@ -19,6 +19,7 @@ import { merge } from 'lodash'
 
 import Input from '@ttn-lw/components/input'
 import Form, { useFormContext } from '@ttn-lw/components/form'
+import Button from '@ttn-lw/components/button'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -51,14 +52,26 @@ const msg = defineMessages({
 
 const initialValues = merge(
   {
+    authenticated_identifiers: {
+      join_eui: '',
+    },
     ids: {
       join_eui: '',
     },
-    _claim: '',
+    _claim: undefined,
   },
   claimingInitialValues,
   registrationInitialValues,
 )
+
+// Save EUI in both fields.
+const joinEuiEncoder = value => ({
+  ids: { join_eui: value },
+  authenticated_identifiers: {
+    join_eui: value,
+  },
+})
+const joinEuiDecoder = value => value?.ids?.join_eui || ''
 
 const DeviceProvisioningFormSection = () => {
   const dispatch = useDispatch()
@@ -74,81 +87,73 @@ const DeviceProvisioningFormSection = () => {
   } = values
 
   const template = useSelector(selectDeviceTemplate)
+  const isClaiming = _claim === true
+  const isRegistration = _claim === false
+  const isClaimingDetermined = _claim !== undefined
+  const isRepository = _inputMethod === 'device-repository'
+  let joinEuiConfirmationMessage
+
+  if (isClaimingDetermined) {
+    joinEuiConfirmationMessage = isClaiming ? msg.claiming : msg.registration
+  }
+
   const mayProvisionDevice =
     (Boolean(frequency_plan_id) && Boolean(lorawan_version) && Boolean(lorawan_phy_version)) ||
     (_inputMethod === 'device-repository' && hasValidDeviceRepositoryType(version, template))
-  const mayConfirm = _claim === '' || _claim === undefined
+  const mayConfirm = ids.join_eui.length === 16
 
-  const isClaimable = React.useCallback(async () => {
-    if (_claim !== '') {
-      setValues(values => ({
-        ...values,
-        ids: {
-          ...values.ids,
-          join_eui: '',
-        },
-        _claim: '',
-      }))
-    } else {
-      const claim = await dispatch(attachPromise(getInfoByJoinEUI({ join_eui: ids?.join_eui })))
-      const supportsClaiming = claim.supports_claiming ?? false
+  const resetJoinEui = React.useCallback(async () => {
+    setValues(values => ({
+      ...values,
+      ids: {
+        ...values.ids,
+        join_eui: '',
+      },
+      _claim: '',
+    }))
+  }, [setValues])
 
-      setFieldValue('_claim', supportsClaiming)
-    }
-  }, [ids, setFieldValue, _claim, dispatch, setValues])
+  const getClaiming = React.useCallback(async () => {
+    const claim = await dispatch(attachPromise(getInfoByJoinEUI({ join_eui: ids?.join_eui })))
+    const supportsClaiming = claim.supports_claiming ?? false
 
-  React.useEffect(() => {
-    // Merge the new device template with other form values.
-    if (template && hasValidDeviceRepositoryType && _inputMethod === 'device-repository') {
-      const { end_device } = template
-      setValues(merge(values, end_device), false)
-    }
-  }, [template, _inputMethod, setValues, values])
+    setFieldValue('_claim', supportsClaiming)
+  }, [ids, setFieldValue, dispatch])
 
   return (
     <>
       {mayProvisionDevice ? (
         <Form.Field
           title={sharedMessages.joinEUI}
-          name="ids.join_eui"
+          name="ids.join_eui,authenticated_identifiers.join_eui"
+          description={joinEuiConfirmationMessage}
           type="byte"
           min={8}
           max={8}
           required
           component={Input}
-          actionDisable={!Boolean(ids?.join_eui)}
-          action={{
-            type: 'button',
-            disable: !Boolean(ids?.join_eui),
-            title: mayConfirm ? msg.confirm : msg.reset,
-            message: mayConfirm ? msg.confirm : msg.reset,
-            onClick: isClaimable,
-            raw: true,
-          }}
           tooltipId={tooltipIds.JOIN_EUI}
-        />
+          encode={joinEuiEncoder}
+          decode={joinEuiDecoder}
+        >
+          {_claim === undefined ? (
+            <Button disabled={!mayConfirm} onClick={getClaiming} message={msg.confirm} raw />
+          ) : (
+            <Button onClick={resetJoinEui} message={msg.reset} raw />
+          )}
+        </Form.Field>
       ) : (
         <Message
-          content={_inputMethod === 'device-repository' ? m.continueDeviceRepo : m.continueManual}
+          content={isRepository ? m.continueDeviceRepo : m.continueManual}
           className="mt-ls-m mb-ls-m"
           component="div"
         />
       )}
-      {mayProvisionDevice && _claim === '' && (
+      {!isClaimingDetermined && mayProvisionDevice && (
         <Message content={msg.continue} className="mt-ls-m mb-ls-m" component="div" />
       )}
-      {mayProvisionDevice && _claim === true && (
-        <>
-          <Message content={msg.claiming} className="mb-ls-s" component="div" />
-          <DeviceClaimingFormSection />
-        </>
-      )}
-      {mayProvisionDevice && _claim === false && (
-        <>
-          <Message content={msg.registration} className="mb-ls-s" component="div" />
-          <DeviceRegistrationFormSection />
-        </>
-      )}
+      {isClaiming && <DeviceClaimingFormSection />}
+      {isRegistration && <DeviceRegistrationFormSection />}
     </>
   )
 }
