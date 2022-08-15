@@ -177,7 +177,7 @@ func TestBuildLorad(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			gtw := deepcopy.Copy(tc.Gateway).(*ttnpb.Gateway)
+			gtw := ttnpb.Clone(tc.Gateway)
 			conf, err := BuildLorad(gtw, fps)
 			a.So(gtw, should.Resemble, tc.Gateway)
 			if a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
@@ -267,7 +267,7 @@ func TestBuildLorafwd(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			gtw := deepcopy.Copy(tc.Gateway).(*ttnpb.Gateway)
+			gtw := ttnpb.Clone(tc.Gateway)
 			conf, err := BuildLorafwd(gtw)
 			a.So(gtw, should.Resemble, tc.Gateway)
 			if a.So(tc.ErrorAssertion(t, err), should.BeTrue) {

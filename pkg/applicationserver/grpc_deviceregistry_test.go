@@ -21,7 +21,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
@@ -192,10 +191,10 @@ func TestDeviceRegistryGet(t *testing.T) {
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"formatters",
 				})
-				return deepcopy.Copy(&ttnpb.EndDevice{
+				return ttnpb.Clone(&ttnpb.EndDevice{
 					Ids:        registeredDevice.Ids,
 					Formatters: registeredDevice.Formatters,
-				}).(*ttnpb.EndDevice), nil
+				}), nil
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIds: registeredDevice.Ids,
@@ -260,7 +259,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					"skip_payload_crypto",
 					"skip_payload_crypto_override",
 				})
-				return deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice), nil
+				return ttnpb.Clone(registeredDevice), nil
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIds: registeredDevice.Ids,
@@ -318,7 +317,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			defer as.Close()
 
 			ctx := as.FillContext(test.Context())
-			req := deepcopy.Copy(tc.DeviceRequest).(*ttnpb.GetEndDeviceRequest)
+			req := ttnpb.Clone(tc.DeviceRequest)
 
 			dev, err := ttnpb.NewAsEndDeviceRegistryClient(as.LoopbackConn()).Get(ctx, req)
 			a.So(req, should.Resemble, tc.DeviceRequest)
@@ -369,7 +368,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				return nil, errors.New("SetFunc must not be called")
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				EndDevice: deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice),
+				EndDevice: ttnpb.Clone(registeredDevice),
 				FieldMask: ttnpb.FieldMask("formatters"),
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -394,7 +393,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				return nil, errors.New("SetFunc must not be called")
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				EndDevice: deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice),
+				EndDevice: ttnpb.Clone(registeredDevice),
 				FieldMask: ttnpb.FieldMask("formatters"),
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -492,7 +491,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				EndDevice: deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice),
+				EndDevice: ttnpb.Clone(registeredDevice),
 				FieldMask: ttnpb.FieldMask("formatters"),
 			},
 			SetFunc: func(ctx context.Context, deviceIds *ttnpb.EndDeviceIdentifiers, gets []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
@@ -501,7 +500,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				a.So(gets, should.HaveSameElementsDeep, []string{
 					"formatters",
 				})
-				dev, sets, err := cb(deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice))
+				dev, sets, err := cb(ttnpb.Clone(registeredDevice))
 				a.So(sets, should.HaveSameElementsDeep, []string{
 					"formatters",
 				})
@@ -524,7 +523,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
 				EndDevice: func() *ttnpb.EndDevice {
-					dev := deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice)
+					dev := ttnpb.Clone(registeredDevice)
 					dev.Formatters.UpFormatterParameter = strings.Repeat("-", maxParameterLength+1)
 					return dev
 				}(),
@@ -552,7 +551,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
 				EndDevice: func() *ttnpb.EndDevice {
-					dev := deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice)
+					dev := ttnpb.Clone(registeredDevice)
 					dev.Formatters.DownFormatterParameter = strings.Repeat("-", maxParameterLength+1)
 					return dev
 				}(),
@@ -599,7 +598,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			defer as.Close()
 
 			ctx := as.FillContext(test.Context())
-			req := deepcopy.Copy(tc.DeviceRequest).(*ttnpb.SetEndDeviceRequest)
+			req := ttnpb.Clone(tc.DeviceRequest)
 
 			dev, err := ttnpb.NewAsEndDeviceRegistryClient(as.LoopbackConn()).Set(ctx, req)
 			a.So(setCalls, should.Equal, tc.SetCalls)
@@ -655,7 +654,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				test.MustTFromContext(ctx).Errorf("UpClearFunc must not be called")
 				return errors.New("UpClearFunc must not be called")
 			},
-			DeviceRequest: deepcopy.Copy(registeredDevice.Ids).(*ttnpb.EndDeviceIdentifiers),
+			DeviceRequest: ttnpb.Clone(registeredDevice.Ids),
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)
 				return a.So(errors.IsPermissionDenied(err), should.BeTrue)
@@ -681,7 +680,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				test.MustTFromContext(ctx).Errorf("UpClearFunc must not be called")
 				return errors.New("UpClearFunc must not be called")
 			},
-			DeviceRequest: deepcopy.Copy(registeredDevice.Ids).(*ttnpb.EndDeviceIdentifiers),
+			DeviceRequest: ttnpb.Clone(registeredDevice.Ids),
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)
 				return a.So(errors.IsPermissionDenied(err), should.BeTrue)
@@ -715,7 +714,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				a.So(ids, should.Resemble, registeredDevice.Ids)
 				return nil
 			},
-			DeviceRequest: deepcopy.Copy(registeredDevice.Ids).(*ttnpb.EndDeviceIdentifiers),
+			DeviceRequest: ttnpb.Clone(registeredDevice.Ids),
 			SetCalls:      1,
 			UpClearCalls:  1,
 		},
@@ -747,7 +746,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				a.So(ids, should.Resemble, registeredDevice.Ids)
 				return nil
 			},
-			DeviceRequest: deepcopy.Copy(registeredDevice.Ids).(*ttnpb.EndDeviceIdentifiers),
+			DeviceRequest: ttnpb.Clone(registeredDevice.Ids),
 			SetCalls:      1,
 			UpClearCalls:  1,
 		},
@@ -789,7 +788,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			defer as.Close()
 
 			ctx := as.FillContext(test.Context())
-			req := deepcopy.Copy(tc.DeviceRequest).(*ttnpb.EndDeviceIdentifiers)
+			req := ttnpb.Clone(tc.DeviceRequest)
 
 			_, err := ttnpb.NewAsEndDeviceRegistryClient(as.LoopbackConn()).Delete(ctx, req)
 			a.So(setCalls, should.Equal, tc.SetCalls)

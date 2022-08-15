@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/mohae/deepcopy"
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
@@ -150,7 +149,7 @@ func decodeJoinAccept(msg *ttnpb.Message, config lorawanConfig) (*lorawanDecoded
 			return &lorawanDecodedFrame{Message: msg}, nil
 		}
 		buf, mic := buf[:n-4], buf[n-4:]
-		decBuf := deepcopy.Copy(pld).(*ttnpb.JoinAcceptPayload)
+		decBuf := ttnpb.Clone(pld)
 		if err := lorawan.UnmarshalJoinAcceptPayload(buf, decBuf); err != nil {
 			logger.WithError(err).Warn("Failed to unmarshal join accept payload")
 			return &lorawanDecodedFrame{Message: msg}, nil

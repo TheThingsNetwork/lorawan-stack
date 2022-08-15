@@ -18,7 +18,6 @@ import (
 	"encoding/hex"
 	"testing"
 
-	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	. "go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -439,7 +438,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			sk := deepcopy.Copy(tc.SessionKeys).(*ttnpb.SessionKeys)
+			sk := ttnpb.Clone(tc.SessionKeys)
 			ret, err := UnwrapSelectedSessionKeys(test.Context(), v, sk, tc.Prefix, tc.Paths...)
 			a.So(sk, should.Resemble, tc.SessionKeys)
 			a.So(ret, should.Resemble, tc.ExpectedSessionKeys)
