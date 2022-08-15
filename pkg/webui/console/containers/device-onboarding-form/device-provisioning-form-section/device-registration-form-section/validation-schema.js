@@ -35,13 +35,7 @@ const validationSchema = Yup.object({
 
       return devEUISchema.default(null).nullable()
     }),
-    device_id: Yup.string().when('_claim', claim => {
-      if (!claim) {
-        return Yup.string().required(sharedMessages.validateRequired)
-      }
-
-      return Yup.string().default(null).nullable()
-    }),
+    device_id: Yup.string(),
   }),
 
   root_keys: Yup.object().when(

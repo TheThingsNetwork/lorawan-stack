@@ -18,8 +18,7 @@ import { useSelector } from 'react-redux'
 import Input from '@ttn-lw/components/input'
 import Form, { useFormContext } from '@ttn-lw/components/form'
 
-import DevEUIComponent from '@console/components/dev-eui-component'
-
+import DevEUIComponent from '@console/containers/dev-eui-component'
 import DevAddrInput from '@console/containers/dev-addr-input'
 
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
@@ -94,14 +93,7 @@ const DeviceRegistrationFormSection = () => {
 
   return (
     <div data-test-id="device-registration">
-      {showDevEUI && (
-        <DevEUIComponent
-          values={values}
-          setFieldValue={setFieldValue}
-          initialValues={initialValues}
-          devEUISchema={devEUISchema}
-        />
-      )}
+      {showDevEUI && <DevEUIComponent name="ids.dev_eui" />}
       {(isOTAA || isManualOTAA) && (
         <>
           <Form.Field

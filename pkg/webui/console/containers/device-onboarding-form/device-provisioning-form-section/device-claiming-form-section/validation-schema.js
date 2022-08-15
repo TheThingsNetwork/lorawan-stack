@@ -21,21 +21,19 @@ const m = defineMessages({
   validateCode: 'Claim authentication code must consist only of numbers and letters',
 })
 
+const devEUISchema = Yup.string().length(8 * 2, Yup.passValues(sharedMessages.validateLength))
 const validationSchema = Yup.object({
-  ids: Yup.object().shape({
-    dev_eui: Yup.string()
-      .length(8 * 2, Yup.passValues(sharedMessages.validateLength))
-      .required(sharedMessages.validateRequired),
+  target_device_id: Yup.string().required(sharedMessages.validateRequired),
+  authenticated_identifiers: Yup.object().shape({
+    dev_eui: devEUISchema.required(sharedMessages.validateRequired),
   }),
-  authentication_code: Yup.string().when('_claim', claim => {
-    if (claim) {
-      return Yup.string()
+  authentication_code: Yup.string().when('_claim', {
+    is: true,
+    then: schema =>
+      schema
         .matches(/^[A-Z0-9]{1,32}$/, Yup.passValues(m.validateCode))
-        .required(sharedMessages.validateRequired)
-    }
-
-    return Yup.string().default(null).nullable()
+        .required(sharedMessages.validateRequired),
   }),
 })
 
-export default validationSchema
+export { validationSchema as default, devEUISchema }
