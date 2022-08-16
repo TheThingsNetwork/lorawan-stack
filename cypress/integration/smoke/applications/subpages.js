@@ -34,7 +34,7 @@ const applicationSubpages = defineSmokeTest('check all application sub-pages', (
   cy.findByRole('cell', { name: application.ids.application_id }).click()
 
   cy.findByRole('link', { name: /End devices/ }).click()
-  cy.findByText('End devices (0)')
+  cy.findByText('End devices (0)').should('be.visible')
   cy.findByRole('link', { name: /Add end device/ })
     .should('be.visible')
     .click()
@@ -55,28 +55,28 @@ const applicationSubpages = defineSmokeTest('check all application sub-pages', (
   cy.findByRole('button', { name: /Payload formatters/ }).click()
 
   cy.findByRole('link', { name: /Uplink/ }).click()
-  cy.findByLabelText('Formatter type')
+  cy.findByLabelText('Formatter type').should('be.visible')
   cy.findByRole('button', { name: 'Save changes' })
   cy.findByRole('link', { name: /Downlink/ }).click()
-  cy.findByLabelText('Formatter type')
+  cy.findByLabelText('Formatter type').should('be.visible')
   cy.findByRole('button', { name: 'Save changes' })
 
   cy.findByRole('button', { name: /Integrations/ }).click()
 
   cy.findByRole('link', { name: /MQTT/ }).click()
-  cy.findByText('Connection information')
-  cy.findByText('MQTT server host')
-  cy.findByText('Connection credentials')
+  cy.findByText('Connection information').should('be.visible')
+  cy.findByText('MQTT server host').should('be.visible')
+  cy.findByText('Connection credentials').should('be.visible')
   cy.findByTestId('error-notification').should('not.exist')
 
   cy.findByRole('link', { name: /Webhooks/ }).click()
-  cy.findByText('Webhooks (0)')
-  cy.findByText('No items found')
+  cy.findByText('Webhooks (0)').should('be.visible')
+  cy.findByText('No items found').should('be.visible')
   cy.findByTestId('error-notification').should('not.exist')
 
   cy.findByRole('link', { name: /Pub\/Subs/ }).click()
-  cy.findByText('Pub/Subs (0)')
-  cy.findByText('No items found')
+  cy.findByText('Pub/Subs (0)').should('be.visible')
+  cy.findByText('No items found').should('be.visible')
   cy.findByTestId('error-notification').should('not.exist')
 
   cy.findByRole('link', { name: /LoRa Cloud/ }).click()
@@ -101,17 +101,17 @@ const applicationSubpages = defineSmokeTest('check all application sub-pages', (
   cy.findByTestId('error-notification').should('not.exist')
 
   cy.findByRole('link', { name: /Collaborators/ }).click()
-  cy.findByText('Collaborators (1)')
+  cy.findByText('Collaborators (1)').should('be.visible')
   cy.findByRole('link', { name: /Add collaborator/ }).should('be.visible')
   cy.findByTestId('error-notification').should('not.exist')
 
   cy.findByRole('link', { name: /API keys/ }).click()
-  cy.findByText('API keys (0)')
+  cy.findByText('API keys (0)').should('be.visible')
   cy.findByRole('link', { name: /Add API key/ }).should('be.visible')
   cy.findByTestId('error-notification').should('not.exist')
 
   cy.findByRole('link', { name: /General settings/ }).click()
-  cy.findByLabelText('Application ID')
+  cy.findByLabelText('Application ID').should('be.visible')
   cy.findByRole('button', { name: /Save changes/ }).should('be.visible')
   cy.findByTestId('error-notification').should('not.exist')
 })
