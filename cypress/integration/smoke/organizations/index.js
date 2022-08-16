@@ -13,5 +13,6 @@
 // limitations under the License.
 
 import createTests from './create'
+import subpageTests from './subpages'
 
-export default [...createTests]
+export default [...createTests, ...subpageTests]

@@ -166,7 +166,7 @@ describe('Device general settings', () => {
       app_key: generateHexValue(32),
     }
 
-    cy.findByText('Join Settings', { selector: 'h3' })
+    cy.findByText('Join settings', { selector: 'h3' })
       .closest('[data-test-id="collapsible-section"]')
       .within(() => {
         cy.findByRole('button', { name: 'Expand' }).click()

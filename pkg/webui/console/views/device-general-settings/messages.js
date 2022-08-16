@@ -22,7 +22,7 @@ const messages = defineMessages({
   asDescription: 'Application-layer behavior and session',
   asDescriptionMissing: 'Application Server is not available',
   asDescriptionOTAA: 'Only keys of joined OTAA end devices are stored on the Application Server',
-  jsTitle: 'Join Settings',
+  jsTitle: 'Join settings',
   jsDescription: 'Root keys and network settings for end device activation',
   jsDescriptionMissing: 'Join Server is not available',
   jsDescriptionOTAA: 'ABP/multicast end devices are not stored on the Join Server',
