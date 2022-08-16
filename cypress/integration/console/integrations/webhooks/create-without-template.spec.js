@@ -56,6 +56,8 @@ describe('Application Webhook create without template', () => {
       'The API key will be provided to the endpoint using the "X-Downlink-Apikey" header',
     )
     cy.findByText('Add header entry').should('be.visible')
+    cy.findByText(/Filter event data/).should('be.visible')
+    cy.findByText('Add filter path').should('be.visible')
     cy.findByRole('heading', { name: 'Enabled event types' }).should('be.visible')
     cy.findByText(
       'For each enabled event type an optional path can be defined which will be appended to the base URL',
@@ -108,6 +110,17 @@ describe('Application Webhook create without template', () => {
       .within(() => {
         cy.findByPlaceholderText('/path/to/webhook').type(webhook.path)
       })
+
+    cy.findByRole('button', { name: /Add header entry/ }).click()
+    cy.findByTestId('_headers[0].key').type('webhook-test-key')
+    cy.findByTestId('_headers[0].value').type('webhook-test-value')
+
+    cy.findByRole('button', { name: /Add filter path/ }).click()
+    cy.findByText('Filter event data')
+      .parents('div[data-test-id="form-field"]')
+      .find('input')
+      .first()
+      .selectOption('received_at')
 
     cy.findByRole('button', { name: 'Add webhook' }).click()
 

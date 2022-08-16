@@ -40,6 +40,7 @@ export default Object.freeze({
   DOWNLINK_QUEUE_INVALIDATED: 'downlink-queue-invalidated',
   ENFORCE_DUTY_CYCLE: 'duty-cycle',
   FACTORY_PRESET_FREQUENCIES: 'factory-preset-frequencies',
+  FILTER_EVENT_DATA: 'fitler-event-data',
   FRAME_COUNTER_WIDTH: 'frame-counter-width',
   FREQUENCY_PLAN: 'frequency-plan',
   GATEWAY_ATTRIBUTES: 'gateway-attributes',

@@ -18,6 +18,7 @@ import { defineMessages } from 'react-intl'
 import classnames from 'classnames'
 
 import Button from '@ttn-lw/components/button'
+import Input from '@ttn-lw/components/input'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -32,9 +33,11 @@ const m = defineMessages({
 class KeyValueMap extends React.PureComponent {
   static propTypes = {
     addMessage: PropTypes.message,
+    additionalInputProps: PropTypes.shape({}),
     className: PropTypes.string,
     disabled: PropTypes.bool,
     indexAsKey: PropTypes.bool,
+    inputElement: PropTypes.elementType,
     isReadOnly: PropTypes.func,
     keyPlaceholder: PropTypes.message,
     name: PropTypes.string.isRequired,
@@ -53,6 +56,7 @@ class KeyValueMap extends React.PureComponent {
   }
 
   static defaultProps = {
+    additionalInputProps: {},
     className: undefined,
     onBlur: () => null,
     onChange: () => null,
@@ -62,6 +66,7 @@ class KeyValueMap extends React.PureComponent {
     keyPlaceholder: '',
     disabled: false,
     isReadOnly: () => null,
+    inputElement: Input,
   }
 
   @bind
@@ -104,6 +109,8 @@ class KeyValueMap extends React.PureComponent {
       indexAsKey,
       disabled,
       isReadOnly,
+      inputElement,
+      additionalInputProps,
     } = this.props
 
     return (
@@ -123,6 +130,8 @@ class KeyValueMap extends React.PureComponent {
                 onBlur={onBlur}
                 indexAsKey={indexAsKey}
                 readOnly={isReadOnly(value)}
+                inputElement={inputElement}
+                additionalInputProps={additionalInputProps}
               />
             ))}
         </div>

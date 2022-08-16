@@ -21,6 +21,7 @@ import (
 	"sync"
 	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -247,6 +248,7 @@ type webhookTemplate struct {
 	Fields               []webhookTemplateField `yaml:"fields,omitempty"`
 	CreateDownlinkAPIKey bool                   `yaml:"create-downlink-api-key"`
 	Paths                webhookTemplatePaths   `yaml:"paths,omitempty"`
+	FieldMask            []string               `yaml:"field-mask,omitempty"`
 }
 
 func (webhookTemplate) pathToMessage(s *string) *ttnpb.ApplicationWebhookTemplate_Message {
@@ -264,6 +266,10 @@ func (t webhookTemplate) pbFields() []*ttnpb.ApplicationWebhookTemplateField {
 		fields = append(fields, f.toPB())
 	}
 	return fields
+}
+
+func (t webhookTemplate) pbFieldMask() *pbtypes.FieldMask {
+	return ttnpb.FieldMask(t.FieldMask...)
 }
 
 func (t webhookTemplate) toPB() *ttnpb.ApplicationWebhookTemplate {
@@ -291,5 +297,6 @@ func (t webhookTemplate) toPB() *ttnpb.ApplicationWebhookTemplate {
 		DownlinkQueueInvalidated: t.pathToMessage(t.Paths.DownlinkQueueInvalidated),
 		LocationSolved:           t.pathToMessage(t.Paths.LocationSolved),
 		ServiceData:              t.pathToMessage(t.Paths.ServiceData),
+		FieldMask:                t.pbFieldMask(),
 	}
 }

@@ -260,6 +260,9 @@ const m = defineMessages({
 
   downlinkQueueInvalidated:
     'This occurs only when using LoRaWAN 1.0.x because the frame counters for the application downlinks and network downlinks are shared. Network downlinks increment this frame counter, thus rendering the queued downlinks invalid (since you cannot send two messages with the same frame counter). The Application Server will automatically handle this message as long as "Skip Payload Crypto" is not enabled.',
+
+  filterEventDataDescription:
+    'By default, the data pushed to your webhook contains a vast variety details and metadata related to the event. To avoid noise and to save bandwidth, you can filter the event data by specific paths, e.g. `up.uplink_message.decoded_payload`. Your webhook will then only receive the event data that passed the filter.',
 })
 
 const descriptions = Object.freeze({
@@ -506,6 +509,9 @@ const descriptions = Object.freeze({
   [TOOLTIP_IDS.DOWNLINK_QUEUE_INVALIDATED]: {
     description: m.downlinkQueueInvalidated,
   },
+  [TOOLTIP_IDS.FILTER_EVENT_DATA]: {
+    description: m.filterEventDataDescription,
+  },
 })
 
 const links = Object.freeze({
@@ -538,6 +544,9 @@ const links = Object.freeze({
   },
   [TOOLTIP_IDS.ADR_MARGIN]: {
     documentationPath: '/reference/adr',
+  },
+  [TOOLTIP_IDS.FILTER_EVENT_DATA]: {
+    documentationPath: '/integrations/webhooks/creating-webhooks/',
   },
 })
 

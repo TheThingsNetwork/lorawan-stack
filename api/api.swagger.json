@@ -5185,6 +5185,9 @@
                     },
                     "health_status": {
                       "$ref": "#/definitions/v3ApplicationWebhookHealth"
+                    },
+                    "field_mask": {
+                      "type": "string"
                     }
                   }
                 },
@@ -5318,6 +5321,9 @@
                     },
                     "health_status": {
                       "$ref": "#/definitions/v3ApplicationWebhookHealth"
+                    },
+                    "field_mask": {
+                      "type": "string"
                     }
                   }
                 },
@@ -19251,6 +19257,9 @@
         },
         "health_status": {
           "$ref": "#/definitions/v3ApplicationWebhookHealth"
+        },
+        "field_mask": {
+          "type": "string"
         }
       }
     },
@@ -19371,6 +19380,9 @@
         },
         "service_data": {
           "$ref": "#/definitions/v3ApplicationWebhookTemplateMessage"
+        },
+        "field_mask": {
+          "type": "string"
         }
       }
     },

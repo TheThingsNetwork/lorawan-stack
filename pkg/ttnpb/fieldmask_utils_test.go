@@ -29,8 +29,9 @@ func TestTopLevelFields(t *testing.T) {
 		"b",
 		"b.c",
 		"b.c.d",
+		"c.d",
 	}
-	a.So(TopLevelFields(paths), should.Resemble, []string{"a", "b"})
+	a.So(TopLevelFields(paths), should.Resemble, []string{"a", "b", "c"})
 }
 
 func TestBottomLevelFields(t *testing.T) {
@@ -132,7 +133,9 @@ func TestAllowedFields(t *testing.T) {
 	allowedPaths := []string{
 		"a",
 		"a.b",
+		"c",
 		"c.d",
+		"c.d.e",
 	}
 	a.So(AllowedFields(paths, allowedPaths), should.Resemble, []string{"c.d"})
 }
@@ -210,4 +213,22 @@ func TestAllFields(t *testing.T) {
 		"e",
 		"f",
 	})
+}
+
+func TestIncludeFields(t *testing.T) {
+	t.Parallel()
+
+	a := assertions.New(t)
+	paths := []string{
+		"a.b.c",
+		"b",
+		"c.d",
+		"c.d.e",
+		"c.e",
+		"c.e.f",
+	}
+	a.So(IncludeFields(paths, "c.d"), should.Resemble, []string{"c.d", "c.d.e"})
+	a.So(IncludeFields(paths, "c.d", "c.e.f"), should.Resemble, []string{"c.d", "c.d.e", "c.e.f"})
+	a.So(IncludeFields(paths, "a", "b", "c"), should.Resemble, paths)
+	a.So(IncludeFields(paths, "c.e.g"), should.Resemble, []string{})
 }

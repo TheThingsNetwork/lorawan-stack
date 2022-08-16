@@ -13,6 +13,8 @@ For details about compatibility between different releases, see the **Commitment
 
 - New `SearchAccounts` RPC on the `EntityRegistrySearch` service.
 - Prompt user to confirm navigation when changes have not been saved in the payload formatter form to prevent big change-drafts from getting lost.
+- Event data pushed by webhooks can now be filtered with field masks.
+  - Support for the field mask setup was added for both CLI and Console.
 
 ### Changed
 
@@ -21,6 +23,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Removed
 
 ### Fixed
+
 - CLI command `end-device template create` no longer breaks when providing field mask values.
 - Device repository services no longer require ApplicationID in its request URL.
 
@@ -49,7 +52,7 @@ For details about compatibility between different releases, see the **Commitment
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added columns.
   - CAC values stored currently in the Join Server should be migrated to the Identity Server. One method is to run the following CLI commands on each device with a CAC.
     - Read the current values using `ttn-lw-cli dev get <application-id> <device-id> --claim-authentication-code`. This will fetch the value stored in the Join Server as a fallback.
-    - Write back the value read `ttn-lw-cli dev set  <application-id> <device-id> --claim-authentication-code.valid_from [xxx] --claim-authentication-code.valid_to [xxx] --claim-authentication-code.value <xxx>`. This will by default write to the Identity Server.
+    - Write back the value read `ttn-lw-cli dev set <application-id> <device-id> --claim-authentication-code.valid_from [xxx] --claim-authentication-code.valid_to [xxx] --claim-authentication-code.value <xxx>`. This will by default write to the Identity Server.
     - Note that this requires a minimum CLI version of 3.21.0.
 - Device Repository no longer uses the `ApplicationID` for validating requests. Authentication is still necessary, but the `ApplicationID` field has been deprecated in the Device Repository API.
 
@@ -2272,6 +2275,7 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
+
 [unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.21.0...v3.21
 [3.21.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.20.2...v3.21.0
 [3.20.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.20.1...v3.20.2

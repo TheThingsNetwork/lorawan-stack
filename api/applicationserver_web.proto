@@ -98,7 +98,9 @@ message ApplicationWebhookTemplate {
   Message location_solved = 18;
   Message service_data = 20;
 
-  // next: 22
+  google.protobuf.FieldMask field_mask = 22;
+
+  // next: 23
 }
 
 message ApplicationWebhookTemplates {
@@ -176,7 +178,9 @@ message ApplicationWebhook {
 
   ApplicationWebhookHealth health_status = 20;
 
-  // next: 21
+  google.protobuf.FieldMask field_mask = 21;
+
+  // next: 22
 }
 
 message ApplicationWebhooks {
