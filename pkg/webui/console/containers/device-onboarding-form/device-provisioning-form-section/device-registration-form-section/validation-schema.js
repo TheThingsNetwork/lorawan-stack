@@ -39,7 +39,7 @@ const validationSchema = Yup.object({
   }),
 
   root_keys: Yup.object().when(
-    ['$lorawan_version', '$supports_join', '$inputMethod', '$claim', '$mayEditKeys'],
+    ['$lorawanVersion', '$supportsJoin', '$inputMethod', '$claim', '$mayEditKeys'],
     (isOTAA, version, inputMethod, claim, mayEditKeys, schema) => {
       const notRequiredKeySchema = Yup.object().shape({
         key: Yup.string().default('').nullable(),
@@ -76,7 +76,9 @@ const validationSchema = Yup.object({
       })
     },
   ),
-  session: Yup.object().when(['$lorawan_version', '$supports_join'], (version, isOTAA, schema) => {
+  session: Yup.object().when(['$lorawanVersion', '$supportsJoin'], (version, isOTAA, schema) => {
+    console.log(version)
+    console.log(isOTAA)
     const lwVersion = parseLorawanMacVersion(version)
     const notRequiredKeySchema = Yup.object().shape({
       key: Yup.string().default('').nullable(),
