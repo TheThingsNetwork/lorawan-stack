@@ -22,6 +22,7 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 - CLI command `end-device template create` no longer breaks when providing field mask values.
+- Device repository services no longer require ApplicationID in its request URL.
 
 ### Security
 
