@@ -60,3 +60,8 @@ func (c *ConfigurationServer) ListFrequencyPlans(ctx context.Context, req *ttnpb
 func (c *ConfigurationServer) GetPhyVersions(ctx context.Context, req *ttnpb.GetPhyVersionsRequest) (*ttnpb.GetPhyVersionsResponse, error) {
 	return band.GetPhyVersions(ctx, req)
 }
+
+// ListBands implements the Configuration service's ListBands RPC
+func (c *ConfigurationServer) ListBands(ctx context.Context, req *ttnpb.ListBandsRequest) (*ttnpb.ListBandsResponse, error) {
+	return band.ListBands(ctx, req)
+}

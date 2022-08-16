@@ -8620,6 +8620,54 @@
               "defaultValue": ""
             },
             {
+              "name": "min_retransmit_timeout",
+              "description": "",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "max_retransmit_timeout",
+              "description": "",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "tx_offset",
+              "description": "",
+              "label": "repeated",
+              "type": "float",
+              "longType": "float",
+              "fullType": "float",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "max_adr_data_rate_index",
+              "description": "",
+              "label": "",
+              "type": "DataRateIndex",
+              "longType": "DataRateIndex",
+              "fullType": "ttn.lorawan.v3.DataRateIndex",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
               "name": "tx_param_setup_req_support",
               "description": "",
               "label": "",
@@ -9221,7 +9269,7 @@
           "fields": [
             {
               "name": "band",
-              "description": "map\u003cPHYVersion, BandDescription\u003e",
+              "description": "",
               "label": "repeated",
               "type": "BandEntry",
               "longType": "ListBandsResponse.VersionedBandDescription.BandEntry",

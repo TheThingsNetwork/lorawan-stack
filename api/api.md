@@ -2338,6 +2338,10 @@ PeerInfo
 | `max_fcnt_gap` | [`uint64`](#uint64) |  |  |
 | `supports_dynamic_adr` | [`bool`](#bool) |  |  |
 | `adr_ack_limit` | [`ADRAckLimitExponent`](#ttn.lorawan.v3.ADRAckLimitExponent) |  |  |
+| `min_retransmit_timeout` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
+| `max_retransmit_timeout` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
+| `tx_offset` | [`float`](#float) | repeated |  |
+| `max_adr_data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  |  |
 | `tx_param_setup_req_support` | [`bool`](#bool) |  |  |
 | `default_max_eirp` | [`float`](#float) |  |  |
 | `lora_coding_rate` | [`string`](#string) |  |  |
@@ -2448,7 +2452,7 @@ PeerInfo
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `band` | [`ListBandsResponse.VersionedBandDescription.BandEntry`](#ttn.lorawan.v3.ListBandsResponse.VersionedBandDescription.BandEntry) | repeated | map<PHYVersion, BandDescription> |
+| `band` | [`ListBandsResponse.VersionedBandDescription.BandEntry`](#ttn.lorawan.v3.ListBandsResponse.VersionedBandDescription.BandEntry) | repeated |  |
 
 ### <a name="ttn.lorawan.v3.ListBandsResponse.VersionedBandDescription.BandEntry">Message `ListBandsResponse.VersionedBandDescription.BandEntry`</a>
 

@@ -16722,8 +16722,7 @@
           "type": "object",
           "additionalProperties": {
             "$ref": "#/definitions/v3BandDescription"
-          },
-          "title": "map\u003cPHYVersion, BandDescription\u003e"
+          }
         }
       }
     },
@@ -19042,6 +19041,22 @@
         },
         "adr_ack_limit": {
           "$ref": "#/definitions/v3ADRAckLimitExponent"
+        },
+        "min_retransmit_timeout": {
+          "type": "string"
+        },
+        "max_retransmit_timeout": {
+          "type": "string"
+        },
+        "tx_offset": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "max_adr_data_rate_index": {
+          "$ref": "#/definitions/v3DataRateIndex"
         },
         "tx_param_setup_req_support": {
           "type": "boolean"

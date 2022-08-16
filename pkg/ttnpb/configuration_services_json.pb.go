@@ -505,6 +505,34 @@ func (x *BandDescription) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("adr_ack_limit")
 		x.AdrAckLimit.MarshalProtoJSON(s)
 	}
+	if x.MinRetransmitTimeout != nil || s.HasField("min_retransmit_timeout") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("min_retransmit_timeout")
+		if x.MinRetransmitTimeout == nil {
+			s.WriteNil()
+		} else {
+			gogo.MarshalDuration(s, x.MinRetransmitTimeout)
+		}
+	}
+	if x.MaxRetransmitTimeout != nil || s.HasField("max_retransmit_timeout") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("max_retransmit_timeout")
+		if x.MaxRetransmitTimeout == nil {
+			s.WriteNil()
+		} else {
+			gogo.MarshalDuration(s, x.MaxRetransmitTimeout)
+		}
+	}
+	if len(x.TxOffset) > 0 || s.HasField("tx_offset") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("tx_offset")
+		s.WriteFloat32Array(x.TxOffset)
+	}
+	if x.MaxAdrDataRateIndex != 0 || s.HasField("max_adr_data_rate_index") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("max_adr_data_rate_index")
+		x.MaxAdrDataRateIndex.MarshalProtoJSON(s)
+	}
 	if x.TxParamSetupReqSupport || s.HasField("tx_param_setup_req_support") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("tx_param_setup_req_support")
@@ -698,6 +726,38 @@ func (x *BandDescription) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		case "adr_ack_limit", "adrAckLimit":
 			s.AddField("adr_ack_limit")
 			x.AdrAckLimit.UnmarshalProtoJSON(s)
+		case "min_retransmit_timeout", "minRetransmitTimeout":
+			s.AddField("min_retransmit_timeout")
+			if s.ReadNil() {
+				x.MinRetransmitTimeout = nil
+				return
+			}
+			v := gogo.UnmarshalDuration(s)
+			if s.Err() != nil {
+				return
+			}
+			x.MinRetransmitTimeout = v
+		case "max_retransmit_timeout", "maxRetransmitTimeout":
+			s.AddField("max_retransmit_timeout")
+			if s.ReadNil() {
+				x.MaxRetransmitTimeout = nil
+				return
+			}
+			v := gogo.UnmarshalDuration(s)
+			if s.Err() != nil {
+				return
+			}
+			x.MaxRetransmitTimeout = v
+		case "tx_offset", "txOffset":
+			s.AddField("tx_offset")
+			if s.ReadNil() {
+				x.TxOffset = nil
+				return
+			}
+			x.TxOffset = s.ReadFloat32Array()
+		case "max_adr_data_rate_index", "maxAdrDataRateIndex":
+			s.AddField("max_adr_data_rate_index")
+			x.MaxAdrDataRateIndex.UnmarshalProtoJSON(s)
 		case "tx_param_setup_req_support", "txParamSetupReqSupport":
 			s.AddField("tx_param_setup_req_support")
 			x.TxParamSetupReqSupport = s.ReadBool()

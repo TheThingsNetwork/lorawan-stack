@@ -118,32 +118,36 @@ message BandDescription {
   uint64 max_fcnt_gap = 17;
   bool supports_dynamic_adr = 18;
   ADRAckLimitExponent adr_ack_limit = 19;
-  bool tx_param_setup_req_support = 20;
-  float default_max_eirp = 21;
-  string lora_coding_rate = 22;
-  reserved 23; // rx1_channel
-  reserved 24; // rx2_datarate
-  reserved 25; // generate_ch_masks
-  reserved 26; // parse_ch_mask
+  google.protobuf.Duration min_retransmit_timeout = 20;
+  google.protobuf.Duration max_retransmit_timeout = 21;
+  repeated float tx_offset = 22;
+  DataRateIndex max_adr_data_rate_index = 23; 
+
+  bool tx_param_setup_req_support = 24;
+  float default_max_eirp = 25;
+  string lora_coding_rate = 26;
+  reserved 27; // rx1_channel
+  reserved 28; // rx2_datarate
+  reserved 29; // generate_ch_masks
+  reserved 30; // parse_ch_mask
 
   message Rx2Parameters {
     DataRateIndex data_rate_index = 1; 
     uint64 frequency = 2;
   }
 
-  Rx2Parameters default_rx2_parameters = 27;
+  Rx2Parameters default_rx2_parameters = 31;
 
   message DwellTime {
     google.protobuf.BoolValue uplinks = 1;
     google.protobuf.BoolValue downlinks = 2;
   }
 
-  DwellTime boot_dwell_time = 28;
+  DwellTime boot_dwell_time = 32;
 }
 
 message ListBandsResponse {
   message VersionedBandDescription {
-    // map<PHYVersion, BandDescription>
     map<string, BandDescription> band = 1;
   }
   map<string, VersionedBandDescription> descriptions = 1;

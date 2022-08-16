@@ -747,6 +747,34 @@ func (m *BandDescription) ValidateFields(paths ...string) error {
 			// no validation rules for SupportsDynamicAdr
 		case "adr_ack_limit":
 			// no validation rules for AdrAckLimit
+		case "min_retransmit_timeout":
+
+			if v, ok := interface{}(m.GetMinRetransmitTimeout()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return BandDescriptionValidationError{
+						field:  "min_retransmit_timeout",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "max_retransmit_timeout":
+
+			if v, ok := interface{}(m.GetMaxRetransmitTimeout()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return BandDescriptionValidationError{
+						field:  "max_retransmit_timeout",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "tx_offset":
+
+		case "max_adr_data_rate_index":
+			// no validation rules for MaxAdrDataRateIndex
 		case "tx_param_setup_req_support":
 			// no validation rules for TxParamSetupReqSupport
 		case "default_max_eirp":

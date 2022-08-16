@@ -367,6 +367,43 @@ func (dst *BandDescription) SetFields(src *BandDescription, paths ...string) err
 				var zero ADRAckLimitExponent
 				dst.AdrAckLimit = zero
 			}
+		case "min_retransmit_timeout":
+			if len(subs) > 0 {
+				return fmt.Errorf("'min_retransmit_timeout' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MinRetransmitTimeout = src.MinRetransmitTimeout
+			} else {
+				dst.MinRetransmitTimeout = nil
+			}
+		case "max_retransmit_timeout":
+			if len(subs) > 0 {
+				return fmt.Errorf("'max_retransmit_timeout' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MaxRetransmitTimeout = src.MaxRetransmitTimeout
+			} else {
+				dst.MaxRetransmitTimeout = nil
+			}
+		case "tx_offset":
+			if len(subs) > 0 {
+				return fmt.Errorf("'tx_offset' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TxOffset = src.TxOffset
+			} else {
+				dst.TxOffset = nil
+			}
+		case "max_adr_data_rate_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'max_adr_data_rate_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MaxAdrDataRateIndex = src.MaxAdrDataRateIndex
+			} else {
+				var zero DataRateIndex
+				dst.MaxAdrDataRateIndex = zero
+			}
 		case "tx_param_setup_req_support":
 			if len(subs) > 0 {
 				return fmt.Errorf("'tx_param_setup_req_support' has no subfields, but %s were specified", subs)
