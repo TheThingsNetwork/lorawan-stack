@@ -3779,6 +3779,15 @@
       "file": "ttscsv.go"
     }
   },
+  "error:pkg/devicetemplates:generate_session_key_id": {
+    "translations": {
+      "en": "generate session key ID"
+    },
+    "description": {
+      "package": "pkg/devicetemplates",
+      "file": "ttscsv.go"
+    }
+  },
   "error:pkg/devicetemplates:microchip_certificate_san": {
     "translations": {
       "en": "invalid Microchip certificate Subject Alternate Name"
