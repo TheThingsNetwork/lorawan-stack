@@ -31,7 +31,7 @@ class DeviceClaim {
     targetNetworkServerAddress = this._stackConfig.nsHost,
     targetApplicationServerAddress = this._stackConfig.asHost,
   ) {
-    const deviceToClaim = qrCode ? { qr_code: btoa(qrCode) } : { authenticated_identifiers: values }
+    const deviceToClaim = qrCode ? { qr_code: qrCode } : values
     const payload = {
       ...deviceToClaim,
       target_application_ids: {

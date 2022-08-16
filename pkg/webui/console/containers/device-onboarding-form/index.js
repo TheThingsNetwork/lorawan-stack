@@ -96,18 +96,8 @@ const DeviceOnboardingForm = () => {
 
   const handleClaim = useCallback(
     async values => {
-      const { ids, authentication_code, qr_code } = values
-      let authenticatedIdentifiers
-      if (!qr_code) {
-        authenticatedIdentifiers = {
-          join_eui: ids.join_eui,
-          dev_eui: ids.dev_eui,
-          authentication_code,
-        }
-      }
-      const device = await dispatch(
-        attachPromise(claimDevice(appId, qr_code, authenticatedIdentifiers)),
-      )
+      const { qr_code, ids, ...rest } = values
+      const device = await dispatch(attachPromise(claimDevice(appId, qr_code, rest)))
       const { deviceIds } = device
       navigateToDevice(appId, deviceIds.device_id)
     },
@@ -165,9 +155,9 @@ const DeviceOnboardingForm = () => {
       try {
         let result
         if (values._claim) {
-          result = handleClaim(cleanedValues)
+          result = await handleClaim(cleanedValues)
         } else {
-          result = handleRegister(values, resetForm, cleanedValues)
+          result = await handleRegister(values, resetForm, cleanedValues)
         }
 
         return result
@@ -183,15 +173,6 @@ const DeviceOnboardingForm = () => {
       onSubmit={handleSubmit}
       error={error}
       initialValues={initialValues}
-      hiddenFields={[
-        'network_server_address',
-        'application_server_address',
-        'join_server_address',
-        'frequency_plan_id',
-        'lorawan_phy_version',
-        'lorawan_version',
-        'supports_join',
-      ]}
       validationSchema={validationSchema}
       validationContext={validationContext}
       validateAgainstCleanedValues

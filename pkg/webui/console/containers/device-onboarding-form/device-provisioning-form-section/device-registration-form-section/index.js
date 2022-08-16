@@ -41,33 +41,6 @@ const DeviceRegistrationFormSection = () => {
   const template = useSelector(selectDeviceTemplate)
   const idInputRef = React.useRef(null)
 
-  const generateDeviceId = (device = {}) => {
-    const { ids: idsValues = {} } = device
-
-    try {
-      devEUISchema.validateSync(idsValues.dev_eui)
-      return `eui-${idsValues.dev_eui.toLowerCase()}`
-    } catch (e) {
-      // We dont want to use invalid `dev_eui` as `device_id`.
-    }
-
-    return initialValues.ids.device_id || ''
-  }
-
-  const handleIdTextSelect = React.useCallback(
-    idInputRef => {
-      if (idInputRef.current && values) {
-        const { setSelectionRange } = idInputRef.current
-
-        const generatedId = generateDeviceId(values)
-        if (generatedId.length > 0 && generatedId === values.ids.device_id) {
-          setSelectionRange.call(idInputRef.current, 0, generatedId.length)
-        }
-      }
-    },
-    [values],
-  )
-
   let appKeyPlaceholder = undefined
   let nwkKeyPlaceholder = undefined
   if (!mayEditKeys) {
@@ -75,10 +48,9 @@ const DeviceRegistrationFormSection = () => {
     nwkKeyPlaceholder = sharedMessages.insufficientNwkKeyRights
   }
 
-  const isOTAA = template?.end_device?.supports_join
   const isMulticast = values.multicast
   const isABP = !values.supports_join && !values.multicast
-  const isManualOTAA = values.supports_join
+  const isOTAA = values.supports_join
   const lwVersion =
     parseLorawanMacVersion(template?.end_device?.lorawan_version) ||
     parseLorawanMacVersion(values.lorawan_version)
@@ -94,7 +66,7 @@ const DeviceRegistrationFormSection = () => {
   return (
     <div data-test-id="device-registration">
       {showDevEUI && <DevEUIComponent name="ids.dev_eui" />}
-      {(isOTAA || isManualOTAA) && (
+      {isOTAA && (
         <>
           <Form.Field
             required
@@ -199,7 +171,6 @@ const DeviceRegistrationFormSection = () => {
         name="ids.device_id"
         placeholder={sharedMessages.deviceIdPlaceholder}
         component={Input}
-        onFocus={handleIdTextSelect}
         inputRef={idInputRef}
         tooltipId={tooltipIds.DEVICE_ID}
         description={messages.deviceIdDescription}

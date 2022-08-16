@@ -13,29 +13,11 @@
 // limitations under the License.
 
 import Yup from '@ttn-lw/lib/yup'
-import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import claimValidationSchema from './device-claiming-form-section/validation-schema'
 import registrationValidationSchema from './device-registration-form-section/validation-schema'
 
-const joinEUISchema = Yup.string().length(8 * 2, Yup.passValues(sharedMessages.validateLength))
-// Validation schema of the provisioning form section.
-// Please observe the following rules to keep the validation schemas maintainable:
-// 1. DO NOT USE ANY TYPE CONVERSIONS HERE. Use decocer/encoder on field level instead.
-//    Consider all values as backend values. Exceptions may apply in consideration.
-// 2. Comment each individual validation prop and use whitespace to structure visually.
-// 3. Do not use ternary assignments but use plain if statements to ensure clarity.
-const validationSchema = Yup.object({
-  ids: Yup.object().when(['supports_join'], (isOTAA, schema) => {
-    if (isOTAA) {
-      return schema.shape({
-        join_eui: joinEUISchema.required(sharedMessages.validateRequired),
-      })
-    }
-  }),
-  supports_join: Yup.bool().default(false),
-  _claim: Yup.mixed().oneOf(['', true, false]),
-}).when(['_claim'], {
+const validationSchema = Yup.object({}).when('$claim', {
   is: true,
   then: schema => schema.concat(claimValidationSchema),
   otherwise: schema => schema.concat(registrationValidationSchema),

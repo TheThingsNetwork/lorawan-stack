@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React, { useEffect } from 'react'
+import { useFormikContext } from 'formik'
 import { isEmpty, isPlainObject, isUndefined, merge } from 'lodash'
 import { defineMessages } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
@@ -174,6 +175,7 @@ const initialValues = {
 }
 
 const AdvancedSettingsSection = () => {
+  const { addToFieldRegistry, removeFromFieldRegistry } = useFormikContext()
   const {
     setValues,
     setValidationContext,
@@ -284,6 +286,17 @@ const AdvancedSettingsSection = () => {
     }))
   }, [_default_ns_settings, defaultMacSettings, mayChangeToDefaultSettings, setValues])
 
+  // Register hidden fields so they don't get cleaned.
+  useEffect(() => {
+    const hiddenFields = [
+      'network_server_address',
+      'application_server_address',
+      'join_server_address',
+    ]
+    addToFieldRegistry(hiddenFields)
+    return () => removeFromFieldRegistry(hiddenFields)
+  }, [addToFieldRegistry, removeFromFieldRegistry])
+
   return (
     <Form.CollapseSection id="advanced-settings" title={m.advancedSectionTitle}>
       <Form.Field
@@ -328,7 +341,7 @@ const AdvancedSettingsSection = () => {
           <>
             <Form.FieldContainer horizontal>
               <Form.Field
-                required={!isUndefined(mac_settings?.rx1_data_rate_offset)}
+                required={!isUndefined(mac_settings.rx1_data_rate_offset)}
                 title={messages.rx1DataRateOffsetTitle}
                 type="number"
                 name="mac_settings.rx1_data_rate_offset"
@@ -341,7 +354,7 @@ const AdvancedSettingsSection = () => {
                 titleChildren={
                   <WarningTooltip
                     desiredValue={defaultMacSettings.desired_rx1_data_rate_offset}
-                    currentValue={mac_settings?.rx1_data_rate_offset}
+                    currentValue={mac_settings.rx1_data_rate_offset}
                   />
                 }
               />
@@ -360,14 +373,14 @@ const AdvancedSettingsSection = () => {
                 titleChildren={
                   <WarningTooltip
                     desiredValue={defaultMacSettings.desired_rx1_delay}
-                    currentValue={mac_settings?.rx1_delay}
+                    currentValue={mac_settings.rx1_delay}
                   />
                 }
               />
               <Form.Field
                 title={sharedMessages.resetsFCnt}
                 tooltipId={tooltipIds.RESETS_F_CNT}
-                warning={mac_settings?.resets_f_cnt ? sharedMessages.resetWarning : undefined}
+                warning={mac_settings.resets_f_cnt ? sharedMessages.resetWarning : undefined}
                 name="mac_settings.resets_f_cnt"
                 component={Checkbox}
               />
@@ -389,7 +402,7 @@ const AdvancedSettingsSection = () => {
                 titleChildren={
                   <WarningTooltip
                     desiredValue={defaultMacSettings.desired_class_b_timeout}
-                    currentValue={mac_settings?.class_b_timeout}
+                    currentValue={mac_settings.class_b_timeout}
                   />
                 }
               />
@@ -416,7 +429,7 @@ const AdvancedSettingsSection = () => {
                 titleChildren={
                   <WarningTooltip
                     desiredValue={defaultMacSettings.desired_ping_slot_data_rate_index}
-                    currentValue={mac_settings?.ping_slot_data_rate_index}
+                    currentValue={mac_settings.ping_slot_data_rate_index}
                   />
                 }
               />
@@ -435,7 +448,7 @@ const AdvancedSettingsSection = () => {
                 titleChildren={
                   <WarningTooltip
                     desiredValue={defaultMacSettings.desired_beacon_frequency}
-                    currentValue={mac_settings?.beacon_frequency}
+                    currentValue={mac_settings.beacon_frequency}
                   />
                 }
               />
@@ -452,7 +465,7 @@ const AdvancedSettingsSection = () => {
                 titleChildren={
                   <WarningTooltip
                     desiredValue={defaultMacSettings.desired_ping_slot_frequency}
-                    currentValue={mac_settings?.ping_slot_frequency}
+                    currentValue={mac_settings.ping_slot_frequency}
                   />
                 }
               />
@@ -474,7 +487,7 @@ const AdvancedSettingsSection = () => {
               titleChildren={
                 <WarningTooltip
                   desiredValue={defaultMacSettings.desired_class_c_timeout}
-                  currentValue={mac_settings?.class_c_timeout}
+                  currentValue={mac_settings.class_c_timeout}
                 />
               }
             />
@@ -493,7 +506,7 @@ const AdvancedSettingsSection = () => {
             titleChildren={
               <WarningTooltip
                 desiredValue={defaultMacSettings.desired_rx2_data_rate_index}
-                currentValue={mac_settings?.rx2_data_rate_index}
+                currentValue={mac_settings.rx2_data_rate_index}
               />
             }
           />
@@ -511,7 +524,7 @@ const AdvancedSettingsSection = () => {
             titleChildren={
               <WarningTooltip
                 desiredValue={defaultMacSettings.desired_rx2_frequency}
-                currentValue={mac_settings?.rx2_frequency}
+                currentValue={mac_settings.rx2_frequency}
               />
             }
           />

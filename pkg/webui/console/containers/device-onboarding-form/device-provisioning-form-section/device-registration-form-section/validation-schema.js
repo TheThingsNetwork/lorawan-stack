@@ -28,19 +28,19 @@ const devEUISchema = Yup.string().length(8 * 2, Yup.passValues(sharedMessages.va
 
 const validationSchema = Yup.object({
   ids: Yup.object().shape({
-    dev_eui: devEUISchema.when('supports_join', supports_joins => {
-      if (supports_joins) {
-        return devEUISchema.required(sharedMessages.validateRequired)
-      }
-
-      return devEUISchema.default(null).nullable()
+    dev_eui: devEUISchema.when('$supportsJoin', {
+      is: true,
+      then: devEUISchema.required(sharedMessages.validateRequired),
     }),
     device_id: Yup.string(),
+    join_eui: Yup.string()
+      .length(8 * 2, Yup.passValues(sharedMessages.validateLength))
+      .required(sharedMessages.validateRequired),
   }),
 
   root_keys: Yup.object().when(
-    ['supports_join', 'lorawan_version', '_inputMethod', '$mayEditKeys'],
-    (isOTAA, version, inputMethod, mayEditKeys, schema) => {
+    ['$lorawan_version', '$supports_join', '$inputMethod', '$claim', '$mayEditKeys'],
+    (isOTAA, version, inputMethod, claim, mayEditKeys, schema) => {
       const notRequiredKeySchema = Yup.object().shape({
         key: Yup.string().default('').nullable(),
       })
@@ -56,7 +56,7 @@ const validationSchema = Yup.object({
         return notRequiredKeySchema
       })
 
-      if (!mayEditKeys || !isOTAA || inputMethod === 'manual') {
+      if (!mayEditKeys || !isOTAA || inputMethod === 'manual' || claim) {
         return schema.shape({
           nwk_key: notRequiredKeySchema,
           app_key: notRequiredKeySchema,
@@ -76,7 +76,7 @@ const validationSchema = Yup.object({
       })
     },
   ),
-  session: Yup.object().when(['lorawan_version', 'supports_join'], (version, isOTAA, schema) => {
+  session: Yup.object().when(['$lorawan_version', '$supports_join'], (version, isOTAA, schema) => {
     const lwVersion = parseLorawanMacVersion(version)
     const notRequiredKeySchema = Yup.object().shape({
       key: Yup.string().default('').nullable(),
@@ -140,7 +140,6 @@ const validationSchema = Yup.object({
       }),
     })
   }),
-  lorawan_version: Yup.string().default(null).nullable(),
 })
 
 const initialValues = {

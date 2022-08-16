@@ -16,6 +16,7 @@ import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { merge } from 'lodash'
+import { useFormikContext } from 'formik'
 
 import Input from '@ttn-lw/components/input'
 import Form, { useFormContext } from '@ttn-lw/components/form'
@@ -75,6 +76,7 @@ const joinEuiDecoder = value => value?.ids?.join_eui || ''
 
 const DeviceProvisioningFormSection = () => {
   const dispatch = useDispatch()
+  const { setValidationContext } = useFormikContext()
   const { values, setFieldValue, setValues } = useFormContext()
   const {
     _claim,
@@ -102,7 +104,7 @@ const DeviceProvisioningFormSection = () => {
     (_inputMethod === 'device-repository' && hasValidDeviceRepositoryType(version, template))
   const mayConfirm = ids.join_eui.length === 16
 
-  const resetJoinEui = React.useCallback(async () => {
+  const resetJoinEui = React.useCallback(() => {
     setValues(values => ({
       ...values,
       ids: {
@@ -118,7 +120,8 @@ const DeviceProvisioningFormSection = () => {
     const supportsClaiming = claim.supports_claiming ?? false
 
     setFieldValue('_claim', supportsClaiming)
-  }, [ids, setFieldValue, dispatch])
+    setValidationContext(context => ({ ...context, claim: _claim }))
+  }, [ids, setFieldValue, dispatch, setValidationContext, _claim])
 
   return (
     <>
@@ -137,9 +140,15 @@ const DeviceProvisioningFormSection = () => {
           decode={joinEuiDecoder}
         >
           {_claim === undefined ? (
-            <Button disabled={!mayConfirm} onClick={getClaiming} message={msg.confirm} raw />
+            <Button
+              type="button"
+              disabled={!mayConfirm}
+              onClick={getClaiming}
+              message={msg.confirm}
+              className="ml-cs-xs"
+            />
           ) : (
-            <Button onClick={resetJoinEui} message={msg.reset} raw />
+            <Button onClick={resetJoinEui} type="button" message={msg.reset} className="ml-cs-xs" />
           )}
         </Form.Field>
       ) : (

@@ -15,6 +15,7 @@
 import React, { useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Col, Row } from 'react-grid-system'
+import { useFormikContext } from 'formik'
 import classnames from 'classnames'
 
 import { useFormContext } from '@ttn-lw/components/form'
@@ -84,6 +85,7 @@ const DeviceTypeRepositoryFormSection = () => {
     [dispatch],
   )
 
+  const { addToFieldRegistry, removeFromFieldRegistry, setValidationContext } = useFormikContext()
   const { values, setValues } = useFormContext()
   const { version_ids } = values
 
@@ -109,7 +111,7 @@ const DeviceTypeRepositoryFormSection = () => {
   const showFrequencyPlanSelector = hasValidType
   const showOtherHint = hasSelectedOther
 
-  // Apply template once it is fetched.
+  // Apply template once it is fetched and register the template fields so they don't get cleaned.
   React.useEffect(() => {
     if (template && hasCompleted) {
       setValues(values => ({
@@ -117,8 +119,26 @@ const DeviceTypeRepositoryFormSection = () => {
         ...template.end_device,
         version_ids: values.version_ids,
       }))
+
+      const hiddenFields = Object.keys(template.end_device)
+      setValidationContext(context => ({
+        ...context,
+        supportsJoin: values.supports_join,
+        lorawanVersion: values.lorawan_version,
+      }))
+      addToFieldRegistry(hiddenFields)
+      return () => removeFromFieldRegistry(hiddenFields)
     }
-  }, [hasCompleted, setValues, template])
+  }, [
+    hasCompleted,
+    setValues,
+    template,
+    addToFieldRegistry,
+    removeFromFieldRegistry,
+    setValidationContext,
+    values.supports_join,
+    values.lorawan_version,
+  ])
 
   // Fetch template after completing the selection step (select band, model, hw/fw versions and band).
   React.useEffect(() => {

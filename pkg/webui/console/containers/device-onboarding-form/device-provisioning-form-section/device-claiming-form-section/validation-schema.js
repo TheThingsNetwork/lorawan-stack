@@ -26,13 +26,13 @@ const validationSchema = Yup.object({
   target_device_id: Yup.string().required(sharedMessages.validateRequired),
   authenticated_identifiers: Yup.object().shape({
     dev_eui: devEUISchema.required(sharedMessages.validateRequired),
-  }),
-  authentication_code: Yup.string().when('_claim', {
-    is: true,
-    then: schema =>
-      schema
-        .matches(/^[A-Z0-9]{1,32}$/, Yup.passValues(m.validateCode))
-        .required(sharedMessages.validateRequired),
+    authentication_code: Yup.string().when('$claim', {
+      is: true,
+      then: schema =>
+        schema
+          .matches(/^[A-Z0-9]{1,32}$/, Yup.passValues(m.validateCode))
+          .required(sharedMessages.validateRequired),
+    }),
   }),
 })
 
