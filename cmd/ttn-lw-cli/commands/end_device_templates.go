@@ -150,6 +150,7 @@ This command takes end devices from stdin.`,
 
 			mappingKey, _ := cmd.Flags().GetString("mapping-key")
 			res := &ttnpb.EndDeviceTemplate{
+				EndDevice:  &ttnpb.EndDevice{},
 				FieldMask:  ttnpb.FieldMask(paths...),
 				MappingKey: mappingKey,
 			}
