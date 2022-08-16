@@ -54,8 +54,26 @@ const initialValues = merge(
 
 const DeviceOnboardingFormInner = () => {
   const {
-    values: { frequency_plan_id, lorawan_version, lorawan_phy_version, _claim },
+    values: {
+      _inputMethod,
+      frequency_plan_id,
+      lorawan_version,
+      lorawan_phy_version,
+      _claim,
+      supports_join,
+    },
+    setValidationContext,
   } = useFormContext()
+
+  React.useEffect(() => {
+    setValidationContext(context => ({
+      ...context,
+      supportsJoin: supports_join,
+      lorawanVersion: lorawan_version,
+      claim: _claim,
+      inputMethod: _inputMethod,
+    }))
+  }, [setValidationContext, supports_join, lorawan_version, _claim, _inputMethod])
 
   const maySubmit =
     Boolean(frequency_plan_id) &&
