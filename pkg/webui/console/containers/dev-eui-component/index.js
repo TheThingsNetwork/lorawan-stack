@@ -94,7 +94,11 @@ const DevEUIComponent = props => {
         ) {
           const generatedId = `eui-${values.authenticated_identifiers.dev_eui.toLowerCase()}`
           setFieldValue('target_device_id', generatedId)
+
+          return generatedId
         }
+
+        return null
       }
 
       if (
@@ -103,7 +107,11 @@ const DevEUIComponent = props => {
       ) {
         const generatedId = `eui-${values.ids.dev_eui.toLowerCase()}`
         setFieldValue('ids.device_id', generatedId)
+
+        return generatedId
       }
+
+      return null
     }
   }, [values, setFieldValue])
 
@@ -146,19 +154,6 @@ const DevEUIComponent = props => {
 
 DevEUIComponent.propTypes = {
   name: PropTypes.string.isRequired,
-  values: PropTypes.shape({
-    ids: PropTypes.shape({
-      device_id: PropTypes.string,
-    }),
-  }),
-}
-
-DevEUIComponent.defaultProps = {
-  values: {
-    ids: {
-      device_id: undefined,
-    },
-  },
 }
 
 export default DevEUIComponent
