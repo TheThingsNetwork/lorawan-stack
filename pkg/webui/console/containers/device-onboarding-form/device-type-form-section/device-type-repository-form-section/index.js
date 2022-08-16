@@ -85,7 +85,7 @@ const DeviceTypeRepositoryFormSection = () => {
     [dispatch],
   )
 
-  const { addToFieldRegistry, removeFromFieldRegistry, setValidationContext } = useFormikContext()
+  const { addToFieldRegistry, removeFromFieldRegistry } = useFormikContext()
   const { values, setValues } = useFormContext()
   const { version_ids } = values
 
@@ -120,25 +120,17 @@ const DeviceTypeRepositoryFormSection = () => {
         version_ids: values.version_ids,
       }))
 
-      const hiddenFields = Object.keys(template.end_device)
-      setValidationContext(context => ({
-        ...context,
-        supportsJoin: values.supports_join,
-        lorawanVersion: values.lorawan_version,
-      }))
+      const hiddenFields = [
+        ...Object.keys(template.end_device),
+        'network_server_address',
+        'application_server_address',
+        'join_server_address',
+      ]
+
       addToFieldRegistry(hiddenFields)
       return () => removeFromFieldRegistry(hiddenFields)
     }
-  }, [
-    hasCompleted,
-    setValues,
-    template,
-    addToFieldRegistry,
-    removeFromFieldRegistry,
-    setValidationContext,
-    values.supports_join,
-    values.lorawan_version,
-  ])
+  }, [hasCompleted, setValues, template, addToFieldRegistry, removeFromFieldRegistry])
 
   // Fetch template after completing the selection step (select band, model, hw/fw versions and band).
   React.useEffect(() => {

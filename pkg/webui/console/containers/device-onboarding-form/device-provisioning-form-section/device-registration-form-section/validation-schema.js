@@ -77,8 +77,6 @@ const validationSchema = Yup.object({
     },
   ),
   session: Yup.object().when(['$lorawanVersion', '$supportsJoin'], (version, isOTAA, schema) => {
-    console.log(version)
-    console.log(isOTAA)
     const lwVersion = parseLorawanMacVersion(version)
     const notRequiredKeySchema = Yup.object().shape({
       key: Yup.string().default('').nullable(),
@@ -92,7 +90,7 @@ const validationSchema = Yup.object({
             .required(sharedMessages.validateRequired)
         }
 
-        return notRequiredKeySchema
+        return Yup.string()
       }),
       keys: Yup.object().shape({
         app_s_key: Yup.lazy(() => {

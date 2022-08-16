@@ -16,7 +16,6 @@ import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { merge } from 'lodash'
-import { useFormikContext } from 'formik'
 
 import Input from '@ttn-lw/components/input'
 import Form, { useFormContext } from '@ttn-lw/components/form'
@@ -76,7 +75,6 @@ const joinEuiDecoder = value => value?.ids?.join_eui || ''
 
 const DeviceProvisioningFormSection = () => {
   const dispatch = useDispatch()
-  const { setValidationContext } = useFormikContext()
   const { values, setFieldValue, setValues } = useFormContext()
   const {
     _claim,
@@ -111,7 +109,7 @@ const DeviceProvisioningFormSection = () => {
         ...values.ids,
         join_eui: '',
       },
-      _claim: '',
+      _claim: undefined,
     }))
   }, [setValues])
 
@@ -120,8 +118,7 @@ const DeviceProvisioningFormSection = () => {
     const supportsClaiming = claim.supports_claiming ?? false
 
     setFieldValue('_claim', supportsClaiming)
-    setValidationContext(context => ({ ...context, claim: _claim }))
-  }, [ids, setFieldValue, dispatch, setValidationContext, _claim])
+  }, [ids, setFieldValue, dispatch])
 
   return (
     <>

@@ -14,7 +14,6 @@
 
 import React, { useCallback, useRef, useState } from 'react'
 import { merge } from 'lodash'
-import { useFormikContext } from 'formik'
 
 import Radio from '@ttn-lw/components/radio-button'
 import Form, { useFormContext } from '@ttn-lw/components/form'
@@ -39,16 +38,9 @@ const initialValues = merge(
 )
 
 const DeviceTypeFormSection = () => {
-  const { setValidationContext } = useFormikContext()
   const { values, resetForm } = useFormContext()
   const { version_ids, frequency_plan_id, lorawan_version, lorawan_phy_version, _inputMethod } =
     values
-
-  React.useEffect(() => {
-    if (_inputMethod) {
-      setValidationContext(context => ({ ...context, inputMethod: _inputMethod }))
-    }
-  }, [_inputMethod, setValidationContext])
 
   const isPristineForm =
     (!hasCompletedDeviceRepositorySelection(version_ids) ||
