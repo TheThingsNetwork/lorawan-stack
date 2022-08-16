@@ -20,8 +20,6 @@ import PageTitle from '@ttn-lw/components/page-title'
 
 import DeviceOnboardingForm from '@console/containers/device-onboarding-form'
 
-import PropTypes from '@ttn-lw/lib/prop-types'
-
 const m = defineMessages({
   title: 'Register end device',
 })
