@@ -38,7 +38,23 @@ const TTSCSV = "the-things-stack-csv"
 
 var errGenerateSessionKeyID = errors.DefineUnavailable("generate_session_key_id", "generate session key ID")
 
-type ttsCSV struct{}
+type ttsCSV struct {
+	profileFetchers []EndDeviceProfileFetcher
+}
+
+// EndDeviceProfileFetcher specifies the necessary methods to ascertain if the end device contains the necessary
+// information to make the profile template request and for performing the request itself.
+type EndDeviceProfileFetcher interface {
+	ShouldFetchProfile(*ttnpb.EndDevice) bool
+	FetchProfile(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDeviceTemplate, error)
+}
+
+// NewCSV generates a new CSV converter with an implementation of the EndDeviceProfileFetcher interface.
+func NewCSV(fetchers ...EndDeviceProfileFetcher) Converter {
+	return &ttsCSV{
+		profileFetchers: fetchers,
+	}
+}
 
 // Format implements the devicetemplates.Converter interface.
 func (*ttsCSV) Format() *ttnpb.EndDeviceTemplateFormat {
@@ -74,7 +90,7 @@ func convertCSVErr(err error) error {
 
 type csvFieldSetterFunc func(dst *ttnpb.EndDevice, field string) (paths []string, err error)
 
-var csvFieldSetters = map[string]csvFieldSetterFunc{
+var csvFieldSetters = map[string]csvFieldSetterFunc{ //nolint:gocyclo
 	"id": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
 		dst.Ids.DeviceId = val
 		return []string{"ids.device_id"}, nil
@@ -165,6 +181,28 @@ var csvFieldSetters = map[string]csvFieldSetterFunc{
 		}
 		dst.VersionIds.BandId = val
 		return []string{"version_ids.band_id"}, nil
+	},
+	"vendor_id": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
+		if dst.VersionIds == nil {
+			dst.VersionIds = &ttnpb.EndDeviceVersionIdentifiers{}
+		}
+		s, err := strconv.ParseUint(val, 16, 32)
+		if err != nil {
+			return nil, err
+		}
+		dst.VersionIds.VendorId = uint32(s)
+		return []string{"version_ids.vendor_id"}, nil
+	},
+	"vendor_profile_id": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
+		if dst.VersionIds == nil {
+			dst.VersionIds = &ttnpb.EndDeviceVersionIdentifiers{}
+		}
+		s, err := strconv.ParseUint(val, 16, 32)
+		if err != nil {
+			return nil, err
+		}
+		dst.VersionIds.VendorProfileId = uint32(s)
+		return []string{"version_ids.vendor_profile_id"}, nil
 	},
 	"app_key": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
 		var key types.AES128Key
@@ -314,28 +352,6 @@ var csvFieldSetters = map[string]csvFieldSetterFunc{
 		}
 		return []string{"supports_class_c"}, nil
 	},
-	"vendor_id": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
-		if dst.VersionIds == nil {
-			dst.VersionIds = &ttnpb.EndDeviceVersionIdentifiers{}
-		}
-		s, err := strconv.ParseUint(val, 10, 32)
-		if err != nil {
-			return nil, err
-		}
-		dst.VersionIds.VendorId = uint32(s)
-		return []string{"version_ids.vendor_id"}, nil
-	},
-	"vendor_profile_id": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
-		if dst.VersionIds == nil {
-			dst.VersionIds = &ttnpb.EndDeviceVersionIdentifiers{}
-		}
-		s, err := strconv.ParseUint(val, 10, 32)
-		if err != nil {
-			return nil, err
-		}
-		dst.VersionIds.VendorProfileId = uint32(s)
-		return []string{"version_ids.vendor_profile_id"}, nil
-	},
 }
 
 func determineComma(head []byte) (rune, bool) {
@@ -353,7 +369,7 @@ func determineComma(head []byte) (rune, bool) {
 }
 
 // Convert implements the devicetemplates.Converter interface.
-func (*ttsCSV) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDeviceTemplate) error {
+func (t *ttsCSV) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDeviceTemplate) error { //nolint:gocyclo
 	defer close(ch)
 
 	r, err := charset.NewReader(r, "text/csv")
@@ -405,10 +421,15 @@ func (*ttsCSV) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDev
 			return convertCSVErr(err)
 		}
 
-		dev := &ttnpb.EndDevice{
-			Ids: &ttnpb.EndDeviceIdentifiers{},
-		}
+		// Fallback value for end device profile fetching.
+		versionIDs := ProfileIDsFromContext(ctx)
+
 		paths := make([]string, 0, len(record))
+		dev := &ttnpb.EndDevice{
+			Ids:        &ttnpb.EndDeviceIdentifiers{},
+			VersionIds: versionIDs,
+		}
+
 		for i, val := range record {
 			fieldSetter, ok := fieldSetters[i]
 			if !ok {
@@ -432,6 +453,28 @@ func (*ttsCSV) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDev
 			EndDevice: dev,
 			FieldMask: ttnpb.FieldMask(paths...),
 		}
+
+		for _, fetcher := range t.profileFetchers {
+			if !fetcher.ShouldFetchProfile(dev) {
+				continue
+			}
+			profileTmpl, err := fetcher.FetchProfile(ctx, dev)
+			if err != nil {
+				return err
+			}
+			if profileTmpl == nil {
+				continue
+			}
+
+			// Overwrites profile values with the ones provided by the user.
+			if err := profileTmpl.EndDevice.SetFields(tmpl.EndDevice, tmpl.FieldMask.Paths...); err != nil {
+				return err
+			}
+			profileTmpl.FieldMask.Paths = ttnpb.AddFields(profileTmpl.FieldMask.Paths, tmpl.FieldMask.Paths...)
+
+			tmpl = profileTmpl
+		}
+
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
@@ -439,6 +482,24 @@ func (*ttsCSV) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDev
 		}
 		line++
 	}
+}
+
+type profileIdentifiersKeyType struct{}
+
+var profileIDsKey = &profileIdentifiersKeyType{}
+
+// NewContextWithProfileIDs returns a context with an EndDeviceVersionIdentifiers injected into it.
+func NewContextWithProfileIDs(ctx context.Context, ids *ttnpb.EndDeviceVersionIdentifiers) context.Context {
+	return context.WithValue(ctx, profileIDsKey, ids)
+}
+
+// ProfileIDsFromContext fetches an EndDeviceVersionIdentifiers from within the given context, nil if does not exist.
+func ProfileIDsFromContext(ctx context.Context) *ttnpb.EndDeviceVersionIdentifiers {
+	ids, ok := ctx.Value(profileIDsKey).(*ttnpb.EndDeviceVersionIdentifiers)
+	if !ok {
+		return nil
+	}
+	return ids
 }
 
 func init() {
