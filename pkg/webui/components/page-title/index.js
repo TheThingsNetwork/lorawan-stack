@@ -23,15 +23,24 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './page-title.styl'
 
-const PageTitle = ({ title, values, tall, hideHeading, children, className }) => {
+const PageTitle = ({
+  title,
+  values,
+  tall,
+  hideHeading,
+  children,
+  className,
+  colProps,
+  rowProps,
+}) => {
   const titleClass = classnames(style.title, className, { [style.tall]: tall })
   const pageTitle = <IntlHelmet title={title} values={values} />
 
   return hideHeading ? (
     pageTitle
   ) : (
-    <Row>
-      <Col>
+    <Row {...rowProps}>
+      <Col {...colProps}>
         {pageTitle}
         {!hideHeading && (
           <Message component="h1" className={titleClass} content={title} values={values} />
@@ -45,7 +54,9 @@ const PageTitle = ({ title, values, tall, hideHeading, children, className }) =>
 PageTitle.propTypes = {
   children: PropTypes.node,
   className: PropTypes.string,
+  colProps: PropTypes.shape({}),
   hideHeading: PropTypes.bool,
+  rowProps: PropTypes.shape({}),
   tall: PropTypes.bool,
   title: PropTypes.message.isRequired,
   values: PropTypes.shape({}),
@@ -54,7 +65,9 @@ PageTitle.propTypes = {
 PageTitle.defaultProps = {
   children: null,
   className: undefined,
+  colProps: {},
   hideHeading: false,
+  rowProps: {},
   tall: false,
   values: undefined,
 }

@@ -68,4 +68,18 @@ const createApplicationApiKeyLogic = createRequestLogic({
   },
 })
 
-export default [getApiKeyLogic, getApiKeysLogic, createApplicationApiKeyLogic]
+const createGatewayApiKeyLogic = createRequestLogic({
+  type: apiKeys.CREATE_GATEWAY_API_KEY,
+  process: async ({ action }) => {
+    const { gatewayId, key } = action.payload
+
+    return await tts.Gateways.ApiKeys.create(gatewayId, key)
+  },
+})
+
+export default [
+  getApiKeyLogic,
+  getApiKeysLogic,
+  createApplicationApiKeyLogic,
+  createGatewayApiKeyLogic,
+]
