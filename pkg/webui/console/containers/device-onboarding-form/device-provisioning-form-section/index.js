@@ -66,8 +66,9 @@ const initialValues = merge(
 
 // Save EUI in both fields.
 const joinEuiEncoder = value => ({
-  ids: { join_eui: value },
+  ids: { ...value.ids, join_eui: value },
   authenticated_identifiers: {
+    ...value.authenticated_identifiers,
     join_eui: value,
   },
 })

@@ -127,8 +127,8 @@ const DeviceTypeRepositoryFormSection = () => {
         'join_server_address',
       ]
 
-      addToFieldRegistry(hiddenFields)
-      return () => removeFromFieldRegistry(hiddenFields)
+      addToFieldRegistry(...hiddenFields)
+      return () => removeFromFieldRegistry(...hiddenFields)
     }
   }, [hasCompleted, setValues, template, addToFieldRegistry, removeFromFieldRegistry])
 

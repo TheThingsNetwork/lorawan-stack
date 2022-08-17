@@ -133,9 +133,7 @@ const Form = props => {
       try {
         // Compose clean values as well, which do not contain values of unmounted
         // fields, as well as pseudo values (starting with `_`).
-        const cleanedValues = omitBy(pick(values, fieldRegistry.flat(Infinity)), (_, key) =>
-          key.startsWith('_'),
-        )
+        const cleanedValues = omitBy(pick(values, fieldRegistry), (_, key) => key.startsWith('_'))
 
         return onSubmit(values, formikBag, cleanedValues)
       } catch (error) {

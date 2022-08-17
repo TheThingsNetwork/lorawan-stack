@@ -17,7 +17,7 @@ import Yup from '@ttn-lw/lib/yup'
 import claimValidationSchema from './device-claiming-form-section/validation-schema'
 import registrationValidationSchema from './device-registration-form-section/validation-schema'
 
-const validationSchema = Yup.object({}).when('$claim', {
+const validationSchema = Yup.object({}).when('_claim', {
   is: true,
   then: schema => schema.concat(claimValidationSchema),
   otherwise: schema => schema.concat(registrationValidationSchema),

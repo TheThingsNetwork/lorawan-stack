@@ -79,37 +79,39 @@ const validationSchema = Yup.object({
       .length(8 * 2, Yup.passValues(sharedMessages.validateLength))
       .required(sharedMessages.validateRequired),
   }),
-}).when(
-  ['supports_join', '_claim', 'lorawan_version', '$mayEditKeys'],
-  (isOTAA, claim, version, mayEditKeys, schema) => {
-    if (mayEditKeys || isOTAA || claim === false) {
-      const rootKeysSchema = Yup.object().concat(appKeySchema)
-      if (parseLorawanMacVersion(version) >= 110) {
-        rootKeysSchema.concat(networkKeySchema)
+  root_keys: Yup.object().when(
+    ['supports_join', '_claim', 'lorawan_version', '$mayEditKeys'],
+    (isOTAA, claim, lorawanVersion, mayEditKeys, schema) => {
+      if (mayEditKeys || isOTAA || claim === false) {
+        const rootKeysSchema = appKeySchema
+        if (parseLorawanMacVersion(lorawanVersion) >= 110) {
+          rootKeysSchema.concat(networkKeySchema)
+        }
+        schema.concat(rootKeysSchema)
       }
-      schema.concat(
-        Yup.object({
-          root_keys: rootKeysSchema,
-        }),
-      )
-    }
 
-    if (!isOTAA) {
-      const sessionKeysSchema = Yup.object().concat(sessionKeysSchemaBase)
-      if (parseLorawanMacVersion(version) >= 110) {
-        sessionKeysSchema.concat(sessionKeysVersion110Schema)
-      }
-      schema.concat(
-        Yup.object({
-          session: Yup.object({
+      return schema
+    },
+  ),
+  session: Yup.object().when(
+    ['supports_join', 'lorawan_version'],
+    (isOTAA, lorawanVersion, schema) => {
+      if (!isOTAA) {
+        const sessionKeysSchema = Yup.object().concat(sessionKeysSchemaBase)
+        if (parseLorawanMacVersion(lorawanVersion) >= 110) {
+          sessionKeysSchema.concat(sessionKeysVersion110Schema)
+        }
+
+        return schema.concat(
+          Yup.object({
             devAddrSchema,
             keys: sessionKeysSchema,
           }),
-        }),
-      )
-    }
-  },
-)
+        )
+      }
+    },
+  ),
+})
 
 const initialValues = {
   ids: {

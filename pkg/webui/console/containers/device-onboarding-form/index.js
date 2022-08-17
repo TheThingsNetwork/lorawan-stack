@@ -69,9 +69,7 @@ const DeviceOnboardingFormInner = () => {
     setValidationContext(context => ({
       ...context,
       supportsJoin: supports_join,
-      lorawanVersion: lorawan_version,
       claim: _claim,
-      inputMethod: _inputMethod,
     }))
   }, [setValidationContext, supports_join, lorawan_version, _claim, _inputMethod])
 

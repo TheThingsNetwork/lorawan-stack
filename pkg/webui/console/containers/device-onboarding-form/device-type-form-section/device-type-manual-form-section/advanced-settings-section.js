@@ -293,8 +293,8 @@ const AdvancedSettingsSection = () => {
       'application_server_address',
       'join_server_address',
     ]
-    addToFieldRegistry(hiddenFields)
-    return () => removeFromFieldRegistry(hiddenFields)
+    addToFieldRegistry(...hiddenFields)
+    return () => removeFromFieldRegistry(...hiddenFields)
   }, [addToFieldRegistry, removeFromFieldRegistry])
 
   return (
