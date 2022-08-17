@@ -94,24 +94,14 @@ const DevEUIComponent = props => {
         ) {
           const generatedId = `eui-${values.authenticated_identifiers.dev_eui.toLowerCase()}`
           setFieldValue('target_device_id', generatedId)
-
-          return generatedId
         }
-
-        return null
-      }
-
-      if (
+      } else if (
         values?.ids?.dev_eui.length === 16 &&
         (!Boolean(values?.ids?.device_id) || /eui-\d{16}/.test(values?.ids?.device_id))
       ) {
         const generatedId = `eui-${values.ids.dev_eui.toLowerCase()}`
         setFieldValue('ids.device_id', generatedId)
-
-        return generatedId
       }
-
-      return null
     }
   }, [values, setFieldValue])
 
