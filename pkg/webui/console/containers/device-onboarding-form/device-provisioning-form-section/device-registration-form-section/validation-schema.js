@@ -17,61 +17,51 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { parseLorawanMacVersion } from '@console/lib/device-utils'
 
-// Validation schema of the device registration form section.
-// Please observe the following rules to keep the validation schemas maintainable:
-// 1. DO NOT USE ANY TYPE CONVERSIONS HERE. Use decocer/encoder on field level instead.
-//    Consider all values as backend values. Exceptions may apply in consideration.
-// 2. Comment each individual validation prop and use whitespace to structure visually.
-// 3. Do not use ternary assignments but use plain if statements to ensure clarity.
-
-const rootKeysSchema = Yup.object().shape({
-  nwk_key: Yup.object().shape({
-    key: Yup.string().when('$lorawanVersion', (version, schema) => {
-      if (parseLorawanMacVersion(version) > 110) {
-        return schema
-          .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
-          .required(sharedMessages.validateRequired)
-      }
-    }),
-  }),
-  app_key: Yup.object().shape({
+const networkKeySchema = Yup.object({
+  app_key: Yup.object({
     key: Yup.string()
       .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
       .required(sharedMessages.validateRequired),
   }),
 })
 
-const sessionSchema = Yup.object().shape({
+const appKeySchema = Yup.object({
+  app_key: Yup.object({
+    key: Yup.string()
+      .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+      .required(sharedMessages.validateRequired),
+  }),
+})
+
+const devAddrSchema = Yup.object({
   dev_addr: Yup.string()
     .length(4 * 2, Yup.passValues(sharedMessages.validateLength))
     .required(sharedMessages.validateRequired),
-  keys: Yup.object().shape({
-    app_s_key: Yup.object().shape({
-      key: Yup.string()
-        .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
-        .required(sharedMessages.validateRequired),
-    }),
-    f_nwk_s_int_key: Yup.object().shape({
-      key: Yup.string()
-        .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
-        .required(sharedMessages.validateRequired),
-    }),
-    s_nwk_s_int_key: Yup.object().shape({
-      key: Yup.string().when('$lorawanVersion', (version, schema) => {
-        if (parseLorawanMacVersion(version) >= 110) {
-          return schema
-            .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
-            .required(sharedMessages.validateRequired)
-        }
-      }),
-    }),
-    nwk_s_enc_key: Yup.object().when('$lorawanVersion', (version, schema) => {
-      if (parseLorawanMacVersion(version) >= 110) {
-        return schema
-          .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
-          .required(sharedMessages.validateRequired)
-      }
-    }),
+})
+
+const sessionKeysSchemaBase = Yup.object({
+  app_s_key: Yup.object({
+    key: Yup.string()
+      .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+      .required(sharedMessages.validateRequired),
+  }),
+  f_nwk_s_int_key: Yup.object({
+    key: Yup.string()
+      .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+      .required(sharedMessages.validateRequired),
+  }),
+})
+
+const sessionKeysVersion110Schema = Yup.object({
+  s_nwk_s_int_key: Yup.object({
+    key: Yup.string()
+      .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+      .required(sharedMessages.validateRequired),
+  }),
+  nwk_s_enc_key: Yup.object({
+    key: Yup.string()
+      .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+      .required(sharedMessages.validateRequired),
   }),
 })
 
@@ -89,15 +79,37 @@ const validationSchema = Yup.object({
       .length(8 * 2, Yup.passValues(sharedMessages.validateLength))
       .required(sharedMessages.validateRequired),
   }),
-}).when(['$supportsJoin', '$claim', '$mayEditKeys'], (isOTAA, claim, mayEditKeys, schema) => {
-  if (mayEditKeys || isOTAA || claim === false) {
-    schema.concat(rootKeysSchema)
-  }
+}).when(
+  ['supports_join', '_claim', 'lorawan_version', '$mayEditKeys'],
+  (isOTAA, claim, version, mayEditKeys, schema) => {
+    if (mayEditKeys || isOTAA || claim === false) {
+      const rootKeysSchema = Yup.object().concat(appKeySchema)
+      if (parseLorawanMacVersion(version) >= 110) {
+        rootKeysSchema.concat(networkKeySchema)
+      }
+      schema.concat(
+        Yup.object({
+          root_keys: rootKeysSchema,
+        }),
+      )
+    }
 
-  if (!isOTAA) {
-    schema.concat(sessionSchema)
-  }
-})
+    if (!isOTAA) {
+      const sessionKeysSchema = Yup.object().concat(sessionKeysSchemaBase)
+      if (parseLorawanMacVersion(version) >= 110) {
+        sessionKeysSchema.concat(sessionKeysVersion110Schema)
+      }
+      schema.concat(
+        Yup.object({
+          session: Yup.object({
+            devAddrSchema,
+            keys: sessionKeysSchema,
+          }),
+        }),
+      )
+    }
+  },
+)
 
 const initialValues = {
   ids: {
