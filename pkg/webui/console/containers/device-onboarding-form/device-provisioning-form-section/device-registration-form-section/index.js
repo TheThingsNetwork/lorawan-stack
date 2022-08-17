@@ -31,7 +31,7 @@ import { selectDeviceTemplate } from '@console/store/selectors/device-repository
 
 import messages from '../../messages'
 
-import { devEUISchema, initialValues } from './validation-schema'
+import { initialValues } from './validation-schema'
 
 const DeviceRegistrationFormSection = () => {
   const { values, setFieldValue } = useFormContext()
@@ -108,7 +108,6 @@ const DeviceRegistrationFormSection = () => {
               values={values}
               setFieldValue={setFieldValue}
               initialValues={initialValues}
-              devEUISchema={devEUISchema}
             />
           )}
           <Form.Field

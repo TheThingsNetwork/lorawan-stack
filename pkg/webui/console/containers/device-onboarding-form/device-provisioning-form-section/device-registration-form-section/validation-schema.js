@@ -24,122 +24,79 @@ import { parseLorawanMacVersion } from '@console/lib/device-utils'
 // 2. Comment each individual validation prop and use whitespace to structure visually.
 // 3. Do not use ternary assignments but use plain if statements to ensure clarity.
 
-const devEUISchema = Yup.string().length(8 * 2, Yup.passValues(sharedMessages.validateLength))
+const rootKeysSchema = Yup.object().shape({
+  nwk_key: Yup.object().shape({
+    key: Yup.string().when('$lorawanVersion', (version, schema) => {
+      if (parseLorawanMacVersion(version) > 110) {
+        return schema
+          .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+          .required(sharedMessages.validateRequired)
+      }
+    }),
+  }),
+  app_key: Yup.object().shape({
+    key: Yup.string()
+      .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+      .required(sharedMessages.validateRequired),
+  }),
+})
+
+const sessionSchema = Yup.object().shape({
+  dev_addr: Yup.string()
+    .length(4 * 2, Yup.passValues(sharedMessages.validateLength))
+    .required(sharedMessages.validateRequired),
+  keys: Yup.object().shape({
+    app_s_key: Yup.object().shape({
+      key: Yup.string()
+        .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+        .required(sharedMessages.validateRequired),
+    }),
+    f_nwk_s_int_key: Yup.object().shape({
+      key: Yup.string()
+        .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+        .required(sharedMessages.validateRequired),
+    }),
+    s_nwk_s_int_key: Yup.object().shape({
+      key: Yup.string().when('$lorawanVersion', (version, schema) => {
+        if (parseLorawanMacVersion(version) >= 110) {
+          return schema
+            .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+            .required(sharedMessages.validateRequired)
+        }
+      }),
+    }),
+    nwk_s_enc_key: Yup.object().when('$lorawanVersion', (version, schema) => {
+      if (parseLorawanMacVersion(version) >= 110) {
+        return schema
+          .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+          .required(sharedMessages.validateRequired)
+      }
+    }),
+  }),
+})
 
 const validationSchema = Yup.object({
   ids: Yup.object().shape({
-    dev_eui: devEUISchema.when('$supportsJoin', {
+    dev_eui: Yup.string().when('$supportsJoin', {
       is: true,
-      then: devEUISchema.required(sharedMessages.validateRequired),
+      then: schema =>
+        schema
+          .length(8 * 2, Yup.passValues(sharedMessages.validateLength))
+          .required(sharedMessages.validateRequired),
     }),
     device_id: Yup.string(),
     join_eui: Yup.string()
       .length(8 * 2, Yup.passValues(sharedMessages.validateLength))
       .required(sharedMessages.validateRequired),
   }),
+}).when(['$supportsJoin', '$claim', '$mayEditKeys'], (isOTAA, claim, mayEditKeys, schema) => {
+  if (mayEditKeys || isOTAA || claim === false) {
+    schema.concat(rootKeysSchema)
+  }
 
-  root_keys: Yup.object().when(
-    ['$lorawanVersion', '$supportsJoin', '$inputMethod', '$claim', '$mayEditKeys'],
-    (isOTAA, version, inputMethod, claim, mayEditKeys, schema) => {
-      const notRequiredKeySchema = Yup.object().shape({
-        key: Yup.string().default('').nullable(),
-      })
-      const requiredKeySchema = Yup.lazy(() => {
-        if (mayEditKeys) {
-          return Yup.object().shape({
-            key: Yup.string()
-              .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
-              .required(sharedMessages.validateRequired),
-          })
-        }
-
-        return notRequiredKeySchema
-      })
-
-      if (!mayEditKeys || !isOTAA || inputMethod === 'manual' || claim) {
-        return schema.shape({
-          nwk_key: notRequiredKeySchema,
-          app_key: notRequiredKeySchema,
-        })
-      }
-
-      if (parseLorawanMacVersion(version) < 110) {
-        return schema.shape({
-          nwk_key: notRequiredKeySchema,
-          app_key: requiredKeySchema,
-        })
-      }
-
-      return schema.shape({
-        nwk_key: requiredKeySchema,
-        app_key: requiredKeySchema,
-      })
-    },
-  ),
-  session: Yup.object().when(['$lorawanVersion', '$supportsJoin'], (version, isOTAA, schema) => {
-    const lwVersion = parseLorawanMacVersion(version)
-    const notRequiredKeySchema = Yup.object().shape({
-      key: Yup.string().default('').nullable(),
-    })
-
-    return schema.shape({
-      dev_addr: Yup.lazy(() => {
-        if (!isOTAA) {
-          return Yup.string()
-            .length(4 * 2, Yup.passValues(sharedMessages.validateLength))
-            .required(sharedMessages.validateRequired)
-        }
-
-        return Yup.string()
-      }),
-      keys: Yup.object().shape({
-        app_s_key: Yup.lazy(() => {
-          if (!isOTAA) {
-            return Yup.object().shape({
-              key: Yup.string()
-                .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
-                .required(sharedMessages.validateRequired),
-            })
-          }
-
-          return notRequiredKeySchema
-        }),
-        f_nwk_s_int_key: Yup.lazy(() => {
-          if (!isOTAA) {
-            return Yup.object().shape({
-              key: Yup.string()
-                .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
-                .required(sharedMessages.validateRequired),
-            })
-          }
-
-          return notRequiredKeySchema
-        }),
-        s_nwk_s_int_key: Yup.lazy(() => {
-          if (!isOTAA && lwVersion >= 110) {
-            return Yup.object().shape({
-              key: Yup.string()
-                .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
-                .required(sharedMessages.validateRequired),
-            })
-          }
-
-          return notRequiredKeySchema
-        }),
-        nwk_s_enc_key: Yup.lazy(() => {
-          if (!isOTAA && lwVersion >= 110) {
-            return Yup.object().shape({
-              key: Yup.string()
-                .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
-                .required(sharedMessages.validateRequired),
-            })
-          }
-
-          return notRequiredKeySchema
-        }),
-      }),
-    })
-  }),
+  if (!isOTAA) {
+    schema.concat(sessionSchema)
+  }
 })
 
 const initialValues = {
@@ -170,4 +127,4 @@ const initialValues = {
   },
 }
 
-export { validationSchema as default, devEUISchema, initialValues }
+export { validationSchema as default, initialValues }
