@@ -52,11 +52,13 @@ var (
 		return downlinkChannels
 	}()
 
-	us902928DownlinkDRTable = [5][4]ttnpb.DataRateIndex{
+	us902928DownlinkDRTable = [7][4]ttnpb.DataRateIndex{
 		{10, 9, 8, 8},
 		{11, 10, 9, 8},
 		{12, 11, 10, 9},
 		{13, 12, 11, 10},
 		{13, 13, 12, 11},
+		{10, 9, 8, 8},
+		{11, 10, 9, 8},
 	}
 )

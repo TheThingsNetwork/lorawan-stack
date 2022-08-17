@@ -115,8 +115,8 @@ var EU_863_870_RP2_V1_0_3 = Band{
 
 	Rx1Channel: channelIndexIdentity,
 	Rx1DataRate: func(idx ttnpb.DataRateIndex, offset ttnpb.DataRateOffset, _ bool) (ttnpb.DataRateIndex, error) {
-		if idx > ttnpb.DataRateIndex_DATA_RATE_7 {
-			return 0, errDataRateIndexTooHigh.WithAttributes("max", 7)
+		if idx > ttnpb.DataRateIndex_DATA_RATE_11 {
+			return 0, errDataRateIndexTooHigh.WithAttributes("max", 11)
 		}
 		if offset > 5 {
 			return 0, errDataRateOffsetTooHigh.WithAttributes("max", 5)

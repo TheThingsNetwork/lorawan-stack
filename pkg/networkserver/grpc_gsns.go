@@ -683,12 +683,7 @@ macLoop:
 			return nil, false, nil
 		}
 	}
-	if isLRFHSS := up.GetSettings().GetDataRate().GetLrfhss() != nil; isLRFHSS {
-		dev.MacState.RxWindowsAvailable = false
-		dev.MacState.QueuedResponses = nil
-	} else {
-		dev.MacState.RxWindowsAvailable = true
-	}
+	dev.MacState.RxWindowsAvailable = true
 	dev.Session.LastFCntUp = cmacFMatchResult.FullFCnt
 
 	var queuedApplicationUplinks []*ttnpb.ApplicationUp
@@ -1259,7 +1254,25 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		log.FromContext(ctx).Error("Reusing the DevAddr used for current session")
 	}
 
-	cfList := frequencyplans.CFList(*fp, matched.LorawanPhyVersion)
+	maxMACPayloadSize, err := computeMaxMACDownlinkPayloadSize(
+		macState,
+		phy,
+		fp,
+		uint32(chIdx),
+		up.Settings.DataRate,
+	)
+	if err != nil {
+		return err
+	}
+	// NOTE: The CFList is an optional part of a JoinAccept message. A JoinAccept containing a CFList has size
+	// 33, while a JoinAccept without a CFList has size 17. Bands which are susceptible to downlink dwell time
+	// limitations such as AS923 and its variants may need to generate messages whose MAC payload is smaller
+	// than 19 bytes. For such bands, we need to always omit the CFList.
+	// NOTE: The 5 bytes added to the maximum represent the MHDR (1 byte) and the MIC (4 bytes).
+	var cfList *ttnpb.CFList
+	if maxMACPayloadSize+5 >= lorawan.JoinAcceptWithCFListLength {
+		cfList = frequencyplans.CFList(fp, matched.LorawanPhyVersion)
+	}
 	dlSettings := &ttnpb.DLSettings{
 		Rx1DrOffset: macState.DesiredParameters.Rx1DataRateOffset,
 		Rx2Dr:       macState.DesiredParameters.Rx2DataRateIndex,
@@ -1434,7 +1447,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			"ocw", dr.Lrfhss.GetOperatingChannelWidth(),
 		))
 	default:
-		return nil, errDataRateNotFound.New()
+		return nil, errDataRateNotFound.WithAttributes("data_rate", up.Settings.DataRate)
 	}
 	ctx = log.NewContext(ctx, logger)
 

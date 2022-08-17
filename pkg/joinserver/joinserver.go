@@ -364,9 +364,9 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 
 			var b []byte
 			if req.CfList == nil {
-				b = make([]byte, 0, 17)
+				b = make([]byte, 0, lorawan.JoinAcceptWithoutCFListLength)
 			} else {
-				b = make([]byte, 0, 33)
+				b = make([]byte, 0, lorawan.JoinAcceptWithCFListLength)
 			}
 			b, err = lorawan.AppendMHDR(b, &ttnpb.MHDR{
 				MType: ttnpb.MType_JOIN_ACCEPT,

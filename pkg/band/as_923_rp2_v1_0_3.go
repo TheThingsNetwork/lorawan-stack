@@ -20,13 +20,13 @@ import (
 
 var (
 	// AS_923_RP2_v1_0_3 is the band definition for AS923 Group 1 in the RP002-1.0.3 specification.
-	AS_923_RP2_v1_0_3 = as923RP2102Band(AS_923, as923Group1Offset)
+	AS_923_RP2_v1_0_3 = as923RP2103Band(AS_923, as923Group1Offset)
 	// AS_923_2_RP2_v1_0_3 is the band definition for AS923 Group 2 in the RP002-1.0.3 specification.
-	AS_923_2_RP2_v1_0_3 = as923RP2102Band(AS_923_2, as923Group2Offset)
+	AS_923_2_RP2_v1_0_3 = as923RP2103Band(AS_923_2, as923Group2Offset)
 	// AS_923_3_RP2_v1_0_3 is the band definition for AS923 Group 3 in the RP002-1.0.3 specification.
-	AS_923_3_RP2_v1_0_3 = as923RP2102Band(AS_923_3, as923Group3Offset)
+	AS_923_3_RP2_v1_0_3 = as923RP2103Band(AS_923_3, as923Group3Offset)
 	// AS_923_4_RP2_v1_0_3 is the band definition for AS923 Group 4 in the RP002-1.0.3 specification.
-	AS_923_4_RP2_v1_0_3 = as923RP2102Band(AS_923_4, as923Group4Offset)
+	AS_923_4_RP2_v1_0_3 = as923RP2103Band(AS_923_4, as923Group4Offset)
 )
 
 var as923RP2103Band = func(id string, offset as923GroupOffset) Band {
@@ -48,10 +48,10 @@ var as923RP2103Band = func(id string, offset as923GroupOffset) Band {
 			ttnpb.DataRateIndex_DATA_RATE_1: makeLoRaDataRate(11, 125000, makeDwellTimeMaxMACPayloadSizeFunc(59, 0)),
 			ttnpb.DataRateIndex_DATA_RATE_2: makeLoRaDataRate(10, 125000, makeDwellTimeMaxMACPayloadSizeFunc(123, 19)),
 			ttnpb.DataRateIndex_DATA_RATE_3: makeLoRaDataRate(9, 125000, makeDwellTimeMaxMACPayloadSizeFunc(123, 61)),
-			ttnpb.DataRateIndex_DATA_RATE_4: makeLoRaDataRate(8, 125000, makeDwellTimeMaxMACPayloadSizeFunc(230, 133)),
-			ttnpb.DataRateIndex_DATA_RATE_5: makeLoRaDataRate(7, 125000, makeDwellTimeMaxMACPayloadSizeFunc(230, 250)),
-			ttnpb.DataRateIndex_DATA_RATE_6: makeLoRaDataRate(7, 250000, makeDwellTimeMaxMACPayloadSizeFunc(230, 250)),
-			ttnpb.DataRateIndex_DATA_RATE_7: makeFSKDataRate(50000, makeDwellTimeMaxMACPayloadSizeFunc(230, 250)),
+			ttnpb.DataRateIndex_DATA_RATE_4: makeLoRaDataRate(8, 125000, makeDwellTimeMaxMACPayloadSizeFunc(250, 133)),
+			ttnpb.DataRateIndex_DATA_RATE_5: makeLoRaDataRate(7, 125000, makeDwellTimeMaxMACPayloadSizeFunc(250, 250)),
+			ttnpb.DataRateIndex_DATA_RATE_6: makeLoRaDataRate(7, 250000, makeDwellTimeMaxMACPayloadSizeFunc(250, 250)),
+			ttnpb.DataRateIndex_DATA_RATE_7: makeFSKDataRate(50000, makeDwellTimeMaxMACPayloadSizeFunc(250, 250)),
 		},
 		MaxADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 

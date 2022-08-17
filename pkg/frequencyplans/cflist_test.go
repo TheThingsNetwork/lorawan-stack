@@ -27,7 +27,7 @@ import (
 func TestFrequenciesCFList(t *testing.T) {
 	a := assertions.New(t)
 
-	euFP := frequencyplans.FrequencyPlan{
+	euFP := &frequencyplans.FrequencyPlan{
 		BandID: "EU_863_870",
 		UplinkChannels: []frequencyplans.Channel{
 			// 7 custom channels.
@@ -81,7 +81,7 @@ outer:
 func TestChannelMasksCFList(t *testing.T) {
 	a := assertions.New(t)
 
-	usFP := frequencyplans.FrequencyPlan{
+	usFP := &frequencyplans.FrequencyPlan{
 		BandID: "US_902_928",
 		UplinkChannels: []frequencyplans.Channel{
 			{Frequency: 903900000},
@@ -113,7 +113,7 @@ outer:
 func TestUnimplementedCFList(t *testing.T) {
 	a := assertions.New(t)
 
-	usFP := frequencyplans.FrequencyPlan{
+	usFP := &frequencyplans.FrequencyPlan{
 		BandID: "US_902_928",
 		UplinkChannels: []frequencyplans.Channel{
 			{Frequency: 903900000},
