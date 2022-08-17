@@ -100,7 +100,7 @@ func ListBands(ctx context.Context, req *ttnpb.ListBandsRequest) (*ttnpb.ListBan
 		}
 
 		for PHYVersion, band := range versions {
-			versionedBandDescription.Band[PHYVersion.String()] = band.convertToBandDescription()
+			versionedBandDescription.Band[PHYVersion.String()] = band.BandDescription()
 		}
 
 		res.Descriptions[bandID] = versionedBandDescription
@@ -109,47 +109,47 @@ func ListBands(ctx context.Context, req *ttnpb.ListBandsRequest) (*ttnpb.ListBan
 	return res, nil
 }
 
-// convertToBandDescription parses a band into a ttnpb.BandDescription
-func (band Band) convertToBandDescription() *ttnpb.BandDescription {
+// BandDescription parses a band into a ttnpb.BandDescription.
+func (b Band) BandDescription() *ttnpb.BandDescription {
 	bandDescription := &ttnpb.BandDescription{
-		Id: band.ID,
+		Id: b.ID,
 		Beacon: &ttnpb.BandDescription_Beacon{
-			DataRateIndex:    band.Beacon.DataRateIndex,
-			CodingRate:       band.Beacon.CodingRate,
-			InvertedPolarity: band.Beacon.InvertedPolarity,
+			DataRateIndex:    b.Beacon.DataRateIndex,
+			CodingRate:       b.Beacon.CodingRate,
+			InvertedPolarity: b.Beacon.InvertedPolarity,
 		},
 		PingSlotFrequency:      nil,
-		MaxUplinkChannels:      uint32(band.MaxUplinkChannels),
-		UplinkChannels:         make([]*ttnpb.BandDescription_Channel, 0, len(band.UplinkChannels)),
-		MaxDownlinkChannels:    uint32(band.MaxDownlinkChannels),
-		DownlinkChannels:       make([]*ttnpb.BandDescription_Channel, 0, len(band.DownlinkChannels)),
-		SubBands:               make([]*ttnpb.BandDescription_SubBandParameters, 0, len(band.SubBands)),
+		MaxUplinkChannels:      uint32(b.MaxUplinkChannels),
+		UplinkChannels:         make([]*ttnpb.BandDescription_Channel, 0, len(b.UplinkChannels)),
+		MaxDownlinkChannels:    uint32(b.MaxDownlinkChannels),
+		DownlinkChannels:       make([]*ttnpb.BandDescription_Channel, 0, len(b.DownlinkChannels)),
+		SubBands:               make([]*ttnpb.BandDescription_SubBandParameters, 0, len(b.SubBands)),
 		DataRates:              make(map[uint32]*ttnpb.BandDescription_BandDataRate),
-		FreqMultiplier:         band.FreqMultiplier,
-		ImplementsCfList:       band.ImplementsCFList,
-		CfListType:             band.CFListType,
-		ReceiveDelay_1:         types.DurationProto(band.ReceiveDelay1),
-		ReceiveDelay_2:         types.DurationProto(band.ReceiveDelay2),
-		JoinAcceptDelay_1:      types.DurationProto(band.JoinAcceptDelay1),
-		JoinAcceptDelay_2:      types.DurationProto(band.JoinAcceptDelay2),
-		MaxFcntGap:             uint64(band.MaxFCntGap),
-		SupportsDynamicAdr:     band.SupportsDynamicADR,
-		AdrAckLimit:            band.ADRAckLimit,
-		MinRetransmitTimeout:   types.DurationProto(band.MinRetransmitTimeout),
-		MaxRetransmitTimeout:   types.DurationProto(band.MaxRetransmitTimeout),
-		TxOffset:               band.TxOffset,
-		MaxAdrDataRateIndex:    band.MaxADRDataRateIndex,
-		TxParamSetupReqSupport: band.TxParamSetupReqSupport,
-		DefaultMaxEirp:         band.DefaultMaxEIRP,
-		LoraCodingRate:         band.LoRaCodingRate,
+		FreqMultiplier:         b.FreqMultiplier,
+		ImplementsCfList:       b.ImplementsCFList,
+		CfListType:             b.CFListType,
+		ReceiveDelay_1:         types.DurationProto(b.ReceiveDelay1),
+		ReceiveDelay_2:         types.DurationProto(b.ReceiveDelay2),
+		JoinAcceptDelay_1:      types.DurationProto(b.JoinAcceptDelay1),
+		JoinAcceptDelay_2:      types.DurationProto(b.JoinAcceptDelay2),
+		MaxFcntGap:             uint64(b.MaxFCntGap),
+		SupportsDynamicAdr:     b.SupportsDynamicADR,
+		AdrAckLimit:            b.ADRAckLimit,
+		MinRetransmitTimeout:   types.DurationProto(b.MinRetransmitTimeout),
+		MaxRetransmitTimeout:   types.DurationProto(b.MaxRetransmitTimeout),
+		TxOffset:               b.TxOffset,
+		MaxAdrDataRateIndex:    b.MaxADRDataRateIndex,
+		TxParamSetupReqSupport: b.TxParamSetupReqSupport,
+		DefaultMaxEirp:         b.DefaultMaxEIRP,
+		LoraCodingRate:         b.LoRaCodingRate,
 		DefaultRx2Parameters: &ttnpb.BandDescription_Rx2Parameters{
-			DataRateIndex: band.DefaultRx2Parameters.DataRateIndex,
-			Frequency:     band.DefaultRx2Parameters.Frequency,
+			DataRateIndex: b.DefaultRx2Parameters.DataRateIndex,
+			Frequency:     b.DefaultRx2Parameters.Frequency,
 		},
 		BootDwellTime: &ttnpb.BandDescription_DwellTime{},
 	}
 
-	for _, channel := range band.UplinkChannels {
+	for _, channel := range b.UplinkChannels {
 		bandDescription.UplinkChannels = append(bandDescription.UplinkChannels, &ttnpb.BandDescription_Channel{
 			Frequency:   channel.Frequency,
 			MinDataRate: channel.MinDataRate,
@@ -157,7 +157,7 @@ func (band Band) convertToBandDescription() *ttnpb.BandDescription {
 		})
 	}
 
-	for _, channel := range band.DownlinkChannels {
+	for _, channel := range b.DownlinkChannels {
 		bandDescription.DownlinkChannels = append(bandDescription.DownlinkChannels, &ttnpb.BandDescription_Channel{
 			Frequency:   channel.Frequency,
 			MinDataRate: channel.MinDataRate,
@@ -165,7 +165,7 @@ func (band Band) convertToBandDescription() *ttnpb.BandDescription {
 		})
 	}
 
-	for _, subbands := range band.SubBands {
+	for _, subbands := range b.SubBands {
 		bandDescription.SubBands = append(bandDescription.SubBands, &ttnpb.BandDescription_SubBandParameters{
 			MinFrequency: subbands.MinFrequency,
 			MaxFrequency: subbands.MaxFrequency,
@@ -174,7 +174,7 @@ func (band Band) convertToBandDescription() *ttnpb.BandDescription {
 		})
 	}
 
-	for index, datarate := range band.DataRates {
+	for index, datarate := range b.DataRates {
 		bandDescription.DataRates[uint32(index)] = &ttnpb.BandDescription_BandDataRate{
 			Rate: &ttnpb.DataRate{
 				Modulation: datarate.Rate.Modulation,
@@ -182,21 +182,21 @@ func (band Band) convertToBandDescription() *ttnpb.BandDescription {
 		}
 	}
 
-	if band.PingSlotFrequency != nil {
+	if b.PingSlotFrequency != nil {
 		bandDescription.PingSlotFrequency = &types.UInt64Value{
-			Value: *band.PingSlotFrequency,
+			Value: *b.PingSlotFrequency,
 		}
 	}
 
-	if band.BootDwellTime.Uplinks != nil {
+	if b.BootDwellTime.Uplinks != nil {
 		bandDescription.BootDwellTime.Uplinks = &types.BoolValue{
-			Value: *band.BootDwellTime.Uplinks,
+			Value: *b.BootDwellTime.Uplinks,
 		}
 	}
 
-	if band.BootDwellTime.Downlinks != nil {
+	if b.BootDwellTime.Downlinks != nil {
 		bandDescription.BootDwellTime.Downlinks = &types.BoolValue{
-			Value: *band.BootDwellTime.Downlinks,
+			Value: *b.BootDwellTime.Downlinks,
 		}
 	}
 

@@ -12,6 +12,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - New `SearchAccounts` RPC on the `EntityRegistrySearch` service.
+- New `Bands` RPC on the `Configuration` service.
 
 ### Changed
 
