@@ -54,24 +54,8 @@ const initialValues = merge(
 
 const DeviceOnboardingFormInner = () => {
   const {
-    values: {
-      _inputMethod,
-      frequency_plan_id,
-      lorawan_version,
-      lorawan_phy_version,
-      _claim,
-      supports_join,
-    },
-    setValidationContext,
+    values: { frequency_plan_id, lorawan_version, lorawan_phy_version, _claim },
   } = useFormContext()
-
-  React.useEffect(() => {
-    setValidationContext(context => ({
-      ...context,
-      supportsJoin: supports_join,
-      claim: _claim,
-    }))
-  }, [setValidationContext, supports_join, lorawan_version, _claim, _inputMethod])
 
   const maySubmit =
     Boolean(frequency_plan_id) &&
@@ -154,11 +138,6 @@ const DeviceOnboardingForm = () => {
           })
           break
         case REGISTRATION_TYPES.SINGLE:
-          resetForm({ values: initialValues })
-          toast({
-            type: toast.types.SUCCESS,
-            message: m.createSuccess,
-          })
         default:
           navigateToDevice(appId, ids.device_id)
       }
@@ -168,6 +147,7 @@ const DeviceOnboardingForm = () => {
 
   const handleSubmit = useCallback(
     async (values, { resetForm }, cleanedValues) => {
+      setError()
       try {
         let result
         if (values._claim) {
@@ -191,7 +171,7 @@ const DeviceOnboardingForm = () => {
       initialValues={initialValues}
       validationSchema={validationSchema}
       validationContext={validationContext}
-      validateAgainstCleanedValues
+      validateSync={false}
     >
       <DeviceOnboardingFormInner />
     </Form>
