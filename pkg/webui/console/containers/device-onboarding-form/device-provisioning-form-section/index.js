@@ -66,9 +66,8 @@ const initialValues = merge(
 
 // Save EUI in both fields.
 const joinEuiEncoder = value => ({
-  ids: { ...value.ids, join_eui: value },
+  ids: { join_eui: value },
   authenticated_identifiers: {
-    ...value.authenticated_identifiers,
     join_eui: value,
   },
 })
@@ -114,7 +113,7 @@ const DeviceProvisioningFormSection = () => {
     }))
   }, [setValues])
 
-  const getClaiming = React.useCallback(async () => {
+  const handleJoinEuiConfirm = React.useCallback(async () => {
     const claim = await dispatch(attachPromise(getInfoByJoinEUI({ join_eui: ids?.join_eui })))
     const supportsClaiming = claim.supports_claiming ?? false
 
@@ -141,7 +140,7 @@ const DeviceProvisioningFormSection = () => {
             <Button
               type="button"
               disabled={!mayConfirm}
-              onClick={getClaiming}
+              onClick={handleJoinEuiConfirm}
               message={msg.confirm}
               className="ml-cs-xs"
             />
@@ -159,8 +158,8 @@ const DeviceProvisioningFormSection = () => {
       {!isClaimingDetermined && mayProvisionDevice && (
         <Message content={msg.continue} className="mt-ls-m mb-ls-m" component="div" />
       )}
-      {isClaiming && <DeviceClaimingFormSection />}
-      {isRegistration && <DeviceRegistrationFormSection />}
+      {mayProvisionDevice && isClaiming && <DeviceClaimingFormSection />}
+      {mayProvisionDevice && isRegistration && <DeviceRegistrationFormSection />}
     </>
   )
 }
