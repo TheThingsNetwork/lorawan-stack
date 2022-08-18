@@ -24,6 +24,8 @@ import { NsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
+import { parseLorawanMacVersion, LORAWAN_VERSION_PAIRS } from '@console/lib/device-utils'
+
 import AdvancedSettingsSection, {
   initialValues as advancedSettingsInitialValues,
 } from './advanced-settings-section'
@@ -52,8 +54,13 @@ const frequencyPlanValueSetter = ({ setValues, setFieldTouched }, { value }) => 
 // invalid version combinations that would otherwise briefly occur until
 // the PHY version is set by the field itself.
 const lorawanVersionValueSetter = ({ setValues, setFieldTouched }, { value }) => {
+  const phyVersions = LORAWAN_VERSION_PAIRS[parseLorawanMacVersion(value)] || []
   setFieldTouched('lorawan_phy_version', false)
-  return setValues(values => ({ ...values, lorawan_version: value, lorawan_phy_version: '' }))
+  return setValues(values => ({
+    ...values,
+    lorawan_version: value,
+    lorawan_phy_version: phyVersions.length === 1 ? phyVersions[0].value : '',
+  }))
 }
 
 const DeviceTypeManualFormSection = () => {
@@ -86,9 +93,7 @@ const DeviceTypeManualFormSection = () => {
         tooltipId={tooltipIds.REGIONAL_PARAMETERS}
         lorawanVersion={lorawan_version}
       />
-      <hr />
       <AdvancedSettingsSection />
-      <hr />
     </>
   )
 }

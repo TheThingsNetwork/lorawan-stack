@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { defineMessages } from 'react-intl'
+import { merge } from 'lodash'
 
 import Field from '@ttn-lw/components/form/field'
+import { useFormContext } from '@ttn-lw/components/form'
 
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -41,7 +43,15 @@ const DevAddrField = props => {
     generatedValue,
     generatedError,
     generatedLoading,
+    encode,
+    decode,
   } = props
+
+  const { setValues } = useFormContext()
+
+  useEffect(() => {
+    setValues(values => merge({}, values, encode(generatedValue)))
+  }, [encode, generatedValue, name, setValues])
 
   return (
     <Field
@@ -58,8 +68,9 @@ const DevAddrField = props => {
       onGenerate={onGenerate}
       generatedError={generatedError}
       generatedLoading={generatedLoading}
-      generatedValue={generatedValue}
       tooltipId={tooltipIds.DEVICE_ADDRESS}
+      encode={encode}
+      decode={decode}
     />
   )
 }
@@ -67,8 +78,10 @@ const DevAddrField = props => {
 DevAddrField.propTypes = {
   autoFocus: PropTypes.bool,
   className: PropTypes.string,
+  decode: PropTypes.func,
   description: PropTypes.message,
   disabled: PropTypes.bool,
+  encode: PropTypes.func,
   generatedError: PropTypes.bool,
   generatedLoading: PropTypes.bool,
   generatedValue: PropTypes.string,
@@ -82,6 +95,8 @@ DevAddrField.propTypes = {
 DevAddrField.defaultProps = {
   className: undefined,
   description: undefined,
+  decode: val => val,
+  encode: val => val,
   placeholder: undefined,
   disabled: false,
   required: false,

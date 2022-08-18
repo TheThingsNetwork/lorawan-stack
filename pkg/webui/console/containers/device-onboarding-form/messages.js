@@ -20,8 +20,6 @@ export default defineMessages({
   inputMethod: 'Input Method',
   inputMethodDeviceRepo: 'Select the end device in the LoRaWAN Device Repository',
   inputMethodManual: 'Enter end device specifics manually',
-  registerEndDevice: 'Register end device',
-  claimEndDevice: 'Claim end device',
   continueManual: 'Please enter versions and frequency plan information above to continue',
   continueDeviceRepo: 'Please specify your device above to continue',
   continueJoinEUI: 'Please enter the JoinEUI to continue',
@@ -67,6 +65,8 @@ export default defineMessages({
   clusterSettings: 'Cluster settings',
   networkDefaults: 'Network defaults',
   // Device repository messages.
+  claimEndDevice: 'Claim end device',
+  registerEndDevice: 'Register end device',
   otherOption: 'Other…',
   typeToSearch: 'Type to search…',
   unknownHwOption: 'Unknown ver.',

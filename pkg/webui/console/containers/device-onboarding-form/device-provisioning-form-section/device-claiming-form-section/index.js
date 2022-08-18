@@ -14,8 +14,48 @@
 
 import React from 'react'
 
-const initialValues = {}
+import Input from '@ttn-lw/components/input'
+import Form from '@ttn-lw/components/form'
 
-const DeviceClaimingFormSection = props => <span>Device Type Repository Form Section</span>
+import DevEUIComponent from '@console/containers/dev-eui-component'
+
+import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import m from '../../messages'
+
+const initialValues = {
+  authenticated_identifiers: {
+    dev_eui: '',
+    authentication_code: '',
+  },
+  target_device_id: '',
+}
+
+const DeviceClaimingFormSection = () => {
+  const idInputRef = React.useRef(null)
+
+  return (
+    <>
+      <DevEUIComponent name="authenticated_identifiers.dev_eui" />
+      <Form.Field
+        title={sharedMessages.claimAuthCode}
+        name="authenticated_identifiers.authentication_code"
+        component={Input}
+        sensitive
+      />
+      <Form.Field
+        required
+        title={sharedMessages.devID}
+        name="target_device_id"
+        placeholder={sharedMessages.deviceIdPlaceholder}
+        component={Input}
+        inputRef={idInputRef}
+        tooltipId={tooltipIds.DEVICE_ID}
+        description={m.deviceIdDescription}
+      />
+    </>
+  )
+}
 
 export { DeviceClaimingFormSection as default, initialValues }

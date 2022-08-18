@@ -13,13 +13,134 @@
 // limitations under the License.
 
 import Yup from '@ttn-lw/lib/yup'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-// Validation schema of the device registration form section.
-// Please observe the following rules to keep the validation schemas maintainable:
-// 1. DO NOT USE ANY TYPE CONVERSIONS HERE. Use decocer/encoder on field level instead.
-//    Consider all values as backend values. Exceptions may apply in consideration.
-// 2. Comment each individual validation prop and use whitespace to structure visually.
-// 3. Do not use ternary assignments but use plain if statements to ensure clarity.
-const validationSchema = Yup.object({})
+import { parseLorawanMacVersion } from '@console/lib/device-utils'
 
-export default validationSchema
+const networkKeySchema = Yup.object({
+  nwk_key: Yup.object({
+    key: Yup.string()
+      .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+      .required(sharedMessages.validateRequired),
+  }),
+})
+
+const appKeySchema = Yup.object({
+  app_key: Yup.object({
+    key: Yup.string()
+      .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+      .required(sharedMessages.validateRequired),
+  }),
+})
+
+const devAddrSchema = Yup.string()
+  .length(4 * 2, Yup.passValues(sharedMessages.validateLength))
+  .required(sharedMessages.validateRequired)
+
+const sessionKeysSchemaBase = Yup.object({
+  app_s_key: Yup.object({
+    key: Yup.string()
+      .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+      .required(sharedMessages.validateRequired),
+  }),
+  f_nwk_s_int_key: Yup.object({
+    key: Yup.string()
+      .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+      .required(sharedMessages.validateRequired),
+  }),
+})
+
+const sessionKeysVersion110Schema = Yup.object({
+  s_nwk_s_int_key: Yup.object({
+    key: Yup.string()
+      .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+      .required(sharedMessages.validateRequired),
+  }),
+  nwk_s_enc_key: Yup.object({
+    key: Yup.string()
+      .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+      .required(sharedMessages.validateRequired),
+  }),
+})
+
+const validationSchema = Yup.object({
+  ids: Yup.object({
+    device_id: Yup.string().required(sharedMessages.validateRequired),
+    join_eui: Yup.string()
+      .length(8 * 2, Yup.passValues(sharedMessages.validateLength))
+      .required(sharedMessages.validateRequired),
+  }).when('supports_join', {
+    is: true,
+    then: schema =>
+      schema.concat(
+        Yup.object({
+          dev_eui: Yup.string()
+            .length(8 * 2, Yup.passValues(sharedMessages.validateLength))
+            .required(sharedMessages.validateRequired),
+        }),
+      ),
+  }),
+  root_keys: Yup.object().when(
+    ['supports_join', '_claim', 'lorawan_version', '$mayEditKeys'],
+    (isOTAA, claim, lorawanVersion, mayEditKeys, schema) => {
+      if (mayEditKeys && isOTAA && claim === false) {
+        let rootKeysSchema = appKeySchema
+        if (parseLorawanMacVersion(lorawanVersion) >= 110) {
+          rootKeysSchema = rootKeysSchema.concat(networkKeySchema)
+        }
+        return schema.concat(rootKeysSchema)
+      }
+
+      return schema
+    },
+  ),
+  session: Yup.object().when(
+    ['supports_join', 'lorawan_version'],
+    (isOTAA, lorawanVersion, schema) => {
+      if (!isOTAA) {
+        let sessionKeysSchema = Yup.object().concat(sessionKeysSchemaBase)
+        if (parseLorawanMacVersion(lorawanVersion) >= 110) {
+          sessionKeysSchema = sessionKeysSchema.concat(sessionKeysVersion110Schema)
+        }
+
+        return schema.concat(
+          Yup.object({
+            dev_addr: devAddrSchema,
+            keys: sessionKeysSchema,
+          }),
+        )
+      }
+    },
+  ),
+})
+
+const initialValues = {
+  ids: {
+    device_id: '',
+    dev_eui: '',
+    dev_addr: '',
+  },
+  root_keys: {
+    app_key: { key: '' },
+    nwk_key: { key: '' },
+  },
+  session: {
+    dev_addr: '',
+    keys: {
+      app_s_key: {
+        key: '',
+      },
+      f_nwk_s_int_key: {
+        key: '',
+      },
+      s_nwk_s_int_key: {
+        key: '',
+      },
+      nwk_s_enc_key: {
+        key: '',
+      },
+    },
+  },
+}
+
+export { validationSchema as default, initialValues }

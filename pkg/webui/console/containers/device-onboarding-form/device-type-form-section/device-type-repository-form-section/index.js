@@ -15,7 +15,9 @@
 import React, { useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Col, Row } from 'react-grid-system'
+import { useFormikContext } from 'formik'
 import classnames from 'classnames'
+import { get, set } from 'lodash'
 
 import { useFormContext } from '@ttn-lw/components/form'
 
@@ -68,11 +70,11 @@ const modelValueSetter = ({ setValues }, { value }) =>
 
 const initialValues = {
   version_ids: {
-    brand_id: undefined,
-    model_id: undefined,
-    hardware_version: undefined,
-    firmware_version: undefined,
-    band_id: undefined,
+    brand_id: '',
+    model_id: '',
+    hardware_version: '',
+    firmware_version: '',
+    band_id: '',
   },
 }
 
@@ -84,6 +86,7 @@ const DeviceTypeRepositoryFormSection = () => {
     [dispatch],
   )
 
+  const { addToFieldRegistry, removeFromFieldRegistry } = useFormikContext()
   const { values, setValues } = useFormContext()
   const { version_ids } = values
 
@@ -109,16 +112,35 @@ const DeviceTypeRepositoryFormSection = () => {
   const showFrequencyPlanSelector = hasValidType
   const showOtherHint = hasSelectedOther
 
-  // Apply template once it is fetched.
+  // Apply template once it is fetched and register the template fields so they don't get cleaned.
   React.useEffect(() => {
     if (template && hasCompleted) {
+      // Since the template response will strip zero values, we cannot simply spread the result
+      // over the existing form values. Instead we need to make all zero values explicit
+      // by assigning them as `undefined`, using the provided field mask.
+      const templateFields = template.field_mask.split(',')
+      const endDeviceFill = templateFields.reduce(
+        (device, path) => set(device, path, get(template.end_device, path)),
+        {},
+      )
+
       setValues(values => ({
         ...values,
-        ...template.end_device,
+        ...endDeviceFill,
         version_ids: values.version_ids,
       }))
+
+      const hiddenFields = [
+        templateFields,
+        'network_server_address',
+        'application_server_address',
+        'join_server_address',
+      ]
+
+      addToFieldRegistry(...hiddenFields)
+      return () => removeFromFieldRegistry(...hiddenFields)
     }
-  }, [hasCompleted, setValues, template])
+  }, [hasCompleted, setValues, template, addToFieldRegistry, removeFromFieldRegistry])
 
   // Fetch template after completing the selection step (select band, model, hw/fw versions and band).
   React.useEffect(() => {
