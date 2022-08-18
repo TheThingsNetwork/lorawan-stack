@@ -5918,6 +5918,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 | ----- | ---- | ----- | ----------- |
 | `bandwidth` | [`uint32`](#uint32) |  | Bandwidth (Hz). |
 | `spreading_factor` | [`uint32`](#uint32) |  |  |
+| `coding_rate` | [`string`](#string) |  |  |
 
 ### <a name="ttn.lorawan.v3.MACCommand">Message `MACCommand`</a>
 

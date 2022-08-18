@@ -239,8 +239,7 @@ func (req *JoinRequest) toUplinkMessage(ids *ttnpb.GatewayIdentifiers, bandID st
 	var codingRate string
 	switch mod := bandDR.Rate.Modulation.(type) {
 	case *ttnpb.DataRate_Lora:
-		// TODO: Set coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466).
-		codingRate = phy.LoRaCodingRate
+		codingRate = mod.Lora.CodingRate
 	case *ttnpb.DataRate_Lrfhss:
 		codingRate = mod.Lrfhss.CodingRate
 	}
@@ -399,8 +398,7 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids *ttnpb.GatewayIdentifiers, band
 	var codingRate string
 	switch mod := bandDR.Rate.Modulation.(type) {
 	case *ttnpb.DataRate_Lora:
-		// TODO: Set coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466).
-		codingRate = phy.LoRaCodingRate
+		codingRate = mod.Lora.CodingRate
 	case *ttnpb.DataRate_Lrfhss:
 		codingRate = mod.Lrfhss.CodingRate
 	}

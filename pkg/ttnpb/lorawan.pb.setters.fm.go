@@ -750,6 +750,16 @@ func (dst *LoRaDataRate) SetFields(src *LoRaDataRate, paths ...string) error {
 				var zero uint32
 				dst.SpreadingFactor = zero
 			}
+		case "coding_rate":
+			if len(subs) > 0 {
+				return fmt.Errorf("'coding_rate' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CodingRate = src.CodingRate
+			} else {
+				var zero string
+				dst.CodingRate = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

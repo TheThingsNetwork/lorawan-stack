@@ -486,6 +486,7 @@ func (m *CFList) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []stri
 func AddSelectFlagsForLoRaDataRate(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("bandwidth", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("bandwidth", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("spreading-factor", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("spreading-factor", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("coding-rate", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("coding-rate", prefix), false), flagsplugin.WithHidden(hidden)))
 }
 
 // SelectFromFlags outputs the fieldmask paths forLoRaDataRate message from select flags.
@@ -499,6 +500,11 @@ func PathsFromSelectFlagsForLoRaDataRate(flags *pflag.FlagSet, prefix string) (p
 		return nil, err
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("spreading_factor", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("coding_rate", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("coding_rate", prefix))
 	}
 	return paths, nil
 }

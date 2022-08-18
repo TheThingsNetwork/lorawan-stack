@@ -22385,6 +22385,9 @@
         "spreading_factor": {
           "type": "integer",
           "format": "int64"
+        },
+        "coding_rate": {
+          "type": "string"
         }
       }
     },

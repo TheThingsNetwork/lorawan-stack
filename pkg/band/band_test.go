@@ -591,6 +591,7 @@ func TestFindSubBand(t *testing.T) {
 }
 
 func TestFindDataRate(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	// US_902_928
@@ -600,6 +601,7 @@ func TestFindDataRate(t *testing.T) {
 			Lora: &ttnpb.LoRaDataRate{
 				Bandwidth:       500000,
 				SpreadingFactor: 8,
+				CodingRate:      CR_4_5,
 			},
 		},
 	}
@@ -614,6 +616,7 @@ func TestFindDataRate(t *testing.T) {
 			Lora: &ttnpb.LoRaDataRate{
 				Bandwidth:       500000,
 				SpreadingFactor: 8,
+				CodingRate:      CR_4_5,
 			},
 		},
 	}
@@ -630,6 +633,7 @@ func TestFindDataRate(t *testing.T) {
 			Lora: &ttnpb.LoRaDataRate{
 				Bandwidth:       500000,
 				SpreadingFactor: 12,
+				CodingRate:      CR_4_5,
 			},
 		},
 	}
@@ -644,6 +648,7 @@ func TestFindDataRate(t *testing.T) {
 			Lora: &ttnpb.LoRaDataRate{
 				Bandwidth:       500000,
 				SpreadingFactor: 12,
+				CodingRate:      CR_4_5,
 			},
 		},
 	}

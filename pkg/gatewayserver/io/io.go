@@ -592,8 +592,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		}
 		switch mod := rx.dataRate.Modulation.(type) {
 		case *ttnpb.DataRate_Lora:
-			// TODO: Set coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466).
-			settings.CodingRate = phy.LoRaCodingRate
+			settings.CodingRate = mod.Lora.CodingRate
 			settings.Downlink.InvertPolarization = true
 		case *ttnpb.DataRate_Lrfhss:
 			settings.CodingRate = mod.Lrfhss.CodingRate

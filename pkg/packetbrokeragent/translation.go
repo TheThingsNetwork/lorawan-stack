@@ -634,10 +634,6 @@ func toPBDownlink(ctx context.Context, msg *ttnpb.DownlinkMessage, fps frequency
 	if err != nil {
 		return nil, nil, errFrequencyPlanNotConfigured.WithAttributes("id", req.FrequencyPlanId)
 	}
-	phy, err := band.GetLatest(fp.BandID)
-	if err != nil {
-		return nil, nil, errUnknownBand.WithCause(err).WithAttributes("band_id", fp.BandID)
-	}
 
 	down := &packetbroker.DownlinkMessage{
 		PhyPayload: msg.RawPayload,
@@ -658,11 +654,10 @@ func toPBDownlink(ctx context.Context, msg *ttnpb.DownlinkMessage, fps frequency
 		if rx.frequency == 0 || rx.dataRate == nil {
 			continue
 		}
-		// TODO: Get coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466)
 		var codingRate string
 		switch mod := rx.dataRate.Modulation.(type) {
 		case *ttnpb.DataRate_Lora:
-			codingRate = phy.LoRaCodingRate
+			codingRate = mod.Lora.CodingRate
 		case *ttnpb.DataRate_Lrfhss:
 			codingRate = mod.Lrfhss.CodingRate
 		}

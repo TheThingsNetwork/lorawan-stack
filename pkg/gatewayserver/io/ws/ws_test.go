@@ -873,6 +873,7 @@ func TestTraffic(t *testing.T) {
 					DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
+						CodingRate:      "4/5",
 					}}},
 				},
 			},
@@ -937,6 +938,7 @@ func TestTraffic(t *testing.T) {
 					DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
+						CodingRate:      "4/5",
 					}}},
 				},
 			},

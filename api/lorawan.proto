@@ -399,6 +399,7 @@ message LoRaDataRate {
   // Bandwidth (Hz).
   uint32 bandwidth = 1;
   uint32 spreading_factor = 2;
+  string coding_rate = 3;
 }
 
 message FSKDataRate {

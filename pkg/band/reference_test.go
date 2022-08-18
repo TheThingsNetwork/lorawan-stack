@@ -120,8 +120,6 @@ type serializableBand struct {
 
 	DefaultMaxEIRP float32
 
-	LoRaCodingRate string
-
 	Rx1Channel  map[uint8]uint8
 	Rx1DataRate map[string]ttnpb.DataRateIndex
 
@@ -208,8 +206,6 @@ func makeBand(b band.Band) serializableBand {
 
 		DefaultMaxEIRP: b.DefaultMaxEIRP,
 
-		LoRaCodingRate: b.LoRaCodingRate,
-
 		Rx1Channel:  makeRx1Channel(b.Rx1Channel),
 		Rx1DataRate: makeRx1DataRate(b.Rx1DataRate),
 
@@ -251,6 +247,7 @@ func testBand(t *testing.T, band serializableBand, version ttnpb.PHYVersion) {
 func TestBandDefinitions(t *testing.T) {
 	for name, versions := range band.All {
 		for version, band := range versions {
+			t.Parallel()
 			t.Run(fmt.Sprintf("%v/%v", name, version), func(t *testing.T) {
 				testBand(t, makeBand(band), version)
 			})

@@ -195,11 +195,13 @@ var CFListFieldPathsTopLevel = []string{
 }
 var LoRaDataRateFieldPathsNested = []string{
 	"bandwidth",
+	"coding_rate",
 	"spreading_factor",
 }
 
 var LoRaDataRateFieldPathsTopLevel = []string{
 	"bandwidth",
+	"coding_rate",
 	"spreading_factor",
 }
 var FSKDataRateFieldPathsNested = []string{
@@ -226,6 +228,7 @@ var DataRateFieldPathsNested = []string{
 	"modulation.fsk.bit_rate",
 	"modulation.lora",
 	"modulation.lora.bandwidth",
+	"modulation.lora.coding_rate",
 	"modulation.lora.spreading_factor",
 	"modulation.lrfhss",
 	"modulation.lrfhss.coding_rate",
@@ -245,6 +248,7 @@ var TxSettingsFieldPathsNested = []string{
 	"data_rate.modulation.fsk.bit_rate",
 	"data_rate.modulation.lora",
 	"data_rate.modulation.lora.bandwidth",
+	"data_rate.modulation.lora.coding_rate",
 	"data_rate.modulation.lora.spreading_factor",
 	"data_rate.modulation.lrfhss",
 	"data_rate.modulation.lrfhss.coding_rate",
@@ -339,6 +343,7 @@ var TxRequestFieldPathsNested = []string{
 	"rx1_data_rate.modulation.fsk.bit_rate",
 	"rx1_data_rate.modulation.lora",
 	"rx1_data_rate.modulation.lora.bandwidth",
+	"rx1_data_rate.modulation.lora.coding_rate",
 	"rx1_data_rate.modulation.lora.spreading_factor",
 	"rx1_data_rate.modulation.lrfhss",
 	"rx1_data_rate.modulation.lrfhss.coding_rate",
@@ -352,6 +357,7 @@ var TxRequestFieldPathsNested = []string{
 	"rx2_data_rate.modulation.fsk.bit_rate",
 	"rx2_data_rate.modulation.lora",
 	"rx2_data_rate.modulation.lora.bandwidth",
+	"rx2_data_rate.modulation.lora.coding_rate",
 	"rx2_data_rate.modulation.lora.spreading_factor",
 	"rx2_data_rate.modulation.lrfhss",
 	"rx2_data_rate.modulation.lrfhss.coding_rate",
