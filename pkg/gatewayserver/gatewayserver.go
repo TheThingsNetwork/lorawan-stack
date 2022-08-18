@@ -527,8 +527,13 @@ func (gs *GatewayServer) Connect(
 	gs.startDisconnectOnChangeTask(connEntry)
 	gs.startHandleUpstreamTask(connEntry)
 	gs.startUpdateConnStatsTask(connEntry)
-	gs.startHandleLocationUpdatesTask(connEntry)
-	gs.startHandleVersionUpdatesTask(connEntry)
+	// Unauthenticated connections cannot update the gateway entity.
+	// As such, there is no reason to start these tasks, since they
+	// will perpetually fail.
+	if isAuthenticated {
+		gs.startHandleLocationUpdatesTask(connEntry)
+		gs.startHandleVersionUpdatesTask(connEntry)
+	}
 
 	for name, handler := range gs.upstreamHandlers {
 		connCtx := log.NewContextWithField(conn.Context(), "upstream_handler", name)
