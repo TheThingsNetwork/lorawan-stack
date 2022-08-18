@@ -17,6 +17,7 @@ package devicetemplateconverter_test
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"testing"
@@ -33,6 +34,7 @@ import (
 )
 
 func TestConvertEndDeviceTemplate(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
@@ -94,7 +96,7 @@ func TestConvertEndDeviceTemplate(t *testing.T) {
 	tmpls := make([]*ttnpb.EndDeviceTemplate, 0, 2)
 	for {
 		tmpl, err := stream.Recv()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			break
 		}
 		tmpls = append(tmpls, tmpl)
