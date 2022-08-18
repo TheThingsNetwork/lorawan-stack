@@ -38,7 +38,7 @@ import {
 import style from './dev-eui.styl'
 
 const DevEUIComponent = props => {
-  const { name } = props
+  const { name, required } = props
   const { values, setFieldValue, touched } = useFormContext()
 
   const dispatch = useDispatch()
@@ -111,13 +111,13 @@ const DevEUIComponent = props => {
       type="byte"
       min={8}
       max={8}
-      required
       component={Input.Generate}
       tooltipId={tooltipIds.DEV_EUI}
       onBlur={handleIdPrefill}
       onGenerateValue={handleGenerate}
       actionDisable={devEUIGenerateDisabled}
       inputRef={euiInputRef}
+      required={required}
     >
       <Message className={indicatorCls} component="label" content={indicatorContent} />
     </Form.Field>
@@ -128,7 +128,7 @@ const DevEUIComponent = props => {
       type="byte"
       min={8}
       max={8}
-      required
+      required={required}
       component={Input}
       tooltipId={tooltipIds.DEV_EUI}
       onBlur={handleIdPrefill}
@@ -138,6 +138,11 @@ const DevEUIComponent = props => {
 
 DevEUIComponent.propTypes = {
   name: PropTypes.string.isRequired,
+  required: PropTypes.bool,
+}
+
+DevEUIComponent.defaultProps = {
+  required: false,
 }
 
 export default DevEUIComponent
