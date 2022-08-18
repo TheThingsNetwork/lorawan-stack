@@ -18,7 +18,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { parseLorawanMacVersion } from '@console/lib/device-utils'
 
 const networkKeySchema = Yup.object({
-  app_key: Yup.object({
+  nwk_key: Yup.object({
     key: Yup.string()
       .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
       .required(sharedMessages.validateRequired),
@@ -64,28 +64,31 @@ const sessionKeysVersion110Schema = Yup.object({
 })
 
 const validationSchema = Yup.object({
-  ids: Yup.object().shape({
-    dev_eui: Yup.string().when('$supportsJoin', {
-      is: true,
-      then: schema =>
-        schema
-          .length(8 * 2, Yup.passValues(sharedMessages.validateLength))
-          .required(sharedMessages.validateRequired),
-    }),
-    device_id: Yup.string(),
+  ids: Yup.object({
+    device_id: Yup.string().required(sharedMessages.validateRequired),
     join_eui: Yup.string()
       .length(8 * 2, Yup.passValues(sharedMessages.validateLength))
       .required(sharedMessages.validateRequired),
+  }).when('supports_join', {
+    is: true,
+    then: schema =>
+      schema.concat(
+        Yup.object({
+          dev_eui: Yup.string()
+            .length(8 * 2, Yup.passValues(sharedMessages.validateLength))
+            .required(sharedMessages.validateRequired),
+        }),
+      ),
   }),
   root_keys: Yup.object().when(
     ['supports_join', '_claim', 'lorawan_version', '$mayEditKeys'],
     (isOTAA, claim, lorawanVersion, mayEditKeys, schema) => {
-      if (mayEditKeys || isOTAA || claim === false) {
-        const rootKeysSchema = appKeySchema
+      if (mayEditKeys && isOTAA && claim === false) {
+        let rootKeysSchema = appKeySchema
         if (parseLorawanMacVersion(lorawanVersion) >= 110) {
-          rootKeysSchema.concat(networkKeySchema)
+          rootKeysSchema = rootKeysSchema.concat(networkKeySchema)
         }
-        schema.concat(rootKeysSchema)
+        return schema.concat(rootKeysSchema)
       }
 
       return schema
@@ -95,9 +98,9 @@ const validationSchema = Yup.object({
     ['supports_join', 'lorawan_version'],
     (isOTAA, lorawanVersion, schema) => {
       if (!isOTAA) {
-        const sessionKeysSchema = Yup.object().concat(sessionKeysSchemaBase)
+        let sessionKeysSchema = Yup.object().concat(sessionKeysSchemaBase)
         if (parseLorawanMacVersion(lorawanVersion) >= 110) {
-          sessionKeysSchema.concat(sessionKeysVersion110Schema)
+          sessionKeysSchema = sessionKeysSchema.concat(sessionKeysVersion110Schema)
         }
 
         return schema.concat(
@@ -115,6 +118,7 @@ const initialValues = {
   ids: {
     device_id: '',
     dev_eui: '',
+    dev_addr: '',
   },
   root_keys: {
     app_key: { key: '' },

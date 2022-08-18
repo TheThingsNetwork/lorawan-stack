@@ -27,18 +27,18 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { parseLorawanMacVersion, generate16BytesKey } from '@console/lib/device-utils'
 import { checkFromState, mayEditApplicationDeviceKeys } from '@console/lib/feature-checks'
 
-import { selectDeviceTemplate } from '@console/store/selectors/device-repository'
-
 import messages from '../../messages'
 
 import { initialValues } from './validation-schema'
+
+const devAddrEncoder = dev_addr => ({ ids: { dev_addr }, session: { dev_addr } })
+const devAddrDecoder = values => values?.ids?.dev_addr
 
 const DeviceRegistrationFormSection = () => {
   const { values, setFieldValue } = useFormContext()
 
   const mayEditKeys = useSelector(state => checkFromState(mayEditApplicationDeviceKeys, state))
 
-  const template = useSelector(selectDeviceTemplate)
   const idInputRef = React.useRef(null)
 
   let appKeyPlaceholder = undefined
@@ -51,9 +51,7 @@ const DeviceRegistrationFormSection = () => {
   const isMulticast = values.multicast
   const isABP = !values.supports_join && !values.multicast
   const isOTAA = values.supports_join
-  const lwVersion =
-    parseLorawanMacVersion(template?.end_device?.lorawan_version) ||
-    parseLorawanMacVersion(values.lorawan_version)
+  const lwVersion = parseLorawanMacVersion(values.lorawan_version)
 
   const showDevEUI =
     (!isMulticast && values._inputMethod === 'manual') ||
@@ -65,7 +63,7 @@ const DeviceRegistrationFormSection = () => {
 
   return (
     <div data-test-id="device-registration">
-      {showDevEUI && <DevEUIComponent name="ids.dev_eui" />}
+      {showDevEUI && <DevEUIComponent name="ids.dev_eui" required={isOTAA} />}
       {isOTAA && (
         <>
           <Form.Field
@@ -102,12 +100,20 @@ const DeviceRegistrationFormSection = () => {
       )}
       {showSessionKeys && (
         <>
-          <DevAddrInput title={sharedMessages.devAddr} name="session.dev_addr" required />
+          <DevAddrInput
+            title={sharedMessages.devAddr}
+            name="session.dev_addr,ids.dev_addr"
+            encode={devAddrEncoder}
+            decode={devAddrDecoder}
+            required
+          />
           {lwVersion === 104 && (
             <DevEUIComponent
+              name="ids.dev_eui"
               values={values}
               setFieldValue={setFieldValue}
               initialValues={initialValues}
+              required={isOTAA}
             />
           )}
           <Form.Field
