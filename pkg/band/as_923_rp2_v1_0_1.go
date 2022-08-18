@@ -42,13 +42,13 @@ var as923RP2101Band = func(id string, offset as923GroupOffset) Band {
 		SubBands: as923SubBandParameters(offset),
 
 		DataRates: map[ttnpb.DataRateIndex]DataRate{
-			ttnpb.DataRateIndex_DATA_RATE_0: makeLoRaDataRate(12, 125000, makeDwellTimeMaxMACPayloadSizeFunc(59, 0)),
-			ttnpb.DataRateIndex_DATA_RATE_1: makeLoRaDataRate(11, 125000, makeDwellTimeMaxMACPayloadSizeFunc(59, 0)),
-			ttnpb.DataRateIndex_DATA_RATE_2: makeLoRaDataRate(10, 125000, makeDwellTimeMaxMACPayloadSizeFunc(123, 19)),
-			ttnpb.DataRateIndex_DATA_RATE_3: makeLoRaDataRate(9, 125000, makeDwellTimeMaxMACPayloadSizeFunc(123, 61)),
-			ttnpb.DataRateIndex_DATA_RATE_4: makeLoRaDataRate(8, 125000, makeDwellTimeMaxMACPayloadSizeFunc(250, 133)),
-			ttnpb.DataRateIndex_DATA_RATE_5: makeLoRaDataRate(7, 125000, makeDwellTimeMaxMACPayloadSizeFunc(250, 250)),
-			ttnpb.DataRateIndex_DATA_RATE_6: makeLoRaDataRate(7, 250000, makeDwellTimeMaxMACPayloadSizeFunc(250, 250)),
+			ttnpb.DataRateIndex_DATA_RATE_0: makeLoRaDataRate(12, 125000, CR_4_5, makeDwellTimeMaxMACPayloadSizeFunc(59, 0)),
+			ttnpb.DataRateIndex_DATA_RATE_1: makeLoRaDataRate(11, 125000, CR_4_5, makeDwellTimeMaxMACPayloadSizeFunc(59, 0)),
+			ttnpb.DataRateIndex_DATA_RATE_2: makeLoRaDataRate(10, 125000, CR_4_5, makeDwellTimeMaxMACPayloadSizeFunc(123, 19)),
+			ttnpb.DataRateIndex_DATA_RATE_3: makeLoRaDataRate(9, 125000, CR_4_5, makeDwellTimeMaxMACPayloadSizeFunc(123, 61)),
+			ttnpb.DataRateIndex_DATA_RATE_4: makeLoRaDataRate(8, 125000, CR_4_5, makeDwellTimeMaxMACPayloadSizeFunc(250, 133)),
+			ttnpb.DataRateIndex_DATA_RATE_5: makeLoRaDataRate(7, 125000, CR_4_5, makeDwellTimeMaxMACPayloadSizeFunc(250, 250)),
+			ttnpb.DataRateIndex_DATA_RATE_6: makeLoRaDataRate(7, 250000, CR_4_5, makeDwellTimeMaxMACPayloadSizeFunc(250, 250)),
 			ttnpb.DataRateIndex_DATA_RATE_7: makeFSKDataRate(50000, makeDwellTimeMaxMACPayloadSizeFunc(250, 250)),
 		},
 		MaxADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
@@ -74,8 +74,6 @@ var as923RP2101Band = func(id string, offset as923GroupOffset) Band {
 			-12,
 			-14,
 		},
-
-		LoRaCodingRate: "4/5",
 
 		FreqMultiplier:   100,
 		ImplementsCFList: true,

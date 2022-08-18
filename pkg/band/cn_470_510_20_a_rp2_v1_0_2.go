@@ -39,12 +39,12 @@ var CN_470_510_20_A_RP2_v1_0_2 = Band{
 	},
 
 	DataRates: map[ttnpb.DataRateIndex]DataRate{
-		ttnpb.DataRateIndex_DATA_RATE_1: makeLoRaDataRate(11, 125000, makeConstMaxMACPayloadSizeFunc(31)),
-		ttnpb.DataRateIndex_DATA_RATE_2: makeLoRaDataRate(10, 125000, makeConstMaxMACPayloadSizeFunc(94)),
-		ttnpb.DataRateIndex_DATA_RATE_3: makeLoRaDataRate(9, 125000, makeConstMaxMACPayloadSizeFunc(172)),
-		ttnpb.DataRateIndex_DATA_RATE_4: makeLoRaDataRate(8, 125000, makeConstMaxMACPayloadSizeFunc(250)),
-		ttnpb.DataRateIndex_DATA_RATE_5: makeLoRaDataRate(7, 125000, makeConstMaxMACPayloadSizeFunc(250)),
-		ttnpb.DataRateIndex_DATA_RATE_6: makeLoRaDataRate(7, 500000, makeConstMaxMACPayloadSizeFunc(250)),
+		ttnpb.DataRateIndex_DATA_RATE_1: makeLoRaDataRate(11, 125000, CR_4_5, makeConstMaxMACPayloadSizeFunc(31)),
+		ttnpb.DataRateIndex_DATA_RATE_2: makeLoRaDataRate(10, 125000, CR_4_5, makeConstMaxMACPayloadSizeFunc(94)),
+		ttnpb.DataRateIndex_DATA_RATE_3: makeLoRaDataRate(9, 125000, CR_4_5, makeConstMaxMACPayloadSizeFunc(172)),
+		ttnpb.DataRateIndex_DATA_RATE_4: makeLoRaDataRate(8, 125000, CR_4_5, makeConstMaxMACPayloadSizeFunc(250)),
+		ttnpb.DataRateIndex_DATA_RATE_5: makeLoRaDataRate(7, 125000, CR_4_5, makeConstMaxMACPayloadSizeFunc(250)),
+		ttnpb.DataRateIndex_DATA_RATE_6: makeLoRaDataRate(7, 500000, CR_4_5, makeConstMaxMACPayloadSizeFunc(250)),
 		ttnpb.DataRateIndex_DATA_RATE_7: makeFSKDataRate(50000, makeConstMaxMACPayloadSizeFunc(250)),
 	},
 	MaxADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
@@ -92,8 +92,6 @@ var CN_470_510_20_A_RP2_v1_0_2 = Band{
 		DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
 		CodingRate:    "4/5",
 	},
-
-	LoRaCodingRate: "4/5",
 
 	FreqMultiplier:   100,
 	ImplementsCFList: true,

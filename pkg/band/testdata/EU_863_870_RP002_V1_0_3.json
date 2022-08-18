@@ -93,7 +93,8 @@
       "Rate": {
         "lora": {
           "bandwidth": 125000,
-          "spreading_factor": 12
+          "spreading_factor": 12,
+          "coding_rate": "4/5"
         }
       }
     },
@@ -105,7 +106,8 @@
       "Rate": {
         "lora": {
           "bandwidth": 125000,
-          "spreading_factor": 11
+          "spreading_factor": 11,
+          "coding_rate": "4/5"
         }
       }
     },
@@ -141,7 +143,8 @@
       "Rate": {
         "lora": {
           "bandwidth": 125000,
-          "spreading_factor": 10
+          "spreading_factor": 10,
+          "coding_rate": "4/5"
         }
       }
     },
@@ -153,7 +156,8 @@
       "Rate": {
         "lora": {
           "bandwidth": 125000,
-          "spreading_factor": 9
+          "spreading_factor": 9,
+          "coding_rate": "4/5"
         }
       }
     },
@@ -165,7 +169,8 @@
       "Rate": {
         "lora": {
           "bandwidth": 125000,
-          "spreading_factor": 8
+          "spreading_factor": 8,
+          "coding_rate": "4/5"
         }
       }
     },
@@ -177,7 +182,8 @@
       "Rate": {
         "lora": {
           "bandwidth": 125000,
-          "spreading_factor": 7
+          "spreading_factor": 7,
+          "coding_rate": "4/5"
         }
       }
     },
@@ -189,7 +195,8 @@
       "Rate": {
         "lora": {
           "bandwidth": 250000,
-          "spreading_factor": 7
+          "spreading_factor": 7,
+          "coding_rate": "4/5"
         }
       }
     },
@@ -255,7 +262,6 @@
   "MaxADRDataRateIndex": 5,
   "TxParamSetupReqSupport": false,
   "DefaultMaxEIRP": 16,
-  "LoRaCodingRate": "4/5",
   "Rx1Channel": {
     "0": 0,
     "1": 1,
