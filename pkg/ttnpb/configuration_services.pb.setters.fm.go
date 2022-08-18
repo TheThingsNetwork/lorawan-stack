@@ -424,16 +424,6 @@ func (dst *BandDescription) SetFields(src *BandDescription, paths ...string) err
 				var zero float32
 				dst.DefaultMaxEirp = zero
 			}
-		case "lora_coding_rate":
-			if len(subs) > 0 {
-				return fmt.Errorf("'lora_coding_rate' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.LoraCodingRate = src.LoraCodingRate
-			} else {
-				var zero string
-				dst.LoraCodingRate = zero
-			}
 		case "default_rx2_parameters":
 			if len(subs) > 0 {
 				var newDst, newSrc *BandDescription_Rx2Parameters

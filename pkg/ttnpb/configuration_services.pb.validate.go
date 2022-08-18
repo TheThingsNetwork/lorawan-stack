@@ -779,8 +779,6 @@ func (m *BandDescription) ValidateFields(paths ...string) error {
 			// no validation rules for TxParamSetupReqSupport
 		case "default_max_eirp":
 			// no validation rules for DefaultMaxEirp
-		case "lora_coding_rate":
-			// no validation rules for LoraCodingRate
 		case "default_rx2_parameters":
 
 			if v, ok := interface{}(m.GetDefaultRx2Parameters()).(interface{ ValidateFields(...string) error }); ok {

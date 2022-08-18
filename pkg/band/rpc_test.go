@@ -444,8 +444,6 @@ func TestBand_convertToBandDescription(t *testing.T) {
 
 				DefaultMaxEIRP: 1.0,
 
-				LoRaCodingRate: "default",
-
 				DefaultRx2Parameters: Rx2Parameters{
 					DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
 				},
@@ -516,8 +514,6 @@ func TestBand_convertToBandDescription(t *testing.T) {
 				TxParamSetupReqSupport: true,
 
 				DefaultMaxEirp: 1.0,
-
-				LoraCodingRate: "default",
 
 				DefaultRx2Parameters: &ttnpb.BandDescription_Rx2Parameters{
 					DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
@@ -593,8 +589,6 @@ func TestBand_convertToBandDescription(t *testing.T) {
 
 				DefaultMaxEIRP: 1.0,
 
-				LoRaCodingRate: "default",
-
 				DefaultRx2Parameters: Rx2Parameters{
 					DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
 				},
@@ -662,8 +656,6 @@ func TestBand_convertToBandDescription(t *testing.T) {
 				TxParamSetupReqSupport: true,
 
 				DefaultMaxEirp: 1.0,
-
-				LoraCodingRate: "default",
 
 				DefaultRx2Parameters: &ttnpb.BandDescription_Rx2Parameters{
 					DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,

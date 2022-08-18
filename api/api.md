@@ -2344,7 +2344,6 @@ PeerInfo
 | `max_adr_data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  |  |
 | `tx_param_setup_req_support` | [`bool`](#bool) |  |  |
 | `default_max_eirp` | [`float`](#float) |  |  |
-| `lora_coding_rate` | [`string`](#string) |  |  |
 | `default_rx2_parameters` | [`BandDescription.Rx2Parameters`](#ttn.lorawan.v3.BandDescription.Rx2Parameters) |  |  |
 | `boot_dwell_time` | [`BandDescription.DwellTime`](#ttn.lorawan.v3.BandDescription.DwellTime) |  |  |
 

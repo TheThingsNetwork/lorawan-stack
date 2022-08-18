@@ -141,7 +141,6 @@ func (b Band) BandDescription() *ttnpb.BandDescription {
 		MaxAdrDataRateIndex:    b.MaxADRDataRateIndex,
 		TxParamSetupReqSupport: b.TxParamSetupReqSupport,
 		DefaultMaxEirp:         b.DefaultMaxEIRP,
-		LoraCodingRate:         b.LoRaCodingRate,
 		DefaultRx2Parameters: &ttnpb.BandDescription_Rx2Parameters{
 			DataRateIndex: b.DefaultRx2Parameters.DataRateIndex,
 			Frequency:     b.DefaultRx2Parameters.Frequency,

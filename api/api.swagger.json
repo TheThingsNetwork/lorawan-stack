@@ -19065,9 +19065,6 @@
           "type": "number",
           "format": "float"
         },
-        "lora_coding_rate": {
-          "type": "string"
-        },
         "default_rx2_parameters": {
           "$ref": "#/definitions/BandDescriptionRx2Parameters"
         },

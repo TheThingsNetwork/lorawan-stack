@@ -125,25 +125,24 @@ message BandDescription {
 
   bool tx_param_setup_req_support = 24;
   float default_max_eirp = 25;
-  string lora_coding_rate = 26;
-  reserved 27; // rx1_channel
-  reserved 28; // rx2_datarate
-  reserved 29; // generate_ch_masks
-  reserved 30; // parse_ch_mask
+  reserved 26; // rx1_channel
+  reserved 27; // rx2_datarate
+  reserved 28; // generate_ch_masks
+  reserved 29; // parse_ch_mask
 
   message Rx2Parameters {
     DataRateIndex data_rate_index = 1; 
     uint64 frequency = 2;
   }
 
-  Rx2Parameters default_rx2_parameters = 31;
+  Rx2Parameters default_rx2_parameters = 30;
 
   message DwellTime {
     google.protobuf.BoolValue uplinks = 1;
     google.protobuf.BoolValue downlinks = 2;
   }
 
-  DwellTime boot_dwell_time = 32;
+  DwellTime boot_dwell_time = 31;
 }
 
 message ListBandsResponse {

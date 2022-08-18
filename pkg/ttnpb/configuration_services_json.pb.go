@@ -543,11 +543,6 @@ func (x *BandDescription) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("default_max_eirp")
 		s.WriteFloat32(x.DefaultMaxEirp)
 	}
-	if x.LoraCodingRate != "" || s.HasField("lora_coding_rate") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("lora_coding_rate")
-		s.WriteString(x.LoraCodingRate)
-	}
 	if x.DefaultRx2Parameters != nil || s.HasField("default_rx2_parameters") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("default_rx2_parameters")
@@ -764,9 +759,6 @@ func (x *BandDescription) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		case "default_max_eirp", "defaultMaxEirp":
 			s.AddField("default_max_eirp")
 			x.DefaultMaxEirp = s.ReadFloat32()
-		case "lora_coding_rate", "loraCodingRate":
-			s.AddField("lora_coding_rate")
-			x.LoraCodingRate = s.ReadString()
 		case "default_rx2_parameters", "defaultRx2Parameters":
 			if s.ReadNil() {
 				x.DefaultRx2Parameters = nil

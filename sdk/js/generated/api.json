@@ -8692,18 +8692,6 @@
               "defaultValue": ""
             },
             {
-              "name": "lora_coding_rate",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
               "name": "default_rx2_parameters",
               "description": "",
               "label": "",
