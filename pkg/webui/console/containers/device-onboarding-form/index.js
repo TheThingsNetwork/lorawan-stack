@@ -64,7 +64,7 @@ const DeviceOnboardingFormInner = () => {
     },
     setValidationContext,
   } = useFormContext()
-
+  console.log(useFormContext())
   React.useEffect(() => {
     setValidationContext(context => ({
       ...context,

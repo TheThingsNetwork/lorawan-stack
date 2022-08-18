@@ -39,7 +39,7 @@ import style from './dev-eui.styl'
 
 const DevEUIComponent = props => {
   const { name } = props
-  const { values, setFieldValue } = useFormContext()
+  const { values, setFieldValue, touched } = useFormContext()
 
   const dispatch = useDispatch()
   const appId = useSelector(selectSelectedApplicationId)
@@ -49,6 +49,9 @@ const DevEUIComponent = props => {
   const [devEUIGenerated, setDevEUIGenerated] = React.useState(false)
   const [errorMessage, setErrorMessage] = React.useState(undefined)
   const applicationDevEUICounter = useSelector(selectApplicationDevEUICount)
+  const idTouched = touched?.ids?.device_id || touched?.target_device_id
+  const hasEuiId =
+    /eui-\d{16}/.test(values?.target_device_id) || /eui-\d{16}/.test(values?.ids?.device_id)
 
   const indicatorContent = errorMessage || {
     ...sharedMessages.used,
@@ -84,26 +87,17 @@ const DevEUIComponent = props => {
     }
   }, [handleDevEUIRequest])
 
-  const handleIdPrefill = React.useCallback(() => {
-    if (values) {
-      if (values._claim) {
-        // Do not overwrite a value that the user has already set unless it is already in the EUI format.
-        if (
-          values?.authenticated_identifiers?.dev_eui?.length === 16 &&
-          (values?.target_device_id === '' || /eui-\d{16}/.test(values?.target_device_id))
-        ) {
-          const generatedId = `eui-${values.authenticated_identifiers.dev_eui.toLowerCase()}`
-          setFieldValue('target_device_id', generatedId)
-        }
-      } else if (
-        values?.ids?.dev_eui.length === 16 &&
-        (!Boolean(values?.ids?.device_id) || /eui-\d{16}/.test(values?.ids?.device_id))
-      ) {
-        const generatedId = `eui-${values.ids.dev_eui.toLowerCase()}`
+  const handleIdPrefill = React.useCallback(
+    event => {
+      const value = event.target.value
+      if (value.length === 16 && (!idTouched || hasEuiId)) {
+        const generatedId = `eui-${value.toLowerCase()}`
+        setFieldValue('target_device_id', generatedId)
         setFieldValue('ids.device_id', generatedId)
       }
-    }
-  }, [values, setFieldValue])
+    },
+    [hasEuiId, idTouched, setFieldValue],
+  )
 
   const devEUIGenerateDisabled =
     applicationDevEUICounter === env.devEUIConfig.applicationLimit ||

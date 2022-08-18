@@ -33,11 +33,9 @@ const appKeySchema = Yup.object({
   }),
 })
 
-const devAddrSchema = Yup.object({
-  dev_addr: Yup.string()
-    .length(4 * 2, Yup.passValues(sharedMessages.validateLength))
-    .required(sharedMessages.validateRequired),
-})
+const devAddrSchema = Yup.string()
+  .length(4 * 2, Yup.passValues(sharedMessages.validateLength))
+  .required(sharedMessages.validateRequired)
 
 const sessionKeysSchemaBase = Yup.object({
   app_s_key: Yup.object({
@@ -104,7 +102,7 @@ const validationSchema = Yup.object({
 
         return schema.concat(
           Yup.object({
-            devAddrSchema,
+            dev_addr: devAddrSchema,
             keys: sessionKeysSchema,
           }),
         )
