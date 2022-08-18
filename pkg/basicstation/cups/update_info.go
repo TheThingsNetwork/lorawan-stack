@@ -48,9 +48,15 @@ const (
 
 var (
 	errUnauthenticated       = errors.DefineUnauthenticated("unauthenticated", "call was not authenticated")
-	errTargetCUPSCredentials = errors.DefineNotFound("target_cups_credentials_not_found", "Target CUPS credentials not found for gateway `{gateway_uid}`")
-	errLNSCredentials        = errors.DefineNotFound("lns_credentials_not_found", "LNS credentials not found for gateway `{gateway_uid}`")
-	errServerTrust           = errors.Define("server_trust", "failed to fetch server trust for address `{address}`")
+	errTargetCUPSCredentials = errors.DefineNotFound(
+		"target_cups_credentials_not_found", "Target CUPS credentials not found for gateway `{gateway_uid}`",
+	)
+	errLNSCredentials = errors.DefineNotFound(
+		"lns_credentials_not_found", "LNS credentials not found for gateway `{gateway_uid}`",
+	)
+	errServerTrust = errors.DefineUnavailable(
+		"server_trust", "failed to fetch server trust for address `{address}`",
+	)
 )
 
 // registerGateway creates a new gateway for the default owner. It also creates the necessary CUPS and LNS credentials.
