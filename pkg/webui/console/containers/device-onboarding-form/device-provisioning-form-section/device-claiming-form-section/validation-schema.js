@@ -27,7 +27,7 @@ const validationSchema = Yup.object({
     dev_eui: Yup.string()
       .length(8 * 2, Yup.passValues(sharedMessages.validateLength))
       .required(sharedMessages.validateRequired),
-    authentication_code: Yup.string().when('$claim', {
+    authentication_code: Yup.string().when('._claim', {
       is: true,
       then: schema =>
         schema
