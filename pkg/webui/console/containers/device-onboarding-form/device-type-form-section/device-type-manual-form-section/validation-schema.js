@@ -54,8 +54,8 @@ const advancedSettingsSchema = Yup.object({
 const macSettingsSchema = Yup.object({
   mac_settings: Yup.lazy(macSettings =>
     Yup.object().when(
-      ['multicast', 'supports_join', '$defaultMacSettings'],
-      (multicast, supports_join, defaultMacSettings, schema) => {
+      ['multicast', 'supports_join', 'supports_class_b', '$defaultMacSettings'],
+      (multicast, supports_join, supports_class_b, defaultMacSettings, schema) => {
         if (!defaultMacSettings || !macSettings) {
           return schema
         }
@@ -98,7 +98,7 @@ const macSettingsSchema = Yup.object({
           ping_slot_periodicity: Yup.lazy(() => {
             // Ping slot periodicity does not have a default value, so it has to be
             // set explicitly when not using OTAA.
-            if (multicast || !supports_join) {
+            if ((multicast || !supports_join) && supports_class_b) {
               return Yup.string().default(null).typeError(sharedMessages.validateRequired)
             }
 

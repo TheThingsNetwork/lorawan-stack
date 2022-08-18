@@ -64,8 +64,6 @@ const m = defineMessages({
     'There was an error and the default MAC settings for the <code>{freqPlan}</code> frequency plan could not be loaded',
   fpNotFoundError:
     'The LoRaWAN version <code>{lorawanVersion}</code> does not support the <code>{freqPlan}</code> frequency plan. Please choose a different MAC version or frequency plan.',
-  disabledNetworkSettings:
-    'Please select frequency plan and LoRaWAN versions to manage MAC settings',
 })
 
 const emptyDefaultMacSettings = {}
@@ -163,7 +161,7 @@ const initialValues = {
   mac_settings: {
     // Adding just values that don't have defaults.
     ping_slot_periodicity: '',
-    beacon_frequency: '',
+    beacon_frequency: undefined,
   },
   supports_class_b: false,
   supports_class_c: false,
@@ -297,264 +295,272 @@ const AdvancedSettingsSection = () => {
     return () => removeFromFieldRegistry(...hiddenFields)
   }, [addToFieldRegistry, removeFromFieldRegistry])
 
+  // Do not render advanced settings when FP, MAC and PHY version is unknown.
+  if (!canManageNetworkSettings) {
+    return null
+  }
+
   return (
-    <Form.CollapseSection id="advanced-settings" title={m.advancedSectionTitle}>
-      <Form.Field
-        title={sharedMessages.activationMode}
-        name="supports_join,multicast"
-        component={Radio.Group}
-        tooltipId={tooltipIds.ACTIVATION_MODE}
-        encode={activationModeEncoder}
-        decode={activationModeDecoder}
-        valueSetter={activationModeValueSetter}
-        required
-      >
-        <Radio label={sharedMessages.otaa} value={ACTIVATION_MODES.OTAA} />
-        {mayEditKeys && (
-          <>
-            <Radio label={sharedMessages.abp} value={ACTIVATION_MODES.ABP} />
-            <Radio label={sharedMessages.multicast} value={ACTIVATION_MODES.MULTICAST} />
-          </>
-        )}
-      </Form.Field>
-      <Form.Field
-        title={isMulticast ? m.multicastClassCapabilities : messages.classCapabilities}
-        required={isMulticast}
-        name="supports_class_b,supports_class_c"
-        component={Select}
-        options={isMulticast ? multicastClassOptions : allClassOptions}
-        tooltipId={tooltipIds.CLASSES}
-        encode={deviceClassEncoder}
-        decode={deviceClassDecoder}
-      />
-      <Form.Field
-        title={messages.networkDefaults}
-        label={messages.defaultNetworksSettings}
-        name="_default_ns_settings"
-        component={Checkbox}
-        tooltipId={tooltipIds.NETWORK_RX_DEFAULTS}
-        disabled={!mayChangeToDefaultSettings || !canManageNetworkSettings}
-        description={!canManageNetworkSettings ? m.disabledNetworkSettings : undefined}
-      />
-      <div style={{ display: !_default_ns_settings ? 'block' : 'none' }}>
-        {isABP && (
-          <>
-            <Form.FieldContainer horizontal>
+    <>
+      <hr />
+      <Form.CollapseSection id="advanced-settings" title={m.advancedSectionTitle}>
+        <Form.Field
+          title={sharedMessages.activationMode}
+          name="supports_join,multicast"
+          component={Radio.Group}
+          tooltipId={tooltipIds.ACTIVATION_MODE}
+          encode={activationModeEncoder}
+          decode={activationModeDecoder}
+          valueSetter={activationModeValueSetter}
+          required
+        >
+          <Radio label={sharedMessages.otaa} value={ACTIVATION_MODES.OTAA} />
+          {mayEditKeys && (
+            <>
+              <Radio label={sharedMessages.abp} value={ACTIVATION_MODES.ABP} />
+              <Radio label={sharedMessages.multicast} value={ACTIVATION_MODES.MULTICAST} />
+            </>
+          )}
+        </Form.Field>
+        <Form.Field
+          title={isMulticast ? m.multicastClassCapabilities : messages.classCapabilities}
+          required={isMulticast}
+          name="supports_class_b,supports_class_c"
+          component={Select}
+          options={isMulticast ? multicastClassOptions : allClassOptions}
+          tooltipId={tooltipIds.CLASSES}
+          encode={deviceClassEncoder}
+          decode={deviceClassDecoder}
+        />
+        <Form.Field
+          title={messages.networkDefaults}
+          label={messages.defaultNetworksSettings}
+          name="_default_ns_settings"
+          component={Checkbox}
+          tooltipId={tooltipIds.NETWORK_RX_DEFAULTS}
+          disabled={!mayChangeToDefaultSettings || !canManageNetworkSettings}
+        />
+        <div style={{ display: !_default_ns_settings ? 'block' : 'none' }}>
+          {isABP && (
+            <>
+              <Form.FieldContainer horizontal>
+                <Form.Field
+                  required={!isUndefined(mac_settings.rx1_data_rate_offset)}
+                  title={messages.rx1DataRateOffsetTitle}
+                  type="number"
+                  name="mac_settings.rx1_data_rate_offset"
+                  component={Input}
+                  min={0}
+                  max={7}
+                  tooltipId={tooltipIds.DATA_RATE_OFFSET}
+                  inputWidth="xxs"
+                  fieldWidth="xs"
+                  titleChildren={
+                    <WarningTooltip
+                      desiredValue={defaultMacSettings.desired_rx1_data_rate_offset}
+                      currentValue={mac_settings.rx1_data_rate_offset}
+                    />
+                  }
+                />
+                <Form.Field
+                  title={messages.rx1DelayTitle}
+                  type="number"
+                  required={!isUndefined(defaultMacSettings.rx1_delay)}
+                  name="mac_settings.rx1_delay"
+                  append={<Message content={sharedMessages.secondsAbbreviated} />}
+                  tooltipId={tooltipIds.RX1_DELAY}
+                  component={Input}
+                  min={1}
+                  max={15}
+                  inputWidth="xs"
+                  fieldWidth={isClassB ? 'xs' : 'xxs'}
+                  titleChildren={
+                    <WarningTooltip
+                      desiredValue={defaultMacSettings.desired_rx1_delay}
+                      currentValue={mac_settings.rx1_delay}
+                    />
+                  }
+                />
+                <Form.Field
+                  title={sharedMessages.resetsFCnt}
+                  tooltipId={tooltipIds.RESETS_F_CNT}
+                  warning={mac_settings.resets_f_cnt ? sharedMessages.resetWarning : undefined}
+                  name="mac_settings.resets_f_cnt"
+                  component={Checkbox}
+                />
+              </Form.FieldContainer>
+            </>
+          )}
+          {(isClassB || isMulticast) && (
+            <>
+              <Form.FieldContainer horizontal>
+                <Form.Field
+                  required={!isUndefined(defaultMacSettings.class_b_timeout)}
+                  title={messages.classBTimeout}
+                  name="mac_settings.class_b_timeout"
+                  tooltipId={tooltipIds.CLASS_B_TIMEOUT}
+                  component={UnitInput.Duration}
+                  unitSelector={['ms', 's']}
+                  type="number"
+                  fieldWidth="xs"
+                  titleChildren={
+                    <WarningTooltip
+                      desiredValue={defaultMacSettings.desired_class_b_timeout}
+                      currentValue={mac_settings.class_b_timeout}
+                    />
+                  }
+                />
+                <Form.Field
+                  title={messages.pingSlotPeriodicityTitle}
+                  name="mac_settings.ping_slot_periodicity"
+                  tooltipId={tooltipIds.PING_SLOT_PERIODICITY}
+                  component={Select}
+                  options={pingSlotPeriodicityOptions}
+                  required={isClassB && (isMulticast || isABP)}
+                  menuPlacement="top"
+                  fieldWidth="xs"
+                />
+                <Form.Field
+                  title={messages.pingSlotDataRateTitle}
+                  name="mac_settings.ping_slot_data_rate_index"
+                  required={!isUndefined(defaultMacSettings.ping_slot_data_rate_index)}
+                  tooltipId={tooltipIds.PING_SLOT_DATA_RATE_INDEX}
+                  component={Input}
+                  type="number"
+                  min={0}
+                  max={15}
+                  inputWidth="xxs"
+                  titleChildren={
+                    <WarningTooltip
+                      desiredValue={defaultMacSettings.desired_ping_slot_data_rate_index}
+                      currentValue={mac_settings.ping_slot_data_rate_index}
+                    />
+                  }
+                />
+              </Form.FieldContainer>
+              <Form.FieldContainer horizontal>
+                <Form.Field
+                  type="number"
+                  min={100000}
+                  required={!isUndefined(defaultMacSettings.beacon_frequency)}
+                  title={messages.beaconFrequency}
+                  placeholder={messages.frequencyPlaceholder}
+                  name="mac_settings.beacon_frequency"
+                  tooltipId={tooltipIds.BEACON_FREQUENCY}
+                  component={UnitInput.Hertz}
+                  fieldWidth="xs"
+                  titleChildren={
+                    <WarningTooltip
+                      desiredValue={defaultMacSettings.desired_beacon_frequency}
+                      currentValue={mac_settings.beacon_frequency}
+                    />
+                  }
+                />
+                <Form.Field
+                  type="number"
+                  min={100000}
+                  required={!isUndefined(defaultMacSettings.ping_slot_frequency)}
+                  title={messages.pingSlotFrequencyTitle}
+                  placeholder={messages.frequencyPlaceholder}
+                  name="mac_settings.ping_slot_frequency"
+                  tooltipId={tooltipIds.PING_SLOT_FREQUENCY}
+                  component={UnitInput.Hertz}
+                  fieldWidth="xs"
+                  titleChildren={
+                    <WarningTooltip
+                      desiredValue={defaultMacSettings.desired_ping_slot_frequency}
+                      currentValue={mac_settings.ping_slot_frequency}
+                    />
+                  }
+                />
+              </Form.FieldContainer>
+            </>
+          )}
+          <Form.FieldContainer horizontal>
+            {isClassC && (
               <Form.Field
-                required={!isUndefined(mac_settings.rx1_data_rate_offset)}
-                title={messages.rx1DataRateOffsetTitle}
-                type="number"
-                name="mac_settings.rx1_data_rate_offset"
-                component={Input}
-                min={0}
-                max={7}
-                tooltipId={tooltipIds.DATA_RATE_OFFSET}
-                inputWidth="xxs"
-                fieldWidth="xs"
-                titleChildren={
-                  <WarningTooltip
-                    desiredValue={defaultMacSettings.desired_rx1_data_rate_offset}
-                    currentValue={mac_settings.rx1_data_rate_offset}
-                  />
-                }
-              />
-              <Form.Field
-                title={messages.rx1DelayTitle}
-                type="number"
-                required={!isUndefined(defaultMacSettings.rx1_delay)}
-                name="mac_settings.rx1_delay"
-                append={<Message content={sharedMessages.secondsAbbreviated} />}
-                tooltipId={tooltipIds.RX1_DELAY}
-                component={Input}
-                min={1}
-                max={15}
-                inputWidth="xs"
-                fieldWidth={isClassB ? 'xs' : 'xxs'}
-                titleChildren={
-                  <WarningTooltip
-                    desiredValue={defaultMacSettings.desired_rx1_delay}
-                    currentValue={mac_settings.rx1_delay}
-                  />
-                }
-              />
-              <Form.Field
-                title={sharedMessages.resetsFCnt}
-                tooltipId={tooltipIds.RESETS_F_CNT}
-                warning={mac_settings.resets_f_cnt ? sharedMessages.resetWarning : undefined}
-                name="mac_settings.resets_f_cnt"
-                component={Checkbox}
-              />
-            </Form.FieldContainer>
-          </>
-        )}
-        {(isClassB || isMulticast) && (
-          <>
-            <Form.FieldContainer horizontal>
-              <Form.Field
-                required={!isUndefined(defaultMacSettings.class_b_timeout)}
-                title={messages.classBTimeout}
-                name="mac_settings.class_b_timeout"
-                tooltipId={tooltipIds.CLASS_B_TIMEOUT}
+                required={!isUndefined(defaultMacSettings.class_c_timeout)}
+                title={messages.classCTimeout}
+                name="mac_settings.class_c_timeout"
+                tooltipId={tooltipIds.CLASS_C_TIMEOUT}
                 component={UnitInput.Duration}
                 unitSelector={['ms', 's']}
                 type="number"
                 fieldWidth="xs"
-                titleChildren={
-                  <WarningTooltip
-                    desiredValue={defaultMacSettings.desired_class_b_timeout}
-                    currentValue={mac_settings.class_b_timeout}
-                  />
-                }
-              />
-              <Form.Field
-                title={messages.pingSlotPeriodicityTitle}
-                name="mac_settings.ping_slot_periodicity"
-                tooltipId={tooltipIds.PING_SLOT_PERIODICITY}
-                component={Select}
-                options={pingSlotPeriodicityOptions}
-                required={isClassB && (isMulticast || isABP)}
-                menuPlacement="top"
-                fieldWidth="xs"
-              />
-              <Form.Field
-                title={messages.pingSlotDataRateTitle}
-                name="mac_settings.ping_slot_data_rate_index"
-                required={!isUndefined(defaultMacSettings.ping_slot_data_rate_index)}
-                tooltipId={tooltipIds.PING_SLOT_DATA_RATE_INDEX}
-                component={Input}
-                type="number"
-                min={0}
-                max={15}
                 inputWidth="xxs"
                 titleChildren={
                   <WarningTooltip
-                    desiredValue={defaultMacSettings.desired_ping_slot_data_rate_index}
-                    currentValue={mac_settings.ping_slot_data_rate_index}
+                    desiredValue={defaultMacSettings.desired_class_c_timeout}
+                    currentValue={mac_settings.class_c_timeout}
                   />
                 }
               />
-            </Form.FieldContainer>
-            <Form.FieldContainer horizontal>
-              <Form.Field
-                type="number"
-                min={100000}
-                required={!isUndefined(defaultMacSettings.beacon_frequency)}
-                title={messages.beaconFrequency}
-                placeholder={messages.frequencyPlaceholder}
-                name="mac_settings.beacon_frequency"
-                tooltipId={tooltipIds.BEACON_FREQUENCY}
-                component={UnitInput.Hertz}
-                fieldWidth="xs"
-                titleChildren={
-                  <WarningTooltip
-                    desiredValue={defaultMacSettings.desired_beacon_frequency}
-                    currentValue={mac_settings.beacon_frequency}
-                  />
-                }
-              />
-              <Form.Field
-                type="number"
-                min={100000}
-                required={!isUndefined(defaultMacSettings.ping_slot_frequency)}
-                title={messages.pingSlotFrequencyTitle}
-                placeholder={messages.frequencyPlaceholder}
-                name="mac_settings.ping_slot_frequency"
-                tooltipId={tooltipIds.PING_SLOT_FREQUENCY}
-                component={UnitInput.Hertz}
-                fieldWidth="xs"
-                titleChildren={
-                  <WarningTooltip
-                    desiredValue={defaultMacSettings.desired_ping_slot_frequency}
-                    currentValue={mac_settings.ping_slot_frequency}
-                  />
-                }
-              />
-            </Form.FieldContainer>
-          </>
-        )}
-        <Form.FieldContainer horizontal>
-          {isClassC && (
+            )}
             <Form.Field
-              required={!isUndefined(defaultMacSettings.class_c_timeout)}
-              title={messages.classCTimeout}
-              name="mac_settings.class_c_timeout"
-              tooltipId={tooltipIds.CLASS_C_TIMEOUT}
-              component={UnitInput.Duration}
-              unitSelector={['ms', 's']}
+              title={messages.rx2DataRateIndexTitle}
               type="number"
-              fieldWidth="xs"
+              name="mac_settings.rx2_data_rate_index"
+              tooltipId={tooltipIds.RX2_DATA_RATE_INDEX}
+              required={!isUndefined(defaultMacSettings.rx2_data_rate_index)}
+              component={Input}
+              min={0}
+              max={15}
               inputWidth="xxs"
+              fieldWidth={!isClassC || isMulticast ? 'xs' : 'xxs'}
               titleChildren={
                 <WarningTooltip
-                  desiredValue={defaultMacSettings.desired_class_c_timeout}
-                  currentValue={mac_settings.class_c_timeout}
+                  desiredValue={defaultMacSettings.desired_rx2_data_rate_index}
+                  currentValue={mac_settings.rx2_data_rate_index}
                 />
               }
             />
+            <Form.Field
+              type="number"
+              min={100000}
+              step={100}
+              required={!isUndefined(defaultMacSettings.rx2_frequency)}
+              title={messages.rx2FrequencyTitle}
+              placeholder={messages.frequencyPlaceholder}
+              name="mac_settings.rx2_frequency"
+              tooltipId={tooltipIds.RX2_FREQUENCY}
+              component={UnitInput.Hertz}
+              fieldWidth="xs"
+              titleChildren={
+                <WarningTooltip
+                  desiredValue={defaultMacSettings.desired_rx2_frequency}
+                  currentValue={mac_settings.rx2_frequency}
+                />
+              }
+            />
+          </Form.FieldContainer>
+          {!isOTAA && (
+            <Form.Field
+              indexAsKey
+              disabled={disableFactoryPresetFreq}
+              name="mac_settings.factory_preset_frequencies"
+              description={disableFactoryPresetFreq ? m.factoryFreqWarning : undefined}
+              component={KeyValueMap}
+              title={messages.factoryPresetFreqTitle}
+              addMessage={messages.freqAdd}
+              valuePlaceholder={messages.frequencyPlaceholder}
+              tooltipId={tooltipIds.FACTORY_PRESET_FREQUENCIES}
+              encode={factoryPresetFreqEncoder}
+              decode={factoryPresetFreqDecoder}
+            />
           )}
-          <Form.Field
-            title={messages.rx2DataRateIndexTitle}
-            type="number"
-            name="mac_settings.rx2_data_rate_index"
-            tooltipId={tooltipIds.RX2_DATA_RATE_INDEX}
-            required={!isUndefined(defaultMacSettings.rx2_data_rate_index)}
-            component={Input}
-            min={0}
-            max={15}
-            inputWidth="xxs"
-            fieldWidth={!isClassC || isMulticast ? 'xs' : 'xxs'}
-            titleChildren={
-              <WarningTooltip
-                desiredValue={defaultMacSettings.desired_rx2_data_rate_index}
-                currentValue={mac_settings.rx2_data_rate_index}
-              />
-            }
-          />
-          <Form.Field
-            type="number"
-            min={100000}
-            step={100}
-            required={!isUndefined(defaultMacSettings.rx2_frequency)}
-            title={messages.rx2FrequencyTitle}
-            placeholder={messages.frequencyPlaceholder}
-            name="mac_settings.rx2_frequency"
-            tooltipId={tooltipIds.RX2_FREQUENCY}
-            component={UnitInput.Hertz}
-            fieldWidth="xs"
-            titleChildren={
-              <WarningTooltip
-                desiredValue={defaultMacSettings.desired_rx2_frequency}
-                currentValue={mac_settings.rx2_frequency}
-              />
-            }
-          />
-        </Form.FieldContainer>
-        {!isOTAA && (
-          <Form.Field
-            indexAsKey
-            disabled={disableFactoryPresetFreq}
-            name="mac_settings.factory_preset_frequencies"
-            description={disableFactoryPresetFreq ? m.factoryFreqWarning : undefined}
-            component={KeyValueMap}
-            title={messages.factoryPresetFreqTitle}
-            addMessage={messages.freqAdd}
-            valuePlaceholder={messages.frequencyPlaceholder}
-            tooltipId={tooltipIds.FACTORY_PRESET_FREQUENCIES}
-            encode={factoryPresetFreqEncoder}
-            decode={factoryPresetFreqDecoder}
-          />
-        )}
-      </div>
-      <Form.Field
-        title={messages.clusterSettings}
-        label={m.skipJsRegistration}
-        name="join_server_address"
-        encode={skipJsRegistrationEncoder}
-        decode={skipJsRegistrationDecoder}
-        component={Checkbox}
-        tooltipId={tooltipIds.SKIP_JOIN_SERVER_REGISTRATION}
-      />
-    </Form.CollapseSection>
+        </div>
+        <Form.Field
+          title={messages.clusterSettings}
+          label={m.skipJsRegistration}
+          name="join_server_address"
+          encode={skipJsRegistrationEncoder}
+          decode={skipJsRegistrationDecoder}
+          component={Checkbox}
+          tooltipId={tooltipIds.SKIP_JOIN_SERVER_REGISTRATION}
+        />
+      </Form.CollapseSection>
+      <hr />
+    </>
   )
 }
 
