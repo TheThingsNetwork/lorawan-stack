@@ -205,7 +205,7 @@ const Form = props => {
 
   useEffect(() => {
     // Scroll form notification into view if needed.
-    if (error) {
+    if (error && !isSubmitting) {
       scrollIntoView(notificationRef.current, { behavior: 'smooth' })
       notificationRef.current.focus({ preventScroll: true })
     }
