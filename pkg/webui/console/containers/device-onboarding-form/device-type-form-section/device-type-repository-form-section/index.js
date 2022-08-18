@@ -17,6 +17,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Col, Row } from 'react-grid-system'
 import { useFormikContext } from 'formik'
 import classnames from 'classnames'
+import { get, set } from 'lodash'
 
 import { useFormContext } from '@ttn-lw/components/form'
 
@@ -114,14 +115,23 @@ const DeviceTypeRepositoryFormSection = () => {
   // Apply template once it is fetched and register the template fields so they don't get cleaned.
   React.useEffect(() => {
     if (template && hasCompleted) {
+      // Since the template response will strip zero values, we cannot simply spread the result
+      // over the existing form values. Instead we need to make all zero values explicit
+      // by assigning them as `undefined`, using the provided field mask.
+      const templateFields = template.field_mask.split(',')
+      const endDeviceFill = templateFields.reduce(
+        (device, path) => set(device, path, get(template.end_device, path)),
+        {},
+      )
+
       setValues(values => ({
         ...values,
-        ...template.end_device,
+        ...endDeviceFill,
         version_ids: values.version_ids,
       }))
 
       const hiddenFields = [
-        ...Object.keys(template.end_device),
+        templateFields,
         'network_server_address',
         'application_server_address',
         'join_server_address',

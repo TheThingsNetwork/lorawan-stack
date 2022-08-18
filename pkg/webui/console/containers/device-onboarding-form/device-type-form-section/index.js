@@ -17,7 +17,7 @@ import { merge } from 'lodash'
 
 import Radio from '@ttn-lw/components/radio-button'
 import Form, { useFormContext } from '@ttn-lw/components/form'
-import Modal from '@ttn-lw/components/modal'
+import PortalledModal from '@ttn-lw/components/modal/portalled'
 
 import m from '../messages'
 import { hasCompletedDeviceRepositorySelection, hasSelectedDeviceRepositoryOther } from '../utils'
@@ -80,14 +80,13 @@ const DeviceTypeFormSection = () => {
 
   return (
     <>
-      {showModal && (
-        <Modal
-          buttonMessage={m.changeDeviceTypeButton}
-          message={m.changeDeviceType}
-          title={m.changeDeviceTypeButton}
-          onComplete={handleMethodModalComplete}
-        />
-      )}
+      <PortalledModal
+        buttonMessage={m.changeDeviceTypeButton}
+        message={m.changeDeviceType}
+        title={m.changeDeviceTypeButton}
+        onComplete={handleMethodModalComplete}
+        visible={showModal}
+      />
       <Form.SubTitle title={m.endDeviceType} />
       <Form.Field
         title={m.inputMethod}
