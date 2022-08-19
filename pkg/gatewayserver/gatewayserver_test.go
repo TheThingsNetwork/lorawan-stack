@@ -102,7 +102,7 @@ func TestGatewayServer(t *testing.T) {
 					RequireRegisteredGateways:         false,
 					UpdateGatewayLocationDebounceTime: 0,
 					ConnectionStatsTTL:                (1 << 3) * test.Delay,
-					ConnectionStatsDisconnectTTL:      (1 << 3) * test.Delay,
+					ConnectionStatsDisconnectTTL:      (1 << 6) * test.Delay,
 					Stats:                             statsRegistry,
 					FetchGatewayInterval:              time.Minute,
 					FetchGatewayJitter:                1,
@@ -731,7 +731,7 @@ func TestGatewayServer(t *testing.T) {
 				})
 
 				// Wait for gateway disconnection to be processed.
-				time.Sleep(3 * timeout)
+				time.Sleep(6 * timeout)
 
 				t.Run(fmt.Sprintf("Traffic/%v", ptc.Protocol), func(t *testing.T) {
 					a := assertions.New(t)
@@ -1764,7 +1764,7 @@ func TestGatewayServer(t *testing.T) {
 					}
 
 					// Wait for disconnection to be processed.
-					time.Sleep(2 * config.ConnectionStatsDisconnectTTL)
+					time.Sleep(4 * config.ConnectionStatsDisconnectTTL)
 
 					// After canceling the context and awaiting the link, the connection should be gone.
 					t.Run("Disconnected", func(t *testing.T) {
