@@ -1,0 +1,19 @@
+name: Documentation
+
+on:
+  pull_request:
+    paths:
+      - '*.md'
+
+jobs:
+  quality:
+    name: Documentation Quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Lint markdown
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          check-modified-files-only: 'yes'
