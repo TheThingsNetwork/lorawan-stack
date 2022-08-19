@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.21.1] - unreleased
+
+### Added
+
 - New `SearchAccounts` RPC on the `EntityRegistrySearch` service.
 - Prompt user to confirm navigation when changes have not been saved in the payload formatter form to prevent big change-drafts from getting lost.
 - Event data pushed by webhooks can now be filtered with field masks.
@@ -20,17 +34,11 @@ For details about compatibility between different releases, see the **Commitment
 
 - Gateway registration in the Console has been updated to simplify the onboarding experience.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - CLI command `end-device template create` no longer breaks when providing field mask values.
 - Device repository services no longer require ApplicationID in its request URL.
 - Importing ABP devices via the CSV format now correctly handles the missing session key ID.
-
-### Security
 
 ## [3.21.0] - 2022-08-11
 
@@ -2279,7 +2287,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.21.0...v3.21
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.21.1...v3.21
+[3.21.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.21.0...v3.21.1
 [3.21.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.20.2...v3.21.0
 [3.20.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.20.1...v3.20.2
 [3.20.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.20.0...v3.20.1
