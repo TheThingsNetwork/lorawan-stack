@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package devicetemplateconverter_test
+package profilefetcher_test
 
 import (
 	"context"
@@ -20,7 +20,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	mockdr "go.thethings.network/lorawan-stack/v3/pkg/devicerepository/mock"
-	. "go.thethings.network/lorawan-stack/v3/pkg/devicetemplateconverter"
+	. "go.thethings.network/lorawan-stack/v3/pkg/devicetemplateconverter/profilefetcher"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -44,7 +44,8 @@ func Test_VendorIDProfileFetcher_ShouldFetchProfile(t *testing.T) {
 			name: "Valid",
 			device: &ttnpb.EndDevice{
 				VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
-					VendorId: 10,
+					VendorId:        10,
+					VendorProfileId: 10,
 				},
 			},
 			want: true,
@@ -55,7 +56,7 @@ func Test_VendorIDProfileFetcher_ShouldFetchProfile(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			a := assertions.New(t)
-			fetcher := &VendorIDProfileFetcher{}
+			fetcher := NewFetcherByVendorIDs()
 			a.So(fetcher.ShouldFetchProfile(tt.device), should.Equal, tt.want)
 		})
 	}
@@ -133,9 +134,9 @@ func Test_VendorIDProfileFetcher_FetchProfile(t *testing.T) {
 			a := assertions.New(t)
 			drMock := mockdr.New()
 			tt.populateMock(drMock)
-			pf := &VendorIDProfileFetcher{
-				DeviceRepository: drMock,
-			}
+			ctx = NewContextWithFetcher(ctx, MockTemplateFetcher(drMock))
+
+			pf := NewFetcherByVendorIDs()
 			tmpl, err := pf.FetchProfile(ctx, tt.endDevice)
 			if tt.validateErr == nil {
 				a.So(err, should.BeNil)

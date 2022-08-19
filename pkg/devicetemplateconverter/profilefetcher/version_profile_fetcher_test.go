@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package devicetemplateconverter_test
+package profilefetcher_test
 
 import (
 	"context"
@@ -20,7 +20,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	mockdr "go.thethings.network/lorawan-stack/v3/pkg/devicerepository/mock"
-	. "go.thethings.network/lorawan-stack/v3/pkg/devicetemplateconverter"
+	. "go.thethings.network/lorawan-stack/v3/pkg/devicetemplateconverter/profilefetcher"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -59,7 +59,7 @@ func Test_VersionIDProfileFetcher_ShouldFetchProfile(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			a := assertions.New(t)
-			fetcher := &VersionIDProfileFetcher{}
+			fetcher := NewFetcherByVersionIDs()
 			a.So(fetcher.ShouldFetchProfile(tt.device), should.Equal, tt.want)
 		})
 	}
@@ -149,9 +149,8 @@ func Test_VersionIDProfileFetcher_FetchProfile(t *testing.T) {
 			a := assertions.New(t)
 			drMock := mockdr.New()
 			tt.populateMock(drMock)
-			pf := &VersionIDProfileFetcher{
-				DeviceRepository: drMock,
-			}
+			pf := NewFetcherByVersionIDs()
+			ctx = NewContextWithFetcher(ctx, MockTemplateFetcher(drMock))
 			tmpl, err := pf.FetchProfile(ctx, tt.endDevice)
 			if tt.validateErr == nil {
 				a.So(err, should.BeNil)
