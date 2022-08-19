@@ -2100,6 +2100,31 @@
           "parameters": []
         }
       ]
+    },
+    "ListBands": {
+      "file": "lorawan-stack/api/configuration_services.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/configuration/bands",
+          "parameters": []
+        },
+        {
+          "method": "get",
+          "pattern": "/configuration/bands/{band_id}",
+          "parameters": [
+            "band_id"
+          ]
+        },
+        {
+          "method": "get",
+          "pattern": "/configuration/bands/{band_id}/{phy_version}",
+          "parameters": [
+            "band_id",
+            "phy_version"
+          ]
+        }
+      ]
     }
   },
   "ContactInfoRegistry": {

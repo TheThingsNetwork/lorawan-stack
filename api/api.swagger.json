@@ -6025,6 +6025,185 @@
         ]
       }
     },
+    "/configuration/bands": {
+      "get": {
+        "operationId": "Configuration_ListBands",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ListBandsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "band_id",
+            "description": "Optional Band ID to filter the results.\nIf unused, all supported Bands are returned.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "phy_version",
+            "description": "Optional PHY version to filter the results.\nIf unused, all supported versions are returned.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "PHY_UNKNOWN",
+              "PHY_V1_0",
+              "TS001_V1_0",
+              "PHY_V1_0_1",
+              "TS001_V1_0_1",
+              "PHY_V1_0_2_REV_A",
+              "RP001_V1_0_2",
+              "PHY_V1_0_2_REV_B",
+              "RP001_V1_0_2_REV_B",
+              "PHY_V1_1_REV_A",
+              "RP001_V1_1_REV_A",
+              "PHY_V1_1_REV_B",
+              "RP001_V1_1_REV_B",
+              "PHY_V1_0_3_REV_A",
+              "RP001_V1_0_3_REV_A",
+              "RP002_V1_0_0",
+              "RP002_V1_0_1",
+              "RP002_V1_0_2",
+              "RP002_V1_0_3"
+            ],
+            "default": "PHY_UNKNOWN"
+          }
+        ],
+        "tags": [
+          "Configuration"
+        ]
+      }
+    },
+    "/configuration/bands/{band_id}": {
+      "get": {
+        "operationId": "Configuration_ListBands2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ListBandsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "band_id",
+            "description": "Optional Band ID to filter the results.\nIf unused, all supported Bands are returned.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "phy_version",
+            "description": "Optional PHY version to filter the results.\nIf unused, all supported versions are returned.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "PHY_UNKNOWN",
+              "PHY_V1_0",
+              "TS001_V1_0",
+              "PHY_V1_0_1",
+              "TS001_V1_0_1",
+              "PHY_V1_0_2_REV_A",
+              "RP001_V1_0_2",
+              "PHY_V1_0_2_REV_B",
+              "RP001_V1_0_2_REV_B",
+              "PHY_V1_1_REV_A",
+              "RP001_V1_1_REV_A",
+              "PHY_V1_1_REV_B",
+              "RP001_V1_1_REV_B",
+              "PHY_V1_0_3_REV_A",
+              "RP001_V1_0_3_REV_A",
+              "RP002_V1_0_0",
+              "RP002_V1_0_1",
+              "RP002_V1_0_2",
+              "RP002_V1_0_3"
+            ],
+            "default": "PHY_UNKNOWN"
+          }
+        ],
+        "tags": [
+          "Configuration"
+        ]
+      }
+    },
+    "/configuration/bands/{band_id}/{phy_version}": {
+      "get": {
+        "operationId": "Configuration_ListBands3",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ListBandsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "band_id",
+            "description": "Optional Band ID to filter the results.\nIf unused, all supported Bands are returned.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "phy_version",
+            "description": "Optional PHY version to filter the results.\nIf unused, all supported versions are returned.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "PHY_UNKNOWN",
+              "PHY_V1_0",
+              "TS001_V1_0",
+              "PHY_V1_0_1",
+              "TS001_V1_0_1",
+              "PHY_V1_0_2_REV_A",
+              "RP001_V1_0_2",
+              "PHY_V1_0_2_REV_B",
+              "RP001_V1_0_2_REV_B",
+              "PHY_V1_1_REV_A",
+              "RP001_V1_1_REV_A",
+              "PHY_V1_1_REV_B",
+              "RP001_V1_1_REV_B",
+              "PHY_V1_0_3_REV_A",
+              "RP001_V1_0_3_REV_A",
+              "RP002_V1_0_0",
+              "RP002_V1_0_1",
+              "RP002_V1_0_2",
+              "RP002_V1_0_3"
+            ]
+          }
+        ],
+        "tags": [
+          "Configuration"
+        ]
+      }
+    },
     "/configuration/frequency-plans": {
       "get": {
         "operationId": "Configuration_ListFrequencyPlans",
@@ -16711,6 +16890,72 @@
         }
       }
     },
+    "BandDescriptionBandDataRate": {
+      "type": "object",
+      "properties": {
+        "rate": {
+          "$ref": "#/definitions/v3DataRate"
+        }
+      }
+    },
+    "BandDescriptionBeacon": {
+      "type": "object",
+      "properties": {
+        "data_rate_index": {
+          "$ref": "#/definitions/v3DataRateIndex"
+        },
+        "coding_rate": {
+          "type": "string"
+        },
+        "inverted_polarity": {
+          "type": "boolean"
+        }
+      }
+    },
+    "BandDescriptionDwellTime": {
+      "type": "object",
+      "properties": {
+        "uplinks": {
+          "type": "boolean"
+        },
+        "downlinks": {
+          "type": "boolean"
+        }
+      }
+    },
+    "BandDescriptionRx2Parameters": {
+      "type": "object",
+      "properties": {
+        "data_rate_index": {
+          "$ref": "#/definitions/v3DataRateIndex"
+        },
+        "frequency": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "BandDescriptionSubBandParameters": {
+      "type": "object",
+      "properties": {
+        "min_frequency": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "max_frequency": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "duty_cycle": {
+          "type": "number",
+          "format": "float"
+        },
+        "max_eirp": {
+          "type": "number",
+          "format": "float"
+        }
+      }
+    },
     "BatchUpdateEndDeviceLastSeenRequestEndDeviceLastSeenUpdate": {
       "type": "object",
       "properties": {
@@ -17246,6 +17491,17 @@
         },
         "create_organizations": {
           "type": "boolean"
+        }
+      }
+    },
+    "ListBandsResponseVersionedBandDescription": {
+      "type": "object",
+      "properties": {
+        "band": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v3BandDescription"
+          }
         }
       }
     },
@@ -19494,6 +19750,129 @@
         }
       }
     },
+    "v3BandDescription": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "beacon": {
+          "$ref": "#/definitions/BandDescriptionBeacon"
+        },
+        "ping_slot_frequency": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "max_uplink_channels": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "uplink_channels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3BandDescriptionChannel"
+          }
+        },
+        "max_downlink_channels": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "downlink_channels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3BandDescriptionChannel"
+          }
+        },
+        "sub_bands": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BandDescriptionSubBandParameters"
+          }
+        },
+        "data_rates": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/BandDescriptionBandDataRate"
+          }
+        },
+        "freq_multiplier": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "implements_cf_list": {
+          "type": "boolean"
+        },
+        "cf_list_type": {
+          "$ref": "#/definitions/v3CFListType"
+        },
+        "receive_delay_1": {
+          "type": "string"
+        },
+        "receive_delay_2": {
+          "type": "string"
+        },
+        "join_accept_delay_1": {
+          "type": "string"
+        },
+        "join_accept_delay_2": {
+          "type": "string"
+        },
+        "max_fcnt_gap": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "supports_dynamic_adr": {
+          "type": "boolean"
+        },
+        "adr_ack_limit": {
+          "$ref": "#/definitions/v3ADRAckLimitExponent"
+        },
+        "min_retransmit_timeout": {
+          "type": "string"
+        },
+        "max_retransmit_timeout": {
+          "type": "string"
+        },
+        "tx_offset": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "max_adr_data_rate_index": {
+          "$ref": "#/definitions/v3DataRateIndex"
+        },
+        "tx_param_setup_req_support": {
+          "type": "boolean"
+        },
+        "default_max_eirp": {
+          "type": "number",
+          "format": "float"
+        },
+        "default_rx2_parameters": {
+          "$ref": "#/definitions/BandDescriptionRx2Parameters"
+        },
+        "boot_dwell_time": {
+          "$ref": "#/definitions/BandDescriptionDwellTime"
+        }
+      }
+    },
+    "v3BandDescriptionChannel": {
+      "type": "object",
+      "properties": {
+        "frequency": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "min_data_rate": {
+          "$ref": "#/definitions/v3DataRateIndex"
+        },
+        "max_data_rate": {
+          "$ref": "#/definitions/v3DataRateIndex"
+        }
+      }
+    },
     "v3BatchGetGatewayConnectionStatsRequest": {
       "type": "object",
       "properties": {
@@ -21738,6 +22117,17 @@
         },
         "coding_rate": {
           "type": "string"
+        }
+      }
+    },
+    "v3ListBandsResponse": {
+      "type": "object",
+      "properties": {
+        "descriptions": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/ListBandsResponseVersionedBandDescription"
+          }
         }
       }
     },
