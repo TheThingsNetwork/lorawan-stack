@@ -60,7 +60,7 @@ func (protobufv2) FromDownlink(down *ttnpb.DownlinkMessage, _ *ttnpb.GatewayIden
 	switch dr := settings.DataRate.Modulation.(type) {
 	case *ttnpb.DataRate_Lora:
 		lorawan.Modulation = ttnpbv2.Modulation_LORA
-		lorawan.CodingRate = settings.CodingRate
+		lorawan.CodingRate = dr.Lora.CodingRate
 		lorawan.DataRate = fmt.Sprintf("SF%dBW%d", dr.Lora.SpreadingFactor, dr.Lora.Bandwidth/1000)
 	case *ttnpb.DataRate_Fsk:
 		lorawan.Modulation = ttnpbv2.Modulation_FSK
@@ -112,7 +112,7 @@ func (protobufv2) ToUplink(message []byte, ids *ttnpb.GatewayIdentifiers) (*ttnp
 			return nil, err
 		}
 		settings.DataRate = loraDr.DataRate
-		settings.CodingRate = lorawanMetadata.CodingRate
+		settings.DataRate.Modulation.(*ttnpb.DataRate_Lora).Lora.CodingRate = lorawanMetadata.CodingRate
 	case ttnpbv2.Modulation_FSK:
 		settings.DataRate = &ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_Fsk{

@@ -50,6 +50,8 @@ For details about compatibility between different releases, see the **Commitment
 ### Changed
 
 - Gateway registration in the Console has been updated to simplify the onboarding experience.
+- LoRa coding rate now defined in `DataRate` instead of `Band`.
+- Removed coding rate from `TxSettings` as it is now defined in `DataRate`.
 
 ### Fixed
 

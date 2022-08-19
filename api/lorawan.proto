@@ -446,8 +446,7 @@ message TxSettings {
   // Data rate.
   DataRate data_rate = 1 [(validate.rules).message.required = true];
   reserved 2; // data_rate_index
-  // LoRa coding rate.
-  string coding_rate = 3;
+  reserved 3; // coding_rate
   // Frequency (Hz).
   uint64 frequency = 4;
   // Send a CRC in the packet; only on uplink; on downlink, CRC should not be enabled.

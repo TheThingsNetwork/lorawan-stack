@@ -512,11 +512,11 @@ func TestTraffic(t *testing.T) {
 									Lora: &ttnpb.LoRaDataRate{
 										Bandwidth:       125000,
 										SpreadingFactor: 7,
+										CodingRate:      "4/5",
 									},
 								},
 							},
-							CodingRate: "4/5",
-							Frequency:  869525000,
+							Frequency: 869525000,
 						},
 					},
 				},

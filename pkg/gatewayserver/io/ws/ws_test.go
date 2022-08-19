@@ -868,8 +868,7 @@ func TestTraffic(t *testing.T) {
 					Snr:         9.25,
 				}},
 				Settings: &ttnpb.TxSettings{
-					Frequency:  868300000,
-					CodingRate: "4/5",
+					Frequency: 868300000,
 					DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
@@ -931,10 +930,9 @@ func TestTraffic(t *testing.T) {
 					},
 				},
 				Settings: &ttnpb.TxSettings{
-					Frequency:  868300000,
-					Time:       ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
-					Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
-					CodingRate: "4/5",
+					Frequency: 868300000,
+					Time:      ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
+					Timestamp: (uint32)(12666373963464220 & 0xFFFFFFFF),
 					DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,

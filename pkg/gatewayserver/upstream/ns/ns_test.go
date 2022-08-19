@@ -83,11 +83,11 @@ func TestNSHandler(t *testing.T) {
 						Snr:         9.25,
 					}},
 					Settings: &ttnpb.TxSettings{
-						Frequency:  868300000,
-						CodingRate: "4/5",
+						Frequency: 868300000,
 						DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 							SpreadingFactor: 11,
 							Bandwidth:       125000,
+							CodingRate:      "4/5",
 						}}},
 					},
 				},

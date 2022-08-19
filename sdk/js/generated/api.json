@@ -30820,18 +30820,6 @@
               }
             },
             {
-              "name": "coding_rate",
-              "description": "LoRa coding rate.",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
               "name": "frequency",
               "description": "Frequency (Hz).",
               "label": "",

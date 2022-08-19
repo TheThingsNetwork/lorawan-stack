@@ -6466,7 +6466,6 @@ On downlink, this is a scheduled transmission.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `data_rate` | [`DataRate`](#ttn.lorawan.v3.DataRate) |  | Data rate. |
-| `coding_rate` | [`string`](#string) |  | LoRa coding rate. |
 | `frequency` | [`uint64`](#uint64) |  | Frequency (Hz). |
 | `enable_crc` | [`bool`](#bool) |  | Send a CRC in the packet; only on uplink; on downlink, CRC should not be enabled. |
 | `timestamp` | [`uint32`](#uint32) |  | Timestamp of the gateway concentrator when the uplink message was received, or when the downlink message should be transmitted (microseconds). On downlink, set timestamp to 0 and time to null to use immediate scheduling. |

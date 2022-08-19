@@ -199,13 +199,13 @@ func simulate(cmd *cobra.Command, forUp func(*ttnpb.UplinkMessage) error, forDow
 					Lora: &ttnpb.LoRaDataRate{
 						Bandwidth:       uplinkParams.Bandwidth,
 						SpreadingFactor: uplinkParams.SpreadingFactor,
+						CodingRate:      "4/5",
 					},
 				},
 			},
-			CodingRate: "4/5",
-			Frequency:  uplinkParams.Frequency,
-			Timestamp:  uplinkParams.Timestamp,
-			Time:       ttnpb.ProtoTime(uplinkParams.Time),
+			Frequency: uplinkParams.Frequency,
+			Timestamp: uplinkParams.Timestamp,
+			Time:      ttnpb.ProtoTime(uplinkParams.Time),
 		},
 		RxMetadata: []*ttnpb.RxMetadata{
 			{

@@ -590,12 +590,9 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		if int(ids.AntennaIndex) < len(c.gateway.Antennas) {
 			settings.Downlink.TxPower -= c.gateway.Antennas[ids.AntennaIndex].Gain
 		}
-		switch mod := rx.dataRate.Modulation.(type) {
+		switch rx.dataRate.Modulation.(type) {
 		case *ttnpb.DataRate_Lora:
-			settings.CodingRate = mod.Lora.CodingRate
 			settings.Downlink.InvertPolarization = true
-		case *ttnpb.DataRate_Lrfhss:
-			settings.CodingRate = mod.Lrfhss.CodingRate
 		}
 		var f func(context.Context, scheduling.Options) (scheduling.Emission, scheduling.ConcentratorTime, error)
 		switch request.Class {

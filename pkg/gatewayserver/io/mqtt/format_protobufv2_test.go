@@ -45,11 +45,11 @@ func TestProtobufV2Downlink(t *testing.T) {
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 12,
+							CodingRate:      "4/5",
 						},
 					},
 				},
-				CodingRate: "4/5",
-				Frequency:  863000000,
+				Frequency: 863000000,
 				Downlink: &ttnpb.TxSettings_Downlink{
 					TxPower: 16.15,
 				},
@@ -107,10 +107,10 @@ func TestProtobufV2Uplinks(t *testing.T) {
 				Lora: &ttnpb.LoRaDataRate{
 					Bandwidth:       125000,
 					SpreadingFactor: 7,
+					CodingRate:      "4/5",
 				},
 			},
 		},
-		CodingRate: "4/5",
 	}
 	validV2Metadata := ttnpbv2.GatewayRxMetadata{
 		GatewayId: "gateway-id",

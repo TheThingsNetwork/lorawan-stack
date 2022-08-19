@@ -28,11 +28,11 @@ import (
 func Compute(payloadSize int, settings *ttnpb.TxSettings) (d time.Duration, err error) {
 	switch dr := settings.DataRate.Modulation.(type) {
 	case *ttnpb.DataRate_Lora:
-		return computeLoRa(payloadSize, settings.Frequency, uint8(dr.Lora.SpreadingFactor), dr.Lora.Bandwidth, settings.CodingRate, settings.EnableCrc)
+		return computeLoRa(payloadSize, settings.Frequency, uint8(dr.Lora.SpreadingFactor), dr.Lora.Bandwidth, dr.Lora.CodingRate, settings.EnableCrc)
 	case *ttnpb.DataRate_Fsk:
 		return computeFSK(payloadSize, settings.Frequency, dr.Fsk.BitRate, settings.EnableCrc)
 	case *ttnpb.DataRate_Lrfhss:
-		return computeLRFHSS(payloadSize, settings.CodingRate, settings.EnableCrc)
+		return computeLRFHSS(payloadSize, dr.Lrfhss.CodingRate, settings.EnableCrc)
 	default:
 		panic("invalid modulation")
 	}
