@@ -24,8 +24,6 @@ type GatewayAntenna struct {
 	GatewayID string `gorm:"type:UUID;unique_index:gateway_antenna_id_index;index:gateway_antenna_gateway_index;not null"`
 	Index     int    `gorm:"unique_index:gateway_antenna_id_index;not null"`
 
-	Attributes []Attribute `gorm:"polymorphic:Entity;polymorphic_value:gateway"`
-
 	Gain float32
 
 	Location
@@ -49,10 +47,9 @@ func (a GatewayAntenna) toPB() *ttnpb.GatewayAntenna {
 		}
 	}
 	return &ttnpb.GatewayAntenna{
-		Gain:       a.Gain,
-		Location:   loc,
-		Attributes: attributes(a.Attributes).toMap(),
-		Placement:  ttnpb.GatewayAntennaPlacement(a.Placement),
+		Gain:      a.Gain,
+		Location:  loc,
+		Placement: ttnpb.GatewayAntennaPlacement(a.Placement),
 	}
 }
 
@@ -64,6 +61,5 @@ func (a *GatewayAntenna) fromPB(pb *ttnpb.GatewayAntenna) {
 		Altitude:  pb.GetLocation().GetAltitude(),
 		Accuracy:  pb.GetLocation().GetAccuracy(),
 	}
-	a.Attributes = attributes(a.Attributes).updateFromMap(pb.Attributes)
 	a.Placement = int(pb.Placement)
 }

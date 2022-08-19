@@ -13,6 +13,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Deprecated `attributes` from `GatewayAntenna` definition. While it was present in the API it was never stored in the database.
+
 ### Deprecated
 
 ### Removed

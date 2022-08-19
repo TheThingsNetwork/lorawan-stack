@@ -18808,6 +18808,7 @@
               "oneofdecl": "",
               "defaultValue": "",
               "options": {
+                "deprecated": true,
                 "validate.rules": [
                   {
                     "name": "map.max_pairs",
