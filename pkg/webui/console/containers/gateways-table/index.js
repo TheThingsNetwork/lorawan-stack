@@ -243,7 +243,7 @@ const GatewaysTable = props => {
     <FetchTable
       entity="gateways"
       defaultOrder="-created_at"
-      addMessage={sharedMessages.addGateway}
+      addMessage={sharedMessages.registerGateway}
       headers={headers}
       getItemsAction={getGateways}
       baseDataSelector={baseDataSelector}

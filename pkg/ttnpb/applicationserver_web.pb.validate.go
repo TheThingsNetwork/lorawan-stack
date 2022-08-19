@@ -680,6 +680,18 @@ func (m *ApplicationWebhookTemplate) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "field_mask":
+
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationWebhookTemplateValidationError{
+						field:  "field_mask",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return ApplicationWebhookTemplateValidationError{
 				field:  name,
@@ -1239,6 +1251,18 @@ func (m *ApplicationWebhook) ValidateFields(paths ...string) error {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationWebhookValidationError{
 						field:  "health_status",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "field_mask":
+
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationWebhookValidationError{
+						field:  "field_mask",
 						reason: "embedded message failed validation",
 						cause:  err,
 					}

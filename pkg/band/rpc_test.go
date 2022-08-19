@@ -308,6 +308,22 @@ func TestGetPhyVersions(t *testing.T) {
 						},
 					},
 					{
+						BandId: "MA_869_870_DRAFT",
+						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_3,
+							ttnpb.PHYVersion_RP002_V1_0_2,
+							ttnpb.PHYVersion_RP002_V1_0_1,
+							ttnpb.PHYVersion_RP002_V1_0_0,
+							ttnpb.PHYVersion_RP001_V1_0_3_REV_A,
+							ttnpb.PHYVersion_RP001_V1_1_REV_B,
+							ttnpb.PHYVersion_RP001_V1_1_REV_A,
+							ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
+							ttnpb.PHYVersion_RP001_V1_0_2,
+							ttnpb.PHYVersion_TS001_V1_0_1,
+							ttnpb.PHYVersion_TS001_V1_0,
+						},
+					},
+					{
 						BandId: "RU_864_870",
 						PhyVersions: []ttnpb.PHYVersion{
 							ttnpb.PHYVersion_RP002_V1_0_3,

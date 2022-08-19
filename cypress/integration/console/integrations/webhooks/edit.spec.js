@@ -107,11 +107,18 @@ describe('Application Webhook', () => {
     cy.findByLabelText('Uplink message').should('not.be.checked')
   })
 
-  it('succeeds adding headers', () => {
+  it('succeeds adding headers and filters', () => {
     cy.findByRole('button', { name: /Add header entry/ }).click()
 
     cy.findByTestId('_headers[0].key').type('webhook-test-key')
     cy.findByTestId('_headers[0].value').type('webhook-test-value')
+
+    cy.findByRole('button', { name: /Add filter path/ }).click()
+    cy.findByText('Filter event data')
+      .parents('div[data-test-id="form-field"]')
+      .find('input')
+      .first()
+      .selectOption('received_at')
 
     cy.findByRole('button', { name: 'Save changes' }).click()
 
@@ -131,6 +138,10 @@ describe('Application Webhook', () => {
       .should('be.visible')
       .and('have.attr', 'value')
       .and('eq', 'webhook-test-value')
+    cy.get('input[name="field_mask.paths[0].value"]')
+      .should('exist')
+      .and('have.attr', 'value')
+      .and('eq', 'received_at')
   })
 
   it('succeeds adding basic authorization header', () => {

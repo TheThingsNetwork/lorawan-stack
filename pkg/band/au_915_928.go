@@ -30,7 +30,7 @@ var (
 		{13, 13, 12, 11},
 	}
 
-	au915928DownlinkDRTable = [7][6]ttnpb.DataRateIndex{
+	au915928DownlinkDRTable = [8][6]ttnpb.DataRateIndex{
 		{8, 8, 8, 8, 8, 8},
 		{9, 8, 8, 8, 8, 8},
 		{10, 9, 8, 8, 8, 8},
@@ -38,6 +38,7 @@ var (
 		{12, 11, 10, 9, 8, 8},
 		{13, 12, 11, 10, 9, 8},
 		{13, 13, 12, 11, 10, 9},
+		{9, 8, 8, 8, 8, 8},
 	}
 
 	au915928UplinkChannels = func(delta ttnpb.DataRateIndex) []Channel {

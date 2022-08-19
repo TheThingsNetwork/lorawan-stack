@@ -108,10 +108,13 @@ export const decodeValues = backendValues => {
 
 export const blankValues = {
   ids: {
-    webhook_id: undefined,
+    webhook_id: '',
   },
-  base_url: undefined,
+  base_url: '',
   format: 'json',
+  field_mask: {
+    paths: [],
+  },
   downlink_api_key: '',
   uplink_message: null,
   join_accept: null,

@@ -39,7 +39,7 @@ export default ({
 }) => {
   @storeConnect(
     state => ({
-      options: [...additionalOptions, ...optionsFormatter(optionsSelector(state))],
+      options: [...optionsFormatter(optionsSelector(state)), ...additionalOptions],
       error: errorSelector(state),
       fetching: fetchingSelector(state),
     }),

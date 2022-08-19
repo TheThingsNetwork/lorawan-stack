@@ -19,7 +19,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
@@ -2441,7 +2440,7 @@ func TestHandleJoin(t *testing.T) {
 				)).(*joinserver.JoinServer)
 				componenttest.StartComponent(t, c)
 
-				pb := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
+				pb := ttnpb.Clone(tc.Device)
 
 				start := time.Now()
 
@@ -2468,7 +2467,7 @@ func TestHandleJoin(t *testing.T) {
 						if !a.So(stored, should.BeNil) {
 							t.Fatal("Registry is not empty")
 						}
-						return CopyEndDevice(pb), []string{
+						return ttnpb.Clone(pb), []string{
 							"application_server_address",
 							"application_server_id",
 							"application_server_kek_label",
@@ -2500,7 +2499,7 @@ func TestHandleJoin(t *testing.T) {
 				pb.UpdatedAt = ret.UpdatedAt
 				a.So(ret, should.HaveEmptyDiff, pb)
 
-				res, err := js.HandleJoin(ctx, deepcopy.Copy(tc.JoinRequest).(*ttnpb.JoinRequest), tc.Authorizer)
+				res, err := js.HandleJoin(ctx, ttnpb.Clone(tc.JoinRequest), tc.Authorizer)
 				if tc.ErrorAssertion != nil {
 					if !a.So(err, should.BeError) || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 						t.Fatalf("Received an unexpected error: %s", err)
@@ -2512,7 +2511,7 @@ func TestHandleJoin(t *testing.T) {
 				if !a.So(err, should.BeNil) || !a.So(res, should.NotBeNil) {
 					t.FailNow()
 				}
-				expectedResp := deepcopy.Copy(tc.JoinResponse).(*ttnpb.JoinResponse)
+				expectedResp := ttnpb.Clone(tc.JoinResponse)
 				a.So(res.SessionKeys.SessionKeyId, should.NotBeEmpty)
 				expectedResp.SessionKeys.SessionKeyId = res.SessionKeys.SessionKeyId
 				a.So(res, should.Resemble, expectedResp)
@@ -2548,7 +2547,7 @@ func TestHandleJoin(t *testing.T) {
 				pb.Ids.DevAddr = tc.JoinRequest.DevAddr
 				a.So(ret, should.HaveEmptyDiff, pb)
 
-				res, err = js.HandleJoin(ctx, deepcopy.Copy(tc.JoinRequest).(*ttnpb.JoinRequest), tc.Authorizer)
+				res, err = js.HandleJoin(ctx, ttnpb.Clone(tc.JoinRequest), tc.Authorizer)
 				if !tc.Device.ResetsJoinNonces {
 					a.So(err, should.BeError)
 					a.So(res, should.BeNil)

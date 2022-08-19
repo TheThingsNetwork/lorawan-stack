@@ -317,3 +317,17 @@ func ApplySessionKeysFieldMask(dst, src *SessionKeys, paths ...string) (*Session
 func FilterGetSessionKeys(pb *SessionKeys, paths ...string) (*SessionKeys, error) {
 	return ApplySessionKeysFieldMask(nil, pb, AddImplicitSessionKeysGetFields(paths...)...)
 }
+
+// IncludeFields returns the given paths with the given search paths to include.
+func IncludeFields(paths []string, includePaths ...string) []string {
+	if len(paths) == 0 {
+		return paths
+	}
+	included := make([]string, 0, len(paths))
+	for _, path := range paths {
+		if HasAnyField(includePaths, path) {
+			included = append(included, path)
+		}
+	}
+	return included
+}

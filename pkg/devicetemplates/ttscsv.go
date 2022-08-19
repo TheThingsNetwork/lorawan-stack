@@ -18,12 +18,15 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"crypto/rand"
 	"encoding/csv"
 	"fmt"
 	"io"
 	"strconv"
 	"strings"
+	"time"
 
+	"github.com/oklog/ulid/v2"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -32,6 +35,8 @@ import (
 
 // TTSCSV is the device template converter ID.
 const TTSCSV = "the-things-stack-csv"
+
+var errGenerateSessionKeyID = errors.DefineUnavailable("generate_session_key_id", "generate session key ID")
 
 type ttsCSV struct{}
 
@@ -233,7 +238,13 @@ var csvFieldSetters = map[string]csvFieldSetterFunc{
 			dst.Session = &ttnpb.Session{}
 		}
 		if dst.Session.Keys == nil {
-			dst.Session.Keys = &ttnpb.SessionKeys{}
+			skID, err := ulid.New(ulid.Timestamp(time.Now()), rand.Reader)
+			if err != nil {
+				return nil, errGenerateSessionKeyID.WithCause(err)
+			}
+			dst.Session.Keys = &ttnpb.SessionKeys{
+				SessionKeyId: skID[:],
+			}
 		}
 		dst.Session.Keys.AppSKey = &ttnpb.KeyEnvelope{
 			Key: key.Bytes(),
@@ -249,7 +260,13 @@ var csvFieldSetters = map[string]csvFieldSetterFunc{
 			dst.Session = &ttnpb.Session{}
 		}
 		if dst.Session.Keys == nil {
-			dst.Session.Keys = &ttnpb.SessionKeys{}
+			skID, err := ulid.New(ulid.Timestamp(time.Now()), rand.Reader)
+			if err != nil {
+				return nil, errGenerateSessionKeyID.WithCause(err)
+			}
+			dst.Session.Keys = &ttnpb.SessionKeys{
+				SessionKeyId: skID[:],
+			}
 		}
 		dst.Session.Keys.FNwkSIntKey = &ttnpb.KeyEnvelope{
 			Key: key.Bytes(),

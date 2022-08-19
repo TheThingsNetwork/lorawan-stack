@@ -245,7 +245,7 @@ const Form = props => {
 }
 
 Form.propTypes = {
-  children: PropTypes.node.isRequired,
+  children: PropTypes.oneOfType([PropTypes.node, PropTypes.func]).isRequired,
   className: PropTypes.string,
   disabled: PropTypes.bool,
   enableReinitialize: PropTypes.bool,

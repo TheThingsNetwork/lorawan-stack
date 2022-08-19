@@ -68,6 +68,7 @@ const WebhookAdd = props => {
         downlink_queue_invalidated: pathExpand(template.downlink_queue_invalidated, fields),
         location_solved: pathExpand(template.location_solved, fields),
         service_data: pathExpand(template.service_data, fields),
+        field_mask: template.field_mask,
       }
 
       if (template.create_downlink_api_key) {

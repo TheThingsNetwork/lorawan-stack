@@ -23,7 +23,6 @@ import (
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/gogo/protobuf/proto"
-	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
@@ -271,7 +270,7 @@ func TestTraffic(t *testing.T) {
 				case up := <-conn.Up():
 					if tc.OK {
 						a.So(time.Since(*ttnpb.StdTime(up.Message.ReceivedAt)), should.BeLessThan, timeout)
-						expected := deepcopy.Copy(tc.Message).(*ttnpb.UplinkMessage)
+						expected := ttnpb.Clone(tc.Message).(*ttnpb.UplinkMessage)
 						expected.ReceivedAt = up.Message.ReceivedAt
 						a.So(up.Message, should.Resemble, expected)
 					} else {

@@ -17,7 +17,6 @@ import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 import classnames from 'classnames'
 
-import Input from '@ttn-lw/components/input'
 import Button from '@ttn-lw/components/button'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -88,12 +87,20 @@ class Entry extends React.Component {
   }
 
   render() {
-    const { keyPlaceholder, valuePlaceholder, value, indexAsKey, readOnly } = this.props
+    const {
+      keyPlaceholder,
+      valuePlaceholder,
+      value,
+      indexAsKey,
+      readOnly,
+      inputElement: InputElement,
+      additionalInputProps,
+    } = this.props
 
     return (
       <div className={style.entriesRow}>
         {!indexAsKey && (
-          <Input
+          <InputElement
             data-test-id={this._getKeyInputName()}
             className={style.input}
             name={this._getKeyInputName()}
@@ -104,9 +111,10 @@ class Entry extends React.Component {
             value={value.key}
             readOnly={readOnly}
             code
+            {...additionalInputProps}
           />
         )}
-        <Input
+        <InputElement
           data-test-id={this._getValueInputName()}
           className={classnames(style.input, { [style.inputIndexAsKey]: indexAsKey })}
           name={this._getValueInputName()}
@@ -117,6 +125,7 @@ class Entry extends React.Component {
           value={indexAsKey ? value : value.value}
           readOnly={readOnly}
           code
+          {...additionalInputProps}
         />
         <Button
           type="button"
@@ -132,8 +141,10 @@ class Entry extends React.Component {
 }
 
 Entry.propTypes = {
+  additionalInputProps: PropTypes.shape({}).isRequired,
   index: PropTypes.number.isRequired,
   indexAsKey: PropTypes.bool.isRequired,
+  inputElement: PropTypes.elementType.isRequired,
   keyPlaceholder: PropTypes.message.isRequired,
   name: PropTypes.string.isRequired,
   onBlur: PropTypes.func.isRequired,

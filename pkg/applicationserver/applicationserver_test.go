@@ -29,7 +29,6 @@ import (
 	mqttserver "github.com/TheThingsIndustries/mystique/pkg/server"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/mohae/deepcopy"
 	nats_server "github.com/nats-io/nats-server/v2/server"
 	nats_test_server "github.com/nats-io/nats-server/v2/test"
 	nats_client "github.com/nats-io/nats.go"
@@ -2402,7 +2401,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 				ns.reset()
 				devsFlush()
 				deviceRegistry.Set(ctx, registeredDevice.Ids, nil, func(_ *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-					dev := deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice)
+					dev := ttnpb.Clone(registeredDevice)
 					dev.SkipPayloadCryptoOverride = override
 					return dev, []string{
 						"ids",
@@ -2622,7 +2621,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 				ns.reset()
 				devsFlush()
 				deviceRegistry.Set(ctx, registeredDevice.Ids, nil, func(_ *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-					dev := deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice)
+					dev := ttnpb.Clone(registeredDevice)
 					dev.Session = &ttnpb.Session{
 						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 						Keys: &ttnpb.SessionKeys{

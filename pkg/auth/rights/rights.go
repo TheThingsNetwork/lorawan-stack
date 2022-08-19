@@ -18,7 +18,6 @@ package rights
 import (
 	"context"
 
-	"github.com/mohae/deepcopy"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -189,7 +188,7 @@ func NewContextWithAuthInfoCache(ctx context.Context) context.Context {
 
 func cacheAuthInfoInContext(ctx context.Context, res *ttnpb.AuthInfoResponse) {
 	if authInfo, ok := ctx.Value(authInfoCacheKey).(**ttnpb.AuthInfoResponse); ok {
-		*authInfo = deepcopy.Copy(res).(*ttnpb.AuthInfoResponse)
+		*authInfo = ttnpb.Clone(res)
 	}
 }
 

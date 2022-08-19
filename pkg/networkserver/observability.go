@@ -148,6 +148,12 @@ var (
 		events.WithErrorDataType(),
 		events.WithPropagateToParent(),
 	)
+	evtRXParametersFail = events.Define(
+		"ns.down.rx.parameters.fail", "failed to compute RX parameters",
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithErrorDataType(),
+		events.WithPropagateToParent(),
+	)
 )
 
 const (

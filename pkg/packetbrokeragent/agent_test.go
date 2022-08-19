@@ -25,7 +25,6 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	mappingpb "go.packetbroker.org/api/mapping/v2"
 	packetbroker "go.packetbroker.org/api/v3"
@@ -858,7 +857,7 @@ func TestHomeNetwork(t *testing.T) {
 				a.So(nsMsg.CorrelationIds, should.HaveLength, 2)
 				a.So(*ttnpb.StdTime(nsMsg.ReceivedAt), should.HappenBetween, before, time.Now()) // Packet Broker Agent sets local time on receive.
 
-				expected := deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
+				expected := ttnpb.Clone(tc.UplinkMessage)
 				expected.CorrelationIds = nsMsg.CorrelationIds
 				expected.ReceivedAt = nsMsg.ReceivedAt
 				for _, md := range expected.RxMetadata {

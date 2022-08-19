@@ -91,7 +91,7 @@
     },
     "4": {
       "MaxMACPayloadSize": {
-        "false": 230,
+        "false": 250,
         "true": 133
       },
       "Rate": {
@@ -103,7 +103,7 @@
     },
     "5": {
       "MaxMACPayloadSize": {
-        "false": 230,
+        "false": 250,
         "true": 250
       },
       "Rate": {
@@ -115,7 +115,7 @@
     },
     "6": {
       "MaxMACPayloadSize": {
-        "false": 230,
+        "false": 250,
         "true": 250
       },
       "Rate": {
@@ -127,7 +127,7 @@
     },
     "7": {
       "MaxMACPayloadSize": {
-        "false": 230,
+        "false": 250,
         "true": 250
       },
       "Rate": {
