@@ -193,6 +193,10 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		return nil, generateDownlinkState{}, errInvalidDataRate.New()
 	}
 	maxDownLen, maxUpLen = maxDownLen-8, maxUpLen-8
+	// Subsequent operations on maxDownLen will decrement its size.
+	// As such, we save the space left for the FOpts and the FRMPayload
+	// in order to pre-allocate the space for the two.
+	maxDownPayloadLen := maxDownLen
 
 	var (
 		fPending bool
@@ -285,7 +289,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 			genState.EventBuilders = append(genState.EventBuilders, st.QueuedEvents...)
 		}
 
-		b := make([]byte, 0, maxDownLen)
+		b := make([]byte, 0, maxDownPayloadLen-maxDownLen)
 		cmds = append(cmds, dev.MacState.PendingRequests...)
 		for _, cmd := range cmds {
 			logger := logger.WithField("cid", cmd.Cid)

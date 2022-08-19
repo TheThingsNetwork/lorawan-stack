@@ -4125,10 +4125,10 @@ func (m *ADRSettings_StaticMode) ValidateFields(paths ...string) error {
 
 		case "nb_trans":
 
-			if m.GetNbTrans() > 15 {
+			if val := m.GetNbTrans(); val < 1 || val > 15 {
 				return ADRSettings_StaticModeValidationError{
 					field:  "nb_trans",
-					reason: "value must be less than or equal to 15",
+					reason: "value must be inside range [1, 15]",
 				}
 			}
 

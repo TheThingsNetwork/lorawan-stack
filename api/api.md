@@ -3185,7 +3185,7 @@ Configuration options for static ADR.
 | ----- | ----------- |
 | `data_rate_index` | <p>`enum.defined_only`: `true`</p> |
 | `tx_power_index` | <p>`uint32.lte`: `15`</p> |
-| `nb_trans` | <p>`uint32.lte`: `15`</p> |
+| `nb_trans` | <p>`uint32.lte`: `15`</p><p>`uint32.gte`: `1`</p> |
 
 ### <a name="ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest">Message `BatchUpdateEndDeviceLastSeenRequest`</a>
 
