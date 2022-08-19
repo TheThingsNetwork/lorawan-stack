@@ -881,7 +881,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	if !ok {
 		trace.Log(ctx, "ns", "message is duplicate (initial round)")
 		registerReceiveDuplicateUplink(ctx, up)
-		return nil
+		return errDuplicateUplink.New()
 	}
 	trace.Log(ctx, "ns", "message is original (initial round)")
 
