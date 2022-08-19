@@ -21,17 +21,20 @@ import (
 	"time"
 
 	assertions "github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-func buildLoRaDownlinkFromParameters(payloadSize int, frequency uint64, dataRate *ttnpb.DataRate) (downlink *ttnpb.DownlinkMessage, err error) {
+func buildLoRaDownlinkFromParameters(
+	payloadSize int, frequency uint64, dataRate *ttnpb.DataRate,
+) (*ttnpb.DownlinkMessage, error) {
 	payload := bytes.Repeat([]byte{0x0}, payloadSize)
 	scheduled := &ttnpb.TxSettings{
 		Frequency: frequency,
 		DataRate:  dataRate,
 	}
-	downlink = &ttnpb.DownlinkMessage{
+	downlink := &ttnpb.DownlinkMessage{
 		RawPayload: payload,
 		Settings: &ttnpb.DownlinkMessage_Scheduled{
 			Scheduled: scheduled,
@@ -66,7 +69,7 @@ func TestInvalidLoRa(t *testing.T) {
 				Lora: &ttnpb.LoRaDataRate{
 					SpreadingFactor: 0,
 					Bandwidth:       125000,
-					CodingRate:      "4/5",
+					CodingRate:      band.Cr4_5,
 				},
 			},
 		})
@@ -82,7 +85,7 @@ func TestInvalidLoRa(t *testing.T) {
 				Lora: &ttnpb.LoRaDataRate{
 					SpreadingFactor: 7,
 					Bandwidth:       0,
-					CodingRate:      "4/5",
+					CodingRate:      band.Cr4_5,
 				},
 			},
 		})
@@ -102,7 +105,7 @@ func TestDifferentLoRaSFs(t *testing.T) {
 			dr: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 7,
 				Bandwidth:       125000,
-				CodingRate:      "4/5",
+				CodingRate:      band.Cr4_5,
 			}}},
 			expected: 41216,
 		},
@@ -110,7 +113,7 @@ func TestDifferentLoRaSFs(t *testing.T) {
 			dr: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 8,
 				Bandwidth:       125000,
-				CodingRate:      "4/5",
+				CodingRate:      band.Cr4_5,
 			}}},
 			expected: 72192,
 		},
@@ -118,7 +121,7 @@ func TestDifferentLoRaSFs(t *testing.T) {
 			dr: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 9,
 				Bandwidth:       125000,
-				CodingRate:      "4/5",
+				CodingRate:      band.Cr4_5,
 			}}},
 			expected: 144384,
 		},
@@ -126,7 +129,7 @@ func TestDifferentLoRaSFs(t *testing.T) {
 			dr: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 10,
 				Bandwidth:       125000,
-				CodingRate:      "4/5",
+				CodingRate:      band.Cr4_5,
 			}}},
 			expected: 288768,
 		},
@@ -134,7 +137,7 @@ func TestDifferentLoRaSFs(t *testing.T) {
 			dr: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 11,
 				Bandwidth:       125000,
-				CodingRate:      "4/5",
+				CodingRate:      band.Cr4_5,
 			}}},
 			expected: 577536,
 		},
@@ -142,7 +145,7 @@ func TestDifferentLoRaSFs(t *testing.T) {
 			dr: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 12,
 				Bandwidth:       125000,
-				CodingRate:      "4/5",
+				CodingRate:      band.Cr4_5,
 			}}},
 			expected: 991232,
 		},
@@ -166,7 +169,7 @@ func TestDifferentLoRaBWs(t *testing.T) {
 			dr: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 7,
 				Bandwidth:       125000,
-				CodingRate:      "4/5",
+				CodingRate:      band.Cr4_5,
 			}}},
 			expected: 41216,
 		},
@@ -174,7 +177,7 @@ func TestDifferentLoRaBWs(t *testing.T) {
 			dr: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 7,
 				Bandwidth:       250000,
-				CodingRate:      "4/5",
+				CodingRate:      band.Cr4_5,
 			}}},
 			expected: 20608,
 		},
@@ -182,7 +185,7 @@ func TestDifferentLoRaBWs(t *testing.T) {
 			dr: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 7,
 				Bandwidth:       500000,
-				CodingRate:      "4/5",
+				CodingRate:      band.Cr4_5,
 			}}},
 			expected: 10304,
 		},
@@ -199,17 +202,19 @@ func TestDifferentLoRaBWs(t *testing.T) {
 func TestDifferentLoRaCRs(t *testing.T) {
 	a := assertions.New(t)
 	crTests := map[string]uint{
-		"4/5": 41216,
-		"4/6": 45312,
-		"4/7": 49408,
-		"4/8": 53504,
+		band.Cr4_5: 41216,
+		band.Cr4_6: 45312,
+		band.Cr4_7: 49408,
+		band.Cr4_8: 53504,
 	}
 	for cr, us := range crTests {
-		dl, err := buildLoRaDownlinkFromParameters(10, 868100000, &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
-			SpreadingFactor: 7,
-			Bandwidth:       125000,
-			CodingRate:      cr,
-		}}})
+		dl, err := buildLoRaDownlinkFromParameters(10, 868100000, &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{
+			Lora: &ttnpb.LoRaDataRate{
+				SpreadingFactor: 7,
+				Bandwidth:       125000,
+				CodingRate:      cr,
+			},
+		}})
 		a.So(err, should.BeNil)
 		toa, err := Compute(len(dl.RawPayload), dl.GetScheduled())
 		a.So(err, should.BeNil)
@@ -229,11 +234,13 @@ func TestDifferentLoRaPayloadSizes(t *testing.T) {
 		19: 51456,
 	}
 	for size, us := range plTests {
-		dl, err := buildLoRaDownlinkFromParameters(size, 868100000, &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
-			SpreadingFactor: 7,
-			Bandwidth:       125000,
-			CodingRate:      "4/5",
-		}}})
+		dl, err := buildLoRaDownlinkFromParameters(size, 868100000, &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{
+			Lora: &ttnpb.LoRaDataRate{
+				SpreadingFactor: 7,
+				Bandwidth:       125000,
+				CodingRate:      band.Cr4_5,
+			},
+		}})
 		a.So(err, should.BeNil)
 		toa, err := Compute(len(dl.RawPayload), dl.GetScheduled())
 		a.So(err, should.BeNil)
@@ -454,10 +461,10 @@ func TestDifferentLoRa2400BWs(t *testing.T) {
 func TestDifferentLoRa2400CRs(t *testing.T) {
 	a := assertions.New(t)
 	crTests := map[string]time.Duration{
-		"4/5LI": 5556700,
-		"4/6LI": 6029600,
-		"4/7LI": 6817700,
-		"4/8LI": 6817700,
+		"4/5LI":      5556700,
+		"4/6LI":      6029600,
+		"4/7LI":      6817700,
+		band.Cr4_8LI: 6817700,
 	}
 	for cr, ns := range crTests {
 		dl, err := buildLoRaDownlinkFromParameters(10, 2422000000, &ttnpb.DataRate{

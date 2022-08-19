@@ -593,6 +593,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		switch rx.dataRate.Modulation.(type) {
 		case *ttnpb.DataRate_Lora:
 			settings.Downlink.InvertPolarization = true
+		default:
 		}
 		var f func(context.Context, scheduling.Options) (scheduling.Emission, scheduling.ConcentratorTime, error)
 		switch request.Class {

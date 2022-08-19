@@ -29,6 +29,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/gorilla/websocket"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
@@ -872,7 +873,7 @@ func TestTraffic(t *testing.T) {
 					DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
-						CodingRate:      "4/5",
+						CodingRate:      band.Cr4_5,
 					}}},
 				},
 			},
@@ -936,7 +937,7 @@ func TestTraffic(t *testing.T) {
 					DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
-						CodingRate:      "4/5",
+						CodingRate:      band.Cr4_5,
 					}}},
 				},
 			},

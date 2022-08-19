@@ -80,7 +80,9 @@ func (p *RxPacket) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &aux); err != nil {
 		return err
 	}
-	switch mod := p.DatR.DataRate.Modulation.(type) {
+	switch mod := p.DatR.DataRate.GetModulation().(type) {
+	case *ttnpb.DataRate_Lora:
+		mod.Lora.CodingRate = p.CodR
 	case *ttnpb.DataRate_Lrfhss:
 		mod.Lrfhss.CodingRate = reduceLRFHSSCodingRate(p.CodR)
 	}

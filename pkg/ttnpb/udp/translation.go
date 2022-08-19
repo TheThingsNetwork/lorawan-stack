@@ -418,7 +418,7 @@ func FromDownlinkMessage(msg *ttnpb.DownlinkMessage) (*TxPacket, error) {
 	}
 
 	tx.DatR.DataRate = scheduled.DataRate
-	switch mod := scheduled.DataRate.Modulation.(type) {
+	switch mod := scheduled.DataRate.GetModulation().(type) {
 	case *ttnpb.DataRate_Lora:
 		tx.CodR = mod.Lora.CodingRate
 		tx.NCRC = !scheduled.EnableCrc

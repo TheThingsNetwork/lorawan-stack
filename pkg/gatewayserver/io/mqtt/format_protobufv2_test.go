@@ -21,6 +21,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	ttnpbv2 "go.thethings.network/lorawan-stack-legacy/v2/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mqtt"
@@ -45,7 +46,7 @@ func TestProtobufV2Downlink(t *testing.T) {
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 12,
-							CodingRate:      "4/5",
+							CodingRate:      band.Cr4_5,
 						},
 					},
 				},
@@ -72,7 +73,7 @@ func TestProtobufV2Downlink(t *testing.T) {
 		},
 		ProtocolConfiguration: &ttnpbv2.ProtocolTxConfiguration{
 			Lorawan: &ttnpbv2.LoRaWANTxConfiguration{
-				CodingRate: "4/5",
+				CodingRate: band.Cr4_5,
 				DataRate:   "SF12BW125",
 				FCnt:       2,
 				Modulation: ttnpbv2.Modulation_LORA,
@@ -94,7 +95,7 @@ func TestProtobufV2Downlink(t *testing.T) {
 func TestProtobufV2Uplinks(t *testing.T) {
 	validV2Settings := ttnpbv2.ProtocolRxMetadata{
 		Lorawan: &ttnpbv2.LoRaWANMetadata{
-			CodingRate:    "4/5",
+			CodingRate:    band.Cr4_5,
 			DataRate:      "SF7BW125",
 			FrequencyPlan: 0,
 			Modulation:    ttnpbv2.Modulation_LORA,
@@ -107,7 +108,7 @@ func TestProtobufV2Uplinks(t *testing.T) {
 				Lora: &ttnpb.LoRaDataRate{
 					Bandwidth:       125000,
 					SpreadingFactor: 7,
-					CodingRate:      "4/5",
+					CodingRate:      band.Cr4_5,
 				},
 			},
 		},

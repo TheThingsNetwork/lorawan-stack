@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	_ "go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
@@ -61,7 +62,7 @@ func generatePushData(eui types.EUI64, status bool, timestamps ...time.Duration)
 			Freq: 868.1,
 			Chan: 2,
 			Modu: "LORA",
-			CodR: "4/5",
+			CodR: band.Cr4_5,
 			DatR: datarate.DR{
 				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{

@@ -39,13 +39,13 @@ var CN_779_787_RP1_V1_0 = Band{
 	},
 
 	DataRates: map[ttnpb.DataRateIndex]DataRate{
-		ttnpb.DataRateIndex_DATA_RATE_0: makeLoRaDataRate(12, 125000, CR_4_5, makeConstMaxMACPayloadSizeFunc(59)),
-		ttnpb.DataRateIndex_DATA_RATE_1: makeLoRaDataRate(11, 125000, CR_4_5, makeConstMaxMACPayloadSizeFunc(59)),
-		ttnpb.DataRateIndex_DATA_RATE_2: makeLoRaDataRate(10, 125000, CR_4_5, makeConstMaxMACPayloadSizeFunc(59)),
-		ttnpb.DataRateIndex_DATA_RATE_3: makeLoRaDataRate(9, 125000, CR_4_5, makeConstMaxMACPayloadSizeFunc(123)),
-		ttnpb.DataRateIndex_DATA_RATE_4: makeLoRaDataRate(8, 125000, CR_4_5, makeConstMaxMACPayloadSizeFunc(250)),
-		ttnpb.DataRateIndex_DATA_RATE_5: makeLoRaDataRate(7, 125000, CR_4_5, makeConstMaxMACPayloadSizeFunc(250)),
-		ttnpb.DataRateIndex_DATA_RATE_6: makeLoRaDataRate(7, 250000, CR_4_5, makeConstMaxMACPayloadSizeFunc(250)),
+		ttnpb.DataRateIndex_DATA_RATE_0: makeLoRaDataRate(12, 125000, Cr4_5, makeConstMaxMACPayloadSizeFunc(59)),
+		ttnpb.DataRateIndex_DATA_RATE_1: makeLoRaDataRate(11, 125000, Cr4_5, makeConstMaxMACPayloadSizeFunc(59)),
+		ttnpb.DataRateIndex_DATA_RATE_2: makeLoRaDataRate(10, 125000, Cr4_5, makeConstMaxMACPayloadSizeFunc(59)),
+		ttnpb.DataRateIndex_DATA_RATE_3: makeLoRaDataRate(9, 125000, Cr4_5, makeConstMaxMACPayloadSizeFunc(123)),
+		ttnpb.DataRateIndex_DATA_RATE_4: makeLoRaDataRate(8, 125000, Cr4_5, makeConstMaxMACPayloadSizeFunc(250)),
+		ttnpb.DataRateIndex_DATA_RATE_5: makeLoRaDataRate(7, 125000, Cr4_5, makeConstMaxMACPayloadSizeFunc(250)),
+		ttnpb.DataRateIndex_DATA_RATE_6: makeLoRaDataRate(7, 250000, Cr4_5, makeConstMaxMACPayloadSizeFunc(250)),
 		ttnpb.DataRateIndex_DATA_RATE_7: makeFSKDataRate(50000, makeConstMaxMACPayloadSizeFunc(250)),
 	},
 	MaxADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
@@ -92,7 +92,7 @@ var CN_779_787_RP1_V1_0 = Band{
 
 	Beacon: Beacon{
 		DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
-		CodingRate:    "4/5",
+		CodingRate:    Cr4_5,
 		Frequencies:   cn779787BeaconFrequencies,
 	},
 	PingSlotFrequencies: cn779787BeaconFrequencies,

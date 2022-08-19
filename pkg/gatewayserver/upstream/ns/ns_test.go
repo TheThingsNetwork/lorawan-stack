@@ -87,7 +87,7 @@ func TestNSHandler(t *testing.T) {
 						DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 							SpreadingFactor: 11,
 							Bandwidth:       125000,
-							CodingRate:      "4/5",
+							CodingRate:      band.Cr4_5,
 						}}},
 					},
 				},

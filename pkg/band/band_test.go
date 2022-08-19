@@ -601,7 +601,7 @@ func TestFindDataRate(t *testing.T) {
 			Lora: &ttnpb.LoRaDataRate{
 				Bandwidth:       500000,
 				SpreadingFactor: 8,
-				CodingRate:      CR_4_5,
+				CodingRate:      Cr4_5,
 			},
 		},
 	}
@@ -616,7 +616,7 @@ func TestFindDataRate(t *testing.T) {
 			Lora: &ttnpb.LoRaDataRate{
 				Bandwidth:       500000,
 				SpreadingFactor: 8,
-				CodingRate:      CR_4_5,
+				CodingRate:      Cr4_5,
 			},
 		},
 	}
@@ -633,7 +633,7 @@ func TestFindDataRate(t *testing.T) {
 			Lora: &ttnpb.LoRaDataRate{
 				Bandwidth:       500000,
 				SpreadingFactor: 12,
-				CodingRate:      CR_4_5,
+				CodingRate:      Cr4_5,
 			},
 		},
 	}
@@ -648,7 +648,7 @@ func TestFindDataRate(t *testing.T) {
 			Lora: &ttnpb.LoRaDataRate{
 				Bandwidth:       500000,
 				SpreadingFactor: 12,
-				CodingRate:      CR_4_5,
+				CodingRate:      Cr4_5,
 			},
 		},
 	}

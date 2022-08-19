@@ -16,12 +16,13 @@ package band
 
 import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 
+// Default LoRa coding rates.
 const (
-	CR_4_5   = "4/5"
-	CR_4_6   = "4/6"
-	CR_4_7   = "4/7"
-	CR_4_8   = "4/8"
-	CR_4_8LI = "4/8LI"
+	Cr4_5   = "4/5"
+	Cr4_6   = "4/6"
+	Cr4_7   = "4/7"
+	Cr4_8   = "4/8"
+	Cr4_8LI = "4/8LI"
 )
 
 // MaxMACPayloadSizeFunc is a function that returns the maximum payload size
@@ -49,7 +50,9 @@ type DataRate struct {
 	MaxMACPayloadSize MaxMACPayloadSizeFunc
 }
 
-func makeLoRaDataRate(spreadingFactor uint8, bandwidth uint32, codingRate string, maximumMACPayloadSize MaxMACPayloadSizeFunc) DataRate {
+func makeLoRaDataRate(
+	spreadingFactor uint8, bandwidth uint32, codingRate string, maximumMACPayloadSize MaxMACPayloadSizeFunc,
+) DataRate {
 	return DataRate{
 		Rate: (&ttnpb.LoRaDataRate{
 			SpreadingFactor: uint32(spreadingFactor),

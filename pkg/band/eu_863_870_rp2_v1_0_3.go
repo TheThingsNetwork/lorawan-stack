@@ -76,13 +76,13 @@ var EU_863_870_RP2_V1_0_3 = Band{
 	},
 
 	DataRates: map[ttnpb.DataRateIndex]DataRate{
-		ttnpb.DataRateIndex_DATA_RATE_0:  makeLoRaDataRate(12, 125000, CR_4_5, makeConstMaxMACPayloadSizeFunc(59)),
-		ttnpb.DataRateIndex_DATA_RATE_1:  makeLoRaDataRate(11, 125000, CR_4_5, makeConstMaxMACPayloadSizeFunc(59)),
-		ttnpb.DataRateIndex_DATA_RATE_2:  makeLoRaDataRate(10, 125000, CR_4_5, makeConstMaxMACPayloadSizeFunc(59)),
-		ttnpb.DataRateIndex_DATA_RATE_3:  makeLoRaDataRate(9, 125000, CR_4_5, makeConstMaxMACPayloadSizeFunc(123)),
-		ttnpb.DataRateIndex_DATA_RATE_4:  makeLoRaDataRate(8, 125000, CR_4_5, makeConstMaxMACPayloadSizeFunc(250)),
-		ttnpb.DataRateIndex_DATA_RATE_5:  makeLoRaDataRate(7, 125000, CR_4_5, makeConstMaxMACPayloadSizeFunc(250)),
-		ttnpb.DataRateIndex_DATA_RATE_6:  makeLoRaDataRate(7, 250000, CR_4_5, makeConstMaxMACPayloadSizeFunc(250)),
+		ttnpb.DataRateIndex_DATA_RATE_0:  makeLoRaDataRate(12, 125000, Cr4_5, makeConstMaxMACPayloadSizeFunc(59)),
+		ttnpb.DataRateIndex_DATA_RATE_1:  makeLoRaDataRate(11, 125000, Cr4_5, makeConstMaxMACPayloadSizeFunc(59)),
+		ttnpb.DataRateIndex_DATA_RATE_2:  makeLoRaDataRate(10, 125000, Cr4_5, makeConstMaxMACPayloadSizeFunc(59)),
+		ttnpb.DataRateIndex_DATA_RATE_3:  makeLoRaDataRate(9, 125000, Cr4_5, makeConstMaxMACPayloadSizeFunc(123)),
+		ttnpb.DataRateIndex_DATA_RATE_4:  makeLoRaDataRate(8, 125000, Cr4_5, makeConstMaxMACPayloadSizeFunc(250)),
+		ttnpb.DataRateIndex_DATA_RATE_5:  makeLoRaDataRate(7, 125000, Cr4_5, makeConstMaxMACPayloadSizeFunc(250)),
+		ttnpb.DataRateIndex_DATA_RATE_6:  makeLoRaDataRate(7, 250000, Cr4_5, makeConstMaxMACPayloadSizeFunc(250)),
 		ttnpb.DataRateIndex_DATA_RATE_7:  makeFSKDataRate(50000, makeConstMaxMACPayloadSizeFunc(250)),
 		ttnpb.DataRateIndex_DATA_RATE_8:  makeLRFHSSDataRate(0, 137000, "1/3", makeConstMaxMACPayloadSizeFunc(58)),
 		ttnpb.DataRateIndex_DATA_RATE_9:  makeLRFHSSDataRate(0, 137000, "2/3", makeConstMaxMACPayloadSizeFunc(123)),
@@ -135,7 +135,7 @@ var EU_863_870_RP2_V1_0_3 = Band{
 
 	Beacon: Beacon{
 		DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
-		CodingRate:    "4/5",
+		CodingRate:    Cr4_5,
 		Frequencies:   eu863870BeaconFrequencies,
 	},
 	PingSlotFrequencies: eu863870BeaconFrequencies,

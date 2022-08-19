@@ -54,7 +54,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 10,
 									Bandwidth:       125000,
-									CodingRate:      "4/5",
+									CodingRate:      band.Cr4_5,
 								},
 							},
 						},
@@ -98,7 +98,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 10,
 									Bandwidth:       125000,
-									CodingRate:      "4/5",
+									CodingRate:      band.Cr4_5,
 								},
 							},
 						},
@@ -176,7 +176,7 @@ func TestToDownlinkMessage(t *testing.T) {
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 10,
 									Bandwidth:       125000,
-									CodingRate:      "4/5",
+									CodingRate:      band.Cr4_5,
 								},
 							},
 						},
@@ -212,7 +212,7 @@ func TestToDownlinkMessage(t *testing.T) {
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 10,
 									Bandwidth:       125000,
-									CodingRate:      "4/5",
+									CodingRate:      band.Cr4_5,
 								},
 							},
 						},

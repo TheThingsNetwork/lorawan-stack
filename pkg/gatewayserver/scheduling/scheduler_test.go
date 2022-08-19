@@ -69,7 +69,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 7,
-							CodingRate:      "4/5",
+							CodingRate:      band.Cr4_5,
 						},
 					},
 				},
@@ -90,7 +90,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 12,
-							CodingRate:      "4/5",
+							CodingRate:      band.Cr4_5,
 						},
 					},
 				},
@@ -110,7 +110,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 7,
-							CodingRate:      "4/5",
+							CodingRate:      band.Cr4_5,
 						},
 					},
 				},
@@ -132,7 +132,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 12,
-							CodingRate:      "4/5",
+							CodingRate:      band.Cr4_5,
 						},
 					},
 				},
@@ -153,7 +153,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 12,
-							CodingRate:      "4/5",
+							CodingRate:      band.Cr4_5,
 						},
 					},
 				},
@@ -173,7 +173,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 7,
-							CodingRate:      "4/5",
+							CodingRate:      band.Cr4_5,
 						},
 					},
 				},
@@ -194,7 +194,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 7,
-							CodingRate:      "4/5",
+							CodingRate:      band.Cr4_5,
 						},
 					},
 				},
@@ -213,7 +213,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 7,
-							CodingRate:      "4/5",
+							CodingRate:      band.Cr4_5,
 						},
 					},
 				},
@@ -232,7 +232,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 7,
-							CodingRate:      "4/5",
+							CodingRate:      band.Cr4_5,
 						},
 					},
 				},
@@ -252,7 +252,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 7,
-							CodingRate:      "4/5",
+							CodingRate:      band.Cr4_5,
 						},
 					},
 				},
@@ -272,7 +272,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 7,
-							CodingRate:      "4/5",
+							CodingRate:      band.Cr4_5,
 						},
 					},
 				},
@@ -291,7 +291,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 12,
-							CodingRate:      "4/5",
+							CodingRate:      band.Cr4_5,
 						},
 					},
 				},
@@ -386,7 +386,7 @@ func TestScheduleAtWithFrequencyPlanDutyCycle(t *testing.T) {
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 12,
-							CodingRate:      "4/5",
+							CodingRate:      band.Cr4_5,
 						},
 					},
 				},
@@ -458,7 +458,7 @@ func TestScheduleAnytime(t *testing.T) {
 					Lora: &ttnpb.LoRaDataRate{
 						Bandwidth:       125000,
 						SpreadingFactor: sf,
-						CodingRate:      "4/5",
+						CodingRate:      band.Cr4_5,
 					},
 				},
 			},
@@ -569,7 +569,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 					Lora: &ttnpb.LoRaDataRate{
 						Bandwidth:       125000,
 						SpreadingFactor: sf,
-						CodingRate:      "4/5",
+						CodingRate:      band.Cr4_5,
 					},
 				},
 			},
@@ -764,7 +764,7 @@ func TestScheduleAnytimeClassC(t *testing.T) {
 					Lora: &ttnpb.LoRaDataRate{
 						Bandwidth:       125000,
 						SpreadingFactor: 7,
-						CodingRate:      "4/5",
+						CodingRate:      band.Cr4_5,
 					},
 				},
 			},
@@ -786,7 +786,7 @@ func TestScheduleAnytimeClassC(t *testing.T) {
 					Lora: &ttnpb.LoRaDataRate{
 						Bandwidth:       125000,
 						SpreadingFactor: 7,
-						CodingRate:      "4/5",
+						CodingRate:      band.Cr4_5,
 					},
 				},
 			},
@@ -812,7 +812,7 @@ func TestScheduleAnytimeClassC(t *testing.T) {
 					Lora: &ttnpb.LoRaDataRate{
 						Bandwidth:       125000,
 						SpreadingFactor: 7,
-						CodingRate:      "4/5",
+						CodingRate:      band.Cr4_5,
 					},
 				},
 			},
@@ -1060,7 +1060,7 @@ func TestSchedulingWithMultipleFrequencyPlans(t *testing.T) {
 					Lora: &ttnpb.LoRaDataRate{
 						Bandwidth:       125000,
 						SpreadingFactor: 7,
-						CodingRate:      "4/5",
+						CodingRate:      band.Cr4_5,
 					},
 				},
 			},
@@ -1082,7 +1082,7 @@ func TestSchedulingWithMultipleFrequencyPlans(t *testing.T) {
 					Lora: &ttnpb.LoRaDataRate{
 						Bandwidth:       125000,
 						SpreadingFactor: 7,
-						CodingRate:      "4/5",
+						CodingRate:      band.Cr4_5,
 					},
 				},
 			},
@@ -1108,7 +1108,7 @@ func TestSchedulingWithMultipleFrequencyPlans(t *testing.T) {
 					Lora: &ttnpb.LoRaDataRate{
 						Bandwidth:       125000,
 						SpreadingFactor: 7,
-						CodingRate:      "4/5",
+						CodingRate:      band.Cr4_5,
 					},
 				},
 			},
@@ -1149,7 +1149,7 @@ func TestScheduleSyncViaUplinkToken(t *testing.T) {
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 7,
-							CodingRate:      "4/5",
+							CodingRate:      band.Cr4_5,
 						},
 					},
 				},
@@ -1176,7 +1176,7 @@ func TestScheduleSyncViaUplinkToken(t *testing.T) {
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 7,
-							CodingRate:      "4/5",
+							CodingRate:      band.Cr4_5,
 						},
 					},
 				},
@@ -1209,7 +1209,7 @@ func TestScheduleSyncViaUplinkToken(t *testing.T) {
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 7,
-							CodingRate:      "4/5",
+							CodingRate:      band.Cr4_5,
 						},
 					},
 				},
