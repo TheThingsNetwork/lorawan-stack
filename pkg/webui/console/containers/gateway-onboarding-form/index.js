@@ -41,7 +41,8 @@ const GatewayOnboardingForm = props => {
       merge(
         {
           _ownerId: userId,
-          ids: { eui: '' },
+          enforce_duty_cycle: true,
+          schedule_anytime_delay: '0.530s',
         },
         registerInitialValues,
       ),
@@ -110,6 +111,7 @@ const GatewayOnboardingForm = props => {
       error={error}
       onSubmit={handleSubmit}
       initialValues={initialValues}
+      hiddenFields={['gateway_server_address', 'enforce_duty_cycle', 'schedule_anytime_delay']}
       validationSchema={validationSchema}
       validateAgainstCleanedValues
     >

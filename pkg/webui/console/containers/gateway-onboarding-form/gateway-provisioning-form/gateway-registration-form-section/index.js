@@ -76,14 +76,7 @@ const initialValues = {
 }
 
 const GatewayRegistrationFormSections = () => {
-  const { values, addToFieldRegistry, removeFromFieldRegistry } = useFormikContext()
-
-  // Register hidden fields so they don't get cleaned.
-  useEffect(() => {
-    const hiddenField = 'gateway_server_address'
-    addToFieldRegistry(hiddenField)
-    return () => removeFromFieldRegistry(hiddenField)
-  }, [addToFieldRegistry, removeFromFieldRegistry])
+  const { values } = useFormikContext()
 
   return (
     <>
