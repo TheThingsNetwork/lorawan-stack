@@ -35,7 +35,7 @@ type ConfigurationServer struct {
 }
 
 // Roles implements the rpcserver.Registerer interface. It just returns nil.
-func (c *ConfigurationServer) Roles() []ttnpb.ClusterRole { return nil }
+func (*ConfigurationServer) Roles() []ttnpb.ClusterRole { return nil }
 
 // RegisterServices registers the Configuration service.
 func (c *ConfigurationServer) RegisterServices(s *grpc.Server) {
@@ -44,11 +44,13 @@ func (c *ConfigurationServer) RegisterServices(s *grpc.Server) {
 
 // RegisterHandlers registers the Configuration service handler.
 func (c *ConfigurationServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
-	ttnpb.RegisterConfigurationHandler(c.component.Context(), s, conn)
+	_ = ttnpb.RegisterConfigurationHandler(c.component.Context(), s, conn)
 }
 
 // ListFrequencyPlans implements the Configuration service's ListFrequencyPlans RPC.
-func (c *ConfigurationServer) ListFrequencyPlans(ctx context.Context, req *ttnpb.ListFrequencyPlansRequest) (*ttnpb.ListFrequencyPlansResponse, error) {
+func (c *ConfigurationServer) ListFrequencyPlans(
+	ctx context.Context, req *ttnpb.ListFrequencyPlansRequest,
+) (*ttnpb.ListFrequencyPlansResponse, error) {
 	fps, err := c.component.FrequencyPlansStore(ctx)
 	if err != nil {
 		return nil, err
@@ -57,11 +59,15 @@ func (c *ConfigurationServer) ListFrequencyPlans(ctx context.Context, req *ttnpb
 }
 
 // GetPhyVersions implements the Configuration service's GetPhyVersions RPC.
-func (c *ConfigurationServer) GetPhyVersions(ctx context.Context, req *ttnpb.GetPhyVersionsRequest) (*ttnpb.GetPhyVersionsResponse, error) {
+func (*ConfigurationServer) GetPhyVersions(
+	ctx context.Context, req *ttnpb.GetPhyVersionsRequest,
+) (*ttnpb.GetPhyVersionsResponse, error) {
 	return band.GetPhyVersions(ctx, req)
 }
 
-// ListBands implements the Configuration service's ListBands RPC
-func (c *ConfigurationServer) ListBands(ctx context.Context, req *ttnpb.ListBandsRequest) (*ttnpb.ListBandsResponse, error) {
+// ListBands implements the Configuration service's ListBands RPC.
+func (*ConfigurationServer) ListBands(
+	ctx context.Context, req *ttnpb.ListBandsRequest,
+) (*ttnpb.ListBandsResponse, error) {
 	return band.ListBands(ctx, req)
 }

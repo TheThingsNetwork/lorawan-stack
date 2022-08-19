@@ -779,6 +779,9 @@ func TestListBands(t *testing.T) {
 					US_902_928: {
 						ttnpb.PHYVersion_TS001_V1_0_1: All[US_902_928][ttnpb.PHYVersion_TS001_V1_0_1],
 					},
+					MA_869_870_DRAFT: {
+						ttnpb.PHYVersion_TS001_V1_0_1: All[MA_869_870_DRAFT][ttnpb.PHYVersion_TS001_V1_0_1],
+					},
 				}),
 			},
 		},

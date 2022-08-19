@@ -23,7 +23,7 @@ import (
 )
 
 // GetPhyVersions returns the list of supported phy versions for the given band.
-func GetPhyVersions(ctx context.Context, req *ttnpb.GetPhyVersionsRequest) (*ttnpb.GetPhyVersionsResponse, error) {
+func GetPhyVersions(_ context.Context, req *ttnpb.GetPhyVersionsRequest) (*ttnpb.GetPhyVersionsResponse, error) {
 	var res *ttnpb.GetPhyVersionsResponse
 	if req.BandId != "" {
 		versions, ok := All[req.BandId]
@@ -62,7 +62,7 @@ func GetPhyVersions(ctx context.Context, req *ttnpb.GetPhyVersionsRequest) (*ttn
 }
 
 // ListBands returns the list of supported bands.
-func ListBands(ctx context.Context, req *ttnpb.ListBandsRequest) (*ttnpb.ListBandsResponse, error) {
+func ListBands(_ context.Context, req *ttnpb.ListBandsRequest) (*ttnpb.ListBandsResponse, error) {
 	filteredVersions := make(map[string]map[ttnpb.PHYVersion]Band)
 
 	if req.BandId != "" {
