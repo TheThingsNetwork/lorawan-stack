@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- New `ListBands` RPC on the `Configuration` service.
+
 ### Changed
 
 ### Deprecated
@@ -26,7 +28,6 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - New `SearchAccounts` RPC on the `EntityRegistrySearch` service.
-- New `ListBands` RPC on the `Configuration` service.
 - Prompt user to confirm navigation when changes have not been saved in the payload formatter form to prevent big change-drafts from getting lost.
 - Event data pushed by webhooks can now be filtered with field masks.
   - Support for the field mask setup was added for both CLI and Console.
