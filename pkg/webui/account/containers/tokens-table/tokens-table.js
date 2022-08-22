@@ -16,6 +16,8 @@ import React from 'react'
 import { defineMessages } from 'react-intl'
 import { Col, Row, Container } from 'react-grid-system'
 
+import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
+
 import toast from '@ttn-lw/components/toast'
 import Button from '@ttn-lw/components/button'
 import SafeInspector from '@ttn-lw/components/safe-inspector'
@@ -186,6 +188,7 @@ const TokensTable = props => {
             headers={headers}
             getItemsAction={getItems}
             baseDataSelector={baseDataSelector}
+            pageSize={PAGE_SIZES.SMALL}
             actionItems={deleteAllButton}
             handlesSorting
             {...rest}
