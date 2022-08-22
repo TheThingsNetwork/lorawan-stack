@@ -47,7 +47,12 @@ type PubSub struct {
 }
 
 // New creates a new pusub frontend.
-func New(c *component.Component, server io.Server, registry Registry, providerStatuses ProviderStatuses) (*PubSub, error) {
+func New(
+	c *component.Component,
+	server io.Server,
+	registry Registry,
+	providerStatuses ProviderStatuses,
+) (*PubSub, error) {
 	ctx := log.NewContextWithField(c.Context(), "namespace", "applicationserver/io/pubsub")
 	ps := &PubSub{
 		Component: c,
@@ -170,7 +175,11 @@ func (i *integration) handleUp(ctx context.Context) {
 	}
 }
 
-func (i *integration) handleDown(ctx context.Context, op func(io.Server, context.Context, *ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error, subscription *pubsub.Subscription) {
+func (i *integration) handleDown(
+	ctx context.Context,
+	op func(io.Server, context.Context, *ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error,
+	subscription *pubsub.Subscription,
+) {
 	logger := log.FromContext(ctx)
 	for {
 		select {
@@ -268,14 +277,14 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 		}
 	}()
 
-	provider, err := provider.GetProvider(pb)
+	p, err := provider.GetProvider(pb)
 	if err != nil {
 		return err
 	}
 	if err := ps.providerStatuses.Enabled(ctx, pb.GetProvider()); err != nil {
 		return err
 	}
-	i.conn, err = provider.OpenConnection(ctx, pb, ps.providerStatuses)
+	i.conn, err = p.OpenConnection(ctx, pb, ps.providerStatuses)
 	if err != nil {
 		return err
 	}

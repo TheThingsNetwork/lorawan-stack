@@ -30,6 +30,7 @@ import (
 )
 
 func TestV3AcceptedTopic(t *testing.T) {
+	t.Parallel()
 	uid := unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"})
 	for i, tc := range []struct {
 		Requested,
@@ -63,7 +64,9 @@ func TestV3AcceptedTopic(t *testing.T) {
 			OK:        true,
 		},
 	} {
+		tc := tc
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			t.Parallel()
 			a := assertions.New(t)
 			actual, ok := topics.Default.AcceptedTopic(uid, topic.Split(tc.Requested))
 			if !a.So(ok, should.Equal, tc.OK) {
@@ -75,6 +78,7 @@ func TestV3AcceptedTopic(t *testing.T) {
 }
 
 func TestV3Topics(t *testing.T) {
+	t.Parallel()
 	appUID := unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"})
 	devID := "foo-device"
 
@@ -131,7 +135,9 @@ func TestV3Topics(t *testing.T) {
 			Expected: fmt.Sprintf("v3/%s/devices/%s/down/replace", appUID, devID),
 		},
 	} {
+		tc := tc
 		t.Run(tc.Expected, func(t *testing.T) {
+			t.Parallel()
 			actual := strings.Join(tc.Fn(appUID, devID), "/")
 			assertions.New(t).So(actual, should.Equal, tc.Expected)
 		})

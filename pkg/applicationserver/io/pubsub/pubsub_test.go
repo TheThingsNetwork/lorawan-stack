@@ -41,6 +41,7 @@ type messageWithError struct {
 }
 
 func TestPubSub(t *testing.T) {
+	t.Parallel()
 	a, ctx := test.New(t)
 
 	redisClient, flush := test.NewRedis(ctx, "pubsub_test")
@@ -158,6 +159,7 @@ func TestPubSub(t *testing.T) {
 	sub := <-io.Subscriptions()
 	conn := <-mockImpl.OpenConnectionCh
 
+	//nolint:paralleltest
 	t.Run("Upstream", func(t *testing.T) {
 		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
@@ -318,10 +320,10 @@ func TestPubSub(t *testing.T) {
 					EndDeviceIds: registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_ServiceData{
 						ServiceData: &ttnpb.ApplicationServiceData{
-							Data: &types.Struct{
-								Fields: map[string]*types.Value{
+							Data: &pbtypes.Struct{
+								Fields: map[string]*pbtypes.Value{
 									"battery": {
-										Kind: &types.Value_NumberValue{
+										Kind: &pbtypes.Value_NumberValue{
 											NumberValue: 42.0,
 										},
 									},
@@ -370,6 +372,7 @@ func TestPubSub(t *testing.T) {
 		}
 	})
 
+	//nolint:paralleltest
 	t.Run("Downstream", func(t *testing.T) {
 		for _, tc := range []struct {
 			Name     string

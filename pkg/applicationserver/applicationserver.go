@@ -282,24 +282,24 @@ func (as *ApplicationServer) RegisterServices(s *grpc.Server) {
 	if ps := as.pubsub; ps != nil {
 		ttnpb.RegisterApplicationPubSubRegistryServer(s, ps)
 	}
-	if packages := as.appPackages; packages != nil {
-		packages.RegisterServices(s)
+	if pkgs := as.appPackages; pkgs != nil {
+		pkgs.RegisterServices(s)
 	}
 }
 
 // RegisterHandlers registers gRPC handlers.
 func (as *ApplicationServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
-	ttnpb.RegisterAsHandler(as.Context(), s, conn)
-	ttnpb.RegisterAsEndDeviceRegistryHandler(as.Context(), s, conn)
-	ttnpb.RegisterAppAsHandler(as.Context(), s, conn)
+	ttnpb.RegisterAsHandler(as.Context(), s, conn)                  //nolint:errcheck
+	ttnpb.RegisterAsEndDeviceRegistryHandler(as.Context(), s, conn) //nolint:errcheck
+	ttnpb.RegisterAppAsHandler(as.Context(), s, conn)               //nolint:errcheck
 	if as.webhooks != nil {
-		ttnpb.RegisterApplicationWebhookRegistryHandler(as.Context(), s, conn)
+		ttnpb.RegisterApplicationWebhookRegistryHandler(as.Context(), s, conn) //nolint:errcheck
 	}
 	if as.pubsub != nil {
-		ttnpb.RegisterApplicationPubSubRegistryHandler(as.Context(), s, conn)
+		ttnpb.RegisterApplicationPubSubRegistryHandler(as.Context(), s, conn) //nolint:errcheck
 	}
-	if packages := as.appPackages; packages != nil {
-		packages.RegisterHandlers(s, conn)
+	if pkgs := as.appPackages; pkgs != nil {
+		pkgs.RegisterHandlers(s, conn)
 	}
 }
 
@@ -308,13 +308,13 @@ func (as *ApplicationServer) RegisterRoutes(s *web.Server) {
 	if wh := as.webhooks; wh != nil {
 		wh.RegisterRoutes(s)
 	}
-	if packages := as.appPackages; packages != nil {
-		packages.RegisterRoutes(s)
+	if pkgs := as.appPackages; pkgs != nil {
+		pkgs.RegisterRoutes(s)
 	}
 }
 
 // Roles returns the roles that the Application Server fulfills.
-func (as *ApplicationServer) Roles() []ttnpb.ClusterRole {
+func (*ApplicationServer) Roles() []ttnpb.ClusterRole {
 	return []ttnpb.ClusterRole{ttnpb.ClusterRole_APPLICATION_SERVER}
 }
 
@@ -459,8 +459,8 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 		}, nil
 	}
 
-	ttnErr, ok := err.(errors.ErrorDetails)
-	if !ok {
+	var ttnErr errors.ErrorDetails
+	if !errors.As(err, &ttnErr) {
 		return nil, err
 	}
 	details := ttnErr.Details()
@@ -469,6 +469,7 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 	}
 	var diagnostics *ttnpb.DownlinkQueueOperationErrorDetails
 	for _, detail := range details {
+		var ok bool
 		diagnostics, ok = detail.(*ttnpb.DownlinkQueueOperationErrorDetails)
 		if ok {
 			break
@@ -928,7 +929,12 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids *ttnpb.En
 		},
 	)
 	if err == nil {
-		as.deviceLastSeenPool.Publish(ctx, lastSeenAtInfo{ids: ids, lastSeenAt: joinAccept.ReceivedAt})
+		if err := as.deviceLastSeenPool.Publish(ctx, lastSeenAtInfo{
+			ids:        ids,
+			lastSeenAt: joinAccept.ReceivedAt,
+		}); err != nil {
+			logger.WithError(err).Warn("Failed to publish last seen event")
+		}
 	}
 	return err
 }
@@ -976,7 +982,7 @@ func (as *ApplicationServer) matchSession(ctx context.Context, ids *ttnpb.EndDev
 // Only fields which are used by integrations are stored.
 // The fields which are stored are based on the following usages:
 // - io/packages/loragls/v3/package.go#multiFrameQuery
-// - io/packages/loragls/v3/api/objects.go#parseRxMetadata
+// - io/packages/loragls/v3/api/objects.go#parseRxMetadata.
 func (as *ApplicationServer) storeUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink) error {
 	cleanUplink := &ttnpb.ApplicationUplink{
 		RxMetadata: make([]*ttnpb.RxMetadata, 0, len(uplink.RxMetadata)),
@@ -1094,7 +1100,6 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids *ttnpb.EndDev
 	} else {
 		uplink.Locations = locations
 	}
-
 	loc := as.locationFromDecodedPayload(uplink)
 	if loc != nil {
 		if uplink.Locations == nil {
@@ -1117,11 +1122,15 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids *ttnpb.EndDev
 	}
 
 	if dev.ActivatedAt == nil {
-		as.activationPool.Publish(ctx, ids)
+		if err := as.activationPool.Publish(ctx, ids); err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Failed to publish activation event")
+		}
 	}
 
 	if err == nil {
-		as.deviceLastSeenPool.Publish(ctx, lastSeenAtInfo{ids: ids, lastSeenAt: uplink.ReceivedAt})
+		if err := as.deviceLastSeenPool.Publish(ctx, lastSeenAtInfo{ids: ids, lastSeenAt: uplink.ReceivedAt}); err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Failed to publish last seen event")
+		}
 	}
 
 	return nil
@@ -1330,11 +1339,11 @@ func (as *ApplicationServer) GetConfig(ctx context.Context) (*Config, error) {
 
 // GetMQTTConfig returns the MQTT frontend configuration based on the context.
 func (as *ApplicationServer) GetMQTTConfig(ctx context.Context) (*config.MQTT, error) {
-	config, err := as.GetConfig(ctx)
+	cfg, err := as.GetConfig(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return &config.MQTT, nil
+	return &cfg.MQTT, nil
 }
 
 // RangeUplinks ranges the application uplinks and calls the callback function, until false is returned.

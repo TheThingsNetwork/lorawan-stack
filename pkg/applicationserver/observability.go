@@ -133,7 +133,6 @@ const (
 	subsystem     = "as"
 	unknown       = "unknown"
 	networkServer = "network_server"
-	protocol      = "protocol"
 	applicationID = "application_id"
 )
 
@@ -245,8 +244,8 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 
 func registerReceiveUp(ctx context.Context, msg *ttnpb.ApplicationUp) {
 	ns := "application"
-	if peer, ok := peer.FromContext(ctx); ok {
-		ns = peer.Addr.String()
+	if p, ok := peer.FromContext(ctx); ok {
+		ns = p.Addr.String()
 	}
 	switch msg.Up.(type) {
 	case *ttnpb.ApplicationUp_JoinAccept:
@@ -326,9 +325,12 @@ func registerDropDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, 
 }
 
 func (as *ApplicationServer) registerDropDownlinks(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink, err error) {
-	var errorDetails ttnpb.ErrorDetails
-	if ttnErr, ok := err.(errors.ErrorDetails); ok {
-		errorDetails = *ttnpb.ErrorDetailsToProto(ttnErr)
+	var (
+		errorDetails   errors.ErrorDetails
+		pbErrorDetails *ttnpb.ErrorDetails
+	)
+	if errors.As(err, &errorDetails) {
+		pbErrorDetails = ttnpb.ErrorDetailsToProto(errorDetails)
 	}
 	for _, item := range items {
 		if err := as.publishUp(ctx, &ttnpb.ApplicationUp{
@@ -337,7 +339,7 @@ func (as *ApplicationServer) registerDropDownlinks(ctx context.Context, ids *ttn
 			Up: &ttnpb.ApplicationUp_DownlinkFailed{
 				DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
 					Downlink: item,
-					Error:    &errorDetails,
+					Error:    pbErrorDetails,
 				},
 			},
 		}); err != nil {

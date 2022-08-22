@@ -211,7 +211,7 @@ func (as *ApplicationServer) decodeDownlink(ctx context.Context, dev *ttnpb.EndD
 	return nil
 }
 
-func (as *ApplicationServer) locationFromDecodedPayload(uplink *ttnpb.ApplicationUplink) (res *ttnpb.Location) {
+func (*ApplicationServer) locationFromDecodedPayload(uplink *ttnpb.ApplicationUplink) (res *ttnpb.Location) {
 	m, err := gogoproto.Map(uplink.DecodedPayload)
 	if err != nil {
 		return nil

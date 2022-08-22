@@ -32,9 +32,9 @@ import (
 type codecType string
 
 const (
-	downlinkEncoder = codecType("downlinkEncoder")
-	downlinkDecoder = codecType("downlinkDecoder")
-	uplinkDecoder   = codecType("uplinkDecoder")
+	downlinkEncoder codecType = "downlinkEncoder"
+	downlinkDecoder codecType = "downlinkDecoder"
+	uplinkDecoder   codecType = "uplinkDecoder"
 
 	// cacheTTL is the TTL for cached payload formatters.
 	cacheTTL = time.Hour
@@ -183,7 +183,7 @@ func (h *host) compileProcessor(ctx context.Context, codec codecType, formatter 
 				uplinkProcessor: run,
 			}, nil
 		default:
-			panic(fmt.Sprintf("Invalid codec type: %v", codec))
+			panic(fmt.Sprintf("invalid codec type: %v", codec))
 		}
 	}
 
@@ -207,7 +207,7 @@ func (h *host) compileProcessor(ctx context.Context, codec codecType, formatter 
 			},
 		}, nil
 	default:
-		panic(fmt.Sprintf("Invalid codec type: %v", codec))
+		panic(fmt.Sprintf("invalid codec type: %v", codec))
 	}
 }
 

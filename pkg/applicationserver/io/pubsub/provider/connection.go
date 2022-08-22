@@ -75,7 +75,7 @@ type Shutdowner interface {
 }
 
 // ProviderConnection is an interface that represents a provider specific connection.
-type ProviderConnection interface {
+type ProviderConnection interface { //nolint:revive
 	Shutdowner
 }
 

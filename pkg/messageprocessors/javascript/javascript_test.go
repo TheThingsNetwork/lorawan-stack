@@ -27,6 +27,7 @@ import (
 )
 
 func TestLegacyEncodeDownlink(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	ctx := test.Context()
@@ -96,6 +97,7 @@ func TestLegacyEncodeDownlink(t *testing.T) {
 }
 
 func TestEncodeDownlink(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	ctx := test.Context()
@@ -231,6 +233,7 @@ func TestEncodeDownlink(t *testing.T) {
 }
 
 func TestLegacyDecodeUplink(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	ctx := test.Context()
@@ -309,6 +312,7 @@ func TestLegacyDecodeUplink(t *testing.T) {
 }
 
 func TestDecodeUplink(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	ctx := test.Context()
@@ -360,6 +364,7 @@ func TestDecodeUplink(t *testing.T) {
 			FPort:      4,
 			FrmPayload: []byte{0x0C, 0xB2, 0x04, 0x80, 0xF7, 0xAE},
 		}
+		//nolint:lll
 		script := `
 		function decodeUplink(input) {
 			var data = {};
@@ -444,6 +449,7 @@ func TestDecodeUplink(t *testing.T) {
 }
 
 func TestDecodeDownlink(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	ctx := test.Context()
