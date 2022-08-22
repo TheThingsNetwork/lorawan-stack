@@ -124,10 +124,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		deviceRegistry:   wrapEndDeviceRegistryWithReplacedFields(conf.Devices, replacedEndDeviceFields...),
 		appUpsRegistry:   conf.UplinkStorage.Registry,
 		locationRegistry: conf.EndDeviceMetadataStorage.Location.Registry,
-		formatters: messageprocessors.MapPayloadProcessor{
-			ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT: javascript.New(),
-			ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),
-		},
+		formatters:       make(messageprocessors.MapPayloadProcessor),
 		clusterDistributor: distribution.NewPubSubDistributor(
 			ctx,
 			c,
@@ -145,6 +142,11 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		interopClient: interopCl,
 		interopID:     conf.Interop.ID,
 	}
+
+	as.formatters[ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT] = javascript.New()
+	as.formatters[ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP] = cayennelpp.New()
+	as.formatters[ttnpb.PayloadFormatter_FORMATTER_REPOSITORY] = devicerepository.New(as.formatters, as)
+
 	as.activationPool = workerpool.NewWorkerPool(workerpool.Config[*ttnpb.EndDeviceIdentifiers]{
 		Component: c,
 		Context:   ctx,
@@ -157,15 +159,12 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		Name:      "process_application_uplinks",
 		Handler:   as.processUpAsync,
 	})
-
 	as.deviceLastSeenPool = workerpool.NewWorkerPool(workerpool.Config[lastSeenAtInfo]{
 		Component: c,
 		Context:   ctx,
 		Name:      "save_device_last_seen_from_uplink",
 		Handler:   as.processDeviceLastSeenAsync,
 	})
-
-	as.formatters[ttnpb.PayloadFormatter_FORMATTER_REPOSITORY] = devicerepository.New(as.formatters, as)
 
 	as.grpc.asDevices = asEndDeviceRegistryServer{
 		AS:       as,
