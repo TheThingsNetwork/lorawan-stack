@@ -384,7 +384,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 					ChannelIndexAck: true,
 				})),
 			},
-			Error: ErrRequestNotFound,
+			Error: ErrRequestNotFound.WithAttributes("cid", ttnpb.MACCommandIdentifier_CID_DL_CHANNEL),
 		},
 		{
 			Name: "frequency nack/channel index ack/no request",
@@ -408,7 +408,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 					ChannelIndexAck: true,
 				})),
 			},
-			Error: ErrRequestNotFound,
+			Error: ErrRequestNotFound.WithAttributes("cid", ttnpb.MACCommandIdentifier_CID_DL_CHANNEL),
 		},
 		{
 			Name: "frequency nack/channel index nack/valid request/no rejections",

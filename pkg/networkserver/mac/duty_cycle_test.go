@@ -106,7 +106,7 @@ func TestHandleDutyCycleAns(t *testing.T) {
 			Events: events.Builders{
 				EvtReceiveDutyCycleAnswer,
 			},
-			Error: ErrRequestNotFound,
+			Error: ErrRequestNotFound.WithAttributes("cid", ttnpb.MACCommandIdentifier_CID_DUTY_CYCLE),
 		},
 		{
 			Name: "2048",

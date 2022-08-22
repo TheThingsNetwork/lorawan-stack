@@ -378,7 +378,7 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 			Events: events.Builders{
 				EvtReceiveTxParamSetupAnswer,
 			},
-			Error: ErrRequestNotFound,
+			Error: ErrRequestNotFound.WithAttributes("cid", ttnpb.MACCommandIdentifier_CID_TX_PARAM_SETUP),
 		},
 		{
 			Name: "EIRP 26, dwell time both",

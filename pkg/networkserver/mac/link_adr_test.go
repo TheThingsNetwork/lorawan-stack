@@ -481,7 +481,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 					TxPowerIndexAck:  true,
 				})),
 			},
-			Error: ErrRequestNotFound,
+			Error: ErrRequestNotFound.WithAttributes("cid", ttnpb.MACCommandIdentifier_CID_LINK_ADR),
 		},
 		{
 			Name: "1 request/all ack",
