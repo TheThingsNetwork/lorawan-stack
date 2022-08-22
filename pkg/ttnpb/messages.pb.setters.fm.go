@@ -522,6 +522,24 @@ func (dst *ApplicationUplink) SetFields(src *ApplicationUplink, paths ...string)
 			} else {
 				dst.DecodedPayloadWarnings = nil
 			}
+		case "normalized_payload":
+			if len(subs) > 0 {
+				return fmt.Errorf("'normalized_payload' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NormalizedPayload = src.NormalizedPayload
+			} else {
+				dst.NormalizedPayload = nil
+			}
+		case "normalized_payload_warnings":
+			if len(subs) > 0 {
+				return fmt.Errorf("'normalized_payload_warnings' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NormalizedPayloadWarnings = src.NormalizedPayloadWarnings
+			} else {
+				dst.NormalizedPayloadWarnings = nil
+			}
 		case "rx_metadata":
 			if len(subs) > 0 {
 				return fmt.Errorf("'rx_metadata' has no subfields, but %s were specified", subs)

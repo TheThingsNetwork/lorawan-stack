@@ -20,6 +20,8 @@ func AddSelectFlagsForApplicationUplink(flags *pflag.FlagSet, prefix string, hid
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("frm-payload", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("frm-payload", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("decoded-payload", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("decoded-payload", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("decoded-payload-warnings", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("decoded-payload-warnings", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("normalized-payload", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("normalized-payload", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("normalized-payload-warnings", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("normalized-payload-warnings", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("rx-metadata", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("rx-metadata", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("settings", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("settings", prefix), true), flagsplugin.WithHidden(hidden)))
 	AddSelectFlagsForTxSettings(flags, flagsplugin.Prefix("settings", prefix), hidden)
@@ -67,6 +69,16 @@ func PathsFromSelectFlagsForApplicationUplink(flags *pflag.FlagSet, prefix strin
 		return nil, err
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("decoded_payload_warnings", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("normalized_payload", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("normalized_payload", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("normalized_payload_warnings", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("normalized_payload_warnings", prefix))
 	}
 	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("rx_metadata", prefix)); err != nil {
 		return nil, err

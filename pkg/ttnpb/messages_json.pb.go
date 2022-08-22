@@ -600,6 +600,26 @@ func (x *ApplicationUplink) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("decoded_payload_warnings")
 		s.WriteStringArray(x.DecodedPayloadWarnings)
 	}
+	if len(x.NormalizedPayload) > 0 || s.HasField("normalized_payload") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("normalized_payload")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.NormalizedPayload {
+			s.WriteMoreIf(&wroteElement)
+			if element == nil {
+				s.WriteNil()
+			} else {
+				gogo.MarshalStruct(s, element)
+			}
+		}
+		s.WriteArrayEnd()
+	}
+	if len(x.NormalizedPayloadWarnings) > 0 || s.HasField("normalized_payload_warnings") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("normalized_payload_warnings")
+		s.WriteStringArray(x.NormalizedPayloadWarnings)
+	}
 	if len(x.RxMetadata) > 0 || s.HasField("rx_metadata") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("rx_metadata")
@@ -720,6 +740,26 @@ func (x *ApplicationUplink) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				return
 			}
 			x.DecodedPayloadWarnings = s.ReadStringArray()
+		case "normalized_payload", "normalizedPayload":
+			s.AddField("normalized_payload")
+			if s.ReadNil() {
+				x.NormalizedPayload = nil
+				return
+			}
+			s.ReadArray(func() {
+				v := gogo.UnmarshalStruct(s)
+				if s.Err() != nil {
+					return
+				}
+				x.NormalizedPayload = append(x.NormalizedPayload, v)
+			})
+		case "normalized_payload_warnings", "normalizedPayloadWarnings":
+			s.AddField("normalized_payload_warnings")
+			if s.ReadNil() {
+				x.NormalizedPayloadWarnings = nil
+				return
+			}
+			x.NormalizedPayloadWarnings = s.ReadStringArray()
 		case "rx_metadata", "rxMetadata":
 			s.AddField("rx_metadata")
 			if s.ReadNil() {

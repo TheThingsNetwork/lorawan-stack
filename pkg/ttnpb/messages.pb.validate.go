@@ -767,6 +767,25 @@ func (m *ApplicationUplink) ValidateFields(paths ...string) error {
 
 		case "decoded_payload_warnings":
 
+		case "normalized_payload":
+
+			for idx, item := range m.GetNormalizedPayload() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return ApplicationUplinkValidationError{
+							field:  fmt.Sprintf("normalized_payload[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		case "normalized_payload_warnings":
+
 		case "rx_metadata":
 
 			for idx, item := range m.GetRxMetadata() {
