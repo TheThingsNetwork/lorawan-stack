@@ -22113,7 +22113,7 @@
         "operating_channel_width": {
           "type": "integer",
           "format": "int64",
-          "description": "Operating Channel Width (kHz)."
+          "description": "Operating Channel Width (Hz)."
         },
         "coding_rate": {
           "type": "string"
