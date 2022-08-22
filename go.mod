@@ -125,11 +125,11 @@ require (
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/otel v1.7.0
 	go.opentelemetry.io/otel/trace v1.7.0
-	go.packetbroker.org/api/iam v1.5.26-tts
-	go.packetbroker.org/api/iam/v2 v2.7.7-tts
-	go.packetbroker.org/api/mapping/v2 v2.1.26-tts
-	go.packetbroker.org/api/routing v1.8.17-tts
-	go.packetbroker.org/api/v3 v3.12.3-tts
+	go.packetbroker.org/api/iam v1.5.27-tts
+	go.packetbroker.org/api/iam/v2 v2.7.8-tts
+	go.packetbroker.org/api/mapping/v2 v2.1.27-tts
+	go.packetbroker.org/api/routing v1.8.18-tts
+	go.packetbroker.org/api/v3 v3.12.4-tts
 	go.thethings.network/lorawan-application-payload v0.0.0-20220125153912-1198ff1e403e
 	go.thethings.network/lorawan-stack-legacy/v2 v2.0.2
 	go.uber.org/zap v1.21.0

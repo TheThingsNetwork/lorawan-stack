@@ -167,7 +167,6 @@ require (
 	github.com/mitchellh/reflectwalk v1.0.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
-	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
 	github.com/nats-io/nats.go v1.13.1-0.20220308171302-2f2f6968e98d // indirect
 	github.com/nats-io/nkeys v0.3.0 // indirect
@@ -217,11 +216,11 @@ require (
 	go.opencensus.io v0.23.0 // indirect
 	go.opentelemetry.io/otel v1.7.0 // indirect
 	go.opentelemetry.io/otel/trace v1.7.0 // indirect
-	go.packetbroker.org/api/iam v1.5.26-tts // indirect
-	go.packetbroker.org/api/iam/v2 v2.7.7-tts // indirect
-	go.packetbroker.org/api/mapping/v2 v2.1.26-tts // indirect
-	go.packetbroker.org/api/routing v1.8.17-tts // indirect
-	go.packetbroker.org/api/v3 v3.12.3-tts // indirect
+	go.packetbroker.org/api/iam v1.5.27-tts // indirect
+	go.packetbroker.org/api/iam/v2 v2.7.8-tts // indirect
+	go.packetbroker.org/api/mapping/v2 v2.1.27-tts // indirect
+	go.packetbroker.org/api/routing v1.8.18-tts // indirect
+	go.packetbroker.org/api/v3 v3.12.4-tts // indirect
 	go.thethings.network/lorawan-application-payload v0.0.0-20220125153912-1198ff1e403e // indirect
 	go.thethings.network/lorawan-stack-legacy/v2 v2.0.2 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
