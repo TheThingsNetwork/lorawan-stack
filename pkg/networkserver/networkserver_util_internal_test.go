@@ -1390,7 +1390,7 @@ func (env TestEnvironment) AssertHandleDeviceUplink(ctx context.Context, assert 
 					return
 
 				case err := <-errCh:
-					if !a.So(err, should.BeNil) {
+					if !a.So(err, should.NotBeNil) || !a.So(errors.IsAlreadyExists(err), should.BeTrue) {
 						t.Errorf("Failed to handle duplicate uplink: %s", err)
 						return
 					}
@@ -1699,11 +1699,6 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 			return a.So(assertEvents(events.Builders(func() []events.Builder {
 				evBuilders := []events.Builder{
 					EvtReceiveJoinRequest,
-				}
-				for range ups[1:] {
-					evBuilders = append(evBuilders,
-						EvtReceiveJoinRequest,
-					)
 				}
 				if conf.ClusterResponse != nil {
 					evBuilders = append(evBuilders,
