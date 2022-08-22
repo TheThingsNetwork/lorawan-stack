@@ -1029,7 +1029,7 @@ func (a *Agent) handleUplinkMessage(
 		case errors.IsNotFound(err):
 			reportError = packetbroker.UplinkMessageProcessingError_NOT_FOUND
 		case errors.IsAlreadyExists(err):
-			// TODO: Use duplicate frame error (https://github.com/packetbroker/api/pull/41).
+			reportError = packetbroker.UplinkMessageProcessingError_DUPLICATE_PAYLOAD
 		}
 		report.Error = &packetbroker.UplinkMessageProcessingErrorValue{
 			Value: reportError,
