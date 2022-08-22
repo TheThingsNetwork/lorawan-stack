@@ -59,7 +59,7 @@ require (
 	github.com/blevesearch/bleve v1.0.14
 	github.com/bluele/gcache v0.0.2
 	github.com/disintegration/imaging v1.6.2
-	github.com/dop251/goja v0.0.0-20220214123719-b09a6bfa842f
+	github.com/dop251/goja v0.0.0-20220815083517-0c74f9139fd6
 	github.com/dustin/go-humanize v1.0.0
 	github.com/eclipse/paho.mqtt.golang v1.3.5
 	github.com/emersion/go-smtp v0.15.0
@@ -180,7 +180,7 @@ require (
 	github.com/couchbase/vellum v1.0.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
-	github.com/dlclark/regexp2 v1.4.1-0.20201116162257-a2a8dda75c91 // indirect
+	github.com/dlclark/regexp2 v1.7.0 // indirect
 	github.com/emersion/go-sasl v0.0.0-20211008083017-0b9dcfb154ac // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/go-kit/log v0.2.0 // indirect
