@@ -295,7 +295,7 @@ func TestToGatewayUpRawLRFHSS(t *testing.T) {
 	dr := msg.Settings.DataRate.GetLrfhss()
 	a.So(dr, should.NotBeNil)
 	a.So(dr.ModulationType, should.Equal, 0)
-	a.So(dr.OperatingChannelWidth, should.Equal, 125)
+	a.So(dr.OperatingChannelWidth, should.Equal, 125000)
 	a.So(msg.Settings.CodingRate, should.Equal, "2/3")
 	a.So(msg.Settings.Frequency, should.Equal, 868100000)
 	a.So(msg.RxMetadata[0].Timestamp, should.Equal, 368384825)
