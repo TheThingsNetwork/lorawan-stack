@@ -143,10 +143,11 @@ const m = defineMessages({
   gatewayIdDescription: 'A unique identifier for your gateway.',
   gatewayIdLocation: 'You make it up, so be creative!',
 
-  gatewayEuiDescription: 'A 64 bit extended unique identifier for your end device.',
+  gatewayEuiDescription: 'A 64 bit extended unique identifier for your gateway.',
   gatewayEuiLocation:
     'It should be provided to you by the manufacturer, or printed on the gateway packaging.',
-  gatewayEuiAbsence: 'Contact the manufacturer or reseller.',
+  gatewayEuiAbsence:
+    'Some gateways do not use EUIs. In that case, you can continue without EUI. If you are unsure, we recommend contacting the manufacturer or reseller.',
 
   gatewayNameDescription: 'An optional human readable name to help you identify your gateway.',
   gatewayNameLocation: 'You make it up, so be creative!',
@@ -157,6 +158,8 @@ const m = defineMessages({
   requireAuthenticatedConnectionDescription:
     'This will only allow a gateway to connect if it uses a TLS enabled Basic Station or MQTT connection. It will not allow connections from UDP packet forwarders.',
 
+  gatewayStatusDescription:
+    'Setting your gateway status to public allows status information about the gateway to be shared with other users in the network, and with Packet Broker if enabled by the network operator.',
   gatewayGenerateApiKeyCUPS:
     'Use this option if you plan to use your gateway with LoRa Basics™ Station CUPS (Configuration and Update Server) to check for configuration and software updates. When checked, an appropriate API key for the CUPS service is automatically generated, so you can authorize the gateway right away.',
   gatewayGenerateApiKeyLNS:
