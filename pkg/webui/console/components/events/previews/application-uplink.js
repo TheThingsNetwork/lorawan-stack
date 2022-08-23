@@ -41,7 +41,7 @@ const ApplicationUplinkPreview = React.memo(({ event }) => {
           )}
         </DescriptionList.Item>
       ) : (
-        <DescriptionList.Byte title={messages.MACPayload} data={data.frm_payload} convertToHex />
+        <DescriptionList.Byte title={messages.payload} data={data.frm_payload} convertToHex />
       )}
       <DescriptionList.Item title={messages.fPort} data={data.f_port} />
       <DescriptionList.Item title={messages.dataRate} data={dataRate} />
