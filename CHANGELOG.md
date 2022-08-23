@@ -24,6 +24,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - `--mac-settings.adr.mode.disabled`, `--mac-settings.adr.mode.dynamic` and `--mac-settings.adr.mode.static` flags of the `end-device update` command.
+- Pagination in `sessions` and `access tokens` tables in the Console.
 
 ### Security
 
