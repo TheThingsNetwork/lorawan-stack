@@ -164,7 +164,7 @@ const TokensTable = props => {
   )
 
   const getItems = React.useCallback(
-    () => getAuthorizationTokensList(userId, clientId, []),
+    filters => getAuthorizationTokensList(userId, clientId, { ...filters }),
     [userId, clientId],
   )
 

@@ -66,7 +66,7 @@ const m = defineMessages({
 
 @connect((state, props) => {
   const base = props.baseDataSelector(state, props)
-  console.log(base)
+
   return {
     items: base[props.entity] || [],
     totalCount: base.totalCount || 0,

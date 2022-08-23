@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {
-  createPaginationByParentRequestActions,
+  createPaginationByIdRequestActions,
   createPaginationByIdDeleteActions,
 } from '@ttn-lw/lib/store/actions/pagination'
 
@@ -29,7 +29,7 @@ export const [
     success: getUserSessionsListSuccess,
     failure: getUserSessionsListFailure,
   },
-] = createPaginationByParentRequestActions('USER_SESSIONS')
+] = createPaginationByIdRequestActions('USER_SESSIONS')
 
 export const DELETE_USER_SESSION_BASE = 'DELETE_USER_SESSION'
 export const [

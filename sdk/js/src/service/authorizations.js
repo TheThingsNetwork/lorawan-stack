@@ -39,10 +39,13 @@ class Authorizations {
     return Marshaler.payloadSingleResponse(result)
   }
 
-  async getAllTokens(userId, client_id) {
-    const result = await this._api.OAuthAuthorizationRegistry.ListTokens({
-      routeParams: { 'user_ids.user_id': userId, 'client_ids.client_id': client_id },
-    })
+  async getAllTokens(userId, client_id, params) {
+    const result = await this._api.OAuthAuthorizationRegistry.ListTokens(
+      {
+        routeParams: { 'user_ids.user_id': userId, 'client_ids.client_id': client_id },
+      },
+      { ...params },
+    )
 
     return Marshaler.payloadListResponse('tokens', result)
   }

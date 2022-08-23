@@ -21,12 +21,12 @@ import * as session from '@account/store/actions/sessions'
 const getUserSessionsLogic = createRequestLogic({
   type: session.GET_USER_SESSIONS_LIST,
   process: async ({ action }) => {
-    const { parentId, parentType } = action.payload
-    let user = parentId
-    if (!parentId) {
-      user = parentType
-    }
-    const result = await tts.Sessions.getAllSessions(user)
+    const {
+      id,
+      params: { page, limit, order },
+    } = action.payload
+
+    const result = await tts.Sessions.getAllSessions(id, { page, limit, order })
 
     return { sessions: result.sessions, sessionsTotalCount: result.totalCount }
   },

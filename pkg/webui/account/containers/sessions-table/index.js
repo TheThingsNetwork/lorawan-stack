@@ -54,7 +54,10 @@ const UserSessionsTable = props => {
   const { pageSize, user, handleDeleteSession, sessionId } = props
   const dispatch = useDispatch()
 
-  const getSessions = React.useCallback(filters => getUserSessionsList(filters, user), [user])
+  const getSessions = React.useCallback(
+    filters => getUserSessionsList(user, { ...filters }),
+    [user],
+  )
 
   const deleteSession = React.useCallback(
     async session_id => {

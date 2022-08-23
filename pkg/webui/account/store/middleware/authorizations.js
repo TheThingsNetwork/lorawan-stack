@@ -44,10 +44,11 @@ const getAuthorizationTokensLogic = createRequestLogic({
   type: authorizations.GET_AUTHORIZATION_TOKENS_LIST,
   process: async ({ action }) => {
     const {
-      payload: { userId, clientId },
-      meta: { selector },
-    } = action
-    const res = await tts.Authorizations.getAllTokens(userId, clientId, selector)
+      parentId,
+      parentType,
+      params: { page, limit, order },
+    } = action.payload
+    const res = await tts.Authorizations.getAllTokens(parentType, parentId, { page, limit, order })
 
     return { entities: res.tokens, tokensTotalCount: res.totalCount }
   },

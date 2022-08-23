@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
+import { createPaginationByParentRequestActions } from '@ttn-lw/lib/store/actions/pagination'
 
 export const GET_AUTHORIZATIONS_LIST_BASE = 'GET_AUTHORIZATIONS_LIST'
 export const [
@@ -44,11 +45,7 @@ export const [
     success: getAuthorizationTokensSuccess,
     failure: getAuthorizationTokensFailure,
   },
-] = createRequestActions(
-  GET_AUTHORIZATION_TOKENS_LIST_BASE,
-  (userId, clientId) => ({ userId, clientId }),
-  (userId, clientId, selector) => ({ selector }),
-)
+] = createPaginationByParentRequestActions('ACCESS_TOKENS')
 
 export const DELETE_AUTHORIZATION_BASE = 'DELETE_AUTHORIZATION'
 export const [
