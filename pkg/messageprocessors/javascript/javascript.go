@@ -18,9 +18,11 @@ package javascript
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"runtime/trace"
 	"strings"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors"
@@ -59,7 +61,7 @@ var (
 )
 
 func wrapDownlinkEncoderScript(script string) string {
-	// Fallback to Encoder() function for backwards compatibility with The Things Network Stack V2 payload functions.
+	// Fallback to Encoder() for backwards compatibility with The Things Network Stack V2 payload functions.
 	return fmt.Sprintf(`
 		%s
 
@@ -176,8 +178,21 @@ type decodeUplinkOutput struct {
 	Errors   []string               `json:"errors"`
 }
 
+type normalizeUplinkOutput struct {
+	Data     interface{} `json:"data"`
+	Warnings []string    `json:"warnings"`
+	Errors   []string    `json:"errors"`
+}
+
+type uplinkDecoderOutput struct {
+	Decoded    decodeUplinkOutput     `json:"decoded"`
+	Normalized *normalizeUplinkOutput `json:"normalized"`
+}
+
 func wrapUplinkDecoderScript(script string) string {
-	// Fallback to Decoder() function for backwards compatibility with The Things Network Stack V2 payload functions.
+	// This wrapper executes decodeUplink() if it is defined. Then, it executes normalizeUplink() if it is defined too,
+	// and if the output of decodeUplink() didn't return errors.
+	// Fallback to Decoder() for backwards compatibility with The Things Network Stack V2 payload functions.
 	return fmt.Sprintf(`
 		%s
 
@@ -185,10 +200,18 @@ func wrapUplinkDecoderScript(script string) string {
 			const bytes = input.bytes.slice();
 			const { fPort } = input;
 			if (typeof decodeUplink === 'function') {
-				return decodeUplink({ bytes, fPort });
+				const decoded = decodeUplink({ bytes, fPort });
+				let normalized;
+				const { data, errors } = decoded;
+				if ((!errors || !errors.length) && data && typeof normalizeUplink === 'function') {
+					normalized = normalizeUplink({ data });
+				}
+				return { decoded, normalized };
 			}
 			return {
-				data: Decoder(bytes, fPort)
+				decoded: {
+					data: Decoder(bytes, fPort)
+				}
 			}
 		}
 	`, script)
@@ -254,21 +277,56 @@ func (*host) decodeUplink(
 		return err
 	}
 
-	var output decodeUplinkOutput
+	var output uplinkDecoderOutput
 	err = valueAs(&output)
 	if err != nil {
 		return errOutput.WithCause(err)
 	}
-	if len(output.Errors) > 0 {
-		return errOutputErrors.WithAttributes("errors", strings.Join(output.Errors, ", "))
-	}
 
-	s, err := gogoproto.Struct(output.Data)
+	if errs := output.Decoded.Errors; len(errs) > 0 {
+		return errOutputErrors.WithAttributes("errors", strings.Join(errs, ", "))
+	}
+	decodedPayload, err := gogoproto.Struct(output.Decoded.Data)
 	if err != nil {
 		return errOutput.WithCause(err)
 	}
-	msg.DecodedPayload = s
-	msg.DecodedPayloadWarnings = output.Warnings
+	msg.DecodedPayload, msg.DecodedPayloadWarnings = decodedPayload, output.Decoded.Warnings
+
+	if normalized := output.Normalized; normalized != nil {
+		if errs := normalized.Errors; len(errs) > 0 {
+			return errOutputErrors.WithAttributes("errors", strings.Join(errs, ", "))
+		}
+		if normalized.Data == nil {
+			return errOutput.New()
+		}
+		// The returned data can be an array of measurements or a single measurement object.
+		var measurements []map[string]interface{}
+		if val := reflect.ValueOf(normalized.Data); val.Kind() == reflect.Slice {
+			measurements = make([]map[string]interface{}, val.Len())
+			for i := 0; i < val.Len(); i++ {
+				measurement, ok := val.Index(i).Interface().(map[string]interface{})
+				if !ok {
+					return errOutput.New()
+				}
+				measurements[i] = measurement
+			}
+		} else {
+			measurement, ok := normalized.Data.(map[string]interface{})
+			if !ok {
+				return errOutput.New()
+			}
+			measurements = []map[string]interface{}{measurement}
+		}
+		normalizedPayload := make([]*pbtypes.Struct, len(measurements))
+		for i := range measurements {
+			pb, err := gogoproto.Struct(measurements[i])
+			if err != nil {
+				return errOutput.WithCause(err)
+			}
+			normalizedPayload[i] = pb
+		}
+		msg.NormalizedPayload, msg.NormalizedPayloadWarnings = normalizedPayload, normalized.Warnings
+	}
 	return nil
 }
 
