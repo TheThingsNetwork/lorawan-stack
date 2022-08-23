@@ -64,11 +64,12 @@ func wrapDownlinkEncoderScript(script string) string {
 		%s
 
 		function main(input) {
+			const { data, fPort } = input;
 			if (typeof encodeDownlink === 'function') {
-				return encodeDownlink(input);
+				return encodeDownlink({ data, fPort });
 			}
 			return {
-				bytes: Encoder(input.data, input.fPort),
+				bytes: Encoder(data, fPort),
 				fPort: input.fPort
 			}
 		}
@@ -176,20 +177,18 @@ type decodeUplinkOutput struct {
 }
 
 func wrapUplinkDecoderScript(script string) string {
-	// Fallback to legacy Decoder() function for backwards compatibility with The Things Network Stack V2 payload functions.
+	// Fallback to Decoder() function for backwards compatibility with The Things Network Stack V2 payload functions.
 	return fmt.Sprintf(`
 		%s
 
 		function main(input) {
-			input = {
-				bytes: input.bytes.slice(),
-				fPort: input.fPort,
-			}
+			const bytes = input.bytes.slice();
+			const { fPort } = input;
 			if (typeof decodeUplink === 'function') {
-				return decodeUplink(input);
+				return decodeUplink({ bytes, fPort });
 			}
 			return {
-				data: Decoder(input.bytes, input.fPort)
+				data: Decoder(bytes, fPort)
 			}
 		}
 	`, script)
@@ -289,11 +288,9 @@ func wrapDownlinkDecoderScript(script string) string {
 		%s
 
 		function main(input) {
-			input = {
-				bytes: input.bytes.slice(),
-				fPort: input.fPort,
-			}
-			return decodeDownlink(input);
+			const bytes = input.bytes.slice();
+			const { fPort } = input;
+			return decodeDownlink({ bytes, fPort });
 		}
 	`, script)
 }
