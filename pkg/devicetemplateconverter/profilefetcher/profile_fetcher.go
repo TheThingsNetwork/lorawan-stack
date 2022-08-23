@@ -25,6 +25,13 @@ import (
 	"google.golang.org/grpc"
 )
 
+// EndDeviceProfileFetcher specifies the necessary methods to ascertain if the end device contains the necessary
+// information to make the profile template request and for performing the request itself.
+type EndDeviceProfileFetcher interface {
+	ShouldFetchProfile(*ttnpb.EndDevice) bool
+	FetchProfile(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDeviceTemplate, error)
+}
+
 // TemplateFetcher implements the steps required to obtain a end-device template from the Device Repository.
 type TemplateFetcher interface {
 	GetTemplate(ctx context.Context, in *ttnpb.GetTemplateRequest) (*ttnpb.EndDeviceTemplate, error)

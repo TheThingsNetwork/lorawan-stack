@@ -17,7 +17,6 @@ package profilefetcher
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/devicetemplates"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -25,7 +24,7 @@ import (
 type vendorIDProfileFetcher struct{}
 
 // NewFetcherByVendorIDs returns a end-device's profile fetcher that builds its request with vendorIDs.
-func NewFetcherByVendorIDs() devicetemplates.EndDeviceProfileFetcher {
+func NewFetcherByVendorIDs() EndDeviceProfileFetcher {
 	return &vendorIDProfileFetcher{}
 }
 

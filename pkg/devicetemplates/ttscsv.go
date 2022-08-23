@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"github.com/oklog/ulid/v2"
+	"go.thethings.network/lorawan-stack/v3/pkg/devicetemplateconverter/profilefetcher"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -39,21 +40,7 @@ const TTSCSV = "the-things-stack-csv"
 var errGenerateSessionKeyID = errors.DefineUnavailable("generate_session_key_id", "generate session key ID")
 
 type ttsCSV struct {
-	profileFetchers []EndDeviceProfileFetcher
-}
-
-// EndDeviceProfileFetcher specifies the necessary methods to ascertain if the end device contains the necessary
-// information to make the profile template request and for performing the request itself.
-type EndDeviceProfileFetcher interface {
-	ShouldFetchProfile(*ttnpb.EndDevice) bool
-	FetchProfile(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDeviceTemplate, error)
-}
-
-// NewCSV generates a new CSV converter with an implementation of the EndDeviceProfileFetcher interface.
-func NewCSV(fetchers ...EndDeviceProfileFetcher) Converter {
-	return &ttsCSV{
-		profileFetchers: fetchers,
-	}
+	profileFetchers []profilefetcher.EndDeviceProfileFetcher
 }
 
 // Format implements the devicetemplates.Converter interface.
@@ -503,5 +490,10 @@ func ProfileIDsFromContext(ctx context.Context) *ttnpb.EndDeviceVersionIdentifie
 }
 
 func init() {
-	RegisterConverter(TTSCSV, &ttsCSV{})
+	RegisterConverter(TTSCSV, &ttsCSV{
+		profileFetchers: []profilefetcher.EndDeviceProfileFetcher{
+			profilefetcher.NewFetcherByVendorIDs(),
+			profilefetcher.NewFetcherByVersionIDs(),
+		},
+	})
 }

@@ -20,7 +20,6 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
-	"go.thethings.network/lorawan-stack/v3/pkg/devicetemplateconverter/profilefetcher"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicetemplates"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -46,14 +45,6 @@ var errNotFound = errors.DefineNotFound("converter", "converter `{id}` not found
 
 // New returns a new *DeviceTemplateConverter.
 func New(c *component.Component, conf *Config) (*DeviceTemplateConverter, error) {
-	devicetemplates.RegisterConverter(
-		devicetemplates.TTSCSV,
-		devicetemplates.NewCSV(
-			profilefetcher.NewFetcherByVendorIDs(),
-			profilefetcher.NewFetcherByVersionIDs(),
-		),
-	)
-
 	// Always enable the TTS device template converters.
 	conf.Enabled = append(conf.Enabled,
 		devicetemplates.TTSJSON,
