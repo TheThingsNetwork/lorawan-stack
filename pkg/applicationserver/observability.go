@@ -56,6 +56,12 @@ var (
 		events.WithDataType(&ttnpb.ApplicationUplink{}),
 		events.WithPropagateToParent(),
 	)
+	evtNormalizeWarningDataUp = events.Define(
+		"as.up.data.normalize.warning", "normalize uplink data message warning",
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.ApplicationUplink{}),
+		events.WithPropagateToParent(),
+	)
 	evtReceiveJoinAccept = events.Define(
 		"as.up.join.receive", "receive join-accept message",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
