@@ -14,11 +14,10 @@
 
 import React from 'react'
 
-import { getGatewayWithHighestSNR } from '@console/components/events/utils'
+import { getDataRate, getSignalInformation } from '@console/components/events/utils'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import getByPath from '@ttn-lw/lib/get-by-path'
 
 import messages from '../messages'
 
@@ -28,22 +27,8 @@ import JSONPayload from './shared/json-payload'
 const ApplicationUplinkPreview = React.memo(({ event }) => {
   const { data, identifiers } = event
   const deviceIds = identifiers[0].device_ids
-  let snr, rssi
-
-  if ('rx_metadata' in data) {
-    if (data.rx_metadata.length > 1) {
-      const gatewayWithHighestSNR = getGatewayWithHighestSNR(data.rx_metadata)
-      snr = gatewayWithHighestSNR.snr
-      rssi = gatewayWithHighestSNR.rssi
-    } else {
-      snr = data.rx_metadata[0].snr
-      rssi = data.rx_metadata[0].rssi
-    }
-  }
-
-  const bandwidth = getByPath(data, 'settings.data_rate.lora.bandwidth')
-  const spreadingFactor = getByPath(data, 'settings.data_rate.lora.spreading_factor')
-  const dataRate = `SF${spreadingFactor}BW${bandwidth / 1000}`
+  const { snr, rssi } = getSignalInformation(data)
+  const dataRate = getDataRate(data)
 
   return (
     <DescriptionList>

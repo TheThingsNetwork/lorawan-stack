@@ -91,5 +91,44 @@ export const getPreviewComponentByApplicationUpMessage = message => {
   return messageType in dataTypeMap ? dataTypeMap[messageType] : DefaultPreview
 }
 
-export const getGatewayWithHighestSNR = gateways =>
-  gateways.reduce((prev, current) => (prev.snr >= current.snr ? prev : current))
+export const getSignalInformation = data => {
+  const notFound = { snr: NaN, rssi: NaN }
+  if (!data) {
+    return notFound
+  }
+  const { rx_metadata } = data
+  if (!rx_metadata || rx_metadata.length === 0) {
+    return notFound
+  }
+  const { snr, rssi } = rx_metadata.reduce((prev, current) =>
+    prev.snr >= current.snr ? prev : current,
+  )
+  return { snr, rssi }
+}
+
+export const getDataRate = data => {
+  if (!data) {
+    return undefined
+  }
+  const { settings } = data
+  if (!settings) {
+    return undefined
+  }
+  const { data_rate } = settings
+  if (!data_rate) {
+    return undefined
+  }
+  const { lora, fsk, lrfhss } = data_rate
+  // The encoding below mimics the encoding of the `modu` field of the UDP packet forwarder.
+  if (lora) {
+    const { bandwidth, spreading_factor } = lora
+    return `SF${spreading_factor}BW${bandwidth / 1000}`
+  } else if (fsk) {
+    const { bit_rate } = fsk
+    return `${bit_rate}`
+  } else if (lrfhss) {
+    const { modulation_type, operating_channel_width } = lrfhss
+    return `M${modulation_type ?? 0}CW${operating_channel_width / 1000}`
+  }
+  return undefined
+}
