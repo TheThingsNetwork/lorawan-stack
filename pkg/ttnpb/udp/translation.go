@@ -409,13 +409,14 @@ func FromDownlinkMessage(msg *ttnpb.DownlinkMessage) (*TxPacket, error) {
 	}
 
 	tx.DatR.DataRate = scheduled.DataRate
-	switch scheduled.DataRate.GetModulation().(type) {
+	switch mod := scheduled.DataRate.Modulation.(type) {
 	case *ttnpb.DataRate_Lora:
 		tx.CodR = scheduled.CodingRate
 		tx.NCRC = !scheduled.EnableCrc
 		tx.Modu = lora
 	case *ttnpb.DataRate_Fsk:
 		tx.Modu = fsk
+		tx.FDev = uint16(mod.Fsk.BitRate) / 2
 	default:
 		return nil, errDataRate.New()
 	}

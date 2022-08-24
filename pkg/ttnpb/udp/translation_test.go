@@ -418,7 +418,7 @@ func TestToGatewayUpRawMultiAntenna(t *testing.T) {
 	})
 }
 
-func TestFromDownlinkMessage(t *testing.T) {
+func TestFromDownlinkMessageLoRa(t *testing.T) {
 	a := assertions.New(t)
 
 	msg := &ttnpb.DownlinkMessage{
@@ -444,9 +444,56 @@ func TestFromDownlinkMessage(t *testing.T) {
 	}
 	tx, err := udp.FromDownlinkMessage(msg)
 	a.So(err, should.BeNil)
-	a.So(tx.DatR, should.Resemble, datarate.DR{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{Bandwidth: 500000, SpreadingFactor: 10}}}})
+	a.So(tx.DatR, should.Resemble, datarate.DR{
+		DataRate: &ttnpb.DataRate{
+			Modulation: &ttnpb.DataRate_Lora{
+				Lora: &ttnpb.LoRaDataRate{
+					Bandwidth:       500000,
+					SpreadingFactor: 10,
+				},
+			},
+		},
+	})
 	a.So(tx.Tmst, should.Equal, 1886440700)
 	a.So(tx.NCRC, should.Equal, true)
+	a.So(tx.Data, should.Equal, "ffOO")
+}
+
+func TestFromDownlinkMessageFSK(t *testing.T) {
+	a := assertions.New(t)
+
+	msg := &ttnpb.DownlinkMessage{
+		Settings: &ttnpb.DownlinkMessage_Scheduled{
+			Scheduled: &ttnpb.TxSettings{
+				Frequency: 925700000,
+				DataRate: &ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_Fsk{
+						Fsk: &ttnpb.FSKDataRate{
+							BitRate: 50000,
+						},
+					},
+				},
+				Downlink: &ttnpb.TxSettings_Downlink{
+					TxPower: 20,
+				},
+				Timestamp: 1886440700,
+			},
+		},
+		RawPayload: []byte{0x7d, 0xf3, 0x8e},
+	}
+	tx, err := udp.FromDownlinkMessage(msg)
+	a.So(err, should.BeNil)
+	a.So(tx.DatR, should.Resemble, datarate.DR{
+		DataRate: &ttnpb.DataRate{
+			Modulation: &ttnpb.DataRate_Fsk{
+				Fsk: &ttnpb.FSKDataRate{
+					BitRate: 50000,
+				},
+			},
+		},
+	})
+	a.So(tx.Tmst, should.Equal, 1886440700)
+	a.So(tx.FDev, should.Equal, 25000)
 	a.So(tx.Data, should.Equal, "ffOO")
 }
 
@@ -480,18 +527,4 @@ func TestDownlinkRoundtrip(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	a.So(actual, should.HaveEmptyDiff, expected)
-}
-
-func TestFromDownlinkMessageDummy(t *testing.T) {
-	a := assertions.New(t)
-
-	msg := ttnpb.DownlinkMessage{
-		Settings: &ttnpb.DownlinkMessage_Scheduled{
-			Scheduled: &ttnpb.TxSettings{
-				Downlink: &ttnpb.TxSettings_Downlink{},
-			},
-		},
-	}
-	_, err := udp.FromDownlinkMessage(&msg)
-	a.So(err, should.NotBeNil)
 }
