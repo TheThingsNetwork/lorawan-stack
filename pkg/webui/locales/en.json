@@ -82,6 +82,7 @@
   "account.containers.sessions-table.index.noExpiryDate": "No expiry date",
   "account.containers.sessions-table.index.endSession": "Logout to end this session",
   "account.containers.sessions-table.index.currentSession": "(This is the current session)",
+  "account.containers.tokens-table.tokens-table.tableTitle": "Access Tokens",
   "account.containers.tokens-table.tokens-table.deleteSuccess": "Access token invalidated",
   "account.containers.tokens-table.tokens-table.deleteFail": "There was an error and the access token could not be invalidated",
   "account.containers.tokens-table.tokens-table.deleteButton": "Invalidate this access token",
