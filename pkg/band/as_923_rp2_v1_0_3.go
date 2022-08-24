@@ -54,6 +54,7 @@ var as923RP2103Band = func(id string, offset as923GroupOffset) Band {
 			ttnpb.DataRateIndex_DATA_RATE_7: makeFSKDataRate(50000, makeDwellTimeMaxMACPayloadSizeFunc(250, 250)),
 		},
 		MaxADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+		StrictCodingRate:    true,
 
 		ReceiveDelay1:        defaultReceiveDelay1,
 		ReceiveDelay2:        defaultReceiveDelay2,

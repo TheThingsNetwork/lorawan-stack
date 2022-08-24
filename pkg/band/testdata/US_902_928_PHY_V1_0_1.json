@@ -589,6 +589,7 @@
       }
     }
   },
+  "StrictCodingRate": false,
   "FreqMultiplier": 100,
   "ImplementsCFList": false,
   "CFListType": "CHANNEL_MASKS",

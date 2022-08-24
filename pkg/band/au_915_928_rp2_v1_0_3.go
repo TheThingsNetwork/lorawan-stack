@@ -55,6 +55,7 @@ var AU_915_928_RP2_v1_0_3 = Band{
 		ttnpb.DataRateIndex_DATA_RATE_13: makeLoRaDataRate(7, 500000, Cr4_5, makeDwellTimeMaxMACPayloadSizeFunc(250, 250)),
 	},
 	MaxADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+	StrictCodingRate:    true,
 
 	ReceiveDelay1:        defaultReceiveDelay1,
 	ReceiveDelay2:        defaultReceiveDelay2,

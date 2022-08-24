@@ -158,6 +158,7 @@
       }
     }
   },
+  "StrictCodingRate": true,
   "FreqMultiplier": 100,
   "ImplementsCFList": true,
   "CFListType": "FREQUENCIES",

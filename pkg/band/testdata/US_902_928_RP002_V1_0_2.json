@@ -613,6 +613,7 @@
       }
     }
   },
+  "StrictCodingRate": true,
   "FreqMultiplier": 100,
   "ImplementsCFList": true,
   "CFListType": "CHANNEL_MASKS",

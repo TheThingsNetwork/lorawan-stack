@@ -65,6 +65,7 @@ var MA_869_870_Draft_Universal = Band{
 		ttnpb.DataRateIndex_DATA_RATE_11: makeLRFHSSDataRate(0, 336000, "2/3", makeConstMaxMACPayloadSizeFunc(123)),
 	},
 	MaxADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+	StrictCodingRate:    true,
 
 	ReceiveDelay1:        defaultReceiveDelay1,
 	ReceiveDelay2:        defaultReceiveDelay2,

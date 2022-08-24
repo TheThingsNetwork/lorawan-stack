@@ -18,7 +18,6 @@ import (
 	"math"
 	"time"
 
-	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -43,6 +42,8 @@ type Band struct {
 	SubBands []SubBandParameters
 
 	DataRates map[ttnpb.DataRateIndex]DataRate
+	// StricCodingRate depicts if the coding rate has been defined in the specifications for this band.
+	StrictCodingRate bool
 
 	FreqMultiplier   uint64
 	ImplementsCFList bool
@@ -139,7 +140,7 @@ func (b Band) FindUplinkDataRate(dr *ttnpb.DataRate) (ttnpb.DataRateIndex, DataR
 		// NOTE(2): A more robust solution could be to record a list of uplink-only data rates
 		// per band and only match those here, however it is more complex and is not necessary.
 		bDR, ok := b.DataRates[i]
-		if ok && proto.Equal(bDR.Rate, dr) {
+		if ok && compareDatarates(bDR.Rate, dr, b.StrictCodingRate) {
 			return i, bDR, true
 		}
 	}
@@ -154,7 +155,7 @@ func (b Band) FindDownlinkDataRate(dr *ttnpb.DataRate) (ttnpb.DataRateIndex, Dat
 	// NOTE: See notes in FindUplinkDataRate explaining the order of scanning data rates.
 	for i := ttnpb.DataRateIndex_DATA_RATE_15; i >= ttnpb.DataRateIndex_DATA_RATE_0; i-- {
 		bDR, ok := b.DataRates[i]
-		if ok && proto.Equal(bDR.Rate, dr) {
+		if ok && compareDatarates(bDR.Rate, dr, b.StrictCodingRate) {
 			return i, bDR, true
 		}
 	}
@@ -162,3 +163,40 @@ func (b Band) FindDownlinkDataRate(dr *ttnpb.DataRate) (ttnpb.DataRateIndex, Dat
 }
 
 func boolPtr(v bool) *bool { return &v }
+
+// compareDatarates checks if two given *ttnpb.DataRate's are equal. If the strict
+// bit is not set the *ttnpb.DataRate_Lora check will skip the `CodingRate`.
+// Make sure to update this check when altering any of the `DataRate` types.
+func compareDatarates(a, b *ttnpb.DataRate, strict bool) bool {
+	switch modA := a.Modulation.(type) {
+	case *ttnpb.DataRate_Lora:
+		switch modB := b.Modulation.(type) {
+		case *ttnpb.DataRate_Lora:
+			return (modA.Lora.Bandwidth == modB.Lora.Bandwidth &&
+				modA.Lora.SpreadingFactor == modB.Lora.SpreadingFactor &&
+				(!strict || (modA.Lora.CodingRate == modB.Lora.CodingRate)))
+		default:
+			return false
+		}
+
+	case *ttnpb.DataRate_Fsk:
+		switch modB := b.Modulation.(type) {
+		case *ttnpb.DataRate_Fsk:
+			return (modA.Fsk.BitRate == modB.Fsk.BitRate)
+		default:
+			return false
+		}
+
+	case *ttnpb.DataRate_Lrfhss:
+		switch modB := b.Modulation.(type) {
+		case *ttnpb.DataRate_Lrfhss:
+			return (modA.Lrfhss.ModulationType == modB.Lrfhss.ModulationType &&
+				modA.Lrfhss.OperatingChannelWidth == modB.Lrfhss.OperatingChannelWidth &&
+				modA.Lrfhss.CodingRate == modB.Lrfhss.CodingRate)
+		default:
+			return false
+		}
+	}
+
+	return false
+}

@@ -60,7 +60,6 @@ var toPBRegion = map[string]packetbroker.Region{
 func fromPBDataRate(dataRate *packetbroker.DataRate) (dr *ttnpb.DataRate, ok bool) {
 	switch mod := dataRate.GetModulation().(type) {
 	case *packetbroker.DataRate_Lora:
-		// TODO: Set coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466)
 		return &ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_Lora{
 				Lora: &ttnpb.LoRaDataRate{

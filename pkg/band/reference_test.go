@@ -94,7 +94,8 @@ type serializableBand struct {
 
 	SubBands []band.SubBandParameters
 
-	DataRates map[ttnpb.DataRateIndex]serializableDataRate
+	DataRates        map[ttnpb.DataRateIndex]serializableDataRate
+	StrictCodingRate bool
 
 	FreqMultiplier   uint64
 	ImplementsCFList bool
@@ -180,7 +181,8 @@ func makeBand(b band.Band) serializableBand {
 
 		SubBands: b.SubBands,
 
-		DataRates: makeDataRates(b.DataRates),
+		DataRates:        makeDataRates(b.DataRates),
+		StrictCodingRate: b.StrictCodingRate,
 
 		FreqMultiplier:   b.FreqMultiplier,
 		ImplementsCFList: b.ImplementsCFList,
@@ -244,13 +246,11 @@ func testBand(t *testing.T, band serializableBand, version ttnpb.PHYVersion) {
 	}
 }
 
-func TestBandDefinitions(t *testing.T) {
-	t.Parallel()
-
-	for name, versions := range band.All {
+func TestBandDefinitions(t *testing.T) { //nolint:paralleltest
+	// Running this in parallel breaks the option to generate golden samples.
+	for name, versions := range band.All { //nolint:paralleltest
 		for version, band := range versions {
 			t.Run(fmt.Sprintf("%v/%v", name, version), func(t *testing.T) {
-				t.Parallel()
 				testBand(t, makeBand(band), version)
 			})
 		}
