@@ -12,12 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  generateHexValue,
-  disableNetworkServer,
-  disableApplicationServer,
-  disableJoinServer,
-} from '../../../support/utils'
+import { generateHexValue } from '../../../support/utils'
 
 describe('End device repository manual registration', () => {
   const user = {
@@ -145,7 +140,7 @@ describe('End device repository manual registration', () => {
           })
       })
 
-      it('succeeds hiding provisioing information on JoinEUI reset', () => {
+      it('succeeds hiding provisioning information on JoinEUI reset', () => {
         cy.findByLabelText('End device brand').selectOption('test-brand-otaa')
         cy.findByLabelText('Model').selectOption('test-model2')
 
@@ -403,94 +398,6 @@ describe('End device repository manual registration', () => {
           `${Cypress.config(
             'consoleRootPath',
           )}/applications/${appId}/devices/eui-${devEui2.toLocaleLowerCase()}`,
-        )
-        cy.findByTestId('full-error-view').should('not.exist')
-      })
-    })
-
-    describe('Only Join server enabled', () => {
-      beforeEach(() => {
-        cy.augmentStackConfig([disableNetworkServer, disableApplicationServer])
-        cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
-        cy.visit(
-          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/add/repository`,
-        )
-      })
-
-      it('succeeds registering OTAA device', () => {
-        const devEui = generateHexValue(16)
-
-        // End device selection.
-        selectDevice({
-          brand_id: 'the-things-products',
-          model_id: 'The Things Uno',
-          hw_version: '1.0',
-          fw_version: 'quickstart',
-          band_id: 'EU_863_870',
-        })
-
-        // End device registration.
-        cy.findByLabelText('Frequency plan').should('not.exist')
-        cy.findByLabelText('JoinEUI').type(generateHexValue(16))
-        cy.findByRole('button', { name: 'Confirm' }).click()
-        cy.findByLabelText('DevEUI').type(devEui)
-        cy.findByLabelText('AppKey').type(generateHexValue(32))
-        cy.findByLabelText('End device ID').should(
-          'have.value',
-          `eui-${devEui.toLocaleLowerCase()}`,
-        )
-
-        cy.findByRole('button', { name: 'Add end device' }).click()
-
-        cy.location('pathname').should(
-          'eq',
-          `${Cypress.config(
-            'consoleRootPath',
-          )}/applications/${appId}/devices/eui-${devEui.toLocaleLowerCase()}`,
-        )
-        cy.findByTestId('full-error-view').should('not.exist')
-      })
-    })
-
-    describe('Join server disabled', () => {
-      beforeEach(() => {
-        cy.augmentStackConfig(disableJoinServer)
-        cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
-        cy.visit(
-          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/add/repository`,
-        )
-      })
-
-      it('succeeds registering OTAA device', () => {
-        const devEui = generateHexValue(16)
-
-        // End device selection.
-        selectDevice({
-          brand_id: 'the-things-products',
-          model_id: 'The Things Uno',
-          hw_version: '1.0',
-          fw_version: 'quickstart',
-          band_id: 'EU_863_870',
-        })
-
-        // End device registration.
-        cy.findByLabelText('Frequency plan').selectOption('EU_863_870_TTN')
-        cy.findByLabelText('JoinEUI').type(generateHexValue(16))
-        cy.findByRole('button', { name: 'Confirm' }).click()
-        cy.findByLabelText('DevEUI').type(devEui).blur()
-        cy.findByLabelText('AppKey').should('not.exist')
-        cy.findByLabelText('End device ID').should(
-          'have.value',
-          `eui-${devEui.toLocaleLowerCase()}`,
-        )
-
-        cy.findByRole('button', { name: 'Add end device' }).click()
-
-        cy.location('pathname').should(
-          'eq',
-          `${Cypress.config(
-            'consoleRootPath',
-          )}/applications/${appId}/devices/eui-${devEui.toLocaleLowerCase()}`,
         )
         cy.findByTestId('full-error-view').should('not.exist')
       })
