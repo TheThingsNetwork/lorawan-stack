@@ -14,9 +14,7 @@
 
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import { selectNsConfig } from '@ttn-lw/lib/selectors/env'
 
-const nsEnabled = selectNsConfig().enabled
 // Validation schema of the device type repository form section.
 // Please observe the following rules to keep the validation schemas maintainable:
 // 1. DO NOT USE ANY TYPE CONVERSIONS HERE. Use decocer/encoder on field level instead.
@@ -31,9 +29,7 @@ const validationSchema = Yup.object({
     firmware_version: Yup.string(),
     band_id: Yup.string(),
   }),
-  frequency_plan_id: nsEnabled
-    ? Yup.string().required(sharedMessages.validateRequired)
-    : Yup.string(),
+  frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
 })
 
 export default validationSchema

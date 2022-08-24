@@ -14,9 +14,6 @@
 
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import { selectJsConfig } from '@ttn-lw/lib/selectors/env'
-
-const jsEnabled = selectJsConfig().enabled
 
 import { parseLorawanMacVersion } from '@console/lib/device-utils'
 
@@ -86,7 +83,7 @@ const validationSchema = Yup.object({
   root_keys: Yup.object().when(
     ['supports_join', '_claim', 'lorawan_version', '$mayEditKeys'],
     (isOTAA, claim, lorawanVersion, mayEditKeys, schema) => {
-      if (jsEnabled && mayEditKeys && isOTAA && claim === false) {
+      if (mayEditKeys && isOTAA && claim === false) {
         let rootKeysSchema = appKeySchema
         if (parseLorawanMacVersion(lorawanVersion) >= 110) {
           rootKeysSchema = rootKeysSchema.concat(networkKeySchema)

@@ -25,7 +25,7 @@ import FreqPlansSelect from '@console/containers/device-freq-plans-select'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
-import { selectSupportLinkConfig, selectNsConfig } from '@ttn-lw/lib/selectors/env'
+import { selectSupportLinkConfig } from '@ttn-lw/lib/selectors/env'
 
 import { getTemplate } from '@console/store/actions/device-repository'
 
@@ -104,13 +104,12 @@ const DeviceTypeRepositoryFormSection = () => {
   const hasHwVersion = Boolean(hardwareVersion) && !isOtherOption(hardwareVersion)
   const hasFwVersion = Boolean(firmwareVersion) && !isOtherOption(firmwareVersion)
 
-  const nsEnabled = selectNsConfig().enabled
   const hasSelectedOther = hasSelectedDeviceRepositoryOther(version)
   const hasCompleted = hasCompletedDeviceRepositorySelection(version)
   const hasValidType = hasValidDeviceRepositoryType(version, template)
   const showProgressHint = !hasSelectedOther && !hasCompleted
   const showDeviceCard = hasValidType
-  const showFrequencyPlanSelector = hasValidType && nsEnabled
+  const showFrequencyPlanSelector = hasValidType
   const showOtherHint = hasSelectedOther
 
   // Apply template once it is fetched and register the template fields so they don't get cleaned.

@@ -58,6 +58,7 @@ const DeviceOnboardingFormInner = () => {
   } = useFormContext()
 
   const maySubmit =
+    Boolean(frequency_plan_id) &&
     Boolean(lorawan_version) &&
     Boolean(lorawan_phy_version) &&
     typeof _claim === 'boolean'

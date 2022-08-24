@@ -30,7 +30,6 @@ import { checkFromState, mayEditApplicationDeviceKeys } from '@console/lib/featu
 import messages from '../../messages'
 
 import { initialValues } from './validation-schema'
-import { selectJsConfig } from '@ttn-lw/lib/selectors/env'
 
 const devAddrEncoder = dev_addr => ({ ids: { dev_addr }, session: { dev_addr } })
 const devAddrDecoder = values => values?.ids?.dev_addr
@@ -62,14 +61,10 @@ const DeviceRegistrationFormSection = () => {
     ((isABP || isMulticast) && values._inputMethod === 'manual') ||
     (!isOTAA && values._inputMethod === 'device-repository')
 
-  const jsEnabled = selectJsConfig().enabled
-  const showRootKeys = (isOTAA && values._inputMethod === 'device-repository' && jsEnabled) ||
-  (isOTAA && values._inputMethod === 'manual')
-
   return (
     <div data-test-id="device-registration">
       {showDevEUI && <DevEUIComponent name="ids.dev_eui" required={isOTAA} />}
-      {showRootKeys && (
+      {isOTAA && (
         <>
           <Form.Field
             required
