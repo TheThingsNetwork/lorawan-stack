@@ -106,15 +106,15 @@ export const getSignalInformation = data => {
   return { snr, rssi }
 }
 
-export const getDataRate = data => {
+export const getDataRate = (data, selector = 'settings') => {
   if (!data) {
     return undefined
   }
-  const { settings } = data
-  if (!settings) {
+  const { [selector]: container } = data
+  if (!container) {
     return undefined
   }
-  const { data_rate } = settings
+  const { data_rate } = container
   if (!data_rate) {
     return undefined
   }
