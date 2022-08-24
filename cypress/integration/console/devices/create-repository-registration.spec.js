@@ -19,7 +19,7 @@ import {
   disableJoinServer,
 } from '../../../support/utils'
 
-describe.skip('End device repository create', () => {
+describe('End device repository manual registration', () => {
   const user = {
     ids: { user_id: 'create-dr-test-user' },
     primary_email_address: 'create-dr-test-user@example.com',
@@ -39,7 +39,7 @@ describe.skip('End device repository create', () => {
     }
 
     const selectDevice = ({ brand_id, model_id, hw_version, fw_version, band_id }) => {
-      cy.findByLabelText('Brand').selectOption(brand_id)
+      cy.findByLabelText('End device brand').selectOption(brand_id)
       cy.findByLabelText('Model').selectOption(model_id)
       cy.findByLabelText('Hardware Ver.').selectOption(hw_version)
       cy.findByLabelText('Firmware Ver.').selectOption(fw_version)
@@ -52,33 +52,19 @@ describe.skip('End device repository create', () => {
 
     it('displays UI elements in place', () => {
       cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
-      cy.visit(`${Cypress.config('consoleRootPath')}/applications/${appId}/devices/add/repository`)
+      cy.visit(`${Cypress.config('consoleRootPath')}/applications/${appId}/devices/add`)
 
       cy.findByText('Register end device', { selector: 'h1' }).should('be.visible')
-      cy.findByRole('button', { name: 'From The LoRaWAN Device Repository' })
-        .should('be.visible')
-        .and('have.attr', 'href', `/console/applications/${appId}/devices/add/repository`)
-      cy.findByRole('button', { name: 'Manually' })
-        .should('be.visible')
-        .and('have.attr', 'href', `/console/applications/${appId}/devices/add/manual`)
+      cy.findByLabelText('Select the end device in the LoRaWAN Device Repository').should(
+        'be.checked',
+      )
+      cy.findByLabelText('End device brand').should('be.visible')
+      cy.findByText(/Cannot find your exact end device?/).should('be.visible')
+      cy.findByText(/enter end device specifics manually/).should('be.visible')
+      cy.findByText('Please specify your device above to continue').should('be.visible')
+      cy.findByRole('button', { name: 'Add end device' }).should('not.exist')
 
-      cy.findByRole('heading', { name: '1. Select the end device' }).should('be.visible')
-      cy.findByLabelText('Brand').should('be.visible')
-      cy.findByText(/Cannot find your exact end device?/).within(() => {
-        cy.findByRole('link', { name: 'Try manual device registration' })
-          .should('be.visible')
-          .and('have.attr', 'href', `/console/applications/${appId}/devices/add/manual`)
-      })
-
-      cy.findByRole('heading', { name: '2. Enter registration data' }).should('be.visible')
-      cy.findByText(
-        'Please choose an end device first to proceed with entering registration data',
-      ).should('be.visible')
-      cy.findByRole('button', { name: 'Register end device' })
-        .should('be.visible')
-        .and('be.disabled')
-
-      cy.findByLabelText('Brand').selectOption('_other_')
+      cy.findByLabelText('End device brand').selectOption('_other_')
       cy.findByTestId('notification')
         .should('be.visible')
         .should('contain', 'Your end device will be added soon!')
@@ -86,9 +72,7 @@ describe.skip('End device repository create', () => {
           cy.findByText(
             /We're sorry, but your device is not yet part of The LoRaWAN Device Repository./,
           ).should('be.visible')
-          cy.findByRole('link', { name: 'manual device registration' })
-            .should('be.visible')
-            .and('have.attr', 'href', `/console/applications/${appId}/devices/add/manual`)
+          cy.findByText(/enter end device specifics manually/).should('be.visible')
           cy.findByRole('link', { name: /Adding Devices/ })
             .should('be.visible')
             .and(
@@ -97,13 +81,6 @@ describe.skip('End device repository create', () => {
               `https://thethingsindustries.com/docs/devices/adding-devices/`,
             )
         })
-
-      cy.findByText(
-        'Please choose an end device first to proceed with entering registration data',
-      ).should('be.visible')
-      cy.findByRole('button', { name: 'Register end device' })
-        .should('be.visible')
-        .and('be.disabled')
     })
 
     describe('Test Brand', () => {
@@ -138,13 +115,11 @@ describe.skip('End device repository create', () => {
         })
 
         cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
-        cy.visit(
-          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/add/repository`,
-        )
+        cy.visit(`${Cypress.config('consoleRootPath')}/applications/${appId}/devices/add`)
       })
 
       it('succeeds handling incomplete model', () => {
-        cy.findByLabelText('Brand').selectOption('test-brand-otaa')
+        cy.findByLabelText('End device brand').selectOption('test-brand-otaa')
         cy.findByLabelText('Model').selectOption('test-model1')
         cy.findByLabelText('Hardware Ver.').selectOption('1.0')
 
@@ -154,49 +129,80 @@ describe.skip('End device repository create', () => {
         cy.findByTestId('device-registration').should('not.exist')
       })
 
+      it('succeeds shwoing modal on device type change', () => {
+        cy.findByLabelText('End device brand').selectOption('test-brand-otaa')
+        cy.findByLabelText('Model').selectOption('test-model2')
+
+        cy.findByLabelText('Enter end device specifics manually').check()
+        cy.findByTestId('modal-window')
+          .should('be.visible')
+          .within(() => {
+            cy.findByText('Change input method', { selector: 'h1' }).should('be.visible')
+            cy.findByText(
+              'Are you sure you want to change the input method? Your current form progress will be lost.',
+            ).should('be.visible')
+            cy.findByRole('button', { name: /Change input method/ }).click()
+          })
+      })
+
+      it('succeeds hiding provisioing information on JoinEUI reset', () => {
+        cy.findByLabelText('End device brand').selectOption('test-brand-otaa')
+        cy.findByLabelText('Model').selectOption('test-model2')
+
+        cy.findByLabelText('Frequency plan').selectOption('EU_863_870_TTN')
+        cy.findByLabelText('JoinEUI').type(generateHexValue(16))
+        cy.findByRole('button', { name: 'Confirm' }).click()
+        cy.findByLabelText('DevEUI').type(generateHexValue(16))
+        cy.findByLabelText('AppKey').type(generateHexValue(32))
+
+        cy.findByRole('button', { name: 'Reset' }).click()
+        cy.findByLabelText('DevEUI').should('not.exist')
+        cy.findByLabelText('AppKey').should('not.exist')
+      })
+
       it('succeeds registering device with single region, hardware and firmware versions', () => {
-        const devId = 'test-model2-device'
+        const devEui = generateHexValue(16)
 
         // End device selection.
-        cy.findByLabelText('Brand').selectOption('test-brand-otaa')
+        cy.findByLabelText('End device brand').selectOption('test-brand-otaa')
         cy.findByLabelText('Model').selectOption('test-model2')
 
         // End device registration.
         cy.findByLabelText('Frequency plan').selectOption('EU_863_870_TTN')
-        cy.findByLabelText('AppEUI').type(generateHexValue(16))
-        cy.findByLabelText('DevEUI').type(generateHexValue(16))
+        cy.findByLabelText('JoinEUI').type(generateHexValue(16))
+        cy.findByRole('button', { name: 'Confirm' }).click()
+        cy.findByLabelText('DevEUI').type(devEui)
         cy.findByLabelText('AppKey').type(generateHexValue(32))
-        cy.findByLabelText('End device ID').type(devId)
+        cy.findByLabelText('End device ID').should(
+          'have.value',
+          `eui-${devEui.toLocaleLowerCase()}`,
+        )
 
-        cy.findByRole('button', { name: 'Register end device' }).click()
+        cy.findByRole('button', { name: 'Add end device' }).click()
 
         cy.location('pathname').should(
           'eq',
-          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${devId}`,
+          `${Cypress.config(
+            'consoleRootPath',
+          )}/applications/${appId}/devices/eui-${devEui.toLocaleLowerCase()}`,
         )
         cy.findByTestId('full-error-view').should('not.exist')
       })
 
       it('validates before submitting an empty form', () => {
-        cy.findByLabelText('Brand').selectOption('test-brand-otaa')
+        cy.findByLabelText('End device brand').selectOption('test-brand-otaa')
         cy.findByLabelText('Model').selectOption('test-model2')
+        cy.findByLabelText('Frequency plan').selectOption('EU_863_870_TTN')
+        cy.findByLabelText('JoinEUI').type(generateHexValue(16))
+        cy.findByRole('button', { name: 'Confirm' }).click()
 
-        cy.findByRole('button', { name: 'Register end device' })
-          .should('be.visible')
-          .and('not.be.disabled')
-
-        cy.findByRole('button', { name: 'Register end device' }).click()
+        cy.findByRole('button', { name: 'Add end device' }).click()
 
         cy.location('pathname').should(
           'eq',
-          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/add/repository`,
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/add`,
         )
-        cy.findErrorByLabelText('Frequency plan')
-          .should('contain.text', 'Frequency plan is required')
-          .and('be.visible')
-        cy.findErrorByLabelText('AppEUI')
-          .should('contain.text', 'AppEUI is required')
-          .and('be.visible')
+
         cy.findErrorByLabelText('DevEUI')
           .should('contain.text', 'DevEUI is required')
           .and('be.visible')
@@ -209,10 +215,10 @@ describe.skip('End device repository create', () => {
       })
 
       it('succeeds registering device', () => {
-        const devId = 'test-model3-device'
+        const devEui = generateHexValue(16)
 
         // End device selection.
-        cy.findByLabelText('Brand').selectOption('test-brand-otaa')
+        cy.findByLabelText('End device brand').selectOption('test-brand-otaa')
         cy.findByLabelText('Model').selectOption('test-model3')
         cy.findByLabelText('Hardware Ver.').selectOption('2.0')
         cy.findByLabelText('Firmware Ver.').selectOption('1.0.1')
@@ -220,16 +226,22 @@ describe.skip('End device repository create', () => {
 
         // End device registration.
         cy.findByLabelText('Frequency plan').selectOption('EU_863_870_TTN')
-        cy.findByLabelText('AppEUI').type(generateHexValue(16))
-        cy.findByLabelText('DevEUI').type(generateHexValue(16))
+        cy.findByLabelText('JoinEUI').type(generateHexValue(16))
+        cy.findByRole('button', { name: 'Confirm' }).click()
+        cy.findByLabelText('DevEUI').type(devEui)
         cy.findByLabelText('AppKey').type(generateHexValue(32))
-        cy.findByLabelText('End device ID').type(devId)
+        cy.findByLabelText('End device ID').should(
+          'have.value',
+          `eui-${devEui.toLocaleLowerCase()}`,
+        )
 
-        cy.findByRole('button', { name: 'Register end device' }).click()
+        cy.findByRole('button', { name: 'Add end device' }).click()
 
         cy.location('pathname').should(
           'eq',
-          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${devId}`,
+          `${Cypress.config(
+            'consoleRootPath',
+          )}/applications/${appId}/devices/eui-${devEui.toLocaleLowerCase()}`,
         )
         cy.findByTestId('full-error-view').should('not.exist')
       })
@@ -266,16 +278,12 @@ describe.skip('End device repository create', () => {
         selectUno()
 
         cy.findByLabelText('Frequency plan').should('be.visible')
-        cy.findByLabelText('AppEUI').should('be.visible')
-        cy.findByLabelText('DevEUI').should('be.visible')
-        cy.findByLabelText('AppKey').should('be.visible')
-        cy.findByLabelText('End device ID').should('be.visible')
-        cy.findByLabelText('View registered end device').should('exist')
-        cy.findByLabelText('Register another end device of this type').should('exist')
-
-        cy.findByRole('button', { name: 'Register end device' })
-          .should('be.visible')
-          .and('not.be.disabled')
+        cy.findByLabelText('JoinEUI').should('be.visible')
+        cy.findByRole('button', { name: 'Confirm' }).should('be.visible').and('be.disabled')
+        cy.findByRole('button', { name: 'Add end device' }).should('not.exist')
+        cy.findByText(
+          'To continue, please enter the JoinEUI of the end device so we can determine onboarding options',
+        ).should('be.visible')
       })
 
       it('succeeds registering the things uno', () => {
@@ -285,12 +293,16 @@ describe.skip('End device repository create', () => {
 
         // End device registration.
         cy.findByLabelText('Frequency plan').selectOption('EU_863_870_TTN')
-        cy.findByLabelText('AppEUI').type(generateHexValue(16))
+        cy.findByLabelText('JoinEUI').type(generateHexValue(16))
+        cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('DevEUI').type(devEui)
         cy.findByLabelText('AppKey').type(generateHexValue(32))
-        cy.findByLabelText('End device ID').should('have.value', `eui-${devEui}`)
+        cy.findByLabelText('End device ID').should(
+          'have.value',
+          `eui-${devEui.toLocaleLowerCase()}`,
+        )
 
-        cy.findByRole('button', { name: 'Register end device' }).click()
+        cy.findByRole('button', { name: 'Add end device' }).click()
 
         cy.location('pathname').should(
           'eq',
@@ -306,12 +318,13 @@ describe.skip('End device repository create', () => {
 
         // End device registration.
         cy.findByLabelText('Frequency plan').selectOption('EU_863_870_TTN')
-        cy.findByLabelText('AppEUI').type(generateHexValue(16))
+        cy.findByLabelText('JoinEUI').type(generateHexValue(16))
+        cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('DevEUI').type(generateHexValue(16))
         cy.findByLabelText('AppKey').type(generateHexValue(32))
         cy.findByLabelText('End device ID').clear().type(devId)
 
-        cy.findByRole('button', { name: 'Register end device' }).click()
+        cy.findByRole('button', { name: 'Add end device' }).click()
 
         cy.location('pathname').should(
           'eq',
@@ -327,16 +340,22 @@ describe.skip('End device repository create', () => {
 
         // End device registration.
         cy.findByLabelText('Frequency plan').selectOption('EU_863_870_TTN')
-        cy.findByLabelText('AppEUI').type(generateHexValue(16))
+        cy.findByLabelText('JoinEUI').type(generateHexValue(16))
+        cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('DevEUI').type(devEui)
         cy.findByLabelText('AppKey').type(generateHexValue(32))
-        cy.findByLabelText('End device ID').should('have.value', `eui-${devEui}`)
+        cy.findByLabelText('End device ID').should(
+          'have.value',
+          `eui-${devEui.toLocaleLowerCase()}`,
+        )
 
-        cy.findByRole('button', { name: 'Register end device' }).click()
+        cy.findByRole('button', { name: 'Add end device' }).click()
 
         cy.location('pathname').should(
           'eq',
-          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/eui-${devEui}`,
+          `${Cypress.config(
+            'consoleRootPath',
+          )}/applications/${appId}/devices/eui-${devEui.toLocaleLowerCase()}`,
         )
         cy.findByTestId('full-error-view').should('not.exist')
       })
@@ -349,13 +368,17 @@ describe.skip('End device repository create', () => {
 
         // End device registration.
         cy.findByLabelText('Frequency plan').selectOption('EU_863_870_TTN')
-        cy.findByLabelText('AppEUI').type(generateHexValue(16))
+        cy.findByLabelText('JoinEUI').type(generateHexValue(16))
+        cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('DevEUI').type(devEui1)
         cy.findByLabelText('AppKey').type(generateHexValue(32))
-        cy.findByLabelText('End device ID').should('have.value', `eui-${devEui1}`)
+        cy.findByLabelText('End device ID').should(
+          'have.value',
+          `eui-${devEui1.toLocaleLowerCase()}`,
+        )
         cy.findByLabelText('Register another end device of this type').check()
 
-        cy.findByRole('button', { name: 'Register end device' }).click()
+        cy.findByRole('button', { name: 'Add end device' }).click()
 
         cy.findByTestId('toast-notification')
           .should('be.visible')
@@ -367,14 +390,19 @@ describe.skip('End device repository create', () => {
         // End device registration.
         cy.findByLabelText('DevEUI').type(devEui2)
         cy.findByLabelText('AppKey').type(generateHexValue(32))
-        cy.findByLabelText('End device ID').should('have.value', `eui-${devEui2}`)
+        cy.findByLabelText('End device ID').should(
+          'have.value',
+          `eui-${devEui2.toLocaleLowerCase()}`,
+        )
         cy.findByLabelText('View registered end device').check()
 
-        cy.findByRole('button', { name: 'Register end device' }).click()
+        cy.findByRole('button', { name: 'Add end device' }).click()
 
         cy.location('pathname').should(
           'eq',
-          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/eui-${devEui2}`,
+          `${Cypress.config(
+            'consoleRootPath',
+          )}/applications/${appId}/devices/eui-${devEui2.toLocaleLowerCase()}`,
         )
         cy.findByTestId('full-error-view').should('not.exist')
       })
@@ -403,16 +431,22 @@ describe.skip('End device repository create', () => {
 
         // End device registration.
         cy.findByLabelText('Frequency plan').should('not.exist')
-        cy.findByLabelText('AppEUI').type(generateHexValue(16))
+        cy.findByLabelText('JoinEUI').type(generateHexValue(16))
+        cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('DevEUI').type(devEui)
         cy.findByLabelText('AppKey').type(generateHexValue(32))
-        cy.findByLabelText('End device ID').should('have.value', `eui-${devEui}`)
+        cy.findByLabelText('End device ID').should(
+          'have.value',
+          `eui-${devEui.toLocaleLowerCase()}`,
+        )
 
-        cy.findByRole('button', { name: 'Register end device' }).click()
+        cy.findByRole('button', { name: 'Add end device' }).click()
 
         cy.location('pathname').should(
           'eq',
-          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/eui-${devEui}`,
+          `${Cypress.config(
+            'consoleRootPath',
+          )}/applications/${appId}/devices/eui-${devEui.toLocaleLowerCase()}`,
         )
         cy.findByTestId('full-error-view').should('not.exist')
       })
@@ -441,16 +475,22 @@ describe.skip('End device repository create', () => {
 
         // End device registration.
         cy.findByLabelText('Frequency plan').selectOption('EU_863_870_TTN')
-        cy.findByLabelText('AppEUI').type(generateHexValue(16))
+        cy.findByLabelText('JoinEUI').type(generateHexValue(16))
+        cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('DevEUI').type(devEui).blur()
         cy.findByLabelText('AppKey').should('not.exist')
-        cy.findByLabelText('End device ID').should('have.value', `eui-${devEui}`)
+        cy.findByLabelText('End device ID').should(
+          'have.value',
+          `eui-${devEui.toLocaleLowerCase()}`,
+        )
 
-        cy.findByRole('button', { name: 'Register end device' }).click()
+        cy.findByRole('button', { name: 'Add end device' }).click()
 
         cy.location('pathname').should(
           'eq',
-          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/eui-${devEui}`,
+          `${Cypress.config(
+            'consoleRootPath',
+          )}/applications/${appId}/devices/eui-${devEui.toLocaleLowerCase()}`,
         )
         cy.findByTestId('full-error-view').should('not.exist')
       })
@@ -495,42 +535,21 @@ describe.skip('End device repository create', () => {
         )
       })
 
-      it('displays UI elements in place', () => {
-        cy.findByLabelText('Brand').selectOption('test-brand-abp')
-        cy.findByLabelText('Model').selectOption('test-model1')
-        cy.findByLabelText('Profile (Region)').selectOption('EU_863_870')
-
-        cy.findByLabelText('Frequency plan').should('be.visible')
-        cy.findByLabelText('Device address').should('be.visible')
-        cy.findByLabelText('AppSKey').should('be.visible')
-        cy.findByLabelText('NwkSKey').should('be.visible')
-        cy.findByLabelText('End device ID').should('be.visible')
-        cy.findByLabelText('View registered end device').should('exist')
-        cy.findByLabelText('Register another end device of this type').should('exist')
-
-        cy.findByRole('button', { name: 'Register end device' })
-          .should('be.visible')
-          .and('not.be.disabled')
-      })
-
       it('validates before submitting an empty form', () => {
-        cy.findByLabelText('Brand').selectOption('test-brand-abp')
+        cy.findByLabelText('End device brand').selectOption('test-brand-abp')
         cy.findByLabelText('Model').selectOption('test-model1')
         cy.findByLabelText('Profile (Region)').selectOption('EU_863_870')
+        cy.findByLabelText('Frequency plan').selectOption('EU_863_870_TTN')
+        cy.findByLabelText('JoinEUI').type(generateHexValue(16))
+        cy.findByRole('button', { name: 'Confirm' }).click()
 
-        cy.findByRole('button', { name: 'Register end device' })
-          .should('be.visible')
-          .and('not.be.disabled')
-
-        cy.findByRole('button', { name: 'Register end device' }).click()
+        cy.findByRole('button', { name: 'Add end device' }).click()
 
         cy.location('pathname').should(
           'eq',
           `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/add/repository`,
         )
-        cy.findErrorByLabelText('Frequency plan')
-          .should('contain.text', 'Frequency plan is required')
-          .and('be.visible')
+
         cy.findErrorByLabelText('Device address')
           .should('contain.text', 'Device address is required')
           .and('be.visible')
@@ -549,18 +568,20 @@ describe.skip('End device repository create', () => {
         const devId = 'test-abp-dev'
 
         // End device selection.
-        cy.findByLabelText('Brand').selectOption('test-brand-abp')
+        cy.findByLabelText('End device brand').selectOption('test-brand-abp')
         cy.findByLabelText('Model').selectOption('test-model1')
         cy.findByLabelText('Profile (Region)').selectOption('EU_863_870')
 
         // End device registration.
         cy.findByLabelText('Frequency plan').selectOption('EU_863_870_TTN')
+        cy.findByLabelText('JoinEUI').type(generateHexValue(16))
+        cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('Device address').type(generateHexValue(8))
         cy.findByLabelText('AppSKey').type(generateHexValue(32))
         cy.findByLabelText('NwkSKey').type(generateHexValue(32))
         cy.findByLabelText('End device ID').type(devId)
 
-        cy.findByRole('button', { name: 'Register end device' }).click()
+        cy.findByRole('button', { name: 'Add end device' }).click()
 
         cy.location('pathname').should(
           'eq',
@@ -573,19 +594,21 @@ describe.skip('End device repository create', () => {
         const devId1 = 'test-abp-dev-1'
 
         // End device selection.
-        cy.findByLabelText('Brand').selectOption('test-brand-abp')
+        cy.findByLabelText('End device brand').selectOption('test-brand-abp')
         cy.findByLabelText('Model').selectOption('test-model1')
         cy.findByLabelText('Profile (Region)').selectOption('EU_863_870')
 
         // End device registration.
         cy.findByLabelText('Frequency plan').selectOption('EU_863_870_TTN')
+        cy.findByLabelText('JoinEUI').type(generateHexValue(16))
+        cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('Device address').type(generateHexValue(8))
         cy.findByLabelText('AppSKey').type(generateHexValue(32))
         cy.findByLabelText('NwkSKey').type(generateHexValue(32))
         cy.findByLabelText('End device ID').type(devId1)
         cy.findByLabelText('Register another end device of this type').check()
 
-        cy.findByRole('button', { name: 'Register end device' }).click()
+        cy.findByRole('button', { name: 'Add end device' }).click()
 
         cy.findByTestId('toast-notification')
           .should('be.visible')
@@ -601,7 +624,7 @@ describe.skip('End device repository create', () => {
         cy.findByLabelText('End device ID').type(devId2)
         cy.findByLabelText('View registered end device').check()
 
-        cy.findByRole('button', { name: 'Register end device' }).click()
+        cy.findByRole('button', { name: 'Add end device' }).click()
 
         cy.location('pathname').should(
           'eq',
