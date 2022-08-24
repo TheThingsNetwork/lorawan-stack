@@ -138,6 +138,7 @@ describe('End device repository manual registration', () => {
             ).should('be.visible')
             cy.findByRole('button', { name: /Change input method/ }).click()
           })
+        cy.findByLabelText('Enter end device specifics manually').should('be.checked')
       })
 
       it('succeeds hiding provisioning information on JoinEUI reset', () => {
