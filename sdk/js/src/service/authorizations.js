@@ -23,10 +23,13 @@ class Authorizations {
     autoBind(this)
   }
 
-  async getAllAuthorizations(userId) {
-    const result = await this._api.OAuthAuthorizationRegistry.List({
-      routeParams: { 'user_ids.user_id': userId },
-    })
+  async getAllAuthorizations(userId, params) {
+    const result = await this._api.OAuthAuthorizationRegistry.List(
+      {
+        routeParams: { 'user_ids.user_id': userId },
+      },
+      { ...params },
+    )
 
     return Marshaler.payloadListResponse('authorizations', result)
   }

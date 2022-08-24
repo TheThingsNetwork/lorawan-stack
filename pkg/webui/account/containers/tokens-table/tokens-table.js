@@ -31,7 +31,7 @@ import DateTime from '@ttn-lw/lib/components/date-time'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { getAuthorizationTokensList } from '@account/store/actions/authorizations'
+import { getAccessTokensList } from '@account/store/actions/authorizations'
 
 import {
   selectTokens,
@@ -54,8 +54,8 @@ const TokensTable = props => {
     props
 
   useBreadcrumbs(
-    'client-authorizations.single.tokens',
-    <Breadcrumb path={`/client-authorizations/${clientId}/tokens`} content={'tokens'} />,
+    'client-authorizations.single.access-tokens',
+    <Breadcrumb path={`/client-authorizations/${clientId}/access-tokens`} content={'tokens'} />,
   )
 
   const handleDeleteToken = React.useCallback(
@@ -164,7 +164,7 @@ const TokensTable = props => {
   )
 
   const getItems = React.useCallback(
-    filters => getAuthorizationTokensList(userId, clientId, { ...filters }),
+    filters => getAccessTokensList(userId, clientId, { ...filters }),
     [userId, clientId],
   )
 

@@ -76,7 +76,7 @@ const OAuthClientAuthorizationsTable = props => {
     [],
   )
 
-  const getItems = React.useCallback(() => getAuthorizationsList(userId, []), [userId])
+  const getItems = React.useCallback(filters => getAuthorizationsList(userId, ...filters), [userId])
 
   return (
     <FetchTable

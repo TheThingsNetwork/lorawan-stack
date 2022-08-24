@@ -45,9 +45,9 @@ describe('Account App authorization management', () => {
     cy.findByText('Actions').should('be.visible')
   })
 
-  it('succeeds showing active authorization tokens', () => {
+  it('succeeds showing active access tokens', () => {
     cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
-    cy.visit(`${Cypress.config('accountAppRootPath')}/client-authorizations/console/tokens`)
+    cy.visit(`${Cypress.config('accountAppRootPath')}/client-authorizations/console/access-tokens`)
     cy.findByRole('rowgroup').within(() => {
       cy.findAllByRole('row').should('have.length', 1)
     })

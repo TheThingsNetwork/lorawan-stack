@@ -70,7 +70,7 @@ const AuthorizationOverview = props => {
       name: 'overview',
       link: `${basePath}`,
     },
-    { title: m.accessTokens, name: 'tokens', link: `${basePath}/tokens` },
+    { title: m.accessTokens, name: 'access-tokens', link: `${basePath}/access-tokens` },
   ]
 
   return (
@@ -89,7 +89,7 @@ const AuthorizationOverview = props => {
       </div>
       <Switch>
         <Route exact path={path} component={AuthorizationSettings} />
-        <Route exact path={`${path}/tokens`} component={TokensTable} />
+        <Route exact path={`${path}/access-tokens`} component={TokensTable} />
         <NotFoundRoute />
       </Switch>
     </React.Fragment>
