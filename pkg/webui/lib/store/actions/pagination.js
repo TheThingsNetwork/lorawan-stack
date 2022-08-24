@@ -71,6 +71,12 @@ export const createPaginationByIdDeleteActions = name =>
     targetId,
   }))
 
+export const createPaginationByRouteParametersDeleteActions = name =>
+  createRequestActions(createPaginationDeleteBaseActionType(name), (routeParams, id) => ({
+    routeParams,
+    id,
+  }))
+
 export const createPaginationRestoreActions = name =>
   createRequestActions(
     createPaginationRestoreBaseActionType(name),

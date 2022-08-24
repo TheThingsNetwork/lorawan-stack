@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
 import {
   createPaginationByParentRequestActions,
   createPaginationByIdRequestActions,
+  createPaginationByIdDeleteActions,
+  createPaginationByRouteParametersDeleteActions,
 } from '@ttn-lw/lib/store/actions/pagination'
 
 export const GET_AUTHORIZATIONS_LIST_BASE = 'GET_AUTHORIZATIONS_LIST'
@@ -58,11 +59,7 @@ export const [
     success: deleteAuthorizationSuccess,
     failure: deleteAuthorizationFailure,
   },
-] = createRequestActions(
-  DELETE_AUTHORIZATION_BASE,
-  (userId, clientId) => ({ userId, clientId }),
-  (userId, clientId, selector) => ({ selector }),
-)
+] = createPaginationByIdDeleteActions('AUTHORIZATION', (userId, clientId) => ({ userId, clientId }))
 
 export const DELETE_ACCESS_TOKEN_BASE = 'DELETE_ACCESS_TOKEN'
 export const [
@@ -76,7 +73,7 @@ export const [
     success: deleteAccessTokenSuccess,
     failure: deleteAccessTokenFailure,
   },
-] = createRequestActions(DELETE_ACCESS_TOKEN_BASE, (userId, clientId, id) => ({
+] = createPaginationByRouteParametersDeleteActions('ACCESS_TOKEN', (userId, clientId, id) => ({
   userId,
   clientId,
   id,
@@ -90,8 +87,7 @@ export const [
     failure: DELETE_ALL_TOKENS_FAILURE,
   },
   { request: deleteAllTokens, success: deleteAllTokensSuccess, failure: deleteAllTokensFailure },
-] = createRequestActions(DELETE_ALL_TOKENS_BASE, (userId, clientId, ids) => ({
-  userId,
-  clientId,
+] = createPaginationByRouteParametersDeleteActions('ACCESS_TOKENS', (routeParams, ids) => ({
+  routeParams,
   ids,
 }))
