@@ -87,7 +87,6 @@ const OAuthClientAuthorizationsTable = props => {
       baseDataSelector={baseDataSelector}
       getItemPathPrefix={getItemPathPrefix}
       tableTitle={<Message content={m.tableTitle} />}
-      handlesSorting
       clickable
       {...rest}
     />

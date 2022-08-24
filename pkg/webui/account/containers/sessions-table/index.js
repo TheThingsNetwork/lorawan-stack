@@ -127,6 +127,7 @@ const UserSessionsTable = props => {
         name: 'created_at',
         displayName: sharedMessages.createdAt,
         width: 25,
+        sortable: true,
         render: created_at => (
           <>
             <DateTime value={created_at} />

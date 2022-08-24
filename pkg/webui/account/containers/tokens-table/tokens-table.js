@@ -26,6 +26,7 @@ import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
+import Message from '@ttn-lw/lib/components/message'
 import DateTime from '@ttn-lw/lib/components/date-time'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -40,6 +41,7 @@ import {
 } from '@account/store/selectors/authorizations'
 
 const m = defineMessages({
+  tableTitle: 'Access Tokens',
   deleteSuccess: 'Access token invalidated',
   deleteFail: 'There was an error and the access token could not be invalidated',
   deleteButton: 'Invalidate this access token',
@@ -128,7 +130,6 @@ const TokensTable = props => {
         name: 'expires_at',
         displayName: m.expires,
         width: 20,
-        sortable: true,
         render: expires_at => <DateTime.Relative value={expires_at} />,
       },
       {
@@ -190,7 +191,7 @@ const TokensTable = props => {
             baseDataSelector={baseDataSelector}
             pageSize={PAGE_SIZES.SMALL}
             actionItems={deleteAllButton}
-            handlesSorting
+            tableTitle={<Message content={m.tableTitle} />}
             {...rest}
           />
         </Col>
