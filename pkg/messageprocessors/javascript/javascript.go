@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors"
+	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/normalizedpayload"
 	"go.thethings.network/lorawan-stack/v3/pkg/scripting"
 	js "go.thethings.network/lorawan-stack/v3/pkg/scripting/javascript"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -324,6 +325,11 @@ func (*host) decodeUplink(
 				return errOutput.WithCause(err)
 			}
 			normalizedPayload[i] = pb
+		}
+		// Validate the normalized payload.
+		_, err := normalizedpayload.Parse(normalizedPayload)
+		if err != nil {
+			return errOutput.WithCause(err)
 		}
 		msg.NormalizedPayload, msg.NormalizedPayloadWarnings = normalizedPayload, normalized.Warnings
 	}

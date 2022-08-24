@@ -484,6 +484,37 @@ func TestDecodeUplink(t *testing.T) {
 		a.So(errors.IsAborted(err), should.BeTrue)
 	}
 
+	// Decode and normalize a single measurement with out-of-range value.
+	{
+		message := &ttnpb.ApplicationUplink{
+			FPort:      4,
+			FrmPayload: []byte{0x80, 0x42}, // Temperature is -327.02 °C which is below absolute zero
+		}
+		//nolint:lll
+		script := `
+			function decodeUplink(input) {
+				return {
+					data: {
+						temperature: (((input.bytes[0] & 0x80 ? input.bytes[0] - 0x100 : input.bytes[0]) << 8) | input.bytes[1]) / 100
+					}
+				}
+			}
+
+			function normalizeUplink(input) {
+				return {
+					data: {
+						air: {
+							temperature: input.data.temperature
+						}
+					}
+				}
+			}
+			`
+		err := host.DecodeUplink(ctx, ids, nil, message, script)
+		a.So(err, should.NotBeNil)
+		a.So(errors.IsInvalidArgument(err), should.BeTrue)
+	}
+
 	// The Things Node example.
 	{
 		message := &ttnpb.ApplicationUplink{
