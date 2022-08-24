@@ -237,6 +237,17 @@ func addVersions(status *ttnpb.GatewayStatus, stat Stat) {
 	if stat.HAL != nil {
 		status.Versions["hal"] = *stat.HAL
 	}
+	if hver := stat.HVer; hver != nil {
+		if fpga := hver.FPGA; fpga != nil {
+			status.Versions["fpga"] = strconv.Itoa(int(*fpga))
+		}
+		if dsp0 := hver.DSP0; dsp0 != nil {
+			status.Versions["dsp0"] = strconv.Itoa(int(*dsp0))
+		}
+		if dsp1 := hver.DSP1; dsp1 != nil {
+			status.Versions["dsp1"] = strconv.Itoa(int(*dsp1))
+		}
+	}
 }
 
 func addMetrics(status *ttnpb.GatewayStatus, stat Stat) {

@@ -128,6 +128,11 @@ type Stat struct {
 	FPGA *uint32       `json:"fpga,omitempty"` // Version of Gateway FPGA (unsigned integer)
 	DSP  *uint32       `json:"dsp,omitempty"`  // Version of Gateway DSP software (unsigned interger)
 	HAL  *string       `json:"hal,omitempty"`  // Version of Gateway driver (format X.X.X)
+	HVer *struct {
+		FPGA *uint32 `json:"fpga,omitempty"` // Version of FPGA (unsigned integer)
+		DSP0 *uint32 `json:"dsp0,omitempty"` // Version of DSP 0 software (unsigned interger)
+		DSP1 *uint32 `json:"dsp1,omitempty"` // Version of DSP 1 software (unsigned interger)
+	} `json:"hver,omitempty"` // Gateway hardware versions
 }
 
 // TxError is returned in the TxPacketAck
