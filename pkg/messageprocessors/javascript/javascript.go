@@ -332,6 +332,17 @@ func (*host) decodeUplink(
 			return errOutput.WithCause(err)
 		}
 		msg.NormalizedPayload, msg.NormalizedPayloadWarnings = normalizedPayload, normalized.Warnings
+	} else {
+		// If the normalizer is not set, the decoder may return already normalized payload.
+		// This is a best effort attempt to parse the decoded payload as normalized payload.
+		// If that does not return an error, the decoded payload is assumed to be normalized.
+		normalizedPayload := []*pbtypes.Struct{
+			decodedPayload,
+		}
+		_, err := normalizedpayload.Parse(normalizedPayload)
+		if err == nil {
+			msg.NormalizedPayload, msg.NormalizedPayloadWarnings = normalizedPayload, nil
+		}
 	}
 	return nil
 }

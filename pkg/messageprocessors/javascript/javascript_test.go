@@ -384,6 +384,34 @@ func TestDecodeUplink(t *testing.T) {
 		})
 	}
 
+	// Decode a single measurement that is already normalized.
+	{
+		//nolint:lll
+		script := `
+		function decodeUplink(input) {
+			return {
+				data: {
+					air: {
+						temperature: (((input.bytes[0] & 0x80 ? input.bytes[0] - 0x100 : input.bytes[0]) << 8) | input.bytes[1]) / 100
+					}
+				}
+			}
+		}
+		`
+		err := host.DecodeUplink(ctx, ids, nil, message, script)
+		a.So(err, should.BeNil)
+		a.So(message.NormalizedPayload, should.HaveLength, 1)
+		a.So(message.DecodedPayload, should.Resemble, message.NormalizedPayload[0])
+
+		measurements, err := normalizedpayload.Parse(message.NormalizedPayload)
+		a.So(err, should.BeNil)
+		a.So(measurements[0], should.Resemble, normalizedpayload.Measurement{
+			Air: &normalizedpayload.Air{
+				Temperature: float64Ptr(-21.3),
+			},
+		})
+	}
+
 	// Decode and normalize two measurements.
 	{
 		script := `
