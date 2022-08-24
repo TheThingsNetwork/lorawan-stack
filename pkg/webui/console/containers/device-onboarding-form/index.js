@@ -58,7 +58,6 @@ const DeviceOnboardingFormInner = () => {
   } = useFormContext()
 
   const maySubmit =
-    Boolean(frequency_plan_id) &&
     Boolean(lorawan_version) &&
     Boolean(lorawan_phy_version) &&
     typeof _claim === 'boolean'
@@ -126,10 +125,9 @@ const DeviceOnboardingForm = () => {
             errors: {},
             values: {
               ...values,
-              ...initialValues,
               ids: {
                 ...initialValues.ids,
-                join_eui: supports_join ? values.ids.join_eui : undefined,
+                join_eui: values.ids.join_eui,
               },
               frequency_plan_id: values.frequency_plan_id,
               version_ids: values.version_ids,
