@@ -53,6 +53,23 @@ type RxPacket struct {
 	Aesk  uint         `json:"aesk"`            // AES key index used for encrypting fine timestamps (unsigned integer)
 }
 
+// reduceCodingRate reduces the coding rate fraction returned by the packet forwarder.
+// The packet forwarder is concentrator centric - and the concentrator expresses coding
+// rates as a fraction of form `4/(4 + x)`. But the RP002-1.0.x series of documents uses
+// the irreducible form of the fraction.
+func reduceCodingRate(cr string) string {
+	switch cr {
+	case "4/6":
+		return "2/3"
+	case "4/8":
+		return "1/2"
+	case "2/6":
+		return "1/3"
+	default:
+		return cr
+	}
+}
+
 // UnmarshalJSON implements json.Unmarshaler.
 func (p *RxPacket) UnmarshalJSON(data []byte) error {
 	type Alias RxPacket
@@ -66,7 +83,9 @@ func (p *RxPacket) UnmarshalJSON(data []byte) error {
 	}
 	switch mod := p.DatR.DataRate.Modulation.(type) {
 	case *ttnpb.DataRate_Lrfhss:
-		mod.Lrfhss.CodingRate = p.CodR
+		// The normalization should be applied only for LR-FHSS modulations
+		// since they are defined in the RP002 as irreducible fractions.
+		mod.Lrfhss.CodingRate = reduceCodingRate(p.CodR)
 	}
 	return nil
 }

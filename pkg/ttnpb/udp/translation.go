@@ -219,9 +219,11 @@ func convertUplink(rx RxPacket, md UpstreamMetadata) (*ttnpb.UplinkMessage, erro
 		}
 	}
 
-	switch up.Settings.DataRate.Modulation.(type) {
-	case *ttnpb.DataRate_Lora, *ttnpb.DataRate_Lrfhss:
+	switch mod := up.Settings.DataRate.Modulation.(type) {
+	case *ttnpb.DataRate_Lora:
 		up.Settings.CodingRate = rx.CodR
+	case *ttnpb.DataRate_Lrfhss:
+		up.Settings.CodingRate = mod.Lrfhss.CodingRate
 	}
 
 	return up, nil

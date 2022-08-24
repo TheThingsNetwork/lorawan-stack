@@ -154,7 +154,17 @@ func TestToGatewayUpLRFHSS(t *testing.T) {
 					Freq: 868.0,
 					Chan: 2,
 					Modu: "LR-FHSS",
-					DatR: datarate.DR{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lrfhss{Lrfhss: &ttnpb.LRFHSSDataRate{ModulationType: 0, OperatingChannelWidth: 125}}}},
+					DatR: datarate.DR{
+						DataRate: &ttnpb.DataRate{
+							Modulation: &ttnpb.DataRate_Lrfhss{
+								Lrfhss: &ttnpb.LRFHSSDataRate{
+									ModulationType:        0,
+									OperatingChannelWidth: 125,
+									CodingRate:            "5/6",
+								},
+							},
+						},
+					},
 					CodR: "5/6",
 					Data: "QCkuASaAAAAByFaF53Iu+vzmwQ==",
 					Size: 19,
