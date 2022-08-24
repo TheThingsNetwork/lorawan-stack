@@ -136,6 +136,29 @@ func TestUplink(t *testing.T) {
 			errorAssertion: errors.IsInvalidArgument,
 		},
 		{
+			name: "invalid direction",
+			normalizedPayload: []*pbtypes.Struct{
+				{
+					Fields: map[string]*pbtypes.Value{
+						"wind": {
+							Kind: &pbtypes.Value_StructValue{
+								StructValue: &pbtypes.Struct{
+									Fields: map[string]*pbtypes.Value{
+										"direction": {
+											Kind: &pbtypes.Value_NumberValue{
+												NumberValue: 360, // this is 0 degrees
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			errorAssertion: errors.IsInvalidArgument,
+		},
+		{
 			name: "invalid type",
 			normalizedPayload: []*pbtypes.Struct{
 				{

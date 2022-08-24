@@ -26,13 +26,22 @@ import (
 
 // Air is an air measurement.
 type Air struct {
-	Temperature *float64
+	Temperature      *float64
+	RelativeHumidity *float64
+	Pressure         *float64
+}
+
+// Wind is a wind measurement.
+type Wind struct {
+	Speed     *float64
+	Direction *float64
 }
 
 // Measurement is a measurement.
 type Measurement struct {
 	Time *time.Time
 	Air  *Air
+	Wind *Wind
 }
 
 var (
@@ -40,6 +49,19 @@ var (
 	errFieldMinimum = errors.DefineInvalidArgument(
 		"field_minimum",
 		"`{path}` should be equal or greater than `{minimum}`",
+	)
+	//nolint:unused
+	errFieldExclusiveMinimum = errors.DefineInvalidArgument(
+		"field_exclusive_minimum",
+		"`{path}` should be greater than `{minimum}`",
+	)
+	errFieldMaximum = errors.DefineInvalidArgument(
+		"field_maximum",
+		"`{path}` should be equal or less than `{maximum}`",
+	)
+	errFieldExclusiveMaximum = errors.DefineInvalidArgument(
+		"field_exclusive_maximum",
+		"`{path}` should be less than `{maximum}`",
 	)
 	errUnknownField = errors.DefineInvalidArgument("unknown_field", "unknown field `{path}`")
 )
@@ -117,11 +139,67 @@ func minimum[T constraints.Ordered](min T) fieldValidator[T] {
 	}
 }
 
+// exclusiveMinimum returns a field validator that checks the exclusive minimum.
+//nolint:unused,deadcode
+func exclusiveMinimum[T constraints.Ordered](min T) fieldValidator[T] {
+	return func(v T, path string) error {
+		if v <= min {
+			return errFieldExclusiveMinimum.WithAttributes(
+				"path", path,
+				"minimum", min,
+			)
+		}
+		return nil
+	}
+}
+
+// maximum returns a field validator that checks the inclusive maximum.
+func maximum[T constraints.Ordered](max T) fieldValidator[T] {
+	return func(v T, path string) error {
+		if v > max {
+			return errFieldMaximum.WithAttributes(
+				"path", path,
+				"maximum", max,
+			)
+		}
+		return nil
+	}
+}
+
+// exclusiveMaximum returns a field validator that checks the exclusive maximum.
+func exclusiveMaximum[T constraints.Ordered](max T) fieldValidator[T] {
+	return func(v T, path string) error {
+		if v >= max {
+			return errFieldExclusiveMaximum.WithAttributes(
+				"path", path,
+				"maximum", max,
+			)
+		}
+		return nil
+	}
+}
+
 var fieldParsers = map[string]fieldParser{
 	"time": parseTime(func(dst *Measurement) **time.Time { return &dst.Time }),
 	"air":  object(func(dst *Measurement) **Air { return &dst.Air }),
 	"air.temperature": parseNumber(func(dst *Measurement) **float64 { return &dst.Air.Temperature },
 		minimum(-273.15),
+	),
+	"air.relativeHumidity": parseNumber(func(dst *Measurement) **float64 { return &dst.Air.RelativeHumidity },
+		minimum(0.0),
+		maximum(1.0),
+	),
+	"air.pressure": parseNumber(func(dst *Measurement) **float64 { return &dst.Air.Pressure },
+		minimum(900.0),
+		maximum(1100.0),
+	),
+	"wind": object(func(dst *Measurement) **Wind { return &dst.Wind }),
+	"wind.speed": parseNumber(func(dst *Measurement) **float64 { return &dst.Wind.Speed },
+		minimum(0.0),
+	),
+	"wind.direction": parseNumber(func(dst *Measurement) **float64 { return &dst.Wind.Direction },
+		minimum(0.0),
+		exclusiveMaximum(360.0),
 	),
 }
 
