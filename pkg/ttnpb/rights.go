@@ -91,6 +91,13 @@ func (r Right) Implied() *Rights {
 		return AllOrganizationRights
 	case Right_RIGHT_ALL:
 		return AllRights
+	case Right_RIGHT_CLIENT_ALL:
+		return RightsFrom(
+			Right_RIGHT_CLIENT_INFO,
+			Right_RIGHT_CLIENT_SETTINGS_BASIC,
+			Right_RIGHT_CLIENT_SETTINGS_COLLABORATORS,
+			Right_RIGHT_CLIENT_DELETE,
+		)
 	}
 	return RightsFrom(r)
 }
