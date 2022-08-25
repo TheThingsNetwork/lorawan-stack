@@ -5696,15 +5696,6 @@
       "file": "client_access.go"
     }
   },
-  "error:pkg/identityserver:client_update_admin_field": {
-    "translations": {
-      "en": "only admins can update the `{field}` field"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "client_registry.go"
-    }
-  },
   "error:pkg/identityserver:common_password": {
     "translations": {
       "en": "must not be too common"
