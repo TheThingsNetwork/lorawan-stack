@@ -66,7 +66,7 @@ func requireRights(ctx context.Context, id string) (res struct {
 	go func() {
 		res.CliErr = RequireClient(ctx, &ttnpb.ClientIdentifiers{
 			ClientId: id,
-		}, ttnpb.Right_RIGHT_CLIENT_ALL)
+		}, ttnpb.Right_RIGHT_CLIENT_INFO)
 		wg.Done()
 	}()
 	go func() {
@@ -105,7 +105,7 @@ func TestRequire(t *testing.T) {
 		_ = RequireApplication(ctx, &ttnpb.ApplicationIdentifiers{}, ttnpb.Right_RIGHT_APPLICATION_INFO)
 	}, should.Panic)
 	a.So(func() {
-		_ = RequireClient(ctx, &ttnpb.ClientIdentifiers{}, ttnpb.Right_RIGHT_CLIENT_ALL)
+		_ = RequireClient(ctx, &ttnpb.ClientIdentifiers{}, ttnpb.Right_RIGHT_CLIENT_INFO)
 	}, should.Panic)
 	a.So(func() {
 		_ = RequireGateway(ctx, &ttnpb.GatewayIdentifiers{}, ttnpb.Right_RIGHT_GATEWAY_INFO)
@@ -127,7 +127,7 @@ func TestRequire(t *testing.T) {
 		ClientRights: map[string]*ttnpb.Rights{
 			unique.ID(fooCtx, &ttnpb.ClientIdentifiers{
 				ClientId: "foo",
-			}): ttnpb.RightsFrom(ttnpb.Right_RIGHT_CLIENT_ALL),
+			}): ttnpb.RightsFrom(ttnpb.Right_RIGHT_CLIENT_INFO),
 		},
 		GatewayRights: map[string]*ttnpb.Rights{
 			unique.ID(fooCtx, &ttnpb.GatewayIdentifiers{

@@ -41,7 +41,7 @@ func TestContext(t *testing.T) {
 		ClientRights: map[string]*ttnpb.Rights{
 			unique.ID(ctx, &ttnpb.ClientIdentifiers{
 				ClientId: "foo-cli",
-			}): ttnpb.RightsFrom(ttnpb.Right_RIGHT_CLIENT_ALL),
+			}): ttnpb.RightsFrom(ttnpb.Right_RIGHT_CLIENT_INFO),
 		},
 		GatewayRights: map[string]*ttnpb.Rights{
 			unique.ID(ctx, &ttnpb.GatewayIdentifiers{
@@ -71,7 +71,7 @@ func TestContext(t *testing.T) {
 	), should.BeTrue)
 	a.So(rights.IncludesClientRights(
 		unique.ID(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo-cli"}),
-		ttnpb.Right_RIGHT_CLIENT_ALL,
+		ttnpb.Right_RIGHT_CLIENT_INFO,
 	), should.BeTrue)
 	a.So(rights.IncludesGatewayRights(
 		unique.ID(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo-gtw"}),
