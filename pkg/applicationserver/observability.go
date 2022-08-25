@@ -78,6 +78,12 @@ var (
 		events.WithDataType(&ttnpb.ApplicationUp{}),
 		events.WithPropagateToParent(),
 	)
+	evtForwardNormalizedUp = events.Define(
+		"as.up.normalized.forward", "forward normalized uplink message",
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.ApplicationUp{}),
+		events.WithPropagateToParent(),
+	)
 	evtForwardLocationSolved = events.Define(
 		"as.up.location.forward", "forward location solved message",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
@@ -270,6 +276,8 @@ func registerForwardUp(ctx context.Context, msg *ttnpb.ApplicationUp) {
 		events.Publish(evtForwardJoinAccept.NewWithIdentifiersAndData(ctx, msg.EndDeviceIds, msg))
 	case *ttnpb.ApplicationUp_UplinkMessage:
 		events.Publish(evtForwardDataUp.NewWithIdentifiersAndData(ctx, msg.EndDeviceIds, msg))
+	case *ttnpb.ApplicationUp_UplinkNormalized:
+		events.Publish(evtForwardNormalizedUp.NewWithIdentifiersAndData(ctx, msg.EndDeviceIds, msg))
 	case *ttnpb.ApplicationUp_LocationSolved:
 		events.Publish(evtForwardLocationSolved.NewWithIdentifiersAndData(ctx, msg.EndDeviceIds, msg))
 	case *ttnpb.ApplicationUp_ServiceData:

@@ -116,6 +116,9 @@ func TestWebhooks(t *testing.T) {
 						UplinkMessage: &ttnpb.ApplicationWebhook_Message{
 							Path: tc.prefix + "up{?devEUI}",
 						},
+						UplinkNormalized: &ttnpb.ApplicationWebhook_Message{
+							Path: tc.prefix + "up/normalized{?devEUI}",
+						},
 						JoinAccept: &ttnpb.ApplicationWebhook_Message{
 							Path: tc.prefix + "join{?joinEUI}",
 						},
@@ -158,25 +161,27 @@ func TestWebhooks(t *testing.T) {
 							"up.location_solved",
 							"up.service_data",
 							"up.uplink_message",
+							"up.uplink_normalized",
 						),
 					},
 					[]string{
 						"base_url",
-						"downlink_api_key",
 						"downlink_ack",
+						"downlink_api_key",
 						"downlink_failed",
 						"downlink_nack",
-						"downlink_queued",
 						"downlink_queue_invalidated",
+						"downlink_queued",
 						"downlink_sent",
 						"field_mask",
 						"format",
 						"headers",
 						"ids",
-						"service_data",
 						"join_accept",
 						"location_solved",
+						"service_data",
 						"uplink_message",
+						"uplink_normalized",
 					}, nil
 			})
 			if err != nil {
@@ -227,6 +232,39 @@ func TestWebhooks(t *testing.T) {
 								},
 								OK:  true,
 								URL: fmt.Sprintf("%s/up?devEUI=%s", baseURL, types.MustEUI64(registeredDeviceID.DevEui)),
+							},
+							{
+								Name: "UplinkNormalized/RegisteredDevice",
+								Message: &ttnpb.ApplicationUp{
+									EndDeviceIds: registeredDeviceID,
+									Up: &ttnpb.ApplicationUp_UplinkNormalized{
+										UplinkNormalized: &ttnpb.ApplicationUplinkNormalized{
+											SessionKeyId: []byte{0x11},
+											FPort:        42,
+											FCnt:         42,
+											FrmPayload:   []byte{0x1, 0x2, 0x3},
+											NormalizedPayload: &pbtypes.Struct{
+												Fields: map[string]*pbtypes.Value{
+													"air": {
+														Kind: &pbtypes.Value_StructValue{
+															StructValue: &pbtypes.Struct{
+																Fields: map[string]*pbtypes.Value{
+																	"temperature": {
+																		Kind: &pbtypes.Value_NumberValue{
+																			NumberValue: 21.5,
+																		},
+																	},
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+								OK:  true,
+								URL: fmt.Sprintf("%s/up/normalized?devEUI=%s", baseURL, types.MustEUI64(registeredDeviceID.DevEui)),
 							},
 							{
 								Name: "UplinkMessage/UnregisteredDevice",

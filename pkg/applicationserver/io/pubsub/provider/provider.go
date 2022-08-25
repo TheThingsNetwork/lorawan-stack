@@ -28,6 +28,7 @@ import (
 type Topics interface {
 	GetBaseTopic() string
 	GetUplinkMessage() *ttnpb.ApplicationPubSub_Message
+	GetUplinkNormalized() *ttnpb.ApplicationPubSub_Message
 	GetJoinAccept() *ttnpb.ApplicationPubSub_Message
 	GetDownlinkAck() *ttnpb.ApplicationPubSub_Message
 	GetDownlinkNack() *ttnpb.ApplicationPubSub_Message

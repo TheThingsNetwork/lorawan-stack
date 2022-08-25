@@ -135,6 +135,8 @@ func (i *integration) handleUp(ctx context.Context) {
 			switch up.ApplicationUp.Up.(type) {
 			case *ttnpb.ApplicationUp_UplinkMessage:
 				topic = i.conn.Topics.UplinkMessage
+			case *ttnpb.ApplicationUp_UplinkNormalized:
+				topic = i.conn.Topics.UplinkNormalized
 			case *ttnpb.ApplicationUp_JoinAccept:
 				topic = i.conn.Topics.JoinAccept
 			case *ttnpb.ApplicationUp_DownlinkAck:

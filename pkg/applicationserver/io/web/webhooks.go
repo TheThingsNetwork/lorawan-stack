@@ -255,6 +255,7 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 			"location_solved",
 			"service_data",
 			"uplink_message",
+			"uplink_normalized",
 		},
 	)
 	if err != nil {
@@ -295,6 +296,8 @@ func webhookMessage(
 	switch msg.Up.(type) {
 	case *ttnpb.ApplicationUp_UplinkMessage:
 		return hook.UplinkMessage
+	case *ttnpb.ApplicationUp_UplinkNormalized:
+		return hook.UplinkNormalized
 	case *ttnpb.ApplicationUp_JoinAccept:
 		return hook.JoinAccept
 	case *ttnpb.ApplicationUp_DownlinkAck:
@@ -321,6 +324,8 @@ func webhookUplinkMessageMask(msg *ttnpb.ApplicationUp) string {
 	switch msg.Up.(type) {
 	case *ttnpb.ApplicationUp_UplinkMessage:
 		return "up.uplink_message"
+	case *ttnpb.ApplicationUp_UplinkNormalized:
+		return "up.uplink_normalized"
 	case *ttnpb.ApplicationUp_JoinAccept:
 		return "up.join_accept"
 	case *ttnpb.ApplicationUp_DownlinkAck:

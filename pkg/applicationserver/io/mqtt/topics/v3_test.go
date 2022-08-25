@@ -87,8 +87,12 @@ func TestV3Topics(t *testing.T) {
 		Expected string
 	}{
 		{
-			Fn:       topics.Default.UplinkTopic,
+			Fn:       topics.Default.UplinkMessageTopic,
 			Expected: fmt.Sprintf("v3/%s/devices/%s/up", appUID, devID),
+		},
+		{
+			Fn:       topics.Default.UplinkNormalizedTopic,
+			Expected: fmt.Sprintf("v3/%s/devices/%s/up/normalized", appUID, devID),
 		},
 		{
 			Fn:       topics.Default.JoinAcceptTopic,

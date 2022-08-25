@@ -19,7 +19,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/formatters"
 	mock_server "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub"
@@ -80,6 +80,9 @@ func TestPubSub(t *testing.T) {
 		UplinkMessage: &ttnpb.ApplicationPubSub_Message{
 			Topic: "uplink.message",
 		},
+		UplinkNormalized: &ttnpb.ApplicationPubSub_Message{
+			Topic: "uplink.normalized",
+		},
 		JoinAccept: &ttnpb.ApplicationPubSub_Message{
 			Topic: "join.accept",
 		},
@@ -123,6 +126,7 @@ func TestPubSub(t *testing.T) {
 		"provider",
 		"join_accept",
 		"location_solved",
+		"uplink_normalized",
 		"uplink_message",
 		"service_data",
 	}
@@ -183,6 +187,38 @@ func TestPubSub(t *testing.T) {
 					},
 				},
 				Subscription: conn.UplinkMessage,
+			},
+			{
+				Name: "UplinkNormalized",
+				Message: &ttnpb.ApplicationUp{
+					EndDeviceIds: registeredDeviceID,
+					Up: &ttnpb.ApplicationUp_UplinkNormalized{
+						UplinkNormalized: &ttnpb.ApplicationUplinkNormalized{
+							SessionKeyId: []byte{0x11},
+							FPort:        42,
+							FCnt:         42,
+							FrmPayload:   []byte{0x1, 0x2, 0x3},
+							NormalizedPayload: &pbtypes.Struct{
+								Fields: map[string]*pbtypes.Value{
+									"air": {
+										Kind: &pbtypes.Value_StructValue{
+											StructValue: &pbtypes.Struct{
+												Fields: map[string]*pbtypes.Value{
+													"temperature": {
+														Kind: &pbtypes.Value_NumberValue{
+															NumberValue: 21.5,
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				Subscription: conn.UplinkNormalized,
 			},
 			{
 				Name: "JoinAccept",

@@ -44,8 +44,12 @@ func (v3) AcceptedTopic(applicationUID string, requested []string) ([]string, bo
 	return nil, false
 }
 
-func (v3) UplinkTopic(applicationUID, deviceID string) []string {
+func (v3) UplinkMessageTopic(applicationUID, deviceID string) []string {
 	return []string{topicV3, applicationUID, "devices", deviceID, "up"}
+}
+
+func (v3) UplinkNormalizedTopic(applicationUID, deviceID string) []string {
+	return []string{topicV3, applicationUID, "devices", deviceID, "up", "normalized"}
 }
 
 func (v3) JoinAcceptTopic(applicationUID, deviceID string) []string {
