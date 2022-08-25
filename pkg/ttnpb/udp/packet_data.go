@@ -136,18 +136,18 @@ type Stat struct {
 	ACKR float64       `json:"ackr"`           // Percentage of upstream datagrams that were acknowledged
 	DWNb uint32        `json:"dwnb"`           // Number of downlink datagrams received (unsigned integer)
 	TxNb uint32        `json:"txnb"`           // Number of packets emitted (unsigned integer)
-	LMOK *uint32       `json:"lmok,omitempty"` // Number of packets received from link testing mote, with CRC OK (unsigned inteter)
+	LMOK *uint32       `json:"lmok,omitempty"` // Number of packets received from link testing mote, with CRC OK (unsigned integer)
 	LMST *uint32       `json:"lmst,omitempty"` // Sequence number of the first packet received from link testing mote (unsigned integer)
 	LMNW *uint32       `json:"lmnw,omitempty"` // Sequence number of the last packet received from link testing mote (unsigned integer)
 	LPPS *uint32       `json:"lpps,omitempty"` // Number of lost PPS pulses (unsigned integer)
 	Temp *float32      `json:"temp,omitempty"` // Temperature of the Gateway (signed float)
 	FPGA *uint32       `json:"fpga,omitempty"` // Version of Gateway FPGA (unsigned integer)
-	DSP  *uint32       `json:"dsp,omitempty"`  // Version of Gateway DSP software (unsigned interger)
+	DSP  *uint32       `json:"dsp,omitempty"`  // Version of Gateway DSP software (unsigned integer)
 	HAL  *string       `json:"hal,omitempty"`  // Version of Gateway driver (format X.X.X)
 	HVer *struct {
 		FPGA *uint32 `json:"fpga,omitempty"` // Version of FPGA (unsigned integer)
-		DSP0 *uint32 `json:"dsp0,omitempty"` // Version of DSP 0 software (unsigned interger)
-		DSP1 *uint32 `json:"dsp1,omitempty"` // Version of DSP 1 software (unsigned interger)
+		DSP0 *uint32 `json:"dsp0,omitempty"` // Version of DSP 0 software (unsigned integer)
+		DSP1 *uint32 `json:"dsp1,omitempty"` // Version of DSP 1 software (unsigned integer)
 	} `json:"hver,omitempty"` // Gateway hardware versions
 }
 
