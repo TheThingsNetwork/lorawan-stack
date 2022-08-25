@@ -3352,6 +3352,7 @@ Configuration options for static ADR.
 | ----- | ---- | ----- | ----------- |
 | `format_id` | [`string`](#string) |  | ID of the format. |
 | `data` | [`bytes`](#bytes) |  | Data to convert. |
+| `end_device_version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  | End device profile identifiers. |
 
 #### Field Rules
 

@@ -20344,6 +20344,10 @@
           "type": "string",
           "format": "byte",
           "description": "Data to convert."
+        },
+        "end_device_version_ids": {
+          "$ref": "#/definitions/v3EndDeviceVersionIdentifiers",
+          "description": "End device profile identifiers."
         }
       }
     },

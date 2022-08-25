@@ -13949,6 +13949,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "end_device_version_ids",
+              "description": "End device profile identifiers.",
+              "label": "",
+              "type": "EndDeviceVersionIdentifiers",
+              "longType": "EndDeviceVersionIdentifiers",
+              "fullType": "ttn.lorawan.v3.EndDeviceVersionIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },

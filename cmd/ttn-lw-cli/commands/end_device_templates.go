@@ -39,10 +39,22 @@ func templateFormatIDFlags() *pflag.FlagSet {
 }
 
 var (
-	errNoTemplateFormatID             = errors.DefineInvalidArgument("no_template_format_id", "no template format ID set")
-	errEndDeviceMappingNotFound       = errors.DefineNotFound("mapped_end_device_not_found", "end device mapping not found")
-	errNoEndDeviceTemplateJoinEUI     = errors.DefineInvalidArgument("no_end_device_template_join_eui", "no end device template JoinEUI set")
-	errNoEndDeviceTemplateStartDevEUI = errors.DefineInvalidArgument("no_end_device_template_start_dev_eui", "no end device template start DevEUI set")
+	errNoTemplateFormatID = errors.DefineInvalidArgument(
+		"no_template_format_id",
+		"no template format ID set",
+	)
+	errEndDeviceMappingNotFound = errors.DefineNotFound(
+		"mapped_end_device_not_found",
+		"end device mapping not found",
+	)
+	errNoEndDeviceTemplateJoinEUI = errors.DefineInvalidArgument(
+		"no_end_device_template_join_eui",
+		"no end device template JoinEUI set",
+	)
+	errNoEndDeviceTemplateStartDevEUI = errors.DefineInvalidArgument(
+		"no_end_device_template_start_dev_eui",
+		"no end device template start DevEUI set",
+	)
 )
 
 func getTemplateFormatID(flagSet *pflag.FlagSet, args []string) string {
@@ -297,6 +309,7 @@ This command takes end device templates from stdin.`,
 		Short:             "Convert data to an end device template (EXPERIMENTAL)",
 		PersistentPreRunE: preRun(),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			_ = optionalAuth()
 			formatID := getTemplateFormatID(cmd.Flags(), args)
 			if formatID == "" {
 				return errNoTemplateFormatID.New()
@@ -310,10 +323,16 @@ This command takes end device templates from stdin.`,
 			if err != nil {
 				return err
 			}
-			stream, err := ttnpb.NewEndDeviceTemplateConverterClient(dtc).Convert(ctx, &ttnpb.ConvertEndDeviceTemplateRequest{
-				FormatId: formatID,
-				Data:     data,
-			})
+
+			req := &ttnpb.ConvertEndDeviceTemplateRequest{
+				FormatId:            formatID,
+				Data:                data,
+				EndDeviceVersionIds: &ttnpb.EndDeviceVersionIdentifiers{},
+			}
+			if _, err = req.EndDeviceVersionIds.SetFromFlags(cmd.Flags(), "end-device-version-ids"); err != nil {
+				return err
+			}
+			stream, err := ttnpb.NewEndDeviceTemplateConverterClient(dtc).Convert(ctx, req)
 			if err != nil {
 				return err
 			}
@@ -430,7 +449,10 @@ command to assign EUIs to map to end device templates.`,
 				var res ttnpb.EndDeviceTemplate
 				res.EndDevice.SetFields(inputEntry.EndDevice, inputEntry.FieldMask.GetPaths()...)
 				res.EndDevice.SetFields(mappedEntry.EndDevice, mappedEntry.FieldMask.GetPaths()...)
-				res.FieldMask = ttnpb.FieldMask(ttnpb.BottomLevelFields(append(inputEntry.FieldMask.GetPaths(), mappedEntry.FieldMask.GetPaths()...))...)
+				res.FieldMask = ttnpb.FieldMask(
+					ttnpb.BottomLevelFields(
+						append(inputEntry.FieldMask.GetPaths(), mappedEntry.FieldMask.GetPaths()...),
+					)...)
 
 				if err := io.Write(os.Stdout, config.OutputFormat, &res); err != nil {
 					return err
@@ -455,6 +477,11 @@ func init() {
 	endDeviceTemplatesCommand.AddCommand(endDeviceTemplatesListFormats)
 	endDeviceTemplatesFromDataCommand.Flags().AddFlagSet(templateFormatIDFlags())
 	endDeviceTemplatesFromDataCommand.Flags().AddFlagSet(dataFlags("", ""))
+	ttnpb.AddSetFlagsForEndDeviceVersionIdentifiers(
+		endDeviceTemplatesFromDataCommand.Flags(),
+		"end-device-version-ids",
+		false,
+	)
 	endDeviceTemplatesCommand.AddCommand(endDeviceTemplatesFromDataCommand)
 	endDeviceTemplatesMapCommand.Flags().AddFlagSet(dataFlags("input", "input file"))
 	endDeviceTemplatesMapCommand.Flags().AddFlagSet(dataFlags("mapping", "mapping file"))

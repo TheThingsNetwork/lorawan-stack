@@ -16,6 +16,7 @@ package devicetemplates_test
 
 import (
 	"bytes"
+	"context"
 	_ "embed"
 	"io"
 	"sync"
@@ -23,7 +24,10 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	mockdr "go.thethings.network/lorawan-stack/v3/pkg/devicerepository/mock"
+	"go.thethings.network/lorawan-stack/v3/pkg/devicetemplateconverter/profilefetcher"
 	. "go.thethings.network/lorawan-stack/v3/pkg/devicetemplates"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -43,27 +47,30 @@ var (
 	csvAppEUI string
 	//go:embed testdata/comma_separated.csv
 	csvCommaSeparated string
+	//go:embed testdata/with_version_id.csv
+	csvVendorID string
+	//go:embed testdata/without_version_id.csv
+	csvNoVendorID string
 )
+
+var mockErr = errors.DefineInternal("mock_internal_error", "An error is expected")
 
 func TestTTSCSVConverter(t *testing.T) {
 	t.Parallel()
 
-	tts := GetConverter("the-things-stack-csv")
-	a := assertions.New(t)
-	if !a.So(tts, should.NotBeNil) {
-		t.FailNow()
-	}
-
 	for _, tc := range []struct {
 		name           string
 		reader         io.Reader
+		converter      Converter
+		fillContext    func(context.Context) context.Context
 		validateError  func(a *assertions.Assertion, err error)
 		validateResult func(a *assertions.Assertion, templates []*ttnpb.EndDeviceTemplate, count int)
 		nExpect        int
 	}{
 		{
-			name:   "AllColumns",
-			reader: bytes.NewBufferString(csvAllColumns),
+			name:      "AllColumns",
+			reader:    bytes.NewBufferString(csvAllColumns),
+			converter: GetConverter("the-things-stack-csv"),
 			validateError: func(a *assertions.Assertion, err error) {
 				a.So(err, should.BeNil)
 			},
@@ -102,8 +109,9 @@ func TestTTSCSVConverter(t *testing.T) {
 			nExpect: 3,
 		},
 		{
-			name:   "ExtraColumns",
-			reader: bytes.NewBufferString(csvExtraColumns),
+			name:      "ExtraColumns",
+			reader:    bytes.NewBufferString(csvExtraColumns),
+			converter: GetConverter("the-things-stack-csv"),
 			validateError: func(a *assertions.Assertion, err error) {
 				a.So(err, should.BeNil)
 			},
@@ -119,24 +127,27 @@ func TestTTSCSVConverter(t *testing.T) {
 			nExpect: 1,
 		},
 		{
-			name:   "EmptyString",
-			reader: bytes.NewBufferString(""),
+			name:      "EmptyString",
+			reader:    bytes.NewBufferString(""),
+			converter: GetConverter("the-things-stack-csv"),
 			validateError: func(a *assertions.Assertion, err error) {
 				a.So(err, should.NotBeNil)
 			},
 			nExpect: 0,
 		},
 		{
-			name:   "InvalidDevEUI",
-			reader: bytes.NewBufferString(csvInvalidDevEUI),
+			name:      "InvalidDevEUI",
+			reader:    bytes.NewBufferString(csvInvalidDevEUI),
+			converter: GetConverter("the-things-stack-csv"),
 			validateError: func(a *assertions.Assertion, err error) {
 				a.So(err, should.NotBeNil)
 			},
 			nExpect: 0,
 		},
 		{
-			name:   "GenerateDeviceID",
-			reader: bytes.NewBufferString(csvGenerateDeviceID),
+			name:      "GenerateDeviceID",
+			reader:    bytes.NewBufferString(csvGenerateDeviceID),
+			converter: GetConverter("the-things-stack-csv"),
 			validateError: func(a *assertions.Assertion, err error) {
 				a.So(err, should.BeNil)
 			},
@@ -150,8 +161,9 @@ func TestTTSCSVConverter(t *testing.T) {
 			nExpect: 1,
 		},
 		{
-			name:   "AppEUI",
-			reader: bytes.NewBufferString(csvAppEUI),
+			name:      "AppEUI",
+			reader:    bytes.NewBufferString(csvAppEUI),
+			converter: GetConverter("the-things-stack-csv"),
 			validateError: func(a *assertions.Assertion, err error) {
 				a.So(err, should.BeNil)
 			},
@@ -173,8 +185,9 @@ func TestTTSCSVConverter(t *testing.T) {
 			nExpect: 1,
 		},
 		{
-			name:   "CommaSeparated",
-			reader: bytes.NewBufferString(csvCommaSeparated),
+			name:      "CommaSeparated",
+			reader:    bytes.NewBufferString(csvCommaSeparated),
+			converter: GetConverter("the-things-stack-csv"),
 			validateError: func(a *assertions.Assertion, err error) {
 				a.So(err, should.BeNil)
 			},
@@ -193,12 +206,151 @@ func TestTTSCSVConverter(t *testing.T) {
 			},
 			nExpect: 3,
 		},
+		{
+			name:      "VendorID/No valid fields",
+			reader:    bytes.NewBufferString(csvNoVendorID),
+			converter: GetConverter("the-things-stack-csv"),
+			fillContext: func(ctx context.Context) context.Context {
+				return profilefetcher.NewContextWithFetcher(ctx, &mockTemplateFetcher{})
+			},
+			validateError: func(a *assertions.Assertion, err error) {
+				a.So(err, should.BeNil)
+			},
+			validateResult: func(a *assertions.Assertion, templates []*ttnpb.EndDeviceTemplate, count int) {
+				if !a.So(len(templates), should.Equal, count) {
+					t.FailNow()
+				}
+				dev := templates[0]
+				a.So(
+					dev.EndDevice.Ids.JoinEui,
+					should.Resemble,
+					types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}.Bytes(),
+				)
+				a.So(ttnpb.RequireFields(dev.FieldMask.Paths,
+					"frequency_plan_id",
+					"ids.dev_eui",
+					"ids.device_id",
+					"ids.join_eui",
+				), should.BeNil)
+			},
+			nExpect: 1,
+		},
+		{
+			name:      "VendorID/Error fetching",
+			reader:    bytes.NewBufferString(csvVendorID),
+			converter: GetConverter("the-things-stack-csv"),
+			fillContext: func(ctx context.Context) context.Context {
+				return profilefetcher.NewContextWithFetcher(ctx, &mockTemplateFetcher{
+					Err: mockErr.New(),
+				})
+			},
+			validateError: func(a *assertions.Assertion, err error) {
+				a.So(errors.IsInternal(err), should.BeTrue)
+			},
+			nExpect: 1,
+		},
+		{
+			name:      "VendorID/Valid",
+			reader:    bytes.NewBufferString(csvVendorID),
+			converter: GetConverter("the-things-stack-csv"),
+			fillContext: func(ctx context.Context) context.Context {
+				return profilefetcher.NewContextWithFetcher(ctx, &mockTemplateFetcher{
+					MockDR: func() *mockdr.MockDR {
+						dr := mockdr.New()
+						dr.EndDeviceTemplate = mockProfileTemplate
+						return dr
+					}(),
+				})
+			},
+			validateError: func(a *assertions.Assertion, err error) {
+				a.So(err, should.BeNil)
+			},
+			validateResult: func(a *assertions.Assertion, templates []*ttnpb.EndDeviceTemplate, count int) {
+				if !a.So(len(templates), should.Equal, count) {
+					t.FailNow()
+				}
+				dev := templates[0]
+				a.So(
+					dev.EndDevice.Ids.JoinEui,
+					should.Resemble,
+					types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}.Bytes(),
+				)
+				a.So(ttnpb.RequireFields(dev.FieldMask.Paths,
+					"frequency_plan_id",
+					"ids.dev_eui",
+					"ids.device_id",
+					"ids.join_eui",
+					"lorawan_version",
+					"lorawan_phy_version",
+					"supports_class_c",
+				), should.BeNil)
+
+				// validating if end device profile information was applied
+				a.So(dev.EndDevice.LorawanPhyVersion, should.Equal, ttnpb.PHYVersion_PHY_V1_0_2_REV_A)
+				a.So(dev.EndDevice.SupportsClassC, should.BeTrue)
+				// LoRaWAN Version was fetched from profile as MAC_V1_0_2 but provided by csv as MAC_V1_0_4.
+				a.So(dev.EndDevice.LorawanVersion, should.Equal, ttnpb.MACVersion_MAC_V1_0_4)
+			},
+			nExpect: 1,
+		},
+		{
+			name:      "VendorID/Valid fallback value",
+			reader:    bytes.NewBufferString(csvNoVendorID),
+			converter: GetConverter("the-things-stack-csv"),
+			fillContext: func(ctx context.Context) context.Context {
+				ctx = profilefetcher.NewContextWithFetcher(ctx, &mockTemplateFetcher{
+					MockDR: func() *mockdr.MockDR {
+						dr := mockdr.New()
+						dr.EndDeviceTemplate = mockProfileTemplate
+						return dr
+					}(),
+				})
+				return NewContextWithProfileIDs(ctx, &ttnpb.EndDeviceVersionIdentifiers{
+					BandId:          "EU_863_870",
+					BrandId:         "the-things-industries",
+					FirmwareVersion: "1.0",
+					HardwareVersion: "1.1",
+					ModelId:         "generic-node-sensor-edition",
+				})
+			},
+			validateError: func(a *assertions.Assertion, err error) {
+				a.So(err, should.BeNil)
+			},
+			validateResult: func(a *assertions.Assertion, templates []*ttnpb.EndDeviceTemplate, count int) {
+				if !a.So(len(templates), should.Equal, count) {
+					t.FailNow()
+				}
+				dev := templates[0]
+				a.So(
+					dev.EndDevice.Ids.JoinEui,
+					should.Resemble,
+					types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}.Bytes(),
+				)
+				a.So(ttnpb.RequireFields(dev.FieldMask.Paths,
+					"ids.dev_eui",
+					"ids.join_eui",
+					"lorawan_version",
+					"lorawan_phy_version",
+					"supports_class_c",
+				), should.BeNil)
+
+				// validating if end device profile information was applied
+				a.So(dev.EndDevice.LorawanPhyVersion, should.Equal, ttnpb.PHYVersion_PHY_V1_0_2_REV_A)
+				a.So(dev.EndDevice.SupportsClassC, should.BeTrue)
+				// LoRaWAN Version was fetched from profile as MAC_V1_0_2 but provided by csv as MAC_V1_0_4.
+				a.So(dev.EndDevice.LorawanVersion, should.Equal, ttnpb.MACVersion_MAC_V1_0_4)
+			},
+			nExpect: 1,
+		},
 	} {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			ctx := test.Context()
+			a, ctx := test.New(t)
+			if tc.fillContext != nil {
+				ctx = tc.fillContext(ctx)
+			}
 			ch := make(chan *ttnpb.EndDeviceTemplate)
 
 			wg := sync.WaitGroup{}
@@ -206,7 +358,7 @@ func TestTTSCSVConverter(t *testing.T) {
 			var err error
 			templates := []*ttnpb.EndDeviceTemplate{}
 			go func() {
-				err = tts.Convert(ctx, tc.reader, ch)
+				err = tc.converter.Convert(ctx, tc.reader, ch)
 				wg.Done()
 			}()
 			go func() {
@@ -231,11 +383,39 @@ func TestTTSCSVConverter(t *testing.T) {
 				t.FailNow()
 			}
 
-			a := assertions.New(t)
 			tc.validateError(a, err)
 			if tc.validateResult != nil {
 				tc.validateResult(a, templates, tc.nExpect)
 			}
 		})
 	}
+}
+
+// mockProfileTemplate is used in the ValidID tests.
+var mockProfileTemplate = &ttnpb.EndDeviceTemplate{
+	EndDevice: &ttnpb.EndDevice{
+		LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_2,
+		LorawanPhyVersion: ttnpb.PHYVersion_PHY_V1_0_2_REV_A,
+		SupportsClassC:    true,
+	},
+	FieldMask: ttnpb.FieldMask("lorawan_version", "lorawan_phy_version", "supports_class_c"),
+}
+
+type mockTemplateFetcher struct {
+	MockDR *mockdr.MockDR
+	Err    error
+}
+
+// GetTemplate makes a request to the Device Repository server with its predefined call options.
+func (tf *mockTemplateFetcher) GetTemplate(
+	ctx context.Context,
+	in *ttnpb.GetTemplateRequest,
+) (*ttnpb.EndDeviceTemplate, error) {
+	if tf.Err != nil {
+		return nil, tf.Err
+	}
+	if tf.MockDR == nil {
+		return nil, nil
+	}
+	return tf.MockDR.GetTemplate(ctx, in)
 }
