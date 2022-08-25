@@ -505,6 +505,8 @@
 - [File `lorawan-stack/api/networkserver.proto`](#lorawan-stack/api/networkserver.proto)
   - [Message `GenerateDevAddrResponse`](#ttn.lorawan.v3.GenerateDevAddrResponse)
   - [Message `GetDefaultMACSettingsRequest`](#ttn.lorawan.v3.GetDefaultMACSettingsRequest)
+  - [Message `GetDeviceAdressPrefixesResponse`](#ttn.lorawan.v3.GetDeviceAdressPrefixesResponse)
+  - [Message `GetNetIDResponse`](#ttn.lorawan.v3.GetNetIDResponse)
   - [Service `AsNs`](#ttn.lorawan.v3.AsNs)
   - [Service `GsNs`](#ttn.lorawan.v3.GsNs)
   - [Service `Ns`](#ttn.lorawan.v3.Ns)
@@ -7342,6 +7344,30 @@ Request of GetDefaultMACSettings.
 | `frequency_plan_id` | <p>`string.max_len`: `64`</p> |
 | `lorawan_phy_version` | <p>`enum.defined_only`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.GetDeviceAdressPrefixesResponse">Message `GetDeviceAdressPrefixesResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `dev_addr_prefixes` | [`bytes`](#bytes) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `dev_addr_prefixes` | <p>`repeated.items.bytes.len`: `5`</p> |
+
+### <a name="ttn.lorawan.v3.GetNetIDResponse">Message `GetNetIDResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `net_id` | [`bytes`](#bytes) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `net_id` | <p>`bytes.len`: `3`</p> |
+
 ### <a name="ttn.lorawan.v3.AsNs">Service `AsNs`</a>
 
 The AsNs service connects an Application Server to a Network Server.
@@ -7369,6 +7395,8 @@ The Ns service manages the Network Server.
 | ----------- | ------------ | ------------- | ------------|
 | `GenerateDevAddr` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`GenerateDevAddrResponse`](#ttn.lorawan.v3.GenerateDevAddrResponse) | GenerateDevAddr requests a device address assignment from the Network Server. |
 | `GetDefaultMACSettings` | [`GetDefaultMACSettingsRequest`](#ttn.lorawan.v3.GetDefaultMACSettingsRequest) | [`MACSettings`](#ttn.lorawan.v3.MACSettings) | GetDefaultMACSettings retrieves the default MAC settings for a frequency plan. |
+| `GetNetID` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`GetNetIDResponse`](#ttn.lorawan.v3.GetNetIDResponse) |  |
+| `GetDeviceAddressPrefixes` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`GetDeviceAdressPrefixesResponse`](#ttn.lorawan.v3.GetDeviceAdressPrefixesResponse) |  |
 
 #### HTTP bindings
 
@@ -7376,6 +7404,8 @@ The Ns service manages the Network Server.
 | ----------- | ------ | ------- | ---- |
 | `GenerateDevAddr` | `GET` | `/api/v3/ns/dev_addr` |  |
 | `GetDefaultMACSettings` | `GET` | `/api/v3/ns/default_mac_settings/{frequency_plan_id}/{lorawan_phy_version}` |  |
+| `GetNetID` | `GET` | `/api/v3/ns/net_id` |  |
+| `GetDeviceAddressPrefixes` | `GET` | `/api/v3/ns/dev_addr_prefixes` |  |
 
 ### <a name="ttn.lorawan.v3.NsEndDeviceRegistry">Service `NsEndDeviceRegistry`</a>
 

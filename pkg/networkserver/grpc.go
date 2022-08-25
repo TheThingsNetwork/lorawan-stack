@@ -80,3 +80,21 @@ func (ns *NetworkServer) GetDefaultMACSettings(ctx context.Context, req *ttnpb.G
 	}
 	return settings, nil
 }
+
+func (ns *NetworkServer) GetNetID(ctx context.Context, req *pbtypes.Empty) (*ttnpb.GetNetIDResponse, error) {
+	return &ttnpb.GetNetIDResponse{
+		NetId: ns.netID[:],
+	}, nil
+}
+
+func (ns *NetworkServer) GetDeviceAddressPrefixes(ctx context.Context, req *pbtypes.Empty) (*ttnpb.GetDeviceAdressPrefixesResponse, error) {
+	output := &ttnpb.GetDeviceAdressPrefixesResponse{}
+
+	prefixes := ns.devAddrPrefixes(ctx)
+
+	for _, devAddrPrefix := range prefixes {
+		output.DevAddrPrefixes = append(output.DevAddrPrefixes, devAddrPrefix.Bytes())
+	}
+
+	return output, nil
+}

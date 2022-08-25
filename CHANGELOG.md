@@ -12,6 +12,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - New `ListBands` RPC on the `Configuration` service.
+- New `NetID` and `DeviceAddressPrefixes` RPC on the `NS` service.
 
 ### Changed
 
