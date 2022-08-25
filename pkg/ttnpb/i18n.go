@@ -136,6 +136,10 @@ func init() {
 	defineEnum(Right_RIGHT_APPLICATION_ALL, "all application rights")
 
 	defineEnum(Right_RIGHT_CLIENT_ALL, "all OAuth client rights")
+	defineEnum(Right_RIGHT_CLIENT_INFO, "view OAuth client information")
+	defineEnum(Right_RIGHT_CLIENT_SETTINGS_BASIC, "edit OAuth client basic settings")
+	defineEnum(Right_RIGHT_CLIENT_SETTINGS_COLLABORATORS, "view and edit OAuth client collaborators")
+	defineEnum(Right_RIGHT_CLIENT_DELETE, "delete OAuth client")
 
 	defineEnum(Right_RIGHT_GATEWAY_INFO, "view gateway information")
 	defineEnum(Right_RIGHT_GATEWAY_SETTINGS_BASIC, "edit basic gateway settings")
