@@ -30,7 +30,7 @@ var (
 	evtUpdateClientCollaborator = events.Define(
 		"client.collaborator.update", "update client collaborator",
 		events.WithVisibility(
-			ttnpb.Right_RIGHT_CLIENT_ALL,
+			ttnpb.Right_RIGHT_CLIENT_SETTINGS_COLLABORATORS,
 			ttnpb.Right_RIGHT_USER_CLIENTS_LIST,
 		),
 		events.WithAuthFromContext(),
@@ -39,7 +39,7 @@ var (
 	evtDeleteClientCollaborator = events.Define(
 		"client.collaborator.delete", "delete client collaborator",
 		events.WithVisibility(
-			ttnpb.Right_RIGHT_CLIENT_ALL,
+			ttnpb.Right_RIGHT_CLIENT_SETTINGS_COLLABORATORS,
 			ttnpb.Right_RIGHT_USER_CLIENTS_LIST,
 		),
 		events.WithAuthFromContext(),
@@ -55,8 +55,11 @@ func (is *IdentityServer) listClientRights(ctx context.Context, ids *ttnpb.Clien
 	return cliRights.Intersect(ttnpb.AllClientRights), nil
 }
 
-func (is *IdentityServer) getClientCollaborator(ctx context.Context, req *ttnpb.GetClientCollaboratorRequest) (*ttnpb.GetCollaboratorResponse, error) {
-	if err := rights.RequireClient(ctx, req.GetClientIds(), ttnpb.Right_RIGHT_CLIENT_ALL); err != nil {
+func (is *IdentityServer) getClientCollaborator(
+	ctx context.Context,
+	req *ttnpb.GetClientCollaboratorRequest,
+) (*ttnpb.GetCollaboratorResponse, error) {
+	if err := rights.RequireClient(ctx, req.GetClientIds(), ttnpb.Right_RIGHT_CLIENT_SETTINGS_COLLABORATORS); err != nil {
 		return nil, err
 	}
 	res := &ttnpb.GetCollaboratorResponse{
@@ -80,11 +83,17 @@ func (is *IdentityServer) getClientCollaborator(ctx context.Context, req *ttnpb.
 	return res, nil
 }
 
-var errClientNeedsCollaborator = errors.DefineFailedPrecondition("client_needs_collaborator", "every client needs at least one collaborator with all rights")
+var errClientNeedsCollaborator = errors.DefineFailedPrecondition(
+	"client_needs_collaborator",
+	"every client needs at least one collaborator with all rights",
+)
 
-func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.SetClientCollaboratorRequest) (*pbtypes.Empty, error) {
+func (is *IdentityServer) setClientCollaborator(
+	ctx context.Context,
+	req *ttnpb.SetClientCollaboratorRequest,
+) (*pbtypes.Empty, error) {
 	// Require that caller has rights to manage collaborators.
-	if err := rights.RequireClient(ctx, req.GetClientIds(), ttnpb.Right_RIGHT_CLIENT_ALL); err != nil {
+	if err := rights.RequireClient(ctx, req.GetClientIds(), ttnpb.Right_RIGHT_CLIENT_SETTINGS_COLLABORATORS); err != nil {
 		return nil, err
 	}
 
@@ -147,13 +156,21 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 		return nil, err
 	}
 	if len(req.Collaborator.Rights) > 0 {
-		events.Publish(evtUpdateClientCollaborator.New(ctx, events.WithIdentifiers(req.GetClientIds(), req.GetCollaborator().GetIds()), events.WithData(req.GetCollaborator())))
+		events.Publish(
+			evtUpdateClientCollaborator.New(
+				ctx,
+				events.WithIdentifiers(req.GetClientIds(), req.GetCollaborator().GetIds()),
+				events.WithData(req.GetCollaborator()),
+			),
+		)
 		go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
 			EntityIds:        req.GetClientIds().GetEntityIdentifiers(),
 			NotificationType: "collaborator_changed",
 			Data:             ttnpb.MustMarshalAny(req.GetCollaborator()),
-			Receivers:        []ttnpb.NotificationReceiver{ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT},
-			Email:            false,
+			Receivers: []ttnpb.NotificationReceiver{
+				ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
+			},
+			Email: false,
 		})
 	} else {
 		events.Publish(evtDeleteClientCollaborator.New(ctx, events.WithIdentifiers(req.GetClientIds(), req.GetCollaborator().GetIds())))
@@ -161,11 +178,16 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) listClientCollaborators(ctx context.Context, req *ttnpb.ListClientCollaboratorsRequest) (collaborators *ttnpb.Collaborators, err error) {
+func (is *IdentityServer) listClientCollaborators(
+	ctx context.Context,
+	req *ttnpb.ListClientCollaboratorsRequest,
+) (collaborators *ttnpb.Collaborators, err error) {
 	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
-	if err = rights.RequireClient(ctx, req.GetClientIds(), ttnpb.Right_RIGHT_CLIENT_ALL); err != nil {
+	if err = rights.RequireClient(
+		ctx, req.GetClientIds(), ttnpb.Right_RIGHT_CLIENT_SETTINGS_COLLABORATORS,
+	); err != nil {
 		defer func() { collaborators = collaborators.PublicSafe() }()
 	}
 	var total uint64
@@ -203,14 +225,23 @@ func (ca *clientAccess) ListRights(ctx context.Context, req *ttnpb.ClientIdentif
 	return ca.listClientRights(ctx, req)
 }
 
-func (ca *clientAccess) GetCollaborator(ctx context.Context, req *ttnpb.GetClientCollaboratorRequest) (*ttnpb.GetCollaboratorResponse, error) {
+func (ca *clientAccess) GetCollaborator(
+	ctx context.Context,
+	req *ttnpb.GetClientCollaboratorRequest,
+) (*ttnpb.GetCollaboratorResponse, error) {
 	return ca.getClientCollaborator(ctx, req)
 }
 
-func (ca *clientAccess) SetCollaborator(ctx context.Context, req *ttnpb.SetClientCollaboratorRequest) (*pbtypes.Empty, error) {
+func (ca *clientAccess) SetCollaborator(
+	ctx context.Context,
+	req *ttnpb.SetClientCollaboratorRequest,
+) (*pbtypes.Empty, error) {
 	return ca.setClientCollaborator(ctx, req)
 }
 
-func (ca *clientAccess) ListCollaborators(ctx context.Context, req *ttnpb.ListClientCollaboratorsRequest) (*ttnpb.Collaborators, error) {
+func (ca *clientAccess) ListCollaborators(
+	ctx context.Context,
+	req *ttnpb.ListClientCollaboratorsRequest,
+) (*ttnpb.Collaborators, error) {
 	return ca.listClientCollaborators(ctx, req)
 }
