@@ -108,7 +108,7 @@ const macSettingsSchema = Yup.object({
           class_c_timeout: Yup.string(),
         }
 
-        // Each MAC setting that does have a corresponding default setting is required.
+        // Each MAC setting that does not have a corresponding default setting is required.
         // We can use the default MAC settings object to cycle through the list of
         // values and make them required.
         for (const key of Object.keys(shape)) {

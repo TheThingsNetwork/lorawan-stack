@@ -160,7 +160,7 @@ const initialValues = {
   multicast: false,
   mac_settings: {
     // Adding just values that don't have defaults.
-    ping_slot_periodicity: '',
+    ping_slot_periodicity: undefined,
     beacon_frequency: undefined,
   },
   supports_class_b: false,

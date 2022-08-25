@@ -116,8 +116,6 @@ describe('End device manual create', () => {
           frequency_plan_id: '863-870 MHz',
           app_key: generateHexValue(32),
           class_b_timeout: 10,
-          ping_slot_periodicity: 'EVERY_2S',
-          beacon_frequency: '3',
         }
 
         cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
@@ -126,8 +124,6 @@ describe('End device manual create', () => {
         cy.findByLabelText('Additional LoRaWAN class capabilities').selectOption('class-b')
         cy.findByLabelText('Network defaults').uncheck()
         cy.findByLabelText('Class B timeout').type(device.class_b_timeout)
-        cy.findByLabelText('Ping slot periodicity').selectOption(device.ping_slot_periodicity)
-        cy.findByLabelText('Beacon frequency').type(device.beacon_frequency)
         cy.findByLabelText('JoinEUI').type(device.join_eui)
         cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('DevEUI').type(device.dev_eui)
@@ -552,7 +548,6 @@ describe('End device manual create', () => {
           frequency_plan_id: '863-870 MHz',
           app_s_key: generateHexValue(32),
           nwk_s_key: generateHexValue(32),
-          ping_slot_periodicity: 'EVERY_4S',
         }
 
         cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
@@ -561,7 +556,6 @@ describe('End device manual create', () => {
         cy.findByLabelText('Define multicast group (ABP & Multicast)').check()
         cy.findByLabelText('LoRaWAN class for multicast downlinks').selectOption('class-c')
         cy.findByLabelText('Network defaults').uncheck()
-        cy.findByLabelText('Ping slot periodicity').selectOption(device.ping_slot_periodicity)
         cy.findByLabelText('JoinEUI').type(device.join_eui)
         cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('Device address').type(device.dev_addr)
