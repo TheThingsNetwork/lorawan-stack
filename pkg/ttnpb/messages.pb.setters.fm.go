@@ -704,6 +704,194 @@ func (dst *ApplicationUplink) SetFields(src *ApplicationUplink, paths ...string)
 	return nil
 }
 
+func (dst *ApplicationUplinkNormalized) SetFields(src *ApplicationUplinkNormalized, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "session_key_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'session_key_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SessionKeyId = src.SessionKeyId
+			} else {
+				dst.SessionKeyId = nil
+			}
+		case "f_port":
+			if len(subs) > 0 {
+				return fmt.Errorf("'f_port' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FPort = src.FPort
+			} else {
+				var zero uint32
+				dst.FPort = zero
+			}
+		case "f_cnt":
+			if len(subs) > 0 {
+				return fmt.Errorf("'f_cnt' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FCnt = src.FCnt
+			} else {
+				var zero uint32
+				dst.FCnt = zero
+			}
+		case "frm_payload":
+			if len(subs) > 0 {
+				return fmt.Errorf("'frm_payload' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FrmPayload = src.FrmPayload
+			} else {
+				dst.FrmPayload = nil
+			}
+		case "normalized_payload":
+			if len(subs) > 0 {
+				return fmt.Errorf("'normalized_payload' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NormalizedPayload = src.NormalizedPayload
+			} else {
+				dst.NormalizedPayload = nil
+			}
+		case "normalized_payload_warnings":
+			if len(subs) > 0 {
+				return fmt.Errorf("'normalized_payload_warnings' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NormalizedPayloadWarnings = src.NormalizedPayloadWarnings
+			} else {
+				dst.NormalizedPayloadWarnings = nil
+			}
+		case "rx_metadata":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx_metadata' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RxMetadata = src.RxMetadata
+			} else {
+				dst.RxMetadata = nil
+			}
+		case "settings":
+			if len(subs) > 0 {
+				var newDst, newSrc *TxSettings
+				if (src == nil || src.Settings == nil) && dst.Settings == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Settings
+				}
+				if dst.Settings != nil {
+					newDst = dst.Settings
+				} else {
+					newDst = &TxSettings{}
+					dst.Settings = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Settings = src.Settings
+				} else {
+					dst.Settings = nil
+				}
+			}
+		case "received_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'received_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ReceivedAt = src.ReceivedAt
+			} else {
+				dst.ReceivedAt = nil
+			}
+		case "confirmed":
+			if len(subs) > 0 {
+				return fmt.Errorf("'confirmed' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Confirmed = src.Confirmed
+			} else {
+				var zero bool
+				dst.Confirmed = zero
+			}
+		case "consumed_airtime":
+			if len(subs) > 0 {
+				return fmt.Errorf("'consumed_airtime' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ConsumedAirtime = src.ConsumedAirtime
+			} else {
+				dst.ConsumedAirtime = nil
+			}
+		case "locations":
+			if len(subs) > 0 {
+				return fmt.Errorf("'locations' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Locations = src.Locations
+			} else {
+				dst.Locations = nil
+			}
+		case "version_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *EndDeviceVersionIdentifiers
+				if (src == nil || src.VersionIds == nil) && dst.VersionIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.VersionIds
+				}
+				if dst.VersionIds != nil {
+					newDst = dst.VersionIds
+				} else {
+					newDst = &EndDeviceVersionIdentifiers{}
+					dst.VersionIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.VersionIds = src.VersionIds
+				} else {
+					dst.VersionIds = nil
+				}
+			}
+		case "network_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *NetworkIdentifiers
+				if (src == nil || src.NetworkIds == nil) && dst.NetworkIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.NetworkIds
+				}
+				if dst.NetworkIds != nil {
+					newDst = dst.NetworkIds
+				} else {
+					newDst = &NetworkIdentifiers{}
+					dst.NetworkIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.NetworkIds = src.NetworkIds
+				} else {
+					dst.NetworkIds = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *ApplicationLocation) SetFields(src *ApplicationLocation, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
@@ -1264,6 +1452,42 @@ func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 						} else if srcTypeOk {
 							newDst = &ApplicationUplink{}
 							dst.Up = &ApplicationUp_UplinkMessage{UplinkMessage: newDst}
+						} else {
+							dst.Up = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.Up = src.Up
+						} else {
+							dst.Up = nil
+						}
+					}
+				case "uplink_normalized":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Up.(*ApplicationUp_UplinkNormalized)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Up == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'uplink_normalized', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.Up.(*ApplicationUp_UplinkNormalized)
+					if dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'uplink_normalized', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *ApplicationUplinkNormalized
+						if srcTypeOk {
+							newSrc = src.Up.(*ApplicationUp_UplinkNormalized).UplinkNormalized
+						}
+						if dstTypeOk {
+							newDst = dst.Up.(*ApplicationUp_UplinkNormalized).UplinkNormalized
+						} else if srcTypeOk {
+							newDst = &ApplicationUplinkNormalized{}
+							dst.Up = &ApplicationUp_UplinkNormalized{UplinkNormalized: newDst}
 						} else {
 							dst.Up = nil
 							continue

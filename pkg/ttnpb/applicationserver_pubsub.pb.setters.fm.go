@@ -191,6 +191,31 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 					dst.UplinkMessage = nil
 				}
 			}
+		case "uplink_normalized":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationPubSub_Message
+				if (src == nil || src.UplinkNormalized == nil) && dst.UplinkNormalized == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.UplinkNormalized
+				}
+				if dst.UplinkNormalized != nil {
+					newDst = dst.UplinkNormalized
+				} else {
+					newDst = &ApplicationPubSub_Message{}
+					dst.UplinkNormalized = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UplinkNormalized = src.UplinkNormalized
+				} else {
+					dst.UplinkNormalized = nil
+				}
+			}
 		case "join_accept":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationPubSub_Message

@@ -88,6 +88,7 @@ message ApplicationWebhookTemplate {
     string path = 1 [(validate.rules).string.max_len = 64];
   }
   Message uplink_message = 11;
+  Message uplink_normalized = 23;
   Message join_accept = 12;
   Message downlink_ack = 13;
   Message downlink_nack = 14;
@@ -100,7 +101,7 @@ message ApplicationWebhookTemplate {
 
   google.protobuf.FieldMask field_mask = 22;
 
-  // next: 23
+  // next: 24
 }
 
 message ApplicationWebhookTemplates {
@@ -166,6 +167,7 @@ message ApplicationWebhook {
     string path = 1 [(validate.rules).string.max_len = 64];
   }
   Message uplink_message = 7;
+  Message uplink_normalized = 22;
   Message join_accept = 8;
   Message downlink_ack = 9;
   Message downlink_nack = 10;
@@ -180,7 +182,7 @@ message ApplicationWebhook {
 
   google.protobuf.FieldMask field_mask = 21;
 
-  // next: 22
+  // next: 23
 }
 
 message ApplicationWebhooks {
