@@ -1099,7 +1099,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids *ttnpb.EndDev
 	} else {
 		uplink.Locations = locations
 	}
-	loc := as.locationFromDecodedPayload(uplink)
+	loc := as.locationFromPayload(uplink)
 	if loc != nil {
 		if uplink.Locations == nil {
 			uplink.Locations = make(map[string]*ttnpb.Location, 1)

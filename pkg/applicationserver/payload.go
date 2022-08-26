@@ -216,7 +216,8 @@ func (as *ApplicationServer) decodeDownlink(ctx context.Context, dev *ttnpb.EndD
 	return nil
 }
 
-func (*ApplicationServer) locationFromDecodedPayload(uplink *ttnpb.ApplicationUplink) (res *ttnpb.Location) {
+func (*ApplicationServer) locationFromPayload(uplink *ttnpb.ApplicationUplink) (res *ttnpb.Location) {
+	// TODO: Prefer location from normalized payload (https://github.com/TheThingsNetwork/lorawan-stack/issues/5429)
 	m, err := gogoproto.Map(uplink.DecodedPayload)
 	if err != nil {
 		return nil
