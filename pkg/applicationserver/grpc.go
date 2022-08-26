@@ -17,6 +17,7 @@ package applicationserver
 import (
 	"context"
 	"fmt"
+	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
@@ -125,6 +126,7 @@ func (as *ApplicationServer) GetConfiguration(ctx context.Context, _ *ttnpb.GetA
 
 // HandleUplink implements ttnpb.NsAsServer.
 func (as *ApplicationServer) HandleUplink(ctx context.Context, req *ttnpb.NsAsHandleUplinkRequest) (*pbtypes.Empty, error) {
+	now := time.Now()
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}
@@ -136,6 +138,7 @@ func (as *ApplicationServer) HandleUplink(ctx context.Context, req *ttnpb.NsAsHa
 		return nil, err
 	}
 	for _, up := range req.ApplicationUps {
+		up.ReceivedAt = ttnpb.ProtoTimePtr(now)
 		if err := as.processUp(ctx, up, link); err != nil {
 			return nil, err
 		}

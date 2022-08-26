@@ -372,8 +372,6 @@ func (as *ApplicationServer) processUp(ctx context.Context, up *ttnpb.Applicatio
 	up.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 	registerReceiveUp(ctx, up)
 
-	up.ReceivedAt = ttnpb.ProtoTimePtr(time.Now())
-
 	pass, err := as.handleUp(ctx, up, link)
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to process upstream message")
