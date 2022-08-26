@@ -798,7 +798,7 @@ func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.Application
 	case *ttnpb.ApplicationUp_JoinAccept:
 		return true, as.handleJoinAccept(ctx, up.EndDeviceIds, p.JoinAccept, link)
 	case *ttnpb.ApplicationUp_UplinkMessage:
-		return true, as.handleUplink(ctx, up.EndDeviceIds, p.UplinkMessage, link)
+		return true, as.handleUplink(ctx, up.EndDeviceIds, p.UplinkMessage, link, up.ReceivedAt)
 	case *ttnpb.ApplicationUp_DownlinkQueueInvalidated:
 		return as.handleDownlinkQueueInvalidated(ctx, up.EndDeviceIds, p.DownlinkQueueInvalidated, link)
 	case *ttnpb.ApplicationUp_DownlinkSent:
@@ -1120,7 +1120,7 @@ func (as *ApplicationServer) handleUplink(
 		if err := as.Publish(ctx, &ttnpb.ApplicationUp{
 			EndDeviceIds:   ids,
 			CorrelationIds: events.CorrelationIDsFromContext(ctx),
-			ReceivedAt:     uplink.ReceivedAt,
+			ReceivedAt:     receivedAt,
 			Up: &ttnpb.ApplicationUp_LocationSolved{
 				LocationSolved: &ttnpb.ApplicationLocation{
 					Service:  "frm-payload",
