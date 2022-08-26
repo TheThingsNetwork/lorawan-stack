@@ -31536,7 +31536,15 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "timestamp.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -32284,7 +32292,15 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "normalized_payload_warnings",
@@ -32340,7 +32356,15 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "timestamp.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "confirmed",

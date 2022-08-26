@@ -1061,9 +1061,6 @@ func (as *ApplicationServer) handleUplink(
 	defer trace.StartRegion(ctx, "handle uplink").End()
 
 	ctx = log.NewContextWithField(ctx, "session_key_id", uplink.SessionKeyId)
-	if uplink.ReceivedAt == nil {
-		panic("no NS timestamp in ApplicationUplink")
-	}
 	dev, err := as.deviceRegistry.Set(ctx, ids,
 		[]string{
 			"activated_at",

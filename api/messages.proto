@@ -267,7 +267,7 @@ message ApplicationUplinkNormalized {
 
   // The normalized frame payload of the uplink message.
   // This field is set for each item in normalized_payload in the corresponding ApplicationUplink message.
-  google.protobuf.Struct normalized_payload = 5;
+  google.protobuf.Struct normalized_payload = 5 [(validate.rules).message.required = true];
   // This field is set to normalized_payload_warnings in the corresponding ApplicationUplink message.
   repeated string normalized_payload_warnings = 6;
 
@@ -278,7 +278,7 @@ message ApplicationUplinkNormalized {
   TxSettings settings = 8 [(validate.rules).message.required = true];
 
   // Server time when the Network Server received the message.
-  google.protobuf.Timestamp received_at = 9;
+  google.protobuf.Timestamp received_at = 9 [(validate.rules).timestamp.required = true];
 
   // Indicates whether the end device used confirmed data uplink.
   bool confirmed = 10;
@@ -323,7 +323,7 @@ message ApplicationJoinAccept {
   // rejoin-request.
   bool pending_session = 4;
   // Server time when the Network Server received the message.
-  google.protobuf.Timestamp received_at = 8;
+  google.protobuf.Timestamp received_at = 8 [(validate.rules).timestamp.required = true];
 }
 
 message ApplicationDownlink {
