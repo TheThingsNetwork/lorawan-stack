@@ -150,8 +150,8 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 	as.activationPool = workerpool.NewWorkerPool(workerpool.Config[*ttnpb.EndDeviceIdentifiers]{
 		Component: c,
 		Context:   ctx,
-		Name:      "save_activation_status",
-		Handler:   as.saveActivationStatus,
+		Name:      "set_activated",
+		Handler:   as.setActivated,
 	})
 	as.processingPool = workerpool.NewWorkerPool(workerpool.Config[*ttnpb.ApplicationUp]{
 		Component: c,
@@ -162,8 +162,8 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 	as.deviceLastSeenPool = workerpool.NewWorkerPool(workerpool.Config[lastSeenAtInfo]{
 		Component: c,
 		Context:   ctx,
-		Name:      "save_device_last_seen_from_uplink",
-		Handler:   as.processDeviceLastSeenAsync,
+		Name:      "store_device_last_seen_from_uplink",
+		Handler:   as.storeDeviceLastSeen,
 	})
 
 	as.grpc.asDevices = asEndDeviceRegistryServer{
@@ -358,10 +358,9 @@ type lastSeenAtInfo struct {
 	lastSeenAt *pbtypes.Timestamp
 }
 
-func (as *ApplicationServer) processDeviceLastSeenAsync(ctx context.Context, lastSeenEntry lastSeenAtInfo) {
+func (as *ApplicationServer) storeDeviceLastSeen(ctx context.Context, lastSeenEntry lastSeenAtInfo) {
 	if err := as.deviceLastSeenProvider.PushLastSeenFromUplink(ctx, lastSeenEntry.ids, lastSeenEntry.lastSeenAt); err != nil {
-		log.FromContext(ctx).WithError(err).Warn("Failed to update device last seen timestamp")
-		return
+		log.FromContext(ctx).WithError(err).Warn("Failed to set device last seen timestamp")
 	}
 }
 
@@ -833,7 +832,7 @@ var errFetchAppSKey = errors.Define("app_s_key", "failed to get AppSKey")
 // handleJoinAccept handles a join-accept message.
 // If the application or device is not configured to skip application crypto, the InvalidatedDownlinks and the AppSKey
 // in the given join-accept message is reset.
-func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, joinAccept *ttnpb.ApplicationJoinAccept, link *ttnpb.ApplicationLink) (err error) {
+func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, joinAccept *ttnpb.ApplicationJoinAccept, link *ttnpb.ApplicationLink) error {
 	defer trace.StartRegion(ctx, "handle join accept").End()
 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
@@ -845,6 +844,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids *ttnpb.En
 	if err != nil {
 		return err
 	}
+
 	_, err = as.deviceRegistry.Set(ctx, ids,
 		[]string{
 			"formatters",
@@ -927,15 +927,19 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids *ttnpb.En
 			return dev, mask, nil
 		},
 	)
-	if err == nil {
-		if err := as.deviceLastSeenPool.Publish(ctx, lastSeenAtInfo{
-			ids:        ids,
-			lastSeenAt: joinAccept.ReceivedAt,
-		}); err != nil {
-			logger.WithError(err).Warn("Failed to publish last seen event")
-		}
+	if err != nil {
+		return err
 	}
-	return err
+
+	// Publish last seen event.
+	if err := as.deviceLastSeenPool.Publish(ctx, lastSeenAtInfo{
+		ids:        ids,
+		lastSeenAt: joinAccept.ReceivedAt,
+	}); err != nil {
+		logger.WithError(err).Warn("Failed to publish last seen event")
+	}
+
+	return nil
 }
 
 var errUnknownSession = errors.DefineNotFound("unknown_session", "unknown session")
@@ -944,9 +948,9 @@ var errUnknownSession = errors.DefineNotFound("unknown_session", "unknown sessio
 // This function will mutate the provided ttnpb.EndDevice and migrate the Session field to the session that matches
 // the provided session key ID.
 // The following fields are expected to be part of the provided ttnpb.EndDevice:
-// - session and pending_session - used to decide which session is currently active.
-// - formatters, version_ids - used by the downlink queue encoders, in cases in which the queue must be recalculated.
-// - skip_payload_crypto_override - used by the downlink queue migration mechanism in order to avoid payload encryption.
+//   - session and pending_session, used to decide which session is currently active.
+//   - formatters, version_ids, used by the downlink queue encoders, in cases in which the queue must be recalculated.
+//   - skip_payload_crypto_override, used by the downlink queue migration mechanism in order to avoid payload encryption.
 func (as *ApplicationServer) matchSession(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, dev *ttnpb.EndDevice, link *ttnpb.ApplicationLink, sessionKeyID []byte) ([]string, error) {
 	logger := log.FromContext(ctx)
 	var mask []string
@@ -982,7 +986,11 @@ func (as *ApplicationServer) matchSession(ctx context.Context, ids *ttnpb.EndDev
 // The fields which are stored are based on the following usages:
 // - io/packages/loragls/v3/package.go#multiFrameQuery
 // - io/packages/loragls/v3/api/objects.go#parseRxMetadata.
-func (as *ApplicationServer) storeUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink) error {
+func (as *ApplicationServer) storeUplink(
+	ctx context.Context,
+	ids *ttnpb.EndDeviceIdentifiers,
+	uplink *ttnpb.ApplicationUplink,
+) error {
 	cleanUplink := &ttnpb.ApplicationUplink{
 		RxMetadata: make([]*ttnpb.RxMetadata, 0, len(uplink.RxMetadata)),
 		ReceivedAt: uplink.ReceivedAt,
@@ -1005,11 +1013,11 @@ func (as *ApplicationServer) storeUplink(ctx context.Context, ids *ttnpb.EndDevi
 	return as.appUpsRegistry.Push(ctx, ids, cleanUplink)
 }
 
-// saveActivationStatus attempts to mark the end device as activated in the Entity Registry.
+// setActivated attempts to mark the end device as activated in the Entity Registry.
 // If the update succeeds, the end device will be updated in the Application Server end device registry
 // in order to avoid subsequent calls.
-func (as *ApplicationServer) saveActivationStatus(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) {
-	defer trace.StartRegion(ctx, "save activation status").End()
+func (as *ApplicationServer) setActivated(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) {
+	defer trace.StartRegion(ctx, "set activated").End()
 
 	cc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
 	if err != nil {
@@ -1043,7 +1051,13 @@ func (as *ApplicationServer) saveActivationStatus(ctx context.Context, ids *ttnp
 	}
 }
 
-func (as *ApplicationServer) handleUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink, link *ttnpb.ApplicationLink) (err error) {
+func (as *ApplicationServer) handleUplink(
+	ctx context.Context,
+	ids *ttnpb.EndDeviceIdentifiers,
+	uplink *ttnpb.ApplicationUplink,
+	link *ttnpb.ApplicationLink,
+	receivedAt *pbtypes.Timestamp,
+) error {
 	defer trace.StartRegion(ctx, "handle uplink").End()
 
 	ctx = log.NewContextWithField(ctx, "session_key_id", uplink.SessionKeyId)
@@ -1094,6 +1108,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids *ttnpb.EndDev
 		uplink.VersionIds = dev.VersionIds
 	}
 
+	// Set location in message and publish location solved if the payload contains location information.
 	if locations, err := as.locationRegistry.Get(ctx, ids); err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to retrieve end device locations")
 	} else {
@@ -1120,16 +1135,19 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids *ttnpb.EndDev
 		}
 	}
 
+	// If the device has not been activated before, publish the activation event.
 	if dev.ActivatedAt == nil {
 		if err := as.activationPool.Publish(ctx, ids); err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to publish activation event")
 		}
 	}
 
-	if err == nil {
-		if err := as.deviceLastSeenPool.Publish(ctx, lastSeenAtInfo{ids: ids, lastSeenAt: uplink.ReceivedAt}); err != nil {
-			log.FromContext(ctx).WithError(err).Warn("Failed to publish last seen event")
-		}
+	// Publish last seen event.
+	if err := as.deviceLastSeenPool.Publish(ctx, lastSeenAtInfo{
+		ids:        ids,
+		lastSeenAt: uplink.ReceivedAt,
+	}); err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to publish last seen event")
 	}
 
 	return nil
