@@ -68,6 +68,9 @@ export const getPreviewComponentByApplicationUpMessage = message => {
     case 'uplink_message':
       messageType = 'ApplicationUplink'
       break
+    case 'uplink_normalized':
+      messageType = 'ApplicationUplinkNormalized'
+      break
     case 'join_accept':
       messageType = 'ApplicationJoinAccept'
       break
@@ -86,6 +89,7 @@ export const getPreviewComponentByApplicationUpMessage = message => {
       break
     case 'service_data':
       messageType = 'ApplicationServiceData'
+      break
   }
 
   return messageType in dataTypeMap ? dataTypeMap[messageType] : DefaultPreview

@@ -1319,6 +1319,8 @@
   "lib.shared-messages.noLocation": "No location information available",
   "lib.shared-messages.noMatch": "No items found",
   "lib.shared-messages.none": "None",
+  "lib.shared-messages.normalizedPayloadAir": "Air",
+  "lib.shared-messages.normalizedPayloadWind": "Wind",
   "lib.shared-messages.notAvailable": "n/a",
   "lib.shared-messages.notLinked": "Not linked",
   "lib.shared-messages.notSet": "Not set",

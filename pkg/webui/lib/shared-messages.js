@@ -295,6 +295,8 @@ export default defineMessages({
   noLocation: 'No location information available',
   noMatch: 'No items found',
   none: 'None',
+  normalizedPayloadAir: 'Air',
+  normalizedPayloadWind: 'Wind',
   notAvailable: 'n/a',
   notLinked: 'Not linked',
   notSet: 'Not set',
