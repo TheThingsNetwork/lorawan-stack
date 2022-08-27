@@ -59,6 +59,7 @@ const WebhookAdd = props => {
         template_fields: fields,
         base_url: urlTemplate.parse(template.base_url).expand(fields),
         uplink_message: pathExpand(template.uplink_message, fields),
+        uplink_normalized: pathExpand(template.uplink_normalized, fields),
         join_accept: pathExpand(template.join_accept, fields),
         downlink_ack: pathExpand(template.downlink_ack, fields),
         downlink_nack: pathExpand(template.downlink_nack, fields),

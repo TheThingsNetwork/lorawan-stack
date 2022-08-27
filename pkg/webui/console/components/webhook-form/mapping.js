@@ -117,6 +117,7 @@ export const blankValues = {
   },
   downlink_api_key: '',
   uplink_message: null,
+  uplink_normalized: null,
   join_accept: null,
   downlink_ack: null,
   downlink_nack: null,
