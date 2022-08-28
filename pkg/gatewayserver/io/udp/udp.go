@@ -33,6 +33,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
+	"golang.org/x/exp/slices"
 )
 
 type srv struct {
@@ -96,6 +97,8 @@ func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, config Conf
 	return s.read(wp)
 }
 
+var errPacketType = errors.DefineInvalidArgument("packet_type", "invalid packet type")
+
 func (s *srv) read(wp workerpool.WorkerPool[encoding.Packet]) error {
 	var buf [65507]byte
 	for {
@@ -110,15 +113,16 @@ func (s *srv) read(wp workerpool.WorkerPool[encoding.Packet]) error {
 		ctx := log.NewContextWithField(s.ctx, "remote_addr", addr.String())
 		logger := log.FromContext(ctx)
 
+		registerMessageReceived(ctx)
 		if err := ratelimit.Require(s.server.RateLimiter(), ratelimit.GatewayUDPTrafficResource(addr)); err != nil {
 			if ratelimit.Require(s.limitLogs, ratelimit.NewCustomResource(addr.IP.String())) == nil {
 				logger.WithError(err).Warn("Drop packet")
 			}
+			registerMessageDropped(ctx, err)
 			continue
 		}
 
-		packetBuf := make([]byte, n)
-		copy(packetBuf, buf[:])
+		packetBuf := slices.Clone(buf[:n])
 
 		packet := encoding.Packet{
 			GatewayAddr: addr,
@@ -126,22 +130,28 @@ func (s *srv) read(wp workerpool.WorkerPool[encoding.Packet]) error {
 		}
 		if err := packet.UnmarshalBinary(packetBuf); err != nil {
 			logger.WithError(err).Debug("Failed to unmarshal packet")
+			registerMessageDropped(ctx, err)
 			continue
 		}
 		switch packet.PacketType {
 		case encoding.PullData, encoding.PushData, encoding.TxAck:
 		default:
 			logger.WithField("packet_type", packet.PacketType).Debug("Invalid packet type for uplink")
+			registerMessageDropped(ctx, errPacketType)
 			continue
 		}
 		if packet.GatewayEUI == nil {
 			logger.Debug("No gateway EUI in uplink message")
+			registerMessageDropped(ctx, errNoEUI)
 			continue
 		}
 
 		if err := wp.Publish(ctx, packet); err != nil {
 			logger.WithError(err).Warn("UDP packet publishing failed")
+			registerMessageDropped(ctx, err)
+			continue
 		}
+		registerMessageForwarded(ctx, packet.PacketType)
 	}
 }
 
