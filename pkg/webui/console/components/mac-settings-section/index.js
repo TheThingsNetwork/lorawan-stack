@@ -69,9 +69,13 @@ const m = defineMessages({
   maxDutyCycle: 'Maximum duty cycle',
   desiredMaxDutyCycle: 'Desired maximum duty cycle',
   adrMargin: 'ADR margin',
-  adrUplinks: 'ADR uplinks per frame',
+  adrUplinks: 'ADR number of transmissions',
+  adrAdaptiveDataRate: 'Adaptive data rate (ADR)',
   adrDataRate: 'ADR data rate index',
   adrTransPower: 'ADR transmission power index',
+  adrDynamic: 'Dynamic mode',
+  adrStatic: 'Static mode',
+  adrDisabled: 'Disabled',
   desiredAdrAckLimit: 'Desired ADR ack limit',
   desiredAdrAckDelay: 'Desired ADR ack delay',
   adrAckValue: '{count, plural, one {every message} other {every {count} messages}}',
@@ -463,14 +467,14 @@ const MacSettingsSection = props => {
       <Form.Field
         name="mac_settings.adr"
         component={Radio.Group}
-        title={'Adaptive data rate (ADR)'}
+        title={m.adrAdaptiveDataRate}
         tooltipId={tooltipIds.ADR_USE}
         encode={encodeAdrMode}
         decode={decodeAdrMode}
       >
-        <Radio label={'Dynamic mode'} value="dynamic" />
-        <Radio label={'Static mode'} value="static" />
-        <Radio label={'Disabled'} value="disabled" />
+        <Radio label={m.adrDynamic} value="dynamic" />
+        <Radio label={m.adrStatic} value="static" />
+        <Radio label={m.adrDisabled} value="disabled" />
       </Form.Field>
       {isDynamicAdr && (
         <Form.Field
