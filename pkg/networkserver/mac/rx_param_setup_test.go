@@ -184,7 +184,7 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 					Rx2FrequencyAck:      true,
 				})),
 			},
-			Error: ErrRequestNotFound,
+			Error: ErrRequestNotFound.WithAttributes("cid", ttnpb.MACCommandIdentifier_CID_RX_PARAM_SETUP),
 		},
 		{
 			Name: "all ack",

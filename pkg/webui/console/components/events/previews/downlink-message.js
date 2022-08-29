@@ -16,6 +16,8 @@ import React from 'react'
 
 import Message from '@ttn-lw/lib/components/message'
 
+import { getDataRate } from '@console/components/events/utils'
+
 import PropTypes from '@ttn-lw/lib/prop-types'
 import getByPath from '@ttn-lw/lib/get-by-path'
 
@@ -28,9 +30,7 @@ const DownLinkMessagePreview = React.memo(({ event }) => {
 
   if ('scheduled' in data) {
     const txPower = getByPath(data, 'scheduled.downlink.tx_power')
-    const bandwidth = getByPath(data, 'scheduled.data_rate.lora.bandwidth')
-    const spreadingFactor = getByPath(data, 'scheduled.data_rate.lora.spreading_factor')
-    const dataRate = `SF${spreadingFactor}BW${bandwidth / 1000}`
+    const dataRate = getDataRate(data, 'scheduled')
 
     return (
       <DescriptionList>

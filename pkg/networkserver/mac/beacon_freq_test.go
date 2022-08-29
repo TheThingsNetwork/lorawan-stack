@@ -148,7 +148,7 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 					FrequencyAck: true,
 				})),
 			},
-			Error: ErrRequestNotFound,
+			Error: ErrRequestNotFound.WithAttributes("cid", ttnpb.MACCommandIdentifier_CID_BEACON_FREQ),
 		},
 		{
 			Name: "nack/no request",
@@ -168,7 +168,7 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 			Events: events.Builders{
 				EvtReceiveBeaconFreqReject.With(events.WithData(&ttnpb.MACCommand_BeaconFreqAns{})),
 			},
-			Error: ErrRequestNotFound,
+			Error: ErrRequestNotFound.WithAttributes("cid", ttnpb.MACCommandIdentifier_CID_BEACON_FREQ),
 		},
 		{
 			Name: "ack/valid request",

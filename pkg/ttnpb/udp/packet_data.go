@@ -53,6 +53,22 @@ type RxPacket struct {
 	Aesk  uint         `json:"aesk"`            // AES key index used for encrypting fine timestamps (unsigned integer)
 }
 
+// reduceLRFHSSCodingRate reduces the coding rate fraction returned by the packet forwarder.
+// The packet forwarder will render the coding rates used by LR-FHSS in their `4/x` form, even
+// though the real coding rates are irreducible fractions.
+func reduceLRFHSSCodingRate(cr string) string {
+	switch cr {
+	case "4/6":
+		return "2/3"
+	case "4/8":
+		return "1/2"
+	case "2/6":
+		return "1/3"
+	default:
+		return cr
+	}
+}
+
 // UnmarshalJSON implements json.Unmarshaler.
 func (p *RxPacket) UnmarshalJSON(data []byte) error {
 	type Alias RxPacket
@@ -66,7 +82,7 @@ func (p *RxPacket) UnmarshalJSON(data []byte) error {
 	}
 	switch mod := p.DatR.DataRate.Modulation.(type) {
 	case *ttnpb.DataRate_Lrfhss:
-		mod.Lrfhss.CodingRate = p.CodR
+		mod.Lrfhss.CodingRate = reduceLRFHSSCodingRate(p.CodR)
 	}
 	return nil
 }
@@ -120,14 +136,19 @@ type Stat struct {
 	ACKR float64       `json:"ackr"`           // Percentage of upstream datagrams that were acknowledged
 	DWNb uint32        `json:"dwnb"`           // Number of downlink datagrams received (unsigned integer)
 	TxNb uint32        `json:"txnb"`           // Number of packets emitted (unsigned integer)
-	LMOK *uint32       `json:"lmok,omitempty"` // Number of packets received from link testing mote, with CRC OK (unsigned inteter)
+	LMOK *uint32       `json:"lmok,omitempty"` // Number of packets received from link testing mote, with CRC OK (unsigned integer)
 	LMST *uint32       `json:"lmst,omitempty"` // Sequence number of the first packet received from link testing mote (unsigned integer)
 	LMNW *uint32       `json:"lmnw,omitempty"` // Sequence number of the last packet received from link testing mote (unsigned integer)
 	LPPS *uint32       `json:"lpps,omitempty"` // Number of lost PPS pulses (unsigned integer)
 	Temp *float32      `json:"temp,omitempty"` // Temperature of the Gateway (signed float)
 	FPGA *uint32       `json:"fpga,omitempty"` // Version of Gateway FPGA (unsigned integer)
-	DSP  *uint32       `json:"dsp,omitempty"`  // Version of Gateway DSP software (unsigned interger)
+	DSP  *uint32       `json:"dsp,omitempty"`  // Version of Gateway DSP software (unsigned integer)
 	HAL  *string       `json:"hal,omitempty"`  // Version of Gateway driver (format X.X.X)
+	HVer *struct {
+		FPGA *uint32 `json:"fpga,omitempty"` // Version of FPGA (unsigned integer)
+		DSP0 *uint32 `json:"dsp0,omitempty"` // Version of DSP 0 software (unsigned integer)
+		DSP1 *uint32 `json:"dsp1,omitempty"` // Version of DSP 1 software (unsigned integer)
+	} `json:"hver,omitempty"` // Gateway hardware versions
 }
 
 // TxError is returned in the TxPacketAck

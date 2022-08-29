@@ -28247,7 +28247,7 @@
             },
             {
               "name": "operating_channel_width",
-              "description": "Operating Channel Width (kHz).",
+              "description": "Operating Channel Width (Hz).",
               "label": "",
               "type": "uint32",
               "longType": "uint32",

@@ -1963,7 +1963,7 @@ func (m *FSKDataRate) GetBitRate() uint32 {
 
 type LRFHSSDataRate struct {
 	ModulationType uint32 `protobuf:"varint,1,opt,name=modulation_type,json=modulationType,proto3" json:"modulation_type,omitempty"`
-	// Operating Channel Width (kHz).
+	// Operating Channel Width (Hz).
 	OperatingChannelWidth uint32   `protobuf:"varint,2,opt,name=operating_channel_width,json=operatingChannelWidth,proto3" json:"operating_channel_width,omitempty"`
 	CodingRate            string   `protobuf:"bytes,3,opt,name=coding_rate,json=codingRate,proto3" json:"coding_rate,omitempty"`
 	XXX_NoUnkeyedLiteral  struct{} `json:"-"`
