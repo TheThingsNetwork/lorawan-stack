@@ -98,7 +98,7 @@ func parseTime(selector func(dst *Measurement) **time.Time, vals ...fieldValidat
 		if !ok {
 			return errFieldType.WithAttributes("path", path)
 		}
-		t, err := time.Parse(time.RFC3339, val.StringValue)
+		t, err := time.Parse(time.RFC3339Nano, val.StringValue)
 		if err != nil {
 			return err
 		}
@@ -140,6 +140,7 @@ func minimum[T constraints.Ordered](min T) fieldValidator[T] {
 }
 
 // exclusiveMinimum returns a field validator that checks the exclusive minimum.
+//
 //nolint:unused,deadcode
 func exclusiveMinimum[T constraints.Ordered](min T) fieldValidator[T] {
 	return func(v T, path string) error {
