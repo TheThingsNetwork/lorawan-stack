@@ -165,7 +165,7 @@ const TokensTable = props => {
   )
 
   const getItems = React.useCallback(
-    filters => getAccessTokensList(userId, clientId, { ...filters }),
+    filters => getAccessTokensList(userId, clientId, filters),
     [userId, clientId],
   )
 

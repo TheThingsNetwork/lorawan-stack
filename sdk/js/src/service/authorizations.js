@@ -47,7 +47,7 @@ class Authorizations {
       {
         routeParams: { 'user_ids.user_id': userId, 'client_ids.client_id': client_id },
       },
-      { ...params },
+      { params },
     )
 
     return Marshaler.payloadListResponse('tokens', result)

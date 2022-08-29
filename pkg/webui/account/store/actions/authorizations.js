@@ -73,9 +73,8 @@ export const [
     success: deleteAccessTokenSuccess,
     failure: deleteAccessTokenFailure,
   },
-] = createPaginationByRouteParametersDeleteActions('ACCESS_TOKEN', (userId, clientId, id) => ({
-  userId,
-  clientId,
+] = createPaginationByRouteParametersDeleteActions('ACCESS_TOKEN', (routeParams, id) => ({
+  routeParams,
   id,
 }))
 
