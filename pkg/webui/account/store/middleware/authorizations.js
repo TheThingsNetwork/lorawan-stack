@@ -60,7 +60,7 @@ const deleteAccessTokenLogic = createRequestLogic({
   process: async ({ action }) => {
     const { routeParams, id } = action.payload
 
-    return await tts.Authorizations.deleteToken(...routeParams, id)
+    return await tts.Authorizations.deleteToken(routeParams, id)
   },
 })
 
@@ -69,7 +69,7 @@ const deleteAllTokensLogic = createRequestLogic({
   process: async ({ action }) => {
     const { routeParams, id } = action.payload
 
-    return await Promise.all(id.map(id => tts.Authorizations.deleteToken(...routeParams, id)))
+    return await Promise.all(id.map(id => tts.Authorizations.deleteToken(routeParams, id)))
   },
 })
 

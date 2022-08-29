@@ -53,9 +53,13 @@ class Authorizations {
     return Marshaler.payloadListResponse('tokens', result)
   }
 
-  async deleteToken(userId, client_id, id) {
+  async deleteToken(params, id) {
     const result = await this._api.OAuthAuthorizationRegistry.DeleteToken({
-      routeParams: { 'user_ids.user_id': userId, 'client_ids.client_id': client_id, id },
+      routeParams: {
+        'user_ids.user_id': params.userId,
+        'client_ids.client_id': params.client_id,
+        id,
+      },
     })
 
     return Marshaler.payloadSingleResponse(result)
