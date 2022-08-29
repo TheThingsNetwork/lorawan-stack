@@ -600,6 +600,26 @@ func (x *ApplicationUplink) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("decoded_payload_warnings")
 		s.WriteStringArray(x.DecodedPayloadWarnings)
 	}
+	if len(x.NormalizedPayload) > 0 || s.HasField("normalized_payload") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("normalized_payload")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.NormalizedPayload {
+			s.WriteMoreIf(&wroteElement)
+			if element == nil {
+				s.WriteNil()
+			} else {
+				gogo.MarshalStruct(s, element)
+			}
+		}
+		s.WriteArrayEnd()
+	}
+	if len(x.NormalizedPayloadWarnings) > 0 || s.HasField("normalized_payload_warnings") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("normalized_payload_warnings")
+		s.WriteStringArray(x.NormalizedPayloadWarnings)
+	}
 	if len(x.RxMetadata) > 0 || s.HasField("rx_metadata") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("rx_metadata")
@@ -720,6 +740,26 @@ func (x *ApplicationUplink) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				return
 			}
 			x.DecodedPayloadWarnings = s.ReadStringArray()
+		case "normalized_payload", "normalizedPayload":
+			s.AddField("normalized_payload")
+			if s.ReadNil() {
+				x.NormalizedPayload = nil
+				return
+			}
+			s.ReadArray(func() {
+				v := gogo.UnmarshalStruct(s)
+				if s.Err() != nil {
+					return
+				}
+				x.NormalizedPayload = append(x.NormalizedPayload, v)
+			})
+		case "normalized_payload_warnings", "normalizedPayloadWarnings":
+			s.AddField("normalized_payload_warnings")
+			if s.ReadNil() {
+				x.NormalizedPayloadWarnings = nil
+				return
+			}
+			x.NormalizedPayloadWarnings = s.ReadStringArray()
 		case "rx_metadata", "rxMetadata":
 			s.AddField("rx_metadata")
 			if s.ReadNil() {
@@ -818,6 +858,249 @@ func (x *ApplicationUplink) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 
 // UnmarshalJSON unmarshals the ApplicationUplink from JSON.
 func (x *ApplicationUplink) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ApplicationUplinkNormalized message to JSON.
+func (x *ApplicationUplinkNormalized) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.SessionKeyId) > 0 || s.HasField("session_key_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("session_key_id")
+		s.WriteBytes(x.SessionKeyId)
+	}
+	if x.FPort != 0 || s.HasField("f_port") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("f_port")
+		s.WriteUint32(x.FPort)
+	}
+	if x.FCnt != 0 || s.HasField("f_cnt") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("f_cnt")
+		s.WriteUint32(x.FCnt)
+	}
+	if len(x.FrmPayload) > 0 || s.HasField("frm_payload") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("frm_payload")
+		s.WriteBytes(x.FrmPayload)
+	}
+	if x.NormalizedPayload != nil || s.HasField("normalized_payload") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("normalized_payload")
+		if x.NormalizedPayload == nil {
+			s.WriteNil()
+		} else {
+			gogo.MarshalStruct(s, x.NormalizedPayload)
+		}
+	}
+	if len(x.NormalizedPayloadWarnings) > 0 || s.HasField("normalized_payload_warnings") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("normalized_payload_warnings")
+		s.WriteStringArray(x.NormalizedPayloadWarnings)
+	}
+	if len(x.RxMetadata) > 0 || s.HasField("rx_metadata") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("rx_metadata")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.RxMetadata {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("rx_metadata"))
+		}
+		s.WriteArrayEnd()
+	}
+	if x.Settings != nil || s.HasField("settings") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("settings")
+		// NOTE: TxSettings does not seem to implement MarshalProtoJSON.
+		gogo.MarshalMessage(s, x.Settings)
+	}
+	if x.ReceivedAt != nil || s.HasField("received_at") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("received_at")
+		if x.ReceivedAt == nil {
+			s.WriteNil()
+		} else {
+			gogo.MarshalTimestamp(s, x.ReceivedAt)
+		}
+	}
+	if x.Confirmed || s.HasField("confirmed") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("confirmed")
+		s.WriteBool(x.Confirmed)
+	}
+	if x.ConsumedAirtime != nil || s.HasField("consumed_airtime") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("consumed_airtime")
+		if x.ConsumedAirtime == nil {
+			s.WriteNil()
+		} else {
+			gogo.MarshalDuration(s, x.ConsumedAirtime)
+		}
+	}
+	if x.Locations != nil || s.HasField("locations") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("locations")
+		s.WriteObjectStart()
+		var wroteElement bool
+		for k, v := range x.Locations {
+			s.WriteMoreIf(&wroteElement)
+			s.WriteObjectStringField(k)
+			v.MarshalProtoJSON(s.WithField("locations"))
+		}
+		s.WriteObjectEnd()
+	}
+	if x.VersionIds != nil || s.HasField("version_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("version_ids")
+		// NOTE: EndDeviceVersionIdentifiers does not seem to implement MarshalProtoJSON.
+		gogo.MarshalMessage(s, x.VersionIds)
+	}
+	if x.NetworkIds != nil || s.HasField("network_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("network_ids")
+		x.NetworkIds.MarshalProtoJSON(s.WithField("network_ids"))
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ApplicationUplinkNormalized to JSON.
+func (x *ApplicationUplinkNormalized) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ApplicationUplinkNormalized message from JSON.
+func (x *ApplicationUplinkNormalized) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "session_key_id", "sessionKeyId":
+			s.AddField("session_key_id")
+			x.SessionKeyId = s.ReadBytes()
+		case "f_port", "fPort":
+			s.AddField("f_port")
+			x.FPort = s.ReadUint32()
+		case "f_cnt", "fCnt":
+			s.AddField("f_cnt")
+			x.FCnt = s.ReadUint32()
+		case "frm_payload", "frmPayload":
+			s.AddField("frm_payload")
+			x.FrmPayload = s.ReadBytes()
+		case "normalized_payload", "normalizedPayload":
+			s.AddField("normalized_payload")
+			if s.ReadNil() {
+				x.NormalizedPayload = nil
+				return
+			}
+			v := gogo.UnmarshalStruct(s)
+			if s.Err() != nil {
+				return
+			}
+			x.NormalizedPayload = v
+		case "normalized_payload_warnings", "normalizedPayloadWarnings":
+			s.AddField("normalized_payload_warnings")
+			if s.ReadNil() {
+				x.NormalizedPayloadWarnings = nil
+				return
+			}
+			x.NormalizedPayloadWarnings = s.ReadStringArray()
+		case "rx_metadata", "rxMetadata":
+			s.AddField("rx_metadata")
+			if s.ReadNil() {
+				x.RxMetadata = nil
+				return
+			}
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.RxMetadata = append(x.RxMetadata, nil)
+					return
+				}
+				v := &RxMetadata{}
+				v.UnmarshalProtoJSON(s.WithField("rx_metadata", false))
+				if s.Err() != nil {
+					return
+				}
+				x.RxMetadata = append(x.RxMetadata, v)
+			})
+		case "settings":
+			s.AddField("settings")
+			if s.ReadNil() {
+				x.Settings = nil
+				return
+			}
+			// NOTE: TxSettings does not seem to implement UnmarshalProtoJSON.
+			var v TxSettings
+			gogo.UnmarshalMessage(s, &v)
+			x.Settings = &v
+		case "received_at", "receivedAt":
+			s.AddField("received_at")
+			if s.ReadNil() {
+				x.ReceivedAt = nil
+				return
+			}
+			v := gogo.UnmarshalTimestamp(s)
+			if s.Err() != nil {
+				return
+			}
+			x.ReceivedAt = v
+		case "confirmed":
+			s.AddField("confirmed")
+			x.Confirmed = s.ReadBool()
+		case "consumed_airtime", "consumedAirtime":
+			s.AddField("consumed_airtime")
+			if s.ReadNil() {
+				x.ConsumedAirtime = nil
+				return
+			}
+			v := gogo.UnmarshalDuration(s)
+			if s.Err() != nil {
+				return
+			}
+			x.ConsumedAirtime = v
+		case "locations":
+			s.AddField("locations")
+			if s.ReadNil() {
+				x.Locations = nil
+				return
+			}
+			x.Locations = make(map[string]*Location)
+			s.ReadStringMap(func(key string) {
+				var v Location
+				v.UnmarshalProtoJSON(s)
+				x.Locations[key] = &v
+			})
+		case "version_ids", "versionIds":
+			s.AddField("version_ids")
+			if s.ReadNil() {
+				x.VersionIds = nil
+				return
+			}
+			// NOTE: EndDeviceVersionIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v EndDeviceVersionIdentifiers
+			gogo.UnmarshalMessage(s, &v)
+			x.VersionIds = &v
+		case "network_ids", "networkIds":
+			if s.ReadNil() {
+				x.NetworkIds = nil
+				return
+			}
+			x.NetworkIds = &NetworkIdentifiers{}
+			x.NetworkIds.UnmarshalProtoJSON(s.WithField("network_ids", true))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ApplicationUplinkNormalized from JSON.
+func (x *ApplicationUplinkNormalized) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
@@ -1548,6 +1831,10 @@ func (x *ApplicationUp) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 			s.WriteMoreIf(&wroteField)
 			s.WriteObjectField("uplink_message")
 			ov.UplinkMessage.MarshalProtoJSON(s.WithField("uplink_message"))
+		case *ApplicationUp_UplinkNormalized:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("uplink_normalized")
+			ov.UplinkNormalized.MarshalProtoJSON(s.WithField("uplink_normalized"))
 		case *ApplicationUp_JoinAccept:
 			s.WriteMoreIf(&wroteField)
 			s.WriteObjectField("join_accept")
@@ -1643,6 +1930,15 @@ func (x *ApplicationUp) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			}
 			ov.UplinkMessage = &ApplicationUplink{}
 			ov.UplinkMessage.UnmarshalProtoJSON(s.WithField("uplink_message", true))
+		case "uplink_normalized", "uplinkNormalized":
+			ov := &ApplicationUp_UplinkNormalized{}
+			x.Up = ov
+			if s.ReadNil() {
+				ov.UplinkNormalized = nil
+				return
+			}
+			ov.UplinkNormalized = &ApplicationUplinkNormalized{}
+			ov.UplinkNormalized.UnmarshalProtoJSON(s.WithField("uplink_normalized", true))
 		case "join_accept", "joinAccept":
 			ov := &ApplicationUp_JoinAccept{}
 			x.Up = ov

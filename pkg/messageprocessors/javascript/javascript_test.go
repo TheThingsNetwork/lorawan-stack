@@ -19,7 +19,9 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
+	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/normalizedpayload"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -27,6 +29,7 @@ import (
 )
 
 func TestLegacyEncodeDownlink(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	ctx := test.Context()
@@ -96,6 +99,7 @@ func TestLegacyEncodeDownlink(t *testing.T) {
 }
 
 func TestEncodeDownlink(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	ctx := test.Context()
@@ -231,6 +235,7 @@ func TestEncodeDownlink(t *testing.T) {
 }
 
 func TestLegacyDecodeUplink(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	ctx := test.Context()
@@ -308,7 +313,12 @@ func TestLegacyDecodeUplink(t *testing.T) {
 	}
 }
 
+func float64Ptr(f float64) *float64 {
+	return &f
+}
+
 func TestDecodeUplink(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	ctx := test.Context()
@@ -324,10 +334,10 @@ func TestDecodeUplink(t *testing.T) {
 	}
 
 	message := &ttnpb.ApplicationUplink{
-		FrmPayload: []byte{0xF7, 0xAE},
+		FrmPayload: []byte{0xF7, 0xAE, 0xF7, 0xD8},
 	}
 
-	// Decode bytes.
+	// Decode and normalize a single measurement with a decoder warning.
 	{
 		script := `
 		function decodeUplink(input) {
@@ -343,15 +353,194 @@ func TestDecodeUplink(t *testing.T) {
 				warnings: warnings
 			}
 		}
+
+		function normalizeUplink(input) {
+			return {
+				data: {
+					air: {
+						temperature: input.data.temperature
+					}
+				}
+			}
+		}
 		`
 		err := host.DecodeUplink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
-		m, err := gogoproto.Map(message.DecodedPayload)
+
+		decodedPayload, err := gogoproto.Map(message.DecodedPayload)
 		a.So(err, should.BeNil)
-		a.So(m, should.Resemble, map[string]interface{}{
+		a.So(decodedPayload, should.Resemble, map[string]interface{}{
 			"temperature": -21.3,
 		})
 		a.So(message.DecodedPayloadWarnings, should.Resemble, []string{"it's cold"})
+
+		a.So(message.NormalizedPayload, should.HaveLength, 1)
+		measurements, err := normalizedpayload.Parse(message.NormalizedPayload)
+		a.So(err, should.BeNil)
+		a.So(measurements[0], should.Resemble, normalizedpayload.Measurement{
+			Air: &normalizedpayload.Air{
+				Temperature: float64Ptr(-21.3),
+			},
+		})
+	}
+
+	// Decode a single measurement that is already normalized.
+	{
+		//nolint:lll
+		script := `
+		function decodeUplink(input) {
+			return {
+				data: {
+					air: {
+						temperature: (((input.bytes[0] & 0x80 ? input.bytes[0] - 0x100 : input.bytes[0]) << 8) | input.bytes[1]) / 100
+					}
+				}
+			}
+		}
+		`
+		err := host.DecodeUplink(ctx, ids, nil, message, script)
+		a.So(err, should.BeNil)
+		a.So(message.NormalizedPayload, should.HaveLength, 1)
+		a.So(message.DecodedPayload, should.Resemble, message.NormalizedPayload[0])
+
+		measurements, err := normalizedpayload.Parse(message.NormalizedPayload)
+		a.So(err, should.BeNil)
+		a.So(measurements[0], should.Resemble, normalizedpayload.Measurement{
+			Air: &normalizedpayload.Air{
+				Temperature: float64Ptr(-21.3),
+			},
+		})
+	}
+
+	// Decode and normalize two measurements.
+	{
+		script := `
+		function decodeUplink(input) {
+			var data = {
+				temperatures: []
+			};
+			for (var i = 0; i < input.bytes.length; i += 2) {
+				var temp = (((input.bytes[i] & 0x80 ? input.bytes[i] - 0x100 : input.bytes[i]) << 8) | input.bytes[i+1]) / 100;
+				data.temperatures.push(temp);
+			}
+			return {
+				data,
+			}
+		}
+
+		function normalizeUplink(input) {
+			return {
+				data: input.data.temperatures.map((d) => {
+					return {
+						air: {
+							temperature: d
+						}
+					}
+				})
+			}
+		}
+		`
+		err := host.DecodeUplink(ctx, ids, nil, message, script)
+		a.So(err, should.BeNil)
+
+		decodedPayload, err := gogoproto.Map(message.DecodedPayload)
+		a.So(err, should.BeNil)
+		a.So(decodedPayload, should.Resemble, map[string]interface{}{
+			"temperatures": []interface{}{-21.3, -20.88},
+		})
+
+		a.So(message.NormalizedPayload, should.HaveLength, 2)
+		measurements, err := normalizedpayload.Parse(message.NormalizedPayload)
+		a.So(err, should.BeNil)
+		a.So(measurements, should.Resemble, []normalizedpayload.Measurement{
+			{
+				Air: &normalizedpayload.Air{
+					Temperature: float64Ptr(-21.3),
+				},
+			},
+			{
+				Air: &normalizedpayload.Air{
+					Temperature: float64Ptr(-20.88),
+				},
+			},
+		})
+	}
+
+	// Return errors from decoder and ensure that the normalizer isn't called.
+	{
+		script := `
+		function decodeUplink(input) {
+			return {
+				errors: ["test error"]
+			}
+		}
+
+		function normalizeUplink(input) {
+			throw new Error("this should not be called")
+		}
+		`
+		err := host.DecodeUplink(ctx, ids, nil, message, script)
+		a.So(err, should.NotBeNil)
+		a.So(errors.IsAborted(err), should.BeTrue)
+	}
+
+	// Decode and normalize a single measurement with a normalizer error.
+	{
+		script := `
+			function decodeUplink(input) {
+				var data = {
+					temperature: (((input.bytes[0] & 0x80 ? input.bytes[0] - 0x100 : input.bytes[0]) << 8) | input.bytes[1]) / 100
+				}
+				var warnings = [];
+				if (data.temperature < -10) {
+					warnings.push("it's cold");
+				}
+				return {
+					data: data,
+					warnings: warnings
+				}
+			}
+	
+			function normalizeUplink(input) {
+				return {
+					errors: ["test error"]
+				}
+			}
+			`
+		err := host.DecodeUplink(ctx, ids, nil, message, script)
+		a.So(err, should.NotBeNil)
+		a.So(errors.IsAborted(err), should.BeTrue)
+	}
+
+	// Decode and normalize a single measurement with out-of-range value.
+	{
+		message := &ttnpb.ApplicationUplink{
+			FPort:      4,
+			FrmPayload: []byte{0x80, 0x42}, // Temperature is -327.02 °C which is below absolute zero
+		}
+		//nolint:lll
+		script := `
+			function decodeUplink(input) {
+				return {
+					data: {
+						temperature: (((input.bytes[0] & 0x80 ? input.bytes[0] - 0x100 : input.bytes[0]) << 8) | input.bytes[1]) / 100
+					}
+				}
+			}
+
+			function normalizeUplink(input) {
+				return {
+					data: {
+						air: {
+							temperature: input.data.temperature
+						}
+					}
+				}
+			}
+			`
+		err := host.DecodeUplink(ctx, ids, nil, message, script)
+		a.So(err, should.NotBeNil)
+		a.So(errors.IsInvalidArgument(err), should.BeTrue)
 	}
 
 	// The Things Node example.
@@ -360,6 +549,7 @@ func TestDecodeUplink(t *testing.T) {
 			FPort:      4,
 			FrmPayload: []byte{0x0C, 0xB2, 0x04, 0x80, 0xF7, 0xAE},
 		}
+		//nolint:lll
 		script := `
 		function decodeUplink(input) {
 			var data = {};
@@ -444,6 +634,7 @@ func TestDecodeUplink(t *testing.T) {
 }
 
 func TestDecodeDownlink(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	ctx := test.Context()

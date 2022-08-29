@@ -1791,6 +1791,7 @@
   "event:as.up.join.forward": "ジョイン許可メッセージを転送",
   "event:as.up.join.receive": "ジョイン許可メッセージを受信",
   "event:as.up.location.forward": "ロケーション解明メッセージの転送",
+  "event:as.up.normalized.forward": "正規化されたアップリンクデータメッセージの転送",
   "event:as.up.service.forward": "サービスデータメッセージの転送",
   "event:client.collaborator.delete": "クライアントコラボレータの削除",
   "event:client.collaborator.update": "クライアントコラボレータの更新",

@@ -49,6 +49,7 @@ const pubsubEntitySelector = [
   'location_solved',
   'service_data',
   'uplink_message',
+  'uplink_normalized',
 ]
 
 const mapStateToProps = state => ({

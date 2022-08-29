@@ -210,6 +210,8 @@ func AddSelectFlagsForApplicationWebhook(flags *pflag.FlagSet, prefix string, hi
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("downlink-api-key", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("downlink-api-key", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("uplink-message", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("uplink-message", prefix), true), flagsplugin.WithHidden(hidden)))
 	AddSelectFlagsForApplicationWebhook_Message(flags, flagsplugin.Prefix("uplink-message", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("uplink-normalized", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("uplink-normalized", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForApplicationWebhook_Message(flags, flagsplugin.Prefix("uplink-normalized", prefix), hidden)
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("join-accept", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("join-accept", prefix), true), flagsplugin.WithHidden(hidden)))
 	AddSelectFlagsForApplicationWebhook_Message(flags, flagsplugin.Prefix("join-accept", prefix), hidden)
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("downlink-ack", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("downlink-ack", prefix), true), flagsplugin.WithHidden(hidden)))
@@ -276,6 +278,16 @@ func PathsFromSelectFlagsForApplicationWebhook(flags *pflag.FlagSet, prefix stri
 		paths = append(paths, flagsplugin.Prefix("uplink_message", prefix))
 	}
 	if selectPaths, err := PathsFromSelectFlagsForApplicationWebhook_Message(flags, flagsplugin.Prefix("uplink_message", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("uplink_normalized", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("uplink_normalized", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForApplicationWebhook_Message(flags, flagsplugin.Prefix("uplink_normalized", prefix)); err != nil {
 		return nil, err
 	} else {
 		paths = append(paths, selectPaths...)
@@ -398,6 +410,7 @@ func AddSetFlagsForApplicationWebhook(flags *pflag.FlagSet, prefix string, hidde
 	flags.AddFlag(flagsplugin.NewStringStringMapFlag(flagsplugin.Prefix("template-fields", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("downlink-api-key", prefix), "", flagsplugin.WithHidden(hidden)))
 	AddSetFlagsForApplicationWebhook_Message(flags, flagsplugin.Prefix("uplink-message", prefix), hidden)
+	AddSetFlagsForApplicationWebhook_Message(flags, flagsplugin.Prefix("uplink-normalized", prefix), hidden)
 	AddSetFlagsForApplicationWebhook_Message(flags, flagsplugin.Prefix("join-accept", prefix), hidden)
 	AddSetFlagsForApplicationWebhook_Message(flags, flagsplugin.Prefix("downlink-ack", prefix), hidden)
 	AddSetFlagsForApplicationWebhook_Message(flags, flagsplugin.Prefix("downlink-nack", prefix), hidden)
@@ -468,6 +481,16 @@ func (m *ApplicationWebhook) SetFromFlags(flags *pflag.FlagSet, prefix string) (
 			m.UplinkMessage = &ApplicationWebhook_Message{}
 		}
 		if setPaths, err := m.UplinkMessage.SetFromFlags(flags, flagsplugin.Prefix("uplink_message", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("uplink_normalized", prefix)); changed {
+		if m.UplinkNormalized == nil {
+			m.UplinkNormalized = &ApplicationWebhook_Message{}
+		}
+		if setPaths, err := m.UplinkNormalized.SetFromFlags(flags, flagsplugin.Prefix("uplink_normalized", prefix)); err != nil {
 			return nil, err
 		} else {
 			paths = append(paths, setPaths...)

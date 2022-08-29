@@ -16,6 +16,7 @@ import DownlinkMessage from '../previews/downlink-message'
 import GatewayUplinkMessage from '../previews/gateway-uplink-message'
 import ApplicationDownlink from '../previews/application-downlink'
 import ApplicationUplink from '../previews/application-uplink'
+import ApplicationUplinkNormalized from '../previews/application-uplink-normalized'
 import ApplicationUp from '../previews/application-up'
 import ApplicationLocation from '../previews/application-location'
 import JoinRequest from '../previews/join-request'
@@ -98,6 +99,7 @@ export const eventIconMap = [
 export const dataTypeMap = {
   ApplicationDownlink,
   ApplicationUplink,
+  ApplicationUplinkNormalized,
   ApplicationUp,
   ApplicationLocation,
   DownlinkMessage,
@@ -111,6 +113,7 @@ export const dataTypeMap = {
 
 export const applicationUpMessages = [
   'uplink_message',
+  'uplink_normalized',
   'join_accept',
   'downlink_ack',
   'downlink_nack',
