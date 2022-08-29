@@ -114,21 +114,7 @@ const maxDutyCycleOptions = [
   { value: 'DUTY_CYCLE_16384', label: '0.006%' },
 ]
 
-const encodeAdrMode = value => {
-  if (value === 'dynamic') {
-    return {
-      [value]: {
-        min_data_rate_index: null,
-        max_data_rate_index: null,
-        min_tx_power_index: null,
-        max_tx_power_index: null,
-        min_nb_trans: null,
-        max_nb_trans: null,
-      },
-    }
-  }
-  return { [value]: {} }
-}
+const encodeAdrMode = value => ({ [value]: {} })
 const decodeAdrMode = value => (value !== undefined ? Object.keys(value)[0] : null)
 
 const MacSettingsSection = props => {
@@ -149,7 +135,6 @@ const MacSettingsSection = props => {
   const isOTAA = activationMode === ACTIVATION_MODES.OTAA
   const isDynamicAdr = mac_settings.adr && 'dynamic' in mac_settings.adr
   const isStaticAdr = mac_settings.adr && 'static' in mac_settings.adr
-
   const [resetsFCnt, setResetsFCnt] = React.useState(isABP && initialFCnt)
   const handleResetsFCntChange = React.useCallback(evt => {
     const { checked } = evt.target
