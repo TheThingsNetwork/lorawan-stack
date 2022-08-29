@@ -181,24 +181,51 @@ func exclusiveMaximum[T constraints.Ordered](max T) fieldValidator[T] {
 }
 
 var fieldParsers = map[string]fieldParser{
-	"time": parseTime(func(dst *Measurement) **time.Time { return &dst.Time }),
-	"air":  object(func(dst *Measurement) **Air { return &dst.Air }),
-	"air.temperature": parseNumber(func(dst *Measurement) **float64 { return &dst.Air.Temperature },
+	"time": parseTime(
+		func(dst *Measurement) **time.Time {
+			return &dst.Time
+		},
+	),
+	"air": object(
+		func(dst *Measurement) **Air {
+			return &dst.Air
+		},
+	),
+	"air.temperature": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Air.Temperature
+		},
 		minimum(-273.15),
 	),
-	"air.relativeHumidity": parseNumber(func(dst *Measurement) **float64 { return &dst.Air.RelativeHumidity },
+	"air.relativeHumidity": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Air.RelativeHumidity
+		},
 		minimum(0.0),
-		maximum(1.0),
+		maximum(100.0),
 	),
-	"air.pressure": parseNumber(func(dst *Measurement) **float64 { return &dst.Air.Pressure },
+	"air.pressure": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Air.Pressure
+		},
 		minimum(900.0),
 		maximum(1100.0),
 	),
-	"wind": object(func(dst *Measurement) **Wind { return &dst.Wind }),
-	"wind.speed": parseNumber(func(dst *Measurement) **float64 { return &dst.Wind.Speed },
+	"wind": object(
+		func(dst *Measurement) **Wind {
+			return &dst.Wind
+		},
+	),
+	"wind.speed": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Wind.Speed
+		},
 		minimum(0.0),
 	),
-	"wind.direction": parseNumber(func(dst *Measurement) **float64 { return &dst.Wind.Direction },
+	"wind.direction": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Wind.Direction
+		},
 		minimum(0.0),
 		exclusiveMaximum(360.0),
 	),
