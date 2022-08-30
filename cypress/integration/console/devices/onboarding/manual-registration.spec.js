@@ -67,8 +67,14 @@ describe('End device manual create', () => {
       cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
       cy.findByLabelText('JoinEUI').type(device.join_eui)
       cy.findByRole('button', { name: 'Confirm' }).click()
+      cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
+      cy.findByLabelText('Network defaults').uncheck()
+      cy.findByLabelText('Rx2 data rate').clear()
       cy.findByRole('button', { name: 'Add end device' }).click()
 
+      cy.findErrorByLabelText('Rx2 data rate')
+        .should('contain.text', 'Rx2 data rate is required')
+        .and('be.visible')
       cy.findErrorByLabelText('DevEUI')
         .should('contain.text', 'DevEUI is required')
         .and('be.visible')
@@ -78,6 +84,45 @@ describe('End device manual create', () => {
       cy.findErrorByLabelText('End device ID')
         .should('contain.text', 'End device ID is required')
         .and('be.visible')
+    })
+
+    it('succeeds resetting provisioning fields on device type information change', () => {
+      const device = {
+        lorawan_version: 'MAC_V1_0',
+        frequency_plan_id: '863-870 MHz',
+        frequency_plan_id_2: '433 MHz',
+        join_eui: generateHexValue(16),
+        dev_eui: generateHexValue(16),
+        app_key: generateHexValue(32),
+      }
+
+      cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
+      cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
+      cy.findByLabelText('JoinEUI').type(device.join_eui)
+      cy.findByRole('button', { name: 'Confirm' }).click()
+      cy.findByLabelText('DevEUI').type(device.dev_eui)
+      cy.findByLabelText('AppKey').type(device.app_key)
+
+      cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id_2)
+
+      cy.findByLabelText('JoinEUI').should('not.exist')
+      cy.findByLabelText('DevEUI').should('not.exist')
+      cy.findByLabelText('AppKey').should('not.exist')
+    })
+
+    it('succeeds generating keys by clicking on `Generate` button', () => {
+      const device = {
+        lorawan_version: 'MAC_V1_0',
+        frequency_plan_id: '863-870 MHz',
+        join_eui: generateHexValue(16),
+      }
+
+      cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
+      cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
+      cy.findByLabelText('JoinEUI').type(device.join_eui)
+      cy.findByRole('button', { name: 'Confirm' }).click()
+      cy.findByRole('button', { name: 'Generate' }).click()
+      cy.findByLabelText('AppKey').should('not.equal', '')
     })
 
     describe('LoRaWAN V1.0', () => {
@@ -105,6 +150,10 @@ describe('End device manual create', () => {
             'consoleRootPath',
           )}/applications/${appId}/devices/eui-${device.dev_eui.toLocaleLowerCase()}`,
         )
+        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLocaleLowerCase()}` }).should(
+          'be.visible',
+        )
+
         cy.findByTestId('full-error-view').should('not.exist')
       })
 
@@ -137,6 +186,10 @@ describe('End device manual create', () => {
             'consoleRootPath',
           )}/applications/${appId}/devices/eui-${device.dev_eui.toLocaleLowerCase()}`,
         )
+        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLocaleLowerCase()}` }).should(
+          'be.visible',
+        )
+
         cy.findByTestId('full-error-view').should('not.exist')
       })
 
@@ -165,6 +218,9 @@ describe('End device manual create', () => {
           `${Cypress.config(
             'consoleRootPath',
           )}/applications/${appId}/devices/eui-${device.dev_eui.toLocaleLowerCase()}`,
+        )
+        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLocaleLowerCase()}` }).should(
+          'be.visible',
         )
         cy.findByTestId('full-error-view').should('not.exist')
       })
@@ -196,6 +252,42 @@ describe('End device manual create', () => {
             'consoleRootPath',
           )}/applications/${appId}/devices/eui-${device.dev_eui.toLocaleLowerCase()}`,
         )
+        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLocaleLowerCase()}` }).should(
+          'be.visible',
+        )
+
+        cy.findByTestId('full-error-view').should('not.exist')
+      })
+    })
+
+    describe('LoRaWAN V1.0.1', () => {
+      it('succeeds registering a new end device', () => {
+        const device = {
+          join_eui: generateHexValue(16),
+          dev_eui: generateHexValue(16),
+          lorawan_version: 'MAC_V1_0_1',
+          frequency_plan_id: '863-870 MHz',
+          app_key: generateHexValue(32),
+        }
+        cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
+        cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
+        cy.findByLabelText('JoinEUI').type(device.join_eui)
+        cy.findByRole('button', { name: 'Confirm' }).click()
+        cy.findByLabelText('DevEUI').type(device.dev_eui)
+        cy.findByLabelText('AppKey').type(device.app_key)
+
+        cy.findByRole('button', { name: 'Add end device' }).click()
+
+        cy.location('pathname').should(
+          'eq',
+          `${Cypress.config(
+            'consoleRootPath',
+          )}/applications/${appId}/devices/eui-${device.dev_eui.toLocaleLowerCase()}`,
+        )
+        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLocaleLowerCase()}` }).should(
+          'be.visible',
+        )
+
         cy.findByTestId('full-error-view').should('not.exist')
       })
     })
@@ -227,6 +319,76 @@ describe('End device manual create', () => {
             'consoleRootPath',
           )}/applications/${appId}/devices/eui-${device.dev_eui.toLocaleLowerCase()}`,
         )
+        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLocaleLowerCase()}` }).should(
+          'be.visible',
+        )
+
+        cy.findByTestId('full-error-view').should('not.exist')
+      })
+    })
+
+    describe('LoRaWAN V1.0.3', () => {
+      it('succeeds registering a new end device', () => {
+        const device = {
+          join_eui: generateHexValue(16),
+          dev_eui: generateHexValue(16),
+          lorawan_version: 'MAC_V1_0_3',
+          frequency_plan_id: '863-870 MHz',
+          app_key: generateHexValue(32),
+        }
+        cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
+        cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
+        cy.findByLabelText('JoinEUI').type(device.join_eui)
+        cy.findByRole('button', { name: 'Confirm' }).click()
+        cy.findByLabelText('DevEUI').type(device.dev_eui)
+        cy.findByLabelText('AppKey').type(device.app_key)
+
+        cy.findByRole('button', { name: 'Add end device' }).click()
+
+        cy.location('pathname').should(
+          'eq',
+          `${Cypress.config(
+            'consoleRootPath',
+          )}/applications/${appId}/devices/eui-${device.dev_eui.toLocaleLowerCase()}`,
+        )
+        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLocaleLowerCase()}` }).should(
+          'be.visible',
+        )
+
+        cy.findByTestId('full-error-view').should('not.exist')
+      })
+    })
+
+    describe('LoRaWAN V1.0.4', () => {
+      it('succeeds registering a new end device', () => {
+        const device = {
+          join_eui: generateHexValue(16),
+          dev_eui: generateHexValue(16),
+          lorawan_version: 'MAC_V1_0_4',
+          frequency_plan_id: '863-870 MHz',
+          phy_version: 'PHY_V1_0',
+          app_key: generateHexValue(32),
+        }
+        cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
+        cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
+        cy.findByLabelText('Regional Parameters version').selectOption(device.phy_version)
+        cy.findByLabelText('JoinEUI').type(device.join_eui)
+        cy.findByRole('button', { name: 'Confirm' }).click()
+        cy.findByLabelText('DevEUI').type(device.dev_eui)
+        cy.findByLabelText('AppKey').type(device.app_key)
+
+        cy.findByRole('button', { name: 'Add end device' }).click()
+
+        cy.location('pathname').should(
+          'eq',
+          `${Cypress.config(
+            'consoleRootPath',
+          )}/applications/${appId}/devices/eui-${device.dev_eui.toLocaleLowerCase()}`,
+        )
+        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLocaleLowerCase()}` }).should(
+          'be.visible',
+        )
+
         cy.findByTestId('full-error-view').should('not.exist')
       })
     })
@@ -260,6 +422,10 @@ describe('End device manual create', () => {
             'consoleRootPath',
           )}/applications/${appId}/devices/eui-${device.dev_eui.toLocaleLowerCase()}`,
         )
+        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLocaleLowerCase()}` }).should(
+          'be.visible',
+        )
+
         cy.findByTestId('full-error-view').should('not.exist')
       })
     })
@@ -339,6 +505,8 @@ describe('End device manual create', () => {
           'eq',
           `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${device.id}`,
         )
+        cy.findByRole('heading', { name: `${device.id}` }).should('be.visible')
+
         cy.findByTestId('full-error-view').should('not.exist')
       })
 
@@ -360,7 +528,7 @@ describe('End device manual create', () => {
         cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
         cy.findByLabelText('Activation by personalization (ABP)').check()
         cy.findByLabelText('Additional LoRaWAN class capabilities').selectOption('class-b')
-        cy.findByLabelText('Network defaults').uncheck()
+        cy.findByLabelText('Network defaults').should('not.be.checked').and('have.attr', 'disabled')
         cy.findByLabelText('Class B timeout').type(device.class_b_timeout)
         cy.findByLabelText('Ping slot periodicity').selectOption(device.ping_slot_periodicity)
         cy.findByLabelText('JoinEUI').type(device.join_eui)
@@ -376,6 +544,8 @@ describe('End device manual create', () => {
           'eq',
           `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${device.id}`,
         )
+        cy.findByRole('heading', { name: `${device.id}` }).should('be.visible')
+
         cy.findByTestId('full-error-view').should('not.exist')
       })
 
@@ -408,6 +578,8 @@ describe('End device manual create', () => {
           'eq',
           `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${device.id}`,
         )
+        cy.findByRole('heading', { name: `${device.id}` }).should('be.visible')
+
         cy.findByTestId('full-error-view').should('not.exist')
       })
     })
@@ -454,6 +626,10 @@ describe('End device manual create', () => {
             'consoleRootPath',
           )}/applications/${appId}/devices/eui-${device.dev_eui.toLocaleLowerCase()}`,
         )
+        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLocaleLowerCase()}` }).should(
+          'be.visible',
+        )
+
         cy.findByTestId('full-error-view').should('not.exist')
       })
     })
@@ -522,6 +698,7 @@ describe('End device manual create', () => {
         cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
         cy.findByLabelText('Define multicast group (ABP & Multicast)').check()
         cy.findByLabelText('LoRaWAN class for multicast downlinks').selectOption('class-b')
+        cy.findByLabelText('Network defaults').should('not.be.checked').and('have.attr', 'disabled')
         cy.findByLabelText('Ping slot periodicity').selectOption(device.ping_slot_periodicity)
         cy.findByLabelText('JoinEUI').type(device.join_eui)
         cy.findByRole('button', { name: 'Confirm' }).click()
@@ -536,6 +713,8 @@ describe('End device manual create', () => {
           'eq',
           `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${device.id}`,
         )
+        cy.findByRole('heading', { name: `${device.id}` }).should('be.visible')
+
         cy.findByTestId('full-error-view').should('not.exist')
       })
 
@@ -569,6 +748,93 @@ describe('End device manual create', () => {
           'eq',
           `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${device.id}`,
         )
+        cy.findByRole('heading', { name: `${device.id}` }).should('be.visible')
+
+        cy.findByTestId('full-error-view').should('not.exist')
+      })
+
+      it('succeeds regitering multiple devices', () => {
+        const device1 = {
+          id: 'multicast-test-1',
+          join_eui: generateHexValue(16),
+          dev_addr: generateHexValue(8),
+          lorawan_version: 'MAC_V1_0',
+          frequency_plan_id: '863-870 MHz',
+          app_s_key: generateHexValue(32),
+          nwk_s_key: generateHexValue(32),
+        }
+
+        const device2 = {
+          id: 'multicast-test-2',
+          join_eui: generateHexValue(16),
+          dev_addr: generateHexValue(8),
+          lorawan_version: 'MAC_V1_0',
+          frequency_plan_id: '863-870 MHz',
+          app_s_key: generateHexValue(32),
+          nwk_s_key: generateHexValue(32),
+        }
+
+        const device3 = {
+          id: 'multicast-test-3',
+          join_eui: generateHexValue(16),
+          dev_addr: generateHexValue(8),
+          lorawan_version: 'MAC_V1_0',
+          frequency_plan_id: '863-870 MHz',
+          app_s_key: generateHexValue(32),
+          nwk_s_key: generateHexValue(32),
+        }
+
+        // Device 1
+        cy.findByLabelText('Frequency plan').selectOption(device1.frequency_plan_id)
+        cy.findByLabelText('LoRaWAN version').selectOption(device1.lorawan_version)
+        cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
+        cy.findByLabelText('Define multicast group (ABP & Multicast)').check()
+        cy.findByLabelText('LoRaWAN class for multicast downlinks').selectOption('class-c')
+        cy.findByLabelText('Network defaults').uncheck()
+        cy.findByLabelText('JoinEUI').type(device1.join_eui)
+        cy.findByRole('button', { name: 'Confirm' }).click()
+        cy.findByLabelText('Device address').type(device1.dev_addr)
+        cy.findByLabelText('AppSKey').type(device1.app_s_key)
+        cy.findByLabelText('NwkSKey').type(device1.nwk_s_key)
+        cy.findByLabelText('End device ID').type(device1.id)
+        cy.findByLabelText('Register another end device of this type').check()
+
+        cy.findByRole('button', { name: 'Add end device' }).click()
+
+        cy.findByTestId('toast-notification')
+          .should('be.visible')
+          .findByText('End device registered')
+          .should('be.visible')
+
+        // Device 2
+        cy.findByLabelText('Device address').type(device2.dev_addr)
+        cy.findByLabelText('AppSKey').clear().type(device2.app_s_key)
+        cy.findByLabelText('NwkSKey').clear().type(device2.nwk_s_key)
+        cy.findByLabelText('End device ID').type(device2.id)
+        cy.findByLabelText('Register another end device of this type').check()
+
+        cy.findByRole('button', { name: 'Add end device' }).click()
+
+        cy.findByTestId('toast-notification')
+          .should('be.visible')
+          .findByText('End device registered')
+          .should('be.visible')
+
+        // Device 3
+        cy.findByLabelText('Device address').clear().type(device3.dev_addr)
+        cy.findByLabelText('AppSKey').clear().type(device3.app_s_key)
+        cy.findByLabelText('NwkSKey').clear().type(device3.nwk_s_key)
+        cy.findByLabelText('End device ID').type(device3.id)
+        cy.findByLabelText('View registered end device').check()
+
+        cy.findByRole('button', { name: 'Add end device' }).click()
+
+        cy.location('pathname').should(
+          'eq',
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${device3.id}`,
+        )
+        cy.findByRole('heading', { name: `${device3.id}` }).should('be.visible')
+
         cy.findByTestId('full-error-view').should('not.exist')
       })
     })
