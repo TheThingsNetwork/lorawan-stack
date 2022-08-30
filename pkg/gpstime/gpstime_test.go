@@ -20,19 +20,25 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
-	. "go.thethings.network/lorawan-stack/v3/pkg/gpstime"
+	"go.thethings.network/lorawan-stack/v3/pkg/gpstime"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 var (
-	epoch          = time.Date(1980, time.January, 6, 0, 0, 0, 0, time.UTC)
-	leap1          = time.Duration(time.Date(1981, time.June, 30, 23, 59, 59, 0, time.UTC).UnixNano()-epoch.UnixNano()) + time.Second
-	leap5          = time.Duration(time.Date(1987, time.December, 31, 23, 59, 59, 0, time.UTC).UnixNano()-epoch.UnixNano()) + 5*time.Second
+	epoch = time.Date(1980, time.January, 6, 0, 0, 0, 0, time.UTC)
+	leap1 = time.Duration(
+		time.Date(1981, time.June, 30, 23, 59, 59, 0, time.UTC).UnixNano()-epoch.UnixNano(),
+	) + time.Second
+	leap5 = time.Duration(
+		time.Date(1987, time.December, 31, 23, 59, 59, 0, time.UTC).UnixNano()-epoch.UnixNano(),
+	) + 5*time.Second
 	now            = time.Date(2017, time.October, 24, 23, 53, 30, 0, time.UTC)
 	nowLeaps int64 = 18
 )
 
 func TestGPSConversion(t *testing.T) {
+	t.Parallel()
+
 	t.Logf("Leap 1: %d Leap 5: %d", leap1, leap5)
 
 	for i, tc := range []struct {
@@ -122,14 +128,33 @@ func TestGPSConversion(t *testing.T) {
 			Time: epoch.Add(leap5 - 3*time.Second),
 		},
 	} {
+		tc := tc
 		t.Run(fmt.Sprintf("%d/Time:%s/UnixNano:%d/GPS:%d", i, tc.Time, tc.Time.UnixNano(), tc.GPS), func(t *testing.T) {
+			t.Parallel()
+
 			a := assertions.New(t)
-			a.So(Parse(tc.GPS).UnixNano(), should.Resemble, tc.Time.UnixNano())
-			if IsLeapSecond(tc.GPS) {
-				a.So(ToGPS(tc.Time), should.Equal, tc.GPS+time.Second)
+			a.So(gpstime.Parse(tc.GPS).UnixNano(), should.Resemble, tc.Time.UnixNano())
+			if gpstime.IsLeapSecond(tc.GPS) {
+				a.So(gpstime.ToGPS(tc.Time), should.Equal, tc.GPS+time.Second)
 			} else {
-				a.So(ToGPS(tc.Time), should.Equal, tc.GPS)
+				a.So(gpstime.ToGPS(tc.Time), should.Equal, tc.GPS)
 			}
 		})
+	}
+}
+
+func TestIsLeapSecond(t *testing.T) {
+	t.Parallel()
+
+	a := assertions.New(t)
+	for _, v := range gpstime.Leaps {
+		a.So(gpstime.IsLeapSecond(time.Duration(v)*time.Second-time.Millisecond), should.BeFalse)
+		a.So(gpstime.IsLeapSecond(time.Duration(v)*time.Second-time.Microsecond), should.BeFalse)
+		a.So(gpstime.IsLeapSecond(time.Duration(v)*time.Second-time.Nanosecond), should.BeFalse)
+		a.So(gpstime.IsLeapSecond(time.Duration(v)*time.Second), should.BeTrue)
+		a.So(gpstime.IsLeapSecond(time.Duration(v)*time.Second+time.Nanosecond), should.BeTrue)
+		a.So(gpstime.IsLeapSecond(time.Duration(v)*time.Second+time.Microsecond), should.BeTrue)
+		a.So(gpstime.IsLeapSecond(time.Duration(v)*time.Second+999*time.Millisecond), should.BeTrue)
+		a.So(gpstime.IsLeapSecond(time.Duration(v)*time.Second+time.Second), should.BeFalse)
 	}
 }
