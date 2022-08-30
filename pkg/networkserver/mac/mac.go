@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ func handleMACResponse(
 	if allowMissing {
 		return cmds, nil
 	}
-	return cmds, ErrRequestNotFound.New()
+	return cmds, ErrRequestNotFound.WithAttributes("cid", cid)
 }
 
 // handleMACResponse searches for first MAC command block in cmds with CID equal to cid and calls f for each found value as argument.
@@ -79,7 +79,8 @@ func handleMACResponse(
 func handleMACResponseBlock(
 	cid ttnpb.MACCommandIdentifier,
 	allowMissing bool,
-	f func(*ttnpb.MACCommand) error, cmds ...*ttnpb.MACCommand,
+	f func(*ttnpb.MACCommand) error,
+	cmds ...*ttnpb.MACCommand,
 ) ([]*ttnpb.MACCommand, error) {
 	first := -1
 	last := -1
@@ -90,12 +91,14 @@ outer:
 
 		switch {
 		case first >= 0 && cmd.Cid != cid:
+			last--
 			break outer
 		case first < 0 && cmd.Cid != cid:
 			continue
 		case first < 0:
 			first = i
 		}
+
 		if err := f(cmd); err != nil {
 			return cmds, err
 		}
@@ -104,7 +107,7 @@ outer:
 	case first < 0 && allowMissing:
 		return cmds, nil
 	case first < 0 && !allowMissing:
-		return cmds, ErrRequestNotFound.New()
+		return cmds, ErrRequestNotFound.WithAttributes("cid", cid)
 	default:
 		return append(cmds[:first], cmds[last+1:]...), nil
 	}

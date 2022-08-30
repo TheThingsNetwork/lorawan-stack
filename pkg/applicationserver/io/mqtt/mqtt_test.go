@@ -22,6 +22,7 @@ import (
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/mock"
@@ -206,6 +207,38 @@ func TestTraffic(t *testing.T) {
 					EndDeviceIds: registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_UplinkMessage{
 						UplinkMessage: &ttnpb.ApplicationUplink{FrmPayload: []byte{0x2, 0x2, 0x2}},
+					},
+				},
+				OK: true,
+			},
+			{
+				Topic: fmt.Sprintf("v3/%v/devices/%v/up/normalized", unique.ID(ctx, registeredDeviceID.ApplicationIds), registeredDeviceID.DeviceId),
+				Message: &ttnpb.ApplicationUp{
+					EndDeviceIds: registeredDeviceID,
+					Up: &ttnpb.ApplicationUp_UplinkNormalized{
+						UplinkNormalized: &ttnpb.ApplicationUplinkNormalized{
+							SessionKeyId: []byte{0x11},
+							FPort:        42,
+							FCnt:         42,
+							FrmPayload:   []byte{0x1, 0x2, 0x3},
+							NormalizedPayload: &pbtypes.Struct{
+								Fields: map[string]*pbtypes.Value{
+									"air": {
+										Kind: &pbtypes.Value_StructValue{
+											StructValue: &pbtypes.Struct{
+												Fields: map[string]*pbtypes.Value{
+													"temperature": {
+														Kind: &pbtypes.Value_NumberValue{
+															NumberValue: 21.5,
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
 					},
 				},
 				OK: true,

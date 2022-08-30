@@ -77,6 +77,9 @@ func TestOpenConnection(t *testing.T) {
 		UplinkMessage: &ttnpb.ApplicationPubSub_Message{
 			Topic: "uplink.message",
 		},
+		UplinkNormalized: &ttnpb.ApplicationPubSub_Message{
+			Topic: "uplink.normalized",
+		},
 		JoinAccept: &ttnpb.ApplicationPubSub_Message{
 			Topic: "join.accept",
 		},
@@ -203,6 +206,11 @@ func TestOpenConnection(t *testing.T) {
 					name:    "ValidUplink",
 					subject: "app1.ps1.uplink.message",
 					topic:   conn.Topics.UplinkMessage,
+				},
+				{
+					name:    "ValidNormalizedUplink",
+					subject: "app1.ps1.uplink.normalized",
+					topic:   conn.Topics.UplinkNormalized,
 				},
 				{
 					name:    "ValidJoinAccept",

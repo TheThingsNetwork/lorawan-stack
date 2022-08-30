@@ -53,6 +53,7 @@ var (
 )
 
 func TestAuthentication(t *testing.T) {
+	t.Parallel()
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
 	is, isAddr, closeIS := mockis.New(ctx)
@@ -80,6 +81,7 @@ func TestAuthentication(t *testing.T) {
 
 	client := ttnpb.NewAppAsClient(c.LoopbackConn())
 
+	//nolint:paralleltest
 	for _, tc := range []struct {
 		ID  *ttnpb.ApplicationIdentifiers
 		Key string
@@ -138,6 +140,7 @@ type erroredApplicationUp struct {
 }
 
 func TestTraffic(t *testing.T) {
+	t.Parallel()
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -197,6 +200,7 @@ func TestTraffic(t *testing.T) {
 		t.Fatal("Subscription timeout")
 	}
 
+	//nolint:paralleltest
 	t.Run("Upstream", func(t *testing.T) {
 		a := assertions.New(t)
 
@@ -224,6 +228,7 @@ func TestTraffic(t *testing.T) {
 		}
 	})
 
+	//nolint:paralleltest
 	t.Run("Downstream", func(t *testing.T) {
 		a := assertions.New(t)
 		ids := ttnpb.EndDeviceIdentifiers{
@@ -365,6 +370,7 @@ func (p mockMQTTConfigProvider) GetMQTTConfig(context.Context) (*config.MQTT, er
 }
 
 func TestMQTTConfig(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
@@ -416,6 +422,7 @@ func TestMQTTConfig(t *testing.T) {
 }
 
 func TestSimulateUplink(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
@@ -471,6 +478,7 @@ func TestSimulateUplink(t *testing.T) {
 	}()
 
 	<-as.Subscriptions()
+	//nolint:paralleltest
 	for _, tc := range []struct {
 		name              string
 		up                *ttnpb.ApplicationUp
@@ -537,6 +545,7 @@ func TestSimulateUplink(t *testing.T) {
 }
 
 func TestMessageProcessors(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
@@ -611,8 +620,12 @@ func TestMessageProcessors(t *testing.T) {
 			Uplink: &ttnpb.ApplicationUplink{
 				FrmPayload: []byte{1, 0, 255},
 				RxMetadata: []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-				Settings:   &ttnpb.TxSettings{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
-				FPort:      1,
+				Settings: &ttnpb.TxSettings{
+					DataRate: &ttnpb.DataRate{
+						Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}},
+					},
+				},
+				FPort: 1,
 			},
 			Formatter: ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP,
 		}, creds)

@@ -356,6 +356,14 @@ export default class PubsubForm extends Component {
           description={sharedMessages.eventUplinkMessageDesc}
         />
         <Form.Field
+          name="uplink_normalized"
+          type="toggled-input"
+          enabledMessage={sharedMessages.uplinkNormalized}
+          placeholder={pathPlaceholder}
+          component={Input.Toggled}
+          description={sharedMessages.eventUplinkNormalizedDesc}
+        />
+        <Form.Field
           name="join_accept"
           type="toggled-input"
           enabledMessage={sharedMessages.joinAccept}

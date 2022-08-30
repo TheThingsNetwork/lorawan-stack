@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package topics implements MQTT topic layouts.
 package topics
 
 // Layout represents an MQTT topic layout.
 type Layout interface {
 	AcceptedTopic(applicationUID string, requested []string) (accepted []string, ok bool)
 
-	UplinkTopic(applicationUID, deviceID string) []string
+	UplinkMessageTopic(applicationUID, deviceID string) []string
+	UplinkNormalizedTopic(applicationUID, deviceID string) []string
 	JoinAcceptTopic(applicationUID, deviceID string) []string
 	DownlinkAckTopic(applicationUID, deviceID string) []string
 	DownlinkNackTopic(applicationUID, deviceID string) []string

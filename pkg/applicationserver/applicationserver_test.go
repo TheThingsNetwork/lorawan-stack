@@ -502,6 +502,9 @@ func TestApplicationServer(t *testing.T) {
 						UplinkMessage: &ttnpb.ApplicationPubSub_Message{
 							Topic: "up.uplink.message",
 						},
+						UplinkNormalized: &ttnpb.ApplicationPubSub_Message{
+							Topic: "up.uplink.normalized",
+						},
 						JoinAccept: &ttnpb.ApplicationPubSub_Message{
 							Topic: "up.join.accept",
 						},
@@ -535,17 +538,18 @@ func TestApplicationServer(t *testing.T) {
 						"downlink_ack",
 						"downlink_failed",
 						"downlink_nack",
-						"downlink_queued",
-						"downlink_queue_invalidated",
-						"downlink_sent",
 						"downlink_push",
+						"downlink_queue_invalidated",
+						"downlink_queued",
 						"downlink_replace",
+						"downlink_sent",
 						"format",
-						"provider",
-						"service_data",
 						"join_accept",
 						"location_solved",
+						"provider",
+						"service_data",
 						"uplink_message",
+						"uplink_normalized",
 					),
 				}
 				if _, err := client.Set(ctx, req, creds); err != nil {
@@ -644,6 +648,9 @@ func TestApplicationServer(t *testing.T) {
 						UplinkMessage: &ttnpb.ApplicationPubSub_Message{
 							Topic: "up/uplink/message",
 						},
+						UplinkNormalized: &ttnpb.ApplicationPubSub_Message{
+							Topic: "up/uplink/normalized",
+						},
 						JoinAccept: &ttnpb.ApplicationPubSub_Message{
 							Topic: "up/join/accept",
 						},
@@ -677,17 +684,18 @@ func TestApplicationServer(t *testing.T) {
 						"downlink_ack",
 						"downlink_failed",
 						"downlink_nack",
-						"downlink_queued",
-						"downlink_queue_invalidated",
-						"downlink_sent",
 						"downlink_push",
+						"downlink_queue_invalidated",
+						"downlink_queued",
 						"downlink_replace",
+						"downlink_sent",
 						"format",
-						"provider",
-						"service_data",
 						"join_accept",
 						"location_solved",
+						"provider",
+						"service_data",
 						"uplink_message",
+						"uplink_normalized",
 					),
 				}
 				if _, err := client.Set(ctx, req, creds); err != nil {
@@ -781,31 +789,33 @@ func TestApplicationServer(t *testing.T) {
 				client := ttnpb.NewApplicationWebhookRegistryClient(as.LoopbackConn())
 				req := &ttnpb.SetApplicationWebhookRequest{
 					Webhook: &ttnpb.ApplicationWebhook{
-						Ids:            registeredApplicationWebhookID,
-						BaseUrl:        webhookTarget.URL,
-						Format:         "json",
-						UplinkMessage:  &ttnpb.ApplicationWebhook_Message{Path: ""},
-						JoinAccept:     &ttnpb.ApplicationWebhook_Message{Path: ""},
-						DownlinkAck:    &ttnpb.ApplicationWebhook_Message{Path: ""},
-						DownlinkNack:   &ttnpb.ApplicationWebhook_Message{Path: ""},
-						DownlinkQueued: &ttnpb.ApplicationWebhook_Message{Path: ""},
-						DownlinkSent:   &ttnpb.ApplicationWebhook_Message{Path: ""},
-						DownlinkFailed: &ttnpb.ApplicationWebhook_Message{Path: ""},
-						LocationSolved: &ttnpb.ApplicationWebhook_Message{Path: ""},
-						ServiceData:    &ttnpb.ApplicationWebhook_Message{Path: ""},
+						Ids:              registeredApplicationWebhookID,
+						BaseUrl:          webhookTarget.URL,
+						Format:           "json",
+						UplinkMessage:    &ttnpb.ApplicationWebhook_Message{Path: ""},
+						UplinkNormalized: &ttnpb.ApplicationWebhook_Message{Path: ""},
+						JoinAccept:       &ttnpb.ApplicationWebhook_Message{Path: ""},
+						DownlinkAck:      &ttnpb.ApplicationWebhook_Message{Path: ""},
+						DownlinkNack:     &ttnpb.ApplicationWebhook_Message{Path: ""},
+						DownlinkQueued:   &ttnpb.ApplicationWebhook_Message{Path: ""},
+						DownlinkSent:     &ttnpb.ApplicationWebhook_Message{Path: ""},
+						DownlinkFailed:   &ttnpb.ApplicationWebhook_Message{Path: ""},
+						LocationSolved:   &ttnpb.ApplicationWebhook_Message{Path: ""},
+						ServiceData:      &ttnpb.ApplicationWebhook_Message{Path: ""},
 					},
 					FieldMask: ttnpb.FieldMask(
 						"base_url",
-						"format",
-						"uplink_message",
-						"service_data",
-						"join_accept",
 						"downlink_ack",
+						"downlink_failed",
 						"downlink_nack",
 						"downlink_queued",
 						"downlink_sent",
-						"downlink_failed",
+						"format",
+						"join_accept",
 						"location_solved",
+						"service_data",
+						"uplink_message",
+						"uplink_normalized",
 					),
 				}
 				if _, err := client.Set(ctx, req, creds); err != nil {
@@ -939,6 +949,7 @@ func TestApplicationServer(t *testing.T) {
 							Up: &ttnpb.ApplicationUp_JoinAccept{
 								JoinAccept: &ttnpb.ApplicationJoinAccept{
 									SessionKeyId: []byte{0x11},
+									ReceivedAt:   ttnpb.ProtoTimePtr(now),
 								},
 							},
 						},
@@ -949,6 +960,7 @@ func TestApplicationServer(t *testing.T) {
 								Up: &ttnpb.ApplicationUp_JoinAccept{
 									JoinAccept: &ttnpb.ApplicationJoinAccept{
 										SessionKeyId: []byte{0x11},
+										ReceivedAt:   up.GetJoinAccept().ReceivedAt,
 									},
 								},
 								CorrelationIds: up.CorrelationIds,
@@ -985,6 +997,7 @@ func TestApplicationServer(t *testing.T) {
 										EncryptedKey: []byte{0x39, 0x11, 0x40, 0x98, 0xa1, 0x5d, 0x6f, 0x92, 0xd7, 0xf0, 0x13, 0x21, 0x5b, 0x5b, 0x41, 0xa8, 0x98, 0x2d, 0xac, 0x59, 0x34, 0x76, 0x36, 0x18},
 										KekLabel:     "test",
 									},
+									ReceivedAt: ttnpb.ProtoTimePtr(now),
 								},
 							},
 						},
@@ -995,6 +1008,7 @@ func TestApplicationServer(t *testing.T) {
 								Up: &ttnpb.ApplicationUp_JoinAccept{
 									JoinAccept: &ttnpb.ApplicationJoinAccept{
 										SessionKeyId: []byte{0x22},
+										ReceivedAt:   up.GetJoinAccept().ReceivedAt,
 									},
 								},
 								CorrelationIds: up.CorrelationIds,
@@ -1106,6 +1120,7 @@ func TestApplicationServer(t *testing.T) {
 											FrmPayload:   []byte{0xb, 0x8f, 0x94, 0xe6},
 										},
 									},
+									ReceivedAt: ttnpb.ProtoTimePtr(now),
 								},
 							},
 						},
@@ -1116,6 +1131,7 @@ func TestApplicationServer(t *testing.T) {
 								Up: &ttnpb.ApplicationUp_JoinAccept{
 									JoinAccept: &ttnpb.ApplicationJoinAccept{
 										SessionKeyId: []byte{0x33},
+										ReceivedAt:   up.GetJoinAccept().ReceivedAt,
 									},
 								},
 								CorrelationIds: up.CorrelationIds,
@@ -1499,6 +1515,7 @@ func TestApplicationServer(t *testing.T) {
 											FrmPayload:   []byte{0x2f, 0x3f, 0x31, 0x2c},
 										},
 									},
+									ReceivedAt: ttnpb.ProtoTimePtr(now),
 								},
 							},
 						},
@@ -1510,6 +1527,7 @@ func TestApplicationServer(t *testing.T) {
 									JoinAccept: &ttnpb.ApplicationJoinAccept{
 										SessionKeyId:   []byte{0x44},
 										PendingSession: true,
+										ReceivedAt:     up.GetJoinAccept().ReceivedAt,
 									},
 								},
 								CorrelationIds: up.CorrelationIds,
@@ -1885,6 +1903,69 @@ func TestApplicationServer(t *testing.T) {
 						},
 					},
 					{
+						Name: "RegisteredDevice/UplinkMessage/KnownSession/",
+						IDs:  registeredDevice.Ids,
+						Message: &ttnpb.ApplicationUp{
+							EndDeviceIds: withDevAddr(registeredDevice.Ids, types.DevAddr{0x55, 0x55, 0x55, 0x55}),
+							Up: &ttnpb.ApplicationUp_UplinkMessage{
+								UplinkMessage: &ttnpb.ApplicationUplink{
+									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
+									Settings:     &ttnpb.TxSettings{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+									SessionKeyId: []byte{0x55},
+									FPort:        42,
+									FCnt:         42,
+									FrmPayload:   []byte{0xd1, 0x43, 0x6a},
+									ReceivedAt:   ttnpb.ProtoTimePtr(now),
+								},
+							},
+						},
+						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
+							a := assertions.New(t)
+							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
+								EndDeviceIds: withDevAddr(registeredDevice.Ids, types.DevAddr{0x55, 0x55, 0x55, 0x55}),
+								Up: &ttnpb.ApplicationUp_UplinkMessage{
+									UplinkMessage: &ttnpb.ApplicationUplink{
+										RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
+										Settings:     &ttnpb.TxSettings{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+										SessionKeyId: []byte{0x55},
+										FPort:        42,
+										FCnt:         42,
+										FrmPayload:   []byte{0x2a, 0x2a, 0x2a},
+										DecodedPayload: &pbtypes.Struct{
+											Fields: map[string]*pbtypes.Value{
+												"sum": {
+													Kind: &pbtypes.Value_NumberValue{
+														NumberValue: 126, // Payload formatter sums the bytes in FRMPayload.
+													},
+												},
+											},
+										},
+										VersionIds: registeredDevice.VersionIds,
+										ReceivedAt: up.GetUplinkMessage().ReceivedAt,
+									},
+								},
+								CorrelationIds: up.CorrelationIds,
+								ReceivedAt:     up.ReceivedAt,
+							})
+						},
+						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice, queue []*ttnpb.ApplicationDownlink) {
+							a := assertions.New(t)
+							a.So(dev.Session, should.Resemble, &ttnpb.Session{
+								DevAddr: types.DevAddr{0x55, 0x55, 0x55, 0x55}.Bytes(),
+								Keys: &ttnpb.SessionKeys{
+									SessionKeyId: []byte{0x55},
+									AppSKey: &ttnpb.KeyEnvelope{
+										EncryptedKey: []byte{0x56, 0x15, 0xaa, 0x22, 0xb7, 0x5f, 0xc, 0x24, 0x79, 0x6, 0x84, 0x68, 0x89, 0x0, 0xa6, 0x16, 0x4a, 0x9c, 0xef, 0xdb, 0xbf, 0x61, 0x6f, 0x0},
+										KekLabel:     "test",
+									},
+								},
+								LastAFCntDown: 0,
+							})
+							a.So(dev.PendingSession, should.BeNil)
+							a.So(queue, should.Resemble, []*ttnpb.ApplicationDownlink{})
+						},
+					},
+					{
 						Name:          "UnregisteredDevice/JoinAccept",
 						IDs:           unregisteredDeviceID,
 						ExpectTimeout: true,
@@ -1898,6 +1979,7 @@ func TestApplicationServer(t *testing.T) {
 										EncryptedKey: []byte{0x56, 0x15, 0xaa, 0x22, 0xb7, 0x5f, 0xc, 0x24, 0x79, 0x6, 0x84, 0x68, 0x89, 0x0, 0xa6, 0x16, 0x4a, 0x9c, 0xef, 0xdb, 0xbf, 0x61, 0x6f, 0x0},
 										KekLabel:     "test",
 									},
+									ReceivedAt: ttnpb.ProtoTimePtr(now),
 								},
 							},
 						},
@@ -2430,6 +2512,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 										EncryptedKey: []byte{0x39, 0x11, 0x40, 0x98, 0xa1, 0x5d, 0x6f, 0x92, 0xd7, 0xf0, 0x13, 0x21, 0x5b, 0x5b, 0x41, 0xa8, 0x98, 0x2d, 0xac, 0x59, 0x34, 0x76, 0x36, 0x18},
 										KekLabel:     kekLabel,
 									},
+									ReceivedAt: ttnpb.ProtoTimePtr(now),
 								},
 							},
 						},
@@ -2447,6 +2530,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 												EncryptedKey: []byte{0x39, 0x11, 0x40, 0x98, 0xa1, 0x5d, 0x6f, 0x92, 0xd7, 0xf0, 0x13, 0x21, 0x5b, 0x5b, 0x41, 0xa8, 0x98, 0x2d, 0xac, 0x59, 0x34, 0x76, 0x36, 0x18},
 												KekLabel:     kekLabel,
 											},
+											ReceivedAt: up.GetJoinAccept().ReceivedAt,
 										},
 									},
 									CorrelationIds: up.CorrelationIds,
@@ -2458,6 +2542,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 									Up: &ttnpb.ApplicationUp_JoinAccept{
 										JoinAccept: &ttnpb.ApplicationJoinAccept{
 											SessionKeyId: []byte{0x22},
+											ReceivedAt:   up.GetJoinAccept().ReceivedAt,
 										},
 									},
 									CorrelationIds: up.CorrelationIds,
@@ -2892,6 +2977,188 @@ func TestLocationFromPayload(t *testing.T) {
 	if loc, ok := dev.Locations["frm-payload"]; a.So(ok, should.BeTrue) {
 		assertLocation(loc)
 	}
+}
+
+func TestUplinkNormalized(t *testing.T) {
+	a, ctx := test.New(t)
+
+	registeredApplicationID := ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"}
+
+	// This device gets registered in the device registry of the Application Server.
+	registeredDevice := &ttnpb.EndDevice{
+		Ids: &ttnpb.EndDeviceIdentifiers{
+			ApplicationIds: &registeredApplicationID,
+			DeviceId:       "foo-device",
+			JoinEui:        types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
+			DevEui:         types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
+		},
+		Session: &ttnpb.Session{
+			DevAddr: types.DevAddr{0x11, 0x11, 0x11, 0x11}.Bytes(),
+			Keys: &ttnpb.SessionKeys{
+				SessionKeyId: []byte{0x11},
+				AppSKey: &ttnpb.KeyEnvelope{
+					Key: types.AES128Key{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}.Bytes(), //nolint:lll
+				},
+			},
+		},
+		Formatters: &ttnpb.MessagePayloadFormatters{
+			UpFormatter: ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
+			UpFormatterParameter: `function decodeUplink(input) {
+				return {
+					data: {
+						air: {
+							temperature: 21.5,
+						}
+					}
+				};
+			}`,
+		},
+	}
+
+	is, isAddr, closeIS := mockis.New(ctx)
+	defer closeIS()
+	is.EndDeviceRegistry().Add(ctx, registeredDevice)
+
+	devsRedisClient, devsFlush := test.NewRedis(ctx, "applicationserver_test", "devices")
+	defer devsFlush()
+	defer devsRedisClient.Close()
+	deviceRegistry := &redis.DeviceRegistry{Redis: devsRedisClient, LockTTL: test.Delay << 10}
+	if err := deviceRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	_, err := deviceRegistry.Set(ctx, registeredDevice.Ids, nil, func(ed *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+		return registeredDevice, []string{"ids", "session", "formatters"}, nil
+	})
+	if err != nil {
+		t.Fatalf("Failed to set device in registry: %s", err)
+	}
+
+	linksRedisClient, linksFlush := test.NewRedis(ctx, "applicationserver_test", "links")
+	defer linksFlush()
+	defer linksRedisClient.Close()
+	linkRegistry := &redis.LinkRegistry{Redis: linksRedisClient, LockTTL: test.Delay << 10}
+	if err := linkRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	_, err = linkRegistry.Set(ctx, &registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
+		return &ttnpb.ApplicationLink{}, nil, nil
+	})
+	if err != nil {
+		t.Fatalf("Failed to set link in registry: %s", err)
+	}
+
+	distribRedisClient, distribFlush := test.NewRedis(ctx, "applicationserver_test", "traffic")
+	defer distribFlush()
+	defer distribRedisClient.Close()
+	distribPubSub := distribredis.PubSub{Redis: distribRedisClient}
+
+	applicationUpsRedisClient, applicationUpsFlush := test.NewRedis(ctx, "applicationserver_test", "applicationups")
+	defer applicationUpsFlush()
+	defer applicationUpsRedisClient.Close()
+	applicationUpsRegistry := &redis.ApplicationUplinkRegistry{
+		Redis: applicationUpsRedisClient,
+		Limit: 16,
+	}
+
+	c := componenttest.NewComponent(t, &component.Config{
+		ServiceBase: config.ServiceBase{
+			GRPC: config.GRPC{
+				Listen:                      ":9189",
+				AllowInsecureForCredentials: true,
+			},
+			Cluster: cluster.Config{
+				IdentityServer: isAddr,
+			},
+			HTTP: config.HTTP{
+				Listen: ":8100",
+			},
+		},
+	})
+	config := &applicationserver.Config{
+		Devices: deviceRegistry,
+		Links:   linkRegistry,
+		UplinkStorage: applicationserver.UplinkStorageConfig{
+			Registry: applicationUpsRegistry,
+			Limit:    16,
+		},
+		Distribution: applicationserver.DistributionConfig{
+			Global: applicationserver.GlobalDistributorConfig{
+				PubSub: distribPubSub,
+			},
+		},
+		EndDeviceMetadataStorage: applicationserver.EndDeviceMetadataStorageConfig{
+			Location: applicationserver.EndDeviceLocationStorageConfig{
+				Registry: metadata.NewClusterEndDeviceLocationRegistry(c, (1<<4)*Timeout),
+			},
+		},
+	}
+	as, err := applicationserver.New(c, config)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	roles := as.Roles()
+	a.So(len(roles), should.Equal, 1)
+	a.So(roles[0], should.Equal, ttnpb.ClusterRole_APPLICATION_SERVER)
+
+	componenttest.StartComponent(t, c)
+	defer c.Close()
+
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
+
+	sub, err := as.Subscribe(ctx, "test", nil, false)
+	a.So(err, should.BeNil)
+
+	now := time.Now().UTC()
+	err = as.Publish(ctx, &ttnpb.ApplicationUp{
+		EndDeviceIds: registeredDevice.Ids,
+		Up: &ttnpb.ApplicationUp_UplinkMessage{
+			UplinkMessage: &ttnpb.ApplicationUplink{
+				RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
+				Settings:     &ttnpb.TxSettings{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+				SessionKeyId: []byte{0x11},
+				FPort:        11,
+				FCnt:         11,
+				FrmPayload:   []byte{0x11},
+				ReceivedAt:   ttnpb.ProtoTimePtr(now),
+			},
+		},
+	})
+	a.So(err, should.BeNil)
+
+	// The uplink message and the normalized payload message may come out of order.
+	// Expect exactly two messages.
+	var normalized *ttnpb.ApplicationUplinkNormalized
+	for i := 0; i < 2; i++ {
+		select {
+		case msg := <-sub.Up():
+			if n := msg.GetUplinkNormalized(); n != nil {
+				normalized = n
+			}
+		case <-time.After(Timeout):
+			t.Fatalf("Expected upstream message %d timed out", i)
+		}
+	}
+	if normalized == nil {
+		t.Fatalf("Expected uplink normalized message")
+	}
+	a.So(normalized.NormalizedPayload, should.Resemble, &pbtypes.Struct{
+		Fields: map[string]*pbtypes.Value{
+			"air": {
+				Kind: &pbtypes.Value_StructValue{
+					StructValue: &pbtypes.Struct{
+						Fields: map[string]*pbtypes.Value{
+							"temperature": {
+								Kind: &pbtypes.Value_NumberValue{
+									NumberValue: 21.5,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	})
 }
 
 func TestApplicationServerCleanup(t *testing.T) {

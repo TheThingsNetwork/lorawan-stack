@@ -3902,6 +3902,18 @@ func (m *ConvertEndDeviceTemplateRequest) ValidateFields(paths ...string) error 
 
 		case "data":
 			// no validation rules for Data
+		case "end_device_version_ids":
+
+			if v, ok := interface{}(m.GetEndDeviceVersionIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ConvertEndDeviceTemplateRequestValidationError{
+						field:  "end_device_version_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return ConvertEndDeviceTemplateRequestValidationError{
 				field:  name,

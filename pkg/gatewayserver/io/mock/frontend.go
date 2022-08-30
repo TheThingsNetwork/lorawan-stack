@@ -56,7 +56,9 @@ func ConnectFrontend(ctx context.Context, ids *ttnpb.GatewayIdentifiers, server 
 			case up := <-f.Up:
 				gatewayTime := time.Unix(0, 0).Add(time.Since(started))
 				up.ReceivedAt = ttnpb.ProtoTimePtr(time.Now())
-				up.Settings.Time = ttnpb.ProtoTimePtr(gatewayTime)
+				for _, md := range up.RxMetadata {
+					md.GpsTime = ttnpb.ProtoTimePtr(gatewayTime)
+				}
 				conn.HandleUp(up, nil)
 			case status := <-f.Status:
 				conn.HandleStatus(status)

@@ -214,7 +214,7 @@ func TestHandleADRParamSetupAns(t *testing.T) {
 			Events: events.Builders{
 				EvtReceiveADRParamSetupAnswer,
 			},
-			Error: ErrRequestNotFound,
+			Error: ErrRequestNotFound.WithAttributes("cid", ttnpb.MACCommandIdentifier_CID_ADR_PARAM_SETUP),
 		},
 		{
 			Name: "limit 32768, delay 1024",

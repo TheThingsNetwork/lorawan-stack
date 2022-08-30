@@ -13,6 +13,8 @@ For details about compatibility between different releases, see the **Commitment
 
 - New `ListBands` RPC on the `Configuration` service.
 - New `NetID` and `DeviceAddressPrefixes` RPC on the `NS` service.
+- Support for loading end device template from Device Repository when importing devices using a CSV file.
+- Experimental support for normalized payload.
 
 ### Changed
 
@@ -24,7 +26,7 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Security
 
-## [3.21.1] - unreleased
+## [3.21.1] - 2022-08-24
 
 ### Added
 

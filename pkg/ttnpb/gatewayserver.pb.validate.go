@@ -469,10 +469,10 @@ func (m *BatchGetGatewayConnectionStatsRequest) ValidateFields(paths ...string) 
 		switch name {
 		case "gateway_ids":
 
-			if len(m.GetGatewayIds()) > 100 {
+			if l := len(m.GetGatewayIds()); l < 1 || l > 100 {
 				return BatchGetGatewayConnectionStatsRequestValidationError{
 					field:  "gateway_ids",
-					reason: "value must contain no more than 100 item(s)",
+					reason: "value must contain between 1 and 100 items, inclusive",
 				}
 			}
 

@@ -150,7 +150,7 @@ func TestHandlePingSlotChannelAns(t *testing.T) {
 					DataRateIndexAck: true,
 				})),
 			},
-			Error: ErrRequestNotFound,
+			Error: ErrRequestNotFound.WithAttributes("cid", ttnpb.MACCommandIdentifier_CID_PING_SLOT_CHANNEL),
 		},
 		{
 			Name: "both ack",

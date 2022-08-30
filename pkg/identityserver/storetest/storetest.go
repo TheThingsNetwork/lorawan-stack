@@ -88,10 +88,11 @@ func DropSchema(db *sql.DB, schemaName string) error {
 
 func New(t *testing.T, newStore func(t *testing.T, dsn *url.URL) Store) *StoreTest {
 	return &StoreTest{
-		t:          t,
-		dsn:        GetDSN("ttn_lorawan_is_store_test"),
-		newStore:   newStore,
-		population: &Population{},
+		t:            t,
+		dsn:          GetDSN("ttn_lorawan_is_store_test"),
+		newStore:     newStore,
+		population:   &Population{},
+		schemaSuffix: fmt.Sprintf("%p", newStore),
 	}
 }
 
@@ -101,10 +102,16 @@ type Store interface {
 }
 
 type StoreTest struct {
-	t          *testing.T
-	dsn        *url.URL
-	newStore   func(t *testing.T, dsn *url.URL) Store
-	population *Population
+	t            *testing.T
+	dsn          *url.URL
+	newStore     func(t *testing.T, dsn *url.URL) Store
+	population   *Population
+	schemaSuffix string
+}
+
+func (s *StoreTest) schemaName(t *testing.T) string {
+	t.Helper()
+	return strcase.ToSnake(t.Name() + s.schemaSuffix)
 }
 
 func (s *StoreTest) PrepareDB(t *testing.T) Store {
@@ -118,7 +125,7 @@ func (s *StoreTest) PrepareDB(t *testing.T) Store {
 
 	start := time.Now()
 
-	schemaName := strcase.ToSnake(t.Name())
+	schemaName := s.schemaName(t)
 
 	if err = CreateSchema(db, schemaName); err != nil {
 		t.Fatal(err)
@@ -140,7 +147,7 @@ func (s *StoreTest) PrepareDB(t *testing.T) Store {
 }
 
 func (s *StoreTest) DestroyDB(t *testing.T, assertClean bool, exceptions ...string) {
-	schemaName := strcase.ToSnake(t.Name())
+	schemaName := s.schemaName(t)
 
 	if t.Failed() {
 		t.Logf("Keeping database to help debugging: %q", GetSchemaDSN(s.dsn, schemaName))

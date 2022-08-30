@@ -26,6 +26,7 @@ import (
 )
 
 func TestDeviceTemplateConverter(t *testing.T) {
+	t.Parallel()
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
 	conf := &component.Config{}

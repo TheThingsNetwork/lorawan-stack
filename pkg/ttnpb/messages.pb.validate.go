@@ -767,6 +767,25 @@ func (m *ApplicationUplink) ValidateFields(paths ...string) error {
 
 		case "decoded_payload_warnings":
 
+		case "normalized_payload":
+
+			for idx, item := range m.GetNormalizedPayload() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return ApplicationUplinkValidationError{
+							field:  fmt.Sprintf("normalized_payload[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		case "normalized_payload_warnings":
+
 		case "rx_metadata":
 
 			for idx, item := range m.GetRxMetadata() {
@@ -953,6 +972,244 @@ var _ interface {
 } = ApplicationUplinkValidationError{}
 
 var _ApplicationUplink_FPort_NotInLookup = map[uint32]struct{}{
+	224: {},
+}
+
+// ValidateFields checks the field values on ApplicationUplinkNormalized with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *ApplicationUplinkNormalized) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ApplicationUplinkNormalizedFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "session_key_id":
+
+			if len(m.GetSessionKeyId()) > 2048 {
+				return ApplicationUplinkNormalizedValidationError{
+					field:  "session_key_id",
+					reason: "value length must be at most 2048 bytes",
+				}
+			}
+
+		case "f_port":
+
+			if val := m.GetFPort(); val < 1 || val > 255 {
+				return ApplicationUplinkNormalizedValidationError{
+					field:  "f_port",
+					reason: "value must be inside range [1, 255]",
+				}
+			}
+
+			if _, ok := _ApplicationUplinkNormalized_FPort_NotInLookup[m.GetFPort()]; ok {
+				return ApplicationUplinkNormalizedValidationError{
+					field:  "f_port",
+					reason: "value must not be in list [224]",
+				}
+			}
+
+		case "f_cnt":
+			// no validation rules for FCnt
+		case "frm_payload":
+			// no validation rules for FrmPayload
+		case "normalized_payload":
+
+			if m.GetNormalizedPayload() == nil {
+				return ApplicationUplinkNormalizedValidationError{
+					field:  "normalized_payload",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetNormalizedPayload()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationUplinkNormalizedValidationError{
+						field:  "normalized_payload",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "normalized_payload_warnings":
+
+		case "rx_metadata":
+
+			for idx, item := range m.GetRxMetadata() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return ApplicationUplinkNormalizedValidationError{
+							field:  fmt.Sprintf("rx_metadata[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		case "settings":
+
+			if m.GetSettings() == nil {
+				return ApplicationUplinkNormalizedValidationError{
+					field:  "settings",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetSettings()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationUplinkNormalizedValidationError{
+						field:  "settings",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "received_at":
+
+			if m.GetReceivedAt() == nil {
+				return ApplicationUplinkNormalizedValidationError{
+					field:  "received_at",
+					reason: "value is required",
+				}
+			}
+
+		case "confirmed":
+			// no validation rules for Confirmed
+		case "consumed_airtime":
+
+			if v, ok := interface{}(m.GetConsumedAirtime()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationUplinkNormalizedValidationError{
+						field:  "consumed_airtime",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "locations":
+
+			for key, val := range m.GetLocations() {
+				_ = val
+
+				// no validation rules for Locations[key]
+
+				if v, ok := interface{}(val).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return ApplicationUplinkNormalizedValidationError{
+							field:  fmt.Sprintf("locations[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		case "version_ids":
+
+			if v, ok := interface{}(m.GetVersionIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationUplinkNormalizedValidationError{
+						field:  "version_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "network_ids":
+
+			if v, ok := interface{}(m.GetNetworkIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationUplinkNormalizedValidationError{
+						field:  "network_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return ApplicationUplinkNormalizedValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ApplicationUplinkNormalizedValidationError is the validation error returned
+// by ApplicationUplinkNormalized.ValidateFields if the designated constraints
+// aren't met.
+type ApplicationUplinkNormalizedValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ApplicationUplinkNormalizedValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ApplicationUplinkNormalizedValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ApplicationUplinkNormalizedValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ApplicationUplinkNormalizedValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ApplicationUplinkNormalizedValidationError) ErrorName() string {
+	return "ApplicationUplinkNormalizedValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ApplicationUplinkNormalizedValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sApplicationUplinkNormalized.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ApplicationUplinkNormalizedValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ApplicationUplinkNormalizedValidationError{}
+
+var _ApplicationUplinkNormalized_FPort_NotInLookup = map[uint32]struct{}{
 	224: {},
 }
 
@@ -1152,13 +1409,10 @@ func (m *ApplicationJoinAccept) ValidateFields(paths ...string) error {
 			// no validation rules for PendingSession
 		case "received_at":
 
-			if v, ok := interface{}(m.GetReceivedAt()).(interface{ ValidateFields(...string) error }); ok {
-				if err := v.ValidateFields(subs...); err != nil {
-					return ApplicationJoinAcceptValidationError{
-						field:  "received_at",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
+			if m.GetReceivedAt() == nil {
+				return ApplicationJoinAcceptValidationError{
+					field:  "received_at",
+					reason: "value is required",
 				}
 			}
 
@@ -2017,7 +2271,7 @@ func (m *ApplicationUp) ValidateFields(paths ...string) error {
 			}
 			if len(subs) == 0 {
 				subs = []string{
-					"uplink_message", "join_accept", "downlink_ack", "downlink_nack", "downlink_sent", "downlink_failed", "downlink_queued", "downlink_queue_invalidated", "location_solved", "service_data",
+					"uplink_message", "uplink_normalized", "join_accept", "downlink_ack", "downlink_nack", "downlink_sent", "downlink_failed", "downlink_queued", "downlink_queue_invalidated", "location_solved", "service_data",
 				}
 			}
 			for name, subs := range _processPaths(subs) {
@@ -2033,6 +2287,22 @@ func (m *ApplicationUp) ValidateFields(paths ...string) error {
 						if err := v.ValidateFields(subs...); err != nil {
 							return ApplicationUpValidationError{
 								field:  "uplink_message",
+								reason: "embedded message failed validation",
+								cause:  err,
+							}
+						}
+					}
+
+				case "uplink_normalized":
+					w, ok := m.Up.(*ApplicationUp_UplinkNormalized)
+					if !ok || w == nil {
+						continue
+					}
+
+					if v, ok := interface{}(m.GetUplinkNormalized()).(interface{ ValidateFields(...string) error }); ok {
+						if err := v.ValidateFields(subs...); err != nil {
+							return ApplicationUpValidationError{
+								field:  "uplink_normalized",
 								reason: "embedded message failed validation",
 								cause:  err,
 							}

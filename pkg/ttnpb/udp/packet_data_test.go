@@ -150,7 +150,7 @@ func TestUplinkPacket(t *testing.T) {
 		Modulation: &ttnpb.DataRate_Lrfhss{
 			Lrfhss: &ttnpb.LRFHSSDataRate{
 				ModulationType:        0,
-				OperatingChannelWidth: 123,
+				OperatingChannelWidth: 123000,
 				CodingRate:            "4/7",
 			},
 		},

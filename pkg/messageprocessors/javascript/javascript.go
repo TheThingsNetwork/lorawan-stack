@@ -18,12 +18,15 @@ package javascript
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"runtime/trace"
 	"strings"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors"
+	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/normalizedpayload"
 	"go.thethings.network/lorawan-stack/v3/pkg/scripting"
 	js "go.thethings.network/lorawan-stack/v3/pkg/scripting/javascript"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -59,16 +62,17 @@ var (
 )
 
 func wrapDownlinkEncoderScript(script string) string {
-	// Fallback to legacy Encoder() function for backwards compatibility with The Things Network Stack V2 payload functions.
+	// Fallback to Encoder() for backwards compatibility with The Things Network Stack V2 payload functions.
 	return fmt.Sprintf(`
 		%s
 
 		function main(input) {
+			const { data, fPort } = input;
 			if (typeof encodeDownlink === 'function') {
-				return encodeDownlink(input);
+				return encodeDownlink({ data, fPort });
 			}
 			return {
-				bytes: Encoder(input.data, input.fPort),
+				bytes: Encoder(data, fPort),
 				fPort: input.fPort
 			}
 		}
@@ -76,7 +80,17 @@ func wrapDownlinkEncoderScript(script string) string {
 }
 
 // CompileDownlinkEncoder generates a downlink encoder from the provided script.
-func (h *host) CompileDownlinkEncoder(ctx context.Context, script string) (func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDeviceVersionIdentifiers, *ttnpb.ApplicationDownlink) error, error) {
+func (h *host) CompileDownlinkEncoder(
+	ctx context.Context, script string,
+) (
+	func(
+		context.Context,
+		*ttnpb.EndDeviceIdentifiers,
+		*ttnpb.EndDeviceVersionIdentifiers,
+		*ttnpb.ApplicationDownlink,
+	) error,
+	error,
+) {
 	defer trace.StartRegion(ctx, "compile downlink encoder").End()
 
 	run, err := h.engine.Compile(ctx, wrapDownlinkEncoderScript(script))
@@ -84,20 +98,35 @@ func (h *host) CompileDownlinkEncoder(ctx context.Context, script string) (func(
 		return nil, err
 	}
 
-	return func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink) error {
-		return h.encodeDownlink(ctx, ids, version, msg, run)
+	return func(
+		ctx context.Context,
+		ids *ttnpb.EndDeviceIdentifiers,
+		version *ttnpb.EndDeviceVersionIdentifiers,
+		msg *ttnpb.ApplicationDownlink,
+	) error {
+		return h.encodeDownlink(ctx, msg, run)
 	}, nil
 }
 
 // EncodeDownlink encodes the message's DecodedPayload to FRMPayload using the given script.
-func (h *host) EncodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, script string) error {
+func (h *host) EncodeDownlink(
+	ctx context.Context,
+	_ *ttnpb.EndDeviceIdentifiers,
+	_ *ttnpb.EndDeviceVersionIdentifiers,
+	msg *ttnpb.ApplicationDownlink,
+	script string,
+) error {
 	run := func(ctx context.Context, fn string, params ...interface{}) (func(interface{}) error, error) {
 		return h.engine.Run(ctx, wrapDownlinkEncoderScript(script), fn, params...)
 	}
-	return h.encodeDownlink(ctx, ids, version, msg, run)
+	return h.encodeDownlink(ctx, msg, run)
 }
 
-func (h *host) encodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, run func(context.Context, string, ...interface{}) (func(interface{}) error, error)) error {
+func (*host) encodeDownlink(
+	ctx context.Context,
+	msg *ttnpb.ApplicationDownlink,
+	run func(context.Context, string, ...interface{}) (func(interface{}) error, error),
+) error {
 	defer trace.StartRegion(ctx, "encode downlink message").End()
 
 	decoded := msg.DecodedPayload
@@ -150,28 +179,57 @@ type decodeUplinkOutput struct {
 	Errors   []string               `json:"errors"`
 }
 
+type normalizeUplinkOutput struct {
+	Data     interface{} `json:"data"`
+	Warnings []string    `json:"warnings"`
+	Errors   []string    `json:"errors"`
+}
+
+type uplinkDecoderOutput struct {
+	Decoded    decodeUplinkOutput     `json:"decoded"`
+	Normalized *normalizeUplinkOutput `json:"normalized"`
+}
+
 func wrapUplinkDecoderScript(script string) string {
-	// Fallback to legacy Decoder() function for backwards compatibility with The Things Network Stack V2 payload functions.
+	// This wrapper executes decodeUplink() if it is defined. Then, it executes normalizeUplink() if it is defined too,
+	// and if the output of decodeUplink() didn't return errors.
+	// Fallback to Decoder() for backwards compatibility with The Things Network Stack V2 payload functions.
 	return fmt.Sprintf(`
 		%s
 
 		function main(input) {
-			input = {
-				bytes: input.bytes.slice(),
-				fPort: input.fPort,
-			}
+			const bytes = input.bytes.slice();
+			const { fPort } = input;
 			if (typeof decodeUplink === 'function') {
-				return decodeUplink(input);
+				const decoded = decodeUplink({ bytes, fPort });
+				let normalized;
+				const { data, errors } = decoded;
+				if ((!errors || !errors.length) && data && typeof normalizeUplink === 'function') {
+					normalized = normalizeUplink({ data });
+				}
+				return { decoded, normalized };
 			}
 			return {
-				data: Decoder(input.bytes, input.fPort)
+				decoded: {
+					data: Decoder(bytes, fPort)
+				}
 			}
 		}
 	`, script)
 }
 
 // CompileUplinkDecoder generates an uplink decoder from the provided script.
-func (h *host) CompileUplinkDecoder(ctx context.Context, script string) (func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDeviceVersionIdentifiers, *ttnpb.ApplicationUplink) error, error) {
+func (h *host) CompileUplinkDecoder(
+	ctx context.Context, script string,
+) (
+	func(
+		context.Context,
+		*ttnpb.EndDeviceIdentifiers,
+		*ttnpb.EndDeviceVersionIdentifiers,
+		*ttnpb.ApplicationUplink,
+	) error,
+	error,
+) {
 	defer trace.StartRegion(ctx, "compile uplink decoder").End()
 
 	run, err := h.engine.Compile(ctx, wrapUplinkDecoderScript(script))
@@ -179,20 +237,35 @@ func (h *host) CompileUplinkDecoder(ctx context.Context, script string) (func(co
 		return nil, err
 	}
 
-	return func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink) error {
-		return h.decodeUplink(ctx, ids, version, msg, run)
+	return func(
+		ctx context.Context,
+		ids *ttnpb.EndDeviceIdentifiers,
+		version *ttnpb.EndDeviceVersionIdentifiers,
+		msg *ttnpb.ApplicationUplink,
+	) error {
+		return h.decodeUplink(ctx, msg, run)
 	}, nil
 }
 
 // DecodeUplink decodes the message's FRMPayload to DecodedPayload using the given script.
-func (h *host) DecodeUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, script string) error {
+func (h *host) DecodeUplink(
+	ctx context.Context,
+	_ *ttnpb.EndDeviceIdentifiers,
+	_ *ttnpb.EndDeviceVersionIdentifiers,
+	msg *ttnpb.ApplicationUplink,
+	script string,
+) error {
 	run := func(ctx context.Context, fn string, params ...interface{}) (func(interface{}) error, error) {
 		return h.engine.Run(ctx, wrapUplinkDecoderScript(script), fn, params...)
 	}
-	return h.decodeUplink(ctx, ids, version, msg, run)
+	return h.decodeUplink(ctx, msg, run)
 }
 
-func (h *host) decodeUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, run func(context.Context, string, ...interface{}) (func(interface{}) error, error)) error {
+func (*host) decodeUplink(
+	ctx context.Context,
+	msg *ttnpb.ApplicationUplink,
+	run func(context.Context, string, ...interface{}) (func(interface{}) error, error),
+) error {
 	defer trace.StartRegion(ctx, "decode uplink message").End()
 
 	input := decodeUplinkInput{
@@ -205,21 +278,72 @@ func (h *host) decodeUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers
 		return err
 	}
 
-	var output decodeUplinkOutput
+	var output uplinkDecoderOutput
 	err = valueAs(&output)
 	if err != nil {
 		return errOutput.WithCause(err)
 	}
-	if len(output.Errors) > 0 {
-		return errOutputErrors.WithAttributes("errors", strings.Join(output.Errors, ", "))
-	}
 
-	s, err := gogoproto.Struct(output.Data)
+	if errs := output.Decoded.Errors; len(errs) > 0 {
+		return errOutputErrors.WithAttributes("errors", strings.Join(errs, ", "))
+	}
+	decodedPayload, err := gogoproto.Struct(output.Decoded.Data)
 	if err != nil {
 		return errOutput.WithCause(err)
 	}
-	msg.DecodedPayload = s
-	msg.DecodedPayloadWarnings = output.Warnings
+	msg.DecodedPayload, msg.DecodedPayloadWarnings = decodedPayload, output.Decoded.Warnings
+
+	if normalized := output.Normalized; normalized != nil {
+		if errs := normalized.Errors; len(errs) > 0 {
+			return errOutputErrors.WithAttributes("errors", strings.Join(errs, ", "))
+		}
+		if normalized.Data == nil {
+			return errOutput.New()
+		}
+		// The returned data can be an array of measurements or a single measurement object.
+		var measurements []map[string]interface{}
+		if val := reflect.ValueOf(normalized.Data); val.Kind() == reflect.Slice {
+			measurements = make([]map[string]interface{}, val.Len())
+			for i := 0; i < val.Len(); i++ {
+				measurement, ok := val.Index(i).Interface().(map[string]interface{})
+				if !ok {
+					return errOutput.New()
+				}
+				measurements[i] = measurement
+			}
+		} else {
+			measurement, ok := normalized.Data.(map[string]interface{})
+			if !ok {
+				return errOutput.New()
+			}
+			measurements = []map[string]interface{}{measurement}
+		}
+		normalizedPayload := make([]*pbtypes.Struct, len(measurements))
+		for i := range measurements {
+			pb, err := gogoproto.Struct(measurements[i])
+			if err != nil {
+				return errOutput.WithCause(err)
+			}
+			normalizedPayload[i] = pb
+		}
+		// Validate the normalized payload.
+		_, err := normalizedpayload.Parse(normalizedPayload)
+		if err != nil {
+			return errOutput.WithCause(err)
+		}
+		msg.NormalizedPayload, msg.NormalizedPayloadWarnings = normalizedPayload, normalized.Warnings
+	} else {
+		// If the normalizer is not set, the decoder may return already normalized payload.
+		// This is a best effort attempt to parse the decoded payload as normalized payload.
+		// If that does not return an error, the decoded payload is assumed to be normalized.
+		normalizedPayload := []*pbtypes.Struct{
+			decodedPayload,
+		}
+		_, err := normalizedpayload.Parse(normalizedPayload)
+		if err == nil {
+			msg.NormalizedPayload, msg.NormalizedPayloadWarnings = normalizedPayload, nil
+		}
+	}
 	return nil
 }
 
@@ -239,17 +363,25 @@ func wrapDownlinkDecoderScript(script string) string {
 		%s
 
 		function main(input) {
-			input = {
-				bytes: input.bytes.slice(),
-				fPort: input.fPort,
-			}
-			return decodeDownlink(input);
+			const bytes = input.bytes.slice();
+			const { fPort } = input;
+			return decodeDownlink({ bytes, fPort });
 		}
 	`, script)
 }
 
 // CompileDownlinkDecoder generates a downlink decoder from the provided script.
-func (h *host) CompileDownlinkDecoder(ctx context.Context, script string) (func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDeviceVersionIdentifiers, *ttnpb.ApplicationDownlink) error, error) {
+func (h *host) CompileDownlinkDecoder(
+	ctx context.Context, script string,
+) (
+	func(
+		context.Context,
+		*ttnpb.EndDeviceIdentifiers,
+		*ttnpb.EndDeviceVersionIdentifiers,
+		*ttnpb.ApplicationDownlink,
+	) error,
+	error,
+) {
 	defer trace.StartRegion(ctx, "compile downlink decoder").End()
 
 	run, err := h.engine.Compile(ctx, wrapDownlinkDecoderScript(script))
@@ -257,20 +389,35 @@ func (h *host) CompileDownlinkDecoder(ctx context.Context, script string) (func(
 		return nil, err
 	}
 
-	return func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink) error {
-		return h.decodeDownlink(ctx, ids, version, msg, run)
+	return func(
+		ctx context.Context,
+		ids *ttnpb.EndDeviceIdentifiers,
+		version *ttnpb.EndDeviceVersionIdentifiers,
+		msg *ttnpb.ApplicationDownlink,
+	) error {
+		return h.decodeDownlink(ctx, msg, run)
 	}, nil
 }
 
 // DecodeUplink decodes the message's FRMPayload to DecodedPayload using the given script.
-func (h *host) DecodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, script string) error {
+func (h *host) DecodeDownlink(
+	ctx context.Context,
+	_ *ttnpb.EndDeviceIdentifiers,
+	_ *ttnpb.EndDeviceVersionIdentifiers,
+	msg *ttnpb.ApplicationDownlink,
+	script string,
+) error {
 	run := func(ctx context.Context, fn string, params ...interface{}) (func(interface{}) error, error) {
 		return h.engine.Run(ctx, wrapDownlinkDecoderScript(script), fn, params...)
 	}
-	return h.decodeDownlink(ctx, ids, version, msg, run)
+	return h.decodeDownlink(ctx, msg, run)
 }
 
-func (h *host) decodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, run func(context.Context, string, ...interface{}) (func(interface{}) error, error)) error {
+func (*host) decodeDownlink(
+	ctx context.Context,
+	msg *ttnpb.ApplicationDownlink,
+	run func(context.Context, string, ...interface{}) (func(interface{}) error, error),
+) error {
 	defer trace.StartRegion(ctx, "decode downlink message").End()
 
 	input := decodeDownlinkInput{

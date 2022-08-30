@@ -546,6 +546,8 @@ func AddSelectFlagsForApplicationPubSub(flags *pflag.FlagSet, prefix string, hid
 	AddSelectFlagsForApplicationPubSub_Message(flags, flagsplugin.Prefix("downlink-replace", prefix), hidden)
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("uplink-message", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("uplink-message", prefix), true), flagsplugin.WithHidden(hidden)))
 	AddSelectFlagsForApplicationPubSub_Message(flags, flagsplugin.Prefix("uplink-message", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("uplink-normalized", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("uplink-normalized", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForApplicationPubSub_Message(flags, flagsplugin.Prefix("uplink-normalized", prefix), hidden)
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("join-accept", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("join-accept", prefix), true), flagsplugin.WithHidden(hidden)))
 	AddSelectFlagsForApplicationPubSub_Message(flags, flagsplugin.Prefix("join-accept", prefix), hidden)
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("downlink-ack", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("downlink-ack", prefix), true), flagsplugin.WithHidden(hidden)))
@@ -634,6 +636,16 @@ func PathsFromSelectFlagsForApplicationPubSub(flags *pflag.FlagSet, prefix strin
 		paths = append(paths, flagsplugin.Prefix("uplink_message", prefix))
 	}
 	if selectPaths, err := PathsFromSelectFlagsForApplicationPubSub_Message(flags, flagsplugin.Prefix("uplink_message", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("uplink_normalized", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("uplink_normalized", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForApplicationPubSub_Message(flags, flagsplugin.Prefix("uplink_normalized", prefix)); err != nil {
 		return nil, err
 	} else {
 		paths = append(paths, selectPaths...)
@@ -742,6 +754,7 @@ func AddSetFlagsForApplicationPubSub(flags *pflag.FlagSet, prefix string, hidden
 	AddSetFlagsForApplicationPubSub_Message(flags, flagsplugin.Prefix("downlink-push", prefix), hidden)
 	AddSetFlagsForApplicationPubSub_Message(flags, flagsplugin.Prefix("downlink-replace", prefix), hidden)
 	AddSetFlagsForApplicationPubSub_Message(flags, flagsplugin.Prefix("uplink-message", prefix), hidden)
+	AddSetFlagsForApplicationPubSub_Message(flags, flagsplugin.Prefix("uplink-normalized", prefix), hidden)
 	AddSetFlagsForApplicationPubSub_Message(flags, flagsplugin.Prefix("join-accept", prefix), hidden)
 	AddSetFlagsForApplicationPubSub_Message(flags, flagsplugin.Prefix("downlink-ack", prefix), hidden)
 	AddSetFlagsForApplicationPubSub_Message(flags, flagsplugin.Prefix("downlink-nack", prefix), hidden)
@@ -838,6 +851,16 @@ func (m *ApplicationPubSub) SetFromFlags(flags *pflag.FlagSet, prefix string) (p
 			m.UplinkMessage = &ApplicationPubSub_Message{}
 		}
 		if setPaths, err := m.UplinkMessage.SetFromFlags(flags, flagsplugin.Prefix("uplink_message", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("uplink_normalized", prefix)); changed {
+		if m.UplinkNormalized == nil {
+			m.UplinkNormalized = &ApplicationPubSub_Message{}
+		}
+		if setPaths, err := m.UplinkNormalized.SetFromFlags(flags, flagsplugin.Prefix("uplink_normalized", prefix)); err != nil {
 			return nil, err
 		} else {
 			paths = append(paths, setPaths...)

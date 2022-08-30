@@ -273,6 +273,18 @@ func (m *ApplicationPubSub) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "uplink_normalized":
+
+			if v, ok := interface{}(m.GetUplinkNormalized()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationPubSubValidationError{
+						field:  "uplink_normalized",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		case "join_accept":
 
 			if v, ok := interface{}(m.GetJoinAccept()).(interface{ ValidateFields(...string) error }); ok {

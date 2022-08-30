@@ -51,6 +51,7 @@ const selector = [
   'name',
   'service_data',
   'uplink_message',
+  'uplink_normalized',
 ]
 
 const mapStateToProps = state => ({

@@ -124,10 +124,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		deviceRegistry:   wrapEndDeviceRegistryWithReplacedFields(conf.Devices, replacedEndDeviceFields...),
 		appUpsRegistry:   conf.UplinkStorage.Registry,
 		locationRegistry: conf.EndDeviceMetadataStorage.Location.Registry,
-		formatters: messageprocessors.MapPayloadProcessor{
-			ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT: javascript.New(),
-			ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),
-		},
+		formatters:       make(messageprocessors.MapPayloadProcessor),
 		clusterDistributor: distribution.NewPubSubDistributor(
 			ctx,
 			c,
@@ -145,11 +142,16 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		interopClient: interopCl,
 		interopID:     conf.Interop.ID,
 	}
+
+	as.formatters[ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT] = javascript.New()
+	as.formatters[ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP] = cayennelpp.New()
+	as.formatters[ttnpb.PayloadFormatter_FORMATTER_REPOSITORY] = devicerepository.New(as.formatters, as)
+
 	as.activationPool = workerpool.NewWorkerPool(workerpool.Config[*ttnpb.EndDeviceIdentifiers]{
 		Component: c,
 		Context:   ctx,
-		Name:      "save_activation_status",
-		Handler:   as.saveActivationStatus,
+		Name:      "set_activated",
+		Handler:   as.setActivated,
 	})
 	as.processingPool = workerpool.NewWorkerPool(workerpool.Config[*ttnpb.ApplicationUp]{
 		Component: c,
@@ -157,15 +159,12 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		Name:      "process_application_uplinks",
 		Handler:   as.processUpAsync,
 	})
-
 	as.deviceLastSeenPool = workerpool.NewWorkerPool(workerpool.Config[lastSeenAtInfo]{
 		Component: c,
 		Context:   ctx,
-		Name:      "save_device_last_seen_from_uplink",
-		Handler:   as.processDeviceLastSeenAsync,
+		Name:      "store_device_last_seen_from_uplink",
+		Handler:   as.storeDeviceLastSeen,
 	})
-
-	as.formatters[ttnpb.PayloadFormatter_FORMATTER_REPOSITORY] = devicerepository.New(as.formatters, as)
 
 	as.grpc.asDevices = asEndDeviceRegistryServer{
 		AS:       as,
@@ -282,24 +281,24 @@ func (as *ApplicationServer) RegisterServices(s *grpc.Server) {
 	if ps := as.pubsub; ps != nil {
 		ttnpb.RegisterApplicationPubSubRegistryServer(s, ps)
 	}
-	if packages := as.appPackages; packages != nil {
-		packages.RegisterServices(s)
+	if pkgs := as.appPackages; pkgs != nil {
+		pkgs.RegisterServices(s)
 	}
 }
 
 // RegisterHandlers registers gRPC handlers.
 func (as *ApplicationServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
-	ttnpb.RegisterAsHandler(as.Context(), s, conn)
-	ttnpb.RegisterAsEndDeviceRegistryHandler(as.Context(), s, conn)
-	ttnpb.RegisterAppAsHandler(as.Context(), s, conn)
+	ttnpb.RegisterAsHandler(as.Context(), s, conn)                  //nolint:errcheck
+	ttnpb.RegisterAsEndDeviceRegistryHandler(as.Context(), s, conn) //nolint:errcheck
+	ttnpb.RegisterAppAsHandler(as.Context(), s, conn)               //nolint:errcheck
 	if as.webhooks != nil {
-		ttnpb.RegisterApplicationWebhookRegistryHandler(as.Context(), s, conn)
+		ttnpb.RegisterApplicationWebhookRegistryHandler(as.Context(), s, conn) //nolint:errcheck
 	}
 	if as.pubsub != nil {
-		ttnpb.RegisterApplicationPubSubRegistryHandler(as.Context(), s, conn)
+		ttnpb.RegisterApplicationPubSubRegistryHandler(as.Context(), s, conn) //nolint:errcheck
 	}
-	if packages := as.appPackages; packages != nil {
-		packages.RegisterHandlers(s, conn)
+	if pkgs := as.appPackages; pkgs != nil {
+		pkgs.RegisterHandlers(s, conn)
 	}
 }
 
@@ -308,13 +307,13 @@ func (as *ApplicationServer) RegisterRoutes(s *web.Server) {
 	if wh := as.webhooks; wh != nil {
 		wh.RegisterRoutes(s)
 	}
-	if packages := as.appPackages; packages != nil {
-		packages.RegisterRoutes(s)
+	if pkgs := as.appPackages; pkgs != nil {
+		pkgs.RegisterRoutes(s)
 	}
 }
 
 // Roles returns the roles that the Application Server fulfills.
-func (as *ApplicationServer) Roles() []ttnpb.ClusterRole {
+func (*ApplicationServer) Roles() []ttnpb.ClusterRole {
 	return []ttnpb.ClusterRole{ttnpb.ClusterRole_APPLICATION_SERVER}
 }
 
@@ -359,10 +358,9 @@ type lastSeenAtInfo struct {
 	lastSeenAt *pbtypes.Timestamp
 }
 
-func (as *ApplicationServer) processDeviceLastSeenAsync(ctx context.Context, lastSeenEntry lastSeenAtInfo) {
+func (as *ApplicationServer) storeDeviceLastSeen(ctx context.Context, lastSeenEntry lastSeenAtInfo) {
 	if err := as.deviceLastSeenProvider.PushLastSeenFromUplink(ctx, lastSeenEntry.ids, lastSeenEntry.lastSeenAt); err != nil {
-		log.FromContext(ctx).WithError(err).Warn("Failed to update device last seen timestamp")
-		return
+		log.FromContext(ctx).WithError(err).Warn("Failed to set device last seen timestamp")
 	}
 }
 
@@ -373,8 +371,6 @@ func (as *ApplicationServer) processUp(ctx context.Context, up *ttnpb.Applicatio
 	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIds, fmt.Sprintf("as:up:%s", events.NewCorrelationID()))...)
 	up.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 	registerReceiveUp(ctx, up)
-
-	up.ReceivedAt = ttnpb.ProtoTimePtr(time.Now())
 
 	pass, err := as.handleUp(ctx, up, link)
 	if err != nil {
@@ -459,8 +455,8 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 		}, nil
 	}
 
-	ttnErr, ok := err.(errors.ErrorDetails)
-	if !ok {
+	var ttnErr errors.ErrorDetails
+	if !errors.As(err, &ttnErr) {
 		return nil, err
 	}
 	details := ttnErr.Details()
@@ -469,6 +465,7 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 	}
 	var diagnostics *ttnpb.DownlinkQueueOperationErrorDetails
 	for _, detail := range details {
+		var ok bool
 		diagnostics, ok = detail.(*ttnpb.DownlinkQueueOperationErrorDetails)
 		if ok {
 			break
@@ -799,7 +796,9 @@ func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.Application
 	case *ttnpb.ApplicationUp_JoinAccept:
 		return true, as.handleJoinAccept(ctx, up.EndDeviceIds, p.JoinAccept, link)
 	case *ttnpb.ApplicationUp_UplinkMessage:
-		return true, as.handleUplink(ctx, up.EndDeviceIds, p.UplinkMessage, link)
+		return true, as.handleUplink(ctx, uplinkInfo{up.EndDeviceIds, up.ReceivedAt, p.UplinkMessage, false, link})
+	case *ttnpb.ApplicationUp_UplinkNormalized:
+		return true, nil
 	case *ttnpb.ApplicationUp_DownlinkQueueInvalidated:
 		return as.handleDownlinkQueueInvalidated(ctx, up.EndDeviceIds, p.DownlinkQueueInvalidated, link)
 	case *ttnpb.ApplicationUp_DownlinkSent:
@@ -822,7 +821,7 @@ func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.Application
 func (as *ApplicationServer) handleSimulatedUp(ctx context.Context, up *ttnpb.ApplicationUp, link *ttnpb.ApplicationLink) error {
 	switch p := up.Up.(type) {
 	case *ttnpb.ApplicationUp_UplinkMessage:
-		return as.handleSimulatedUplink(ctx, up.EndDeviceIds, p.UplinkMessage, link)
+		return as.handleSimulatedUplink(ctx, uplinkInfo{up.EndDeviceIds, up.ReceivedAt, p.UplinkMessage, true, link})
 	default:
 		return nil
 	}
@@ -833,7 +832,7 @@ var errFetchAppSKey = errors.Define("app_s_key", "failed to get AppSKey")
 // handleJoinAccept handles a join-accept message.
 // If the application or device is not configured to skip application crypto, the InvalidatedDownlinks and the AppSKey
 // in the given join-accept message is reset.
-func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, joinAccept *ttnpb.ApplicationJoinAccept, link *ttnpb.ApplicationLink) (err error) {
+func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, joinAccept *ttnpb.ApplicationJoinAccept, link *ttnpb.ApplicationLink) error {
 	defer trace.StartRegion(ctx, "handle join accept").End()
 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
@@ -845,6 +844,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids *ttnpb.En
 	if err != nil {
 		return err
 	}
+
 	_, err = as.deviceRegistry.Set(ctx, ids,
 		[]string{
 			"formatters",
@@ -927,10 +927,19 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids *ttnpb.En
 			return dev, mask, nil
 		},
 	)
-	if err == nil {
-		as.deviceLastSeenPool.Publish(ctx, lastSeenAtInfo{ids: ids, lastSeenAt: joinAccept.ReceivedAt})
+	if err != nil {
+		return err
 	}
-	return err
+
+	// Publish last seen event.
+	if err := as.deviceLastSeenPool.Publish(ctx, lastSeenAtInfo{
+		ids:        ids,
+		lastSeenAt: joinAccept.ReceivedAt,
+	}); err != nil {
+		logger.WithError(err).Warn("Failed to publish last seen event")
+	}
+
+	return nil
 }
 
 var errUnknownSession = errors.DefineNotFound("unknown_session", "unknown session")
@@ -939,9 +948,9 @@ var errUnknownSession = errors.DefineNotFound("unknown_session", "unknown sessio
 // This function will mutate the provided ttnpb.EndDevice and migrate the Session field to the session that matches
 // the provided session key ID.
 // The following fields are expected to be part of the provided ttnpb.EndDevice:
-// - session and pending_session - used to decide which session is currently active.
-// - formatters, version_ids - used by the downlink queue encoders, in cases in which the queue must be recalculated.
-// - skip_payload_crypto_override - used by the downlink queue migration mechanism in order to avoid payload encryption.
+//   - session and pending_session, used to decide which session is currently active.
+//   - formatters, version_ids, used by the downlink queue encoders, in cases in which the queue must be recalculated.
+//   - skip_payload_crypto_override, used by the downlink queue migration mechanism in order to avoid payload encryption.
 func (as *ApplicationServer) matchSession(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, dev *ttnpb.EndDevice, link *ttnpb.ApplicationLink, sessionKeyID []byte) ([]string, error) {
 	logger := log.FromContext(ctx)
 	var mask []string
@@ -976,8 +985,12 @@ func (as *ApplicationServer) matchSession(ctx context.Context, ids *ttnpb.EndDev
 // Only fields which are used by integrations are stored.
 // The fields which are stored are based on the following usages:
 // - io/packages/loragls/v3/package.go#multiFrameQuery
-// - io/packages/loragls/v3/api/objects.go#parseRxMetadata
-func (as *ApplicationServer) storeUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink) error {
+// - io/packages/loragls/v3/api/objects.go#parseRxMetadata.
+func (as *ApplicationServer) storeUplink(
+	ctx context.Context,
+	ids *ttnpb.EndDeviceIdentifiers,
+	uplink *ttnpb.ApplicationUplink,
+) error {
 	cleanUplink := &ttnpb.ApplicationUplink{
 		RxMetadata: make([]*ttnpb.RxMetadata, 0, len(uplink.RxMetadata)),
 		ReceivedAt: uplink.ReceivedAt,
@@ -1000,11 +1013,11 @@ func (as *ApplicationServer) storeUplink(ctx context.Context, ids *ttnpb.EndDevi
 	return as.appUpsRegistry.Push(ctx, ids, cleanUplink)
 }
 
-// saveActivationStatus attempts to mark the end device as activated in the Entity Registry.
+// setActivated attempts to mark the end device as activated in the Entity Registry.
 // If the update succeeds, the end device will be updated in the Application Server end device registry
 // in order to avoid subsequent calls.
-func (as *ApplicationServer) saveActivationStatus(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) {
-	defer trace.StartRegion(ctx, "save activation status").End()
+func (as *ApplicationServer) setActivated(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) {
+	defer trace.StartRegion(ctx, "set activated").End()
 
 	cc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
 	if err != nil {
@@ -1038,14 +1051,51 @@ func (as *ApplicationServer) saveActivationStatus(ctx context.Context, ids *ttnp
 	}
 }
 
-func (as *ApplicationServer) handleUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink, link *ttnpb.ApplicationLink) (err error) {
+func (as *ApplicationServer) publishNormalizedUplink(ctx context.Context, info uplinkInfo) error {
+	for _, measurement := range info.uplink.NormalizedPayload {
+		if err := as.Publish(ctx, &ttnpb.ApplicationUp{
+			EndDeviceIds:   info.ids,
+			CorrelationIds: events.CorrelationIDsFromContext(ctx),
+			ReceivedAt:     info.receivedAt,
+			Up: &ttnpb.ApplicationUp_UplinkNormalized{
+				UplinkNormalized: &ttnpb.ApplicationUplinkNormalized{
+					SessionKeyId:              info.uplink.SessionKeyId,
+					FPort:                     info.uplink.FPort,
+					FCnt:                      info.uplink.FCnt,
+					FrmPayload:                info.uplink.FrmPayload,
+					NormalizedPayload:         measurement,
+					NormalizedPayloadWarnings: info.uplink.NormalizedPayloadWarnings,
+					RxMetadata:                info.uplink.RxMetadata,
+					Settings:                  info.uplink.Settings,
+					ReceivedAt:                info.uplink.ReceivedAt,
+					Confirmed:                 info.uplink.Confirmed,
+					ConsumedAirtime:           info.uplink.ConsumedAirtime,
+					Locations:                 info.uplink.Locations,
+					VersionIds:                info.uplink.VersionIds,
+					NetworkIds:                info.uplink.NetworkIds,
+				},
+			},
+			Simulated: info.simulated,
+		}); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+type uplinkInfo struct {
+	ids        *ttnpb.EndDeviceIdentifiers
+	receivedAt *pbtypes.Timestamp
+	uplink     *ttnpb.ApplicationUplink
+	simulated  bool
+	link       *ttnpb.ApplicationLink
+}
+
+func (as *ApplicationServer) handleUplink(ctx context.Context, info uplinkInfo) error {
 	defer trace.StartRegion(ctx, "handle uplink").End()
 
-	ctx = log.NewContextWithField(ctx, "session_key_id", uplink.SessionKeyId)
-	if uplink.ReceivedAt == nil {
-		panic("no NS timestamp in ApplicationUplink")
-	}
-	dev, err := as.deviceRegistry.Set(ctx, ids,
+	ctx = log.NewContextWithField(ctx, "session_key_id", info.uplink.SessionKeyId)
+	dev, err := as.deviceRegistry.Set(ctx, info.ids,
 		[]string{
 			"activated_at",
 			"formatters",
@@ -1056,9 +1106,9 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids *ttnpb.EndDev
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dev == nil {
-				return nil, nil, errDeviceNotFound.WithAttributes("device_uid", unique.ID(ctx, ids))
+				return nil, nil, errDeviceNotFound.WithAttributes("device_uid", unique.ID(ctx, info.ids))
 			}
-			mask, err := as.matchSession(ctx, ids, dev, link, uplink.SessionKeyId)
+			mask, err := as.matchSession(ctx, info.ids, dev, info.link, info.uplink.SessionKeyId)
 			if err != nil {
 				return nil, nil, err
 			}
@@ -1071,40 +1121,44 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids *ttnpb.EndDev
 	if err != nil {
 		return err
 	}
-	if !as.skipPayloadCrypto(ctx, link, dev, dev.Session) {
-		if err := as.decryptAndDecodeUplink(ctx, dev, uplink, link.DefaultFormatters); err != nil {
+
+	if !as.skipPayloadCrypto(ctx, info.link, dev, dev.Session) {
+		if err := as.decryptAndDecodeUplink(ctx, dev, info.uplink, info.link.DefaultFormatters); err != nil {
 			return err
 		}
-		if err := as.storeUplink(ctx, ids, uplink); err != nil {
+		if err := as.publishNormalizedUplink(ctx, info); err != nil {
+			return err
+		}
+		if err := as.storeUplink(ctx, info.ids, info.uplink); err != nil {
 			return err
 		}
 	} else if appSKey := dev.GetSession().GetKeys().GetAppSKey(); appSKey != nil {
-		uplink.AppSKey = appSKey
-		uplink.LastAFCntDown = dev.Session.LastAFCntDown
+		info.uplink.AppSKey = appSKey
+		info.uplink.LastAFCntDown = dev.Session.LastAFCntDown
 	}
 
-	registerUplinkLatency(ctx, uplink)
+	registerUplinkLatency(ctx, info.uplink)
 
 	if dev.VersionIds != nil {
-		uplink.VersionIds = dev.VersionIds
+		info.uplink.VersionIds = dev.VersionIds
 	}
 
-	if locations, err := as.locationRegistry.Get(ctx, ids); err != nil {
+	// Set location in message and publish location solved if the payload contains location information.
+	if locations, err := as.locationRegistry.Get(ctx, info.ids); err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to retrieve end device locations")
 	} else {
-		uplink.Locations = locations
+		info.uplink.Locations = locations
 	}
-
-	loc := as.locationFromDecodedPayload(uplink)
+	loc := as.locationFromPayload(info.uplink)
 	if loc != nil {
-		if uplink.Locations == nil {
-			uplink.Locations = make(map[string]*ttnpb.Location, 1)
+		if info.uplink.Locations == nil {
+			info.uplink.Locations = make(map[string]*ttnpb.Location, 1)
 		}
-		uplink.Locations["frm-payload"] = loc
+		info.uplink.Locations["frm-payload"] = loc
 		if err := as.Publish(ctx, &ttnpb.ApplicationUp{
-			EndDeviceIds:   ids,
+			EndDeviceIds:   info.ids,
 			CorrelationIds: events.CorrelationIDsFromContext(ctx),
-			ReceivedAt:     uplink.ReceivedAt,
+			ReceivedAt:     info.receivedAt,
 			Up: &ttnpb.ApplicationUp_LocationSolved{
 				LocationSolved: &ttnpb.ApplicationLocation{
 					Service:  "frm-payload",
@@ -1116,22 +1170,29 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids *ttnpb.EndDev
 		}
 	}
 
+	// If the device has not been activated before, publish the activation event.
 	if dev.ActivatedAt == nil {
-		as.activationPool.Publish(ctx, ids)
+		if err := as.activationPool.Publish(ctx, info.ids); err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Failed to publish activation event")
+		}
 	}
 
-	if err == nil {
-		as.deviceLastSeenPool.Publish(ctx, lastSeenAtInfo{ids: ids, lastSeenAt: uplink.ReceivedAt})
+	// Publish last seen event.
+	if err := as.deviceLastSeenPool.Publish(ctx, lastSeenAtInfo{
+		ids:        info.ids,
+		lastSeenAt: info.uplink.ReceivedAt,
+	}); err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to publish last seen event")
 	}
 
 	return nil
 }
 
-func (as *ApplicationServer) handleSimulatedUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink, link *ttnpb.ApplicationLink) error {
+func (as *ApplicationServer) handleSimulatedUplink(ctx context.Context, info uplinkInfo) error {
 	defer trace.StartRegion(ctx, "handle simulated uplink").End()
 
-	ctx = log.NewContextWithField(ctx, "session_key_id", uplink.SessionKeyId)
-	dev, err := as.deviceRegistry.Get(ctx, ids,
+	ctx = log.NewContextWithField(ctx, "session_key_id", info.uplink.SessionKeyId)
+	dev, err := as.deviceRegistry.Get(ctx, info.ids,
 		[]string{
 			"formatters",
 			"version_ids",
@@ -1141,13 +1202,16 @@ func (as *ApplicationServer) handleSimulatedUplink(ctx context.Context, ids *ttn
 		return err
 	}
 
-	if locations, err := as.locationRegistry.Get(ctx, ids); err != nil {
+	if locations, err := as.locationRegistry.Get(ctx, info.ids); err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to retrieve end device locations")
 	} else {
-		uplink.Locations = locations
+		info.uplink.Locations = locations
 	}
 
-	return as.decodeUplink(ctx, dev, uplink, link.DefaultFormatters)
+	if err := as.decodeUplink(ctx, dev, info.uplink, info.link.DefaultFormatters); err != nil {
+		return err
+	}
+	return as.publishNormalizedUplink(ctx, info)
 }
 
 func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, invalid *ttnpb.ApplicationInvalidatedDownlinks, link *ttnpb.ApplicationLink) (pass bool, err error) {
@@ -1330,11 +1394,11 @@ func (as *ApplicationServer) GetConfig(ctx context.Context) (*Config, error) {
 
 // GetMQTTConfig returns the MQTT frontend configuration based on the context.
 func (as *ApplicationServer) GetMQTTConfig(ctx context.Context) (*config.MQTT, error) {
-	config, err := as.GetConfig(ctx)
+	cfg, err := as.GetConfig(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return &config.MQTT, nil
+	return &cfg.MQTT, nil
 }
 
 // RangeUplinks ranges the application uplinks and calls the callback function, until false is returned.

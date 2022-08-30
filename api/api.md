@@ -484,6 +484,8 @@
   - [Message `ApplicationUp`](#ttn.lorawan.v3.ApplicationUp)
   - [Message `ApplicationUplink`](#ttn.lorawan.v3.ApplicationUplink)
   - [Message `ApplicationUplink.LocationsEntry`](#ttn.lorawan.v3.ApplicationUplink.LocationsEntry)
+  - [Message `ApplicationUplinkNormalized`](#ttn.lorawan.v3.ApplicationUplinkNormalized)
+  - [Message `ApplicationUplinkNormalized.LocationsEntry`](#ttn.lorawan.v3.ApplicationUplinkNormalized.LocationsEntry)
   - [Message `DownlinkMessage`](#ttn.lorawan.v3.DownlinkMessage)
   - [Message `DownlinkQueueOperationErrorDetails`](#ttn.lorawan.v3.DownlinkQueueOperationErrorDetails)
   - [Message `DownlinkQueueRequest`](#ttn.lorawan.v3.DownlinkQueueRequest)
@@ -1524,6 +1526,7 @@ The ApplicationUpStorage service can be used to query stored application upstrea
 | `downlink_push` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  | The topic to which the Application Server subscribes for downlink queue push operations. |
 | `downlink_replace` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  | The topic to which the Application Server subscribes for downlink queue replace operations. |
 | `uplink_message` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
+| `uplink_normalized` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
 | `join_accept` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
 | `downlink_ack` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
 | `downlink_nack` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
@@ -1782,6 +1785,7 @@ The NATS provider settings.
 | `template_fields` | [`ApplicationWebhook.TemplateFieldsEntry`](#ttn.lorawan.v3.ApplicationWebhook.TemplateFieldsEntry) | repeated | The value of the fields used by the template. Maps field.id to the value. |
 | `downlink_api_key` | [`string`](#string) |  | The API key to be used for downlink queue operations. The field is provided for convenience reasons, and can contain API keys with additional rights (albeit this is discouraged). |
 | `uplink_message` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
+| `uplink_normalized` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
 | `join_accept` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
 | `downlink_ack` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
 | `downlink_nack` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
@@ -1896,6 +1900,7 @@ The NATS provider settings.
 | `fields` | [`ApplicationWebhookTemplateField`](#ttn.lorawan.v3.ApplicationWebhookTemplateField) | repeated |  |
 | `create_downlink_api_key` | [`bool`](#bool) |  | Control the creation of the downlink queue operations API key. |
 | `uplink_message` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
+| `uplink_normalized` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
 | `join_accept` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
 | `downlink_ack` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
 | `downlink_nack` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
@@ -3354,6 +3359,7 @@ Configuration options for static ADR.
 | ----- | ---- | ----- | ----------- |
 | `format_id` | [`string`](#string) |  | ID of the format. |
 | `data` | [`bytes`](#bytes) |  | Data to convert. |
+| `end_device_version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  | End device profile identifiers. |
 
 #### Field Rules
 
@@ -5903,7 +5909,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `modulation_type` | [`uint32`](#uint32) |  |  |
-| `operating_channel_width` | [`uint32`](#uint32) |  | Operating Channel Width (kHz). |
+| `operating_channel_width` | [`uint32`](#uint32) |  | Operating Channel Width (Hz). |
 | `coding_rate` | [`string`](#string) |  |  |
 
 ### <a name="ttn.lorawan.v3.LoRaDataRate">Message `LoRaDataRate`</a>
@@ -6934,6 +6940,7 @@ Transmission settings for downlink.
 | Field | Validations |
 | ----- | ----------- |
 | `session_key_id` | <p>`bytes.max_len`: `2048`</p> |
+| `received_at` | <p>`timestamp.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationLocation">Message `ApplicationLocation`</a>
 
@@ -6974,6 +6981,7 @@ Application uplink message.
 | `correlation_ids` | [`string`](#string) | repeated |  |
 | `received_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Server time when the Application Server received the message. |
 | `uplink_message` | [`ApplicationUplink`](#ttn.lorawan.v3.ApplicationUplink) |  |  |
+| `uplink_normalized` | [`ApplicationUplinkNormalized`](#ttn.lorawan.v3.ApplicationUplinkNormalized) |  |  |
 | `join_accept` | [`ApplicationJoinAccept`](#ttn.lorawan.v3.ApplicationJoinAccept) |  |  |
 | `downlink_ack` | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) |  |  |
 | `downlink_nack` | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) |  |  |
@@ -6997,18 +7005,20 @@ Application uplink message.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `session_key_id` | [`bytes`](#bytes) |  | Join Server issued identifier for the session keys used by this uplink. |
-| `f_port` | [`uint32`](#uint32) |  |  |
-| `f_cnt` | [`uint32`](#uint32) |  |  |
+| `f_port` | [`uint32`](#uint32) |  | LoRaWAN FPort of the uplink message. |
+| `f_cnt` | [`uint32`](#uint32) |  | LoRaWAN FCntUp of the uplink message. |
 | `frm_payload` | [`bytes`](#bytes) |  | The frame payload of the uplink message. The payload is still encrypted if the skip_payload_crypto field of the EndDevice is true, which is indicated by the presence of the app_s_key field. |
 | `decoded_payload` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  | The decoded frame payload of the uplink message. This field is set by the message processor that is configured for the end device (see formatters) or application (see default_formatters). |
 | `decoded_payload_warnings` | [`string`](#string) | repeated | Warnings generated by the message processor while decoding the frm_payload. |
+| `normalized_payload` | [`google.protobuf.Struct`](#google.protobuf.Struct) | repeated | The normalized frame payload of the uplink message. This field is set by the message processor that is configured for the end device (see formatters) or application (see default_formatters). If the message processor is a custom script, there is no uplink normalizer script and the decoded output is valid normalized payload, this field contains the decoded payload. |
+| `normalized_payload_warnings` | [`string`](#string) | repeated | Warnings generated by the message processor while normalizing the decoded payload. |
 | `rx_metadata` | [`RxMetadata`](#ttn.lorawan.v3.RxMetadata) | repeated | A list of metadata for each antenna of each gateway that received this message. |
-| `settings` | [`TxSettings`](#ttn.lorawan.v3.TxSettings) |  | Settings for the transmission. |
+| `settings` | [`TxSettings`](#ttn.lorawan.v3.TxSettings) |  | Transmission settings used by the end device. |
 | `received_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Server time when the Network Server received the message. |
 | `app_s_key` | [`KeyEnvelope`](#ttn.lorawan.v3.KeyEnvelope) |  | The AppSKey of the current session. This field is only present if the skip_payload_crypto field of the EndDevice is true. Can be used to decrypt uplink payloads and encrypt downlink payloads. |
 | `last_a_f_cnt_down` | [`uint32`](#uint32) |  | The last AFCntDown of the current session. This field is only present if the skip_payload_crypto field of the EndDevice is true. Can be used with app_s_key to encrypt downlink payloads. |
-| `confirmed` | [`bool`](#bool) |  |  |
-| `consumed_airtime` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings. |
+| `confirmed` | [`bool`](#bool) |  | Indicates whether the end device used confirmed data uplink. |
+| `consumed_airtime` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the raw payload size and the transmission settings. |
 | `locations` | [`ApplicationUplink.LocationsEntry`](#ttn.lorawan.v3.ApplicationUplink.LocationsEntry) | repeated | End device location metadata, set by the Application Server while handling the message. |
 | `version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  | End device version identifiers, set by the Application Server while handling the message. |
 | `network_ids` | [`NetworkIdentifiers`](#ttn.lorawan.v3.NetworkIdentifiers) |  | Network identifiers, set by the Network Server that handles the message. |
@@ -7022,6 +7032,42 @@ Application uplink message.
 | `settings` | <p>`message.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationUplink.LocationsEntry">Message `ApplicationUplink.LocationsEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`string`](#string) |  |  |
+| `value` | [`Location`](#ttn.lorawan.v3.Location) |  |  |
+
+### <a name="ttn.lorawan.v3.ApplicationUplinkNormalized">Message `ApplicationUplinkNormalized`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `session_key_id` | [`bytes`](#bytes) |  | Join Server issued identifier for the session keys used by this uplink. |
+| `f_port` | [`uint32`](#uint32) |  | LoRaWAN FPort of the uplink message. |
+| `f_cnt` | [`uint32`](#uint32) |  | LoRaWAN FCntUp of the uplink message. |
+| `frm_payload` | [`bytes`](#bytes) |  | The frame payload of the uplink message. This field is always decrypted with AppSKey. |
+| `normalized_payload` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  | The normalized frame payload of the uplink message. This field is set for each item in normalized_payload in the corresponding ApplicationUplink message. |
+| `normalized_payload_warnings` | [`string`](#string) | repeated | This field is set to normalized_payload_warnings in the corresponding ApplicationUplink message. |
+| `rx_metadata` | [`RxMetadata`](#ttn.lorawan.v3.RxMetadata) | repeated | A list of metadata for each antenna of each gateway that received this message. |
+| `settings` | [`TxSettings`](#ttn.lorawan.v3.TxSettings) |  | Transmission settings used by the end device. |
+| `received_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Server time when the Network Server received the message. |
+| `confirmed` | [`bool`](#bool) |  | Indicates whether the end device used confirmed data uplink. |
+| `consumed_airtime` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the raw payload size and the transmission settings. |
+| `locations` | [`ApplicationUplinkNormalized.LocationsEntry`](#ttn.lorawan.v3.ApplicationUplinkNormalized.LocationsEntry) | repeated | End device location metadata, set by the Application Server while handling the message. |
+| `version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  | End device version identifiers, set by the Application Server while handling the message. |
+| `network_ids` | [`NetworkIdentifiers`](#ttn.lorawan.v3.NetworkIdentifiers) |  | Network identifiers, set by the Network Server that handles the message. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `session_key_id` | <p>`bytes.max_len`: `2048`</p> |
+| `f_port` | <p>`uint32.lte`: `255`</p><p>`uint32.gte`: `1`</p><p>`uint32.not_in`: `[224]`</p> |
+| `normalized_payload` | <p>`message.required`: `true`</p> |
+| `settings` | <p>`message.required`: `true`</p> |
+| `received_at` | <p>`timestamp.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.ApplicationUplinkNormalized.LocationsEntry">Message `ApplicationUplinkNormalized.LocationsEntry`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
