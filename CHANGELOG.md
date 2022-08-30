@@ -14,14 +14,24 @@ For details about compatibility between different releases, see the **Commitment
 - New `ListBands` RPC on the `Configuration` service.
 - Support for loading end device template from Device Repository when importing devices using a CSV file.
 - Experimental support for normalized payload.
+- Decoded payloads are now visible for downlinks in the Console.
 
 ### Changed
+
+- Absolute time downlinks (such as class B ping slots or class C absolute time downlinks) are now using the native class B downlink API of LoRa Basics Station.
+- Only gateways which are guaranteed to be GPS capable may now be used for absolute time downlinks. This ensures that gateways that have an unknown time source are not used for absolute time scheduling.
+- The static ADR mode may now steer the end device to use custom data rates such as SF7BW250, FSK and LR-FHSS.
 
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+- The Gateway Server scheduler no longer considers the absolute time of a downlink to be the time of arrival.
+- The Network Server now correctly handles the command that may succeed a `LinkADRAns` response.
+- LR-FHSS data rate matching.
+- Console data rate rendering of non-LoRa modulations.
 
 ### Security
 
