@@ -93,9 +93,9 @@ var CN_779_787_RP1_V1_1_RevA = Band{
 	DefaultRx2Parameters: Rx2Parameters{ttnpb.DataRateIndex_DATA_RATE_0, 786000000},
 
 	Beacon: Beacon{
-		DataRateIndex:    ttnpb.DataRateIndex_DATA_RATE_3,
-		CodingRate:       "4/5",
-		ComputeFrequency: func(_ float64) uint64 { return cn779787BeaconFrequency },
+		DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
+		CodingRate:    "4/5",
+		Frequencies:   cn779787BeaconFrequencies,
 	},
-	PingSlotFrequency: uint64Ptr(cn779787BeaconFrequency),
+	PingSlotFrequencies: cn779787BeaconFrequencies,
 }

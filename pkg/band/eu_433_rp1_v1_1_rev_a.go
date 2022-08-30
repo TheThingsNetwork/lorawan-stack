@@ -93,9 +93,9 @@ var EU_433_RP1_V1_1_Rev_A = Band{
 	DefaultRx2Parameters: Rx2Parameters{0, 434665000},
 
 	Beacon: Beacon{
-		DataRateIndex:    ttnpb.DataRateIndex_DATA_RATE_3,
-		CodingRate:       "4/5",
-		ComputeFrequency: func(_ float64) uint64 { return eu433BeaconFrequency },
+		DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
+		CodingRate:    "4/5",
+		Frequencies:   eu433BeaconFrequencies,
 	},
-	PingSlotFrequency: uint64Ptr(eu433BeaconFrequency),
+	PingSlotFrequencies: eu433BeaconFrequencies,
 }

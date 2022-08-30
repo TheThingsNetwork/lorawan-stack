@@ -114,11 +114,9 @@ func (b Band) BandDescription() *ttnpb.BandDescription {
 	bandDescription := &ttnpb.BandDescription{
 		Id: b.ID,
 		Beacon: &ttnpb.BandDescription_Beacon{
-			DataRateIndex:    b.Beacon.DataRateIndex,
-			CodingRate:       b.Beacon.CodingRate,
-			InvertedPolarity: b.Beacon.InvertedPolarity,
+			DataRateIndex: b.Beacon.DataRateIndex,
+			CodingRate:    b.Beacon.CodingRate,
 		},
-		PingSlotFrequency:      nil,
 		MaxUplinkChannels:      uint32(b.MaxUplinkChannels),
 		UplinkChannels:         make([]*ttnpb.BandDescription_Channel, 0, len(b.UplinkChannels)),
 		MaxDownlinkChannels:    uint32(b.MaxDownlinkChannels),
@@ -178,12 +176,6 @@ func (b Band) BandDescription() *ttnpb.BandDescription {
 			Rate: &ttnpb.DataRate{
 				Modulation: datarate.Rate.Modulation,
 			},
-		}
-	}
-
-	if b.PingSlotFrequency != nil {
-		bandDescription.PingSlotFrequency = &types.UInt64Value{
-			Value: *b.PingSlotFrequency,
 		}
 	}
 

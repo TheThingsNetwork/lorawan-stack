@@ -19,11 +19,11 @@ import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 const (
 	// EU_863_870 is the ID of the European 863-870Mhz band
 	EU_863_870 = "EU_863_870"
-
-	eu863870BeaconFrequency = 869525000
 )
 
 var (
+	eu863870BeaconFrequencies = []uint64{869525000}
+
 	eu863870DefaultChannels = []Channel{
 		{
 			Frequency:   868100000,

@@ -19,11 +19,11 @@ import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 const (
 	// EU_433 is the ID of the European 433Mhz band
 	EU_433 = "EU_433"
-
-	eu433BeaconFrequency = 434655000
 )
 
 var (
+	eu433BeaconFrequencies = []uint64{434655000}
+
 	eu433DefaultChannels = []Channel{
 		{
 			Frequency:   433175000,
