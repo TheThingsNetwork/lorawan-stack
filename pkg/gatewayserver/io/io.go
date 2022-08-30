@@ -298,10 +298,16 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 			md.DownlinkPathConstraint = ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NEVER
 			continue
 		}
-		buf, err := UplinkToken(&ttnpb.GatewayAntennaIdentifiers{
-			GatewayIds:   c.gateway.GetIds(),
-			AntennaIndex: md.AntennaIndex,
-		}, md.Timestamp, ct, receivedAt, ttnpb.StdTime(up.Settings.Time))
+		buf, err := UplinkToken(
+			&ttnpb.GatewayAntennaIdentifiers{
+				GatewayIds:   c.gateway.GetIds(),
+				AntennaIndex: md.AntennaIndex,
+			},
+			md.Timestamp,
+			ct,
+			receivedAt,
+			ttnpb.StdTime(gpsTime),
+		)
 		if err != nil {
 			return err
 		}
