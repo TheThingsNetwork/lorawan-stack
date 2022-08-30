@@ -71,12 +71,15 @@ func TestFromDownlinkMessage(t *testing.T) {
 				DeviceClass: 0,
 				Diid:        1,
 				Pdu:         "596d7868616d74686332356b4a334d3d3d",
-				RxDelay:     1,
-				Rx1DR:       2,
-				Rx1Freq:     868500000,
 				RCtx:        2,
 				Priority:    25,
 				MuxTime:     1554300787.123456,
+				TimestampDownlinkMessage: &TimestampDownlinkMessage{
+					RxDelay: 1,
+					Rx1DR:   2,
+					Rx1Freq: 868500000,
+					XTime:   ConcentratorTimeToXTime(0x11, 1553300787) - int64(time.Second/time.Microsecond),
+				},
 			},
 		},
 		{
@@ -101,22 +104,24 @@ func TestFromDownlinkMessage(t *testing.T) {
 						Downlink: &ttnpb.TxSettings_Downlink{
 							AntennaIndex: 2,
 						},
-						ConcentratorTimestamp: 1553300787,
+						Time: ttnpb.ProtoTimePtr(time.Unix(0x42424242, 0x42424242)),
 					},
 				},
 				CorrelationIds: []string{"correlation2"},
 			},
 			ExpectedDownlinkMessage: DownlinkMessage{
 				DevEUI:      "00-00-00-00-00-00-00-01",
-				DeviceClass: 0,
+				DeviceClass: 1,
 				Diid:        2,
 				Pdu:         "596d7868616d74686332356b4a334d3d3d",
-				RxDelay:     1,
-				Rx1DR:       2,
-				Rx1Freq:     869525000,
 				RCtx:        2,
 				Priority:    25,
 				MuxTime:     1554300787.123456,
+				AbsoluteTimeDownlinkMessage: &AbsoluteTimeDownlinkMessage{
+					DR:      2,
+					Freq:    869525000,
+					GPSTime: TimeToGPSTime(time.Unix(0x42424242, 0x42424242)),
+				},
 			},
 		},
 	} {
@@ -131,7 +136,6 @@ func TestFromDownlinkMessage(t *testing.T) {
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
-			dnmsg.XTime = tc.ExpectedDownlinkMessage.XTime
 			if !a.So(dnmsg, should.Resemble, tc.ExpectedDownlinkMessage) {
 				t.Fatalf("Invalid DownlinkMessage: %v", dnmsg)
 			}
@@ -152,12 +156,14 @@ func TestToDownlinkMessage(t *testing.T) {
 			DownlinkMessage: DownlinkMessage{
 				DeviceClass: 0,
 				Pdu:         "Ymxhamthc25kJ3M==",
-				RxDelay:     1,
-				Rx1DR:       2,
-				Rx1Freq:     868500000,
 				RCtx:        2,
 				Priority:    25,
-				XTime:       1554300785,
+				TimestampDownlinkMessage: &TimestampDownlinkMessage{
+					RxDelay: 1,
+					Rx1DR:   2,
+					Rx1Freq: 868500000,
+					XTime:   1554300785,
+				},
 			},
 			ExpectedDownlinkMessage: &ttnpb.DownlinkMessage{
 				RawPayload: []byte("Ymxhamthc25kJ3M=="),
@@ -186,11 +192,13 @@ func TestToDownlinkMessage(t *testing.T) {
 			DownlinkMessage: DownlinkMessage{
 				DeviceClass: 1,
 				Pdu:         "Ymxhamthc25kJ3M==",
-				RxDelay:     1,
-				Rx1DR:       2,
-				Rx1Freq:     869525000,
 				RCtx:        2,
 				Priority:    25,
+				AbsoluteTimeDownlinkMessage: &AbsoluteTimeDownlinkMessage{
+					DR:      2,
+					Freq:    869525000,
+					GPSTime: TimeToGPSTime(time.Unix(0x42424242, 0x42424242)),
+				},
 			},
 			ExpectedDownlinkMessage: &ttnpb.DownlinkMessage{
 				RawPayload: []byte("Ymxhamthc25kJ3M=="),
@@ -208,6 +216,7 @@ func TestToDownlinkMessage(t *testing.T) {
 						Downlink: &ttnpb.TxSettings_Downlink{
 							AntennaIndex: 2,
 						},
+						Time: ttnpb.ProtoTimePtr(time.Unix(0x42424242, 0x42424242).Truncate(time.Microsecond)),
 					},
 				},
 			},
