@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { generateHexValue } from '../../../support/utils'
+import { generateHexValue } from '../../../../support/utils'
 
 describe('End device manual create', () => {
   const user = {
