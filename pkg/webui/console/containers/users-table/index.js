@@ -21,6 +21,8 @@ import Status from '@ttn-lw/components/status'
 import Icon from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import toast from '@ttn-lw/components/toast'
+import ButtonGroup from '@ttn-lw/components/button/group'
+import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
@@ -34,7 +36,13 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { checkFromState, mayManageUsers, maySendInvites } from '@console/lib/feature-checks'
 
-import { getUsersList, deleteInvite, getUserInvitations } from '@console/store/actions/users'
+import {
+  getUsersList,
+  deleteInvite,
+  getUserInvitations,
+  deleteUser,
+  restoreUser,
+} from '@console/store/actions/users'
 
 import { selectUserId, selectUserIsAdmin } from '@console/store/selectors/logout'
 import {
@@ -57,12 +65,14 @@ const m = defineMessages({
 })
 
 const USERS_TAB = 'users'
+const DELETED_TAB = 'deleted'
 const INVITATIONS_TAB = 'invitations'
 const tabs = [
   {
     title: sharedMessages.users,
     name: 'users',
   },
+  { title: sharedMessages.deleted, name: DELETED_TAB },
   {
     title: sharedMessages.userInvitations,
     name: 'invitations',
@@ -104,11 +114,59 @@ const state = {
 }
 
 const UsersTable = props => {
-  const { pageSize, currentUserId, maySendInvites, handleDeleteInvitation } = props
+  const {
+    pageSize,
+    currentUserId,
+    maySendInvites,
+    handleDeleteInvitation,
+    restoreUser,
+    purgeUser,
+  } = props
   const dispatch = useDispatch()
 
   const [tab, setTab] = React.useState(USERS_TAB)
   const isInvitationsTab = tab === INVITATIONS_TAB
+  const isDeletedTab = tab === DELETED_TAB
+
+  const handleRestore = React.useCallback(
+    async id => {
+      try {
+        await restoreUser(id)
+        toast({
+          title: id,
+          message: m.restoreSuccess,
+          type: toast.types.SUCCESS,
+        })
+      } catch (err) {
+        toast({
+          title: id,
+          message: m.restoreFail,
+          type: toast.types.ERROR,
+        })
+      }
+    },
+    [restoreUser],
+  )
+
+  const handlePurge = React.useCallback(
+    async id => {
+      try {
+        await purgeUser(id)
+        toast({
+          title: id,
+          message: m.purgeSuccess,
+          type: toast.types.SUCCESS,
+        })
+      } catch (err) {
+        toast({
+          title: id,
+          message: m.purgeFail,
+          type: toast.types.ERROR,
+        })
+      }
+    },
+    [purgeUser],
+  )
 
   const onDeleteInvite = React.useCallback(
     async email => {
@@ -199,8 +257,33 @@ const UsersTable = props => {
           width: 28,
           sortable: true,
         },
-        ...state,
-        {
+      )
+      if (tab === DELETED_TAB) {
+        baseHeaders.push({
+          name: 'actions',
+          displayName: sharedMessages.actions,
+          width: 45,
+          getValue: row => ({
+            id: row.ids.user_id,
+            name: row.name,
+            restore: handleRestore.bind(null, row.ids.user_id),
+            purge: handlePurge.bind(null, row.ids.user_id),
+          }),
+          render: details => (
+            <ButtonGroup align="end">
+              <Button message={sharedMessages.restore} onClick={details.restore} />
+              <DeleteModalButton
+                entityId={details.id}
+                entityName={details.name}
+                message={sharedMessages.purge}
+                onApprove={details.purge}
+                onlyPurge
+              />
+            </ButtonGroup>
+          ),
+        })
+      } else {
+        baseHeaders.push(state, {
           name: 'admin',
           displayName: sharedMessages.admin,
           width: 7,
@@ -211,21 +294,28 @@ const UsersTable = props => {
 
             return null
           },
-        },
-      )
+        })
+      }
     }
 
     return baseHeaders
-  }, [currentUserId, tab, onDeleteInvite])
+  }, [currentUserId, tab, onDeleteInvite, handleRestore, handlePurge])
 
   const getItems = React.useCallback(params => {
-    const { tab } = params
+    const { tab, query } = params
+    const isDeletedTab = tab === DELETED_TAB
     setTab(tab)
 
     if (tab === INVITATIONS_TAB) {
       return getUserInvitations(params, ['state'])
     }
-    return getUsersList(params, ['name', 'primary_email_address', 'state', 'admin'])
+    return getUsersList(
+      { ...params, deleted: isDeletedTab },
+      ['name', 'primary_email_address', 'state', 'admin'],
+      {
+        isSearch: isDeletedTab || query.length > 0,
+      },
+    )
   }, [])
 
   const baseDataSelector = React.useCallback(
@@ -265,6 +355,7 @@ const UsersTable = props => {
       searchItemsAction={getItems}
       baseDataSelector={baseDataSelector}
       pageSize={pageSize}
+      clickable={!isDeletedTab}
       tabs={maySendInvites ? tabs : []}
       searchable={!isInvitationsTab}
     />
@@ -276,6 +367,8 @@ UsersTable.propTypes = {
   handleDeleteInvitation: PropTypes.func.isRequired,
   maySendInvites: PropTypes.bool.isRequired,
   pageSize: PropTypes.number.isRequired,
+  purgeUser: PropTypes.func.isRequired,
+  restoreUser: PropTypes.func.isRequired,
 }
 
 export default connect(
@@ -287,6 +380,8 @@ export default connect(
   dispatch => ({
     ...bindActionCreators(
       {
+        purgeUser: attachPromise(deleteUser),
+        restoreUser: attachPromise(restoreUser),
         handleDeleteInvitation: attachPromise(deleteInvite),
       },
       dispatch,
@@ -296,6 +391,8 @@ export default connect(
     ...stateProps,
     ...dispatchProps,
     ...ownProps,
-    handleDeleteSession: email => dispatchProps.handleDeleteSession(email),
+    purgeUser: id => dispatchProps.purgeUser(id, { purge: true }),
+    restoreUser: id => dispatchProps.restoreUser(id),
+    handleDeleteInvitation: email => dispatchProps.handleDeleteInvitation(email),
   }),
 )(UsersTable)
