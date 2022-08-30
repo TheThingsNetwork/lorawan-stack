@@ -61,7 +61,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 						Downlink: &ttnpb.TxSettings_Downlink{
 							AntennaIndex: 2,
 						},
-						Timestamp: 1553300787,
+						ConcentratorTimestamp: 1553300787,
 					},
 				},
 				CorrelationIds: []string{"correlation1"},
@@ -101,6 +101,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 						Downlink: &ttnpb.TxSettings_Downlink{
 							AntennaIndex: 2,
 						},
+						ConcentratorTimestamp: 1553300787,
 					},
 				},
 				CorrelationIds: []string{"correlation2"},
@@ -121,7 +122,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			raw, err := lbsLNS.FromDownlink(ctx, tc.DownlinkMessage, tc.BandID, 1554300787, time.Unix(1554300787, 123456000))
+			raw, err := lbsLNS.FromDownlink(ctx, tc.DownlinkMessage, tc.BandID, time.Unix(1554300787, 123456000))
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}

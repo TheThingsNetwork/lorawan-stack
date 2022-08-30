@@ -59,7 +59,9 @@ func (dnmsg *DownlinkMessage) unmarshalJSON(data []byte) error {
 }
 
 // FromDownlink implements Formatter.
-func (f *lbsLNS) FromDownlink(ctx context.Context, down *ttnpb.DownlinkMessage, bandID string, concentratorTime scheduling.ConcentratorTime, dlTime time.Time) ([]byte, error) {
+func (f *lbsLNS) FromDownlink(
+	ctx context.Context, down *ttnpb.DownlinkMessage, bandID string, dlTime time.Time,
+) ([]byte, error) {
 	var dnmsg DownlinkMessage
 	settings := down.GetScheduled()
 	dnmsg.Pdu = hex.EncodeToString(down.GetRawPayload())
@@ -75,7 +77,7 @@ func (f *lbsLNS) FromDownlink(ctx context.Context, down *ttnpb.DownlinkMessage, 
 	if !found {
 		return nil, errSessionStateNotFound.New()
 	}
-	xTime := ConcentratorTimeToXTime(sessionID, concentratorTime)
+	xTime := ConcentratorTimeToXTime(sessionID, scheduling.ConcentratorTime(settings.ConcentratorTimestamp))
 
 	// Estimate the xtime based on the timestamp; xtime = timestamp - (rxdelay). The calculated offset is in microseconds.
 	dnmsg.XTime = xTime - int64(dnmsg.RxDelay*int(time.Second/time.Microsecond))
