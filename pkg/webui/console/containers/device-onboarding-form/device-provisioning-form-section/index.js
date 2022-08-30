@@ -100,7 +100,7 @@ const DeviceProvisioningFormSection = () => {
   const mayProvisionDevice =
     (Boolean(frequency_plan_id) && Boolean(lorawan_version) && Boolean(lorawan_phy_version)) ||
     (_inputMethod === 'device-repository' && hasValidDeviceRepositoryType(version, template))
-  const mayConfirm = ids.join_eui.length === 16
+  const mayConfirm = ids?.join_eui?.length === 16
 
   const resetJoinEui = React.useCallback(() => {
     setValues(values => ({

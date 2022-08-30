@@ -131,7 +131,7 @@ const DeviceTypeRepositoryFormSection = () => {
       }))
 
       const hiddenFields = [
-        templateFields,
+        ...templateFields,
         'network_server_address',
         'application_server_address',
         'join_server_address',

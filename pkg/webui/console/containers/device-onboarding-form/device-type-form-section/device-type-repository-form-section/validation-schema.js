@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import Yup from '@ttn-lw/lib/yup'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 // Validation schema of the device type repository form section.
 // Please observe the following rules to keep the validation schemas maintainable:
@@ -28,6 +29,7 @@ const validationSchema = Yup.object({
     firmware_version: Yup.string(),
     band_id: Yup.string(),
   }),
+  frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
 })
 
 export default validationSchema
