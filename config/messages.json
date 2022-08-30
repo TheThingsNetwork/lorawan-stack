@@ -5831,6 +5831,15 @@
       "file": "invitation_registry.go"
     }
   },
+  "error:pkg/identityserver:no_receiver_user_ids": {
+    "translations": {
+      "en": "no receiver users ids"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "notification_registry.go"
+    }
+  },
   "error:pkg/identityserver:no_validation_needed": {
     "translations": {
       "en": "no validation needed for this contact info"
