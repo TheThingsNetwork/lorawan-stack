@@ -1584,13 +1584,17 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 	switch slot.Class {
 	case ttnpb.Class_CLASS_B:
 		if dev.MacState.CurrentParameters.PingSlotDataRateIndexValue == nil {
-			log.FromContext(ctx).Error("Device is in class B mode, but ping slot data rate index is not known, skip class B/C downlink slot")
 			return downlinkAttemptResult{
 				DownlinkTaskUpdateStrategy: noDownlinkTask,
 			}
 		}
 		drIdx = dev.MacState.CurrentParameters.PingSlotDataRateIndexValue.Value
-		freq = dev.MacState.CurrentParameters.PingSlotFrequency
+		freq = mac.DevicePingSlotFrequency(dev, phy, slot.Time)
+		if freq == 0 {
+			return downlinkAttemptResult{
+				DownlinkTaskUpdateStrategy: noDownlinkTask,
+			}
+		}
 
 	case ttnpb.Class_CLASS_C:
 		drIdx = dev.MacState.CurrentParameters.Rx2DataRateIndex

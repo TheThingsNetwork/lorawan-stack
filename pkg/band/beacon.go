@@ -17,28 +17,27 @@ package band
 import (
 	"time"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/gpstime"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
+
+// ComputePeriodicFrequency computes the frequency at time t given the period p and offset offset.
+// It panics if no frequencies are provided.
+func ComputePeriodicFrequency(t time.Duration, p time.Duration, offset uint32, frequencies ...uint64) uint64 {
+	switch n := len(frequencies); n {
+	case 0:
+		panic("no frequencies available")
+	case 1:
+		return frequencies[0]
+	default:
+		return frequencies[int(time.Duration(offset)+t/p)%n]
+	}
+}
 
 // Beacon parameters of a specific band.
 type Beacon struct {
 	DataRateIndex ttnpb.DataRateIndex
 	CodingRate    string
 	Frequencies   []uint64
-}
-
-// ComputeFrequency computes the frequency of the beacon at time t.
-func (b Beacon) ComputeFrequency(t time.Time) uint64 {
-	switch n := len(b.Frequencies); n {
-	case 0:
-		panic("no frequencies available")
-	case 1:
-		return b.Frequencies[0]
-	default:
-		beacon := gpstime.ToGPS(t) / 128
-		return b.Frequencies[int(beacon)%n]
-	}
 }
 
 var usAuBeaconFrequencies = func() []uint64 {
