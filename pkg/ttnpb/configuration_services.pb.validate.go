@@ -601,17 +601,7 @@ func (m *BandDescription) ValidateFields(paths ...string) error {
 				}
 			}
 
-		case "ping_slot_frequency":
-
-			if v, ok := interface{}(m.GetPingSlotFrequency()).(interface{ ValidateFields(...string) error }); ok {
-				if err := v.ValidateFields(subs...); err != nil {
-					return BandDescriptionValidationError{
-						field:  "ping_slot_frequency",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
-				}
-			}
+		case "ping_slot_frequencies":
 
 		case "max_uplink_channels":
 			// no validation rules for MaxUplinkChannels
@@ -1072,8 +1062,8 @@ func (m *BandDescription_Beacon) ValidateFields(paths ...string) error {
 			// no validation rules for DataRateIndex
 		case "coding_rate":
 			// no validation rules for CodingRate
-		case "inverted_polarity":
-			// no validation rules for InvertedPolarity
+		case "frequencies":
+
 		default:
 			return BandDescription_BeaconValidationError{
 				field:  name,

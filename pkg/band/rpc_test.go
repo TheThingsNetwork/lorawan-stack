@@ -404,9 +404,9 @@ func TestBand_convertToBandDescription(t *testing.T) {
 				Beacon: Beacon{
 					DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
 					CodingRate:    "default",
-					Frequencies:   nil,
+					Frequencies:   []uint64{0x12, 0x23},
 				},
-				PingSlotFrequencies: nil,
+				PingSlotFrequencies: []uint64{0x34, 0x45},
 
 				MaxUplinkChannels: 1,
 				UplinkChannels: []Channel{
@@ -475,8 +475,9 @@ func TestBand_convertToBandDescription(t *testing.T) {
 				Beacon: &ttnpb.BandDescription_Beacon{
 					DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
 					CodingRate:    "default",
+					Frequencies:   []uint64{0x12, 0x23},
 				},
-				PingSlotFrequency: nil,
+				PingSlotFrequencies: []uint64{0x34, 0x45},
 
 				MaxUplinkChannels: 1,
 				UplinkChannels: []*ttnpb.BandDescription_Channel{
@@ -614,8 +615,9 @@ func TestBand_convertToBandDescription(t *testing.T) {
 				Beacon: &ttnpb.BandDescription_Beacon{
 					DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
 					CodingRate:    "default",
+					Frequencies:   nil,
 				},
-				PingSlotFrequency: nil,
+				PingSlotFrequencies: nil,
 
 				MaxUplinkChannels: 1,
 				UplinkChannels: []*ttnpb.BandDescription_Channel{

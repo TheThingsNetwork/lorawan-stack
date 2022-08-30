@@ -116,7 +116,9 @@ func (b Band) BandDescription() *ttnpb.BandDescription {
 		Beacon: &ttnpb.BandDescription_Beacon{
 			DataRateIndex: b.Beacon.DataRateIndex,
 			CodingRate:    b.Beacon.CodingRate,
+			Frequencies:   b.Beacon.Frequencies,
 		},
+		PingSlotFrequencies:    b.PingSlotFrequencies,
 		MaxUplinkChannels:      uint32(b.MaxUplinkChannels),
 		UplinkChannels:         make([]*ttnpb.BandDescription_Channel, 0, len(b.UplinkChannels)),
 		MaxDownlinkChannels:    uint32(b.MaxDownlinkChannels),

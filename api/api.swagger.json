@@ -16966,8 +16966,12 @@
         "coding_rate": {
           "type": "string"
         },
-        "inverted_polarity": {
-          "type": "boolean"
+        "frequencies": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uint64"
+          }
         }
       }
     },
@@ -19922,9 +19926,12 @@
         "beacon": {
           "$ref": "#/definitions/BandDescriptionBeacon"
         },
-        "ping_slot_frequency": {
-          "type": "string",
-          "format": "uint64"
+        "ping_slot_frequencies": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uint64"
+          }
         },
         "max_uplink_channels": {
           "type": "integer",
