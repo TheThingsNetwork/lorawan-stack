@@ -604,6 +604,11 @@ func TestVersion(t *testing.T) {
 						FSKChannel:          &shared.IFConfig{Enable: true, Radio: 0, IFValue: 1300000, Bandwidth: 0, SpreadFactor: 0, Datarate: 50000},
 					},
 				},
+				Beacon: &pfconfig.BeaconingConfig{
+					DR:     ttnpb.DataRateIndex_DATA_RATE_3,
+					Layout: [3]int{2, 8, 17},
+					Freqs:  []uint64{869525000},
+				},
 			},
 			ExpectedStatusMessage: &ttnpb.GatewayStatus{
 				Versions: map[string]string{
@@ -678,6 +683,11 @@ func TestVersion(t *testing.T) {
 						LoRaStandardChannel: &shared.IFConfig{Enable: true, Radio: 0, IFValue: 800000, Bandwidth: 250000, SpreadFactor: 7, Datarate: 0},
 						FSKChannel:          &shared.IFConfig{Enable: true, Radio: 0, IFValue: 1300000, Bandwidth: 0, SpreadFactor: 0, Datarate: 50000},
 					},
+				},
+				Beacon: &pfconfig.BeaconingConfig{
+					DR:     ttnpb.DataRateIndex_DATA_RATE_3,
+					Layout: [3]int{2, 8, 17},
+					Freqs:  []uint64{869525000},
 				},
 			},
 			ExpectedStatusMessage: &ttnpb.GatewayStatus{

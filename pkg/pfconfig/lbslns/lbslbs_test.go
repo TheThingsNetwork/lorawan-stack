@@ -22,17 +22,26 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/pfconfig/shared"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
+type TestFeatures struct {
+	production bool
+}
+
+func (f TestFeatures) Production() bool { return f.production }
+
 func TestGetRouterConfig(t *testing.T) {
+	t.Parallel()
+
 	for _, tc := range []struct {
 		Name            string
 		FrequencyPlan   frequencyplans.FrequencyPlan
 		FrequencyPlanID string
 		Cfg             RouterConfig
-		IsProd          bool
+		Features        TestFeatures
 		ErrorAssertion  func(err error) bool
 	}{
 		{
@@ -122,8 +131,35 @@ func TestGetRouterConfig(t *testing.T) {
 							{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 						},
-						LoRaStandardChannel: &shared.IFConfig{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-						FSKChannel:          &shared.IFConfig{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+						LoRaStandardChannel: &shared.IFConfig{
+							Enable:       false,
+							Radio:        0,
+							IFValue:      0,
+							Bandwidth:    0,
+							SpreadFactor: 0, Datarate: 0,
+						},
+						FSKChannel: &shared.IFConfig{
+							Enable:       false,
+							Radio:        0,
+							IFValue:      0,
+							Bandwidth:    0,
+							SpreadFactor: 0,
+							Datarate:     0,
+						},
+					},
+				},
+				Beacon: &BeaconingConfig{
+					DR:     ttnpb.DataRateIndex_DATA_RATE_8,
+					Layout: [3]int{5, 11, 23},
+					Freqs: []uint64{
+						923300000,
+						923900000,
+						924500000,
+						925100000,
+						925700000,
+						926300000,
+						926900000,
+						927500000,
 					},
 				},
 			},
@@ -192,18 +228,51 @@ func TestGetRouterConfig(t *testing.T) {
 							{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 						},
-						LoRaStandardChannel: &shared.IFConfig{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-						FSKChannel:          &shared.IFConfig{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+						LoRaStandardChannel: &shared.IFConfig{
+							Enable:       false,
+							Radio:        0,
+							IFValue:      0,
+							Bandwidth:    0,
+							SpreadFactor: 0,
+							Datarate:     0,
+						},
+						FSKChannel: &shared.IFConfig{
+							Enable:       false,
+							Radio:        0,
+							IFValue:      0,
+							Bandwidth:    0,
+							SpreadFactor: 0,
+							Datarate:     0,
+						},
+					},
+				},
+				Beacon: &BeaconingConfig{
+					DR:     ttnpb.DataRateIndex_DATA_RATE_8,
+					Layout: [3]int{5, 11, 23},
+					Freqs: []uint64{
+						923300000,
+						923900000,
+						924500000,
+						925100000,
+						925700000,
+						926300000,
+						926900000,
+						927500000,
 					},
 				},
 			},
-			IsProd: true,
+			Features: TestFeatures{
+				production: true,
+			},
 		},
 	} {
+		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
 			a := assertions.New(t)
 			fps := map[string]*frequencyplans.FrequencyPlan{tc.FrequencyPlanID: &tc.FrequencyPlan}
-			cfg, err := GetRouterConfig(tc.FrequencyPlan.BandID, fps, tc.IsProd, time.Now(), 0)
+			cfg, err := GetRouterConfig(tc.FrequencyPlan.BandID, fps, tc.Features, time.Now(), 0)
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
@@ -221,12 +290,14 @@ func TestGetRouterConfig(t *testing.T) {
 }
 
 func TestGetRouterConfigWithMultipleFP(t *testing.T) {
+	t.Parallel()
+
 	for _, tc := range []struct {
 		Name           string
 		BandID         string
 		FrequencyPlans map[string]*frequencyplans.FrequencyPlan
 		Cfg            RouterConfig
-		IsProd         bool
+		Features       TestFeatures
 		ErrorAssertion func(err error) bool
 	}{
 		{
@@ -318,8 +389,22 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 							{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 						},
-						LoRaStandardChannel: &shared.IFConfig{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-						FSKChannel:          &shared.IFConfig{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+						LoRaStandardChannel: &shared.IFConfig{
+							Enable:       false,
+							Radio:        0,
+							IFValue:      0,
+							Bandwidth:    0,
+							SpreadFactor: 0,
+							Datarate:     0,
+						},
+						FSKChannel: &shared.IFConfig{
+							Enable:       false,
+							Radio:        0,
+							IFValue:      0,
+							Bandwidth:    0,
+							SpreadFactor: 0,
+							Datarate:     0,
+						},
 					},
 					{
 						Radios: []LBSRFConfig{
@@ -344,16 +429,47 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 							{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 						},
-						LoRaStandardChannel: &shared.IFConfig{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-						FSKChannel:          &shared.IFConfig{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+						LoRaStandardChannel: &shared.IFConfig{
+							Enable:       false,
+							Radio:        0,
+							IFValue:      0,
+							Bandwidth:    0,
+							SpreadFactor: 0,
+							Datarate:     0,
+						},
+						FSKChannel: &shared.IFConfig{
+							Enable:       false,
+							Radio:        0,
+							IFValue:      0,
+							Bandwidth:    0,
+							SpreadFactor: 0,
+							Datarate:     0,
+						},
+					},
+				},
+				Beacon: &BeaconingConfig{
+					DR:     ttnpb.DataRateIndex_DATA_RATE_8,
+					Layout: [3]int{5, 11, 23},
+					Freqs: []uint64{
+						923300000,
+						923900000,
+						924500000,
+						925100000,
+						925700000,
+						926300000,
+						926900000,
+						927500000,
 					},
 				},
 			},
 		},
 	} {
+		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
 			a := assertions.New(t)
-			cfg, err := GetRouterConfig(tc.BandID, tc.FrequencyPlans, tc.IsProd, time.Now(), 3)
+			cfg, err := GetRouterConfig(tc.BandID, tc.FrequencyPlans, tc.Features, time.Now(), 3)
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
@@ -371,6 +487,8 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 }
 
 func TestGetDataRatesFromFrequencyPlan(t *testing.T) {
+	t.Parallel()
+
 	a := assertions.New(t)
 	for _, tc := range []struct {
 		Name           string
@@ -418,7 +536,10 @@ func TestGetDataRatesFromFrequencyPlan(t *testing.T) {
 			},
 		},
 	} {
+		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
 			drs, err := getDataRatesFromBandID(tc.BandID)
 			if err != nil && (tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue)) {
 				t.Fatalf("Unexpected error: %v", err)
