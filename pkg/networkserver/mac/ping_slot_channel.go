@@ -34,16 +34,17 @@ var (
 )
 
 func DeviceNeedsPingSlotChannelReq(dev *ttnpb.EndDevice) bool {
+	if dev.GetMulticast() || dev.GetMacState() == nil {
+		return false
+	}
+	currentParameters, desiredParameters := dev.MacState.CurrentParameters, dev.MacState.DesiredParameters
 	switch {
-	case dev.GetMulticast(),
-		dev.GetMacState() == nil:
+	case desiredParameters.PingSlotDataRateIndexValue == nil:
 		return false
-	case dev.MacState.DesiredParameters.PingSlotFrequency != dev.MacState.CurrentParameters.PingSlotFrequency:
+	case desiredParameters.PingSlotFrequency != currentParameters.PingSlotFrequency:
 		return true
-	case dev.MacState.DesiredParameters.PingSlotDataRateIndexValue == nil:
-		return false
-	case dev.MacState.CurrentParameters.PingSlotDataRateIndexValue == nil,
-		dev.MacState.DesiredParameters.PingSlotDataRateIndexValue.Value != dev.MacState.CurrentParameters.PingSlotDataRateIndexValue.Value:
+	case currentParameters.PingSlotDataRateIndexValue == nil,
+		desiredParameters.PingSlotDataRateIndexValue.Value != currentParameters.PingSlotDataRateIndexValue.Value:
 		return true
 	}
 	return false
