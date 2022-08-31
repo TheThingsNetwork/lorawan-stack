@@ -349,42 +349,42 @@
     {
       "Frequency": 915900000,
       "MinDataRate": 6,
-      "MaxDataRate": 6
+      "MaxDataRate": 7
     },
     {
       "Frequency": 917500000,
       "MinDataRate": 6,
-      "MaxDataRate": 6
+      "MaxDataRate": 7
     },
     {
       "Frequency": 919100000,
       "MinDataRate": 6,
-      "MaxDataRate": 6
+      "MaxDataRate": 7
     },
     {
       "Frequency": 920700000,
       "MinDataRate": 6,
-      "MaxDataRate": 6
+      "MaxDataRate": 7
     },
     {
       "Frequency": 922300000,
       "MinDataRate": 6,
-      "MaxDataRate": 6
+      "MaxDataRate": 7
     },
     {
       "Frequency": 923900000,
       "MinDataRate": 6,
-      "MaxDataRate": 6
+      "MaxDataRate": 7
     },
     {
       "Frequency": 925500000,
       "MinDataRate": 6,
-      "MaxDataRate": 6
+      "MaxDataRate": 7
     },
     {
       "Frequency": 927100000,
       "MinDataRate": 6,
-      "MaxDataRate": 6
+      "MaxDataRate": 7
     }
   ],
   "MaxDownlinkChannels": 8,

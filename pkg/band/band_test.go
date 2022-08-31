@@ -673,3 +673,30 @@ func TestBeacon(t *testing.T) {
 		})
 	}
 }
+
+func TestChannelsWellDefined(t *testing.T) {
+	t.Parallel()
+
+	for name, versions := range All {
+		for version, b := range versions {
+			b := b
+			t.Run(fmt.Sprintf("%v/%v", name, version), func(t *testing.T) {
+				t.Parallel()
+
+				a := assertions.New(t)
+				assertCh := func(ch Channel) {
+					a.So(ch.MinDataRate, should.BeLessThanOrEqualTo, ch.MaxDataRate)
+					a.So(b.DataRates, should.ContainKey, ch.MinDataRate)
+					a.So(b.DataRates, should.ContainKey, ch.MaxDataRate)
+				}
+
+				for _, ch := range b.UplinkChannels {
+					assertCh(ch)
+				}
+				for _, ch := range b.DownlinkChannels {
+					assertCh(ch)
+				}
+			})
+		}
+	}
+}

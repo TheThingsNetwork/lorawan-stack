@@ -22,27 +22,29 @@ const (
 )
 
 var (
-	cn47051026AUplinkChannels = func() []Channel {
+	cn47051026AUplinkChannels = func(minDataRateIndex ttnpb.DataRateIndex) []Channel {
 		uplinkChannels := make([]Channel, 0, 48)
 		// 26 MHz Type A
 		for i := 0; i < 48; i++ {
 			uplinkChannels = append(uplinkChannels, Channel{
 				Frequency:   uint64(470300000 + 200000*i),
+				MinDataRate: minDataRateIndex,
 				MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
 			})
 		}
 		return uplinkChannels
-	}()
+	}
 
-	cn47051026ADownlinkChannels = func() []Channel {
+	cn47051026ADownlinkChannels = func(minDataRateIndex ttnpb.DataRateIndex) []Channel {
 		downlinkChannels := make([]Channel, 0, 24)
 		// 26 MHz Type A
 		for i := 0; i < 24; i++ {
 			downlinkChannels = append(downlinkChannels, Channel{
 				Frequency:   uint64(490100000 + 200000*i),
+				MinDataRate: minDataRateIndex,
 				MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
 			})
 		}
 		return downlinkChannels
-	}()
+	}
 )
