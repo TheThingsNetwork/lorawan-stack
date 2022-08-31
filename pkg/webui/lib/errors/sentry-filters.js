@@ -25,4 +25,5 @@ export default [
   'error:pkg/identityserver:organization_needs_collaborator',
   'error:pkg/identityserver:password_contains_user_id',
   'error:pkg/identityserver:password_equals_old',
+  'error:pkg/identityserver:tenant_entity_limit',
 ]
