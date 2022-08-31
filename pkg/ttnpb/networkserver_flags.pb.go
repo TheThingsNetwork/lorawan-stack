@@ -9,8 +9,6 @@ package ttnpb
 import (
 	flagsplugin "github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	pflag "github.com/spf13/pflag"
-	customflags "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags"
-	types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // AddSetFlagsForGetDefaultMACSettingsRequest adds flags to select fields in GetDefaultMACSettingsRequest.
@@ -36,68 +34,6 @@ func (m *GetDefaultMACSettingsRequest) SetFromFlags(flags *pflag.FlagSet, prefix
 		}
 		m.LorawanPhyVersion = PHYVersion(enumValue)
 		paths = append(paths, flagsplugin.Prefix("lorawan_phy_version", prefix))
-	}
-	return paths, nil
-}
-
-// AddSelectFlagsForGetNetIDResponse adds flags to select fields in GetNetIDResponse.
-func AddSelectFlagsForGetNetIDResponse(flags *pflag.FlagSet, prefix string, hidden bool) {
-	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("net-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("net-id", prefix), false), flagsplugin.WithHidden(hidden)))
-}
-
-// SelectFromFlags outputs the fieldmask paths forGetNetIDResponse message from select flags.
-func PathsFromSelectFlagsForGetNetIDResponse(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
-	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("net_id", prefix)); err != nil {
-		return nil, err
-	} else if selected && val {
-		paths = append(paths, flagsplugin.Prefix("net_id", prefix))
-	}
-	return paths, nil
-}
-
-// AddSetFlagsForGetNetIDResponse adds flags to select fields in GetNetIDResponse.
-func AddSetFlagsForGetNetIDResponse(flags *pflag.FlagSet, prefix string, hidden bool) {
-	flags.AddFlag(customflags.New3BytesFlag(flagsplugin.Prefix("net-id", prefix), "", flagsplugin.WithHidden(hidden)))
-}
-
-// SetFromFlags sets the GetNetIDResponse message from flags.
-func (m *GetNetIDResponse) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
-	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("net_id", prefix)); err != nil {
-		return nil, err
-	} else if changed {
-		m.NetId = val
-		paths = append(paths, flagsplugin.Prefix("net_id", prefix))
-	}
-	return paths, nil
-}
-
-// AddSelectFlagsForGetDeviceAdressPrefixesResponse adds flags to select fields in GetDeviceAdressPrefixesResponse.
-func AddSelectFlagsForGetDeviceAdressPrefixesResponse(flags *pflag.FlagSet, prefix string, hidden bool) {
-	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("dev-addr-prefixes", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("dev-addr-prefixes", prefix), false), flagsplugin.WithHidden(hidden)))
-}
-
-// SelectFromFlags outputs the fieldmask paths forGetDeviceAdressPrefixesResponse message from select flags.
-func PathsFromSelectFlagsForGetDeviceAdressPrefixesResponse(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
-	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("dev_addr_prefixes", prefix)); err != nil {
-		return nil, err
-	} else if selected && val {
-		paths = append(paths, flagsplugin.Prefix("dev_addr_prefixes", prefix))
-	}
-	return paths, nil
-}
-
-// AddSetFlagsForGetDeviceAdressPrefixesResponse adds flags to select fields in GetDeviceAdressPrefixesResponse.
-func AddSetFlagsForGetDeviceAdressPrefixesResponse(flags *pflag.FlagSet, prefix string, hidden bool) {
-	flags.AddFlag(flagsplugin.NewStringSliceFlag(flagsplugin.Prefix("dev-addr-prefixes", prefix), "", flagsplugin.WithHidden(hidden)))
-}
-
-// SetFromFlags sets the GetDeviceAdressPrefixesResponse message from flags.
-func (m *GetDeviceAdressPrefixesResponse) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
-	if val, changed, err := types.GetDevAddrPrefixSliceFromFlag(flags, flagsplugin.Prefix("dev_addr_prefixes", prefix)); err != nil {
-		return nil, err
-	} else if changed {
-		m.DevAddrPrefixes = val
-		paths = append(paths, flagsplugin.Prefix("dev_addr_prefixes", prefix))
 	}
 	return paths, nil
 }

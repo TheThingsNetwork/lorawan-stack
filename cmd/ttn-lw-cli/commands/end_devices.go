@@ -50,6 +50,8 @@ var (
 	getDefaultMACSettingsFlags = util.NormalizedFlagSet()
 	allEndDeviceSetFlags       = util.NormalizedFlagSet()
 	allEndDeviceSelectFlags    = util.NormalizedFlagSet()
+	getNetIDFlags              = util.NormalizedFlagSet()
+	getDevAddrPrefixesFlags    = util.NormalizedFlagSet()
 
 	selectAllEndDeviceFlags = util.SelectAllFlagSet("end devices")
 	toUnderscore            = strings.NewReplacer("-", "_")
@@ -1375,6 +1377,46 @@ This command may take end device identifiers from stdin.`,
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
+	endDevicesGetNetIDCommand = &cobra.Command{
+		Use:               "get-net-id",
+		Short:             "Get Network Server configured Net ID",
+		PersistentPreRunE: preRun(),
+		RunE: func(_ *cobra.Command, _ []string) error {
+			if !config.NetworkServerEnabled {
+				return errNetworkServerDisabled.New()
+			}
+
+			ns, err := api.Dial(ctx, config.NetworkServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewNsClient(ns).GetNetID(ctx, ttnpb.Empty)
+			if err != nil {
+				return err
+			}
+			return io.Write(os.Stdout, config.OutputFormat, res)
+		},
+	}
+	endDevicesGetDevAddrPrefixesCommand = &cobra.Command{
+		Use:               "get-dev-addr-prefixes",
+		Short:             "Get Network Server configured device address prefixes",
+		PersistentPreRunE: preRun(),
+		RunE: func(_ *cobra.Command, _ []string) error {
+			if !config.NetworkServerEnabled {
+				return errNetworkServerDisabled.New()
+			}
+
+			ns, err := api.Dial(ctx, config.NetworkServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewNsClient(ns).GetDeviceAddressPrefixes(ctx, ttnpb.Empty)
+			if err != nil {
+				return err
+			}
+			return io.Write(os.Stdout, config.OutputFormat, res)
+		},
+	}
 )
 
 func init() {
@@ -1489,6 +1531,12 @@ func init() {
 
 	endDevicesGetDefaultMACSettingsCommand.Flags().AddFlagSet(getDefaultMACSettingsFlags)
 	endDevicesCommand.AddCommand(endDevicesGetDefaultMACSettingsCommand)
+
+	endDevicesGetNetIDCommand.Flags().AddFlagSet(getNetIDFlags)
+	endDevicesCommand.AddCommand(endDevicesGetNetIDCommand)
+
+	endDevicesGetDevAddrPrefixesCommand.Flags().AddFlagSet(getDevAddrPrefixesFlags)
+	endDevicesCommand.AddCommand(endDevicesGetDevAddrPrefixesCommand)
 
 	Root.AddCommand(endDevicesCommand)
 
