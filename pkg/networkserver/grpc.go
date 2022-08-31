@@ -81,13 +81,17 @@ func (ns *NetworkServer) GetDefaultMACSettings(ctx context.Context, req *ttnpb.G
 	return settings, nil
 }
 
-func (ns *NetworkServer) GetNetID(ctx context.Context, req *pbtypes.Empty) (*ttnpb.GetNetIDResponse, error) {
+// GetNetID returns the NetID of the Network Server.
+func (ns *NetworkServer) GetNetID(_ context.Context, _ *pbtypes.Empty) (*ttnpb.GetNetIDResponse, error) {
 	return &ttnpb.GetNetIDResponse{
 		NetId: ns.netID[:],
 	}, nil
 }
 
-func (ns *NetworkServer) GetDeviceAddressPrefixes(ctx context.Context, req *pbtypes.Empty) (*ttnpb.GetDeviceAdressPrefixesResponse, error) {
+// GetDeviceAddressPrefixes return the configured device address prefixes of the Network Server.
+func (ns *NetworkServer) GetDeviceAddressPrefixes(
+	ctx context.Context, _ *pbtypes.Empty,
+) (*ttnpb.GetDeviceAdressPrefixesResponse, error) {
 	output := &ttnpb.GetDeviceAdressPrefixesResponse{}
 
 	prefixes := ns.devAddrPrefixes(ctx)
