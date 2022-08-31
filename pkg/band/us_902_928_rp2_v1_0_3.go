@@ -23,7 +23,7 @@ var US_902_928_RP2_V1_0_3 = Band{
 	SupportsDynamicADR: true,
 
 	MaxUplinkChannels: 72,
-	UplinkChannels:    us902928UplinkChannels,
+	UplinkChannels:    us902928UplinkChannels(2),
 
 	MaxDownlinkChannels: 8,
 	DownlinkChannels:    us902928DownlinkChannels,

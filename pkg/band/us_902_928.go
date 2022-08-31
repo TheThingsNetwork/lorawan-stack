@@ -22,7 +22,7 @@ const (
 )
 
 var (
-	us902928UplinkChannels = func() []Channel {
+	us902928UplinkChannels = func(wideChannelDelta ttnpb.DataRateIndex) []Channel {
 		uplinkChannels := make([]Channel, 0, 72)
 		for i := 0; i < 64; i++ {
 			uplinkChannels = append(uplinkChannels, Channel{
@@ -34,11 +34,11 @@ var (
 			uplinkChannels = append(uplinkChannels, Channel{
 				Frequency:   uint64(903000000 + 1600000*i),
 				MinDataRate: ttnpb.DataRateIndex_DATA_RATE_4,
-				MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_4,
+				MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_4 + wideChannelDelta,
 			})
 		}
 		return uplinkChannels
-	}()
+	}
 
 	us902928DownlinkChannels = func() []Channel {
 		downlinkChannels := make([]Channel, 0, 8)
