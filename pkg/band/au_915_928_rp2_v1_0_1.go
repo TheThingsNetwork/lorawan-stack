@@ -23,7 +23,7 @@ var AU_915_928_RP2_v1_0_1 = Band{
 	SupportsDynamicADR: true,
 
 	MaxUplinkChannels: 72,
-	UplinkChannels:    au915928UplinkChannels(0),
+	UplinkChannels:    au915928UplinkChannels(0, 0),
 
 	MaxDownlinkChannels: 8,
 	DownlinkChannels:    au915928DownlinkChannels,
