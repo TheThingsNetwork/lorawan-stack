@@ -107,7 +107,7 @@ const DeviceOnboardingForm = () => {
   const handleRegister = useCallback(
     async (values, resetForm, { authenticated_identifiers, ...cleanedValues }) => {
       const { _registration } = values
-      const { ids, supports_join, mac_state = {} } = cleanedValues
+      const { ids, mac_state = {} } = cleanedValues
       ids.application_ids = { application_id: appId }
 
       //  Do not attempt to set empty current_parameters on device creation.
