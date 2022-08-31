@@ -200,6 +200,7 @@ func TestDownlinkPacket(t *testing.T) {
 			Lora: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 11,
 				Bandwidth:       125000,
+				CodingRate:      band.Cr4_6,
 			},
 		},
 	}})

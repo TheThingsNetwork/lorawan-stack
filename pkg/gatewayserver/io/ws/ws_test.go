@@ -972,6 +972,7 @@ func TestTraffic(t *testing.T) {
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 7,
 									Bandwidth:       125000,
+									CodingRate:      band.Cr4_5,
 								},
 							},
 						},
@@ -1078,6 +1079,7 @@ func TestTraffic(t *testing.T) {
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 7,
 									Bandwidth:       125000,
+									CodingRate:      band.Cr4_5,
 								},
 							},
 						},
@@ -1471,6 +1473,7 @@ func TestRTT(t *testing.T) {
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 7,
 									Bandwidth:       125000,
+									CodingRate:      band.Cr4_5,
 								},
 							},
 						},

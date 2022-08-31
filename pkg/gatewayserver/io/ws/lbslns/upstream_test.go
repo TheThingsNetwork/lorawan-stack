@@ -59,25 +59,7 @@ func TestMarshalJSON(t *testing.T) {
 					},
 				},
 			},
-			Expected: []byte(`{
-				"msgtype":"jreq",
-				"MHdr":0,
-				"JoinEui":"2222:2222:2222:2222",
-				"DevEui":"1111:1111:1111:1111",
-				"DevNonce":18000,
-				"MIC":12345678,
-				"RefTime":0,
-				"DR":1,
-				"Freq":868300000,
-				"upinfo":{
-					"rxtime":1548059982,
-					"rtcx":0,
-					"xtime":12666373963464220,
-					"gpstime":0,
-					"rssi":89,
-					"snr":9.25
-				}
-			}`),
+			Expected: []byte(`{"msgtype":"jreq","MHdr":0,"JoinEui":"2222:2222:2222:2222","DevEui":"1111:1111:1111:1111","DevNonce":18000,"MIC":12345678,"RefTime":0,"DR":1,"Freq":868300000,"upinfo":{"rxtime":1548059982,"rtcx":0,"xtime":12666373963464220,"gpstime":0,"rssi":89,"snr":9.25}}`), //nolint: lll
 		},
 		{
 			Name: "UplinkDataFrame",
@@ -101,28 +83,7 @@ func TestMarshalJSON(t *testing.T) {
 					},
 				},
 			},
-			Expected: []byte(`{
-				"msgtype":"updf",
-				"MHdr":64,
-				"DevAddr":287454020,
-				"FCtrl":48,
-				"Fcnt":25,
-				"FOpts":"FD",
-				"FPort":0,
-				"FRMPayload":"Ymxhamthc25kJ3M=",
-				"MIC":12345678,
-				"RefTime":0,
-				"DR":1,
-				"Freq":868300000,
-				"upinfo":{
-					"rxtime":1548059982,
-					"rtcx":0,
-					"xtime":12666373963464220,
-					"gpstime":0,
-					"rssi":89,
-					"snr":9.25
-				}
-			}`),
+			Expected: []byte(`{"msgtype":"updf","MHdr":64,"DevAddr":287454020,"FCtrl":48,"Fcnt":25,"FOpts":"FD","FPort":0,"FRMPayload":"Ymxhamthc25kJ3M=","MIC":12345678,"RefTime":0,"DR":1,"Freq":868300000,"upinfo":{"rxtime":1548059982,"rtcx":0,"xtime":12666373963464220,"gpstime":0,"rssi":89,"snr":9.25}}`), //nolint: lll
 		},
 		{
 			Name: "TxConfirmation",
@@ -133,15 +94,7 @@ func TestMarshalJSON(t *testing.T) {
 				TxTime:  1552906698,
 				GPSTime: 1552906698,
 			},
-			Expected: []byte(`{
-				"msgtype":"dntxed",
-				"diid":35,
-				"DevEui":"1111:1111:1111:1111",
-				"rctx":0,
-				"xtime":1552906698,
-				"txtime":1552906698,
-				"gpstime":1552906698
-			}`),
+			Expected: []byte(`{"msgtype":"dntxed","diid":35,"DevEui":"1111:1111:1111:1111","rctx":0,"xtime":1552906698,"txtime":1552906698,"gpstime":1552906698}`), //nolint:lll
 		},
 		{
 			Name: "TimeSyncRequest",

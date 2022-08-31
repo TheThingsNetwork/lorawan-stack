@@ -20,6 +20,7 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
@@ -57,6 +58,7 @@ func TestAdaptDataRate(t *testing.T) {
 						Lora: &ttnpb.LoRaDataRate{
 							SpreadingFactor: 12,
 							Bandwidth:       125000,
+							CodingRate:      band.Cr4_5,
 						},
 					},
 				},
@@ -293,6 +295,7 @@ func TestIssue458(t *testing.T) {
 						Lora: &ttnpb.LoRaDataRate{
 							SpreadingFactor: 10,
 							Bandwidth:       125000,
+							CodingRate:      band.Cr4_5,
 						},
 					},
 				},

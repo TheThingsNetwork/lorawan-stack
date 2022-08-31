@@ -246,11 +246,13 @@ func testBand(t *testing.T, band serializableBand, version ttnpb.PHYVersion) {
 	}
 }
 
-func TestBandDefinitions(t *testing.T) { //nolint:paralleltest
-	// Running this in parallel breaks the option to generate golden samples.
-	for name, versions := range band.All { //nolint:paralleltest
+func TestBandDefinitions(t *testing.T) {
+	t.Parallel()
+	for name, versions := range band.All {
 		for version, band := range versions {
+			version, band := version, band
 			t.Run(fmt.Sprintf("%v/%v", name, version), func(t *testing.T) {
+				t.Parallel()
 				testBand(t, makeBand(band), version)
 			})
 		}

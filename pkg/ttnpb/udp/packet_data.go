@@ -125,6 +125,24 @@ type TxPacket struct {
 	Data string       `json:"data"`           // Base64 encoded RF packet payload, padding optional
 }
 
+// UnmarshalJSON implements json.Unmarshaler.
+func (p *TxPacket) UnmarshalJSON(data []byte) error {
+	type Alias TxPacket
+	aux := struct {
+		*Alias
+	}{
+		Alias: (*Alias)(p),
+	}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+	switch mod := p.DatR.DataRate.GetModulation().(type) {
+	case *ttnpb.DataRate_Lora:
+		mod.Lora.CodingRate = p.CodR
+	}
+	return nil
+}
+
 // Stat contains a status message
 type Stat struct {
 	Time ExpandedTime  `json:"time"`           // UTC 'system' time of the gateway, ISO 8601 'expanded' format (e.g 2014-01-12 08:59:28 GMT)
