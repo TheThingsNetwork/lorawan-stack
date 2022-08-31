@@ -449,7 +449,7 @@ func TestHandleNewChannelAns(t *testing.T) {
 					DataRateAck:  true,
 				})),
 			},
-			Error: ErrRequestNotFound,
+			Error: ErrRequestNotFound.WithAttributes("cid", ttnpb.MACCommandIdentifier_CID_NEW_CHANNEL),
 		},
 		{
 			Name: "frequency nack/data rate ack/no rejections",

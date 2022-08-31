@@ -9,7 +9,6 @@ package ttnpb
 import (
 	gogo "github.com/TheThingsIndustries/protoc-gen-go-json/gogo"
 	jsonplugin "github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
-	types "github.com/gogo/protobuf/types"
 )
 
 // MarshalProtoJSON marshals the GetPhyVersionsResponse_VersionInfo message to JSON.
@@ -207,10 +206,10 @@ func (x *BandDescription_Beacon) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("coding_rate")
 		s.WriteString(x.CodingRate)
 	}
-	if x.InvertedPolarity || s.HasField("inverted_polarity") {
+	if len(x.Frequencies) > 0 || s.HasField("frequencies") {
 		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("inverted_polarity")
-		s.WriteBool(x.InvertedPolarity)
+		s.WriteObjectField("frequencies")
+		s.WriteUint64Array(x.Frequencies)
 	}
 	s.WriteObjectEnd()
 }
@@ -235,9 +234,13 @@ func (x *BandDescription_Beacon) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 		case "coding_rate", "codingRate":
 			s.AddField("coding_rate")
 			x.CodingRate = s.ReadString()
-		case "inverted_polarity", "invertedPolarity":
-			s.AddField("inverted_polarity")
-			x.InvertedPolarity = s.ReadBool()
+		case "frequencies":
+			s.AddField("frequencies")
+			if s.ReadNil() {
+				x.Frequencies = nil
+				return
+			}
+			x.Frequencies = s.ReadUint64Array()
 		}
 	})
 }
@@ -373,14 +376,10 @@ func (x *BandDescription) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("beacon")
 		x.Beacon.MarshalProtoJSON(s.WithField("beacon"))
 	}
-	if x.PingSlotFrequency != nil || s.HasField("ping_slot_frequency") {
+	if len(x.PingSlotFrequencies) > 0 || s.HasField("ping_slot_frequencies") {
 		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("ping_slot_frequency")
-		if x.PingSlotFrequency == nil {
-			s.WriteNil()
-		} else {
-			s.WriteUint64(x.PingSlotFrequency.Value)
-		}
+		s.WriteObjectField("ping_slot_frequencies")
+		s.WriteUint64Array(x.PingSlotFrequencies)
 	}
 	if x.MaxUplinkChannels != 0 || s.HasField("max_uplink_channels") {
 		s.WriteMoreIf(&wroteField)
@@ -581,17 +580,13 @@ func (x *BandDescription) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			}
 			x.Beacon = &BandDescription_Beacon{}
 			x.Beacon.UnmarshalProtoJSON(s.WithField("beacon", true))
-		case "ping_slot_frequency", "pingSlotFrequency":
-			s.AddField("ping_slot_frequency")
+		case "ping_slot_frequencies", "pingSlotFrequencies":
+			s.AddField("ping_slot_frequencies")
 			if s.ReadNil() {
-				x.PingSlotFrequency = nil
+				x.PingSlotFrequencies = nil
 				return
 			}
-			v := s.ReadWrappedUint64()
-			if s.Err() != nil {
-				return
-			}
-			x.PingSlotFrequency = &types.UInt64Value{Value: v}
+			x.PingSlotFrequencies = s.ReadUint64Array()
 		case "max_uplink_channels", "maxUplinkChannels":
 			s.AddField("max_uplink_channels")
 			x.MaxUplinkChannels = s.ReadUint32()

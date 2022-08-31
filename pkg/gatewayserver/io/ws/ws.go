@@ -32,7 +32,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
@@ -327,7 +326,7 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 					return err
 				}
 			case down := <-conn.Down():
-				dnmsg, err := s.formatter.FromDownlink(ctx, down, conn.BandID(), scheduling.ConcentratorTime(down.GetScheduled().ConcentratorTimestamp), time.Now())
+				dnmsg, err := s.formatter.FromDownlink(ctx, down, conn.BandID(), time.Now())
 				if err != nil {
 					logger.WithError(err).Warn("Failed to marshal downlink message")
 					continue

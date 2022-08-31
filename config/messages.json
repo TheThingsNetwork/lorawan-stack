@@ -4562,6 +4562,15 @@
       "file": "firewall.go"
     }
   },
+  "error:pkg/gatewayserver/io/udp:packet_type": {
+    "translations": {
+      "en": "invalid packet type"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/udp",
+      "file": "udp.go"
+    }
+  },
   "error:pkg/gatewayserver/io/udp:rate_exceeded": {
     "translations": {
       "en": "gateway traffic exceeded allowed rate"
@@ -6929,6 +6938,60 @@
       "file": "javascript.go"
     }
   },
+  "error:pkg/messageprocessors/normalizedpayload:field_exclusive_maximum": {
+    "translations": {
+      "en": "`{path}` should be less than `{maximum}`"
+    },
+    "description": {
+      "package": "pkg/messageprocessors/normalizedpayload",
+      "file": "uplink.go"
+    }
+  },
+  "error:pkg/messageprocessors/normalizedpayload:field_exclusive_minimum": {
+    "translations": {
+      "en": "`{path}` should be greater than `{minimum}`"
+    },
+    "description": {
+      "package": "pkg/messageprocessors/normalizedpayload",
+      "file": "uplink.go"
+    }
+  },
+  "error:pkg/messageprocessors/normalizedpayload:field_maximum": {
+    "translations": {
+      "en": "`{path}` should be equal or less than `{maximum}`"
+    },
+    "description": {
+      "package": "pkg/messageprocessors/normalizedpayload",
+      "file": "uplink.go"
+    }
+  },
+  "error:pkg/messageprocessors/normalizedpayload:field_minimum": {
+    "translations": {
+      "en": "`{path}` should be equal or greater than `{minimum}`"
+    },
+    "description": {
+      "package": "pkg/messageprocessors/normalizedpayload",
+      "file": "uplink.go"
+    }
+  },
+  "error:pkg/messageprocessors/normalizedpayload:field_type": {
+    "translations": {
+      "en": "invalid field type of `{path}`"
+    },
+    "description": {
+      "package": "pkg/messageprocessors/normalizedpayload",
+      "file": "uplink.go"
+    }
+  },
+  "error:pkg/messageprocessors/normalizedpayload:unknown_field": {
+    "translations": {
+      "en": "unknown field `{path}`"
+    },
+    "description": {
+      "package": "pkg/messageprocessors/normalizedpayload",
+      "file": "uplink.go"
+    }
+  },
   "error:pkg/messageprocessors:formatter_not_configured": {
     "translations": {
       "en": "formatter `{formatter}` is not configured"
@@ -8099,15 +8162,6 @@
       "file": "lbslns.go"
     }
   },
-  "error:pkg/pfconfig/lbslns:invalid_key": {
-    "translations": {
-      "en": "key `{key}` invalid"
-    },
-    "description": {
-      "package": "pkg/pfconfig/lbslns",
-      "file": "lbslns.go"
-    }
-  },
   "error:pkg/pfconfig/shared:empty_gateway_server_address": {
     "translations": {
       "en": "gateway server address is empty"
@@ -9251,6 +9305,15 @@
       "file": "observability.go"
     }
   },
+  "event:as.up.data.normalize.warning": {
+    "translations": {
+      "en": "normalize uplink data message warning"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
   "event:as.up.data.receive": {
     "translations": {
       "en": "receive uplink data message"
@@ -9290,6 +9353,15 @@
   "event:as.up.location.forward": {
     "translations": {
       "en": "forward location solved message"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.up.normalized.forward": {
+    "translations": {
+      "en": "forward normalized uplink message"
     },
     "description": {
       "package": "pkg/applicationserver",

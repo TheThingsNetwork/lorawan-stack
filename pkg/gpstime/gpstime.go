@@ -47,7 +47,8 @@ func seconds(d time.Duration) int64 {
 	return int64(d / time.Second)
 }
 
-// IsLeap reports whether the given time.Duration elapsed since GPS epoch (January 6, 1980 UTC) is a leap second in UTC.
+// IsLeapSecond reports whether the given time.Duration elapsed since GPS epoch
+// (January 6, 1980 UTC) is a leap second in UTC.
 func IsLeapSecond(d time.Duration) bool {
 	dSec := seconds(d)
 	for i := len(leaps) - 1; i >= 0; i-- {

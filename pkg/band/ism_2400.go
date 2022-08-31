@@ -19,11 +19,11 @@ import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 const (
 	// ISM_2400 is the ID of the LoRa 2.4 GHz band.
 	ISM_2400 = "ISM_2400"
-
-	ism2400BeaconFrequency = 2424000000
 )
 
 var (
+	ism2400BeaconFrequencies = []uint64{2424000000}
+
 	ism2400DefaultChannels = []Channel{
 		{
 			Frequency:   2403000000,

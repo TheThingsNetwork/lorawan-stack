@@ -99,9 +99,10 @@ func setupConnection(ctx context.Context, mqttConn mqttnet.Conn, format Format, 
 					logger.WithError(err).Warn("Failed to marshal upstream message")
 					continue
 				}
-				logger.Debug("Publish upstream message")
+				topicName := topic.Join(topicParts)
+				logger.WithField("topic", topicName).Debug("Publish upstream message")
 				session.Publish(&packet.PublishPacket{
-					TopicName:  topic.Join(topicParts),
+					TopicName:  topicName,
 					TopicParts: topicParts,
 					QoS:        qosUpstream,
 					Message:    buf,
@@ -183,7 +184,8 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (_ context.Co
 	}
 	if err := rights.RequireApplication(ctx, ids, ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ); err == nil {
 		access.reads = append(access.reads,
-			c.format.UplinkTopic(uid, topic.PartWildcard),
+			c.format.UplinkMessageTopic(uid, topic.PartWildcard),
+			c.format.UplinkNormalizedTopic(uid, topic.PartWildcard),
 			c.format.JoinAcceptTopic(uid, topic.PartWildcard),
 			c.format.DownlinkAckTopic(uid, topic.PartWildcard),
 			c.format.DownlinkNackTopic(uid, topic.PartWildcard),

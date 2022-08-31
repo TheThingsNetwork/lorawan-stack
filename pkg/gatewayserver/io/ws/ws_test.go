@@ -40,7 +40,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mock"
 	. "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/lbslns"
-	"go.thethings.network/lorawan-stack/v3/pkg/gpstime"
 	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	pfconfig "go.thethings.network/lorawan-stack/v3/pkg/pfconfig/lbslns"
@@ -605,6 +604,11 @@ func TestVersion(t *testing.T) {
 						FSKChannel:          &shared.IFConfig{Enable: true, Radio: 0, IFValue: 1300000, Bandwidth: 0, SpreadFactor: 0, Datarate: 50000},
 					},
 				},
+				Beacon: &pfconfig.BeaconingConfig{
+					DR:     ttnpb.DataRateIndex_DATA_RATE_3,
+					Layout: [3]int{2, 8, 17},
+					Freqs:  []uint64{869525000},
+				},
 			},
 			ExpectedStatusMessage: &ttnpb.GatewayStatus{
 				Versions: map[string]string{
@@ -679,6 +683,11 @@ func TestVersion(t *testing.T) {
 						LoRaStandardChannel: &shared.IFConfig{Enable: true, Radio: 0, IFValue: 800000, Bandwidth: 250000, SpreadFactor: 7, Datarate: 0},
 						FSKChannel:          &shared.IFConfig{Enable: true, Radio: 0, IFValue: 1300000, Bandwidth: 0, SpreadFactor: 0, Datarate: 50000},
 					},
+				},
+				Beacon: &pfconfig.BeaconingConfig{
+					DR:     ttnpb.DataRateIndex_DATA_RATE_3,
+					Layout: [3]int{2, 8, 17},
+					Freqs:  []uint64{869525000},
 				},
 			},
 			ExpectedStatusMessage: &ttnpb.GatewayStatus{
@@ -976,11 +985,13 @@ func TestTraffic(t *testing.T) {
 				DeviceClass: 0,
 				Pdu:         "596d7868616d74686332356b4a334d3d3d",
 				Diid:        1,
-				RxDelay:     1,
-				Rx1Freq:     868100000,
-				Rx1DR:       5,
 				Priority:    25,
 				MuxTime:     1554300787.123456,
+				TimestampDownlinkMessage: &lbslns.TimestampDownlinkMessage{
+					RxDelay: 1,
+					Rx1Freq: 868100000,
+					Rx1DR:   5,
+				},
 			},
 		},
 		{
@@ -1071,20 +1082,23 @@ func TestTraffic(t *testing.T) {
 						},
 						Rx1Frequency:    868100000,
 						FrequencyPlanId: test.EUFrequencyPlanID,
+						AbsoluteTime:    ttnpb.ProtoTimePtr(time.Unix(0x424242424, 0x42424242)),
 					},
 				},
 				CorrelationIds: []string{"correlation1", "correlation2"},
 			},
 			ExpectedBSDownstream: lbslns.DownlinkMessage{
 				DevEUI:      "00-00-00-00-00-00-00-01",
-				DeviceClass: 0,
+				DeviceClass: 1,
 				Pdu:         "596d7868616d74686332356b4a334d3d3d",
 				Diid:        2,
-				RxDelay:     1,
-				Rx1Freq:     868100000,
-				Rx1DR:       5,
 				Priority:    25,
 				MuxTime:     1554300787.123456,
+				AbsoluteTimeDownlinkMessage: &lbslns.AbsoluteTimeDownlinkMessage{
+					Freq:    868100000,
+					DR:      5,
+					GPSTime: lbslns.TimeToGPSTime(time.Unix(0x424242424, 0x42424242)),
+				},
 			},
 		},
 	} {
@@ -1125,7 +1139,7 @@ func TestTraffic(t *testing.T) {
 					now := time.Unix(time.Now().UTC().Unix(), 0)
 					v.UpInfo.XTime = upXTime
 					v.UpInfo.RxTime = float64(now.Unix())
-					v.UpInfo.GPSTime = int64(gpstime.ToGPS(now) / time.Microsecond)
+					v.UpInfo.GPSTime = lbslns.TimeToGPSTime(now)
 					req, err := json.Marshal(v)
 					if err != nil {
 						panic(err)
@@ -1164,7 +1178,7 @@ func TestTraffic(t *testing.T) {
 					now := time.Unix(time.Now().UTC().Unix(), 0)
 					v.UpInfo.XTime = upXTime
 					v.UpInfo.RxTime = float64(now.Unix())
-					v.UpInfo.GPSTime = int64(gpstime.ToGPS(now) / time.Microsecond)
+					v.UpInfo.GPSTime = lbslns.TimeToGPSTime(now)
 					req, err := json.Marshal(v)
 					if err != nil {
 						panic(err)
@@ -1232,7 +1246,12 @@ func TestTraffic(t *testing.T) {
 
 						now := time.Now().UTC()
 						a.So(msg.TxTime, should.Equal, expected.TxTime)
-						a.So(gpstime.Parse(time.Duration(msg.GPSTime)*time.Microsecond), should.HappenBetween, now.Add(-time.Second), now.Add(time.Second))
+						a.So(
+							lbslns.TimeFromGPSTime(msg.GPSTime),
+							should.HappenBetween,
+							now.Add(-time.Second),
+							now.Add(time.Second),
+						)
 					case <-time.After(timeout):
 						t.Fatalf("Read message timeout")
 					}
@@ -1248,7 +1267,6 @@ func TestTraffic(t *testing.T) {
 					downlinkPath *ttnpb.DownlinkPath
 					down         = tc.InputNetworkDownstream
 					now          = time.Unix(time.Now().UTC().Unix(), 0)
-					dlTime       = now.Add(2 * time.Second)
 					timeStamp    = clock.GetTimestamp()
 					dlClass      = down.GetRequest().Class
 				)
@@ -1272,8 +1290,6 @@ func TestTraffic(t *testing.T) {
 							},
 						},
 					}
-					request := down.GetRequest()
-					request.AbsoluteTime = ttnpb.ProtoTimePtr(dlTime)
 				}
 
 				if _, _, _, err := gsConn.ScheduleDown(downlinkPath, down); err != nil {
@@ -1305,19 +1321,6 @@ func TestTraffic(t *testing.T) {
 						msg.MuxTime = expected.MuxTime
 						if dlClass == ttnpb.Class_CLASS_A {
 							expected.XTime = clock.GetXTimeForTimestamp(timeStamp)
-						} else {
-							expected.XTime = clock.GetXTimeForTime(dlTime)
-							diff := expected.XTime - msg.XTime
-							// The expected difference in XTime is the sum of the following values
-							// 1. Rx1Delay field of the downlink; hardcoded to 1 second.
-							// 2. TOA offset for the payload and the frequency plan used; 51456 microseconds.
-							// Note: If the payload or the frequency plan is changed in the test, adjust the TOA value.
-							expectedDiff := 1*time.Second + 51456*time.Microsecond
-
-							if !a.So(diff, should.BeGreaterThanOrEqualTo, 0) && !a.So(diff, should.BeBetween, (expectedDiff-5*time.Microsecond), (expectedDiff+5*time.Microsecond)) {
-								t.Fatalf("Downlink xtime has larger deviation than expected: %d", diff-int64(expectedDiff))
-							}
-							msg.XTime = expected.XTime
 						}
 						if !a.So(msg, should.Resemble, expected) {
 							t.Fatalf("Incorrect Downlink received: %s", string(res))

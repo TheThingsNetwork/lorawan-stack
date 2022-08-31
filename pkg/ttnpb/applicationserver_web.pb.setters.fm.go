@@ -293,6 +293,31 @@ func (dst *ApplicationWebhookTemplate) SetFields(src *ApplicationWebhookTemplate
 					dst.UplinkMessage = nil
 				}
 			}
+		case "uplink_normalized":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationWebhookTemplate_Message
+				if (src == nil || src.UplinkNormalized == nil) && dst.UplinkNormalized == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.UplinkNormalized
+				}
+				if dst.UplinkNormalized != nil {
+					newDst = dst.UplinkNormalized
+				} else {
+					newDst = &ApplicationWebhookTemplate_Message{}
+					dst.UplinkNormalized = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UplinkNormalized = src.UplinkNormalized
+				} else {
+					dst.UplinkNormalized = nil
+				}
+			}
 		case "join_accept":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationWebhookTemplate_Message
@@ -801,6 +826,31 @@ func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...strin
 					dst.UplinkMessage = src.UplinkMessage
 				} else {
 					dst.UplinkMessage = nil
+				}
+			}
+		case "uplink_normalized":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationWebhook_Message
+				if (src == nil || src.UplinkNormalized == nil) && dst.UplinkNormalized == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.UplinkNormalized
+				}
+				if dst.UplinkNormalized != nil {
+					newDst = dst.UplinkNormalized
+				} else {
+					newDst = &ApplicationWebhook_Message{}
+					dst.UplinkNormalized = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UplinkNormalized = src.UplinkNormalized
+				} else {
+					dst.UplinkNormalized = nil
 				}
 			}
 		case "join_accept":

@@ -4357,6 +4357,18 @@
               "defaultValue": ""
             },
             {
+              "name": "uplink_normalized",
+              "description": "",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationPubSub.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.Message",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
               "name": "join_accept",
               "description": "",
               "label": "",
@@ -5657,6 +5669,18 @@
               "defaultValue": ""
             },
             {
+              "name": "uplink_normalized",
+              "description": "",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationWebhook.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhook.Message",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
               "name": "join_accept",
               "description": "",
               "label": "",
@@ -6341,6 +6365,18 @@
             },
             {
               "name": "uplink_message",
+              "description": "",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationWebhookTemplate.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhookTemplate.Message",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "uplink_normalized",
               "description": "",
               "label": "",
               "type": "Message",
@@ -8440,12 +8476,12 @@
               "defaultValue": ""
             },
             {
-              "name": "ping_slot_frequency",
+              "name": "ping_slot_frequencies",
               "description": "",
-              "label": "",
-              "type": "UInt64Value",
-              "longType": "google.protobuf.UInt64Value",
-              "fullType": "google.protobuf.UInt64Value",
+              "label": "repeated",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -8800,12 +8836,12 @@
               "defaultValue": ""
             },
             {
-              "name": "inverted_polarity",
+              "name": "frequencies",
               "description": "",
-              "label": "",
-              "type": "bool",
-              "longType": "bool",
-              "fullType": "bool",
+              "label": "repeated",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -13945,6 +13981,18 @@
               "type": "bytes",
               "longType": "bytes",
               "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "end_device_version_ids",
+              "description": "End device profile identifiers.",
+              "label": "",
+              "type": "EndDeviceVersionIdentifiers",
+              "longType": "EndDeviceVersionIdentifiers",
+              "fullType": "ttn.lorawan.v3.EndDeviceVersionIdentifiers",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -28235,7 +28283,7 @@
             },
             {
               "name": "operating_channel_width",
-              "description": "Operating Channel Width (kHz).",
+              "description": "Operating Channel Width (Hz).",
               "label": "",
               "type": "uint32",
               "longType": "uint32",
@@ -31488,7 +31536,15 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "timestamp.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -31715,6 +31771,18 @@
               "defaultValue": ""
             },
             {
+              "name": "uplink_normalized",
+              "description": "",
+              "label": "",
+              "type": "ApplicationUplinkNormalized",
+              "longType": "ApplicationUplinkNormalized",
+              "fullType": "ttn.lorawan.v3.ApplicationUplinkNormalized",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "up",
+              "defaultValue": ""
+            },
+            {
               "name": "join_accept",
               "description": "",
               "label": "",
@@ -31868,7 +31936,7 @@
             },
             {
               "name": "f_port",
-              "description": "",
+              "description": "LoRaWAN FPort of the uplink message.",
               "label": "",
               "type": "uint32",
               "longType": "uint32",
@@ -31894,7 +31962,7 @@
             },
             {
               "name": "f_cnt",
-              "description": "",
+              "description": "LoRaWAN FCntUp of the uplink message.",
               "label": "",
               "type": "uint32",
               "longType": "uint32",
@@ -31941,6 +32009,30 @@
               "defaultValue": ""
             },
             {
+              "name": "normalized_payload",
+              "description": "The normalized frame payload of the uplink message.\nThis field is set by the message processor that is configured for the end device (see formatters) or application (see default_formatters).\nIf the message processor is a custom script, there is no uplink normalizer script and the decoded output is valid\nnormalized payload, this field contains the decoded payload.",
+              "label": "repeated",
+              "type": "Struct",
+              "longType": "google.protobuf.Struct",
+              "fullType": "google.protobuf.Struct",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "normalized_payload_warnings",
+              "description": "Warnings generated by the message processor while normalizing the decoded payload.",
+              "label": "repeated",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
               "name": "rx_metadata",
               "description": "A list of metadata for each antenna of each gateway that received this message.",
               "label": "repeated",
@@ -31954,7 +32046,7 @@
             },
             {
               "name": "settings",
-              "description": "Settings for the transmission.",
+              "description": "Transmission settings used by the end device.",
               "label": "",
               "type": "TxSettings",
               "longType": "TxSettings",
@@ -32010,7 +32102,7 @@
             },
             {
               "name": "confirmed",
-              "description": "",
+              "description": "Indicates whether the end device used confirmed data uplink.",
               "label": "",
               "type": "bool",
               "longType": "bool",
@@ -32022,7 +32114,7 @@
             },
             {
               "name": "consumed_airtime",
-              "description": "Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings.",
+              "description": "Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the raw payload size and the transmission settings.",
               "label": "",
               "type": "Duration",
               "longType": "google.protobuf.Duration",
@@ -32074,6 +32166,272 @@
           "name": "LocationsEntry",
           "longName": "ApplicationUplink.LocationsEntry",
           "fullName": "ttn.lorawan.v3.ApplicationUplink.LocationsEntry",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "key",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "Location",
+              "longType": "Location",
+              "fullType": "ttn.lorawan.v3.Location",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ApplicationUplinkNormalized",
+          "longName": "ApplicationUplinkNormalized",
+          "fullName": "ttn.lorawan.v3.ApplicationUplinkNormalized",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "session_key_id",
+              "description": "Join Server issued identifier for the session keys used by this uplink.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.max_len",
+                    "value": 2048
+                  }
+                ]
+              }
+            },
+            {
+              "name": "f_port",
+              "description": "LoRaWAN FPort of the uplink message.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 255
+                  },
+                  {
+                    "name": "uint32.gte",
+                    "value": 1
+                  },
+                  {
+                    "name": "uint32.not_in",
+                    "value": [
+                      224
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "name": "f_cnt",
+              "description": "LoRaWAN FCntUp of the uplink message.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "frm_payload",
+              "description": "The frame payload of the uplink message.\nThis field is always decrypted with AppSKey.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "normalized_payload",
+              "description": "The normalized frame payload of the uplink message.\nThis field is set for each item in normalized_payload in the corresponding ApplicationUplink message.",
+              "label": "",
+              "type": "Struct",
+              "longType": "google.protobuf.Struct",
+              "fullType": "google.protobuf.Struct",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "normalized_payload_warnings",
+              "description": "This field is set to normalized_payload_warnings in the corresponding ApplicationUplink message.",
+              "label": "repeated",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "rx_metadata",
+              "description": "A list of metadata for each antenna of each gateway that received this message.",
+              "label": "repeated",
+              "type": "RxMetadata",
+              "longType": "RxMetadata",
+              "fullType": "ttn.lorawan.v3.RxMetadata",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "settings",
+              "description": "Transmission settings used by the end device.",
+              "label": "",
+              "type": "TxSettings",
+              "longType": "TxSettings",
+              "fullType": "ttn.lorawan.v3.TxSettings",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "received_at",
+              "description": "Server time when the Network Server received the message.",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "timestamp.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "confirmed",
+              "description": "Indicates whether the end device used confirmed data uplink.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "consumed_airtime",
+              "description": "Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the raw payload size and the transmission settings.",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "locations",
+              "description": "End device location metadata, set by the Application Server while handling the message.",
+              "label": "repeated",
+              "type": "LocationsEntry",
+              "longType": "ApplicationUplinkNormalized.LocationsEntry",
+              "fullType": "ttn.lorawan.v3.ApplicationUplinkNormalized.LocationsEntry",
+              "ismap": true,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "version_ids",
+              "description": "End device version identifiers, set by the Application Server while handling the message.",
+              "label": "",
+              "type": "EndDeviceVersionIdentifiers",
+              "longType": "EndDeviceVersionIdentifiers",
+              "fullType": "ttn.lorawan.v3.EndDeviceVersionIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "network_ids",
+              "description": "Network identifiers, set by the Network Server that handles the message.",
+              "label": "",
+              "type": "NetworkIdentifiers",
+              "longType": "NetworkIdentifiers",
+              "fullType": "ttn.lorawan.v3.NetworkIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "LocationsEntry",
+          "longName": "ApplicationUplinkNormalized.LocationsEntry",
+          "fullName": "ttn.lorawan.v3.ApplicationUplinkNormalized.LocationsEntry",
           "description": "",
           "hasExtensions": false,
           "hasFields": true,
@@ -33641,6 +33999,70 @@
               }
             }
           ]
+        },
+        {
+          "name": "GetDeviceAdressPrefixesResponse",
+          "longName": "GetDeviceAdressPrefixesResponse",
+          "fullName": "ttn.lorawan.v3.GetDeviceAdressPrefixesResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "dev_addr_prefixes",
+              "description": "",
+              "label": "repeated",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.items.bytes.len",
+                    "value": 5
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GetNetIDResponse",
+          "longName": "GetNetIDResponse",
+          "fullName": "ttn.lorawan.v3.GetNetIDResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "net_id",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 3
+                  }
+                ]
+              }
+            }
+          ]
         }
       ],
       "services": [
@@ -33765,6 +34187,50 @@
                     {
                       "method": "GET",
                       "pattern": "/ns/default_mac_settings/{frequency_plan_id}/{lorawan_phy_version}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetNetID",
+              "description": "",
+              "requestType": "Empty",
+              "requestLongType": ".google.protobuf.Empty",
+              "requestFullType": "google.protobuf.Empty",
+              "requestStreaming": false,
+              "responseType": "GetNetIDResponse",
+              "responseLongType": "GetNetIDResponse",
+              "responseFullType": "ttn.lorawan.v3.GetNetIDResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ns/net_id"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetDeviceAddressPrefixes",
+              "description": "",
+              "requestType": "Empty",
+              "requestLongType": ".google.protobuf.Empty",
+              "requestFullType": "google.protobuf.Empty",
+              "requestStreaming": false,
+              "responseType": "GetDeviceAdressPrefixesResponse",
+              "responseLongType": "GetDeviceAdressPrefixesResponse",
+              "responseFullType": "ttn.lorawan.v3.GetDeviceAdressPrefixesResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ns/dev_addr_prefixes"
                     }
                   ]
                 }

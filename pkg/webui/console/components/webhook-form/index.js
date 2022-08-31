@@ -168,6 +168,12 @@ const validationSchema = Yup.object().shape({
     })
     .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck)
     .nullable(),
+  uplink_normalized: Yup.object()
+    .shape({
+      path: Yup.string(),
+    })
+    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck)
+    .nullable(),
   join_accept: Yup.object()
     .shape({
       path: Yup.string(),
@@ -515,6 +521,16 @@ export default class WebhookForm extends Component {
             encode={encodeMessageType}
             component={Input.Toggled}
             description={sharedMessages.eventUplinkMessageDesc}
+          />
+          <Form.Field
+            name="uplink_normalized"
+            type="toggled-input"
+            enabledMessage={sharedMessages.uplinkNormalized}
+            placeholder={pathPlaceholder}
+            decode={decodeMessageType}
+            encode={encodeMessageType}
+            component={Input.Toggled}
+            description={sharedMessages.eventUplinkNormalizedDesc}
           />
           <Form.Field
             name="join_accept"

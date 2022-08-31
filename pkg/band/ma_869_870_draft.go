@@ -19,11 +19,11 @@ import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 const (
 	// MA_869_870_DRAFT is the ID of the draft Morocco 869-870Mhz band.
 	MA_869_870_DRAFT = "MA_869_870_DRAFT"
-
-	ma869870DraftBeaconFrequency = 869525000
 )
 
 var (
+	ma869870DraftBeaconFrequencies = []uint64{869525000}
+
 	ma869870DraftDefaultChannels = []Channel{
 		{
 			Frequency:   869100000,

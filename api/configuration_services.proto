@@ -74,12 +74,15 @@ message BandDescription {
   message Beacon {
     DataRateIndex data_rate_index = 1;
     string coding_rate = 2;
-    bool inverted_polarity = 3;
+    reserved 3; // inverted_polarity
     reserved 4; // compute_frequency
+    repeated uint64 frequencies = 5;
   }
 
   Beacon beacon = 2;
-  google.protobuf.UInt64Value ping_slot_frequency = 3;
+  reserved 3; // ping_slot_frequency
+  repeated uint64 ping_slot_frequencies = 32;
+
   uint32 max_uplink_channels = 4;
 
   message Channel {
@@ -98,7 +101,7 @@ message BandDescription {
     float duty_cycle = 3;
     float max_eirp = 4;
   }
-  
+
   repeated SubBandParameters sub_bands = 8;
 
   message BandDataRate {
@@ -121,7 +124,7 @@ message BandDescription {
   google.protobuf.Duration min_retransmit_timeout = 20;
   google.protobuf.Duration max_retransmit_timeout = 21;
   repeated float tx_offset = 22;
-  DataRateIndex max_adr_data_rate_index = 23; 
+  DataRateIndex max_adr_data_rate_index = 23;
 
   bool tx_param_setup_req_support = 24;
   float default_max_eirp = 25;
@@ -131,7 +134,7 @@ message BandDescription {
   reserved 29; // parse_ch_mask
 
   message Rx2Parameters {
-    DataRateIndex data_rate_index = 1; 
+    DataRateIndex data_rate_index = 1;
     uint64 frequency = 2;
   }
 

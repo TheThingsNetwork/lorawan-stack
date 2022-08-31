@@ -83,7 +83,7 @@ func (s *HTTPClientSink) Process(req *http.Request) error {
 		return errRequest.WithCause(err).WithDetails(createRequestErrorDetails(req, res)...)
 	}
 	defer res.Body.Close()
-	defer stdio.Copy(stdio.Discard, res.Body)
+	defer stdio.Copy(stdio.Discard, res.Body) //nolint:errcheck
 	if res.StatusCode >= 200 && res.StatusCode <= 299 {
 		return nil
 	}
@@ -125,10 +125,7 @@ func NewPooledSink(ctx context.Context, c workerpool.Component, sink Sink, worke
 // Process sends the request to the workers.
 // This method returns immediately. An error is returned when the workers are too busy.
 func (s *pooledSink) Process(req *http.Request) error {
-	if err := s.pool.Publish(req.Context(), req); err != nil {
-		return err
-	}
-	return nil
+	return s.pool.Publish(req.Context(), req)
 }
 
 // Webhooks is an interface for registering incoming webhooks for downlink and creating a subscription to outgoing
@@ -147,7 +144,13 @@ type webhooks struct {
 }
 
 // NewWebhooks returns a new Webhooks.
-func NewWebhooks(ctx context.Context, server io.Server, registry WebhookRegistry, target Sink, downlinks DownlinksConfig) (Webhooks, error) {
+func NewWebhooks(
+	ctx context.Context,
+	server io.Server,
+	registry WebhookRegistry,
+	target Sink,
+	downlinks DownlinksConfig,
+) (Webhooks, error) {
 	ctx = log.NewContextWithField(ctx, "namespace", namespace)
 	w := &webhooks{
 		ctx:       ctx,
@@ -174,7 +177,9 @@ func (w *webhooks) Registry() WebhookRegistry { return w.registry }
 
 // RegisterRoutes registers the webhooks to the web server to handle downlink requests.
 func (w *webhooks) RegisterRoutes(server *ttnweb.Server) {
-	router := server.Prefix(ttnpb.HTTPAPIPrefix + "/as/applications/{application_id}/webhooks/{webhook_id}/devices/{device_id}/down").Subrouter()
+	router := server.Prefix(
+		ttnpb.HTTPAPIPrefix + "/as/applications/{application_id}/webhooks/{webhook_id}/devices/{device_id}/down",
+	).Subrouter()
 	router.Use(
 		mux.MiddlewareFunc(webmiddleware.Namespace("applicationserver/io/web")),
 		mux.MiddlewareFunc(webmiddleware.Metadata("Authorization")),
@@ -197,7 +202,12 @@ const (
 	domainHeader = "X-Tts-Domain"
 )
 
-func (w *webhooks) createDownlinkURL(ctx context.Context, webhookID *ttnpb.ApplicationWebhookIdentifiers, devID *ttnpb.EndDeviceIdentifiers, op string) string {
+func (w *webhooks) downlinkURL(
+	_ context.Context,
+	webhookID *ttnpb.ApplicationWebhookIdentifiers,
+	devID *ttnpb.EndDeviceIdentifiers,
+	op string,
+) string {
 	downlinks := w.downlinks
 	baseURL := downlinks.PublicTLSAddress
 	if baseURL == "" {
@@ -212,7 +222,7 @@ func (w *webhooks) createDownlinkURL(ctx context.Context, webhookID *ttnpb.Appli
 	)
 }
 
-func (w *webhooks) createDomain(ctx context.Context) string {
+func (w *webhooks) domain(_ context.Context) string {
 	downlinks := w.downlinks
 	baseURL := downlinks.PublicTLSAddress
 	if baseURL == "" {
@@ -245,6 +255,7 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 			"location_solved",
 			"service_data",
 			"uplink_message",
+			"uplink_normalized",
 		},
 	)
 	if err != nil {
@@ -279,12 +290,14 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 	return nil
 }
 
-func activeWebhookUplinkMessage(
+func webhookMessage(
 	msg *ttnpb.ApplicationUp, hook *ttnpb.ApplicationWebhook,
 ) *ttnpb.ApplicationWebhook_Message {
 	switch msg.Up.(type) {
 	case *ttnpb.ApplicationUp_UplinkMessage:
 		return hook.UplinkMessage
+	case *ttnpb.ApplicationUp_UplinkNormalized:
+		return hook.UplinkNormalized
 	case *ttnpb.ApplicationUp_JoinAccept:
 		return hook.JoinAccept
 	case *ttnpb.ApplicationUp_DownlinkAck:
@@ -311,6 +324,8 @@ func webhookUplinkMessageMask(msg *ttnpb.ApplicationUp) string {
 	switch msg.Up.(type) {
 	case *ttnpb.ApplicationUp_UplinkMessage:
 		return "up.uplink_message"
+	case *ttnpb.ApplicationUp_UplinkNormalized:
+		return "up.uplink_normalized"
 	case *ttnpb.ApplicationUp_JoinAccept:
 		return "up.join_accept"
 	case *ttnpb.ApplicationUp_DownlinkAck:
@@ -333,12 +348,14 @@ func webhookUplinkMessageMask(msg *ttnpb.ApplicationUp) string {
 	return ""
 }
 
+// newRequest returns an HTTP request.
+// This method returns nil, nil if the hook is not configured for the message.
 func (w *webhooks) newRequest(
 	ctx context.Context, msg *ttnpb.ApplicationUp, hook *ttnpb.ApplicationWebhook,
 ) (*http.Request, error) {
-	cfg := activeWebhookUplinkMessage(msg, hook)
+	cfg := webhookMessage(msg, hook)
 	if cfg == nil {
-		return nil, nil
+		return nil, nil //nolint:nilnil
 	}
 	baseURL, err := expandVariables(hook.BaseUrl, msg)
 	if err != nil {
@@ -393,10 +410,10 @@ func (w *webhooks) newRequest(
 	}
 	if hook.DownlinkApiKey != "" {
 		req.Header.Set(downlinkKeyHeader, hook.DownlinkApiKey)
-		req.Header.Set(downlinkPushHeader, w.createDownlinkURL(ctx, hook.Ids, msg.EndDeviceIds, "push"))
-		req.Header.Set(downlinkReplaceHeader, w.createDownlinkURL(ctx, hook.Ids, msg.EndDeviceIds, "replace"))
+		req.Header.Set(downlinkPushHeader, w.downlinkURL(ctx, hook.Ids, msg.EndDeviceIds, "push"))
+		req.Header.Set(downlinkReplaceHeader, w.downlinkURL(ctx, hook.Ids, msg.EndDeviceIds, "replace"))
 	}
-	if domain := w.createDomain(ctx); domain != "" {
+	if domain := w.domain(ctx); domain != "" {
 		req.Header.Set(domainHeader, domain)
 	}
 	req.Header.Set("Content-Type", format.ContentType)
@@ -410,7 +427,9 @@ var (
 	errValidateBody    = errors.DefineInvalidArgument("validate_body", "validate body")
 )
 
-func (w *webhooks) handleDown(op func(io.Server, context.Context, *ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error) http.Handler {
+func (w *webhooks) handleDown(
+	op func(io.Server, context.Context, *ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error,
+) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 		ctx := req.Context()
 		devID := deviceIDFromContext(ctx)

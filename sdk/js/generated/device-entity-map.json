@@ -241,6 +241,20 @@
         "as",
         "ns"
       ]
+    ],
+    "vendor_id": [
+      "as",
+      [
+        "as",
+        "ns"
+      ]
+    ],
+    "vendor_profile_id": [
+      "as",
+      [
+        "as",
+        "ns"
+      ]
     ]
   },
   "picture": [

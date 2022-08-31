@@ -151,8 +151,13 @@ func (as *ApplicationServer) decodeUplink(ctx context.Context, dev *ttnpb.EndDev
 		if err := as.formatters.DecodeUplink(ctx, dev.Ids, dev.VersionIds, uplink, formatter, parameter); err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to decode uplink")
 			events.Publish(evtDecodeFailDataUp.NewWithIdentifiersAndData(ctx, dev.Ids, err))
-		} else if len(uplink.DecodedPayloadWarnings) > 0 {
-			events.Publish(evtDecodeWarningDataUp.NewWithIdentifiersAndData(ctx, dev.Ids, uplink))
+		} else {
+			if len(uplink.DecodedPayloadWarnings) > 0 {
+				events.Publish(evtDecodeWarningDataUp.NewWithIdentifiersAndData(ctx, dev.Ids, uplink))
+			}
+			if len(uplink.NormalizedPayloadWarnings) > 0 {
+				events.Publish(evtNormalizeWarningDataUp.NewWithIdentifiersAndData(ctx, dev.Ids, uplink))
+			}
 		}
 	}
 	return nil
@@ -211,7 +216,8 @@ func (as *ApplicationServer) decodeDownlink(ctx context.Context, dev *ttnpb.EndD
 	return nil
 }
 
-func (as *ApplicationServer) locationFromDecodedPayload(uplink *ttnpb.ApplicationUplink) (res *ttnpb.Location) {
+func (*ApplicationServer) locationFromPayload(uplink *ttnpb.ApplicationUplink) (res *ttnpb.Location) {
+	// TODO: Prefer location from normalized payload (https://github.com/TheThingsNetwork/lorawan-stack/issues/5429)
 	m, err := gogoproto.Map(uplink.DecodedPayload)
 	if err != nil {
 		return nil

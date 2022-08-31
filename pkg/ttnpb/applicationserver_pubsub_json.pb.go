@@ -265,6 +265,12 @@ func (x *ApplicationPubSub) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		// NOTE: ApplicationPubSub_Message does not seem to implement MarshalProtoJSON.
 		gogo.MarshalMessage(s, x.UplinkMessage)
 	}
+	if x.UplinkNormalized != nil || s.HasField("uplink_normalized") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("uplink_normalized")
+		// NOTE: ApplicationPubSub_Message does not seem to implement MarshalProtoJSON.
+		gogo.MarshalMessage(s, x.UplinkNormalized)
+	}
 	if x.JoinAccept != nil || s.HasField("join_accept") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("join_accept")
@@ -437,6 +443,16 @@ func (x *ApplicationPubSub) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			var v ApplicationPubSub_Message
 			gogo.UnmarshalMessage(s, &v)
 			x.UplinkMessage = &v
+		case "uplink_normalized", "uplinkNormalized":
+			s.AddField("uplink_normalized")
+			if s.ReadNil() {
+				x.UplinkNormalized = nil
+				return
+			}
+			// NOTE: ApplicationPubSub_Message does not seem to implement UnmarshalProtoJSON.
+			var v ApplicationPubSub_Message
+			gogo.UnmarshalMessage(s, &v)
+			x.UplinkNormalized = &v
 		case "join_accept", "joinAccept":
 			s.AddField("join_accept")
 			if s.ReadNil() {

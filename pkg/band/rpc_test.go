@@ -402,11 +402,11 @@ func TestBand_convertToBandDescription(t *testing.T) {
 				ID: "All",
 
 				Beacon: Beacon{
-					DataRateIndex:    ttnpb.DataRateIndex_DATA_RATE_0,
-					CodingRate:       "default",
-					InvertedPolarity: true,
+					DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					CodingRate:    "default",
+					Frequencies:   []uint64{0x12, 0x23},
 				},
-				PingSlotFrequency: uint64Ptr(1),
+				PingSlotFrequencies: []uint64{0x34, 0x45},
 
 				MaxUplinkChannels: 1,
 				UplinkChannels: []Channel{
@@ -473,11 +473,11 @@ func TestBand_convertToBandDescription(t *testing.T) {
 				Id: "All",
 
 				Beacon: &ttnpb.BandDescription_Beacon{
-					DataRateIndex:    ttnpb.DataRateIndex_DATA_RATE_0,
-					CodingRate:       "default",
-					InvertedPolarity: true,
+					DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					CodingRate:    "default",
+					Frequencies:   []uint64{0x12, 0x23},
 				},
-				PingSlotFrequency: &types.UInt64Value{Value: 1},
+				PingSlotFrequencies: []uint64{0x34, 0x45},
 
 				MaxUplinkChannels: 1,
 				UplinkChannels: []*ttnpb.BandDescription_Channel{
@@ -547,11 +547,9 @@ func TestBand_convertToBandDescription(t *testing.T) {
 				ID: "Nullable band",
 
 				Beacon: Beacon{
-					DataRateIndex:    ttnpb.DataRateIndex_DATA_RATE_0,
-					CodingRate:       "default",
-					InvertedPolarity: true,
+					DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					CodingRate:    "default",
 				},
-				PingSlotFrequency: nil,
 
 				MaxUplinkChannels: 1,
 				UplinkChannels: []Channel{
@@ -615,11 +613,11 @@ func TestBand_convertToBandDescription(t *testing.T) {
 				Id: "Nullable band",
 
 				Beacon: &ttnpb.BandDescription_Beacon{
-					DataRateIndex:    ttnpb.DataRateIndex_DATA_RATE_0,
-					CodingRate:       "default",
-					InvertedPolarity: true,
+					DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					CodingRate:    "default",
+					Frequencies:   nil,
 				},
-				PingSlotFrequency: nil,
+				PingSlotFrequencies: nil,
 
 				MaxUplinkChannels: 1,
 				UplinkChannels: []*ttnpb.BandDescription_Channel{

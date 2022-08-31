@@ -163,7 +163,7 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 					MaxTimeExponentAck: true,
 				})),
 			},
-			Error: ErrRequestNotFound,
+			Error: ErrRequestNotFound.WithAttributes("cid", ttnpb.MACCommandIdentifier_CID_REJOIN_PARAM_SETUP),
 		},
 		{
 			Name: "ack",

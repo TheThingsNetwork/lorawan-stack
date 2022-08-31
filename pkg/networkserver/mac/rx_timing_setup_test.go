@@ -122,7 +122,7 @@ func TestHandleRxTimingSetupAns(t *testing.T) {
 			Events: events.Builders{
 				EvtReceiveRxTimingSetupAnswer,
 			},
-			Error: ErrRequestNotFound,
+			Error: ErrRequestNotFound.WithAttributes("cid", ttnpb.MACCommandIdentifier_CID_RX_TIMING_SETUP),
 		},
 		{
 			Name: "42",

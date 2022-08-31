@@ -74,6 +74,8 @@ var ApplicationPubSubFieldPathsNested = []string{
 	"updated_at",
 	"uplink_message",
 	"uplink_message.topic",
+	"uplink_normalized",
+	"uplink_normalized.topic",
 }
 
 var ApplicationPubSubFieldPathsTopLevel = []string{
@@ -95,6 +97,7 @@ var ApplicationPubSubFieldPathsTopLevel = []string{
 	"service_data",
 	"updated_at",
 	"uplink_message",
+	"uplink_normalized",
 }
 var ApplicationPubSubsFieldPathsNested = []string{
 	"pubsubs",
@@ -196,6 +199,8 @@ var SetApplicationPubSubRequestFieldPathsNested = []string{
 	"pubsub.updated_at",
 	"pubsub.uplink_message",
 	"pubsub.uplink_message.topic",
+	"pubsub.uplink_normalized",
+	"pubsub.uplink_normalized.topic",
 }
 
 var SetApplicationPubSubRequestFieldPathsTopLevel = []string{

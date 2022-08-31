@@ -54,3 +54,43 @@ func (dst *GetDefaultMACSettingsRequest) SetFields(src *GetDefaultMACSettingsReq
 	}
 	return nil
 }
+
+func (dst *GetNetIDResponse) SetFields(src *GetNetIDResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "net_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'net_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NetId = src.NetId
+			} else {
+				dst.NetId = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *GetDeviceAdressPrefixesResponse) SetFields(src *GetDeviceAdressPrefixesResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "dev_addr_prefixes":
+			if len(subs) > 0 {
+				return fmt.Errorf("'dev_addr_prefixes' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DevAddrPrefixes = src.DevAddrPrefixes
+			} else {
+				dst.DevAddrPrefixes = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}

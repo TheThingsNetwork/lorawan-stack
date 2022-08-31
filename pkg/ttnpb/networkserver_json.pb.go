@@ -102,3 +102,91 @@ func (x *GetDefaultMACSettingsRequest) UnmarshalProtoJSON(s *jsonplugin.Unmarsha
 func (x *GetDefaultMACSettingsRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
+
+// MarshalProtoJSON marshals the GetNetIDResponse message to JSON.
+func (x *GetNetIDResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.NetId) > 0 || s.HasField("net_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("net_id")
+		types.MarshalHEXBytes(s.WithField("net_id"), x.NetId)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the GetNetIDResponse to JSON.
+func (x *GetNetIDResponse) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the GetNetIDResponse message from JSON.
+func (x *GetNetIDResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "net_id", "netId":
+			s.AddField("net_id")
+			x.NetId = types.Unmarshal3Bytes(s.WithField("net_id", false))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the GetNetIDResponse from JSON.
+func (x *GetNetIDResponse) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the GetDeviceAdressPrefixesResponse message to JSON.
+func (x *GetDeviceAdressPrefixesResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.DevAddrPrefixes) > 0 || s.HasField("dev_addr_prefixes") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("dev_addr_prefixes")
+		types.MarshalDevAddrPrefixSlice(s.WithField("dev_addr_prefixes"), x.DevAddrPrefixes)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the GetDeviceAdressPrefixesResponse to JSON.
+func (x *GetDeviceAdressPrefixesResponse) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the GetDeviceAdressPrefixesResponse message from JSON.
+func (x *GetDeviceAdressPrefixesResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "dev_addr_prefixes", "devAddrPrefixes":
+			s.AddField("dev_addr_prefixes")
+			if s.ReadNil() {
+				x.DevAddrPrefixes = nil
+				return
+			}
+			x.DevAddrPrefixes = types.UnmarshalDevAddrPrefixSlice(s.WithField("dev_addr_prefixes", false))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the GetDeviceAdressPrefixesResponse from JSON.
+func (x *GetDeviceAdressPrefixesResponse) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}

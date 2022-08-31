@@ -19,11 +19,11 @@ import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 const (
 	// CN_779_787 is the ID of the Chinese 779-787Mhz band
 	CN_779_787 = "CN_779_787"
-
-	cn779787BeaconFrequency = 785000000
 )
 
 var (
+	cn779787BeaconFrequencies = []uint64{785000000}
+
 	cn779787DefaultChannels = []Channel{
 		{
 			Frequency:   779500000,

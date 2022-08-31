@@ -48,6 +48,7 @@ type Connection struct {
 	Replace *pubsub.Topic
 
 	UplinkMessage            *pubsub.Subscription
+	UplinkNormalized         *pubsub.Subscription
 	JoinAccept               *pubsub.Subscription
 	DownlinkAck              *pubsub.Subscription
 	DownlinkNack             *pubsub.Subscription
@@ -80,6 +81,7 @@ func (c *Connection) Shutdown(ctx context.Context) (err error) {
 		c.Replace,
 
 		c.UplinkMessage,
+		c.UplinkNormalized,
 		c.JoinAccept,
 		c.DownlinkAck,
 		c.DownlinkNack,
@@ -131,6 +133,10 @@ func (i *Impl) OpenConnection(ctx context.Context, target provider.Target, enabl
 		{
 			topic:        &pc.Topics.UplinkMessage,
 			subscription: &conn.UplinkMessage,
+		},
+		{
+			topic:        &pc.Topics.UplinkNormalized,
+			subscription: &conn.UplinkNormalized,
 		},
 		{
 			topic:        &pc.Topics.JoinAccept,

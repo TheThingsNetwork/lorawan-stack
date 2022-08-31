@@ -19,11 +19,11 @@ import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 const (
 	// KR_920_923 is the ID of the Korean frequency plan
 	KR_920_923 = "KR_920_923"
-
-	kr920923BeaconFrequency = 923100000
 )
 
 var (
+	kr920923BeaconFrequencies = []uint64{923100000}
+
 	kr920923DefaultChannels = []Channel{
 		{
 			Frequency:   922100000,

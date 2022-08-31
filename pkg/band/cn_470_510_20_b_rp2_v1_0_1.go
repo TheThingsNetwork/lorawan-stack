@@ -91,9 +91,6 @@ var CN_470_510_20_B_RP2_v1_0_1 = Band{
 	Beacon: Beacon{
 		DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
 		CodingRate:    "4/5",
-		// The frequency of the beacon depends on the Common Join Channel Index,
-		// which is not available at band level.
-		ComputeFrequency: nil,
 	},
 
 	LoRaCodingRate: "4/5",
