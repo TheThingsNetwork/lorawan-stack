@@ -87,10 +87,11 @@ var CN_470_510_TS1_v1_0_1 = Band{
 	DefaultRx2Parameters: Rx2Parameters{ttnpb.DataRateIndex_DATA_RATE_0, 505300000},
 
 	Beacon: Beacon{
-		DataRateIndex:    ttnpb.DataRateIndex_DATA_RATE_2,
-		CodingRate:       "4/5",
-		ComputeFrequency: makeBeaconFrequencyFunc(cn470510BeaconFrequencies),
+		DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+		CodingRate:    "4/5",
+		Frequencies:   cn470510BeaconFrequencies,
 	},
+	PingSlotFrequencies: cn470510BeaconFrequencies,
 
 	LoRaCodingRate: "4/5",
 

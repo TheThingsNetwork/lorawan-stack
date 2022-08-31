@@ -2330,7 +2330,7 @@ PeerInfo
 | ----- | ---- | ----- | ----------- |
 | `id` | [`string`](#string) |  |  |
 | `beacon` | [`BandDescription.Beacon`](#ttn.lorawan.v3.BandDescription.Beacon) |  |  |
-| `ping_slot_frequency` | [`google.protobuf.UInt64Value`](#google.protobuf.UInt64Value) |  |  |
+| `ping_slot_frequencies` | [`uint64`](#uint64) | repeated |  |
 | `max_uplink_channels` | [`uint32`](#uint32) |  |  |
 | `uplink_channels` | [`BandDescription.Channel`](#ttn.lorawan.v3.BandDescription.Channel) | repeated |  |
 | `max_downlink_channels` | [`uint32`](#uint32) |  |  |
@@ -2368,7 +2368,7 @@ PeerInfo
 | ----- | ---- | ----- | ----------- |
 | `data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  |  |
 | `coding_rate` | [`string`](#string) |  |  |
-| `inverted_polarity` | [`bool`](#bool) |  |  |
+| `frequencies` | [`uint64`](#uint64) | repeated |  |
 
 ### <a name="ttn.lorawan.v3.BandDescription.Channel">Message `BandDescription.Channel`</a>
 

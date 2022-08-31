@@ -1765,7 +1765,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 					return nil
 				}
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
-					if phy.PingSlotFrequency == nil {
+					if len(phy.PingSlotFrequencies) == 0 {
 						return newInvalidFieldValueError("mac_settings.ping_slot_frequency.value")
 					}
 					return nil

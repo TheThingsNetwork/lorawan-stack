@@ -206,14 +206,14 @@ func (dst *BandDescription) SetFields(src *BandDescription, paths ...string) err
 					dst.Beacon = nil
 				}
 			}
-		case "ping_slot_frequency":
+		case "ping_slot_frequencies":
 			if len(subs) > 0 {
-				return fmt.Errorf("'ping_slot_frequency' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'ping_slot_frequencies' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.PingSlotFrequency = src.PingSlotFrequency
+				dst.PingSlotFrequencies = src.PingSlotFrequencies
 			} else {
-				dst.PingSlotFrequency = nil
+				dst.PingSlotFrequencies = nil
 			}
 		case "max_uplink_channels":
 			if len(subs) > 0 {
@@ -555,15 +555,14 @@ func (dst *BandDescription_Beacon) SetFields(src *BandDescription_Beacon, paths 
 				var zero string
 				dst.CodingRate = zero
 			}
-		case "inverted_polarity":
+		case "frequencies":
 			if len(subs) > 0 {
-				return fmt.Errorf("'inverted_polarity' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'frequencies' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.InvertedPolarity = src.InvertedPolarity
+				dst.Frequencies = src.Frequencies
 			} else {
-				var zero bool
-				dst.InvertedPolarity = zero
+				dst.Frequencies = nil
 			}
 
 		default:

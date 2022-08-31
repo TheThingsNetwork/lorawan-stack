@@ -16,6 +16,8 @@ For details about compatibility between different releases, see the **Commitment
 - Support for loading end device template from Device Repository when importing devices using a CSV file.
 - Experimental support for normalized payload.
 - Decoded payloads are now visible for downlinks in the Console.
+- Support for dynamic ping slot frequencies, as used by the US915 and AU915 bands.
+- Support for LoRa Basics Station beaconing.
 
 ### Changed
 

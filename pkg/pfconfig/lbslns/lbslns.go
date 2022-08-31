@@ -27,16 +27,14 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/pfconfig/shared"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 const (
 	configHardwareSpecPrefix = "sx1301"
 )
 
-var (
-	errFrequencyPlan = errors.DefineInvalidArgument("frequency_plan", "invalid frequency plan `{name}`")
-	errInvalidKey    = errors.DefineInvalidArgument("invalid_key", "key `{key}` invalid")
-)
+var errFrequencyPlan = errors.DefineInvalidArgument("frequency_plan", "invalid frequency plan `{name}`")
 
 type kv struct {
 	key   string
@@ -77,7 +75,7 @@ func (m orderedMap) MarshalJSON() ([]byte, error) {
 // DataRates encodes the available datarates of the channel plan for the Station in the format below:
 // [0] -> SF (Spreading Factor; Range: 7...12 for LoRa, 0 for FSK)
 // [1] -> BW (Bandwidth; 125/250/500 for LoRa, ignored for FSK)
-// [2] -> DNONLY (Downlink Only; 1 = true, 0 = false)
+// [2] -> DNONLY (Downlink Only; 1 = true, 0 = false).
 type DataRates [16][3]int
 
 // LBSRFConfig contains the configuration for one of the radios only fields used for LoRa Basics Station gateways.
@@ -91,7 +89,8 @@ type LBSRFConfig struct {
 	AntennaGain int    `json:"antenna_gain,omitempty"`
 }
 
-// LBSSX1301Config contains the configuration for the SX1301 concentrator for the LoRa Basics Station `router_config` message.
+// LBSSX1301Config contains the configuration for the SX1301 concentrator for
+// the LoRa Basics Station `router_config` message.
 // This structure incorporates modifications for the `v1.5` and `v2` concentrator reference.
 // https://doc.sm.tc/station/gw_v1.5.html
 // https://doc.sm.tc/station/gw_v2.html
@@ -126,7 +125,7 @@ func (c LBSSX1301Config) MarshalJSON() ([]byte, error) {
 }
 
 // fromSX1301Conf updates fields from shared.SX1301Config.
-func (c *LBSSX1301Config) fromSX1301Conf(sx1301Conf shared.SX1301Config, antennaGain int) error {
+func (c *LBSSX1301Config) fromSX1301Conf(sx1301Conf shared.SX1301Config, antennaGain int) {
 	c.LoRaStandardChannel = sx1301Conf.LoRaStandardChannel
 	c.FSKChannel = sx1301Conf.FSKChannel
 	c.LBTConfig = sx1301Conf.LBTConfig
@@ -139,10 +138,7 @@ func (c *LBSSX1301Config) fromSX1301Conf(sx1301Conf shared.SX1301Config, antenna
 		})
 	}
 
-	for _, channel := range sx1301Conf.Channels {
-		c.Channels = append(c.Channels, channel)
-	}
-	return nil
+	c.Channels = append(c.Channels, sx1301Conf.Channels...)
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -172,22 +168,20 @@ func (c *LBSSX1301Config) UnmarshalJSON(msg []byte) error {
 				return err
 			}
 			var index int
-			if _, err := fmt.Sscanf(key, "chan_multiSF_%d", &index); err == nil {
-				chanMap[index] = channel
-			} else {
+			if _, err := fmt.Sscanf(key, "chan_multiSF_%d", &index); err != nil {
 				return err
 			}
+			chanMap[index] = channel
 		case strings.HasPrefix(key, "radio_"):
 			var radio LBSRFConfig
 			if err := json.Unmarshal(value, &radio); err != nil {
 				return err
 			}
 			var index int
-			if _, err := fmt.Sscanf(key, "radio_%d", &index); err == nil {
-				radioMap[index] = radio
-			} else {
+			if _, err := fmt.Sscanf(key, "radio_%d", &index); err != nil {
 				return err
 			}
+			radioMap[index] = radio
 		}
 	}
 
@@ -199,6 +193,23 @@ func (c *LBSSX1301Config) UnmarshalJSON(msg []byte) error {
 		c.Channels[key] = value
 	}
 	return nil
+}
+
+// BeaconingConfig contains class B beacon configuration.
+type BeaconingConfig struct {
+	DR     ttnpb.DataRateIndex `json:"DR"`
+	Layout [3]int              `json:"layout"`
+	Freqs  []uint64            `json:"freqs"`
+}
+
+// beaconLayouts contains the beacon layouts depending on the beacon spreading factor.
+// This format is in conformance with L2 1.0.4.
+var beaconLayouts = map[uint32][3]int{
+	8:  {1, 7, 19},
+	9:  {2, 8, 17},
+	10: {3, 9, 19},
+	11: {4, 10, 21},
+	12: {5, 11, 23},
 }
 
 // RouterConfig contains the router configuration.
@@ -220,6 +231,8 @@ type RouterConfig struct {
 	NoDwellTime bool `json:"nodwell,omitempty"`
 
 	MuxTime float64 `json:"MuxTime"`
+
+	Beacon *BeaconingConfig `json:"bcning"`
 }
 
 // MarshalJSON implements json.Marshaler.
@@ -234,9 +247,21 @@ func (conf RouterConfig) MarshalJSON() ([]byte, error) {
 	})
 }
 
+// RouterFeatures contains the features of the LBS router.
+type RouterFeatures interface {
+	IsProduction() bool
+}
+
 // GetRouterConfig returns the routerconfig message to be sent to the gateway.
-// Currently as per the basic station docs, all frequency plans have to be from the same region (band) https://doc.sm.tc/station/tcproto.html#router-config-message.
-func GetRouterConfig(bandID string, fps map[string]*frequencyplans.FrequencyPlan, isProd bool, dlTime time.Time, antennaGain int) (RouterConfig, error) {
+// Currently as per the LBS docs, all frequency plans have to be from the same region (band).
+// https://doc.sm.tc/station/tcproto.html#router-config-message.
+func GetRouterConfig(
+	bandID string,
+	fps map[string]*frequencyplans.FrequencyPlan,
+	features RouterFeatures,
+	dlTime time.Time,
+	antennaGain int,
+) (RouterConfig, error) {
 	for _, fp := range fps {
 		if err := fp.Validate(); err != nil {
 			return RouterConfig{}, errFrequencyPlan.New()
@@ -257,6 +282,9 @@ func GetRouterConfig(bandID string, fps map[string]*frequencyplans.FrequencyPlan
 	conf.Region = fmt.Sprintf("%s%s", s[0], s[1])
 
 	min, max, err := getMinMaxFrequencies(fps)
+	if err != nil {
+		return RouterConfig{}, err
+	}
 	conf.FrequencyRange = []int{
 		int(min),
 		int(max),
@@ -270,9 +298,10 @@ func GetRouterConfig(bandID string, fps map[string]*frequencyplans.FrequencyPlan
 	}
 	conf.DataRates = drs
 
-	conf.NoCCA = !isProd
-	conf.NoDutyCycle = !isProd
-	conf.NoDwellTime = !isProd
+	production := features.IsProduction()
+	conf.NoCCA = !production
+	conf.NoDutyCycle = !production
+	conf.NoDwellTime = !production
 
 	for _, fp := range fps {
 		if len(fp.Radios) == 0 {
@@ -283,15 +312,28 @@ func GetRouterConfig(bandID string, fps map[string]*frequencyplans.FrequencyPlan
 			return RouterConfig{}, err
 		}
 		var lbsSX1301Config LBSSX1301Config
-		err = lbsSX1301Config.fromSX1301Conf(*sx1301Conf, antennaGain)
-		if err != nil {
-			return RouterConfig{}, err
-		}
+		lbsSX1301Config.fromSX1301Conf(*sx1301Conf, antennaGain)
 		conf.SX1301Config = append(conf.SX1301Config, lbsSX1301Config)
 	}
 
 	// Add the MuxTime for RTT measurement.
 	conf.MuxTime = float64(dlTime.Unix()) + float64(dlTime.Nanosecond())/(1e9)
+
+	if len(phy.Beacon.Frequencies) > 0 {
+		dr, ok := phy.DataRates[phy.Beacon.DataRateIndex]
+		if !ok {
+			panic("unreachable")
+		}
+		sf := dr.Rate.GetLora().GetSpreadingFactor()
+		if sf == 0 {
+			panic("unreachable")
+		}
+		conf.Beacon = &BeaconingConfig{
+			DR:     phy.Beacon.DataRateIndex,
+			Layout: beaconLayouts[sf],
+			Freqs:  phy.Beacon.Frequencies,
+		}
+	}
 
 	return conf, nil
 }
@@ -323,8 +365,7 @@ func getDataRatesFromBandID(id string) (DataRates, error) {
 }
 
 // getMinMaxFrequencies extract the minimum and maximum frequencies between all the bands.
-func getMinMaxFrequencies(fps map[string]*frequencyplans.FrequencyPlan) (uint64, uint64, error) {
-	var min, max uint64
+func getMinMaxFrequencies(fps map[string]*frequencyplans.FrequencyPlan) (min uint64, max uint64, err error) {
 	min = math.MaxUint64
 	for _, fp := range fps {
 		if len(fp.Radios) == 0 {

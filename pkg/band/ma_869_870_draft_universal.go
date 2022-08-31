@@ -111,9 +111,9 @@ var MA_869_870_Draft_Universal = Band{
 	DefaultRx2Parameters: Rx2Parameters{ttnpb.DataRateIndex_DATA_RATE_0, 869525000},
 
 	Beacon: Beacon{
-		DataRateIndex:    ttnpb.DataRateIndex_DATA_RATE_3,
-		CodingRate:       "4/5",
-		ComputeFrequency: func(_ float64) uint64 { return ma869870DraftBeaconFrequency },
+		DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
+		CodingRate:    "4/5",
+		Frequencies:   ma869870DraftBeaconFrequencies,
 	},
-	PingSlotFrequency: uint64Ptr(ma869870DraftBeaconFrequency),
+	PingSlotFrequencies: ma869870DraftBeaconFrequencies,
 }

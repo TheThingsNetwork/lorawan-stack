@@ -113,10 +113,11 @@ var US_902_928_RP1_V1_0_3_Rev_A = Band{
 	DefaultRx2Parameters: Rx2Parameters{ttnpb.DataRateIndex_DATA_RATE_8, 923300000},
 
 	Beacon: Beacon{
-		DataRateIndex:    ttnpb.DataRateIndex_DATA_RATE_8,
-		CodingRate:       "4/5",
-		ComputeFrequency: makeBeaconFrequencyFunc(usAuBeaconFrequencies),
+		DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_8,
+		CodingRate:    "4/5",
+		Frequencies:   usAuBeaconFrequencies,
 	},
+	PingSlotFrequencies: usAuBeaconFrequencies,
 
 	BootDwellTime: DwellTime{
 		Uplinks:   boolPtr(true),
