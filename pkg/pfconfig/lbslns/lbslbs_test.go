@@ -28,10 +28,10 @@ import (
 )
 
 type TestFeatures struct {
-	production bool
+	Production bool
 }
 
-func (f TestFeatures) Production() bool { return f.production }
+func (f TestFeatures) IsProduction() bool { return f.Production }
 
 func TestGetRouterConfig(t *testing.T) {
 	t.Parallel()
@@ -262,7 +262,7 @@ func TestGetRouterConfig(t *testing.T) {
 				},
 			},
 			Features: TestFeatures{
-				production: true,
+				Production: true,
 			},
 		},
 	} {

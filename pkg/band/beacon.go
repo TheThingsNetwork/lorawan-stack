@@ -29,7 +29,7 @@ func ComputePeriodicFrequency(t time.Duration, p time.Duration, offset uint32, f
 	case 1:
 		return frequencies[0]
 	default:
-		return frequencies[int(time.Duration(offset)+t/p)%n]
+		return frequencies[(int(offset)+int(t/p))%n]
 	}
 }
 

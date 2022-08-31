@@ -51,9 +51,9 @@ func (v Version) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// Production checks the features field for "prod" and returns true if found.
+// IsProduction checks the features field for "prod" and returns true if found.
 // This is then used to set debug options in the router config.
-func (v Version) Production() bool {
+func (v Version) IsProduction() bool {
 	return strings.Contains(v.Features, "prod")
 }
 

@@ -75,7 +75,7 @@ func TestIsProduction(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			a.So(tc.Message.Production(), should.Equal, tc.ExpectedResponse)
+			a.So(tc.Message.IsProduction(), should.Equal, tc.ExpectedResponse)
 		})
 	}
 }

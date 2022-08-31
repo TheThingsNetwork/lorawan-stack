@@ -249,7 +249,7 @@ func (conf RouterConfig) MarshalJSON() ([]byte, error) {
 
 // RouterFeatures contains the features of the LBS router.
 type RouterFeatures interface {
-	Production() bool
+	IsProduction() bool
 }
 
 // GetRouterConfig returns the routerconfig message to be sent to the gateway.
@@ -298,7 +298,7 @@ func GetRouterConfig(
 	}
 	conf.DataRates = drs
 
-	production := features.Production()
+	production := features.IsProduction()
 	conf.NoCCA = !production
 	conf.NoDutyCycle = !production
 	conf.NoDwellTime = !production
