@@ -376,7 +376,8 @@ func MakeDefaultUS915FSB2MACState(class ttnpb.Class, macVersion ttnpb.MACVersion
 	}
 }
 
-func MakeUplinkSettings(dr *ttnpb.DataRate, drIdx ttnpb.DataRateIndex, freq uint64) *ttnpb.TxSettings {
+// MakeUplinkSettings builds the ttnpb.TxSettings for an uplink.
+func MakeUplinkSettings(dr *ttnpb.DataRate, _ ttnpb.DataRateIndex, freq uint64) *ttnpb.TxSettings {
 	return &ttnpb.TxSettings{
 		DataRate:  ttnpb.Clone(dr),
 		EnableCrc: true,

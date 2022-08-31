@@ -139,6 +139,7 @@ func (p *TxPacket) UnmarshalJSON(data []byte) error {
 	switch mod := p.DatR.DataRate.GetModulation().(type) {
 	case *ttnpb.DataRate_Lora:
 		mod.Lora.CodingRate = p.CodR
+	default:
 	}
 	return nil
 }

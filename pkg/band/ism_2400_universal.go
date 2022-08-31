@@ -45,6 +45,7 @@ var ISM_2400_Universal = Band{
 		ttnpb.DataRateIndex_DATA_RATE_6: makeLoRaDataRate(6, 812000, Cr4_8LI, makeConstMaxMACPayloadSizeFunc(250)),
 		ttnpb.DataRateIndex_DATA_RATE_7: makeLoRaDataRate(5, 812000, Cr4_8LI, makeConstMaxMACPayloadSizeFunc(250)),
 	},
+	StrictCodingRate: true,
 
 	ReceiveDelay1:        defaultReceiveDelay1,
 	ReceiveDelay2:        defaultReceiveDelay2,

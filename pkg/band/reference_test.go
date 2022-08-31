@@ -249,11 +249,11 @@ func testBand(t *testing.T, band serializableBand, version ttnpb.PHYVersion) {
 func TestBandDefinitions(t *testing.T) {
 	t.Parallel()
 	for name, versions := range band.All {
-		for version, band := range versions {
-			version, band := version, band
+		for version, b := range versions {
+			version, b := version, b
 			t.Run(fmt.Sprintf("%v/%v", name, version), func(t *testing.T) {
 				t.Parallel()
-				testBand(t, makeBand(band), version)
+				testBand(t, makeBand(b), version)
 			})
 		}
 	}
