@@ -98,7 +98,7 @@ service NsGs {
 }
 
 message BatchGetGatewayConnectionStatsRequest {
-  repeated GatewayIdentifiers gateway_ids = 1 [(validate.rules).repeated.min_items = 1, (validate.rules).repeated.max_items = 100];
+  repeated GatewayIdentifiers gateway_ids = 1 [(validate.rules).repeated = { min_items: 1, max_items: 100 }];
   // The names of the gateway stats fields that should be returned.
   // This mask will be applied on each entry returned.
   google.protobuf.FieldMask field_mask = 2;

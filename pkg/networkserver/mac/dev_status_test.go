@@ -224,7 +224,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 					Margin:  4,
 				})),
 			},
-			Error: ErrRequestNotFound,
+			Error: ErrRequestNotFound.WithAttributes("cid", ttnpb.MACCommandIdentifier_CID_DEV_STATUS),
 		},
 		{
 			Name: "battery 42%/margin 4",

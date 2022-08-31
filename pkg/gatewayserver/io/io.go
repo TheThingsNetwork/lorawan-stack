@@ -22,6 +22,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
@@ -241,19 +242,32 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 	}
 
 	receivedAt := *ttnpb.StdTime(up.ReceivedAt)
+	gpsTime := func(mds []*ttnpb.RxMetadata) *types.Timestamp {
+		for _, md := range mds {
+			if gpsTime := md.GpsTime; gpsTime != nil {
+				return gpsTime
+			}
+		}
+		return nil
+	}(up.RxMetadata)
 
 	var ct scheduling.ConcentratorTime
 	switch {
 	case frontendSync != nil:
-		ct = c.scheduler.SyncWithGatewayConcentrator(frontendSync.Timestamp, frontendSync.ServerTime, frontendSync.GatewayTime, frontendSync.ConcentratorTime)
+		ct = c.scheduler.SyncWithGatewayConcentrator(
+			frontendSync.Timestamp,
+			frontendSync.ServerTime,
+			frontendSync.GatewayTime,
+			frontendSync.ConcentratorTime,
+		)
 		log.FromContext(c.ctx).WithFields(log.Fields(
 			"timestamp", frontendSync.Timestamp,
 			"concentrator_time", frontendSync.ConcentratorTime,
 			"server_time", frontendSync.ServerTime,
 			"gateway_time", frontendSync.GatewayTime,
 		)).Debug("Gateway clocks have been synchronized by the frontend")
-	case up.Settings.Time != nil:
-		gatewayTime := *ttnpb.StdTime(up.Settings.Time)
+	case gpsTime != nil:
+		gatewayTime := *ttnpb.StdTime(gpsTime)
 		ct = c.scheduler.SyncWithGatewayAbsolute(up.Settings.Timestamp, receivedAt, gatewayTime)
 		log.FromContext(c.ctx).WithFields(log.Fields(
 			"timestamp", up.Settings.Timestamp,
@@ -261,7 +275,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 			"server_time", receivedAt,
 			"gateway_time", gatewayTime,
 		)).Debug("Synchronized server and gateway absolute time")
-	case up.Settings.Time == nil:
+	case gpsTime == nil:
 		ct = c.scheduler.Sync(up.Settings.Timestamp, receivedAt)
 		log.FromContext(c.ctx).WithFields(log.Fields(
 			"timestamp", up.Settings.Timestamp,
@@ -284,10 +298,16 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 			md.DownlinkPathConstraint = ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NEVER
 			continue
 		}
-		buf, err := UplinkToken(&ttnpb.GatewayAntennaIdentifiers{
-			GatewayIds:   c.gateway.GetIds(),
-			AntennaIndex: md.AntennaIndex,
-		}, md.Timestamp, ct, receivedAt, ttnpb.StdTime(up.Settings.Time))
+		buf, err := UplinkToken(
+			&ttnpb.GatewayAntennaIdentifiers{
+				GatewayIds:   c.gateway.GetIds(),
+				AntennaIndex: md.AntennaIndex,
+			},
+			md.Timestamp,
+			ct,
+			receivedAt,
+			ttnpb.StdTime(gpsTime),
+		)
 		if err != nil {
 			return err
 		}

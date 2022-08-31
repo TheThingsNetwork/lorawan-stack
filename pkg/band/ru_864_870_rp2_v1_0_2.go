@@ -95,9 +95,9 @@ var RU_864_870_RP2_V1_0_2 = Band{
 	DefaultRx2Parameters: Rx2Parameters{ttnpb.DataRateIndex_DATA_RATE_0, 869100000},
 
 	Beacon: Beacon{
-		DataRateIndex:    ttnpb.DataRateIndex_DATA_RATE_3,
-		CodingRate:       "4/5",
-		ComputeFrequency: func(_ float64) uint64 { return 869100000 },
+		DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
+		CodingRate:    "4/5",
+		Frequencies:   ru864870BeaconFrequencies,
 	},
-	PingSlotFrequency: uint64Ptr(868900000),
+	PingSlotFrequencies: ru864870PingSlotFrequencies,
 }

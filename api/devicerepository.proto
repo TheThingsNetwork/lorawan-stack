@@ -340,14 +340,26 @@ message ListEndDeviceModelsResponse {
 message EncodedMessagePayload {
   uint32 f_port = 1 [(validate.rules).uint32.lte = 255];
   bytes frm_payload = 2;
-  repeated string warnings = 3 [(validate.rules).repeated.max_items = 10, (validate.rules).repeated.items.string.max_len = 100];
-  repeated string errors = 4 [(validate.rules).repeated.max_items = 10, (validate.rules).repeated.items.string.max_len = 100];
+  repeated string warnings = 3 [(validate.rules).repeated = {
+    max_items: 10,
+    items: { string: { max_len: 100 } }
+  }];
+  repeated string errors = 4 [(validate.rules).repeated = {
+    max_items: 10,
+    items: { string: { max_len: 100 } }
+  }];
 }
 
 message DecodedMessagePayload {
   google.protobuf.Struct data = 1;
-  repeated string warnings = 2 [(validate.rules).repeated.max_items = 10, (validate.rules).repeated.items.string.max_len = 100];
-  repeated string errors = 3 [(validate.rules).repeated.max_items = 10, (validate.rules).repeated.items.string.max_len = 100];
+  repeated string warnings = 2 [(validate.rules).repeated = {
+    max_items: 10,
+    items: { string: { max_len: 100 } }
+  }];
+  repeated string errors = 3 [(validate.rules).repeated = {
+    max_items: 10,
+    items: { string: { max_len: 100 } }
+  }];
 }
 
 message MessagePayloadDecoder {

@@ -51,6 +51,11 @@ const (
 
 	// maxConfNbTrans is the maximum number of confirmed uplink retransmissions for pre-1.0.4 devices.
 	maxConfNbTrans = 5
+
+	// joinRequestCollectionWindow is the duration for which duplicated JoinRequests are collected.
+	// This parameter is separated from the uplink collection period since the JoinRequest may have to be
+	// served by a Join Server which is either geographically far away, or simply slow to respond.
+	joinRequestCollectionWindow = 6 * time.Second
 )
 
 // UplinkDeduplicator represents an entity, that deduplicates uplinks and accumulates metadata.
@@ -487,7 +492,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 		case !dev.SupportsClassB:
 			logger.Debug("Ignore class B bit in uplink, since device does not support class B")
 
-		case dev.MacState.CurrentParameters.PingSlotFrequency == 0:
+		case dev.MacState.CurrentParameters.PingSlotFrequency == 0 && len(phy.PingSlotFrequencies) == 0:
 			logger.Debug("Ignore class B bit in uplink, since ping slot frequency is not known")
 
 		case dev.MacState.CurrentParameters.PingSlotDataRateIndexValue == nil:
@@ -881,7 +886,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	if !ok {
 		trace.Log(ctx, "ns", "message is duplicate (initial round)")
 		registerReceiveDuplicateUplink(ctx, up)
-		return nil
+		return errDuplicateUplink.New()
 	}
 	trace.Log(ctx, "ns", "message is original (initial round)")
 
@@ -1170,6 +1175,17 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		"join_eui", pld.JoinEui,
 	))
 
+	ok, err := ns.deduplicateUplink(ctx, up, joinRequestCollectionWindow, initialDeduplicationRound)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		trace.Log(ctx, "ns", "message is duplicate")
+		registerReceiveDuplicateUplink(ctx, up)
+		return errDuplicateUplink.New()
+	}
+	trace.Log(ctx, "ns", "message is original")
+
 	joinEUI, devEUI := types.MustEUI64(pld.JoinEui).OrZero(), types.MustEUI64(pld.DevEui).OrZero()
 	matched, matchedCtx, err := ns.devices.GetByEUI(ctx, joinEUI, devEUI,
 		[]string{
@@ -1232,17 +1248,6 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	ctx = log.NewContextWithField(ctx,
 		"device_channel_index", chIdx,
 	)
-
-	ok, err := ns.deduplicateUplink(ctx, up, phy.JoinAcceptDelay2, initialDeduplicationRound)
-	if err != nil {
-		return err
-	}
-	if !ok {
-		trace.Log(ctx, "ns", "message is duplicate")
-		registerReceiveDuplicateUplink(ctx, up)
-		return nil
-	}
-	trace.Log(ctx, "ns", "message is original")
 
 	devAddr := ns.newDevAddr(ctx, matched)
 	const maxDevAddrGenerationRetries = 5

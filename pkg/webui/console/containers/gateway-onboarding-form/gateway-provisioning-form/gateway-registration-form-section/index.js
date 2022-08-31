@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useFormikContext } from 'formik'
 import { defineMessages } from 'react-intl'
 
@@ -76,14 +76,7 @@ const initialValues = {
 }
 
 const GatewayRegistrationFormSections = () => {
-  const { values, addToFieldRegistry, removeFromFieldRegistry } = useFormikContext()
-
-  // Register hidden fields so they don't get cleaned.
-  useEffect(() => {
-    const hiddenField = 'gateway_server_address'
-    addToFieldRegistry(hiddenField)
-    return () => removeFromFieldRegistry(hiddenField)
-  }, [addToFieldRegistry, removeFromFieldRegistry])
+  const { values } = useFormikContext()
 
   return (
     <>

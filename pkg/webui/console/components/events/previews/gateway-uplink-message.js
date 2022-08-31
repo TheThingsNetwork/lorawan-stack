@@ -16,7 +16,7 @@ import React from 'react'
 
 import Message from '@ttn-lw/lib/components/message'
 
-import { getGatewayWithHighestSNR } from '@console/components/events/utils'
+import { getDataRate, getSignalInformation } from '@console/components/events/utils'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import getByPath from '@ttn-lw/lib/get-by-path'
@@ -46,22 +46,10 @@ const GatewayUplinkMessagePreview = React.memo(({ event }) => {
       isConfirmed = getByPath(data, 'message.payload.m_hdr.m_type') === 'CONFIRMED_UP'
     }
 
-    if ('rx_metadata' in data.message) {
-      if (data.message.rx_metadata.length > 1) {
-        const gatewayWithHighestSNR = getGatewayWithHighestSNR(data.message.rx_metadata)
-        snr = gatewayWithHighestSNR.snr
-        rssi = gatewayWithHighestSNR.rssi
-      } else {
-        snr = data.message.rx_metadata[0].snr
-        rssi = data.message.rx_metadata[0].rssi
-      }
-    }
-
-    if ('settings' in data.message && 'data_rate' in data.message.settings) {
-      const bandwidth = getByPath(data, 'message.settings.data_rate.lora.bandwidth')
-      const spreadingFactor = getByPath(data, 'message.settings.data_rate.lora.spreading_factor')
-      dataRate = `SF${spreadingFactor}BW${bandwidth / 1000}`
-    }
+    const signalInfo = getSignalInformation(data.message)
+    snr = signalInfo.snr
+    rssi = signalInfo.rssi
+    dataRate = getDataRate(data.message)
   }
 
   return (

@@ -26,6 +26,12 @@ import GatewayRegistrationFormSection from './gateway-registration-form-section'
 
 const euiIdRegexp = /eui-\d{16}/
 
+// Empty strings will be interpreted as zero value (00 fill) by the backend
+// For this reason, they need to be transformed to undefined instead,
+// so that the value will be properly stripped when sent to the backend.
+const gatewayEuiEncoder = value => (value === '' ? undefined : value)
+const gatewayEuiDecoder = value => (value === undefined ? '' : value)
+
 const GatewayProvisioningFormSection = () => {
   const { touched, setFieldValue, values } = useFormContext()
   const idTouched = touched?.ids?.gateway_id
@@ -55,8 +61,9 @@ const GatewayProvisioningFormSection = () => {
         component={Input}
         tooltipId={tooltipIds.GATEWAY_EUI}
         onBlur={handleEuiBlur}
+        encode={gatewayEuiEncoder}
+        decode={gatewayEuiDecoder}
         autoFocus
-        required
       />
       <GatewayRegistrationFormSection />
     </>

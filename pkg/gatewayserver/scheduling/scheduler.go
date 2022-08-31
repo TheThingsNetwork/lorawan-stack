@@ -311,26 +311,15 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, opts Options) (res Emission,
 		var ok bool
 		starts, ok = s.clock.FromGatewayTime(*ttnpb.StdTime(opts.Time))
 		if !ok {
-			if medianRTT != nil {
-				serverTime, ok := s.clock.FromServerTime(*ttnpb.StdTime(opts.Time))
-				if !ok {
-					return Emission{}, 0, errNoServerTime.New()
-				}
-				starts = serverTime - ConcentratorTime(*medianRTT/2)
-			} else {
+			if medianRTT == nil {
 				return Emission{}, 0, errNoAbsoluteGatewayTime.New()
 			}
+			serverTime, ok := s.clock.FromServerTime(*ttnpb.StdTime(opts.Time))
+			if !ok {
+				return Emission{}, 0, errNoServerTime.New()
+			}
+			starts = serverTime - ConcentratorTime(*medianRTT/2)
 		}
-		// Assume that the absolute time is the time of arrival, not time of transmission.
-		toa, err := toa.Compute(opts.PayloadSize, opts.TxSettings)
-		if err != nil {
-			return Emission{}, 0, err
-		}
-		log.FromContext(ctx).WithFields(log.Fields(
-			"toa", toa,
-			"time", opts.Time,
-		)).Debug("Computed downlink time-on-air")
-		starts -= ConcentratorTime(toa)
 	} else {
 		starts = s.clock.FromTimestampTime(opts.Timestamp)
 	}

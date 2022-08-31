@@ -3,9 +3,13 @@
   "Beacon": {
     "DataRateIndex": 3,
     "CodingRate": "4/5",
-    "InvertedPolarity": false
+    "Frequencies": [
+      869100000
+    ]
   },
-  "PingSlotFrequency": 868900000,
+  "PingSlotFrequencies": [
+    868900000
+  ],
   "MaxUplinkChannels": 16,
   "UplinkChannels": [
     {

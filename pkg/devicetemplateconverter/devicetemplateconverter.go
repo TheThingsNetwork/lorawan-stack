@@ -50,7 +50,6 @@ func New(c *component.Component, conf *Config) (*DeviceTemplateConverter, error)
 		devicetemplates.TTSJSON,
 		devicetemplates.TTSCSV,
 	)
-
 	converters := make(map[string]devicetemplates.Converter, len(conf.Enabled))
 	for _, id := range conf.Enabled {
 		converter := devicetemplates.GetConverter(id)
@@ -77,7 +76,7 @@ func (dtc *DeviceTemplateConverter) Context() context.Context {
 }
 
 // Roles returns the roles that the Device Template Converter fulfills.
-func (dtc *DeviceTemplateConverter) Roles() []ttnpb.ClusterRole {
+func (*DeviceTemplateConverter) Roles() []ttnpb.ClusterRole {
 	return []ttnpb.ClusterRole{ttnpb.ClusterRole_DEVICE_TEMPLATE_CONVERTER}
 }
 
@@ -88,5 +87,5 @@ func (dtc *DeviceTemplateConverter) RegisterServices(s *grpc.Server) {
 
 // RegisterHandlers registers gRPC handlers.
 func (dtc *DeviceTemplateConverter) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
-	ttnpb.RegisterEndDeviceTemplateConverterHandler(dtc.Context(), s, conn)
+	ttnpb.RegisterEndDeviceTemplateConverterHandler(dtc.Context(), s, conn) //nolint:errcheck
 }

@@ -3065,6 +3065,31 @@ func (dst *ConvertEndDeviceTemplateRequest) SetFields(src *ConvertEndDeviceTempl
 			} else {
 				dst.Data = nil
 			}
+		case "end_device_version_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *EndDeviceVersionIdentifiers
+				if (src == nil || src.EndDeviceVersionIds == nil) && dst.EndDeviceVersionIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.EndDeviceVersionIds
+				}
+				if dst.EndDeviceVersionIds != nil {
+					newDst = dst.EndDeviceVersionIds
+				} else {
+					newDst = &EndDeviceVersionIdentifiers{}
+					dst.EndDeviceVersionIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EndDeviceVersionIds = src.EndDeviceVersionIds
+				} else {
+					dst.EndDeviceVersionIds = nil
+				}
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

@@ -30,10 +30,9 @@ import (
 )
 
 type serializableBeacon struct {
-	DataRateIndex    ttnpb.DataRateIndex
-	CodingRate       string
-	InvertedPolarity bool
-	// Missing: ComputeFrequency
+	DataRateIndex ttnpb.DataRateIndex
+	CodingRate    string
+	Frequencies   []uint64
 }
 
 type serializableDataRate struct {
@@ -84,8 +83,8 @@ func makeDataRates(m map[ttnpb.DataRateIndex]band.DataRate) map[ttnpb.DataRateIn
 type serializableBand struct {
 	ID string
 
-	Beacon            serializableBeacon
-	PingSlotFrequency *uint64
+	Beacon              serializableBeacon
+	PingSlotFrequencies []uint64
 
 	MaxUplinkChannels uint8
 	UplinkChannels    []band.Channel
@@ -169,11 +168,11 @@ func makeBand(b band.Band) serializableBand {
 		ID: b.ID,
 
 		Beacon: serializableBeacon{
-			DataRateIndex:    b.Beacon.DataRateIndex,
-			CodingRate:       b.Beacon.CodingRate,
-			InvertedPolarity: b.Beacon.InvertedPolarity,
+			DataRateIndex: b.Beacon.DataRateIndex,
+			CodingRate:    b.Beacon.CodingRate,
+			Frequencies:   b.Beacon.Frequencies,
 		},
-		PingSlotFrequency: b.PingSlotFrequency,
+		PingSlotFrequencies: b.PingSlotFrequencies,
 
 		MaxUplinkChannels: b.MaxUplinkChannels,
 		UplinkChannels:    b.UplinkChannels,

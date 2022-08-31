@@ -4166,6 +4166,9 @@
                 "uplink_message": {
                   "$ref": "#/definitions/v3ApplicationUplink"
                 },
+                "uplink_normalized": {
+                  "$ref": "#/definitions/v3ApplicationUplinkNormalized"
+                },
                 "join_accept": {
                   "$ref": "#/definitions/v3ApplicationJoinAccept"
                 },
@@ -4701,6 +4704,9 @@
                     "uplink_message": {
                       "$ref": "#/definitions/v3ApplicationPubSubMessage"
                     },
+                    "uplink_normalized": {
+                      "$ref": "#/definitions/v3ApplicationPubSubMessage"
+                    },
                     "join_accept": {
                       "$ref": "#/definitions/v3ApplicationPubSubMessage"
                     },
@@ -4824,6 +4830,9 @@
                       "description": "The topic to which the Application Server subscribes for downlink queue replace operations."
                     },
                     "uplink_message": {
+                      "$ref": "#/definitions/v3ApplicationPubSubMessage"
+                    },
+                    "uplink_normalized": {
                       "$ref": "#/definitions/v3ApplicationPubSubMessage"
                     },
                     "join_accept": {
@@ -5156,6 +5165,9 @@
                     "uplink_message": {
                       "$ref": "#/definitions/v3ApplicationWebhookMessage"
                     },
+                    "uplink_normalized": {
+                      "$ref": "#/definitions/v3ApplicationWebhookMessage"
+                    },
                     "join_accept": {
                       "$ref": "#/definitions/v3ApplicationWebhookMessage"
                     },
@@ -5290,6 +5302,9 @@
                       "description": "The API key to be used for downlink queue operations.\nThe field is provided for convenience reasons, and can contain API keys with additional rights (albeit this is discouraged)."
                     },
                     "uplink_message": {
+                      "$ref": "#/definitions/v3ApplicationWebhookMessage"
+                    },
+                    "uplink_normalized": {
                       "$ref": "#/definitions/v3ApplicationWebhookMessage"
                     },
                     "join_accept": {
@@ -6022,6 +6037,185 @@
         ],
         "tags": [
           "ClientAccess"
+        ]
+      }
+    },
+    "/configuration/bands": {
+      "get": {
+        "operationId": "Configuration_ListBands",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ListBandsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "band_id",
+            "description": "Optional Band ID to filter the results.\nIf unused, all supported Bands are returned.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "phy_version",
+            "description": "Optional PHY version to filter the results.\nIf unused, all supported versions are returned.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "PHY_UNKNOWN",
+              "PHY_V1_0",
+              "TS001_V1_0",
+              "PHY_V1_0_1",
+              "TS001_V1_0_1",
+              "PHY_V1_0_2_REV_A",
+              "RP001_V1_0_2",
+              "PHY_V1_0_2_REV_B",
+              "RP001_V1_0_2_REV_B",
+              "PHY_V1_1_REV_A",
+              "RP001_V1_1_REV_A",
+              "PHY_V1_1_REV_B",
+              "RP001_V1_1_REV_B",
+              "PHY_V1_0_3_REV_A",
+              "RP001_V1_0_3_REV_A",
+              "RP002_V1_0_0",
+              "RP002_V1_0_1",
+              "RP002_V1_0_2",
+              "RP002_V1_0_3"
+            ],
+            "default": "PHY_UNKNOWN"
+          }
+        ],
+        "tags": [
+          "Configuration"
+        ]
+      }
+    },
+    "/configuration/bands/{band_id}": {
+      "get": {
+        "operationId": "Configuration_ListBands2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ListBandsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "band_id",
+            "description": "Optional Band ID to filter the results.\nIf unused, all supported Bands are returned.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "phy_version",
+            "description": "Optional PHY version to filter the results.\nIf unused, all supported versions are returned.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "PHY_UNKNOWN",
+              "PHY_V1_0",
+              "TS001_V1_0",
+              "PHY_V1_0_1",
+              "TS001_V1_0_1",
+              "PHY_V1_0_2_REV_A",
+              "RP001_V1_0_2",
+              "PHY_V1_0_2_REV_B",
+              "RP001_V1_0_2_REV_B",
+              "PHY_V1_1_REV_A",
+              "RP001_V1_1_REV_A",
+              "PHY_V1_1_REV_B",
+              "RP001_V1_1_REV_B",
+              "PHY_V1_0_3_REV_A",
+              "RP001_V1_0_3_REV_A",
+              "RP002_V1_0_0",
+              "RP002_V1_0_1",
+              "RP002_V1_0_2",
+              "RP002_V1_0_3"
+            ],
+            "default": "PHY_UNKNOWN"
+          }
+        ],
+        "tags": [
+          "Configuration"
+        ]
+      }
+    },
+    "/configuration/bands/{band_id}/{phy_version}": {
+      "get": {
+        "operationId": "Configuration_ListBands3",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ListBandsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "band_id",
+            "description": "Optional Band ID to filter the results.\nIf unused, all supported Bands are returned.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "phy_version",
+            "description": "Optional PHY version to filter the results.\nIf unused, all supported versions are returned.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "PHY_UNKNOWN",
+              "PHY_V1_0",
+              "TS001_V1_0",
+              "PHY_V1_0_1",
+              "TS001_V1_0_1",
+              "PHY_V1_0_2_REV_A",
+              "RP001_V1_0_2",
+              "PHY_V1_0_2_REV_B",
+              "RP001_V1_0_2_REV_B",
+              "PHY_V1_1_REV_A",
+              "RP001_V1_1_REV_A",
+              "PHY_V1_1_REV_B",
+              "RP001_V1_1_REV_B",
+              "PHY_V1_0_3_REV_A",
+              "RP001_V1_0_3_REV_A",
+              "RP002_V1_0_0",
+              "RP002_V1_0_1",
+              "RP002_V1_0_2",
+              "RP002_V1_0_3"
+            ]
+          }
+        ],
+        "tags": [
+          "Configuration"
         ]
       }
     },
@@ -11546,6 +11740,50 @@
         ]
       }
     },
+    "/ns/dev_addr_prefixes": {
+      "get": {
+        "operationId": "Ns_GetDeviceAddressPrefixes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetDeviceAdressPrefixesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "Ns"
+        ]
+      }
+    },
+    "/ns/net_id": {
+      "get": {
+        "operationId": "Ns_GetNetID",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetNetIDResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "Ns"
+        ]
+      }
+    },
     "/organizations": {
       "get": {
         "summary": "List organizations where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the organizations the caller\nhas access to.\nSimilar to Get, this selects the fields given by the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
@@ -16711,6 +16949,76 @@
         }
       }
     },
+    "BandDescriptionBandDataRate": {
+      "type": "object",
+      "properties": {
+        "rate": {
+          "$ref": "#/definitions/v3DataRate"
+        }
+      }
+    },
+    "BandDescriptionBeacon": {
+      "type": "object",
+      "properties": {
+        "data_rate_index": {
+          "$ref": "#/definitions/v3DataRateIndex"
+        },
+        "coding_rate": {
+          "type": "string"
+        },
+        "frequencies": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uint64"
+          }
+        }
+      }
+    },
+    "BandDescriptionDwellTime": {
+      "type": "object",
+      "properties": {
+        "uplinks": {
+          "type": "boolean"
+        },
+        "downlinks": {
+          "type": "boolean"
+        }
+      }
+    },
+    "BandDescriptionRx2Parameters": {
+      "type": "object",
+      "properties": {
+        "data_rate_index": {
+          "$ref": "#/definitions/v3DataRateIndex"
+        },
+        "frequency": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "BandDescriptionSubBandParameters": {
+      "type": "object",
+      "properties": {
+        "min_frequency": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "max_frequency": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "duty_cycle": {
+          "type": "number",
+          "format": "float"
+        },
+        "max_eirp": {
+          "type": "number",
+          "format": "float"
+        }
+      }
+    },
     "BatchUpdateEndDeviceLastSeenRequestEndDeviceLastSeenUpdate": {
       "type": "object",
       "properties": {
@@ -17246,6 +17554,17 @@
         },
         "create_organizations": {
           "type": "boolean"
+        }
+      }
+    },
+    "ListBandsResponseVersionedBandDescription": {
+      "type": "object",
+      "properties": {
+        "band": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v3BandDescription"
+          }
         }
       }
     },
@@ -18963,6 +19282,9 @@
         "uplink_message": {
           "$ref": "#/definitions/v3ApplicationPubSubMessage"
         },
+        "uplink_normalized": {
+          "$ref": "#/definitions/v3ApplicationPubSubMessage"
+        },
         "join_accept": {
           "$ref": "#/definitions/v3ApplicationPubSubMessage"
         },
@@ -19066,6 +19388,9 @@
         "uplink_message": {
           "$ref": "#/definitions/v3ApplicationUplink"
         },
+        "uplink_normalized": {
+          "$ref": "#/definitions/v3ApplicationUplinkNormalized"
+        },
         "join_accept": {
           "$ref": "#/definitions/v3ApplicationJoinAccept"
         },
@@ -19110,11 +19435,13 @@
         },
         "f_port": {
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "description": "LoRaWAN FPort of the uplink message."
         },
         "f_cnt": {
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "description": "LoRaWAN FCntUp of the uplink message."
         },
         "frm_payload": {
           "type": "string",
@@ -19132,6 +19459,20 @@
           },
           "description": "Warnings generated by the message processor while decoding the frm_payload."
         },
+        "normalized_payload": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "The normalized frame payload of the uplink message.\nThis field is set by the message processor that is configured for the end device (see formatters) or application (see default_formatters).\nIf the message processor is a custom script, there is no uplink normalizer script and the decoded output is valid\nnormalized payload, this field contains the decoded payload."
+        },
+        "normalized_payload_warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Warnings generated by the message processor while normalizing the decoded payload."
+        },
         "rx_metadata": {
           "type": "array",
           "items": {
@@ -19141,7 +19482,7 @@
         },
         "settings": {
           "$ref": "#/definitions/lorawanv3TxSettings",
-          "description": "Settings for the transmission."
+          "description": "Transmission settings used by the end device."
         },
         "received_at": {
           "type": "string",
@@ -19158,11 +19499,87 @@
           "description": "The last AFCntDown of the current session.\nThis field is only present if the skip_payload_crypto field of the EndDevice\nis true.\nCan be used with app_s_key to encrypt downlink payloads."
         },
         "confirmed": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Indicates whether the end device used confirmed data uplink."
         },
         "consumed_airtime": {
           "type": "string",
-          "description": "Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings."
+          "description": "Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the raw payload size and the transmission settings."
+        },
+        "locations": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/lorawanv3Location"
+          },
+          "description": "End device location metadata, set by the Application Server while handling the message."
+        },
+        "version_ids": {
+          "$ref": "#/definitions/v3EndDeviceVersionIdentifiers",
+          "description": "End device version identifiers, set by the Application Server while handling the message."
+        },
+        "network_ids": {
+          "$ref": "#/definitions/v3NetworkIdentifiers",
+          "description": "Network identifiers, set by the Network Server that handles the message."
+        }
+      }
+    },
+    "v3ApplicationUplinkNormalized": {
+      "type": "object",
+      "properties": {
+        "session_key_id": {
+          "type": "string",
+          "format": "byte",
+          "description": "Join Server issued identifier for the session keys used by this uplink."
+        },
+        "f_port": {
+          "type": "integer",
+          "format": "int64",
+          "description": "LoRaWAN FPort of the uplink message."
+        },
+        "f_cnt": {
+          "type": "integer",
+          "format": "int64",
+          "description": "LoRaWAN FCntUp of the uplink message."
+        },
+        "frm_payload": {
+          "type": "string",
+          "format": "byte",
+          "description": "The frame payload of the uplink message.\nThis field is always decrypted with AppSKey."
+        },
+        "normalized_payload": {
+          "type": "object",
+          "description": "The normalized frame payload of the uplink message.\nThis field is set for each item in normalized_payload in the corresponding ApplicationUplink message."
+        },
+        "normalized_payload_warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "This field is set to normalized_payload_warnings in the corresponding ApplicationUplink message."
+        },
+        "rx_metadata": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/lorawanv3RxMetadata"
+          },
+          "description": "A list of metadata for each antenna of each gateway that received this message."
+        },
+        "settings": {
+          "$ref": "#/definitions/lorawanv3TxSettings",
+          "description": "Transmission settings used by the end device."
+        },
+        "received_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server time when the Network Server received the message."
+        },
+        "confirmed": {
+          "type": "boolean",
+          "description": "Indicates whether the end device used confirmed data uplink."
+        },
+        "consumed_airtime": {
+          "type": "string",
+          "description": "Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the raw payload size and the transmission settings."
         },
         "locations": {
           "type": "object",
@@ -19226,6 +19643,9 @@
           "description": "The API key to be used for downlink queue operations.\nThe field is provided for convenience reasons, and can contain API keys with additional rights (albeit this is discouraged)."
         },
         "uplink_message": {
+          "$ref": "#/definitions/v3ApplicationWebhookMessage"
+        },
+        "uplink_normalized": {
           "$ref": "#/definitions/v3ApplicationWebhookMessage"
         },
         "join_accept": {
@@ -19352,6 +19772,9 @@
           "description": "Control the creation of the downlink queue operations API key."
         },
         "uplink_message": {
+          "$ref": "#/definitions/v3ApplicationWebhookTemplateMessage"
+        },
+        "uplink_normalized": {
           "$ref": "#/definitions/v3ApplicationWebhookTemplateMessage"
         },
         "join_accept": {
@@ -19491,6 +19914,132 @@
         },
         "is_admin": {
           "type": "boolean"
+        }
+      }
+    },
+    "v3BandDescription": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "beacon": {
+          "$ref": "#/definitions/BandDescriptionBeacon"
+        },
+        "ping_slot_frequencies": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uint64"
+          }
+        },
+        "max_uplink_channels": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "uplink_channels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3BandDescriptionChannel"
+          }
+        },
+        "max_downlink_channels": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "downlink_channels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3BandDescriptionChannel"
+          }
+        },
+        "sub_bands": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BandDescriptionSubBandParameters"
+          }
+        },
+        "data_rates": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/BandDescriptionBandDataRate"
+          }
+        },
+        "freq_multiplier": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "implements_cf_list": {
+          "type": "boolean"
+        },
+        "cf_list_type": {
+          "$ref": "#/definitions/v3CFListType"
+        },
+        "receive_delay_1": {
+          "type": "string"
+        },
+        "receive_delay_2": {
+          "type": "string"
+        },
+        "join_accept_delay_1": {
+          "type": "string"
+        },
+        "join_accept_delay_2": {
+          "type": "string"
+        },
+        "max_fcnt_gap": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "supports_dynamic_adr": {
+          "type": "boolean"
+        },
+        "adr_ack_limit": {
+          "$ref": "#/definitions/v3ADRAckLimitExponent"
+        },
+        "min_retransmit_timeout": {
+          "type": "string"
+        },
+        "max_retransmit_timeout": {
+          "type": "string"
+        },
+        "tx_offset": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "max_adr_data_rate_index": {
+          "$ref": "#/definitions/v3DataRateIndex"
+        },
+        "tx_param_setup_req_support": {
+          "type": "boolean"
+        },
+        "default_max_eirp": {
+          "type": "number",
+          "format": "float"
+        },
+        "default_rx2_parameters": {
+          "$ref": "#/definitions/BandDescriptionRx2Parameters"
+        },
+        "boot_dwell_time": {
+          "$ref": "#/definitions/BandDescriptionDwellTime"
+        }
+      }
+    },
+    "v3BandDescriptionChannel": {
+      "type": "object",
+      "properties": {
+        "frequency": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "min_data_rate": {
+          "$ref": "#/definitions/v3DataRateIndex"
+        },
+        "max_data_rate": {
+          "$ref": "#/definitions/v3DataRateIndex"
         }
       }
     },
@@ -19965,6 +20514,10 @@
           "type": "string",
           "format": "byte",
           "description": "Data to convert."
+        },
+        "end_device_version_ids": {
+          "$ref": "#/definitions/v3EndDeviceVersionIdentifiers",
+          "description": "End device profile identifiers."
         }
       }
     },
@@ -21455,6 +22008,21 @@
         }
       }
     },
+    "v3GetDeviceAdressPrefixesResponse": {
+      "type": "object",
+      "properties": {
+        "dev_addr_prefixes": {
+          "type": "array",
+          "example": [
+            "2600AB00/24"
+          ],
+          "items": {
+            "type": "string",
+            "format": "byte"
+          }
+        }
+      }
+    },
     "v3GetGatewayConfigurationResponse": {
       "type": "object",
       "properties": {
@@ -21493,6 +22061,16 @@
       "properties": {
         "configuration": {
           "$ref": "#/definitions/v3IsConfiguration"
+        }
+      }
+    },
+    "v3GetNetIDResponse": {
+      "type": "object",
+      "properties": {
+        "net_id": {
+          "type": "string",
+          "format": "string",
+          "example": "000013"
         }
       }
     },
@@ -21734,10 +22312,21 @@
         "operating_channel_width": {
           "type": "integer",
           "format": "int64",
-          "description": "Operating Channel Width (kHz)."
+          "description": "Operating Channel Width (Hz)."
         },
         "coding_rate": {
           "type": "string"
+        }
+      }
+    },
+    "v3ListBandsResponse": {
+      "type": "object",
+      "properties": {
+        "descriptions": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/ListBandsResponseVersionedBandDescription"
+          }
         }
       }
     },

@@ -131,10 +131,23 @@
   - [Message `PeerInfo`](#ttn.lorawan.v3.PeerInfo)
   - [Message `PeerInfo.TagsEntry`](#ttn.lorawan.v3.PeerInfo.TagsEntry)
 - [File `lorawan-stack/api/configuration_services.proto`](#lorawan-stack/api/configuration_services.proto)
+  - [Message `BandDescription`](#ttn.lorawan.v3.BandDescription)
+  - [Message `BandDescription.BandDataRate`](#ttn.lorawan.v3.BandDescription.BandDataRate)
+  - [Message `BandDescription.Beacon`](#ttn.lorawan.v3.BandDescription.Beacon)
+  - [Message `BandDescription.Channel`](#ttn.lorawan.v3.BandDescription.Channel)
+  - [Message `BandDescription.DataRatesEntry`](#ttn.lorawan.v3.BandDescription.DataRatesEntry)
+  - [Message `BandDescription.DwellTime`](#ttn.lorawan.v3.BandDescription.DwellTime)
+  - [Message `BandDescription.Rx2Parameters`](#ttn.lorawan.v3.BandDescription.Rx2Parameters)
+  - [Message `BandDescription.SubBandParameters`](#ttn.lorawan.v3.BandDescription.SubBandParameters)
   - [Message `FrequencyPlanDescription`](#ttn.lorawan.v3.FrequencyPlanDescription)
   - [Message `GetPhyVersionsRequest`](#ttn.lorawan.v3.GetPhyVersionsRequest)
   - [Message `GetPhyVersionsResponse`](#ttn.lorawan.v3.GetPhyVersionsResponse)
   - [Message `GetPhyVersionsResponse.VersionInfo`](#ttn.lorawan.v3.GetPhyVersionsResponse.VersionInfo)
+  - [Message `ListBandsRequest`](#ttn.lorawan.v3.ListBandsRequest)
+  - [Message `ListBandsResponse`](#ttn.lorawan.v3.ListBandsResponse)
+  - [Message `ListBandsResponse.DescriptionsEntry`](#ttn.lorawan.v3.ListBandsResponse.DescriptionsEntry)
+  - [Message `ListBandsResponse.VersionedBandDescription`](#ttn.lorawan.v3.ListBandsResponse.VersionedBandDescription)
+  - [Message `ListBandsResponse.VersionedBandDescription.BandEntry`](#ttn.lorawan.v3.ListBandsResponse.VersionedBandDescription.BandEntry)
   - [Message `ListFrequencyPlansRequest`](#ttn.lorawan.v3.ListFrequencyPlansRequest)
   - [Message `ListFrequencyPlansResponse`](#ttn.lorawan.v3.ListFrequencyPlansResponse)
   - [Service `Configuration`](#ttn.lorawan.v3.Configuration)
@@ -471,6 +484,8 @@
   - [Message `ApplicationUp`](#ttn.lorawan.v3.ApplicationUp)
   - [Message `ApplicationUplink`](#ttn.lorawan.v3.ApplicationUplink)
   - [Message `ApplicationUplink.LocationsEntry`](#ttn.lorawan.v3.ApplicationUplink.LocationsEntry)
+  - [Message `ApplicationUplinkNormalized`](#ttn.lorawan.v3.ApplicationUplinkNormalized)
+  - [Message `ApplicationUplinkNormalized.LocationsEntry`](#ttn.lorawan.v3.ApplicationUplinkNormalized.LocationsEntry)
   - [Message `DownlinkMessage`](#ttn.lorawan.v3.DownlinkMessage)
   - [Message `DownlinkQueueOperationErrorDetails`](#ttn.lorawan.v3.DownlinkQueueOperationErrorDetails)
   - [Message `DownlinkQueueRequest`](#ttn.lorawan.v3.DownlinkQueueRequest)
@@ -492,6 +507,8 @@
 - [File `lorawan-stack/api/networkserver.proto`](#lorawan-stack/api/networkserver.proto)
   - [Message `GenerateDevAddrResponse`](#ttn.lorawan.v3.GenerateDevAddrResponse)
   - [Message `GetDefaultMACSettingsRequest`](#ttn.lorawan.v3.GetDefaultMACSettingsRequest)
+  - [Message `GetDeviceAdressPrefixesResponse`](#ttn.lorawan.v3.GetDeviceAdressPrefixesResponse)
+  - [Message `GetNetIDResponse`](#ttn.lorawan.v3.GetNetIDResponse)
   - [Service `AsNs`](#ttn.lorawan.v3.AsNs)
   - [Service `GsNs`](#ttn.lorawan.v3.GsNs)
   - [Service `Ns`](#ttn.lorawan.v3.Ns)
@@ -1509,6 +1526,7 @@ The ApplicationUpStorage service can be used to query stored application upstrea
 | `downlink_push` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  | The topic to which the Application Server subscribes for downlink queue push operations. |
 | `downlink_replace` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  | The topic to which the Application Server subscribes for downlink queue replace operations. |
 | `uplink_message` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
+| `uplink_normalized` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
 | `join_accept` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
 | `downlink_ack` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
 | `downlink_nack` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
@@ -1767,6 +1785,7 @@ The NATS provider settings.
 | `template_fields` | [`ApplicationWebhook.TemplateFieldsEntry`](#ttn.lorawan.v3.ApplicationWebhook.TemplateFieldsEntry) | repeated | The value of the fields used by the template. Maps field.id to the value. |
 | `downlink_api_key` | [`string`](#string) |  | The API key to be used for downlink queue operations. The field is provided for convenience reasons, and can contain API keys with additional rights (albeit this is discouraged). |
 | `uplink_message` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
+| `uplink_normalized` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
 | `join_accept` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
 | `downlink_ack` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
 | `downlink_nack` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
@@ -1881,6 +1900,7 @@ The NATS provider settings.
 | `fields` | [`ApplicationWebhookTemplateField`](#ttn.lorawan.v3.ApplicationWebhookTemplateField) | repeated |  |
 | `create_downlink_api_key` | [`bool`](#bool) |  | Control the creation of the downlink queue operations API key. |
 | `uplink_message` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
+| `uplink_normalized` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
 | `join_accept` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
 | `downlink_ack` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
 | `downlink_nack` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
@@ -2304,6 +2324,90 @@ PeerInfo
 
 ## <a name="lorawan-stack/api/configuration_services.proto">File `lorawan-stack/api/configuration_services.proto`</a>
 
+### <a name="ttn.lorawan.v3.BandDescription">Message `BandDescription`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `id` | [`string`](#string) |  |  |
+| `beacon` | [`BandDescription.Beacon`](#ttn.lorawan.v3.BandDescription.Beacon) |  |  |
+| `ping_slot_frequencies` | [`uint64`](#uint64) | repeated |  |
+| `max_uplink_channels` | [`uint32`](#uint32) |  |  |
+| `uplink_channels` | [`BandDescription.Channel`](#ttn.lorawan.v3.BandDescription.Channel) | repeated |  |
+| `max_downlink_channels` | [`uint32`](#uint32) |  |  |
+| `downlink_channels` | [`BandDescription.Channel`](#ttn.lorawan.v3.BandDescription.Channel) | repeated |  |
+| `sub_bands` | [`BandDescription.SubBandParameters`](#ttn.lorawan.v3.BandDescription.SubBandParameters) | repeated |  |
+| `data_rates` | [`BandDescription.DataRatesEntry`](#ttn.lorawan.v3.BandDescription.DataRatesEntry) | repeated |  |
+| `freq_multiplier` | [`uint64`](#uint64) |  |  |
+| `implements_cf_list` | [`bool`](#bool) |  |  |
+| `cf_list_type` | [`CFListType`](#ttn.lorawan.v3.CFListType) |  |  |
+| `receive_delay_1` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
+| `receive_delay_2` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
+| `join_accept_delay_1` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
+| `join_accept_delay_2` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
+| `max_fcnt_gap` | [`uint64`](#uint64) |  |  |
+| `supports_dynamic_adr` | [`bool`](#bool) |  |  |
+| `adr_ack_limit` | [`ADRAckLimitExponent`](#ttn.lorawan.v3.ADRAckLimitExponent) |  |  |
+| `min_retransmit_timeout` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
+| `max_retransmit_timeout` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
+| `tx_offset` | [`float`](#float) | repeated |  |
+| `max_adr_data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  |  |
+| `tx_param_setup_req_support` | [`bool`](#bool) |  |  |
+| `default_max_eirp` | [`float`](#float) |  |  |
+| `default_rx2_parameters` | [`BandDescription.Rx2Parameters`](#ttn.lorawan.v3.BandDescription.Rx2Parameters) |  |  |
+| `boot_dwell_time` | [`BandDescription.DwellTime`](#ttn.lorawan.v3.BandDescription.DwellTime) |  |  |
+
+### <a name="ttn.lorawan.v3.BandDescription.BandDataRate">Message `BandDescription.BandDataRate`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `rate` | [`DataRate`](#ttn.lorawan.v3.DataRate) |  |  |
+
+### <a name="ttn.lorawan.v3.BandDescription.Beacon">Message `BandDescription.Beacon`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  |  |
+| `coding_rate` | [`string`](#string) |  |  |
+| `frequencies` | [`uint64`](#uint64) | repeated |  |
+
+### <a name="ttn.lorawan.v3.BandDescription.Channel">Message `BandDescription.Channel`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `frequency` | [`uint64`](#uint64) |  |  |
+| `min_data_rate` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  |  |
+| `max_data_rate` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  |  |
+
+### <a name="ttn.lorawan.v3.BandDescription.DataRatesEntry">Message `BandDescription.DataRatesEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`uint32`](#uint32) |  |  |
+| `value` | [`BandDescription.BandDataRate`](#ttn.lorawan.v3.BandDescription.BandDataRate) |  |  |
+
+### <a name="ttn.lorawan.v3.BandDescription.DwellTime">Message `BandDescription.DwellTime`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `uplinks` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  |  |
+| `downlinks` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  |  |
+
+### <a name="ttn.lorawan.v3.BandDescription.Rx2Parameters">Message `BandDescription.Rx2Parameters`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  |  |
+| `frequency` | [`uint64`](#uint64) |  |  |
+
+### <a name="ttn.lorawan.v3.BandDescription.SubBandParameters">Message `BandDescription.SubBandParameters`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `min_frequency` | [`uint64`](#uint64) |  |  |
+| `max_frequency` | [`uint64`](#uint64) |  |  |
+| `duty_cycle` | [`float`](#float) |  |  |
+| `max_eirp` | [`float`](#float) |  |  |
+
 ### <a name="ttn.lorawan.v3.FrequencyPlanDescription">Message `FrequencyPlanDescription`</a>
 
 | Field | Type | Label | Description |
@@ -2332,6 +2436,39 @@ PeerInfo
 | `band_id` | [`string`](#string) |  |  |
 | `phy_versions` | [`PHYVersion`](#ttn.lorawan.v3.PHYVersion) | repeated |  |
 
+### <a name="ttn.lorawan.v3.ListBandsRequest">Message `ListBandsRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `band_id` | [`string`](#string) |  | Optional Band ID to filter the results. If unused, all supported Bands are returned. |
+| `phy_version` | [`PHYVersion`](#ttn.lorawan.v3.PHYVersion) |  | Optional PHY version to filter the results. If unused, all supported versions are returned. |
+
+### <a name="ttn.lorawan.v3.ListBandsResponse">Message `ListBandsResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `descriptions` | [`ListBandsResponse.DescriptionsEntry`](#ttn.lorawan.v3.ListBandsResponse.DescriptionsEntry) | repeated |  |
+
+### <a name="ttn.lorawan.v3.ListBandsResponse.DescriptionsEntry">Message `ListBandsResponse.DescriptionsEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`string`](#string) |  |  |
+| `value` | [`ListBandsResponse.VersionedBandDescription`](#ttn.lorawan.v3.ListBandsResponse.VersionedBandDescription) |  |  |
+
+### <a name="ttn.lorawan.v3.ListBandsResponse.VersionedBandDescription">Message `ListBandsResponse.VersionedBandDescription`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `band` | [`ListBandsResponse.VersionedBandDescription.BandEntry`](#ttn.lorawan.v3.ListBandsResponse.VersionedBandDescription.BandEntry) | repeated |  |
+
+### <a name="ttn.lorawan.v3.ListBandsResponse.VersionedBandDescription.BandEntry">Message `ListBandsResponse.VersionedBandDescription.BandEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`string`](#string) |  |  |
+| `value` | [`BandDescription`](#ttn.lorawan.v3.BandDescription) |  |  |
+
 ### <a name="ttn.lorawan.v3.ListFrequencyPlansRequest">Message `ListFrequencyPlansRequest`</a>
 
 | Field | Type | Label | Description |
@@ -2350,6 +2487,7 @@ PeerInfo
 | ----------- | ------------ | ------------- | ------------|
 | `ListFrequencyPlans` | [`ListFrequencyPlansRequest`](#ttn.lorawan.v3.ListFrequencyPlansRequest) | [`ListFrequencyPlansResponse`](#ttn.lorawan.v3.ListFrequencyPlansResponse) |  |
 | `GetPhyVersions` | [`GetPhyVersionsRequest`](#ttn.lorawan.v3.GetPhyVersionsRequest) | [`GetPhyVersionsResponse`](#ttn.lorawan.v3.GetPhyVersionsResponse) | Returns a list of supported LoRaWAN PHY Versions for the given Band ID. |
+| `ListBands` | [`ListBandsRequest`](#ttn.lorawan.v3.ListBandsRequest) | [`ListBandsResponse`](#ttn.lorawan.v3.ListBandsResponse) |  |
 
 #### HTTP bindings
 
@@ -2357,6 +2495,9 @@ PeerInfo
 | ----------- | ------ | ------- | ---- |
 | `ListFrequencyPlans` | `GET` | `/api/v3/configuration/frequency-plans` |  |
 | `GetPhyVersions` | `GET` | `/api/v3/configuration/phy-versions` |  |
+| `ListBands` | `GET` | `/api/v3/configuration/bands` |  |
+| `ListBands` | `GET` | `/api/v3/configuration/bands/{band_id}` |  |
+| `ListBands` | `GET` | `/api/v3/configuration/bands/{band_id}/{phy_version}` |  |
 
 ## <a name="lorawan-stack/api/contact_info.proto">File `lorawan-stack/api/contact_info.proto`</a>
 
@@ -3218,6 +3359,7 @@ Configuration options for static ADR.
 | ----- | ---- | ----- | ----------- |
 | `format_id` | [`string`](#string) |  | ID of the format. |
 | `data` | [`bytes`](#bytes) |  | Data to convert. |
+| `end_device_version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  | End device profile identifiers. |
 
 #### Field Rules
 
@@ -5767,7 +5909,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `modulation_type` | [`uint32`](#uint32) |  |  |
-| `operating_channel_width` | [`uint32`](#uint32) |  | Operating Channel Width (kHz). |
+| `operating_channel_width` | [`uint32`](#uint32) |  | Operating Channel Width (Hz). |
 | `coding_rate` | [`string`](#string) |  |  |
 
 ### <a name="ttn.lorawan.v3.LoRaDataRate">Message `LoRaDataRate`</a>
@@ -6798,6 +6940,7 @@ Transmission settings for downlink.
 | Field | Validations |
 | ----- | ----------- |
 | `session_key_id` | <p>`bytes.max_len`: `2048`</p> |
+| `received_at` | <p>`timestamp.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationLocation">Message `ApplicationLocation`</a>
 
@@ -6838,6 +6981,7 @@ Application uplink message.
 | `correlation_ids` | [`string`](#string) | repeated |  |
 | `received_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Server time when the Application Server received the message. |
 | `uplink_message` | [`ApplicationUplink`](#ttn.lorawan.v3.ApplicationUplink) |  |  |
+| `uplink_normalized` | [`ApplicationUplinkNormalized`](#ttn.lorawan.v3.ApplicationUplinkNormalized) |  |  |
 | `join_accept` | [`ApplicationJoinAccept`](#ttn.lorawan.v3.ApplicationJoinAccept) |  |  |
 | `downlink_ack` | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) |  |  |
 | `downlink_nack` | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) |  |  |
@@ -6861,18 +7005,20 @@ Application uplink message.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `session_key_id` | [`bytes`](#bytes) |  | Join Server issued identifier for the session keys used by this uplink. |
-| `f_port` | [`uint32`](#uint32) |  |  |
-| `f_cnt` | [`uint32`](#uint32) |  |  |
+| `f_port` | [`uint32`](#uint32) |  | LoRaWAN FPort of the uplink message. |
+| `f_cnt` | [`uint32`](#uint32) |  | LoRaWAN FCntUp of the uplink message. |
 | `frm_payload` | [`bytes`](#bytes) |  | The frame payload of the uplink message. The payload is still encrypted if the skip_payload_crypto field of the EndDevice is true, which is indicated by the presence of the app_s_key field. |
 | `decoded_payload` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  | The decoded frame payload of the uplink message. This field is set by the message processor that is configured for the end device (see formatters) or application (see default_formatters). |
 | `decoded_payload_warnings` | [`string`](#string) | repeated | Warnings generated by the message processor while decoding the frm_payload. |
+| `normalized_payload` | [`google.protobuf.Struct`](#google.protobuf.Struct) | repeated | The normalized frame payload of the uplink message. This field is set by the message processor that is configured for the end device (see formatters) or application (see default_formatters). If the message processor is a custom script, there is no uplink normalizer script and the decoded output is valid normalized payload, this field contains the decoded payload. |
+| `normalized_payload_warnings` | [`string`](#string) | repeated | Warnings generated by the message processor while normalizing the decoded payload. |
 | `rx_metadata` | [`RxMetadata`](#ttn.lorawan.v3.RxMetadata) | repeated | A list of metadata for each antenna of each gateway that received this message. |
-| `settings` | [`TxSettings`](#ttn.lorawan.v3.TxSettings) |  | Settings for the transmission. |
+| `settings` | [`TxSettings`](#ttn.lorawan.v3.TxSettings) |  | Transmission settings used by the end device. |
 | `received_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Server time when the Network Server received the message. |
 | `app_s_key` | [`KeyEnvelope`](#ttn.lorawan.v3.KeyEnvelope) |  | The AppSKey of the current session. This field is only present if the skip_payload_crypto field of the EndDevice is true. Can be used to decrypt uplink payloads and encrypt downlink payloads. |
 | `last_a_f_cnt_down` | [`uint32`](#uint32) |  | The last AFCntDown of the current session. This field is only present if the skip_payload_crypto field of the EndDevice is true. Can be used with app_s_key to encrypt downlink payloads. |
-| `confirmed` | [`bool`](#bool) |  |  |
-| `consumed_airtime` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings. |
+| `confirmed` | [`bool`](#bool) |  | Indicates whether the end device used confirmed data uplink. |
+| `consumed_airtime` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the raw payload size and the transmission settings. |
 | `locations` | [`ApplicationUplink.LocationsEntry`](#ttn.lorawan.v3.ApplicationUplink.LocationsEntry) | repeated | End device location metadata, set by the Application Server while handling the message. |
 | `version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  | End device version identifiers, set by the Application Server while handling the message. |
 | `network_ids` | [`NetworkIdentifiers`](#ttn.lorawan.v3.NetworkIdentifiers) |  | Network identifiers, set by the Network Server that handles the message. |
@@ -6886,6 +7032,42 @@ Application uplink message.
 | `settings` | <p>`message.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationUplink.LocationsEntry">Message `ApplicationUplink.LocationsEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`string`](#string) |  |  |
+| `value` | [`Location`](#ttn.lorawan.v3.Location) |  |  |
+
+### <a name="ttn.lorawan.v3.ApplicationUplinkNormalized">Message `ApplicationUplinkNormalized`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `session_key_id` | [`bytes`](#bytes) |  | Join Server issued identifier for the session keys used by this uplink. |
+| `f_port` | [`uint32`](#uint32) |  | LoRaWAN FPort of the uplink message. |
+| `f_cnt` | [`uint32`](#uint32) |  | LoRaWAN FCntUp of the uplink message. |
+| `frm_payload` | [`bytes`](#bytes) |  | The frame payload of the uplink message. This field is always decrypted with AppSKey. |
+| `normalized_payload` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  | The normalized frame payload of the uplink message. This field is set for each item in normalized_payload in the corresponding ApplicationUplink message. |
+| `normalized_payload_warnings` | [`string`](#string) | repeated | This field is set to normalized_payload_warnings in the corresponding ApplicationUplink message. |
+| `rx_metadata` | [`RxMetadata`](#ttn.lorawan.v3.RxMetadata) | repeated | A list of metadata for each antenna of each gateway that received this message. |
+| `settings` | [`TxSettings`](#ttn.lorawan.v3.TxSettings) |  | Transmission settings used by the end device. |
+| `received_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Server time when the Network Server received the message. |
+| `confirmed` | [`bool`](#bool) |  | Indicates whether the end device used confirmed data uplink. |
+| `consumed_airtime` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the raw payload size and the transmission settings. |
+| `locations` | [`ApplicationUplinkNormalized.LocationsEntry`](#ttn.lorawan.v3.ApplicationUplinkNormalized.LocationsEntry) | repeated | End device location metadata, set by the Application Server while handling the message. |
+| `version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  | End device version identifiers, set by the Application Server while handling the message. |
+| `network_ids` | [`NetworkIdentifiers`](#ttn.lorawan.v3.NetworkIdentifiers) |  | Network identifiers, set by the Network Server that handles the message. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `session_key_id` | <p>`bytes.max_len`: `2048`</p> |
+| `f_port` | <p>`uint32.lte`: `255`</p><p>`uint32.gte`: `1`</p><p>`uint32.not_in`: `[224]`</p> |
+| `normalized_payload` | <p>`message.required`: `true`</p> |
+| `settings` | <p>`message.required`: `true`</p> |
+| `received_at` | <p>`timestamp.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.ApplicationUplinkNormalized.LocationsEntry">Message `ApplicationUplinkNormalized.LocationsEntry`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -7208,6 +7390,30 @@ Request of GetDefaultMACSettings.
 | `frequency_plan_id` | <p>`string.max_len`: `64`</p> |
 | `lorawan_phy_version` | <p>`enum.defined_only`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.GetDeviceAdressPrefixesResponse">Message `GetDeviceAdressPrefixesResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `dev_addr_prefixes` | [`bytes`](#bytes) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `dev_addr_prefixes` | <p>`repeated.items.bytes.len`: `5`</p> |
+
+### <a name="ttn.lorawan.v3.GetNetIDResponse">Message `GetNetIDResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `net_id` | [`bytes`](#bytes) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `net_id` | <p>`bytes.len`: `3`</p> |
+
 ### <a name="ttn.lorawan.v3.AsNs">Service `AsNs`</a>
 
 The AsNs service connects an Application Server to a Network Server.
@@ -7235,6 +7441,8 @@ The Ns service manages the Network Server.
 | ----------- | ------------ | ------------- | ------------|
 | `GenerateDevAddr` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`GenerateDevAddrResponse`](#ttn.lorawan.v3.GenerateDevAddrResponse) | GenerateDevAddr requests a device address assignment from the Network Server. |
 | `GetDefaultMACSettings` | [`GetDefaultMACSettingsRequest`](#ttn.lorawan.v3.GetDefaultMACSettingsRequest) | [`MACSettings`](#ttn.lorawan.v3.MACSettings) | GetDefaultMACSettings retrieves the default MAC settings for a frequency plan. |
+| `GetNetID` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`GetNetIDResponse`](#ttn.lorawan.v3.GetNetIDResponse) |  |
+| `GetDeviceAddressPrefixes` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`GetDeviceAdressPrefixesResponse`](#ttn.lorawan.v3.GetDeviceAdressPrefixesResponse) |  |
 
 #### HTTP bindings
 
@@ -7242,6 +7450,8 @@ The Ns service manages the Network Server.
 | ----------- | ------ | ------- | ---- |
 | `GenerateDevAddr` | `GET` | `/api/v3/ns/dev_addr` |  |
 | `GetDefaultMACSettings` | `GET` | `/api/v3/ns/default_mac_settings/{frequency_plan_id}/{lorawan_phy_version}` |  |
+| `GetNetID` | `GET` | `/api/v3/ns/net_id` |  |
+| `GetDeviceAddressPrefixes` | `GET` | `/api/v3/ns/dev_addr_prefixes` |  |
 
 ### <a name="ttn.lorawan.v3.NsEndDeviceRegistry">Service `NsEndDeviceRegistry`</a>
 

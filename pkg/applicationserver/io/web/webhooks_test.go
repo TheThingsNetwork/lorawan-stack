@@ -51,11 +51,12 @@ func (mockComponent) FromRequestContext(ctx context.Context) context.Context {
 	return ctx
 }
 
-func createdPooledSink(ctx context.Context, t *testing.T, sink web.Sink) web.Sink {
+func pooledSink(ctx context.Context, sink web.Sink) web.Sink {
 	return web.NewPooledSink(ctx, mockComponent{}, sink, 1, 4)
 }
 
 func TestWebhooks(t *testing.T) {
+	t.Parallel()
 	a, ctx := test.New(t)
 
 	redisClient, flush := test.NewRedis(ctx, "web_test")
@@ -79,6 +80,7 @@ func TestWebhooks(t *testing.T) {
 	// Use a dummy JWT for auth check.
 	longAuthHeader := "Bearer eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoidGVzdHdocm9sZSIsIklzc3VlciI6Iklzc3VlciIsIlVzZXJuYW1lIjoidGVzdHVzZXIiLCJleHAiOjE2NDI0MjU3NDgsImlhdCI6MTY0MjQyNTc0OH0.imuGY_5xnhZYSqjPrc6EUoYV1eapswDBUIBXKVCIYSw" //nolint:lll
 
+	//nolint:paralleltest
 	for _, tc := range []struct {
 		prefix string
 		suffix string
@@ -113,6 +115,9 @@ func TestWebhooks(t *testing.T) {
 						Format:         "json",
 						UplinkMessage: &ttnpb.ApplicationWebhook_Message{
 							Path: tc.prefix + "up{?devEUI}",
+						},
+						UplinkNormalized: &ttnpb.ApplicationWebhook_Message{
+							Path: tc.prefix + "up/normalized{?devEUI}",
 						},
 						JoinAccept: &ttnpb.ApplicationWebhook_Message{
 							Path: tc.prefix + "join{?joinEUI}",
@@ -156,25 +161,27 @@ func TestWebhooks(t *testing.T) {
 							"up.location_solved",
 							"up.service_data",
 							"up.uplink_message",
+							"up.uplink_normalized",
 						),
 					},
 					[]string{
 						"base_url",
-						"downlink_api_key",
 						"downlink_ack",
+						"downlink_api_key",
 						"downlink_failed",
 						"downlink_nack",
-						"downlink_queued",
 						"downlink_queue_invalidated",
+						"downlink_queued",
 						"downlink_sent",
 						"field_mask",
 						"format",
 						"headers",
 						"ids",
-						"service_data",
 						"join_accept",
 						"location_solved",
+						"service_data",
 						"uplink_message",
+						"uplink_normalized",
 					}, nil
 			})
 			if err != nil {
@@ -182,15 +189,17 @@ func TestWebhooks(t *testing.T) {
 			}
 
 			t.Run("Upstream", func(t *testing.T) {
-				baseURL := fmt.Sprintf("https://myapp.com/api/ttn/v3/%s/%s", registeredApplicationID.ApplicationId, registeredDeviceID.DeviceId)
+				baseURL := fmt.Sprintf(
+					"https://myapp.com/api/ttn/v3/%s/%s", registeredApplicationID.ApplicationId, registeredDeviceID.DeviceId,
+				)
 				testSink := &mockSink{
 					ch: make(chan *http.Request, 1),
 				}
 				for _, sink := range []web.Sink{
 					testSink,
-					createdPooledSink(ctx, t, testSink),
-					createdPooledSink(ctx, t,
-						createdPooledSink(ctx, t, testSink),
+					pooledSink(ctx, testSink),
+					pooledSink(ctx,
+						pooledSink(ctx, testSink),
 					),
 				} {
 					t.Run(fmt.Sprintf("%T", sink), func(t *testing.T) {
@@ -223,6 +232,39 @@ func TestWebhooks(t *testing.T) {
 								},
 								OK:  true,
 								URL: fmt.Sprintf("%s/up?devEUI=%s", baseURL, types.MustEUI64(registeredDeviceID.DevEui)),
+							},
+							{
+								Name: "UplinkNormalized/RegisteredDevice",
+								Message: &ttnpb.ApplicationUp{
+									EndDeviceIds: registeredDeviceID,
+									Up: &ttnpb.ApplicationUp_UplinkNormalized{
+										UplinkNormalized: &ttnpb.ApplicationUplinkNormalized{
+											SessionKeyId: []byte{0x11},
+											FPort:        42,
+											FCnt:         42,
+											FrmPayload:   []byte{0x1, 0x2, 0x3},
+											NormalizedPayload: &pbtypes.Struct{
+												Fields: map[string]*pbtypes.Value{
+													"air": {
+														Kind: &pbtypes.Value_StructValue{
+															StructValue: &pbtypes.Struct{
+																Fields: map[string]*pbtypes.Value{
+																	"temperature": {
+																		Kind: &pbtypes.Value_NumberValue{
+																			NumberValue: 21.5,
+																		},
+																	},
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+								OK:  true,
+								URL: fmt.Sprintf("%s/up/normalized?devEUI=%s", baseURL, types.MustEUI64(registeredDeviceID.DevEui)),
 							},
 							{
 								Name: "UplinkMessage/UnregisteredDevice",
@@ -413,20 +455,21 @@ func TestWebhooks(t *testing.T) {
 										t.Fatalf("Did not expect message but received: %v", req)
 									}
 								case <-time.After(Timeout):
-									if tc.OK {
-										t.Fatal("Expected message but nothing received")
-									} else {
+									if !tc.OK {
 										return
 									}
+									t.Fatal("Expected message but nothing received")
 								}
 								a.So(req.URL.String(), should.Equal, tc.URL)
 								a.So(req.Header.Get("Authorization"), should.Equal, longAuthHeader)
 								a.So(req.Header.Get("Content-Type"), should.Equal, "application/json")
 								a.So(req.Header.Get("X-Downlink-Apikey"), should.Equal, "foo.secret")
 								a.So(req.Header.Get("X-Downlink-Push"), should.Equal,
-									"https://example.com/api/v3/as/applications/foo-app/webhooks/foo-hook/devices/foo-device/down/push")
+									"https://example.com/api/v3/as/applications/foo-app/webhooks/foo-hook/devices/foo-device/down/push",
+								)
 								a.So(req.Header.Get("X-Downlink-Replace"), should.Equal,
-									"https://example.com/api/v3/as/applications/foo-app/webhooks/foo-hook/devices/foo-device/down/replace")
+									"https://example.com/api/v3/as/applications/foo-app/webhooks/foo-hook/devices/foo-device/down/replace", //nolint:lll
+								)
 								a.So(req.Header.Get("X-Tts-Domain"), should.Equal, "example.com")
 								actualBody, err := stdio.ReadAll(req.Body)
 								if !a.So(err, should.BeNil) {
@@ -445,6 +488,7 @@ func TestWebhooks(t *testing.T) {
 		})
 	}
 
+	//nolint:paralleltest
 	t.Run("Downstream", func(t *testing.T) {
 		is, isAddr, closeIS := mockis.New(ctx)
 		defer closeIS()
@@ -482,6 +526,7 @@ func TestWebhooks(t *testing.T) {
 
 		mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 
+		//nolint:paralleltest
 		t.Run("Authorization", func(t *testing.T) {
 			for _, tc := range []struct {
 				Name       string

@@ -41,7 +41,8 @@ const GatewayOnboardingForm = props => {
       merge(
         {
           _ownerId: userId,
-          ids: { eui: '' },
+          enforce_duty_cycle: true,
+          schedule_anytime_delay: '0.530s',
         },
         registerInitialValues,
       ),
@@ -78,10 +79,10 @@ const GatewayOnboardingForm = props => {
 
   const handleRegistrationSubmit = useCallback(
     async (values, cleanValues) => {
-      const { _owner_id, _create_api_key_cups, _create_api_key_lns } = values
+      const { _ownerId, _create_api_key_cups, _create_api_key_lns } = values
 
-      const isUserOwner = _owner_id ? userId === _owner_id : true
-      const ownerId = _owner_id ? _owner_id : userId
+      const isUserOwner = _ownerId ? userId === _ownerId : true
+      const ownerId = _ownerId ? _ownerId : userId
       const gatewayId = cleanValues.ids.gateway_id
 
       try {
@@ -100,7 +101,7 @@ const GatewayOnboardingForm = props => {
     [dispatch, generateCUPSApiKey, generateLNSApiKey, onSuccess, userId],
   )
 
-  const handleSubmit = React.useCallback(
+  const handleSubmit = useCallback(
     (values, _, cleanValues) => handleRegistrationSubmit(values, cleanValues),
     [handleRegistrationSubmit],
   )
@@ -110,6 +111,7 @@ const GatewayOnboardingForm = props => {
       error={error}
       onSubmit={handleSubmit}
       initialValues={initialValues}
+      hiddenFields={['gateway_server_address', 'enforce_duty_cycle', 'schedule_anytime_delay']}
       validationSchema={validationSchema}
       validateAgainstCleanedValues
     >

@@ -26,8 +26,8 @@ import (
 type Band struct {
 	ID string
 
-	Beacon            Beacon
-	PingSlotFrequency *uint64
+	Beacon              Beacon
+	PingSlotFrequencies []uint64
 
 	// MaxUplinkChannels is the maximum amount of uplink channels that can be defined.
 	MaxUplinkChannels uint8

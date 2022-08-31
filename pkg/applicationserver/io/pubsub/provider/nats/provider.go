@@ -65,6 +65,10 @@ func (impl) OpenConnection(ctx context.Context, target provider.Target, enabler 
 			message: target.GetUplinkMessage(),
 		},
 		{
+			topic:   &pc.Topics.UplinkNormalized,
+			message: target.GetUplinkNormalized(),
+		},
+		{
 			topic:   &pc.Topics.JoinAccept,
 			message: target.GetJoinAccept(),
 		},

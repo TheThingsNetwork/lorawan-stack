@@ -1025,8 +1025,11 @@ func (a *Agent) handleUplinkMessage(
 	if err != nil {
 		logger.WithError(err).Debug("Network Server failed to handle uplink message")
 		reportError := packetbroker.UplinkMessageProcessingError_UPLINK_UNKNOWN_ERROR
-		if errors.IsNotFound(err) {
+		switch {
+		case errors.IsNotFound(err):
 			reportError = packetbroker.UplinkMessageProcessingError_NOT_FOUND
+		case errors.IsAlreadyExists(err):
+			reportError = packetbroker.UplinkMessageProcessingError_DUPLICATE_PAYLOAD
 		}
 		report.Error = &packetbroker.UplinkMessageProcessingErrorValue{
 			Value: reportError,

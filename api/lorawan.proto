@@ -410,7 +410,7 @@ message FSKDataRate {
 message LRFHSSDataRate {
   option (thethings.flags.message) = { select: true, set: false };
   uint32 modulation_type = 1;
-  // Operating Channel Width (kHz).
+  // Operating Channel Width (Hz).
   uint32 operating_channel_width = 2;
   string coding_rate = 3;
 }

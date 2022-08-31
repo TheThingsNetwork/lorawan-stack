@@ -219,9 +219,11 @@ func convertUplink(rx RxPacket, md UpstreamMetadata) (*ttnpb.UplinkMessage, erro
 		}
 	}
 
-	switch up.Settings.DataRate.Modulation.(type) {
-	case *ttnpb.DataRate_Lora, *ttnpb.DataRate_Lrfhss:
+	switch mod := up.Settings.DataRate.Modulation.(type) {
+	case *ttnpb.DataRate_Lora:
 		up.Settings.CodingRate = rx.CodR
+	case *ttnpb.DataRate_Lrfhss:
+		up.Settings.CodingRate = mod.Lrfhss.CodingRate
 	}
 
 	return up, nil
@@ -236,6 +238,17 @@ func addVersions(status *ttnpb.GatewayStatus, stat Stat) {
 	}
 	if stat.HAL != nil {
 		status.Versions["hal"] = *stat.HAL
+	}
+	if hver := stat.HVer; hver != nil {
+		if fpga := hver.FPGA; fpga != nil {
+			status.Versions["fpga"] = strconv.Itoa(int(*fpga))
+		}
+		if dsp0 := hver.DSP0; dsp0 != nil {
+			status.Versions["dsp0"] = strconv.Itoa(int(*dsp0))
+		}
+		if dsp1 := hver.DSP1; dsp1 != nil {
+			status.Versions["dsp1"] = strconv.Itoa(int(*dsp1))
+		}
 	}
 }
 
@@ -409,13 +422,14 @@ func FromDownlinkMessage(msg *ttnpb.DownlinkMessage) (*TxPacket, error) {
 	}
 
 	tx.DatR.DataRate = scheduled.DataRate
-	switch scheduled.DataRate.GetModulation().(type) {
+	switch mod := scheduled.DataRate.Modulation.(type) {
 	case *ttnpb.DataRate_Lora:
 		tx.CodR = scheduled.CodingRate
 		tx.NCRC = !scheduled.EnableCrc
 		tx.Modu = lora
 	case *ttnpb.DataRate_Fsk:
 		tx.Modu = fsk
+		tx.FDev = uint16(mod.Fsk.BitRate) / 2
 	default:
 		return nil, errDataRate.New()
 	}

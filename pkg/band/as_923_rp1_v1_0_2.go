@@ -107,11 +107,11 @@ var AS_923_RP1_v1_0_2 = Band{
 	},
 
 	Beacon: Beacon{
-		DataRateIndex:    ttnpb.DataRateIndex_DATA_RATE_3,
-		CodingRate:       "4/5",
-		ComputeFrequency: func(_ float64) uint64 { return as923BeaconFrequency(as923Group1Offset) },
+		DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
+		CodingRate:    "4/5",
+		Frequencies:   as923BeaconFrequencies(as923Group1Offset),
 	},
-	PingSlotFrequency: uint64Ptr(as923BeaconFrequency(as923Group1Offset)),
+	PingSlotFrequencies: as923BeaconFrequencies(as923Group1Offset),
 
 	TxParamSetupReqSupport: true,
 }

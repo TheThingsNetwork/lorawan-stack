@@ -20,6 +20,8 @@ func AddSelectFlagsForApplicationUplink(flags *pflag.FlagSet, prefix string, hid
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("frm-payload", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("frm-payload", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("decoded-payload", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("decoded-payload", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("decoded-payload-warnings", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("decoded-payload-warnings", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("normalized-payload", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("normalized-payload", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("normalized-payload-warnings", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("normalized-payload-warnings", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("rx-metadata", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("rx-metadata", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("settings", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("settings", prefix), true), flagsplugin.WithHidden(hidden)))
 	AddSelectFlagsForTxSettings(flags, flagsplugin.Prefix("settings", prefix), hidden)
@@ -68,6 +70,16 @@ func PathsFromSelectFlagsForApplicationUplink(flags *pflag.FlagSet, prefix strin
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("decoded_payload_warnings", prefix))
 	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("normalized_payload", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("normalized_payload", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("normalized_payload_warnings", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("normalized_payload_warnings", prefix))
+	}
 	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("rx_metadata", prefix)); err != nil {
 		return nil, err
 	} else if selected && val {
@@ -102,6 +114,117 @@ func PathsFromSelectFlagsForApplicationUplink(flags *pflag.FlagSet, prefix strin
 		return nil, err
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("last_a_f_cnt_down", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("confirmed", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("confirmed", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("consumed_airtime", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("consumed_airtime", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("locations", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("locations", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("version_ids", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("version_ids", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForEndDeviceVersionIdentifiers(flags, flagsplugin.Prefix("version_ids", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("network_ids", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("network_ids", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForNetworkIdentifiers(flags, flagsplugin.Prefix("network_ids", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	return paths, nil
+}
+
+// AddSelectFlagsForApplicationUplinkNormalized adds flags to select fields in ApplicationUplinkNormalized.
+func AddSelectFlagsForApplicationUplinkNormalized(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("session-key-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("session-key-id", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("f-port", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("f-port", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("f-cnt", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("f-cnt", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("frm-payload", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("frm-payload", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("normalized-payload", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("normalized-payload", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("normalized-payload-warnings", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("normalized-payload-warnings", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("rx-metadata", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("rx-metadata", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("settings", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("settings", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForTxSettings(flags, flagsplugin.Prefix("settings", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("received-at", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("received-at", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("confirmed", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("confirmed", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("consumed-airtime", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("consumed-airtime", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("locations", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("locations", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("version-ids", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("version-ids", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForEndDeviceVersionIdentifiers(flags, flagsplugin.Prefix("version-ids", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("network-ids", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("network-ids", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForNetworkIdentifiers(flags, flagsplugin.Prefix("network-ids", prefix), hidden)
+}
+
+// SelectFromFlags outputs the fieldmask paths forApplicationUplinkNormalized message from select flags.
+func PathsFromSelectFlagsForApplicationUplinkNormalized(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("session_key_id", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("session_key_id", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("f_port", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("f_port", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("f_cnt", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("f_cnt", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("frm_payload", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("frm_payload", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("normalized_payload", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("normalized_payload", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("normalized_payload_warnings", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("normalized_payload_warnings", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("rx_metadata", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("rx_metadata", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("settings", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("settings", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForTxSettings(flags, flagsplugin.Prefix("settings", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("received_at", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("received_at", prefix))
 	}
 	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("confirmed", prefix)); err != nil {
 		return nil, err
@@ -500,6 +623,8 @@ func AddSelectFlagsForApplicationUp(flags *pflag.FlagSet, prefix string, hidden 
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("received-at", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("received-at", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("up.uplink-message", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("up.uplink-message", prefix), true), flagsplugin.WithHidden(hidden)))
 	AddSelectFlagsForApplicationUplink(flags, flagsplugin.Prefix("up.uplink-message", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("up.uplink-normalized", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("up.uplink-normalized", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForApplicationUplinkNormalized(flags, flagsplugin.Prefix("up.uplink-normalized", prefix), hidden)
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("up.join-accept", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("up.join-accept", prefix), true), flagsplugin.WithHidden(hidden)))
 	AddSelectFlagsForApplicationJoinAccept(flags, flagsplugin.Prefix("up.join-accept", prefix), hidden)
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("up.downlink-ack", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("up.downlink-ack", prefix), true), flagsplugin.WithHidden(hidden)))
@@ -549,6 +674,16 @@ func PathsFromSelectFlagsForApplicationUp(flags *pflag.FlagSet, prefix string) (
 		paths = append(paths, flagsplugin.Prefix("up.uplink_message", prefix))
 	}
 	if selectPaths, err := PathsFromSelectFlagsForApplicationUplink(flags, flagsplugin.Prefix("up.uplink_message", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("up.uplink_normalized", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("up.uplink_normalized", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForApplicationUplinkNormalized(flags, flagsplugin.Prefix("up.uplink_normalized", prefix)); err != nil {
 		return nil, err
 	} else {
 		paths = append(paths, selectPaths...)

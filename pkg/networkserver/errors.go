@@ -28,6 +28,7 @@ var (
 	errDataRateNotFound                   = errors.DefineNotFound("data_rate_not_found", "data rate not found", "data_rate")
 	errDataRateIndexNotFound              = errors.DefineNotFound("data_rate_index_not_found", "data rate with index `{index}` not found")
 	errDecodePayload                      = errors.DefineInvalidArgument("decode_payload", "failed to decode payload")
+	errDuplicateUplink                    = errors.DefineAlreadyExists("duplicate_uplink", "duplicate uplink")
 	errDeviceNotFound                     = errors.DefineNotFound("device_not_found", "device not found")
 	errEmptySession                       = errors.DefineFailedPrecondition("empty_session", "session in empty")
 	errEncodeMAC                          = errors.DefineInternal("encode_mac", "failed to encode MAC commands")

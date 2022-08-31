@@ -70,6 +70,8 @@ var ApplicationWebhookTemplateFieldPathsNested = []string{
 	"service_data.path",
 	"uplink_message",
 	"uplink_message.path",
+	"uplink_normalized",
+	"uplink_normalized.path",
 }
 
 var ApplicationWebhookTemplateFieldPathsTopLevel = []string{
@@ -95,6 +97,7 @@ var ApplicationWebhookTemplateFieldPathsTopLevel = []string{
 	"name",
 	"service_data",
 	"uplink_message",
+	"uplink_normalized",
 }
 var ApplicationWebhookTemplatesFieldPathsNested = []string{
 	"templates",
@@ -183,6 +186,8 @@ var ApplicationWebhookFieldPathsNested = []string{
 	"updated_at",
 	"uplink_message",
 	"uplink_message.path",
+	"uplink_normalized",
+	"uplink_normalized.path",
 }
 
 var ApplicationWebhookFieldPathsTopLevel = []string{
@@ -207,6 +212,7 @@ var ApplicationWebhookFieldPathsTopLevel = []string{
 	"template_ids",
 	"updated_at",
 	"uplink_message",
+	"uplink_normalized",
 }
 var ApplicationWebhooksFieldPathsNested = []string{
 	"webhooks",
@@ -301,6 +307,8 @@ var SetApplicationWebhookRequestFieldPathsNested = []string{
 	"webhook.updated_at",
 	"webhook.uplink_message",
 	"webhook.uplink_message.path",
+	"webhook.uplink_normalized",
+	"webhook.uplink_normalized.path",
 }
 
 var SetApplicationWebhookRequestFieldPathsTopLevel = []string{

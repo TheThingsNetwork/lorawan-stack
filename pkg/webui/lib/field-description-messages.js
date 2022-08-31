@@ -19,9 +19,11 @@ import TOOLTIP_IDS from '@ttn-lw/lib/constants/tooltip-ids'
 
 const m = defineMessages({
   freqPlanDescription:
-    'A Frequency Plan defines data rates and channels which comply with the LoRaWAN Regional Parameters for a band or geographical area.',
+    'A frequency plan defines data rates that your end device or gateway is setup to use. It is important that gateways and end devices within reach use the same frequency plan to be able to communicate.',
   freqPlanLocation:
-    'You need to choose a Frequency Plan which adheres to the local regulations of where your end device is located. It is also important that the gateways in reach of this end device use the same Frequency Plan.',
+    'Your end device or gateway manufacturer should provide information about the applicable frequency plan for a particular device. In some cases they are printed on the device itself but they should always be in the hardware manual or data sheet.',
+  freqPlanAbsence:
+    'Contact the manufacturer or reseller. Using an incorrect frequency plan will prevent traffic between devices.',
 
   devEuiDescription: 'A 64 bit extended unique identifier for your end device.',
   devEuiLocation:
@@ -143,10 +145,11 @@ const m = defineMessages({
   gatewayIdDescription: 'A unique identifier for your gateway.',
   gatewayIdLocation: 'You make it up, so be creative!',
 
-  gatewayEuiDescription: 'A 64 bit extended unique identifier for your end device.',
+  gatewayEuiDescription: 'A 64 bit extended unique identifier for your gateway.',
   gatewayEuiLocation:
     'It should be provided to you by the manufacturer, or printed on the gateway packaging.',
-  gatewayEuiAbsence: 'Contact the manufacturer or reseller.',
+  gatewayEuiAbsence:
+    'Some gateways do not use EUIs. In that case, you can continue without EUI. If you are unsure, we recommend contacting the manufacturer or reseller.',
 
   gatewayNameDescription: 'An optional human readable name to help you identify your gateway.',
   gatewayNameLocation: 'You make it up, so be creative!',
@@ -157,6 +160,8 @@ const m = defineMessages({
   requireAuthenticatedConnectionDescription:
     'This will only allow a gateway to connect if it uses a TLS enabled Basic Station or MQTT connection. It will not allow connections from UDP packet forwarders.',
 
+  gatewayStatusDescription:
+    'Setting your gateway status to public allows status information about the gateway to be shared with other users in the network, and with Packet Broker if enabled by the network operator.',
   gatewayGenerateApiKeyCUPS:
     'Use this option if you plan to use your gateway with LoRa Basics™ Station CUPS (Configuration and Update Server) to check for configuration and software updates. When checked, an appropriate API key for the CUPS service is automatically generated, so you can authorize the gateway right away.',
   gatewayGenerateApiKeyLNS:
@@ -273,6 +278,7 @@ const descriptions = Object.freeze({
   [TOOLTIP_IDS.FREQUENCY_PLAN]: {
     description: m.freqPlanDescription,
     location: m.freqPlanLocation,
+    absence: m.freqPlanAbsence,
     glossaryId: GLOSSARY_IDS.FREQUENCY_PLAN,
   },
   [TOOLTIP_IDS.DEV_EUI]: {

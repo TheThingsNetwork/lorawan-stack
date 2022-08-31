@@ -224,6 +224,7 @@ func (f webhookTemplateField) toPB() *ttnpb.ApplicationWebhookTemplateField {
 
 type webhookTemplatePaths struct {
 	UplinkMessage            *string `yaml:"uplink-message,omitempty"`
+	UplinkNormalized         *string `yaml:"uplink-normalized,omitempty"`
 	JoinAccept               *string `yaml:"join-accept,omitempty"`
 	DownlinkAck              *string `yaml:"downlink-ack,omitempty"`
 	DownlinkNack             *string `yaml:"downlink-nack,omitempty"`
@@ -288,6 +289,7 @@ func (t webhookTemplate) toPB() *ttnpb.ApplicationWebhookTemplate {
 		Fields:                   t.pbFields(),
 		CreateDownlinkApiKey:     t.CreateDownlinkAPIKey,
 		UplinkMessage:            t.pathToMessage(t.Paths.UplinkMessage),
+		UplinkNormalized:         t.pathToMessage(t.Paths.UplinkNormalized),
 		JoinAccept:               t.pathToMessage(t.Paths.JoinAccept),
 		DownlinkAck:              t.pathToMessage(t.Paths.DownlinkAck),
 		DownlinkNack:             t.pathToMessage(t.Paths.DownlinkNack),

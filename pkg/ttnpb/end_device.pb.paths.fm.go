@@ -3082,11 +3082,21 @@ var EndDeviceTemplateFormatsFieldPathsTopLevel = []string{
 }
 var ConvertEndDeviceTemplateRequestFieldPathsNested = []string{
 	"data",
+	"end_device_version_ids",
+	"end_device_version_ids.band_id",
+	"end_device_version_ids.brand_id",
+	"end_device_version_ids.firmware_version",
+	"end_device_version_ids.hardware_version",
+	"end_device_version_ids.model_id",
+	"end_device_version_ids.serial_number",
+	"end_device_version_ids.vendor_id",
+	"end_device_version_ids.vendor_profile_id",
 	"format_id",
 }
 
 var ConvertEndDeviceTemplateRequestFieldPathsTopLevel = []string{
 	"data",
+	"end_device_version_ids",
 	"format_id",
 }
 var MACParameters_ChannelFieldPathsNested = []string{

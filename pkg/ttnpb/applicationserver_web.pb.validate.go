@@ -572,6 +572,18 @@ func (m *ApplicationWebhookTemplate) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "uplink_normalized":
+
+			if v, ok := interface{}(m.GetUplinkNormalized()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationWebhookTemplateValidationError{
+						field:  "uplink_normalized",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		case "join_accept":
 
 			if v, ok := interface{}(m.GetJoinAccept()).(interface{ ValidateFields(...string) error }); ok {
@@ -1131,6 +1143,18 @@ func (m *ApplicationWebhook) ValidateFields(paths ...string) error {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationWebhookValidationError{
 						field:  "uplink_message",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "uplink_normalized":
+
+			if v, ok := interface{}(m.GetUplinkNormalized()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationWebhookValidationError{
+						field:  "uplink_normalized",
 						reason: "embedded message failed validation",
 						cause:  err,
 					}

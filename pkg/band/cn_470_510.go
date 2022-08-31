@@ -53,11 +53,11 @@ var (
 		return downlinkChannels
 	}()
 
-	cn470510BeaconFrequencies = func() [8]uint64 {
-		var beaconFrequencies [8]uint64
+	cn470510BeaconFrequencies = func() []uint64 {
+		freqs := make([]uint64, 8)
 		for i := 0; i < 8; i++ {
-			beaconFrequencies[i] = 508300000 + uint64(i*200000)
+			freqs[i] = 508300000 + uint64(i*200000)
 		}
-		return beaconFrequencies
+		return freqs
 	}()
 )

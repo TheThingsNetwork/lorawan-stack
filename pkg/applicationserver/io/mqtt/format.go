@@ -33,7 +33,9 @@ func TopicParts(up *io.ContextualApplicationUp, layout topics.Layout) []string {
 	var f func(string, string) []string
 	switch up.Up.(type) {
 	case *ttnpb.ApplicationUp_UplinkMessage:
-		f = layout.UplinkTopic
+		f = layout.UplinkMessageTopic
+	case *ttnpb.ApplicationUp_UplinkNormalized:
+		f = layout.UplinkNormalizedTopic
 	case *ttnpb.ApplicationUp_JoinAccept:
 		f = layout.JoinAcceptTopic
 	case *ttnpb.ApplicationUp_DownlinkAck:

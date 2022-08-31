@@ -111,11 +111,11 @@ var as923RP2102Band = func(id string, offset as923GroupOffset) Band {
 		},
 
 		Beacon: Beacon{
-			DataRateIndex:    ttnpb.DataRateIndex_DATA_RATE_3,
-			CodingRate:       "4/5",
-			ComputeFrequency: func(_ float64) uint64 { return as923BeaconFrequency(offset) },
+			DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
+			CodingRate:    "4/5",
+			Frequencies:   as923BeaconFrequencies(offset),
 		},
-		PingSlotFrequency: uint64Ptr(as923BeaconFrequency(offset)),
+		PingSlotFrequencies: as923BeaconFrequencies(offset),
 
 		TxParamSetupReqSupport: true,
 	}

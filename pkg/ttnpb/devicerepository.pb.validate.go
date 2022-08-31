@@ -1647,6 +1647,13 @@ func (m *EncodedMessagePayload) ValidateFields(paths ...string) error {
 			// no validation rules for FrmPayload
 		case "warnings":
 
+			if len(m.GetWarnings()) > 10 {
+				return EncodedMessagePayloadValidationError{
+					field:  "warnings",
+					reason: "value must contain no more than 10 item(s)",
+				}
+			}
+
 			for idx, item := range m.GetWarnings() {
 				_, _ = idx, item
 
@@ -1660,6 +1667,13 @@ func (m *EncodedMessagePayload) ValidateFields(paths ...string) error {
 			}
 
 		case "errors":
+
+			if len(m.GetErrors()) > 10 {
+				return EncodedMessagePayloadValidationError{
+					field:  "errors",
+					reason: "value must contain no more than 10 item(s)",
+				}
+			}
 
 			for idx, item := range m.GetErrors() {
 				_, _ = idx, item
@@ -1768,6 +1782,13 @@ func (m *DecodedMessagePayload) ValidateFields(paths ...string) error {
 
 		case "warnings":
 
+			if len(m.GetWarnings()) > 10 {
+				return DecodedMessagePayloadValidationError{
+					field:  "warnings",
+					reason: "value must contain no more than 10 item(s)",
+				}
+			}
+
 			for idx, item := range m.GetWarnings() {
 				_, _ = idx, item
 
@@ -1781,6 +1802,13 @@ func (m *DecodedMessagePayload) ValidateFields(paths ...string) error {
 			}
 
 		case "errors":
+
+			if len(m.GetErrors()) > 10 {
+				return DecodedMessagePayloadValidationError{
+					field:  "errors",
+					reason: "value must contain no more than 10 item(s)",
+				}
+			}
 
 			for idx, item := range m.GetErrors() {
 				_, _ = idx, item

@@ -95,7 +95,7 @@ func (dr DR) String() string {
 		return fmt.Sprintf("%d", fsk.BitRate)
 	}
 	if lrfhss := dr.GetLrfhss(); lrfhss != nil {
-		return fmt.Sprintf("M%dCW%d", lrfhss.ModulationType, lrfhss.OperatingChannelWidth)
+		return fmt.Sprintf("M%dCW%d", lrfhss.ModulationType, lrfhss.OperatingChannelWidth/1000)
 	}
 	return ""
 }
@@ -149,7 +149,7 @@ func ParseLRFHSS(dr string) (DR, error) {
 			Modulation: &ttnpb.DataRate_Lrfhss{
 				Lrfhss: &ttnpb.LRFHSSDataRate{
 					ModulationType:        uint32(mod),
-					OperatingChannelWidth: uint32(ocw),
+					OperatingChannelWidth: uint32(ocw * 1000),
 				},
 			},
 		},

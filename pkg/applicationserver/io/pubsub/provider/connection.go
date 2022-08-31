@@ -42,6 +42,7 @@ func (ds *DownlinkSubscriptions) Shutdown(ctx context.Context) error {
 // UplinkTopics contains the topics for the uplink messages.
 type UplinkTopics struct {
 	UplinkMessage            *pubsub.Topic
+	UplinkNormalized         *pubsub.Topic
 	JoinAccept               *pubsub.Topic
 	DownlinkAck              *pubsub.Topic
 	DownlinkNack             *pubsub.Topic
@@ -57,6 +58,7 @@ type UplinkTopics struct {
 func (ut *UplinkTopics) Shutdown(ctx context.Context) error {
 	return shutdown(ctx,
 		ut.UplinkMessage,
+		ut.UplinkNormalized,
 		ut.JoinAccept,
 		ut.DownlinkAck,
 		ut.DownlinkNack,
@@ -75,7 +77,7 @@ type Shutdowner interface {
 }
 
 // ProviderConnection is an interface that represents a provider specific connection.
-type ProviderConnection interface {
+type ProviderConnection interface { //nolint:revive
 	Shutdowner
 }
 

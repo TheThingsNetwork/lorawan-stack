@@ -50,10 +50,6 @@ func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.Cluste
 	panic("could not connect to peer")
 }
 
-func eui64Ptr(eui types.EUI64) *types.EUI64 {
-	return &eui
-}
-
 func withDevAddr(ids *ttnpb.EndDeviceIdentifiers, devAddr types.DevAddr) *ttnpb.EndDeviceIdentifiers {
 	newIds := &ttnpb.EndDeviceIdentifiers{}
 	if err := newIds.SetFields(ids, ttnpb.EndDeviceIdentifiersFieldPathsNested...); err != nil {
@@ -90,7 +86,11 @@ func startMockNS(ctx context.Context, link chan *mockNSASConn) (*mockNS, string)
 	if err != nil {
 		panic(err)
 	}
-	go srv.Serve(lis)
+	go func() {
+		if err := srv.Serve(lis); err != nil {
+			panic(err)
+		}
+	}()
 	return ns, lis.Addr().String()
 }
 
@@ -164,7 +164,11 @@ func startMockJS(ctx context.Context) (*mockJS, string) {
 	if err != nil {
 		panic(err)
 	}
-	go srv.Serve(lis)
+	go func() {
+		if err := srv.Serve(lis); err != nil {
+			panic(err)
+		}
+	}()
 	return js, lis.Addr().String()
 }
 

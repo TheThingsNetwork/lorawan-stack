@@ -35,6 +35,7 @@ const webhookEntitySelector = [
   'headers',
   'downlink_api_key',
   'uplink_message',
+  'uplink_normalized',
   'join_accept',
   'downlink_ack',
   'downlink_nack',

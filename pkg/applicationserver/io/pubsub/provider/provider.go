@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package provider implements pub/sub provider interfaces and registration.
 package provider
 
 import (
@@ -27,6 +28,7 @@ import (
 type Topics interface {
 	GetBaseTopic() string
 	GetUplinkMessage() *ttnpb.ApplicationPubSub_Message
+	GetUplinkNormalized() *ttnpb.ApplicationPubSub_Message
 	GetJoinAccept() *ttnpb.ApplicationPubSub_Message
 	GetDownlinkAck() *ttnpb.ApplicationPubSub_Message
 	GetDownlinkNack() *ttnpb.ApplicationPubSub_Message
@@ -57,8 +59,14 @@ type Provider interface {
 }
 
 var (
-	errNotImplemented    = errors.DefineUnimplemented("provider_not_implemented", "provider `{provider_id}` is not implemented")
-	errAlreadyRegistered = errors.DefineAlreadyExists("provider_already_registered", "provider `{provider_id}` already registered")
+	errNotImplemented = errors.DefineUnimplemented(
+		"provider_not_implemented",
+		"provider `{provider_id}` is not implemented",
+	)
+	errAlreadyRegistered = errors.DefineAlreadyExists(
+		"provider_already_registered",
+		"provider `{provider_id}` already registered",
+	)
 
 	providers = map[reflect.Type]Provider{}
 )

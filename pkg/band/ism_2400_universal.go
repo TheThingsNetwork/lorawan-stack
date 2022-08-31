@@ -91,9 +91,9 @@ var ISM_2400_Universal = Band{
 	DefaultRx2Parameters: Rx2Parameters{ttnpb.DataRateIndex_DATA_RATE_0, 2423000000},
 
 	Beacon: Beacon{
-		DataRateIndex:    ttnpb.DataRateIndex_DATA_RATE_3,
-		CodingRate:       "4/8LI",
-		ComputeFrequency: func(_ float64) uint64 { return ism2400BeaconFrequency },
+		DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
+		CodingRate:    "4/8LI",
+		Frequencies:   ism2400BeaconFrequencies,
 	},
-	PingSlotFrequency: uint64Ptr(ism2400BeaconFrequency),
+	PingSlotFrequencies: ism2400BeaconFrequencies,
 }

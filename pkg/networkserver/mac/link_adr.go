@@ -141,11 +141,6 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Ban
 			"desired_adr_data_rate_index", dev.MacState.DesiredParameters.AdrDataRateIndex,
 		}
 		switch {
-		case dev.MacState.DesiredParameters.AdrDataRateIndex > phy.MaxADRDataRateIndex:
-			return linkADRReqParameters{}, false, internal.ErrCorruptedMACState.
-				WithAttributes(append(attributes,
-					"phy_max_adr_data_rate_index", phy.MaxADRDataRateIndex,
-				)...)
 		case dev.MacState.DesiredParameters.AdrDataRateIndex < minDataRateIndex:
 			return linkADRReqParameters{}, false, internal.ErrCorruptedMACState.
 				WithAttributes(append(attributes,
