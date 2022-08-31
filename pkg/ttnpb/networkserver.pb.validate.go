@@ -228,3 +228,191 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GetDefaultMACSettingsRequestValidationError{}
+
+// ValidateFields checks the field values on GetNetIDResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *GetNetIDResponse) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GetNetIDResponseFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "net_id":
+
+			if len(m.GetNetId()) > 0 {
+
+				if len(m.GetNetId()) != 3 {
+					return GetNetIDResponseValidationError{
+						field:  "net_id",
+						reason: "value length must be 3 bytes",
+					}
+				}
+
+			}
+
+		default:
+			return GetNetIDResponseValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// GetNetIDResponseValidationError is the validation error returned by
+// GetNetIDResponse.ValidateFields if the designated constraints aren't met.
+type GetNetIDResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetNetIDResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetNetIDResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetNetIDResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetNetIDResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetNetIDResponseValidationError) ErrorName() string { return "GetNetIDResponseValidationError" }
+
+// Error satisfies the builtin error interface
+func (e GetNetIDResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetNetIDResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetNetIDResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetNetIDResponseValidationError{}
+
+// ValidateFields checks the field values on GetDeviceAdressPrefixesResponse
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *GetDeviceAdressPrefixesResponse) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GetDeviceAdressPrefixesResponseFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "dev_addr_prefixes":
+
+			for idx, item := range m.GetDevAddrPrefixes() {
+				_, _ = idx, item
+
+				if len(item) != 5 {
+					return GetDeviceAdressPrefixesResponseValidationError{
+						field:  fmt.Sprintf("dev_addr_prefixes[%v]", idx),
+						reason: "value length must be 5 bytes",
+					}
+				}
+
+			}
+
+		default:
+			return GetDeviceAdressPrefixesResponseValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// GetDeviceAdressPrefixesResponseValidationError is the validation error
+// returned by GetDeviceAdressPrefixesResponse.ValidateFields if the
+// designated constraints aren't met.
+type GetDeviceAdressPrefixesResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetDeviceAdressPrefixesResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetDeviceAdressPrefixesResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetDeviceAdressPrefixesResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetDeviceAdressPrefixesResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetDeviceAdressPrefixesResponseValidationError) ErrorName() string {
+	return "GetDeviceAdressPrefixesResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetDeviceAdressPrefixesResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetDeviceAdressPrefixesResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetDeviceAdressPrefixesResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetDeviceAdressPrefixesResponseValidationError{}

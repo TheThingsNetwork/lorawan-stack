@@ -11740,6 +11740,50 @@
         ]
       }
     },
+    "/ns/dev_addr_prefixes": {
+      "get": {
+        "operationId": "Ns_GetDeviceAddressPrefixes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetDeviceAdressPrefixesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "Ns"
+        ]
+      }
+    },
+    "/ns/net_id": {
+      "get": {
+        "operationId": "Ns_GetNetID",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetNetIDResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "Ns"
+        ]
+      }
+    },
     "/organizations": {
       "get": {
         "summary": "List organizations where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the organizations the caller\nhas access to.\nSimilar to Get, this selects the fields given by the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
@@ -21957,6 +22001,21 @@
         }
       }
     },
+    "v3GetDeviceAdressPrefixesResponse": {
+      "type": "object",
+      "properties": {
+        "dev_addr_prefixes": {
+          "type": "array",
+          "example": [
+            "2600AB00/24"
+          ],
+          "items": {
+            "type": "string",
+            "format": "byte"
+          }
+        }
+      }
+    },
     "v3GetGatewayConfigurationResponse": {
       "type": "object",
       "properties": {
@@ -21995,6 +22054,16 @@
       "properties": {
         "configuration": {
           "$ref": "#/definitions/v3IsConfiguration"
+        }
+      }
+    },
+    "v3GetNetIDResponse": {
+      "type": "object",
+      "properties": {
+        "net_id": {
+          "type": "string",
+          "format": "string",
+          "example": "000013"
         }
       }
     },

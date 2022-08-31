@@ -33999,6 +33999,70 @@
               }
             }
           ]
+        },
+        {
+          "name": "GetDeviceAdressPrefixesResponse",
+          "longName": "GetDeviceAdressPrefixesResponse",
+          "fullName": "ttn.lorawan.v3.GetDeviceAdressPrefixesResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "dev_addr_prefixes",
+              "description": "",
+              "label": "repeated",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.items.bytes.len",
+                    "value": 5
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GetNetIDResponse",
+          "longName": "GetNetIDResponse",
+          "fullName": "ttn.lorawan.v3.GetNetIDResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "net_id",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 3
+                  }
+                ]
+              }
+            }
+          ]
         }
       ],
       "services": [
@@ -34123,6 +34187,50 @@
                     {
                       "method": "GET",
                       "pattern": "/ns/default_mac_settings/{frequency_plan_id}/{lorawan_phy_version}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetNetID",
+              "description": "",
+              "requestType": "Empty",
+              "requestLongType": ".google.protobuf.Empty",
+              "requestFullType": "google.protobuf.Empty",
+              "requestStreaming": false,
+              "responseType": "GetNetIDResponse",
+              "responseLongType": "GetNetIDResponse",
+              "responseFullType": "ttn.lorawan.v3.GetNetIDResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ns/net_id"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetDeviceAddressPrefixes",
+              "description": "",
+              "requestType": "Empty",
+              "requestLongType": ".google.protobuf.Empty",
+              "requestFullType": "google.protobuf.Empty",
+              "requestStreaming": false,
+              "responseType": "GetDeviceAdressPrefixesResponse",
+              "responseLongType": "GetDeviceAdressPrefixesResponse",
+              "responseFullType": "ttn.lorawan.v3.GetDeviceAdressPrefixesResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ns/dev_addr_prefixes"
                     }
                   ]
                 }

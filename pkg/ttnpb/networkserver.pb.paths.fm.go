@@ -18,3 +18,17 @@ var GetDefaultMACSettingsRequestFieldPathsTopLevel = []string{
 	"frequency_plan_id",
 	"lorawan_phy_version",
 }
+var GetNetIDResponseFieldPathsNested = []string{
+	"net_id",
+}
+
+var GetNetIDResponseFieldPathsTopLevel = []string{
+	"net_id",
+}
+var GetDeviceAdressPrefixesResponseFieldPathsNested = []string{
+	"dev_addr_prefixes",
+}
+
+var GetDeviceAdressPrefixesResponseFieldPathsTopLevel = []string{
+	"dev_addr_prefixes",
+}

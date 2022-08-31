@@ -492,6 +492,34 @@ func (prefix DevAddrPrefix) ConfigString() string {
 	return prefix.String()
 }
 
+// MarshalDevAddrPrefixSlice marshals a slice of DevAddrPrefixes to JSON.
+func MarshalDevAddrPrefixSlice(s *jsonplugin.MarshalState, bs [][]byte) {
+	vs := make([]string, len(bs))
+	for i, b := range bs {
+		prefix := MustDevAddrPrefix(b)
+		vs[i] = prefix.String()
+	}
+	s.WriteStringArray(vs)
+}
+
+// UnmarshalDevAddrPrefixSlice unmarshals a slice of DevAddrPrefixes from JSON.
+func UnmarshalDevAddrPrefixSlice(s *jsonplugin.UnmarshalState) [][]byte {
+	vs := s.ReadStringArray()
+	if s.Err() != nil {
+		return nil
+	}
+	bs := make([][]byte, len(vs))
+	for i, v := range vs {
+		var prefix DevAddrPrefix
+		if err := prefix.UnmarshalText([]byte(v)); err != nil {
+			s.SetError(err)
+			return nil
+		}
+		bs[i] = prefix.Bytes()
+	}
+	return bs
+}
+
 // WithPrefix returns the DevAddr, but with the first length bits replaced by the Prefix.
 func (addr DevAddr) WithPrefix(prefix DevAddrPrefix) (prefixed DevAddr) {
 	k := uint(prefix.Length)
@@ -543,18 +571,18 @@ func GetDevAddrFromFlag(fs *pflag.FlagSet, name string) (value DevAddr, set bool
 }
 
 // GetDevAddrPrefixSliceFromFlag gets a DevAddrPrefix slice from a named flag in the flag set.
-func GetDevAddrPrefixSliceFromFlag(fs *pflag.FlagSet, name string) (value []DevAddrPrefix, set bool, err error) {
+func GetDevAddrPrefixSliceFromFlag(fs *pflag.FlagSet, name string) (value [][]byte, set bool, err error) {
 	flag := fs.Lookup(name)
 	if flag == nil {
 		return nil, false, &flagsplugin.ErrFlagNotFound{FlagName: name}
 	}
-	value = make([]DevAddrPrefix, len(flag.Value.(*flagsplugin.StringSliceValue).Values))
+	value = make([][]byte, len(flag.Value.(*flagsplugin.StringSliceValue).Values))
 	for i, v := range flag.Value.(*flagsplugin.StringSliceValue).Values {
 		var prefix DevAddrPrefix
 		if err := prefix.UnmarshalText([]byte(v.Value)); err != nil {
 			return nil, false, err
 		}
-		value[i] = prefix
+		value[i] = prefix.Bytes()
 	}
 	return value, flag.Changed, nil
 }

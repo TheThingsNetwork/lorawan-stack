@@ -12,6 +12,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - New `ListBands` RPC on the `Configuration` service.
+- New `NetID` and `DeviceAddressPrefixes` RPC on the `NS` service.
 - Support for loading end device template from Device Repository when importing devices using a CSV file.
 - Experimental support for normalized payload.
 - Decoded payloads are now visible for downlinks in the Console.

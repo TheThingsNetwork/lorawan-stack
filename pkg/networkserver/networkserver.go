@@ -82,6 +82,16 @@ func makeNewDevAddrFunc(ps ...types.DevAddrPrefix) newDevAddrFunc {
 	}
 }
 
+// devAddrPrefixesFunc is a function, which is used by the Network Server to list it's DevAddrPrefixes.
+type devAddrPrefixesFunc func(ctx context.Context) []types.DevAddrPrefix
+
+// makeDevAddrPrefixesFunc returns a devAddrPrefixesFunc, which always returns ps.
+func makeDevAddrPrefixesFunc(ps ...types.DevAddrPrefix) devAddrPrefixesFunc {
+	return func(ctx context.Context) []types.DevAddrPrefix {
+		return ps
+	}
+}
+
 // DownlinkPriorities define the schedule priorities for the different types of downlink.
 type DownlinkPriorities struct {
 	// JoinAccept is the downlink priority for join-accept messages.
@@ -108,9 +118,10 @@ type NetworkServer struct {
 
 	devices DeviceRegistry
 
-	netID      types.NetID
-	clusterID  string
-	newDevAddr newDevAddrFunc
+	netID           types.NetID
+	clusterID       string
+	newDevAddr      newDevAddrFunc
+	devAddrPrefixes devAddrPrefixesFunc
 
 	applicationServers *sync.Map // string -> *applicationUpStream
 	applicationUplinks ApplicationUplinkQueue
@@ -218,6 +229,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		netID:                    conf.NetID,
 		clusterID:                conf.ClusterID,
 		newDevAddr:               makeNewDevAddrFunc(devAddrPrefixes...),
+		devAddrPrefixes:          makeDevAddrPrefixesFunc(devAddrPrefixes...),
 		applicationServers:       &sync.Map{},
 		applicationUplinks:       conf.ApplicationUplinkQueue.Queue,
 		deduplicationWindow:      makeWindowDurationFunc(conf.DeduplicationWindow),
