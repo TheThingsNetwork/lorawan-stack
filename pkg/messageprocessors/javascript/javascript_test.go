@@ -377,7 +377,7 @@ func TestDecodeUplink(t *testing.T) {
 		a.So(message.NormalizedPayload, should.HaveLength, 1)
 		measurements, err := normalizedpayload.Parse(message.NormalizedPayload)
 		a.So(err, should.BeNil)
-		a.So(measurements[0], should.Resemble, normalizedpayload.Measurement{
+		a.So(measurements[0].Measurement, should.Resemble, normalizedpayload.Measurement{
 			Air: &normalizedpayload.Air{
 				Temperature: float64Ptr(-21.3),
 			},
@@ -405,7 +405,7 @@ func TestDecodeUplink(t *testing.T) {
 
 		measurements, err := normalizedpayload.Parse(message.NormalizedPayload)
 		a.So(err, should.BeNil)
-		a.So(measurements[0], should.Resemble, normalizedpayload.Measurement{
+		a.So(measurements[0].Measurement, should.Resemble, normalizedpayload.Measurement{
 			Air: &normalizedpayload.Air{
 				Temperature: float64Ptr(-21.3),
 			},
@@ -450,8 +450,12 @@ func TestDecodeUplink(t *testing.T) {
 		})
 
 		a.So(message.NormalizedPayload, should.HaveLength, 2)
-		measurements, err := normalizedpayload.Parse(message.NormalizedPayload)
+		parsedMeasurements, err := normalizedpayload.Parse(message.NormalizedPayload)
 		a.So(err, should.BeNil)
+		measurements := make([]normalizedpayload.Measurement, len(parsedMeasurements))
+		for i, m := range parsedMeasurements {
+			measurements[i] = m.Measurement
+		}
 		a.So(measurements, should.Resemble, []normalizedpayload.Measurement{
 			{
 				Air: &normalizedpayload.Air{
@@ -539,8 +543,23 @@ func TestDecodeUplink(t *testing.T) {
 			}
 			`
 		err := host.DecodeUplink(ctx, ids, nil, message, script)
-		a.So(err, should.NotBeNil)
-		a.So(errors.IsInvalidArgument(err), should.BeTrue)
+		a.So(err, should.BeNil)
+
+		a.So(message.NormalizedPayload, should.HaveLength, 1)
+		parsedMeasurements, err := normalizedpayload.Parse(message.NormalizedPayload)
+		a.So(err, should.BeNil)
+		measurements := make([]normalizedpayload.Measurement, len(parsedMeasurements))
+		for i, m := range parsedMeasurements {
+			measurements[i] = m.Measurement
+		}
+		a.So(measurements, should.Resemble, []normalizedpayload.Measurement{
+			{
+				Air: &normalizedpayload.Air{},
+			},
+		})
+		a.So(message.NormalizedPayloadWarnings, should.Resemble, []string{
+			"measurement 1: `air.temperature` should be equal or greater than `-273.15`",
+		})
 	}
 
 	// The Things Node example.

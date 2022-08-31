@@ -46,34 +46,34 @@ type Measurement struct {
 
 var (
 	errFieldType    = errors.DefineInvalidArgument("field_type", "invalid field type of `{path}`")
-	errFieldMinimum = errors.DefineInvalidArgument(
+	errFieldMinimum = errors.DefineDataLoss(
 		"field_minimum",
 		"`{path}` should be equal or greater than `{minimum}`",
 	)
 	//nolint:unused
-	errFieldExclusiveMinimum = errors.DefineInvalidArgument(
+	errFieldExclusiveMinimum = errors.DefineDataLoss(
 		"field_exclusive_minimum",
 		"`{path}` should be greater than `{minimum}`",
 	)
-	errFieldMaximum = errors.DefineInvalidArgument(
+	errFieldMaximum = errors.DefineDataLoss(
 		"field_maximum",
 		"`{path}` should be equal or less than `{maximum}`",
 	)
-	errFieldExclusiveMaximum = errors.DefineInvalidArgument(
+	errFieldExclusiveMaximum = errors.DefineDataLoss(
 		"field_exclusive_maximum",
 		"`{path}` should be less than `{maximum}`",
 	)
 	errUnknownField = errors.DefineInvalidArgument("unknown_field", "unknown field `{path}`")
 )
 
-type fieldParser func(dst *Measurement, src *pbtypes.Value, path string) error
+type fieldParser func(dst *Measurement, src *pbtypes.Value, path string) []error
 
 // object validates that the path is a structure and sets the target to an empty value.
 func object[T any](selector func(*Measurement) **T) fieldParser {
-	return func(dst *Measurement, src *pbtypes.Value, path string) error {
+	return func(dst *Measurement, src *pbtypes.Value, path string) []error {
 		_, ok := src.Kind.(*pbtypes.Value_StructValue)
 		if !ok {
-			return errFieldType.WithAttributes("path", path)
+			return []error{errFieldType.WithAttributes("path", path)}
 		}
 		*selector(dst) = new(T)
 		return nil
@@ -82,28 +82,28 @@ func object[T any](selector func(*Measurement) **T) fieldParser {
 
 type fieldValidator[T any] func(v T, path string) error
 
-func validate[T any](val T, validators []fieldValidator[T], path string) error {
+func validate[T any](val T, validators []fieldValidator[T], path string) (errs []error) {
 	for _, v := range validators {
 		if err := v(val, path); err != nil {
-			return err
+			errs = append(errs, err)
 		}
 	}
-	return nil
+	return errs
 }
 
 // parseTime parses and validates the time. The input value must be RFC3339.
 func parseTime(selector func(dst *Measurement) **time.Time, vals ...fieldValidator[time.Time]) fieldParser {
-	return func(dst *Measurement, src *pbtypes.Value, path string) error {
+	return func(dst *Measurement, src *pbtypes.Value, path string) []error {
 		val, ok := src.Kind.(*pbtypes.Value_StringValue)
 		if !ok {
-			return errFieldType.WithAttributes("path", path)
+			return []error{errFieldType.WithAttributes("path", path)}
 		}
 		t, err := time.Parse(time.RFC3339Nano, val.StringValue)
 		if err != nil {
-			return err
+			return []error{err}
 		}
-		if err := validate(t, vals, path); err != nil {
-			return err
+		if validateErrs := validate(t, vals, path); len(validateErrs) > 0 {
+			return validateErrs
 		}
 		*selector(dst) = &t
 		return nil
@@ -112,14 +112,14 @@ func parseTime(selector func(dst *Measurement) **time.Time, vals ...fieldValidat
 
 // parseNumber parses and validates a number.
 func parseNumber(selector func(dst *Measurement) **float64, vals ...fieldValidator[float64]) fieldParser {
-	return func(dst *Measurement, src *pbtypes.Value, path string) error {
+	return func(dst *Measurement, src *pbtypes.Value, path string) []error {
 		val, ok := src.Kind.(*pbtypes.Value_NumberValue)
 		if !ok {
-			return errFieldType.WithAttributes("path", path)
+			return []error{errFieldType.WithAttributes("path", path)}
 		}
 		n := val.NumberValue
-		if err := validate(n, vals, path); err != nil {
-			return err
+		if validateErrs := validate(n, vals, path); len(validateErrs) > 0 {
+			return validateErrs
 		}
 		*selector(dst) = &n
 		return nil
@@ -231,10 +231,22 @@ var fieldParsers = map[string]fieldParser{
 	),
 }
 
+// ParsedMeasurement is the result of parsing measurements with Parse.
+type ParsedMeasurement struct {
+	Measurement
+	// ValidationErrors contains any errors that occurred during field validation.
+	ValidationErrors []error
+	// Valid only contains the valid fields, for which there were no validation errors.
+	Valid *pbtypes.Struct
+}
+
 // Parse parses and validates the measurements.
-func Parse(measurements []*pbtypes.Struct) ([]Measurement, error) {
-	res := make([]Measurement, len(measurements))
+func Parse(measurements []*pbtypes.Struct) ([]ParsedMeasurement, error) {
+	res := make([]ParsedMeasurement, len(measurements))
 	for i, src := range measurements {
+		res[i].Valid = &pbtypes.Struct{
+			Fields: make(map[string]*pbtypes.Value),
+		}
 		err := parse(&res[i], src, "")
 		if err != nil {
 			return nil, err
@@ -243,21 +255,41 @@ func Parse(measurements []*pbtypes.Struct) ([]Measurement, error) {
 	return res, nil
 }
 
-func parse(dst *Measurement, src *pbtypes.Struct, prefix string) error {
+func parse(dst *ParsedMeasurement, src *pbtypes.Struct, prefix string) error {
 	for k, v := range src.GetFields() {
 		path := fmt.Sprintf("%s%s", prefix, k)
 		parser, ok := fieldParsers[path]
 		if !ok {
 			return errUnknownField.WithAttributes("path", path)
 		}
-		if err := parser(dst, v, path); err != nil {
-			return err
+		if errs := parser(&dst.Measurement, v, path); errs != nil {
+			for _, err := range errs {
+				if !errors.IsDataLoss(err) {
+					return err
+				}
+				dst.ValidationErrors = append(dst.ValidationErrors, err)
+			}
+			continue
 		}
+		validFieldValue := v
 		if s, ok := v.Kind.(*pbtypes.Value_StructValue); ok {
-			if err := parse(dst, s.StructValue, path+"."); err != nil {
+			nested := &ParsedMeasurement{
+				Measurement: dst.Measurement,
+				Valid: &pbtypes.Struct{
+					Fields: make(map[string]*pbtypes.Value),
+				},
+			}
+			if err := parse(nested, s.StructValue, path+"."); err != nil {
 				return err
 			}
+			dst.ValidationErrors = append(dst.ValidationErrors, nested.ValidationErrors...)
+			validFieldValue = &pbtypes.Value{
+				Kind: &pbtypes.Value_StructValue{
+					StructValue: nested.Valid,
+				},
+			}
 		}
+		dst.Valid.Fields[k] = validFieldValue
 	}
 	return nil
 }
