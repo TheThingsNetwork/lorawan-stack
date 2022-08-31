@@ -14,6 +14,8 @@
 
 syntax = "proto3";
 
+import "github.com/TheThingsIndustries/protoc-gen-go-flags/annotations.proto";
+import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/protobuf/duration.proto";
 import "google/api/annotations.proto";
@@ -28,6 +30,7 @@ option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 option (gogoproto.goproto_registration) = true;
 
 message ListFrequencyPlansRequest {
+  option (thethings.flags.message) = { select: false, set: true };
   // Optional base frequency in MHz for hardware support (433, 470, 868 or 915)
   uint32 base_frequency = 1;
 }
@@ -46,6 +49,7 @@ message ListFrequencyPlansResponse {
 }
 
 message GetPhyVersionsRequest {
+  option (thethings.flags.message) = { select: false, set: true };
   // Optional Band ID to filter the results.
   // If unused, all supported Bands and their versions are returned.
   string band_id = 1;
@@ -60,12 +64,13 @@ message GetPhyVersionsResponse {
 }
 
 message ListBandsRequest {
+  option (thethings.flags.message) = { select: false, set: true };
   // Optional Band ID to filter the results.
   // If unused, all supported Bands are returned.
   string band_id = 1;
   // Optional PHY version to filter the results.
   // If unused, all supported versions are returned.
-  PHYVersion phy_version = 2;
+  PHYVersion phy_version = 2 [(validate.rules).enum.defined_only = true];
 }
 
 message BandDescription {
