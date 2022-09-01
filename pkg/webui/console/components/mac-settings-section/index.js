@@ -483,6 +483,8 @@ const MacSettingsSection = props => {
           component={Input}
           type="number"
           tooltipId={tooltipIds.ADR_MARGIN}
+          min={-100}
+          max={100}
           inputWidth="xs"
           append="dB"
         />

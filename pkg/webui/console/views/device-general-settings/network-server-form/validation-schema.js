@@ -356,7 +356,7 @@ const validationSchema = Yup.object()
               })
             } else if (value && 'disabled' in value) {
               return Yup.object().shape({
-                disabled: Yup.object().shape({}),
+                disabled: Yup.object().shape({}).noUnknown(),
               })
             }
 
