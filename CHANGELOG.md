@@ -12,6 +12,8 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - New `ListBands` RPC on the `Configuration` service.
+  - Added support to CLI. Available via the `end-devices list-bands` command.
+- CLI support for listing PHY versions via the `end-devices list-phy-versions` CLI command.
 - New `NetID` and `DeviceAddressPrefixes` RPC on the `NS` service.
   - Added support on CLI. Available via the `end-devices get-net-id` and `end-devices get-dev-addr-prefixes` commands.
 - Support for loading end device template from Device Repository when importing devices using a CSV file.

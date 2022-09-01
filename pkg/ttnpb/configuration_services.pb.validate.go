@@ -507,7 +507,14 @@ func (m *ListBandsRequest) ValidateFields(paths ...string) error {
 		case "band_id":
 			// no validation rules for BandId
 		case "phy_version":
-			// no validation rules for PhyVersion
+
+			if _, ok := PHYVersion_name[int32(m.GetPhyVersion())]; !ok {
+				return ListBandsRequestValidationError{
+					field:  "phy_version",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		default:
 			return ListBandsRequestValidationError{
 				field:  name,
