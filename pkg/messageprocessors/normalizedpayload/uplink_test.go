@@ -37,10 +37,11 @@ func TestUplink(t *testing.T) {
 	t.Parallel()
 
 	for _, tc := range []struct {
-		name              string
-		normalizedPayload []*pbtypes.Struct
-		expected          []normalizedpayload.Measurement
-		errorAssertion    func(error) bool
+		name                     string
+		normalizedPayload        []*pbtypes.Struct
+		expected                 []normalizedpayload.Measurement
+		expectedValidationErrors [][]error
+		errorAssertion           func(error) bool
 	}{
 		{
 			name: "single timestamp",
@@ -101,12 +102,12 @@ func TestUplink(t *testing.T) {
 			},
 			expected: []normalizedpayload.Measurement{
 				{
-					Air: &normalizedpayload.Air{
+					Air: normalizedpayload.Air{
 						Temperature: float64Ptr(20.42),
 					},
 				},
 				{
-					Air: &normalizedpayload.Air{
+					Air: normalizedpayload.Air{
 						Temperature: float64Ptr(19.61),
 					},
 				},
@@ -133,7 +134,17 @@ func TestUplink(t *testing.T) {
 					},
 				},
 			},
-			errorAssertion: errors.IsInvalidArgument,
+			expected: []normalizedpayload.Measurement{
+				{},
+			},
+			expectedValidationErrors: [][]error{
+				{
+					normalizedpayload.ErrFieldMinimum.WithAttributes(
+						"path", "air.temperature",
+						"minimum", -273.15,
+					),
+				},
+			},
 		},
 		{
 			name: "invalid direction",
@@ -156,7 +167,17 @@ func TestUplink(t *testing.T) {
 					},
 				},
 			},
-			errorAssertion: errors.IsInvalidArgument,
+			expected: []normalizedpayload.Measurement{
+				{},
+			},
+			expectedValidationErrors: [][]error{
+				{
+					normalizedpayload.ErrFieldExclusiveMaximum.WithAttributes(
+						"path", "wind.direction",
+						"maximum", 360.0,
+					),
+				},
+			},
 		},
 		{
 			name: "invalid type",
@@ -216,7 +237,19 @@ func TestUplink(t *testing.T) {
 				a.So(tc.errorAssertion(err), should.BeTrue)
 			} else {
 				a.So(err, should.BeNil)
-				a.So(measurements, should.Resemble, tc.expected)
+				if !a.So(measurements, should.HaveLength, len(tc.expected)) {
+					t.FailNow()
+				}
+				for i, parsed := range measurements {
+					if len(parsed.ValidationErrors) > 0 {
+						a.So(len(tc.expectedValidationErrors), should.BeGreaterThanOrEqualTo, i+1)
+						a.So(parsed.ValidationErrors, should.HaveLength, len(tc.expectedValidationErrors[i]))
+						for j, err := range parsed.ValidationErrors {
+							a.So(err, should.EqualErrorOrDefinition, tc.expectedValidationErrors[i][j])
+						}
+					}
+					a.So(parsed.Measurement, should.Resemble, tc.expected[i])
+				}
 			}
 		})
 	}
