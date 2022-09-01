@@ -33,6 +33,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Removed
 
+- Experimental support for `LoRa Basics Station` gateway GPS timestamps which use the wrong precision (milliseconds instead of microseconds). Please ensure that your gateway has been updated to the latest firmware.
+
 ### Fixed
 
 - The Gateway Server scheduler no longer considers the absolute time of a downlink to be the time of arrival.

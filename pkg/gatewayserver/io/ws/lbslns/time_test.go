@@ -25,6 +25,8 @@ import (
 func timePtr(t time.Time) *time.Time { return &t }
 
 func TestTimePtrFromUpInfo(t *testing.T) {
+	t.Parallel()
+
 	for _, tc := range []struct {
 		Name          string
 		GPSTime       int64
@@ -37,39 +39,31 @@ func TestTimePtrFromUpInfo(t *testing.T) {
 			ReferenceTime: time.Unix(0, 456),
 		},
 		{
-			Name:          "OnlyRxTime",
-			RxTime:        123.456,
-			ReferenceTime: time.Unix(0, 456),
+			Name:   "OnlyRxTime",
+			RxTime: 123.456,
 
 			ExpectedTime: timePtr(time.Unix(123, 456000000).UTC()),
 		},
 		{
-			Name:          "EqualGPSTimeAndRxTime",
-			GPSTime:       -315964676544, // The timestamp is negative as the UTC epoch precedes the GPS epoch.
-			RxTime:        123.456,
-			ReferenceTime: time.Unix(123, 456),
+			Name:    "EqualGPSTimeAndRxTime",
+			GPSTime: -315964676544000, // microseconds. The timestamp is negative as the UTC epoch precedes the GPS epoch.
+			RxTime:  123.456,
 
 			ExpectedTime: timePtr(time.Unix(123, 456000000).UTC()),
 		},
 		{
-			Name:          "OnlyGPSTime",
-			GPSTime:       -315964676544, // The timestamp is negative as the UTC epoch precedes the GPS epoch.
-			ReferenceTime: time.Unix(0, 456),
+			Name:    "OnlyGPSTime",
+			GPSTime: 123456000, // microseconds.
 
-			ExpectedTime: timePtr(time.Unix(123, 456000000).UTC()),
-		},
-		{
-			Name:          "MillisecondGPSTime",
-			GPSTime:       1321619791991, // This timestamp is in milliseconds, instead of microseconds.
-			RxTime:        1637584573,
-			ReferenceTime: time.Unix(1637584483, 999974502), // 2021-11-22T12:34:43.999974502Z
-
-			ExpectedTime: timePtr(time.Unix(1637584573, 991000000).UTC()),
+			ExpectedTime: timePtr(time.Unix(315964923, 456000000).UTC()),
 		},
 	} {
+		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
 			a, _ := test.New(t)
-			a.So(TimePtrFromUpInfo(tc.GPSTime, tc.RxTime, tc.ReferenceTime), should.Resemble, tc.ExpectedTime)
+			a.So(TimePtrFromUpInfo(tc.GPSTime, tc.RxTime), should.Resemble, tc.ExpectedTime)
 		})
 	}
 }

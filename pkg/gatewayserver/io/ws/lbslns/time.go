@@ -68,52 +68,13 @@ func TimeToGPSTime(t time.Time) int64 {
 	return int64(gpstime.ToGPS(t) / time.Microsecond)
 }
 
-func absoluteDuration(d time.Duration) time.Duration {
-	if d > 0 {
-		return d
-	}
-	return -d
-}
-
-func absoluteTimeDifference(a time.Time, b time.Time) time.Duration {
-	return absoluteDuration(a.Sub(b))
-}
-
-func closestTimestamp(referenceTime time.Time, ds ...time.Time) *time.Time {
-	if len(ds) == 0 {
-		return nil
-	}
-	minTime, minDifference := ds[0], absoluteTimeDifference(referenceTime, ds[0])
-	for _, t := range ds[1:] {
-		if diff := absoluteTimeDifference(referenceTime, t); diff < minDifference {
-			minTime, minDifference = t, diff
-		}
-	}
-	return &minTime
-}
-
 // TimePtrFromUpInfo contructs a *time.Time from the provided uplink metadata information.
-// The GPS timestamp is used if present, then the RxTime. The function returns nil if both
-// timestamps are unavailable.
-// The implementation will attempt to correct GPS time precision errors caused by faulty
-// implementations. In cases in which such errors occur, the timestamp which is closer to
-// the provided reference time is considered correct.
-// TODO: Remove precision errors accounting (use TimePtrFromGPSTime directly).
-// https://github.com/TheThingsNetwork/lorawan-stack/issues/4907
-func TimePtrFromUpInfo(gpsTime int64, rxTime float64, referenceTime time.Time) *time.Time {
+// The GPS timestamp (microseconds) is used if present, then the RxTime. The function
+// returns nil if both timestamps are unavailable.
+func TimePtrFromUpInfo(gpsTime int64, rxTime float64) *time.Time {
 	switch {
 	case gpsTime != 0:
-		// Certain gateways report GPS timestamps using millisecond precision, instead of microsecond precision.
-		// This causes the messages to appear as if they originate from ~1980 - very close to the GPS epoch.
-		// In order to account for such errors, we compute the *time.Time associated with the provided timestamp
-		// and the *time.Time associated with the timestamp multiplied by 1000 (the ratio between millisecond
-		// and microsecond). The timestamp which is closer to the reference time is considered to be the correct
-		// timestamp.
-		return closestTimestamp(
-			referenceTime,
-			TimeFromGPSTime(gpsTime),
-			TimeFromGPSTime(gpsTime*int64(time.Millisecond/time.Microsecond)),
-		)
+		return TimePtrFromGPSTime(gpsTime)
 	case rxTime != 0.0:
 		return TimePtrFromUnixSeconds(rxTime)
 	default:
