@@ -640,6 +640,49 @@ func TestDecodeUplink(t *testing.T) {
 		a.So(errors.IsAborted(err), should.BeTrue)
 	}
 
+	// Return no normalized payload (data is nil).
+	{
+		script := `
+			function decodeUplink(input) {
+				return {
+					data: {
+						state: input.bytes[0]
+					}
+				}
+			}
+
+			function normalizeUplink(input) {
+				return {
+					data: null
+				}
+			}
+			`
+		err := host.DecodeUplink(ctx, ids, nil, message, script)
+		a.So(err, should.BeNil)
+		a.So(message.NormalizedPayload, should.BeNil)
+		a.So(message.NormalizedPayloadWarnings, should.BeEmpty)
+	}
+
+	// Return no normalized payload (no return value).
+	{
+		script := `
+			function decodeUplink(input) {
+				return {
+					data: {
+						state: input.bytes[0]
+					}
+				}
+			}
+	
+			function normalizeUplink(input) {
+			}
+			`
+		err := host.DecodeUplink(ctx, ids, nil, message, script)
+		a.So(err, should.BeNil)
+		a.So(message.NormalizedPayload, should.BeNil)
+		a.So(message.NormalizedPayloadWarnings, should.BeEmpty)
+	}
+
 	// Decode and normalize a single measurement with out-of-range value.
 	{
 		message := &ttnpb.ApplicationUplink{

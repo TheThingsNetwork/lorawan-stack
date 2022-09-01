@@ -310,13 +310,14 @@ func (*host) decodeUplink(
 		return errOutput.WithCause(err)
 	}
 	msg.DecodedPayload, msg.DecodedPayloadWarnings = decodedPayload, output.Decoded.Warnings
+	msg.NormalizedPayload, msg.NormalizedPayloadWarnings = nil, nil
 
 	if normalized := output.Normalized; normalized != nil {
 		if errs := normalized.Errors; len(errs) > 0 {
 			return errOutputErrors.WithAttributes("errors", strings.Join(errs, ", "))
 		}
 		if normalized.Data == nil {
-			return errOutput.New()
+			return nil
 		}
 		// The returned data can be an array of measurements or a single measurement object.
 		var measurements []map[string]interface{}
