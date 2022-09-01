@@ -583,8 +583,18 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids *ttnpb.GatewayIde
 		updateSessionID(ctx, SessionIDFromXTime(jreq.UpInfo.XTime))
 		ct := recordTime(jreq.RefTime, jreq.UpInfo.XTime, jreq.UpInfo.GPSTime, jreq.UpInfo.RxTime)
 		if err := conn.HandleUp(up, ct); err != nil {
-			logger.WithError(err).Warn("Failed to handle upstream message")
-			return nil, err
+			// HandleUp calls uplink.ValidateFields which is a deep validation of the payload fields.
+			// jreq.toUplinkMessage already validates that the gateway is sending sane messages.
+			// Ex: The MHDR of a `jreq` message is valid LoRaWAN Join type.
+			// But beyond these basic checks, LBS gateways do not perform a deep validation of the message.
+			// Ex: Checking that the RFU fields are not used is out of scope for the gateway and the Gateway Server.
+			// In such cases, we won't process the uplink message but we shouldn't disconnect the gateway.
+			// This prevents a spamming device from DOSing the gateway.
+			if !errors.IsInvalidArgument(err) {
+				logger.WithError(err).Warn("Failed to handle upstream message")
+				return nil, err
+			}
+			log.FromContext(ctx).WithError(err).Warn("Invalid join request")
 		}
 
 	case TypeUpstreamUplinkDataFrame:
@@ -605,8 +615,18 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids *ttnpb.GatewayIde
 		updateSessionID(ctx, SessionIDFromXTime(updf.UpInfo.XTime))
 		ct := recordTime(updf.RefTime, updf.UpInfo.XTime, updf.UpInfo.GPSTime, updf.UpInfo.RxTime)
 		if err := conn.HandleUp(up, ct); err != nil {
-			logger.WithError(err).Warn("Failed to handle upstream message")
-			return nil, err
+			// HandleUp calls uplink.ValidateFields which is a deep validation of the payload fields.
+			// updf.toUplinkMessage already validates that the gateway is sending sane messages.
+			// Ex: The MHDR of a `updf` message is valid LoRaWAN uplink type.
+			// But beyond these basic checks, LBS gateways do not perform a deep validation of the message.
+			// Ex: Checking that the RFU fields are not used is out of scope for the gateway and the Gateway Server.
+			// In such cases, we won't process the uplink message but we shouldn't disconnect the gateway.
+			// This prevents a spamming device from DOSing the gateway.
+			if !errors.IsInvalidArgument(err) {
+				logger.WithError(err).Warn("Failed to handle upstream message")
+				return nil, err
+			}
+			log.FromContext(ctx).WithError(err).Warn("Invalid uplink message")
 		}
 
 	case TypeUpstreamTxConfirmation:
