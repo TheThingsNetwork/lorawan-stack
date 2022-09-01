@@ -584,7 +584,6 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids *ttnpb.GatewayIde
 		ct := recordTime(jreq.RefTime, jreq.UpInfo.XTime, jreq.UpInfo.GPSTime, jreq.UpInfo.RxTime)
 		if err := conn.HandleUp(up, ct); err != nil {
 			logger.WithError(err).Warn("Failed to handle upstream message")
-			return nil, err
 		}
 
 	case TypeUpstreamUplinkDataFrame:
@@ -606,7 +605,6 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids *ttnpb.GatewayIde
 		ct := recordTime(updf.RefTime, updf.UpInfo.XTime, updf.UpInfo.GPSTime, updf.UpInfo.RxTime)
 		if err := conn.HandleUp(up, ct); err != nil {
 			logger.WithError(err).Warn("Failed to handle upstream message")
-			return nil, err
 		}
 
 	case TypeUpstreamTxConfirmation:
