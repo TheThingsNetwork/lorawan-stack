@@ -367,24 +367,49 @@ func TestDecodeUplink(t *testing.T) {
 		err := host.DecodeUplink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
 
-		decodedPayload, err := gogoproto.Map(message.DecodedPayload)
-		a.So(err, should.BeNil)
-		a.So(decodedPayload, should.Resemble, map[string]interface{}{
-			"temperature": -21.3,
+		a.So(message.DecodedPayload, should.Resemble, &pbtypes.Struct{
+			Fields: map[string]*pbtypes.Value{
+				"temperature": {
+					Kind: &pbtypes.Value_NumberValue{
+						NumberValue: -21.3,
+					},
+				},
+			},
 		})
 		a.So(message.DecodedPayloadWarnings, should.Resemble, []string{"it's cold"})
 
-		a.So(message.NormalizedPayload, should.HaveLength, 1)
+		a.So(message.NormalizedPayload, should.Resemble, []*pbtypes.Struct{
+			{
+				Fields: map[string]*pbtypes.Value{
+					"air": {
+						Kind: &pbtypes.Value_StructValue{
+							StructValue: &pbtypes.Struct{
+								Fields: map[string]*pbtypes.Value{
+									"temperature": {
+										Kind: &pbtypes.Value_NumberValue{
+											NumberValue: -21.3,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		})
+		a.So(message.NormalizedPayloadWarnings, should.BeEmpty)
+
 		measurements, err := normalizedpayload.Parse(message.NormalizedPayload)
 		a.So(err, should.BeNil)
 		a.So(measurements[0].Measurement, should.Resemble, normalizedpayload.Measurement{
-			Air: &normalizedpayload.Air{
+			Air: normalizedpayload.Air{
 				Temperature: float64Ptr(-21.3),
 			},
 		})
 	}
 
 	// Decode a single measurement that is already normalized.
+	// In the normalized payload, empty objects are omitted.
 	{
 		//nolint:lll
 		script := `
@@ -393,20 +418,65 @@ func TestDecodeUplink(t *testing.T) {
 				data: {
 					air: {
 						temperature: (((input.bytes[0] & 0x80 ? input.bytes[0] - 0x100 : input.bytes[0]) << 8) | input.bytes[1]) / 100
-					}
+					},
+					wind: {}
 				}
 			}
 		}
 		`
 		err := host.DecodeUplink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
-		a.So(message.NormalizedPayload, should.HaveLength, 1)
-		a.So(message.DecodedPayload, should.Resemble, message.NormalizedPayload[0])
+
+		a.So(message.DecodedPayload, should.Resemble, &pbtypes.Struct{
+			Fields: map[string]*pbtypes.Value{
+				"air": {
+					Kind: &pbtypes.Value_StructValue{
+						StructValue: &pbtypes.Struct{
+							Fields: map[string]*pbtypes.Value{
+								"temperature": {
+									Kind: &pbtypes.Value_NumberValue{
+										NumberValue: -21.3,
+									},
+								},
+							},
+						},
+					},
+				},
+				"wind": {
+					Kind: &pbtypes.Value_StructValue{
+						StructValue: &pbtypes.Struct{
+							Fields: map[string]*pbtypes.Value{},
+						},
+					},
+				},
+			},
+		})
+		a.So(message.DecodedPayloadWarnings, should.BeEmpty)
+		a.So(message.NormalizedPayload, should.Resemble, []*pbtypes.Struct{
+			{
+				Fields: map[string]*pbtypes.Value{
+					"air": {
+						Kind: &pbtypes.Value_StructValue{
+							StructValue: &pbtypes.Struct{
+								Fields: map[string]*pbtypes.Value{
+									"temperature": {
+										Kind: &pbtypes.Value_NumberValue{
+											NumberValue: -21.3,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		})
+		a.So(message.NormalizedPayloadWarnings, should.BeEmpty)
 
 		measurements, err := normalizedpayload.Parse(message.NormalizedPayload)
 		a.So(err, should.BeNil)
 		a.So(measurements[0].Measurement, should.Resemble, normalizedpayload.Measurement{
-			Air: &normalizedpayload.Air{
+			Air: normalizedpayload.Air{
 				Temperature: float64Ptr(-21.3),
 			},
 		})
@@ -443,13 +513,67 @@ func TestDecodeUplink(t *testing.T) {
 		err := host.DecodeUplink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
 
-		decodedPayload, err := gogoproto.Map(message.DecodedPayload)
-		a.So(err, should.BeNil)
-		a.So(decodedPayload, should.Resemble, map[string]interface{}{
-			"temperatures": []interface{}{-21.3, -20.88},
+		a.So(message.DecodedPayload, should.Resemble, &pbtypes.Struct{
+			Fields: map[string]*pbtypes.Value{
+				"temperatures": {
+					Kind: &pbtypes.Value_ListValue{
+						ListValue: &pbtypes.ListValue{
+							Values: []*pbtypes.Value{
+								{
+									Kind: &pbtypes.Value_NumberValue{
+										NumberValue: -21.3,
+									},
+								},
+								{
+									Kind: &pbtypes.Value_NumberValue{
+										NumberValue: -20.88,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 		})
+		a.So(message.DecodedPayloadWarnings, should.BeEmpty)
+		a.So(message.NormalizedPayload, should.Resemble, []*pbtypes.Struct{
+			{
+				Fields: map[string]*pbtypes.Value{
+					"air": {
+						Kind: &pbtypes.Value_StructValue{
+							StructValue: &pbtypes.Struct{
+								Fields: map[string]*pbtypes.Value{
+									"temperature": {
+										Kind: &pbtypes.Value_NumberValue{
+											NumberValue: -21.3,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			{
+				Fields: map[string]*pbtypes.Value{
+					"air": {
+						Kind: &pbtypes.Value_StructValue{
+							StructValue: &pbtypes.Struct{
+								Fields: map[string]*pbtypes.Value{
+									"temperature": {
+										Kind: &pbtypes.Value_NumberValue{
+											NumberValue: -20.88,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		})
+		a.So(message.NormalizedPayloadWarnings, should.BeEmpty)
 
-		a.So(message.NormalizedPayload, should.HaveLength, 2)
 		parsedMeasurements, err := normalizedpayload.Parse(message.NormalizedPayload)
 		a.So(err, should.BeNil)
 		measurements := make([]normalizedpayload.Measurement, len(parsedMeasurements))
@@ -458,12 +582,12 @@ func TestDecodeUplink(t *testing.T) {
 		}
 		a.So(measurements, should.Resemble, []normalizedpayload.Measurement{
 			{
-				Air: &normalizedpayload.Air{
+				Air: normalizedpayload.Air{
 					Temperature: float64Ptr(-21.3),
 				},
 			},
 			{
-				Air: &normalizedpayload.Air{
+				Air: normalizedpayload.Air{
 					Temperature: float64Ptr(-20.88),
 				},
 			},
@@ -545,7 +669,15 @@ func TestDecodeUplink(t *testing.T) {
 		err := host.DecodeUplink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
 
-		a.So(message.NormalizedPayload, should.HaveLength, 1)
+		a.So(message.NormalizedPayload, should.Resemble, []*pbtypes.Struct{
+			{
+				Fields: map[string]*pbtypes.Value{},
+			},
+		})
+		a.So(message.NormalizedPayloadWarnings, should.Resemble, []string{
+			"measurement 1: `air.temperature` should be equal or greater than `-273.15`",
+		})
+
 		parsedMeasurements, err := normalizedpayload.Parse(message.NormalizedPayload)
 		a.So(err, should.BeNil)
 		measurements := make([]normalizedpayload.Measurement, len(parsedMeasurements))
@@ -553,12 +685,7 @@ func TestDecodeUplink(t *testing.T) {
 			measurements[i] = m.Measurement
 		}
 		a.So(measurements, should.Resemble, []normalizedpayload.Measurement{
-			{
-				Air: &normalizedpayload.Air{},
-			},
-		})
-		a.So(message.NormalizedPayloadWarnings, should.Resemble, []string{
-			"measurement 1: `air.temperature` should be equal or greater than `-273.15`",
+			{},
 		})
 	}
 

@@ -102,12 +102,12 @@ func TestUplink(t *testing.T) {
 			},
 			expected: []normalizedpayload.Measurement{
 				{
-					Air: &normalizedpayload.Air{
+					Air: normalizedpayload.Air{
 						Temperature: float64Ptr(20.42),
 					},
 				},
 				{
-					Air: &normalizedpayload.Air{
+					Air: normalizedpayload.Air{
 						Temperature: float64Ptr(19.61),
 					},
 				},
@@ -135,9 +135,7 @@ func TestUplink(t *testing.T) {
 				},
 			},
 			expected: []normalizedpayload.Measurement{
-				{
-					Air: &normalizedpayload.Air{},
-				},
+				{},
 			},
 			expectedValidationErrors: [][]error{
 				{
@@ -170,9 +168,7 @@ func TestUplink(t *testing.T) {
 				},
 			},
 			expected: []normalizedpayload.Measurement{
-				{
-					Wind: &normalizedpayload.Wind{},
-				},
+				{},
 			},
 			expectedValidationErrors: [][]error{
 				{

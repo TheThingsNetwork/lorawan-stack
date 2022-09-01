@@ -40,8 +40,8 @@ type Wind struct {
 // Measurement is a measurement.
 type Measurement struct {
 	Time *time.Time
-	Air  *Air
-	Wind *Wind
+	Air  Air
+	Wind Wind
 }
 
 var (
@@ -69,13 +69,13 @@ var (
 type fieldParser func(dst *Measurement, src *pbtypes.Value, path string) []error
 
 // object validates that the path is a structure and sets the target to an empty value.
-func object[T any](selector func(*Measurement) **T) fieldParser {
+func object[T any](selector func(*Measurement) *T) fieldParser {
 	return func(dst *Measurement, src *pbtypes.Value, path string) []error {
 		_, ok := src.Kind.(*pbtypes.Value_StructValue)
 		if !ok {
 			return []error{errFieldType.WithAttributes("path", path)}
 		}
-		*selector(dst) = new(T)
+		*selector(dst) = *new(T)
 		return nil
 	}
 }
@@ -187,7 +187,7 @@ var fieldParsers = map[string]fieldParser{
 		},
 	),
 	"air": object(
-		func(dst *Measurement) **Air {
+		func(dst *Measurement) *Air {
 			return &dst.Air
 		},
 	),
@@ -212,7 +212,7 @@ var fieldParsers = map[string]fieldParser{
 		maximum(1100.0),
 	),
 	"wind": object(
-		func(dst *Measurement) **Wind {
+		func(dst *Measurement) *Wind {
 			return &dst.Wind
 		},
 	),
@@ -271,7 +271,6 @@ func parse(dst *ParsedMeasurement, src *pbtypes.Struct, prefix string) error {
 			}
 			continue
 		}
-		validFieldValue := v
 		if s, ok := v.Kind.(*pbtypes.Value_StructValue); ok {
 			nested := &ParsedMeasurement{
 				Measurement: dst.Measurement,
@@ -282,14 +281,18 @@ func parse(dst *ParsedMeasurement, src *pbtypes.Struct, prefix string) error {
 			if err := parse(nested, s.StructValue, path+"."); err != nil {
 				return err
 			}
+			dst.Measurement = nested.Measurement
 			dst.ValidationErrors = append(dst.ValidationErrors, nested.ValidationErrors...)
-			validFieldValue = &pbtypes.Value{
-				Kind: &pbtypes.Value_StructValue{
-					StructValue: nested.Valid,
-				},
+			if len(nested.Valid.Fields) > 0 {
+				dst.Valid.Fields[k] = &pbtypes.Value{
+					Kind: &pbtypes.Value_StructValue{
+						StructValue: nested.Valid,
+					},
+				}
 			}
+		} else {
+			dst.Valid.Fields[k] = v
 		}
-		dst.Valid.Fields[k] = validFieldValue
 	}
 	return nil
 }
