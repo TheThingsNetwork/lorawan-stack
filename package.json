@@ -126,7 +126,7 @@
     "redux-actions": "^2.6.5",
     "redux-logic": "^3.0.2",
     "redux-sentry-middleware": "^0.2.2",
-    "scroll-into-view-if-needed": "^2.2.26",
+    "scroll-into-view-if-needed": "^2.2.29",
     "ttn-lw": "file:sdk/js",
     "unicode-properties": "^1.3.1",
     "url-polyfill": "^1.1.12",
