@@ -213,7 +213,7 @@ func (req *JoinRequest) toUplinkMessage(ids *ttnpb.GatewayIdentifiers, bandID st
 	}
 
 	timestamp := TimestampFromXTime(req.RadioMetaData.UpInfo.XTime)
-	tm := TimePtrFromUpInfo(req.UpInfo.GPSTime, req.UpInfo.RxTime, receivedAt)
+	tm := TimePtrFromUpInfo(req.UpInfo.GPSTime, req.UpInfo.RxTime)
 	gpsTime := TimePtrFromGPSTime(req.UpInfo.GPSTime)
 	up.RxMetadata = []*ttnpb.RxMetadata{
 		{
@@ -374,7 +374,7 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids *ttnpb.GatewayIdentifiers, band
 
 	timestamp := TimestampFromXTime(updf.RadioMetaData.UpInfo.XTime)
 	gpsTime := TimePtrFromGPSTime(updf.UpInfo.GPSTime)
-	tm := TimePtrFromUpInfo(updf.UpInfo.GPSTime, updf.UpInfo.RxTime, receivedAt)
+	tm := TimePtrFromUpInfo(updf.UpInfo.GPSTime, updf.UpInfo.RxTime)
 	up.RxMetadata = []*ttnpb.RxMetadata{
 		{
 			GatewayIds:   ids,
@@ -533,7 +533,7 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids *ttnpb.GatewayIde
 			ServerTime: receivedAt,
 			// RxTime is an undocumented field with unspecified precision.
 			// Using 0.0 for RxTime here means that the GatewayTime is nil and is not used for syncing the gateway clock.
-			GatewayTime:      TimePtrFromUpInfo(gpsTime, 0.0, receivedAt),
+			GatewayTime:      TimePtrFromUpInfo(gpsTime, 0.0),
 			ConcentratorTime: ConcentratorTimeFromXTime(xTime),
 		}
 	}
