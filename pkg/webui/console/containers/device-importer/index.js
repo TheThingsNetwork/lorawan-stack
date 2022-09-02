@@ -30,6 +30,7 @@ import ErrorNotification from '@ttn-lw/components/error-notification'
 import Notification from '@ttn-lw/components/notification'
 import Status from '@ttn-lw/components/status'
 import Link from '@ttn-lw/components/link'
+import ButtonGroup from '@ttn-lw/components/button/group'
 
 import ErrorMessage from '@ttn-lw/lib/components/error-message'
 import Message from '@ttn-lw/lib/components/message'
@@ -274,7 +275,7 @@ export default class DeviceImporter extends Component {
           device.network_server_address = new URL(nsConfig.base_url).hostname
           field_mask = `${field_mask},network_server_address`
         }
-        if (!device.frequency_plan_id && Boolean(frequency_plan_id)) {
+        if (!device.frequency_plan_id && Boolean(frequency_plan_id) && nsConfig.enabled) {
           device.frequency_plan_id = frequency_plan_id
           field_mask = `${field_mask},frequency_plan_id`
         }
@@ -467,14 +468,17 @@ export default class DeviceImporter extends Component {
           editorRef={this.editorRef}
         />
         <SubmitBar align="start">
-          <Button
-            busy={status !== 'finished' && !hasErrored}
-            message={hasErrored ? m.retry : m.proceed}
-            onClick={hasErrored ? this.handleReset : redirectToList}
-          />
-          {status === 'processing' && step === 'creation' && (
-            <Button message={m.abort} onClick={this.handleAbort} />
-          )}
+          <ButtonGroup>
+            <Button
+              busy={status !== 'finished' && !hasErrored}
+              message={hasErrored ? m.retry : m.proceed}
+              onClick={hasErrored ? this.handleReset : redirectToList}
+              primary
+            />
+            {status === 'processing' && step === 'creation' && (
+              <Button danger message={m.abort} onClick={this.handleAbort} />
+            )}
+          </ButtonGroup>
         </SubmitBar>
       </div>
     )
