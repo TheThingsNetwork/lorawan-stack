@@ -153,9 +153,9 @@ class DeviceOverview extends React.Component {
     let lorawanVersion, frequencyPlan, lorawanVersionName, phyVersionName
     if (nsEnabled) {
       lorawanVersion = parseLorawanMacVersion(lorawan_version)
-      frequencyPlan = frequencyPlans.find(f => f.id === frequency_plan_id).name
-      lorawanVersionName = LORAWAN_VERSIONS.find(v => v.value === lorawan_version).label
-      phyVersionName = LORAWAN_PHY_VERSIONS.find(v => v.value === lorawan_phy_version).label
+      frequencyPlan = frequencyPlans.find(f => f.id === frequency_plan_id)?.name
+      lorawanVersionName = LORAWAN_VERSIONS.find(v => v.value === lorawan_version)?.label
+      phyVersionName = LORAWAN_PHY_VERSIONS.find(v => v.value === lorawan_phy_version)?.label
     }
     const {
       f_nwk_s_int_key = { key: undefined },

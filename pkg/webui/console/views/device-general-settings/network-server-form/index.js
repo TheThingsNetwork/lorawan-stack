@@ -239,9 +239,9 @@ const NetworkServerForm = React.memo(props => {
     }
   }, [onMacReset])
 
-  const onFormSubmit = React.useCallback(
-    async (values, { resetForm, setSubmitting }) => {
-      const castedValues = validationSchema.cast(values, {
+  const handleSubmit = React.useCallback(
+    async ({ _activation_mode }, { resetForm, setSubmitting }, cleanValues) => {
+      const castedValues = validationSchema.cast(cleanValues, {
         context: validationContext,
         stripUnknown: true,
       })
@@ -261,7 +261,7 @@ const NetworkServerForm = React.memo(props => {
       // Always submit current `mac_settings` values to avoid overwriting nested entries.
       patch.mac_settings = castedValues.mac_settings
 
-      const isOTAA = values._activation_mode === ACTIVATION_MODES.OTAA
+      const isOTAA = _activation_mode === ACTIVATION_MODES.OTAA
       // Do not update session for joined OTAA end devices.
       if (!isOTAA && castedValues.session && castedValues.session.keys) {
         const { app_s_key, ...keys } = castedValues.session.keys
@@ -367,7 +367,7 @@ const NetworkServerForm = React.memo(props => {
       validationSchema={validationSchema}
       validationContext={validationContext}
       initialValues={initialValues}
-      onSubmit={onFormSubmit}
+      onSubmit={handleSubmit}
       error={error}
       formikRef={formRef}
     >

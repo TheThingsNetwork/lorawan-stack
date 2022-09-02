@@ -41,6 +41,8 @@ For details about compatibility between different releases, see the **Commitment
 - The Network Server now correctly handles the command that may succeed a `LinkADRAns` response.
 - LR-FHSS data rate matching.
 - Console data rate rendering of non-LoRa modulations.
+- End device network layer form crashing in some situations in the Console device general settings.
+- End device overview crashing in some situations in the Console.
 
 ### Security
 
