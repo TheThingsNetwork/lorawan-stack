@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Add more specific rights for OAuth clients.
+
 ### Changed
 
 - LoRa coding rate now defined in `DataRate` instead of `Band`.
