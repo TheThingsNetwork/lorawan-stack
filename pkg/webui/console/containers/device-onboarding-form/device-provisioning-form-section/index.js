@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { merge } from 'lodash'
@@ -79,6 +79,7 @@ const DeviceProvisioningFormSection = () => {
   const {
     _claim,
     _inputMethod,
+    _withQRdata,
     version_ids: version,
     frequency_plan_id,
     lorawan_version,
@@ -120,6 +121,13 @@ const DeviceProvisioningFormSection = () => {
     setFieldValue('_claim', supportsClaiming)
   }, [ids, setFieldValue, dispatch])
 
+  useEffect(() => {
+    // Auto-confirm the join EUI when using QR code data.
+    if (_withQRdata) {
+      handleJoinEuiConfirm()
+    }
+  }, [_withQRdata, handleJoinEuiConfirm, ids.join_eui.length])
+
   return (
     <>
       {mayProvisionDevice ? (
@@ -131,6 +139,7 @@ const DeviceProvisioningFormSection = () => {
           min={8}
           max={8}
           required
+          disabled={_withQRdata}
           component={Input}
           tooltipId={tooltipIds.JOIN_EUI}
           encode={joinEuiEncoder}
@@ -139,13 +148,19 @@ const DeviceProvisioningFormSection = () => {
           {_claim === undefined ? (
             <Button
               type="button"
-              disabled={!mayConfirm}
+              disabled={!mayConfirm || _withQRdata}
               onClick={handleJoinEuiConfirm}
               message={msg.confirm}
               className="ml-cs-xs"
             />
           ) : (
-            <Button onClick={resetJoinEui} type="button" message={msg.reset} className="ml-cs-xs" />
+            <Button
+              onClick={resetJoinEui}
+              type="button"
+              message={msg.reset}
+              className="ml-cs-xs"
+              disabled={_withQRdata}
+            />
           )}
         </Form.Field>
       ) : (

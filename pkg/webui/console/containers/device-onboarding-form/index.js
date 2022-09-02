@@ -42,11 +42,13 @@ import DeviceProvisioningFormSection, {
 import DeviceTypeFormSection, {
   initialValues as typeInitialValues,
 } from './device-type-form-section'
+import DeviceQRScanFormSection from './device-qr-scan-form-section'
 import validationSchema from './validation-schema'
 
 const initialValues = merge(
   {
     _registration: REGISTRATION_TYPES.SINGLE,
+    _withQRdata: false,
   },
   provisioningInitialValues,
   typeInitialValues,
@@ -172,6 +174,8 @@ const DeviceOnboardingForm = () => {
       validationContext={validationContext}
       validateSync={false}
     >
+      <DeviceQRScanFormSection />
+      <hr />
       <DeviceOnboardingFormInner />
     </Form>
   )

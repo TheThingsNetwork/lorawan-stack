@@ -38,7 +38,7 @@ import {
 import style from './dev-eui.styl'
 
 const DevEUIComponent = props => {
-  const { name, required } = props
+  const { name, required, disabled } = props
   const { values, setFieldValue, touched } = useFormContext()
 
   const dispatch = useDispatch()
@@ -118,6 +118,7 @@ const DevEUIComponent = props => {
       actionDisable={devEUIGenerateDisabled}
       inputRef={euiInputRef}
       required={required}
+      disabled={disabled}
     >
       <Message className={indicatorCls} component="label" content={indicatorContent} />
     </Form.Field>
@@ -132,16 +133,19 @@ const DevEUIComponent = props => {
       component={Input}
       tooltipId={tooltipIds.DEV_EUI}
       onBlur={handleIdPrefill}
+      disabled={disabled}
     />
   )
 }
 
 DevEUIComponent.propTypes = {
+  disabled: PropTypes.bool,
   name: PropTypes.string.isRequired,
   required: PropTypes.bool,
 }
 
 DevEUIComponent.defaultProps = {
+  disabled: false,
   required: false,
 }
 
