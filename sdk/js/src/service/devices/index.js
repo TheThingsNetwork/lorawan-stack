@@ -46,6 +46,16 @@ class Devices {
     this.DownlinkQueue = new DownlinkQueue(api.AppAs, { stackConfig })
     this.Repository = new Repository(api.DeviceRepository)
 
+    this.deviceCreationAllowedFieldMaskPaths = [
+      // Use unique values only.
+      ...new Set([
+        ...this._api.EndDeviceRegistry.UpdateAllowedFieldMaskPaths,
+        ...this._api.NsEndDeviceRegistry.SetAllowedFieldMaskPaths,
+        ...this._api.AsEndDeviceRegistry.SetAllowedFieldMaskPaths,
+        ...this._api.JsEndDeviceRegistry.SetAllowedFieldMaskPaths,
+      ]),
+    ]
+
     autoBind(this)
   }
 
@@ -313,6 +323,10 @@ class Devices {
 
     const deviceMap = traverse(deviceEntityMap)
     const paths = traverse(patch).reduce(function (acc) {
+      // Disregard illegal paths.
+      if (!this.deviceCreationAllowedFieldMaskPaths.some(p => this.path.startsWith(p))) {
+        return acc
+      }
       // Only add the top level path for arrays, otherwise paths are generated
       // for each item in the array.
       if (Array.isArray(this.node)) {
@@ -450,7 +464,11 @@ class Devices {
    * @returns {object} - Created end device on successful creation, an error
    * otherwise.
    */
-  async create(applicationId, device, mask = Marshaler.fieldMaskFromPatch(device)) {
+  async create(
+    applicationId,
+    device,
+    mask = Marshaler.fieldMaskFromPatch(device, this.deviceCreationAllowedFieldMaskPaths),
+  ) {
     if (!Boolean(applicationId)) {
       throw new Error('Missing application ID for device')
     }
