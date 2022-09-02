@@ -40279,6 +40279,26 @@
               "description": "The pseudo-right for all (current and future) OAuth client rights."
             },
             {
+              "name": "RIGHT_CLIENT_INFO",
+              "number": "60",
+              "description": "The right to read client information."
+            },
+            {
+              "name": "RIGHT_CLIENT_SETTINGS_BASIC",
+              "number": "61",
+              "description": "The right to edit basic client settings."
+            },
+            {
+              "name": "RIGHT_CLIENT_SETTINGS_COLLABORATORS",
+              "number": "62",
+              "description": "The right to view and edit client collaborators."
+            },
+            {
+              "name": "RIGHT_CLIENT_DELETE",
+              "number": "63",
+              "description": "The right to delete a client."
+            },
+            {
               "name": "RIGHT_GATEWAY_INFO",
               "number": "30",
               "description": "The right to view gateway information."
