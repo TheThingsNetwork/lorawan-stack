@@ -51,7 +51,7 @@ const qrDataInitialState = {
 }
 
 const DeviceQRScanFormSection = () => {
-  const { setFieldValue, resetForm, setValues } = useFormContext()
+  const { resetForm, setValues } = useFormContext()
   const brands = useSelector(selectDeviceBrands)
   const [qrData, setQrData] = useState(qrDataInitialState)
 
@@ -71,11 +71,7 @@ const DeviceQRScanFormSection = () => {
 
   const handleQRCodeApprove = useCallback(() => {
     const { device } = qrData
-
-    if (device.profileID.vendorID && device.profileID.vendorID !== '0000') {
-      const brand = getBrand(device.profileID.vendorID)
-      setFieldValue('version_ids.brand_id', brand.brand_id)
-    }
+    const brand = getBrand(device.profileID.vendorID)
 
     setValues(values => ({
       ...values,
@@ -89,10 +85,14 @@ const DeviceQRScanFormSection = () => {
         dev_eui: device.devEUI,
         authentication_code: device.ownerToken ? device.ownerToken : '',
       },
+      version_ids: {
+        ...values.version_ids,
+        brand_id: brand ? brand.brand_id : values.version_ids.brand_id,
+      },
     }))
 
     setQrData({ ...qrData, approved: true })
-  }, [getBrand, qrData, setFieldValue, setValues])
+  }, [getBrand, qrData, setValues])
 
   const handleQRCodeCancel = useCallback(() => {
     setQrData(qrDataInitialState)
