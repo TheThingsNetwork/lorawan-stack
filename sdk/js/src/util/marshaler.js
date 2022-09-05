@@ -130,43 +130,44 @@ class Marshaler {
     return this.payloadSingleResponse(result)
   }
 
-  static fieldMaskFromPatch(patch, whitelist, remaps) {
-    let paths = []
+  static fieldMaskFromPatch(patch, whitelist, remaps = []) {
+    const paths = []
 
     traverse(patch).map(function () {
-      if (this.node instanceof Array) {
+      const isArray = this.node instanceof Array
+      if (isArray) {
         // Add only the top level array path and do not recurse into arrays.
-        paths.push(this.path.join('.'))
         this.update(undefined, true)
-      } else if (this.isLeaf) {
-        paths.push(this.path.join('.'))
       }
-    })
+      if (this.isLeaf || isArray) {
+        let pathArray = this.path
+        const pathString = pathArray.join('.')
 
-    // Field masks can sometimes be arbitrarily mapped to the actual message
-    // structure (e.g. for oneoffs). Through the remap argument, it can be
-    // accounted for that by remapping these paths.
-    if (remaps) {
-      paths = paths.map(path => {
+        // Field masks can sometimes be arbitrarily mapped to the actual message
+        // structure (e.g. for oneoffs). Through the remap argument, it can be
+        // accounted for that by remapping these paths.
         for (const remap of remaps) {
-          if (path.startsWith(remap[0])) {
-            return path.replace(remap[0], remap[1])
+          if (pathString.startsWith(remap[0])) {
+            pathArray = pathString.replace(remap[0], remap[1]).split('.')
           }
         }
-        return path
-      })
-    }
 
-    // If we have a whitelist provided, add paths only in the depth that the
-    // whitelist allows and strip all other paths.
-    if (whitelist) {
-      paths = whitelist.reduce((acc, e) => {
-        if (paths.some(path => path.startsWith(e))) {
-          acc.push(e)
+        // If we have a whitelist provided add paths only in the depth that the
+        // whitelist allows and strip all other paths.
+        if (whitelist) {
+          // Only add the deepest possible path.
+          for (let i = pathArray.length; i >= 0; i--) {
+            const subPath = pathArray.slice(0, i).join('.')
+            if (whitelist.includes(subPath) && !paths.includes(subPath)) {
+              paths.push(subPath)
+              break
+            }
+          }
+        } else {
+          paths.push(this.path.join('.'))
         }
-        return acc
-      }, [])
-    }
+      }
+    })
 
     return paths
   }

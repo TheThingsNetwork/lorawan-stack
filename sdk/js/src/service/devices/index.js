@@ -47,14 +47,12 @@ class Devices {
     this.Repository = new Repository(api.DeviceRepository)
 
     this.deviceCreationAllowedFieldMaskPaths = [
-      // Use unique values only.
-      ...new Set([
-        ...this._api.EndDeviceRegistry.UpdateAllowedFieldMaskPaths,
-        ...this._api.NsEndDeviceRegistry.SetAllowedFieldMaskPaths,
-        ...this._api.AsEndDeviceRegistry.SetAllowedFieldMaskPaths,
-        ...this._api.JsEndDeviceRegistry.SetAllowedFieldMaskPaths,
-      ]),
-    ]
+      ...this._api.EndDeviceRegistry.UpdateAllowedFieldMaskPaths,
+      ...this._api.NsEndDeviceRegistry.SetAllowedFieldMaskPaths,
+      ...this._api.AsEndDeviceRegistry.SetAllowedFieldMaskPaths,
+      ...this._api.JsEndDeviceRegistry.SetAllowedFieldMaskPaths,
+      // Store unique entries only.
+    ].filter((path, index, paths) => paths.indexOf(path) === index)
 
     autoBind(this)
   }
@@ -322,9 +320,10 @@ class Devices {
     }
 
     const deviceMap = traverse(deviceEntityMap)
+    const allowedPaths = this.deviceCreationAllowedFieldMaskPaths
     const paths = traverse(patch).reduce(function (acc) {
       // Disregard illegal paths.
-      if (!this.deviceCreationAllowedFieldMaskPaths.some(p => this.path.startsWith(p))) {
+      if (!allowedPaths.some(p => this.path.join('.').startsWith(p))) {
         return acc
       }
       // Only add the top level path for arrays, otherwise paths are generated

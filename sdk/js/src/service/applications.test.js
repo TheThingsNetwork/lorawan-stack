@@ -38,6 +38,18 @@ const mockApplicationData = {
 
 jest.mock('../api', () =>
   jest.fn().mockImplementation(() => ({
+    EndDeviceRegistry: {
+      UpdateAllowedFieldMaskPaths: [],
+    },
+    NsEndDeviceRegistry: {
+      SetAllowedFieldMaskPaths: [],
+    },
+    JsEndDeviceRegistry: {
+      SetAllowedFieldMaskPaths: [],
+    },
+    AsEndDeviceRegistry: {
+      SetAllowedFieldMaskPaths: [],
+    },
     ApplicationRegistry: {
       Get: jest.fn().mockResolvedValue({ data: mockApplicationData }),
       List: jest.fn().mockResolvedValue({
