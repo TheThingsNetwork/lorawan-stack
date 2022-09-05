@@ -48,7 +48,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/TheThingsIndustries/mystique v0.0.0-20211230093812-d4088bd06959
 	github.com/TheThingsIndustries/protoc-gen-go-flags v1.0.6
-	github.com/TheThingsIndustries/protoc-gen-go-json v1.4.0
+	github.com/TheThingsIndustries/protoc-gen-go-json v1.4.2
 	github.com/TheThingsNetwork/go-cayenne-lib v1.1.0
 	github.com/aws/aws-sdk-go v1.42.53
 	github.com/blang/semver v3.5.1+incompatible

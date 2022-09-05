@@ -84,8 +84,8 @@ github.com/TheThingsIndustries/mystique v0.0.0-20211230093812-d4088bd06959 h1:YR
 github.com/TheThingsIndustries/mystique v0.0.0-20211230093812-d4088bd06959/go.mod h1:zJmv+zv/E4SFsThOS+ExjtJf3M1x2MOziwyHI7l5zZo=
 github.com/TheThingsIndustries/protoc-gen-go-flags v1.0.6 h1:IzTyiZA4tbGGnAv4V7epr8EPjXlV4qK07+kLYt4uScc=
 github.com/TheThingsIndustries/protoc-gen-go-flags v1.0.6/go.mod h1:WFhbSHpgeGU32bQFmLRspFOd8tndSZe6JRaF45qve/o=
-github.com/TheThingsIndustries/protoc-gen-go-json v1.4.0 h1:51GcLhX2se5RbQYb+++HTP+7qsrEIa5tdUb9+FPuFhs=
-github.com/TheThingsIndustries/protoc-gen-go-json v1.4.0/go.mod h1:7xYRiu4k/ioxM2/nqq2lyXLr4Lj4Nyx7AvYjr7rJSww=
+github.com/TheThingsIndustries/protoc-gen-go-json v1.4.2 h1:WqNl7MOZimBlw3oYn+l63qJ89HCxInpB8c52jEz4FYE=
+github.com/TheThingsIndustries/protoc-gen-go-json v1.4.2/go.mod h1:ieoFAumiOHd7ZwPakdqL2KoshR8ta9aTU0O0tdb1Rvw=
 github.com/TheThingsIndustries/throttled/v2 v2.7.1-noredis h1:uashKgjy7XCNZNb00+3GheWtJXnS9DnAkYQ1X89cAIg=
 github.com/TheThingsIndustries/throttled/v2 v2.7.1-noredis/go.mod h1:XC/YhKcHsxRy8shbYICwf+oWeYTCC2kpL5/clSJbt+U=
 github.com/TheThingsNetwork/go-cayenne-lib v1.1.0 h1:uw+WnTMSSwTo58/ob3ktWNBiCY2psIof8p3lKdxreAE=
