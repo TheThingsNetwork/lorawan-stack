@@ -589,3 +589,119 @@ func (st *StoreTest) TestEndDeviceBatchUpdate(t *T) {
 		}
 	})
 }
+
+func (st *StoreTest) TestEndDeviceCAC(t *T) { //nolint:revive
+	a, ctx := test.New(t)
+
+	s, ok := st.PrepareDB(t).(interface {
+		Store
+		is.ApplicationStore
+		is.EndDeviceStore
+	})
+	defer st.DestroyDB(
+		t,
+		true,
+		"applications",
+		"attributes",
+		"end_device_locations",
+		"pictures",
+	)
+	if !ok {
+		t.Skip("Store does not implement ApplicationStore and EndDeviceStore")
+	}
+	defer s.Close()
+
+	application, err := s.CreateApplication(ctx, &ttnpb.Application{
+		Ids: &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
+	})
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	var created *ttnpb.EndDevice
+
+	t.Run("CreateAndGetEndDeviceWithoutCAC", func(t *T) {
+		a, ctx := test.New(t)
+		var err error
+		start := time.Now().Truncate(time.Second)
+
+		created, err = s.CreateEndDevice(ctx, &ttnpb.EndDevice{
+			Ids: &ttnpb.EndDeviceIdentifiers{
+				ApplicationIds: application.GetIds(),
+				DeviceId:       "foo",
+				JoinEui:        types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}.Bytes(),
+				DevEui:         types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}.Bytes(),
+			},
+		})
+
+		if a.So(err, should.BeNil) && a.So(created, should.NotBeNil) {
+			a.So(created.GetIds().GetApplicationIds(), should.Resemble, application.GetIds())
+			a.So(created.GetIds().GetDeviceId(), should.Equal, "foo")
+			a.So(*ttnpb.StdTime(created.CreatedAt), should.HappenWithin, 5*time.Second, start)
+			a.So(*ttnpb.StdTime(created.UpdatedAt), should.HappenWithin, 5*time.Second, start)
+			a.So(created.ClaimAuthenticationCode, should.BeNil)
+		}
+
+		got, err := s.GetEndDevice(ctx, created.GetIds(), []string{"claim_authentication_code"})
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got.ClaimAuthenticationCode, should.BeNil)
+		}
+
+		// Update the CAC value.
+		updated, err := s.UpdateEndDevice(ctx, &ttnpb.EndDevice{
+			Ids: created.GetIds(),
+			ClaimAuthenticationCode: &ttnpb.EndDeviceAuthenticationCode{
+				Value: "bar",
+			},
+		}, []string{"claim_authentication_code"})
+		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
+			a.So(updated.ClaimAuthenticationCode, should.Resemble, &ttnpb.EndDeviceAuthenticationCode{
+				Value: "bar",
+			})
+		}
+
+		// Update CAC validity fields individually.
+		validFrom := time.Now().Add(-1 * time.Hour)
+		updated, err = s.UpdateEndDevice(ctx, &ttnpb.EndDevice{
+			Ids: created.GetIds(),
+			ClaimAuthenticationCode: &ttnpb.EndDeviceAuthenticationCode{
+				ValidFrom: ttnpb.ProtoTime(&validFrom),
+			},
+		}, []string{"claim_authentication_code"})
+		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
+			a.So(updated.ClaimAuthenticationCode, should.Resemble, &ttnpb.EndDeviceAuthenticationCode{
+				Value:     "bar",
+				ValidFrom: ttnpb.ProtoTime(&validFrom),
+			})
+		}
+
+		validTo := time.Now().Add(-1 * time.Hour)
+		updated, err = s.UpdateEndDevice(ctx, &ttnpb.EndDevice{
+			Ids: created.GetIds(),
+			ClaimAuthenticationCode: &ttnpb.EndDeviceAuthenticationCode{
+				ValidTo: ttnpb.ProtoTime(&validTo),
+			},
+		}, []string{"claim_authentication_code"})
+		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
+			a.So(updated.ClaimAuthenticationCode, should.Resemble, &ttnpb.EndDeviceAuthenticationCode{
+				Value:     "bar",
+				ValidFrom: ttnpb.ProtoTime(&validFrom),
+				ValidTo:   ttnpb.ProtoTime(&validTo),
+			})
+		}
+
+		// Clear the CAC value.
+		updated, err = s.UpdateEndDevice(ctx, &ttnpb.EndDevice{
+			Ids:                     created.GetIds(),
+			ClaimAuthenticationCode: nil,
+		}, []string{"claim_authentication_code"})
+		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
+			a.So(updated.ClaimAuthenticationCode, should.BeNil)
+		}
+
+		got, err = s.GetEndDevice(ctx, created.GetIds(), []string{"claim_authentication_code"})
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got.ClaimAuthenticationCode, should.BeNil)
+		}
+	})
+}
