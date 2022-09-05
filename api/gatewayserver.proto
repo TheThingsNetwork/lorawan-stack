@@ -15,7 +15,6 @@
 syntax = "proto3";
 
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
-import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
@@ -31,9 +30,6 @@ import "lorawan-stack/api/regional.proto";
 package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
-
-// TODO: Migrate away from GoGo Protobuf (https://github.com/TheThingsNetwork/lorawan-stack/issues/2798).
-option (gogoproto.goproto_registration) = true;
 
 // GatewayUp may contain zero or more uplink messages and/or a status message for the gateway.
 message GatewayUp {

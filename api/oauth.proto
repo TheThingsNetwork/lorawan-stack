@@ -15,7 +15,6 @@
 syntax = "proto3";
 
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
-import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/rights.proto";
@@ -23,9 +22,6 @@ import "lorawan-stack/api/rights.proto";
 package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
-
-// TODO: Migrate away from GoGo Protobuf (https://github.com/TheThingsNetwork/lorawan-stack/issues/2798).
-option (gogoproto.goproto_registration) = true;
 
 message OAuthClientAuthorizationIdentifiers {
   UserIdentifiers user_ids = 1 [(validate.rules).message.required = true];

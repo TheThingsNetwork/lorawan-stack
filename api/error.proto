@@ -15,16 +15,12 @@
 syntax = "proto3";
 
 import "github.com/TheThingsIndustries/protoc-gen-go-flags/annotations.proto";
-import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/protobuf/any.proto";
 import "google/protobuf/struct.proto";
 
 package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
-
-// TODO: Migrate away from GoGo Protobuf (https://github.com/TheThingsNetwork/lorawan-stack/issues/2798).
-option (gogoproto.goproto_registration) = true;
 
 // Error details that are communicated over gRPC (and HTTP) APIs.
 // The messages (for translation) are stored as "error:<namespace>:<name>".
