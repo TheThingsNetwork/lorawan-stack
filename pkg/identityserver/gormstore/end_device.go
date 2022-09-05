@@ -244,7 +244,7 @@ var deviceModelSetters = map[string]func(*EndDevice, *ttnpb.EndDevice){
 		} else {
 			// If not, allow setting each value separately.
 			// For example, this allows the updating only the valid_to field without clearing the other fields.
-			if pb.ClaimAuthenticationCode.GetValue() != "" {
+			if pb.ClaimAuthenticationCode.Value != "" {
 				dev.ClaimAuthenticationCodeSecret = []byte(pb.ClaimAuthenticationCode.Value)
 			}
 			if pb.ClaimAuthenticationCode.ValidFrom != nil {

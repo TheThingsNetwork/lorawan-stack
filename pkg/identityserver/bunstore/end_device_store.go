@@ -667,7 +667,7 @@ func (s *endDeviceStore) updateEndDeviceModel( //nolint:gocyclo
 			} else {
 				// If not, allow setting each value separately.
 				// For example, this allows the updating only the valid_to field without clearing the other fields.
-				if pb.ClaimAuthenticationCode.GetValue() != "" {
+				if pb.ClaimAuthenticationCode.Value != "" {
 					model.ClaimAuthenticationCodeSecret = []byte(pb.ClaimAuthenticationCode.Value)
 				}
 				if pb.ClaimAuthenticationCode.ValidFrom != nil {
