@@ -661,7 +661,10 @@ func (st *StoreTest) TestEndDeviceCAC(t *T) { //nolint:revive
 		}
 
 		// Update CAC validity fields individually.
-		validFrom := time.Now().Add(-1 * time.Hour)
+		// Truncate to avoid nanosecond precision issues.
+		now := time.Unix(time.Now().Unix(), 0)
+
+		validFrom := now.Add(-1 * time.Hour)
 		updated, err = s.UpdateEndDevice(ctx, &ttnpb.EndDevice{
 			Ids: created.GetIds(),
 			ClaimAuthenticationCode: &ttnpb.EndDeviceAuthenticationCode{
@@ -675,7 +678,7 @@ func (st *StoreTest) TestEndDeviceCAC(t *T) { //nolint:revive
 			})
 		}
 
-		validTo := time.Now().Add(-1 * time.Hour)
+		validTo := now.Add(-1 * time.Hour)
 		updated, err = s.UpdateEndDevice(ctx, &ttnpb.EndDevice{
 			Ids: created.GetIds(),
 			ClaimAuthenticationCode: &ttnpb.EndDeviceAuthenticationCode{
