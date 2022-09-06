@@ -12,19 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+const { cypressBrowserPermissionsPlugin } = require('cypress-browser-permissions')
+
 const tasks = require('./tasks')
 
 module.exports = (on, config) => {
-  tasks.stackConfigTask(on, config)
-  tasks.sqlTask(on, config)
-  tasks.fileExistsTask(on, config)
-  tasks.emailTask(on, config)
+  const configWithPermissions = cypressBrowserPermissionsPlugin(on, config)
+
+  tasks.stackConfigTask(on, configWithPermissions)
+  tasks.sqlTask(on, configWithPermissions)
+  tasks.fileExistsTask(on, configWithPermissions)
+  tasks.emailTask(on, configWithPermissions)
 
   if (process.env.NODE_ENV === 'development') {
-    tasks.codeCoverageTask(on, config)
+    tasks.codeCoverageTask(on, configWithPermissions)
   }
 
   on('before:browser:launch', (browser = {}, launchOptions) => {
+    if (browser.family === 'chromium' && browser.name !== 'electron') {
+      launchOptions.args.push(
+        '--use-file-for-fake-video-capture=cypress/fixtures/qr-code-mock-feed.y4m',
+      )
+    }
+
     if (browser.name === 'chrome' && browser.isHeadless) {
       launchOptions.args.push('--disable-gpu')
     }
@@ -32,5 +42,5 @@ module.exports = (on, config) => {
     return launchOptions
   })
 
-  return config
+  return configWithPermissions
 }

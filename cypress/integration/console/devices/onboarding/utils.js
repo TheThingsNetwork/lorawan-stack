@@ -43,3 +43,21 @@ export const interceptDeviceRepo = appId => {
     fixture: 'console/devices/repository/brands.json',
   })
 }
+
+export const composeClaimResponse = ({ joinEui, devEui, id, appId }) => ({
+  application_ids: { application_id: appId },
+  device_id: id,
+  dev_eui: devEui,
+  join_eui: joinEui,
+  dev_addr: '2600ABCD',
+})
+
+export const composeExpectedRequest = ({ joinEui, devEui, cac, id, appId }) => ({
+  authenticated_identifiers: {
+    join_eui: joinEui.toUpperCase(),
+    dev_eui: devEui.toUpperCase(),
+    authentication_code: cac,
+  },
+  target_device_id: id,
+  target_application_ids: { application_id: appId },
+})

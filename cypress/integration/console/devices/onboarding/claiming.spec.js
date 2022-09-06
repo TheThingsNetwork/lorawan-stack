@@ -14,25 +14,12 @@
 
 import { generateHexValue } from '../../../../support/utils'
 
-import { interceptDeviceRepo, selectDevice } from './utils'
-
-const composeExpectedRequest = ({ joinEui, devEui, cac, id, appId }) => ({
-  authenticated_identifiers: {
-    join_eui: joinEui.toUpperCase(),
-    dev_eui: devEui.toUpperCase(),
-    authentication_code: cac,
-  },
-  target_device_id: id,
-  target_application_ids: { application_id: appId },
-})
-
-const composeClaimResponse = ({ joinEui, devEui, id, appId }) => ({
-  application_ids: { application_id: appId },
-  device_id: id,
-  dev_eui: devEui,
-  join_eui: joinEui,
-  dev_addr: '2600ABCD',
-})
+import {
+  interceptDeviceRepo,
+  selectDevice,
+  composeClaimResponse,
+  composeExpectedRequest,
+} from './utils'
 
 describe('End device repository claiming', () => {
   const user = {

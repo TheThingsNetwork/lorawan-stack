@@ -101,7 +101,7 @@ const Video = props => {
   }, [devices, handleVideoFrame, stream, videoRef])
 
   return devices.length && stream ? (
-    <video autoPlay playsInline ref={videoRef} className={style.video} />
+    <video autoPlay playsInline ref={videoRef} className={style.video} data-test-id="webcam-feed" />
   ) : (
     <Spinner center>
       <Message className={style.msg} content={m.fetchingCamera} />

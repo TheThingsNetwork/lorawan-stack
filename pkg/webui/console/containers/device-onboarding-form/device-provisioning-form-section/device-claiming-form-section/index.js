@@ -41,7 +41,7 @@ const DeviceClaimingFormSection = () => {
 
   return (
     <>
-      <DevEUIComponent name="authenticated_identifiers.dev_eui" />
+      <DevEUIComponent name="authenticated_identifiers.dev_eui" disabled={_withQRdata} />
       <Form.Field
         title={sharedMessages.claimAuthCode}
         name="authenticated_identifiers.authentication_code"
