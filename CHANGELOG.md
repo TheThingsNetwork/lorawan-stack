@@ -44,6 +44,7 @@ For details about compatibility between different releases, see the **Commitment
 - Console data rate rendering of non-LoRa modulations.
 - End device network layer form crashing in some situations in the Console device general settings.
 - End device overview crashing in some situations in the Console.
+- QRG can generate QR Codes without the claim authentication code.
 
 ### Security
 
