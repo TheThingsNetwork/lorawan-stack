@@ -507,7 +507,14 @@ func (m *ListBandsRequest) ValidateFields(paths ...string) error {
 		case "band_id":
 			// no validation rules for BandId
 		case "phy_version":
-			// no validation rules for PhyVersion
+
+			if _, ok := PHYVersion_name[int32(m.GetPhyVersion())]; !ok {
+				return ListBandsRequestValidationError{
+					field:  "phy_version",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		default:
 			return ListBandsRequestValidationError{
 				field:  name,
@@ -601,17 +608,7 @@ func (m *BandDescription) ValidateFields(paths ...string) error {
 				}
 			}
 
-		case "ping_slot_frequency":
-
-			if v, ok := interface{}(m.GetPingSlotFrequency()).(interface{ ValidateFields(...string) error }); ok {
-				if err := v.ValidateFields(subs...); err != nil {
-					return BandDescriptionValidationError{
-						field:  "ping_slot_frequency",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
-				}
-			}
+		case "ping_slot_frequencies":
 
 		case "max_uplink_channels":
 			// no validation rules for MaxUplinkChannels
@@ -1072,8 +1069,8 @@ func (m *BandDescription_Beacon) ValidateFields(paths ...string) error {
 			// no validation rules for DataRateIndex
 		case "coding_rate":
 			// no validation rules for CodingRate
-		case "inverted_polarity":
-			// no validation rules for InvertedPolarity
+		case "frequencies":
+
 		default:
 			return BandDescription_BeaconValidationError{
 				field:  name,

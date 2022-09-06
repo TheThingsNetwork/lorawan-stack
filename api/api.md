@@ -507,6 +507,8 @@
 - [File `lorawan-stack/api/networkserver.proto`](#lorawan-stack/api/networkserver.proto)
   - [Message `GenerateDevAddrResponse`](#ttn.lorawan.v3.GenerateDevAddrResponse)
   - [Message `GetDefaultMACSettingsRequest`](#ttn.lorawan.v3.GetDefaultMACSettingsRequest)
+  - [Message `GetDeviceAdressPrefixesResponse`](#ttn.lorawan.v3.GetDeviceAdressPrefixesResponse)
+  - [Message `GetNetIDResponse`](#ttn.lorawan.v3.GetNetIDResponse)
   - [Service `AsNs`](#ttn.lorawan.v3.AsNs)
   - [Service `GsNs`](#ttn.lorawan.v3.GsNs)
   - [Service `Ns`](#ttn.lorawan.v3.Ns)
@@ -2328,7 +2330,7 @@ PeerInfo
 | ----- | ---- | ----- | ----------- |
 | `id` | [`string`](#string) |  |  |
 | `beacon` | [`BandDescription.Beacon`](#ttn.lorawan.v3.BandDescription.Beacon) |  |  |
-| `ping_slot_frequency` | [`google.protobuf.UInt64Value`](#google.protobuf.UInt64Value) |  |  |
+| `ping_slot_frequencies` | [`uint64`](#uint64) | repeated |  |
 | `max_uplink_channels` | [`uint32`](#uint32) |  |  |
 | `uplink_channels` | [`BandDescription.Channel`](#ttn.lorawan.v3.BandDescription.Channel) | repeated |  |
 | `max_downlink_channels` | [`uint32`](#uint32) |  |  |
@@ -2366,7 +2368,7 @@ PeerInfo
 | ----- | ---- | ----- | ----------- |
 | `data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  |  |
 | `coding_rate` | [`string`](#string) |  |  |
-| `inverted_polarity` | [`bool`](#bool) |  |  |
+| `frequencies` | [`uint64`](#uint64) | repeated |  |
 
 ### <a name="ttn.lorawan.v3.BandDescription.Channel">Message `BandDescription.Channel`</a>
 
@@ -2440,6 +2442,12 @@ PeerInfo
 | ----- | ---- | ----- | ----------- |
 | `band_id` | [`string`](#string) |  | Optional Band ID to filter the results. If unused, all supported Bands are returned. |
 | `phy_version` | [`PHYVersion`](#ttn.lorawan.v3.PHYVersion) |  | Optional PHY version to filter the results. If unused, all supported versions are returned. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `phy_version` | <p>`enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.ListBandsResponse">Message `ListBandsResponse`</a>
 
@@ -7388,6 +7396,30 @@ Request of GetDefaultMACSettings.
 | `frequency_plan_id` | <p>`string.max_len`: `64`</p> |
 | `lorawan_phy_version` | <p>`enum.defined_only`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.GetDeviceAdressPrefixesResponse">Message `GetDeviceAdressPrefixesResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `dev_addr_prefixes` | [`bytes`](#bytes) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `dev_addr_prefixes` | <p>`repeated.items.bytes.len`: `5`</p> |
+
+### <a name="ttn.lorawan.v3.GetNetIDResponse">Message `GetNetIDResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `net_id` | [`bytes`](#bytes) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `net_id` | <p>`bytes.len`: `3`</p> |
+
 ### <a name="ttn.lorawan.v3.AsNs">Service `AsNs`</a>
 
 The AsNs service connects an Application Server to a Network Server.
@@ -7415,6 +7447,8 @@ The Ns service manages the Network Server.
 | ----------- | ------------ | ------------- | ------------|
 | `GenerateDevAddr` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`GenerateDevAddrResponse`](#ttn.lorawan.v3.GenerateDevAddrResponse) | GenerateDevAddr requests a device address assignment from the Network Server. |
 | `GetDefaultMACSettings` | [`GetDefaultMACSettingsRequest`](#ttn.lorawan.v3.GetDefaultMACSettingsRequest) | [`MACSettings`](#ttn.lorawan.v3.MACSettings) | GetDefaultMACSettings retrieves the default MAC settings for a frequency plan. |
+| `GetNetID` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`GetNetIDResponse`](#ttn.lorawan.v3.GetNetIDResponse) |  |
+| `GetDeviceAddressPrefixes` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`GetDeviceAdressPrefixesResponse`](#ttn.lorawan.v3.GetDeviceAdressPrefixesResponse) |  |
 
 #### HTTP bindings
 
@@ -7422,6 +7456,8 @@ The Ns service manages the Network Server.
 | ----------- | ------ | ------- | ---- |
 | `GenerateDevAddr` | `GET` | `/api/v3/ns/dev_addr` |  |
 | `GetDefaultMACSettings` | `GET` | `/api/v3/ns/default_mac_settings/{frequency_plan_id}/{lorawan_phy_version}` |  |
+| `GetNetID` | `GET` | `/api/v3/ns/net_id` |  |
+| `GetDeviceAddressPrefixes` | `GET` | `/api/v3/ns/dev_addr_prefixes` |  |
 
 ### <a name="ttn.lorawan.v3.NsEndDeviceRegistry">Service `NsEndDeviceRegistry`</a>
 

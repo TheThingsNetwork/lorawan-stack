@@ -286,7 +286,10 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 			EntityIds:        req.GetUser().GetIds().GetEntityIdentifiers(),
 			NotificationType: "user_requested",
 			Data:             ttnpb.MustMarshalAny(req),
-			Email:            true,
+			Receivers: []ttnpb.NotificationReceiver{
+				ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
+			},
+			Email: true,
 		})
 	}
 
@@ -506,10 +509,8 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateUser.NewWithIdentifiersAndData(ctx, req.User.GetIds(), req.FieldMask.GetPaths()))
 
-	// TODO: Send emails (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
-	// - If primary email address changed
+	events.Publish(evtUpdateUser.NewWithIdentifiersAndData(ctx, req.User.GetIds(), req.FieldMask.GetPaths()))
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "state") {
 		go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
 			EntityIds:        usr.GetIds().GetEntityIdentifiers(),
@@ -518,7 +519,8 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 				State:            usr.State,
 				StateDescription: usr.StateDescription,
 			}),
-			Email: true,
+			Receivers: []ttnpb.NotificationReceiver{ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_COLLABORATOR},
+			Email:     true,
 		})
 	}
 
@@ -634,6 +636,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 		EntityIds:        req.GetUserIds().GetEntityIdentifiers(),
 		NotificationType: "password_changed",
 		Email:            true,
+		Receivers:        []ttnpb.NotificationReceiver{ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_COLLABORATOR},
 	})
 	return ttnpb.Empty, nil
 }

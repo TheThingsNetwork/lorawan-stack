@@ -23,7 +23,7 @@ var AU_915_928_RP2_v1_0_3 = Band{
 	SupportsDynamicADR: true,
 
 	MaxUplinkChannels: 72,
-	UplinkChannels:    au915928UplinkChannels(0),
+	UplinkChannels:    au915928UplinkChannels(0, 1),
 
 	MaxDownlinkChannels: 8,
 	DownlinkChannels:    au915928DownlinkChannels,
@@ -108,10 +108,11 @@ var AU_915_928_RP2_v1_0_3 = Band{
 	DefaultRx2Parameters: Rx2Parameters{ttnpb.DataRateIndex_DATA_RATE_8, 923300000},
 
 	Beacon: Beacon{
-		DataRateIndex:    ttnpb.DataRateIndex_DATA_RATE_8,
-		CodingRate:       "4/5",
-		ComputeFrequency: makeBeaconFrequencyFunc(usAuBeaconFrequencies),
+		DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_8,
+		CodingRate:    "4/5",
+		Frequencies:   usAuBeaconFrequencies,
 	},
+	PingSlotFrequencies: usAuBeaconFrequencies,
 
 	TxParamSetupReqSupport: true,
 

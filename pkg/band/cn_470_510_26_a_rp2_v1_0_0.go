@@ -23,10 +23,10 @@ var CN_470_510_26_A_RP2_v1_0_0 = Band{
 	SupportsDynamicADR: true,
 
 	MaxUplinkChannels: 48,
-	UplinkChannels:    cn47051026AUplinkChannels,
+	UplinkChannels:    cn47051026AUplinkChannels(0),
 
 	MaxDownlinkChannels: 24,
-	DownlinkChannels:    cn47051026ADownlinkChannels,
+	DownlinkChannels:    cn47051026ADownlinkChannels(0),
 
 	// See IEEE 11-11/0972r0
 	SubBands: []SubBandParameters{
@@ -90,9 +90,6 @@ var CN_470_510_26_A_RP2_v1_0_0 = Band{
 	Beacon: Beacon{
 		DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
 		CodingRate:    "4/5",
-		// The frequency of the beacon depends on the Common Join Channel Index,
-		// which is not available at band level.
-		ComputeFrequency: nil,
 	},
 
 	LoRaCodingRate: "4/5",

@@ -653,3 +653,50 @@ func TestFindDataRate(t *testing.T) {
 		t.Fatalf("Invalid index, expected 8. Got %d", index)
 	}
 }
+
+func TestBeacon(t *testing.T) {
+	t.Parallel()
+
+	for name, version := range LatestVersion {
+		b := All[name][version]
+		t.Run(fmt.Sprintf("%v/%v", name, version), func(t *testing.T) {
+			t.Parallel()
+
+			a := assertions.New(t)
+			beaconDR, ok := b.DataRates[b.Beacon.DataRateIndex]
+			if a.So(ok, should.BeTrue) {
+				// As of L2 1.0.4, the beacons are guaranteed to be LoRa modulated with a spreading
+				// factor between 8 and 12.
+				a.So(beaconDR.Rate.GetLora(), should.NotBeNil)
+				a.So(beaconDR.Rate.GetLora().GetSpreadingFactor(), should.BeBetweenOrEqual, 8, 12)
+			}
+		})
+	}
+}
+
+func TestChannelsWellDefined(t *testing.T) {
+	t.Parallel()
+
+	for name, versions := range All {
+		for version, b := range versions {
+			b := b
+			t.Run(fmt.Sprintf("%v/%v", name, version), func(t *testing.T) {
+				t.Parallel()
+
+				a := assertions.New(t)
+				assertCh := func(ch Channel) {
+					a.So(ch.MinDataRate, should.BeLessThanOrEqualTo, ch.MaxDataRate)
+					a.So(b.DataRates, should.ContainKey, ch.MinDataRate)
+					a.So(b.DataRates, should.ContainKey, ch.MaxDataRate)
+				}
+
+				for _, ch := range b.UplinkChannels {
+					assertCh(ch)
+				}
+				for _, ch := range b.DownlinkChannels {
+					assertCh(ch)
+				}
+			})
+		}
+	}
+}

@@ -3,9 +3,27 @@
   "Beacon": {
     "DataRateIndex": 8,
     "CodingRate": "4/5",
-    "InvertedPolarity": false
+    "Frequencies": [
+      923300000,
+      923900000,
+      924500000,
+      925100000,
+      925700000,
+      926300000,
+      926900000,
+      927500000
+    ]
   },
-  "PingSlotFrequency": null,
+  "PingSlotFrequencies": [
+    923300000,
+    923900000,
+    924500000,
+    925100000,
+    925700000,
+    926300000,
+    926900000,
+    927500000
+  ],
   "MaxUplinkChannels": 72,
   "UplinkChannels": [
     {
@@ -331,42 +349,42 @@
     {
       "Frequency": 903000000,
       "MinDataRate": 4,
-      "MaxDataRate": 4
+      "MaxDataRate": 6
     },
     {
       "Frequency": 904600000,
       "MinDataRate": 4,
-      "MaxDataRate": 4
+      "MaxDataRate": 6
     },
     {
       "Frequency": 906200000,
       "MinDataRate": 4,
-      "MaxDataRate": 4
+      "MaxDataRate": 6
     },
     {
       "Frequency": 907800000,
       "MinDataRate": 4,
-      "MaxDataRate": 4
+      "MaxDataRate": 6
     },
     {
       "Frequency": 909400000,
       "MinDataRate": 4,
-      "MaxDataRate": 4
+      "MaxDataRate": 6
     },
     {
       "Frequency": 911000000,
       "MinDataRate": 4,
-      "MaxDataRate": 4
+      "MaxDataRate": 6
     },
     {
       "Frequency": 912600000,
       "MinDataRate": 4,
-      "MaxDataRate": 4
+      "MaxDataRate": 6
     },
     {
       "Frequency": 914200000,
       "MinDataRate": 4,
-      "MaxDataRate": 4
+      "MaxDataRate": 6
     }
   ],
   "MaxDownlinkChannels": 8,

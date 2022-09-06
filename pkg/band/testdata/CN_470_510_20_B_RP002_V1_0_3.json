@@ -3,329 +3,329 @@
   "Beacon": {
     "DataRateIndex": 2,
     "CodingRate": "4/5",
-    "InvertedPolarity": false
+    "Frequencies": null
   },
-  "PingSlotFrequency": null,
+  "PingSlotFrequencies": null,
   "MaxUplinkChannels": 64,
   "UplinkChannels": [
     {
       "Frequency": 476900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 477100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 477300000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 477500000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 477700000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 477900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 478100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 478300000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 478500000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 478700000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 478900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 479100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 479300000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 479500000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 479700000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 479900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 480100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 480300000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 480500000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 480700000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 480900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 481100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 481300000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 481500000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 481700000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 481900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 482100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 482300000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 482500000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 482700000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 482900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 483100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 496900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 497100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 497300000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 497500000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 497700000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 497900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 498100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 498300000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 498500000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 498700000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 498900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 499100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 499300000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 499500000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 499700000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 499900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 500100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 500300000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 500500000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 500700000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 500900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 501100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 501300000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 501500000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 501700000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 501900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 502100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 502300000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 502500000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 502700000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 502900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 503100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     }
   ],
@@ -333,322 +333,322 @@
   "DownlinkChannels": [
     {
       "Frequency": 476900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 477100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 477300000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 477500000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 477700000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 477900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 478100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 478300000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 478500000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 478700000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 478900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 479100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 479300000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 479500000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 479700000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 479900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 480100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 480300000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 480500000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 480700000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 480900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 481100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 481300000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 481500000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 481700000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 481900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 482100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 482300000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 482500000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 482700000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 482900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 483100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 496900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 497100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 497300000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 497500000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 497700000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 497900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 498100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 498300000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 498500000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 498700000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 498900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 499100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 499300000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 499500000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 499700000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 499900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 500100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 500300000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 500500000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 500700000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 500900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 501100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 501300000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 501500000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 501700000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 501900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 502100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 502300000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 502500000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 502700000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 502900000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     },
     {
       "Frequency": 503100000,
-      "MinDataRate": 0,
+      "MinDataRate": 1,
       "MaxDataRate": 5
     }
   ],

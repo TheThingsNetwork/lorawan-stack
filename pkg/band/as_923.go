@@ -39,8 +39,8 @@ const (
 )
 
 var (
-	as923BeaconFrequency = func(offset as923GroupOffset) uint64 {
-		return uint64(923400000 + offset)
+	as923BeaconFrequencies = func(offset as923GroupOffset) []uint64 {
+		return []uint64{uint64(923400000 + offset)}
 	}
 
 	as923DefaultChannels = func(offset as923GroupOffset) []Channel {

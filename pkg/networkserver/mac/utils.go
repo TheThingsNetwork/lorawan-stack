@@ -148,6 +148,22 @@ func NextPingSlotAt(ctx context.Context, dev *ttnpb.EndDevice, earliestAt time.T
 	return time.Time{}, false
 }
 
+// DevicePingSlotFrequency computes the frequency of the ping slot at time pingAt.
+// If no frequency is found, this function returns 0.
+func DevicePingSlotFrequency(dev *ttnpb.EndDevice, phy *band.Band, pingAt time.Time) uint64 {
+	switch {
+	case dev.GetMacState().GetCurrentParameters().GetPingSlotFrequency() != 0:
+		return dev.MacState.CurrentParameters.PingSlotFrequency
+	case len(phy.PingSlotFrequencies) > 0:
+		devAddr := types.MustDevAddr(dev.GetSession().GetDevAddr()).OrZero().MarshalNumber()
+		return band.ComputePeriodicFrequency(
+			beaconTimeBefore(pingAt), BeaconPeriod, devAddr, phy.PingSlotFrequencies...,
+		)
+	default:
+		return 0
+	}
+}
+
 func DeviceResetsFCnt(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings) bool {
 	switch {
 	case dev.GetMacSettings().GetResetsFCnt() != nil:
@@ -410,8 +426,8 @@ func DeviceDefaultPingSlotFrequency(dev *ttnpb.EndDevice, phy *band.Band, defaul
 		return dev.MacSettings.PingSlotFrequency.Value
 	case defaults.PingSlotFrequency != nil && defaults.PingSlotFrequency.Value != 0:
 		return defaults.PingSlotFrequency.Value
-	case phy.PingSlotFrequency != nil:
-		return *phy.PingSlotFrequency
+	case len(phy.PingSlotFrequencies) == 1:
+		return phy.PingSlotFrequencies[0]
 	default:
 		return 0
 	}

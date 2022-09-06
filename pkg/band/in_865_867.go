@@ -19,21 +19,23 @@ import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 const (
 	// IN_865_867 is the ID of the Indian frequency plan
 	IN_865_867 = "IN_865_867"
-
-	in865867BeaconFrequency = 866500000
 )
 
-var in865867DefaultChannels = []Channel{
-	{
-		Frequency:   865062500,
-		MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
-	},
-	{
-		Frequency:   865402500,
-		MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
-	},
-	{
-		Frequency:   865985000,
-		MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
-	},
-}
+var (
+	in865867BeaconFrequencies = []uint64{866500000}
+
+	in865867DefaultChannels = []Channel{
+		{
+			Frequency:   865062500,
+			MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
+		},
+		{
+			Frequency:   865402500,
+			MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
+		},
+		{
+			Frequency:   865985000,
+			MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
+		},
+	}
+)

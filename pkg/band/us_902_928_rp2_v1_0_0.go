@@ -23,7 +23,7 @@ var US_902_928_RP2_V1_0_0 = Band{
 	SupportsDynamicADR: true,
 
 	MaxUplinkChannels: 72,
-	UplinkChannels:    us902928UplinkChannels,
+	UplinkChannels:    us902928UplinkChannels(0),
 
 	MaxDownlinkChannels: 8,
 	DownlinkChannels:    us902928DownlinkChannels,
@@ -112,10 +112,11 @@ var US_902_928_RP2_V1_0_0 = Band{
 	DefaultRx2Parameters: Rx2Parameters{ttnpb.DataRateIndex_DATA_RATE_8, 923300000},
 
 	Beacon: Beacon{
-		DataRateIndex:    ttnpb.DataRateIndex_DATA_RATE_8,
-		CodingRate:       "4/5",
-		ComputeFrequency: makeBeaconFrequencyFunc(usAuBeaconFrequencies),
+		DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_8,
+		CodingRate:    "4/5",
+		Frequencies:   usAuBeaconFrequencies,
 	},
+	PingSlotFrequencies: usAuBeaconFrequencies,
 
 	BootDwellTime: DwellTime{
 		Uplinks:   boolPtr(true),

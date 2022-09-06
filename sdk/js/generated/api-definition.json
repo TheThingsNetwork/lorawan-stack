@@ -3764,6 +3764,26 @@
           ]
         }
       ]
+    },
+    "GetNetID": {
+      "file": "lorawan-stack/api/networkserver.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/ns/net_id",
+          "parameters": []
+        }
+      ]
+    },
+    "GetDeviceAddressPrefixes": {
+      "file": "lorawan-stack/api/networkserver.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/ns/dev_addr_prefixes",
+          "parameters": []
+        }
+      ]
     }
   },
   "NsEndDeviceRegistry": {

@@ -57,7 +57,7 @@ var BandDescriptionFieldPathsNested = []string{
 	"beacon",
 	"beacon.coding_rate",
 	"beacon.data_rate_index",
-	"beacon.inverted_polarity",
+	"beacon.frequencies",
 	"boot_dwell_time",
 	"boot_dwell_time.downlinks",
 	"boot_dwell_time.uplinks",
@@ -79,7 +79,7 @@ var BandDescriptionFieldPathsNested = []string{
 	"max_retransmit_timeout",
 	"max_uplink_channels",
 	"min_retransmit_timeout",
-	"ping_slot_frequency",
+	"ping_slot_frequencies",
 	"receive_delay_1",
 	"receive_delay_2",
 	"sub_bands",
@@ -109,7 +109,7 @@ var BandDescriptionFieldPathsTopLevel = []string{
 	"max_retransmit_timeout",
 	"max_uplink_channels",
 	"min_retransmit_timeout",
-	"ping_slot_frequency",
+	"ping_slot_frequencies",
 	"receive_delay_1",
 	"receive_delay_2",
 	"sub_bands",
@@ -137,13 +137,13 @@ var GetPhyVersionsResponse_VersionInfoFieldPathsTopLevel = []string{
 var BandDescription_BeaconFieldPathsNested = []string{
 	"coding_rate",
 	"data_rate_index",
-	"inverted_polarity",
+	"frequencies",
 }
 
 var BandDescription_BeaconFieldPathsTopLevel = []string{
 	"coding_rate",
 	"data_rate_index",
-	"inverted_polarity",
+	"frequencies",
 }
 var BandDescription_ChannelFieldPathsNested = []string{
 	"frequency",

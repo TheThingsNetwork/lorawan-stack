@@ -22,6 +22,9 @@ const (
 )
 
 var (
+	ru864870BeaconFrequencies   = []uint64{869100000}
+	ru864870PingSlotFrequencies = []uint64{868900000}
+
 	ru864870DefaultChannels = []Channel{
 		{
 			Frequency:   868900000,

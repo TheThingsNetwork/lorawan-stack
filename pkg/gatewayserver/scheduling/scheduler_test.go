@@ -142,8 +142,8 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			Priority:       ttnpb.TxSchedulePriority_NORMAL,
 			NPercentileRTT: durationPtr(500 * time.Millisecond),
 			ExpectedToa:    2465792 * time.Microsecond,
-			// Too late for transmission with RTT.
-			ExpectedError: scheduling.ErrTooLate,
+			// Exceeding dwell time of 2 seconds.
+			ExpectedError: scheduling.ErrDwellTime,
 		},
 		{
 			PayloadSize: 51,
@@ -183,7 +183,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 			MedianRTT:      durationPtr(200 * time.Millisecond),
 			ExpectedToa:    51456 * time.Microsecond,
-			ExpectedStarts: 1000000000 - 200000000/2 - 51456000,
+			ExpectedStarts: 1000000000 - 200000000/2,
 		},
 		{
 			SyncWithGatewayAbsolute: true,
@@ -203,7 +203,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			},
 			Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 			ExpectedToa:    51456 * time.Microsecond,
-			ExpectedStarts: 60000000000 - 51456000,
+			ExpectedStarts: 60000000000,
 		},
 		{
 			PayloadSize: 10,

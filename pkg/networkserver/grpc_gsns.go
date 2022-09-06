@@ -492,7 +492,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 		case !dev.SupportsClassB:
 			logger.Debug("Ignore class B bit in uplink, since device does not support class B")
 
-		case dev.MacState.CurrentParameters.PingSlotFrequency == 0:
+		case dev.MacState.CurrentParameters.PingSlotFrequency == 0 && len(phy.PingSlotFrequencies) == 0:
 			logger.Debug("Ignore class B bit in uplink, since ping slot frequency is not known")
 
 		case dev.MacState.CurrentParameters.PingSlotDataRateIndexValue == nil:

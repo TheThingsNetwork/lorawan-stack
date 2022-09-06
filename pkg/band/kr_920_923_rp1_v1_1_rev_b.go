@@ -92,9 +92,9 @@ var KR_920_923_RP1_V1_1_Rev_B = Band{
 	DefaultRx2Parameters: Rx2Parameters{ttnpb.DataRateIndex_DATA_RATE_0, 921900000},
 
 	Beacon: Beacon{
-		DataRateIndex:    ttnpb.DataRateIndex_DATA_RATE_3,
-		CodingRate:       "4/5",
-		ComputeFrequency: func(_ float64) uint64 { return kr920923BeaconFrequency },
+		DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
+		CodingRate:    "4/5",
+		Frequencies:   kr920923BeaconFrequencies,
 	},
-	PingSlotFrequency: uint64Ptr(kr920923BeaconFrequency),
+	PingSlotFrequencies: kr920923BeaconFrequencies,
 }
