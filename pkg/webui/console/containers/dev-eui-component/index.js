@@ -38,7 +38,7 @@ import {
 import style from './dev-eui.styl'
 
 const DevEUIComponent = props => {
-  const { name, required, disabled } = props
+  const { name, required, disabled, autoFocus } = props
   const { values, setFieldValue, touched } = useFormContext()
 
   const dispatch = useDispatch()
@@ -119,6 +119,7 @@ const DevEUIComponent = props => {
       inputRef={euiInputRef}
       required={required}
       disabled={disabled}
+      autoFocus={autoFocus}
     >
       <Message className={indicatorCls} component="label" content={indicatorContent} />
     </Form.Field>
@@ -134,17 +135,20 @@ const DevEUIComponent = props => {
       tooltipId={tooltipIds.DEV_EUI}
       onBlur={handleIdPrefill}
       disabled={disabled}
+      autoFocus={autoFocus}
     />
   )
 }
 
 DevEUIComponent.propTypes = {
+  autoFocus: PropTypes.bool,
   disabled: PropTypes.bool,
   name: PropTypes.string.isRequired,
   required: PropTypes.bool,
 }
 
 DevEUIComponent.defaultProps = {
+  autoFocus: false,
   disabled: false,
   required: false,
 }
