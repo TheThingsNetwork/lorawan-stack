@@ -75,7 +75,6 @@ const m = defineMessages({
   adrTransPower: 'ADR transmission power index',
   adrDynamic: 'Dynamic mode',
   adrStatic: 'Static mode',
-  adrDisabled: 'Disabled',
   desiredAdrAckLimit: 'Desired ADR ack limit',
   desiredAdrAckDelay: 'Desired ADR ack delay',
   adrAckValue: '{count, plural, one {every message} other {every {count} messages}}',
@@ -474,7 +473,7 @@ const MacSettingsSection = props => {
       >
         <Radio label={m.adrDynamic} value="dynamic" />
         <Radio label={m.adrStatic} value="static" />
-        <Radio label={m.adrDisabled} value="disabled" />
+        <Radio label={sharedMessages.disabled} value="disabled" />
       </Form.Field>
       {isDynamicAdr && (
         <Form.Field
