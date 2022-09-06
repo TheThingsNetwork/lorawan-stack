@@ -38,9 +38,9 @@ const GatewayOnboardingForm = props => {
   const userId = useSelector(selectUserId)
   const dispatch = useDispatch()
   const [error, setError] = useState()
-  const [cupsKey, setCupsKey] = useState('ola')
-  const [lnsKey, setLnsKey] = useState('ola')
-  const [modalVisible, setModalVisible] = useState(true)
+  const [cupsKey, setCupsKey] = useState()
+  const [lnsKey, setLnsKey] = useState()
+  const [modalVisible, setModalVisible] = useState(false)
 
   const initialValues = useMemo(
     () =>

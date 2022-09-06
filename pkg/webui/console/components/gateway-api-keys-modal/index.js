@@ -30,7 +30,7 @@ const m = defineMessages({
   grantedRights: 'Granted rights',
   description: `<b>Your Gateway has been created successfully.</b>{lineBreak}Below are the API keys.{lineBreak}
   Note: After proceeding to the gateway, the API keys will not be accessible for download anymore.
-  Make sure to copy and store them in a safe place now.`,
+  Make sure to download and store them.`,
   lnsKey: 'LNS key:',
   downloadButton: 'Download',
   cupsKey: 'CUPS key:',
