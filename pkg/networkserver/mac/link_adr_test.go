@@ -34,6 +34,7 @@ import (
 )
 
 func TestLinkADRReq(t *testing.T) {
+	t.Parallel()
 	for _, tc := range []struct {
 		Name                                             string
 		BandID                                           string
@@ -46,7 +47,7 @@ func TestLinkADRReq(t *testing.T) {
 		RejectedADRDataRateIndexes                       []ttnpb.DataRateIndex
 		RejectedADRTxPowerIndexes                        []uint32
 		Commands                                         []*ttnpb.MACCommand_LinkADRReq
-		ErrorAssertion                                   func(*testing.T, error) bool
+		EventBuildersAssertion                           func(*testing.T, events.Builders) bool
 	}{
 		{
 			Name:              "no channels",
@@ -61,15 +62,21 @@ func TestLinkADRReq(t *testing.T) {
 			BandID:            band.US_902_928,
 			LoRaWANVersion:    ttnpb.MACVersion_MAC_V1_0_3,
 			LoRaWANPHYVersion: ttnpb.PHYVersion_RP001_V1_0_3_REV_A,
-			CurrentChannels:   MakeDefaultUS915FSB2DesiredChannels(),
+			CurrentChannels:   MakeDefaultUS915CurrentChannels(),
 			CurrentADRNbTrans: 1,
 			DesiredChannels: []*ttnpb.MACParameters_Channel{
 				{EnableUplink: true},
 			},
 			DesiredADRNbTrans: 1,
-			ErrorAssertion: func(t *testing.T, err error) bool {
+			EventBuildersAssertion: func(t *testing.T, bs events.Builders) bool {
+				t.Helper()
 				a, _ := test.New(t)
-				return a.So(err, should.BeError)
+				return a.So(bs, should.ResembleEventBuilders, events.Builders{
+					EvtGenerateLinkADRFail.BindData(ErrNoUplinkFrequency.WithAttributes(
+						"parameters", "desired",
+						"i", 0,
+					)),
+				})
 			},
 		},
 		{
@@ -81,9 +88,16 @@ func TestLinkADRReq(t *testing.T) {
 			CurrentADRNbTrans: 1,
 			DesiredChannels:   MakeDefaultUS915FSB2DesiredChannels(),
 			DesiredADRNbTrans: 1,
-			ErrorAssertion: func(t *testing.T, err error) bool {
+			EventBuildersAssertion: func(t *testing.T, bs events.Builders) bool {
+				t.Helper()
 				a, _ := test.New(t)
-				return a.So(err, should.BeError)
+				return a.So(bs, should.ResembleEventBuilders, events.Builders{
+					EvtGenerateLinkADRFail.BindData(ErrTooManyChannels.WithAttributes(
+						"parameters", "desired",
+						"channels_len", 72,
+						"phy_max_uplink_channels", uint8(16),
+					)),
+				})
 			},
 		},
 		{
@@ -95,9 +109,16 @@ func TestLinkADRReq(t *testing.T) {
 			CurrentADRNbTrans: 1,
 			DesiredChannels:   MakeDefaultUS915FSB2DesiredChannels(),
 			DesiredADRNbTrans: 1,
-			ErrorAssertion: func(t *testing.T, err error) bool {
+			EventBuildersAssertion: func(t *testing.T, bs events.Builders) bool {
+				t.Helper()
 				a, _ := test.New(t)
-				return a.So(err, should.BeError)
+				return a.So(bs, should.ResembleEventBuilders, events.Builders{
+					EvtGenerateLinkADRFail.BindData(ErrTooManyChannels.WithAttributes(
+						"parameters", "current",
+						"channels_len", 72,
+						"phy_max_uplink_channels", uint8(16),
+					)),
+				})
 			},
 		},
 		{
@@ -110,9 +131,14 @@ func TestLinkADRReq(t *testing.T) {
 			DesiredChannels:         MakeDefaultEU868DesiredChannels(),
 			DesiredADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_15,
 			DesiredADRNbTrans:       1,
-			ErrorAssertion: func(t *testing.T, err error) bool {
+			EventBuildersAssertion: func(t *testing.T, bs events.Builders) bool {
+				t.Helper()
 				a, _ := test.New(t)
-				return a.So(err, should.BeError)
+				return a.So(bs, should.ResembleEventBuilders, events.Builders{
+					EvtGenerateLinkADRFail.BindData(ErrInvalidDataRateIndex.WithAttributes(
+						"desired_adr_data_rate_index", ttnpb.DataRateIndex(15),
+					)),
+				})
 			},
 		},
 		{
@@ -125,9 +151,15 @@ func TestLinkADRReq(t *testing.T) {
 			DesiredChannels:        MakeDefaultEU868DesiredChannels(),
 			DesiredADRTxPowerIndex: 14,
 			DesiredADRNbTrans:      1,
-			ErrorAssertion: func(t *testing.T, err error) bool {
+			EventBuildersAssertion: func(t *testing.T, bs events.Builders) bool {
+				t.Helper()
 				a, _ := test.New(t)
-				return a.So(err, should.BeError)
+				return a.So(bs, should.ResembleEventBuilders, events.Builders{
+					EvtGenerateLinkADRFail.BindData(ErrTxPowerIndexTooHigh.WithAttributes(
+						"desired_adr_tx_power_index", uint32(14),
+						"phy_max_tx_power_index", uint8(7),
+					)),
+				})
 			},
 		},
 		{
@@ -206,16 +238,16 @@ func TestLinkADRReq(t *testing.T) {
 				0,
 				1,
 			},
-			Commands: []*ttnpb.MACCommand_LinkADRReq{
-				{
-					ChannelMask: []bool{
-						false, false, false, false, false, false, false, false,
-						true, true, true, true, true, true, true, true,
-					},
-					DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
-					TxPowerIndex:  15,
-					NbTrans:       2,
-				},
+			EventBuildersAssertion: func(t *testing.T, bs events.Builders) bool {
+				t.Helper()
+				a, _ := test.New(t)
+				return a.So(bs, should.ResembleEventBuilders, events.Builders{
+					EvtGenerateLinkADRFail.BindData(ErrRejectedParameters.WithAttributes(
+						"parameters", "current",
+						"data_rate_index", ttnpb.DataRateIndex_DATA_RATE_0,
+						"tx_power_index", uint32(0),
+					)),
+				})
 			},
 		},
 		{
@@ -311,6 +343,150 @@ func TestLinkADRReq(t *testing.T) {
 				},
 			},
 		},
+		{
+			Name:                    "fallback to current indices on data rate rejection",
+			BandID:                  band.US_902_928,
+			LoRaWANVersion:          ttnpb.MACVersion_MAC_V1_0_2,
+			LoRaWANPHYVersion:       ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
+			CurrentChannels:         MakeDefaultUS915CurrentChannels(),
+			CurrentADRNbTrans:       1,
+			CurrentADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+			DesiredChannels:         MakeDefaultUS915FSB2DesiredChannels(),
+			DesiredADRNbTrans:       2,
+			DesiredADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+			DesiredADRTxPowerIndex:  3,
+			RejectedADRDataRateIndexes: []ttnpb.DataRateIndex{
+				ttnpb.DataRateIndex_DATA_RATE_2,
+			},
+			Commands: []*ttnpb.MACCommand_LinkADRReq{
+				{
+					ChannelMask: []bool{
+						false, false, false, false, false, false, false, false,
+						false, false, false, false, false, false, false, false,
+					},
+					ChannelMaskControl: 7,
+					DataRateIndex:      ttnpb.DataRateIndex_DATA_RATE_1,
+					NbTrans:            2,
+				},
+				{
+					ChannelMask: []bool{
+						false, false, false, false, false, false, false, false,
+						true, true, true, true, true, true, true, true,
+					},
+					DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					NbTrans:       2,
+				},
+			},
+		},
+		{
+			Name:                    "fallback to current indices on TX power rejection",
+			BandID:                  band.US_902_928,
+			LoRaWANVersion:          ttnpb.MACVersion_MAC_V1_0_2,
+			LoRaWANPHYVersion:       ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
+			CurrentChannels:         MakeDefaultUS915CurrentChannels(),
+			CurrentADRNbTrans:       1,
+			CurrentADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+			DesiredChannels:         MakeDefaultUS915FSB2DesiredChannels(),
+			DesiredADRNbTrans:       2,
+			DesiredADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+			DesiredADRTxPowerIndex:  3,
+			RejectedADRTxPowerIndexes: []uint32{
+				3,
+			},
+			Commands: []*ttnpb.MACCommand_LinkADRReq{
+				{
+					ChannelMask: []bool{
+						false, false, false, false, false, false, false, false,
+						false, false, false, false, false, false, false, false,
+					},
+					ChannelMaskControl: 7,
+					DataRateIndex:      ttnpb.DataRateIndex_DATA_RATE_1,
+					NbTrans:            2,
+				},
+				{
+					ChannelMask: []bool{
+						false, false, false, false, false, false, false, false,
+						true, true, true, true, true, true, true, true,
+					},
+					DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					NbTrans:       2,
+				},
+			},
+		},
+		{
+			Name:                    "fallback to no-change indices on data rate rejection",
+			BandID:                  band.US_902_928,
+			LoRaWANVersion:          ttnpb.MACVersion_MAC_V1_0_4,
+			LoRaWANPHYVersion:       ttnpb.PHYVersion_RP001_V1_0_3_REV_A,
+			CurrentChannels:         MakeDefaultUS915CurrentChannels(),
+			CurrentADRNbTrans:       1,
+			CurrentADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+			DesiredChannels:         MakeDefaultUS915FSB2DesiredChannels(),
+			DesiredADRNbTrans:       2,
+			DesiredADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+			DesiredADRTxPowerIndex:  3,
+			RejectedADRDataRateIndexes: []ttnpb.DataRateIndex{
+				ttnpb.DataRateIndex_DATA_RATE_2,
+			},
+			Commands: []*ttnpb.MACCommand_LinkADRReq{
+				{
+					ChannelMask: []bool{
+						false, false, false, false, false, false, false, false,
+						false, false, false, false, false, false, false, false,
+					},
+					ChannelMaskControl: 7,
+					DataRateIndex:      ttnpb.DataRateIndex_DATA_RATE_15,
+					TxPowerIndex:       15,
+					NbTrans:            2,
+				},
+				{
+					ChannelMask: []bool{
+						false, false, false, false, false, false, false, false,
+						true, true, true, true, true, true, true, true,
+					},
+					DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_15,
+					TxPowerIndex:  15,
+					NbTrans:       2,
+				},
+			},
+		},
+		{
+			Name:                    "fallback to no-change indices on TX power rejection",
+			BandID:                  band.US_902_928,
+			LoRaWANVersion:          ttnpb.MACVersion_MAC_V1_0_4,
+			LoRaWANPHYVersion:       ttnpb.PHYVersion_RP001_V1_0_3_REV_A,
+			CurrentChannels:         MakeDefaultUS915CurrentChannels(),
+			CurrentADRNbTrans:       1,
+			CurrentADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+			DesiredChannels:         MakeDefaultUS915FSB2DesiredChannels(),
+			DesiredADRNbTrans:       2,
+			DesiredADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+			DesiredADRTxPowerIndex:  3,
+			RejectedADRTxPowerIndexes: []uint32{
+				3,
+			},
+			Commands: []*ttnpb.MACCommand_LinkADRReq{
+				{
+					ChannelMask: []bool{
+						false, false, false, false, false, false, false, false,
+						false, false, false, false, false, false, false, false,
+					},
+					ChannelMaskControl: 7,
+					DataRateIndex:      ttnpb.DataRateIndex_DATA_RATE_15,
+					TxPowerIndex:       15,
+					NbTrans:            2,
+				},
+				{
+					ChannelMask: []bool{
+						false, false, false, false, false, false, false, false,
+						true, true, true, true, true, true, true, true,
+					},
+					DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_15,
+					TxPowerIndex:  15,
+					NbTrans:       2,
+				},
+			},
+		},
 	} {
 		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
@@ -389,20 +565,24 @@ func TestLinkADRReq(t *testing.T) {
 						Parallel: true,
 						Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 							dev := makeDevice()
-							st, err := EnqueueLinkADRReq(ctx, dev, cmdLen, answerLen, phy)
-							if tc.ErrorAssertion != nil {
-								if !a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
+							st := EnqueueLinkADRReq(ctx, dev, cmdLen, answerLen, phy)
+							if tc.EventBuildersAssertion != nil {
+								if !a.So(tc.EventBuildersAssertion(t, st.QueuedEvents), should.BeTrue) {
 									t.FailNow()
 								}
-								a.So(st, should.Resemble, EnqueueState{
-									MaxDownLen: cmdLen,
-									MaxUpLen:   answerLen,
-									Ok:         false,
-								})
+								a.So(
+									EnqueueState{
+										MaxDownLen: st.MaxDownLen,
+										MaxUpLen:   st.MaxUpLen,
+										Ok:         st.Ok,
+									},
+									should.Resemble,
+									EnqueueState{
+										MaxDownLen: cmdLen,
+										MaxUpLen:   answerLen,
+										Ok:         true,
+									})
 								return
-							}
-							if !a.So(err, should.BeNil) {
-								t.Fatalf("Failed to enqueue LinkADRReq: %s", err)
 							}
 							expectedDevice := makeDevice()
 							var expectedEventBuilders []events.Builder
@@ -426,6 +606,7 @@ func TestLinkADRReq(t *testing.T) {
 }
 
 func TestHandleLinkADRAns(t *testing.T) {
+	t.Parallel()
 	const fCntUp = 42
 	for _, tc := range []struct {
 		Name             string

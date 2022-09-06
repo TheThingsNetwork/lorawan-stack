@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
@@ -51,6 +52,13 @@ func ShouldResembleEvent(actual interface{}, expected ...interface{}) string {
 	ap, err := events.Proto(ae)
 	if s := assertions.ShouldBeNil(err); s != success {
 		return s
+	}
+	if _, ok := ee.Data().(errors.DefinitionInterface); ok {
+		if s := ShouldEqualErrorOrDefinition(ae.Data(), ee.Data()); s != success {
+			return s
+		}
+		ap.Data = nil
+		ep.Data = nil
 	}
 	ap.UniqueId = ""
 	ep.UniqueId = ""

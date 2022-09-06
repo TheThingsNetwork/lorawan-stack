@@ -7046,9 +7046,18 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/networkserver/internal:downlink_channel": {
+  "error:pkg/networkserver/internal:incompatible_channel_mask": {
     "translations": {
-      "en": "channel does not allow uplinks"
+      "en": "the channel mask is not compatible with the current parameters"
+    },
+    "description": {
+      "package": "pkg/networkserver/internal",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver/internal:invalid_data_rate_index": {
+    "translations": {
+      "en": "invalid data rate index"
     },
     "description": {
       "package": "pkg/networkserver/internal",
@@ -7082,6 +7091,15 @@
       "file": "utils.go"
     }
   },
+  "error:pkg/networkserver/internal:no_uplink_frequency": {
+    "translations": {
+      "en": "uplink channel with no uplink frequency"
+    },
+    "description": {
+      "package": "pkg/networkserver/internal",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/networkserver/internal:payload": {
     "translations": {
       "en": "invalid payload"
@@ -7091,9 +7109,36 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver/internal:rejected_parameters": {
+    "translations": {
+      "en": "the parameters have been rejected in this session"
+    },
+    "description": {
+      "package": "pkg/networkserver/internal",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/networkserver/internal:session": {
     "translations": {
       "en": "no device session"
+    },
+    "description": {
+      "package": "pkg/networkserver/internal",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver/internal:too_many_channels": {
+    "translations": {
+      "en": "too many channels"
+    },
+    "description": {
+      "package": "pkg/networkserver/internal",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver/internal:tx_power_index_too_high": {
+    "translations": {
+      "en": "tx power index too high"
     },
     "description": {
       "package": "pkg/networkserver/internal",
@@ -10154,6 +10199,15 @@
   "event:ns.mac.link_adr.request": {
     "translations": {
       "en": "link ADR request enqueued"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "link_adr.go"
+    }
+  },
+  "event:ns.mac.link_adr.request.fail": {
+    "translations": {
+      "en": "link ADR request generation failure"
     },
     "description": {
       "package": "pkg/networkserver/mac",

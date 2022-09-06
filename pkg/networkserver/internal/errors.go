@@ -26,9 +26,45 @@ var (
 
 	ErrNetworkDownlinkSlot  = errors.DefineCorruption("network_downlink_slot", "could not generate network initiated downlink slot")
 	ErrUplinkChannel        = errors.DefineCorruption("uplink_channel", "channel does not allow downlinks")
-	ErrDownlinkChannel      = errors.DefineCorruption("downlink_channel", "channel does not allow uplinks")
 	ErrSession              = errors.DefineCorruption("session", "no device session")
 	ErrMACHandler           = errors.DefineCorruption("mac_handler", "missing MAC handler")
 	ErrChannelDataRateRange = errors.DefineCorruption("channel_data_rate_range", "could not generate channel datarate range")
 	ErrChannelMask          = errors.DefineCorruption("channel_mask", "could not generate channel mask")
+
+	ErrTooManyChannels = errors.DefineResourceExhausted(
+		"too_many_channels",
+		"too many channels",
+		"parameters",
+		"channels_len",
+		"phy_max_uplink_channels",
+	)
+	ErrNoUplinkFrequency = errors.DefineInvalidArgument(
+		"no_uplink_frequency",
+		"uplink channel with no uplink frequency",
+		"parameters",
+		"i",
+	)
+	ErrTxPowerIndexTooHigh = errors.DefineInvalidArgument(
+		"tx_power_index_too_high",
+		"tx power index too high",
+		"desired_adr_tx_power_index",
+		"phy_max_tx_power_index",
+	)
+	ErrInvalidDataRateIndex = errors.DefineInvalidArgument(
+		"invalid_data_rate_index",
+		"invalid data rate index",
+		"desired_adr_data_rate_index",
+	)
+	ErrRejectedParameters = errors.DefineUnavailable(
+		"rejected_parameters",
+		"the parameters have been rejected in this session",
+		"parameters",
+		"data_rate_index",
+		"tx_power_index",
+	)
+	ErrIncompatibleChannelMask = errors.DefineUnavailable(
+		"incompatible_channel_mask",
+		"the channel mask is not compatible with the current parameters",
+		"data_rate_index",
+	)
 )
