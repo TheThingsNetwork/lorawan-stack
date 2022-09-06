@@ -106,11 +106,14 @@ const GatewayOnboardingForm = props => {
           setLnsKey(generatedLnsKey.key)
         }
         setModalVisible(_create_api_key_cups || _create_api_key_lns)
+        if (!(_create_api_key_cups || _create_api_key_lns)) {
+          onSuccess(gatewayId)
+        }
       } catch (error) {
         setError(error)
       }
     },
-    [dispatch, generateCUPSApiKey, generateLNSApiKey, userId],
+    [dispatch, generateCUPSApiKey, generateLNSApiKey, userId, onSuccess],
   )
 
   const handleSubmit = useCallback(
