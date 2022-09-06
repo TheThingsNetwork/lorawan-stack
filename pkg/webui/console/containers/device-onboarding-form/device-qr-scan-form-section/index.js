@@ -71,10 +71,13 @@ const DeviceQRScanFormSection = () => {
         ...values.ids,
         join_eui: device.joinEUI,
         dev_eui: device.devEUI,
+        device_id: `eui-${device.devEUI.toLowerCase()}`,
       },
+      target_device_id: `eui-${device.devEUI.toLowerCase()}`,
       authenticated_identifiers: {
         dev_eui: device.devEUI,
         authentication_code: device.ownerToken ? device.ownerToken : '',
+        join_eui: device.joinEUI,
       },
       version_ids: {
         ...values.version_ids,
