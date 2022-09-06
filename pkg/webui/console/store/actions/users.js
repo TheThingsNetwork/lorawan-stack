@@ -16,6 +16,8 @@ import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actio
 import {
   createPaginationRequestActions,
   createPaginationBaseActionType,
+  createPaginationRestoreBaseActionType,
+  createPaginationRestoreActions,
 } from '@ttn-lw/lib/store/actions/pagination'
 
 import createGetRightsListRequestActions, { createGetRightsListActionType } from './rights'
@@ -59,6 +61,12 @@ export const [
   id => ({ id }),
   (id, options = {}) => ({ options }),
 )
+
+export const RESTORE_USER_BASE = createPaginationRestoreBaseActionType(SHARED_NAME)
+export const [
+  { request: RESTORE_USER, success: RESTORE_USER_SUCCESS, failure: RESTORE_USER_FAILURE },
+  { request: restoreUser, success: restoreUserSuccess, failure: restoreUserFailure },
+] = createPaginationRestoreActions(SHARED_NAME, id => ({ id }))
 
 export const GET_USER_RIGHTS_LIST_BASE = createGetRightsListActionType(SHARED_NAME)
 export const [

@@ -18,6 +18,7 @@ For details about compatibility between different releases, see the **Commitment
   - Added support on CLI. Available via the `end-devices get-net-id` and `end-devices get-dev-addr-prefixes` commands.
 - Support for loading end device template from Device Repository when importing devices using a CSV file.
 - Experimental support for normalized payload.
+- Support management of deleted users in the Console.
 - Decoded payloads are now visible for downlinks in the Console.
 - Support for dynamic ping slot frequencies, as used by the US915 and AU915 bands.
 - Support for LoRa Basics Station beaconing.
