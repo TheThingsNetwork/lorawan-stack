@@ -25,53 +25,49 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import style from './gateway-api-key-modal.styl'
 
 const m = defineMessages({
-  modalTitle: 'Gateway API keys',
-  buttonMessage: 'Go to gateway',
-  grantedRights: 'Granted rights',
-  description: `<b>Your Gateway has been created successfully.</b>{lineBreak}Below are the API keys.{lineBreak}
-  Note: After proceeding to the gateway, the API keys will not be accessible for download anymore.
-  Make sure to download and store them.`,
-  lnsKey: 'LNS key:',
-  downloadButton: 'Download',
-  cupsKey: 'CUPS key:',
+  modalTitle: 'Download gateway API keys',
+  buttonMessage: 'I have downloaded the keys',
+  description:
+    'Note: After proceeding to the gateway, the API keys will not be accessible for download anymore. Make sure to download and store them.',
+  downloadLns: 'Download LNS key',
+  downloadCups: 'Download CUPS key',
 })
 
-const GatewayApiKeysModal = ({ modalVisible, lnsKey, cupsKey, downloadLns, downloadCups }) => (
+const GatewayApiKeysModal = ({
+  modalVisible,
+  modalApprove,
+  lnsKey,
+  cupsKey,
+  downloadLns,
+  downloadCups,
+}) => (
   <PortalledModal
+    className={style.gatewayApiKeyModal}
     visible={modalVisible}
     title={m.modalTitle}
-    approval={false}
+    approval
+    onComplete={modalApprove}
     buttonMessage={m.buttonMessage}
   >
-    <div className={style.div}>
-      <Message
-        content={m.description}
-        values={{ b: str => <b>{str}</b>, lineBreak: <br /> }}
-        component="p"
+    {lnsKey && (
+      <Button
+        className={style.downloadButton}
+        type="button"
+        message={m.downloadLns}
+        onClick={downloadLns}
+        icon="file_download"
       />
-      {lnsKey && (
-        <div className={style.row}>
-          <Message component="h4" content={m.lnsKey} />
-          <Button
-            type="button"
-            message={m.downloadButton}
-            onClick={downloadLns}
-            icon="file_download"
-          />
-        </div>
-      )}
-      {cupsKey && (
-        <div className={style.row}>
-          <Message component="h4" content={m.cupsKey} />
-          <Button
-            type="button"
-            message={m.downloadButton}
-            onClick={downloadCups}
-            icon="file_download"
-          />
-        </div>
-      )}
-    </div>
+    )}
+    {cupsKey && (
+      <Button
+        className={style.downloadButton}
+        type="button"
+        message={m.downloadCups}
+        onClick={downloadCups}
+        icon="file_download"
+      />
+    )}
+    <Message content={m.description} component="p" />
   </PortalledModal>
 )
 
@@ -80,6 +76,7 @@ GatewayApiKeysModal.propTypes = {
   downloadCups: PropTypes.func.isRequired,
   downloadLns: PropTypes.func.isRequired,
   lnsKey: PropTypes.string,
+  modalApprove: PropTypes.func.isRequired,
   modalVisible: PropTypes.bool,
 }
 

@@ -24,7 +24,7 @@ import { composeDataUri, downloadDataUriAsFile } from '@ttn-lw/lib/data-uri'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
-import { createGateway } from '@console/store/actions/gateways'
+import { createGateway, updateGateway } from '@console/store/actions/gateways'
 import { createGatewayApiKey } from '@console/store/actions/api-keys'
 
 import { selectUserId } from '@console/store/selectors/logout'
@@ -41,6 +41,7 @@ const GatewayOnboardingForm = props => {
   const [cupsKey, setCupsKey] = useState()
   const [lnsKey, setLnsKey] = useState()
   const [modalVisible, setModalVisible] = useState(false)
+  const [gatewayId, setGatewayId] = useState('')
 
   const initialValues = useMemo(
     () =>
@@ -90,25 +91,26 @@ const GatewayOnboardingForm = props => {
       const isUserOwner = _ownerId ? userId === _ownerId : true
       const ownerId = _ownerId ? _ownerId : userId
       const gatewayId = cleanValues.ids.gateway_id
+      setGatewayId(gatewayId)
 
       try {
+        await dispatch(attachPromise(createGateway(ownerId, cleanValues, isUserOwner)))
         if (_create_api_key_cups) {
           const generatedCupsKey = await generateCUPSApiKey(gatewayId)
-          setCupsKey(generatedCupsKey)
+          setCupsKey(generatedCupsKey.key)
         }
         if (_create_api_key_lns) {
           const generatedLnsKey = await generateLNSApiKey(gatewayId)
-          cleanValues.lbs_lns_secret = { value: generatedLnsKey }
-          setLnsKey(generatedLnsKey)
+          const lbs_lns_secret = { value: btoa(generatedLnsKey.key) }
+          await dispatch(attachPromise(updateGateway(gatewayId, { lbs_lns_secret })))
+          setLnsKey(generatedLnsKey.key)
         }
-        await dispatch(attachPromise(createGateway(ownerId, cleanValues, isUserOwner)))
-        onSuccess(gatewayId)
-        setModalVisible(cupsKey || lnsKey)
+        setModalVisible(_create_api_key_cups || _create_api_key_lns)
       } catch (error) {
         setError(error)
       }
     },
-    [dispatch, generateCUPSApiKey, generateLNSApiKey, onSuccess, userId, cupsKey, lnsKey],
+    [dispatch, generateCUPSApiKey, generateLNSApiKey, userId],
   )
 
   const handleSubmit = useCallback(
@@ -130,6 +132,8 @@ const GatewayOnboardingForm = props => {
     }
   }, [cupsKey])
 
+  const modalApprove = useCallback(() => onSuccess(gatewayId), [onSuccess, gatewayId])
+
   return (
     <React.Fragment>
       <GatewayApiKeysModal
@@ -138,6 +142,7 @@ const GatewayOnboardingForm = props => {
         cupsKey={cupsKey}
         downloadLns={downloadLns}
         downloadCups={downloadCups}
+        modalApprove={modalApprove}
       />
       <Form
         error={error}
