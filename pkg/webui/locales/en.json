@@ -312,7 +312,6 @@
   "console.components.mac-settings-section.index.adrTransPower": "ADR transmission power index",
   "console.components.mac-settings-section.index.adrDynamic": "Dynamic mode",
   "console.components.mac-settings-section.index.adrStatic": "Static mode",
-  "console.components.mac-settings-section.index.adrDisabled": "Disabled",
   "console.components.mac-settings-section.index.desiredAdrAckLimit": "Desired ADR ack limit",
   "console.components.mac-settings-section.index.desiredAdrAckDelay": "Desired ADR ack delay",
   "console.components.mac-settings-section.index.adrAckValue": "{count, plural, one {every message} other {every {count} messages}}",
