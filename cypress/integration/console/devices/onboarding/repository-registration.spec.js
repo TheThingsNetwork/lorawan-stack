@@ -14,6 +14,8 @@
 
 import { generateHexValue } from '../../../../support/utils'
 
+import { interceptDeviceRepo, selectDevice } from './utils'
+
 describe('End device repository manual registration', () => {
   const user = {
     ids: { user_id: 'create-dr-test-user' },
@@ -31,14 +33,6 @@ describe('End device repository manual registration', () => {
     const appId = 'otaa-test-application'
     const application = {
       ids: { application_id: appId },
-    }
-
-    const selectDevice = ({ brand_id, model_id, hw_version, fw_version, band_id }) => {
-      cy.findByLabelText('End device brand').selectOption(brand_id)
-      cy.findByLabelText('Model').selectOption(model_id)
-      cy.findByLabelText('Hardware Ver.').selectOption(hw_version)
-      cy.findByLabelText('Firmware Ver.').selectOption(fw_version)
-      cy.findByLabelText('Profile (Region)').selectOption(band_id)
     }
 
     before(() => {
@@ -80,43 +74,7 @@ describe('End device repository manual registration', () => {
 
     describe('Test Brand', () => {
       beforeEach(() => {
-        cy.fixture('console/devices/repository/test-brand-otaa-model4.template.json').then(
-          templateJson => {
-            cy.intercept(
-              'GET',
-              `/api/v3/dr/applications/${appId}/brands/test-brand-otaa/models/test-model4/1.0/EU_863_870/template`,
-              templateJson,
-            )
-          },
-        )
-        cy.fixture('console/devices/repository/test-brand-otaa-model3.template.json').then(
-          templateJson => {
-            cy.intercept(
-              'GET',
-              `/api/v3/dr/applications/${appId}/brands/test-brand-otaa/models/test-model3/1.0.1/EU_863_870/template`,
-              templateJson,
-            )
-          },
-        )
-        cy.fixture('console/devices/repository/test-brand-otaa-model2.template.json').then(
-          templateJson => {
-            cy.intercept(
-              'GET',
-              `/api/v3/dr/applications/${appId}/brands/test-brand-otaa/models/test-model2/1.0/EU_863_870/template`,
-              templateJson,
-            )
-          },
-        )
-        cy.fixture('console/devices/repository/test-brand-otaa.models.json').then(modelsJson => {
-          cy.intercept(
-            'GET',
-            `/api/v3/dr/applications/${appId}/brands/test-brand-otaa/models*`,
-            modelsJson,
-          )
-        })
-        cy.fixture('console/devices/repository/brands.json').then(brandsJson => {
-          cy.intercept('GET', `/api/v3/dr/applications/${appId}/brands*`, brandsJson)
-        })
+        interceptDeviceRepo(appId)
 
         cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
         cy.visit(`${Cypress.config('consoleRootPath')}/applications/${appId}/devices/add`)
@@ -420,9 +378,8 @@ describe('End device repository manual registration', () => {
         cy.findByLabelText('Register another end device of this type').check()
 
         cy.findByRole('button', { name: 'Add end device' }).click()
-
+        cy.findByRole('button', { name: 'Add end device' }).should('not.be.disabled')
         cy.findByTestId('toast-notification')
-          .should('be.visible')
           .findByText('End device registered')
           .should('be.visible')
 
@@ -566,11 +523,10 @@ describe('End device repository manual registration', () => {
         cy.findByLabelText('Register another end device of this type').check()
 
         cy.findByRole('button', { name: 'Add end device' }).click()
-
         cy.findByTestId('toast-notification')
-          .should('be.visible')
           .findByText('End device registered')
           .should('be.visible')
+        cy.findByRole('button', { name: 'Add end device' }).should('not.be.disabled')
 
         const devId2 = 'test-abp-dev-2'
 
@@ -582,11 +538,10 @@ describe('End device repository manual registration', () => {
         cy.findByLabelText('Register another end device of this type').check()
 
         cy.findByRole('button', { name: 'Add end device' }).click()
-
         cy.findByTestId('toast-notification')
-          .should('be.visible')
           .findByText('End device registered')
           .should('be.visible')
+        cy.findByRole('button', { name: 'Add end device' }).should('not.be.disabled')
 
         const devId3 = 'test-abp-dev-3'
 
