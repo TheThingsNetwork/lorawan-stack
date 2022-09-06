@@ -105,10 +105,11 @@ const GatewayOnboardingForm = props => {
           await dispatch(attachPromise(updateGateway(gatewayId, { lbs_lns_secret })))
           setLnsKey(generatedLnsKey.key)
         }
-        setModalVisible(_create_api_key_cups || _create_api_key_lns)
-        if (!(_create_api_key_cups || _create_api_key_lns)) {
-          onSuccess(gatewayId)
+        if (_create_api_key_cups || _create_api_key_lns) {
+          return setModalVisible(true)
         }
+
+        return onSuccess(gatewayId)
       } catch (error) {
         setError(error)
       }
