@@ -324,6 +324,8 @@ func (is *IdentityServer) listGatewayCollaborators(ctx context.Context, req *ttn
 	if err = rights.RequireGateway(ctx, req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
 		defer func() { collaborators = collaborators.PublicSafe() }()
 	}
+
+	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
 	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
 	defer func() {
