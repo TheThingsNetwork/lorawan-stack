@@ -45,7 +45,7 @@ const getAccessTokensLogic = createRequestLogic({
   type: authorizations.GET_ACCESS_TOKENS_LIST,
   process: async ({ action }) => {
     const { userId, clientId, params } = action.payload
-    console.log(action.payload)
+
     const res = await tts.Authorizations.getAllTokens(userId, clientId, {
       page: params?.page,
       limit: params?.limit,
