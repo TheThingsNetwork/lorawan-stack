@@ -190,6 +190,8 @@ func (is *IdentityServer) listClientCollaborators(
 	); err != nil {
 		defer func() { collaborators = collaborators.PublicSafe() }()
 	}
+
+	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
 	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
 	defer func() {
