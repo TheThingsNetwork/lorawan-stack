@@ -88,7 +88,6 @@ const NetworkServerForm = React.memo(props => {
     supports_join = false,
     supports_class_b = false,
     supports_class_c = false,
-    mac_settings = {},
     version_ids = {},
   } = device
 
@@ -146,14 +145,24 @@ const NetworkServerForm = React.memo(props => {
         setMacSettings(settings)
         if (formRef.current) {
           const { setValues, values } = formRef.current
-
           setValues(
             validationSchema.cast(
               {
                 ...values,
                 mac_settings: {
-                  ...settings,
                   ...values.mac_settings,
+                  // To use `adr_margin` as initial value of `adr.dynamic.margin`.
+                  // And to make sure that, if there is already a value set for `adr`, it is not overwritten
+                  // by the default mac settings.
+                  adr:
+                    'dynamic' in values.mac_settings.adr
+                      ? {
+                          dynamic: {
+                            margin: values.mac_settings.adr.dynamic?.margin ?? settings.adr_margin,
+                          },
+                        }
+                      : values.mac_settings.adr,
+                  ...settings,
                 },
               },
               { context: validationContext },
@@ -200,9 +209,6 @@ const NetworkServerForm = React.memo(props => {
     ? ACTIVATION_MODES.MULTICAST
     : ACTIVATION_MODES.ABP
 
-  const initialUseAdr =
-    typeof mac_settings.use_adr === 'boolean' ? mac_settings.use_adr : macSettings.use_adr
-
   const initialValues = React.useMemo(
     () =>
       validationSchema.cast(
@@ -223,7 +229,6 @@ const NetworkServerForm = React.memo(props => {
       ),
     [device, initialActivationMode, isClassB, isClassC, macSettings, validationContext],
   )
-
   const handleMacReset = React.useCallback(async () => {
     try {
       await onMacReset()
@@ -240,11 +245,14 @@ const NetworkServerForm = React.memo(props => {
   }, [onMacReset])
 
   const handleSubmit = React.useCallback(
-    async ({ _activation_mode }, { resetForm, setSubmitting }, cleanValues) => {
+    async (values, { resetForm, setSubmitting }, cleanValues) => {
+      const { _activation_mode } = values
+
       const castedValues = validationSchema.cast(cleanValues, {
         context: validationContext,
         stripUnknown: true,
       })
+
       const updatedValues = diff(device, castedValues, [
         '_activation_mode',
         '_device_classes',
@@ -279,10 +287,15 @@ const NetworkServerForm = React.memo(props => {
         delete patch.session
       }
 
+      if (patch.mac_settings.adr) {
+        patch.mac_settings.adr_margin = null
+        patch.mac_settings.use_adr = null
+      }
+
       setError('')
       try {
         await onSubmit(patch)
-        resetForm({ values: castedValues })
+        resetForm({ values })
         onSubmitSuccess()
       } catch (err) {
         setSubmitting(false)
@@ -522,7 +535,6 @@ const NetworkServerForm = React.memo(props => {
         lorawanVersion={lorawanVersion}
         isClassB={isClassB}
         isClassC={isClassC}
-        isUseAdr={initialUseAdr}
       />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />

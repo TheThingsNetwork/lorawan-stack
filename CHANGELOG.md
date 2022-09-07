@@ -18,6 +18,7 @@ For details about compatibility between different releases, see the **Commitment
   - Added support on CLI. Available via the `end-devices get-net-id` and `end-devices get-dev-addr-prefixes` commands.
 - Support for loading end device template from Device Repository when importing devices using a CSV file.
 - Experimental support for normalized payload.
+- Support management of deleted users in the Console.
 - Decoded payloads are now visible for downlinks in the Console.
 - Support for dynamic ping slot frequencies, as used by the US915 and AU915 bands.
 - Support for LoRa Basics Station beaconing.
@@ -28,6 +29,7 @@ For details about compatibility between different releases, see the **Commitment
 - Absolute time downlinks (such as class B ping slots or class C absolute time downlinks) are now using the native class B downlink API of LoRa Basics Station.
 - Only gateways which are guaranteed to be GPS capable may now be used for absolute time downlinks. This ensures that gateways that have an unknown time source are not used for absolute time scheduling.
 - The static ADR mode may now steer the end device to use custom data rates such as SF7BW250, FSK and LR-FHSS.
+- Error details are now displayed in a modal instead of within the notification element in the Console.
 
 ### Deprecated
 
@@ -44,6 +46,7 @@ For details about compatibility between different releases, see the **Commitment
 - End device network layer form crashing in some situations in the Console device general settings.
 - End device overview crashing in some situations in the Console.
 - Device import when using Join Server-only deployments.
+- QRG can generate QR Codes without the claim authentication code.
 
 ### Security
 

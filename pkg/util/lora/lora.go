@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,23 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.details
-  width: 100%
-  display: flex
-  flex-wrap: wrap
-  justify-content: flex-end
-  margin-top: -2rem
+// Package lora contains LoRa modulation utilities.
+package lora
 
-  &-code
-    width: 100%
-    background-color: $c-backdrop
-    color: $tc-black
-    font-size: $fs.s
-    y-overflow: auto
-    padding: $cs.s
-    color: $tc-deep-gray
-    margin: (-1 * $ls.m) 0 0 0
-    box-sizing: border-box
-
-  &-button
-    margin-right: 0 !important
+// AdjustedRSSI returns the LoRa RSSI: the channel RSSI adjusted for SNR.
+// Below -5 dB, the SNR is added to the channel RSSI.
+// Between -5 dB and 10 dB, the SNR is scaled to 0 and added to the channel RSSI.
+func AdjustedRSSI(channelRSSI, snr float32) float32 {
+	rssi := channelRSSI
+	if snr <= -5.0 {
+		rssi += snr
+	} else if snr < 10.0 {
+		rssi += snr/3.0 - 10.0/3.0
+	}
+	return rssi
+}

@@ -159,7 +159,8 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 	// Store plaintext value to return in the response to clients.
 	var ptCACSecret string
 
-	if req.EndDevice.ClaimAuthenticationCode != nil {
+	// Create the CAC only if the value is set.
+	if req.EndDevice.GetClaimAuthenticationCode().GetValue() != "" {
 		ptCACSecret = req.EndDevice.ClaimAuthenticationCode.Value
 		if err = validateEndDeviceAuthenticationCode(*req.EndDevice.ClaimAuthenticationCode); err != nil {
 			return nil, err
@@ -240,8 +241,8 @@ func (is *IdentityServer) getEndDevice(ctx context.Context, req *ttnpb.GetEndDev
 	if err != nil {
 		return nil, err
 	}
-	if dev.GetClaimAuthenticationCode().GetValue() != "" {
-		s := strings.Split(dev.ClaimAuthenticationCode.Value, endDeviceAuthenticationCodeSeparator)
+	if cacVal := dev.GetClaimAuthenticationCode().GetValue(); cacVal != "" {
+		s := strings.Split(cacVal, endDeviceAuthenticationCodeSeparator)
 		if len(s) == 2 {
 			v, err := hex.DecodeString(s[1])
 			if err != nil {
@@ -370,27 +371,29 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 		if err = validateEndDeviceAuthenticationCode(*req.EndDevice.ClaimAuthenticationCode); err != nil {
 			return nil, err
 		}
-		if is.config.EndDevices.EncryptionKeyID != "" {
-			ptCACSecret = req.EndDevice.ClaimAuthenticationCode.Value
-			encrypted, err := is.KeyVault.Encrypt(
-				ctx,
-				[]byte(req.EndDevice.ClaimAuthenticationCode.Value),
-				is.config.EndDevices.EncryptionKeyID,
-			)
-			if err != nil {
-				return nil, err
+		if req.EndDevice.ClaimAuthenticationCode.Value != "" {
+			if is.config.EndDevices.EncryptionKeyID != "" {
+				ptCACSecret = req.EndDevice.ClaimAuthenticationCode.Value
+				encrypted, err := is.KeyVault.Encrypt(
+					ctx,
+					[]byte(req.EndDevice.ClaimAuthenticationCode.Value),
+					is.config.EndDevices.EncryptionKeyID,
+				)
+				if err != nil {
+					return nil, err
+				}
+				// Store the encrypted value along with the ID of the key used to encrypt it.
+				req.EndDevice.ClaimAuthenticationCode.Value = fmt.Sprintf(
+					"%s%s%s",
+					is.config.EndDevices.EncryptionKeyID,
+					endDeviceAuthenticationCodeSeparator,
+					hex.EncodeToString(encrypted),
+				)
+			} else {
+				log.FromContext(ctx).Debug(
+					"No encryption key defined, store end device claim authentication code directly in plaintext",
+				)
 			}
-			// Store the encrypted value along with the ID of the key used to encrypt it.
-			req.EndDevice.ClaimAuthenticationCode.Value = fmt.Sprintf(
-				"%s%s%s",
-				is.config.EndDevices.EncryptionKeyID,
-				endDeviceAuthenticationCodeSeparator,
-				hex.EncodeToString(encrypted),
-			)
-		} else {
-			log.FromContext(ctx).Debug(
-				"No encryption key defined, store end device claim authentication code directly in plaintext",
-			)
 		}
 	}
 

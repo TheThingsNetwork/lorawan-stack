@@ -21,6 +21,7 @@ import (
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -62,6 +63,9 @@ func filterUserIdentifiers(ids []*ttnpb.OrganizationOrUserIdentifiers) []*ttnpb.
 }
 
 func (is *IdentityServer) notifyInternal(ctx context.Context, req *ttnpb.CreateNotificationRequest) error {
+	if err := req.ValidateFields(); err != nil {
+		panic(err)
+	}
 	ctx = is.FromRequestContext(ctx)
 	if authInfo, err := is.authInfo(ctx); err == nil {
 		if userIDs := authInfo.GetEntityIdentifiers().GetUserIds(); userIDs != nil {
@@ -71,6 +75,8 @@ func (is *IdentityServer) notifyInternal(ctx context.Context, req *ttnpb.CreateN
 	_, err := is.createNotification(clusterauth.NewContext(ctx, nil), req) // just call the RPC with cluster auth.
 	return err
 }
+
+var errNoReceiverUserIDs = errors.Define("no_receiver_user_ids", "no receiver users ids")
 
 func (is *IdentityServer) lookupNotificationReceivers(ctx context.Context, req *ttnpb.CreateNotificationRequest) ([]*ttnpb.UserIdentifiers, error) {
 	var receiverIDs []*ttnpb.OrganizationOrUserIdentifiers
@@ -162,6 +168,10 @@ func (is *IdentityServer) lookupNotificationReceivers(ctx context.Context, req *
 	// Filter only user identifiers and remove duplicates.
 	receiverUserIDs := filterUserIdentifiers(uniqueOrganizationOrUserIdentifiers(ctx, receiverIDs))
 
+	if len(receiverUserIDs) == 0 {
+		return nil, errNoReceiverUserIDs.New()
+	}
+
 	return receiverUserIDs, nil
 }
 
@@ -215,8 +225,11 @@ func (is *IdentityServer) createNotification(ctx context.Context, req *ttnpb.Cre
 }
 
 func (is *IdentityServer) notifyAdminsInternal(ctx context.Context, req *ttnpb.CreateNotificationRequest) error {
-	ctx = is.FromRequestContext(ctx)
+	if err := req.ValidateFields(); err != nil {
+		panic(err)
+	}
 
+	ctx = is.FromRequestContext(ctx)
 	if authInfo, err := is.authInfo(ctx); err == nil {
 		if userIDs := authInfo.GetEntityIdentifiers().GetUserIds(); userIDs != nil {
 			req.SenderIds = userIDs
