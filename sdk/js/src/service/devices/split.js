@@ -185,6 +185,10 @@ export const makeRequests = async (
 
   const { end_device = {} } = payload
 
+  let makeJsRequest = true
+  let makeNsRequest = true
+  let makeAsRequest = true
+
   // Do a possible IS request first.
   if (stackConfig.isComponentAvailable(IS) && IS in requestTree) {
     let func
@@ -196,6 +200,20 @@ export const makeRequests = async (
       func = 'Delete'
     } else {
       func = 'Get'
+      // If other components are requested, check in the IS whether they
+      // are actually enabled to save the requests if possible.
+      if (Object.keys(requestTree).length > 1) {
+        requestTree.is = [
+          ...requestTree.is,
+          ['join_server_address'],
+          ['application_server_address'],
+          ['network_server_address'],
+        ]
+          // Remove duplicates.
+          .map(p => p.join('.'))
+          .filter((path, index, paths) => paths.indexOf(path) === index)
+          .map(p => p.split('.'))
+      }
     }
 
     result[3] = await requestWrapper(
@@ -210,30 +228,40 @@ export const makeRequests = async (
     )
 
     if (isCreate) {
-      // Abort and return the result object when the IS create request has
-      // failed.
+      // Abort and return the result object when the IS create request has failed.
       if (result[3].hasErrored) {
         return result
       }
       // Set the device id param based on the id of the newly created device.
       params.routeParams['end_device.ids.device_id'] = result[3].device.ids.device_id
     }
+
+    // Avoid unnecessary requests component requests if the IS does not know about them.
+    makeJsRequest =
+      Boolean(result[3].device.join_server_address) &&
+      stackConfig.isSameHost(JS, result[3].device.join_server_address)
+    makeNsRequest =
+      Boolean(result[3].device.application_server_address) &&
+      stackConfig.isSameHost(AS, result[3].device.application_server_address)
+    makeAsRequest =
+      Boolean(result[3].device.network_server_address) &&
+      stackConfig.isSameHost(NS, result[3].device.network_server_address)
   }
 
   // Compose an array of possible api calls to NS, AS, JS.
-  if (stackConfig.isComponentAvailable(NS) && NS in requestTree) {
+  if (stackConfig.isComponentAvailable(NS) && NS in requestTree && makeNsRequest) {
     requests[0] = requestWrapper(api.NsEndDeviceRegistry[rpcFunction], params, NS, {
       ...splitPayload(payload, requestTree[NS]),
       ...Marshaler.pathsToFieldMask(requestTree[NS]),
     })
   }
-  if (stackConfig.isComponentAvailable(AS) && AS in requestTree) {
+  if (stackConfig.isComponentAvailable(AS) && AS in requestTree && makeAsRequest) {
     requests[1] = requestWrapper(api.AsEndDeviceRegistry[rpcFunction], params, AS, {
       ...splitPayload(payload, requestTree[AS]),
       ...Marshaler.pathsToFieldMask(requestTree[AS]),
     })
   }
-  if (stackConfig.isComponentAvailable(JS) && JS in requestTree) {
+  if (stackConfig.isComponentAvailable(JS) && JS in requestTree && makeJsRequest) {
     requests[2] = requestWrapper(api.JsEndDeviceRegistry[rpcFunction], params, JS, {
       ...splitPayload(payload, requestTree[JS], { ids: end_device.ids }),
       ...Marshaler.pathsToFieldMask(requestTree[JS]),
