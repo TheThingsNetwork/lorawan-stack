@@ -45,7 +45,7 @@ const GatewayApiKeysModal = ({
     className={style.gatewayApiKeyModal}
     visible={modalVisible}
     title={m.modalTitle}
-    approval
+    approval={false}
     onComplete={modalApprove}
     buttonMessage={m.buttonMessage}
   >

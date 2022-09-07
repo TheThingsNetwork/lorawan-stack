@@ -139,7 +139,7 @@ const GatewayOnboardingForm = props => {
   const modalApprove = useCallback(() => onSuccess(gatewayId), [onSuccess, gatewayId])
 
   return (
-    <React.Fragment>
+    <>
       <GatewayApiKeysModal
         modalVisible={modalVisible}
         lnsKey={lnsKey}
@@ -158,7 +158,7 @@ const GatewayOnboardingForm = props => {
       >
         <GatewayProvisioningFormSection userId={userId} />
       </Form>
-    </React.Fragment>
+    </>
   )
 }
 
