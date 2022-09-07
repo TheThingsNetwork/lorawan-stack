@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { merge } from 'lodash'
@@ -75,7 +75,7 @@ const joinEuiDecoder = value => value?.ids?.join_eui || ''
 
 const DeviceProvisioningFormSection = () => {
   const dispatch = useDispatch()
-  const { values, setFieldValue, setValues } = useFormContext()
+  const { values, setValues } = useFormContext()
   const {
     _claim,
     _inputMethod,
@@ -114,12 +114,28 @@ const DeviceProvisioningFormSection = () => {
     }))
   }, [setValues])
 
-  const handleJoinEuiConfirm = React.useCallback(async () => {
+  const handleJoinEuiConfirm = useCallback(async () => {
     const claim = await dispatch(attachPromise(getInfoByJoinEUI({ join_eui: ids?.join_eui })))
     const supportsClaiming = claim.supports_claiming ?? false
 
-    setFieldValue('_claim', supportsClaiming)
-  }, [ids, setFieldValue, dispatch])
+    setValues(values => ({
+      ...values,
+      _claim: supportsClaiming,
+      // In case of claiming, the creation on the join server needs to be skipped.
+      join_server_address: supportsClaiming ? undefined : values.join_server_address,
+    }))
+  }, [dispatch, ids.join_eui, setValues])
+
+  const handleJoinEuiKeyDown = useCallback(
+    event => {
+      if (event.key === 'Enter' && mayConfirm) {
+        event.preventDefault()
+        event.target.blur()
+        handleJoinEuiConfirm()
+      }
+    },
+    [handleJoinEuiConfirm, mayConfirm],
+  )
 
   useEffect(() => {
     // Auto-confirm the join EUI when using QR code data.
@@ -139,16 +155,17 @@ const DeviceProvisioningFormSection = () => {
           min={8}
           max={8}
           required
-          disabled={_withQRdata}
+          disabled={isClaimingDetermined || _withQRdata}
           component={Input}
           tooltipId={tooltipIds.JOIN_EUI}
           encode={joinEuiEncoder}
           decode={joinEuiDecoder}
+          onKeyDown={handleJoinEuiKeyDown}
         >
           {_claim === undefined ? (
             <Button
               type="button"
-              disabled={!mayConfirm || _withQRdata}
+              disabled={!mayConfirm}
               onClick={handleJoinEuiConfirm}
               message={msg.confirm}
               className="ml-cs-xs"
