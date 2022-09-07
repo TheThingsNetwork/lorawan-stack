@@ -753,7 +753,7 @@ describe('End device manual create', () => {
         cy.findByTestId('full-error-view').should('not.exist')
       })
 
-      it('succeeds regitering multiple devices', () => {
+      it('succeeds registering multiple devices', () => {
         const device1 = {
           id: 'multicast-test-1',
           join_eui: generateHexValue(16),
@@ -766,22 +766,12 @@ describe('End device manual create', () => {
 
         const device2 = {
           id: 'multicast-test-2',
-          join_eui: generateHexValue(16),
           dev_addr: generateHexValue(8),
-          lorawan_version: 'MAC_V1_0',
-          frequency_plan_id: '863-870 MHz',
-          app_s_key: generateHexValue(32),
-          nwk_s_key: generateHexValue(32),
         }
 
         const device3 = {
           id: 'multicast-test-3',
-          join_eui: generateHexValue(16),
           dev_addr: generateHexValue(8),
-          lorawan_version: 'MAC_V1_0',
-          frequency_plan_id: '863-870 MHz',
-          app_s_key: generateHexValue(32),
-          nwk_s_key: generateHexValue(32),
         }
 
         // Device 1
@@ -802,28 +792,24 @@ describe('End device manual create', () => {
         cy.findByRole('button', { name: 'Add end device' }).click()
 
         cy.findByTestId('toast-notification')
-          .should('be.visible')
           .findByText('End device registered')
           .should('be.visible')
+        cy.findByRole('button', { name: 'Add end device' }).should('not.be.disabled')
 
         // Device 2
         cy.findByLabelText('Device address').type(device2.dev_addr)
-        cy.findByLabelText('AppSKey').clear().type(device2.app_s_key)
-        cy.findByLabelText('NwkSKey').clear().type(device2.nwk_s_key)
         cy.findByLabelText('End device ID').type(device2.id)
         cy.findByLabelText('Register another end device of this type').check()
 
         cy.findByRole('button', { name: 'Add end device' }).click()
 
         cy.findByTestId('toast-notification')
-          .should('be.visible')
           .findByText('End device registered')
           .should('be.visible')
+        cy.findByRole('button', { name: 'Add end device' }).should('not.be.disabled')
 
         // Device 3
         cy.findByLabelText('Device address').clear().type(device3.dev_addr)
-        cy.findByLabelText('AppSKey').clear().type(device3.app_s_key)
-        cy.findByLabelText('NwkSKey').clear().type(device3.nwk_s_key)
         cy.findByLabelText('End device ID').type(device3.id)
         cy.findByLabelText('View registered end device').check()
 

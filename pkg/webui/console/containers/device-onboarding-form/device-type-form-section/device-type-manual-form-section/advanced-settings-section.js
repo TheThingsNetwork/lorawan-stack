@@ -180,6 +180,7 @@ const AdvancedSettingsSection = () => {
     values: {
       mac_settings,
       _default_ns_settings,
+      _claim,
       frequency_plan_id,
       lorawan_phy_version,
       lorawan_version,
@@ -286,11 +287,7 @@ const AdvancedSettingsSection = () => {
 
   // Register hidden fields so they don't get cleaned.
   useEffect(() => {
-    const hiddenFields = [
-      'network_server_address',
-      'application_server_address',
-      'join_server_address',
-    ]
+    const hiddenFields = ['network_server_address', 'application_server_address']
     addToFieldRegistry(...hiddenFields)
     return () => removeFromFieldRegistry(...hiddenFields)
   }, [addToFieldRegistry, removeFromFieldRegistry])
@@ -557,6 +554,7 @@ const AdvancedSettingsSection = () => {
           decode={skipJsRegistrationDecoder}
           component={Checkbox}
           tooltipId={tooltipIds.SKIP_JOIN_SERVER_REGISTRATION}
+          disabled={_claim}
         />
       </Form.CollapseSection>
       <hr />
