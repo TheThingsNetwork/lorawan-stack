@@ -67,8 +67,9 @@ var (
 				return err
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
+			order := getOrder(cmd.Flags())
 			res, err := ttnpb.NewApplicationAccessClient(is).ListCollaborators(ctx, &ttnpb.ListApplicationCollaboratorsRequest{
-				ApplicationIds: appID, Limit: limit, Page: page,
+				ApplicationIds: appID, Limit: limit, Page: page, Order: order,
 			}, opt)
 			if err != nil {
 				return err
@@ -371,6 +372,7 @@ func init() {
 	applicationsCommand.AddCommand(applicationRights)
 
 	applicationCollaboratorsList.Flags().AddFlagSet(paginationFlags())
+	applicationCollaboratorsList.Flags().AddFlagSet(orderFlags())
 	applicationCollaborators.AddCommand(applicationCollaboratorsList)
 	applicationCollaboratorsGet.Flags().AddFlagSet(collaboratorFlags())
 	applicationCollaborators.AddCommand(applicationCollaboratorsGet)
