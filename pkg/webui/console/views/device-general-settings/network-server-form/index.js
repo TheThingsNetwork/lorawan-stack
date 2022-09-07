@@ -245,7 +245,9 @@ const NetworkServerForm = React.memo(props => {
   }, [onMacReset])
 
   const handleSubmit = React.useCallback(
-    async ({ _activation_mode }, { resetForm, setSubmitting }, cleanValues) => {
+    async (values, { resetForm, setSubmitting }, cleanValues) => {
+      const { _activation_mode } = values
+
       const castedValues = validationSchema.cast(cleanValues, {
         context: validationContext,
         stripUnknown: true,
@@ -293,7 +295,7 @@ const NetworkServerForm = React.memo(props => {
       setError('')
       try {
         await onSubmit(patch)
-        resetForm({ values: castedValues })
+        resetForm({ values })
         onSubmitSuccess()
       } catch (err) {
         setSubmitting(false)
