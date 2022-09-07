@@ -21,12 +21,12 @@ import * as authorizations from '@account/store/actions/authorizations'
 const getAuthorizationsLogic = createRequestLogic({
   type: authorizations.GET_AUTHORIZATIONS_LIST,
   process: async ({ action }) => {
-    const {
-      userId,
-      params: { page, limit },
-    } = action.payload
+    const { userId, params } = action.payload
 
-    const res = await tts.Authorizations.getAllAuthorizations(userId, { page, limit })
+    const res = await tts.Authorizations.getAllAuthorizations(userId, {
+      page: params?.page,
+      limit: params?.limit,
+    })
 
     return { entities: res.authorizations, authorizationsTotalCount: res.totalCount }
   },
@@ -44,12 +44,12 @@ const deleteAuthorizationLogic = createRequestLogic({
 const getAccessTokensLogic = createRequestLogic({
   type: authorizations.GET_ACCESS_TOKENS_LIST,
   process: async ({ action }) => {
-    const {
-      userId,
-      clientId,
-      params: { page, limit },
-    } = action.payload
-    const res = await tts.Authorizations.getAllTokens(userId, clientId, { page, limit })
+    const { userId, clientId, params } = action.payload
+    console.log(action.payload)
+    const res = await tts.Authorizations.getAllTokens(userId, clientId, {
+      page: params?.page,
+      limit: params?.limit,
+    })
 
     return { entities: res.tokens, tokensTotalCount: res.totalCount }
   },

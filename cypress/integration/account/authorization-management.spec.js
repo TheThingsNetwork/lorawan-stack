@@ -36,7 +36,7 @@ describe('Account App authorization management', () => {
     cy.findByRole('cell', { name: 'console' }).should('be.visible')
   })
 
-  it('succeeds viewing an authtorized client', () => {
+  it('succeeds viewing an authorized client', () => {
     cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
     cy.visit(`${Cypress.config('accountAppRootPath')}/client-authorizations/console`)
     cy.findByText('Authorization settings').should('be.visible')
