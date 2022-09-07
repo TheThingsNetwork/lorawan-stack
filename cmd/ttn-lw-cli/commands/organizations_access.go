@@ -67,8 +67,9 @@ var (
 				return err
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
+			order := getOrder(cmd.Flags())
 			res, err := ttnpb.NewOrganizationAccessClient(is).ListCollaborators(ctx, &ttnpb.ListOrganizationCollaboratorsRequest{
-				OrganizationIds: orgID, Limit: limit, Page: page,
+				OrganizationIds: orgID, Limit: limit, Page: page, Order: order,
 			}, opt)
 			if err != nil {
 				return err
@@ -377,6 +378,7 @@ func init() {
 	organizationsCommand.AddCommand(organizationRights)
 
 	organizationCollaboratorsList.Flags().AddFlagSet(paginationFlags())
+	organizationCollaboratorsList.Flags().AddFlagSet(orderFlags())
 	organizationCollaborators.AddCommand(organizationCollaboratorsList)
 	organizationCollaboratorsGet.Flags().AddFlagSet(collaboratorFlags())
 	organizationCollaborators.AddCommand(organizationCollaboratorsGet)

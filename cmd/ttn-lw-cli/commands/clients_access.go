@@ -66,8 +66,9 @@ var (
 				return err
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
+			order := getOrder(cmd.Flags())
 			res, err := ttnpb.NewClientAccessClient(is).ListCollaborators(ctx, &ttnpb.ListClientCollaboratorsRequest{
-				ClientIds: cliID, Limit: limit, Page: page,
+				ClientIds: cliID, Limit: limit, Page: page, Order: order,
 			}, opt)
 			if err != nil {
 				return err
@@ -185,6 +186,7 @@ func init() {
 	clientsCommand.AddCommand(clientRights)
 
 	clientCollaboratorsList.Flags().AddFlagSet(paginationFlags())
+	clientCollaboratorsList.Flags().AddFlagSet(orderFlags())
 	clientCollaborators.AddCommand(clientCollaboratorsList)
 	clientCollaboratorsGet.Flags().AddFlagSet(collaboratorFlags())
 	clientCollaborators.AddCommand(clientCollaboratorsGet)

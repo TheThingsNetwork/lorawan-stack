@@ -67,8 +67,9 @@ var (
 				return err
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
+			order := getOrder(cmd.Flags())
 			res, err := ttnpb.NewGatewayAccessClient(is).ListCollaborators(ctx, &ttnpb.ListGatewayCollaboratorsRequest{
-				GatewayIds: gtwID, Limit: limit, Page: page,
+				GatewayIds: gtwID, Limit: limit, Page: page, Order: order,
 			}, opt)
 			if err != nil {
 				return err
@@ -371,6 +372,7 @@ func init() {
 	gatewaysCommand.AddCommand(gatewayRights)
 
 	gatewayCollaboratorsList.Flags().AddFlagSet(paginationFlags())
+	gatewayCollaboratorsList.Flags().AddFlagSet(orderFlags())
 	gatewayCollaborators.AddCommand(gatewayCollaboratorsList)
 	gatewayCollaboratorsGet.Flags().AddFlagSet(collaboratorFlags())
 	gatewayCollaborators.AddCommand(gatewayCollaboratorsGet)
