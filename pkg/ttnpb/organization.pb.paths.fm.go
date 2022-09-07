@@ -209,6 +209,7 @@ var UpdateOrganizationAPIKeyRequestFieldPathsTopLevel = []string{
 }
 var ListOrganizationCollaboratorsRequestFieldPathsNested = []string{
 	"limit",
+	"order",
 	"organization_ids",
 	"organization_ids.organization_id",
 	"page",
@@ -216,6 +217,7 @@ var ListOrganizationCollaboratorsRequestFieldPathsNested = []string{
 
 var ListOrganizationCollaboratorsRequestFieldPathsTopLevel = []string{
 	"limit",
+	"order",
 	"organization_ids",
 	"page",
 }
