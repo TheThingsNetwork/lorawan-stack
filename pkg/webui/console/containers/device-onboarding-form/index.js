@@ -96,73 +96,81 @@ const DeviceOnboardingForm = () => {
     [dispatch],
   )
 
-  const handleClaim = useCallback(
-    async values => {
-      const { qr_code, ids, ...rest } = values
-      const device = await dispatch(attachPromise(claimDevice(appId, qr_code, rest)))
-      const { deviceIds } = device
-      navigateToDevice(appId, deviceIds.device_id)
-    },
-    [appId, navigateToDevice, dispatch],
-  )
-
-  const handleRegister = useCallback(
-    async (values, resetForm, { authenticated_identifiers, ...cleanedValues }) => {
-      const { _registration } = values
-      const { ids, mac_state = {} } = cleanedValues
-      ids.application_ids = { application_id: appId }
-
-      //  Do not attempt to set empty current_parameters on device creation.
-      if (mac_state.current_parameters && Object.keys(mac_state.current_parameters).length === 0) {
-        delete mac_state.current_parameters
-      }
-
-      await dispatch(attachPromise(createDevice(appId, cleanedValues)))
-      switch (_registration) {
-        case REGISTRATION_TYPES.MULTIPLE:
-          toast({
-            type: toast.types.SUCCESS,
-            message: m.createSuccess,
-          })
-          resetForm({
-            errors: {},
-            values: {
-              ...values,
-              ids: {
-                ...initialValues.ids,
-                join_eui: values.ids.join_eui,
-              },
-              frequency_plan_id: values.frequency_plan_id,
-              version_ids: values.version_ids,
-              _registration: REGISTRATION_TYPES.MULTIPLE,
-            },
-          })
-          break
-        case REGISTRATION_TYPES.SINGLE:
-        default:
-          navigateToDevice(appId, ids.device_id)
-      }
-    },
-    [appId, dispatch, navigateToDevice],
-  )
-
   const handleSubmit = useCallback(
     async (values, { resetForm }, cleanedValues) => {
+      const { _registration } = values
+      const applicationIds = { application_id: appId }
+      const { authenticated_identifiers, target_device_id, ...submitValues } = cleanedValues
+      const { mac_state = {} } = submitValues
+
       setError()
+
+      // Set the application ID.
+      submitValues.ids.application_ids = applicationIds
+
       try {
-        let result
+        // Initiate claiming, if the device is claimable.
         if (values._claim) {
-          result = await handleClaim(cleanedValues)
-        } else {
-          result = await handleRegister(values, resetForm, cleanedValues)
+          const claimValues = {
+            authenticated_identifiers,
+            target_device_id,
+          }
+          // Provision (claim) the device on the Join Server.
+          const deviceIds = await dispatch(
+            attachPromise(claimDevice(appId, undefined, claimValues)),
+          )
+          // Apply the resulting IDs to the submit values.
+          submitValues.ids = deviceIds
         }
 
-        return result
+        //  Do not attempt to set empty `current_parameters` on device creation.
+        if (
+          mac_state.current_parameters &&
+          Object.keys(mac_state.current_parameters).length === 0
+        ) {
+          delete mac_state.current_parameters
+        }
+
+        // Create the device in the stack (skipping JS, if claimed previously).
+        await dispatch(attachPromise(createDevice(appId, submitValues)))
+        switch (_registration) {
+          case REGISTRATION_TYPES.MULTIPLE:
+            toast({
+              type: toast.types.SUCCESS,
+              message: m.createSuccess,
+            })
+            resetForm({
+              errors: {},
+              values: {
+                ...values,
+                _registration: REGISTRATION_TYPES.MULTIPLE,
+                // Reset registration values.
+                ids: {
+                  ...initialValues.ids,
+                  join_eui: values.ids.join_eui,
+                },
+                frequency_plan_id: values.frequency_plan_id,
+                version_ids: values.version_ids,
+                // Reset claim values.
+                authenticated_identifiers: {
+                  ...initialValues.authenticated_identifiers,
+                  join_eui: values.authenticated_identifiers.join_eui,
+                },
+                target_device_id: initialValues.target_device_id,
+                // Only reset session when not using multicast.
+                session: values.multicast ? values.session : initialValues.session,
+              },
+            })
+            break
+          case REGISTRATION_TYPES.SINGLE:
+          default:
+            navigateToDevice(appId, submitValues.ids.device_id)
+        }
       } catch (error) {
         setError(error)
       }
     },
-    [handleClaim, handleRegister],
+    [appId, dispatch, navigateToDevice],
   )
 
   return (
