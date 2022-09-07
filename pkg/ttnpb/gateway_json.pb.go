@@ -1127,6 +1127,11 @@ func (x *ListGatewayCollaboratorsRequest) MarshalProtoJSON(s *jsonplugin.Marshal
 		s.WriteObjectField("page")
 		s.WriteUint32(x.Page)
 	}
+	if x.Order != "" || s.HasField("order") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("order")
+		s.WriteString(x.Order)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -1157,6 +1162,9 @@ func (x *ListGatewayCollaboratorsRequest) UnmarshalProtoJSON(s *jsonplugin.Unmar
 		case "page":
 			s.AddField("page")
 			x.Page = s.ReadUint32()
+		case "order":
+			s.AddField("order")
+			x.Order = s.ReadString()
 		}
 	})
 }

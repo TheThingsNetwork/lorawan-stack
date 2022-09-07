@@ -1429,6 +1429,15 @@ func (m *ListOrganizationCollaboratorsRequest) ValidateFields(paths ...string) e
 
 		case "page":
 			// no validation rules for Page
+		case "order":
+
+			if _, ok := _ListOrganizationCollaboratorsRequest_Order_InLookup[m.GetOrder()]; !ok {
+				return ListOrganizationCollaboratorsRequestValidationError{
+					field:  "order",
+					reason: "value must be in list [ id -id -rights rights]",
+				}
+			}
+
 		default:
 			return ListOrganizationCollaboratorsRequestValidationError{
 				field:  name,
@@ -1495,6 +1504,14 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ListOrganizationCollaboratorsRequestValidationError{}
+
+var _ListOrganizationCollaboratorsRequest_Order_InLookup = map[string]struct{}{
+	"":        {},
+	"id":      {},
+	"-id":     {},
+	"-rights": {},
+	"rights":  {},
+}
 
 // ValidateFields checks the field values on GetOrganizationCollaboratorRequest
 // with the rules defined in the proto definition for this message. If any

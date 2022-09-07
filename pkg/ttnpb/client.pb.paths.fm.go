@@ -190,12 +190,14 @@ var ListClientCollaboratorsRequestFieldPathsNested = []string{
 	"client_ids",
 	"client_ids.client_id",
 	"limit",
+	"order",
 	"page",
 }
 
 var ListClientCollaboratorsRequestFieldPathsTopLevel = []string{
 	"client_ids",
 	"limit",
+	"order",
 	"page",
 }
 var GetClientCollaboratorRequestFieldPathsNested = []string{

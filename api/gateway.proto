@@ -311,6 +311,11 @@ message ListGatewayCollaboratorsRequest {
   uint32 limit = 2 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
   uint32 page = 3;
+  // Order the results by this field path (must be present in the field mask).
+  // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
+  string order = 4 [
+    (validate.rules).string = { in: ["", "id", "-id", "-rights", "rights"] }
+  ];
 }
 
 message GetGatewayCollaboratorRequest {

@@ -421,12 +421,14 @@ var ListGatewayCollaboratorsRequestFieldPathsNested = []string{
 	"gateway_ids.eui",
 	"gateway_ids.gateway_id",
 	"limit",
+	"order",
 	"page",
 }
 
 var ListGatewayCollaboratorsRequestFieldPathsTopLevel = []string{
 	"gateway_ids",
 	"limit",
+	"order",
 	"page",
 }
 var GetGatewayCollaboratorRequestFieldPathsNested = []string{
