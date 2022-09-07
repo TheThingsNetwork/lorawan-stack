@@ -44,13 +44,9 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
   ...stateProps,
   ...dispatchProps,
   ...ownProps,
-  deleteToken: id =>
-    dispatchProps.deleteToken({ userId: stateProps.userId, clientId: stateProps.clientId }, id),
+  deleteToken: id => dispatchProps.deleteToken(stateProps.userId, stateProps.clientId, id),
   deleteAllTokens: ids =>
-    dispatchProps.deleteAllTokens(
-      { userId: stateProps.userId, clientId: stateProps.clientId },
-      ids,
-    ),
+    dispatchProps.deleteAllTokens(stateProps.userId, stateProps.clientId, ids),
 })
 
 export default Tokens => connect(mapStateToProps, mapDispatchToProps, mergeProps)(Tokens)

@@ -28,7 +28,7 @@ class Authorizations {
       {
         routeParams: { 'user_ids.user_id': userId },
       },
-      { ...params },
+      params,
     )
 
     return Marshaler.payloadListResponse('authorizations', result)
@@ -47,17 +47,17 @@ class Authorizations {
       {
         routeParams: { 'user_ids.user_id': userId, 'client_ids.client_id': client_id },
       },
-      { params },
+      params,
     )
 
     return Marshaler.payloadListResponse('tokens', result)
   }
 
-  async deleteToken(params, id) {
+  async deleteToken(userId, client_id, id) {
     const result = await this._api.OAuthAuthorizationRegistry.DeleteToken({
       routeParams: {
-        'user_ids.user_id': params.userId,
-        'client_ids.client_id': params.client_id,
+        'user_ids.user_id': userId,
+        'client_ids.client_id': client_id,
         id,
       },
     })

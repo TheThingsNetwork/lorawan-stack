@@ -22,11 +22,11 @@ const getAuthorizationsLogic = createRequestLogic({
   type: authorizations.GET_AUTHORIZATIONS_LIST,
   process: async ({ action }) => {
     const {
-      id,
-      params: { page, limit, order },
+      userId,
+      params: { page, limit },
     } = action.payload
 
-    const res = await tts.Authorizations.getAllAuthorizations(id, { page, limit, order })
+    const res = await tts.Authorizations.getAllAuthorizations(userId, { page, limit })
 
     return { entities: res.authorizations, authorizationsTotalCount: res.totalCount }
   },
@@ -35,9 +35,9 @@ const getAuthorizationsLogic = createRequestLogic({
 const deleteAuthorizationLogic = createRequestLogic({
   type: authorizations.DELETE_AUTHORIZATION,
   process: async ({ action }) => {
-    const { id, targetId } = action.payload
+    const { userId, clientId } = action.payload
 
-    return await tts.Authorizations.deleteAuthorization(id, targetId)
+    return await tts.Authorizations.deleteAuthorization(userId, clientId)
   },
 })
 
@@ -45,11 +45,11 @@ const getAccessTokensLogic = createRequestLogic({
   type: authorizations.GET_ACCESS_TOKENS_LIST,
   process: async ({ action }) => {
     const {
-      parentId,
-      parentType,
-      params: { page, limit, order },
+      userId,
+      clientId,
+      params: { page, limit },
     } = action.payload
-    const res = await tts.Authorizations.getAllTokens(parentType, parentId, { page, limit, order })
+    const res = await tts.Authorizations.getAllTokens(userId, clientId, { page, limit })
 
     return { entities: res.tokens, tokensTotalCount: res.totalCount }
   },
@@ -58,18 +58,18 @@ const getAccessTokensLogic = createRequestLogic({
 const deleteAccessTokenLogic = createRequestLogic({
   type: authorizations.DELETE_ACCESS_TOKEN,
   process: async ({ action }) => {
-    const { routeParams, id } = action.payload
+    const { userId, clientId, id } = action.payload
 
-    return await tts.Authorizations.deleteToken(routeParams, id)
+    return await tts.Authorizations.deleteToken(userId, clientId, id)
   },
 })
 
 const deleteAllTokensLogic = createRequestLogic({
   type: authorizations.DELETE_ALL_TOKENS,
   process: async ({ action }) => {
-    const { routeParams, id } = action.payload
+    const { userId, clientId, ids } = action.payload
 
-    return await Promise.all(id.map(id => tts.Authorizations.deleteToken(routeParams, id)))
+    return await Promise.all(ids.map(id => tts.Authorizations.deleteToken(userId, clientId, id)))
   },
 })
 

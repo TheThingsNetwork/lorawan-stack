@@ -12,12 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  createPaginationByParentRequestActions,
-  createPaginationByIdRequestActions,
-  createPaginationByIdDeleteActions,
-  createPaginationByRouteParametersDeleteActions,
-} from '@ttn-lw/lib/store/actions/pagination'
+import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
 
 export const GET_AUTHORIZATIONS_LIST_BASE = 'GET_AUTHORIZATIONS_LIST'
 export const [
@@ -31,7 +26,11 @@ export const [
     success: getAuthorizationsSuccess,
     failure: getAuthorizationsFailure,
   },
-] = createPaginationByIdRequestActions('AUTHORIZATIONS')
+] = createRequestActions(
+  GET_AUTHORIZATIONS_LIST_BASE,
+  (userId, params) => ({ userId, params }),
+  (userId, params, selector) => ({ selector }),
+)
 
 export const GET_ACCESS_TOKENS_LIST_BASE = 'GET_ACCESS_TOKENS_LIST'
 export const [
@@ -45,7 +44,11 @@ export const [
     success: getAccessTokensSuccess,
     failure: getAccessTokensFailure,
   },
-] = createPaginationByParentRequestActions('ACCESS_TOKENS')
+] = createRequestActions(
+  GET_ACCESS_TOKENS_LIST_BASE,
+  (userId, clientId, params) => ({ userId, clientId, params }),
+  (userId, clientId, params, selector) => ({ selector }),
+)
 
 export const DELETE_AUTHORIZATION_BASE = 'DELETE_AUTHORIZATION'
 export const [
@@ -59,7 +62,11 @@ export const [
     success: deleteAuthorizationSuccess,
     failure: deleteAuthorizationFailure,
   },
-] = createPaginationByIdDeleteActions('AUTHORIZATION', (userId, clientId) => ({ userId, clientId }))
+] = createRequestActions(
+  DELETE_AUTHORIZATION_BASE,
+  (userId, clientId) => ({ userId, clientId }),
+  (userId, clientId, selector) => ({ selector }),
+)
 
 export const DELETE_ACCESS_TOKEN_BASE = 'DELETE_ACCESS_TOKEN'
 export const [
@@ -73,8 +80,9 @@ export const [
     success: deleteAccessTokenSuccess,
     failure: deleteAccessTokenFailure,
   },
-] = createPaginationByRouteParametersDeleteActions('ACCESS_TOKEN', (routeParams, id) => ({
-  routeParams,
+] = createRequestActions(DELETE_ACCESS_TOKEN_BASE, (userId, clientId, id) => ({
+  userId,
+  clientId,
   id,
 }))
 
@@ -86,7 +94,8 @@ export const [
     failure: DELETE_ALL_TOKENS_FAILURE,
   },
   { request: deleteAllTokens, success: deleteAllTokensSuccess, failure: deleteAllTokensFailure },
-] = createPaginationByRouteParametersDeleteActions('ACCESS_TOKENS', (routeParams, ids) => ({
-  routeParams,
+] = createRequestActions(DELETE_ALL_TOKENS_BASE, (userId, clientId, ids) => ({
+  userId,
+  clientId,
   ids,
 }))
