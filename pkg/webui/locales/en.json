@@ -261,7 +261,7 @@
   "console.components.events.previews.shared.json-payload.index.invalid": "Invalid JSON",
   "console.components.gateway-api-keys-modal.index.modalTitle": "Download gateway API keys",
   "console.components.gateway-api-keys-modal.index.buttonMessage": "I have downloaded the keys",
-  "console.components.gateway-api-keys-modal.index.description": "Note: After proceeding to the gateway, the API keys will not be accessible for download anymore. Make sure to download and store them.",
+  "console.components.gateway-api-keys-modal.index.description": "Note: After closing this window, these API keys will not be accessible for download anymore. Please make sure to download and store them now.",
   "console.components.gateway-api-keys-modal.index.downloadLns": "Download LNS key",
   "console.components.gateway-api-keys-modal.index.downloadCups": "Download CUPS key",
   "console.components.gateway-visibility-form.index.saveDefaultGatewayVisibility": "Save default gateway visibility",
