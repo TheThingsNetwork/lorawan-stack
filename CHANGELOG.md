@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.21.2] - unreleased
+
+### Added
+
 - New `ListBands` RPC on the `Configuration` service.
   - Added support to CLI. Available via the `end-devices list-bands` command.
 - CLI support for listing PHY versions via the `end-devices list-phy-versions` CLI command.
@@ -32,8 +46,6 @@ For details about compatibility between different releases, see the **Commitment
 - The Console will try to resolve invalid state errors during login with an automatic refresh.
 - Error details are now displayed in a modal instead of within the notification element in the Console.
 
-### Deprecated
-
 ### Removed
 
 - Experimental support for `LoRa Basics Station` gateway GPS timestamps which use the wrong precision (milliseconds instead of microseconds). Please ensure that your gateway has been updated to the latest firmware.
@@ -48,8 +60,6 @@ For details about compatibility between different releases, see the **Commitment
 - End device overview crashing in some situations in the Console.
 - Device import when using Join Server-only deployments.
 - QRG can generate QR Codes without the claim authentication code.
-
-### Security
 
 ## [3.21.1] - 2022-08-24
 
@@ -2317,7 +2327,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.21.1...v3.21
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.21.2...v3.21
+[3.21.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.21.1...v3.21.2
 [3.21.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.21.0...v3.21.1
 [3.21.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.20.2...v3.21.0
 [3.20.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.20.1...v3.20.2
