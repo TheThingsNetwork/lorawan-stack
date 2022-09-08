@@ -15,39 +15,31 @@
 import { defineMessages } from 'react-intl'
 
 export default defineMessages({
-  endDeviceType: 'End device type information',
+  endDeviceType: 'End device type',
   provisioningTitle: 'Provisioning information',
   inputMethod: 'Input Method',
   inputMethodDeviceRepo: 'Select the end device in the LoRaWAN Device Repository',
   inputMethodManual: 'Enter end device specifics manually',
-  continueManual: 'Please enter versions and frequency plan information above to continue',
-  continueDeviceRepo: 'Please specify your device above to continue',
-  continueJoinEUI: 'Please enter the JoinEUI to continue',
+  continueManual: 'To continue, please enter versions and frequency plan information',
+  continueJoinEui:
+    'To continue, please enter the JoinEUI of the end device so we can determine onboarding options',
   changeDeviceType:
     'Are you sure you want to change the input method? Your current form progress will be lost.',
   changeDeviceTypeButton: 'Change input method',
+  confirmedRegistration: 'This end device can be registered on the network',
+  confirmedClaiming: 'This end device can be claimed',
   // Shared messages.
-  repositoryTabTitle: 'From The LoRaWAN Device Repository',
-  manualTabTitle: 'Manually',
   classCapabilities: 'Additional LoRaWAN class capabilities',
   submitTitle: 'Register end device',
-  activationModeNone: 'Do not configure activation',
   afterRegistration: 'After registration',
   singleRegistration: 'View registered end device',
   multipleRegistration: 'Register another end device of this type',
   createSuccess: 'End device registered',
   deviceIdDescription: 'This value is automatically prefilled using the DevEUI',
+  onboardingDisabled:
+    'Device onboarding can only be performed on deployments that have Network Server, Application Server and Join Server activated. Please use the CLI to register devices on individual components.',
   // Manual messages.
-  basicTitle: 'Basic settings',
-  basicDescription: "End device ID's, Name and Description",
-  basicDetails: 'Defines general settings of an end device',
   beaconFrequency: 'Beacon frequency',
-  networkTitle: 'Network layer settings',
-  networkDescription: 'Frequency plan, regional parameters, end device class and session keys.',
-  appTitle: 'Application layer settings',
-  appDescription: 'Application session key to encrypt/decrypt LoRaWAN payload.',
-  joinTitle: 'Join settings',
-  joinDescription: 'Root keys, NetID and kek labels.',
   rx1DataRateOffsetTitle: 'Rx1 data rate offset',
   rx1DelayTitle: 'Rx1 delay',
   factoryPresetFreqTitle: 'Factory preset frequencies',
@@ -65,9 +57,16 @@ export default defineMessages({
   clusterSettings: 'Cluster settings',
   networkDefaults: 'Network defaults',
   // Device repository messages.
-  claimEndDevice: 'Claim end device',
-  registerEndDevice: 'Register end device',
   otherOption: 'Other…',
   typeToSearch: 'Type to search…',
   unknownHwOption: 'Unknown ver.',
+  // QR code section.
+  hasEndDeviceQR: 'Does your end device have a QR code? Scan it to speed up onboarding.',
+  learnMore: 'Learn more',
+  scanEndDevice: 'Scan end device QR code',
+  deviceInfo: 'Found QR code data',
+  resetQRCodeData: 'Reset QR code data',
+  resetConfirm:
+    'Are you sure you want to discard QR code data? The scanned device will not be registered and the form will be reset.',
+  scanSuccess: 'QR code scanned successfully',
 })
