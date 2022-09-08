@@ -87,7 +87,7 @@ describe('Gateway create', () => {
         cy.findByRole('button', { name: /Download LNS key/ }).click()
         cy.findByRole('button', { name: /Download CUPS key/ }).click()
         cy.findByText(
-          'Note: After proceeding to the gateway, the API keys will not be accessible for download anymore. Make sure to download and store them.',
+          'Note: After closing this window, these API keys will not be accessible for download anymore. Please make sure to download and store them now.',
         ).should('be.visible')
         cy.findByRole('button', { name: /I have downloaded the keys/ }).click()
       })
