@@ -219,7 +219,6 @@ const DeviceTypeRepositoryFormSection = () => {
         </div>
         {showProgressHint && <ProgressHint supportLink={supportLink} />}
         {showOtherHint && <OtherHint manualGuideDocsPath="/devices/adding-devices/" />}
-        {!showDeviceCard && <hr />}
         {showDeviceCard && <Card brandId={brand} modelId={model} template={template} />}
         {showFrequencyPlanSelector && (
           <FreqPlansSelect
@@ -228,8 +227,10 @@ const DeviceTypeRepositoryFormSection = () => {
             tooltipId={tooltipIds.FREQUENCY_PLAN}
             name="frequency_plan_id"
             bandId={band}
+            autoFocus
           />
         )}
+        {hasCompleted && <hr />}
       </Col>
     </Row>
   )

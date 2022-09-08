@@ -28,7 +28,7 @@ const DeviceAdd = () => (
   <Container>
     <Row>
       <Col>
-        <PageTitle tall title={m.title} />
+        <PageTitle tall title={m.title} className="mb-cs-m" />
         <DeviceOnboardingForm />
       </Col>
     </Row>

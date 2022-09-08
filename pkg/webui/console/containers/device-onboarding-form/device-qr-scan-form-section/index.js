@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useCallback, useState } from 'react'
-import { defineMessages } from 'react-intl'
 import { useSelector } from 'react-redux'
 
 import QRModalButton from '@ttn-lw/components/qr-modal-button'
@@ -21,6 +20,7 @@ import { useFormContext } from '@ttn-lw/components/form'
 import Link from '@ttn-lw/components/link'
 import Icon from '@ttn-lw/components/icon'
 import ModalButton from '@ttn-lw/components/button/modal-button'
+import ButtonGroup from '@ttn-lw/components/button/group'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -30,18 +30,9 @@ import { readDeviceQr } from '@console/lib/device-claiming-parse-qr'
 
 import { selectDeviceBrands } from '@console/store/selectors/device-repository'
 
-const hexToDecimal = hex => parseInt(hex, 16)
+import m from '../messages'
 
-const m = defineMessages({
-  hasEndDeviceQR: 'Does your end device have a QR code? Scan it to speed up onboarding.',
-  learnMore: 'Learn more',
-  scanEndDevice: 'Scan end device code',
-  deviceInfo: 'Found QR code data',
-  resetQRCodeData: 'Reset QR code data',
-  resetConfirm:
-    'Are you sure you want to discard QR code data? The scanned device will not be registered and the form will be reset.',
-  scanSuccess: 'QR code scanned successfully',
-})
+const hexToDecimal = hex => parseInt(hex, 16)
 
 const qrDataInitialState = {
   valid: false,
@@ -138,13 +129,19 @@ const DeviceQRScanFormSection = () => {
   )
 
   return (
-    <div className="mb-cs-l">
+    <>
       {qrData.approved ? (
-        <>
-          <div className="mb-cs-xs">
-            <Icon icon="check" textPaddedRight className="c-success" />
-            <Message content={m.scanSuccess} />
-          </div>
+        <div className="mb-cs-xs">
+          <Icon icon="check" textPaddedRight className="c-success" />
+          <Message content={m.scanSuccess} />
+        </div>
+      ) : (
+        <div className="mb-cs-xs">
+          <Message content={m.hasEndDeviceQR} />
+        </div>
+      )}
+      <ButtonGroup>
+        {qrData.approved ? (
           <ModalButton
             type="button"
             icon="close"
@@ -152,6 +149,7 @@ const DeviceQRScanFormSection = () => {
             message={m.resetQRCodeData}
             modalData={{
               title: m.resetQRCodeData,
+              noTitleLine: true,
               buttonMessage: m.resetQRCodeData,
               children: <Message content={m.resetConfirm} component="span" />,
               approveButtonProps: {
@@ -159,12 +157,7 @@ const DeviceQRScanFormSection = () => {
               },
             }}
           />
-        </>
-      ) : (
-        <>
-          <div className="mb-cs-xs">
-            <Message content={m.hasEndDeviceQR} />
-          </div>
+        ) : (
           <QRModalButton
             message={m.scanEndDevice}
             onApprove={handleQRCodeApprove}
@@ -172,17 +165,18 @@ const DeviceQRScanFormSection = () => {
             onRead={handleQRCodeRead}
             qrData={qrData}
           />
-        </>
-      )}
-      <Link.Anchor
-        className="ml-cs-xs"
-        href="https://www.thethingsindustries.com/docs"
-        external
-        secondary
-      >
-        <Message content={m.learnMore} />
-      </Link.Anchor>
-    </div>
+        )}
+        <Link.Anchor
+          className="ml-cs-xs"
+          href="https://www.thethingsindustries.com/docs"
+          external
+          secondary
+        >
+          <Message content={m.learnMore} />
+        </Link.Anchor>
+      </ButtonGroup>
+      <hr className="mt-cs-m mb-0" />
+    </>
   )
 }
 
