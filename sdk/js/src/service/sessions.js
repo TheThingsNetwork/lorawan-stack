@@ -28,7 +28,7 @@ class Sessions {
       {
         routeParams: { 'user_ids.user_id': userId },
       },
-      { params },
+      params,
     )
 
     return Marshaler.payloadListResponse('sessions', result)
