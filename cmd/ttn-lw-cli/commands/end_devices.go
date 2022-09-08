@@ -621,7 +621,6 @@ var (
 								AuthenticationCode: device.ClaimAuthenticationCode.Value,
 							},
 						},
-						TargetNetworkServerAddress: device.NetworkServerAddress,
 					})
 					if err != nil {
 						return errEndDeviceClaim.WithCause(err)

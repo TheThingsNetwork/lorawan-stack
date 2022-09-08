@@ -249,6 +249,14 @@ export const isTimeoutError = error =>
 export const isOAuthClientRefusedError = error =>
   isBackend(error) && getBackendErrorId(error) === 'error:pkg/web/oauthclient:refused'
 /**
+ * Returns whether the `error` is a invalid state error with ID: 'pkg/web/oauthclient:invalid_state'.
+ *
+ * @param {object} error - The error to be tested.
+ * @returns {boolean} `true` if `error` is such error, `false` otherwise.
+ */
+export const isOAuthInvalidStateError = error =>
+  isBackend(error) && getBackendErrorId(error) === 'error:pkg/web/oauthclient:invalid_state'
+/**
  * Returns whether the error is worth being sent to Sentry.
  *
  * @param {object} error - The error to be tested.

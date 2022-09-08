@@ -35,6 +35,7 @@ const Modal = props => {
     buttonMessage,
     title,
     subtitle,
+    noTitleLine,
     children,
     message,
     logo,
@@ -174,8 +175,8 @@ const Modal = props => {
               {Boolean(logo) && <img className={style.logo} src={logo} alt="Logo" />}
             </div>
           )}
-          {title && <div className={style.line} />}
-          <div className={classnames(className, style.body)}>{children || messageElement}</div>
+          {title && !noTitleLine && <div className={style.line} />}
+          <div className={style.body}>{children || messageElement}</div>
           <div className={style.controlBar}>
             <div>{bottomLineElement}</div>
             {buttons}
@@ -205,6 +206,7 @@ Modal.propTypes = {
   message: PropTypes.message,
   method: PropTypes.string,
   name: PropTypes.string,
+  noTitleLine: PropTypes.bool,
   onComplete: PropTypes.func,
   subtitle: PropTypes.message,
   title: PropTypes.message,
@@ -221,6 +223,7 @@ Modal.defaultProps = {
   logo: undefined,
   message: undefined,
   method: undefined,
+  noTitleLine: false,
   onComplete: () => null,
   inline: false,
   approval: true,

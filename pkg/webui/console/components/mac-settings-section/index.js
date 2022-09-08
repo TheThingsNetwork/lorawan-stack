@@ -15,7 +15,7 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 
-import Form from '@ttn-lw/components/form'
+import Form, { useFormContext } from '@ttn-lw/components/form'
 import Select from '@ttn-lw/components/select'
 import Checkbox from '@ttn-lw/components/checkbox'
 import Input from '@ttn-lw/components/input'
@@ -68,8 +68,13 @@ const m = defineMessages({
   classCTimeout: 'Class C timeout',
   maxDutyCycle: 'Maximum duty cycle',
   desiredMaxDutyCycle: 'Desired maximum duty cycle',
-  useAdr: 'Use adaptive data rate (ADR)',
   adrMargin: 'ADR margin',
+  adrUplinks: 'ADR number of transmissions',
+  adrAdaptiveDataRate: 'Adaptive data rate (ADR)',
+  adrDataRate: 'ADR data rate index',
+  adrTransPower: 'ADR transmission power index',
+  adrDynamic: 'Dynamic mode',
+  adrStatic: 'Static mode',
   desiredAdrAckLimit: 'Desired ADR ack limit',
   desiredAdrAckDelay: 'Desired ADR ack delay',
   adrAckValue: '{count, plural, one {every message} other {every {count} messages}}',
@@ -112,6 +117,9 @@ const maxDutyCycleOptions = [
   { value: 'DUTY_CYCLE_16384', label: '0.006%' },
 ]
 
+const encodeAdrMode = value => ({ [value]: {} })
+const decodeAdrMode = value => (value !== undefined ? Object.keys(value)[0] : null)
+
 const MacSettingsSection = props => {
   const {
     activationMode,
@@ -120,14 +128,16 @@ const MacSettingsSection = props => {
     lorawanVersion,
     isClassB,
     isClassC,
-    isUseAdr,
   } = props
 
+  const { values } = useFormContext()
+  const { mac_settings } = values
   const isNewLorawanVersion = parseLorawanMacVersion(lorawanVersion) >= 110
   const isABP = activationMode === ACTIVATION_MODES.ABP
   const isMulticast = activationMode === ACTIVATION_MODES.MULTICAST
   const isOTAA = activationMode === ACTIVATION_MODES.OTAA
-
+  const isDynamicAdr = mac_settings.adr && 'dynamic' in mac_settings.adr
+  const isStaticAdr = mac_settings.adr && 'static' in mac_settings.adr
   const [resetsFCnt, setResetsFCnt] = React.useState(isABP && initialFCnt)
   const handleResetsFCntChange = React.useCallback(evt => {
     const { checked } = evt.target
@@ -147,27 +157,12 @@ const MacSettingsSection = props => {
     setIsCollapsed(isCollapsed => !isCollapsed)
   }, [isCollapsed, pingPeriodicityRequired])
 
-  const isUseAdrRef = React.useRef(isUseAdr)
-  const [useAdr, setUseAdr] = React.useState(isUseAdr)
-  const handleUseAdrChange = React.useCallback(evt => {
-    const checked = evt.target.checked
-
-    setUseAdr(checked)
-  }, [])
-
   React.useEffect(() => {
     if (isCollapsed && pingPeriodicityRequired) {
       // Expand section if `ping_slot_periodicity` is required.
       setIsCollapsed(false)
     }
   }, [handleIsCollapsedChange, isABP, isClassB, isCollapsed, isMulticast, pingPeriodicityRequired])
-
-  React.useEffect(() => {
-    if (isUseAdrRef.current !== isUseAdr) {
-      isUseAdrRef.current = isUseAdr
-      setUseAdr(isUseAdr)
-    }
-  }, [isUseAdr])
 
   return (
     <Form.CollapseSection
@@ -469,43 +464,73 @@ const MacSettingsSection = props => {
         />
       </Form.FieldContainer>
       <Form.Field
-        name="mac_settings.use_adr"
-        component={Checkbox}
-        label={m.useAdr}
-        onChange={handleUseAdrChange}
+        name="mac_settings.adr"
+        component={Radio.Group}
+        title={m.adrAdaptiveDataRate}
         tooltipId={tooltipIds.ADR_USE}
-      />
-      {useAdr && (
+        encode={encodeAdrMode}
+        decode={decodeAdrMode}
+      >
+        <Radio label={m.adrDynamic} value="dynamic" />
+        <Radio label={m.adrStatic} value="static" />
+        <Radio label={sharedMessages.disabled} value="disabled" />
+      </Form.Field>
+      {isDynamicAdr && (
+        <Form.Field
+          title={m.adrMargin}
+          name="mac_settings.adr.dynamic.margin"
+          component={Input}
+          type="number"
+          tooltipId={tooltipIds.ADR_MARGIN}
+          min={-100}
+          max={100}
+          inputWidth="xs"
+          append="dB"
+        />
+      )}
+      {isStaticAdr && (
         <>
           <Form.Field
-            title={m.adrMargin}
-            name="mac_settings.adr_margin"
+            title={m.adrDataRate}
+            name="mac_settings.adr.static.data_rate_index"
             component={Input}
             type="number"
-            tooltipId={tooltipIds.ADR_MARGIN}
             inputWidth="xs"
-            append="dB"
           />
-          {isNewLorawanVersion && (
-            <>
-              <Form.Field
-                title={m.desiredAdrAckLimit}
-                name="mac_settings.desired_adr_ack_limit_exponent"
-                component={Select}
-                options={adrAckLimitOptions}
-                tooltipId={tooltipIds.ADR_ACK_LIMIT}
-                fieldWidth="xs"
-              />
-              <Form.Field
-                title={m.desiredAdrAckDelay}
-                name="mac_settings.desired_adr_ack_delay_exponent"
-                component={Select}
-                options={adrAckDelayOptions}
-                tooltipId={tooltipIds.ADR_ACK_DELAY}
-                fieldWidth="xs"
-              />
-            </>
-          )}
+          <Form.Field
+            title={m.adrTransPower}
+            name="mac_settings.adr.static.tx_power_index"
+            component={Input}
+            type="number"
+            inputWidth="xs"
+          />
+          <Form.Field
+            title={m.adrUplinks}
+            name="mac_settings.adr.static.nb_trans"
+            component={Input}
+            type="number"
+            inputWidth="xs"
+          />
+        </>
+      )}
+      {isNewLorawanVersion && (
+        <>
+          <Form.Field
+            title={m.desiredAdrAckLimit}
+            name="mac_settings.desired_adr_ack_limit_exponent"
+            component={Select}
+            options={adrAckLimitOptions}
+            tooltipId={tooltipIds.ADR_ACK_LIMIT}
+            fieldWidth="xs"
+          />
+          <Form.Field
+            title={m.desiredAdrAckDelay}
+            name="mac_settings.desired_adr_ack_delay_exponent"
+            component={Select}
+            options={adrAckDelayOptions}
+            tooltipId={tooltipIds.ADR_ACK_DELAY}
+            fieldWidth="xs"
+          />
         </>
       )}
     </Form.CollapseSection>
@@ -517,7 +542,6 @@ MacSettingsSection.propTypes = {
   initiallyCollapsed: PropTypes.bool,
   isClassB: PropTypes.bool,
   isClassC: PropTypes.bool,
-  isUseAdr: PropTypes.bool,
   lorawanVersion: PropTypes.string.isRequired,
   resetsFCnt: PropTypes.bool,
 }
@@ -527,7 +551,6 @@ MacSettingsSection.defaultProps = {
   initiallyCollapsed: true,
   isClassB: false,
   isClassC: false,
-  isUseAdr: false,
 }
 
 export default MacSettingsSection

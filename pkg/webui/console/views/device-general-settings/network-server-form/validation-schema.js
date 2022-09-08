@@ -343,23 +343,38 @@ const validationSchema = Yup.object()
 
             return Yup.string()
           }),
-          use_adr: Yup.bool(),
-          adr_margin: Yup.number().when(['use_adr'], (useAdr, schema) => {
-            if (!useAdr) {
+          use_adr: Yup.bool().nullable(),
+          adr_margin: Yup.number().nullable(),
+          adr: Yup.lazy(value => {
+            if (value && 'static' in value) {
+              return Yup.object().shape({
+                static: Yup.object().shape({
+                  data_rate_index: Yup.number().nullable(),
+                  tx_power_index: Yup.number().nullable(),
+                  nb_trans: Yup.number().nullable(),
+                }),
+              })
+            } else if (value && 'disabled' in value) {
+              return Yup.object().shape({
+                disabled: Yup.object().shape({}).noUnknown(),
+              })
+            }
+
+            return Yup.object().shape({
+              dynamic: Yup.object().shape({
+                margin: Yup.number().nullable(),
+              }),
+            })
+          }),
+          desired_adr_ack_limit_exponent: Yup.string().when(['adr'], (adr, schema) => {
+            if (!('dynamic' in adr) || !isNewVersion) {
               return schema.strip()
             }
 
             return schema
           }),
-          desired_adr_ack_limit_exponent: Yup.string().when(['use_adr'], (useAdr, schema) => {
-            if (!useAdr || !isNewVersion) {
-              return schema.strip()
-            }
-
-            return schema
-          }),
-          desired_adr_ack_delay_exponent: Yup.string().when(['use_adr'], (useAdr, schema) => {
-            if (!useAdr || !isNewVersion) {
+          desired_adr_ack_delay_exponent: Yup.string().when(['adr'], (adr, schema) => {
+            if (!('dynamic' in adr) || !isNewVersion) {
               return schema.strip()
             }
 

@@ -36,6 +36,7 @@ import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import { selectNsConfig } from '@ttn-lw/lib/selectors/env'
 
 import style from './device-import-form.styl'
 
@@ -62,6 +63,8 @@ const validationSchema = Yup.object({
   lorawan_version: Yup.string(),
   lorawan_phy_version: Yup.string(),
 })
+
+const { enabled: nsEnabled } = selectNsConfig()
 
 export default class DeviceBulkCreateForm extends Component {
   static propTypes = {
@@ -159,11 +162,13 @@ export default class DeviceBulkCreateForm extends Component {
             />
             <Form.SubTitle title="Fallback values" />
             <Notification small info content={m.fallbackValuesImport} />
-            <NsFrequencyPlansSelect
-              tooltipId={tooltipIds.FREQUENCY_PLAN}
-              name="frequency_plan_id"
-              onChange={this.handleFreqPlanChange}
-            />
+            {nsEnabled && (
+              <NsFrequencyPlansSelect
+                tooltipId={tooltipIds.FREQUENCY_PLAN}
+                name="frequency_plan_id"
+                onChange={this.handleFreqPlanChange}
+              />
+            )}
             <Form.Field
               title={sharedMessages.macVersion}
               name="lorawan_version"

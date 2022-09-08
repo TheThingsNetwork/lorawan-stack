@@ -157,10 +157,13 @@ var devicePBSetters = map[string]func(*ttnpb.EndDevice, *EndDevice){
 		pb.LastSeenAt = ttnpb.ProtoTime(dev.LastSeenAt)
 	},
 	claimAuthenticationCodeField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
-		pb.ClaimAuthenticationCode = &ttnpb.EndDeviceAuthenticationCode{
-			Value:     string(dev.ClaimAuthenticationCodeSecret),
-			ValidFrom: ttnpb.ProtoTime(dev.ClaimAuthenticationCodeValidFrom),
-			ValidTo:   ttnpb.ProtoTime(dev.ClaimAuthenticationCodeValidTo),
+		// Only set the CAC wrapper if the secret has a value.
+		if len(dev.ClaimAuthenticationCodeSecret) != 0 {
+			pb.ClaimAuthenticationCode = &ttnpb.EndDeviceAuthenticationCode{
+				Value:     string(dev.ClaimAuthenticationCodeSecret),
+				ValidFrom: ttnpb.ProtoTime(dev.ClaimAuthenticationCodeValidFrom),
+				ValidTo:   ttnpb.ProtoTime(dev.ClaimAuthenticationCodeValidTo),
+			}
 		}
 	},
 }
@@ -233,8 +236,17 @@ var deviceModelSetters = map[string]func(*EndDevice, *ttnpb.EndDevice){
 		dev.LastSeenAt = ttnpb.StdTime(pb.LastSeenAt)
 	},
 	claimAuthenticationCodeField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
-		if pb.ClaimAuthenticationCode != nil {
-			dev.ClaimAuthenticationCodeSecret = []byte(pb.ClaimAuthenticationCode.Value)
+		// If the CAC wrapper is nil but the path is set in the fieldmask, then we clear the values.
+		if pb.ClaimAuthenticationCode == nil {
+			dev.ClaimAuthenticationCodeSecret = nil
+			dev.ClaimAuthenticationCodeValidFrom = nil
+			dev.ClaimAuthenticationCodeValidTo = nil
+		} else {
+			// If not, allow setting each value separately.
+			// For example, this allows the updating only the valid_to field without clearing the other fields.
+			if pb.ClaimAuthenticationCode.Value != "" {
+				dev.ClaimAuthenticationCodeSecret = []byte(pb.ClaimAuthenticationCode.Value)
+			}
 			if pb.ClaimAuthenticationCode.ValidFrom != nil {
 				dev.ClaimAuthenticationCodeValidFrom = ttnpb.StdTime(pb.ClaimAuthenticationCode.ValidFrom)
 			}

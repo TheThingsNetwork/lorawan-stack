@@ -150,7 +150,10 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 			EntityIds:        req.GetClient().GetIds().GetEntityIdentifiers(),
 			NotificationType: "client_requested",
 			Data:             ttnpb.MustMarshalAny(req),
-			Email:            true,
+			Receivers: []ttnpb.NotificationReceiver{
+				ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
+			},
+			Email: true,
 		})
 	}
 
