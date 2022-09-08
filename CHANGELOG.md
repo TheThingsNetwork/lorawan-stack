@@ -29,6 +29,7 @@ For details about compatibility between different releases, see the **Commitment
 - Absolute time downlinks (such as class B ping slots or class C absolute time downlinks) are now using the native class B downlink API of LoRa Basics Station.
 - Only gateways which are guaranteed to be GPS capable may now be used for absolute time downlinks. This ensures that gateways that have an unknown time source are not used for absolute time scheduling.
 - The static ADR mode may now steer the end device to use custom data rates such as SF7BW250, FSK and LR-FHSS.
+- The Console will try to resolve invalid state errors during login with an automatic refresh.
 - Error details are now displayed in a modal instead of within the notification element in the Console.
 
 ### Deprecated
