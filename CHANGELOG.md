@@ -38,6 +38,7 @@ For details about compatibility between different releases, see the **Commitment
 - The Network Server now correctly handles the command that may succeed a `LinkADRAns` response.
 - LR-FHSS data rate matching.
 - Console data rate rendering of non-LoRa modulations.
+- `--mac-settings.adr.mode.disabled`, `--mac-settings.adr.mode.dynamic` and `--mac-settings.adr.mode.static` flags of the `end-device update` command.
 
 ### Security
 

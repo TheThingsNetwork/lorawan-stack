@@ -189,7 +189,7 @@ message EndDeviceVersion {
 
 // Adaptive Data Rate settings.
 message ADRSettings {
-  option (thethings.flags.message) = { select: true, set: true };
+  option (thethings.flags.message) = { select: true, set: true, semantical: true };
   // Configuration options for static ADR.
   message StaticMode {
     option (thethings.flags.message) = { select: true, set: true };
@@ -198,7 +198,7 @@ message ADRSettings {
     // Transmission power index to use.
     uint32 tx_power_index = 2 [(validate.rules).uint32.lte = 15];
     // Number of retransmissions.
-    uint32 nb_trans = 3 [(validate.rules).uint32 = {gte: 1, lte: 15}];
+    uint32 nb_trans = 3 [(validate.rules).uint32 = { gte: 1, lte: 15 }];
   }
 
   // Configuration options for dynamic ADR.

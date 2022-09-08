@@ -200,22 +200,6 @@ func isAtomicType(t reflect.Type, maskOnly bool) bool {
 	return false
 }
 
-// isStandaloneType returns if the provided type has represents a value
-// just by being present. This property usually applies to oneof fields.
-func isStandaloneType(t reflect.Type) bool {
-	switch t.PkgPath() {
-	case "go.thethings.network/lorawan-stack/v3/pkg/ttnpb":
-		switch t.Name() {
-		case
-			"ADRSettings_DisabledMode",
-			"ADRSettings_StaticMode",
-			"ADRSettings_DynamicMode":
-			return true
-		}
-	}
-	return false
-}
-
 func isSelectableField(name string) bool {
 	switch name {
 	case "created_at", "updated_at", "ids":
@@ -267,11 +251,6 @@ func AddField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 			return
 		}
 		fs.Bool(name, false, fmt.Sprintf("select the %s field", name))
-		return
-	}
-
-	if isStandaloneType(t) {
-		fs.Bool(name, false, "")
 		return
 	}
 

@@ -30,6 +30,8 @@ message MessageOptions {
   optional bool set = 2;
   // Treat this message as a wrapper for the value field inside it.
   optional bool wrapper = 3;
+  // Generate semantical flags for this message. Only active when set is also set.
+  optional bool semantical = 4;
 }
 
 extend google.protobuf.MessageOptions {
@@ -49,6 +51,8 @@ message FieldOptions {
   optional string set_flag_getter_func = 4;
   // Set flag and all of its subfield flags to hidden.
   optional bool hidden = 5;
+  // Implies field has meaning just by existing. Only active when set is also set.
+  optional bool semantical = 6;
 }
 
 extend google.protobuf.FieldOptions {
@@ -65,6 +69,8 @@ extend google.protobuf.OneofOptions {
 
 message EnumOptions {
   // Path where the custom enum values are defined.
+  // The map must be of type string to int32, where string is an alias name and
+  // int32 must be a valid enum int32.
   optional string alias_map = 1;
 }
 
