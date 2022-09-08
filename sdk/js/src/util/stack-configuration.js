@@ -76,10 +76,29 @@ class StackConfiguration {
   }
 
   /**
+   * Checks whether a URL shares the same hostname as a stack component.
+   *
+   * @param {string} componentName - The abbreviation of the component, e.g. Is
+   * for the Identity Server.
+   * @param {string} testHost - The hostname to test against.
+   * @returns {boolean} - `true` if the component shares the same host,
+   * `false` otherwise.
+   */
+  isSameHost(componentName, testHost) {
+    const componentUrl = this.getComponentUrlByName(componentName)
+    try {
+      return testHost === new URL(componentUrl).hostname
+    } catch {
+      // Do not propagate the error, simply return `false`.
+      return false
+    }
+  }
+
+  /**
    * Identity Server hostname getter.
    *
    * @returns {?string} - The hostname of the Identity Server of the stack
-   * onfiguration.
+   * configuration.
    */
   get isHost() {
     return (
