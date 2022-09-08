@@ -41,7 +41,7 @@ import {
 } from '@account/store/selectors/authorizations'
 
 const m = defineMessages({
-  tableTitle: 'Access Tokens',
+  tableTitle: 'Access tokens',
   deleteSuccess: 'Access token invalidated',
   deleteFail: 'There was an error and the access token could not be invalidated',
   deleteButton: 'Invalidate this access token',
@@ -49,6 +49,7 @@ const m = defineMessages({
   deleteAllFail: 'There was an error and the access tokens could not be invalidated',
   deleteAllButton: 'Invalidate all access tokens',
   expires: 'Expires',
+  accessTokens: 'Access tokens',
 })
 
 const TokensTable = props => {
@@ -57,7 +58,10 @@ const TokensTable = props => {
 
   useBreadcrumbs(
     'client-authorizations.single.access-tokens',
-    <Breadcrumb path={`/client-authorizations/${clientId}/access-tokens`} content={'tokens'} />,
+    <Breadcrumb
+      path={`/client-authorizations/${clientId}/access-tokens`}
+      content={m.accessTokens}
+    />,
   )
 
   const handleDeleteToken = React.useCallback(

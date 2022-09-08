@@ -21,12 +21,12 @@ import * as session from '@account/store/actions/sessions'
 const getUserSessionsLogic = createRequestLogic({
   type: session.GET_USER_SESSIONS_LIST,
   process: async ({ action }) => {
-    const {
-      id,
-      params: { page, limit, order },
-    } = action.payload
+    const { id, params } = action.payload
 
-    const result = await tts.Sessions.getAllSessions(id, { page, limit, order })
+    const result = await tts.Sessions.getAllSessions(id, {
+      page: params?.page,
+      limit: params?.limit,
+    })
 
     return { sessions: result.sessions, sessionsTotalCount: result.totalCount }
   },
@@ -35,8 +35,8 @@ const getUserSessionsLogic = createRequestLogic({
 const deleteUserSessionLogic = createRequestLogic({
   type: session.DELETE_USER_SESSION,
   process: async ({ action }) => {
-    const { id, targetId } = action.payload
-    const result = await tts.Sessions.deleteSession(id, targetId)
+    const { user, sessionId } = action.payload
+    const result = await tts.Sessions.deleteSession(user, sessionId)
 
     return result
   },

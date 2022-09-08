@@ -35,7 +35,7 @@ import {
 
 const m = defineMessages({
   clientId: 'Client ID',
-  tableTitle: 'OAuth Client Authorizations',
+  tableTitle: 'OAuth client authorizations',
 })
 
 const getItemPathPrefix = item => `/${item.client_ids.client_id}`

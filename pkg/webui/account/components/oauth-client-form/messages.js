@@ -16,11 +16,11 @@ import { defineMessages } from 'react-intl'
 
 export default defineMessages({
   clientIdPlaceholder: 'my-new-oauth-client',
-  clientNamePlaceholder: 'My new OAuth Client',
-  clientDescPlaceholder: 'Description for my new OAuth Client',
+  clientNamePlaceholder: 'My new OAuth client',
+  clientDescPlaceholder: 'Description for my new OAuth client',
   clientDescDescription:
     'The description is displayed to the user when authorizing the client. Use it to explain the purpose of your client.',
-  createClient: 'Create OAuth Client',
+  createClient: 'Create OAuth client',
   deleteTitle: 'Are you sure you want to delete this account?',
   deleteWarning:
     'This will <strong>PERMANENTLY DELETE THIS OAUTH CLIENT</strong> and <strong>LOCK THE OAUTH ID</strong>. Make sure you assign new collaborators to such entities if you plan to continue using them.',
@@ -44,7 +44,7 @@ export default defineMessages({
   grantAuthorizationLabel: 'Authorization code',
   grantRefreshTokenLabel: 'Refresh token',
   grantPasswordLabel: 'Password',
-  deleteClient: 'Delete OAuth Client',
+  deleteClient: 'Delete OAuth client',
   urlsPlaceholder: 'https://example.com/oauth/callback',
   rightsWarning:
     'Note that only the minimum set of rights needed to provide the functionality of the application should be requested',
