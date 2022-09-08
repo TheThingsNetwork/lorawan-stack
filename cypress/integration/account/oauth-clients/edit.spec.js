@@ -51,7 +51,7 @@ describe('OAuth Client general settings', () => {
     cy.findByTestId('error-notification').should('not.exist')
     cy.findByTestId('toast-notification')
       .should('be.visible')
-      .findByText(`OAuth Client updated`)
+      .findByText(`OAuth client updated`)
       .should('be.visible')
 
     cy.reload()
@@ -70,13 +70,13 @@ describe('OAuth Client general settings', () => {
 
   it('succeeds deleting client', () => {
     cy.visit(`${Cypress.config('accountAppRootPath')}/oauth-clients/${clientId}/general-settings`)
-    cy.findByRole('button', { name: /Delete OAuth Client/ }).click()
+    cy.findByRole('button', { name: /Delete OAuth client/ }).click()
 
     cy.findByTestId('modal-window')
       .should('be.visible')
       .within(() => {
         cy.findByText('Confirm deletion', { selector: 'h1' }).should('be.visible')
-        cy.findByRole('button', { name: /Delete OAuth Client/ }).click()
+        cy.findByRole('button', { name: /Delete OAuth client/ }).click()
       })
 
     cy.findByTestId('error-notification').should('not.exist')

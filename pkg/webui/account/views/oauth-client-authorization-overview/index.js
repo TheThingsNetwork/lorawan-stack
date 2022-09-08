@@ -17,7 +17,6 @@ import { connect, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { Col, Row, Container } from 'react-grid-system'
 import { Switch, Route } from 'react-router-dom'
-import { capitalize } from 'lodash'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Tabs from '@ttn-lw/components/tabs'
@@ -62,7 +61,7 @@ const AuthorizationOverview = props => {
   } = props
 
   const client = useSelector(state => selectClientById(state, clientId))
-  const clientName = client?.name || capitalize(clientId)
+  const clientName = client?.name || clientId
 
   useBreadcrumbs(
     'client-authorizations.single',
