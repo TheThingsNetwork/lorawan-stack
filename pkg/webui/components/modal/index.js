@@ -176,7 +176,7 @@ const Modal = props => {
             </div>
           )}
           {title && !noTitleLine && <div className={style.line} />}
-          <div className={style.body}>{children || messageElement}</div>
+          <div className={classnames(className, style.body)}>{children || messageElement}</div>
           <div className={style.controlBar}>
             <div>{bottomLineElement}</div>
             {buttons}
