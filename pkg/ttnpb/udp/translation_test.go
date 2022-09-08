@@ -130,7 +130,7 @@ func TestToGatewayUp(t *testing.T) {
 	a.So(dr, should.NotBeNil)
 	a.So(dr.SpreadingFactor, should.Equal, 10)
 	a.So(dr.Bandwidth, should.Equal, 125000)
-	a.So(msg.Settings.CodingRate, should.Equal, "4/7")
+	a.So(msg.Settings.DataRate.GetLora().CodingRate, should.Equal, "4/7")
 	a.So(msg.Settings.Frequency, should.Equal, 868000000)
 	a.So(msg.Settings.Timestamp, should.Equal, 1000)
 	a.So(*ttnpb.StdTime(msg.Settings.Time), should.Resemble, absoluteTime)
@@ -190,7 +190,7 @@ func TestToGatewayUpLRFHSS(t *testing.T) {
 	a.So(dr, should.NotBeNil)
 	a.So(dr.ModulationType, should.Equal, 0)
 	a.So(dr.OperatingChannelWidth, should.Equal, 125)
-	a.So(msg.Settings.CodingRate, should.Equal, "5/6")
+	a.So(msg.Settings.DataRate.GetLrfhss().CodingRate, should.Equal, "5/6")
 	a.So(msg.Settings.Frequency, should.Equal, 868000000)
 	a.So(msg.Settings.Timestamp, should.Equal, 1000)
 	a.So(msg.RxMetadata[0].Timestamp, should.Equal, 1000)
@@ -281,7 +281,7 @@ func TestToGatewayUpRaw(t *testing.T) {
 	a.So(dr, should.NotBeNil)
 	a.So(dr.SpreadingFactor, should.Equal, 7)
 	a.So(dr.Bandwidth, should.Equal, 125000)
-	a.So(msg.Settings.CodingRate, should.Equal, "4/5")
+	a.So(msg.Settings.DataRate.GetLora().CodingRate, should.Equal, "4/5")
 	a.So(msg.Settings.Frequency, should.Equal, 868100000)
 	a.So(msg.RxMetadata[0].Timestamp, should.Equal, 368384825)
 	a.So(len(msg.RawPayload), should.Equal, base64.StdEncoding.DecodedLen(len("Wqish6GVYpKy6o9WFHingeTJ1oh+ABc8iALBvwz44yxZP+BKDocaC5VQT5Y6dDdUaBILVjRMz0Ynzow1U/Kkts9AoZh3Ja3DX+DyY27exB+BKpSx2rXJ2vs9svm/EKYIsPF0RG1E+7lBYaD9")))
@@ -306,7 +306,7 @@ func TestToGatewayUpRawLRFHSS(t *testing.T) {
 	a.So(dr, should.NotBeNil)
 	a.So(dr.ModulationType, should.Equal, 0)
 	a.So(dr.OperatingChannelWidth, should.Equal, 125000)
-	a.So(msg.Settings.CodingRate, should.Equal, "2/3")
+	a.So(msg.Settings.DataRate.GetLrfhss().CodingRate, should.Equal, "2/3")
 	a.So(msg.Settings.Frequency, should.Equal, 868100000)
 	a.So(msg.RxMetadata[0].Timestamp, should.Equal, 368384825)
 	a.So(msg.RxMetadata[0].HoppingWidth, should.Equal, 52)
@@ -377,13 +377,13 @@ func TestToGatewayUpRawMultiAntenna(t *testing.T) {
 							Lora: &ttnpb.LoRaDataRate{
 								SpreadingFactor: 7,
 								Bandwidth:       125000,
+								CodingRate:      "4/5",
 							},
 						},
 					},
-					CodingRate: "4/5",
-					Frequency:  868500000,
-					Time:       ttnpb.ProtoTimePtr(utcTime),
-					Timestamp:  timestamp,
+					Frequency: 868500000,
+					Time:      ttnpb.ProtoTimePtr(utcTime),
+					Timestamp: timestamp,
 				},
 				RxMetadata: []*ttnpb.RxMetadata{
 					{

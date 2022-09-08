@@ -1469,6 +1469,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 									Lora: &ttnpb.LoRaDataRate{
 										Bandwidth:       125000,
 										SpreadingFactor: 9,
+										CodingRate:      band.Cr4_5,
 									},
 								},
 							},
@@ -1907,6 +1908,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 									Lora: &ttnpb.LoRaDataRate{
 										Bandwidth:       125000,
 										SpreadingFactor: 12,
+										CodingRate:      band.Cr4_5,
 									},
 								},
 							},

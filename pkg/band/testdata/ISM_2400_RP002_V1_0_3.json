@@ -63,7 +63,8 @@
       "Rate": {
         "lora": {
           "bandwidth": 812000,
-          "spreading_factor": 12
+          "spreading_factor": 12,
+          "coding_rate": "4/8LI"
         }
       }
     },
@@ -75,7 +76,8 @@
       "Rate": {
         "lora": {
           "bandwidth": 812000,
-          "spreading_factor": 11
+          "spreading_factor": 11,
+          "coding_rate": "4/8LI"
         }
       }
     },
@@ -87,7 +89,8 @@
       "Rate": {
         "lora": {
           "bandwidth": 812000,
-          "spreading_factor": 10
+          "spreading_factor": 10,
+          "coding_rate": "4/8LI"
         }
       }
     },
@@ -99,7 +102,8 @@
       "Rate": {
         "lora": {
           "bandwidth": 812000,
-          "spreading_factor": 9
+          "spreading_factor": 9,
+          "coding_rate": "4/8LI"
         }
       }
     },
@@ -111,7 +115,8 @@
       "Rate": {
         "lora": {
           "bandwidth": 812000,
-          "spreading_factor": 8
+          "spreading_factor": 8,
+          "coding_rate": "4/8LI"
         }
       }
     },
@@ -123,7 +128,8 @@
       "Rate": {
         "lora": {
           "bandwidth": 812000,
-          "spreading_factor": 7
+          "spreading_factor": 7,
+          "coding_rate": "4/8LI"
         }
       }
     },
@@ -135,7 +141,8 @@
       "Rate": {
         "lora": {
           "bandwidth": 812000,
-          "spreading_factor": 6
+          "spreading_factor": 6,
+          "coding_rate": "4/8LI"
         }
       }
     },
@@ -147,11 +154,13 @@
       "Rate": {
         "lora": {
           "bandwidth": 812000,
-          "spreading_factor": 5
+          "spreading_factor": 5,
+          "coding_rate": "4/8LI"
         }
       }
     }
   },
+  "StrictCodingRate": true,
   "FreqMultiplier": 200,
   "ImplementsCFList": true,
   "CFListType": "FREQUENCIES",
@@ -178,7 +187,6 @@
   "MaxADRDataRateIndex": 0,
   "TxParamSetupReqSupport": false,
   "DefaultMaxEIRP": 10,
-  "LoRaCodingRate": "4/8LI",
   "Rx1Channel": {
     "0": 0,
     "1": 1,

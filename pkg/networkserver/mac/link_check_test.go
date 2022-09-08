@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
@@ -52,6 +53,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 							Lora: &ttnpb.LoRaDataRate{
 								SpreadingFactor: 13,
 								Bandwidth:       250000,
+								CodingRate:      band.Cr4_5,
 							},
 						},
 					},
@@ -77,6 +79,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 							Lora: &ttnpb.LoRaDataRate{
 								SpreadingFactor: 12,
 								Bandwidth:       250000,
+								CodingRate:      band.Cr4_5,
 							},
 						},
 					},
@@ -108,6 +111,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 							Lora: &ttnpb.LoRaDataRate{
 								SpreadingFactor: 12,
 								Bandwidth:       250000,
+								CodingRate:      band.Cr4_5,
 							},
 						},
 					},
@@ -160,6 +164,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 							Lora: &ttnpb.LoRaDataRate{
 								SpreadingFactor: 12,
 								Bandwidth:       250000,
+								CodingRate:      band.Cr4_5,
 							},
 						},
 					},
@@ -212,6 +217,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 							Lora: &ttnpb.LoRaDataRate{
 								SpreadingFactor: 12,
 								Bandwidth:       250000,
+								CodingRate:      band.Cr4_5,
 							},
 						},
 					},
@@ -276,6 +282,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 							Lora: &ttnpb.LoRaDataRate{
 								SpreadingFactor: 12,
 								Bandwidth:       250000,
+								CodingRate:      band.Cr4_5,
 							},
 						},
 					},

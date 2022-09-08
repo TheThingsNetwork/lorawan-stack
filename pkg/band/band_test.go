@@ -16,6 +16,7 @@ package band_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/smartystreets/assertions"
@@ -591,6 +592,7 @@ func TestFindSubBand(t *testing.T) {
 }
 
 func TestFindDataRate(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	// US_902_928
@@ -600,6 +602,7 @@ func TestFindDataRate(t *testing.T) {
 			Lora: &ttnpb.LoRaDataRate{
 				Bandwidth:       500000,
 				SpreadingFactor: 8,
+				CodingRate:      Cr4_5,
 			},
 		},
 	}
@@ -614,6 +617,7 @@ func TestFindDataRate(t *testing.T) {
 			Lora: &ttnpb.LoRaDataRate{
 				Bandwidth:       500000,
 				SpreadingFactor: 8,
+				CodingRate:      Cr4_5,
 			},
 		},
 	}
@@ -630,6 +634,7 @@ func TestFindDataRate(t *testing.T) {
 			Lora: &ttnpb.LoRaDataRate{
 				Bandwidth:       500000,
 				SpreadingFactor: 12,
+				CodingRate:      Cr4_5,
 			},
 		},
 	}
@@ -644,6 +649,7 @@ func TestFindDataRate(t *testing.T) {
 			Lora: &ttnpb.LoRaDataRate{
 				Bandwidth:       500000,
 				SpreadingFactor: 12,
+				CodingRate:      Cr4_5,
 			},
 		},
 	}
@@ -671,5 +677,33 @@ func TestBeacon(t *testing.T) {
 				a.So(beaconDR.Rate.GetLora().GetSpreadingFactor(), should.BeBetweenOrEqual, 8, 12)
 			}
 		})
+	}
+}
+
+func TestStrictCodingRateSanityCheck(t *testing.T) {
+	t.Parallel()
+	for bandID, versions := range All {
+		for version, b := range versions {
+			bandID, version, b := bandID, version, b
+
+			t.Run(fmt.Sprintf("%v/%v", bandID, version), func(t *testing.T) {
+				t.Parallel()
+				if version >= ttnpb.PHYVersion_RP002_V1_0_0 ||
+					strings.HasPrefix(bandID, "MA") ||
+					strings.HasPrefix(bandID, "ISM") {
+					if !b.StrictCodingRate {
+						t.Errorf("Strict coding rate doesn't match expected. Want true, got %v.", b.StrictCodingRate)
+					}
+				} else if strings.HasPrefix(bandID, "US") && version >= ttnpb.PHYVersion_PHY_V1_0_2_REV_A ||
+					strings.HasPrefix(bandID, "AU") ||
+					strings.HasPrefix(bandID, "CN_470") {
+					if !b.StrictCodingRate {
+						t.Errorf("Strict coding rate doesn't match expected. Want true, got %v.", b.StrictCodingRate)
+					}
+				} else if b.StrictCodingRate {
+					t.Errorf("Strict coding rate doesn't match expected. Want false, got %v.", b.StrictCodingRate)
+				}
+			})
+		}
 	}
 }

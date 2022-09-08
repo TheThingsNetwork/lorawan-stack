@@ -80,7 +80,9 @@ func (p *RxPacket) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &aux); err != nil {
 		return err
 	}
-	switch mod := p.DatR.DataRate.Modulation.(type) {
+	switch mod := p.DatR.DataRate.GetModulation().(type) {
+	case *ttnpb.DataRate_Lora:
+		mod.Lora.CodingRate = p.CodR
 	case *ttnpb.DataRate_Lrfhss:
 		mod.Lrfhss.CodingRate = reduceLRFHSSCodingRate(p.CodR)
 	}
@@ -121,6 +123,25 @@ type TxPacket struct {
 	Size uint16       `json:"size"`           // RF packet payload size in bytes (unsigned integer)
 	NCRC bool         `json:"ncrc,omitempty"` // If true, disable the CRC of the physical layer (optional)
 	Data string       `json:"data"`           // Base64 encoded RF packet payload, padding optional
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (p *TxPacket) UnmarshalJSON(data []byte) error {
+	type Alias TxPacket
+	aux := struct {
+		*Alias
+	}{
+		Alias: (*Alias)(p),
+	}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+	switch mod := p.DatR.DataRate.GetModulation().(type) {
+	case *ttnpb.DataRate_Lora:
+		mod.Lora.CodingRate = p.CodR
+	default:
+	}
+	return nil
 }
 
 // Stat contains a status message

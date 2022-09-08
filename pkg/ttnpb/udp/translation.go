@@ -221,9 +221,9 @@ func convertUplink(rx RxPacket, md UpstreamMetadata) (*ttnpb.UplinkMessage, erro
 
 	switch mod := up.Settings.DataRate.Modulation.(type) {
 	case *ttnpb.DataRate_Lora:
-		up.Settings.CodingRate = rx.CodR
+		mod.Lora.CodingRate = rx.CodR
 	case *ttnpb.DataRate_Lrfhss:
-		up.Settings.CodingRate = mod.Lrfhss.CodingRate
+		mod.Lrfhss.CodingRate = rx.CodR
 	}
 
 	return up, nil
@@ -314,7 +314,7 @@ func FromGatewayUp(up *ttnpb.GatewayUp) (rxs []*RxPacket, stat *Stat, ack *TxPac
 		switch mod := msg.Settings.DataRate.Modulation.(type) {
 		case *ttnpb.DataRate_Lora:
 			modulation = lora
-			codr = msg.Settings.CodingRate
+			codr = mod.Lora.CodingRate
 		case *ttnpb.DataRate_Fsk:
 			modulation = fsk
 		case *ttnpb.DataRate_Lrfhss:
@@ -379,10 +379,6 @@ func ToDownlinkMessage(tx *TxPacket) (*ttnpb.DownlinkMessage, error) {
 		},
 		Timestamp: tx.Tmst,
 	}
-	switch scheduled.DataRate.Modulation.(type) {
-	case *ttnpb.DataRate_Lora:
-		scheduled.CodingRate = tx.CodR
-	}
 	if tx.Time != nil {
 		t := gpstime.Parse(time.Duration(*tx.Tmms) * time.Millisecond)
 		scheduled.Time = ttnpb.ProtoTimePtr(t)
@@ -422,9 +418,9 @@ func FromDownlinkMessage(msg *ttnpb.DownlinkMessage) (*TxPacket, error) {
 	}
 
 	tx.DatR.DataRate = scheduled.DataRate
-	switch mod := scheduled.DataRate.Modulation.(type) {
+	switch mod := scheduled.DataRate.GetModulation().(type) {
 	case *ttnpb.DataRate_Lora:
-		tx.CodR = scheduled.CodingRate
+		tx.CodR = mod.Lora.CodingRate
 		tx.NCRC = !scheduled.EnableCrc
 		tx.Modu = lora
 	case *ttnpb.DataRate_Fsk:

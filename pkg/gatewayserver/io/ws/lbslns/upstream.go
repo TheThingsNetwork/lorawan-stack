@@ -236,20 +236,12 @@ func (req *JoinRequest) toUplinkMessage(ids *ttnpb.GatewayIdentifiers, bandID st
 	if !ok {
 		return nil, errDataRate.New()
 	}
-	var codingRate string
-	switch mod := bandDR.Rate.Modulation.(type) {
-	case *ttnpb.DataRate_Lora:
-		// TODO: Set coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466).
-		codingRate = phy.LoRaCodingRate
-	case *ttnpb.DataRate_Lrfhss:
-		codingRate = mod.Lrfhss.CodingRate
-	}
+
 	up.Settings = &ttnpb.TxSettings{
-		Frequency:  req.RadioMetaData.Frequency,
-		DataRate:   bandDR.Rate,
-		CodingRate: codingRate,
-		Timestamp:  timestamp,
-		Time:       ttnpb.ProtoTime(tm),
+		Frequency: req.RadioMetaData.Frequency,
+		DataRate:  bandDR.Rate,
+		Timestamp: timestamp,
+		Time:      ttnpb.ProtoTime(tm),
 	}
 
 	return &up, nil
@@ -396,20 +388,12 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids *ttnpb.GatewayIdentifiers, band
 	if !ok {
 		return nil, errDataRate.New()
 	}
-	var codingRate string
-	switch mod := bandDR.Rate.Modulation.(type) {
-	case *ttnpb.DataRate_Lora:
-		// TODO: Set coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466).
-		codingRate = phy.LoRaCodingRate
-	case *ttnpb.DataRate_Lrfhss:
-		codingRate = mod.Lrfhss.CodingRate
-	}
+
 	up.Settings = &ttnpb.TxSettings{
-		Frequency:  updf.RadioMetaData.Frequency,
-		DataRate:   bandDR.Rate,
-		CodingRate: codingRate,
-		Timestamp:  timestamp,
-		Time:       ttnpb.ProtoTime(tm),
+		Frequency: updf.RadioMetaData.Frequency,
+		DataRate:  bandDR.Rate,
+		Timestamp: timestamp,
+		Time:      ttnpb.ProtoTime(tm),
 	}
 	return &up, nil
 }

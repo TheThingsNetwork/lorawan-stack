@@ -94,7 +94,8 @@ type serializableBand struct {
 
 	SubBands []band.SubBandParameters
 
-	DataRates map[ttnpb.DataRateIndex]serializableDataRate
+	DataRates        map[ttnpb.DataRateIndex]serializableDataRate
+	StrictCodingRate bool
 
 	FreqMultiplier   uint64
 	ImplementsCFList bool
@@ -119,8 +120,6 @@ type serializableBand struct {
 	TxParamSetupReqSupport bool
 
 	DefaultMaxEIRP float32
-
-	LoRaCodingRate string
 
 	Rx1Channel  map[uint8]uint8
 	Rx1DataRate map[string]ttnpb.DataRateIndex
@@ -182,7 +181,8 @@ func makeBand(b band.Band) serializableBand {
 
 		SubBands: b.SubBands,
 
-		DataRates: makeDataRates(b.DataRates),
+		DataRates:        makeDataRates(b.DataRates),
+		StrictCodingRate: b.StrictCodingRate,
 
 		FreqMultiplier:   b.FreqMultiplier,
 		ImplementsCFList: b.ImplementsCFList,
@@ -207,8 +207,6 @@ func makeBand(b band.Band) serializableBand {
 		TxParamSetupReqSupport: b.TxParamSetupReqSupport,
 
 		DefaultMaxEIRP: b.DefaultMaxEIRP,
-
-		LoRaCodingRate: b.LoRaCodingRate,
 
 		Rx1Channel:  makeRx1Channel(b.Rx1Channel),
 		Rx1DataRate: makeRx1DataRate(b.Rx1DataRate),
@@ -249,10 +247,13 @@ func testBand(t *testing.T, band serializableBand, version ttnpb.PHYVersion) {
 }
 
 func TestBandDefinitions(t *testing.T) {
+	t.Parallel()
 	for name, versions := range band.All {
-		for version, band := range versions {
+		for version, b := range versions {
+			version, b := version, b
 			t.Run(fmt.Sprintf("%v/%v", name, version), func(t *testing.T) {
-				testBand(t, makeBand(band), version)
+				t.Parallel()
+				testBand(t, makeBand(b), version)
 			})
 		}
 	}
