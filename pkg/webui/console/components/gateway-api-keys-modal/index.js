@@ -17,6 +17,7 @@ import { defineMessages } from 'react-intl'
 
 import PortalledModal from '@ttn-lw/components/modal/portalled'
 import Button from '@ttn-lw/components/button'
+import ButtonGroup from '@ttn-lw/components/button/group'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -28,7 +29,7 @@ const m = defineMessages({
   modalTitle: 'Download gateway API keys',
   buttonMessage: 'I have downloaded the keys',
   description:
-    'Note: After proceeding to the gateway, the API keys will not be accessible for download anymore. Make sure to download and store them.',
+    'Note: After closing this window, these API keys will not be accessible for download anymore. Please make sure to download and store them now.',
   downloadLns: 'Download LNS key',
   downloadCups: 'Download CUPS key',
 })
@@ -49,24 +50,19 @@ const GatewayApiKeysModal = ({
     onComplete={modalApprove}
     buttonMessage={m.buttonMessage}
   >
-    {lnsKey && (
-      <Button
-        className={style.downloadButton}
-        type="button"
-        message={m.downloadLns}
-        onClick={downloadLns}
-        icon="file_download"
-      />
-    )}
-    {cupsKey && (
-      <Button
-        className={style.downloadButton}
-        type="button"
-        message={m.downloadCups}
-        onClick={downloadCups}
-        icon="file_download"
-      />
-    )}
+    <ButtonGroup>
+      {lnsKey && (
+        <Button type="button" message={m.downloadLns} onClick={downloadLns} icon="file_download" />
+      )}
+      {cupsKey && (
+        <Button
+          type="button"
+          message={m.downloadCups}
+          onClick={downloadCups}
+          icon="file_download"
+        />
+      )}
+    </ButtonGroup>
     <Message content={m.description} component="p" />
   </PortalledModal>
 )
