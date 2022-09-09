@@ -50,6 +50,10 @@ var (
 	getDefaultMACSettingsFlags = util.NormalizedFlagSet()
 	allEndDeviceSetFlags       = util.NormalizedFlagSet()
 	allEndDeviceSelectFlags    = util.NormalizedFlagSet()
+	listBandsFlags             = util.NormalizedFlagSet()
+	listPhyVersionFlags        = util.NormalizedFlagSet()
+	getNetIDFlags              = util.NormalizedFlagSet()
+	getDevAddrPrefixesFlags    = util.NormalizedFlagSet()
 
 	selectAllEndDeviceFlags = util.SelectAllFlagSet("end devices")
 	toUnderscore            = strings.NewReplacer("-", "_")
@@ -617,7 +621,6 @@ var (
 								AuthenticationCode: device.ClaimAuthenticationCode.Value,
 							},
 						},
-						TargetNetworkServerAddress: device.NetworkServerAddress,
 					})
 					if err != nil {
 						return errEndDeviceClaim.WithCause(err)
@@ -1375,6 +1378,97 @@ This command may take end device identifiers from stdin.`,
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
+	endDevicesGetNetIDCommand = &cobra.Command{
+		Use:               "get-net-id",
+		Short:             "Get Network Server configured Net ID",
+		PersistentPreRunE: preRun(),
+		RunE: func(_ *cobra.Command, _ []string) error {
+			if !config.NetworkServerEnabled {
+				return errNetworkServerDisabled.New()
+			}
+
+			ns, err := api.Dial(ctx, config.NetworkServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewNsClient(ns).GetNetID(ctx, ttnpb.Empty)
+			if err != nil {
+				return err
+			}
+			return io.Write(os.Stdout, config.OutputFormat, res)
+		},
+	}
+	endDevicesGetDevAddrPrefixesCommand = &cobra.Command{
+		Use:               "get-dev-addr-prefixes",
+		Short:             "Get Network Server configured device address prefixes",
+		PersistentPreRunE: preRun(),
+		RunE: func(_ *cobra.Command, _ []string) error {
+			if !config.NetworkServerEnabled {
+				return errNetworkServerDisabled.New()
+			}
+
+			ns, err := api.Dial(ctx, config.NetworkServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewNsClient(ns).GetDeviceAddressPrefixes(ctx, ttnpb.Empty)
+			if err != nil {
+				return err
+			}
+			return io.Write(os.Stdout, config.OutputFormat, res)
+		},
+	}
+	endDevicesListBandsCommand = &cobra.Command{
+		Use:               "list-bands",
+		Short:             "List available band definitions",
+		PersistentPreRunE: preRun(),
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			if !config.NetworkServerEnabled {
+				return errNetworkServerDisabled.New()
+			}
+
+			req := &ttnpb.ListBandsRequest{}
+			_, err := req.SetFromFlags(cmd.Flags(), "")
+			if err != nil {
+				return err
+			}
+			ns, err := api.Dial(ctx, config.NetworkServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewConfigurationClient(ns).ListBands(ctx, req)
+			if err != nil {
+				return err
+			}
+			return io.Write(os.Stdout, config.OutputFormat, res)
+		},
+	}
+	endDevicesListPhyVersionsCommand = &cobra.Command{
+		Use:               "list-phy-versions",
+		Aliases:           []string{"get-phy-versions"},
+		Short:             "List supported phy versions",
+		PersistentPreRunE: preRun(),
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			if !config.NetworkServerEnabled {
+				return errNetworkServerDisabled.New()
+			}
+
+			req := &ttnpb.GetPhyVersionsRequest{}
+			_, err := req.SetFromFlags(cmd.Flags(), "")
+			if err != nil {
+				return err
+			}
+			ns, err := api.Dial(ctx, config.NetworkServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewConfigurationClient(ns).GetPhyVersions(ctx, req)
+			if err != nil {
+				return err
+			}
+			return io.Write(os.Stdout, config.OutputFormat, res)
+		},
+	}
 )
 
 func init() {
@@ -1382,6 +1476,8 @@ func init() {
 	ttnpb.AddSetFlagsForGetDefaultMACSettingsRequest(getDefaultMACSettingsFlags, "", false)
 	ttnpb.AddSelectFlagsForEndDevice(allEndDeviceSelectFlags, "", false)
 	ttnpb.AddSetFlagsForEndDevice(allEndDeviceSetFlags, "", false)
+	ttnpb.AddSetFlagsForListBandsRequest(listBandsFlags, "", false)
+	ttnpb.AddSetFlagsForGetPhyVersionsRequest(listPhyVersionFlags, "", false)
 
 	allEndDeviceSelectFlags.VisitAll(func(flag *pflag.Flag) {
 		fieldName := toUnderscore.Replace(flag.Name)
@@ -1489,6 +1585,18 @@ func init() {
 
 	endDevicesGetDefaultMACSettingsCommand.Flags().AddFlagSet(getDefaultMACSettingsFlags)
 	endDevicesCommand.AddCommand(endDevicesGetDefaultMACSettingsCommand)
+
+	endDevicesGetNetIDCommand.Flags().AddFlagSet(getNetIDFlags)
+	endDevicesCommand.AddCommand(endDevicesGetNetIDCommand)
+
+	endDevicesGetDevAddrPrefixesCommand.Flags().AddFlagSet(getDevAddrPrefixesFlags)
+	endDevicesCommand.AddCommand(endDevicesGetDevAddrPrefixesCommand)
+
+	endDevicesListBandsCommand.Flags().AddFlagSet(listBandsFlags)
+	endDevicesCommand.AddCommand(endDevicesListBandsCommand)
+
+	endDevicesListPhyVersionsCommand.Flags().AddFlagSet(listPhyVersionFlags)
+	endDevicesCommand.AddCommand(endDevicesListPhyVersionsCommand)
 
 	Root.AddCommand(endDevicesCommand)
 

@@ -261,6 +261,24 @@ func (h *host) DecodeUplink(
 	return h.decodeUplink(ctx, msg, run)
 }
 
+func appendValidationErrors(dst []string, measurements []normalizedpayload.ParsedMeasurement) []string {
+	for i, m := range measurements {
+		for _, err := range m.ValidationErrors {
+			var (
+				errString string
+				ttnErr    *errors.Error
+			)
+			if errors.As(err, &ttnErr) {
+				errString = ttnErr.FormatMessage(ttnErr.PublicAttributes())
+			} else {
+				errString = err.Error()
+			}
+			dst = append(dst, fmt.Sprintf("measurement %d: %s", i+1, errString))
+		}
+	}
+	return dst
+}
+
 func (*host) decodeUplink(
 	ctx context.Context,
 	msg *ttnpb.ApplicationUplink,
@@ -292,13 +310,14 @@ func (*host) decodeUplink(
 		return errOutput.WithCause(err)
 	}
 	msg.DecodedPayload, msg.DecodedPayloadWarnings = decodedPayload, output.Decoded.Warnings
+	msg.NormalizedPayload, msg.NormalizedPayloadWarnings = nil, nil
 
 	if normalized := output.Normalized; normalized != nil {
 		if errs := normalized.Errors; len(errs) > 0 {
 			return errOutputErrors.WithAttributes("errors", strings.Join(errs, ", "))
 		}
 		if normalized.Data == nil {
-			return errOutput.New()
+			return nil
 		}
 		// The returned data can be an array of measurements or a single measurement object.
 		var measurements []map[string]interface{}
@@ -327,11 +346,17 @@ func (*host) decodeUplink(
 			normalizedPayload[i] = pb
 		}
 		// Validate the normalized payload.
-		_, err := normalizedpayload.Parse(normalizedPayload)
+		normalizedMeasurements, err := normalizedpayload.Parse(normalizedPayload)
 		if err != nil {
 			return errOutput.WithCause(err)
 		}
-		msg.NormalizedPayload, msg.NormalizedPayloadWarnings = normalizedPayload, normalized.Warnings
+		msg.NormalizedPayload = make([]*pbtypes.Struct, len(normalizedMeasurements))
+		for i, measurement := range normalizedMeasurements {
+			msg.NormalizedPayload[i] = measurement.Valid
+		}
+		msg.NormalizedPayloadWarnings = make([]string, 0, len(normalized.Warnings))
+		msg.NormalizedPayloadWarnings = append(msg.NormalizedPayloadWarnings, normalized.Warnings...)
+		msg.NormalizedPayloadWarnings = appendValidationErrors(msg.NormalizedPayloadWarnings, normalizedMeasurements)
 	} else {
 		// If the normalizer is not set, the decoder may return already normalized payload.
 		// This is a best effort attempt to parse the decoded payload as normalized payload.
@@ -339,9 +364,13 @@ func (*host) decodeUplink(
 		normalizedPayload := []*pbtypes.Struct{
 			decodedPayload,
 		}
-		_, err := normalizedpayload.Parse(normalizedPayload)
+		normalizedMeasurements, err := normalizedpayload.Parse(normalizedPayload)
 		if err == nil {
-			msg.NormalizedPayload, msg.NormalizedPayloadWarnings = normalizedPayload, nil
+			msg.NormalizedPayload = make([]*pbtypes.Struct, len(normalizedMeasurements))
+			for i, measurement := range normalizedMeasurements {
+				msg.NormalizedPayload[i] = measurement.Valid
+			}
+			msg.NormalizedPayloadWarnings = appendValidationErrors(msg.NormalizedPayloadWarnings, normalizedMeasurements)
 		}
 	}
 	return nil

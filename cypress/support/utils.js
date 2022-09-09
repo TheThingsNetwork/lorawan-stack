@@ -91,6 +91,31 @@ const disableGatewayServer = config => {
   })
 }
 
+/**
+ * Generates a Join Server Only configuration object.
+ *
+ * @param {object} config - The stack configuration object.
+ */
+const generateJoinServerOnlyConfig = config => {
+  Cypress._.merge(config, {
+    APP_CONFIG: {
+      stack_config: {
+        gs: { enabled: false, base_url: '' },
+        ns: { enabled: false, base_url: '' },
+        as: { enabled: false, base_url: '' },
+      },
+    },
+  })
+  Cypress.config({
+    asBaseUrl: '',
+    asEnabled: false,
+    gsBaseUrl: '',
+    gsEnabled: false,
+    nsBaseUrl: '',
+    nsEnabled: false,
+  })
+}
+
 /** General utitlies. */
 
 /**
@@ -108,4 +133,5 @@ export {
   disableJoinServer,
   disableGatewayServer,
   generateHexValue,
+  generateJoinServerOnlyConfig,
 }

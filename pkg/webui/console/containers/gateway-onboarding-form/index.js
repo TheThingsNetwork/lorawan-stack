@@ -18,10 +18,13 @@ import { merge } from 'lodash'
 
 import Form from '@ttn-lw/components/form'
 
+import GatewayApiKeysModal from '@console/components/gateway-api-keys-modal'
+
+import { composeDataUri, downloadDataUriAsFile } from '@ttn-lw/lib/data-uri'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
-import { createGateway } from '@console/store/actions/gateways'
+import { createGateway, updateGateway } from '@console/store/actions/gateways'
 import { createGatewayApiKey } from '@console/store/actions/api-keys'
 
 import { selectUserId } from '@console/store/selectors/logout'
@@ -35,6 +38,10 @@ const GatewayOnboardingForm = props => {
   const userId = useSelector(selectUserId)
   const dispatch = useDispatch()
   const [error, setError] = useState()
+  const [cupsKey, setCupsKey] = useState()
+  const [lnsKey, setLnsKey] = useState()
+  const [modalVisible, setModalVisible] = useState(false)
+  const [gatewayId, setGatewayId] = useState('')
 
   const initialValues = useMemo(
     () =>
@@ -84,21 +91,30 @@ const GatewayOnboardingForm = props => {
       const isUserOwner = _ownerId ? userId === _ownerId : true
       const ownerId = _ownerId ? _ownerId : userId
       const gatewayId = cleanValues.ids.gateway_id
+      setGatewayId(gatewayId)
 
       try {
         await dispatch(attachPromise(createGateway(ownerId, cleanValues, isUserOwner)))
         if (_create_api_key_cups) {
-          await generateCUPSApiKey(gatewayId)
+          const generatedCupsKey = await generateCUPSApiKey(gatewayId)
+          setCupsKey(generatedCupsKey.key)
         }
         if (_create_api_key_lns) {
-          await generateLNSApiKey(gatewayId)
+          const generatedLnsKey = await generateLNSApiKey(gatewayId)
+          const lbs_lns_secret = { value: btoa(generatedLnsKey.key) }
+          await dispatch(attachPromise(updateGateway(gatewayId, { lbs_lns_secret })))
+          setLnsKey(generatedLnsKey.key)
         }
-        onSuccess(gatewayId)
+        if (_create_api_key_cups || _create_api_key_lns) {
+          return setModalVisible(true)
+        }
+
+        return onSuccess(gatewayId)
       } catch (error) {
         setError(error)
       }
     },
-    [dispatch, generateCUPSApiKey, generateLNSApiKey, onSuccess, userId],
+    [dispatch, generateCUPSApiKey, generateLNSApiKey, userId, onSuccess],
   )
 
   const handleSubmit = useCallback(
@@ -106,17 +122,43 @@ const GatewayOnboardingForm = props => {
     [handleRegistrationSubmit],
   )
 
+  const downloadLns = useCallback(() => {
+    if (lnsKey) {
+      const content = composeDataUri(`Authorization: Bearer ${lnsKey}\r\n`)
+      downloadDataUriAsFile(content, 'tc.key')
+    }
+  }, [lnsKey])
+
+  const downloadCups = useCallback(() => {
+    if (cupsKey) {
+      const content = composeDataUri(`Authorization: Bearer ${cupsKey}\r\n`)
+      downloadDataUriAsFile(content, 'cups.key')
+    }
+  }, [cupsKey])
+
+  const modalApprove = useCallback(() => onSuccess(gatewayId), [onSuccess, gatewayId])
+
   return (
-    <Form
-      error={error}
-      onSubmit={handleSubmit}
-      initialValues={initialValues}
-      hiddenFields={['gateway_server_address', 'enforce_duty_cycle', 'schedule_anytime_delay']}
-      validationSchema={validationSchema}
-      validateAgainstCleanedValues
-    >
-      <GatewayProvisioningFormSection userId={userId} />
-    </Form>
+    <>
+      <GatewayApiKeysModal
+        modalVisible={modalVisible}
+        lnsKey={lnsKey}
+        cupsKey={cupsKey}
+        downloadLns={downloadLns}
+        downloadCups={downloadCups}
+        modalApprove={modalApprove}
+      />
+      <Form
+        error={error}
+        onSubmit={handleSubmit}
+        initialValues={initialValues}
+        hiddenFields={['gateway_server_address', 'enforce_duty_cycle', 'schedule_anytime_delay']}
+        validationSchema={validationSchema}
+        validateAgainstCleanedValues
+      >
+        <GatewayProvisioningFormSection userId={userId} />
+      </Form>
+    </>
   )
 }
 

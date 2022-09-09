@@ -147,6 +147,11 @@ class Gateways {
       this._api.GatewayRegistry.UpdateAllowedFieldMaskPaths,
     ),
   ) {
+    // Apply exceptional field mask requirement for `lbs_lns_secret.value`.
+    if (mask.includes('lbs_lns_secret.value')) {
+      mask.push('lbs_lns_secret')
+    }
+
     const response = await this._api.GatewayRegistry.Update(
       {
         routeParams: { 'gateway.ids.gateway_id': id },

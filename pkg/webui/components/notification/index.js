@@ -67,7 +67,7 @@ const Notification = ({
           </div>
         </div>
       </div>
-      {Boolean(details) && <Details className={style.details} details={details} />}
+      {Boolean(details) && <Details className={style.details} details={details} isError={error} />}
     </div>
   )
 }

@@ -2443,6 +2443,12 @@ PeerInfo
 | `band_id` | [`string`](#string) |  | Optional Band ID to filter the results. If unused, all supported Bands are returned. |
 | `phy_version` | [`PHYVersion`](#ttn.lorawan.v3.PHYVersion) |  | Optional PHY version to filter the results. If unused, all supported versions are returned. |
 
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `phy_version` | <p>`enum.defined_only`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.ListBandsResponse">Message `ListBandsResponse`</a>
 
 | Field | Type | Label | Description |

@@ -37,17 +37,13 @@ type GatewayAntenna struct {
 
 	Location
 
-	// TODO: Add attributes as JSONB field (https://github.com/TheThingsNetwork/lorawan-stack/issues/5614).
-	// Attributes map[string]string `bun:"attributes"`
-
 	Placement int `bun:"placement,nullzero"`
 }
 
 func gatewayAntennaFromPB(pb *ttnpb.GatewayAntenna) *GatewayAntenna {
 	return &GatewayAntenna{
-		Gain:     pb.Gain,
-		Location: locationFromPB(pb.Location),
-		// TODO: Attributes field (https://github.com/TheThingsNetwork/lorawan-stack/issues/5614).
+		Gain:      pb.Gain,
+		Location:  locationFromPB(pb.Location),
 		Placement: int(pb.Placement),
 	}
 }
@@ -57,9 +53,8 @@ func gatewayAntennaToPB(m *GatewayAntenna) *ttnpb.GatewayAntenna {
 		return nil
 	}
 	pb := &ttnpb.GatewayAntenna{
-		Gain:     m.Gain,
-		Location: locationToPB(m.Location),
-		// TODO: Attributes field (https://github.com/TheThingsNetwork/lorawan-stack/issues/5614).
+		Gain:      m.Gain,
+		Location:  locationToPB(m.Location),
 		Placement: ttnpb.GatewayAntennaPlacement(m.Placement),
 	}
 	return pb

@@ -100,6 +100,16 @@ class Users {
     return Marshaler.payloadSingleResponse(response)
   }
 
+  async restoreById(id) {
+    const response = await this._api.UserRegistry.Restore({
+      routeParams: {
+        user_id: id,
+      },
+    })
+
+    return Marshaler.payloadSingleResponse(response)
+  }
+
   async updateById(id, patch, mask = Marshaler.fieldMaskFromPatch(patch)) {
     const response = await this._api.UserRegistry.Update(
       {

@@ -382,7 +382,7 @@ export default class PubsubForm extends Component {
         <Form.Field
           name="downlink_nack"
           type="toggled-input"
-          title={sharedMessages.downlinkNack}
+          enabledMessage={sharedMessages.downlinkNack}
           placeholder={pathPlaceholder}
           component={Input.Toggled}
           description={sharedMessages.eventDownlinkNackDesc}

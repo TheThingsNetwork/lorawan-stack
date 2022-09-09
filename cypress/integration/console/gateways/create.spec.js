@@ -65,6 +65,42 @@ describe('Gateway create', () => {
     cy.findByTestId('error-notification').should('not.exist')
   })
 
+  it('succeeds showing modal when generating API keys for CUPS and LNS', () => {
+    const gateway = {
+      frequency_plan: 'EU_863_870',
+      eui: generateHexValue(16),
+    }
+
+    cy.findByLabelText('Gateway EUI').type(gateway.eui).blur()
+    cy.findByLabelText('Gateway ID').should('have.value', `eui-${gateway.eui}`)
+    cy.findByLabelText('Gateway name').type('Test Gateway')
+    cy.findByLabelText('Frequency plan').selectOption(gateway.frequency_plan)
+    cy.findByLabelText(/Require authenticated connection/).check()
+    cy.findByLabelText(/Generate API key for CUPS/).check()
+    cy.findByLabelText(/Generate API key for LNS/).check()
+    cy.findByRole('button', { name: 'Register gateway' }).click()
+
+    cy.findByTestId('modal-window')
+      .should('be.visible')
+      .within(() => {
+        cy.findByText('Download gateway API keys', { selector: 'h1' }).should('be.visible')
+        cy.findByRole('button', { name: /Download LNS key/ }).click()
+        cy.findByRole('button', { name: /Download CUPS key/ }).click()
+        cy.findByText(
+          'Note: After closing this window, these API keys will not be accessible for download anymore. Please make sure to download and store them now.',
+        ).should('be.visible')
+        cy.findByRole('button', { name: /I have downloaded the keys/ }).click()
+      })
+
+    cy.location('pathname').should(
+      'eq',
+      `${Cypress.config('consoleRootPath')}/gateways/eui-${gateway.eui}`,
+    )
+    cy.findByRole('heading', { name: 'Test Gateway' })
+    cy.findByText(gateway.frequency_plan).should('be.visible')
+    cy.findByTestId('error-notification').should('not.exist')
+  })
+
   it('succeeds adding gateway without frequency plan', () => {
     const gateway = {
       frequency_plan: 'EU_863_870',
