@@ -257,7 +257,7 @@ var findMembersFieldToColumn = map[string]string{
 
 func (s *membershipStore) FindMembers(
 	ctx context.Context, entityID *ttnpb.EntityIdentifiers,
-) (map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, error) {
+) ([]*store.MemberByID, error) {
 	defer trace.StartRegion(ctx, fmt.Sprintf("find members of %s", entityID.EntityType())).End()
 
 	query := s.queryWithDirectMemberships(ctx, entityID.EntityType(), entityID.IDString())
@@ -285,8 +285,9 @@ func (s *membershipStore) FindMembers(
 	} else {
 		store.SetTotal(ctx, uint64(len(results)))
 	}
-	membershipRights := make(map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, len(results))
-	for _, result := range results {
+
+	membershipRights := make([]*store.MemberByID, len(results))
+	for i, result := range results {
 		chain := result.GetMembershipChain()
 		var ids *ttnpb.OrganizationOrUserIdentifiers
 		if chain.OrganizationIdentifiers != nil {
@@ -294,7 +295,10 @@ func (s *membershipStore) FindMembers(
 		} else {
 			ids = chain.UserIdentifiers.GetOrganizationOrUserIdentifiers()
 		}
-		membershipRights[ids] = chain.RightsOnEntity
+		membershipRights[i] = &store.MemberByID{
+			Ids:    ids,
+			Rights: chain.RightsOnEntity,
+		}
 	}
 	return membershipRights, nil
 }

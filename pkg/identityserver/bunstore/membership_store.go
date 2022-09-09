@@ -302,7 +302,7 @@ func (s *membershipStore) FindAccountMembershipChains(
 
 func (s *membershipStore) FindMembers(
 	ctx context.Context, entityID *ttnpb.EntityIdentifiers,
-) (map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, error) {
+) ([]*store.MemberByID, error) {
 	ctx, span := tracer.Start(ctx, "FindMembers", trace.WithAttributes(
 		attribute.String("entity_type", entityID.EntityType()),
 		attribute.String("entity_id", entityID.IDString()),
@@ -337,10 +337,13 @@ func (s *membershipStore) FindMembers(
 		return nil, wrapDriverError(err)
 	}
 
-	res := make(map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, len(models))
-	for _, model := range models {
-		res[s.getOrganizationOrUserIdentifiers(model.AccountType, model.AccountFriendlyID)] = &ttnpb.Rights{
-			Rights: convertIntSlice[int, ttnpb.Right](model.Rights),
+	res := make([]*store.MemberByID, len(models))
+	for i, model := range models {
+		res[i] = &store.MemberByID{
+			Ids: s.getOrganizationOrUserIdentifiers(model.AccountType, model.AccountFriendlyID),
+			Rights: &ttnpb.Rights{
+				Rights: convertIntSlice[int, ttnpb.Right](model.Rights),
+			},
 		}
 	}
 

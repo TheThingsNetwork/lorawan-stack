@@ -64,3 +64,9 @@ func (c MembershipChains) GetRights(
 	}
 	return entityRights
 }
+
+// MemberByID defines a set containing a User or Organization Ids and their respective Rights.
+type MemberByID struct {
+	Ids    *ttnpb.OrganizationOrUserIdentifiers
+	Rights *ttnpb.Rights
+}
