@@ -64,7 +64,12 @@ const DeviceRegistrationFormSection = () => {
   return (
     <div data-test-id="device-registration">
       {showDevEUI && (
-        <DevEUIComponent name="ids.dev_eui" required={isOTAA} disabled={values._withQRdata} />
+        <DevEUIComponent
+          name="ids.dev_eui"
+          required={isOTAA}
+          disabled={values._withQRdata}
+          autoFocus
+        />
       )}
       {isOTAA && (
         <>

@@ -29,8 +29,6 @@ import UnitInput from '@ttn-lw/components/unit-input'
 
 import Message from '@ttn-lw/lib/components/message'
 
-import WarningTooltip from '@console/views/device-add-old/manual/form/warning-tooltip'
-
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectAsConfig, selectJsConfig, selectNsConfig } from '@ttn-lw/lib/selectors/env'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
@@ -46,6 +44,7 @@ import { getDefaultMacSettings } from '@console/store/actions/network-server'
 
 import { selectDefaultMacSettings } from '@console/store/selectors/network-server'
 
+import WarningTooltip from '../../warning-tooltip'
 import { DEVICE_CLASS_MAP } from '../../utils'
 import messages from '../../messages'
 

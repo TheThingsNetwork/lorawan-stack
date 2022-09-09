@@ -16,6 +16,8 @@ import React from 'react'
 
 import Form, { useFormContext } from '@ttn-lw/components/form'
 
+import Message from '@ttn-lw/lib/components/message'
+
 import LorawanVersionInput from '@console/components/lorawan-version-input'
 import PhyVersionInput from '@console/components/phy-version-input'
 
@@ -25,6 +27,8 @@ import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { parseLorawanMacVersion, LORAWAN_VERSION_PAIRS } from '@console/lib/device-utils'
+
+import m from '../../messages'
 
 import AdvancedSettingsSection, {
   initialValues as advancedSettingsInitialValues,
@@ -65,8 +69,10 @@ const lorawanVersionValueSetter = ({ setValues, setFieldTouched }, { value }) =>
 
 const DeviceTypeManualFormSection = () => {
   const {
-    values: { frequency_plan_id, lorawan_version },
+    values: { frequency_plan_id, lorawan_version, lorawan_phy_version },
   } = useFormContext()
+
+  const hasCompleted = Boolean(frequency_plan_id && lorawan_version && lorawan_phy_version)
 
   return (
     <>
@@ -93,6 +99,7 @@ const DeviceTypeManualFormSection = () => {
         tooltipId={tooltipIds.REGIONAL_PARAMETERS}
         lorawanVersion={lorawan_version}
       />
+      {!hasCompleted && <Message content={m.continueManual} className="mb-ls-m" component="div" />}
       <AdvancedSettingsSection />
     </>
   )

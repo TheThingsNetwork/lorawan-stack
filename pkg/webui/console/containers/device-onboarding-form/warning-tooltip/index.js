@@ -23,8 +23,6 @@ import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import style from './form.styl'
-
 const isEqual = (current, desired) => {
   if (isNumber(current) || isNumber(desired)) {
     return Number(current) === Number(desired)
@@ -71,7 +69,7 @@ const WarningTooltip = props => {
   if (hasDesiredValue && hasCurrentValue && !isEqual(currentValue, desiredValue)) {
     return (
       <Tooltip placement="bottom-start" interactive content={<Content desired={desiredValue} />}>
-        <Icon icon="warning" small className={style.warningTooltip} nudgeUp />
+        <Icon icon="warning" small className="c-warning" nudgeUp />
       </Tooltip>
     )
   }

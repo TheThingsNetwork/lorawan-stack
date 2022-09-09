@@ -22,9 +22,10 @@ import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import toast from '@ttn-lw/components/toast'
 import Radio from '@ttn-lw/components/radio-button'
+import Notification from '@ttn-lw/components/notification'
 
-import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+import { selectAsEnabled, selectJsEnabled, selectNsEnabled } from '@ttn-lw/lib/selectors/env'
 
 import { checkFromState } from '@account/lib/feature-checks'
 import { mayEditApplicationDeviceKeys } from '@console/lib/feature-checks'
@@ -44,6 +45,8 @@ import DeviceTypeFormSection, {
 } from './device-type-form-section'
 import DeviceQRScanFormSection from './device-qr-scan-form-section'
 import validationSchema from './validation-schema'
+
+const deviceOnboardingEnabled = selectNsEnabled() && selectAsEnabled() && selectJsEnabled()
 
 const initialValues = merge(
   {
@@ -76,7 +79,7 @@ const DeviceOnboardingFormInner = () => {
             <Radio label={m.multipleRegistration} value={REGISTRATION_TYPES.MULTIPLE} />
           </Form.Field>
           <SubmitBar>
-            <Form.Submit message={sharedMessages.addDevice} component={SubmitButton} />
+            <Form.Submit message={m.submitTitle} component={SubmitButton} />
           </SubmitBar>
         </>
       )}
@@ -181,9 +184,12 @@ const DeviceOnboardingForm = () => {
       validationSchema={validationSchema}
       validationContext={validationContext}
       validateSync={false}
+      disabled={!deviceOnboardingEnabled}
     >
-      <DeviceQRScanFormSection />
-      <hr />
+      {deviceOnboardingEnabled && <DeviceQRScanFormSection />}
+      {!deviceOnboardingEnabled && (
+        <Notification content={m.onboardingDisabled} className="mt-ls-m" warning small />
+      )}
       <DeviceOnboardingFormInner />
     </Form>
   )

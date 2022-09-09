@@ -50,8 +50,7 @@ describe('End device repository manual registration', () => {
       cy.findByLabelText('End device brand').should('be.visible')
       cy.findByText(/Cannot find your exact end device?/).should('be.visible')
       cy.findByText(/enter end device specifics manually/).should('be.visible')
-      cy.findByText('Please specify your device above to continue').should('be.visible')
-      cy.findByRole('button', { name: 'Add end device' }).should('not.exist')
+      cy.findByRole('button', { name: 'Register end device' }).should('not.exist')
 
       cy.findByLabelText('End device brand').selectOption('_other_')
       cy.findByTestId('notification')
@@ -141,7 +140,7 @@ describe('End device repository manual registration', () => {
           `eui-${devEui.toLocaleLowerCase()}`,
         )
 
-        cy.findByRole('button', { name: 'Add end device' }).click()
+        cy.findByRole('button', { name: 'Register end device' }).click()
 
         cy.location('pathname').should(
           'eq',
@@ -160,7 +159,7 @@ describe('End device repository manual registration', () => {
         cy.findByLabelText('JoinEUI').type(generateHexValue(16))
         cy.findByRole('button', { name: 'Confirm' }).click()
 
-        cy.findByRole('button', { name: 'Add end device' }).click()
+        cy.findByRole('button', { name: 'Register end device' }).click()
 
         cy.location('pathname').should(
           'eq',
@@ -199,7 +198,7 @@ describe('End device repository manual registration', () => {
           `eui-${devEui.toLocaleLowerCase()}`,
         )
 
-        cy.findByRole('button', { name: 'Add end device' }).click()
+        cy.findByRole('button', { name: 'Register end device' }).click()
 
         cy.location('pathname').should(
           'eq',
@@ -228,7 +227,7 @@ describe('End device repository manual registration', () => {
           `eui-${devEui.toLocaleLowerCase()}`,
         )
 
-        cy.findByRole('button', { name: 'Add end device' }).click()
+        cy.findByRole('button', { name: 'Register end device' }).click()
 
         cy.location('pathname').should(
           'eq',
@@ -274,7 +273,7 @@ describe('End device repository manual registration', () => {
         cy.findByLabelText('Frequency plan').should('be.visible')
         cy.findByLabelText('JoinEUI').should('be.visible')
         cy.findByRole('button', { name: 'Confirm' }).should('be.visible').and('be.disabled')
-        cy.findByRole('button', { name: 'Add end device' }).should('not.exist')
+        cy.findByRole('button', { name: 'Register end device' }).should('not.exist')
         cy.findByText(
           'To continue, please enter the JoinEUI of the end device so we can determine onboarding options',
         ).should('be.visible')
@@ -296,7 +295,7 @@ describe('End device repository manual registration', () => {
           `eui-${devEui.toLocaleLowerCase()}`,
         )
 
-        cy.findByRole('button', { name: 'Add end device' }).click()
+        cy.findByRole('button', { name: 'Register end device' }).click()
 
         cy.location('pathname').should(
           'eq',
@@ -321,7 +320,7 @@ describe('End device repository manual registration', () => {
         cy.findByLabelText('AppKey').type(generateHexValue(32))
         cy.findByLabelText('End device ID').clear().type(devId)
 
-        cy.findByRole('button', { name: 'Add end device' }).click()
+        cy.findByRole('button', { name: 'Register end device' }).click()
 
         cy.location('pathname').should(
           'eq',
@@ -347,7 +346,7 @@ describe('End device repository manual registration', () => {
           `eui-${devEui.toLocaleLowerCase()}`,
         )
 
-        cy.findByRole('button', { name: 'Add end device' }).click()
+        cy.findByRole('button', { name: 'Register end device' }).click()
 
         cy.location('pathname').should(
           'eq',
@@ -377,8 +376,8 @@ describe('End device repository manual registration', () => {
         )
         cy.findByLabelText('Register another end device of this type').check()
 
-        cy.findByRole('button', { name: 'Add end device' }).click()
-        cy.findByRole('button', { name: 'Add end device' }).should('not.be.disabled')
+        cy.findByRole('button', { name: 'Register end device' }).click()
+        cy.findByRole('button', { name: 'Register end device' }).should('not.be.disabled')
         cy.findByTestId('toast-notification')
           .findByText('End device registered')
           .should('be.visible')
@@ -394,7 +393,7 @@ describe('End device repository manual registration', () => {
         )
         cy.findByLabelText('View registered end device').check()
 
-        cy.findByRole('button', { name: 'Add end device' }).click()
+        cy.findByRole('button', { name: 'Register end device' }).click()
 
         cy.location('pathname').should(
           'eq',
@@ -456,7 +455,7 @@ describe('End device repository manual registration', () => {
         cy.findByLabelText('JoinEUI').type(generateHexValue(16))
         cy.findByRole('button', { name: 'Confirm' }).click()
 
-        cy.findByRole('button', { name: 'Add end device' }).click()
+        cy.findByRole('button', { name: 'Register end device' }).click()
 
         cy.location('pathname').should(
           'eq',
@@ -494,7 +493,7 @@ describe('End device repository manual registration', () => {
         cy.findByLabelText('NwkSKey').type(generateHexValue(32))
         cy.findByLabelText('End device ID').type(devId)
 
-        cy.findByRole('button', { name: 'Add end device' }).click()
+        cy.findByRole('button', { name: 'Register end device' }).click()
 
         cy.location('pathname').should(
           'eq',
@@ -522,11 +521,11 @@ describe('End device repository manual registration', () => {
         cy.findByLabelText('End device ID').type(devId1)
         cy.findByLabelText('Register another end device of this type').check()
 
-        cy.findByRole('button', { name: 'Add end device' }).click()
+        cy.findByRole('button', { name: 'Register end device' }).click()
         cy.findByTestId('toast-notification')
           .findByText('End device registered')
           .should('be.visible')
-        cy.findByRole('button', { name: 'Add end device' }).should('not.be.disabled')
+        cy.findByRole('button', { name: 'Register end device' }).should('not.be.disabled')
 
         const devId2 = 'test-abp-dev-2'
 
@@ -537,11 +536,11 @@ describe('End device repository manual registration', () => {
         cy.findByLabelText('End device ID').type(devId2)
         cy.findByLabelText('Register another end device of this type').check()
 
-        cy.findByRole('button', { name: 'Add end device' }).click()
+        cy.findByRole('button', { name: 'Register end device' }).click()
         cy.findByTestId('toast-notification')
           .findByText('End device registered')
           .should('be.visible')
-        cy.findByRole('button', { name: 'Add end device' }).should('not.be.disabled')
+        cy.findByRole('button', { name: 'Register end device' }).should('not.be.disabled')
 
         const devId3 = 'test-abp-dev-3'
 
@@ -552,7 +551,7 @@ describe('End device repository manual registration', () => {
         cy.findByLabelText('End device ID').type(devId3)
         cy.findByLabelText('View registered end device').check()
 
-        cy.findByRole('button', { name: 'Add end device' }).click()
+        cy.findByRole('button', { name: 'Register end device' }).click()
 
         cy.location('pathname').should(
           'eq',
