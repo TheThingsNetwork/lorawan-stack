@@ -38,7 +38,8 @@ import Require from '@console/lib/components/require'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import { composeDataUri, downloadDataUriAsFile } from '@ttn-lw/lib/data-uri'
-import { selectStackConfig } from '@ttn-lw/lib/selectors/env'
+import { selectJsConfig, selectStackConfig } from '@ttn-lw/lib/selectors/env'
+import getHostFromUrl from '@ttn-lw/lib/host-from-url'
 
 import {
   parseLorawanMacVersion,
@@ -71,6 +72,9 @@ const m = defineMessages({
   noSession: 'This device has not joined the network yet',
 })
 
+const jsHost = getHostFromUrl(selectJsConfig().base_url)
+const jsEnabled = selectJsConfig().enabled
+
 @connect(state => {
   const appId = selectSelectedApplicationId(state)
   const device = selectSelectedDevice(state)
@@ -100,11 +104,16 @@ class DeviceOverview extends React.Component {
   async onExport() {
     const {
       appId,
-      device: { ids, mac_settings, session },
+      device: { ids, mac_settings, session, join_server_address },
     } = this.props
 
     let result
-    if (session) {
+    if (
+      session &&
+      jsEnabled &&
+      join_server_address &&
+      getHostFromUrl(join_server_address) === jsHost
+    ) {
       try {
         result = await tts.Applications.Devices.getById(appId, ids.device_id, ['mac_state'])
 
@@ -153,9 +162,9 @@ class DeviceOverview extends React.Component {
     let lorawanVersion, frequencyPlan, lorawanVersionName, phyVersionName
     if (nsEnabled) {
       lorawanVersion = parseLorawanMacVersion(lorawan_version)
-      frequencyPlan = frequencyPlans.find(f => f.id === frequency_plan_id).name
-      lorawanVersionName = LORAWAN_VERSIONS.find(v => v.value === lorawan_version).label
-      phyVersionName = LORAWAN_PHY_VERSIONS.find(v => v.value === lorawan_phy_version).label
+      frequencyPlan = frequencyPlans.find(f => f.id === frequency_plan_id)?.name
+      lorawanVersionName = LORAWAN_VERSIONS.find(v => v.value === lorawan_version)?.label
+      phyVersionName = LORAWAN_PHY_VERSIONS.find(v => v.value === lorawan_phy_version)?.label
     }
     const {
       f_nwk_s_int_key = { key: undefined },

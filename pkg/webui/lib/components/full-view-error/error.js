@@ -27,6 +27,7 @@ import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
 import errorMessages from '@ttn-lw/lib/errors/error-messages'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import * as cache from '@ttn-lw/lib/cache'
 import {
   isUnknown as isUnknownError,
   isNotFoundError,
@@ -35,6 +36,7 @@ import {
   getCorrelationId,
   getBackendErrorId,
   isOAuthClientRefusedError,
+  isOAuthInvalidStateError,
 } from '@ttn-lw/lib/errors/utils'
 import statusCodeMessages from '@ttn-lw/lib/errors/status-code-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -54,6 +56,7 @@ const siteTitle = selectApplicationSiteTitle()
 const supportLink = selectSupportLinkConfig()
 const documentationLink = selectDocumentationUrlConfig()
 const hasSupportLink = Boolean(supportLink)
+const lastRefreshAttemptCacheKey = 'last-refresh-attempt'
 
 // Mind any rendering that is dependant on context, since the errors
 // can be rendered before such context is injected. Use the `safe`
@@ -86,6 +89,9 @@ const FullViewErrorInner = ({ error, safe }) => {
 
   const [copied, setCopied] = useState(false)
 
+  const lastRefreshAttempt = cache.get(lastRefreshAttemptCacheKey)
+  let doBlankRender = false
+
   let errorMessage
   let errorTitle
   if (isNotFound) {
@@ -93,10 +99,19 @@ const FullViewErrorInner = ({ error, safe }) => {
     errorMessage = errorMessages.genericNotFound
   } else if (isOAuthCallback) {
     errorTitle = errorMessages.loginFailed
+    errorMessage = errorMessages.loginFailedDescription
     if (isOAuthClientRefusedError(error)) {
       errorMessage = errorMessages.loginFailedAbortDescription
-    } else {
-      errorMessage = errorMessages.loginFailedDescription
+    } else if (isOAuthInvalidStateError(error)) {
+      // Usually in case of state errors, the state has expired or otherwise
+      // invalidated since initiating the OAuth request. This can usually be
+      // resolved by re-initiating the OAuth flow. We need to keep track of
+      // refresh attempts though to avoid infinite refresh loops.
+      if (!lastRefreshAttempt || Date.now() - lastRefreshAttempt > 6 * 1000) {
+        cache.set(lastRefreshAttemptCacheKey, Date.now())
+        doBlankRender = true
+        window.location = appRoot
+      }
     }
   } else if (isFrontend) {
     errorMessage = error.errorMessage
@@ -136,6 +151,11 @@ const FullViewErrorInner = ({ error, safe }) => {
   const hasErrorDetails =
     (!isNotFound && Boolean(error) && errorDetails.length > 2) || (isFrontend && error.errorCode)
   const buttonClasses = classnames(buttonStyle.button, style.actionButton)
+
+  // Do not render anything when performing a redirect.
+  if (doBlankRender) {
+    return null
+  }
 
   return (
     <div className={style.fullViewError} data-test-id="full-error-view">

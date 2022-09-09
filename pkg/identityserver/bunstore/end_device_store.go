@@ -117,6 +117,10 @@ func endDeviceToPB(m *EndDevice, fieldMask ...string) (*ttnpb.EndDevice, error) 
 		JoinServerAddress:        m.JoinServerAddress,
 
 		ClaimAuthenticationCode: func() *ttnpb.EndDeviceAuthenticationCode {
+			// Only set the CAC wrapper if the secret has a value.
+			if len(m.ClaimAuthenticationCodeSecret) == 0 {
+				return nil
+			}
 			return &ttnpb.EndDeviceAuthenticationCode{
 				Value:     string(m.ClaimAuthenticationCodeSecret),
 				ValidFrom: ttnpb.ProtoTime(m.ClaimAuthenticationCodeValidFrom),
@@ -655,10 +659,24 @@ func (s *endDeviceStore) updateEndDeviceModel( //nolint:gocyclo
 			columns = append(columns, "last_seen_at")
 
 		case "claim_authentication_code":
-			// NOTE: The old implementation didn't allow for updating the sub-fields, so we don't either.
-			model.ClaimAuthenticationCodeSecret = []byte(pb.ClaimAuthenticationCode.GetValue())
-			model.ClaimAuthenticationCodeValidFrom = cleanTimePtr(ttnpb.StdTime(pb.ClaimAuthenticationCode.GetValidFrom()))
-			model.ClaimAuthenticationCodeValidTo = cleanTimePtr(ttnpb.StdTime(pb.ClaimAuthenticationCode.GetValidTo()))
+			// If the CAC wrapper is nil but the path is set in the fieldmask, then we clear the values.
+			if pb.ClaimAuthenticationCode == nil {
+				model.ClaimAuthenticationCodeSecret = nil
+				model.ClaimAuthenticationCodeValidFrom = nil
+				model.ClaimAuthenticationCodeValidTo = nil
+			} else {
+				// If not, allow setting each value separately.
+				// For example, this allows the updating only the valid_to field without clearing the other fields.
+				if pb.ClaimAuthenticationCode.Value != "" {
+					model.ClaimAuthenticationCodeSecret = []byte(pb.ClaimAuthenticationCode.Value)
+				}
+				if pb.ClaimAuthenticationCode.ValidFrom != nil {
+					model.ClaimAuthenticationCodeValidFrom = ttnpb.StdTime(pb.ClaimAuthenticationCode.ValidFrom)
+				}
+				if pb.ClaimAuthenticationCode.ValidTo != nil {
+					model.ClaimAuthenticationCodeValidTo = ttnpb.StdTime(pb.ClaimAuthenticationCode.ValidTo)
+				}
+			}
 			columns = append(
 				columns,
 				"claim_authentication_code_secret",

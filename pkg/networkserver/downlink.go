@@ -37,6 +37,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/lora"
 	"google.golang.org/grpc"
 )
 
@@ -644,19 +645,9 @@ type downlinkPath struct {
 	*ttnpb.DownlinkPath
 }
 
-func computeWantedRSSI(snr float32, channelRSSI float32) float32 {
-	wantedRSSI := channelRSSI
-	if snr <= -5.0 {
-		wantedRSSI += snr
-	} else if snr < 10.0 {
-		wantedRSSI += snr/3.0 - 10.0/3.0
-	}
-	return wantedRSSI
-}
-
 func buildMetadataComparator(mds []*ttnpb.MACState_UplinkMessage_RxMetadata) func(int, int) bool {
 	invalidMD := func(k int) bool { return mds[k].Snr == 0.0 || mds[k].ChannelRssi == 0.0 }
-	wantedRSSI := func(k int) float32 { return computeWantedRSSI(mds[k].Snr, mds[k].ChannelRssi) }
+	wantedRSSI := func(k int) float32 { return lora.AdjustedRSSI(mds[k].ChannelRssi, mds[k].Snr) }
 	return func(i, j int) bool {
 		lhsInvalid, rhsInvalid := invalidMD(i), invalidMD(j)
 		if lhsInvalid {

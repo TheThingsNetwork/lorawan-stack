@@ -89,6 +89,7 @@ func TestEndDeviceStore(t *testing.T) {
 	st.TestEndDeviceStoreCRUD(t)
 	st.TestEndDeviceStorePagination(t)
 	st.TestEndDeviceBatchUpdate(t)
+	st.TestEndDeviceCAC(t)
 }
 
 func TestGatewayStore(t *testing.T) {

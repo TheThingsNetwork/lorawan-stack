@@ -59,21 +59,33 @@ const deleteUserLogic = createRequestLogic({
   },
 })
 
+const restoreUserLogic = createRequestLogic({
+  type: users.RESTORE_USER,
+  process: async ({ action }) => {
+    const { id } = action.payload
+
+    await tts.Users.restoreById(id)
+
+    return { id }
+  },
+})
+
 const getUsersLogic = createRequestLogic({
   type: users.GET_USERS_LIST,
   process: async ({ action }) => {
     const {
-      params: { page, limit, query, order },
+      params: { page, limit, query, order, deleted },
     } = action.payload
-    const { selectors } = action.meta
+    const { selectors, options } = action.meta
 
-    const data = query
+    const data = options.isSearch
       ? await tts.Users.search(
           {
             page,
             limit,
             query,
             order,
+            deleted,
           },
           selectors,
         )
@@ -139,6 +151,7 @@ export default [
   getUsersLogic,
   updateUserLogic,
   deleteUserLogic,
+  restoreUserLogic,
   createUserLogic,
   getUsersRightsLogic,
   getUserInvitationsLogic,

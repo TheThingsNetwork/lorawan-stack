@@ -11,19 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
-- New `ListBands` RPC on the `Configuration` service.
-- New `NetID` and `DeviceAddressPrefixes` RPC on the `NS` service.
-- Support for loading end device template from Device Repository when importing devices using a CSV file.
-- Experimental support for normalized payload.
-- Decoded payloads are now visible for downlinks in the Console.
-- Support for dynamic ping slot frequencies, as used by the US915 and AU915 bands.
-- Support for LoRa Basics Station beaconing.
-
 ### Changed
 
-- Absolute time downlinks (such as class B ping slots or class C absolute time downlinks) are now using the native class B downlink API of LoRa Basics Station.
-- Only gateways which are guaranteed to be GPS capable may now be used for absolute time downlinks. This ensures that gateways that have an unknown time source are not used for absolute time scheduling.
-- The static ADR mode may now steer the end device to use custom data rates such as SF7BW250, FSK and LR-FHSS.
 - LoRa coding rate now defined in `DataRate` instead of `Band`.
 
 ### Deprecated
@@ -34,13 +23,52 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- `--mac-settings.adr.mode.disabled`, `--mac-settings.adr.mode.dynamic` and `--mac-settings.adr.mode.static` flags of the `end-device update` command.
+
+### Security
+
+## [3.21.2] - unreleased
+
+### Added
+
+- New `ListBands` RPC on the `Configuration` service.
+  - Added support to CLI. Available via the `end-devices list-bands` command.
+- CLI support for listing PHY versions via the `end-devices list-phy-versions` CLI command.
+- New `NetID` and `DeviceAddressPrefixes` RPC on the `NS` service.
+  - Added support on CLI. Available via the `end-devices get-net-id` and `end-devices get-dev-addr-prefixes` commands.
+- Support for loading end device template from Device Repository when importing devices using a CSV file.
+- Experimental support for normalized payload.
+- Support management of deleted users in the Console.
+- Decoded payloads are now visible for downlinks in the Console.
+- Support for dynamic ping slot frequencies, as used by the US915 and AU915 bands.
+- Support for LoRa Basics Station beaconing.
+
+### Changed
+
+- Deprecated `attributes` from `GatewayAntenna` definition. While it was present in the API it was never stored in the database.
+- Absolute time downlinks (such as class B ping slots or class C absolute time downlinks) are now using the native class B downlink API of LoRa Basics Station.
+- Only gateways which are guaranteed to be GPS capable may now be used for absolute time downlinks. This ensures that gateways that have an unknown time source are not used for absolute time scheduling.
+- The static ADR mode may now steer the end device to use custom data rates such as SF7BW250, FSK and LR-FHSS.
+- The Console will try to resolve invalid state errors during login with an automatic refresh.
+- Error details are now displayed in a modal instead of within the notification element in the Console.
+
+### Removed
+
+- Experimental support for `LoRa Basics Station` gateway GPS timestamps which use the wrong precision (milliseconds instead of microseconds). Please ensure that your gateway has been updated to the latest firmware.
+
+### Fixed
+
 - The Gateway Server scheduler no longer considers the absolute time of a downlink to be the time of arrival.
 - The Network Server now correctly handles the command that may succeed a `LinkADRAns` response.
 - LR-FHSS data rate matching.
 - Console data rate rendering of non-LoRa modulations.
-- `--mac-settings.adr.mode.disabled`, `--mac-settings.adr.mode.dynamic` and `--mac-settings.adr.mode.static` flags of the `end-device update` command.
 
 ### Security
+
+- End device network layer form crashing in some situations in the Console device general settings.
+- End device overview crashing in some situations in the Console.
+- Device import when using Join Server-only deployments.
+- QRG can generate QR Codes without the claim authentication code.
 
 ## [3.21.1] - 2022-08-24
 
@@ -2308,7 +2336,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.21.1...v3.21
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.21.2...v3.21
+[3.21.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.21.1...v3.21.2
 [3.21.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.21.0...v3.21.1
 [3.21.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.20.2...v3.21.0
 [3.20.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.20.1...v3.20.2

@@ -52,7 +52,7 @@
 /pkg/types @johanstokking
 /pkg/web @kschiffer @ryaplots
 /pkg/webmiddleware @KrishnaIyer @kschiffer
-/pkg/webui @kschiffer @ryaplots
+/pkg/webui @kschiffer @ryaplots @mjamescompton 
 /pkg/ratelimit @johanstokking @KrishnaIyer
 
 # Subsystems
@@ -92,7 +92,7 @@
 /pkg/devicerepository @adriansmares @KrishnaIyer
 
 # SDKs
-/sdk/js @kschiffer @ryaplots
+/sdk/js @kschiffer @ryaplots @mjamescompton 
 
 # Clear generated code
 /api/api.md

@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useCallback, useState } from 'react'
 import { defineMessages } from 'react-intl'
-import bind from 'autobind-decorator'
 
 import Button from '@ttn-lw/components/button'
+import PortalledModal from '@ttn-lw/components/modal/portalled'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -24,67 +24,55 @@ import style from './details.styl'
 
 const m = defineMessages({
   showDetails: 'Show details',
-  hideDetails: 'Hide details',
+  details: 'Details',
+  errorDetails: 'Error details',
+  close: 'Close',
 })
 
-export default class Details extends React.PureComponent {
-  static propTypes = {
-    details: PropTypes.oneOfType([PropTypes.string, PropTypes.error]).isRequired,
-  }
+const Details = props => {
+  const [showDetails, setShowDetails] = useState()
+  const { details, isError } = props
+  const content = typeof details === 'string' ? details : JSON.stringify(details, undefined, 2)
 
-  state = {
-    expanded: false,
-    buttonIcon: 'arrow_drop_down',
-    buttonText: m.showDetails,
-  }
+  const showDropdown = useCallback(() => {
+    setShowDetails(true)
+  }, [])
 
-  showDropdown() {
-    document.addEventListener('mousedown', this.handleClickOutside)
-    this.setState({
-      expanded: true,
-      buttonIcon: 'arrow_drop_up',
-      buttonText: m.hideDetails,
-    })
-  }
+  const handleModalComplete = useCallback(() => {
+    setShowDetails(false)
+  }, [])
 
-  hideDropdown() {
-    document.removeEventListener('mousedown', this.handleClickOutside)
-    this.setState({
-      expanded: false,
-      buttonIcon: 'arrow_drop_down',
-      buttonText: m.showDetails,
-    })
-  }
-
-  @bind
-  toggleDropdown() {
-    let { expanded } = this.state
-    expanded = !expanded
-    if (expanded) {
-      this.showDropdown()
-    } else {
-      this.hideDropdown()
-    }
-  }
-
-  render() {
-    const { expanded, buttonIcon, buttonText } = this.state
-    const { details } = this.props
-    const content = typeof details === 'string' ? details : JSON.stringify(details, undefined, 2)
-    return (
-      <div className={style.details}>
-        <Button
-          className={style.detailsButton}
-          naked
-          onClick={this.toggleDropdown}
-          icon={buttonIcon}
-          message={buttonText}
-          type="button"
-        />
-        {expanded && <pre className={style.detailsDropdown}>{content}</pre>}
-      </div>
-    )
-  }
+  return (
+    <div className={style.details}>
+      <Button
+        className={style.detailsButton}
+        naked
+        onClick={showDropdown}
+        message={m.showDetails}
+        type="button"
+      />
+      <PortalledModal
+        title={isError ? m.errorDetails : m.details}
+        visible={showDetails}
+        onComplete={handleModalComplete}
+        approval={false}
+        buttonMessage={m.close}
+        approveButtonProps={{ primary: false, icon: undefined }}
+        noTitleLine
+      >
+        <pre className={style.detailsCode}>{content}</pre>
+      </PortalledModal>
+    </div>
+  )
 }
 
-export { Details }
+Details.propTypes = {
+  details: PropTypes.oneOfType([PropTypes.string, PropTypes.error]).isRequired,
+  isError: PropTypes.bool,
+}
+
+Details.defaultProps = {
+  isError: false,
+}
+
+export default Details

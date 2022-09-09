@@ -23,10 +23,10 @@ var CN_470_510_20_A_RP2_v1_0_0 = Band{
 	SupportsDynamicADR: true,
 
 	MaxUplinkChannels: 64,
-	UplinkChannels:    cn47051020AUplinkChannels,
+	UplinkChannels:    cn47051020AUplinkChannels(0),
 
 	MaxDownlinkChannels: 64,
-	DownlinkChannels:    cn47051020ADownlinkChannels,
+	DownlinkChannels:    cn47051020ADownlinkChannels(0),
 
 	// See IEEE 11-11/0972r0
 	SubBands: []SubBandParameters{

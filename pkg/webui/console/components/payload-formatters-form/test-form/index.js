@@ -86,8 +86,9 @@ const TestForm = props => {
     uplink,
     testResult,
     testResult: {
-      decoded_payload: payload,
-      decoded_payload_warnings: warnings,
+      decoded_payload: decodedPayload,
+      decoded_payload_warnings: decodedPayloadWarnings,
+      normalized_payload_warnings: normalizedPayloadWarnings,
       frm_payload: framePayload,
     },
   } = props
@@ -104,8 +105,10 @@ const TestForm = props => {
 
   const hasTestError = isBackend(testResult)
   const hasFatalError = !isOutputError(testResult)
-  const hasTestWarning = warnings instanceof Array && warnings.length !== 0
-  const hasPayload = payload !== undefined
+  const hasTestWarning =
+    (decodedPayloadWarnings instanceof Array && decodedPayloadWarnings.length !== 0) ||
+    (normalizedPayloadWarnings instanceof Array && normalizedPayloadWarnings.length !== 0)
+  const hasPayload = decodedPayload !== undefined
 
   const showTestError = hasTestError
   const showTestWarning = !hasTestError && hasTestWarning
@@ -200,7 +203,7 @@ const TestForm = props => {
             {!showTestError && (
               <Form.InfoField title={m.decodedPayload}>
                 <CodeEditor
-                  value={JSON.stringify(payload, null, 2)}
+                  value={JSON.stringify(decodedPayload, null, 2)}
                   language="json"
                   name="test_result"
                   minLines={12}
@@ -274,6 +277,8 @@ TestForm.propTypes = {
   testResult: PropTypes.shape({
     decoded_payload: PropTypes.PropTypes.shape({}),
     decoded_payload_warnings: PropTypes.arrayOf(PropTypes.message),
+    normalized_payload: PropTypes.arrayOf(PropTypes.PropTypes.shape({})),
+    normalized_payload_warnings: PropTypes.arrayOf(PropTypes.message),
     frm_payload: PropTypes.string,
   }).isRequired,
   uplink: PropTypes.bool.isRequired,

@@ -20,6 +20,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"golang.org/x/sync/errgroup"
 )
 
 // GetGatewayConnectionStats returns statistics about a gateway connection.
@@ -67,10 +68,15 @@ func (gs *GatewayServer) BatchGetGatewayConnectionStats(
 	ctx context.Context,
 	req *ttnpb.BatchGetGatewayConnectionStatsRequest,
 ) (*ttnpb.BatchGetGatewayConnectionStatsResponse, error) {
+	wg, wgCtx := errgroup.WithContext(ctx)
 	for _, ids := range req.GatewayIds {
-		if err := gs.entityRegistry.AssertGatewayRights(ctx, ids, ttnpb.Right_RIGHT_GATEWAY_STATUS_READ); err != nil {
-			return nil, err
-		}
+		ids := ids
+		wg.Go(func() error {
+			return gs.entityRegistry.AssertGatewayRights(wgCtx, ids, ttnpb.Right_RIGHT_GATEWAY_STATUS_READ)
+		})
+	}
+	if err := wg.Wait(); err != nil {
+		return nil, err
 	}
 
 	if gs.statsRegistry != nil {
