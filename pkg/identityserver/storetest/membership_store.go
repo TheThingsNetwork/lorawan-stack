@@ -97,7 +97,8 @@ func (st *StoreTest) TestMembershipStoreCRUD(t *T) {
 				a, ctx := test.New(t)
 				members, err := s.FindMembers(ctx, ids)
 				if a.So(err, should.BeNil) && a.So(members, should.NotBeNil) && a.So(members, should.HaveLength, 1) {
-					for memberIDs, rights := range members {
+					for _, v := range members {
+						memberIDs, rights := v.Ids, v.Rights
 						a.So(memberIDs, should.Resemble, usr1.GetEntityIdentifiers())
 						a.So(rights, should.Resemble, someRights[ids.EntityType()])
 					}
@@ -301,8 +302,8 @@ func (st *StoreTest) TestMembershipStorePagination(t *T) {
 					a.So(got, should.HaveLength, 2)
 				}
 				gotIDs := make([]*ttnpb.OrganizationOrUserIdentifiers, 0, len(got))
-				for ids := range got {
-					gotIDs = append(gotIDs, ids)
+				for _, v := range got {
+					gotIDs = append(gotIDs, v.Ids)
 				}
 				sort.Sort(organizationOrUserIdentifiersByID(gotIDs))
 				for i, ids := range gotIDs {

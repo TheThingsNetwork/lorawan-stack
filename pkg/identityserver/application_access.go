@@ -281,7 +281,9 @@ func (is *IdentityServer) setApplicationCollaborator(
 				return err
 			}
 			var hasOtherOwner bool
-			for member, rights := range memberRights {
+			for _, v := range memberRights {
+				member, rights := v.Ids, v.Rights
+
 				if unique.ID(ctx, member) == unique.ID(ctx, req.GetCollaborator().GetIds()) {
 					continue
 				}
@@ -341,12 +343,15 @@ func (is *IdentityServer) listApplicationCollaborators(ctx context.Context, req 
 		if err != nil {
 			return err
 		}
-		collaborators = &ttnpb.Collaborators{}
-		for member, rights := range memberRights {
-			collaborators.Collaborators = append(collaborators.Collaborators, &ttnpb.Collaborator{
+		collaborators = &ttnpb.Collaborators{
+			Collaborators: make([]*ttnpb.Collaborator, len(memberRights)),
+		}
+		for i, v := range memberRights {
+			member, rights := v.Ids, v.Rights
+			collaborators.Collaborators[i] = &ttnpb.Collaborator{
 				Ids:    member,
 				Rights: rights.GetRights(),
-			})
+			}
 		}
 		return nil
 	})

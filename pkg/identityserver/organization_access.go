@@ -282,7 +282,8 @@ func (is *IdentityServer) setOrganizationCollaborator( //nolint:gocycle
 				return err
 			}
 			var hasOtherOwner bool
-			for member, rights := range memberRights {
+			for _, v := range memberRights {
+				member, rights := v.Ids, v.Rights
 				if unique.ID(ctx, member) == unique.ID(ctx, req.GetCollaborator().GetIds()) {
 					continue
 				}
@@ -343,7 +344,8 @@ func (is *IdentityServer) listOrganizationCollaborators(ctx context.Context, req
 			return err
 		}
 		collaborators = &ttnpb.Collaborators{}
-		for member, rights := range memberRights {
+		for _, v := range memberRights {
+			member, rights := v.Ids, v.Rights
 			collaborators.Collaborators = append(collaborators.Collaborators, &ttnpb.Collaborator{
 				Ids:    member,
 				Rights: rights.GetRights(),
