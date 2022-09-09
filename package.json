@@ -90,7 +90,7 @@
     "cancelable-promise": "^3.2.3",
     "classnames": "^2.2.6",
     "clipboard": "^2.0.6",
-    "connected-react-router": "^6.9.1",
+    "connected-react-router": "^6.9.3",
     "deep-diff": "^1.0.2",
     "focus-visible": "^5.2.0",
     "formik": "^2.2.9",
