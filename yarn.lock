@@ -5119,10 +5119,10 @@ can-use-dom@^0.1.0:
   resolved "https://registry.yarnpkg.com/can-use-dom/-/can-use-dom-0.1.0.tgz#22cc4a34a0abc43950f42c6411024a3f6366b45a"
   integrity sha1-IsxKNKCrxDlQ9CxkEQJKP2NmtFo=
 
-cancelable-promise@^3.2.3:
-  version "3.2.3"
-  resolved "https://registry.yarnpkg.com/cancelable-promise/-/cancelable-promise-3.2.3.tgz#7bc579c003fa05147d942ca9f6c4e39217d832e4"
-  integrity sha512-P0yW/pq7ZEx4znOnDd4PqA5l+I/INpo32BE4Rg3QQxVBhKk7g9hAbmJt7oYbffo1q8j+1QfSZHGmjHMqj8RoJw==
+cancelable-promise@^4.3.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/cancelable-promise/-/cancelable-promise-4.3.0.tgz#13059151a52622ff282df3d07c4838ac8de93086"
+  integrity sha512-sh4IYH3YLhi1AlNIBeka4WqRIJ8m8msgc8Och0DFRY4rgf83UnhYD0hQ83to4M/lZ3TLzDIwQeQP6wcyA2JJow==
 
 caniuse-lite@^1.0.30001109, caniuse-lite@^1.0.30001125, caniuse-lite@^1.0.30001280:
   version "1.0.30001286"
@@ -15474,7 +15474,7 @@ tsutils@^3.21.0:
     tslib "^1.8.1"
 
 "ttn-lw@file:sdk/js":
-  version "3.20.2"
+  version "3.21.1"
   dependencies:
     arraybuffer-to-string "^1.0.2"
     auto-bind "^5.0.1"
