@@ -199,7 +199,7 @@ type MembershipStore interface {
 	// Find direct members and rights of the given entity.
 	FindMembers(
 		ctx context.Context, entityID *ttnpb.EntityIdentifiers,
-	) (map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, error)
+	) ([]*MemberByID, error)
 	// Get direct member rights on an entity.
 	GetMember(
 		ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID *ttnpb.EntityIdentifiers,
