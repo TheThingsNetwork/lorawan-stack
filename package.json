@@ -103,7 +103,7 @@
     "prop-types": "^15.8.1",
     "query-string": "^7.1.1",
     "react": "^17.0.1",
-    "react-ace": "^10.1.0",
+    "react-ace": "^6.6.0",
     "react-display-name": "^0.2.5",
     "react-dom": "^17.0.1",
     "react-focus-lock": "^2.8.1",
