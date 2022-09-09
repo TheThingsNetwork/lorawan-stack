@@ -56,7 +56,7 @@ const m = defineMessages({
   restoreFail: 'There was an error and OAuth client could not be restored',
   purgeSuccess: 'OAuth client purged',
   purgeFail: 'There was an error and the OAuth client could not be purged',
-  addClient: 'Add OAuth Client',
+  addClient: 'Add OAuth client',
 })
 
 const OWNED_TAB = 'owned'

@@ -39,7 +39,7 @@ import {
 } from '@account/store/selectors/user'
 
 const m = defineMessages({
-  addClient: 'Add OAuth Client',
+  addClient: 'Add OAuth client',
 })
 
 const OAuthClientAdd = props => {

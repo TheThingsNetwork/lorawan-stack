@@ -18,7 +18,7 @@ import { push } from 'connected-react-router'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
-import { deleteAuthorizationToken, deleteAllTokens } from '@account/store/actions/authorizations'
+import { deleteAccessToken, deleteAllTokens } from '@account/store/actions/authorizations'
 
 import { selectUserId } from '@account/store/selectors/user'
 import { selectTokenIds } from '@account/store/selectors/authorizations'
@@ -32,7 +32,7 @@ const mapStateToProps = (state, props) => ({
 const mapDispatchToProps = dispatch => ({
   ...bindActionCreators(
     {
-      deleteToken: attachPromise(deleteAuthorizationToken),
+      deleteToken: attachPromise(deleteAccessToken),
       deleteAllTokens: attachPromise(deleteAllTokens),
     },
     dispatch,

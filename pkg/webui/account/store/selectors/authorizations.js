@@ -17,7 +17,7 @@ import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
 
 import {
   GET_AUTHORIZATIONS_LIST_BASE,
-  GET_AUTHORIZATION_TOKENS_LIST_BASE,
+  GET_ACCESS_TOKENS_LIST_BASE,
 } from '@account/store/actions/authorizations'
 
 const selectAuthorizationsStore = state => state.authorizations
@@ -41,5 +41,5 @@ export const selectAuthorizationsError = createErrorSelector(GET_AUTHORIZATIONS_
 export const selectTokens = state => selectAuthorizationsStore(state).tokens
 export const selectTokenIds = state => selectTokens(state).map(token => token.id)
 export const selectTokensTotalCount = state => selectAuthorizationsStore(state).tokensTotalCount
-export const selectTokensFetching = createFetchingSelector(GET_AUTHORIZATION_TOKENS_LIST_BASE)
-export const selectTokensError = createErrorSelector(GET_AUTHORIZATION_TOKENS_LIST_BASE)
+export const selectTokensFetching = createFetchingSelector(GET_ACCESS_TOKENS_LIST_BASE)
+export const selectTokensError = createErrorSelector(GET_ACCESS_TOKENS_LIST_BASE)

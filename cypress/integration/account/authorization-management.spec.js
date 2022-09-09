@@ -36,7 +36,7 @@ describe('Account App authorization management', () => {
     cy.findByRole('cell', { name: 'console' }).should('be.visible')
   })
 
-  it('succeeds viewing an auhtorized client', () => {
+  it('succeeds viewing an authorized client', () => {
     cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
     cy.visit(`${Cypress.config('accountAppRootPath')}/client-authorizations/console`)
     cy.findByText('Authorization settings').should('be.visible')
@@ -45,9 +45,9 @@ describe('Account App authorization management', () => {
     cy.findByText('Actions').should('be.visible')
   })
 
-  it('succeeds showing active authorization tokens', () => {
+  it('succeeds showing active access tokens', () => {
     cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
-    cy.visit(`${Cypress.config('accountAppRootPath')}/client-authorizations/console/tokens`)
+    cy.visit(`${Cypress.config('accountAppRootPath')}/client-authorizations/console/access-tokens`)
     cy.findByRole('rowgroup').within(() => {
       cy.findAllByRole('row').should('have.length', 1)
     })
@@ -75,7 +75,7 @@ describe('Account App authorization management', () => {
 
   it('succeeds invalidating all tokens', () => {
     cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
-    cy.visit(`${Cypress.config('accountAppRootPath')}/client-authorizations/console/tokens`)
+    cy.visit(`${Cypress.config('accountAppRootPath')}/client-authorizations/console/access-tokens`)
     cy.findByRole('button', { name: /Invalidate all access tokens/ }).click()
     cy.findByTestId('error-notification').should('not.exist')
 
@@ -84,13 +84,13 @@ describe('Account App authorization management', () => {
       `${Cypress.config('accountAppRootPath')}/client-authorizations/console`,
     )
 
-    cy.visit(`${Cypress.config('accountAppRootPath')}/client-authorizations/console/tokens`)
+    cy.visit(`${Cypress.config('accountAppRootPath')}/client-authorizations/console/access-tokens`)
     cy.findByRole('rowgroup').should('not.exist')
   })
 
   it('succeeds invalidating one token', () => {
     cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
-    cy.visit(`${Cypress.config('accountAppRootPath')}/client-authorizations/console/tokens`)
+    cy.visit(`${Cypress.config('accountAppRootPath')}/client-authorizations/console/access-tokens`)
     cy.findByRole('button', { name: /Invalidate this access token/ }).click()
     cy.findByTestId('error-notification').should('not.exist')
 

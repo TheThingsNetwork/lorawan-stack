@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { Col, Row, Container } from 'react-grid-system'
 import { Switch, Route } from 'react-router-dom'
@@ -32,16 +32,19 @@ import TokensTable from '@account/containers/tokens-table'
 
 import AuthorizationSettings from '@account/views/oauth-authorization-settings'
 
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { getAuthorizationsList } from '@account/store/actions/authorizations'
+import { getClientsList } from '@account/store/actions/clients'
 
 import {
   selectAuthorizationsError,
   selectAuthorizationsFetching,
 } from '@account/store/selectors/authorizations'
 import { selectUserId } from '@account/store/selectors/user'
+import { selectClientById } from '@account/store/selectors/clients'
 
 import style from './authorization.styl'
 
@@ -57,6 +60,9 @@ const AuthorizationOverview = props => {
     siteName,
   } = props
 
+  const client = useSelector(state => selectClientById(state, clientId))
+  const clientName = client?.name || clientId
+
   useBreadcrumbs(
     'client-authorizations.single',
     <Breadcrumb path={`/client-authorizations/${clientId}`} content={clientId} />,
@@ -70,18 +76,18 @@ const AuthorizationOverview = props => {
       name: 'overview',
       link: `${basePath}`,
     },
-    { title: m.accessTokens, name: 'tokens', link: `${basePath}/tokens` },
+    { title: m.accessTokens, name: 'access-tokens', link: `${basePath}/access-tokens` },
   ]
 
   return (
-    <React.Fragment>
+    <>
       <IntlHelmet titleTemplate={`%s - ${clientId} - ${siteName}`} />
       <Breadcrumbs />
       <div className={style.titleSection}>
         <Container>
           <Row>
             <Col sm={12}>
-              <PageTitle title={clientId} className={style.pageTitle} />
+              <PageTitle title={clientName} className={style.pageTitle} />
               <Tabs className={style.tabs} narrow tabs={tabs} />
             </Col>
           </Row>
@@ -89,10 +95,10 @@ const AuthorizationOverview = props => {
       </div>
       <Switch>
         <Route exact path={path} component={AuthorizationSettings} />
-        <Route exact path={`${path}/tokens`} component={TokensTable} />
+        <Route exact path={`${path}/access-tokens`} component={TokensTable} />
         <NotFoundRoute />
       </Switch>
-    </React.Fragment>
+    </>
   )
 }
 
@@ -113,6 +119,7 @@ export default connect(
   dispatch => ({
     loadData: userId => {
       dispatch(getAuthorizationsList(userId))
+      dispatch(attachPromise(getClientsList(undefined, ['name'])))
     },
   }),
 )(withRequest(({ userId, loadData }) => loadData(userId))(AuthorizationOverview))

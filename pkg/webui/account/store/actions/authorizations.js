@@ -28,26 +28,26 @@ export const [
   },
 ] = createRequestActions(
   GET_AUTHORIZATIONS_LIST_BASE,
-  userId => ({ userId }),
-  (userId, selector) => ({ selector }),
+  (userId, params) => ({ userId, params }),
+  (userId, params, selector) => ({ selector }),
 )
 
-export const GET_AUTHORIZATION_TOKENS_LIST_BASE = 'GET_AUTHORIZATION_TOKENS_LIST'
+export const GET_ACCESS_TOKENS_LIST_BASE = 'GET_ACCESS_TOKENS_LIST'
 export const [
   {
-    request: GET_AUTHORIZATION_TOKENS_LIST,
-    success: GET_AUTHORIZATION_TOKENS_LIST_SUCCESS,
-    failure: GET_AUTHORIZATION_TOKENS_LIST_FAILURE,
+    request: GET_ACCESS_TOKENS_LIST,
+    success: GET_ACCESS_TOKENS_LIST_SUCCESS,
+    failure: GET_ACCESS_TOKENS_LIST_FAILURE,
   },
   {
-    request: getAuthorizationTokensList,
-    success: getAuthorizationTokensSuccess,
-    failure: getAuthorizationTokensFailure,
+    request: getAccessTokensList,
+    success: getAccessTokensSuccess,
+    failure: getAccessTokensFailure,
   },
 ] = createRequestActions(
-  GET_AUTHORIZATION_TOKENS_LIST_BASE,
-  (userId, clientId) => ({ userId, clientId }),
-  (userId, clientId, selector) => ({ selector }),
+  GET_ACCESS_TOKENS_LIST_BASE,
+  (userId, clientId, params) => ({ userId, clientId, params }),
+  (userId, clientId, params, selector) => ({ selector }),
 )
 
 export const DELETE_AUTHORIZATION_BASE = 'DELETE_AUTHORIZATION'
@@ -68,19 +68,19 @@ export const [
   (userId, clientId, selector) => ({ selector }),
 )
 
-export const DELETE_AUTHORIZATION_TOKEN_BASE = 'DELETE_AUTHORIZATION_TOKEN'
+export const DELETE_ACCESS_TOKEN_BASE = 'DELETE_ACCESS_TOKEN'
 export const [
   {
-    request: DELETE_AUTHORIZATION_TOKEN,
-    success: DELETE_AUTHORIZATION_TOKEN_SUCCESS,
-    failure: DELETE_AUTHORIZATION_TOKEN_FAILURE,
+    request: DELETE_ACCESS_TOKEN,
+    success: DELETE_ACCESS_TOKEN_SUCCESS,
+    failure: DELETE_ACCESS_TOKEN_FAILURE,
   },
   {
-    request: deleteAuthorizationToken,
-    success: deleteAuthorizationTokenSuccess,
-    failure: deleteAuthorizationTokenFailure,
+    request: deleteAccessToken,
+    success: deleteAccessTokenSuccess,
+    failure: deleteAccessTokenFailure,
   },
-] = createRequestActions(DELETE_AUTHORIZATION_TOKEN_BASE, (userId, clientId, id) => ({
+] = createRequestActions(DELETE_ACCESS_TOKEN_BASE, (userId, clientId, id) => ({
   userId,
   clientId,
   id,
