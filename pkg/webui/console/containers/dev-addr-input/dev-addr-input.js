@@ -13,15 +13,10 @@
 // limitations under the License.
 
 import React from 'react'
-import { defineMessages } from 'react-intl'
 
 import Input from '@ttn-lw/components/input'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
-
-const m = defineMessages({
-  generate: 'Generate end device address',
-})
 
 const DevAddrInput = props => {
   const {
@@ -40,37 +35,20 @@ const DevAddrInput = props => {
     onGenerate,
     generatedError,
     generatedLoading,
-    generatedValue,
     ...rest
   } = props
-
-  const action = {
-    icon: 'autorenew',
-    title: m.generate,
-    type: 'button',
-    disabled: fieldLoading || disabled || generatedLoading,
-    onClick: onGenerate,
-    raw: true,
-  }
 
   const showLoading = fieldLoading || generatedLoading
   const showError = fieldError
   // Always show field validation error first.
   const showWarning = fieldError ? false : Boolean(warning) && generatedError
 
-  React.useEffect(() => {
-    if (Boolean(generatedValue)) {
-      onChange(generatedValue, true)
-    }
-  }, [generatedValue, onChange])
-
   return (
-    <Input
+    <Input.Generate
       type="byte"
       id={id}
       min={4}
       max={4}
-      action={action}
       className={className}
       name={name}
       onChange={onChange}
@@ -82,6 +60,8 @@ const DevAddrInput = props => {
       loading={showLoading}
       disabled={disabled}
       autoFocus={autoFocus}
+      onGenerateValue={onGenerate}
+      mayGenerateValue={!fieldLoading && !disabled && !generatedLoading}
       {...rest}
     />
   )
@@ -94,7 +74,6 @@ DevAddrInput.propTypes = {
   error: PropTypes.bool,
   generatedError: PropTypes.bool.isRequired,
   generatedLoading: PropTypes.bool.isRequired,
-  generatedValue: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
   loading: PropTypes.bool,
   name: PropTypes.string.isRequired,
