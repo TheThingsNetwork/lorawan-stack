@@ -109,6 +109,7 @@ export default defineMessages({
   componentJs: 'Join Server',
   componentNs: 'Network Server',
   componentQrg: 'QR Code Generator',
+  confirm: 'Confirm',
   confirmPassword: 'Confirm password',
   connected: 'Connected',
   connecting: 'Connecting',
@@ -356,6 +357,7 @@ export default defineMessages({
   requireAuthenticatedConnection: 'Require authenticated connection',
   requireAuthenticatedConnectionDescription:
     'Controls whether this gateway may only connect if it uses an authenticated Basic Station or MQTT connection',
+  reset: 'Reset',
   resetsFCnt: 'Resets frame counters',
   resetsJoinNonces: 'Resets join nonces',
   resetWarning: 'Reseting is insecure and makes your end device susceptible for replay attacks',
