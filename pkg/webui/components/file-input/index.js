@@ -44,6 +44,7 @@ const defaultDataTransform = content => content.replace(/^.*;base64,/, '')
 export default class FileInput extends Component {
   static propTypes = {
     accept: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
+    center: PropTypes.bool,
     changeMessage: PropTypes.message,
     /** `dataTransform` is a marshaler used to transform the raw field value into.
      * a value matching the field schema. */
@@ -65,6 +66,7 @@ export default class FileInput extends Component {
 
   static defaultProps = {
     accept: undefined,
+    center: false,
     dataTransform: defaultDataTransform,
     disabled: false,
     image: false,
@@ -135,7 +137,7 @@ export default class FileInput extends Component {
     const { onChange, dataTransform } = this.props
 
     this.fileInputRef.current.value = null
-    this.setState({ filename: '', error: undefined })
+    this.setState({ filename: '', error: undefined, isLarger: false })
     onChange(dataTransform(''), true)
   }
 
@@ -191,11 +193,12 @@ export default class FileInput extends Component {
       imageClassName,
       largeFileWarningMessage,
       warningSize,
+      center,
     } = this.props
     const warningThreshold = humanFileSize(warningSize)
 
     return (
-      <div className={style.container}>
+      <div className={classnames(style.container, { [style.center]: center })}>
         {this.state.isLarger && (
           <Notification
             className={style.notification}
@@ -215,7 +218,10 @@ export default class FileInput extends Component {
               ref={this.imageRef}
             />
           )}
-          <ButtonGroup>
+          <ButtonGroup
+            align={center ? 'center' : 'start'}
+            className={classnames({ [style.buttonGroupCenter]: center })}
+          >
             <Button
               type="button"
               aria-controls="fileupload"
