@@ -68,6 +68,16 @@ export const LORAWAN_PHY_VERSIONS = Object.freeze([
   RP002_V1_0_3,
 ])
 
+export const LORAWAN_VERSION_PAIRS = {
+  100: [PHY_V1_0],
+  101: [PHY_V1_0_1],
+  102: [PHY_V1_0_2_REV_A, PHY_V1_0_2_REV_B],
+  103: [PHY_V1_0_3_REV_A],
+  104: LORAWAN_PHY_VERSIONS,
+  110: [PHY_V1_1_REV_A, PHY_V1_1_REV_B, RP002_V1_0_0, RP002_V1_0_1, RP002_V1_0_2, RP002_V1_0_3],
+  0: LORAWAN_PHY_VERSIONS,
+}
+
 export const MAC_V1_0 = { value: 'MAC_V1_0', label: 'LoRaWAN Specification 1.0.0' }
 export const MAC_V1_0_1 = { value: 'MAC_V1_0_1', label: 'LoRaWAN Specification 1.0.1' }
 export const MAC_V1_0_2 = { value: 'MAC_V1_0_2', label: 'LoRaWAN Specification 1.0.2' }
