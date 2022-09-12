@@ -150,6 +150,7 @@ const NetworkServerForm = React.memo(props => {
               {
                 ...values,
                 mac_settings: {
+                  ...settings,
                   ...values.mac_settings,
                   // To use `adr_margin` as initial value of `adr.dynamic.margin`.
                   // And to make sure that, if there is already a value set for `adr`, it is not overwritten
@@ -162,7 +163,6 @@ const NetworkServerForm = React.memo(props => {
                           },
                         }
                       : values.mac_settings.adr,
-                  ...settings,
                 },
               },
               { context: validationContext },
