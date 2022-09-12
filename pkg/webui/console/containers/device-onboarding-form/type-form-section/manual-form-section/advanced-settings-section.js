@@ -36,7 +36,7 @@ import { getBackendErrorName, isBackend } from '@ttn-lw/lib/errors/utils'
 import getHostFromUrl from '@ttn-lw/lib/host-from-url'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
-import { ACTIVATION_MODES, hasCFListTypeChMask } from '@console/lib/device-utils'
+import { ACTIVATION_MODES } from '@console/lib/device-utils'
 import { checkFromState } from '@account/lib/feature-checks'
 import { mayEditApplicationDeviceKeys } from '@console/lib/feature-checks'
 
@@ -56,8 +56,6 @@ const m = defineMessages({
   classBandC: 'Class B and class C',
   skipJsRegistration: 'Skip registration on Join Server',
   multicastClassCapabilities: 'LoRaWAN class for multicast downlinks',
-  factoryFreqWarning:
-    'In LoRaWAN, factory preset frequencies are only supported for bands with a CFList type of frequencies',
   register: 'Register manually',
   macSettingsError:
     'There was an error and the default MAC settings for the <code>{freqPlan}</code> frequency plan could not be loaded',
@@ -198,14 +196,6 @@ const AdvancedSettingsSection = () => {
     Boolean(frequency_plan_id) && Boolean(lorawan_phy_version) && Boolean(lorawan_version)
   // Disallow using default settings when there is a required field within.
   const mayChangeToDefaultSettings = !((isABP || isMulticast) && isClassB)
-
-  // The technical difference between bands that do support factory preset frequencies
-  // and bands that do not support them, is that the former uses a CFList type of Frequencies,
-  // and the latter uses a CFList type of ChMask (channel mask).
-  // When there is a channel mask, the frequencies aren't configured by frequency in Hertz,
-  // but by index. The factory preset frequencies is really the frequencies in Hertz,
-  // so it requires bands with a CFList type of Frequencies.
-  const disableFactoryPresetFreq = hasCFListTypeChMask(frequency_plan_id)
 
   const dispatch = useDispatch()
 
@@ -532,9 +522,7 @@ const AdvancedSettingsSection = () => {
           {!isOTAA && (
             <Form.Field
               indexAsKey
-              disabled={disableFactoryPresetFreq}
               name="mac_settings.factory_preset_frequencies"
-              description={disableFactoryPresetFreq ? m.factoryFreqWarning : undefined}
               component={KeyValueMap}
               title={messages.factoryPresetFreqTitle}
               addMessage={messages.freqAdd}
