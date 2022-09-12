@@ -1,6 +1,6 @@
 {
   "brands": [
-    { "brand_id": "test-brand-otaa", "name": "Test Brand OTAA" },
+    { "brand_id": "test-brand-otaa", "name": "Test Brand OTAA", "lora_alliance_vendor_id": 428  },
     { "brand_id": "test-brand-abp", "name": "Test Brand ABP" }
   ]
 }

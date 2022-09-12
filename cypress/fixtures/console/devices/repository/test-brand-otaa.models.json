@@ -87,6 +87,27 @@
         }
       ],
       "key_provisioning": ["custom"]
+    },
+    {
+      "brand_id": "test-brand-otaa",
+      "model_id": "test-model4",
+      "name": "Test brand OTAA device",
+      "description": "This model has several values for region, hardware and firmware versions. It should not be possible to register an end device based on this model.",
+      "hardware_versions": [{ "version": "1.0" }],
+      "firmware_versions": [
+        {
+          "version": "1.0",
+          "supported_hardware_versions": ["1.0"],
+          "profiles": {
+            "EU_863_870": {
+              "profile_id": "test-brand-otaa-model4-868",
+              "lorawan_certified": true,
+              "codec_id": "test-brand-otaa-model4-codec"
+            }
+          }
+        }
+      ],
+      "key_provisioning": ["custom"]
     }
   ]
 }
