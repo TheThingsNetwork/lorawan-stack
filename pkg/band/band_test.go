@@ -734,3 +734,33 @@ func TestChannelsWellDefined(t *testing.T) {
 		}
 	}
 }
+
+func TestSubBandsWellDefined(t *testing.T) {
+	t.Parallel()
+
+	for name, versions := range All {
+		for version, b := range versions {
+			b := b
+			t.Run(fmt.Sprintf("%v/%v", name, version), func(t *testing.T) {
+				t.Parallel()
+
+				checkSubBand := func(ch Channel) bool {
+					for _, sb := range b.SubBands {
+						if sb.MinFrequency <= ch.Frequency && ch.Frequency <= sb.MaxFrequency {
+							return true
+						}
+					}
+					return false
+				}
+
+				a := assertions.New(t)
+				for _, ch := range b.UplinkChannels {
+					a.So(checkSubBand(ch), should.BeTrue)
+				}
+				for _, ch := range b.DownlinkChannels {
+					a.So(checkSubBand(ch), should.BeTrue)
+				}
+			})
+		}
+	}
+}

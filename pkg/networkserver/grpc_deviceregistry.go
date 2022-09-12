@@ -1742,9 +1742,36 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 					return nil
 				}
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
-					if phy.MaxUplinkChannels != phy.MaxDownlinkChannels {
-						// TODO: Allow this (https://github.com/TheThingsNetwork/lorawan-stack/issues/2269).
-						return newInvalidFieldValueError(field)
+					switch phy.CFListType {
+					case ttnpb.CFListType_FREQUENCIES:
+						// Factory preset frequencies in bands which provide frequencies as part of the CFList
+						// are interpreted as being used both for uplinks and downlinks.
+						for _, frequency := range dev.MacSettings.FactoryPresetFrequencies {
+							inSubBand := false
+							for _, sb := range phy.SubBands {
+								if sb.MinFrequency <= frequency && frequency <= sb.MaxFrequency {
+									inSubBand = true
+									break
+								}
+							}
+							if !inSubBand {
+								return newInvalidFieldValueError(field)
+							}
+						}
+					case ttnpb.CFListType_CHANNEL_MASKS:
+						// Factory preset frequencies in bands which provide channel masks as part of the CFList
+						// are interpreted as enabling explicit uplink channels.
+						uplinkChannels := make(map[uint64]struct{}, len(phy.UplinkChannels))
+						for _, ch := range phy.UplinkChannels {
+							uplinkChannels[ch.Frequency] = struct{}{}
+						}
+						for _, frequency := range dev.MacSettings.FactoryPresetFrequencies {
+							if _, ok := uplinkChannels[frequency]; !ok {
+								return newInvalidFieldValueError(field)
+							}
+						}
+					default:
+						panic("unreachable")
 					}
 					return nil
 				})
