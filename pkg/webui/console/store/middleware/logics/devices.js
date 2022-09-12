@@ -32,6 +32,15 @@ const m = defineMessage({
   joinSuccess: 'The device has successfully joined the network',
 })
 
+const createDeviceLogic = createRequestLogic({
+  type: devices.CREATE_DEVICE,
+  process: async ({ action }) => {
+    const { appId, device } = action.payload
+
+    return await tts.Applications.Devices.create(appId, device)
+  },
+})
+
 const getDeviceLogic = createRequestLogic({
   type: devices.GET_DEV,
   process: async ({ action }, dispatch) => {
@@ -154,6 +163,7 @@ const getDeviceSessionLogic = createLogic({
 })
 
 export default [
+  createDeviceLogic,
   getDevicesListLogic,
   getDeviceTemplateFormatsLogic,
   convertTemplateLogic,

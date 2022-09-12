@@ -42,6 +42,12 @@ import {
 
 export const SHARED_NAME = END_DEVICE
 
+export const CREATE_DEVICE_BASE = 'CREATE_DEVICE'
+export const [
+  { request: CREATE_DEVICE, success: CREATE_DEVICE_SUCCESS, failure: CREATE_DEVICE_FAILURE },
+  { request: createDevice, success: createDeviceSuccess, failure: createDeviceFailure },
+] = createRequestActions(CREATE_DEVICE_BASE, (appId, device) => ({ appId, device }))
+
 export const GET_DEV_BASE = 'GET_END_DEVICE'
 export const [
   { request: GET_DEV, success: GET_DEV_SUCCESS, failure: GET_DEV_FAILURE },
