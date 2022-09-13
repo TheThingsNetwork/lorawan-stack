@@ -16,6 +16,7 @@ package grpc
 
 import (
 	"context"
+	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
@@ -215,6 +216,9 @@ func (s *impl) SimulateUplink(ctx context.Context, up *ttnpb.ApplicationUp) (*pb
 		log.FromContext(ctx).WithError(err).Debug("Failed to determine if the payload crypto should be skipped")
 	} else if skip {
 		return nil, errPayloadCryptoSkipped.New()
+	}
+	if up.ReceivedAt == nil {
+		up.ReceivedAt = ttnpb.ProtoTimePtr(time.Now())
 	}
 	up.Simulated = true
 	ids, err := s.getIdentifiers(ctx, up.EndDeviceIds)
