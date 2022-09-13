@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -196,22 +196,22 @@ const Footer = ({
           safe={safe}
           link={documentationLink ? `${documentationLink}/whats-new/` : undefined}
         >
-          v{process.env.VERSION}
+          v{process.env.VERSION} ({process.env.REVISION})
         </FooterSection>
         {documentationLink && (
           <FooterSection className={style.documentation} safe={safe} link={documentationLink}>
             <Message content={sharedMessages.documentation} />
           </FooterSection>
         )}
+        {statusPageLink && (
+          <FooterSection link={statusPageLink} safe={safe}>
+            <Message content={sharedMessages.statusPage} />
+          </FooterSection>
+        )}
         {supportLink && (
           <FooterSection link={supportLink} safe={safe} primary>
             <Icon icon="contact_support" textPaddedRight nudgeDown />
             <Message content={sharedMessages.getSupport} />
-          </FooterSection>
-        )}
-        {statusPageLink && (
-          <FooterSection link={statusPageLink} safe={safe} primary>
-            <Message content={sharedMessages.statusPage} />
           </FooterSection>
         )}
       </div>
