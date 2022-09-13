@@ -350,9 +350,12 @@ func (*host) decodeUplink(
 		if err != nil {
 			return errOutput.WithCause(err)
 		}
-		msg.NormalizedPayload = make([]*pbtypes.Struct, len(normalizedMeasurements))
-		for i, measurement := range normalizedMeasurements {
-			msg.NormalizedPayload[i] = measurement.Valid
+		msg.NormalizedPayload = make([]*pbtypes.Struct, 0, len(normalizedMeasurements))
+		for _, measurement := range normalizedMeasurements {
+			if len(measurement.Valid.GetFields()) == 0 {
+				continue
+			}
+			msg.NormalizedPayload = append(msg.NormalizedPayload, measurement.Valid)
 		}
 		msg.NormalizedPayloadWarnings = make([]string, 0, len(normalized.Warnings))
 		msg.NormalizedPayloadWarnings = append(msg.NormalizedPayloadWarnings, normalized.Warnings...)
@@ -366,9 +369,12 @@ func (*host) decodeUplink(
 		}
 		normalizedMeasurements, err := normalizedpayload.Parse(normalizedPayload)
 		if err == nil {
-			msg.NormalizedPayload = make([]*pbtypes.Struct, len(normalizedMeasurements))
-			for i, measurement := range normalizedMeasurements {
-				msg.NormalizedPayload[i] = measurement.Valid
+			msg.NormalizedPayload = make([]*pbtypes.Struct, 0, len(normalizedMeasurements))
+			for _, measurement := range normalizedMeasurements {
+				if len(measurement.Valid.GetFields()) == 0 {
+					continue
+				}
+				msg.NormalizedPayload = append(msg.NormalizedPayload, measurement.Valid)
 			}
 			msg.NormalizedPayloadWarnings = appendValidationErrors(msg.NormalizedPayloadWarnings, normalizedMeasurements)
 		}

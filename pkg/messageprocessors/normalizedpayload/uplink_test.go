@@ -114,6 +114,15 @@ func TestUplink(t *testing.T) {
 			},
 		},
 		{
+			name: "no fields",
+			normalizedPayload: []*pbtypes.Struct{
+				{},
+			},
+			expected: []normalizedpayload.Measurement{
+				{},
+			},
+		},
+		{
 			name: "below absolute zero",
 			normalizedPayload: []*pbtypes.Struct{
 				{
