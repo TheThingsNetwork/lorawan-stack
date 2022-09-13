@@ -35,7 +35,7 @@ import {
 
 const m = defineMessages({
   clientId: 'Client ID',
-  tableTitle: 'OAuth Client Authorizations',
+  tableTitle: 'OAuth client authorizations',
 })
 
 const getItemPathPrefix = item => `/${item.client_ids.client_id}`
@@ -76,7 +76,7 @@ const OAuthClientAuthorizationsTable = props => {
     [],
   )
 
-  const getItems = React.useCallback(() => getAuthorizationsList(userId, []), [userId])
+  const getItems = React.useCallback(filters => getAuthorizationsList(userId, filters), [userId])
 
   return (
     <FetchTable
@@ -87,7 +87,6 @@ const OAuthClientAuthorizationsTable = props => {
       baseDataSelector={baseDataSelector}
       getItemPathPrefix={getItemPathPrefix}
       tableTitle={<Message content={m.tableTitle} />}
-      handlesSorting
       clickable
       {...rest}
     />

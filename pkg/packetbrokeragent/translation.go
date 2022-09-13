@@ -57,18 +57,18 @@ var toPBRegion = map[string]packetbroker.Region{
 	band.ISM_2400:        packetbroker.Region_WW_2G4,
 }
 
-func fromPBDataRate(dataRate *packetbroker.DataRate) (dr *ttnpb.DataRate, codingRate string, ok bool) {
+func fromPBDataRate(dataRate *packetbroker.DataRate) (dr *ttnpb.DataRate, ok bool) {
 	switch mod := dataRate.GetModulation().(type) {
 	case *packetbroker.DataRate_Lora:
-		// TODO: Set coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466)
 		return &ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_Lora{
 				Lora: &ttnpb.LoRaDataRate{
 					SpreadingFactor: mod.Lora.SpreadingFactor,
 					Bandwidth:       mod.Lora.Bandwidth,
+					CodingRate:      mod.Lora.CodingRate,
 				},
 			},
-		}, mod.Lora.CodingRate, true
+		}, true
 	case *packetbroker.DataRate_Fsk:
 		return &ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_Fsk{
@@ -76,7 +76,7 @@ func fromPBDataRate(dataRate *packetbroker.DataRate) (dr *ttnpb.DataRate, coding
 					BitRate: mod.Fsk.BitsPerSecond,
 				},
 			},
-		}, "", true
+		}, true
 	case *packetbroker.DataRate_Lrfhss:
 		return &ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_Lrfhss{
@@ -86,13 +86,13 @@ func fromPBDataRate(dataRate *packetbroker.DataRate) (dr *ttnpb.DataRate, coding
 					CodingRate:            mod.Lrfhss.CodingRate,
 				},
 			},
-		}, mod.Lrfhss.CodingRate, true
+		}, true
 	default:
-		return nil, "", false
+		return nil, false
 	}
 }
 
-func toPBDataRate(dataRate *ttnpb.DataRate, codingRate string) (*packetbroker.DataRate, bool) {
+func toPBDataRate(dataRate *ttnpb.DataRate) (*packetbroker.DataRate, bool) {
 	if dataRate == nil {
 		return nil, false
 	}
@@ -103,8 +103,7 @@ func toPBDataRate(dataRate *ttnpb.DataRate, codingRate string) (*packetbroker.Da
 				Lora: &packetbroker.LoRaDataRate{
 					SpreadingFactor: mod.Lora.SpreadingFactor,
 					Bandwidth:       mod.Lora.Bandwidth,
-					// TODO: Consider getting coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466)
-					CodingRate: codingRate,
+					CodingRate:      mod.Lora.CodingRate,
 				},
 			},
 		}, true
@@ -287,15 +286,14 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 				Plain: msg.Message.RawPayload,
 			},
 		},
-		Frequency:  msg.Message.Settings.Frequency,
-		CodingRate: msg.Message.Settings.CodingRate,
+		Frequency: msg.Message.Settings.Frequency,
 	}
 
 	var ok bool
 	if up.GatewayRegion, ok = toPBRegion[msg.BandId]; !ok {
 		return nil, errUnknownBand.WithAttributes("band_id", msg.BandId)
 	}
-	if up.DataRate, ok = toPBDataRate(msg.Message.Settings.DataRate, msg.Message.Settings.CodingRate); !ok {
+	if up.DataRate, ok = toPBDataRate(msg.Message.Settings.DataRate); !ok {
 		return nil, errUnknownDataRate.New()
 	}
 
@@ -442,7 +440,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 var errWrapUplinkTokens = errors.DefineAborted("wrap_uplink_tokens", "wrap uplink tokens")
 
 func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, receivedAt time.Time, includeHops bool) (*ttnpb.UplinkMessage, error) {
-	dataRate, codingRate, ok := fromPBDataRate(msg.Message.DataRate)
+	dataRate, ok := fromPBDataRate(msg.Message.DataRate)
 	if !ok {
 		return nil, errUnknownDataRate.New()
 	}
@@ -475,9 +473,8 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 	up := &ttnpb.UplinkMessage{
 		RawPayload: msg.Message.PhyPayload.GetPlain(),
 		Settings: &ttnpb.TxSettings{
-			DataRate:   dataRate,
-			Frequency:  msg.Message.Frequency,
-			CodingRate: codingRate,
+			DataRate:  dataRate,
+			Frequency: msg.Message.Frequency,
 		},
 		ReceivedAt:     ttnpb.ProtoTimePtr(receivedAt),
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
@@ -634,10 +631,6 @@ func toPBDownlink(ctx context.Context, msg *ttnpb.DownlinkMessage, fps frequency
 	if err != nil {
 		return nil, nil, errFrequencyPlanNotConfigured.WithAttributes("id", req.FrequencyPlanId)
 	}
-	phy, err := band.GetLatest(fp.BandID)
-	if err != nil {
-		return nil, nil, errUnknownBand.WithCause(err).WithAttributes("band_id", fp.BandID)
-	}
 
 	down := &packetbroker.DownlinkMessage{
 		PhyPayload: msg.RawPayload,
@@ -658,15 +651,7 @@ func toPBDownlink(ctx context.Context, msg *ttnpb.DownlinkMessage, fps frequency
 		if rx.frequency == 0 || rx.dataRate == nil {
 			continue
 		}
-		// TODO: Get coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466)
-		var codingRate string
-		switch mod := rx.dataRate.Modulation.(type) {
-		case *ttnpb.DataRate_Lora:
-			codingRate = phy.LoRaCodingRate
-		case *ttnpb.DataRate_Lrfhss:
-			codingRate = mod.Lrfhss.CodingRate
-		}
-		pbDR, ok := toPBDataRate(rx.dataRate, codingRate)
+		pbDR, ok := toPBDataRate(rx.dataRate)
 		if !ok {
 			return nil, nil, errIncompatibleDataRate.WithAttributes("rx_window", i+1)
 		}
@@ -745,7 +730,7 @@ func fromPBDownlink(ctx context.Context, msg *packetbroker.DownlinkMessage, rece
 		if rx.settings == nil {
 			continue
 		}
-		dr, _, ok := fromPBDataRate(rx.settings.DataRate)
+		dr, ok := fromPBDataRate(rx.settings.DataRate)
 		if !ok {
 			return "", nil, errIncompatibleDataRate.WithAttributes("rx_window", i+1)
 		}

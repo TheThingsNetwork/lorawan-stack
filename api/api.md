@@ -1280,7 +1280,7 @@ The NsAs service connects a Network Server to an Application Server.
 
 | Field | Validations |
 | ----- | ----------- |
-| `type` | <p>`string.in`: `[ uplink_message join_accept downlink_ack downlink_nack downlink_sent downlink_failed downlink_queued downlink_queue_invalidated location_solved service_data]`</p> |
+| `type` | <p>`string.in`: `[ uplink_message uplink_normalized join_accept downlink_ack downlink_nack downlink_sent downlink_failed downlink_queued downlink_queue_invalidated location_solved service_data]`</p> |
 | `order` | <p>`string.in`: `[ -received_at received_at]`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationUpStorage">Service `ApplicationUpStorage`</a>
@@ -5924,6 +5924,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 | ----- | ---- | ----- | ----------- |
 | `bandwidth` | [`uint32`](#uint32) |  | Bandwidth (Hz). |
 | `spreading_factor` | [`uint32`](#uint32) |  |  |
+| `coding_rate` | [`string`](#string) |  |  |
 
 ### <a name="ttn.lorawan.v3.MACCommand">Message `MACCommand`</a>
 
@@ -6471,7 +6472,6 @@ On downlink, this is a scheduled transmission.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `data_rate` | [`DataRate`](#ttn.lorawan.v3.DataRate) |  | Data rate. |
-| `coding_rate` | [`string`](#string) |  | LoRa coding rate. |
 | `frequency` | [`uint64`](#uint64) |  | Frequency (Hz). |
 | `enable_crc` | [`bool`](#bool) |  | Send a CRC in the packet; only on uplink; on downlink, CRC should not be enabled. |
 | `timestamp` | [`uint32`](#uint32) |  | Timestamp of the gateway concentrator when the uplink message was received, or when the downlink message should be transmitted (microseconds). On downlink, set timestamp to 0 and time to null to use immediate scheduling. |

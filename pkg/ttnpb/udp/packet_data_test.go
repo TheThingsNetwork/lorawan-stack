@@ -19,12 +19,14 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/datarate"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func TestStatusPacket(t *testing.T) {
+	t.Parallel()
 	statusPacket := `{
 		"stat":{
 		   "time":"2017-06-08 09:40:42 GMT",
@@ -61,6 +63,7 @@ func TestStatusPacket(t *testing.T) {
 }
 
 func TestUplinkPacket(t *testing.T) {
+	t.Parallel()
 	uplinkPacket := `{
 		"rxpk":[
 		   {
@@ -102,10 +105,11 @@ func TestUplinkPacket(t *testing.T) {
 			Lora: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 7,
 				Bandwidth:       125000,
+				CodingRate:      band.Cr4_5,
 			},
 		},
 	}})
-	a.So(uplink.CodR, should.Equal, "4/5")
+	a.So(uplink.CodR, should.Equal, band.Cr4_5)
 	a.So(uplink.LSNR, should.AlmostEqual, -12.0)
 	a.So(uplink.RSSI, should.Equal, -112)
 
@@ -151,16 +155,17 @@ func TestUplinkPacket(t *testing.T) {
 			Lrfhss: &ttnpb.LRFHSSDataRate{
 				ModulationType:        0,
 				OperatingChannelWidth: 123000,
-				CodingRate:            "4/7",
+				CodingRate:            band.Cr4_7,
 			},
 		},
 	}})
-	a.So(uplink.CodR, should.Equal, "4/7")
+	a.So(uplink.CodR, should.Equal, band.Cr4_7)
 	a.So(uplink.LSNR, should.AlmostEqual, -12.0)
 	a.So(uplink.RSSI, should.Equal, -112)
 }
 
 func TestDownlinkPacket(t *testing.T) {
+	t.Parallel()
 	downlinkPacket := `{"txpk":
 		{
 		"imme":true,
@@ -195,9 +200,10 @@ func TestDownlinkPacket(t *testing.T) {
 			Lora: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 11,
 				Bandwidth:       125000,
+				CodingRate:      band.Cr4_6,
 			},
 		},
 	}})
-	a.So(tx.CodR, should.Equal, "4/6")
+	a.So(tx.CodR, should.Equal, band.Cr4_6)
 	a.So(tx.IPol, should.Equal, false)
 }

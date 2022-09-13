@@ -23,10 +23,13 @@ class Sessions {
     autoBind(this)
   }
 
-  async getAllSessions(userId) {
-    const result = await this._api.UserSessionRegistry.List({
-      routeParams: { 'user_ids.user_id': userId },
-    })
+  async getAllSessions(userId, params) {
+    const result = await this._api.UserSessionRegistry.List(
+      {
+        routeParams: { 'user_ids.user_id': userId },
+      },
+      params,
+    )
 
     return Marshaler.payloadListResponse('sessions', result)
   }

@@ -41,6 +41,7 @@ message GetStoredApplicationUpRequest {
   string type = 3 [(validate.rules).string = { in: [
     "",
     "uplink_message",
+    "uplink_normalized",
     "join_accept",
     "downlink_ack",
     "downlink_nack",

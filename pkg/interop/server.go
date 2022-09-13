@@ -24,6 +24,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/fillcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
@@ -222,7 +223,7 @@ func (s *Server) handle() http.Handler {
 		}
 		ctx, err = senderAuthenticator.Authenticate(ctx, r, data)
 		if err != nil {
-			logger.WithError(err).Warn("Failed to authenticate")
+			logRPCError(logger, err, "Failed to authenticate")
 			writeError(w, r, header, err)
 			return
 		}
@@ -263,11 +264,23 @@ func (s *Server) handle() http.Handler {
 			return
 		}
 		if err != nil {
-			logger.WithError(err).Warn("Failed to handle request")
+			logRPCError(logger, err, "Failed to handle request")
 			writeError(w, r, header, err)
 			return
 		}
 
 		json.NewEncoder(w).Encode(ans) //nolint:errcheck
 	})
+}
+
+func logRPCError(logger log.Interface, err error, msg string) {
+	logger = logger.WithError(err)
+	var printLog func(args ...interface{})
+	switch {
+	case errors.IsNotFound(err), errors.IsInvalidArgument(err), errors.IsCanceled(err):
+		printLog = logger.Debug
+	default:
+		printLog = logger.Warn
+	}
+	printLog(msg)
 }

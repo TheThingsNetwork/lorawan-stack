@@ -29,6 +29,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/gorilla/websocket"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
@@ -868,11 +869,11 @@ func TestTraffic(t *testing.T) {
 					Snr:         9.25,
 				}},
 				Settings: &ttnpb.TxSettings{
-					Frequency:  868300000,
-					CodingRate: "4/5",
+					Frequency: 868300000,
 					DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
+						CodingRate:      band.Cr4_5,
 					}}},
 				},
 			},
@@ -930,13 +931,13 @@ func TestTraffic(t *testing.T) {
 					},
 				},
 				Settings: &ttnpb.TxSettings{
-					Frequency:  868300000,
-					Time:       ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
-					Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
-					CodingRate: "4/5",
+					Frequency: 868300000,
+					Time:      ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
+					Timestamp: (uint32)(12666373963464220 & 0xFFFFFFFF),
 					DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
+						CodingRate:      band.Cr4_5,
 					}}},
 				},
 			},
@@ -971,6 +972,7 @@ func TestTraffic(t *testing.T) {
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 7,
 									Bandwidth:       125000,
+									CodingRate:      band.Cr4_5,
 								},
 							},
 						},
@@ -1077,6 +1079,7 @@ func TestTraffic(t *testing.T) {
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 7,
 									Bandwidth:       125000,
+									CodingRate:      band.Cr4_5,
 								},
 							},
 						},
@@ -1470,6 +1473,7 @@ func TestRTT(t *testing.T) {
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 7,
 									Bandwidth:       125000,
+									CodingRate:      band.Cr4_5,
 								},
 							},
 						},

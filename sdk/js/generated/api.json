@@ -2996,6 +2996,7 @@
                     "value": [
                       "",
                       "uplink_message",
+                      "uplink_normalized",
                       "join_accept",
                       "downlink_ack",
                       "downlink_nack",
@@ -28349,6 +28350,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "coding_rate",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -30815,18 +30828,6 @@
                   }
                 ]
               }
-            },
-            {
-              "name": "coding_rate",
-              "description": "LoRa coding rate.",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
             },
             {
               "name": "frequency",

@@ -30,7 +30,7 @@ import { deleteClient, updateClient } from '@account/store/actions/clients'
 const m = defineMessages({
   deleteSuccess: 'OAuth client deleted',
   deleteFail: 'There was an error and the OAuth client could not be deleted',
-  updateSuccess: 'OAuth Client updated',
+  updateSuccess: 'OAuth client updated',
   updateFailure: 'There was an error updating this client',
 })
 

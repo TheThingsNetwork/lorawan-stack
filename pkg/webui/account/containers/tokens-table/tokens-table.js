@@ -16,6 +16,8 @@ import React from 'react'
 import { defineMessages } from 'react-intl'
 import { Col, Row, Container } from 'react-grid-system'
 
+import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
+
 import toast from '@ttn-lw/components/toast'
 import Button from '@ttn-lw/components/button'
 import SafeInspector from '@ttn-lw/components/safe-inspector'
@@ -24,12 +26,13 @@ import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
+import Message from '@ttn-lw/lib/components/message'
 import DateTime from '@ttn-lw/lib/components/date-time'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { getAuthorizationTokensList } from '@account/store/actions/authorizations'
+import { getAccessTokensList } from '@account/store/actions/authorizations'
 
 import {
   selectTokens,
@@ -38,6 +41,7 @@ import {
 } from '@account/store/selectors/authorizations'
 
 const m = defineMessages({
+  tableTitle: 'Access tokens',
   deleteSuccess: 'Access token invalidated',
   deleteFail: 'There was an error and the access token could not be invalidated',
   deleteButton: 'Invalidate this access token',
@@ -45,6 +49,7 @@ const m = defineMessages({
   deleteAllFail: 'There was an error and the access tokens could not be invalidated',
   deleteAllButton: 'Invalidate all access tokens',
   expires: 'Expires',
+  accessTokens: 'Access tokens',
 })
 
 const TokensTable = props => {
@@ -52,8 +57,11 @@ const TokensTable = props => {
     props
 
   useBreadcrumbs(
-    'client-authorizations.single.tokens',
-    <Breadcrumb path={`/client-authorizations/${clientId}/tokens`} content={'tokens'} />,
+    'client-authorizations.single.access-tokens',
+    <Breadcrumb
+      path={`/client-authorizations/${clientId}/access-tokens`}
+      content={m.accessTokens}
+    />,
   )
 
   const handleDeleteToken = React.useCallback(
@@ -126,7 +134,6 @@ const TokensTable = props => {
         name: 'expires_at',
         displayName: m.expires,
         width: 20,
-        sortable: true,
         render: expires_at => <DateTime.Relative value={expires_at} />,
       },
       {
@@ -162,7 +169,7 @@ const TokensTable = props => {
   )
 
   const getItems = React.useCallback(
-    () => getAuthorizationTokensList(userId, clientId, []),
+    filters => getAccessTokensList(userId, clientId, filters),
     [userId, clientId],
   )
 
@@ -186,8 +193,9 @@ const TokensTable = props => {
             headers={headers}
             getItemsAction={getItems}
             baseDataSelector={baseDataSelector}
+            pageSize={PAGE_SIZES.SMALL}
             actionItems={deleteAllButton}
-            handlesSorting
+            tableTitle={<Message content={m.tableTitle} />}
             {...rest}
           />
         </Col>

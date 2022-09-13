@@ -23,10 +23,13 @@ class Authorizations {
     autoBind(this)
   }
 
-  async getAllAuthorizations(userId) {
-    const result = await this._api.OAuthAuthorizationRegistry.List({
-      routeParams: { 'user_ids.user_id': userId },
-    })
+  async getAllAuthorizations(userId, params) {
+    const result = await this._api.OAuthAuthorizationRegistry.List(
+      {
+        routeParams: { 'user_ids.user_id': userId },
+      },
+      params,
+    )
 
     return Marshaler.payloadListResponse('authorizations', result)
   }
@@ -39,17 +42,24 @@ class Authorizations {
     return Marshaler.payloadSingleResponse(result)
   }
 
-  async getAllTokens(userId, client_id) {
-    const result = await this._api.OAuthAuthorizationRegistry.ListTokens({
-      routeParams: { 'user_ids.user_id': userId, 'client_ids.client_id': client_id },
-    })
+  async getAllTokens(userId, client_id, params) {
+    const result = await this._api.OAuthAuthorizationRegistry.ListTokens(
+      {
+        routeParams: { 'user_ids.user_id': userId, 'client_ids.client_id': client_id },
+      },
+      params,
+    )
 
     return Marshaler.payloadListResponse('tokens', result)
   }
 
   async deleteToken(userId, client_id, id) {
     const result = await this._api.OAuthAuthorizationRegistry.DeleteToken({
-      routeParams: { 'user_ids.user_id': userId, 'client_ids.client_id': client_id, id },
+      routeParams: {
+        'user_ids.user_id': userId,
+        'client_ids.client_id': client_id,
+        id,
+      },
     })
 
     return Marshaler.payloadSingleResponse(result)

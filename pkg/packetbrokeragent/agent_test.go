@@ -28,6 +28,7 @@ import (
 	"github.com/smartystreets/assertions"
 	mappingpb "go.packetbroker.org/api/mapping/v2"
 	packetbroker "go.packetbroker.org/api/v3"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
@@ -151,11 +152,11 @@ func TestForwarder(t *testing.T) {
 									Lora: &ttnpb.LoRaDataRate{
 										SpreadingFactor: 7,
 										Bandwidth:       125000,
+										CodingRate:      band.Cr4_5,
 									},
 								},
 							},
-							CodingRate: "4/5",
-							Frequency:  869525000,
+							Frequency: 869525000,
 						},
 					},
 					BandId: "EU_863_870",
@@ -174,9 +175,8 @@ func TestForwarder(t *testing.T) {
 							},
 						},
 						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
-						DataRate:             packetbroker.NewLoRaDataRate(7, 125000, "4/5"),
+						DataRate:             packetbroker.NewLoRaDataRate(7, 125000, band.Cr4_5),
 						Frequency:            869525000,
-						CodingRate:           "4/5",
 						GatewayMetadata: &packetbroker.UplinkMessage_GatewayMetadata{
 							Teaser: &packetbroker.GatewayMetadataTeaser{
 								Value: &packetbroker.GatewayMetadataTeaser_Terrestrial_{
@@ -271,11 +271,11 @@ func TestForwarder(t *testing.T) {
 									Lora: &ttnpb.LoRaDataRate{
 										SpreadingFactor: 9,
 										Bandwidth:       125000,
+										CodingRate:      band.Cr4_5,
 									},
 								},
 							},
-							CodingRate: "4/5",
-							Frequency:  868300000,
+							Frequency: 868300000,
 						},
 					},
 					BandId: "EU_863_870",
@@ -294,9 +294,8 @@ func TestForwarder(t *testing.T) {
 							},
 						},
 						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
-						DataRate:             packetbroker.NewLoRaDataRate(9, 125000, "4/5"),
+						DataRate:             packetbroker.NewLoRaDataRate(9, 125000, band.Cr4_5),
 						Frequency:            868300000,
-						CodingRate:           "4/5",
 						GatewayMetadata: &packetbroker.UplinkMessage_GatewayMetadata{
 							Teaser: &packetbroker.GatewayMetadataTeaser{
 								Value: &packetbroker.GatewayMetadataTeaser_Terrestrial_{
@@ -575,10 +574,10 @@ func TestHomeNetwork(t *testing.T) {
 								Plain: "foo-gateway",
 							},
 						},
-						DataRate:             packetbroker.NewLoRaDataRate(7, 125000, "4/5"),
+						DataRate:             packetbroker.NewLoRaDataRate(7, 125000, band.Cr4_5),
 						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
 						Frequency:            869525000,
-						CodingRate:           "4/5",
+						CodingRate:           band.Cr4_5,
 						GatewayMetadata: &packetbroker.UplinkMessage_GatewayMetadata{
 							Teaser: &packetbroker.GatewayMetadataTeaser{
 								Value: &packetbroker.GatewayMetadataTeaser_Terrestrial_{
@@ -722,11 +721,11 @@ func TestHomeNetwork(t *testing.T) {
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 7,
 									Bandwidth:       125000,
+									CodingRate:      band.Cr4_5,
 								},
 							},
 						},
-						Frequency:  869525000,
-						CodingRate: "4/5",
+						Frequency: 869525000,
 					},
 				},
 			},
@@ -749,10 +748,10 @@ func TestHomeNetwork(t *testing.T) {
 								Plain: "foo-gateway",
 							},
 						},
-						DataRate:             packetbroker.NewLoRaDataRate(9, 125000, "4/5"),
+						DataRate:             packetbroker.NewLoRaDataRate(9, 125000, band.Cr4_5),
 						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
 						Frequency:            869525000,
-						CodingRate:           "4/5",
+						CodingRate:           band.Cr4_5,
 						GatewayMetadata: &packetbroker.UplinkMessage_GatewayMetadata{
 							Teaser: &packetbroker.GatewayMetadataTeaser{
 								Value: &packetbroker.GatewayMetadataTeaser_Terrestrial_{
@@ -833,11 +832,11 @@ func TestHomeNetwork(t *testing.T) {
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 9,
 									Bandwidth:       125000,
+									CodingRate:      band.Cr4_5,
 								},
 							},
 						},
-						Frequency:  869525000,
-						CodingRate: "4/5",
+						Frequency: 869525000,
 					},
 				},
 			},
@@ -903,6 +902,7 @@ func TestHomeNetwork(t *testing.T) {
 							Lora: &ttnpb.LoRaDataRate{
 								Bandwidth:       125000,
 								SpreadingFactor: 7,
+								CodingRate:      band.Cr4_5,
 							},
 						},
 					},
@@ -913,6 +913,7 @@ func TestHomeNetwork(t *testing.T) {
 							Lora: &ttnpb.LoRaDataRate{
 								Bandwidth:       125000,
 								SpreadingFactor: 12,
+								CodingRate:      band.Cr4_5,
 							},
 						},
 					},
@@ -946,11 +947,11 @@ func TestHomeNetwork(t *testing.T) {
 				Priority:   packetbroker.DownlinkMessagePriority_NORMAL,
 				Rx1: &packetbroker.DownlinkMessage_RXSettings{
 					Frequency: 868100000,
-					DataRate:  packetbroker.NewLoRaDataRate(7, 125000, "4/5"),
+					DataRate:  packetbroker.NewLoRaDataRate(7, 125000, band.Cr4_5),
 				},
 				Rx2: &packetbroker.DownlinkMessage_RXSettings{
 					Frequency: 869525000,
-					DataRate:  packetbroker.NewLoRaDataRate(12, 125000, "4/5"),
+					DataRate:  packetbroker.NewLoRaDataRate(12, 125000, band.Cr4_5),
 				},
 				Rx1Delay:           pbtypes.DurationProto(5 * time.Second),
 				GatewayUplinkToken: []byte(`test-token`),

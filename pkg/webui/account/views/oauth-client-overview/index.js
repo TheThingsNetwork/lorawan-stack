@@ -47,7 +47,7 @@ const { Content } = EntityTitleSection
 const OAuthClientOverview = props => {
   const {
     oauthClientId,
-    oauthClient: { created_at, updated_at, state, state_description, secret },
+    oauthClient: { created_at, updated_at, state, state_description, secret, name },
     fetching,
     includeStateDescription,
     collaboratorsTotalCount,
@@ -111,6 +111,7 @@ const OAuthClientOverview = props => {
             <Col sm={12}>
               <EntityTitleSection
                 id={oauthClientId}
+                name={name}
                 icon={applicationIcon}
                 iconAlt={sharedMessages.overview}
               >
@@ -141,6 +142,7 @@ OAuthClientOverview.propTypes = {
     state: PropTypes.string,
     state_description: PropTypes.string,
     secret: PropTypes.string,
+    name: PropTypes.string,
   }).isRequired,
   oauthClientId: PropTypes.string.isRequired,
 }

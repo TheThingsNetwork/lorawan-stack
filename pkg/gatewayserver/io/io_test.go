@@ -21,6 +21,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
@@ -208,6 +209,7 @@ func TestFlow(t *testing.T) {
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 7,
 									Bandwidth:       125000,
+									CodingRate:      band.Cr4_5,
 								},
 							},
 						},
@@ -242,6 +244,7 @@ func TestFlow(t *testing.T) {
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 7,
 									Bandwidth:       125000,
+									CodingRate:      band.Cr4_5,
 								},
 							},
 						}, // Same as previous.
@@ -278,6 +281,7 @@ func TestFlow(t *testing.T) {
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 7,
 									Bandwidth:       125000,
+									CodingRate:      band.Cr4_5,
 								},
 							},
 						}, // Same as previous.
@@ -312,6 +316,7 @@ func TestFlow(t *testing.T) {
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 7,
 									Bandwidth:       125000,
+									CodingRate:      band.Cr4_5,
 								},
 							},
 						},
@@ -346,6 +351,7 @@ func TestFlow(t *testing.T) {
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 7,
 									Bandwidth:       125000,
+									CodingRate:      band.Cr4_5,
 								},
 							},
 						},
@@ -378,6 +384,7 @@ func TestFlow(t *testing.T) {
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 7,
 									Bandwidth:       125000,
+									CodingRate:      band.Cr4_5,
 								},
 							},
 						},
@@ -410,6 +417,7 @@ func TestFlow(t *testing.T) {
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 7,
 									Bandwidth:       125000,
+									CodingRate:      band.Cr4_5,
 								},
 							},
 						},
@@ -435,6 +443,7 @@ func TestFlow(t *testing.T) {
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 7,
 									Bandwidth:       125000,
+									CodingRate:      band.Cr4_5,
 								},
 							},
 						},
@@ -470,6 +479,7 @@ func TestFlow(t *testing.T) {
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 12,
 									Bandwidth:       125000,
+									CodingRate:      band.Cr4_5,
 								},
 							},
 						},
@@ -635,6 +645,7 @@ func TestSubBandEIRPOverride(t *testing.T) {
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 7,
 									Bandwidth:       125000,
+									CodingRate:      band.Cr4_5,
 								},
 							},
 						},

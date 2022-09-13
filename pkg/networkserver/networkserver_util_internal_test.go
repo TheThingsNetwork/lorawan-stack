@@ -238,6 +238,7 @@ type NsJsJoinRequestConfig struct {
 	PHYVersion         ttnpb.PHYVersion
 	CorrelationIDs     []string
 	CFList             *ttnpb.CFList
+	ConsumedAirtime    *pbtypes.Duration
 }
 
 func MakeNsJsJoinRequest(conf NsJsJoinRequestConfig) *ttnpb.JoinRequest {
@@ -260,6 +261,7 @@ func MakeNsJsJoinRequest(conf NsJsJoinRequestConfig) *ttnpb.JoinRequest {
 			}
 			return conf.CorrelationIDs
 		}()),
+		ConsumedAirtime: conf.ConsumedAirtime,
 	}
 }
 
@@ -1606,6 +1608,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 									DataRateIndex:   conf.DataRateIndex,
 									DataRateOffset:  defaultRX1DROffset,
 								}),
+								ConsumedAirtime: ups[0].ConsumedAirtime,
 							})),
 						)
 					},
@@ -1892,14 +1895,15 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 						CorrelationIds: up.CorrelationIds,
 						Up: &ttnpb.ApplicationUp_UplinkMessage{
 							UplinkMessage: &ttnpb.ApplicationUplink{
-								Confirmed:    conf.Confirmed,
-								FPort:        deduplicatedUp.Payload.GetMacPayload().FPort,
-								FrmPayload:   deduplicatedUp.Payload.GetMacPayload().FrmPayload,
-								ReceivedAt:   up.GetUplinkMessage().GetReceivedAt(),
-								RxMetadata:   up.GetUplinkMessage().GetRxMetadata(),
-								Settings:     deduplicatedUp.Settings,
-								SessionKeyId: upConf.SessionKeys.SessionKeyId,
-								NetworkIds:   up.GetUplinkMessage().GetNetworkIds(),
+								Confirmed:       conf.Confirmed,
+								FPort:           deduplicatedUp.Payload.GetMacPayload().FPort,
+								FrmPayload:      deduplicatedUp.Payload.GetMacPayload().FrmPayload,
+								ReceivedAt:      up.GetUplinkMessage().GetReceivedAt(),
+								RxMetadata:      up.GetUplinkMessage().GetRxMetadata(),
+								Settings:        deduplicatedUp.Settings,
+								SessionKeyId:    upConf.SessionKeys.SessionKeyId,
+								NetworkIds:      up.GetUplinkMessage().GetNetworkIds(),
+								ConsumedAirtime: up.GetUplinkMessage().GetConsumedAirtime(),
 							},
 						},
 					}),

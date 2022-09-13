@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
@@ -248,6 +249,7 @@ func TestTraffic(t *testing.T) {
 								Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 									Bandwidth:       125000,
 									SpreadingFactor: 11,
+									CodingRate:      band.Cr4_5,
 								}},
 							},
 							EnableCrc: true,
@@ -271,6 +273,7 @@ func TestTraffic(t *testing.T) {
 								Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 									Bandwidth:       125000,
 									SpreadingFactor: 11,
+									CodingRate:      band.Cr4_5,
 								}},
 							},
 							EnableCrc: true,
@@ -298,6 +301,7 @@ func TestTraffic(t *testing.T) {
 								Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 									Bandwidth:       125000,
 									SpreadingFactor: 11,
+									CodingRate:      band.Cr4_5,
 								}},
 							},
 							EnableCrc: true,
@@ -317,6 +321,7 @@ func TestTraffic(t *testing.T) {
 								Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 									Bandwidth:       125000,
 									SpreadingFactor: 11,
+									CodingRate:      band.Cr4_5,
 								}},
 							},
 							EnableCrc: true,
@@ -336,6 +341,7 @@ func TestTraffic(t *testing.T) {
 								Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 									Bandwidth:       125000,
 									SpreadingFactor: 11,
+									CodingRate:      band.Cr4_5,
 								}},
 							},
 							EnableCrc: true,
@@ -400,6 +406,7 @@ func TestTraffic(t *testing.T) {
 								Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 									Bandwidth:       125000,
 									SpreadingFactor: 11,
+									CodingRate:      band.Cr4_5,
 								}},
 							},
 							EnableCrc: true,
@@ -415,6 +422,7 @@ func TestTraffic(t *testing.T) {
 								Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 									Bandwidth:       125000,
 									SpreadingFactor: 11,
+									CodingRate:      band.Cr4_5,
 								}},
 							},
 							EnableCrc: true,
@@ -472,6 +480,7 @@ func TestTraffic(t *testing.T) {
 									Lora: &ttnpb.LoRaDataRate{
 										SpreadingFactor: 7,
 										Bandwidth:       125000,
+										CodingRate:      band.Cr4_5,
 									},
 								},
 							},
@@ -481,6 +490,7 @@ func TestTraffic(t *testing.T) {
 									Lora: &ttnpb.LoRaDataRate{
 										SpreadingFactor: 0,
 										Bandwidth:       125000,
+										CodingRate:      band.Cr4_5,
 									},
 								},
 							},
@@ -512,11 +522,11 @@ func TestTraffic(t *testing.T) {
 									Lora: &ttnpb.LoRaDataRate{
 										Bandwidth:       125000,
 										SpreadingFactor: 7,
+										CodingRate:      band.Cr4_5,
 									},
 								},
 							},
-							CodingRate: "4/5",
-							Frequency:  869525000,
+							Frequency: 869525000,
 						},
 					},
 				},

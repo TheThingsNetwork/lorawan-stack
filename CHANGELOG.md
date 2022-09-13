@@ -16,12 +16,18 @@ For details about compatibility between different releases, see the **Commitment
 - The flow for adding end devices has been updated in the Console.
   - Device QR codes can now be scanned to speed up end device onboarding.
   - Claiming end devices from external Join Servers is now possible seemlessly from the same onboarding flow.
+- LoRa coding rate now defined in `DataRate` instead of `Band`.
 
 ### Deprecated
 
 ### Removed
 
+- Removed coding rate from `TxSettings` as it is now defined in `DataRate`.
+
 ### Fixed
+
+- `--mac-settings.adr.mode.disabled`, `--mac-settings.adr.mode.dynamic` and `--mac-settings.adr.mode.static` flags of the `end-device update` command.
+- Pagination in `sessions` and `access tokens` tables in the Console.
 
 ### Security
 
@@ -60,6 +66,9 @@ For details about compatibility between different releases, see the **Commitment
 - The Network Server now correctly handles the command that may succeed a `LinkADRAns` response.
 - LR-FHSS data rate matching.
 - Console data rate rendering of non-LoRa modulations.
+
+### Security
+
 - End device network layer form crashing in some situations in the Console device general settings.
 - End device overview crashing in some situations in the Console.
 - Device import when using Join Server-only deployments.

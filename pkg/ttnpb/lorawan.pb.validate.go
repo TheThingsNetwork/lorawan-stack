@@ -1282,6 +1282,8 @@ func (m *LoRaDataRate) ValidateFields(paths ...string) error {
 			// no validation rules for Bandwidth
 		case "spreading_factor":
 			// no validation rules for SpreadingFactor
+		case "coding_rate":
+			// no validation rules for CodingRate
 		default:
 			return LoRaDataRateValidationError{
 				field:  name,
@@ -1690,8 +1692,6 @@ func (m *TxSettings) ValidateFields(paths ...string) error {
 				}
 			}
 
-		case "coding_rate":
-			// no validation rules for CodingRate
 		case "frequency":
 			// no validation rules for Frequency
 		case "enable_crc":

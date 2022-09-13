@@ -21,11 +21,12 @@ import * as authorizations from '@account/store/actions/authorizations'
 const getAuthorizationsLogic = createRequestLogic({
   type: authorizations.GET_AUTHORIZATIONS_LIST,
   process: async ({ action }) => {
-    const {
-      payload: { userId },
-      meta: { selector },
-    } = action
-    const res = await tts.Authorizations.getAllAuthorizations(userId, selector)
+    const { userId, params } = action.payload
+
+    const res = await tts.Authorizations.getAllAuthorizations(userId, {
+      page: params?.page,
+      limit: params?.limit,
+    })
 
     return { entities: res.authorizations, authorizationsTotalCount: res.totalCount }
   },
@@ -40,21 +41,22 @@ const deleteAuthorizationLogic = createRequestLogic({
   },
 })
 
-const getAuthorizationTokensLogic = createRequestLogic({
-  type: authorizations.GET_AUTHORIZATION_TOKENS_LIST,
+const getAccessTokensLogic = createRequestLogic({
+  type: authorizations.GET_ACCESS_TOKENS_LIST,
   process: async ({ action }) => {
-    const {
-      payload: { userId, clientId },
-      meta: { selector },
-    } = action
-    const res = await tts.Authorizations.getAllTokens(userId, clientId, selector)
+    const { userId, clientId, params } = action.payload
+
+    const res = await tts.Authorizations.getAllTokens(userId, clientId, {
+      page: params?.page,
+      limit: params?.limit,
+    })
 
     return { entities: res.tokens, tokensTotalCount: res.totalCount }
   },
 })
 
-const deleteAuthorizationTokenLogic = createRequestLogic({
-  type: authorizations.DELETE_AUTHORIZATION_TOKEN,
+const deleteAccessTokenLogic = createRequestLogic({
+  type: authorizations.DELETE_ACCESS_TOKEN,
   process: async ({ action }) => {
     const { userId, clientId, id } = action.payload
 
@@ -74,7 +76,7 @@ const deleteAllTokensLogic = createRequestLogic({
 export default [
   getAuthorizationsLogic,
   deleteAuthorizationLogic,
-  getAuthorizationTokensLogic,
-  deleteAuthorizationTokenLogic,
+  getAccessTokensLogic,
+  deleteAccessTokenLogic,
   deleteAllTokensLogic,
 ]

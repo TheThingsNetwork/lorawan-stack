@@ -176,6 +176,7 @@ var BandDescription_BandDataRateFieldPathsNested = []string{
 	"rate.modulation.fsk.bit_rate",
 	"rate.modulation.lora",
 	"rate.modulation.lora.bandwidth",
+	"rate.modulation.lora.coding_rate",
 	"rate.modulation.lora.spreading_factor",
 	"rate.modulation.lrfhss",
 	"rate.modulation.lrfhss.coding_rate",

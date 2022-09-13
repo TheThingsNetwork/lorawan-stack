@@ -32,6 +32,7 @@ import (
 	nstime "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
+	"go.thethings.network/lorawan-stack/v3/pkg/toa"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -375,8 +376,9 @@ func MakeDefaultUS915FSB2MACState(class ttnpb.Class, macVersion ttnpb.MACVersion
 	}
 }
 
-func MakeUplinkSettings(dr *ttnpb.DataRate, drIdx ttnpb.DataRateIndex, freq uint64) ttnpb.TxSettings {
-	return ttnpb.TxSettings{
+// MakeUplinkSettings builds the ttnpb.TxSettings for an uplink.
+func MakeUplinkSettings(dr *ttnpb.DataRate, _ ttnpb.DataRateIndex, freq uint64) *ttnpb.TxSettings {
+	return &ttnpb.TxSettings{
 		DataRate:  ttnpb.Clone(dr),
 		EnableCrc: true,
 		Frequency: freq,
@@ -401,11 +403,14 @@ func MakeUplinkMessage(conf UplinkMessageConfig) *ttnpb.UplinkMessage {
 	return &ttnpb.UplinkMessage{
 		RawPayload:         conf.RawPayload,
 		Payload:            conf.Payload,
-		Settings:           &settings,
+		Settings:           settings,
 		RxMetadata:         ttnpb.CloneSlice(conf.RxMetadata),
 		ReceivedAt:         ttnpb.ProtoTimePtr(conf.ReceivedAt),
 		CorrelationIds:     CopyStrings(conf.CorrelationIDs),
 		DeviceChannelIndex: uint32(conf.ChannelIndex),
+		ConsumedAirtime: ttnpb.ProtoDurationPtr(
+			test.Must(toa.Compute(len(conf.RawPayload), settings)).(time.Duration),
+		),
 	}
 }
 

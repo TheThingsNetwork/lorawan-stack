@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  createPaginationByParentRequestActions,
-  createPaginationByIdDeleteActions,
-} from '@ttn-lw/lib/store/actions/pagination'
+import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
 
 export const GET_USER_SESSIONS_LIST_BASE = 'GET_USER_SESSIONS_LIST'
 export const [
@@ -29,7 +26,11 @@ export const [
     success: getUserSessionsListSuccess,
     failure: getUserSessionsListFailure,
   },
-] = createPaginationByParentRequestActions('USER_SESSIONS')
+] = createRequestActions(
+  GET_USER_SESSIONS_LIST_BASE,
+  (id, params) => ({ id, params }),
+  (id, params, selector) => ({ selector }),
+)
 
 export const DELETE_USER_SESSION_BASE = 'DELETE_USER_SESSION'
 export const [
@@ -43,4 +44,4 @@ export const [
     success: deleteUserSessionSuccess,
     failure: deleteUserSessionFailure,
   },
-] = createPaginationByIdDeleteActions('USER_SESSIONS', (user, sessionId) => ({ user, sessionId }))
+] = createRequestActions(DELETE_USER_SESSION_BASE, (user, sessionId) => ({ user, sessionId }))

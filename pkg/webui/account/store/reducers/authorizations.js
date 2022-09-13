@@ -14,7 +14,7 @@
 
 import {
   GET_AUTHORIZATIONS_LIST_SUCCESS,
-  GET_AUTHORIZATION_TOKENS_LIST_SUCCESS,
+  GET_ACCESS_TOKENS_LIST_SUCCESS,
 } from '@account/store/actions/authorizations'
 
 const defaultState = {
@@ -32,7 +32,7 @@ const authorizations = (state = defaultState, { type, payload }) => {
         authorizations: payload.entities,
         authorizationsTotalCount: payload.authorizationsTotalCount,
       }
-    case GET_AUTHORIZATION_TOKENS_LIST_SUCCESS:
+    case GET_ACCESS_TOKENS_LIST_SUCCESS:
       return {
         ...state,
         tokens: payload.entities,
