@@ -120,8 +120,6 @@ const maxDutyCycleOptions = [
 const encodeAdrMode = value => ({ [value]: {} })
 const decodeAdrMode = value => (value !== undefined ? Object.keys(value)[0] : null)
 
-const decodeStaticFields = value => (value ? value : 0)
-
 const MacSettingsSection = props => {
   const {
     activationMode,
@@ -498,7 +496,6 @@ const MacSettingsSection = props => {
             component={Input}
             type="number"
             inputWidth="xs"
-            decode={decodeStaticFields}
           />
           <Form.Field
             title={m.adrTransPower}
@@ -506,7 +503,6 @@ const MacSettingsSection = props => {
             component={Input}
             type="number"
             inputWidth="xs"
-            decode={decodeStaticFields}
           />
           <Form.Field
             title={m.adrUplinks}
@@ -514,7 +510,6 @@ const MacSettingsSection = props => {
             component={Input}
             type="number"
             inputWidth="xs"
-            decode={decodeStaticFields}
           />
         </>
       )}

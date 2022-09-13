@@ -129,6 +129,20 @@ class Devices {
       ) {
         mac_settings.rx2_data_rate_index = 0
       }
+
+      if (mac_settings.adr && 'static' in mac_settings.adr) {
+        if (typeof mac_settings.adr.static.data_rate_index === 'undefined') {
+          mac_settings.adr.static.data_rate_index = 0
+        }
+
+        if (typeof mac_settings.adr.static.nb_trans === 'undefined') {
+          mac_settings.adr.static.nb_trans = 0
+        }
+
+        if (typeof mac_settings.adr.static.tx_power_index === 'undefined') {
+          mac_settings.adr.static.tx_power_index = 0
+        }
+      }
     }
 
     return device
