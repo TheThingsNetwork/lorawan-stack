@@ -204,8 +204,8 @@ const m = defineMessages({
   networkRxDefaultsDescription:
     'The network uses a set of default MAC settings (e.g. Rx delays, data rates and frequencies) for the end device. These are based on the recommendations made for the respective band. In most cases these defaults will be correct for your setup. If you wish to use different settings, you can uncheck this checkbox and use custom values.',
 
-  clusterSettingsDescription:
-    'By default, the server components of the current cluster are used. However, for advanced use cases, it is possible to register this end device to different Network Server and/or Join Server.',
+  skipJoinServerRegistration:
+    'For testing purposes, you can opt to skip registration of this end device on the Join Server. Do not enable this option if you do not understand the implications, as it will affect join capabilities of the end device.',
 
   factoryPresetFreqDescription:
     'Factory preset frequencies are hard-coded channel frequencies to provide for the Network Server when the end device uses frequencies that divert from the defaults of the band specification. This is uncommon but can be the case for some special devices.',
@@ -461,8 +461,8 @@ const descriptions = Object.freeze({
   [TOOLTIP_IDS.NETWORK_RX_DEFAULTS]: {
     description: m.networkRxDefaultsDescription,
   },
-  [TOOLTIP_IDS.CLUSTER_SETTINGS]: {
-    description: m.clusterSettingsDescription,
+  [TOOLTIP_IDS.SKIP_JOIN_SERVER_REGISTRATION]: {
+    description: m.skipJoinServerRegistration,
   },
   [TOOLTIP_IDS.FACTORY_PRESET_FREQUENCIES]: {
     description: m.factoryPresetFreqDescription,

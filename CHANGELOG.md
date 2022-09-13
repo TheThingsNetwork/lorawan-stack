@@ -13,6 +13,9 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- The flow for adding end devices has been updated in the Console.
+  - Device QR codes can now be scanned to speed up end device onboarding.
+  - Claiming end devices from external Join Servers is now possible seemlessly from the same onboarding flow.
 - LoRa coding rate now defined in `DataRate` instead of `Band`.
 
 ### Deprecated

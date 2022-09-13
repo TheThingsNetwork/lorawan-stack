@@ -1,6 +1,8 @@
 {
   "end_device": {
-    "ids": { "application_ids": {} },
+    "ids": {
+      "application_ids": {}
+    },
     "created_at": "0001-01-01T00:00:00Z",
     "updated_at": "0001-01-01T00:00:00Z",
     "version_ids": {
@@ -15,31 +17,23 @@
       "rx1_delay": 1,
       "rx1_data_rate_offset": 0,
       "rx2_frequency": "869525000",
-      "factory_preset_frequencies": ["868100000", "868300000", "868500000"],
+      "factory_preset_frequencies": [
+        "868100000",
+        "868300000",
+        "868500000"
+      ],
       "supports_32_bit_f_cnt": true
     },
-    "mac_state": { "current_parameters": {}, "desired_parameters": { "max_eirp": 16 } },
+    "mac_state": {
+      "current_parameters": {},
+      "desired_parameters": {
+        "max_eirp": 16
+      }
+    },
     "formatters": {
       "up_formatter": "FORMATTER_REPOSITORY",
       "down_formatter": "FORMATTER_REPOSITORY"
     }
   },
-  "field_mask": {
-    "paths": [
-      "version_ids",
-      "supports_join",
-      "supports_class_b",
-      "supports_class_c",
-      "lorawan_version",
-      "lorawan_phy_version",
-      "formatters",
-      "mac_settings.rx1_delay",
-      "mac_settings.rx1_data_rate_offset",
-      "mac_settings.rx2_data_rate_index",
-      "mac_settings.rx2_frequency",
-      "mac_settings.supports_32_bit_f_cnt",
-      "mac_settings.factory_preset_frequencies",
-      "mac_state.desired_parameters.max_eirp"
-    ]
-  }
+  "field_mask": "version_ids,supports_join,supports_class_b,supports_class_c,lorawan_version,lorawan_phy_version,formatters,mac_settings.rx1_delay,mac_settings.rx1_data_rate_offset,mac_settings.rx2_data_rate_index,mac_settings.rx2_frequency,mac_settings.supports_32_bit_f_cnt,mac_settings.factory_preset_frequencies,mac_state.desired_parameters.max_eirp"
 }

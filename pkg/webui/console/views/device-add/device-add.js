@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,59 +13,26 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route, Redirect } from 'react-router-dom'
 import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
 import PageTitle from '@ttn-lw/components/page-title'
-import Tabs from '@ttn-lw/components/tabs'
 
-import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
-
-import PropTypes from '@ttn-lw/lib/prop-types'
-
-import Manual from './manual'
-import Repository from './repository'
-import messages from './messages'
-
-import style from './device-add.styl'
+import DeviceOnboardingForm from '@console/containers/device-onboarding-form'
 
 const m = defineMessages({
   title: 'Register end device',
 })
 
-const DeviceAdd = props => {
-  const { match } = props
-  const { url } = match
-
-  const tabs = React.useMemo(
-    () => [
-      { title: messages.repositoryTabTitle, link: `${url}/repository`, name: 'repository' },
-      { title: messages.manualTabTitle, link: `${url}/manual`, name: 'manual', exact: false },
-    ],
-    [url],
-  )
-
-  return (
-    <Container>
-      <Row>
-        <Col>
-          <PageTitle title={m.title} />
-          <Tabs className={style.tabs} narrow tabs={tabs} />
-        </Col>
-      </Row>
-      <Switch>
-        <Redirect exact from={url} to={`${url}/repository`} />
-        <Route path={`${match.url}/repository`} component={Repository} />
-        <Route path={`${match.url}/manual`} component={Manual} />
-        <NotFoundRoute />
-      </Switch>
-    </Container>
-  )
-}
-
-DeviceAdd.propTypes = {
-  match: PropTypes.match.isRequired,
-}
+const DeviceAdd = () => (
+  <Container>
+    <Row>
+      <Col>
+        <PageTitle tall title={m.title} className="mb-cs-m" />
+        <DeviceOnboardingForm />
+      </Col>
+    </Row>
+  </Container>
+)
 
 export default DeviceAdd

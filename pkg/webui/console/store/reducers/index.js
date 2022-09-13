@@ -62,6 +62,7 @@ import is from './identity-server'
 import as from './application-server'
 import deviceRepository from './device-repository'
 import packetBroker from './packet-broker'
+import ns from './network-server'
 
 export default history =>
   combineReducers({
@@ -120,4 +121,5 @@ export default history =>
     as,
     deviceRepository,
     packetBroker,
+    ns,
   })

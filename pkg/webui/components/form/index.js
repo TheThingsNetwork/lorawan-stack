@@ -134,6 +134,7 @@ const Form = props => {
         // Compose clean values as well, which do not contain values of unmounted
         // fields, as well as pseudo values (starting with `_`).
         const cleanedValues = omitBy(pick(values, fieldRegistry), (_, key) => key.startsWith('_'))
+
         return onSubmit(values, formikBag, cleanedValues)
       } catch (error) {
         // Make sure all unhandled exceptions during submit are ingested.
@@ -204,7 +205,7 @@ const Form = props => {
 
   useEffect(() => {
     // Scroll form notification into view if needed.
-    if (error) {
+    if (error && !isSubmitting) {
       scrollIntoView(notificationRef.current, { behavior: 'smooth' })
       notificationRef.current.focus({ preventScroll: true })
     }
