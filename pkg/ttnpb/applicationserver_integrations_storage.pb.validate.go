@@ -79,7 +79,7 @@ func (m *GetStoredApplicationUpRequest) ValidateFields(paths ...string) error {
 			if _, ok := _GetStoredApplicationUpRequest_Type_InLookup[m.GetType()]; !ok {
 				return GetStoredApplicationUpRequestValidationError{
 					field:  "type",
-					reason: "value must be in list [ uplink_message join_accept downlink_ack downlink_nack downlink_sent downlink_failed downlink_queued downlink_queue_invalidated location_solved service_data]",
+					reason: "value must be in list [ uplink_message uplink_normalized join_accept downlink_ack downlink_nack downlink_sent downlink_failed downlink_queued downlink_queue_invalidated location_solved service_data]",
 				}
 			}
 
@@ -234,6 +234,7 @@ var _ interface {
 var _GetStoredApplicationUpRequest_Type_InLookup = map[string]struct{}{
 	"":                           {},
 	"uplink_message":             {},
+	"uplink_normalized":          {},
 	"join_accept":                {},
 	"downlink_ack":               {},
 	"downlink_nack":              {},
