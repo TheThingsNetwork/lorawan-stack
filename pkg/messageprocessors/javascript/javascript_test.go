@@ -712,11 +712,7 @@ func TestDecodeUplink(t *testing.T) {
 		err := host.DecodeUplink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
 
-		a.So(message.NormalizedPayload, should.Resemble, []*pbtypes.Struct{
-			{
-				Fields: map[string]*pbtypes.Value{},
-			},
-		})
+		a.So(message.NormalizedPayload, should.Resemble, []*pbtypes.Struct{})
 		a.So(message.NormalizedPayloadWarnings, should.Resemble, []string{
 			"measurement 1: `air.temperature` should be equal or greater than `-273.15`",
 		})
@@ -727,9 +723,7 @@ func TestDecodeUplink(t *testing.T) {
 		for i, m := range parsedMeasurements {
 			measurements[i] = m.Measurement
 		}
-		a.So(measurements, should.Resemble, []normalizedpayload.Measurement{
-			{},
-		})
+		a.So(measurements, should.Resemble, []normalizedpayload.Measurement{})
 	}
 
 	// The Things Node example.
