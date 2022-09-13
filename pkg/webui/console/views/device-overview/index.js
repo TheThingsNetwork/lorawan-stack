@@ -38,7 +38,7 @@ import Require from '@console/lib/components/require'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import { composeDataUri, downloadDataUriAsFile } from '@ttn-lw/lib/data-uri'
-import { selectJsConfig, selectStackConfig } from '@ttn-lw/lib/selectors/env'
+import { selectNsConfig, selectStackConfig } from '@ttn-lw/lib/selectors/env'
 import getHostFromUrl from '@ttn-lw/lib/host-from-url'
 
 import {
@@ -72,8 +72,8 @@ const m = defineMessages({
   noSession: 'This device has not joined the network yet',
 })
 
-const jsHost = getHostFromUrl(selectJsConfig().base_url)
-const jsEnabled = selectJsConfig().enabled
+const nsHost = getHostFromUrl(selectNsConfig().base_url)
+const nsEnabled = selectNsConfig().enabled
 
 @connect(state => {
   const appId = selectSelectedApplicationId(state)
@@ -104,16 +104,11 @@ class DeviceOverview extends React.Component {
   async onExport() {
     const {
       appId,
-      device: { ids, mac_settings, session, join_server_address },
+      device: { ids, mac_settings, session, network_server_address },
     } = this.props
 
     let result
-    if (
-      session &&
-      jsEnabled &&
-      join_server_address &&
-      getHostFromUrl(join_server_address) === jsHost
-    ) {
+    if (session && nsEnabled && getHostFromUrl(network_server_address) === nsHost) {
       try {
         result = await tts.Applications.Devices.getById(appId, ids.device_id, ['mac_state'])
 
