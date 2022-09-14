@@ -32,6 +32,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - `--mac-settings.adr.mode.disabled`, `--mac-settings.adr.mode.dynamic` and `--mac-settings.adr.mode.static` flags of the `end-device update` command.
 - Pagination in `sessions` and `access tokens` tables in the Console.
+- `LinkADRReq` MAC command generation for LoRaWAN 1.0 and 1.0.1 end devices.
 
 ### Security
 

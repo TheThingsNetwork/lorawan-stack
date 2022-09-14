@@ -96,7 +96,7 @@ var US_902_928_TS1_V1_0_1 = Band{
 		return us902928DownlinkDRTable[idx][offset], nil
 	},
 
-	GenerateChMasks: makeGenerateChMask72(false),
+	GenerateChMasks: makeGenerateChMask72(false, false),
 	ParseChMask:     parseChMask72,
 
 	FreqMultiplier:   100,

@@ -17,6 +17,8 @@ package band
 import (
 	"fmt"
 	"math"
+
+	"golang.org/x/exp/slices"
 )
 
 // ChMaskCntlPair pairs a ChMaskCntl with a mask.
@@ -351,7 +353,7 @@ func generateChMask64(currentChs, desiredChs []bool) ([]ChMaskCntlPair, error) {
 	}
 }
 
-func generateChMask72Generic(currentChs, desiredChs []bool) ([]ChMaskCntlPair, error) {
+func generateChMask72Generic(currentChs, desiredChs []bool, atomic bool) ([]ChMaskCntlPair, error) {
 	if len(currentChs) != 72 || len(desiredChs) != 72 {
 		return nil, errInvalidChannelCount.New()
 	}
@@ -437,6 +439,18 @@ func generateChMask72Generic(currentChs, desiredChs []bool) ([]ChMaskCntlPair, e
 			Mask: boolsTo16BoolArray(desiredChs[64:72]...),
 		}), cntl6Pairs...), nil
 
+	case !atomic:
+		// If the masks are not atomically processed, the Cntl=7 command will appear to the
+		// end device as an attempt to completely mute the end device, and it will be rejected.
+		// In such situations, we will fall back to including all of the pairs.
+		// We also sort the masks descending on the number of enabled channels in order to ensure
+		// that intermediary states through which the end device goes while parsing the masks
+		// are valid (i.e. the total number of enabled channels is always greater than 0).
+		slices.SortFunc(pairs, func(a, b ChMaskCntlPair) bool {
+			return trueCount(a.Mask[:]...) >= trueCount(b.Mask[:]...)
+		})
+		return pairs, nil
+
 	default:
 		return append(append(make([]ChMaskCntlPair, 0, 1+len(cntl7Pairs)), ChMaskCntlPair{
 			Cntl: 7,
@@ -445,12 +459,14 @@ func generateChMask72Generic(currentChs, desiredChs []bool) ([]ChMaskCntlPair, e
 	}
 }
 
-func makeGenerateChMask72(supportChMaskCntl5 bool) func([]bool, []bool) ([]ChMaskCntlPair, error) {
+func makeGenerateChMask72(supportChMaskCntl5 bool, atomic bool) func([]bool, []bool) ([]ChMaskCntlPair, error) {
 	if !supportChMaskCntl5 {
-		return generateChMask72Generic
+		return func(currentChs, desiredChs []bool) ([]ChMaskCntlPair, error) {
+			return generateChMask72Generic(currentChs, desiredChs, atomic)
+		}
 	}
 	return func(currentChs, desiredChs []bool) ([]ChMaskCntlPair, error) {
-		pairs, err := generateChMask72Generic(currentChs, desiredChs)
+		pairs, err := generateChMask72Generic(currentChs, desiredChs, atomic)
 		if err != nil {
 			return nil, err
 		}
@@ -552,8 +568,4 @@ func generateChMask96(currentChs, desiredChs []bool) ([]ChMaskCntlPair, error) {
 	return append(append(make([]ChMaskCntlPair, 0, 1+len(cntl6Pairs)), ChMaskCntlPair{
 		Cntl: 6,
 	}), cntl6Pairs...), nil
-}
-
-func uint64Ptr(v uint64) *uint64 {
-	return &v
 }
