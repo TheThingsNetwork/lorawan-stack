@@ -32,6 +32,7 @@ var (
 )
 
 func TestGenerateChMask(t *testing.T) {
+	t.Parallel()
 	for _, tc := range []struct {
 		Name            string
 		Generate        func([]bool, []bool) ([]ChMaskCntlPair, error)
@@ -61,6 +62,7 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
@@ -84,6 +86,7 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
@@ -122,6 +125,7 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
@@ -159,6 +163,7 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
@@ -196,6 +201,7 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
@@ -233,6 +239,7 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
@@ -270,6 +277,7 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
@@ -307,6 +315,7 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
@@ -345,6 +354,7 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
@@ -383,6 +393,7 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
@@ -427,6 +438,7 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
@@ -471,6 +483,7 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
@@ -515,6 +528,7 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
@@ -559,6 +573,7 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
@@ -603,6 +618,7 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
@@ -641,6 +657,7 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
@@ -688,6 +705,7 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
@@ -753,6 +771,7 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
@@ -798,6 +817,7 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
@@ -842,6 +862,7 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
@@ -882,6 +903,7 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
@@ -928,11 +950,14 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
 	} {
+		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
 			a := assertions.New(t)
 
 			current := append(tc.CurrentChannels[:0:0], tc.CurrentChannels...)
