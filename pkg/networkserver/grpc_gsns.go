@@ -873,7 +873,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		"adr", pld.FHdr.FCtrl.Adr,
 		"adr_ack_req", pld.FHdr.FCtrl.AdrAckReq,
 		"class_b", pld.FHdr.FCtrl.ClassB,
-		"dev_addr", pld.FHdr.DevAddr,
+		"dev_addr", types.MustDevAddr(pld.FHdr.DevAddr).OrZero(),
 		"f_opts_len", len(pld.FHdr.FOpts),
 		"f_port", pld.FPort,
 		"uplink_f_cnt", pld.FHdr.FCnt,
@@ -1434,7 +1434,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		"m_type", up.Payload.MHdr.MType,
 		"major", up.Payload.MHdr.Major,
 		"phy_payload_len", len(up.RawPayload),
-		"received_at", up.ReceivedAt,
+		"received_at", ttnpb.StdTime(up.ReceivedAt),
 		"frequency", up.Settings.Frequency,
 	))
 	switch dr := up.Settings.DataRate.Modulation.(type) {
