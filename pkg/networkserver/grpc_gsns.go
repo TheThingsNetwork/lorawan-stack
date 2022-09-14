@@ -885,7 +885,6 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	}
 	if !ok {
 		trace.Log(ctx, "ns", "message is duplicate (initial round)")
-		registerReceiveDuplicateUplink(ctx, up)
 		return errDuplicateUplink.New()
 	}
 	trace.Log(ctx, "ns", "message is original (initial round)")
@@ -1181,7 +1180,6 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	}
 	if !ok {
 		trace.Log(ctx, "ns", "message is duplicate")
-		registerReceiveDuplicateUplink(ctx, up)
 		return errDuplicateUplink.New()
 	}
 	trace.Log(ctx, "ns", "message is original")
@@ -1423,6 +1421,10 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	}
 	registerReceiveUplink(ctx, up)
 	defer func() {
+		if errors.Is(err, errDuplicateUplink) {
+			registerReceiveDuplicateUplink(ctx, up)
+			return
+		}
 		if err != nil {
 			registerDropUplink(ctx, up, err)
 		}
