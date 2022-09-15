@@ -19,6 +19,18 @@
 export const readDeviceQr = qrCode => {
   if (Boolean(qrCode.match(/^LW:D0:/))) {
     const parts = qrCode.split(':')
+    // The QR code, has mandatory fields (SchemaID, JoinEUI, DevEUI, ProfileID)
+    // and optional fields (OwnerToken, SerNum, Proprietary, CheckSum).
+    // The data for the optional fields is preceeded by a the first letter
+    // of the corresponding field. So when parsing we need to also split that
+    // and only include the actual field data.
+    // e.g `LW:D0:1122334455667788:AABBCCDDEEFF0011:AABB1122:OAABBCCDDEEFF:SYYWWNNNNNN:PFOOBAR:CAF2C`
+    const optionalTags = {
+      ownerToken: parts[5]?.split('O')[1],
+      serNum: parts[6]?.split('S')[1],
+      proprietary: parts[7]?.split('P')[1],
+      checkSum: parts[8]?.split('C')[1],
+    }
     return {
       formatId: 'tr005',
       schemaId: parts[1],
@@ -28,10 +40,10 @@ export const readDeviceQr = qrCode => {
         vendorID: parts[4].substring(0, 4),
         vendorProfileID: parts[4].substring(4, 8),
       },
-      ownerToken: parts[5],
-      qrCode,
+      ...optionalTags,
     }
   } else if (Boolean(qrCode.match(/^URN:DEV:LW:/))) {
+    // Good to know: draft versions are deprecated.
     const parts = qrCode.split(':')[3].split('_')
     return {
       formatId: 'tr005draft3',
