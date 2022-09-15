@@ -1,3 +1,4 @@
 The RxParamSetup, RxTimingSetup, TxParamSetup and DlChannel MAC commands use the sticky answer mechanism:
-After an end device receives a {Command}Req, it will piggy back the associated {Command}Ans on every subsequent uplink until a class A downlink reaches the end device. This means that we will observe {Command}Ans even in the absence of a request.
+After an end device receives a {Command}Req, it will piggy back the associated {Command}Ans on every subsequent uplink until a class A downlink reaches the end device. This means that we will observe {Command}Ans even in the absence of a request, and that we should generate a downlink in order to stop the end device from
+sending the {Command}Ans.
 We should allow this, provided the previous uplink messages did contain a {Command}Ans as well. A corollary of the sticky answer mechanism is that we should not schedule {Command}Req if an {Command}Ans was found in the last uplink received from the end device, as we cannot distinguish between a sticky answer and a real answer for the new {Command}Req.

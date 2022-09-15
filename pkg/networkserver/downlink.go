@@ -332,6 +332,11 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 			panic(fmt.Sprintf("invalid uplink MType: %s", up.Payload.MHdr.MType))
 		}
 	}
+	if class == ttnpb.Class_CLASS_A &&
+		mac.ContainsStickyMACCommand(dev.MacState.RecentMacCommandIdentifiers...) {
+		logger.Debug("Need downlink for sticky MAC command")
+		needsDownlink = true
+	}
 
 	pld := &ttnpb.MACPayload{
 		FHdr: &ttnpb.FHDR{

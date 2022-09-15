@@ -19,6 +19,7 @@ For details about compatibility between different releases, see the **Commitment
   - Device QR codes can now be scanned to speed up end device onboarding.
   - Claiming end devices from external Join Servers is now possible seemlessly from the same onboarding flow.
 - LoRa coding rate now defined in `DataRate` instead of `Band`.
+- The Network Server will now schedule a potentially empty downlink in order to stop end devices from sending sticky MAC commands.
 
 ### Deprecated
 
