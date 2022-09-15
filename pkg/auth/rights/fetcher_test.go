@@ -233,7 +233,7 @@ func TestAccessFetcher(t *testing.T) {
 				IsAdmin:         true,
 			},
 			applicationRights:  ttnpb.RightsFrom(ttnpb.Right_RIGHT_APPLICATION_INFO),
-			clientRights:       ttnpb.RightsFrom(ttnpb.Right_RIGHT_CLIENT_ALL),
+			clientRights:       ttnpb.RightsFrom(ttnpb.Right_RIGHT_CLIENT_INFO),
 			gatewayRights:      ttnpb.RightsFrom(ttnpb.Right_RIGHT_GATEWAY_INFO),
 			organizationRights: ttnpb.RightsFrom(ttnpb.Right_RIGHT_ORGANIZATION_INFO),
 			userRights:         ttnpb.RightsFrom(ttnpb.Right_RIGHT_USER_INFO),

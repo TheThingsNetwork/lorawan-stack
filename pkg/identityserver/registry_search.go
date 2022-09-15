@@ -188,7 +188,7 @@ func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchCl
 
 	for i, cli := range res.Clients {
 		entityRights := callerMemberships.GetRights(member, cli.GetIds()).Union(authInfo.GetUniversalRights())
-		if !entityRights.IncludesAll(ttnpb.Right_RIGHT_CLIENT_ALL) {
+		if !entityRights.IncludesAll(ttnpb.Right_RIGHT_CLIENT_INFO) {
 			res.Clients[i] = cli.PublicSafe()
 		}
 	}
@@ -368,7 +368,7 @@ func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.Se
 	if member != nil {
 		for i, org := range res.Organizations {
 			entityRights := callerMemberships.GetRights(member, org.GetIds()).Union(authInfo.GetUniversalRights())
-			if !entityRights.IncludesAll(ttnpb.Right_RIGHT_CLIENT_ALL) {
+			if !entityRights.IncludesAll(ttnpb.Right_RIGHT_CLIENT_INFO) {
 				res.Organizations[i] = org.PublicSafe()
 			}
 		}

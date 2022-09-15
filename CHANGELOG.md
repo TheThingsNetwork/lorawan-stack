@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Add more specific rights for OAuth clients.
+
 ### Changed
 
 - The flow for adding end devices has been updated in the Console.

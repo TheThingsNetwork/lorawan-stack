@@ -173,7 +173,7 @@ func (cir *contactInfoRegistry) RequestValidation(ctx context.Context, ids *ttnp
 	case *ttnpb.EntityIdentifiers_ApplicationIds:
 		err = rights.RequireApplication(ctx, id.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC)
 	case *ttnpb.EntityIdentifiers_ClientIds:
-		err = rights.RequireClient(ctx, id.ClientIds, ttnpb.Right_RIGHT_CLIENT_ALL)
+		err = rights.RequireClient(ctx, id.ClientIds, ttnpb.Right_RIGHT_CLIENT_SETTINGS_BASIC)
 	case *ttnpb.EntityIdentifiers_GatewayIds:
 		err = rights.RequireGateway(ctx, id.GatewayIds, ttnpb.Right_RIGHT_GATEWAY_SETTINGS_BASIC)
 	case *ttnpb.EntityIdentifiers_OrganizationIds:

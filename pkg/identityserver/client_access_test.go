@@ -35,7 +35,7 @@ func TestClientCollaborators(t *testing.T) {
 	adminCreds := rpcCreds(adminKey)
 
 	usr1 := p.NewUser()
-	usr1Key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	usr1Key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_CLIENT_SETTINGS_COLLABORATORS)
 	usr1Creds := rpcCreds(usr1Key)
 
 	cli1 := p.NewClient(usr1.GetOrganizationOrUserIdentifiers())
@@ -44,7 +44,7 @@ func TestClientCollaborators(t *testing.T) {
 	p.NewMembership(
 		usr2.GetOrganizationOrUserIdentifiers(),
 		cli1.GetEntityIdentifiers(),
-		ttnpb.Right_RIGHT_CLIENT_ALL,
+		ttnpb.Right_RIGHT_CLIENT_SETTINGS_COLLABORATORS,
 	)
 
 	usr3 := p.NewUser()
@@ -73,7 +73,7 @@ func TestClientCollaborators(t *testing.T) {
 			Collaborator: &ttnpb.Collaborator{
 				Ids: usr2.GetOrganizationOrUserIdentifiers(),
 				Rights: []ttnpb.Right{
-					ttnpb.Right_RIGHT_CLIENT_ALL,
+					ttnpb.Right_RIGHT_CLIENT_SETTINGS_COLLABORATORS,
 				},
 			},
 		})
@@ -105,7 +105,7 @@ func TestClientCollaborators(t *testing.T) {
 				Collaborator: &ttnpb.Collaborator{
 					Ids: usr3.GetOrganizationOrUserIdentifiers(),
 					Rights: []ttnpb.Right{
-						ttnpb.Right_RIGHT_CLIENT_ALL,
+						ttnpb.Right_RIGHT_CLIENT_SETTINGS_COLLABORATORS,
 					},
 				},
 			}, opts...)
@@ -118,7 +118,7 @@ func TestClientCollaborators(t *testing.T) {
 				for _, k := range list.Collaborators {
 					if unique.ID(ctx, k.GetIds()) == unique.ID(ctx, usr3.GetIds()) {
 						a.So(k.Rights, should.Resemble, []ttnpb.Right{
-							ttnpb.Right_RIGHT_CLIENT_ALL,
+							ttnpb.Right_RIGHT_CLIENT_SETTINGS_COLLABORATORS,
 						})
 					}
 				}
@@ -130,7 +130,7 @@ func TestClientCollaborators(t *testing.T) {
 			}, opts...)
 			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
 				a.So(got.Rights, should.Resemble, []ttnpb.Right{
-					ttnpb.Right_RIGHT_CLIENT_ALL,
+					ttnpb.Right_RIGHT_CLIENT_SETTINGS_COLLABORATORS,
 				})
 			}
 
