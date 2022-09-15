@@ -23,6 +23,7 @@ import Notification from '@ttn-lw/components/notification'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import Link from '@ttn-lw/components/link'
+import Radio from '@ttn-lw/components/radio-button'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -53,6 +54,9 @@ const m = defineMessages({
     'You can use the import functionality to register multiple end devices at once by uploading a file containing the registration information in one of the available formats. For more information, see also our documentation on <DocLink>Importing End Devices</DocLink>.',
   fallbackValuesImport:
     'These values will be used in case the imported file does not provide them. They are not required, although if not provided here or in the imported file, the import of the end device will not be successful.',
+  inputMethod: 'Input Method',
+  inputMethodDeviceRepo: 'Select the end device in the LoRaWAN Device Repository',
+  inputMethodManual: 'Enter end device specifics manually',
 })
 
 const validationSchema = Yup.object({
@@ -161,6 +165,16 @@ export default class DeviceBulkCreateForm extends Component {
               required
             />
             <Form.SubTitle title="Fallback values" />
+            <Form.Field
+              title={m.inputMethod}
+              component={Radio.Group}
+              value={_inputMethod}
+              name="_inputMethod"
+              valueSetter={handleInputMethodChange}
+            >
+              <Radio label={m.inputMethodDeviceRepo} value="device-repository" />
+              <Radio label={m.inputMethodManual} value="manual" />
+            </Form.Field>
             <Notification small info content={m.fallbackValuesImport} />
             {nsEnabled && (
               <NsFrequencyPlansSelect
