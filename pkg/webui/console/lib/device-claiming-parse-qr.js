@@ -21,7 +21,7 @@ export const readDeviceQr = qrCode => {
     const parts = qrCode.split(':')
     // The QR code, has mandatory fields (SchemaID, JoinEUI, DevEUI, ProfileID)
     // and optional fields (OwnerToken, SerNum, Proprietary, CheckSum).
-    // The data for the optional fields is preceeded by a the first letter
+    // The data for the optional fields is preceded by a the first letter
     // of the corresponding field. So when parsing we need to also split that
     // and only include the actual field data.
     // e.g `LW:D0:1122334455667788:AABBCCDDEEFF0011:AABB1122:OAABBCCDDEEFF:SYYWWNNNNNN:PFOOBAR:CAF2C`
