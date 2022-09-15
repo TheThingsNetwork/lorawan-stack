@@ -49,7 +49,6 @@ export const composeClaimResponse = ({ joinEui, devEui, id, appId }) => ({
   device_id: id,
   dev_eui: devEui,
   join_eui: joinEui,
-  dev_addr: '2600ABCD',
 })
 
 export const composeExpectedRequest = ({ joinEui, devEui, cac, id, appId }) => ({
