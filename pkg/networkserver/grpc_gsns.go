@@ -208,11 +208,8 @@ func appendRecentMACCommandIdentifier(
 	cids []ttnpb.MACCommandIdentifier,
 	cid ttnpb.MACCommandIdentifier,
 ) []ttnpb.MACCommandIdentifier {
-	switch cid {
-	case ttnpb.MACCommandIdentifier_CID_RX_PARAM_SETUP,
-		ttnpb.MACCommandIdentifier_CID_RX_TIMING_SETUP,
-		ttnpb.MACCommandIdentifier_CID_TX_PARAM_SETUP,
-		ttnpb.MACCommandIdentifier_CID_DL_CHANNEL:
+	switch {
+	case mac.ContainsStickyMACCommand(cid):
 		return append(cids, cid)
 	default:
 		return cids

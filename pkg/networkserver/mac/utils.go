@@ -767,6 +767,29 @@ func containsMACCommandIdentifier(cid ttnpb.MACCommandIdentifier) func(...ttnpb.
 	}
 }
 
+func containsAnyMACCommandIdentifier(cids ...ttnpb.MACCommandIdentifier) func(...ttnpb.MACCommandIdentifier) bool {
+	m := make(map[ttnpb.MACCommandIdentifier]struct{}, len(cids))
+	for _, cid := range cids {
+		m[cid] = struct{}{}
+	}
+	f := func(cid ttnpb.MACCommandIdentifier) bool {
+		_, ok := m[cid]
+		return ok
+	}
+	return func(cmds ...ttnpb.MACCommandIdentifier) bool {
+		return slices.IndexFunc(cmds, f) >= 0
+	}
+}
+
+// ContainsStickyMACCommand checks if any of the provided MAC command identifiers exhibit sticky behavior.
+// See STICKY.md.
+var ContainsStickyMACCommand = containsAnyMACCommandIdentifier(
+	ttnpb.MACCommandIdentifier_CID_DL_CHANNEL,
+	ttnpb.MACCommandIdentifier_CID_RX_PARAM_SETUP,
+	ttnpb.MACCommandIdentifier_CID_RX_TIMING_SETUP,
+	ttnpb.MACCommandIdentifier_CID_TX_PARAM_SETUP,
+)
+
 func consumeMACCommandIdentifier(
 	cid ttnpb.MACCommandIdentifier,
 ) func(...ttnpb.MACCommandIdentifier) (rest []ttnpb.MACCommandIdentifier, found bool) {
