@@ -32,6 +32,7 @@ var (
 )
 
 func TestGenerateChMask(t *testing.T) {
+	t.Parallel()
 	for _, tc := range []struct {
 		Name            string
 		Generate        func([]bool, []bool) ([]ChMaskCntlPair, error)
@@ -61,6 +62,7 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
@@ -84,13 +86,14 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
 
 		{
 			Name:     "72 channels/no cntl5/current(1-72)/desired(1-72)",
-			Generate: makeGenerateChMask72(false),
+			Generate: makeGenerateChMask72(false, true),
 			CurrentChannels: []bool{
 				true, true, true, true, true, true, true, true,
 				true, true, true, true, true, true, true, true,
@@ -122,12 +125,13 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
 		{
 			Name:     "72 channels/cntl5/current(1-72)/desired(1-72)",
-			Generate: makeGenerateChMask72(true),
+			Generate: makeGenerateChMask72(true, true),
 			CurrentChannels: []bool{
 				true, true, true, true, true, true, true, true,
 				true, true, true, true, true, true, true, true,
@@ -159,12 +163,13 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
 		{
 			Name:     "72 channels/no cntl5/current:(1-16,42,67,69);desired:(1-16,42,67,69)",
-			Generate: makeGenerateChMask72(false),
+			Generate: makeGenerateChMask72(false, true),
 			CurrentChannels: []bool{
 				true, true, true, true, true, true, true, true,
 				true, true, true, true, true, true, true, true,
@@ -196,12 +201,13 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
 		{
 			Name:     "72 channels/cntl5/current:(1-16,42,67,69);desired:(1-16,42,67,69)",
-			Generate: makeGenerateChMask72(true),
+			Generate: makeGenerateChMask72(true, true),
 			CurrentChannels: []bool{
 				true, true, true, true, true, true, true, true,
 				true, true, true, true, true, true, true, true,
@@ -233,12 +239,13 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
 		{
 			Name:     "72 channels/no cntl5/current:(1-4,6-16,42,67,69);desired:(1-16,42,67,69)",
-			Generate: makeGenerateChMask72(false),
+			Generate: makeGenerateChMask72(false, true),
 			CurrentChannels: []bool{
 				false, false, false, false, true, false, false, false,
 				false, false, false, false, false, false, false, false,
@@ -270,12 +277,13 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
 		{
 			Name:     "72 channels/cntl5/current:(1-4,6-16,42,67,69);desired:(1-16,42,67,69)",
-			Generate: makeGenerateChMask72(false),
+			Generate: makeGenerateChMask72(false, true),
 			CurrentChannels: []bool{
 				false, false, false, false, true, false, false, false,
 				false, false, false, false, false, false, false, false,
@@ -307,12 +315,13 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
 		{
 			Name:     "72 channels/no cntl5/current(1-12,14-33,36-42,44-72)/desired(1-69)",
-			Generate: makeGenerateChMask72(false),
+			Generate: makeGenerateChMask72(false, true),
 			CurrentChannels: []bool{
 				true, true, true, true, true, true, true, true,
 				true, true, true, true, false, true, true, true,
@@ -345,12 +354,13 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
 		{
 			Name:     "72 channels/cntl5/current(1-12,14-33,36-42,44-72)/desired(1-69)",
-			Generate: makeGenerateChMask72(false),
+			Generate: makeGenerateChMask72(false, true),
 			CurrentChannels: []bool{
 				true, true, true, true, true, true, true, true,
 				true, true, true, true, false, true, true, true,
@@ -383,12 +393,13 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
 		{
 			Name:     "72 channels/no cntl5/current(1-12,14-33,36-42,44-71)/desired(1-3,5-72)",
-			Generate: makeGenerateChMask72(false),
+			Generate: makeGenerateChMask72(false, true),
 			CurrentChannels: []bool{
 				true, true, true, true, true, true, true, true,
 				true, true, true, true, false, true, true, true,
@@ -427,12 +438,13 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
 		{
 			Name:     "72 channels/cntl5/current(1-12,14-33,36-42,44-71)/desired(1-3,5-72)",
-			Generate: makeGenerateChMask72(false),
+			Generate: makeGenerateChMask72(false, true),
 			CurrentChannels: []bool{
 				true, true, true, true, true, true, true, true,
 				true, true, true, true, false, true, true, true,
@@ -471,12 +483,13 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
 		{
 			Name:     "72 channels/no cntl5/current(1-12,14-33,36-42,44-63,65-72)/desired(1-3,5-72)",
-			Generate: makeGenerateChMask72(false),
+			Generate: makeGenerateChMask72(false, true),
 			CurrentChannels: []bool{
 				true, true, true, true, true, true, true, true,
 				true, true, true, true, false, true, true, true,
@@ -515,12 +528,13 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
 		{
 			Name:     "72 channels/cntl5/current(1-12,14-33,36-42,44-63,65-72)/desired(1-3,5-72)",
-			Generate: makeGenerateChMask72(false),
+			Generate: makeGenerateChMask72(false, true),
 			CurrentChannels: []bool{
 				true, true, true, true, true, true, true, true,
 				true, true, true, true, false, true, true, true,
@@ -559,12 +573,13 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
 		{
 			Name:     "72 channels/no cntl5/current(1-72)/desired(9-16,65-72)",
-			Generate: makeGenerateChMask72(false),
+			Generate: makeGenerateChMask72(false, true),
 			CurrentChannels: []bool{
 				true, true, true, true, true, true, true, true,
 				true, true, true, true, true, true, true, true,
@@ -603,12 +618,13 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
 		{
 			Name:     "72 channels/cntl5/current(1-72)/desired(9-16,65-72)",
-			Generate: makeGenerateChMask72(true),
+			Generate: makeGenerateChMask72(true, true),
 			CurrentChannels: []bool{
 				true, true, true, true, true, true, true, true,
 				true, true, true, true, true, true, true, true,
@@ -641,12 +657,13 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
 		{
 			Name:     "72 channels/no cntl5/current(1-72)/desired(9-24)",
-			Generate: makeGenerateChMask72(false),
+			Generate: makeGenerateChMask72(false, true),
 			CurrentChannels: []bool{
 				true, true, true, true, true, true, true, true,
 				true, true, true, true, true, true, true, true,
@@ -688,12 +705,79 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:     "72 channels/no cntl5/non-atomic/current(1-72)/desired(40-48)",
+			Generate: makeGenerateChMask72(false, false),
+			CurrentChannels: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+			},
+			DesiredChannels: []bool{
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				true, true, true, true, true, true, true, true,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+			},
+			Expected: []ChMaskCntlPair{
+				{
+					Cntl: 2,
+					Mask: [16]bool{
+						false, false, false, false, false, false, false, false,
+						true, true, true, true, true, true, true, true,
+					},
+				},
+				{
+					Cntl: 4,
+					Mask: [16]bool{
+						false, false, false, false, false, false, false, false,
+						false, false, false, false, false, false, false, false,
+					},
+				},
+				{
+					Cntl: 3,
+					Mask: [16]bool{
+						false, false, false, false, false, false, false, false,
+						false, false, false, false, false, false, false, false,
+					},
+				},
+				{
+					Cntl: 1,
+					Mask: [16]bool{
+						false, false, false, false, false, false, false, false,
+						false, false, false, false, false, false, false, false,
+					},
+				},
+				{
+					Mask: [16]bool{
+						false, false, false, false, false, false, false, false,
+						false, false, false, false, false, false, false, false,
+					},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
 		{
 			Name:     "72 channels/cntl5/current(1-72)/desired(9-24)",
-			Generate: makeGenerateChMask72(true),
+			Generate: makeGenerateChMask72(true, true),
 			CurrentChannels: []bool{
 				true, true, true, true, true, true, true, true,
 				true, true, true, true, true, true, true, true,
@@ -733,6 +817,7 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
@@ -777,6 +862,7 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
@@ -817,6 +903,7 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
@@ -863,11 +950,14 @@ func TestGenerateChMask(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
 	} {
+		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
 			a := assertions.New(t)
 
 			current := append(tc.CurrentChannels[:0:0], tc.CurrentChannels...)

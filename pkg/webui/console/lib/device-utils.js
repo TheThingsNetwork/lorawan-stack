@@ -170,15 +170,6 @@ export const fCntWidthEncode = value => value === FRAME_WIDTH_COUNT.SUPPORTS_32_
 export const fCntWidthDecode = value =>
   value ? FRAME_WIDTH_COUNT.SUPPORTS_32_BIT : FRAME_WIDTH_COUNT.SUPPORTS_16_BIT
 
-/**
- * @param {string} freqPlan - End device frequency plan.
- * @returns {boolean} - Whether end device frequency plan has a CFList type of ChMask (channel mask).
- */
-export const hasCFListTypeChMask = (freqPlan = '') =>
-  freqPlan.startsWith('US_902_928') ||
-  freqPlan.startsWith('AU_915_928') ||
-  freqPlan.startsWith('CN_470_510')
-
 const ALL_ZERO_KEY = '0'.repeat(32)
 
 /**

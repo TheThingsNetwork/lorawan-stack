@@ -95,7 +95,7 @@ var AU_915_928_TS1_v1_0_1 = Band{
 		return au915928DownlinkDRTableLegacy[idx][offset], nil
 	},
 
-	GenerateChMasks: makeGenerateChMask72(false),
+	GenerateChMasks: makeGenerateChMask72(false, false),
 	ParseChMask:     parseChMask72,
 
 	DefaultRx2Parameters: Rx2Parameters{ttnpb.DataRateIndex_DATA_RATE_8, 923300000},

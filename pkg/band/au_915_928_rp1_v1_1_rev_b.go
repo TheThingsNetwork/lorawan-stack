@@ -101,7 +101,7 @@ var AU_915_928_RP1_v1_1_RevB = Band{
 		return au915928DownlinkDRTable[idx][offset], nil
 	},
 
-	GenerateChMasks: makeGenerateChMask72(true),
+	GenerateChMasks: makeGenerateChMask72(true, true),
 	ParseChMask:     parseChMask72,
 
 	DefaultRx2Parameters: Rx2Parameters{ttnpb.DataRateIndex_DATA_RATE_8, 923300000},

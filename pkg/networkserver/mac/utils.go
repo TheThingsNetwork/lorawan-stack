@@ -541,6 +541,17 @@ outer:
 				continue outer
 			}
 		}
+		switch phy.CFListType {
+		case ttnpb.CFListType_FREQUENCIES:
+			// Factory preset frequencies in bands which provide frequencies as part of the CFList
+			// are interpreted as being used both for uplinks and downlinks.
+		case ttnpb.CFListType_CHANNEL_MASKS:
+			// Factory preset frequencies in bands which provide channel masks as part of the CFList
+			// are interpreted as enabling explicit uplink channels.
+			continue outer
+		default:
+			panic("unreachable")
+		}
 		if dev.Multicast {
 			chs = append(chs, &ttnpb.MACParameters_Channel{
 				DownlinkFrequency: freq,

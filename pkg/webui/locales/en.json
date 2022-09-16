@@ -559,7 +559,6 @@
   "console.containers.device-onboarding-form.type-form-section.manual-form-section.advanced-settings-section.classBandC": "Class B and class C",
   "console.containers.device-onboarding-form.type-form-section.manual-form-section.advanced-settings-section.skipJsRegistration": "Skip registration on Join Server",
   "console.containers.device-onboarding-form.type-form-section.manual-form-section.advanced-settings-section.multicastClassCapabilities": "LoRaWAN class for multicast downlinks",
-  "console.containers.device-onboarding-form.type-form-section.manual-form-section.advanced-settings-section.factoryFreqWarning": "In LoRaWAN, factory preset frequencies are only supported for bands with a CFList type of frequencies",
   "console.containers.device-onboarding-form.type-form-section.manual-form-section.advanced-settings-section.register": "Register manually",
   "console.containers.device-onboarding-form.type-form-section.manual-form-section.advanced-settings-section.macSettingsError": "There was an error and the default MAC settings for the <code>{freqPlan}</code> frequency plan could not be loaded",
   "console.containers.device-onboarding-form.type-form-section.manual-form-section.advanced-settings-section.fpNotFoundError": "The LoRaWAN version <code>{lorawanVersion}</code> does not support the <code>{freqPlan}</code> frequency plan. Please choose a different MAC version or frequency plan.",
