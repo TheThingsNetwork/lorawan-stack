@@ -38,7 +38,7 @@ describe('Device onboarding with QR scan', () => {
     appId,
     joinEui: '0000000000000001',
     devEui: '0000000000000002',
-    cac: 'O22322',
+    cac: '22322',
   }
 
   const joinEui = device.joinEui.match(/.{1,2}/g).join(' ')
