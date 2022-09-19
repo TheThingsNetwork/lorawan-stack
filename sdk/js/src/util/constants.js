@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const STACK_COMPONENTS = ['as', 'is', 'ns', 'js', 'gs', 'edtc', 'qrg', 'gcs']
+export const STACK_COMPONENTS = ['as', 'is', 'ns', 'js', 'gs', 'edtc', 'qrg', 'gcs', 'dcs']
 
 export const STACK_COMPONENTS_MAP = STACK_COMPONENTS.reduce((acc, curr) => {
   acc[curr] = curr
@@ -27,6 +27,7 @@ export const URI_PREFIX_STACK_COMPONENT_MAP = {
   edtc: 'edtc',
   qrg: 'qrg',
   gcs: 'gcs',
+  edcs: 'dcs',
 }
 
 export const AUTHORIZATION_MODES = Object.freeze({
