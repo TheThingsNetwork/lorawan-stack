@@ -31,6 +31,7 @@ const stack = {
   [STACK_COMPONENTS_MAP.edtc]: stackConfig.edtc.enabled ? stackConfig.edtc.base_url : undefined,
   [STACK_COMPONENTS_MAP.qrg]: stackConfig.qrg.enabled ? stackConfig.qrg.base_url : undefined,
   [STACK_COMPONENTS_MAP.gcs]: stackConfig.gcs.enabled ? stackConfig.gcs.base_url : undefined,
+  [STACK_COMPONENTS_MAP.dcs]: stackConfig.dcs.enabled ? stackConfig.dcs.base_url : undefined,
 }
 
 const tts = new TTS({
