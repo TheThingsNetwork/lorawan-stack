@@ -234,8 +234,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		dev.MacState.QueuedResponses = nil
 		dev.MacState.PendingRequests = dev.MacState.PendingRequests[:0]
 
-		enqueuers := make([]func(context.Context, *ttnpb.EndDevice, uint16, uint16) mac.EnqueueState, 0, 13)
-		enqueuers = append(enqueuers,
+		enqueuers := []func(context.Context, *ttnpb.EndDevice, uint16, uint16) mac.EnqueueState{
 			mac.EnqueueDutyCycleReq,
 			func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
 				return mac.EnqueueTxParamSetupReq(ctx, dev, maxDownLen, maxUpLen, phy)
@@ -258,25 +257,15 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				return st
 			},
 			mac.EnqueueRxTimingSetupReq,
-		)
-		if dev.MacState.DeviceClass == ttnpb.Class_CLASS_B {
-			if class == ttnpb.Class_CLASS_A {
-				enqueuers = append(enqueuers,
-					mac.EnqueuePingSlotChannelReq,
-				)
-			}
-			enqueuers = append(enqueuers,
-				mac.EnqueueBeaconFreqReq,
-			)
-		}
-		enqueuers = append(enqueuers,
+			mac.EnqueueBeaconFreqReq,
+			mac.EnqueuePingSlotChannelReq,
 			mac.EnqueueDLChannelReq,
 			func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
 				return mac.EnqueueADRParamSetupReq(ctx, dev, maxDownLen, maxUpLen, phy)
 			},
 			mac.EnqueueForceRejoinReq,
 			mac.EnqueueRejoinParamSetupReq,
-		)
+		}
 
 		for _, f := range enqueuers {
 			st := f(ctx, dev, maxDownLen, maxUpLen)
