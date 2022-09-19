@@ -27,7 +27,13 @@ const units = [
   { label: sharedMessages.hours, value: 'h' },
 ]
 
-const encoder = (value, unit) => (value ? `${value}${unit}` : null)
+const encoder = (value, unit) => {
+  if (value === null) {
+    return null
+  }
+
+  return value ? `${value}${unit}` : unit
+}
 const decoder = (rawValue = '') => {
   if (rawValue === null) {
     return { value: '', unit: null }
