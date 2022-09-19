@@ -240,9 +240,6 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				return mac.EnqueueTxParamSetupReq(ctx, dev, maxDownLen, maxUpLen, phy)
 			},
 			mac.EnqueueRxParamSetupReq,
-			func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
-				return mac.EnqueueDevStatusReq(ctx, dev, maxDownLen, maxUpLen, ns.defaultMACSettings, transmitAt)
-			},
 			mac.EnqueueNewChannelReq,
 			func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
 				// NOTE: LinkADRReq must be enqueued after NewChannelReq.
@@ -265,6 +262,9 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 			},
 			mac.EnqueueForceRejoinReq,
 			mac.EnqueueRejoinParamSetupReq,
+			func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
+				return mac.EnqueueDevStatusReq(ctx, dev, maxDownLen, maxUpLen, ns.defaultMACSettings, transmitAt)
+			},
 		}
 
 		for _, f := range enqueuers {
