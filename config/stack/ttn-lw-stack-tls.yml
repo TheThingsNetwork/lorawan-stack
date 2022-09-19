@@ -33,7 +33,7 @@ console:
     gcs:
       base-url: 'https://localhost:8885/api/v3'
     dcs:
-      base-url: 'http://localhost:1885/api/v3'
+      base-url: 'https://localhost:8885/api/v3'
 
   oauth:
     authorize-url: 'https://localhost:8885/oauth/authorize'

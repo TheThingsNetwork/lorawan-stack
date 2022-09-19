@@ -92,6 +92,8 @@ tls:
 #       base-url: 'https://thethings.example.com/api/v3'
 #     edtc:
 #       base-url: 'https://thethings.example.com/api/v3'
+#     dcs:
+#       base-url: 'https://thethings.example.com/api/v3'
 #
 #   oauth:
 #     authorize-url: 'https://thethings.example.com/oauth/authorize'
