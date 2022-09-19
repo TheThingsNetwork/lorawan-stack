@@ -237,6 +237,9 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		enqueuers := make([]func(context.Context, *ttnpb.EndDevice, uint16, uint16) mac.EnqueueState, 0, 13)
 		enqueuers = append(enqueuers,
 			mac.EnqueueDutyCycleReq,
+			func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
+				return mac.EnqueueTxParamSetupReq(ctx, dev, maxDownLen, maxUpLen, phy)
+			},
 			mac.EnqueueRxParamSetupReq,
 			func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
 				return mac.EnqueueDevStatusReq(ctx, dev, maxDownLen, maxUpLen, ns.defaultMACSettings, transmitAt)
@@ -264,13 +267,6 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 			}
 			enqueuers = append(enqueuers,
 				mac.EnqueueBeaconFreqReq,
-			)
-		}
-		if phy.TxParamSetupReqSupport {
-			enqueuers = append(enqueuers,
-				func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
-					return mac.EnqueueTxParamSetupReq(ctx, dev, maxDownLen, maxUpLen, phy)
-				},
 			)
 		}
 		enqueuers = append(enqueuers,
