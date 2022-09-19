@@ -170,7 +170,7 @@ const devices = (state = defaultState, { type, payload, event }) => {
         // For 1.1+ end devices there are two frame counters. If `f_port` is equal to 0 - then it's the "network" frame counter,
         // otherwise it's the "application" frame counter. Currently, we display only the application counter.
         // Also, see https://github.com/TheThingsNetwork/lorawan-stack/issues/2740.
-        if (getByPath(event, 'data.payload.f_port') > 0) {
+        if (getByPath(event, 'data.payload.mac_payload.f_port') > 0) {
           const downlinkFrameCount = getByPath(event, 'data.payload.mac_payload.full_f_cnt')
           if (typeof downlinkFrameCount === 'number') {
             return mergeDerived(state, combinedDeviceId, {
