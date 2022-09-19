@@ -71,6 +71,17 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Ban
 	for i, ch := range dev.MacState.CurrentParameters.Channels {
 		currentChs[i] = ch.GetEnableUplink()
 	}
+	pendingChs := make([]bool, phy.MaxUplinkChannels)
+	for _, req := range dev.MacState.PendingRequests {
+		newChannelReq := req.GetNewChannelReq()
+		if newChannelReq == nil {
+			continue
+		}
+		idx := int(newChannelReq.ChannelIndex)
+		pendingChs[idx] = true
+		// NewChannelReq will automatically enable the channel if the frequency is not 0.
+		currentChs[idx] = newChannelReq.Frequency != 0
+	}
 	desiredChs := make([]bool, phy.MaxUplinkChannels)
 	for i, ch := range dev.MacState.DesiredParameters.Channels {
 		isEnabled := ch.GetEnableUplink()
@@ -83,8 +94,11 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Ban
 				).
 				WithCause(internal.ErrDownlinkChannel)
 		}
-		if DeviceNeedsNewChannelReqAtIndex(dev, i) {
-			currentChs[i] = ch != nil && ch.UplinkFrequency != 0
+		if i >= len(dev.MacState.CurrentParameters.Channels) && !pendingChs[i] {
+			// The channel is not yet part of the end device channels list, and it is not pending
+			// registration by a NewChannelReq command. As such, we avoid trying to enable it via
+			// the channel mask.
+			continue
 		}
 		desiredChs[i] = isEnabled
 	}
