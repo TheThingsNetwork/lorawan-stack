@@ -16,6 +16,7 @@
 
 import fs from 'fs'
 import path from 'path'
+import child_process from 'child_process'
 
 import webpack from 'webpack'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
@@ -30,6 +31,8 @@ import nib from 'nib'
 import pjson from '../package.json'
 
 const { version } = pjson
+const revision =
+  child_process.execSync('git rev-parse --short HEAD').toString().trim() || 'unknown revision'
 
 const {
   CONTEXT = '.',
@@ -263,6 +266,7 @@ export default {
       new webpack.EnvironmentPlugin({
         NODE_ENV,
         VERSION: version,
+        REVISION: revision,
       }),
       new webpack.DefinePlugin({
         'process.predefined.SUPPORTED_LOCALES': JSON.stringify(supportedLocales),
