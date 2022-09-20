@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { Component } from 'react'
+import React, { useCallback, useState } from 'react'
 import { defineMessages } from 'react-intl'
-import bind from 'autobind-decorator'
 
 import Form from '@ttn-lw/components/form'
 import FileInput from '@ttn-lw/components/file-input'
@@ -32,12 +31,13 @@ import LorawanVersionInput from '@console/components/lorawan-version-input'
 
 import DeviceTemplateFormatSelect from '@console/containers/device-template-format-select'
 import { NsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
+import DeviceTypeRepositoryFormSection from '@console/containers/device-onboarding-form/type-form-section/repository-form-section'
 
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
-import { selectNsConfig } from '@ttn-lw/lib/selectors/env'
+import { selectNsEnabled } from '@ttn-lw/lib/selectors/env'
 
 import style from './device-import-form.styl'
 
@@ -68,153 +68,154 @@ const validationSchema = Yup.object({
   lorawan_phy_version: Yup.string(),
 })
 
-const { enabled: nsEnabled } = selectNsConfig()
+const nsEnabled = selectNsEnabled
 
-export default class DeviceBulkCreateForm extends Component {
-  static propTypes = {
-    initialValues: PropTypes.shape({
-      format_id: PropTypes.string,
-      data: PropTypes.string,
-      set_claim_auth_code: PropTypes.bool,
-      frequency_plan_id: PropTypes.string,
-      lorawan_version: PropTypes.string,
-      lorawan_phy_version: PropTypes.string,
-    }).isRequired,
-    jsEnabled: PropTypes.bool.isRequired,
-    largeFileWarningMessage: PropTypes.message,
-    onSubmit: PropTypes.func.isRequired,
-    warningSize: PropTypes.number,
-  }
+const DeviceBulkCreateForm = props => {
+  const { initialValues, onSubmit, jsEnabled, warningSize, largeFileWarningMessage } = props
+  const [allowedFileExtensions, setAllowedFileExtensions] = useState(undefined)
+  const [formatDescription, setFormatDescription] = useState(undefined)
+  const [formatSelected, setFormatSelected] = useState(false)
+  const [lorawanVersion, setLorawanVersion] = useState('')
+  const [freqPlan, setFreqPlan] = useState('')
+  const [inputMethod, setInputMethod] = useState('manual')
 
-  static defaultProps = {
-    largeFileWarningMessage: undefined,
-    warningSize: undefined,
-  }
-
-  state = {
-    allowedFileExtensions: undefined,
-    formatDescription: undefined,
-    formatSelected: false,
-    lorawanVersion: '',
-    freqPlan: '',
-  }
-
-  @bind
-  handleSelectChange(value) {
-    const newState = { formatSelected: true }
+  const handleSelectChange = useCallback(value => {
+    setFormatSelected(true)
     if (value && value.fileExtensions && value.fileExtensions instanceof Array) {
-      newState.allowedFileExtensions = value.fileExtensions.join(',')
+      setAllowedFileExtensions(value.fileExtensions.join(','))
     }
     if (value && value.description) {
-      newState.formatDescription = value.description
+      setFormatDescription(value.description)
     }
-    this.setState(newState)
+  }, [])
+
+  const handleFreqPlanChange = useCallback(value => {
+    const { value: freqPlan } = value
+    setFreqPlan(freqPlan)
+  }, [])
+
+  const handleLorawanVersionChange = useCallback(value => {
+    setLorawanVersion(value)
+  }, [])
+
+  const handleInputMethodChange = useCallback(value => {
+    setInputMethod(value)
+  }, [])
+
+  let passedInitialValues = initialValues
+  if (!jsEnabled && initialValues.set_claim_auth_code) {
+    passedInitialValues = { ...initialValues, set_claim_auth_code: false }
   }
 
-  @bind
-  handleFreqPlanChange(option) {
-    const { value: freqPlan } = option
-    this.setState({ freqPlan })
-  }
-
-  @bind
-  handleLorawanVersionChange(version) {
-    this.setState({ lorawanVersion: version })
-  }
-
-  render() {
-    const { initialValues, onSubmit, jsEnabled, warningSize, largeFileWarningMessage } = this.props
-    const { allowedFileExtensions, formatSelected, formatDescription, freqPlan, lorawanVersion } =
-      this.state
-    let passedInitialValues = initialValues
-    if (!jsEnabled && initialValues.set_claim_auth_code) {
-      passedInitialValues = { ...initialValues, set_claim_auth_code: false }
-    }
-    return (
-      <Form
-        onSubmit={onSubmit}
-        validationSchema={validationSchema}
-        submitEnabledWhenInvalid
-        initialValues={passedInitialValues}
-      >
-        <Message
-          content={m.infoText}
-          className={style.info}
-          values={{
-            DocLink: msg => (
-              <Link.DocLink secondary path="/getting-started/migrating/import-devices/">
-                {msg}
-              </Link.DocLink>
-            ),
-          }}
-        />
-        <hr className={style.hRule} />
-        <DeviceTemplateFormatSelect onChange={this.handleSelectChange} name="format_id" required />
-        <Form.InfoField disabled={!formatSelected} title={m.formatInfo}>
-          {formatDescription ? formatDescription : <Message content={m.fileInfoPlaceholder} />}
-        </Form.InfoField>
-        {formatSelected && (
-          <>
-            <Form.Field
-              title={m.file}
-              accept={allowedFileExtensions}
-              component={FileInput}
-              largeFileWarningMessage={largeFileWarningMessage}
-              warningSize={warningSize}
-              name="data"
-              required
-            />
-            <Form.SubTitle title="Fallback values" />
-            <Form.Field
-              title={m.inputMethod}
-              component={Radio.Group}
-              value={_inputMethod}
-              name="_inputMethod"
-              valueSetter={handleInputMethodChange}
-            >
-              <Radio label={m.inputMethodDeviceRepo} value="device-repository" />
-              <Radio label={m.inputMethodManual} value="manual" />
-            </Form.Field>
-            <Notification small info content={m.fallbackValuesImport} />
-            {nsEnabled && (
-              <NsFrequencyPlansSelect
-                tooltipId={tooltipIds.FREQUENCY_PLAN}
-                name="frequency_plan_id"
-                onChange={this.handleFreqPlanChange}
-              />
-            )}
-            <Form.Field
-              title={sharedMessages.macVersion}
-              name="lorawan_version"
-              component={LorawanVersionInput}
-              tooltipId={tooltipIds.LORAWAN_VERSION}
-              onChange={this.handleLorawanVersionChange}
-              frequencyPlan={freqPlan}
-            />
-            <Form.Field
-              title={sharedMessages.phyVersion}
-              name="lorawan_phy_version"
-              component={PhyVersionInput}
-              tooltipId={tooltipIds.REGIONAL_PARAMETERS}
-              onChange={this.handlePhyVersionChange}
-              lorawanVersion={lorawanVersion}
-            />
-            <Form.CollapseSection id="advanced-settings" title={m.advancedSectionTitle}>
+  return (
+    <Form
+      onSubmit={onSubmit}
+      validationSchema={validationSchema}
+      submitEnabledWhenInvalid
+      initialValues={passedInitialValues}
+    >
+      <Message
+        content={m.infoText}
+        className={style.info}
+        values={{
+          DocLink: msg => (
+            <Link.DocLink secondary path="/getting-started/migrating/import-devices/">
+              {msg}
+            </Link.DocLink>
+          ),
+        }}
+      />
+      <hr className={style.hRule} />
+      <DeviceTemplateFormatSelect onChange={handleSelectChange} name="format_id" required />
+      <Form.InfoField disabled={!formatSelected} title={m.formatInfo}>
+        {formatDescription ? formatDescription : <Message content={m.fileInfoPlaceholder} />}
+      </Form.InfoField>
+      {formatSelected && (
+        <>
+          <Form.Field
+            title={m.file}
+            accept={allowedFileExtensions}
+            component={FileInput}
+            largeFileWarningMessage={largeFileWarningMessage}
+            warningSize={warningSize}
+            name="data"
+            required
+          />
+          <Form.SubTitle title="Fallback values" />
+          <Notification small info content={m.fallbackValuesImport} />
+          <Form.Field
+            title={m.inputMethod}
+            onChange={handleInputMethodChange}
+            component={Radio.Group}
+            name="_inputMethod"
+          >
+            <Radio label={m.inputMethodDeviceRepo} value="device-repository" />
+            <Radio label={m.inputMethodManual} value="manual" />
+          </Form.Field>
+          {inputMethod === 'manual' && (
+            <>
+              {nsEnabled && (
+                <NsFrequencyPlansSelect
+                  tooltipId={tooltipIds.FREQUENCY_PLAN}
+                  name="frequency_plan_id"
+                  onChange={handleFreqPlanChange}
+                />
+              )}
               <Form.Field
-                disabled={!jsEnabled}
-                title={m.claiming}
-                label={m.setClaimAuthCode}
-                component={Checkbox}
-                name="set_claim_auth_code"
-                tooltipId={tooltipIds.SET_CLAIM_AUTH_CODE}
+                title={sharedMessages.macVersion}
+                name="lorawan_version"
+                component={LorawanVersionInput}
+                tooltipId={tooltipIds.LORAWAN_VERSION}
+                onChange={handleLorawanVersionChange}
+                frequencyPlan={freqPlan}
               />
-            </Form.CollapseSection>
-            <SubmitBar>
-              <Form.Submit component={SubmitButton} message={sharedMessages.importDevices} />
-            </SubmitBar>
-          </>
-        )}
-      </Form>
-    )
-  }
+              <Form.Field
+                title={sharedMessages.phyVersion}
+                name="lorawan_phy_version"
+                component={PhyVersionInput}
+                tooltipId={tooltipIds.REGIONAL_PARAMETERS}
+                lorawanVersion={lorawanVersion}
+              />
+            </>
+          )}
+          {inputMethod === 'device-repository' && <DeviceTypeRepositoryFormSection />}
+          <Form.CollapseSection id="advanced-settings" title={m.advancedSectionTitle}>
+            <Form.Field
+              disabled={!jsEnabled}
+              title={m.claiming}
+              label={m.setClaimAuthCode}
+              component={Checkbox}
+              name="set_claim_auth_code"
+              tooltipId={tooltipIds.SET_CLAIM_AUTH_CODE}
+            />
+          </Form.CollapseSection>
+          <SubmitBar>
+            <Form.Submit component={SubmitButton} message={sharedMessages.importDevices} />
+          </SubmitBar>
+        </>
+      )}
+    </Form>
+  )
 }
+
+DeviceBulkCreateForm.propTypes = {
+  initialValues: PropTypes.shape({
+    format_id: PropTypes.string,
+    data: PropTypes.string,
+    set_claim_auth_code: PropTypes.bool,
+    frequency_plan_id: PropTypes.string,
+    lorawan_version: PropTypes.string,
+    lorawan_phy_version: PropTypes.string,
+  }).isRequired,
+  jsEnabled: PropTypes.bool.isRequired,
+  largeFileWarningMessage: PropTypes.message,
+  onSubmit: PropTypes.func.isRequired,
+  warningSize: PropTypes.number,
+}
+
+DeviceBulkCreateForm.defaultProps = {
+  largeFileWarningMessage: undefined,
+  warningSize: undefined,
+}
+
+export default DeviceBulkCreateForm
