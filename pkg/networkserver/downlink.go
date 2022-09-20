@@ -482,6 +482,9 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 					panic(fmt.Sprintf("invalid downlink MType: %s", down.Payload.MHdr.MType))
 				}
 			}
+			if dev.Session.LastNFCntDown > 0 {
+				return dev.Session.LastNFCntDown + 1
+			}
 			return 0
 		}()
 
