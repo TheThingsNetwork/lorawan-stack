@@ -96,6 +96,19 @@ func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYV
 		}
 		return linkADRReqs, evBuilders, false
 	case test.ASAUFrequencyPlanID:
+		maxEIRPIndex := ttnpb.DeviceEIRP(5)
+		// The maximum EIRP in the RP001-1.0.2A version is 14 dB only, while the other versions use 16 dB.
+		if phyVersion == ttnpb.PHYVersion_PHY_V1_0_2_REV_A {
+			maxEIRPIndex = ttnpb.DeviceEIRP(4)
+		}
+		txParamSetupReq := &ttnpb.MACCommand_TxParamSetupReq{
+			MaxEirpIndex:      maxEIRPIndex,
+			DownlinkDwellTime: false,
+			UplinkDwellTime:   false,
+		}
+		macCommanders := []MACCommander{txParamSetupReq}
+		evBuilders := []events.Builder{mac.EvtEnqueueTxParamSetupRequest.With(events.WithData(txParamSetupReq))}
+
 		newChannelReq := &ttnpb.MACCommand_NewChannelReq{
 			ChannelIndex:     7,
 			Frequency:        924600000,
@@ -112,8 +125,8 @@ func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYV
 			}
 		}
 
-		macCommanders := []MACCommander{newChannelReq}
-		evBuilders := []events.Builder{mac.EvtEnqueueNewChannelRequest.With(events.WithData(newChannelReq))}
+		macCommanders = append(macCommanders, newChannelReq)
+		evBuilders = append(evBuilders, mac.EvtEnqueueNewChannelRequest.With(events.WithData(newChannelReq)))
 
 		fPending := true
 		// The boot time settings of RP001-1.0.2B devices enable downlink dwell time, which limits the number
@@ -131,19 +144,6 @@ func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYV
 			evBuilders = append(evBuilders, mac.EvtEnqueueLinkADRRequest.With(events.WithData(linkADRReq)))
 			fPending = false
 		}
-
-		maxEIRPIndex := ttnpb.DeviceEIRP(5)
-		// The maximum EIRP in the RP001-1.0.2A version is 14 dB only, while the other versions use 16 dB.
-		if phyVersion == ttnpb.PHYVersion_PHY_V1_0_2_REV_A {
-			maxEIRPIndex = ttnpb.DeviceEIRP(4)
-		}
-		txParamSetupReq := &ttnpb.MACCommand_TxParamSetupReq{
-			MaxEirpIndex:      maxEIRPIndex,
-			DownlinkDwellTime: false,
-			UplinkDwellTime:   false,
-		}
-		macCommanders = append(macCommanders, txParamSetupReq)
-		evBuilders = append(evBuilders, mac.EvtEnqueueTxParamSetupRequest.With(events.WithData(txParamSetupReq)))
 		return macCommanders, evBuilders, fPending
 	default:
 		panic(fmt.Errorf("unknown LinkADRReqs for %s frequency plan", fpID))
@@ -154,10 +154,12 @@ type OTAAFlowTestConfig struct {
 	CreateDevice *ttnpb.SetEndDeviceRequest
 	Func         func(context.Context, TestEnvironment, *ttnpb.EndDevice)
 
-	UplinkMACCommanders   []MACCommander
-	UplinkEventBuilders   []events.Builder
-	DownlinkMACCommanders []MACCommander
-	DownlinkEventBuilders []events.Builder
+	UplinkMACCommanders       []MACCommander
+	UplinkEventBuilders       []events.Builder
+	DownlinkHeadMACCommanders []MACCommander
+	DownlinkHeadEventBuilders []events.Builder
+	DownlinkTailMACCommanders []MACCommander
+	DownlinkTailEventBuilders []events.Builder
 }
 
 func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnvironment) {
@@ -272,9 +274,11 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 		}
 
 		fpCmders, fpEvBuilders, fPending := frequencyPlanMACCommands(dev.MacState.LorawanVersion, dev.LorawanPhyVersion, dev.FrequencyPlanId, true)
-		downEvBuilders := append(conf.DownlinkEventBuilders, fpEvBuilders...)
-		downCmders = append(downCmders, conf.DownlinkMACCommanders...)
+		downEvBuilders := append(conf.DownlinkHeadEventBuilders, fpEvBuilders...)
+		downEvBuilders = append(downEvBuilders, conf.DownlinkTailEventBuilders...)
+		downCmders = append(downCmders, conf.DownlinkHeadMACCommanders...)
 		downCmders = append(downCmders, fpCmders...)
+		downCmders = append(downCmders, conf.DownlinkTailMACCommanders...)
 
 		fOpts := MakeDownlinkMACBuffer(phy, downCmders...)
 		var frmPayload []byte
@@ -368,8 +372,8 @@ func makeClassAOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 				"supports_join",
 			),
 		},
-		DownlinkMACCommanders: []MACCommander{ttnpb.MACCommandIdentifier_CID_DEV_STATUS},
-		DownlinkEventBuilders: []events.Builder{mac.EvtEnqueueDevStatusRequest},
+		DownlinkTailMACCommanders: []MACCommander{ttnpb.MACCommandIdentifier_CID_DEV_STATUS},
+		DownlinkTailEventBuilders: []events.Builder{mac.EvtEnqueueDevStatusRequest},
 		Func: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) {
 		},
 	})
@@ -415,10 +419,11 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 				"supports_join",
 			),
 		},
-		UplinkMACCommanders:   upCmders,
-		UplinkEventBuilders:   upEvBuilders,
-		DownlinkMACCommanders: append(downCmders, ttnpb.MACCommandIdentifier_CID_DEV_STATUS),
-		DownlinkEventBuilders: []events.Builder{mac.EvtEnqueueDevStatusRequest},
+		UplinkMACCommanders:       upCmders,
+		UplinkEventBuilders:       upEvBuilders,
+		DownlinkHeadMACCommanders: downCmders,
+		DownlinkTailMACCommanders: []MACCommander{ttnpb.MACCommandIdentifier_CID_DEV_STATUS},
+		DownlinkTailEventBuilders: []events.Builder{mac.EvtEnqueueDevStatusRequest},
 		Func: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) {
 		},
 	})

@@ -69,7 +69,7 @@ func DeviceNeedsNewChannelReq(dev *ttnpb.EndDevice) bool {
 	if dev.GetMulticast() || dev.GetMacState() == nil {
 		return false
 	}
-	if len(dev.MacState.DesiredParameters.Channels) != len(dev.MacState.CurrentParameters.Channels) {
+	if len(dev.MacState.DesiredParameters.Channels) > len(dev.MacState.CurrentParameters.Channels) {
 		return true
 	}
 	for i := range dev.MacState.DesiredParameters.Channels {

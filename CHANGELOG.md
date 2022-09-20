@@ -21,6 +21,8 @@ For details about compatibility between different releases, see the **Commitment
 - LoRa coding rate now defined in `DataRate` instead of `Band`.
 - The Network Server will now schedule a potentially empty downlink in order to stop end devices from sending sticky MAC commands.
 - Factory preset frequencies may now be provided for bands with fixed channel plans, such as US915 or AU915. The factory preset frequencies are interpreted as the only channels which are enabled at boot time.
+- `TxParamSetupReq` MAC command priority has been increased.
+- `DevStatusReq` MAC command priority has been lowered.
 
 ### Deprecated
 
@@ -33,6 +35,7 @@ For details about compatibility between different releases, see the **Commitment
 - `--mac-settings.adr.mode.disabled`, `--mac-settings.adr.mode.dynamic` and `--mac-settings.adr.mode.static` flags of the `end-device update` command.
 - Pagination in `sessions` and `access tokens` tables in the Console.
 - `LinkADRReq` MAC command generation for LoRaWAN 1.0 and 1.0.1 end devices.
+- `LinkADRReq` no longer attempts to enable channels which have not yet been negotiated with the end device.
 
 ### Security
 

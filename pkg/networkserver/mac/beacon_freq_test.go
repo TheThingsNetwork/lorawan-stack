@@ -77,7 +77,7 @@ func TestNeedsBeaconFreqReq(t *testing.T) {
 							DesiredParameters: conf.DesiredParameters,
 						},
 					},
-					Needs: conf.Needs && class == ttnpb.Class_CLASS_B,
+					Needs: conf.Needs,
 				},
 			)
 		}

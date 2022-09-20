@@ -1152,20 +1152,63 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 							a.So(lorawan.UnmarshalMessage(req.Message.RawPayload, actual), should.BeNil)
 							a.So(lorawan.UnmarshalMessage(conf.Payload, expected), should.BeNil)
 							a.So(actual, should.Resemble, expected)
-							if aPld, ePld := actual.GetMacPayload(), expected.GetMacPayload(); !macspec.EncryptFOpts(conf.MACState.LorawanVersion) &&
-								aPld != nil && ePld != nil &&
-								!bytes.Equal(aPld.FHdr.FOpts, ePld.FHdr.FOpts) {
-								macCommands := func(b []byte) (cmds []*ttnpb.MACCommand) {
-									for r := bytes.NewReader(b); r.Len() > 0; {
-										cmd := &ttnpb.MACCommand{}
-										if !a.So(lorawan.DefaultMACCommands.ReadDownlink(*phy, r, cmd), should.BeNil) {
-											return nil
-										}
-										cmds = append(cmds, cmd)
+
+							macCommands := func(b []byte) (cmds []*ttnpb.MACCommand) {
+								for r := bytes.NewReader(b); r.Len() > 0; {
+									cmd := &ttnpb.MACCommand{}
+									if !a.So(lorawan.DefaultMACCommands.ReadDownlink(*phy, r, cmd), should.BeNil) {
+										return nil
 									}
-									return cmds
+									cmds = append(cmds, cmd)
 								}
-								a.So(macCommands(aPld.FHdr.FOpts), should.Resemble, macCommands(ePld.FHdr.FOpts))
+								return cmds
+							}
+							aPld, ePld := actual.GetMacPayload(), expected.GetMacPayload()
+							if aPld != nil && ePld != nil && !bytes.Equal(aPld.FHdr.FOpts, ePld.FHdr.FOpts) {
+								aFOpts, eFOpts := aPld.FHdr.FOpts, ePld.FHdr.FOpts
+								if macspec.EncryptFOpts(conf.MACState.LorawanVersion) {
+									encOpts := macspec.EncryptionOptions(
+										conf.MACState.LorawanVersion,
+										macspec.DownlinkFrame,
+										ePld.FPort,
+										true,
+									)
+
+									aFOpts = MustEncryptDownlink(
+										*types.MustAES128Key(conf.Session.Keys.NwkSEncKey.Key),
+										*types.MustDevAddr(conf.Session.DevAddr),
+										ePld.FPort,
+										encOpts,
+										aFOpts...,
+									)
+									eFOpts = MustEncryptDownlink(
+										*types.MustAES128Key(conf.Session.Keys.NwkSEncKey.Key),
+										*types.MustDevAddr(conf.Session.DevAddr),
+										ePld.FPort,
+										encOpts,
+										eFOpts...,
+									)
+								}
+								a.So(macCommands(aFOpts), should.Resemble, macCommands(eFOpts))
+							}
+							if aPld != nil && ePld != nil && aPld.FPort == 0 &&
+								!bytes.Equal(aPld.FrmPayload, ePld.FrmPayload) {
+								aFrmPayload, eFrmPayload := aPld.FrmPayload, ePld.FrmPayload
+								aFrmPayload = MustEncryptDownlink(
+									*types.MustAES128Key(conf.Session.Keys.NwkSEncKey.Key),
+									*types.MustDevAddr(conf.Session.DevAddr),
+									ePld.FPort,
+									nil,
+									aFrmPayload...,
+								)
+								eFrmPayload = MustEncryptDownlink(
+									*types.MustAES128Key(conf.Session.Keys.NwkSEncKey.Key),
+									*types.MustDevAddr(conf.Session.DevAddr),
+									ePld.FPort,
+									nil,
+									eFrmPayload...,
+								)
+								a.So(macCommands(aFrmPayload), should.Resemble, macCommands(eFrmPayload))
 							}
 						}
 						t.Errorf("NsGs.ScheduleDownlink request assertion failed for schedule attempt number %d", i)
