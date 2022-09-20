@@ -69,6 +69,7 @@ func generatePushData(eui types.EUI64, status bool, timestamps ...time.Duration)
 						Lora: &ttnpb.LoRaDataRate{
 							SpreadingFactor: 7,
 							Bandwidth:       125000,
+							CodingRate:      band.Cr4_5,
 						},
 					},
 				},
