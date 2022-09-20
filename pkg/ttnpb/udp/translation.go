@@ -218,14 +218,6 @@ func convertUplink(rx RxPacket, md UpstreamMetadata) (*ttnpb.UplinkMessage, erro
 			md.GpsTime = protoTime
 		}
 	}
-
-	switch mod := up.Settings.DataRate.Modulation.(type) {
-	case *ttnpb.DataRate_Lora:
-		mod.Lora.CodingRate = rx.CodR
-	case *ttnpb.DataRate_Lrfhss:
-		mod.Lrfhss.CodingRate = rx.CodR
-	}
-
 	return up, nil
 }
 
