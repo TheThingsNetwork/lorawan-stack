@@ -228,6 +228,7 @@ export default class DeviceImporter extends Component {
       frequency_plan_id,
       lorawan_version,
       lorawan_phy_version,
+      version_ids,
     } = values
 
     let devices = []
@@ -254,7 +255,7 @@ export default class DeviceImporter extends Component {
         throw conversionError
       }
 
-      await this.setState({ convertedDevices: devices })
+      this.setState({ convertedDevices: devices })
       // Apply default values.
       for (const deviceAndFieldMask of devices) {
         const { end_device: device, field_mask } = deviceAndFieldMask
@@ -286,6 +287,10 @@ export default class DeviceImporter extends Component {
         if (!device.lorawan_phy_version && Boolean(lorawan_phy_version)) {
           device.lorawan_phy_version = lorawan_phy_version
           field_mask.paths.push('lorawan_phy_version')
+        }
+        if (!device.version_ids && Boolean(version_ids)) {
+          device.version_ids = version_ids
+          field_mask = `${field_mask},version_ids`
         }
       }
     } catch (error) {
@@ -490,6 +495,7 @@ export default class DeviceImporter extends Component {
       format_id: '',
       data: '',
       set_claim_auth_code: true,
+      _inputMethod: 'manual',
     }
     const largeFile = 10 * 1024 * 1024
     return (
