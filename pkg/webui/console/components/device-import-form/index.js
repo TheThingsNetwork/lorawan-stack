@@ -31,13 +31,14 @@ import LorawanVersionInput from '@console/components/lorawan-version-input'
 
 import DeviceTemplateFormatSelect from '@console/containers/device-template-format-select'
 import { NsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
-import DeviceTypeRepositoryFormSection from '@console/containers/device-onboarding-form/type-form-section/repository-form-section'
 
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import { selectNsEnabled } from '@ttn-lw/lib/selectors/env'
+
+import FallbackVersionIdsSection from './fallback-version-ids-section'
 
 import style from './device-import-form.styl'
 
@@ -55,8 +56,8 @@ const m = defineMessages({
   fallbackValuesImport:
     'These values will be used in case the imported file does not provide them. They are not required, although if not provided here or in the imported file, the import of the end device will not be successful.',
   inputMethod: 'Input Method',
-  inputMethodDeviceRepo: 'Select the end device in the LoRaWAN Device Repository',
-  inputMethodManual: 'Enter end device specifics manually',
+  inputMethodDeviceRepo: 'Load end device profile from the LoRaWAN Device Repository',
+  inputMethodManual: 'Enter end device fallback specifics manually',
 })
 
 const validationSchema = Yup.object({
@@ -149,8 +150,8 @@ const DeviceBulkCreateForm = props => {
             component={Radio.Group}
             name="_inputMethod"
           >
-            <Radio label={m.inputMethodDeviceRepo} value="device-repository" />
             <Radio label={m.inputMethodManual} value="manual" />
+            <Radio label={m.inputMethodDeviceRepo} value="device-repository" />
           </Form.Field>
           {inputMethod === 'manual' && (
             <>
@@ -178,7 +179,7 @@ const DeviceBulkCreateForm = props => {
               />
             </>
           )}
-          {inputMethod === 'device-repository' && <DeviceTypeRepositoryFormSection />}
+          {inputMethod === 'device-repository' && <FallbackVersionIdsSection />}
           <Form.CollapseSection id="advanced-settings" title={m.advancedSectionTitle}>
             <Form.Field
               disabled={!jsEnabled}
