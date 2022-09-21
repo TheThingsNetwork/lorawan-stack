@@ -229,6 +229,7 @@ export default class DeviceImporter extends Component {
       lorawan_version,
       lorawan_phy_version,
       version_ids,
+      _inputMethod,
     } = values
 
     let devices = []
@@ -288,7 +289,7 @@ export default class DeviceImporter extends Component {
           device.lorawan_phy_version = lorawan_phy_version
           field_mask.paths.push('lorawan_phy_version')
         }
-        if (!device.version_ids && Boolean(version_ids)) {
+        if (!device.version_ids && Boolean(version_ids) && _inputMethod === 'device-repository') {
           device.version_ids = version_ids
           field_mask = `${field_mask},version_ids`
         }
