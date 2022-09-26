@@ -246,6 +246,9 @@ func nextDataDownlinkSlot(ctx context.Context, dev *ttnpb.EndDevice, phy *band.B
 		case len(dev.MacState.QueuedResponses) > 0:
 			logger.Debug("MAC responses enqueued, choose class A downlink slot")
 			return classA, true
+		case mac.ContainsStickyMACCommand(dev.MacState.RecentMacCommandIdentifiers...):
+			logger.Debug("Sticky MAC response received, choose class A downlink slot")
+			return classA, true
 		case mac.DeviceNeedsADRParamSetupReq(dev, phy):
 			logger.Debug("Device needs ADRParamSetupReq, choose class A downlink slot")
 			return classA, true
