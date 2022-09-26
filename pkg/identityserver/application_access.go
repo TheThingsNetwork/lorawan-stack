@@ -209,14 +209,16 @@ func (is *IdentityServer) updateApplicationAPIKey(ctx context.Context, req *ttnp
 	return key, nil
 }
 
-func (is *IdentityServer) getApplicationCollaborator(ctx context.Context, req *ttnpb.GetApplicationCollaboratorRequest) (*ttnpb.GetCollaboratorResponse, error) {
+func (is *IdentityServer) getApplicationCollaborator(
+	ctx context.Context, req *ttnpb.GetApplicationCollaboratorRequest,
+) (_ *ttnpb.GetCollaboratorResponse, err error) {
 	if err := rights.RequireApplication(ctx, req.GetApplicationIds(), ttnpb.Right_RIGHT_APPLICATION_SETTINGS_COLLABORATORS); err != nil {
 		return nil, err
 	}
 	res := &ttnpb.GetCollaboratorResponse{
 		Ids: req.GetCollaborator(),
 	}
-	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
 		rights, err := st.GetMember(
 			ctx,
 			req.GetCollaborator(),
@@ -236,13 +238,16 @@ func (is *IdentityServer) getApplicationCollaborator(ctx context.Context, req *t
 
 var errApplicationNeedsCollaborator = errors.DefineFailedPrecondition("application_needs_collaborator", "every application needs at least one collaborator with all rights")
 
-func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *ttnpb.SetApplicationCollaboratorRequest) (*pbtypes.Empty, error) {
+func (is *IdentityServer) setApplicationCollaborator(
+	ctx context.Context, req *ttnpb.SetApplicationCollaboratorRequest,
+) (_ *pbtypes.Empty, err error) {
 	// Require that caller has rights to manage collaborators.
-	if err := rights.RequireApplication(ctx, req.GetApplicationIds(), ttnpb.Right_RIGHT_APPLICATION_SETTINGS_COLLABORATORS); err != nil {
+	err = rights.RequireApplication(ctx, req.GetApplicationIds(), ttnpb.Right_RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
+	if err != nil {
 		return nil, err
 	}
 
-	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
 		existingRights, err := st.GetMember(
 			ctx,
 			req.GetCollaborator().GetIds(),

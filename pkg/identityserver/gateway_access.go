@@ -237,12 +237,14 @@ func (is *IdentityServer) getGatewayCollaborator(ctx context.Context, req *ttnpb
 
 var errGatewayNeedsCollaborator = errors.DefineFailedPrecondition("gateway_needs_collaborator", "every gateway needs at least one collaborator with all rights")
 
-func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb.SetGatewayCollaboratorRequest) (*pbtypes.Empty, error) {
+func (is *IdentityServer) setGatewayCollaborator(
+	ctx context.Context, req *ttnpb.SetGatewayCollaboratorRequest,
+) (_ *pbtypes.Empty, err error) {
 	// Require that caller has rights to manage collaborators.
 	if err := rights.RequireGateway(ctx, req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
 		return nil, err
 	}
-	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
 		existingRights, err := st.GetMember(
 			ctx,
 			req.GetCollaborator().GetIds(),
