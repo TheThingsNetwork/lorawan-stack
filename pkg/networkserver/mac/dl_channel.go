@@ -53,7 +53,12 @@ func DeviceNeedsDLChannelReqAtIndex(dev *ttnpb.EndDevice, i int) bool {
 		deviceRejectedFrequency(dev, desiredCh.DownlinkFrequency) {
 		return false
 	}
-	if DeviceNeedsNewChannelReqAtIndex(dev, i) {
+	var hasPendingChannel bool
+	iteratePendingNewChannelReq(dev, func(req *ttnpb.MACCommand_NewChannelReq) bool {
+		hasPendingChannel = req.ChannelIndex == uint32(i)
+		return !hasPendingChannel
+	})
+	if hasPendingChannel {
 		return desiredCh.DownlinkFrequency != desiredCh.UplinkFrequency
 	}
 	// NOTE: NewChannelReq may be needed, but parameters could have been rejected before.

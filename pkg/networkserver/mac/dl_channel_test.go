@@ -32,6 +32,7 @@ import (
 func TestDLChannelReq(t *testing.T) {
 	for _, tc := range []struct {
 		CurrentChannels, DesiredChannels []*ttnpb.MACParameters_Channel
+		PendingRequests                  []*ttnpb.MACCommand
 		RejectedFrequencies              []uint64
 		Commands                         []*ttnpb.MACCommand_DLChannelReq
 	}{
@@ -57,6 +58,15 @@ func TestDLChannelReq(t *testing.T) {
 				{
 					UplinkFrequency:   128,
 					DownlinkFrequency: 128,
+				},
+			},
+			PendingRequests: []*ttnpb.MACCommand{
+				{
+					Payload: &ttnpb.MACCommand_NewChannelReq_{
+						NewChannelReq: &ttnpb.MACCommand_NewChannelReq{
+							ChannelIndex: 2,
+						},
+					},
 				},
 			},
 		},
@@ -87,6 +97,15 @@ func TestDLChannelReq(t *testing.T) {
 				{
 					UplinkFrequency:   128,
 					DownlinkFrequency: 128,
+				},
+			},
+			PendingRequests: []*ttnpb.MACCommand{
+				{
+					Payload: &ttnpb.MACCommand_NewChannelReq_{
+						NewChannelReq: &ttnpb.MACCommand_NewChannelReq{
+							ChannelIndex: 2,
+						},
+					},
 				},
 			},
 		},
@@ -123,6 +142,29 @@ func TestDLChannelReq(t *testing.T) {
 				{
 					UplinkFrequency:   129,
 					DownlinkFrequency: 130,
+				},
+			},
+			PendingRequests: []*ttnpb.MACCommand{
+				{
+					Payload: &ttnpb.MACCommand_NewChannelReq_{
+						NewChannelReq: &ttnpb.MACCommand_NewChannelReq{
+							ChannelIndex: 0,
+						},
+					},
+				},
+				{
+					Payload: &ttnpb.MACCommand_NewChannelReq_{
+						NewChannelReq: &ttnpb.MACCommand_NewChannelReq{
+							ChannelIndex: 1,
+						},
+					},
+				},
+				{
+					Payload: &ttnpb.MACCommand_NewChannelReq_{
+						NewChannelReq: &ttnpb.MACCommand_NewChannelReq{
+							ChannelIndex: 3,
+						},
+					},
 				},
 			},
 			Commands: []*ttnpb.MACCommand_DLChannelReq{
@@ -171,6 +213,29 @@ func TestDLChannelReq(t *testing.T) {
 					DownlinkFrequency: 130,
 				},
 			},
+			PendingRequests: []*ttnpb.MACCommand{
+				{
+					Payload: &ttnpb.MACCommand_NewChannelReq_{
+						NewChannelReq: &ttnpb.MACCommand_NewChannelReq{
+							ChannelIndex: 0,
+						},
+					},
+				},
+				{
+					Payload: &ttnpb.MACCommand_NewChannelReq_{
+						NewChannelReq: &ttnpb.MACCommand_NewChannelReq{
+							ChannelIndex: 1,
+						},
+					},
+				},
+				{
+					Payload: &ttnpb.MACCommand_NewChannelReq_{
+						NewChannelReq: &ttnpb.MACCommand_NewChannelReq{
+							ChannelIndex: 3,
+						},
+					},
+				},
+			},
 			Commands: []*ttnpb.MACCommand_DLChannelReq{
 				{
 					ChannelIndex: 1,
@@ -206,6 +271,22 @@ func TestDLChannelReq(t *testing.T) {
 				{
 					UplinkFrequency:   130,
 					DownlinkFrequency: 131,
+				},
+			},
+			PendingRequests: []*ttnpb.MACCommand{
+				{
+					Payload: &ttnpb.MACCommand_NewChannelReq_{
+						NewChannelReq: &ttnpb.MACCommand_NewChannelReq{
+							ChannelIndex: 0,
+						},
+					},
+				},
+				{
+					Payload: &ttnpb.MACCommand_NewChannelReq_{
+						NewChannelReq: &ttnpb.MACCommand_NewChannelReq{
+							ChannelIndex: 1,
+						},
+					},
 				},
 			},
 			Commands: []*ttnpb.MACCommand_DLChannelReq{
@@ -245,6 +326,7 @@ func TestDLChannelReq(t *testing.T) {
 							DesiredParameters: &ttnpb.MACParameters{
 								Channels: tc.DesiredChannels,
 							},
+							PendingRequests:     tc.PendingRequests,
 							RejectedFrequencies: tc.RejectedFrequencies,
 							LorawanVersion:      ttnpb.MACVersion_MAC_V1_0_3,
 						},

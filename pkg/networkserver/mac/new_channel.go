@@ -37,6 +37,8 @@ var (
 	)()
 )
 
+var iteratePendingNewChannelReq = iteratePendingRequests((*ttnpb.MACCommand).GetNewChannelReq)
+
 func deviceRejectedNewChannelReq(dev *ttnpb.EndDevice, freq uint64, minDRIdx, maxDRIdx ttnpb.DataRateIndex) bool {
 	return deviceRejectedFrequency(dev, freq) || deviceRejectedDataRateRange(dev, freq, minDRIdx, maxDRIdx)
 }
@@ -181,17 +183,17 @@ func HandleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 					)...,
 				)
 			}
-			ch := dev.MacState.CurrentParameters.Channels[req.ChannelIndex]
-			if ch == nil {
+			var ch *ttnpb.MACParameters_Channel
+			if req.Frequency != 0 {
 				ch = &ttnpb.MACParameters_Channel{
+					UplinkFrequency:   req.Frequency,
 					DownlinkFrequency: req.Frequency,
+					MinDataRateIndex:  req.MinDataRateIndex,
+					MaxDataRateIndex:  req.MaxDataRateIndex,
+					EnableUplink:      true,
 				}
-				dev.MacState.CurrentParameters.Channels[req.ChannelIndex] = ch
 			}
-			ch.UplinkFrequency = req.Frequency
-			ch.MinDataRateIndex = req.MinDataRateIndex
-			ch.MaxDataRateIndex = req.MaxDataRateIndex
-			ch.EnableUplink = req.Frequency > 0
+			dev.MacState.CurrentParameters.Channels[req.ChannelIndex] = ch
 			return nil
 		},
 		dev.MacState.PendingRequests...,
