@@ -74,7 +74,9 @@ var (
 	errDevEUIIssuingNotEnabled  = errors.DefineInvalidArgument("dev_eui_issuing_not_enabled", "DevEUI issuing not configured")
 )
 
-func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.CreateApplicationRequest) (app *ttnpb.Application, err error) {
+func (is *IdentityServer) createApplication( //nolint:gocyclo
+	ctx context.Context, req *ttnpb.CreateApplicationRequest,
+) (app *ttnpb.Application, err error) {
 	if err = blocklist.Check(ctx, req.Application.GetIds().GetApplicationId()); err != nil {
 		return nil, err
 	}

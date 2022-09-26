@@ -89,15 +89,15 @@ var errClientNeedsCollaborator = errors.DefineFailedPrecondition(
 )
 
 func (is *IdentityServer) setClientCollaborator(
-	ctx context.Context,
-	req *ttnpb.SetClientCollaboratorRequest,
-) (*pbtypes.Empty, error) {
+	ctx context.Context, req *ttnpb.SetClientCollaboratorRequest,
+) (_ *pbtypes.Empty, err error) {
 	// Require that caller has rights to manage collaborators.
-	if err := rights.RequireClient(ctx, req.GetClientIds(), ttnpb.Right_RIGHT_CLIENT_SETTINGS_COLLABORATORS); err != nil {
+	err = rights.RequireClient(ctx, req.GetClientIds(), ttnpb.Right_RIGHT_CLIENT_SETTINGS_COLLABORATORS)
+	if err != nil {
 		return nil, err
 	}
 
-	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
 		existingRights, err := st.GetMember(
 			ctx,
 			req.GetCollaborator().GetIds(),
