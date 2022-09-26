@@ -17,6 +17,7 @@ package mac
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -67,7 +68,10 @@ func DeviceNeedsNewChannelReqAtIndex(dev *ttnpb.EndDevice, i int) bool {
 	return false
 }
 
-func DeviceNeedsNewChannelReq(dev *ttnpb.EndDevice) bool {
+func DeviceNeedsNewChannelReq(dev *ttnpb.EndDevice, phy *band.Band) bool {
+	if phy.CFListType != ttnpb.CFListType_FREQUENCIES {
+		return false
+	}
 	if dev.GetMulticast() || dev.GetMacState() == nil {
 		return false
 	}
@@ -82,8 +86,10 @@ func DeviceNeedsNewChannelReq(dev *ttnpb.EndDevice) bool {
 	return false
 }
 
-func EnqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) EnqueueState {
-	if !DeviceNeedsNewChannelReq(dev) {
+func EnqueueNewChannelReq(
+	ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, phy *band.Band,
+) EnqueueState {
+	if !DeviceNeedsNewChannelReq(dev, phy) {
 		return EnqueueState{
 			MaxDownLen: maxDownLen,
 			MaxUpLen:   maxUpLen,

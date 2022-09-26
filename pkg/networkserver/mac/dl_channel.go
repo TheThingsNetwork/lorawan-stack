@@ -17,6 +17,7 @@ package mac
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
@@ -68,7 +69,10 @@ func DeviceNeedsDLChannelReqAtIndex(dev *ttnpb.EndDevice, i int) bool {
 	return desiredCh.DownlinkFrequency != currentParameters.Channels[i].DownlinkFrequency
 }
 
-func DeviceNeedsDLChannelReq(dev *ttnpb.EndDevice) bool {
+func DeviceNeedsDLChannelReq(dev *ttnpb.EndDevice, phy *band.Band) bool {
+	if phy.CFListType != ttnpb.CFListType_FREQUENCIES {
+		return false
+	}
 	if dev.GetMulticast() ||
 		dev.GetMacState() == nil {
 		return false
@@ -86,8 +90,10 @@ func DeviceNeedsDLChannelReq(dev *ttnpb.EndDevice) bool {
 	return false
 }
 
-func EnqueueDLChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) EnqueueState {
-	if !DeviceNeedsDLChannelReq(dev) {
+func EnqueueDLChannelReq(
+	ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, phy *band.Band,
+) EnqueueState {
+	if !DeviceNeedsDLChannelReq(dev, phy) {
 		return EnqueueState{
 			MaxDownLen: maxDownLen,
 			MaxUpLen:   maxUpLen,
