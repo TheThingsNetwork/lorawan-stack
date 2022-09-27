@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
@@ -344,12 +345,13 @@ func TestNewChannelReq(t *testing.T) {
 					},
 				})
 
+				phy := &band.Band{CFListType: ttnpb.CFListType_FREQUENCIES}
 				test.RunSubtestFromContext(ctx, test.SubtestConfig{
 					Name:     "DeviceNeedsNewChannelReq",
 					Parallel: true,
 					Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 						dev := makeDevice()
-						a.So(DeviceNeedsNewChannelReq(dev), func() func(interface{}, ...interface{}) string {
+						a.So(DeviceNeedsNewChannelReq(dev, phy), func() func(interface{}, ...interface{}) string {
 							if len(tc.Commands) > 0 {
 								return should.BeTrue
 							}
@@ -378,7 +380,7 @@ func TestNewChannelReq(t *testing.T) {
 						Parallel: true,
 						Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 							dev := makeDevice()
-							st := EnqueueNewChannelReq(ctx, dev, cmdLen, answerLen)
+							st := EnqueueNewChannelReq(ctx, dev, cmdLen, answerLen, phy)
 							expectedDevice := makeDevice()
 							var expectedEventBuilders []events.Builder
 							for _, cmd := range cmds {

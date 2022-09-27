@@ -17,6 +17,7 @@ package mac
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -36,6 +37,8 @@ var (
 		events.WithDataType(&ttnpb.MACCommand_NewChannelAns{}),
 	)()
 )
+
+var iteratePendingNewChannelReq = iteratePendingRequests((*ttnpb.MACCommand).GetNewChannelReq)
 
 func deviceRejectedNewChannelReq(dev *ttnpb.EndDevice, freq uint64, minDRIdx, maxDRIdx ttnpb.DataRateIndex) bool {
 	return deviceRejectedFrequency(dev, freq) || deviceRejectedDataRateRange(dev, freq, minDRIdx, maxDRIdx)
@@ -65,7 +68,10 @@ func DeviceNeedsNewChannelReqAtIndex(dev *ttnpb.EndDevice, i int) bool {
 	return false
 }
 
-func DeviceNeedsNewChannelReq(dev *ttnpb.EndDevice) bool {
+func DeviceNeedsNewChannelReq(dev *ttnpb.EndDevice, phy *band.Band) bool {
+	if phy.CFListType != ttnpb.CFListType_FREQUENCIES {
+		return false
+	}
 	if dev.GetMulticast() || dev.GetMacState() == nil {
 		return false
 	}
@@ -80,8 +86,10 @@ func DeviceNeedsNewChannelReq(dev *ttnpb.EndDevice) bool {
 	return false
 }
 
-func EnqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) EnqueueState {
-	if !DeviceNeedsNewChannelReq(dev) {
+func EnqueueNewChannelReq(
+	ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, phy *band.Band,
+) EnqueueState {
+	if !DeviceNeedsNewChannelReq(dev, phy) {
 		return EnqueueState{
 			MaxDownLen: maxDownLen,
 			MaxUpLen:   maxUpLen,
@@ -181,17 +189,17 @@ func HandleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 					)...,
 				)
 			}
-			ch := dev.MacState.CurrentParameters.Channels[req.ChannelIndex]
-			if ch == nil {
+			var ch *ttnpb.MACParameters_Channel
+			if req.Frequency != 0 {
 				ch = &ttnpb.MACParameters_Channel{
+					UplinkFrequency:   req.Frequency,
 					DownlinkFrequency: req.Frequency,
+					MinDataRateIndex:  req.MinDataRateIndex,
+					MaxDataRateIndex:  req.MaxDataRateIndex,
+					EnableUplink:      true,
 				}
-				dev.MacState.CurrentParameters.Channels[req.ChannelIndex] = ch
 			}
-			ch.UplinkFrequency = req.Frequency
-			ch.MinDataRateIndex = req.MinDataRateIndex
-			ch.MaxDataRateIndex = req.MaxDataRateIndex
-			ch.EnableUplink = req.Frequency > 0
+			dev.MacState.CurrentParameters.Channels[req.ChannelIndex] = ch
 			return nil
 		},
 		dev.MacState.PendingRequests...,

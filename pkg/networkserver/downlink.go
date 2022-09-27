@@ -240,7 +240,9 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				return mac.EnqueueTxParamSetupReq(ctx, dev, maxDownLen, maxUpLen, phy)
 			},
 			mac.EnqueueRxParamSetupReq,
-			mac.EnqueueNewChannelReq,
+			func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
+				return mac.EnqueueNewChannelReq(ctx, dev, maxDownLen, maxUpLen, phy)
+			},
 			func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
 				// NOTE: LinkADRReq must be enqueued after NewChannelReq.
 				st, err := mac.EnqueueLinkADRReq(ctx, dev, maxDownLen, maxUpLen, phy)
@@ -256,7 +258,9 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 			mac.EnqueueRxTimingSetupReq,
 			mac.EnqueueBeaconFreqReq,
 			mac.EnqueuePingSlotChannelReq,
-			mac.EnqueueDLChannelReq,
+			func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
+				return mac.EnqueueDLChannelReq(ctx, dev, maxDownLen, maxUpLen, phy)
+			},
 			func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
 				return mac.EnqueueADRParamSetupReq(ctx, dev, maxDownLen, maxUpLen, phy)
 			},

@@ -261,7 +261,7 @@ func nextDataDownlinkSlot(ctx context.Context, dev *ttnpb.EndDevice, phy *band.B
 		case mac.DeviceNeedsDevStatusReq(dev, defaults, rx2):
 			logger.Debug("Device needs DevStatusReq, choose class A downlink slot")
 			return classA, true
-		case mac.DeviceNeedsDLChannelReq(dev):
+		case mac.DeviceNeedsDLChannelReq(dev, phy):
 			logger.Debug("Device needs DLChannelReq, choose class A downlink slot")
 			return classA, true
 		case mac.DeviceNeedsDutyCycleReq(dev):
@@ -270,7 +270,7 @@ func nextDataDownlinkSlot(ctx context.Context, dev *ttnpb.EndDevice, phy *band.B
 		case mac.DeviceNeedsLinkADRReq(ctx, dev, phy):
 			logger.Debug("Device needs LinkADRReq, choose class A downlink slot")
 			return classA, true
-		case mac.DeviceNeedsNewChannelReq(dev):
+		case mac.DeviceNeedsNewChannelReq(dev, phy):
 			logger.Debug("Device needs NewChannelReq, choose class A downlink slot")
 			return classA, true
 		case mac.DeviceNeedsPingSlotChannelReq(dev):

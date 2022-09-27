@@ -72,16 +72,12 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Ban
 		currentChs[i] = ch.GetEnableUplink()
 	}
 	pendingChs := make([]bool, phy.MaxUplinkChannels)
-	for _, req := range dev.MacState.PendingRequests {
-		newChannelReq := req.GetNewChannelReq()
-		if newChannelReq == nil {
-			continue
-		}
-		idx := int(newChannelReq.ChannelIndex)
-		pendingChs[idx] = true
+	iteratePendingNewChannelReq(dev, func(req *ttnpb.MACCommand_NewChannelReq) bool {
+		pendingChs[req.ChannelIndex] = true
 		// NewChannelReq will automatically enable the channel if the frequency is not 0.
-		currentChs[idx] = newChannelReq.Frequency != 0
-	}
+		currentChs[req.ChannelIndex] = req.Frequency != 0
+		return true
+	})
 	desiredChs := make([]bool, phy.MaxUplinkChannels)
 	for i, ch := range dev.MacState.DesiredParameters.Channels {
 		isEnabled := ch.GetEnableUplink()

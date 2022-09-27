@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
@@ -32,6 +33,7 @@ import (
 func TestDLChannelReq(t *testing.T) {
 	for _, tc := range []struct {
 		CurrentChannels, DesiredChannels []*ttnpb.MACParameters_Channel
+		PendingRequests                  []*ttnpb.MACCommand
 		RejectedFrequencies              []uint64
 		Commands                         []*ttnpb.MACCommand_DLChannelReq
 	}{
@@ -57,6 +59,15 @@ func TestDLChannelReq(t *testing.T) {
 				{
 					UplinkFrequency:   128,
 					DownlinkFrequency: 128,
+				},
+			},
+			PendingRequests: []*ttnpb.MACCommand{
+				{
+					Payload: &ttnpb.MACCommand_NewChannelReq_{
+						NewChannelReq: &ttnpb.MACCommand_NewChannelReq{
+							ChannelIndex: 2,
+						},
+					},
 				},
 			},
 		},
@@ -87,6 +98,15 @@ func TestDLChannelReq(t *testing.T) {
 				{
 					UplinkFrequency:   128,
 					DownlinkFrequency: 128,
+				},
+			},
+			PendingRequests: []*ttnpb.MACCommand{
+				{
+					Payload: &ttnpb.MACCommand_NewChannelReq_{
+						NewChannelReq: &ttnpb.MACCommand_NewChannelReq{
+							ChannelIndex: 2,
+						},
+					},
 				},
 			},
 		},
@@ -123,6 +143,29 @@ func TestDLChannelReq(t *testing.T) {
 				{
 					UplinkFrequency:   129,
 					DownlinkFrequency: 130,
+				},
+			},
+			PendingRequests: []*ttnpb.MACCommand{
+				{
+					Payload: &ttnpb.MACCommand_NewChannelReq_{
+						NewChannelReq: &ttnpb.MACCommand_NewChannelReq{
+							ChannelIndex: 0,
+						},
+					},
+				},
+				{
+					Payload: &ttnpb.MACCommand_NewChannelReq_{
+						NewChannelReq: &ttnpb.MACCommand_NewChannelReq{
+							ChannelIndex: 1,
+						},
+					},
+				},
+				{
+					Payload: &ttnpb.MACCommand_NewChannelReq_{
+						NewChannelReq: &ttnpb.MACCommand_NewChannelReq{
+							ChannelIndex: 3,
+						},
+					},
 				},
 			},
 			Commands: []*ttnpb.MACCommand_DLChannelReq{
@@ -171,6 +214,29 @@ func TestDLChannelReq(t *testing.T) {
 					DownlinkFrequency: 130,
 				},
 			},
+			PendingRequests: []*ttnpb.MACCommand{
+				{
+					Payload: &ttnpb.MACCommand_NewChannelReq_{
+						NewChannelReq: &ttnpb.MACCommand_NewChannelReq{
+							ChannelIndex: 0,
+						},
+					},
+				},
+				{
+					Payload: &ttnpb.MACCommand_NewChannelReq_{
+						NewChannelReq: &ttnpb.MACCommand_NewChannelReq{
+							ChannelIndex: 1,
+						},
+					},
+				},
+				{
+					Payload: &ttnpb.MACCommand_NewChannelReq_{
+						NewChannelReq: &ttnpb.MACCommand_NewChannelReq{
+							ChannelIndex: 3,
+						},
+					},
+				},
+			},
 			Commands: []*ttnpb.MACCommand_DLChannelReq{
 				{
 					ChannelIndex: 1,
@@ -206,6 +272,22 @@ func TestDLChannelReq(t *testing.T) {
 				{
 					UplinkFrequency:   130,
 					DownlinkFrequency: 131,
+				},
+			},
+			PendingRequests: []*ttnpb.MACCommand{
+				{
+					Payload: &ttnpb.MACCommand_NewChannelReq_{
+						NewChannelReq: &ttnpb.MACCommand_NewChannelReq{
+							ChannelIndex: 0,
+						},
+					},
+				},
+				{
+					Payload: &ttnpb.MACCommand_NewChannelReq_{
+						NewChannelReq: &ttnpb.MACCommand_NewChannelReq{
+							ChannelIndex: 1,
+						},
+					},
 				},
 			},
 			Commands: []*ttnpb.MACCommand_DLChannelReq{
@@ -245,6 +327,7 @@ func TestDLChannelReq(t *testing.T) {
 							DesiredParameters: &ttnpb.MACParameters{
 								Channels: tc.DesiredChannels,
 							},
+							PendingRequests:     tc.PendingRequests,
 							RejectedFrequencies: tc.RejectedFrequencies,
 							LorawanVersion:      ttnpb.MACVersion_MAC_V1_0_3,
 						},
@@ -280,12 +363,13 @@ func TestDLChannelReq(t *testing.T) {
 					},
 				})
 
+				phy := &band.Band{CFListType: ttnpb.CFListType_FREQUENCIES}
 				test.RunSubtestFromContext(ctx, test.SubtestConfig{
 					Name:     "DeviceNeedsDLChannelReq",
 					Parallel: true,
 					Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 						dev := makeDevice()
-						a.So(DeviceNeedsDLChannelReq(dev), func() func(interface{}, ...interface{}) string {
+						a.So(DeviceNeedsDLChannelReq(dev, phy), func() func(interface{}, ...interface{}) string {
 							if len(tc.Commands) > 0 {
 								return should.BeTrue
 							}
@@ -314,7 +398,7 @@ func TestDLChannelReq(t *testing.T) {
 						Parallel: true,
 						Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 							dev := makeDevice()
-							st := EnqueueDLChannelReq(ctx, dev, cmdLen, answerLen)
+							st := EnqueueDLChannelReq(ctx, dev, cmdLen, answerLen, phy)
 							expectedDevice := makeDevice()
 							var expectedEventBuilders []events.Builder
 							for _, cmd := range cmds {

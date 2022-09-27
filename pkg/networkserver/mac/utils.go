@@ -811,3 +811,21 @@ func consumeMACCommandIdentifier(
 		return cmds, false
 	}
 }
+
+// iteratePendingRequests returns a functions that iterates the pending requests of the end device
+// and checks if they match the provided selector. If they match the selector, the provided function
+// is called. The function may stop the iteration by returning false.
+func iteratePendingRequests[T any](selector func(*ttnpb.MACCommand) *T) func(*ttnpb.EndDevice, func(*T) bool) {
+	f := func(dev *ttnpb.EndDevice, f func(*T) bool) {
+		for _, req := range dev.MacState.PendingRequests {
+			cmd := selector(req)
+			if cmd == nil {
+				continue
+			}
+			if !f(cmd) {
+				return
+			}
+		}
+	}
+	return f
+}
