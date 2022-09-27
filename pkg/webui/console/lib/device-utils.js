@@ -73,7 +73,7 @@ export const LORAWAN_VERSION_PAIRS = {
   101: [PHY_V1_0_1],
   102: [PHY_V1_0_2_REV_A, PHY_V1_0_2_REV_B],
   103: [PHY_V1_0_3_REV_A],
-  104: LORAWAN_PHY_VERSIONS,
+  104: [RP002_V1_0_0, RP002_V1_0_1, RP002_V1_0_2, RP002_V1_0_3],
   110: [PHY_V1_1_REV_A, PHY_V1_1_REV_B, RP002_V1_0_0, RP002_V1_0_1, RP002_V1_0_2, RP002_V1_0_3],
   0: LORAWAN_PHY_VERSIONS,
 }
@@ -105,7 +105,7 @@ const lwCache = {}
 /**
  * Parses string representation of the lorawan mac version to number.
  *
- * @param {string} strMacVersion - Formatted string representation fot the
+ * @param {string} strMacVersion - Formatted string representation for the
  * lorawan mac version, e.g. 1.1.0.
  * @returns {number} - Number representation of the lorawan mac version. Returns
  * 0 if provided
