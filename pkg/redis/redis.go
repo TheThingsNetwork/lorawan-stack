@@ -961,7 +961,7 @@ outer:
 
 // GenerateLockerID generates a unique locker ID to be used with a Redis mutex.
 func GenerateLockerID() (string, error) {
-	lockID, err := ulid.New(ulid.Timestamp(time.Now()), rand.Reader)
+	lockID, err := ulid.New(ulid.Now(), rand.Reader)
 	if err != nil {
 		return "", err
 	}

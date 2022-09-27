@@ -24,7 +24,6 @@ import (
 	"io"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/oklog/ulid/v2"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicetemplateconverter/profilefetcher"
@@ -263,7 +262,7 @@ var csvFieldSetters = map[string]csvFieldSetterFunc{ //nolint:gocyclo
 			dst.Session = &ttnpb.Session{}
 		}
 		if dst.Session.Keys == nil {
-			skID, err := ulid.New(ulid.Timestamp(time.Now()), rand.Reader)
+			skID, err := ulid.New(ulid.Now(), rand.Reader)
 			if err != nil {
 				return nil, errGenerateSessionKeyID.WithCause(err)
 			}
@@ -285,7 +284,7 @@ var csvFieldSetters = map[string]csvFieldSetterFunc{ //nolint:gocyclo
 			dst.Session = &ttnpb.Session{}
 		}
 		if dst.Session.Keys == nil {
-			skID, err := ulid.New(ulid.Timestamp(time.Now()), rand.Reader)
+			skID, err := ulid.New(ulid.Now(), rand.Reader)
 			if err != nil {
 				return nil, errGenerateSessionKeyID.WithCause(err)
 			}
