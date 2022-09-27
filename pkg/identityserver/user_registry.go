@@ -693,12 +693,13 @@ func (is *IdentityServer) deleteUser(ctx context.Context, ids *ttnpb.UserIdentif
 		return nil, err
 	}
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
-		err := st.DeleteUser(ctx, ids)
+		// Delete the the user's sessions to enforce logouts.
+		err := st.DeleteAllUserSessions(ctx, ids)
 		if err != nil {
 			return err
 		}
-		// Also delete the the user's sessions to enforce logouts.
-		return st.DeleteAllUserSessions(ctx, ids)
+		return st.DeleteUser(ctx, ids)
+
 	})
 	if err != nil {
 		return nil, err
@@ -741,7 +742,7 @@ func (is *IdentityServer) purgeUser(ctx context.Context, ids *ttnpb.UserIdentifi
 		if err != nil {
 			return err
 		}
-		// delete related API keys before purging the user
+		// Delete related API keys before purging the user.
 		err = st.DeleteEntityAPIKeys(ctx, ids.GetEntityIdentifiers())
 		if err != nil {
 			return err
