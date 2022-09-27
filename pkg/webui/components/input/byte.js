@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -62,6 +62,7 @@ export default class ByteInput extends React.Component {
     min: PropTypes.number,
     onBlur: PropTypes.func,
     onChange: PropTypes.func.isRequired,
+    onFocus: PropTypes.func,
     placeholder: PropTypes.message,
     showPerChar: PropTypes.bool,
     unbounded: PropTypes.bool,
@@ -75,6 +76,7 @@ export default class ByteInput extends React.Component {
     placeholder: undefined,
     showPerChar: false,
     onBlur: () => null,
+    onFocus: () => null,
     unbounded: false,
   }
 
@@ -105,7 +107,6 @@ export default class ByteInput extends React.Component {
 
     return (
       <MaskedInput
-        ref={this.input}
         key="input"
         className={classnames(className, style.byte)}
         value={value}
@@ -122,44 +123,28 @@ export default class ByteInput extends React.Component {
         showMask={!placeholder && !unbounded}
         guide={!unbounded}
         {...rest}
+        type="text"
       />
     )
   }
 
-  focus() {
-    if (this.input.current && this.input.current.inputElement) {
-      const { inputElement } = this.input.current
-
-      let i = inputElement.value.indexOf(PLACEHOLDER_CHAR)
-      if (i === -1) {
-        i = inputElement.value.length
-      }
-
-      setTimeout(() => {
-        inputElement.focus()
-        inputElement.setSelectionRange(i, i)
-      }, 0)
-    }
-  }
-
   @bind
   onChange(evt) {
-    const { max, showPerChar } = this.props
-    const { data } = evt.nativeEvent
+    const { value: oldValue } = this.props
+    const data = evt?.nativeEvent?.data
 
     let value = clean(evt.target.value)
-    const normalizedMax = showPerChar ? Math.ceil(max / 2) : max
 
-    // Check if the value already has length equal to `max`.
-    const isValueMaxLength = value.length === normalizedMax * 2
-    // Check if the cursor is placed after the last placeholder chararcter.
-    const isCursorAfterMask = evt.target.selectionStart === normalizedMax * 3 - 1
-
-    if (!isValueMaxLength && isCursorAfterMask && data !== null) {
-      const hexMatch = data.match(hex)
-      if (hexMatch !== null) {
-        value += hexMatch[0]
-      }
+    // Make sure values entered at the end of the input (with placeholders)
+    // are added as expected. `selectionStart` cannot be used due to
+    // inconsistent behavior on Android phones.
+    if (
+      evt.target.value.endsWith(PLACEHOLDER_CHAR) &&
+      data &&
+      hex.test(data) &&
+      oldValue === value
+    ) {
+      value += data
     }
 
     this.props.onChange({
@@ -195,11 +180,16 @@ export default class ByteInput extends React.Component {
   @bind
   onPaste(evt) {
     const { min, showPerChar, unbounded } = this.props
+    evt.preventDefault()
+    const pasteData = (event.clipboardData || window.clipboardData).getData('text')
     if (unbounded) {
-      evt.preventDefault()
-      this.input.current.inputElement.value = evt.clipboardData.getData('text/plain')
-      mask(min, evt.clipboardData.getData('text/plain').length, showPerChar)
+      evt.target.value = evt.clipboardData.getData('text/plain')
+      mask(min, pasteData.length, showPerChar)
       this.onChange(evt)
+    } else {
+      // Compose and clean new data and mask it.
+      const newValue = clean(evt.target.value + pasteData)
+      this.onChange({ target: { value: newValue } })
     }
   }
 
