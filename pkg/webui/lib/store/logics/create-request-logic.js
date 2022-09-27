@@ -16,12 +16,15 @@
 
 import { createLogic } from 'redux-logic'
 
+import toast from '@ttn-lw/components/toast'
+
 import {
   isUnauthenticatedError,
   isNetworkError,
   isTimeoutError,
   ingestError,
   isPermissionDeniedError,
+  isConnectionFailureError,
 } from '@ttn-lw/lib/errors/utils'
 import { clear as clearAccessToken } from '@ttn-lw/lib/access-token'
 import {
@@ -33,6 +36,7 @@ import { promisifyDispatch } from '@ttn-lw/lib/store/middleware/request-promise-
 import attachPromise, { getResultActionFromType } from '@ttn-lw/lib/store/actions/attach-promise'
 import { selectIsCheckingStatus } from '@ttn-lw/lib/store/selectors/status'
 import { TokenError } from '@ttn-lw/lib/errors/custom-errors'
+import errorMessages from '@ttn-lw/lib/errors/error-messages'
 
 let connectionChecking = null
 let lastError
@@ -166,6 +170,19 @@ const createRequestLogic = (
 
             // Trigger a retry once the app is back online.
             continue
+
+            // If the connection failed, the backend is likely updating. We can then
+            // abort the request and display a toast with info about the status page
+            // and ask to try again later.
+          } else if (isConnectionFailureError(e)) {
+            toast({
+              messageGroup: 'connection-failure',
+              message: errorMessages.connectionFailure,
+              preventConsecutive: true,
+              type: toast.types.WARNING,
+            })
+            dispatch(abortAction())
+            break
           }
 
           // Pass relevant errors to Sentry.

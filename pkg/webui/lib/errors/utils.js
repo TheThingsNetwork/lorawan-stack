@@ -241,6 +241,19 @@ export const isTimeoutError = error =>
   Boolean(error) && typeof error === 'object' && error.code === 'ECONNABORTED'
 
 /**
+ * Returns whether `error` is a connection failure error that happens on the
+ * proxy layer when the service is currently unavailable, e.g. When updating
+ * the server.
+ *
+ * @param {object} error - The error to be tested.
+ * @returns {boolean} `true` if `error` is a connection failure error, `false` otherwise.
+ */
+export const isConnectionFailureError = error =>
+  isPlainObject(error) &&
+  hasValidDetails(error) &&
+  Boolean(error.details[0]?.name?.startsWith('503_upstream_reset_before_response_started'))
+
+/**
  * Returns whether `error` is a backend error with ID: 'pkg/web/oauthclient:refused'.
  *
  * @param {object} error - The error to be tested.
@@ -514,6 +527,8 @@ export const toMessageProps = (error, each = false) => {
   } else if (isTranslated(error)) {
     // Fall back to normal message.
     props.push({ content: error })
+  } else if (isConnectionFailureError(error)) {
+    props.push({ content: errorMessages.connectionFailure })
   }
 
   if (props.length === 0) {
