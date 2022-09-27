@@ -14,8 +14,6 @@
 
 import { connect } from 'react-redux'
 
-import { listBrands } from '@console/store/actions/device-repository'
-
 import {
   selectDeviceBrands,
   selectDeviceBrandsError,
@@ -30,6 +28,6 @@ const mapStateToProps = state => ({
   fetching: selectDeviceBrandsFetching(state),
 })
 
-const mapDispatchToProps = { listBrands }
+const mapDispatchToProps = {}
 
 export default BrandSelect => connect(mapStateToProps, mapDispatchToProps)(BrandSelect)

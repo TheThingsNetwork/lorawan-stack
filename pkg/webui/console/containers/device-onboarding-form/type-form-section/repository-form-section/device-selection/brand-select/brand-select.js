@@ -39,12 +39,8 @@ const formatOptions = (brands = []) =>
     .concat([{ value: SELECT_OTHER_OPTION, label: messages.otherOption }])
 
 const BrandSelect = props => {
-  const { appId, name, error, fetching, brands, listBrands, onChange, ...rest } = props
+  const { appId, name, error, fetching, brands, onChange, ...rest } = props
   const { formatMessage } = useIntl()
-
-  React.useEffect(() => {
-    listBrands(appId, {}, ['name', 'lora_alliance_vendor_id'])
-  }, [appId, listBrands])
 
   const options = React.useMemo(() => formatOptions(brands), [brands])
   const handleNoOptions = React.useCallback(
