@@ -54,8 +54,8 @@ func TestValidatePasswordStrength(t *testing.T) {
 			"password1":    false, // Too common.
 			"āaaAAA123!@#": true,
 			"       1A":    true,
-			"āaa	AAA123 ": true,
-			"āaaAAA123 ": true,
+			"āaa	AAA123 ":  true,
+			"āaaAAA123 ":   true,
 		} {
 			t.Run(p, func(t *testing.T) {
 				a, ctx := test.New(t)

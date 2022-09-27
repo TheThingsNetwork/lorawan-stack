@@ -114,37 +114,37 @@ var DefaultOptions = []Option{
 //
 // Possible struct tags are:
 //
-// - `name:"<name>"`: Defines the name of the config flag, in the environment,
-//    on the command line and in the config files.
-// - `shorthand:"<n>"`: Defines a shorthand name for use on the command line.
-// - `description:"<description>"`: Add a description that will be printed in the
-//    command's help message.
-// - `file-only:"<true|false>"` Denotes wether or not to attempt to parse this
-//    variable from the command line and environment or only from the config file.
-//    This can be used to allow complicated types to exist in the config file
-//    but not on the command line.
+//   - `name:"<name>"`: Defines the name of the config flag, in the environment,
+//     on the command line and in the config files.
+//   - `shorthand:"<n>"`: Defines a shorthand name for use on the command line.
+//   - `description:"<description>"`: Add a description that will be printed in the
+//     command's help message.
+//   - `file-only:"<true|false>"` Denotes wether or not to attempt to parse this
+//     variable from the command line and environment or only from the config file.
+//     This can be used to allow complicated types to exist in the config file
+//     but not on the command line.
 //
 // The type of the struct fields also defines their type when parsing the config
 // file, command line arguments or environment variables.
 // Currently, the following types are supported:
 //
-// - `bool`
-// - `int`, `int8`, `int16`, `int32`, `int64`
-// - `uint`, `uint8`, `uint16`, `uint32`, `uint64`
-// - `float32`, `float64`
-// - `string`
-// - `time.Time`: Parsed according to the TimeFormat variable set in this package
-// - `time.Duration`: Parsed by `time.ParseDuration`
-// - `[]string``: Parsed by splitting on whitespace or by passing multiple flags
+//   - `bool`
+//   - `int`, `int8`, `int16`, `int32`, `int64`
+//   - `uint`, `uint8`, `uint16`, `uint32`, `uint64`
+//   - `float32`, `float64`
+//   - `string`
+//   - `time.Time`: Parsed according to the TimeFormat variable set in this package
+//   - `time.Duration`: Parsed by `time.ParseDuration`
+//   - `[]string`: Parsed by splitting on whitespace or by passing multiple flags
 //     VAR="a b c" or --var a --var b --var c
-// - `map[string]string``: Parsed by key=val pairs
+//   - `map[string]string`: Parsed by key=val pairs
 //     VAR="k=v q=r" or --var k=v --var q=r
-// - `map[string][]byte``: Parsed by key=val pairs, val must be hex
+//   - `map[string][]byte`: Parsed by key=val pairs, val must be hex
 //     VAR="k=0x01 q=0x02" or --var k=0x01 --var q=0x02
-// - `map[string][]string``: Parsed by key=val pairs where keys are repeated
+//   - `map[string][]string`: Parsed by key=val pairs where keys are repeated
 //     VAR="k=v1 k=v2 q=r" or --var k=v1 --var k=v2 --var q=r
-// - `Configurable``: Parsed by the UnmarshalConfigString method
-// - structs with fields of these types: The nested config names will be prefixed
+//   - `Configurable`: Parsed by the UnmarshalConfigString method
+//   - structs with fields of these types: The nested config names will be prefixed
 //     by the name of this struct, unless it is `name:",squash"` in which case
 //     the names are merged into the parent struct.
 func Initialize(name, envPrefix string, defaults interface{}, opts ...Option) *Manager {
