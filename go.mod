@@ -1,6 +1,6 @@
 module go.thethings.network/lorawan-stack/v3
 
-go 1.18
+go 1.19
 
 // Use our fork of grpc-gateway.
 replace github.com/grpc-ecosystem/grpc-gateway => github.com/TheThingsIndustries/grpc-gateway v1.15.2-gogo
