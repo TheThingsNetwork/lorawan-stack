@@ -642,21 +642,37 @@ type downlinkPath struct {
 	*ttnpb.DownlinkPath
 }
 
-func buildMetadataComparator(mds []*ttnpb.MACState_UplinkMessage_RxMetadata) func(int, int) bool {
-	invalidMD := func(k int) bool { return mds[k].Snr == 0.0 || mds[k].ChannelRssi == 0.0 }
-	wantedRSSI := func(k int) float32 { return lora.AdjustedRSSI(mds[k].ChannelRssi, mds[k].Snr) }
-	return func(i, j int) bool {
-		lhsInvalid, rhsInvalid := invalidMD(i), invalidMD(j)
-		if lhsInvalid {
-			return lhsInvalid == rhsInvalid
+func buildMetadataComparator(
+	settings *ttnpb.MACState_UplinkMessage_TxSettings, mds []*ttnpb.MACState_UplinkMessage_RxMetadata,
+) func(int, int) bool {
+	build := func(invalid func(int) bool, measure func(int) float32) func(i, j int) bool {
+		return func(i, j int) bool {
+			lhsInvalid, rhsInvalid := invalid(i), invalid(j)
+			if lhsInvalid {
+				return lhsInvalid == rhsInvalid
+			}
+			return measure(i) >= measure(j)
 		}
-		return wantedRSSI(i) >= wantedRSSI(j)
+	}
+	switch settings.DataRate.Modulation.(type) {
+	case *ttnpb.DataRate_Lora:
+		return build(
+			func(k int) bool { return mds[k].Snr == 0.0 || mds[k].ChannelRssi == 0.0 },
+			func(k int) float32 { return lora.AdjustedRSSI(mds[k].ChannelRssi, mds[k].Snr) },
+		)
+	default:
+		return build(
+			func(k int) bool { return mds[k].ChannelRssi == 0.0 },
+			func(k int) float32 { return mds[k].ChannelRssi },
+		)
 	}
 }
 
-func downlinkPathsFromMetadata(mds ...*ttnpb.MACState_UplinkMessage_RxMetadata) []downlinkPath {
+func downlinkPathsFromMetadata(
+	settings *ttnpb.MACState_UplinkMessage_TxSettings, mds []*ttnpb.MACState_UplinkMessage_RxMetadata,
+) []downlinkPath {
 	mds = append(mds[:0:0], mds...)
-	sort.SliceStable(mds, buildMetadataComparator(mds))
+	sort.SliceStable(mds, buildMetadataComparator(settings, mds))
 	head := make([]downlinkPath, 0, len(mds))
 	body := make([]downlinkPath, 0, len(mds))
 	tail := make([]downlinkPath, 0, len(mds))
@@ -690,7 +706,7 @@ func downlinkPathsFromMetadata(mds ...*ttnpb.MACState_UplinkMessage_RxMetadata) 
 
 func downlinkPathsFromRecentUplinks(ups ...*ttnpb.MACState_UplinkMessage) []downlinkPath {
 	for i := len(ups) - 1; i >= 0; i-- {
-		if paths := downlinkPathsFromMetadata(ups[i].RxMetadata...); len(paths) > 0 {
+		if paths := downlinkPathsFromMetadata(ups[i].Settings, ups[i].RxMetadata); len(paths) > 0 {
 			return paths
 		}
 	}

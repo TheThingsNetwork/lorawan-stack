@@ -101,6 +101,18 @@ var (
 		},
 	}
 
+	DefaultTxSettings = &ttnpb.TxSettings{
+		DataRate: &ttnpb.DataRate{
+			Modulation: &ttnpb.DataRate_Lora{
+				Lora: &ttnpb.LoRaDataRate{
+					Bandwidth:       125000,
+					SpreadingFactor: 7,
+					CodingRate:      band.Cr4_5,
+				},
+			},
+		},
+	}
+
 	DefaultRxMetadata = [...]*ttnpb.RxMetadata{
 		{
 			GatewayIds:             &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-1"},

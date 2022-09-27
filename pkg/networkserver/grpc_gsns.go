@@ -735,7 +735,7 @@ macLoop:
 	}, true, nil
 }
 
-func toMACStateRxMetadata(mds ...*ttnpb.RxMetadata) []*ttnpb.MACState_UplinkMessage_RxMetadata {
+func toMACStateRxMetadata(mds []*ttnpb.RxMetadata) []*ttnpb.MACState_UplinkMessage_RxMetadata {
 	if len(mds) == 0 {
 		return nil
 	}
@@ -757,22 +757,25 @@ func toMACStateRxMetadata(mds ...*ttnpb.RxMetadata) []*ttnpb.MACState_UplinkMess
 	return recentMDs
 }
 
+func toMACStateTxSettings(settings *ttnpb.TxSettings) *ttnpb.MACState_UplinkMessage_TxSettings {
+	if settings == nil {
+		return nil
+	}
+	return &ttnpb.MACState_UplinkMessage_TxSettings{
+		DataRate: settings.DataRate,
+	}
+}
+
 func toMACStateUplinkMessages(ups ...*ttnpb.UplinkMessage) []*ttnpb.MACState_UplinkMessage {
 	if len(ups) == 0 {
 		return nil
 	}
 	recentUps := make([]*ttnpb.MACState_UplinkMessage, 0, len(ups))
 	for _, up := range ups {
-		var settings *ttnpb.MACState_UplinkMessage_TxSettings
-		if up.Settings != nil {
-			settings = &ttnpb.MACState_UplinkMessage_TxSettings{
-				DataRate: up.Settings.DataRate,
-			}
-		}
 		recentUps = append(recentUps, &ttnpb.MACState_UplinkMessage{
 			Payload:            up.Payload,
-			Settings:           settings,
-			RxMetadata:         toMACStateRxMetadata(up.RxMetadata...),
+			Settings:           toMACStateTxSettings(up.Settings),
+			RxMetadata:         toMACStateRxMetadata(up.RxMetadata),
 			ReceivedAt:         up.ReceivedAt,
 			CorrelationIds:     up.CorrelationIds,
 			DeviceChannelIndex: up.DeviceChannelIndex,

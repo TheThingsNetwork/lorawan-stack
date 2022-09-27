@@ -45,6 +45,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				},
 			},
 		},
+		Settings:   DefaultTxSettings,
 		RxMetadata: DefaultRxMetadata[:],
 		ReceivedAt: ttnpb.ProtoTimePtr(time.Time{}),
 	}
