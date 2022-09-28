@@ -18,21 +18,36 @@ import { defineMessages } from 'react-intl'
 
 import PageTitle from '@ttn-lw/components/page-title'
 
+import RequireRequest from '@ttn-lw/lib/components/require-request'
+
 import DeviceOnboardingForm from '@console/containers/device-onboarding-form'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { listBrands } from '@console/store/actions/device-repository'
 
 const m = defineMessages({
   title: 'Register end device',
 })
 
-const DeviceAdd = () => (
-  <Container>
-    <Row>
-      <Col>
-        <PageTitle tall title={m.title} className="mb-cs-m" />
-        <DeviceOnboardingForm />
-      </Col>
-    </Row>
-  </Container>
-)
+const DeviceAdd = props => {
+  const { appId } = props
+  return (
+    <RequireRequest requestAction={listBrands(appId, {}, ['name', 'lora_alliance_vendor_id'])}>
+      <Container>
+        <Row>
+          <Col>
+            <PageTitle tall title={m.title} className="mb-cs-m" />
+            <DeviceOnboardingForm />
+          </Col>
+        </Row>
+      </Container>
+    </RequireRequest>
+  )
+}
+
+DeviceAdd.propTypes = {
+  appId: PropTypes.string.isRequired,
+}
 
 export default DeviceAdd

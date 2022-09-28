@@ -20,6 +20,7 @@ import { selectJsConfig } from '@ttn-lw/lib/selectors/env'
 
 import { getJoinEUIPrefixes } from '@console/store/actions/join-server'
 
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 import {
   selectJoinEUIPrefixesFetching,
   selectJoinEUIPrefixesError,
@@ -29,6 +30,7 @@ const mapStateToProps = state => {
   const { enabled: jsEnabled } = selectJsConfig()
 
   return {
+    appId: selectSelectedApplicationId(state),
     fetching: selectJoinEUIPrefixesFetching(state) && jsEnabled,
     error: selectJoinEUIPrefixesError(state),
     jsEnabled,
