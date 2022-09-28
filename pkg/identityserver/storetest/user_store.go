@@ -15,6 +15,7 @@
 package storetest
 
 import (
+	"fmt"
 	. "testing"
 	"time"
 
@@ -372,6 +373,36 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 		// if a.So(err, should.NotBeNil) {
 		// 	a.So(errors.IsNotFound(err), should.BeTrue)
 		// }
+	})
+
+	t.Run("CreateAfterPurge", func(t *T) {
+		for _, itr := range []int{1, 2} {
+			t.Run(fmt.Sprintf("Iteration %d", itr), func(t *T) {
+				a, ctx := test.New(t)
+				var err error
+				_, err = s.CreateUser(ctx, &ttnpb.User{
+					Ids:                 &ttnpb.UserIdentifiers{UserId: "foo"},
+					PrimaryEmailAddress: "foo@example.com",
+				})
+				a.So(err, should.BeNil)
+
+				err = s.DeleteUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"})
+				a.So(err, should.BeNil)
+
+				err = s.RestoreUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"})
+				a.So(err, should.BeNil)
+
+				got, err := s.GetUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"}, mask)
+				a.So(err, should.BeNil)
+				a.So(got, should.NotBeNil)
+
+				err = s.DeleteUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"})
+				a.So(err, should.BeNil)
+
+				err = s.PurgeUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"})
+				a.So(err, should.BeNil)
+			})
+		}
 	})
 }
 
