@@ -22,7 +22,8 @@ import tts from '@account/api/tts'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import PageTitle from '@ttn-lw/components/page-title'
-import CollaboratorForm from '@ttn-lw/components/collaborator-form'
+
+import CollaboratorForm from '@ttn-lw/containers/collaborator-form'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
 
