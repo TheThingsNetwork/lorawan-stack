@@ -212,7 +212,7 @@ jobs:
           name: cypress-failed-test-spec
           path: .cache/.failed-specs-*.txt
   cross-browser-smoke:
-    name: Cross-browser smoke tests (Firefox 78 ESR)
+    name: Cross-browser smoke tests (Firefox 102.3.0 ESR)
     runs-on: ubuntu-22.04
     env:
       NODE_ENV: development
@@ -237,9 +237,9 @@ jobs:
           name: 'build-files'
       - name: Unzip build artifacts
         run: unzip -o build.zip
-      - name: Install FF 78 ESR
+      - name: Install FF 102.3.0 ESR
         run: |
-          wget --no-verbose -O /tmp/firefox.tar.bz2 https://download-installer.cdn.mozilla.net/pub/firefox/releases/78.13.0esr/linux-x86_64/en-US/firefox-78.13.0esr.tar.bz2
+          wget --no-verbose -O /tmp/firefox.tar.bz2 https://download-installer.cdn.mozilla.net/pub/firefox/releases/102.3.0esr/linux-x86_64/en-US/firefox-102.3.0esr.tar.bz2
           tar -C /opt -xjf /tmp/firefox.tar.bz2
           rm /tmp/firefox.tar.bz2
           sudo ln -fs /opt/firefox/firefox /usr/bin/firefox
