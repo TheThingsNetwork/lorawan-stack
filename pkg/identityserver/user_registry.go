@@ -699,7 +699,6 @@ func (is *IdentityServer) deleteUser(ctx context.Context, ids *ttnpb.UserIdentif
 			return err
 		}
 		return st.DeleteUser(ctx, ids)
-
 	})
 	if err != nil {
 		return nil, err
