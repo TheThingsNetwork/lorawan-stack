@@ -31,7 +31,7 @@ const validationSchema = Yup.object({
       is: true,
       then: schema =>
         schema
-          .matches(/^[a-zA-Z0-9]{1,32}$/, Yup.passValues(m.validateCode))
+          .matches(/^[A-Z0-9]{1,32}$/, Yup.passValues(m.validateCode))
           .required(sharedMessages.validateRequired),
     }),
   }),
