@@ -30,7 +30,7 @@ env:
 jobs:
   determine-if-required:
     name: Determine if run is required
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     outputs:
       needs-to-run: ${{ steps.check-result.outputs.passed != 'true' }}
       hash: ${{ steps.get-hash.outputs.hash }}
@@ -58,7 +58,7 @@ jobs:
         run: test -f .cache/passed && echo "::set-output name=passed::$(cat .cache/passed)"
   preparation:
     name: Run preparations
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: determine-if-required
     if: needs.determine-if-required.outputs.needs-to-run == 'true'
     timeout-minutes: 30
@@ -114,7 +114,7 @@ jobs:
           path: build.zip
   end-to-end:
     name: Main frontend end-to-end tests (Chrome)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       NODE_ENV: development
       CYPRESS_MACHINE_NUMBER: ${{ matrix.machines }}
@@ -213,7 +213,7 @@ jobs:
           path: .cache/.failed-specs-*.txt
   cross-browser-smoke:
     name: Cross-browser smoke tests (Firefox 78 ESR)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       NODE_ENV: development
     needs: [determine-if-required, preparation]
@@ -271,7 +271,7 @@ jobs:
           path: cypress/screenshots
   cache-result:
     name: Write result cache
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: [preparation, end-to-end, cross-browser-smoke, determine-if-required]
     timeout-minutes: 5
     steps:

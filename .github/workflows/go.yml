@@ -18,7 +18,7 @@ on:
 jobs:
   quality:
     name: Code Quality
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 15
     steps:
       - name: Check out code
@@ -50,7 +50,7 @@ jobs:
 
   test:
     name: Tests
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     services:
       postgres:
         image: postgres

@@ -11,7 +11,7 @@ jobs:
   check_mergeability:
     name: Check Mergeability
     if: ${{ github.repository == 'TheThingsNetwork/lorawan-stack' }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       MERGE_CONFLICTS_IGNORE: |
         CHANGELOG.md
