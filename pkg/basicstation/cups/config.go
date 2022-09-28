@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package cups implements the CUPS protocol.
 package cups
 
 import (
@@ -25,9 +26,9 @@ import (
 
 // ServerConfig is the configuration of the CUPS server.
 type ServerConfig struct {
-	ExplicitEnable  bool `name:"require-explicit-enable" description:"Require gateways to explicitly enable CUPS. This option is ineffective"`
+	ExplicitEnable  bool `name:"require-explicit-enable" description:"Require gateways to explicitly enable CUPS. This option is ineffective"` //nolint:lll
 	RegisterUnknown struct {
-		Type   string `name:"account-type" description:"Type of account to register unknown gateways to (user|organization)"`
+		Type   string `name:"account-type" description:"Type of account to register unknown gateways to (user|organization)"` //nolint:lll
 		ID     string `name:"id" description:"ID of the account to register unknown gateways to"`
 		APIKey string `name:"api-key" description:"API Key to use for unknown gateway registration"`
 	} `name:"owner-for-unknown"`
