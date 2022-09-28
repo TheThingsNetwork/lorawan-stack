@@ -45,4 +45,7 @@ func TestEmptyKeyVault(t *testing.T) {
 
 	_, err = cryptoutil.EmptyKeyVault.ExportCertificate(test.Context(), "test")
 	a.So(errors.IsNotFound(err), should.BeTrue)
+
+	_, err = cryptoutil.EmptyKeyVault.HMACHash(test.Context(), []byte{0x01, 0x02}, "test")
+	a.So(errors.IsNotFound(err), should.BeTrue)
 }

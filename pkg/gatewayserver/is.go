@@ -46,6 +46,10 @@ func NewIS(c Cluster) *IS {
 
 // AssertGatewayRights implements EntityRegistry.
 func (is IS) AssertGatewayRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers, required ...ttnpb.Right) error {
+	ctx, err := getAuthenticatedContext(ctx)
+	if err != nil {
+		return err
+	}
 	return rights.RequireGateway(ctx, ids, required...)
 }
 
@@ -60,6 +64,10 @@ func (is IS) GetIdentifiersForEUI(ctx context.Context, req *ttnpb.GetGatewayIden
 
 // Get implements EntityRegistry.
 func (is IS) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error) {
+	ctx, err := getAuthenticatedContext(ctx)
+	if err != nil {
+		return nil, err
+	}
 	callOpt, err := rpcmetadata.WithForwardedAuth(ctx, is.AllowInsecureForCredentials())
 	if errors.IsUnauthenticated(err) {
 		callOpt = is.WithClusterAuth()
@@ -75,6 +83,10 @@ func (is IS) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gate
 
 // UpdateAntennas updates the gateway antennas.
 func (is IS) UpdateAntennas(ctx context.Context, ids *ttnpb.GatewayIdentifiers, antennas []*ttnpb.GatewayAntenna) error {
+	ctx, err := getAuthenticatedContext(ctx)
+	if err != nil {
+		return err
+	}
 	callOpt, err := rpcmetadata.WithForwardedAuth(ctx, is.AllowInsecureForCredentials())
 	if err != nil {
 		return err
@@ -98,6 +110,10 @@ func (is IS) UpdateAntennas(ctx context.Context, ids *ttnpb.GatewayIdentifiers, 
 
 // UpdateAttributes implements EntityRegistry.
 func (is IS) UpdateAttributes(ctx context.Context, ids *ttnpb.GatewayIdentifiers, current, new map[string]string) error {
+	ctx, err := getAuthenticatedContext(ctx)
+	if err != nil {
+		return err
+	}
 	callOpt, err := rpcmetadata.WithForwardedAuth(ctx, is.AllowInsecureForCredentials())
 	if err != nil {
 		return err
@@ -139,4 +155,8 @@ func (is IS) newRegistryClient(ctx context.Context, ids *ttnpb.GatewayIdentifier
 		return nil, err
 	}
 	return ttnpb.NewGatewayRegistryClient(cc), nil
+}
+
+func getAuthenticatedContext(ctx context.Context) (context.Context, error) {
+	return ctx, nil
 }

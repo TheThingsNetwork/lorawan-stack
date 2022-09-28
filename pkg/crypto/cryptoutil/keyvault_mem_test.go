@@ -16,6 +16,7 @@ package cryptoutil_test
 
 import (
 	"crypto/ecdsa"
+	"crypto/subtle"
 	"encoding/hex"
 	"testing"
 
@@ -128,5 +129,34 @@ TPERi9uMQjERns1qXG/9DJLe/Qxi0r84hA==
 	{
 		_, err := v.ExportCertificate(test.Context(), "cert2")
 		a.So(errors.IsNotFound(err), should.BeTrue)
+	}
+
+	// Hashing with valid key
+	{
+		hash1, err := v.HMACHash(test.Context(), []byte{0x01, 0x02}, "key1")
+		a.So(err, should.BeNil)
+		a.So(hash1, should.NotBeNil)
+		hash2, err := v.HMACHash(test.Context(), []byte{0x01, 0x02}, "key1")
+		a.So(err, should.BeNil)
+		a.So(hash2, should.NotBeNil)
+		a.So(subtle.ConstantTimeCompare(hash1, hash2), should.Equal, 1)
+	}
+
+	// Hashing with invalild key
+	{
+		hash, err := v.HMACHash(test.Context(), []byte{0x01, 0x02}, "key2")
+		a.So(errors.IsNotFound(err), should.BeTrue)
+		a.So(hash, should.BeNil)
+	}
+
+	// Hashing with corrupted value key
+	{
+		hash1, err := v.HMACHash(test.Context(), []byte{0x01, 0x02}, "key1")
+		a.So(err, should.BeNil)
+		a.So(hash1, should.NotBeNil)
+		hash2, err := v.HMACHash(test.Context(), []byte{0x01, 0x02, 0x03}, "key1")
+		a.So(err, should.BeNil)
+		a.So(hash2, should.NotBeNil)
+		a.So(subtle.ConstantTimeCompare(hash1, hash2), should.BeZeroValue)
 	}
 }

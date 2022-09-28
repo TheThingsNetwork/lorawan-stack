@@ -34,6 +34,11 @@ var AuthInfoResponseFieldPathsNested = []string{
 	"access_method.api_key.entity_ids.ids.user_ids",
 	"access_method.api_key.entity_ids.ids.user_ids.email",
 	"access_method.api_key.entity_ids.ids.user_ids.user_id",
+	"access_method.gateway_token",
+	"access_method.gateway_token.gateway_ids",
+	"access_method.gateway_token.gateway_ids.eui",
+	"access_method.gateway_token.gateway_ids.gateway_id",
+	"access_method.gateway_token.rights",
 	"access_method.oauth_access_token",
 	"access_method.oauth_access_token.access_token",
 	"access_method.oauth_access_token.client_ids",
@@ -179,6 +184,17 @@ var AuthInfoResponse_APIKeyAccessFieldPathsNested = []string{
 var AuthInfoResponse_APIKeyAccessFieldPathsTopLevel = []string{
 	"api_key",
 	"entity_ids",
+}
+var AuthInfoResponse_GatewayTokenFieldPathsNested = []string{
+	"gateway_ids",
+	"gateway_ids.eui",
+	"gateway_ids.gateway_id",
+	"rights",
+}
+
+var AuthInfoResponse_GatewayTokenFieldPathsTopLevel = []string{
+	"gateway_ids",
+	"rights",
 }
 var IsConfiguration_UserRegistrationFieldPathsNested = []string{
 	"admin_approval",

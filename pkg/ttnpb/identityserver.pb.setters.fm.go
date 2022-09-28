@@ -166,6 +166,42 @@ func (dst *AuthInfoResponse) SetFields(src *AuthInfoResponse, paths ...string) e
 							dst.AccessMethod = nil
 						}
 					}
+				case "gateway_token":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.AccessMethod.(*AuthInfoResponse_GatewayToken_)
+					}
+					if srcValid := srcTypeOk || src == nil || src.AccessMethod == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'gateway_token', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.AccessMethod.(*AuthInfoResponse_GatewayToken_)
+					if dstValid := dstTypeOk || dst.AccessMethod == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'gateway_token', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *AuthInfoResponse_GatewayToken
+						if srcTypeOk {
+							newSrc = src.AccessMethod.(*AuthInfoResponse_GatewayToken_).GatewayToken
+						}
+						if dstTypeOk {
+							newDst = dst.AccessMethod.(*AuthInfoResponse_GatewayToken_).GatewayToken
+						} else if srcTypeOk {
+							newDst = &AuthInfoResponse_GatewayToken{}
+							dst.AccessMethod = &AuthInfoResponse_GatewayToken_{GatewayToken: newDst}
+						} else {
+							dst.AccessMethod = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.AccessMethod = src.AccessMethod
+						} else {
+							dst.AccessMethod = nil
+						}
+					}
 
 				default:
 					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
@@ -435,6 +471,51 @@ func (dst *AuthInfoResponse_APIKeyAccess) SetFields(src *AuthInfoResponse_APIKey
 				} else {
 					dst.EntityIds = nil
 				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *AuthInfoResponse_GatewayToken) SetFields(src *AuthInfoResponse_GatewayToken, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "gateway_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *GatewayIdentifiers
+				if (src == nil || src.GatewayIds == nil) && dst.GatewayIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.GatewayIds
+				}
+				if dst.GatewayIds != nil {
+					newDst = dst.GatewayIds
+				} else {
+					newDst = &GatewayIdentifiers{}
+					dst.GatewayIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.GatewayIds = src.GatewayIds
+				} else {
+					dst.GatewayIds = nil
+				}
+			}
+		case "rights":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rights' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rights = src.Rights
+			} else {
+				dst.Rights = nil
 			}
 
 		default:

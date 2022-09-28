@@ -69,6 +69,74 @@ func (x *AuthInfoResponse_APIKeyAccess) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the AuthInfoResponse_GatewayToken message to JSON.
+func (x *AuthInfoResponse_GatewayToken) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.GatewayIds != nil || s.HasField("gateway_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("gateway_ids")
+		x.GatewayIds.MarshalProtoJSON(s.WithField("gateway_ids"))
+	}
+	if len(x.Rights) > 0 || s.HasField("rights") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("rights")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.Rights {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s)
+		}
+		s.WriteArrayEnd()
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the AuthInfoResponse_GatewayToken to JSON.
+func (x *AuthInfoResponse_GatewayToken) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the AuthInfoResponse_GatewayToken message from JSON.
+func (x *AuthInfoResponse_GatewayToken) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "gateway_ids", "gatewayIds":
+			if s.ReadNil() {
+				x.GatewayIds = nil
+				return
+			}
+			x.GatewayIds = &GatewayIdentifiers{}
+			x.GatewayIds.UnmarshalProtoJSON(s.WithField("gateway_ids", true))
+		case "rights":
+			s.AddField("rights")
+			if s.ReadNil() {
+				x.Rights = nil
+				return
+			}
+			s.ReadArray(func() {
+				var v Right
+				v.UnmarshalProtoJSON(s)
+				x.Rights = append(x.Rights, v)
+			})
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the AuthInfoResponse_GatewayToken from JSON.
+func (x *AuthInfoResponse_GatewayToken) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the AuthInfoResponse message to JSON.
 func (x *AuthInfoResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -92,6 +160,10 @@ func (x *AuthInfoResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 			s.WriteObjectField("user_session")
 			// NOTE: UserSession does not seem to implement MarshalProtoJSON.
 			gogo.MarshalMessage(s, ov.UserSession)
+		case *AuthInfoResponse_GatewayToken_:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("gateway_token")
+			ov.GatewayToken.MarshalProtoJSON(s.WithField("gateway_token"))
 		}
 	}
 	if x.UniversalRights != nil || s.HasField("universal_rights") {
@@ -151,6 +223,15 @@ func (x *AuthInfoResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			var v UserSession
 			gogo.UnmarshalMessage(s, &v)
 			ov.UserSession = &v
+		case "gateway_token", "gatewayToken":
+			ov := &AuthInfoResponse_GatewayToken_{}
+			x.AccessMethod = ov
+			if s.ReadNil() {
+				ov.GatewayToken = nil
+				return
+			}
+			ov.GatewayToken = &AuthInfoResponse_GatewayToken{}
+			ov.GatewayToken.UnmarshalProtoJSON(s.WithField("gateway_token", true))
 		case "universal_rights", "universalRights":
 			if s.ReadNil() {
 				x.UniversalRights = nil

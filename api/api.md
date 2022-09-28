@@ -336,6 +336,7 @@
 - [File `lorawan-stack/api/identityserver.proto`](#lorawan-stack/api/identityserver.proto)
   - [Message `AuthInfoResponse`](#ttn.lorawan.v3.AuthInfoResponse)
   - [Message `AuthInfoResponse.APIKeyAccess`](#ttn.lorawan.v3.AuthInfoResponse.APIKeyAccess)
+  - [Message `AuthInfoResponse.GatewayToken`](#ttn.lorawan.v3.AuthInfoResponse.GatewayToken)
   - [Message `GetIsConfigurationRequest`](#ttn.lorawan.v3.GetIsConfigurationRequest)
   - [Message `GetIsConfigurationResponse`](#ttn.lorawan.v3.GetIsConfigurationResponse)
   - [Message `IsConfiguration`](#ttn.lorawan.v3.IsConfiguration)
@@ -5079,6 +5080,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | `api_key` | [`AuthInfoResponse.APIKeyAccess`](#ttn.lorawan.v3.AuthInfoResponse.APIKeyAccess) |  |  |
 | `oauth_access_token` | [`OAuthAccessToken`](#ttn.lorawan.v3.OAuthAccessToken) |  |  |
 | `user_session` | [`UserSession`](#ttn.lorawan.v3.UserSession) |  | Warning: A user authorized by session cookie will be granted all current and future rights. When using this auth type, the respective handlers need to ensure thorough CSRF and CORS protection using appropriate middleware. |
+| `gateway_token` | [`AuthInfoResponse.GatewayToken`](#ttn.lorawan.v3.AuthInfoResponse.GatewayToken) |  |  |
 | `universal_rights` | [`Rights`](#ttn.lorawan.v3.Rights) |  |  |
 | `is_admin` | [`bool`](#bool) |  |  |
 
@@ -5095,6 +5097,19 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | ----- | ----------- |
 | `api_key` | <p>`message.required`: `true`</p> |
 | `entity_ids` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.AuthInfoResponse.GatewayToken">Message `AuthInfoResponse.GatewayToken`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
+| `rights` | [`Right`](#ttn.lorawan.v3.Right) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `gateway_ids` | <p>`message.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.GetIsConfigurationRequest">Message `GetIsConfigurationRequest`</a>
 

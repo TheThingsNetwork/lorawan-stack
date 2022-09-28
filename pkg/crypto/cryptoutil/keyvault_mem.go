@@ -85,6 +85,19 @@ func (v MemKeyVault) Decrypt(ctx context.Context, ciphertext []byte, id string) 
 	return crypto.Decrypt(key, ciphertext)
 }
 
+// HMACHash implements KeyVault.
+func (v MemKeyVault) HMACHash(_ context.Context, payload []byte, id string) ([]byte, error) {
+	rawKey, ok := v.m[id]
+	if !ok {
+		return nil, errKeyNotFound.WithAttributes("id", id)
+	}
+	var key types.AES128Key
+	if err := key.UnmarshalBinary(rawKey); err != nil {
+		return nil, err
+	}
+	return crypto.HMACHash(key, payload)
+}
+
 // GetCertificate implements KeyVault.
 func (v MemKeyVault) GetCertificate(ctx context.Context, id string) (*x509.Certificate, error) {
 	raw, ok := v.m[id]

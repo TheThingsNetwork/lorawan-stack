@@ -37,6 +37,10 @@ message AuthInfoResponse {
     APIKey api_key = 1 [(validate.rules).message.required = true];
     EntityIdentifiers entity_ids = 2 [(validate.rules).message.required = true];
   }
+  message GatewayToken {
+    GatewayIdentifiers gateway_ids = 1 [(validate.rules).message.required = true];
+    repeated Right rights = 6;
+  }
   oneof access_method {
     AuthInfoResponse.APIKeyAccess api_key = 1;
     OAuthAccessToken oauth_access_token = 2;
@@ -45,6 +49,7 @@ message AuthInfoResponse {
     // handlers need to ensure thorough CSRF and CORS protection using
     // appropriate middleware.
     UserSession user_session = 5;
+    AuthInfoResponse.GatewayToken gateway_token = 6;
   }
   Rights universal_rights = 3;
   bool is_admin = 4;
