@@ -23197,6 +23197,18 @@
               "defaultValue": ""
             },
             {
+              "name": "gateway_token",
+              "description": "",
+              "label": "",
+              "type": "GatewayToken",
+              "longType": "AuthInfoResponse.GatewayToken",
+              "fullType": "ttn.lorawan.v3.AuthInfoResponse.GatewayToken",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "access_method",
+              "defaultValue": ""
+            },
+            {
               "name": "universal_rights",
               "description": "",
               "label": "",
@@ -23271,6 +23283,50 @@
                   }
                 ]
               }
+            }
+          ]
+        },
+        {
+          "name": "GatewayToken",
+          "longName": "AuthInfoResponse.GatewayToken",
+          "fullName": "ttn.lorawan.v3.AuthInfoResponse.GatewayToken",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_ids",
+              "description": "",
+              "label": "",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "rights",
+              "description": "",
+              "label": "repeated",
+              "type": "Right",
+              "longType": "Right",
+              "fullType": "ttn.lorawan.v3.Right",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
