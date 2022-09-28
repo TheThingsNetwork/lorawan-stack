@@ -57,7 +57,8 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 				},
 			},
 		},
-		RxMetadata: ToMACStateRxMetadata(DefaultRxMetadata[:]...),
+		Settings:   ToMACStateTxSettings(DefaultTxSettings),
+		RxMetadata: ToMACStateRxMetadata(DefaultRxMetadata[:]),
 		ReceivedAt: ttnpb.ProtoTimePtr(beaconTime),
 	}
 	ups := []*ttnpb.MACState_UplinkMessage{up}

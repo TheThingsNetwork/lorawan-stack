@@ -212,8 +212,7 @@ func (s *Server) updateInfo(w http.ResponseWriter, r *http.Request) (err error) 
 	logger.WithField("gateway_uid", uid).Debug("Found gateway for EUI")
 
 	var md metadata.MD
-	auth := r.Header.Get("Authorization")
-	if auth != "" {
+	if auth := r.Header.Get("Authorization"); auth != "" {
 		if !strings.HasPrefix(auth, "Bearer ") {
 			auth = fmt.Sprintf("Bearer %s", auth)
 		}
@@ -222,21 +221,23 @@ func (s *Server) updateInfo(w http.ResponseWriter, r *http.Request) (err error) 
 			"authorization": auth,
 		})
 	}
+
 	if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
 		md = metadata.Join(ctxMd, md)
 	}
 	ctx = metadata.NewIncomingContext(ctx, md)
 
 	var gatewayAuth grpc.CallOption
-	if rights.RequireGateway(ctx, ids,
+	if err := rights.RequireGateway(ctx, ids,
 		ttnpb.Right_RIGHT_GATEWAY_INFO,
 		ttnpb.Right_RIGHT_GATEWAY_SETTINGS_BASIC,
 		ttnpb.Right_RIGHT_GATEWAY_READ_SECRETS,
-	) == nil {
-		logger.Debug("Authorized with The Things Stack token")
-	} else {
-		return errUnauthenticated.New()
+	); err != nil {
+		return errUnauthenticated.WithCause(err)
 	}
+
+	logger.Debug("Authorized with The Things Stack token or client TLS certificate")
+
 	gatewayAuth, err = rpcmetadata.WithForwardedAuth(ctx, s.component.AllowInsecureForCredentials())
 	if err != nil {
 		return err

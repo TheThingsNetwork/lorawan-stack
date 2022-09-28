@@ -26,6 +26,8 @@ func (m *AuthInfoResponse) GetEntityIdentifiers() *EntityIdentifiers {
 		return accessMethod.OauthAccessToken.UserIds.GetEntityIdentifiers()
 	case *AuthInfoResponse_UserSession:
 		return accessMethod.UserSession.GetUserIds().GetEntityIdentifiers()
+	case *AuthInfoResponse_GatewayToken_:
+		return accessMethod.GatewayToken.GetGatewayIds().GetEntityIdentifiers()
 	}
 	return nil
 }
@@ -42,6 +44,8 @@ func (m *AuthInfoResponse) GetRights() []Right {
 		return accessMethod.OauthAccessToken.GetRights()
 	case *AuthInfoResponse_UserSession:
 		return RightsFrom(Right_RIGHT_ALL).Implied().GetRights()
+	case *AuthInfoResponse_GatewayToken_:
+		return accessMethod.GatewayToken.GetRights()
 	}
 	return nil
 }

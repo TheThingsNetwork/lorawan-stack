@@ -12,22 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { connect } from 'react-redux'
+package crypto
 
-import {
-  selectDeviceBrands,
-  selectDeviceBrandsError,
-  selectDeviceBrandsFetching,
-} from '@console/store/selectors/device-repository'
-import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+import (
+	"crypto/hmac"
+	"crypto/sha256"
 
-const mapStateToProps = state => ({
-  appId: selectSelectedApplicationId(state),
-  brands: selectDeviceBrands(state),
-  error: selectDeviceBrandsError(state),
-  fetching: selectDeviceBrandsFetching(state),
-})
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
+)
 
-const mapDispatchToProps = {}
-
-export default BrandSelect => connect(mapStateToProps, mapDispatchToProps)(BrandSelect)
+// HMACHash calculates the  Keyed-Hash Message Authentication Code (HMAC, RFC 2104) hash of the data.
+func HMACHash(key types.AES128Key, payload []byte) ([]byte, error) {
+	h := hmac.New(sha256.New, key[:])
+	_, err := h.Write(payload)
+	if err != nil {
+		return nil, err
+	}
+	return h.Sum([]byte{}), nil
+}

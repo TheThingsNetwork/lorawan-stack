@@ -52,3 +52,7 @@ func (emptyKeyVault) GetCertificate(ctx context.Context, id string) (*x509.Certi
 func (emptyKeyVault) ExportCertificate(ctx context.Context, id string) (*tls.Certificate, error) {
 	return nil, errCertificateNotFound.WithAttributes("id", id)
 }
+
+func (emptyKeyVault) HMACHash(_ context.Context, _ []byte, id string) ([]byte, error) {
+	return nil, errKeyNotFound.WithAttributes("id", id)
+}

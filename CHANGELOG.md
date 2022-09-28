@@ -36,9 +36,11 @@ For details about compatibility between different releases, see the **Commitment
 - Pagination in `sessions` and `access tokens` tables in the Console.
 - `LinkADRReq` MAC command generation for LoRaWAN 1.0 and 1.0.1 end devices.
 - `LinkADRReq` no longer attempts to enable channels which have not yet been negotiated with the end device.
+- Downlink path selection for uplinks which are not LoRa modulated.
 - Issues with byte inputs in the Console.
   - Pasting values into the input leading to issues in some cases.
   - Values being typed double on android phones.
+
 
 ### Security
 

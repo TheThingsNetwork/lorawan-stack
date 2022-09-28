@@ -96,7 +96,8 @@ type Config struct {
 		EncryptionKeyID string `name:"encryption-key-id" description:"ID of the key used to encrypt end device secrets at rest"` //nolint:lll
 	} `name:"end-devices"`
 	Gateways struct {
-		EncryptionKeyID string `name:"encryption-key-id" description:"ID of the key used to encrypt gateway secrets at rest"`
+		EncryptionKeyID string        `name:"encryption-key-id" description:"ID of the key used to encrypt gateway secrets at rest"`
+		TokenValidity   time.Duration `name:"token-validity" description:"Time in seconds after creation when a gateway token is valid"` //nolint:lll
 	} `name:"gateways"`
 	Delete struct {
 		Restore time.Duration `name:"restore" description:"How long after soft-deletion an entity can be restored"`

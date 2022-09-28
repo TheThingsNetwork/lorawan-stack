@@ -354,7 +354,7 @@ describe('End device manual create', () => {
           dev_eui: generateHexValue(16),
           lorawan_version: 'MAC_V1_0_4',
           frequency_plan_id: '863-870 MHz',
-          phy_version: 'PHY_V1_0',
+          phy_version: 'RP002_V1_0_0',
           app_key: generateHexValue(32),
         }
         cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)

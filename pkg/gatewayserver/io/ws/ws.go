@@ -78,12 +78,16 @@ func New(ctx context.Context, server io.Server, formatter Formatter, cfg Config)
 		cfg:       cfg,
 	}
 
-	web, err := web.New(ctx, web.WithDisableWarnings(true))
+	w, err := web.New(
+		ctx,
+		web.WithDisableWarnings(true),
+		web.WithTrustedProxies(server.GetBaseConfig(ctx).HTTP.TrustedProxies...),
+	)
 	if err != nil {
 		return nil, err
 	}
 
-	router := web.RootRouter()
+	router := w.RootRouter()
 	router.Use(
 		ratelimit.HTTPMiddleware(server.RateLimiter(), "gs:accept:ws"),
 	)
@@ -96,7 +100,7 @@ func New(ctx context.Context, server io.Server, formatter Formatter, cfg Config)
 		}
 	}).Methods(http.MethodGet)
 
-	return web, nil
+	return w, nil
 }
 
 func (s *srv) handleConnectionInfo(w http.ResponseWriter, r *http.Request) {
@@ -212,20 +216,39 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 		ctx = frequencyplans.WithFallbackID(ctx, fallback)
 	}
 
-	if auth == "" {
-		// If the server allows unauthenticated connections (for local testing), we provide the link rights ourselves.
-		if s.cfg.AllowUnauthenticated {
-			ctx = rights.NewContext(ctx, rights.Rights{
-				GatewayRights: map[string]*ttnpb.Rights{
-					uid: {
-						Rights: []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_LINK},
-					},
-				},
-			})
-		} else {
-			// We error here directly as there is no need make an RPC call to the IS to get a failed rights check due to no Auth.
+	var hasAuth bool
+	if auth != "" {
+		if !strings.HasPrefix(auth, "Bearer ") {
+			auth = fmt.Sprintf("Bearer %s", auth)
+		}
+		md = metadata.New(map[string]string{
+			"authorization": auth,
+		})
+		hasAuth = true
+	}
+
+	if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
+		md = metadata.Join(ctxMd, md)
+	}
+	ctx = metadata.NewIncomingContext(ctx, md)
+	// If a fallback frequency is defined in the server context, inject it into local the context.
+	if fallback, ok := frequencyplans.FallbackIDFromContext(s.ctx); ok {
+		ctx = frequencyplans.WithFallbackID(ctx, fallback)
+	}
+
+	if !hasAuth {
+		if !s.cfg.AllowUnauthenticated {
+			// We error here directly as there is no auth.
 			return errNoAuthProvided.WithAttributes("uid", uid)
 		}
+		// If the server allows unauthenticated connections (for local testing), we provide the link rights ourselves.
+		ctx = rights.NewContext(ctx, rights.Rights{
+			GatewayRights: map[string]*ttnpb.Rights{
+				uid: {
+					Rights: []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_LINK},
+				},
+			},
+		})
 	}
 
 	logger := log.FromContext(ctx)

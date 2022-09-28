@@ -95,7 +95,10 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 		var downlinkPaths []DownlinkPath
 		if !fixedPaths {
-			downlinkPaths = DownlinkPathsFromMetadata(ToMACStateRxMetadata(DefaultRxMetadata[:]...)...)
+			downlinkPaths = DownlinkPathsFromMetadata(
+				ToMACStateTxSettings(DefaultTxSettings),
+				ToMACStateRxMetadata(DefaultRxMetadata[:]),
+			)
 		} else {
 			for i, ids := range DefaultClassBCGatewayIdentifiers {
 				ids := ids

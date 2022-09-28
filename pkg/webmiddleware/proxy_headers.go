@@ -81,6 +81,7 @@ func (c *ProxyConfiguration) ParseAndAddTrusted(cidrs ...string) error {
 func ProxyHeaders(config ProxyConfiguration) MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
 			remoteIP, _, err := net.SplitHostPort(r.RemoteAddr)
 			if err != nil {
 				// The *http.Server should have set r.RemoteAddr to "IP:port".
@@ -105,7 +106,7 @@ func ProxyHeaders(config ProxyConfiguration) MiddlewareFunc {
 				}
 				r.Header.Set(headerXRealIP, remoteIP)
 			}
-			next.ServeHTTP(w, r)
+			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
 }

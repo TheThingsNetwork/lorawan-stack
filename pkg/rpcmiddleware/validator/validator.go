@@ -157,9 +157,7 @@ func validateMessage(ctx context.Context, fullMethod string, msg interface{}) er
 		}
 		return nil
 
-	case interface {
-		Validate() error
-	}:
+	case interface{ Validate() error }:
 		defer trace.StartRegion(ctx, "validate without context").End()
 		if err := v.Validate(); err != nil {
 			return convertError(err)
@@ -185,9 +183,11 @@ func validateMessage(ctx context.Context, fullMethod string, msg interface{}) er
 
 // UnaryServerInterceptor returns a new unary server interceptor that validates
 // incoming messages if those incoming messages implement:
-//   (A) ValidateContext(ctx context.Context) error
-//   (B) Validate() error
-//   (C) ValidateFields(...string) error
+//
+//	(A) ValidateContext(ctx context.Context) error
+//	(B) Validate() error
+//	(C) ValidateFields(...string) error
+//
 // If a message implements both, then (A) should call (B).
 //
 // Invalid messages will be rejected with the error returned from the validator,
@@ -222,9 +222,11 @@ func (s *recvWrapper) RecvMsg(msg interface{}) error {
 
 // StreamServerInterceptor returns a new streaming server interceptor that validates
 // incoming messages if those incoming messages implement:
-//   (A) ValidateContext(ctx context.Context) error
-//   (B) Validate() error
-//   (C) ValidateFields(...string) error
+//
+//	(A) ValidateContext(ctx context.Context) error
+//	(B) Validate() error
+//	(C) ValidateFields(...string) error
+//
 // If a message implements both, then (A) should call (B).
 //
 // Invalid messages will be rejected with the error returned from the validator,

@@ -93,8 +93,7 @@ var errKeyLength = errors.DefineInternal(
 // Validate validates a plaintext password against a hashed one.
 // The format of the hashed password should be:
 //
-//     PBKDF2$<algorithm>$<iterations>$<salt>$<key in base64>
-//
+//	PBKDF2$<algorithm>$<iterations>$<salt>$<key in base64>
 func (PBKDF2) Validate(hashed, plain string) (bool, error) {
 	parts := strings.Split(hashed, "$")
 	if len(parts) != 5 {
