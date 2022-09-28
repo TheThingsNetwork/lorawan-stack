@@ -71,15 +71,10 @@ const ApplicationCollaboratorEdit = props => {
 
     try {
       await removeCollaborator(updatedCollaborator)
-      toast({
-        message: sharedMessages.collaboratorDeleteSuccess,
-        type: toast.types.SUCCESS,
-      })
-      redirectToList(appId)
     } catch (error) {
       setError(error)
     }
-  }, [appId, collaboratorId, collaboratorType, redirectToList, removeCollaborator])
+  }, [collaboratorId, collaboratorType, removeCollaborator])
 
   return (
     <Container>
