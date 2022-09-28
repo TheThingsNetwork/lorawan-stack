@@ -2686,7 +2686,7 @@ ApplicationRegistry, ClientRegistry, GatewayRegistry, OrganizationRegistry and U
 | ----- | ----------- |
 | `join_eui` | <p>`bytes.len`: `8`</p> |
 | `dev_eui` | <p>`bytes.len`: `8`</p> |
-| `authentication_code` | <p>`string.pattern`: `^[A-Z0-9]{1,32}$`</p> |
+| `authentication_code` | <p>`string.pattern`: `^[a-zA-Z0-9]{1,32}$`</p> |
 
 ### <a name="ttn.lorawan.v3.ClaimGatewayRequest">Message `ClaimGatewayRequest`</a>
 

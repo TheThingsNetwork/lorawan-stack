@@ -1215,7 +1215,7 @@ func (m *ClaimEndDeviceRequest_AuthenticatedIdentifiers) ValidateFields(paths ..
 			if !_ClaimEndDeviceRequest_AuthenticatedIdentifiers_AuthenticationCode_Pattern.MatchString(m.GetAuthenticationCode()) {
 				return ClaimEndDeviceRequest_AuthenticatedIdentifiersValidationError{
 					field:  "authentication_code",
-					reason: "value does not match regex pattern \"^[A-Z0-9]{1,32}$\"",
+					reason: "value does not match regex pattern \"^[a-zA-Z0-9]{1,32}$\"",
 				}
 			}
 
@@ -1289,7 +1289,7 @@ var _ interface {
 	ErrorName() string
 } = ClaimEndDeviceRequest_AuthenticatedIdentifiersValidationError{}
 
-var _ClaimEndDeviceRequest_AuthenticatedIdentifiers_AuthenticationCode_Pattern = regexp.MustCompile("^[A-Z0-9]{1,32}$")
+var _ClaimEndDeviceRequest_AuthenticatedIdentifiers_AuthenticationCode_Pattern = regexp.MustCompile("^[a-zA-Z0-9]{1,32}$")
 
 // ValidateFields checks the field values on
 // GetClaimStatusResponse_VendorSpecific with the rules defined in the proto
