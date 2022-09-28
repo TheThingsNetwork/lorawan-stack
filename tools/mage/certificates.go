@@ -88,6 +88,10 @@ func (Dev) Certificates() error {
 	return nil
 }
 
+var names = []csr.Name{
+	{C: "NL", ST: "Noord-Holland", L: "Amsterdam", O: "The Things Gateway Demo"},
+}
+
 // GenGatewayCA generates a certificate authority to sign gateway certificates.
 func (Dev) GenGatewayCA() error {
 	caReq := csr.CertificateRequest{
