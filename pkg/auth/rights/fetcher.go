@@ -48,11 +48,10 @@ type Fetcher interface {
 // A EntityFetcherFunc that returns all Application rights for any Application,
 // would look like this:
 //
-//    fetcher := rights.EntityFetcherFunc(func(ctx context.Context, ids *ttnpb.EntityIdentifiers) (*ttnpb.Rights, error) {
-//    	rights := ttnpb.AllApplicationRights // Instead this usually comes from an identity server or a database.
-//    	return &rights, nil
-//    })
-//
+//	fetcher := rights.EntityFetcherFunc(func(ctx context.Context, ids *ttnpb.EntityIdentifiers) (*ttnpb.Rights, error) {
+//		rights := ttnpb.AllApplicationRights // Instead this usually comes from an identity server or a database.
+//		return &rights, nil
+//	})
 type EntityFetcherFunc func(ctx context.Context, ids *ttnpb.EntityIdentifiers) (*ttnpb.Rights, error)
 
 // ApplicationRights implements the Fetcher interface.
