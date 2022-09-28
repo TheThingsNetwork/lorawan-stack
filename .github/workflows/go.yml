@@ -42,7 +42,7 @@ jobs:
       - name: Lint code
         uses: golangci/golangci-lint-action@v3
         with:
-          version: v1.46.2
+          version: v1.50.0
           only-new-issues: true
           skip-pkg-cache: true # Caching is set up by install-go-and-deps
           skip-build-cache: true # Caching is set up by install-go-and-deps
