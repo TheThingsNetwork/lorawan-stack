@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
@@ -154,7 +155,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					RecentUplinks:      ups,
 				},
 				MacSettings: &ttnpb.MACSettings{
-					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
+					StatusTimePeriodicity:  durationpb.New(0),
 					StatusCountPeriodicity: &wrapperspb.UInt32Value{Value: 0},
 				},
 				Session: &ttnpb.Session{

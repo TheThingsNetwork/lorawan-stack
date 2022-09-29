@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
@@ -85,7 +86,7 @@ func TestNeedsDevStatusReq(t *testing.T) {
 					StatusCountPeriodicity: &wrapperspb.UInt32Value{
 						Value: 1000,
 					},
-					StatusTimePeriodicity: ttnpb.ProtoDurationPtr(time.Hour),
+					StatusTimePeriodicity: durationpb.New(time.Hour),
 				},
 				MacState: &ttnpb.MACState{
 					LastDevStatusFCntUp: 1,
@@ -103,7 +104,7 @@ func TestNeedsDevStatusReq(t *testing.T) {
 					StatusCountPeriodicity: &wrapperspb.UInt32Value{
 						Value: 1000,
 					},
-					StatusTimePeriodicity: ttnpb.ProtoDurationPtr(time.Hour),
+					StatusTimePeriodicity: durationpb.New(time.Hour),
 				},
 				MacState: &ttnpb.MACState{
 					LastDevStatusFCntUp: 1,
@@ -121,7 +122,7 @@ func TestNeedsDevStatusReq(t *testing.T) {
 					StatusCountPeriodicity: &wrapperspb.UInt32Value{
 						Value: 1000,
 					},
-					StatusTimePeriodicity: ttnpb.ProtoDurationPtr(time.Hour),
+					StatusTimePeriodicity: durationpb.New(time.Hour),
 				},
 				MacState: &ttnpb.MACState{
 					LastDevStatusFCntUp: 1,
@@ -140,7 +141,7 @@ func TestNeedsDevStatusReq(t *testing.T) {
 					StatusCountPeriodicity: &wrapperspb.UInt32Value{
 						Value: 1000,
 					},
-					StatusTimePeriodicity: ttnpb.ProtoDurationPtr(time.Hour),
+					StatusTimePeriodicity: durationpb.New(time.Hour),
 				},
 				MacState: &ttnpb.MACState{
 					LastDevStatusFCntUp: 1,

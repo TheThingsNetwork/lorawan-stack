@@ -31,6 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 // InteropClient is a client, which Application Server can use for interoperability.
@@ -144,7 +145,7 @@ type WebhooksConfig struct {
 func (c WebhooksConfig) toProto() *ttnpb.AsConfiguration_Webhooks {
 	return &ttnpb.AsConfiguration_Webhooks{
 		UnhealthyAttemptsThreshold: int64(c.UnhealthyAttemptsThreshold),
-		UnhealthyRetryInterval:     ttnpb.ProtoDurationPtr(c.UnhealthyRetryInterval),
+		UnhealthyRetryInterval:     durationpb.New(c.UnhealthyRetryInterval),
 	}
 }
 

@@ -42,6 +42,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
@@ -393,7 +394,7 @@ func TestForwarder(t *testing.T) {
 					Frequency: 869525000,
 					DataRate:  packetbroker.NewLoRaDataRate(12, 125000, ""),
 				},
-				Rx1Delay:           pbtypes.DurationProto(5 * time.Second),
+				Rx1Delay:           durationpb.New(5 * time.Second),
 				GatewayUplinkToken: []byte(tokenCompact),
 			},
 		}
@@ -504,7 +505,7 @@ func TestForwarder(t *testing.T) {
 			),
 		})
 		a.So(err, should.BeNil)
-		a.So(test.Must(pbtypes.DurationFromProto(res.OnlineTtl)).(time.Duration), should.NotBeZeroValue)
+		a.So(res.OnlineTtl.AsDuration(), should.NotBeZeroValue)
 
 		select {
 		case update := <-updateCh:
@@ -956,7 +957,7 @@ func TestHomeNetwork(t *testing.T) {
 					Frequency: 869525000,
 					DataRate:  packetbroker.NewLoRaDataRate(12, 125000, band.Cr4_5),
 				},
-				Rx1Delay:           pbtypes.DurationProto(5 * time.Second),
+				Rx1Delay:           durationpb.New(5 * time.Second),
 				GatewayUplinkToken: []byte(`test-token`),
 			},
 		})

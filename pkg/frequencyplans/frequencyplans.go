@@ -23,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/durationpb"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -79,7 +80,7 @@ func (lbt *LBT) ToConcentratorConfig() *ttnpb.ConcentratorConfig_LBTConfiguratio
 	return &ttnpb.ConcentratorConfig_LBTConfiguration{
 		RssiOffset: lbt.RSSIOffset,
 		RssiTarget: lbt.RSSITarget,
-		ScanTime:   ttnpb.ProtoDurationPtr(lbt.ScanTime),
+		ScanTime:   durationpb.New(lbt.ScanTime),
 	}
 }
 

@@ -21,6 +21,7 @@ import (
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
@@ -47,12 +48,12 @@ func (ns *NetworkServer) GetDefaultMACSettings(ctx context.Context, req *ttnpb.G
 	statusTimePeriodicity := mac.DeviceStatusTimePeriodicity(nil, ns.defaultMACSettings)
 	statusCountPeriodicity := mac.DeviceStatusCountPeriodicity(nil, ns.defaultMACSettings)
 	settings := &ttnpb.MACSettings{
-		ClassBTimeout:                ttnpb.ProtoDurationPtr(classBTimeout),
+		ClassBTimeout:                durationpb.New(classBTimeout),
 		PingSlotPeriodicity:          mac.DeviceDefaultPingSlotPeriodicity(nil, ns.defaultMACSettings),
 		PingSlotDataRateIndex:        mac.DeviceDefaultPingSlotDataRateIndexValue(nil, phy, ns.defaultMACSettings),
 		PingSlotFrequency:            &ttnpb.ZeroableFrequencyValue{Value: mac.DeviceDefaultPingSlotFrequency(nil, phy, ns.defaultMACSettings)},
 		BeaconFrequency:              &ttnpb.ZeroableFrequencyValue{Value: mac.DeviceDefaultBeaconFrequency(nil, phy, ns.defaultMACSettings)},
-		ClassCTimeout:                ttnpb.ProtoDurationPtr(classCTimeout),
+		ClassCTimeout:                durationpb.New(classCTimeout),
 		Rx1Delay:                     &ttnpb.RxDelayValue{Value: mac.DeviceDefaultRX1Delay(nil, phy, ns.defaultMACSettings)},
 		Rx1DataRateOffset:            &ttnpb.DataRateOffsetValue{Value: mac.DeviceDefaultRX1DataRateOffset(nil, ns.defaultMACSettings)},
 		Rx2DataRateIndex:             &ttnpb.DataRateIndexValue{Value: mac.DeviceDefaultRX2DataRateIndex(nil, phy, ns.defaultMACSettings)},
@@ -62,7 +63,7 @@ func (ns *NetworkServer) GetDefaultMACSettings(ctx context.Context, req *ttnpb.G
 		UseAdr:                       &ttnpb.BoolValue{Value: mac.DeviceUseADR(nil, ns.defaultMACSettings, phy)},
 		AdrMargin:                    &wrapperspb.FloatValue{Value: adrMargin},
 		ResetsFCnt:                   &ttnpb.BoolValue{Value: mac.DeviceResetsFCnt(nil, ns.defaultMACSettings)},
-		StatusTimePeriodicity:        ttnpb.ProtoDurationPtr(statusTimePeriodicity),
+		StatusTimePeriodicity:        durationpb.New(statusTimePeriodicity),
 		StatusCountPeriodicity:       &wrapperspb.UInt32Value{Value: statusCountPeriodicity},
 		DesiredRx1Delay:              &ttnpb.RxDelayValue{Value: mac.DeviceDesiredRX1Delay(nil, phy, ns.defaultMACSettings)},
 		DesiredRx1DataRateOffset:     &ttnpb.DataRateOffsetValue{Value: mac.DeviceDesiredRX1DataRateOffset(nil, ns.defaultMACSettings)},

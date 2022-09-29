@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -90,7 +91,7 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 			ScheduleDownlinkLate:           true,
 			EnforceDutyCycle:               true,
 			DownlinkPathConstraint:         ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
-			ScheduleAnytimeDelay:           ttnpb.ProtoDurationPtr(time.Second),
+			ScheduleAnytimeDelay:           durationpb.New(time.Second),
 			UpdateLocationFromStatus:       true,
 			LbsLnsSecret:                   secret,
 			ClaimAuthenticationCode:        claim,
@@ -248,7 +249,7 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 			ScheduleDownlinkLate:           false,
 			EnforceDutyCycle:               false,
 			DownlinkPathConstraint:         ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NONE,
-			ScheduleAnytimeDelay:           ttnpb.ProtoDurationPtr(time.Second / 2),
+			ScheduleAnytimeDelay:           durationpb.New(time.Second / 2),
 			UpdateLocationFromStatus:       false,
 			LbsLnsSecret:                   updatedSecret,
 			ClaimAuthenticationCode:        updatedClaim,

@@ -39,6 +39,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
@@ -279,7 +280,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DevAddr:        devAddr.Bytes(),
 				},
 				MacSettings: &ttnpb.MACSettings{
-					StatusTimePeriodicity: ttnpb.ProtoDurationPtr(24 * time.Hour),
+					StatusTimePeriodicity: durationpb.New(24 * time.Hour),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{},
@@ -1066,7 +1067,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DevAddr:        devAddr.Bytes(),
 				},
 				MacSettings: &ttnpb.MACSettings{
-					StatusTimePeriodicity: ttnpb.ProtoDurationPtr(time.Nanosecond),
+					StatusTimePeriodicity: durationpb.New(time.Nanosecond),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{},
@@ -1143,7 +1144,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						DevAddr:        devAddr.Bytes(),
 					},
 					MacSettings: &ttnpb.MACSettings{
-						StatusTimePeriodicity: ttnpb.ProtoDurationPtr(time.Nanosecond),
+						StatusTimePeriodicity: durationpb.New(time.Nanosecond),
 					},
 					MacState: &ttnpb.MACState{
 						CurrentParameters: &ttnpb.MACParameters{},
@@ -1217,7 +1218,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					Component: c,
 					ctx:       ctx,
 					defaultMACSettings: &ttnpb.MACSettings{
-						StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
+						StatusTimePeriodicity:  durationpb.New(0),
 						StatusCountPeriodicity: &wrapperspb.UInt32Value{Value: 0},
 					},
 				}

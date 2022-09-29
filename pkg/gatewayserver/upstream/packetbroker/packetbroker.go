@@ -19,7 +19,6 @@ import (
 	"context"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
@@ -28,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
@@ -85,15 +85,13 @@ func (h *Handler) Setup(context.Context) error {
 	return nil
 }
 
-func (h *Handler) nextUpdateGateway(onlineTTL *pbtypes.Duration) <-chan time.Time {
+func (h *Handler) nextUpdateGateway(onlineTTL *durationpb.Duration) <-chan time.Time {
 	d := random.Jitter(h.UpdateInterval, h.UpdateJitter)
 	if onlineTTL != nil {
-		ttl, err := pbtypes.DurationFromProto(onlineTTL)
-		if err == nil {
-			ttl -= h.OnlineTTLMargin
-			if ttl < d {
-				d = ttl
-			}
+		ttl := onlineTTL.AsDuration()
+		ttl -= h.OnlineTTLMargin
+		if ttl < d {
+			d = ttl
 		}
 	}
 	return time.After(d)

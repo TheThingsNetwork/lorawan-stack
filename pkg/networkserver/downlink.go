@@ -39,6 +39,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/lora"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -839,7 +840,7 @@ func (t *packetBrokerDownlinkTarget) Schedule(
 		return nil, err
 	}
 	return &ttnpb.ScheduleDownlinkResponse{
-		Delay: ttnpb.ProtoDurationPtr(peeringScheduleDelay),
+		Delay: durationpb.New(peeringScheduleDelay),
 		DownlinkPath: &ttnpb.DownlinkPath{
 			Path: &ttnpb.DownlinkPath_Fixed{
 				Fixed: &ttnpb.GatewayAntennaIdentifiers{

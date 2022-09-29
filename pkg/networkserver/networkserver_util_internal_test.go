@@ -23,7 +23,6 @@ import (
 	"testing"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
@@ -47,6 +46,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -240,7 +240,7 @@ type NsJsJoinRequestConfig struct {
 	PHYVersion         ttnpb.PHYVersion
 	CorrelationIDs     []string
 	CFList             *ttnpb.CFList
-	ConsumedAirtime    *pbtypes.Duration
+	ConsumedAirtime    *durationpb.Duration
 }
 
 func MakeNsJsJoinRequest(conf NsJsJoinRequestConfig) *ttnpb.JoinRequest {

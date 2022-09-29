@@ -39,6 +39,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"golang.org/x/exp/slices"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -1462,7 +1464,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	if t, err := toa.Compute(len(up.RawPayload), up.Settings); err != nil {
 		log.FromContext(ctx).WithError(err).Debug("Failed to compute time-on-air")
 	} else {
-		up.ConsumedAirtime = ttnpb.ProtoDurationPtr(t)
+		up.ConsumedAirtime = durationpb.New(t)
 	}
 	switch up.Payload.MHdr.MType {
 	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:

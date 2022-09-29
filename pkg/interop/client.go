@@ -38,6 +38,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"google.golang.org/protobuf/types/known/durationpb"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -300,7 +301,7 @@ func (cl joinServerHTTPClient) HandleJoinRequest(
 			NwkSEncKey:   (*ttnpb.KeyEnvelope)(interopAns.NwkSEncKey),
 			AppSKey:      (*ttnpb.KeyEnvelope)(interopAns.AppSKey),
 		},
-		Lifetime: ttnpb.ProtoDurationPtr(time.Duration(interopAns.Lifetime) * time.Second),
+		Lifetime: durationpb.New(time.Duration(interopAns.Lifetime) * time.Second),
 	}, nil
 }
 

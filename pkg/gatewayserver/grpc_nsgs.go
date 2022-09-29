@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 var (
@@ -93,7 +94,7 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 		registerSendDownlink(ctx, conn.Gateway(), connDown, conn.Frontend().Protocol())
 
 		return &ttnpb.ScheduleDownlinkResponse{
-			Delay: ttnpb.ProtoDurationPtr(delay),
+			Delay: durationpb.New(delay),
 			DownlinkPath: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_Fixed{
 					Fixed: ids,

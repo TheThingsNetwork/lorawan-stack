@@ -28,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/oauth"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	ttntypes "go.thethings.network/lorawan-stack/v3/pkg/types"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
@@ -172,7 +173,7 @@ func (c Config) toProto() *ttnpb.IsConfiguration {
 			Enabled: c.UserRegistration.Enabled,
 			Invitation: &ttnpb.IsConfiguration_UserRegistration_Invitation{
 				Required: &wrapperspb.BoolValue{Value: c.UserRegistration.Invitation.Required},
-				TokenTtl: ttnpb.ProtoDurationPtr(c.UserRegistration.Invitation.TokenTTL),
+				TokenTtl: durationpb.New(c.UserRegistration.Invitation.TokenTTL),
 			},
 			ContactInfoValidation: &ttnpb.IsConfiguration_UserRegistration_ContactInfoValidation{
 				Required: &wrapperspb.BoolValue{Value: c.UserRegistration.ContactInfoValidation.Required},

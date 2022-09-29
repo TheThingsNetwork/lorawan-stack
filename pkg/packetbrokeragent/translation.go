@@ -33,6 +33,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 	"gopkg.in/square/go-jose.v2"
@@ -629,7 +630,7 @@ func toPBDownlink(ctx context.Context, msg *ttnpb.DownlinkMessage, fps frequency
 
 	down := &packetbroker.DownlinkMessage{
 		PhyPayload: msg.RawPayload,
-		Rx1Delay:   pbtypes.DurationProto(req.Rx1Delay.Duration()),
+		Rx1Delay:   durationpb.New(req.Rx1Delay.Duration()),
 	}
 	var ok bool
 	if down.Region, ok = toPBRegion[fp.BandID]; !ok {
@@ -709,10 +710,7 @@ func fromPBDownlink(ctx context.Context, msg *packetbroker.DownlinkMessage, rece
 	if req.Priority, ok = fromPBPriority[msg.Priority]; !ok {
 		return "", nil, errUnknownPriority.WithAttributes("priority", msg.Priority)
 	}
-	rx1Delay, err := pbtypes.DurationFromProto(msg.Rx1Delay)
-	if err != nil {
-		return "", nil, errInvalidRx1Delay.WithCause(err)
-	}
+	rx1Delay := msg.Rx1Delay.AsDuration()
 	req.Rx1Delay = ttnpb.RxDelay(rx1Delay / time.Second)
 	for i, rx := range []struct {
 		settings  *packetbroker.DownlinkMessage_RXSettings

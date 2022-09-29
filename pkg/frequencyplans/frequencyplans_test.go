@@ -20,13 +20,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 func uint64Ptr(v uint64) *uint64 { return &v }
@@ -340,7 +340,7 @@ func TestProtoConversion(t *testing.T) {
 			},
 			Output: &ttnpb.ConcentratorConfig{
 				Lbt: &ttnpb.ConcentratorConfig_LBTConfiguration{
-					ScanTime: types.DurationProto(32 * time.Microsecond),
+					ScanTime: durationpb.New(32 * time.Microsecond),
 				},
 				PingSlot: &ttnpb.ConcentratorConfig_Channel{
 					Frequency: 923000000,

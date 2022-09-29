@@ -19,10 +19,10 @@ import (
 	"sort"
 	"strings"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
@@ -128,7 +128,7 @@ func countStoredUpRequest(flags *pflag.FlagSet) (*ttnpb.GetStoredApplicationUpCo
 	return req, nil
 }
 
-func timeRangeFromFlags(flags *pflag.FlagSet) (beforePB *timestamppb.Timestamp, afterPB *timestamppb.Timestamp, lastPB *pbtypes.Duration, err error) {
+func timeRangeFromFlags(flags *pflag.FlagSet) (beforePB *timestamppb.Timestamp, afterPB *timestamppb.Timestamp, lastPB *durationpb.Duration, err error) {
 	if flags.Changed("last") && (hasTimestampFlags(flags, "after") || hasTimestampFlags(flags, "before")) {
 		return nil, nil, nil, fmt.Errorf("--last cannot be used with --after or --before flags")
 	}
@@ -152,7 +152,7 @@ func timeRangeFromFlags(flags *pflag.FlagSet) (beforePB *timestamppb.Timestamp, 
 		if err != nil {
 			return nil, nil, nil, err
 		}
-		lastPB = pbtypes.DurationProto(d)
+		lastPB = durationpb.New(d)
 	}
 	return
 }

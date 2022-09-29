@@ -17,26 +17,23 @@ package ttnpb
 import (
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
 )
 
 // StdDuration converts a protobuf duration to a standard library duration.
 //
 // ProtoDuration panics if the Duration is invalid.
-func StdDuration(protoDuration *pbtypes.Duration) *time.Duration {
+func StdDuration(protoDuration *durationpb.Duration) *time.Duration {
 	if protoDuration == nil {
 		return nil
 	}
-	stdDuration, err := pbtypes.DurationFromProto(protoDuration)
-	if err != nil {
-		panic(err)
-	}
+	stdDuration := protoDuration.AsDuration()
 	return &stdDuration
 }
 
 // StdDurationOrZero converts a protobuf duration to a standard library duration.
 // If protoDuration is nil, it returns a zero duration.
-func StdDurationOrZero(protoDuration *pbtypes.Duration) time.Duration {
+func StdDurationOrZero(protoDuration *durationpb.Duration) time.Duration {
 	stdDuration := StdDuration(protoDuration)
 	if stdDuration == nil {
 		return 0
@@ -45,14 +42,9 @@ func StdDurationOrZero(protoDuration *pbtypes.Duration) time.Duration {
 }
 
 // ProtoDuration converts a standard library duration to a protobuf duration.
-func ProtoDuration(stdDuration *time.Duration) *pbtypes.Duration {
+func ProtoDuration(stdDuration *time.Duration) *durationpb.Duration {
 	if stdDuration == nil {
 		return nil
 	}
-	return pbtypes.DurationProto(*stdDuration)
-}
-
-// ProtoDuration converts a standard library duration to a pointer and then to a protobuf duration.
-func ProtoDurationPtr(stdDuration time.Duration) *pbtypes.Duration {
-	return ProtoDuration(&stdDuration)
+	return durationpb.New(*stdDuration)
 }

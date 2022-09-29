@@ -20,12 +20,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	. "go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
@@ -514,17 +514,17 @@ func TestBand_convertToBandDescription(t *testing.T) {
 				ImplementsCfList: true,
 				CfListType:       ttnpb.CFListType_CHANNEL_MASKS,
 
-				ReceiveDelay_1: &types.Duration{Seconds: 1},
-				ReceiveDelay_2: &types.Duration{Seconds: 2},
+				ReceiveDelay_1: durationpb.New(time.Second),
+				ReceiveDelay_2: durationpb.New(2 * time.Second),
 
-				JoinAcceptDelay_1: &types.Duration{Seconds: 3},
-				JoinAcceptDelay_2: &types.Duration{Seconds: 4},
+				JoinAcceptDelay_1: durationpb.New(3 * time.Second),
+				JoinAcceptDelay_2: durationpb.New(4 * time.Second),
 				MaxFcntGap:        5,
 
 				SupportsDynamicAdr:   true,
 				AdrAckLimit:          ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_1,
-				MinRetransmitTimeout: &types.Duration{Seconds: 1},
-				MaxRetransmitTimeout: &types.Duration{Seconds: 2},
+				MinRetransmitTimeout: durationpb.New(time.Second),
+				MaxRetransmitTimeout: durationpb.New(2 * time.Second),
 
 				TxOffset:            []float32{1.0, 2.0},
 				MaxAdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
@@ -654,17 +654,17 @@ func TestBand_convertToBandDescription(t *testing.T) {
 				ImplementsCfList: true,
 				CfListType:       ttnpb.CFListType_CHANNEL_MASKS,
 
-				ReceiveDelay_1: &types.Duration{Seconds: 1},
-				ReceiveDelay_2: &types.Duration{Seconds: 2},
+				ReceiveDelay_1: durationpb.New(time.Second),
+				ReceiveDelay_2: durationpb.New(2 * time.Second),
 
-				JoinAcceptDelay_1: &types.Duration{Seconds: 3},
-				JoinAcceptDelay_2: &types.Duration{Seconds: 4},
+				JoinAcceptDelay_1: durationpb.New(3 * time.Second),
+				JoinAcceptDelay_2: durationpb.New(4 * time.Second),
 				MaxFcntGap:        5,
 
 				SupportsDynamicAdr:   true,
 				AdrAckLimit:          ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_1,
-				MinRetransmitTimeout: &types.Duration{Seconds: 1},
-				MaxRetransmitTimeout: &types.Duration{Seconds: 2},
+				MinRetransmitTimeout: durationpb.New(time.Second),
+				MaxRetransmitTimeout: durationpb.New(2 * time.Second),
 
 				TxOffset:            []float32{1.0, 2.0},
 				MaxAdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,

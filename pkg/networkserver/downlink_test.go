@@ -43,6 +43,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
@@ -335,7 +336,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 	}
 	oneSecondScheduleResponse := NsGsScheduleDownlinkResponse{
 		Response: &ttnpb.ScheduleDownlinkResponse{
-			Delay: ttnpb.ProtoDurationPtr(time.Second),
+			Delay: durationpb.New(time.Second),
 		},
 	}
 
@@ -513,7 +514,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					),
 				},
 				MacSettings: &ttnpb.MACSettings{
-					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
+					StatusTimePeriodicity:  durationpb.New(0),
 					StatusCountPeriodicity: &wrapperspb.UInt32Value{Value: 0},
 				},
 				Session: &ttnpb.Session{
@@ -563,7 +564,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				},
 				MacSettings: &ttnpb.MACSettings{
 					StatusCountPeriodicity: &wrapperspb.UInt32Value{Value: 0},
-					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
+					StatusTimePeriodicity:  durationpb.New(0),
 				},
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr.Bytes(),
@@ -612,7 +613,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				},
 				MacSettings: &ttnpb.MACSettings{
 					StatusCountPeriodicity: &wrapperspb.UInt32Value{Value: 0},
-					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
+					StatusTimePeriodicity:  durationpb.New(0),
 				},
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr.Bytes(),
@@ -697,7 +698,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				},
 				MacSettings: &ttnpb.MACSettings{
 					StatusCountPeriodicity: &wrapperspb.UInt32Value{Value: 0},
-					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
+					StatusTimePeriodicity:  durationpb.New(0),
 				},
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr.Bytes(),
@@ -1370,7 +1371,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
-					ClassBTimeout: ttnpb.ProtoDurationPtr(42 * time.Second),
+					ClassBTimeout: durationpb.New(42 * time.Second),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters:   makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
@@ -1517,7 +1518,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
-					ClassCTimeout: ttnpb.ProtoDurationPtr(42 * time.Second),
+					ClassCTimeout: durationpb.New(42 * time.Second),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
@@ -1680,7 +1681,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
-					ClassCTimeout: ttnpb.ProtoDurationPtr(42 * time.Second),
+					ClassCTimeout: durationpb.New(42 * time.Second),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
@@ -1817,8 +1818,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				LastDevStatusReceivedAt: timestamppb.New(now),
 				LorawanPhyVersion:       ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
-					ClassCTimeout:         ttnpb.ProtoDurationPtr(42 * time.Second),
-					StatusTimePeriodicity: ttnpb.ProtoDurationPtr(time.Hour),
+					ClassCTimeout:         durationpb.New(42 * time.Second),
+					StatusTimePeriodicity: durationpb.New(time.Hour),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
@@ -1957,7 +1958,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
-					ClassCTimeout: ttnpb.ProtoDurationPtr(42 * time.Second),
+					ClassCTimeout: durationpb.New(42 * time.Second),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
@@ -2117,7 +2118,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
-					ClassCTimeout: ttnpb.ProtoDurationPtr(42 * time.Second),
+					ClassCTimeout: durationpb.New(42 * time.Second),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
@@ -2257,9 +2258,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
-					ClassCTimeout:          ttnpb.ProtoDurationPtr(42 * time.Second),
+					ClassCTimeout:          durationpb.New(42 * time.Second),
 					StatusCountPeriodicity: &wrapperspb.UInt32Value{Value: 0},
-					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
+					StatusTimePeriodicity:  durationpb.New(0),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
@@ -2319,9 +2320,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
-					ClassCTimeout:          ttnpb.ProtoDurationPtr(42 * time.Second),
+					ClassCTimeout:          durationpb.New(42 * time.Second),
 					StatusCountPeriodicity: &wrapperspb.UInt32Value{Value: 0},
-					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
+					StatusTimePeriodicity:  durationpb.New(0),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),

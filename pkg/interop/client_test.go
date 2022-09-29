@@ -33,6 +33,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 func TestGetAppSKey(t *testing.T) { //nolint:paralleltest
@@ -471,7 +472,7 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 							EncryptedKey: []byte{0x2a, 0x19, 0x5c, 0xc9, 0x3c, 0xa5, 0x4a, 0xd8, 0x2c, 0xfb, 0x36, 0xc8, 0x3d, 0x91, 0x45, 0x0f, 0x3d, 0x2d, 0x52, 0x35, 0x56, 0xf1, 0x3e, 0x69}, //nolint:lll
 						},
 					},
-					Lifetime: ttnpb.ProtoDurationPtr(0),
+					Lifetime: durationpb.New(0),
 				})
 			},
 			ErrorAssertion: func(a *assertions.Assertion, err error) bool {
@@ -556,7 +557,7 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 							EncryptedKey: []byte{0x2a, 0x19, 0x5c, 0xc9, 0x3c, 0xa5, 0x4a, 0xd8, 0x2c, 0xfb, 0x36, 0xc8, 0x3d, 0x91, 0x45, 0x0f, 0x3d, 0x2d, 0x52, 0x35, 0x56, 0xf1, 0x3e, 0x69}, //nolint:lll
 						},
 					},
-					Lifetime: ttnpb.ProtoDurationPtr(0),
+					Lifetime: durationpb.New(0),
 				})
 			},
 			ErrorAssertion: func(a *assertions.Assertion, err error) bool {
@@ -643,7 +644,7 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 							EncryptedKey: []byte{0x2a, 0x19, 0x5c, 0xc9, 0x3c, 0xa5, 0x4a, 0xd8, 0x2c, 0xfb, 0x36, 0xc8, 0x3d, 0x91, 0x45, 0x0f, 0x3d, 0x2d, 0x52, 0x35, 0x56, 0xf1, 0x3e, 0x69}, //nolint:lll
 						},
 					},
-					Lifetime: ttnpb.ProtoDurationPtr(0),
+					Lifetime: durationpb.New(0),
 				})
 			},
 			ErrorAssertion: func(a *assertions.Assertion, err error) bool {

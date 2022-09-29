@@ -32,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -783,9 +784,9 @@ func (c *Connection) Stats() (*ttnpb.GatewayConnectionStats, []string) {
 	}
 	if min, max, median, _, count := c.RTTStats(100, time.Now()); count > 0 {
 		stats.RoundTripTimes = &ttnpb.GatewayConnectionStats_RoundTripTimes{
-			Min:    ttnpb.ProtoDurationPtr(min),
-			Max:    ttnpb.ProtoDurationPtr(max),
-			Median: ttnpb.ProtoDurationPtr(median),
+			Min:    durationpb.New(min),
+			Max:    durationpb.New(max),
+			Median: durationpb.New(median),
 			Count:  uint32(count),
 		}
 		paths = append(paths, "round_trip_times")

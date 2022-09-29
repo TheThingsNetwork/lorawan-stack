@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
@@ -153,7 +154,7 @@ func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacket
 		updateReq.Online = &wrapperspb.BoolValue{}
 		if req.Gateway.StatusPublic && req.Gateway.Online {
 			updateReq.Online.Value = true
-			updateReq.OnlineTtl = pbtypes.DurationProto(s.config.GatewayOnlineTTL)
+			updateReq.OnlineTtl = durationpb.New(s.config.GatewayOnlineTTL)
 		}
 	}
 
@@ -207,7 +208,7 @@ func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacket
 
 	res := &ttnpb.UpdatePacketBrokerGatewayResponse{}
 	if updateReq.Online.GetValue() {
-		res.OnlineTtl = pbtypes.DurationProto(s.config.GatewayOnlineTTL)
+		res.OnlineTtl = durationpb.New(s.config.GatewayOnlineTTL)
 	}
 	return res, nil
 }
