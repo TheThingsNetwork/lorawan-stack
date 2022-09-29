@@ -19,7 +19,7 @@ import (
 
 	lpp "github.com/TheThingsNetwork/go-cayenne-lib"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
+	"go.thethings.network/lorawan-stack/v3/pkg/goproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -63,7 +63,7 @@ func TestEncode(t *testing.T) {
 		message.DecodedPayload = nil
 		err = host.DecodeDownlink(ctx, ids, nil, message, "")
 		a.So(err, should.BeNil)
-		m, err := gogoproto.Map(message.DecodedPayload)
+		m, err := goproto.Map(message.DecodedPayload)
 		a.So(err, should.BeNil)
 		a.So(m["value_2"], should.AlmostEqual, -50.51, 0.01)
 	}
@@ -145,7 +145,7 @@ func TestDecode(t *testing.T) {
 
 	err := host.DecodeUplink(ctx, ids, nil, message, "")
 	a.So(err, should.BeNil)
-	m, err := gogoproto.Map(message.DecodedPayload)
+	m, err := goproto.Map(message.DecodedPayload)
 	a.So(err, should.BeNil)
 	a.So(m, should.HaveLength, 12)
 	a.So(m["digital_in_1"], should.Equal, 255)

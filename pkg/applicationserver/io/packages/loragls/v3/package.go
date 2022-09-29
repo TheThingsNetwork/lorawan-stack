@@ -26,7 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v3/api"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
-	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
+	"go.thethings.network/lorawan-stack/v3/pkg/goproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -112,7 +112,7 @@ func (p *GeolocationPackage) gnssQuery(ctx context.Context, ids *ttnpb.EndDevice
 	if up.DecodedPayload == nil {
 		req.Payload = up.FrmPayload
 	} else {
-		m, err := gogoproto.Map(up.DecodedPayload)
+		m, err := goproto.Map(up.DecodedPayload)
 		if err != nil {
 			return nil, err
 		}
@@ -174,7 +174,7 @@ func (p *GeolocationPackage) multiFrameQuery(ctx context.Context, ids *ttnpb.End
 }
 
 func (p *GeolocationPackage) wifiQuery(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data, client *api.Client) (api.AbstractLocationSolverResponse, error) {
-	m, err := gogoproto.Map(up.DecodedPayload)
+	m, err := goproto.Map(up.DecodedPayload)
 	if err != nil {
 		return nil, err
 	}

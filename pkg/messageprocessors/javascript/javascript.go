@@ -23,7 +23,7 @@ import (
 	"strings"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
+	"go.thethings.network/lorawan-stack/v3/pkg/goproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/normalizedpayload"
 	"go.thethings.network/lorawan-stack/v3/pkg/scripting"
@@ -133,7 +133,7 @@ func (*host) encodeDownlink(
 	if decoded == nil {
 		return nil
 	}
-	data, err := gogoproto.Map(decoded)
+	data, err := goproto.Map(decoded)
 	if err != nil {
 		return errInput.WithCause(err)
 	}
@@ -305,7 +305,7 @@ func (*host) decodeUplink(
 	if errs := output.Decoded.Errors; len(errs) > 0 {
 		return errOutputErrors.WithAttributes("errors", strings.Join(errs, ", "))
 	}
-	decodedPayload, err := gogoproto.Struct(output.Decoded.Data)
+	decodedPayload, err := goproto.Struct(output.Decoded.Data)
 	if err != nil {
 		return errOutput.WithCause(err)
 	}
@@ -339,7 +339,7 @@ func (*host) decodeUplink(
 		}
 		normalizedPayload := make([]*structpb.Struct, len(measurements))
 		for i := range measurements {
-			pb, err := gogoproto.Struct(measurements[i])
+			pb, err := goproto.Struct(measurements[i])
 			if err != nil {
 				return errOutput.WithCause(err)
 			}
@@ -474,7 +474,7 @@ func (*host) decodeDownlink(
 		return errOutputErrors.WithAttributes("errors", strings.Join(output.Errors, ", "))
 	}
 
-	s, err := gogoproto.Struct(output.Data)
+	s, err := goproto.Struct(output.Data)
 	if err != nil {
 		return errOutput.WithCause(err)
 	}

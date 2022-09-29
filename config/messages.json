@@ -5093,12 +5093,12 @@
       "file": "gatewayserver.go"
     }
   },
-  "error:pkg/gogoproto:stack_depth_exceeded": {
+  "error:pkg/goproto:stack_depth_exceeded": {
     "translations": {
       "en": "stack depth exceeded"
     },
     "description": {
-      "package": "pkg/gogoproto",
+      "package": "pkg/goproto",
       "file": "struct.go"
     }
   },

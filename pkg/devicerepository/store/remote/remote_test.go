@@ -22,7 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store/remote"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
-	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
+	"go.thethings.network/lorawan-stack/v3/pkg/goproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -612,7 +612,7 @@ func TestRemoteStore(t *testing.T) {
 }
 
 func mustStruct(d map[string]interface{}) *structpb.Struct {
-	v, err := gogoproto.Struct(d)
+	v, err := goproto.Struct(d)
 	if err != nil {
 		panic(err)
 	}

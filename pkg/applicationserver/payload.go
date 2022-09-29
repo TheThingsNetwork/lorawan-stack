@@ -23,7 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
-	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
+	"go.thethings.network/lorawan-stack/v3/pkg/goproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -218,7 +218,7 @@ func (as *ApplicationServer) decodeDownlink(ctx context.Context, dev *ttnpb.EndD
 
 func (*ApplicationServer) locationFromPayload(uplink *ttnpb.ApplicationUplink) (res *ttnpb.Location) {
 	// TODO: Prefer location from normalized payload (https://github.com/TheThingsNetwork/lorawan-stack/issues/5429)
-	m, err := gogoproto.Map(uplink.DecodedPayload)
+	m, err := goproto.Map(uplink.DecodedPayload)
 	if err != nil {
 		return nil
 	}

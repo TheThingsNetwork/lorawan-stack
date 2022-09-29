@@ -18,7 +18,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
-	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
+	"go.thethings.network/lorawan-stack/v3/pkg/goproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"gopkg.in/yaml.v2"
 )
@@ -410,7 +410,7 @@ func (s *remoteStore) getDecoder(req store.GetCodecRequest, choose func(codecs *
 					Errors:   e.Output.Errors,
 				},
 			}
-			if pb.Output.Data, err = gogoproto.Struct(e.Output.Data); err != nil {
+			if pb.Output.Data, err = goproto.Struct(e.Output.Data); err != nil {
 				return nil, err
 			}
 			examples = append(examples, pb)
@@ -470,7 +470,7 @@ func (s *remoteStore) GetDownlinkEncoder(req store.GetCodecRequest) (*ttnpb.Mess
 					Errors:     e.Output.Errors,
 				},
 			}
-			if pb.Input.Data, err = gogoproto.Struct(e.Input.Data); err != nil {
+			if pb.Input.Data, err = goproto.Struct(e.Input.Data); err != nil {
 				return nil, err
 			}
 			examples = append(examples, pb)

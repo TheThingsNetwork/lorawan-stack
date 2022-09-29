@@ -21,7 +21,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
+	"go.thethings.network/lorawan-stack/v3/pkg/goproto"
 )
 
 const (
@@ -43,7 +43,7 @@ func parse(result interface{}, res *http.Response) error {
 	reader := io.LimitReader(res.Body, maxResponseSize)
 	if res.StatusCode < 200 || res.StatusCode > 299 {
 		body, _ := io.ReadAll(reader)
-		detail, err := gogoproto.Struct(map[string]interface{}{
+		detail, err := goproto.Struct(map[string]interface{}{
 			"status_code": res.StatusCode,
 			"body":        string(body),
 		})
@@ -63,7 +63,7 @@ func parse(result interface{}, res *http.Response) error {
 	}
 	var details []proto.Message
 	for _, message := range r.Errors {
-		detail, err := gogoproto.Value(message)
+		detail, err := goproto.Value(message)
 		if err != nil {
 			return err
 		}

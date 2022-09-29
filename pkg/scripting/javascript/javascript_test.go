@@ -19,7 +19,6 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/goproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/scripting"
 	"go.thethings.network/lorawan-stack/v3/pkg/scripting/javascript"
@@ -122,7 +121,7 @@ func TestStackOverflow(t *testing.T) {
 	err = as(&m)
 	a.So(err, should.BeNil)
 
-	_, err = gogoproto.Struct(m)
+	_, err = goproto.Struct(m)
 	a.So(err, should.NotBeNil)
 
 	_, err = goproto.Struct(m)

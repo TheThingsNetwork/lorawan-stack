@@ -29,7 +29,7 @@ import (
 	"github.com/jtacoma/uritemplates"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
+	"go.thethings.network/lorawan-stack/v3/pkg/goproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -69,7 +69,7 @@ func createRequestErrorDetails(req *http.Request, res *http.Response) []proto.Me
 		m["status_code"] = res.StatusCode
 		m["body"] = string(body)
 	}
-	detail, err := gogoproto.Struct(m)
+	detail, err := goproto.Struct(m)
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Error("Failed to marshal request error details")
 		return nil

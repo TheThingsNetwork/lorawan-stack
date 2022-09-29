@@ -19,7 +19,7 @@ import (
 
 	proto "github.com/golang/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
+	"go.thethings.network/lorawan-stack/v3/pkg/goproto"
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
@@ -36,9 +36,9 @@ func (e errorDetails) Namespace() string     { return e.GetNamespace() }
 func (e errorDetails) Name() string          { return e.GetName() }
 func (e errorDetails) MessageFormat() string { return e.GetMessageFormat() }
 func (e errorDetails) PublicAttributes() map[string]interface{} {
-	attributes, err := gogoproto.Map(e.GetAttributes())
+	attributes, err := goproto.Map(e.GetAttributes())
 	if err != nil {
-		panic(fmt.Sprintf("Failed to decode error attributes: %s", err)) // Likely a bug in gogoproto.
+		panic(fmt.Sprintf("Failed to decode error attributes: %s", err)) // Likely a bug in goproto.
 	}
 	return attributes
 }
@@ -78,7 +78,7 @@ func ErrorDetailsToProto(e errors.ErrorDetails) *ErrorDetails {
 		Code:          e.Code(),
 	}
 	if attributes := e.PublicAttributes(); len(attributes) > 0 {
-		attributesStruct, err := gogoproto.Struct(attributes)
+		attributesStruct, err := goproto.Struct(attributes)
 		if err != nil {
 			panic(fmt.Sprintf("Failed to encode error attributes: %s", err)) // Likely a bug in ttn (invalid attribute type).
 		}

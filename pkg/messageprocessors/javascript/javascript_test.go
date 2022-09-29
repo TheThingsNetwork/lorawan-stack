@@ -19,7 +19,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
+	"go.thethings.network/lorawan-stack/v3/pkg/goproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/normalizedpayload"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -265,7 +265,7 @@ func TestLegacyDecodeUplink(t *testing.T) {
 		`
 		err := host.DecodeUplink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
-		m, err := gogoproto.Map(message.DecodedPayload)
+		m, err := goproto.Map(message.DecodedPayload)
 		a.So(err, should.BeNil)
 		a.So(m, should.Resemble, map[string]interface{}{
 			"temperature": -21.3,
@@ -283,7 +283,7 @@ func TestLegacyDecodeUplink(t *testing.T) {
 		`
 		err := host.DecodeUplink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
-		m, err := gogoproto.Map(message.DecodedPayload)
+		m, err := goproto.Map(message.DecodedPayload)
 		a.So(err, should.BeNil)
 		a.So(m, should.Resemble, map[string]interface{}{
 			"temperature": -21.3,
@@ -753,7 +753,7 @@ func TestDecodeUplink(t *testing.T) {
 		`
 		err := host.DecodeUplink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
-		m, err := gogoproto.Map(message.DecodedPayload)
+		m, err := goproto.Map(message.DecodedPayload)
 		a.So(err, should.BeNil)
 		a.So(m, should.Resemble, map[string]interface{}{
 			"event":       "button",
@@ -850,7 +850,7 @@ func TestDecodeDownlink(t *testing.T) {
 		`
 		err := host.DecodeDownlink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
-		m, err := gogoproto.Map(message.DecodedPayload)
+		m, err := goproto.Map(message.DecodedPayload)
 		a.So(err, should.BeNil)
 		a.So(m, should.Resemble, map[string]interface{}{
 			"value": -21.3,
@@ -887,7 +887,7 @@ func TestDecodeDownlink(t *testing.T) {
 		`
 		err := host.DecodeDownlink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
-		m, err := gogoproto.Map(message.DecodedPayload)
+		m, err := goproto.Map(message.DecodedPayload)
 		a.So(err, should.BeNil)
 		a.So(m, should.Resemble, map[string]interface{}{
 			"color": "blue",
