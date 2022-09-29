@@ -77,6 +77,10 @@ func (*mockKeyVault) ExportCertificate(ctx context.Context, id string) (*tls.Cer
 	return nil, errors.New("not implemented")
 }
 
+func (*mockKeyVault) HMACHash(_ context.Context, _ []byte, _ string) ([]byte, error) {
+	return nil, errors.New("not implemented")
+}
+
 func TestCacheUsed(t *testing.T) {
 	a := assertions.New(t)
 	m := &mockKeyVault{}

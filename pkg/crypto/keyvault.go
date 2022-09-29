@@ -42,4 +42,8 @@ type KeyVault interface {
 	GetCertificate(ctx context.Context, id string) (*x509.Certificate, error)
 	// ExportCertificate exports the X.509 certificate and private key of the given identifier.
 	ExportCertificate(ctx context.Context, id string) (*tls.Certificate, error)
+
+	// HMACHash calculates the Keyed-Hash Message Authentication Code (HMAC, RFC 2104) hash of the data.
+	// The AES key used for hashing is referenced using the ID.
+	HMACHash(ctx context.Context, payload []byte, id string) ([]byte, error)
 }

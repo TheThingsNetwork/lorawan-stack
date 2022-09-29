@@ -77,6 +77,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 	if md.AuthType == "" {
 		return &ttnpb.AuthInfoResponse{}, nil
 	}
+
 	if md.AuthType == clusterauth.AuthType {
 		if err := clusterauth.Authorized(ctx); err != nil {
 			return nil, err
@@ -361,6 +362,7 @@ func (is *IdentityServer) RequireAuthenticated(ctx context.Context) error {
 	} else if userSession := authInfo.GetUserSession(); userSession != nil {
 		return nil
 	}
+
 	if len(authInfo.UniversalRights.GetRights()) > 0 {
 		return nil
 	}

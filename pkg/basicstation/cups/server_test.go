@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
@@ -42,7 +43,7 @@ import (
 func TestGetTrust(t *testing.T) {
 	a := assertions.New(t)
 
-	s := NewServer(nil)
+	s := NewServer(componenttest.NewComponent(t, &component.Config{}))
 
 	for _, addr := range []string{
 		"thethingsnetwork.org:443",
@@ -173,13 +174,18 @@ var (
 	}
 )
 
-func TestServer(t *testing.T) {
+func TestServer(t *testing.T) { //nolint:gocyclo
+	t.Parallel()
 	tlsServer := httptest.NewTLSServer(http.HandlerFunc(http.NotFound))
-	defer tlsServer.Close()
+	t.Cleanup(func() {
+		tlsServer.Close()
+	})
 	tlsServerURL, _ := url.Parse(tlsServer.URL)
 
 	cupsURI := (&url.URL{Scheme: "https", Host: tlsServerURL.Host}).String()
 	lnsURI := (&url.URL{Scheme: "wss", Host: tlsServerURL.Host}).String()
+
+	var kv config.KeyVault //nolint:gosimple
 
 	mockGateway := func(hasLNSSecret, redirectCUPS, updateCUPSCreds bool) *ttnpb.Gateway {
 		secret := &ttnpb.Secret{
@@ -216,6 +222,7 @@ func TestServer(t *testing.T) {
 		StoreSetup     func(*mockGatewayClient)
 		Options        []Option
 		RequestSetup   func(*http.Request)
+		SetContext     func(ctx context.Context) context.Context
 		AssertError    func(error) bool
 		AssertStore    func(*assertions.Assertion, *mockGatewayClient)
 		AssertResponse func(*assertions.Assertion, *httptest.ResponseRecorder)
@@ -552,16 +559,22 @@ func TestServer(t *testing.T) {
 			},
 		},
 	} {
+		tt := tt
 		t.Run(tt.Name, func(t *testing.T) {
+			t.Parallel()
 			a := assertions.New(t)
 			store := &mockGatewayClient{}
 			if tt.StoreSetup != nil {
 				tt.StoreSetup(store)
 			}
 
-			s := NewServer(componenttest.NewComponent(t, &component.Config{}), append([]Option{
+			s := NewServer(componenttest.NewComponent(t, &component.Config{
+				ServiceBase: config.ServiceBase{
+					KeyVault: kv,
+				},
+			}), append([]Option{
 				WithTLSConfig(&tls.Config{
-					InsecureSkipVerify: true,
+					InsecureSkipVerify: true, //nolint:gosec
 				}),
 				WithAuth(mockAuthFunc),
 				WithRegistries(store, store),
@@ -570,6 +583,9 @@ func TestServer(t *testing.T) {
 			ctx := test.Context()
 			ctx = log.NewContext(ctx, test.GetLogger(t))
 			ctx = rights.NewContextWithFetcher(ctx, mockRightsFetcher)
+			if tt.SetContext != nil {
+				ctx = tt.SetContext(ctx)
+			}
 			req = req.WithContext(ctx)
 			req.Header.Set("Content-Type", "application/json")
 			req.Header.Set("Authorization", "random string")

@@ -51,7 +51,7 @@ export const selectOrganizationError = createErrorSelector(GET_ORG_BASE)
 export const selectOrganizationCollaboratorCounts = state =>
   selectOrganizationStore(state).collaboratorCounts
 export const selectOrganizationCollaboratorCount = (state, id) =>
-  selectOrganizationCollaboratorCounts(state)[id]
+  selectOrganizationCollaboratorCounts(state)?.[id] || 0
 
 // Organizations.
 const selectOrgsIds = createPaginationIdsSelectorByEntity(ENTITY)
