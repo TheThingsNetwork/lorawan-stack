@@ -19,6 +19,7 @@ import { merge } from 'lodash'
 import Input from '@ttn-lw/components/input'
 import Form, { useFormContext } from '@ttn-lw/components/form'
 import Button from '@ttn-lw/components/button'
+import toast from '@ttn-lw/components/toast'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -88,8 +89,9 @@ const DeviceProvisioningFormSection = () => {
   }
 
   const mayProvisionDevice =
-    (Boolean(frequency_plan_id) && Boolean(lorawan_version) && Boolean(lorawan_phy_version)) ||
-    (_inputMethod === 'device-repository' && hasValidDeviceRepositoryType(version, template))
+    Boolean(frequency_plan_id) &&
+    ((Boolean(lorawan_version) && Boolean(lorawan_phy_version)) ||
+      (_inputMethod === 'device-repository' && hasValidDeviceRepositoryType(version, template)))
   const mayConfirm = ids?.join_eui?.length === 16
 
   const resetJoinEui = React.useCallback(() => {
@@ -104,15 +106,22 @@ const DeviceProvisioningFormSection = () => {
   }, [setValues])
 
   const handleJoinEuiConfirm = useCallback(async () => {
-    const claim = await dispatch(attachPromise(getInfoByJoinEUI({ join_eui: ids?.join_eui })))
-    const supportsClaiming = claim.supports_claiming ?? false
+    try {
+      const claim = await dispatch(attachPromise(getInfoByJoinEUI({ join_eui: ids?.join_eui })))
+      const supportsClaiming = claim.supports_claiming ?? false
 
-    setValues(values => ({
-      ...values,
-      _claim: supportsClaiming,
-      // In case of claiming, the creation on the join server needs to be skipped.
-      join_server_address: supportsClaiming ? undefined : values.join_server_address,
-    }))
+      setValues(values => ({
+        ...values,
+        _claim: supportsClaiming,
+        // In case of claiming, the creation on the join server needs to be skipped.
+        join_server_address: supportsClaiming ? undefined : values.join_server_address,
+      }))
+    } catch {
+      toast({
+        message: m.cannotConfirmEui,
+        type: toast.types.ERROR,
+      })
+    }
   }, [dispatch, ids.join_eui, setValues])
 
   const handleJoinEuiKeyDown = useCallback(

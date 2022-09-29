@@ -28,6 +28,8 @@ export default defineMessages({
   changeDeviceTypeButton: 'Change input method',
   confirmedRegistration: 'This end device can be registered on the network',
   confirmedClaiming: 'This end device can be claimed',
+  cannotConfirmEui:
+    'There was an error and the JoinEUI could not be confirmed. Please try again later.',
   // Shared messages.
   classCapabilities: 'Additional LoRaWAN class capabilities',
   submitTitle: 'Register end device',

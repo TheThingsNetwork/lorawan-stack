@@ -74,7 +74,6 @@ BrandSelect.propTypes = {
   ),
   error: PropTypes.error,
   fetching: PropTypes.bool,
-  listBrands: PropTypes.func.isRequired,
   name: PropTypes.string.isRequired,
   onChange: PropTypes.func,
 }
