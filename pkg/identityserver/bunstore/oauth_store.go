@@ -725,7 +725,7 @@ func (s *oauthStore) DeleteUserAuthorizations(ctx context.Context, userIDs *ttnp
 	))
 	defer span.End()
 
-	_, userUUID, err := s.getEntity(ctx, userIDs)
+	_, userUUID, err := s.getEntity(store.WithSoftDeleted(ctx, false), userIDs)
 	if err != nil {
 		return err
 	}

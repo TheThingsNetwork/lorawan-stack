@@ -646,6 +646,24 @@ func (s *userStore) DeleteUser(ctx context.Context, id *ttnpb.UserIdentifiers) e
 		return wrapDriverError(err)
 	}
 
+	accountModel, err := s.getAccountModel(ctx, id.GetEntityIdentifiers().EntityType(), id.GetUserId())
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrUserNotFound.WithAttributes(
+				"user_id", id.GetUserId(),
+			)
+		}
+		return err
+	}
+
+	_, err = s.DB.NewDelete().
+		Model(accountModel).
+		WherePK().
+		Exec(ctx)
+	if err != nil {
+		return wrapDriverError(err)
+	}
+
 	if model.ProfilePictureID != nil {
 		_, err = s.DB.NewDelete().
 			Model((*Picture)(nil)).
@@ -681,6 +699,28 @@ func (s *userStore) RestoreUser(ctx context.Context, id *ttnpb.UserIdentifiers) 
 
 	_, err = s.DB.NewUpdate().
 		Model(model).
+		WherePK().
+		WhereAllWithDeleted().
+		Set("deleted_at = NULL").
+		Exec(ctx)
+	if err != nil {
+		return wrapDriverError(err)
+	}
+
+	accountModel, err := s.getAccountModel(
+		store.WithSoftDeleted(ctx, true), id.GetEntityIdentifiers().EntityType(), id.GetUserId(),
+	)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrUserNotFound.WithAttributes(
+				"user_id", id.GetUserId(),
+			)
+		}
+		return err
+	}
+
+	_, err = s.DB.NewUpdate().
+		Model(accountModel).
 		WherePK().
 		WhereAllWithDeleted().
 		Set("deleted_at = NULL").
@@ -740,6 +780,27 @@ func (s *userStore) PurgeUser(ctx context.Context, id *ttnpb.UserIdentifiers) er
 
 	_, err = s.DB.NewDelete().
 		Model(model).
+		WherePK().
+		ForceDelete().
+		Exec(ctx)
+	if err != nil {
+		return wrapDriverError(err)
+	}
+
+	accountModel, err := s.getAccountModel(
+		store.WithSoftDeleted(ctx, false), id.GetEntityIdentifiers().EntityType(), id.GetUserId(),
+	)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrUserNotFound.WithAttributes(
+				"user_id", id.GetUserId(),
+			)
+		}
+		return err
+	}
+
+	_, err = s.DB.NewDelete().
+		Model(accountModel).
 		WherePK().
 		ForceDelete().
 		Exec(ctx)

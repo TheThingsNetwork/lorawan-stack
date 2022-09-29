@@ -510,6 +510,24 @@ func (s *organizationStore) DeleteOrganization(ctx context.Context, id *ttnpb.Or
 		return wrapDriverError(err)
 	}
 
+	accountModel, err := s.getAccountModel(ctx, id.GetEntityIdentifiers().EntityType(), id.GetOrganizationId())
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrUserNotFound.WithAttributes(
+				"organization_id", id.GetOrganizationId(),
+			)
+		}
+		return err
+	}
+
+	_, err = s.DB.NewDelete().
+		Model(accountModel).
+		WherePK().
+		Exec(ctx)
+	if err != nil {
+		return wrapDriverError(err)
+	}
+
 	return nil
 }
 
@@ -535,6 +553,28 @@ func (s *organizationStore) RestoreOrganization(ctx context.Context, id *ttnpb.O
 
 	_, err = s.DB.NewUpdate().
 		Model(model).
+		WherePK().
+		WhereAllWithDeleted().
+		Set("deleted_at = NULL").
+		Exec(ctx)
+	if err != nil {
+		return wrapDriverError(err)
+	}
+
+	accountModel, err := s.getAccountModel(
+		store.WithSoftDeleted(ctx, true), id.GetEntityIdentifiers().EntityType(), id.GetOrganizationId(),
+	)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrUserNotFound.WithAttributes(
+				"organization_id", id.GetOrganizationId(),
+			)
+		}
+		return err
+	}
+
+	_, err = s.DB.NewUpdate().
+		Model(accountModel).
 		WherePK().
 		WhereAllWithDeleted().
 		Set("deleted_at = NULL").
@@ -582,6 +622,27 @@ func (s *organizationStore) PurgeOrganization(ctx context.Context, id *ttnpb.Org
 
 	_, err = s.DB.NewDelete().
 		Model(model).
+		WherePK().
+		ForceDelete().
+		Exec(ctx)
+	if err != nil {
+		return wrapDriverError(err)
+	}
+
+	accountModel, err := s.getAccountModel(
+		store.WithSoftDeleted(ctx, false), id.GetEntityIdentifiers().EntityType(), id.GetOrganizationId(),
+	)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrUserNotFound.WithAttributes(
+				"organization_id", id.GetOrganizationId(),
+			)
+		}
+		return err
+	}
+
+	_, err = s.DB.NewDelete().
+		Model(accountModel).
 		WherePK().
 		ForceDelete().
 		Exec(ctx)

@@ -15,6 +15,7 @@
 package storetest
 
 import (
+	"fmt"
 	. "testing"
 	"time"
 
@@ -272,6 +273,35 @@ func (st *StoreTest) TestClientStoreCRUD(t *T) {
 		// if a.So(err, should.NotBeNil) {
 		// 	a.So(errors.IsNotFound(err), should.BeTrue)
 		// }
+	})
+
+	t.Run("CreateAfterPurge", func(t *T) {
+		for _, itr := range []int{1, 2} {
+			t.Run(fmt.Sprintf("Iteration %d", itr), func(t *T) {
+				a, ctx := test.New(t)
+				var err error
+				_, err = s.CreateClient(ctx, &ttnpb.Client{
+					Ids: &ttnpb.ClientIdentifiers{ClientId: "foo"},
+				})
+				a.So(err, should.BeNil)
+
+				err = s.DeleteClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"})
+				a.So(err, should.BeNil)
+
+				err = s.RestoreClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"})
+				a.So(err, should.BeNil)
+
+				got, err := s.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"}, mask)
+				a.So(err, should.BeNil)
+				a.So(got, should.NotBeNil)
+
+				err = s.DeleteClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"})
+				a.So(err, should.BeNil)
+
+				err = s.PurgeClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"})
+				a.So(err, should.BeNil)
+			})
+		}
 	})
 }
 

@@ -359,7 +359,7 @@ func (s *apiKeyStore) DeleteEntityAPIKeys(ctx context.Context, entityID *ttnpb.E
 	))
 	defer span.End()
 
-	entityType, entityUUID, err := s.getEntity(ctx, entityID)
+	entityType, entityUUID, err := s.getEntity(store.WithSoftDeleted(ctx, false), entityID)
 	if err != nil {
 		return err
 	}

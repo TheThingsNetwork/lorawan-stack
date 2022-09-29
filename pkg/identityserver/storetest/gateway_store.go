@@ -15,6 +15,7 @@
 package storetest
 
 import (
+	"fmt"
 	. "testing"
 	"time"
 
@@ -427,6 +428,35 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 		// if a.So(err, should.NotBeNil) {
 		// 	a.So(errors.IsNotFound(err), should.BeTrue)
 		// }
+	})
+
+	t.Run("CreateAfterPurge", func(t *T) {
+		for _, itr := range []int{1, 2} {
+			t.Run(fmt.Sprintf("Iteration %d", itr), func(t *T) {
+				a, ctx := test.New(t)
+				var err error
+				_, err = s.CreateGateway(ctx, &ttnpb.Gateway{
+					Ids: &ttnpb.GatewayIdentifiers{GatewayId: "foo"},
+				})
+				a.So(err, should.BeNil)
+
+				err = s.DeleteGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"})
+				a.So(err, should.BeNil)
+
+				err = s.RestoreGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"})
+				a.So(err, should.BeNil)
+
+				got, err := s.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"}, mask)
+				a.So(err, should.BeNil)
+				a.So(got, should.NotBeNil)
+
+				err = s.DeleteGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"})
+				a.So(err, should.BeNil)
+
+				err = s.PurgeGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"})
+				a.So(err, should.BeNil)
+			})
+		}
 	})
 }
 
