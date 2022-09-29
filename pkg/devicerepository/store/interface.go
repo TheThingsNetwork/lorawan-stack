@@ -15,8 +15,8 @@
 package store
 
 import (
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
 // GetBrandsRequest is a request to list available end device vendors, with pagination and sorting.
@@ -78,7 +78,7 @@ type GetModelsResponse struct {
 // GetCodecRequest is a request to retrieve the codec of
 type GetCodecRequest interface {
 	GetVersionIds() *ttnpb.EndDeviceVersionIdentifiers
-	GetFieldMask() *pbtypes.FieldMask
+	GetFieldMask() *fieldmaskpb.FieldMask
 }
 
 // Store contains end device definitions.

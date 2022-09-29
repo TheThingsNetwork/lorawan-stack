@@ -20,7 +20,7 @@ import (
 	"regexp"
 	"strings"
 
-	pbtypes "github.com/gogo/protobuf/types"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
 var nameTagRegex *regexp.Regexp
@@ -32,7 +32,7 @@ func init() {
 // GoFieldsPaths converts protobuf FieldMask paths to Go fields paths.
 //
 // This implementation does not support separation by ",", but only paths separated by ".".
-func GoFieldsPaths(pb *pbtypes.FieldMask, v interface{}) []string {
+func GoFieldsPaths(pb *fieldmaskpb.FieldMask, v interface{}) []string {
 	var newFields []string
 	if len(pb.GetPaths()) == 0 {
 		return newFields

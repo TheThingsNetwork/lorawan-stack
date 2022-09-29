@@ -19,16 +19,16 @@ import (
 	"fmt"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
-func removeDeprecatedPaths(ctx context.Context, fieldMask *pbtypes.FieldMask) *pbtypes.FieldMask {
+func removeDeprecatedPaths(ctx context.Context, fieldMask *fieldmaskpb.FieldMask) *fieldmaskpb.FieldMask {
 	validPaths := make([]string, 0, len(fieldMask.GetPaths()))
 nextPath:
 	for _, path := range fieldMask.GetPaths() {

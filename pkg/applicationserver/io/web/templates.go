@@ -21,10 +21,10 @@ import (
 	"sync"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 	"gopkg.in/yaml.v2"
 )
 
@@ -269,7 +269,7 @@ func (t webhookTemplate) pbFields() []*ttnpb.ApplicationWebhookTemplateField {
 	return fields
 }
 
-func (t webhookTemplate) pbFieldMask() *pbtypes.FieldMask {
+func (t webhookTemplate) pbFieldMask() *fieldmaskpb.FieldMask {
 	return ttnpb.FieldMask(t.FieldMask...)
 }
 

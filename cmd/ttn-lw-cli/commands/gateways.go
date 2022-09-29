@@ -20,7 +20,6 @@ import (
 
 	"github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	"github.com/gogo/protobuf/proto"
-	"github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
@@ -489,9 +488,7 @@ If both the parameter and the flag are provided, the flag is ignored.`,
 				res, err := ttnpb.NewGsClient(gs).BatchGetGatewayConnectionStats(ctx,
 					&ttnpb.BatchGetGatewayConnectionStatsRequest{
 						GatewayIds: gtwIDs,
-						FieldMask: &types.FieldMask{
-							Paths: paths,
-						},
+						FieldMask:  ttnpb.FieldMask(paths...),
 					})
 				if err != nil {
 					return err
