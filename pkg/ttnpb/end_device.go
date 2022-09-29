@@ -1552,3 +1552,14 @@ func (m *GetEndDeviceRequest) ExtractRequestFields(dst map[string]interface{}) {
 func (m *EndDevice) ExtractRequestFields(dst map[string]interface{}) {
 	m.GetIds().ExtractRequestFields(dst)
 }
+
+// Utility
+
+func (d *EndDevice) UpdateTimestamps(src *EndDevice) {
+	if d.CreatedAt == nil || (src.CreatedAt != nil && StdTime(src.CreatedAt).Before(*StdTime(d.CreatedAt))) {
+		d.CreatedAt = src.CreatedAt
+	}
+	if d.UpdatedAt == nil || (src.UpdatedAt != nil && StdTime(src.UpdatedAt).After(*StdTime(d.UpdatedAt))) {
+		d.UpdatedAt = src.UpdatedAt
+	}
+}
