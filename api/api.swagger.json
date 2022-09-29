@@ -6342,6 +6342,7 @@
         "parameters": [
           {
             "name": "body",
+            "description": "EntityIdentifiers contains one of the possible entity identifiers.",
             "in": "body",
             "required": true,
             "schema": {

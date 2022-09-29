@@ -206,8 +206,7 @@ func (dst *RxMetadata) SetFields(src *RxMetadata, paths ...string) error {
 			if src != nil {
 				dst.DownlinkPathConstraint = src.DownlinkPathConstraint
 			} else {
-				var zero DownlinkPathConstraint
-				dst.DownlinkPathConstraint = zero
+				dst.DownlinkPathConstraint = 0
 			}
 		case "uplink_token":
 			if len(subs) > 0 {
@@ -333,8 +332,7 @@ func (dst *Location) SetFields(src *Location, paths ...string) error {
 			if src != nil {
 				dst.Source = src.Source
 			} else {
-				var zero LocationSource
-				dst.Source = zero
+				dst.Source = 0
 			}
 
 		default:

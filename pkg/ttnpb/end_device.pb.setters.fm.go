@@ -148,8 +148,7 @@ func (dst *MACParameters) SetFields(src *MACParameters, paths ...string) error {
 			if src != nil {
 				dst.AdrDataRateIndex = src.AdrDataRateIndex
 			} else {
-				var zero DataRateIndex
-				dst.AdrDataRateIndex = zero
+				dst.AdrDataRateIndex = 0
 			}
 		case "adr_tx_power_index":
 			if len(subs) > 0 {
@@ -198,8 +197,7 @@ func (dst *MACParameters) SetFields(src *MACParameters, paths ...string) error {
 			if src != nil {
 				dst.Rx1Delay = src.Rx1Delay
 			} else {
-				var zero RxDelay
-				dst.Rx1Delay = zero
+				dst.Rx1Delay = 0
 			}
 		case "rx1_data_rate_offset":
 			if len(subs) > 0 {
@@ -208,8 +206,7 @@ func (dst *MACParameters) SetFields(src *MACParameters, paths ...string) error {
 			if src != nil {
 				dst.Rx1DataRateOffset = src.Rx1DataRateOffset
 			} else {
-				var zero DataRateOffset
-				dst.Rx1DataRateOffset = zero
+				dst.Rx1DataRateOffset = 0
 			}
 		case "rx2_data_rate_index":
 			if len(subs) > 0 {
@@ -218,8 +215,7 @@ func (dst *MACParameters) SetFields(src *MACParameters, paths ...string) error {
 			if src != nil {
 				dst.Rx2DataRateIndex = src.Rx2DataRateIndex
 			} else {
-				var zero DataRateIndex
-				dst.Rx2DataRateIndex = zero
+				dst.Rx2DataRateIndex = 0
 			}
 		case "rx2_frequency":
 			if len(subs) > 0 {
@@ -238,8 +234,7 @@ func (dst *MACParameters) SetFields(src *MACParameters, paths ...string) error {
 			if src != nil {
 				dst.MaxDutyCycle = src.MaxDutyCycle
 			} else {
-				var zero AggregatedDutyCycle
-				dst.MaxDutyCycle = zero
+				dst.MaxDutyCycle = 0
 			}
 		case "rejoin_time_periodicity":
 			if len(subs) > 0 {
@@ -248,8 +243,7 @@ func (dst *MACParameters) SetFields(src *MACParameters, paths ...string) error {
 			if src != nil {
 				dst.RejoinTimePeriodicity = src.RejoinTimePeriodicity
 			} else {
-				var zero RejoinTimeExponent
-				dst.RejoinTimePeriodicity = zero
+				dst.RejoinTimePeriodicity = 0
 			}
 		case "rejoin_count_periodicity":
 			if len(subs) > 0 {
@@ -258,8 +252,7 @@ func (dst *MACParameters) SetFields(src *MACParameters, paths ...string) error {
 			if src != nil {
 				dst.RejoinCountPeriodicity = src.RejoinCountPeriodicity
 			} else {
-				var zero RejoinCountExponent
-				dst.RejoinCountPeriodicity = zero
+				dst.RejoinCountPeriodicity = 0
 			}
 		case "ping_slot_frequency":
 			if len(subs) > 0 {
@@ -278,8 +271,7 @@ func (dst *MACParameters) SetFields(src *MACParameters, paths ...string) error {
 			if src != nil {
 				dst.PingSlotDataRateIndex = src.PingSlotDataRateIndex
 			} else {
-				var zero DataRateIndex
-				dst.PingSlotDataRateIndex = zero
+				dst.PingSlotDataRateIndex = 0
 			}
 		case "beacon_frequency":
 			if len(subs) > 0 {
@@ -468,8 +460,7 @@ func (dst *EndDeviceVersion) SetFields(src *EndDeviceVersion, paths ...string) e
 			if src != nil {
 				dst.LorawanVersion = src.LorawanVersion
 			} else {
-				var zero MACVersion
-				dst.LorawanVersion = zero
+				dst.LorawanVersion = 0
 			}
 		case "lorawan_phy_version":
 			if len(subs) > 0 {
@@ -478,8 +469,7 @@ func (dst *EndDeviceVersion) SetFields(src *EndDeviceVersion, paths ...string) e
 			if src != nil {
 				dst.LorawanPhyVersion = src.LorawanPhyVersion
 			} else {
-				var zero PHYVersion
-				dst.LorawanPhyVersion = zero
+				dst.LorawanPhyVersion = 0
 			}
 		case "frequency_plan_id":
 			if len(subs) > 0 {
@@ -1567,8 +1557,7 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 			if src != nil {
 				dst.DeviceClass = src.DeviceClass
 			} else {
-				var zero Class
-				dst.DeviceClass = zero
+				dst.DeviceClass = 0
 			}
 		case "lorawan_version":
 			if len(subs) > 0 {
@@ -1577,8 +1566,7 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 			if src != nil {
 				dst.LorawanVersion = src.LorawanVersion
 			} else {
-				var zero MACVersion
-				dst.LorawanVersion = zero
+				dst.LorawanVersion = 0
 			}
 		case "last_confirmed_downlink_at":
 			if len(subs) > 0 {
@@ -2096,8 +2084,7 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 			if src != nil {
 				dst.LorawanVersion = src.LorawanVersion
 			} else {
-				var zero MACVersion
-				dst.LorawanVersion = zero
+				dst.LorawanVersion = 0
 			}
 		case "lorawan_phy_version":
 			if len(subs) > 0 {
@@ -2106,8 +2093,7 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 			if src != nil {
 				dst.LorawanPhyVersion = src.LorawanPhyVersion
 			} else {
-				var zero PHYVersion
-				dst.LorawanPhyVersion = zero
+				dst.LorawanPhyVersion = 0
 			}
 		case "frequency_plan_id":
 			if len(subs) > 0 {
@@ -2383,8 +2369,7 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 			if src != nil {
 				dst.PowerState = src.PowerState
 			} else {
-				var zero PowerState
-				dst.PowerState = zero
+				dst.PowerState = 0
 			}
 		case "battery_percentage":
 			if len(subs) > 0 {
@@ -3163,8 +3148,7 @@ func (dst *MACParameters_Channel) SetFields(src *MACParameters_Channel, paths ..
 			if src != nil {
 				dst.MinDataRateIndex = src.MinDataRateIndex
 			} else {
-				var zero DataRateIndex
-				dst.MinDataRateIndex = zero
+				dst.MinDataRateIndex = 0
 			}
 		case "max_data_rate_index":
 			if len(subs) > 0 {
@@ -3173,8 +3157,7 @@ func (dst *MACParameters_Channel) SetFields(src *MACParameters_Channel, paths ..
 			if src != nil {
 				dst.MaxDataRateIndex = src.MaxDataRateIndex
 			} else {
-				var zero DataRateIndex
-				dst.MaxDataRateIndex = zero
+				dst.MaxDataRateIndex = 0
 			}
 		case "enable_uplink":
 			if len(subs) > 0 {
@@ -3204,8 +3187,7 @@ func (dst *ADRSettings_StaticMode) SetFields(src *ADRSettings_StaticMode, paths 
 			if src != nil {
 				dst.DataRateIndex = src.DataRateIndex
 			} else {
-				var zero DataRateIndex
-				dst.DataRateIndex = zero
+				dst.DataRateIndex = 0
 			}
 		case "tx_power_index":
 			if len(subs) > 0 {
@@ -3383,8 +3365,7 @@ func (dst *MACState_JoinRequest) SetFields(src *MACState_JoinRequest, paths ...s
 			if src != nil {
 				dst.RxDelay = src.RxDelay
 			} else {
-				var zero RxDelay
-				dst.RxDelay = zero
+				dst.RxDelay = 0
 			}
 		case "cf_list":
 			if len(subs) > 0 {
@@ -3669,8 +3650,7 @@ func (dst *MACState_DataRateRange) SetFields(src *MACState_DataRateRange, paths 
 			if src != nil {
 				dst.MinDataRateIndex = src.MinDataRateIndex
 			} else {
-				var zero DataRateIndex
-				dst.MinDataRateIndex = zero
+				dst.MinDataRateIndex = 0
 			}
 		case "max_data_rate_index":
 			if len(subs) > 0 {
@@ -3679,8 +3659,7 @@ func (dst *MACState_DataRateRange) SetFields(src *MACState_DataRateRange, paths 
 			if src != nil {
 				dst.MaxDataRateIndex = src.MaxDataRateIndex
 			} else {
-				var zero DataRateIndex
-				dst.MaxDataRateIndex = zero
+				dst.MaxDataRateIndex = 0
 			}
 
 		default:
@@ -3801,8 +3780,7 @@ func (dst *MACState_UplinkMessage_RxMetadata) SetFields(src *MACState_UplinkMess
 			if src != nil {
 				dst.DownlinkPathConstraint = src.DownlinkPathConstraint
 			} else {
-				var zero DownlinkPathConstraint
-				dst.DownlinkPathConstraint = zero
+				dst.DownlinkPathConstraint = 0
 			}
 		case "uplink_token":
 			if len(subs) > 0 {
@@ -3924,8 +3902,7 @@ func (dst *MACState_DownlinkMessage_Message_MHDR) SetFields(src *MACState_Downli
 			if src != nil {
 				dst.MType = src.MType
 			} else {
-				var zero MType
-				dst.MType = zero
+				dst.MType = 0
 			}
 
 		default:

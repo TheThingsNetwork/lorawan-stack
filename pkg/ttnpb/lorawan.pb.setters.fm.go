@@ -224,8 +224,7 @@ func (dst *MHDR) SetFields(src *MHDR, paths ...string) error {
 			if src != nil {
 				dst.MType = src.MType
 			} else {
-				var zero MType
-				dst.MType = zero
+				dst.MType = 0
 			}
 		case "major":
 			if len(subs) > 0 {
@@ -234,8 +233,7 @@ func (dst *MHDR) SetFields(src *MHDR, paths ...string) error {
 			if src != nil {
 				dst.Major = src.Major
 			} else {
-				var zero Major
-				dst.Major = zero
+				dst.Major = 0
 			}
 
 		default:
@@ -492,8 +490,7 @@ func (dst *RejoinRequestPayload) SetFields(src *RejoinRequestPayload, paths ...s
 			if src != nil {
 				dst.RejoinType = src.RejoinType
 			} else {
-				var zero RejoinRequestType
-				dst.RejoinType = zero
+				dst.RejoinType = 0
 			}
 		case "net_id":
 			if len(subs) > 0 {
@@ -611,8 +608,7 @@ func (dst *JoinAcceptPayload) SetFields(src *JoinAcceptPayload, paths ...string)
 			if src != nil {
 				dst.RxDelay = src.RxDelay
 			} else {
-				var zero RxDelay
-				dst.RxDelay = zero
+				dst.RxDelay = 0
 			}
 		case "cf_list":
 			if len(subs) > 0 {
@@ -657,8 +653,7 @@ func (dst *DLSettings) SetFields(src *DLSettings, paths ...string) error {
 			if src != nil {
 				dst.Rx1DrOffset = src.Rx1DrOffset
 			} else {
-				var zero DataRateOffset
-				dst.Rx1DrOffset = zero
+				dst.Rx1DrOffset = 0
 			}
 		case "rx2_dr":
 			if len(subs) > 0 {
@@ -667,8 +662,7 @@ func (dst *DLSettings) SetFields(src *DLSettings, paths ...string) error {
 			if src != nil {
 				dst.Rx2Dr = src.Rx2Dr
 			} else {
-				var zero DataRateIndex
-				dst.Rx2Dr = zero
+				dst.Rx2Dr = 0
 			}
 		case "opt_neg":
 			if len(subs) > 0 {
@@ -698,8 +692,7 @@ func (dst *CFList) SetFields(src *CFList, paths ...string) error {
 			if src != nil {
 				dst.Type = src.Type
 			} else {
-				var zero CFListType
-				dst.Type = zero
+				dst.Type = 0
 			}
 		case "freq":
 			if len(subs) > 0 {
@@ -1354,8 +1347,7 @@ func (dst *TxRequest) SetFields(src *TxRequest, paths ...string) error {
 			if src != nil {
 				dst.Class = src.Class
 			} else {
-				var zero Class
-				dst.Class = zero
+				dst.Class = 0
 			}
 		case "downlink_paths":
 			if len(subs) > 0 {
@@ -1373,8 +1365,7 @@ func (dst *TxRequest) SetFields(src *TxRequest, paths ...string) error {
 			if src != nil {
 				dst.Rx1Delay = src.Rx1Delay
 			} else {
-				var zero RxDelay
-				dst.Rx1Delay = zero
+				dst.Rx1Delay = 0
 			}
 		case "rx1_data_rate":
 			if len(subs) > 0 {
@@ -1453,8 +1444,7 @@ func (dst *TxRequest) SetFields(src *TxRequest, paths ...string) error {
 			if src != nil {
 				dst.Priority = src.Priority
 			} else {
-				var zero TxSchedulePriority
-				dst.Priority = zero
+				dst.Priority = 0
 			}
 		case "absolute_time":
 			if len(subs) > 0 {
@@ -1502,8 +1492,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 			if src != nil {
 				dst.Cid = src.Cid
 			} else {
-				var zero MACCommandIdentifier
-				dst.Cid = zero
+				dst.Cid = 0
 			}
 
 		case "payload":
@@ -2706,8 +2695,7 @@ func (dst *DataRateOffsetValue) SetFields(src *DataRateOffsetValue, paths ...str
 			if src != nil {
 				dst.Value = src.Value
 			} else {
-				var zero DataRateOffset
-				dst.Value = zero
+				dst.Value = 0
 			}
 
 		default:
@@ -2727,8 +2715,7 @@ func (dst *DataRateIndexValue) SetFields(src *DataRateIndexValue, paths ...strin
 			if src != nil {
 				dst.Value = src.Value
 			} else {
-				var zero DataRateIndex
-				dst.Value = zero
+				dst.Value = 0
 			}
 
 		default:
@@ -2748,8 +2735,7 @@ func (dst *PingSlotPeriodValue) SetFields(src *PingSlotPeriodValue, paths ...str
 			if src != nil {
 				dst.Value = src.Value
 			} else {
-				var zero PingSlotPeriod
-				dst.Value = zero
+				dst.Value = 0
 			}
 
 		default:
@@ -2769,8 +2755,7 @@ func (dst *AggregatedDutyCycleValue) SetFields(src *AggregatedDutyCycleValue, pa
 			if src != nil {
 				dst.Value = src.Value
 			} else {
-				var zero AggregatedDutyCycle
-				dst.Value = zero
+				dst.Value = 0
 			}
 
 		default:
@@ -2790,8 +2775,7 @@ func (dst *RxDelayValue) SetFields(src *RxDelayValue, paths ...string) error {
 			if src != nil {
 				dst.Value = src.Value
 			} else {
-				var zero RxDelay
-				dst.Value = zero
+				dst.Value = 0
 			}
 
 		default:
@@ -2811,8 +2795,7 @@ func (dst *ADRAckLimitExponentValue) SetFields(src *ADRAckLimitExponentValue, pa
 			if src != nil {
 				dst.Value = src.Value
 			} else {
-				var zero ADRAckLimitExponent
-				dst.Value = zero
+				dst.Value = 0
 			}
 
 		default:
@@ -2832,8 +2815,7 @@ func (dst *ADRAckDelayExponentValue) SetFields(src *ADRAckDelayExponentValue, pa
 			if src != nil {
 				dst.Value = src.Value
 			} else {
-				var zero ADRAckDelayExponent
-				dst.Value = zero
+				dst.Value = 0
 			}
 
 		default:
@@ -2853,8 +2835,7 @@ func (dst *DeviceEIRPValue) SetFields(src *DeviceEIRPValue, paths ...string) err
 			if src != nil {
 				dst.Value = src.Value
 			} else {
-				var zero DeviceEIRP
-				dst.Value = zero
+				dst.Value = 0
 			}
 
 		default:
@@ -2915,8 +2896,7 @@ func (dst *MACCommand_ResetInd) SetFields(src *MACCommand_ResetInd, paths ...str
 			if src != nil {
 				dst.MinorVersion = src.MinorVersion
 			} else {
-				var zero Minor
-				dst.MinorVersion = zero
+				dst.MinorVersion = 0
 			}
 
 		default:
@@ -2936,8 +2916,7 @@ func (dst *MACCommand_ResetConf) SetFields(src *MACCommand_ResetConf, paths ...s
 			if src != nil {
 				dst.MinorVersion = src.MinorVersion
 			} else {
-				var zero Minor
-				dst.MinorVersion = zero
+				dst.MinorVersion = 0
 			}
 
 		default:
@@ -2988,8 +2967,7 @@ func (dst *MACCommand_LinkADRReq) SetFields(src *MACCommand_LinkADRReq, paths ..
 			if src != nil {
 				dst.DataRateIndex = src.DataRateIndex
 			} else {
-				var zero DataRateIndex
-				dst.DataRateIndex = zero
+				dst.DataRateIndex = 0
 			}
 		case "tx_power_index":
 			if len(subs) > 0 {
@@ -3089,8 +3067,7 @@ func (dst *MACCommand_DutyCycleReq) SetFields(src *MACCommand_DutyCycleReq, path
 			if src != nil {
 				dst.MaxDutyCycle = src.MaxDutyCycle
 			} else {
-				var zero AggregatedDutyCycle
-				dst.MaxDutyCycle = zero
+				dst.MaxDutyCycle = 0
 			}
 
 		default:
@@ -3110,8 +3087,7 @@ func (dst *MACCommand_RxParamSetupReq) SetFields(src *MACCommand_RxParamSetupReq
 			if src != nil {
 				dst.Rx2DataRateIndex = src.Rx2DataRateIndex
 			} else {
-				var zero DataRateIndex
-				dst.Rx2DataRateIndex = zero
+				dst.Rx2DataRateIndex = 0
 			}
 		case "rx1_data_rate_offset":
 			if len(subs) > 0 {
@@ -3120,8 +3096,7 @@ func (dst *MACCommand_RxParamSetupReq) SetFields(src *MACCommand_RxParamSetupReq
 			if src != nil {
 				dst.Rx1DataRateOffset = src.Rx1DataRateOffset
 			} else {
-				var zero DataRateOffset
-				dst.Rx1DataRateOffset = zero
+				dst.Rx1DataRateOffset = 0
 			}
 		case "rx2_frequency":
 			if len(subs) > 0 {
@@ -3243,8 +3218,7 @@ func (dst *MACCommand_NewChannelReq) SetFields(src *MACCommand_NewChannelReq, pa
 			if src != nil {
 				dst.MinDataRateIndex = src.MinDataRateIndex
 			} else {
-				var zero DataRateIndex
-				dst.MinDataRateIndex = zero
+				dst.MinDataRateIndex = 0
 			}
 		case "max_data_rate_index":
 			if len(subs) > 0 {
@@ -3253,8 +3227,7 @@ func (dst *MACCommand_NewChannelReq) SetFields(src *MACCommand_NewChannelReq, pa
 			if src != nil {
 				dst.MaxDataRateIndex = src.MaxDataRateIndex
 			} else {
-				var zero DataRateIndex
-				dst.MaxDataRateIndex = zero
+				dst.MaxDataRateIndex = 0
 			}
 
 		default:
@@ -3367,8 +3340,7 @@ func (dst *MACCommand_RxTimingSetupReq) SetFields(src *MACCommand_RxTimingSetupR
 			if src != nil {
 				dst.Delay = src.Delay
 			} else {
-				var zero RxDelay
-				dst.Delay = zero
+				dst.Delay = 0
 			}
 
 		default:
@@ -3388,8 +3360,7 @@ func (dst *MACCommand_TxParamSetupReq) SetFields(src *MACCommand_TxParamSetupReq
 			if src != nil {
 				dst.MaxEirpIndex = src.MaxEirpIndex
 			} else {
-				var zero DeviceEIRP
-				dst.MaxEirpIndex = zero
+				dst.MaxEirpIndex = 0
 			}
 		case "uplink_dwell_time":
 			if len(subs) > 0 {
@@ -3429,8 +3400,7 @@ func (dst *MACCommand_RekeyInd) SetFields(src *MACCommand_RekeyInd, paths ...str
 			if src != nil {
 				dst.MinorVersion = src.MinorVersion
 			} else {
-				var zero Minor
-				dst.MinorVersion = zero
+				dst.MinorVersion = 0
 			}
 
 		default:
@@ -3450,8 +3420,7 @@ func (dst *MACCommand_RekeyConf) SetFields(src *MACCommand_RekeyConf, paths ...s
 			if src != nil {
 				dst.MinorVersion = src.MinorVersion
 			} else {
-				var zero Minor
-				dst.MinorVersion = zero
+				dst.MinorVersion = 0
 			}
 
 		default:
@@ -3471,8 +3440,7 @@ func (dst *MACCommand_ADRParamSetupReq) SetFields(src *MACCommand_ADRParamSetupR
 			if src != nil {
 				dst.AdrAckLimitExponent = src.AdrAckLimitExponent
 			} else {
-				var zero ADRAckLimitExponent
-				dst.AdrAckLimitExponent = zero
+				dst.AdrAckLimitExponent = 0
 			}
 		case "adr_ack_delay_exponent":
 			if len(subs) > 0 {
@@ -3481,8 +3449,7 @@ func (dst *MACCommand_ADRParamSetupReq) SetFields(src *MACCommand_ADRParamSetupR
 			if src != nil {
 				dst.AdrAckDelayExponent = src.AdrAckDelayExponent
 			} else {
-				var zero ADRAckDelayExponent
-				dst.AdrAckDelayExponent = zero
+				dst.AdrAckDelayExponent = 0
 			}
 
 		default:
@@ -3522,8 +3489,7 @@ func (dst *MACCommand_ForceRejoinReq) SetFields(src *MACCommand_ForceRejoinReq, 
 			if src != nil {
 				dst.RejoinType = src.RejoinType
 			} else {
-				var zero RejoinRequestType
-				dst.RejoinType = zero
+				dst.RejoinType = 0
 			}
 		case "data_rate_index":
 			if len(subs) > 0 {
@@ -3532,8 +3498,7 @@ func (dst *MACCommand_ForceRejoinReq) SetFields(src *MACCommand_ForceRejoinReq, 
 			if src != nil {
 				dst.DataRateIndex = src.DataRateIndex
 			} else {
-				var zero DataRateIndex
-				dst.DataRateIndex = zero
+				dst.DataRateIndex = 0
 			}
 		case "max_retries":
 			if len(subs) > 0 {
@@ -3552,8 +3517,7 @@ func (dst *MACCommand_ForceRejoinReq) SetFields(src *MACCommand_ForceRejoinReq, 
 			if src != nil {
 				dst.PeriodExponent = src.PeriodExponent
 			} else {
-				var zero RejoinPeriodExponent
-				dst.PeriodExponent = zero
+				dst.PeriodExponent = 0
 			}
 
 		default:
@@ -3573,8 +3537,7 @@ func (dst *MACCommand_RejoinParamSetupReq) SetFields(src *MACCommand_RejoinParam
 			if src != nil {
 				dst.MaxCountExponent = src.MaxCountExponent
 			} else {
-				var zero RejoinCountExponent
-				dst.MaxCountExponent = zero
+				dst.MaxCountExponent = 0
 			}
 		case "max_time_exponent":
 			if len(subs) > 0 {
@@ -3583,8 +3546,7 @@ func (dst *MACCommand_RejoinParamSetupReq) SetFields(src *MACCommand_RejoinParam
 			if src != nil {
 				dst.MaxTimeExponent = src.MaxTimeExponent
 			} else {
-				var zero RejoinTimeExponent
-				dst.MaxTimeExponent = zero
+				dst.MaxTimeExponent = 0
 			}
 
 		default:
@@ -3625,8 +3587,7 @@ func (dst *MACCommand_PingSlotInfoReq) SetFields(src *MACCommand_PingSlotInfoReq
 			if src != nil {
 				dst.Period = src.Period
 			} else {
-				var zero PingSlotPeriod
-				dst.Period = zero
+				dst.Period = 0
 			}
 
 		default:
@@ -3656,8 +3617,7 @@ func (dst *MACCommand_PingSlotChannelReq) SetFields(src *MACCommand_PingSlotChan
 			if src != nil {
 				dst.DataRateIndex = src.DataRateIndex
 			} else {
-				var zero DataRateIndex
-				dst.DataRateIndex = zero
+				dst.DataRateIndex = 0
 			}
 
 		default:
@@ -3781,8 +3741,7 @@ func (dst *MACCommand_DeviceModeInd) SetFields(src *MACCommand_DeviceModeInd, pa
 			if src != nil {
 				dst.Class = src.Class
 			} else {
-				var zero Class
-				dst.Class = zero
+				dst.Class = 0
 			}
 
 		default:
@@ -3802,8 +3761,7 @@ func (dst *MACCommand_DeviceModeConf) SetFields(src *MACCommand_DeviceModeConf, 
 			if src != nil {
 				dst.Class = src.Class
 			} else {
-				var zero Class
-				dst.Class = zero
+				dst.Class = 0
 			}
 
 		default:

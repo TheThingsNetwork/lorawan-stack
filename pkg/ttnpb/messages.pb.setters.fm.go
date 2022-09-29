@@ -320,8 +320,7 @@ func (dst *TxAcknowledgment) SetFields(src *TxAcknowledgment, paths ...string) e
 			if src != nil {
 				dst.Result = src.Result
 			} else {
-				var zero TxAcknowledgment_Result
-				dst.Result = zero
+				dst.Result = 0
 			}
 		case "downlink_message":
 			if len(subs) > 0 {
@@ -1121,8 +1120,7 @@ func (dst *ApplicationDownlink) SetFields(src *ApplicationDownlink, paths ...str
 			if src != nil {
 				dst.Priority = src.Priority
 			} else {
-				var zero TxSchedulePriority
-				dst.Priority = zero
+				dst.Priority = 0
 			}
 		case "correlation_ids":
 			if len(subs) > 0 {
@@ -1849,8 +1847,7 @@ func (dst *MessagePayloadFormatters) SetFields(src *MessagePayloadFormatters, pa
 			if src != nil {
 				dst.UpFormatter = src.UpFormatter
 			} else {
-				var zero PayloadFormatter
-				dst.UpFormatter = zero
+				dst.UpFormatter = 0
 			}
 		case "up_formatter_parameter":
 			if len(subs) > 0 {
@@ -1869,8 +1866,7 @@ func (dst *MessagePayloadFormatters) SetFields(src *MessagePayloadFormatters, pa
 			if src != nil {
 				dst.DownFormatter = src.DownFormatter
 			} else {
-				var zero PayloadFormatter
-				dst.DownFormatter = zero
+				dst.DownFormatter = 0
 			}
 		case "down_formatter_parameter":
 			if len(subs) > 0 {

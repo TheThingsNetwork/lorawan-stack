@@ -44,8 +44,7 @@ func (dst *GetDefaultMACSettingsRequest) SetFields(src *GetDefaultMACSettingsReq
 			if src != nil {
 				dst.LorawanPhyVersion = src.LorawanPhyVersion
 			} else {
-				var zero PHYVersion
-				dst.LorawanPhyVersion = zero
+				dst.LorawanPhyVersion = 0
 			}
 
 		default:

@@ -14,7 +14,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/gogo/protobuf/types"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // ensure the imports are used
@@ -29,11 +29,8 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = types.DynamicAny{}
+	_ = anypb.Any{}
 )
-
-// define the regex for a UUID once up-front
-var _organization_uuidPattern = regexp.MustCompile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
 
 // ValidateFields checks the field values on Organization with the rules
 // defined in the proto definition for this message. If any rules are
@@ -1165,7 +1162,7 @@ func (m *CreateOrganizationAPIKeyRequest) ValidateFields(paths ...string) error 
 		case "expires_at":
 
 			if t := m.GetExpiresAt(); t != nil {
-				ts, err := types.TimestampFromProto(t)
+				ts, err := t.AsTime(), t.CheckValid()
 				if err != nil {
 					return CreateOrganizationAPIKeyRequestValidationError{
 						field:  "expires_at",
