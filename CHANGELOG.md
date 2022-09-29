@@ -40,7 +40,8 @@ For details about compatibility between different releases, see the **Commitment
 - Issues with byte inputs in the Console.
   - Pasting values into the input leading to issues in some cases.
   - Values being typed double on android phones.
-
+- Console showing deleted collaborator after successful deletion in application collaborator list.
+- Console crashing after deleting an organization.
 
 ### Security
 

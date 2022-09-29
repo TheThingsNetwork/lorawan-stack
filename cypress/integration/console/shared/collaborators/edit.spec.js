@@ -128,6 +128,7 @@ describe('Collaborators', () => {
 
       cy.visit(`${Cypress.config('consoleRootPath')}/applications/${applicationId}/collaborators`)
 
+      cy.findByText(/Collaborators \(\d+\)/).should('be.visible')
       cy.findByRole('cell', { name: organizationId }).should('not.exist')
     })
 
@@ -172,6 +173,7 @@ describe('Collaborators', () => {
 
       cy.visit(`${Cypress.config('consoleRootPath')}/applications/${applicationId}/collaborators`)
 
+      cy.findByText(/Collaborators \(\d+\)/).should('be.visible')
       cy.findByRole('cell', { name: collaboratorId }).should('not.exist')
     })
   })
@@ -230,6 +232,7 @@ describe('Collaborators', () => {
 
       cy.visit(`${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/collaborators`)
 
+      cy.findByText(/Collaborators \(\d+\)/).should('be.visible')
       cy.findByRole('cell', { name: organizationId }).should('not.exist')
     })
 
@@ -274,6 +277,7 @@ describe('Collaborators', () => {
 
       cy.visit(`${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/collaborators`)
 
+      cy.findByText(/Collaborators \(\d+\)/).should('be.visible')
       cy.findByRole('cell', { name: collaboratorId }).should('not.exist')
     })
   })
@@ -330,6 +334,7 @@ describe('Collaborators', () => {
 
       cy.visit(`${Cypress.config('consoleRootPath')}/organizations/${orgId}/collaborators`)
 
+      cy.findByText(/Collaborators \(\d+\)/).should('be.visible')
       cy.findByRole('cell', { name: collaboratorId }).should('not.exist')
     })
   })
