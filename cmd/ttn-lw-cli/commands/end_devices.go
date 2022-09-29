@@ -1024,6 +1024,13 @@ var (
 				device.UpdateTimestamps(jsDevice)
 			}
 
+			// Remove temporary fields (e.g. "supports_join") that were not selected by user
+			joinedPaths := ttnpb.AddFields(isPaths, ttnpb.AddFields(nsPaths, ttnpb.AddFields(asPaths, jsPaths...)...)...)
+			if diff := ttnpb.ExcludeFields(joinedPaths, paths...); len(diff) > 0 {
+				if err := device.SetFields(nil, diff...); err != nil {
+					return err
+				}
+			}
 			return io.Write(os.Stdout, config.OutputFormat, device)
 		},
 	}
