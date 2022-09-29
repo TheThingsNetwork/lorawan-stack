@@ -18,7 +18,6 @@ import (
 	"context"
 	"net/http"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
@@ -29,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var errMethodUnavailable = errors.DefineUnimplemented("method_unavailable", "method unavailable")
@@ -89,7 +89,7 @@ func (mockEDCS) Claim(ctx context.Context, req *ttnpb.ClaimEndDeviceRequest) (id
 }
 
 // Unclaim implements EndDeviceClaimingServer.
-func (mockEDCS) Unclaim(ctx context.Context, in *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
+func (mockEDCS) Unclaim(ctx context.Context, in *ttnpb.EndDeviceIdentifiers) (*emptypb.Empty, error) {
 	return nil, errMethodUnavailable.New()
 }
 

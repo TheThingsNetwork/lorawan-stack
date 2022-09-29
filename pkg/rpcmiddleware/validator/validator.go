@@ -30,6 +30,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var (
@@ -173,7 +174,7 @@ func validateMessage(ctx context.Context, fullMethod string, msg interface{}) er
 		}
 		return nil
 
-	case *types.Empty:
+	case *emptypb.Empty:
 		return nil
 
 	default:

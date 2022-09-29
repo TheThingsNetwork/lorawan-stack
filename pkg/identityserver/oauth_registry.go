@@ -17,11 +17,11 @@ package identityserver
 import (
 	"context"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func (is *IdentityServer) listOAuthClientAuthorizations(ctx context.Context, req *ttnpb.ListOAuthClientAuthorizationsRequest) (authorizations *ttnpb.OAuthClientAuthorizations, err error) {
@@ -80,7 +80,7 @@ func (is *IdentityServer) listOAuthAccessTokens(ctx context.Context, req *ttnpb.
 	return tokens, nil
 }
 
-func (is *IdentityServer) deleteOAuthAuthorization(ctx context.Context, req *ttnpb.OAuthClientAuthorizationIdentifiers) (*pbtypes.Empty, error) {
+func (is *IdentityServer) deleteOAuthAuthorization(ctx context.Context, req *ttnpb.OAuthClientAuthorizationIdentifiers) (*emptypb.Empty, error) {
 	if err := rights.RequireUser(ctx, req.UserIds, ttnpb.Right_RIGHT_USER_AUTHORIZED_CLIENTS); err != nil {
 		return nil, err
 	}
@@ -95,7 +95,7 @@ func (is *IdentityServer) deleteOAuthAuthorization(ctx context.Context, req *ttn
 
 var errAccessTokenMismatch = errors.DefineInvalidArgument("access_token_mismatch", "access token ID did not match user or client identifiers")
 
-func (is *IdentityServer) deleteOAuthAccessToken(ctx context.Context, req *ttnpb.OAuthAccessTokenIdentifiers) (*pbtypes.Empty, error) {
+func (is *IdentityServer) deleteOAuthAccessToken(ctx context.Context, req *ttnpb.OAuthAccessTokenIdentifiers) (*emptypb.Empty, error) {
 	authInfo, err := is.authInfo(ctx)
 	if err != nil {
 		return nil, err
@@ -138,10 +138,10 @@ func (or *oauthRegistry) ListTokens(ctx context.Context, req *ttnpb.ListOAuthAcc
 	return or.listOAuthAccessTokens(ctx, req)
 }
 
-func (or *oauthRegistry) Delete(ctx context.Context, req *ttnpb.OAuthClientAuthorizationIdentifiers) (*pbtypes.Empty, error) {
+func (or *oauthRegistry) Delete(ctx context.Context, req *ttnpb.OAuthClientAuthorizationIdentifiers) (*emptypb.Empty, error) {
 	return or.deleteOAuthAuthorization(ctx, req)
 }
 
-func (or *oauthRegistry) DeleteToken(ctx context.Context, req *ttnpb.OAuthAccessTokenIdentifiers) (*pbtypes.Empty, error) {
+func (or *oauthRegistry) DeleteToken(ctx context.Context, req *ttnpb.OAuthAccessTokenIdentifiers) (*emptypb.Empty, error) {
 	return or.deleteOAuthAccessToken(ctx, req)
 }

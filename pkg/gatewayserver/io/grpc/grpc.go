@@ -19,7 +19,6 @@ import (
 	"net"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -33,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"google.golang.org/grpc/peer"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // Option represents an option for the gRPC frontend.
@@ -195,7 +195,7 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) error {
 	}
 }
 
-func (s *impl) GetConcentratorConfig(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ConcentratorConfig, error) {
+func (s *impl) GetConcentratorConfig(ctx context.Context, _ *emptypb.Empty) (*ttnpb.ConcentratorConfig, error) {
 	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/grpc")
 
 	ids := &ttnpb.GatewayIdentifiers{

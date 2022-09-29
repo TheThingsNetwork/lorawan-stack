@@ -21,7 +21,6 @@ import (
 	"runtime/trace"
 
 	"github.com/gogo/protobuf/proto"
-	pbtypes "github.com/gogo/protobuf/types"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
@@ -40,6 +39,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"golang.org/x/exp/slices"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 const (
@@ -1398,7 +1398,7 @@ func (ns *NetworkServer) handleRejoinRequest(ctx context.Context, up *ttnpb.Upli
 }
 
 // HandleUplink is called by the Gateway Server when an uplink message arrives.
-func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessage) (_ *pbtypes.Empty, err error) {
+func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessage) (_ *emptypb.Empty, err error) {
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}
@@ -1480,7 +1480,7 @@ var errTransmission = errors.Define("transmission", "downlink transmission faile
 // ReportTxAcknowledgment is called by the Gateway Server when a tx acknowledgment arrives.
 func (ns *NetworkServer) ReportTxAcknowledgment(
 	ctx context.Context, txAck *ttnpb.GatewayTxAcknowledgment,
-) (*pbtypes.Empty, error) {
+) (*emptypb.Empty, error) {
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}

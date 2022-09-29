@@ -17,17 +17,17 @@ package networkserver
 import (
 	"context"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // GenerateDevAddr returns a device address assignment in the device address
 // range of the network server.
-func (ns *NetworkServer) GenerateDevAddr(ctx context.Context, req *pbtypes.Empty) (*ttnpb.GenerateDevAddrResponse, error) {
+func (ns *NetworkServer) GenerateDevAddr(ctx context.Context, req *emptypb.Empty) (*ttnpb.GenerateDevAddrResponse, error) {
 	devAddr := ns.newDevAddr(ctx, nil)
 	return &ttnpb.GenerateDevAddrResponse{DevAddr: devAddr.Bytes()}, nil
 }
@@ -83,7 +83,7 @@ func (ns *NetworkServer) GetDefaultMACSettings(ctx context.Context, req *ttnpb.G
 }
 
 // GetNetID returns the NetID of the Network Server.
-func (ns *NetworkServer) GetNetID(_ context.Context, _ *pbtypes.Empty) (*ttnpb.GetNetIDResponse, error) {
+func (ns *NetworkServer) GetNetID(_ context.Context, _ *emptypb.Empty) (*ttnpb.GetNetIDResponse, error) {
 	return &ttnpb.GetNetIDResponse{
 		NetId: ns.netID[:],
 	}, nil
@@ -91,7 +91,7 @@ func (ns *NetworkServer) GetNetID(_ context.Context, _ *pbtypes.Empty) (*ttnpb.G
 
 // GetDeviceAddressPrefixes return the configured device address prefixes of the Network Server.
 func (ns *NetworkServer) GetDeviceAddressPrefixes(
-	ctx context.Context, _ *pbtypes.Empty,
+	ctx context.Context, _ *emptypb.Empty,
 ) (*ttnpb.GetDeviceAdressPrefixesResponse, error) {
 	output := &ttnpb.GetDeviceAdressPrefixesResponse{}
 

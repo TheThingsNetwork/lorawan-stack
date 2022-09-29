@@ -17,13 +17,13 @@ package pubsub
 import (
 	"context"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // appendImplicitPubSubGetPaths appends implicit ttnpb.ApplicationPubSub get paths to paths.
@@ -36,7 +36,7 @@ func appendImplicitPubSubGetPaths(paths ...string) []string {
 }
 
 // GetFormats implements ttnpb.ApplicationPubSubRegistryServer.
-func (ps *PubSub) GetFormats(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ApplicationPubSubFormats, error) {
+func (ps *PubSub) GetFormats(ctx context.Context, _ *emptypb.Empty) (*ttnpb.ApplicationPubSubFormats, error) {
 	fs := make(map[string]string, len(formats))
 	for key, val := range formats {
 		fs[key] = val.Name
@@ -117,7 +117,7 @@ func (ps *PubSub) Set(ctx context.Context, req *ttnpb.SetApplicationPubSubReques
 }
 
 // Delete implements ttnpb.ApplicationPubSubRegistryServer.
-func (ps *PubSub) Delete(ctx context.Context, ids *ttnpb.ApplicationPubSubIdentifiers) (*pbtypes.Empty, error) {
+func (ps *PubSub) Delete(ctx context.Context, ids *ttnpb.ApplicationPubSubIdentifiers) (*emptypb.Empty, error) {
 	if err := rights.RequireApplication(ctx, ids.ApplicationIds,
 		ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC,
 		ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ,

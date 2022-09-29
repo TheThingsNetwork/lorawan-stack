@@ -235,7 +235,7 @@ func FromProto(pb *ttnpb.Event) (Event, error) {
 	}
 	var data interface{}
 	if pb.Data != nil {
-		anyMsg, err := pbtypes.EmptyAny(pb.Data)
+		anyMsg, err := emptypb.EmptyAny(pb.Data)
 		if err != nil {
 			return nil, err
 		}

@@ -17,13 +17,13 @@ package identityserver
 import (
 	"context"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var (
@@ -239,7 +239,7 @@ var errGatewayNeedsCollaborator = errors.DefineFailedPrecondition("gateway_needs
 
 func (is *IdentityServer) setGatewayCollaborator(
 	ctx context.Context, req *ttnpb.SetGatewayCollaboratorRequest,
-) (_ *pbtypes.Empty, err error) {
+) (_ *emptypb.Empty, err error) {
 	// Require that caller has rights to manage collaborators.
 	if err := rights.RequireGateway(ctx, req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
 		return nil, err
@@ -385,7 +385,7 @@ func (ga *gatewayAccess) GetCollaborator(ctx context.Context, req *ttnpb.GetGate
 	return ga.getGatewayCollaborator(ctx, req)
 }
 
-func (ga *gatewayAccess) SetCollaborator(ctx context.Context, req *ttnpb.SetGatewayCollaboratorRequest) (*pbtypes.Empty, error) {
+func (ga *gatewayAccess) SetCollaborator(ctx context.Context, req *ttnpb.SetGatewayCollaboratorRequest) (*emptypb.Empty, error) {
 	return ga.setGatewayCollaborator(ctx, req)
 }
 

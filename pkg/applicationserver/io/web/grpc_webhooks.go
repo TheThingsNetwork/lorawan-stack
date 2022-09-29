@@ -18,11 +18,11 @@ import (
 	"context"
 	"strconv"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func setTotalHeader(ctx context.Context, total uint64) {
@@ -52,7 +52,7 @@ func NewWebhookRegistryRPC(webhooks WebhookRegistry, templates TemplateStore) tt
 	}
 }
 
-func (s webhookRegistryRPC) GetFormats(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ApplicationWebhookFormats, error) {
+func (s webhookRegistryRPC) GetFormats(ctx context.Context, _ *emptypb.Empty) (*ttnpb.ApplicationWebhookFormats, error) {
 	fs := make(map[string]string, len(formats))
 	for key, val := range formats {
 		fs[key] = val.Name
@@ -116,7 +116,7 @@ func (s webhookRegistryRPC) Set(ctx context.Context, req *ttnpb.SetApplicationWe
 	)
 }
 
-func (s webhookRegistryRPC) Delete(ctx context.Context, req *ttnpb.ApplicationWebhookIdentifiers) (*pbtypes.Empty, error) {
+func (s webhookRegistryRPC) Delete(ctx context.Context, req *ttnpb.ApplicationWebhookIdentifiers) (*emptypb.Empty, error) {
 	if err := rights.RequireApplication(ctx, req.ApplicationIds,
 		ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC,
 		ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ,

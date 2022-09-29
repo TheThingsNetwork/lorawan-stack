@@ -42,6 +42,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
@@ -225,7 +226,7 @@ func TestPba(t *testing.T) {
 						},
 					}, nil
 				}
-				p.Registry.UpdateTenantHandler = func(ctx context.Context, req *iampb.UpdateTenantRequest) (*pbtypes.Empty, error) {
+				p.Registry.UpdateTenantHandler = func(ctx context.Context, req *iampb.UpdateTenantRequest) (*emptypb.Empty, error) {
 					_, a := test.MustNewTFromContext(ctx)
 					a.So(req, should.Resemble, &iampb.UpdateTenantRequest{
 						NetId:    0x13,
@@ -291,7 +292,7 @@ func TestPba(t *testing.T) {
 		{
 			name: "Deregister",
 			withIAMHandlers: func(p *mock.PBIAM) {
-				p.Registry.DeleteTenantHandler = func(ctx context.Context, req *iampb.TenantRequest) (*pbtypes.Empty, error) {
+				p.Registry.DeleteTenantHandler = func(ctx context.Context, req *iampb.TenantRequest) (*emptypb.Empty, error) {
 					_, a := test.MustNewTFromContext(ctx)
 					a.So(req.NetId, should.Equal, 0x13)
 					a.So(req.TenantId, should.Equal, "foo-tenant")
@@ -353,7 +354,7 @@ func TestPba(t *testing.T) {
 		{
 			name: "RoutingPolicy/Default/Set",
 			withControlPlaneHandlers: func(p *mock.PBControlPlane) {
-				p.SetDefaultPolicyHandler = func(ctx context.Context, req *routingpb.SetPolicyRequest) (*pbtypes.Empty, error) {
+				p.SetDefaultPolicyHandler = func(ctx context.Context, req *routingpb.SetPolicyRequest) (*emptypb.Empty, error) {
 					_, a := test.MustNewTFromContext(ctx)
 					a.So(req.Policy, should.Resemble, &packetbroker.RoutingPolicy{
 						ForwarderNetId:    0x13,
@@ -386,7 +387,7 @@ func TestPba(t *testing.T) {
 		{
 			name: "RoutingPolicy/Default/Delete",
 			withControlPlaneHandlers: func(p *mock.PBControlPlane) {
-				p.SetDefaultPolicyHandler = func(ctx context.Context, req *routingpb.SetPolicyRequest) (*pbtypes.Empty, error) {
+				p.SetDefaultPolicyHandler = func(ctx context.Context, req *routingpb.SetPolicyRequest) (*emptypb.Empty, error) {
 					_, a := test.MustNewTFromContext(ctx)
 					a.So(req.Policy, should.Resemble, &packetbroker.RoutingPolicy{
 						ForwarderNetId:    0x13,

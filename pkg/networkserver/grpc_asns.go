@@ -19,7 +19,6 @@ import (
 	"context"
 	"fmt"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -31,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type ApplicationUplinkQueueDrainFunc func(limit int, f func(...*ttnpb.ApplicationUp) error) error
@@ -276,7 +276,7 @@ func matchQueuedApplicationDownlinks(ctx context.Context, dev *ttnpb.EndDevice, 
 var errDownlinkQueueCapacity = errors.DefineResourceExhausted("downlink_queue_capacity", "downlink queue capacity exceeded")
 
 // DownlinkQueueReplace is called by the Application Server to completely replace the downlink queue for a device.
-func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
+func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*emptypb.Empty, error) {
 	if n := len(req.Downlinks); n > ns.downlinkQueueCapacity*2 {
 		return nil, errDownlinkQueueCapacity.New()
 	} else if err := clusterauth.Authorized(ctx); err != nil {
@@ -349,7 +349,7 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 }
 
 // DownlinkQueuePush is called by the Application Server to push a downlink to queue for a device.
-func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
+func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*emptypb.Empty, error) {
 	if n := len(req.Downlinks); n > ns.downlinkQueueCapacity*2 {
 		return nil, errDownlinkQueueCapacity.New()
 	} else if n == 0 {

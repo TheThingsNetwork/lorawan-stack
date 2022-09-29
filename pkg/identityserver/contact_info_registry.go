@@ -18,7 +18,6 @@ import (
 	"context"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
@@ -27,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var (
@@ -151,7 +151,7 @@ func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids 
 	}, nil
 }
 
-func (is *IdentityServer) validateContactInfo(ctx context.Context, req *ttnpb.ContactInfoValidation) (*pbtypes.Empty, error) {
+func (is *IdentityServer) validateContactInfo(ctx context.Context, req *ttnpb.ContactInfoValidation) (*emptypb.Empty, error) {
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
 		return st.Validate(ctx, req)
 	})
@@ -191,6 +191,6 @@ func (cir *contactInfoRegistry) RequestValidation(ctx context.Context, ids *ttnp
 	return cir.requestContactInfoValidation(ctx, ids)
 }
 
-func (cir *contactInfoRegistry) Validate(ctx context.Context, req *ttnpb.ContactInfoValidation) (*pbtypes.Empty, error) {
+func (cir *contactInfoRegistry) Validate(ctx context.Context, req *ttnpb.ContactInfoValidation) (*emptypb.Empty, error) {
 	return cir.validateContactInfo(ctx, req)
 }

@@ -17,13 +17,13 @@ package identityserver
 import (
 	"context"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var (
@@ -90,7 +90,7 @@ var errClientNeedsCollaborator = errors.DefineFailedPrecondition(
 
 func (is *IdentityServer) setClientCollaborator(
 	ctx context.Context, req *ttnpb.SetClientCollaboratorRequest,
-) (_ *pbtypes.Empty, err error) {
+) (_ *emptypb.Empty, err error) {
 	// Require that caller has rights to manage collaborators.
 	err = rights.RequireClient(ctx, req.GetClientIds(), ttnpb.Right_RIGHT_CLIENT_SETTINGS_COLLABORATORS)
 	if err != nil {
@@ -241,7 +241,7 @@ func (ca *clientAccess) GetCollaborator(
 func (ca *clientAccess) SetCollaborator(
 	ctx context.Context,
 	req *ttnpb.SetClientCollaboratorRequest,
-) (*pbtypes.Empty, error) {
+) (*emptypb.Empty, error) {
 	return ca.setClientCollaborator(ctx, req)
 }
 

@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
@@ -43,7 +44,7 @@ type pbaServer struct {
 	cpConn *grpc.ClientConn
 }
 
-func (s *pbaServer) GetInfo(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.PacketBrokerInfo, error) {
+func (s *pbaServer) GetInfo(ctx context.Context, _ *emptypb.Empty) (*ttnpb.PacketBrokerInfo, error) {
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
 	}
@@ -196,7 +197,7 @@ func (s *pbaServer) Register(ctx context.Context, req *ttnpb.PacketBrokerRegiste
 	}, nil
 }
 
-func (s *pbaServer) Deregister(ctx context.Context, _ *pbtypes.Empty) (*pbtypes.Empty, error) {
+func (s *pbaServer) Deregister(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
 	}
@@ -215,7 +216,7 @@ func (s *pbaServer) Deregister(ctx context.Context, _ *pbtypes.Empty) (*pbtypes.
 	return ttnpb.Empty, nil
 }
 
-func (s *pbaServer) GetHomeNetworkDefaultRoutingPolicy(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.PacketBrokerDefaultRoutingPolicy, error) {
+func (s *pbaServer) GetHomeNetworkDefaultRoutingPolicy(ctx context.Context, _ *emptypb.Empty) (*ttnpb.PacketBrokerDefaultRoutingPolicy, error) {
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
 	}
@@ -233,7 +234,7 @@ func (s *pbaServer) GetHomeNetworkDefaultRoutingPolicy(ctx context.Context, _ *p
 	return fromPBDefaultRoutingPolicy(res.GetPolicy()), nil
 }
 
-func (s *pbaServer) SetHomeNetworkDefaultRoutingPolicy(ctx context.Context, req *ttnpb.SetPacketBrokerDefaultRoutingPolicyRequest) (*pbtypes.Empty, error) {
+func (s *pbaServer) SetHomeNetworkDefaultRoutingPolicy(ctx context.Context, req *ttnpb.SetPacketBrokerDefaultRoutingPolicyRequest) (*emptypb.Empty, error) {
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
 	}
@@ -255,7 +256,7 @@ func (s *pbaServer) SetHomeNetworkDefaultRoutingPolicy(ctx context.Context, req 
 	return ttnpb.Empty, nil
 }
 
-func (s *pbaServer) DeleteHomeNetworkDefaultRoutingPolicy(ctx context.Context, _ *pbtypes.Empty) (*pbtypes.Empty, error) {
+func (s *pbaServer) DeleteHomeNetworkDefaultRoutingPolicy(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
 	}
@@ -364,7 +365,7 @@ func (s *pbaServer) GetHomeNetworkRoutingPolicy(ctx context.Context, req *ttnpb.
 	return fromPBRoutingPolicy(res.GetPolicy()), nil
 }
 
-func (s *pbaServer) SetHomeNetworkRoutingPolicy(ctx context.Context, req *ttnpb.SetPacketBrokerRoutingPolicyRequest) (*pbtypes.Empty, error) {
+func (s *pbaServer) SetHomeNetworkRoutingPolicy(ctx context.Context, req *ttnpb.SetPacketBrokerRoutingPolicyRequest) (*emptypb.Empty, error) {
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
 	}
@@ -388,7 +389,7 @@ func (s *pbaServer) SetHomeNetworkRoutingPolicy(ctx context.Context, req *ttnpb.
 	return ttnpb.Empty, nil
 }
 
-func (s *pbaServer) DeleteHomeNetworkRoutingPolicy(ctx context.Context, req *ttnpb.PacketBrokerNetworkIdentifier) (*pbtypes.Empty, error) {
+func (s *pbaServer) DeleteHomeNetworkRoutingPolicy(ctx context.Context, req *ttnpb.PacketBrokerNetworkIdentifier) (*emptypb.Empty, error) {
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
 	}
@@ -410,7 +411,7 @@ func (s *pbaServer) DeleteHomeNetworkRoutingPolicy(ctx context.Context, req *ttn
 	return ttnpb.Empty, nil
 }
 
-func (s *pbaServer) GetHomeNetworkDefaultGatewayVisibility(ctx context.Context, req *pbtypes.Empty) (*ttnpb.PacketBrokerDefaultGatewayVisibility, error) {
+func (s *pbaServer) GetHomeNetworkDefaultGatewayVisibility(ctx context.Context, req *emptypb.Empty) (*ttnpb.PacketBrokerDefaultGatewayVisibility, error) {
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
 	}
@@ -428,7 +429,7 @@ func (s *pbaServer) GetHomeNetworkDefaultGatewayVisibility(ctx context.Context, 
 	return fromPBDefaultGatewayVisibility(res.GetVisibility()), nil
 }
 
-func (s *pbaServer) SetHomeNetworkDefaultGatewayVisibility(ctx context.Context, req *ttnpb.SetPacketBrokerDefaultGatewayVisibilityRequest) (*pbtypes.Empty, error) {
+func (s *pbaServer) SetHomeNetworkDefaultGatewayVisibility(ctx context.Context, req *ttnpb.SetPacketBrokerDefaultGatewayVisibilityRequest) (*emptypb.Empty, error) {
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
 	}
@@ -456,7 +457,7 @@ func (s *pbaServer) SetHomeNetworkDefaultGatewayVisibility(ctx context.Context, 
 	return ttnpb.Empty, nil
 }
 
-func (s *pbaServer) DeleteHomeNetworkDefaultGatewayVisibility(ctx context.Context, req *pbtypes.Empty) (*pbtypes.Empty, error) {
+func (s *pbaServer) DeleteHomeNetworkDefaultGatewayVisibility(ctx context.Context, req *emptypb.Empty) (*emptypb.Empty, error) {
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
 	}

@@ -18,12 +18,12 @@ import (
 	"context"
 	"testing"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	routingpb "go.packetbroker.org/api/routing"
 	packetbroker "go.packetbroker.org/api/v3"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // PBDataPlane is a mock Packet Broker Data Plane.
@@ -98,7 +98,7 @@ func (s *routerForwarderServer) Subscribe(req *routingpb.SubscribeForwarderReque
 	}
 }
 
-func (s *routerForwarderServer) ReportDownlinkMessageDeliveryState(ctx context.Context, req *routingpb.DownlinkMessageDeliveryStateChangeRequest) (*pbtypes.Empty, error) {
+func (s *routerForwarderServer) ReportDownlinkMessageDeliveryState(ctx context.Context, req *routingpb.DownlinkMessageDeliveryStateChangeRequest) (*emptypb.Empty, error) {
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()
@@ -147,7 +147,7 @@ func (s *routerHomeNetworkServer) Subscribe(req *routingpb.SubscribeHomeNetworkR
 	}
 }
 
-func (s *routerHomeNetworkServer) ReportUplinkMessageDeliveryState(ctx context.Context, req *routingpb.UplinkMessageDeliveryStateChangeRequest) (*pbtypes.Empty, error) {
+func (s *routerHomeNetworkServer) ReportUplinkMessageDeliveryState(ctx context.Context, req *routingpb.UplinkMessageDeliveryStateChangeRequest) (*emptypb.Empty, error) {
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()

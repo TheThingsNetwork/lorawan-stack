@@ -19,13 +19,13 @@ import (
 	"fmt"
 	"sync"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var errNoGatewayRights = errors.DefinePermissionDenied("no_gateway_rights", "no gateway rights")
@@ -122,7 +122,7 @@ func (is *mockISGatewayRegistry) Update(ctx context.Context, req *ttnpb.UpdateGa
 	return gtw, nil
 }
 
-func (is *mockISGatewayRegistry) Delete(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
+func (is *mockISGatewayRegistry) Delete(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
 	is.mu.Lock()
 	defer is.mu.Unlock()
 
@@ -132,7 +132,7 @@ func (is *mockISGatewayRegistry) Delete(ctx context.Context, ids *ttnpb.GatewayI
 		return nil, errNotFound.New()
 	}
 	is.gateways[uid] = nil
-	return &pbtypes.Empty{}, nil
+	return ttnpb.Empty, nil
 }
 
 func (is *mockISGatewayRegistry) ListRights(

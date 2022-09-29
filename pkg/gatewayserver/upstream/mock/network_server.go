@@ -19,9 +19,9 @@ import (
 	"context"
 	"net"
 
-	types "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // NS is a mock NS for GS tests.
@@ -49,15 +49,15 @@ func StartNS(ctx context.Context) (*NS, string) {
 }
 
 // HandleUplink implements ttnpb.GsNsServer
-func (ns *NS) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMessage) (*types.Empty, error) {
+func (ns *NS) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMessage) (*emptypb.Empty, error) {
 	ns.upCh <- msg
-	return &types.Empty{}, nil
+	return ttnpb.Empty, nil
 }
 
 // ReportTxAcknowledgment implements ttnpb.GsNsServer
-func (ns *NS) ReportTxAcknowledgment(ctx context.Context, msg *ttnpb.GatewayTxAcknowledgment) (*types.Empty, error) {
+func (ns *NS) ReportTxAcknowledgment(ctx context.Context, msg *ttnpb.GatewayTxAcknowledgment) (*emptypb.Empty, error) {
 	ns.txAckCh <- msg
-	return &types.Empty{}, nil
+	return ttnpb.Empty, nil
 }
 
 // Up returns the upstream channel.

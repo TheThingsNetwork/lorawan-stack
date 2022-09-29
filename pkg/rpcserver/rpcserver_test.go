@@ -20,7 +20,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gogo/protobuf/types"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	"github.com/smartystreets/assertions"
@@ -32,6 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var (
@@ -169,7 +169,7 @@ func (s *mockServer) Subscribe(ids *ttnpb.ApplicationIdentifiers, srv ttnpb.AppA
 	return nil
 }
 
-func (s *mockServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*types.Empty, error) {
+func (s *mockServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*emptypb.Empty, error) {
 	s.pushCtx, s.pushReq = ctx, req
-	return &types.Empty{}, nil
+	return ttnpb.Empty, nil
 }

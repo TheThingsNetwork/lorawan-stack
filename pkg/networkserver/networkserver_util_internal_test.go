@@ -47,6 +47,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 const (
@@ -457,7 +458,7 @@ type MockNsAsServer struct {
 }
 
 // ScheduleDownlink calls HandleUplinkFunc if set and panics otherwise.
-func (m MockNsAsServer) HandleUplink(ctx context.Context, req *ttnpb.NsAsHandleUplinkRequest) (*pbtypes.Empty, error) {
+func (m MockNsAsServer) HandleUplink(ctx context.Context, req *ttnpb.NsAsHandleUplinkRequest) (*emptypb.Empty, error) {
 	if m.HandleUplinkFunc == nil {
 		panic("HandleUplink called, but not set")
 	}

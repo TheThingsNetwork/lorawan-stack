@@ -20,7 +20,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
@@ -33,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"gopkg.in/yaml.v2"
 )
 
@@ -168,7 +168,7 @@ func (upstream *Upstream) Claim(
 }
 
 // Unclaim implements EndDeviceClaimingServer.
-func (upstream *Upstream) Unclaim(ctx context.Context, in *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
+func (upstream *Upstream) Unclaim(ctx context.Context, in *ttnpb.EndDeviceIdentifiers) (*emptypb.Empty, error) {
 	if in.DevEui == nil || in.JoinEui == nil {
 		return nil, errNoEUI.New()
 	}
@@ -188,7 +188,7 @@ func (upstream *Upstream) Unclaim(ctx context.Context, in *ttnpb.EndDeviceIdenti
 	if err != nil {
 		return nil, err
 	}
-	return &pbtypes.Empty{}, nil
+	return ttnpb.Empty, nil
 }
 
 // GetInfoByJoinEUI implements EndDeviceClaimingServer.

@@ -54,6 +54,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // ApplicationServer implements the Application Server component.
@@ -537,7 +538,7 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 
 type downlinkQueueOperation struct {
 	Items             []*ttnpb.ApplicationDownlink
-	Operation         func(ttnpb.AsNsClient, context.Context, *ttnpb.DownlinkQueueRequest, ...grpc.CallOption) (*pbtypes.Empty, error)
+	Operation         func(ttnpb.AsNsClient, context.Context, *ttnpb.DownlinkQueueRequest, ...grpc.CallOption) (*emptypb.Empty, error)
 	SkipSessionKeyIDs [][]byte
 	ResultFunc        func(decrypted, encrypted []*ttnpb.ApplicationDownlink, err error)
 }
@@ -615,7 +616,7 @@ func (as *ApplicationServer) attemptDownlinkQueueOp(ctx context.Context, dev *tt
 	}
 }
 
-func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink, op func(ttnpb.AsNsClient, context.Context, *ttnpb.DownlinkQueueRequest, ...grpc.CallOption) (*pbtypes.Empty, error)) error {
+func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink, op func(ttnpb.AsNsClient, context.Context, *ttnpb.DownlinkQueueRequest, ...grpc.CallOption) (*emptypb.Empty, error)) error {
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("as:downlink:%s", events.NewCorrelationID()))
 	link, err := as.getLink(ctx, ids.ApplicationIds, []string{
 		"default_formatters",

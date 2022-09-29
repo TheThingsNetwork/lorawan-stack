@@ -42,6 +42,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 	"gopkg.in/square/go-jose.v2"
 )
@@ -452,7 +453,7 @@ func TestForwarder(t *testing.T) {
 		a := assertions.New(t)
 
 		updateCh := make(chan *mappingpb.UpdateGatewayRequest, 1)
-		mp.UpdateGatewayHandler = func(ctx context.Context, req *mappingpb.UpdateGatewayRequest, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
+		mp.UpdateGatewayHandler = func(ctx context.Context, req *mappingpb.UpdateGatewayRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 			updateCh <- req
 			return ttnpb.Empty, nil
 		}

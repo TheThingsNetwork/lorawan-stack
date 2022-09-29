@@ -17,12 +17,12 @@ package joinserver
 import (
 	"context"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type applicationActivationSettingsRegistryServer struct {
@@ -106,7 +106,7 @@ func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, 
 }
 
 // Delete implements ttnpb.ApplicationActivationSettingsRegistryServer.
-func (srv applicationActivationSettingsRegistryServer) Delete(ctx context.Context, req *ttnpb.DeleteApplicationActivationSettingsRequest) (*pbtypes.Empty, error) {
+func (srv applicationActivationSettingsRegistryServer) Delete(ctx context.Context, req *ttnpb.DeleteApplicationActivationSettingsRequest) (*emptypb.Empty, error) {
 	if err := rights.RequireApplication(ctx, req.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
 		return nil, err
 	}

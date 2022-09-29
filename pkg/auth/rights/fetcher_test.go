@@ -20,7 +20,6 @@ import (
 	"sync"
 	"testing"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -28,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func fetchEntityRights(ctx context.Context, id string, f EntityFetcher) (res struct {
@@ -118,7 +118,7 @@ func (as *mockAccessServer) Server() *grpc.Server {
 	return srv
 }
 
-func (as *mockEntityAccessServer) AuthInfo(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.AuthInfoResponse, error) {
+func (as *mockEntityAccessServer) AuthInfo(ctx context.Context, _ *emptypb.Empty) (*ttnpb.AuthInfoResponse, error) {
 	as.authInfoCtx = ctx
 	if as.authInfoError != nil {
 		return nil, as.authInfoError

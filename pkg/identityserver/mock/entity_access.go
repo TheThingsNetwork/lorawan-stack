@@ -17,8 +17,8 @@ package mockis
 import (
 	"context"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type mockEntityAccess struct {
@@ -28,7 +28,7 @@ type mockEntityAccess struct {
 	err              error
 }
 
-func (ea *mockEntityAccess) AuthInfo(context.Context, *pbtypes.Empty) (*ttnpb.AuthInfoResponse, error) {
+func (ea *mockEntityAccess) AuthInfo(context.Context, *emptypb.Empty) (*ttnpb.AuthInfoResponse, error) {
 	if ea.err != nil {
 		return &ttnpb.AuthInfoResponse{}, ea.err
 	}

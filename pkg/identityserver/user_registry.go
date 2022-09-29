@@ -21,7 +21,6 @@ import (
 	"time"
 	"unicode"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
@@ -34,6 +33,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/validate"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var (
@@ -551,7 +551,7 @@ var (
 	}
 )
 
-func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.UpdateUserPasswordRequest) (*pbtypes.Empty, error) {
+func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.UpdateUserPasswordRequest) (*emptypb.Empty, error) {
 	if err := is.validatePasswordStrength(ctx, req.GetUserIds().GetUserId(), req.New); err != nil {
 		return nil, err
 	}
@@ -649,7 +649,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 
 var errTemporaryPasswordStillValid = errors.DefineInvalidArgument("temporary_password_still_valid", "previous temporary password still valid")
 
-func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnpb.CreateTemporaryPasswordRequest) (*pbtypes.Empty, error) {
+func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnpb.CreateTemporaryPasswordRequest) (*emptypb.Empty, error) {
 	temporaryPassword, err := auth.GenerateKey(ctx)
 	if err != nil {
 		return nil, err
@@ -694,7 +694,7 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) deleteUser(ctx context.Context, ids *ttnpb.UserIdentifiers) (*pbtypes.Empty, error) {
+func (is *IdentityServer) deleteUser(ctx context.Context, ids *ttnpb.UserIdentifiers) (*emptypb.Empty, error) {
 	if err := rights.RequireUser(ctx, ids, ttnpb.Right_RIGHT_USER_DELETE); err != nil {
 		return nil, err
 	}
@@ -718,7 +718,7 @@ func (is *IdentityServer) deleteUser(ctx context.Context, ids *ttnpb.UserIdentif
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) restoreUser(ctx context.Context, ids *ttnpb.UserIdentifiers) (*pbtypes.Empty, error) {
+func (is *IdentityServer) restoreUser(ctx context.Context, ids *ttnpb.UserIdentifiers) (*emptypb.Empty, error) {
 	if err := rights.RequireUser(store.WithSoftDeleted(ctx, false), ids, ttnpb.Right_RIGHT_USER_DELETE); err != nil {
 		return nil, err
 	}
@@ -743,7 +743,7 @@ func (is *IdentityServer) restoreUser(ctx context.Context, ids *ttnpb.UserIdenti
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) purgeUser(ctx context.Context, ids *ttnpb.UserIdentifiers) (*pbtypes.Empty, error) {
+func (is *IdentityServer) purgeUser(ctx context.Context, ids *ttnpb.UserIdentifiers) (*emptypb.Empty, error) {
 	if !is.IsAdmin(ctx) {
 		return nil, errAdminsPurgeUsers.New()
 	}
@@ -800,22 +800,22 @@ func (ur *userRegistry) Update(ctx context.Context, req *ttnpb.UpdateUserRequest
 	return ur.updateUser(ctx, req)
 }
 
-func (ur *userRegistry) UpdatePassword(ctx context.Context, req *ttnpb.UpdateUserPasswordRequest) (*pbtypes.Empty, error) {
+func (ur *userRegistry) UpdatePassword(ctx context.Context, req *ttnpb.UpdateUserPasswordRequest) (*emptypb.Empty, error) {
 	return ur.updateUserPassword(ctx, req)
 }
 
-func (ur *userRegistry) CreateTemporaryPassword(ctx context.Context, req *ttnpb.CreateTemporaryPasswordRequest) (*pbtypes.Empty, error) {
+func (ur *userRegistry) CreateTemporaryPassword(ctx context.Context, req *ttnpb.CreateTemporaryPasswordRequest) (*emptypb.Empty, error) {
 	return ur.createTemporaryPassword(ctx, req)
 }
 
-func (ur *userRegistry) Delete(ctx context.Context, req *ttnpb.UserIdentifiers) (*pbtypes.Empty, error) {
+func (ur *userRegistry) Delete(ctx context.Context, req *ttnpb.UserIdentifiers) (*emptypb.Empty, error) {
 	return ur.deleteUser(ctx, req)
 }
 
-func (ur *userRegistry) Restore(ctx context.Context, req *ttnpb.UserIdentifiers) (*pbtypes.Empty, error) {
+func (ur *userRegistry) Restore(ctx context.Context, req *ttnpb.UserIdentifiers) (*emptypb.Empty, error) {
 	return ur.restoreUser(ctx, req)
 }
 
-func (ur *userRegistry) Purge(ctx context.Context, req *ttnpb.UserIdentifiers) (*pbtypes.Empty, error) {
+func (ur *userRegistry) Purge(ctx context.Context, req *ttnpb.UserIdentifiers) (*emptypb.Empty, error) {
 	return ur.purgeUser(ctx, req)
 }

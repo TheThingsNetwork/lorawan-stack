@@ -17,8 +17,8 @@ package deviceclaimingserver
 import (
 	"context"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // noopGCLS is a no-op GCLS.
@@ -32,12 +32,12 @@ func (noopGCLS) Claim(ctx context.Context, req *ttnpb.ClaimGatewayRequest) (ids 
 }
 
 // AuthorizeGateway implements GatewayClaimingServer.
-func (noopGCLS) AuthorizeGateway(ctx context.Context, req *ttnpb.AuthorizeGatewayRequest) (*pbtypes.Empty, error) {
+func (noopGCLS) AuthorizeGateway(ctx context.Context, req *ttnpb.AuthorizeGatewayRequest) (*emptypb.Empty, error) {
 	return nil, errMethodUnavailable.New()
 }
 
 // UnauthorizeGateway implements GatewayClaimingServer.
-func (noopGCLS) UnauthorizeGateway(ctx context.Context, gtwIDs *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
+func (noopGCLS) UnauthorizeGateway(ctx context.Context, gtwIDs *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
 	return nil, errMethodUnavailable.New()
 }
 
@@ -54,11 +54,11 @@ func (gcls gatewayClaimingServer) Claim(ctx context.Context, req *ttnpb.ClaimGat
 }
 
 // AuthorizeGateway implements GatewayClaimingServer.
-func (gcls gatewayClaimingServer) AuthorizeGateway(ctx context.Context, req *ttnpb.AuthorizeGatewayRequest) (*pbtypes.Empty, error) {
+func (gcls gatewayClaimingServer) AuthorizeGateway(ctx context.Context, req *ttnpb.AuthorizeGatewayRequest) (*emptypb.Empty, error) {
 	return gcls.DCS.gatewayClaimingServerUpstream.AuthorizeGateway(ctx, req)
 }
 
 // UnauthorizeGateway implements GatewayClaimingServer.
-func (gcls gatewayClaimingServer) UnauthorizeGateway(ctx context.Context, gtwIDs *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
+func (gcls gatewayClaimingServer) UnauthorizeGateway(ctx context.Context, gtwIDs *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
 	return gcls.DCS.gatewayClaimingServerUpstream.UnauthorizeGateway(ctx, gtwIDs)
 }

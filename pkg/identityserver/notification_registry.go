@@ -17,7 +17,6 @@ package identityserver
 import (
 	"context"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
@@ -26,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func receiversContains(receivers []ttnpb.NotificationReceiver, search ttnpb.NotificationReceiver) bool {
@@ -291,7 +291,7 @@ func (is *IdentityServer) listNotifications(ctx context.Context, req *ttnpb.List
 	return res, nil
 }
 
-func (is *IdentityServer) updateNotificationStatus(ctx context.Context, req *ttnpb.UpdateNotificationStatusRequest) (*pbtypes.Empty, error) {
+func (is *IdentityServer) updateNotificationStatus(ctx context.Context, req *ttnpb.UpdateNotificationStatusRequest) (*emptypb.Empty, error) {
 	if err := rights.RequireUser(ctx, req.ReceiverIds, ttnpb.Right_RIGHT_USER_NOTIFICATIONS_READ); err != nil {
 		return nil, err
 	}
@@ -318,6 +318,6 @@ func (cr *notificationRegistry) List(ctx context.Context, req *ttnpb.ListNotific
 	return cr.listNotifications(ctx, req)
 }
 
-func (cr *notificationRegistry) UpdateStatus(ctx context.Context, req *ttnpb.UpdateNotificationStatusRequest) (*pbtypes.Empty, error) {
+func (cr *notificationRegistry) UpdateStatus(ctx context.Context, req *ttnpb.UpdateNotificationStatusRequest) (*emptypb.Empty, error) {
 	return cr.updateNotificationStatus(ctx, req)
 }
