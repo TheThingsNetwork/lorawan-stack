@@ -250,16 +250,29 @@ func (s *membershipStore) FindAccountMembershipChains(
 	return chains, nil
 }
 
+var findMembersFieldToColumn = map[string]string{
+	"id":     "direct_account_friendly_id",
+	"rights": "rights",
+}
+
 func (s *membershipStore) FindMembers(
 	ctx context.Context, entityID *ttnpb.EntityIdentifiers,
-) (map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, error) {
+) ([]*store.MemberByID, error) {
 	defer trace.StartRegion(ctx, fmt.Sprintf("find members of %s", entityID.EntityType())).End()
-	query := s.queryWithDirectMemberships(ctx, entityID.EntityType(), entityID.IDString()).
-		Order("direct_account_friendly_id")
+
+	query := s.queryWithDirectMemberships(ctx, entityID.EntityType(), entityID.IDString())
+	order := store.OrderOptionsFromContext(ctx)
+	if column, ok := findMembersFieldToColumn[order.Field]; ok {
+		query = query.Order(fmt.Sprintf("%s %s", column, order.Direction))
+	} else {
+		query = query.Order("direct_account_friendly_id")
+	}
+
 	page := query
 	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 {
 		page = query.Limit(limit).Offset(offset)
 	}
+
 	var results []membershipChain
 	if err := page.Scan(&results).Error; err != nil {
 		return nil, err
@@ -272,8 +285,9 @@ func (s *membershipStore) FindMembers(
 	} else {
 		store.SetTotal(ctx, uint64(len(results)))
 	}
-	membershipRights := make(map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, len(results))
-	for _, result := range results {
+
+	membershipRights := make([]*store.MemberByID, len(results))
+	for i, result := range results {
 		chain := result.GetMembershipChain()
 		var ids *ttnpb.OrganizationOrUserIdentifiers
 		if chain.OrganizationIdentifiers != nil {
@@ -281,7 +295,10 @@ func (s *membershipStore) FindMembers(
 		} else {
 			ids = chain.UserIdentifiers.GetOrganizationOrUserIdentifiers()
 		}
-		membershipRights[ids] = chain.RightsOnEntity
+		membershipRights[i] = &store.MemberByID{
+			Ids:    ids,
+			Rights: chain.RightsOnEntity,
+		}
 	}
 	return membershipRights, nil
 }

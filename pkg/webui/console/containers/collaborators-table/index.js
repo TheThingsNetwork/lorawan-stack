@@ -54,7 +54,7 @@ const CollaboratorsTable = props => {
       name: 'ids',
       displayName: m.id,
       sortable: true,
-      sortKey: '_id',
+      sortKey: 'id',
       width: 30,
       render: ids => {
         const isUser = 'user_ids' in ids
@@ -125,7 +125,7 @@ const CollaboratorsTable = props => {
     <FetchTable
       entity="collaborators"
       headers={headers}
-      defaultOrder="_id"
+      defaultOrder="id"
       rowKeySelector={rowKeySelector}
       getItemPathPrefix={getCollaboratorPathPrefix}
       addMessage={sharedMessages.addCollaborator}

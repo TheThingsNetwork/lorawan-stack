@@ -2285,6 +2285,15 @@ func (m *ListGatewayCollaboratorsRequest) ValidateFields(paths ...string) error 
 
 		case "page":
 			// no validation rules for Page
+		case "order":
+
+			if _, ok := _ListGatewayCollaboratorsRequest_Order_InLookup[m.GetOrder()]; !ok {
+				return ListGatewayCollaboratorsRequestValidationError{
+					field:  "order",
+					reason: "value must be in list [ id -id -rights rights]",
+				}
+			}
+
 		default:
 			return ListGatewayCollaboratorsRequestValidationError{
 				field:  name,
@@ -2351,6 +2360,14 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ListGatewayCollaboratorsRequestValidationError{}
+
+var _ListGatewayCollaboratorsRequest_Order_InLookup = map[string]struct{}{
+	"":        {},
+	"id":      {},
+	"-id":     {},
+	"-rights": {},
+	"rights":  {},
+}
 
 // ValidateFields checks the field values on GetGatewayCollaboratorRequest with
 // the rules defined in the proto definition for this message. If any rules

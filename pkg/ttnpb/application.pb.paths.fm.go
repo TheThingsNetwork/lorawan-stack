@@ -234,12 +234,14 @@ var ListApplicationCollaboratorsRequestFieldPathsNested = []string{
 	"application_ids",
 	"application_ids.application_id",
 	"limit",
+	"order",
 	"page",
 }
 
 var ListApplicationCollaboratorsRequestFieldPathsTopLevel = []string{
 	"application_ids",
 	"limit",
+	"order",
 	"page",
 }
 var GetApplicationCollaboratorRequestFieldPathsNested = []string{

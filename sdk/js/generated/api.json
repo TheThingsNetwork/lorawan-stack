@@ -820,6 +820,32 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "order",
+              "description": "Order the results by this field path (must be present in the field mask).\nDefault ordering is by ID. Prepend with a minus (-) to reverse the order.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.in",
+                    "value": [
+                      "",
+                      "id",
+                      "-id",
+                      "-rights",
+                      "rights"
+                    ]
+                  }
+                ]
+              }
             }
           ]
         },
@@ -7815,6 +7841,32 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "order",
+              "description": "Order the results by this field path (must be present in the field mask).\nDefault ordering is by ID. Prepend with a minus (-) to reverse the order.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.in",
+                    "value": [
+                      "",
+                      "id",
+                      "-id",
+                      "-rights",
+                      "rights"
+                    ]
+                  }
+                ]
+              }
             }
           ]
         },
@@ -21045,6 +21097,32 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "order",
+              "description": "Order the results by this field path (must be present in the field mask).\nDefault ordering is by ID. Prepend with a minus (-) to reverse the order.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.in",
+                    "value": [
+                      "",
+                      "id",
+                      "-id",
+                      "-rights",
+                      "rights"
+                    ]
+                  }
+                ]
+              }
             }
           ]
         },
@@ -36395,6 +36473,32 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "order",
+              "description": "Order the results by this field path (must be present in the field mask).\nDefault ordering is by ID. Prepend with a minus (-) to reverse the order.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.in",
+                    "value": [
+                      "",
+                      "id",
+                      "-id",
+                      "-rights",
+                      "rights"
+                    ]
+                  }
+                ]
+              }
             }
           ]
         },

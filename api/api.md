@@ -829,6 +829,7 @@ Stored in Entity Registry. The typical format of the address is "host:port". If 
 | `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
 | `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
 | `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+| `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
 
 #### Field Rules
 
@@ -836,6 +837,7 @@ Stored in Entity Registry. The typical format of the address is "host:port". If 
 | ----- | ----------- |
 | `application_ids` | <p>`message.required`: `true`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
+| `order` | <p>`string.in`: `[ id -id -rights rights]`</p> |
 
 ### <a name="ttn.lorawan.v3.ListApplicationsRequest">Message `ListApplicationsRequest`</a>
 
@@ -2183,6 +2185,7 @@ An OAuth client on the network.
 | `client_ids` | [`ClientIdentifiers`](#ttn.lorawan.v3.ClientIdentifiers) |  |  |
 | `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
 | `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+| `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
 
 #### Field Rules
 
@@ -2190,6 +2193,7 @@ An OAuth client on the network.
 | ----- | ----------- |
 | `client_ids` | <p>`message.required`: `true`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
+| `order` | <p>`string.in`: `[ id -id -rights rights]`</p> |
 
 ### <a name="ttn.lorawan.v3.ListClientsRequest">Message `ListClientsRequest`</a>
 
@@ -4614,6 +4618,7 @@ Identifies an end device model with version information.
 | `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
 | `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
 | `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+| `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
 
 #### Field Rules
 
@@ -4621,6 +4626,7 @@ Identifies an end device model with version information.
 | ----- | ----------- |
 | `gateway_ids` | <p>`message.required`: `true`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
+| `order` | <p>`string.in`: `[ id -id -rights rights]`</p> |
 
 ### <a name="ttn.lorawan.v3.ListGatewaysRequest">Message `ListGatewaysRequest`</a>
 
@@ -7885,6 +7891,7 @@ is used to manage OAuth client authorizations for users.
 | `organization_ids` | [`OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers) |  |  |
 | `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
 | `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+| `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
 
 #### Field Rules
 
@@ -7892,6 +7899,7 @@ is used to manage OAuth client authorizations for users.
 | ----- | ----------- |
 | `organization_ids` | <p>`message.required`: `true`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
+| `order` | <p>`string.in`: `[ id -id -rights rights]`</p> |
 
 ### <a name="ttn.lorawan.v3.ListOrganizationsRequest">Message `ListOrganizationsRequest`</a>
 

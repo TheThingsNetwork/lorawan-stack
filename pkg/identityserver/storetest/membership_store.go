@@ -18,6 +18,7 @@ import (
 	"sort"
 	. "testing"
 
+	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	is "go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
@@ -97,7 +98,8 @@ func (st *StoreTest) TestMembershipStoreCRUD(t *T) {
 				a, ctx := test.New(t)
 				members, err := s.FindMembers(ctx, ids)
 				if a.So(err, should.BeNil) && a.So(members, should.NotBeNil) && a.So(members, should.HaveLength, 1) {
-					for memberIDs, rights := range members {
+					for _, v := range members {
+						memberIDs, rights := v.Ids, v.Rights
 						a.So(memberIDs, should.Resemble, usr1.GetEntityIdentifiers())
 						a.So(rights, should.Resemble, someRights[ids.EntityType()])
 					}
@@ -301,8 +303,8 @@ func (st *StoreTest) TestMembershipStorePagination(t *T) {
 					a.So(got, should.HaveLength, 2)
 				}
 				gotIDs := make([]*ttnpb.OrganizationOrUserIdentifiers, 0, len(got))
-				for ids := range got {
-					gotIDs = append(gotIDs, ids)
+				for _, v := range got {
+					gotIDs = append(gotIDs, v.Ids)
 				}
 				sort.Sort(organizationOrUserIdentifiersByID(gotIDs))
 				for i, ids := range gotIDs {
@@ -311,6 +313,55 @@ func (st *StoreTest) TestMembershipStorePagination(t *T) {
 			}
 
 			a.So(total, should.Equal, 7)
+		}
+	})
+
+	t.Run("FindMembers_Ordered", func(t *T) {
+		a, ctx := test.New(t)
+
+		for _, tc := range []struct {
+			Order    string
+			Expected func(*assertions.Assertion, []*is.MemberByID)
+		}{
+			{
+				Order: "",
+				Expected: func(a *assertions.Assertion, got []*is.MemberByID) {
+					for i, elem := range got {
+						a.So(elem.Ids, should.Resemble, memberIDs[i])
+						a.So(elem.Rights, should.Resemble, &ttnpb.Rights{
+							Rights: []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_ALL},
+						})
+					}
+				},
+			},
+			{
+				Order: "id",
+				Expected: func(a *assertions.Assertion, got []*is.MemberByID) {
+					for i, elem := range got {
+						a.So(elem.Ids, should.Resemble, memberIDs[i])
+						a.So(elem.Rights, should.Resemble, &ttnpb.Rights{
+							Rights: []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_ALL},
+						})
+					}
+				},
+			},
+			{
+				Order: "-id",
+				Expected: func(a *assertions.Assertion, got []*is.MemberByID) {
+					for i, elem := range got {
+						a.So(len(memberIDs), should.Equal, len(got))
+						a.So(elem.Ids, should.Resemble, memberIDs[len(memberIDs)-1-i])
+						a.So(elem.Rights, should.Resemble, &ttnpb.Rights{
+							Rights: []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_ALL},
+						})
+					}
+				},
+			},
+		} {
+			orderCtx := store.WithOrder(ctx, tc.Order)
+			got, err := s.FindMembers(orderCtx, apps[0].GetEntityIdentifiers())
+			a.So(err, should.BeNil)
+			tc.Expected(a, got)
 		}
 	})
 

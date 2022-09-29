@@ -139,8 +139,8 @@ func (is *IdentityServer) lookupNotificationReceivers(ctx context.Context, req *
 				if err != nil {
 					return err
 				}
-				for member := range members {
-					receiverIDs = append(receiverIDs, member)
+				for _, v := range members {
+					receiverIDs = append(receiverIDs, v.Ids)
 				}
 			}
 		}
@@ -154,8 +154,8 @@ func (is *IdentityServer) lookupNotificationReceivers(ctx context.Context, req *
 			if err != nil {
 				return err
 			}
-			for member := range members {
-				receiverIDs = append(receiverIDs, member)
+			for _, v := range members {
+				receiverIDs = append(receiverIDs, v.Ids)
 			}
 		}
 
