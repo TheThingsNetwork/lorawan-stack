@@ -31,6 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (
@@ -187,7 +188,7 @@ func (tsr TimeSyncResponse) MarshalJSON() ([]byte, error) {
 // toUplinkMessage extracts fields from the Basics Station Join Request "jreq" message and converts them into an UplinkMessage for the network server.
 func (req *JoinRequest) toUplinkMessage(ids *ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
 	var up ttnpb.UplinkMessage
-	up.ReceivedAt = ttnpb.ProtoTimePtr(receivedAt)
+	up.ReceivedAt = timestamppb.New(receivedAt)
 
 	parsedMHDR := &ttnpb.MHDR{}
 	if err := lorawan.UnmarshalMHDR([]byte{byte(req.MHdr)}, parsedMHDR); err != nil {
@@ -305,7 +306,7 @@ func (req *JoinRequest) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string
 // toUplinkMessage extracts fields from the LoRa Basics Station Uplink Data Frame "updf" message and converts them into an UplinkMessage for the network server.
 func (updf *UplinkDataFrame) toUplinkMessage(ids *ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
 	var up ttnpb.UplinkMessage
-	up.ReceivedAt = ttnpb.ProtoTimePtr(receivedAt)
+	up.ReceivedAt = timestamppb.New(receivedAt)
 
 	parsedMHDR := &ttnpb.MHDR{}
 	if err := lorawan.UnmarshalMHDR([]byte{byte(updf.MHdr)}, parsedMHDR); err != nil {

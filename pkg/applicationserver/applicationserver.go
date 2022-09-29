@@ -22,7 +22,6 @@ import (
 	"runtime/trace"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/distribution"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
@@ -55,6 +54,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // ApplicationServer implements the Application Server component.
@@ -359,7 +359,7 @@ func (as *ApplicationServer) processUpAsync(ctx context.Context, up *ttnpb.Appli
 // lastSeenAtInfo holds the information needed for a worker to store entry in the LastSeen map.
 type lastSeenAtInfo struct {
 	ids        *ttnpb.EndDeviceIdentifiers
-	lastSeenAt *pbtypes.Timestamp
+	lastSeenAt *timestamppb.Timestamp
 }
 
 func (as *ApplicationServer) storeDeviceLastSeen(ctx context.Context, lastSeenEntry lastSeenAtInfo) {
@@ -1033,7 +1033,7 @@ func (as *ApplicationServer) setActivated(ctx context.Context, ids *ttnpb.EndDev
 	_, err = ttnpb.NewEndDeviceRegistryClient(cc).Update(ctx, &ttnpb.UpdateEndDeviceRequest{
 		EndDevice: &ttnpb.EndDevice{
 			Ids:         ids,
-			ActivatedAt: ttnpb.ProtoTimePtr(now),
+			ActivatedAt: timestamppb.New(now),
 		},
 		FieldMask: ttnpb.FieldMask(mask...),
 	}, as.WithClusterAuth())
@@ -1046,7 +1046,7 @@ func (as *ApplicationServer) setActivated(ctx context.Context, ids *ttnpb.EndDev
 			if dev == nil {
 				return nil, nil, errDeviceNotFound.WithAttributes("device_uid", unique.ID(ctx, ids))
 			}
-			dev.ActivatedAt = ttnpb.ProtoTimePtr(now)
+			dev.ActivatedAt = timestamppb.New(now)
 			return dev, mask, nil
 		},
 	); err != nil {
@@ -1089,7 +1089,7 @@ func (as *ApplicationServer) publishNormalizedUplink(ctx context.Context, info u
 
 type uplinkInfo struct {
 	ids        *ttnpb.EndDeviceIdentifiers
-	receivedAt *pbtypes.Timestamp
+	receivedAt *timestamppb.Timestamp
 	uplink     *ttnpb.ApplicationUplink
 	simulated  bool
 	link       *ttnpb.ApplicationLink

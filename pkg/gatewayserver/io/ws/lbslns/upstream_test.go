@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type message interface {
@@ -218,7 +219,7 @@ func TestJoinRequest(t *testing.T) {
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
 						GatewayIds:  gtwID,
-						Time:        ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
+						Time:        timestamppb.New(time.Unix(1548059982, 0)),
 						Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
 						Rssi:        89,
 						ChannelRssi: 89,
@@ -227,7 +228,7 @@ func TestJoinRequest(t *testing.T) {
 				},
 				Settings: &ttnpb.TxSettings{
 					Frequency: 868300000,
-					Time:      ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
+					Time:      timestamppb.New(time.Unix(1548059982, 0)),
 					Timestamp: (uint32)(12666373963464220 & 0xFFFFFFFF),
 					DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
@@ -336,7 +337,7 @@ func TestUplinkDataFrame(t *testing.T) {
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
 						GatewayIds:  gtwID,
-						Time:        ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
+						Time:        timestamppb.New(time.Unix(1548059982, 0)),
 						Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
 						Rssi:        89,
 						ChannelRssi: 89,
@@ -345,7 +346,7 @@ func TestUplinkDataFrame(t *testing.T) {
 				},
 				Settings: &ttnpb.TxSettings{
 					Timestamp: (uint32)(12666373963464220 & 0xFFFFFFFF),
-					Time:      ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
+					Time:      timestamppb.New(time.Unix(1548059982, 0)),
 					Frequency: 868300000,
 					DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
@@ -400,7 +401,7 @@ func TestUplinkDataFrame(t *testing.T) {
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
 						GatewayIds:  gtwID,
-						Time:        ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
+						Time:        timestamppb.New(time.Unix(1548059982, 0)),
 						Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
 						Rssi:        89,
 						ChannelRssi: 89,
@@ -410,7 +411,7 @@ func TestUplinkDataFrame(t *testing.T) {
 				Settings: &ttnpb.TxSettings{
 					Frequency: 868300000,
 					Timestamp: (uint32)(12666373963464220 & 0xFFFFFFFF),
-					Time:      ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
+					Time:      timestamppb.New(time.Unix(1548059982, 0)),
 					DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
@@ -494,7 +495,7 @@ func TestFromUplinkDataFrame(t *testing.T) {
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
 						GatewayIds: &gtwID,
-						Time:       ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
+						Time:       timestamppb.New(time.Unix(1548059982, 0)),
 						Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
 						Rssi:       89,
 						Snr:        9.25,
@@ -593,7 +594,7 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
 						GatewayIds: &gtwID,
-						Time:       ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
+						Time:       timestamppb.New(time.Unix(1548059982, 0)),
 						Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
 						Rssi:       89,
 						Snr:        9.25,

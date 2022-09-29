@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // TimestampDownlinkMessage encapsulates the information used for downlinks
@@ -161,7 +162,7 @@ func (dnmsg *DownlinkMessage) ToDownlinkMessage(bandID string) (*ttnpb.DownlinkM
 		}
 		down.GetScheduled().DataRate = bandDR.Rate
 		down.GetScheduled().Frequency = uint64(dnmsg.Freq)
-		down.GetScheduled().Time = ttnpb.ProtoTimePtr(ws.TimeFromGPSTime(dnmsg.GPSTime))
+		down.GetScheduled().Time = timestamppb.New(ws.TimeFromGPSTime(dnmsg.GPSTime))
 	default:
 		panic("unreachable")
 	}

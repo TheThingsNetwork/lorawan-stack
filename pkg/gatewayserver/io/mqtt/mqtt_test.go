@@ -39,6 +39,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (
@@ -229,7 +230,7 @@ func TestTraffic(t *testing.T) {
 			{
 				Topic: fmt.Sprintf("v3/%v/status", registeredGatewayUID),
 				Message: &ttnpb.GatewayStatus{
-					Time: ttnpb.ProtoTimePtr(time.Now()),
+					Time: timestamppb.Now(),
 					Ip:   []string{"1.1.1.1"},
 				},
 				OK: true,

@@ -34,6 +34,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/validate"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (
@@ -237,7 +238,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		return nil, err
 	}
 	req.User.Password = hashedPassword
-	req.User.PasswordUpdatedAt = ttnpb.ProtoTimePtr(time.Now())
+	req.User.PasswordUpdatedAt = timestamppb.Now()
 
 	if req.User.ProfilePicture != nil {
 		if err = is.processUserProfilePicture(ctx, req.User); err != nil {
@@ -447,11 +448,11 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 		req.User.TemporaryPassword = hashedTemporaryPassword
 		now := time.Now()
 		if !ttnpb.HasAnyField(req.FieldMask.GetPaths(), "temporary_password_created_at") {
-			req.User.TemporaryPasswordCreatedAt = ttnpb.ProtoTimePtr(now)
+			req.User.TemporaryPasswordCreatedAt = timestamppb.New(now)
 			req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "temporary_password_created_at")
 		}
 		if !ttnpb.HasAnyField(req.FieldMask.GetPaths(), "temporary_password_expires_at") {
-			req.User.TemporaryPasswordExpiresAt = ttnpb.ProtoTimePtr(now.Add(36 * time.Hour))
+			req.User.TemporaryPasswordExpiresAt = timestamppb.New(now.Add(36 * time.Hour))
 			req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "temporary_password_expires_at")
 		}
 	}
@@ -630,7 +631,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 			}
 		}
 		now := time.Now()
-		usr.Password, usr.PasswordUpdatedAt, usr.RequirePasswordUpdate = hashedPassword, ttnpb.ProtoTimePtr(now), false
+		usr.Password, usr.PasswordUpdatedAt, usr.RequirePasswordUpdate = hashedPassword, timestamppb.New(now), false
 		usr, err = st.UpdateUser(ctx, usr, updateMask)
 		return err
 	})
@@ -670,7 +671,7 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 			return errTemporaryPasswordStillValid.New()
 		}
 		usr.TemporaryPassword = hashedTemporaryPassword
-		usr.TemporaryPasswordCreatedAt, usr.TemporaryPasswordExpiresAt = ttnpb.ProtoTimePtr(now), ttnpb.ProtoTimePtr(expires)
+		usr.TemporaryPasswordCreatedAt, usr.TemporaryPasswordExpiresAt = timestamppb.New(now), timestamppb.New(expires)
 		usr, err = st.UpdateUser(ctx, usr, updateTemporaryPasswordFieldMask)
 		return err
 	})

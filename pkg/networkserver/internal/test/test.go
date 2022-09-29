@@ -36,6 +36,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func init() {
@@ -418,7 +419,7 @@ func MakeUplinkMessage(conf UplinkMessageConfig) *ttnpb.UplinkMessage {
 		Payload:            conf.Payload,
 		Settings:           settings,
 		RxMetadata:         ttnpb.CloneSlice(conf.RxMetadata),
-		ReceivedAt:         ttnpb.ProtoTimePtr(conf.ReceivedAt),
+		ReceivedAt:         timestamppb.New(conf.ReceivedAt),
 		CorrelationIds:     CopyStrings(conf.CorrelationIDs),
 		DeviceChannelIndex: uint32(conf.ChannelIndex),
 		ConsumedAirtime: ttnpb.ProtoDurationPtr(

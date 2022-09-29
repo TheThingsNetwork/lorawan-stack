@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func TestScheduleAtWithBandDutyCycle(t *testing.T) {
@@ -95,7 +96,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 					},
 				},
 				Frequency: 869525000,
-				Time:      ttnpb.ProtoTimePtr(time.Unix(0, int64(100*time.Millisecond))),
+				Time:      timestamppb.New(time.Unix(0, int64(100*time.Millisecond))),
 			},
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
 			ExpectedToa: 2465792 * time.Microsecond,
@@ -137,7 +138,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 					},
 				},
 				Frequency: 869525000,
-				Time:      ttnpb.ProtoTimePtr(time.Unix(0, int64(300*time.Millisecond))),
+				Time:      timestamppb.New(time.Unix(0, int64(300*time.Millisecond))),
 			},
 			Priority:       ttnpb.TxSchedulePriority_NORMAL,
 			NPercentileRTT: durationPtr(500 * time.Millisecond),
@@ -178,7 +179,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 					},
 				},
 				Frequency: 868100000,
-				Time:      ttnpb.ProtoTimePtr(time.Unix(0, int64(1*time.Second))),
+				Time:      timestamppb.New(time.Unix(0, int64(1*time.Second))),
 			},
 			Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 			MedianRTT:      durationPtr(200 * time.Millisecond),
@@ -199,7 +200,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 					},
 				},
 				Frequency: 868100000,
-				Time:      ttnpb.ProtoTimePtr(time.Unix(0, int64(1*time.Minute))),
+				Time:      timestamppb.New(time.Unix(0, int64(1*time.Minute))),
 			},
 			Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 			ExpectedToa:    51456 * time.Microsecond,
@@ -1204,7 +1205,7 @@ func TestScheduleSyncViaUplinkToken(t *testing.T) {
 				Timestamp: 6000000,
 			},
 			UplinkToken: &ttnpb.UplinkToken{
-				ServerTime:       ttnpb.ProtoTimePtr(t),
+				ServerTime:       timestamppb.New(t),
 				Timestamp:        5000000,
 				ConcentratorTime: 5000000000,
 			},
@@ -1239,7 +1240,7 @@ func TestScheduleSyncViaUplinkToken(t *testing.T) {
 				Timestamp: 7000000,
 			},
 			UplinkToken: &ttnpb.UplinkToken{
-				ServerTime:       ttnpb.ProtoTimePtr(t),
+				ServerTime:       timestamppb.New(t),
 				Timestamp:        5000000,
 				ConcentratorTime: 5000000000,
 			},

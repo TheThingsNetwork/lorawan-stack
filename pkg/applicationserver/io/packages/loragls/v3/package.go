@@ -33,6 +33,7 @@ import (
 	urlutil "go.thethings.network/lorawan-stack/v3/pkg/util/url"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // PackageName defines the package name.
@@ -276,7 +277,7 @@ func (p *GeolocationPackage) sendServiceData(ctx context.Context, ids *ttnpb.End
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIds:   ids,
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
-		ReceivedAt:     ttnpb.ProtoTimePtr(time.Now()),
+		ReceivedAt:     timestamppb.Now(),
 		Up: &ttnpb.ApplicationUp_ServiceData{
 			ServiceData: &ttnpb.ApplicationServiceData{
 				Data:    data,
@@ -291,7 +292,7 @@ func (p *GeolocationPackage) sendLocationSolved(ctx context.Context, ids *ttnpb.
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIds:   ids,
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
-		ReceivedAt:     ttnpb.ProtoTimePtr(time.Now()),
+		ReceivedAt:     timestamppb.Now(),
 		Up: &ttnpb.ApplicationUp_LocationSolved{
 			LocationSolved: &ttnpb.ApplicationLocation{
 				Service:  fmt.Sprintf("%v-%s", PackageName, result.Algorithm()),

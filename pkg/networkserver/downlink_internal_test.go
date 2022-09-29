@@ -39,6 +39,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
@@ -265,7 +266,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				},
 				LorawanPhyVersion:       ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				FrequencyPlanId:         band.EU_863_870,
-				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(time.Unix(42, 0)),
+				LastDevStatusReceivedAt: timestamppb.New(time.Unix(42, 0)),
 			},
 			Error: errNoDownlink,
 		},
@@ -299,7 +300,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				},
 				LorawanPhyVersion:       ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				FrequencyPlanId:         band.EU_863_870,
-				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(time.Now()),
+				LastDevStatusReceivedAt: timestamppb.Now(),
 				Session:                 generateSession(),
 			},
 			Error: errNoDownlink,
@@ -1307,7 +1308,7 @@ func generateSession() *ttnpb.Session {
 		LastFCntUp:                 randomVal,
 		LastNFCntDown:              randomVal,
 		LastAFCntDown:              randomVal,
-		StartedAt:                  ttnpb.ProtoTimePtr(time.Now()),
+		StartedAt:                  timestamppb.Now(),
 		QueuedApplicationDownlinks: queuedDownlinks,
 	}
 }

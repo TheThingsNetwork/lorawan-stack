@@ -43,6 +43,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 	"gopkg.in/square/go-jose.v2"
 )
@@ -129,7 +130,7 @@ func TestForwarder(t *testing.T) {
 				GatewayMessage: &ttnpb.GatewayUplinkMessage{
 					Message: &ttnpb.UplinkMessage{
 						RawPayload: []byte{0x40, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
-						ReceivedAt: ttnpb.ProtoTimePtr(receivedAt),
+						ReceivedAt: timestamppb.New(receivedAt),
 						RxMetadata: []*ttnpb.RxMetadata{
 							{
 								GatewayIds: &ttnpb.GatewayIdentifiers{
@@ -176,7 +177,7 @@ func TestForwarder(t *testing.T) {
 								Hash: []byte{0xc7, 0x4a, 0x72, 0x7c, 0xe5, 0x01, 0xe9, 0xc1, 0x20, 0x6b, 0xb2, 0x81, 0x82, 0xeb, 0x06, 0x91, 0x7f, 0x94, 0x43, 0x54, 0x30, 0x90, 0x78, 0x0f, 0x3a, 0x39, 0x3d, 0xeb, 0xad, 0x91, 0xad, 0x96},
 							},
 						},
-						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
+						ForwarderReceiveTime: timestamppb.New(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC)),
 						DataRate:             packetbroker.NewLoRaDataRate(7, 125000, band.Cr4_5),
 						Frequency:            869525000,
 						GatewayMetadata: &packetbroker.UplinkMessage_GatewayMetadata{
@@ -253,7 +254,7 @@ func TestForwarder(t *testing.T) {
 				GatewayMessage: &ttnpb.GatewayUplinkMessage{
 					Message: &ttnpb.UplinkMessage{
 						RawPayload: []byte{0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42, 0x22, 0x11, 0x1, 0x2, 0x3, 0x4},
-						ReceivedAt: ttnpb.ProtoTimePtr(receivedAt),
+						ReceivedAt: timestamppb.New(receivedAt),
 						RxMetadata: []*ttnpb.RxMetadata{
 							{
 								GatewayIds: &ttnpb.GatewayIdentifiers{
@@ -295,7 +296,7 @@ func TestForwarder(t *testing.T) {
 								Hash: []byte{0xc7, 0x4a, 0x72, 0x7c, 0xe5, 0x01, 0xe9, 0xc1, 0x20, 0x6b, 0xb2, 0x81, 0x82, 0xeb, 0x06, 0x91, 0x7f, 0x94, 0x43, 0x54, 0x30, 0x90, 0x78, 0x0f, 0x3a, 0x39, 0x3d, 0xeb, 0xad, 0x91, 0xad, 0x96},
 							},
 						},
-						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
+						ForwarderReceiveTime: timestamppb.New(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC)),
 						DataRate:             packetbroker.NewLoRaDataRate(9, 125000, band.Cr4_5),
 						Frequency:            868300000,
 						GatewayMetadata: &packetbroker.UplinkMessage_GatewayMetadata{
@@ -577,7 +578,7 @@ func TestHomeNetwork(t *testing.T) {
 							},
 						},
 						DataRate:             packetbroker.NewLoRaDataRate(7, 125000, band.Cr4_5),
-						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
+						ForwarderReceiveTime: timestamppb.New(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC)),
 						Frequency:            869525000,
 						CodingRate:           band.Cr4_5,
 						GatewayMetadata: &packetbroker.UplinkMessage_GatewayMetadata{
@@ -751,7 +752,7 @@ func TestHomeNetwork(t *testing.T) {
 							},
 						},
 						DataRate:             packetbroker.NewLoRaDataRate(9, 125000, band.Cr4_5),
-						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
+						ForwarderReceiveTime: timestamppb.New(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC)),
 						Frequency:            869525000,
 						CodingRate:           band.Cr4_5,
 						GatewayMetadata: &packetbroker.UplinkMessage_GatewayMetadata{

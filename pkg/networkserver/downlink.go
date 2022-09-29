@@ -39,6 +39,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/lora"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // DownlinkTaskQueue represents an entity, that holds downlink tasks sorted by timestamp.
@@ -1356,12 +1357,12 @@ func recordDataDownlink(dev *ttnpb.EndDevice, genState generateDownlinkState, ne
 	if genState.ApplicationDownlink == nil || macspec.UseSharedFCntDown(dev.MacState.LorawanVersion) && macPayload.FullFCnt > dev.Session.LastNFCntDown {
 		dev.Session.LastNFCntDown = macPayload.FullFCnt
 	}
-	dev.MacState.LastDownlinkAt = ttnpb.ProtoTimePtr(down.TransmitAt)
+	dev.MacState.LastDownlinkAt = timestamppb.New(down.TransmitAt)
 	if needsMACAnswer || down.Message.Payload.MHdr.MType == ttnpb.MType_CONFIRMED_DOWN {
-		dev.MacState.LastConfirmedDownlinkAt = ttnpb.ProtoTimePtr(down.TransmitAt)
+		dev.MacState.LastConfirmedDownlinkAt = timestamppb.New(down.TransmitAt)
 	}
 	if class := down.Message.GetRequest().GetClass(); class == ttnpb.Class_CLASS_B || class == ttnpb.Class_CLASS_C {
-		dev.MacState.LastNetworkInitiatedDownlinkAt = ttnpb.ProtoTimePtr(down.TransmitAt)
+		dev.MacState.LastNetworkInitiatedDownlinkAt = timestamppb.New(down.TransmitAt)
 	}
 
 	if genState.ApplicationDownlink != nil && genState.ApplicationDownlink.Confirmed {
@@ -1661,7 +1662,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 
 	case slot.Time.After(time.Now()):
 		log.FromContext(ctx).Debug("Slot starts in the future, set absolute time in downlink request")
-		absTime = ttnpb.ProtoTimePtr(slot.Time)
+		absTime = timestamppb.New(slot.Time)
 
 	case slot.Class == ttnpb.Class_CLASS_B:
 		log.FromContext(ctx).Error("Class B ping slot expired, retry downlink attempt")

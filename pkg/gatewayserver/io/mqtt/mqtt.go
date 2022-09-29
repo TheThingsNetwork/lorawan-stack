@@ -37,6 +37,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const qosDownlink byte = 0
@@ -246,7 +247,7 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 			logger.WithError(err).Warn("Failed to unmarshal uplink message")
 			return
 		}
-		up.ReceivedAt = ttnpb.ProtoTimePtr(pkt.Received)
+		up.ReceivedAt = timestamppb.New(pkt.Received)
 		if err := c.io.HandleUp(up, nil); err != nil {
 			logger.WithError(err).Warn("Failed to handle uplink message")
 		}

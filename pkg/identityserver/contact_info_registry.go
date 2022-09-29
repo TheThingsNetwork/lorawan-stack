@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (
@@ -89,8 +90,8 @@ func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids 
 					Id:        id,
 					Token:     key,
 					Entity:    ids,
-					CreatedAt: ttnpb.ProtoTimePtr(now),
-					ExpiresAt: ttnpb.ProtoTimePtr(expires),
+					CreatedAt: timestamppb.New(now),
+					ExpiresAt: timestamppb.New(expires),
 				}
 				emailValidations[info.Value] = validation
 			}
@@ -147,7 +148,7 @@ func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids 
 		Id:          id,
 		Entity:      ids,
 		ContactInfo: pendingContactInfo,
-		CreatedAt:   ttnpb.ProtoTimePtr(now),
+		CreatedAt:   timestamppb.New(now),
 	}, nil
 }
 

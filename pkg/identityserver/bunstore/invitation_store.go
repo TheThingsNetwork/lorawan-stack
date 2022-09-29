@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // Invitation is the invitation model in the database.
@@ -56,8 +57,8 @@ func invitationToPB(m *Invitation) (*ttnpb.Invitation, error) {
 		Email:      m.Email,
 		Token:      m.Token,
 		ExpiresAt:  ttnpb.ProtoTime(m.ExpiresAt),
-		CreatedAt:  ttnpb.ProtoTimePtr(m.CreatedAt),
-		UpdatedAt:  ttnpb.ProtoTimePtr(m.UpdatedAt),
+		CreatedAt:  timestamppb.New(m.CreatedAt),
+		UpdatedAt:  timestamppb.New(m.UpdatedAt),
 		AcceptedAt: ttnpb.ProtoTime(m.AcceptedAt),
 	}
 	if m.AcceptedBy != nil {

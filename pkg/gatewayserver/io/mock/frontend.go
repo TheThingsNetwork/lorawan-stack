@@ -21,6 +21,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // Frontend is a mock front-end.
@@ -57,9 +58,9 @@ func ConnectFrontend(ctx context.Context, ids *ttnpb.GatewayIdentifiers, server 
 				return
 			case up := <-f.Up:
 				gatewayTime := time.Unix(0, 0).Add(time.Since(started))
-				up.ReceivedAt = ttnpb.ProtoTimePtr(time.Now())
+				up.ReceivedAt = timestamppb.Now()
 				for _, md := range up.RxMetadata {
-					md.GpsTime = ttnpb.ProtoTimePtr(gatewayTime)
+					md.GpsTime = timestamppb.New(gatewayTime)
 				}
 				conn.HandleUp(up, nil)
 			case status := <-f.Status:

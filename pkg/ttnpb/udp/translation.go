@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/datarate"
 	"go.thethings.network/lorawan-stack/v3/pkg/version"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
@@ -206,14 +207,14 @@ func convertUplink(rx RxPacket, md UpstreamMetadata) (*ttnpb.UplinkMessage, erro
 		goTime = time.Time(*rx.Time)
 	}
 	if !goTime.IsZero() {
-		protoTime := ttnpb.ProtoTimePtr(goTime)
+		protoTime := timestamppb.New(goTime)
 		for _, md := range up.RxMetadata {
 			md.Time = protoTime
 		}
 		up.Settings.Time = protoTime
 	}
 	if !goGpsTime.IsZero() {
-		protoTime := ttnpb.ProtoTimePtr(goGpsTime)
+		protoTime := timestamppb.New(goGpsTime)
 		for _, md := range up.RxMetadata {
 			md.GpsTime = protoTime
 		}
@@ -285,9 +286,9 @@ func convertStatus(stat Stat, md UpstreamMetadata) *ttnpb.GatewayStatus {
 		}
 	}
 
-	status.Time = ttnpb.ProtoTimePtr(time.Time(stat.Time))
+	status.Time = timestamppb.New(time.Time(stat.Time))
 	if stat.Boot != nil {
-		status.BootTime = ttnpb.ProtoTimePtr(time.Time(*stat.Boot))
+		status.BootTime = timestamppb.New(time.Time(*stat.Boot))
 	}
 
 	addVersions(status, stat)
@@ -373,7 +374,7 @@ func ToDownlinkMessage(tx *TxPacket) (*ttnpb.DownlinkMessage, error) {
 	}
 	if tx.Time != nil {
 		t := gpstime.Parse(time.Duration(*tx.Tmms) * time.Millisecond)
-		scheduled.Time = ttnpb.ProtoTimePtr(t)
+		scheduled.Time = timestamppb.New(t)
 	}
 	buf, err := base64.RawStdEncoding.DecodeString(strings.TrimRight(tx.Data, "="))
 	if err != nil {

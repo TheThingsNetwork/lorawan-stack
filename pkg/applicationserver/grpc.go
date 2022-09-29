@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func removeDeprecatedPaths(ctx context.Context, fieldMask *fieldmaskpb.FieldMask) *fieldmaskpb.FieldMask {
@@ -139,7 +140,7 @@ func (as *ApplicationServer) HandleUplink(ctx context.Context, req *ttnpb.NsAsHa
 		return nil, err
 	}
 	for _, up := range req.ApplicationUps {
-		up.ReceivedAt = ttnpb.ProtoTimePtr(now)
+		up.ReceivedAt = timestamppb.New(now)
 		if err := as.processUp(ctx, up, link); err != nil {
 			return nil, err
 		}

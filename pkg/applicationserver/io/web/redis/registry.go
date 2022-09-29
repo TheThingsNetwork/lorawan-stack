@@ -26,6 +26,7 @@ import (
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (
@@ -174,7 +175,7 @@ func (r WebhookRegistry) Set(ctx context.Context, ids *ttnpb.ApplicationWebhookI
 				pb = &ttnpb.ApplicationWebhook{}
 			}
 
-			pb.UpdatedAt = ttnpb.ProtoTimePtr(time.Now())
+			pb.UpdatedAt = timestamppb.Now()
 			sets = append(append(sets[:0:0], sets...),
 				"updated_at",
 			)

@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func TestEntityAccess(t *testing.T) {
@@ -54,7 +55,7 @@ func TestEntityAccess(t *testing.T) {
 	adminUsrCreds := rpcCreds(adminUsrKey)
 
 	expiredKey, storedKey := p.NewAPIKey(adminUsr.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
-	storedKey.ExpiresAt = ttnpb.ProtoTimePtr(time.Now().Add(-10 * time.Minute))
+	storedKey.ExpiresAt = timestamppb.New(time.Now().Add(-10 * time.Minute))
 	expiredCreds := rpcCreds(expiredKey)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {

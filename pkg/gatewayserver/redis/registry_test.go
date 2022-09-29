@@ -23,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var Timeout = 10 * test.Delay
@@ -55,11 +56,11 @@ func TestRegistry(t *testing.T) {
 
 	now := time.Now().UTC()
 	initialStats := &ttnpb.GatewayConnectionStats{
-		ConnectedAt:            ttnpb.ProtoTimePtr(now),
+		ConnectedAt:            timestamppb.New(now),
 		Protocol:               "dummy",
-		LastDownlinkReceivedAt: ttnpb.ProtoTimePtr(now),
+		LastDownlinkReceivedAt: timestamppb.New(now),
 		DownlinkCount:          1,
-		LastUplinkReceivedAt:   ttnpb.ProtoTimePtr(now),
+		LastUplinkReceivedAt:   timestamppb.New(now),
 		UplinkCount:            1,
 	}
 
@@ -135,7 +136,7 @@ func TestRegistry(t *testing.T) {
 	t.Run("SetWithTTL", func(t *testing.T) {
 		a, ctx := test.New(t)
 		stats := &ttnpb.GatewayConnectionStats{
-			DisconnectedAt: ttnpb.ProtoTimePtr(time.Date(2021, 12, 2, 11, 24, 58, 0, time.UTC)),
+			DisconnectedAt: timestamppb.New(time.Date(2021, 12, 2, 11, 24, 58, 0, time.UTC)),
 		}
 
 		err := registry.Set(ctx, ids, stats, []string{"disconnected_at"}, Timeout)
@@ -158,7 +159,7 @@ func TestRegistry(t *testing.T) {
 		a, ctx := test.New(t)
 
 		stats := &ttnpb.GatewayConnectionStats{
-			LastUplinkReceivedAt: ttnpb.ProtoTimePtr(now),
+			LastUplinkReceivedAt: timestamppb.New(now),
 			UplinkCount:          1,
 			DownlinkCount:        1,
 		}
@@ -171,7 +172,7 @@ func TestRegistry(t *testing.T) {
 		retrieved, err := registry.Get(ctx, ids)
 		a.So(err, should.BeNil)
 		a.So(retrieved, should.Resemble, &ttnpb.GatewayConnectionStats{
-			LastUplinkReceivedAt: ttnpb.ProtoTimePtr(now),
+			LastUplinkReceivedAt: timestamppb.New(now),
 			UplinkCount:          1,
 		})
 
@@ -181,7 +182,7 @@ func TestRegistry(t *testing.T) {
 		retrieved, err = registry.Get(ctx, ids)
 		a.So(err, should.BeNil)
 		a.So(retrieved, should.Resemble, &ttnpb.GatewayConnectionStats{
-			LastUplinkReceivedAt: ttnpb.ProtoTimePtr(now),
+			LastUplinkReceivedAt: timestamppb.New(now),
 			UplinkCount:          1,
 			DownlinkCount:        1,
 		})

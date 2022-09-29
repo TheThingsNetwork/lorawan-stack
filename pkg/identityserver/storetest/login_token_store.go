@@ -23,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (st *StoreTest) TestLoginTokenStore(t *T) {
@@ -50,7 +51,7 @@ func (st *StoreTest) TestLoginTokenStore(t *T) {
 		created, err = s.CreateLoginToken(ctx, &ttnpb.LoginToken{
 			UserIds:   usr1.GetIds(),
 			Token:     "TOKEN",
-			ExpiresAt: ttnpb.ProtoTimePtr(start.Add(5 * time.Minute)),
+			ExpiresAt: timestamppb.New(start.Add(5 * time.Minute)),
 		})
 
 		if a.So(err, should.BeNil) && a.So(created, should.NotBeNil) {
@@ -113,7 +114,7 @@ func (st *StoreTest) TestLoginTokenStore(t *T) {
 		_, err := s.CreateLoginToken(ctx, &ttnpb.LoginToken{
 			UserIds:   usr1.GetIds(),
 			Token:     "EXPIRED_TOKEN",
-			ExpiresAt: ttnpb.ProtoTimePtr(start.Add(-1 * time.Minute)),
+			ExpiresAt: timestamppb.New(start.Add(-1 * time.Minute)),
 		})
 		if !a.So(err, should.BeNil) {
 			t.FailNow()

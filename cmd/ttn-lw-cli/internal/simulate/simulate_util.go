@@ -17,12 +17,11 @@ package simulate
 
 import (
 	"strings"
-	"time"
 
-	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func _processPaths(paths []string) map[string][]string {
@@ -61,11 +60,10 @@ var (
 //nolint:gocyclo
 func (m *SimulateMetadataParams) SetDefaults() error {
 	if m.Time == nil || (m.Time.Nanos == 0 && m.Time.Seconds == 0) {
-		now := time.Now()
-		m.Time = ttnpb.ProtoTime(&now)
+		m.Time = timestamppb.Now()
 	}
 
-	timestamp, _ := types.TimestampFromProto(m.Time)
+	timestamp := m.Time.AsTime()
 	if m.Timestamp == 0 {
 		m.Timestamp = uint32(timestamp.UnixNano() / 1000)
 	}

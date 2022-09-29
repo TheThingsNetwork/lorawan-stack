@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // User is the user model in the database.
@@ -79,8 +80,8 @@ func userToPB(m *User, fieldMask ...string) (*ttnpb.User, error) {
 			UserId: m.Account.UID,
 		},
 
-		CreatedAt: ttnpb.ProtoTimePtr(m.CreatedAt),
-		UpdatedAt: ttnpb.ProtoTimePtr(m.UpdatedAt),
+		CreatedAt: timestamppb.New(m.CreatedAt),
+		UpdatedAt: timestamppb.New(m.UpdatedAt),
 		DeletedAt: ttnpb.ProtoTime(m.DeletedAt),
 
 		Name:        m.Name,
@@ -90,7 +91,7 @@ func userToPB(m *User, fieldMask ...string) (*ttnpb.User, error) {
 		PrimaryEmailAddressValidatedAt: ttnpb.ProtoTime(m.PrimaryEmailAddressValidatedAt),
 
 		Password:              m.Password,
-		PasswordUpdatedAt:     ttnpb.ProtoTimePtr(m.PasswordUpdatedAt),
+		PasswordUpdatedAt:     timestamppb.New(m.PasswordUpdatedAt),
 		RequirePasswordUpdate: m.RequirePasswordUpdate,
 
 		State:            ttnpb.State(m.State),

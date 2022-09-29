@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var endDeviceMask = fieldMask(
@@ -85,7 +86,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 	}
 	start := time.Now().Truncate(time.Second)
 	claim := &ttnpb.EndDeviceAuthenticationCode{
-		ValidFrom: ttnpb.ProtoTimePtr(start),
+		ValidFrom: timestamppb.New(start),
 		Value:     "secret",
 	}
 	var created *ttnpb.EndDevice
@@ -124,7 +125,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 				"wifi": wifiLocation,
 			},
 			Picture:                 picture,
-			ActivatedAt:             ttnpb.ProtoTimePtr(stamp),
+			ActivatedAt:             timestamppb.New(stamp),
 			ClaimAuthenticationCode: claim,
 		})
 
@@ -287,8 +288,8 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 		VendorProfileId: 2,
 	}
 	updatedCAC := &ttnpb.EndDeviceAuthenticationCode{
-		ValidFrom: ttnpb.ProtoTimePtr(start),
-		ValidTo:   ttnpb.ProtoTimePtr(start.Add(time.Hour)),
+		ValidFrom: timestamppb.New(start),
+		ValidTo:   timestamppb.New(start.Add(time.Hour)),
 		Value:     "other secret",
 	}
 	var updated *ttnpb.EndDevice
@@ -325,8 +326,8 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 				"geo": extraLocation,
 			},
 			Picture:                 updatedPicture,
-			ActivatedAt:             ttnpb.ProtoTimePtr(stamp),
-			LastSeenAt:              ttnpb.ProtoTimePtr(stamp),
+			ActivatedAt:             timestamppb.New(stamp),
+			LastSeenAt:              timestamppb.New(stamp),
 			ClaimAuthenticationCode: updatedCAC,
 		}
 
@@ -538,9 +539,9 @@ func (st *StoreTest) TestEndDeviceBatchUpdate(t *T) {
 		a, ctx := test.New(t)
 
 		validDevTime := time.Now().Truncate(time.Millisecond)
-		dev1.LastSeenAt = ttnpb.ProtoTimePtr(validDevTime)
-		dev2.LastSeenAt = ttnpb.ProtoTimePtr(validDevTime)
-		dev3.LastSeenAt = ttnpb.ProtoTimePtr(validDevTime.Add(10 * time.Second))
+		dev1.LastSeenAt = timestamppb.New(validDevTime)
+		dev2.LastSeenAt = timestamppb.New(validDevTime)
+		dev3.LastSeenAt = timestamppb.New(validDevTime.Add(10 * time.Second))
 
 		batch := []*ttnpb.BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate{
 			{Ids: dev1.Ids, LastSeenAt: dev1.LastSeenAt},
@@ -556,18 +557,18 @@ func (st *StoreTest) TestEndDeviceBatchUpdate(t *T) {
 			for _, dev := range got {
 				a.So(dev.LastSeenAt, should.NotBeNil)
 				if dev.Ids.DeviceId == dev1.Ids.DeviceId {
-					a.So(dev.LastSeenAt, should.Resemble, ttnpb.ProtoTimePtr(validDevTime))
+					a.So(dev.LastSeenAt, should.Resemble, timestamppb.New(validDevTime))
 				} else if dev.Ids.DeviceId == dev2.Ids.DeviceId {
-					a.So(dev.LastSeenAt, should.Resemble, ttnpb.ProtoTimePtr(validDevTime))
+					a.So(dev.LastSeenAt, should.Resemble, timestamppb.New(validDevTime))
 				} else if dev.Ids.DeviceId == dev3.Ids.DeviceId {
-					a.So(dev.LastSeenAt, should.Resemble, ttnpb.ProtoTimePtr(validDevTime.Add(10*time.Second)))
+					a.So(dev.LastSeenAt, should.Resemble, timestamppb.New(validDevTime.Add(10*time.Second)))
 				}
 			}
 		}
 
-		invalidDev1Time := ttnpb.ProtoTimePtr(time.Now().Add(-10 * time.Minute).Truncate(time.Millisecond))
-		invalidDev2Time := ttnpb.ProtoTimePtr(time.Now().Add(-5 * time.Minute).Truncate(time.Millisecond))
-		invalidDev3Time := ttnpb.ProtoTimePtr(time.Now().Add(-1 * time.Minute).Truncate(time.Millisecond))
+		invalidDev1Time := timestamppb.New(time.Now().Add(-10 * time.Minute).Truncate(time.Millisecond))
+		invalidDev2Time := timestamppb.New(time.Now().Add(-5 * time.Minute).Truncate(time.Millisecond))
+		invalidDev3Time := timestamppb.New(time.Now().Add(-1 * time.Minute).Truncate(time.Millisecond))
 		dev1.LastSeenAt = invalidDev1Time
 		dev2.LastSeenAt = invalidDev2Time
 		dev3.LastSeenAt = invalidDev3Time
@@ -586,11 +587,11 @@ func (st *StoreTest) TestEndDeviceBatchUpdate(t *T) {
 			for _, dev := range got {
 				a.So(dev.LastSeenAt, should.NotBeNil)
 				if dev.Ids.DeviceId == dev1.Ids.DeviceId {
-					a.So(dev.LastSeenAt, should.Resemble, ttnpb.ProtoTimePtr(validDevTime))
+					a.So(dev.LastSeenAt, should.Resemble, timestamppb.New(validDevTime))
 				} else if dev.Ids.DeviceId == dev2.Ids.DeviceId {
-					a.So(dev.LastSeenAt, should.Resemble, ttnpb.ProtoTimePtr(validDevTime))
+					a.So(dev.LastSeenAt, should.Resemble, timestamppb.New(validDevTime))
 				} else if dev.Ids.DeviceId == dev3.Ids.DeviceId {
-					a.So(dev.LastSeenAt, should.Resemble, ttnpb.ProtoTimePtr(validDevTime.Add(10*time.Second)))
+					a.So(dev.LastSeenAt, should.Resemble, timestamppb.New(validDevTime.Add(10*time.Second)))
 				}
 			}
 		}
@@ -598,7 +599,7 @@ func (st *StoreTest) TestEndDeviceBatchUpdate(t *T) {
 		// Test duplicates in batch update call.
 		batch = []*ttnpb.BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate{
 			{Ids: dev1.Ids, LastSeenAt: dev1.LastSeenAt},
-			{Ids: dev1.Ids, LastSeenAt: ttnpb.ProtoTimePtr(validDevTime.Add(10 * time.Second))},
+			{Ids: dev1.Ids, LastSeenAt: timestamppb.New(validDevTime.Add(10 * time.Second))},
 		}
 
 		err = s.BatchUpdateEndDeviceLastSeen(ctx, batch)
@@ -606,7 +607,7 @@ func (st *StoreTest) TestEndDeviceBatchUpdate(t *T) {
 
 		dev, err := s.GetEndDevice(ctx, dev1.Ids, []string{"last_seen_at"})
 		if a.So(err, should.BeNil) && a.So(dev, should.NotBeNil) && a.So(dev.LastSeenAt, should.NotBeNil) {
-			a.So(dev.LastSeenAt, should.Resemble, ttnpb.ProtoTimePtr(validDevTime.Add(10*time.Second)))
+			a.So(dev.LastSeenAt, should.Resemble, timestamppb.New(validDevTime.Add(10*time.Second)))
 		}
 	})
 }

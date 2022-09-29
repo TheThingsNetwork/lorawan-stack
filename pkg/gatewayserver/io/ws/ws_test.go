@@ -49,6 +49,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (
@@ -924,7 +925,7 @@ func TestTraffic(t *testing.T) {
 							GatewayId: "eui-0101010101010101",
 							Eui:       types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01}.Bytes(),
 						},
-						Time:        ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
+						Time:        timestamppb.New(time.Unix(1548059982, 0)),
 						Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
 						Rssi:        89,
 						ChannelRssi: 89,
@@ -933,7 +934,7 @@ func TestTraffic(t *testing.T) {
 				},
 				Settings: &ttnpb.TxSettings{
 					Frequency: 868300000,
-					Time:      ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
+					Time:      timestamppb.New(time.Unix(1548059982, 0)),
 					Timestamp: (uint32)(12666373963464220 & 0xFFFFFFFF),
 					DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
@@ -1086,7 +1087,7 @@ func TestTraffic(t *testing.T) {
 						},
 						Rx1Frequency:    868100000,
 						FrequencyPlanId: test.EUFrequencyPlanID,
-						AbsoluteTime:    ttnpb.ProtoTimePtr(now.Add(30 * time.Second)),
+						AbsoluteTime:    timestamppb.New(now.Add(30 * time.Second)),
 					},
 				},
 				CorrelationIds: []string{"correlation1", "correlation2"},
@@ -1168,8 +1169,8 @@ func TestTraffic(t *testing.T) {
 						for i, md := range expectedUp.RxMetadata {
 							md.UplinkToken = up.Message.RxMetadata[i].UplinkToken
 							md.Timestamp = timestamp
-							md.Time = ttnpb.ProtoTimePtr(now)
-							md.GpsTime = ttnpb.ProtoTimePtr(now)
+							md.Time = timestamppb.New(now)
+							md.GpsTime = timestamppb.New(now)
 							md.ReceivedAt = expectedUp.ReceivedAt
 						}
 						expectedUp.Settings.Timestamp = timestamp
@@ -1207,8 +1208,8 @@ func TestTraffic(t *testing.T) {
 						for i, md := range expectedUp.RxMetadata {
 							md.UplinkToken = up.Message.RxMetadata[i].UplinkToken
 							md.Timestamp = timestamp
-							md.Time = ttnpb.ProtoTimePtr(now)
-							md.GpsTime = ttnpb.ProtoTimePtr(now)
+							md.Time = timestamppb.New(now)
+							md.GpsTime = timestamppb.New(now)
 							md.ReceivedAt = expectedUp.ReceivedAt
 						}
 						expectedUp.Settings.Timestamp = timestamp

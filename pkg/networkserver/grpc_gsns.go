@@ -40,6 +40,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"golang.org/x/exp/slices"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const (
@@ -1410,7 +1411,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	up.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 
 	registerUplinkLatency(ctx, up)
-	up.ReceivedAt = ttnpb.ProtoTimePtr(time.Now())
+	up.ReceivedAt = timestamppb.New(time.Now()) // NOTE: This is not equivalent to timestamppb.Now().
 
 	up.Payload = &ttnpb.Message{}
 	if err := lorawan.UnmarshalMessage(up.RawPayload, up.Payload); err != nil {

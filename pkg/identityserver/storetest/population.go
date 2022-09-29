@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/pbkdf2"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // EntityAPIKey is an API key for an entity.
@@ -207,7 +208,7 @@ func (p *Population) NewUser() *ttnpb.User {
 		},
 		Name:                           fmt.Sprintf("User %02d", i),
 		PrimaryEmailAddress:            fmt.Sprintf("usr-%02d@example.com", i),
-		PrimaryEmailAddressValidatedAt: ttnpb.ProtoTimePtr(now),
+		PrimaryEmailAddressValidatedAt: timestamppb.New(now),
 		State:                          ttnpb.State_STATE_APPROVED,
 	}
 	p.Users = append(p.Users, usr)

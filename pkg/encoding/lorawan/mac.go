@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gpstime"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/byteutil"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // fractStep defines (1/2)^8 second step used in DeviceTimeAns payload.
@@ -611,7 +612,7 @@ var DefaultMACCommands = MACCommandSpec{
 		UnmarshalDownlink: newMACUnmarshaler(ttnpb.MACCommandIdentifier_CID_DEVICE_TIME, "DeviceTimeAns", 5, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_DeviceTimeAns_{
 				DeviceTimeAns: &ttnpb.MACCommand_DeviceTimeAns{
-					Time: ttnpb.ProtoTimePtr(gpstime.Parse(time.Duration(byteutil.ParseUint32(b[0:4]))*time.Second + time.Duration(b[4])*fractStep)),
+					Time: timestamppb.New(gpstime.Parse(time.Duration(byteutil.ParseUint32(b[0:4]))*time.Second + time.Duration(b[4])*fractStep)),
 				},
 			}
 			return nil

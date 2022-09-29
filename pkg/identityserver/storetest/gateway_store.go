@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
@@ -56,7 +57,7 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 		Value: []byte("some bytes"),
 	}
 	claim := &ttnpb.GatewayClaimAuthenticationCode{
-		ValidFrom: ttnpb.ProtoTimePtr(start),
+		ValidFrom: timestamppb.New(start),
 		Secret:    secret,
 	}
 	var created *ttnpb.Gateway
@@ -213,8 +214,8 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 		Value: []byte("other bytes"),
 	}
 	updatedClaim := &ttnpb.GatewayClaimAuthenticationCode{
-		ValidFrom: ttnpb.ProtoTimePtr(start),
-		ValidTo:   ttnpb.ProtoTimePtr(start.Add(time.Hour)),
+		ValidFrom: timestamppb.New(start),
+		ValidTo:   timestamppb.New(start.Add(time.Hour)),
 		Secret:    secret,
 	}
 	var updated *ttnpb.Gateway

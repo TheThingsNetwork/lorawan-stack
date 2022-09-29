@@ -57,6 +57,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (
@@ -777,7 +779,7 @@ func TestGatewayServer(t *testing.T) {
 									UpdateLocation: false,
 									Up: &ttnpb.GatewayUp{
 										GatewayStatus: &ttnpb.GatewayStatus{
-											Time: ttnpb.ProtoTimePtr(time.Unix(424242, 0)),
+											Time: timestamppb.New(time.Unix(424242, 0)),
 											AntennaLocations: []*ttnpb.Location{
 												{
 													Source:    ttnpb.LocationSource_SOURCE_GPS,
@@ -797,7 +799,7 @@ func TestGatewayServer(t *testing.T) {
 									UpdateLocation: true,
 									Up: &ttnpb.GatewayUp{
 										GatewayStatus: &ttnpb.GatewayStatus{
-											Time: ttnpb.ProtoTimePtr(time.Unix(424242, 0)),
+											Time: timestamppb.New(time.Unix(424242, 0)),
 										},
 									},
 									ExpectLocation: &ttnpb.Location{
@@ -809,7 +811,7 @@ func TestGatewayServer(t *testing.T) {
 									UpdateLocation: true,
 									Up: &ttnpb.GatewayUp{
 										GatewayStatus: &ttnpb.GatewayStatus{
-											Time: ttnpb.ProtoTimePtr(time.Unix(42424242, 0)),
+											Time: timestamppb.New(time.Unix(42424242, 0)),
 											AntennaLocations: []*ttnpb.Location{
 												{
 													Source:    ttnpb.LocationSource_SOURCE_GPS,
@@ -1035,7 +1037,7 @@ func TestGatewayServer(t *testing.T) {
 								Name: "GatewayStatus",
 								Up: &ttnpb.GatewayUp{
 									GatewayStatus: &ttnpb.GatewayStatus{
-										Time: ttnpb.ProtoTimePtr(time.Unix(424242, 0)),
+										Time: timestamppb.New(time.Unix(424242, 0)),
 									},
 								},
 							},
@@ -1288,7 +1290,7 @@ func TestGatewayServer(t *testing.T) {
 										},
 									},
 									GatewayStatus: &ttnpb.GatewayStatus{
-										Time: ttnpb.ProtoTimePtr(time.Unix(4242424, 0)),
+										Time: timestamppb.New(time.Unix(4242424, 0)),
 									},
 								},
 								Forwards: []uint32{200, 300},

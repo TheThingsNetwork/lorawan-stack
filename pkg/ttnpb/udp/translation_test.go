@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/datarate"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/version"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
@@ -410,7 +411,7 @@ func TestToGatewayUpRawMultiAntenna(t *testing.T) {
 						},
 					},
 					Frequency: 868500000,
-					Time:      ttnpb.ProtoTimePtr(utcTime),
+					Time:      timestamppb.New(utcTime),
 					Timestamp: timestamp,
 				},
 				RxMetadata: []*ttnpb.RxMetadata{
@@ -420,7 +421,7 @@ func TestToGatewayUpRawMultiAntenna(t *testing.T) {
 						},
 						AntennaIndex:                0,
 						ChannelIndex:                7,
-						Time:                        ttnpb.ProtoTimePtr(utcTime),
+						Time:                        timestamppb.New(utcTime),
 						Timestamp:                   timestamp,
 						FineTimestamp:               1255738435,
 						EncryptedFineTimestamp:      []byte{0xe3, 0x64, 0x0c, 0xcc, 0xe9, 0x58, 0x49, 0x23, 0xcc, 0x31, 0xea, 0x95, 0x3e, 0xb6, 0x34, 0x7d}, //nolint:lll
@@ -438,7 +439,7 @@ func TestToGatewayUpRawMultiAntenna(t *testing.T) {
 						},
 						AntennaIndex:                1,
 						ChannelIndex:                23,
-						Time:                        ttnpb.ProtoTimePtr(utcTime),
+						Time:                        timestamppb.New(utcTime),
 						Timestamp:                   timestamp,
 						FineTimestamp:               1252538436,
 						EncryptedFineTimestamp:      []byte{0x76, 0x31, 0xa2, 0x4b, 0x33, 0x82, 0xfa, 0x00, 0x93, 0xee, 0xf4, 0x4f, 0xbf, 0xbf, 0x80, 0xb3}, //nolint:lll

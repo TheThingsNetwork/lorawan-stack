@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (
@@ -805,7 +806,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 			if err != nil {
 				return err
 			}
-			updated.UpdatedAt = ttnpb.ProtoTimePtr(time.Now())
+			updated.UpdatedAt = timestamppb.New(time.Now()) // NOTE: This is not equivalent to timestamppb.Now().
 			if stored == nil {
 				updated.CreatedAt = updated.UpdatedAt
 			}

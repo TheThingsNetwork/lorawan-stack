@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type apiKeysByID []*ttnpb.APIKey
@@ -156,7 +157,7 @@ func (st *StoreTest) TestAPIKeyStoreCRUD(t *T) {
 					Id:        id,
 					Name:      "Updated Name",
 					Rights:    allRights.GetRights(),
-					ExpiresAt: ttnpb.ProtoTimePtr(start.Add(5 * time.Minute)),
+					ExpiresAt: timestamppb.New(start.Add(5 * time.Minute)),
 				}, fieldMask("name", "rights", "expires_at"))
 				if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
 					a.So(updated.Name, should.Equal, "Updated Name")

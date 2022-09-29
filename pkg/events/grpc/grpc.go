@@ -37,6 +37,7 @@ import (
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // NewEventsServer returns a new EventsServer on the given PubSub.
@@ -150,7 +151,7 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 	if hasStore {
 		if req.After == nil && req.Tail == 0 {
 			now := time.Now()
-			req.After = ttnpb.ProtoTimePtr(now)
+			req.After = timestamppb.New(now)
 		}
 		group, ctx = errgroup.WithContext(ctx)
 		group.Go(func() error {
@@ -176,7 +177,7 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 	startEvent := &ttnpb.Event{
 		UniqueId:       events.NewCorrelationID(),
 		Name:           "events.stream.start",
-		Time:           ttnpb.ProtoTimePtr(time.Now()),
+		Time:           timestamppb.Now(),
 		Identifiers:    req.Identifiers,
 		Origin:         hostname,
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),

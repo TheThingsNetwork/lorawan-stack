@@ -33,6 +33,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"google.golang.org/grpc/peer"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // Option represents an option for the gRPC frontend.
@@ -149,7 +150,7 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) error {
 			)).Debug("Received message")
 
 			for _, up := range io.UniqueUplinkMessagesByRSSI(msg.UplinkMessages) {
-				up.ReceivedAt = ttnpb.ProtoTimePtr(now)
+				up.ReceivedAt = timestamppb.New(now)
 				if err := conn.HandleUp(up, nil); err != nil {
 					logger.WithError(err).Warn("Failed to handle uplink message")
 				}

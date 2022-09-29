@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // Application is the application model in the database.
@@ -71,8 +72,8 @@ func applicationToPB(m *Application, fieldMask ...string) (*ttnpb.Application, e
 			ApplicationId: m.ApplicationID,
 		},
 
-		CreatedAt: ttnpb.ProtoTimePtr(m.CreatedAt),
-		UpdatedAt: ttnpb.ProtoTimePtr(m.UpdatedAt),
+		CreatedAt: timestamppb.New(m.CreatedAt),
+		UpdatedAt: timestamppb.New(m.UpdatedAt),
 		DeletedAt: ttnpb.ProtoTime(m.DeletedAt),
 
 		Name:        m.Name,

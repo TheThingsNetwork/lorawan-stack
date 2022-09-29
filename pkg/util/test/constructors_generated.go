@@ -219,7 +219,7 @@ func (SessionOptionNamespace) WithLastConfFCntDown(v uint32) SessionOption {
 }
 
 // WithStartedAt returns a SessionOption, which returns a copy of ttnpb.Session with StartedAt set to v.
-func (SessionOptionNamespace) WithStartedAt(v *pbtypes.Timestamp) SessionOption {
+func (SessionOptionNamespace) WithStartedAt(v *timestamppb.Timestamp) SessionOption {
 	return func(x *ttnpb.Session) *ttnpb.Session {
 		copy := ttnpb.Clone(x)
 		copy.StartedAt = v
@@ -311,7 +311,7 @@ func (MACStateOptionNamespace) WithLorawanVersion(v ttnpb.MACVersion) MACStateOp
 }
 
 // WithLastConfirmedDownlinkAt returns a MACStateOption, which returns a copy of ttnpb.MACState with LastConfirmedDownlinkAt set to v.
-func (MACStateOptionNamespace) WithLastConfirmedDownlinkAt(v *pbtypes.Timestamp) MACStateOption {
+func (MACStateOptionNamespace) WithLastConfirmedDownlinkAt(v *timestamppb.Timestamp) MACStateOption {
 	return func(x *ttnpb.MACState) *ttnpb.MACState {
 		copy := ttnpb.Clone(x)
 		copy.LastConfirmedDownlinkAt = v
@@ -410,7 +410,7 @@ func (MACStateOptionNamespace) WithRecentDownlinks(vs ...*ttnpb.MACState_Downlin
 }
 
 // WithLastNetworkInitiatedDownlinkAt returns a MACStateOption, which returns a copy of ttnpb.MACState with LastNetworkInitiatedDownlinkAt set to v.
-func (MACStateOptionNamespace) WithLastNetworkInitiatedDownlinkAt(v *pbtypes.Timestamp) MACStateOption {
+func (MACStateOptionNamespace) WithLastNetworkInitiatedDownlinkAt(v *timestamppb.Timestamp) MACStateOption {
 	return func(x *ttnpb.MACState) *ttnpb.MACState {
 		copy := ttnpb.Clone(x)
 		copy.LastNetworkInitiatedDownlinkAt = v
@@ -446,7 +446,7 @@ func (MACStateOptionNamespace) WithRejectedFrequencies(vs ...uint64) MACStateOpt
 }
 
 // WithLastDownlinkAt returns a MACStateOption, which returns a copy of ttnpb.MACState with LastDownlinkAt set to v.
-func (MACStateOptionNamespace) WithLastDownlinkAt(v *pbtypes.Timestamp) MACStateOption {
+func (MACStateOptionNamespace) WithLastDownlinkAt(v *timestamppb.Timestamp) MACStateOption {
 	return func(x *ttnpb.MACState) *ttnpb.MACState {
 		copy := ttnpb.Clone(x)
 		copy.LastDownlinkAt = v
@@ -612,7 +612,7 @@ func (EndDeviceOptionNamespace) WithIds(v *ttnpb.EndDeviceIdentifiers) EndDevice
 }
 
 // WithCreatedAt returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with CreatedAt set to v.
-func (EndDeviceOptionNamespace) WithCreatedAt(v *pbtypes.Timestamp) EndDeviceOption {
+func (EndDeviceOptionNamespace) WithCreatedAt(v *timestamppb.Timestamp) EndDeviceOption {
 	return func(x *ttnpb.EndDevice) *ttnpb.EndDevice {
 		copy := ttnpb.Clone(x)
 		copy.CreatedAt = v
@@ -621,7 +621,7 @@ func (EndDeviceOptionNamespace) WithCreatedAt(v *pbtypes.Timestamp) EndDeviceOpt
 }
 
 // WithUpdatedAt returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with UpdatedAt set to v.
-func (EndDeviceOptionNamespace) WithUpdatedAt(v *pbtypes.Timestamp) EndDeviceOption {
+func (EndDeviceOptionNamespace) WithUpdatedAt(v *timestamppb.Timestamp) EndDeviceOption {
 	return func(x *ttnpb.EndDevice) *ttnpb.EndDevice {
 		copy := ttnpb.Clone(x)
 		copy.UpdatedAt = v
@@ -936,7 +936,7 @@ func (EndDeviceOptionNamespace) WithLastRjCount_1(v uint32) EndDeviceOption {
 }
 
 // WithLastDevStatusReceivedAt returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with LastDevStatusReceivedAt set to v.
-func (EndDeviceOptionNamespace) WithLastDevStatusReceivedAt(v *pbtypes.Timestamp) EndDeviceOption {
+func (EndDeviceOptionNamespace) WithLastDevStatusReceivedAt(v *timestamppb.Timestamp) EndDeviceOption {
 	return func(x *ttnpb.EndDevice) *ttnpb.EndDevice {
 		copy := ttnpb.Clone(x)
 		copy.LastDevStatusReceivedAt = v
@@ -1044,7 +1044,7 @@ func (EndDeviceOptionNamespace) WithSkipPayloadCryptoOverride(v *wrapperspb.Bool
 }
 
 // WithActivatedAt returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with ActivatedAt set to v.
-func (EndDeviceOptionNamespace) WithActivatedAt(v *pbtypes.Timestamp) EndDeviceOption {
+func (EndDeviceOptionNamespace) WithActivatedAt(v *timestamppb.Timestamp) EndDeviceOption {
 	return func(x *ttnpb.EndDevice) *ttnpb.EndDevice {
 		copy := ttnpb.Clone(x)
 		copy.ActivatedAt = v
@@ -1053,7 +1053,7 @@ func (EndDeviceOptionNamespace) WithActivatedAt(v *pbtypes.Timestamp) EndDeviceO
 }
 
 // WithLastSeenAt returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with LastSeenAt set to v.
-func (EndDeviceOptionNamespace) WithLastSeenAt(v *pbtypes.Timestamp) EndDeviceOption {
+func (EndDeviceOptionNamespace) WithLastSeenAt(v *timestamppb.Timestamp) EndDeviceOption {
 	return func(x *ttnpb.EndDevice) *ttnpb.EndDevice {
 		copy := ttnpb.Clone(x)
 		copy.LastSeenAt = v

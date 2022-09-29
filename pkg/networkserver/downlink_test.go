@@ -43,6 +43,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
@@ -312,15 +313,15 @@ func TestProcessDownlinkTask(t *testing.T) {
 		return true
 	})
 	setLastConfirmedDownlinkAtDiff := DeviceDiffFunc(func(_ context.Context, expected, _, _ *ttnpb.EndDevice, _ *ttnpb.DownlinkMessage, downAt time.Time) bool {
-		expected.MacState.LastConfirmedDownlinkAt = ttnpb.ProtoTimePtr(downAt)
+		expected.MacState.LastConfirmedDownlinkAt = timestamppb.New(downAt)
 		return true
 	})
 	setLastDownlinkAtDiff := DeviceDiffFunc(func(_ context.Context, expected, _, _ *ttnpb.EndDevice, _ *ttnpb.DownlinkMessage, downAt time.Time) bool {
-		expected.MacState.LastDownlinkAt = ttnpb.ProtoTimePtr(downAt)
+		expected.MacState.LastDownlinkAt = timestamppb.New(downAt)
 		return true
 	})
 	setLastNetworkInitiatedDownlinkAtDiff := DeviceDiffFunc(func(_ context.Context, expected, _, _ *ttnpb.EndDevice, _ *ttnpb.DownlinkMessage, downAt time.Time) bool {
-		expected.MacState.LastNetworkInitiatedDownlinkAt = ttnpb.ProtoTimePtr(downAt)
+		expected.MacState.LastNetworkInitiatedDownlinkAt = timestamppb.New(downAt)
 		return true
 	})
 	setPendingApplicationDownlinkDiff := DeviceDiffFunc(func(_ context.Context, expected, created, _ *ttnpb.EndDevice, _ *ttnpb.DownlinkMessage, downAt time.Time) bool {
@@ -1477,7 +1478,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								},
 							},
 							Rx2Frequency:    DefaultEU868RX2Frequency,
-							AbsoluteTime:    ttnpb.ProtoTimePtr(pingAt),
+							AbsoluteTime:    timestamppb.New(pingAt),
 							FrequencyPlanId: dev.FrequencyPlanId,
 						}
 					},
@@ -1813,7 +1814,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DevAddr:        test.DefaultDevAddr.Bytes(),
 				},
 				FrequencyPlanId:         test.EUFrequencyPlanID,
-				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(now),
+				LastDevStatusReceivedAt: timestamppb.New(now),
 				LorawanPhyVersion:       ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					ClassCTimeout:         ttnpb.ProtoDurationPtr(42 * time.Second),
@@ -1858,7 +1859,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-								AbsoluteTime: ttnpb.ProtoTimePtr(now.Add(InfrastructureDelay)),
+								AbsoluteTime: timestamppb.New(now.Add(InfrastructureDelay)),
 							},
 						},
 					},
@@ -1916,7 +1917,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								},
 							},
 							Rx2Frequency:    DefaultEU868RX2Frequency,
-							AbsoluteTime:    ttnpb.ProtoTimePtr(now.Add(InfrastructureDelay)),
+							AbsoluteTime:    timestamppb.New(now.Add(InfrastructureDelay)),
 							FrequencyPlanId: dev.FrequencyPlanId,
 						}
 					},
@@ -1996,7 +1997,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-								AbsoluteTime: ttnpb.ProtoTimePtr(now.Add(AbsoluteTimeSchedulingDelay)),
+								AbsoluteTime: timestamppb.New(now.Add(AbsoluteTimeSchedulingDelay)),
 							},
 						},
 					},
@@ -2044,7 +2045,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Class:           ttnpb.Class_CLASS_C,
 							DownlinkPaths:   paths,
 							Priority:        ttnpb.TxSchedulePriority_HIGH,
-							AbsoluteTime:    ttnpb.ProtoTimePtr(now.Add(AbsoluteTimeSchedulingDelay)),
+							AbsoluteTime:    timestamppb.New(now.Add(AbsoluteTimeSchedulingDelay)),
 							Rx2DataRate:     rx2DataRateFromIndex(dev, a, t),
 							Rx2Frequency:    dev.MacState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanId: dev.FrequencyPlanId,
@@ -2299,7 +2300,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-								AbsoluteTime: ttnpb.ProtoTimePtr(now.Add(42 * time.Hour)),
+								AbsoluteTime: timestamppb.New(now.Add(42 * time.Hour)),
 							},
 						},
 					},
@@ -2361,7 +2362,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-								AbsoluteTime: ttnpb.ProtoTimePtr(now.Add(-2)),
+								AbsoluteTime: timestamppb.New(now.Add(-2)),
 							},
 						},
 						{
@@ -2372,7 +2373,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-								AbsoluteTime: ttnpb.ProtoTimePtr(now.Add(-1)),
+								AbsoluteTime: timestamppb.New(now.Add(-1)),
 							},
 						},
 					},
@@ -2626,7 +2627,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(updated, should.Resemble, created)
 				} else {
 					expected := ttnpb.Clone(created)
-					expected.UpdatedAt = ttnpb.ProtoTimePtr(now)
+					expected.UpdatedAt = timestamppb.New(now)
 					if down != nil {
 						msg := &ttnpb.Message{}
 						test.Must(nil, lorawan.UnmarshalMessage(down.RawPayload, msg))

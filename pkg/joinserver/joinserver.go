@@ -20,7 +20,6 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/binary"
-	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	ulid "github.com/oklog/ulid/v2"
@@ -38,6 +37,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // JoinServer implements the Join Server component.
@@ -600,7 +600,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			}
 
 			dev.Session = &ttnpb.Session{
-				StartedAt: ttnpb.ProtoTimePtr(time.Now()),
+				StartedAt: timestamppb.Now(),
 				DevAddr:   req.DevAddr,
 				Keys:      sk,
 			}

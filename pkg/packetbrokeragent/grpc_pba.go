@@ -17,9 +17,7 @@ package packetbrokeragent
 import (
 	"context"
 	"strconv"
-	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	iampb "go.packetbroker.org/api/iam"
 	iampbv2 "go.packetbroker.org/api/iam/v2"
 	mappingpb "go.packetbroker.org/api/mapping/v2"
@@ -31,6 +29,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
@@ -290,7 +289,7 @@ func (s *pbaServer) ListHomeNetworkRoutingPolicies(ctx context.Context, req *ttn
 		client       = routingpb.NewPolicyManagerClient(s.cpConn)
 		netID        = s.netID.MarshalNumber()
 		tenantID     = s.tenantIDExtractor(ctx)
-		updatedSince *time.Time
+		updatedSince *timestamppb.Timestamp
 		policies     []*packetbroker.RoutingPolicy
 		total        int64
 	)
@@ -307,7 +306,7 @@ func (s *pbaServer) ListHomeNetworkRoutingPolicies(ctx context.Context, req *ttn
 			ForwarderTenantId: tenantID,
 		}
 		if updatedSince != nil {
-			req.UpdatedSince, _ = pbtypes.TimestampProto(*updatedSince)
+			req.UpdatedSince = updatedSince
 		}
 		res, err := client.ListHomeNetworkPolicies(ctx, req)
 		if err != nil {
@@ -317,11 +316,7 @@ func (s *pbaServer) ListHomeNetworkRoutingPolicies(ctx context.Context, req *ttn
 			break
 		}
 		policies = append(policies, res.GetPolicies()...)
-		t, err := pbtypes.TimestampFromProto(res.Policies[len(res.Policies)-1].GetUpdatedAt())
-		if err != nil {
-			return nil, err
-		}
-		updatedSince = &t
+		updatedSince = res.Policies[len(res.Policies)-1].GetUpdatedAt()
 		total = int64(res.Total)
 	}
 

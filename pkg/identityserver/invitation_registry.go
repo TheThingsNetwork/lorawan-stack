@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var evtCreateInvitation = events.Define(
@@ -57,7 +58,7 @@ func (is *IdentityServer) sendInvitation(ctx context.Context, in *ttnpb.SendInvi
 	invitation := &ttnpb.Invitation{
 		Email:     in.Email,
 		Token:     token,
-		ExpiresAt: ttnpb.ProtoTimePtr(expires),
+		ExpiresAt: timestamppb.New(expires),
 	}
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		invitation, err = st.CreateInvitation(ctx, invitation)

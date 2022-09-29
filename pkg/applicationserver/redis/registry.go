@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (
@@ -163,7 +164,7 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids *ttnpb.EndDeviceIdentifier
 				return errInvalidIdentifiers.New()
 			}
 
-			pb.UpdatedAt = ttnpb.ProtoTimePtr(time.Now())
+			pb.UpdatedAt = timestamppb.Now()
 			sets = append(append(sets[:0:0], sets...),
 				"updated_at",
 			)

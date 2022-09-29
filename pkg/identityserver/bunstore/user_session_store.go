@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // UserSession is the user session model in the database.
@@ -53,8 +54,8 @@ func userSessionToPB(m *UserSession, userIDs *ttnpb.UserIdentifiers) (*ttnpb.Use
 	pb := &ttnpb.UserSession{
 		UserIds:       userIDs,
 		SessionId:     m.ID,
-		CreatedAt:     ttnpb.ProtoTimePtr(m.CreatedAt),
-		UpdatedAt:     ttnpb.ProtoTimePtr(m.UpdatedAt),
+		CreatedAt:     timestamppb.New(m.CreatedAt),
+		UpdatedAt:     timestamppb.New(m.UpdatedAt),
 		ExpiresAt:     ttnpb.ProtoTime(m.ExpiresAt),
 		SessionSecret: m.SessionSecret,
 	}

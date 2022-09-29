@@ -36,6 +36,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (
@@ -2700,7 +2701,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			if st.HasSetField("session.started_at") && st.Device.GetSession().GetStartedAt() == nil ||
 				st.HasSetField("session.session_key_id") && !bytes.Equal(st.Device.GetSession().GetKeys().GetSessionKeyId(), stored.GetSession().GetKeys().GetSessionKeyId()) ||
 				stored.GetSession().GetStartedAt() == nil {
-				st.Device.Session.StartedAt = ttnpb.ProtoTimePtr(time.Now())
+				st.Device.Session.StartedAt = timestamppb.New(time.Now()) // NOTE: This is not equivalent to timestamppb.Now().
 				st.AddSetFields(
 					"session.started_at",
 				)
@@ -2830,7 +2831,7 @@ func (ns *NetworkServer) ResetFactoryDefaults(ctx context.Context, req *ttnpb.Re
 			stored.Session = &ttnpb.Session{
 				DevAddr:                    stored.Session.DevAddr,
 				Keys:                       stored.Session.Keys,
-				StartedAt:                  ttnpb.ProtoTimePtr(time.Now()),
+				StartedAt:                  timestamppb.New(time.Now()), // NOTE: This is not equivalent to timestamppb.Now().
 				QueuedApplicationDownlinks: stored.Session.QueuedApplicationDownlinks,
 			}
 		}

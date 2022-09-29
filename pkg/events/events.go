@@ -32,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
@@ -63,7 +64,7 @@ func local(evt Event) *event {
 			innerEvent: &ttnpb.Event{
 				UniqueId:       evt.UniqueID(),
 				Name:           evt.Name(),
-				Time:           ttnpb.ProtoTimePtr(t),
+				Time:           timestamppb.New(t),
 				Identifiers:    evt.Identifiers(),
 				CorrelationIds: evt.CorrelationIds(),
 				Origin:         evt.Origin(),

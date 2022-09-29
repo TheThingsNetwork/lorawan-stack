@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var registeredWebhookIDs = &ttnpb.ApplicationWebhookIdentifiers{
@@ -109,7 +110,7 @@ func TestHealthStatusRegistry(t *testing.T) {
 			Status: &ttnpb.ApplicationWebhookHealth_Unhealthy{
 				Unhealthy: &ttnpb.ApplicationWebhookHealth_WebhookHealthStatusUnhealthy{
 					FailedAttempts:           123,
-					LastFailedAttemptAt:      ttnpb.ProtoTimePtr(time.Unix(123, 234)),
+					LastFailedAttemptAt:      timestamppb.New(time.Unix(123, 234)),
 					LastFailedAttemptDetails: ttnpb.ErrorDetailsToProto(errorDetails),
 				},
 			},
@@ -124,7 +125,7 @@ func TestHealthStatusRegistry(t *testing.T) {
 		Status: &ttnpb.ApplicationWebhookHealth_Unhealthy{
 			Unhealthy: &ttnpb.ApplicationWebhookHealth_WebhookHealthStatusUnhealthy{
 				FailedAttempts:           123,
-				LastFailedAttemptAt:      ttnpb.ProtoTimePtr(time.Unix(123, 234)),
+				LastFailedAttemptAt:      timestamppb.New(time.Unix(123, 234)),
 				LastFailedAttemptDetails: ttnpb.ErrorDetailsToProto(errorDetails),
 			},
 		},
@@ -138,7 +139,7 @@ func TestHealthStatusRegistry(t *testing.T) {
 		Status: &ttnpb.ApplicationWebhookHealth_Unhealthy{
 			Unhealthy: &ttnpb.ApplicationWebhookHealth_WebhookHealthStatusUnhealthy{
 				FailedAttempts:           123,
-				LastFailedAttemptAt:      ttnpb.ProtoTimePtr(time.Unix(123, 234)),
+				LastFailedAttemptAt:      timestamppb.New(time.Unix(123, 234)),
 				LastFailedAttemptDetails: ttnpb.ErrorDetailsToProto(errorDetails),
 			},
 		},
@@ -165,7 +166,7 @@ func TestHealthStatusRegistry(t *testing.T) {
 			Status: &ttnpb.ApplicationWebhookHealth_Unhealthy{
 				Unhealthy: &ttnpb.ApplicationWebhookHealth_WebhookHealthStatusUnhealthy{
 					FailedAttempts:           123,
-					LastFailedAttemptAt:      ttnpb.ProtoTimePtr(time.Unix(123, 234)),
+					LastFailedAttemptAt:      timestamppb.New(time.Unix(123, 234)),
 					LastFailedAttemptDetails: ttnpb.ErrorDetailsToProto(errorDetails),
 				},
 			},
@@ -174,7 +175,7 @@ func TestHealthStatusRegistry(t *testing.T) {
 			Status: &ttnpb.ApplicationWebhookHealth_Unhealthy{
 				Unhealthy: &ttnpb.ApplicationWebhookHealth_WebhookHealthStatusUnhealthy{
 					FailedAttempts:           234,
-					LastFailedAttemptAt:      ttnpb.ProtoTimePtr(time.Unix(345, 567)),
+					LastFailedAttemptAt:      timestamppb.New(time.Unix(345, 567)),
 					LastFailedAttemptDetails: ttnpb.ErrorDetailsToProto(errorDetails),
 				},
 			},

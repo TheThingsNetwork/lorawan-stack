@@ -33,6 +33,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 	"gopkg.in/square/go-jose.v2"
 )
@@ -373,7 +374,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 				localization.Antennas = append(localization.Antennas, locAnt)
 			}
 
-			earlierGatewayReceiveTime := func(t *pbtypes.Timestamp) bool {
+			earlierGatewayReceiveTime := func(t *timestamppb.Timestamp) bool {
 				g := gatewayReceiveTime
 				return g == nil || t != nil && ttnpb.StdTime(t).Before(*g)
 			}
@@ -477,14 +478,11 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 			DataRate:  dataRate,
 			Frequency: msg.Message.Frequency,
 		},
-		ReceivedAt:     ttnpb.ProtoTimePtr(receivedAt),
+		ReceivedAt:     timestamppb.New(receivedAt),
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
 	}
 
-	var receiveTime *pbtypes.Timestamp
-	if t, err := pbtypes.TimestampFromProto(msg.Message.GatewayReceiveTime); err == nil {
-		receiveTime = ttnpb.ProtoTimePtr(t)
-	}
+	receiveTime := msg.Message.GatewayReceiveTime
 	if gtwMd := msg.Message.GatewayMetadata; gtwMd != nil {
 		pbMD := &ttnpb.PacketBrokerMetadata{
 			MessageId:            msg.Id,
@@ -515,12 +513,8 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 		if includeHops {
 			pbMD.Hops = make([]*ttnpb.PacketBrokerRouteHop, 0, len(msg.Hops))
 			for _, h := range msg.Hops {
-				receivedAt, err := pbtypes.TimestampFromProto(h.ReceivedAt)
-				if err != nil {
-					continue
-				}
 				pbMD.Hops = append(pbMD.Hops, &ttnpb.PacketBrokerRouteHop{
-					ReceivedAt:    ttnpb.ProtoTimePtr(receivedAt),
+					ReceivedAt:    h.ReceivedAt,
 					SenderName:    h.SenderName,
 					SenderAddress: h.SenderAddress,
 					ReceiverName:  h.ReceiverName,

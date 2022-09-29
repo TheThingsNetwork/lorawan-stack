@@ -29,6 +29,7 @@ import (
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (
@@ -241,7 +242,7 @@ func (r ApplicationPackagesRegistry) SetAssociation(ctx context.Context, ids *tt
 				pb = &ttnpb.ApplicationPackageAssociation{}
 			}
 
-			pb.UpdatedAt = ttnpb.ProtoTimePtr(time.Now())
+			pb.UpdatedAt = timestamppb.Now()
 			sets = append(append(sets[:0:0], sets...),
 				"updated_at",
 			)
@@ -447,7 +448,7 @@ func (r ApplicationPackagesRegistry) SetDefaultAssociation(ctx context.Context, 
 				pb = &ttnpb.ApplicationPackageDefaultAssociation{}
 			}
 
-			pb.UpdatedAt = ttnpb.ProtoTimePtr(time.Now())
+			pb.UpdatedAt = timestamppb.Now()
 			sets = append(append(sets[:0:0], sets...),
 				"updated_at",
 			)

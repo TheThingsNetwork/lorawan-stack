@@ -34,6 +34,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var timeout = (1 << 3) * test.Delay
@@ -128,7 +129,7 @@ func TestFlow(t *testing.T) {
 
 	{
 		frontend.Status <- &ttnpb.GatewayStatus{
-			Time: ttnpb.ProtoTimePtr(time.Now()),
+			Time: timestamppb.Now(),
 		}
 		select {
 		case <-conn.Status():
@@ -422,7 +423,7 @@ func TestFlow(t *testing.T) {
 							},
 						},
 						Rx2Frequency:    869525000,
-						AbsoluteTime:    ttnpb.ProtoTimePtr(time.Unix(100, 0)), // The mock front-end uses Unix epoch as start time.
+						AbsoluteTime:    timestamppb.New(time.Unix(100, 0)), // The mock front-end uses Unix epoch as start time.
 						FrequencyPlanId: test.EUFrequencyPlanID,
 					},
 				},
@@ -448,7 +449,7 @@ func TestFlow(t *testing.T) {
 							},
 						},
 						Rx2Frequency:    869525000,
-						AbsoluteTime:    ttnpb.ProtoTimePtr(time.Unix(100, 0)), // The mock front-end uses Unix epoch as start time.
+						AbsoluteTime:    timestamppb.New(time.Unix(100, 0)), // The mock front-end uses Unix epoch as start time.
 						FrequencyPlanId: test.EUFrequencyPlanID,
 					},
 				},

@@ -16,7 +16,6 @@ package grpc
 
 import (
 	"context"
-	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
@@ -28,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"google.golang.org/grpc/peer"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // Option represents an option for the gRPC frontend.
@@ -223,7 +223,7 @@ func (s *impl) SimulateUplink(ctx context.Context, up *ttnpb.ApplicationUp) (*em
 		return nil, errPayloadCryptoSkipped.New()
 	}
 	if up.ReceivedAt == nil {
-		up.ReceivedAt = ttnpb.ProtoTimePtr(time.Now())
+		up.ReceivedAt = timestamppb.Now()
 	}
 	up.Simulated = true
 	ids, err := s.getIdentifiers(ctx, up.EndDeviceIds)
