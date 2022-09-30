@@ -26,7 +26,7 @@ import { NsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { parseLorawanMacVersion, LORAWAN_VERSION_PAIRS } from '@console/lib/device-utils'
+import { frequencyPlanValueSetter, lorawanVersionValueSetter } from '@console/lib/device-utils'
 
 import m from '../../messages'
 
@@ -39,32 +39,6 @@ const initialValues = {
   lorawan_phy_version: '',
   frequency_plan_id: '',
   ...advancedSettingsInitialValues,
-}
-
-// Always reset LW and PHY version when changing FP do avoid invalid
-// version combinations that can otherwise occur.
-const frequencyPlanValueSetter = ({ setValues, setFieldTouched }, { value }) => {
-  setFieldTouched('lorawan_version', false)
-  setFieldTouched('lorawan_phy_version', false)
-  return setValues(values => ({
-    ...values,
-    frequency_plan_id: value,
-    lorawan_version: '',
-    lorawan_phy_version: '',
-  }))
-}
-
-// Always reset the PHY version when setting the lorawan version to avoid
-// invalid version combinations that would otherwise briefly occur until
-// the PHY version is set by the field itself.
-const lorawanVersionValueSetter = ({ setValues, setFieldTouched }, { value }) => {
-  const phyVersions = LORAWAN_VERSION_PAIRS[parseLorawanMacVersion(value)] || []
-  setFieldTouched('lorawan_phy_version', false)
-  return setValues(values => ({
-    ...values,
-    lorawan_version: value,
-    lorawan_phy_version: phyVersions.length === 1 ? phyVersions[0].value : '',
-  }))
 }
 
 const DeviceTypeManualFormSection = () => {

@@ -24,7 +24,7 @@ import Message from '@ttn-lw/lib/components/message'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { getLorawanVersionLabel, getLorawanPhyVersionLabel } from '../../../utils'
+import { getLorawanVersionLabel, getLorawanPhyVersionLabel } from '@console/lib/device-utils'
 
 import style from './device-card.styl'
 

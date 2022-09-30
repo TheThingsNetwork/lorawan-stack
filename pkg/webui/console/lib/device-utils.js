@@ -177,3 +177,60 @@ const ALL_ZERO_KEY = '0'.repeat(32)
  * @returns {boolean} - `true` if the key is non-zero, `false` otherwise.
  */
 export const isNonZeroSessionKey = key => key !== ALL_ZERO_KEY
+
+// End device profile utils.
+
+export const SELECT_OTHER_OPTION = '_other_'
+export const isOtherOption = option => option === SELECT_OTHER_OPTION
+export const hasSelectedDeviceRepositoryOther = version =>
+  version && Object.values(version).some(value => isOtherOption(value))
+
+/*
+  `hardware_version` is not required when registering an end device in the device repository, so for 
+  certain end device models it can be missing. When this is the case, we still want to allow the users
+  to select such models because `firmware_version` (that might depend on hw version) and `band_id`
+  are required. `SELECT_UNKNOWN_HW_OPTION` option represents such end devices.
+*/
+export const SELECT_UNKNOWN_HW_OPTION = '_unknown_hw_version_'
+export const isUnknownHwVersion = option => option === SELECT_UNKNOWN_HW_OPTION
+
+// End device lorawan version, phy version and frequency plan utils.
+
+export const getLorawanVersionLabel = ({ lorawan_version }) => {
+  const { label } = LORAWAN_VERSIONS.find(version => version.value === lorawan_version) || {}
+
+  return label
+}
+
+export const getLorawanPhyVersionLabel = ({ lorawan_phy_version }) => {
+  const { label } =
+    LORAWAN_PHY_VERSIONS.find(version => version.value === lorawan_phy_version) || {}
+
+  return label
+}
+
+// Always reset LW and PHY version when changing FP do avoid invalid
+// version combinations that can otherwise occur.
+export const frequencyPlanValueSetter = ({ setValues, setFieldTouched }, { value }) => {
+  setFieldTouched('lorawan_version', false)
+  setFieldTouched('lorawan_phy_version', false)
+  return setValues(values => ({
+    ...values,
+    frequency_plan_id: value,
+    lorawan_version: '',
+    lorawan_phy_version: '',
+  }))
+}
+
+// Always reset the PHY version when setting the lorawan version to avoid
+// invalid version combinations that would otherwise briefly occur until
+// the PHY version is set by the field itself.
+export const lorawanVersionValueSetter = ({ setValues, setFieldTouched }, { value }) => {
+  const phyVersions = LORAWAN_VERSION_PAIRS[parseLorawanMacVersion(value)] || []
+  setFieldTouched('lorawan_phy_version', false)
+  return setValues(values => ({
+    ...values,
+    lorawan_version: value,
+    lorawan_phy_version: phyVersions.length === 1 ? phyVersions[0].value : '',
+  }))
+}
