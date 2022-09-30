@@ -14,15 +14,23 @@
 
 import React from 'react'
 import { Col, Row } from 'react-grid-system'
+import { useSelector } from 'react-redux'
 
 import { useFormContext } from '@ttn-lw/components/form'
+
+import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import OtherHint from '@console/containers/device-profile-section/hints/other-hint'
 import VersionIdsSection from '@console/containers/device-profile-section'
 
 import { hasSelectedDeviceRepositoryOther } from '@console/lib/device-utils'
 
+import { listBrands } from '@console/store/actions/device-repository'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+
 const FallbackVersionIdsSection = () => {
+  const appId = useSelector(selectSelectedApplicationId)
   const { values } = useFormContext()
   const { version_ids } = values
   const version = version_ids
@@ -30,12 +38,14 @@ const FallbackVersionIdsSection = () => {
   const showOtherHint = hasSelectedOther
 
   return (
-    <Row>
-      <Col>
-        <VersionIdsSection />
-        {showOtherHint && <OtherHint manualGuideDocsPath="/devices/adding-devices/" />}
-      </Col>
-    </Row>
+    <RequireRequest requestAction={listBrands(appId, {}, ['name', 'lora_alliance_vendor_id'])}>
+      <Row>
+        <Col>
+          <VersionIdsSection />
+          {showOtherHint && <OtherHint manualGuideDocsPath="/devices/adding-devices/" />}
+        </Col>
+      </Row>
+    </RequireRequest>
   )
 }
 

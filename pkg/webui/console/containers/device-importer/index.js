@@ -277,15 +277,24 @@ export default class DeviceImporter extends Component {
           device.network_server_address = new URL(nsConfig.base_url).hostname
           field_mask.paths.push('network_server_address')
         }
-        if (!device.frequency_plan_id && Boolean(frequency_plan_id) && nsConfig.enabled) {
+        if (
+          !device.frequency_plan_id &&
+          Boolean(frequency_plan_id) &&
+          nsConfig.enabled &&
+          _inputMethod === 'manual'
+        ) {
           device.frequency_plan_id = frequency_plan_id
           field_mask.paths.push('frequency_plan_id')
         }
-        if (!device.lorawan_version && Boolean(lorawan_version)) {
+        if (!device.lorawan_version && Boolean(lorawan_version) && _inputMethod === 'manual') {
           device.lorawan_version = lorawan_version
           field_mask.paths.push('lorawan_version')
         }
-        if (!device.lorawan_phy_version && Boolean(lorawan_phy_version)) {
+        if (
+          !device.lorawan_phy_version &&
+          Boolean(lorawan_phy_version) &&
+          _inputMethod === 'manual'
+        ) {
           device.lorawan_phy_version = lorawan_phy_version
           field_mask.paths.push('lorawan_phy_version')
         }
