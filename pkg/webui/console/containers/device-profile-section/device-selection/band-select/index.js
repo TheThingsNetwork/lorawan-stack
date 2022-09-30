@@ -21,11 +21,11 @@ import Select from '@ttn-lw/components/select'
 import { useFormContext } from '@ttn-lw/components/form'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { SELECT_OTHER_OPTION } from '@console/lib/device-utils'
 
 import { selectDeviceModelFirmwareVersions } from '@console/store/selectors/device-repository'
-
-import { SELECT_OTHER_OPTION } from '../../../../utils'
-import messages from '../../../../messages'
 
 const m = defineMessages({
   title: 'Profile (Region)',
@@ -37,7 +37,7 @@ const formatOptions = (profiles = []) =>
       value: profile,
       label: profile,
     }))
-    .concat([{ value: SELECT_OTHER_OPTION, label: messages.otherOption }])
+    .concat([{ value: SELECT_OTHER_OPTION, label: sharedMessages.otherOption }])
 
 const BandSelect = props => {
   const { name, onChange, brandId, modelId, fwVersion, ...rest } = props

@@ -14,6 +14,7 @@
 
 import React, { useCallback, useState } from 'react'
 import { defineMessages } from 'react-intl'
+import { useFormikContext } from 'formik'
 
 import Form from '@ttn-lw/components/form'
 import FileInput from '@ttn-lw/components/file-input'
@@ -38,6 +39,8 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import { selectNsEnabled } from '@ttn-lw/lib/selectors/env'
 
+import { frequencyPlanValueSetter, lorawanVersionValueSetter } from '@console/lib/device-utils'
+
 import FallbackVersionIdsSection from './fallback-version-ids-section'
 
 import style from './device-import-form.styl'
@@ -55,9 +58,9 @@ const m = defineMessages({
     'You can use the import functionality to register multiple end devices at once by uploading a file containing the registration information in one of the available formats. For more information, see also our documentation on <DocLink>Importing End Devices</DocLink>.',
   fallbackValuesImport:
     'These values will be used in case the imported file does not provide them. They are not required, although if not provided here or in the imported file, the import of the end device will not be successful.',
-  inputMethod: 'Input Method',
   inputMethodDeviceRepo: 'Load end device profile from the LoRaWAN Device Repository',
-  inputMethodManual: 'Enter end device fallback specifics manually',
+  inputMethodManual: 'Enter LoRaWAN versions and frequency plan manually',
+  fallbackValues: 'Fallback values',
 })
 
 const validationSchema = Yup.object({
@@ -71,17 +74,16 @@ const validationSchema = Yup.object({
 
 const nsEnabled = selectNsEnabled
 
-const DeviceBulkCreateForm = props => {
-  const { initialValues, onSubmit, jsEnabled, warningSize, largeFileWarningMessage } = props
+const DeviceBulkCreateFormInner = props => {
+  const { warningSize, largeFileWarningMessage, jsEnabled } = props
+  const {
+    values: { format_id, _inputMethod, frequency_plan_id, lorawan_version },
+  } = useFormikContext()
+  const formatSelected = Boolean(format_id)
   const [allowedFileExtensions, setAllowedFileExtensions] = useState(undefined)
   const [formatDescription, setFormatDescription] = useState(undefined)
-  const [formatSelected, setFormatSelected] = useState(false)
-  const [lorawanVersion, setLorawanVersion] = useState('')
-  const [freqPlan, setFreqPlan] = useState('')
-  const [inputMethod, setInputMethod] = useState('manual')
 
   const handleSelectChange = useCallback(value => {
-    setFormatSelected(true)
     if (value && value.fileExtensions && value.fileExtensions instanceof Array) {
       setAllowedFileExtensions(value.fileExtensions.join(','))
     }
@@ -90,31 +92,8 @@ const DeviceBulkCreateForm = props => {
     }
   }, [])
 
-  const handleFreqPlanChange = useCallback(value => {
-    const { value: freqPlan } = value
-    setFreqPlan(freqPlan)
-  }, [])
-
-  const handleLorawanVersionChange = useCallback(value => {
-    setLorawanVersion(value)
-  }, [])
-
-  const handleInputMethodChange = useCallback(value => {
-    setInputMethod(value)
-  }, [])
-
-  let passedInitialValues = initialValues
-  if (!jsEnabled && initialValues.set_claim_auth_code) {
-    passedInitialValues = { ...initialValues, set_claim_auth_code: false }
-  }
-
   return (
-    <Form
-      onSubmit={onSubmit}
-      validationSchema={validationSchema}
-      submitEnabledWhenInvalid
-      initialValues={passedInitialValues}
-    >
+    <>
       <Message
         content={m.infoText}
         className={style.info}
@@ -142,24 +121,23 @@ const DeviceBulkCreateForm = props => {
             name="data"
             required
           />
-          <Form.SubTitle title="Fallback values" />
+          <Form.SubTitle title={m.fallbackValues} />
           <Notification small info content={m.fallbackValuesImport} />
           <Form.Field
-            title={m.inputMethod}
-            onChange={handleInputMethodChange}
+            title={sharedMessages.inputMethod}
             component={Radio.Group}
             name="_inputMethod"
           >
             <Radio label={m.inputMethodManual} value="manual" />
             <Radio label={m.inputMethodDeviceRepo} value="device-repository" />
           </Form.Field>
-          {inputMethod === 'manual' && (
+          {_inputMethod === 'manual' && (
             <>
               {nsEnabled && (
                 <NsFrequencyPlansSelect
                   tooltipId={tooltipIds.FREQUENCY_PLAN}
                   name="frequency_plan_id"
-                  onChange={handleFreqPlanChange}
+                  valueSetter={frequencyPlanValueSetter}
                 />
               )}
               <Form.Field
@@ -167,19 +145,19 @@ const DeviceBulkCreateForm = props => {
                 name="lorawan_version"
                 component={LorawanVersionInput}
                 tooltipId={tooltipIds.LORAWAN_VERSION}
-                onChange={handleLorawanVersionChange}
-                frequencyPlan={freqPlan}
+                frequencyPlan={frequency_plan_id}
+                valueSetter={lorawanVersionValueSetter}
               />
               <Form.Field
                 title={sharedMessages.phyVersion}
                 name="lorawan_phy_version"
                 component={PhyVersionInput}
                 tooltipId={tooltipIds.REGIONAL_PARAMETERS}
-                lorawanVersion={lorawanVersion}
+                lorawanVersion={lorawan_version}
               />
             </>
           )}
-          {inputMethod === 'device-repository' && <FallbackVersionIdsSection />}
+          {_inputMethod === 'device-repository' && <FallbackVersionIdsSection />}
           <Form.CollapseSection id="advanced-settings" title={m.advancedSectionTitle}>
             <Form.Field
               disabled={!jsEnabled}
@@ -195,8 +173,43 @@ const DeviceBulkCreateForm = props => {
           </SubmitBar>
         </>
       )}
+    </>
+  )
+}
+
+const DeviceBulkCreateForm = props => {
+  const { initialValues, onSubmit, jsEnabled, warningSize, largeFileWarningMessage } = props
+
+  let passedInitialValues = initialValues
+  if (!jsEnabled && initialValues.set_claim_auth_code) {
+    passedInitialValues = { ...initialValues, set_claim_auth_code: false }
+  }
+
+  return (
+    <Form
+      onSubmit={onSubmit}
+      validationSchema={validationSchema}
+      submitEnabledWhenInvalid
+      initialValues={passedInitialValues}
+    >
+      <DeviceBulkCreateFormInner
+        warningSize={warningSize}
+        largeFileWarningMessage={largeFileWarningMessage}
+        jsEnabled={jsEnabled}
+      />
     </Form>
   )
+}
+
+DeviceBulkCreateFormInner.propTypes = {
+  jsEnabled: PropTypes.bool.isRequired,
+  largeFileWarningMessage: PropTypes.message,
+  warningSize: PropTypes.number,
+}
+
+DeviceBulkCreateFormInner.defaultProps = {
+  largeFileWarningMessage: undefined,
+  warningSize: undefined,
 }
 
 DeviceBulkCreateForm.propTypes = {
