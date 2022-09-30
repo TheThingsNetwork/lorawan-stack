@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.22.0] - unreleased
+
+### Added
+
 - Add more specific rights for OAuth clients.
 
 ### Changed
@@ -23,8 +37,6 @@ For details about compatibility between different releases, see the **Commitment
 - Factory preset frequencies may now be provided for bands with fixed channel plans, such as US915 or AU915. The factory preset frequencies are interpreted as the only channels which are enabled at boot time.
 - `TxParamSetupReq` MAC command priority has been increased.
 - `DevStatusReq` MAC command priority has been lowered.
-
-### Deprecated
 
 ### Removed
 
@@ -42,8 +54,6 @@ For details about compatibility between different releases, see the **Commitment
   - Values being typed double on android phones.
 - Console showing deleted collaborator after successful deletion in application collaborator list.
 - Console crashing after deleting an organization.
-
-### Security
 
 ## [3.21.2] - 2022-09-14
 
@@ -2354,7 +2364,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.21.2...v3.21
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.22.0...v3.22
+[3.22.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.21.2...v3.22.0
 [3.21.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.21.1...v3.21.2
 [3.21.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.21.0...v3.21.1
 [3.21.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.20.2...v3.21.0
