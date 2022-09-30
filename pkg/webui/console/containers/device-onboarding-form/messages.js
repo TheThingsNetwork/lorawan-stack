@@ -58,10 +58,6 @@ export default defineMessages({
   defaultNetworksSettings: "Use network's default MAC settings",
   clusterSettings: 'Cluster settings',
   networkDefaults: 'Network defaults',
-  // Device repository messages.
-  otherOption: 'Other…',
-  typeToSearch: 'Type to search…',
-  unknownHwOption: 'Unknown ver.',
   // QR code section.
   hasEndDeviceQR: 'Does your end device have a QR code? Scan it to speed up onboarding.',
   deviceGuide: 'Device registration help',
