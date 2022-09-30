@@ -19,8 +19,12 @@ import Radio from '@ttn-lw/components/radio-button'
 import Form, { useFormContext } from '@ttn-lw/components/form'
 import PortalledModal from '@ttn-lw/components/modal/portalled'
 
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { hasSelectedDeviceRepositoryOther } from '@console/lib/device-utils'
+
 import m from '../messages'
-import { hasCompletedDeviceRepositorySelection, hasSelectedDeviceRepositoryOther } from '../utils'
+import { hasCompletedDeviceRepositorySelection } from '../utils'
 
 import DeviceTypeRepositoryFormSection, {
   initialValues as repositoryInitialValues,
@@ -89,7 +93,7 @@ const DeviceTypeFormSection = () => {
       />
       <Form.SubTitle title={m.endDeviceType} />
       <Form.Field
-        title={m.inputMethod}
+        title={sharedMessages.inputMethod}
         component={Radio.Group}
         value={_inputMethod}
         name="_inputMethod"
