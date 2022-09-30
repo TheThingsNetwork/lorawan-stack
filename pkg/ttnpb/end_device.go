@@ -1553,8 +1553,7 @@ func (m *EndDevice) ExtractRequestFields(dst map[string]interface{}) {
 	m.GetIds().ExtractRequestFields(dst)
 }
 
-// Utility
-
+// UpdateTimestamps sets earliest CreatedAt and latest UpdatedAt timestamps for EndDevice based on src device.
 func (d *EndDevice) UpdateTimestamps(src *EndDevice) {
 	if d.CreatedAt == nil || (src.CreatedAt != nil && StdTime(src.CreatedAt).Before(*StdTime(d.CreatedAt))) {
 		d.CreatedAt = src.CreatedAt
