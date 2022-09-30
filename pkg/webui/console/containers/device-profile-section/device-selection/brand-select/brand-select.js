@@ -19,42 +19,30 @@ import Field from '@ttn-lw/components/form/field'
 import Select from '@ttn-lw/components/select'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { SELECT_OTHER_OPTION } from '../../../../utils'
-import messages from '../../../../messages'
+import { SELECT_OTHER_OPTION } from '@console/lib/device-utils'
 
 const m = defineMessages({
-  title: 'Model',
+  title: 'End device brand',
   warning: 'End device models unavailable',
-  noOptionsMessage: 'No matching model found',
+  noOptionsMessage: 'No matching brand found',
 })
 
-const formatOptions = (models = []) =>
-  models
-    .map(model => ({
-      value: model.model_id,
-      label: model.name,
+const formatOptions = (brands = []) =>
+  brands
+    .map(brand => ({
+      value: brand.brand_id,
+      label: brand.name || brand.brand_id,
+      profileID: brand.brand_id,
     }))
-    .concat([{ value: SELECT_OTHER_OPTION, label: messages.otherOption }])
+    .concat([{ value: SELECT_OTHER_OPTION, label: sharedMessages.otherOption }])
 
-const ModelSelect = props => {
-  const { appId, brandId, name, error, fetching, models, listModels, onChange, ...rest } = props
+const BrandSelect = props => {
+  const { appId, name, error, fetching, brands, onChange, ...rest } = props
   const { formatMessage } = useIntl()
 
-  React.useEffect(() => {
-    listModels(appId, brandId, {}, [
-      'name',
-      'description',
-      'firmware_versions',
-      'hardware_versions',
-      'key_provisioning',
-      'photos',
-      'product_url',
-      'datasheet_url',
-    ])
-  }, [appId, brandId, listModels])
-
-  const options = React.useMemo(() => formatOptions(models), [models])
+  const options = React.useMemo(() => formatOptions(brands), [brands])
   const handleNoOptions = React.useCallback(
     () => formatMessage(m.noOptionsMessage),
     [formatMessage],
@@ -71,33 +59,30 @@ const ModelSelect = props => {
       warning={Boolean(error) ? m.warning : undefined}
       onChange={onChange}
       noOptionsMessage={handleNoOptions}
-      placeholder={messages.typeToSearch}
+      placeholder={sharedMessages.typeToSearch}
       autoFocus
     />
   )
 }
 
-ModelSelect.propTypes = {
+BrandSelect.propTypes = {
   appId: PropTypes.string.isRequired,
-  brandId: PropTypes.string.isRequired,
-  error: PropTypes.error,
-  fetching: PropTypes.bool,
-  listModels: PropTypes.func.isRequired,
-  models: PropTypes.arrayOf(
+  brands: PropTypes.arrayOf(
     PropTypes.shape({
-      model_id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
+      brand_id: PropTypes.string.isRequired,
     }),
   ),
+  error: PropTypes.error,
+  fetching: PropTypes.bool,
   name: PropTypes.string.isRequired,
   onChange: PropTypes.func,
 }
 
-ModelSelect.defaultProps = {
+BrandSelect.defaultProps = {
   error: undefined,
   fetching: false,
-  models: [],
+  brands: [],
   onChange: () => null,
 }
 
-export default ModelSelect
+export default BrandSelect

@@ -14,9 +14,9 @@
 
 import { connect } from 'react-redux'
 
-import { selectDeviceModelFirmwareVersions } from '@console/store/selectors/device-repository'
+import { isUnknownHwVersion } from '@console/lib/device-utils'
 
-import { isUnknownHwVersion } from '../../../../utils'
+import { selectDeviceModelFirmwareVersions } from '@console/store/selectors/device-repository'
 
 const mapStateToProps = (state, props) => {
   const { brandId, modelId, hwVersion } = props
