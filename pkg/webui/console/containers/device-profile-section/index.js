@@ -18,6 +18,7 @@ import classnames from 'classnames'
 import { useFormContext } from '@ttn-lw/components/form'
 
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { isOtherOption } from '@console/lib/device-utils'
 
@@ -57,10 +58,9 @@ const initialValues = {
   },
 }
 
-const VersionIdsSection = () => {
+const VersionIdsSection = ({ isImport }) => {
   const { values } = useFormContext()
   const { version_ids } = values
-
   const brand = version_ids?.brand_id
   const model = version_ids?.model_id
   const hardwareVersion = version_ids?.hardware_version
@@ -74,18 +74,18 @@ const VersionIdsSection = () => {
   return (
     <>
       <div className={style.configurationSection}>
-        <BrandSelect
-          className={classnames(style.select, style.selectS)}
-          name="version_ids.brand_id"
-          required
-          tooltipId={tooltipIds.DEVICE_BRAND}
-          valueSetter={brandValueSetter}
-        />
+          <BrandSelect
+            className={classnames(style.select, style.selectS)}
+            name="version_ids.brand_id"
+            required={!isImport}
+            tooltipId={tooltipIds.DEVICE_BRAND}
+            valueSetter={brandValueSetter}
+          />
         {hasBrand && (
           <ModelSelect
             className={classnames(style.select, style.selectS)}
             name="version_ids.model_id"
-            required
+            required={!isImport}
             brandId={brand}
             tooltipId={tooltipIds.DEVICE_MODEL}
             valueSetter={modelValueSetter}
@@ -94,7 +94,7 @@ const VersionIdsSection = () => {
         {hasModel && (
           <HardwareVersionSelect
             className={classnames(style.select, style.selectXs)}
-            required
+            required={!isImport}
             brandId={brand}
             modelId={model}
             name="version_ids.hardware_version"
@@ -104,7 +104,7 @@ const VersionIdsSection = () => {
         {hasHwVersion && (
           <FirmwareVersionSelect
             className={classnames(style.select, style.selectXs)}
-            required
+            required={!isImport}
             name="version_ids.firmware_version"
             brandId={brand}
             modelId={model}
@@ -115,7 +115,7 @@ const VersionIdsSection = () => {
         {hasFwVersion && (
           <BandSelect
             className={classnames(style.select, style.selectS)}
-            required
+            required={!isImport}
             name="version_ids.band_id"
             fwVersion={firmwareVersion}
             brandId={brand}
@@ -125,6 +125,14 @@ const VersionIdsSection = () => {
       </div>
     </>
   )
+}
+
+VersionIdsSection.propTypes = {
+  isImport: PropTypes.bool,
+}
+
+VersionIdsSection.defaultProps = {
+  isImport: false,
 }
 
 export { VersionIdsSection as default, initialValues }

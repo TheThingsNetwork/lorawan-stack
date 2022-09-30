@@ -157,7 +157,7 @@ const DeviceBulkCreateFormInner = props => {
               />
             </>
           )}
-          {_inputMethod === 'device-repository' && <FallbackVersionIdsSection />}
+          {_inputMethod === 'device-repository' && <FallbackVersionIdsSection isImport />}
           <Form.CollapseSection id="advanced-settings" title={m.advancedSectionTitle}>
             <Form.Field
               disabled={!jsEnabled}
