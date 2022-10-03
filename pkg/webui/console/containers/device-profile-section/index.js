@@ -74,13 +74,13 @@ const VersionIdsSection = ({ isImport }) => {
   return (
     <>
       <div className={style.configurationSection}>
-          <BrandSelect
-            className={classnames(style.select, style.selectS)}
-            name="version_ids.brand_id"
-            required={!isImport}
-            tooltipId={tooltipIds.DEVICE_BRAND}
-            valueSetter={brandValueSetter}
-          />
+        <BrandSelect
+          className={classnames(style.select, style.selectS)}
+          name="version_ids.brand_id"
+          required={!isImport}
+          tooltipId={tooltipIds.DEVICE_BRAND}
+          valueSetter={brandValueSetter}
+        />
         {hasBrand && (
           <ModelSelect
             className={classnames(style.select, style.selectS)}
