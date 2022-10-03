@@ -277,6 +277,8 @@ export default class DeviceImporter extends Component {
           device.network_server_address = new URL(nsConfig.base_url).hostname
           field_mask = `${field_mask},network_server_address`
         }
+
+        // Fallback values
         if (
           !device.frequency_plan_id &&
           Boolean(frequency_plan_id) &&
@@ -505,7 +507,6 @@ export default class DeviceImporter extends Component {
       format_id: '',
       data: '',
       set_claim_auth_code: true,
-      _inputMethod: 'manual',
     }
     const largeFile = 10 * 1024 * 1024
     return (
