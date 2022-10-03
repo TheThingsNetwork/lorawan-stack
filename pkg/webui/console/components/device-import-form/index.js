@@ -15,6 +15,7 @@
 import React, { useCallback, useState } from 'react'
 import { defineMessages } from 'react-intl'
 import { useFormikContext } from 'formik'
+import { useSelector } from 'react-redux'
 
 import Form from '@ttn-lw/components/form'
 import FileInput from '@ttn-lw/components/file-input'
@@ -40,6 +41,8 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import { selectNsEnabled } from '@ttn-lw/lib/selectors/env'
 
 import { frequencyPlanValueSetter, lorawanVersionValueSetter } from '@console/lib/device-utils'
+
+import { selectNsFrequencyPlans } from '@console/store/selectors/configuration'
 
 import FallbackVersionIdsSection from './fallback-version-ids-section'
 
@@ -70,6 +73,13 @@ const validationSchema = Yup.object({
   frequency_plan_id: Yup.string(),
   lorawan_version: Yup.string(),
   lorawan_phy_version: Yup.string(),
+  version_ids: Yup.object({
+    brand_id: Yup.string(),
+    model_id: Yup.string(),
+    hardware_version: Yup.string(),
+    firmware_version: Yup.string(),
+    band_id: Yup.string(),
+  }),
 })
 
 const nsEnabled = selectNsEnabled
@@ -82,6 +92,7 @@ const DeviceBulkCreateFormInner = props => {
   const formatSelected = Boolean(format_id)
   const [allowedFileExtensions, setAllowedFileExtensions] = useState(undefined)
   const [formatDescription, setFormatDescription] = useState(undefined)
+  const nsFrequencyPlans = useSelector(selectNsFrequencyPlans)
 
   const handleSelectChange = useCallback(value => {
     if (value && value.fileExtensions && value.fileExtensions instanceof Array) {
@@ -133,7 +144,7 @@ const DeviceBulkCreateFormInner = props => {
           </Form.Field>
           {_inputMethod === 'manual' && (
             <>
-              {nsEnabled && (
+              {nsEnabled && nsFrequencyPlans && (
                 <NsFrequencyPlansSelect
                   tooltipId={tooltipIds.FREQUENCY_PLAN}
                   name="frequency_plan_id"
