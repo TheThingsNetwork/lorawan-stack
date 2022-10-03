@@ -342,8 +342,6 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 		// }
 	})
 
-	updated.Ids.Eui = nil // Unset EUI for the should.Resembles below.
-
 	t.Run("GetGateway_AfterDelete", func(t *T) {
 		a, ctx := test.New(t)
 		_, err := s.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"}, mask)
@@ -457,6 +455,45 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 				a.So(err, should.BeNil)
 			})
 		}
+	})
+
+	t.Run("Gateway EUI behaviour test set", func(t *T) {
+		a, ctx := test.New(t)
+
+		// Creates the first gateway.
+		gtwCreated, err := s.CreateGateway(ctx, &ttnpb.Gateway{
+			Ids: &ttnpb.GatewayIdentifiers{GatewayId: "foo", Eui: eui.Bytes()},
+		})
+		a.So(err, should.BeNil)
+
+		// Deletes the gateway.
+		err = s.DeleteGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"})
+		a.So(err, should.BeNil)
+
+		deletedGtw, err := s.GetGateway(
+			store.WithSoftDeleted(ctx, true), &ttnpb.GatewayIdentifiers{GatewayId: "foo"}, mask,
+		)
+		a.So(err, should.BeNil)
+		// Validates if the deleted gateway still contains the initial EUI value.
+		a.So(deletedGtw.Ids, should.Resemble, gtwCreated.Ids)
+
+		// Creates a new gateway with the same EUI value.
+		newGtw, err := s.CreateGateway(ctx, &ttnpb.Gateway{
+			Ids: &ttnpb.GatewayIdentifiers{GatewayId: "bar", Eui: eui.Bytes()},
+		})
+		a.So(err, should.BeNil)
+		a.So(newGtw.Ids.Eui, should.Resemble, deletedGtw.Ids.Eui)
+
+		err = s.RestoreGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"})
+		a.So(err, should.BeNil)
+
+		// EUI of the restored gateway should be empty.
+		oldGtw, err := s.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"}, mask)
+		a.So(err, should.BeNil)
+		a.So(oldGtw.Ids.Eui, should.BeEmpty)
+
+		a.So(s.PurgeGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"}), should.BeNil)
+		a.So(s.PurgeGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "bar"}), should.BeNil)
 	})
 }
 
