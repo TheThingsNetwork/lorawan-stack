@@ -94,6 +94,10 @@ describe('End device messaging', () => {
     })
 
     it('succeeds setting lorawan_version, lorawan_phy_version and frequency_plan_id from fallback values', () => {
+      cy.intercept(
+        'PUT',
+        '/api/v3/js/applications/import-devices-test-application/devices/this-is-fallback-test-id',
+      ).as('importDevice')
       const devicesFile = 'freqId-version-phy-device.json'
       const fallbackValues = {
         lorawan_version: 'MAC_V1_0',
@@ -106,6 +110,7 @@ describe('End device messaging', () => {
       cy.findByLabelText('LoRaWAN version').selectOption(fallbackValues.lorawan_version)
 
       cy.findByRole('button', { name: 'Import end devices' }).click()
+      cy.wait('@importDevice')
       cy.findByText('Operation finished').should('be.visible')
       cy.findByText('3 of 3 (100.00% finished)').should('be.visible')
       cy.findByTestId('notification')
