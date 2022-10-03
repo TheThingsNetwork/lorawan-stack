@@ -16,6 +16,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Gateway EUI is no longer unset when deleting a gateway, meaning it could be recovered if no other gateway claimed it. This requires a schema migration (`ttn-lw-stack is-db migrate`) because of the change in the database's `gateway_eui_index`.
+
 ### Deprecated
 
 ### Removed
