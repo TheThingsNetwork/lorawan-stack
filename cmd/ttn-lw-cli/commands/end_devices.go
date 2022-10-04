@@ -922,7 +922,7 @@ var (
 			}
 			paths := util.SelectFieldMask(cmd.Flags(), selectEndDeviceFlags)
 
-			isPaths, nsPaths, _, _ := splitEndDeviceGetPaths(paths...)
+			isPaths, nsPaths, asPaths, jsPaths := splitEndDeviceGetPaths(paths...)
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
@@ -949,22 +949,87 @@ var (
 			logger.WithField("paths", nsPaths).Debug("Reset end device to factory defaults on Network Server")
 			nsDevice, err := ttnpb.NewNsEndDeviceRegistryClient(ns).ResetFactoryDefaults(ctx, &ttnpb.ResetAndGetEndDeviceRequest{
 				EndDeviceIds: devID,
-				FieldMask:    ttnpb.FieldMask(nsPaths...),
+				FieldMask:    ttnpb.FieldMask(ttnpb.AddFields(nsPaths, "supports_join")...),
 			})
 			if err != nil {
 				return err
 			}
-			if err := device.SetFields(nsDevice, "ids.dev_addr"); err != nil {
+			if err = device.SetFields(nsDevice, "ids.dev_addr"); err != nil {
 				return err
 			}
-			if err := device.SetFields(nsDevice, ttnpb.AllowedBottomLevelFields(nsPaths, getEndDeviceFromNS)...); err != nil {
+			if err = device.SetFields(nsDevice, ttnpb.AllowedBottomLevelFields(nsPaths, getEndDeviceFromNS)...); err != nil {
 				return err
 			}
-			if device.CreatedAt == nil || (nsDevice.CreatedAt != nil && ttnpb.StdTime(nsDevice.CreatedAt).Before(*ttnpb.StdTime(device.CreatedAt))) {
-				device.CreatedAt = nsDevice.CreatedAt
+			device.UpdateTimestamps(nsDevice)
+
+			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
+			if err != nil {
+				return err
 			}
-			if nsDevice.UpdatedAt != nil && ttnpb.StdTime(nsDevice.UpdatedAt).After(*ttnpb.StdTime(device.UpdatedAt)) {
-				device.UpdatedAt = nsDevice.UpdatedAt
+			logger.WithField("paths", asPaths).Debug("Reset end device to factory defaults on Application Server")
+			asDevice, err := ttnpb.NewAsEndDeviceRegistryClient(as).Get(ctx, &ttnpb.GetEndDeviceRequest{
+				EndDeviceIds: devID,
+				FieldMask:    ttnpb.FieldMask(asPaths...),
+			})
+			if err != nil {
+				return err
+			}
+			var fieldsToReset []string
+			if device.SupportsJoin {
+				fieldsToReset = []string{"session", "pending_session"}
+			} else {
+				fieldsToReset = []string{"session.last_a_f_cnt_down"}
+			}
+			if err = asDevice.SetFields(nil, fieldsToReset...); err != nil {
+				return err
+			}
+			_, err = ttnpb.NewAsEndDeviceRegistryClient(as).Set(ctx, &ttnpb.SetEndDeviceRequest{
+				EndDevice: asDevice,
+				FieldMask: ttnpb.FieldMask(asPaths...),
+			})
+			if err != nil {
+				return err
+			}
+			if err := device.SetFields(asDevice, asPaths...); err != nil {
+				return err
+			}
+			device.UpdateTimestamps(asDevice)
+
+			if device.SupportsJoin {
+				js, err := api.Dial(ctx, config.JoinServerGRPCAddress)
+				if err != nil {
+					return err
+				}
+				logger.WithField("paths", jsPaths).Debug("Reset end device to factory defaults on Join Server")
+				jsDevice, err := ttnpb.NewJsEndDeviceRegistryClient(js).Get(ctx, &ttnpb.GetEndDeviceRequest{
+					EndDeviceIds: devID,
+					FieldMask:    ttnpb.FieldMask(jsPaths...),
+				})
+				if err != nil {
+					return err
+				}
+				if err = jsDevice.SetFields(nil, "last_dev_nonce", "used_dev_nonces", "last_join_nonce", "last_rj_count_0", "last_rj_count_1"); err != nil {
+					return err
+				}
+				_, err = ttnpb.NewJsEndDeviceRegistryClient(js).Set(ctx, &ttnpb.SetEndDeviceRequest{
+					EndDevice: jsDevice,
+					FieldMask: ttnpb.FieldMask(jsPaths...),
+				})
+				if err != nil {
+					return err
+				}
+				if err := device.SetFields(jsDevice, jsPaths...); err != nil {
+					return err
+				}
+				device.UpdateTimestamps(jsDevice)
+			}
+
+			// Remove temporary fields (e.g. "supports_join") that were not selected by user
+			joinedPaths := ttnpb.AddFields(isPaths, ttnpb.AddFields(nsPaths, ttnpb.AddFields(asPaths, jsPaths...)...)...)
+			if diff := ttnpb.ExcludeFields(joinedPaths, paths...); len(diff) > 0 {
+				if err := device.SetFields(nil, diff...); err != nil {
+					return err
+				}
 			}
 			return io.Write(os.Stdout, config.OutputFormat, device)
 		},
