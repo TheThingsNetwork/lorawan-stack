@@ -110,9 +110,8 @@ describe('End device messaging', () => {
       cy.findByLabelText('LoRaWAN version').selectOption(fallbackValues.lorawan_version)
 
       cy.findByRole('button', { name: 'Import end devices' }).click()
+      cy.findByTestId('progress-bar').should('be.visible')
       cy.wait('@importDevice')
-      cy.findByText('Operation finished').should('be.visible')
-      cy.findByText('3 of 3 (100.00% finished)').should('be.visible')
       cy.findByTestId('notification')
         .findByText('All end devices imported successfully')
         .should('be.visible')

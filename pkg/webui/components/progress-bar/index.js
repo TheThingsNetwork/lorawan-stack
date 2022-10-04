@@ -118,7 +118,7 @@ export default class ProgressBar extends PureComponent {
     }
 
     return (
-      <div className={classnames(className, style.container)}>
+      <div className={classnames(className, style.container)} data-test-id="progress-bar">
         <div className={style.bar}>
           <div style={{ width: `${displayPercentage}%` }} className={style.filler} />
         </div>
