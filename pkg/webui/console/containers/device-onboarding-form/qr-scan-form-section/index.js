@@ -169,14 +169,9 @@ const DeviceQRScanFormSection = () => {
             qrData={qrData}
           />
         )}
-        <Link.Anchor
-          className="ml-cs-xs"
-          href="https://www.thethingsindustries.com/docs"
-          external
-          secondary
-        >
-          <Message content={m.learnMore} />
-        </Link.Anchor>
+        <Link.DocLink className="ml-cs-xs" path="/devices/adding-devices" secondary>
+          <Message content={m.deviceGuide} />
+        </Link.DocLink>
       </ButtonGroup>
       <hr className="mt-cs-m mb-0" />
     </>
