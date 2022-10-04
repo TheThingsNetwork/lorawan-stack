@@ -78,7 +78,7 @@ func (ps *PubSubStore) storeEvent(ctx context.Context, tx redis.Cmdable, evt eve
 
 // loadEventData loads event data for every event in evts (by UniqueID)
 // and set additional fields in the events.
-func (ps *PubSubStore) loadEventData(ctx context.Context, evts ...*ttnpb.Event) error {
+func (ps *PubSubStore) loadEventData(ctx context.Context, cl redis.Cmdable, evts ...*ttnpb.Event) error {
 	if len(evts) == 0 {
 		return nil
 	}
@@ -86,7 +86,7 @@ func (ps *PubSubStore) loadEventData(ctx context.Context, evts ...*ttnpb.Event) 
 	for _, evt := range evts {
 		keys = append(keys, ps.eventDataKey(ctx, evt.UniqueId))
 	}
-	bs, err := ps.client.MGet(ctx, keys...).Result()
+	bs, err := cl.MGet(ctx, keys...).Result()
 	if err != nil {
 		return ttnredis.ConvertError(err)
 	}
@@ -186,7 +186,7 @@ func (ps *PubSubStore) tailStream(
 		eventPBs = eventsFromXMessages(msgs, matchNames)
 		nextStart = msgs[len(msgs)-1].ID
 	}
-	if err = ps.loadEventData(ctx, eventPBs...); err != nil {
+	if err = ps.loadEventData(ctx, ps.client, eventPBs...); err != nil {
 		return nil, "", err
 	}
 	return eventPBs, nextStart, nil
@@ -331,7 +331,7 @@ func (ps *PubSubStore) SubscribeWithHistory(
 				if len(evtPBs) == 0 {
 					continue
 				}
-				if err = ps.loadEventData(ctx, evtPBs...); err != nil {
+				if err = ps.loadEventData(ctx, ps.client, evtPBs...); err != nil {
 					return err
 				}
 				for _, evtPB := range evtPBs {
@@ -356,7 +356,7 @@ func (ps *PubSubStore) FindRelated(ctx context.Context, correlationID string) ([
 	for i, uid := range uids {
 		evtPBs[i] = &ttnpb.Event{UniqueId: uid}
 	}
-	if err = ps.loadEventData(ctx, evtPBs...); err != nil {
+	if err = ps.loadEventData(ctx, ps.client, evtPBs...); err != nil {
 		return nil, err
 	}
 	evts := make([]events.Event, 0, len(evtPBs))
