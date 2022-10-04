@@ -33,7 +33,7 @@ describe('Organization create', () => {
   })
 
   it('displays UI elements in place', () => {
-    cy.findByText('Add organization', { selector: 'h1' }).should('be.visible')
+    cy.findByText('Create organization', { selector: 'h1' }).should('be.visible')
     cy.findByLabelText('Organization ID').should('be.visible')
     cy.findByLabelText('Name').should('be.visible')
     cy.findByLabelText('Description').should('be.visible')

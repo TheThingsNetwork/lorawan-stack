@@ -35,7 +35,7 @@ const applicationSubpages = defineSmokeTest('check all application sub-pages', (
 
   cy.findByRole('link', { name: /End devices/ }).click()
   cy.findByText('End devices (0)').should('be.visible')
-  cy.findByRole('link', { name: /Add end device/ })
+  cy.findByRole('link', { name: /Register end device/ })
     .should('be.visible')
     .click()
   cy.findByRole('heading', { name: 'Register end device' }).should('be.visible')
