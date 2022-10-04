@@ -115,7 +115,7 @@ OrganizationForm.defaultProps = {
   initialValues,
   error: undefined,
   submitBarItems: null,
-  submitMessage: sharedMessages.createOrganization
+  submitMessage: sharedMessages.createOrganization,
 }
 
 export { OrganizationForm as default, initialValues }

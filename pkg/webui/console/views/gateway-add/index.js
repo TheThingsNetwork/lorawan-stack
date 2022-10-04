@@ -36,17 +36,13 @@ import { getOrganizationsList } from '@console/store/actions/organizations'
 
 const m = defineMessages({
   gtwOnboardingDescription:
-    'Register your gateway to enable data traffic between nearby end devices and the network. {break} Learn more in our {gatewayGuideURL}.',
+    'Register your gateway to enable data traffic between nearby end devices and the network. {break} Learn more in our guide on <Link>Adding Gateways</Link>.',
 })
 
-const GatewayGuideLink = (
-  <Link.Anchor
-    external
-    secondary
-    href="https://www.thethingsindustries.com/docs/gateways/adding-gateways/"
-  >
-    Gateway Guide
-  </Link.Anchor>
+const GatewayGuideLink = content => (
+  <Link.DocLink secondary path="/gateways/adding-gateways">
+    {content}
+  </Link.DocLink>
 )
 
 const GatewayAdd = () => {
@@ -70,7 +66,7 @@ const GatewayAdd = () => {
             <Message
               component="p"
               content={m.gtwOnboardingDescription}
-              values={{ gatewayGuideURL: GatewayGuideLink, break: <br /> }}
+              values={{ Link: GatewayGuideLink, break: <br /> }}
             />
             <hr className="mb-ls-s" />
           </PageTitle>

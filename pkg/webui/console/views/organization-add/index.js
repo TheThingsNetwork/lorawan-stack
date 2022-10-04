@@ -12,9 +12,69 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import OrganizationAdd from './organization-add'
-import connect from './connect'
+import React, { useCallback } from 'react'
+import { Container, Col, Row } from 'react-grid-system'
+import { defineMessages } from 'react-intl'
+import { push } from 'connected-react-router'
+import { useDispatch } from 'react-redux'
 
-const ConnectedOrganizationAdd = connect(OrganizationAdd)
+import PageTitle from '@ttn-lw/components/page-title'
+import Link from '@ttn-lw/components/link'
 
-export { ConnectedOrganizationAdd as default, OrganizationAdd }
+import Message from '@ttn-lw/lib/components/message'
+
+import OrganizationAddForm from '@console/containers/organization-form/add'
+
+import Require from '@console/lib/components/require'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { mayCreateOrganizations } from '@console/lib/feature-checks'
+
+const m = defineMessages({
+  orgDescription:
+    'Organizations are used to group multiple users and assigning collective rights for them. An organization can then be set as collaborator of applications or gateways. This makes it easy to grant or revoke rights to entities for a group of users.{break} Learn more in our guide on <Link>Organization Management</Link>.',
+})
+
+const OrganizationAdd = () => {
+  const dispatch = useDispatch()
+  const handleSuccess = useCallback(
+    orgId => {
+      dispatch(push(`/organizations/${orgId}`))
+    },
+    [dispatch],
+  )
+
+  return (
+    <Require featureCheck={mayCreateOrganizations} otherwise={{ redirect: '/organizations' }}>
+      <Container>
+        <PageTitle
+          colProps={{ md: 10, lg: 9 }}
+          className="mb-cs-s"
+          title={sharedMessages.createOrganization}
+        >
+          <Message
+            component="p"
+            content={m.orgDescription}
+            values={{
+              Link: content => (
+                <Link.DocLink secondary path="/getting-started/user-management/org">
+                  {content}
+                </Link.DocLink>
+              ),
+              break: <br />,
+            }}
+          />
+          <hr className="mb-ls-s" />
+        </PageTitle>
+        <Row>
+          <Col md={10} lg={9}>
+            <OrganizationAddForm onSuccess={handleSuccess} />
+          </Col>
+        </Row>
+      </Container>
+    </Require>
+  )
+}
+
+export default OrganizationAdd
