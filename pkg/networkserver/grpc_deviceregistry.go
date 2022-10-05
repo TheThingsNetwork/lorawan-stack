@@ -1741,13 +1741,13 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				if dev.GetMacSettings() == nil || len(dev.MacSettings.FactoryPresetFrequencies) == 0 {
 					return nil
 				}
-				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+				return withPHY(func(phy *band.Band, fp *frequencyplans.FrequencyPlan) error {
 					switch phy.CFListType {
 					case ttnpb.CFListType_FREQUENCIES:
 						// Factory preset frequencies in bands which provide frequencies as part of the CFList
 						// are interpreted as being used both for uplinks and downlinks.
 						for _, frequency := range dev.MacSettings.FactoryPresetFrequencies {
-							inSubBand := false
+							_, inSubBand := fp.FindSubBand(frequency)
 							for _, sb := range phy.SubBands {
 								if sb.MinFrequency <= frequency && frequency <= sb.MaxFrequency {
 									inSubBand = true
