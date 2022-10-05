@@ -29,6 +29,7 @@ import Checkbox from '@ttn-lw/components/checkbox'
 
 import Require from '@console/lib/components/require'
 
+import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import Yup from '@ttn-lw/lib/yup'
 import diff from '@ttn-lw/lib/diff'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -193,6 +194,7 @@ const ApplicationGeneralSettings = props => {
                 name="skip_payload_crypto"
                 description={sharedMessages.skipCryptoDescription}
                 component={Checkbox}
+                tooltipId={tooltipIds.SKIP_PAYLOAD_CRYPTO_OVERRIDE}
               />
             )}
             <Form.Field
