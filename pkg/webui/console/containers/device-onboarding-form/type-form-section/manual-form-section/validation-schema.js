@@ -36,6 +36,8 @@ const factoryPresetFreqNumericTest = frequencies =>
     return true
   })
 
+const dynamicFrequencyTest = value => value === 0 || value >= 100000
+
 const advancedSettingsSchema = Yup.object({
   supports_class_b: Yup.boolean().required(sharedMessages.validateRequired),
   supports_class_c: Yup.boolean().required(sharedMessages.validateRequired),
@@ -81,13 +83,15 @@ const macSettingsSchema = Yup.object({
               factoryPresetFreqRequiredTest,
             ),
           rx2_frequency: Yup.number().min(100000, Yup.passValues(sharedMessages.validateNumberGte)),
-          beacon_frequency: Yup.number().min(
-            100000,
-            Yup.passValues(sharedMessages.validateNumberGte),
+          beacon_frequency: Yup.number().test(
+            'is-valid-freq',
+            sharedMessages.validateFreqDynamic,
+            dynamicFrequencyTest,
           ),
-          ping_slot_frequency: Yup.number().min(
-            100000,
-            Yup.passValues(sharedMessages.validateNumberGte),
+          ping_slot_frequency: Yup.number().test(
+            'is-valid-freq',
+            sharedMessages.validateFreqDynamic,
+            dynamicFrequencyTest,
           ),
           rx2_data_rate_index: Yup.number()
             .min(0, Yup.passValues(sharedMessages.validateNumberGte))
