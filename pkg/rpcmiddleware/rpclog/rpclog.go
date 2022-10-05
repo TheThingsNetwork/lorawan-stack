@@ -118,3 +118,11 @@ func (l *ttnGrpcLogger) V(int) bool {
 func shouldSuppressError(err error) bool {
 	return errors.IsResourceExhausted(err)
 }
+
+func shouldSuppressLog(cfg methodLogConfig, err error) bool {
+	if err != nil {
+		wrapped, ok := errors.From(err)
+		return ok && cfg.shouldIgnorError(wrapped)
+	}
+	return cfg.IgnoreSuccess
+}
