@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useState, useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import classnames from 'classnames'
 
@@ -45,9 +45,8 @@ const DevEUIComponent = props => {
   const appId = useSelector(selectSelectedApplicationId)
   const promisifiedIssueDevEUI = attachPromise(issueDevEUI)
   const fetchDevEUICounter = attachPromise(getApplicationDevEUICount)
-  const euiInputRef = React.useRef(null)
-  const [devEUIGenerated, setDevEUIGenerated] = React.useState(false)
-  const [errorMessage, setErrorMessage] = React.useState(undefined)
+  const [devEUIGenerated, setDevEUIGenerated] = useState(false)
+  const [errorMessage, setErrorMessage] = useState(undefined)
   const applicationDevEUICounter = useSelector(selectApplicationDevEUICount)
   const idTouched = touched?.ids?.device_id || touched?.target_device_id
   const hasEuiId =
@@ -66,17 +65,16 @@ const DevEUIComponent = props => {
       applicationDevEUICounter === env.devEUIConfig.applicationLimit || Boolean(errorMessage),
   })
 
-  const handleDevEUIRequest = React.useCallback(async () => {
+  const handleDevEUIRequest = useCallback(async () => {
     const result = await dispatch(promisifiedIssueDevEUI(appId))
     await dispatch(fetchDevEUICounter(appId))
     return result.dev_eui
   }, [appId, dispatch, fetchDevEUICounter, promisifiedIssueDevEUI])
 
-  const handleGenerate = React.useCallback(async () => {
+  const handleGenerate = useCallback(async () => {
     try {
       const result = await handleDevEUIRequest()
       setDevEUIGenerated(true)
-      euiInputRef.current.focus()
       setErrorMessage(undefined)
       return result
     } catch (error) {
@@ -87,7 +85,7 @@ const DevEUIComponent = props => {
     }
   }, [handleDevEUIRequest])
 
-  const handleIdPrefill = React.useCallback(
+  const handleIdPrefill = useCallback(
     event => {
       const value = event.target.value
       if (value.length === 16 && (!idTouched || hasEuiId)) {
@@ -116,7 +114,6 @@ const DevEUIComponent = props => {
       onBlur={handleIdPrefill}
       onGenerateValue={handleGenerate}
       actionDisable={devEUIGenerateDisabled}
-      inputRef={euiInputRef}
       required={required}
       disabled={disabled}
       autoFocus={autoFocus}

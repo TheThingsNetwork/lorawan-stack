@@ -126,7 +126,7 @@ describe('End device manual create', () => {
         cy.findByLabelText('DevEUI').type(device.dev_eui)
         cy.findByLabelText('AppKey')
           .parents('[data-test-id="form-field"]')
-          .findByRole('button', { name: 'Generate' })
+          .findByRole('button', { name: /Generate/ })
           .click()
         cy.findByLabelText('AppKey').should('not.equal', '')
 
