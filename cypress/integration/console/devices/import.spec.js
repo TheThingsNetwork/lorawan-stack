@@ -93,7 +93,7 @@ describe('End device messaging', () => {
       cy.findByText('some-fail-id').should('not.exist')
     })
 
-    it('succeeds setting lorawan_version, lorawan_phy_version and frequency_plan_id from fallback values', () => {
+    it.only('succeeds setting lorawan_version, lorawan_phy_version and frequency_plan_id from fallback values', () => {
       cy.intercept(
         'PUT',
         '/api/v3/js/applications/import-devices-test-application/devices/this-is-fallback-test-id',

@@ -30,6 +30,10 @@ module.exports = (on, config) => {
   }
 
   on('before:browser:launch', (browser = {}, launchOptions) => {
+    // Log console log to output when debug mode is enabled.
+    if (process.env.RUNNER_DEBUG) {
+      launchOptions.args = cypressLogToOutput.browserLaunchHandler(browser, launchOptions.args)
+    }
     if (browser.family === 'chromium' && browser.name !== 'electron') {
       launchOptions.args.push(
         '--use-file-for-fake-video-capture=cypress/fixtures/qr-code-mock-feed.y4m',

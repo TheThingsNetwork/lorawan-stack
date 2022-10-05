@@ -60,10 +60,11 @@ const m = defineMessages({
   infoText:
     'You can use the import functionality to register multiple end devices at once by uploading a file containing the registration information in one of the available formats. For more information, see also our documentation on <DocLink>Importing End Devices</DocLink>.',
   fallbackValuesImport:
-    'These values will be used in case the imported file does not provide them. They are not required, although if not provided here or in the imported file, the import of the end device will not be successful.',
+    'Fallback values can be defined in case the imported file does not provide them. Any device with a required value that is not provided as fallback or in the imported file will be skipped by the importer.',
   inputMethodDeviceRepo: 'Load end device profile from the LoRaWAN Device Repository',
   inputMethodManual: 'Enter LoRaWAN versions and frequency plan manually',
   fallbackValues: 'Fallback values',
+  noFallback: 'Do not set any fallback values',
 })
 
 const validationSchema = Yup.object({
@@ -73,12 +74,17 @@ const validationSchema = Yup.object({
   frequency_plan_id: Yup.string(),
   lorawan_version: Yup.string(),
   lorawan_phy_version: Yup.string(),
-  version_ids: Yup.object({
-    brand_id: Yup.string(),
-    model_id: Yup.string(),
-    hardware_version: Yup.string(),
-    firmware_version: Yup.string(),
-    band_id: Yup.string(),
+  _inputMethod: Yup.string(),
+  version_ids: Yup.object().when('_inputMethod', {
+    is: 'device-repository',
+    then: schema =>
+      schema.shape({
+        brand_id: Yup.string().required(),
+        model_id: Yup.string().required(),
+        hardware_version: Yup.string().required(),
+        firmware_version: Yup.string().required(),
+        band_id: Yup.string().required(),
+      }),
   }),
 })
 
@@ -133,15 +139,24 @@ const DeviceBulkCreateFormInner = props => {
             name="data"
             required
           />
+          <hr />
+          <Form.CollapseSection id="advanced-settings" title={m.advancedSectionTitle}>
+            <Form.Field
+              disabled={!jsEnabled}
+              title={m.claiming}
+              label={m.setClaimAuthCode}
+              component={Checkbox}
+              name="set_claim_auth_code"
+              tooltipId={tooltipIds.SET_CLAIM_AUTH_CODE}
+            />
+          </Form.CollapseSection>
+          <hr />
           <Form.SubTitle title={m.fallbackValues} />
           <Notification small info content={m.fallbackValuesImport} />
-          <Form.Field
-            title={sharedMessages.inputMethod}
-            component={Radio.Group}
-            name="_inputMethod"
-          >
-            <Radio label={m.inputMethodManual} value="manual" />
+          <Form.Field component={Radio.Group} name="_inputMethod">
+            <Radio label={m.noFallback} value="no-fallback" />
             <Radio label={m.inputMethodDeviceRepo} value="device-repository" />
+            <Radio label={m.inputMethodManual} value="manual" />
           </Form.Field>
           {_inputMethod === 'manual' && (
             <>
@@ -169,17 +184,7 @@ const DeviceBulkCreateFormInner = props => {
               />
             </>
           )}
-          {_inputMethod === 'device-repository' && <FallbackVersionIdsSection isImport />}
-          <Form.CollapseSection id="advanced-settings" title={m.advancedSectionTitle}>
-            <Form.Field
-              disabled={!jsEnabled}
-              title={m.claiming}
-              label={m.setClaimAuthCode}
-              component={Checkbox}
-              name="set_claim_auth_code"
-              tooltipId={tooltipIds.SET_CLAIM_AUTH_CODE}
-            />
-          </Form.CollapseSection>
+          {_inputMethod === 'device-repository' && <FallbackVersionIdsSection />}
           <SubmitBar>
             <Form.Submit component={SubmitButton} message={sharedMessages.importDevices} />
           </SubmitBar>
