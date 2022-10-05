@@ -17,6 +17,7 @@ import { Col, Row } from 'react-grid-system'
 import { useSelector } from 'react-redux'
 
 import { useFormContext } from '@ttn-lw/components/form'
+import ErrorNotification from '@ttn-lw/components/error-notification'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
@@ -38,14 +39,18 @@ const FallbackVersionIdsSection = () => {
   const showOtherHint = hasSelectedOther
 
   return (
-    <RequireRequest requestAction={listBrands(appId, {}, ['name', 'lora_alliance_vendor_id'])}>
-      <Row>
-        <Col>
+    <Row>
+      <Col>
+        <RequireRequest
+          requestAction={listBrands(appId, {}, ['name', 'lora_alliance_vendor_id'])}
+          errorRenderFunction={ErrorNotification}
+          spinnerProps={{ center: false, inline: true }}
+        >
           <VersionIdsSection />
           {showOtherHint && <OtherHint manualGuideDocsPath="/devices/adding-devices/" />}
-        </Col>
-      </Row>
-    </RequireRequest>
+        </RequireRequest>
+      </Col>
+    </Row>
   )
 }
 
