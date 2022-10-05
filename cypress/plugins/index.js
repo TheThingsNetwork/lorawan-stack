@@ -13,6 +13,7 @@
 // limitations under the License.
 
 const { cypressBrowserPermissionsPlugin } = require('cypress-browser-permissions')
+const cypressLogToOutput = require('cypress-log-to-output')
 
 const tasks = require('./tasks')
 
@@ -29,6 +30,9 @@ module.exports = (on, config) => {
   }
 
   on('before:browser:launch', (browser = {}, launchOptions) => {
+    if (['chrome', 'chromium'].includes(browser.family)) {
+      launchOptions.args = cypressLogToOutput.browserLaunchHandler(browser, launchOptions.args)
+    }
     if (browser.family === 'chromium' && browser.name !== 'electron') {
       launchOptions.args.push(
         '--use-file-for-fake-video-capture=cypress/fixtures/qr-code-mock-feed.y4m',

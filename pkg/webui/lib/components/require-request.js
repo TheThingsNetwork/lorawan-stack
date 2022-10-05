@@ -31,19 +31,20 @@ const RequireRequest = ({
   requestAction,
   children,
   handleErrors,
+  spinnerProps,
   errorRenderFunction: ErrorRenderFunction,
 }) => {
   const [fetching, error] = useRequest(requestAction)
   if (fetching) {
     return (
-      <Spinner center>
+      <Spinner {...spinnerProps}>
         <Message content={sharedMessages.fetching} />
       </Spinner>
     )
   }
 
   if (error && handleErrors) {
-    return <ErrorRenderFunction error={error} />
+    return <ErrorRenderFunction error={error} content={error} />
   }
 
   return children
@@ -55,11 +56,13 @@ RequireRequest.propTypes = {
   handleErrors: PropTypes.bool,
   requestAction: PropTypes.oneOfType([PropTypes.shape({}), PropTypes.arrayOf(PropTypes.shape({}))])
     .isRequired,
+  spinnerProps: PropTypes.shape(Spinner.propTypes),
 }
 
 RequireRequest.defaultProps = {
   errorRenderFunction: FullViewErrorInner,
   handleErrors: true,
+  spinnerProps: { center: true },
 }
 
 export default RequireRequest

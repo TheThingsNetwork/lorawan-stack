@@ -220,6 +220,7 @@ export default class DeviceImporter extends Component {
 
   @bind
   async handleSubmit(values) {
+    console.log(values)
     const { appId, jsConfig, nsConfig, asConfig, convertTemplate } = this.props
     const {
       format_id,
@@ -236,6 +237,7 @@ export default class DeviceImporter extends Component {
 
     try {
       // Start template conversion.
+      console.log('1')
       this.setState({ step: 'conversion', status: 'processing' })
       this.appendToLog('Converting end device templates…')
       const templateStream = await convertTemplate(format_id, data)
@@ -507,6 +509,17 @@ export default class DeviceImporter extends Component {
       format_id: '',
       data: '',
       set_claim_auth_code: true,
+      _inputMethod: 'no-fallback',
+      frequency_plan_id: '',
+      lorawan_version: '',
+      lorawan_phy_version: '',
+      version_ids: {
+        brand_id: '',
+        model_id: '',
+        firmware_version: '',
+        hardware_version: '',
+        band_id: '',
+      },
     }
     const largeFile = 10 * 1024 * 1024
     return (
