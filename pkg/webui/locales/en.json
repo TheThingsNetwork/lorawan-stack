@@ -1490,6 +1490,7 @@
   "lib.shared-messages.validateEmail": "An email address must use exactly one \"@\", one \".\" and use no special characters",
   "lib.shared-messages.validateFreqNumeric": "All frequency values must be positive integers",
   "lib.shared-messages.validateFreqRequired": "All frequency values are required. Please remove empty entries.",
+  "lib.shared-messages.validateFreqDynamic": "{field} must be 0 for dynamic frequencies or greater than 100000Hz",
   "lib.shared-messages.validateHexLength": "{field} must be a complete hex value",
   "lib.shared-messages.validateIdFormat": "{field} must contain only lowercase letters, numbers and dashes (-)",
   "lib.shared-messages.validateInt32": "{field} must be a whole number, negative or positive",

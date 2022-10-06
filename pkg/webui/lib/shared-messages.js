@@ -442,6 +442,7 @@ export default defineMessages({
   validateEmail: 'An email address must use exactly one "@", one "." and use no special characters',
   validateFreqNumeric: 'All frequency values must be positive integers',
   validateFreqRequired: 'All frequency values are required. Please remove empty entries.',
+  validateFreqDynamic: '{field} must be 0 for dynamic frequencies or greater than 100000Hz',
   validateHexLength: '{field} must be a complete hex value',
   validateIdFormat: '{field} must contain only lowercase letters, numbers and dashes (-)',
   validateInt32: '{field} must be a whole number, negative or positive',
