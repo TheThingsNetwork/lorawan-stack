@@ -52,12 +52,12 @@
 /pkg/types @johanstokking
 /pkg/web @kschiffer @ryaplots
 /pkg/webmiddleware @KrishnaIyer @kschiffer
-/pkg/webui @kschiffer @ryaplots @mjamescompton 
+/pkg/webui @kschiffer @ryaplots @mjamescompton
 /pkg/ratelimit @johanstokking @KrishnaIyer
 
 # Subsystems
 
-/pkg/identityserver @kschiffer @nicholaspcr
+/pkg/identityserver @adriansmares @nicholaspcr
 /pkg/email @kschiffer @nicholaspcr
 /pkg/oauth @kschiffer @nicholaspcr
 /pkg/account @kschiffer @nicholaspcr
@@ -92,7 +92,7 @@
 /pkg/devicerepository @adriansmares @KrishnaIyer
 
 # SDKs
-/sdk/js @kschiffer @ryaplots @mjamescompton 
+/sdk/js @kschiffer @ryaplots @mjamescompton
 
 # Clear generated code
 /api/api.md
