@@ -395,6 +395,7 @@ func (w *webhooks) newRequest(
 	if !ok {
 		return nil, errFormatNotFound.WithAttributes("format", hook.Format)
 	}
+	deviceIDs := msg.EndDeviceIds
 	if paths := hook.FieldMask.GetPaths(); len(paths) > 0 {
 		mask := webhookUplinkMessageMask(msg)
 		included := ttnpb.IncludeFields(paths, mask)
@@ -420,8 +421,8 @@ func (w *webhooks) newRequest(
 	}
 	if hook.DownlinkApiKey != "" {
 		req.Header.Set(downlinkKeyHeader, hook.DownlinkApiKey)
-		req.Header.Set(downlinkPushHeader, w.downlinkURL(ctx, hook.Ids, msg.EndDeviceIds, "push"))
-		req.Header.Set(downlinkReplaceHeader, w.downlinkURL(ctx, hook.Ids, msg.EndDeviceIds, "replace"))
+		req.Header.Set(downlinkPushHeader, w.downlinkURL(ctx, hook.Ids, deviceIDs, "push"))
+		req.Header.Set(downlinkReplaceHeader, w.downlinkURL(ctx, hook.Ids, deviceIDs, "replace"))
 	}
 	if domain := w.domain(ctx); domain != "" {
 		req.Header.Set(domainHeader, domain)
