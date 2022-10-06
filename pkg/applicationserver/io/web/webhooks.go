@@ -31,6 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	ttnweb "go.thethings.network/lorawan-stack/v3/pkg/web"
@@ -268,23 +269,32 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 		ctx := withWebhookID(ctx, hook.Ids)
 		ctx = WithCachedHealthStatus(ctx, hook.HealthStatus)
 		logger := log.FromContext(ctx).WithField("hook", hook.Ids.WebhookId)
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		f := func(ctx context.Context) error {
 			req, err := w.newRequest(ctx, msg, hook)
 			if err != nil {
 				logger.WithError(err).Warn("Failed to create request")
-				return
+				return err
 			}
 			if req == nil {
-				return
+				return nil
 			}
 			logger.WithField("url", req.URL).Debug("Process message")
 			if err := w.target.Process(req); err != nil {
 				registerWebhookFailed(ctx, err)
 				logger.WithError(err).Warn("Failed to process message")
+				return err
 			}
-		}()
+			return nil
+		}
+		wg.Add(1)
+		w.server.StartTask(&task.Config{
+			Context: ctx,
+			ID:      "execute_webhook",
+			Func:    f,
+			Done:    wg.Done,
+			Restart: task.RestartNever,
+			Backoff: task.DefaultBackoffConfig,
+		})
 	}
 	wg.Wait()
 	return nil
@@ -385,6 +395,7 @@ func (w *webhooks) newRequest(
 	if !ok {
 		return nil, errFormatNotFound.WithAttributes("format", hook.Format)
 	}
+	deviceIDs := msg.EndDeviceIds
 	if paths := hook.FieldMask.GetPaths(); len(paths) > 0 {
 		mask := webhookUplinkMessageMask(msg)
 		included := ttnpb.IncludeFields(paths, mask)
@@ -410,8 +421,8 @@ func (w *webhooks) newRequest(
 	}
 	if hook.DownlinkApiKey != "" {
 		req.Header.Set(downlinkKeyHeader, hook.DownlinkApiKey)
-		req.Header.Set(downlinkPushHeader, w.downlinkURL(ctx, hook.Ids, msg.EndDeviceIds, "push"))
-		req.Header.Set(downlinkReplaceHeader, w.downlinkURL(ctx, hook.Ids, msg.EndDeviceIds, "replace"))
+		req.Header.Set(downlinkPushHeader, w.downlinkURL(ctx, hook.Ids, deviceIDs, "push"))
+		req.Header.Set(downlinkReplaceHeader, w.downlinkURL(ctx, hook.Ids, deviceIDs, "replace"))
 	}
 	if domain := w.domain(ctx); domain != "" {
 		req.Header.Set(domainHeader, domain)
