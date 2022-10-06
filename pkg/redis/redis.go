@@ -656,14 +656,6 @@ func (q *TaskQueue) Pop(ctx context.Context, consumerID string, r redis.Cmdable,
 	return popTask(ctx, r, q.Group, consumerID, q.MaxLen, f, q.Key)
 }
 
-// Scripter is redis.scripter.
-type Scripter interface {
-	Eval(ctx context.Context, script string, keys []string, args ...interface{}) *redis.Cmd
-	EvalSha(ctx context.Context, sha1 string, keys []string, args ...interface{}) *redis.Cmd
-	ScriptExists(ctx context.Context, hashes ...string) *redis.BoolSliceCmd
-	ScriptLoad(ctx context.Context, script string) *redis.StringCmd
-}
-
 var deduplicateProtosScript = redis.NewScript(`local exp = ARGV[1]
 local ok = redis.call('set', KEYS[1], '', 'px', exp, 'nx')
 if #ARGV > 1 then
@@ -812,7 +804,7 @@ func LockMutex(ctx context.Context, r redis.Cmdable, k, id string, expiration ti
 }
 
 // UnlockMutex unlocks the key k with identifier id.
-func UnlockMutex(ctx context.Context, r Scripter, k, id string, expiration time.Duration) error {
+func UnlockMutex(ctx context.Context, r redis.Scripter, k, id string, expiration time.Duration) error {
 	defer trace.StartRegion(ctx, "unlock mutex").End()
 	if err := unlockMutexScript.Run(ctx, r, []string{LockKey(k), ListKey(k)}, id, milliseconds(expiration)).Err(); err != nil {
 		return ConvertError(err)
@@ -822,7 +814,7 @@ func UnlockMutex(ctx context.Context, r Scripter, k, id string, expiration time.
 
 // InitMutex initializes the mutex scripts at r.
 // InitMutex must be called before mutex functionality is used in a transaction or pipeline.
-func InitMutex(ctx context.Context, r Scripter) error {
+func InitMutex(ctx context.Context, r redis.Scripter) error {
 	if err := lockMutexScript.Load(ctx, r).Err(); err != nil {
 		return ConvertError(err)
 	}
