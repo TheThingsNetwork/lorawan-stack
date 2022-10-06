@@ -225,6 +225,17 @@ func (s *entitySearch) SearchEndDevices(
 
 	selectors = append(selectors, s.selectWithMetaFields(ctx, "end_device", req))
 
+	if v := req.DevEuiContains; v != "" {
+		selectors = append(selectors, func(q *bun.SelectQuery) *bun.SelectQuery {
+			return q.Where(ilike("dev_eui"), v)
+		})
+	}
+	if v := req.JoinEuiContains; v != "" {
+		selectors = append(selectors, func(q *bun.SelectQuery) *bun.SelectQuery {
+			return q.Where(ilike("join_eui"), v)
+		})
+	}
+
 	pbs, err := s.listEndDevicesBy(ctx, combineApply(selectors...), store.FieldMask{"ids"})
 	if err != nil {
 		return nil, err

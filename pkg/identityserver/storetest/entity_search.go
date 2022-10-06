@@ -254,24 +254,46 @@ func (st *StoreTest) TestEntitySearch(t *T) {
 			}
 		})
 		t.Run("JoinEUI", func(t *T) {
-			a, ctx := test.New(t)
-			ids, err := s.SearchEndDevices(ctx, &ttnpb.SearchEndDevicesRequest{
-				ApplicationIds:  app1.GetIds(),
-				JoinEuiContains: "0101",
+			t.Run("Non Existent", func(t *T) {
+				a, ctx := test.New(t)
+				ids, err := s.SearchEndDevices(ctx, &ttnpb.SearchEndDevicesRequest{
+					ApplicationIds:  app1.GetIds(),
+					JoinEuiContains: "F00",
+				})
+				a.So(err, should.BeNil)
+				a.So(ids, should.HaveLength, 0)
 			})
-			if a.So(err, should.BeNil) && a.So(ids, should.NotBeNil) && a.So(ids, should.HaveLength, 1) {
-				a.So(ids[0], should.Resemble, dev1ID)
-			}
+			t.Run("Should be found", func(t *T) {
+				a, ctx := test.New(t)
+				ids, err := s.SearchEndDevices(ctx, &ttnpb.SearchEndDevicesRequest{
+					ApplicationIds:  app1.GetIds(),
+					JoinEuiContains: "0101",
+				})
+				if a.So(err, should.BeNil) && a.So(ids, should.NotBeNil) && a.So(ids, should.HaveLength, 1) {
+					a.So(ids[0], should.Resemble, dev1ID)
+				}
+			})
 		})
 		t.Run("DevEUI", func(t *T) {
-			a, ctx := test.New(t)
-			ids, err := s.SearchEndDevices(ctx, &ttnpb.SearchEndDevicesRequest{
-				ApplicationIds: app1.GetIds(),
-				DevEuiContains: "0202",
+			t.Run("Non Existent", func(t *T) {
+				a, ctx := test.New(t)
+				ids, err := s.SearchEndDevices(ctx, &ttnpb.SearchEndDevicesRequest{
+					ApplicationIds: app1.GetIds(),
+					DevEuiContains: "F00",
+				})
+				a.So(err, should.BeNil)
+				a.So(ids, should.HaveLength, 0)
 			})
-			if a.So(err, should.BeNil) && a.So(ids, should.NotBeNil) && a.So(ids, should.HaveLength, 1) {
-				a.So(ids[0], should.Resemble, dev1ID)
-			}
+			t.Run("Should be found", func(t *T) {
+				a, ctx := test.New(t)
+				ids, err := s.SearchEndDevices(ctx, &ttnpb.SearchEndDevicesRequest{
+					ApplicationIds: app1.GetIds(),
+					DevEuiContains: "0202",
+				})
+				if a.So(err, should.BeNil) && a.So(ids, should.NotBeNil) && a.So(ids, should.HaveLength, 1) {
+					a.So(ids[0], should.Resemble, dev1ID)
+				}
+			})
 		})
 		t.Run("Name", func(t *T) {
 			a, ctx := test.New(t)
