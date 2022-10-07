@@ -13,6 +13,12 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Option to ignore logs from selected gRPC methods now supports ignoring logs for selected errors on method.
+    Examples:
+    - `--grpc.log-ignore-methods="/ttn.lorawan.v3.GsNs/HandleUplink"`: log is skipped when no error occurs.
+    - `--grpc.log-ignore-methods="/ttn.lorawan.v3.GsNs/HandleUplink:pkg/networkserver:duplicate_uplink;pkg/networkserver:device_not_found"`: log is skipped when either `pkg/networkserver:duplicate_uplink` or `pkg/networkserver:device_not_found` error occurs (but not on success).
+    - `--grpc.log-ignore-methods="/ttn.lorawan.v3.GsNs/HandleUplink:;pkg/networkserver:duplicate_uplink"`: log is skipped on success or when `pkg/networkserver:duplicate_uplink` error occurs.
+
 ### Deprecated
 
 ### Removed

@@ -107,3 +107,24 @@ func commit(i log.Interface, level log.Level, msg string) {
 		panic(fmt.Sprintf("rpclog: unknown log level %d", level))
 	}
 }
+
+func parseMethodLogCfg(opt string) (string, methodLogConfig) {
+	optParts := strings.SplitN(opt, ":", 2)
+	methodName := optParts[0]
+	if len(optParts) == 1 {
+		return methodName, methodLogConfig{IgnoreSuccess: true}
+	}
+	ignoredErrors := strings.Split(optParts[1], ";")
+	isSuccessIgnored := ignoredErrors[0] == ""
+	if isSuccessIgnored {
+		ignoredErrors = ignoredErrors[1:]
+	}
+	ignoredErrorSet := make(map[string]struct{}, len(ignoredErrors))
+	for _, ignoredMethodError := range ignoredErrors {
+		ignoredErrorSet[ignoredMethodError] = struct{}{}
+	}
+	return methodName, methodLogConfig{
+		IgnoreSuccess: isSuccessIgnored,
+		IgnoredErrors: ignoredErrorSet,
+	}
+}

@@ -36,11 +36,10 @@ func UnaryServerInterceptor(ctx context.Context, opts ...Option) grpc.UnaryServe
 		startTime := time.Now()
 		resp, err := handler(newCtx, req)
 
-		if err == nil {
-			if _, ok := o.ignoreMethods[info.FullMethod]; ok {
-				return resp, err
-			}
+		if cfg, ok := o.ignoreMethods[info.FullMethod]; ok && shouldSuppressLog(cfg, err) {
+			return resp, err
 		}
+
 		if shouldSuppressError(err) {
 			return resp, err
 		}
@@ -87,11 +86,10 @@ func StreamServerInterceptor(ctx context.Context, opts ...Option) grpc.StreamSer
 		startTime := time.Now()
 		err := handler(srv, wrapped)
 
-		if err == nil {
-			if _, ok := o.ignoreMethods[info.FullMethod]; ok {
-				return err
-			}
+		if cfg, ok := o.ignoreMethods[info.FullMethod]; ok && shouldSuppressLog(cfg, err) {
+			return err
 		}
+
 		if shouldSuppressError(err) {
 			return err
 		}
