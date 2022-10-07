@@ -117,6 +117,20 @@ func (sb *SubBand) prioritizedDutyCycle(p ttnpb.TxSchedulePriority) float32 {
 	return sb.DutyCycle * ceiling
 }
 
+// computeWindowUsage verifies if the emission will not exceed the usable amount of the duty cycle in the
+// [t + toa - window, t + toa] and [t, t + window] windows, where `t` is the start of the emission and
+// `toa` is the duration of the emission.
+// This method requires that the read lock is held.
+func (sb *SubBand) computeWindowUsage(em Emission, usable float32) (used float32, ok bool) {
+	for _, to := range []ConcentratorTime{em.Ends(), em.t + ConcentratorTime(DutyCycleWindow)} {
+		used := float32(sb.sum(to-ConcentratorTime(DutyCycleWindow), to)+em.d) / float32(DutyCycleWindow)
+		if used > usable {
+			return used, false
+		}
+	}
+	return 0, true
+}
+
 var errDutyCycle = errors.DefineResourceExhausted("duty_cycle", "utilization `{used}%` would be higher than the available `{usable}%` for priority `{priority}`")
 
 // Schedule schedules the given emission with the priority.
@@ -129,16 +143,12 @@ func (sb *SubBand) Schedule(em Emission, p ttnpb.TxSchedulePriority) error {
 		return nil
 	}
 	usable := sb.prioritizedDutyCycle(p)
-	// Check the window before and after the emission for availability.
-	for _, to := range []ConcentratorTime{em.Ends(), em.t + ConcentratorTime(DutyCycleWindow)} {
-		used := float32(sb.sum(to-ConcentratorTime(DutyCycleWindow), to)+em.d) / float32(DutyCycleWindow)
-		if used > usable {
-			return errDutyCycle.WithAttributes(
-				"used", fmt.Sprintf("%.1f", used*100),
-				"usable", fmt.Sprintf("%.1f", usable*100),
-				"priority", fmt.Sprintf("%v", p),
-			)
-		}
+	if used, ok := sb.computeWindowUsage(em, usable); !ok {
+		return errDutyCycle.WithAttributes(
+			"used", fmt.Sprintf("%.1f", used*100),
+			"usable", fmt.Sprintf("%.1f", usable*100),
+			"priority", fmt.Sprintf("%v", p),
+		)
 	}
 	sb.emissions = sb.emissions.Insert(em)
 	return nil
@@ -165,13 +175,7 @@ func (sb *SubBand) ScheduleAnytime(d time.Duration, next func() ConcentratorTime
 		)
 	}
 	for {
-		conflicts := false
-		// Check the window before and after the emission for availability.
-		for _, to := range []ConcentratorTime{em.Ends(), em.t + ConcentratorTime(DutyCycleWindow)} {
-			sum := float32(sb.sum(to-ConcentratorTime(DutyCycleWindow), to)+em.d) / float32(DutyCycleWindow)
-			conflicts = conflicts || sum > usable
-		}
-		if !conflicts {
+		if _, ok := sb.computeWindowUsage(em, usable); ok {
 			break
 		}
 		if t := next(); t != em.t {
