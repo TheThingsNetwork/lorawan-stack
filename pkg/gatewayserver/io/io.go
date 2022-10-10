@@ -48,6 +48,8 @@ type Frontend interface {
 	Protocol() string
 	// SupportsDownlinkClaim returns true if the frontend can itself claim downlinks.
 	SupportsDownlinkClaim() bool
+	// DutyCycleStyle returns the duty cycle style used by the frontend.
+	DutyCycleStyle() scheduling.DutyCycleStyle
 }
 
 // Server represents the Gateway Server to gateway frontends.
@@ -170,7 +172,9 @@ func NewConnection(
 	}
 
 	ctx, cancelCtx := errorcontext.New(ctx)
-	scheduler, err := scheduling.NewScheduler(ctx, gatewayFPs, enforceDutyCycle, scheduleAnytimeDelay, nil)
+	scheduler, err := scheduling.NewScheduler(
+		ctx, gatewayFPs, enforceDutyCycle, frontend.DutyCycleStyle(), scheduleAnytimeDelay, nil,
+	)
 	if err != nil {
 		return nil, err
 	}

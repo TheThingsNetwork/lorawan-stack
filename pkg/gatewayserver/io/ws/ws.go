@@ -32,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
@@ -57,8 +58,11 @@ type srv struct {
 	formatter Formatter
 }
 
-func (s *srv) Protocol() string            { return "ws" }
-func (s *srv) SupportsDownlinkClaim() bool { return false }
+func (*srv) Protocol() string            { return "ws" }
+func (*srv) SupportsDownlinkClaim() bool { return false }
+func (*srv) DutyCycleStyle() scheduling.DutyCycleStyle {
+	return scheduling.DutyCycleStyleBlockingWindow
+}
 
 // New creates a new WebSocket frontend.
 func New(ctx context.Context, server io.Server, formatter Formatter, cfg Config) (*web.Server, error) {

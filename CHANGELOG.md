@@ -18,6 +18,7 @@ For details about compatibility between different releases, see the **Commitment
     - `--grpc.log-ignore-methods="/ttn.lorawan.v3.GsNs/HandleUplink"`: log is skipped when no error occurs.
     - `--grpc.log-ignore-methods="/ttn.lorawan.v3.GsNs/HandleUplink:pkg/networkserver:duplicate_uplink;pkg/networkserver:device_not_found"`: log is skipped when either `pkg/networkserver:duplicate_uplink` or `pkg/networkserver:device_not_found` error occurs (but not on success).
     - `--grpc.log-ignore-methods="/ttn.lorawan.v3.GsNs/HandleUplink:;pkg/networkserver:duplicate_uplink"`: log is skipped on success or when `pkg/networkserver:duplicate_uplink` error occurs.
+- The Gateway Server now takes into consideration the extra dutycycle checks present in the LoRa Basics Station forwarder. Previously the Gateway Server may accept the scheduling of downlinks which the packet forwarder would silently drop.
 
 ### Deprecated
 

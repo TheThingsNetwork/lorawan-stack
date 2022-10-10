@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/mqtt"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
@@ -67,6 +68,9 @@ type connection struct {
 
 func (*connection) Protocol() string            { return "mqtt" }
 func (*connection) SupportsDownlinkClaim() bool { return false }
+func (*connection) DutyCycleStyle() scheduling.DutyCycleStyle {
+	return scheduling.DefaultDutyCycleStyle
+}
 
 func setupConnection(ctx context.Context, mqttConn mqttnet.Conn, format Format, server io.Server) error {
 	c := &connection{
