@@ -399,7 +399,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 				return nil, nil, errEncodePayload.WithCause(err)
 			}
 
-			skID, err := ulid.New(ulid.Timestamp(time.Now()), rand.Reader)
+			skID, err := ulid.New(ulid.Now(), rand.Reader)
 			if err != nil {
 				return nil, nil, errGenerateSessionKeyID.New()
 			}

@@ -10,11 +10,11 @@ on:
 jobs:
   protos:
     name: Generate protos
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 5
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install Go and Dependencies
         uses: ./.github/actions/install-go-and-deps
       - name: Build Mage

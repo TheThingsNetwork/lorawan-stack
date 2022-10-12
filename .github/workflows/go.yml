@@ -18,11 +18,11 @@ on:
 jobs:
   quality:
     name: Code Quality
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 15
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install Go and Dependencies
         uses: ./.github/actions/install-go-and-deps
       - name: Build Mage
@@ -42,7 +42,7 @@ jobs:
       - name: Lint code
         uses: golangci/golangci-lint-action@v3
         with:
-          version: v1.46.2
+          version: v1.50.0
           only-new-issues: true
           skip-pkg-cache: true # Caching is set up by install-go-and-deps
           skip-build-cache: true # Caching is set up by install-go-and-deps
@@ -50,7 +50,7 @@ jobs:
 
   test:
     name: Tests
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     services:
       postgres:
         image: postgres
@@ -82,7 +82,7 @@ jobs:
           entrypoint: /usr/bin/createdb
           args: -h postgres -U root ttn_lorawan_is_store_test
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install Go and Dependencies
         uses: ./.github/actions/install-go-and-deps
       - name: Build Mage

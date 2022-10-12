@@ -30,14 +30,14 @@ env:
 jobs:
   determine-if-required:
     name: Determine if run is required
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     outputs:
       needs-to-run: ${{ steps.check-result.outputs.passed != 'true' }}
       hash: ${{ steps.get-hash.outputs.hash }}
     timeout-minutes: 5
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           submodules: false
@@ -58,13 +58,13 @@ jobs:
         run: test -f .cache/passed && echo "::set-output name=passed::$(cat .cache/passed)"
   preparation:
     name: Run preparations
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: determine-if-required
     if: needs.determine-if-required.outputs.needs-to-run == 'true'
     timeout-minutes: 30
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           submodules: true
@@ -114,7 +114,7 @@ jobs:
           path: build.zip
   end-to-end:
     name: Main frontend end-to-end tests (Chrome)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       NODE_ENV: development
       CYPRESS_MACHINE_NUMBER: ${{ matrix.machines }}
@@ -126,7 +126,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           submodules: true
@@ -212,8 +212,8 @@ jobs:
           name: cypress-failed-test-spec
           path: .cache/.failed-specs-*.txt
   cross-browser-smoke:
-    name: Cross-browser smoke tests (Firefox 78 ESR)
-    runs-on: ubuntu-20.04
+    name: Cross-browser smoke tests (Firefox 102.3.0 ESR)
+    runs-on: ubuntu-22.04
     env:
       NODE_ENV: development
     needs: [determine-if-required, preparation]
@@ -221,7 +221,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           submodules: true
@@ -237,9 +237,9 @@ jobs:
           name: 'build-files'
       - name: Unzip build artifacts
         run: unzip -o build.zip
-      - name: Install FF 78 ESR
+      - name: Install FF 102.3.0 ESR
         run: |
-          wget --no-verbose -O /tmp/firefox.tar.bz2 https://download-installer.cdn.mozilla.net/pub/firefox/releases/78.13.0esr/linux-x86_64/en-US/firefox-78.13.0esr.tar.bz2
+          wget --no-verbose -O /tmp/firefox.tar.bz2 https://download-installer.cdn.mozilla.net/pub/firefox/releases/102.3.0esr/linux-x86_64/en-US/firefox-102.3.0esr.tar.bz2
           tar -C /opt -xjf /tmp/firefox.tar.bz2
           rm /tmp/firefox.tar.bz2
           sudo ln -fs /opt/firefox/firefox /usr/bin/firefox
@@ -271,7 +271,7 @@ jobs:
           path: cypress/screenshots
   cache-result:
     name: Write result cache
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: [preparation, end-to-end, cross-browser-smoke, determine-if-required]
     timeout-minutes: 5
     steps:

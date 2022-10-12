@@ -11,7 +11,7 @@ jobs:
   check_mergeability:
     name: Check Mergeability
     if: ${{ github.repository == 'TheThingsNetwork/lorawan-stack' }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       MERGE_CONFLICTS_IGNORE: |
         CHANGELOG.md
@@ -30,7 +30,7 @@ jobs:
           git config --global user.name github-actions
           git config --global user.email github-actions@github.com
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           token: ${{ secrets.BOT_TOKEN }}
           ref: ${{ github.event.pull_request.head.sha }}

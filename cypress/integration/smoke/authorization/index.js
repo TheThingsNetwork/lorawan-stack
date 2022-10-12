@@ -32,7 +32,8 @@ const authorizeConsole = defineSmokeTest(
 
     // Login.
     cy.findByLabelText('User ID').type(user.ids.user_id)
-    cy.findByLabelText('Password').type(`${user.password}{enter}`)
+    cy.findByLabelText('Password').type(user.password)
+    cy.findByRole('button', { name: 'Login' }).click()
 
     // Authorize.
     cy.location('pathname').should('contain', `${Cypress.config('accountAppRootPath')}/authorize`)
@@ -62,7 +63,8 @@ const abortAuthorization = defineSmokeTest(
 
     // Login.
     cy.findByLabelText('User ID').type(user.ids.user_id)
-    cy.findByLabelText('Password').type(`${user.password}{enter}`)
+    cy.findByLabelText('Password').type(user.password)
+    cy.findByRole('button', { name: 'Login' }).click()
 
     // Deny authorization.
     cy.location('pathname').should('contain', `${Cypress.config('accountAppRootPath')}/authorize`)
