@@ -405,13 +405,14 @@ func TestToGatewayUpRawMultiAntenna(t *testing.T) {
 							Lora: &ttnpb.LoRaDataRate{
 								SpreadingFactor: 7,
 								Bandwidth:       125000,
-								CodingRate:      "4/5",
+								CodingRate:      band.Cr4_5,
 							},
 						},
 					},
-					Frequency: 868500000,
-					Time:      ttnpb.ProtoTimePtr(utcTime),
-					Timestamp: timestamp,
+					CodingRate: band.Cr4_5,
+					Frequency:  868500000,
+					Time:       ttnpb.ProtoTimePtr(utcTime),
+					Timestamp:  timestamp,
 				},
 				RxMetadata: []*ttnpb.RxMetadata{
 					{

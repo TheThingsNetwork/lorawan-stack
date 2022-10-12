@@ -627,6 +627,7 @@ func PathsFromSelectFlagsForTxSettings_Downlink(flags *pflag.FlagSet, prefix str
 func AddSelectFlagsForTxSettings(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("data-rate", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("data-rate", prefix), true), flagsplugin.WithHidden(hidden)))
 	AddSelectFlagsForDataRate(flags, flagsplugin.Prefix("data-rate", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("coding-rate", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("coding-rate", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("frequency", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("frequency", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("enable-crc", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("enable-crc", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("timestamp", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("timestamp", prefix), false), flagsplugin.WithHidden(hidden)))
@@ -647,6 +648,11 @@ func PathsFromSelectFlagsForTxSettings(flags *pflag.FlagSet, prefix string) (pat
 		return nil, err
 	} else {
 		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("coding_rate", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("coding_rate", prefix))
 	}
 	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("frequency", prefix)); err != nil {
 		return nil, err

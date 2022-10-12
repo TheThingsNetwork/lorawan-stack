@@ -18627,6 +18627,10 @@
           "$ref": "#/definitions/v3DataRate",
           "description": "Data rate."
         },
+        "coding_rate": {
+          "type": "string",
+          "description": "LoRa coding rate.\nDEPRECATED: Set through data_rate instead."
+        },
         "frequency": {
           "type": "string",
           "format": "uint64",

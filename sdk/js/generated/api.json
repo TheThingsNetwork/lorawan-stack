@@ -30964,6 +30964,18 @@
               }
             },
             {
+              "name": "coding_rate",
+              "description": "LoRa coding rate.\nDEPRECATED: Set through data_rate instead.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
               "name": "frequency",
               "description": "Frequency (Hz).",
               "label": "",

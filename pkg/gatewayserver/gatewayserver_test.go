@@ -903,8 +903,9 @@ func TestGatewayServer(t *testing.T) {
 													},
 												},
 											},
-											Frequency: 867900000,
-											Timestamp: 100,
+											CodingRate: band.Cr4_5,
+											Frequency:  867900000,
+											Timestamp:  100,
 										},
 										RxMetadata: []*ttnpb.RxMetadata{
 											{
@@ -1062,8 +1063,9 @@ func TestGatewayServer(t *testing.T) {
 														},
 													},
 												},
-												Frequency: 867900000,
-												Timestamp: 100,
+												CodingRate: band.Cr4_5,
+												Frequency:  867900000,
+												Timestamp:  100,
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
@@ -1096,8 +1098,9 @@ func TestGatewayServer(t *testing.T) {
 														},
 													},
 												},
-												Frequency: 867900000,
-												Timestamp: 101,
+												CodingRate: band.Cr4_5,
+												Frequency:  867900000,
+												Timestamp:  101,
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
@@ -1122,8 +1125,9 @@ func TestGatewayServer(t *testing.T) {
 														},
 													},
 												},
-												Frequency: 867900000,
-												Timestamp: 100,
+												CodingRate: band.Cr4_5,
+												Frequency:  867900000,
+												Timestamp:  100,
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
@@ -1148,8 +1152,9 @@ func TestGatewayServer(t *testing.T) {
 														},
 													},
 												},
-												Frequency: 867900000,
-												Timestamp: 100,
+												CodingRate: band.Cr4_5,
+												Frequency:  867900000,
+												Timestamp:  100,
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
@@ -1216,8 +1221,9 @@ func TestGatewayServer(t *testing.T) {
 														},
 													},
 												},
-												Frequency: 868500000,
-												Timestamp: 100,
+												CodingRate: band.Cr4_5,
+												Frequency:  868500000,
+												Timestamp:  100,
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
@@ -1242,8 +1248,9 @@ func TestGatewayServer(t *testing.T) {
 														},
 													},
 												},
-												Frequency: 868100000,
-												Timestamp: 200,
+												CodingRate: band.Cr4_5,
+												Frequency:  868100000,
+												Timestamp:  200,
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
@@ -1268,8 +1275,9 @@ func TestGatewayServer(t *testing.T) {
 														},
 													},
 												},
-												Frequency: 867700000,
-												Timestamp: 300,
+												CodingRate: band.Cr4_5,
+												Frequency:  867700000,
+												Timestamp:  300,
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
@@ -1462,7 +1470,8 @@ func TestGatewayServer(t *testing.T) {
 													},
 												},
 											},
-											Frequency: 869525000,
+											CodingRate: band.Cr4_5,
+											Frequency:  869525000,
 											Downlink: &ttnpb.TxSettings_Downlink{
 												TxPower: 10,
 											},

@@ -1692,6 +1692,8 @@ func (m *TxSettings) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "coding_rate":
+			// no validation rules for CodingRate
 		case "frequency":
 			// no validation rules for Frequency
 		case "enable_crc":

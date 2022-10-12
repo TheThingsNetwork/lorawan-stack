@@ -113,6 +113,7 @@ func (protobufv2) ToUplink(message []byte, ids *ttnpb.GatewayIdentifiers) (*ttnp
 		}
 		settings.DataRate = loraDr.DataRate
 		settings.DataRate.Modulation.(*ttnpb.DataRate_Lora).Lora.CodingRate = lorawanMetadata.CodingRate
+		settings.CodingRate = lorawanMetadata.CodingRate
 	case ttnpbv2.Modulation_FSK:
 		settings.DataRate = &ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_Fsk{

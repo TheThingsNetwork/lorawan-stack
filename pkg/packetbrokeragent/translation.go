@@ -480,6 +480,13 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
 	}
 
+	switch mod := up.Settings.DataRate.Modulation.(type) {
+	case *ttnpb.DataRate_Lora:
+		up.Settings.CodingRate = mod.Lora.CodingRate
+	case *ttnpb.DataRate_Lrfhss:
+		up.Settings.CodingRate = mod.Lrfhss.CodingRate
+	}
+
 	var receiveTime *pbtypes.Timestamp
 	if t, err := pbtypes.TimestampFromProto(msg.Message.GatewayReceiveTime); err == nil {
 		receiveTime = ttnpb.ProtoTimePtr(t)

@@ -156,7 +156,8 @@ func TestForwarder(t *testing.T) {
 									},
 								},
 							},
-							Frequency: 869525000,
+							CodingRate: band.Cr4_5,
+							Frequency:  869525000,
 						},
 					},
 					BandId: "EU_863_870",
@@ -275,7 +276,8 @@ func TestForwarder(t *testing.T) {
 									},
 								},
 							},
-							Frequency: 868300000,
+							CodingRate: band.Cr4_5,
+							Frequency:  868300000,
 						},
 					},
 					BandId: "EU_863_870",
@@ -577,7 +579,6 @@ func TestHomeNetwork(t *testing.T) {
 						DataRate:             packetbroker.NewLoRaDataRate(7, 125000, band.Cr4_5),
 						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
 						Frequency:            869525000,
-						CodingRate:           band.Cr4_5,
 						GatewayMetadata: &packetbroker.UplinkMessage_GatewayMetadata{
 							Teaser: &packetbroker.GatewayMetadataTeaser{
 								Value: &packetbroker.GatewayMetadataTeaser_Terrestrial_{
@@ -725,7 +726,8 @@ func TestHomeNetwork(t *testing.T) {
 								},
 							},
 						},
-						Frequency: 869525000,
+						CodingRate: band.Cr4_5,
+						Frequency:  869525000,
 					},
 				},
 			},
@@ -751,7 +753,6 @@ func TestHomeNetwork(t *testing.T) {
 						DataRate:             packetbroker.NewLoRaDataRate(9, 125000, band.Cr4_5),
 						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
 						Frequency:            869525000,
-						CodingRate:           band.Cr4_5,
 						GatewayMetadata: &packetbroker.UplinkMessage_GatewayMetadata{
 							Teaser: &packetbroker.GatewayMetadataTeaser{
 								Value: &packetbroker.GatewayMetadataTeaser_Terrestrial_{
@@ -836,7 +837,8 @@ func TestHomeNetwork(t *testing.T) {
 								},
 							},
 						},
-						Frequency: 869525000,
+						CodingRate: band.Cr4_5,
+						Frequency:  869525000,
 					},
 				},
 			},

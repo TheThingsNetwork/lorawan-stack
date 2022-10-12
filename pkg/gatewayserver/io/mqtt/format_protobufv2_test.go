@@ -50,7 +50,8 @@ func TestProtobufV2Downlink(t *testing.T) {
 						},
 					},
 				},
-				Frequency: 863000000,
+				CodingRate: band.Cr4_5,
+				Frequency:  863000000,
 				Downlink: &ttnpb.TxSettings_Downlink{
 					TxPower: 16.15,
 				},
@@ -112,6 +113,7 @@ func TestProtobufV2Uplinks(t *testing.T) {
 				},
 			},
 		},
+		CodingRate: band.Cr4_5,
 	}
 	validV2Metadata := ttnpbv2.GatewayRxMetadata{
 		GatewayId: "gateway-id",

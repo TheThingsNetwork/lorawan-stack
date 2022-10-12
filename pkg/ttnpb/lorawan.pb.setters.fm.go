@@ -998,6 +998,16 @@ func (dst *TxSettings) SetFields(src *TxSettings, paths ...string) error {
 					dst.DataRate = nil
 				}
 			}
+		case "coding_rate":
+			if len(subs) > 0 {
+				return fmt.Errorf("'coding_rate' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CodingRate = src.CodingRate
+			} else {
+				var zero string
+				dst.CodingRate = zero
+			}
 		case "frequency":
 			if len(subs) > 0 {
 				return fmt.Errorf("'frequency' has no subfields, but %s were specified", subs)

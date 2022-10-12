@@ -203,9 +203,10 @@ func simulate(cmd *cobra.Command, forUp func(*ttnpb.UplinkMessage) error, forDow
 					},
 				},
 			},
-			Frequency: uplinkParams.Frequency,
-			Timestamp: uplinkParams.Timestamp,
-			Time:      ttnpb.ProtoTime(uplinkParams.Time),
+			CodingRate: band.Cr4_5,
+			Frequency:  uplinkParams.Frequency,
+			Timestamp:  uplinkParams.Timestamp,
+			Time:       ttnpb.ProtoTime(uplinkParams.Time),
 		},
 		RxMetadata: []*ttnpb.RxMetadata{
 			{

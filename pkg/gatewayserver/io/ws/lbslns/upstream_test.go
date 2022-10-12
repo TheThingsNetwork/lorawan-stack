@@ -176,6 +176,7 @@ func TestJoinRequest(t *testing.T) {
 					GatewayIds: gtwID,
 				}},
 				Settings: &ttnpb.TxSettings{
+					CodingRate: band.Cr4_5,
 					DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 12,
 						Bandwidth:       125000,
@@ -226,9 +227,10 @@ func TestJoinRequest(t *testing.T) {
 					},
 				},
 				Settings: &ttnpb.TxSettings{
-					Frequency: 868300000,
-					Time:      ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
-					Timestamp: (uint32)(12666373963464220 & 0xFFFFFFFF),
+					Frequency:  868300000,
+					Time:       ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
+					Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
+					CodingRate: band.Cr4_5,
 					DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
@@ -344,9 +346,10 @@ func TestUplinkDataFrame(t *testing.T) {
 					},
 				},
 				Settings: &ttnpb.TxSettings{
-					Timestamp: (uint32)(12666373963464220 & 0xFFFFFFFF),
-					Time:      ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
-					Frequency: 868300000,
+					Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
+					Time:       ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
+					CodingRate: band.Cr4_5,
+					Frequency:  868300000,
 					DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
@@ -408,9 +411,10 @@ func TestUplinkDataFrame(t *testing.T) {
 					},
 				},
 				Settings: &ttnpb.TxSettings{
-					Frequency: 868300000,
-					Timestamp: (uint32)(12666373963464220 & 0xFFFFFFFF),
-					Time:      ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
+					Frequency:  868300000,
+					Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
+					Time:       ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
+					CodingRate: band.Cr4_5,
 					DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,

@@ -31,8 +31,9 @@ func buildLoRaDownlinkFromParameters(
 ) (*ttnpb.DownlinkMessage, error) {
 	payload := bytes.Repeat([]byte{0x0}, payloadSize)
 	scheduled := &ttnpb.TxSettings{
-		Frequency: frequency,
-		DataRate:  dataRate,
+		Frequency:  frequency,
+		DataRate:   dataRate,
+		CodingRate: dataRate.GetLora().CodingRate,
 	}
 	downlink := &ttnpb.DownlinkMessage{
 		RawPayload: payload,

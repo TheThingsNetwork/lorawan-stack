@@ -18,6 +18,7 @@ For details about compatibility between different releases, see the **Commitment
     - `--grpc.log-ignore-methods="/ttn.lorawan.v3.GsNs/HandleUplink"`: log is skipped when no error occurs.
     - `--grpc.log-ignore-methods="/ttn.lorawan.v3.GsNs/HandleUplink:pkg/networkserver:duplicate_uplink;pkg/networkserver:device_not_found"`: log is skipped when either `pkg/networkserver:duplicate_uplink` or `pkg/networkserver:device_not_found` error occurs (but not on success).
     - `--grpc.log-ignore-methods="/ttn.lorawan.v3.GsNs/HandleUplink:;pkg/networkserver:duplicate_uplink"`: log is skipped on success or when `pkg/networkserver:duplicate_uplink` error occurs.
+- Reverted removal of `CodingRate` from `TxSettings`. This field is now a duplicate of the `CodingRate` defined in the `DataRate`. Full deprecation is planned for version `3.23.0`.
 
 ### Deprecated
 
