@@ -4859,6 +4859,15 @@
       "file": "io.go"
     }
   },
+  "error:pkg/gatewayserver/scheduling:blocked": {
+    "translations": {
+      "en": "sub band is blocked for `{duration}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/scheduling",
+      "file": "sub_band.go"
+    }
+  },
   "error:pkg/gatewayserver/scheduling:conflict": {
     "translations": {
       "en": "scheduling conflict"

@@ -48,8 +48,9 @@ type srv struct {
 	limitLogs ratelimit.Interface
 }
 
-func (*srv) Protocol() string            { return "udp" }
-func (*srv) SupportsDownlinkClaim() bool { return true }
+func (*srv) Protocol() string                          { return "udp" }
+func (*srv) SupportsDownlinkClaim() bool               { return true }
+func (*srv) DutyCycleStyle() scheduling.DutyCycleStyle { return scheduling.DefaultDutyCycleStyle }
 
 var (
 	limitLogsConfig      = config.RateLimitingProfile{MaxPerMin: 1}

@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
@@ -74,8 +75,9 @@ func New(server io.Server, opts ...Option) ttnpb.GtwGsServer {
 	return i
 }
 
-func (*impl) Protocol() string            { return "grpc" }
-func (*impl) SupportsDownlinkClaim() bool { return false }
+func (*impl) Protocol() string                          { return "grpc" }
+func (*impl) SupportsDownlinkClaim() bool               { return false }
+func (*impl) DutyCycleStyle() scheduling.DutyCycleStyle { return scheduling.DefaultDutyCycleStyle }
 
 var errConnect = errors.Define("connect", "failed to connect gateway `{gateway_uid}`")
 

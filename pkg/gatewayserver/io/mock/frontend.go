@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -30,8 +31,9 @@ type Frontend struct {
 	Down   chan *ttnpb.DownlinkMessage
 }
 
-func (*Frontend) Protocol() string            { return "mock" }
-func (*Frontend) SupportsDownlinkClaim() bool { return true }
+func (*Frontend) Protocol() string                          { return "mock" }
+func (*Frontend) SupportsDownlinkClaim() bool               { return true }
+func (*Frontend) DutyCycleStyle() scheduling.DutyCycleStyle { return scheduling.DefaultDutyCycleStyle }
 
 // ConnectFrontend connects a new mock front-end to the given server.
 // The gateway time starts at Unix epoch.

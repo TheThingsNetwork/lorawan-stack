@@ -79,7 +79,14 @@ var (
 
 // NewScheduler instantiates a new Scheduler for the given frequency plan.
 // If no time source is specified, the system time is used.
-func NewScheduler(ctx context.Context, fps map[string]*frequencyplans.FrequencyPlan, enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration, timeSource TimeSource) (*Scheduler, error) {
+func NewScheduler(
+	ctx context.Context,
+	fps map[string]*frequencyplans.FrequencyPlan,
+	enforceDutyCycle bool,
+	dutyCycleStyle DutyCycleStyle,
+	scheduleAnytimeDelay *time.Duration,
+	timeSource TimeSource,
+) (*Scheduler, error) {
 	logger := log.FromContext(ctx)
 	if timeSource == nil {
 		timeSource = SystemTimeSource
@@ -123,7 +130,7 @@ func NewScheduler(ctx context.Context, fps map[string]*frequencyplans.FrequencyP
 						MaxFrequency: subBand.MaxFrequency,
 						DutyCycle:    subBand.DutyCycle,
 					}
-					sb := NewSubBand(params, s.clock, nil)
+					sb := NewSubBand(params, s.clock, nil, dutyCycleStyle)
 					var isIdentical bool
 					for _, subBand := range s.subBands {
 						if subBand.IsIdentical(sb) {
@@ -149,7 +156,7 @@ func NewScheduler(ctx context.Context, fps map[string]*frequencyplans.FrequencyP
 						MaxFrequency: subBand.MaxFrequency,
 						DutyCycle:    subBand.DutyCycle,
 					}
-					sb := NewSubBand(params, s.clock, nil)
+					sb := NewSubBand(params, s.clock, nil, dutyCycleStyle)
 					var isIdentical bool
 					for _, subBand := range s.subBands {
 						if subBand.IsIdentical(sb) {
@@ -171,7 +178,7 @@ func NewScheduler(ctx context.Context, fps map[string]*frequencyplans.FrequencyP
 			MinFrequency: 0,
 			MaxFrequency: math.MaxUint64,
 		}
-		sb := NewSubBand(noDutyCycleParams, s.clock, nil)
+		sb := NewSubBand(noDutyCycleParams, s.clock, nil, dutyCycleStyle)
 		s.subBands = append(s.subBands, sb)
 	}
 	go s.gc(ctx)

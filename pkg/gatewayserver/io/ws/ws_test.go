@@ -822,8 +822,9 @@ func TestTraffic(t *testing.T) {
 		t.Fatal("Connection timeout")
 	}
 
+	now := time.Now().UTC()
 	clock := mockClock{}
-	clock.Start(ctx, time.Now().UTC())
+	clock.Start(ctx, now)
 
 	for _, tc := range []struct {
 		Name                    string
@@ -1085,7 +1086,7 @@ func TestTraffic(t *testing.T) {
 						},
 						Rx1Frequency:    868100000,
 						FrequencyPlanId: test.EUFrequencyPlanID,
-						AbsoluteTime:    ttnpb.ProtoTimePtr(time.Unix(0x424242424, 0x42424242)),
+						AbsoluteTime:    ttnpb.ProtoTimePtr(now.Add(30 * time.Second)),
 					},
 				},
 				CorrelationIds: []string{"correlation1", "correlation2"},
@@ -1100,7 +1101,7 @@ func TestTraffic(t *testing.T) {
 				AbsoluteTimeDownlinkMessage: &lbslns.AbsoluteTimeDownlinkMessage{
 					Freq:    868100000,
 					DR:      5,
-					GPSTime: lbslns.TimeToGPSTime(time.Unix(0x424242424, 0x42424242)),
+					GPSTime: lbslns.TimeToGPSTime(now.Add(30 * time.Second)),
 				},
 			},
 		},

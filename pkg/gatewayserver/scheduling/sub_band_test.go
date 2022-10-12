@@ -34,7 +34,7 @@ func TestSubBandScheduleUnrestricted(t *testing.T) {
 		DutyCycle:    1,
 	}
 	clock := &mockClock{}
-	sb := scheduling.NewSubBand(params, clock, nil)
+	sb := scheduling.NewSubBand(params, clock, nil, scheduling.DefaultDutyCycleStyle)
 	for i, tc := range []struct {
 		Starts            scheduling.ConcentratorTime
 		Duration          time.Duration
@@ -101,7 +101,7 @@ func TestSubBandScheduleRestricted(t *testing.T) {
 		ttnpb.TxSchedulePriority_NORMAL:  0.5, // Duty-cycle <= 0.25
 		ttnpb.TxSchedulePriority_HIGHEST: 1.0, // Duty-cycle <= 0.50
 	}
-	sb := scheduling.NewSubBand(params, clock, ceilings)
+	sb := scheduling.NewSubBand(params, clock, ceilings, scheduling.DefaultDutyCycleStyle)
 	for i, tc := range []struct {
 		Starts            scheduling.ConcentratorTime
 		Duration          time.Duration
@@ -183,7 +183,7 @@ func TestScheduleAnytimeRestricted(t *testing.T) {
 		ttnpb.TxSchedulePriority_NORMAL:  0.5, // Duty-cycle <= 0.25
 		ttnpb.TxSchedulePriority_HIGHEST: 1.0, // Duty-cycle <= 0.50
 	}
-	sb := scheduling.NewSubBand(params, clock, ceilings)
+	sb := scheduling.NewSubBand(params, clock, ceilings, scheduling.DefaultDutyCycleStyle)
 
 	for _, t := range []scheduling.ConcentratorTime{
 		scheduling.ConcentratorTime(6 * time.Second),
@@ -231,5 +231,62 @@ func TestScheduleAnytimeRestricted(t *testing.T) {
 		}
 		_, err := sb.ScheduleAnytime(5*time.Second, next, ttnpb.TxSchedulePriority_NORMAL)
 		a.So(err, should.HaveSameErrorDefinitionAs, scheduling.ErrDutyCycle)
+	}
+}
+
+func TestBlockingScheduling(t *testing.T) {
+	t.Parallel()
+
+	a := assertions.New(t)
+	params := scheduling.SubBandParameters{
+		MinFrequency: 0,
+		MaxFrequency: math.MaxUint64,
+		DutyCycle:    0.1,
+	}
+	clock := &mockClock{}
+	sb := scheduling.NewSubBand(params, clock, nil, scheduling.DutyCycleStyleBlockingWindow)
+
+	// No emissions - the sub band is unblocked.
+	// After the emission, the sub band should be blocked for 0.5 * 1/0.1 = 5s.
+	{
+		em := scheduling.NewEmission(0, 500*time.Millisecond)
+		err := sb.Schedule(em, ttnpb.TxSchedulePriority_HIGHEST)
+		a.So(err, should.BeNil)
+	}
+
+	// The previous emission keeps the [0, 5s) interval blocked.
+	{
+		for i := 0; i < 5; i++ {
+			em := scheduling.NewEmission(scheduling.ConcentratorTime(i*int(time.Second)), 500*time.Millisecond)
+			err := sb.Schedule(em, ttnpb.TxSchedulePriority_HIGHEST)
+			a.So(err, should.NotBeNil)
+			a.So(errors.IsResourceExhausted(err), should.BeTrue)
+		}
+	}
+
+	// We can schedule a new emission after 5s.
+	// After this emission, the band should be blocked for 0.2 * 1/0.1 = 2s.
+	{
+		em := scheduling.NewEmission(scheduling.ConcentratorTime(5*time.Second), 200*time.Millisecond)
+		err := sb.Schedule(em, ttnpb.TxSchedulePriority_HIGHEST)
+		a.So(err, should.BeNil)
+	}
+
+	// The previous emission keeps the [5s, 7s) interval blocked.
+	{
+		for i := 0; i < 2; i++ {
+			t := 5*time.Second + time.Duration(i)*time.Second
+			em := scheduling.NewEmission(scheduling.ConcentratorTime(t), 200*time.Millisecond)
+			err := sb.Schedule(em, ttnpb.TxSchedulePriority_HIGHEST)
+			a.So(err, should.NotBeNil)
+			a.So(errors.IsResourceExhausted(err), should.BeTrue)
+		}
+	}
+
+	// We can schedule a new emission after 2s.
+	{
+		em := scheduling.NewEmission(scheduling.ConcentratorTime(7*time.Second), 200*time.Millisecond)
+		err := sb.Schedule(em, ttnpb.TxSchedulePriority_HIGHEST)
+		a.So(err, should.BeNil)
 	}
 }

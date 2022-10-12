@@ -27,6 +27,20 @@ import (
 // A lower value results in balancing capacity in time, while a higher value allows for bursts.
 var DutyCycleWindow = 1 * time.Hour
 
+// DutyCycleStyle represents the of duty cycle algorithm to be used by a sub band.
+type DutyCycleStyle int
+
+const (
+	// DefaultDutyCycleStyle is the default duty cycle style.
+	DefaultDutyCycleStyle = DutyCycleStyleSimpleWindow
+
+	// DutyCycleStyleSimpleWindow uses a rolling window in order to compute the usage of a sub band.
+	DutyCycleStyleSimpleWindow DutyCycleStyle = iota
+	// DutyCycleStyleBlockingWindow uses a rolling window in order to compute the usage of a sub band.
+	// The sub band is also blocked for the inverse duration of the non prioritized duty cycle.
+	DutyCycleStyleBlockingWindow
+)
+
 // DutyCycleCeilings contains the upper limits per schedule priority.
 // The limit is a fraction of the duty-cycle.
 type DutyCycleCeilings map[ttnpb.TxSchedulePriority]float32
@@ -55,11 +69,14 @@ type SubBand struct {
 	mu        sync.RWMutex
 	clock     Clock
 	ceilings  DutyCycleCeilings
+	style     DutyCycleStyle
 	emissions Emissions
 }
 
 // NewSubBand returns a new SubBand considering the given duty-cycle, clock and optionally duty-cycle ceilings.
-func NewSubBand(params SubBandParameters, clock Clock, ceilings DutyCycleCeilings) *SubBand {
+func NewSubBand(
+	params SubBandParameters, clock Clock, ceilings DutyCycleCeilings, style DutyCycleStyle,
+) *SubBand {
 	if ceilings == nil {
 		ceilings = DefaultDutyCycleCeilings
 	}
@@ -67,6 +84,7 @@ func NewSubBand(params SubBandParameters, clock Clock, ceilings DutyCycleCeiling
 		SubBandParameters: params,
 		clock:             clock,
 		ceilings:          ceilings,
+		style:             style,
 	}
 	if sb.DutyCycle == 0 {
 		sb.DutyCycle = 1
@@ -117,26 +135,74 @@ func (sb *SubBand) prioritizedDutyCycle(p ttnpb.TxSchedulePriority) float32 {
 	return sb.DutyCycle * ceiling
 }
 
-var errDutyCycle = errors.DefineResourceExhausted("duty_cycle", "utilization `{used}%` would be higher than the available `{usable}%` for priority `{priority}`")
+var (
+	errDutyCycle = errors.DefineResourceExhausted(
+		"duty_cycle",
+		"utilization `{used}%` would be higher than the available `{usable}%` for priority `{priority}`",
+	)
+	errBlocked = errors.DefineResourceExhausted(
+		"blocked",
+		"sub band is blocked for `{duration}`",
+	)
+)
+
+// checkDutyCycle verifies if the emission complies with the duty cycle limitations, based on the style.
+//
+// For the simple window style, it verifies if the emission will not exceed the usable amount of the duty
+// cycle in the [t + toa - window, t + toa] and [t, t + window] windows, where `t` is the start of the
+// emission and `toa` is the duration of the emission.
+//
+// For the blocking window style, in addition to the above mentioned check it verifies if the inverse of
+// the duty cycle has passed from the last emission.
+// Given a duty cycle of p%, and an emission of d time units at timestamp t, the duty cycle check will
+// allow the next transmission to occur only after the t + d * (100%/p%) timestamp.
+//
+// This method requires that the read lock is held.
+func (sb *SubBand) checkDutyCycle(em Emission, p ttnpb.TxSchedulePriority) error {
+	usable := sb.prioritizedDutyCycle(p)
+	for _, to := range []ConcentratorTime{em.Ends(), em.t + ConcentratorTime(DutyCycleWindow)} {
+		used := float32(sb.sum(to-ConcentratorTime(DutyCycleWindow), to)+em.d) / float32(DutyCycleWindow)
+		if used <= usable {
+			continue
+		}
+		return errDutyCycle.WithAttributes(
+			"used", fmt.Sprintf("%.1f", used*100),
+			"usable", fmt.Sprintf("%.1f", usable*100),
+			"priority", fmt.Sprintf("%v", p),
+		)
+	}
+	switch sb.style {
+	case DutyCycleStyleSimpleWindow:
+	case DutyCycleStyleBlockingWindow:
+		if len(sb.emissions) == 0 {
+			return nil
+		}
+		lastEmission := sb.emissions[len(sb.emissions)-1]
+		// NOTE: The priority is intentionally elided here, as the blocking algorithm does not consider
+		// the emission priority for duty cycle purposes.
+		blockedUntil := lastEmission.t + ConcentratorTime(lastEmission.d*time.Duration(1.0/sb.DutyCycle))
+		if em.t < blockedUntil {
+			return errBlocked.WithAttributes(
+				"duration", time.Duration(blockedUntil-em.t),
+			)
+		}
+	default:
+		panic("unreachable")
+	}
+	return nil
+}
 
 // Schedule schedules the given emission with the priority.
 // If there is no time available due to duty-cycle limitations, an error with code ResourceExhausted is returned.
 func (sb *SubBand) Schedule(em Emission, p ttnpb.TxSchedulePriority) error {
 	sb.mu.Lock()
 	defer sb.mu.Unlock()
-	if sb.DutyCycle < 1 {
-		usable := sb.prioritizedDutyCycle(p)
-		// Check the window before and after the emission for availability.
-		for _, to := range []ConcentratorTime{em.Ends(), em.t + ConcentratorTime(DutyCycleWindow)} {
-			used := float32(sb.sum(to-ConcentratorTime(DutyCycleWindow), to)+em.d) / float32(DutyCycleWindow)
-			if used > usable {
-				return errDutyCycle.WithAttributes(
-					"used", fmt.Sprintf("%.1f", used*100),
-					"usable", fmt.Sprintf("%.1f", usable*100),
-					"priority", fmt.Sprintf("%v", p),
-				)
-			}
-		}
+	if sb.DutyCycle >= 1 {
+		sb.emissions = sb.emissions.Insert(em)
+		return nil
+	}
+	if err := sb.checkDutyCycle(em, p); err != nil {
+		return err
 	}
 	sb.emissions = sb.emissions.Insert(em)
 	return nil
@@ -149,41 +215,37 @@ func (sb *SubBand) ScheduleAnytime(d time.Duration, next func() ConcentratorTime
 	sb.mu.Lock()
 	defer sb.mu.Unlock()
 	em := NewEmission(next(), d)
-	if sb.DutyCycle < 1 {
-		usable := sb.prioritizedDutyCycle(p)
-		used := float32(em.d) / float32(DutyCycleWindow)
-		if used > usable {
-			return Emission{}, errDutyCycle.WithAttributes(
-				"used", fmt.Sprintf("%.1f", used*100),
-				"usable", fmt.Sprintf("%.1f", usable*100),
-				"priority", fmt.Sprintf("%v", p),
-			)
-		}
-		for {
-			conflicts := false
-			// Check the window before and after the emission for availability.
-			for _, to := range []ConcentratorTime{em.Ends(), em.t + ConcentratorTime(DutyCycleWindow)} {
-				sum := float32(sb.sum(to-ConcentratorTime(DutyCycleWindow), to)+em.d) / float32(DutyCycleWindow)
-				conflicts = conflicts || sum > usable
-			}
-			if !conflicts {
-				break
-			}
-			if t := next(); t != em.t {
-				em.t = t
-				continue
-			}
-			// The caller has no later option; find the last emission after which we consider the duty-cycle window.
-			for i := len(sb.emissions) - 1; i >= 0; i-- {
-				other := sb.emissions[i]
-				used += float32(other.d) / float32(DutyCycleWindow)
-				if used > usable {
-					em.t = other.Ends() + ConcentratorTime(DutyCycleWindow) - ConcentratorTime(em.d)
-					break
-				}
-			}
+	if sb.DutyCycle >= 1 {
+		sb.emissions = sb.emissions.Insert(em)
+		return em, nil
+	}
+	usable := sb.prioritizedDutyCycle(p)
+	used := float32(em.d) / float32(DutyCycleWindow)
+	if used > usable {
+		return Emission{}, errDutyCycle.WithAttributes(
+			"used", fmt.Sprintf("%.1f", used*100),
+			"usable", fmt.Sprintf("%.1f", usable*100),
+			"priority", fmt.Sprintf("%v", p),
+		)
+	}
+	for {
+		if err := sb.checkDutyCycle(em, p); err == nil {
 			break
 		}
+		if t := next(); t != em.t {
+			em.t = t
+			continue
+		}
+		// The caller has no later option; find the last emission after which we consider the duty-cycle window.
+		for i := len(sb.emissions) - 1; i >= 0; i-- {
+			other := sb.emissions[i]
+			used += float32(other.d) / float32(DutyCycleWindow)
+			if used > usable {
+				em.t = other.Ends() + ConcentratorTime(DutyCycleWindow) - ConcentratorTime(em.d)
+				break
+			}
+		}
+		break
 	}
 	sb.emissions = sb.emissions.Insert(em)
 	return em, nil
