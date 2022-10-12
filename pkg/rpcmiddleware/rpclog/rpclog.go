@@ -122,7 +122,7 @@ func shouldSuppressError(err error) bool {
 func shouldSuppressLog(cfg methodLogConfig, err error) bool {
 	if err != nil {
 		wrapped, ok := errors.From(err)
-		return ok && cfg.shouldIgnorError(wrapped)
+		return ok && cfg.shouldIgnoreError(wrapped)
 	}
 	return cfg.IgnoreSuccess
 }

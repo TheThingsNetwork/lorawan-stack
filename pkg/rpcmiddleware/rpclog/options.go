@@ -26,7 +26,7 @@ type methodLogConfig struct {
 	IgnoredErrors map[string]struct{}
 }
 
-func (cfg *methodLogConfig) shouldIgnorError(err *errors.Error) bool {
+func (cfg *methodLogConfig) shouldIgnoreError(err *errors.Error) bool {
 	_, ok := cfg.IgnoredErrors[err.FullName()]
 	return ok
 }

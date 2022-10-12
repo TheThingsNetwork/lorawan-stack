@@ -1199,7 +1199,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	)
 	if err != nil {
 		logRegistryRPCError(ctx, err, "Failed to load device from registry by EUIs")
-		return err
+		return errDeviceNotFound.WithCause(err)
 	}
 	ctx = matchedCtx
 	ctx = log.NewContextWithField(ctx, "device_uid", unique.ID(ctx, matched.Ids))

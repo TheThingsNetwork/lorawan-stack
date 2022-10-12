@@ -47,7 +47,7 @@ func UnaryClientInterceptor(ctx context.Context, opts ...Option) grpc.UnaryClien
 			onceFields = onceFields.WithFields(logFieldsForError(err))
 		}
 
-		level := o.levelFunc(grpc.Code(err))
+		level := o.levelFunc(o.codeFunc(err))
 		entry := logger.WithFields(onceFields)
 		if err != nil {
 			entry = entry.WithError(err)
