@@ -56,7 +56,7 @@ func UnaryServerInterceptor(ctx context.Context, opts ...Option) grpc.UnaryServe
 			onceFields = onceFields.With(fields.fields)
 		}
 
-		level := o.levelFunc(grpc.Code(err))
+		level := o.levelFunc(o.codeFunc(err))
 		if err == context.Canceled {
 			level = log.InfoLevel
 		}
@@ -106,7 +106,7 @@ func StreamServerInterceptor(ctx context.Context, opts ...Option) grpc.StreamSer
 			onceFields = onceFields.With(fields.fields)
 		}
 
-		level := o.levelFunc(grpc.Code(err))
+		level := o.levelFunc(o.codeFunc(err))
 		if err == context.Canceled {
 			level = log.InfoLevel
 		}

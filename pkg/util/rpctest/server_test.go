@@ -81,7 +81,7 @@ func TestFooBarExampleServer(t *testing.T) {
 			a.So(err, should.BeNil)
 			cancel()
 			err = stream.RecvMsg(&rpctest.Bar{})
-			a.So(grpc.Code(err), should.Equal, codes.Canceled)
+			a.So(status.Code(err), should.Equal, codes.Canceled)
 		}
 
 		{
@@ -91,7 +91,7 @@ func TestFooBarExampleServer(t *testing.T) {
 			a.So(err, should.BeNil)
 			time.Sleep(150 * time.Millisecond)
 			err = stream.RecvMsg(&empty.Empty{})
-			a.So(grpc.Code(err), should.Equal, codes.Unknown)
+			a.So(status.Code(err), should.Equal, codes.Unknown)
 		}
 	})
 
