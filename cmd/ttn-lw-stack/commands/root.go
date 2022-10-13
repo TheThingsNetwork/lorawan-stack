@@ -46,7 +46,7 @@ var (
 	config = new(Config)
 
 	versionUpdate       chan pkgversion.Update
-	versionCheckTimeout = 500 * time.Millisecond
+	versionCheckTimeout = time.Second
 
 	// Root command is the entrypoint of the program.
 	Root = &cobra.Command{

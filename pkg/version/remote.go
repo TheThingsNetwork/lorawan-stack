@@ -210,13 +210,14 @@ func saveCheck(result *Update) error {
 // If there is no update, or no new version is available, this function returns nil.
 // The function uses cache.
 func CheckUpdate(ctx context.Context, opts ...CheckOption) (*Update, error) {
-	cachedCheck, err := cachedCheck()
-	if err == nil && cachedCheck.Timestamp.Add(versionCheckCacheTTL).After(time.Now()) {
-		return cachedCheck.Result, nil
-	}
 	current, err := semver.Parse(strings.TrimPrefix(TTN, "v"))
 	if err != nil {
 		return nil, err
+	}
+	if c, err := cachedCheck(); err == nil {
+		if c.Timestamp.Add(versionCheckCacheTTL).After(time.Now()) && c.Result.Current.Compare(current) == 0 {
+			return c.Result, nil
+		}
 	}
 	o := &checkOptions{
 		client:    http.DefaultClient,
