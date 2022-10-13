@@ -115,6 +115,10 @@ var (
 
 // Claim implements EndDeviceClaimer.
 func (client *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, claimAuthenticationCode string) error {
+	var (
+		err      error
+		hostName = client.config.NetworkServer.Hostname
+	)
 	htenantID := client.config.TenantID
 
 	claimReq := &claimRequest{
@@ -130,14 +134,14 @@ func (client *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, clai
 					HNSAddress string
 				}{
 					HTenantID:  htenantID,
-					HNSAddress: client.config.NetworkServer.Hostname,
+					HNSAddress: hostName,
 				},
 			},
 		},
 	}
 
 	var buf bytes.Buffer
-	err := json.NewEncoder(&buf).Encode(claimReq)
+	err = json.NewEncoder(&buf).Encode(claimReq)
 	if err != nil {
 		return err
 	}

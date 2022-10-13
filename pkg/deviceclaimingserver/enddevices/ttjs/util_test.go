@@ -37,6 +37,18 @@ type clientData struct {
 	asID string
 }
 
+type mockComponent struct {
+	Component
+}
+
+func (mockComponent) GetClusterID(context.Context) string {
+	return "test"
+}
+
+func (mockComponent) ClusterAddress(string) (string, error) {
+	return "localhost", nil
+}
+
 type mockTTJS struct {
 	provisonedDevices map[types.EUI64]device
 	joinEUIPrefixes   []types.EUI64Prefix

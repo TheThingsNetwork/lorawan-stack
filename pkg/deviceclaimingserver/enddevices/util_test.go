@@ -38,20 +38,28 @@ type mockEDCS struct {
 	ttnpb.EndDeviceRegistryClient
 }
 
+func (mockEDCS) GetClusterID(context.Context) string {
+	return "test"
+}
+
+func (mockEDCS) ClusterAddress(string) (string, error) {
+	return "localhost", nil
+}
+
 func (mockEDCS) HTTPClient(ctx context.Context, opts ...httpclient.Option) (*http.Client, error) {
 	return test.HTTPClientProvider.HTTPClient(ctx, opts...)
 }
 
-func (mockEDCS) GetBaseConfig(ctx context.Context) config.ServiceBase {
+func (mockEDCS) GetBaseConfig(context.Context) config.ServiceBase {
 	return config.ServiceBase{}
 }
 
-func (mockEDCS) GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (*grpc.ClientConn, error) {
-	return nil, nil
+func (mockEDCS) GetPeerConn(context.Context, ttnpb.ClusterRole, cluster.EntityIdentifiers) (*grpc.ClientConn, error) {
+	return nil, errMethodUnavailable.New()
 }
 
 func (mockEDCS) AuthInfo(context.Context) (*ttnpb.AuthInfoResponse, error) {
-	return nil, nil
+	return nil, errMethodUnavailable.New()
 }
 
 func (mockEDCS) AllowInsecureForCredentials() bool {
@@ -59,14 +67,14 @@ func (mockEDCS) AllowInsecureForCredentials() bool {
 }
 
 // Get implements EndDeviceRegistryClient.
-func (mockEDCS) Get(ctx context.Context, in *ttnpb.GetEndDeviceRequest, opts ...grpc.CallOption) (*ttnpb.EndDevice, error) {
+func (mockEDCS) Get(_ context.Context, in *ttnpb.GetEndDeviceRequest, _ ...grpc.CallOption) (*ttnpb.EndDevice, error) {
 	return &ttnpb.EndDevice{
 		Ids: in.EndDeviceIds,
 	}, nil
 }
 
 // ApplicationRights implements the Fetcher interface.
-func (mockEDCS) ApplicationRights(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
+func (mockEDCS) ApplicationRights(context.Context, *ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
 	return &ttnpb.Rights{
 		Rights: []ttnpb.Right{
 			ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
@@ -80,25 +88,28 @@ func (mockEDCS) SupportsJoinEUI(types.EUI64) bool {
 }
 
 // RegisterRoutes implements EndDeviceClaimingServer.
-func (mockEDCS) RegisterRoutes(server *web.Server) {
+func (mockEDCS) RegisterRoutes(*web.Server) {
 }
 
 // Claim implements EndDeviceClaimingServer.
-func (mockEDCS) Claim(ctx context.Context, req *ttnpb.ClaimEndDeviceRequest) (ids *ttnpb.EndDeviceIdentifiers, err error) {
+func (mockEDCS) Claim(context.Context, *ttnpb.ClaimEndDeviceRequest) (ids *ttnpb.EndDeviceIdentifiers, err error) {
 	return nil, errMethodUnavailable.New()
 }
 
 // Unclaim implements EndDeviceClaimingServer.
-func (mockEDCS) Unclaim(ctx context.Context, in *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
+func (mockEDCS) Unclaim(context.Context, *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
 	return nil, errMethodUnavailable.New()
 }
 
 // GetInfoByJoinEUI implements EndDeviceClaimingServer.
-func (mockEDCS) GetInfoByJoinEUI(ctx context.Context, in *ttnpb.GetInfoByJoinEUIRequest) (*ttnpb.GetInfoByJoinEUIResponse, error) {
+func (mockEDCS) GetInfoByJoinEUI(
+	context.Context,
+	*ttnpb.GetInfoByJoinEUIRequest,
+) (*ttnpb.GetInfoByJoinEUIResponse, error) {
 	return nil, errMethodUnavailable.New()
 }
 
 // GetClaimStatus implements EndDeviceClaimingServer.
-func (mockEDCS) GetClaimStatus(ctx context.Context, in *ttnpb.EndDeviceIdentifiers) (*ttnpb.GetClaimStatusResponse, error) {
+func (mockEDCS) GetClaimStatus(context.Context, *ttnpb.EndDeviceIdentifiers) (*ttnpb.GetClaimStatusResponse, error) {
 	return nil, errMethodUnavailable.New()
 }

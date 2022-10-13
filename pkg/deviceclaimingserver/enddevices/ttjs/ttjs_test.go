@@ -74,6 +74,8 @@ func TestTTJS(t *testing.T) {
 
 	c := componenttest.NewComponent(t, &component.Config{})
 
+	mockComponent := mockComponent{c}
+
 	mockTTJS := mockTTJS{
 		joinEUIPrefixes: []types.EUI64Prefix{
 			supportedJoinEUIPrefix,
@@ -118,7 +120,7 @@ func TestTTJS(t *testing.T) {
 	}
 
 	// Invalid client API key.
-	unauthenticatedClient, err := ttJSConfig.NewClient(ctx, c)
+	unauthenticatedClient, err := ttJSConfig.NewClient(ctx, mockComponent)
 	test.Must(unauthenticatedClient, err)
 	err = unauthenticatedClient.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode)
 	a.So(errors.IsUnauthenticated(err), should.BeTrue)
@@ -136,7 +138,7 @@ func TestTTJS(t *testing.T) {
 
 	// With Valid Key
 	ttJSConfig.Password = password
-	client, err := ttJSConfig.NewClient(ctx, c)
+	client, err := ttJSConfig.NewClient(ctx, mockComponent)
 	test.Must(client, err)
 
 	// Check JoinEUI support.
@@ -214,7 +216,7 @@ func TestTTJS(t *testing.T) {
 		},
 		URL: fmt.Sprintf("http://%s", lis.Addr().String()),
 	}
-	otherClient, err := otherClientConfig.NewClient(ctx, c)
+	otherClient, err := otherClientConfig.NewClient(ctx, mockComponent)
 	test.Must(otherClient, err)
 	err = otherClient.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode)
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
