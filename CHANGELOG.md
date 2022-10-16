@@ -13,14 +13,6 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
-- Option to ignore logs from selected gRPC methods now supports ignoring logs for selected errors on method.
-    Examples:
-    - `--grpc.log-ignore-methods="/ttn.lorawan.v3.GsNs/HandleUplink"`: log is skipped when no error occurs.
-    - `--grpc.log-ignore-methods="/ttn.lorawan.v3.GsNs/HandleUplink:pkg/networkserver:duplicate_uplink;pkg/networkserver:device_not_found"`: log is skipped when either `pkg/networkserver:duplicate_uplink` or `pkg/networkserver:device_not_found` error occurs (but not on success).
-    - `--grpc.log-ignore-methods="/ttn.lorawan.v3.GsNs/HandleUplink:;pkg/networkserver:duplicate_uplink"`: log is skipped on success or when `pkg/networkserver:duplicate_uplink` error occurs.
-- The Gateway Server now takes into consideration the extra duty cycle checks present in the LoRa Basics Station forwarder. Previously the Gateway Server may accept the scheduling of downlinks which the packet forwarder would silently drop.
-  - Note that in some rare cases in which the LoRa Basics Station duty cycle is stricter than the windowed approach used by The Things Stack, the scheduling will fail and this will be visible via `ns.down.data.schedule.fail` events. Note that this is actually a positive outcome - it allows the Network Server to schedule the downlink via another gateway, while previously the downlink would be scheduled but get silently dropped on the gateway.
-
 ### Deprecated
 
 ### Removed
@@ -28,6 +20,18 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 ### Security
+
+## [3.22.1] - unreleased
+
+### Changed
+
+- Option to ignore logs from selected gRPC methods now supports ignoring logs for selected errors on method.
+    Examples:
+    - `--grpc.log-ignore-methods="/ttn.lorawan.v3.GsNs/HandleUplink"`: log is skipped when no error occurs.
+    - `--grpc.log-ignore-methods="/ttn.lorawan.v3.GsNs/HandleUplink:pkg/networkserver:duplicate_uplink;pkg/networkserver:device_not_found"`: log is skipped when either `pkg/networkserver:duplicate_uplink` or `pkg/networkserver:device_not_found` error occurs (but not on success).
+    - `--grpc.log-ignore-methods="/ttn.lorawan.v3.GsNs/HandleUplink:;pkg/networkserver:duplicate_uplink"`: log is skipped on success or when `pkg/networkserver:duplicate_uplink` error occurs.
+- The Gateway Server now takes into consideration the extra duty cycle checks present in the LoRa Basics Station forwarder. Previously the Gateway Server may accept the scheduling of downlinks which the packet forwarder would silently drop.
+  - Note that in some rare cases in which the LoRa Basics Station duty cycle is stricter than the windowed approach used by The Things Stack, the scheduling will fail and this will be visible via `ns.down.data.schedule.fail` events. Note that this is actually a positive outcome - it allows the Network Server to schedule the downlink via another gateway, while previously the downlink would be scheduled but get silently dropped on the gateway.
 
 ## [3.22.0] - 2022-10-06
 
@@ -2372,7 +2376,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.22.0...v3.22
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.22.1...v3.22
+[3.22.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.22.0...v3.22.1
 [3.22.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.21.2...v3.22.0
 [3.21.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.21.1...v3.21.2
 [3.21.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.21.0...v3.21.1
