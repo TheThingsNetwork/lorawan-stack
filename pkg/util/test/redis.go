@@ -38,6 +38,8 @@ var defaultNamespace = [...]string{
 	"redistest",
 }
 
+var _ redis.Hook = (*redisHook)(nil)
+
 type redisHook struct {
 	testing.TB
 }
@@ -50,31 +52,36 @@ func (redisHook) formatCommand(cmd redis.Cmder) string {
 	return strings.Join(ss, " ")
 }
 
-func (h redisHook) BeforeProcess(ctx context.Context, cmd redis.Cmder) (context.Context, error) {
-	GetLogger(h.TB).Debugf("Executing `%s`", h.formatCommand(cmd))
-	return ctx, nil
+// DialHook implements redis.Hook.
+func (redisHook) DialHook(hook redis.DialHook) redis.DialHook {
+	return hook
 }
 
-func (h redisHook) AfterProcess(context.Context, redis.Cmder) error {
-	return nil
-}
-
-func (h redisHook) BeforeProcessPipeline(ctx context.Context, cmds []redis.Cmder) (context.Context, error) {
-	printLog := GetLogger(h.TB).Debug
-	if len(cmds) == 0 {
-		printLog("Executing empty pipeline")
-	} else {
-		s := fmt.Sprintf("Executing %d commands in pipeline:", len(cmds))
-		for _, cmd := range cmds {
-			s += fmt.Sprintf("\n   %s", h.formatCommand(cmd))
-		}
-		printLog(s)
+// ProcessHook implements redis.Hook.
+func (h redisHook) ProcessHook(hook redis.ProcessHook) redis.ProcessHook {
+	f := func(ctx context.Context, cmd redis.Cmder) error {
+		GetLogger(h.TB).Debugf("Executing `%s`", h.formatCommand(cmd))
+		return hook(ctx, cmd)
 	}
-	return ctx, nil
+	return f
 }
 
-func (h redisHook) AfterProcessPipeline(context.Context, []redis.Cmder) error {
-	return nil
+// ProcessPipelineHook implements redis.Hook.
+func (h redisHook) ProcessPipelineHook(hook redis.ProcessPipelineHook) redis.ProcessPipelineHook {
+	f := func(ctx context.Context, cmds []redis.Cmder) error {
+		printLog := GetLogger(h.TB).Debug
+		if len(cmds) == 0 {
+			printLog("Executing empty pipeline")
+		} else {
+			s := fmt.Sprintf("Executing %d commands in pipeline:", len(cmds))
+			for _, cmd := range cmds {
+				s += fmt.Sprintf("\n   %s", h.formatCommand(cmd))
+			}
+			printLog(s)
+		}
+		return hook(ctx, cmds)
+	}
+	return f
 }
 
 // NewRedis returns a new namespaced *redis.Client ready to use
