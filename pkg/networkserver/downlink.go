@@ -645,7 +645,8 @@ type downlinkPath struct {
 func buildMetadataComparator(
 	settings *ttnpb.MACState_UplinkMessage_TxSettings, mds []*ttnpb.MACState_UplinkMessage_RxMetadata,
 ) func(int, int) bool {
-	build := func(invalid func(int) bool, measure func(int) float32) func(i, j int) bool {
+	invalid := func(k int) bool { return mds[k].ChannelRssi == 0.0 }
+	build := func(measure func(int) float32) func(i, j int) bool {
 		return func(i, j int) bool {
 			lhsInvalid, rhsInvalid := invalid(i), invalid(j)
 			if lhsInvalid {
@@ -657,12 +658,10 @@ func buildMetadataComparator(
 	switch settings.DataRate.Modulation.(type) {
 	case *ttnpb.DataRate_Lora:
 		return build(
-			func(k int) bool { return mds[k].Snr == 0.0 || mds[k].ChannelRssi == 0.0 },
 			func(k int) float32 { return lora.AdjustedRSSI(mds[k].ChannelRssi, mds[k].Snr) },
 		)
 	default:
 		return build(
-			func(k int) bool { return mds[k].ChannelRssi == 0.0 },
 			func(k int) float32 { return mds[k].ChannelRssi },
 		)
 	}
