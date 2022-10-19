@@ -34,13 +34,16 @@ const (
 )
 
 // NewDownlinkTaskQueue returns new downlink task queue.
-func NewDownlinkTaskQueue(cl *ttnredis.Client, maxLen int64, group string) *DownlinkTaskQueue {
+func NewDownlinkTaskQueue(
+	cl *ttnredis.Client, maxLen int64, group string, streamBlockLimit time.Duration,
+) *DownlinkTaskQueue {
 	return &DownlinkTaskQueue{
 		queue: &ttnredis.TaskQueue{
-			Redis:  cl,
-			MaxLen: maxLen,
-			Group:  group,
-			Key:    cl.Key(downlinkKey),
+			Redis:            cl,
+			MaxLen:           maxLen,
+			Group:            group,
+			Key:              cl.Key(downlinkKey),
+			StreamBlockLimit: streamBlockLimit,
 		},
 	}
 }

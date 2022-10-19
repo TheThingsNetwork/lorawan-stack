@@ -41,13 +41,20 @@ const (
 )
 
 // NewApplicationUplinkQueue returns new application uplink queue.
-func NewApplicationUplinkQueue(cl *ttnredis.Client, maxLen int64, group string, minIdle time.Duration) *ApplicationUplinkQueue {
+func NewApplicationUplinkQueue(
+	cl *ttnredis.Client,
+	maxLen int64,
+	group string,
+	minIdle time.Duration,
+	streamBlockLimit time.Duration,
+) *ApplicationUplinkQueue {
 	return &ApplicationUplinkQueue{
 		applicationQueue: &ttnredis.TaskQueue{
-			Redis:  cl,
-			MaxLen: maxLen,
-			Group:  group,
-			Key:    cl.Key("application"),
+			Redis:            cl,
+			MaxLen:           maxLen,
+			Group:            group,
+			Key:              cl.Key("application"),
+			StreamBlockLimit: streamBlockLimit,
 		},
 		redis:   cl,
 		maxLen:  maxLen,
