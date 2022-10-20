@@ -26,6 +26,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -299,48 +300,43 @@ func (ps *PubSubStore) SubscribeWithHistory(
 	matchNames := xMessageHasEventName(names...)
 
 	for {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		default:
-			args := &redis.XReadArgs{
-				Count: 10,
-				Block: time.Second,
-			}
-			for _, s := range state {
-				args.Streams = append(args.Streams, s.stream)
-			}
-			for _, s := range state {
-				args.Streams = append(args.Streams, s.start)
-			}
+		args := &redis.XReadArgs{
+			Count: 10,
+			Block: random.Jitter(8*time.Second, 0.2),
+		}
+		for _, s := range state {
+			args.Streams = append(args.Streams, s.stream)
+		}
+		for _, s := range state {
+			args.Streams = append(args.Streams, s.start)
+		}
 
-			streams, err := ps.client.XRead(ctx, args).Result()
-			if err != nil && !errors.Is(err, redis.Nil) {
-				return ttnredis.ConvertError(err)
+		streams, err := ps.client.XRead(ctx, args).Result()
+		if err != nil && !errors.Is(err, redis.Nil) {
+			return ttnredis.ConvertError(err)
+		}
+		for _, stream := range streams {
+			if len(stream.Messages) == 0 {
+				continue
 			}
-			for _, stream := range streams {
-				if len(stream.Messages) == 0 {
-					continue
-				}
-				state := getState(stream.Stream)
-				if state == nil {
-					continue
-				}
-				state.start = stream.Messages[len(stream.Messages)-1].ID
-				evtPBs := eventsFromXMessages(stream.Messages, matchNames)
-				if len(evtPBs) == 0 {
-					continue
-				}
-				if err = ps.loadEventData(ctx, ps.client, evtPBs...); err != nil {
+			state := getState(stream.Stream)
+			if state == nil {
+				continue
+			}
+			state.start = stream.Messages[len(stream.Messages)-1].ID
+			evtPBs := eventsFromXMessages(stream.Messages, matchNames)
+			if len(evtPBs) == 0 {
+				continue
+			}
+			if err = ps.loadEventData(ctx, ps.client, evtPBs...); err != nil {
+				return err
+			}
+			for _, evtPB := range evtPBs {
+				evt, err := events.FromProto(evtPB)
+				if err != nil {
 					return err
 				}
-				for _, evtPB := range evtPBs {
-					evt, err := events.FromProto(evtPB)
-					if err != nil {
-						return err
-					}
-					hdl.Notify(evt)
-				}
+				hdl.Notify(evt)
 			}
 		}
 	}
