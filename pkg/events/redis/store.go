@@ -299,9 +299,18 @@ func (ps *PubSubStore) SubscribeWithHistory(
 
 	matchNames := xMessageHasEventName(names...)
 
+	// We expect that the subscriber can ingest `tail` events at a time.
+	eventCountLimit := int64(tail)
+	switch {
+	case eventCountLimit < 8:
+		eventCountLimit = 8
+	case eventCountLimit > 32:
+		eventCountLimit = 32
+	}
+
 	for {
 		args := &redis.XReadArgs{
-			Count: 10,
+			Count: eventCountLimit,
 			Block: random.Jitter(8*time.Second, 0.2),
 		}
 		for _, s := range state {
