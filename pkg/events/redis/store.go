@@ -32,6 +32,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
+const ttlJitter = 0.01
+
 // PubSubStore is a PubSub with historical event storage.
 type PubSubStore struct {
 	*PubSub
@@ -67,12 +69,13 @@ func (ps *PubSubStore) storeEvent(ctx context.Context, tx redis.Cmdable, evt eve
 	if err != nil {
 		return err
 	}
-	tx.Set(ctx, ps.eventDataKey(evt.Context(), evt.UniqueID()), b, ps.historyTTL)
+	ttl := random.Jitter(ps.historyTTL, ttlJitter)
+	tx.Set(ctx, ps.eventDataKey(evt.Context(), evt.UniqueID()), b, ttl)
 	for _, cid := range evt.CorrelationIds() {
 		key := ps.eventIndexKey(evt.Context(), cid)
 		tx.LPush(ctx, key, evt.UniqueID())
 		tx.LTrim(ctx, key, 0, int64(ps.correlationIDHistoryCount))
-		tx.Expire(ctx, key, ps.historyTTL)
+		tx.Expire(ctx, key, ttl)
 	}
 	return nil
 }
@@ -304,8 +307,8 @@ func (ps *PubSubStore) SubscribeWithHistory(
 	switch {
 	case eventCountLimit < 8:
 		eventCountLimit = 8
-	case eventCountLimit > 32:
-		eventCountLimit = 32
+	case eventCountLimit > 1024:
+		eventCountLimit = 1024
 	}
 
 	for {
@@ -384,6 +387,7 @@ func (ps *PubSubStore) FindRelated(ctx context.Context, correlationID string) ([
 func (ps *PubSubStore) Publish(evs ...events.Event) {
 	logger := log.FromContext(ps.ctx)
 
+	ttl := random.Jitter(ps.entityHistoryTTL, ttlJitter)
 	tx := ps.client.TxPipeline()
 
 	for _, evt := range evs {
@@ -414,7 +418,7 @@ func (ps *PubSubStore) Publish(evs ...events.Event) {
 				MaxLenApprox: int64(ps.entityHistoryCount),
 				Values:       streamValues,
 			})
-			tx.Expire(ps.ctx, eventStream, ps.entityHistoryTTL)
+			tx.Expire(ps.ctx, eventStream, ttl)
 			if devID := id.GetDeviceIds(); devID != nil && definition != nil && definition.PropagateToParent() {
 				eventStream := ps.eventStream(evt.Context(), devID.ApplicationIds.GetEntityIdentifiers())
 				tx.XAdd(ps.ctx, &redis.XAddArgs{
@@ -422,7 +426,7 @@ func (ps *PubSubStore) Publish(evs ...events.Event) {
 					MaxLenApprox: int64(ps.entityHistoryCount),
 					Values:       streamValues,
 				})
-				tx.Expire(ps.ctx, eventStream, ps.entityHistoryTTL)
+				tx.Expire(ps.ctx, eventStream, ttl)
 			}
 		}
 	}
