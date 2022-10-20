@@ -75,7 +75,7 @@ func (ps *PubSubStore) storeEvent(ctx context.Context, tx redis.Cmdable, evt eve
 		key := ps.eventIndexKey(evt.Context(), cid)
 		tx.LPush(ctx, key, evt.UniqueID())
 		tx.LTrim(ctx, key, 0, int64(ps.correlationIDHistoryCount))
-		tx.Expire(ctx, key, ttl)
+		tx.PExpire(ctx, key, ttl)
 	}
 	return nil
 }
@@ -418,7 +418,7 @@ func (ps *PubSubStore) Publish(evs ...events.Event) {
 				MaxLenApprox: int64(ps.entityHistoryCount),
 				Values:       streamValues,
 			})
-			tx.Expire(ps.ctx, eventStream, ttl)
+			tx.PExpire(ps.ctx, eventStream, ttl)
 			if devID := id.GetDeviceIds(); devID != nil && definition != nil && definition.PropagateToParent() {
 				eventStream := ps.eventStream(evt.Context(), devID.ApplicationIds.GetEntityIdentifiers())
 				tx.XAdd(ps.ctx, &redis.XAddArgs{
@@ -426,7 +426,7 @@ func (ps *PubSubStore) Publish(evs ...events.Event) {
 					MaxLenApprox: int64(ps.entityHistoryCount),
 					Values:       streamValues,
 				})
-				tx.Expire(ps.ctx, eventStream, ttl)
+				tx.PExpire(ps.ctx, eventStream, ttl)
 			}
 		}
 	}
