@@ -3203,15 +3203,6 @@
       "file": "messages.go"
     }
   },
-  "error:pkg/basicstation:format": {
-    "translations": {
-      "en": "invalid format"
-    },
-    "description": {
-      "package": "pkg/basicstation",
-      "file": "eui.go"
-    }
-  },
   "error:pkg/blob:invalid_config": {
     "translations": {
       "en": "invalid blob store configuration"
@@ -4614,6 +4605,15 @@
     "description": {
       "package": "pkg/gatewayserver/io/udp",
       "file": "firewall_ratelimit.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ws/id6:format": {
+    "translations": {
+      "en": "invalid format"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ws/id6",
+      "file": "id6.go"
     }
   },
   "error:pkg/gatewayserver/io/ws/lbslns:data_rate": {
