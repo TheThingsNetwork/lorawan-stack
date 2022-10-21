@@ -38,7 +38,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mock"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	. "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/id6"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/lbslns"
@@ -1102,7 +1101,7 @@ func TestTraffic(t *testing.T) {
 				AbsoluteTimeDownlinkMessage: &lbslns.AbsoluteTimeDownlinkMessage{
 					Freq:    868100000,
 					DR:      5,
-					GPSTime: ws.TimeToGPSTime(now.Add(30 * time.Second)),
+					GPSTime: TimeToGPSTime(now.Add(30 * time.Second)),
 				},
 			},
 		},
@@ -1144,7 +1143,7 @@ func TestTraffic(t *testing.T) {
 					now := time.Unix(time.Now().UTC().Unix(), 0)
 					v.UpInfo.XTime = upXTime
 					v.UpInfo.RxTime = float64(now.Unix())
-					v.UpInfo.GPSTime = ws.TimeToGPSTime(now)
+					v.UpInfo.GPSTime = TimeToGPSTime(now)
 					req, err := json.Marshal(v)
 					if err != nil {
 						panic(err)
@@ -1183,7 +1182,7 @@ func TestTraffic(t *testing.T) {
 					now := time.Unix(time.Now().UTC().Unix(), 0)
 					v.UpInfo.XTime = upXTime
 					v.UpInfo.RxTime = float64(now.Unix())
-					v.UpInfo.GPSTime = ws.TimeToGPSTime(now)
+					v.UpInfo.GPSTime = TimeToGPSTime(now)
 					req, err := json.Marshal(v)
 					if err != nil {
 						panic(err)
@@ -1252,7 +1251,7 @@ func TestTraffic(t *testing.T) {
 						now := time.Now().UTC()
 						a.So(msg.TxTime, should.Equal, expected.TxTime)
 						a.So(
-							ws.TimeFromGPSTime(msg.GPSTime),
+							TimeFromGPSTime(msg.GPSTime),
 							should.HappenBetween,
 							now.Add(-time.Second),
 							now.Add(time.Second),
@@ -1749,7 +1748,8 @@ func TestPingPong(t *testing.T) {
 		case <-ctx.Done():
 			return
 		default:
-			//  The ping/pong handlers are called only after ws.ReadMessage() receives a ping/pong message. The data read here is irrelevant.
+			// The ping/pong handlers are called only after ReadMessage() receives a ping/pong message.
+			// The data read here is irrelevant.
 			_, _, err := conn.ReadMessage()
 			if err != nil {
 				return
@@ -1845,7 +1845,8 @@ func TestPingPong(t *testing.T) {
 					case <-ctx.Done():
 						return
 					default:
-						//  The ping/pong handlers are called only after ws.ReadMessage() receives a ping/pong message. The data read here is irrelevant.
+						// The ping/pong handlers are called only after ReadMessage() receives a ping/pong message.
+						// The data read here is irrelevant.
 						_, _, err := conn.ReadMessage()
 						if err != nil {
 							errCh <- err
