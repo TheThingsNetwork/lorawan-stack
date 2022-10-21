@@ -26,23 +26,23 @@ import (
 	"math"
 	"strings"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/id6"
 )
 
 var emptyClientCert = []byte{0x00, 0x00, 0x00, 0x00}
 
 // UpdateInfoRequest is the contents of the update-info request.
 type UpdateInfoRequest struct {
-	Router             basicstation.EUI `json:"router"`
-	CUPSURI            string           `json:"cupsUri"`
-	LNSURI             string           `json:"tcUri"`
-	CUPSCredentialsCRC uint32           `json:"cupsCredCrc"`
-	LNSCredentialsCRC  uint32           `json:"tcCredCrc"`
-	Station            string           `json:"station"`
-	Model              string           `json:"model"`
-	Package            string           `json:"package"`
-	KeyCRCs            []uint32         `json:"keys"`
+	Router             id6.EUI  `json:"router"`
+	CUPSURI            string   `json:"cupsUri"`
+	LNSURI             string   `json:"tcUri"`
+	CUPSCredentialsCRC uint32   `json:"cupsCredCrc"`
+	LNSCredentialsCRC  uint32   `json:"tcCredCrc"`
+	Station            string   `json:"station"`
+	Model              string   `json:"model"`
+	Package            string   `json:"package"`
+	KeyCRCs            []uint32 `json:"keys"`
 }
 
 var errMissingRouter = errors.DefineInvalidArgument("missing_router", "missing router")

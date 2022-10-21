@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -84,7 +85,7 @@ func (f *lbsLNS) FromDownlink(
 		Pdu:      hex.EncodeToString(down.GetRawPayload()),
 		Priority: 25,
 		RCtx:     int64(settings.Downlink.AntennaIndex),
-		MuxTime:  TimeToUnixSeconds(dlTime),
+		MuxTime:  ws.TimeToUnixSeconds(dlTime),
 	}
 
 	phy, err := band.GetLatest(bandID)
@@ -102,17 +103,17 @@ func (f *lbsLNS) FromDownlink(
 		dnmsg.AbsoluteTimeDownlinkMessage = &AbsoluteTimeDownlinkMessage{
 			DR:      int(drIdx),
 			Freq:    int(settings.Frequency),
-			GPSTime: TimeToGPSTime(*transmitAt),
+			GPSTime: ws.TimeToGPSTime(*transmitAt),
 		}
 	} else {
 		// The first 16 bits of XTime gets the session ID from the upstream
 		// latest XTime and the other 48 bits are concentrator timestamp accounted for rollover.
-		sessionID, found := getSessionID(ctx)
+		sessionID, found := ws.GetSessionID(ctx)
 		if !found {
 			return nil, errSessionStateNotFound.New()
 		}
 
-		xTime := ConcentratorTimeToXTime(sessionID, scheduling.ConcentratorTime(settings.ConcentratorTimestamp))
+		xTime := ws.ConcentratorTimeToXTime(sessionID, scheduling.ConcentratorTime(settings.ConcentratorTimestamp))
 		xTime = xTime - int64(time.Second/time.Microsecond) // Subtract a second, since the RX delay is 1.
 
 		// Timestamp based downlinks are scheduled as class A downlinks.
@@ -152,7 +153,7 @@ func (dnmsg *DownlinkMessage) ToDownlinkMessage(bandID string) (*ttnpb.DownlinkM
 		}
 		down.GetScheduled().DataRate = bandDR.Rate
 		down.GetScheduled().Frequency = uint64(dnmsg.Rx1Freq)
-		down.GetScheduled().Timestamp = TimestampFromXTime(dnmsg.XTime)
+		down.GetScheduled().Timestamp = ws.TimestampFromXTime(dnmsg.XTime)
 	case uint(ttnpb.Class_CLASS_B):
 		bandDR, ok := phy.DataRates[ttnpb.DataRateIndex(dnmsg.DR)]
 		if !ok {
@@ -160,7 +161,7 @@ func (dnmsg *DownlinkMessage) ToDownlinkMessage(bandID string) (*ttnpb.DownlinkM
 		}
 		down.GetScheduled().DataRate = bandDR.Rate
 		down.GetScheduled().Frequency = uint64(dnmsg.Freq)
-		down.GetScheduled().Time = ttnpb.ProtoTimePtr(TimeFromGPSTime(dnmsg.GPSTime))
+		down.GetScheduled().Time = ttnpb.ProtoTimePtr(ws.TimeFromGPSTime(dnmsg.GPSTime))
 	default:
 		panic("unreachable")
 	}
@@ -175,23 +176,23 @@ const (
 
 // TransferTime implements Formatter.
 func (*lbsLNS) TransferTime(ctx context.Context, serverTime time.Time, gpsTime *time.Time, concentratorTime *scheduling.ConcentratorTime) ([]byte, error) {
-	if enabled, ok := getSessionTimeSync(ctx); !ok || !enabled {
+	if enabled, ok := ws.GetSessionTimeSync(ctx); !ok || !enabled {
 		return nil, nil
 	}
 
 	response := TimeSyncResponse{
-		MuxTime: TimeToUnixSeconds(serverTime),
+		MuxTime: ws.TimeToUnixSeconds(serverTime),
 	}
 
-	sessionID, found := getSessionID(ctx)
+	sessionID, found := ws.GetSessionID(ctx)
 	if !found || gpsTime == nil || concentratorTime == nil {
 		// Update only the MuxTime.
 		// https://github.com/lorabasics/basicstation/blob/bd17e53ab1137de6abb5ae48d6f3d52f6c268299/src/s2e.c#L1616-L1619
 		return response.MarshalJSON()
 	}
 
-	response.XTime = ConcentratorTimeToXTime(sessionID, *concentratorTime)
-	response.GPSTime = TimeToGPSTime(*gpsTime)
+	response.XTime = ws.ConcentratorTimeToXTime(sessionID, *concentratorTime)
+	response.GPSTime = ws.TimeToGPSTime(*gpsTime)
 
 	return response.MarshalJSON()
 }

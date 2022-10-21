@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package basicstation_test
+package id6_test
 
 import (
 	"encoding/json"
@@ -20,16 +20,19 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
+
+	. "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/id6"
+
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func TestMarshalEUI(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	{
-		eui := basicstation.EUI{
+		eui := EUI{
 			EUI64: types.EUI64{0xaa, 0xbb, 0x00, 0x01, 0x02, 0x03, 0x42, 0xff},
 		}
 		data, err := json.Marshal(eui)
@@ -38,7 +41,7 @@ func TestMarshalEUI(t *testing.T) {
 	}
 
 	{
-		eui := basicstation.EUI{
+		eui := EUI{
 			Prefix: "ROUTER",
 			EUI64:  types.EUI64{0xaa, 0xbb, 0x00, 0x01, 0x02, 0x03, 0x42, 0xff},
 		}
@@ -48,7 +51,7 @@ func TestMarshalEUI(t *testing.T) {
 	}
 
 	{
-		eui := basicstation.EUI{
+		eui := EUI{
 			Prefix: "muxs",
 			EUI64:  types.EUI64{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 		}
@@ -169,7 +172,7 @@ func TestUnmarshalEUI(t *testing.T) {
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
-			var eui basicstation.EUI
+			var eui EUI
 			err := json.Unmarshal([]byte(tc.Input), &eui)
 			if tc.OK {
 				a.So(err, should.BeNil)

@@ -21,9 +21,9 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
-	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/id6"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -44,8 +44,8 @@ func TestMarshalJSON(t *testing.T) {
 			Name: "JoinRequest",
 			Message: JoinRequest{
 				MHdr:     0,
-				DevEUI:   basicstation.EUI{EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
-				JoinEUI:  basicstation.EUI{EUI64: types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
+				DevEUI:   id6.EUI{EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
+				JoinEUI:  id6.EUI{EUI64: types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
 				DevNonce: 18000,
 				MIC:      12345678,
 				RadioMetaData: RadioMetaData{
@@ -89,7 +89,7 @@ func TestMarshalJSON(t *testing.T) {
 			Name: "TxConfirmation",
 			Message: TxConfirmation{
 				Diid:    35,
-				DevEUI:  basicstation.EUI{EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
+				DevEUI:  id6.EUI{EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
 				XTime:   1552906698,
 				TxTime:  1552906698,
 				GPSTime: 1552906698,
@@ -138,8 +138,8 @@ func TestJoinRequest(t *testing.T) {
 			Name: "InvalidBandID",
 			JoinRequest: JoinRequest{
 				MHdr:     0,
-				DevEUI:   basicstation.EUI{EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
-				JoinEUI:  basicstation.EUI{EUI64: types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
+				DevEUI:   id6.EUI{EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
+				JoinEUI:  id6.EUI{EUI64: types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
 				DevNonce: 18000,
 				MIC:      12345678,
 				RadioMetaData: RadioMetaData{
@@ -188,8 +188,8 @@ func TestJoinRequest(t *testing.T) {
 			Name: "ValidJoinRequest",
 			JoinRequest: JoinRequest{
 				MHdr:     0,
-				DevEUI:   basicstation.EUI{EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
-				JoinEUI:  basicstation.EUI{EUI64: types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
+				DevEUI:   id6.EUI{EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
+				JoinEUI:  id6.EUI{EUI64: types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
 				DevNonce: 18000,
 				MIC:      12345678,
 				RadioMetaData: RadioMetaData{
@@ -611,8 +611,8 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 			FrequencyPlanID: band.EU_863_870,
 			ExpectedJoinRequest: JoinRequest{
 				MHdr:     0,
-				DevEUI:   basicstation.EUI{EUI64: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}},
-				JoinEUI:  basicstation.EUI{EUI64: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}},
+				DevEUI:   id6.EUI{EUI64: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}},
+				JoinEUI:  id6.EUI{EUI64: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}},
 				DevNonce: 0x42ff,
 				MIC:      268435266,
 				RadioMetaData: RadioMetaData{
