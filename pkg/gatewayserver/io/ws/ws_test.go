@@ -30,7 +30,6 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
-	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
@@ -39,7 +38,9 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mock"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	. "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/id6"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/lbslns"
 	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -419,7 +420,7 @@ func TestDiscover(t *testing.T) {
 			EndPointEUI: "1111111111111111",
 			EUI:         types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11},
 			Query: lbslns.DiscoverQuery{
-				EUI: basicstation.EUI{
+				EUI: id6.EUI{
 					Prefix: "router",
 					EUI64:  types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11},
 				},
@@ -464,8 +465,8 @@ func TestDiscover(t *testing.T) {
 					t.Fatalf("Failed to unmarshal response `%s`: %v", string(res), err)
 				}
 				a.So(response, should.Resemble, lbslns.DiscoverResponse{
-					EUI: basicstation.EUI{Prefix: "router", EUI64: tc.EUI},
-					Muxs: basicstation.EUI{
+					EUI: id6.EUI{Prefix: "router", EUI64: tc.EUI},
+					Muxs: id6.EUI{
 						Prefix: "muxs",
 					},
 					URI: servAddr + connectionRootEndPoint + "eui-" + tc.EndPointEUI,
@@ -837,8 +838,8 @@ func TestTraffic(t *testing.T) {
 			Name: "JoinRequest",
 			InputBSUpstream: lbslns.JoinRequest{
 				MHdr:     0,
-				DevEUI:   basicstation.EUI{Prefix: "DevEui", EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
-				JoinEUI:  basicstation.EUI{Prefix: "JoinEui", EUI64: types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
+				DevEUI:   id6.EUI{Prefix: "DevEui", EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
+				JoinEUI:  id6.EUI{Prefix: "JoinEui", EUI64: types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
 				DevNonce: 18000,
 				MIC:      12345678,
 				RadioMetaData: lbslns.RadioMetaData{
@@ -1101,7 +1102,7 @@ func TestTraffic(t *testing.T) {
 				AbsoluteTimeDownlinkMessage: &lbslns.AbsoluteTimeDownlinkMessage{
 					Freq:    868100000,
 					DR:      5,
-					GPSTime: lbslns.TimeToGPSTime(now.Add(30 * time.Second)),
+					GPSTime: ws.TimeToGPSTime(now.Add(30 * time.Second)),
 				},
 			},
 		},
@@ -1143,7 +1144,7 @@ func TestTraffic(t *testing.T) {
 					now := time.Unix(time.Now().UTC().Unix(), 0)
 					v.UpInfo.XTime = upXTime
 					v.UpInfo.RxTime = float64(now.Unix())
-					v.UpInfo.GPSTime = lbslns.TimeToGPSTime(now)
+					v.UpInfo.GPSTime = ws.TimeToGPSTime(now)
 					req, err := json.Marshal(v)
 					if err != nil {
 						panic(err)
@@ -1182,7 +1183,7 @@ func TestTraffic(t *testing.T) {
 					now := time.Unix(time.Now().UTC().Unix(), 0)
 					v.UpInfo.XTime = upXTime
 					v.UpInfo.RxTime = float64(now.Unix())
-					v.UpInfo.GPSTime = lbslns.TimeToGPSTime(now)
+					v.UpInfo.GPSTime = ws.TimeToGPSTime(now)
 					req, err := json.Marshal(v)
 					if err != nil {
 						panic(err)
@@ -1251,7 +1252,7 @@ func TestTraffic(t *testing.T) {
 						now := time.Now().UTC()
 						a.So(msg.TxTime, should.Equal, expected.TxTime)
 						a.So(
-							lbslns.TimeFromGPSTime(msg.GPSTime),
+							ws.TimeFromGPSTime(msg.GPSTime),
 							should.HappenBetween,
 							now.Add(-time.Second),
 							now.Add(time.Second),
@@ -1436,8 +1437,8 @@ func TestRTT(t *testing.T) {
 			Name: "JoinRequest",
 			InputBSUpstream: lbslns.JoinRequest{
 				MHdr:     0,
-				DevEUI:   basicstation.EUI{Prefix: "DevEui", EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
-				JoinEUI:  basicstation.EUI{Prefix: "JoinEui", EUI64: types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
+				DevEUI:   id6.EUI{Prefix: "DevEui", EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
+				JoinEUI:  id6.EUI{Prefix: "JoinEui", EUI64: types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
 				DevNonce: 18000,
 				MIC:      12345678,
 				RadioMetaData: lbslns.RadioMetaData{

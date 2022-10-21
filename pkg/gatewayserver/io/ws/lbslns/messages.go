@@ -17,7 +17,7 @@ package lbslns
 import (
 	"encoding/json"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/id6"
 )
 
 // MessageType is the type of the message.
@@ -45,16 +45,16 @@ const (
 // DiscoverQuery contains the unique identifier of the gateway.
 // This message is sent by the gateway.
 type DiscoverQuery struct {
-	EUI basicstation.EUI `json:"router"`
+	EUI id6.EUI `json:"router"`
 }
 
 // DiscoverResponse contains the response to the discover query.
 // This message is sent by the Gateway Server.
 type DiscoverResponse struct {
-	EUI   basicstation.EUI `json:"router"`
-	Muxs  basicstation.EUI `json:"muxs,omitempty"`
-	URI   string           `json:"uri,omitempty"`
-	Error string           `json:"error,omitempty"`
+	EUI   id6.EUI `json:"router"`
+	Muxs  id6.EUI `json:"muxs,omitempty"`
+	URI   string  `json:"uri,omitempty"`
+	Error string  `json:"error,omitempty"`
 }
 
 // Type returns the message type of the given data.

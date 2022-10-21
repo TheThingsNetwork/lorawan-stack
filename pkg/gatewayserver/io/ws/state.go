@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package lbslns
+package ws
 
 import (
 	"context"
-
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 )
 
 // state represents the LBS session state.
@@ -26,8 +24,9 @@ type state struct {
 	TimeSync *bool
 }
 
+// updateState updates the session state.
 func updateState(ctx context.Context, f func(*state)) {
-	session := ws.SessionFromContext(ctx)
+	session := SessionFromContext(ctx)
 	session.DataMu.Lock()
 	defer session.DataMu.Unlock()
 	st, ok := session.Data.(*state)
@@ -38,20 +37,9 @@ func updateState(ctx context.Context, f func(*state)) {
 	f(st)
 }
 
-func updateSessionID(ctx context.Context, id int32) {
-	updateState(ctx, func(st *state) {
-		st.ID = &id
-	})
-}
-
-func updateSessionTimeSync(ctx context.Context, b bool) {
-	updateState(ctx, func(st *state) {
-		st.TimeSync = &b
-	})
-}
-
+// GetState returns the session state.
 func getState(ctx context.Context, f func(*state) interface{}) interface{} {
-	session := ws.SessionFromContext(ctx)
+	session := SessionFromContext(ctx)
 	session.DataMu.RLock()
 	defer session.DataMu.RUnlock()
 	st, ok := session.Data.(*state)
@@ -61,7 +49,22 @@ func getState(ctx context.Context, f func(*state) interface{}) interface{} {
 	return f(st)
 }
 
-func getSessionID(ctx context.Context) (int32, bool) {
+// UpdateSessionID updates the session ID.
+func UpdateSessionID(ctx context.Context, id int32) {
+	updateState(ctx, func(st *state) {
+		st.ID = &id
+	})
+}
+
+// UpdateSessionTimeSync updates the session time sync.
+func UpdateSessionTimeSync(ctx context.Context, b bool) {
+	updateState(ctx, func(st *state) {
+		st.TimeSync = &b
+	})
+}
+
+// GetSessionID returns the session ID.
+func GetSessionID(ctx context.Context) (int32, bool) {
 	i, ok := getState(ctx, func(st *state) interface{} {
 		if st.ID != nil {
 			return *st.ID
@@ -71,7 +74,8 @@ func getSessionID(ctx context.Context) (int32, bool) {
 	return i, ok
 }
 
-func getSessionTimeSync(ctx context.Context) (bool, bool) {
+// GetSessionTimeSync returns the session time sync.
+func GetSessionTimeSync(ctx context.Context) (enabled bool, ok bool) {
 	d, ok := getState(ctx, func(st *state) interface{} {
 		if st.TimeSync != nil {
 			return *st.TimeSync

@@ -31,7 +31,7 @@ import (
 func TestFromDownlinkMessage(t *testing.T) {
 	_, ctx := test.New(t)
 	ctx = ws.NewContextWithSession(ctx, &ws.Session{})
-	updateSessionID(ctx, 0x11)
+	ws.UpdateSessionID(ctx, 0x11)
 	var lbsLNS lbsLNS
 	for _, tc := range []struct {
 		BandID,
@@ -79,7 +79,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 					RxDelay: 1,
 					Rx1DR:   2,
 					Rx1Freq: 868500000,
-					XTime:   ConcentratorTimeToXTime(0x11, 1553300787) - int64(time.Second/time.Microsecond),
+					XTime:   ws.ConcentratorTimeToXTime(0x11, 1553300787) - int64(time.Second/time.Microsecond),
 				},
 			},
 		},
@@ -122,7 +122,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 				AbsoluteTimeDownlinkMessage: &AbsoluteTimeDownlinkMessage{
 					DR:      2,
 					Freq:    869525000,
-					GPSTime: TimeToGPSTime(time.Unix(0x42424242, 0x42424242)),
+					GPSTime: ws.TimeToGPSTime(time.Unix(0x42424242, 0x42424242)),
 				},
 			},
 		},
@@ -200,7 +200,7 @@ func TestToDownlinkMessage(t *testing.T) {
 				AbsoluteTimeDownlinkMessage: &AbsoluteTimeDownlinkMessage{
 					DR:      2,
 					Freq:    869525000,
-					GPSTime: TimeToGPSTime(time.Unix(0x42424242, 0x42424242)),
+					GPSTime: ws.TimeToGPSTime(time.Unix(0x42424242, 0x42424242)),
 				},
 			},
 			ExpectedDownlinkMessage: &ttnpb.DownlinkMessage{
@@ -255,7 +255,7 @@ func TestTransferTime(t *testing.T) {
 	a.So(b, should.BeNil)
 
 	// Enable timesync for the session.
-	updateSessionTimeSync(ctx, true)
+	ws.UpdateSessionTimeSync(ctx, true)
 
 	// No GPSTime / ConcentratorTime - expect only MuxTime.
 	b, err = f.TransferTime(ctx, now, nil, nil)
@@ -270,11 +270,11 @@ func TestTransferTime(t *testing.T) {
 		a.So(res.TxTime, should.Equal, 0.0)
 		a.So(res.XTime, should.Equal, 0)
 		a.So(res.GPSTime, should.Equal, 0)
-		a.So(res.MuxTime, should.Equal, TimeToUnixSeconds(now))
+		a.So(res.MuxTime, should.Equal, ws.TimeToUnixSeconds(now))
 	}
 
 	// Add fictional session ID.
-	updateSessionID(ctx, 0x42)
+	ws.UpdateSessionID(ctx, 0x42)
 
 	gpsTime := time.Unix(456, 678)
 	concentratorTime := scheduling.ConcentratorTime(890 * time.Microsecond)
@@ -290,9 +290,9 @@ func TestTransferTime(t *testing.T) {
 			t.FailNow()
 		}
 		a.So(res.TxTime, should.Equal, 0.0)
-		a.So(SessionIDFromXTime(res.XTime), should.Equal, 0x42)
-		a.So(ConcentratorTimeFromXTime(res.XTime), should.Equal, 890*time.Microsecond)
-		a.So(res.GPSTime, should.Equal, TimeToGPSTime(gpsTime))
-		a.So(res.MuxTime, should.Equal, TimeToUnixSeconds(now))
+		a.So(ws.SessionIDFromXTime(res.XTime), should.Equal, 0x42)
+		a.So(ws.ConcentratorTimeFromXTime(res.XTime), should.Equal, 890*time.Microsecond)
+		a.So(res.GPSTime, should.Equal, ws.TimeToGPSTime(gpsTime))
+		a.So(res.MuxTime, should.Equal, ws.TimeToUnixSeconds(now))
 	}
 }

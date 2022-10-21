@@ -20,10 +20,10 @@ import (
 	"fmt"
 	"time"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/id6"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -55,7 +55,7 @@ func (f *lbsLNS) HandleConnectionInfo(ctx context.Context, raw []byte, server io
 	euiWithPrefix := fmt.Sprintf("eui-%s", types.MustEUI64(ids.Eui).OrZero().String())
 	res := DiscoverResponse{
 		EUI: req.EUI,
-		Muxs: basicstation.EUI{
+		Muxs: id6.EUI{
 			Prefix: "muxs",
 		},
 		URI: fmt.Sprintf("%s://%s%s/%s", info.Scheme, info.Address, trafficEndPointPrefix, euiWithPrefix),

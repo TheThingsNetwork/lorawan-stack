@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package ws provides common interface for Web Socket front end.
 package ws
 
 import (
