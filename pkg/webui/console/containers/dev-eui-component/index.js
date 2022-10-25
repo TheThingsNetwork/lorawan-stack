@@ -71,23 +71,9 @@ const DevEUIComponent = props => {
     return result.dev_eui
   }, [appId, dispatch, fetchDevEUICounter, promisifiedIssueDevEUI])
 
-  const handleGenerate = useCallback(async () => {
-    try {
-      const result = await handleDevEUIRequest()
-      setDevEUIGenerated(true)
-      setErrorMessage(undefined)
-      return result
-    } catch (error) {
-      if (getBackendErrorName(error) === 'global_eui_limit_reached') {
-        setErrorMessage(sharedMessages.devEUIBlockLimitReached)
-      } else setErrorMessage(sharedMessages.unknownError)
-      setDevEUIGenerated(true)
-    }
-  }, [handleDevEUIRequest])
-
   const handleIdPrefill = useCallback(
-    event => {
-      const value = event.target.value
+    eventOrEui => {
+      const value = typeof eventOrEui === 'string' ? eventOrEui : eventOrEui.target.value
       if (value.length === 16 && (!idTouched || hasEuiId)) {
         const generatedId = `eui-${value.toLowerCase()}`
         setFieldValue('target_device_id', generatedId)
@@ -96,6 +82,21 @@ const DevEUIComponent = props => {
     },
     [hasEuiId, idTouched, setFieldValue],
   )
+
+  const handleGenerate = useCallback(async () => {
+    try {
+      const result = await handleDevEUIRequest()
+      setDevEUIGenerated(true)
+      setErrorMessage(undefined)
+      handleIdPrefill(result)
+      return result
+    } catch (error) {
+      if (getBackendErrorName(error) === 'global_eui_limit_reached') {
+        setErrorMessage(sharedMessages.devEUIBlockLimitReached)
+      } else setErrorMessage(sharedMessages.unknownError)
+      setDevEUIGenerated(true)
+    }
+  }, [handleDevEUIRequest, handleIdPrefill])
 
   const devEUIGenerateDisabled =
     applicationDevEUICounter === env.devEUIConfig.applicationLimit ||
