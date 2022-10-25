@@ -49,7 +49,7 @@ const initialValues = merge(
     ids: {
       join_eui: '',
     },
-    _claim: undefined,
+    _claim: null,
   },
   claimingInitialValues,
   registrationInitialValues,
@@ -76,12 +76,13 @@ const DeviceProvisioningFormSection = () => {
     lorawan_version,
     lorawan_phy_version,
     ids,
+    supports_join: supportsJoin,
   } = values
 
   const template = useSelector(selectDeviceTemplate)
   const isClaiming = _claim === true
   const isRegistration = _claim === false
-  const isClaimingDetermined = _claim !== undefined
+  const isClaimingDetermined = isClaiming || isRegistration
   let joinEuiConfirmationMessage
 
   if (isClaimingDetermined) {
@@ -89,9 +90,13 @@ const DeviceProvisioningFormSection = () => {
   }
 
   const mayProvisionDevice =
-    Boolean(frequency_plan_id) &&
-    ((Boolean(lorawan_version) && Boolean(lorawan_phy_version)) ||
-      (_inputMethod === 'device-repository' && hasValidDeviceRepositoryType(version, template)))
+    (_inputMethod === 'manual' &&
+      Boolean(frequency_plan_id) &&
+      Boolean(lorawan_version) &&
+      Boolean(lorawan_phy_version)) ||
+    (_inputMethod === 'device-repository' &&
+      hasValidDeviceRepositoryType(version, template) &&
+      Boolean(frequency_plan_id))
   const mayConfirm = ids?.join_eui?.length === 16
 
   const resetJoinEui = React.useCallback(() => {
@@ -101,7 +106,7 @@ const DeviceProvisioningFormSection = () => {
         ...values.ids,
         join_eui: '',
       },
-      _claim: undefined,
+      _claim: null,
     }))
   }, [setValues])
 
@@ -137,49 +142,51 @@ const DeviceProvisioningFormSection = () => {
 
   useEffect(() => {
     // Auto-confirm the join EUI when using QR code data.
-    if (_withQRdata) {
+    if (_withQRdata && supportsJoin) {
       handleJoinEuiConfirm()
     }
-  }, [_withQRdata, handleJoinEuiConfirm, ids.join_eui.length])
+  }, [_withQRdata, handleJoinEuiConfirm, ids.join_eui.length, supportsJoin])
 
   return (
     <>
       {mayProvisionDevice && (
         <>
           <Form.SubTitle title={m.provisioningTitle} />
-          <Form.Field
-            title={sharedMessages.joinEUI}
-            name="ids.join_eui,authenticated_identifiers.join_eui"
-            description={joinEuiConfirmationMessage}
-            type="byte"
-            min={8}
-            max={8}
-            required
-            disabled={isClaimingDetermined || _withQRdata}
-            component={Input}
-            tooltipId={tooltipIds.JOIN_EUI}
-            encode={joinEuiEncoder}
-            decode={joinEuiDecoder}
-            onKeyDown={handleJoinEuiKeyDown}
-          >
-            {_claim === undefined ? (
-              <Button
-                type="button"
-                disabled={!mayConfirm}
-                onClick={handleJoinEuiConfirm}
-                message={sharedMessages.confirm}
-                className="ml-cs-xs"
-              />
-            ) : (
-              <Button
-                onClick={resetJoinEui}
-                type="button"
-                message={sharedMessages.reset}
-                className="ml-cs-xs"
-                disabled={_withQRdata}
-              />
-            )}
-          </Form.Field>
+          {supportsJoin && (
+            <Form.Field
+              title={sharedMessages.joinEUI}
+              name="ids.join_eui,authenticated_identifiers.join_eui"
+              description={joinEuiConfirmationMessage}
+              type="byte"
+              min={8}
+              max={8}
+              required
+              disabled={isClaimingDetermined || _withQRdata}
+              component={Input}
+              tooltipId={tooltipIds.JOIN_EUI}
+              encode={joinEuiEncoder}
+              decode={joinEuiDecoder}
+              onKeyDown={handleJoinEuiKeyDown}
+            >
+              {_claim === null ? (
+                <Button
+                  type="button"
+                  disabled={!mayConfirm}
+                  onClick={handleJoinEuiConfirm}
+                  message={sharedMessages.confirm}
+                  className="ml-cs-xs"
+                />
+              ) : (
+                <Button
+                  onClick={resetJoinEui}
+                  type="button"
+                  message={sharedMessages.reset}
+                  className="ml-cs-xs"
+                  disabled={_withQRdata}
+                />
+              )}
+            </Form.Field>
+          )}
         </>
       )}
       {!isClaimingDetermined && mayProvisionDevice && (
