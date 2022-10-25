@@ -24,6 +24,8 @@ import style from './input.styl'
 const PLACEHOLDER_CHAR = '·'
 
 const hex = /[0-9a-f]/i
+const voidChars = RegExp(`[ ${PLACEHOLDER_CHAR}]`, 'g')
+const onlyVoidChars = RegExp(`^[ ${PLACEHOLDER_CHAR}]+$`, 'g')
 
 const masks = {}
 const mask = (min, max, showPerChar = false) => {
@@ -52,8 +54,7 @@ const mask = (min, max, showPerChar = false) => {
 
 const upper = str => str.toUpperCase()
 
-const clean = str =>
-  typeof str === 'string' ? str.replace(new RegExp(`[ ${PLACEHOLDER_CHAR}]`, 'g'), '') : str
+const clean = str => (typeof str === 'string' ? str.replace(voidChars, '') : str)
 
 export default class ByteInput extends React.Component {
   static propTypes = {
@@ -180,16 +181,18 @@ export default class ByteInput extends React.Component {
   @bind
   onPaste(evt) {
     const { min, showPerChar, unbounded } = this.props
-    evt.preventDefault()
-    const pasteData = (event.clipboardData || window.clipboardData).getData('text')
+    const val = evt.target.value
     if (unbounded) {
-      evt.target.value = evt.clipboardData.getData('text/plain')
-      mask(min, pasteData.length, showPerChar)
+      evt.preventDefault()
+      this.input.current.inputElement.value = evt.clipboardData.getData('text/plain')
+      mask(min, evt.clipboardData.getData('text/plain').length, showPerChar)
       this.onChange(evt)
-    } else {
-      // Compose and clean new data and mask it.
-      const newValue = clean(evt.target.value + pasteData)
-      this.onChange({ target: { value: newValue } })
+    } else if (evt.target.selectionStart === evt.target.selectionEnd) {
+      // To avoid the masked input from cutting off characters when the cursor
+      // is placed in the mask placeholders, the placeholder chars are removed before
+      // the paste is applied, unless the user made a selection to paste into.
+      // This will ensure a consistent pasting experience.
+      evt.target.value = val.replace(voidChars, '')
     }
   }
 
@@ -205,7 +208,6 @@ export default class ByteInput extends React.Component {
 
     // Emit the cut value.
     const cut = input.value.substr(0, input.selectionStart) + input.value.substr(input.selectionEnd)
-    evt.target.value = cut
     this.onChange({
       target: {
         value: cut,

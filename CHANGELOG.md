@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Issue with pasting values into byte input at the wrong position in the Console.
+
 ### Security
 
 ## [3.22.1] - 2022-10-19
