@@ -50,7 +50,6 @@ const advancedSettingsSchema = Yup.object({
     then: schema => schema.oneOf([false]),
   }),
   _default_ns_settings: Yup.bool(),
-  _skip_js_registration: Yup.bool(),
 })
 
 const macSettingsSchema = Yup.object({
