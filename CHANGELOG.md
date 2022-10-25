@@ -19,6 +19,9 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Do not require AppKey when skipping Join Server registration in end device onboarding in the Console.
+- Fix auto generation of device ID when using DevEUI generator in the Console.
+
 ### Security
 
 ## [3.22.1] - 2022-10-19
