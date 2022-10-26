@@ -13,6 +13,10 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Class B and C downlinks will no longer be automatically retried indefinitely if none of the gateways are available at the scheduling moment, and the downlink paths come from the last uplink.
+  - This was already the behavior for downlinks which had their downlink path provided explicitly using the `class_b_c.gateways` field.
+  - The downlinks will be evicted from the downlink queue and a downlink failure event will be generated. The failure event can be observed by the application using the `downlink_failed` message, which is available in all integrations.
+
 ### Deprecated
 
 ### Removed
