@@ -125,7 +125,7 @@ func (p EndDeviceProfile) ToTemplatePB(ids *ttnpb.EndDeviceVersionIdentifiers, i
 		paths = append(paths, "mac_settings.ping_slot_data_rate_index")
 	}
 	if p.PingSlotFrequency > 0 {
-		dev.MacSettings.PingSlotFrequency = &ttnpb.FrequencyValue{
+		dev.MacSettings.PingSlotFrequency = &ttnpb.ZeroableFrequencyValue{
 			Value: uint64(p.PingSlotFrequency * mhz),
 		}
 		paths = append(paths, "mac_settings.ping_slot_frequency")

@@ -121,7 +121,7 @@ func TestProfile(t *testing.T) {
 						ClassBTimeout:         ttnpb.ProtoDurationPtr(8 * time.Second),
 						PingSlotPeriodicity:   &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_16S},
 						PingSlotDataRateIndex: &ttnpb.DataRateIndexValue{Value: ttnpb.DataRateIndex_DATA_RATE_3},
-						PingSlotFrequency:     &ttnpb.FrequencyValue{Value: 868300000},
+						PingSlotFrequency:     &ttnpb.ZeroableFrequencyValue{Value: 868300000},
 					},
 				},
 				FieldMask: ttnpb.FieldMask(
