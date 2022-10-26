@@ -22725,11 +22725,11 @@
           "description": "Data rate index of the class B ping slot.\nIf unset, the default value from Network Server configuration will be used."
         },
         "ping_slot_frequency": {
-          "$ref": "#/definitions/v3FrequencyValue",
+          "$ref": "#/definitions/v3ZeroableFrequencyValue",
           "description": "Frequency of the class B ping slot (Hz).\nIf unset, the default value from Network Server configuration will be used."
         },
         "beacon_frequency": {
-          "$ref": "#/definitions/v3FrequencyValue",
+          "$ref": "#/definitions/v3ZeroableFrequencyValue",
           "description": "Frequency of the class B beacon (Hz).\nIf unset, the default value from Network Server configuration will be used."
         },
         "class_c_timeout": {
@@ -22823,11 +22823,11 @@
           "description": "The data rate index of the class B ping slot Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration will be used."
         },
         "desired_ping_slot_frequency": {
-          "$ref": "#/definitions/v3FrequencyValue",
+          "$ref": "#/definitions/v3ZeroableFrequencyValue",
           "description": "The frequency of the class B ping slot (Hz) Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used."
         },
         "desired_beacon_frequency": {
-          "$ref": "#/definitions/v3FrequencyValue",
+          "$ref": "#/definitions/v3ZeroableFrequencyValue",
           "description": "The frequency of the class B beacon (Hz) Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration will be used."
         },
         "desired_max_eirp": {
@@ -24644,6 +24644,15 @@
           "items": {
             "$ref": "#/definitions/v3User"
           }
+        }
+      }
+    },
+    "v3ZeroableFrequencyValue": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     }

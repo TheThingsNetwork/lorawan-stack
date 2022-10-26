@@ -320,6 +320,46 @@ func (v *FrequencyValue) FieldIsZero(p string) bool {
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }
 
+// MarshalText implements encoding.TextMarshaler interface.
+func (v *ZeroableFrequencyValue) MarshalText() ([]byte, error) {
+	return []byte(strconv.FormatUint(v.GetValue(), 10)), nil
+}
+
+// MarshalJSONPB implements jsonpb.JSONPBMarshaler interface.
+func (v *ZeroableFrequencyValue) MarshalJSONPB(*jsonpb.Marshaler) ([]byte, error) {
+	return v.MarshalJSON()
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler interface.
+func (v *ZeroableFrequencyValue) UnmarshalText(b []byte) error {
+	var vv uint64
+	vv, err := strconv.ParseUint(string(b), 10, 64)
+	if err != nil {
+		return err
+	}
+	*v = ZeroableFrequencyValue{
+		Value: vv,
+	}
+	return nil
+}
+
+// UnmarshalJSONPB implements jsonpb.JSONPBUnmarshaler interface.
+func (v *ZeroableFrequencyValue) UnmarshalJSONPB(_ *jsonpb.Unmarshaler, b []byte) error {
+	return v.UnmarshalJSON(b)
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *ZeroableFrequencyValue) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "value":
+		return v.Value == 0
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
 func (v JoinRequestType) MarshalBinary() ([]byte, error) {
 	return marshalBinaryEnum(int32(v)), nil
 }

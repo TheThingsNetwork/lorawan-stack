@@ -108,6 +108,13 @@ func TestMarshalers(t *testing.T) {
 		&FrequencyValue{Value: 30000000},
 	})
 
+	vals = append(vals, []interface{}{
+		&ZeroableFrequencyValue{Value: 0},
+		&ZeroableFrequencyValue{Value: 100000},
+		&ZeroableFrequencyValue{Value: 2000000},
+		&ZeroableFrequencyValue{Value: 30000000},
+	})
+
 	var joinRequestTypes []interface{}
 	for i := range JoinRequestType_name {
 		joinRequestTypes = append(joinRequestTypes, JoinRequestType(i))

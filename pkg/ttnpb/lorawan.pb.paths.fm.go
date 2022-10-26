@@ -489,6 +489,13 @@ var FrequencyValueFieldPathsNested = []string{
 var FrequencyValueFieldPathsTopLevel = []string{
 	"value",
 }
+var ZeroableFrequencyValueFieldPathsNested = []string{
+	"value",
+}
+
+var ZeroableFrequencyValueFieldPathsTopLevel = []string{
+	"value",
+}
 var DataRateOffsetValueFieldPathsNested = []string{
 	"value",
 }
