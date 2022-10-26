@@ -230,7 +230,6 @@ describe('End device manual create', () => {
         cy.findByLabelText('JoinEUI').type(device.join_eui)
         cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('DevEUI').type(device.dev_eui)
-        cy.findByLabelText('AppKey').type(device.app_key)
 
         cy.findByRole('button', { name: 'Register end device' }).click()
 
