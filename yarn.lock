@@ -2177,29 +2177,14 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
-"@pmmmwh/react-refresh-webpack-plugin@^0.5.1":
-  version "0.5.3"
-  resolved "https://registry.yarnpkg.com/@pmmmwh/react-refresh-webpack-plugin/-/react-refresh-webpack-plugin-0.5.3.tgz#b8f0e035f6df71b5c4126cb98de29f65188b9e7b"
-  integrity sha512-OoTnFb8XEYaOuMNhVDsLRnAO6MCYHNs1g6d8pBcHhDFsi1P3lPbq/IklwtbAx9cG0W4J9KswxZtwGnejrnxp+g==
+"@pmmmwh/react-refresh-webpack-plugin@^0.5.1", "@pmmmwh/react-refresh-webpack-plugin@^0.5.8":
+  version "0.5.8"
+  resolved "https://registry.yarnpkg.com/@pmmmwh/react-refresh-webpack-plugin/-/react-refresh-webpack-plugin-0.5.8.tgz#da3383761e2c0c440610819f3204769022a38d12"
+  integrity sha512-wxXRwf+IQ6zvHSJZ+5T2RQNEsq+kx4jKRXfFvdt3nBIUzJUAvXEFsUeoaohDe/Kr84MTjGwcuIUPNcstNJORsA==
   dependencies:
     ansi-html-community "^0.0.8"
     common-path-prefix "^3.0.0"
-    core-js-pure "^3.8.1"
-    error-stack-parser "^2.0.6"
-    find-up "^5.0.0"
-    html-entities "^2.1.0"
-    loader-utils "^2.0.0"
-    schema-utils "^3.0.0"
-    source-map "^0.7.3"
-
-"@pmmmwh/react-refresh-webpack-plugin@^0.5.6":
-  version "0.5.6"
-  resolved "https://registry.yarnpkg.com/@pmmmwh/react-refresh-webpack-plugin/-/react-refresh-webpack-plugin-0.5.6.tgz#9ced74cb23dae31ab385f775e237ce4c50422a1d"
-  integrity sha512-IIWxofIYt/AbMwoeBgj+O2aAXLrlCQVg+A4a2zfpXFNHgP8o8rvi3v+oe5t787Lj+KXlKOh8BAiUp9bhuELXhg==
-  dependencies:
-    ansi-html-community "^0.0.8"
-    common-path-prefix "^3.0.0"
-    core-js-pure "^3.8.1"
+    core-js-pure "^3.23.3"
     error-stack-parser "^2.0.6"
     find-up "^5.0.0"
     html-entities "^2.1.0"
@@ -5586,10 +5571,10 @@ core-js-compat@^3.20.2, core-js-compat@^3.21.0, core-js-compat@^3.8.1:
     browserslist "^4.19.1"
     semver "7.0.0"
 
-core-js-pure@^3.8.1, core-js-pure@^3.8.2:
-  version "3.19.3"
-  resolved "https://registry.yarnpkg.com/core-js-pure/-/core-js-pure-3.19.3.tgz#c69b2b36b58927317824994b532ec3f0f7e49607"
-  integrity sha512-N3JruInmCyt7EJj5mAq3csCgGYgiSqu7p7TQp2KOztr180/OAIxyIvL1FCjzgmQk/t3Yniua50Fsak7FShI9lA==
+core-js-pure@^3.23.3, core-js-pure@^3.8.2:
+  version "3.25.5"
+  resolved "https://registry.yarnpkg.com/core-js-pure/-/core-js-pure-3.25.5.tgz#79716ba54240c6aa9ceba6eee08cf79471ba184d"
+  integrity sha512-oml3M22pHM+igfWHDfdLVq2ShWmjM2V4L+dQEBs0DWVIqEm9WHCwGAlZ6BmyBQGy5sFrJmcx+856D9lVKyGWYg==
 
 core-js@^1.0.0:
   version "1.2.7"
