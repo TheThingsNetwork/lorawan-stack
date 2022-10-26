@@ -773,7 +773,7 @@ func nonRetryableAbsoluteTimeGatewayError(err error) bool {
 		errors.IsAlreadyExists(err) // e.g. a downlink has already been scheduled on the given time.
 }
 
-func nonRetryableFixedPathGatewayError(err error) bool {
+func nonRetryablePathGatewayError(err error) bool {
 	return errors.IsNotFound(err) || // e.g. gateway is not connected.
 		errors.IsDataLoss(err) || // e.g. invalid uplink token.
 		errors.IsFailedPrecondition(err) // e.g. no downlink allowed, invalid frequency, too late for transmission.
@@ -1538,7 +1538,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 	)
 	queuedEvents = append(queuedEvents, scheduleEvents...)
 	if err != nil {
-		if schedErr, ok := err.(downlinkSchedulingError); ok {
+		if schedErr := (downlinkSchedulingError{}); errors.As(err, &schedErr) {
 			logger = loggerWithDownlinkSchedulingErrorFields(logger, schedErr)
 		} else {
 			logger = logger.WithError(err)
@@ -1732,15 +1732,16 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 	queuedEvents = append(queuedEvents, scheduleEvents...)
 	if err != nil {
 		logger := log.FromContext(ctx)
-		schedErr, ok := err.(downlinkSchedulingError)
-		if ok {
+		var schedErr downlinkSchedulingError
+		isSchedErr := errors.As(err, &schedErr)
+		if isSchedErr {
 			logger = loggerWithDownlinkSchedulingErrorFields(logger, schedErr)
 		} else {
 			logger = logger.WithError(err)
 		}
-		if ok && genState.ApplicationDownlink != nil {
-			pathErrs, ok := schedErr.pathErrors()
-			if ok {
+		if isSchedErr && genState.ApplicationDownlink != nil {
+			pathErrs, isPathErr := schedErr.pathErrors()
+			if isPathErr {
 				if genState.ApplicationDownlink.GetClassBC().GetAbsoluteTime() != nil &&
 					allErrors(nonRetryableAbsoluteTimeGatewayError, pathErrs...) {
 					logger.Warn("Absolute time invalid, fail application downlink")
@@ -1759,9 +1760,8 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 						QueuedEvents: queuedEvents,
 					}
 				}
-				if len(genState.ApplicationDownlink.GetClassBC().GetGateways()) > 0 &&
-					allErrors(nonRetryableFixedPathGatewayError, pathErrs...) {
-					logger.Warn("Fixed paths invalid, fail application downlink")
+				if allErrors(nonRetryablePathGatewayError, pathErrs...) {
+					logger.Warn("Downlink paths invalid, fail application downlink")
 					return downlinkAttemptResult{
 						SetPaths: ttnpb.AddFields(sets, "session.queued_application_downlinks"),
 						QueuedApplicationUplinks: append(genState.appendApplicationUplinks(nil, false), &ttnpb.ApplicationUp{
@@ -1993,7 +1993,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 					)
 					queuedEvents = append(queuedEvents, downEvs...)
 					if err != nil {
-						if schedErr, ok := err.(downlinkSchedulingError); ok {
+						if schedErr := (downlinkSchedulingError{}); errors.As(err, &schedErr) {
 							logger = loggerWithDownlinkSchedulingErrorFields(logger, schedErr)
 						} else {
 							logger = logger.WithError(err)

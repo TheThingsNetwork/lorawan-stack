@@ -88,11 +88,13 @@ var (
 		"as.up.location.forward", "forward location solved message",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.ApplicationUp{}),
+		events.WithPropagateToParent(),
 	)
 	evtForwardServiceData = events.Define(
 		"as.up.service.forward", "forward service data message",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.ApplicationUp{}),
+		events.WithPropagateToParent(),
 	)
 	evtReceiveDataDown = events.Define(
 		"as.down.data.receive", "receive downlink data message",
