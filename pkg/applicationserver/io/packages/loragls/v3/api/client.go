@@ -47,8 +47,9 @@ type Client struct {
 
 const (
 	contentType      = "application/json"
-	defaultServerURL = "https://gls.loracloud.com"
+	defaultServerURL = "https://mgs.loracloud.com"
 	basePath         = "/api"
+	authHeader       = "Authorization"
 )
 
 // DefaultServerURL is the default server URL for LoRa Cloud Geolocation.
@@ -69,7 +70,7 @@ func (c *Client) newRequest(ctx context.Context, method, version, category, oper
 	}
 	req.Header.Set("Content-Type", contentType)
 	if c.token != "" {
-		req.Header.Set("Ocp-Apim-Subscription-Key", c.token)
+		req.Header.Set(authHeader, c.token)
 	}
 	return req, nil
 }
@@ -110,7 +111,7 @@ func WithBaseURL(baseURL *url.URL) Option {
 
 // SolveSingleFrame attempts to solve the location of the end-device using the provided single frame request.
 func (c *Client) SolveSingleFrame(ctx context.Context, request *SingleFrameRequest) (*ExtendedLocationSolverResponse, error) {
-	resp, err := c.Do(ctx, http.MethodPost, "v3", "solve", "singleframe", request)
+	resp, err := c.Do(ctx, http.MethodPost, "v1", "solve", "singleframe", request)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +125,7 @@ func (c *Client) SolveSingleFrame(ctx context.Context, request *SingleFrameReque
 
 // SolveMultiFrame attempts to solve the location of the end-device using the provided multi frame request.
 func (c *Client) SolveMultiFrame(ctx context.Context, request *MultiFrameRequest) (*ExtendedLocationSolverResponse, error) {
-	resp, err := c.Do(ctx, http.MethodPost, "v3", "solve", "multiframe", request)
+	resp, err := c.Do(ctx, http.MethodPost, "v1", "solve", "multiframe", request)
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +139,7 @@ func (c *Client) SolveMultiFrame(ctx context.Context, request *MultiFrameRequest
 
 // SolveGNSS attempts to solve the location of the end-device using the provided GNSS request.
 func (c *Client) SolveGNSS(ctx context.Context, request *GNSSRequest) (*ExtendedGNSSLocationSolverResponse, error) {
-	resp, err := c.Do(ctx, http.MethodPost, "v3", "solve", "gnss_lr1110_singleframe", request)
+	resp, err := c.Do(ctx, http.MethodPost, "v1", "solve", "gnss_lr1110_singleframe", request)
 	if err != nil {
 		return nil, err
 	}
@@ -152,7 +153,7 @@ func (c *Client) SolveGNSS(ctx context.Context, request *GNSSRequest) (*Extended
 
 // SolveWiFi attempts to solve the location of the end-device using the provided WiFi request.
 func (c *Client) SolveWiFi(ctx context.Context, request *WiFiRequest) (*ExtendedWiFiLocationSolverResponse, error) {
-	resp, err := c.Do(ctx, http.MethodPost, "v2", "", "loraWifi", request)
+	resp, err := c.Do(ctx, http.MethodPost, "v1", "solve", "loraWifi", request)
 	if err != nil {
 		return nil, err
 	}

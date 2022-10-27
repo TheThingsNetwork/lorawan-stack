@@ -54,6 +54,7 @@ export default Object.freeze({
   GATEWAY_GENERATE_API_KEY_LNS: 'gateway-generate-api-key-lns',
   JOIN_EUI: 'joineui',
   JOIN_SERVER: 'join-server',
+  LORA_CLOUD_MODEM_ENCODING: 'lora-cloud-modem-encoding',
   LORAWAN_VERSION: 'lorawan-version',
   MAX_DUTY_CYCLE: 'max-duty-cycle',
   NETWORK_KEY: 'network-key',

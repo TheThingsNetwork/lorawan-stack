@@ -92,7 +92,8 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.Appli
 			Freq:      uint32Ptr(uint32(settings.Frequency)),
 			Timestamp: float64PtrOfTimestamp(msg.ReceivedAt),
 		}
-		if fPort != msg.FPort {
+
+		if _, ok := data.fPortSet[msg.FPort]; !ok && fPort != msg.FPort {
 			log.FromContext(ctx).Debug("Uplink received on unhandled FPort; drop payload")
 			loraUp.Payload = &objects.Hex{}
 		}
@@ -294,6 +295,9 @@ func (p *DeviceManagementPackage) mergePackageData(def *ttnpb.ApplicationPackage
 		}
 		if data.useTLVEncoding != nil {
 			merged.useTLVEncoding = data.useTLVEncoding
+		}
+		if data.fPortSet != nil {
+			merged.fPortSet = data.fPortSet
 		}
 	}
 	if merged.serverURL == nil {
