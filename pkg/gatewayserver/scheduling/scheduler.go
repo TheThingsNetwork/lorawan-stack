@@ -102,21 +102,21 @@ func NewScheduler(
 		scheduleAnytimeDelay = &ScheduleTimeShort
 	}
 
-	var toa *frequencyplans.TimeOffAir
+	var timeOffAir *frequencyplans.TimeOffAir
 	for _, fp := range fps {
-		if toa != nil && fp.TimeOffAir != *toa {
+		if timeOffAir != nil && fp.TimeOffAir != *timeOffAir {
 			return nil, errFrequencyPlansTimeOffAir.New()
 		}
-		toa = &fp.TimeOffAir
+		timeOffAir = fp.TimeOffAir.Clone()
 	}
 
-	if toa.Duration < QueueDelay {
-		toa.Duration = QueueDelay
+	if timeOffAir.Duration < QueueDelay {
+		timeOffAir.Duration = QueueDelay
 	}
 
 	s := &Scheduler{
 		clock:                &RolloverClock{},
-		timeOffAir:           *toa,
+		timeOffAir:           *timeOffAir,
 		fps:                  fps,
 		timeSource:           timeSource,
 		scheduleAnytimeDelay: *scheduleAnytimeDelay,
