@@ -23,6 +23,10 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Fix several device onboarding issues with ABP in the Console.
+  - Do not ask for a JoinEUI.
+  - Reinitialize form properly when switching between ABP and OTAA.
+
 ### Security
 
 ## [3.22.1] - 2022-10-19
