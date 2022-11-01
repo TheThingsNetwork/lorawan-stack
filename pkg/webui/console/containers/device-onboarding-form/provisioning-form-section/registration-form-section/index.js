@@ -52,6 +52,7 @@ const DeviceRegistrationFormSection = () => {
   const isABP = !values.supports_join && !values.multicast
   const isOTAA = values.supports_join
   const lwVersion = parseLorawanMacVersion(values.lorawan_version)
+  const skipJs = values.join_server_address === undefined
 
   const showDevEUI =
     // OTAA end devices do require a DevEUI.
@@ -73,7 +74,7 @@ const DeviceRegistrationFormSection = () => {
           autoFocus
         />
       )}
-      {isOTAA && (
+      {isOTAA && !skipJs && (
         <>
           <Form.Field
             required

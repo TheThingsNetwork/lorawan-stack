@@ -23,6 +23,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Do not require AppKey when skipping Join Server registration in end device onboarding in the Console.
+- Fix auto generation of device ID when using DevEUI generator in the Console.
 - Fix several device onboarding issues with ABP in the Console.
   - Do not ask for a JoinEUI.
   - Reinitialize form properly when switching between ABP and OTAA.

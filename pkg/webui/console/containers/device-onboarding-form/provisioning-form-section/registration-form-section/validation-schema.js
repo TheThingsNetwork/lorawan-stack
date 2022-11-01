@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable react/forbid-prop-types */
+
+import { isUndefined } from 'lodash'
+
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -25,12 +29,16 @@ const networkKeySchema = Yup.object({
   }),
 })
 
-const appKeySchema = Yup.object({
-  app_key: Yup.object({
-    key: Yup.string()
-      .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
-      .required(sharedMessages.validateRequired),
-  }),
+const appKeySchema = Yup.object().when('join_server_address', {
+  is: isUndefined,
+  otherwise: schema =>
+    schema.shape({
+      app_key: Yup.object({
+        key: Yup.string()
+          .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+          .required(sharedMessages.validateRequired),
+      }),
+    }),
 })
 
 const devAddrSchema = Yup.string()
