@@ -120,7 +120,7 @@
     "react-select": "^4.1.0",
     "react-string-replace": "^1.1.0",
     "react-switch": "^6.0.0",
-    "react-text-mask": "^5.4.3",
+    "react-text-mask": "^5.5.0",
     "react-toastify": "^8.1.0",
     "react-virtualized-auto-sizer": "^1.0.4",
     "react-window": "^1.8.6",
