@@ -147,15 +147,15 @@ type rightsKeyType struct{}
 
 var rightsKey rightsKeyType
 
-func fromContext(ctx context.Context) (Rights, bool) {
-	if rights, ok := ctx.Value(rightsKey).(Rights); ok {
+func fromContext(ctx context.Context) (*Rights, bool) {
+	if rights, ok := ctx.Value(rightsKey).(*Rights); ok {
 		return rights, true
 	}
-	return Rights{}, false
+	return &Rights{}, false
 }
 
 // NewContext returns a derived context with the given rights.
-func NewContext(ctx context.Context, rights Rights) context.Context {
+func NewContext(ctx context.Context, rights *Rights) context.Context {
 	return context.WithValue(ctx, rightsKey, rights)
 }
 
@@ -175,11 +175,11 @@ func cacheInContext(ctx context.Context, f func(*Rights)) {
 	}
 }
 
-func cacheFromContext(ctx context.Context) (Rights, bool) {
+func cacheFromContext(ctx context.Context) (*Rights, bool) {
 	if rights, ok := ctx.Value(rightsCacheKey).(*Rights); ok {
-		return *rights, true
+		return rights, true
 	}
-	return Rights{}, false
+	return &Rights{}, false
 }
 
 type authInfoKeyType struct{}
