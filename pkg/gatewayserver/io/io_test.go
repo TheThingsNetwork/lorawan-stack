@@ -74,7 +74,7 @@ func TestFlow(t *testing.T) {
 	}
 	gs.RegisterGateway(ctx, ids, gtw)
 
-	gtwCtx := rights.NewContext(ctx, rights.Rights{
+	gtwCtx := rights.NewContext(ctx, &rights.Rights{
 		GatewayRights: rights.NewMap(map[string]*ttnpb.Rights{
 			unique.ID(ctx, ids): ttnpb.RightsFrom(ttnpb.Right_RIGHT_GATEWAY_LINK),
 		}),
@@ -567,7 +567,7 @@ func TestSubBandEIRPOverride(t *testing.T) {
 	}
 	gs.RegisterGateway(ctx, ids, gtw)
 
-	gtwCtx := rights.NewContext(ctx, rights.Rights{
+	gtwCtx := rights.NewContext(ctx, &rights.Rights{
 		GatewayRights: rights.NewMap(map[string]*ttnpb.Rights{
 			unique.ID(ctx, ids): ttnpb.RightsFrom(ttnpb.Right_RIGHT_GATEWAY_LINK),
 		}),

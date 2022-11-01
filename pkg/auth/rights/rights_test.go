@@ -30,9 +30,9 @@ func TestContext(t *testing.T) {
 	ctx := test.Context()
 	rights, ok := fromContext(ctx)
 	a.So(ok, should.BeFalse)
-	a.So(rights, should.Resemble, Rights{})
+	a.So(rights, should.Resemble, &Rights{})
 
-	fooRights := Rights{
+	fooRights := &Rights{
 		ApplicationRights: NewMap(map[string]*ttnpb.Rights{
 			unique.ID(ctx, &ttnpb.ApplicationIdentifiers{
 				ApplicationId: "foo-app",

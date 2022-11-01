@@ -121,7 +121,7 @@ func TestRequire(t *testing.T) {
 		fooCtx = ctx
 		fooID  = "foo"
 	)
-	fooCtx = NewContext(fooCtx, Rights{
+	fooCtx = NewContext(fooCtx, &Rights{
 		ApplicationRights: NewMap(map[string]*ttnpb.Rights{
 			unique.ID(fooCtx, &ttnpb.ApplicationIdentifiers{
 				ApplicationId: fooID,

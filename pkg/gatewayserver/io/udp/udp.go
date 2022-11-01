@@ -222,7 +222,7 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64, addr *net.UDPAddr) (
 		}
 		uid := unique.ID(ctx, ids)
 		ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
-		ctx = rights.NewContext(ctx, rights.Rights{
+		ctx = rights.NewContext(ctx, &rights.Rights{
 			GatewayRights: rights.NewMap(map[string]*ttnpb.Rights{
 				uid: {
 					Rights: []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_LINK},
