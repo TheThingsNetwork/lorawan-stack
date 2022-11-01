@@ -2896,11 +2896,11 @@ func TestGetAppSKey(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				ctx = rights.NewContextWithAuthInfo(ctx, &ttnpb.AuthInfoResponse{})
 				ctx = rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
+					ApplicationRights: rights.NewMap(map[string]*ttnpb.Rights{
 						unique.ID(ctx, &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"}): {
 							Rights: []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ}, // Require READ_KEYS
 						},
-					},
+					}),
 				})
 				return ctx
 			},
@@ -2984,11 +2984,11 @@ func TestGetAppSKey(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				ctx = rights.NewContextWithAuthInfo(ctx, &ttnpb.AuthInfoResponse{})
 				ctx = rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
+					ApplicationRights: rights.NewMap(map[string]*ttnpb.Rights{
 						unique.ID(ctx, &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"}): {
 							Rights: []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS},
 						},
-					},
+					}),
 				})
 				return ctx
 			},

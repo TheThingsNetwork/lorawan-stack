@@ -248,11 +248,11 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 		}
 		// If the server allows unauthenticated connections (for local testing), we provide the link rights ourselves.
 		ctx = rights.NewContext(ctx, rights.Rights{
-			GatewayRights: map[string]*ttnpb.Rights{
+			GatewayRights: rights.NewMap(map[string]*ttnpb.Rights{
 				uid: {
 					Rights: []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_LINK},
 				},
-			},
+			}),
 		})
 	}
 
