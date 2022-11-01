@@ -18,10 +18,12 @@ import (
 	"context"
 	"time"
 
-	"github.com/jinzhu/gorm"
 	"github.com/spf13/cobra"
+	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/dialect/pgdialect"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
-	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
+	bunstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/bunstore"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -33,7 +35,12 @@ var createOAuthClient = &cobra.Command{
 		defer cancel()
 
 		logger.Info("Connecting to Identity Server database...")
-		db, err := store.Open(ctx, config.IS.DatabaseURI)
+		db, err := store.OpenDB(ctx, config.IS.DatabaseURI)
+		if err != nil {
+			return err
+		}
+		bunDB := bun.NewDB(db, pgdialect.New())
+		st, err := bunstore.NewStore(ctx, bunDB)
 		if err != nil {
 			return err
 		}
@@ -106,11 +113,9 @@ var createOAuthClient = &cobra.Command{
 			Ids: &ttnpb.ClientIdentifiers{ClientId: clientID},
 		}
 
-		err = store.Transact(ctx, db, func(db *gorm.DB) error {
-			cliStore := store.GetClientStore(db)
-
+		err = st.Transact(ctx, func(ctx context.Context, st store.Store) error {
 			var cliExists bool
-			if _, err := cliStore.GetClient(ctx, cli.GetIds(), cliFieldMask); err == nil {
+			if _, err := st.GetClient(ctx, cli.GetIds(), cliFieldMask); err == nil {
 				cliExists = true
 			}
 			cli.Name = name
@@ -120,18 +125,21 @@ var createOAuthClient = &cobra.Command{
 			cli.State = ttnpb.State_STATE_APPROVED
 			cli.SkipAuthorization = authorized
 			cli.Endorsed = endorsed
-			cli.Grants = []ttnpb.GrantType{ttnpb.GrantType_GRANT_AUTHORIZATION_CODE, ttnpb.GrantType_GRANT_REFRESH_TOKEN}
+			cli.Grants = []ttnpb.GrantType{
+				ttnpb.GrantType_GRANT_AUTHORIZATION_CODE,
+				ttnpb.GrantType_GRANT_REFRESH_TOKEN,
+			}
 			cli.Rights = []ttnpb.Right{ttnpb.Right_RIGHT_ALL}
 
 			if cliExists {
 				logger.Info("Updating OAuth client...")
-				if _, err = cliStore.UpdateClient(ctx, cli, cliFieldMask); err != nil {
+				if _, err = st.UpdateClient(ctx, cli, cliFieldMask); err != nil {
 					return err
 				}
 				logger.WithField("secret", secret).Info("Updated OAuth client")
 			} else {
 				logger.Info("Creating OAuth client...")
-				if _, err = cliStore.CreateClient(ctx, cli); err != nil {
+				if _, err = st.CreateClient(ctx, cli); err != nil {
 					return err
 				}
 				logger.WithField("secret", secret).Info("Created OAuth client")
@@ -139,8 +147,7 @@ var createOAuthClient = &cobra.Command{
 
 			if owner != "" {
 				logger.Info("Setting owner rights...")
-				memberStore := store.GetMembershipStore(db)
-				err = memberStore.SetMember(
+				err = st.SetMember(
 					ctx,
 					(&ttnpb.UserIdentifiers{UserId: owner}).GetOrganizationOrUserIdentifiers(),
 					cli.GetIds().GetEntityIdentifiers(),
