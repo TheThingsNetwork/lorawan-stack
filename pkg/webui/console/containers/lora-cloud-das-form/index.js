@@ -47,13 +47,13 @@ const m = defineMessages({
   tokenDescription: 'Device & Application Services Access Token as configured within LoRa Cloud',
   fPortSetTitle: 'FPort Set',
   fPortSetDescription:
-    'Comma separated list of F-Port values (1-253) to be used for LoRa Cloud Modem Services',
+    'Comma separated list of F-Port values (1-223) to be used for LoRa Cloud Modem Services',
   modemEncoding: 'LoRa Edge Reference Tracker (Modem-E) encoding',
   setLoRaCloudToken: 'Set LoRa Cloud token',
   deleteWarning:
     'Are you sure you want to delete the LoRa Cloud Modem and Geolocation Services token? This action cannot be undone.',
   fPortSetValidationFormat:
-    'The FPort must be a number between 1 and 255, or a comma-separated list of numbers between 1 and 255',
+    'The FPort must be a number between 1 and 223, or a comma-separated list of numbers between 1 and 223',
 })
 
 const mapFPortInputToNumberArr = value => {
@@ -80,13 +80,13 @@ const validationSchema = Yup.object()
           return returning
         })
         .test('fport-format', m.fPortSetValidationFormat, value => {
-          // Blank value or comma-separated list of numbers between 1 and 253
+          // Blank value or comma-separated list of numbers between 1 and 223
           const matchesFormat = value.match(/^$|^\d+(\s*,\s*\d+)*$/)
           if (!matchesFormat) {
             return false
           }
           const fPorts = mapFPortInputToNumberArr(value)
-          return fPorts.every(fPort => fPort >= 1 && fPort <= 253)
+          return fPorts.every(fPort => fPort >= 1 && fPort <= 223)
         })
         .default(''),
     }),
