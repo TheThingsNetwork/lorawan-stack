@@ -822,7 +822,7 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			}
 		case "ping_slot_frequency":
 			if len(subs) > 0 {
-				var newDst, newSrc *FrequencyValue
+				var newDst, newSrc *ZeroableFrequencyValue
 				if (src == nil || src.PingSlotFrequency == nil) && dst.PingSlotFrequency == nil {
 					continue
 				}
@@ -832,7 +832,7 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 				if dst.PingSlotFrequency != nil {
 					newDst = dst.PingSlotFrequency
 				} else {
-					newDst = &FrequencyValue{}
+					newDst = &ZeroableFrequencyValue{}
 					dst.PingSlotFrequency = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
@@ -847,7 +847,7 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			}
 		case "beacon_frequency":
 			if len(subs) > 0 {
-				var newDst, newSrc *FrequencyValue
+				var newDst, newSrc *ZeroableFrequencyValue
 				if (src == nil || src.BeaconFrequency == nil) && dst.BeaconFrequency == nil {
 					continue
 				}
@@ -857,7 +857,7 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 				if dst.BeaconFrequency != nil {
 					newDst = dst.BeaconFrequency
 				} else {
-					newDst = &FrequencyValue{}
+					newDst = &ZeroableFrequencyValue{}
 					dst.BeaconFrequency = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
@@ -1317,7 +1317,7 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			}
 		case "desired_ping_slot_frequency":
 			if len(subs) > 0 {
-				var newDst, newSrc *FrequencyValue
+				var newDst, newSrc *ZeroableFrequencyValue
 				if (src == nil || src.DesiredPingSlotFrequency == nil) && dst.DesiredPingSlotFrequency == nil {
 					continue
 				}
@@ -1327,7 +1327,7 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 				if dst.DesiredPingSlotFrequency != nil {
 					newDst = dst.DesiredPingSlotFrequency
 				} else {
-					newDst = &FrequencyValue{}
+					newDst = &ZeroableFrequencyValue{}
 					dst.DesiredPingSlotFrequency = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
@@ -1342,7 +1342,7 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			}
 		case "desired_beacon_frequency":
 			if len(subs) > 0 {
-				var newDst, newSrc *FrequencyValue
+				var newDst, newSrc *ZeroableFrequencyValue
 				if (src == nil || src.DesiredBeaconFrequency == nil) && dst.DesiredBeaconFrequency == nil {
 					continue
 				}
@@ -1352,7 +1352,7 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 				if dst.DesiredBeaconFrequency != nil {
 					newDst = dst.DesiredBeaconFrequency
 				} else {
-					newDst = &FrequencyValue{}
+					newDst = &ZeroableFrequencyValue{}
 					dst.DesiredBeaconFrequency = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {

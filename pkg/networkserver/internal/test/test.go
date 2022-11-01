@@ -245,6 +245,7 @@ func MakeDefaultEU868CurrentMACParameters(phyVersion ttnpb.PHYVersion) *ttnpb.MA
 		MaxEirp:                    16,
 		PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DataRateIndex_DATA_RATE_3},
 		PingSlotFrequency:          869525000,
+		BeaconFrequency:            869525000,
 		RejoinCountPeriodicity:     ttnpb.RejoinCountExponent_REJOIN_COUNT_16,
 		RejoinTimePeriodicity:      ttnpb.RejoinTimeExponent_REJOIN_TIME_0,
 		Rx1Delay:                   DefaultEU868RX1Delay,

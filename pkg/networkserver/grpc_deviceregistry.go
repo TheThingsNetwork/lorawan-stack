@@ -1805,6 +1805,75 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			}
 		}
 
+		if hasPHYUpdate || st.HasSetField(
+			"mac_settings.desired_ping_slot_frequency.value",
+			"supports_class_b",
+		) {
+			if err := st.WithFields(func(m map[string]*ttnpb.EndDevice) error {
+				if !m["supports_class_b"].GetSupportsClassB() ||
+					m["mac_settings.desired_ping_slot_frequency.value"].GetMacSettings().GetDesiredPingSlotFrequency().GetValue() > 0 {
+					return nil
+				}
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if len(phy.PingSlotFrequencies) == 0 {
+						return newInvalidFieldValueError("mac_settings.desired_ping_slot_frequency.value")
+					}
+					return nil
+				})
+			},
+				"mac_settings.desired_ping_slot_frequency.value",
+				"supports_class_b",
+			); err != nil {
+				return nil, err
+			}
+		}
+
+		if hasPHYUpdate || st.HasSetField(
+			"mac_settings.beacon_frequency.value",
+			"supports_class_b",
+		) {
+			if err := st.WithFields(func(m map[string]*ttnpb.EndDevice) error {
+				if !m["supports_class_b"].GetSupportsClassB() ||
+					m["mac_settings.beacon_frequency.value"].GetMacSettings().GetBeaconFrequency().GetValue() > 0 {
+					return nil
+				}
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if len(phy.Beacon.Frequencies) == 0 {
+						return newInvalidFieldValueError("mac_settings.beacon_frequency.value")
+					}
+					return nil
+				})
+			},
+				"mac_settings.beacon_frequency.value",
+				"supports_class_b",
+			); err != nil {
+				return nil, err
+			}
+		}
+
+		if hasPHYUpdate || st.HasSetField(
+			"mac_settings.desired_beacon_frequency.value",
+			"supports_class_b",
+		) {
+			if err := st.WithFields(func(m map[string]*ttnpb.EndDevice) error {
+				if !m["supports_class_b"].GetSupportsClassB() ||
+					m["mac_settings.desired_beacon_frequency.value"].GetMacSettings().GetDesiredBeaconFrequency().GetValue() > 0 {
+					return nil
+				}
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if len(phy.Beacon.Frequencies) == 0 {
+						return newInvalidFieldValueError("mac_settings.desired_beacon_frequency.value")
+					}
+					return nil
+				})
+			},
+				"mac_settings.desired_beacon_frequency.value",
+				"supports_class_b",
+			); err != nil {
+				return nil, err
+			}
+		}
+
 		for p, isValid := range map[string]func(*ttnpb.EndDevice, *band.Band) bool{
 			"mac_settings.use_adr.value": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
 				return !dev.GetMacSettings().GetUseAdr().GetValue() || phy.SupportsDynamicADR

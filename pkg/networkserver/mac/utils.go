@@ -472,25 +472,27 @@ func DeviceDesiredPingSlotDataRateIndexValue(dev *ttnpb.EndDevice, phy *band.Ban
 	}
 }
 
-func DeviceDefaultBeaconFrequency(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings) uint64 {
+func DeviceDefaultBeaconFrequency(dev *ttnpb.EndDevice, phy *band.Band, defaults *ttnpb.MACSettings) uint64 {
 	switch {
 	case dev.GetMacSettings().GetBeaconFrequency() != nil && dev.MacSettings.BeaconFrequency.Value != 0:
 		return dev.MacSettings.BeaconFrequency.Value
 	case defaults.BeaconFrequency != nil:
 		return defaults.BeaconFrequency.Value
+	case len(phy.Beacon.Frequencies) == 1:
+		return phy.Beacon.Frequencies[0]
 	default:
 		return 0
 	}
 }
 
-func DeviceDesiredBeaconFrequency(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings) uint64 {
+func DeviceDesiredBeaconFrequency(dev *ttnpb.EndDevice, phy *band.Band, defaults *ttnpb.MACSettings) uint64 {
 	switch {
 	case dev.GetMacSettings().GetDesiredBeaconFrequency() != nil && dev.MacSettings.DesiredBeaconFrequency.Value != 0:
 		return dev.MacSettings.DesiredBeaconFrequency.Value
 	case defaults.DesiredBeaconFrequency != nil && defaults.DesiredBeaconFrequency.Value != 0:
 		return defaults.DesiredBeaconFrequency.Value
 	default:
-		return DeviceDefaultBeaconFrequency(dev, defaults)
+		return DeviceDefaultBeaconFrequency(dev, phy, defaults)
 	}
 }
 
@@ -668,7 +670,7 @@ func NewState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults *ttnpb.M
 		RejoinTimePeriodicity:      ttnpb.RejoinTimeExponent_REJOIN_TIME_0,
 		RejoinCountPeriodicity:     ttnpb.RejoinCountExponent_REJOIN_COUNT_16,
 		PingSlotFrequency:          DeviceDefaultPingSlotFrequency(dev, phy, defaults),
-		BeaconFrequency:            DeviceDefaultBeaconFrequency(dev, defaults),
+		BeaconFrequency:            DeviceDefaultBeaconFrequency(dev, phy, defaults),
 		Channels:                   DeviceDefaultChannels(dev, phy, defaults),
 		UplinkDwellTime:            DeviceUplinkDwellTime(dev, phy, defaults),
 		DownlinkDwellTime:          DeviceDownlinkDwellTime(dev, phy, defaults),
@@ -694,7 +696,7 @@ func NewState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults *ttnpb.M
 			RejoinTimePeriodicity:      ttnpb.RejoinTimeExponent_REJOIN_TIME_0,
 			RejoinCountPeriodicity:     ttnpb.RejoinCountExponent_REJOIN_COUNT_16,
 			PingSlotFrequency:          DeviceDesiredPingSlotFrequency(dev, phy, fp, defaults),
-			BeaconFrequency:            DeviceDesiredBeaconFrequency(dev, defaults),
+			BeaconFrequency:            DeviceDesiredBeaconFrequency(dev, phy, defaults),
 			Channels:                   deviceDesiredChannels,
 			UplinkDwellTime:            DeviceDesiredUplinkDwellTime(phy, fp),
 			DownlinkDwellTime:          DeviceDesiredDownlinkDwellTime(phy, fp),

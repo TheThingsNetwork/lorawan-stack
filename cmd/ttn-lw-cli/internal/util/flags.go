@@ -190,6 +190,7 @@ func isAtomicType(t reflect.Type, maskOnly bool) bool {
 			"DataRateOffsetValue",
 			"DeviceEIRPValue",
 			"FrequencyValue",
+			"ZeroableFrequencyValue",
 			"GatewayAntennaIdentifiers",
 			"Picture",
 			"PingSlotPeriodValue",
@@ -332,7 +333,7 @@ func AddField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 			// Not supported
 			return
 
-		case "FrequencyValue":
+		case "FrequencyValue", "ZeroableFrequencyValue":
 			fs.Uint64(name, 0, "")
 			return
 
@@ -648,6 +649,8 @@ func setField(rv reflect.Value, path []string, v reflect.Value) error {
 						field.Set(reflect.ValueOf(ttnpb.BoolValue{Value: v.Bool()}))
 					case "FrequencyValue":
 						field.Set(reflect.ValueOf(ttnpb.FrequencyValue{Value: v.Uint()}))
+					case "ZeroableFrequencyValue":
+						field.Set(reflect.ValueOf(ttnpb.ZeroableFrequencyValue{Value: v.Uint()}))
 
 					case "DataRateIndexValue":
 						if enumValue, ok := proto.EnumValueMap(unwrapLoRaWANEnumType(typeName))[v.String()]; ok {
