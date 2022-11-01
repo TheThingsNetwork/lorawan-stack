@@ -13,6 +13,10 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Class B and C downlinks will no longer be automatically retried indefinitely if none of the gateways are available at the scheduling moment, and the downlink paths come from the last uplink.
+  - This was already the behavior for downlinks which had their downlink path provided explicitly using the `class_b_c.gateways` field.
+  - The downlinks will be evicted from the downlink queue and a downlink failure event will be generated. The failure event can be observed by the application using the `downlink_failed` message, which is available in all integrations.
+
 ### Deprecated
 
 ### Removed
@@ -21,6 +25,9 @@ For details about compatibility between different releases, see the **Commitment
 
 - Do not require AppKey when skipping Join Server registration in end device onboarding in the Console.
 - Fix auto generation of device ID when using DevEUI generator in the Console.
+- Fix several device onboarding issues with ABP in the Console.
+  - Do not ask for a JoinEUI.
+  - Reinitialize form properly when switching between ABP and OTAA.
 
 ### Security
 

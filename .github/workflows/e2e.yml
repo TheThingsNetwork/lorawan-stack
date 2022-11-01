@@ -46,7 +46,7 @@ jobs:
         run: echo "::set-output name=hash::${{ hashFiles('.github/workflows/e2e.yml', '*.go', 'go.mod', 'go.sum', 'pkg/**', 'tools/**', 'config/**', 'package.json', 'pkg/webui/**', 'sdk/js/**', 'yarn.lock', 'cypress/**', 'docker-compose.yml') }}"
       - name: Get the cached result
         id: run-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: .cache/passed
           key: run-cache-${{ steps.get-hash.outputs.hash }}-${{ github.run_id }}
@@ -76,7 +76,7 @@ jobs:
         uses: ./.github/actions/install-node-and-deps
       - name: Initialize SQL dump cache
         id: db-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             .env/cache/database.pgdump
@@ -84,7 +84,7 @@ jobs:
           key: db-cache-${{ hashFiles('pkg/identityserver/store/**/*.go', 'cmd/ttn-lw-stack/commands/is-db.go', '.github/workflows/e2e.yml', 'docker-compose.yml') }}
       - name: Initialize device repository index cache
         id: dr-index-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: data/lorawan-devices-index
           key: dr-index-cache-${{ hashFiles('data/lorawan-devices') }}
@@ -98,7 +98,7 @@ jobs:
         uses: ./.github/actions/build-frontend
       - name: Initialize build cache
         id: build-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ttn-lw-stack
           key: build-cache-${{ hashFiles('go.mod', 'go.sum', 'pkg/**',  'config/**', 'cmd/**') }}
@@ -108,7 +108,7 @@ jobs:
       - name: Zip build artifacts
         run: zip -r build.zip .env/cache/database.pgdump .env/admin_api_key.txt data/lorawan-devices-index public ttn-lw-stack tools/bin/mage
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: build-files
           path: build.zip
@@ -141,7 +141,7 @@ jobs:
           sudo apt-get update
           sudo apt-get --only-upgrade install google-chrome-stable
           google-chrome --version
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         name: Download build artifacts
         with:
           name: 'build-files'
@@ -170,7 +170,7 @@ jobs:
       - name: Run stack
         run: tools/bin/mage dev:startDevStack &
       - name: Run previously failed test first
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v4
         if: steps.get-failed-spec.outputs.failed-test != ''
         with:
           config-file: config/cypress.json
@@ -181,7 +181,7 @@ jobs:
           group: previously-failed-${{ needs.determine-if-required.outputs.hash }}
           spec: ${{ steps.get-failed-spec.outputs.failed-test }}
       - name: Run frontend end-to-end tests
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v4
         with:
           config-file: config/cypress.json
           config: baseUrl=https://localhost:8885
@@ -194,19 +194,19 @@ jobs:
             !cypress/integration/smoke/smoke.spec.js
             ${{ steps.get-failed-spec.outputs.neg-failed-test }}
       - name: Upload logs
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: logs
           path: .cache/devStack.log
       - name: Upload screenshots for failed tests
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: cypress-screenshots
           path: cypress/screenshots
       - name: Upload name of failing test
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: cypress-failed-test-spec
@@ -231,7 +231,7 @@ jobs:
         uses: ./.github/actions/build-mage
       - name: Install Node and Dependencies
         uses: ./.github/actions/install-node-and-deps
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         name: Download build artifacts
         with:
           name: 'build-files'
@@ -250,7 +250,7 @@ jobs:
       - name: Run stack
         run: tools/bin/mage dev:startDevStack &
       - name: Run end-to-end smoke tests (Firefox)
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v4
         with:
           config-file: config/cypress.json
           config: baseUrl=https://localhost:8885
@@ -258,13 +258,13 @@ jobs:
           record: true
           spec: cypress/integration/smoke/smoke.spec.js
       - name: Upload logs
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: logs
           path: .cache/devStack.log
       - name: Upload screenshots for failed tests
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: cypress-screenshots
@@ -277,7 +277,7 @@ jobs:
     steps:
       - name: Setup result cache to skip redundant runs
         id: run-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: .cache/passed
           key: run-cache-${{ needs.determine-if-required.outputs.hash }}

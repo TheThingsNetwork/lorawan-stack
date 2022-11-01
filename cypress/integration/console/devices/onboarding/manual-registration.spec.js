@@ -136,9 +136,9 @@ describe('End device manual create', () => {
           'eq',
           `${Cypress.config(
             'consoleRootPath',
-          )}/applications/${appId}/devices/eui-${device.dev_eui.toLocaleLowerCase()}`,
+          )}/applications/${appId}/devices/eui-${device.dev_eui.toLowerCase()}`,
         )
-        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLocaleLowerCase()}` }).should(
+        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLowerCase()}` }).should(
           'be.visible',
         )
 
@@ -165,6 +165,10 @@ describe('End device manual create', () => {
         cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('DevEUI').type(device.dev_eui)
         cy.findByLabelText('AppKey').type(device.app_key)
+        cy.findByLabelText('End device ID').should(
+          'have.value',
+          `eui-${device.dev_eui.toLowerCase()}`,
+        )
 
         cy.findByRole('button', { name: 'Register end device' }).click()
 
@@ -172,9 +176,9 @@ describe('End device manual create', () => {
           'eq',
           `${Cypress.config(
             'consoleRootPath',
-          )}/applications/${appId}/devices/eui-${device.dev_eui.toLocaleLowerCase()}`,
+          )}/applications/${appId}/devices/eui-${device.dev_eui.toLowerCase()}`,
         )
-        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLocaleLowerCase()}` }).should(
+        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLowerCase()}` }).should(
           'be.visible',
         )
 
@@ -205,9 +209,9 @@ describe('End device manual create', () => {
           'eq',
           `${Cypress.config(
             'consoleRootPath',
-          )}/applications/${appId}/devices/eui-${device.dev_eui.toLocaleLowerCase()}`,
+          )}/applications/${appId}/devices/eui-${device.dev_eui.toLowerCase()}`,
         )
-        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLocaleLowerCase()}` }).should(
+        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLowerCase()}` }).should(
           'be.visible',
         )
         cy.findByTestId('full-error-view').should('not.exist')
@@ -237,9 +241,9 @@ describe('End device manual create', () => {
           'eq',
           `${Cypress.config(
             'consoleRootPath',
-          )}/applications/${appId}/devices/eui-${device.dev_eui.toLocaleLowerCase()}`,
+          )}/applications/${appId}/devices/eui-${device.dev_eui.toLowerCase()}`,
         )
-        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLocaleLowerCase()}` }).should(
+        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLowerCase()}` }).should(
           'be.visible',
         )
 
@@ -269,9 +273,9 @@ describe('End device manual create', () => {
           'eq',
           `${Cypress.config(
             'consoleRootPath',
-          )}/applications/${appId}/devices/eui-${device.dev_eui.toLocaleLowerCase()}`,
+          )}/applications/${appId}/devices/eui-${device.dev_eui.toLowerCase()}`,
         )
-        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLocaleLowerCase()}` }).should(
+        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLowerCase()}` }).should(
           'be.visible',
         )
 
@@ -304,9 +308,9 @@ describe('End device manual create', () => {
           'eq',
           `${Cypress.config(
             'consoleRootPath',
-          )}/applications/${appId}/devices/eui-${device.dev_eui.toLocaleLowerCase()}`,
+          )}/applications/${appId}/devices/eui-${device.dev_eui.toLowerCase()}`,
         )
-        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLocaleLowerCase()}` }).should(
+        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLowerCase()}` }).should(
           'be.visible',
         )
 
@@ -336,9 +340,9 @@ describe('End device manual create', () => {
           'eq',
           `${Cypress.config(
             'consoleRootPath',
-          )}/applications/${appId}/devices/eui-${device.dev_eui.toLocaleLowerCase()}`,
+          )}/applications/${appId}/devices/eui-${device.dev_eui.toLowerCase()}`,
         )
-        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLocaleLowerCase()}` }).should(
+        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLowerCase()}` }).should(
           'be.visible',
         )
 
@@ -370,9 +374,9 @@ describe('End device manual create', () => {
           'eq',
           `${Cypress.config(
             'consoleRootPath',
-          )}/applications/${appId}/devices/eui-${device.dev_eui.toLocaleLowerCase()}`,
+          )}/applications/${appId}/devices/eui-${device.dev_eui.toLowerCase()}`,
         )
-        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLocaleLowerCase()}` }).should(
+        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLowerCase()}` }).should(
           'be.visible',
         )
 
@@ -407,9 +411,9 @@ describe('End device manual create', () => {
           'eq',
           `${Cypress.config(
             'consoleRootPath',
-          )}/applications/${appId}/devices/eui-${device.dev_eui.toLocaleLowerCase()}`,
+          )}/applications/${appId}/devices/eui-${device.dev_eui.toLowerCase()}`,
         )
-        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLocaleLowerCase()}` }).should(
+        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLowerCase()}` }).should(
           'be.visible',
         )
 
@@ -445,8 +449,6 @@ describe('End device manual create', () => {
       cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
       cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
       cy.findByLabelText('Activation by personalization (ABP)').check()
-      cy.findByLabelText('JoinEUI').type(device.join_eui)
-      cy.findByRole('button', { name: 'Confirm' }).click()
       cy.findByRole('button', { name: 'Register end device' }).click()
 
       cy.findErrorByLabelText('Device address')
@@ -479,8 +481,6 @@ describe('End device manual create', () => {
         cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
         cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
         cy.findByLabelText('Activation by personalization (ABP)').check()
-        cy.findByLabelText('JoinEUI').type(device.join_eui)
-        cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('Device address').type(device.dev_addr)
         cy.findByLabelText('NwkSKey').type(device.nwk_s_key)
         cy.findByLabelText('AppSKey').type(device.app_s_key)
@@ -518,8 +518,6 @@ describe('End device manual create', () => {
         cy.findByLabelText('Network defaults').should('not.be.checked').and('have.attr', 'disabled')
         cy.findByLabelText('Class B timeout').type(device.class_b_timeout)
         cy.findByLabelText('Ping slot periodicity').selectOption(device.ping_slot_periodicity)
-        cy.findByLabelText('JoinEUI').type(device.join_eui)
-        cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('Device address').type(device.dev_addr)
         cy.findByLabelText('NwkSKey').type(device.nwk_s_key)
         cy.findByLabelText('AppSKey').type(device.app_s_key)
@@ -552,8 +550,6 @@ describe('End device manual create', () => {
         cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
         cy.findByLabelText('Activation by personalization (ABP)').check()
         cy.findByLabelText('Additional LoRaWAN class capabilities').selectOption('class-c')
-        cy.findByLabelText('JoinEUI').type(device.join_eui)
-        cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('Device address').type(device.dev_addr)
         cy.findByLabelText('NwkSKey').type(device.nwk_s_key)
         cy.findByLabelText('AppSKey').type(device.app_s_key)
@@ -574,10 +570,8 @@ describe('End device manual create', () => {
     describe('LoRaWAN V1.1', () => {
       it('succeeds registering a new class A end device', () => {
         const device = {
-          id: 'abp-test-1-1-class-a',
-          join_eui: generateHexValue(16),
-          dev_eui: generateHexValue(16),
           dev_addr: generateHexValue(8),
+          dev_eui: generateHexValue(16),
           lorawan_version: 'MAC_V1_1',
           phy_version: 'PHY_V1_1_REV_A',
           frequency_plan_id: '863-870 MHz',
@@ -592,8 +586,6 @@ describe('End device manual create', () => {
         cy.findByLabelText('Regional Parameters version').selectOption(device.phy_version)
         cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
         cy.findByLabelText('Activation by personalization (ABP)').check()
-        cy.findByLabelText('JoinEUI').type(device.join_eui)
-        cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('DevEUI').type(device.dev_eui)
         cy.findByLabelText('Device address').type(device.dev_addr)
         cy.findByLabelText('AppSKey').type(device.app_s_key)
@@ -602,7 +594,7 @@ describe('End device manual create', () => {
         cy.findByLabelText('NwkSEncKey').type(device.f_nwk_s_int_key)
         cy.findByLabelText('End device ID').should(
           'have.value',
-          `eui-${device.dev_eui.toLocaleLowerCase()}`,
+          `eui-${device.dev_eui.toLowerCase()}`,
         )
 
         cy.findByRole('button', { name: 'Register end device' }).click()
@@ -611,9 +603,9 @@ describe('End device manual create', () => {
           'eq',
           `${Cypress.config(
             'consoleRootPath',
-          )}/applications/${appId}/devices/eui-${device.dev_eui.toLocaleLowerCase()}`,
+          )}/applications/${appId}/devices/eui-${device.dev_eui.toLowerCase()}`,
         )
-        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLocaleLowerCase()}` }).should(
+        cy.findByRole('heading', { name: `eui-${device.dev_eui.toLowerCase()}` }).should(
           'be.visible',
         )
 
@@ -642,15 +634,12 @@ describe('End device manual create', () => {
       const device = {
         lorawan_version: 'MAC_V1_0',
         frequency_plan_id: '863-870 MHz',
-        join_eui: generateHexValue(16),
       }
 
       cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
       cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
       cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
       cy.findByLabelText('Define multicast group (ABP & Multicast)').check()
-      cy.findByLabelText('JoinEUI').type(device.join_eui)
-      cy.findByRole('button', { name: 'Confirm' }).click()
       cy.findByRole('button', { name: 'Register end device' }).click()
 
       cy.findErrorByLabelText('Device address')
@@ -671,7 +660,6 @@ describe('End device manual create', () => {
       it('succeeds registering a new class B end device', () => {
         const device = {
           id: 'multicast-test-1-0-class-b',
-          join_eui: generateHexValue(16),
           dev_addr: generateHexValue(8),
           lorawan_version: 'MAC_V1_0',
           frequency_plan_id: '863-870 MHz',
@@ -687,8 +675,6 @@ describe('End device manual create', () => {
         cy.findByLabelText('LoRaWAN class for multicast downlinks').selectOption('class-b')
         cy.findByLabelText('Network defaults').should('not.be.checked').and('have.attr', 'disabled')
         cy.findByLabelText('Ping slot periodicity').selectOption(device.ping_slot_periodicity)
-        cy.findByLabelText('JoinEUI').type(device.join_eui)
-        cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('Device address').type(device.dev_addr)
         cy.findByLabelText('AppSKey').type(device.app_s_key)
         cy.findByLabelText('NwkSKey').type(device.nwk_s_key)
@@ -708,7 +694,6 @@ describe('End device manual create', () => {
       it('succeeds registering a new class C end device', () => {
         const device = {
           id: 'multicast-test-1-0-class-c',
-          join_eui: generateHexValue(16),
           dev_addr: generateHexValue(8),
           lorawan_version: 'MAC_V1_0',
           frequency_plan_id: '863-870 MHz',
@@ -722,8 +707,6 @@ describe('End device manual create', () => {
         cy.findByLabelText('Define multicast group (ABP & Multicast)').check()
         cy.findByLabelText('LoRaWAN class for multicast downlinks').selectOption('class-c')
         cy.findByLabelText('Network defaults').uncheck()
-        cy.findByLabelText('JoinEUI').type(device.join_eui)
-        cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('Device address').type(device.dev_addr)
         cy.findByLabelText('AppSKey').type(device.app_s_key)
         cy.findByLabelText('NwkSKey').type(device.nwk_s_key)
@@ -743,7 +726,6 @@ describe('End device manual create', () => {
       it('succeeds registering multiple devices', () => {
         const device1 = {
           id: 'multicast-test-1',
-          join_eui: generateHexValue(16),
           dev_addr: generateHexValue(8),
           lorawan_version: 'MAC_V1_0',
           frequency_plan_id: '863-870 MHz',
@@ -768,8 +750,6 @@ describe('End device manual create', () => {
         cy.findByLabelText('Define multicast group (ABP & Multicast)').check()
         cy.findByLabelText('LoRaWAN class for multicast downlinks').selectOption('class-c')
         cy.findByLabelText('Network defaults').uncheck()
-        cy.findByLabelText('JoinEUI').type(device1.join_eui)
-        cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('Device address').type(device1.dev_addr)
         cy.findByLabelText('AppSKey').type(device1.app_s_key)
         cy.findByLabelText('NwkSKey').type(device1.nwk_s_key)

@@ -44,6 +44,7 @@ import { getDefaultMacSettings } from '@console/store/actions/network-server'
 
 import { selectDefaultMacSettings } from '@console/store/selectors/network-server'
 
+import { initialValues as provisioningInitialValues } from '../../provisioning-form-section'
 import WarningTooltip from '../../warning-tooltip'
 import { DEVICE_CLASS_MAP } from '../../utils'
 import messages from '../../messages'
@@ -98,7 +99,7 @@ const activationModeDecoder = ({ supports_join, multicast }) => {
 }
 
 const activationModeValueSetter = ({ setValues }, { value, value: { multicast } }) => {
-  setValues(({ supports_class_b, supports_class_c, ...values }) => {
+  setValues(({ supports_class_b, supports_class_c, _claim, ...values }) => {
     const isClassA = supports_class_b === false && supports_class_c === false
     return {
       ...values,
@@ -117,6 +118,10 @@ const activationModeValueSetter = ({ setValues }, { value, value: { multicast } 
           : !multicast && supports_class_c === undefined
           ? false
           : supports_class_c,
+      // Reset provisioning data if activation mode changed.
+      ...(values.supports_join !== value.supports_join ? provisioningInitialValues : {}),
+      // Skip JoinEUI check if the device is ABP/Multicast.
+      _claim: !value.supports_join ? false : values._withQRdata ? values._claim : null,
     }
   })
 }

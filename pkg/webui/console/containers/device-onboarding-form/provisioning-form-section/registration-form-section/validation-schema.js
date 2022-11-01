@@ -74,15 +74,15 @@ const sessionKeysVersion110Schema = Yup.object({
 const validationSchema = Yup.object({
   ids: Yup.object({
     device_id: Yup.string().required(sharedMessages.validateRequired),
-    join_eui: Yup.string()
-      .length(8 * 2, Yup.passValues(sharedMessages.validateLength))
-      .required(sharedMessages.validateRequired),
   }).when('supports_join', {
     is: true,
     then: schema =>
       schema.concat(
         Yup.object({
           dev_eui: Yup.string()
+            .length(8 * 2, Yup.passValues(sharedMessages.validateLength))
+            .required(sharedMessages.validateRequired),
+          join_eui: Yup.string()
             .length(8 * 2, Yup.passValues(sharedMessages.validateLength))
             .required(sharedMessages.validateRequired),
         }),

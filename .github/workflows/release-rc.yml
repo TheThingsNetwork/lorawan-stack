@@ -40,7 +40,7 @@ jobs:
         uses: ./.github/actions/install-node-and-deps
       - name: Initialize device repository index cache
         id: dr-index-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: data/lorawan-devices-index
           key: dr-index-cache-${{ hashFiles('data/lorawan-devices') }}
@@ -64,7 +64,7 @@ jobs:
           export RC_VERSION=${RC_VERSION#release/v}
           echo "::set-output name=rc_version::$RC_VERSION"
       - name: Run Goreleaser
-        uses: goreleaser/goreleaser-action@v2
+        uses: goreleaser/goreleaser-action@v3
         with:
           version: 'v1.9.2'
           args: release --config .goreleaser.snapshot.yml --snapshot --timeout 60m

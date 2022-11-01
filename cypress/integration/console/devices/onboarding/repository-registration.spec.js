@@ -452,8 +452,6 @@ describe('End device repository manual registration', () => {
         cy.findByLabelText('Model').selectOption('test-model1')
         cy.findByLabelText('Profile (Region)').selectOption('EU_863_870')
         cy.findByLabelText('Frequency plan').selectOption('EU_863_870_TTN')
-        cy.findByLabelText('JoinEUI').type(generateHexValue(16))
-        cy.findByRole('button', { name: 'Confirm' }).click()
 
         cy.findByRole('button', { name: 'Register end device' }).click()
 
@@ -486,8 +484,6 @@ describe('End device repository manual registration', () => {
 
         // End device registration.
         cy.findByLabelText('Frequency plan').selectOption('EU_863_870_TTN')
-        cy.findByLabelText('JoinEUI').type(generateHexValue(16))
-        cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('Device address').type(generateHexValue(8))
         cy.findByLabelText('AppSKey').type(generateHexValue(32))
         cy.findByLabelText('NwkSKey').type(generateHexValue(32))
@@ -513,8 +509,6 @@ describe('End device repository manual registration', () => {
 
         // End device registration.
         cy.findByLabelText('Frequency plan').selectOption('EU_863_870_TTN')
-        cy.findByLabelText('JoinEUI').type(generateHexValue(16))
-        cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('Device address').type(generateHexValue(8))
         cy.findByLabelText('AppSKey').type(generateHexValue(32))
         cy.findByLabelText('NwkSKey').type(generateHexValue(32))
