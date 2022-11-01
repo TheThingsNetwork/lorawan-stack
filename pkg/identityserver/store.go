@@ -24,15 +24,16 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
 
-var bunstoreFeatureFlag = experimental.DefineFeature("is.bunstore", false)
+var gormFeatureFlag = experimental.DefineFeature("is.gormstore", false)
 
 func (is *IdentityServer) setupStore() error {
-	if bunstoreFeatureFlag.GetValue(is.Context()) {
-		return is.setupBunStore()
+	if gormFeatureFlag.GetValue(is.Context()) {
+		return is.setupGormStore()
 	}
-	return is.setupGormStore()
+	return is.setupBunStore()
 }
 
+// TODO: Remove the gormstore implementation. (https://github.com/TheThingsNetwork/lorawan-stack/issues/5643)
 func (is *IdentityServer) setupGormStore() error {
 	gormDB, err := gormstore.Open(is.Context(), is.config.DatabaseURI)
 	if err != nil {
