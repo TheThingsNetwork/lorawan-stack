@@ -75,7 +75,7 @@ const m = defineMessages({
   createErrorTitle: 'Could not create webhook',
   reactivateButtonMessage: 'Reactivate',
   suspendedWebhookMessage:
-    'This webhook has been deactivated due to several unsuccessful forwarding attempts. It will be automatically reactivated after 24 hours. If you wish to reactivate right away, you can use the button below.',
+    'This webhook has been deactivated due to several unsuccessful forwarding attempts. It will be automatically reactivated after {webhookRetryInterval} hours. If you wish to reactivate right away, you can use the button below.',
   pendingInfo:
     'This webhook is currently pending until attempting its first regular request attempt. Note that webhooks can be restricted if they encounter too many request failures.',
   messagePathValidateTooLong: 'Enabled message path must be at most 64 characters',
@@ -253,6 +253,7 @@ export default class WebhookForm extends Component {
     onReactivateSuccess: PropTypes.func,
     onSubmit: PropTypes.func.isRequired,
     update: PropTypes.bool.isRequired,
+    webhookRetryInterval: PropTypes.number,
     webhookTemplate: PropTypes.webhookTemplate,
   }
 
@@ -267,6 +268,7 @@ export default class WebhookForm extends Component {
     healthStatusEnabled: false,
     error: undefined,
     existCheck: () => null,
+    webhookRetryInterval: null,
   }
 
   form = React.createRef()
@@ -372,7 +374,8 @@ export default class WebhookForm extends Component {
       update &&
       initialWebhookValue &&
       initialWebhookValue.health_status &&
-      initialWebhookValue.health_status.unhealthy
+      initialWebhookValue.health_status.unhealthy &&
+      !healthStatusEnabled
 
     const isPending =
       healthStatusEnabled &&
@@ -402,7 +405,7 @@ export default class WebhookForm extends Component {
         {mayReactivate && (
           <Notification
             warning
-            content={m.suspendedWebhookMessage}
+            content={{ ...m.suspendedWebhookMessage, values: {webhookRetryInterval: webhookRetryInterval ?? '24 hours'}}}
             children={
               <Button
                 onClick={this.handleReactivate}
