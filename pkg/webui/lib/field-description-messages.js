@@ -77,6 +77,9 @@ const m = defineMessages({
   nwkSKeyLocation:
     'For OTAA, it is created by the Network Server. If using ABP, you must create one and manually enter it in the end device and The Things Stack.',
 
+  loraCloudModemEncodingDescription:
+    'The Application Server will parse streaming fragments using the TLV encoding and resubmit it to the Modem Services as a GNSS or WiFi payload, depending on the tag.',
+
   lwVersionDescription:
     'The LoRa Alliance LoRaWAN specification your end device conforms to, which defines which Media Access Control (MAC) features it supports.',
   lwVersionLocation:
@@ -528,6 +531,9 @@ const descriptions = Object.freeze({
   [TOOLTIP_IDS.FILTER_EVENT_DATA]: {
     description: m.filterEventDataDescription,
   },
+  [TOOLTIP_IDS.LORA_CLOUD_MODEM_ENCODING]: {
+    description: m.loraCloudModemEncodingDescription,
+  },
 })
 
 const links = Object.freeze({
@@ -569,6 +575,10 @@ const links = Object.freeze({
   },
   [TOOLTIP_IDS.FILTER_EVENT_DATA]: {
     documentationPath: '/integrations/webhooks/creating-webhooks/',
+  },
+  [TOOLTIP_IDS.LORA_CLOUD_MODEM_ENCODING]: {
+    externalUrl:
+      'https://github.com/Lora-net/lr1110_evk_demo_app/wiki/Command-tool---Node-RED-application-server-example#building-tlv-payload',
   },
 })
 

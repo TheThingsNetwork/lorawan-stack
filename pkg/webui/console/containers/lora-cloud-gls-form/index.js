@@ -81,6 +81,9 @@ const validationSchema = Yup.object()
         .oneOf(LORACLOUD_GLS_QUERY_VALUES)
         .default(LORACLOUD_GLS_QUERY_TYPES.TOARSSI)
         .required(sharedMessages.validateRequired),
+      server_url: Yup.string()
+        .url(sharedMessages.validateUrl)
+        .required(sharedMessages.validateRequired),
       multi_frame: Yup.boolean().when('query', {
         is: LORACLOUD_GLS_QUERY_TYPES.TOARSSI,
         then: schema => schema.default(false).required(sharedMessages.validateRequired),
@@ -116,6 +119,12 @@ const promisifiedDeleteAppPkgDefaultAssoc = attachPromise(deleteAppPkgDefaultAss
 const decodeDetermineMultiframeAutomatically = value => value === 0
 const encodeDetermineMultiframeAutomatically = value => (value ? 0 : 1)
 
+const defaultValues = {
+  data: {
+    server_url: LORA_CLOUD_GLS.DEFAULT_SERVER_URL,
+  },
+}
+
 const LoRaCloudGLSForm = () => {
   const [error, setError] = useState('')
   const appId = useSelector(selectSelectedApplicationId)
@@ -126,7 +135,7 @@ const LoRaCloudGLSForm = () => {
     selectApplicationPackageDefaultAssociation(state, LORA_CLOUD_GLS.DEFAULT_PORT),
   )
   const packageError = useSelector(selectGetApplicationPackagesError)
-  const initialValues = validationSchema.cast(defaultAssociation)
+  const initialValues = validationSchema.cast(defaultAssociation || defaultValues)
 
   const handleSubmit = useCallback(
     async values => {
@@ -224,6 +233,12 @@ const LoRaCloudGLSForm = () => {
         name="data.token"
         sensitive
         required
+      />
+      <Form.Field
+        component={Input}
+        title={sharedMessages.serverUrl}
+        description={sharedMessages.loraCloudServerUrlDescription}
+        name="data.server_url"
       />
       <Form.Field
         component={Select}

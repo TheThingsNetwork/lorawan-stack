@@ -83,7 +83,7 @@ func TestUplinks(t *testing.T) {
 						a.So(req.Method, should.Equal, "POST")
 						a.So(req.URL, should.Resemble, &url.URL{
 							Scheme: "https",
-							Host:   "das.loracloud.com",
+							Host:   "mgs.loracloud.com",
 							Path:   "/api/v1/uplink/send",
 						})
 					},

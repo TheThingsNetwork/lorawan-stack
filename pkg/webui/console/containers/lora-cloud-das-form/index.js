@@ -30,6 +30,7 @@ import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { isNotFoundError } from '@ttn-lw/lib/errors/utils'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
 import {
   setAppPkgDefaultAssoc,
@@ -44,17 +45,50 @@ import {
 
 const m = defineMessages({
   tokenDescription: 'Device & Application Services Access Token as configured within LoRa Cloud',
-  lr1110Encoding: 'LR1110 demo encoding',
+  fPortSetTitle: 'FPort Set',
+  fPortSetDescription:
+    'Comma separated list of F-Port values (1-223) to be used for LoRa Cloud Modem Services',
+  modemEncoding: 'LoRa Edge Reference Tracker (Modem-E) encoding',
   setLoRaCloudToken: 'Set LoRa Cloud token',
   deleteWarning:
-    'Are you sure you want to delete the LoRa Cloud Device & Application Services token? This action cannot be undone.',
+    'Are you sure you want to delete the LoRa Cloud Modem and Geolocation Services token? This action cannot be undone.',
+  fPortSetValidationFormat:
+    'The FPort must be a number between 1 and 223, or a comma-separated list of numbers between 1 and 223',
 })
+
+const mapFPortInputToNumberArr = value => {
+  if (!value || value === '') {
+    return []
+  }
+  return value.split(',').map(v => Number.parseInt(v.trim()))
+}
 
 const validationSchema = Yup.object()
   .shape({
     data: Yup.object().shape({
       token: Yup.string().required(sharedMessages.validateRequired),
       use_tlv_encoding: Yup.boolean(),
+      server_url: Yup.string()
+        .url(sharedMessages.validateUrl)
+        .required(sharedMessages.validateRequired),
+      f_port_set: Yup.string()
+        .transform(value => {
+          let returning = value
+          if (Array.isArray(value)) {
+            returning = value.join(',')
+          }
+          return returning
+        })
+        .test('fport-format', m.fPortSetValidationFormat, value => {
+          // Blank value or comma-separated list of numbers between 1 and 223
+          const matchesFormat = value.match(/^$|^\d+(\s*,\s*\d+)*$/)
+          if (!matchesFormat) {
+            return false
+          }
+          const fPorts = mapFPortInputToNumberArr(value)
+          return fPorts.every(fPort => fPort >= 1 && fPort <= 223)
+        })
+        .default(''),
     }),
   })
   .noUnknown()
@@ -62,6 +96,7 @@ const validationSchema = Yup.object()
 const defaultValues = {
   data: {
     token: '',
+    server_url: LORA_CLOUD_DAS.DEFAULT_SERVER_URL,
   },
 }
 
@@ -82,6 +117,7 @@ const LoRaCloudDASForm = () => {
   const handleSubmit = useCallback(
     async values => {
       try {
+        values.data.f_port_set = mapFPortInputToNumberArr(values.data.f_port_set)
         await dispatch(
           promisifiedSetAppPkgDefaultAssoc(appId, LORA_CLOUD_DAS.DEFAULT_PORT, {
             package_name: LORA_CLOUD_DAS.DEFAULT_PACKAGE_NAME,
@@ -137,7 +173,24 @@ const LoRaCloudDASForm = () => {
         sensitive
         required
       />
-      <Form.Field component={Checkbox} title={m.lr1110Encoding} name="data.use_tlv_encoding" />
+      <Form.Field
+        component={Input}
+        title={sharedMessages.serverUrl}
+        description={sharedMessages.loraCloudServerUrlDescription}
+        name="data.server_url"
+      />
+      <Form.Field
+        component={Checkbox}
+        title={m.modemEncoding}
+        tooltipId={tooltipIds.LORA_CLOUD_MODEM_ENCODING}
+        name="data.use_tlv_encoding"
+      />
+      <Form.Field
+        component={Input}
+        title={m.fPortSetTitle}
+        description={m.fPortSetDescription}
+        name="data.f_port_set"
+      />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.tokenSet} />
         {Boolean(defaultAssociation) && (

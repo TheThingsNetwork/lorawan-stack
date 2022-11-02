@@ -23,15 +23,16 @@ import (
 )
 
 type packageData struct {
-	token     string
-	serverURL *url.URL
-
+	token          string
+	serverURL      *url.URL
+	fPortSet       map[uint32]struct{}
 	useTLVEncoding *bool
 }
 
 const (
 	tokenField          = "token"
 	serverURLField      = "server_url"
+	fPortSetField       = "f_port_set"
 	useTLVEncodingField = "use_tlv_encoding"
 )
 
@@ -84,6 +85,28 @@ func (d *packageData) fromStruct(st *types.Struct) (err error) {
 			)
 		}
 		d.useTLVEncoding = &boolValue.BoolValue
+	}
+	value, ok = fields[fPortSetField]
+	if ok {
+		listValue, ok := value.GetKind().(*types.Value_ListValue)
+		if !ok {
+			return errInvalidFieldType.WithAttributes(
+				"field", fPortSetField,
+				"type", fmt.Sprintf("%T", value.GetKind()),
+			)
+		}
+		listValues := listValue.ListValue.GetValues()
+		d.fPortSet = make(map[uint32]struct{}, len(listValues))
+		for _, v := range listValues {
+			numberValue, ok := v.GetKind().(*types.Value_NumberValue)
+			if !ok {
+				return errInvalidFieldType.WithAttributes(
+					"field", fPortSetField,
+					"type", fmt.Sprintf("%T", v.GetKind()),
+				)
+			}
+			d.fPortSet[uint32(numberValue.NumberValue)] = struct{}{}
+		}
 	}
 	return nil
 }

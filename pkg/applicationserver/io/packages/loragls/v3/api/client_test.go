@@ -29,6 +29,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
+const authHeader = "Authorization"
+
 type roundTripperFunc func(*http.Request) (*http.Response, error)
 
 func (f roundTripperFunc) RoundTrip(req *http.Request) (*http.Response, error) {
@@ -71,7 +73,7 @@ func TestNoAuth(t *testing.T) {
 			req := <-reqChan
 			a.So(resp, should.NotBeNil)
 			a.So(err, should.BeNil)
-			a.So(req.Header, should.NotContainKey, "Ocp-Apim-Subscription-Key")
+			a.So(req.Header, should.NotContainKey, authHeader)
 		})
 }
 
@@ -89,8 +91,8 @@ func TestAuth(t *testing.T) {
 			req := <-reqChan
 			a.So(resp, should.NotBeNil)
 			a.So(err, should.BeNil)
-			if a.So(req.Header, should.ContainKey, "Ocp-Apim-Subscription-Key") {
-				a.So(req.Header["Ocp-Apim-Subscription-Key"], should.Resemble, []string{"foobar"})
+			if a.So(req.Header, should.ContainKey, authHeader) {
+				a.So(req.Header[authHeader], should.Resemble, []string{"foobar"})
 			}
 		})
 }
@@ -285,7 +287,7 @@ func TestClient(t *testing.T) {
 						}
 					},
 					assertRequest: func(t *testing.T, a *assertions.Assertion, req *http.Request) {
-						a.So(req.URL.Path, should.Equal, "/api/v3/solve/singleframe")
+						a.So(req.URL.Path, should.Equal, "/api/v1/solve/singleframe")
 
 						request := &api.SingleFrameRequest{}
 						a.So(json.NewDecoder(req.Body).Decode(request), should.BeNil)
@@ -303,7 +305,7 @@ func TestClient(t *testing.T) {
 						}
 					},
 					assertRequest: func(t *testing.T, a *assertions.Assertion, req *http.Request) {
-						a.So(req.URL.Path, should.Equal, "/api/v3/solve/multiframe")
+						a.So(req.URL.Path, should.Equal, "/api/v1/solve/multiframe")
 
 						request := &api.MultiFrameRequest{}
 						a.So(json.NewDecoder(req.Body).Decode(request), should.BeNil)
@@ -321,7 +323,7 @@ func TestClient(t *testing.T) {
 						}
 					},
 					assertRequest: func(t *testing.T, a *assertions.Assertion, req *http.Request) {
-						a.So(req.URL.Path, should.Equal, "/api/v3/solve/gnss_lr1110_singleframe")
+						a.So(req.URL.Path, should.Equal, "/api/v1/solve/gnss_lr1110_singleframe")
 
 						request := &api.GNSSRequest{}
 						a.So(json.NewDecoder(req.Body).Decode(request), should.BeNil)
@@ -339,7 +341,7 @@ func TestClient(t *testing.T) {
 						}
 					},
 					assertRequest: func(t *testing.T, a *assertions.Assertion, req *http.Request) {
-						a.So(req.URL.Path, should.Equal, "/api/v2/loraWifi")
+						a.So(req.URL.Path, should.Equal, "/api/v1/solve/loraWifi")
 
 						request := &api.WiFiRequest{}
 						a.So(json.NewDecoder(req.Body).Decode(request), should.BeNil)

@@ -54,7 +54,7 @@ const m = defineMessages({
   officialLoRaCloudDocumentation: 'Official LoRa Cloud documentation',
   setToken: 'Set LoRa Cloud token',
   dasDescription:
-    'With the LoRa Cloud Device & Application Services protocol, you can manage common device functionality at the application layer for LoRaWAN-enabled devices.',
+    'With the LoRa Cloud Modem and Geolocation Services protocol, you can manage common device functionality at the application layer for LoRaWAN-enabled devices.',
   glsDescription:
     'LoRa Cloud Geolocation is a simple cloud API that can be easily integrated with The Things Stack to enable estimating the location of any LoRa-based device.',
 })
@@ -76,7 +76,7 @@ const LoRaCloud = () => {
       >
         <ErrorView errorRender={SubViewError}>
           <Container>
-            <PageTitle title="LoRa Cloud Device & Application Services" />
+            <PageTitle title="LoRa Cloud Modem and Geolocation Services" />
             <Row>
               <Col lg={8} md={12}>
                 <img className={style.logo} src={LoRaCloudImage} alt="LoRa Cloud" />

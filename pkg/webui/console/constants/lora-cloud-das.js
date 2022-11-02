@@ -15,4 +15,5 @@
 export default Object.freeze({
   DEFAULT_PORT: 199,
   DEFAULT_PACKAGE_NAME: 'lora-cloud-device-management-v1',
+  DEFAULT_SERVER_URL: 'https://mgs.loracloud.com',
 })

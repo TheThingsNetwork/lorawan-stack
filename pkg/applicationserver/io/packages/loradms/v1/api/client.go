@@ -49,7 +49,7 @@ type Client struct {
 
 const (
 	contentType      = "application/json"
-	defaultServerURL = "https://das.loracloud.com"
+	defaultServerURL = "https://mgs.loracloud.com"
 	basePath         = "/api/v1"
 )
 
