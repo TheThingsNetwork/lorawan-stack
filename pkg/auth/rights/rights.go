@@ -28,8 +28,8 @@ type Map struct {
 }
 
 // NewMap ...
-func NewMap(rights map[string]*ttnpb.Rights) Map {
-	m := Map{}
+func NewMap(rights map[string]*ttnpb.Rights) *Map {
+	m := &Map{}
 	for k, v := range rights {
 		m.SetRights(k, v)
 	}
