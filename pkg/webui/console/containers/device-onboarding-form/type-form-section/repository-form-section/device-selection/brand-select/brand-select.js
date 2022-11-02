@@ -60,7 +60,6 @@ const BrandSelect = props => {
       onChange={onChange}
       noOptionsMessage={handleNoOptions}
       placeholder={messages.typeToSearch}
-      autoFocus
     />
   )
 }
