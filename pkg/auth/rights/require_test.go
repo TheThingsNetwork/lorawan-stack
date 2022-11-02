@@ -122,27 +122,27 @@ func TestRequire(t *testing.T) {
 		fooID  = "foo"
 	)
 	fooCtx = NewContext(fooCtx, &Rights{
-		ApplicationRights: NewMap(map[string]*ttnpb.Rights{
+		ApplicationRights: *NewMap(map[string]*ttnpb.Rights{
 			unique.ID(fooCtx, &ttnpb.ApplicationIdentifiers{
 				ApplicationId: fooID,
 			}): ttnpb.RightsFrom(ttnpb.Right_RIGHT_APPLICATION_INFO),
 		}),
-		ClientRights: NewMap(map[string]*ttnpb.Rights{
+		ClientRights: *NewMap(map[string]*ttnpb.Rights{
 			unique.ID(fooCtx, &ttnpb.ClientIdentifiers{
 				ClientId: fooID,
 			}): ttnpb.RightsFrom(ttnpb.Right_RIGHT_CLIENT_INFO),
 		}),
-		GatewayRights: NewMap(map[string]*ttnpb.Rights{
+		GatewayRights: *NewMap(map[string]*ttnpb.Rights{
 			unique.ID(fooCtx, &ttnpb.GatewayIdentifiers{
 				GatewayId: fooID,
 			}): ttnpb.RightsFrom(ttnpb.Right_RIGHT_GATEWAY_INFO),
 		}),
-		OrganizationRights: NewMap(map[string]*ttnpb.Rights{
+		OrganizationRights: *NewMap(map[string]*ttnpb.Rights{
 			unique.ID(fooCtx, &ttnpb.OrganizationIdentifiers{
 				OrganizationId: fooID,
 			}): ttnpb.RightsFrom(ttnpb.Right_RIGHT_ORGANIZATION_INFO),
 		}),
-		UserRights: NewMap(map[string]*ttnpb.Rights{
+		UserRights: *NewMap(map[string]*ttnpb.Rights{
 			unique.ID(fooCtx, &ttnpb.UserIdentifiers{
 				UserId: fooID,
 			}): ttnpb.RightsFrom(ttnpb.Right_RIGHT_USER_INFO),

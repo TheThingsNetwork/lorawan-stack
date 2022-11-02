@@ -52,7 +52,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			Name: "No device read rights",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, &rights.Rights{
-					ApplicationRights: rights.NewMap(map[string]*ttnpb.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.Right_RIGHT_GATEWAY_SETTINGS_BASIC,
@@ -86,7 +86,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			Name: "no keys",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, &rights.Rights{
-					ApplicationRights: rights.NewMap(map[string]*ttnpb.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
@@ -131,7 +131,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			Name: "with keys",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, &rights.Rights{
-					ApplicationRights: rights.NewMap(map[string]*ttnpb.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
@@ -198,7 +198,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			Name: "with specific key envelope",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, &rights.Rights{
-					ApplicationRights: rights.NewMap(map[string]*ttnpb.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
@@ -260,7 +260,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			Name: "with specific key",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, &rights.Rights{
-					ApplicationRights: rights.NewMap(map[string]*ttnpb.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
@@ -1219,7 +1219,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			Name: "No device write rights",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, &rights.Rights{
-					ApplicationRights: rights.NewMap(map[string]*ttnpb.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.Right_RIGHT_GATEWAY_SETTINGS_BASIC,
@@ -1250,7 +1250,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			Name: "Non-existing device",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, &rights.Rights{
-					ApplicationRights: rights.NewMap(map[string]*ttnpb.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
@@ -1285,7 +1285,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			Name: "Existing device",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, &rights.Rights{
-					ApplicationRights: rights.NewMap(map[string]*ttnpb.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
