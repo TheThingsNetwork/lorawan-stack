@@ -3772,6 +3772,35 @@ func (x *FrequencyValue) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the ZeroableFrequencyValue message to JSON.
+func (x *ZeroableFrequencyValue) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteUint64(x.Value)
+	return
+}
+
+// MarshalJSON marshals the ZeroableFrequencyValue to JSON.
+func (x *ZeroableFrequencyValue) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ZeroableFrequencyValue message from JSON.
+func (x *ZeroableFrequencyValue) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	x.Value = s.ReadUint64()
+	return
+}
+
+// UnmarshalJSON unmarshals the ZeroableFrequencyValue from JSON.
+func (x *ZeroableFrequencyValue) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the DataRateOffsetValue message to JSON.
 func (x *DataRateOffsetValue) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {

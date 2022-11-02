@@ -1263,7 +1263,7 @@ func (x *MACSettings) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				x.PingSlotFrequency = nil
 				return
 			}
-			x.PingSlotFrequency = &FrequencyValue{}
+			x.PingSlotFrequency = &ZeroableFrequencyValue{}
 			x.PingSlotFrequency.UnmarshalProtoJSON(s.WithField("ping_slot_frequency", false))
 		case "beacon_frequency", "beaconFrequency":
 			s.AddField("beacon_frequency")
@@ -1271,7 +1271,7 @@ func (x *MACSettings) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				x.BeaconFrequency = nil
 				return
 			}
-			x.BeaconFrequency = &FrequencyValue{}
+			x.BeaconFrequency = &ZeroableFrequencyValue{}
 			x.BeaconFrequency.UnmarshalProtoJSON(s.WithField("beacon_frequency", false))
 		case "class_c_timeout", "classCTimeout":
 			s.AddField("class_c_timeout")
@@ -1458,7 +1458,7 @@ func (x *MACSettings) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				x.DesiredPingSlotFrequency = nil
 				return
 			}
-			x.DesiredPingSlotFrequency = &FrequencyValue{}
+			x.DesiredPingSlotFrequency = &ZeroableFrequencyValue{}
 			x.DesiredPingSlotFrequency.UnmarshalProtoJSON(s.WithField("desired_ping_slot_frequency", false))
 		case "desired_beacon_frequency", "desiredBeaconFrequency":
 			s.AddField("desired_beacon_frequency")
@@ -1466,7 +1466,7 @@ func (x *MACSettings) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				x.DesiredBeaconFrequency = nil
 				return
 			}
-			x.DesiredBeaconFrequency = &FrequencyValue{}
+			x.DesiredBeaconFrequency = &ZeroableFrequencyValue{}
 			x.DesiredBeaconFrequency.UnmarshalProtoJSON(s.WithField("desired_beacon_frequency", false))
 		case "desired_max_eirp", "desiredMaxEirp":
 			s.AddField("desired_max_eirp")

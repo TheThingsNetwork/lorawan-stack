@@ -943,6 +943,13 @@ message FrequencyValue {
   option (thethings.json.message) = { wrapper: true };
   uint64 value = 1 [(validate.rules).uint64.gte = 100000];
 }
+
+message ZeroableFrequencyValue {
+  option (thethings.flags.message) = { select: true, set: true, wrapper: true };
+  option (thethings.json.message) = { wrapper: true };
+  uint64 value = 1 [(validate.rules).uint64 = {lte: 0, gte: 100000}];
+}
+
 message DataRateOffsetValue {
   option (thethings.flags.message) = { select: true, set: true, wrapper: true };
   option (thethings.json.message) = { wrapper: true };

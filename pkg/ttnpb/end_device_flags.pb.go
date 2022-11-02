@@ -969,9 +969,9 @@ func AddSelectFlagsForMACSettings(flags *pflag.FlagSet, prefix string, hidden bo
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("ping-slot-data-rate-index", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("ping-slot-data-rate-index", prefix), true), flagsplugin.WithHidden(hidden)))
 	AddSelectFlagsForDataRateIndexValue(flags, flagsplugin.Prefix("ping-slot-data-rate-index", prefix), true)
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("ping-slot-frequency", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("ping-slot-frequency", prefix), true), flagsplugin.WithHidden(hidden)))
-	AddSelectFlagsForFrequencyValue(flags, flagsplugin.Prefix("ping-slot-frequency", prefix), true)
+	AddSelectFlagsForZeroableFrequencyValue(flags, flagsplugin.Prefix("ping-slot-frequency", prefix), true)
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("beacon-frequency", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("beacon-frequency", prefix), true), flagsplugin.WithHidden(hidden)))
-	AddSelectFlagsForFrequencyValue(flags, flagsplugin.Prefix("beacon-frequency", prefix), true)
+	AddSelectFlagsForZeroableFrequencyValue(flags, flagsplugin.Prefix("beacon-frequency", prefix), true)
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("class-c-timeout", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("class-c-timeout", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("rx1-delay", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("rx1-delay", prefix), true), flagsplugin.WithHidden(hidden)))
 	AddSelectFlagsForRxDelayValue(flags, flagsplugin.Prefix("rx1-delay", prefix), true)
@@ -1010,9 +1010,9 @@ func AddSelectFlagsForMACSettings(flags *pflag.FlagSet, prefix string, hidden bo
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("desired-ping-slot-data-rate-index", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("desired-ping-slot-data-rate-index", prefix), true), flagsplugin.WithHidden(hidden)))
 	AddSelectFlagsForDataRateIndexValue(flags, flagsplugin.Prefix("desired-ping-slot-data-rate-index", prefix), true)
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("desired-ping-slot-frequency", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("desired-ping-slot-frequency", prefix), true), flagsplugin.WithHidden(hidden)))
-	AddSelectFlagsForFrequencyValue(flags, flagsplugin.Prefix("desired-ping-slot-frequency", prefix), true)
+	AddSelectFlagsForZeroableFrequencyValue(flags, flagsplugin.Prefix("desired-ping-slot-frequency", prefix), true)
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("desired-beacon-frequency", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("desired-beacon-frequency", prefix), true), flagsplugin.WithHidden(hidden)))
-	AddSelectFlagsForFrequencyValue(flags, flagsplugin.Prefix("desired-beacon-frequency", prefix), true)
+	AddSelectFlagsForZeroableFrequencyValue(flags, flagsplugin.Prefix("desired-beacon-frequency", prefix), true)
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("desired-max-eirp", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("desired-max-eirp", prefix), true), flagsplugin.WithHidden(hidden)))
 	AddSelectFlagsForDeviceEIRPValue(flags, flagsplugin.Prefix("desired-max-eirp", prefix), true)
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("class-b-c-downlink-interval", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("class-b-c-downlink-interval", prefix), false), flagsplugin.WithHidden(hidden)))
@@ -1058,7 +1058,7 @@ func PathsFromSelectFlagsForMACSettings(flags *pflag.FlagSet, prefix string) (pa
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("ping_slot_frequency", prefix))
 	}
-	if selectPaths, err := PathsFromSelectFlagsForFrequencyValue(flags, flagsplugin.Prefix("ping_slot_frequency", prefix)); err != nil {
+	if selectPaths, err := PathsFromSelectFlagsForZeroableFrequencyValue(flags, flagsplugin.Prefix("ping_slot_frequency", prefix)); err != nil {
 		return nil, err
 	} else {
 		paths = append(paths, selectPaths...)
@@ -1068,7 +1068,7 @@ func PathsFromSelectFlagsForMACSettings(flags *pflag.FlagSet, prefix string) (pa
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("beacon_frequency", prefix))
 	}
-	if selectPaths, err := PathsFromSelectFlagsForFrequencyValue(flags, flagsplugin.Prefix("beacon_frequency", prefix)); err != nil {
+	if selectPaths, err := PathsFromSelectFlagsForZeroableFrequencyValue(flags, flagsplugin.Prefix("beacon_frequency", prefix)); err != nil {
 		return nil, err
 	} else {
 		paths = append(paths, selectPaths...)
@@ -1263,7 +1263,7 @@ func PathsFromSelectFlagsForMACSettings(flags *pflag.FlagSet, prefix string) (pa
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("desired_ping_slot_frequency", prefix))
 	}
-	if selectPaths, err := PathsFromSelectFlagsForFrequencyValue(flags, flagsplugin.Prefix("desired_ping_slot_frequency", prefix)); err != nil {
+	if selectPaths, err := PathsFromSelectFlagsForZeroableFrequencyValue(flags, flagsplugin.Prefix("desired_ping_slot_frequency", prefix)); err != nil {
 		return nil, err
 	} else {
 		paths = append(paths, selectPaths...)
@@ -1273,7 +1273,7 @@ func PathsFromSelectFlagsForMACSettings(flags *pflag.FlagSet, prefix string) (pa
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("desired_beacon_frequency", prefix))
 	}
-	if selectPaths, err := PathsFromSelectFlagsForFrequencyValue(flags, flagsplugin.Prefix("desired_beacon_frequency", prefix)); err != nil {
+	if selectPaths, err := PathsFromSelectFlagsForZeroableFrequencyValue(flags, flagsplugin.Prefix("desired_beacon_frequency", prefix)); err != nil {
 		return nil, err
 	} else {
 		paths = append(paths, selectPaths...)
@@ -1343,9 +1343,9 @@ func AddSetFlagsForMACSettings(flags *pflag.FlagSet, prefix string, hidden bool)
 	flagsplugin.AddAlias(flags, flagsplugin.Prefix("ping-slot-periodicity.value", prefix), flagsplugin.Prefix("ping-slot-periodicity", prefix), flagsplugin.WithHidden(hidden))
 	AddSetFlagsForDataRateIndexValue(flags, flagsplugin.Prefix("ping-slot-data-rate-index", prefix), true)
 	flagsplugin.AddAlias(flags, flagsplugin.Prefix("ping-slot-data-rate-index.value", prefix), flagsplugin.Prefix("ping-slot-data-rate-index", prefix), flagsplugin.WithHidden(hidden))
-	AddSetFlagsForFrequencyValue(flags, flagsplugin.Prefix("ping-slot-frequency", prefix), true)
+	AddSetFlagsForZeroableFrequencyValue(flags, flagsplugin.Prefix("ping-slot-frequency", prefix), true)
 	flagsplugin.AddAlias(flags, flagsplugin.Prefix("ping-slot-frequency.value", prefix), flagsplugin.Prefix("ping-slot-frequency", prefix), flagsplugin.WithHidden(hidden))
-	AddSetFlagsForFrequencyValue(flags, flagsplugin.Prefix("beacon-frequency", prefix), true)
+	AddSetFlagsForZeroableFrequencyValue(flags, flagsplugin.Prefix("beacon-frequency", prefix), true)
 	flagsplugin.AddAlias(flags, flagsplugin.Prefix("beacon-frequency.value", prefix), flagsplugin.Prefix("beacon-frequency", prefix), flagsplugin.WithHidden(hidden))
 	flags.AddFlag(flagsplugin.NewDurationFlag(flagsplugin.Prefix("class-c-timeout", prefix), "", flagsplugin.WithHidden(hidden)))
 	AddSetFlagsForRxDelayValue(flags, flagsplugin.Prefix("rx1-delay", prefix), true)
@@ -1384,9 +1384,9 @@ func AddSetFlagsForMACSettings(flags *pflag.FlagSet, prefix string, hidden bool)
 	flagsplugin.AddAlias(flags, flagsplugin.Prefix("desired-adr-ack-delay-exponent.value", prefix), flagsplugin.Prefix("desired-adr-ack-delay-exponent", prefix), flagsplugin.WithHidden(hidden))
 	AddSetFlagsForDataRateIndexValue(flags, flagsplugin.Prefix("desired-ping-slot-data-rate-index", prefix), true)
 	flagsplugin.AddAlias(flags, flagsplugin.Prefix("desired-ping-slot-data-rate-index.value", prefix), flagsplugin.Prefix("desired-ping-slot-data-rate-index", prefix), flagsplugin.WithHidden(hidden))
-	AddSetFlagsForFrequencyValue(flags, flagsplugin.Prefix("desired-ping-slot-frequency", prefix), true)
+	AddSetFlagsForZeroableFrequencyValue(flags, flagsplugin.Prefix("desired-ping-slot-frequency", prefix), true)
 	flagsplugin.AddAlias(flags, flagsplugin.Prefix("desired-ping-slot-frequency.value", prefix), flagsplugin.Prefix("desired-ping-slot-frequency", prefix), flagsplugin.WithHidden(hidden))
-	AddSetFlagsForFrequencyValue(flags, flagsplugin.Prefix("desired-beacon-frequency", prefix), true)
+	AddSetFlagsForZeroableFrequencyValue(flags, flagsplugin.Prefix("desired-beacon-frequency", prefix), true)
 	flagsplugin.AddAlias(flags, flagsplugin.Prefix("desired-beacon-frequency.value", prefix), flagsplugin.Prefix("desired-beacon-frequency", prefix), flagsplugin.WithHidden(hidden))
 	AddSetFlagsForDeviceEIRPValue(flags, flagsplugin.Prefix("desired-max-eirp", prefix), true)
 	flagsplugin.AddAlias(flags, flagsplugin.Prefix("desired-max-eirp.value", prefix), flagsplugin.Prefix("desired-max-eirp", prefix), flagsplugin.WithHidden(hidden))
@@ -1430,7 +1430,7 @@ func (m *MACSettings) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths [
 	}
 	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("ping_slot_frequency", prefix)); changed {
 		if m.PingSlotFrequency == nil {
-			m.PingSlotFrequency = &FrequencyValue{}
+			m.PingSlotFrequency = &ZeroableFrequencyValue{}
 		}
 		if setPaths, err := m.PingSlotFrequency.SetFromFlags(flags, flagsplugin.Prefix("ping_slot_frequency", prefix)); err != nil {
 			return nil, err
@@ -1440,7 +1440,7 @@ func (m *MACSettings) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths [
 	}
 	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("beacon_frequency", prefix)); changed {
 		if m.BeaconFrequency == nil {
-			m.BeaconFrequency = &FrequencyValue{}
+			m.BeaconFrequency = &ZeroableFrequencyValue{}
 		}
 		if setPaths, err := m.BeaconFrequency.SetFromFlags(flags, flagsplugin.Prefix("beacon_frequency", prefix)); err != nil {
 			return nil, err
@@ -1640,7 +1640,7 @@ func (m *MACSettings) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths [
 	}
 	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("desired_ping_slot_frequency", prefix)); changed {
 		if m.DesiredPingSlotFrequency == nil {
-			m.DesiredPingSlotFrequency = &FrequencyValue{}
+			m.DesiredPingSlotFrequency = &ZeroableFrequencyValue{}
 		}
 		if setPaths, err := m.DesiredPingSlotFrequency.SetFromFlags(flags, flagsplugin.Prefix("desired_ping_slot_frequency", prefix)); err != nil {
 			return nil, err
@@ -1650,7 +1650,7 @@ func (m *MACSettings) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths [
 	}
 	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("desired_beacon_frequency", prefix)); changed {
 		if m.DesiredBeaconFrequency == nil {
-			m.DesiredBeaconFrequency = &FrequencyValue{}
+			m.DesiredBeaconFrequency = &ZeroableFrequencyValue{}
 		}
 		if setPaths, err := m.DesiredBeaconFrequency.SetFromFlags(flags, flagsplugin.Prefix("desired_beacon_frequency", prefix)); err != nil {
 			return nil, err

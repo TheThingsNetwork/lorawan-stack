@@ -717,6 +717,37 @@ func (m *FrequencyValue) SetFromFlags(flags *pflag.FlagSet, prefix string) (path
 	return paths, nil
 }
 
+// AddSelectFlagsForZeroableFrequencyValue adds flags to select fields in ZeroableFrequencyValue.
+func AddSelectFlagsForZeroableFrequencyValue(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("value", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("value", prefix), false), flagsplugin.WithHidden(hidden)))
+}
+
+// SelectFromFlags outputs the fieldmask paths forZeroableFrequencyValue message from select flags.
+func PathsFromSelectFlagsForZeroableFrequencyValue(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("value", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("value", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForZeroableFrequencyValue adds flags to select fields in ZeroableFrequencyValue.
+func AddSetFlagsForZeroableFrequencyValue(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewUint64Flag(flagsplugin.Prefix("value", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the ZeroableFrequencyValue message from flags.
+func (m *ZeroableFrequencyValue) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := flagsplugin.GetUint64(flags, flagsplugin.Prefix("value", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Value = val
+		paths = append(paths, flagsplugin.Prefix("value", prefix))
+	}
+	return paths, nil
+}
+
 // AddSelectFlagsForDataRateOffsetValue adds flags to select fields in DataRateOffsetValue.
 func AddSelectFlagsForDataRateOffsetValue(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("value", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("value", prefix), false), flagsplugin.WithHidden(hidden)))

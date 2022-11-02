@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable react/forbid-prop-types */
+
+import { isUndefined } from 'lodash'
+
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -25,12 +29,16 @@ const networkKeySchema = Yup.object({
   }),
 })
 
-const appKeySchema = Yup.object({
-  app_key: Yup.object({
-    key: Yup.string()
-      .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
-      .required(sharedMessages.validateRequired),
-  }),
+const appKeySchema = Yup.object().when('join_server_address', {
+  is: isUndefined,
+  otherwise: schema =>
+    schema.shape({
+      app_key: Yup.object({
+        key: Yup.string()
+          .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+          .required(sharedMessages.validateRequired),
+      }),
+    }),
 })
 
 const devAddrSchema = Yup.string()
@@ -66,15 +74,15 @@ const sessionKeysVersion110Schema = Yup.object({
 const validationSchema = Yup.object({
   ids: Yup.object({
     device_id: Yup.string().required(sharedMessages.validateRequired),
-    join_eui: Yup.string()
-      .length(8 * 2, Yup.passValues(sharedMessages.validateLength))
-      .required(sharedMessages.validateRequired),
   }).when('supports_join', {
     is: true,
     then: schema =>
       schema.concat(
         Yup.object({
           dev_eui: Yup.string()
+            .length(8 * 2, Yup.passValues(sharedMessages.validateLength))
+            .required(sharedMessages.validateRequired),
+          join_eui: Yup.string()
             .length(8 * 2, Yup.passValues(sharedMessages.validateLength))
             .required(sharedMessages.validateRequired),
         }),

@@ -43,7 +43,6 @@ const DownLinkMessagePreview = React.memo(({ event }) => {
   if ('request' in data) {
     const { name } = event
     if (name.startsWith('gs')) {
-      const gatewayEUI = event.identifiers[0].gateway_ids.eui
       const lorawanClass = getByPath(data, 'request.class')
       const rx1Delay = getByPath(data, 'request.rx1_delay')
       const rx1DataRateIndex = getByPath(data, 'request.rx1_data_rate_index')
@@ -52,7 +51,6 @@ const DownLinkMessagePreview = React.memo(({ event }) => {
       const rx2DataRateIndex = getByPath(data, 'request.rx2_data_rate_index')
       return (
         <DescriptionList>
-          <DescriptionList.Byte title={messages.gatewayEUI} data={gatewayEUI} />
           <DescriptionList.Item title={messages.class} data={lorawanClass} />
           <DescriptionList.Item title={messages.rx1Delay} data={rx1Delay} />
           <DescriptionList.Item title={messages.rx1DataRateIndex} data={rx1DataRateIndex} />

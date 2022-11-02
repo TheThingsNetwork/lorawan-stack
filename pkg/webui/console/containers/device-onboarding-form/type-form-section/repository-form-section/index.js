@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Col, Row } from 'react-grid-system'
 import { useFormikContext } from 'formik'
@@ -32,6 +32,7 @@ import { getTemplate } from '@console/store/actions/device-repository'
 import { selectDeviceTemplate } from '@console/store/selectors/device-repository'
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
+import { initialValues as provisioningInitialValues } from '../../provisioning-form-section'
 import {
   hasCompletedDeviceRepositorySelection,
   hasSelectedDeviceRepositoryOther,
@@ -113,7 +114,7 @@ const DeviceTypeRepositoryFormSection = () => {
   const showOtherHint = hasSelectedOther
 
   // Apply template once it is fetched and register the template fields so they don't get cleaned.
-  React.useEffect(() => {
+  useEffect(() => {
     if (template && hasCompleted) {
       // Since the template response will strip zero values, we cannot simply spread the result
       // over the existing form values. Instead we need to make all zero values explicit
@@ -123,11 +124,16 @@ const DeviceTypeRepositoryFormSection = () => {
         (device, path) => set(device, path, get(template.end_device, path)),
         {},
       )
+      const supportsJoin = endDeviceFill.supports_join
 
       setValues(values => ({
         ...values,
         ...endDeviceFill,
         version_ids: values.version_ids,
+        // Reset provisioning data if activation mode changed.
+        ...(endDeviceFill.supports_join !== values.supports_join ? provisioningInitialValues : {}),
+        // Skip JoinEUI check if the device is ABP/Multicast.
+        _claim: !supportsJoin ? false : values._withQRdata ? values._claim : null,
       }))
 
       const hiddenFields = [
@@ -140,10 +146,17 @@ const DeviceTypeRepositoryFormSection = () => {
       addToFieldRegistry(...hiddenFields)
       return () => removeFromFieldRegistry(...hiddenFields)
     }
-  }, [hasCompleted, setValues, template, addToFieldRegistry, removeFromFieldRegistry])
+  }, [
+    hasCompleted,
+    setValues,
+    template,
+    addToFieldRegistry,
+    removeFromFieldRegistry,
+    values.supports_join,
+  ])
 
   // Fetch template after completing the selection step (select band, model, hw/fw versions and band).
-  React.useEffect(() => {
+  useEffect(() => {
     if (hasCompleted && !hasSelectedOther && values._isClaiming === undefined) {
       getRegistrationTemplate(appId, {
         brand_id: brand,

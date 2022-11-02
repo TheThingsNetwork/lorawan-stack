@@ -103,9 +103,9 @@ func registerMessageDropped(_ context.Context, err error) {
 	errorLabel := "unknown"
 	if ttnErr, ok := errors.From(err); ok {
 		errorLabel = ttnErr.FullName()
-	} else if jsonErr := (&json.SyntaxError{}); errors.Is(err, jsonErr) {
+	} else if jsonErr := (&json.SyntaxError{}); errors.As(err, &jsonErr) {
 		errorLabel = "encoding/json:syntax"
-	} else if jsonErr := (&json.UnmarshalTypeError{}); errors.Is(err, jsonErr) {
+	} else if jsonErr := (&json.UnmarshalTypeError{}); errors.As(err, &jsonErr) {
 		errorLabel = "encoding/json:unmarshal_type"
 		udpMetrics.unmarshalTypeErrors.WithLabelValues(jsonErr.Value, jsonErr.Field).Inc()
 	}

@@ -16274,9 +16274,9 @@
               "name": "ping_slot_frequency",
               "description": "Frequency of the class B ping slot (Hz).\nIf unset, the default value from Network Server configuration will be used.",
               "label": "",
-              "type": "FrequencyValue",
-              "longType": "FrequencyValue",
-              "fullType": "ttn.lorawan.v3.FrequencyValue",
+              "type": "ZeroableFrequencyValue",
+              "longType": "ZeroableFrequencyValue",
+              "fullType": "ttn.lorawan.v3.ZeroableFrequencyValue",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -16286,9 +16286,9 @@
               "name": "beacon_frequency",
               "description": "Frequency of the class B beacon (Hz).\nIf unset, the default value from Network Server configuration will be used.",
               "label": "",
-              "type": "FrequencyValue",
-              "longType": "FrequencyValue",
-              "fullType": "ttn.lorawan.v3.FrequencyValue",
+              "type": "ZeroableFrequencyValue",
+              "longType": "ZeroableFrequencyValue",
+              "fullType": "ttn.lorawan.v3.ZeroableFrequencyValue",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -16564,9 +16564,9 @@
               "name": "desired_ping_slot_frequency",
               "description": "The frequency of the class B ping slot (Hz) Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used.",
               "label": "",
-              "type": "FrequencyValue",
-              "longType": "FrequencyValue",
-              "fullType": "ttn.lorawan.v3.FrequencyValue",
+              "type": "ZeroableFrequencyValue",
+              "longType": "ZeroableFrequencyValue",
+              "fullType": "ttn.lorawan.v3.ZeroableFrequencyValue",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -16576,9 +16576,9 @@
               "name": "desired_beacon_frequency",
               "description": "The frequency of the class B beacon (Hz) Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration will be used.",
               "label": "",
-              "type": "FrequencyValue",
-              "longType": "FrequencyValue",
-              "fullType": "ttn.lorawan.v3.FrequencyValue",
+              "type": "ZeroableFrequencyValue",
+              "longType": "ZeroableFrequencyValue",
+              "fullType": "ttn.lorawan.v3.ZeroableFrequencyValue",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -31162,6 +31162,42 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ZeroableFrequencyValue",
+          "longName": "ZeroableFrequencyValue",
+          "fullName": "ttn.lorawan.v3.ZeroableFrequencyValue",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint64.lte",
+                    "value": 0
+                  },
+                  {
+                    "name": "uint64.gte",
+                    "value": 100000
+                  }
+                ]
+              }
             }
           ]
         }

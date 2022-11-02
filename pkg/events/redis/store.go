@@ -26,10 +26,13 @@ import (
 	"github.com/go-redis/redis/v8"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
+
+const ttlJitter = 0.01
 
 // PubSubStore is a PubSub with historical event storage.
 type PubSubStore struct {
@@ -66,12 +69,13 @@ func (ps *PubSubStore) storeEvent(ctx context.Context, tx redis.Cmdable, evt eve
 	if err != nil {
 		return err
 	}
-	tx.Set(ctx, ps.eventDataKey(evt.Context(), evt.UniqueID()), b, ps.historyTTL)
+	ttl := random.Jitter(ps.historyTTL, ttlJitter)
+	tx.Set(ctx, ps.eventDataKey(evt.Context(), evt.UniqueID()), b, ttl)
 	for _, cid := range evt.CorrelationIds() {
 		key := ps.eventIndexKey(evt.Context(), cid)
 		tx.LPush(ctx, key, evt.UniqueID())
 		tx.LTrim(ctx, key, 0, int64(ps.correlationIDHistoryCount))
-		tx.Expire(ctx, key, ps.historyTTL)
+		tx.PExpire(ctx, key, ttl)
 	}
 	return nil
 }
@@ -298,49 +302,53 @@ func (ps *PubSubStore) SubscribeWithHistory(
 
 	matchNames := xMessageHasEventName(names...)
 
-	for {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		default:
-			args := &redis.XReadArgs{
-				Count: 10,
-				Block: time.Second,
-			}
-			for _, s := range state {
-				args.Streams = append(args.Streams, s.stream)
-			}
-			for _, s := range state {
-				args.Streams = append(args.Streams, s.start)
-			}
+	// We expect that the subscriber can ingest `tail` events at a time.
+	eventCountLimit := int64(tail)
+	switch {
+	case eventCountLimit < 8:
+		eventCountLimit = 8
+	case eventCountLimit > 1024:
+		eventCountLimit = 1024
+	}
 
-			streams, err := ps.client.XRead(ctx, args).Result()
-			if err != nil && !errors.Is(err, redis.Nil) {
-				return ttnredis.ConvertError(err)
+	for {
+		args := &redis.XReadArgs{
+			Count: eventCountLimit,
+			Block: random.Jitter(8*time.Second, 0.2),
+		}
+		for _, s := range state {
+			args.Streams = append(args.Streams, s.stream)
+		}
+		for _, s := range state {
+			args.Streams = append(args.Streams, s.start)
+		}
+
+		streams, err := ps.client.XRead(ctx, args).Result()
+		if err != nil && !errors.Is(err, redis.Nil) {
+			return ttnredis.ConvertError(err)
+		}
+		for _, stream := range streams {
+			if len(stream.Messages) == 0 {
+				continue
 			}
-			for _, stream := range streams {
-				if len(stream.Messages) == 0 {
-					continue
-				}
-				state := getState(stream.Stream)
-				if state == nil {
-					continue
-				}
-				state.start = stream.Messages[len(stream.Messages)-1].ID
-				evtPBs := eventsFromXMessages(stream.Messages, matchNames)
-				if len(evtPBs) == 0 {
-					continue
-				}
-				if err = ps.loadEventData(ctx, ps.client, evtPBs...); err != nil {
+			state := getState(stream.Stream)
+			if state == nil {
+				continue
+			}
+			state.start = stream.Messages[len(stream.Messages)-1].ID
+			evtPBs := eventsFromXMessages(stream.Messages, matchNames)
+			if len(evtPBs) == 0 {
+				continue
+			}
+			if err = ps.loadEventData(ctx, ps.client, evtPBs...); err != nil {
+				return err
+			}
+			for _, evtPB := range evtPBs {
+				evt, err := events.FromProto(evtPB)
+				if err != nil {
 					return err
 				}
-				for _, evtPB := range evtPBs {
-					evt, err := events.FromProto(evtPB)
-					if err != nil {
-						return err
-					}
-					hdl.Notify(evt)
-				}
+				hdl.Notify(evt)
 			}
 		}
 	}
@@ -379,6 +387,7 @@ func (ps *PubSubStore) FindRelated(ctx context.Context, correlationID string) ([
 func (ps *PubSubStore) Publish(evs ...events.Event) {
 	logger := log.FromContext(ps.ctx)
 
+	ttl := random.Jitter(ps.entityHistoryTTL, ttlJitter)
 	tx := ps.client.TxPipeline()
 
 	for _, evt := range evs {
@@ -409,7 +418,7 @@ func (ps *PubSubStore) Publish(evs ...events.Event) {
 				MaxLenApprox: int64(ps.entityHistoryCount),
 				Values:       streamValues,
 			})
-			tx.Expire(ps.ctx, eventStream, ps.entityHistoryTTL)
+			tx.PExpire(ps.ctx, eventStream, ttl)
 			if devID := id.GetDeviceIds(); devID != nil && definition != nil && definition.PropagateToParent() {
 				eventStream := ps.eventStream(evt.Context(), devID.ApplicationIds.GetEntityIdentifiers())
 				tx.XAdd(ps.ctx, &redis.XAddArgs{
@@ -417,7 +426,7 @@ func (ps *PubSubStore) Publish(evs ...events.Event) {
 					MaxLenApprox: int64(ps.entityHistoryCount),
 					Values:       streamValues,
 				})
-				tx.Expire(ps.ctx, eventStream, ps.entityHistoryTTL)
+				tx.PExpire(ps.ctx, eventStream, ttl)
 			}
 		}
 	}

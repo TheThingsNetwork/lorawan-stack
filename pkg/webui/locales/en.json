@@ -258,7 +258,6 @@
   "console.components.events.messages.rx1Frequency": "Rx1 Frequency",
   "console.components.events.messages.rx2DataRateIndex": "Rx2 Data Rate Index",
   "console.components.events.messages.rx2Frequency": "Rx2 Frequency",
-  "console.components.events.messages.gatewayEUI": "Gtw EUI",
   "console.components.events.messages.class": "Class",
   "console.components.events.messages.eventDetails": "Event details",
   "console.components.events.messages.rawEvent": "Raw event",

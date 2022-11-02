@@ -952,14 +952,15 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 			DisconnectedAt: ttnpb.ProtoTimePtr(time.Now()),
 		}
 		registerGatewayConnectionStats(decoupledCtx, ids, stats)
-		if gs.statsRegistry != nil {
-			if err := gs.statsRegistry.Set(
-				decoupledCtx, ids, stats,
-				[]string{"connected_at", "disconnected_at"},
-				gs.config.ConnectionStatsDisconnectTTL,
-			); err != nil {
-				logger.WithError(err).Warn("Failed to clear connection stats")
-			}
+		if gs.statsRegistry == nil {
+			return
+		}
+		if err := gs.statsRegistry.Set(
+			decoupledCtx, ids, stats,
+			[]string{"connected_at", "disconnected_at"},
+			gs.config.ConnectionStatsDisconnectTTL,
+		); err != nil {
+			logger.WithError(err).Warn("Failed to clear connection stats")
 		}
 	}()
 
@@ -968,7 +969,6 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 		lastUpdate = time.Now() // Start with a debounce, the initial update has already been sent.
 	)
 	for {
-		now := time.Now()
 		select {
 		case <-ctx.Done():
 			return
@@ -982,7 +982,7 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 
 		// Debounce the updates with jitter to spread event publishes and store updates over time.
 		// If the time since the last update is longer than the debounce time, the update happens immediately.
-		if wait := gs.config.UpdateConnectionStatsDebounceTime - now.Sub(lastUpdate); wait > 0 {
+		if wait := gs.config.UpdateConnectionStatsDebounceTime - time.Since(lastUpdate); wait > 0 {
 			duration := random.Jitter(wait, debounceJitter)
 			select {
 			case <-ctx.Done():
@@ -990,14 +990,15 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 			case <-time.After(duration):
 			}
 		}
-		lastUpdate = now
+		lastUpdate = time.Now()
 
 		stats, paths := conn.Stats()
 		registerGatewayConnectionStats(decoupledCtx, ids, stats)
-		if gs.statsRegistry != nil {
-			if err := gs.statsRegistry.Set(decoupledCtx, ids, stats, paths, gs.config.ConnectionStatsTTL); err != nil {
-				logger.WithError(err).Warn("Failed to update connection stats")
-			}
+		if gs.statsRegistry == nil {
+			continue
+		}
+		if err := gs.statsRegistry.Set(decoupledCtx, ids, stats, paths, gs.config.ConnectionStatsTTL); err != nil {
+			logger.WithError(err).Warn("Failed to update connection stats")
 		}
 	}
 }

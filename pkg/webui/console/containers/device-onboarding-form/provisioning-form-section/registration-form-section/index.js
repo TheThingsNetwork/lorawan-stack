@@ -35,7 +35,7 @@ const devAddrEncoder = dev_addr => ({ ids: { dev_addr }, session: { dev_addr } }
 const devAddrDecoder = values => values?.ids?.dev_addr
 
 const DeviceRegistrationFormSection = () => {
-  const { values, setFieldValue } = useFormContext()
+  const { values } = useFormContext()
 
   const mayEditKeys = useSelector(state => checkFromState(mayEditApplicationDeviceKeys, state))
 
@@ -52,10 +52,13 @@ const DeviceRegistrationFormSection = () => {
   const isABP = !values.supports_join && !values.multicast
   const isOTAA = values.supports_join
   const lwVersion = parseLorawanMacVersion(values.lorawan_version)
+  const skipJs = values.join_server_address === undefined
 
   const showDevEUI =
-    (!isMulticast && values._inputMethod === 'manual') ||
-    (isOTAA && values._inputMethod === 'device-repository')
+    // OTAA end devices do require a DevEUI.
+    isOTAA ||
+    // ABP (non multicast) end devices do require a DevEUI if their version is 1.0.4 or higher.
+    (isABP && !isMulticast && lwVersion >= 104)
 
   const showSessionKeys =
     ((isABP || isMulticast) && values._inputMethod === 'manual') ||
@@ -71,7 +74,7 @@ const DeviceRegistrationFormSection = () => {
           autoFocus
         />
       )}
-      {isOTAA && (
+      {isOTAA && !skipJs && (
         <>
           <Form.Field
             required
@@ -114,15 +117,6 @@ const DeviceRegistrationFormSection = () => {
             decode={devAddrDecoder}
             required
           />
-          {lwVersion === 104 && (
-            <DevEUIComponent
-              name="ids.dev_eui"
-              values={values}
-              setFieldValue={setFieldValue}
-              initialValues={initialValues}
-              required={isOTAA}
-            />
-          )}
           <Form.Field
             required={mayEditKeys}
             title={sharedMessages.appSKey}
@@ -185,7 +179,7 @@ const DeviceRegistrationFormSection = () => {
         component={Input}
         inputRef={idInputRef}
         tooltipId={tooltipIds.DEVICE_ID}
-        description={messages.deviceIdDescription}
+        description={showDevEUI ? messages.deviceIdDescription : undefined}
       />
     </div>
   )

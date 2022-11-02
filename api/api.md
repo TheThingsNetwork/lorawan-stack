@@ -450,6 +450,7 @@
   - [Message `TxSettings`](#ttn.lorawan.v3.TxSettings)
   - [Message `TxSettings.Downlink`](#ttn.lorawan.v3.TxSettings.Downlink)
   - [Message `UplinkToken`](#ttn.lorawan.v3.UplinkToken)
+  - [Message `ZeroableFrequencyValue`](#ttn.lorawan.v3.ZeroableFrequencyValue)
   - [Enum `ADRAckDelayExponent`](#ttn.lorawan.v3.ADRAckDelayExponent)
   - [Enum `ADRAckLimitExponent`](#ttn.lorawan.v3.ADRAckLimitExponent)
   - [Enum `AggregatedDutyCycle`](#ttn.lorawan.v3.AggregatedDutyCycle)
@@ -3722,8 +3723,8 @@ This is used internally by the Network Server.
 | `class_b_timeout` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Maximum delay for the device to answer a MAC request or a confirmed downlink frame. If unset, the default value from Network Server configuration will be used. |
 | `ping_slot_periodicity` | [`PingSlotPeriodValue`](#ttn.lorawan.v3.PingSlotPeriodValue) |  | Periodicity of the class B ping slot. If unset, the default value from Network Server configuration will be used. |
 | `ping_slot_data_rate_index` | [`DataRateIndexValue`](#ttn.lorawan.v3.DataRateIndexValue) |  | Data rate index of the class B ping slot. If unset, the default value from Network Server configuration will be used. |
-| `ping_slot_frequency` | [`FrequencyValue`](#ttn.lorawan.v3.FrequencyValue) |  | Frequency of the class B ping slot (Hz). If unset, the default value from Network Server configuration will be used. |
-| `beacon_frequency` | [`FrequencyValue`](#ttn.lorawan.v3.FrequencyValue) |  | Frequency of the class B beacon (Hz). If unset, the default value from Network Server configuration will be used. |
+| `ping_slot_frequency` | [`ZeroableFrequencyValue`](#ttn.lorawan.v3.ZeroableFrequencyValue) |  | Frequency of the class B ping slot (Hz). If unset, the default value from Network Server configuration will be used. |
+| `beacon_frequency` | [`ZeroableFrequencyValue`](#ttn.lorawan.v3.ZeroableFrequencyValue) |  | Frequency of the class B beacon (Hz). If unset, the default value from Network Server configuration will be used. |
 | `class_c_timeout` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Maximum delay for the device to answer a MAC request or a confirmed downlink frame. If unset, the default value from Network Server configuration will be used. |
 | `rx1_delay` | [`RxDelayValue`](#ttn.lorawan.v3.RxDelayValue) |  | Class A Rx1 delay. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | `rx1_data_rate_offset` | [`DataRateOffsetValue`](#ttn.lorawan.v3.DataRateOffsetValue) |  | Rx1 data rate offset. If unset, the default value from Network Server configuration will be used. |
@@ -3745,8 +3746,8 @@ This is used internally by the Network Server.
 | `desired_adr_ack_limit_exponent` | [`ADRAckLimitExponentValue`](#ttn.lorawan.v3.ADRAckLimitExponentValue) |  | The ADR ACK limit Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | `desired_adr_ack_delay_exponent` | [`ADRAckDelayExponentValue`](#ttn.lorawan.v3.ADRAckDelayExponentValue) |  | The ADR ACK delay Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | `desired_ping_slot_data_rate_index` | [`DataRateIndexValue`](#ttn.lorawan.v3.DataRateIndexValue) |  | The data rate index of the class B ping slot Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration will be used. |
-| `desired_ping_slot_frequency` | [`FrequencyValue`](#ttn.lorawan.v3.FrequencyValue) |  | The frequency of the class B ping slot (Hz) Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
-| `desired_beacon_frequency` | [`FrequencyValue`](#ttn.lorawan.v3.FrequencyValue) |  | The frequency of the class B beacon (Hz) Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration will be used. |
+| `desired_ping_slot_frequency` | [`ZeroableFrequencyValue`](#ttn.lorawan.v3.ZeroableFrequencyValue) |  | The frequency of the class B ping slot (Hz) Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
+| `desired_beacon_frequency` | [`ZeroableFrequencyValue`](#ttn.lorawan.v3.ZeroableFrequencyValue) |  | The frequency of the class B beacon (Hz) Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration will be used. |
 | `desired_max_eirp` | [`DeviceEIRPValue`](#ttn.lorawan.v3.DeviceEIRPValue) |  | Maximum EIRP (dBm). If unset, the default value from regional parameters specification will be used. |
 | `class_b_c_downlink_interval` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | The minimum duration passed before a network-initiated(e.g. Class B or C) downlink following an arbitrary downlink. |
 | `uplink_dwell_time` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether uplink dwell time is set (400ms). If unset, the default value from Network Server configuration or regional parameters specification will be used. |
@@ -6531,6 +6532,18 @@ Transmission settings for downlink.
 | Field | Validations |
 | ----- | ----------- |
 | `ids` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.ZeroableFrequencyValue">Message `ZeroableFrequencyValue`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `value` | [`uint64`](#uint64) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `value` | <p>`uint64.lte`: `0`</p><p>`uint64.gte`: `100000`</p> |
 
 ### <a name="ttn.lorawan.v3.ADRAckDelayExponent">Enum `ADRAckDelayExponent`</a>
 

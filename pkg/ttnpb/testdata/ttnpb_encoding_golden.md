@@ -785,6 +785,10 @@ JSON | ttnpb.TxSchedulePriority | HIGHEST | "HIGHEST"
 JSON | ttnpb.TxSchedulePriority | LOW | "LOW"
 JSON | ttnpb.TxSchedulePriority | LOWEST | "LOWEST"
 JSON | ttnpb.TxSchedulePriority | NORMAL | "NORMAL"
+JSON | ttnpb.ZeroableFrequencyValue | 0 | "0"
+JSON | ttnpb.ZeroableFrequencyValue | 100000 | "100000"
+JSON | ttnpb.ZeroableFrequencyValue | 2000000 | "2000000"
+JSON | ttnpb.ZeroableFrequencyValue | 30000000 | "30000000"
 JSONPB | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_1 | "ADR_ACK_DELAY_1"
 JSONPB | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_1024 | "ADR_ACK_DELAY_1024"
 JSONPB | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_128 | "ADR_ACK_DELAY_128"
@@ -1012,6 +1016,10 @@ JSONPB | ttnpb.RxDelayValue | 6 | 6
 JSONPB | ttnpb.RxDelayValue | 7 | 7
 JSONPB | ttnpb.RxDelayValue | 8 | 8
 JSONPB | ttnpb.RxDelayValue | 9 | 9
+JSONPB | ttnpb.ZeroableFrequencyValue | 0 | "0"
+JSONPB | ttnpb.ZeroableFrequencyValue | 100000 | "100000"
+JSONPB | ttnpb.ZeroableFrequencyValue | 2000000 | "2000000"
+JSONPB | ttnpb.ZeroableFrequencyValue | 30000000 | "30000000"
 ProtoJSON | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_1 | "ADR_ACK_DELAY_1"
 ProtoJSON | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_1024 | "ADR_ACK_DELAY_1024"
 ProtoJSON | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_128 | "ADR_ACK_DELAY_128"
@@ -1449,6 +1457,10 @@ ProtoJSON | ttnpb.TxSchedulePriority | HIGHEST | "HIGHEST"
 ProtoJSON | ttnpb.TxSchedulePriority | LOW | "LOW"
 ProtoJSON | ttnpb.TxSchedulePriority | LOWEST | "LOWEST"
 ProtoJSON | ttnpb.TxSchedulePriority | NORMAL | "NORMAL"
+ProtoJSON | ttnpb.ZeroableFrequencyValue | 0 | "0"
+ProtoJSON | ttnpb.ZeroableFrequencyValue | 100000 | "100000"
+ProtoJSON | ttnpb.ZeroableFrequencyValue | 2000000 | "2000000"
+ProtoJSON | ttnpb.ZeroableFrequencyValue | 30000000 | "30000000"
 Text | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_1 | ADR_ACK_DELAY_1
 Text | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_1024 | ADR_ACK_DELAY_1024
 Text | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_128 | ADR_ACK_DELAY_128
@@ -1886,3 +1898,7 @@ Text | ttnpb.TxSchedulePriority | HIGHEST | HIGHEST
 Text | ttnpb.TxSchedulePriority | LOW | LOW
 Text | ttnpb.TxSchedulePriority | LOWEST | LOWEST
 Text | ttnpb.TxSchedulePriority | NORMAL | NORMAL
+Text | ttnpb.ZeroableFrequencyValue | 0 | 0
+Text | ttnpb.ZeroableFrequencyValue | 100000 | 100000
+Text | ttnpb.ZeroableFrequencyValue | 2000000 | 2000000
+Text | ttnpb.ZeroableFrequencyValue | 30000000 | 30000000
