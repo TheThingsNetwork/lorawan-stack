@@ -25,7 +25,6 @@ const PLACEHOLDER_CHAR = '·'
 
 const hex = /[0-9a-f]/i
 const voidChars = RegExp(`[ ${PLACEHOLDER_CHAR}]`, 'g')
-const onlyVoidChars = RegExp(`^[ ${PLACEHOLDER_CHAR}]+$`, 'g')
 
 const masks = {}
 const mask = (min, max, showPerChar = false) => {
