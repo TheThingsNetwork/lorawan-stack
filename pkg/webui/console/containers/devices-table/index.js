@@ -229,7 +229,7 @@ class DevicesTable extends React.Component {
         entity="devices"
         defaultOrder="-created_at"
         headers={headers}
-        addMessage={sharedMessages.addDevice}
+        addMessage={sharedMessages.registerEndDevice}
         actionItems={this.importButton}
         tableTitle={<Message content={sharedMessages.devices} />}
         getItemsAction={this.getDevicesList}

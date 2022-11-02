@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React from 'react'
 import { defineMessages } from 'react-intl'
 
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import SubmitButton from '@ttn-lw/components/submit-button'
 
 import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -45,49 +47,34 @@ const m = defineMessages({
   orgNamePlaceholder: 'My new organization',
 })
 
+const initialValues = {
+  ids: {
+    organization_id: '',
+  },
+  name: '',
+  description: '',
+}
+
 const OrganizationForm = props => {
-  const {
-    error,
-    initialValues,
-    update,
-    children,
-    formRef,
-    onSubmit,
-    onSubmitSuccess,
-    onSubmitFailure,
-  } = props
+  const { onSubmit, error, submitBarItems, initialValues, submitMessage } = props
 
-  const handleSubmit = useCallback(
-    async (values, { resetForm }) => {
-      const castedValues = validationSchema.cast(values)
-
-      try {
-        const result = await onSubmit(castedValues)
-        onSubmitSuccess(result)
-      } catch (error) {
-        resetForm({ values })
-        onSubmitFailure(error)
-      }
-    },
-    [onSubmit, onSubmitFailure, onSubmitSuccess],
-  )
+  const isUpdate = Boolean(initialValues.ids.organization_id)
 
   return (
     <Form
       error={error}
-      onSubmit={handleSubmit}
+      onSubmit={onSubmit}
       initialValues={initialValues}
       validationSchema={validationSchema}
-      formikRef={formRef}
     >
       <Form.Field
         title={sharedMessages.organizationId}
         name="ids.organization_id"
         placeholder={m.orgIdPlaceholder}
-        autoFocus={!update}
-        disabled={update}
         required
         component={Input}
+        disabled={isUpdate}
+        autoFocus={!isUpdate}
       />
       <Form.Field
         title={sharedMessages.name}
@@ -103,33 +90,32 @@ const OrganizationForm = props => {
         description={m.orgDescDescription}
         component={Input}
       />
-      {children}
+      <SubmitBar>
+        <Form.Submit message={submitMessage} component={SubmitButton} />
+        {submitBarItems}
+      </SubmitBar>
     </Form>
   )
 }
 OrganizationForm.propTypes = {
-  children: PropTypes.node.isRequired,
   error: PropTypes.error,
-  formRef: Form.propTypes.formikRef,
   initialValues: PropTypes.shape({
     ids: PropTypes.shape({
       organization_id: PropTypes.string.isRequired,
-    }).isRequired,
+    }),
     name: PropTypes.string,
     description: PropTypes.string,
-  }).isRequired,
+  }),
   onSubmit: PropTypes.func.isRequired,
-  onSubmitFailure: PropTypes.func,
-  onSubmitSuccess: PropTypes.func,
-  update: PropTypes.bool,
+  submitBarItems: PropTypes.element,
+  submitMessage: PropTypes.message,
 }
 
 OrganizationForm.defaultProps = {
-  update: false,
-  error: '',
-  onSubmitFailure: () => null,
-  onSubmitSuccess: () => null,
-  formRef: undefined,
+  initialValues,
+  error: undefined,
+  submitBarItems: null,
+  submitMessage: sharedMessages.createOrganization,
 }
 
-export default OrganizationForm
+export { OrganizationForm as default, initialValues }

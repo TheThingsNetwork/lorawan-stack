@@ -14,7 +14,6 @@
 
 import React from 'react'
 import { Container, Col, Row } from 'react-grid-system'
-import { defineMessages } from 'react-intl'
 
 import PageTitle from '@ttn-lw/components/page-title'
 
@@ -23,12 +22,9 @@ import RequireRequest from '@ttn-lw/lib/components/require-request'
 import DeviceOnboardingForm from '@console/containers/device-onboarding-form'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { listBrands } from '@console/store/actions/device-repository'
-
-const m = defineMessages({
-  title: 'Register end device',
-})
 
 const DeviceAdd = props => {
   const { appId } = props
@@ -37,7 +33,7 @@ const DeviceAdd = props => {
       <Container>
         <Row>
           <Col>
-            <PageTitle tall title={m.title} className="mb-cs-m" />
+            <PageTitle tall title={sharedMessages.registerEndDevice} className="mb-cs-m" />
             <DeviceOnboardingForm />
           </Col>
         </Row>

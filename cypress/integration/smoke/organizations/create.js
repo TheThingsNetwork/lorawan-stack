@@ -35,7 +35,7 @@ const organizationCreate = defineSmokeTest('succeeds creating organization', () 
   cy.get('header').within(() => {
     cy.findByRole('link', { name: /Organizations/ }).click()
   })
-  cy.findByRole('link', { name: /Add organization/ }).click()
+  cy.findByRole('link', { name: /Create organization/ }).click()
   cy.findByLabelText('Organization ID').type(organization.organization_id)
   cy.findByLabelText('Name').type(organization.name)
   cy.findByLabelText('Description').type(organization.description)

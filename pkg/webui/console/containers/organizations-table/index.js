@@ -226,7 +226,7 @@ const OrganizationsTable = props => {
       entity="organizations"
       defaultOrder="-created_at"
       headers={headers}
-      addMessage={sharedMessages.addOrganization}
+      addMessage={sharedMessages.createOrganization}
       tableTitle={<Message content={sharedMessages.organizations} />}
       getItemsAction={getOrganizations}
       baseDataSelector={baseDataSelector}

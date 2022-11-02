@@ -36,7 +36,7 @@ describe('Application create', () => {
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
     cy.visit(`${Cypress.config('consoleRootPath')}/applications/add`)
 
-    cy.findByText('Add application', { selector: 'h1' }).should('be.visible')
+    cy.findByText('Create application', { selector: 'h1' }).should('be.visible')
     cy.findByLabelText('Application ID')
       .should('be.visible')
       .and('have.attr', 'placeholder')
@@ -104,7 +104,7 @@ describe('Application create', () => {
       cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
       cy.visit(`${Cypress.config('consoleRootPath')}/applications/add`)
 
-      cy.findByText('Add application', { selector: 'h1' }).should('be.visible')
+      cy.findByText('Create application', { selector: 'h1' }).should('be.visible')
       cy.findByLabelText('Application ID')
         .should('be.visible')
         .and('have.attr', 'placeholder')

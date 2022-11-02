@@ -199,7 +199,7 @@ class NetworkLayerStep {
   }
 
   submit() {
-    cy.findByRole('button', { name: 'Add end device' }).should('be.visible').click()
+    cy.findByRole('button', { name: 'Register end device' }).should('be.visible').click()
   }
 }
 
@@ -238,7 +238,7 @@ class JoinSettingsStep {
   }
 
   submit() {
-    cy.findByRole('button', { name: 'Add end device' }).should('be.visible').click()
+    cy.findByRole('button', { name: 'Register end device' }).should('be.visible').click()
   }
 }
 
@@ -255,7 +255,7 @@ class ApplicationLayerStep {
   }
 
   submit() {
-    cy.findByRole('button', { name: 'Add end device' }).should('be.visible').click()
+    cy.findByRole('button', { name: 'Register end device' }).should('be.visible').click()
   }
 }
 

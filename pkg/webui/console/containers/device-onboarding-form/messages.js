@@ -64,7 +64,7 @@ export default defineMessages({
   unknownHwOption: 'Unknown ver.',
   // QR code section.
   hasEndDeviceQR: 'Does your end device have a QR code? Scan it to speed up onboarding.',
-  learnMore: 'Learn more',
+  deviceGuide: 'Device registration help',
   scanEndDevice: 'Scan end device QR code',
   deviceInfo: 'Found QR code data',
   resetQRCodeData: 'Reset QR code data',

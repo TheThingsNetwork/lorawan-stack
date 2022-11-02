@@ -280,7 +280,7 @@ const ApplicationsTable = props => {
       entity="applications"
       defaultOrder="-created_at"
       headers={headers}
-      addMessage={sharedMessages.addApplication}
+      addMessage={sharedMessages.createApplication}
       tableTitle={<Message content={sharedMessages.applications} />}
       getItemsAction={getApplications}
       baseDataSelector={baseDataSelector}

@@ -36,7 +36,7 @@ const applicationCreate = defineSmokeTest('succeeds creating application', () =>
   cy.get('header').within(() => {
     cy.findByRole('link', { name: /Applications/ }).click()
   })
-  cy.findByRole('link', { name: /Add application/ }).click()
+  cy.findByRole('link', { name: /Create application/ }).click()
   cy.findByLabelText('Application ID').type(application.application_id)
   cy.findByLabelText('Application name').type(application.name)
   cy.findByLabelText('Description').type(application.description)
