@@ -29,6 +29,7 @@ For details about compatibility between different releases, see the **Commitment
 - Fix several device onboarding issues with ABP in the Console.
   - Do not ask for a JoinEUI.
   - Reinitialize form properly when switching between ABP and OTAA.
+- Issue with pasting values into byte input at the wrong position in the Console.
 
 ### Security
 
