@@ -1,0 +1,4 @@
+url: http://localhost:3000
+basic-auth:
+  username: 'localhost'
+  password: 'secret'

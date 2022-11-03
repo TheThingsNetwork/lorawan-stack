@@ -50,7 +50,6 @@ func TestUpstream(t *testing.T) {
 		Directory: "testdata",
 		NetworkServer: NetworkServer{
 			Hostname: "localhost",
-			HomeNSID: types.EUI64{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 		},
 	}
 

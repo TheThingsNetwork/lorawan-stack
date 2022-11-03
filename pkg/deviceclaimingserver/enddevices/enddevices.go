@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices/ttjsv1"
+	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices/ttjsv2"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
@@ -55,7 +56,10 @@ type Component interface {
 	AllowInsecureForCredentials() bool
 }
 
-const ttJSType = "ttjs"
+const (
+	ttjsType   = "ttjs" // TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/5911)
+	ttjsV2Type = "ttjsv2"
+)
 
 var errInvalidUpstream = errors.DefineInvalidArgument("invalid_upstream", "upstream `{type}` is invalid")
 
@@ -90,41 +94,52 @@ func NewUpstream(ctx context.Context, conf Config, c Component, opts ...Option) 
 
 	// Setup upstreams.
 	for _, js := range baseConfig.JoinServers {
-		var (
-			s          EndDeviceClaimer
-			clientName string
-		)
+		// Fetch and parse configuration.
+		fileParts := strings.Split(filepath.ToSlash(js.File), "/")
+		fetcher := fetch.WithBasePath(fetcher, fileParts[:len(fileParts)-1]...)
+		fileName := fileParts[len(fileParts)-1]
+		configBytes, err := fetcher.File(fileName)
+		if err != nil {
+			return nil, err
+		}
+
+		var claimer EndDeviceClaimer
 		switch js.Type {
-		case ttJSType:
-			// Fetch and parse configuration.
-			fileParts := strings.Split(filepath.ToSlash(js.File), "/")
-			fetcher := fetch.WithBasePath(fetcher, fileParts[:len(fileParts)-1]...)
-			fileName := fileParts[len(fileParts)-1]
-			configBytes, err := fetcher.File(fileName)
+		case ttjsType: // TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/5911)
+			var cfg ttjsv1.Config
+			if err := yaml.UnmarshalStrict(configBytes, &cfg); err != nil {
+				return nil, err
+			}
+			cfg.NetID = conf.NetID
+			cfg.JoinEUIPrefixes = js.JoinEUIs
+			cfg.NetworkServer.Hostname = conf.NetworkServer.Hostname
+			if conf.NetworkServer.HomeNSID != nil {
+				cfg.NetworkServer.HomeNSID = *conf.NetworkServer.HomeNSID
+			}
+			claimer, err = cfg.NewClient(ctx, c)
 			if err != nil {
 				return nil, err
 			}
-
-			var ttjsConfig ttjsv1.Config
-			if err := yaml.UnmarshalStrict(configBytes, &ttjsConfig); err != nil {
+		case ttjsV2Type:
+			var cfg ttjsv2.Config
+			if err := yaml.UnmarshalStrict(configBytes, &cfg); err != nil {
 				return nil, err
 			}
-
-			ttjsConfig.NetID = conf.NetID
-			ttjsConfig.JoinEUIPrefixes = js.JoinEUIs
-			ttjsConfig.NetworkServer.HomeNSID = conf.NetworkServer.HomeNSID
-			ttjsConfig.NetworkServer.Hostname = conf.NetworkServer.Hostname
-
-			s, err = ttjsConfig.NewClient(ctx, c)
+			cfg.NetID = conf.NetID
+			cfg.JoinEUIPrefixes = js.JoinEUIs
+			cfg.NetworkServer.Hostname = conf.NetworkServer.Hostname
+			cfg.NetworkServer.HomeNSID = conf.NetworkServer.HomeNSID
+			claimer, err = cfg.NewClient(ctx, c)
 			if err != nil {
 				return nil, err
 			}
-			// The file for each client will be unique.
-			clientName = strings.Trim(fileName, filepath.Ext(fileName))
 		default:
 			return nil, errInvalidUpstream.WithAttributes("type", js.Type)
 		}
-		upstream.servers[clientName] = s
+
+		// The file for each client will be unique.
+		clientName := strings.Trim(fileName, filepath.Ext(fileName))
+		upstream.servers[clientName] = claimer
 	}
 
 	for _, opt := range opts {
