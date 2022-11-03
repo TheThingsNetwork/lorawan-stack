@@ -299,6 +299,12 @@ export const isSentryWorthy = error => {
   // Forward any other unknown errors without relevant status code,
   // that are not network related.
   if (isUnknown(error) && statusCode === undefined) {
+    if (typeof error === 'string' && /<html.*>|<!DOCTYPE/i.test(error)) {
+      // If the error is a string and resembles a HTML document, it is likely
+      // caused by a client side firewall or other security middleware.
+      // Such errors can be discarded.
+      return false
+    }
     return true
   }
 
