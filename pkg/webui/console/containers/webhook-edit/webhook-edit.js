@@ -45,13 +45,11 @@ const WebhookEdit = props => {
 
   const handleUpdateWebhook = React.useCallback(
     async updatedWebhook => {
-      const patch = diff(selectedWebhook, updatedWebhook, ['ids'])
-
-      // Ensure that the header prop is always patched fully, otherwise we loose
-      // old header entries.
-      if ('headers' in patch) {
-        patch.headers = updatedWebhook.headers
-      }
+      const patch = diff(selectedWebhook, updatedWebhook, {
+        exclude: ['ids'],
+        patchArraysItems: false,
+        patchInFull: ['headers'],
+      })
 
       if (Object.keys(patch).length === 0) {
         await updateWebhook(updatedWebhook)
