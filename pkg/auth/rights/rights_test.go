@@ -19,6 +19,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -85,4 +86,143 @@ func TestContext(t *testing.T) {
 		unique.ID(ctx, &ttnpb.UserIdentifiers{UserId: "foo-usr"}),
 		ttnpb.Right_RIGHT_USER_INFO,
 	), should.BeTrue)
+}
+
+func TestMap(t *testing.T) {
+	t.Parallel()
+	a := assertions.New(t)
+
+	expectedMap := func(rights map[string]*ttnpb.Rights) *Map {
+		m := &Map{}
+		for k, v := range rights {
+			m.syncMap.Store(k, v)
+		}
+		return m
+	}
+
+	var (
+		fooID   = "foo"
+		barID   = "bar"
+		wrongID = "baz"
+	)
+	for _, tc := range []struct {
+		Name      string
+		Rights    map[string]*ttnpb.Rights
+		NewMap    func(*testing.T, map[string]*ttnpb.Rights) *Map
+		Assertion func(*testing.T, map[string]*ttnpb.Rights, *Map) bool
+	}{
+		{
+			Name:   "`NewMap` with nil Rights",
+			Rights: nil,
+			NewMap: func(t *testing.T, r map[string]*ttnpb.Rights) *Map {
+				t.Helper()
+				return NewMap(r)
+			},
+			Assertion: func(t *testing.T, _ map[string]*ttnpb.Rights, m *Map) bool {
+				t.Helper()
+				return a.So(m, should.Resemble, &Map{})
+			},
+		},
+
+		{
+			Name: "NewMap with argument",
+			Rights: map[string]*ttnpb.Rights{
+				fooID: ttnpb.RightsFrom(ttnpb.Right_RIGHT_APPLICATION_INFO),
+				barID: ttnpb.RightsFrom(ttnpb.Right_RIGHT_APPLICATION_INFO),
+			},
+			NewMap: func(t *testing.T, r map[string]*ttnpb.Rights) *Map {
+				t.Helper()
+				return NewMap(r)
+			},
+			Assertion: func(t *testing.T, r map[string]*ttnpb.Rights, m *Map) bool {
+				t.Helper()
+				for k, v := range r {
+					got, ok := m.GetRights(k)
+					if !a.So(ok, should.BeTrue) {
+						return false
+					}
+					if !a.So(got, should.Resemble, v) {
+						return false
+					}
+				}
+				return true
+			},
+		},
+
+		{
+			Name: "GetRights correct ID",
+			Rights: map[string]*ttnpb.Rights{
+				fooID: ttnpb.RightsFrom(ttnpb.Right_RIGHT_APPLICATION_INFO),
+				barID: ttnpb.RightsFrom(ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ),
+			},
+			NewMap: func(t *testing.T, r map[string]*ttnpb.Rights) *Map {
+				t.Helper()
+				return expectedMap(r)
+			},
+			Assertion: func(t *testing.T, r map[string]*ttnpb.Rights, m *Map) bool {
+				t.Helper()
+				for k, v := range r {
+					got, ok := m.GetRights(k)
+					if !a.So(ok, should.BeTrue) {
+						return false
+					}
+					if !a.So(got, should.Resemble, v) {
+						return false
+					}
+				}
+				return true
+			},
+		},
+
+		{
+			Name: "SetRights with key and value",
+			Rights: map[string]*ttnpb.Rights{
+				fooID: ttnpb.RightsFrom(ttnpb.Right_RIGHT_APPLICATION_INFO),
+				barID: ttnpb.RightsFrom(ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ),
+			},
+			NewMap: func(t *testing.T, r map[string]*ttnpb.Rights) *Map {
+				t.Helper()
+				m := &Map{}
+				for k, v := range r {
+					m.SetRights(k, v)
+				}
+				return m
+			},
+			Assertion: func(t *testing.T, r map[string]*ttnpb.Rights, m *Map) bool {
+				t.Helper()
+				for k, v := range r {
+					got, ok := m.GetRights(k)
+					if !a.So(ok, should.BeTrue) {
+						return false
+					}
+					if !a.So(got, should.Resemble, v) {
+						return false
+					}
+				}
+				return true
+			},
+		},
+
+		{
+			Name: "GetRights wrong ID",
+			Rights: map[string]*ttnpb.Rights{
+				fooID: ttnpb.RightsFrom(ttnpb.Right_RIGHT_APPLICATION_INFO),
+			},
+			NewMap: func(t *testing.T, r map[string]*ttnpb.Rights) *Map {
+				t.Helper()
+				return expectedMap(r)
+			},
+			Assertion: func(t *testing.T, _ map[string]*ttnpb.Rights, m *Map) bool {
+				t.Helper()
+				got, ok := m.GetRights(wrongID)
+				return a.So(got, should.BeNil) && a.So(ok, should.BeFalse)
+			},
+		},
+	} {
+		tc := tc
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+			a.So(tc.Assertion(t, tc.Rights, tc.NewMap(t, tc.Rights)), should.BeTrue)
+		})
+	}
 }
