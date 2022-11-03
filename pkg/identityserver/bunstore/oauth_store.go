@@ -763,7 +763,7 @@ func (s *oauthStore) DeleteClientAuthorizations(ctx context.Context, clientIDs *
 	))
 	defer span.End()
 
-	clientUUID, err := s.getClientUUID(ctx, clientIDs)
+	clientUUID, err := s.getClientUUID(store.WithSoftDeleted(ctx, false), clientIDs)
 	if err != nil {
 		return err
 	}
