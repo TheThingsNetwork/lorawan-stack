@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ttjs
+package ttjsv1
 
 import (
 	"encoding/json"
 	"fmt"
 	"strconv"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/interop"
 )
 
@@ -79,11 +78,6 @@ type claimData struct {
 
 // OUI is the Organisation Unique Identifier.
 type OUI uint32
-
-var (
-	errInvalidOUILength = errors.DefineInvalidArgument("invalid_oui_length", "invalid length for OUI `{oui}`")
-	errInvalidOUI       = errors.DefineInvalidArgument("invalid_oui", "invalid OUI `{oui}`")
-)
 
 // MarshalText implements encoding.TextUnmarshaler interface.
 // This makes sure that the value sent to The Things Join Server is six upper case (UTF-8) hex characters.

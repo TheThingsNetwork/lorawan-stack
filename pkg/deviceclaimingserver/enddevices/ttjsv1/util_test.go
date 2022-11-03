@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ttjs
+package ttjsv1
 
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net"
 	"net/http"
 	"time"
@@ -44,9 +43,9 @@ type mockTTJS struct {
 	clients           map[string]clientData // key is the auth token.
 }
 
-func (srv *mockTTJS) Start(ctx context.Context, apiVersion string) error {
+func (srv *mockTTJS) Start(ctx context.Context) error {
 	r := mux.NewRouter()
-	r.HandleFunc(fmt.Sprintf("/%s/claim/{devEUI}", apiVersion), srv.handleClaim)
+	r.HandleFunc("/v1/claim/{devEUI}", srv.handleClaim)
 	s := http.Server{
 		Handler:           r,
 		ReadTimeout:       60 * time.Second,
@@ -65,10 +64,10 @@ func writeResponse(w http.ResponseWriter, statusCode int, message string) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	json.NewEncoder(w).Encode(resp)
+	json.NewEncoder(w).Encode(resp) //nolint:errcheck
 }
 
-func (srv *mockTTJS) handleClaim(w http.ResponseWriter, r *http.Request) {
+func (srv *mockTTJS) handleClaim(w http.ResponseWriter, r *http.Request) { //nolint:gocyclo
 	asID, password, ok := r.BasicAuth()
 	if !ok {
 		writeResponse(w, http.StatusUnauthorized, "API Key not found")
@@ -76,6 +75,7 @@ func (srv *mockTTJS) handleClaim(w http.ResponseWriter, r *http.Request) {
 	}
 	var client *clientData
 	for token, cl := range srv.clients {
+		cl := cl
 		if password == token && cl.asID == asID {
 			client = &cl
 			break
@@ -131,7 +131,7 @@ func (srv *mockTTJS) handleClaim(w http.ResponseWriter, r *http.Request) {
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(dev.claimData)
+		json.NewEncoder(w).Encode(dev.claimData) //nolint:errcheck
 
 	case http.MethodPost:
 		var req claimRequest

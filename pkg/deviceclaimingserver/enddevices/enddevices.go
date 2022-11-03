@@ -24,11 +24,10 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
-	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices/ttjs"
+	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices/ttjsv1"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -106,7 +105,7 @@ func NewUpstream(ctx context.Context, conf Config, c Component, opts ...Option) 
 				return nil, err
 			}
 
-			var ttjsConfig ttjs.Config
+			var ttjsConfig ttjsv1.Config
 			if err := yaml.UnmarshalStrict(configBytes, &ttjsConfig); err != nil {
 				return nil, err
 			}
@@ -151,15 +150,10 @@ var (
 )
 
 func (upstream *Upstream) joinEUIClaimer(ctx context.Context, joinEUI types.EUI64) EndDeviceClaimer {
-	for name, srv := range upstream.servers {
-		if !srv.SupportsJoinEUI(joinEUI) {
-			continue
+	for _, srv := range upstream.servers {
+		if srv.SupportsJoinEUI(joinEUI) {
+			return srv
 		}
-		log.FromContext(ctx).WithFields(log.Fields(
-			"name", name,
-			"join_eui", joinEUI,
-		)).Debug("JoinEUI supported by upstream")
-		return srv
 	}
 	return nil
 }

@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package ttjs provides the claiming client implementation for The Things Join Server API.
-package ttjs
+// Package ttjsv1 provides the claiming client implementation for The Things Join Server 1.0 API.
+package ttjsv1
 
 import (
 	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 
@@ -78,17 +78,17 @@ type TTJS struct {
 }
 
 // NewClient applies the config and returns a new TTJS client.
-func (config *Config) NewClient(ctx context.Context, c Component) (*TTJS, error) {
+func (cfg *Config) NewClient(ctx context.Context, c Component) (*TTJS, error) {
 	httpClient, err := c.HTTPClient(ctx)
 	if err != nil {
 		return nil, err
 	}
-	baseURL, err := url.Parse(config.URL)
+	baseURL, err := url.Parse(cfg.URL)
 	if err != nil {
 		return nil, err
 	}
 	return &TTJS{
-		config:      *config,
+		config:      *cfg,
 		httpClient:  httpClient,
 		baseURL:     baseURL,
 		Component:   c,
@@ -107,9 +107,9 @@ func (client *TTJS) SupportsJoinEUI(eui types.EUI64) bool {
 }
 
 var (
-	errDeviceNotProvisioned = errors.DefineNotFound("device_not_provisioned", "device with EUI `{dev_eui}` not provisioned")
+	errDeviceNotProvisioned = errors.DefineNotFound("device_not_provisioned", "device with EUI `{dev_eui}` not provisioned") //nolint:lll
 	errDeviceNotClaimed     = errors.DefineNotFound("device_not_claimed", "device with EUI `{dev_eui}` not claimed")
-	errDeviceAccessDenied   = errors.DefinePermissionDenied("device_access_denied", "access to device with `{dev_eui}` denied. Either device is already claimed or owner token is invalid")
+	errDeviceAccessDenied   = errors.DefinePermissionDenied("device_access_denied", "access to device with `{dev_eui}` denied. Either device is already claimed or owner token is invalid") //nolint:lll
 	errUnauthorized         = errors.DefineUnauthenticated("unauthorized", "client API Key missing or invalid")
 )
 
@@ -163,7 +163,7 @@ func (client *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, clai
 	}
 	defer resp.Body.Close()
 
-	respBody, err := ioutil.ReadAll(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
@@ -217,7 +217,7 @@ func (client *TTJS) Unclaim(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers
 	}
 	defer resp.Body.Close()
 
-	respBody, err := ioutil.ReadAll(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
@@ -248,7 +248,9 @@ func (client *TTJS) Unclaim(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers
 }
 
 // GetClaimStatus implements EndDeviceClaimer.
-func (client *TTJS) GetClaimStatus(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*ttnpb.GetClaimStatusResponse, error) {
+func (client *TTJS) GetClaimStatus(
+	ctx context.Context, ids *ttnpb.EndDeviceIdentifiers,
+) (*ttnpb.GetClaimStatusResponse, error) {
 	devEUI := types.MustEUI64(ids.DevEui)
 	path := fmt.Sprintf("%s/%s/claim/%s", client.baseURL.String(), client.config.ClaimingAPIVersion, devEUI.String())
 	logger := log.FromContext(ctx).WithFields(log.Fields(
@@ -271,7 +273,7 @@ func (client *TTJS) GetClaimStatus(ctx context.Context, ids *ttnpb.EndDeviceIden
 	}
 	defer resp.Body.Close()
 
-	respBody, err := ioutil.ReadAll(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
