@@ -22,12 +22,12 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-// Map ...
+// Map stores rights for a given ID.
 type Map struct {
 	syncMap sync.Map
 }
 
-// NewMap ...
+// NewMap returns a pointer to a new Map.
 func NewMap(rights map[string]*ttnpb.Rights) *Map {
 	m := &Map{}
 	for k, v := range rights {
