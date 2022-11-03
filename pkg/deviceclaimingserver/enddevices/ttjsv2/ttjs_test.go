@@ -18,7 +18,6 @@ import (
 	"context"
 	"fmt"
 	"net"
-	"net/http"
 	"testing"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
@@ -90,11 +89,7 @@ func TestTTJS(t *testing.T) { //nolint:tparallel
 		},
 	}
 
-	go func() {
-		if err := mockTTJS.Start(ctx); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			panic(err)
-		}
-	}()
+	go mockTTJS.Start(ctx) //nolint:errcheck
 
 	// Valid Config
 	ttJSConfig := Config{
