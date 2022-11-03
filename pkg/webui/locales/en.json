@@ -443,7 +443,7 @@
   "console.components.webhook-form.index.updateErrorTitle": "Could not update webhook",
   "console.components.webhook-form.index.createErrorTitle": "Could not create webhook",
   "console.components.webhook-form.index.reactivateButtonMessage": "Reactivate",
-  "console.components.webhook-form.index.suspendedWebhookMessage": "This webhook has been deactivated due to several unsuccessful forwarding attempts. It will be automatically reactivated after 24 hours. If you wish to reactivate right away, you can use the button below.",
+  "console.components.webhook-form.index.suspendedWebhookMessage": "This webhook has been deactivated due to several unsuccessful forwarding attempts. It will be automatically reactivated after {webhookRetryInterval}. If you wish to reactivate right away, you can use the button below.",
   "console.components.webhook-form.index.pendingInfo": "This webhook is currently pending until attempting its first regular request attempt. Note that webhooks can be restricted if they encounter too many request failures.",
   "console.components.webhook-form.index.messagePathValidateTooLong": "Enabled message path must be at most 64 characters",
   "console.components.webhook-form.index.basicAuthCheckbox": "Use basic access authentication (basic auth)",
