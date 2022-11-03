@@ -44,6 +44,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
+import { durationDecoder } from '@console/lib/utils'
 import { apiKey as webhookAPIKeyRegexp } from '@console/lib/regexp'
 
 import {
@@ -75,7 +76,7 @@ const m = defineMessages({
   createErrorTitle: 'Could not create webhook',
   reactivateButtonMessage: 'Reactivate',
   suspendedWebhookMessage:
-    'This webhook has been deactivated due to several unsuccessful forwarding attempts. It will be automatically reactivated after {webhookRetryInterval} hours. If you wish to reactivate right away, you can use the button below.',
+    'This webhook has been deactivated due to several unsuccessful forwarding attempts. It will be automatically reactivated after {webhookRetryInterval}. If you wish to reactivate right away, you can use the button below.',
   pendingInfo:
     'This webhook is currently pending until attempting its first regular request attempt. Note that webhooks can be restricted if they encounter too many request failures.',
   messagePathValidateTooLong: 'Enabled message path must be at most 64 characters',
@@ -246,6 +247,7 @@ export default class WebhookForm extends Component {
         Authorization: PropTypes.string,
       }),
     }),
+    isUnhealthyWebhook: PropTypes.bool,
     onDelete: PropTypes.func,
     onDeleteFailure: PropTypes.func,
     onDeleteSuccess: PropTypes.func,
@@ -253,7 +255,7 @@ export default class WebhookForm extends Component {
     onReactivateSuccess: PropTypes.func,
     onSubmit: PropTypes.func.isRequired,
     update: PropTypes.bool.isRequired,
-    webhookRetryInterval: PropTypes.number,
+    webhookRetryInterval: PropTypes.string,
     webhookTemplate: PropTypes.webhookTemplate,
   }
 
@@ -269,6 +271,7 @@ export default class WebhookForm extends Component {
     error: undefined,
     existCheck: () => null,
     webhookRetryInterval: null,
+    isUnhealthyWebhook: false,
   }
 
   form = React.createRef()
@@ -362,7 +365,15 @@ export default class WebhookForm extends Component {
   }
 
   render() {
-    const { update, initialWebhookValue, webhookTemplate, healthStatusEnabled, error } = this.props
+    const {
+      update,
+      initialWebhookValue,
+      webhookTemplate,
+      healthStatusEnabled,
+      webhookRetryInterval,
+      isUnhealthyWebhook,
+      error,
+    } = this.props
     let initialValues = blankValues
     if (update && initialWebhookValue) {
       initialValues = decodeValues({ ...blankValues, ...initialWebhookValue })
@@ -370,12 +381,7 @@ export default class WebhookForm extends Component {
 
     const hasTemplate = Boolean(webhookTemplate)
 
-    const mayReactivate =
-      update &&
-      initialWebhookValue &&
-      initialWebhookValue.health_status &&
-      initialWebhookValue.health_status.unhealthy &&
-      !healthStatusEnabled
+    const mayReactivate = update && initialWebhookValue && isUnhealthyWebhook
 
     const isPending =
       healthStatusEnabled &&
@@ -405,7 +411,10 @@ export default class WebhookForm extends Component {
         {mayReactivate && (
           <Notification
             warning
-            content={{ ...m.suspendedWebhookMessage, values: {webhookRetryInterval: webhookRetryInterval ?? '24 hours'}}}
+            content={{
+              ...m.suspendedWebhookMessage,
+              values: { webhookRetryInterval: durationDecoder(webhookRetryInterval) },
+            }}
             children={
               <Button
                 onClick={this.handleReactivate}

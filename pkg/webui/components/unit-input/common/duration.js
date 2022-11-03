@@ -14,18 +14,10 @@
 
 import React from 'react'
 
-import sharedMessages from '@ttn-lw/lib/shared-messages'
-
+import { units } from '@console/lib/utils'
 import { unit as unitRegexp } from '@console/lib/regexp'
 
 import EncodedUnitInput from '../encoded'
-
-const units = [
-  { label: sharedMessages.milliseconds, value: 'ms' },
-  { label: sharedMessages.seconds, value: 's' },
-  { label: sharedMessages.minutes, value: 'm' },
-  { label: sharedMessages.hours, value: 'h' },
-]
 
 const encoder = (value, unit) => {
   if (value === null) {

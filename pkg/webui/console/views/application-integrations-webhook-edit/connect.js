@@ -27,7 +27,11 @@ import {
 } from '@console/store/selectors/webhooks'
 import { selectWebhookTemplateById } from '@console/store/selectors/webhook-templates'
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
-import { selectWebhooksHealthStatusEnabled } from '@console/store/selectors/application-server'
+import {
+  selectWebhooksHealthStatusEnabled,
+  selectWebhookRetryInterval,
+  selectIsWebhookUnhealthy,
+} from '@console/store/selectors/application-server'
 
 const webhookEntitySelector = [
   'base_url',
@@ -52,6 +56,8 @@ const webhookEntitySelector = [
 
 const mapStateToProps = state => {
   const healthStatusEnabled = selectWebhooksHealthStatusEnabled(state)
+  const webhookRetryInterval = selectWebhookRetryInterval(state)
+  const isUnhealthyWebhook = selectIsWebhookUnhealthy(state)
   const webhook = selectSelectedWebhook(state)
   const webhookTemplateId = getWebhookTemplateId(webhook)
   const webhookTemplate = Boolean(webhookTemplateId)
@@ -62,6 +68,8 @@ const mapStateToProps = state => {
     webhook,
     webhookTemplate,
     healthStatusEnabled,
+    webhookRetryInterval,
+    isUnhealthyWebhook,
     fetching: selectWebhookFetching(state),
     error: selectWebhookError(state),
   }

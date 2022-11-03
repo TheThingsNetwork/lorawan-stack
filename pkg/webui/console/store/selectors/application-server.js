@@ -42,7 +42,20 @@ export const selectWebhooksHealthStatusEnabled = state => {
 
   return (
     webhooksConfig.unhealthy_retry_interval !== '0s' ||
-    webhooksConfig.unhealthy_attempts_threshold !== '0s'
+    'unhealthy_attempts_threshold' in webhooksConfig
+  )
+}
+
+export const selectIsWebhookUnhealthy = state => {
+  const webhooksConfig = selectWebhooksConfiguration(state)
+
+  if (!webhooksConfig) {
+    return false
+  }
+
+  return (
+    webhooksConfig.unhealthy_retry_interval !== '0s' &&
+    'unhealthy_attempts_threshold' in webhooksConfig
   )
 }
 

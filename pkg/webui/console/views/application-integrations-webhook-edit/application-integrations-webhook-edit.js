@@ -33,7 +33,15 @@ const m = defineMessages({
 })
 
 const ApplicationWebhookEdit = props => {
-  const { webhook, appId, webhookTemplate, match, healthStatusEnabled } = props
+  const {
+    webhook,
+    appId,
+    webhookTemplate,
+    match,
+    healthStatusEnabled,
+    webhookRetryInterval,
+    isUnhealthyWebhook,
+  } = props
   const { webhookId } = match.params
   useBreadcrumbs(
     'apps.single.integrations.webhooks.edit',
@@ -55,6 +63,8 @@ const ApplicationWebhookEdit = props => {
             webhookId={webhookId}
             webhookTemplate={webhookTemplate}
             healthStatusEnabled={healthStatusEnabled}
+            webhookRetryInterval={webhookRetryInterval}
+            isUnhealthyWebhook={isUnhealthyWebhook}
           />
         </Col>
       </Row>
@@ -65,13 +75,16 @@ const ApplicationWebhookEdit = props => {
 ApplicationWebhookEdit.propTypes = {
   appId: PropTypes.string.isRequired,
   healthStatusEnabled: PropTypes.bool.isRequired,
+  isUnhealthyWebhook: PropTypes.bool.isRequired,
   match: PropTypes.match.isRequired,
   webhook: PropTypes.webhook.isRequired,
+  webhookRetryInterval: PropTypes.string,
   webhookTemplate: PropTypes.webhookTemplate,
 }
 
 ApplicationWebhookEdit.defaultProps = {
   webhookTemplate: undefined,
+  webhookRetryInterval: null,
 }
 
 export default ApplicationWebhookEdit
