@@ -22,7 +22,7 @@ import (
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/migrate"
-	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
+	bunstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/bunstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	ismigrations "go.thethings.network/lorawan-stack/v3/pkg/identityserver/store/migrations"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -116,16 +116,17 @@ var (
 		Short: "Cleanup expired entities in the Identity Server database",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			logger.Info("Connecting to Identity Server database...")
-			db, err := gormstore.Open(ctx, config.IS.DatabaseURI)
+			db, err := store.OpenDB(ctx, config.IS.DatabaseURI)
+			if err != nil {
+				return err
+			}
+			bunDB := bun.NewDB(db, pgdialect.New())
+			st, err := bunstore.NewStore(ctx, bunDB)
 			if err != nil {
 				return err
 			}
 			defer db.Close()
-			appStore := gormstore.GetApplicationStore(db)
-			userStore := gormstore.GetUserStore(db)
-			organizationStore := gormstore.GetOrganizationStore(db)
-			gatewayStore := gormstore.GetGatewayStore(db)
-			clientStore := gormstore.GetClientStore(db)
+
 			expiryDate := time.Now().Add(-1 * config.IS.Delete.Restore)
 			ctx := store.WithSoftDeletedBetween(ctx, nil, &expiryDate)
 			dryRun, err := cmd.Flags().GetBool("dry-run")
@@ -133,27 +134,31 @@ var (
 				return err
 			}
 			// Find expired applications.
-			expiredApplications, err := appStore.FindApplications(ctx, []*ttnpb.ApplicationIdentifiers{}, []string{"ids", "deleted_at"})
+			expiredApplications, err := st.FindApplications(
+				ctx, []*ttnpb.ApplicationIdentifiers{}, []string{"ids", "deleted_at"},
+			)
 			if err != nil {
 				return err
 			}
 			// Find expired users.
-			expiredUsers, err := userStore.FindUsers(ctx, []*ttnpb.UserIdentifiers{}, []string{"ids", "deleted_at"})
+			expiredUsers, err := st.FindUsers(ctx, []*ttnpb.UserIdentifiers{}, []string{"ids", "deleted_at"})
 			if err != nil {
 				return err
 			}
 			// Find expired organizations.
-			expiredOrganizations, err := organizationStore.FindOrganizations(ctx, []*ttnpb.OrganizationIdentifiers{}, []string{"ids", "deleted_at"})
+			expiredOrganizations, err := st.FindOrganizations(
+				ctx, []*ttnpb.OrganizationIdentifiers{}, []string{"ids", "deleted_at"},
+			)
 			if err != nil {
 				return err
 			}
 			// Find expired gateways.
-			expiredGateways, err := gatewayStore.FindGateways(ctx, []*ttnpb.GatewayIdentifiers{}, []string{"ids", "deleted_at"})
+			expiredGateways, err := st.FindGateways(ctx, []*ttnpb.GatewayIdentifiers{}, []string{"ids", "deleted_at"})
 			if err != nil {
 				return err
 			}
 			// Find expired clients.
-			expiredClients, err := clientStore.FindClients(ctx, []*ttnpb.ClientIdentifiers{}, []string{"ids", "deleted_at"})
+			expiredClients, err := st.FindClients(ctx, []*ttnpb.ClientIdentifiers{}, []string{"ids", "deleted_at"})
 			if err != nil {
 				return err
 			}
@@ -192,21 +197,21 @@ var (
 			logger.Info("Purging expired applications")
 			for _, ids := range expiredApplications {
 				// Delete related API keys before purging the application.
-				err = gormstore.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids.GetIds().GetEntityIdentifiers())
+				err = st.DeleteEntityAPIKeys(ctx, ids.GetIds().GetEntityIdentifiers())
 				if err != nil {
 					return err
 				}
 				// Delete related memberships before purging the application.
-				err = gormstore.GetMembershipStore(db).DeleteEntityMembers(ctx, ids.GetIds().GetEntityIdentifiers())
+				err = st.DeleteEntityMembers(ctx, ids.GetIds().GetEntityIdentifiers())
 				if err != nil {
 					return err
 				}
 				// Delete related contact info before purging the application.
-				err = gormstore.GetContactInfoStore(db).DeleteEntityContactInfo(ctx, ids.GetIds())
+				err = st.DeleteEntityContactInfo(ctx, ids.GetIds())
 				if err != nil {
 					return err
 				}
-				err = appStore.PurgeApplication(ctx, ids.GetIds())
+				err = st.PurgeApplication(ctx, ids.GetIds())
 				if err != nil {
 					return err
 				}
@@ -214,48 +219,48 @@ var (
 
 			logger.Info("Purging expired users")
 			for _, ids := range expiredUsers {
-				err = gormstore.GetContactInfoStore(db).DeleteEntityContactInfo(ctx, ids.GetIds())
+				err = st.DeleteEntityContactInfo(ctx, ids.GetIds())
 				if err != nil {
 					return err
 				}
 				// Delete related API keys before purging the user.
-				err = gormstore.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids.GetIds().GetEntityIdentifiers())
+				err = st.DeleteEntityAPIKeys(ctx, ids.GetIds().GetEntityIdentifiers())
 				if err != nil {
 					return err
 				}
-				err = gormstore.GetMembershipStore(db).DeleteAccountMembers(ctx, ids.GetIds().GetOrganizationOrUserIdentifiers())
+				err = st.DeleteAccountMembers(ctx, ids.GetIds().GetOrganizationOrUserIdentifiers())
 				if err != nil {
 					return err
 				}
-				err = gormstore.GetOAuthStore(db).DeleteUserAuthorizations(ctx, ids.GetIds())
+				err = st.DeleteUserAuthorizations(ctx, ids.GetIds())
 				if err != nil {
 					return err
 				}
-				err = gormstore.GetUserSessionStore(db).DeleteAllUserSessions(ctx, ids.GetIds())
+				err = st.DeleteAllUserSessions(ctx, ids.GetIds())
 				if err != nil {
 					return err
 				}
-				err = userStore.PurgeUser(ctx, ids.GetIds())
+				err = st.PurgeUser(ctx, ids.GetIds())
 				if err != nil {
 					return err
 				}
 			}
 			logger.Info("Purging expired organizations")
 			for _, ids := range expiredOrganizations {
-				err = gormstore.GetContactInfoStore(db).DeleteEntityContactInfo(ctx, ids.GetIds())
+				err = st.DeleteEntityContactInfo(ctx, ids.GetIds())
 				if err != nil {
 					return err
 				}
 				// Delete related API keys before purging the organization.
-				err = gormstore.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids.GetIds().GetEntityIdentifiers())
+				err = st.DeleteEntityAPIKeys(ctx, ids.GetIds().GetEntityIdentifiers())
 				if err != nil {
 					return err
 				}
-				err = gormstore.GetMembershipStore(db).DeleteAccountMembers(ctx, ids.GetIds().GetOrganizationOrUserIdentifiers())
+				err = st.DeleteAccountMembers(ctx, ids.GetIds().GetOrganizationOrUserIdentifiers())
 				if err != nil {
 					return err
 				}
-				err = organizationStore.PurgeOrganization(ctx, ids.GetIds())
+				err = st.PurgeOrganization(ctx, ids.GetIds())
 				if err != nil {
 					return err
 				}
@@ -263,21 +268,21 @@ var (
 			logger.Info("Purging expired gateways")
 			for _, ids := range expiredGateways {
 				// Delete related API keys before purging the gateway.
-				err = gormstore.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids.GetIds().GetEntityIdentifiers())
+				err = st.DeleteEntityAPIKeys(ctx, ids.GetIds().GetEntityIdentifiers())
 				if err != nil {
 					return err
 				}
 				// Delete related memberships before purging the gateway.
-				err = gormstore.GetMembershipStore(db).DeleteEntityMembers(ctx, ids.GetIds().GetEntityIdentifiers())
+				err = st.DeleteEntityMembers(ctx, ids.GetIds().GetEntityIdentifiers())
 				if err != nil {
 					return err
 				}
 				// Delete related contact info before purging the gateway.
-				err = gormstore.GetContactInfoStore(db).DeleteEntityContactInfo(ctx, ids.GetIds())
+				err = st.DeleteEntityContactInfo(ctx, ids.GetIds())
 				if err != nil {
 					return err
 				}
-				err = gatewayStore.PurgeGateway(ctx, ids.GetIds())
+				err = st.PurgeGateway(ctx, ids.GetIds())
 				if err != nil {
 					return err
 				}
@@ -285,21 +290,21 @@ var (
 			logger.Info("Purging expired clients")
 			for _, ids := range expiredClients {
 				// Delete related authorizations before purging the client.
-				err = gormstore.GetOAuthStore(db).DeleteClientAuthorizations(ctx, ids.GetIds())
+				err = st.DeleteClientAuthorizations(ctx, ids.GetIds())
 				if err != nil {
 					return err
 				}
 				// Delete related memberships before purging the client.
-				err = gormstore.GetMembershipStore(db).DeleteEntityMembers(ctx, ids.GetIds().GetEntityIdentifiers())
+				err = st.DeleteEntityMembers(ctx, ids.GetIds().GetEntityIdentifiers())
 				if err != nil {
 					return err
 				}
 				// Delete related contact info before purging the client.
-				err = gormstore.GetContactInfoStore(db).DeleteEntityContactInfo(ctx, ids.GetIds())
+				err = st.DeleteEntityContactInfo(ctx, ids.GetIds())
 				if err != nil {
 					return err
 				}
-				err = clientStore.PurgeClient(ctx, ids.GetIds())
+				err = st.PurgeClient(ctx, ids.GetIds())
 				if err != nil {
 					return err
 				}
@@ -312,18 +317,25 @@ var (
 		Short: "Create an EUI block in IS db (currently only DevEUI block supported)",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			logger.Info("Connecting to Identity Server database...")
-			db, err := gormstore.Open(ctx, config.IS.DatabaseURI)
+
+			db, err := store.OpenDB(ctx, config.IS.DatabaseURI)
+			if err != nil {
+				return err
+			}
+			bunDB := bun.NewDB(db, pgdialect.New())
+			st, err := bunstore.NewStore(ctx, bunDB)
 			if err != nil {
 				return err
 			}
 			defer db.Close()
+
 			useConfig, err := cmd.Flags().GetBool("use-config")
 			if err != nil {
 				return err
 			}
 			if useConfig {
 				logger.Info("Using config values...")
-				return gormstore.GetEUIStore(db).CreateEUIBlock(ctx, config.IS.DevEUIBlock.Prefix, config.IS.DevEUIBlock.InitCounter, "dev_eui")
+				return st.CreateEUIBlock(ctx, config.IS.DevEUIBlock.Prefix, config.IS.DevEUIBlock.InitCounter, "dev_eui")
 			}
 			prefix, err := cmd.Flags().GetString("prefix")
 			if err != nil {
@@ -343,7 +355,7 @@ var (
 			}
 			switch euiType {
 			case "dev_eui":
-				if err := gormstore.GetEUIStore(db).CreateEUIBlock(ctx, *euiPrefix, counter, euiType); err != nil {
+				if err := st.CreateEUIBlock(ctx, *euiPrefix, counter, euiType); err != nil {
 					return err
 				}
 				logger.Info("Block created successfully")

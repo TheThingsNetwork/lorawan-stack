@@ -21,9 +21,12 @@ import (
 
 	"github.com/howeyc/gopass"
 	"github.com/spf13/cobra"
+	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/dialect/pgdialect"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
+	bunstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/bunstore"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -37,7 +40,12 @@ var createAdminUserCommand = &cobra.Command{
 		defer cancel()
 
 		logger.Info("Connecting to Identity Server database...")
-		db, err := store.Open(ctx, config.IS.DatabaseURI)
+		db, err := store.OpenDB(ctx, config.IS.DatabaseURI)
+		if err != nil {
+			return err
+		}
+		bunDB := bun.NewDB(db, pgdialect.New())
+		st, err := bunstore.NewStore(ctx, bunDB)
 		if err != nil {
 			return err
 		}
@@ -94,10 +102,8 @@ var createAdminUserCommand = &cobra.Command{
 			Ids: &ttnpb.UserIdentifiers{UserId: userID},
 		}
 
-		usrStore := store.GetUserStore(db)
-
 		var usrExists bool
-		if _, err := usrStore.GetUser(ctx, usr.GetIds(), usrFieldMask); err == nil {
+		if _, err := st.GetUser(ctx, usr.GetIds(), usrFieldMask); err == nil {
 			usrExists = true
 		}
 		usr.PrimaryEmailAddress = email
@@ -109,13 +115,13 @@ var createAdminUserCommand = &cobra.Command{
 
 		if usrExists {
 			logger.Info("Updating user...")
-			if _, err = usrStore.UpdateUser(ctx, usr, usrFieldMask); err != nil {
+			if _, err = st.UpdateUser(ctx, usr, usrFieldMask); err != nil {
 				return err
 			}
 			logger.Info("Updated user")
 		} else {
 			logger.Info("Creating user...")
-			if _, err = usrStore.CreateUser(ctx, usr); err != nil {
+			if _, err = st.CreateUser(ctx, usr); err != nil {
 				return err
 			}
 			logger.Info("Created user")

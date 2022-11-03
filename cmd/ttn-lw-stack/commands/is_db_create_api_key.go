@@ -20,10 +20,13 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/dialect/pgdialect"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	is "go.thethings.network/lorawan-stack/v3/pkg/identityserver"
-	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
+	bunstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/bunstore"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -40,7 +43,13 @@ var createAPIKeyCommand = &cobra.Command{
 		defer cancel()
 
 		logger.Info("Connecting to Identity Server database...")
-		db, err := store.Open(ctx, config.IS.DatabaseURI)
+
+		db, err := store.OpenDB(ctx, config.IS.DatabaseURI)
+		if err != nil {
+			return err
+		}
+		bunDB := bun.NewDB(db, pgdialect.New())
+		st, err := bunstore.NewStore(ctx, bunDB)
 		if err != nil {
 			return err
 		}
@@ -69,12 +78,11 @@ var createAPIKeyCommand = &cobra.Command{
 			Ids: &ttnpb.UserIdentifiers{UserId: userID},
 		}
 		rights := []ttnpb.Right{ttnpb.Right_RIGHT_ALL}
-		apiKeyStore := store.GetAPIKeyStore(db)
 		key, token, err := is.GenerateAPIKey(ctx, name, expiryDate, rights...)
 		if err != nil {
 			return err
 		}
-		key, err = apiKeyStore.CreateAPIKey(ctx, usr.GetEntityIdentifiers(), key)
+		key, err = st.CreateAPIKey(ctx, usr.GetEntityIdentifiers(), key)
 		if err != nil {
 			return err
 		}
