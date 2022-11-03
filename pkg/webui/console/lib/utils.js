@@ -14,15 +14,13 @@
 
 /* eslint-disable import/prefer-default-export */
 
-import sharedMessages from '@ttn-lw/lib/shared-messages'
-
 import { unit as unitRegexp } from '@console/lib/regexp'
 
 export const units = [
-  { label: sharedMessages.milliseconds, value: 'ms' },
-  { label: sharedMessages.seconds, value: 's' },
-  { label: sharedMessages.minutes, value: 'm' },
-  { label: sharedMessages.hours, value: 'h' },
+  { label: 'milliseconds', value: 'ms' },
+  { label: 'seconds', value: 's' },
+  { label: 'minutes', value: 'm' },
+  { label: 'hours', value: 'h' },
 ]
 
 export const durationDecoder = duration => {
