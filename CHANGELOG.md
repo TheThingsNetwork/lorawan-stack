@@ -11,9 +11,14 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- The Things Join Server 2.0 (type `ttjsv2`) for claiming with Device Claiming Server.
+- All Join Servers with a `/64` JoinEUI prefix are contacted concurrently with LoRaWAN Backend Interfaces interoperability. This should only be used with ambiguous JoinEUIs and when migrating Join Servers.
+
 ### Changed
 
 ### Deprecated
+
+- The Things Join Server 1.0 (type `ttjs`) for claiming with Device Claiming Server. Use The Things Join Server 2.0 (type `ttjsv2`) instead.
 
 ### Removed
 
