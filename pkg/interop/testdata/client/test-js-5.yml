@@ -1,0 +1,14 @@
+fqdn: localhost
+port: 9184
+protocol: BI1.1
+sender-ns-id: '70B3D57ED0000001'
+paths:
+  app-s-key: test-app-s-key-path
+  home-ns: test-home-ns-path
+tls:
+  root-ca: ../rootCA.pem
+  certificate: ../clientcert.pem
+  key: ../clientkey.pem
+headers:
+  Authorization: Custom foo bar
+  TestHeader: baz

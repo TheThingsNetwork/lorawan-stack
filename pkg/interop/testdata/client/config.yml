@@ -4,6 +4,7 @@ join-servers:
       - 0000000000000000/0
       - 70b3d57ed0001000/52
 
+  # Selected in tests
   - file: foo/test-js-2.yml
     join-euis:
       - 70b3d57ed0000000/40
@@ -13,7 +14,15 @@ join-servers:
       - 70b3d57ed0000000/39
       - 70b3d83ed0000000/30
 
+  # Selected in tests
   - file: test-js-4.yml
     components: [ns, as]
     join-euis:
       - ec656e0000000000/24
+      - ec656e0000000001/64
+
+  # Selected in tests; this one races with test-js-4 on EC656E0000000001
+  - file: test-js-5.yml
+    components: [ns, as]
+    join-euis:
+      - ec656e0000000001/64
