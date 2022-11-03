@@ -275,6 +275,9 @@ const m = defineMessages({
 
   filterEventDataDescription:
     'By default, the data pushed to your webhook contains a vast variety details and metadata related to the event. To avoid noise and to save bandwidth, you can filter the event data by specific paths, e.g. `up.uplink_message.decoded_payload`. Your webhook will then only receive the event data that passed the filter.',
+
+  inputMethodDescription:
+    'To register the device, we need to know the exact LoRaWAN specifications that the device adheres to. To do that, you can select your device in our extensive LoRaWAN Device Repository, which is the best way to ensure proper configuration. If your device is not listed in the repository, you can also provide versions and MAC configurations manually. Please refer to the manual and/or data sheet of your device and contact your manufacturer or reseller if you are unsure about a certain config.',
 })
 
 const descriptions = Object.freeze({
@@ -534,6 +537,9 @@ const descriptions = Object.freeze({
   [TOOLTIP_IDS.LORA_CLOUD_MODEM_ENCODING]: {
     description: m.loraCloudModemEncodingDescription,
   },
+  [TOOLTIP_IDS.INPUT_METHOD]: {
+    description: m.inputMethodDescription,
+  },
 })
 
 const links = Object.freeze({
@@ -579,6 +585,9 @@ const links = Object.freeze({
   [TOOLTIP_IDS.LORA_CLOUD_MODEM_ENCODING]: {
     externalUrl:
       'https://github.com/Lora-net/lr1110_evk_demo_app/wiki/Command-tool---Node-RED-application-server-example#building-tlv-payload',
+  },
+  [TOOLTIP_IDS.INPUT_METHOD]: {
+    documentationPath: '/devices/adding-devices/',
   },
 })
 

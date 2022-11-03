@@ -78,4 +78,5 @@ export default Object.freeze({
   STATUS_COUNT_PERIODICITY: 'status-count-periodicity',
   STATUS_TIME_PERIODICITY: 'status-time-periodicity',
   UPDATE_LOCATION_FROM_STATUS: 'update-location-from-status',
+  INPUT_METHOD: 'input-method',
 })

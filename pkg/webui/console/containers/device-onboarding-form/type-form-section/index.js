@@ -19,6 +19,8 @@ import Radio from '@ttn-lw/components/radio-button'
 import Form, { useFormContext } from '@ttn-lw/components/form'
 import PortalledModal from '@ttn-lw/components/modal/portalled'
 
+import TOOLTIP_IDS from '@ttn-lw/lib/constants/tooltip-ids'
+
 import m from '../messages'
 import { hasCompletedDeviceRepositorySelection, hasSelectedDeviceRepositoryOther } from '../utils'
 
@@ -94,6 +96,7 @@ const DeviceTypeFormSection = () => {
         value={_inputMethod}
         name="_inputMethod"
         valueSetter={handleInputMethodChange}
+        tooltipId={TOOLTIP_IDS.INPUT_METHOD}
       >
         <Radio label={m.inputMethodDeviceRepo} value="device-repository" />
         <Radio label={m.inputMethodManual} value="manual" />
