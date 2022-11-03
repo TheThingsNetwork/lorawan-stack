@@ -142,9 +142,9 @@ const ProfileEditForm = () => {
   const handleSubmit = useCallback(
     async (values, { setSubmitting, resetForm }) => {
       setError(undefined)
-      let patch = diff(user, validationSchema.cast(values, { context: validationContext }), [
-        '_profile_picture_source',
-      ])
+      let patch = diff(user, validationSchema.cast(values, { context: validationContext }), {
+        exclude: ['_profile_picture_source'],
+      })
       if (Object.keys(patch).length === 0) {
         patch = { ...values }
         delete patch.profile_picture

@@ -78,7 +78,7 @@ const OrganizationUpdateForm = ({ onDeleteSuccess }) => {
       try {
         setError()
 
-        const changed = diff(organization, updated, ['created_at', 'updated_at'])
+        const changed = diff(organization, updated, { exclude: ['created_at', 'updated_at'] })
         await dispatch(attachPromise(updateOrganization(orgId, changed)))
 
         toast({
