@@ -89,6 +89,7 @@ const DeviceBulkCreateFormInner = props => {
   const {
     values: { format_id, _inputMethod, frequency_plan_id, lorawan_version },
   } = useFormikContext()
+  console.log(useFormikContext().values)
   const formatSelected = Boolean(format_id)
   const [allowedFileExtensions, setAllowedFileExtensions] = useState(undefined)
   const [formatDescription, setFormatDescription] = useState(undefined)
