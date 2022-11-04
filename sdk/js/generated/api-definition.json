@@ -2240,6 +2240,7 @@
         {
           "method": "delete",
           "pattern": "/edcs/claim/{application_ids.application_id}/devices/{device_id}",
+          "body": "*",
           "parameters": [
             "application_ids.application_id",
             "device_id"
