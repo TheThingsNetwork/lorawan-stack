@@ -68,9 +68,7 @@ const validationSchema = Yup.object()
     data: Yup.object().shape({
       token: Yup.string().required(sharedMessages.validateRequired),
       use_tlv_encoding: Yup.boolean(),
-      server_url: Yup.string()
-        .url(sharedMessages.validateUrl)
-        .required(sharedMessages.validateRequired),
+      server_url: Yup.string().url(sharedMessages.validateUrl),
       f_port_set: Yup.string()
         .transform(value => {
           let returning = value

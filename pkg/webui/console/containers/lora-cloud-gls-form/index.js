@@ -81,9 +81,7 @@ const validationSchema = Yup.object()
         .oneOf(LORACLOUD_GLS_QUERY_VALUES)
         .default(LORACLOUD_GLS_QUERY_TYPES.TOARSSI)
         .required(sharedMessages.validateRequired),
-      server_url: Yup.string()
-        .url(sharedMessages.validateUrl)
-        .required(sharedMessages.validateRequired),
+      server_url: Yup.string().url(sharedMessages.validateUrl),
       multi_frame: Yup.boolean().when('query', {
         is: LORACLOUD_GLS_QUERY_TYPES.TOARSSI,
         then: schema => schema.default(false).required(sharedMessages.validateRequired),
