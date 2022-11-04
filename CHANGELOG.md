@@ -47,6 +47,7 @@ For details about compatibility between different releases, see the **Commitment
   - Do not ask for a JoinEUI.
   - Reinitialize form properly when switching between ABP and OTAA.
 - Issue with pasting values into byte input at the wrong position in the Console.
+- Issue with updating field masks in the webhook edit form in the Console.
 
 ## [3.22.1] - 2022-10-19
 

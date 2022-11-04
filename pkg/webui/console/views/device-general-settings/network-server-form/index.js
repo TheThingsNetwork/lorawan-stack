@@ -251,17 +251,19 @@ const NetworkServerForm = React.memo(props => {
         stripUnknown: true,
       })
 
-      const updatedValues = diff(device, castedValues, [
-        '_activation_mode',
-        '_device_classes',
-        'class_b',
-        'class_c',
-        'mac_settings',
-        'f_nwk_s_int_key',
-        's_nwk_s_int_key',
-        'nwk_s_enc_key',
-        'app_s_key',
-      ])
+      const updatedValues = diff(device, castedValues, {
+        exclude: [
+          '_activation_mode',
+          '_device_classes',
+          'class_b',
+          'class_c',
+          'mac_settings',
+          'f_nwk_s_int_key',
+          's_nwk_s_int_key',
+          'nwk_s_enc_key',
+          'app_s_key',
+        ],
+      })
 
       const patch = updatedValues
       // Always submit current `mac_settings` values to avoid overwriting nested entries.

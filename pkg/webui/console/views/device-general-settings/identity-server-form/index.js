@@ -117,7 +117,7 @@ const IdentityServerForm = React.memo(props => {
         delete castedValues.attributes
       }
 
-      const updatedValues = diff(initialValues, castedValues, ['_external_js'])
+      const updatedValues = diff(initialValues, castedValues, { exclude: ['_external_js'] })
 
       const update =
         'attributes' in updatedValues ? { ...updatedValues, attributes } : updatedValues
