@@ -31,3 +31,4 @@ export const unit = new RegExp('[a-zA-Z]{1,}')
 export const emptyDuration = /^[a-zA-z]+$/
 export const delay = new RegExp('^[0-9]{1,}[.]?([0-9]{1,})?[a-zA-Z]{1,2}$')
 export const apiKeyPath = '([A-Z0-9]{39})' // To be used within router paths.
+export const duration = /^[0-9]+([a-z])$/

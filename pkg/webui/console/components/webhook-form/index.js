@@ -44,7 +44,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
-import { apiKey as webhookAPIKeyRegexp, unit as unitRegexp } from '@console/lib/regexp'
+import { apiKey as webhookAPIKeyRegexp, duration as durationRegExp } from '@console/lib/regexp'
 
 import {
   blankValues,
@@ -54,11 +54,11 @@ import {
   encodeMessageType,
 } from './mapping'
 
-const units = [
-  { unit: 'second', value: 's' },
-  { unit: 'minute', value: 'm' },
-  { unit: 'hour', value: 'h' },
-]
+const units = {
+  s: 'second',
+  m: 'minute',
+  h: 'hour',
+}
 
 const pathPlaceholder = '/path/to/webhook'
 
@@ -379,13 +379,11 @@ export default class WebhookForm extends Component {
       isUnhealthyWebhook,
       error,
     } = this.props
-    let retryIntervalValue
-    let retryIntervalIntlUnit
-    if (webhookRetryInterval) {
-      retryIntervalValue = webhookRetryInterval.split(unitRegexp)[0]
-      const retryIntervalUnit = webhookRetryInterval.split(retryIntervalValue)[1]
-      retryIntervalIntlUnit = units.find(({ value }) => value === retryIntervalUnit).unit
-    }
+
+    const retryIntervalValue = webhookRetryInterval?.match(durationRegExp)[0]
+    const retryIntervalUnit = webhookRetryInterval?.match(durationRegExp)[1]
+    const retryIntervalIntlUnit = units[retryIntervalUnit]
+
     let initialValues = blankValues
     if (update && initialWebhookValue) {
       initialValues = decodeValues({ ...blankValues, ...initialWebhookValue })
