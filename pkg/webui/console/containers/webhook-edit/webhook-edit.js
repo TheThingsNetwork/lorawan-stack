@@ -41,6 +41,8 @@ const WebhookEdit = props => {
     healthStatusEnabled,
     webhookId,
     updateHealthStatus,
+    isUnhealthyWebhook,
+    webhookRetryInterval,
   } = props
 
   const handleUpdateWebhook = React.useCallback(
@@ -119,6 +121,8 @@ const WebhookEdit = props => {
       onReactivate={handleReactivate}
       onReactivateSuccess={handleReactivateSuccess}
       healthStatusEnabled={healthStatusEnabled}
+      webhookRetryInterval={webhookRetryInterval}
+      isUnhealthyWebhook={isUnhealthyWebhook}
       error={error}
     />
   )
@@ -127,16 +131,19 @@ const WebhookEdit = props => {
 WebhookEdit.propTypes = {
   appId: PropTypes.string.isRequired,
   healthStatusEnabled: PropTypes.bool.isRequired,
+  isUnhealthyWebhook: PropTypes.bool.isRequired,
   navigateToList: PropTypes.func.isRequired,
   selectedWebhook: PropTypes.webhook.isRequired,
   updateHealthStatus: PropTypes.func.isRequired,
   updateWebhook: PropTypes.func.isRequired,
   webhookId: PropTypes.string.isRequired,
+  webhookRetryInterval: PropTypes.string,
   webhookTemplate: PropTypes.webhookTemplate,
 }
 
 WebhookEdit.defaultProps = {
   webhookTemplate: undefined,
+  webhookRetryInterval: null,
 }
 
 export default WebhookEdit

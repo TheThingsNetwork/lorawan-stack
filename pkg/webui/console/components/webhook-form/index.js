@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, { Component } from 'react'
-import { defineMessages } from 'react-intl'
+import { defineMessages, FormattedRelativeTime } from 'react-intl'
 import bind from 'autobind-decorator'
 import { uniq } from 'lodash'
 
@@ -44,7 +44,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
-import { apiKey as webhookAPIKeyRegexp } from '@console/lib/regexp'
+import { apiKey as webhookAPIKeyRegexp, duration as durationRegExp } from '@console/lib/regexp'
 
 import {
   blankValues,
@@ -53,6 +53,12 @@ import {
   decodeMessageType,
   encodeMessageType,
 } from './mapping'
+
+const units = {
+  s: 'second',
+  m: 'minute',
+  h: 'hour',
+}
 
 const pathPlaceholder = '/path/to/webhook'
 
@@ -75,7 +81,7 @@ const m = defineMessages({
   createErrorTitle: 'Could not create webhook',
   reactivateButtonMessage: 'Reactivate',
   suspendedWebhookMessage:
-    'This webhook has been deactivated due to several unsuccessful forwarding attempts. It will be automatically reactivated after 24 hours. If you wish to reactivate right away, you can use the button below.',
+    'This webhook has been deactivated due to several unsuccessful forwarding attempts. It will be automatically reactivated after {webhookRetryInterval}. If you wish to reactivate right away, you can use the button below.',
   pendingInfo:
     'This webhook is currently pending until attempting its first regular request attempt. Note that webhooks can be restricted if they encounter too many request failures.',
   messagePathValidateTooLong: 'Enabled message path must be at most 64 characters',
@@ -246,6 +252,7 @@ export default class WebhookForm extends Component {
         Authorization: PropTypes.string,
       }),
     }),
+    isUnhealthyWebhook: PropTypes.bool,
     onDelete: PropTypes.func,
     onDeleteFailure: PropTypes.func,
     onDeleteSuccess: PropTypes.func,
@@ -253,6 +260,7 @@ export default class WebhookForm extends Component {
     onReactivateSuccess: PropTypes.func,
     onSubmit: PropTypes.func.isRequired,
     update: PropTypes.bool.isRequired,
+    webhookRetryInterval: PropTypes.string,
     webhookTemplate: PropTypes.webhookTemplate,
   }
 
@@ -267,6 +275,8 @@ export default class WebhookForm extends Component {
     healthStatusEnabled: false,
     error: undefined,
     existCheck: () => null,
+    webhookRetryInterval: null,
+    isUnhealthyWebhook: false,
   }
 
   form = React.createRef()
@@ -360,7 +370,20 @@ export default class WebhookForm extends Component {
   }
 
   render() {
-    const { update, initialWebhookValue, webhookTemplate, healthStatusEnabled, error } = this.props
+    const {
+      update,
+      initialWebhookValue,
+      webhookTemplate,
+      healthStatusEnabled,
+      webhookRetryInterval,
+      isUnhealthyWebhook,
+      error,
+    } = this.props
+
+    const retryIntervalValue = webhookRetryInterval?.match(durationRegExp)[0]
+    const retryIntervalUnit = webhookRetryInterval?.match(durationRegExp)[1]
+    const retryIntervalIntlUnit = units[retryIntervalUnit]
+
     let initialValues = blankValues
     if (update && initialWebhookValue) {
       initialValues = decodeValues({ ...blankValues, ...initialWebhookValue })
@@ -368,11 +391,7 @@ export default class WebhookForm extends Component {
 
     const hasTemplate = Boolean(webhookTemplate)
 
-    const mayReactivate =
-      update &&
-      initialWebhookValue &&
-      initialWebhookValue.health_status &&
-      initialWebhookValue.health_status.unhealthy
+    const mayReactivate = update && initialWebhookValue && isUnhealthyWebhook
 
     const isPending =
       healthStatusEnabled &&
@@ -403,6 +422,15 @@ export default class WebhookForm extends Component {
           <Notification
             warning
             content={m.suspendedWebhookMessage}
+            messageValues={{
+              webhookRetryInterval: (
+                <FormattedRelativeTime
+                  style="long"
+                  value={retryIntervalValue}
+                  unit={retryIntervalIntlUnit}
+                />
+              ),
+            }}
             children={
               <Button
                 onClick={this.handleReactivate}
