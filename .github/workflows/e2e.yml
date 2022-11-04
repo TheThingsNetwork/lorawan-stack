@@ -27,6 +27,7 @@ env:
   CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
   CYPRESS_FAIL_FAST: true
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  ACTIONS_RUNNER_DEBUG: true
 jobs:
   determine-if-required:
     name: Determine if run is required
