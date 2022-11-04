@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.22.2] - unreleased
+
+### Added
+
 - The `is.gormstore` experimental flag has been added. Swaps the underlying Identity Server store implementation if set to true.
 
 ### Changed
@@ -20,8 +34,6 @@ For details about compatibility between different releases, see the **Commitment
   - The downlinks will be evicted from the downlink queue and a downlink failure event will be generated. The failure event can be observed by the application using the `downlink_failed` message, which is available in all integrations.
 - Event history and payload storage TTL has now 1% jitter.
 - The underlying store implementation has been changed to be by default based on `bun` instead of `gorm`. The previous store implementation can be reactivated using the `is.gormstore` experimental flag.
-
-### Deprecated
 
 ### Removed
 
@@ -35,8 +47,6 @@ For details about compatibility between different releases, see the **Commitment
   - Do not ask for a JoinEUI.
   - Reinitialize form properly when switching between ABP and OTAA.
 - Issue with pasting values into byte input at the wrong position in the Console.
-
-### Security
 
 ## [3.22.1] - 2022-10-19
 
@@ -2393,7 +2403,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.22.1...v3.22
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.22.2...v3.22
+[3.22.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.22.1...v3.22.2
 [3.22.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.22.0...v3.22.1
 [3.22.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.21.2...v3.22.0
 [3.21.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.21.1...v3.21.2
