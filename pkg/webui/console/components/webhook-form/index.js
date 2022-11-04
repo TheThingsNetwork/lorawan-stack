@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, { Component } from 'react'
-import { defineMessages } from 'react-intl'
+import { defineMessages, FormattedRelativeTime } from 'react-intl'
 import bind from 'autobind-decorator'
 import { uniq } from 'lodash'
 
@@ -44,8 +44,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
-import { durationDecoder } from '@console/lib/utils'
-import { apiKey as webhookAPIKeyRegexp } from '@console/lib/regexp'
+import { apiKey as webhookAPIKeyRegexp, unit as unitRegexp } from '@console/lib/regexp'
 
 import {
   blankValues,
@@ -54,6 +53,12 @@ import {
   decodeMessageType,
   encodeMessageType,
 } from './mapping'
+
+const units = [
+  { unit: 'second', value: 's' },
+  { unit: 'minute', value: 'm' },
+  { unit: 'hour', value: 'h' },
+]
 
 const pathPlaceholder = '/path/to/webhook'
 
@@ -374,6 +379,13 @@ export default class WebhookForm extends Component {
       isUnhealthyWebhook,
       error,
     } = this.props
+    let retryIntervalValue
+    let retryIntervalIntlUnit
+    if (webhookRetryInterval) {
+      retryIntervalValue = webhookRetryInterval.split(unitRegexp)[0]
+      const retryIntervalUnit = webhookRetryInterval.split(retryIntervalValue)[1]
+      retryIntervalIntlUnit = units.find(({ value }) => value === retryIntervalUnit).unit
+    }
     let initialValues = blankValues
     if (update && initialWebhookValue) {
       initialValues = decodeValues({ ...blankValues, ...initialWebhookValue })
@@ -411,9 +423,15 @@ export default class WebhookForm extends Component {
         {mayReactivate && (
           <Notification
             warning
-            content={{
-              ...m.suspendedWebhookMessage,
-              values: { webhookRetryInterval: durationDecoder(webhookRetryInterval) },
+            content={m.suspendedWebhookMessage}
+            messageValues={{
+              webhookRetryInterval: (
+                <FormattedRelativeTime
+                  style="long"
+                  value={retryIntervalValue}
+                  unit={retryIntervalIntlUnit}
+                />
+              ),
             }}
             children={
               <Button
