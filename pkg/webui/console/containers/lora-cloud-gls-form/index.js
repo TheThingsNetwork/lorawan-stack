@@ -133,8 +133,9 @@ const LoRaCloudGLSForm = () => {
     selectApplicationPackageDefaultAssociation(state, LORA_CLOUD_GLS.DEFAULT_PORT),
   )
   const packageError = useSelector(selectGetApplicationPackagesError)
-  const initialValues = validationSchema.cast(defaultAssociation || defaultValues)
-
+  const initialValues = validationSchema.cast(
+    defaultAssociation ? { server_url: '', ...defaultAssociation } : defaultValues,
+  )
   const handleSubmit = useCallback(
     async values => {
       try {
