@@ -39,6 +39,12 @@ var goModuleEnv = map[string]string{
 
 var goTags = os.Getenv("GO_TAGS")
 
+const (
+	gofumpt      = "mvdan.cc/gofumpt@v0.4.0"
+	golangciLint = "github.com/golangci/golangci-lint/cmd/golangci-lint@v1.50.1"
+	goveralls    = "github.com/mattn/goveralls@v0.0.11"
+)
+
 func buildGoArgs(cmd string, args ...string) []string {
 	if goTags != "" {
 		args = append([]string{fmt.Sprintf("-tags=%s", goTags)}, args...)
@@ -116,7 +122,8 @@ func (Go) CheckVersion() error {
 	current := semver.Version{Major: uint64(major), Minor: uint64(minor), Patch: uint64(patch)}
 	min, _ := semver.Parse(minGoVersion)
 	if current.LT(min) {
-		return fmt.Errorf("Your version of Go (%s) is not supported. Please install Go %s or later", versionStr, minGoVersion)
+		return fmt.Errorf("Your version of Go (%s) is not supported. Please install Go %s or later",
+			versionStr, minGoVersion)
 	}
 	return nil
 }
@@ -160,7 +167,7 @@ func (g Go) Fmt() error {
 	if mg.Verbose() {
 		fmt.Printf("Formatting and simplifying %d Go packages\n", len(dirs))
 	}
-	return runGoTool(append([]string{"mvdan.cc/gofumpt@latest", "-w"}, dirs...)...)
+	return runGoTool(append([]string{gofumpt, "-w"}, dirs...)...)
 }
 
 // Lint lints all Go files.
@@ -175,13 +182,13 @@ func (g Go) Lint() error {
 	if mg.Verbose() {
 		fmt.Printf("Linting %d Go packages\n", len(dirs))
 	}
-	return runGoTool(append([]string{"github.com/golangci/golangci-lint/cmd/golangci-lint@latest", "run"}, dirs...)...)
+	return runGoTool(append([]string{golangciLint, "run"}, dirs...)...)
 }
 
 // Quality runs code quality checks on Go files.
 func (g Go) Quality() {
 	mg.Deps(g.Fmt)
-	g.Lint() // Errors are allowed.
+	_ = g.Lint() // Errors are allowed.
 }
 
 func init() {
@@ -274,15 +281,15 @@ nextLine:
 	if mg.Verbose() {
 		fmt.Println("Sending Go coverage to Coveralls")
 	}
-	return runGoTool("github.com/mattn/goveralls", "-coverprofile=coveralls_"+goCoverageFile, "-service="+service)
+	return runGoTool(goveralls, "-coverprofile=coveralls_"+goCoverageFile, "-service="+service)
 }
 
 // Generate runs go generate.
-func (g Go) Generate() error {
+func (Go) Generate() error {
 	return execGo(os.Stdout, os.Stderr, "generate", "./...")
 }
 
 // Messages builds the file with translatable messages in Go code.
-func (g Go) Messages() error {
+func (Go) Messages() error {
 	return runGoTool("generate_i18n.go")
 }
