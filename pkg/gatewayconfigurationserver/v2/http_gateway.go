@@ -183,7 +183,7 @@ func (s *Server) ttkgFirmwareURL(updateChannel string) string {
 	}
 	firmwareBaseURL := s.ttgConfig.Default.FirmwareURL
 	if firmwareBaseURL == "" {
-		firmwareBaseURL = "https://thethingsproducts.blob.core.windows.net/the-things-gateway/v1"
+		firmwareBaseURL = "https://ttkg-fw.thethingsindustries.com/v1"
 	}
 	return fmt.Sprintf("%s/%s", firmwareBaseURL, updateChannel)
 }
