@@ -51,7 +51,7 @@ require (
 	github.com/Azure/go-autorest/autorest/adal v0.9.18
 	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/TheThingsIndustries/mystique v0.0.0-20211230093812-d4088bd06959
-	github.com/TheThingsIndustries/protoc-gen-go-flags v1.0.0
+	github.com/TheThingsIndustries/protoc-gen-go-flags v1.0.6
 	github.com/TheThingsIndustries/protoc-gen-go-json v1.4.0
 	github.com/TheThingsNetwork/go-cayenne-lib v1.1.0
 	github.com/aws/aws-sdk-go v1.42.53
@@ -71,7 +71,7 @@ require (
 	github.com/golang/gddo v0.0.0-20210115222349-20d68f94ee1f
 	// NOTE: github.com/golang/protobuf is actually a different version (see above).
 	github.com/golang/protobuf v1.5.2
-	github.com/google/go-cmp v0.5.8
+	github.com/google/go-cmp v0.5.9
 	github.com/gorilla/csrf v1.7.1
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/mux v1.8.0
@@ -267,7 +267,7 @@ require (
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/api v0.61.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/protobuf v1.28.0 // indirect
+	google.golang.org/protobuf v1.28.1 // indirect
 	// NOTE: gopkg.in/DATA-DOG/go-sqlmock.v1 is actually a different version (see above).
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.0.0-00010101000000-000000000000 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
