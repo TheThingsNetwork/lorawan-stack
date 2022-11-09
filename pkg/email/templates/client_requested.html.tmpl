@@ -11,8 +11,8 @@ Your review is required for a newly registered OAuth client.
 Dear {{ .ReceiverName }},
 </p>
 <p>
-User <code>{{ .Notification.SenderIds.IDString }}</code> just registered a new OAuth client under {{ .Collaborator.EntityType }} <code>{{ .Collaborator.IDString }}</code> on <b>{{ .Network.Name }}</b>.
-Since user <code>{{ .Notification.SenderIds.IDString }}</code> is not an admin, you need to approve this client before it can be used.
+{{ .SenderType }} <code>{{ .Sender }}</code> just registered a new OAuth client under {{ .Collaborator.EntityType }} <code>{{ .Collaborator.IDString }}</code> on <b>{{ .Network.Name }}</b>.
+Since {{ .SenderTypeMidSentence }} <code>{{ .Sender }}</code> is not an admin, you need to approve this client before it can be used.
 </p>
 
 <p>
