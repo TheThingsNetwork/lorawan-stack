@@ -80,8 +80,6 @@ export default class ByteInput extends React.Component {
     unbounded: false,
   }
 
-  input = React.createRef()
-
   static validate(value, props) {
     const { min = 0, max = 256 } = props
     const len = Math.floor(value.length / 2)
@@ -103,7 +101,7 @@ export default class ByteInput extends React.Component {
     } = this.props
 
     const valueLength = clean(value).length || 0
-    const calculatedMax = max || Math.max(Math.floor(valueLength / 2) + 1, 1)
+    const calculatedMax = max || (unbounded ? 1000 : Math.max(Math.floor(valueLength / 2) + 1, 1))
 
     return (
       <MaskedInput
@@ -179,13 +177,11 @@ export default class ByteInput extends React.Component {
 
   @bind
   onPaste(evt) {
-    const { min, showPerChar, unbounded } = this.props
+    const { unbounded } = this.props
     const val = evt.target.value
     if (unbounded) {
-      evt.preventDefault()
-      this.input.current.inputElement.value = evt.clipboardData.getData('text/plain')
-      mask(min, evt.clipboardData.getData('text/plain').length, showPerChar)
-      this.onChange(evt)
+      // To make sure it's possible to paste in the middle of the value.
+      // This way the cursor behaves as expected.
     } else if (evt.target.selectionStart === evt.target.selectionEnd) {
       // To avoid the masked input from cutting off characters when the cursor
       // is placed in the mask placeholders, the placeholder chars are removed before
