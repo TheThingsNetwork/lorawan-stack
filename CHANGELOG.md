@@ -18,9 +18,9 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Deprecated
 
-- The Things Join Server 1.0 (type `ttjs`) for claiming with Device Claiming Server. Use The Things Join Server 2.0 (type `ttjsv2`) instead.
-
 ### Removed
+
+- The Things Join Server 1.0 (type `ttjs`) for claiming with Device Claiming Server. Use The Things Join Server 2.0 (type `ttjsv2`) instead.
 
 ### Fixed
 

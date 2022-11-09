@@ -24,11 +24,11 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
-	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices/ttjsv1"
 	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices/ttjsv2"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -57,11 +57,8 @@ type Component interface {
 }
 
 const (
-	ttjsType   = "ttjs" // TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/5911)
 	ttjsV2Type = "ttjsv2"
 )
-
-var errInvalidUpstream = errors.DefineInvalidArgument("invalid_upstream", "upstream `{type}` is invalid")
 
 // Upstream abstracts EndDeviceClaimingServer.
 type Upstream struct {
@@ -105,21 +102,6 @@ func NewUpstream(ctx context.Context, conf Config, c Component, opts ...Option) 
 
 		var claimer EndDeviceClaimer
 		switch js.Type {
-		case ttjsType: // TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/5911)
-			var cfg ttjsv1.Config
-			if err := yaml.UnmarshalStrict(configBytes, &cfg); err != nil {
-				return nil, err
-			}
-			cfg.NetID = conf.NetID
-			cfg.JoinEUIPrefixes = js.JoinEUIs
-			cfg.NetworkServer.Hostname = conf.NetworkServer.Hostname
-			if conf.NetworkServer.HomeNSID != nil {
-				cfg.NetworkServer.HomeNSID = *conf.NetworkServer.HomeNSID
-			}
-			claimer, err = cfg.NewClient(ctx, c)
-			if err != nil {
-				return nil, err
-			}
 		case ttjsV2Type:
 			var cfg ttjsv2.Config
 			if err := yaml.UnmarshalStrict(configBytes, &cfg); err != nil {
@@ -134,7 +116,8 @@ func NewUpstream(ctx context.Context, conf Config, c Component, opts ...Option) 
 				return nil, err
 			}
 		default:
-			return nil, errInvalidUpstream.WithAttributes("type", js.Type)
+			log.FromContext(ctx).WithField("type", js.Type).Warn("Unknown Join Server type")
+			continue
 		}
 
 		// The file for each client will be unique.

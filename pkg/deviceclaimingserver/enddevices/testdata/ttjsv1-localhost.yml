@@ -1,6 +1,0 @@
-claiming-api-version: 'v1'
-url: http://localhost:3000
-tenant-id: test
-basic-auth:
-  username: 'localhost'
-  password: 'secret'

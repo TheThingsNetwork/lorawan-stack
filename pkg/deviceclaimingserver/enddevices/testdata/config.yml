@@ -1,9 +1,4 @@
 join-servers:
-  - file: ttjsv1-localhost.yml
-    join-euis:
-      - 800000000000000C/64
-    type: ttjs
-
   - file: ttjsv2-localhost.yml
     join-euis:
       - 800000000000000C/64
