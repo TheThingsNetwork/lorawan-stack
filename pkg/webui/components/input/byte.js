@@ -18,6 +18,7 @@ import bind from 'autobind-decorator'
 import MaskedInput from 'react-text-mask'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import { warn } from '@ttn-lw/lib/log'
 
 import style from './input.styl'
 
@@ -102,8 +103,15 @@ export default class ByteInput extends React.Component {
       ...rest
     } = this.props
 
-    const valueLength = clean(value).length || 0
-    const calculatedMax = max || Math.max(Math.floor(valueLength / 2) + 1, 1)
+    // Instead of calculating the max width dynamically, which leads to various issues,
+    // it's better to use a high max value for unbounded inputs instead.
+    const calculatedMax = max || 4096
+
+    if (!unbounded && typeof max !== 'number') {
+      warn(
+        'Byte input has been setup without `max` prop. Always use a max prop unless using `unbounded`',
+      )
+    }
 
     return (
       <MaskedInput
@@ -130,10 +138,12 @@ export default class ByteInput extends React.Component {
 
   @bind
   onChange(evt) {
-    const { value: oldValue } = this.props
+    const { value: oldValue, unbounded } = this.props
     const data = evt?.nativeEvent?.data
 
-    let value = clean(evt.target.value)
+    // Clean the value for unbounded inputs, to prevent adding bytes after
+    // placeholders instead of at the end of the current values.
+    let value = unbounded ? evt.target.value : clean(evt.target.value)
 
     // Make sure values entered at the end of the input (with placeholders)
     // are added as expected. `selectionStart` cannot be used due to
@@ -179,38 +189,33 @@ export default class ByteInput extends React.Component {
 
   @bind
   onPaste(evt) {
-    const { min, showPerChar, unbounded } = this.props
+    // Ignore empty pastes.
+    if (evt?.clipboardData?.getData('text/plain')?.length === 0) {
+      return
+    }
+    const { unbounded } = this.props
     const val = evt.target.value
-    if (unbounded) {
-      evt.preventDefault()
-      this.input.current.inputElement.value = evt.clipboardData.getData('text/plain')
-      mask(min, evt.clipboardData.getData('text/plain').length, showPerChar)
-      this.onChange(evt)
-    } else if (evt.target.selectionStart === evt.target.selectionEnd) {
-      // To avoid the masked input from cutting off characters when the cursor
-      // is placed in the mask placeholders, the placeholder chars are removed before
-      // the paste is applied, unless the user made a selection to paste into.
-      // This will ensure a consistent pasting experience.
+    const cleanedSelection = clean(
+      val.substr(
+        evt.target.selectionStart,
+        Math.max(1, evt.target.selectionEnd - evt.target.selectionStart),
+      ),
+    )
+
+    // To avoid the masked input from cutting off characters when the cursor
+    // is placed in the mask placeholders, the placeholder chars are removed before
+    // the paste is applied, unless the user made a selection to paste into.
+    // This will ensure a consistent pasting experience.
+    if (!unbounded && cleanedSelection === '') {
       evt.target.value = val.replace(voidChars, '')
     }
   }
 
   @bind
   onCut(evt) {
-    const input = evt.target
-    const value = input.value.substr(
-      input.selectionStart,
-      input.selectionEnd - input.selectionStart,
-    )
-    evt.clipboardData.setData('text/plain', clean(value))
     evt.preventDefault()
-
-    // Emit the cut value.
-    const cut = input.value.substr(0, input.selectionStart) + input.value.substr(input.selectionEnd)
-    this.onChange({
-      target: {
-        value: cut,
-      },
-    })
+    // Recreate cut action by deleting and reusing copy handler.
+    document.execCommand('copy')
+    document.execCommand('delete')
   }
 }
