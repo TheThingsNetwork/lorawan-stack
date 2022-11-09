@@ -174,7 +174,9 @@ func (upstream *Upstream) joinEUIClaimer(ctx context.Context, joinEUI types.EUI6
 }
 
 // Claim implements EndDeviceClaimingServer.
-func (upstream *Upstream) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, claimAuthenticationCode string) error {
+func (upstream *Upstream) Claim(
+	ctx context.Context, joinEUI, devEUI types.EUI64, claimAuthenticationCode string,
+) error {
 	claimer := upstream.joinEUIClaimer(ctx, joinEUI)
 	if claimer == nil {
 		return errClaimingNotSupported.WithAttributes("eui", joinEUI)
@@ -207,7 +209,9 @@ func (upstream *Upstream) Unclaim(ctx context.Context, in *ttnpb.EndDeviceIdenti
 }
 
 // GetInfoByJoinEUI implements EndDeviceClaimingServer.
-func (upstream *Upstream) GetInfoByJoinEUI(ctx context.Context, in *ttnpb.GetInfoByJoinEUIRequest) (*ttnpb.GetInfoByJoinEUIResponse, error) {
+func (upstream *Upstream) GetInfoByJoinEUI(
+	ctx context.Context, in *ttnpb.GetInfoByJoinEUIRequest,
+) (*ttnpb.GetInfoByJoinEUIResponse, error) {
 	joinEUI := types.MustEUI64(in.JoinEui).OrZero()
 	claimer := upstream.joinEUIClaimer(ctx, joinEUI)
 	return &ttnpb.GetInfoByJoinEUIResponse{
@@ -217,7 +221,9 @@ func (upstream *Upstream) GetInfoByJoinEUI(ctx context.Context, in *ttnpb.GetInf
 }
 
 // GetClaimStatus implements EndDeviceClaimingServer.
-func (upstream *Upstream) GetClaimStatus(ctx context.Context, in *ttnpb.EndDeviceIdentifiers) (*ttnpb.GetClaimStatusResponse, error) {
+func (upstream *Upstream) GetClaimStatus(
+	ctx context.Context, in *ttnpb.EndDeviceIdentifiers,
+) (*ttnpb.GetClaimStatusResponse, error) {
 	if in.DevEui == nil || in.JoinEui == nil {
 		return nil, errNoEUI.New()
 	}
@@ -236,7 +242,9 @@ func (upstream *Upstream) GetClaimStatus(ctx context.Context, in *ttnpb.EndDevic
 	return claimer.GetClaimStatus(ctx, in)
 }
 
-func (upstream *Upstream) requireRights(ctx context.Context, in *ttnpb.EndDeviceIdentifiers, appRights *ttnpb.Rights) error {
+func (upstream *Upstream) requireRights(
+	ctx context.Context, in *ttnpb.EndDeviceIdentifiers, appRights *ttnpb.Rights,
+) error {
 	// Collaborator must have the required rights on the application.
 	if err := rights.RequireApplication(ctx, in.ApplicationIds,
 		appRights.Rights...,
