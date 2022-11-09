@@ -293,7 +293,6 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 						"DevAddr":         "01020304",
 						"DLSettings":      "00",
 						"RxDelay":         5.0,
-						"CFList":          "",
 					})
 					test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
 						"ProtocolVersion": "1.0",
@@ -352,7 +351,6 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 						"DevAddr":         "01020304",
 						"DLSettings":      "00",
 						"RxDelay":         5.0,
-						"CFList":          "",
 					})
 					test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
 						"ProtocolVersion": "1.1",
@@ -411,7 +409,6 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 						"DevAddr":         "01020304",
 						"DLSettings":      "00",
 						"RxDelay":         5.0,
-						"CFList":          "",
 					})
 					test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
 						"ProtocolVersion": "1.0",
@@ -496,7 +493,6 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 						"DevAddr":         "01020304",
 						"DLSettings":      "00",
 						"RxDelay":         5.0,
-						"CFList":          "",
 					})
 					test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
 						"ProtocolVersion": "1.1",
@@ -582,7 +578,6 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 						"DevAddr":         "01020304",
 						"DLSettings":      "00",
 						"RxDelay":         5.0,
-						"CFList":          "",
 					})
 					test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
 						"ProtocolVersion": "1.1",
