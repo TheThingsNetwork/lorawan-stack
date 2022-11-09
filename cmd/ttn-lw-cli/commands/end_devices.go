@@ -110,7 +110,6 @@ var (
 	errEndDeviceEUIUpdate           = errors.DefineInvalidArgument("end_device_eui_update", "end device EUIs can not be updated")
 	errEndDeviceKeysWithProvisioner = errors.DefineInvalidArgument("end_device_keys_provisioner", "end device ABP or OTAA keys cannot be set when there is a provisioner")
 	errInconsistentEndDeviceEUI     = errors.DefineInvalidArgument("inconsistent_end_device_eui", "given end device EUIs do not match registered EUIs")
-	errInvalidDataRateIndex         = errors.DefineInvalidArgument("data_rate_index", "Data rate index is invalid")
 	errInvalidMACVersion            = errors.DefineInvalidArgument("mac_version", "LoRaWAN MAC version is invalid")
 	errInvalidPHYVersion            = errors.DefineInvalidArgument("phy_version", "LoRaWAN PHY version is invalid")
 	errNoEndDeviceEUI               = errors.DefineInvalidArgument("no_end_device_eui", "no end device EUIs set")
