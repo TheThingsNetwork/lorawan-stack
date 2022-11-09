@@ -123,7 +123,7 @@ type JoinReq struct {
 	DevAddr    DevAddr
 	DLSettings Buffer
 	RxDelay    ttnpb.RxDelay
-	CFList     Buffer
+	CFList     Buffer `json:",omitempty"`
 }
 
 // JoinAns is an answer to a JoinReq message.
