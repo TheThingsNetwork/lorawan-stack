@@ -68,9 +68,7 @@ const validationSchema = Yup.object()
     data: Yup.object().shape({
       token: Yup.string().required(sharedMessages.validateRequired),
       use_tlv_encoding: Yup.boolean(),
-      server_url: Yup.string()
-        .url(sharedMessages.validateUrl)
-        .required(sharedMessages.validateRequired),
+      server_url: Yup.string().url(sharedMessages.validateUrl),
       f_port_set: Yup.string()
         .transform(value => {
           let returning = value
@@ -112,7 +110,9 @@ const LoRaCloudDASForm = () => {
     selectApplicationPackageDefaultAssociation(state, LORA_CLOUD_DAS.DEFAULT_PORT),
   )
   const packageError = useSelector(selectGetApplicationPackagesError)
-  const initialValues = validationSchema.cast(defaultAssociation || defaultValues)
+  const initialValues = validationSchema.cast(
+    defaultAssociation ? { server_url: '', ...defaultAssociation } : defaultValues,
+  )
 
   const handleSubmit = useCallback(
     async values => {
