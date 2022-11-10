@@ -814,26 +814,13 @@ func (s *gatewayStore) DeleteGateway(ctx context.Context, id *ttnpb.GatewayIdent
 		return err
 	}
 
-	// TODO: Replace unique constraint to only check EUI for deleted_at = NULL.
-	// https://github.com/TheThingsNetwork/lorawan-stack/issues/5615
-	// _, err = s.DB.NewDelete().
-	// 	Model(model).
-	// 	WherePK().
-	// 	Exec(ctx)
-	// if err != nil {
-	// 	return wrapDriverError(err)
-	// }
-
-	_, err = s.DB.NewUpdate().
+	_, err = s.DB.NewDelete().
 		Model(model).
 		WherePK().
-		Set("deleted_at = ?", s.now()).
-		Set("gateway_eui = NULL").
 		Exec(ctx)
 	if err != nil {
 		return wrapDriverError(err)
 	}
-
 	return nil
 }
 
@@ -857,12 +844,28 @@ func (s *gatewayStore) RestoreGateway(ctx context.Context, id *ttnpb.GatewayIden
 		return err
 	}
 
-	_, err = s.DB.NewUpdate().
+	updateQuery := s.DB.NewUpdate().
 		Model(model).
 		WherePK().
 		WhereAllWithDeleted().
-		Set("deleted_at = NULL").
-		Exec(ctx)
+		Set("deleted_at = NULL")
+
+	// If there is GatewayEUI information, validate if its still possible to use it.
+	if model.GatewayEUI != nil {
+		existingGtw, err := s.getGatewayModelBy(
+			ctx,
+			s.selectWithEUI(ctx, *model.GatewayEUI),
+			store.FieldMask{"ids.eui"},
+		)
+		if err != nil && !errors.IsNotFound(err) {
+			return err
+		}
+		// Clear the gateway eui if there already exists a gateway with it (someone else claimed it).
+		if existingGtw != nil {
+			updateQuery = updateQuery.Set("gateway_eui = NULL")
+		}
+	}
+	_, err = updateQuery.Exec(ctx)
 	if err != nil {
 		return wrapDriverError(err)
 	}

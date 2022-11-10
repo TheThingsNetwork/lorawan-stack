@@ -213,6 +213,30 @@ func (s *gatewayStore) DeleteGateway(ctx context.Context, id *ttnpb.GatewayIdent
 
 func (s *gatewayStore) RestoreGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) error {
 	defer trace.StartRegion(ctx, "restore gateway").End()
+	// Fetches the deleted gateway by ID.
+	queryGtwByID := s.query(ctx, Gateway{}, withGatewayID(id.GatewayId), withSoftDeleted())
+	queryGtwByID = selectGatewayFields(ctx, queryGtwByID, []string{"ids.eui"})
+	var gtwByIDModel Gateway
+	if err := queryGtwByID.First(&gtwByIDModel).Error; err != nil && !gorm.IsRecordNotFoundError(err) {
+		return err
+	}
+
+	// If deleted gateway contains an EUI, validates if there is another gateway with the same value.
+	if gtwByIDModel.GatewayEUI != nil {
+		queryByEUI := s.query(ctx, Gateway{}, withSoftDeleted(), withGatewayEUI(*gtwByIDModel.GatewayEUI))
+		queryByEUI = selectGatewayFields(ctx, queryByEUI, []string{"ids.gateway_id", "ids.eui"})
+		var total uint64
+		if err := queryByEUI.Count(&total).Error; err != nil {
+			return err
+		}
+
+		if total > 1 {
+			gtwByIDModel.GatewayEUI = nil
+			if err := s.updateEntity(store.WithSoftDeleted(ctx, true), &gtwByIDModel, "gateway_eui"); err != nil {
+				return err
+			}
+		}
+	}
 	return s.restoreEntity(ctx, id)
 }
 

@@ -625,6 +625,7 @@ func (is *IdentityServer) restoreGateway(ctx context.Context, ids *ttnpb.Gateway
 		if time.Since(*deletedAt) > is.configFromContext(ctx).Delete.Restore {
 			return errRestoreWindowExpired.New()
 		}
+		ids = ttnpb.Clone(gtw.Ids)
 		return st.RestoreGateway(ctx, ids)
 	})
 	if err != nil {

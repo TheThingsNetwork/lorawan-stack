@@ -13,10 +13,3 @@
 // limitations under the License.
 
 package store
-
-import "github.com/jinzhu/gorm"
-
-// AfterDelete releases the EUI of a Gateway after it is deleted.
-func (gtw *Gateway) AfterDelete(db *gorm.DB) error {
-	return db.Unscoped().Model(gtw).UpdateColumn("gateway_eui", nil).Error
-}
