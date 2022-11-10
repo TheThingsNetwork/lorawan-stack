@@ -2798,7 +2798,7 @@ and allows clients to claim end devices.
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
 | `Claim` | `POST` | `/api/v3/edcs/claim` | `*` |
-| `Unclaim` | `DELETE` | `/api/v3/edcs/claim/{application_ids.application_id}/devices/{device_id}` |  |
+| `Unclaim` | `DELETE` | `/api/v3/edcs/claim/{application_ids.application_id}/devices/{device_id}` | `*` |
 | `GetInfoByJoinEUI` | `POST` | `/api/v3/edcs/claim/info` | `*` |
 | `GetClaimStatus` | `GET` | `/api/v3/edcs/claim/{application_ids.application_id}/devices/{device_id}` |  |
 | `AuthorizeApplication` | `POST` | `/api/v3/edcs/applications/{application_ids.application_id}/authorize` | `*` |

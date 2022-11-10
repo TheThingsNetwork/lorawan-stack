@@ -184,6 +184,7 @@ service EndDeviceClaimingServer {
   rpc Unclaim(EndDeviceIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/edcs/claim/{application_ids.application_id}/devices/{device_id}",
+      body: "*"
     };
   };
 

@@ -3518,72 +3518,45 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/deviceclaimingserver/enddevices/ttjs:device_access_denied": {
+  "error:pkg/deviceclaimingserver/enddevices/ttjsv2:device_access_denied": {
     "translations": {
       "en": "access to device with `{dev_eui}` denied. Either device is already claimed or owner token is invalid"
     },
     "description": {
-      "package": "pkg/deviceclaimingserver/enddevices/ttjs",
+      "package": "pkg/deviceclaimingserver/enddevices/ttjsv2",
       "file": "ttjs.go"
     }
   },
-  "error:pkg/deviceclaimingserver/enddevices/ttjs:device_not_claimed": {
+  "error:pkg/deviceclaimingserver/enddevices/ttjsv2:device_not_claimed": {
     "translations": {
       "en": "device with EUI `{dev_eui}` not claimed"
     },
     "description": {
-      "package": "pkg/deviceclaimingserver/enddevices/ttjs",
+      "package": "pkg/deviceclaimingserver/enddevices/ttjsv2",
       "file": "ttjs.go"
     }
   },
-  "error:pkg/deviceclaimingserver/enddevices/ttjs:device_not_provisioned": {
+  "error:pkg/deviceclaimingserver/enddevices/ttjsv2:device_not_provisioned": {
     "translations": {
       "en": "device with EUI `{dev_eui}` not provisioned"
     },
     "description": {
-      "package": "pkg/deviceclaimingserver/enddevices/ttjs",
+      "package": "pkg/deviceclaimingserver/enddevices/ttjsv2",
       "file": "ttjs.go"
     }
   },
-  "error:pkg/deviceclaimingserver/enddevices/ttjs:invalid_oui": {
-    "translations": {
-      "en": "invalid OUI `{oui}`"
-    },
-    "description": {
-      "package": "pkg/deviceclaimingserver/enddevices/ttjs",
-      "file": "messages.go"
-    }
-  },
-  "error:pkg/deviceclaimingserver/enddevices/ttjs:invalid_oui_length": {
-    "translations": {
-      "en": "invalid length for OUI `{oui}`"
-    },
-    "description": {
-      "package": "pkg/deviceclaimingserver/enddevices/ttjs",
-      "file": "messages.go"
-    }
-  },
-  "error:pkg/deviceclaimingserver/enddevices/ttjs:unauthorized": {
+  "error:pkg/deviceclaimingserver/enddevices/ttjsv2:unauthorized": {
     "translations": {
       "en": "client API Key missing or invalid"
     },
     "description": {
-      "package": "pkg/deviceclaimingserver/enddevices/ttjs",
+      "package": "pkg/deviceclaimingserver/enddevices/ttjsv2",
       "file": "ttjs.go"
     }
   },
   "error:pkg/deviceclaimingserver/enddevices:claiming_not_supported": {
     "translations": {
       "en": "claiming not supported for JoinEUI `{eui}`"
-    },
-    "description": {
-      "package": "pkg/deviceclaimingserver/enddevices",
-      "file": "enddevices.go"
-    }
-  },
-  "error:pkg/deviceclaimingserver/enddevices:invalid_upstream": {
-    "translations": {
-      "en": "upstream `{type}` is invalid"
     },
     "description": {
       "package": "pkg/deviceclaimingserver/enddevices",

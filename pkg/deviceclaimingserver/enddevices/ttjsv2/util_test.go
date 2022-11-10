@@ -12,23 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ttjs
+package ttjsv2
 
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net"
 	"net/http"
 	"time"
 
 	"github.com/gorilla/mux"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
 type device struct {
-	claimData
-	claimedBy               string // AS-ID.
+	homeNetID               types.NetID
+	homeNSID                *types.EUI64
+	asID                    string
 	locked                  bool
 	claimAuthenticationCode string
 }
@@ -44,9 +45,9 @@ type mockTTJS struct {
 	clients           map[string]clientData // key is the auth token.
 }
 
-func (srv *mockTTJS) Start(ctx context.Context, apiVersion string) error {
+func (srv *mockTTJS) Start(ctx context.Context) error {
 	r := mux.NewRouter()
-	r.HandleFunc(fmt.Sprintf("/%s/claim/{devEUI}", apiVersion), srv.handleClaim)
+	r.HandleFunc("/api/v2/devices/{devEUI}/claim", srv.handleClaim)
 	s := http.Server{
 		Handler:           r,
 		ReadTimeout:       60 * time.Second,
@@ -65,10 +66,10 @@ func writeResponse(w http.ResponseWriter, statusCode int, message string) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	json.NewEncoder(w).Encode(resp)
+	json.NewEncoder(w).Encode(resp) //nolint:errcheck
 }
 
-func (srv *mockTTJS) handleClaim(w http.ResponseWriter, r *http.Request) {
+func (srv *mockTTJS) handleClaim(w http.ResponseWriter, r *http.Request) { //nolint:gocyclo
 	asID, password, ok := r.BasicAuth()
 	if !ok {
 		writeResponse(w, http.StatusUnauthorized, "API Key not found")
@@ -76,6 +77,7 @@ func (srv *mockTTJS) handleClaim(w http.ResponseWriter, r *http.Request) {
 	}
 	var client *clientData
 	for token, cl := range srv.clients {
+		cl := cl
 		if password == token && cl.asID == asID {
 			client = &cl
 			break
@@ -102,15 +104,15 @@ func (srv *mockTTJS) handleClaim(w http.ResponseWriter, r *http.Request) {
 			writeResponse(w, http.StatusNotFound, "Device not provisoned")
 			return
 		}
-		if dev.claimedBy == "" {
+		if dev.asID == "" {
 			writeResponse(w, http.StatusNotFound, "Device not claimed")
 			return
 		}
-		if dev.claimedBy != client.asID {
+		if dev.asID != client.asID {
 			writeResponse(w, http.StatusForbidden, "Client not allowed to unclaim")
 			return
 		}
-		dev.claimedBy = ""
+		dev.asID = ""
 		dev.locked = false
 		srv.provisonedDevices[reqDevEUI] = dev
 
@@ -121,19 +123,27 @@ func (srv *mockTTJS) handleClaim(w http.ResponseWriter, r *http.Request) {
 			writeResponse(w, http.StatusNotFound, "Device not provisoned")
 			return
 		}
-		if dev.claimedBy == "" {
+		if dev.asID == "" {
 			writeResponse(w, http.StatusNotFound, "Device not claimed")
 			return
 		}
-		if dev.claimedBy != client.asID {
+		if dev.asID != client.asID {
 			writeResponse(w, http.StatusForbidden, "Client not allowed to get status")
 			return
 		}
+		res := claimData{
+			HomeNetID: dev.homeNetID.String(),
+			Locked:    dev.locked,
+		}
+		if dev.homeNSID != nil {
+			res.HomeNSID = new(string)
+			*res.HomeNSID = dev.homeNSID.String()
+		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(dev.claimData)
+		json.NewEncoder(w).Encode(res) //nolint:errcheck
 
-	case http.MethodPost:
+	case http.MethodPut:
 		var req claimRequest
 		err = json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
@@ -147,7 +157,7 @@ func (srv *mockTTJS) handleClaim(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if dev.claimedBy != "" && dev.claimedBy != client.asID && dev.locked {
+		if dev.asID != "" && dev.asID != client.asID && dev.locked {
 			writeResponse(w, http.StatusForbidden, "Client not allowed to claim")
 			return
 		}
@@ -157,9 +167,13 @@ func (srv *mockTTJS) handleClaim(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		dev.claimedBy = client.asID
-		dev.claimData = req.claimData
-		dev.locked = req.Locked
+		test.Must(nil, dev.homeNetID.UnmarshalText([]byte(req.HomeNetID)))
+		if req.HomeNSID != nil {
+			dev.homeNSID = new(types.EUI64)
+			test.Must(nil, dev.homeNSID.UnmarshalText([]byte(*req.HomeNSID)))
+		}
+		dev.asID = client.asID
+		dev.locked = req.Lock
 
 		// Update
 		srv.provisonedDevices[reqDevEUI] = dev

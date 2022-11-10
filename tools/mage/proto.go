@@ -154,7 +154,7 @@ func (p Proto) fieldMask(context.Context) error {
 func (p Proto) grpcGateway(context.Context) error {
 	if err := withProtoc(grpcGatewayProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
-			fmt.Sprintf("--grpc-gateway_out=%s:%s", strings.Join(gogoConvs, ","), protocOut),
+			fmt.Sprintf("--grpc-gateway_out=allow_delete_body=true,%s:%s", strings.Join(gogoConvs, ","), protocOut),
 			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
 			return fmt.Errorf("failed to generate protos: %w", err)
@@ -214,6 +214,7 @@ func (p Proto) Swagger(context.Context) error {
 	}
 	return withProtoc(openAPIv2ProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
+			"--openapiv2_opt allow_delete_body=true",
 			"--openapiv2_opt=json_names_for_fields=false",
 			fmt.Sprintf("--openapiv2_out=allow_merge,merge_file_name=api:%s/api", pCtx.WorkingDirectory),
 			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),

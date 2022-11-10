@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ttjs
+package ttjsv2
 
 import (
 	"context"
@@ -32,45 +32,40 @@ import (
 var (
 	serverAddress           = "127.0.0.1:0"
 	password                = "secret"
-	apiVersion              = "v1"
 	asID                    = "localhost"
 	otherClientPassword     = "other-secret"
 	otherClientASID         = "localhost-other"
 	claimAuthenticationCode = "SECRET"
-	nsAddress               = "localhost"
 	homeNSID                = types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}
 	supportedJoinEUI        = types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0C}
 	supportedJoinEUIPrefix  = types.EUI64Prefix{
 		EUI64:  supportedJoinEUI,
 		Length: 64,
 	}
-	unsupportedJoinEUI       = types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0D}
-	unsupportedJoinEUIPrefix = types.EUI64Prefix{
-		EUI64:  unsupportedJoinEUI,
-		Length: 64,
-	}
-	devEUI            = types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30}
-	validEndDeviceIds = &ttnpb.EndDeviceIdentifiers{
+	unsupportedJoinEUI = types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0D}
+	devEUI             = types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30}
+	validEndDeviceIds  = &ttnpb.EndDeviceIdentifiers{
 		DevEui:  devEUI.Bytes(),
 		JoinEui: types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0C}.Bytes(),
 	}
-	tenantID     = "test-os"
-	targetAppIDs = &ttnpb.ApplicationIdentifiers{
-		ApplicationId: "test-app",
-	}
-	targetDeviceID = "test-dev"
 )
 
-func TestTTJS(t *testing.T) {
+func TestTTJS(t *testing.T) { //nolint:tparallel
+	t.Parallel()
+
 	a, ctx := test.New(t)
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	defer lis.Close()
+	t.Cleanup(func() {
+		lis.Close()
+	})
 
 	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
+	t.Cleanup(func() {
+		cancel()
+	})
 
 	c := componenttest.NewComponent(t, &component.Config{})
 
@@ -94,22 +89,18 @@ func TestTTJS(t *testing.T) {
 		},
 	}
 
-	go func() error {
-		return mockTTJS.Start(ctx, apiVersion)
-	}()
+	go mockTTJS.Start(ctx) //nolint:errcheck
 
 	// Valid Config
 	ttJSConfig := Config{
 		NetworkServer: NetworkServer{
 			Hostname: "localhost",
-			HomeNSID: homeNSID,
+			HomeNSID: &homeNSID,
 		},
-		TenantID: tenantID,
-		NetID:    test.DefaultNetID,
+		NetID: test.DefaultNetID,
 		JoinEUIPrefixes: []types.EUI64Prefix{
 			supportedJoinEUIPrefix,
 		},
-		ClaimingAPIVersion: apiVersion,
 		BasicAuth: BasicAuth{
 			Username: asID,
 			Password: "invalid",
@@ -144,7 +135,7 @@ func TestTTJS(t *testing.T) {
 	a.So(client.SupportsJoinEUI(supportedJoinEUI), should.BeTrue)
 
 	// Test Claiming
-	for _, tc := range []struct {
+	for _, tc := range []struct { //nolint:paralleltest
 		Name               string
 		DevEUI             types.EUI64
 		JoinEUI            types.EUI64
@@ -201,13 +192,12 @@ func TestTTJS(t *testing.T) {
 	otherClientConfig := Config{
 		NetworkServer: NetworkServer{
 			Hostname: "localhost",
-			HomeNSID: homeNSID,
+			HomeNSID: &homeNSID,
 		},
 		NetID: test.DefaultNetID,
 		JoinEUIPrefixes: []types.EUI64Prefix{
 			supportedJoinEUIPrefix,
 		},
-		ClaimingAPIVersion: apiVersion,
 		BasicAuth: BasicAuth{
 			Username: otherClientASID,
 			Password: otherClientPassword,
@@ -264,6 +254,5 @@ func TestTTJS(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(retHomeNSID, should.Equal, homeNSID)
 	a.So(err, should.BeNil)
-	a.So(ret.VendorSpecific, should.NotBeNil)
-	a.So(ret.VendorSpecific.OrganizationUniqueIdentifier, should.Equal, 0xec656e)
+	a.So(ret.VendorSpecific, should.BeNil)
 }

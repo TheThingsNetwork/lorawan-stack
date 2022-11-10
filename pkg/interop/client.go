@@ -455,26 +455,64 @@ func NewClient(
 	}, nil
 }
 
-func (cl Client) joinServer(joinEUI types.EUI64) (joinServerClient, bool) {
+// matchingJoinServerClients returns the Join Server clients that match the JoinEUI.
+// If there are multiple Join Servers with a /64 prefix, all of them are returned.
+func (cl Client) matchingJoinServerClients(joinEUI types.EUI64) (res []joinServerClient) {
 	// NOTE: joinServers slice is sorted by prefix length and the range start decreasing,
-	// hence the first match is the most specific one.
+	// hence the first matches are the most specific ones.
 	for _, js := range cl.joinServers {
-		if js.prefix.Matches(joinEUI) {
-			return js.joinServerClient, true
+		if js.prefix.Matches(joinEUI) && (len(res) == 0 || js.prefix.Length == 64) {
+			res = append(res, js.joinServerClient)
 		}
 	}
-	return nil, false
+	return
+}
+
+// joinServerRace returns the first successful response from the given Join Servers, or the first error if all fail.
+func joinServerRace[T any](
+	ctx context.Context, fn func(joinServerClient) (T, error), jss []joinServerClient,
+) (T, error) {
+	res := make(chan struct {
+		resp T
+		err  error
+	}, len(jss))
+	for _, js := range jss {
+		go func(js joinServerClient) {
+			response, err := fn(js)
+			res <- struct {
+				resp T
+				err  error
+			}{resp: response, err: err}
+		}(js)
+	}
+	var firstErr error
+	for range jss {
+		select {
+		case <-ctx.Done():
+			return *new(T), ctx.Err()
+		case r := <-res:
+			if r.err == nil {
+				return r.resp, nil
+			}
+			if firstErr == nil {
+				firstErr = r.err
+			}
+		}
+	}
+	return *new(T), firstErr
 }
 
 // GetAppSKey performs AppSKey request to Join Server associated with req.JoinEUI.
 func (cl Client) GetAppSKey(
 	ctx context.Context, asID string, req *ttnpb.SessionKeyRequest,
 ) (*ttnpb.AppSKeyResponse, error) {
-	js, ok := cl.joinServer(types.MustEUI64(req.JoinEui).OrZero())
-	if !ok {
+	jss := cl.matchingJoinServerClients(types.MustEUI64(req.JoinEui).OrZero())
+	if len(jss) == 0 {
 		return nil, errNotRegistered.New()
 	}
-	return js.GetAppSKey(ctx, asID, req)
+	return joinServerRace(ctx, func(js joinServerClient) (*ttnpb.AppSKeyResponse, error) {
+		return js.GetAppSKey(ctx, asID, req)
+	}, jss)
 }
 
 // HandleJoinRequest performs Join request to Join Server associated with req.JoinEUI.
@@ -485,9 +523,11 @@ func (cl Client) HandleJoinRequest(
 	if pld == nil {
 		return nil, errNoJoinRequestPayload.New()
 	}
-	js, ok := cl.joinServer(types.MustEUI64(pld.JoinEui).OrZero())
-	if !ok {
+	jss := cl.matchingJoinServerClients(types.MustEUI64(pld.JoinEui).OrZero())
+	if len(jss) == 0 {
 		return nil, errNotRegistered.New()
 	}
-	return js.HandleJoinRequest(ctx, netID, req)
+	return joinServerRace(ctx, func(js joinServerClient) (*ttnpb.JoinResponse, error) {
+		return js.HandleJoinRequest(ctx, netID, req)
+	}, jss)
 }
