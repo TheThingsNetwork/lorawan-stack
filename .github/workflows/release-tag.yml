@@ -9,6 +9,9 @@ jobs:
   release:
     name: Tag release
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      id-token: write
     timeout-minutes: 60
     steps:
       - name: Check branch
@@ -39,6 +42,12 @@ jobs:
             git tag v${{ steps.version.outputs.result }}
             git push origin v${{ steps.version.outputs.result }}
           fi
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: '${{ secrets.AWS_REGION }}'
+          role-to-assume: 'arn:aws:iam::${{ secrets.AWS_USER_ID }}:role/${{ secrets.AWS_ROLE_NAME }}'
+          role-session-name: '${{ secrets.AWS_ROLE_NAME }}-${{ github.job }}-${{ github.run_id }}'
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
@@ -100,9 +109,6 @@ jobs:
           args: release --config .goreleaser.release.yml --release-notes /tmp/release-notes.md --timeout 120m
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_LOGIN }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
           SIGN_KEY_NAME: ${{ secrets.SIGN_KEY_NAME }}
       - name: Determine if released version is latest
