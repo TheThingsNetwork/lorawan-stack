@@ -51,6 +51,9 @@ jobs:
   test:
     name: Tests
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      id-token: write
     services:
       postgres:
         image: postgres
@@ -81,6 +84,12 @@ jobs:
         with:
           entrypoint: /usr/bin/createdb
           args: -h postgres -U root ttn_lorawan_is_store_test
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: '${{ secrets.AWS_REGION }}'
+          role-to-assume: 'arn:aws:iam::${{ secrets.AWS_USER_ID }}:role/${{ secrets.AWS_ROLE_NAME }}'
+          role-session-name: '${{ secrets.AWS_ROLE_NAME }}-${{ github.job }}-${{ github.run_id }}'
       - name: Check out code
         uses: actions/checkout@v3
       - name: Install Go and Dependencies
@@ -96,9 +105,6 @@ jobs:
           REDIS_ADDRESS: localhost:${{ job.services.redis.ports['6379'] }}
           TEST_REDIS: '1'
           TEST_SLOWDOWN: '8'
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_TEST_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_TEST_SECRET_ACCESS_KEY }}
           GCP_CREDENTIALS: ${{ secrets.GCP_TEST_CREDENTIALS }}
           TEST_BUCKET: lorawan-stack-test-bucket
         run: tools/bin/mage go:test
