@@ -267,7 +267,7 @@ func FieldsWithPrefix(prefix string, paths ...string) []string {
 func FieldsWithoutPrefix(prefix string, paths ...string) []string {
 	ret := make([]string, 0, len(paths))
 	for _, p := range paths {
-		if i := strings.Index(p, prefix+"."); i >= 0 {
+		if strings.HasPrefix(p, prefix+".") {
 			ret = append(ret, p[1+len(prefix):])
 		}
 	}
