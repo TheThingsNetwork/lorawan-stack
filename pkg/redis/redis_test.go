@@ -25,6 +25,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	. "go.thethings.network/lorawan-stack/v3/pkg/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
@@ -474,14 +475,13 @@ func TestProtoDeduplicator(t *testing.T) {
 	defer flush()
 	defer cl.Close()
 
-	makeMockProto := func(s string) proto.Message {
-		return &test.MockProtoMessageMarshalUnmarshaler{
-			MockProtoMarshaler: test.MockProtoMarshaler{
-				MarshalFunc: func() ([]byte, error) {
-					return []byte(s), nil
-				},
-			},
-		}
+	makeProto := func(s string) proto.Message {
+		return &ttnpb.APIKey{Id: s}
+	}
+	makeProtoString := func(s string) string {
+		m := makeProto(s)
+		s, _ = MarshalProto(m)
+		return s
 	}
 
 	ttl := (1 << 12) * test.Delay
@@ -494,31 +494,31 @@ func TestProtoDeduplicator(t *testing.T) {
 	}
 	a.So(v, should.BeTrue)
 
-	v, err = DeduplicateProtos(ctx, cl, key1, ttl, makeMockProto("proto1"))
+	v, err = DeduplicateProtos(ctx, cl, key1, ttl, makeProto("proto1"))
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 	a.So(v, should.BeFalse)
 
-	v, err = DeduplicateProtos(ctx, cl, key2, ttl, makeMockProto("proto1"))
+	v, err = DeduplicateProtos(ctx, cl, key2, ttl, makeProto("proto1"))
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 	a.So(v, should.BeTrue)
 
-	v, err = DeduplicateProtos(ctx, cl, key1, ttl, makeMockProto("proto1"))
+	v, err = DeduplicateProtos(ctx, cl, key1, ttl, makeProto("proto1"))
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 	a.So(v, should.BeFalse)
 
-	v, err = DeduplicateProtos(ctx, cl, key1, ttl, makeMockProto("proto2"), makeMockProto("proto3"))
+	v, err = DeduplicateProtos(ctx, cl, key1, ttl, makeProto("proto2"), makeProto("proto3"))
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 	a.So(v, should.BeFalse)
 
-	v, err = DeduplicateProtos(ctx, cl, key2, ttl, makeMockProto("proto2"))
+	v, err = DeduplicateProtos(ctx, cl, key2, ttl, makeProto("proto2"))
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -537,10 +537,10 @@ func TestProtoDeduplicator(t *testing.T) {
 		t.FailNow()
 	}
 	a.So(ss, should.Resemble, []string{
-		Encoding.EncodeToString([]byte("proto1")),
-		Encoding.EncodeToString([]byte("proto1")),
-		Encoding.EncodeToString([]byte("proto2")),
-		Encoding.EncodeToString([]byte("proto3")),
+		makeProtoString("proto1"),
+		makeProtoString("proto1"),
+		makeProtoString("proto2"),
+		makeProtoString("proto3"),
 	})
 	a.So(lockTTL, should.BeGreaterThan, 0)
 	a.So(lockTTL, should.BeLessThanOrEqualTo, ttl)
@@ -560,8 +560,8 @@ func TestProtoDeduplicator(t *testing.T) {
 		t.FailNow()
 	}
 	a.So(ss, should.Resemble, []string{
-		Encoding.EncodeToString([]byte("proto1")),
-		Encoding.EncodeToString([]byte("proto2")),
+		makeProtoString("proto1"),
+		makeProtoString("proto2"),
 	})
 	a.So(lockTTL, should.BeGreaterThan, 0)
 	a.So(lockTTL, should.BeLessThanOrEqualTo, ttl)
