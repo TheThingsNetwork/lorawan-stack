@@ -26,6 +26,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Devices with pending session and MAC state may now successfully be imported.
+
 ### Security
 
 ## [3.22.2] - 2022-11-10
