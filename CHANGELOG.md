@@ -27,6 +27,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Devices with pending session and MAC state may now successfully be imported.
+- Client creation with an organization API key will no longer send an email without user information to the admins. Instead, the API key name will be used and if that is empty the API key ID will be the default.
 
 ### Security
 
