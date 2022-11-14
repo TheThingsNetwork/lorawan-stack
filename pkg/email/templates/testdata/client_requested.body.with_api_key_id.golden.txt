@@ -1,0 +1,36 @@
+Dear John Doe,
+
+API key "My API key ID" just registered a new OAuth client under user "foo-usr" on The Things Network.
+Since API key "My API key ID" is not an admin, you need to approve this client before it can be used.
+
+Client ID: foo-cli
+Name: Foo Client
+Description: Foo Client Description
+
+Grants:
+- GRANT_AUTHORIZATION_CODE
+
+Rights:
+- RIGHT_USER_INFO
+- RIGHT_USER_APPLICATIONS_LIST
+- RIGHT_USER_ORGANIZATIONS_LIST
+- RIGHT_ORGANIZATION_INFO
+- RIGHT_ORGANIZATION_APPLICATIONS_LIST
+- RIGHT_APPLICATION_INFO
+- RIGHT_APPLICATION_SETTINGS_BASIC
+- RIGHT_APPLICATION_DEVICES_READ
+- RIGHT_APPLICATION_DEVICES_READ_KEYS
+- RIGHT_APPLICATION_DEVICES_WRITE
+- RIGHT_APPLICATION_DEVICES_WRITE_KEYS
+
+Redirect URIs:
+- https://example.com/oauth/callback
+
+Logout Redirect URIs:
+- https://example.com/logout/success
+
+You can use the command-line interface to approve (or reject) the OAuth client:
+
+ttn-lw-cli clients set foo-cli --state APPROVED (or REJECTED) --state-description "..."
+
+For more information on how to use the command-line interface, please refer to the documentation: https://www.thethingsindustries.com/docs/getting-started/cli.

@@ -42,13 +42,14 @@ func init() {
 }
 
 func newClientRequestedData(_ context.Context, data email.NotificationTemplateData) (email.NotificationTemplateData, error) {
-	var nData ttnpb.CreateClientRequest
-	if err := ttnpb.UnmarshalAny(data.Notification().GetData(), &nData); err != nil {
+	var emailMsg ttnpb.CreateClientEmailMessage
+	if err := ttnpb.UnmarshalAny(data.Notification().GetData(), &emailMsg); err != nil {
 		return nil, err
 	}
 	return &ClientRequestedData{
 		NotificationTemplateData: data,
-		CreateClientRequest:      &nData,
+		CreateClientRequest:      emailMsg.GetCreateClientRequest(),
+		APIKey:                   emailMsg.GetApiKey(),
 	}, nil
 }
 
@@ -56,4 +57,36 @@ func newClientRequestedData(_ context.Context, data email.NotificationTemplateDa
 type ClientRequestedData struct {
 	email.NotificationTemplateData
 	*ttnpb.CreateClientRequest
+	*ttnpb.APIKey
+}
+
+func (crd *ClientRequestedData) getAPIKeyName() string {
+	if crd.APIKey.GetName() == "" {
+		return crd.APIKey.GetId()
+	}
+	return crd.APIKey.GetName()
+}
+
+// SenderType returns the type of the entity that triggered the email.
+func (crd *ClientRequestedData) SenderType() string {
+	if crd.Notification().GetSenderIds().IDString() == "" {
+		return "API key"
+	}
+	return "User"
+}
+
+// SenderTypeMidSentence returns the type of the entity that triggered the email, altered to fit midsentence.
+func (crd *ClientRequestedData) SenderTypeMidSentence() string {
+	if crd.Notification().GetSenderIds().IDString() == "" {
+		return "API key"
+	}
+	return "user"
+}
+
+// Sender returns the name of the User or APIKey used for triggering the email.
+func (crd *ClientRequestedData) Sender() string {
+	if crd.Notification().GetSenderIds().IDString() == "" {
+		return crd.getAPIKeyName()
+	}
+	return crd.Notification().GetSenderIds().IDString()
 }

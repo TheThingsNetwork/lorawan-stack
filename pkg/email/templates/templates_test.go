@@ -157,6 +157,7 @@ func TestNotificationEmailTemplates(t *testing.T) {
 		},
 
 		{
+			Id:               "with_sender_ids",
 			EntityIds:        appIDs.GetEntityIdentifiers(),
 			NotificationType: "api_key_created",
 			Data: ttnpb.MustMarshalAny(&ttnpb.APIKey{
@@ -178,36 +179,119 @@ func TestNotificationEmailTemplates(t *testing.T) {
 		},
 
 		{
+			Id:               "with_api_key_name",
 			EntityIds:        cliIDs.GetEntityIdentifiers(),
 			NotificationType: "client_requested",
-			Data: ttnpb.MustMarshalAny(&ttnpb.CreateClientRequest{
-				Client: &ttnpb.Client{
-					Ids:                   cliIDs,
-					CreatedAt:             now,
-					UpdatedAt:             now,
-					Name:                  "Foo Client",
-					Description:           "Foo Client Description",
-					AdministrativeContact: usrIDs.GetOrganizationOrUserIdentifiers(),
-					TechnicalContact:      usrIDs.GetOrganizationOrUserIdentifiers(),
-					RedirectUris:          []string{"https://example.com/oauth/callback"},
-					LogoutRedirectUris:    []string{"https://example.com/logout/success"},
-					State:                 ttnpb.State_STATE_REQUESTED,
-					Grants:                []ttnpb.GrantType{ttnpb.GrantType_GRANT_AUTHORIZATION_CODE},
-					Rights: []ttnpb.Right{
-						ttnpb.Right_RIGHT_USER_INFO,
-						ttnpb.Right_RIGHT_USER_APPLICATIONS_LIST,
-						ttnpb.Right_RIGHT_USER_ORGANIZATIONS_LIST,
-						ttnpb.Right_RIGHT_ORGANIZATION_INFO,
-						ttnpb.Right_RIGHT_ORGANIZATION_APPLICATIONS_LIST,
-						ttnpb.Right_RIGHT_APPLICATION_INFO,
-						ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC,
-						ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
-						ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS,
-						ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
-						ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
-					},
+			Data: ttnpb.MustMarshalAny(&ttnpb.CreateClientEmailMessage{
+				ApiKey: &ttnpb.APIKey{
+					Name: "My API key Name",
 				},
-				Collaborator: usrIDs.GetOrganizationOrUserIdentifiers(),
+				CreateClientRequest: &ttnpb.CreateClientRequest{
+					Client: &ttnpb.Client{
+						Ids:                   cliIDs,
+						CreatedAt:             now,
+						UpdatedAt:             now,
+						Name:                  "Foo Client",
+						Description:           "Foo Client Description",
+						AdministrativeContact: usrIDs.GetOrganizationOrUserIdentifiers(),
+						TechnicalContact:      usrIDs.GetOrganizationOrUserIdentifiers(),
+						RedirectUris:          []string{"https://example.com/oauth/callback"},
+						LogoutRedirectUris:    []string{"https://example.com/logout/success"},
+						State:                 ttnpb.State_STATE_REQUESTED,
+						Grants:                []ttnpb.GrantType{ttnpb.GrantType_GRANT_AUTHORIZATION_CODE},
+						Rights: []ttnpb.Right{
+							ttnpb.Right_RIGHT_USER_INFO,
+							ttnpb.Right_RIGHT_USER_APPLICATIONS_LIST,
+							ttnpb.Right_RIGHT_USER_ORGANIZATIONS_LIST,
+							ttnpb.Right_RIGHT_ORGANIZATION_INFO,
+							ttnpb.Right_RIGHT_ORGANIZATION_APPLICATIONS_LIST,
+							ttnpb.Right_RIGHT_APPLICATION_INFO,
+							ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC,
+							ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
+							ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS,
+							ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+							ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+						},
+					},
+					Collaborator: usrIDs.GetOrganizationOrUserIdentifiers(),
+				},
+			}),
+			SenderIds: nil,
+		},
+
+		{
+			Id:               "with_api_key_id",
+			EntityIds:        cliIDs.GetEntityIdentifiers(),
+			NotificationType: "client_requested",
+			Data: ttnpb.MustMarshalAny(&ttnpb.CreateClientEmailMessage{
+				ApiKey: &ttnpb.APIKey{
+					Id: "My API key ID",
+				},
+				CreateClientRequest: &ttnpb.CreateClientRequest{
+					Client: &ttnpb.Client{
+						Ids:                   cliIDs,
+						CreatedAt:             now,
+						UpdatedAt:             now,
+						Name:                  "Foo Client",
+						Description:           "Foo Client Description",
+						AdministrativeContact: usrIDs.GetOrganizationOrUserIdentifiers(),
+						TechnicalContact:      usrIDs.GetOrganizationOrUserIdentifiers(),
+						RedirectUris:          []string{"https://example.com/oauth/callback"},
+						LogoutRedirectUris:    []string{"https://example.com/logout/success"},
+						State:                 ttnpb.State_STATE_REQUESTED,
+						Grants:                []ttnpb.GrantType{ttnpb.GrantType_GRANT_AUTHORIZATION_CODE},
+						Rights: []ttnpb.Right{
+							ttnpb.Right_RIGHT_USER_INFO,
+							ttnpb.Right_RIGHT_USER_APPLICATIONS_LIST,
+							ttnpb.Right_RIGHT_USER_ORGANIZATIONS_LIST,
+							ttnpb.Right_RIGHT_ORGANIZATION_INFO,
+							ttnpb.Right_RIGHT_ORGANIZATION_APPLICATIONS_LIST,
+							ttnpb.Right_RIGHT_APPLICATION_INFO,
+							ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC,
+							ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
+							ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS,
+							ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+							ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+						},
+					},
+					Collaborator: usrIDs.GetOrganizationOrUserIdentifiers(),
+				},
+			}),
+			SenderIds: nil,
+		},
+		{
+			EntityIds:        cliIDs.GetEntityIdentifiers(),
+			NotificationType: "client_requested",
+			Data: ttnpb.MustMarshalAny(&ttnpb.CreateClientEmailMessage{
+				CreateClientRequest: &ttnpb.CreateClientRequest{
+					Client: &ttnpb.Client{
+						Ids:                   cliIDs,
+						CreatedAt:             now,
+						UpdatedAt:             now,
+						Name:                  "Foo Client",
+						Description:           "Foo Client Description",
+						AdministrativeContact: usrIDs.GetOrganizationOrUserIdentifiers(),
+						TechnicalContact:      usrIDs.GetOrganizationOrUserIdentifiers(),
+						RedirectUris:          []string{"https://example.com/oauth/callback"},
+						LogoutRedirectUris:    []string{"https://example.com/logout/success"},
+						State:                 ttnpb.State_STATE_REQUESTED,
+						Grants:                []ttnpb.GrantType{ttnpb.GrantType_GRANT_AUTHORIZATION_CODE},
+						Rights: []ttnpb.Right{
+							ttnpb.Right_RIGHT_USER_INFO,
+							ttnpb.Right_RIGHT_USER_APPLICATIONS_LIST,
+							ttnpb.Right_RIGHT_USER_ORGANIZATIONS_LIST,
+							ttnpb.Right_RIGHT_ORGANIZATION_INFO,
+							ttnpb.Right_RIGHT_ORGANIZATION_APPLICATIONS_LIST,
+							ttnpb.Right_RIGHT_APPLICATION_INFO,
+							ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC,
+							ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
+							ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS,
+							ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+							ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+						},
+					},
+					Collaborator: usrIDs.GetOrganizationOrUserIdentifiers(),
+				},
 			}),
 			SenderIds: usrIDs,
 		},
@@ -272,7 +356,7 @@ func TestNotificationEmailTemplates(t *testing.T) {
 			a.So(err, should.BeNil)
 			message, err := emailTemplate.Execute(templateData)
 			if a.So(err, should.BeNil) && a.So(message, should.NotBeNil) {
-				if err = compareMessageToGolden(message); err != nil {
+				if err = compareMessageToGolden(message, appendSuffix(notification.Id)); err != nil {
 					t.Error(err)
 				}
 			}
@@ -280,8 +364,22 @@ func TestNotificationEmailTemplates(t *testing.T) {
 	}
 }
 
-func compareMessageToGolden(message *email.Message) error {
+type pathTransformation func(string) string
+
+func appendSuffix(suffix string) pathTransformation {
+	return func(base string) string {
+		if suffix == "" {
+			return base
+		}
+		return fmt.Sprintf("%s.%s", base, suffix)
+	}
+}
+
+func compareMessageToGolden(message *email.Message, ops ...pathTransformation) error {
 	goldenFile := func(part, ext string) string {
+		for _, op := range ops {
+			part = op(part)
+		}
 		return filepath.Join("testdata", fmt.Sprintf("%s.%s.golden.%s", message.TemplateName, part, ext))
 	}
 

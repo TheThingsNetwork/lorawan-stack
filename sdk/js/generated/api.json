@@ -13605,6 +13605,56 @@
       ]
     },
     {
+      "name": "lorawan-stack/api/email_messages.proto",
+      "description": "",
+      "package": "ttn.lorawan.v3",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "CreateClientEmailMessage",
+          "longName": "CreateClientEmailMessage",
+          "fullName": "ttn.lorawan.v3.CreateClientEmailMessage",
+          "description": "CreateClientEmailMessage is used as a wrapper for handling the email regarding the create client procedure.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "create_client_request",
+              "description": "",
+              "label": "",
+              "type": "CreateClientRequest",
+              "longType": "CreateClientRequest",
+              "fullType": "ttn.lorawan.v3.CreateClientRequest",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "api_key",
+              "description": "",
+              "label": "",
+              "type": "APIKey",
+              "longType": "APIKey",
+              "fullType": "ttn.lorawan.v3.APIKey",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
       "name": "lorawan-stack/api/end_device.proto",
       "description": "",
       "package": "ttn.lorawan.v3",

@@ -1,7 +1,7 @@
 Dear {{ .ReceiverName }},
 
-User "{{ .Notification.SenderIds.IDString }}" just registered a new OAuth client under {{ .Collaborator.EntityType }} "{{ .Collaborator.IDString }}" on {{ .Network.Name }}.
-Since user "{{ .Notification.SenderIds.IDString }}" is not an admin, you need to approve this client before it can be used.
+{{ .SenderType }} "{{ .Sender }}" just registered a new OAuth client under {{ .Collaborator.EntityType }} "{{ .Collaborator.IDString }}" on {{ .Network.Name }}.
+Since {{ .SenderTypeMidSentence }} "{{ .Sender }}" is not an admin, you need to approve this client before it can be used.
 
 Client ID: {{ .Client.Ids.IDString }}
 Name: {{ with .Client.Name }}{{ . }}{{ else }}(none){{ end }}

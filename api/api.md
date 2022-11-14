@@ -206,6 +206,8 @@
   - [Enum `KeyProvisioning`](#ttn.lorawan.v3.KeyProvisioning)
   - [Enum `KeySecurity`](#ttn.lorawan.v3.KeySecurity)
   - [Service `DeviceRepository`](#ttn.lorawan.v3.DeviceRepository)
+- [File `lorawan-stack/api/email_messages.proto`](#lorawan-stack/api/email_messages.proto)
+  - [Message `CreateClientEmailMessage`](#ttn.lorawan.v3.CreateClientEmailMessage)
 - [File `lorawan-stack/api/end_device.proto`](#lorawan-stack/api/end_device.proto)
   - [Message `ADRSettings`](#ttn.lorawan.v3.ADRSettings)
   - [Message `ADRSettings.DisabledMode`](#ttn.lorawan.v3.ADRSettings.DisabledMode)
@@ -3281,6 +3283,17 @@ Identifiers to uniquely identify a LoRaWAN end device profile.
 | `GetDownlinkDecoder` | `GET` | `/api/v3/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/decoder` |  |
 | `GetDownlinkEncoder` | `GET` | `/api/v3/dr/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/encoder` |  |
 | `GetDownlinkEncoder` | `GET` | `/api/v3/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/encoder` |  |
+
+## <a name="lorawan-stack/api/email_messages.proto">File `lorawan-stack/api/email_messages.proto`</a>
+
+### <a name="ttn.lorawan.v3.CreateClientEmailMessage">Message `CreateClientEmailMessage`</a>
+
+CreateClientEmailMessage is used as a wrapper for handling the email regarding the create client procedure.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `create_client_request` | [`CreateClientRequest`](#ttn.lorawan.v3.CreateClientRequest) |  |  |
+| `api_key` | [`APIKey`](#ttn.lorawan.v3.APIKey) |  |  |
 
 ## <a name="lorawan-stack/api/end_device.proto">File `lorawan-stack/api/end_device.proto`</a>
 
