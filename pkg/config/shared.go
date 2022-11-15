@@ -212,7 +212,7 @@ type BlobConfigAWS struct {
 	AccessKeyID      string `name:"access-key-id" description:"Access key ID"`
 	SecretAccessKey  string `name:"secret-access-key" description:"Secret access key"`
 	SessionToken     string `name:"session-token" description:"Session token"`
-	S3ForcePathStyle *bool  `name:"s3-force-path-style" description:"Force the AWS SDK to use path-style (s3://) addressing for calls to S3"`
+	S3ForcePathStyle *bool  `name:"s3-force-path-style" description:"Force the AWS SDK to use path-style (s3://) addressing for calls to S3"` //nolint:lll
 }
 
 // BlobConfigGCP is the blob store configuration for the GCP provider.
