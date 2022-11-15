@@ -28,6 +28,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Devices with pending session and MAC state may now successfully be imported.
 - Client creation with an organization API key will no longer send an email without user information to the admins. Instead, the API key name will be used and if that is empty the API key ID will be the default.
+- Allow providing DevEUI for ABP end devices with a LoRaWAN specification lower or equal to 1.0.4 in the end device onboarding screen in the Console.
 
 ### Security
 
