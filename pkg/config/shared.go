@@ -207,11 +207,12 @@ type BlobConfigAzure struct {
 
 // BlobConfigAWS is the blob store configuration for the AWS provider.
 type BlobConfigAWS struct {
-	Endpoint        string `name:"endpoint" description:"S3 endpoint"`
-	Region          string `name:"region" description:"S3 region"`
-	AccessKeyID     string `name:"access-key-id" description:"Access key ID"`
-	SecretAccessKey string `name:"secret-access-key" description:"Secret access key"`
-	SessionToken    string `name:"session-token" description:"Session token"`
+	Endpoint         string `name:"endpoint" description:"S3 endpoint"`
+	Region           string `name:"region" description:"S3 region"`
+	AccessKeyID      string `name:"access-key-id" description:"Access key ID"`
+	SecretAccessKey  string `name:"secret-access-key" description:"Secret access key"`
+	SessionToken     string `name:"session-token" description:"Session token"`
+	S3ForcePathStyle *bool  `name:"s3-force-path-style" description:"Force the AWS SDK to use path-style (s3://) addressing for calls to S3"` //nolint:lll
 }
 
 // BlobConfigGCP is the blob store configuration for the GCP provider.
@@ -253,6 +254,9 @@ func (c BlobConfig) Bucket(
 		conf := aws.NewConfig().WithHTTPClient(httpClient)
 		if c.AWS.Endpoint != "" {
 			conf = conf.WithEndpoint(c.AWS.Endpoint)
+		}
+		if c.AWS.S3ForcePathStyle != nil {
+			conf.WithS3ForcePathStyle(*c.AWS.S3ForcePathStyle)
 		}
 		if c.AWS.Region != "" {
 			conf = conf.WithRegion(c.AWS.Region)
