@@ -13,6 +13,7 @@
 // limitations under the License.
 
 const { cypressBrowserPermissionsPlugin } = require('cypress-browser-permissions')
+const logToOutput = require('cypress-log-to-output')
 
 const tasks = require('./tasks')
 
@@ -37,6 +38,11 @@ module.exports = (on, config) => {
 
     if (browser.name === 'chrome' && browser.isHeadless) {
       launchOptions.args.push('--disable-gpu')
+    }
+
+    if (browser.name === 'chrome' && process.env.RUNNER_DEBUG) {
+      // eslint-disable-next-line no-param-reassign
+      launchOptions = logToOutput.browserLaunchHandler(browser, launchOptions)
     }
 
     return launchOptions

@@ -43,6 +43,20 @@ export const hasValidDeviceRepositoryType = (version, template) =>
   !hasSelectedDeviceRepositoryOther(version) &&
   hasCompletedDeviceRepositorySelection(version) &&
   Boolean(template)
+export const mayProvisionDevice = (values, template) => {
+  const { frequency_plan_id, lorawan_version, lorawan_phy_version, _inputMethod, version_ids } =
+    values
+
+  return (
+    (_inputMethod === 'manual' &&
+      Boolean(frequency_plan_id) &&
+      Boolean(lorawan_version) &&
+      Boolean(lorawan_phy_version)) ||
+    (_inputMethod === 'device-repository' &&
+      hasValidDeviceRepositoryType(version_ids, template) &&
+      Boolean(frequency_plan_id))
+  )
+}
 
 /*
   `hardware_version` is not required when registering an end device in the device repository, so for 
