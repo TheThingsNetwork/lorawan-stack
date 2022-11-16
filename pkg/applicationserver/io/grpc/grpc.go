@@ -143,6 +143,9 @@ func (s *impl) Subscribe(ids *ttnpb.ApplicationIdentifiers, stream ttnpb.AppAs_S
 		case <-sub.Context().Done():
 			return sub.Context().Err()
 		case up := <-sub.Up():
+			if err := rights.RequireApplication(ctx, ids, ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
+				return err
+			}
 			if err := stream.Send(up.ApplicationUp); err != nil {
 				logger.WithError(err).Warn("Failed to send message")
 				sub.Disconnect(err)
