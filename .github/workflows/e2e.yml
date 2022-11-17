@@ -43,7 +43,7 @@ jobs:
           submodules: false
       - name: Get hash of code files
         id: get-hash
-        run: echo "::set-output name=hash::${{ hashFiles('.github/workflows/e2e.yml', '*.go', 'go.mod', 'go.sum', 'pkg/**', 'tools/**', 'config/**', 'package.json', 'pkg/webui/**', 'sdk/js/**', 'yarn.lock', 'cypress/**', 'docker-compose.yml') }}"
+        run: echo "hash=${{ hashFiles('.github/workflows/e2e.yml', '*.go', 'go.mod', 'go.sum', 'pkg/**', 'tools/**', 'config/**', 'package.json', 'pkg/webui/**', 'sdk/js/**', 'yarn.lock', 'cypress/**', 'docker-compose.yml') }}" >> $GITHUB_OUT
       - name: Get the cached result
         id: run-cache
         uses: actions/cache@v3
@@ -55,7 +55,7 @@ jobs:
       - name: Check cached result connected to the hashed files (if any)
         id: check-result
         continue-on-error: true
-        run: test -f .cache/passed && echo "::set-output name=passed::$(cat .cache/passed)"
+        run: test -f .cache/passed && echo "passed=$(cat .cache/passed)" >> $GITHUB_OUT
   preparation:
     name: Run preparations
     runs-on: ubuntu-22.04
@@ -159,8 +159,8 @@ jobs:
         id: get-failed-spec
         continue-on-error: true
         run: |
-          echo "::set-output name=failed-test::$(paste -d , .failed-specs-*.txt)"
-          echo "::set-output name=neg-failed-test::!$(paste -d ',!' .failed-specs-*.txt)"
+          echo "failed-test=$(paste -d , .failed-specs-*.txt)" >> $GITHUB_OUT
+          echo "neg-failed-test=!$(paste -d ',!' .failed-specs-*.txt)" >> $GITHUB_OUT
       - name: Unzip build artifacts
         run: unzip -o build.zip
       - name: Generate certs
