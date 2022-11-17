@@ -62,7 +62,7 @@ jobs:
         run: |
           export RC_VERSION=${{ format('{0}-rc{1}', github.ref_name, github.event.inputs.rc_version) }}
           export RC_VERSION=${RC_VERSION#release/v}
-          echo "rc_version=$RC_VERSION" >> $GITHUB_OUT
+          echo "rc_version=$RC_VERSION" >> $GITHUB_OUTPUT
       - name: Run Goreleaser
         uses: goreleaser/goreleaser-action@v3
         with:
