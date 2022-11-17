@@ -62,7 +62,7 @@ const validationSchema = Yup.object({
       return schema.test(
         'len',
         Yup.passValues(sharedMessages.validateHexLength),
-        payload => !Boolean(payload) || payload.length % 2 === 0,
+        payload => !Boolean(payload) || payload.length % 3 === 0,
       )
     }
 
