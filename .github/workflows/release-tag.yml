@@ -17,7 +17,7 @@ jobs:
         id: version
         run: |
           export VERSION=$(echo ${{ github.ref_name }} | grep -Po '3\.\d+.\d+')
-          echo "result=$VERSION" >> $GITHUB_OUT
+          echo "result=$VERSION" >> $GITHUB_OUTPUT
       - name: Check out code
         uses: actions/checkout@v3
         with:
@@ -111,7 +111,7 @@ jobs:
           export LATEST_TAG=$(git tag | grep -P '^v3.\d+\.\d+$' | sort -V | tail -n 1)
           set +e
           test "$LATEST_TAG" != 'v${{ steps.version.outputs.result }}'
-          echo "latest=$?" >> $GITHUB_OUT
+          echo "latest=$?" >> $GITHUB_OUTPUT
       - name: Tag latest
         if: steps.latest-version.outputs.latest == '1'
         run: |
