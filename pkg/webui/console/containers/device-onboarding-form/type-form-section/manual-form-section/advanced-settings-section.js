@@ -303,7 +303,6 @@ const AdvancedSettingsSection = () => {
           encode={activationModeEncoder}
           decode={activationModeDecoder}
           valueSetter={activationModeValueSetter}
-          required
         >
           <Radio label={sharedMessages.otaa} value={ACTIVATION_MODES.OTAA} />
           {mayEditKeys && (

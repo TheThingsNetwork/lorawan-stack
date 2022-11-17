@@ -31,7 +31,7 @@ import { getInfoByJoinEUI } from '@console/store/actions/claim'
 
 import { selectDeviceTemplate } from '@console/store/selectors/device-repository'
 
-import { hasValidDeviceRepositoryType } from '../utils'
+import { mayProvisionDevice as getMayProvisionDevice } from '../utils'
 import m from '../messages'
 
 import DeviceClaimingFormSection, {
@@ -67,17 +67,7 @@ const joinEuiDecoder = value => value?.ids?.join_eui || ''
 const DeviceProvisioningFormSection = () => {
   const dispatch = useDispatch()
   const { values, setValues } = useFormContext()
-  const {
-    _claim,
-    _inputMethod,
-    _withQRdata,
-    version_ids: version,
-    frequency_plan_id,
-    lorawan_version,
-    lorawan_phy_version,
-    ids,
-    supports_join: supportsJoin,
-  } = values
+  const { _claim, _withQRdata, ids, supports_join: supportsJoin } = values
 
   const template = useSelector(selectDeviceTemplate)
   const isClaiming = _claim === true
@@ -89,14 +79,7 @@ const DeviceProvisioningFormSection = () => {
     joinEuiConfirmationMessage = isClaiming ? m.confirmedClaiming : m.confirmedRegistration
   }
 
-  const mayProvisionDevice =
-    (_inputMethod === 'manual' &&
-      Boolean(frequency_plan_id) &&
-      Boolean(lorawan_version) &&
-      Boolean(lorawan_phy_version)) ||
-    (_inputMethod === 'device-repository' &&
-      hasValidDeviceRepositoryType(version, template) &&
-      Boolean(frequency_plan_id))
+  const mayProvisionDevice = getMayProvisionDevice(values, template)
   const mayConfirm = ids?.join_eui?.length === 16
 
   const resetJoinEui = React.useCallback(() => {
@@ -147,53 +130,53 @@ const DeviceProvisioningFormSection = () => {
     }
   }, [_withQRdata, handleJoinEuiConfirm, ids.join_eui.length, supportsJoin])
 
+  if (!mayProvisionDevice) {
+    return null
+  }
+
   return (
     <>
-      {mayProvisionDevice && (
-        <>
-          <Form.SubTitle title={m.provisioningTitle} />
-          {supportsJoin && (
-            <Form.Field
-              title={sharedMessages.joinEUI}
-              name="ids.join_eui,authenticated_identifiers.join_eui"
-              description={joinEuiConfirmationMessage}
-              type="byte"
-              min={8}
-              max={8}
-              required
-              disabled={isClaimingDetermined || _withQRdata}
-              component={Input}
-              tooltipId={tooltipIds.JOIN_EUI}
-              encode={joinEuiEncoder}
-              decode={joinEuiDecoder}
-              onKeyDown={handleJoinEuiKeyDown}
-            >
-              {_claim === null ? (
-                <Button
-                  type="button"
-                  disabled={!mayConfirm}
-                  onClick={handleJoinEuiConfirm}
-                  message={sharedMessages.confirm}
-                  className="ml-cs-xs"
-                />
-              ) : (
-                <Button
-                  onClick={resetJoinEui}
-                  type="button"
-                  message={sharedMessages.reset}
-                  className="ml-cs-xs"
-                  disabled={_withQRdata}
-                />
-              )}
-            </Form.Field>
+      <Form.SubTitle title={m.provisioningTitle} />
+      {supportsJoin && (
+        <Form.Field
+          title={sharedMessages.joinEUI}
+          name="ids.join_eui,authenticated_identifiers.join_eui"
+          description={joinEuiConfirmationMessage}
+          type="byte"
+          min={8}
+          max={8}
+          required
+          disabled={isClaimingDetermined || _withQRdata}
+          component={Input}
+          tooltipId={tooltipIds.JOIN_EUI}
+          encode={joinEuiEncoder}
+          decode={joinEuiDecoder}
+          onKeyDown={handleJoinEuiKeyDown}
+        >
+          {_claim === null ? (
+            <Button
+              type="button"
+              disabled={!mayConfirm}
+              onClick={handleJoinEuiConfirm}
+              message={sharedMessages.confirm}
+              className="ml-cs-xs"
+            />
+          ) : (
+            <Button
+              onClick={resetJoinEui}
+              type="button"
+              message={sharedMessages.reset}
+              className="ml-cs-xs"
+              disabled={_withQRdata}
+            />
           )}
-        </>
+        </Form.Field>
       )}
-      {!isClaimingDetermined && mayProvisionDevice && (
+      {!isClaimingDetermined && (
         <Message content={m.continueJoinEui} className="mb-ls-m" component="div" />
       )}
-      {mayProvisionDevice && isClaiming && <DeviceClaimingFormSection />}
-      {mayProvisionDevice && isRegistration && <DeviceRegistrationFormSection />}
+      {isClaiming && <DeviceClaimingFormSection />}
+      {isRegistration && <DeviceRegistrationFormSection />}
     </>
   )
 }

@@ -74,19 +74,29 @@ const sessionKeysVersion110Schema = Yup.object({
 const validationSchema = Yup.object({
   ids: Yup.object({
     device_id: Yup.string().required(sharedMessages.validateRequired),
-  }).when('supports_join', {
-    is: true,
-    then: schema =>
-      schema.concat(
+  }).when(['supports_join', 'lorawan_version'], (supportsJoin, lorawanVersion, schema) => {
+    let newSchema = schema
+    if (supportsJoin) {
+      newSchema = newSchema.concat(
         Yup.object({
-          dev_eui: Yup.string()
-            .length(8 * 2, Yup.passValues(sharedMessages.validateLength))
-            .required(sharedMessages.validateRequired),
           join_eui: Yup.string()
             .length(8 * 2, Yup.passValues(sharedMessages.validateLength))
             .required(sharedMessages.validateRequired),
         }),
-      ),
+      )
+    }
+    // Even for ABP devices of LW 1.0.4 and higher, DevEUIs are required.
+    if (supportsJoin || parseLorawanMacVersion(lorawanVersion) >= 104) {
+      newSchema = newSchema.concat(
+        Yup.object({
+          dev_eui: Yup.string()
+            .length(8 * 2, Yup.passValues(sharedMessages.validateLength))
+            .required(sharedMessages.validateRequired),
+        }),
+      )
+    }
+
+    return newSchema
   }),
   root_keys: Yup.object().when(
     ['supports_join', '_claim', 'lorawan_version', '$mayEditKeys'],

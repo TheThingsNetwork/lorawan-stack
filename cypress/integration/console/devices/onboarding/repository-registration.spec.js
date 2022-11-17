@@ -453,6 +453,12 @@ describe('End device repository manual registration', () => {
         cy.findByLabelText('Profile (Region)').selectOption('EU_863_870')
         cy.findByLabelText('Frequency plan').selectOption('EU_863_870_TTN')
 
+        // Adding this input interaction since clicking the submit button right
+        // after it renders can cause the click to be fired before the event
+        // handler got attached, which is what happens in slow CI environments.
+        // Unfortunately there is currently no good workaround for this.
+        // See also: https://www.cypress.io/blog/2019/01/22/when-can-the-test-click/
+        cy.findByLabelText('End device ID').type('type-and-remove').clear()
         cy.findByRole('button', { name: 'Register end device' }).click()
 
         cy.location('pathname').should(

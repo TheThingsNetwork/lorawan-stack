@@ -54,7 +54,7 @@ const DeviceRegistrationFormSection = () => {
   const lwVersion = parseLorawanMacVersion(values.lorawan_version)
   const skipJs = values.join_server_address === undefined
 
-  const showDevEUI =
+  const requireDevEUI =
     // OTAA end devices do require a DevEUI.
     isOTAA ||
     // ABP (non multicast) end devices do require a DevEUI if their version is 1.0.4 or higher.
@@ -66,14 +66,12 @@ const DeviceRegistrationFormSection = () => {
 
   return (
     <div data-test-id="device-registration">
-      {showDevEUI && (
-        <DevEUIComponent
-          name="ids.dev_eui"
-          required={isOTAA}
-          disabled={values._withQRdata}
-          autoFocus
-        />
-      )}
+      <DevEUIComponent
+        name="ids.dev_eui"
+        required={requireDevEUI}
+        disabled={values._withQRdata}
+        autoFocus
+      />
       {isOTAA && !skipJs && (
         <>
           <Form.Field
@@ -179,7 +177,7 @@ const DeviceRegistrationFormSection = () => {
         component={Input}
         inputRef={idInputRef}
         tooltipId={tooltipIds.DEVICE_ID}
-        description={showDevEUI ? messages.deviceIdDescription : undefined}
+        description={messages.deviceIdDescription}
       />
     </div>
   )

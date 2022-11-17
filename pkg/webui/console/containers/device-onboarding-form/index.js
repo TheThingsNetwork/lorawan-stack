@@ -34,9 +34,10 @@ import { claimDevice } from '@console/store/actions/claim'
 import { createDevice } from '@console/store/actions/devices'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+import { selectDeviceTemplate } from '@console/store/selectors/device-repository'
 
 import m from './messages'
-import { REGISTRATION_TYPES } from './utils'
+import { mayProvisionDevice, REGISTRATION_TYPES } from './utils'
 import DeviceProvisioningFormSection, {
   initialValues as provisioningInitialValues,
 } from './provisioning-form-section'
@@ -56,15 +57,11 @@ const initialValues = merge(
 )
 
 const DeviceOnboardingFormInner = () => {
-  const {
-    values: { frequency_plan_id, lorawan_version, lorawan_phy_version, _claim },
-  } = useFormContext()
+  const { values } = useFormContext()
+  const template = useSelector(selectDeviceTemplate)
 
-  const maySubmit =
-    Boolean(frequency_plan_id) &&
-    Boolean(lorawan_version) &&
-    Boolean(lorawan_phy_version) &&
-    typeof _claim === 'boolean'
+  // Submitting is allowed once the device type was specified and the claimability was determined.
+  const maySubmit = values._claim !== null && mayProvisionDevice(values, template)
 
   return (
     <>
