@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package cryptoservices implements services for LoRaWAN cryptograhpy.
 package cryptoservices
 
 import (
@@ -31,10 +32,26 @@ type NwkSKeys struct {
 // Network performs network layer cryptographic operations.
 type Network interface {
 	JoinRequestMIC(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, payload []byte) ([4]byte, error)
-	JoinAcceptMIC(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, joinReqType byte, dn types.DevNonce, payload []byte) ([4]byte, error)
+	JoinAcceptMIC(
+		ctx context.Context,
+		dev *ttnpb.EndDevice,
+		version ttnpb.MACVersion,
+		joinReqType byte,
+		dn types.DevNonce,
+		payload []byte,
+	) ([4]byte, error)
 	EncryptJoinAccept(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, payload []byte) ([]byte, error)
-	EncryptRejoinAccept(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, payload []byte) ([]byte, error)
-	DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (NwkSKeys, error)
+	EncryptRejoinAccept(
+		ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, payload []byte,
+	) ([]byte, error)
+	DeriveNwkSKeys(
+		ctx context.Context,
+		dev *ttnpb.EndDevice,
+		version ttnpb.MACVersion,
+		jn types.JoinNonce,
+		dn types.DevNonce,
+		nid types.NetID,
+	) (NwkSKeys, error)
 	// GetNwkKey returns the NwkKey of the given end device.
 	// If the implementation does not expose root keys, this method returns nil, nil.
 	GetNwkKey(ctx context.Context, dev *ttnpb.EndDevice) (*types.AES128Key, error)
@@ -42,7 +59,14 @@ type Network interface {
 
 // Application performs application layer cryptographic operations.
 type Application interface {
-	DeriveAppSKey(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (types.AES128Key, error)
+	DeriveAppSKey(
+		ctx context.Context,
+		dev *ttnpb.EndDevice,
+		version ttnpb.MACVersion,
+		jn types.JoinNonce,
+		dn types.DevNonce,
+		nid types.NetID,
+	) (types.AES128Key, error)
 	// GetAppKey returns the AppKey of the given end device.
 	// If the implementation does not expose root keys, this method returns nil, nil.
 	GetAppKey(ctx context.Context, dev *ttnpb.EndDevice) (*types.AES128Key, error)
