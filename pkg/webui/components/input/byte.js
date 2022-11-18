@@ -103,8 +103,8 @@ export default class ByteInput extends React.Component {
       ...rest
     } = this.props
 
-    // Instead of calculating the max width dynamically, which leads to various issues,
-    // it's better to use a high max value for unbounded inputs instead.
+    // Instead of calculating the max width dynamically, which leads to various issues
+    // with pasting, it's better to use a high max value for unbounded inputs instead.
     const calculatedMax = max || 4096
 
     if (!unbounded && typeof max !== 'number') {
@@ -141,8 +141,12 @@ export default class ByteInput extends React.Component {
     const { value: oldValue, unbounded } = this.props
     const data = evt?.nativeEvent?.data
 
-    // Clean the value for unbounded inputs, to prevent adding bytes after
-    // placeholders instead of at the end of the current values.
+    // Due to the way that react-text-mask works, it is not possible to
+    // store the cleaned value, since it would create ambiguity between
+    // values like `AA` and `AA `. This causes backspaces to not work
+    // if it targets the space character, since the deleted space would
+    // be re-added right away. Hence, unbounded inputs need to remove
+    // the space paddings manually.
     let value = unbounded ? evt.target.value : clean(evt.target.value)
 
     // Make sure values entered at the end of the input (with placeholders)
