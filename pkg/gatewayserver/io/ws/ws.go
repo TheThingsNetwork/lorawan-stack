@@ -247,12 +247,12 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 			return errNoAuthProvided.WithAttributes("uid", uid)
 		}
 		// If the server allows unauthenticated connections (for local testing), we provide the link rights ourselves.
-		ctx = rights.NewContext(ctx, rights.Rights{
-			GatewayRights: map[string]*ttnpb.Rights{
+		ctx = rights.NewContext(ctx, &rights.Rights{
+			GatewayRights: *rights.NewMap(map[string]*ttnpb.Rights{
 				uid: {
 					Rights: []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_LINK},
 				},
-			},
+			}),
 		})
 	}
 

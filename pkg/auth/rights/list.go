@@ -26,11 +26,12 @@ import (
 func ListApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers) (rights *ttnpb.Rights, err error) {
 	uid := unique.ID(ctx, id)
 	if inCtx, ok := fromContext(ctx); ok {
-		return inCtx.ApplicationRights[uid], nil
+		r, _ := inCtx.ApplicationRights.GetRights(uid)
+		return r, nil
 	}
 	if inCtx, ok := cacheFromContext(ctx); ok {
-		if rights, ok := inCtx.ApplicationRights[uid]; ok {
-			return rights, nil
+		if r, ok := inCtx.ApplicationRights.GetRights(uid); ok {
+			return r, nil
 		}
 	}
 	defer func() {
@@ -56,11 +57,12 @@ func ListApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers) (rig
 func ListClient(ctx context.Context, id *ttnpb.ClientIdentifiers) (rights *ttnpb.Rights, err error) {
 	uid := unique.ID(ctx, id)
 	if inCtx, ok := fromContext(ctx); ok {
-		return inCtx.ClientRights[uid], nil
+		r, _ := inCtx.ClientRights.GetRights(uid)
+		return r, nil
 	}
 	if inCtx, ok := cacheFromContext(ctx); ok {
-		if rights, ok := inCtx.ClientRights[uid]; ok {
-			return rights, nil
+		if r, ok := inCtx.ClientRights.GetRights(uid); ok {
+			return r, nil
 		}
 	}
 	defer func() {
@@ -86,11 +88,12 @@ func ListClient(ctx context.Context, id *ttnpb.ClientIdentifiers) (rights *ttnpb
 func ListGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) (rights *ttnpb.Rights, err error) {
 	uid := unique.ID(ctx, id)
 	if inCtx, ok := fromContext(ctx); ok {
-		return inCtx.GatewayRights[uid], nil
+		r, _ := inCtx.GatewayRights.GetRights(uid)
+		return r, nil
 	}
 	if inCtx, ok := cacheFromContext(ctx); ok {
-		if rights, ok := inCtx.GatewayRights[uid]; ok {
-			return rights, nil
+		if r, ok := inCtx.GatewayRights.GetRights(uid); ok {
+			return r, nil
 		}
 	}
 	defer func() {
@@ -116,11 +119,12 @@ func ListGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) (rights *ttn
 func ListOrganization(ctx context.Context, id *ttnpb.OrganizationIdentifiers) (rights *ttnpb.Rights, err error) {
 	uid := unique.ID(ctx, id)
 	if inCtx, ok := fromContext(ctx); ok {
-		return inCtx.OrganizationRights[uid], nil
+		r, _ := inCtx.OrganizationRights.GetRights(uid)
+		return r, nil
 	}
 	if inCtx, ok := cacheFromContext(ctx); ok {
-		if rights, ok := inCtx.OrganizationRights[uid]; ok {
-			return rights, nil
+		if r, ok := inCtx.OrganizationRights.GetRights(uid); ok {
+			return r, nil
 		}
 	}
 	defer func() {
@@ -146,11 +150,12 @@ func ListOrganization(ctx context.Context, id *ttnpb.OrganizationIdentifiers) (r
 func ListUser(ctx context.Context, id *ttnpb.UserIdentifiers) (rights *ttnpb.Rights, err error) {
 	uid := unique.ID(ctx, id)
 	if inCtx, ok := fromContext(ctx); ok {
-		return inCtx.UserRights[uid], nil
+		r, _ := inCtx.UserRights.GetRights(uid)
+		return r, nil
 	}
 	if inCtx, ok := cacheFromContext(ctx); ok {
-		if rights, ok := inCtx.UserRights[uid]; ok {
-			return rights, nil
+		if r, ok := inCtx.UserRights.GetRights(uid); ok {
+			return r, nil
 		}
 	}
 	defer func() {

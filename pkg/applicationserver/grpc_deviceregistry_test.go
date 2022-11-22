@@ -100,10 +100,10 @@ func TestDeviceRegistryGet(t *testing.T) {
 		{
 			Name: "Permission denied",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): nil,
-					},
+					}),
 				})
 			},
 			GetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
@@ -121,12 +121,12 @@ func TestDeviceRegistryGet(t *testing.T) {
 		{
 			Name: "Invalid application ID",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: "bar-application"}): ttnpb.RightsFrom(
 							ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
 						),
-					},
+					}),
 				})
 			},
 			GetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
@@ -144,12 +144,12 @@ func TestDeviceRegistryGet(t *testing.T) {
 		{
 			Name: "Not found",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
 							ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
 						),
-					},
+					}),
 				})
 			},
 			GetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
@@ -172,12 +172,12 @@ func TestDeviceRegistryGet(t *testing.T) {
 		{
 			Name: "Get formatters",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
 							ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
 						),
-					},
+					}),
 				})
 			},
 			GetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
@@ -213,12 +213,12 @@ func TestDeviceRegistryGet(t *testing.T) {
 		{
 			Name: "Get formatters, session/no key rights",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
 							ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
 						),
-					},
+					}),
 				})
 			},
 			GetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
@@ -236,13 +236,13 @@ func TestDeviceRegistryGet(t *testing.T) {
 		{
 			Name: "Get formatters,session/has rights",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
 							ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
 							ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS,
 						),
-					},
+					}),
 				})
 			},
 			GetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
@@ -357,10 +357,10 @@ func TestDeviceRegistrySet(t *testing.T) {
 		{
 			Name: "Permission denied",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): nil,
-					},
+					}),
 				})
 			},
 			SetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
@@ -380,12 +380,12 @@ func TestDeviceRegistrySet(t *testing.T) {
 		{
 			Name: "Invalid application ID",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: "bar-application"}): ttnpb.RightsFrom(
 							ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 						),
-					},
+					}),
 				})
 			},
 			SetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
@@ -405,14 +405,14 @@ func TestDeviceRegistrySet(t *testing.T) {
 		{
 			Name: "Create",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): {
 							Rights: []ttnpb.Right{
 								ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 							},
 						},
-					},
+					}),
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
@@ -482,12 +482,12 @@ func TestDeviceRegistrySet(t *testing.T) {
 		{
 			Name: "Set",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
 							ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 						),
-					},
+					}),
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
@@ -513,12 +513,12 @@ func TestDeviceRegistrySet(t *testing.T) {
 		{
 			Name: "Uplink formatter script size exceeds maximum allowed",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
 							ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 						),
-					},
+					}),
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
@@ -541,12 +541,12 @@ func TestDeviceRegistrySet(t *testing.T) {
 		{
 			Name: "Downlink formatter script size exceeds maximum allowed",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
 							ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 						),
-					},
+					}),
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
@@ -640,10 +640,10 @@ func TestDeviceRegistryDelete(t *testing.T) {
 		{
 			Name: "Permission denied",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): nil,
-					},
+					}),
 				})
 			},
 			SetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
@@ -664,12 +664,12 @@ func TestDeviceRegistryDelete(t *testing.T) {
 		{
 			Name: "Invalid application ID",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: "bar-application"}): ttnpb.RightsFrom(
 							ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 						),
-					},
+					}),
 				})
 			},
 			SetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
@@ -690,12 +690,12 @@ func TestDeviceRegistryDelete(t *testing.T) {
 		{
 			Name: "Not found",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
 							ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 						),
-					},
+					}),
 				})
 			},
 			SetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
@@ -722,12 +722,12 @@ func TestDeviceRegistryDelete(t *testing.T) {
 		{
 			Name: "Delete",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
 							ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 						),
-					},
+					}),
 				})
 			},
 			SetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {

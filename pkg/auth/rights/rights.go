@@ -17,106 +17,129 @@ package rights
 
 import (
 	"context"
+	"sync"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
+// Map stores rights for a given ID.
+type Map struct {
+	syncMap sync.Map
+}
+
+// NewMap returns a pointer to a new Map.
+func NewMap(rights map[string]*ttnpb.Rights) *Map {
+	m := &Map{}
+	for k, v := range rights {
+		m.SetRights(k, v)
+	}
+	return m
+}
+
+// SetRights sets the rights for the given UID.
+func (m *Map) SetRights(uid string, rights *ttnpb.Rights) {
+	m.syncMap.Store(uid, rights)
+}
+
+// GetRights returns the rights stored in the map for a given UID,
+// or nil if no value is present.
+// The ok result indicates whether value was found in the map.
+func (m *Map) GetRights(uid string) (*ttnpb.Rights, bool) {
+	if r, ok := m.syncMap.Load(uid); ok {
+		return r.(*ttnpb.Rights), ok
+	}
+	return nil, false
+}
+
+// MissingRights returns the rights that are missing for the given RightsMap.
+func (m *Map) MissingRights(uid string, rights ...ttnpb.Right) []ttnpb.Right {
+	if r, ok := m.GetRights(uid); ok {
+		return ttnpb.RightsFrom(rights...).Sub(r).GetRights()
+	}
+	return rights
+}
+
 // Rights for the request.
 type Rights struct {
-	ApplicationRights  map[string]*ttnpb.Rights
-	ClientRights       map[string]*ttnpb.Rights
-	GatewayRights      map[string]*ttnpb.Rights
-	OrganizationRights map[string]*ttnpb.Rights
-	UserRights         map[string]*ttnpb.Rights
+	ApplicationRights  Map
+	ClientRights       Map
+	GatewayRights      Map
+	OrganizationRights Map
+	UserRights         Map
 }
 
 // SetApplicationRights sets the rights for the given application.
 func (r *Rights) setApplicationRights(appUID string, rights *ttnpb.Rights) {
-	if r.ApplicationRights == nil {
-		r.ApplicationRights = make(map[string]*ttnpb.Rights)
-	}
-	r.ApplicationRights[appUID] = rights
+	r.ApplicationRights.SetRights(appUID, rights)
 }
 
 // SetClientRights sets the rights for the given client.
 func (r *Rights) setClientRights(cliUID string, rights *ttnpb.Rights) {
-	if r.ClientRights == nil {
-		r.ClientRights = make(map[string]*ttnpb.Rights)
-	}
-	r.ClientRights[cliUID] = rights
+	r.ClientRights.SetRights(cliUID, rights)
 }
 
 // SetGatewayRights sets the rights for the given gateway.
 func (r *Rights) setGatewayRights(gtwUID string, rights *ttnpb.Rights) {
-	if r.GatewayRights == nil {
-		r.GatewayRights = make(map[string]*ttnpb.Rights)
-	}
-	r.GatewayRights[gtwUID] = rights
+	r.GatewayRights.SetRights(gtwUID, rights)
 }
 
 // SetOrganizationRights sets the rights for the given organization.
 func (r *Rights) setOrganizationRights(orgUID string, rights *ttnpb.Rights) {
-	if r.OrganizationRights == nil {
-		r.OrganizationRights = make(map[string]*ttnpb.Rights)
-	}
-	r.OrganizationRights[orgUID] = rights
+	r.OrganizationRights.SetRights(orgUID, rights)
 }
 
 // SetUserRights sets the rights for the given user.
 func (r *Rights) setUserRights(usrUID string, rights *ttnpb.Rights) {
-	if r.UserRights == nil {
-		r.UserRights = make(map[string]*ttnpb.Rights)
-	}
-	r.UserRights[usrUID] = rights
+	r.UserRights.SetRights(usrUID, rights)
 }
 
 // MissingApplicationRights returns the rights that are missing for the given application.
-func (r Rights) MissingApplicationRights(appUID string, rights ...ttnpb.Right) []ttnpb.Right {
-	return ttnpb.RightsFrom(rights...).Sub(r.ApplicationRights[appUID]).GetRights()
+func (r *Rights) MissingApplicationRights(appUID string, rights ...ttnpb.Right) []ttnpb.Right {
+	return r.ApplicationRights.MissingRights(appUID, rights...)
 }
 
 // MissingClientRights returns the rights that are missing for the given client.
-func (r Rights) MissingClientRights(cliUID string, rights ...ttnpb.Right) []ttnpb.Right {
-	return ttnpb.RightsFrom(rights...).Sub(r.ClientRights[cliUID]).GetRights()
+func (r *Rights) MissingClientRights(cliUID string, rights ...ttnpb.Right) []ttnpb.Right {
+	return r.ClientRights.MissingRights(cliUID, rights...)
 }
 
 // MissingGatewayRights returns the rights that are missing for the given gateway.
-func (r Rights) MissingGatewayRights(gtwUID string, rights ...ttnpb.Right) []ttnpb.Right {
-	return ttnpb.RightsFrom(rights...).Sub(r.GatewayRights[gtwUID]).GetRights()
+func (r *Rights) MissingGatewayRights(gtwUID string, rights ...ttnpb.Right) []ttnpb.Right {
+	return r.GatewayRights.MissingRights(gtwUID, rights...)
 }
 
 // MissingOrganizationRights returns the rights that are missing for the given organization.
-func (r Rights) MissingOrganizationRights(orgUID string, rights ...ttnpb.Right) []ttnpb.Right {
-	return ttnpb.RightsFrom(rights...).Sub(r.OrganizationRights[orgUID]).GetRights()
+func (r *Rights) MissingOrganizationRights(orgUID string, rights ...ttnpb.Right) []ttnpb.Right {
+	return r.OrganizationRights.MissingRights(orgUID, rights...)
 }
 
 // MissingUserRights returns the rights that are missing for the given user.
-func (r Rights) MissingUserRights(usrUID string, rights ...ttnpb.Right) []ttnpb.Right {
-	return ttnpb.RightsFrom(rights...).Sub(r.UserRights[usrUID]).GetRights()
+func (r *Rights) MissingUserRights(usrUID string, rights ...ttnpb.Right) []ttnpb.Right {
+	return r.UserRights.MissingRights(usrUID, rights...)
 }
 
 // IncludesApplicationRights returns whether the given rights are included for the given application.
-func (r Rights) IncludesApplicationRights(appUID string, rights ...ttnpb.Right) bool {
+func (r *Rights) IncludesApplicationRights(appUID string, rights ...ttnpb.Right) bool {
 	return len(r.MissingApplicationRights(appUID, rights...)) == 0
 }
 
 // IncludesClientRights returns whether the given rights are included for the given client.
-func (r Rights) IncludesClientRights(cliUID string, rights ...ttnpb.Right) bool {
+func (r *Rights) IncludesClientRights(cliUID string, rights ...ttnpb.Right) bool {
 	return len(r.MissingClientRights(cliUID, rights...)) == 0
 }
 
 // IncludesGatewayRights returns whether the given rights are included for the given gateway.
-func (r Rights) IncludesGatewayRights(gtwUID string, rights ...ttnpb.Right) bool {
+func (r *Rights) IncludesGatewayRights(gtwUID string, rights ...ttnpb.Right) bool {
 	return len(r.MissingGatewayRights(gtwUID, rights...)) == 0
 }
 
 // IncludesOrganizationRights returns whether the given rights are included for the given organization.
-func (r Rights) IncludesOrganizationRights(orgUID string, rights ...ttnpb.Right) bool {
+func (r *Rights) IncludesOrganizationRights(orgUID string, rights ...ttnpb.Right) bool {
 	return len(r.MissingOrganizationRights(orgUID, rights...)) == 0
 }
 
 // IncludesUserRights returns whether the given rights are included for the given user.
-func (r Rights) IncludesUserRights(usrUID string, rights ...ttnpb.Right) bool {
+func (r *Rights) IncludesUserRights(usrUID string, rights ...ttnpb.Right) bool {
 	return len(r.MissingUserRights(usrUID, rights...)) == 0
 }
 
@@ -124,15 +147,15 @@ type rightsKeyType struct{}
 
 var rightsKey rightsKeyType
 
-func fromContext(ctx context.Context) (Rights, bool) {
-	if rights, ok := ctx.Value(rightsKey).(Rights); ok {
+func fromContext(ctx context.Context) (*Rights, bool) {
+	if rights, ok := ctx.Value(rightsKey).(*Rights); ok {
 		return rights, true
 	}
-	return Rights{}, false
+	return &Rights{}, false
 }
 
 // NewContext returns a derived context with the given rights.
-func NewContext(ctx context.Context, rights Rights) context.Context {
+func NewContext(ctx context.Context, rights *Rights) context.Context {
 	return context.WithValue(ctx, rightsKey, rights)
 }
 
@@ -152,11 +175,11 @@ func cacheInContext(ctx context.Context, f func(*Rights)) {
 	}
 }
 
-func cacheFromContext(ctx context.Context) (Rights, bool) {
+func cacheFromContext(ctx context.Context) (*Rights, bool) {
 	if rights, ok := ctx.Value(rightsCacheKey).(*Rights); ok {
-		return *rights, true
+		return rights, true
 	}
-	return Rights{}, false
+	return &Rights{}, false
 }
 
 type authInfoKeyType struct{}
