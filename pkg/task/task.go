@@ -17,6 +17,7 @@ package task
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"runtime/debug"
 	"time"
@@ -165,7 +166,18 @@ func DefaultStartTask(conf *Config) {
 			startTime := time.Now()
 			err := conf.Func.Execute(conf.Context, logger)
 			executionDuration := time.Since(startTime)
-			if err != nil && err != context.Canceled {
+			// NOTE: We discard only the common errors here, instead of checking
+			// the error code intentionally. The intent is to drop the commonly
+			// met errors without hiding other errors with the canceled or deadline
+			// exceeded error code.
+			switch {
+			case err == nil:
+			case errors.Is(err, context.Canceled),
+				errors.Is(err, errors.ErrContextCanceled),
+				errors.Is(err, context.DeadlineExceeded),
+				errors.Is(err, errors.ErrContextDeadlineExceeded):
+			case errors.Is(err, io.EOF):
+			default:
 				logger.WithError(err).Warn("Task failed")
 			}
 			switch conf.Restart {
