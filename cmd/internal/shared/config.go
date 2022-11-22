@@ -110,6 +110,7 @@ var DefaultEventsConfig = func() config.Events {
 	c.Redis.Store.EntityTTL = 24 * time.Hour
 	c.Redis.Store.EntityCount = 100
 	c.Redis.Store.CorrelationIDCount = 100
+	c.Redis.Store.StreamPartitionSize = 64
 	c.Redis.Workers = 16
 	c.Redis.Publish.QueueSize = 8192
 	c.Redis.Publish.MaxWorkers = 1024

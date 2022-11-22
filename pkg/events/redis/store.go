@@ -21,13 +21,16 @@ import (
 	"errors"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/go-redis/redis/v8"
+	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
@@ -38,10 +41,13 @@ const ttlJitter = 0.01
 type PubSubStore struct {
 	*PubSub
 
+	taskStarter task.Starter
+
 	historyTTL                time.Duration
 	entityHistoryCount        int
 	entityHistoryTTL          time.Duration
 	correlationIDHistoryCount int
+	streamPartitionSize       int
 }
 
 func (ps *PubSubStore) eventDataKey(_ context.Context, uid string) string {
@@ -236,11 +242,85 @@ func (ps *PubSubStore) FetchHistory(
 	return evts, nil
 }
 
+type streamState struct {
+	id     *ttnpb.EntityIdentifiers
+	stream string
+	start  string
+}
+
+func streamPartitionSize(states []*streamState, partitionSize int) int {
+	size := partitionSize
+	if n := len(states); n < size {
+		size = n
+	}
+	return size
+}
+
+func partitionStreamStates(states []*streamState, partitionSize int) [][]*streamState {
+	partitionedStates := make([][]*streamState, 0, len(states)/partitionSize+1)
+	for len(states) > 0 {
+		n := streamPartitionSize(states, partitionSize)
+		partitionedStates = append(partitionedStates, states[:n])
+		states = states[n:]
+	}
+	return partitionedStates
+}
+
+func createStreamStateMapping(states []*streamState) map[string]*streamState {
+	m := make(map[string]*streamState, len(states))
+	for _, state := range states {
+		m[state.stream] = state
+	}
+	return m
+}
+
+func (ps *PubSubStore) iterateStreamPartition(
+	ctx context.Context,
+	states []*streamState,
+	eventCountLimit int64,
+	ch chan<- []redis.XStream,
+) error {
+	statesByStream := createStreamStateMapping(states)
+	for {
+		args := &redis.XReadArgs{
+			Count: eventCountLimit,
+			Block: random.Jitter(8*time.Second, 0.2),
+		}
+		for _, s := range states {
+			args.Streams = append(args.Streams, s.stream)
+		}
+		for _, s := range states {
+			args.Streams = append(args.Streams, s.start)
+		}
+		streams, err := ps.client.XRead(ctx, args).Result()
+		if err != nil && !errors.Is(err, redis.Nil) {
+			return ttnredis.ConvertError(err)
+		}
+		result := make([]redis.XStream, 0, len(streams))
+		for _, stream := range streams {
+			if len(stream.Messages) == 0 {
+				continue
+			}
+			state, ok := statesByStream[stream.Stream]
+			if !ok {
+				continue
+			}
+			state.start = stream.Messages[len(stream.Messages)-1].ID
+			result = append(result, stream)
+		}
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case ch <- result:
+		}
+	}
+}
+
 // SubscribeWithHistory is like FetchHistory, but after fetching historical events,
 // this continues sending live events until the context is done.
 func (ps *PubSubStore) SubscribeWithHistory(
 	ctx context.Context, names []string, ids []*ttnpb.EntityIdentifiers, after *time.Time, tail int, hdl events.Handler,
-) error {
+) (err error) {
 	start := "0-0"
 	switch {
 	case after == nil:
@@ -254,32 +334,16 @@ func (ps *PubSubStore) SubscribeWithHistory(
 		start = strconv.FormatInt(after.Add(-1*time.Second).UnixNano()/1_000_000, 10)
 	}
 
-	type streamState struct {
-		id     *ttnpb.EntityIdentifiers
-		stream string
-		start  string
-	}
-	state := make([]*streamState, len(ids))
+	states := make([]*streamState, len(ids))
 	for i, id := range ids {
-		state[i] = &streamState{
+		states[i] = &streamState{
 			id:     id,
 			stream: ps.eventStream(ctx, id),
 			start:  start,
 		}
 	}
-	getState := func(stream string) *streamState {
-		for _, state := range state {
-			if state.stream == stream {
-				return state
-			}
-		}
-		return nil
-	}
 
-	for _, s := range state {
-		if ctx.Err() != nil {
-			return ctx.Err()
-		}
+	for _, s := range states {
 		evtPBs, nextStart, err := ps.tailStream(ctx, names, s.id, s.start, tail)
 		if err != nil {
 			return err
@@ -311,44 +375,48 @@ func (ps *PubSubStore) SubscribeWithHistory(
 		eventCountLimit = 1024
 	}
 
-	for {
-		args := &redis.XReadArgs{
-			Count: eventCountLimit,
-			Block: random.Jitter(8*time.Second, 0.2),
+	ch := make(chan []redis.XStream, 1)
+	wg := sync.WaitGroup{}
+	defer wg.Wait()
+	ctx, cancel := errorcontext.New(ctx)
+	for _, states := range partitionStreamStates(states, ps.streamPartitionSize) {
+		states := states
+		f := func(ctx context.Context) (err error) {
+			defer func() { cancel(err) }()
+			return ps.iterateStreamPartition(ctx, states, eventCountLimit, ch)
 		}
-		for _, s := range state {
-			args.Streams = append(args.Streams, s.stream)
-		}
-		for _, s := range state {
-			args.Streams = append(args.Streams, s.start)
-		}
+		wg.Add(1)
+		ps.taskStarter.StartTask(&task.Config{
+			Context: ctx,
+			ID:      "events_iterate_partition",
+			Func:    f,
+			Done:    wg.Done,
+			Restart: task.RestartNever,
+			Backoff: task.DefaultBackoffConfig,
+		})
+	}
 
-		streams, err := ps.client.XRead(ctx, args).Result()
-		if err != nil && !errors.Is(err, redis.Nil) {
-			return ttnredis.ConvertError(err)
-		}
-		for _, stream := range streams {
-			if len(stream.Messages) == 0 {
-				continue
-			}
-			state := getState(stream.Stream)
-			if state == nil {
-				continue
-			}
-			state.start = stream.Messages[len(stream.Messages)-1].ID
-			evtPBs := eventsFromXMessages(stream.Messages, matchNames)
-			if len(evtPBs) == 0 {
-				continue
-			}
-			if err = ps.loadEventData(ctx, ps.client, evtPBs...); err != nil {
-				return err
-			}
-			for _, evtPB := range evtPBs {
-				evt, err := events.FromProto(evtPB)
-				if err != nil {
+	defer func() { cancel(err) }()
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case streams := <-ch:
+			for _, stream := range streams {
+				evtPBs := eventsFromXMessages(stream.Messages, matchNames)
+				if len(evtPBs) == 0 {
+					continue
+				}
+				if err := ps.loadEventData(ctx, ps.client, evtPBs...); err != nil {
 					return err
 				}
-				hdl.Notify(evt)
+				for _, evtPB := range evtPBs {
+					evt, err := events.FromProto(evtPB)
+					if err != nil {
+						return err
+					}
+					hdl.Notify(evt)
+				}
 			}
 		}
 	}

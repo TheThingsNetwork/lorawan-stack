@@ -81,11 +81,15 @@ func NewPubSub(ctx context.Context, component workerpool.Component, conf config.
 	}
 
 	pss := &PubSubStore{
-		PubSub:                    ps,
+		PubSub: ps,
+
+		taskStarter: component,
+
 		historyTTL:                conf.Store.TTL,
 		entityHistoryCount:        conf.Store.EntityCount,
 		entityHistoryTTL:          conf.Store.EntityTTL,
 		correlationIDHistoryCount: conf.Store.CorrelationIDCount,
+		streamPartitionSize:       conf.Store.StreamPartitionSize,
 	}
 	if pss.historyTTL == 0 {
 		pss.historyTTL = 10 * time.Minute
@@ -98,6 +102,9 @@ func NewPubSub(ctx context.Context, component workerpool.Component, conf config.
 	}
 	if pss.correlationIDHistoryCount == 0 {
 		pss.correlationIDHistoryCount = 100
+	}
+	if pss.streamPartitionSize == 0 {
+		pss.streamPartitionSize = 64
 	}
 
 	return pss
