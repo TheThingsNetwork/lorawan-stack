@@ -24,7 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
 )
 
-var pgdriverFeatureFlag = experimental.DefineFeature("is.pgdriver", false)
+var pgdriverFeatureFlag = experimental.DefineFeature("db.pgdriver", false)
 
 // OpenDB opens the database connection.
 func OpenDB(ctx context.Context, databaseURI string) (*sql.DB, error) {
