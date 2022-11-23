@@ -26,8 +26,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	bunstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/bunstore"
-	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 )
 
 var errPasswordMismatch = errors.DefineInvalidArgument("password_mismatch", "password did not match")
@@ -40,7 +40,7 @@ var createAdminUserCommand = &cobra.Command{
 		defer cancel()
 
 		logger.Info("Connecting to Identity Server database...")
-		db, err := store.OpenDB(ctx, config.IS.DatabaseURI)
+		db, err := storeutil.OpenDB(ctx, config.IS.DatabaseURI)
 		if err != nil {
 			return err
 		}

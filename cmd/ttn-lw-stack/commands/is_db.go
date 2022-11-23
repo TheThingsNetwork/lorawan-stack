@@ -27,6 +27,7 @@ import (
 	ismigrations "go.thethings.network/lorawan-stack/v3/pkg/identityserver/store/migrations"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	ttntypes "go.thethings.network/lorawan-stack/v3/pkg/types"
+	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 )
 
 var (
@@ -47,7 +48,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			logger.Info("Connecting to Identity Server database...")
 
-			sqlDB, err := store.OpenDB(cmd.Context(), config.IS.DatabaseURI)
+			sqlDB, err := storeutil.OpenDB(cmd.Context(), config.IS.DatabaseURI)
 			if err != nil {
 				return err
 			}
@@ -116,7 +117,7 @@ var (
 		Short: "Cleanup expired entities in the Identity Server database",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			logger.Info("Connecting to Identity Server database...")
-			db, err := store.OpenDB(ctx, config.IS.DatabaseURI)
+			db, err := storeutil.OpenDB(ctx, config.IS.DatabaseURI)
 			if err != nil {
 				return err
 			}
@@ -318,7 +319,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			logger.Info("Connecting to Identity Server database...")
 
-			db, err := store.OpenDB(ctx, config.IS.DatabaseURI)
+			db, err := storeutil.OpenDB(ctx, config.IS.DatabaseURI)
 			if err != nil {
 				return err
 			}

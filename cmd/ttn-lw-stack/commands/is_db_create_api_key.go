@@ -26,8 +26,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	is "go.thethings.network/lorawan-stack/v3/pkg/identityserver"
 	bunstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/bunstore"
-	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 )
 
 var (
@@ -44,7 +44,7 @@ var createAPIKeyCommand = &cobra.Command{
 
 		logger.Info("Connecting to Identity Server database...")
 
-		db, err := store.OpenDB(ctx, config.IS.DatabaseURI)
+		db, err := storeutil.OpenDB(ctx, config.IS.DatabaseURI)
 		if err != nil {
 			return err
 		}
