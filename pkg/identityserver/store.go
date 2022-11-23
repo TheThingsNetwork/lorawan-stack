@@ -20,8 +20,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
 	bunstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/bunstore"
 	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
-	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 )
 
 var gormFeatureFlag = experimental.DefineFeature("is.gormstore", false)
@@ -53,7 +53,7 @@ func (is *IdentityServer) setupGormStore() error {
 }
 
 func (is *IdentityServer) setupBunStore() (err error) {
-	is.db, err = store.OpenDB(is.Context(), is.config.DatabaseURI)
+	is.db, err = storeutil.OpenDB(is.Context(), is.config.DatabaseURI)
 	if err != nil {
 		return err
 	}
