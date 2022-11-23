@@ -31,7 +31,7 @@ import (
 	ttntypes "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
-// Config for the Identity Server
+// Config for the Identity Server.
 type Config struct {
 	DatabaseURI      string `name:"database-uri" description:"Database connection URI"`
 	UserRegistration struct {
@@ -87,7 +87,7 @@ type Config struct {
 	} `name:"login-tokens"`
 	Email struct {
 		email.Config `name:",squash"`
-		Dir          string               `name:"dir" description:"Directory to write emails to if the dir provider is used (development only)"`
+		Dir          string               `name:"dir" description:"Directory to write emails to if the dir provider is used (development only)"` //nolint:lll
 		SendGrid     sendgrid.Config      `name:"sendgrid"`
 		SMTP         smtp.Config          `name:"smtp"`
 		Templates    emailTemplatesConfig `name:"templates"`
