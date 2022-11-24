@@ -57,10 +57,14 @@ var (
 		"x509_certificate_invalid", "certificate invalid", "detail", "reason",
 	)
 
-	errContextCancelled = DefineCanceled(
-		"context_canceled", "context canceled",
-	)
-	errContextDeadlineExceeded = DefineDeadlineExceeded(
+	// ErrContextCanceled is the Definition of the standard context.Cancelled error.
+	// This variant exists in order to allow the error code to be properly propagated
+	// over gRPC calls, otherwise the error code is unknown.
+	ErrContextCanceled = DefineCanceled("context_canceled", "context canceled")
+	// ErrContextDeadlineExceeded is the definition of the standard context.DeadlineExceeded error.
+	// This variant exists in order to allow the error code to be properly propagated
+	// over gRPC calls, otherwise the error code is unknown.
+	ErrContextDeadlineExceeded = DefineDeadlineExceeded(
 		"context_deadline_exceeded", "context deadline exceeded",
 	)
 )
@@ -78,10 +82,10 @@ func From(err error) (out *Error, ok bool) { //nolint:gocyclo
 		}
 	}()
 	if errors.Is(err, context.Canceled) {
-		return build(errContextCancelled, 0), true
+		return build(ErrContextCanceled, 0), true
 	}
 	if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, os.ErrDeadlineExceeded) {
-		return build(errContextDeadlineExceeded, 0), true
+		return build(ErrContextDeadlineExceeded, 0), true
 	}
 	if matched := (*Error)(nil); errors.As(err, &matched) {
 		if matched == nil {
