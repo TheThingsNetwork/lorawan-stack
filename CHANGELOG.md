@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.23.0] - unreleased
+
+### Added
+
 - The Things Join Server 2.0 (type `ttjsv2`) for claiming with Device Claiming Server.
 - All Join Servers with a `/64` JoinEUI prefix are contacted concurrently with LoRaWAN Backend Interfaces interoperability. This should only be used with ambiguous JoinEUIs and when migrating Join Servers.
 
@@ -18,8 +32,6 @@ For details about compatibility between different releases, see the **Commitment
 
 - Gateway EUI is no longer unset when deleting a gateway, meaning it could be recovered if no other gateway claimed it. This requires a schema migration (`ttn-lw-stack is-db migrate`) because of the change in the database's `gateway_eui_index`.
 - The new database driver is no longer specific to the Identity Server and is now activated using the `db.pgdriver` feature flag (instead of `is.pgdriver`).
-
-### Deprecated
 
 ### Removed
 
@@ -31,8 +43,6 @@ For details about compatibility between different releases, see the **Commitment
 - Client creation with an organization API key will no longer send an email without user information to the admins. Instead, the API key name will be used and if that is empty the API key ID will be the default.
 - Allow providing DevEUI for ABP end devices with a LoRaWAN specification lower or equal to 1.0.4 in the end device onboarding screen in the Console.
 - Faulty field validation for byte payloads in the uplink payload formatter panel in the Console.
-
-### Security
 
 ## [3.22.2] - 2022-11-10
 
@@ -2417,7 +2427,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.22.2...v3.22
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.23.0...v3.23
+[3.23.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.22.2...v3.23.0
 [3.22.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.22.1...v3.22.2
 [3.22.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.22.0...v3.22.1
 [3.22.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.21.2...v3.22.0
