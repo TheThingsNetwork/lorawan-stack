@@ -1,5 +1,5 @@
 # Root
-/** @johanstokking
+/** @johanstokking @adriansmares
 /CODEOWNERS @johanstokking
 /LICENSE @johanstokking
 /CHANGELOG.md
@@ -8,8 +8,8 @@
 /pkg
 
 # Dependencies
-/go.mod @johanstokking
-/go.sum @johanstokking
+/go.mod @johanstokking @adriansmares
+/go.sum @johanstokking @adriansmares
 /package.json @kschiffer @ryaplots
 /yarn.lock @kschiffer @ryaplots
 /sdk/js/package.json @kschiffer @ryaplots
@@ -24,26 +24,26 @@
 /cypress @kschiffer @ryaplots
 
 # API, configuration, CLI and storage compatibility
-/api/*.proto @johanstokking
+/api/*.proto @johanstokking @adriansmares
 /cmd @adriansmares
 /pkg/**/config.go @adriansmares
 /pkg/**/registry.go @adriansmares
 /pkg/config/shared.go @adriansmares
-/pkg/gogoproto @johanstokking
-/pkg/goproto @johanstokking
-/pkg/identityserver/store @johanstokking
-/pkg/jsonpb @johanstokking
-/pkg/ttnpb @johanstokking
+/pkg/gogoproto @johanstokking @adriansmares
+/pkg/goproto @johanstokking @adriansmares
+/pkg/identityserver/store @johanstokking @adriansmares
+/pkg/jsonpb @johanstokking @adriansmares
+/pkg/ttnpb @johanstokking @adriansmares
 
 # Security
-/pkg/auth @johanstokking
-/pkg/crypto @johanstokking
+/pkg/auth @johanstokking @adriansmares
+/pkg/crypto @johanstokking @adriansmares
 
 # Shared components
 /pkg/band @johanstokking @KrishnaIyer
 /pkg/cluster @johanstokking @adriansmares
-/pkg/component @johanstokking
-/pkg/errors @johanstokking
+/pkg/component @johanstokking @adriansmares
+/pkg/errors @johanstokking @adriansmares
 /pkg/events @adriansmares
 /pkg/frequencyplans @johanstokking @KrishnaIyer
 /pkg/interop @johanstokking @adriansmares
@@ -64,9 +64,9 @@
 /pkg/web/oauthclient @kschiffer @nicholaspcr
 
 /pkg/gatewayserver @johanstokking @KrishnaIyer @adriansmares
-/pkg/gatewayconfigurationserver @KrishnaIyer
-/pkg/pfconfig @KrishnaIyer
-/pkg/basicstation @KrishnaIyer
+/pkg/gatewayconfigurationserver @KrishnaIyer @adriansmares
+/pkg/pfconfig @KrishnaIyer @adriansmares
+/pkg/basicstation @KrishnaIyer @adriansmares
 
 /pkg/networkserver @johanstokking @adriansmares
 /pkg/specification/macspec @johanstokking @adriansmares
