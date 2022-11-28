@@ -25,6 +25,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 var errFormat = errors.DefineInvalidArgument("format", "invalid format `{input}`")
@@ -285,6 +286,21 @@ func stringToRxDelayPointerHook(f reflect.Type, t reflect.Type, data interface{}
 		enum = ttnpb.RxDelay(n)
 	}
 	return &enum, nil
+}
+
+func stringToEUI64PointerHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+	var eui types.EUI64
+	if f.Kind() != reflect.String || t != reflect.TypeOf(&eui) {
+		return data, nil
+	}
+	s := data.(string)
+	if s == "" {
+		return (*types.EUI64)(nil), nil
+	}
+	if err := eui.UnmarshalText([]byte(s)); err != nil {
+		return nil, err
+	}
+	return &eui, nil
 }
 
 func stringToADRAckDelayExponentPointerHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
