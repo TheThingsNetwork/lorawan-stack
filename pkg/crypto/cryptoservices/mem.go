@@ -101,7 +101,7 @@ func (d *mem) JoinAcceptMIC(
 	dn types.DevNonce,
 	payload []byte,
 ) ([4]byte, error) {
-	if dev.Ids == nil || types.MustEUI64(dev.Ids.JoinEui).OrZero().IsZero() {
+	if dev.Ids == nil || len(dev.Ids.JoinEui) == 0 {
 		return [4]byte{}, errNoJoinEUI.New()
 	}
 	if types.MustEUI64(dev.Ids.DevEui).OrZero().IsZero() {
@@ -138,7 +138,7 @@ func (d *mem) EncryptRejoinAccept(
 	if !macspec.UseNwkKey(version) {
 		panic("This statement is unreachable. Please version check.")
 	}
-	if dev.Ids == nil || types.MustEUI64(dev.Ids.JoinEui).OrZero().IsZero() {
+	if dev.Ids == nil || len(dev.Ids.JoinEui) == 0 {
 		return nil, errNoJoinEUI.New()
 	}
 	if types.MustEUI64(dev.Ids.DevEui).OrZero().IsZero() {
@@ -161,7 +161,7 @@ func (d *mem) DeriveNwkSKeys(
 	dn types.DevNonce,
 	nid types.NetID,
 ) (NwkSKeys, error) {
-	if dev.Ids == nil || types.MustEUI64(dev.Ids.JoinEui).OrZero().IsZero() {
+	if dev.Ids == nil || len(dev.Ids.JoinEui) == 0 {
 		return NwkSKeys{}, errNoJoinEUI.New()
 	}
 	if types.MustEUI64(dev.Ids.DevEui).OrZero().IsZero() {
@@ -203,7 +203,7 @@ func (d *mem) DeriveAppSKey(
 	dn types.DevNonce,
 	nid types.NetID,
 ) (types.AES128Key, error) {
-	if dev.Ids == nil || types.MustEUI64(dev.Ids.JoinEui).OrZero().IsZero() {
+	if dev.Ids == nil || len(dev.Ids.JoinEui) == 0 {
 		return types.AES128Key{}, errNoJoinEUI.New()
 	}
 	if types.MustEUI64(dev.Ids.DevEui).OrZero().IsZero() {
