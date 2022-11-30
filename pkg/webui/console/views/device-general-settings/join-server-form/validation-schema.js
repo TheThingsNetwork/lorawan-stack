@@ -61,12 +61,7 @@ const validationSchema = Yup.object()
         })
       },
     ),
-    resets_join_nonces: Yup.boolean().when('$lorawanVersion', {
-      // Verify if lorawan version is 1.1.0 or higher.
-      is: version => parseLorawanMacVersion(version) >= 110,
-      then: schema => schema,
-      otherwise: schema => schema.strip(),
-    }),
+    resets_join_nonces: Yup.boolean(),
     application_server_id: Yup.string()
       .max(100, Yup.passValues(sharedMessages.validateTooLong))
       .default(''),

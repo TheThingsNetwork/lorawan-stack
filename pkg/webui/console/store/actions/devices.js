@@ -84,6 +84,20 @@ export const [
   { request: resetDevice, success: resetDeviceSuccess, failure: resetDeviceFailure },
 ] = createRequestActions(RESET_DEV_BASE, (appId, deviceId) => ({ appId, deviceId }))
 
+export const RESET_USED_DEV_NONCES_BASE = 'RESET_USED_DEV_NONCES'
+export const [
+  {
+    request: RESET_USED_DEV_NONCES,
+    success: RESET_USED_DEV_NONCES_SUCCESS,
+    failure: RESET_USED_DEV_NONCES_FAILURE,
+  },
+  {
+    request: resetUsedDevNonces,
+    success: resetUsedDevNoncesSuccess,
+    failure: resetUsedDevNoncesFailure,
+  },
+] = createRequestActions(RESET_USED_DEV_NONCES_BASE, (appId, deviceId) => ({ appId, deviceId }))
+
 export const START_DEVICE_EVENT_STREAM = createStartEventsStreamActionType(SHARED_NAME)
 export const START_DEVICE_EVENT_STREAM_SUCCESS =
   createStartEventsStreamSuccessActionType(SHARED_NAME)
