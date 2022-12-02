@@ -63,7 +63,7 @@
     "nib": "^1.2.0",
     "pg": "^8.8.0",
     "prettier": "^2.7.1",
-    "react-refresh": "^0.13.0",
+    "react-refresh": "^0.14.0",
     "stylint": "^2.0.0",
     "stylus": "^0.59.0",
     "stylus-loader": "^4.3.3",
