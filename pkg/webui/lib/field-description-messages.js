@@ -278,6 +278,12 @@ const m = defineMessages({
 
   inputMethodDescription:
     'To register the device, we need to know the exact LoRaWAN specifications that the device adheres to. To do that, you can select your device in our extensive LoRaWAN Device Repository, which is the best way to ensure proper configuration. If your device is not listed in the repository, you can also provide versions and MAC configurations manually. Please refer to the manual and/or data sheet of your device and contact your manufacturer or reseller if you are unsure about a certain config.',
+
+  resetsJoinNoncesDescription:
+    'Allowing join nonces to be reset disables any reuse checks for the device nonces and join nonces. The join requests can be replayed indefinitely when this option is enabled. This behavior is non compliant with the LoRaWAN specifications and must not be used outside of development environments.',
+
+  resetUsedDevNoncesDescription:
+    'The device nonces ensure that join requests cannot be replayed by attackers. Resetting the device nonces enables the end device to re-use a previously used nonce. Do not use this option unless you are sure that you would like the nonces to be usable again.',
 })
 
 const descriptions = Object.freeze({
@@ -539,6 +545,12 @@ const descriptions = Object.freeze({
   },
   [TOOLTIP_IDS.INPUT_METHOD]: {
     description: m.inputMethodDescription,
+  },
+  [TOOLTIP_IDS.RESETS_JOIN_NONCES]: {
+    description: m.resetsJoinNoncesDescription,
+  },
+  [TOOLTIP_IDS.RESET_USED_DEV_NONCES]: {
+    description: m.resetUsedDevNoncesDescription,
   },
 })
 

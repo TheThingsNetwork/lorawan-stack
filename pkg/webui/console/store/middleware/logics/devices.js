@@ -105,6 +105,20 @@ const resetDeviceLogic = createRequestLogic({
   },
 })
 
+const resetUsedDevNoncesLogic = createRequestLogic({
+  type: devices.RESET_USED_DEV_NONCES,
+  process: async ({ action }) => {
+    const {
+      payload: { appId, deviceId },
+    } = action
+    const result = await tts.Applications.Devices.updateById(appId, deviceId, {
+      used_dev_nonces: [],
+    })
+
+    return { ...result }
+  },
+})
+
 const getDeviceTemplateFormatsLogic = createRequestLogic({
   type: deviceTemplateFormats.GET_DEVICE_TEMPLATE_FORMATS,
   process: async () => await tts.Applications.Devices.listTemplateFormats(),
@@ -171,5 +185,6 @@ export default [
   resetDeviceLogic,
   updateDeviceLogic,
   getDeviceSessionLogic,
+  resetUsedDevNoncesLogic,
   ...createEventsConnectLogics(devices.SHARED_NAME, 'devices', tts.Applications.Devices.openStream),
 ]

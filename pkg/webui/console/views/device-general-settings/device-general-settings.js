@@ -60,6 +60,7 @@ export default class DeviceGeneralSettings extends React.Component {
     onDelete: PropTypes.func.isRequired,
     onDeleteSuccess: PropTypes.func.isRequired,
     resetDevice: PropTypes.func.isRequired,
+    resetUsedDevNonces: PropTypes.func.isRequired,
     updateDevice: PropTypes.func.isRequired,
   }
 
@@ -139,6 +140,7 @@ export default class DeviceGeneralSettings extends React.Component {
       mayReadKeys,
       resetDevice,
       getDefaultMacSettings,
+      resetUsedDevNonces,
     } = this.props
 
     const isOTAA = isDeviceOTAA(device)
@@ -248,6 +250,7 @@ export default class DeviceGeneralSettings extends React.Component {
                 onSubmitSuccess={this.handleSubmitSuccess}
                 mayEditKeys={mayEditKeys}
                 mayReadKeys={mayReadKeys}
+                onUsedDevNoncesReset={resetUsedDevNonces}
               />
             </Collapse>
           </Col>
