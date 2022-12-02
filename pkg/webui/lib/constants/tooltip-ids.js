@@ -67,6 +67,8 @@ export default Object.freeze({
   REQUIRE_AUTHENTICATED_CONNECTION: 'require-authenticated-connection',
   RESET_MAC: 'reset-mac',
   RESETS_F_CNT: 'resets-f-cnt',
+  RESETS_JOIN_NONCES: 'resets-join-nonces',
+  RESET_USED_DEV_NONCES: 'reset-used-dev-nonces',
   RX1_DELAY: 'rx1-delay',
   RX2_DATA_RATE_INDEX: 'rx2-data-rate-index',
   RX2_FREQUENCY: 'rx2-frequency',

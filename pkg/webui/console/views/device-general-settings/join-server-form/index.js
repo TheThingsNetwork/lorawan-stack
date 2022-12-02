@@ -189,8 +189,12 @@ const JoinServerForm = React.memo(props => {
         warning={resetsJoinNonces ? sharedMessages.resetWarning : undefined}
         name="resets_join_nonces"
         component={Checkbox}
+        tooltipId={tooltipIds.RESETS_JOIN_NONCES}
       />
-      <Form.InfoField title={messages.resetUsedDevNonces}>
+      <Form.InfoField
+        title={messages.resetUsedDevNonces}
+        tooltipId={tooltipIds.RESET_USED_DEV_NONCES}
+      >
         <ModalButton
           type="button"
           warning
