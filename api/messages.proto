@@ -187,7 +187,7 @@ message GatewayUplinkMessage {
 }
 
 message ApplicationUplink {
-  option (thethings.flags.message) = { select: true, set: false };
+  option (thethings.flags.message) = { select: true, set: true };
   // Join Server issued identifier for the session keys used by this uplink.
   bytes session_key_id = 1 [(validate.rules).bytes.max_len = 2048];
   // LoRaWAN FPort of the uplink message.

@@ -18,13 +18,11 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"reflect"
 	"strings"
 	"time"
 
 	"github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	"github.com/spf13/pflag"
-	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -136,7 +134,7 @@ func getAPIKeyID(flagSet *pflag.FlagSet, args []string, i int) string {
 
 var apiKeyExpiryFlag = func() *pflag.FlagSet {
 	flagSet := &pflag.FlagSet{}
-	util.AddField(flagSet, "api-key-expiry", reflect.TypeOf(time.Time{}), false)
+	flagSet.AddFlag(flagsplugin.NewTimestampFlag("api-key-expiry", "(YYYY-MM-DDTHH:MM:SSZ)"))
 	return flagSet
 }()
 

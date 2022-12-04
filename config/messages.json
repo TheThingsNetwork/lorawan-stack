@@ -1358,24 +1358,6 @@
       "file": "contact_info.go"
     }
   },
-  "error:cmd/ttn-lw-cli/commands:data_rate": {
-    "translations": {
-      "en": "data rate is invalid"
-    },
-    "description": {
-      "package": "cmd/ttn-lw-cli/commands",
-      "file": "simulate.go"
-    }
-  },
-  "error:cmd/ttn-lw-cli/commands:data_rate_index": {
-    "translations": {
-      "en": "Data rate index is invalid"
-    },
-    "description": {
-      "package": "cmd/ttn-lw-cli/commands",
-      "file": "end_devices.go"
-    }
-  },
   "error:cmd/ttn-lw-cli/commands:default_packet_broker_network_identifier": {
     "translations": {
       "en": "default Packet Broker network identifier"
@@ -1473,15 +1455,6 @@
     "description": {
       "package": "cmd/ttn-lw-cli/commands",
       "file": "use.go"
-    }
-  },
-  "error:cmd/ttn-lw-cli/commands:frequency": {
-    "translations": {
-      "en": "frequency is invalid"
-    },
-    "description": {
-      "package": "cmd/ttn-lw-cli/commands",
-      "file": "simulate.go"
     }
   },
   "error:cmd/ttn-lw-cli/commands:gateway_server_address_mismatch": {
@@ -1898,13 +1871,31 @@
       "file": "root.go"
     }
   },
-  "error:cmd/ttn-lw-cli/internal/util:flag_value": {
+  "error:cmd/ttn-lw-cli/internal/simulate:data_rate": {
     "translations": {
-      "en": "invalid flag value"
+      "en": "data rate is invalid"
     },
     "description": {
-      "package": "cmd/ttn-lw-cli/internal/util",
-      "file": "flags.go"
+      "package": "cmd/ttn-lw-cli/internal/simulate",
+      "file": "simulate_util.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/internal/simulate:data_rate_index": {
+    "translations": {
+      "en": "Data rate index is invalid"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/internal/simulate",
+      "file": "simulate_util.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/internal/simulate:frequency": {
+    "translations": {
+      "en": "frequency is invalid"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/internal/simulate",
+      "file": "simulate_util.go"
     }
   },
   "error:cmd/ttn-lw-stack/commands:expiry_date_format_invalid": {

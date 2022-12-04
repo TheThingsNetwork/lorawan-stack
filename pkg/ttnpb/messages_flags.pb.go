@@ -153,6 +153,119 @@ func PathsFromSelectFlagsForApplicationUplink(flags *pflag.FlagSet, prefix strin
 	return paths, nil
 }
 
+// AddSetFlagsForApplicationUplink adds flags to select fields in ApplicationUplink.
+func AddSetFlagsForApplicationUplink(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("session-key-id", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("f-port", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("f-cnt", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("frm-payload", prefix), "", flagsplugin.WithHidden(hidden)))
+	// FIXME: Skipping DecodedPayload because this WKT is currently not supported.
+	flags.AddFlag(flagsplugin.NewStringSliceFlag(flagsplugin.Prefix("decoded-payload-warnings", prefix), "", flagsplugin.WithHidden(hidden)))
+	// FIXME: Skipping NormalizedPayload because this repeated WKT is currently not supported.
+	flags.AddFlag(flagsplugin.NewStringSliceFlag(flagsplugin.Prefix("normalized-payload-warnings", prefix), "", flagsplugin.WithHidden(hidden)))
+	// FIXME: Skipping RxMetadata because repeated messages are currently not supported.
+	// FIXME: Skipping Settings because it does not seem to implement AddSetFlags.
+	flags.AddFlag(flagsplugin.NewTimestampFlag(flagsplugin.Prefix("received-at", prefix), "", flagsplugin.WithHidden(hidden)))
+	AddSetFlagsForKeyEnvelope(flags, flagsplugin.Prefix("app-s-key", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("last-a-f-cnt-down", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("confirmed", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewDurationFlag(flagsplugin.Prefix("consumed-airtime", prefix), "", flagsplugin.WithHidden(hidden)))
+	// FIXME: Skipping Locations because maps with message value types are currently not supported.
+	AddSetFlagsForEndDeviceVersionIdentifiers(flags, flagsplugin.Prefix("version-ids", prefix), hidden)
+	// FIXME: Skipping NetworkIds because it does not seem to implement AddSetFlags.
+}
+
+// SetFromFlags sets the ApplicationUplink message from flags.
+func (m *ApplicationUplink) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := flagsplugin.GetBytes(flags, flagsplugin.Prefix("session_key_id", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.SessionKeyId = val
+		paths = append(paths, flagsplugin.Prefix("session_key_id", prefix))
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("f_port", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.FPort = val
+		paths = append(paths, flagsplugin.Prefix("f_port", prefix))
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("f_cnt", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.FCnt = val
+		paths = append(paths, flagsplugin.Prefix("f_cnt", prefix))
+	}
+	if val, changed, err := flagsplugin.GetBytes(flags, flagsplugin.Prefix("frm_payload", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.FrmPayload = val
+		paths = append(paths, flagsplugin.Prefix("frm_payload", prefix))
+	}
+	// FIXME: Skipping DecodedPayload because this WKT is not supported.
+	if val, changed, err := flagsplugin.GetStringSlice(flags, flagsplugin.Prefix("decoded_payload_warnings", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.DecodedPayloadWarnings = val
+		paths = append(paths, flagsplugin.Prefix("decoded_payload_warnings", prefix))
+	}
+	// FIXME: Skipping NormalizedPayload because this repeated WKT is not supported
+	if val, changed, err := flagsplugin.GetStringSlice(flags, flagsplugin.Prefix("normalized_payload_warnings", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.NormalizedPayloadWarnings = val
+		paths = append(paths, flagsplugin.Prefix("normalized_payload_warnings", prefix))
+	}
+	// FIXME: Skipping RxMetadata because it does not seem to implement AddSetFlags.
+	// FIXME: Skipping Settings because it does not seem to implement AddSetFlags.
+	if val, changed, err := flagsplugin.GetTimestamp(flags, flagsplugin.Prefix("received_at", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.ReceivedAt = gogo.SetTimestamp(val)
+		paths = append(paths, flagsplugin.Prefix("received_at", prefix))
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("app_s_key", prefix)); changed {
+		if m.AppSKey == nil {
+			m.AppSKey = &KeyEnvelope{}
+		}
+		if setPaths, err := m.AppSKey.SetFromFlags(flags, flagsplugin.Prefix("app_s_key", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("last_a_f_cnt_down", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.LastAFCntDown = val
+		paths = append(paths, flagsplugin.Prefix("last_a_f_cnt_down", prefix))
+	}
+	if val, changed, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("confirmed", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Confirmed = val
+		paths = append(paths, flagsplugin.Prefix("confirmed", prefix))
+	}
+	if val, changed, err := flagsplugin.GetDuration(flags, flagsplugin.Prefix("consumed_airtime", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.ConsumedAirtime = gogo.SetDuration(val)
+		paths = append(paths, flagsplugin.Prefix("consumed_airtime", prefix))
+	}
+	// FIXME: Skipping Locations because maps with message value types are currently not supported.
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("version_ids", prefix)); changed {
+		if m.VersionIds == nil {
+			m.VersionIds = &EndDeviceVersionIdentifiers{}
+		}
+		if setPaths, err := m.VersionIds.SetFromFlags(flags, flagsplugin.Prefix("version_ids", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	// FIXME: Skipping NetworkIds because it does not seem to implement AddSetFlags.
+	return paths, nil
+}
+
 // AddSelectFlagsForApplicationUplinkNormalized adds flags to select fields in ApplicationUplinkNormalized.
 func AddSelectFlagsForApplicationUplinkNormalized(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("session-key-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("session-key-id", prefix), false), flagsplugin.WithHidden(hidden)))
