@@ -87,8 +87,8 @@ github.com/TheThingsIndustries/mapstructure v0.0.0-20220329135826-c42f9f170b2a h
 github.com/TheThingsIndustries/mapstructure v0.0.0-20220329135826-c42f9f170b2a/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RRV2QTWOzhPopBRo=
 github.com/TheThingsIndustries/mystique v0.0.0-20211230093812-d4088bd06959 h1:YRyHofsKjSff/aofUxYl0PuSibYaYZMXGrOGD4w1ayE=
 github.com/TheThingsIndustries/mystique v0.0.0-20211230093812-d4088bd06959/go.mod h1:zJmv+zv/E4SFsThOS+ExjtJf3M1x2MOziwyHI7l5zZo=
-github.com/TheThingsIndustries/protoc-gen-go-flags v1.0.0 h1:zU7Sp5BES8h9Qi3dXeIhSpTGxrjtaqbzpdIm2L+G+FQ=
-github.com/TheThingsIndustries/protoc-gen-go-flags v1.0.0/go.mod h1:nlf5qiiSsW9OQfcSUUqzGv7v8OJg0MhI2rXvTiBf/fw=
+github.com/TheThingsIndustries/protoc-gen-go-flags v1.0.6 h1:IzTyiZA4tbGGnAv4V7epr8EPjXlV4qK07+kLYt4uScc=
+github.com/TheThingsIndustries/protoc-gen-go-flags v1.0.6/go.mod h1:WFhbSHpgeGU32bQFmLRspFOd8tndSZe6JRaF45qve/o=
 github.com/TheThingsIndustries/protoc-gen-go-json v1.4.0 h1:51GcLhX2se5RbQYb+++HTP+7qsrEIa5tdUb9+FPuFhs=
 github.com/TheThingsIndustries/protoc-gen-go-json v1.4.0/go.mod h1:7xYRiu4k/ioxM2/nqq2lyXLr4Lj4Nyx7AvYjr7rJSww=
 github.com/TheThingsIndustries/throttled/v2 v2.7.1-noredis h1:uashKgjy7XCNZNb00+3GheWtJXnS9DnAkYQ1X89cAIg=
@@ -313,8 +313,8 @@ github.com/google/go-cmp v0.5.4/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/
 github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-cmp v0.5.6/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-cmp v0.5.7/go.mod h1:n+brtR0CgQNWTVd5ZUFpTBC8YFBDLK/h/bpaJ8/DtOE=
-github.com/google/go-cmp v0.5.8 h1:e6P7q2lk1O+qJJb4BtCQXlK8vWEO8V1ZeuEdJNOqZyg=
-github.com/google/go-cmp v0.5.8/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
+github.com/google/go-cmp v0.5.9 h1:O2Tfq5qg4qc4AmwVlvv0oLiVAGB7enBSJ2x2DqQFi38=
+github.com/google/go-cmp v0.5.9/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
 github.com/google/go-querystring v1.0.0/go.mod h1:odCYkC5MyYFN7vkCjXpyrEuKhc/BUO6wN/zVPAxq5ck=
 github.com/google/go-replayers/grpcreplay v0.1.0 h1:eNb1y9rZFmY4ax45uEEECSa8fsxGRU+8Bil52ASAwic=
 github.com/google/go-replayers/grpcreplay v0.1.0/go.mod h1:8Ig2Idjpr6gifRd6pNVggX6TC1Zw6Jx74AKp7QNH2QE=
@@ -1100,8 +1100,8 @@ google.golang.org/grpc v1.33.1/go.mod h1:fr5YgcSWrqhRRxogOsw7RzIpsmvOZ6IcH4kBYTp
 google.golang.org/protobuf v1.26.0-rc.1/go.mod h1:jlhhOSvTdKEhbULTjvd4ARK9grFBp09yW+WbY/TyQbw=
 google.golang.org/protobuf v1.26.0/go.mod h1:9q0QmTI4eRPtz6boOQmLYwt+qCgq0jsYwAQnmE0givc=
 google.golang.org/protobuf v1.27.1/go.mod h1:9q0QmTI4eRPtz6boOQmLYwt+qCgq0jsYwAQnmE0givc=
-google.golang.org/protobuf v1.28.0 h1:w43yiav+6bVFTBQFZX0r7ipe9JQ1QsbMgHwbBziscLw=
-google.golang.org/protobuf v1.28.0/go.mod h1:HV8QOd/L58Z+nl8r43ehVNZIU/HEI6OcFqwMG9pJV4I=
+google.golang.org/protobuf v1.28.1 h1:d0NfwRgPtno5B1Wa6L2DAG+KivqkdutMf1UhdNx175w=
+google.golang.org/protobuf v1.28.1/go.mod h1:HV8QOd/L58Z+nl8r43ehVNZIU/HEI6OcFqwMG9pJV4I=
 gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0 h1:FVCohIoYO7IJoDDVpV2pdq7SgrMH6wHnuTyrdrxJNoY=
 gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0/go.mod h1:OdE7CF6DbADk7lN8LIKRzRJTTZXIjtWgA5THM5lhBAw=
 gopkg.in/alecthomas/kingpin.v2 v2.2.6/go.mod h1:FMv+mEhP44yOT+4EoQTLFTRgOQ1FBLkstjWtayDeSgw=

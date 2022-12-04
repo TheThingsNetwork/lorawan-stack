@@ -36,7 +36,7 @@ const (
 	grpcGatewayProtoImage = "ghcr.io/thethingsindustries/protoc:gen-grpc-gateway-1.16.0"
 	openAPIv2ProtoImage   = "ghcr.io/thethingsindustries/protoc:gen-grpc-gateway-2.10.3"
 	docProtoImage         = "ghcr.io/thethingsindustries/protoc:gen-doc-1.4.1"
-	flagProtoImage        = "ghcr.io/thethingsindustries/protoc:3.9.1-gen-go-flags-1.0.5"
+	flagProtoImage        = "ghcr.io/thethingsindustries/protoc:3.9.1-gen-go-flags-1.0.6"
 )
 
 // Proto namespace.
