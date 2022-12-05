@@ -4993,9 +4993,6 @@ Identifies an end device model with version information.
 | `hardware_version` | [`string`](#string) |  |  |
 | `firmware_version` | [`string`](#string) |  |  |
 | `band_id` | [`string`](#string) |  |  |
-| `vendor_id` | [`uint32`](#uint32) |  | VendorID managed by the LoRa Alliance, as defined in TR005. |
-| `vendor_profile_id` | [`uint32`](#uint32) |  | ID of the LoRaWAN end device profile assigned by the vendor. |
-| `serial_number` | [`string`](#string) |  |  |
 
 #### Field Rules
 
@@ -5006,7 +5003,6 @@ Identifies an end device model with version information.
 | `hardware_version` | <p>`string.max_len`: `32`</p> |
 | `firmware_version` | <p>`string.max_len`: `32`</p> |
 | `band_id` | <p>`string.max_len`: `32`</p> |
-| `serial_number` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 
 ### <a name="ttn.lorawan.v3.EntityIdentifiers">Message `EntityIdentifiers`</a>
 

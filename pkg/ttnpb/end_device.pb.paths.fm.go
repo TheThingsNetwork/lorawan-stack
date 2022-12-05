@@ -191,9 +191,6 @@ var EndDeviceVersionFieldPathsNested = []string{
 	"ids.firmware_version",
 	"ids.hardware_version",
 	"ids.model_id",
-	"ids.serial_number",
-	"ids.vendor_id",
-	"ids.vendor_profile_id",
 	"lorawan_phy_version",
 	"lorawan_version",
 	"max_frequency",
@@ -998,9 +995,6 @@ var EndDeviceFieldPathsNested = []string{
 	"version_ids.firmware_version",
 	"version_ids.hardware_version",
 	"version_ids.model_id",
-	"version_ids.serial_number",
-	"version_ids.vendor_id",
-	"version_ids.vendor_profile_id",
 }
 
 var EndDeviceFieldPathsTopLevel = []string{
@@ -1544,9 +1538,6 @@ var CreateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.version_ids.firmware_version",
 	"end_device.version_ids.hardware_version",
 	"end_device.version_ids.model_id",
-	"end_device.version_ids.serial_number",
-	"end_device.version_ids.vendor_id",
-	"end_device.version_ids.vendor_profile_id",
 }
 
 var CreateEndDeviceRequestFieldPathsTopLevel = []string{
@@ -2024,9 +2015,6 @@ var UpdateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.version_ids.firmware_version",
 	"end_device.version_ids.hardware_version",
 	"end_device.version_ids.model_id",
-	"end_device.version_ids.serial_number",
-	"end_device.version_ids.vendor_id",
-	"end_device.version_ids.vendor_profile_id",
 	"field_mask",
 }
 
@@ -2553,9 +2541,6 @@ var SetEndDeviceRequestFieldPathsNested = []string{
 	"end_device.version_ids.firmware_version",
 	"end_device.version_ids.hardware_version",
 	"end_device.version_ids.model_id",
-	"end_device.version_ids.serial_number",
-	"end_device.version_ids.vendor_id",
-	"end_device.version_ids.vendor_profile_id",
 	"field_mask",
 }
 
@@ -3050,9 +3035,6 @@ var EndDeviceTemplateFieldPathsNested = []string{
 	"end_device.version_ids.firmware_version",
 	"end_device.version_ids.hardware_version",
 	"end_device.version_ids.model_id",
-	"end_device.version_ids.serial_number",
-	"end_device.version_ids.vendor_id",
-	"end_device.version_ids.vendor_profile_id",
 	"field_mask",
 	"mapping_key",
 }
@@ -3088,9 +3070,6 @@ var ConvertEndDeviceTemplateRequestFieldPathsNested = []string{
 	"end_device_version_ids.firmware_version",
 	"end_device_version_ids.hardware_version",
 	"end_device_version_ids.model_id",
-	"end_device_version_ids.serial_number",
-	"end_device_version_ids.vendor_id",
-	"end_device_version_ids.vendor_profile_id",
 	"format_id",
 }
 

@@ -606,36 +606,6 @@ func (dst *EndDeviceVersionIdentifiers) SetFields(src *EndDeviceVersionIdentifie
 				var zero string
 				dst.BandId = zero
 			}
-		case "vendor_id":
-			if len(subs) > 0 {
-				return fmt.Errorf("'vendor_id' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.VendorId = src.VendorId
-			} else {
-				var zero uint32
-				dst.VendorId = zero
-			}
-		case "vendor_profile_id":
-			if len(subs) > 0 {
-				return fmt.Errorf("'vendor_profile_id' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.VendorProfileId = src.VendorProfileId
-			} else {
-				var zero uint32
-				dst.VendorProfileId = zero
-			}
-		case "serial_number":
-			if len(subs) > 0 {
-				return fmt.Errorf("'serial_number' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.SerialNumber = src.SerialNumber
-			} else {
-				var zero string
-				dst.SerialNumber = zero
-			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

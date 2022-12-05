@@ -1107,30 +1107,6 @@ func (m *EndDeviceVersionIdentifiers) ValidateFields(paths ...string) error {
 				}
 			}
 
-		case "vendor_id":
-			// no validation rules for VendorId
-		case "vendor_profile_id":
-			// no validation rules for VendorProfileId
-		case "serial_number":
-
-			if m.GetSerialNumber() != "" {
-
-				if utf8.RuneCountInString(m.GetSerialNumber()) > 36 {
-					return EndDeviceVersionIdentifiersValidationError{
-						field:  "serial_number",
-						reason: "value length must be at most 36 runes",
-					}
-				}
-
-				if !_EndDeviceVersionIdentifiers_SerialNumber_Pattern.MatchString(m.GetSerialNumber()) {
-					return EndDeviceVersionIdentifiersValidationError{
-						field:  "serial_number",
-						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
-					}
-				}
-
-			}
-
 		default:
 			return EndDeviceVersionIdentifiersValidationError{
 				field:  name,
@@ -1201,8 +1177,6 @@ var _ interface {
 var _EndDeviceVersionIdentifiers_BrandId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 var _EndDeviceVersionIdentifiers_ModelId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
-
-var _EndDeviceVersionIdentifiers_SerialNumber_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on NetworkIdentifiers with the rules
 // defined in the proto definition for this message. If any rules are

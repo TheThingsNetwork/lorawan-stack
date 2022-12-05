@@ -6653,28 +6653,6 @@
             "type": "string"
           },
           {
-            "name": "version_ids.vendor_id",
-            "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.vendor_profile_id",
-            "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.serial_number",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
             "name": "field_mask",
             "description": "Field mask paths.",
             "in": "query",
@@ -6737,28 +6715,6 @@
           },
           {
             "name": "version_ids.hardware_version",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "version_ids.vendor_id",
-            "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.vendor_profile_id",
-            "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.serial_number",
             "in": "query",
             "required": false,
             "type": "string"
@@ -6831,28 +6787,6 @@
             "type": "string"
           },
           {
-            "name": "version_ids.vendor_id",
-            "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.vendor_profile_id",
-            "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.serial_number",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
             "name": "field_mask",
             "description": "Field mask paths.",
             "in": "query",
@@ -6915,28 +6849,6 @@
           },
           {
             "name": "version_ids.hardware_version",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "version_ids.vendor_id",
-            "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.vendor_profile_id",
-            "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.serial_number",
             "in": "query",
             "required": false,
             "type": "string"
@@ -7103,28 +7015,6 @@
           },
           {
             "name": "version_ids.band_id",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "version_ids.vendor_id",
-            "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.vendor_profile_id",
-            "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.serial_number",
             "in": "query",
             "required": false,
             "type": "string"
@@ -7426,28 +7316,6 @@
             "type": "string"
           },
           {
-            "name": "version_ids.vendor_id",
-            "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.vendor_profile_id",
-            "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.serial_number",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
             "name": "field_mask",
             "description": "Field mask paths.",
             "in": "query",
@@ -7510,28 +7378,6 @@
           },
           {
             "name": "version_ids.hardware_version",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "version_ids.vendor_id",
-            "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.vendor_profile_id",
-            "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.serial_number",
             "in": "query",
             "required": false,
             "type": "string"
@@ -7604,28 +7450,6 @@
             "type": "string"
           },
           {
-            "name": "version_ids.vendor_id",
-            "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.vendor_profile_id",
-            "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.serial_number",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
             "name": "field_mask",
             "description": "Field mask paths.",
             "in": "query",
@@ -7688,28 +7512,6 @@
           },
           {
             "name": "version_ids.hardware_version",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "version_ids.vendor_id",
-            "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.vendor_profile_id",
-            "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.serial_number",
             "in": "query",
             "required": false,
             "type": "string"
@@ -7876,28 +7678,6 @@
           },
           {
             "name": "version_ids.band_id",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "version_ids.vendor_id",
-            "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.vendor_profile_id",
-            "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.serial_number",
             "in": "query",
             "required": false,
             "type": "string"
@@ -21341,19 +21121,6 @@
           "type": "string"
         },
         "band_id": {
-          "type": "string"
-        },
-        "vendor_id": {
-          "type": "integer",
-          "format": "int64",
-          "description": "VendorID managed by the LoRa Alliance, as defined in TR005."
-        },
-        "vendor_profile_id": {
-          "type": "integer",
-          "format": "int64",
-          "description": "ID of the LoRaWAN end device profile assigned by the vendor."
-        },
-        "serial_number": {
           "type": "string"
         }
       },

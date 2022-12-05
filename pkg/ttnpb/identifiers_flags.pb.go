@@ -361,9 +361,6 @@ func AddSelectFlagsForEndDeviceVersionIdentifiers(flags *pflag.FlagSet, prefix s
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("hardware-version", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("hardware-version", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("firmware-version", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("firmware-version", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("band-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("band-id", prefix), false), flagsplugin.WithHidden(hidden)))
-	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("vendor-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("vendor-id", prefix), false), flagsplugin.WithHidden(hidden)))
-	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("vendor-profile-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("vendor-profile-id", prefix), false), flagsplugin.WithHidden(hidden)))
-	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("serial-number", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("serial-number", prefix), false), flagsplugin.WithHidden(hidden)))
 }
 
 // SelectFromFlags outputs the fieldmask paths forEndDeviceVersionIdentifiers message from select flags.
@@ -393,21 +390,6 @@ func PathsFromSelectFlagsForEndDeviceVersionIdentifiers(flags *pflag.FlagSet, pr
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("band_id", prefix))
 	}
-	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("vendor_id", prefix)); err != nil {
-		return nil, err
-	} else if selected && val {
-		paths = append(paths, flagsplugin.Prefix("vendor_id", prefix))
-	}
-	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("vendor_profile_id", prefix)); err != nil {
-		return nil, err
-	} else if selected && val {
-		paths = append(paths, flagsplugin.Prefix("vendor_profile_id", prefix))
-	}
-	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("serial_number", prefix)); err != nil {
-		return nil, err
-	} else if selected && val {
-		paths = append(paths, flagsplugin.Prefix("serial_number", prefix))
-	}
 	return paths, nil
 }
 
@@ -418,9 +400,6 @@ func AddSetFlagsForEndDeviceVersionIdentifiers(flags *pflag.FlagSet, prefix stri
 	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("hardware-version", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("firmware-version", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("band-id", prefix), "", flagsplugin.WithHidden(hidden)))
-	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("vendor-id", prefix), "", flagsplugin.WithHidden(hidden)))
-	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("vendor-profile-id", prefix), "", flagsplugin.WithHidden(hidden)))
-	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("serial-number", prefix), "", flagsplugin.WithHidden(hidden)))
 }
 
 // SetFromFlags sets the EndDeviceVersionIdentifiers message from flags.
@@ -454,24 +433,6 @@ func (m *EndDeviceVersionIdentifiers) SetFromFlags(flags *pflag.FlagSet, prefix 
 	} else if changed {
 		m.BandId = val
 		paths = append(paths, flagsplugin.Prefix("band_id", prefix))
-	}
-	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("vendor_id", prefix)); err != nil {
-		return nil, err
-	} else if changed {
-		m.VendorId = val
-		paths = append(paths, flagsplugin.Prefix("vendor_id", prefix))
-	}
-	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("vendor_profile_id", prefix)); err != nil {
-		return nil, err
-	} else if changed {
-		m.VendorProfileId = val
-		paths = append(paths, flagsplugin.Prefix("vendor_profile_id", prefix))
-	}
-	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("serial_number", prefix)); err != nil {
-		return nil, err
-	} else if changed {
-		m.SerialNumber = val
-		paths = append(paths, flagsplugin.Prefix("serial_number", prefix))
 	}
 	return paths, nil
 }
