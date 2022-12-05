@@ -1495,6 +1495,19 @@
                       "type": "string",
                       "format": "date-time",
                       "description": "Timestamp when a device uplink has been last observed.\nThis field is set by the Application Server and stored in the Identity Server."
+                    },
+                    "vendor_id": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "VendorID managed by the LoRa Alliance, as defined in TR005."
+                    },
+                    "vendor_profile_id": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "ID of the LoRaWAN end device profile assigned by the vendor."
+                    },
+                    "serial_number": {
+                      "type": "string"
                     }
                   },
                   "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -1800,6 +1813,19 @@
                       "type": "string",
                       "format": "date-time",
                       "description": "Timestamp when a device uplink has been last observed.\nThis field is set by the Application Server and stored in the Identity Server."
+                    },
+                    "vendor_id": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "VendorID managed by the LoRa Alliance, as defined in TR005."
+                    },
+                    "vendor_profile_id": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "ID of the LoRaWAN end device profile assigned by the vendor."
+                    },
+                    "serial_number": {
+                      "type": "string"
                     }
                   },
                   "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -2990,6 +3016,19 @@
                       "type": "string",
                       "format": "date-time",
                       "description": "Timestamp when a device uplink has been last observed.\nThis field is set by the Application Server and stored in the Identity Server."
+                    },
+                    "vendor_id": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "VendorID managed by the LoRa Alliance, as defined in TR005."
+                    },
+                    "vendor_profile_id": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "ID of the LoRaWAN end device profile assigned by the vendor."
+                    },
+                    "serial_number": {
+                      "type": "string"
                     }
                   },
                   "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -3299,6 +3338,19 @@
                       "type": "string",
                       "format": "date-time",
                       "description": "Timestamp when a device uplink has been last observed.\nThis field is set by the Application Server and stored in the Identity Server."
+                    },
+                    "vendor_id": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "VendorID managed by the LoRa Alliance, as defined in TR005."
+                    },
+                    "vendor_profile_id": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "ID of the LoRaWAN end device profile assigned by the vendor."
+                    },
+                    "serial_number": {
+                      "type": "string"
                     }
                   },
                   "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -10207,6 +10259,19 @@
                       "type": "string",
                       "format": "date-time",
                       "description": "Timestamp when a device uplink has been last observed.\nThis field is set by the Application Server and stored in the Identity Server."
+                    },
+                    "vendor_id": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "VendorID managed by the LoRa Alliance, as defined in TR005."
+                    },
+                    "vendor_profile_id": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "ID of the LoRaWAN end device profile assigned by the vendor."
+                    },
+                    "serial_number": {
+                      "type": "string"
                     }
                   },
                   "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -10516,6 +10581,19 @@
                       "type": "string",
                       "format": "date-time",
                       "description": "Timestamp when a device uplink has been last observed.\nThis field is set by the Application Server and stored in the Identity Server."
+                    },
+                    "vendor_id": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "VendorID managed by the LoRa Alliance, as defined in TR005."
+                    },
+                    "vendor_profile_id": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "ID of the LoRaWAN end device profile assigned by the vendor."
+                    },
+                    "serial_number": {
+                      "type": "string"
                     }
                   },
                   "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -10998,6 +11076,19 @@
                       "type": "string",
                       "format": "date-time",
                       "description": "Timestamp when a device uplink has been last observed.\nThis field is set by the Application Server and stored in the Identity Server."
+                    },
+                    "vendor_id": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "VendorID managed by the LoRa Alliance, as defined in TR005."
+                    },
+                    "vendor_profile_id": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "ID of the LoRaWAN end device profile assigned by the vendor."
+                    },
+                    "serial_number": {
+                      "type": "string"
                     }
                   },
                   "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -11307,6 +11398,19 @@
                       "type": "string",
                       "format": "date-time",
                       "description": "Timestamp when a device uplink has been last observed.\nThis field is set by the Application Server and stored in the Identity Server."
+                    },
+                    "vendor_id": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "VendorID managed by the LoRa Alliance, as defined in TR005."
+                    },
+                    "vendor_profile_id": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "ID of the LoRaWAN end device profile assigned by the vendor."
+                    },
+                    "serial_number": {
+                      "type": "string"
                     }
                   },
                   "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -20863,6 +20967,19 @@
           "type": "string",
           "format": "date-time",
           "description": "Timestamp when a device uplink has been last observed.\nThis field is set by the Application Server and stored in the Identity Server."
+        },
+        "vendor_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "VendorID managed by the LoRa Alliance, as defined in TR005."
+        },
+        "vendor_profile_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID of the LoRaWAN end device profile assigned by the vendor."
+        },
+        "serial_number": {
+          "type": "string"
         }
       },
       "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."

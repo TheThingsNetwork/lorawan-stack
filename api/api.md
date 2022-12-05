@@ -3476,6 +3476,9 @@ SDKs are responsible for combining (if desired) the three.
 | `skip_payload_crypto_override` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  | Skip decryption of uplink payloads and encryption of downlink payloads. This field overrides the application-level setting. |
 | `activated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Timestamp when the device has been activated. Stored in the Entity Registry. This field is set by the Application Server when an end device sends its first uplink. The Application Server will use the field in order to avoid repeated calls to the Entity Registry. The field cannot be unset once set. |
 | `last_seen_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Timestamp when a device uplink has been last observed. This field is set by the Application Server and stored in the Identity Server. |
+| `vendor_id` | [`uint32`](#uint32) |  | VendorID managed by the LoRa Alliance, as defined in TR005. |
+| `vendor_profile_id` | [`uint32`](#uint32) |  | ID of the LoRaWAN end device profile assigned by the vendor. |
+| `serial_number` | [`string`](#string) |  |  |
 
 #### Field Rules
 
@@ -3500,6 +3503,7 @@ SDKs are responsible for combining (if desired) the three.
 | `power_state` | <p>`enum.defined_only`: `true`</p> |
 | `battery_percentage` | <p>`float.lte`: `1`</p><p>`float.gte`: `0`</p> |
 | `provisioner_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`</p> |
+| `serial_number` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 
 ### <a name="ttn.lorawan.v3.EndDevice.AttributesEntry">Message `EndDevice.AttributesEntry`</a>
 

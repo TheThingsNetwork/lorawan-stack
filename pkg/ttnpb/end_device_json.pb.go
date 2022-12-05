@@ -2920,6 +2920,21 @@ func (x *EndDevice) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 			gogo.MarshalTimestamp(s, x.LastSeenAt)
 		}
 	}
+	if x.VendorId != 0 || s.HasField("vendor_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("vendor_id")
+		s.WriteUint32(x.VendorId)
+	}
+	if x.VendorProfileId != 0 || s.HasField("vendor_profile_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("vendor_profile_id")
+		s.WriteUint32(x.VendorProfileId)
+	}
+	if x.SerialNumber != "" || s.HasField("serial_number") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("serial_number")
+		s.WriteString(x.SerialNumber)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -3242,6 +3257,15 @@ func (x *EndDevice) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				return
 			}
 			x.LastSeenAt = v
+		case "vendor_id", "vendorId":
+			s.AddField("vendor_id")
+			x.VendorId = s.ReadUint32()
+		case "vendor_profile_id", "vendorProfileId":
+			s.AddField("vendor_profile_id")
+			x.VendorProfileId = s.ReadUint32()
+		case "serial_number", "serialNumber":
+			s.AddField("serial_number")
+			x.SerialNumber = s.ReadString()
 		}
 	})
 }

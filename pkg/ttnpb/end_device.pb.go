@@ -2411,10 +2411,15 @@ type EndDevice struct {
 	ActivatedAt *types.Timestamp `protobuf:"bytes,53,opt,name=activated_at,json=activatedAt,proto3" json:"activated_at,omitempty"`
 	// Timestamp when a device uplink has been last observed.
 	// This field is set by the Application Server and stored in the Identity Server.
-	LastSeenAt           *types.Timestamp `protobuf:"bytes,54,opt,name=last_seen_at,json=lastSeenAt,proto3" json:"last_seen_at,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
-	XXX_unrecognized     []byte           `json:"-"`
-	XXX_sizecache        int32            `json:"-"`
+	LastSeenAt *types.Timestamp `protobuf:"bytes,54,opt,name=last_seen_at,json=lastSeenAt,proto3" json:"last_seen_at,omitempty"`
+	// VendorID managed by the LoRa Alliance, as defined in TR005.
+	VendorId uint32 `protobuf:"varint,55,opt,name=vendor_id,json=vendorId,proto3" json:"vendor_id,omitempty"`
+	// ID of the LoRaWAN end device profile assigned by the vendor.
+	VendorProfileId      uint32   `protobuf:"varint,56,opt,name=vendor_profile_id,json=vendorProfileId,proto3" json:"vendor_profile_id,omitempty"`
+	SerialNumber         string   `protobuf:"bytes,57,opt,name=serial_number,json=serialNumber,proto3" json:"serial_number,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *EndDevice) Reset()         { *m = EndDevice{} }
@@ -2796,6 +2801,27 @@ func (m *EndDevice) GetLastSeenAt() *types.Timestamp {
 		return m.LastSeenAt
 	}
 	return nil
+}
+
+func (m *EndDevice) GetVendorId() uint32 {
+	if m != nil {
+		return m.VendorId
+	}
+	return 0
+}
+
+func (m *EndDevice) GetVendorProfileId() uint32 {
+	if m != nil {
+		return m.VendorProfileId
+	}
+	return 0
+}
+
+func (m *EndDevice) GetSerialNumber() string {
+	if m != nil {
+		return m.SerialNumber
+	}
+	return ""
 }
 
 type EndDevices struct {
