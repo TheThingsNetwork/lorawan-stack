@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- List of end-devices can now be sorted by `last_seen_at` field. Unseen devices will be shown last.
+
 ### Changed
 
 ### Deprecated
