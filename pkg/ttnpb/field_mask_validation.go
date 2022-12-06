@@ -47,6 +47,7 @@ var isEndDeviceReadFieldPaths = []string{
 	"locations",
 	"name",
 	"network_server_address",
+	"serial_number",
 	"service_profile_id",
 	"updated_at",
 	"version_ids",
@@ -72,6 +73,7 @@ var isEndDeviceWriteFieldPaths = []string{
 	"locations",
 	"name",
 	"network_server_address",
+	"serial_number",
 	"service_profile_id",
 	"version_ids",
 	"version_ids.band_id",
@@ -410,50 +412,143 @@ type RPCFieldMaskPathValue struct {
 // RPCFieldMaskPaths lists the field mask paths for each RPC in this API.
 var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 	// Applications:
-	"/ttn.lorawan.v3.ApplicationRegistry/Get":                 {All: ApplicationFieldPathsNested, Allowed: ApplicationFieldPathsNested},
-	"/ttn.lorawan.v3.ApplicationRegistry/List":                {All: ApplicationFieldPathsNested, Allowed: ApplicationFieldPathsNested},
-	"/ttn.lorawan.v3.ApplicationRegistry/Update":              {All: ApplicationFieldPathsNested, Allowed: omitFields(ApplicationFieldPathsNested, "dev_eui_counter"), Set: true},
-	"/ttn.lorawan.v3.EntityRegistrySearch/SearchApplications": {All: ApplicationFieldPathsNested, Allowed: ApplicationFieldPathsNested},
+	"/ttn.lorawan.v3.ApplicationRegistry/Get": {
+		All:     ApplicationFieldPathsNested,
+		Allowed: ApplicationFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.ApplicationRegistry/List": {
+		All:     ApplicationFieldPathsNested,
+		Allowed: ApplicationFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.ApplicationRegistry/Update": {
+		All:     ApplicationFieldPathsNested,
+		Allowed: omitFields(ApplicationFieldPathsNested, "dev_eui_counter"),
+		Set:     true,
+	},
+	"/ttn.lorawan.v3.EntityRegistrySearch/SearchApplications": {
+		All:     ApplicationFieldPathsNested,
+		Allowed: ApplicationFieldPathsNested,
+	},
 
 	// Application Activation Settings:
-	"/ttn.lorawan.v3.ApplicationActivationSettingRegistry/Get":    {All: ApplicationActivationSettingsFieldPathsNested, Allowed: ApplicationActivationSettingsFieldPathsNested},
-	"/ttn.lorawan.v3.ApplicationActivationSettingRegistry/Set":    {All: ApplicationActivationSettingsFieldPathsNested, Allowed: ApplicationActivationSettingsFieldPathsNested, Set: true},
-	"/ttn.lorawan.v3.ApplicationActivationSettingRegistry/Delete": {All: ApplicationActivationSettingsFieldPathsNested, Allowed: ApplicationActivationSettingsFieldPathsNested},
+	"/ttn.lorawan.v3.ApplicationActivationSettingRegistry/Get": {
+		All:     ApplicationActivationSettingsFieldPathsNested,
+		Allowed: ApplicationActivationSettingsFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.ApplicationActivationSettingRegistry/Set": {
+		All:     ApplicationActivationSettingsFieldPathsNested,
+		Allowed: ApplicationActivationSettingsFieldPathsNested,
+		Set:     true,
+	},
+	"/ttn.lorawan.v3.ApplicationActivationSettingRegistry/Delete": {
+		All:     ApplicationActivationSettingsFieldPathsNested,
+		Allowed: ApplicationActivationSettingsFieldPathsNested,
+	},
 
 	// Application Webhook Templates:
-	"/ttn.lorawan.v3.ApplicationWebhookRegistry/GetTemplate":   {All: ApplicationWebhookTemplateFieldPathsNested, Allowed: ApplicationWebhookTemplateFieldPathsNested},
-	"/ttn.lorawan.v3.ApplicationWebhookRegistry/ListTemplates": {All: ApplicationWebhookTemplateFieldPathsNested, Allowed: ApplicationWebhookTemplateFieldPathsNested},
+	"/ttn.lorawan.v3.ApplicationWebhookRegistry/GetTemplate": {
+		All:     ApplicationWebhookTemplateFieldPathsNested,
+		Allowed: ApplicationWebhookTemplateFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.ApplicationWebhookRegistry/ListTemplates": {
+		All:     ApplicationWebhookTemplateFieldPathsNested,
+		Allowed: ApplicationWebhookTemplateFieldPathsNested,
+	},
 
 	// Application Webhooks:
-	"/ttn.lorawan.v3.ApplicationWebhookRegistry/Get":  {All: ApplicationWebhookFieldPathsNested, Allowed: ApplicationWebhookFieldPathsNested},
-	"/ttn.lorawan.v3.ApplicationWebhookRegistry/List": {All: ApplicationWebhookFieldPathsNested, Allowed: ApplicationWebhookFieldPathsNested},
-	"/ttn.lorawan.v3.ApplicationWebhookRegistry/Set":  {All: ApplicationWebhookFieldPathsNested, Allowed: ApplicationWebhookFieldPathsNested, Set: true},
+	"/ttn.lorawan.v3.ApplicationWebhookRegistry/Get": {
+		All:     ApplicationWebhookFieldPathsNested,
+		Allowed: ApplicationWebhookFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.ApplicationWebhookRegistry/List": {
+		All:     ApplicationWebhookFieldPathsNested,
+		Allowed: ApplicationWebhookFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.ApplicationWebhookRegistry/Set": {
+		All:     ApplicationWebhookFieldPathsNested,
+		Allowed: ApplicationWebhookFieldPathsNested,
+		Set:     true,
+	},
 
 	// Application PubSubs:
-	"/ttn.lorawan.v3.ApplicationPubSubRegistry/Get":  {All: ApplicationPubSubFieldPathsNested, Allowed: ApplicationPubSubFieldPathsNested},
-	"/ttn.lorawan.v3.ApplicationPubSubRegistry/List": {All: ApplicationPubSubFieldPathsNested, Allowed: ApplicationPubSubFieldPathsNested},
-	"/ttn.lorawan.v3.ApplicationPubSubRegistry/Set":  {All: ApplicationPubSubFieldPathsNested, Allowed: ApplicationPubSubFieldPathsNested, Set: true},
+	"/ttn.lorawan.v3.ApplicationPubSubRegistry/Get": {
+		All:     ApplicationPubSubFieldPathsNested,
+		Allowed: ApplicationPubSubFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.ApplicationPubSubRegistry/List": {
+		All:     ApplicationPubSubFieldPathsNested,
+		Allowed: ApplicationPubSubFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.ApplicationPubSubRegistry/Set": {
+		All:     ApplicationPubSubFieldPathsNested,
+		Allowed: ApplicationPubSubFieldPathsNested,
+		Set:     true,
+	},
 
 	// Application Packages:
-	"/ttn.lorawan.v3.ApplicationPackageRegistry/GetAssociation":          {All: ApplicationPackageAssociationFieldPathsNested, Allowed: ApplicationPackageAssociationFieldPathsNested},
-	"/ttn.lorawan.v3.ApplicationPackageRegistry/ListAssociations":        {All: ApplicationPackageAssociationFieldPathsNested, Allowed: ApplicationPackageAssociationFieldPathsNested},
-	"/ttn.lorawan.v3.ApplicationPackageRegistry/SetAssociation":          {All: ApplicationPackageAssociationFieldPathsNested, Allowed: ApplicationPackageAssociationFieldPathsNested, Set: true},
-	"/ttn.lorawan.v3.ApplicationPackageRegistry/GetDefaultAssociation":   {All: ApplicationPackageDefaultAssociationFieldPathsNested, Allowed: ApplicationPackageDefaultAssociationFieldPathsNested},
-	"/ttn.lorawan.v3.ApplicationPackageRegistry/ListDefaultAssociations": {All: ApplicationPackageDefaultAssociationFieldPathsNested, Allowed: ApplicationPackageDefaultAssociationFieldPathsNested},
-	"/ttn.lorawan.v3.ApplicationPackageRegistry/SetDefaultAssociation":   {All: ApplicationPackageDefaultAssociationFieldPathsNested, Allowed: ApplicationPackageDefaultAssociationFieldPathsNested, Set: true},
+	"/ttn.lorawan.v3.ApplicationPackageRegistry/GetAssociation": {
+		All:     ApplicationPackageAssociationFieldPathsNested,
+		Allowed: ApplicationPackageAssociationFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.ApplicationPackageRegistry/ListAssociations": {
+		All:     ApplicationPackageAssociationFieldPathsNested,
+		Allowed: ApplicationPackageAssociationFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.ApplicationPackageRegistry/SetAssociation": {
+		All:     ApplicationPackageAssociationFieldPathsNested,
+		Allowed: ApplicationPackageAssociationFieldPathsNested,
+		Set:     true,
+	},
+	"/ttn.lorawan.v3.ApplicationPackageRegistry/GetDefaultAssociation": {
+		All:     ApplicationPackageDefaultAssociationFieldPathsNested,
+		Allowed: ApplicationPackageDefaultAssociationFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.ApplicationPackageRegistry/ListDefaultAssociations": {
+		All:     ApplicationPackageDefaultAssociationFieldPathsNested,
+		Allowed: ApplicationPackageDefaultAssociationFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.ApplicationPackageRegistry/SetDefaultAssociation": {
+		All:     ApplicationPackageDefaultAssociationFieldPathsNested,
+		Allowed: ApplicationPackageDefaultAssociationFieldPathsNested,
+		Set:     true,
+	},
 
 	// Application Links:
-	"/ttn.lorawan.v3.As/GetLink": {All: asApplicationLinkFieldPaths, Allowed: asApplicationLinkFieldPaths},
-	"/ttn.lorawan.v3.As/SetLink": {All: asApplicationLinkFieldPaths, Allowed: asApplicationLinkFieldPaths, Set: true},
+	"/ttn.lorawan.v3.As/GetLink": {
+		All:     asApplicationLinkFieldPaths,
+		Allowed: asApplicationLinkFieldPaths,
+	},
+	"/ttn.lorawan.v3.As/SetLink": {
+		All:     asApplicationLinkFieldPaths,
+		Allowed: asApplicationLinkFieldPaths,
+		Set:     true,
+	},
 
 	// Application API Keys:
-	"/ttn.lorawan.v3.ApplicationAccess/UpdateAPIKey": {All: APIKeyFieldPathsNested, Allowed: APIKeyFieldPathsNested, Set: true},
+	"/ttn.lorawan.v3.ApplicationAccess/UpdateAPIKey": {
+		All:     APIKeyFieldPathsNested,
+		Allowed: APIKeyFieldPathsNested,
+		Set:     true,
+	},
 
 	// Clients:
-	"/ttn.lorawan.v3.ClientRegistry/Get":                 {All: ClientFieldPathsNested, Allowed: omitFields(ClientFieldPathsNested, "secret")},
-	"/ttn.lorawan.v3.ClientRegistry/List":                {All: ClientFieldPathsNested, Allowed: omitFields(ClientFieldPathsNested, "secret")},
-	"/ttn.lorawan.v3.ClientRegistry/Update":              {All: ClientFieldPathsNested, Allowed: ClientFieldPathsNested, Set: true},
-	"/ttn.lorawan.v3.EntityRegistrySearch/SearchClients": {All: ClientFieldPathsNested, Allowed: omitFields(ClientFieldPathsNested, "secret")},
+	"/ttn.lorawan.v3.ClientRegistry/Get": {
+		All:     ClientFieldPathsNested,
+		Allowed: omitFields(ClientFieldPathsNested, "secret"),
+	},
+	"/ttn.lorawan.v3.ClientRegistry/List": {
+		All:     ClientFieldPathsNested,
+		Allowed: omitFields(ClientFieldPathsNested, "secret"),
+	},
+	"/ttn.lorawan.v3.ClientRegistry/Update": {
+		All:     ClientFieldPathsNested,
+		Allowed: ClientFieldPathsNested,
+		Set:     true,
+	},
+	"/ttn.lorawan.v3.EntityRegistrySearch/SearchClients": {
+		All:     ClientFieldPathsNested,
+		Allowed: omitFields(ClientFieldPathsNested, "secret"),
+	},
 
 	// End Devices:
 	"/ttn.lorawan.v3.AsEndDeviceRegistry/Get": {
@@ -478,6 +573,7 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 			"pending_session.keys.app_s_key.key",
 			"pending_session.keys.session_key_id",
 			"pending_session.last_a_f_cnt_down",
+			"serial_number",
 			"session",
 			"session.dev_addr",
 			"session.keys",
@@ -487,6 +583,8 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 			"session.last_a_f_cnt_down",
 			"skip_payload_crypto",
 			"skip_payload_crypto_override",
+			"vendor_id",
+			"vendor_profile_id",
 			"version_ids",
 			"version_ids.band_id",
 			"version_ids.brand_id",
@@ -509,6 +607,7 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 			"ids.dev_eui",
 			"ids.device_id",
 			"ids.join_eui",
+			"serial_number",
 			"session.dev_addr",
 			"session.keys.app_s_key",
 			"session.keys.app_s_key.key",
@@ -516,21 +615,34 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 			"session.last_a_f_cnt_down",
 			"skip_payload_crypto",
 			"skip_payload_crypto_override",
+			"vendor_id",
+			"vendor_profile_id",
 			"version_ids",
 			"version_ids.band_id",
 			"version_ids.brand_id",
 			"version_ids.firmware_version",
 			"version_ids.hardware_version",
 			"version_ids.model_id",
-			"version_ids.vendor_id",
-			"version_ids.vendor_profile_id",
 		},
 		Set: true,
 	},
-	"/ttn.lorawan.v3.EndDeviceRegistry/Get":                    {All: EndDeviceFieldPathsNested, Allowed: isEndDeviceReadFieldPaths},
-	"/ttn.lorawan.v3.EndDeviceRegistry/List":                   {All: EndDeviceFieldPathsNested, Allowed: isEndDeviceReadFieldPaths},
-	"/ttn.lorawan.v3.EndDeviceRegistry/Update":                 {All: EndDeviceFieldPathsNested, Allowed: isEndDeviceWriteFieldPaths, Set: true},
-	"/ttn.lorawan.v3.EndDeviceRegistrySearch/SearchEndDevices": {All: EndDeviceFieldPathsNested, Allowed: isEndDeviceReadFieldPaths},
+	"/ttn.lorawan.v3.EndDeviceRegistry/Get": {
+		All:     EndDeviceFieldPathsNested,
+		Allowed: isEndDeviceReadFieldPaths,
+	},
+	"/ttn.lorawan.v3.EndDeviceRegistry/List": {
+		All:     EndDeviceFieldPathsNested,
+		Allowed: isEndDeviceReadFieldPaths,
+	},
+	"/ttn.lorawan.v3.EndDeviceRegistry/Update": {
+		All:     EndDeviceFieldPathsNested,
+		Allowed: isEndDeviceWriteFieldPaths,
+		Set:     true,
+	},
+	"/ttn.lorawan.v3.EndDeviceRegistrySearch/SearchEndDevices": {
+		All:     EndDeviceFieldPathsNested,
+		Allowed: isEndDeviceReadFieldPaths,
+	},
 	"/ttn.lorawan.v3.JsEndDeviceRegistry/Get": {
 		All: EndDeviceFieldPathsNested,
 		Allowed: []string{
@@ -603,7 +715,10 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 		},
 		Set: true,
 	},
-	"/ttn.lorawan.v3.NsEndDeviceRegistry/Get": {All: EndDeviceFieldPathsNested, Allowed: nsEndDeviceReadFieldPaths[:]},
+	"/ttn.lorawan.v3.NsEndDeviceRegistry/Get": {
+		All:     EndDeviceFieldPathsNested,
+		Allowed: nsEndDeviceReadFieldPaths[:],
+	},
 	"/ttn.lorawan.v3.NsEndDeviceRegistry/Set": {
 		All: EndDeviceFieldPathsNested,
 		Allowed: []string{
@@ -895,6 +1010,7 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 			"pending_session.keys.s_nwk_s_int_key",
 			"pending_session.keys.s_nwk_s_int_key.key",
 			"pending_session.keys.session_key_id",
+			"serial_number",
 			"session",
 			"session.dev_addr",
 			"session.keys",
@@ -912,9 +1028,9 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 			"supports_class_b",
 			"supports_class_c",
 			"supports_join",
+			"vendor_id",
+			"vendor_profile_id",
 			"version_ids",
-			"version_ids.vendor_id",
-			"version_ids.vendor_profile_id",
 			"version_ids.band_id",
 			"version_ids.brand_id",
 			"version_ids.firmware_version",
@@ -923,11 +1039,15 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 		},
 		Set: true,
 	},
-	"/ttn.lorawan.v3.NsEndDeviceRegistry/ResetFactoryDefaults": {All: EndDeviceFieldPathsNested, Allowed: nsEndDeviceReadFieldPaths[:]},
+	"/ttn.lorawan.v3.NsEndDeviceRegistry/ResetFactoryDefaults": {
+		All:     EndDeviceFieldPathsNested,
+		Allowed: nsEndDeviceReadFieldPaths[:],
+	},
 
 	// Gateways:
 	"/ttn.lorawan.v3.EntityRegistrySearch/SearchGateways": {
-		All: GatewayFieldPathsNested, Allowed: omitFields(GatewayFieldPathsNested,
+		All: GatewayFieldPathsNested,
+		Allowed: omitFields(GatewayFieldPathsNested,
 			"gateway.claim_authentication_code.secret",
 			"gateway.claim_authentication_code.secret.key_id",
 			"gateway.claim_authentication_code.secret.value",
@@ -987,37 +1107,99 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 	},
 
 	// Gateway API Keys:
-	"/ttn.lorawan.v3.GatewayAccess/UpdateAPIKey": {All: APIKeyFieldPathsNested, Allowed: APIKeyFieldPathsNested, Set: true},
+	"/ttn.lorawan.v3.GatewayAccess/UpdateAPIKey": {
+		All:     APIKeyFieldPathsNested,
+		Allowed: APIKeyFieldPathsNested,
+		Set:     true,
+	},
 
 	// Organizations:
-	"/ttn.lorawan.v3.OrganizationRegistry/Get":                 {All: OrganizationFieldPathsNested, Allowed: OrganizationFieldPathsNested},
-	"/ttn.lorawan.v3.OrganizationRegistry/List":                {All: OrganizationFieldPathsNested, Allowed: OrganizationFieldPathsNested},
-	"/ttn.lorawan.v3.OrganizationRegistry/Update":              {All: OrganizationFieldPathsNested, Allowed: OrganizationFieldPathsNested, Set: true},
-	"/ttn.lorawan.v3.EntityRegistrySearch/SearchOrganizations": {All: OrganizationFieldPathsNested, Allowed: OrganizationFieldPathsNested},
+	"/ttn.lorawan.v3.OrganizationRegistry/Get": {
+		All:     OrganizationFieldPathsNested,
+		Allowed: OrganizationFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.OrganizationRegistry/List": {
+		All:     OrganizationFieldPathsNested,
+		Allowed: OrganizationFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.OrganizationRegistry/Update": {
+		All:     OrganizationFieldPathsNested,
+		Allowed: OrganizationFieldPathsNested,
+		Set:     true,
+	},
+	"/ttn.lorawan.v3.EntityRegistrySearch/SearchOrganizations": {
+		All:     OrganizationFieldPathsNested,
+		Allowed: OrganizationFieldPathsNested,
+	},
 
 	// Organization API Keys:
-	"/ttn.lorawan.v3.OrganizationAccess/UpdateAPIKey": {All: APIKeyFieldPathsNested, Allowed: APIKeyFieldPathsNested, Set: true},
+	"/ttn.lorawan.v3.OrganizationAccess/UpdateAPIKey": {
+		All:     APIKeyFieldPathsNested,
+		Allowed: APIKeyFieldPathsNested,
+		Set:     true,
+	},
 
 	// Users:
-	"/ttn.lorawan.v3.UserRegistry/Get":                 {All: UserFieldPathsNested, Allowed: omitFields(UserFieldPathsNested, "password", "temporary_password")},
-	"/ttn.lorawan.v3.UserRegistry/List":                {All: UserFieldPathsNested, Allowed: omitFields(UserFieldPathsNested, "password", "temporary_password")},
-	"/ttn.lorawan.v3.UserRegistry/Update":              {All: UserFieldPathsNested, Allowed: omitFields(UserFieldPathsNested, "password", "password_updated_at"), Set: true},
-	"/ttn.lorawan.v3.EntityRegistrySearch/SearchUsers": {All: UserFieldPathsNested, Allowed: omitFields(UserFieldPathsNested, "password", "temporary_password")},
+	"/ttn.lorawan.v3.UserRegistry/Get": {
+		All:     UserFieldPathsNested,
+		Allowed: omitFields(UserFieldPathsNested, "password", "temporary_password"),
+	},
+	"/ttn.lorawan.v3.UserRegistry/List": {
+		All:     UserFieldPathsNested,
+		Allowed: omitFields(UserFieldPathsNested, "password", "temporary_password"),
+	},
+	"/ttn.lorawan.v3.UserRegistry/Update": {
+		All:     UserFieldPathsNested,
+		Allowed: omitFields(UserFieldPathsNested, "password", "password_updated_at"),
+		Set:     true,
+	},
+	"/ttn.lorawan.v3.EntityRegistrySearch/SearchUsers": {
+		All:     UserFieldPathsNested,
+		Allowed: omitFields(UserFieldPathsNested, "password", "temporary_password"),
+	},
 
 	// User API Keys:
-	"/ttn.lorawan.v3.UserAccess/UpdateAPIKey": {All: APIKeyFieldPathsNested, Allowed: APIKeyFieldPathsNested, Set: true},
+	"/ttn.lorawan.v3.UserAccess/UpdateAPIKey": {
+		All:     APIKeyFieldPathsNested,
+		Allowed: APIKeyFieldPathsNested,
+		Set:     true,
+	},
 
 	// Storage Integration:
-	"/ttn.lorawan.v3.ApplicationUpStorage/GetStoredApplicationUp": {All: ApplicationUpFieldPathsNested, Allowed: applicationUpFieldMaskPaths()},
+	"/ttn.lorawan.v3.ApplicationUpStorage/GetStoredApplicationUp": {
+		All:     ApplicationUpFieldPathsNested,
+		Allowed: applicationUpFieldMaskPaths(),
+	},
 
 	// Device Repository:
-	"/ttn.lorawan.v3.DeviceRepository/GetBrand":           {All: EndDeviceBrandFieldPathsNested, Allowed: EndDeviceBrandFieldPathsNested},
-	"/ttn.lorawan.v3.DeviceRepository/ListBrands":         {All: EndDeviceBrandFieldPathsNested, Allowed: EndDeviceBrandFieldPathsNested},
-	"/ttn.lorawan.v3.DeviceRepository/GetModel":           {All: EndDeviceModelFieldPathsNested, Allowed: EndDeviceModelFieldPathsNested},
-	"/ttn.lorawan.v3.DeviceRepository/ListModels":         {All: EndDeviceModelFieldPathsNested, Allowed: EndDeviceModelFieldPathsNested},
-	"/ttn.lorawan.v3.DeviceRepository/GetUplinkDecoder":   {All: MessagePayloadDecoderFieldPathsNested, Allowed: MessagePayloadDecoderFieldPathsNested},
-	"/ttn.lorawan.v3.DeviceRepository/GetDownlinkDecoder": {All: MessagePayloadDecoderFieldPathsNested, Allowed: MessagePayloadDecoderFieldPathsNested},
-	"/ttn.lorawan.v3.DeviceRepository/GetDownlinkEncoder": {All: MessagePayloadEncoderFieldPathsNested, Allowed: MessagePayloadEncoderFieldPathsNested},
+	"/ttn.lorawan.v3.DeviceRepository/GetBrand": {
+		All:     EndDeviceBrandFieldPathsNested,
+		Allowed: EndDeviceBrandFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.DeviceRepository/ListBrands": {
+		All:     EndDeviceBrandFieldPathsNested,
+		Allowed: EndDeviceBrandFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.DeviceRepository/GetModel": {
+		All:     EndDeviceModelFieldPathsNested,
+		Allowed: EndDeviceModelFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.DeviceRepository/ListModels": {
+		All:     EndDeviceModelFieldPathsNested,
+		Allowed: EndDeviceModelFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.DeviceRepository/GetUplinkDecoder": {
+		All:     MessagePayloadDecoderFieldPathsNested,
+		Allowed: MessagePayloadDecoderFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.DeviceRepository/GetDownlinkDecoder": {
+		All:     MessagePayloadDecoderFieldPathsNested,
+		Allowed: MessagePayloadDecoderFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.DeviceRepository/GetDownlinkEncoder": {
+		All:     MessagePayloadEncoderFieldPathsNested,
+		Allowed: MessagePayloadEncoderFieldPathsNested,
+	},
 }
 
 func omitFields(fields []string, fieldsToOmit ...string) []string {
@@ -1043,7 +1225,10 @@ func applicationUpFieldMaskPaths() []string {
 	paths = append(paths, FieldsWithPrefix("up.downlink_sent", ApplicationDownlinkFieldPathsNested...)...)
 	paths = append(paths, FieldsWithPrefix("up.downlink_failed", ApplicationDownlinkFailedFieldPathsNested...)...)
 	paths = append(paths, FieldsWithPrefix("up.downlink_queued", ApplicationDownlinkFieldPathsNested...)...)
-	paths = append(paths, FieldsWithPrefix("up.downlink_queue_invalidated", ApplicationInvalidatedDownlinksFieldPathsNested...)...)
+	paths = append(
+		paths,
+		FieldsWithPrefix("up.downlink_queue_invalidated", ApplicationInvalidatedDownlinksFieldPathsNested...)...,
+	)
 	paths = append(paths, FieldsWithPrefix("up.location_solved", ApplicationLocationFieldPathsNested...)...)
 	paths = append(paths, FieldsWithPrefix("up.service_data", ApplicationServiceDataFieldPathsNested...)...)
 	return paths
