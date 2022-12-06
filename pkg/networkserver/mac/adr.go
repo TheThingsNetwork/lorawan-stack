@@ -191,7 +191,7 @@ func adrLossRate(ups ...*ttnpb.MACState_UplinkMessage) float32 {
 		}
 		lastFCnt = fCnt
 	}
-	return float32(lost) / float32(1+internal.LastUplink(ups...).GetPayload().GetMacPayload().GetFullFCnt()-min)
+	return float32(lost) / float32(1+lastFCnt-min)
 }
 
 func maxSNRFromMetadata(mds ...*ttnpb.MACState_UplinkMessage_RxMetadata) (float32, bool) {

@@ -526,6 +526,8 @@ func AppendMessage(dst []byte, msg *ttnpb.Message) ([]byte, error) {
 			return nil, errEncryptedJoinAcceptPayloadLength(n)
 		}
 		dst = append(dst, pld.Encrypted...)
+	case ttnpb.MType_PROPRIETARY:
+		return nil, errProprietary.New()
 	default:
 		return nil, errUnknown("MType")(msg.MHdr.MType.String())
 	}
@@ -551,6 +553,8 @@ func MarshalMessage(msg *ttnpb.Message) ([]byte, error) {
 	case ttnpb.MType_JOIN_ACCEPT:
 		// MHDR(1) + Encrypted payload(16|32)
 		return AppendMessage(make([]byte, 0, 33), msg)
+	case ttnpb.MType_PROPRIETARY:
+		return nil, errProprietary.New()
 	default:
 		return nil, errUnknown("MType")(msg.MHdr.MType.String())
 	}
@@ -623,6 +627,8 @@ func UnmarshalMessage(b []byte, msg *ttnpb.Message) error {
 			return errExpectedLengthTwoChoices("JoinAcceptPHYPayload", 17, 33)(n)
 		}
 		msg.Payload = &ttnpb.Message_JoinAcceptPayload{JoinAcceptPayload: &ttnpb.JoinAcceptPayload{Encrypted: b[1:]}}
+	case ttnpb.MType_PROPRIETARY:
+		return errProprietary.New()
 	default:
 		return errUnknown("MType")(msg.MHdr.MType.String())
 	}
@@ -678,6 +684,8 @@ func GetUplinkMessageIdentifiers(phyPayload []byte) (*ttnpb.EndDeviceIdentifiers
 		default:
 			return nil, errUnknown("RejoinType")(phyPayload[1])
 		}
+	case ttnpb.MType_PROPRIETARY:
+		return nil, errProprietary.New()
 	default:
 		return nil, errUnknown("MType")(mhdr.MType.String())
 	}
