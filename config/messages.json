@@ -4013,6 +4013,15 @@
       "file": "mac.go"
     }
   },
+  "error:pkg/encoding/lorawan:proprietary": {
+    "translations": {
+      "en": "expected standard LoRaWAN frame"
+    },
+    "description": {
+      "package": "pkg/encoding/lorawan",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/encoding/lorawan:unknown_field": {
     "translations": {
       "en": "unknown `{lorawan_field}`"

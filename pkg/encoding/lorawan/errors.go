@@ -31,6 +31,7 @@ var (
 	errFieldLengthHasMin            = errors.DefineInvalidArgument("field_length_with_min", "`{lorawan_field}` length `{value}` should be higher or equal to `{min}`", valueKey)
 	errFieldLengthTwoChoices        = errors.DefineInvalidArgument("field_length_with_multiple_choices", "`{lorawan_field}` length `{value}` should be equal to `{expected_1}` or `{expected_2}`", valueKey)
 	errUnknownField                 = errors.DefineInvalidArgument("unknown_field", "unknown `{lorawan_field}`", valueKey)
+	errProprietary                  = errors.DefineInvalidArgument("proprietary", "expected standard LoRaWAN frame")
 )
 
 const valueKey = "value"
