@@ -201,18 +201,20 @@ const MacSettingsSection = props => {
                 fieldWidth="xs"
               />
             )}
-            <Form.Field
-              title={m.desiredRx1DelayTitle}
-              type="number"
-              name="mac_settings.desired_rx1_delay"
-              append={<Message content={sharedMessages.secondsAbbreviated} />}
-              tooltipId={tooltipIds.RX1_DELAY}
-              component={Input}
-              min={1}
-              max={15}
-              inputWidth="xs"
-              fieldWidth="xs"
-            />
+            {!isMulticast && (
+              <Form.Field
+                title={m.desiredRx1DelayTitle}
+                type="number"
+                name="mac_settings.desired_rx1_delay"
+                append={<Message content={sharedMessages.secondsAbbreviated} />}
+                tooltipId={tooltipIds.RX1_DELAY}
+                component={Input}
+                min={1}
+                max={15}
+                inputWidth="xs"
+                fieldWidth="xs"
+              />
+            )}
           </Form.FieldContainer>
           <Form.FieldContainer horizontal>
             {!isOTAA && (
@@ -228,17 +230,19 @@ const MacSettingsSection = props => {
                 tooltipId={tooltipIds.DATA_RATE_OFFSET}
               />
             )}
-            <Form.Field
-              title={m.desiredRx1DataRateOffsetTitle}
-              type="number"
-              inputWidth="xxs"
-              fieldWidth="xs"
-              name="mac_settings.desired_rx1_data_rate_offset"
-              component={Input}
-              min={0}
-              max={7}
-              tooltipId={tooltipIds.DATA_RATE_OFFSET}
-            />
+            {!isMulticast && (
+              <Form.Field
+                title={m.desiredRx1DataRateOffsetTitle}
+                type="number"
+                inputWidth="xxs"
+                fieldWidth="xs"
+                name="mac_settings.desired_rx1_data_rate_offset"
+                component={Input}
+                min={0}
+                max={7}
+                tooltipId={tooltipIds.DATA_RATE_OFFSET}
+              />
+            )}
           </Form.FieldContainer>
           {!isOTAA && (
             <Form.Field
@@ -266,17 +270,19 @@ const MacSettingsSection = props => {
             fieldWidth="xs"
           />
         )}
-        <Form.Field
-          title={m.desiredRx2DataRateIndexTitle}
-          type="number"
-          name="mac_settings.desired_rx2_data_rate_index"
-          component={Input}
-          min={0}
-          max={15}
-          inputWidth="xxs"
-          tooltipId={tooltipIds.RX2_DATA_RATE_INDEX}
-          fieldWidth="xs"
-        />
+        {!isMulticast && (
+          <Form.Field
+            title={m.desiredRx2DataRateIndexTitle}
+            type="number"
+            name="mac_settings.desired_rx2_data_rate_index"
+            component={Input}
+            min={0}
+            max={15}
+            inputWidth="xxs"
+            tooltipId={tooltipIds.RX2_DATA_RATE_INDEX}
+            fieldWidth="xs"
+          />
+        )}
       </Form.FieldContainer>
       <Form.FieldContainer horizontal>
         {!isOTAA && (
@@ -291,16 +297,18 @@ const MacSettingsSection = props => {
             fieldWidth="xs"
           />
         )}
-        <Form.Field
-          type="number"
-          min={100000}
-          step={100}
-          title={m.desiredRx2FrequencyTitle}
-          name="mac_settings.desired_rx2_frequency"
-          component={UnitInput.Hertz}
-          tooltipId={tooltipIds.RX2_FREQUENCY}
-          fieldWidth="xs"
-        />
+        {!isMulticast && (
+          <Form.Field
+            type="number"
+            min={100000}
+            step={100}
+            title={m.desiredRx2FrequencyTitle}
+            name="mac_settings.desired_rx2_frequency"
+            component={UnitInput.Hertz}
+            tooltipId={tooltipIds.RX2_FREQUENCY}
+            fieldWidth="xs"
+          />
+        )}
       </Form.FieldContainer>
       <Form.FieldContainer horizontal>
         {!isOTAA && (
@@ -313,14 +321,16 @@ const MacSettingsSection = props => {
             tooltipId={tooltipIds.MAX_DUTY_CYCLE}
           />
         )}
-        <Form.Field
-          title={m.desiredMaxDutyCycle}
-          name="mac_settings.desired_max_duty_cycle"
-          component={Select}
-          options={maxDutyCycleOptions}
-          fieldWidth="xs"
-          tooltipId={tooltipIds.MAX_DUTY_CYCLE}
-        />
+        {!isMulticast && (
+          <Form.Field
+            title={m.desiredMaxDutyCycle}
+            name="mac_settings.desired_max_duty_cycle"
+            component={Select}
+            options={maxDutyCycleOptions}
+            fieldWidth="xs"
+            tooltipId={tooltipIds.MAX_DUTY_CYCLE}
+          />
+        )}
       </Form.FieldContainer>
       <Form.Field
         indexAsKey
@@ -377,16 +387,18 @@ const MacSettingsSection = props => {
                 fieldWidth="xs"
               />
             )}
-            <Form.Field
-              type="number"
-              min={100000}
-              title={m.desiredBeaconFrequency}
-              placeholder={m.frequencyPlaceholder}
-              name="mac_settings.desired_beacon_frequency"
-              tooltipId={tooltipIds.BEACON_FREQUENCY}
-              component={UnitInput.Hertz}
-              fieldWidth="xs"
-            />
+            {!isMulticast && (
+              <Form.Field
+                type="number"
+                min={100000}
+                title={m.desiredBeaconFrequency}
+                placeholder={m.frequencyPlaceholder}
+                name="mac_settings.desired_beacon_frequency"
+                tooltipId={tooltipIds.BEACON_FREQUENCY}
+                component={UnitInput.Hertz}
+                fieldWidth="xs"
+              />
+            )}
           </Form.FieldContainer>
           <Form.FieldContainer horizontal>
             {!isOTAA && (
@@ -402,17 +414,19 @@ const MacSettingsSection = props => {
                 fieldWidth="xs"
               />
             )}
-            <Form.Field
-              type="number"
-              min={100000}
-              step={100}
-              title={m.desiredPingSlotFrequencyTitle}
-              placeholder={m.frequencyPlaceholder}
-              name="mac_settings.desired_ping_slot_frequency"
-              tooltipId={tooltipIds.PING_SLOT_FREQUENCY}
-              component={UnitInput.Hertz}
-              fieldWidth="xs"
-            />
+            {!isMulticast && (
+              <Form.Field
+                type="number"
+                min={100000}
+                step={100}
+                title={m.desiredPingSlotFrequencyTitle}
+                placeholder={m.frequencyPlaceholder}
+                name="mac_settings.desired_ping_slot_frequency"
+                tooltipId={tooltipIds.PING_SLOT_FREQUENCY}
+                component={UnitInput.Hertz}
+                fieldWidth="xs"
+              />
+            )}
           </Form.FieldContainer>
           <Form.FieldContainer horizontal>
             {!isOTAA && (
@@ -428,17 +442,19 @@ const MacSettingsSection = props => {
                 max={15}
               />
             )}
-            <Form.Field
-              title={m.desiredPingSlotDataRateTitle}
-              name="mac_settings.desired_ping_slot_data_rate_index"
-              tooltipId={tooltipIds.PING_SLOT_DATA_RATE_INDEX}
-              component={Input}
-              type="number"
-              fieldWidth="xs"
-              inputWidth="xxs"
-              min={0}
-              max={15}
-            />
+            {!isMulticast && (
+              <Form.Field
+                title={m.desiredPingSlotDataRateTitle}
+                name="mac_settings.desired_ping_slot_data_rate_index"
+                tooltipId={tooltipIds.PING_SLOT_DATA_RATE_INDEX}
+                component={Input}
+                type="number"
+                fieldWidth="xs"
+                inputWidth="xxs"
+                min={0}
+                max={15}
+              />
+            )}
           </Form.FieldContainer>
         </>
       )}
@@ -513,7 +529,7 @@ const MacSettingsSection = props => {
           />
         </>
       )}
-      {isNewLorawanVersion && (
+      {isNewLorawanVersion && !isMulticast && (
         <>
           <Form.Field
             title={m.desiredAdrAckLimit}

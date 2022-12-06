@@ -17,6 +17,8 @@ import { isUndefined } from 'lodash'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import Yup from '@ttn-lw/lib/yup'
 
+import { dynamicFrequencyTest } from '@console/lib/device-utils'
+
 // Validation schemas of the device type manual form section.
 // Please observe the following rules to keep the validation schemas maintainable:
 // 1. DO NOT USE ANY TYPE CONVERSIONS HERE. Use decocer/encoder on field level instead.
@@ -35,8 +37,6 @@ const factoryPresetFreqNumericTest = frequencies =>
 
     return true
   })
-
-const dynamicFrequencyTest = value => value === 0 || value >= 100000
 
 const advancedSettingsSchema = Yup.object({
   supports_class_b: Yup.boolean().required(sharedMessages.validateRequired),
