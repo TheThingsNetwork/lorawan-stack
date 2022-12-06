@@ -103,6 +103,8 @@ const headers = [
   {
     name: 'status',
     displayName: sharedMessages.lastSeen,
+    sortable: true,
+    sortKey: 'last_seen_at',
     width: 14,
     render: status => {
       if (status.otherCluster) {
