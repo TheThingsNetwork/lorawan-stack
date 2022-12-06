@@ -15730,7 +15730,9 @@
                       "description",
                       "-description",
                       "created_at",
-                      "-created_at"
+                      "-created_at",
+                      "last_seen_at",
+                      "-last_seen_at"
                     ]
                   }
                 ]
