@@ -97,10 +97,8 @@ func Test_VersionIDProfileFetcher_FetchProfile(t *testing.T) {
 		{
 			name: "valid",
 			endDevice: &ttnpb.EndDevice{
-				VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
-					VendorId:        1,
-					VendorProfileId: 1,
-				},
+				VendorId:        1,
+				VendorProfileId: 1,
 			},
 			populateMock: func(md *mockdr.MockDR) {
 				md.EndDeviceTemplate = &ttnpb.EndDeviceTemplate{

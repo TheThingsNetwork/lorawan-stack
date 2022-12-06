@@ -30,7 +30,7 @@ func NewFetcherByVendorIDs() EndDeviceProfileFetcher {
 
 // ShouldFetchProfile dictactes if the end-device has the necessary fields to fetch its profile.
 func (*vendorIDProfileFetcher) ShouldFetchProfile(device *ttnpb.EndDevice) bool {
-	return device.GetVersionIds().GetVendorId() != 0 && device.GetVersionIds().GetVendorProfileId() != 0
+	return device.GetVendorId() != 0 && device.GetVendorProfileId() != 0
 }
 
 // FetchProfile provides the end-device profile.
@@ -39,8 +39,8 @@ func (*vendorIDProfileFetcher) FetchProfile(
 	device *ttnpb.EndDevice,
 ) (*ttnpb.EndDeviceTemplate, error) {
 	profileIdentifiers := &ttnpb.GetTemplateRequest_EndDeviceProfileIdentifiers{
-		VendorId:        device.GetVersionIds().GetVendorId(),
-		VendorProfileId: device.GetVersionIds().GetVendorProfileId(),
+		VendorId:        device.GetVendorId(),
+		VendorProfileId: device.GetVendorProfileId(),
 	}
 
 	fetcher, ok := fetcherFromContext(ctx)
