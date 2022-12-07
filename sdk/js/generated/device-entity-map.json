@@ -158,6 +158,17 @@
       "js"
     ]
   ],
+  "serial_number": [
+    [
+      "is",
+      "as"
+    ],
+    [
+      "is",
+      "as",
+      "ns"
+    ]
+  ],
   "service_profile_id": [
     "is",
     "is"
@@ -238,20 +249,6 @@
       ],
       [
         "is",
-        "as",
-        "ns"
-      ]
-    ],
-    "vendor_id": [
-      "as",
-      [
-        "as",
-        "ns"
-      ]
-    ],
-    "vendor_profile_id": [
-      "as",
-      [
         "as",
         "ns"
       ]
@@ -468,6 +465,20 @@
   "skip_payload_crypto_override": [
     "as",
     "as"
+  ],
+  "vendor_id": [
+    "as",
+    [
+      "as",
+      "ns"
+    ]
+  ],
+  "vendor_profile_id": [
+    "as",
+    [
+      "as",
+      "ns"
+    ]
   ],
   "battery_percentage": [
     "ns",
