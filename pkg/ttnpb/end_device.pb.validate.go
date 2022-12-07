@@ -3178,7 +3178,7 @@ func (m *ListEndDevicesRequest) ValidateFields(paths ...string) error {
 			if _, ok := _ListEndDevicesRequest_Order_InLookup[m.GetOrder()]; !ok {
 				return ListEndDevicesRequestValidationError{
 					field:  "order",
-					reason: "value must be in list [ device_id -device_id join_eui -join_eui dev_eui -dev_eui name -name description -description created_at -created_at]",
+					reason: "value must be in list [ device_id -device_id join_eui -join_eui dev_eui -dev_eui name -name description -description created_at -created_at last_seen_at -last_seen_at]",
 				}
 			}
 
@@ -3260,19 +3260,21 @@ var _ interface {
 } = ListEndDevicesRequestValidationError{}
 
 var _ListEndDevicesRequest_Order_InLookup = map[string]struct{}{
-	"":             {},
-	"device_id":    {},
-	"-device_id":   {},
-	"join_eui":     {},
-	"-join_eui":    {},
-	"dev_eui":      {},
-	"-dev_eui":     {},
-	"name":         {},
-	"-name":        {},
-	"description":  {},
-	"-description": {},
-	"created_at":   {},
-	"-created_at":  {},
+	"":              {},
+	"device_id":     {},
+	"-device_id":    {},
+	"join_eui":      {},
+	"-join_eui":     {},
+	"dev_eui":       {},
+	"-dev_eui":      {},
+	"name":          {},
+	"-name":         {},
+	"description":   {},
+	"-description":  {},
+	"created_at":    {},
+	"-created_at":   {},
+	"last_seen_at":  {},
+	"-last_seen_at": {},
 }
 
 // ValidateFields checks the field values on SetEndDeviceRequest with the rules
