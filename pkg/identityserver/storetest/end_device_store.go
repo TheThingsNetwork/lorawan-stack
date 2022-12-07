@@ -31,7 +31,7 @@ var endDeviceMask = fieldMask(
 	"name", "description", "attributes", "version_ids",
 	"network_server_address", "application_server_address", "join_server_address",
 	"service_profile_id", "locations", "picture", "activated_at", "last_seen_at",
-	"claim_authentication_code",
+	"claim_authentication_code", "serial_number",
 )
 
 func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
@@ -42,7 +42,10 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 		is.ApplicationStore
 		is.EndDeviceStore
 	})
-	defer st.DestroyDB(t, true, "applications", "attributes", "end_device_locations", "pictures") // TODO: Make sure (at least) attributes and end_device_locations are deleted when deleting end devices.
+	defer st.DestroyDB(
+		t, true,
+		"applications", "attributes", "end_device_locations", "pictures",
+	) // TODO: Make sure (at least) attributes and end_device_locations are deleted when deleting end devices.
 	if !ok {
 		t.Skip("Store does not implement ApplicationStore and EndDeviceStore")
 	}
@@ -108,6 +111,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 			NetworkServerAddress:     "ns.example.com",
 			ApplicationServerAddress: "as.example.com",
 			JoinServerAddress:        "js.example.com",
+			SerialNumber:             "YYWWNNNNN1",
 			ServiceProfileId:         "some_profile_id",
 			Locations: map[string]*ttnpb.Location{
 				"":     location,
@@ -134,6 +138,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 			a.So(created.NetworkServerAddress, should.Equal, "ns.example.com")
 			a.So(created.ApplicationServerAddress, should.Equal, "as.example.com")
 			a.So(created.JoinServerAddress, should.Equal, "js.example.com")
+			a.So(created.SerialNumber, should.Equal, "YYWWNNNNN1")
 			a.So(created.ServiceProfileId, should.Equal, "some_profile_id")
 			a.So(created.Locations, should.Resemble, map[string]*ttnpb.Location{
 				"":     location,
@@ -284,7 +289,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 		start := time.Now().Truncate(time.Second)
 		stamp := start.Add(time.Minute)
 
-		updated, err = s.UpdateEndDevice(ctx, &ttnpb.EndDevice{
+		in := &ttnpb.EndDevice{
 			Ids: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIds: application.GetIds(),
 				DeviceId:       "foo",
@@ -302,6 +307,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 			NetworkServerAddress:     "other-ns.example.com",
 			ApplicationServerAddress: "other-as.example.com",
 			JoinServerAddress:        "other-js.example.com",
+			SerialNumber:             "YYWWNNNNN2",
 			ServiceProfileId:         "other_profile_id",
 			Locations: map[string]*ttnpb.Location{
 				"":    updatedLocation,
@@ -311,7 +317,9 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 			ActivatedAt:             ttnpb.ProtoTimePtr(stamp),
 			LastSeenAt:              ttnpb.ProtoTimePtr(stamp),
 			ClaimAuthenticationCode: updatedCAC,
-		}, endDeviceMask)
+		}
+
+		updated, err = s.UpdateEndDevice(ctx, in, endDeviceMask)
 		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
 			a.So(updated.GetIds().GetDeviceId(), should.Equal, "foo")
 			a.So(updated.Name, should.Equal, "New Foo Name")
@@ -327,6 +335,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 			a.So(updated.NetworkServerAddress, should.Equal, "other-ns.example.com")
 			a.So(updated.ApplicationServerAddress, should.Equal, "other-as.example.com")
 			a.So(updated.JoinServerAddress, should.Equal, "other-js.example.com")
+			a.So(updated.SerialNumber, should.Equal, "YYWWNNNNN2")
 			a.So(updated.ServiceProfileId, should.Equal, "other_profile_id")
 			a.So(updated.Locations, should.Resemble, map[string]*ttnpb.Location{
 				"":    updatedLocation,
