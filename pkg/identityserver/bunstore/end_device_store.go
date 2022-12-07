@@ -56,6 +56,7 @@ type EndDevice struct {
 	ApplicationServerAddress string `bun:"application_server_address,nullzero"`
 	JoinServerAddress        string `bun:"join_server_address,nullzero"`
 
+	SerialNumber     string `bun:"serial_number,nullzero"`
 	ServiceProfileID string `bun:"service_profile_id,nullzero"`
 
 	Locations []*EndDeviceLocation `bun:"rel:has-many,join:id=end_device_id"`
@@ -128,6 +129,7 @@ func endDeviceToPB(m *EndDevice, fieldMask ...string) (*ttnpb.EndDevice, error) 
 			}
 		}(),
 
+		SerialNumber:     m.SerialNumber,
 		ServiceProfileId: m.ServiceProfileID,
 
 		ActivatedAt: ttnpb.ProtoTime(m.ActivatedAt),
@@ -221,6 +223,7 @@ func (s *endDeviceStore) CreateEndDevice(
 		ClaimAuthenticationCodeValidFrom: cleanTimePtr(ttnpb.StdTime(pb.ClaimAuthenticationCode.GetValidFrom())),
 		ClaimAuthenticationCodeValidTo:   cleanTimePtr(ttnpb.StdTime(pb.ClaimAuthenticationCode.GetValidTo())),
 
+		SerialNumber:     pb.SerialNumber,
 		ServiceProfileID: pb.ServiceProfileId,
 
 		ActivatedAt: cleanTimePtr(ttnpb.StdTime(pb.ActivatedAt)),
@@ -298,7 +301,7 @@ func (*endDeviceStore) selectWithFields(q *bun.SelectQuery, fieldMask store.Fiel
 				// Always selected.
 			case "name", "description",
 				"network_server_address", "application_server_address", "join_server_address",
-				"service_profile_id",
+				"service_profile_id", "serial_number",
 				"activated_at", "last_seen_at":
 				// Proto name equals model name.
 				columns = append(columns, f)
@@ -607,6 +610,10 @@ func (s *endDeviceStore) updateEndDeviceModel( //nolint:gocyclo
 		case "join_server_address":
 			model.JoinServerAddress = pb.JoinServerAddress
 			columns = append(columns, "join_server_address")
+
+		case "serial_number":
+			model.SerialNumber = pb.SerialNumber
+			columns = append(columns, "serial_number")
 
 		case "service_profile_id":
 			model.ServiceProfileID = pb.ServiceProfileId
