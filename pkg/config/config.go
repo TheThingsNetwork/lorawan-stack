@@ -238,6 +238,7 @@ func (m *Manager) Unmarshal(result interface{}) error {
 			stringToADRAckLimitExponentPointerHook,
 			stringToAggregatedDutyCyclePointerHook,
 			stringToRxDelayPointerHook,
+			stringToEUI64PointerHook,
 		),
 	})
 	if err != nil {
@@ -427,6 +428,14 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 				m.viper.SetDefault(name, val)
 				flags.BoolP(name, shorthand, val, description)
 
+			case *bool:
+				m.viper.SetDefault(name, val)
+				value := false
+				if val != nil && *val {
+					value = true
+				}
+				flags.BoolP(name, shorthand, value, description)
+
 			case int:
 				m.viper.SetDefault(name, val)
 				flags.IntP(name, shorthand, val, description)
@@ -563,6 +572,14 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 			case types.EUI64:
 				str := val.String()
 				m.viper.SetDefault(name, str)
+				flags.StringP(name, shorthand, str, description)
+
+			case *types.EUI64:
+				var str string
+				if val != nil {
+					m.viper.SetDefault(name, str)
+					str = val.String()
+				}
 				flags.StringP(name, shorthand, str, description)
 
 			case ttnpb.RxDelay:
