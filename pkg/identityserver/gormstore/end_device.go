@@ -49,6 +49,7 @@ type EndDevice struct {
 	ApplicationServerAddress string `gorm:"type:VARCHAR"`
 	JoinServerAddress        string `gorm:"type:VARCHAR"`
 
+	SerialNumber     string `gorm:"type:VARCHAR(16)"`
 	ServiceProfileID string `gorm:"type:VARCHAR"`
 
 	Locations []EndDeviceLocation
@@ -137,6 +138,9 @@ var devicePBSetters = map[string]func(*ttnpb.EndDevice, *EndDevice){
 	joinServerAddressField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
 		pb.JoinServerAddress = dev.JoinServerAddress
 	},
+	serialNumberField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
+		pb.SerialNumber = dev.SerialNumber
+	},
 	serviceProfileIDField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
 		pb.ServiceProfileId = dev.ServiceProfileID
 	},
@@ -216,6 +220,9 @@ var deviceModelSetters = map[string]func(*EndDevice, *ttnpb.EndDevice){
 	joinServerAddressField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
 		dev.JoinServerAddress = pb.JoinServerAddress
 	},
+	serialNumberField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
+		dev.SerialNumber = pb.SerialNumber
+	},
 	serviceProfileIDField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
 		dev.ServiceProfileID = pb.ServiceProfileId
 	},
@@ -286,6 +293,7 @@ var deviceColumnNames = map[string][]string{
 	networkServerAddressField:     {networkServerAddressField},
 	applicationServerAddressField: {applicationServerAddressField},
 	joinServerAddressField:        {joinServerAddressField},
+	serialNumberField:             {serialNumberField},
 	serviceProfileIDField:         {serviceProfileIDField},
 	locationsField:                {},
 	activatedAtField:              {activatedAtField},

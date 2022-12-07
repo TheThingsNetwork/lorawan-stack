@@ -62,6 +62,7 @@ const (
 	scheduleAnytimeDelayField           = "schedule_anytime_delay"
 	scheduleDownlinkLateField           = "schedule_downlink_late"
 	secretField                         = "secret"
+	serialNumberField                   = "serial_number"
 	serviceProfileIDField               = "service_profile_id"
 	skipAuthorizationField              = "skip_authorization"
 	stateDescriptionField               = "state_description"
