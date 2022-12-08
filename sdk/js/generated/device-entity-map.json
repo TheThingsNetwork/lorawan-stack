@@ -173,6 +173,41 @@
     "is",
     "is"
   ],
+  "tr005_identifiers": {
+    "_root": [
+      [
+        "is",
+        "as"
+      ],
+      [
+        "is",
+        "as",
+        "ns"
+      ]
+    ],
+    "vendor_id": [
+      [
+        "is",
+        "as"
+      ],
+      [
+        "is",
+        "as",
+        "ns"
+      ]
+    ],
+    "vendor_profile_id": [
+      [
+        "is",
+        "as"
+      ],
+      [
+        "is",
+        "as",
+        "ns"
+      ]
+    ]
+  },
   "updated_at": [
     [
       "is",
@@ -465,20 +500,6 @@
   "skip_payload_crypto_override": [
     "as",
     "as"
-  ],
-  "vendor_id": [
-    "as",
-    [
-      "as",
-      "ns"
-    ]
-  ],
-  "vendor_profile_id": [
-    "as",
-    [
-      "as",
-      "ns"
-    ]
   ],
   "battery_percentage": [
     "ns",
