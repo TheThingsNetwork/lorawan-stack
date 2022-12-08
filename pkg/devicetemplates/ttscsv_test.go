@@ -99,6 +99,8 @@ func TestTTSCSVConverter(t *testing.T) {
 					"session.last_n_f_cnt_down",
 					"supports_class_c",
 					"supports_join",
+					"tr005_identifiers.vendor_id",
+					"tr005_identifiers.vendor_profile_id",
 					"version_ids.band_id",
 					"version_ids.brand_id",
 					"version_ids.firmware_version",

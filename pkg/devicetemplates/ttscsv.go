@@ -177,7 +177,7 @@ var csvFieldSetters = map[string]csvFieldSetterFunc{ //nolint:gocyclo
 			return nil, err
 		}
 		dst.Tr005Identifiers.VendorId = uint32(s)
-		return []string{"vendor_id"}, nil
+		return []string{"tr005_identifiers.vendor_id"}, nil
 	},
 	"vendor_profile_id": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
 		if dst.Tr005Identifiers == nil {
@@ -188,7 +188,7 @@ var csvFieldSetters = map[string]csvFieldSetterFunc{ //nolint:gocyclo
 			return nil, err
 		}
 		dst.Tr005Identifiers.VendorProfileId = uint32(s)
-		return []string{"vendor_profile_id"}, nil
+		return []string{"tr005_identifiers.vendor_profile_id"}, nil
 	},
 	"app_key": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
 		var key types.AES128Key
