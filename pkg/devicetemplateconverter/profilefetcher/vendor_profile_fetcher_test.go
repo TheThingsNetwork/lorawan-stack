@@ -43,8 +43,10 @@ func Test_VendorIDProfileFetcher_ShouldFetchProfile(t *testing.T) {
 		{
 			name: "Valid",
 			device: &ttnpb.EndDevice{
-				VendorId:        10,
-				VendorProfileId: 10,
+				Tr005Identifiers: &ttnpb.TR005Identifiers{
+					VendorId:        10,
+					VendorProfileId: 10,
+				},
 			},
 			want: true,
 		},
@@ -92,14 +94,18 @@ func Test_VendorIDProfileFetcher_FetchProfile(t *testing.T) {
 		{
 			name: "valid",
 			endDevice: &ttnpb.EndDevice{
-				VendorId:        1,
-				VendorProfileId: 1,
+				Tr005Identifiers: &ttnpb.TR005Identifiers{
+					VendorId:        1,
+					VendorProfileId: 1,
+				},
 			},
 			populateMock: func(md *mockdr.MockDR) {
 				md.EndDeviceTemplate = &ttnpb.EndDeviceTemplate{
 					EndDevice: &ttnpb.EndDevice{
-						VendorId:        1,
-						VendorProfileId: 1,
+						Tr005Identifiers: &ttnpb.TR005Identifiers{
+							VendorId:        1,
+							VendorProfileId: 1,
+						},
 					},
 					FieldMask: ttnpb.FieldMask(
 						"vendor_id",
@@ -114,8 +120,8 @@ func Test_VendorIDProfileFetcher_FetchProfile(t *testing.T) {
 					"vendor_profile_id",
 				), should.BeNil)
 				a.So(
-					tmpl.GetEndDevice().GetVendorId() == 1 &&
-						tmpl.GetEndDevice().GetVendorProfileId() == 1,
+					tmpl.GetEndDevice().GetTr005Identifiers().GetVendorId() == 1 &&
+						tmpl.GetEndDevice().GetTr005Identifiers().GetVendorProfileId() == 1,
 					should.BeTrue,
 				)
 			},

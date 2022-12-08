@@ -1061,29 +1061,20 @@ func (EndDeviceOptionNamespace) WithLastSeenAt(v *pbtypes.Timestamp) EndDeviceOp
 	}
 }
 
-// WithVendorId returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with VendorId set to v.
-func (EndDeviceOptionNamespace) WithVendorId(v uint32) EndDeviceOption {
-	return func(x *ttnpb.EndDevice) *ttnpb.EndDevice {
-		copy := ttnpb.Clone(x)
-		copy.VendorId = v
-		return copy
-	}
-}
-
-// WithVendorProfileId returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with VendorProfileId set to v.
-func (EndDeviceOptionNamespace) WithVendorProfileId(v uint32) EndDeviceOption {
-	return func(x *ttnpb.EndDevice) *ttnpb.EndDevice {
-		copy := ttnpb.Clone(x)
-		copy.VendorProfileId = v
-		return copy
-	}
-}
-
 // WithSerialNumber returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with SerialNumber set to v.
 func (EndDeviceOptionNamespace) WithSerialNumber(v string) EndDeviceOption {
 	return func(x *ttnpb.EndDevice) *ttnpb.EndDevice {
 		copy := ttnpb.Clone(x)
 		copy.SerialNumber = v
+		return copy
+	}
+}
+
+// WithTr005Identifiers returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with Tr005Identifiers set to v.
+func (EndDeviceOptionNamespace) WithTr005Identifiers(v *ttnpb.TR005Identifiers) EndDeviceOption {
+	return func(x *ttnpb.EndDevice) *ttnpb.EndDevice {
+		copy := ttnpb.Clone(x)
+		copy.Tr005Identifiers = v
 		return copy
 	}
 }
