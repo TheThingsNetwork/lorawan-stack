@@ -32,6 +32,7 @@ var endDeviceMask = fieldMask(
 	"network_server_address", "application_server_address", "join_server_address",
 	"service_profile_id", "locations", "picture", "activated_at", "last_seen_at",
 	"claim_authentication_code", "serial_number",
+	"tr005_identifiers",
 )
 
 func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
@@ -78,6 +79,10 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 			Data:     []byte("foobarbaz"),
 		},
 	}
+	created005Ids := &ttnpb.TR005Identifiers{
+		VendorId:        1,
+		VendorProfileId: 1,
+	}
 	start := time.Now().Truncate(time.Second)
 	claim := &ttnpb.EndDeviceAuthenticationCode{
 		ValidFrom: ttnpb.ProtoTimePtr(start),
@@ -113,6 +118,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 			JoinServerAddress:        "js.example.com",
 			SerialNumber:             "YYWWNNNNN1",
 			ServiceProfileId:         "some_profile_id",
+			Tr005Identifiers:         created005Ids,
 			Locations: map[string]*ttnpb.Location{
 				"":     location,
 				"wifi": wifiLocation,
@@ -140,6 +146,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 			a.So(created.JoinServerAddress, should.Equal, "js.example.com")
 			a.So(created.SerialNumber, should.Equal, "YYWWNNNNN1")
 			a.So(created.ServiceProfileId, should.Equal, "some_profile_id")
+			a.So(created.Tr005Identifiers, should.Resemble, created005Ids)
 			a.So(created.Locations, should.Resemble, map[string]*ttnpb.Location{
 				"":     location,
 				"wifi": wifiLocation,
@@ -275,7 +282,10 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 	updatedPicture := &ttnpb.Picture{
 		Sizes: map[uint32]string{0: "https://example.com/device_picture.jpg"},
 	}
-
+	updatedTr005Ids := &ttnpb.TR005Identifiers{
+		VendorId:        2,
+		VendorProfileId: 2,
+	}
 	updatedCAC := &ttnpb.EndDeviceAuthenticationCode{
 		ValidFrom: ttnpb.ProtoTimePtr(start),
 		ValidTo:   ttnpb.ProtoTimePtr(start.Add(time.Hour)),
@@ -309,6 +319,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 			JoinServerAddress:        "other-js.example.com",
 			SerialNumber:             "YYWWNNNNN2",
 			ServiceProfileId:         "other_profile_id",
+			Tr005Identifiers:         updatedTr005Ids,
 			Locations: map[string]*ttnpb.Location{
 				"":    updatedLocation,
 				"geo": extraLocation,
@@ -337,6 +348,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 			a.So(updated.JoinServerAddress, should.Equal, "other-js.example.com")
 			a.So(updated.SerialNumber, should.Equal, "YYWWNNNNN2")
 			a.So(updated.ServiceProfileId, should.Equal, "other_profile_id")
+			a.So(updated.Tr005Identifiers, should.Resemble, updatedTr005Ids)
 			a.So(updated.Locations, should.Resemble, map[string]*ttnpb.Location{
 				"":    updatedLocation,
 				"geo": extraLocation,
