@@ -1003,6 +1003,19 @@ func (v *EndDeviceVersionIdentifiers) FieldIsZero(p string) bool {
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }
 
+func (v *TR005Identifiers) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "vendor_id":
+		return v.VendorId == 0
+	case "vendor_profile_id":
+		return v.VendorProfileId == 0
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
 // FieldIsZero returns whether path p is zero.
 func (v *EndDevice) FieldIsZero(p string) bool {
 	if v == nil {
@@ -1411,14 +1424,16 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 		return !v.SupportsClassC
 	case "supports_join":
 		return !v.SupportsJoin
+	case "tr005_identifiers":
+		return v.Tr005Identifiers == nil
+	case "tr005_identifiers.vendor_id":
+		return v.Tr005Identifiers.FieldIsZero("vendor_id")
+	case "tr005_identifiers.vendor_profile_id":
+		return v.Tr005Identifiers.FieldIsZero("vendor_profile_id")
 	case "updated_at":
 		return v.UpdatedAt == nil
 	case "used_dev_nonces":
 		return v.UsedDevNonces == nil
-	case "vendor_id":
-		return v.VendorId == 0
-	case "vendor_profile_id":
-		return v.VendorProfileId == 0
 	case "version_ids":
 		return v.VersionIds == nil
 	case "version_ids.brand_id":
