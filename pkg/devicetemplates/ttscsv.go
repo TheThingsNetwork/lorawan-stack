@@ -169,19 +169,25 @@ var csvFieldSetters = map[string]csvFieldSetterFunc{ //nolint:gocyclo
 		return []string{"version_ids.band_id"}, nil
 	},
 	"vendor_id": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
+		if dst.Tr005Identifiers == nil {
+			dst.Tr005Identifiers = &ttnpb.TR005Identifiers{}
+		}
 		s, err := strconv.ParseUint(val, 16, 32)
 		if err != nil {
 			return nil, err
 		}
-		dst.VendorId = uint32(s)
+		dst.Tr005Identifiers.VendorId = uint32(s)
 		return []string{"vendor_id"}, nil
 	},
 	"vendor_profile_id": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
+		if dst.Tr005Identifiers == nil {
+			dst.Tr005Identifiers = &ttnpb.TR005Identifiers{}
+		}
 		s, err := strconv.ParseUint(val, 16, 32)
 		if err != nil {
 			return nil, err
 		}
-		dst.VendorProfileId = uint32(s)
+		dst.Tr005Identifiers.VendorProfileId = uint32(s)
 		return []string{"vendor_profile_id"}, nil
 	},
 	"app_key": func(dst *ttnpb.EndDevice, val string) ([]string, error) {

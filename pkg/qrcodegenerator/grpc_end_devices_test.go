@@ -190,8 +190,6 @@ func TestGenerateEndDeviceQRCodeParsing(t *testing.T) {
 				a.So(endDeviceTemplate, should.NotBeNil)
 				endDevice := endDeviceTemplate.EndDevice
 				a.So(endDevice, should.NotBeNil)
-				a.So(endDevice.VendorId, should.Equal, 0xAABB)
-				a.So(endDevice.VendorProfileId, should.Equal, 0x1122)
 
 				endDeviceIDs := endDevice.Ids.GetEntityIdentifiers().GetDeviceIds()
 				a.So(endDeviceIDs, should.NotBeNil)
@@ -201,6 +199,10 @@ func TestGenerateEndDeviceQRCodeParsing(t *testing.T) {
 				a.So(endDevice.ClaimAuthenticationCode, should.NotBeNil)
 				a.So(endDevice.ClaimAuthenticationCode.Value, should.Equal, "123456")
 
+				tr005Ids := endDevice.GetTr005Identifiers()
+				a.So(tr005Ids, should.NotBeNil)
+				a.So(tr005Ids.VendorId, should.Equal, 0xAABB)
+				a.So(tr005Ids.VendorProfileId, should.Equal, 0x1122)
 				return true
 			},
 		},
@@ -222,10 +224,7 @@ func TestGenerateEndDeviceQRCodeParsing(t *testing.T) {
 				a.So(endDeviceTemplate, should.NotBeNil)
 				endDevice := endDeviceTemplate.GetEndDevice()
 				a.So(endDevice, should.NotBeNil)
-				a.So(endDevice.VendorId, should.Equal, 0xABCD)
-				a.So(endDevice.VendorProfileId, should.Equal, 0xABCD)
 				a.So(endDevice.SerialNumber, should.Equal, "12345678")
-				t.Logf("End device: %v", endDevice)
 
 				endDeviceIDs := endDevice.GetIds()
 				a.So(endDeviceIDs, should.NotBeNil)
@@ -234,6 +233,11 @@ func TestGenerateEndDeviceQRCodeParsing(t *testing.T) {
 
 				a.So(endDevice.ClaimAuthenticationCode, should.NotBeNil)
 				a.So(endDevice.ClaimAuthenticationCode.Value, should.Equal, "123456")
+
+				tr005Ids := endDevice.GetTr005Identifiers()
+				a.So(tr005Ids, should.NotBeNil)
+				a.So(tr005Ids.VendorId, should.Equal, 0xABCD)
+				a.So(tr005Ids.VendorProfileId, should.Equal, 0xABCD)
 				return true
 			},
 		},
