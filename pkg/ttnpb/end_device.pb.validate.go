@@ -2337,10 +2337,6 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 				}
 			}
 
-		case "vendor_id":
-			// no validation rules for VendorId
-		case "vendor_profile_id":
-			// no validation rules for VendorProfileId
 		case "serial_number":
 
 			if m.GetSerialNumber() != "" {
@@ -2359,6 +2355,18 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 					}
 				}
 
+			}
+
+		case "tr005_identifiers":
+
+			if v, ok := interface{}(m.GetTr005Identifiers()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return EndDeviceValidationError{
+						field:  "tr005_identifiers",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
 			}
 
 		default:

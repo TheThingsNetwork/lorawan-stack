@@ -2530,26 +2530,6 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 			} else {
 				dst.LastSeenAt = nil
 			}
-		case "vendor_id":
-			if len(subs) > 0 {
-				return fmt.Errorf("'vendor_id' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.VendorId = src.VendorId
-			} else {
-				var zero uint32
-				dst.VendorId = zero
-			}
-		case "vendor_profile_id":
-			if len(subs) > 0 {
-				return fmt.Errorf("'vendor_profile_id' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.VendorProfileId = src.VendorProfileId
-			} else {
-				var zero uint32
-				dst.VendorProfileId = zero
-			}
 		case "serial_number":
 			if len(subs) > 0 {
 				return fmt.Errorf("'serial_number' has no subfields, but %s were specified", subs)
@@ -2559,6 +2539,31 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 			} else {
 				var zero string
 				dst.SerialNumber = zero
+			}
+		case "tr005_identifiers":
+			if len(subs) > 0 {
+				var newDst, newSrc *TR005Identifiers
+				if (src == nil || src.Tr005Identifiers == nil) && dst.Tr005Identifiers == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Tr005Identifiers
+				}
+				if dst.Tr005Identifiers != nil {
+					newDst = dst.Tr005Identifiers
+				} else {
+					newDst = &TR005Identifiers{}
+					dst.Tr005Identifiers = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Tr005Identifiers = src.Tr005Identifiers
+				} else {
+					dst.Tr005Identifiers = nil
+				}
 			}
 
 		default:

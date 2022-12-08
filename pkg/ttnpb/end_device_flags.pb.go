@@ -2484,9 +2484,9 @@ func AddSelectFlagsForEndDevice(flags *pflag.FlagSet, prefix string, hidden bool
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("skip-payload-crypto-override", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("skip-payload-crypto-override", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("activated-at", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("activated-at", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("last-seen-at", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("last-seen-at", prefix), false), flagsplugin.WithHidden(hidden)))
-	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("vendor-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("vendor-id", prefix), false), flagsplugin.WithHidden(hidden)))
-	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("vendor-profile-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("vendor-profile-id", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("serial-number", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("serial-number", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("tr005-identifiers", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("tr005-identifiers", prefix), true), flagsplugin.WithHidden(hidden)))
+	// NOTE: tr005_identifiers (TR005Identifiers) does not seem to have select flags.
 }
 
 // SelectFromFlags outputs the fieldmask paths forEndDevice message from select flags.
@@ -2777,21 +2777,17 @@ func PathsFromSelectFlagsForEndDevice(flags *pflag.FlagSet, prefix string) (path
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("last_seen_at", prefix))
 	}
-	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("vendor_id", prefix)); err != nil {
-		return nil, err
-	} else if selected && val {
-		paths = append(paths, flagsplugin.Prefix("vendor_id", prefix))
-	}
-	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("vendor_profile_id", prefix)); err != nil {
-		return nil, err
-	} else if selected && val {
-		paths = append(paths, flagsplugin.Prefix("vendor_profile_id", prefix))
-	}
 	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("serial_number", prefix)); err != nil {
 		return nil, err
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("serial_number", prefix))
 	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("tr005_identifiers", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("tr005_identifiers", prefix))
+	}
+	// NOTE: tr005_identifiers (TR005Identifiers) does not seem to have select flags.
 	return paths, nil
 }
 
@@ -2845,9 +2841,8 @@ func AddSetFlagsForEndDevice(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("skip-payload-crypto-override", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewTimestampFlag(flagsplugin.Prefix("activated-at", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewTimestampFlag(flagsplugin.Prefix("last-seen-at", prefix), "", flagsplugin.WithHidden(hidden)))
-	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("vendor-id", prefix), "", flagsplugin.WithHidden(hidden)))
-	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("vendor-profile-id", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("serial-number", prefix), "", flagsplugin.WithHidden(hidden)))
+	// FIXME: Skipping Tr005Identifiers because it does not seem to implement AddSetFlags.
 }
 
 // SetFromFlags sets the EndDevice message from flags.
@@ -3168,23 +3163,12 @@ func (m *EndDevice) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []s
 		m.LastSeenAt = gogo.SetTimestamp(val)
 		paths = append(paths, flagsplugin.Prefix("last_seen_at", prefix))
 	}
-	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("vendor_id", prefix)); err != nil {
-		return nil, err
-	} else if changed {
-		m.VendorId = val
-		paths = append(paths, flagsplugin.Prefix("vendor_id", prefix))
-	}
-	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("vendor_profile_id", prefix)); err != nil {
-		return nil, err
-	} else if changed {
-		m.VendorProfileId = val
-		paths = append(paths, flagsplugin.Prefix("vendor_profile_id", prefix))
-	}
 	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("serial_number", prefix)); err != nil {
 		return nil, err
 	} else if changed {
 		m.SerialNumber = val
 		paths = append(paths, flagsplugin.Prefix("serial_number", prefix))
 	}
+	// FIXME: Skipping Tr005Identifiers because it does not seem to implement AddSetFlags.
 	return paths, nil
 }

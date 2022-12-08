@@ -125,3 +125,12 @@ var NetworkIdentifiersFieldPathsTopLevel = []string{
 	"tenant_address",
 	"tenant_id",
 }
+var TR005IdentifiersFieldPathsNested = []string{
+	"vendor_id",
+	"vendor_profile_id",
+}
+
+var TR005IdentifiersFieldPathsTopLevel = []string{
+	"vendor_id",
+	"vendor_profile_id",
+}

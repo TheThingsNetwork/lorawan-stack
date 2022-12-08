@@ -14987,30 +14987,6 @@
               "defaultValue": ""
             },
             {
-              "name": "vendor_id",
-              "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
-              "label": "",
-              "type": "uint32",
-              "longType": "uint32",
-              "fullType": "uint32",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "vendor_profile_id",
-              "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
-              "label": "",
-              "type": "uint32",
-              "longType": "uint32",
-              "fullType": "uint32",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
               "name": "serial_number",
               "description": "",
               "label": "",
@@ -15033,6 +15009,18 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "tr005_identifiers",
+              "description": "",
+              "label": "",
+              "type": "TR005Identifiers",
+              "longType": "TR005Identifiers",
+              "fullType": "ttn.lorawan.v3.TR005Identifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -23215,6 +23203,42 @@
               "ismap": false,
               "isoneof": true,
               "oneofdecl": "ids",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "TR005Identifiers",
+          "longName": "TR005Identifiers",
+          "fullName": "ttn.lorawan.v3.TR005Identifiers",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "vendor_id",
+              "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "vendor_profile_id",
+              "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
               "defaultValue": ""
             }
           ]

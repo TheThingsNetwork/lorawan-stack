@@ -2920,20 +2920,16 @@ func (x *EndDevice) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 			gogo.MarshalTimestamp(s, x.LastSeenAt)
 		}
 	}
-	if x.VendorId != 0 || s.HasField("vendor_id") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("vendor_id")
-		s.WriteUint32(x.VendorId)
-	}
-	if x.VendorProfileId != 0 || s.HasField("vendor_profile_id") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("vendor_profile_id")
-		s.WriteUint32(x.VendorProfileId)
-	}
 	if x.SerialNumber != "" || s.HasField("serial_number") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("serial_number")
 		s.WriteString(x.SerialNumber)
+	}
+	if x.Tr005Identifiers != nil || s.HasField("tr005_identifiers") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("tr005_identifiers")
+		// NOTE: TR005Identifiers does not seem to implement MarshalProtoJSON.
+		gogo.MarshalMessage(s, x.Tr005Identifiers)
 	}
 	s.WriteObjectEnd()
 }
@@ -3257,15 +3253,19 @@ func (x *EndDevice) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				return
 			}
 			x.LastSeenAt = v
-		case "vendor_id", "vendorId":
-			s.AddField("vendor_id")
-			x.VendorId = s.ReadUint32()
-		case "vendor_profile_id", "vendorProfileId":
-			s.AddField("vendor_profile_id")
-			x.VendorProfileId = s.ReadUint32()
 		case "serial_number", "serialNumber":
 			s.AddField("serial_number")
 			x.SerialNumber = s.ReadString()
+		case "tr005_identifiers", "tr005Identifiers":
+			s.AddField("tr005_identifiers")
+			if s.ReadNil() {
+				x.Tr005Identifiers = nil
+				return
+			}
+			// NOTE: TR005Identifiers does not seem to implement UnmarshalProtoJSON.
+			var v TR005Identifiers
+			gogo.UnmarshalMessage(s, &v)
+			x.Tr005Identifiers = &v
 		}
 	})
 }

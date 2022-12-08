@@ -775,15 +775,11 @@ message EndDevice {
   // This field is set by the Application Server and stored in the Identity Server.
   google.protobuf.Timestamp last_seen_at = 54;
 
-  // VendorID managed by the LoRa Alliance, as defined in TR005.
-  uint32 vendor_id = 55;
+  string serial_number = 55 [(validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36, ignore_empty: true}];
 
-  // ID of the LoRaWAN end device profile assigned by the vendor.
-  uint32 vendor_profile_id = 56;
+  TR005Identifiers tr005_identifiers = 56;
 
-  string serial_number = 57 [(validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36, ignore_empty: true}];
-
-  // next: 58;
+  // next: 57;
 }
 
 message EndDevices {
