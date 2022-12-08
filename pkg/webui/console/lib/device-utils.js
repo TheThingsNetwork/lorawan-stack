@@ -177,3 +177,9 @@ const ALL_ZERO_KEY = '0'.repeat(32)
  * @returns {boolean} - `true` if the key is non-zero, `false` otherwise.
  */
 export const isNonZeroSessionKey = key => key !== ALL_ZERO_KEY
+
+/**
+ * @param {string} value - The frequency value.
+ * @returns {boolean} - True if the frequency value is valid, false otherwise.
+ */
+export const dynamicFrequencyTest = value => value === 0 || value >= 100000

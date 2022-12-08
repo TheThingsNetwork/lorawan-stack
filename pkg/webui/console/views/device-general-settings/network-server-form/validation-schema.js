@@ -16,6 +16,7 @@ import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import {
+  dynamicFrequencyTest,
   parseLorawanMacVersion,
   ACTIVATION_MODES,
   isNonZeroSessionKey,
@@ -133,34 +134,27 @@ const validationSchema = Yup.object()
         const isNewVersion = parseLorawanMacVersion(version) >= 110
 
         return schema.shape({
-          beacon_frequency: Yup.lazy(frequency => {
-            if (
-              !isClassB ||
-              frequency === undefined ||
-              frequency === '' ||
-              mode === ACTIVATION_MODES.OTAA
-            ) {
+          beacon_frequency: Yup.lazy(() => {
+            if (!isClassB || mode === ACTIVATION_MODES.OTAA) {
               return Yup.number().strip()
             }
 
-            const schema = Yup.number().min(
-              100000,
-              Yup.passValues(sharedMessages.validateNumberGte),
+            return Yup.number().test(
+              'is-valid-freq',
+              sharedMessages.validateFreqDynamic,
+              dynamicFrequencyTest,
             )
-
-            return schema
           }),
-          desired_beacon_frequency: Yup.lazy(frequency => {
-            if (!isClassB || frequency === undefined || frequency === '') {
+          desired_beacon_frequency: Yup.lazy(() => {
+            if (!isClassB || mode !== ACTIVATION_MODES.MULTICAST) {
               return Yup.number().strip()
             }
 
-            const schema = Yup.number().min(
-              100000,
-              Yup.passValues(sharedMessages.validateNumberGte),
+            return Yup.number().test(
+              'is-valid-freq',
+              sharedMessages.validateFreqDynamic,
+              dynamicFrequencyTest,
             )
-
-            return schema
           }),
           class_b_timeout: Yup.lazy(value => {
             if (!isClassB || !Boolean(value)) {
@@ -186,11 +180,7 @@ const validationSchema = Yup.object()
               .max(15, Yup.passValues(sharedMessages.validateNumberLte))
           }),
           desired_rx1_delay: Yup.lazy(delay => {
-            if (
-              delay === undefined ||
-              delay === '' ||
-              (mode !== ACTIVATION_MODES.ABP && mode !== ACTIVATION_MODES.OTAA)
-            ) {
+            if (delay === undefined || delay === '' || mode !== ACTIVATION_MODES.MULTICAST) {
               return Yup.number().strip()
             }
 
@@ -208,11 +198,7 @@ const validationSchema = Yup.object()
               .max(7, Yup.passValues(sharedMessages.validateNumberLte))
           }),
           desired_rx1_data_rate_offset: Yup.lazy(value => {
-            if (
-              value === undefined ||
-              value === '' ||
-              (mode !== ACTIVATION_MODES.ABP && mode !== ACTIVATION_MODES.OTAA)
-            ) {
+            if (value === undefined || value === '' || mode === ACTIVATION_MODES.MULTICAST) {
               return Yup.number().strip()
             }
 
@@ -242,7 +228,12 @@ const validationSchema = Yup.object()
               .max(15, Yup.passValues(sharedMessages.validateNumberLte))
           }),
           desired_ping_slot_data_rate_index: Yup.lazy(dataRate => {
-            if (!isClassB || dataRate === '' || dataRate === undefined) {
+            if (
+              !isClassB ||
+              dataRate === '' ||
+              dataRate === undefined ||
+              mode === ACTIVATION_MODES.MULTICAST
+            ) {
               return Yup.number().strip()
             }
 
@@ -260,7 +251,7 @@ const validationSchema = Yup.object()
               .max(15, Yup.passValues(sharedMessages.validateNumberLte))
           }),
           desired_rx2_data_rate_index: Yup.lazy(dataRate => {
-            if (dataRate === '' || dataRate === undefined) {
+            if (dataRate === '' || dataRate === undefined || mode === ACTIVATION_MODES.MULTICAST) {
               return Yup.number().strip()
             }
 
@@ -291,24 +282,36 @@ const validationSchema = Yup.object()
             return Yup.string().strip()
           }),
           desired_rx2_frequency: Yup.lazy(frequency => {
-            if (frequency === undefined || frequency === '') {
+            if (
+              frequency === undefined ||
+              frequency === '' ||
+              mode === ACTIVATION_MODES.MULTICAST
+            ) {
               return Yup.number().strip()
             }
             return Yup.number().min(100000, Yup.passValues(sharedMessages.validateNumberGte))
           }),
-          ping_slot_frequency: Yup.lazy(frequency => {
-            if (!Boolean(frequency) || !isClassB || mode === ACTIVATION_MODES.OTAA) {
+          ping_slot_frequency: Yup.lazy(() => {
+            if (!isClassB || mode === ACTIVATION_MODES.OTAA) {
               return Yup.number().strip()
             }
 
-            return Yup.number().min(100000, Yup.passValues(sharedMessages.validateNumberGte))
+            return Yup.number().test(
+              'is-valid-freq',
+              sharedMessages.validateFreqDynamic,
+              dynamicFrequencyTest,
+            )
           }),
           desired_ping_slot_frequency: Yup.lazy(frequency => {
-            if (!Boolean(frequency) || !isClassB) {
+            if (!Boolean(frequency) || !isClassB || mode === ACTIVATION_MODES.MULTICAST) {
               return Yup.number().strip()
             }
 
-            return Yup.number().min(100000, Yup.passValues(sharedMessages.validateNumberGte))
+            return Yup.number().test(
+              'is-valid-freq',
+              sharedMessages.validateFreqDynamic,
+              dynamicFrequencyTest,
+            )
           }),
           factory_preset_frequencies: Yup.lazy(frequencies => {
             if (!Boolean(frequencies)) {
@@ -329,15 +332,15 @@ const validationSchema = Yup.object()
               )
           }),
           supports_32_bit_f_cnt: Yup.boolean().default(true),
-          max_duty_cycle: Yup.lazy(value => {
-            if (mode !== ACTIVATION_MODES.ABP || !value) {
+          max_duty_cycle: Yup.lazy(() => {
+            if (mode !== ACTIVATION_MODES.ABP) {
               return Yup.string().strip()
             }
 
             return Yup.string()
           }),
           desired_max_duty_cycle: Yup.lazy(value => {
-            if (!Boolean(value)) {
+            if (!Boolean(value) || mode === ACTIVATION_MODES.MULTICAST) {
               return Yup.string().strip()
             }
 
@@ -367,14 +370,14 @@ const validationSchema = Yup.object()
             })
           }),
           desired_adr_ack_limit_exponent: Yup.string().when(['adr'], (adr, schema) => {
-            if (!('dynamic' in adr) || !isNewVersion) {
+            if (!('dynamic' in adr) || !isNewVersion || mode === ACTIVATION_MODES.MULTICAST) {
               return schema.strip()
             }
 
             return schema
           }),
           desired_adr_ack_delay_exponent: Yup.string().when(['adr'], (adr, schema) => {
-            if (!('dynamic' in adr) || !isNewVersion) {
+            if (!('dynamic' in adr) || !isNewVersion || mode === ACTIVATION_MODES.MULTICAST) {
               return schema.strip()
             }
 

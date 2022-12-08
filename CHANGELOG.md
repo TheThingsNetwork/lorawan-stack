@@ -21,6 +21,9 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- It is now allowed to set `0` for ping slot frequency and beacon frequency in the Network Layer Settings of the end device general settings in the Console.
+- MAC parameters that have the `desired_` will be hidden from the end device general settings for multicast end devices in the Console.
+
 ### Security
 
 ## [3.23.0] - 2022-11-30
