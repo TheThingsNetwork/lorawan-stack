@@ -57,6 +57,9 @@ type EndDevice struct {
 	Picture   *Picture
 	PictureID *string `gorm:"type:UUID;index:end_device_picture_index"`
 
+	VendorID        uint32 `gorm:"type:INTEGER"`
+	VendorProfileID uint32 `gorm:"type:INTEGER"`
+
 	ActivatedAt *time.Time `gorm:"default:null"`
 	LastSeenAt  *time.Time `gorm:"default:null"`
 
@@ -74,6 +77,13 @@ func mustEndDeviceVersionIDs(pb *ttnpb.EndDevice) *ttnpb.EndDeviceVersionIdentif
 		pb.VersionIds = &ttnpb.EndDeviceVersionIdentifiers{}
 	}
 	return pb.VersionIds
+}
+
+func mustEndDeviceTr005IDs(pb *ttnpb.EndDevice) *ttnpb.TR005Identifiers {
+	if pb.Tr005Identifiers == nil {
+		pb.Tr005Identifiers = &ttnpb.TR005Identifiers{}
+	}
+	return pb.Tr005Identifiers
 }
 
 // functions to set fields from the device model into the device proto.
@@ -143,6 +153,18 @@ var devicePBSetters = map[string]func(*ttnpb.EndDevice, *EndDevice){
 	},
 	serviceProfileIDField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
 		pb.ServiceProfileId = dev.ServiceProfileID
+	},
+	tr005IdsField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
+		pb.Tr005Identifiers = &ttnpb.TR005Identifiers{
+			VendorId:        dev.VendorID,
+			VendorProfileId: dev.VendorProfileID,
+		}
+	},
+	vendorIDField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
+		mustEndDeviceTr005IDs(pb).VendorId = dev.VendorID
+	},
+	vendorProfileIDField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
+		mustEndDeviceTr005IDs(pb).VendorProfileId = dev.VendorProfileID
 	},
 	locationsField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
 		pb.Locations = deviceLocations(dev.Locations).toMap()
@@ -226,6 +248,22 @@ var deviceModelSetters = map[string]func(*EndDevice, *ttnpb.EndDevice){
 	serviceProfileIDField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
 		dev.ServiceProfileID = pb.ServiceProfileId
 	},
+	tr005IdsField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
+		if pb.Tr005Identifiers != nil {
+			dev.VendorID = pb.Tr005Identifiers.VendorId
+			dev.VendorProfileID = pb.Tr005Identifiers.VendorProfileId
+		}
+	},
+	vendorIDField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
+		if pb.Tr005Identifiers != nil {
+			dev.VendorID = pb.Tr005Identifiers.VendorId
+		}
+	},
+	vendorProfileIDField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
+		if pb.Tr005Identifiers != nil {
+			dev.VendorProfileID = pb.Tr005Identifiers.VendorProfileId
+		}
+	},
 	locationsField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
 		dev.Locations = deviceLocations(dev.Locations).updateFromMap(pb.Locations)
 	},
@@ -295,6 +333,9 @@ var deviceColumnNames = map[string][]string{
 	joinServerAddressField:        {joinServerAddressField},
 	serialNumberField:             {serialNumberField},
 	serviceProfileIDField:         {serviceProfileIDField},
+	vendorIDField:                 {"vendor_id"},
+	vendorProfileIDField:          {"vendor_profile_id"},
+	tr005IdsField:                 {"vendor_id", "vendor_profile_id"},
 	locationsField:                {},
 	activatedAtField:              {activatedAtField},
 	lastSeenAtField:               {lastSeenAtField},
