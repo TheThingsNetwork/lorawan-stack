@@ -21,6 +21,7 @@ import getByPath from '@ttn-lw/lib/get-by-path'
 
 import { parseLorawanMacVersion } from '@console/lib/device-utils'
 
+import { GET_INFO_BY_JOIN_EUI_SUCCESS } from '@console/store/actions/claim'
 import {
   GET_DEV,
   GET_DEVICES_LIST_SUCCESS,
@@ -35,6 +36,7 @@ const defaultState = {
   entities: {},
   derived: {},
   selectedDevice: undefined,
+  selectedDeviceClaimable: undefined,
 }
 const defaultDerived = {
   uplinkFrameCount: undefined,
@@ -61,6 +63,11 @@ const mergeDerived = (state, id, derived) =>
 
 const devices = (state = defaultState, { type, payload, event }) => {
   switch (type) {
+    case GET_INFO_BY_JOIN_EUI_SUCCESS:
+      return {
+        ...state,
+        selectedDeviceClaimable: payload.supports_claiming ?? false,
+      }
     case GET_DEV:
       return {
         ...state,

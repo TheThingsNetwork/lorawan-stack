@@ -61,7 +61,13 @@ export default class DeviceGeneralSettings extends React.Component {
     onDeleteSuccess: PropTypes.func.isRequired,
     resetDevice: PropTypes.func.isRequired,
     resetUsedDevNonces: PropTypes.func.isRequired,
+    supportsClaiming: PropTypes.bool,
+    unclaimDevice: PropTypes.func.isRequired,
     updateDevice: PropTypes.func.isRequired,
+  }
+
+  static defaultProps = {
+    supportsClaiming: false,
   }
 
   @bind
@@ -87,6 +93,31 @@ export default class DeviceGeneralSettings extends React.Component {
       title: deviceId,
       message: m.updateSuccess,
       type: toast.types.SUCCESS,
+    })
+  }
+
+  @bind
+  async handleUnclaim() {
+    const { appId, device, unclaimDevice } = this.props
+
+    const {
+      ids: { device_id: deviceId, dev_eui: devEui, join_eui: joinEui },
+    } = device
+
+    unclaimDevice(appId, deviceId, devEui, joinEui)
+  }
+
+  @bind
+  async handleUnclaimFailure() {
+    const { device } = this.props
+    const {
+      ids: { device_id: deviceId },
+    } = device
+
+    toast({
+      title: deviceId,
+      message: m.unclaimFailure,
+      type: toast.types.ERROR,
     })
   }
 
@@ -141,6 +172,7 @@ export default class DeviceGeneralSettings extends React.Component {
       resetDevice,
       getDefaultMacSettings,
       resetUsedDevNonces,
+      supportsClaiming,
     } = this.props
 
     const isOTAA = isDeviceOTAA(device)
@@ -218,9 +250,12 @@ export default class DeviceGeneralSettings extends React.Component {
                 onDelete={this.handleDelete}
                 onDeleteSuccess={this.handleDeleteSuccess}
                 onDeleteFailure={this.handleDeleteFailure}
+                onUnclaim={this.handleUnclaim}
+                onUnclaimFailure={this.handleUnclaimFailure}
                 jsConfig={jsConfig}
                 nsConfig={nsConfig}
                 asConfig={asConfig}
+                supportsClaiming={supportsClaiming}
               />
             </Collapse>
             <Collapse title={m.nsTitle} description={nsDescription} disabled={nsDisabled}>

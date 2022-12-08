@@ -43,6 +43,31 @@ class DeviceClaim {
 
     return Marshaler.payloadSingleResponse(response)
   }
+
+  /**
+   * Unclaim an end device.
+   *
+   * @param {string} applicationId - The Application ID.
+   * @param {string} deviceId - The Device ID.
+   * @param {Array} devEui - The Device dev_eui.
+   * @param {object} joinEui - The Device join_eui.
+   * @returns {object} - An empty object on successful requests, an error otherwise.
+   */
+  async unclaim(applicationId, deviceId, devEui, joinEui) {
+    const params = {
+      routeParams: {
+        'application_ids.application_id': applicationId,
+        device_id: deviceId,
+      },
+    }
+
+    const response = await this._api.EndDeviceClaimingServer.Unclaim(params, {
+      dev_eui: devEui,
+      join_eui: joinEui,
+    })
+
+    return Marshaler.payloadSingleResponse(response)
+  }
 }
 
 export default DeviceClaim

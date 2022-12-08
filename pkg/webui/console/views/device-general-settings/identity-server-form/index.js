@@ -38,6 +38,7 @@ import { hasExternalJs, isDeviceOTAA } from '../utils'
 import validationSchema from './validation-schema'
 
 const messages = defineMessages({
+  unclaimAndDeleteDevice: 'Unclaim and delete end device',
   deleteDevice: 'Delete end device',
   deleteWarning: 'Are you sure you want to delete "{deviceId}"? This action cannot be undone.',
 })
@@ -50,9 +51,12 @@ const IdentityServerForm = React.memo(props => {
     onDelete,
     onDeleteSuccess,
     onDeleteFailure,
+    onUnclaim,
+    onUnclaimFailure,
     jsConfig,
     nsConfig,
     asConfig,
+    supportsClaiming,
   } = props
   const { name, ids } = device
 
@@ -136,13 +140,22 @@ const IdentityServerForm = React.memo(props => {
   )
 
   const onDeviceDelete = React.useCallback(async () => {
+    // Check if device is claimable and if so, try to unclaim.
+    if (supportsClaiming) {
+      try {
+        await onUnclaim()
+      } catch {
+        return onUnclaimFailure()
+      }
+    }
+    // Delete device.
     try {
       await onDelete()
       onDeleteSuccess()
     } catch (error) {
       onDeleteFailure()
     }
-  }, [onDelete, onDeleteFailure, onDeleteSuccess])
+  }, [onDelete, onDeleteFailure, onDeleteSuccess, onUnclaim, onUnclaimFailure, supportsClaiming])
 
   const { enabled: jsEnabled } = jsConfig
   const { enabled: asEnabled } = asConfig
@@ -279,7 +292,7 @@ const IdentityServerForm = React.memo(props => {
         <ModalButton
           type="button"
           icon="delete"
-          message={messages.deleteDevice}
+          message={supportsClaiming ? messages.unclaimAndDeleteDevice : messages.deleteDevice}
           modalData={{
             message: { values: { deviceId: name || ids.device_id }, ...messages.deleteWarning },
           }}
@@ -302,6 +315,9 @@ IdentityServerForm.propTypes = {
   onDeleteSuccess: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   onSubmitSuccess: PropTypes.func.isRequired,
+  onUnclaim: PropTypes.func.isRequired,
+  onUnclaimFailure: PropTypes.func.isRequired,
+  supportsClaiming: PropTypes.bool.isRequired,
 }
 
 export default IdentityServerForm

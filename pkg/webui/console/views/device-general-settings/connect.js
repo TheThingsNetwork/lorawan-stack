@@ -32,11 +32,17 @@ import {
 } from '@console/lib/feature-checks'
 
 import { updateDevice, resetDevice, resetUsedDevNonces } from '@console/store/actions/devices'
+import { unclaimDevice } from '@console/store/actions/claim'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
-import { selectSelectedDevice, selectSelectedDeviceId } from '@console/store/selectors/devices'
+import {
+  selectSelectedDevice,
+  selectSelectedDeviceId,
+  selectSelectedDeviceClaimable,
+} from '@console/store/selectors/devices'
 
 const mapStateToProps = state => ({
+  supportsClaiming: selectSelectedDeviceClaimable(state),
   device: selectSelectedDevice(state),
   devId: selectSelectedDeviceId(state),
   appId: selectSelectedApplicationId(state),
@@ -59,6 +65,7 @@ const mapDispatchToProps = dispatch => ({
       updateDevice: attachPromise(updateDevice),
       resetDevice: attachPromise(resetDevice),
       resetUsedDevNonces: attachPromise(resetUsedDevNonces),
+      unclaimDevice: attachPromise(unclaimDevice),
     },
     dispatch,
   ),
