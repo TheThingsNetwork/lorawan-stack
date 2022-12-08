@@ -45,7 +45,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Gateway EUI is no longer unset when deleting a gateway, meaning it could be recovered if no other gateway claimed it. This requires a schema migration (`ttn-lw-stack is-db migrate`) because of the change in the database's `gateway_eui_index`.
 - The new database driver is no longer specific to the Identity Server and is now activated using the `db.pgdriver` feature flag (instead of `is.pgdriver`).
-- `vendor_id`, `vendor_profile_id` and `serial_number` fields are now moved from the device version identifiers to the root of the end device structure.
+- `vendor_id`, `vendor_profile_id` and `serial_number` fields are now moved from the device version identifiers to the root of the end device structure. This requires a database migration in the Identity Server.
 
 ### Removed
 
