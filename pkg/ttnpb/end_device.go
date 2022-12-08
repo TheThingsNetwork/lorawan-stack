@@ -1003,6 +1003,7 @@ func (v *EndDeviceVersionIdentifiers) FieldIsZero(p string) bool {
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }
 
+// FieldIsZero returns whether path p is zero.
 func (v *TR005Identifiers) FieldIsZero(p string) bool {
 	if v == nil {
 		return true
