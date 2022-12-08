@@ -3,17 +3,17 @@ name: Go Code
 on:
   pull_request:
     paths:
-      - '.github/workflows/go.yml'
-      - '*.go'
-      - '.revive.toml'
-      - 'cmd/**'
-      - 'go.mod'
-      - 'go.sum'
-      - 'Makefile'
-      - 'pkg/**'
-      - '!pkg/webui/**'
-      - 'pkg/webui/**.go'
-      - 'tools/**'
+      - ".github/workflows/go.yml"
+      - "*.go"
+      - ".revive.toml"
+      - "cmd/**"
+      - "go.mod"
+      - "go.sum"
+      - "Makefile"
+      - "pkg/**"
+      - "!pkg/webui/**"
+      - "pkg/webui/**.go"
+      - "tools/**"
 
 jobs:
   quality:
@@ -58,7 +58,7 @@ jobs:
       postgres:
         image: postgres
         ports:
-          - '5432/tcp'
+          - "5432/tcp"
         env:
           POSTGRES_USER: root
           POSTGRES_PASSWORD: root
@@ -67,7 +67,7 @@ jobs:
         # TODO: Support latest Redis (7.x is not supported, see https://github.com/TheThingsNetwork/lorawan-stack/issues/5416)
         image: redis:6.2
         ports:
-          - '6379/tcp'
+          - "6379/tcp"
     timeout-minutes: 15
     steps:
       - name: Create ttn_lorawan_is_test DB
@@ -85,11 +85,11 @@ jobs:
           entrypoint: /usr/bin/createdb
           args: -h postgres -U root ttn_lorawan_is_store_test
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
-          aws-region: '${{ secrets.AWS_REGION }}'
-          role-to-assume: 'arn:aws:iam::${{ secrets.AWS_USER_ID }}:role/${{ secrets.AWS_ROLE_NAME }}'
-          role-session-name: '${{ secrets.AWS_ROLE_NAME }}-${{ github.job }}-${{ github.run_id }}'
+          aws-region: "${{ secrets.AWS_REGION }}"
+          role-to-assume: "arn:aws:iam::${{ secrets.AWS_USER_ID }}:role/${{ secrets.AWS_ROLE_NAME }}"
+          role-session-name: "${{ secrets.AWS_ROLE_NAME }}-${{ github.job }}-${{ github.run_id }}"
       - name: Check out code
         uses: actions/checkout@v3
       - name: Install Go and Dependencies
@@ -101,10 +101,10 @@ jobs:
       - name: Test code
         env:
           SQL_DB_ADDRESS: localhost:${{ job.services.postgres.ports['5432'] }}
-          SQL_DB_AUTH: 'root:root'
+          SQL_DB_AUTH: "root:root"
           REDIS_ADDRESS: localhost:${{ job.services.redis.ports['6379'] }}
-          TEST_REDIS: '1'
-          TEST_SLOWDOWN: '8'
+          TEST_REDIS: "1"
+          TEST_SLOWDOWN: "8"
           GCP_CREDENTIALS: ${{ secrets.GCP_TEST_CREDENTIALS }}
           TEST_BUCKET: lorawan-stack-test-bucket
         run: tools/bin/mage go:test
