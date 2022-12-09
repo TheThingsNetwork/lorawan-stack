@@ -240,6 +240,7 @@ export default class WebhookForm extends Component {
   static propTypes = {
     error: PropTypes.error,
     existCheck: PropTypes.func,
+    hasUnhealthyWebhookConfig: PropTypes.bool,
     healthStatusEnabled: PropTypes.bool,
     initialWebhookValue: PropTypes.shape({
       ids: PropTypes.shape({
@@ -252,7 +253,6 @@ export default class WebhookForm extends Component {
         Authorization: PropTypes.string,
       }),
     }),
-    isUnhealthyWebhook: PropTypes.bool,
     onDelete: PropTypes.func,
     onDeleteFailure: PropTypes.func,
     onDeleteSuccess: PropTypes.func,
@@ -276,7 +276,7 @@ export default class WebhookForm extends Component {
     error: undefined,
     existCheck: () => null,
     webhookRetryInterval: null,
-    isUnhealthyWebhook: false,
+    hasUnhealthyWebhookConfig: false,
   }
 
   form = React.createRef()
@@ -376,7 +376,7 @@ export default class WebhookForm extends Component {
       webhookTemplate,
       healthStatusEnabled,
       webhookRetryInterval,
-      isUnhealthyWebhook,
+      hasUnhealthyWebhookConfig,
       error,
     } = this.props
 
@@ -391,7 +391,11 @@ export default class WebhookForm extends Component {
 
     const hasTemplate = Boolean(webhookTemplate)
 
-    const mayReactivate = update && initialWebhookValue && isUnhealthyWebhook
+    const mayReactivate =
+      update &&
+      initialWebhookValue &&
+      hasUnhealthyWebhookConfig &&
+      !('healthy' in initialWebhookValue.health_status)
 
     const isPending =
       healthStatusEnabled &&
