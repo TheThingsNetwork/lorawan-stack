@@ -3,9 +3,9 @@ name: API
 on:
   pull_request:
     paths:
-      - '.github/workflows/proto.yml'
-      - '**.proto'
-      - 'tools/**'
+      - ".github/workflows/proto.yml"
+      - "**.proto"
+      - "tools/**"
 
 jobs:
   protos:

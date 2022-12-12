@@ -3,7 +3,7 @@ name: Pull Request Mergeability
 on:
   pull_request_target:
     branches:
-      - 'v3.*'
+      - "v3.*"
 
 jobs:
   # IMPORTANT: THIS JOB USES AN UNTRUSTED CHECKOUT!
