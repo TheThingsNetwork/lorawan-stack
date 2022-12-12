@@ -5,20 +5,20 @@ concurrency:
 on:
   pull_request:
     paths:
-      - '*.go'
-      - 'go.mod'
-      - 'go.sum'
-      - 'pkg/**'
-      - 'tools/**'
-      - 'config/**'
-      - '!config/stack/ttn-lw-stack.yml'
-      - 'package.json'
-      - 'pkg/webui/**'
-      - 'sdk/js/**'
-      - 'yarn.lock'
-      - 'cypress/**'
-      - 'docker-compose.yml'
-      - '.github/workflows/e2e.yml'
+      - "*.go"
+      - "go.mod"
+      - "go.sum"
+      - "pkg/**"
+      - "tools/**"
+      - "config/**"
+      - "!config/stack/ttn-lw-stack.yml"
+      - "package.json"
+      - "pkg/webui/**"
+      - "sdk/js/**"
+      - "yarn.lock"
+      - "cypress/**"
+      - "docker-compose.yml"
+      - ".github/workflows/e2e.yml"
 env:
   TTN_LW_LOG_LEVEL: debug
   TTN_LW_IS_EMAIL_PROVIDER: dir
@@ -144,7 +144,7 @@ jobs:
       - uses: actions/download-artifact@v3
         name: Download build artifacts
         with:
-          name: 'build-files'
+          name: "build-files"
       - name: Download last failed spec
         uses: dawidd6/action-download-artifact@v2
         continue-on-error: true
@@ -234,7 +234,7 @@ jobs:
       - uses: actions/download-artifact@v3
         name: Download build artifacts
         with:
-          name: 'build-files'
+          name: "build-files"
       - name: Unzip build artifacts
         run: unzip -o build.zip
       - name: Install FF 102.3.0 ESR
