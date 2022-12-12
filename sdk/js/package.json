@@ -52,7 +52,10 @@
     },
     "transformIgnorePatterns": [
       "node_modules/(?!auto-bind)"
-    ]
+    ],
+    "moduleNameMapper": {
+      "axios": "axios/dist/node/axios.cjs"
+    }
   },
   "prettier": "../../config/.prettierrc.js",
   "dependencies": {
