@@ -3,17 +3,17 @@ name: JS Code
 on:
   pull_request:
     paths:
-      - '.github/workflows/js.yml'
-      - 'config/**'
-      - '!config/stack/ttn-lw-stack.yml'
-      - 'Makefile'
-      - 'package.json'
-      - 'pkg/webui/**'
-      - '!pkg/webui/**.go'
-      - 'sdk/js/**'
-      - 'tools/**'
-      - 'cypress/**'
-      - 'yarn.lock'
+      - ".github/workflows/js.yml"
+      - "config/**"
+      - "!config/stack/ttn-lw-stack.yml"
+      - "Makefile"
+      - "package.json"
+      - "pkg/webui/**"
+      - "!pkg/webui/**.go"
+      - "sdk/js/**"
+      - "tools/**"
+      - "cypress/**"
+      - "yarn.lock"
 
 jobs:
   quality:
