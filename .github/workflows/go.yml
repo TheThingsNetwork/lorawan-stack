@@ -106,7 +106,7 @@ jobs:
           TEST_REDIS: "1"
           TEST_SLOWDOWN: "8"
           GCP_CREDENTIALS: ${{ secrets.GCP_TEST_CREDENTIALS }}
-          TEST_BUCKET: lorawan-stack-test-bucket
+          TEST_BUCKET: ttn-lorawan-test
         run: tools/bin/mage go:test
       - name: Check for diff
         run: tools/bin/mage git:diff
