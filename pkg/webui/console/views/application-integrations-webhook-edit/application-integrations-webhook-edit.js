@@ -40,7 +40,7 @@ const ApplicationWebhookEdit = props => {
     match,
     healthStatusEnabled,
     webhookRetryInterval,
-    isUnhealthyWebhook,
+    hasUnhealthyWebhookConfig,
   } = props
   const { webhookId } = match.params
   useBreadcrumbs(
@@ -64,7 +64,7 @@ const ApplicationWebhookEdit = props => {
             webhookTemplate={webhookTemplate}
             healthStatusEnabled={healthStatusEnabled}
             webhookRetryInterval={webhookRetryInterval}
-            isUnhealthyWebhook={isUnhealthyWebhook}
+            hasUnhealthyWebhookConfig={hasUnhealthyWebhookConfig}
           />
         </Col>
       </Row>
@@ -74,8 +74,8 @@ const ApplicationWebhookEdit = props => {
 
 ApplicationWebhookEdit.propTypes = {
   appId: PropTypes.string.isRequired,
+  hasUnhealthyWebhookConfig: PropTypes.bool.isRequired,
   healthStatusEnabled: PropTypes.bool.isRequired,
-  isUnhealthyWebhook: PropTypes.bool.isRequired,
   match: PropTypes.match.isRequired,
   webhook: PropTypes.webhook.isRequired,
   webhookRetryInterval: PropTypes.string,
