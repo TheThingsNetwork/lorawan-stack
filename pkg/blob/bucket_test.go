@@ -83,6 +83,7 @@ func TestAWS(t *testing.T) {
 	conf.AWS.Region = os.Getenv("AWS_REGION")
 	conf.AWS.AccessKeyID = os.Getenv("AWS_ACCESS_KEY_ID")
 	conf.AWS.SecretAccessKey = os.Getenv("AWS_SECRET_ACCESS_KEY")
+	conf.AWS.SessionToken = os.Getenv("AWS_SESSION_TOKEN")
 
 	if conf.AWS.Region == "" || conf.AWS.AccessKeyID == "" || conf.AWS.SecretAccessKey == "" {
 		t.Skip("Missing AWS credentials")
