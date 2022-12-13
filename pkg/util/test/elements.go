@@ -18,7 +18,9 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/kr/pretty"
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
+	"google.golang.org/protobuf/testing/protocmp"
 )
 
 // StringEqual returns true iff strings x and y are equal and false otherwise.
@@ -26,9 +28,41 @@ func StringEqual(x, y string) bool {
 	return x == y
 }
 
-// DiffEqual returns true iff pretty.Diff of x and y is empty and false otherwise.
+var (
+	// reflect.DeepEqual considers functions to be equal if their pointers are equal.
+	// cmp.Equal does not - only nil function pointers are equal, otherwise they are unequal.
+	equateFuncs = cmp.FilterPath(func(p cmp.Path) bool {
+		return p.Last().Type().Kind() == reflect.Func
+	}, cmp.Comparer(func(x, y interface{}) bool {
+		px := uintptr(reflect.ValueOf(x).UnsafePointer())
+		py := uintptr(reflect.ValueOf(y).UnsafePointer())
+		return px == py
+	}))
+	// reflect.DeepEqual compares unexported struct fields automatically.
+	// cmp.Equal does not - only types which are explicitly allowed may have their unexported
+	// fields compared.
+	equateUnexported = cmp.Exporter(func(t reflect.Type) bool { return true })
+	// reflect.DeepEqual considers empty and nil slices and maps as being equal.
+	// cmp.Equal does not.
+	equateEmpty = cmpopts.EquateEmpty()
+
+	cmpOpts []cmp.Option = []cmp.Option{
+		protocmp.Transform(),
+		cmpopts.EquateErrors(),
+		equateEmpty,
+		equateFuncs,
+		equateUnexported,
+	}
+)
+
+// Diff returns the cmp.Diff between x and y.
+func Diff(x, y interface{}) string {
+	return cmp.Diff(x, y, cmpOpts...)
+}
+
+// DiffEqual returns true iff Diff of x and y is empty and false otherwise.
 func DiffEqual(x, y interface{}) bool {
-	return len(pretty.Diff(x, y)) == 0
+	return len(Diff(x, y)) == 0
 }
 
 // Ranger represents an entity, which can be ranged over(e.g. sync.Map).

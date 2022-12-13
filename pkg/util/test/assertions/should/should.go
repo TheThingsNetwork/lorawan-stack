@@ -133,8 +133,8 @@ var (
 	NotPanicWith = assertions.ShouldNotPanicWith
 	// NotPointTo receives exactly two parameters and checks to see that they point to different addresess.
 	NotPointTo = assertions.ShouldNotPointTo
-	// NotResemble receives exactly two parameters and does an inverse deep equal check (see reflect.DeepEqual)
-	NotResemble = assertions.ShouldNotResemble
+	// NotResemble receives exactly two parameters and does an inverse deep equal check (see test.DiffEqual).
+	NotResemble = testassertions.ShouldNotResemble
 	// NotStartWith receives exactly 2 string parameters and ensures that the first does not start with the second.
 	NotStartWith = assertions.ShouldNotStartWith
 	// Panic receives a void, niladic function and expects to recover a panic.
@@ -143,7 +143,7 @@ var (
 	PanicWith = assertions.ShouldPanicWith
 	// PointTo receives exactly two parameters and checks to see that they point to the same address.
 	PointTo = assertions.ShouldPointTo
-	// Resemble receives exactly two parameters and does a deep equal check (see reflect.DeepEqual)
+	// Resemble receives exactly two parameters and does a deep equal check (see test.DiffEqual).
 	Resemble = testassertions.ShouldResemble
 	// StartWith receives exactly 2 string parameters and ensures that the first starts with the second.
 	StartWith = assertions.ShouldStartWith
@@ -152,13 +152,13 @@ var (
 	HaveSameElementsFunc = testassertions.ShouldHaveSameElementsFunc
 	// NotHaveSameElementsFunc asserts that the actual A and expected B elements are not equal using an equality function with signature func(A, B) bool.
 	NotHaveSameElementsFunc = testassertions.ShouldNotHaveSameElementsFunc
-	// HaveSameElementsDeep asserts that the actual A and expected B elements are equal using reflect.Equal.
+	// HaveSameElementsDeep asserts that the actual A and expected B elements are equal using test.DiffEqual.
 	HaveSameElementsDeep = testassertions.ShouldHaveSameElementsDeep
-	// NotHaveSameElementsDeep asserts that the actual A and expected B elements are not equal using reflect.Equal.
+	// NotHaveSameElementsDeep asserts that the actual A and expected B elements are not equal using test.DiffEqual.
 	NotHaveSameElementsDeep = testassertions.ShouldNotHaveSameElementsDeep
-	// HaveSameElementsDiff asserts that the actual A and expected B elements are equal using pretty.Diff.
+	// HaveSameElementsDiff asserts that the actual A and expected B elements are equal using test.Diff.
 	HaveSameElementsDiff = testassertions.ShouldHaveSameElementsDiff
-	// NotHaveSameElementsDiff asserts that the actual A and expected B elements are not equal using pretty.Diff.
+	// NotHaveSameElementsDiff asserts that the actual A and expected B elements are not equal using test.Diff.
 	NotHaveSameElementsDiff = testassertions.ShouldNotHaveSameElementsDiff
 	// HaveSameElementsEvent asserts that the actual A and expected B elements are equal using test.EventEqual.
 	HaveSameElementsEvent = testassertions.ShouldHaveSameElementsEvent
@@ -177,9 +177,9 @@ var (
 	// EqualErrorOrDefinition asserts that the actual and expected arguments are of the same type (error or definition),
 	// and that they have the same underlying definition, as well as arguments if they are both errors.
 	EqualErrorOrDefinition = testassertions.ShouldEqualErrorOrDefinition
-	// HaveEmptyDiff receives exactly two parameters and does an equality check using pretty.Diff.
+	// HaveEmptyDiff receives exactly two parameters and does an equality check using test.Diff.
 	HaveEmptyDiff = testassertions.ShouldHaveEmptyDiff
-	// NotHaveEmptyDiff receives exactly two parameters and does an inequality check using pretty.Diff.
+	// NotHaveEmptyDiff receives exactly two parameters and does an inequality check using test.Diff.
 	NotHaveEmptyDiff = testassertions.ShouldNotHaveEmptyDiff
 
 	// ResembleEvent receives exactly two events.Event and does a resemblance check.
@@ -189,7 +189,7 @@ var (
 	// ResembleEventBuilders receives exactly two events.Builders and does a resemblance check.
 	ResembleEventBuilders = testassertions.ShouldResembleEventBuilders
 
-	// ResembleFields receives at least two SetFielder parameters and optional variadic field paths and does a deep equal check (see reflect.DeepEqual) on selected fields. If field paths are empty, it checks all fields similar to Resemble.
+	// ResembleFields receives at least two SetFielder parameters and optional variadic field paths and does a deep equal check (see test.DiffEqual) on selected fields. If field paths are empty, it checks all fields similar to Resemble.
 	ResembleFields = testassertions.ShouldResembleFields
 
 	// ReceiveEventResembling receives <-chan events.Event or <-chan test.EventPubSubPublishRequest as first argument and events.Event as second one and does resemblance check on received event.
