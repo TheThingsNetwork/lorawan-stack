@@ -46,7 +46,7 @@ export const selectWebhooksHealthStatusEnabled = state => {
   )
 }
 
-export const selectIsWebhookUnhealthy = state => {
+export const selectWebhookHasUnhealthyConfig = state => {
   const webhooksConfig = selectWebhooksConfiguration(state)
 
   if (!webhooksConfig) {

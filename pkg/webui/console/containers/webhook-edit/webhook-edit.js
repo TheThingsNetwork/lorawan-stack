@@ -41,7 +41,7 @@ const WebhookEdit = props => {
     healthStatusEnabled,
     webhookId,
     updateHealthStatus,
-    isUnhealthyWebhook,
+    hasUnhealthyWebhookConfig,
     webhookRetryInterval,
   } = props
 
@@ -122,7 +122,7 @@ const WebhookEdit = props => {
       onReactivateSuccess={handleReactivateSuccess}
       healthStatusEnabled={healthStatusEnabled}
       webhookRetryInterval={webhookRetryInterval}
-      isUnhealthyWebhook={isUnhealthyWebhook}
+      hasUnhealthyWebhookConfig={hasUnhealthyWebhookConfig}
       error={error}
     />
   )
@@ -130,8 +130,8 @@ const WebhookEdit = props => {
 
 WebhookEdit.propTypes = {
   appId: PropTypes.string.isRequired,
+  hasUnhealthyWebhookConfig: PropTypes.bool.isRequired,
   healthStatusEnabled: PropTypes.bool.isRequired,
-  isUnhealthyWebhook: PropTypes.bool.isRequired,
   navigateToList: PropTypes.func.isRequired,
   selectedWebhook: PropTypes.webhook.isRequired,
   updateHealthStatus: PropTypes.func.isRequired,
