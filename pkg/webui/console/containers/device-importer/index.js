@@ -261,31 +261,31 @@ export default class DeviceImporter extends Component {
 
         if (set_claim_auth_code && jsConfig.enabled) {
           device.claim_authentication_code = { value: randomByteString(4 * 2) }
-          field_mask = `${field_mask},claim_authentication_code`
+          field_mask.paths.push('claim_authentication_code')
         }
         if (device.supports_join && !device.join_server_address && jsConfig.enabled) {
           device.join_server_address = new URL(jsConfig.base_url).hostname
-          field_mask = `${field_mask},join_server_address`
+          field_mask.paths.push('join_server_address')
         }
         if (!device.application_server_address && asConfig.enabled) {
           device.application_server_address = new URL(asConfig.base_url).hostname
-          field_mask = `${field_mask},application_server_address`
+          field_mask.paths.push('application_server_address')
         }
         if (!device.network_server_address && nsConfig.enabled) {
           device.network_server_address = new URL(nsConfig.base_url).hostname
-          field_mask = `${field_mask},network_server_address`
+          field_mask.paths.push('network_server_address')
         }
         if (!device.frequency_plan_id && Boolean(frequency_plan_id) && nsConfig.enabled) {
           device.frequency_plan_id = frequency_plan_id
-          field_mask = `${field_mask},frequency_plan_id`
+          field_mask.paths.push('frequency_plan_id')
         }
         if (!device.lorawan_version && Boolean(lorawan_version)) {
           device.lorawan_version = lorawan_version
-          field_mask = `${field_mask},lorawan_version`
+          field_mask.paths.push('lorawan_version')
         }
         if (!device.lorawan_phy_version && Boolean(lorawan_phy_version)) {
           device.lorawan_phy_version = lorawan_phy_version
-          field_mask = `${field_mask},lorawan_phy_version`
+          field_mask.paths.push('lorawan_phy_version')
         }
       }
     } catch (error) {

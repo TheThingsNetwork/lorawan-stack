@@ -1,26 +1,37 @@
 {
-    "end_device": {
-        "ids": {
-            "application_ids": {}
-        },
-        "created_at": "0001-01-01T00:00:00Z",
-        "updated_at": "0001-01-01T00:00:00Z",
-        "version_ids": {
-            "brand_id": "test-brand-otaa",
-            "model_id": "test-model4",
-            "firmware_version": "1.0",
-            "band_id": "EU_863_870"
-        },
-        "lorawan_version": "1.1.0",
-        "lorawan_phy_version": "1.1.0-a",
-        "supports_join": true,
-        "mac_settings": {
-            "supports_32_bit_f_cnt": true
-        },
-        "formatters": {
-            "up_formatter": "FORMATTER_REPOSITORY",
-            "down_formatter": "FORMATTER_REPOSITORY"
-        }
+  "end_device": {
+    "ids": {
+      "application_ids": {}
     },
-    "field_mask": "version_ids,supports_join,supports_class_b,supports_class_c,lorawan_version,lorawan_phy_version,formatters,mac_settings.supports_32_bit_f_cnt"
+    "created_at": "0001-01-01T00:00:00Z",
+    "updated_at": "0001-01-01T00:00:00Z",
+    "version_ids": {
+      "brand_id": "test-brand-otaa",
+      "model_id": "test-model4",
+      "firmware_version": "1.0",
+      "band_id": "EU_863_870"
+    },
+    "lorawan_version": "1.1.0",
+    "lorawan_phy_version": "1.1.0-a",
+    "supports_join": true,
+    "mac_settings": {
+      "supports_32_bit_f_cnt": true
+    },
+    "formatters": {
+      "up_formatter": "FORMATTER_REPOSITORY",
+      "down_formatter": "FORMATTER_REPOSITORY"
+    }
+  },
+  "field_mask": {
+    "paths": [
+      "version_ids",
+      "supports_join",
+      "supports_class_b",
+      "supports_class_c",
+      "lorawan_version",
+      "lorawan_phy_version",
+      "formatters",
+      "mac_settings.supports_32_bit_f_cnt"
+    ]
+  }
 }
