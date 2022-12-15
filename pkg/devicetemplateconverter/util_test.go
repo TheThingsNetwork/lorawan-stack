@@ -35,16 +35,16 @@ func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.Cluste
 
 type mockConverter struct {
 	ttnpb.EndDeviceTemplateFormat
-	ConvertFunc func(context.Context, io.Reader, chan<- *ttnpb.EndDeviceTemplate) error
+	ConvertFunc func(context.Context, io.Reader, func(*ttnpb.EndDeviceTemplate) error) error
 }
 
 func (c *mockConverter) Format() *ttnpb.EndDeviceTemplateFormat {
 	return &c.EndDeviceTemplateFormat
 }
 
-func (c *mockConverter) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDeviceTemplate) error {
+func (c *mockConverter) Convert(ctx context.Context, r io.Reader, f func(*ttnpb.EndDeviceTemplate) error) error {
 	if c.ConvertFunc == nil {
 		panic("Convert should not be called")
 	}
-	return c.ConvertFunc(ctx, r, ch)
+	return c.ConvertFunc(ctx, r, f)
 }

@@ -331,3 +331,28 @@ func IncludeFields(paths []string, includePaths ...string) []string {
 	}
 	return included
 }
+
+// FieldsWithoutWrappers returns the paths without the wrapper value paths.
+// A wrapper type is a type which contains a singular field called `value`.
+func FieldsWithoutWrappers(paths []string) []string {
+	if len(paths) == 0 {
+		return paths
+	}
+	leaves := make(map[string]int)
+	for _, path := range paths {
+		prefix := path
+		for i := strings.LastIndex(prefix, "."); i != -1; i = strings.LastIndex(prefix, ".") {
+			prefix = path[:i]
+			leaves[prefix]++
+		}
+	}
+	result := make([]string, 0, len(paths))
+	for _, path := range paths {
+		father := strings.TrimSuffix(path, ".value")
+		if path != father && leaves[father] == 1 {
+			continue
+		}
+		result = append(result, path)
+	}
+	return result
+}

@@ -256,7 +256,7 @@ var (
 			}
 			var gateway ttnpb.Gateway
 			if inputDecoder != nil {
-				_, err := inputDecoder.Decode(&gateway)
+				err := inputDecoder.Decode(&gateway)
 				if err != nil {
 					return err
 				}

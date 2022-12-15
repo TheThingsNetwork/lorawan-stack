@@ -174,7 +174,7 @@ var (
 				ttnpb.GrantType_GRANT_AUTHORIZATION_CODE,
 			}
 			if inputDecoder != nil {
-				_, err := inputDecoder.Decode(&client)
+				err := inputDecoder.Decode(&client)
 				if err != nil {
 					return err
 				}

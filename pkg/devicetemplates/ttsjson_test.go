@@ -16,14 +16,11 @@ package devicetemplates_test
 
 import (
 	"bytes"
-	"encoding/json"
-	"io"
-	"sync"
 	"testing"
-	"time"
 
 	"github.com/smartystreets/assertions"
 	. "go.thethings.network/lorawan-stack/v3/pkg/devicetemplates"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -157,23 +154,22 @@ func TestTTSJSONConverter(t *testing.T) {
 
 	for _, tc := range []struct {
 		name              string
-		reader            io.Reader
+		body              []byte
 		validateError     func(t *testing.T, err error)
 		validateResult    func(t *testing.T, templates []*ttnpb.EndDeviceTemplate, count int)
 		nExpect           int
 		expectedTemplates []*ttnpb.EndDeviceTemplate
 	}{
 		{
-			name:   "InvalidJSON",
-			reader: bytes.NewBufferString("invalid json"),
+			name: "InvalidJSON",
+			body: []byte("invalid json"),
 			validateError: func(t *testing.T, err error) {
-				_, ok := err.(*json.SyntaxError)
-				assertions.New(t).So(ok, should.BeTrue)
+				assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue)
 			},
 		},
 		{
-			name:   "OneDevice",
-			reader: bytes.NewBufferString(otaaDevice),
+			name: "OneDevice",
+			body: []byte(otaaDevice),
 			validateError: func(t *testing.T, err error) {
 				assertions.New(t).So(err, should.BeNil)
 			},
@@ -181,8 +177,8 @@ func TestTTSJSONConverter(t *testing.T) {
 			validateResult: validateTemplates,
 		},
 		{
-			name:   "OneABPOneOTAA",
-			reader: bytes.NewBufferString(abpDevice + "\n\n" + otaaDevice),
+			name: "OneABPOneOTAA",
+			body: []byte(abpDevice + "\n\n" + otaaDevice),
 			validateError: func(t *testing.T, err error) {
 				assertions.New(t).So(err, should.BeNil)
 			},
@@ -190,18 +186,17 @@ func TestTTSJSONConverter(t *testing.T) {
 			nExpect:        2,
 		},
 		{
-			name:   "OneOKOneError",
-			reader: bytes.NewBufferString(abpDevice + "\n\n" + "invalid json"),
+			name: "OneOKOneError",
+			body: []byte(abpDevice + "\n\n" + "invalid json"),
 			validateError: func(t *testing.T, err error) {
-				_, ok := err.(*json.SyntaxError)
-				assertions.New(t).So(ok, should.BeTrue)
+				assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue)
 			},
 			validateResult: validateTemplates,
 			nExpect:        1,
 		},
 		{
-			name:   "OneWithSession",
-			reader: bytes.NewBufferString(otaaWithSession),
+			name: "OneWithSession",
+			body: []byte(otaaWithSession),
 			validateError: func(t *testing.T, err error) {
 				assertions.New(t).So(err, should.BeNil)
 			},
@@ -209,8 +204,8 @@ func TestTTSJSONConverter(t *testing.T) {
 			nExpect:        1,
 		},
 		{
-			name:   "OneWithSessionOneWithout",
-			reader: bytes.NewBufferString(otaaWithSession + "\n\n" + abpDeviceWithoutSession),
+			name: "OneWithSessionOneWithout",
+			body: []byte(otaaWithSession + "\n\n" + abpDeviceWithoutSession),
 			validateError: func(t *testing.T, err error) {
 				assertions.New(t).So(err, should.BeNil)
 			},
@@ -218,8 +213,8 @@ func TestTTSJSONConverter(t *testing.T) {
 			nExpect:        2,
 		},
 		{
-			name:   "RemovesDevAddrFromRoot",
-			reader: bytes.NewBufferString(devWithDevAddr),
+			name: "RemovesDevAddrFromRoot",
+			body: []byte(devWithDevAddr),
 			validateError: func(t *testing.T, err error) {
 				assertions.New(t).So(err, should.BeNil)
 			},
@@ -241,37 +236,12 @@ func TestTTSJSONConverter(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			ctx := test.Context()
-			ch := make(chan *ttnpb.EndDeviceTemplate)
 
-			wg := sync.WaitGroup{}
-			wg.Add(2)
-			var err error
 			templates := []*ttnpb.EndDeviceTemplate{}
-			go func() {
-				err = tts.Convert(ctx, tc.reader, ch)
-				wg.Done()
-			}()
-			go func() {
-				for i := 0; i < tc.nExpect; i++ {
-					templates = append(templates, <-ch)
-				}
-				wg.Done()
-			}()
-
-			complete := make(chan struct{})
-			go func() {
-				defer func() {
-					complete <- struct{}{}
-				}()
-				wg.Wait()
-			}()
-
-			select {
-			case <-complete:
-			case <-time.After(time.Second):
-				t.Error("Timed out waiting for converter")
-				t.FailNow()
-			}
+			err := tts.Convert(ctx, bytes.NewReader(tc.body), func(tmpl *ttnpb.EndDeviceTemplate) error {
+				templates = append(templates, tmpl)
+				return nil
+			})
 
 			tc.validateError(t, err)
 			if tc.validateResult != nil {

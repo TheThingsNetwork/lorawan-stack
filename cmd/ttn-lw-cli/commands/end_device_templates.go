@@ -89,7 +89,7 @@ var (
 
 			var res ttnpb.EndDeviceTemplate
 			if inputDecoder != nil {
-				_, err := inputDecoder.Decode(&res)
+				err := inputDecoder.Decode(&res)
 				if err != nil {
 					return err
 				}
@@ -152,11 +152,12 @@ This command takes end devices from stdin.`,
 			}
 
 			var input ttnpb.EndDevice
-			decodedPaths, err := inputDecoder.Decode(&input)
+			err := inputDecoder.Decode(&input)
 			if err != nil {
 				return err
 			}
-			decodedPaths = ttnpb.FlattenPaths(decodedPaths, endDeviceFlattenPaths)
+			decodedPaths := ttnpb.NonZeroFields(&input, ttnpb.EndDeviceFieldPathsNestedWithoutWrappers...)
+			decodedPaths = ttnpb.BottomLevelFields(decodedPaths)
 			decodedPaths = ttnpb.ExcludeFields(decodedPaths, excludePaths...)
 			paths = append(paths, decodedPaths...)
 
@@ -187,7 +188,7 @@ This command takes end device templates from stdin.`,
 			forwardDeprecatedDeviceFlags(cmd.Flags())
 
 			var input ttnpb.EndDeviceTemplate
-			_, err := inputDecoder.Decode(&input)
+			err := inputDecoder.Decode(&input)
 			if err != nil {
 				return err
 			}
@@ -252,8 +253,8 @@ This command takes end device templates from stdin.`,
 			count, _ := cmd.Flags().GetInt("count")
 			for {
 				var template ttnpb.EndDeviceTemplate
-				if _, err := inputDecoder.Decode(&template); err != nil {
-					if err == stdio.EOF {
+				if err := inputDecoder.Decode(&template); err != nil {
+					if errors.Is(err, stdio.EOF) {
 						return nil
 					}
 					return err
@@ -339,7 +340,7 @@ This command takes end device templates from stdin.`,
 
 			for {
 				dev, err := stream.Recv()
-				if err == stdio.EOF {
+				if errors.Is(err, stdio.EOF) {
 					return nil
 				}
 				if err != nil {
@@ -390,9 +391,9 @@ command to assign EUIs to map to end device templates.`,
 			var input []*ttnpb.EndDeviceTemplate
 			for {
 				var entry ttnpb.EndDeviceTemplate
-				_, err := inputDecoder.Decode(&entry)
+				err := inputDecoder.Decode(&entry)
 				if err != nil {
-					if err == stdio.EOF {
+					if errors.Is(err, stdio.EOF) {
 						break
 					}
 					return err
@@ -411,8 +412,8 @@ command to assign EUIs to map to end device templates.`,
 			}
 			for {
 				var entry ttnpb.EndDeviceTemplate
-				if _, err := mappingDecoder.Decode(&entry); err != nil {
-					if err == stdio.EOF {
+				if err := mappingDecoder.Decode(&entry); err != nil {
+					if errors.Is(err, stdio.EOF) {
 						break
 					}
 					return err

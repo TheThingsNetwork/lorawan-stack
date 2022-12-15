@@ -191,7 +191,7 @@ var (
 			var user ttnpb.User
 			user.State = ttnpb.State_STATE_APPROVED // This may not be honored by the server.
 			if inputDecoder != nil {
-				_, err := inputDecoder.Decode(&user)
+				err := inputDecoder.Decode(&user)
 				if err != nil {
 					return err
 				}

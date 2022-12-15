@@ -355,9 +355,9 @@ func determineComma(head []byte) (rune, bool) {
 }
 
 // Convert implements the devicetemplates.Converter interface.
-func (t *ttsCSV) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDeviceTemplate) error { //nolint:gocyclo
-	defer close(ch)
-
+func (t *ttsCSV) Convert( //nolint:gocyclo
+	ctx context.Context, r io.Reader, f func(*ttnpb.EndDeviceTemplate) error,
+) error {
 	r, err := charset.NewReader(r, "text/csv")
 	if err != nil {
 		return err
@@ -461,10 +461,8 @@ func (t *ttsCSV) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndD
 			tmpl = profileTmpl
 		}
 
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case ch <- tmpl:
+		if err := f(tmpl); err != nil {
+			return err
 		}
 		line++
 	}
