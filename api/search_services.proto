@@ -393,7 +393,7 @@ message SearchEndDevicesRequest {
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
   string order = 10 [
-    (validate.rules).string = { in: ["", "device_id", "-device_id", "join_eui", "-join_eui", "dev_eui", "-dev_eui", "name", "-name", "description", "-description", "created_at", "-created_at"] }
+    (validate.rules).string = { in: ["", "device_id", "-device_id", "join_eui", "-join_eui", "dev_eui", "-dev_eui", "name", "-name", "description", "-description", "created_at", "-created_at", "last_seen_at", "-last_seen_at"] }
   ];
   // Limit the number of results per page.
   uint32 limit = 11 [(validate.rules).uint32.lte = 1000];

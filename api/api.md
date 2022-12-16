@@ -8914,7 +8914,7 @@ This message is used for finding OAuth clients in the EntityRegistrySearch servi
 | `dev_eui_contains` | <p>`string.max_len`: `16`</p> |
 | `join_eui_contains` | <p>`string.max_len`: `16`</p> |
 | `dev_addr_contains` | <p>`string.max_len`: `8`</p> |
-| `order` | <p>`string.in`: `[ device_id -device_id join_eui -join_eui dev_eui -dev_eui name -name description -description created_at -created_at]`</p> |
+| `order` | <p>`string.in`: `[ device_id -device_id join_eui -join_eui dev_eui -dev_eui name -name description -description created_at -created_at last_seen_at -last_seen_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.SearchEndDevicesRequest.AttributesContainEntry">Message `SearchEndDevicesRequest.AttributesContainEntry`</a>
