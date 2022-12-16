@@ -59,6 +59,8 @@ func WithMQTTV2ConfigProvider(provider config.MQTTConfigProvider) Option {
 }
 
 type impl struct {
+	ttnpb.UnimplementedGtwGsServer
+
 	server               io.Server
 	mqttConfigProvider   config.MQTTConfigProvider
 	mqttv2ConfigProvider config.MQTTConfigProvider

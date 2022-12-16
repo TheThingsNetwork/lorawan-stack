@@ -26,6 +26,8 @@ import (
 
 // NS is a mock NS for GS tests.
 type NS struct {
+	ttnpb.UnimplementedGsNsServer
+
 	upCh    chan *ttnpb.UplinkMessage
 	txAckCh chan *ttnpb.GatewayTxAcknowledgment
 }
