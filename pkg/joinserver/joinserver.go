@@ -44,6 +44,8 @@ import (
 //
 // The Join Server exposes the NsJs, AsJs, AppJs and DeviceRegistry services.
 type JoinServer struct {
+	ttnpb.UnimplementedJsServer
+
 	*component.Component
 	ctx context.Context
 

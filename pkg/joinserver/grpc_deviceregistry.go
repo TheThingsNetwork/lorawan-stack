@@ -56,6 +56,8 @@ var (
 )
 
 type jsEndDeviceRegistryServer struct {
+	ttnpb.UnimplementedJsEndDeviceRegistryServer
+
 	JS       *JoinServer
 	kekLabel string
 }
