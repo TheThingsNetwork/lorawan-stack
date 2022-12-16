@@ -150,9 +150,6 @@ type mockServer struct {
 
 	subCtx context.Context
 	subIDs *ttnpb.ApplicationIdentifiers
-
-	decCtx context.Context
-	decReq *ttnpb.DecodeDownlinkRequest
 }
 
 func UnaryServerInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
