@@ -362,6 +362,8 @@ func (is *IdentityServer) listApplicationCollaborators(ctx context.Context, req 
 }
 
 type applicationAccess struct {
+	ttnpb.UnimplementedApplicationAccessServer
+
 	*IdentityServer
 }
 

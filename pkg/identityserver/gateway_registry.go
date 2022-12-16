@@ -677,6 +677,8 @@ func validateClaimAuthenticationCode(authCode *ttnpb.GatewayClaimAuthenticationC
 }
 
 type gatewayRegistry struct {
+	ttnpb.UnimplementedGatewayRegistryServer
+
 	*IdentityServer
 }
 

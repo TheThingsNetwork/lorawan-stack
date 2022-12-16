@@ -360,6 +360,8 @@ func (is *IdentityServer) listOrganizationCollaborators(ctx context.Context, req
 }
 
 type organizationAccess struct {
+	ttnpb.UnimplementedOrganizationAccessServer
+
 	*IdentityServer
 }
 

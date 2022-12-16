@@ -24,6 +24,9 @@ import (
 )
 
 type registrySearch struct {
+	ttnpb.UnimplementedEntityRegistrySearchServer
+	ttnpb.UnimplementedEndDeviceRegistrySearchServer
+
 	*IdentityServer
 }
 

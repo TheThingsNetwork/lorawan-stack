@@ -125,6 +125,8 @@ func (is *IdentityServer) deleteOAuthAccessToken(ctx context.Context, req *ttnpb
 }
 
 type oauthRegistry struct {
+	ttnpb.UnimplementedOAuthAuthorizationRegistryServer
+
 	*IdentityServer
 }
 

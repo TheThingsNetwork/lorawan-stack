@@ -340,6 +340,8 @@ func (is *IdentityServer) purgeOrganization(ctx context.Context, ids *ttnpb.Orga
 }
 
 type organizationRegistry struct {
+	ttnpb.UnimplementedOrganizationRegistryServer
+
 	*IdentityServer
 }
 

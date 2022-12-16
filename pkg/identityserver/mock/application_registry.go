@@ -25,8 +25,8 @@ import (
 )
 
 type mockISApplicationRegistry struct {
-	ttnpb.ApplicationRegistryServer
-	ttnpb.ApplicationAccessServer
+	ttnpb.UnimplementedApplicationRegistryServer
+	ttnpb.UnimplementedApplicationAccessServer
 
 	applications      map[string]*ttnpb.Application
 	applicationAuths  map[string][]string

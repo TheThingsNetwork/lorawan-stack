@@ -162,6 +162,8 @@ func (is *IdentityServer) validateContactInfo(ctx context.Context, req *ttnpb.Co
 }
 
 type contactInfoRegistry struct {
+	ttnpb.UnimplementedContactInfoRegistryServer
+
 	*IdentityServer
 }
 

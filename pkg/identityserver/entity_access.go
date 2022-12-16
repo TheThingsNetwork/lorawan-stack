@@ -430,6 +430,8 @@ func restrictRights(info *ttnpb.AuthInfoResponse, rights *ttnpb.Rights) {
 }
 
 type entityAccess struct {
+	ttnpb.UnimplementedEntityAccessServer
+
 	*IdentityServer
 }
 

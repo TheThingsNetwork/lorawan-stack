@@ -454,6 +454,8 @@ func validateEndDeviceAuthenticationCode(authCode ttnpb.EndDeviceAuthenticationC
 }
 
 type endDeviceRegistry struct {
+	ttnpb.UnimplementedEndDeviceRegistryServer
+
 	*IdentityServer
 }
 

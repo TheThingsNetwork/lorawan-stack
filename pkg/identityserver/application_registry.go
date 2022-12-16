@@ -409,6 +409,8 @@ func (is *IdentityServer) issueDevEUI(ctx context.Context, ids *ttnpb.Applicatio
 }
 
 type applicationRegistry struct {
+	ttnpb.UnimplementedApplicationRegistryServer
+
 	*IdentityServer
 }
 
