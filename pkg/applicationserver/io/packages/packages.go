@@ -32,6 +32,8 @@ import (
 const namespace = "applicationserver/io/packages"
 
 type server struct {
+	ttnpb.UnimplementedApplicationPackageRegistryServer
+
 	ctx context.Context
 
 	server   io.Server

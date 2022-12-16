@@ -34,7 +34,7 @@ import (
 
 // PubSub is an pub/sub frontend that exposes ttnpb.ApplicationPubSubRegistryServer.
 type PubSub struct {
-	ttnpb.ApplicationPubSubRegistryServer
+	ttnpb.UnimplementedApplicationPubSubRegistryServer
 
 	*component.Component
 	ctx      context.Context

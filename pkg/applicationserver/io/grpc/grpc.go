@@ -60,6 +60,8 @@ func (p *defaultMessageProcessor) DecodeDownlink(ctx context.Context, ids *ttnpb
 type SkipPayloadCryptoFunc func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (bool, error)
 
 type impl struct {
+	ttnpb.UnimplementedAppAsServer
+
 	server             io.Server
 	getIdentifiers     GetEndDeviceIdentifiersFunc
 	mqttConfigProvider config.MQTTConfigProvider

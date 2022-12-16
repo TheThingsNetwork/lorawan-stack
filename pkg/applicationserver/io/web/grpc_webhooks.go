@@ -38,6 +38,8 @@ func appendImplicitWebhookGetPaths(paths ...string) []string {
 }
 
 type webhookRegistryRPC struct {
+	ttnpb.UnimplementedApplicationWebhookRegistryServer
+
 	webhooks  WebhookRegistry
 	templates TemplateStore
 }
