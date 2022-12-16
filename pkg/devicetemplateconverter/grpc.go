@@ -26,6 +26,8 @@ import (
 )
 
 type endDeviceTemplateConverterServer struct {
+	ttnpb.EndDeviceTemplateConverterServer
+
 	DTC *DeviceTemplateConverter
 }
 
