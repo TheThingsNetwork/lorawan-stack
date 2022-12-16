@@ -143,13 +143,16 @@ type (
 )
 
 type mockServer struct {
-	ttnpb.AppAsServer
+	ttnpb.UnimplementedAppAsServer
 
 	pushCtx context.Context
 	pushReq *ttnpb.DownlinkQueueRequest
 
 	subCtx context.Context
 	subIDs *ttnpb.ApplicationIdentifiers
+
+	decCtx context.Context
+	decReq *ttnpb.DecodeDownlinkRequest
 }
 
 func UnaryServerInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
