@@ -25,6 +25,8 @@ import (
 
 // GatewayServer is a mock Gateway Server.
 type GatewayServer struct {
+	ttnpb.UnimplementedNsGsServer
+
 	*component.Component
 	Downlink chan *ttnpb.DownlinkMessage
 }

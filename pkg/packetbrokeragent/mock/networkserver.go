@@ -26,6 +26,8 @@ import (
 
 // NetworkServer is a mock Network Server.
 type NetworkServer struct {
+	ttnpb.UnimplementedGsNsServer
+
 	*component.Component
 	Uplink chan *ttnpb.UplinkMessage
 	TxAck  chan *ttnpb.GatewayTxAcknowledgment
