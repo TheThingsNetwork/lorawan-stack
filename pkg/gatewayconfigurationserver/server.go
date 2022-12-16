@@ -26,6 +26,8 @@ import (
 
 // Server implements the Gateway Configuration Server component.
 type Server struct {
+	ttnpb.UnimplementedGatewayConfigurationServiceServer
+
 	*component.Component
 	config *Config
 }
