@@ -27,6 +27,8 @@ import (
 var errUnauthenticated = errors.DefineUnauthenticated("unauthenticated", "call was not authenticated")
 
 type endDeviceQRCodeGeneratorServer struct {
+	ttnpb.UnimplementedEndDeviceQRCodeGeneratorServer
+
 	QRG *QRCodeGenerator
 }
 
