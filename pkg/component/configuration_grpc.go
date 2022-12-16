@@ -31,6 +31,8 @@ func NewConfigurationServer(c *Component) *ConfigurationServer {
 
 // ConfigurationServer implements the Configuration RPC service.
 type ConfigurationServer struct {
+	ttnpb.UnimplementedConfigurationServer
+
 	component *Component
 }
 
