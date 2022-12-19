@@ -21,7 +21,7 @@ import (
 	"crypto/rand"
 	"encoding/binary"
 
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	ulid "github.com/oklog/ulid/v2"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"

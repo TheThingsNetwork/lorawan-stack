@@ -17,7 +17,7 @@ package deviceclaimingserver
 import (
 	"context"
 
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"

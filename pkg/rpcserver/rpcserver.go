@@ -29,7 +29,7 @@ import (
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"go.opencensus.io/plugin/ocgrpc"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -215,7 +215,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 	server.ServeMux = runtime.NewServeMux(
 		runtime.WithMarshalerOption("*", jsonpb.TTN()),
 		runtime.WithMarshalerOption("text/event-stream", jsonpb.TTNEventStream()),
-		runtime.WithProtoErrorHandler(runtime.DefaultHTTPProtoErrorHandler),
+		runtime.WithErrorHandler(runtime.DefaultHTTPErrorHandler),
 		runtime.WithMetadata(func(ctx context.Context, req *http.Request) metadata.MD {
 			md := rpcmetadata.MD{
 				Host: req.Host,

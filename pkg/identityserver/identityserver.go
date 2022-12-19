@@ -20,7 +20,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/account"
 	account_store "go.thethings.network/lorawan-stack/v3/pkg/account/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"

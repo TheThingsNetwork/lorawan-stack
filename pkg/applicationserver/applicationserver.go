@@ -22,7 +22,7 @@ import (
 	"runtime/trace"
 	"time"
 
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/distribution"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	iogrpc "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/grpc"

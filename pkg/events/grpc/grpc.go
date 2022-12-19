@@ -24,7 +24,7 @@ import (
 	"strings"
 	"time"
 
-	grpc_runtime "github.com/grpc-ecosystem/grpc-gateway/runtime"
+	grpc_runtime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights/rightsutil"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
