@@ -26,11 +26,11 @@ import (
 	"time"
 
 	"github.com/gogo/protobuf/proto"
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
@@ -176,20 +176,20 @@ func New(ctx context.Context, name, description string, opts ...Option) Event {
 	return (&definition{name: name, description: description}).New(ctx, opts...)
 }
 
-func marshalData(data interface{}) (anyPB *pbtypes.Any, err error) {
+func marshalData(data interface{}) (anyPB *anypb.Any, err error) {
 	if protoMessage, ok := data.(proto.Message); ok {
-		anyPB, err = pbtypes.MarshalAny(protoMessage)
+		anyPB, err = anypb.New(protoMessage)
 		if err != nil {
 			return nil, err
 		}
 	} else if errData, ok := data.(error); ok {
 		if ttnErrData, ok := errors.From(errData); ok {
-			anyPB, err = pbtypes.MarshalAny(ttnpb.ErrorDetailsToProto(ttnErrData))
+			anyPB, err = anypb.New(ttnpb.ErrorDetailsToProto(ttnErrData))
 			if err != nil {
 				return nil, err
 			}
 		} else {
-			anyPB, err = pbtypes.MarshalAny(&wrapperspb.StringValue{Value: errData.Error()})
+			anyPB, err = anypb.New(&wrapperspb.StringValue{Value: errData.Error()})
 			if err != nil {
 				return nil, err
 			}
@@ -200,7 +200,7 @@ func marshalData(data interface{}) (anyPB *pbtypes.Any, err error) {
 			return nil, err
 		}
 		if _, isNull := value.Kind.(*structpb.Value_NullValue); !isNull {
-			anyPB, err = pbtypes.MarshalAny(value)
+			anyPB, err = anypb.New(value)
 			if err != nil {
 				return nil, err
 			}
@@ -236,11 +236,8 @@ func FromProto(pb *ttnpb.Event) (Event, error) {
 	}
 	var data interface{}
 	if pb.Data != nil {
-		anyMsg, err := emptypb.EmptyAny(pb.Data)
+		anyMsg, err := pb.Data.UnmarshalNew()
 		if err != nil {
-			return nil, err
-		}
-		if err = pbtypes.UnmarshalAny(pb.Data, anyMsg); err != nil {
 			return nil, err
 		}
 		data = anyMsg

@@ -19,12 +19,12 @@ import (
 	. "testing"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	is "go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
@@ -56,7 +56,7 @@ func (st *StoreTest) TestNotificationStore(t *T) {
 	}
 	defer s.Close()
 
-	notificationData, _ := pbtypes.MarshalAny(&wrapperspb.StringValue{Value: "test"})
+	notificationData, _ := anypb.New(&wrapperspb.StringValue{Value: "test"})
 
 	var notifications []*ttnpb.Notification
 

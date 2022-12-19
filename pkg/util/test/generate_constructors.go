@@ -40,9 +40,6 @@ func typeString(typ reflect.Type) string {
 	if typ.Kind() == reflect.Ptr {
 		return "*" + typeString(typ.Elem())
 	}
-	if typ.PkgPath() == "github.com/gogo/protobuf/types" {
-		return "pbtypes." + typ.Name()
-	}
 	return typ.String()
 }
 
@@ -94,7 +91,6 @@ package test
 
 import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	pbtypes "github.com/gogo/protobuf/types"
 )
 {{ range . }}
 {{ with $type := typeOf . -}}

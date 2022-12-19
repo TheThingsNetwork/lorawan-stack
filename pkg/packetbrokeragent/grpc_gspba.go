@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	mappingpb "go.packetbroker.org/api/mapping/v2"
 	packetbroker "go.packetbroker.org/api/v3"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"

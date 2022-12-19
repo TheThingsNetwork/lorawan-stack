@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	packetbroker "go.packetbroker.org/api/v3"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"

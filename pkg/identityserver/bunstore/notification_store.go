@@ -19,7 +19,6 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/gogo/protobuf/types"
 	"github.com/uptrace/bun"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -27,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
+	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -92,12 +92,12 @@ func notificationToPB(m *Notification, r *NotificationReceiver) (*ttnpb.Notifica
 		Email:            m.Email,
 	}
 	if len(m.Data) > 0 {
-		var anyPB types.Any
-		err := jsonpb.TTN().Unmarshal(m.Data, &anyPB)
+		anyPB := &anypb.Any{}
+		err := jsonpb.TTN().Unmarshal(m.Data, anyPB)
 		if err != nil {
 			return nil, err
 		}
-		pb.Data = &anyPB
+		pb.Data = anyPB
 	}
 	if m.SenderUID != "" {
 		pb.SenderIds = &ttnpb.UserIdentifiers{UserId: m.SenderUID}

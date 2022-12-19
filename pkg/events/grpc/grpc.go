@@ -24,7 +24,6 @@ import (
 	"strings"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	grpc_runtime "github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights/rightsutil"
@@ -37,6 +36,7 @@ import (
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -188,7 +188,7 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 		if err != nil {
 			return err
 		}
-		startEvent.Data, err = pbtypes.MarshalAny(value)
+		startEvent.Data, err = anypb.New(value)
 		if err != nil {
 			return err
 		}

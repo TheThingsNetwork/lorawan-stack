@@ -24,7 +24,6 @@ import (
 	"testing"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	mappingpb "go.packetbroker.org/api/mapping/v2"
 	packetbroker "go.packetbroker.org/api/v3"

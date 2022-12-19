@@ -43,7 +43,7 @@ func init() {
 
 func newEntityStateChangedData(_ context.Context, data email.NotificationTemplateData) (email.NotificationTemplateData, error) {
 	var nData ttnpb.EntityStateChangedNotification
-	if err := ttnpb.UnmarshalAny(data.Notification().GetData(), &nData); err != nil {
+	if err := data.Notification().GetData().UnmarshalTo(&nData); err != nil {
 		return nil, err
 	}
 	return &EntityStateChangedData{
