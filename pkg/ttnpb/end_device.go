@@ -1004,7 +1004,7 @@ func (v *EndDeviceVersionIdentifiers) FieldIsZero(p string) bool {
 }
 
 // FieldIsZero returns whether path p is zero.
-func (v *TR005Identifiers) FieldIsZero(p string) bool {
+func (v *LoRaAllianceProfileIdentifiers) FieldIsZero(p string) bool {
 	if v == nil {
 		return true
 	}
@@ -1425,12 +1425,12 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 		return !v.SupportsClassC
 	case "supports_join":
 		return !v.SupportsJoin
-	case "tr005_identifiers":
-		return v.Tr005Identifiers == nil
-	case "tr005_identifiers.vendor_id":
-		return v.Tr005Identifiers.FieldIsZero("vendor_id")
-	case "tr005_identifiers.vendor_profile_id":
-		return v.Tr005Identifiers.FieldIsZero("vendor_profile_id")
+	case "lora_alliance_profile_ids":
+		return v.LoraAllianceProfileIds == nil
+	case "lora_alliance_profile_ids.vendor_id":
+		return v.LoraAllianceProfileIds.FieldIsZero("vendor_id")
+	case "lora_alliance_profile_ids.vendor_profile_id":
+		return v.LoraAllianceProfileIds.FieldIsZero("vendor_profile_id")
 	case "updated_at":
 		return v.UpdatedAt == nil
 	case "used_dev_nonces":

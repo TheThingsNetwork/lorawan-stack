@@ -190,7 +190,7 @@ message NetworkIdentifiers {
   string tenant_address = 5 [(validate.rules).string.max_len = 256];
 }
 
-message TR005Identifiers {
+message LoRaAllianceProfileIdentifiers {
   // VendorID managed by the LoRa Alliance, as defined in TR005.
   uint32 vendor_id = 1;
   // ID of the LoRaWAN end device profile assigned by the vendor.

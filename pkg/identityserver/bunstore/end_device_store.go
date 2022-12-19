@@ -134,7 +134,7 @@ func endDeviceToPB(m *EndDevice, fieldMask ...string) (*ttnpb.EndDevice, error) 
 
 		SerialNumber:     m.SerialNumber,
 		ServiceProfileId: m.ServiceProfileID,
-		Tr005Identifiers: &ttnpb.TR005Identifiers{
+		LoraAllianceProfileIds: &ttnpb.LoRaAllianceProfileIdentifiers{
 			VendorId:        m.VendorID,
 			VendorProfileId: m.VendorProfileID,
 		},
@@ -233,8 +233,8 @@ func (s *endDeviceStore) CreateEndDevice(
 		SerialNumber:     pb.SerialNumber,
 		ServiceProfileID: pb.ServiceProfileId,
 
-		VendorID:        pb.Tr005Identifiers.GetVendorId(),
-		VendorProfileID: pb.Tr005Identifiers.GetVendorProfileId(),
+		VendorID:        pb.LoraAllianceProfileIds.GetVendorId(),
+		VendorProfileID: pb.LoraAllianceProfileIds.GetVendorProfileId(),
 
 		ActivatedAt: cleanTimePtr(ttnpb.StdTime(pb.ActivatedAt)),
 		LastSeenAt:  cleanTimePtr(ttnpb.StdTime(pb.LastSeenAt)),
@@ -315,11 +315,11 @@ func (*endDeviceStore) selectWithFields(q *bun.SelectQuery, fieldMask store.Fiel
 				"activated_at", "last_seen_at":
 				// Proto name equals model name.
 				columns = append(columns, f)
-			case "tr005_identifiers":
+			case "lora_alliance_profile_ids":
 				columns = append(columns, "vendor_id", "vendor_profile_id")
-			case "tr005_identifiers.vendor_id":
+			case "lora_alliance_profile_ids.vendor_id":
 				columns = append(columns, "vendor_id")
-			case "tr005_identifiers.vendor_profile_id":
+			case "lora_alliance_profile_ids.vendor_profile_id":
 				columns = append(columns, "vendor_profile_id")
 			case "version_ids":
 				columns = append(columns, "brand_id", "model_id", "hardware_version", "firmware_version", "band_id")
@@ -635,22 +635,22 @@ func (s *endDeviceStore) updateEndDeviceModel( //nolint:gocyclo
 			model.ServiceProfileID = pb.ServiceProfileId
 			columns = append(columns, "service_profile_id")
 
-		case "tr005_identifiers":
-			if pb.Tr005Identifiers != nil {
-				model.VendorID = pb.Tr005Identifiers.VendorId
-				model.VendorProfileID = pb.Tr005Identifiers.VendorProfileId
+		case "lora_alliance_profile_ids":
+			if pb.LoraAllianceProfileIds != nil {
+				model.VendorID = pb.LoraAllianceProfileIds.VendorId
+				model.VendorProfileID = pb.LoraAllianceProfileIds.VendorProfileId
 				columns = append(columns, "vendor_id", "vendor_profile_id")
 			}
 
-		case "tr005_identifiers.vendor_id":
-			if pb.Tr005Identifiers != nil {
-				model.VendorID = pb.Tr005Identifiers.VendorId
+		case "lora_alliance_profile_ids.vendor_id":
+			if pb.LoraAllianceProfileIds != nil {
+				model.VendorID = pb.LoraAllianceProfileIds.VendorId
 				columns = append(columns, "vendor_id")
 			}
 
-		case "tr005_identifiers.vendor_profile_id":
-			if pb.Tr005Identifiers != nil {
-				model.VendorProfileID = pb.Tr005Identifiers.VendorProfileId
+		case "lora_alliance_profile_ids.vendor_profile_id":
+			if pb.LoraAllianceProfileIds != nil {
+				model.VendorProfileID = pb.LoraAllianceProfileIds.VendorProfileId
 				columns = append(columns, "vendor_profile_id")
 			}
 

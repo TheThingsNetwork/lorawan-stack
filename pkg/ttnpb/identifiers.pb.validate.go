@@ -1317,16 +1317,16 @@ var _ interface {
 
 var _NetworkIdentifiers_TenantId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$")
 
-// ValidateFields checks the field values on TR005Identifiers with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
-func (m *TR005Identifiers) ValidateFields(paths ...string) error {
+// ValidateFields checks the field values on LoRaAllianceProfileIdentifiers
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *LoRaAllianceProfileIdentifiers) ValidateFields(paths ...string) error {
 	if m == nil {
 		return nil
 	}
 
 	if len(paths) == 0 {
-		paths = TR005IdentifiersFieldPathsNested
+		paths = LoRaAllianceProfileIdentifiersFieldPathsNested
 	}
 
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
@@ -1337,7 +1337,7 @@ func (m *TR005Identifiers) ValidateFields(paths ...string) error {
 		case "vendor_profile_id":
 			// no validation rules for VendorProfileId
 		default:
-			return TR005IdentifiersValidationError{
+			return LoRaAllianceProfileIdentifiersValidationError{
 				field:  name,
 				reason: "invalid field path",
 			}
@@ -1346,9 +1346,10 @@ func (m *TR005Identifiers) ValidateFields(paths ...string) error {
 	return nil
 }
 
-// TR005IdentifiersValidationError is the validation error returned by
-// TR005Identifiers.ValidateFields if the designated constraints aren't met.
-type TR005IdentifiersValidationError struct {
+// LoRaAllianceProfileIdentifiersValidationError is the validation error
+// returned by LoRaAllianceProfileIdentifiers.ValidateFields if the designated
+// constraints aren't met.
+type LoRaAllianceProfileIdentifiersValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1356,22 +1357,24 @@ type TR005IdentifiersValidationError struct {
 }
 
 // Field function returns field value.
-func (e TR005IdentifiersValidationError) Field() string { return e.field }
+func (e LoRaAllianceProfileIdentifiersValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e TR005IdentifiersValidationError) Reason() string { return e.reason }
+func (e LoRaAllianceProfileIdentifiersValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e TR005IdentifiersValidationError) Cause() error { return e.cause }
+func (e LoRaAllianceProfileIdentifiersValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e TR005IdentifiersValidationError) Key() bool { return e.key }
+func (e LoRaAllianceProfileIdentifiersValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e TR005IdentifiersValidationError) ErrorName() string { return "TR005IdentifiersValidationError" }
+func (e LoRaAllianceProfileIdentifiersValidationError) ErrorName() string {
+	return "LoRaAllianceProfileIdentifiersValidationError"
+}
 
 // Error satisfies the builtin error interface
-func (e TR005IdentifiersValidationError) Error() string {
+func (e LoRaAllianceProfileIdentifiersValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1383,14 +1386,14 @@ func (e TR005IdentifiersValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sTR005Identifiers.%s: %s%s",
+		"invalid %sLoRaAllianceProfileIdentifiers.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = TR005IdentifiersValidationError{}
+var _ error = LoRaAllianceProfileIdentifiersValidationError{}
 
 var _ interface {
 	Field() string
@@ -1398,4 +1401,4 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = TR005IdentifiersValidationError{}
+} = LoRaAllianceProfileIdentifiersValidationError{}

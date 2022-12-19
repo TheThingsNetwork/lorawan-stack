@@ -331,10 +331,10 @@
   - [Message `EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers)
   - [Message `EntityIdentifiers`](#ttn.lorawan.v3.EntityIdentifiers)
   - [Message `GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers)
+  - [Message `LoRaAllianceProfileIdentifiers`](#ttn.lorawan.v3.LoRaAllianceProfileIdentifiers)
   - [Message `NetworkIdentifiers`](#ttn.lorawan.v3.NetworkIdentifiers)
   - [Message `OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers)
   - [Message `OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers)
-  - [Message `TR005Identifiers`](#ttn.lorawan.v3.TR005Identifiers)
   - [Message `UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers)
 - [File `lorawan-stack/api/identityserver.proto`](#lorawan-stack/api/identityserver.proto)
   - [Message `AuthInfoResponse`](#ttn.lorawan.v3.AuthInfoResponse)
@@ -3478,7 +3478,7 @@ SDKs are responsible for combining (if desired) the three.
 | `activated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Timestamp when the device has been activated. Stored in the Entity Registry. This field is set by the Application Server when an end device sends its first uplink. The Application Server will use the field in order to avoid repeated calls to the Entity Registry. The field cannot be unset once set. |
 | `last_seen_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Timestamp when a device uplink has been last observed. This field is set by the Application Server and stored in the Identity Server. |
 | `serial_number` | [`string`](#string) |  |  |
-| `tr005_identifiers` | [`TR005Identifiers`](#ttn.lorawan.v3.TR005Identifiers) |  |  |
+| `lora_alliance_profile_ids` | [`LoRaAllianceProfileIdentifiers`](#ttn.lorawan.v3.LoRaAllianceProfileIdentifiers) |  |  |
 
 #### Field Rules
 
@@ -5035,6 +5035,13 @@ EntityIdentifiers contains one of the possible entity identifiers.
 | `gateway_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 | `eui` | <p>`bytes.len`: `8`</p> |
 
+### <a name="ttn.lorawan.v3.LoRaAllianceProfileIdentifiers">Message `LoRaAllianceProfileIdentifiers`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `vendor_id` | [`uint32`](#uint32) |  | VendorID managed by the LoRa Alliance, as defined in TR005. |
+| `vendor_profile_id` | [`uint32`](#uint32) |  | ID of the LoRaWAN end device profile assigned by the vendor. |
+
 ### <a name="ttn.lorawan.v3.NetworkIdentifiers">Message `NetworkIdentifiers`</a>
 
 Identifies a Network Server.
@@ -5077,13 +5084,6 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | ----- | ---- | ----- | ----------- |
 | `organization_ids` | [`OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers) |  |  |
 | `user_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  |  |
-
-### <a name="ttn.lorawan.v3.TR005Identifiers">Message `TR005Identifiers`</a>
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `vendor_id` | [`uint32`](#uint32) |  | VendorID managed by the LoRa Alliance, as defined in TR005. |
-| `vendor_profile_id` | [`uint32`](#uint32) |  | ID of the LoRaWAN end device profile assigned by the vendor. |
 
 ### <a name="ttn.lorawan.v3.UserIdentifiers">Message `UserIdentifiers`</a>
 

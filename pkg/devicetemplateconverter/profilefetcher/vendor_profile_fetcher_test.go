@@ -43,7 +43,7 @@ func Test_VendorIDProfileFetcher_ShouldFetchProfile(t *testing.T) {
 		{
 			name: "Valid",
 			device: &ttnpb.EndDevice{
-				Tr005Identifiers: &ttnpb.TR005Identifiers{
+				LoraAllianceProfileIds: &ttnpb.LoRaAllianceProfileIdentifiers{
 					VendorId:        10,
 					VendorProfileId: 10,
 				},
@@ -94,7 +94,7 @@ func Test_VendorIDProfileFetcher_FetchProfile(t *testing.T) {
 		{
 			name: "valid",
 			endDevice: &ttnpb.EndDevice{
-				Tr005Identifiers: &ttnpb.TR005Identifiers{
+				LoraAllianceProfileIds: &ttnpb.LoRaAllianceProfileIdentifiers{
 					VendorId:        1,
 					VendorProfileId: 1,
 				},
@@ -102,7 +102,7 @@ func Test_VendorIDProfileFetcher_FetchProfile(t *testing.T) {
 			populateMock: func(md *mockdr.MockDR) {
 				md.EndDeviceTemplate = &ttnpb.EndDeviceTemplate{
 					EndDevice: &ttnpb.EndDevice{
-						Tr005Identifiers: &ttnpb.TR005Identifiers{
+						LoraAllianceProfileIds: &ttnpb.LoRaAllianceProfileIdentifiers{
 							VendorId:        1,
 							VendorProfileId: 1,
 						},
@@ -120,8 +120,8 @@ func Test_VendorIDProfileFetcher_FetchProfile(t *testing.T) {
 					"vendor_profile_id",
 				), should.BeNil)
 				a.So(
-					tmpl.GetEndDevice().GetTr005Identifiers().GetVendorId() == 1 &&
-						tmpl.GetEndDevice().GetTr005Identifiers().GetVendorProfileId() == 1,
+					tmpl.GetEndDevice().GetLoraAllianceProfileIds().GetVendorId() == 1 &&
+						tmpl.GetEndDevice().GetLoraAllianceProfileIds().GetVendorProfileId() == 1,
 					should.BeTrue,
 				)
 			},

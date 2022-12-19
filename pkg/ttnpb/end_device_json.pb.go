@@ -2925,11 +2925,11 @@ func (x *EndDevice) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("serial_number")
 		s.WriteString(x.SerialNumber)
 	}
-	if x.Tr005Identifiers != nil || s.HasField("tr005_identifiers") {
+	if x.LoraAllianceProfileIds != nil || s.HasField("lora_alliance_profile_ids") {
 		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("tr005_identifiers")
-		// NOTE: TR005Identifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.Tr005Identifiers)
+		s.WriteObjectField("lora_alliance_profile_ids")
+		// NOTE: LoRaAllianceProfileIdentifiers does not seem to implement MarshalProtoJSON.
+		gogo.MarshalMessage(s, x.LoraAllianceProfileIds)
 	}
 	s.WriteObjectEnd()
 }
@@ -3256,16 +3256,16 @@ func (x *EndDevice) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		case "serial_number", "serialNumber":
 			s.AddField("serial_number")
 			x.SerialNumber = s.ReadString()
-		case "tr005_identifiers", "tr005Identifiers":
-			s.AddField("tr005_identifiers")
+		case "lora_alliance_profile_ids", "loraAllianceProfileIds":
+			s.AddField("lora_alliance_profile_ids")
 			if s.ReadNil() {
-				x.Tr005Identifiers = nil
+				x.LoraAllianceProfileIds = nil
 				return
 			}
-			// NOTE: TR005Identifiers does not seem to implement UnmarshalProtoJSON.
-			var v TR005Identifiers
+			// NOTE: LoRaAllianceProfileIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v LoRaAllianceProfileIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.Tr005Identifiers = &v
+			x.LoraAllianceProfileIds = &v
 		}
 	})
 }

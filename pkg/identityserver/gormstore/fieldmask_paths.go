@@ -74,10 +74,10 @@ const (
 	temporaryPasswordCreatedAtField     = "temporary_password_created_at"
 	temporaryPasswordExpiresAtField     = "temporary_password_expires_at"
 	temporaryPasswordField              = "temporary_password"
-	tr005IdsField                       = "tr005_identifiers"
+	loraAllianceProfileIdsField         = "lora_alliance_profile_ids"
 	updateChannelField                  = "update_channel"
 	updateLocationFromStatusField       = "update_location_from_status"
 	versionIDsField                     = "version_ids"
-	vendorIDField                       = "tr005_identifiers.vendor_id"
-	vendorProfileIDField                = "tr005_identifiers.vendor_profile_id"
+	vendorIDField                       = "lora_alliance_profile_ids.vendor_id"
+	vendorProfileIDField                = "lora_alliance_profile_ids.vendor_profile_id"
 )

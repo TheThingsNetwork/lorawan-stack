@@ -125,12 +125,12 @@ var NetworkIdentifiersFieldPathsTopLevel = []string{
 	"tenant_address",
 	"tenant_id",
 }
-var TR005IdentifiersFieldPathsNested = []string{
+var LoRaAllianceProfileIdentifiersFieldPathsNested = []string{
 	"vendor_id",
 	"vendor_profile_id",
 }
 
-var TR005IdentifiersFieldPathsTopLevel = []string{
+var LoRaAllianceProfileIdentifiersFieldPathsTopLevel = []string{
 	"vendor_id",
 	"vendor_profile_id",
 }

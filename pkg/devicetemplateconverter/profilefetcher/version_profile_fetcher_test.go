@@ -97,7 +97,7 @@ func Test_VersionIDProfileFetcher_FetchProfile(t *testing.T) {
 		{
 			name: "valid",
 			endDevice: &ttnpb.EndDevice{
-				Tr005Identifiers: &ttnpb.TR005Identifiers{
+				LoraAllianceProfileIds: &ttnpb.LoRaAllianceProfileIdentifiers{
 					VendorId:        1,
 					VendorProfileId: 1,
 				},

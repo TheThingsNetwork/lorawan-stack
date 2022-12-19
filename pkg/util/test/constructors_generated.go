@@ -1070,11 +1070,11 @@ func (EndDeviceOptionNamespace) WithSerialNumber(v string) EndDeviceOption {
 	}
 }
 
-// WithTr005Identifiers returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with Tr005Identifiers set to v.
-func (EndDeviceOptionNamespace) WithTr005Identifiers(v *ttnpb.TR005Identifiers) EndDeviceOption {
+// WithLoraAllianceProfileIds returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with LoraAllianceProfileIds set to v.
+func (EndDeviceOptionNamespace) WithLoraAllianceProfileIds(v *ttnpb.LoRaAllianceProfileIdentifiers) EndDeviceOption {
 	return func(x *ttnpb.EndDevice) *ttnpb.EndDevice {
 		copy := ttnpb.Clone(x)
-		copy.Tr005Identifiers = v
+		copy.LoraAllianceProfileIds = v
 		return copy
 	}
 }

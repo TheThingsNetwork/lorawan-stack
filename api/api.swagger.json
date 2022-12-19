@@ -1499,8 +1499,8 @@
                     "serial_number": {
                       "type": "string"
                     },
-                    "tr005_identifiers": {
-                      "$ref": "#/definitions/v3TR005Identifiers"
+                    "lora_alliance_profile_ids": {
+                      "$ref": "#/definitions/v3LoRaAllianceProfileIdentifiers"
                     }
                   },
                   "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -1810,8 +1810,8 @@
                     "serial_number": {
                       "type": "string"
                     },
-                    "tr005_identifiers": {
-                      "$ref": "#/definitions/v3TR005Identifiers"
+                    "lora_alliance_profile_ids": {
+                      "$ref": "#/definitions/v3LoRaAllianceProfileIdentifiers"
                     }
                   },
                   "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -3006,8 +3006,8 @@
                     "serial_number": {
                       "type": "string"
                     },
-                    "tr005_identifiers": {
-                      "$ref": "#/definitions/v3TR005Identifiers"
+                    "lora_alliance_profile_ids": {
+                      "$ref": "#/definitions/v3LoRaAllianceProfileIdentifiers"
                     }
                   },
                   "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -3321,8 +3321,8 @@
                     "serial_number": {
                       "type": "string"
                     },
-                    "tr005_identifiers": {
-                      "$ref": "#/definitions/v3TR005Identifiers"
+                    "lora_alliance_profile_ids": {
+                      "$ref": "#/definitions/v3LoRaAllianceProfileIdentifiers"
                     }
                   },
                   "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -10235,8 +10235,8 @@
                     "serial_number": {
                       "type": "string"
                     },
-                    "tr005_identifiers": {
-                      "$ref": "#/definitions/v3TR005Identifiers"
+                    "lora_alliance_profile_ids": {
+                      "$ref": "#/definitions/v3LoRaAllianceProfileIdentifiers"
                     }
                   },
                   "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -10550,8 +10550,8 @@
                     "serial_number": {
                       "type": "string"
                     },
-                    "tr005_identifiers": {
-                      "$ref": "#/definitions/v3TR005Identifiers"
+                    "lora_alliance_profile_ids": {
+                      "$ref": "#/definitions/v3LoRaAllianceProfileIdentifiers"
                     }
                   },
                   "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -11038,8 +11038,8 @@
                     "serial_number": {
                       "type": "string"
                     },
-                    "tr005_identifiers": {
-                      "$ref": "#/definitions/v3TR005Identifiers"
+                    "lora_alliance_profile_ids": {
+                      "$ref": "#/definitions/v3LoRaAllianceProfileIdentifiers"
                     }
                   },
                   "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -11353,8 +11353,8 @@
                     "serial_number": {
                       "type": "string"
                     },
-                    "tr005_identifiers": {
-                      "$ref": "#/definitions/v3TR005Identifiers"
+                    "lora_alliance_profile_ids": {
+                      "$ref": "#/definitions/v3LoRaAllianceProfileIdentifiers"
                     }
                   },
                   "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -20915,8 +20915,8 @@
         "serial_number": {
           "type": "string"
         },
-        "tr005_identifiers": {
-          "$ref": "#/definitions/v3TR005Identifiers"
+        "lora_alliance_profile_ids": {
+          "$ref": "#/definitions/v3LoRaAllianceProfileIdentifiers"
         }
       },
       "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -22240,6 +22240,21 @@
           "items": {
             "$ref": "#/definitions/v3Notification"
           }
+        }
+      }
+    },
+    "v3LoRaAllianceProfileIdentifiers": {
+      "type": "object",
+      "properties": {
+        "vendor_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "VendorID managed by the LoRa Alliance, as defined in TR005."
+        },
+        "vendor_profile_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID of the LoRaWAN end device profile assigned by the vendor."
         }
       }
     },
@@ -24219,21 +24234,6 @@
             "type": "string"
           },
           "description": "If provided, this will filter events, so that only events with the given names are returned.\nNames can be provided as either exact event names (e.g. 'gs.up.receive'),\nor as regular expressions (e.g. '/^gs\\..+/')."
-        }
-      }
-    },
-    "v3TR005Identifiers": {
-      "type": "object",
-      "properties": {
-        "vendor_id": {
-          "type": "integer",
-          "format": "int64",
-          "description": "VendorID managed by the LoRa Alliance, as defined in TR005."
-        },
-        "vendor_profile_id": {
-          "type": "integer",
-          "format": "int64",
-          "description": "ID of the LoRaWAN end device profile assigned by the vendor."
         }
       }
     },

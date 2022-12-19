@@ -2357,12 +2357,12 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 
 			}
 
-		case "tr005_identifiers":
+		case "lora_alliance_profile_ids":
 
-			if v, ok := interface{}(m.GetTr005Identifiers()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetLoraAllianceProfileIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return EndDeviceValidationError{
-						field:  "tr005_identifiers",
+						field:  "lora_alliance_profile_ids",
 						reason: "embedded message failed validation",
 						cause:  err,
 					}

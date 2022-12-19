@@ -674,7 +674,7 @@ func (dst *NetworkIdentifiers) SetFields(src *NetworkIdentifiers, paths ...strin
 	return nil
 }
 
-func (dst *TR005Identifiers) SetFields(src *TR005Identifiers, paths ...string) error {
+func (dst *LoRaAllianceProfileIdentifiers) SetFields(src *LoRaAllianceProfileIdentifiers, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "vendor_id":

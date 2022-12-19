@@ -2540,29 +2540,29 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 				var zero string
 				dst.SerialNumber = zero
 			}
-		case "tr005_identifiers":
+		case "lora_alliance_profile_ids":
 			if len(subs) > 0 {
-				var newDst, newSrc *TR005Identifiers
-				if (src == nil || src.Tr005Identifiers == nil) && dst.Tr005Identifiers == nil {
+				var newDst, newSrc *LoRaAllianceProfileIdentifiers
+				if (src == nil || src.LoraAllianceProfileIds == nil) && dst.LoraAllianceProfileIds == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.Tr005Identifiers
+					newSrc = src.LoraAllianceProfileIds
 				}
-				if dst.Tr005Identifiers != nil {
-					newDst = dst.Tr005Identifiers
+				if dst.LoraAllianceProfileIds != nil {
+					newDst = dst.LoraAllianceProfileIds
 				} else {
-					newDst = &TR005Identifiers{}
-					dst.Tr005Identifiers = newDst
+					newDst = &LoRaAllianceProfileIdentifiers{}
+					dst.LoraAllianceProfileIds = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.Tr005Identifiers = src.Tr005Identifiers
+					dst.LoraAllianceProfileIds = src.LoraAllianceProfileIds
 				} else {
-					dst.Tr005Identifiers = nil
+					dst.LoraAllianceProfileIds = nil
 				}
 			}
 

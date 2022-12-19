@@ -79,11 +79,11 @@ func mustEndDeviceVersionIDs(pb *ttnpb.EndDevice) *ttnpb.EndDeviceVersionIdentif
 	return pb.VersionIds
 }
 
-func mustEndDeviceTr005IDs(pb *ttnpb.EndDevice) *ttnpb.TR005Identifiers {
-	if pb.Tr005Identifiers == nil {
-		pb.Tr005Identifiers = &ttnpb.TR005Identifiers{}
+func mustEndDeviceTr005IDs(pb *ttnpb.EndDevice) *ttnpb.LoRaAllianceProfileIdentifiers {
+	if pb.LoraAllianceProfileIds == nil {
+		pb.LoraAllianceProfileIds = &ttnpb.LoRaAllianceProfileIdentifiers{}
 	}
-	return pb.Tr005Identifiers
+	return pb.LoraAllianceProfileIds
 }
 
 // functions to set fields from the device model into the device proto.
@@ -154,8 +154,8 @@ var devicePBSetters = map[string]func(*ttnpb.EndDevice, *EndDevice){
 	serviceProfileIDField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
 		pb.ServiceProfileId = dev.ServiceProfileID
 	},
-	tr005IdsField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
-		pb.Tr005Identifiers = &ttnpb.TR005Identifiers{
+	loraAllianceProfileIdsField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
+		pb.LoraAllianceProfileIds = &ttnpb.LoRaAllianceProfileIdentifiers{
 			VendorId:        dev.VendorID,
 			VendorProfileId: dev.VendorProfileID,
 		}
@@ -248,20 +248,20 @@ var deviceModelSetters = map[string]func(*EndDevice, *ttnpb.EndDevice){
 	serviceProfileIDField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
 		dev.ServiceProfileID = pb.ServiceProfileId
 	},
-	tr005IdsField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
-		if pb.Tr005Identifiers != nil {
-			dev.VendorID = pb.Tr005Identifiers.VendorId
-			dev.VendorProfileID = pb.Tr005Identifiers.VendorProfileId
+	loraAllianceProfileIdsField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
+		if pb.LoraAllianceProfileIds != nil {
+			dev.VendorID = pb.LoraAllianceProfileIds.VendorId
+			dev.VendorProfileID = pb.LoraAllianceProfileIds.VendorProfileId
 		}
 	},
 	vendorIDField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
-		if pb.Tr005Identifiers != nil {
-			dev.VendorID = pb.Tr005Identifiers.VendorId
+		if pb.LoraAllianceProfileIds != nil {
+			dev.VendorID = pb.LoraAllianceProfileIds.VendorId
 		}
 	},
 	vendorProfileIDField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
-		if pb.Tr005Identifiers != nil {
-			dev.VendorProfileID = pb.Tr005Identifiers.VendorProfileId
+		if pb.LoraAllianceProfileIds != nil {
+			dev.VendorProfileID = pb.LoraAllianceProfileIds.VendorProfileId
 		}
 	},
 	locationsField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
@@ -335,7 +335,7 @@ var deviceColumnNames = map[string][]string{
 	serviceProfileIDField:         {serviceProfileIDField},
 	vendorIDField:                 {"vendor_id"},
 	vendorProfileIDField:          {"vendor_profile_id"},
-	tr005IdsField:                 {"vendor_id", "vendor_profile_id"},
+	loraAllianceProfileIdsField:   {"vendor_id", "vendor_profile_id"},
 	locationsField:                {},
 	activatedAtField:              {activatedAtField},
 	lastSeenAtField:               {lastSeenAtField},
