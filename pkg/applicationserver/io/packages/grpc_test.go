@@ -37,6 +37,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 var (
@@ -243,10 +244,10 @@ func TestAssociations(t *testing.T) {
 	association := &ttnpb.ApplicationPackageAssociation{
 		Ids:         registeredAssociationID,
 		PackageName: "test-package",
-		Data: &types.Struct{
-			Fields: map[string]*types.Value{
+		Data: &structpb.Struct{
+			Fields: map[string]*structpb.Value{
 				"state": {
-					Kind: &types.Value_NumberValue{
+					Kind: &structpb.Value_NumberValue{
 						NumberValue: 0,
 					},
 				},

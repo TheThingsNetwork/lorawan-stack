@@ -31,6 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	urlutil "go.thethings.network/lorawan-stack/v3/pkg/util/url"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // PackageName defines the package name.
@@ -179,7 +180,7 @@ func (p *DeviceManagementPackage) sendDownlink(ctx context.Context, ids *ttnpb.E
 func (p *DeviceManagementPackage) sendServiceData(
 	ctx context.Context,
 	ids *ttnpb.EndDeviceIdentifiers,
-	data *pbtypes.Struct,
+	data *structpb.Struct,
 ) error {
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIds:   ids,
@@ -342,15 +343,15 @@ func hexPtr(x objects.Hex) *objects.Hex {
 	return &x
 }
 
-func toStruct(i interface{}) (*pbtypes.Struct, error) {
+func toStruct(i interface{}) (*structpb.Struct, error) {
 	b, err := jsonpb.TTN().Marshal(i)
 	if err != nil {
 		return nil, err
 	}
-	var st pbtypes.Struct
-	err = jsonpb.TTN().Unmarshal(b, &st)
+	st := &structpb.Struct{}
+	err = jsonpb.TTN().Unmarshal(b, st)
 	if err != nil {
 		return nil, err
 	}
-	return &st, nil
+	return st, nil
 }

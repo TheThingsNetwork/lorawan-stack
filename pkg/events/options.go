@@ -19,12 +19,12 @@ import (
 	"sort"
 	"strings"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/peer"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // Option is an option that is used to build events.
@@ -132,9 +132,9 @@ var errorDataType, _ = marshalData(&ttnpb.ErrorDetails{
 	Namespace:     "pkg/example",
 	Name:          "example",
 	MessageFormat: "example error for `{attr_name}`",
-	Attributes: &pbtypes.Struct{
-		Fields: map[string]*pbtypes.Value{
-			"attr_name": {Kind: &pbtypes.Value_StringValue{
+	Attributes: &structpb.Struct{
+		Fields: map[string]*structpb.Value{
+			"attr_name": {Kind: &structpb.Value_StringValue{
 				StringValue: "attr_value",
 			}},
 		},

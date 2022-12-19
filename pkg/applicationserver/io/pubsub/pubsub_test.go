@@ -19,7 +19,6 @@ import (
 	"testing"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/formatters"
 	mock_server "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub"
@@ -33,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	cloudpubsub "gocloud.dev/pubsub"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 type messageWithError struct {
@@ -198,14 +198,14 @@ func TestPubSub(t *testing.T) {
 							FPort:        42,
 							FCnt:         42,
 							FrmPayload:   []byte{0x1, 0x2, 0x3},
-							NormalizedPayload: &pbtypes.Struct{
-								Fields: map[string]*pbtypes.Value{
+							NormalizedPayload: &structpb.Struct{
+								Fields: map[string]*structpb.Value{
 									"air": {
-										Kind: &pbtypes.Value_StructValue{
-											StructValue: &pbtypes.Struct{
-												Fields: map[string]*pbtypes.Value{
+										Kind: &structpb.Value_StructValue{
+											StructValue: &structpb.Struct{
+												Fields: map[string]*structpb.Value{
 													"temperature": {
-														Kind: &pbtypes.Value_NumberValue{
+														Kind: &structpb.Value_NumberValue{
 															NumberValue: 21.5,
 														},
 													},
@@ -356,10 +356,10 @@ func TestPubSub(t *testing.T) {
 					EndDeviceIds: registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_ServiceData{
 						ServiceData: &ttnpb.ApplicationServiceData{
-							Data: &pbtypes.Struct{
-								Fields: map[string]*pbtypes.Value{
+							Data: &structpb.Struct{
+								Fields: map[string]*structpb.Value{
 									"battery": {
-										Kind: &pbtypes.Value_NumberValue{
+										Kind: &structpb.Value_NumberValue{
 											NumberValue: 42.0,
 										},
 									},

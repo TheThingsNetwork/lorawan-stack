@@ -17,7 +17,6 @@ package remote_test
 import (
 	"testing"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store/remote"
@@ -26,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
@@ -611,7 +611,7 @@ func TestRemoteStore(t *testing.T) {
 	})
 }
 
-func mustStruct(d map[string]interface{}) *pbtypes.Struct {
+func mustStruct(d map[string]interface{}) *structpb.Struct {
 	v, err := gogoproto.Struct(d)
 	if err != nil {
 		panic(err)

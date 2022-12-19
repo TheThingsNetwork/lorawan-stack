@@ -27,12 +27,12 @@ import (
 	"io"
 	"strings"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/provisioning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"google.golang.org/protobuf/types/known/structpb"
 	jose "gopkg.in/square/go-jose.v2"
 )
 
@@ -201,7 +201,7 @@ func (m *microchipATECC608AMAHTNT) Convert(
 		if err != nil {
 			return errMicrochipData.WithCause(err)
 		}
-		s := &pbtypes.Struct{}
+		s := &structpb.Struct{}
 		if err := jsonpb.TTN().Unmarshal(buf, s); err != nil {
 			return errMicrochipData.WithCause(err)
 		}
@@ -359,7 +359,7 @@ func (m *microchipATECC608TNGLORA) Convert( //nolint:gocyclo
 		if devEUI.IsZero() {
 			return errMicrochipData.WithCause(errMicrochipUnknownDevEUI)
 		}
-		s := &pbtypes.Struct{}
+		s := &structpb.Struct{}
 		if err := jsonpb.TTN().Unmarshal(buf, s); err != nil {
 			return errMicrochipData.WithCause(err)
 		}

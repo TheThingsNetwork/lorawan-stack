@@ -19,8 +19,8 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 var (
@@ -33,7 +33,7 @@ var (
 type QueryType uint8
 
 // Value returns the protobuf value for the query type.
-func (t QueryType) Value() *types.Value {
+func (t QueryType) Value() *structpb.Value {
 	var s string
 	switch t {
 	case QUERY_TOARSSI:
@@ -45,16 +45,16 @@ func (t QueryType) Value() *types.Value {
 	default:
 		panic("invalid query type")
 	}
-	return &types.Value{
-		Kind: &types.Value_StringValue{
+	return &structpb.Value{
+		Kind: &structpb.Value_StringValue{
 			StringValue: s,
 		},
 	}
 }
 
 // FromValue sets the query type from a protobuf value.
-func (t *QueryType) FromValue(v *types.Value) error {
-	sv, ok := v.Kind.(*types.Value_StringValue)
+func (t *QueryType) FromValue(v *structpb.Value) error {
+	sv, ok := v.Kind.(*structpb.Value_StringValue)
 	if !ok {
 		return errInvalidType.WithAttributes("type", fmt.Sprintf("%T", v.Kind))
 	}
@@ -107,34 +107,34 @@ const (
 	tokenField           = "token"
 )
 
-func toString(s string) *types.Value {
-	return &types.Value{
-		Kind: &types.Value_StringValue{
+func toString(s string) *structpb.Value {
+	return &structpb.Value{
+		Kind: &structpb.Value_StringValue{
 			StringValue: s,
 		},
 	}
 }
 
-func toBool(b bool) *types.Value {
-	return &types.Value{
-		Kind: &types.Value_BoolValue{
+func toBool(b bool) *structpb.Value {
+	return &structpb.Value{
+		Kind: &structpb.Value_BoolValue{
 			BoolValue: b,
 		},
 	}
 }
 
-func toFloat64(f float64) *types.Value {
-	return &types.Value{
-		Kind: &types.Value_NumberValue{
+func toFloat64(f float64) *structpb.Value {
+	return &structpb.Value{
+		Kind: &structpb.Value_NumberValue{
 			NumberValue: f,
 		},
 	}
 }
 
-// Struct serializes the configuration to *types.Struct.
-func (d *Data) Struct() *types.Struct {
-	st := &types.Struct{
-		Fields: map[string]*types.Value{
+// Struct serializes the configuration to *structpb.Struct.
+func (d *Data) Struct() *structpb.Struct {
+	st := &structpb.Struct{
+		Fields: map[string]*structpb.Value{
 			queryField: d.Query.Value(),
 			tokenField: toString(d.Token),
 		},
@@ -154,32 +154,32 @@ func (d *Data) Struct() *types.Struct {
 	return st
 }
 
-func stringFromValue(v *types.Value) (string, error) {
-	sv, ok := v.Kind.(*types.Value_StringValue)
+func stringFromValue(v *structpb.Value) (string, error) {
+	sv, ok := v.Kind.(*structpb.Value_StringValue)
 	if !ok {
 		return "", errInvalidType.WithAttributes("type", fmt.Sprintf("%T", v.Kind))
 	}
 	return sv.StringValue, nil
 }
 
-func boolFromValue(v *types.Value) (bool, error) {
-	bv, ok := v.Kind.(*types.Value_BoolValue)
+func boolFromValue(v *structpb.Value) (bool, error) {
+	bv, ok := v.Kind.(*structpb.Value_BoolValue)
 	if !ok {
 		return false, errInvalidType.WithAttributes("type", fmt.Sprintf("%T", v.Kind))
 	}
 	return bv.BoolValue, nil
 }
 
-func float64FromValue(v *types.Value) (float64, error) {
-	fv, ok := v.Kind.(*types.Value_NumberValue)
+func float64FromValue(v *structpb.Value) (float64, error) {
+	fv, ok := v.Kind.(*structpb.Value_NumberValue)
 	if !ok {
 		return 0.0, errInvalidType.WithAttributes("type", fmt.Sprintf("%T", v.Kind))
 	}
 	return fv.NumberValue, nil
 }
 
-// FromStruct deserializes the configuration from *types.Struct.
-func (d *Data) FromStruct(st *types.Struct) error {
+// FromStruct deserializes the configuration from *structpb.Struct.
+func (d *Data) FromStruct(st *structpb.Struct) error {
 	fields := st.GetFields()
 	{
 		value, ok := fields[queryField]

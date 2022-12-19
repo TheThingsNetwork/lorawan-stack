@@ -17,7 +17,7 @@ package provisioning
 import (
 	"strings"
 
-	pbtypes "github.com/gogo/protobuf/types"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // Microchip is the provisioning ID for Microchip devices.
@@ -26,7 +26,7 @@ const Microchip = "microchip"
 type microchip struct{}
 
 // UniqueID returns the serial number.
-func (p *microchip) UniqueID(entry *pbtypes.Struct) (string, error) {
+func (p *microchip) UniqueID(entry *structpb.Struct) (string, error) {
 	if entry == nil {
 		return "", errEntry.New()
 	}

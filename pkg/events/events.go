@@ -31,6 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
@@ -197,7 +198,7 @@ func marshalData(data interface{}) (anyPB *pbtypes.Any, err error) {
 		if err != nil {
 			return nil, err
 		}
-		if _, isNull := value.Kind.(*pbtypes.Value_NullValue); !isNull {
+		if _, isNull := value.Kind.(*structpb.Value_NullValue); !isNull {
 			anyPB, err = pbtypes.MarshalAny(value)
 			if err != nil {
 				return nil, err
@@ -242,7 +243,7 @@ func FromProto(pb *ttnpb.Event) (Event, error) {
 			return nil, err
 		}
 		data = anyMsg
-		v, ok := anyMsg.(*pbtypes.Value)
+		v, ok := anyMsg.(*structpb.Value)
 		if ok {
 			iface, err := gogoproto.Interface(v)
 			if err != nil {

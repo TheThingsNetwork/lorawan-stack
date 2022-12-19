@@ -18,13 +18,13 @@ import (
 	"testing"
 
 	lpp "github.com/TheThingsNetwork/go-cayenne-lib"
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 func TestEncode(t *testing.T) {
@@ -45,10 +45,10 @@ func TestEncode(t *testing.T) {
 	// Happy flow.
 	{
 		message := &ttnpb.ApplicationDownlink{
-			DecodedPayload: &pbtypes.Struct{
-				Fields: map[string]*pbtypes.Value{
+			DecodedPayload: &structpb.Struct{
+				Fields: map[string]*structpb.Value{
 					"value_2": {
-						Kind: &pbtypes.Value_NumberValue{
+						Kind: &structpb.Value_NumberValue{
 							NumberValue: -50.51,
 						},
 					},
@@ -71,29 +71,29 @@ func TestEncode(t *testing.T) {
 	// Test resilience against custom fields from the user. Should be fine.
 	{
 		message := &ttnpb.ApplicationDownlink{
-			DecodedPayload: &pbtypes.Struct{
-				Fields: map[string]*pbtypes.Value{
+			DecodedPayload: &structpb.Struct{
+				Fields: map[string]*structpb.Value{
 					"custom": {
-						Kind: &pbtypes.Value_NumberValue{
+						Kind: &structpb.Value_NumberValue{
 							NumberValue: 8,
 						},
 					},
 					"digital_in_8": {
-						Kind: &pbtypes.Value_StringValue{
+						Kind: &structpb.Value_StringValue{
 							StringValue: "shouldn't be a string",
 						},
 					},
 					"custom_5": {
-						Kind: &pbtypes.Value_NumberValue{
+						Kind: &structpb.Value_NumberValue{
 							NumberValue: 5,
 						},
 					},
 					"accelerometer_1": {
-						Kind: &pbtypes.Value_StructValue{
-							StructValue: &pbtypes.Struct{
-								Fields: map[string]*pbtypes.Value{
+						Kind: &structpb.Value_StructValue{
+							StructValue: &structpb.Struct{
+								Fields: map[string]*structpb.Value{
 									"x": {
-										Kind: &pbtypes.Value_StringValue{
+										Kind: &structpb.Value_StringValue{
 											StringValue: "test",
 										},
 									},

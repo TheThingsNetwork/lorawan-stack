@@ -19,11 +19,11 @@ import (
 	"testing"
 
 	"github.com/gogo/protobuf/proto"
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/formatters"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 func TestProtobufUpstream(t *testing.T) {
@@ -47,10 +47,10 @@ func TestProtobufUpstream(t *testing.T) {
 						FPort:        42,
 						FCnt:         42,
 						FrmPayload:   []byte{0x1, 0x2, 0x3},
-						DecodedPayload: &pbtypes.Struct{
-							Fields: map[string]*pbtypes.Value{
+						DecodedPayload: &structpb.Struct{
+							Fields: map[string]*structpb.Value{
 								"test_key": {
-									Kind: &pbtypes.Value_NumberValue{
+									Kind: &structpb.Value_NumberValue{
 										NumberValue: 42,
 									},
 								},

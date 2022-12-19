@@ -19,9 +19,9 @@ import (
 	"fmt"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"golang.org/x/exp/constraints"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // Air is an air measurement.
@@ -66,12 +66,12 @@ var (
 	errUnknownField = errors.DefineInvalidArgument("unknown_field", "unknown field `{path}`")
 )
 
-type fieldParser func(dst *Measurement, src *pbtypes.Value, path string) []error
+type fieldParser func(dst *Measurement, src *structpb.Value, path string) []error
 
 // object validates that the path is a structure and sets the target to an empty value.
 func object[T any](selector func(*Measurement) *T) fieldParser {
-	return func(dst *Measurement, src *pbtypes.Value, path string) []error {
-		_, ok := src.Kind.(*pbtypes.Value_StructValue)
+	return func(dst *Measurement, src *structpb.Value, path string) []error {
+		_, ok := src.Kind.(*structpb.Value_StructValue)
 		if !ok {
 			return []error{errFieldType.WithAttributes("path", path)}
 		}
@@ -93,8 +93,8 @@ func validate[T any](val T, validators []fieldValidator[T], path string) (errs [
 
 // parseTime parses and validates the time. The input value must be RFC3339.
 func parseTime(selector func(dst *Measurement) **time.Time, vals ...fieldValidator[time.Time]) fieldParser {
-	return func(dst *Measurement, src *pbtypes.Value, path string) []error {
-		val, ok := src.Kind.(*pbtypes.Value_StringValue)
+	return func(dst *Measurement, src *structpb.Value, path string) []error {
+		val, ok := src.Kind.(*structpb.Value_StringValue)
 		if !ok {
 			return []error{errFieldType.WithAttributes("path", path)}
 		}
@@ -112,8 +112,8 @@ func parseTime(selector func(dst *Measurement) **time.Time, vals ...fieldValidat
 
 // parseNumber parses and validates a number.
 func parseNumber(selector func(dst *Measurement) **float64, vals ...fieldValidator[float64]) fieldParser {
-	return func(dst *Measurement, src *pbtypes.Value, path string) []error {
-		val, ok := src.Kind.(*pbtypes.Value_NumberValue)
+	return func(dst *Measurement, src *structpb.Value, path string) []error {
+		val, ok := src.Kind.(*structpb.Value_NumberValue)
 		if !ok {
 			return []error{errFieldType.WithAttributes("path", path)}
 		}
@@ -237,15 +237,15 @@ type ParsedMeasurement struct {
 	// ValidationErrors contains any errors that occurred during field validation.
 	ValidationErrors []error
 	// Valid only contains the valid fields, for which there were no validation errors.
-	Valid *pbtypes.Struct
+	Valid *structpb.Struct
 }
 
 // Parse parses and validates the measurements.
-func Parse(measurements []*pbtypes.Struct) ([]ParsedMeasurement, error) {
+func Parse(measurements []*structpb.Struct) ([]ParsedMeasurement, error) {
 	res := make([]ParsedMeasurement, len(measurements))
 	for i, src := range measurements {
-		res[i].Valid = &pbtypes.Struct{
-			Fields: make(map[string]*pbtypes.Value),
+		res[i].Valid = &structpb.Struct{
+			Fields: make(map[string]*structpb.Value),
 		}
 		err := parse(&res[i], src, "")
 		if err != nil {
@@ -255,7 +255,7 @@ func Parse(measurements []*pbtypes.Struct) ([]ParsedMeasurement, error) {
 	return res, nil
 }
 
-func parse(dst *ParsedMeasurement, src *pbtypes.Struct, prefix string) error {
+func parse(dst *ParsedMeasurement, src *structpb.Struct, prefix string) error {
 	for k, v := range src.GetFields() {
 		path := fmt.Sprintf("%s%s", prefix, k)
 		parser, ok := fieldParsers[path]
@@ -271,11 +271,11 @@ func parse(dst *ParsedMeasurement, src *pbtypes.Struct, prefix string) error {
 			}
 			continue
 		}
-		if s, ok := v.Kind.(*pbtypes.Value_StructValue); ok {
+		if s, ok := v.Kind.(*structpb.Value_StructValue); ok {
 			nested := &ParsedMeasurement{
 				Measurement: dst.Measurement,
-				Valid: &pbtypes.Struct{
-					Fields: make(map[string]*pbtypes.Value),
+				Valid: &structpb.Struct{
+					Fields: make(map[string]*structpb.Value),
 				},
 			}
 			if err := parse(nested, s.StructValue, path+"."); err != nil {
@@ -284,8 +284,8 @@ func parse(dst *ParsedMeasurement, src *pbtypes.Struct, prefix string) error {
 			dst.Measurement = nested.Measurement
 			dst.ValidationErrors = append(dst.ValidationErrors, nested.ValidationErrors...)
 			if len(nested.Valid.Fields) > 0 {
-				dst.Valid.Fields[k] = &pbtypes.Value{
-					Kind: &pbtypes.Value_StructValue{
+				dst.Valid.Fields[k] = &structpb.Value{
+					Kind: &structpb.Value_StructValue{
 						StructValue: nested.Valid,
 					},
 				}

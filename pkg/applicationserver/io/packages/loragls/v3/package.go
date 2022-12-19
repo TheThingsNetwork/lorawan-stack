@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gogo/protobuf/types"
 	"github.com/golang/protobuf/proto"
 	apppayload "go.thethings.network/lorawan-application-payload"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
@@ -33,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	urlutil "go.thethings.network/lorawan-stack/v3/pkg/util/url"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // PackageName defines the package name.
@@ -272,7 +272,7 @@ func (p *GeolocationPackage) sendQuery(ctx context.Context, ids *ttnpb.EndDevice
 	return nil
 }
 
-func (p *GeolocationPackage) sendServiceData(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, data *types.Struct) error {
+func (p *GeolocationPackage) sendServiceData(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, data *structpb.Struct) error {
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIds:   ids,
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
@@ -334,15 +334,15 @@ func (p *GeolocationPackage) mergePackageData(def *ttnpb.ApplicationPackageDefau
 	return &merged, nil
 }
 
-func toStruct(i interface{}) (*types.Struct, error) {
+func toStruct(i interface{}) (*structpb.Struct, error) {
 	b, err := jsonpb.TTN().Marshal(i)
 	if err != nil {
 		return nil, err
 	}
-	var st types.Struct
-	err = jsonpb.TTN().Unmarshal(b, &st)
+	st := &structpb.Struct{}
+	err = jsonpb.TTN().Unmarshal(b, st)
 	if err != nil {
 		return nil, err
 	}
-	return &st, nil
+	return st, nil
 }

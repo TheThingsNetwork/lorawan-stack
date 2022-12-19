@@ -999,7 +999,7 @@ func (EndDeviceOptionNamespace) WithProvisionerId(v string) EndDeviceOption {
 }
 
 // WithProvisioningData returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with ProvisioningData set to v.
-func (EndDeviceOptionNamespace) WithProvisioningData(v *pbtypes.Struct) EndDeviceOption {
+func (EndDeviceOptionNamespace) WithProvisioningData(v *structpb.Struct) EndDeviceOption {
 	return func(x *ttnpb.EndDevice) *ttnpb.EndDevice {
 		copy := ttnpb.Clone(x)
 		copy.ProvisioningData = v

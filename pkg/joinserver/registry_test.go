@@ -21,7 +21,6 @@ import (
 	"testing"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	. "go.thethings.network/lorawan-stack/v3/pkg/joinserver"
@@ -30,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // handleDeviceRegistryTest runs a test suite on reg.
@@ -47,10 +47,10 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 			DeviceId:       "test-dev",
 		},
 		ProvisionerId: "mock",
-		ProvisioningData: &pbtypes.Struct{
-			Fields: map[string]*pbtypes.Value{
+		ProvisioningData: &structpb.Struct{
+			Fields: map[string]*structpb.Value{
 				"serial_number": {
-					Kind: &pbtypes.Value_NumberValue{
+					Kind: &structpb.Value_NumberValue{
 						NumberValue: 42,
 					},
 				},

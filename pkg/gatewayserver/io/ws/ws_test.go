@@ -26,7 +26,6 @@ import (
 	"time"
 
 	"github.com/gogo/protobuf/proto"
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/gorilla/websocket"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
@@ -49,6 +48,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 var (
@@ -618,13 +618,13 @@ func TestVersion(t *testing.T) {
 					"package":  "test-package",
 					"platform": "test-model - Firmware 1.0.0 - Protocol 2",
 				},
-				Advanced: &pbtypes.Struct{
-					Fields: map[string]*pbtypes.Value{
+				Advanced: &structpb.Struct{
+					Fields: map[string]*structpb.Value{
 						"model": {
-							Kind: &pbtypes.Value_StringValue{StringValue: "test-model"},
+							Kind: &structpb.Value_StringValue{StringValue: "test-model"},
 						},
 						"features": {
-							Kind: &pbtypes.Value_StringValue{StringValue: "prod gps"},
+							Kind: &structpb.Value_StringValue{StringValue: "prod gps"},
 						},
 					},
 				},
@@ -698,13 +698,13 @@ func TestVersion(t *testing.T) {
 					"package":  "test-package",
 					"platform": "test-model - Firmware 1.0.0 - Protocol 2",
 				},
-				Advanced: &pbtypes.Struct{
-					Fields: map[string]*pbtypes.Value{
+				Advanced: &structpb.Struct{
+					Fields: map[string]*structpb.Value{
 						"model": {
-							Kind: &pbtypes.Value_StringValue{StringValue: "test-model"},
+							Kind: &structpb.Value_StringValue{StringValue: "test-model"},
 						},
 						"features": {
-							Kind: &pbtypes.Value_StringValue{StringValue: "rmtsh gps"},
+							Kind: &structpb.Value_StringValue{StringValue: "rmtsh gps"},
 						},
 					},
 				},

@@ -18,8 +18,8 @@ import (
 	"fmt"
 	"reflect"
 
-	structpb "github.com/golang/protobuf/ptypes/struct"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // maxNestingDepth represents the maximum object depth to be marshalled.
