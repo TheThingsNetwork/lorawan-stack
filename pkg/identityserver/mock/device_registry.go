@@ -26,7 +26,7 @@ import (
 var errFetchDevice = errors.DefineInternal("fetch_device", "failed to fetch device")
 
 type mockISEndDeviceRegistry struct {
-	ttnpb.EndDeviceRegistryServer
+	ttnpb.UnimplementedEndDeviceRegistryServer
 	endDevices sync.Map
 }
 

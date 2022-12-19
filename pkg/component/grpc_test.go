@@ -40,9 +40,9 @@ var (
 )
 
 type asImplementation struct {
-	*component.Component
 	ttnpb.UnimplementedAppAsServer
 
+	*component.Component
 	up chan *ttnpb.ApplicationUp
 }
 
@@ -61,6 +61,8 @@ func (as *asImplementation) Subscribe(id *ttnpb.ApplicationIdentifiers, stream t
 }
 
 type gsImplementation struct {
+	ttnpb.UnimplementedGsServer
+
 	*component.Component
 }
 

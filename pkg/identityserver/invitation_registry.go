@@ -122,6 +122,8 @@ func (is *IdentityServer) deleteInvitation(ctx context.Context, in *ttnpb.Delete
 }
 
 type invitationRegistry struct {
+	ttnpb.UnimplementedUserInvitationRegistryServer
+
 	*IdentityServer
 }
 

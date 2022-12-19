@@ -32,6 +32,8 @@ import (
 //
 // The Device Repository component exposes the DeviceRepository service.
 type DeviceRepository struct {
+	ttnpb.UnimplementedDeviceRepositoryServer
+
 	*component.Component
 	ctx context.Context
 

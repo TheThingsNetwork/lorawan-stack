@@ -440,6 +440,8 @@ func (is *IdentityServer) purgeClient(ctx context.Context, ids *ttnpb.ClientIden
 }
 
 type clientRegistry struct {
+	ttnpb.UnimplementedClientRegistryServer
+
 	*IdentityServer
 }
 

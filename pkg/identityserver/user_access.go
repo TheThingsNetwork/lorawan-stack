@@ -267,6 +267,8 @@ func (is *IdentityServer) createLoginToken(ctx context.Context, req *ttnpb.Creat
 }
 
 type userAccess struct {
+	ttnpb.UnimplementedUserAccessServer
+
 	*IdentityServer
 }
 

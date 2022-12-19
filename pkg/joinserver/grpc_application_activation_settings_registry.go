@@ -26,6 +26,8 @@ import (
 )
 
 type applicationActivationSettingsRegistryServer struct {
+	ttnpb.UnimplementedApplicationActivationSettingRegistryServer
+
 	JS       *JoinServer
 	kekLabel string
 }

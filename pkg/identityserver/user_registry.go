@@ -768,6 +768,8 @@ func (is *IdentityServer) purgeUser(ctx context.Context, ids *ttnpb.UserIdentifi
 }
 
 type userRegistry struct {
+	ttnpb.UnimplementedUserRegistryServer
+
 	*IdentityServer
 }
 

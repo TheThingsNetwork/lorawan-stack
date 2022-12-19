@@ -22,6 +22,8 @@ import (
 )
 
 type mockEntityAccess struct {
+	ttnpb.UnimplementedEntityAccessServer
+
 	authInfoResponse *ttnpb.AuthInfoResponse
 	err              error
 }

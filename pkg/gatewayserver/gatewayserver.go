@@ -62,6 +62,9 @@ import (
 //
 // The Gateway Server exposes the Gs, GtwGs and NsGs services and MQTT and UDP frontends for gateways.
 type GatewayServer struct {
+	ttnpb.UnimplementedGsServer
+	ttnpb.UnimplementedNsGsServer
+
 	*component.Component
 	ctx context.Context
 

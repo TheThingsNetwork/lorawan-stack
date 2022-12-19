@@ -50,8 +50,8 @@ func DefaultGateway(ids *ttnpb.GatewayIdentifiers, locationPublic, updateLocatio
 }
 
 type mockISGatewayRegistry struct {
-	ttnpb.GatewayRegistryServer
-	ttnpb.GatewayAccessServer
+	ttnpb.UnimplementedGatewayRegistryServer
+	ttnpb.UnimplementedGatewayAccessServer
 	gateways      map[string]*ttnpb.Gateway
 	gatewayAuths  map[string][]string
 	gatewayRights map[string]authKeyToRights

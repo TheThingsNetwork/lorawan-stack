@@ -87,6 +87,8 @@ func (noopEDCS) UnauthorizeApplication(ctx context.Context, ids *ttnpb.Applicati
 
 // endDeviceClaimingServer is the front facing entity for gRPC requests.
 type endDeviceClaimingServer struct {
+	ttnpb.UnimplementedEndDeviceClaimingServerServer
+
 	DCS *DeviceClaimingServer
 }
 

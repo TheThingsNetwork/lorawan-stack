@@ -67,6 +67,8 @@ func (is *IdentityServer) deleteUserSession(ctx context.Context, req *ttnpb.User
 }
 
 type userSessionRegistry struct {
+	ttnpb.UnimplementedUserSessionRegistryServer
+
 	*IdentityServer
 }
 

@@ -222,6 +222,8 @@ func (is *IdentityServer) listClientCollaborators(
 }
 
 type clientAccess struct {
+	ttnpb.UnimplementedClientAccessServer
+
 	*IdentityServer
 }
 

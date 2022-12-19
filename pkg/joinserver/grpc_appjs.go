@@ -21,6 +21,8 @@ import (
 )
 
 type appJsServer struct {
+	ttnpb.UnimplementedAppJsServer
+
 	JS *JoinServer
 }
 

@@ -46,6 +46,8 @@ import (
 // The Identity Server exposes the Registry and Access services for Applications,
 // OAuth clients, Gateways, Organizations and Users.
 type IdentityServer struct {
+	ttnpb.UnimplementedIsServer
+
 	*component.Component
 	ctx    context.Context
 	config *Config

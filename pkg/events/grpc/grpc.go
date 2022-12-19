@@ -57,6 +57,8 @@ func NewEventsServer(ctx context.Context, pubsub events.PubSub) *EventsServer {
 
 // EventsServer streams events from a PubSub over gRPC.
 type EventsServer struct {
+	ttnpb.UnimplementedEventsServer
+
 	ctx          context.Context
 	pubsub       events.PubSub
 	definedNames map[string]struct{}

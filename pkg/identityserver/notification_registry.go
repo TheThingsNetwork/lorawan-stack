@@ -305,6 +305,8 @@ func (is *IdentityServer) updateNotificationStatus(ctx context.Context, req *ttn
 }
 
 type notificationRegistry struct {
+	ttnpb.UnimplementedNotificationServiceServer
+
 	*IdentityServer
 }
 

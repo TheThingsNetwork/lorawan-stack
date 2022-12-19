@@ -87,6 +87,8 @@ func (m mockProvider) GetPayloadEncoderDecoder(ctx context.Context, formatter tt
 }
 
 type mockDR struct {
+	ttnpb.UnimplementedDeviceRepositoryServer
+
 	uplinkDecoders,
 	downlinkDecoders map[string]*ttnpb.MessagePayloadDecoder
 	downlinkEncoders map[string]*ttnpb.MessagePayloadEncoder

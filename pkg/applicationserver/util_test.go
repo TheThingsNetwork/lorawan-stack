@@ -60,6 +60,8 @@ func withDevAddr(ids *ttnpb.EndDeviceIdentifiers, devAddr types.DevAddr) *ttnpb.
 }
 
 type mockNS struct {
+	ttnpb.UnimplementedAsNsServer
+
 	linkCh          chan ttnpb.ApplicationIdentifiers
 	unlinkCh        chan ttnpb.ApplicationIdentifiers
 	upCh            chan *ttnpb.ApplicationUp
@@ -151,6 +153,8 @@ func (ns *mockNS) DownlinkQueueList(ctx context.Context, ids *ttnpb.EndDeviceIde
 var errNotFound = errors.DefineNotFound("not_found", "not found")
 
 type mockJS struct {
+	ttnpb.UnimplementedAsJsServer
+
 	keys map[string]*ttnpb.KeyEnvelope
 }
 

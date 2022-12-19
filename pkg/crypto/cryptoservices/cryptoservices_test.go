@@ -52,8 +52,8 @@ func TestCryptoServices(t *testing.T) {
 	}
 	defer lis.Close()
 	s := grpc.NewServer()
-	ttnpb.RegisterNetworkCryptoServiceServer(s, &mockNetworkRPCServer{memSvc, keyVault})
-	ttnpb.RegisterApplicationCryptoServiceServer(s, &mockApplicationRPCServer{memSvc, keyVault})
+	ttnpb.RegisterNetworkCryptoServiceServer(s, &mockNetworkRPCServer{Network: memSvc, KeyVault: keyVault})
+	ttnpb.RegisterApplicationCryptoServiceServer(s, &mockApplicationRPCServer{Application: memSvc, KeyVault: keyVault})
 	go s.Serve(lis)
 	conn, err := grpc.Dial(lis.Addr().String(), grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
@@ -372,6 +372,8 @@ func TestCryptoServices(t *testing.T) {
 }
 
 type mockNetworkRPCServer struct {
+	ttnpb.UnimplementedNetworkCryptoServiceServer
+
 	Network Network
 	crypto.KeyVault
 }
@@ -471,6 +473,8 @@ func (s *mockNetworkRPCServer) GetNwkKey(ctx context.Context, req *ttnpb.GetRoot
 }
 
 type mockApplicationRPCServer struct {
+	ttnpb.UnimplementedApplicationCryptoServiceServer
+
 	Application Application
 	crypto.KeyVault
 }

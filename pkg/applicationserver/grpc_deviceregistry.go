@@ -56,6 +56,8 @@ var (
 )
 
 type asEndDeviceRegistryServer struct {
+	ttnpb.UnimplementedAsEndDeviceRegistryServer
+
 	AS       *ApplicationServer
 	kekLabel string
 }

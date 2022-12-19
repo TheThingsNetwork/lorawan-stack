@@ -74,32 +74,32 @@ func fetchAuthInfo(ctx context.Context, f AuthInfoFetcher) (*ttnpb.AuthInfoRespo
 }
 
 type mockEntityAccessServer struct {
-	ttnpb.EntityAccessServer
+	ttnpb.UnimplementedEntityAccessServer
 	*mockFetcher
 }
 
 type mockApplicationAccessServer struct {
-	ttnpb.ApplicationAccessServer
+	ttnpb.UnimplementedApplicationAccessServer
 	*mockFetcher
 }
 
 type mockClientAccessServer struct {
-	ttnpb.ClientAccessServer
+	ttnpb.UnimplementedClientAccessServer
 	*mockFetcher
 }
 
 type mockGatewayAccessServer struct {
-	ttnpb.GatewayAccessServer
+	ttnpb.UnimplementedGatewayAccessServer
 	*mockFetcher
 }
 
 type mockOrganizationAccessServer struct {
-	ttnpb.OrganizationAccessServer
+	ttnpb.UnimplementedOrganizationAccessServer
 	*mockFetcher
 }
 
 type mockUserAccessServer struct {
-	ttnpb.UserAccessServer
+	ttnpb.UnimplementedUserAccessServer
 	*mockFetcher
 }
 

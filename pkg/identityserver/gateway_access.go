@@ -356,6 +356,8 @@ func (is *IdentityServer) listGatewayCollaborators(ctx context.Context, req *ttn
 }
 
 type gatewayAccess struct {
+	ttnpb.UnimplementedGatewayAccessServer
+
 	*IdentityServer
 }
 

@@ -21,6 +21,8 @@ import (
 )
 
 type asJsServer struct {
+	ttnpb.UnimplementedAsJsServer
+
 	JS *JoinServer
 }
 

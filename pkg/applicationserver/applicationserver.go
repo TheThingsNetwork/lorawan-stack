@@ -60,6 +60,9 @@ import (
 //
 // The Application Server exposes the As, AppAs and AsEndDeviceRegistry services.
 type ApplicationServer struct {
+	ttnpb.UnimplementedAsServer
+	ttnpb.UnimplementedNsAsServer
+
 	*component.Component
 	ctx context.Context
 

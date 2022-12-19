@@ -113,6 +113,11 @@ type InteropClient interface {
 //
 // The Network Server exposes the GsNs, AsNs, DeviceRegistry and ApplicationDownlinkQueue services.
 type NetworkServer struct {
+	ttnpb.UnimplementedAsNsServer
+	ttnpb.UnimplementedGsNsServer
+	ttnpb.UnimplementedNsEndDeviceRegistryServer
+	ttnpb.UnimplementedNsServer
+
 	*component.Component
 	ctx context.Context
 

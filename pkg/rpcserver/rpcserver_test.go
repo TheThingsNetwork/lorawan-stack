@@ -143,7 +143,7 @@ type (
 )
 
 type mockServer struct {
-	ttnpb.AppAsServer
+	ttnpb.UnimplementedAppAsServer
 
 	pushCtx context.Context
 	pushReq *ttnpb.DownlinkQueueRequest

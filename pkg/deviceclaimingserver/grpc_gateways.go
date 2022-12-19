@@ -41,6 +41,8 @@ func (noopGCLS) UnauthorizeGateway(ctx context.Context, gtwIDs *ttnpb.GatewayIde
 
 // gatewayClaimingServer is the front facing entity for gRPC requests.
 type gatewayClaimingServer struct {
+	ttnpb.UnimplementedGatewayClaimingServerServer
+
 	DCS *DeviceClaimingServer
 }
 
