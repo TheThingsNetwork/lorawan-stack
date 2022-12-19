@@ -20,6 +20,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - When searching for end-devices, specifying `last_seen_at` as the field in which the devices will be sorted by no longer returns an error.
+- Importing devices via CSV no longer skips the first header column when BOM bytes are present.
 
 ### Security
 
