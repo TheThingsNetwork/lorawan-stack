@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- When searching for end-devices, specifying `last_seen_at` as the field in which the devices will be sorted by no longer returns an error.
+
 ### Security
 
 ## [3.23.1] - 2022-12-14

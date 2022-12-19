@@ -1508,7 +1508,7 @@ func (m *SearchEndDevicesRequest) ValidateFields(paths ...string) error {
 			if _, ok := _SearchEndDevicesRequest_Order_InLookup[m.GetOrder()]; !ok {
 				return SearchEndDevicesRequestValidationError{
 					field:  "order",
-					reason: "value must be in list [ device_id -device_id join_eui -join_eui dev_eui -dev_eui name -name description -description created_at -created_at]",
+					reason: "value must be in list [ device_id -device_id join_eui -join_eui dev_eui -dev_eui name -name description -description created_at -created_at last_seen_at -last_seen_at]",
 				}
 			}
 
@@ -1592,17 +1592,19 @@ var _ interface {
 var _SearchEndDevicesRequest_AttributesContain_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 var _SearchEndDevicesRequest_Order_InLookup = map[string]struct{}{
-	"":             {},
-	"device_id":    {},
-	"-device_id":   {},
-	"join_eui":     {},
-	"-join_eui":    {},
-	"dev_eui":      {},
-	"-dev_eui":     {},
-	"name":         {},
-	"-name":        {},
-	"description":  {},
-	"-description": {},
-	"created_at":   {},
-	"-created_at":  {},
+	"":              {},
+	"device_id":     {},
+	"-device_id":    {},
+	"join_eui":      {},
+	"-join_eui":     {},
+	"dev_eui":       {},
+	"-dev_eui":      {},
+	"name":          {},
+	"-name":         {},
+	"description":   {},
+	"-description":  {},
+	"created_at":    {},
+	"-created_at":   {},
+	"last_seen_at":  {},
+	"-last_seen_at": {},
 }
