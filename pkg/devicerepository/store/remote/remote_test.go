@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 func TestRemoteStore(t *testing.T) {
@@ -273,24 +274,24 @@ func TestRemoteStore(t *testing.T) {
 				},
 				Sensors: []string{"temperature", "gas"},
 				Dimensions: &ttnpb.EndDeviceModel_Dimensions{
-					Width:    &pbtypes.FloatValue{Value: 1},
-					Height:   &pbtypes.FloatValue{Value: 2},
-					Diameter: &pbtypes.FloatValue{Value: 3},
-					Length:   &pbtypes.FloatValue{Value: 4},
+					Width:    &wrapperspb.FloatValue{Value: 1},
+					Height:   &wrapperspb.FloatValue{Value: 2},
+					Diameter: &wrapperspb.FloatValue{Value: 3},
+					Length:   &wrapperspb.FloatValue{Value: 4},
 				},
-				Weight: &pbtypes.FloatValue{Value: 5},
+				Weight: &wrapperspb.FloatValue{Value: 5},
 				Battery: &ttnpb.EndDeviceModel_Battery{
 					Replaceable: &pbtypes.BoolValue{Value: true},
 					Type:        "AAA",
 				},
 				OperatingConditions: &ttnpb.EndDeviceModel_OperatingConditions{
 					Temperature: &ttnpb.EndDeviceModel_OperatingConditions_Limits{
-						Min: &pbtypes.FloatValue{Value: 1},
-						Max: &pbtypes.FloatValue{Value: 2},
+						Min: &wrapperspb.FloatValue{Value: 1},
+						Max: &wrapperspb.FloatValue{Value: 2},
 					},
 					RelativeHumidity: &ttnpb.EndDeviceModel_OperatingConditions_Limits{
-						Min: &pbtypes.FloatValue{Value: 3},
-						Max: &pbtypes.FloatValue{Value: 4},
+						Min: &wrapperspb.FloatValue{Value: 3},
+						Max: &wrapperspb.FloatValue{Value: 4},
 					},
 				},
 				IpCode:          "IP67",

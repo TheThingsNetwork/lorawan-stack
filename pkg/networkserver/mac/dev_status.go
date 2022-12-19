@@ -17,11 +17,11 @@ package mac
 import (
 	"context"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 var (
@@ -130,7 +130,7 @@ func HandleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 				dev.BatteryPercentage = nil
 			default:
 				dev.PowerState = ttnpb.PowerState_POWER_BATTERY
-				dev.BatteryPercentage = &pbtypes.FloatValue{Value: float32(pld.Battery-1) / 253}
+				dev.BatteryPercentage = &wrapperspb.FloatValue{Value: float32(pld.Battery-1) / 253}
 			}
 			dev.DownlinkMargin = pld.Margin
 			dev.LastDevStatusReceivedAt = ttnpb.ProtoTimePtr(recvAt)

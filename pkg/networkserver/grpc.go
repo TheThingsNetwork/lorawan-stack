@@ -22,6 +22,7 @@ import (
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // GenerateDevAddr returns a device address assignment in the device address
@@ -59,7 +60,7 @@ func (ns *NetworkServer) GetDefaultMACSettings(ctx context.Context, req *ttnpb.G
 		MaxDutyCycle:                 &ttnpb.AggregatedDutyCycleValue{Value: mac.DeviceDefaultMaxDutyCycle(nil, ns.defaultMACSettings)},
 		Supports_32BitFCnt:           &ttnpb.BoolValue{Value: mac.DeviceSupports32BitFCnt(nil, ns.defaultMACSettings)},
 		UseAdr:                       &ttnpb.BoolValue{Value: mac.DeviceUseADR(nil, ns.defaultMACSettings, phy)},
-		AdrMargin:                    &pbtypes.FloatValue{Value: adrMargin},
+		AdrMargin:                    &wrapperspb.FloatValue{Value: adrMargin},
 		ResetsFCnt:                   &ttnpb.BoolValue{Value: mac.DeviceResetsFCnt(nil, ns.defaultMACSettings)},
 		StatusTimePeriodicity:        ttnpb.ProtoDurationPtr(statusTimePeriodicity),
 		StatusCountPeriodicity:       &pbtypes.UInt32Value{Value: statusCountPeriodicity},

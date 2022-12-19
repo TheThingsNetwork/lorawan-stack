@@ -22,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // ApplicationUplinkQueueConfig defines application uplink queue configuration.
@@ -61,7 +62,7 @@ func (c MACSettingConfig) Parse() *ttnpb.MACSettings {
 		StatusTimePeriodicity: ttnpb.ProtoDuration(c.StatusTimePeriodicity),
 	}
 	if c.ADRMargin != nil {
-		p.AdrMargin = &pbtypes.FloatValue{Value: *c.ADRMargin}
+		p.AdrMargin = &wrapperspb.FloatValue{Value: *c.ADRMargin}
 	}
 	if c.DesiredRx1Delay != nil {
 		p.DesiredRx1Delay = &ttnpb.RxDelayValue{Value: *c.DesiredRx1Delay}

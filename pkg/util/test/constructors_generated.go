@@ -954,7 +954,7 @@ func (EndDeviceOptionNamespace) WithPowerState(v ttnpb.PowerState) EndDeviceOpti
 }
 
 // WithBatteryPercentage returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with BatteryPercentage set to v.
-func (EndDeviceOptionNamespace) WithBatteryPercentage(v *pbtypes.FloatValue) EndDeviceOption {
+func (EndDeviceOptionNamespace) WithBatteryPercentage(v *wrapperspb.FloatValue) EndDeviceOption {
 	return func(x *ttnpb.EndDevice) *ttnpb.EndDevice {
 		copy := ttnpb.Clone(x)
 		copy.BatteryPercentage = v

@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 func TestNeedsDevStatusReq(t *testing.T) {
@@ -235,7 +236,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 						ttnpb.MACCommandIdentifier_CID_DEV_STATUS.MACCommand(),
 					},
 				},
-				BatteryPercentage: &pbtypes.FloatValue{Value: 0.44},
+				BatteryPercentage: &wrapperspb.FloatValue{Value: 0.44},
 				PowerState:        ttnpb.PowerState_POWER_EXTERNAL,
 			},
 			Expected: &ttnpb.EndDevice{
@@ -244,7 +245,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 					LastDevStatusFCntUp: 43,
 					PendingRequests:     []*ttnpb.MACCommand{},
 				},
-				BatteryPercentage: &pbtypes.FloatValue{Value: float32(42-1) / float32(253)},
+				BatteryPercentage: &wrapperspb.FloatValue{Value: float32(42-1) / float32(253)},
 				DownlinkMargin:    4,
 				PowerState:        ttnpb.PowerState_POWER_BATTERY,
 			},
@@ -270,7 +271,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 						ttnpb.MACCommandIdentifier_CID_DEV_STATUS.MACCommand(),
 					},
 				},
-				BatteryPercentage: &pbtypes.FloatValue{Value: 0.44},
+				BatteryPercentage: &wrapperspb.FloatValue{Value: 0.44},
 				PowerState:        ttnpb.PowerState_POWER_BATTERY,
 			},
 			Expected: &ttnpb.EndDevice{
@@ -303,7 +304,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 						ttnpb.MACCommandIdentifier_CID_DEV_STATUS.MACCommand(),
 					},
 				},
-				BatteryPercentage: &pbtypes.FloatValue{Value: 0.44},
+				BatteryPercentage: &wrapperspb.FloatValue{Value: 0.44},
 				PowerState:        ttnpb.PowerState_POWER_BATTERY,
 			},
 			Expected: &ttnpb.EndDevice{

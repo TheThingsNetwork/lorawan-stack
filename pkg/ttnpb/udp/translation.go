@@ -20,11 +20,11 @@ import (
 	"strings"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/gpstime"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/datarate"
 	"go.thethings.network/lorawan-stack/v3/pkg/version"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 const (
@@ -151,7 +151,7 @@ func v2Metadata(rx RxPacket, gatewayID *ttnpb.GatewayIdentifiers) []*ttnpb.RxMet
 			FrequencyDrift:  signal.Fdri,
 		}
 		if signal.RSSIS != nil {
-			signalMetadata.SignalRssi = &pbtypes.FloatValue{
+			signalMetadata.SignalRssi = &wrapperspb.FloatValue{
 				Value: float32(*signal.RSSIS),
 			}
 		}

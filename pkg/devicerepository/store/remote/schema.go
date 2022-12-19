@@ -16,6 +16,7 @@ package remote
 
 import (
 	pbtypes "github.com/gogo/protobuf/types"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -188,21 +189,21 @@ func (d EndDeviceModel) ToPB(brandID, modelID string, paths ...string) (*ttnpb.E
 	if dim := d.Dimensions; dim != nil {
 		pb.Dimensions = &ttnpb.EndDeviceModel_Dimensions{}
 		if w := d.Dimensions.Width; w > 0 {
-			pb.Dimensions.Width = &pbtypes.FloatValue{Value: w}
+			pb.Dimensions.Width = &wrapperspb.FloatValue{Value: w}
 		}
 		if h := d.Dimensions.Height; h > 0 {
-			pb.Dimensions.Height = &pbtypes.FloatValue{Value: h}
+			pb.Dimensions.Height = &wrapperspb.FloatValue{Value: h}
 		}
 		if d := d.Dimensions.Diameter; d > 0 {
-			pb.Dimensions.Diameter = &pbtypes.FloatValue{Value: d}
+			pb.Dimensions.Diameter = &wrapperspb.FloatValue{Value: d}
 		}
 		if l := d.Dimensions.Length; l > 0 {
-			pb.Dimensions.Length = &pbtypes.FloatValue{Value: l}
+			pb.Dimensions.Length = &wrapperspb.FloatValue{Value: l}
 		}
 	}
 
 	if w := d.Weight; w > 0 {
-		pb.Weight = &pbtypes.FloatValue{Value: w}
+		pb.Weight = &wrapperspb.FloatValue{Value: w}
 	}
 
 	if battery := d.Battery; battery != nil {
@@ -217,15 +218,15 @@ func (d EndDeviceModel) ToPB(brandID, modelID string, paths ...string) (*ttnpb.E
 
 		if rh := oc.RelativeHumidity; rh != nil {
 			pb.OperatingConditions.RelativeHumidity = &ttnpb.EndDeviceModel_OperatingConditions_Limits{
-				Min: &pbtypes.FloatValue{Value: rh.Min},
-				Max: &pbtypes.FloatValue{Value: rh.Max},
+				Min: &wrapperspb.FloatValue{Value: rh.Min},
+				Max: &wrapperspb.FloatValue{Value: rh.Max},
 			}
 		}
 
 		if temp := oc.Temperature; temp != nil {
 			pb.OperatingConditions.Temperature = &ttnpb.EndDeviceModel_OperatingConditions_Limits{
-				Min: &pbtypes.FloatValue{Value: temp.Min},
-				Max: &pbtypes.FloatValue{Value: temp.Max},
+				Min: &wrapperspb.FloatValue{Value: temp.Min},
+				Max: &wrapperspb.FloatValue{Value: temp.Max},
 			}
 		}
 	}

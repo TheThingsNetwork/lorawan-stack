@@ -33,6 +33,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 	"gopkg.in/square/go-jose.v2"
 )
 
@@ -335,9 +336,9 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 		var signalQuality packetbroker.GatewayMetadataSignalQuality_Terrestrial
 		var localization *packetbroker.GatewayMetadataLocalization_Terrestrial
 		for _, md := range msg.Message.RxMetadata {
-			var rssiStandardDeviation *pbtypes.FloatValue
+			var rssiStandardDeviation *wrapperspb.FloatValue
 			if md.RssiStandardDeviation > 0 {
-				rssiStandardDeviation = &pbtypes.FloatValue{
+				rssiStandardDeviation = &wrapperspb.FloatValue{
 					Value: md.RssiStandardDeviation,
 				}
 			}

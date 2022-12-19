@@ -18,7 +18,6 @@ import (
 	"context"
 	"testing"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
@@ -27,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 func TestAdaptDataRate(t *testing.T) {
@@ -91,7 +91,7 @@ func TestAdaptDataRate(t *testing.T) {
 					RecentUplinks: semtechPaperUplinks,
 				},
 				MacSettings: &ttnpb.MACSettings{
-					AdrMargin: &pbtypes.FloatValue{
+					AdrMargin: &wrapperspb.FloatValue{
 						Value: 2,
 					},
 				},
@@ -122,7 +122,7 @@ func TestAdaptDataRate(t *testing.T) {
 					RecentUplinks: semtechPaperUplinks,
 				},
 				MacSettings: &ttnpb.MACSettings{
-					AdrMargin: &pbtypes.FloatValue{
+					AdrMargin: &wrapperspb.FloatValue{
 						Value: 2,
 					},
 				},
@@ -153,7 +153,7 @@ func TestAdaptDataRate(t *testing.T) {
 					RecentUplinks: semtechPaperUplinks,
 				},
 				MacSettings: &ttnpb.MACSettings{
-					AdrMargin: &pbtypes.FloatValue{
+					AdrMargin: &wrapperspb.FloatValue{
 						Value: 2,
 					},
 				},
@@ -184,7 +184,7 @@ func TestAdaptDataRate(t *testing.T) {
 					RecentUplinks: semtechPaperUplinks,
 				},
 				MacSettings: &ttnpb.MACSettings{
-					AdrMargin: &pbtypes.FloatValue{
+					AdrMargin: &wrapperspb.FloatValue{
 						Value: 2,
 					},
 				},
@@ -218,7 +218,7 @@ func TestAdaptDataRate(t *testing.T) {
 					RecentUplinks: semtechPaperUplinks,
 				},
 				MacSettings: &ttnpb.MACSettings{
-					AdrMargin: &pbtypes.FloatValue{
+					AdrMargin: &wrapperspb.FloatValue{
 						Value: 2,
 					},
 				},
@@ -252,7 +252,7 @@ func TestAdaptDataRate(t *testing.T) {
 					RecentUplinks: semtechPaperUplinks,
 				},
 				MacSettings: &ttnpb.MACSettings{
-					AdrMargin: &pbtypes.FloatValue{
+					AdrMargin: &wrapperspb.FloatValue{
 						Value: 2,
 					},
 				},
