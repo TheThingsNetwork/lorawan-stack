@@ -42,6 +42,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 func TestPba(t *testing.T) {
@@ -243,7 +244,7 @@ func TestPba(t *testing.T) {
 								Email: "tech@example.com",
 							},
 						},
-						Listed: &pbtypes.BoolValue{
+						Listed: &wrapperspb.BoolValue{
 							Value: true,
 						},
 					})

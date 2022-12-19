@@ -15,7 +15,6 @@
 package remote
 
 import (
-	pbtypes "github.com/gogo/protobuf/types"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -208,7 +207,7 @@ func (d EndDeviceModel) ToPB(brandID, modelID string, paths ...string) (*ttnpb.E
 
 	if battery := d.Battery; battery != nil {
 		pb.Battery = &ttnpb.EndDeviceModel_Battery{
-			Replaceable: &pbtypes.BoolValue{Value: d.Battery.Replaceable},
+			Replaceable: &wrapperspb.BoolValue{Value: d.Battery.Replaceable},
 			Type:        d.Battery.Type,
 		}
 	}

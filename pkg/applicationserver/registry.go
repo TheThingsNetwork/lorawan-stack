@@ -17,10 +17,10 @@ package applicationserver
 import (
 	"context"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/internal/registry"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // DeviceRegistry is a store for end devices.
@@ -106,7 +106,7 @@ var replacedEndDeviceFields = []registry.ReplacedEndDeviceField{
 		New: "skip_payload_crypto_override",
 		GetTransform: func(dev *ttnpb.EndDevice) {
 			if dev.SkipPayloadCryptoOverride == nil && dev.SkipPayloadCrypto {
-				dev.SkipPayloadCryptoOverride = &pbtypes.BoolValue{Value: true}
+				dev.SkipPayloadCryptoOverride = &wrapperspb.BoolValue{Value: true}
 			} else {
 				dev.SkipPayloadCrypto = dev.SkipPayloadCryptoOverride.GetValue()
 			}
@@ -118,7 +118,7 @@ var replacedEndDeviceFields = []registry.ReplacedEndDeviceField{
 						return errInvalidFieldValue.WithAttributes("field", "skip_payload_crypto")
 					}
 				} else {
-					dev.SkipPayloadCryptoOverride = &pbtypes.BoolValue{Value: dev.SkipPayloadCrypto}
+					dev.SkipPayloadCryptoOverride = &wrapperspb.BoolValue{Value: dev.SkipPayloadCrypto}
 				}
 			}
 			dev.SkipPayloadCrypto = false

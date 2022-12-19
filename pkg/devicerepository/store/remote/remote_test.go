@@ -281,7 +281,7 @@ func TestRemoteStore(t *testing.T) {
 				},
 				Weight: &wrapperspb.FloatValue{Value: 5},
 				Battery: &ttnpb.EndDeviceModel_Battery{
-					Replaceable: &pbtypes.BoolValue{Value: true},
+					Replaceable: &wrapperspb.BoolValue{Value: true},
 					Type:        "AAA",
 				},
 				OperatingConditions: &ttnpb.EndDeviceModel_OperatingConditions{

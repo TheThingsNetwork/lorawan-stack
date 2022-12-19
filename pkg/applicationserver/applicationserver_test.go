@@ -58,6 +58,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 type connChannels struct {
@@ -2342,7 +2343,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 	}
 	_, err := linkRegistry.Set(ctx, registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 		return &ttnpb.ApplicationLink{
-			SkipPayloadCrypto: &pbtypes.BoolValue{Value: true},
+			SkipPayloadCrypto: &wrapperspb.BoolValue{Value: true},
 		}, []string{"skip_payload_crypto"}, nil
 	})
 	if err != nil {
@@ -2470,7 +2471,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 		}
 	}()
 
-	for _, override := range []*pbtypes.BoolValue{
+	for _, override := range []*wrapperspb.BoolValue{
 		nil,
 		{Value: true},
 		{Value: false},

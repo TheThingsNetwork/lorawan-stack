@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 const listPageSize = 100
@@ -164,7 +165,7 @@ func (s *pbaServer) Register(ctx context.Context, req *ttnpb.PacketBrokerRegiste
 			TechnicalContact: &packetbroker.ContactInfoValue{
 				Value: technicalContact,
 			},
-			Listed: &pbtypes.BoolValue{
+			Listed: &wrapperspb.BoolValue{
 				Value: listed,
 			},
 		}

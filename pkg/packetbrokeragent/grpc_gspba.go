@@ -149,7 +149,7 @@ func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacket
 	}
 
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "status_public") && ttnpb.HasAnyField(req.FieldMask.GetPaths(), "online") {
-		updateReq.Online = &pbtypes.BoolValue{}
+		updateReq.Online = &wrapperspb.BoolValue{}
 		if req.Gateway.StatusPublic && req.Gateway.Online {
 			updateReq.Online.Value = true
 			updateReq.OnlineTtl = pbtypes.DurationProto(s.config.GatewayOnlineTTL)

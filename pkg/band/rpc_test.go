@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 func TestGetPhyVersions(t *testing.T) {
@@ -537,8 +538,8 @@ func TestBand_convertToBandDescription(t *testing.T) {
 				},
 
 				BootDwellTime: &ttnpb.BandDescription_DwellTime{
-					Uplinks:   &types.BoolValue{Value: true},
-					Downlinks: &types.BoolValue{Value: true},
+					Uplinks:   &wrapperspb.BoolValue{Value: true},
+					Downlinks: &wrapperspb.BoolValue{Value: true},
 				},
 			},
 		},

@@ -1035,7 +1035,7 @@ func (EndDeviceOptionNamespace) WithSkipPayloadCrypto(v bool) EndDeviceOption {
 }
 
 // WithSkipPayloadCryptoOverride returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with SkipPayloadCryptoOverride set to v.
-func (EndDeviceOptionNamespace) WithSkipPayloadCryptoOverride(v *pbtypes.BoolValue) EndDeviceOption {
+func (EndDeviceOptionNamespace) WithSkipPayloadCryptoOverride(v *wrapperspb.BoolValue) EndDeviceOption {
 	return func(x *ttnpb.EndDevice) *ttnpb.EndDevice {
 		copy := ttnpb.Clone(x)
 		copy.SkipPayloadCryptoOverride = v

@@ -19,7 +19,6 @@ import (
 	"os"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
 	"go.thethings.network/lorawan-stack/v3/pkg/email/sendgrid"
@@ -172,14 +171,14 @@ func (c Config) toProto() *ttnpb.IsConfiguration {
 		UserRegistration: &ttnpb.IsConfiguration_UserRegistration{
 			Enabled: c.UserRegistration.Enabled,
 			Invitation: &ttnpb.IsConfiguration_UserRegistration_Invitation{
-				Required: &pbtypes.BoolValue{Value: c.UserRegistration.Invitation.Required},
+				Required: &wrapperspb.BoolValue{Value: c.UserRegistration.Invitation.Required},
 				TokenTtl: ttnpb.ProtoDurationPtr(c.UserRegistration.Invitation.TokenTTL),
 			},
 			ContactInfoValidation: &ttnpb.IsConfiguration_UserRegistration_ContactInfoValidation{
-				Required: &pbtypes.BoolValue{Value: c.UserRegistration.ContactInfoValidation.Required},
+				Required: &wrapperspb.BoolValue{Value: c.UserRegistration.ContactInfoValidation.Required},
 			},
 			AdminApproval: &ttnpb.IsConfiguration_UserRegistration_AdminApproval{
-				Required: &pbtypes.BoolValue{Value: c.UserRegistration.AdminApproval.Required},
+				Required: &wrapperspb.BoolValue{Value: c.UserRegistration.AdminApproval.Required},
 			},
 			PasswordRequirements: &ttnpb.IsConfiguration_UserRegistration_PasswordRequirements{
 				MinLength:    &wrapperspb.UInt32Value{Value: uint32(c.UserRegistration.PasswordRequirements.MinLength)},
@@ -190,20 +189,20 @@ func (c Config) toProto() *ttnpb.IsConfiguration {
 			},
 		},
 		ProfilePicture: &ttnpb.IsConfiguration_ProfilePicture{
-			DisableUpload: &pbtypes.BoolValue{Value: c.ProfilePicture.DisableUpload},
-			UseGravatar:   &pbtypes.BoolValue{Value: c.ProfilePicture.UseGravatar},
+			DisableUpload: &wrapperspb.BoolValue{Value: c.ProfilePicture.DisableUpload},
+			UseGravatar:   &wrapperspb.BoolValue{Value: c.ProfilePicture.UseGravatar},
 		},
 		EndDevicePicture: &ttnpb.IsConfiguration_EndDevicePicture{
-			DisableUpload: &pbtypes.BoolValue{Value: c.ProfilePicture.DisableUpload},
+			DisableUpload: &wrapperspb.BoolValue{Value: c.ProfilePicture.DisableUpload},
 		},
 		UserRights: &ttnpb.IsConfiguration_UserRights{
-			CreateApplications:  &pbtypes.BoolValue{Value: c.UserRights.CreateApplications},
-			CreateClients:       &pbtypes.BoolValue{Value: c.UserRights.CreateClients},
-			CreateGateways:      &pbtypes.BoolValue{Value: c.UserRights.CreateGateways},
-			CreateOrganizations: &pbtypes.BoolValue{Value: c.UserRights.CreateOrganizations},
+			CreateApplications:  &wrapperspb.BoolValue{Value: c.UserRights.CreateApplications},
+			CreateClients:       &wrapperspb.BoolValue{Value: c.UserRights.CreateClients},
+			CreateGateways:      &wrapperspb.BoolValue{Value: c.UserRights.CreateGateways},
+			CreateOrganizations: &wrapperspb.BoolValue{Value: c.UserRights.CreateOrganizations},
 		},
 		AdminRights: &ttnpb.IsConfiguration_AdminRights{
-			All: &pbtypes.BoolValue{Value: c.AdminRights.All},
+			All: &wrapperspb.BoolValue{Value: c.AdminRights.All},
 		},
 	}
 }

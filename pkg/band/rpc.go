@@ -20,6 +20,7 @@ import (
 	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"golang.org/x/exp/maps"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // GetPhyVersions returns the list of supported phy versions for the given band.
@@ -182,13 +183,13 @@ func (b Band) BandDescription() *ttnpb.BandDescription {
 	}
 
 	if b.BootDwellTime.Uplinks != nil {
-		bandDescription.BootDwellTime.Uplinks = &types.BoolValue{
+		bandDescription.BootDwellTime.Uplinks = &wrapperspb.BoolValue{
 			Value: *b.BootDwellTime.Uplinks,
 		}
 	}
 
 	if b.BootDwellTime.Downlinks != nil {
-		bandDescription.BootDwellTime.Downlinks = &types.BoolValue{
+		bandDescription.BootDwellTime.Downlinks = &wrapperspb.BoolValue{
 			Value: *b.BootDwellTime.Downlinks,
 		}
 	}
