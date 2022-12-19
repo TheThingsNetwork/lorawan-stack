@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 type notificationsByCreatedAt []*ttnpb.Notification
@@ -55,7 +56,7 @@ func (st *StoreTest) TestNotificationStore(t *T) {
 	}
 	defer s.Close()
 
-	notificationData, _ := pbtypes.MarshalAny(&pbtypes.StringValue{Value: "test"})
+	notificationData, _ := pbtypes.MarshalAny(&wrapperspb.StringValue{Value: "test"})
 
 	var notifications []*ttnpb.Notification
 

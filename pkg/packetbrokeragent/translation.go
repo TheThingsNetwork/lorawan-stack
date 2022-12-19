@@ -503,11 +503,11 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 			}
 			switch s := id.Id.(type) {
 			case *packetbroker.GatewayIdentifier_Hash:
-				pbMD.ForwarderGatewayId = &pbtypes.StringValue{
+				pbMD.ForwarderGatewayId = &wrapperspb.StringValue{
 					Value: base64.StdEncoding.EncodeToString(s.Hash),
 				}
 			case *packetbroker.GatewayIdentifier_Plain:
-				pbMD.ForwarderGatewayId = &pbtypes.StringValue{
+				pbMD.ForwarderGatewayId = &wrapperspb.StringValue{
 					Value: s.Plain,
 				}
 			}

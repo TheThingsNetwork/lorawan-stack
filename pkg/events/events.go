@@ -31,6 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // Event interface.
@@ -186,7 +187,7 @@ func marshalData(data interface{}) (anyPB *pbtypes.Any, err error) {
 				return nil, err
 			}
 		} else {
-			anyPB, err = pbtypes.MarshalAny(&pbtypes.StringValue{Value: errData.Error()})
+			anyPB, err = pbtypes.MarshalAny(&wrapperspb.StringValue{Value: errData.Error()})
 			if err != nil {
 				return nil, err
 			}

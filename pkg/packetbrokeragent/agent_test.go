@@ -668,7 +668,7 @@ func TestHomeNetwork(t *testing.T) {
 								ForwarderTenantId:   "foo-tenant",
 								ForwarderClusterId:  "test",
 								ForwarderGatewayEui: types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}.Bytes(),
-								ForwarderGatewayId: &pbtypes.StringValue{
+								ForwarderGatewayId: &wrapperspb.StringValue{
 									Value: "foo-gateway",
 								},
 								HomeNetworkNetId:     types.NetID{0x0, 0x0, 0x13}.Bytes(),
@@ -698,7 +698,7 @@ func TestHomeNetwork(t *testing.T) {
 								ForwarderTenantId:   "foo-tenant",
 								ForwarderClusterId:  "test",
 								ForwarderGatewayEui: types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}.Bytes(),
-								ForwarderGatewayId: &pbtypes.StringValue{
+								ForwarderGatewayId: &wrapperspb.StringValue{
 									Value: "foo-gateway",
 								},
 								HomeNetworkNetId:     types.NetID{0x0, 0x0, 0x13}.Bytes(),
@@ -810,7 +810,7 @@ func TestHomeNetwork(t *testing.T) {
 								ForwarderTenantId:   "foo-tenant",
 								ForwarderClusterId:  "test",
 								ForwarderGatewayEui: types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}.Bytes(),
-								ForwarderGatewayId: &pbtypes.StringValue{
+								ForwarderGatewayId: &wrapperspb.StringValue{
 									Value: "foo-gateway",
 								},
 								HomeNetworkNetId:     types.NetID{0x0, 0x0, 0x13}.Bytes(),

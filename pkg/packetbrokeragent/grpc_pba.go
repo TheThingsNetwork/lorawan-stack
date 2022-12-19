@@ -156,7 +156,7 @@ func (s *pbaServer) Register(ctx context.Context, req *ttnpb.PacketBrokerRegiste
 		req := &iampb.UpdateTenantRequest{
 			NetId:    s.netID.MarshalNumber(),
 			TenantId: tenantID,
-			Name: &pbtypes.StringValue{
+			Name: &wrapperspb.StringValue{
 				Value: registration.Name,
 			},
 			AdministrativeContact: &packetbroker.ContactInfoValue{

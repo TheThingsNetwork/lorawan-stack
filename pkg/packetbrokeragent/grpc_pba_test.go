@@ -230,7 +230,7 @@ func TestPba(t *testing.T) {
 					a.So(req, should.Resemble, &iampb.UpdateTenantRequest{
 						NetId:    0x13,
 						TenantId: "foo-tenant",
-						Name: &pbtypes.StringValue{
+						Name: &wrapperspb.StringValue{
 							Value: "Test Network",
 						},
 						// NOTE: DevAddrBlocks are not updated here, as the tenant cannot change their own DevAddr blocks.
