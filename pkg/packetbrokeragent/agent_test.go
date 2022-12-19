@@ -42,6 +42,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 	"gopkg.in/square/go-jose.v2"
 )
 
@@ -167,7 +168,7 @@ func TestForwarder(t *testing.T) {
 					ForwarderClusterId: "test",
 					Message: &packetbroker.UplinkMessage{
 						GatewayId: &packetbroker.GatewayIdentifier{
-							Eui: &pbtypes.UInt64Value{
+							Eui: &wrapperspb.UInt64Value{
 								Value: 0x1122334455667788,
 							},
 							Id: &packetbroker.GatewayIdentifier_Hash{
@@ -286,7 +287,7 @@ func TestForwarder(t *testing.T) {
 					ForwarderClusterId: "test",
 					Message: &packetbroker.UplinkMessage{
 						GatewayId: &packetbroker.GatewayIdentifier{
-							Eui: &pbtypes.UInt64Value{
+							Eui: &wrapperspb.UInt64Value{
 								Value: 0x1122334455667788,
 							},
 							Id: &packetbroker.GatewayIdentifier_Hash{
@@ -567,7 +568,7 @@ func TestHomeNetwork(t *testing.T) {
 					Id:                   "test",
 					Message: &packetbroker.UplinkMessage{
 						GatewayId: &packetbroker.GatewayIdentifier{
-							Eui: &pbtypes.UInt64Value{
+							Eui: &wrapperspb.UInt64Value{
 								Value: 0x1122334455667788,
 							},
 							Id: &packetbroker.GatewayIdentifier_Plain{
@@ -741,7 +742,7 @@ func TestHomeNetwork(t *testing.T) {
 					Id:                   "test",
 					Message: &packetbroker.UplinkMessage{
 						GatewayId: &packetbroker.GatewayIdentifier{
-							Eui: &pbtypes.UInt64Value{
+							Eui: &wrapperspb.UInt64Value{
 								Value: 0x1122334455667788,
 							},
 							Id: &packetbroker.GatewayIdentifier_Plain{

@@ -233,7 +233,7 @@ func toPBGatewayIdentifier(ids gatewayIdentifier, config ForwarderConfig) *packe
 	if config.IncludeGatewayEUI && ids.GetEui() != nil {
 		eui := types.MustEUI64(ids.GetEui())
 		res = &packetbroker.GatewayIdentifier{
-			Eui: &pbtypes.UInt64Value{
+			Eui: &wrapperspb.UInt64Value{
 				Value: eui.MarshalNumber(),
 			},
 		}
@@ -366,7 +366,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 				}
 				if md.FineTimestamp > 0 {
 					teaser.FineTimestamp = true
-					locAnt.FineTimestamp = &pbtypes.UInt64Value{
+					locAnt.FineTimestamp = &wrapperspb.UInt64Value{
 						Value: md.FineTimestamp,
 					}
 				}
