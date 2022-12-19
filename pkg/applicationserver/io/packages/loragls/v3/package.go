@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/golang/protobuf/proto"
 	apppayload "go.thethings.network/lorawan-application-payload"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
@@ -32,6 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	urlutil "go.thethings.network/lorawan-stack/v3/pkg/util/url"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )

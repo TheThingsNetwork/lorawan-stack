@@ -21,7 +21,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gogo/protobuf/proto"
 	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -31,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/proto"
 )
 
 func isNil(c interface{}) bool {

@@ -15,7 +15,7 @@
 package ttnpb
 
 import (
-	proto "github.com/gogo/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 )
 

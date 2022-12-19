@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
@@ -35,6 +34,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )

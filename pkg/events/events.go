@@ -25,11 +25,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/goproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"

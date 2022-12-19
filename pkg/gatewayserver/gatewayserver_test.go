@@ -25,7 +25,6 @@ import (
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/gogo/protobuf/proto"
 	"github.com/gorilla/websocket"
 	"github.com/smartystreets/assertions"
 	ttnpbv2 "go.thethings.network/lorawan-stack-legacy/v2/pkg/ttnpb"

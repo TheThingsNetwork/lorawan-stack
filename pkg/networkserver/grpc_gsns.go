@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"runtime/trace"
 
-	"github.com/gogo/protobuf/proto"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"

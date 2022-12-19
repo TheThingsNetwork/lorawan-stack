@@ -12,7 +12,7 @@ import (
 	. "github.com/grpc-ecosystem/grpc-gateway/runtime" // nolint: golint
 
 	"github.com/gogo/protobuf/jsonpb"
-	"github.com/gogo/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 )
 
 // GoGoJSONPb is a Marshaler which marshals/unmarshals into/from JSON

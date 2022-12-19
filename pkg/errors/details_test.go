@@ -18,21 +18,10 @@ import (
 	gerrors "errors"
 	"testing"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
-
-type detail string
-
-func (s *detail) Reset()        { *s = "" }
-func (s detail) String() string { return string(s) }
-func (detail) ProtoMessage()    {}
-
-func stringDetail(s string) *detail {
-	return (*detail)(&s)
-}
 
 func TestDetails(t *testing.T) {
 	t.Parallel()
@@ -45,14 +34,4 @@ func TestDetails(t *testing.T) {
 	a.So(errors.Details(errInvalidFoo), should.BeEmpty)
 	a.So(errors.Details(errInvalidFoo.GRPCStatus().Err()), should.BeEmpty)
 	a.So(errors.Details(gerrors.New("go stdlib error")), should.BeEmpty)
-
-	err1 := errInvalidFoo.WithDetails(stringDetail("foo"), stringDetail("bar"))
-	err2 := err1.WithDetails(stringDetail("baz"))
-
-	a.So(err1, should.HaveSameErrorDefinitionAs, errInvalidFoo)
-	a.So(err1.Details(), should.Resemble, []proto.Message{stringDetail("foo"), stringDetail("bar")})
-
-	a.So(err2, should.HaveSameErrorDefinitionAs, err1)
-	a.So(err2, should.HaveSameErrorDefinitionAs, errInvalidFoo)
-	a.So(err2.Details(), should.Resemble, []proto.Message{stringDetail("foo"), stringDetail("bar"), stringDetail("baz")})
 }

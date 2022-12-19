@@ -15,9 +15,9 @@
 package band
 
 import (
-	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/proto"
 )
 
 var errDataRateNotFound = errors.DefineNotFound(

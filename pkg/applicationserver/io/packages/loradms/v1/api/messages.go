@@ -19,9 +19,9 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/golang/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/goproto"
+	"google.golang.org/protobuf/proto"
 )
 
 const (

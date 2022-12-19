@@ -19,7 +19,6 @@ import (
 	"strings"
 
 	"github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
-	"github.com/gogo/protobuf/proto"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
@@ -30,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	ttntypes "go.thethings.network/lorawan-stack/v3/pkg/types"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/proto"
 )
 
 var (

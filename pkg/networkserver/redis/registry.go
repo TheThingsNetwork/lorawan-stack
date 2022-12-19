@@ -20,7 +20,6 @@ import (
 	"runtime/trace"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/gogo/protobuf/proto"
 	"github.com/vmihailenco/msgpack/v5"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -30,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 

@@ -17,9 +17,9 @@ package store
 import (
 	"context"
 
-	"github.com/gogo/protobuf/proto"
 	"github.com/uptrace/bun"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/proto"
 )
 
 // Picture is the picture model in the database.

@@ -18,11 +18,11 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/gogo/protobuf/proto"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/formatters"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
 )
 

@@ -19,10 +19,10 @@ import (
 	"strconv"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/proto"
 )
 
 // UplinkDeduplicator is an implementation of networkserver.UplinkDeduplicator.

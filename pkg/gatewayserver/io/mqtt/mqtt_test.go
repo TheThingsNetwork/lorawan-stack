@@ -39,7 +39,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -196,7 +195,7 @@ func TestTraffic(t *testing.T) {
 	t.Run("Upstream", func(t *testing.T) {
 		for _, tc := range []struct {
 			Topic   string
-			Message protoreflect.ProtoMessage
+			Message proto.Message
 			OK      bool
 		}{
 			{

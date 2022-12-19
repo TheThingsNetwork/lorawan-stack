@@ -21,9 +21,9 @@ import (
 	"fmt"
 	"sync/atomic"
 
-	"github.com/golang/protobuf/proto"
 	uuid "github.com/satori/go.uuid"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/proto"
 )
 
 // New returns an error that formats as the given text.

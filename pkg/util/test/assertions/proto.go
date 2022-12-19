@@ -20,8 +20,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/gogo/protobuf/proto"
 	"github.com/google/go-cmp/cmp"
+	"google.golang.org/protobuf/proto"
 )
 
 func getProtoMessage(i interface{}) proto.Message {

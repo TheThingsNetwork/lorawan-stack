@@ -24,7 +24,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/gorilla/mux"
 	"github.com/jtacoma/uritemplates"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
@@ -38,6 +37,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 	"go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
 	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
+	"google.golang.org/protobuf/proto"
 )
 
 const (

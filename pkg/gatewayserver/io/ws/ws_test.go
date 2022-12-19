@@ -25,7 +25,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gogo/protobuf/proto"
 	"github.com/gorilla/websocket"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
@@ -48,6 +47,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )

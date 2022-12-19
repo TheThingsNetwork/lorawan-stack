@@ -18,11 +18,11 @@ import (
 	"encoding/base64"
 	"strings"
 
-	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"google.golang.org/protobuf/proto"
 )
 
 func encodeEventData(evt events.Event) (string, error) {

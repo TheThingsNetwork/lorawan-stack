@@ -17,7 +17,6 @@ package joinserver
 import (
 	"context"
 
-	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoservices"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
@@ -27,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 

@@ -17,7 +17,6 @@ package io
 import (
 	"time"
 
-	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/protobuf/proto"

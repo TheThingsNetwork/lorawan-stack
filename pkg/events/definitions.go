@@ -19,9 +19,9 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/i18n"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/proto"
 )
 
 const i18nPrefix = "event"

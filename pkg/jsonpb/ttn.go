@@ -21,9 +21,9 @@ import (
 	"sort"
 
 	"github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
-	"github.com/gogo/protobuf/proto"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"golang.org/x/exp/maps"
+	"google.golang.org/protobuf/proto"
 )
 
 // TTN returns the default JSONPb marshaler of The Things Stack.

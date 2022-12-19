@@ -20,13 +20,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gogo/protobuf/proto"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/proto"
 )
 
 // handleApplicationUplinkQueueTest runs a test suite on q.
