@@ -23,6 +23,7 @@ import (
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 var applicationUpFlags = util.NormalizedFlagSet()
@@ -67,7 +68,7 @@ func getStoredUpRequest(flags *pflag.FlagSet) (*ttnpb.GetStoredApplicationUpRequ
 
 	if flags.Changed("f-port") {
 		fport, _ := flags.GetUint32("f-port")
-		req.FPort = &pbtypes.UInt32Value{
+		req.FPort = &wrapperspb.UInt32Value{
 			Value: fport,
 		}
 	}
@@ -80,7 +81,7 @@ func getStoredUpRequest(flags *pflag.FlagSet) (*ttnpb.GetStoredApplicationUpRequ
 
 	if flags.Changed("limit") {
 		limit, _ := flags.GetUint32("limit")
-		req.Limit = &pbtypes.UInt32Value{
+		req.Limit = &wrapperspb.UInt32Value{
 			Value: limit,
 		}
 	}
@@ -117,7 +118,7 @@ func countStoredUpRequest(flags *pflag.FlagSet) (*ttnpb.GetStoredApplicationUpCo
 	}
 	if flags.Changed("f-port") {
 		fport, _ := flags.GetUint32("f-port")
-		req.FPort = &pbtypes.UInt32Value{
+		req.FPort = &wrapperspb.UInt32Value{
 			Value: fport,
 		}
 	}

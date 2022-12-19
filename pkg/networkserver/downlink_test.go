@@ -23,7 +23,6 @@ import (
 	"testing"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/oklog/ulid/v2"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
@@ -44,6 +43,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 func TestProcessDownlinkTask(t *testing.T) {
@@ -513,7 +513,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				},
 				MacSettings: &ttnpb.MACSettings{
 					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
-					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
+					StatusCountPeriodicity: &wrapperspb.UInt32Value{Value: 0},
 				},
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr.Bytes(),
@@ -561,7 +561,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RxWindowsAvailable: true,
 				},
 				MacSettings: &ttnpb.MACSettings{
-					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
+					StatusCountPeriodicity: &wrapperspb.UInt32Value{Value: 0},
 					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
 				},
 				Session: &ttnpb.Session{
@@ -610,7 +610,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RxWindowsAvailable: true,
 				},
 				MacSettings: &ttnpb.MACSettings{
-					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
+					StatusCountPeriodicity: &wrapperspb.UInt32Value{Value: 0},
 					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
 				},
 				Session: &ttnpb.Session{
@@ -695,7 +695,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RxWindowsAvailable: true,
 				},
 				MacSettings: &ttnpb.MACSettings{
-					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
+					StatusCountPeriodicity: &wrapperspb.UInt32Value{Value: 0},
 					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
 				},
 				Session: &ttnpb.Session{
@@ -2257,7 +2257,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					ClassCTimeout:          ttnpb.ProtoDurationPtr(42 * time.Second),
-					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
+					StatusCountPeriodicity: &wrapperspb.UInt32Value{Value: 0},
 					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
 				},
 				MacState: &ttnpb.MACState{
@@ -2319,7 +2319,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					ClassCTimeout:          ttnpb.ProtoDurationPtr(42 * time.Second),
-					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
+					StatusCountPeriodicity: &wrapperspb.UInt32Value{Value: 0},
 					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
 				},
 				MacState: &ttnpb.MACState{

@@ -20,7 +20,6 @@ import (
 	"testing"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/gpstime"
@@ -31,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 func TestNextDataDownlinkSlot(t *testing.T) {
@@ -154,7 +154,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 				},
 				MacSettings: &ttnpb.MACSettings{
 					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
-					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
+					StatusCountPeriodicity: &wrapperspb.UInt32Value{Value: 0},
 				},
 				Session: &ttnpb.Session{
 					DevAddr: test.DefaultDevAddr.Bytes(),

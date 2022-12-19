@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/oauth"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	ttntypes "go.thethings.network/lorawan-stack/v3/pkg/types"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // Config for the Identity Server.
@@ -181,11 +182,11 @@ func (c Config) toProto() *ttnpb.IsConfiguration {
 				Required: &pbtypes.BoolValue{Value: c.UserRegistration.AdminApproval.Required},
 			},
 			PasswordRequirements: &ttnpb.IsConfiguration_UserRegistration_PasswordRequirements{
-				MinLength:    &pbtypes.UInt32Value{Value: uint32(c.UserRegistration.PasswordRequirements.MinLength)},
-				MaxLength:    &pbtypes.UInt32Value{Value: uint32(c.UserRegistration.PasswordRequirements.MaxLength)},
-				MinUppercase: &pbtypes.UInt32Value{Value: uint32(c.UserRegistration.PasswordRequirements.MinUppercase)},
-				MinDigits:    &pbtypes.UInt32Value{Value: uint32(c.UserRegistration.PasswordRequirements.MinDigits)},
-				MinSpecial:   &pbtypes.UInt32Value{Value: uint32(c.UserRegistration.PasswordRequirements.MinSpecial)},
+				MinLength:    &wrapperspb.UInt32Value{Value: uint32(c.UserRegistration.PasswordRequirements.MinLength)},
+				MaxLength:    &wrapperspb.UInt32Value{Value: uint32(c.UserRegistration.PasswordRequirements.MaxLength)},
+				MinUppercase: &wrapperspb.UInt32Value{Value: uint32(c.UserRegistration.PasswordRequirements.MinUppercase)},
+				MinDigits:    &wrapperspb.UInt32Value{Value: uint32(c.UserRegistration.PasswordRequirements.MinDigits)},
+				MinSpecial:   &wrapperspb.UInt32Value{Value: uint32(c.UserRegistration.PasswordRequirements.MinSpecial)},
 			},
 		},
 		ProfilePicture: &ttnpb.IsConfiguration_ProfilePicture{

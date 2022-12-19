@@ -19,7 +19,6 @@ import (
 	"testing"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
@@ -47,7 +46,7 @@ func TestNeedsDevStatusReq(t *testing.T) {
 			InputDevice: &ttnpb.EndDevice{
 				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(scheduleAt),
 				MacSettings: &ttnpb.MACSettings{
-					StatusCountPeriodicity: &pbtypes.UInt32Value{
+					StatusCountPeriodicity: &wrapperspb.UInt32Value{
 						Value: 5,
 					},
 				},
@@ -64,7 +63,7 @@ func TestNeedsDevStatusReq(t *testing.T) {
 			InputDevice: &ttnpb.EndDevice{
 				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(scheduleAt),
 				MacSettings: &ttnpb.MACSettings{
-					StatusCountPeriodicity: &pbtypes.UInt32Value{
+					StatusCountPeriodicity: &wrapperspb.UInt32Value{
 						Value: 5,
 					},
 				},
@@ -82,7 +81,7 @@ func TestNeedsDevStatusReq(t *testing.T) {
 			InputDevice: &ttnpb.EndDevice{
 				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(scheduleAt),
 				MacSettings: &ttnpb.MACSettings{
-					StatusCountPeriodicity: &pbtypes.UInt32Value{
+					StatusCountPeriodicity: &wrapperspb.UInt32Value{
 						Value: 1000,
 					},
 					StatusTimePeriodicity: ttnpb.ProtoDurationPtr(time.Hour),
@@ -100,7 +99,7 @@ func TestNeedsDevStatusReq(t *testing.T) {
 			InputDevice: &ttnpb.EndDevice{
 				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(scheduleAt.Add(-time.Hour + time.Nanosecond)),
 				MacSettings: &ttnpb.MACSettings{
-					StatusCountPeriodicity: &pbtypes.UInt32Value{
+					StatusCountPeriodicity: &wrapperspb.UInt32Value{
 						Value: 1000,
 					},
 					StatusTimePeriodicity: ttnpb.ProtoDurationPtr(time.Hour),
@@ -118,7 +117,7 @@ func TestNeedsDevStatusReq(t *testing.T) {
 			InputDevice: &ttnpb.EndDevice{
 				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(scheduleAt.Add(-time.Hour)),
 				MacSettings: &ttnpb.MACSettings{
-					StatusCountPeriodicity: &pbtypes.UInt32Value{
+					StatusCountPeriodicity: &wrapperspb.UInt32Value{
 						Value: 1000,
 					},
 					StatusTimePeriodicity: ttnpb.ProtoDurationPtr(time.Hour),
@@ -137,7 +136,7 @@ func TestNeedsDevStatusReq(t *testing.T) {
 			InputDevice: &ttnpb.EndDevice{
 				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(scheduleAt.Add(-time.Hour - time.Nanosecond)),
 				MacSettings: &ttnpb.MACSettings{
-					StatusCountPeriodicity: &pbtypes.UInt32Value{
+					StatusCountPeriodicity: &wrapperspb.UInt32Value{
 						Value: 1000,
 					},
 					StatusTimePeriodicity: ttnpb.ProtoDurationPtr(time.Hour),

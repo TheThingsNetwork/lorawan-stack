@@ -15,7 +15,6 @@
 package networkserver
 
 import (
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
@@ -77,7 +76,7 @@ func (c MACSettingConfig) Parse() *ttnpb.MACSettings {
 		p.DesiredAdrAckDelayExponent = &ttnpb.ADRAckDelayExponentValue{Value: *c.DesiredADRAckDelayExponent}
 	}
 	if c.StatusCountPeriodicity != nil {
-		p.StatusCountPeriodicity = &pbtypes.UInt32Value{Value: *c.StatusCountPeriodicity}
+		p.StatusCountPeriodicity = &wrapperspb.UInt32Value{Value: *c.StatusCountPeriodicity}
 	}
 	return p
 }

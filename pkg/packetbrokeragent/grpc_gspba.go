@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // DefaultGatewayOnlineTTL is the default time-to-live of the online status reported to Packet Broker.
@@ -127,7 +128,7 @@ func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacket
 		var val *packetbroker.GatewayLocation_Terrestrial
 		if req.Gateway.LocationPublic && ttnpb.HasAnyField(req.FieldMask.GetPaths(), "antennas") && len(req.Gateway.Antennas) > 0 {
 			val = &packetbroker.GatewayLocation_Terrestrial{
-				AntennaCount: &pbtypes.UInt32Value{
+				AntennaCount: &wrapperspb.UInt32Value{
 					Value: uint32(len(req.Gateway.Antennas)),
 				},
 				AntennaPlacement: toPBTerrestrialAntennaPlacement(req.Gateway.Antennas[0].Placement),
@@ -137,7 +138,7 @@ func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacket
 			}
 		} else {
 			val = &packetbroker.GatewayLocation_Terrestrial{
-				AntennaCount: &pbtypes.UInt32Value{Value: 0},
+				AntennaCount: &wrapperspb.UInt32Value{Value: 0},
 			}
 		}
 		updateReq.GatewayLocation.Location = &packetbroker.GatewayLocation{
