@@ -4,11 +4,14 @@ package test
 
 import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 type (
 	// RootKeysOption transforms ttnpb.RootKeys and returns it.
-	// Implemetations must be pure functions with no side-effects.
+	// Implementations must be pure functions with no side-effects.
 	RootKeysOption func(*ttnpb.RootKeys) *ttnpb.RootKeys
 
 	// RootKeysOptionNamespace represents the namespace, on which various RootKeysOption are defined.
@@ -73,7 +76,7 @@ func MakeRootKeys(opts ...RootKeysOption) *ttnpb.RootKeys {
 
 type (
 	// SessionKeysOption transforms ttnpb.SessionKeys and returns it.
-	// Implemetations must be pure functions with no side-effects.
+	// Implementations must be pure functions with no side-effects.
 	SessionKeysOption func(*ttnpb.SessionKeys) *ttnpb.SessionKeys
 
 	// SessionKeysOptionNamespace represents the namespace, on which various SessionKeysOption are defined.
@@ -156,7 +159,7 @@ func MakeSessionKeys(opts ...SessionKeysOption) *ttnpb.SessionKeys {
 
 type (
 	// SessionOption transforms ttnpb.Session and returns it.
-	// Implemetations must be pure functions with no side-effects.
+	// Implementations must be pure functions with no side-effects.
 	SessionOption func(*ttnpb.Session) *ttnpb.Session
 
 	// SessionOptionNamespace represents the namespace, on which various SessionOption are defined.
@@ -266,7 +269,7 @@ func MakeSession(opts ...SessionOption) *ttnpb.Session {
 
 type (
 	// MACStateOption transforms ttnpb.MACState and returns it.
-	// Implemetations must be pure functions with no side-effects.
+	// Implementations must be pure functions with no side-effects.
 	MACStateOption func(*ttnpb.MACState) *ttnpb.MACState
 
 	// MACStateOptionNamespace represents the namespace, on which various MACStateOption are defined.
@@ -511,7 +514,7 @@ func MakeMACState(opts ...MACStateOption) *ttnpb.MACState {
 
 type (
 	// EndDeviceIdentifiersOption transforms ttnpb.EndDeviceIdentifiers and returns it.
-	// Implemetations must be pure functions with no side-effects.
+	// Implementations must be pure functions with no side-effects.
 	EndDeviceIdentifiersOption func(*ttnpb.EndDeviceIdentifiers) *ttnpb.EndDeviceIdentifiers
 
 	// EndDeviceIdentifiersOptionNamespace represents the namespace, on which various EndDeviceIdentifiersOption are defined.
@@ -594,7 +597,7 @@ func MakeEndDeviceIdentifiers(opts ...EndDeviceIdentifiersOption) *ttnpb.EndDevi
 
 type (
 	// EndDeviceOption transforms ttnpb.EndDevice and returns it.
-	// Implemetations must be pure functions with no side-effects.
+	// Implementations must be pure functions with no side-effects.
 	EndDeviceOption func(*ttnpb.EndDevice) *ttnpb.EndDevice
 
 	// EndDeviceOptionNamespace represents the namespace, on which various EndDeviceOption are defined.
