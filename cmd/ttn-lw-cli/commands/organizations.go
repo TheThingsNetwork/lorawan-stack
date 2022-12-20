@@ -170,7 +170,7 @@ var (
 			}
 			var organization ttnpb.Organization
 			if inputDecoder != nil {
-				_, err := inputDecoder.Decode(&organization)
+				err := inputDecoder.Decode(&organization)
 				if err != nil {
 					return err
 				}

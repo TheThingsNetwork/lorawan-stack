@@ -317,7 +317,7 @@ var (
 					return nil
 				}
 				var input []byte
-				if _, err := inputDecoder.Decode(&input); err != nil {
+				if err := inputDecoder.Decode(&input); err != nil {
 					return err
 				}
 				var frame ttnpb.Message

@@ -27,8 +27,9 @@ import (
 	"io"
 	"strings"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
+	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/provisioning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -164,7 +165,7 @@ type microchipATECC608AMAHTNT struct {
 	keys map[string]interface{}
 }
 
-func (m *microchipATECC608AMAHTNT) Format() *ttnpb.EndDeviceTemplateFormat {
+func (*microchipATECC608AMAHTNT) Format() *ttnpb.EndDeviceTemplateFormat {
 	return &ttnpb.EndDeviceTemplateFormat{
 		Name:           "Microchip ATECC608A-MAHTN-T Manifest File",
 		Description:    "JSON manifest file received through Microchip Purchasing & Client Services.",
@@ -174,9 +175,9 @@ func (m *microchipATECC608AMAHTNT) Format() *ttnpb.EndDeviceTemplateFormat {
 
 // Convert decodes the given manifest data.
 // The input data is an array of JWS (JSON Web Signatures).
-func (m *microchipATECC608AMAHTNT) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDeviceTemplate) error {
-	defer close(ch)
-
+func (m *microchipATECC608AMAHTNT) Convert(
+	_ context.Context, r io.Reader, f func(*ttnpb.EndDeviceTemplate) error,
+) error {
 	dec := json.NewDecoder(r)
 	delim, err := dec.Token()
 	if err != nil {
@@ -200,12 +201,8 @@ func (m *microchipATECC608AMAHTNT) Convert(ctx context.Context, r io.Reader, ch 
 		if err != nil {
 			return errMicrochipData.WithCause(err)
 		}
-		m := make(map[string]interface{})
-		if err := json.Unmarshal(buf, &m); err != nil {
-			return errMicrochipData.WithCause(err)
-		}
-		s, err := gogoproto.Struct(m)
-		if err != nil {
+		s := &pbtypes.Struct{}
+		if err := jsonpb.TTN().Unmarshal(buf, s); err != nil {
 			return errMicrochipData.WithCause(err)
 		}
 		sn := s.Fields["uniqueId"].GetStringValue()
@@ -230,10 +227,8 @@ func (m *microchipATECC608AMAHTNT) Convert(ctx context.Context, r io.Reader, ch 
 			),
 			MappingKey: sn,
 		}
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case ch <- tmpl:
+		if err := f(tmpl); err != nil {
+			return err
 		}
 	}
 	return nil
@@ -244,7 +239,7 @@ type microchipATECC608TNGLORA struct {
 	keys map[string]interface{}
 }
 
-func (m *microchipATECC608TNGLORA) Format() *ttnpb.EndDeviceTemplateFormat {
+func (*microchipATECC608TNGLORA) Format() *ttnpb.EndDeviceTemplateFormat {
 	return &ttnpb.EndDeviceTemplateFormat{
 		Name:           "Microchip ATECC608A-TNGLORA Manifest File",
 		Description:    "JSON manifest file received through Microchip Purchasing & Client Services.",
@@ -253,16 +248,20 @@ func (m *microchipATECC608TNGLORA) Format() *ttnpb.EndDeviceTemplateFormat {
 }
 
 var (
-	errMicrochipNoCertificate  = errors.DefineInvalidArgument("microchip_no_certificate", "no Microchip certificate found")
-	errMicrochipCertificateSAN = errors.DefineInvalidArgument("microchip_certificate_san", "invalid Microchip certificate Subject Alternate Name")
-	errMicrochipUnknownDevEUI  = errors.DefineInvalidArgument("microchip_unknown_dev_eui", "unknown Microchip DevEUI")
+	errMicrochipNoCertificate = errors.DefineInvalidArgument(
+		"microchip_no_certificate", "no Microchip certificate found",
+	)
+	errMicrochipCertificateSAN = errors.DefineInvalidArgument(
+		"microchip_certificate_san", "invalid Microchip certificate Subject Alternate Name",
+	)
+	errMicrochipUnknownDevEUI = errors.DefineInvalidArgument("microchip_unknown_dev_eui", "unknown Microchip DevEUI")
 )
 
 // Convert decodes the given manifest data.
 // The input data is an array of JWS (JSON Web Signatures).
-func (m *microchipATECC608TNGLORA) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDeviceTemplate) error {
-	defer close(ch)
-
+func (m *microchipATECC608TNGLORA) Convert( //nolint:gocyclo
+	_ context.Context, r io.Reader, f func(*ttnpb.EndDeviceTemplate) error,
+) error {
 	dec := json.NewDecoder(r)
 	delim, err := dec.Token()
 	if err != nil {
@@ -318,7 +317,8 @@ func (m *microchipATECC608TNGLORA) Convert(ctx context.Context, r io.Reader, ch 
 				if !ext.Id.Equal(asn1.ObjectIdentifier{2, 5, 29, 17}) {
 					continue
 				}
-				// The extension is a DirectoryName with a serial number which contains the illegal ASN.1 PrintableString character `_`:
+				// The extension is a DirectoryName with a serial number which contains
+				// the illegal ASN.1 PrintableString character `_`:
 				//  0  37: SEQUENCE {
 				// 	2  35:   [4] {
 				// 	4  33:     SEQUENCE {
@@ -359,12 +359,8 @@ func (m *microchipATECC608TNGLORA) Convert(ctx context.Context, r io.Reader, ch 
 		if devEUI.IsZero() {
 			return errMicrochipData.WithCause(errMicrochipUnknownDevEUI)
 		}
-		m := make(map[string]interface{})
-		if err := json.Unmarshal(buf, &m); err != nil {
-			return errMicrochipData.WithCause(err)
-		}
-		s, err := gogoproto.Struct(m)
-		if err != nil {
+		s := &pbtypes.Struct{}
+		if err := jsonpb.TTN().Unmarshal(buf, s); err != nil {
 			return errMicrochipData.WithCause(err)
 		}
 		sn := s.Fields["uniqueId"].GetStringValue()
@@ -393,10 +389,8 @@ func (m *microchipATECC608TNGLORA) Convert(ctx context.Context, r io.Reader, ch 
 			),
 			MappingKey: sn,
 		}
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case ch <- tmpl:
+		if err := f(tmpl); err != nil {
+			return err
 		}
 	}
 	return nil

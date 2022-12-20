@@ -94,6 +94,7 @@ require (
 	github.com/jarcoal/httpmock v1.1.0
 	github.com/jaytaylor/html2text v0.0.0-20211105163654-bc68cce691ba
 	github.com/jinzhu/gorm v1.9.16
+	github.com/json-iterator/go v1.1.12
 	github.com/jtacoma/uritemplates v1.0.0
 	github.com/kr/pretty v0.3.0
 	github.com/lib/pq v1.10.4
@@ -214,9 +215,8 @@ require (
 	github.com/jacobsa/reqtrace v0.0.0-20150505043853-245c9e0234cb // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
-	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/jstemmer/go-junit-report v0.9.1 // indirect
-	github.com/klauspost/compress v1.14.4 // indirect
+	github.com/klauspost/compress v1.15.11 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/mattn/go-ieproxy v0.0.3 // indirect

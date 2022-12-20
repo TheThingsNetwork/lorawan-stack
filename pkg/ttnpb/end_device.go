@@ -1562,3 +1562,6 @@ func (d *EndDevice) UpdateTimestamps(src *EndDevice) {
 		d.UpdatedAt = src.UpdatedAt
 	}
 }
+
+// EndDeviceFieldPathsNestedWithoutWrappers is the set of EndDevice nested paths without the wrapper paths.
+var EndDeviceFieldPathsNestedWithoutWrappers = FieldsWithoutWrappers(EndDeviceFieldPathsNested)

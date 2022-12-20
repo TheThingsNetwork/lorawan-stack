@@ -165,7 +165,7 @@ var (
 		RunE: asBulk(func(cmd *cobra.Command, args []string) (err error) {
 			var application ttnpb.Application
 			if inputDecoder != nil {
-				_, err := inputDecoder.Decode(&application)
+				err := inputDecoder.Decode(&application)
 				if err != nil {
 					return err
 				}

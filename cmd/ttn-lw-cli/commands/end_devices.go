@@ -44,7 +44,6 @@ var (
 	selectEndDeviceListFlags   = util.NormalizedFlagSet()
 	selectEndDeviceFlags       = util.NormalizedFlagSet()
 	setEndDeviceFlags          = util.NormalizedFlagSet()
-	endDeviceFlattenPaths      = []string{"provisioning_data"}
 	endDevicePictureFlags      = util.NormalizedFlagSet()
 	endDeviceLocationFlags     = util.NormalizedFlagSet()
 	getDefaultMACSettingsFlags = util.NormalizedFlagSet()
@@ -380,11 +379,13 @@ var (
 				Ids: &ttnpb.EndDeviceIdentifiers{},
 			}
 			if inputDecoder != nil {
-				decodedPaths, err := inputDecoder.Decode(device)
+				err := inputDecoder.Decode(device)
 				if err != nil {
 					return err
 				}
-				paths = append(paths, ttnpb.FlattenPaths(decodedPaths, endDeviceFlattenPaths)...)
+				decodedPaths := ttnpb.NonZeroFields(device, ttnpb.EndDeviceFieldPathsNestedWithoutWrappers...)
+				decodedPaths = ttnpb.BottomLevelFields(decodedPaths)
+				paths = ttnpb.AddFields(paths, decodedPaths...)
 
 				if abp && device.SupportsJoin {
 					logger.Warn("Reading from standard input, ignoring --abp and --multicast flags")
@@ -853,8 +854,8 @@ var (
 				}
 				for {
 					var ids ttnpb.EndDeviceIdentifiers
-					_, err := inputDecoder.Decode(&ids)
-					if err == stdio.EOF {
+					err := inputDecoder.Decode(&ids)
+					if errors.Is(err, stdio.EOF) {
 						break
 					}
 					if err != nil {
@@ -897,7 +898,7 @@ var (
 			}
 			for {
 				dev, err := stream.Recv()
-				if err == stdio.EOF {
+				if errors.Is(err, stdio.EOF) {
 					return nil
 				}
 				if err != nil {
@@ -1257,7 +1258,7 @@ This command may take end device identifiers from stdin.`,
 			var ids *ttnpb.EndDeviceIdentifiers
 			if inputDecoder != nil {
 				var dev ttnpb.EndDevice
-				if _, err := inputDecoder.Decode(&dev); err != nil {
+				if err := inputDecoder.Decode(&dev); err != nil {
 					return err
 				}
 				if dev.GetIds().GetApplicationIds().GetApplicationId() == "" {

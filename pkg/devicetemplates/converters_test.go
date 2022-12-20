@@ -48,6 +48,6 @@ func (c *mockConverter) Format() *ttnpb.EndDeviceTemplateFormat {
 	return &c.EndDeviceTemplateFormat
 }
 
-func (c *mockConverter) Convert(context.Context, io.Reader, chan<- *ttnpb.EndDeviceTemplate) error {
+func (*mockConverter) Convert(context.Context, io.Reader, func(*ttnpb.EndDeviceTemplate) error) error {
 	return nil
 }

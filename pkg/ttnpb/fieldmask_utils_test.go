@@ -232,3 +232,16 @@ func TestIncludeFields(t *testing.T) {
 	a.So(IncludeFields(paths, "a", "b", "c"), should.Resemble, paths)
 	a.So(IncludeFields(paths, "c.e.g"), should.Resemble, []string{})
 }
+
+func TestFieldsWithoutWrappers(t *testing.T) {
+	t.Parallel()
+
+	a := assertions.New(t)
+	paths := []string{
+		"a",
+		"a.b.value",
+		"a.c.value",
+		"a.c.d",
+	}
+	a.So(FieldsWithoutWrappers(paths), should.Resemble, []string{"a", "a.c.value", "a.c.d"})
+}
