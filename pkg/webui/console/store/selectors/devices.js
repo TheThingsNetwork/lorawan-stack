@@ -81,6 +81,9 @@ export const selectDeviceDerivedDownlinkFrameCount = (state, appId, devId) => {
   return derived.downlinkFrameCount
 }
 
+export const selectSelectedDeviceClaimable = state =>
+  selectDeviceStore(state).selectedDeviceClaimable
+
 // Devices.
 const selectDevsIds = createPaginationIdsSelectorByEntity(ENTITY)
 const selectDevsTotalCount = createPaginationTotalCountSelectorByEntity(ENTITY)

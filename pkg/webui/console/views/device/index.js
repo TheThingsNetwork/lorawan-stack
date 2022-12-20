@@ -43,6 +43,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import { selectJsConfig, selectAsConfig, selectNsConfig } from '@ttn-lw/lib/selectors/env'
 import { combineDeviceIds } from '@ttn-lw/lib/selectors/id'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import {
   mayReadApplicationDeviceKeys,
@@ -52,6 +53,7 @@ import {
   checkFromState,
 } from '@console/lib/feature-checks'
 
+import { getInfoByJoinEUI } from '@console/store/actions/claim'
 import { getDevice, stopDeviceEventsStream } from '@console/store/actions/devices'
 import { getApplicationLink } from '@console/store/actions/link'
 import { getNsFrequencyPlans } from '@console/store/actions/configuration'
@@ -98,10 +100,12 @@ import style from './device.styl'
     }
   },
   dispatch => ({
-    loadDeviceData: (appId, devId, deviceSelector, linkSelector, mayViewLink) => {
+    loadDeviceData: async (appId, devId, deviceSelector, linkSelector, mayViewLink) => {
       const nsEnabled = selectNsConfig().enabled
 
-      dispatch(getDevice(appId, devId, deviceSelector, { ignoreNotFound: true }))
+      const device = await dispatch(
+        attachPromise(getDevice(appId, devId, deviceSelector, { ignoreNotFound: true })),
+      )
 
       if (nsEnabled) {
         dispatch(getNsFrequencyPlans())
@@ -109,6 +113,8 @@ import style from './device.styl'
       if (mayViewLink) {
         dispatch(getApplicationLink(appId, linkSelector))
       }
+
+      dispatch(getInfoByJoinEUI({ join_eui: device.ids.join_eui }))
     },
     stopStream: id => dispatch(stopDeviceEventsStream(id)),
   }),

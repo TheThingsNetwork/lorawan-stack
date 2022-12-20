@@ -108,8 +108,8 @@ class Http {
         url: endpoint,
       }
 
-      if (method === 'get' || method === 'delete') {
-        // For GETs and DELETEs, convert payload to query params (should usually
+      if (method === 'get') {
+        // For GETs convert payload to query params (should usually
         // be field_mask only).
         config.params = this._payloadToQueryParams(payload)
       } else {

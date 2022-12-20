@@ -36,6 +36,7 @@ const messages = defineMessages({
   updateSuccess: 'End device updated',
   keysResetWarning:
     'You do not have sufficient rights to view end device keys. Only overwriting is allowed.',
+  unclaimFailure: 'An error occurred and the end device could not be unclaimed and deleted',
   validateSessionKey: '{field} must have non-zero value',
   macSettingsError:
     'There was an error and the default MAC settings for the <code>{freqPlan}</code> frequency plan could not be loaded',
