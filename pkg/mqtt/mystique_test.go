@@ -19,10 +19,10 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/log/handler/memory"
 	"go.thethings.network/lorawan-stack/v3/pkg/mqtt"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func TestLogger(t *testing.T) {
