@@ -31,7 +31,7 @@ func NewFetcherByVendorIDs() EndDeviceProfileFetcher {
 // ShouldFetchProfile dictactes if the end-device has the necessary fields to fetch its profile.
 func (*vendorIDProfileFetcher) ShouldFetchProfile(device *ttnpb.EndDevice) bool {
 	ids := device.GetLoraAllianceProfileIds()
-	return ids != nil && ids.GetVendorId() != 0 && ids.GetVendorProfileId() != 0
+	return ids.GetVendorId() != 0 && ids.GetVendorProfileId() != 0
 }
 
 // FetchProfile provides the end-device profile.
