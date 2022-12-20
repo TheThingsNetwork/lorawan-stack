@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,18 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cluster
+package cluster_test
 
 import (
+	"testing"
+
+	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 )
 
-func NewTestPeer(conn *grpc.ClientConn) Peer {
-	return &peer{
-		name:   "name",
-		roles:  []ttnpb.ClusterRole{ttnpb.ClusterRole_ACCESS},
-		target: "target",
-		conn:   conn,
-	}
+func TestPeer(t *testing.T) {
+	a := assertions.New(t)
+
+	conn := new(grpc.ClientConn)
+
+	p := cluster.NewTestPeer(conn)
+
+	a.So(p.HasRole(ttnpb.ClusterRole_APPLICATION_SERVER), should.BeFalse)
+	a.So(p.HasRole(ttnpb.ClusterRole_ACCESS), should.BeTrue)
+
+	cc, err := p.Conn()
+	a.So(err, should.BeNil)
+	a.So(cc, should.Equal, conn)
 }
