@@ -1908,7 +1908,7 @@ func TestUpdateVersionInfo(t *testing.T) { //nolint:paralleltest
 				case <-ctx.Done():
 					return
 				case stat := <-statCh:
-					buf, err := stat.Marshal()
+					buf, err := proto.Marshal(stat)
 					if err != nil {
 						cancel(err)
 						return
@@ -2113,7 +2113,7 @@ func TestBatchGetStatus(t *testing.T) {
 						case <-ctx.Done():
 							return
 						case stat := <-statCh:
-							buf, err := stat.Marshal()
+							buf, err := proto.Marshal(stat)
 							if err != nil {
 								cancel(err)
 								return

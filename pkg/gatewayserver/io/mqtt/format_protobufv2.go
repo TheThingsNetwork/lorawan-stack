@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mqtt/topics"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/datarate"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -83,7 +84,7 @@ func (protobufv2) FromDownlink(down *ttnpb.DownlinkMessage, _ *ttnpb.GatewayIden
 			Lorawan: lorawan,
 		},
 	}
-	return v2downlink.Marshal()
+	return proto.Marshal(v2downlink)
 }
 
 func (protobufv2) ToUplink(message []byte, ids *ttnpb.GatewayIdentifiers) (*ttnpb.UplinkMessage, error) {
