@@ -89,7 +89,7 @@ func (protobufv2) FromDownlink(down *ttnpb.DownlinkMessage, _ *ttnpb.GatewayIden
 
 func (protobufv2) ToUplink(message []byte, ids *ttnpb.GatewayIdentifiers) (*ttnpb.UplinkMessage, error) {
 	v2uplink := &ttnpbv2.UplinkMessage{}
-	err := v2uplink.Unmarshal(message)
+	err := proto.Unmarshal(message, v2uplink)
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +165,7 @@ var ttkgPlatformRegex = regexp.MustCompile(`The Things Gateway v1 - BL (r[0-9]+\
 
 func (protobufv2) ToStatus(message []byte, _ *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayStatus, error) {
 	v2status := &ttnpbv2.StatusMessage{}
-	err := v2status.Unmarshal(message)
+	err := proto.Unmarshal(message, v2status)
 	if err != nil {
 		return nil, err
 	}
