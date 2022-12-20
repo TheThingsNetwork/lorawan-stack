@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,40 +21,44 @@ import (
 	"sort"
 
 	"github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"golang.org/x/exp/maps"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 )
 
 // TTN returns the default JSONPb marshaler of The Things Stack.
 func TTN() *TTNMarshaler {
 	return &TTNMarshaler{
-		GoGoJSONPb: &GoGoJSONPb{
-			OrigName:    true,
-			EnumsAsInts: true,
+		JSONPb: &runtime.JSONPb{
+			MarshalOptions: protojson.MarshalOptions{
+				AllowPartial:   true,
+				UseProtoNames:  true,
+				UseEnumNumbers: true,
+			},
+			UnmarshalOptions: protojson.UnmarshalOptions{
+				AllowPartial: true,
+			},
 		},
 	}
 }
 
 // TTNMarshaler is the JSON marshaler/unmarshaler that is used in grpc-gateway.
 type TTNMarshaler struct {
-	*GoGoJSONPb
+	*runtime.JSONPb
 }
-
-// ContentType returns the content-type of the marshaler.
-func (*TTNMarshaler) ContentType() string { return "application/json" }
 
 // Marshal marshals v to JSON.
 func (m *TTNMarshaler) Marshal(v any) ([]byte, error) {
-	b, err := marshalAny(v, m.GoGoJSONPb)
+	b, err := marshalAny(v, m.JSONPb)
 	if err != nil {
 		return nil, err
 	}
-	if m.GoGoJSONPb.Indent == "" {
+	if m.JSONPb.Indent == "" {
 		return b, nil
 	}
 	var buf bytes.Buffer
-	if err = json.Indent(&buf, b, "", m.GoGoJSONPb.Indent); err != nil {
+	if err = json.Indent(&buf, b, "", m.JSONPb.Indent); err != nil {
 		return nil, err
 	}
 	return buf.Bytes(), nil
@@ -103,27 +107,27 @@ func marshalMap[X any](kv map[string]X, fallback runtime.Marshaler) ([]byte, err
 
 // NewEncoder returns a new JSON encoder that writes values to w.
 func (m *TTNMarshaler) NewEncoder(w io.Writer) runtime.Encoder {
-	return &TTNEncoder{w: w, gogo: m.GoGoJSONPb}
+	return &TTNEncoder{w: w, inner: m.JSONPb}
 }
 
 // TTNEncoder marshals values to JSON and writes them to an io.Writer.
 type TTNEncoder struct {
-	w    io.Writer
-	gogo *GoGoJSONPb
+	w     io.Writer
+	inner *runtime.JSONPb
 }
 
 // Encode marshals v to JSON and writes it to the writer.
 func (e *TTNEncoder) Encode(v any) error {
-	b, err := marshalAny(v, e.gogo)
+	b, err := marshalAny(v, e.inner)
 	if err != nil {
 		return err
 	}
-	if e.gogo.Indent == "" {
+	if e.inner.Indent == "" {
 		_, err = e.w.Write(b)
 		return err
 	}
 	var buf bytes.Buffer
-	if err = json.Indent(&buf, b, "", e.gogo.Indent); err != nil {
+	if err = json.Indent(&buf, b, "", e.inner.Indent); err != nil {
 		return err
 	}
 	_, err = io.Copy(e.w, &buf)
@@ -135,18 +139,18 @@ func (m *TTNMarshaler) Unmarshal(data []byte, v any) error {
 	if unmarshaler, ok := v.(jsonplugin.Unmarshaler); ok {
 		return jsonplugin.UnmarshalerConfig{}.Unmarshal(data, unmarshaler)
 	}
-	return m.GoGoJSONPb.Unmarshal(data, v)
+	return m.JSONPb.Unmarshal(data, v)
 }
 
 // NewDecoder returns a new JSON decoder that reads data from r.
 func (m *TTNMarshaler) NewDecoder(r io.Reader) runtime.Decoder {
-	return &TTNDecoder{d: json.NewDecoder(r), gogo: m.GoGoJSONPb}
+	return &TTNDecoder{d: json.NewDecoder(r), inner: m.JSONPb}
 }
 
 // TTNDecoder reads JSON data from an io.Reader and unmarshals that into values.
 type TTNDecoder struct {
-	d    *json.Decoder
-	gogo *GoGoJSONPb
+	d     *json.Decoder
+	inner *runtime.JSONPb
 }
 
 // Decode reads a value from the reader and unmarshals v from JSON.
@@ -159,7 +163,7 @@ func (d *TTNDecoder) Decode(v any) error {
 		}
 		return jsonplugin.UnmarshalerConfig{}.Unmarshal(data, unmarshaler)
 	}
-	return GoGoDecoderWrapper{Decoder: d.d}.Decode(v)
+	return runtime.DecoderWrapper{Decoder: d.d, UnmarshalOptions: d.inner.UnmarshalOptions}.Decode(v)
 }
 
 // TTNEventStream returns a TTN JsonPb marshaler with double newlines for
@@ -172,6 +176,6 @@ type ttnEventStream struct {
 	*TTNMarshaler
 }
 
-func (*ttnEventStream) ContentType() string { return "text/event-stream" }
+func (*ttnEventStream) ContentType(_ any) string { return "text/event-stream" }
 
 func (*ttnEventStream) Delimiter() []byte { return []byte{'\n', '\n'} }

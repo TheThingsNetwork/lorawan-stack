@@ -27,7 +27,6 @@ import (
 	"testing"
 
 	jsonplugin "github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
-	"github.com/gogo/protobuf/jsonpb"
 	"github.com/smartystreets/assertions"
 	. "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -329,24 +328,6 @@ func TestMarshalers(t *testing.T) {
 							err = got.UnmarshalText(b)
 							a.So(err, should.BeNil)
 							a.So(reflect.Indirect(reflect.ValueOf(got)).Interface(), should.Resemble, v)
-
-							sv, ok := v.(fmt.Stringer)
-							if !ok {
-								// Structs (e.g. Value wrappers) implement String() on pointer types and do not
-								// require compatibility of string and text encoding
-								return
-							}
-							var s string
-							if !a.So(func() { s = sv.String() }, should.NotPanic) {
-								t.Fatalf("Failed to call String()")
-							}
-
-							got = newV().(encoding.TextUnmarshaler)
-							err = got.UnmarshalText([]byte(s))
-							if !a.So(err, should.BeNil) {
-								t.Error(test.FormatError(err))
-							}
-							a.So(reflect.Indirect(reflect.ValueOf(got)).Interface(), should.Resemble, v)
 						})
 					}
 
@@ -391,39 +372,6 @@ func TestMarshalers(t *testing.T) {
 								t.Error(test.FormatError(err))
 							}
 							a.So(reflect.Indirect(reflect.ValueOf(got)).Interface(), should.Resemble, v)
-						})
-					}
-
-					if m, ok := v.(jsonpb.JSONPBMarshaler); ok {
-						t.Run("JSONPB", func(t *testing.T) {
-							a := assertions.New(t)
-							b, err := m.MarshalJSONPB(&jsonpb.Marshaler{})
-							if !a.So(err, should.BeNil) {
-								t.Error(test.FormatError(err))
-							}
-							outLines = append(outLines, fmt.Sprintf(`JSONPB | %s | %v | %s`, typName, v, b))
-
-							{
-								got, ok := newV().(jsonpb.JSONPBUnmarshaler)
-								if !ok {
-									t.Fatalf("%T does not implement JSONPBUnmarshaler", newV())
-								}
-
-								err = got.UnmarshalJSONPB(&jsonpb.Unmarshaler{}, b)
-								if !a.So(err, should.BeNil) {
-									t.Error(test.FormatError(err))
-								}
-								a.So(reflect.Indirect(reflect.ValueOf(got)).Interface(), should.Resemble, v)
-							}
-
-							{
-								got := newV()
-								err = json.Unmarshal(b, got)
-								if !a.So(err, should.BeNil) {
-									t.Error(test.FormatError(err))
-								}
-								a.So(reflect.Indirect(reflect.ValueOf(got)).Interface(), should.Resemble, v)
-							}
 						})
 					}
 
