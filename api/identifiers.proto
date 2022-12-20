@@ -160,6 +160,7 @@ message EndDeviceVersionIdentifiers {
   string hardware_version = 3 [(validate.rules).string.max_len = 32];
   string firmware_version = 4 [(validate.rules).string.max_len = 32];
   string band_id = 5 [(validate.rules).string.max_len = 32];
+  reserved 6, 7, 8; // vendor_id, vendor_profile_id, serial_number
 }
 
 // Identifies a Network Server.
