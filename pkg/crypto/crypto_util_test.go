@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,16 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package crypto_test
+package crypto
 
-import (
-	"testing"
-
-	"github.com/smartystreets/assertions"
-	. "go.thethings.network/lorawan-stack/v3/pkg/crypto"
-	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
-)
-
-func TestReverse(t *testing.T) {
-	assertions.New(t).So(Reverse([]byte{1, 2, 3, 4}), should.Resemble, []byte{4, 3, 2, 1})
-}
+var Reverse = reverse
