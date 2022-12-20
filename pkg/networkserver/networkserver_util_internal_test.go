@@ -338,6 +338,8 @@ func MakeInteropClientHandleJoinRequestChFunc(reqCh chan<- InteropClientHandleJo
 var _ ttnpb.NsJsServer = &MockNsJsServer{}
 
 type MockNsJsServer struct {
+	ttnpb.UnimplementedNsJsServer
+
 	HandleJoinFunc  func(context.Context, *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error)
 	GetNwkSKeysFunc func(context.Context, *ttnpb.SessionKeyRequest) (*ttnpb.NwkSKeysResponse, error)
 }
@@ -409,6 +411,8 @@ func (m MockNsJsClient) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRe
 var _ ttnpb.NsGsServer = &MockNsGsServer{}
 
 type MockNsGsServer struct {
+	ttnpb.UnimplementedNsGsServer
+
 	ScheduleDownlinkFunc func(context.Context, *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error)
 }
 
@@ -447,6 +451,8 @@ func MakeNsGsScheduleDownlinkChFunc(reqCh chan<- NsGsScheduleDownlinkRequest) fu
 var _ ttnpb.NsAsServer = &MockNsAsServer{}
 
 type MockNsAsServer struct {
+	ttnpb.UnimplementedNsAsServer
+
 	HandleUplinkFunc func(context.Context, *ttnpb.NsAsHandleUplinkRequest) error
 }
 

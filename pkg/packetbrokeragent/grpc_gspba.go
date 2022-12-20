@@ -50,6 +50,8 @@ type frequencyPlansStore interface {
 type GetFrequencyPlansStore func(ctx context.Context) (frequencyPlansStore, error)
 
 type gsPbaServer struct {
+	ttnpb.UnimplementedGsPbaServer
+
 	netID               types.NetID
 	clusterID           string
 	config              ForwarderConfig

@@ -25,7 +25,9 @@ import (
 )
 
 // The FooBarExampleServer is an example/test server
-type FooBarExampleServer struct{}
+type FooBarExampleServer struct {
+	UnimplementedFooBarServer
+}
 
 // Unary RPC example
 func (s *FooBarExampleServer) Unary(ctx context.Context, foo *Foo) (*Bar, error) {

@@ -35,6 +35,8 @@ import (
 const listPageSize = 100
 
 type pbaServer struct {
+	ttnpb.UnimplementedPbaServer
+
 	*Agent
 	iamConn,
 	cpConn *grpc.ClientConn

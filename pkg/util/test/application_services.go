@@ -23,6 +23,8 @@ import (
 
 // MockApplicationAccessServer is a mock ttnpb.ApplicationAccessServer used for testing.
 type MockApplicationAccessServer struct {
+	ttnpb.UnimplementedApplicationAccessServer
+
 	CreateAPIKeyFunc      func(context.Context, *ttnpb.CreateApplicationAPIKeyRequest) (*ttnpb.APIKey, error)
 	GetAPIKeyFunc         func(context.Context, *ttnpb.GetApplicationAPIKeyRequest) (*ttnpb.APIKey, error)
 	ListAPIKeysFunc       func(context.Context, *ttnpb.ListApplicationAPIKeysRequest) (*ttnpb.APIKeys, error)
