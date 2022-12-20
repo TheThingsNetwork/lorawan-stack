@@ -1009,7 +1009,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 				return nil, nil, errOutdatedData.New()
 			}
 
-			if !matched.Device.CreatedAt.Equal(stored.CreatedAt) || !matched.Device.UpdatedAt.Equal(stored.UpdatedAt) {
+			if !proto.Equal(matched.Device.CreatedAt, stored.CreatedAt) || !proto.Equal(matched.Device.UpdatedAt, stored.UpdatedAt) {
 				matched, ok, err = ns.matchAndHandleDataUplink(ctx, stored, up, true, matched.cmacFMatchingResult)
 				if err != nil {
 					return nil, nil, err
