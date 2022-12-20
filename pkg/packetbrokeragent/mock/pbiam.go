@@ -57,13 +57,16 @@ func NewPBIAM(tb testing.TB) *PBIAM {
 			}),
 		),
 	}
-	iampb.RegisterNetworkRegistryServer(iam.Server, &pbIAMRegistry{iam})
-	iampb.RegisterTenantRegistryServer(iam.Server, &pbIAMRegistry{iam})
-	iampbv2.RegisterCatalogServer(iam.Server, &pbIAMCatalog{iam})
+	iampb.RegisterNetworkRegistryServer(iam.Server, &pbIAMRegistry{PBIAM: iam})
+	iampb.RegisterTenantRegistryServer(iam.Server, &pbIAMRegistry{PBIAM: iam})
+	iampbv2.RegisterCatalogServer(iam.Server, &pbIAMCatalog{PBIAM: iam})
 	return iam
 }
 
 type pbIAMRegistry struct {
+	iampb.UnimplementedNetworkRegistryServer
+	iampb.UnimplementedTenantRegistryServer
+
 	*PBIAM
 }
 
@@ -138,6 +141,8 @@ func (s *pbIAMRegistry) DeleteTenant(ctx context.Context, req *iampb.TenantReque
 }
 
 type pbIAMCatalog struct {
+	iampbv2.UnimplementedCatalogServer
+
 	*PBIAM
 }
 

@@ -40,11 +40,13 @@ func NewPBMapper(tb testing.TB) *PBMapper {
 			}),
 		),
 	}
-	mappingpb.RegisterMapperServer(mp.Server, &pbMapper{mp})
+	mappingpb.RegisterMapperServer(mp.Server, &pbMapper{PBMapper: mp})
 	return mp
 }
 
 type pbMapper struct {
+	mappingpb.UnimplementedMapperServer
+
 	*PBMapper
 }
 

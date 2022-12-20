@@ -26,6 +26,8 @@ import (
 
 // PBControlPlane is a mock Packet Broker Control Plane.
 type PBControlPlane struct {
+	routingpb.UnimplementedPolicyManagerServer
+
 	*grpc.Server
 	ListDefaultPoliciesHandler     func(ctx context.Context, req *routingpb.ListDefaultPoliciesRequest) (*routingpb.ListDefaultPoliciesResponse, error)
 	GetDefaultPolicyHandler        func(ctx context.Context, req *routingpb.GetDefaultPolicyRequest) (*routingpb.GetPolicyResponse, error)

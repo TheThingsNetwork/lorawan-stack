@@ -26,6 +26,8 @@ import (
 )
 
 type nsPbaServer struct {
+	ttnpb.UnimplementedNsPbaServer
+
 	contextDecoupler contextDecoupler
 	downstreamCh     chan *downlinkMessage
 	frequencyPlans   GetFrequencyPlansStore
