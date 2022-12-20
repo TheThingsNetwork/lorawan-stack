@@ -62,6 +62,7 @@ const (
 	scheduleAnytimeDelayField           = "schedule_anytime_delay"
 	scheduleDownlinkLateField           = "schedule_downlink_late"
 	secretField                         = "secret"
+	serialNumberField                   = "serial_number"
 	serviceProfileIDField               = "service_profile_id"
 	skipAuthorizationField              = "skip_authorization"
 	stateDescriptionField               = "state_description"
@@ -73,7 +74,10 @@ const (
 	temporaryPasswordCreatedAtField     = "temporary_password_created_at"
 	temporaryPasswordExpiresAtField     = "temporary_password_expires_at"
 	temporaryPasswordField              = "temporary_password"
+	loraAllianceProfileIdsField         = "lora_alliance_profile_ids"
 	updateChannelField                  = "update_channel"
 	updateLocationFromStatusField       = "update_location_from_status"
 	versionIDsField                     = "version_ids"
+	vendorIDField                       = "lora_alliance_profile_ids.vendor_id"
+	vendorProfileIDField                = "lora_alliance_profile_ids.vendor_profile_id"
 )

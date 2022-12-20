@@ -1107,30 +1107,6 @@ func (m *EndDeviceVersionIdentifiers) ValidateFields(paths ...string) error {
 				}
 			}
 
-		case "vendor_id":
-			// no validation rules for VendorId
-		case "vendor_profile_id":
-			// no validation rules for VendorProfileId
-		case "serial_number":
-
-			if m.GetSerialNumber() != "" {
-
-				if utf8.RuneCountInString(m.GetSerialNumber()) > 36 {
-					return EndDeviceVersionIdentifiersValidationError{
-						field:  "serial_number",
-						reason: "value length must be at most 36 runes",
-					}
-				}
-
-				if !_EndDeviceVersionIdentifiers_SerialNumber_Pattern.MatchString(m.GetSerialNumber()) {
-					return EndDeviceVersionIdentifiersValidationError{
-						field:  "serial_number",
-						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
-					}
-				}
-
-			}
-
 		default:
 			return EndDeviceVersionIdentifiersValidationError{
 				field:  name,
@@ -1201,8 +1177,6 @@ var _ interface {
 var _EndDeviceVersionIdentifiers_BrandId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 var _EndDeviceVersionIdentifiers_ModelId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
-
-var _EndDeviceVersionIdentifiers_SerialNumber_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on NetworkIdentifiers with the rules
 // defined in the proto definition for this message. If any rules are
@@ -1342,3 +1316,89 @@ var _ interface {
 } = NetworkIdentifiersValidationError{}
 
 var _NetworkIdentifiers_TenantId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$")
+
+// ValidateFields checks the field values on LoRaAllianceProfileIdentifiers
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *LoRaAllianceProfileIdentifiers) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = LoRaAllianceProfileIdentifiersFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "vendor_id":
+			// no validation rules for VendorId
+		case "vendor_profile_id":
+			// no validation rules for VendorProfileId
+		default:
+			return LoRaAllianceProfileIdentifiersValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// LoRaAllianceProfileIdentifiersValidationError is the validation error
+// returned by LoRaAllianceProfileIdentifiers.ValidateFields if the designated
+// constraints aren't met.
+type LoRaAllianceProfileIdentifiersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoRaAllianceProfileIdentifiersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoRaAllianceProfileIdentifiersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoRaAllianceProfileIdentifiersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoRaAllianceProfileIdentifiersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoRaAllianceProfileIdentifiersValidationError) ErrorName() string {
+	return "LoRaAllianceProfileIdentifiersValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e LoRaAllianceProfileIdentifiersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLoRaAllianceProfileIdentifiers.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoRaAllianceProfileIdentifiersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoRaAllianceProfileIdentifiersValidationError{}

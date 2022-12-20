@@ -1495,6 +1495,12 @@
                       "type": "string",
                       "format": "date-time",
                       "description": "Timestamp when a device uplink has been last observed.\nThis field is set by the Application Server and stored in the Identity Server."
+                    },
+                    "serial_number": {
+                      "type": "string"
+                    },
+                    "lora_alliance_profile_ids": {
+                      "$ref": "#/definitions/v3LoRaAllianceProfileIdentifiers"
                     }
                   },
                   "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -1800,6 +1806,12 @@
                       "type": "string",
                       "format": "date-time",
                       "description": "Timestamp when a device uplink has been last observed.\nThis field is set by the Application Server and stored in the Identity Server."
+                    },
+                    "serial_number": {
+                      "type": "string"
+                    },
+                    "lora_alliance_profile_ids": {
+                      "$ref": "#/definitions/v3LoRaAllianceProfileIdentifiers"
                     }
                   },
                   "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -2990,6 +3002,12 @@
                       "type": "string",
                       "format": "date-time",
                       "description": "Timestamp when a device uplink has been last observed.\nThis field is set by the Application Server and stored in the Identity Server."
+                    },
+                    "serial_number": {
+                      "type": "string"
+                    },
+                    "lora_alliance_profile_ids": {
+                      "$ref": "#/definitions/v3LoRaAllianceProfileIdentifiers"
                     }
                   },
                   "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -3299,6 +3317,12 @@
                       "type": "string",
                       "format": "date-time",
                       "description": "Timestamp when a device uplink has been last observed.\nThis field is set by the Application Server and stored in the Identity Server."
+                    },
+                    "serial_number": {
+                      "type": "string"
+                    },
+                    "lora_alliance_profile_ids": {
+                      "$ref": "#/definitions/v3LoRaAllianceProfileIdentifiers"
                     }
                   },
                   "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -6653,28 +6677,6 @@
             "type": "string"
           },
           {
-            "name": "version_ids.vendor_id",
-            "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.vendor_profile_id",
-            "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.serial_number",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
             "name": "field_mask",
             "description": "Field mask paths.",
             "in": "query",
@@ -6737,28 +6739,6 @@
           },
           {
             "name": "version_ids.hardware_version",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "version_ids.vendor_id",
-            "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.vendor_profile_id",
-            "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.serial_number",
             "in": "query",
             "required": false,
             "type": "string"
@@ -6831,28 +6811,6 @@
             "type": "string"
           },
           {
-            "name": "version_ids.vendor_id",
-            "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.vendor_profile_id",
-            "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.serial_number",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
             "name": "field_mask",
             "description": "Field mask paths.",
             "in": "query",
@@ -6915,28 +6873,6 @@
           },
           {
             "name": "version_ids.hardware_version",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "version_ids.vendor_id",
-            "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.vendor_profile_id",
-            "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.serial_number",
             "in": "query",
             "required": false,
             "type": "string"
@@ -7103,28 +7039,6 @@
           },
           {
             "name": "version_ids.band_id",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "version_ids.vendor_id",
-            "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.vendor_profile_id",
-            "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.serial_number",
             "in": "query",
             "required": false,
             "type": "string"
@@ -7426,28 +7340,6 @@
             "type": "string"
           },
           {
-            "name": "version_ids.vendor_id",
-            "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.vendor_profile_id",
-            "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.serial_number",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
             "name": "field_mask",
             "description": "Field mask paths.",
             "in": "query",
@@ -7510,28 +7402,6 @@
           },
           {
             "name": "version_ids.hardware_version",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "version_ids.vendor_id",
-            "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.vendor_profile_id",
-            "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.serial_number",
             "in": "query",
             "required": false,
             "type": "string"
@@ -7604,28 +7474,6 @@
             "type": "string"
           },
           {
-            "name": "version_ids.vendor_id",
-            "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.vendor_profile_id",
-            "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.serial_number",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
             "name": "field_mask",
             "description": "Field mask paths.",
             "in": "query",
@@ -7688,28 +7536,6 @@
           },
           {
             "name": "version_ids.hardware_version",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "version_ids.vendor_id",
-            "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.vendor_profile_id",
-            "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.serial_number",
             "in": "query",
             "required": false,
             "type": "string"
@@ -7876,28 +7702,6 @@
           },
           {
             "name": "version_ids.band_id",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "version_ids.vendor_id",
-            "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.vendor_profile_id",
-            "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "version_ids.serial_number",
             "in": "query",
             "required": false,
             "type": "string"
@@ -10427,6 +10231,12 @@
                       "type": "string",
                       "format": "date-time",
                       "description": "Timestamp when a device uplink has been last observed.\nThis field is set by the Application Server and stored in the Identity Server."
+                    },
+                    "serial_number": {
+                      "type": "string"
+                    },
+                    "lora_alliance_profile_ids": {
+                      "$ref": "#/definitions/v3LoRaAllianceProfileIdentifiers"
                     }
                   },
                   "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -10736,6 +10546,12 @@
                       "type": "string",
                       "format": "date-time",
                       "description": "Timestamp when a device uplink has been last observed.\nThis field is set by the Application Server and stored in the Identity Server."
+                    },
+                    "serial_number": {
+                      "type": "string"
+                    },
+                    "lora_alliance_profile_ids": {
+                      "$ref": "#/definitions/v3LoRaAllianceProfileIdentifiers"
                     }
                   },
                   "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -11218,6 +11034,12 @@
                       "type": "string",
                       "format": "date-time",
                       "description": "Timestamp when a device uplink has been last observed.\nThis field is set by the Application Server and stored in the Identity Server."
+                    },
+                    "serial_number": {
+                      "type": "string"
+                    },
+                    "lora_alliance_profile_ids": {
+                      "$ref": "#/definitions/v3LoRaAllianceProfileIdentifiers"
                     }
                   },
                   "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -11527,6 +11349,12 @@
                       "type": "string",
                       "format": "date-time",
                       "description": "Timestamp when a device uplink has been last observed.\nThis field is set by the Application Server and stored in the Identity Server."
+                    },
+                    "serial_number": {
+                      "type": "string"
+                    },
+                    "lora_alliance_profile_ids": {
+                      "$ref": "#/definitions/v3LoRaAllianceProfileIdentifiers"
                     }
                   },
                   "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -21083,6 +20911,12 @@
           "type": "string",
           "format": "date-time",
           "description": "Timestamp when a device uplink has been last observed.\nThis field is set by the Application Server and stored in the Identity Server."
+        },
+        "serial_number": {
+          "type": "string"
+        },
+        "lora_alliance_profile_ids": {
+          "$ref": "#/definitions/v3LoRaAllianceProfileIdentifiers"
         }
       },
       "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
@@ -21341,19 +21175,6 @@
           "type": "string"
         },
         "band_id": {
-          "type": "string"
-        },
-        "vendor_id": {
-          "type": "integer",
-          "format": "int64",
-          "description": "VendorID managed by the LoRa Alliance, as defined in TR005."
-        },
-        "vendor_profile_id": {
-          "type": "integer",
-          "format": "int64",
-          "description": "ID of the LoRaWAN end device profile assigned by the vendor."
-        },
-        "serial_number": {
           "type": "string"
         }
       },
@@ -22419,6 +22240,21 @@
           "items": {
             "$ref": "#/definitions/v3Notification"
           }
+        }
+      }
+    },
+    "v3LoRaAllianceProfileIdentifiers": {
+      "type": "object",
+      "properties": {
+        "vendor_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "VendorID managed by the LoRa Alliance, as defined in TR005."
+        },
+        "vendor_profile_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID of the LoRaWAN end device profile assigned by the vendor."
         }
       }
     },

@@ -49,12 +49,16 @@ type EndDevice struct {
 	ApplicationServerAddress string `gorm:"type:VARCHAR"`
 	JoinServerAddress        string `gorm:"type:VARCHAR"`
 
+	SerialNumber     string `gorm:"type:VARCHAR(16)"`
 	ServiceProfileID string `gorm:"type:VARCHAR"`
 
 	Locations []EndDeviceLocation
 
 	Picture   *Picture
 	PictureID *string `gorm:"type:UUID;index:end_device_picture_index"`
+
+	VendorID        uint32 `gorm:"type:INTEGER"`
+	VendorProfileID uint32 `gorm:"type:INTEGER"`
 
 	ActivatedAt *time.Time `gorm:"default:null"`
 	LastSeenAt  *time.Time `gorm:"default:null"`
@@ -73,6 +77,13 @@ func mustEndDeviceVersionIDs(pb *ttnpb.EndDevice) *ttnpb.EndDeviceVersionIdentif
 		pb.VersionIds = &ttnpb.EndDeviceVersionIdentifiers{}
 	}
 	return pb.VersionIds
+}
+
+func mustEndDeviceTr005IDs(pb *ttnpb.EndDevice) *ttnpb.LoRaAllianceProfileIdentifiers {
+	if pb.LoraAllianceProfileIds == nil {
+		pb.LoraAllianceProfileIds = &ttnpb.LoRaAllianceProfileIdentifiers{}
+	}
+	return pb.LoraAllianceProfileIds
 }
 
 // functions to set fields from the device model into the device proto.
@@ -137,8 +148,23 @@ var devicePBSetters = map[string]func(*ttnpb.EndDevice, *EndDevice){
 	joinServerAddressField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
 		pb.JoinServerAddress = dev.JoinServerAddress
 	},
+	serialNumberField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
+		pb.SerialNumber = dev.SerialNumber
+	},
 	serviceProfileIDField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
 		pb.ServiceProfileId = dev.ServiceProfileID
+	},
+	loraAllianceProfileIdsField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
+		pb.LoraAllianceProfileIds = &ttnpb.LoRaAllianceProfileIdentifiers{
+			VendorId:        dev.VendorID,
+			VendorProfileId: dev.VendorProfileID,
+		}
+	},
+	vendorIDField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
+		mustEndDeviceTr005IDs(pb).VendorId = dev.VendorID
+	},
+	vendorProfileIDField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
+		mustEndDeviceTr005IDs(pb).VendorProfileId = dev.VendorProfileID
 	},
 	locationsField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
 		pb.Locations = deviceLocations(dev.Locations).toMap()
@@ -216,8 +242,27 @@ var deviceModelSetters = map[string]func(*EndDevice, *ttnpb.EndDevice){
 	joinServerAddressField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
 		dev.JoinServerAddress = pb.JoinServerAddress
 	},
+	serialNumberField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
+		dev.SerialNumber = pb.SerialNumber
+	},
 	serviceProfileIDField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
 		dev.ServiceProfileID = pb.ServiceProfileId
+	},
+	loraAllianceProfileIdsField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
+		if pb.LoraAllianceProfileIds != nil {
+			dev.VendorID = pb.LoraAllianceProfileIds.VendorId
+			dev.VendorProfileID = pb.LoraAllianceProfileIds.VendorProfileId
+		}
+	},
+	vendorIDField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
+		if pb.LoraAllianceProfileIds != nil {
+			dev.VendorID = pb.LoraAllianceProfileIds.VendorId
+		}
+	},
+	vendorProfileIDField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
+		if pb.LoraAllianceProfileIds != nil {
+			dev.VendorProfileID = pb.LoraAllianceProfileIds.VendorProfileId
+		}
 	},
 	locationsField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
 		dev.Locations = deviceLocations(dev.Locations).updateFromMap(pb.Locations)
@@ -286,7 +331,11 @@ var deviceColumnNames = map[string][]string{
 	networkServerAddressField:     {networkServerAddressField},
 	applicationServerAddressField: {applicationServerAddressField},
 	joinServerAddressField:        {joinServerAddressField},
+	serialNumberField:             {serialNumberField},
 	serviceProfileIDField:         {serviceProfileIDField},
+	vendorIDField:                 {"vendor_id"},
+	vendorProfileIDField:          {"vendor_profile_id"},
+	loraAllianceProfileIdsField:   {"vendor_id", "vendor_profile_id"},
 	locationsField:                {},
 	activatedAtField:              {activatedAtField},
 	lastSeenAtField:               {lastSeenAtField},

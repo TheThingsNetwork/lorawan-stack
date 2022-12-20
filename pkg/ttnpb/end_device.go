@@ -999,8 +999,16 @@ func (v *EndDeviceVersionIdentifiers) FieldIsZero(p string) bool {
 		return v.ModelId == ""
 	case "band_id":
 		return v.BandId == ""
-	case "serial_number":
-		return v.SerialNumber == ""
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *LoRaAllianceProfileIdentifiers) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
 	case "vendor_id":
 		return v.VendorId == 0
 	case "vendor_profile_id":
@@ -1351,6 +1359,8 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 		return v.RootKeys.FieldIsZero("nwk_key.key")
 	case "root_keys.root_key_id":
 		return v.RootKeys.FieldIsZero("root_key_id")
+	case "serial_number":
+		return v.SerialNumber == ""
 	case "service_profile_id":
 		return v.ServiceProfileId == ""
 	case "session":
@@ -1415,6 +1425,12 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 		return !v.SupportsClassC
 	case "supports_join":
 		return !v.SupportsJoin
+	case "lora_alliance_profile_ids":
+		return v.LoraAllianceProfileIds == nil
+	case "lora_alliance_profile_ids.vendor_id":
+		return v.LoraAllianceProfileIds.FieldIsZero("vendor_id")
+	case "lora_alliance_profile_ids.vendor_profile_id":
+		return v.LoraAllianceProfileIds.FieldIsZero("vendor_profile_id")
 	case "updated_at":
 		return v.UpdatedAt == nil
 	case "used_dev_nonces":
@@ -1431,12 +1447,6 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 		return v.VersionIds.FieldIsZero("model_id")
 	case "version_ids.band_id":
 		return v.VersionIds.FieldIsZero("band_id")
-	case "version_ids.serial_number":
-		return v.VersionIds.FieldIsZero("serial_number")
-	case "version_ids.vendor_id":
-		return v.VersionIds.FieldIsZero("vendor_id")
-	case "version_ids.vendor_profile_id":
-		return v.VersionIds.FieldIsZero("vendor_profile_id")
 	}
 	switch {
 	case strings.HasPrefix(p, "mac_state."):

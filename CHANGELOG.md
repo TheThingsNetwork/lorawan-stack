@@ -11,11 +11,18 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- List of end-devices can now be sorted by `last_seen_at` field. Unseen devices will be shown last.
+- End devices now contain `lora_alliance_profile_ids` field.
+
 ### Changed
+
+- `serial_number` field is now moved to the root of the end device structure. `vendor_id` and `vendor_profile_id` are now moved to the `lora_alliance_profile_ids`. This requires a database migration in the Identity Server.
 
 ### Deprecated
 
 ### Removed
+
+- The device version identifiers no longer have the `serial_number`, `vendor_id` and `vendor_profile_id` fields.
 
 ### Fixed
 
@@ -56,6 +63,7 @@ For details about compatibility between different releases, see the **Commitment
 - Client creation with an organization API key will no longer send an email without user information to the admins. Instead, the API key name will be used and if that is empty the API key ID will be the default.
 - Allow providing DevEUI for ABP end devices with a LoRaWAN specification lower or equal to 1.0.4 in the end device onboarding screen in the Console.
 - Faulty field validation for byte payloads in the uplink payload formatter panel in the Console.
+- `serial_number` field is now properly stored.
 
 ## [3.22.2] - 2022-11-10
 

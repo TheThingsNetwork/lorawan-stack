@@ -2920,6 +2920,17 @@ func (x *EndDevice) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 			gogo.MarshalTimestamp(s, x.LastSeenAt)
 		}
 	}
+	if x.SerialNumber != "" || s.HasField("serial_number") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("serial_number")
+		s.WriteString(x.SerialNumber)
+	}
+	if x.LoraAllianceProfileIds != nil || s.HasField("lora_alliance_profile_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("lora_alliance_profile_ids")
+		// NOTE: LoRaAllianceProfileIdentifiers does not seem to implement MarshalProtoJSON.
+		gogo.MarshalMessage(s, x.LoraAllianceProfileIds)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -3242,6 +3253,19 @@ func (x *EndDevice) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				return
 			}
 			x.LastSeenAt = v
+		case "serial_number", "serialNumber":
+			s.AddField("serial_number")
+			x.SerialNumber = s.ReadString()
+		case "lora_alliance_profile_ids", "loraAllianceProfileIds":
+			s.AddField("lora_alliance_profile_ids")
+			if s.ReadNil() {
+				x.LoraAllianceProfileIds = nil
+				return
+			}
+			// NOTE: LoRaAllianceProfileIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v LoRaAllianceProfileIdentifiers
+			gogo.UnmarshalMessage(s, &v)
+			x.LoraAllianceProfileIds = &v
 		}
 	})
 }

@@ -31,7 +31,8 @@ var endDeviceMask = fieldMask(
 	"name", "description", "attributes", "version_ids",
 	"network_server_address", "application_server_address", "join_server_address",
 	"service_profile_id", "locations", "picture", "activated_at", "last_seen_at",
-	"claim_authentication_code",
+	"claim_authentication_code", "serial_number",
+	"lora_alliance_profile_ids",
 )
 
 func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
@@ -42,7 +43,10 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 		is.ApplicationStore
 		is.EndDeviceStore
 	})
-	defer st.DestroyDB(t, true, "applications", "attributes", "end_device_locations", "pictures") // TODO: Make sure (at least) attributes and end_device_locations are deleted when deleting end devices.
+	defer st.DestroyDB(
+		t, true,
+		"applications", "attributes", "end_device_locations", "pictures",
+	) // TODO: Make sure (at least) attributes and end_device_locations are deleted when deleting end devices.
 	if !ok {
 		t.Skip("Store does not implement ApplicationStore and EndDeviceStore")
 	}
@@ -74,6 +78,10 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 			MimeType: "image/png",
 			Data:     []byte("foobarbaz"),
 		},
+	}
+	createdLoRaIds := &ttnpb.LoRaAllianceProfileIdentifiers{
+		VendorId:        1,
+		VendorProfileId: 1,
 	}
 	start := time.Now().Truncate(time.Second)
 	claim := &ttnpb.EndDeviceAuthenticationCode{
@@ -108,7 +116,9 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 			NetworkServerAddress:     "ns.example.com",
 			ApplicationServerAddress: "as.example.com",
 			JoinServerAddress:        "js.example.com",
+			SerialNumber:             "YYWWNNNNN1",
 			ServiceProfileId:         "some_profile_id",
+			LoraAllianceProfileIds:   createdLoRaIds,
 			Locations: map[string]*ttnpb.Location{
 				"":     location,
 				"wifi": wifiLocation,
@@ -134,7 +144,9 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 			a.So(created.NetworkServerAddress, should.Equal, "ns.example.com")
 			a.So(created.ApplicationServerAddress, should.Equal, "as.example.com")
 			a.So(created.JoinServerAddress, should.Equal, "js.example.com")
+			a.So(created.SerialNumber, should.Equal, "YYWWNNNNN1")
 			a.So(created.ServiceProfileId, should.Equal, "some_profile_id")
+			a.So(created.LoraAllianceProfileIds, should.Resemble, createdLoRaIds)
 			a.So(created.Locations, should.Resemble, map[string]*ttnpb.Location{
 				"":     location,
 				"wifi": wifiLocation,
@@ -270,7 +282,10 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 	updatedPicture := &ttnpb.Picture{
 		Sizes: map[uint32]string{0: "https://example.com/device_picture.jpg"},
 	}
-
+	updatedLoRaIds := &ttnpb.LoRaAllianceProfileIdentifiers{
+		VendorId:        2,
+		VendorProfileId: 2,
+	}
 	updatedCAC := &ttnpb.EndDeviceAuthenticationCode{
 		ValidFrom: ttnpb.ProtoTimePtr(start),
 		ValidTo:   ttnpb.ProtoTimePtr(start.Add(time.Hour)),
@@ -284,7 +299,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 		start := time.Now().Truncate(time.Second)
 		stamp := start.Add(time.Minute)
 
-		updated, err = s.UpdateEndDevice(ctx, &ttnpb.EndDevice{
+		in := &ttnpb.EndDevice{
 			Ids: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIds: application.GetIds(),
 				DeviceId:       "foo",
@@ -302,7 +317,9 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 			NetworkServerAddress:     "other-ns.example.com",
 			ApplicationServerAddress: "other-as.example.com",
 			JoinServerAddress:        "other-js.example.com",
+			SerialNumber:             "YYWWNNNNN2",
 			ServiceProfileId:         "other_profile_id",
+			LoraAllianceProfileIds:   updatedLoRaIds,
 			Locations: map[string]*ttnpb.Location{
 				"":    updatedLocation,
 				"geo": extraLocation,
@@ -311,7 +328,9 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 			ActivatedAt:             ttnpb.ProtoTimePtr(stamp),
 			LastSeenAt:              ttnpb.ProtoTimePtr(stamp),
 			ClaimAuthenticationCode: updatedCAC,
-		}, endDeviceMask)
+		}
+
+		updated, err = s.UpdateEndDevice(ctx, in, endDeviceMask)
 		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
 			a.So(updated.GetIds().GetDeviceId(), should.Equal, "foo")
 			a.So(updated.Name, should.Equal, "New Foo Name")
@@ -327,7 +346,9 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 			a.So(updated.NetworkServerAddress, should.Equal, "other-ns.example.com")
 			a.So(updated.ApplicationServerAddress, should.Equal, "other-as.example.com")
 			a.So(updated.JoinServerAddress, should.Equal, "other-js.example.com")
+			a.So(updated.SerialNumber, should.Equal, "YYWWNNNNN2")
 			a.So(updated.ServiceProfileId, should.Equal, "other_profile_id")
+			a.So(updated.LoraAllianceProfileIds, should.Resemble, updatedLoRaIds)
 			a.So(updated.Locations, should.Resemble, map[string]*ttnpb.Location{
 				"":    updatedLocation,
 				"geo": extraLocation,

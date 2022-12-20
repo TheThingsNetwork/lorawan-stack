@@ -2530,6 +2530,41 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 			} else {
 				dst.LastSeenAt = nil
 			}
+		case "serial_number":
+			if len(subs) > 0 {
+				return fmt.Errorf("'serial_number' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SerialNumber = src.SerialNumber
+			} else {
+				var zero string
+				dst.SerialNumber = zero
+			}
+		case "lora_alliance_profile_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *LoRaAllianceProfileIdentifiers
+				if (src == nil || src.LoraAllianceProfileIds == nil) && dst.LoraAllianceProfileIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.LoraAllianceProfileIds
+				}
+				if dst.LoraAllianceProfileIds != nil {
+					newDst = dst.LoraAllianceProfileIds
+				} else {
+					newDst = &LoRaAllianceProfileIdentifiers{}
+					dst.LoraAllianceProfileIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.LoraAllianceProfileIds = src.LoraAllianceProfileIds
+				} else {
+					dst.LoraAllianceProfileIds = nil
+				}
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

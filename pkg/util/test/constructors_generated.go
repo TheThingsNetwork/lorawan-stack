@@ -1061,6 +1061,24 @@ func (EndDeviceOptionNamespace) WithLastSeenAt(v *pbtypes.Timestamp) EndDeviceOp
 	}
 }
 
+// WithSerialNumber returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with SerialNumber set to v.
+func (EndDeviceOptionNamespace) WithSerialNumber(v string) EndDeviceOption {
+	return func(x *ttnpb.EndDevice) *ttnpb.EndDevice {
+		copy := ttnpb.Clone(x)
+		copy.SerialNumber = v
+		return copy
+	}
+}
+
+// WithLoraAllianceProfileIds returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with LoraAllianceProfileIds set to v.
+func (EndDeviceOptionNamespace) WithLoraAllianceProfileIds(v *ttnpb.LoRaAllianceProfileIdentifiers) EndDeviceOption {
+	return func(x *ttnpb.EndDevice) *ttnpb.EndDevice {
+		copy := ttnpb.Clone(x)
+		copy.LoraAllianceProfileIds = v
+		return copy
+	}
+}
+
 // Compose returns a functional composition of opts as a singular EndDeviceOption.
 func (EndDeviceOptionNamespace) Compose(opts ...EndDeviceOption) EndDeviceOption {
 	return func(x *ttnpb.EndDevice) *ttnpb.EndDevice {

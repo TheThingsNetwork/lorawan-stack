@@ -56,7 +56,11 @@ type EndDevice struct {
 	ApplicationServerAddress string `bun:"application_server_address,nullzero"`
 	JoinServerAddress        string `bun:"join_server_address,nullzero"`
 
+	SerialNumber     string `bun:"serial_number,nullzero"`
 	ServiceProfileID string `bun:"service_profile_id,nullzero"`
+
+	VendorID        uint32 `bun:"vendor_id,nullzero"`
+	VendorProfileID uint32 `bun:"vendor_profile_id,nullzero"`
 
 	Locations []*EndDeviceLocation `bun:"rel:has-many,join:id=end_device_id"`
 
@@ -128,7 +132,12 @@ func endDeviceToPB(m *EndDevice, fieldMask ...string) (*ttnpb.EndDevice, error) 
 			}
 		}(),
 
+		SerialNumber:     m.SerialNumber,
 		ServiceProfileId: m.ServiceProfileID,
+		LoraAllianceProfileIds: &ttnpb.LoRaAllianceProfileIdentifiers{
+			VendorId:        m.VendorID,
+			VendorProfileId: m.VendorProfileID,
+		},
 
 		ActivatedAt: ttnpb.ProtoTime(m.ActivatedAt),
 		LastSeenAt:  ttnpb.ProtoTime(m.LastSeenAt),
@@ -221,7 +230,11 @@ func (s *endDeviceStore) CreateEndDevice(
 		ClaimAuthenticationCodeValidFrom: cleanTimePtr(ttnpb.StdTime(pb.ClaimAuthenticationCode.GetValidFrom())),
 		ClaimAuthenticationCodeValidTo:   cleanTimePtr(ttnpb.StdTime(pb.ClaimAuthenticationCode.GetValidTo())),
 
+		SerialNumber:     pb.SerialNumber,
 		ServiceProfileID: pb.ServiceProfileId,
+
+		VendorID:        pb.LoraAllianceProfileIds.GetVendorId(),
+		VendorProfileID: pb.LoraAllianceProfileIds.GetVendorProfileId(),
 
 		ActivatedAt: cleanTimePtr(ttnpb.StdTime(pb.ActivatedAt)),
 		LastSeenAt:  cleanTimePtr(ttnpb.StdTime(pb.LastSeenAt)),
@@ -298,10 +311,16 @@ func (*endDeviceStore) selectWithFields(q *bun.SelectQuery, fieldMask store.Fiel
 				// Always selected.
 			case "name", "description",
 				"network_server_address", "application_server_address", "join_server_address",
-				"service_profile_id",
+				"service_profile_id", "serial_number",
 				"activated_at", "last_seen_at":
 				// Proto name equals model name.
 				columns = append(columns, f)
+			case "lora_alliance_profile_ids":
+				columns = append(columns, "vendor_id", "vendor_profile_id")
+			case "lora_alliance_profile_ids.vendor_id":
+				columns = append(columns, "vendor_id")
+			case "lora_alliance_profile_ids.vendor_profile_id":
+				columns = append(columns, "vendor_profile_id")
 			case "version_ids":
 				columns = append(columns, "brand_id", "model_id", "hardware_version", "firmware_version", "band_id")
 			case "attributes":
@@ -608,9 +627,32 @@ func (s *endDeviceStore) updateEndDeviceModel( //nolint:gocyclo
 			model.JoinServerAddress = pb.JoinServerAddress
 			columns = append(columns, "join_server_address")
 
+		case "serial_number":
+			model.SerialNumber = pb.SerialNumber
+			columns = append(columns, "serial_number")
+
 		case "service_profile_id":
 			model.ServiceProfileID = pb.ServiceProfileId
 			columns = append(columns, "service_profile_id")
+
+		case "lora_alliance_profile_ids":
+			if pb.LoraAllianceProfileIds != nil {
+				model.VendorID = pb.LoraAllianceProfileIds.VendorId
+				model.VendorProfileID = pb.LoraAllianceProfileIds.VendorProfileId
+				columns = append(columns, "vendor_id", "vendor_profile_id")
+			}
+
+		case "lora_alliance_profile_ids.vendor_id":
+			if pb.LoraAllianceProfileIds != nil {
+				model.VendorID = pb.LoraAllianceProfileIds.VendorId
+				columns = append(columns, "vendor_id")
+			}
+
+		case "lora_alliance_profile_ids.vendor_profile_id":
+			if pb.LoraAllianceProfileIds != nil {
+				model.VendorProfileID = pb.LoraAllianceProfileIds.VendorProfileId
+				columns = append(columns, "vendor_profile_id")
+			}
 
 		case "locations":
 			model.Locations, err = s.replaceEndDeviceLocations(

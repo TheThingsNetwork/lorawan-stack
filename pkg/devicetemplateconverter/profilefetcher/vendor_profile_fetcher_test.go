@@ -43,7 +43,7 @@ func Test_VendorIDProfileFetcher_ShouldFetchProfile(t *testing.T) {
 		{
 			name: "Valid",
 			device: &ttnpb.EndDevice{
-				VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
+				LoraAllianceProfileIds: &ttnpb.LoRaAllianceProfileIdentifiers{
 					VendorId:        10,
 					VendorProfileId: 10,
 				},
@@ -94,7 +94,7 @@ func Test_VendorIDProfileFetcher_FetchProfile(t *testing.T) {
 		{
 			name: "valid",
 			endDevice: &ttnpb.EndDevice{
-				VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
+				LoraAllianceProfileIds: &ttnpb.LoRaAllianceProfileIdentifiers{
 					VendorId:        1,
 					VendorProfileId: 1,
 				},
@@ -102,26 +102,26 @@ func Test_VendorIDProfileFetcher_FetchProfile(t *testing.T) {
 			populateMock: func(md *mockdr.MockDR) {
 				md.EndDeviceTemplate = &ttnpb.EndDeviceTemplate{
 					EndDevice: &ttnpb.EndDevice{
-						VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
+						LoraAllianceProfileIds: &ttnpb.LoRaAllianceProfileIdentifiers{
 							VendorId:        1,
 							VendorProfileId: 1,
 						},
 					},
 					FieldMask: ttnpb.FieldMask(
-						"version_ids.vendor_id",
-						"version_ids.vendor_profile_id",
+						"vendor_id",
+						"vendor_profile_id",
 					),
 				}
 			},
 			validateResp: func(a *assertions.Assertion, tmpl *ttnpb.EndDeviceTemplate) {
 				// validates if there is a mock path and all the mocked Identifiers.
 				a.So(ttnpb.RequireFields(tmpl.GetFieldMask().GetPaths(),
-					"version_ids.vendor_id",
-					"version_ids.vendor_profile_id",
+					"vendor_id",
+					"vendor_profile_id",
 				), should.BeNil)
 				a.So(
-					tmpl.GetEndDevice().GetVersionIds().GetVendorId() == 1 &&
-						tmpl.GetEndDevice().GetVersionIds().GetVendorProfileId() == 1,
+					tmpl.GetEndDevice().GetLoraAllianceProfileIds().GetVendorId() == 1 &&
+						tmpl.GetEndDevice().GetLoraAllianceProfileIds().GetVendorProfileId() == 1,
 					should.BeTrue,
 				)
 			},

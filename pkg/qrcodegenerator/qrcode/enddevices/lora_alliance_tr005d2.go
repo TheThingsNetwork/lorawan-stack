@@ -173,11 +173,11 @@ func (m *LoRaAllianceTR005Draft2) EndDeviceTemplate() *ttnpb.EndDeviceTemplate {
 			ClaimAuthenticationCode: &ttnpb.EndDeviceAuthenticationCode{
 				Value: m.DeviceValidationCode,
 			},
-			VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
+			LoraAllianceProfileIds: &ttnpb.LoRaAllianceProfileIdentifiers{
 				VendorId:        uint32(vendorID),
 				VendorProfileId: uint32(vendorProfileID),
-				SerialNumber:    m.SerialNumber,
 			},
+			SerialNumber: m.SerialNumber,
 		},
 		FieldMask: ttnpb.FieldMask(paths...),
 	}

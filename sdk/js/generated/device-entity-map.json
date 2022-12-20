@@ -158,10 +158,56 @@
       "js"
     ]
   ],
+  "serial_number": [
+    [
+      "is",
+      "as"
+    ],
+    [
+      "is",
+      "as",
+      "ns"
+    ]
+  ],
   "service_profile_id": [
     "is",
     "is"
   ],
+  "lora_alliance_profile_ids": {
+    "_root": [
+      [
+        "is",
+        "as"
+      ],
+      [
+        "is",
+        "as",
+        "ns"
+      ]
+    ],
+    "vendor_id": [
+      [
+        "is",
+        "as"
+      ],
+      [
+        "is",
+        "as",
+        "ns"
+      ]
+    ],
+    "vendor_profile_id": [
+      [
+        "is",
+        "as"
+      ],
+      [
+        "is",
+        "as",
+        "ns"
+      ]
+    ]
+  },
   "updated_at": [
     [
       "is",
@@ -238,20 +284,6 @@
       ],
       [
         "is",
-        "as",
-        "ns"
-      ]
-    ],
-    "vendor_id": [
-      "as",
-      [
-        "as",
-        "ns"
-      ]
-    ],
-    "vendor_profile_id": [
-      "as",
-      [
         "as",
         "ns"
       ]

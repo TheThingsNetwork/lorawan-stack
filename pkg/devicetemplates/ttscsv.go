@@ -169,26 +169,26 @@ var csvFieldSetters = map[string]csvFieldSetterFunc{ //nolint:gocyclo
 		return []string{"version_ids.band_id"}, nil
 	},
 	"vendor_id": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
-		if dst.VersionIds == nil {
-			dst.VersionIds = &ttnpb.EndDeviceVersionIdentifiers{}
+		if dst.LoraAllianceProfileIds == nil {
+			dst.LoraAllianceProfileIds = &ttnpb.LoRaAllianceProfileIdentifiers{}
 		}
 		s, err := strconv.ParseUint(val, 16, 32)
 		if err != nil {
 			return nil, err
 		}
-		dst.VersionIds.VendorId = uint32(s)
-		return []string{"version_ids.vendor_id"}, nil
+		dst.LoraAllianceProfileIds.VendorId = uint32(s)
+		return []string{"lora_alliance_profile_ids.vendor_id"}, nil
 	},
 	"vendor_profile_id": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
-		if dst.VersionIds == nil {
-			dst.VersionIds = &ttnpb.EndDeviceVersionIdentifiers{}
+		if dst.LoraAllianceProfileIds == nil {
+			dst.LoraAllianceProfileIds = &ttnpb.LoRaAllianceProfileIdentifiers{}
 		}
 		s, err := strconv.ParseUint(val, 16, 32)
 		if err != nil {
 			return nil, err
 		}
-		dst.VersionIds.VendorProfileId = uint32(s)
-		return []string{"version_ids.vendor_profile_id"}, nil
+		dst.LoraAllianceProfileIds.VendorProfileId = uint32(s)
+		return []string{"lora_alliance_profile_ids.vendor_profile_id"}, nil
 	},
 	"app_key": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
 		var key types.AES128Key

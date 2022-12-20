@@ -2337,6 +2337,38 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "serial_number":
+
+			if m.GetSerialNumber() != "" {
+
+				if utf8.RuneCountInString(m.GetSerialNumber()) > 36 {
+					return EndDeviceValidationError{
+						field:  "serial_number",
+						reason: "value length must be at most 36 runes",
+					}
+				}
+
+				if !_EndDevice_SerialNumber_Pattern.MatchString(m.GetSerialNumber()) {
+					return EndDeviceValidationError{
+						field:  "serial_number",
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
+			}
+
+		case "lora_alliance_profile_ids":
+
+			if v, ok := interface{}(m.GetLoraAllianceProfileIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return EndDeviceValidationError{
+						field:  "lora_alliance_profile_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return EndDeviceValidationError{
 				field:  name,
@@ -2412,6 +2444,8 @@ var _EndDevice_JoinServerAddress_Pattern = regexp.MustCompile("^(?:(?:[a-zA-Z0-9
 var _EndDevice_Locations_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 var _EndDevice_ProvisionerId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$")
+
+var _EndDevice_SerialNumber_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on EndDevices with the rules defined
 // in the proto definition for this message. If any rules are violated, an
