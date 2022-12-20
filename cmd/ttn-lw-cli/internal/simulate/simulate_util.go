@@ -16,38 +16,11 @@
 package simulate
 
 import (
-	"strings"
-
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
-
-func _processPaths(paths []string) map[string][]string {
-	if len(paths) == 0 {
-		return nil
-	}
-	pathMap := make(map[string][]string, len(paths))
-	for _, p := range paths {
-		if !strings.Contains(p, ".") {
-			pathMap[p] = nil
-			continue
-		}
-		parts := strings.SplitN(p, ".", 2)
-		h, t := parts[0], parts[1]
-		if val, ok := pathMap[h]; ok {
-			if val == nil {
-				continue
-			}
-			pathMap[h] = append(pathMap[h], t)
-		} else {
-			pathMap[h] = []string{t}
-		}
-	}
-
-	return pathMap
-}
 
 var (
 	errDataRate             = errors.DefineInvalidArgument("data_rate", "data rate is invalid")
