@@ -46,24 +46,23 @@ func TestMicrochipATECC608AMAHTNT(t *testing.T) {
 		"signature": "rOrjAQyI1FQO-RmNjS0ggA7t4U7l9epwCbTQYnyb92j2EOqZ3vNhF5RAMldvG68v6w25mKrGaPG8wdn--TSy4w"
 	}]`)
 
-	ch := make(chan *ttnpb.EndDeviceTemplate, 1)
-	err := converter.Convert(ctx, bytes.NewReader(data), ch)
-	a.So(err, should.BeNil)
-
-	entry, ok := <-ch
-	if !a.So(ok, should.BeTrue) {
-		t.FailNow()
+	calls := 0
+	f := func(entry *ttnpb.EndDeviceTemplate) error {
+		calls++
+		a.So(
+			entry.EndDevice.Ids.JoinEui,
+			should.Resemble,
+			types.EUI64{0x70, 0xB3, 0xD5, 0x7E, 0xD0, 0x00, 0x00, 0x00}.Bytes(),
+		)
+		a.So(entry.EndDevice.ProvisionerId, should.Equal, provisioning.Microchip)
+		a.So(entry.EndDevice.RootKeys.GetRootKeyId(), should.Equal, "01237a005b08bcc527")
+		a.So(entry.EndDevice.SupportsJoin, should.BeTrue)
+		a.So(entry.MappingKey, should.Equal, "01237a005b08bcc527")
+		return nil
 	}
-
-	a.So(
-		entry.EndDevice.Ids.JoinEui,
-		should.Resemble,
-		types.EUI64{0x70, 0xB3, 0xD5, 0x7E, 0xD0, 0x00, 0x00, 0x00}.Bytes(),
-	)
-	a.So(entry.EndDevice.ProvisionerId, should.Equal, provisioning.Microchip)
-	a.So(entry.EndDevice.RootKeys.GetRootKeyId(), should.Equal, "01237a005b08bcc527")
-	a.So(entry.EndDevice.SupportsJoin, should.BeTrue)
-	a.So(entry.MappingKey, should.Equal, "01237a005b08bcc527")
+	err := converter.Convert(ctx, bytes.NewReader(data), f)
+	a.So(err, should.BeNil)
+	a.So(calls, should.Equal, 1)
 }
 
 func TestMicrochipATECC608ATNGLORA(t *testing.T) {
@@ -82,14 +81,11 @@ func TestMicrochipATECC608ATNGLORA(t *testing.T) {
 	{
 		data := []byte(`garbage`)
 
-		ch := make(chan *ttnpb.EndDeviceTemplate, 1)
-		err := converter.Convert(ctx, bytes.NewReader(data), ch)
-		a.So(err, should.NotBeNil)
-
-		_, ok := <-ch
-		if !a.So(ok, should.BeFalse) {
+		err := converter.Convert(ctx, bytes.NewReader(data), func(*ttnpb.EndDeviceTemplate) error {
 			t.FailNow()
-		}
+			return nil
+		})
+		a.So(err, should.NotBeNil)
 	}
 
 	// Test bad signature.
@@ -103,14 +99,11 @@ func TestMicrochipATECC608ATNGLORA(t *testing.T) {
 			"signature": "ZFhl0AAAAAAAIOVqvmDtmYdNytq6WBK5zH1GcN0nu7VkkM1k4hbowUEfyTDZKlam3LvdPLcKM13Z6oEifQ"
 		}]`)
 
-		ch := make(chan *ttnpb.EndDeviceTemplate, 1)
-		err := converter.Convert(ctx, bytes.NewReader(data), ch)
-		a.So(err, should.NotBeNil)
-
-		_, ok := <-ch
-		if !a.So(ok, should.BeFalse) {
+		err := converter.Convert(ctx, bytes.NewReader(data), func(*ttnpb.EndDeviceTemplate) error {
 			t.FailNow()
-		}
+			return nil
+		})
+		a.So(err, should.NotBeNil)
 	}
 
 	// Test valid manifest B-generation entry.
@@ -124,30 +117,29 @@ func TestMicrochipATECC608ATNGLORA(t *testing.T) {
 			"signature": "ZFhl07osmnG8pB0AIOVqvmDtmYdNytq6WBK5zH1GcN0nu7VkkM1k4hbowUEfyTDZKlam3LvdPLcKM13Z6oEifQ"
 		}]`)
 
-		ch := make(chan *ttnpb.EndDeviceTemplate, 1)
-		err := converter.Convert(ctx, bytes.NewReader(data), ch)
-		a.So(err, should.BeNil)
-
-		entry, ok := <-ch
-		if !a.So(ok, should.BeTrue) {
-			t.FailNow()
+		calls := 0
+		f := func(entry *ttnpb.EndDeviceTemplate) error {
+			calls++
+			a.So(entry.EndDevice.Ids.DeviceId, should.Equal, "eui-0004a310001ff9da")
+			a.So(
+				entry.EndDevice.Ids.JoinEui,
+				should.Resemble,
+				types.EUI64{0x70, 0xB3, 0xD5, 0x7E, 0xD0, 0x00, 0x00, 0x00}.Bytes(),
+			)
+			a.So(
+				entry.EndDevice.Ids.DevEui,
+				should.Resemble,
+				types.EUI64{0x00, 0x04, 0xA3, 0x10, 0x00, 0x1F, 0xF9, 0xDA}.Bytes(),
+			)
+			a.So(entry.EndDevice.ProvisionerId, should.Equal, provisioning.Microchip)
+			a.So(entry.EndDevice.RootKeys.GetRootKeyId(), should.Equal, "01238ebe20080bd527")
+			a.So(entry.EndDevice.SupportsJoin, should.BeTrue)
+			a.So(entry.MappingKey, should.Equal, "01238ebe20080bd527")
+			return nil
 		}
-
-		a.So(entry.EndDevice.Ids.DeviceId, should.Equal, "eui-0004a310001ff9da")
-		a.So(
-			entry.EndDevice.Ids.JoinEui,
-			should.Resemble,
-			types.EUI64{0x70, 0xB3, 0xD5, 0x7E, 0xD0, 0x00, 0x00, 0x00}.Bytes(),
-		)
-		a.So(
-			entry.EndDevice.Ids.DevEui,
-			should.Resemble,
-			types.EUI64{0x00, 0x04, 0xA3, 0x10, 0x00, 0x1F, 0xF9, 0xDA}.Bytes(),
-		)
-		a.So(entry.EndDevice.ProvisionerId, should.Equal, provisioning.Microchip)
-		a.So(entry.EndDevice.RootKeys.GetRootKeyId(), should.Equal, "01238ebe20080bd527")
-		a.So(entry.EndDevice.SupportsJoin, should.BeTrue)
-		a.So(entry.MappingKey, should.Equal, "01238ebe20080bd527")
+		err := converter.Convert(ctx, bytes.NewReader(data), f)
+		a.So(err, should.BeNil)
+		a.So(calls, should.Equal, 1)
 	}
 
 	// Test valid manifest C-generation entry.
@@ -161,30 +153,27 @@ func TestMicrochipATECC608ATNGLORA(t *testing.T) {
 			"signature": "qWE59pmZpI7jx0Unr8zFjF-H-FRPBeDaOLM_wfeZwMb_RizRnLLh0tB1Taep6hcIVauZbOK2iI59GDMxb0meEw"
 		}]`)
 
-		ch := make(chan *ttnpb.EndDeviceTemplate, 1)
-		err := converter.Convert(ctx, bytes.NewReader(data), ch)
-		if !a.So(err, should.BeNil) {
-			t.FailNow()
+		calls := 0
+		f := func(entry *ttnpb.EndDeviceTemplate) error {
+			calls++
+			a.So(entry.EndDevice.Ids.DeviceId, should.Equal, "eui-0004a310001aa90a")
+			a.So(
+				entry.EndDevice.Ids.JoinEui,
+				should.Resemble,
+				types.EUI64{0x70, 0xB3, 0xD5, 0x7E, 0xD0, 0x00, 0x00, 0x00}.Bytes(),
+			)
+			a.So(entry.EndDevice.Ids.DevEui,
+				should.Resemble,
+				types.EUI64{0x00, 0x04, 0xA3, 0x10, 0x00, 0x1A, 0xA9, 0x0A}.Bytes(),
+			)
+			a.So(entry.EndDevice.ProvisionerId, should.Equal, provisioning.Microchip)
+			a.So(entry.EndDevice.RootKeys.GetRootKeyId(), should.Equal, "0123114e171b98b427")
+			a.So(entry.EndDevice.SupportsJoin, should.BeTrue)
+			a.So(entry.MappingKey, should.Equal, "0123114e171b98b427")
+			return nil
 		}
-
-		entry, ok := <-ch
-		if !a.So(ok, should.BeTrue) {
-			t.FailNow()
-		}
-
-		a.So(entry.EndDevice.Ids.DeviceId, should.Equal, "eui-0004a310001aa90a")
-		a.So(
-			entry.EndDevice.Ids.JoinEui,
-			should.Resemble,
-			types.EUI64{0x70, 0xB3, 0xD5, 0x7E, 0xD0, 0x00, 0x00, 0x00}.Bytes(),
-		)
-		a.So(entry.EndDevice.Ids.DevEui,
-			should.Resemble,
-			types.EUI64{0x00, 0x04, 0xA3, 0x10, 0x00, 0x1A, 0xA9, 0x0A}.Bytes(),
-		)
-		a.So(entry.EndDevice.ProvisionerId, should.Equal, provisioning.Microchip)
-		a.So(entry.EndDevice.RootKeys.GetRootKeyId(), should.Equal, "0123114e171b98b427")
-		a.So(entry.EndDevice.SupportsJoin, should.BeTrue)
-		a.So(entry.MappingKey, should.Equal, "0123114e171b98b427")
+		err := converter.Convert(ctx, bytes.NewReader(data), f)
+		a.So(err, should.BeNil)
+		a.So(calls, should.Equal, 1)
 	}
 }

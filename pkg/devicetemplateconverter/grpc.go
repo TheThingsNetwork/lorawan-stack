@@ -21,7 +21,6 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicetemplateconverter/profilefetcher"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicetemplates"
-	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -54,27 +53,14 @@ func (s *endDeviceTemplateConverterServer) Convert(
 	if !ok {
 		return errNotFound.WithAttributes("id", req.FormatId)
 	}
-	ctx, cancel := errorcontext.New(res.Context())
+
+	ctx := res.Context()
 	ctx = devicetemplates.NewContextWithProfileIDs(ctx, req.GetEndDeviceVersionIds())
 	ctx = profilefetcher.NewContextWithFetcher(ctx, profilefetcher.NewTemplateFetcher(s.DTC.Component))
-	ch := make(chan *ttnpb.EndDeviceTemplate)
-	go func() {
-		if err := converter.Convert(ctx, bytes.NewReader(req.Data), ch); err != nil {
-			cancel(err)
-		}
-	}()
 
-	for {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case tmpl, ok := <-ch:
-			if !ok {
-				return ctx.Err()
-			}
-			if err := res.Send(tmpl); err != nil {
-				return err
-			}
-		}
-	}
+	return converter.Convert(
+		ctx,
+		bytes.NewReader(req.Data),
+		res.Send,
+	)
 }

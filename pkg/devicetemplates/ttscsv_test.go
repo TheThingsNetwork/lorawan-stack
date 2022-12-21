@@ -18,10 +18,7 @@ import (
 	"bytes"
 	"context"
 	_ "embed"
-	"io"
-	"sync"
 	"testing"
-	"time"
 
 	"github.com/smartystreets/assertions"
 	mockdr "go.thethings.network/lorawan-stack/v3/pkg/devicerepository/mock"
@@ -60,7 +57,7 @@ func TestTTSCSVConverter(t *testing.T) {
 
 	for _, tc := range []struct {
 		name           string
-		reader         io.Reader
+		body           string
 		converter      Converter
 		fillContext    func(context.Context) context.Context
 		validateError  func(a *assertions.Assertion, err error)
@@ -69,7 +66,7 @@ func TestTTSCSVConverter(t *testing.T) {
 	}{
 		{
 			name:      "AllColumns",
-			reader:    bytes.NewBufferString(csvAllColumns),
+			body:      csvAllColumns,
 			converter: GetConverter("the-things-stack-csv"),
 			validateError: func(a *assertions.Assertion, err error) {
 				a.So(err, should.BeNil)
@@ -112,7 +109,7 @@ func TestTTSCSVConverter(t *testing.T) {
 		},
 		{
 			name:      "ExtraColumns",
-			reader:    bytes.NewBufferString(csvExtraColumns),
+			body:      csvExtraColumns,
 			converter: GetConverter("the-things-stack-csv"),
 			validateError: func(a *assertions.Assertion, err error) {
 				a.So(err, should.BeNil)
@@ -130,7 +127,7 @@ func TestTTSCSVConverter(t *testing.T) {
 		},
 		{
 			name:      "EmptyString",
-			reader:    bytes.NewBufferString(""),
+			body:      "",
 			converter: GetConverter("the-things-stack-csv"),
 			validateError: func(a *assertions.Assertion, err error) {
 				a.So(err, should.NotBeNil)
@@ -139,7 +136,7 @@ func TestTTSCSVConverter(t *testing.T) {
 		},
 		{
 			name:      "InvalidDevEUI",
-			reader:    bytes.NewBufferString(csvInvalidDevEUI),
+			body:      csvInvalidDevEUI,
 			converter: GetConverter("the-things-stack-csv"),
 			validateError: func(a *assertions.Assertion, err error) {
 				a.So(err, should.NotBeNil)
@@ -148,7 +145,7 @@ func TestTTSCSVConverter(t *testing.T) {
 		},
 		{
 			name:      "GenerateDeviceID",
-			reader:    bytes.NewBufferString(csvGenerateDeviceID),
+			body:      csvGenerateDeviceID,
 			converter: GetConverter("the-things-stack-csv"),
 			validateError: func(a *assertions.Assertion, err error) {
 				a.So(err, should.BeNil)
@@ -164,7 +161,7 @@ func TestTTSCSVConverter(t *testing.T) {
 		},
 		{
 			name:      "AppEUI",
-			reader:    bytes.NewBufferString(csvAppEUI),
+			body:      csvAppEUI,
 			converter: GetConverter("the-things-stack-csv"),
 			validateError: func(a *assertions.Assertion, err error) {
 				a.So(err, should.BeNil)
@@ -188,7 +185,7 @@ func TestTTSCSVConverter(t *testing.T) {
 		},
 		{
 			name:      "CommaSeparated",
-			reader:    bytes.NewBufferString(csvCommaSeparated),
+			body:      csvCommaSeparated,
 			converter: GetConverter("the-things-stack-csv"),
 			validateError: func(a *assertions.Assertion, err error) {
 				a.So(err, should.BeNil)
@@ -210,7 +207,7 @@ func TestTTSCSVConverter(t *testing.T) {
 		},
 		{
 			name:      "VendorID/No valid fields",
-			reader:    bytes.NewBufferString(csvNoVendorID),
+			body:      csvNoVendorID,
 			converter: GetConverter("the-things-stack-csv"),
 			fillContext: func(ctx context.Context) context.Context {
 				return profilefetcher.NewContextWithFetcher(ctx, &mockTemplateFetcher{})
@@ -239,7 +236,7 @@ func TestTTSCSVConverter(t *testing.T) {
 		},
 		{
 			name:      "VendorID/Error fetching",
-			reader:    bytes.NewBufferString(csvVendorID),
+			body:      csvVendorID,
 			converter: GetConverter("the-things-stack-csv"),
 			fillContext: func(ctx context.Context) context.Context {
 				return profilefetcher.NewContextWithFetcher(ctx, &mockTemplateFetcher{
@@ -253,7 +250,7 @@ func TestTTSCSVConverter(t *testing.T) {
 		},
 		{
 			name:      "VendorID/Valid",
-			reader:    bytes.NewBufferString(csvVendorID),
+			body:      csvVendorID,
 			converter: GetConverter("the-things-stack-csv"),
 			fillContext: func(ctx context.Context) context.Context {
 				return profilefetcher.NewContextWithFetcher(ctx, &mockTemplateFetcher{
@@ -297,7 +294,7 @@ func TestTTSCSVConverter(t *testing.T) {
 		},
 		{
 			name:      "VendorID/Valid fallback value",
-			reader:    bytes.NewBufferString(csvNoVendorID),
+			body:      csvNoVendorID,
 			converter: GetConverter("the-things-stack-csv"),
 			fillContext: func(ctx context.Context) context.Context {
 				ctx = profilefetcher.NewContextWithFetcher(ctx, &mockTemplateFetcher{
@@ -353,39 +350,15 @@ func TestTTSCSVConverter(t *testing.T) {
 			if tc.fillContext != nil {
 				ctx = tc.fillContext(ctx)
 			}
-			ch := make(chan *ttnpb.EndDeviceTemplate)
 
-			wg := sync.WaitGroup{}
-			wg.Add(2)
-			var err error
 			templates := []*ttnpb.EndDeviceTemplate{}
-			go func() {
-				err = tc.converter.Convert(ctx, tc.reader, ch)
-				wg.Done()
-			}()
-			go func() {
-				for t := range ch {
-					templates = append(templates, t)
-				}
-				wg.Done()
-			}()
-
-			complete := make(chan struct{})
-			go func() {
-				defer func() {
-					complete <- struct{}{}
-				}()
-				wg.Wait()
-			}()
-
-			select {
-			case <-complete:
-			case <-time.After(time.Second):
-				t.Error("Timed out waiting for converter")
-				t.FailNow()
+			f := func(tmpl *ttnpb.EndDeviceTemplate) error {
+				templates = append(templates, tmpl)
+				return nil
 			}
-
+			err := tc.converter.Convert(ctx, bytes.NewBufferString(tc.body), f)
 			tc.validateError(a, err)
+
 			if tc.validateResult != nil {
 				tc.validateResult(a, templates, tc.nExpect)
 			}

@@ -18,6 +18,7 @@ import (
 	"io"
 
 	"github.com/spf13/cobra"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
 // asBulk enables some commands to do bulk operations.
@@ -31,7 +32,7 @@ func asBulk(runE func(cmd *cobra.Command, args []string) error) func(cmd *cobra.
 		}
 		for {
 			err = runE(cmd, args)
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				return nil
 			}
 			if err != nil {

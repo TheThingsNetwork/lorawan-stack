@@ -24,7 +24,7 @@ import (
 // Converter converts a binary file in end device templates.
 type Converter interface {
 	Format() *ttnpb.EndDeviceTemplateFormat
-	Convert(context.Context, io.Reader, chan<- *ttnpb.EndDeviceTemplate) error
+	Convert(context.Context, io.Reader, func(*ttnpb.EndDeviceTemplate) error) error
 }
 
 var converters = map[string]Converter{}
