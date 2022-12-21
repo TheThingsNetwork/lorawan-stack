@@ -41,6 +41,7 @@ const CollaboratorForm = props => {
   const {
     collaborator,
     collaboratorId,
+    deleteDisabled,
     rights,
     pseudoRights,
     error: passedError,
@@ -100,6 +101,7 @@ const CollaboratorForm = props => {
     const updatedCollaborator = {
       ids: collaborator_ids,
     }
+    setSubmitError(undefined)
 
     try {
       await onDelete(updatedCollaborator)
@@ -188,10 +190,13 @@ const CollaboratorForm = props => {
           <ModalButton
             type="button"
             icon="delete"
+            disabled={deleteDisabled}
             danger
             naked
             message={
-              isCollaboratorCurrentUser
+              deleteDisabled
+                ? sharedMessages.removeCollaboratorLast
+                : isCollaboratorCurrentUser
                 ? sharedMessages.removeCollaboratorSelf
                 : sharedMessages.removeCollaborator
             }
@@ -214,6 +219,7 @@ const CollaboratorForm = props => {
 CollaboratorForm.propTypes = {
   collaborator: PropTypes.collaborator,
   collaboratorId: PropTypes.string,
+  deleteDisabled: PropTypes.bool,
   error: PropTypes.error,
   isCollaboratorAdmin: PropTypes.bool.isRequired,
   isCollaboratorCurrentUser: PropTypes.bool.isRequired,
@@ -230,6 +236,7 @@ CollaboratorForm.propTypes = {
 }
 
 CollaboratorForm.defaultProps = {
+  deleteDisabled: false,
   onSubmitFailure: () => null,
   onDelete: () => null,
   onDeleteSuccess: () => null,

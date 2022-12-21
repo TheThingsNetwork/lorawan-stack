@@ -19,12 +19,13 @@ import tts from '@console/api/tts'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
 
-import { getCollaborator } from '@ttn-lw/lib/store/actions/collaborators'
+import { getCollaborator, getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
 import {
   selectUserCollaborator,
   selectOrganizationCollaborator,
   selectCollaboratorFetching,
   selectCollaboratorError,
+  selectCollaboratorsTotalCount,
 } from '@ttn-lw/lib/store/selectors/collaborators'
 
 import {
@@ -54,6 +55,7 @@ export default OrganizationCollaboratorEdit =>
         collaboratorId,
         collaboratorType,
         collaborator,
+        collaboratorsTotalCount: selectCollaboratorsTotalCount(state, orgId),
         orgId,
         rights: selectOrganizationRights(state),
         pseudoRights: selectOrganizationPseudoRights(state),
@@ -64,6 +66,7 @@ export default OrganizationCollaboratorEdit =>
     dispatch => ({
       getOrganizationCollaborator: (orgId, collaboratorId, isUser) => {
         dispatch(getCollaborator('organization', orgId, collaboratorId, isUser))
+        dispatch(getCollaboratorsList('organization', orgId))
       },
       redirectToList: orgId => {
         dispatch(replace(`/organizations/${orgId}/collaborators`))

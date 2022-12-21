@@ -355,6 +355,7 @@ export default defineMessages({
   replaceWebhook: 'Replace webhook',
   removeCollaborator: 'Remove collaborator',
   removeCollaboratorSelf: 'Remove yourself as collaborator',
+  removeCollaboratorLast: 'Cannot remove last collaborator',
   requireAuthenticatedConnection: 'Require authenticated connection',
   requireAuthenticatedConnectionDescription:
     'Controls whether this gateway may only connect if it uses an authenticated Basic Station or MQTT connection',

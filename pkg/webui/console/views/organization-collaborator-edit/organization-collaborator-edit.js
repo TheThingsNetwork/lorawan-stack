@@ -38,6 +38,7 @@ const OrganizationCollaboratorEdit = props => {
     collaboratorType,
     collaboratorId,
     collaborator,
+    collaboratorsTotalCount,
     rights,
     redirectToList,
     pseudoRights,
@@ -69,6 +70,7 @@ const OrganizationCollaboratorEdit = props => {
             collaborator={collaborator}
             pseudoRights={pseudoRights}
             rights={rights}
+            deleteDisabled={collaboratorsTotalCount === 1}
             update
           />
         </Col>
@@ -80,6 +82,7 @@ OrganizationCollaboratorEdit.propTypes = {
   collaborator: PropTypes.collaborator.isRequired,
   collaboratorId: PropTypes.string.isRequired,
   collaboratorType: PropTypes.string.isRequired,
+  collaboratorsTotalCount: PropTypes.number.isRequired,
   orgId: PropTypes.string.isRequired,
   pseudoRights: PropTypes.rights,
   redirectToList: PropTypes.func.isRequired,
