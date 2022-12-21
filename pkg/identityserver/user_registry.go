@@ -469,6 +469,12 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	}
 
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "admin") {
+			if err := isLastAdmin(ctx, st, req.User.Ids); err != nil {
+				// Is updating the last admin to no longer be an admin.
+				return err
+			}
+		}
 		updatingContactInfo := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
 		var contactInfo []*ttnpb.ContactInfo
 		updatingPrimaryEmailAddress := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "primary_email_address")
