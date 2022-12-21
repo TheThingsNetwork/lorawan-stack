@@ -40,9 +40,6 @@ func TestEmptyKeyVault(t *testing.T) {
 	_, err = cryptoutil.EmptyKeyVault.Decrypt(test.Context(), []byte{0x1, 0x2}, "test")
 	a.So(errors.IsNotFound(err), should.BeTrue)
 
-	_, err = cryptoutil.EmptyKeyVault.GetCertificate(test.Context(), "test")
-	a.So(errors.IsNotFound(err), should.BeTrue)
-
 	_, err = cryptoutil.EmptyKeyVault.ExportCertificate(test.Context(), "test")
 	a.So(errors.IsNotFound(err), should.BeTrue)
 

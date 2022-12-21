@@ -17,7 +17,6 @@ package crypto
 import (
 	"context"
 	"crypto/tls"
-	"crypto/x509"
 )
 
 // KeyVault provides wrapping and unwrapping keys using KEK labels.
@@ -38,8 +37,6 @@ type KeyVault interface {
 	// The encryption key is referenced using the ID.
 	Decrypt(ctx context.Context, ciphertext []byte, id string) ([]byte, error)
 
-	// GetCertificate gets the X.509 certificate of the given identifier.
-	GetCertificate(ctx context.Context, id string) (*x509.Certificate, error)
 	// ExportCertificate exports the X.509 certificate and private key of the given identifier.
 	ExportCertificate(ctx context.Context, id string) (*tls.Certificate, error)
 

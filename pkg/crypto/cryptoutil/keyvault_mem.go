@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
-	"crypto/x509"
 	"encoding/pem"
 	"strings"
 
@@ -96,19 +95,6 @@ func (v MemKeyVault) HMACHash(_ context.Context, payload []byte, id string) ([]b
 		return nil, err
 	}
 	return crypto.HMACHash(key, payload)
-}
-
-// GetCertificate implements KeyVault.
-func (v MemKeyVault) GetCertificate(ctx context.Context, id string) (*x509.Certificate, error) {
-	raw, ok := v.m[id]
-	if !ok {
-		return nil, errCertificateNotFound.WithAttributes("id", id)
-	}
-	block, _ := pem.Decode(raw)
-	if block == nil || block.Type != "CERTIFICATE" {
-		return nil, errCertificateNotFound.WithAttributes("id", id)
-	}
-	return x509.ParseCertificate(block.Bytes)
 }
 
 // ExportCertificate implements KeyVault.

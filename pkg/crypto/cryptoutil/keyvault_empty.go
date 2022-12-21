@@ -17,7 +17,6 @@ package cryptoutil
 import (
 	"context"
 	"crypto/tls"
-	"crypto/x509"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 )
@@ -43,10 +42,6 @@ func (emptyKeyVault) Encrypt(ctx context.Context, plaintext []byte, id string) (
 
 func (emptyKeyVault) Decrypt(ctx context.Context, ciphertext []byte, id string) ([]byte, error) {
 	return nil, errKeyNotFound.WithAttributes("id", id)
-}
-
-func (emptyKeyVault) GetCertificate(ctx context.Context, id string) (*x509.Certificate, error) {
-	return nil, errCertificateNotFound.WithAttributes("id", id)
 }
 
 func (emptyKeyVault) ExportCertificate(ctx context.Context, id string) (*tls.Certificate, error) {
