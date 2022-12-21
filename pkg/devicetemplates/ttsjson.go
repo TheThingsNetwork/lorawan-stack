@@ -18,6 +18,7 @@ import (
 	"context"
 	"io"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	ttnio "go.thethings.network/lorawan-stack/v3/pkg/util/io"
 	"golang.org/x/net/html/charset"
@@ -29,7 +30,7 @@ const TTSJSON = "the-things-stack"
 type ttsJSON struct{}
 
 // Format implements the devicetemplates.Converter interface.
-func (t *ttsJSON) Format() *ttnpb.EndDeviceTemplateFormat {
+func (*ttsJSON) Format() *ttnpb.EndDeviceTemplateFormat {
 	return &ttnpb.EndDeviceTemplateFormat{
 		Name:           "The Things Stack JSON",
 		Description:    "File containing end devices in The Things Stack JSON format.",
@@ -38,52 +39,35 @@ func (t *ttsJSON) Format() *ttnpb.EndDeviceTemplateFormat {
 }
 
 // Convert implements the devicetemplates.Converter interface.
-func (t *ttsJSON) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDeviceTemplate) error {
-	defer close(ch)
-
+func (*ttsJSON) Convert(_ context.Context, r io.Reader, f func(*ttnpb.EndDeviceTemplate) error) error {
 	r, err := charset.NewReader(r, "application/json")
 	if err != nil {
 		return err
 	}
-
 	dec := ttnio.NewJSONDecoder(r)
 	for {
 		dev := &ttnpb.EndDevice{
 			Ids: &ttnpb.EndDeviceIdentifiers{},
 		}
-		paths, err := dec.Decode(dev)
-		if err != nil {
-			if err != io.EOF {
+		if err := dec.Decode(dev); err != nil {
+			if !errors.Is(err, io.EOF) {
 				return err
 			}
 			return nil
 		}
-		paths = append(paths, "supports_join")
 
-		// dev_addr must be set as `session.dev_addr`.
+		paths := ttnpb.NonZeroFields(dev, ttnpb.EndDeviceFieldPathsNestedWithoutWrappers...)
+		paths = ttnpb.BottomLevelFields(paths)
+
 		dev.Ids.DevAddr = nil
-		for idx, path := range paths {
-			if path == "dev_addr" {
-				switch idx {
-				case 0:
-					paths = paths[1:]
-				case len(paths) - 1:
-					paths = paths[:len(paths)-1]
-				default:
-					paths = append(paths[:idx], paths[idx+1:]...)
-				}
-				break
-			}
-		}
+		paths = ttnpb.ExcludeFields(paths, "ids.dev_addr")
 
 		tmpl := &ttnpb.EndDeviceTemplate{
 			EndDevice: dev,
 			FieldMask: ttnpb.FieldMask(paths...),
 		}
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case ch <- tmpl:
+		if err := f(tmpl); err != nil {
+			return err
 		}
 	}
 }

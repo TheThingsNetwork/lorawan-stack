@@ -43,24 +43,25 @@ func TestConvertEndDeviceTemplate(t *testing.T) {
 			Name:        "Test",
 			Description: "Test",
 		},
-		ConvertFunc: func(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDeviceTemplate) error {
+		ConvertFunc: func(ctx context.Context, r io.Reader, f func(*ttnpb.EndDeviceTemplate) error) error {
 			reader := bufio.NewReader(r)
 			for {
 				b, err := reader.ReadByte()
 				if err != nil {
-					if err == io.EOF {
-						close(ch)
+					if errors.Is(err, io.EOF) {
 						return nil
 					}
 					return err
 				}
-				ch <- &ttnpb.EndDeviceTemplate{
+				if err := f(&ttnpb.EndDeviceTemplate{
 					EndDevice: &ttnpb.EndDevice{
 						Ids: &ttnpb.EndDeviceIdentifiers{
 							DeviceId: fmt.Sprintf("sn-%d", b),
 						},
 					},
 					FieldMask: ttnpb.FieldMask("ids.device_id"),
+				}); err != nil {
+					return err
 				}
 			}
 		},

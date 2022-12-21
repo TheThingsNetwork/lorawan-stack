@@ -8837,6 +8837,15 @@
       "file": "data_rate.go"
     }
   },
+  "error:pkg/util/io:json_token": {
+    "translations": {
+      "en": "invalid JSON token"
+    },
+    "description": {
+      "package": "pkg/util/io",
+      "file": "io.go"
+    }
+  },
   "error:pkg/validate:email": {
     "translations": {
       "en": "`{email}` is not a valid email."
