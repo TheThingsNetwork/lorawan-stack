@@ -15,30 +15,15 @@
 package cluster
 
 import (
-	"testing"
-
-	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
 )
 
-func TestPeer(t *testing.T) {
-	a := assertions.New(t)
-
-	conn := new(grpc.ClientConn)
-
-	p := &peer{
+func NewTestPeer(conn *grpc.ClientConn) Peer {
+	return &peer{
 		name:   "name",
 		roles:  []ttnpb.ClusterRole{ttnpb.ClusterRole_ACCESS},
 		target: "target",
 		conn:   conn,
 	}
-
-	a.So(p.HasRole(ttnpb.ClusterRole_APPLICATION_SERVER), should.BeFalse)
-	a.So(p.HasRole(ttnpb.ClusterRole_ACCESS), should.BeTrue)
-
-	cc, err := p.Conn()
-	a.So(err, should.BeNil)
-	a.So(cc, should.Equal, conn)
 }

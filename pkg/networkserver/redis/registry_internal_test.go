@@ -24,11 +24,11 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
 	"github.com/vmihailenco/msgpack/v5"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func TestMsgpackCompatibility(t *testing.T) {

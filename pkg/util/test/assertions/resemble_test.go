@@ -19,8 +19,8 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
 	. "go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func TestHaveEmptyDiff(t *testing.T) {

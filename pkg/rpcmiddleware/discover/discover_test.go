@@ -24,10 +24,10 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/discover"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/resolver"
@@ -228,6 +228,86 @@ func TestDialContext(t *testing.T) {
 			if !tc.DialAddressesAssertion(t, dialAddresses) {
 				t.FailNow()
 			}
+		})
+	}
+}
+
+func TestDefaultPort(t *testing.T) {
+	for input, expected := range map[string]string{
+		"localhost:http": "localhost:http",
+		"localhost:80":   "localhost:80",
+		"localhost":      "localhost:8884",
+		"[::1]:80":       "[::1]:80",
+		"::1":            "[::1]:8884",
+		"192.168.1.1:80": "192.168.1.1:80",
+		"192.168.1.1":    "192.168.1.1:8884",
+		":80":            ":80",
+		"":               ":8884",
+		"[::]:80":        "[::]:80",
+		"::":             "[::]:8884",
+		"[::]":           "", // Invalid address
+		"[::":            "", // Invalid address
+	} {
+		t.Run(input, func(t *testing.T) {
+			target, err := discover.DefaultPort(input, 8884)
+			if err != nil {
+				target = ""
+			}
+			assertions.New(t).So(target, should.Equal, expected)
+		})
+	}
+}
+
+func TestDefaultURL(t *testing.T) {
+	for _, tc := range []struct {
+		target   string
+		port     int
+		tls      bool
+		expected string
+	}{
+		{
+			target:   "localhost",
+			port:     80,
+			tls:      false,
+			expected: "http://localhost",
+		},
+		{
+			target:   "localhost",
+			port:     8080,
+			tls:      false,
+			expected: "http://localhost:8080",
+		},
+		{
+			target:   "host.with.port:http",
+			port:     8000,
+			tls:      false,
+			expected: "http://host.with.port:http",
+		},
+		{
+			target:   "hostname:433",
+			port:     4000,
+			tls:      true,
+			expected: "https://hostname:433",
+		},
+		{
+			target:   "hostname",
+			port:     443,
+			tls:      true,
+			expected: "https://hostname",
+		},
+		{
+			target:   "hostname",
+			port:     8443,
+			tls:      true,
+			expected: "https://hostname:8443",
+		},
+	} {
+		t.Run(tc.expected, func(t *testing.T) {
+			target, err := discover.DefaultURL(tc.target, tc.port, tc.tls)
+			if err != nil {
+				target = ""
+			}
+			assertions.New(t).So(target, should.Equal, tc.expected)
 		})
 	}
 }
