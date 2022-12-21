@@ -327,7 +327,7 @@ var (
 			if err != nil {
 				return err
 			}
-			var gateway ttnpb.Gateway
+			gateway := &ttnpb.Gateway{}
 			paths, err := gateway.SetFromFlags(cmd.Flags(), "")
 			if err != nil {
 				return err
@@ -340,7 +340,6 @@ var (
 				return err
 			}
 			paths = append(paths, ttnpb.FlattenPaths(paths, gatewayFlattenPaths)...)
-
 			if gtwID.Eui != nil {
 				paths = append(paths, "ids.eui")
 			}
@@ -375,19 +374,25 @@ var (
 				if antennaRemove {
 					gateway.Antennas = append(res.Antennas[:antennaIndex], res.Antennas[antennaIndex+1:]...)
 				} else { // create or update
+					mask := ttnpb.FieldsWithoutPrefix("antenna", antennaPaths...)
 					gateway.Antennas = res.Antennas
+					if err := gateway.Antennas[antennaIndex].SetFields(antenna, mask...); err != nil {
+						return err
+					}
 				}
 				paths = append(paths, "antennas")
 			}
 			res, err := ttnpb.NewGatewayRegistryClient(is).Update(ctx, &ttnpb.UpdateGatewayRequest{
-				Gateway:   &gateway,
+				Gateway:   gateway,
 				FieldMask: ttnpb.FieldMask(append(paths, unsetPaths...)...),
 			})
 			if err != nil {
 				return err
 			}
 
-			res.SetFields(&gateway, "ids")
+			if err = res.SetFields(gateway, "ids"); err != nil {
+				return err
+			}
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
