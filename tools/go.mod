@@ -35,9 +35,6 @@ replace (
 	google.golang.org/grpc => google.golang.org/grpc v1.33.1
 )
 
-// TODO: Remove once https://github.com/magefile/mage/pull/307 is merged.
-replace github.com/magefile/mage => github.com/TheThingsIndustries/mage v1.10.0
-
 // Do not upgrade go-sqlmock beyond v1.3.0.
 // See https://github.com/heptiolabs/healthcheck/issues/23.
 replace gopkg.in/DATA-DOG/go-sqlmock.v1 => gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0
@@ -47,7 +44,7 @@ require (
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/client9/misspell v0.3.4
 	github.com/cloudflare/cfssl v1.4.1
-	github.com/magefile/mage v1.10.0
+	github.com/magefile/mage v1.14.0
 	github.com/mattn/goveralls v0.0.5
 	go.thethings.network/lorawan-stack/v3 v3.0.0-00010101000000-000000000000
 	gopkg.in/yaml.v2 v2.4.0

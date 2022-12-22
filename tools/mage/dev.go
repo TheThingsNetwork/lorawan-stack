@@ -17,7 +17,10 @@ package ttnmage
 import (
 	"errors"
 	"fmt"
+	"io"
+	"log"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"strings"
@@ -332,12 +335,46 @@ func (Dev) StartDevStack() error {
 	}
 	defer logFile.Close()
 	if os.Getenv("CI") == "true" {
-		_, err := sh.ExecFrom("", map[string]string{}, logFile, logFile, "./ttn-lw-stack", "start", "--log.format=json", "--config=config/stack/ttn-lw-stack-tls.yml")
-		return err
+		return execFrom(
+			"",
+			map[string]string{},
+			logFile,
+			logFile,
+			"./ttn-lw-stack",
+			"start",
+			"--log.format=json",
+			"--config=config/stack/ttn-lw-stack-tls.yml",
+		)
 	}
 	return execGo(logFile, logFile, "run", "./cmd/ttn-lw-stack", "start", "--log.format=json")
 }
 
 func init() {
 	initDeps = append(initDeps, Dev.Certificates, Dev.InitDeviceRepo)
+}
+
+func execFrom(
+	dir string, env map[string]string, stdout, stderr io.Writer, cmd string, args ...string,
+) error {
+	c := exec.Command(cmd, args...)
+	c.Env = os.Environ()
+	for k, v := range env {
+		c.Env = append(c.Env, k+"="+v)
+	}
+	c.Dir = dir
+	c.Stderr = stderr
+	c.Stdout = stdout
+	c.Stdin = os.Stdin
+	if mg.Verbose() {
+		log.Println("exec:", cmd, strings.Join(args, " "))
+	}
+	err := c.Run()
+	if err == nil {
+		return nil
+	}
+	ran, code := sh.CmdRan(err), sh.ExitStatus(err)
+	if ran {
+		return mg.Fatalf(code, `running "%s %s" failed with exit code %d`, cmd, strings.Join(args, " "), code)
+	}
+	return fmt.Errorf(`failed to run "%s %s: %w"`, cmd, strings.Join(args, " "), err)
 }
