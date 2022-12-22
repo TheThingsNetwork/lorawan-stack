@@ -179,7 +179,7 @@ func (p Proto) Go(context.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to construct absolute path to pkg/ttnpb: %w", err)
 	}
-	return sh.RunV("gofmt", "-w", "-s", ttnpb)
+	return runGoTool(gofumpt, "-w", ttnpb)
 }
 
 // GoClean removes generated Go protos.
