@@ -13,6 +13,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Deletion of the last admin user or removal of its admin status via an update operation now returns an error.
+
 ### Deprecated
 
 ### Removed
