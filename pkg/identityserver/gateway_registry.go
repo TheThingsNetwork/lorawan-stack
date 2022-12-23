@@ -110,7 +110,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 	if reqGtw.LbsLnsSecret != nil {
 		value := reqGtw.LbsLnsSecret.Value
 		if is.config.Gateways.EncryptionKeyID != "" {
-			value, err = is.KeyVault.Encrypt(ctx, reqGtw.LbsLnsSecret.Value, is.config.Gateways.EncryptionKeyID)
+			value, err = is.KeyService().Encrypt(ctx, reqGtw.LbsLnsSecret.Value, is.config.Gateways.EncryptionKeyID)
 			if err != nil {
 				return nil, err
 			}
@@ -124,7 +124,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 	if reqGtw.TargetCupsKey != nil {
 		value := reqGtw.TargetCupsKey.Value
 		if is.config.Gateways.EncryptionKeyID != "" {
-			value, err = is.KeyVault.Encrypt(ctx, reqGtw.TargetCupsKey.Value, is.config.Gateways.EncryptionKeyID)
+			value, err = is.KeyService().Encrypt(ctx, reqGtw.TargetCupsKey.Value, is.config.Gateways.EncryptionKeyID)
 			if err != nil {
 				return nil, err
 			}
@@ -141,7 +141,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 		}
 		value := reqGtw.ClaimAuthenticationCode.Secret.Value
 		if is.config.Gateways.EncryptionKeyID != "" {
-			value, err = is.KeyVault.Encrypt(ctx, value, is.config.Gateways.EncryptionKeyID)
+			value, err = is.KeyService().Encrypt(ctx, value, is.config.Gateways.EncryptionKeyID)
 			if err != nil {
 				return nil, err
 			}
@@ -245,7 +245,7 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 	if gtw.LbsLnsSecret != nil {
 		value := gtw.LbsLnsSecret.Value
 		if gtw.LbsLnsSecret.KeyId != "" {
-			value, err = is.KeyVault.Decrypt(ctx, gtw.LbsLnsSecret.Value, gtw.LbsLnsSecret.KeyId)
+			value, err = is.KeyService().Decrypt(ctx, gtw.LbsLnsSecret.Value, gtw.LbsLnsSecret.KeyId)
 			if err != nil {
 				return nil, err
 			}
@@ -259,7 +259,7 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 	if gtw.ClaimAuthenticationCode != nil && gtw.ClaimAuthenticationCode.Secret != nil {
 		value := gtw.ClaimAuthenticationCode.Secret.Value
 		if gtw.ClaimAuthenticationCode.Secret.KeyId != "" {
-			value, err = is.KeyVault.Decrypt(ctx, gtw.ClaimAuthenticationCode.Secret.Value, gtw.ClaimAuthenticationCode.Secret.KeyId)
+			value, err = is.KeyService().Decrypt(ctx, gtw.ClaimAuthenticationCode.Secret.Value, gtw.ClaimAuthenticationCode.Secret.KeyId)
 			if err != nil {
 				return nil, err
 			}
@@ -278,7 +278,7 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 	if gtw.TargetCupsKey != nil {
 		value := gtw.TargetCupsKey.Value
 		if gtw.TargetCupsKey.KeyId != "" {
-			value, err = is.KeyVault.Decrypt(ctx, gtw.TargetCupsKey.Value, gtw.TargetCupsKey.KeyId)
+			value, err = is.KeyService().Decrypt(ctx, gtw.TargetCupsKey.Value, gtw.TargetCupsKey.KeyId)
 			if err != nil {
 				return nil, err
 			}
@@ -407,7 +407,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 			} else if gtws.Gateways[i].LbsLnsSecret != nil {
 				value := gtws.Gateways[i].LbsLnsSecret.Value
 				if gtws.Gateways[i].LbsLnsSecret.KeyId != "" {
-					value, err = is.KeyVault.Decrypt(ctx, gtws.Gateways[i].LbsLnsSecret.Value, gtws.Gateways[i].LbsLnsSecret.KeyId)
+					value, err = is.KeyService().Decrypt(ctx, gtws.Gateways[i].LbsLnsSecret.Value, gtws.Gateways[i].LbsLnsSecret.KeyId)
 					if err != nil {
 						return nil, err
 					}
@@ -426,7 +426,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 			} else if gtws.Gateways[i].TargetCupsKey != nil {
 				value := gtws.Gateways[i].TargetCupsKey.Value
 				if gtws.Gateways[i].TargetCupsKey.KeyId != "" {
-					value, err = is.KeyVault.Decrypt(ctx, gtws.Gateways[i].TargetCupsKey.Value, gtws.Gateways[i].TargetCupsKey.KeyId)
+					value, err = is.KeyService().Decrypt(ctx, gtws.Gateways[i].TargetCupsKey.Value, gtws.Gateways[i].TargetCupsKey.KeyId)
 					if err != nil {
 						return nil, err
 					}
@@ -445,7 +445,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 			} else if gtws.Gateways[i].ClaimAuthenticationCode != nil && gtws.Gateways[i].ClaimAuthenticationCode.Secret != nil {
 				value := gtws.Gateways[i].ClaimAuthenticationCode.Secret.Value
 				if keyID := gtws.Gateways[i].ClaimAuthenticationCode.Secret.KeyId; keyID != "" {
-					value, err = is.KeyVault.Decrypt(ctx, value, keyID)
+					value, err = is.KeyService().Decrypt(ctx, value, keyID)
 					if err != nil {
 						return nil, err
 					}
@@ -502,7 +502,7 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 			value := reqGtw.LbsLnsSecret.Value
 			ptLBSLNSSecret = reqGtw.LbsLnsSecret.Value
 			if is.config.Gateways.EncryptionKeyID != "" {
-				value, err = is.KeyVault.Encrypt(ctx, reqGtw.LbsLnsSecret.Value, is.config.Gateways.EncryptionKeyID)
+				value, err = is.KeyService().Encrypt(ctx, reqGtw.LbsLnsSecret.Value, is.config.Gateways.EncryptionKeyID)
 				if err != nil {
 					return nil, err
 				}
@@ -522,7 +522,7 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 			value := reqGtw.TargetCupsKey.Value
 			ptTargetCUPSKeySecret = reqGtw.TargetCupsKey.Value
 			if is.config.Gateways.EncryptionKeyID != "" {
-				value, err = is.KeyVault.Encrypt(ctx, reqGtw.TargetCupsKey.Value, is.config.Gateways.EncryptionKeyID)
+				value, err = is.KeyService().Encrypt(ctx, reqGtw.TargetCupsKey.Value, is.config.Gateways.EncryptionKeyID)
 				if err != nil {
 					return nil, err
 				}
@@ -545,7 +545,7 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 			value := reqGtw.ClaimAuthenticationCode.Secret.Value
 			ptCACSecret = reqGtw.ClaimAuthenticationCode.Secret.Value
 			if is.config.Gateways.EncryptionKeyID != "" {
-				value, err = is.KeyVault.Encrypt(ctx, value, is.config.Gateways.EncryptionKeyID)
+				value, err = is.KeyService().Encrypt(ctx, value, is.config.Gateways.EncryptionKeyID)
 				if err != nil {
 					return nil, err
 				}
