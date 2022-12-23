@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package cryptoutil implements cryptography utilities.
 package cryptoutil
 
 import (
@@ -26,21 +27,25 @@ import (
 )
 
 var (
-	errKEKNotFound         = errors.DefineNotFound("kek_not_found", "KEK with label `{label}` not found")
-	errKeyNotFound         = errors.DefineNotFound("key_not_found", "key with ID `{id}` not found")
-	errCertificateNotFound = errors.DefineNotFound("certificate_not_found", "certificate with ID `{id}` not found")
+	errKeyNotFound         = errors.DefineNotFound("key_not_found", "key with label `{label}` not found")
+	errCertificateNotFound = errors.DefineNotFound(
+		"certificate_not_found", "certificate with label `{label}` not found",
+	)
+	errClientCertificateNotFound = errors.DefineNotFound("client_certificate_not_found", "client certificate not found")
 )
 
-// WrapAES128Key performs the RFC 3394 Wrap algorithm on the given key using the given key vault and KEK label.
+// WrapAES128Key performs the RFC 3394 Wrap algorithm on the given key using the given key service and KEK label.
 // If the KEK label is empty, the key will be returned in the clear.
-func WrapAES128Key(ctx context.Context, key types.AES128Key, kekLabel string, v crypto.KeyVault) (*ttnpb.KeyEnvelope, error) {
+func WrapAES128Key(
+	ctx context.Context, key types.AES128Key, kekLabel string, ks crypto.KeyService,
+) (*ttnpb.KeyEnvelope, error) {
 	defer trace.StartRegion(ctx, "wrap AES-128 key").End()
 	if kekLabel == "" {
 		return &ttnpb.KeyEnvelope{
 			EncryptedKey: key[:],
 		}, nil
 	}
-	wrapped, err := v.Wrap(ctx, key[:], kekLabel)
+	wrapped, err := ks.Wrap(ctx, key[:], kekLabel)
 	if err != nil {
 		return nil, err
 	}
@@ -50,8 +55,11 @@ func WrapAES128Key(ctx context.Context, key types.AES128Key, kekLabel string, v 
 	}, nil
 }
 
-// WrapAES128KeyWithKEK is like WrapAES128Key, but takes a KEK instead of key vault.
-func WrapAES128KeyWithKEK(ctx context.Context, key types.AES128Key, kekLabel string, kek types.AES128Key) (*ttnpb.KeyEnvelope, error) {
+// WrapAES128KeyWithKEK wraps the key with the given KEK.
+// If the KEK label is empty, the key will be returned in the clear.
+func WrapAES128KeyWithKEK(
+	ctx context.Context, key types.AES128Key, kekLabel string, kek types.AES128Key,
+) (*ttnpb.KeyEnvelope, error) {
 	defer trace.StartRegion(ctx, "wrap AES-128 key").End()
 	if kekLabel == "" {
 		return &ttnpb.KeyEnvelope{
@@ -70,9 +78,11 @@ func WrapAES128KeyWithKEK(ctx context.Context, key types.AES128Key, kekLabel str
 
 var errInvalidLength = errors.DefineInvalidArgument("invalid_length", "invalid slice length")
 
-// UnwrapAES128Key performs the RFC 3394 Unwrap algorithm on the given key envelope using the given key vault.
+// UnwrapAES128Key performs the RFC 3394 Unwrap algorithm on the given key envelope using the given key service.
 // If the KEK label is empty, the key is assumed to be stored in the clear.
-func UnwrapAES128Key(ctx context.Context, wrapped *ttnpb.KeyEnvelope, v crypto.KeyVault) (key types.AES128Key, err error) {
+func UnwrapAES128Key(
+	ctx context.Context, wrapped *ttnpb.KeyEnvelope, ks crypto.KeyService,
+) (key types.AES128Key, err error) {
 	defer trace.StartRegion(ctx, "unwrap AES-128 key").End()
 	if wrapped.Key != nil {
 		return *types.MustAES128Key(wrapped.Key), nil
@@ -83,7 +93,7 @@ func UnwrapAES128Key(ctx context.Context, wrapped *ttnpb.KeyEnvelope, v crypto.K
 		}
 		copy(key[:], wrapped.EncryptedKey)
 	} else {
-		keyBytes, err := v.Unwrap(ctx, wrapped.EncryptedKey, wrapped.KekLabel)
+		keyBytes, err := ks.Unwrap(ctx, wrapped.EncryptedKey, wrapped.KekLabel)
 		if err != nil {
 			return key, err
 		}
@@ -95,14 +105,14 @@ func UnwrapAES128Key(ctx context.Context, wrapped *ttnpb.KeyEnvelope, v crypto.K
 	return key, nil
 }
 
-// UnwrapKeyEnvelope calls UnwrapAES128Key on the given key envelope using the given key vault if necessary and
+// UnwrapKeyEnvelope calls UnwrapAES128Key on the given key envelope using the given key service if necessary and
 // returns the result as a key envelope.
 // NOTE: UnwrapKeyEnvelope returns ke if unwrapping is not necessary.
-func UnwrapKeyEnvelope(ctx context.Context, ke *ttnpb.KeyEnvelope, v crypto.KeyVault) (*ttnpb.KeyEnvelope, error) {
+func UnwrapKeyEnvelope(ctx context.Context, ke *ttnpb.KeyEnvelope, ks crypto.KeyService) (*ttnpb.KeyEnvelope, error) {
 	if !types.MustAES128Key(ke.GetKey()).OrZero().IsZero() || len(ke.GetEncryptedKey()) == 0 {
 		return ke, nil
 	}
-	k, err := UnwrapAES128Key(ctx, ke, v)
+	k, err := UnwrapAES128Key(ctx, ke, ks)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +128,10 @@ func pathWithPrefix(prefix, path string) string {
 	return fmt.Sprintf("%s.%s", prefix, path)
 }
 
-func UnwrapSelectedSessionKeys(ctx context.Context, keyVault crypto.KeyVault, sk *ttnpb.SessionKeys, prefix string, paths ...string) (*ttnpb.SessionKeys, error) {
+// UnwrapSelectedSessionKeys unwraps the selected session keys in the given session keys using the given key service.
+func UnwrapSelectedSessionKeys(
+	ctx context.Context, ks crypto.KeyService, sk *ttnpb.SessionKeys, prefix string, paths ...string,
+) (*ttnpb.SessionKeys, error) {
 	var (
 		fNwkSIntKeyEnvelope *ttnpb.KeyEnvelope
 		sNwkSIntKeyEnvelope *ttnpb.KeyEnvelope
@@ -128,25 +141,25 @@ func UnwrapSelectedSessionKeys(ctx context.Context, keyVault crypto.KeyVault, sk
 		err error
 	)
 	if ttnpb.HasAnyField(paths, pathWithPrefix(prefix, "app_s_key.key")) && sk.GetAppSKey() != nil {
-		appSKeyEnvelope, err = UnwrapKeyEnvelope(ctx, sk.AppSKey, keyVault)
+		appSKeyEnvelope, err = UnwrapKeyEnvelope(ctx, sk.AppSKey, ks)
 		if err != nil {
 			return nil, err
 		}
 	}
 	if ttnpb.HasAnyField(paths, pathWithPrefix(prefix, "f_nwk_s_int_key.key")) && sk.GetFNwkSIntKey() != nil {
-		fNwkSIntKeyEnvelope, err = UnwrapKeyEnvelope(ctx, sk.FNwkSIntKey, keyVault)
+		fNwkSIntKeyEnvelope, err = UnwrapKeyEnvelope(ctx, sk.FNwkSIntKey, ks)
 		if err != nil {
 			return nil, err
 		}
 	}
 	if ttnpb.HasAnyField(paths, pathWithPrefix(prefix, "nwk_s_enc_key.key")) && sk.GetNwkSEncKey() != nil {
-		nwkSEncKeyEnvelope, err = UnwrapKeyEnvelope(ctx, sk.NwkSEncKey, keyVault)
+		nwkSEncKeyEnvelope, err = UnwrapKeyEnvelope(ctx, sk.NwkSEncKey, ks)
 		if err != nil {
 			return nil, err
 		}
 	}
 	if ttnpb.HasAnyField(paths, pathWithPrefix(prefix, "s_nwk_s_int_key.key")) && sk.GetSNwkSIntKey() != nil {
-		sNwkSIntKeyEnvelope, err = UnwrapKeyEnvelope(ctx, sk.SNwkSIntKey, keyVault)
+		sNwkSIntKeyEnvelope, err = UnwrapKeyEnvelope(ctx, sk.SNwkSIntKey, ks)
 		if err != nil {
 			return nil, err
 		}

@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,33 +21,22 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 )
 
-type emptyKeyVault struct {
-	ComponentPrefixKEKLabeler
+type emptyKeyVault struct{}
+
+// Key implements crypto.KeyVault.
+func (emptyKeyVault) Key(_ context.Context, label string) ([]byte, error) {
+	return nil, errKeyNotFound.WithAttributes("label", label)
+}
+
+// ServerCertificate implements crypto.KeyVault.
+func (emptyKeyVault) ServerCertificate(_ context.Context, label string) (tls.Certificate, error) {
+	return tls.Certificate{}, errCertificateNotFound.WithAttributes("label", label)
+}
+
+// ClientCertificate implements crypto.KeyVault.
+func (emptyKeyVault) ClientCertificate(_ context.Context) (tls.Certificate, error) {
+	return tls.Certificate{}, errClientCertificateNotFound.New()
 }
 
 // EmptyKeyVault is an empty key vault.
 var EmptyKeyVault crypto.KeyVault = emptyKeyVault{}
-
-func (emptyKeyVault) Wrap(ctx context.Context, plaintext []byte, kekLabel string) ([]byte, error) {
-	return nil, errKEKNotFound.WithAttributes("label", kekLabel)
-}
-
-func (emptyKeyVault) Unwrap(ctx context.Context, ciphertext []byte, kekLabel string) ([]byte, error) {
-	return nil, errKEKNotFound.WithAttributes("label", kekLabel)
-}
-
-func (emptyKeyVault) Encrypt(ctx context.Context, plaintext []byte, id string) ([]byte, error) {
-	return nil, errKeyNotFound.WithAttributes("id", id)
-}
-
-func (emptyKeyVault) Decrypt(ctx context.Context, ciphertext []byte, id string) ([]byte, error) {
-	return nil, errKeyNotFound.WithAttributes("id", id)
-}
-
-func (emptyKeyVault) ExportCertificate(ctx context.Context, id string) (*tls.Certificate, error) {
-	return nil, errCertificateNotFound.WithAttributes("id", id)
-}
-
-func (emptyKeyVault) HMACHash(_ context.Context, _ []byte, id string) ([]byte, error) {
-	return nil, errKeyNotFound.WithAttributes("id", id)
-}

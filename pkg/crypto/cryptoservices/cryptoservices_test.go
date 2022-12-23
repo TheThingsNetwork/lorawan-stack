@@ -37,6 +37,7 @@ func aes128KeyPtr(key types.AES128Key) *types.AES128Key { return &key }
 func TestCryptoServices(t *testing.T) {
 	ctx := test.Context()
 	keyVault := cryptoutil.NewMemKeyVault(map[string][]byte{})
+	keyService := crypto.NewKeyService(keyVault)
 	memSvc := NewMemory(
 		aes128KeyPtr(types.AES128Key{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
 		aes128KeyPtr(types.AES128Key{0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2}),
@@ -52,8 +53,14 @@ func TestCryptoServices(t *testing.T) {
 	}
 	defer lis.Close()
 	s := grpc.NewServer()
-	ttnpb.RegisterNetworkCryptoServiceServer(s, &mockNetworkRPCServer{Network: memSvc, KeyVault: keyVault})
-	ttnpb.RegisterApplicationCryptoServiceServer(s, &mockApplicationRPCServer{Application: memSvc, KeyVault: keyVault})
+	ttnpb.RegisterNetworkCryptoServiceServer(s, &mockNetworkRPCServer{
+		Network:    memSvc,
+		KeyService: keyService,
+	})
+	ttnpb.RegisterApplicationCryptoServiceServer(s, &mockApplicationRPCServer{
+		Application: memSvc,
+		KeyService:  keyService,
+	})
 	go s.Serve(lis)
 	conn, err := grpc.Dial(lis.Addr().String(), grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
@@ -62,7 +69,7 @@ func TestCryptoServices(t *testing.T) {
 
 	for _, svc := range []Network{
 		memSvc,
-		NewNetworkRPCClient(conn, keyVault),
+		NewNetworkRPCClient(conn, keyService),
 	} {
 		t.Run(fmt.Sprintf("%T", svc), func(t *testing.T) {
 			t.Run("JoinRequestMIC", func(t *testing.T) {
@@ -303,7 +310,7 @@ func TestCryptoServices(t *testing.T) {
 
 	for _, svc := range []Application{
 		memSvc,
-		NewApplicationRPCClient(conn, keyVault),
+		NewApplicationRPCClient(conn, keyService),
 	} {
 		t.Run(fmt.Sprintf("%T", svc), func(t *testing.T) {
 			t.Run("DeriveAppSKey", func(t *testing.T) {
@@ -375,7 +382,7 @@ type mockNetworkRPCServer struct {
 	ttnpb.UnimplementedNetworkCryptoServiceServer
 
 	Network Network
-	crypto.KeyVault
+	crypto.KeyService
 }
 
 func (s *mockNetworkRPCServer) JoinRequestMIC(ctx context.Context, req *ttnpb.CryptoServicePayloadRequest) (*ttnpb.CryptoServicePayloadResponse, error) {
@@ -442,15 +449,15 @@ func (s *mockNetworkRPCServer) DeriveNwkSKeys(ctx context.Context, req *ttnpb.De
 	if err != nil {
 		return nil, err
 	}
-	fNwkSIntKeyEnvelope, err := cryptoutil.WrapAES128Key(ctx, nwkSKeys.FNwkSIntKey, "", s.KeyVault)
+	fNwkSIntKeyEnvelope, err := cryptoutil.WrapAES128Key(ctx, nwkSKeys.FNwkSIntKey, "", s.KeyService)
 	if err != nil {
 		return nil, err
 	}
-	sNwkSIntKeyEnvelope, err := cryptoutil.WrapAES128Key(ctx, nwkSKeys.SNwkSIntKey, "", s.KeyVault)
+	sNwkSIntKeyEnvelope, err := cryptoutil.WrapAES128Key(ctx, nwkSKeys.SNwkSIntKey, "", s.KeyService)
 	if err != nil {
 		return nil, err
 	}
-	nwkSEncKeyEnvelope, err := cryptoutil.WrapAES128Key(ctx, nwkSKeys.NwkSEncKey, "", s.KeyVault)
+	nwkSEncKeyEnvelope, err := cryptoutil.WrapAES128Key(ctx, nwkSKeys.NwkSEncKey, "", s.KeyService)
 	if err != nil {
 		return nil, err
 	}
@@ -469,14 +476,14 @@ func (s *mockNetworkRPCServer) GetNwkKey(ctx context.Context, req *ttnpb.GetRoot
 	if err != nil {
 		return nil, err
 	}
-	return cryptoutil.WrapAES128Key(ctx, *nwkKey, "", s.KeyVault)
+	return cryptoutil.WrapAES128Key(ctx, *nwkKey, "", s.KeyService)
 }
 
 type mockApplicationRPCServer struct {
 	ttnpb.UnimplementedApplicationCryptoServiceServer
 
 	Application Application
-	crypto.KeyVault
+	crypto.KeyService
 }
 
 func (s *mockApplicationRPCServer) DeriveAppSKey(ctx context.Context, req *ttnpb.DeriveSessionKeysRequest) (*ttnpb.AppSKeyResponse, error) {
@@ -489,7 +496,7 @@ func (s *mockApplicationRPCServer) DeriveAppSKey(ctx context.Context, req *ttnpb
 	if err != nil {
 		return nil, err
 	}
-	appSKeyEnvelope, err := cryptoutil.WrapAES128Key(ctx, appSKey, "", s.KeyVault)
+	appSKeyEnvelope, err := cryptoutil.WrapAES128Key(ctx, appSKey, "", s.KeyService)
 	if err != nil {
 		return nil, err
 	}
@@ -506,5 +513,5 @@ func (s *mockApplicationRPCServer) GetAppKey(ctx context.Context, req *ttnpb.Get
 	if err != nil {
 		return nil, err
 	}
-	return cryptoutil.WrapAES128Key(ctx, *appKey, "", s.KeyVault)
+	return cryptoutil.WrapAES128Key(ctx, *appKey, "", s.KeyService)
 }
