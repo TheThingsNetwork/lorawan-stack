@@ -263,7 +263,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 		dev.PendingMacState != nil &&
 		devAddr.Equal(types.MustDevAddr(dev.PendingSession.DevAddr).OrZero()) &&
 		macspec.UseLegacyMIC(cmacFMatchResult.LoRaWANVersion) == macspec.UseLegacyMIC(dev.PendingMacState.LorawanVersion) {
-		fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.PendingSession.Keys.FNwkSIntKey, ns.KeyVault)
+		fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.PendingSession.Keys.FNwkSIntKey, ns.KeyService())
 		if err != nil {
 			log.FromContext(ctx).WithError(err).WithField("kek_label", dev.PendingSession.Keys.FNwkSIntKey.KekLabel).Warn("Failed to unwrap FNwkSIntKey")
 			return nil, false, nil
@@ -304,7 +304,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 		macspec.UseLegacyMIC(cmacFMatchResult.LoRaWANVersion) == macspec.UseLegacyMIC(dev.MacState.LorawanVersion) &&
 		(cmacFMatchResult.FullFCnt == FullFCnt(uint16(pld.FHdr.FCnt), dev.Session.LastFCntUp, mac.DeviceSupports32BitFCnt(dev, ns.defaultMACSettings)) ||
 			cmacFMatchResult.FullFCnt == pld.FHdr.FCnt) {
-		fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.Keys.FNwkSIntKey, ns.KeyVault)
+		fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.Keys.FNwkSIntKey, ns.KeyService())
 		if err != nil {
 			log.FromContext(ctx).WithError(err).WithField("kek_label", dev.Session.Keys.FNwkSIntKey.KekLabel).Warn("Failed to unwrap FNwkSIntKey")
 			return nil, false, nil
@@ -435,7 +435,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 			log.FromContext(ctx).Warn("Device missing NwkSEncKey in registry")
 			return nil, false, nil
 		}
-		key, err := cryptoutil.UnwrapAES128Key(ctx, session.Keys.NwkSEncKey, ns.KeyVault)
+		key, err := cryptoutil.UnwrapAES128Key(ctx, session.Keys.NwkSEncKey, ns.KeyService())
 		if err != nil {
 			log.FromContext(ctx).WithField("kek_label", session.Keys.NwkSEncKey.KekLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey")
 			return nil, false, nil
@@ -653,7 +653,7 @@ macLoop:
 
 	// NOTE: Legacy MIC check is already performed.
 	if !macspec.UseLegacyMIC(dev.MacState.LorawanVersion) {
-		sNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.Keys.SNwkSIntKey, ns.KeyVault)
+		sNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.Keys.SNwkSIntKey, ns.KeyService())
 		if err != nil {
 			logger.WithField("kek_label", dev.Session.Keys.SNwkSIntKey.GetKekLabel()).WithError(err).Warn("Failed to unwrap SNwkSIntKey")
 			return nil, false, nil
@@ -903,7 +903,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 				"pending_session", match.IsPending,
 			))
 
-			fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, match.FNwkSIntKey, ns.KeyVault)
+			fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, match.FNwkSIntKey, ns.KeyService())
 			if err != nil {
 				log.FromContext(ctx).WithError(err).WithField("kek_label", match.FNwkSIntKey.KekLabel).Warn("Failed to unwrap FNwkSIntKey")
 				return false, nil
@@ -1309,11 +1309,11 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		keyEnvelopes = keyEnvelopes[:1]
 	}
 	for _, keyEnvelope := range keyEnvelopes {
-		unwrappedKey, err := cryptoutil.UnwrapAES128Key(ctx, keyEnvelope, ns.KeyVault)
+		unwrappedKey, err := cryptoutil.UnwrapAES128Key(ctx, keyEnvelope, ns.KeyService())
 		if err != nil {
 			return err
 		}
-		wrappedEnvelope, err := cryptoutil.WrapAES128Key(ctx, unwrappedKey, ns.deviceKEKLabel, ns.KeyVault)
+		wrappedEnvelope, err := cryptoutil.WrapAES128Key(ctx, unwrappedKey, ns.deviceKEKLabel, ns.KeyService())
 		if err != nil {
 			return err
 		}

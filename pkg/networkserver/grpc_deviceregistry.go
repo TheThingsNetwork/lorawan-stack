@@ -217,7 +217,7 @@ func addDeviceGetPaths(paths ...string) []string {
 	return gets
 }
 
-func unwrapSelectedSessionKeys(ctx context.Context, kv crypto.KeyVault, dev *ttnpb.EndDevice, paths ...string) error {
+func unwrapSelectedSessionKeys(ctx context.Context, kv crypto.KeyService, dev *ttnpb.EndDevice, paths ...string) error {
 	if dev.PendingSession != nil && ttnpb.HasAnyField(paths,
 		"pending_session.keys.f_nwk_s_int_key.key",
 		"pending_session.keys.nwk_s_enc_key.key",
@@ -268,7 +268,7 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 		logRegistryRPCError(ctx, err, "Failed to get device from registry")
 		return nil, err
 	}
-	if err := unwrapSelectedSessionKeys(ctx, ns.KeyVault, dev, req.FieldMask.GetPaths()...); err != nil {
+	if err := unwrapSelectedSessionKeys(ctx, ns.KeyService(), dev, req.FieldMask.GetPaths()...); err != nil {
 		log.FromContext(ctx).WithError(err).Error("Failed to unwrap selected keys")
 		return nil, err
 	}
@@ -1990,7 +1990,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 		if st.HasSetField("session.keys.f_nwk_s_int_key.key") {
 			k := st.Device.Session.Keys.FNwkSIntKey.Key
-			fNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, types.MustAES128Key(k).OrZero(), ns.deviceKEKLabel, ns.KeyVault)
+			fNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, types.MustAES128Key(k).OrZero(), ns.deviceKEKLabel, ns.KeyService())
 			if err != nil {
 				return nil, err
 			}
@@ -2006,7 +2006,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			})
 		}
 		if k := st.Device.Session.Keys.GetNwkSEncKey().GetKey(); k != nil && st.HasSetField("session.keys.nwk_s_enc_key.key") {
-			nwkSEncKey, err := cryptoutil.WrapAES128Key(ctx, types.MustAES128Key(k).OrZero(), ns.deviceKEKLabel, ns.KeyVault)
+			nwkSEncKey, err := cryptoutil.WrapAES128Key(ctx, types.MustAES128Key(k).OrZero(), ns.deviceKEKLabel, ns.KeyService())
 			if err != nil {
 				return nil, err
 			}
@@ -2022,7 +2022,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			})
 		}
 		if k := st.Device.Session.Keys.GetSNwkSIntKey().GetKey(); k != nil && st.HasSetField("session.keys.s_nwk_s_int_key.key") {
-			sNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, types.MustAES128Key(k).OrZero(), ns.deviceKEKLabel, ns.KeyVault)
+			sNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, types.MustAES128Key(k).OrZero(), ns.deviceKEKLabel, ns.KeyService())
 			if err != nil {
 				return nil, err
 			}
@@ -2055,7 +2055,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 		if st.HasSetField("pending_session.keys.f_nwk_s_int_key.key") {
 			k := st.Device.PendingSession.Keys.FNwkSIntKey.Key
-			fNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, types.MustAES128Key(k).OrZero(), ns.deviceKEKLabel, ns.KeyVault)
+			fNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, types.MustAES128Key(k).OrZero(), ns.deviceKEKLabel, ns.KeyService())
 			if err != nil {
 				return nil, err
 			}
@@ -2072,7 +2072,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 		if st.HasSetField("pending_session.keys.nwk_s_enc_key.key") {
 			k := st.Device.PendingSession.Keys.NwkSEncKey.Key
-			nwkSEncKey, err := cryptoutil.WrapAES128Key(ctx, types.MustAES128Key(k).OrZero(), ns.deviceKEKLabel, ns.KeyVault)
+			nwkSEncKey, err := cryptoutil.WrapAES128Key(ctx, types.MustAES128Key(k).OrZero(), ns.deviceKEKLabel, ns.KeyService())
 			if err != nil {
 				return nil, err
 			}
@@ -2089,7 +2089,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 		if st.HasSetField("pending_session.keys.s_nwk_s_int_key.key") {
 			k := st.Device.PendingSession.Keys.SNwkSIntKey.Key
-			sNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, types.MustAES128Key(k).OrZero(), ns.deviceKEKLabel, ns.KeyVault)
+			sNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, types.MustAES128Key(k).OrZero(), ns.deviceKEKLabel, ns.KeyService())
 			if err != nil {
 				return nil, err
 			}
@@ -2123,7 +2123,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 		if st.HasSetField("pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.key") {
 			k := st.Device.PendingMacState.QueuedJoinAccept.Keys.FNwkSIntKey.Key
-			fNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, types.MustAES128Key(k).OrZero(), ns.deviceKEKLabel, ns.KeyVault)
+			fNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, types.MustAES128Key(k).OrZero(), ns.deviceKEKLabel, ns.KeyService())
 			if err != nil {
 				return nil, err
 			}
@@ -2140,7 +2140,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 		if st.HasSetField("pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.key") {
 			k := st.Device.PendingMacState.QueuedJoinAccept.Keys.NwkSEncKey.Key
-			nwkSEncKey, err := cryptoutil.WrapAES128Key(ctx, types.MustAES128Key(k).OrZero(), ns.deviceKEKLabel, ns.KeyVault)
+			nwkSEncKey, err := cryptoutil.WrapAES128Key(ctx, types.MustAES128Key(k).OrZero(), ns.deviceKEKLabel, ns.KeyService())
 			if err != nil {
 				return nil, err
 			}
@@ -2157,7 +2157,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 		if st.HasSetField("pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key.key") {
 			k := st.Device.PendingMacState.QueuedJoinAccept.Keys.SNwkSIntKey.Key
-			sNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, types.MustAES128Key(k).OrZero(), ns.deviceKEKLabel, ns.KeyVault)
+			sNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, types.MustAES128Key(k).OrZero(), ns.deviceKEKLabel, ns.KeyService())
 			if err != nil {
 				return nil, err
 			}
@@ -2848,7 +2848,7 @@ func (ns *NetworkServer) ResetFactoryDefaults(ctx context.Context, req *ttnpb.Re
 		logRegistryRPCError(ctx, err, "Failed to reset device state in registry")
 		return nil, err
 	}
-	if err := unwrapSelectedSessionKeys(ctx, ns.KeyVault, dev, req.FieldMask.GetPaths()...); err != nil {
+	if err := unwrapSelectedSessionKeys(ctx, ns.KeyService(), dev, req.FieldMask.GetPaths()...); err != nil {
 		log.FromContext(ctx).WithError(err).Error("Failed to unwrap selected keys")
 		return nil, err
 	}
