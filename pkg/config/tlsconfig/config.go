@@ -79,17 +79,16 @@ func (a ACME) IsZero() bool {
 		len(a.Hosts) == 0
 }
 
-// KeyVault defines configuration for loading a certificate from the key vault.
-type KeyVault struct {
-	KeyVault interface {
-		ExportCertificate(ctx context.Context, id string) (*tls.Certificate, error)
+// ServerKeyVault defines configuration for loading a TLS server certificate from the key vault.
+type ServerKeyVault struct {
+	CertificateProvider interface {
+		ServerCertificate(ctx context.Context, id string) (tls.Certificate, error)
 	} `name:"-"`
-
 	ID string `name:"id" description:"ID of the certificate"`
 }
 
-// IsZero returns whether the TLS KeyVault is empty.
-func (t KeyVault) IsZero() bool {
+// IsZero returns whether the TLS server key vault is empty.
+func (t ServerKeyVault) IsZero() bool {
 	return t.ID == ""
 }
 
@@ -173,13 +172,13 @@ func readCert(fileReader FileReader, certFile, keyFile string) (*tls.Certificate
 
 // ServerAuth is configuration for TLS server authentication.
 type ServerAuth struct {
-	Source       string     `name:"source" description:"Source of the TLS certificate (file, acme, key-vault)"`
-	FileReader   FileReader `json:"-" yaml:"-" name:"-"`
-	Certificate  string     `json:"certificate" yaml:"certificate" name:"certificate" description:"Location of TLS certificate"` //nolint:lll
-	Key          string     `json:"key" yaml:"key" name:"key" description:"Location of TLS private key"`
-	ACME         ACME       `name:"acme"`
-	KeyVault     KeyVault   `name:"key-vault"`
-	CipherSuites []string   `name:"cipher-suites" description:"DEPRECATED: List of IANA names of TLS cipher suites to use"` //nolint:lll
+	Source       string         `name:"source" description:"Source of the TLS certificate (file, acme, key-vault)"`
+	FileReader   FileReader     `json:"-" yaml:"-" name:"-"`
+	Certificate  string         `json:"certificate" yaml:"certificate" name:"certificate" description:"Location of TLS certificate"` //nolint:lll
+	Key          string         `json:"key" yaml:"key" name:"key" description:"Location of TLS private key"`
+	ACME         ACME           `name:"acme"`
+	KeyVault     ServerKeyVault `name:"key-vault"`
+	CipherSuites []string       `name:"cipher-suites" description:"DEPRECATED: List of IANA names of TLS cipher suites to use"` //nolint:lll
 }
 
 var (
@@ -259,7 +258,11 @@ func (c *ServerAuth) ApplyTo(tlsConfig *tls.Config) error {
 			return errTLSKeyVaultID.New()
 		}
 		tlsConfig.GetCertificate = func(inf *tls.ClientHelloInfo) (*tls.Certificate, error) {
-			return c.KeyVault.KeyVault.ExportCertificate(inf.Context(), c.KeyVault.ID)
+			cert, err := c.KeyVault.CertificateProvider.ServerCertificate(inf.Context(), c.KeyVault.ID)
+			if err != nil {
+				return nil, err
+			}
+			return &cert, nil
 		}
 	default:
 		return errInvalidTLSConfigSource.WithAttributes("source", c.Source)
@@ -267,13 +270,20 @@ func (c *ServerAuth) ApplyTo(tlsConfig *tls.Config) error {
 	return nil
 }
 
+// ClientKeyVault defines configuration for loading a TLS client certificate from the key vault.
+type ClientKeyVault struct {
+	CertificateProvider interface {
+		ClientCertificate(ctx context.Context) (tls.Certificate, error)
+	} `name:"-"`
+}
+
 // ClientAuth is (client-side) configuration for TLS client authentication.
 type ClientAuth struct {
-	Source      string     `name:"source" description:"Source of the TLS certificate (file, key-vault)"`
-	FileReader  FileReader `json:"-" yaml:"-" name:"-"`
-	Certificate string     `json:"certificate" yaml:"certificate" name:"certificate" description:"Location of TLS certificate"` //nolint:lll
-	Key         string     `json:"key" yaml:"key" name:"key" description:"Location of TLS private key"`
-	KeyVault    KeyVault   `name:"key-vault"`
+	Source      string         `name:"source" description:"Source of the TLS certificate (file, key-vault)"`
+	FileReader  FileReader     `json:"-" yaml:"-" name:"-"`
+	Certificate string         `json:"certificate" yaml:"certificate" name:"certificate" description:"Location of TLS certificate"` //nolint:lll
+	Key         string         `json:"key" yaml:"key" name:"key" description:"Location of TLS private key"`
+	KeyVault    ClientKeyVault `name:"key-vault"`
 }
 
 // ApplyTo applies the TLS authentication configuration options to the given TLS configuration.
@@ -298,11 +308,12 @@ func (c *ClientAuth) ApplyTo(tlsConfig *tls.Config) error {
 			return cert, nil
 		}
 	case "key-vault":
-		if c.KeyVault.ID == "" {
-			return errTLSKeyVaultID.New()
-		}
 		tlsConfig.GetClientCertificate = func(r *tls.CertificateRequestInfo) (*tls.Certificate, error) {
-			return c.KeyVault.KeyVault.ExportCertificate(r.Context(), c.KeyVault.ID)
+			cert, err := c.KeyVault.CertificateProvider.ClientCertificate(r.Context())
+			if err != nil {
+				return nil, err
+			}
+			return &cert, nil
 		}
 	default:
 		return errInvalidTLSConfigSource.WithAttributes("source", c.Source)

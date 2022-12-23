@@ -171,20 +171,37 @@ type KeyVault struct {
 	Static   map[string][]byte `name:"static"`
 }
 
-// KeyVault returns an initialized crypto.KeyVault based on the configuration.
-func (v KeyVault) KeyVault(context.Context, httpclient.Provider) (crypto.KeyVault, error) {
-	vault := cryptoutil.EmptyKeyVault
+// ComponentKEKLabeler returns an initialized crypto.ComponentKEKLabeler based on the configuration.
+func (v KeyVault) ComponentKEKLabeler() (crypto.ComponentKEKLabeler, error) {
 	switch v.Provider { //nolint:revive
+	default:
+		return &cryptoutil.ComponentPrefixKEKLabeler{
+			Separator:     ":",
+			ReplaceOldNew: []string{":", "_"},
+		}, nil
+	}
+}
+
+// KeyService returns an initialized crypto.KeyService based on the configuration.
+func (v KeyVault) KeyService(ctx context.Context, httpClientProvider httpclient.Provider) (crypto.KeyService, error) {
+	var kv crypto.KeyVault
+	switch v.Provider {
 	case "static":
-		kv := cryptoutil.NewMemKeyVault(v.Static)
-		kv.Separator = ":"
-		kv.ReplaceOldNew = []string{":", "_"}
-		vault = kv
+		kv = cryptoutil.NewMemKeyVault(v.Static)
+	default:
+		kv = cryptoutil.EmptyKeyVault
 	}
 	if v.Cache.Size > 0 {
-		vault = cryptoutil.NewCacheKeyVault(vault, v.Cache.TTL, v.Cache.Size)
+		kv = cryptoutil.NewCacheKeyVault(kv,
+			cryptoutil.WithCacheKeyVaultTTL(v.Cache.TTL),
+			cryptoutil.WithCacheKeyVaultSize(v.Cache.Size),
+		)
 	}
-	return vault, nil
+	ks := crypto.NewKeyService(kv)
+	if v.Cache.Size > 0 {
+		ks = cryptoutil.NewCacheKeyService(ks, v.Cache.TTL, v.Cache.Size)
+	}
+	return ks, nil
 }
 
 var (
