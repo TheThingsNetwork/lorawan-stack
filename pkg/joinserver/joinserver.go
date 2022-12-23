@@ -165,7 +165,7 @@ var supportedMACVersions = [...]ttnpb.MACVersion{
 
 // wrapKeyWithVault wraps the given key with the configured KEK label.
 // If KEK label is empty or wrapping fails with err, for which plaintextCond(err) is true, the key is returned in the clear.
-func wrapKeyWithVault(ctx context.Context, key types.AES128Key, kekLabel string, kv crypto.KeyVault, plaintextCond func(error) bool) (*ttnpb.KeyEnvelope, error) {
+func wrapKeyWithVault(ctx context.Context, key types.AES128Key, kekLabel string, kv crypto.KeyService, plaintextCond func(error) bool) (*ttnpb.KeyEnvelope, error) {
 	if kekLabel == "" {
 		return &ttnpb.KeyEnvelope{
 			Key: key.Bytes(),
@@ -435,7 +435,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			if dev.RootKeys != nil && dev.RootKeys.NwkKey != nil &&
 				(macspec.UseNwkKey(req.SelectedMacVersion) || dev.RootKeys.RootKeyId != "ttn-lw-cli-generated") {
 				// If a NwkKey is set, assume that the end device is capable of LoRaWAN 1.1.
-				nwkKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.RootKeys.NwkKey, js.KeyVault)
+				nwkKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.RootKeys.NwkKey, js.KeyService())
 				if err != nil {
 					return nil, nil, err
 				}
@@ -445,10 +445,10 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 					applicationCryptoService = cryptoservices.NewMemory(nil, &nwkKey)
 				}
 			} else if cc != nil && dev.ProvisionerId != "" {
-				networkCryptoService = cryptoservices.NewNetworkRPCClient(cc, js.KeyVault, js.WithClusterAuth())
+				networkCryptoService = cryptoservices.NewNetworkRPCClient(cc, js.KeyService(), js.WithClusterAuth())
 			}
 			if applicationCryptoService == nil && dev.RootKeys != nil && dev.RootKeys.AppKey != nil {
-				appKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.RootKeys.AppKey, js.KeyVault)
+				appKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.RootKeys.AppKey, js.KeyService())
 				if err != nil {
 					return nil, nil, err
 				}
@@ -458,7 +458,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 					networkCryptoService = cryptoservices.NewMemory(&appKey, nil)
 				}
 			} else if cc != nil && dev.ProvisionerId != "" {
-				applicationCryptoService = cryptoservices.NewApplicationRPCClient(cc, js.KeyVault, js.WithClusterAuth())
+				applicationCryptoService = cryptoservices.NewApplicationRPCClient(cc, js.KeyService(), js.WithClusterAuth())
 			}
 			if networkCryptoService == nil {
 				return nil, nil, errNoNwkKey.New()
@@ -515,19 +515,19 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			)
 			nsKEKLabel, asKEKLabel := dev.NetworkServerKekLabel, dev.ApplicationServerKekLabel
 			if nsKEKLabel == "" {
-				nsKEKLabel = js.KeyVault.NsKEKLabel(ctx, types.MustNetID(dev.NetId), dev.NetworkServerAddress)
+				nsKEKLabel = js.ComponentKEKLabeler().NsKEKLabel(ctx, types.MustNetID(dev.NetId), dev.NetworkServerAddress)
 				nsPlaintextCond = errors.IsNotFound
 			}
-			fNwkSIntKeyEnvelope, err = wrapKeyWithVault(ctx, nwkSKeys.FNwkSIntKey, nsKEKLabel, js.KeyVault, nsPlaintextCond)
+			fNwkSIntKeyEnvelope, err = wrapKeyWithVault(ctx, nwkSKeys.FNwkSIntKey, nsKEKLabel, js.KeyService(), nsPlaintextCond)
 			if err != nil {
 				return nil, nil, err
 			}
 			if macspec.UseNwkKey(req.SelectedMacVersion) {
-				sNwkSIntKeyEnvelope, err = wrapKeyWithVault(ctx, nwkSKeys.SNwkSIntKey, nsKEKLabel, js.KeyVault, nsPlaintextCond)
+				sNwkSIntKeyEnvelope, err = wrapKeyWithVault(ctx, nwkSKeys.SNwkSIntKey, nsKEKLabel, js.KeyService(), nsPlaintextCond)
 				if err != nil {
 					return nil, nil, err
 				}
-				nwkSEncKeyEnvelope, err = wrapKeyWithVault(ctx, nwkSKeys.NwkSEncKey, nsKEKLabel, js.KeyVault, nsPlaintextCond)
+				nwkSEncKeyEnvelope, err = wrapKeyWithVault(ctx, nwkSKeys.NwkSEncKey, nsKEKLabel, js.KeyService(), nsPlaintextCond)
 				if err != nil {
 					return nil, nil, err
 				}
@@ -538,7 +538,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 					if !errors.IsNotFound(err) {
 						return nil, nil, errGetApplicationActivationSettings.WithCause(err)
 					}
-					asKEKLabel = js.KeyVault.AsKEKLabel(ctx, dev.ApplicationServerAddress)
+					asKEKLabel = js.ComponentKEKLabeler().AsKEKLabel(ctx, dev.ApplicationServerAddress)
 					asPlaintextCond = errors.IsNotFound
 				} else {
 					var kek types.AES128Key
@@ -546,7 +546,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 						if appSettings.Kek == nil {
 							return nil, nil, errNoKEK.New()
 						}
-						kek, err = cryptoutil.UnwrapAES128Key(ctx, appSettings.Kek, js.KeyVault)
+						kek, err = cryptoutil.UnwrapAES128Key(ctx, appSettings.Kek, js.KeyService())
 						if err != nil {
 							return nil, nil, errUnwrapKey.WithCause(err)
 						}
@@ -558,7 +558,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 				}
 			}
 			if asKEKLabel != "" {
-				appSKeyEnvelope, err = wrapKeyWithVault(ctx, appSKey, asKEKLabel, js.KeyVault, asPlaintextCond)
+				appSKeyEnvelope, err = wrapKeyWithVault(ctx, appSKey, asKEKLabel, js.KeyService(), asPlaintextCond)
 				if err != nil {
 					return nil, nil, err
 				}

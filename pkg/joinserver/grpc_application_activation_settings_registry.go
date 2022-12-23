@@ -46,7 +46,7 @@ func (srv applicationActivationSettingsRegistryServer) Get(ctx context.Context, 
 	if err != nil {
 		return nil, err
 	}
-	kek, err := cryptoutil.UnwrapKeyEnvelope(ctx, sets.Kek, srv.JS.KeyVault)
+	kek, err := cryptoutil.UnwrapKeyEnvelope(ctx, sets.Kek, srv.JS.KeyService())
 	if err != nil {
 		return nil, errUnwrapKey.WithCause(err)
 	}
@@ -84,7 +84,7 @@ func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, 
 
 	sets := req.FieldMask.GetPaths()
 	if ttnpb.HasAnyField(sets, "kek.key") && len(reqKEK.GetKey()) > 0 {
-		kek, err := cryptoutil.WrapAES128Key(ctx, *types.MustAES128Key(reqKEK.Key), srv.kekLabel, srv.JS.KeyVault)
+		kek, err := cryptoutil.WrapAES128Key(ctx, *types.MustAES128Key(reqKEK.Key), srv.kekLabel, srv.JS.KeyService())
 		if err != nil {
 			return nil, errWrapKey.WithCause(err)
 		}

@@ -23,7 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
-	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	. "go.thethings.network/lorawan-stack/v3/pkg/joinserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/joinserver/redis"
@@ -69,10 +69,6 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 	jsKEK := types.AES128Key{0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xe}
 	sessionKEK := types.AES128Key{0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xd}
 
-	keyVault := cryptoutil.NewMemKeyVault(map[string][]byte{
-		jsKEKLabel:      jsKEK[:],
-		sessionKEKLabel: sessionKEK[:],
-	})
 	jsKEKEnvelopeUnwrapped := &ttnpb.KeyEnvelope{
 		Key: jsKEK.Bytes(),
 	}
@@ -86,7 +82,19 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 		reg, closeFn := NewRedisApplicationActivationSettingRegistry(ctx)
 
 		js := test.Must(New(
-			componenttest.NewComponent(t, &component.Config{},
+			componenttest.NewComponent(
+				t,
+				&component.Config{
+					ServiceBase: config.ServiceBase{
+						KeyVault: config.KeyVault{
+							Provider: "static",
+							Static: map[string][]byte{
+								jsKEKLabel:      jsKEK[:],
+								sessionKEKLabel: sessionKEK[:],
+							},
+						},
+					},
+				},
 				component.WithClusterNew(func(context.Context, *cluster.Config, ...cluster.Option) (cluster.Cluster, error) {
 					return &test.MockCluster{
 						JoinFunc: test.ClusterJoinNilFunc,
@@ -111,7 +119,6 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 				DevNonceLimit:                 defaultDevNonceLimit,
 			},
 		)).(*JoinServer)
-		js.KeyVault = keyVault
 		componenttest.StartComponent(t, js.Component)
 		return ttnpb.NewApplicationActivationSettingRegistryClient(js.LoopbackConn()), reg, func() {
 			js.Close()

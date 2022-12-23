@@ -144,7 +144,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 					Key: rootKeysEnc.NwkKey.Key,
 				}
 			case len(rootKeysEnc.GetNwkKey().GetEncryptedKey()) > 0:
-				nwkKey, err := cryptoutil.UnwrapAES128Key(ctx, rootKeysEnc.NwkKey, srv.JS.KeyVault)
+				nwkKey, err := cryptoutil.UnwrapAES128Key(ctx, rootKeysEnc.NwkKey, srv.JS.KeyService())
 				if err != nil {
 					return nil, err
 				}
@@ -152,7 +152,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 					Key: nwkKey.Bytes(),
 				}
 			case cc != nil && dev.ProvisionerId != "":
-				nwkKey, err := cryptoservices.NewNetworkRPCClient(cc, srv.JS.KeyVault, srv.JS.WithClusterAuth()).GetNwkKey(ctx, dev)
+				nwkKey, err := cryptoservices.NewNetworkRPCClient(cc, srv.JS.KeyService(), srv.JS.WithClusterAuth()).GetNwkKey(ctx, dev)
 				if err != nil {
 					return nil, err
 				}
@@ -171,7 +171,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 					Key: rootKeysEnc.GetAppKey().GetKey(),
 				}
 			case len(rootKeysEnc.GetAppKey().GetEncryptedKey()) > 0:
-				appKey, err := cryptoutil.UnwrapAES128Key(ctx, rootKeysEnc.AppKey, srv.JS.KeyVault)
+				appKey, err := cryptoutil.UnwrapAES128Key(ctx, rootKeysEnc.AppKey, srv.JS.KeyService())
 				if err != nil {
 					return nil, err
 				}
@@ -179,7 +179,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 					Key: appKey.Bytes(),
 				}
 			case cc != nil && dev.ProvisionerId != "":
-				appKey, err := cryptoservices.NewApplicationRPCClient(cc, srv.JS.KeyVault, srv.JS.WithClusterAuth()).GetAppKey(ctx, dev)
+				appKey, err := cryptoservices.NewApplicationRPCClient(cc, srv.JS.KeyService(), srv.JS.WithClusterAuth()).GetAppKey(ctx, dev)
 				if err != nil {
 					return nil, err
 				}
@@ -242,7 +242,7 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 	sets := append(req.FieldMask.GetPaths()[:0:0], req.FieldMask.GetPaths()...)
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "root_keys.app_key.key") {
 		appKey, err := cryptoutil.WrapAES128Key(
-			ctx, *types.MustAES128Key(req.EndDevice.RootKeys.AppKey.Key), srv.kekLabel, srv.JS.KeyVault,
+			ctx, *types.MustAES128Key(req.EndDevice.RootKeys.AppKey.Key), srv.kekLabel, srv.JS.KeyService(),
 		)
 		if err != nil {
 			return nil, err
@@ -261,7 +261,7 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "root_keys.nwk_key.key") {
 		if !types.MustAES128Key(req.EndDevice.GetRootKeys().GetNwkKey().GetKey()).OrZero().IsZero() {
 			nwkKey, err := cryptoutil.WrapAES128Key(
-				ctx, *types.MustAES128Key(req.EndDevice.RootKeys.NwkKey.Key), srv.kekLabel, srv.JS.KeyVault,
+				ctx, *types.MustAES128Key(req.EndDevice.RootKeys.NwkKey.Key), srv.kekLabel, srv.JS.KeyService(),
 			)
 			if err != nil {
 				return nil, err
