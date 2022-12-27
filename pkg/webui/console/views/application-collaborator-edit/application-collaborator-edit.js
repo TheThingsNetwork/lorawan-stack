@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState, useCallback } from 'react'
+import React, { useCallback } from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
@@ -37,6 +37,7 @@ const ApplicationCollaboratorEdit = props => {
     appId,
     removeCollaborator,
     updateCollaborator,
+    collaboratorsTotalCount,
     collaborator,
     collaboratorId,
     rights,
@@ -53,8 +54,6 @@ const ApplicationCollaboratorEdit = props => {
     />,
   )
 
-  const [error, setError] = useState(undefined)
-
   const handleSubmit = useCallback(
     updatedCollaborator => updateCollaborator(updatedCollaborator),
     [updateCollaborator],
@@ -70,11 +69,7 @@ const ApplicationCollaboratorEdit = props => {
       ids: collaborator_ids,
     }
 
-    try {
-      await removeCollaborator(updatedCollaborator)
-    } catch (error) {
-      setError(error)
-    }
+    await removeCollaborator(updatedCollaborator)
   }, [collaboratorId, collaboratorType, removeCollaborator])
 
   return (
@@ -83,7 +78,6 @@ const ApplicationCollaboratorEdit = props => {
       <Row>
         <Col lg={8} md={12}>
           <CollaboratorForm
-            error={error}
             onSubmit={handleSubmit}
             onSubmitSuccess={showSuccessToast}
             onDelete={handleDelete}
@@ -91,6 +85,7 @@ const ApplicationCollaboratorEdit = props => {
             collaborator={collaborator}
             pseudoRights={pseudoRights}
             rights={rights}
+            deleteDisabled={collaboratorsTotalCount === 1}
             update
           />
         </Col>
@@ -104,6 +99,7 @@ ApplicationCollaboratorEdit.propTypes = {
   collaborator: PropTypes.collaborator.isRequired,
   collaboratorId: PropTypes.string.isRequired,
   collaboratorType: PropTypes.oneOf(['collaborator', 'user']).isRequired,
+  collaboratorsTotalCount: PropTypes.number.isRequired,
   pseudoRights: PropTypes.rights.isRequired,
   redirectToList: PropTypes.func.isRequired,
   removeCollaborator: PropTypes.func.isRequired,
