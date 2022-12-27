@@ -63,6 +63,9 @@ var (
 	ErrUserSessionNotFound = errors.DefineNotFound(
 		"user_session_not_found", "user session with id `{session_id}` not found", "user_id",
 	)
+	ErrLastAdmin = errors.DefineFailedPrecondition(
+		"last_admin", "user `{user_id}` is the last admin",
+	)
 
 	ErrAPIKeyNotFound = errors.DefineNotFound(
 		"api_key_not_found", "api key with id `{api_key_id}` not found", "entity_type", "entity_id",

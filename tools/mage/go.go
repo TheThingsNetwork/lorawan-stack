@@ -25,7 +25,6 @@ import (
 
 	"github.com/blang/semver"
 	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
 )
 
 // Go namespace.
@@ -53,8 +52,7 @@ func buildGoArgs(cmd string, args ...string) []string {
 }
 
 func execGoFrom(dir string, stdout, stderr io.Writer, cmd string, args ...string) error {
-	_, err := sh.ExecFrom(dir, goModuleEnv, stdout, stderr, "go", buildGoArgs(cmd, args...)...)
-	return err
+	return execFrom(dir, goModuleEnv, stdout, stderr, "go", buildGoArgs(cmd, args...)...)
 }
 
 func execGo(stdout, stderr io.Writer, cmd string, args ...string) error {

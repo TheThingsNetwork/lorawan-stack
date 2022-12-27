@@ -100,7 +100,7 @@ func (st *StoreTest) TestMembershipStoreCRUD(t *T) {
 				if a.So(err, should.BeNil) && a.So(members, should.NotBeNil) && a.So(members, should.HaveLength, 1) {
 					for _, v := range members {
 						memberIDs, rights := v.Ids, v.Rights
-						a.So(memberIDs, should.Resemble, usr1.GetEntityIdentifiers())
+						a.So(memberIDs.GetEntityIdentifiers(), should.Resemble, usr1.GetEntityIdentifiers())
 						a.So(rights, should.Resemble, someRights[ids.EntityType()])
 					}
 				}

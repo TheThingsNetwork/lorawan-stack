@@ -46,7 +46,7 @@ func TestOAuth2(t *testing.T) {
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	a.So(tenantID, should.Resemble, ttnpb.PacketBrokerNetworkIdentifier{
+	a.So(tenantID, should.Resemble, &ttnpb.PacketBrokerNetworkIdentifier{
 		NetId:    0x000013,
 		TenantId: "tti",
 	})

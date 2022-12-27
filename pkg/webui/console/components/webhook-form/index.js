@@ -247,6 +247,7 @@ export default class WebhookForm extends Component {
         webhook_id: PropTypes.string,
       }),
       health_status: PropTypes.shape({
+        healthy: PropTypes.shape({}),
         unhealthy: PropTypes.shape({}),
       }),
       headers: PropTypes.shape({
@@ -392,17 +393,9 @@ export default class WebhookForm extends Component {
     const hasTemplate = Boolean(webhookTemplate)
 
     const mayReactivate =
-      update &&
-      initialWebhookValue &&
-      hasUnhealthyWebhookConfig &&
-      !('healthy' in initialWebhookValue.health_status)
+      update && hasUnhealthyWebhookConfig && !initialWebhookValue?.health_status?.healthy
 
-    const isPending =
-      healthStatusEnabled &&
-      update &&
-      initialWebhookValue &&
-      (initialWebhookValue.health_status === null ||
-        initialWebhookValue.health_status === undefined)
+    const isPending = healthStatusEnabled && update && !initialWebhookValue?.health_status
 
     return (
       <>

@@ -113,6 +113,8 @@ func TestNetErrors(t *testing.T) {
 	t.Parallel()
 	a := assertions.New(t)
 
+	errDummy := fmt.Errorf("dummy")
+
 	for _, tc := range []struct {
 		Name     string
 		Error    error
@@ -205,7 +207,7 @@ func TestNetErrors(t *testing.T) {
 				Addr:   &net.IPAddr{IP: net.IP{1, 1, 1, 1}},
 				Source: &net.IPAddr{IP: net.IP{2, 2, 2, 2}},
 				Net:    "0.0.0.0",
-				Err:    fmt.Errorf("dummy"),
+				Err:    errDummy,
 			},
 			Validate: func(_ error, e *errors.Error, a *assertions.Assertion) {
 				a.So(e.FullName(), should.Equal, "pkg/errors:net_operation")
@@ -217,7 +219,7 @@ func TestNetErrors(t *testing.T) {
 					"net":     "0.0.0.0",
 					"op":      "read",
 				})
-				a.So(e.Cause(), should.Resemble, fmt.Errorf("dummy"))
+				a.So(e.Cause(), should.Resemble, errDummy)
 			},
 		},
 	} {
