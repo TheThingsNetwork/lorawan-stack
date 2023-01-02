@@ -21,7 +21,6 @@ import (
 	"fmt"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	_ "github.com/jinzhu/gorm/dialects/postgres" // Postgres database driver.
 	"go.thethings.network/lorawan-stack/v3/pkg/account"
 	account_store "go.thethings.network/lorawan-stack/v3/pkg/account/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"

@@ -16,18 +16,15 @@ package store
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/uptrace/bun"
-	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/migrate"
 	ismigrations "go.thethings.network/lorawan-stack/v3/pkg/identityserver/store/migrations"
 )
 
 // Migrate migrates the database.
-func Migrate(ctx context.Context, db *sql.DB) error {
-	bunDB := bun.NewDB(db, pgdialect.New())
-	migrator := migrate.NewMigrator(bunDB, ismigrations.Migrations)
+func Migrate(ctx context.Context, db *bun.DB) error {
+	migrator := migrate.NewMigrator(db, ismigrations.Migrations)
 	err := migrator.Init(ctx)
 	if err != nil {
 		return err

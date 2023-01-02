@@ -297,3 +297,18 @@ func (s *Store) Transact(ctx context.Context, fc func(context.Context, store.Sto
 	}
 	return err
 }
+
+// Open opens a new database connection.
+func Open(ctx context.Context, dsn string) (*bun.DB, error) {
+	panic("not implemented")
+}
+
+// Initialize initializes the database.
+func Initialize(ctx context.Context, db *bun.DB) error {
+	panic("not implemented")
+}
+
+// Clear clears the database.
+func Clear(ctx context.Context, db *bun.DB) error {
+	panic("not implemented")
+}
