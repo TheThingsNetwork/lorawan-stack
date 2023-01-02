@@ -39,9 +39,9 @@ type ContactInfo struct {
 	// EntityID is Application.ID, Client.ID, EndDevice.ID, Gateway.ID, Organization.ID or User.ID.
 	EntityID string `bun:"entity_id,notnull"`
 
-	ContactType   int    `gorm:"contact_type,notnull"`
-	ContactMethod int    `gorm:"contact_method,notnull"`
-	Value         string `gorm:"value,notnull"`
+	ContactType   int    `bun:"contact_type,notnull"`
+	ContactMethod int    `bun:"contact_method,notnull"`
+	Value         string `bun:"value,notnull"`
 
 	Public bool `bun:"public"`
 
