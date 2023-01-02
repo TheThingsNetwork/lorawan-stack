@@ -104,8 +104,9 @@ func defaultTestOptions() *testOptions {
 }
 
 var (
-	baseDSN = storetest.GetDSN("ttn_lorawan_is_test")
-	baseDB  = func() *sql.DB {
+	baseDBName = "ttn_lorawan_is_test"
+	baseDSN    = storetest.GetDSN(baseDBName)
+	baseDB     = func() *sql.DB {
 		baseDB, err := sql.Open("postgres", baseDSN.String())
 		if err != nil {
 			panic(err)
@@ -131,7 +132,7 @@ func testWithIdentityServer(t *testing.T, f func(*IdentityServer, *grpc.ClientCo
 			return
 		}
 		defer db.Close()
-		if setupBaseDBErr = store.Initialize(ctx, db); setupBaseDBErr != nil {
+		if setupBaseDBErr = store.Initialize(ctx, db, baseDBName); setupBaseDBErr != nil {
 			return
 		}
 		if setupBaseDBErr = store.Migrate(ctx, db); setupBaseDBErr != nil {
@@ -163,7 +164,7 @@ func testWithIdentityServer(t *testing.T, f func(*IdentityServer, *grpc.ClientCo
 	defer db.Close()
 
 	if testOptions.privateDatabase {
-		if err = store.Initialize(ctx, db); err != nil {
+		if err = store.Initialize(ctx, db, baseDBName); err != nil {
 			t.Fatal(err)
 		}
 		if err = store.Migrate(ctx, db); err != nil {
