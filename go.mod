@@ -84,7 +84,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.0.0-00010101000000-000000000000
-	github.com/heptiolabs/healthcheck v0.0.0-20211123025425-613501dd5deb
+	github.com/hellofresh/health-go/v5 v5.0.0
 	github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef
 	github.com/iancoleman/strcase v0.2.0
 	github.com/jackc/pgerrcode v0.0.0-20220416144525-469b46aa5efa
@@ -95,7 +95,7 @@ require (
 	github.com/json-iterator/go v1.1.12
 	github.com/jtacoma/uritemplates v1.0.0
 	github.com/kr/pretty v0.3.0
-	github.com/lib/pq v1.10.4
+	github.com/lib/pq v1.10.6
 	github.com/mitchellh/mapstructure v1.4.3
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/nats-io/nats-server/v2 v2.7.4
@@ -122,8 +122,8 @@ require (
 	github.com/uptrace/bun/driver/pgdriver v1.1.8
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	go.opencensus.io v0.23.0
-	go.opentelemetry.io/otel v1.7.0
-	go.opentelemetry.io/otel/trace v1.7.0
+	go.opentelemetry.io/otel v1.10.0
+	go.opentelemetry.io/otel/trace v1.10.0
 	go.packetbroker.org/api/iam v1.5.27-tts
 	go.packetbroker.org/api/iam/v2 v2.7.8-tts
 	go.packetbroker.org/api/mapping/v2 v2.1.27-tts
@@ -260,8 +260,6 @@ require (
 	google.golang.org/api v0.61.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
-	// NOTE: gopkg.in/DATA-DOG/go-sqlmock.v1 is actually a different version (see above).
-	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.0.0-00010101000000-000000000000 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	mellium.im/sasl v0.3.1 // indirect

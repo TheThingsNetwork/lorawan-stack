@@ -26,13 +26,13 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/heptiolabs/healthcheck"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/fillcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/v3/pkg/healthcheck"
 	"go.thethings.network/lorawan-stack/v3/pkg/interop"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
@@ -75,7 +75,7 @@ type Component struct {
 	interop           *interop.Server
 	interopSubsystems []interop.Registerer
 
-	healthHandler healthcheck.Handler
+	healthHandler healthcheck.HealthChecker
 
 	loopback *grpc.ClientConn
 
@@ -151,11 +151,14 @@ func New(logger log.Stack, config *Config, opts ...Option) (c *Component, err er
 		config: config,
 		logger: logger,
 
-		healthHandler: healthcheck.NewHandler(),
-
 		tcpListeners: make(map[string]*listener),
 
 		taskStarter: task.StartTaskFunc(task.DefaultStartTask),
+	}
+
+	c.healthHandler, err = healthcheck.NewDefaultHealthChecker()
+	if err != nil {
+		return nil, err
 	}
 
 	c.KeyVault, err = config.KeyVault.KeyVault(ctx, c)

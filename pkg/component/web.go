@@ -23,8 +23,8 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/heptiolabs/healthcheck"
 	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
+	"go.thethings.network/lorawan-stack/v3/pkg/healthcheck"
 	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
@@ -108,8 +108,7 @@ func (c *Component) initWeb() error {
 				webmiddleware.AuthUser(healthUsername, c.config.HTTP.Health.Password),
 			)))
 		}
-		g.HandleFunc("/healthz/live", c.healthHandler.LiveEndpoint)
-		g.HandleFunc("/healthz/ready", c.healthHandler.ReadyEndpoint)
+		g.Handle("/healthz", c.healthHandler.GetHandler())
 	}
 
 	c.web = web
@@ -121,14 +120,9 @@ func (c *Component) RegisterWeb(s web.Registerer) {
 	c.webSubsystems = append(c.webSubsystems, s)
 }
 
-// RegisterLivenessCheck registers a liveness check for the component.
-func (c *Component) RegisterLivenessCheck(name string, check healthcheck.Check) {
-	c.healthHandler.AddLivenessCheck(name, check)
-}
-
-// RegisterReadinessCheck registers a readiness check for the component.
-func (c *Component) RegisterReadinessCheck(name string, check healthcheck.Check) {
-	c.healthHandler.AddReadinessCheck(name, check)
+// RegisterCheck registers a liveness check for the component.
+func (c *Component) RegisterCheck(name string, check healthcheck.Check) error {
+	return c.healthHandler.AddCheck(name, check)
 }
 
 func (c *Component) serveWeb(lis net.Listener) error {
