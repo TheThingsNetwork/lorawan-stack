@@ -17,39 +17,13 @@ package identityserver
 import (
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
-	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
 	bunstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/bunstore"
-	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 )
 
-var gormFeatureFlag = experimental.DefineFeature("is.gormstore", false)
-
 func (is *IdentityServer) setupStore() error {
-	if gormFeatureFlag.GetValue(is.Context()) {
-		return is.setupGormStore()
-	}
 	return is.setupBunStore()
-}
-
-// TODO: Remove the gormstore implementation. (https://github.com/TheThingsNetwork/lorawan-stack/issues/5643)
-func (is *IdentityServer) setupGormStore() error {
-	gormDB, err := gormstore.Open(is.Context(), is.config.DatabaseURI)
-	if err != nil {
-		return err
-	}
-	if is.LogDebug() {
-		gormDB = gormDB.Debug()
-	}
-	is.db = gormDB.DB()
-	if err = gormstore.Check(gormDB); err != nil {
-		return errDBNeedsMigration.WithCause(err)
-	}
-	st := gormstore.NewCombinedStore(gormDB)
-	is.store = st
-
-	return nil
 }
 
 func (is *IdentityServer) setupBunStore() (err error) {

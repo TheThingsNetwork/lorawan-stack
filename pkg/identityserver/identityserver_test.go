@@ -22,12 +22,12 @@ import (
 	"testing"
 
 	"github.com/iancoleman/strcase"
-	"github.com/jinzhu/gorm"
+	"github.com/uptrace/bun"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
-	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
+	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/bunstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/storetest"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
@@ -104,8 +104,9 @@ func defaultTestOptions() *testOptions {
 }
 
 var (
-	baseDSN = storetest.GetDSN("ttn_lorawan_is_test")
-	baseDB  = func() *sql.DB {
+	baseDBName = "ttn_lorawan_is_test"
+	baseDSN    = storetest.GetDSN(baseDBName)
+	baseDB     = func() *sql.DB {
 		baseDB, err := sql.Open("postgres", baseDSN.String())
 		if err != nil {
 			panic(err)
@@ -125,13 +126,13 @@ func testWithIdentityServer(t *testing.T, f func(*IdentityServer, *grpc.ClientCo
 	ctx := test.Context()
 
 	setupBaseDBOnce.Do(func() {
-		var db *gorm.DB
+		var db *bun.DB
 		db, setupBaseDBErr = store.Open(context.Background(), baseDSN.String())
 		if setupBaseDBErr != nil {
 			return
 		}
 		defer db.Close()
-		if setupBaseDBErr = store.Initialize(db); setupBaseDBErr != nil {
+		if setupBaseDBErr = store.Initialize(ctx, db, baseDBName); setupBaseDBErr != nil {
 			return
 		}
 		if setupBaseDBErr = store.Migrate(ctx, db); setupBaseDBErr != nil {
@@ -163,20 +164,24 @@ func testWithIdentityServer(t *testing.T, f func(*IdentityServer, *grpc.ClientCo
 	defer db.Close()
 
 	if testOptions.privateDatabase {
-		if err = store.Initialize(db); err != nil {
+		if err = store.Initialize(ctx, db, baseDBName); err != nil {
 			t.Fatal(err)
 		}
 		if err = store.Migrate(ctx, db); err != nil {
 			t.Fatal(err)
 		}
 	} else {
-		if err = store.Clear(db); err != nil {
+		if err = store.Clear(ctx, db); err != nil {
 			t.Fatal(err)
 		}
 	}
 
 	if testOptions.population != nil {
-		if err = testOptions.population.Populate(test.Context(), store.NewCombinedStore(db)); err != nil {
+		st, err := store.NewStore(ctx, db)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err = testOptions.population.Populate(test.Context(), st); err != nil {
 			t.Fatal(err)
 		}
 	}

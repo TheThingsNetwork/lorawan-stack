@@ -32,7 +32,7 @@ type testStore struct {
 }
 
 func (t testStore) Init(ctx context.Context) error {
-	return Migrate(ctx, t.Store.baseStore.baseDB.DB.DB)
+	return Migrate(ctx, t.Store.baseStore.baseDB.DB)
 }
 
 func (t testStore) Close() error {
