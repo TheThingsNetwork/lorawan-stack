@@ -33,10 +33,6 @@ replace (
 	google.golang.org/grpc => google.golang.org/grpc v1.33.1
 )
 
-// Do not upgrade go-sqlmock beyond v1.3.0.
-// See https://github.com/heptiolabs/healthcheck/issues/23.
-replace gopkg.in/DATA-DOG/go-sqlmock.v1 => gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0
-
 // See https://github.com/mattn/go-ieproxy/issues/31
 replace github.com/mattn/go-ieproxy => github.com/mattn/go-ieproxy v0.0.1
 
