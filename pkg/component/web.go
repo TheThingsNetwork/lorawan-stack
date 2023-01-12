@@ -120,9 +120,9 @@ func (c *Component) RegisterWeb(s web.Registerer) {
 	c.webSubsystems = append(c.webSubsystems, s)
 }
 
-// RegisterCheck registers a liveness check for the component.
-func (c *Component) RegisterCheck(name string, check healthcheck.Check) error {
-	return c.healthHandler.AddCheck(name, check)
+// HealthChecker returns the component's health checker.
+func (c *Component) HealthChecker() healthcheck.HealthChecker {
+	return c.healthHandler
 }
 
 func (c *Component) serveWeb(lis net.Listener) error {
