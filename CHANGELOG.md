@@ -13,20 +13,26 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
-- Deletion of the last admin user or removal of its admin status via an update operation now returns an error.
-- Do not allow to remove the collaborator of an entity if it is the last collaborator (in the Console).
-
 ### Deprecated
 
 ### Removed
 
 ### Fixed
 
+### Security
+
+## [3.23.2] - unreleased
+
+### Changed
+
+- Deletion of the last admin user or removal of its admin status via an update operation now returns an error.
+- Do not allow to remove the collaborator of an entity if it is the last collaborator (in the Console).
+
+### Fixed
+
 - When searching for end-devices, specifying `last_seen_at` as the field in which the devices will be sorted by no longer returns an error.
 - Errors during removal of collaborators the application collaborator form not being forwarded to the user in the Console.
 - Importing devices via CSV no longer skips the first header column when BOM bytes are present.
-
-### Security
 
 ## [3.23.1] - 2022-12-14
 
@@ -2445,7 +2451,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.23.1...v3.23
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.23.2...v3.23
+[3.23.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.23.1...v3.23.2
 [3.23.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.23.0...v3.23.1
 [3.23.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.22.2...v3.23.0
 [3.22.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.22.1...v3.22.2
