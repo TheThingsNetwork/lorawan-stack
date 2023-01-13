@@ -87,9 +87,8 @@ require (
 	github.com/heptiolabs/healthcheck v0.0.0-20211123025425-613501dd5deb
 	github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef
 	github.com/iancoleman/strcase v0.2.0
-	github.com/jackc/pgconn v1.12.1
 	github.com/jackc/pgerrcode v0.0.0-20220416144525-469b46aa5efa
-	github.com/jackc/pgx/v4 v4.16.1
+	github.com/jackc/pgx/v5 v5.2.0
 	github.com/jacobsa/crypto v0.0.0-20190317225127-9f44e2d11115
 	github.com/jarcoal/httpmock v1.1.0
 	github.com/jaytaylor/html2text v0.0.0-20211105163654-bc68cce691ba
@@ -137,11 +136,11 @@ require (
 	gocloud.dev v0.20.0
 	// NOTE: gocloud.dev/pubsub/natspubsub is actually a different version (see above).
 	gocloud.dev/pubsub/natspubsub v0.19.0
-	golang.org/x/crypto v0.0.0-20220826181053-bd7e27e6170d
+	golang.org/x/crypto v0.5.0
 	golang.org/x/exp v0.0.0-20220706164943-b4a6d9510983
-	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd
+	golang.org/x/net v0.5.0
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
-	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
+	golang.org/x/sync v0.0.0-20220923202941-7f9b1623fab7
 	// NOTE: google.golang.org/genproto is actually a different version (see above).
 	google.golang.org/genproto v0.0.0-20220519153652-3a47de7e79bd
 	// NOTE: google.golang.org/grpc is actually a different version (see above).
@@ -201,12 +200,8 @@ require (
 	github.com/huandu/xstrings v1.3.1 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
-	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
-	github.com/jackc/pgio v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
-	github.com/jackc/pgproto3/v2 v2.3.0 // indirect
-	github.com/jackc/pgservicefile v0.0.0-20200714003250-2b9c44734f2b // indirect
-	github.com/jackc/pgtype v1.11.0 // indirect
+	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jacobsa/oglematchers v0.0.0-20150720000706-141901ea67cd // indirect
 	github.com/jacobsa/oglemock v0.0.0-20150831005832-e94d794d06ff // indirect
 	github.com/jacobsa/ogletest v0.0.0-20170503003838-80d50a735a11 // indirect
@@ -251,16 +246,16 @@ require (
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/willf/bitset v1.1.11 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
-	go.uber.org/atomic v1.9.0 // indirect
+	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
 	golang.org/x/image v0.0.0-20211028202545-6944b10bf410 // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
-	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
-	golang.org/x/sys v0.0.0-20220825204002-c680a09ffe64 // indirect
-	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
+	golang.org/x/sys v0.4.0 // indirect
+	golang.org/x/term v0.4.0 // indirect
+	golang.org/x/text v0.6.0 // indirect
 	golang.org/x/time v0.0.0-20220210224613-90d013bbcef8 // indirect
-	golang.org/x/tools v0.1.10 // indirect
+	golang.org/x/tools v0.1.12 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/api v0.61.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect

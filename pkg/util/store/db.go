@@ -18,8 +18,8 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/jackc/pgx/v4"
-	"github.com/jackc/pgx/v4/stdlib"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/uptrace/bun/driver/pgdriver"
 	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
 )
@@ -40,7 +40,7 @@ func OpenDB(ctx context.Context, databaseURI string) (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	config.PreferSimpleProtocol = true
+	config.DefaultQueryExecMode = pgx.QueryExecModeSimpleProtocol
 	return stdlib.OpenDB(*config, stdlib.OptionResetSession(func(ctx context.Context, cn *pgx.Conn) error {
 		return checkConn(cn.PgConn().Conn())
 	})), nil
