@@ -24,8 +24,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jackc/pgconn"
 	"github.com/jackc/pgerrcode"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/driver/pgdriver"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
