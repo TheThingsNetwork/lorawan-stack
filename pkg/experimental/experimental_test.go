@@ -12,14 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package experimental
+package experimental_test
 
 import (
 	"context"
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
+	. "go.thethings.network/lorawan-stack/v3/pkg/experimental"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func TestExperimentalFeatures(t *testing.T) {

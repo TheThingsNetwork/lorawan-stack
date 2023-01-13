@@ -469,6 +469,12 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	}
 
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "admin") {
+			if err := isLastAdmin(ctx, st, req.User.Ids); err != nil {
+				// Is updating the last admin to no longer be an admin.
+				return err
+			}
+		}
 		updatingContactInfo := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
 		var contactInfo []*ttnpb.ContactInfo
 		updatingPrimaryEmailAddress := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "primary_email_address")
@@ -692,9 +698,14 @@ func (is *IdentityServer) deleteUser(ctx context.Context, ids *ttnpb.UserIdentif
 	if err := rights.RequireUser(ctx, ids, ttnpb.Right_RIGHT_USER_DELETE); err != nil {
 		return nil, err
 	}
+
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		err := isLastAdmin(ctx, st, ids)
+		if err != nil {
+			return err
+		}
 		// Delete the the user's sessions to enforce logouts.
-		err := st.DeleteAllUserSessions(ctx, ids)
+		err = st.DeleteAllUserSessions(ctx, ids)
 		if err != nil {
 			return err
 		}

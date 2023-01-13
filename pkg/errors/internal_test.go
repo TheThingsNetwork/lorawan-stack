@@ -14,27 +14,7 @@
 
 package errors
 
-import (
-	"testing"
-
-	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
+var (
+	MessageFormatArguments = messageFormatArguments
+	Supported              = supported
 )
-
-func TestMessageFormat(t *testing.T) {
-	t.Parallel()
-	a := assertions.New(t)
-
-	args := messageFormatArguments(
-		"Application with ID {app_id} could not be found in namespace { ns } or namespace {   ns } does not exist",
-	)
-	a.So(args, should.HaveLength, 2) // no duplicates
-	a.So(args, should.Contain, "app_id")
-	a.So(args, should.Contain, "ns")
-
-	err := Define("test_message_format", "MessageFormat {foo}, {bar}")
-	a.So(err.publicAttributes, should.Contain, "foo")
-	a.So(err.publicAttributes, should.Contain, "bar")
-}
-
-var Supported = supported // Used by TestSupportedAttributes

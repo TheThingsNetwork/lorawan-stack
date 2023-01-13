@@ -21,7 +21,6 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/gpstime"
@@ -260,6 +259,7 @@ func TestToGatewayUpRoundtrip(t *testing.T) {
 		{
 			Name: "TxAcknowledgment",
 			Data: &udp.Data{
+				RxPacket: []*udp.RxPacket{},
 				TxPacketAck: &udp.TxPacketAck{
 					Error: udp.TxErrNone,
 				},
@@ -285,7 +285,7 @@ func TestToGatewayUpRoundtrip(t *testing.T) {
 			PacketType:      tc.PacketType,
 		}
 		actual.Data.RxPacket, actual.Data.Stat, actual.Data.TxPacketAck = udp.FromGatewayUp(up)
-		a.So(pretty.Diff(actual, expected), should.BeEmpty)
+		a.So(actual, should.Resemble, expected)
 	}
 }
 

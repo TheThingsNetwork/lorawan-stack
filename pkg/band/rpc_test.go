@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package band
+package band_test
 
 import (
 	"context"
@@ -22,9 +22,10 @@ import (
 
 	"github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
+	. "go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func TestGetPhyVersions(t *testing.T) {
@@ -392,13 +393,13 @@ func TestBand_convertToBandDescription(t *testing.T) {
 
 	for _, tc := range []struct {
 		Name           string
-		Band           Band
+		Definition     Band
 		Expected       *ttnpb.BandDescription
 		ErrorAssertion func(err error) bool
 	}{
 		{
 			Name: "All",
-			Band: Band{
+			Definition: Band{
 				ID: "All",
 
 				Beacon: Beacon{
@@ -465,8 +466,8 @@ func TestBand_convertToBandDescription(t *testing.T) {
 				},
 
 				BootDwellTime: DwellTime{
-					Uplinks:   boolPtr(true),
-					Downlinks: boolPtr(true),
+					Uplinks:   BoolPtr(true),
+					Downlinks: BoolPtr(true),
 				},
 			},
 			Expected: &ttnpb.BandDescription{
@@ -543,7 +544,7 @@ func TestBand_convertToBandDescription(t *testing.T) {
 		},
 		{
 			Name: "Nullable",
-			Band: Band{
+			Definition: Band{
 				ID: "Nullable band",
 
 				Beacon: Beacon{
@@ -684,7 +685,7 @@ func TestBand_convertToBandDescription(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 
-			res := tc.Band.BandDescription()
+			res := tc.Definition.BandDescription()
 
 			if !a.So(res, should.NotBeNil) {
 				t.Fatalf("Nil value received. Expected :%v", tc.Expected)
@@ -703,8 +704,8 @@ func convertBands(input map[string]map[ttnpb.PHYVersion]Band) map[string]*ttnpb.
 			Band: make(map[string]*ttnpb.BandDescription),
 		}
 
-		for PHYVersion, band := range versions {
-			versionedBandDescription.Band[PHYVersion.String()] = band.BandDescription()
+		for PHYVersion, definition := range versions {
+			versionedBandDescription.Band[PHYVersion.String()] = definition.BandDescription()
 		}
 
 		output[bandID] = versionedBandDescription

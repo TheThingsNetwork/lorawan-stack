@@ -5327,6 +5327,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/identityserver/store:last_admin": {
+    "translations": {
+      "en": "user `{user_id}` is the last admin"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/identityserver/store:login_token_already_used": {
     "translations": {
       "en": "login token already used"

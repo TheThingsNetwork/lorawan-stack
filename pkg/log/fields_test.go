@@ -12,35 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package log
+package log_test
 
 import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
+	. "go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func TestPairs(t *testing.T) {
 	a := assertions.New(t)
 
 	{
-		n := pairsToMap("a", 10, "b", true)
+		n := PairsToMap("a", 10, "b", true)
 		a.So(n["a"], should.Equal, 10)
 		a.So(n["b"], should.Equal, true)
 	}
 
 	{
-		n := pairsToMap()
+		n := PairsToMap()
 		a.So(n, should.BeEmpty)
 	}
 
 	{
-		a.So(func() { pairsToMap("a") }, should.Panic)
+		a.So(func() { PairsToMap("a") }, should.Panic)
 	}
 
 	{
-		n := pairsToMap(10, 20, true, "OK")
+		n := PairsToMap(10, 20, true, "OK")
 		a.So(n["10"], should.Equal, 20)
 		a.So(n["true"], should.Equal, "OK")
 	}

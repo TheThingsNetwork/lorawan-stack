@@ -1419,6 +1419,7 @@
   "lib.shared-messages.replaceWebhook": "Replace webhook",
   "lib.shared-messages.removeCollaborator": "Remove collaborator",
   "lib.shared-messages.removeCollaboratorSelf": "Remove yourself as collaborator",
+  "lib.shared-messages.removeCollaboratorLast": "Cannot remove last collaborator",
   "lib.shared-messages.requireAuthenticatedConnection": "Require authenticated connection",
   "lib.shared-messages.requireAuthenticatedConnectionDescription": "Controls whether this gateway may only connect if it uses an authenticated Basic Station or MQTT connection",
   "lib.shared-messages.reset": "Reset",

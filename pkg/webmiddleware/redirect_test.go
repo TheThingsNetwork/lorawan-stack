@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package webmiddleware
+package webmiddleware_test
 
 import (
 	"io"
@@ -22,12 +22,13 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	. "go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
 )
 
 func TestRedirect(t *testing.T) {
 	m := Redirect(RedirectConfiguration{
-		Scheme: func(s string) string { return schemeHTTPS },
+		Scheme: func(s string) string { return SchemeHTTPS },
 		HostName: func(h string) string {
 			if strings.HasPrefix(h, "dev.") {
 				return h

@@ -367,6 +367,18 @@ func (t *ttsCSV) Convert( //nolint:gocyclo
 	comma := ';'
 	const maxHeaderLength = 1024
 	buf := bufio.NewReaderSize(r, maxHeaderLength)
+
+	// eliminate BOM if its present
+	ru, _, err := buf.ReadRune()
+	if err != nil {
+		return err
+	}
+	if ru != '\uFEFF' {
+		if err := buf.UnreadRune(); err != nil {
+			return err
+		}
+	}
+
 	if head, _ := buf.Peek(maxHeaderLength); len(head) > 0 {
 		if c, ok := determineComma(head); ok {
 			comma = c

@@ -65,8 +65,6 @@ var (
 	Equal = assertions.ShouldEqual
 	// EqualJSON receives exactly two parameters and does an equality check by marshalling to JSON.
 	EqualJSON = assertions.ShouldEqualJSON
-	// EqualProto receives exactly two parameters and does an equality check by marshalling to protobuf text.
-	EqualProto = testassertions.ShouldEqualProto
 	// EqualTrimSpace receives exactly 2 string parameters and ensures that the first is equal to the second after removing all leading and trailing whitespace using strings.TrimSpace(first).
 	EqualTrimSpace = assertions.ShouldEqualTrimSpace
 	// EqualWithout receives exactly 3 string parameters and ensures that the first is equal to the second after removing all instances of the third from the first using strings.Replace(first, third, "", -1).

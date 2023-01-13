@@ -316,5 +316,18 @@ func TestUsersCRUD(t *testing.T) {
 
 		_, err = reg.Purge(ctx, usr1.GetIds(), adminUsrCreds)
 		a.So(err, should.BeNil)
+
+		// Admin restrictions, cannot remove the only admin in tenant store.
+		_, err = reg.Delete(ctx, adminUsr.GetIds(), adminUsrCreds)
+		a.So(errors.IsFailedPrecondition(err), should.BeTrue)
+
+		_, err = reg.Update(ctx, &ttnpb.UpdateUserRequest{
+			User: &ttnpb.User{
+				Ids:   adminUsr.GetIds(),
+				Admin: false,
+			},
+			FieldMask: ttnpb.FieldMask("admin"),
+		}, adminUsrCreds)
+		a.So(errors.IsFailedPrecondition(err), should.BeTrue)
 	}, withPrivateTestDatabase(p))
 }

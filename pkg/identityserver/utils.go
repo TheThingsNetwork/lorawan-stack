@@ -19,6 +19,8 @@ import (
 	"strconv"
 
 	pbtypes "github.com/gogo/protobuf/types"
+	"github.com/golang/protobuf/proto"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/validate"
 	"google.golang.org/grpc"
@@ -79,4 +81,17 @@ func idStrings(entityIDs ...*ttnpb.EntityIdentifiers) []string {
 		idStrings[i] = entityID.IDString()
 	}
 	return idStrings
+}
+
+// isLastAdmin determines if the userID provided belongs to the last admin of the tenant. Returns an error if the
+// condition is true.
+func isLastAdmin(ctx context.Context, st store.Store, id *ttnpb.UserIdentifiers) error {
+	adminList, err := st.ListAdmins(ctx, store.FieldMask{"ids"})
+	if err != nil {
+		return err
+	}
+	if len(adminList) == 1 && proto.Equal(adminList[0].Ids, id) {
+		return store.ErrLastAdmin.New()
+	}
+	return nil
 }

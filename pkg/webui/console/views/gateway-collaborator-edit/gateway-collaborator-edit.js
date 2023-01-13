@@ -37,6 +37,7 @@ const GatewayCollaboratorEdit = props => {
     collaborator,
     collaboratorId,
     collaboratorType,
+    collaboratorsTotalCount,
     gtwId,
     pseudoRights,
     redirectToList,
@@ -72,6 +73,7 @@ const GatewayCollaboratorEdit = props => {
             collaborator={collaborator}
             pseudoRights={pseudoRights}
             rights={rights}
+            deleteDisabled={collaboratorsTotalCount === 1}
             update
           />
         </Col>
@@ -84,6 +86,7 @@ GatewayCollaboratorEdit.propTypes = {
   collaborator: PropTypes.collaborator.isRequired,
   collaboratorId: PropTypes.string.isRequired,
   collaboratorType: PropTypes.string.isRequired,
+  collaboratorsTotalCount: PropTypes.number.isRequired,
   gtwId: PropTypes.string.isRequired,
   pseudoRights: PropTypes.rights.isRequired,
   redirectToList: PropTypes.func.isRequired,

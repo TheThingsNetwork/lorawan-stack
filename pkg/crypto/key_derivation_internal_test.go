@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package crypto
+package crypto_test
 
 import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
+	. "go.thethings.network/lorawan-stack/v3/pkg/crypto"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func TestReverse(t *testing.T) {
-	assertions.New(t).So(reverse([]byte{1, 2, 3, 4}), should.Resemble, []byte{4, 3, 2, 1})
+	assertions.New(t).So(Reverse([]byte{1, 2, 3, 4}), should.Resemble, []byte{4, 3, 2, 1})
 }
