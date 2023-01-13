@@ -77,12 +77,7 @@ func TestPProf(t *testing.T) {
 			password: metricsPassword,
 		},
 		{
-			path:     "healthz/live",
-			username: healthUsername,
-			password: healthPassword,
-		},
-		{
-			path:     "healthz/ready",
+			path:     "healthz",
 			username: healthUsername,
 			password: healthPassword,
 		},

@@ -37,7 +37,7 @@ RUN mkdir /srv/ttn-lorawan/public/blob
 
 VOLUME ["/srv/ttn-lorawan/public/blob"]
 
-ENV TTN_LW_HEALTHCHECK_URL=http://localhost:1885/healthz/live
+ENV TTN_LW_HEALTHCHECK_URL=http://localhost:1885/healthz
 
 HEALTHCHECK --interval=1m --timeout=5s CMD curl -f $TTN_LW_HEALTHCHECK_URL || exit 1
 
