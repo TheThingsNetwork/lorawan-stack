@@ -17,6 +17,8 @@ For details about compatibility between different releases, see the **Commitment
 ### Changed
 
 - `serial_number` field is now moved to the root of the end device structure. `vendor_id` and `vendor_profile_id` are now moved to the `lora_alliance_profile_ids`. This requires a database migration in the Identity Server.
+- Deletion of the last admin user or removal of its admin status via an update operation now returns an error.
+- Do not allow to remove the collaborator of an entity if it is the last collaborator (in the Console).
 
 ### Deprecated
 
@@ -27,6 +29,8 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - When searching for end-devices, specifying `last_seen_at` as the field in which the devices will be sorted by no longer returns an error.
+- Errors during removal of collaborators the application collaborator form not being forwarded to the user in the Console.
+- Importing devices via CSV no longer skips the first header column when BOM bytes are present.
 
 ### Security
 

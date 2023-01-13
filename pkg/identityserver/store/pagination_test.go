@@ -18,8 +18,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func TestPagination(t *testing.T) {

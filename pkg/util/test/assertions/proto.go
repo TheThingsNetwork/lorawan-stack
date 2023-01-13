@@ -82,19 +82,3 @@ func shouldEqualProto(actual, expected proto.Message) string {
 	}
 	return success
 }
-
-// ShouldEqualProto does an equality check by marshalling to protobuf text.
-func ShouldEqualProto(actual interface{}, expected ...interface{}) (message string) {
-	if message = need(1, expected); message != success {
-		return
-	}
-	expectedMessage := getProtoMessage(expected[0])
-	if expectedMessage == nil {
-		return fmt.Sprintf("expected value (of type %T) is not a proto.Message", expected[0])
-	}
-	actualMessage := getProtoMessage(actual)
-	if actualMessage == nil {
-		return fmt.Sprintf("actual value (of type %T) is not a proto.Message", actual)
-	}
-	return shouldEqualProto(actualMessage, expectedMessage)
-}

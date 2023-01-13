@@ -19,12 +19,13 @@ import tts from '@console/api/tts'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
 
-import { getCollaborator } from '@ttn-lw/lib/store/actions/collaborators'
+import { getCollaborator, getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
 import {
   selectUserCollaborator,
   selectOrganizationCollaborator,
   selectCollaboratorFetching,
   selectCollaboratorError,
+  selectCollaboratorsTotalCount,
 } from '@ttn-lw/lib/store/selectors/collaborators'
 
 import {
@@ -52,6 +53,7 @@ const mapStateToProps = (state, props) => {
     collaboratorId,
     collaboratorType,
     collaborator,
+    collaboratorsTotalCount: selectCollaboratorsTotalCount(state, gtwId),
     gtwId,
     rights: selectGatewayRights(state),
     pseudoRights: selectGatewayPseudoRights(state),
@@ -63,6 +65,7 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = dispatch => ({
   getCollaborator: (gtwId, collaboratorId, isUser) => {
     dispatch(getCollaborator('gateway', gtwId, collaboratorId, isUser))
+    dispatch(getCollaboratorsList('gateway', gtwId))
   },
   redirectToList: gtwId => {
     dispatch(replace(`/gateways/${gtwId}/collaborators`))

@@ -27,7 +27,6 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/account"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/pbkdf2"
@@ -38,6 +37,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/oauth"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/webui"
 	"golang.org/x/net/publicsuffix"
 )
