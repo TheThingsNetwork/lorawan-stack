@@ -22,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 )
 
 // Account is the account model in the database.
@@ -82,7 +83,7 @@ func (s *baseStore) getAccountModel(
 		Where("?TableAlias.uid = ?", uid)
 
 	if err := selectQuery.Scan(ctx); err != nil {
-		err = errors.WrapDriverError(err)
+		err = storeutil.WrapDriverError(err)
 		if errors.IsNotFound(err) {
 			return nil, store.ErrAccountNotFound.WithAttributes(
 				"account_type", accountType,

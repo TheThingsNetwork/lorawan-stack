@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 )
 
 // EndDevice is the end_device model in the database.
@@ -251,7 +252,7 @@ func (s *endDeviceStore) CreateEndDevice(
 			Model(model.Picture).
 			Exec(ctx)
 		if err != nil {
-			return nil, errors.WrapDriverError(err)
+			return nil, storeutil.WrapDriverError(err)
 		}
 
 		model.PictureID = &model.Picture.ID
@@ -261,7 +262,7 @@ func (s *endDeviceStore) CreateEndDevice(
 		Model(model).
 		Exec(ctx)
 	if err != nil {
-		return nil, errors.WrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	if len(pb.Attributes) > 0 {
@@ -356,7 +357,7 @@ func (s *endDeviceStore) listEndDevicesBy(
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
 	if err != nil {
-		return nil, errors.WrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 	store.SetTotal(ctx, uint64(count))
 
@@ -378,7 +379,7 @@ func (s *endDeviceStore) listEndDevicesBy(
 	// Scan the results.
 	err = selectQuery.Scan(ctx)
 	if err != nil {
-		return nil, errors.WrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	// Convert the results to protobuf.
@@ -442,7 +443,7 @@ func (s *endDeviceStore) CountEndDevices(ctx context.Context, ids *ttnpb.Applica
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
 	if err != nil {
-		return 0, errors.WrapDriverError(err)
+		return 0, storeutil.WrapDriverError(err)
 	}
 
 	return uint64(count), nil
@@ -509,7 +510,7 @@ func (s *endDeviceStore) getEndDeviceModelBy(
 	}
 
 	if err := selectQuery.Scan(ctx); err != nil {
-		return nil, errors.WrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	return model, nil
@@ -669,7 +670,7 @@ func (s *endDeviceStore) updateEndDeviceModel( //nolint:gocyclo
 					WherePK().
 					Exec(ctx)
 				if err != nil {
-					return errors.WrapDriverError(err)
+					return storeutil.WrapDriverError(err)
 				}
 			}
 			if pb.Picture != nil {
@@ -682,7 +683,7 @@ func (s *endDeviceStore) updateEndDeviceModel( //nolint:gocyclo
 					Model(model.Picture).
 					Exec(ctx)
 				if err != nil {
-					return errors.WrapDriverError(err)
+					return storeutil.WrapDriverError(err)
 				}
 
 				model.PictureID = &model.Picture.ID
@@ -735,7 +736,7 @@ func (s *endDeviceStore) updateEndDeviceModel( //nolint:gocyclo
 		Column(columns...).
 		Exec(ctx)
 	if err != nil {
-		return errors.WrapDriverError(err)
+		return storeutil.WrapDriverError(err)
 	}
 
 	return nil
@@ -814,7 +815,7 @@ func (s *endDeviceStore) DeleteEndDevice(ctx context.Context, id *ttnpb.EndDevic
 		WherePK().
 		Exec(ctx)
 	if err != nil {
-		return errors.WrapDriverError(err)
+		return storeutil.WrapDriverError(err)
 	}
 
 	if _, err = s.replaceEndDeviceLocations(ctx, model.Locations, nil, model.ID); err != nil {
@@ -827,7 +828,7 @@ func (s *endDeviceStore) DeleteEndDevice(ctx context.Context, id *ttnpb.EndDevic
 			Where("id = ?", *model.PictureID).
 			Exec(ctx)
 		if err != nil {
-			return errors.WrapDriverError(err)
+			return storeutil.WrapDriverError(err)
 		}
 	}
 
@@ -877,7 +878,7 @@ func (s *endDeviceStore) BatchUpdateEndDeviceLastSeen(
 
 	_, err := updateQuery.Exec(ctx)
 	if err != nil {
-		return errors.WrapDriverError(err)
+		return storeutil.WrapDriverError(err)
 	}
 
 	return nil

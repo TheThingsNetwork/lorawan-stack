@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package errors
+package store
 
 import (
 	"context"
@@ -24,26 +24,27 @@ import (
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/uptrace/bun/driver/pgdriver"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
 var (
 	// ErrUnavailable is an error that indicates an unavailable database.
-	ErrUnavailable = DefineUnavailable("database_unavailable", "database unavailable")
+	ErrUnavailable = errors.DefineUnavailable("database_unavailable", "database unavailable")
 	// ErrNotFound is an error that indicates a missing entity.
-	ErrNotFound = DefineNotFound("not_found", "no results found")
+	ErrNotFound = errors.DefineNotFound("not_found", "no results found")
 	// ErrDriver is an error that indicates a driver error.
-	ErrDriver = Define("driver", "driver error")
+	ErrDriver = errors.Define("driver", "driver error")
 	// ErrIDTaken is returned when an entity can not be created because the ID is already taken.
-	ErrIDTaken = DefineAlreadyExists("id_taken", "ID already taken, choose a different one and try again")
+	ErrIDTaken = errors.DefineAlreadyExists("id_taken", "ID already taken, choose a different one and try again")
 	// ErrEUITaken is returned when an entity can not be created because the EUI is already taken.
-	ErrEUITaken = DefineAlreadyExists("eui_taken", "EUI already taken")
+	ErrEUITaken = errors.DefineAlreadyExists("eui_taken", "EUI already taken")
 )
 
 // driverErrorCodes maps PostgreSQL error codes to the corresponding error definition.
 // See https://www.postgresql.org/docs/current/errcodes-appendix.html for more information.
-var driverErrorCodes = map[string]*Definition{
-	pgerrcode.UniqueViolation:  DefineAlreadyExists("already_exists", "already exists"),
-	pgerrcode.QueryCanceled:    DefineCanceled("query_canceled", "query canceled"),
+var driverErrorCodes = map[string]*errors.Definition{
+	pgerrcode.UniqueViolation:  errors.DefineAlreadyExists("already_exists", "already exists"),
+	pgerrcode.QueryCanceled:    errors.DefineCanceled("query_canceled", "query canceled"),
 	pgerrcode.AdminShutdown:    ErrUnavailable,
 	pgerrcode.CrashShutdown:    ErrUnavailable,
 	pgerrcode.CannotConnectNow: ErrUnavailable,
@@ -103,11 +104,11 @@ func (e *DriverError) GetError() error {
 
 // WrapDriverError wraps a driver error with the corresponding error definition.
 func WrapDriverError(err error) error {
-	if Is(err, sql.ErrNoRows) {
+	if errors.Is(err, sql.ErrNoRows) {
 		return ErrNotFound.WithCause(err)
 	}
 	var driverError DriverError
-	if pgconnErr := (*pgconn.PgError)(nil); As(err, &pgconnErr) {
+	if pgconnErr := (*pgconn.PgError)(nil); errors.As(err, &pgconnErr) {
 		driverError.Code = pgconnErr.Code
 		driverError.Message = pgconnErr.Message
 		driverError.Detail = pgconnErr.Detail
@@ -116,7 +117,7 @@ func WrapDriverError(err error) error {
 		driverError.Constraint = pgconnErr.ConstraintName
 		return driverError.GetError()
 	}
-	if pgdriverErr := (pgdriver.Error{}); As(err, &pgdriverErr) {
+	if pgdriverErr := (pgdriver.Error{}); errors.As(err, &pgdriverErr) {
 		// See https://www.postgresql.org/docs/current/protocol-error-fields.html for more information.
 		driverError.Code = pgdriverErr.Field('C')
 		driverError.Message = pgdriverErr.Field('M')
@@ -126,13 +127,13 @@ func WrapDriverError(err error) error {
 		driverError.Constraint = pgdriverErr.Field('n')
 		return driverError.GetError()
 	}
-	if Is(err, io.EOF) {
+	if errors.Is(err, io.EOF) {
 		return ErrUnavailable.WithCause(err)
 	}
-	if Is(err, driver.ErrBadConn) {
+	if errors.Is(err, driver.ErrBadConn) {
 		return ErrUnavailable.WithCause(err)
 	}
-	if timeoutError := (interface{ Timeout() bool })(nil); As(err, &timeoutError) && timeoutError.Timeout() {
+	if timeoutError := (interface{ Timeout() bool })(nil); errors.As(err, &timeoutError) && timeoutError.Timeout() {
 		return context.DeadlineExceeded
 	}
 	return err

@@ -44,11 +44,11 @@ func newDB(ctx context.Context, db *bun.DB) (*baseDB, error) {
 	var version string
 	res, err := db.QueryContext(ctx, "SELECT VERSION()")
 	if err != nil {
-		return nil, errors.WrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 	res.Next()
 	if err = res.Scan(&version); err != nil {
-		return nil, errors.WrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	s.server, _, _ = strings.Cut(version, " ")
@@ -56,11 +56,11 @@ func newDB(ctx context.Context, db *bun.DB) (*baseDB, error) {
 	var serverVersion string
 	res, err = db.QueryContext(ctx, "SHOW SERVER_VERSION")
 	if err != nil {
-		return nil, errors.WrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 	res.Next()
 	if err = res.Scan(&serverVersion); err != nil {
-		return nil, errors.WrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	major, _, _ := strings.Cut(serverVersion, ".")
@@ -87,7 +87,7 @@ func (s *baseStore) transact(ctx context.Context, fc func(context.Context, bun.I
 	}
 	tx, err := db.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
-		return errors.WrapDriverError(err)
+		return storeutil.WrapDriverError(err)
 	}
 	var done bool
 	defer func() {
@@ -106,7 +106,7 @@ func (s *baseStore) transact(ctx context.Context, fc func(context.Context, bun.I
 		if ctxErr := ctx.Err(); ctxErr != nil && errors.Is(err, sql.ErrTxDone) {
 			return ctxErr
 		}
-		return errors.WrapDriverError(err)
+		return storeutil.WrapDriverError(err)
 	}
 	return nil
 }
@@ -181,7 +181,7 @@ func (s *Store) Transact(ctx context.Context, fc func(context.Context, store.Sto
 			baseStore.DB = idb
 			return fc(ctx, newStore(baseStore))
 		})
-		if !errors.Is(err, errors.ErrUnavailable) {
+		if !errors.Is(err, storeutil.ErrUnavailable) {
 			break
 		}
 		log.FromContext(ctx).WithError(err).WithFields(log.Fields(

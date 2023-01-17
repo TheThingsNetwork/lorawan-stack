@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 )
 
 // APIKey is the API key model in the database.
@@ -105,7 +106,7 @@ func (s *apiKeyStore) CreateAPIKey(
 		Model(model).
 		Exec(ctx)
 	if err != nil {
-		return nil, errors.WrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	pb, err = apiKeyToPB(model)
@@ -126,7 +127,7 @@ func (s *apiKeyStore) listAPIKeysBy(
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
 	if err != nil {
-		return nil, errors.WrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 	store.SetTotal(ctx, uint64(count))
 
@@ -143,7 +144,7 @@ func (s *apiKeyStore) listAPIKeysBy(
 	// Scan the results.
 	err = selectQuery.Scan(ctx)
 	if err != nil {
-		return nil, errors.WrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	// Convert the results to protobuf.
@@ -200,7 +201,7 @@ func (s *apiKeyStore) getAPIKeyModelBy(
 	selectQuery := s.newSelectModel(ctx, model).Apply(by)
 
 	if err := selectQuery.Scan(ctx); err != nil {
-		return nil, errors.WrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	return model, nil
@@ -312,7 +313,7 @@ func (s *apiKeyStore) UpdateAPIKey(
 			WherePK().
 			Exec(ctx)
 		if err != nil {
-			return nil, errors.WrapDriverError(err)
+			return nil, storeutil.WrapDriverError(err)
 		}
 		return nil, nil //nolint:nilnil // This will be fixed by the refactor mentioned above.
 	}
@@ -341,7 +342,7 @@ func (s *apiKeyStore) UpdateAPIKey(
 		Column(columns...).
 		Exec(ctx)
 	if err != nil {
-		return nil, errors.WrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	updatedPB, err := apiKeyToPB(model)
@@ -369,7 +370,7 @@ func (s *apiKeyStore) DeleteEntityAPIKeys(ctx context.Context, entityID *ttnpb.E
 		Where("entity_type = ? AND entity_id = ?", entityType, entityUUID).
 		Exec(ctx)
 	if err != nil {
-		return errors.WrapDriverError(err)
+		return storeutil.WrapDriverError(err)
 	}
 
 	return nil

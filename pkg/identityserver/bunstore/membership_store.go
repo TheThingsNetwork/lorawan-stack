@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 )
 
 // Membership is the membership model in the database.
@@ -149,7 +150,7 @@ func (s *membershipStore) CountMemberships(
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
 	if err != nil {
-		return 0, errors.WrapDriverError(err)
+		return 0, storeutil.WrapDriverError(err)
 	}
 
 	return uint64(count), nil
@@ -245,7 +246,7 @@ func (s *membershipStore) FindAccountMembershipChains(
 	}
 
 	if err = directSelectQuery.Scan(ctx); err != nil {
-		return nil, errors.WrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	var indirectMemberships []*indirectEntityMembership
@@ -258,7 +259,7 @@ func (s *membershipStore) FindAccountMembershipChains(
 	}
 
 	if err = indirectSelectQuery.Scan(ctx); err != nil {
-		return nil, errors.WrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	membershipChains := make([]*store.MembershipChain, 0, len(directMemberships)+len(indirectMemberships))
@@ -321,7 +322,7 @@ func (s *membershipStore) FindMembers(
 
 	count, err := selectQuery.Count(ctx)
 	if err != nil {
-		return nil, errors.WrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 	store.SetTotal(ctx, uint64(count))
 
@@ -334,7 +335,7 @@ func (s *membershipStore) FindMembers(
 		Apply(selectWithLimitAndOffsetFromContext(ctx))
 
 	if err := selectQuery.Scan(ctx); err != nil {
-		return nil, errors.WrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	res := make([]*store.MemberByID, len(models))
@@ -378,7 +379,7 @@ func (s *membershipStore) GetMember(
 		Where("entity_id = ?", entityUUID).
 		Scan(ctx)
 	if err != nil {
-		err = errors.WrapDriverError(err)
+		err = storeutil.WrapDriverError(err)
 		if errors.IsNotFound(err) {
 			return nil, store.ErrMembershipNotFound.WithAttributes(
 				"account_type", accountID.EntityType(),
@@ -425,7 +426,7 @@ func (s *membershipStore) SetMember(
 		Where("entity_id = ?", entityUUID).
 		Scan(ctx)
 	if err != nil {
-		err = errors.WrapDriverError(err)
+		err = storeutil.WrapDriverError(err)
 		if errors.IsNotFound(err) {
 			_, err = s.DB.NewInsert().
 				Model(&Membership{
@@ -437,7 +438,7 @@ func (s *membershipStore) SetMember(
 				}).
 				Exec(ctx)
 			if err != nil {
-				return errors.WrapDriverError(err)
+				return storeutil.WrapDriverError(err)
 			}
 			return nil
 		}
@@ -452,7 +453,7 @@ func (s *membershipStore) SetMember(
 			WherePK().
 			Exec(ctx)
 		if err != nil {
-			return errors.WrapDriverError(err)
+			return storeutil.WrapDriverError(err)
 		}
 		return nil
 	}
@@ -465,7 +466,7 @@ func (s *membershipStore) SetMember(
 		Column("rights", "updated_at").
 		Exec(ctx)
 	if err != nil {
-		return errors.WrapDriverError(err)
+		return storeutil.WrapDriverError(err)
 	}
 
 	return nil
@@ -491,7 +492,7 @@ func (s *membershipStore) DeleteEntityMembers(
 		Where("entity_type = ?", entityType).
 		Where("entity_id = ?", entityUUID)
 	if _, err = deleteQuery.Exec(ctx); err != nil {
-		return errors.WrapDriverError(err)
+		return storeutil.WrapDriverError(err)
 	}
 
 	return nil
@@ -516,7 +517,7 @@ func (s *membershipStore) DeleteAccountMembers(
 		Model(model).
 		Where("account_id = ?", account.ID)
 	if _, err = deleteQuery.Exec(ctx); err != nil {
-		return errors.WrapDriverError(err)
+		return storeutil.WrapDriverError(err)
 	}
 
 	return nil

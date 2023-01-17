@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 )
 
 // LoginToken is the login token model in the database.
@@ -96,7 +97,7 @@ func (s *loginTokenStore) FindActiveLoginTokens(
 		Where("used = FALSE OR used IS NULL"). // TODO: Make "used" column NOT NULL (https://github.com/TheThingsNetwork/lorawan-stack/issues/5613).
 		Scan(ctx)
 	if err != nil {
-		return nil, errors.WrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	pbs := make([]*ttnpb.LoginToken, len(models))
@@ -132,7 +133,7 @@ func (s *loginTokenStore) CreateLoginToken(ctx context.Context, pb *ttnpb.LoginT
 		Model(model).
 		Exec(ctx)
 	if err != nil {
-		return nil, errors.WrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	pb, err = loginTokenToPB(model, pb.GetUserIds())
@@ -155,7 +156,7 @@ func (s *loginTokenStore) ConsumeLoginToken(ctx context.Context, token string) (
 		}).
 		Scan(ctx)
 	if err != nil {
-		err = errors.WrapDriverError(err)
+		err = storeutil.WrapDriverError(err)
 		if errors.IsNotFound(err) {
 			return nil, store.ErrLoginTokenNotFound.New()
 		}
@@ -176,7 +177,7 @@ func (s *loginTokenStore) ConsumeLoginToken(ctx context.Context, token string) (
 		Set("used = true").
 		Exec(ctx)
 	if err != nil {
-		return nil, errors.WrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	pb, err := loginTokenToPB(model, nil)
