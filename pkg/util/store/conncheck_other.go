@@ -15,7 +15,7 @@
 //go:build !linux && !darwin
 // +build !linux,!darwin
 
-package store
+package storeutil
 
 import "net"
 
