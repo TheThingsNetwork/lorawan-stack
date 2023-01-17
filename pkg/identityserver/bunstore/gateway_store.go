@@ -305,7 +305,7 @@ func (s *gatewayStore) CreateGateway(
 		Model(gatewayModel).
 		Exec(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 
 	if len(pb.Attributes) > 0 {
@@ -420,7 +420,7 @@ func (s *gatewayStore) CountGateways(ctx context.Context) (uint64, error) {
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
 	if err != nil {
-		return 0, wrapDriverError(err)
+		return 0, errors.WrapDriverError(err)
 	}
 
 	return uint64(count), nil
@@ -437,7 +437,7 @@ func (s *gatewayStore) listGatewaysBy(
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 	store.SetTotal(ctx, uint64(count))
 
@@ -458,7 +458,7 @@ func (s *gatewayStore) listGatewaysBy(
 	// Scan the results.
 	err = selectQuery.Scan(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 
 	// Convert the results to protobuf.
@@ -529,7 +529,7 @@ func (s *gatewayStore) getGatewayModelBy(
 	}
 
 	if err := selectQuery.Scan(ctx); err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 
 	return model, nil
@@ -759,7 +759,7 @@ func (s *gatewayStore) updateGatewayModel( //nolint:gocyclo
 		Column(columns...).
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	return nil
@@ -819,7 +819,7 @@ func (s *gatewayStore) DeleteGateway(ctx context.Context, id *ttnpb.GatewayIdent
 		WherePK().
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 	return nil
 }
@@ -867,7 +867,7 @@ func (s *gatewayStore) RestoreGateway(ctx context.Context, id *ttnpb.GatewayIden
 	}
 	_, err = updateQuery.Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	return nil
@@ -917,7 +917,7 @@ func (s *gatewayStore) PurgeGateway(ctx context.Context, id *ttnpb.GatewayIdenti
 		ForceDelete().
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	return nil

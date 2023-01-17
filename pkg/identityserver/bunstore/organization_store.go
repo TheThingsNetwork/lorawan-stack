@@ -179,7 +179,7 @@ func (s *organizationStore) CreateOrganization(
 		return nil
 	})
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 
 	if len(pb.Attributes) > 0 {
@@ -254,7 +254,7 @@ func (s *organizationStore) CountOrganizations(ctx context.Context) (uint64, err
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
 	if err != nil {
-		return 0, wrapDriverError(err)
+		return 0, errors.WrapDriverError(err)
 	}
 
 	return uint64(count), nil
@@ -271,7 +271,7 @@ func (s *organizationStore) listOrganizationsBy(
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 	store.SetTotal(ctx, uint64(count))
 
@@ -292,7 +292,7 @@ func (s *organizationStore) listOrganizationsBy(
 	// Scan the results.
 	err = selectQuery.Scan(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 
 	// Convert the results to protobuf.
@@ -348,7 +348,7 @@ func (s *organizationStore) getOrganizationModelBy(
 	}
 
 	if err := selectQuery.Scan(ctx); err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 
 	return model, nil
@@ -447,7 +447,7 @@ func (s *organizationStore) updateOrganizationModel( //nolint:gocyclo
 		Column(columns...).
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	return nil
@@ -507,7 +507,7 @@ func (s *organizationStore) DeleteOrganization(ctx context.Context, id *ttnpb.Or
 		WherePK().
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	accountModel, err := s.getAccountModel(ctx, id.GetEntityIdentifiers().EntityType(), id.GetOrganizationId())
@@ -525,7 +525,7 @@ func (s *organizationStore) DeleteOrganization(ctx context.Context, id *ttnpb.Or
 		WherePK().
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	return nil
@@ -558,7 +558,7 @@ func (s *organizationStore) RestoreOrganization(ctx context.Context, id *ttnpb.O
 		Set("deleted_at = NULL").
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	accountModel, err := s.getAccountModel(
@@ -580,7 +580,7 @@ func (s *organizationStore) RestoreOrganization(ctx context.Context, id *ttnpb.O
 		Set("deleted_at = NULL").
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	return nil
@@ -626,7 +626,7 @@ func (s *organizationStore) PurgeOrganization(ctx context.Context, id *ttnpb.Org
 		ForceDelete().
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	accountModel, err := s.getAccountModel(
@@ -647,7 +647,7 @@ func (s *organizationStore) PurgeOrganization(ctx context.Context, id *ttnpb.Org
 		ForceDelete().
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	return nil

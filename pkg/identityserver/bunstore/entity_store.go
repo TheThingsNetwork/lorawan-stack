@@ -114,7 +114,7 @@ func (s *entityStore) getEntity(ctx context.Context, ids ttnpb.IDStringer) (enti
 	var uuid string
 	err = s.query(ctx, entityType, ids.IDString()).Scan(ctx, &uuid)
 	if err != nil {
-		err = wrapDriverError(err)
+		err = errors.WrapDriverError(err)
 		if errors.IsNotFound(err) {
 			return "", "", store.ErrEntityNotFound.WithAttributes(
 				"entity_type", ids.EntityType(),
@@ -130,7 +130,7 @@ func (s *entityStore) getEntityUUIDs(ctx context.Context, entityType string, ent
 	var uuids []string
 	err := s.query(ctx, entityType, entityIDs...).Scan(ctx, &uuids)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 	return uuids, nil
 }
@@ -163,7 +163,7 @@ func (s *entityStore) getEntityID(ctx context.Context, entityType, entityUUID st
 	var friendlyID string
 	err := query.Scan(ctx, &friendlyID)
 	if err != nil {
-		return "", wrapDriverError(err)
+		return "", errors.WrapDriverError(err)
 	}
 
 	return friendlyID, nil

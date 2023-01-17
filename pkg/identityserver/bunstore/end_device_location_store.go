@@ -19,6 +19,7 @@ import (
 	"sort"
 
 	"github.com/uptrace/bun"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -107,7 +108,7 @@ func (s *endDeviceStore) replaceEndDeviceLocations(
 			WherePK().
 			Exec(ctx)
 		if err != nil {
-			return nil, wrapDriverError(err)
+			return nil, errors.WrapDriverError(err)
 		}
 	}
 
@@ -118,7 +119,7 @@ func (s *endDeviceStore) replaceEndDeviceLocations(
 			Bulk().
 			Exec(ctx)
 		if err != nil {
-			return nil, wrapDriverError(err)
+			return nil, errors.WrapDriverError(err)
 		}
 	}
 
@@ -127,7 +128,7 @@ func (s *endDeviceStore) replaceEndDeviceLocations(
 			Model(&toCreate).
 			Exec(ctx)
 		if err != nil {
-			return nil, wrapDriverError(err)
+			return nil, errors.WrapDriverError(err)
 		}
 	}
 

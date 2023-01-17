@@ -93,7 +93,7 @@ func (s *invitationStore) CreateInvitation(
 		Model(model).
 		Exec(ctx)
 	if err != nil {
-		err = wrapDriverError(err)
+		err = errors.WrapDriverError(err)
 		if errors.IsAlreadyExists(err) {
 			return nil, store.ErrInvitationAlreadySent.New()
 		}
@@ -118,7 +118,7 @@ func (s *invitationStore) FindInvitations(ctx context.Context) ([]*ttnpb.Invitat
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 	store.SetTotal(ctx, uint64(count))
 
@@ -141,7 +141,7 @@ func (s *invitationStore) FindInvitations(ctx context.Context) ([]*ttnpb.Invitat
 	// Scan the results.
 	err = selectQuery.Scan(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 
 	// Convert the results to protobuf.
@@ -165,7 +165,7 @@ func (s *invitationStore) getInvitationModelBy(
 	selectQuery := s.newSelectModel(ctx, model).Apply(by)
 
 	if err := selectQuery.Scan(ctx); err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 
 	return model, nil
@@ -241,7 +241,7 @@ func (s *invitationStore) SetInvitationAcceptedBy(
 		Set("accepted_by_id = ?, accepted_at = NOW()", userUUID).
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	return nil
@@ -266,7 +266,7 @@ func (s *invitationStore) DeleteInvitation(ctx context.Context, email string) er
 		WherePK().
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	return nil

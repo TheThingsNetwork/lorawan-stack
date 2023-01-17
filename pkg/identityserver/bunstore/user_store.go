@@ -189,7 +189,7 @@ func (s *userStore) CreateUser(ctx context.Context, pb *ttnpb.User) (*ttnpb.User
 			Model(userModel.ProfilePicture).
 			Exec(ctx)
 		if err != nil {
-			return nil, wrapDriverError(err)
+			return nil, errors.WrapDriverError(err)
 		}
 
 		userModel.ProfilePictureID = &userModel.ProfilePicture.ID
@@ -219,7 +219,7 @@ func (s *userStore) CreateUser(ctx context.Context, pb *ttnpb.User) (*ttnpb.User
 		return nil
 	})
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 
 	if len(pb.Attributes) > 0 {
@@ -301,7 +301,7 @@ func (s *userStore) CountUsers(ctx context.Context) (uint64, error) {
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
 	if err != nil {
-		return 0, wrapDriverError(err)
+		return 0, errors.WrapDriverError(err)
 	}
 
 	return uint64(count), nil
@@ -318,7 +318,7 @@ func (s *userStore) listUsersBy(
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 	store.SetTotal(ctx, uint64(count))
 
@@ -342,7 +342,7 @@ func (s *userStore) listUsersBy(
 	// Scan the results.
 	err = selectQuery.Scan(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 
 	// Convert the results to protobuf.
@@ -409,7 +409,7 @@ func (s *userStore) getUserModelBy(
 	}
 
 	if err := selectQuery.Scan(ctx); err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 
 	return model, nil
@@ -553,7 +553,7 @@ func (s *userStore) updateUserModel( //nolint:gocyclo
 					WherePK().
 					Exec(ctx)
 				if err != nil {
-					return wrapDriverError(err)
+					return errors.WrapDriverError(err)
 				}
 			}
 			if pb.ProfilePicture != nil {
@@ -566,7 +566,7 @@ func (s *userStore) updateUserModel( //nolint:gocyclo
 					Model(model.ProfilePicture).
 					Exec(ctx)
 				if err != nil {
-					return wrapDriverError(err)
+					return errors.WrapDriverError(err)
 				}
 
 				model.ProfilePictureID = &model.ProfilePicture.ID
@@ -585,7 +585,7 @@ func (s *userStore) updateUserModel( //nolint:gocyclo
 		Column(columns...).
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	return nil
@@ -643,7 +643,7 @@ func (s *userStore) DeleteUser(ctx context.Context, id *ttnpb.UserIdentifiers) e
 		WherePK().
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	accountModel, err := s.getAccountModel(ctx, id.GetEntityIdentifiers().EntityType(), id.GetUserId())
@@ -661,7 +661,7 @@ func (s *userStore) DeleteUser(ctx context.Context, id *ttnpb.UserIdentifiers) e
 		WherePK().
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	if model.ProfilePictureID != nil {
@@ -670,7 +670,7 @@ func (s *userStore) DeleteUser(ctx context.Context, id *ttnpb.UserIdentifiers) e
 			Where("id = ?", *model.ProfilePictureID).
 			Exec(ctx)
 		if err != nil {
-			return wrapDriverError(err)
+			return errors.WrapDriverError(err)
 		}
 	}
 
@@ -704,7 +704,7 @@ func (s *userStore) RestoreUser(ctx context.Context, id *ttnpb.UserIdentifiers) 
 		Set("deleted_at = NULL").
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	accountModel, err := s.getAccountModel(
@@ -726,7 +726,7 @@ func (s *userStore) RestoreUser(ctx context.Context, id *ttnpb.UserIdentifiers) 
 		Set("deleted_at = NULL").
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	if model.ProfilePictureID != nil {
@@ -737,7 +737,7 @@ func (s *userStore) RestoreUser(ctx context.Context, id *ttnpb.UserIdentifiers) 
 			Set("deleted_at = NULL").
 			Exec(ctx)
 		if err != nil {
-			return wrapDriverError(err)
+			return errors.WrapDriverError(err)
 		}
 	}
 
@@ -784,7 +784,7 @@ func (s *userStore) PurgeUser(ctx context.Context, id *ttnpb.UserIdentifiers) er
 		ForceDelete().
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	accountModel, err := s.getAccountModel(
@@ -805,7 +805,7 @@ func (s *userStore) PurgeUser(ctx context.Context, id *ttnpb.UserIdentifiers) er
 		ForceDelete().
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	// Instead of purging, we soft-delete the profile picture,
@@ -816,7 +816,7 @@ func (s *userStore) PurgeUser(ctx context.Context, id *ttnpb.UserIdentifiers) er
 			Where("id = ?", *model.ProfilePictureID).
 			Exec(ctx)
 		if err != nil {
-			return wrapDriverError(err)
+			return errors.WrapDriverError(err)
 		}
 	}
 

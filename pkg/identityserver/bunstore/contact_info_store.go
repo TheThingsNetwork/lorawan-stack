@@ -151,7 +151,7 @@ func (s *baseStore) replaceContactInfo(
 			WherePK().
 			Exec(ctx)
 		if err != nil {
-			return nil, wrapDriverError(err)
+			return nil, errors.WrapDriverError(err)
 		}
 	}
 
@@ -162,7 +162,7 @@ func (s *baseStore) replaceContactInfo(
 			Bulk().
 			Exec(ctx)
 		if err != nil {
-			return nil, wrapDriverError(err)
+			return nil, errors.WrapDriverError(err)
 		}
 	}
 
@@ -171,7 +171,7 @@ func (s *baseStore) replaceContactInfo(
 			Model(&toCreate).
 			Exec(ctx)
 		if err != nil {
-			return nil, wrapDriverError(err)
+			return nil, errors.WrapDriverError(err)
 		}
 	}
 
@@ -230,7 +230,7 @@ func (s *contactInfoStore) getContactInfoModelsBy(
 
 	err := selectQuery.Scan(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 	return models, nil
 }
@@ -339,7 +339,7 @@ func (s *contactInfoStore) CreateValidation(
 		Where("expires_at IS NULL OR expires_at > NOW()").
 		Count(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 	if n > 0 {
 		return nil, store.ErrValidationAlreadySent.New()
@@ -359,7 +359,7 @@ func (s *contactInfoStore) CreateValidation(
 		Model(model).
 		Exec(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 
 	return &ttnpb.ContactInfoValidation{
@@ -385,7 +385,7 @@ func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.Conta
 		Where("reference = ? AND token = ?", validation.Id, validation.Token).
 		Scan(ctx)
 	if err != nil {
-		err = wrapDriverError(err)
+		err = errors.WrapDriverError(err)
 		if errors.IsNotFound(err) {
 			return store.ErrValidationTokenNotFound.WithAttributes(
 				"validation_id", validation.Id,
@@ -415,7 +415,7 @@ func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.Conta
 		Set("validated_at = ?", now).
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	if model.EntityType == "user" &&
@@ -426,7 +426,7 @@ func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.Conta
 			Set("primary_email_address_validated_at = ?", now).
 			Exec(ctx)
 		if err != nil {
-			return wrapDriverError(err)
+			return errors.WrapDriverError(err)
 		}
 	}
 
@@ -436,7 +436,7 @@ func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.Conta
 		Set("expires_at = ?, used = true", now).
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	return nil
@@ -459,7 +459,7 @@ func (s *contactInfoStore) DeleteEntityContactInfo(ctx context.Context, entityID
 		Where("entity_type = ? AND entity_id = ?", entityType, entityUUID).
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	return nil

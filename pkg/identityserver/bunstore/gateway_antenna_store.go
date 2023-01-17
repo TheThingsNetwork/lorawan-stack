@@ -19,6 +19,7 @@ import (
 	"sort"
 
 	"github.com/uptrace/bun"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -126,7 +127,7 @@ func (s *gatewayStore) replaceGatewayAntennas(
 			WherePK().
 			Exec(ctx)
 		if err != nil {
-			return nil, wrapDriverError(err)
+			return nil, errors.WrapDriverError(err)
 		}
 	}
 
@@ -137,7 +138,7 @@ func (s *gatewayStore) replaceGatewayAntennas(
 			Bulk().
 			Exec(ctx)
 		if err != nil {
-			return nil, wrapDriverError(err)
+			return nil, errors.WrapDriverError(err)
 		}
 	}
 
@@ -146,7 +147,7 @@ func (s *gatewayStore) replaceGatewayAntennas(
 			Model(&toCreate).
 			Exec(ctx)
 		if err != nil {
-			return nil, wrapDriverError(err)
+			return nil, errors.WrapDriverError(err)
 		}
 	}
 

@@ -16,13 +16,6 @@ package store
 
 import "go.thethings.network/lorawan-stack/v3/pkg/errors"
 
-var (
-	// ErrIDTaken is returned when an entity can not be created because the ID is already taken.
-	ErrIDTaken = errors.DefineAlreadyExists("id_taken", "ID already taken, choose a different one and try again")
-	// ErrEUITaken is returned when an entity can not be created because the EUI is already taken.
-	ErrEUITaken = errors.DefineAlreadyExists("eui_taken", "EUI already taken")
-)
-
 // Errors returned when stores can't find an entity.
 var (
 	ErrEntityNotFound = errors.DefineNotFound(

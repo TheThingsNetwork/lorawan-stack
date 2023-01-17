@@ -68,7 +68,7 @@ func (h *LoggerHook) AfterQuery(_ context.Context, event *bun.QueryEvent) {
 		}
 	}
 	if event.Err != nil {
-		err := wrapDriverError(event.Err)
+		err := errors.WrapDriverError(event.Err)
 		logFields = logFields.WithError(err)
 		switch errors.Code(err) {
 		case uint32(codes.Canceled),

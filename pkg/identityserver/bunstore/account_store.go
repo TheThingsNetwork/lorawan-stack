@@ -82,7 +82,7 @@ func (s *baseStore) getAccountModel(
 		Where("?TableAlias.uid = ?", uid)
 
 	if err := selectQuery.Scan(ctx); err != nil {
-		err = wrapDriverError(err)
+		err = errors.WrapDriverError(err)
 		if errors.IsNotFound(err) {
 			return nil, store.ErrAccountNotFound.WithAttributes(
 				"account_type", accountType,

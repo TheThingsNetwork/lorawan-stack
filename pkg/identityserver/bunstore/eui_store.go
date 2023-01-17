@@ -76,7 +76,7 @@ func (s *euiStore) CreateEUIBlock(
 		return nil
 	}
 
-	err = wrapDriverError(err)
+	err = errors.WrapDriverError(err)
 	if !errors.IsNotFound(err) {
 		return err
 	}
@@ -92,7 +92,7 @@ func (s *euiStore) CreateEUIBlock(
 		Model(model).
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	return nil
@@ -134,7 +134,7 @@ func (s *euiStore) IssueDevEUIForApplication(
 			Returning("dev_eui_counter").
 			Exec(ctx)
 		if err != nil {
-			return wrapDriverError(err)
+			return errors.WrapDriverError(err)
 		}
 
 		if applicationLimit > 0 && applicationModel.DevEUICounter > applicationLimit {
@@ -150,7 +150,7 @@ func (s *euiStore) IssueDevEUIForApplication(
 			Order("created_at ASC").
 			Limit(1)
 		if err := selectQuery.Scan(ctx); err != nil {
-			err = wrapDriverError(err)
+			err = errors.WrapDriverError(err)
 			if errors.IsNotFound(err) {
 				return store.ErrNoEUIBlockAvailable.New()
 			}
@@ -164,13 +164,13 @@ func (s *euiStore) IssueDevEUIForApplication(
 			Returning("current_counter").
 			Exec(ctx)
 		if err != nil {
-			return wrapDriverError(err)
+			return errors.WrapDriverError(err)
 		}
 
 		return nil
 	})
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 
 	var eui types.EUI64

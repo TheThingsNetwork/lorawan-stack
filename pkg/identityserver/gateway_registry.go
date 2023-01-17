@@ -173,7 +173,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 		return nil
 	})
 	if err != nil {
-		if errors.IsAlreadyExists(err) && errors.Resemble(err, store.ErrEUITaken) {
+		if errors.IsAlreadyExists(err) && errors.Resemble(err, errors.ErrEUITaken) {
 			var existing *ttnpb.Gateway
 			if err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 				existing, err = st.GetGateway(ctx, &ttnpb.GatewayIdentifiers{

@@ -19,6 +19,7 @@ import (
 	"sort"
 
 	"github.com/uptrace/bun"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
 // Attribute is the attribute model in the database.
@@ -105,7 +106,7 @@ func (s *baseStore) replaceAttributes(
 			WherePK().
 			Exec(ctx)
 		if err != nil {
-			return nil, wrapDriverError(err)
+			return nil, errors.WrapDriverError(err)
 		}
 	}
 
@@ -116,7 +117,7 @@ func (s *baseStore) replaceAttributes(
 			Bulk().
 			Exec(ctx)
 		if err != nil {
-			return nil, wrapDriverError(err)
+			return nil, errors.WrapDriverError(err)
 		}
 	}
 
@@ -125,7 +126,7 @@ func (s *baseStore) replaceAttributes(
 			Model(&toCreate).
 			Exec(ctx)
 		if err != nil {
-			return nil, wrapDriverError(err)
+			return nil, errors.WrapDriverError(err)
 		}
 	}
 

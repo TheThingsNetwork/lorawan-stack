@@ -199,7 +199,7 @@ func (s *clientStore) CreateClient(
 		Model(clientModel).
 		Exec(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 
 	if len(pb.Attributes) > 0 {
@@ -279,7 +279,7 @@ func (s *clientStore) CountClients(ctx context.Context) (uint64, error) {
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
 	if err != nil {
-		return 0, wrapDriverError(err)
+		return 0, errors.WrapDriverError(err)
 	}
 
 	return uint64(count), nil
@@ -296,7 +296,7 @@ func (s *clientStore) listClientsBy(
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 	store.SetTotal(ctx, uint64(count))
 
@@ -317,7 +317,7 @@ func (s *clientStore) listClientsBy(
 	// Scan the results.
 	err = selectQuery.Scan(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 
 	// Convert the results to protobuf.
@@ -373,7 +373,7 @@ func (s *clientStore) getClientModelBy(
 	}
 
 	if err := selectQuery.Scan(ctx); err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 
 	return model, nil
@@ -504,7 +504,7 @@ func (s *clientStore) updateClientModel( //nolint:gocyclo
 		Column(columns...).
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	return nil
@@ -564,7 +564,7 @@ func (s *clientStore) DeleteClient(ctx context.Context, id *ttnpb.ClientIdentifi
 		WherePK().
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	return nil
@@ -597,7 +597,7 @@ func (s *clientStore) RestoreClient(ctx context.Context, id *ttnpb.ClientIdentif
 		Set("deleted_at = NULL").
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	return nil
@@ -643,7 +643,7 @@ func (s *clientStore) PurgeClient(ctx context.Context, id *ttnpb.ClientIdentifie
 		ForceDelete().
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	return nil

@@ -4040,6 +4040,15 @@
       "file": "mac.go"
     }
   },
+  "error:pkg/errors:already_exists": {
+    "translations": {
+      "en": "already exists"
+    },
+    "description": {
+      "package": "pkg/errors",
+      "file": "driver.go"
+    }
+  },
   "error:pkg/errors:context_canceled": {
     "translations": {
       "en": "context canceled"
@@ -4056,6 +4065,42 @@
     "description": {
       "package": "pkg/errors",
       "file": "conversion.go"
+    }
+  },
+  "error:pkg/errors:database_unavailable": {
+    "translations": {
+      "en": "database unavailable"
+    },
+    "description": {
+      "package": "pkg/errors",
+      "file": "driver.go"
+    }
+  },
+  "error:pkg/errors:driver": {
+    "translations": {
+      "en": "driver error"
+    },
+    "description": {
+      "package": "pkg/errors",
+      "file": "driver.go"
+    }
+  },
+  "error:pkg/errors:eui_taken": {
+    "translations": {
+      "en": "EUI already taken"
+    },
+    "description": {
+      "package": "pkg/errors",
+      "file": "driver.go"
+    }
+  },
+  "error:pkg/errors:id_taken": {
+    "translations": {
+      "en": "ID already taken, choose a different one and try again"
+    },
+    "description": {
+      "package": "pkg/errors",
+      "file": "driver.go"
     }
   },
   "error:pkg/errors:net_addr": {
@@ -4112,6 +4157,15 @@
       "file": "conversion.go"
     }
   },
+  "error:pkg/errors:not_found": {
+    "translations": {
+      "en": "no results found"
+    },
+    "description": {
+      "package": "pkg/errors",
+      "file": "driver.go"
+    }
+  },
   "error:pkg/errors:odd_kv": {
     "translations": {
       "en": "Odd number of key-value elements"
@@ -4119,6 +4173,15 @@
     "description": {
       "package": "pkg/errors",
       "file": "attributes.go"
+    }
+  },
+  "error:pkg/errors:query_canceled": {
+    "translations": {
+      "en": "query canceled"
+    },
+    "description": {
+      "package": "pkg/errors",
+      "file": "driver.go"
     }
   },
   "error:pkg/errors:request": {
@@ -5111,51 +5174,6 @@
       "file": "blocklist.go"
     }
   },
-  "error:pkg/identityserver/bunstore:already_exists": {
-    "translations": {
-      "en": "already exists"
-    },
-    "description": {
-      "package": "pkg/identityserver/bunstore",
-      "file": "store.go"
-    }
-  },
-  "error:pkg/identityserver/bunstore:database_unavailable": {
-    "translations": {
-      "en": "database unavailable"
-    },
-    "description": {
-      "package": "pkg/identityserver/bunstore",
-      "file": "store.go"
-    }
-  },
-  "error:pkg/identityserver/bunstore:driver": {
-    "translations": {
-      "en": "driver error"
-    },
-    "description": {
-      "package": "pkg/identityserver/bunstore",
-      "file": "store.go"
-    }
-  },
-  "error:pkg/identityserver/bunstore:not_found": {
-    "translations": {
-      "en": "no results found"
-    },
-    "description": {
-      "package": "pkg/identityserver/bunstore",
-      "file": "store.go"
-    }
-  },
-  "error:pkg/identityserver/bunstore:query_canceled": {
-    "translations": {
-      "en": "query canceled"
-    },
-    "description": {
-      "package": "pkg/identityserver/bunstore",
-      "file": "store.go"
-    }
-  },
   "error:pkg/identityserver/picture:original_not_found": {
     "translations": {
       "en": "original picture not found"
@@ -5276,15 +5294,6 @@
   "error:pkg/identityserver/store:gateway_not_found_by_eui": {
     "translations": {
       "en": "gateway with eui `{gateway_eui}` not found"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/identityserver/store:id_taken": {
-    "translations": {
-      "en": "ID already taken, choose a different one and try again"
     },
     "description": {
       "package": "pkg/identityserver/store",

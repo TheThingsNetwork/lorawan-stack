@@ -149,7 +149,7 @@ func (s *membershipStore) CountMemberships(
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
 	if err != nil {
-		return 0, wrapDriverError(err)
+		return 0, errors.WrapDriverError(err)
 	}
 
 	return uint64(count), nil
@@ -245,7 +245,7 @@ func (s *membershipStore) FindAccountMembershipChains(
 	}
 
 	if err = directSelectQuery.Scan(ctx); err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 
 	var indirectMemberships []*indirectEntityMembership
@@ -258,7 +258,7 @@ func (s *membershipStore) FindAccountMembershipChains(
 	}
 
 	if err = indirectSelectQuery.Scan(ctx); err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 
 	membershipChains := make([]*store.MembershipChain, 0, len(directMemberships)+len(indirectMemberships))
@@ -321,7 +321,7 @@ func (s *membershipStore) FindMembers(
 
 	count, err := selectQuery.Count(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 	store.SetTotal(ctx, uint64(count))
 
@@ -334,7 +334,7 @@ func (s *membershipStore) FindMembers(
 		Apply(selectWithLimitAndOffsetFromContext(ctx))
 
 	if err := selectQuery.Scan(ctx); err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 
 	res := make([]*store.MemberByID, len(models))
@@ -378,7 +378,7 @@ func (s *membershipStore) GetMember(
 		Where("entity_id = ?", entityUUID).
 		Scan(ctx)
 	if err != nil {
-		err = wrapDriverError(err)
+		err = errors.WrapDriverError(err)
 		if errors.IsNotFound(err) {
 			return nil, store.ErrMembershipNotFound.WithAttributes(
 				"account_type", accountID.EntityType(),
@@ -425,7 +425,7 @@ func (s *membershipStore) SetMember(
 		Where("entity_id = ?", entityUUID).
 		Scan(ctx)
 	if err != nil {
-		err = wrapDriverError(err)
+		err = errors.WrapDriverError(err)
 		if errors.IsNotFound(err) {
 			_, err = s.DB.NewInsert().
 				Model(&Membership{
@@ -437,7 +437,7 @@ func (s *membershipStore) SetMember(
 				}).
 				Exec(ctx)
 			if err != nil {
-				return wrapDriverError(err)
+				return errors.WrapDriverError(err)
 			}
 			return nil
 		}
@@ -452,7 +452,7 @@ func (s *membershipStore) SetMember(
 			WherePK().
 			Exec(ctx)
 		if err != nil {
-			return wrapDriverError(err)
+			return errors.WrapDriverError(err)
 		}
 		return nil
 	}
@@ -465,7 +465,7 @@ func (s *membershipStore) SetMember(
 		Column("rights", "updated_at").
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	return nil
@@ -491,7 +491,7 @@ func (s *membershipStore) DeleteEntityMembers(
 		Where("entity_type = ?", entityType).
 		Where("entity_id = ?", entityUUID)
 	if _, err = deleteQuery.Exec(ctx); err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	return nil
@@ -516,7 +516,7 @@ func (s *membershipStore) DeleteAccountMembers(
 		Model(model).
 		Where("account_id = ?", account.ID)
 	if _, err = deleteQuery.Exec(ctx); err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 
 	return nil

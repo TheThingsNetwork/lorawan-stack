@@ -198,7 +198,7 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 	if err != nil {
 		joinEUI := types.MustEUI64(req.EndDevice.Ids.JoinEui)
 		devEUI := types.MustEUI64(req.EndDevice.Ids.DevEui)
-		if errors.IsAlreadyExists(err) && errors.Resemble(err, store.ErrEUITaken) {
+		if errors.IsAlreadyExists(err) && errors.Resemble(err, errors.ErrEUITaken) {
 			if ids, err := is.getEndDeviceIdentifiersForEUIs(ctx, &ttnpb.GetEndDeviceIdentifiersForEUIsRequest{
 				JoinEui: req.EndDevice.Ids.JoinEui,
 				DevEui:  req.EndDevice.Ids.DevEui,

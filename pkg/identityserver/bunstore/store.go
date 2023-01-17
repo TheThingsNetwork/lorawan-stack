@@ -18,18 +18,13 @@ package store
 import (
 	"context"
 	"database/sql"
-	"database/sql/driver"
 	"fmt"
-	"io"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/jackc/pgerrcode"
-	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
-	"github.com/uptrace/bun/driver/pgdriver"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -49,11 +44,11 @@ func newDB(ctx context.Context, db *bun.DB) (*baseDB, error) {
 	var version string
 	res, err := db.QueryContext(ctx, "SELECT VERSION()")
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 	res.Next()
 	if err = res.Scan(&version); err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 
 	s.server, _, _ = strings.Cut(version, " ")
@@ -61,11 +56,11 @@ func newDB(ctx context.Context, db *bun.DB) (*baseDB, error) {
 	var serverVersion string
 	res, err = db.QueryContext(ctx, "SHOW SERVER_VERSION")
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 	res.Next()
 	if err = res.Scan(&serverVersion); err != nil {
-		return nil, wrapDriverError(err)
+		return nil, errors.WrapDriverError(err)
 	}
 
 	major, _, _ := strings.Cut(serverVersion, ".")
@@ -92,7 +87,7 @@ func (s *baseStore) transact(ctx context.Context, fc func(context.Context, bun.I
 	}
 	tx, err := db.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 	var done bool
 	defer func() {
@@ -111,111 +106,9 @@ func (s *baseStore) transact(ctx context.Context, fc func(context.Context, bun.I
 		if ctxErr := ctx.Err(); ctxErr != nil && errors.Is(err, sql.ErrTxDone) {
 			return ctxErr
 		}
-		return wrapDriverError(err)
+		return errors.WrapDriverError(err)
 	}
 	return nil
-}
-
-var (
-	errUnavailable = errors.DefineUnavailable("database_unavailable", "database unavailable")
-	errNotFound    = errors.DefineNotFound("not_found", "no results found")
-	errDriver      = errors.Define("driver", "driver error")
-)
-
-// driverErrorcodes maps PostgreSQL error codes to the corresponding error definition.
-// See https://www.postgresql.org/docs/current/errcodes-appendix.html for more information.
-var driverErrorCodes = map[string]*errors.Definition{
-	pgerrcode.UniqueViolation:  errors.DefineAlreadyExists("already_exists", "already exists"),
-	pgerrcode.QueryCanceled:    errors.DefineCanceled("query_canceled", "query canceled"),
-	pgerrcode.AdminShutdown:    errUnavailable,
-	pgerrcode.CrashShutdown:    errUnavailable,
-	pgerrcode.CannotConnectNow: errUnavailable,
-}
-
-type driverError struct {
-	Code       string
-	Message    string
-	Detail     string
-	Table      string
-	Column     string
-	Constraint string
-}
-
-func (e *driverError) Attributes() []any {
-	var attributes []any
-	if e.Code != "" {
-		attributes = append(attributes, "driver_code", e.Code)
-	}
-	if e.Message != "" {
-		attributes = append(attributes, "driver_message", e.Message)
-	}
-	if e.Detail != "" {
-		attributes = append(attributes, "driver_detail", e.Detail)
-	}
-	if e.Table != "" {
-		attributes = append(attributes, "driver_table", e.Table)
-	}
-	if e.Column != "" {
-		attributes = append(attributes, "driver_column", e.Column)
-	}
-	if e.Constraint != "" {
-		attributes = append(attributes, "driver_constraint", e.Constraint)
-	}
-	return attributes
-}
-
-func (e *driverError) GetError() error {
-	attributes := e.Attributes()
-	if def, ok := driverErrorCodes[e.Code]; ok {
-		err := def.WithAttributes(attributes...)
-		if def.Name() == "already_exists" {
-			switch {
-			case strings.HasSuffix(e.Constraint, "_id_index"):
-				return store.ErrIDTaken.WithCause(err)
-			case strings.HasSuffix(e.Constraint, "_eui_index"):
-				return store.ErrEUITaken.WithCause(err)
-			}
-		}
-		return err
-	}
-	return errDriver.WithAttributes(attributes...)
-}
-
-// wrapDriverError wraps a driver error with the corresponding error definition.
-func wrapDriverError(err error) error {
-	if errors.Is(err, sql.ErrNoRows) {
-		return errNotFound.WithCause(err)
-	}
-	var driverError driverError
-	if pgconnErr := (*pgconn.PgError)(nil); errors.As(err, &pgconnErr) {
-		driverError.Code = pgconnErr.Code
-		driverError.Message = pgconnErr.Message
-		driverError.Detail = pgconnErr.Detail
-		driverError.Table = pgconnErr.TableName
-		driverError.Column = pgconnErr.ColumnName
-		driverError.Constraint = pgconnErr.ConstraintName
-		return driverError.GetError()
-	}
-	if pgdriverErr := (pgdriver.Error{}); errors.As(err, &pgdriverErr) {
-		// See https://www.postgresql.org/docs/current/protocol-error-fields.html for more information.
-		driverError.Code = pgdriverErr.Field('C')
-		driverError.Message = pgdriverErr.Field('M')
-		driverError.Detail = pgdriverErr.Field('D')
-		driverError.Table = pgdriverErr.Field('t')
-		driverError.Column = pgdriverErr.Field('c')
-		driverError.Constraint = pgdriverErr.Field('n')
-		return driverError.GetError()
-	}
-	if errors.Is(err, io.EOF) {
-		return errUnavailable.WithCause(err)
-	}
-	if errors.Is(err, driver.ErrBadConn) {
-		return errUnavailable.WithCause(err)
-	}
-	if timeoutError := (interface{ Timeout() bool })(nil); errors.As(err, &timeoutError) && timeoutError.Timeout() {
-		return context.DeadlineExceeded
-	}
-	return err
 }
 
 func newStore(baseStore *baseStore) *Store {
@@ -288,7 +181,7 @@ func (s *Store) Transact(ctx context.Context, fc func(context.Context, store.Sto
 			baseStore.DB = idb
 			return fc(ctx, newStore(baseStore))
 		})
-		if !errors.Is(err, errUnavailable) {
+		if !errors.Is(err, errors.ErrUnavailable) {
 			break
 		}
 		log.FromContext(ctx).WithError(err).WithFields(log.Fields(
