@@ -54,7 +54,7 @@ var (
 	errLNSCredentials = errors.DefineNotFound(
 		"lns_credentials_not_found", "LNS credentials not found for gateway `{gateway_uid}`",
 	)
-	errServerTrust = errors.DefineUnavailable(
+	errServerTrust = errors.DefineNotFound(
 		"server_trust", "failed to fetch server trust for address `{address}`",
 	)
 )
