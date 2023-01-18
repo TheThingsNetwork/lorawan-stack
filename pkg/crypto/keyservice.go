@@ -71,7 +71,6 @@ func (ks *keyService) aes128Key(ctx context.Context, label string) (types.AES128
 	return res, nil
 }
 
-// Decrypt decrypts messages of variable length using AES 128 GCM.
 func (ks *keyService) Decrypt(ctx context.Context, ciphertext []byte, label string) ([]byte, error) {
 	key, err := ks.aes128Key(ctx, label)
 	if err != nil {
