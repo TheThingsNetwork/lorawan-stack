@@ -12,5 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package storeutil provides utilities when working with a database.
-package storeutil
+// Package store provides utilities when working with a database.
+package store

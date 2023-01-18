@@ -15,7 +15,7 @@
 //go:build linux || darwin
 // +build linux darwin
 
-package storeutil
+package store
 
 import (
 	"io"
