@@ -86,7 +86,7 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
   return [
     createLogic({
       type: START_EVENTS,
-      cancelType: [STOP_EVENTS, START_EVENTS_FAILURE],
+      cancelType: [START_EVENTS_FAILURE],
       warnTimeout: 0,
       processOptions: {
         dispatchMultiple: true,
