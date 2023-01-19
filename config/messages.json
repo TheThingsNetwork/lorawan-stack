@@ -5111,51 +5111,6 @@
       "file": "blocklist.go"
     }
   },
-  "error:pkg/identityserver/bunstore:already_exists": {
-    "translations": {
-      "en": "already exists"
-    },
-    "description": {
-      "package": "pkg/identityserver/bunstore",
-      "file": "store.go"
-    }
-  },
-  "error:pkg/identityserver/bunstore:database_unavailable": {
-    "translations": {
-      "en": "database unavailable"
-    },
-    "description": {
-      "package": "pkg/identityserver/bunstore",
-      "file": "store.go"
-    }
-  },
-  "error:pkg/identityserver/bunstore:driver": {
-    "translations": {
-      "en": "driver error"
-    },
-    "description": {
-      "package": "pkg/identityserver/bunstore",
-      "file": "store.go"
-    }
-  },
-  "error:pkg/identityserver/bunstore:not_found": {
-    "translations": {
-      "en": "no results found"
-    },
-    "description": {
-      "package": "pkg/identityserver/bunstore",
-      "file": "store.go"
-    }
-  },
-  "error:pkg/identityserver/bunstore:query_canceled": {
-    "translations": {
-      "en": "query canceled"
-    },
-    "description": {
-      "package": "pkg/identityserver/bunstore",
-      "file": "store.go"
-    }
-  },
   "error:pkg/identityserver/picture:original_not_found": {
     "translations": {
       "en": "original picture not found"
@@ -5255,15 +5210,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/identityserver/store:eui_taken": {
-    "translations": {
-      "en": "EUI already taken"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/identityserver/store:gateway_not_found": {
     "translations": {
       "en": "gateway with id `{gateway_id}` not found"
@@ -5276,15 +5222,6 @@
   "error:pkg/identityserver/store:gateway_not_found_by_eui": {
     "translations": {
       "en": "gateway with eui `{gateway_eui}` not found"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/identityserver/store:id_taken": {
-    "translations": {
-      "en": "ID already taken, choose a different one and try again"
     },
     "description": {
       "package": "pkg/identityserver/store",
@@ -8772,6 +8709,69 @@
     "description": {
       "package": "pkg/util/io",
       "file": "io.go"
+    }
+  },
+  "error:pkg/util/store:already_exists": {
+    "translations": {
+      "en": "already exists"
+    },
+    "description": {
+      "package": "pkg/util/store",
+      "file": "error.go"
+    }
+  },
+  "error:pkg/util/store:database_unavailable": {
+    "translations": {
+      "en": "database unavailable"
+    },
+    "description": {
+      "package": "pkg/util/store",
+      "file": "error.go"
+    }
+  },
+  "error:pkg/util/store:driver": {
+    "translations": {
+      "en": "driver error"
+    },
+    "description": {
+      "package": "pkg/util/store",
+      "file": "error.go"
+    }
+  },
+  "error:pkg/util/store:eui_taken": {
+    "translations": {
+      "en": "EUI already taken"
+    },
+    "description": {
+      "package": "pkg/util/store",
+      "file": "error.go"
+    }
+  },
+  "error:pkg/util/store:id_taken": {
+    "translations": {
+      "en": "ID already taken, choose a different one and try again"
+    },
+    "description": {
+      "package": "pkg/util/store",
+      "file": "error.go"
+    }
+  },
+  "error:pkg/util/store:not_found": {
+    "translations": {
+      "en": "no results found"
+    },
+    "description": {
+      "package": "pkg/util/store",
+      "file": "error.go"
+    }
+  },
+  "error:pkg/util/store:query_canceled": {
+    "translations": {
+      "en": "query canceled"
+    },
+    "description": {
+      "package": "pkg/util/store",
+      "file": "error.go"
     }
   },
   "error:pkg/validate:email": {

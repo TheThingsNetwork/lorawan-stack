@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 )
 
 // Application is the application model in the database.
@@ -175,7 +176,7 @@ func (s *applicationStore) CreateApplication(
 		Model(applicationModel).
 		Exec(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	if len(pb.Attributes) > 0 {
@@ -251,7 +252,7 @@ func (s *applicationStore) CountApplications(ctx context.Context) (uint64, error
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
 	if err != nil {
-		return 0, wrapDriverError(err)
+		return 0, storeutil.WrapDriverError(err)
 	}
 
 	return uint64(count), nil
@@ -268,7 +269,7 @@ func (s *applicationStore) listApplicationsBy(
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 	store.SetTotal(ctx, uint64(count))
 
@@ -289,7 +290,7 @@ func (s *applicationStore) listApplicationsBy(
 	// Scan the results.
 	err = selectQuery.Scan(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	// Convert the results to protobuf.
@@ -345,7 +346,7 @@ func (s *applicationStore) getApplicationModelBy(
 	}
 
 	if err := selectQuery.Scan(ctx); err != nil {
-		return nil, wrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	return model, nil
@@ -459,7 +460,7 @@ func (s *applicationStore) updateApplicationModel( //nolint:gocyclo
 		Column(columns...).
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return storeutil.WrapDriverError(err)
 	}
 
 	return nil
@@ -519,7 +520,7 @@ func (s *applicationStore) DeleteApplication(ctx context.Context, id *ttnpb.Appl
 		WherePK().
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return storeutil.WrapDriverError(err)
 	}
 
 	return nil
@@ -552,7 +553,7 @@ func (s *applicationStore) RestoreApplication(ctx context.Context, id *ttnpb.App
 		Set("deleted_at = NULL").
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return storeutil.WrapDriverError(err)
 	}
 
 	return nil
@@ -598,7 +599,7 @@ func (s *applicationStore) PurgeApplication(ctx context.Context, id *ttnpb.Appli
 		ForceDelete().
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return storeutil.WrapDriverError(err)
 	}
 
 	return nil

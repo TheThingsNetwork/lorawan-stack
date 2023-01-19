@@ -22,6 +22,7 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 )
 
 type entitySearch struct {
@@ -401,7 +402,7 @@ func (s *entitySearch) SearchAccounts(
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 	store.SetTotal(ctx, uint64(count))
 
@@ -417,7 +418,7 @@ func (s *entitySearch) SearchAccounts(
 	// Scan the results.
 	err = selectQuery.Scan(ctx, &results)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	// Convert the results to protobuf.

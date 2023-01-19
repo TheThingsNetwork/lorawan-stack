@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 )
 
 var (
@@ -173,7 +174,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 		return nil
 	})
 	if err != nil {
-		if errors.IsAlreadyExists(err) && errors.Resemble(err, store.ErrEUITaken) {
+		if errors.IsAlreadyExists(err) && errors.Resemble(err, storeutil.ErrEUITaken) {
 			var existing *ttnpb.Gateway
 			if err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 				existing, err = st.GetGateway(ctx, &ttnpb.GatewayIdentifiers{

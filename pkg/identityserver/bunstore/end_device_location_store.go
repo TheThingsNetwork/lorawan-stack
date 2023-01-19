@@ -20,6 +20,7 @@ import (
 
 	"github.com/uptrace/bun"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 )
 
 // EndDeviceLocation is the end device location model in the database.
@@ -107,7 +108,7 @@ func (s *endDeviceStore) replaceEndDeviceLocations(
 			WherePK().
 			Exec(ctx)
 		if err != nil {
-			return nil, wrapDriverError(err)
+			return nil, storeutil.WrapDriverError(err)
 		}
 	}
 
@@ -118,7 +119,7 @@ func (s *endDeviceStore) replaceEndDeviceLocations(
 			Bulk().
 			Exec(ctx)
 		if err != nil {
-			return nil, wrapDriverError(err)
+			return nil, storeutil.WrapDriverError(err)
 		}
 	}
 
@@ -127,7 +128,7 @@ func (s *endDeviceStore) replaceEndDeviceLocations(
 			Model(&toCreate).
 			Exec(ctx)
 		if err != nil {
-			return nil, wrapDriverError(err)
+			return nil, storeutil.WrapDriverError(err)
 		}
 	}
 

@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 )
 
 // UserSession is the user session model in the database.
@@ -98,7 +99,7 @@ func (s *userSessionStore) CreateSession(
 		Model(model).
 		Exec(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	pb, err = userSessionToPB(model, pb.GetUserIds())
@@ -119,7 +120,7 @@ func (s *userSessionStore) listUserSessionsBy(
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 	store.SetTotal(ctx, uint64(count))
 
@@ -135,7 +136,7 @@ func (s *userSessionStore) listUserSessionsBy(
 	// Scan the results.
 	err = selectQuery.Scan(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	// Convert the results to protobuf.
@@ -200,7 +201,7 @@ func (s *userSessionStore) getUserSessionModelBy(
 	selectQuery := s.newSelectModel(ctx, model).Apply(by)
 
 	if err := selectQuery.Scan(ctx); err != nil {
-		return nil, wrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	return model, nil
@@ -302,7 +303,7 @@ func (s *userSessionStore) DeleteSession(ctx context.Context, userIDs *ttnpb.Use
 		WherePK().
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return storeutil.WrapDriverError(err)
 	}
 	return nil
 }
@@ -323,7 +324,7 @@ func (s *userSessionStore) DeleteAllUserSessions(ctx context.Context, userIDs *t
 		Where("user_id = ?", userUUID).
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return storeutil.WrapDriverError(err)
 	}
 
 	return nil

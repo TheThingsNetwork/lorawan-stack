@@ -20,6 +20,7 @@ import (
 
 	"github.com/uptrace/bun"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 )
 
 // GatewayAntenna is the gateway antenna model in the database.
@@ -126,7 +127,7 @@ func (s *gatewayStore) replaceGatewayAntennas(
 			WherePK().
 			Exec(ctx)
 		if err != nil {
-			return nil, wrapDriverError(err)
+			return nil, storeutil.WrapDriverError(err)
 		}
 	}
 
@@ -137,7 +138,7 @@ func (s *gatewayStore) replaceGatewayAntennas(
 			Bulk().
 			Exec(ctx)
 		if err != nil {
-			return nil, wrapDriverError(err)
+			return nil, storeutil.WrapDriverError(err)
 		}
 	}
 
@@ -146,7 +147,7 @@ func (s *gatewayStore) replaceGatewayAntennas(
 			Model(&toCreate).
 			Exec(ctx)
 		if err != nil {
-			return nil, wrapDriverError(err)
+			return nil, storeutil.WrapDriverError(err)
 		}
 	}
 

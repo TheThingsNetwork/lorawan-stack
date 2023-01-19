@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 )
 
 // ClientAuthorization is the OAuth client authorization model in the database.
@@ -232,7 +233,7 @@ func (s *oauthStore) ListAuthorizations(
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 	store.SetTotal(ctx, uint64(count))
 
@@ -253,7 +254,7 @@ func (s *oauthStore) ListAuthorizations(
 	// Scan the results.
 	err = selectQuery.Scan(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	// Convert the results to protobuf.
@@ -316,7 +317,7 @@ func (s *oauthStore) GetAuthorization(
 		Apply(s.selectWithClientIDs(ctx, clientUUID))
 
 	if err := selectQuery.Scan(ctx); err != nil {
-		err = wrapDriverError(err)
+		err = storeutil.WrapDriverError(err)
 		if errors.IsNotFound(err) {
 			return nil, store.ErrAuthorizationNotFound.WithAttributes(
 				"user_id", userIDs.GetUserId(),
@@ -359,7 +360,7 @@ func (s *oauthStore) Authorize(
 		Apply(s.selectWithClientIDs(ctx, clientUUID))
 
 	if err := selectQuery.Scan(ctx); err != nil {
-		err = wrapDriverError(err)
+		err = storeutil.WrapDriverError(err)
 		if !errors.IsNotFound(err) {
 			return nil, err
 		}
@@ -372,7 +373,7 @@ func (s *oauthStore) Authorize(
 			Model(model).
 			Exec(ctx)
 		if err != nil {
-			return nil, wrapDriverError(err)
+			return nil, storeutil.WrapDriverError(err)
 		}
 	} else {
 		model.Rights = convertIntSlice[ttnpb.Right, int](pb.Rights)
@@ -382,7 +383,7 @@ func (s *oauthStore) Authorize(
 			WherePK().
 			Exec(ctx)
 		if err != nil {
-			return nil, wrapDriverError(err)
+			return nil, storeutil.WrapDriverError(err)
 		}
 	}
 
@@ -419,7 +420,7 @@ func (s *oauthStore) DeleteAuthorization(
 		Apply(s.selectWithClientIDs(ctx, clientUUID))
 
 	if err := selectQuery.Scan(ctx); err != nil {
-		err = wrapDriverError(err)
+		err = storeutil.WrapDriverError(err)
 		if errors.IsNotFound(err) {
 			return store.ErrAuthorizationNotFound.WithAttributes(
 				"user_id", userIDs.GetUserId(),
@@ -434,7 +435,7 @@ func (s *oauthStore) DeleteAuthorization(
 		WherePK().
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return storeutil.WrapDriverError(err)
 	}
 
 	return nil
@@ -474,7 +475,7 @@ func (s *oauthStore) CreateAuthorizationCode(
 		Model(model).
 		Exec(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	pb, err = authorizationCodeToPB(model, pb.GetUserIds(), pb.GetClientIds())
@@ -506,7 +507,7 @@ func (s *oauthStore) GetAuthorizationCode(ctx context.Context, code string) (*tt
 		})
 
 	if err := selectQuery.Scan(ctx); err != nil {
-		err = wrapDriverError(err)
+		err = storeutil.WrapDriverError(err)
 		if errors.IsNotFound(err) {
 			return nil, store.ErrAuthorizationCodeNotFound.New()
 		}
@@ -530,7 +531,7 @@ func (s *oauthStore) DeleteAuthorizationCode(ctx context.Context, code string) e
 		Where("code = ?", code)
 
 	if err := selectQuery.Scan(ctx); err != nil {
-		err = wrapDriverError(err)
+		err = storeutil.WrapDriverError(err)
 		if errors.IsNotFound(err) {
 			return store.ErrAuthorizationCodeNotFound.New()
 		}
@@ -542,7 +543,7 @@ func (s *oauthStore) DeleteAuthorizationCode(ctx context.Context, code string) e
 		WherePK().
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return storeutil.WrapDriverError(err)
 	}
 
 	return nil
@@ -583,7 +584,7 @@ func (s *oauthStore) CreateAccessToken(
 		Model(model).
 		Exec(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	pb, err = accessTokenToPB(model, pb.GetUserIds(), pb.GetClientIds())
@@ -621,7 +622,7 @@ func (s *oauthStore) ListAccessTokens(
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 	store.SetTotal(ctx, uint64(count))
 
@@ -636,7 +637,7 @@ func (s *oauthStore) ListAccessTokens(
 	// Scan the results.
 	err = selectQuery.Scan(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	// Convert the results to protobuf.
@@ -673,7 +674,7 @@ func (s *oauthStore) GetAccessToken(ctx context.Context, id string) (*ttnpb.OAut
 		})
 
 	if err := selectQuery.Scan(ctx); err != nil {
-		err = wrapDriverError(err)
+		err = storeutil.WrapDriverError(err)
 		if errors.IsNotFound(err) {
 			return nil, store.ErrAccessTokenNotFound.WithAttributes(
 				"access_token_id", id,
@@ -699,7 +700,7 @@ func (s *oauthStore) DeleteAccessToken(ctx context.Context, id string) error {
 		Where("token_id = ?", id)
 
 	if err := selectQuery.Scan(ctx); err != nil {
-		err = wrapDriverError(err)
+		err = storeutil.WrapDriverError(err)
 		if errors.IsNotFound(err) {
 			return store.ErrAccessTokenNotFound.WithAttributes(
 				"access_token_id", id,
@@ -713,7 +714,7 @@ func (s *oauthStore) DeleteAccessToken(ctx context.Context, id string) error {
 		WherePK().
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return storeutil.WrapDriverError(err)
 	}
 
 	return nil
@@ -735,7 +736,7 @@ func (s *oauthStore) DeleteUserAuthorizations(ctx context.Context, userIDs *ttnp
 		Where("user_id = ?", userUUID).
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return storeutil.WrapDriverError(err)
 	}
 
 	_, err = s.DB.NewDelete().
@@ -743,7 +744,7 @@ func (s *oauthStore) DeleteUserAuthorizations(ctx context.Context, userIDs *ttnp
 		Where("user_id = ?", userUUID).
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return storeutil.WrapDriverError(err)
 	}
 
 	_, err = s.DB.NewDelete().
@@ -751,7 +752,7 @@ func (s *oauthStore) DeleteUserAuthorizations(ctx context.Context, userIDs *ttnp
 		Where("user_id = ?", userUUID).
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return storeutil.WrapDriverError(err)
 	}
 
 	return nil
@@ -773,7 +774,7 @@ func (s *oauthStore) DeleteClientAuthorizations(ctx context.Context, clientIDs *
 		Where("client_id = ?", clientUUID).
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return storeutil.WrapDriverError(err)
 	}
 
 	_, err = s.DB.NewDelete().
@@ -781,7 +782,7 @@ func (s *oauthStore) DeleteClientAuthorizations(ctx context.Context, clientIDs *
 		Where("client_id = ?", clientUUID).
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return storeutil.WrapDriverError(err)
 	}
 
 	_, err = s.DB.NewDelete().
@@ -789,7 +790,7 @@ func (s *oauthStore) DeleteClientAuthorizations(ctx context.Context, clientIDs *
 		Where("client_id = ?", clientUUID).
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return storeutil.WrapDriverError(err)
 	}
 
 	return nil

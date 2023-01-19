@@ -23,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 )
 
 type entityStore struct {
@@ -114,7 +115,7 @@ func (s *entityStore) getEntity(ctx context.Context, ids ttnpb.IDStringer) (enti
 	var uuid string
 	err = s.query(ctx, entityType, ids.IDString()).Scan(ctx, &uuid)
 	if err != nil {
-		err = wrapDriverError(err)
+		err = storeutil.WrapDriverError(err)
 		if errors.IsNotFound(err) {
 			return "", "", store.ErrEntityNotFound.WithAttributes(
 				"entity_type", ids.EntityType(),
@@ -130,7 +131,7 @@ func (s *entityStore) getEntityUUIDs(ctx context.Context, entityType string, ent
 	var uuids []string
 	err := s.query(ctx, entityType, entityIDs...).Scan(ctx, &uuids)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 	return uuids, nil
 }
@@ -163,7 +164,7 @@ func (s *entityStore) getEntityID(ctx context.Context, entityType, entityUUID st
 	var friendlyID string
 	err := query.Scan(ctx, &friendlyID)
 	if err != nil {
-		return "", wrapDriverError(err)
+		return "", storeutil.WrapDriverError(err)
 	}
 
 	return friendlyID, nil

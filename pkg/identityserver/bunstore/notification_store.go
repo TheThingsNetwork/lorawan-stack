@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 )
 
 // Notification is the notification model in the database.
@@ -165,7 +166,7 @@ func (s *notificationStore) CreateNotification(
 		Model(model).
 		Exec(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	receiverIDStrings := make([]string, len(receiverIDs))
@@ -192,7 +193,7 @@ func (s *notificationStore) CreateNotification(
 		Model(&receivers).
 		Exec(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	pb, err = notificationToPB(model, &NotificationReceiver{
@@ -233,7 +234,7 @@ func (s *notificationStore) ListNotifications(
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 	store.SetTotal(ctx, uint64(count))
 
@@ -249,7 +250,7 @@ func (s *notificationStore) ListNotifications(
 	// Scan the results.
 	err = selectQuery.Scan(ctx)
 	if err != nil {
-		return nil, wrapDriverError(err)
+		return nil, storeutil.WrapDriverError(err)
 	}
 
 	// Convert the results to protobuf.
@@ -288,7 +289,7 @@ func (s *notificationStore) UpdateNotificationStatus(
 		Set("status = ?, status_updated_at = NOW()", int(status)).
 		Exec(ctx)
 	if err != nil {
-		return wrapDriverError(err)
+		return storeutil.WrapDriverError(err)
 	}
 
 	return nil
