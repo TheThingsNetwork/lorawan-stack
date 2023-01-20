@@ -391,10 +391,10 @@ var (
 			if _, err := joinParams.SetFromFlags(simulateJoinRequestFlags, ""); err != nil {
 				return err
 			}
-			if err := uplinkParams.LoRaWANVersion.Validate(); err != nil {
+			if err := uplinkParams.LorawanVersion.Validate(); err != nil {
 				return errInvalidMACVersion.WithCause(err)
 			}
-			if err := uplinkParams.LoRaWAN_PHYVersion.Validate(); err != nil {
+			if err := uplinkParams.LorawanPhyVersion.Validate(); err != nil {
 				return errInvalidPHYVersion.WithCause(err)
 			}
 
@@ -419,7 +419,7 @@ var (
 						return err
 					}
 					var key *ttnpb.KeyEnvelope
-					if macspec.UseNwkKey(uplinkParams.LoRaWANVersion) {
+					if macspec.UseNwkKey(uplinkParams.LorawanVersion) {
 						key = joinParams.NwkKey
 					} else {
 						key = joinParams.AppKey
@@ -440,8 +440,8 @@ var (
 				},
 				func(downMsg *ttnpb.DownlinkMessage) error {
 					if err := processDownlink(&ttnpb.EndDevice{
-						LorawanVersion:    uplinkParams.LoRaWANVersion,
-						LorawanPhyVersion: uplinkParams.LoRaWAN_PHYVersion,
+						LorawanVersion:    uplinkParams.LorawanVersion,
+						LorawanPhyVersion: uplinkParams.LorawanPhyVersion,
 						FrequencyPlanId:   uplinkParams.BandId,
 						Ids: &ttnpb.EndDeviceIdentifiers{
 							JoinEui: joinParams.JoinEui,
@@ -481,18 +481,18 @@ var (
 			if _, err := dataUplinkParams.SetFromFlags(simulateDataUplinkFlags, ""); err != nil {
 				return err
 			}
-			if err := uplinkParams.LoRaWANVersion.Validate(); err != nil {
+			if err := uplinkParams.LorawanVersion.Validate(); err != nil {
 				return errInvalidMACVersion.WithCause(err)
 			}
-			if err := uplinkParams.LoRaWAN_PHYVersion.Validate(); err != nil {
+			if err := uplinkParams.LorawanPhyVersion.Validate(); err != nil {
 				return errInvalidPHYVersion.WithCause(err)
 			}
 
 			return startSimulation(cmd,
 				func(upMsg *ttnpb.UplinkMessage) error {
 					fOpts := dataUplinkParams.FOpts
-					if len(fOpts) > 0 && macspec.EncryptFOpts(uplinkParams.LoRaWANVersion) {
-						encOpts := macspec.EncryptionOptions(uplinkParams.LoRaWANVersion, macspec.UplinkFrame, dataUplinkParams.FPort, true)
+					if len(fOpts) > 0 && macspec.EncryptFOpts(uplinkParams.LorawanVersion) {
+						encOpts := macspec.EncryptionOptions(uplinkParams.LorawanVersion, macspec.UplinkFrame, dataUplinkParams.FPort, true)
 						nwkSEncKey, err := types.GetAES128Key(dataUplinkParams.NwkSEncKey.EncryptedKey)
 						if err != nil {
 							return err
@@ -582,7 +582,7 @@ var (
 					if err != nil {
 						return err
 					}
-					if macspec.UseLegacyMIC(uplinkParams.LoRaWANVersion) {
+					if macspec.UseLegacyMIC(uplinkParams.LorawanVersion) {
 						mic, err = crypto.ComputeLegacyUplinkMIC(
 							*fNwkSIntKey,
 							*devAddr,
@@ -616,8 +616,8 @@ var (
 					lastNFCntDown, _ := cmd.Flags().GetUint32("n_f_cnt_down")
 					lastAFCntDown, _ := cmd.Flags().GetUint32("a_f_cnt_down")
 					if err := processDownlink(&ttnpb.EndDevice{
-						LorawanVersion:    uplinkParams.LoRaWANVersion,
-						LorawanPhyVersion: uplinkParams.LoRaWAN_PHYVersion,
+						LorawanVersion:    uplinkParams.LorawanVersion,
+						LorawanPhyVersion: uplinkParams.LorawanPhyVersion,
 						FrequencyPlanId:   uplinkParams.BandId,
 						Session: &ttnpb.Session{
 							LastNFCntDown: lastNFCntDown,

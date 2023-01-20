@@ -68,10 +68,10 @@ func (m *SimulateMetadataParams) ValidateFields(paths ...string) error {
 				}
 			}
 
-		case "loRaWAN_version":
-			// no validation rules for LoRaWANVersion
-		case "loRaWAN_PHY_version":
-			// no validation rules for LoRaWAN_PHYVersion
+		case "lorawan_version":
+			// no validation rules for LorawanVersion
+		case "lorawan_phy_version":
+			// no validation rules for LorawanPhyVersion
 		case "band_id":
 			// no validation rules for BandId
 		case "frequency":

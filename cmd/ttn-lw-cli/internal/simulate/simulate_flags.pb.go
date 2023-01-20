@@ -10,7 +10,7 @@ import (
 	flagsplugin "github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	gogo "github.com/TheThingsIndustries/protoc-gen-go-flags/gogo"
 	pflag "github.com/spf13/pflag"
-	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	ttnpb "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // AddSelectFlagsForSimulateMetadataParams adds flags to select fields in SimulateMetadataParams.
@@ -19,8 +19,8 @@ func AddSelectFlagsForSimulateMetadataParams(flags *pflag.FlagSet, prefix string
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("snr", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("snr", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("timestamp", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("timestamp", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("time", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("time", prefix), false), flagsplugin.WithHidden(hidden)))
-	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("loRaWAN-versio", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("loRaWAN-versio", prefix), false), flagsplugin.WithHidden(hidden)))
-	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("loRaWAN-PHY-version", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("loRaWAN-PHY-version", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("lorawan-version", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("lorawan-version", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("lorawan-phy-version", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("lorawan-phy-version", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("band-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("band-id", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("frequency", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("frequency", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("channel-index", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("channel-index", prefix), false), flagsplugin.WithHidden(hidden)))
@@ -51,15 +51,15 @@ func PathsFromSelectFlagsForSimulateMetadataParams(flags *pflag.FlagSet, prefix 
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("time", prefix))
 	}
-	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("loRaWAN_version", prefix)); err != nil {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("lorawan_version", prefix)); err != nil {
 		return nil, err
 	} else if selected && val {
-		paths = append(paths, flagsplugin.Prefix("loRaWAN_version", prefix))
+		paths = append(paths, flagsplugin.Prefix("lorawan_version", prefix))
 	}
-	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("loRaWAN_PHY_version", prefix)); err != nil {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("lorawan_phy_version", prefix)); err != nil {
 		return nil, err
 	} else if selected && val {
-		paths = append(paths, flagsplugin.Prefix("loRaWAN_PHY_version", prefix))
+		paths = append(paths, flagsplugin.Prefix("lorawan_phy_version", prefix))
 	}
 	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("band_id", prefix)); err != nil {
 		return nil, err
@@ -100,8 +100,8 @@ func AddSetFlagsForSimulateMetadataParams(flags *pflag.FlagSet, prefix string, h
 	flags.AddFlag(flagsplugin.NewFloat32Flag(flagsplugin.Prefix("snr", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("timestamp", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewTimestampFlag(flagsplugin.Prefix("time", prefix), "", flagsplugin.WithHidden(hidden)))
-	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("loRaWAN-versio", prefix), flagsplugin.EnumValueDesc(ttnpb.MACVersion_value, ttnpb.MACVersion_customvalue), flagsplugin.WithHidden(hidden)))
-	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("loRaWAN-PHY-version", prefix), flagsplugin.EnumValueDesc(ttnpb.PHYVersion_value, ttnpb.PHYVersion_customvalue), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("lorawan-version", prefix), flagsplugin.EnumValueDesc(ttnpb.MACVersion_value, ttnpb.MACVersion_customvalue), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("lorawan-phy-version", prefix), flagsplugin.EnumValueDesc(ttnpb.PHYVersion_value, ttnpb.PHYVersion_customvalue), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("band-id", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewUint64Flag(flagsplugin.Prefix("frequency", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("channel-index", prefix), "", flagsplugin.WithHidden(hidden)))
@@ -136,25 +136,25 @@ func (m *SimulateMetadataParams) SetFromFlags(flags *pflag.FlagSet, prefix strin
 		m.Time = gogo.SetTimestamp(val)
 		paths = append(paths, flagsplugin.Prefix("time", prefix))
 	}
-	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("loRaWAN_version", prefix)); err != nil {
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("lorawan_version", prefix)); err != nil {
 		return nil, err
 	} else if changed {
 		enumValue, err := flagsplugin.SetEnumString(val, ttnpb.MACVersion_value, ttnpb.MACVersion_customvalue)
 		if err != nil {
 			return nil, err
 		}
-		m.LoRaWANVersion = ttnpb.MACVersion(enumValue)
-		paths = append(paths, flagsplugin.Prefix("loRaWAN_version", prefix))
+		m.LorawanVersion = ttnpb.MACVersion(enumValue)
+		paths = append(paths, flagsplugin.Prefix("lorawan_version", prefix))
 	}
-	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("loRaWAN_PHY_version", prefix)); err != nil {
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("lorawan_phy_version", prefix)); err != nil {
 		return nil, err
 	} else if changed {
 		enumValue, err := flagsplugin.SetEnumString(val, ttnpb.PHYVersion_value, ttnpb.PHYVersion_customvalue)
 		if err != nil {
 			return nil, err
 		}
-		m.LoRaWAN_PHYVersion = ttnpb.PHYVersion(enumValue)
-		paths = append(paths, flagsplugin.Prefix("loRaWAN_PHY_version", prefix))
+		m.LorawanPhyVersion = ttnpb.PHYVersion(enumValue)
+		paths = append(paths, flagsplugin.Prefix("lorawan_phy_version", prefix))
 	}
 	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("band_id", prefix)); err != nil {
 		return nil, err

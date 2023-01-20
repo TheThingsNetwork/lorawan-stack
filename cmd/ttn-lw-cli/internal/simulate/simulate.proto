@@ -24,46 +24,46 @@ package ttn.lorawan.v3;
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
 message simulateMetadataParams {
-    option (thethings.flags.message) = { select: true, set: true };
-	float rssi = 1;
-	float snr = 2;
-	uint32 timestamp = 3;
-	google.protobuf.Timestamp time = 4;
-	ttn.lorawan.v3.MACVersion loRaWAN_version = 5;
-	ttn.lorawan.v3.PHYVersion loRaWAN_PHY_version = 6;
-	string band_id = 7;
-	uint64 frequency = 8;
-	uint32 channel_index = 9;
-	uint32 bandwidth = 10;
-	uint32 spreading_factor = 11;
-	uint32 data_rate_index = 12;
+  option (thethings.flags.message) = { select: true, set: true };
+  float rssi = 1;
+  float snr = 2;
+  uint32 timestamp = 3;
+  google.protobuf.Timestamp time = 4;
+  ttn.lorawan.v3.MACVersion lorawan_version = 5;
+  ttn.lorawan.v3.PHYVersion lorawan_phy_version = 6;
+  string band_id = 7;
+  uint64 frequency = 8;
+  uint32 channel_index = 9;
+  uint32 bandwidth = 10;
+  uint32 spreading_factor = 11;
+  uint32 data_rate_index = 12;
 }
 
 message simulateJoinRequestParams {
-    option (thethings.flags.message) = { select: true, set: true };
-	bytes join_eui = 1;
-	bytes dev_eui = 2;
-	bytes dev_nonce = 3;
-	ttn.lorawan.v3.KeyEnvelope app_key = 4;
-	ttn.lorawan.v3.KeyEnvelope nwk_key = 5;
+  option (thethings.flags.message) = { select: true, set: true };
+  bytes join_eui = 1;
+  bytes dev_eui = 2;
+  bytes dev_nonce = 3;
+  ttn.lorawan.v3.KeyEnvelope app_key = 4;
+  ttn.lorawan.v3.KeyEnvelope nwk_key = 5;
 }
 
 message simulateDataUplinkParams {
-    option (thethings.flags.message) = { select: true, set: true };
-	bytes dev_addr = 1;
-	ttn.lorawan.v3.KeyEnvelope f_nwk_s_int_key = 2;
-	ttn.lorawan.v3.KeyEnvelope s_nwk_s_int_key = 3;
-	ttn.lorawan.v3.KeyEnvelope nwk_s_enc_key = 4;
-	ttn.lorawan.v3.KeyEnvelope app_s_key = 5;
-	bool adr = 6;
-	bool adr_ack_req = 7;
-	bool confirmed = 8;
-	bool ack = 9;
-	uint32 f_cnt = 10;
-	uint32 f_port = 11;
-	bytes frm_payload = 12;
-	uint32 conf_f_cnt = 13;
-	uint32 tx_dr_idx = 14;
-	uint32 tx_ch_idx = 15;
-	bytes f_opts = 16;
+  option (thethings.flags.message) = { select: true, set: true };
+  bytes dev_addr = 1;
+  ttn.lorawan.v3.KeyEnvelope f_nwk_s_int_key = 2;
+  ttn.lorawan.v3.KeyEnvelope s_nwk_s_int_key = 3;
+  ttn.lorawan.v3.KeyEnvelope nwk_s_enc_key = 4;
+  ttn.lorawan.v3.KeyEnvelope app_s_key = 5;
+  bool adr = 6;
+  bool adr_ack_req = 7;
+  bool confirmed = 8;
+  bool ack = 9;
+  uint32 f_cnt = 10;
+  uint32 f_port = 11;
+  bytes frm_payload = 12;
+  uint32 conf_f_cnt = 13;
+  uint32 tx_dr_idx = 14;
+  uint32 tx_ch_idx = 15;
+  bytes f_opts = 16;
 }

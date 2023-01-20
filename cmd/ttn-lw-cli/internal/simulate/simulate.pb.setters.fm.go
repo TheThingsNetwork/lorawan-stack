@@ -4,7 +4,7 @@ package simulate
 
 import (
 	fmt "fmt"
-	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	ttnpb "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 func (dst *SimulateMetadataParams) SetFields(src *SimulateMetadataParams, paths ...string) error {
@@ -49,25 +49,25 @@ func (dst *SimulateMetadataParams) SetFields(src *SimulateMetadataParams, paths 
 			} else {
 				dst.Time = nil
 			}
-		case "loRaWAN_version":
+		case "lorawan_version":
 			if len(subs) > 0 {
-				return fmt.Errorf("'loRaWAN_version' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'lorawan_version' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.LoRaWANVersion = src.LoRaWANVersion
+				dst.LorawanVersion = src.LorawanVersion
 			} else {
 				var zero ttnpb.MACVersion
-				dst.LoRaWANVersion = zero
+				dst.LorawanVersion = zero
 			}
-		case "loRaWAN_PHY_version":
+		case "lorawan_phy_version":
 			if len(subs) > 0 {
-				return fmt.Errorf("'loRaWAN_PHY_version' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'lorawan_phy_version' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.LoRaWAN_PHYVersion = src.LoRaWAN_PHYVersion
+				dst.LorawanPhyVersion = src.LorawanPhyVersion
 			} else {
 				var zero ttnpb.PHYVersion
-				dst.LoRaWAN_PHYVersion = zero
+				dst.LorawanPhyVersion = zero
 			}
 		case "band_id":
 			if len(subs) > 0 {
