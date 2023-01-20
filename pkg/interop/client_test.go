@@ -23,6 +23,8 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	. "go.thethings.network/lorawan-stack/v3/pkg/interop"
@@ -246,10 +248,14 @@ func TestGetAppSKey(t *testing.T) { //nolint:paralleltest
 			srv := tc.NewServer(a)
 			defer srv.Close()
 
+			c := componenttest.NewComponent(t, &component.Config{})
+			componenttest.StartComponent(t, c)
+			defer c.Close()
+
 			cl, err := NewClient(ctx, config.InteropClient{
 				ConfigSource: "directory",
 				Directory:    "testdata/client",
-			}, test.HTTPClientProvider, SelectorApplicationServer)
+			}, c, SelectorApplicationServer)
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Failed to create new client: %s", err)
 			}
@@ -655,10 +661,14 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 			srv := tc.NewServer(a)
 			defer srv.Close()
 
+			c := componenttest.NewComponent(t, &component.Config{})
+			componenttest.StartComponent(t, c)
+			defer c.Close()
+
 			cl, err := NewClient(ctx, config.InteropClient{
 				ConfigSource: "directory",
 				Directory:    "testdata/client",
-			}, test.HTTPClientProvider, SelectorNetworkServer)
+			}, c, SelectorNetworkServer)
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Failed to create new client: %s", err)
 			}
@@ -830,10 +840,14 @@ func TestJoinServerRace(t *testing.T) { //nolint:paralleltest
 				defer srv.Close() //nolint:revive
 			}
 
+			c := componenttest.NewComponent(t, &component.Config{})
+			componenttest.StartComponent(t, c)
+			defer c.Close()
+
 			cl, err := NewClient(ctx, config.InteropClient{
 				ConfigSource: "directory",
 				Directory:    "testdata/client",
-			}, test.HTTPClientProvider, SelectorNetworkServer)
+			}, c, SelectorNetworkServer)
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Failed to create new client: %s", err)
 			}

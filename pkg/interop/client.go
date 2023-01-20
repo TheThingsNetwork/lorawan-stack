@@ -29,6 +29,7 @@ import (
 
 	"github.com/oklog/ulid/v2"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
@@ -49,8 +50,13 @@ type jsRPCPaths struct {
 	HomeNS  string `yaml:"home-ns"`
 }
 
-func (p jsRPCPaths) join() string    { return p.Join }
-func (p jsRPCPaths) appSKey() string { return p.AppSKey }
+func (p jsRPCPaths) join() string {
+	return p.Join
+}
+
+func (p jsRPCPaths) appSKey() string {
+	return p.AppSKey
+}
 
 func serverURL(scheme, fqdn, path string, port uint32) string {
 	if scheme == "" {
@@ -323,6 +329,12 @@ var (
 	errDNSLookupNotSupported = errors.DefineFailedPrecondition("dns_lookup_not_supported", "DNS lookup is not supported")
 )
 
+// ClientComponent provides an interface to the component for the interop client.
+type ClientComponent interface {
+	httpclient.Provider
+	KeyService() crypto.KeyService
+}
+
 // ComponentSelector is a component selector.
 type ComponentSelector string
 
@@ -334,9 +346,9 @@ const (
 
 // NewClient return new interop client.
 func NewClient(
-	ctx context.Context, conf config.InteropClient, httpClientProvider httpclient.Provider, selector ComponentSelector,
+	ctx context.Context, conf config.InteropClient, c ClientComponent, selector ComponentSelector,
 ) (*Client, error) {
-	fetcher, err := conf.Fetcher(ctx, httpClientProvider)
+	fetcher, err := conf.Fetcher(ctx, c)
 	if err != nil {
 		return nil, err
 	}
@@ -410,7 +422,7 @@ func NewClient(
 		case ProtocolV1_0, ProtocolV1_1:
 			var opts []httpclient.Option
 			if !jsConf.TLS.IsZero() {
-				tlsConf, err := jsConf.TLS.TLSConfig(fetcher)
+				tlsConf, err := jsConf.TLS.TLSConfig(fetcher, c.KeyService())
 				if err != nil {
 					return nil, err
 				}
@@ -420,7 +432,7 @@ func NewClient(
 				return nil, errDNSLookupNotSupported.New()
 			}
 			js = &joinServerHTTPClient{
-				clientProvider: httpClientProvider,
+				clientProvider: c,
 				clientOpts:     opts,
 				protocol:       jsConf.Protocol,
 				senderNSID:     jsConf.SenderNSID,
