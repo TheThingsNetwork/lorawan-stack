@@ -22,6 +22,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Deprecated
 
+- Configuring certificate authorities per LoRaWAN Backend Interfaces SenderID (`interop.sender-client-ca`) is now deprecated and support will be removed in a future version of The Things Stack.
+
 ### Removed
 
 - The device version identifiers no longer have the `serial_number`, `vendor_id` and `vendor_profile_id` fields.

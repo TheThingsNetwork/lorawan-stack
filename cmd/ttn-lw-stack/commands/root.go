@@ -41,7 +41,10 @@ var (
 	logger log.Stack
 	name   = "ttn-lw-stack"
 	mgr    = conf.InitializeWithDefaults(name, "ttn_lw", DefaultConfig,
-		conf.WithDeprecatedFlag("interop.sender-client-cas", "use interop.sender-client-ca sub-fields instead"),
+		conf.WithDeprecatedFlag(
+			"interop.sender-client-cas",
+			"TLS client authentication with LoRaWAN Backend Interfaces is deprecated",
+		),
 	)
 	config = new(Config)
 

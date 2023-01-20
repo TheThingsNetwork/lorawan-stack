@@ -71,6 +71,7 @@ type Server struct {
 
 	router *mux.Router
 
+	// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/6026)
 	senderClientCAs    map[string][]*x509.Certificate
 	senderClientCAPool *x509.CertPool
 
@@ -92,6 +93,7 @@ func NewServer(c Component, contextFillers []fillcontext.Filler, conf config.Int
 	ctx := log.NewContextWithField(c.Context(), "namespace", "interop")
 	logger := log.FromContext(ctx)
 
+	// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/6026)
 	senderClientCAs, err := fetchSenderClientCAs(ctx, conf, c)
 	if err != nil {
 		return nil, err
@@ -119,7 +121,8 @@ func NewServer(c Component, contextFillers []fillcontext.Filler, conf config.Int
 	}
 
 	s := &Server{
-		config:             conf,
+		config: conf,
+		// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/6026)
 		senderClientCAs:    senderClientCAs,
 		senderClientCAPool: senderClientCAPool,
 		tokenVerifiers:     tokenVerifiers,
@@ -163,6 +166,7 @@ func (s *Server) RegisterJS(js JoinServer) {
 }
 
 // ClientCAPool returns a certificate pool of all configured client CAs.
+// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/6026)
 func (s *Server) ClientCAPool() *x509.CertPool {
 	return s.senderClientCAPool
 }
@@ -172,6 +176,7 @@ func (s *Server) ClientCAPool() *x509.CertPool {
 // and Join Servers respectively.
 func (s *Server) SenderClientCAs(_ context.Context, senderID string) ([]*x509.Certificate, error) {
 	// TODO: Lookup partner CA by SenderID with DNS (https://github.com/TheThingsNetwork/lorawan-stack/issues/718).
+	// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/6026)
 	return s.senderClientCAs[senderID], nil
 }
 

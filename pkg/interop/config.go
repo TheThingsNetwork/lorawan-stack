@@ -81,6 +81,7 @@ const (
 	SenderClientCAsConfigurationName = "config.yml"
 )
 
+// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/6026)
 func fetchSenderClientCAs( //nolint:gocyclo
 	ctx context.Context, conf config.InteropServer, httpClientProvider httpclient.Provider,
 ) (map[string][]*x509.Certificate, error) {

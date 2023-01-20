@@ -476,8 +476,8 @@ type InteropServer struct {
 	ListenTLS        string `name:"listen-tls" description:"TLS address for the interop server for LoRaWAN Backend Interfaces to listen on"` //nolint:lll
 	PublicTLSAddress string `name:"public-tls-address" description:"Public address of the interop server for LoRaWAN Backend Interfaces"`    //nolint:lll
 
-	SenderClientCA           SenderClientCA    `name:"sender-client-ca"`
-	SenderClientCADeprecated map[string]string `name:"sender-client-cas" description:"Path to PEM encoded file with client CAs of sender IDs to trust; deprecated - use sender-client-ca instead"` //nolint:lll
+	SenderClientCA           SenderClientCA    `name:"sender-client-ca" description:"Client CAs for sender IDs to trust (DEPRECATED)"`                               //nolint:lll
+	SenderClientCADeprecated map[string]string `name:"sender-client-cas" description:"Path to PEM encoded file with client CAs of sender IDs to trust (DEPRECATED)"` //nolint:lll
 
 	PacketBroker PacketBrokerInteropAuth `name:"packet-broker"`
 }

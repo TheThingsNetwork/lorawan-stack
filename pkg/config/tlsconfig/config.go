@@ -178,7 +178,7 @@ type ServerAuth struct {
 	Key          string         `json:"key" yaml:"key" name:"key" description:"Location of TLS private key"`
 	ACME         ACME           `name:"acme"`
 	KeyVault     ServerKeyVault `name:"key-vault"`
-	CipherSuites []string       `name:"cipher-suites" description:"DEPRECATED: List of IANA names of TLS cipher suites to use"` //nolint:lll
+	CipherSuites []string       `name:"cipher-suites" description:"List of IANA names of TLS cipher suites to use (DEPRECATED)"` //nolint:lll
 }
 
 var (
