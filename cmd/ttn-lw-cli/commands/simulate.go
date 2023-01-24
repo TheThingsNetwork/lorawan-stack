@@ -172,6 +172,7 @@ func startSimulation(
 	return ctx.Err()
 }
 
+//nolint:gocyclo
 func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *ttnpb.DownlinkMessage) error {
 	phy, err := band.Get(dev.FrequencyPlanId, dev.LorawanPhyVersion)
 	if err != nil {
@@ -492,7 +493,12 @@ var (
 				func(upMsg *ttnpb.UplinkMessage) error {
 					fOpts := dataUplinkParams.FOpts
 					if len(fOpts) > 0 && macspec.EncryptFOpts(uplinkParams.LorawanVersion) {
-						encOpts := macspec.EncryptionOptions(uplinkParams.LorawanVersion, macspec.UplinkFrame, dataUplinkParams.FPort, true)
+						encOpts := macspec.EncryptionOptions(
+							uplinkParams.LorawanVersion,
+							macspec.UplinkFrame,
+							dataUplinkParams.FPort,
+							true,
+						)
 						nwkSEncKey, err := types.GetAES128Key(dataUplinkParams.NwkSEncKey.EncryptedKey)
 						if err != nil {
 							return err
