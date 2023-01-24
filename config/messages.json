@@ -3385,7 +3385,16 @@
   },
   "error:pkg/crypto/cryptoutil:certificate_not_found": {
     "translations": {
-      "en": "certificate with ID `{id}` not found"
+      "en": "certificate with label `{label}` not found"
+    },
+    "description": {
+      "package": "pkg/crypto/cryptoutil",
+      "file": "cryptoutil.go"
+    }
+  },
+  "error:pkg/crypto/cryptoutil:client_certificate_not_found": {
+    "translations": {
+      "en": "client certificate not found"
     },
     "description": {
       "package": "pkg/crypto/cryptoutil",
@@ -3401,18 +3410,9 @@
       "file": "cryptoutil.go"
     }
   },
-  "error:pkg/crypto/cryptoutil:kek_not_found": {
-    "translations": {
-      "en": "KEK with label `{label}` not found"
-    },
-    "description": {
-      "package": "pkg/crypto/cryptoutil",
-      "file": "cryptoutil.go"
-    }
-  },
   "error:pkg/crypto/cryptoutil:key_not_found": {
     "translations": {
-      "en": "key with ID `{id}` not found"
+      "en": "key with label `{label}` not found"
     },
     "description": {
       "package": "pkg/crypto/cryptoutil",
