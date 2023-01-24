@@ -76,11 +76,11 @@ func startSimulation(
 		return err
 	}
 
-	var uplinkParams simulate.SimulateMetadataParams
+	var uplinkParams ttnpb.SimulateMetadataParams
 	if _, err := uplinkParams.SetFromFlags(simulateUplinkFlags, ""); err != nil {
 		return err
 	}
-	if err := uplinkParams.SetDefaults(); err != nil {
+	if err := simulate.SetDefaults(&uplinkParams); err != nil {
 		return err
 	}
 
@@ -378,14 +378,14 @@ var (
 		Hidden: true,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			var (
-				uplinkParams simulate.SimulateMetadataParams
-				joinParams   simulate.SimulateJoinRequestParams
+				uplinkParams ttnpb.SimulateMetadataParams
+				joinParams   ttnpb.SimulateJoinRequestParams
 				joinRequest  *ttnpb.Message
 			)
 			if _, err := uplinkParams.SetFromFlags(simulateUplinkFlags, ""); err != nil {
 				return err
 			}
-			if err := uplinkParams.SetDefaults(); err != nil {
+			if err := simulate.SetDefaults(&uplinkParams); err != nil {
 				return err
 			}
 			if _, err := joinParams.SetFromFlags(simulateJoinRequestFlags, ""); err != nil {
@@ -468,14 +468,14 @@ var (
 		Hidden: true,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			var (
-				uplinkParams     simulate.SimulateMetadataParams
-				dataUplinkParams simulate.SimulateDataUplinkParams
+				uplinkParams     ttnpb.SimulateMetadataParams
+				dataUplinkParams ttnpb.SimulateDataUplinkParams
 				dataUplink       *ttnpb.Message
 			)
 			if _, err := uplinkParams.SetFromFlags(simulateUplinkFlags, ""); err != nil {
 				return err
 			}
-			if err := uplinkParams.SetDefaults(); err != nil {
+			if err := simulate.SetDefaults(&uplinkParams); err != nil {
 				return err
 			}
 			if _, err := dataUplinkParams.SetFromFlags(simulateDataUplinkFlags, ""); err != nil {
@@ -675,9 +675,9 @@ var (
 )
 
 func init() {
-	simulate.AddSetFlagsForSimulateMetadataParams(simulateUplinkFlags, "", false)
-	simulate.AddSetFlagsForSimulateJoinRequestParams(simulateJoinRequestFlags, "", false)
-	simulate.AddSetFlagsForSimulateDataUplinkParams(simulateDataUplinkFlags, "", false)
+	ttnpb.AddSetFlagsForSimulateMetadataParams(simulateUplinkFlags, "", false)
+	ttnpb.AddSetFlagsForSimulateJoinRequestParams(simulateJoinRequestFlags, "", false)
+	ttnpb.AddSetFlagsForSimulateDataUplinkParams(simulateDataUplinkFlags, "", false)
 	ttnpb.AddSetFlagsForApplicationUplink(applicationUplinkFlags, "", false)
 
 	simulateJoinRequestCommand.Flags().AddFlagSet(gatewayIDFlags())

@@ -635,6 +635,10 @@
   - [Service `EntityRegistrySearch`](#ttn.lorawan.v3.EntityRegistrySearch)
 - [File `lorawan-stack/api/secrets.proto`](#lorawan-stack/api/secrets.proto)
   - [Message `Secret`](#ttn.lorawan.v3.Secret)
+- [File `lorawan-stack/api/simulate.proto`](#lorawan-stack/api/simulate.proto)
+  - [Message `SimulateDataUplinkParams`](#ttn.lorawan.v3.SimulateDataUplinkParams)
+  - [Message `SimulateJoinRequestParams`](#ttn.lorawan.v3.SimulateJoinRequestParams)
+  - [Message `SimulateMetadataParams`](#ttn.lorawan.v3.SimulateMetadataParams)
 - [File `lorawan-stack/api/user.proto`](#lorawan-stack/api/user.proto)
   - [Message `CreateLoginTokenRequest`](#ttn.lorawan.v3.CreateLoginTokenRequest)
   - [Message `CreateLoginTokenResponse`](#ttn.lorawan.v3.CreateLoginTokenResponse)
@@ -9105,6 +9109,56 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 | Field | Validations |
 | ----- | ----------- |
 | `value` | <p>`bytes.max_len`: `2048`</p> |
+
+## <a name="lorawan-stack/api/simulate.proto">File `lorawan-stack/api/simulate.proto`</a>
+
+### <a name="ttn.lorawan.v3.SimulateDataUplinkParams">Message `SimulateDataUplinkParams`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `dev_addr` | [`bytes`](#bytes) |  |  |
+| `f_nwk_s_int_key` | [`KeyEnvelope`](#ttn.lorawan.v3.KeyEnvelope) |  |  |
+| `s_nwk_s_int_key` | [`KeyEnvelope`](#ttn.lorawan.v3.KeyEnvelope) |  |  |
+| `nwk_s_enc_key` | [`KeyEnvelope`](#ttn.lorawan.v3.KeyEnvelope) |  |  |
+| `app_s_key` | [`KeyEnvelope`](#ttn.lorawan.v3.KeyEnvelope) |  |  |
+| `adr` | [`bool`](#bool) |  |  |
+| `adr_ack_req` | [`bool`](#bool) |  |  |
+| `confirmed` | [`bool`](#bool) |  |  |
+| `ack` | [`bool`](#bool) |  |  |
+| `f_cnt` | [`uint32`](#uint32) |  |  |
+| `f_port` | [`uint32`](#uint32) |  |  |
+| `frm_payload` | [`bytes`](#bytes) |  |  |
+| `conf_f_cnt` | [`uint32`](#uint32) |  |  |
+| `tx_dr_idx` | [`uint32`](#uint32) |  |  |
+| `tx_ch_idx` | [`uint32`](#uint32) |  |  |
+| `f_opts` | [`bytes`](#bytes) |  |  |
+
+### <a name="ttn.lorawan.v3.SimulateJoinRequestParams">Message `SimulateJoinRequestParams`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `join_eui` | [`bytes`](#bytes) |  |  |
+| `dev_eui` | [`bytes`](#bytes) |  |  |
+| `dev_nonce` | [`bytes`](#bytes) |  |  |
+| `app_key` | [`KeyEnvelope`](#ttn.lorawan.v3.KeyEnvelope) |  |  |
+| `nwk_key` | [`KeyEnvelope`](#ttn.lorawan.v3.KeyEnvelope) |  |  |
+
+### <a name="ttn.lorawan.v3.SimulateMetadataParams">Message `SimulateMetadataParams`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `rssi` | [`float`](#float) |  |  |
+| `snr` | [`float`](#float) |  |  |
+| `timestamp` | [`uint32`](#uint32) |  |  |
+| `time` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `lorawan_version` | [`MACVersion`](#ttn.lorawan.v3.MACVersion) |  |  |
+| `lorawan_phy_version` | [`PHYVersion`](#ttn.lorawan.v3.PHYVersion) |  |  |
+| `band_id` | [`string`](#string) |  |  |
+| `frequency` | [`uint64`](#uint64) |  |  |
+| `channel_index` | [`uint32`](#uint32) |  |  |
+| `bandwidth` | [`uint32`](#uint32) |  |  |
+| `spreading_factor` | [`uint32`](#uint32) |  |  |
+| `data_rate_index` | [`uint32`](#uint32) |  |  |
 
 ## <a name="lorawan-stack/api/user.proto">File `lorawan-stack/api/user.proto`</a>
 

@@ -16,7 +16,6 @@
 package simulate
 
 import (
-	"strings"
 	"time"
 
 	"github.com/gogo/protobuf/types"
@@ -24,31 +23,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
-
-func _processPaths(paths []string) map[string][]string {
-	if len(paths) == 0 {
-		return nil
-	}
-	pathMap := make(map[string][]string, len(paths))
-	for _, p := range paths {
-		if !strings.Contains(p, ".") {
-			pathMap[p] = nil
-			continue
-		}
-		parts := strings.SplitN(p, ".", 2)
-		h, t := parts[0], parts[1]
-		if val, ok := pathMap[h]; ok {
-			if val == nil {
-				continue
-			}
-			pathMap[h] = append(pathMap[h], t)
-		} else {
-			pathMap[h] = []string{t}
-		}
-	}
-
-	return pathMap
-}
 
 var (
 	errDataRate             = errors.DefineInvalidArgument("data_rate", "data rate is invalid")
@@ -59,7 +33,7 @@ var (
 // SetDefaults sets the defaults for the struct where relevant.
 //
 //nolint:gocyclo
-func (m *SimulateMetadataParams) SetDefaults() error {
+func SetDefaults(m *ttnpb.SimulateMetadataParams) error {
 	if m.Time == nil || (m.Time.Nanos == 0 && m.Time.Seconds == 0) {
 		now := time.Now()
 		m.Time = ttnpb.ProtoTime(&now)

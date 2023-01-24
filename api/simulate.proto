@@ -23,7 +23,7 @@ package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
-message simulateMetadataParams {
+message SimulateMetadataParams {
   option (thethings.flags.message) = { select: true, set: true };
   float rssi = 1;
   float snr = 2;
@@ -39,7 +39,7 @@ message simulateMetadataParams {
   uint32 data_rate_index = 12;
 }
 
-message simulateJoinRequestParams {
+message SimulateJoinRequestParams {
   option (thethings.flags.message) = { select: true, set: true };
   bytes join_eui = 1;
   bytes dev_eui = 2;
@@ -48,7 +48,7 @@ message simulateJoinRequestParams {
   ttn.lorawan.v3.KeyEnvelope nwk_key = 5;
 }
 
-message simulateDataUplinkParams {
+message SimulateDataUplinkParams {
   option (thethings.flags.message) = { select: true, set: true };
   bytes dev_addr = 1;
   ttn.lorawan.v3.KeyEnvelope f_nwk_s_int_key = 2;
