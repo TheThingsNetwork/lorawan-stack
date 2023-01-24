@@ -6,16 +6,13 @@ linters:
   disable-all: true
   enable:
     # Enabled by default:
-    - deadcode # Finds unused code; similar to "unused" below.
     - errcheck # Finds unchecked errors.
     - gosimple # Finds potential simplifications. See also: https://staticcheck.io/docs/checks/#S.
     - govet # See "go tool vet help".
     - ineffassign # Finds assignments that are not used.
     - staticcheck # See also: https://staticcheck.io/docs/checks/#SA.
-    - structcheck # Finds unused struct fields.
     - typecheck # Parses and type-checks Go code.
     - unused # Finds unused consts, vars, funcs and types.
-    - varcheck # Pretty much the same as "unused".
 
     # Enabled manually:
     - asciicheck # Finds non-ASCII identifiers.

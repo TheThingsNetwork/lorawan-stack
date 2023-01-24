@@ -236,7 +236,7 @@ func (is *IdentityServer) getOrganizationCollaborator(ctx context.Context, req *
 
 var errOrganizationNeedsCollaborator = errors.DefineFailedPrecondition("organization_needs_collaborator", "every organization needs at least one collaborator with all rights")
 
-func (is *IdentityServer) setOrganizationCollaborator( //nolint:gocycle
+func (is *IdentityServer) setOrganizationCollaborator( //nolint:gocyclo
 	ctx context.Context, req *ttnpb.SetOrganizationCollaboratorRequest,
 ) (_ *pbtypes.Empty, err error) {
 	// Require that caller has rights to manage collaborators.
