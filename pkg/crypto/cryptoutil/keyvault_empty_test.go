@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,26 +26,15 @@ import (
 )
 
 func TestEmptyKeyVault(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
-	_, err := cryptoutil.EmptyKeyVault.Wrap(test.Context(), []byte{0x1, 0x2}, "test")
+	_, err := cryptoutil.EmptyKeyVault.Key(test.Context(), "test")
 	a.So(errors.IsNotFound(err), should.BeTrue)
 
-	_, err = cryptoutil.EmptyKeyVault.Unwrap(test.Context(), []byte{0x1, 0x2}, "test")
+	_, err = cryptoutil.EmptyKeyVault.ServerCertificate(test.Context(), "test")
 	a.So(errors.IsNotFound(err), should.BeTrue)
 
-	_, err = cryptoutil.EmptyKeyVault.Encrypt(test.Context(), []byte{0x1, 0x2}, "test")
-	a.So(errors.IsNotFound(err), should.BeTrue)
-
-	_, err = cryptoutil.EmptyKeyVault.Decrypt(test.Context(), []byte{0x1, 0x2}, "test")
-	a.So(errors.IsNotFound(err), should.BeTrue)
-
-	_, err = cryptoutil.EmptyKeyVault.GetCertificate(test.Context(), "test")
-	a.So(errors.IsNotFound(err), should.BeTrue)
-
-	_, err = cryptoutil.EmptyKeyVault.ExportCertificate(test.Context(), "test")
-	a.So(errors.IsNotFound(err), should.BeTrue)
-
-	_, err = cryptoutil.EmptyKeyVault.HMACHash(test.Context(), []byte{0x01, 0x02}, "test")
+	_, err = cryptoutil.EmptyKeyVault.ClientCertificate(test.Context())
 	a.So(errors.IsNotFound(err), should.BeTrue)
 }

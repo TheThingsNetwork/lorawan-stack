@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,104 +18,29 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
-	"crypto/x509"
 	"encoding/pem"
 	"strings"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
-	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
-// MemKeyVault is a KeyVault that uses secrets from memory.
-// This implementation does not provide any security as secrets are stored in the clear.
-type MemKeyVault struct {
-	ComponentPrefixKEKLabeler
+type memKeyVault struct {
 	m map[string][]byte
 }
 
-// NewMemKeyVault returns a MemKeyVault.
-// Certificates keys can be appended as PEM block.
-func NewMemKeyVault(m map[string][]byte) *MemKeyVault {
-	return &MemKeyVault{
-		m: m,
+// Key implements crypto.KeyVault.
+func (kv *memKeyVault) Key(_ context.Context, label string) ([]byte, error) {
+	key, ok := kv.m[label]
+	if !ok {
+		return nil, errKeyNotFound.WithAttributes("label", label)
 	}
+	return key, nil
 }
 
-// Wrap implements KeyVault.
-func (v MemKeyVault) Wrap(ctx context.Context, plaintext []byte, kekLabel string) ([]byte, error) {
-	kek, ok := v.m[kekLabel]
+func (kv *memKeyVault) certificate(label string) (tls.Certificate, error) {
+	raw, ok := kv.m[label]
 	if !ok {
-		return nil, errKEKNotFound.WithAttributes("label", kekLabel)
-	}
-	return crypto.WrapKey(plaintext, kek)
-}
-
-// Unwrap implements KeyVault.
-func (v MemKeyVault) Unwrap(ctx context.Context, ciphertext []byte, kekLabel string) ([]byte, error) {
-	kek, ok := v.m[kekLabel]
-	if !ok {
-		return nil, errKEKNotFound.WithAttributes("label", kekLabel)
-	}
-	return crypto.UnwrapKey(ciphertext, kek)
-}
-
-// Encrypt implements KeyVault.
-func (v MemKeyVault) Encrypt(ctx context.Context, plaintext []byte, id string) ([]byte, error) {
-	rawKey, ok := v.m[id]
-	if !ok {
-		return nil, errKeyNotFound.WithAttributes("id", id)
-	}
-	var key types.AES128Key
-	if err := key.UnmarshalBinary(rawKey); err != nil {
-		return nil, err
-	}
-	return crypto.Encrypt(key, plaintext)
-}
-
-// Decrypt implements KeyVault.
-func (v MemKeyVault) Decrypt(ctx context.Context, ciphertext []byte, id string) ([]byte, error) {
-	rawKey, ok := v.m[id]
-	if !ok {
-		return nil, errKeyNotFound.WithAttributes("id", id)
-	}
-	var key types.AES128Key
-	if err := key.UnmarshalBinary(rawKey); err != nil {
-		return nil, err
-	}
-	return crypto.Decrypt(key, ciphertext)
-}
-
-// HMACHash implements KeyVault.
-func (v MemKeyVault) HMACHash(_ context.Context, payload []byte, id string) ([]byte, error) {
-	rawKey, ok := v.m[id]
-	if !ok {
-		return nil, errKeyNotFound.WithAttributes("id", id)
-	}
-	var key types.AES128Key
-	if err := key.UnmarshalBinary(rawKey); err != nil {
-		return nil, err
-	}
-	return crypto.HMACHash(key, payload)
-}
-
-// GetCertificate implements KeyVault.
-func (v MemKeyVault) GetCertificate(ctx context.Context, id string) (*x509.Certificate, error) {
-	raw, ok := v.m[id]
-	if !ok {
-		return nil, errCertificateNotFound.WithAttributes("id", id)
-	}
-	block, _ := pem.Decode(raw)
-	if block == nil || block.Type != "CERTIFICATE" {
-		return nil, errCertificateNotFound.WithAttributes("id", id)
-	}
-	return x509.ParseCertificate(block.Bytes)
-}
-
-// ExportCertificate implements KeyVault.
-func (v MemKeyVault) ExportCertificate(ctx context.Context, id string) (*tls.Certificate, error) {
-	raw, ok := v.m[id]
-	if !ok {
-		return nil, errCertificateNotFound.WithAttributes("id", id)
+		return tls.Certificate{}, errCertificateNotFound.WithAttributes("label", label)
 	}
 	certPEMBlock, keyPEMBlock := &bytes.Buffer{}, &bytes.Buffer{}
 	for {
@@ -125,18 +50,33 @@ func (v MemKeyVault) ExportCertificate(ctx context.Context, id string) (*tls.Cer
 		}
 		if block.Type == "CERTIFICATE" {
 			if err := pem.Encode(certPEMBlock, block); err != nil {
-				return nil, err
+				return tls.Certificate{}, err
 			}
 		} else if block.Type == "PRIVATE KEY" || strings.HasSuffix(block.Type, " PRIVATE KEY") {
 			if err := pem.Encode(keyPEMBlock, block); err != nil {
-				return nil, err
+				return tls.Certificate{}, err
 			}
 		}
 		raw = rest
 	}
-	res, err := tls.X509KeyPair(certPEMBlock.Bytes(), keyPEMBlock.Bytes())
-	if err != nil {
-		return nil, err
+	return tls.X509KeyPair(certPEMBlock.Bytes(), keyPEMBlock.Bytes())
+}
+
+// ServerCertificate implements crypto.KeyVault.
+func (kv *memKeyVault) ServerCertificate(_ context.Context, label string) (tls.Certificate, error) {
+	return kv.certificate(label)
+}
+
+// ClientCertificate implements crypto.KeyVault.
+func (kv *memKeyVault) ClientCertificate(context.Context) (tls.Certificate, error) {
+	return kv.certificate("client")
+}
+
+// NewMemKeyVault returns a crypto.KeyVault that stores keys in memory.
+// Certificates must be PEM encoded. The client certificate must be labeled "client".
+// The given map must not be modified after calling this function.
+func NewMemKeyVault(m map[string][]byte) crypto.KeyVault {
+	return &memKeyVault{
+		m: m,
 	}
-	return &res, nil
 }

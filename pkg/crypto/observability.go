@@ -63,12 +63,23 @@ func init() {
 	metrics.MustRegister(cMetrics)
 }
 
+// CacheKey is a cache key.
+type CacheKey string
+
+// Cache keys.
+const (
+	CacheEncryptionKey     CacheKey = "key"
+	CacheServerCertificate CacheKey = "server_certificate"
+	CacheClientCertificate CacheKey = "client_certificate"
+	CacheUnwrap            CacheKey = "unwrap"
+)
+
 // RegisterCacheHit registers a cache hit for the provided cache.
-func RegisterCacheHit(ctx context.Context, cache string) {
-	cMetrics.cacheHit.WithLabelValues(ctx, cache).Inc()
+func RegisterCacheHit(ctx context.Context, cache CacheKey) {
+	cMetrics.cacheHit.WithLabelValues(ctx, string(cache)).Inc()
 }
 
 // RegisterCacheMiss registers a cache miss for the provided cache.
-func RegisterCacheMiss(ctx context.Context, cache string) {
-	cMetrics.cacheMiss.WithLabelValues(ctx, cache).Inc()
+func RegisterCacheMiss(ctx context.Context, cache CacheKey) {
+	cMetrics.cacheMiss.WithLabelValues(ctx, string(cache)).Inc()
 }

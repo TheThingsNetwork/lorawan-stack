@@ -101,7 +101,7 @@ func (as *ApplicationServer) encryptDownlink(ctx context.Context, dev *ttnpb.End
 	if session.GetKeys().GetAppSKey() == nil {
 		return errNoAppSKey.New()
 	}
-	appSKey, err := cryptoutil.UnwrapAES128Key(ctx, session.Keys.AppSKey, as.KeyVault)
+	appSKey, err := cryptoutil.UnwrapAES128Key(ctx, session.Keys.AppSKey, as.KeyService())
 	if err != nil {
 		return err
 	}
@@ -124,7 +124,7 @@ func (as *ApplicationServer) decryptUplink(ctx context.Context, dev *ttnpb.EndDe
 	if dev.GetSession().GetKeys().GetAppSKey() == nil {
 		return errNoAppSKey.New()
 	}
-	appSKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.Keys.AppSKey, as.KeyVault)
+	appSKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.Keys.AppSKey, as.KeyService())
 	if err != nil {
 		return err
 	}
@@ -185,7 +185,7 @@ func (as *ApplicationServer) decryptDownlink(ctx context.Context, dev *ttnpb.End
 	if session.GetKeys().GetAppSKey() == nil {
 		return errNoAppSKey.New()
 	}
-	appSKey, err := cryptoutil.UnwrapAES128Key(ctx, session.Keys.AppSKey, as.KeyVault)
+	appSKey, err := cryptoutil.UnwrapAES128Key(ctx, session.Keys.AppSKey, as.KeyService())
 	if err != nil {
 		return err
 	}

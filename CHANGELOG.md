@@ -13,6 +13,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - List of end-devices can now be sorted by `last_seen_at` field. Unseen devices will be shown last.
 - End devices now contain `lora_alliance_profile_ids` field.
+- Add `source` config option for TLS certificates in LoRaWAN Backend Interfaces interop client configuration. This value can be `file` (existing behavior) or `key-vault`.
 
 ### Changed
 
@@ -21,6 +22,8 @@ For details about compatibility between different releases, see the **Commitment
 - Do not allow to remove the collaborator of an entity if it is the last collaborator (in the Console).
 
 ### Deprecated
+
+- Configuring certificate authorities per LoRaWAN Backend Interfaces SenderID (`interop.sender-client-ca`) is now deprecated and support will be removed in a future version of The Things Stack.
 
 ### Removed
 

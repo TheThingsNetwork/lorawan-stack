@@ -24,7 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
-	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	. "go.thethings.network/lorawan-stack/v3/pkg/joinserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -36,7 +36,7 @@ import (
 
 var errNotFound = errors.DefineNotFound("not_found", "not found")
 
-func TestDeviceRegistryGet(t *testing.T) {
+func TestDeviceRegistryGet(t *testing.T) { //nolint:paralleltest
 	registeredApplicationID := "foo-application"
 	registeredDeviceID := "foo-device"
 	registeredRootKeyID := "testKey"
@@ -60,9 +60,9 @@ func TestDeviceRegistryGet(t *testing.T) {
 	}
 	unregisteredJoinEUI := types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 	unregisteredDevEUI := types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
-	keyVault := cryptoutil.NewMemKeyVault(map[string][]byte{
+	keyVault := map[string][]byte{
 		"test": {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf},
-	})
+	}
 	registeredDevice := &ttnpb.EndDevice{
 		Ids: &ttnpb.EndDeviceIdentifiers{
 			ApplicationIds: &ttnpb.ApplicationIdentifiers{
@@ -86,7 +86,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 		},
 	}
-	for _, tc := range []struct {
+	for _, tc := range []struct { //nolint:paralleltest
 		Name            string
 		ContextFunc     func(context.Context) context.Context
 		GetByIDFunc     func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error)
@@ -391,7 +391,14 @@ func TestDeviceRegistryGet(t *testing.T) {
 			var getByIDCalls uint64
 
 			js := test.Must(New(
-				componenttest.NewComponent(t, &component.Config{}),
+				componenttest.NewComponent(t, &component.Config{
+					ServiceBase: config.ServiceBase{
+						KeyVault: config.KeyVault{
+							Provider: "static",
+							Static:   keyVault,
+						},
+					},
+				}),
 				&Config{
 					Devices: &MockDeviceRegistry{
 						GetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
@@ -402,7 +409,6 @@ func TestDeviceRegistryGet(t *testing.T) {
 					DevNonceLimit: defaultDevNonceLimit,
 				},
 			)).(*JoinServer)
-			js.KeyVault = keyVault
 
 			js.AddContextFiller(tc.ContextFunc)
 			js.AddContextFiller(func(ctx context.Context) context.Context {
@@ -435,7 +441,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 	}
 }
 
-func TestDeviceRegistrySet(t *testing.T) {
+func TestDeviceRegistrySet(t *testing.T) { //nolint:paralleltest
 	registeredApplicationID := "foo-application"
 	registeredDeviceID := "foo-device"
 	registeredRootKeyID := "testKey"
@@ -450,9 +456,9 @@ func TestDeviceRegistrySet(t *testing.T) {
 	}
 	unregisteredJoinEUI := types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 	unregisteredDevEUI := types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
-	keyVault := cryptoutil.NewMemKeyVault(map[string][]byte{
+	keyVault := map[string][]byte{
 		"test": {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf},
-	})
+	}
 	registeredDevice := &ttnpb.EndDevice{
 		Ids: &ttnpb.EndDeviceIdentifiers{
 			ApplicationIds: &ttnpb.ApplicationIdentifiers{
@@ -474,7 +480,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			},
 		},
 	}
-	for _, tc := range []struct {
+	for _, tc := range []struct { //nolint:paralleltest
 		Name            string
 		ContextFunc     func(context.Context) context.Context
 		SetByIDFunc     func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
@@ -798,7 +804,14 @@ func TestDeviceRegistrySet(t *testing.T) {
 			var setByIDCalls uint64
 
 			js := test.Must(New(
-				componenttest.NewComponent(t, &component.Config{}),
+				componenttest.NewComponent(t, &component.Config{
+					ServiceBase: config.ServiceBase{
+						KeyVault: config.KeyVault{
+							Provider: "static",
+							Static:   keyVault,
+						},
+					},
+				}),
 				&Config{
 					Devices: &MockDeviceRegistry{
 						SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
@@ -809,7 +822,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 					DevNonceLimit: defaultDevNonceLimit,
 				},
 			)).(*JoinServer)
-			js.KeyVault = keyVault
 
 			js.AddContextFiller(tc.ContextFunc)
 			js.AddContextFiller(func(ctx context.Context) context.Context {
@@ -842,7 +854,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 	}
 }
 
-func TestDeviceRegistryDelete(t *testing.T) {
+func TestDeviceRegistryDelete(t *testing.T) { //nolint:paralleltest
 	registeredApplicationID := "foo-application"
 	registeredDeviceID := "foo-device"
 	registeredRootKeyID := "testKey"
@@ -858,9 +870,9 @@ func TestDeviceRegistryDelete(t *testing.T) {
 	}
 	unregisteredJoinEUI := types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 	unregisteredDevEUI := types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
-	keyVault := cryptoutil.NewMemKeyVault(map[string][]byte{
+	keyVault := map[string][]byte{
 		"test": {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf},
-	})
+	}
 	registeredDevice := &ttnpb.EndDevice{
 		Ids: &ttnpb.EndDeviceIdentifiers{
 			ApplicationIds: &ttnpb.ApplicationIdentifiers{
@@ -882,7 +894,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			},
 		},
 	}
-	for _, tc := range []struct {
+	for _, tc := range []struct { //nolint:paralleltest
 		Name            string
 		ContextFunc     func(context.Context) context.Context
 		SetByIDFunc     func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
@@ -988,7 +1000,14 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			)
 
 			js := test.Must(New(
-				componenttest.NewComponent(t, &component.Config{}),
+				componenttest.NewComponent(t, &component.Config{
+					ServiceBase: config.ServiceBase{
+						KeyVault: config.KeyVault{
+							Provider: "static",
+							Static:   keyVault,
+						},
+					},
+				}),
 				&Config{
 					Devices: &MockDeviceRegistry{
 						SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
@@ -1005,7 +1024,6 @@ func TestDeviceRegistryDelete(t *testing.T) {
 					DevNonceLimit: defaultDevNonceLimit,
 				},
 			)).(*JoinServer)
-			js.KeyVault = keyVault
 
 			js.AddContextFiller(tc.ContextFunc)
 			js.AddContextFiller(func(ctx context.Context) context.Context {

@@ -64,7 +64,7 @@ type asEndDeviceRegistryServer struct {
 
 func (r asEndDeviceRegistryServer) retrieveSessionKeys(ctx context.Context, dev *ttnpb.EndDevice, paths []string) error {
 	unwrapKeys := func(ctx context.Context, session *ttnpb.Session, prefix string, paths ...string) error {
-		sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, r.AS.KeyVault, session.Keys, prefix, paths...)
+		sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, r.AS.KeyService(), session.Keys, prefix, paths...)
 		if err != nil {
 			return err
 		}
@@ -212,7 +212,7 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 	sets := append(req.FieldMask.GetPaths()[:0:0], req.FieldMask.GetPaths()...)
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "session.keys.app_s_key.key") {
 		appSKey, err := cryptoutil.WrapAES128Key(
-			ctx, *types.MustAES128Key(req.EndDevice.Session.Keys.AppSKey.Key), r.kekLabel, r.AS.KeyVault,
+			ctx, *types.MustAES128Key(req.EndDevice.Session.Keys.AppSKey.Key), r.kekLabel, r.AS.KeyService(),
 		)
 		if err != nil {
 			return nil, err

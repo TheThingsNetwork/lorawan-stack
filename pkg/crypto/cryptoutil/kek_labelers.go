@@ -34,8 +34,8 @@ type ComponentPrefixKEKLabeler struct {
 // hostFromAddress returns the cluster host from the given address.
 func hostFromAddress(ctx context.Context, addr string) string {
 	host := addr
-	if url, err := url.Parse(addr); err == nil && url.Host != "" {
-		host = url.Host
+	if u, err := url.Parse(addr); err == nil && u.Host != "" {
+		host = u.Host
 	}
 	if h, _, err := net.SplitHostPort(host); err == nil {
 		host = h
@@ -58,7 +58,8 @@ func (c ComponentPrefixKEKLabeler) join(parts ...string) string {
 	return strings.Join(parts, sep)
 }
 
-// NsKEKLabel returns a KEK label in the form `ns:netID:host` from the given NetID and address, where `:` is the default separator. Empty parts are omitted.
+// NsKEKLabel returns a KEK label in the form `ns:netID:host` from the given NetID and address,
+// where `:` is the default separator. Empty parts are omitted.
 func (c ComponentPrefixKEKLabeler) NsKEKLabel(ctx context.Context, netID *types.NetID, addr string) string {
 	parts := make([]string, 0, 3)
 	parts = append(parts, "ns")
@@ -71,7 +72,8 @@ func (c ComponentPrefixKEKLabeler) NsKEKLabel(ctx context.Context, netID *types.
 	return c.join(parts...)
 }
 
-// AsKEKLabel returns a KEK label in the form `as:host` from the given address, where `:` is the default separator. Empty parts are omitted.
+// AsKEKLabel returns a KEK label in the form `as:host` from the given address,
+// where `:` is the default separator. Empty parts are omitted.
 func (c ComponentPrefixKEKLabeler) AsKEKLabel(ctx context.Context, addr string) string {
 	parts := make([]string, 0, 2)
 	parts = append(parts, "as")

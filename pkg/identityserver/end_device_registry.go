@@ -167,7 +167,7 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 			return nil, err
 		}
 		if is.config.EndDevices.EncryptionKeyID != "" {
-			encrypted, err := is.KeyVault.Encrypt(
+			encrypted, err := is.KeyService().Encrypt(
 				ctx,
 				[]byte(req.EndDevice.ClaimAuthenticationCode.Value),
 				is.config.EndDevices.EncryptionKeyID,
@@ -249,7 +249,7 @@ func (is *IdentityServer) getEndDevice(ctx context.Context, req *ttnpb.GetEndDev
 			if err != nil {
 				return nil, err
 			}
-			value, err := is.KeyVault.Decrypt(ctx, v, s[0])
+			value, err := is.KeyService().Decrypt(ctx, v, s[0])
 			if err != nil {
 				return nil, err
 			}
@@ -375,7 +375,7 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 		if req.EndDevice.ClaimAuthenticationCode.Value != "" {
 			if is.config.EndDevices.EncryptionKeyID != "" {
 				ptCACSecret = req.EndDevice.ClaimAuthenticationCode.Value
-				encrypted, err := is.KeyVault.Encrypt(
+				encrypted, err := is.KeyService().Encrypt(
 					ctx,
 					[]byte(req.EndDevice.ClaimAuthenticationCode.Value),
 					is.config.EndDevices.EncryptionKeyID,

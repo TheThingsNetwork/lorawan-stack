@@ -27,16 +27,16 @@ import (
 
 type networkRPCClient struct {
 	Client ttnpb.NetworkCryptoServiceClient
-	crypto.KeyVault
+	crypto.KeyService
 	callOpts []grpc.CallOption
 }
 
 // NewNetworkRPCClient returns a network service which uses a gRPC service on the given connection.
-func NewNetworkRPCClient(cc *grpc.ClientConn, keyVault crypto.KeyVault, callOpts ...grpc.CallOption) Network {
+func NewNetworkRPCClient(cc *grpc.ClientConn, keyVault crypto.KeyService, callOpts ...grpc.CallOption) Network {
 	return &networkRPCClient{
-		Client:   ttnpb.NewNetworkCryptoServiceClient(cc),
-		KeyVault: keyVault,
-		callOpts: callOpts,
+		Client:     ttnpb.NewNetworkCryptoServiceClient(cc),
+		KeyService: keyVault,
+		callOpts:   callOpts,
 	}
 }
 
@@ -116,15 +116,15 @@ func (s *networkRPCClient) DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDev
 		return NwkSKeys{}, err
 	}
 	var res NwkSKeys
-	res.FNwkSIntKey, err = cryptoutil.UnwrapAES128Key(ctx, keys.FNwkSIntKey, s.KeyVault)
+	res.FNwkSIntKey, err = cryptoutil.UnwrapAES128Key(ctx, keys.FNwkSIntKey, s.KeyService)
 	if err != nil {
 		return NwkSKeys{}, err
 	}
-	res.SNwkSIntKey, err = cryptoutil.UnwrapAES128Key(ctx, keys.SNwkSIntKey, s.KeyVault)
+	res.SNwkSIntKey, err = cryptoutil.UnwrapAES128Key(ctx, keys.SNwkSIntKey, s.KeyService)
 	if err != nil {
 		return NwkSKeys{}, err
 	}
-	res.NwkSEncKey, err = cryptoutil.UnwrapAES128Key(ctx, keys.NwkSEncKey, s.KeyVault)
+	res.NwkSEncKey, err = cryptoutil.UnwrapAES128Key(ctx, keys.NwkSEncKey, s.KeyService)
 	if err != nil {
 		return NwkSKeys{}, err
 	}
@@ -143,7 +143,7 @@ func (s *networkRPCClient) GetNwkKey(ctx context.Context, dev *ttnpb.EndDevice) 
 		}
 		return nil, err
 	}
-	plain, err := cryptoutil.UnwrapAES128Key(ctx, ke, s.KeyVault)
+	plain, err := cryptoutil.UnwrapAES128Key(ctx, ke, s.KeyService)
 	if err != nil {
 		return nil, err
 	}
@@ -152,16 +152,16 @@ func (s *networkRPCClient) GetNwkKey(ctx context.Context, dev *ttnpb.EndDevice) 
 
 type applicationRPCClient struct {
 	Client ttnpb.ApplicationCryptoServiceClient
-	crypto.KeyVault
+	crypto.KeyService
 	callOpts []grpc.CallOption
 }
 
 // NewApplicationRPCClient returns an application service which uses a gRPC service on the given connection.
-func NewApplicationRPCClient(cc *grpc.ClientConn, keyVault crypto.KeyVault, callOpts ...grpc.CallOption) Application {
+func NewApplicationRPCClient(cc *grpc.ClientConn, keyVault crypto.KeyService, callOpts ...grpc.CallOption) Application {
 	return &applicationRPCClient{
-		Client:   ttnpb.NewApplicationCryptoServiceClient(cc),
-		KeyVault: keyVault,
-		callOpts: callOpts,
+		Client:     ttnpb.NewApplicationCryptoServiceClient(cc),
+		KeyService: keyVault,
+		callOpts:   callOpts,
 	}
 }
 
@@ -178,7 +178,7 @@ func (s *applicationRPCClient) DeriveAppSKey(ctx context.Context, dev *ttnpb.End
 	if err != nil {
 		return types.AES128Key{}, err
 	}
-	return cryptoutil.UnwrapAES128Key(ctx, res.AppSKey, s.KeyVault)
+	return cryptoutil.UnwrapAES128Key(ctx, res.AppSKey, s.KeyService)
 }
 
 func (s *applicationRPCClient) GetAppKey(ctx context.Context, dev *ttnpb.EndDevice) (*types.AES128Key, error) {
@@ -193,7 +193,7 @@ func (s *applicationRPCClient) GetAppKey(ctx context.Context, dev *ttnpb.EndDevi
 		}
 		return nil, err
 	}
-	plain, err := cryptoutil.UnwrapAES128Key(ctx, ke, s.KeyVault)
+	plain, err := cryptoutil.UnwrapAES128Key(ctx, ke, s.KeyService)
 	if err != nil {
 		return nil, err
 	}

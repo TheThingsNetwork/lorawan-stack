@@ -409,7 +409,7 @@ func (as *ApplicationServer) publishUp(ctx context.Context, up *ttnpb.Applicatio
 // Server, and if the end device's skip_payload_crypto_override is true or if the link's skip_payload_crypto is true.
 func (as *ApplicationServer) skipPayloadCrypto(ctx context.Context, link *ttnpb.ApplicationLink, dev *ttnpb.EndDevice, session *ttnpb.Session) bool {
 	if appSKey := session.GetKeys().GetAppSKey(); appSKey != nil {
-		if _, err := cryptoutil.UnwrapAES128Key(ctx, appSKey, as.KeyVault); err == nil {
+		if _, err := cryptoutil.UnwrapAES128Key(ctx, appSKey, as.KeyService()); err == nil {
 			return false
 		}
 	}

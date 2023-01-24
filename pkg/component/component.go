@@ -85,7 +85,9 @@ type Component struct {
 	fillers []fillcontext.Filler
 
 	frequencyPlans *frequencyplans.Store
-	KeyVault       crypto.KeyVault
+
+	componentKEKLabeler crypto.ComponentKEKLabeler
+	keyService          crypto.KeyService
 
 	rightsFetcher rights.Fetcher
 
@@ -161,7 +163,11 @@ func New(logger log.Stack, config *Config, opts ...Option) (c *Component, err er
 		return nil, err
 	}
 
-	c.KeyVault, err = config.KeyVault.KeyVault(ctx, c)
+	c.componentKEKLabeler, err = config.KeyVault.ComponentKEKLabeler()
+	if err != nil {
+		return nil, err
+	}
+	c.keyService, err = config.KeyVault.KeyService(ctx, c)
 	if err != nil {
 		return nil, err
 	}
@@ -264,6 +270,16 @@ func (c *Component) FromRequestContext(ctx context.Context) context.Context {
 		valueCtx:  ctx,
 		cancelCtx: c.ctx,
 	}
+}
+
+// ComponentKEKLabeler returns the component's ComponentKEKLabeler
+func (c *Component) ComponentKEKLabeler() crypto.ComponentKEKLabeler {
+	return c.componentKEKLabeler
+}
+
+// KeyService returns the component's KeyService.
+func (c *Component) KeyService() crypto.KeyService {
+	return c.keyService
 }
 
 // FrequencyPlansStore returns the component's frequencyPlans Store

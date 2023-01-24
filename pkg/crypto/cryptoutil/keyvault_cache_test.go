@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,121 +16,123 @@ package cryptoutil_test
 
 import (
 	"context"
+	"crypto/rand"
+	"crypto/rsa"
 	"crypto/tls"
 	"crypto/x509"
-	"errors"
+	"crypto/x509/pkix"
+	"math/big"
 	"testing"
+	"time"
 
-	"github.com/smartystreets/assertions"
-	. "go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
-	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
+	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 type mockKeyVault struct {
-	params struct {
-		ctx        context.Context
-		ciphertext []byte
-		kekLabel   string
+	KeyFunc               func(ctx context.Context, label string) ([]byte, error)
+	ServerCertificateFunc func(ctx context.Context, label string) (tls.Certificate, error)
+	ClientCertificateFunc func(ctx context.Context) (tls.Certificate, error)
+}
+
+func (m *mockKeyVault) Key(ctx context.Context, label string) ([]byte, error) {
+	if m.KeyFunc == nil {
+		panic("Key called but not set")
 	}
-	results struct {
-		key []byte
-		err error
+	return m.KeyFunc(ctx, label)
+}
+
+func (m *mockKeyVault) ServerCertificate(ctx context.Context, label string) (tls.Certificate, error) {
+	if m.ServerCertificateFunc == nil {
+		panic("ServerCertificate called but not set")
 	}
-	calls struct {
-		count int
+	return m.ServerCertificateFunc(ctx, label)
+}
+
+func (m *mockKeyVault) ClientCertificate(ctx context.Context) (tls.Certificate, error) {
+	if m.ClientCertificateFunc == nil {
+		panic("ClientCertificate called but not set")
 	}
+	return m.ClientCertificateFunc(ctx)
 }
 
-func (*mockKeyVault) NsKEKLabel(ctx context.Context, netID *types.NetID, addr string) string {
-	return ""
+var _ crypto.KeyVault = (*mockKeyVault)(nil)
+
+type mockClock struct {
+	time.Time
 }
 
-func (*mockKeyVault) AsKEKLabel(ctx context.Context, addr string) string {
-	return ""
+func (m mockClock) Now() time.Time {
+	return m.Time
 }
 
-func (*mockKeyVault) Wrap(ctx context.Context, plaintext []byte, kekLabel string) ([]byte, error) {
-	return nil, errors.New("not implemented")
-}
+func TestCacheKeyVault(t *testing.T) {
+	t.Parallel()
+	a, ctx := test.New(t)
 
-func (m *mockKeyVault) Unwrap(ctx context.Context, ciphertext []byte, kekLabel string) ([]byte, error) {
-	m.params.ctx, m.params.ciphertext, m.params.kekLabel = ctx, ciphertext, kekLabel
-	m.calls.count++
-	return m.results.key, m.results.err
-}
+	var (
+		keys, serverCerts []string
+		now               = &mockClock{time.Now()}
+	)
+	kv := cryptoutil.NewCacheKeyVault(&mockKeyVault{
+		KeyFunc: func(ctx context.Context, label string) ([]byte, error) {
+			keys = append(keys, label)
+			return []byte(label), nil
+		},
+		ServerCertificateFunc: func(ctx context.Context, label string) (tls.Certificate, error) {
+			serverCerts = append(serverCerts, label)
+			tmpl := &x509.Certificate{
+				IsCA: true,
+				Subject: pkix.Name{
+					CommonName: label,
+				},
+				DNSNames: []string{label},
+				NotAfter: time.Now().Add(3 * time.Hour),
+				ExtKeyUsage: []x509.ExtKeyUsage{
+					x509.ExtKeyUsageServerAuth,
+				},
+				SerialNumber: big.NewInt(1),
+			}
+			key, err := rsa.GenerateKey(rand.Reader, 2048)
+			if err != nil {
+				return tls.Certificate{}, err
+			}
+			cert, err := x509.CreateCertificate(rand.Reader, tmpl, tmpl, &key.PublicKey, key)
+			if err != nil {
+				return tls.Certificate{}, err
+			}
+			return tls.Certificate{Certificate: [][]byte{cert}}, nil
+		},
+	}, cryptoutil.WithCacheKeyVaultClock(now))
 
-func (*mockKeyVault) Encrypt(ctx context.Context, plaintext []byte, id string) ([]byte, error) {
-	return nil, errors.New("not implemented")
-}
+	test.Must(kv.Key(ctx, "key1"))
+	test.Must(kv.Key(ctx, "key1"))
+	test.Must(kv.Key(ctx, "key2"))
+	test.Must(kv.Key(ctx, "key1"))
+	test.Must(kv.Key(ctx, "key2"))
+	a.So(keys, should.Resemble, []string{"key1", "key2"})
 
-func (m *mockKeyVault) Decrypt(ctx context.Context, ciphertext []byte, id string) ([]byte, error) {
-	return nil, errors.New("not implemented")
-}
+	test.Must(kv.ServerCertificate(ctx, "server1.example.com"))
+	test.Must(kv.ServerCertificate(ctx, "server2.example.com"))
+	test.Must(kv.ServerCertificate(ctx, "server1.example.com"))
+	a.So(serverCerts, should.Resemble, []string{"server1.example.com", "server2.example.com"})
 
-func (*mockKeyVault) GetCertificate(ctx context.Context, id string) (*x509.Certificate, error) {
-	return nil, errors.New("not implemented")
-}
+	// 1 hour later, the certficates are still valid.
+	now.Time = time.Now().Add(1 * time.Hour)
+	test.Must(kv.ServerCertificate(ctx, "server1.example.com"))
+	test.Must(kv.ServerCertificate(ctx, "server2.example.com"))
+	a.So(serverCerts, should.Resemble, []string{"server1.example.com", "server2.example.com"})
 
-func (*mockKeyVault) ExportCertificate(ctx context.Context, id string) (*tls.Certificate, error) {
-	return nil, errors.New("not implemented")
-}
-
-func (*mockKeyVault) HMACHash(_ context.Context, _ []byte, _ string) ([]byte, error) {
-	return nil, errors.New("not implemented")
-}
-
-func TestCacheUsed(t *testing.T) {
-	a := assertions.New(t)
-	m := &mockKeyVault{}
-
-	ctx := test.Context()
-	ck := NewCacheKeyVault(m, test.Delay, 1)
-
-	// Cache is empty, expect a miss
-	m.results.key = []byte{0x01, 0x02, 0x03}
-	m.results.err = nil
-
-	key, err := ck.Unwrap(ctx, []byte{0x02, 0x03, 0x04}, "foo")
-	a.So(key, should.Resemble, m.results.key)
-	a.So(err, should.Equal, m.results.err)
-	a.So(m.params.ctx, should.HaveParentContextOrEqual, ctx)
-	a.So(m.params.ciphertext, should.Resemble, []byte{0x02, 0x03, 0x04})
-	a.So(m.params.kekLabel, should.Equal, "foo")
-	a.So(m.calls.count, should.Equal, 1)
-
-	// Expect to be served from cache
-	key, err = ck.Unwrap(ctx, []byte{0x02, 0x03, 0x04}, "foo")
-	a.So(key, should.Resemble, m.results.key)
-	a.So(err, should.Equal, m.results.err)
-	a.So(m.calls.count, should.Equal, 1)
-
-	// Expect the old element to be evicted, and a cache miss to occur
-	m.results.key = []byte{0x05, 0x06, 0x07}
-	m.results.err = nil
-	m.calls.count = 0
-
-	key, err = ck.Unwrap(ctx, []byte{0x03, 0x04, 0x05}, "bar")
-	a.So(key, should.Resemble, m.results.key)
-	a.So(err, should.Equal, m.results.err)
-	a.So(m.params.ctx, should.HaveParentContextOrEqual, ctx)
-	a.So(m.params.ciphertext, should.Resemble, []byte{0x03, 0x04, 0x05})
-	a.So(m.params.kekLabel, should.Equal, "bar")
-	a.So(m.calls.count, should.Equal, 1)
-
-	// Expect the cache miss
-	m.results.key = []byte{0x01, 0x02, 0x03}
-	m.results.err = nil
-	m.calls.count = 0
-
-	key, err = ck.Unwrap(ctx, []byte{0x02, 0x03, 0x04}, "foo")
-	a.So(key, should.Resemble, m.results.key)
-	a.So(err, should.Equal, m.results.err)
-	a.So(m.params.ctx, should.HaveParentContextOrEqual, ctx)
-	a.So(m.params.ciphertext, should.Resemble, []byte{0x02, 0x03, 0x04})
-	a.So(m.params.kekLabel, should.Equal, "foo")
-	a.So(m.calls.count, should.Equal, 1)
-
-	// Delay based evictions are left out since they may lead to flakyness.
+	// 3 hours later, the certificates are expired.
+	now.Time = time.Now().Add(3 * time.Hour)
+	test.Must(kv.ServerCertificate(ctx, "server1.example.com"))
+	test.Must(kv.ServerCertificate(ctx, "server2.example.com"))
+	a.So(serverCerts, should.Resemble, []string{
+		"server1.example.com",
+		"server2.example.com",
+		"server1.example.com",
+		"server2.example.com",
+	})
 }

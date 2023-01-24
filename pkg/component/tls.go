@@ -35,7 +35,7 @@ func (c *Component) getTLSConfig(ctx context.Context) tlsconfig.Config {
 		}
 	}
 	if conf.Source == "key-vault" {
-		conf.KeyVault.KeyVault = c.KeyVault
+		conf.KeyVault.CertificateProvider = c.keyService
 	}
 	return conf
 }

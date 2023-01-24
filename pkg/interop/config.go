@@ -23,6 +23,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
+	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
@@ -31,6 +32,7 @@ import (
 
 type tlsConfig struct {
 	RootCA      string `yaml:"root-ca"`
+	Source      string `yaml:"source"`
 	Certificate string `yaml:"certificate"`
 	Key         string `yaml:"key"`
 }
@@ -53,22 +55,33 @@ func (r fetcherFileReader) ReadFile(name string) ([]byte, error) {
 	return b, nil
 }
 
-func (conf tlsConfig) TLSConfig(fetcher fetch.Interface) (*tls.Config, error) {
+func (conf tlsConfig) TLSConfig(fetcher fetch.Interface, ks crypto.KeyService) (*tls.Config, error) {
 	res := &tls.Config{
 		MinVersion: tls.VersionTLS12,
 	}
-	if err := (&tlsconfig.Client{
+	clientConfig := &tlsconfig.Client{
 		FileReader: fetcherFileReader{fetcher: fetcher},
 		RootCA:     conf.RootCA,
-	}).ApplyTo(res); err != nil {
+	}
+	if err := clientConfig.ApplyTo(res); err != nil {
 		return nil, err
 	}
-	if err := (&tlsconfig.ClientAuth{
-		Source:      "file",
+	source := conf.Source
+	// TODO: Require explicit source for client certificate
+	// (https://github.com/TheThingsNetwork/lorawan-stack/issues/1450)
+	if source == "" && (conf.Certificate != "" || conf.Key != "") {
+		source = "file"
+	}
+	clientAuthConfig := &tlsconfig.ClientAuth{
+		Source:      source,
 		FileReader:  fetcherFileReader{fetcher: fetcher},
 		Certificate: conf.Certificate,
 		Key:         conf.Key,
-	}).ApplyTo(res); err != nil {
+		KeyVault: tlsconfig.ClientKeyVault{
+			CertificateProvider: ks,
+		},
+	}
+	if err := clientAuthConfig.ApplyTo(res); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -81,6 +94,7 @@ const (
 	SenderClientCAsConfigurationName = "config.yml"
 )
 
+// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/6026)
 func fetchSenderClientCAs( //nolint:gocyclo
 	ctx context.Context, conf config.InteropServer, httpClientProvider httpclient.Provider,
 ) (map[string][]*x509.Certificate, error) {
