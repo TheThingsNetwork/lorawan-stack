@@ -1045,7 +1045,7 @@ func loggerWithTxRequestFields(logger log.Interface, req *ttnpb.TxRequest, rx1, 
 	}
 	if req.AbsoluteTime != nil {
 		pairs = append(pairs,
-			"absolute_time", *req.AbsoluteTime,
+			"absolute_time", req.AbsoluteTime.AsTime(),
 		)
 	}
 	return logger.WithFields(log.Fields(pairs...))
