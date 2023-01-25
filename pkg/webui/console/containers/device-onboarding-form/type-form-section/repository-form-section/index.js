@@ -119,7 +119,7 @@ const DeviceTypeRepositoryFormSection = () => {
       // Since the template response will strip zero values, we cannot simply spread the result
       // over the existing form values. Instead we need to make all zero values explicit
       // by assigning them as `undefined`, using the provided field mask.
-      const templateFields = template.field_mask.split(',')
+      const templateFields = template.field_mask.paths
       const endDeviceFill = templateFields.reduce(
         (device, path) => set(device, path, get(template.end_device, path)),
         {},

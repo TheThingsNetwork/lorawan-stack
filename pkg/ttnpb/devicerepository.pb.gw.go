@@ -13,15 +13,14 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/golang/protobuf/descriptor"
-	"github.com/golang/protobuf/proto"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/grpc-ecosystem/grpc-gateway/utilities"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/utilities"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 )
 
 // Suppress "imported and not used" errors
@@ -30,7 +29,6 @@ var _ io.Reader
 var _ status.Status
 var _ = runtime.String
 var _ = utilities.NewDoubleArray
-var _ = descriptor.ForMessage
 var _ = metadata.Join
 
 var (
@@ -90,7 +88,6 @@ func request_DeviceRepository_ListBrands_1(ctx context.Context, marshaler runtim
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
@@ -124,7 +121,6 @@ func local_request_DeviceRepository_ListBrands_1(ctx context.Context, marshaler 
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
@@ -162,7 +158,6 @@ func request_DeviceRepository_GetBrand_0(ctx context.Context, marshaler runtime.
 	}
 
 	protoReq.BrandId, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "brand_id", err)
 	}
@@ -196,7 +191,6 @@ func local_request_DeviceRepository_GetBrand_0(ctx context.Context, marshaler ru
 	}
 
 	protoReq.BrandId, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "brand_id", err)
 	}
@@ -234,7 +228,6 @@ func request_DeviceRepository_GetBrand_1(ctx context.Context, marshaler runtime.
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
@@ -245,7 +238,6 @@ func request_DeviceRepository_GetBrand_1(ctx context.Context, marshaler runtime.
 	}
 
 	protoReq.BrandId, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "brand_id", err)
 	}
@@ -279,7 +271,6 @@ func local_request_DeviceRepository_GetBrand_1(ctx context.Context, marshaler ru
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
@@ -290,7 +281,6 @@ func local_request_DeviceRepository_GetBrand_1(ctx context.Context, marshaler ru
 	}
 
 	protoReq.BrandId, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "brand_id", err)
 	}
@@ -364,7 +354,6 @@ func request_DeviceRepository_ListModels_1(ctx context.Context, marshaler runtim
 	}
 
 	protoReq.BrandId, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "brand_id", err)
 	}
@@ -398,7 +387,6 @@ func local_request_DeviceRepository_ListModels_1(ctx context.Context, marshaler 
 	}
 
 	protoReq.BrandId, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "brand_id", err)
 	}
@@ -436,7 +424,6 @@ func request_DeviceRepository_ListModels_2(ctx context.Context, marshaler runtim
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
@@ -470,7 +457,6 @@ func local_request_DeviceRepository_ListModels_2(ctx context.Context, marshaler 
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
@@ -508,7 +494,6 @@ func request_DeviceRepository_ListModels_3(ctx context.Context, marshaler runtim
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
@@ -519,7 +504,6 @@ func request_DeviceRepository_ListModels_3(ctx context.Context, marshaler runtim
 	}
 
 	protoReq.BrandId, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "brand_id", err)
 	}
@@ -553,7 +537,6 @@ func local_request_DeviceRepository_ListModels_3(ctx context.Context, marshaler 
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
@@ -564,7 +547,6 @@ func local_request_DeviceRepository_ListModels_3(ctx context.Context, marshaler 
 	}
 
 	protoReq.BrandId, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "brand_id", err)
 	}
@@ -602,7 +584,6 @@ func request_DeviceRepository_GetModel_0(ctx context.Context, marshaler runtime.
 	}
 
 	protoReq.BrandId, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "brand_id", err)
 	}
@@ -613,7 +594,6 @@ func request_DeviceRepository_GetModel_0(ctx context.Context, marshaler runtime.
 	}
 
 	protoReq.ModelId, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "model_id", err)
 	}
@@ -647,7 +627,6 @@ func local_request_DeviceRepository_GetModel_0(ctx context.Context, marshaler ru
 	}
 
 	protoReq.BrandId, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "brand_id", err)
 	}
@@ -658,7 +637,6 @@ func local_request_DeviceRepository_GetModel_0(ctx context.Context, marshaler ru
 	}
 
 	protoReq.ModelId, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "model_id", err)
 	}
@@ -696,7 +674,6 @@ func request_DeviceRepository_GetModel_1(ctx context.Context, marshaler runtime.
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
@@ -707,7 +684,6 @@ func request_DeviceRepository_GetModel_1(ctx context.Context, marshaler runtime.
 	}
 
 	protoReq.BrandId, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "brand_id", err)
 	}
@@ -718,7 +694,6 @@ func request_DeviceRepository_GetModel_1(ctx context.Context, marshaler runtime.
 	}
 
 	protoReq.ModelId, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "model_id", err)
 	}
@@ -752,7 +727,6 @@ func local_request_DeviceRepository_GetModel_1(ctx context.Context, marshaler ru
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
@@ -763,7 +737,6 @@ func local_request_DeviceRepository_GetModel_1(ctx context.Context, marshaler ru
 	}
 
 	protoReq.BrandId, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "brand_id", err)
 	}
@@ -774,7 +747,6 @@ func local_request_DeviceRepository_GetModel_1(ctx context.Context, marshaler ru
 	}
 
 	protoReq.ModelId, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "model_id", err)
 	}
@@ -812,7 +784,6 @@ func request_DeviceRepository_GetTemplate_0(ctx context.Context, marshaler runti
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.brand_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.brand_id", err)
 	}
@@ -823,7 +794,6 @@ func request_DeviceRepository_GetTemplate_0(ctx context.Context, marshaler runti
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.model_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.model_id", err)
 	}
@@ -834,7 +804,6 @@ func request_DeviceRepository_GetTemplate_0(ctx context.Context, marshaler runti
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.firmware_version", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.firmware_version", err)
 	}
@@ -845,7 +814,6 @@ func request_DeviceRepository_GetTemplate_0(ctx context.Context, marshaler runti
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.band_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.band_id", err)
 	}
@@ -879,7 +847,6 @@ func local_request_DeviceRepository_GetTemplate_0(ctx context.Context, marshaler
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.brand_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.brand_id", err)
 	}
@@ -890,7 +857,6 @@ func local_request_DeviceRepository_GetTemplate_0(ctx context.Context, marshaler
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.model_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.model_id", err)
 	}
@@ -901,7 +867,6 @@ func local_request_DeviceRepository_GetTemplate_0(ctx context.Context, marshaler
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.firmware_version", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.firmware_version", err)
 	}
@@ -912,7 +877,6 @@ func local_request_DeviceRepository_GetTemplate_0(ctx context.Context, marshaler
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.band_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.band_id", err)
 	}
@@ -950,7 +914,6 @@ func request_DeviceRepository_GetTemplate_1(ctx context.Context, marshaler runti
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "end_device_profile_ids.vendor_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device_profile_ids.vendor_id", err)
 	}
@@ -961,7 +924,6 @@ func request_DeviceRepository_GetTemplate_1(ctx context.Context, marshaler runti
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "end_device_profile_ids.vendor_profile_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device_profile_ids.vendor_profile_id", err)
 	}
@@ -995,7 +957,6 @@ func local_request_DeviceRepository_GetTemplate_1(ctx context.Context, marshaler
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "end_device_profile_ids.vendor_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device_profile_ids.vendor_id", err)
 	}
@@ -1006,7 +967,6 @@ func local_request_DeviceRepository_GetTemplate_1(ctx context.Context, marshaler
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "end_device_profile_ids.vendor_profile_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device_profile_ids.vendor_profile_id", err)
 	}
@@ -1044,7 +1004,6 @@ func request_DeviceRepository_GetTemplate_2(ctx context.Context, marshaler runti
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
@@ -1055,7 +1014,6 @@ func request_DeviceRepository_GetTemplate_2(ctx context.Context, marshaler runti
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.brand_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.brand_id", err)
 	}
@@ -1066,7 +1024,6 @@ func request_DeviceRepository_GetTemplate_2(ctx context.Context, marshaler runti
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.model_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.model_id", err)
 	}
@@ -1077,7 +1034,6 @@ func request_DeviceRepository_GetTemplate_2(ctx context.Context, marshaler runti
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.firmware_version", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.firmware_version", err)
 	}
@@ -1088,7 +1044,6 @@ func request_DeviceRepository_GetTemplate_2(ctx context.Context, marshaler runti
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.band_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.band_id", err)
 	}
@@ -1122,7 +1077,6 @@ func local_request_DeviceRepository_GetTemplate_2(ctx context.Context, marshaler
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
@@ -1133,7 +1087,6 @@ func local_request_DeviceRepository_GetTemplate_2(ctx context.Context, marshaler
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.brand_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.brand_id", err)
 	}
@@ -1144,7 +1097,6 @@ func local_request_DeviceRepository_GetTemplate_2(ctx context.Context, marshaler
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.model_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.model_id", err)
 	}
@@ -1155,7 +1107,6 @@ func local_request_DeviceRepository_GetTemplate_2(ctx context.Context, marshaler
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.firmware_version", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.firmware_version", err)
 	}
@@ -1166,7 +1117,6 @@ func local_request_DeviceRepository_GetTemplate_2(ctx context.Context, marshaler
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.band_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.band_id", err)
 	}
@@ -1204,7 +1154,6 @@ func request_DeviceRepository_GetTemplate_3(ctx context.Context, marshaler runti
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
@@ -1215,7 +1164,6 @@ func request_DeviceRepository_GetTemplate_3(ctx context.Context, marshaler runti
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "end_device_profile_ids.vendor_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device_profile_ids.vendor_id", err)
 	}
@@ -1226,7 +1174,6 @@ func request_DeviceRepository_GetTemplate_3(ctx context.Context, marshaler runti
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "end_device_profile_ids.vendor_profile_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device_profile_ids.vendor_profile_id", err)
 	}
@@ -1260,7 +1207,6 @@ func local_request_DeviceRepository_GetTemplate_3(ctx context.Context, marshaler
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
@@ -1271,7 +1217,6 @@ func local_request_DeviceRepository_GetTemplate_3(ctx context.Context, marshaler
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "end_device_profile_ids.vendor_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device_profile_ids.vendor_id", err)
 	}
@@ -1282,7 +1227,6 @@ func local_request_DeviceRepository_GetTemplate_3(ctx context.Context, marshaler
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "end_device_profile_ids.vendor_profile_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device_profile_ids.vendor_profile_id", err)
 	}
@@ -1320,7 +1264,6 @@ func request_DeviceRepository_GetUplinkDecoder_0(ctx context.Context, marshaler 
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.brand_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.brand_id", err)
 	}
@@ -1331,7 +1274,6 @@ func request_DeviceRepository_GetUplinkDecoder_0(ctx context.Context, marshaler 
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.model_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.model_id", err)
 	}
@@ -1342,7 +1284,6 @@ func request_DeviceRepository_GetUplinkDecoder_0(ctx context.Context, marshaler 
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.firmware_version", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.firmware_version", err)
 	}
@@ -1353,7 +1294,6 @@ func request_DeviceRepository_GetUplinkDecoder_0(ctx context.Context, marshaler 
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.band_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.band_id", err)
 	}
@@ -1387,7 +1327,6 @@ func local_request_DeviceRepository_GetUplinkDecoder_0(ctx context.Context, mars
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.brand_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.brand_id", err)
 	}
@@ -1398,7 +1337,6 @@ func local_request_DeviceRepository_GetUplinkDecoder_0(ctx context.Context, mars
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.model_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.model_id", err)
 	}
@@ -1409,7 +1347,6 @@ func local_request_DeviceRepository_GetUplinkDecoder_0(ctx context.Context, mars
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.firmware_version", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.firmware_version", err)
 	}
@@ -1420,7 +1357,6 @@ func local_request_DeviceRepository_GetUplinkDecoder_0(ctx context.Context, mars
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.band_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.band_id", err)
 	}
@@ -1458,7 +1394,6 @@ func request_DeviceRepository_GetUplinkDecoder_1(ctx context.Context, marshaler 
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
@@ -1469,7 +1404,6 @@ func request_DeviceRepository_GetUplinkDecoder_1(ctx context.Context, marshaler 
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.brand_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.brand_id", err)
 	}
@@ -1480,7 +1414,6 @@ func request_DeviceRepository_GetUplinkDecoder_1(ctx context.Context, marshaler 
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.model_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.model_id", err)
 	}
@@ -1491,7 +1424,6 @@ func request_DeviceRepository_GetUplinkDecoder_1(ctx context.Context, marshaler 
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.firmware_version", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.firmware_version", err)
 	}
@@ -1502,7 +1434,6 @@ func request_DeviceRepository_GetUplinkDecoder_1(ctx context.Context, marshaler 
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.band_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.band_id", err)
 	}
@@ -1536,7 +1467,6 @@ func local_request_DeviceRepository_GetUplinkDecoder_1(ctx context.Context, mars
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
@@ -1547,7 +1477,6 @@ func local_request_DeviceRepository_GetUplinkDecoder_1(ctx context.Context, mars
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.brand_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.brand_id", err)
 	}
@@ -1558,7 +1487,6 @@ func local_request_DeviceRepository_GetUplinkDecoder_1(ctx context.Context, mars
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.model_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.model_id", err)
 	}
@@ -1569,7 +1497,6 @@ func local_request_DeviceRepository_GetUplinkDecoder_1(ctx context.Context, mars
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.firmware_version", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.firmware_version", err)
 	}
@@ -1580,7 +1507,6 @@ func local_request_DeviceRepository_GetUplinkDecoder_1(ctx context.Context, mars
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.band_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.band_id", err)
 	}
@@ -1618,7 +1544,6 @@ func request_DeviceRepository_GetDownlinkDecoder_0(ctx context.Context, marshale
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.brand_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.brand_id", err)
 	}
@@ -1629,7 +1554,6 @@ func request_DeviceRepository_GetDownlinkDecoder_0(ctx context.Context, marshale
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.model_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.model_id", err)
 	}
@@ -1640,7 +1564,6 @@ func request_DeviceRepository_GetDownlinkDecoder_0(ctx context.Context, marshale
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.firmware_version", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.firmware_version", err)
 	}
@@ -1651,7 +1574,6 @@ func request_DeviceRepository_GetDownlinkDecoder_0(ctx context.Context, marshale
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.band_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.band_id", err)
 	}
@@ -1685,7 +1607,6 @@ func local_request_DeviceRepository_GetDownlinkDecoder_0(ctx context.Context, ma
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.brand_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.brand_id", err)
 	}
@@ -1696,7 +1617,6 @@ func local_request_DeviceRepository_GetDownlinkDecoder_0(ctx context.Context, ma
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.model_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.model_id", err)
 	}
@@ -1707,7 +1627,6 @@ func local_request_DeviceRepository_GetDownlinkDecoder_0(ctx context.Context, ma
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.firmware_version", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.firmware_version", err)
 	}
@@ -1718,7 +1637,6 @@ func local_request_DeviceRepository_GetDownlinkDecoder_0(ctx context.Context, ma
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.band_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.band_id", err)
 	}
@@ -1756,7 +1674,6 @@ func request_DeviceRepository_GetDownlinkDecoder_1(ctx context.Context, marshale
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
@@ -1767,7 +1684,6 @@ func request_DeviceRepository_GetDownlinkDecoder_1(ctx context.Context, marshale
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.brand_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.brand_id", err)
 	}
@@ -1778,7 +1694,6 @@ func request_DeviceRepository_GetDownlinkDecoder_1(ctx context.Context, marshale
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.model_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.model_id", err)
 	}
@@ -1789,7 +1704,6 @@ func request_DeviceRepository_GetDownlinkDecoder_1(ctx context.Context, marshale
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.firmware_version", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.firmware_version", err)
 	}
@@ -1800,7 +1714,6 @@ func request_DeviceRepository_GetDownlinkDecoder_1(ctx context.Context, marshale
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.band_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.band_id", err)
 	}
@@ -1834,7 +1747,6 @@ func local_request_DeviceRepository_GetDownlinkDecoder_1(ctx context.Context, ma
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
@@ -1845,7 +1757,6 @@ func local_request_DeviceRepository_GetDownlinkDecoder_1(ctx context.Context, ma
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.brand_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.brand_id", err)
 	}
@@ -1856,7 +1767,6 @@ func local_request_DeviceRepository_GetDownlinkDecoder_1(ctx context.Context, ma
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.model_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.model_id", err)
 	}
@@ -1867,7 +1777,6 @@ func local_request_DeviceRepository_GetDownlinkDecoder_1(ctx context.Context, ma
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.firmware_version", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.firmware_version", err)
 	}
@@ -1878,7 +1787,6 @@ func local_request_DeviceRepository_GetDownlinkDecoder_1(ctx context.Context, ma
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.band_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.band_id", err)
 	}
@@ -1916,7 +1824,6 @@ func request_DeviceRepository_GetDownlinkEncoder_0(ctx context.Context, marshale
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.brand_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.brand_id", err)
 	}
@@ -1927,7 +1834,6 @@ func request_DeviceRepository_GetDownlinkEncoder_0(ctx context.Context, marshale
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.model_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.model_id", err)
 	}
@@ -1938,7 +1844,6 @@ func request_DeviceRepository_GetDownlinkEncoder_0(ctx context.Context, marshale
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.firmware_version", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.firmware_version", err)
 	}
@@ -1949,7 +1854,6 @@ func request_DeviceRepository_GetDownlinkEncoder_0(ctx context.Context, marshale
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.band_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.band_id", err)
 	}
@@ -1983,7 +1887,6 @@ func local_request_DeviceRepository_GetDownlinkEncoder_0(ctx context.Context, ma
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.brand_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.brand_id", err)
 	}
@@ -1994,7 +1897,6 @@ func local_request_DeviceRepository_GetDownlinkEncoder_0(ctx context.Context, ma
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.model_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.model_id", err)
 	}
@@ -2005,7 +1907,6 @@ func local_request_DeviceRepository_GetDownlinkEncoder_0(ctx context.Context, ma
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.firmware_version", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.firmware_version", err)
 	}
@@ -2016,7 +1917,6 @@ func local_request_DeviceRepository_GetDownlinkEncoder_0(ctx context.Context, ma
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.band_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.band_id", err)
 	}
@@ -2054,7 +1954,6 @@ func request_DeviceRepository_GetDownlinkEncoder_1(ctx context.Context, marshale
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
@@ -2065,7 +1964,6 @@ func request_DeviceRepository_GetDownlinkEncoder_1(ctx context.Context, marshale
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.brand_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.brand_id", err)
 	}
@@ -2076,7 +1974,6 @@ func request_DeviceRepository_GetDownlinkEncoder_1(ctx context.Context, marshale
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.model_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.model_id", err)
 	}
@@ -2087,7 +1984,6 @@ func request_DeviceRepository_GetDownlinkEncoder_1(ctx context.Context, marshale
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.firmware_version", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.firmware_version", err)
 	}
@@ -2098,7 +1994,6 @@ func request_DeviceRepository_GetDownlinkEncoder_1(ctx context.Context, marshale
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.band_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.band_id", err)
 	}
@@ -2132,7 +2027,6 @@ func local_request_DeviceRepository_GetDownlinkEncoder_1(ctx context.Context, ma
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
@@ -2143,7 +2037,6 @@ func local_request_DeviceRepository_GetDownlinkEncoder_1(ctx context.Context, ma
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.brand_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.brand_id", err)
 	}
@@ -2154,7 +2047,6 @@ func local_request_DeviceRepository_GetDownlinkEncoder_1(ctx context.Context, ma
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.model_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.model_id", err)
 	}
@@ -2165,7 +2057,6 @@ func local_request_DeviceRepository_GetDownlinkEncoder_1(ctx context.Context, ma
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.firmware_version", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.firmware_version", err)
 	}
@@ -2176,7 +2067,6 @@ func local_request_DeviceRepository_GetDownlinkEncoder_1(ctx context.Context, ma
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "version_ids.band_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version_ids.band_id", err)
 	}
@@ -2205,20 +2095,22 @@ func RegisterDeviceRepositoryHandlerServer(ctx context.Context, mux *runtime.Ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/ListBrands", runtime.WithHTTPPathPattern("/dr/brands"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_DeviceRepository_ListBrands_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_DeviceRepository_ListBrands_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_ListBrands_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_ListBrands_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2228,20 +2120,22 @@ func RegisterDeviceRepositoryHandlerServer(ctx context.Context, mux *runtime.Ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/ListBrands", runtime.WithHTTPPathPattern("/dr/applications/{application_ids.application_id}/brands"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_DeviceRepository_ListBrands_1(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_DeviceRepository_ListBrands_1(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_ListBrands_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_ListBrands_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2251,20 +2145,22 @@ func RegisterDeviceRepositoryHandlerServer(ctx context.Context, mux *runtime.Ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetBrand", runtime.WithHTTPPathPattern("/dr/brands/{brand_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_DeviceRepository_GetBrand_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_DeviceRepository_GetBrand_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetBrand_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetBrand_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2274,20 +2170,22 @@ func RegisterDeviceRepositoryHandlerServer(ctx context.Context, mux *runtime.Ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetBrand", runtime.WithHTTPPathPattern("/dr/applications/{application_ids.application_id}/brands/{brand_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_DeviceRepository_GetBrand_1(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_DeviceRepository_GetBrand_1(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetBrand_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetBrand_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2297,20 +2195,22 @@ func RegisterDeviceRepositoryHandlerServer(ctx context.Context, mux *runtime.Ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/ListModels", runtime.WithHTTPPathPattern("/dr/models"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_DeviceRepository_ListModels_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_DeviceRepository_ListModels_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_ListModels_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_ListModels_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2320,20 +2220,22 @@ func RegisterDeviceRepositoryHandlerServer(ctx context.Context, mux *runtime.Ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/ListModels", runtime.WithHTTPPathPattern("/dr/brands/{brand_id}/models"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_DeviceRepository_ListModels_1(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_DeviceRepository_ListModels_1(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_ListModels_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_ListModels_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2343,20 +2245,22 @@ func RegisterDeviceRepositoryHandlerServer(ctx context.Context, mux *runtime.Ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/ListModels", runtime.WithHTTPPathPattern("/dr/applications/{application_ids.application_id}/models"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_DeviceRepository_ListModels_2(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_DeviceRepository_ListModels_2(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_ListModels_2(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_ListModels_2(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2366,20 +2270,22 @@ func RegisterDeviceRepositoryHandlerServer(ctx context.Context, mux *runtime.Ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/ListModels", runtime.WithHTTPPathPattern("/dr/applications/{application_ids.application_id}/brands/{brand_id}/models"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_DeviceRepository_ListModels_3(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_DeviceRepository_ListModels_3(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_ListModels_3(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_ListModels_3(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2389,20 +2295,22 @@ func RegisterDeviceRepositoryHandlerServer(ctx context.Context, mux *runtime.Ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetModel", runtime.WithHTTPPathPattern("/dr/brands/{brand_id}/models/{model_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_DeviceRepository_GetModel_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_DeviceRepository_GetModel_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetModel_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetModel_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2412,20 +2320,22 @@ func RegisterDeviceRepositoryHandlerServer(ctx context.Context, mux *runtime.Ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetModel", runtime.WithHTTPPathPattern("/dr/applications/{application_ids.application_id}/brands/{brand_id}/models/{model_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_DeviceRepository_GetModel_1(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_DeviceRepository_GetModel_1(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetModel_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetModel_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2435,20 +2345,22 @@ func RegisterDeviceRepositoryHandlerServer(ctx context.Context, mux *runtime.Ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetTemplate", runtime.WithHTTPPathPattern("/dr/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/template"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_DeviceRepository_GetTemplate_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_DeviceRepository_GetTemplate_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetTemplate_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetTemplate_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2458,20 +2370,22 @@ func RegisterDeviceRepositoryHandlerServer(ctx context.Context, mux *runtime.Ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetTemplate", runtime.WithHTTPPathPattern("/dr/vendors/{end_device_profile_ids.vendor_id}/profiles/{end_device_profile_ids.vendor_profile_id}/template"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_DeviceRepository_GetTemplate_1(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_DeviceRepository_GetTemplate_1(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetTemplate_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetTemplate_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2481,20 +2395,22 @@ func RegisterDeviceRepositoryHandlerServer(ctx context.Context, mux *runtime.Ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetTemplate", runtime.WithHTTPPathPattern("/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/template"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_DeviceRepository_GetTemplate_2(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_DeviceRepository_GetTemplate_2(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetTemplate_2(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetTemplate_2(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2504,20 +2420,22 @@ func RegisterDeviceRepositoryHandlerServer(ctx context.Context, mux *runtime.Ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetTemplate", runtime.WithHTTPPathPattern("/dr/applications/{application_ids.application_id}/vendors/{end_device_profile_ids.vendor_id}/profiles/{end_device_profile_ids.vendor_profile_id}/template"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_DeviceRepository_GetTemplate_3(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_DeviceRepository_GetTemplate_3(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetTemplate_3(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetTemplate_3(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2527,20 +2445,22 @@ func RegisterDeviceRepositoryHandlerServer(ctx context.Context, mux *runtime.Ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetUplinkDecoder", runtime.WithHTTPPathPattern("/dr/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/uplink/decoder"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_DeviceRepository_GetUplinkDecoder_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_DeviceRepository_GetUplinkDecoder_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetUplinkDecoder_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetUplinkDecoder_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2550,20 +2470,22 @@ func RegisterDeviceRepositoryHandlerServer(ctx context.Context, mux *runtime.Ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetUplinkDecoder", runtime.WithHTTPPathPattern("/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/uplink/decoder"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_DeviceRepository_GetUplinkDecoder_1(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_DeviceRepository_GetUplinkDecoder_1(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetUplinkDecoder_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetUplinkDecoder_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2573,20 +2495,22 @@ func RegisterDeviceRepositoryHandlerServer(ctx context.Context, mux *runtime.Ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetDownlinkDecoder", runtime.WithHTTPPathPattern("/dr/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/decoder"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_DeviceRepository_GetDownlinkDecoder_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_DeviceRepository_GetDownlinkDecoder_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetDownlinkDecoder_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetDownlinkDecoder_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2596,20 +2520,22 @@ func RegisterDeviceRepositoryHandlerServer(ctx context.Context, mux *runtime.Ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetDownlinkDecoder", runtime.WithHTTPPathPattern("/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/decoder"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_DeviceRepository_GetDownlinkDecoder_1(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_DeviceRepository_GetDownlinkDecoder_1(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetDownlinkDecoder_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetDownlinkDecoder_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2619,20 +2545,22 @@ func RegisterDeviceRepositoryHandlerServer(ctx context.Context, mux *runtime.Ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetDownlinkEncoder", runtime.WithHTTPPathPattern("/dr/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/encoder"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_DeviceRepository_GetDownlinkEncoder_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_DeviceRepository_GetDownlinkEncoder_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetDownlinkEncoder_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetDownlinkEncoder_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2642,20 +2570,22 @@ func RegisterDeviceRepositoryHandlerServer(ctx context.Context, mux *runtime.Ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetDownlinkEncoder", runtime.WithHTTPPathPattern("/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/encoder"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_DeviceRepository_GetDownlinkEncoder_1(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_DeviceRepository_GetDownlinkEncoder_1(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetDownlinkEncoder_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetDownlinkEncoder_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2704,19 +2634,21 @@ func RegisterDeviceRepositoryHandlerClient(ctx context.Context, mux *runtime.Ser
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/ListBrands", runtime.WithHTTPPathPattern("/dr/brands"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_DeviceRepository_ListBrands_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_DeviceRepository_ListBrands_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_ListBrands_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_ListBrands_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2724,19 +2656,21 @@ func RegisterDeviceRepositoryHandlerClient(ctx context.Context, mux *runtime.Ser
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/ListBrands", runtime.WithHTTPPathPattern("/dr/applications/{application_ids.application_id}/brands"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_DeviceRepository_ListBrands_1(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_DeviceRepository_ListBrands_1(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_ListBrands_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_ListBrands_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2744,19 +2678,21 @@ func RegisterDeviceRepositoryHandlerClient(ctx context.Context, mux *runtime.Ser
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetBrand", runtime.WithHTTPPathPattern("/dr/brands/{brand_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_DeviceRepository_GetBrand_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_DeviceRepository_GetBrand_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetBrand_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetBrand_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2764,19 +2700,21 @@ func RegisterDeviceRepositoryHandlerClient(ctx context.Context, mux *runtime.Ser
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetBrand", runtime.WithHTTPPathPattern("/dr/applications/{application_ids.application_id}/brands/{brand_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_DeviceRepository_GetBrand_1(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_DeviceRepository_GetBrand_1(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetBrand_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetBrand_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2784,19 +2722,21 @@ func RegisterDeviceRepositoryHandlerClient(ctx context.Context, mux *runtime.Ser
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/ListModels", runtime.WithHTTPPathPattern("/dr/models"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_DeviceRepository_ListModels_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_DeviceRepository_ListModels_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_ListModels_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_ListModels_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2804,19 +2744,21 @@ func RegisterDeviceRepositoryHandlerClient(ctx context.Context, mux *runtime.Ser
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/ListModels", runtime.WithHTTPPathPattern("/dr/brands/{brand_id}/models"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_DeviceRepository_ListModels_1(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_DeviceRepository_ListModels_1(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_ListModels_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_ListModels_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2824,19 +2766,21 @@ func RegisterDeviceRepositoryHandlerClient(ctx context.Context, mux *runtime.Ser
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/ListModels", runtime.WithHTTPPathPattern("/dr/applications/{application_ids.application_id}/models"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_DeviceRepository_ListModels_2(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_DeviceRepository_ListModels_2(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_ListModels_2(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_ListModels_2(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2844,19 +2788,21 @@ func RegisterDeviceRepositoryHandlerClient(ctx context.Context, mux *runtime.Ser
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/ListModels", runtime.WithHTTPPathPattern("/dr/applications/{application_ids.application_id}/brands/{brand_id}/models"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_DeviceRepository_ListModels_3(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_DeviceRepository_ListModels_3(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_ListModels_3(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_ListModels_3(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2864,19 +2810,21 @@ func RegisterDeviceRepositoryHandlerClient(ctx context.Context, mux *runtime.Ser
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetModel", runtime.WithHTTPPathPattern("/dr/brands/{brand_id}/models/{model_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_DeviceRepository_GetModel_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_DeviceRepository_GetModel_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetModel_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetModel_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2884,19 +2832,21 @@ func RegisterDeviceRepositoryHandlerClient(ctx context.Context, mux *runtime.Ser
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetModel", runtime.WithHTTPPathPattern("/dr/applications/{application_ids.application_id}/brands/{brand_id}/models/{model_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_DeviceRepository_GetModel_1(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_DeviceRepository_GetModel_1(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetModel_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetModel_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2904,19 +2854,21 @@ func RegisterDeviceRepositoryHandlerClient(ctx context.Context, mux *runtime.Ser
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetTemplate", runtime.WithHTTPPathPattern("/dr/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/template"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_DeviceRepository_GetTemplate_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_DeviceRepository_GetTemplate_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetTemplate_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetTemplate_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2924,19 +2876,21 @@ func RegisterDeviceRepositoryHandlerClient(ctx context.Context, mux *runtime.Ser
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetTemplate", runtime.WithHTTPPathPattern("/dr/vendors/{end_device_profile_ids.vendor_id}/profiles/{end_device_profile_ids.vendor_profile_id}/template"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_DeviceRepository_GetTemplate_1(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_DeviceRepository_GetTemplate_1(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetTemplate_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetTemplate_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2944,19 +2898,21 @@ func RegisterDeviceRepositoryHandlerClient(ctx context.Context, mux *runtime.Ser
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetTemplate", runtime.WithHTTPPathPattern("/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/template"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_DeviceRepository_GetTemplate_2(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_DeviceRepository_GetTemplate_2(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetTemplate_2(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetTemplate_2(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2964,19 +2920,21 @@ func RegisterDeviceRepositoryHandlerClient(ctx context.Context, mux *runtime.Ser
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetTemplate", runtime.WithHTTPPathPattern("/dr/applications/{application_ids.application_id}/vendors/{end_device_profile_ids.vendor_id}/profiles/{end_device_profile_ids.vendor_profile_id}/template"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_DeviceRepository_GetTemplate_3(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_DeviceRepository_GetTemplate_3(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetTemplate_3(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetTemplate_3(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2984,19 +2942,21 @@ func RegisterDeviceRepositoryHandlerClient(ctx context.Context, mux *runtime.Ser
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetUplinkDecoder", runtime.WithHTTPPathPattern("/dr/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/uplink/decoder"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_DeviceRepository_GetUplinkDecoder_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_DeviceRepository_GetUplinkDecoder_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetUplinkDecoder_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetUplinkDecoder_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -3004,19 +2964,21 @@ func RegisterDeviceRepositoryHandlerClient(ctx context.Context, mux *runtime.Ser
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetUplinkDecoder", runtime.WithHTTPPathPattern("/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/uplink/decoder"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_DeviceRepository_GetUplinkDecoder_1(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_DeviceRepository_GetUplinkDecoder_1(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetUplinkDecoder_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetUplinkDecoder_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -3024,19 +2986,21 @@ func RegisterDeviceRepositoryHandlerClient(ctx context.Context, mux *runtime.Ser
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetDownlinkDecoder", runtime.WithHTTPPathPattern("/dr/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/decoder"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_DeviceRepository_GetDownlinkDecoder_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_DeviceRepository_GetDownlinkDecoder_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetDownlinkDecoder_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetDownlinkDecoder_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -3044,19 +3008,21 @@ func RegisterDeviceRepositoryHandlerClient(ctx context.Context, mux *runtime.Ser
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetDownlinkDecoder", runtime.WithHTTPPathPattern("/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/decoder"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_DeviceRepository_GetDownlinkDecoder_1(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_DeviceRepository_GetDownlinkDecoder_1(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetDownlinkDecoder_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetDownlinkDecoder_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -3064,19 +3030,21 @@ func RegisterDeviceRepositoryHandlerClient(ctx context.Context, mux *runtime.Ser
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetDownlinkEncoder", runtime.WithHTTPPathPattern("/dr/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/encoder"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_DeviceRepository_GetDownlinkEncoder_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_DeviceRepository_GetDownlinkEncoder_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetDownlinkEncoder_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetDownlinkEncoder_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -3084,19 +3052,21 @@ func RegisterDeviceRepositoryHandlerClient(ctx context.Context, mux *runtime.Ser
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.DeviceRepository/GetDownlinkEncoder", runtime.WithHTTPPathPattern("/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/encoder"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_DeviceRepository_GetDownlinkEncoder_1(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_DeviceRepository_GetDownlinkEncoder_1(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_DeviceRepository_GetDownlinkEncoder_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_DeviceRepository_GetDownlinkEncoder_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -3104,45 +3074,45 @@ func RegisterDeviceRepositoryHandlerClient(ctx context.Context, mux *runtime.Ser
 }
 
 var (
-	pattern_DeviceRepository_ListBrands_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"dr", "brands"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DeviceRepository_ListBrands_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"dr", "brands"}, ""))
 
-	pattern_DeviceRepository_ListBrands_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"dr", "applications", "application_ids.application_id", "brands"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DeviceRepository_ListBrands_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"dr", "applications", "application_ids.application_id", "brands"}, ""))
 
-	pattern_DeviceRepository_GetBrand_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"dr", "brands", "brand_id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DeviceRepository_GetBrand_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"dr", "brands", "brand_id"}, ""))
 
-	pattern_DeviceRepository_GetBrand_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"dr", "applications", "application_ids.application_id", "brands", "brand_id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DeviceRepository_GetBrand_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"dr", "applications", "application_ids.application_id", "brands", "brand_id"}, ""))
 
-	pattern_DeviceRepository_ListModels_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"dr", "models"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DeviceRepository_ListModels_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"dr", "models"}, ""))
 
-	pattern_DeviceRepository_ListModels_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"dr", "brands", "brand_id", "models"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DeviceRepository_ListModels_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"dr", "brands", "brand_id", "models"}, ""))
 
-	pattern_DeviceRepository_ListModels_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"dr", "applications", "application_ids.application_id", "models"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DeviceRepository_ListModels_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"dr", "applications", "application_ids.application_id", "models"}, ""))
 
-	pattern_DeviceRepository_ListModels_3 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"dr", "applications", "application_ids.application_id", "brands", "brand_id", "models"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DeviceRepository_ListModels_3 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"dr", "applications", "application_ids.application_id", "brands", "brand_id", "models"}, ""))
 
-	pattern_DeviceRepository_GetModel_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"dr", "brands", "brand_id", "models", "model_id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DeviceRepository_GetModel_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"dr", "brands", "brand_id", "models", "model_id"}, ""))
 
-	pattern_DeviceRepository_GetModel_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"dr", "applications", "application_ids.application_id", "brands", "brand_id", "models", "model_id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DeviceRepository_GetModel_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"dr", "applications", "application_ids.application_id", "brands", "brand_id", "models", "model_id"}, ""))
 
-	pattern_DeviceRepository_GetTemplate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"dr", "brands", "version_ids.brand_id", "models", "version_ids.model_id", "version_ids.firmware_version", "version_ids.band_id", "template"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DeviceRepository_GetTemplate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"dr", "brands", "version_ids.brand_id", "models", "version_ids.model_id", "version_ids.firmware_version", "version_ids.band_id", "template"}, ""))
 
-	pattern_DeviceRepository_GetTemplate_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"dr", "vendors", "end_device_profile_ids.vendor_id", "profiles", "end_device_profile_ids.vendor_profile_id", "template"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DeviceRepository_GetTemplate_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"dr", "vendors", "end_device_profile_ids.vendor_id", "profiles", "end_device_profile_ids.vendor_profile_id", "template"}, ""))
 
-	pattern_DeviceRepository_GetTemplate_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 2, 9}, []string{"dr", "applications", "application_ids.application_id", "brands", "version_ids.brand_id", "models", "version_ids.model_id", "version_ids.firmware_version", "version_ids.band_id", "template"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DeviceRepository_GetTemplate_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 2, 9}, []string{"dr", "applications", "application_ids.application_id", "brands", "version_ids.brand_id", "models", "version_ids.model_id", "version_ids.firmware_version", "version_ids.band_id", "template"}, ""))
 
-	pattern_DeviceRepository_GetTemplate_3 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"dr", "applications", "application_ids.application_id", "vendors", "end_device_profile_ids.vendor_id", "profiles", "end_device_profile_ids.vendor_profile_id", "template"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DeviceRepository_GetTemplate_3 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"dr", "applications", "application_ids.application_id", "vendors", "end_device_profile_ids.vendor_id", "profiles", "end_device_profile_ids.vendor_profile_id", "template"}, ""))
 
-	pattern_DeviceRepository_GetUplinkDecoder_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 2, 7, 2, 8, 2, 9}, []string{"dr", "brands", "version_ids.brand_id", "models", "version_ids.model_id", "version_ids.firmware_version", "version_ids.band_id", "formatters", "uplink", "decoder"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DeviceRepository_GetUplinkDecoder_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 2, 7, 2, 8, 2, 9}, []string{"dr", "brands", "version_ids.brand_id", "models", "version_ids.model_id", "version_ids.firmware_version", "version_ids.band_id", "formatters", "uplink", "decoder"}, ""))
 
-	pattern_DeviceRepository_GetUplinkDecoder_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 2, 9, 2, 10, 2, 11}, []string{"dr", "applications", "application_ids.application_id", "brands", "version_ids.brand_id", "models", "version_ids.model_id", "version_ids.firmware_version", "version_ids.band_id", "formatters", "uplink", "decoder"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DeviceRepository_GetUplinkDecoder_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 2, 9, 2, 10, 2, 11}, []string{"dr", "applications", "application_ids.application_id", "brands", "version_ids.brand_id", "models", "version_ids.model_id", "version_ids.firmware_version", "version_ids.band_id", "formatters", "uplink", "decoder"}, ""))
 
-	pattern_DeviceRepository_GetDownlinkDecoder_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 2, 7, 2, 8, 2, 9}, []string{"dr", "brands", "version_ids.brand_id", "models", "version_ids.model_id", "version_ids.firmware_version", "version_ids.band_id", "formatters", "downlink", "decoder"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DeviceRepository_GetDownlinkDecoder_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 2, 7, 2, 8, 2, 9}, []string{"dr", "brands", "version_ids.brand_id", "models", "version_ids.model_id", "version_ids.firmware_version", "version_ids.band_id", "formatters", "downlink", "decoder"}, ""))
 
-	pattern_DeviceRepository_GetDownlinkDecoder_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 2, 9, 2, 10, 2, 11}, []string{"dr", "applications", "application_ids.application_id", "brands", "version_ids.brand_id", "models", "version_ids.model_id", "version_ids.firmware_version", "version_ids.band_id", "formatters", "downlink", "decoder"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DeviceRepository_GetDownlinkDecoder_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 2, 9, 2, 10, 2, 11}, []string{"dr", "applications", "application_ids.application_id", "brands", "version_ids.brand_id", "models", "version_ids.model_id", "version_ids.firmware_version", "version_ids.band_id", "formatters", "downlink", "decoder"}, ""))
 
-	pattern_DeviceRepository_GetDownlinkEncoder_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 2, 7, 2, 8, 2, 9}, []string{"dr", "brands", "version_ids.brand_id", "models", "version_ids.model_id", "version_ids.firmware_version", "version_ids.band_id", "formatters", "downlink", "encoder"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DeviceRepository_GetDownlinkEncoder_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 2, 7, 2, 8, 2, 9}, []string{"dr", "brands", "version_ids.brand_id", "models", "version_ids.model_id", "version_ids.firmware_version", "version_ids.band_id", "formatters", "downlink", "encoder"}, ""))
 
-	pattern_DeviceRepository_GetDownlinkEncoder_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 2, 9, 2, 10, 2, 11}, []string{"dr", "applications", "application_ids.application_id", "brands", "version_ids.brand_id", "models", "version_ids.model_id", "version_ids.firmware_version", "version_ids.band_id", "formatters", "downlink", "encoder"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DeviceRepository_GetDownlinkEncoder_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 2, 9, 2, 10, 2, 11}, []string{"dr", "applications", "application_ids.application_id", "brands", "version_ids.brand_id", "models", "version_ids.model_id", "version_ids.firmware_version", "version_ids.band_id", "formatters", "downlink", "encoder"}, ""))
 )
 
 var (

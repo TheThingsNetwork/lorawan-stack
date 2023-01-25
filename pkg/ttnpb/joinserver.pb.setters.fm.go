@@ -199,8 +199,7 @@ func (dst *CryptoServicePayloadRequest) SetFields(src *CryptoServicePayloadReque
 			if src != nil {
 				dst.LorawanVersion = src.LorawanVersion
 			} else {
-				var zero MACVersion
-				dst.LorawanVersion = zero
+				dst.LorawanVersion = 0
 			}
 		case "payload":
 			if len(subs) > 0 {
@@ -293,8 +292,7 @@ func (dst *JoinAcceptMICRequest) SetFields(src *JoinAcceptMICRequest, paths ...s
 			if src != nil {
 				dst.JoinRequestType = src.JoinRequestType
 			} else {
-				var zero JoinRequestType
-				dst.JoinRequestType = zero
+				dst.JoinRequestType = 0
 			}
 		case "dev_nonce":
 			if len(subs) > 0 {
@@ -348,8 +346,7 @@ func (dst *DeriveSessionKeysRequest) SetFields(src *DeriveSessionKeysRequest, pa
 			if src != nil {
 				dst.LorawanVersion = src.LorawanVersion
 			} else {
-				var zero MACVersion
-				dst.LorawanVersion = zero
+				dst.LorawanVersion = 0
 			}
 		case "join_nonce":
 			if len(subs) > 0 {

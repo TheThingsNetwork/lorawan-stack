@@ -20,7 +20,6 @@ import (
 	"testing"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/gpstime"
@@ -31,6 +30,9 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 func TestNextDataDownlinkSlot(t *testing.T) {
@@ -59,7 +61,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 		},
 		Settings:   ToMACStateTxSettings(DefaultTxSettings),
 		RxMetadata: ToMACStateRxMetadata(DefaultRxMetadata[:]),
-		ReceivedAt: ttnpb.ProtoTimePtr(beaconTime),
+		ReceivedAt: timestamppb.New(beaconTime),
 	}
 	ups := []*ttnpb.MACState_UplinkMessage{up}
 
@@ -153,8 +155,8 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					RecentUplinks:      ups,
 				},
 				MacSettings: &ttnpb.MACSettings{
-					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
-					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
+					StatusTimePeriodicity:  durationpb.New(0),
+					StatusCountPeriodicity: &wrapperspb.UInt32Value{Value: 0},
 				},
 				Session: &ttnpb.Session{
 					DevAddr: test.DefaultDevAddr.Bytes(),
@@ -415,7 +417,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-								AbsoluteTime: ttnpb.ProtoTimePtr(absTime),
+								AbsoluteTime: timestamppb.New(absTime),
 								Gateways: []*ttnpb.ClassBCGatewayIdentifiers{
 									{
 										GatewayIds: &ttnpb.GatewayIdentifiers{
@@ -452,7 +454,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-								AbsoluteTime: ttnpb.ProtoTimePtr(absTime),
+								AbsoluteTime: timestamppb.New(absTime),
 								Gateways: []*ttnpb.ClassBCGatewayIdentifiers{
 									{
 										GatewayIds: &ttnpb.GatewayIdentifiers{
@@ -483,7 +485,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-								AbsoluteTime: ttnpb.ProtoTimePtr(absTime),
+								AbsoluteTime: timestamppb.New(absTime),
 							},
 						},
 					},
@@ -508,7 +510,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-								AbsoluteTime: ttnpb.ProtoTimePtr(absTime),
+								AbsoluteTime: timestamppb.New(absTime),
 							},
 						},
 					},

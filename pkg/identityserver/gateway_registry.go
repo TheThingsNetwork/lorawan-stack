@@ -18,7 +18,6 @@ import (
 	"context"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -28,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var (
@@ -596,7 +596,7 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 	return gtw, nil
 }
 
-func (is *IdentityServer) deleteGateway(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
+func (is *IdentityServer) deleteGateway(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
 	if err := rights.RequireGateway(ctx, ids, ttnpb.Right_RIGHT_GATEWAY_DELETE); err != nil {
 		return nil, err
 	}
@@ -610,7 +610,7 @@ func (is *IdentityServer) deleteGateway(ctx context.Context, ids *ttnpb.GatewayI
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) restoreGateway(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
+func (is *IdentityServer) restoreGateway(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
 	if err := rights.RequireGateway(store.WithSoftDeleted(ctx, false), ids, ttnpb.Right_RIGHT_GATEWAY_DELETE); err != nil {
 		return nil, err
 	}
@@ -636,7 +636,7 @@ func (is *IdentityServer) restoreGateway(ctx context.Context, ids *ttnpb.Gateway
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) purgeGateway(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
+func (is *IdentityServer) purgeGateway(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
 	if !is.IsAdmin(ctx) {
 		return nil, errAdminsPurgeGateways.New()
 	}
@@ -703,14 +703,14 @@ func (gr *gatewayRegistry) Update(ctx context.Context, req *ttnpb.UpdateGatewayR
 	return gr.updateGateway(ctx, req)
 }
 
-func (gr *gatewayRegistry) Delete(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
+func (gr *gatewayRegistry) Delete(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
 	return gr.deleteGateway(ctx, req)
 }
 
-func (gr *gatewayRegistry) Restore(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
+func (gr *gatewayRegistry) Restore(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
 	return gr.restoreGateway(ctx, req)
 }
 
-func (gr *gatewayRegistry) Purge(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
+func (gr *gatewayRegistry) Purge(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
 	return gr.purgeGateway(ctx, req)
 }

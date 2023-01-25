@@ -20,8 +20,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gogo/protobuf/proto"
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
@@ -36,6 +34,9 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (
@@ -2700,7 +2701,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			if st.HasSetField("session.started_at") && st.Device.GetSession().GetStartedAt() == nil ||
 				st.HasSetField("session.session_key_id") && !bytes.Equal(st.Device.GetSession().GetKeys().GetSessionKeyId(), stored.GetSession().GetKeys().GetSessionKeyId()) ||
 				stored.GetSession().GetStartedAt() == nil {
-				st.Device.Session.StartedAt = ttnpb.ProtoTimePtr(time.Now())
+				st.Device.Session.StartedAt = timestamppb.New(time.Now()) // NOTE: This is not equivalent to timestamppb.Now().
 				st.AddSetFields(
 					"session.started_at",
 				)
@@ -2830,7 +2831,7 @@ func (ns *NetworkServer) ResetFactoryDefaults(ctx context.Context, req *ttnpb.Re
 			stored.Session = &ttnpb.Session{
 				DevAddr:                    stored.Session.DevAddr,
 				Keys:                       stored.Session.Keys,
-				StartedAt:                  ttnpb.ProtoTimePtr(time.Now()),
+				StartedAt:                  timestamppb.New(time.Now()), // NOTE: This is not equivalent to timestamppb.Now().
 				QueuedApplicationDownlinks: stored.Session.QueuedApplicationDownlinks,
 			}
 		}
@@ -2856,7 +2857,7 @@ func (ns *NetworkServer) ResetFactoryDefaults(ctx context.Context, req *ttnpb.Re
 }
 
 // Delete implements NsEndDeviceRegistryServer.
-func (ns *NetworkServer) Delete(ctx context.Context, req *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
+func (ns *NetworkServer) Delete(ctx context.Context, req *ttnpb.EndDeviceIdentifiers) (*emptypb.Empty, error) {
 	if err := rights.RequireApplication(ctx, req.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}

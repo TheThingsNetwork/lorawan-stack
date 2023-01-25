@@ -17,13 +17,13 @@ package identityserver
 import (
 	"context"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var (
@@ -238,7 +238,7 @@ var errOrganizationNeedsCollaborator = errors.DefineFailedPrecondition("organiza
 
 func (is *IdentityServer) setOrganizationCollaborator( //nolint:gocyclo
 	ctx context.Context, req *ttnpb.SetOrganizationCollaboratorRequest,
-) (_ *pbtypes.Empty, err error) {
+) (_ *emptypb.Empty, err error) {
 	// Require that caller has rights to manage collaborators.
 	if err := rights.RequireOrganization(ctx, req.GetOrganizationIds(), ttnpb.Right_RIGHT_ORGANIZATION_SETTINGS_MEMBERS); err != nil {
 		return nil, err
@@ -389,7 +389,7 @@ func (oa *organizationAccess) GetCollaborator(ctx context.Context, req *ttnpb.Ge
 	return oa.getOrganizationCollaborator(ctx, req)
 }
 
-func (oa *organizationAccess) SetCollaborator(ctx context.Context, req *ttnpb.SetOrganizationCollaboratorRequest) (*pbtypes.Empty, error) {
+func (oa *organizationAccess) SetCollaborator(ctx context.Context, req *ttnpb.SetOrganizationCollaboratorRequest) (*emptypb.Empty, error) {
 	return oa.setOrganizationCollaborator(ctx, req)
 }
 

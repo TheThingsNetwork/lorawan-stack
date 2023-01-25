@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	. "go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/validator"
@@ -27,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
 type testSubject struct {
@@ -63,12 +63,12 @@ func (m *msgWithValidateContext) ValidateContext(ctx context.Context) error {
 
 type msgWithFieldMask struct {
 	testSubject
-	fieldMask *types.FieldMask
+	fieldMask *fieldmaskpb.FieldMask
 
 	fieldIsZero map[string]bool
 }
 
-func (m *msgWithFieldMask) GetFieldMask() *types.FieldMask { return m.fieldMask }
+func (m *msgWithFieldMask) GetFieldMask() *fieldmaskpb.FieldMask { return m.fieldMask }
 
 func (m *msgWithFieldMask) ValidateFields(...string) error { return nil }
 

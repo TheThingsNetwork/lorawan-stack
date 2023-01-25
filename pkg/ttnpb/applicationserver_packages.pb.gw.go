@@ -13,15 +13,14 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/golang/protobuf/descriptor"
-	"github.com/golang/protobuf/proto"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/grpc-ecosystem/grpc-gateway/utilities"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/utilities"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 )
 
 // Suppress "imported and not used" errors
@@ -30,7 +29,6 @@ var _ io.Reader
 var _ status.Status
 var _ = runtime.String
 var _ = utilities.NewDoubleArray
-var _ = descriptor.ForMessage
 var _ = metadata.Join
 
 var (
@@ -54,7 +52,6 @@ func request_ApplicationPackageRegistry_List_0(ctx context.Context, marshaler ru
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
@@ -65,7 +62,6 @@ func request_ApplicationPackageRegistry_List_0(ctx context.Context, marshaler ru
 	}
 
 	protoReq.DeviceId, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "device_id", err)
 	}
@@ -99,7 +95,6 @@ func local_request_ApplicationPackageRegistry_List_0(ctx context.Context, marsha
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
@@ -110,7 +105,6 @@ func local_request_ApplicationPackageRegistry_List_0(ctx context.Context, marsha
 	}
 
 	protoReq.DeviceId, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "device_id", err)
 	}
@@ -148,7 +142,6 @@ func request_ApplicationPackageRegistry_GetAssociation_0(ctx context.Context, ma
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "ids.end_device_ids.application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ids.end_device_ids.application_ids.application_id", err)
 	}
@@ -159,7 +152,6 @@ func request_ApplicationPackageRegistry_GetAssociation_0(ctx context.Context, ma
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "ids.end_device_ids.device_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ids.end_device_ids.device_id", err)
 	}
@@ -170,7 +162,6 @@ func request_ApplicationPackageRegistry_GetAssociation_0(ctx context.Context, ma
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "ids.f_port", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ids.f_port", err)
 	}
@@ -204,7 +195,6 @@ func local_request_ApplicationPackageRegistry_GetAssociation_0(ctx context.Conte
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "ids.end_device_ids.application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ids.end_device_ids.application_ids.application_id", err)
 	}
@@ -215,7 +205,6 @@ func local_request_ApplicationPackageRegistry_GetAssociation_0(ctx context.Conte
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "ids.end_device_ids.device_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ids.end_device_ids.device_id", err)
 	}
@@ -226,7 +215,6 @@ func local_request_ApplicationPackageRegistry_GetAssociation_0(ctx context.Conte
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "ids.f_port", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ids.f_port", err)
 	}
@@ -264,7 +252,6 @@ func request_ApplicationPackageRegistry_ListAssociations_0(ctx context.Context, 
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "ids.application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ids.application_ids.application_id", err)
 	}
@@ -275,7 +262,6 @@ func request_ApplicationPackageRegistry_ListAssociations_0(ctx context.Context, 
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "ids.device_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ids.device_id", err)
 	}
@@ -309,7 +295,6 @@ func local_request_ApplicationPackageRegistry_ListAssociations_0(ctx context.Con
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "ids.application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ids.application_ids.application_id", err)
 	}
@@ -320,7 +305,6 @@ func local_request_ApplicationPackageRegistry_ListAssociations_0(ctx context.Con
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "ids.device_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ids.device_id", err)
 	}
@@ -362,7 +346,6 @@ func request_ApplicationPackageRegistry_SetAssociation_0(ctx context.Context, ma
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "association.ids.end_device_ids.application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "association.ids.end_device_ids.application_ids.application_id", err)
 	}
@@ -373,7 +356,6 @@ func request_ApplicationPackageRegistry_SetAssociation_0(ctx context.Context, ma
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "association.ids.end_device_ids.device_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "association.ids.end_device_ids.device_id", err)
 	}
@@ -384,7 +366,6 @@ func request_ApplicationPackageRegistry_SetAssociation_0(ctx context.Context, ma
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "association.ids.f_port", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "association.ids.f_port", err)
 	}
@@ -419,7 +400,6 @@ func local_request_ApplicationPackageRegistry_SetAssociation_0(ctx context.Conte
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "association.ids.end_device_ids.application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "association.ids.end_device_ids.application_ids.application_id", err)
 	}
@@ -430,7 +410,6 @@ func local_request_ApplicationPackageRegistry_SetAssociation_0(ctx context.Conte
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "association.ids.end_device_ids.device_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "association.ids.end_device_ids.device_id", err)
 	}
@@ -441,7 +420,6 @@ func local_request_ApplicationPackageRegistry_SetAssociation_0(ctx context.Conte
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "association.ids.f_port", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "association.ids.f_port", err)
 	}
@@ -472,7 +450,6 @@ func request_ApplicationPackageRegistry_DeleteAssociation_0(ctx context.Context,
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "end_device_ids.application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device_ids.application_ids.application_id", err)
 	}
@@ -483,7 +460,6 @@ func request_ApplicationPackageRegistry_DeleteAssociation_0(ctx context.Context,
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "end_device_ids.device_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device_ids.device_id", err)
 	}
@@ -494,7 +470,6 @@ func request_ApplicationPackageRegistry_DeleteAssociation_0(ctx context.Context,
 	}
 
 	protoReq.FPort, err = runtime.Uint32(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "f_port", err)
 	}
@@ -528,7 +503,6 @@ func local_request_ApplicationPackageRegistry_DeleteAssociation_0(ctx context.Co
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "end_device_ids.application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device_ids.application_ids.application_id", err)
 	}
@@ -539,7 +513,6 @@ func local_request_ApplicationPackageRegistry_DeleteAssociation_0(ctx context.Co
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "end_device_ids.device_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device_ids.device_id", err)
 	}
@@ -550,7 +523,6 @@ func local_request_ApplicationPackageRegistry_DeleteAssociation_0(ctx context.Co
 	}
 
 	protoReq.FPort, err = runtime.Uint32(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "f_port", err)
 	}
@@ -588,7 +560,6 @@ func request_ApplicationPackageRegistry_GetDefaultAssociation_0(ctx context.Cont
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "ids.application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ids.application_ids.application_id", err)
 	}
@@ -599,7 +570,6 @@ func request_ApplicationPackageRegistry_GetDefaultAssociation_0(ctx context.Cont
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "ids.f_port", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ids.f_port", err)
 	}
@@ -633,7 +603,6 @@ func local_request_ApplicationPackageRegistry_GetDefaultAssociation_0(ctx contex
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "ids.application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ids.application_ids.application_id", err)
 	}
@@ -644,7 +613,6 @@ func local_request_ApplicationPackageRegistry_GetDefaultAssociation_0(ctx contex
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "ids.f_port", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ids.f_port", err)
 	}
@@ -682,7 +650,6 @@ func request_ApplicationPackageRegistry_ListDefaultAssociations_0(ctx context.Co
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ids.application_id", err)
 	}
@@ -716,7 +683,6 @@ func local_request_ApplicationPackageRegistry_ListDefaultAssociations_0(ctx cont
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ids.application_id", err)
 	}
@@ -758,7 +724,6 @@ func request_ApplicationPackageRegistry_SetDefaultAssociation_0(ctx context.Cont
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "default.ids.application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "default.ids.application_ids.application_id", err)
 	}
@@ -769,7 +734,6 @@ func request_ApplicationPackageRegistry_SetDefaultAssociation_0(ctx context.Cont
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "default.ids.f_port", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "default.ids.f_port", err)
 	}
@@ -804,7 +768,6 @@ func local_request_ApplicationPackageRegistry_SetDefaultAssociation_0(ctx contex
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "default.ids.application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "default.ids.application_ids.application_id", err)
 	}
@@ -815,7 +778,6 @@ func local_request_ApplicationPackageRegistry_SetDefaultAssociation_0(ctx contex
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "default.ids.f_port", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "default.ids.f_port", err)
 	}
@@ -846,7 +808,6 @@ func request_ApplicationPackageRegistry_DeleteDefaultAssociation_0(ctx context.C
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
@@ -857,7 +818,6 @@ func request_ApplicationPackageRegistry_DeleteDefaultAssociation_0(ctx context.C
 	}
 
 	protoReq.FPort, err = runtime.Uint32(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "f_port", err)
 	}
@@ -891,7 +851,6 @@ func local_request_ApplicationPackageRegistry_DeleteDefaultAssociation_0(ctx con
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
@@ -902,7 +861,6 @@ func local_request_ApplicationPackageRegistry_DeleteDefaultAssociation_0(ctx con
 	}
 
 	protoReq.FPort, err = runtime.Uint32(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "f_port", err)
 	}
@@ -931,20 +889,22 @@ func RegisterApplicationPackageRegistryHandlerServer(ctx context.Context, mux *r
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.ApplicationPackageRegistry/List", runtime.WithHTTPPathPattern("/as/applications/{application_ids.application_id}/devices/{device_id}/packages"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ApplicationPackageRegistry_List_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ApplicationPackageRegistry_List_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationPackageRegistry_List_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationPackageRegistry_List_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -954,20 +914,22 @@ func RegisterApplicationPackageRegistryHandlerServer(ctx context.Context, mux *r
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.ApplicationPackageRegistry/GetAssociation", runtime.WithHTTPPathPattern("/as/applications/{ids.end_device_ids.application_ids.application_id}/devices/{ids.end_device_ids.device_id}/packages/associations/{ids.f_port}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ApplicationPackageRegistry_GetAssociation_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ApplicationPackageRegistry_GetAssociation_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationPackageRegistry_GetAssociation_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationPackageRegistry_GetAssociation_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -977,20 +939,22 @@ func RegisterApplicationPackageRegistryHandlerServer(ctx context.Context, mux *r
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.ApplicationPackageRegistry/ListAssociations", runtime.WithHTTPPathPattern("/as/applications/{ids.application_ids.application_id}/devices/{ids.device_id}/packages/associations"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ApplicationPackageRegistry_ListAssociations_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ApplicationPackageRegistry_ListAssociations_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationPackageRegistry_ListAssociations_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationPackageRegistry_ListAssociations_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1000,20 +964,22 @@ func RegisterApplicationPackageRegistryHandlerServer(ctx context.Context, mux *r
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.ApplicationPackageRegistry/SetAssociation", runtime.WithHTTPPathPattern("/as/applications/{association.ids.end_device_ids.application_ids.application_id}/devices/{association.ids.end_device_ids.device_id}/packages/associations/{association.ids.f_port}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ApplicationPackageRegistry_SetAssociation_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ApplicationPackageRegistry_SetAssociation_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationPackageRegistry_SetAssociation_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationPackageRegistry_SetAssociation_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1023,20 +989,22 @@ func RegisterApplicationPackageRegistryHandlerServer(ctx context.Context, mux *r
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.ApplicationPackageRegistry/DeleteAssociation", runtime.WithHTTPPathPattern("/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/packages/associations/{f_port}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ApplicationPackageRegistry_DeleteAssociation_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ApplicationPackageRegistry_DeleteAssociation_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationPackageRegistry_DeleteAssociation_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationPackageRegistry_DeleteAssociation_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1046,20 +1014,22 @@ func RegisterApplicationPackageRegistryHandlerServer(ctx context.Context, mux *r
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.ApplicationPackageRegistry/GetDefaultAssociation", runtime.WithHTTPPathPattern("/as/applications/{ids.application_ids.application_id}/packages/associations/{ids.f_port}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ApplicationPackageRegistry_GetDefaultAssociation_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ApplicationPackageRegistry_GetDefaultAssociation_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationPackageRegistry_GetDefaultAssociation_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationPackageRegistry_GetDefaultAssociation_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1069,20 +1039,22 @@ func RegisterApplicationPackageRegistryHandlerServer(ctx context.Context, mux *r
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.ApplicationPackageRegistry/ListDefaultAssociations", runtime.WithHTTPPathPattern("/as/applications/{ids.application_id}/packages/associations"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ApplicationPackageRegistry_ListDefaultAssociations_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ApplicationPackageRegistry_ListDefaultAssociations_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationPackageRegistry_ListDefaultAssociations_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationPackageRegistry_ListDefaultAssociations_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1092,20 +1064,22 @@ func RegisterApplicationPackageRegistryHandlerServer(ctx context.Context, mux *r
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.ApplicationPackageRegistry/SetDefaultAssociation", runtime.WithHTTPPathPattern("/as/applications/{default.ids.application_ids.application_id}/packages/associations/{default.ids.f_port}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ApplicationPackageRegistry_SetDefaultAssociation_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ApplicationPackageRegistry_SetDefaultAssociation_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationPackageRegistry_SetDefaultAssociation_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationPackageRegistry_SetDefaultAssociation_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1115,20 +1089,22 @@ func RegisterApplicationPackageRegistryHandlerServer(ctx context.Context, mux *r
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.ApplicationPackageRegistry/DeleteDefaultAssociation", runtime.WithHTTPPathPattern("/as/applications/{application_ids.application_id}/packages/associations/{f_port}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ApplicationPackageRegistry_DeleteDefaultAssociation_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ApplicationPackageRegistry_DeleteDefaultAssociation_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationPackageRegistry_DeleteDefaultAssociation_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationPackageRegistry_DeleteDefaultAssociation_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1177,19 +1153,21 @@ func RegisterApplicationPackageRegistryHandlerClient(ctx context.Context, mux *r
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.ApplicationPackageRegistry/List", runtime.WithHTTPPathPattern("/as/applications/{application_ids.application_id}/devices/{device_id}/packages"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationPackageRegistry_List_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_ApplicationPackageRegistry_List_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationPackageRegistry_List_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationPackageRegistry_List_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1197,19 +1175,21 @@ func RegisterApplicationPackageRegistryHandlerClient(ctx context.Context, mux *r
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.ApplicationPackageRegistry/GetAssociation", runtime.WithHTTPPathPattern("/as/applications/{ids.end_device_ids.application_ids.application_id}/devices/{ids.end_device_ids.device_id}/packages/associations/{ids.f_port}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationPackageRegistry_GetAssociation_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_ApplicationPackageRegistry_GetAssociation_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationPackageRegistry_GetAssociation_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationPackageRegistry_GetAssociation_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1217,19 +1197,21 @@ func RegisterApplicationPackageRegistryHandlerClient(ctx context.Context, mux *r
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.ApplicationPackageRegistry/ListAssociations", runtime.WithHTTPPathPattern("/as/applications/{ids.application_ids.application_id}/devices/{ids.device_id}/packages/associations"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationPackageRegistry_ListAssociations_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_ApplicationPackageRegistry_ListAssociations_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationPackageRegistry_ListAssociations_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationPackageRegistry_ListAssociations_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1237,19 +1219,21 @@ func RegisterApplicationPackageRegistryHandlerClient(ctx context.Context, mux *r
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.ApplicationPackageRegistry/SetAssociation", runtime.WithHTTPPathPattern("/as/applications/{association.ids.end_device_ids.application_ids.application_id}/devices/{association.ids.end_device_ids.device_id}/packages/associations/{association.ids.f_port}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationPackageRegistry_SetAssociation_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_ApplicationPackageRegistry_SetAssociation_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationPackageRegistry_SetAssociation_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationPackageRegistry_SetAssociation_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1257,19 +1241,21 @@ func RegisterApplicationPackageRegistryHandlerClient(ctx context.Context, mux *r
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.ApplicationPackageRegistry/DeleteAssociation", runtime.WithHTTPPathPattern("/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/packages/associations/{f_port}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationPackageRegistry_DeleteAssociation_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_ApplicationPackageRegistry_DeleteAssociation_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationPackageRegistry_DeleteAssociation_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationPackageRegistry_DeleteAssociation_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1277,19 +1263,21 @@ func RegisterApplicationPackageRegistryHandlerClient(ctx context.Context, mux *r
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.ApplicationPackageRegistry/GetDefaultAssociation", runtime.WithHTTPPathPattern("/as/applications/{ids.application_ids.application_id}/packages/associations/{ids.f_port}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationPackageRegistry_GetDefaultAssociation_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_ApplicationPackageRegistry_GetDefaultAssociation_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationPackageRegistry_GetDefaultAssociation_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationPackageRegistry_GetDefaultAssociation_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1297,19 +1285,21 @@ func RegisterApplicationPackageRegistryHandlerClient(ctx context.Context, mux *r
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.ApplicationPackageRegistry/ListDefaultAssociations", runtime.WithHTTPPathPattern("/as/applications/{ids.application_id}/packages/associations"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationPackageRegistry_ListDefaultAssociations_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_ApplicationPackageRegistry_ListDefaultAssociations_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationPackageRegistry_ListDefaultAssociations_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationPackageRegistry_ListDefaultAssociations_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1317,19 +1307,21 @@ func RegisterApplicationPackageRegistryHandlerClient(ctx context.Context, mux *r
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.ApplicationPackageRegistry/SetDefaultAssociation", runtime.WithHTTPPathPattern("/as/applications/{default.ids.application_ids.application_id}/packages/associations/{default.ids.f_port}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationPackageRegistry_SetDefaultAssociation_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_ApplicationPackageRegistry_SetDefaultAssociation_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationPackageRegistry_SetDefaultAssociation_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationPackageRegistry_SetDefaultAssociation_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1337,19 +1329,21 @@ func RegisterApplicationPackageRegistryHandlerClient(ctx context.Context, mux *r
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.ApplicationPackageRegistry/DeleteDefaultAssociation", runtime.WithHTTPPathPattern("/as/applications/{application_ids.application_id}/packages/associations/{f_port}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationPackageRegistry_DeleteDefaultAssociation_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_ApplicationPackageRegistry_DeleteDefaultAssociation_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationPackageRegistry_DeleteDefaultAssociation_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationPackageRegistry_DeleteDefaultAssociation_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1357,23 +1351,23 @@ func RegisterApplicationPackageRegistryHandlerClient(ctx context.Context, mux *r
 }
 
 var (
-	pattern_ApplicationPackageRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"as", "applications", "application_ids.application_id", "devices", "device_id", "packages"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationPackageRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"as", "applications", "application_ids.application_id", "devices", "device_id", "packages"}, ""))
 
-	pattern_ApplicationPackageRegistry_GetAssociation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 2, 6, 1, 0, 4, 1, 5, 7}, []string{"as", "applications", "ids.end_device_ids.application_ids.application_id", "devices", "ids.end_device_ids.device_id", "packages", "associations", "ids.f_port"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationPackageRegistry_GetAssociation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 2, 6, 1, 0, 4, 1, 5, 7}, []string{"as", "applications", "ids.end_device_ids.application_ids.application_id", "devices", "ids.end_device_ids.device_id", "packages", "associations", "ids.f_port"}, ""))
 
-	pattern_ApplicationPackageRegistry_ListAssociations_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 2, 6}, []string{"as", "applications", "ids.application_ids.application_id", "devices", "ids.device_id", "packages", "associations"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationPackageRegistry_ListAssociations_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 2, 6}, []string{"as", "applications", "ids.application_ids.application_id", "devices", "ids.device_id", "packages", "associations"}, ""))
 
-	pattern_ApplicationPackageRegistry_SetAssociation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 2, 6, 1, 0, 4, 1, 5, 7}, []string{"as", "applications", "association.ids.end_device_ids.application_ids.application_id", "devices", "association.ids.end_device_ids.device_id", "packages", "associations", "association.ids.f_port"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationPackageRegistry_SetAssociation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 2, 6, 1, 0, 4, 1, 5, 7}, []string{"as", "applications", "association.ids.end_device_ids.application_ids.application_id", "devices", "association.ids.end_device_ids.device_id", "packages", "associations", "association.ids.f_port"}, ""))
 
-	pattern_ApplicationPackageRegistry_DeleteAssociation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 2, 6, 1, 0, 4, 1, 5, 7}, []string{"as", "applications", "end_device_ids.application_ids.application_id", "devices", "end_device_ids.device_id", "packages", "associations", "f_port"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationPackageRegistry_DeleteAssociation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 2, 6, 1, 0, 4, 1, 5, 7}, []string{"as", "applications", "end_device_ids.application_ids.application_id", "devices", "end_device_ids.device_id", "packages", "associations", "f_port"}, ""))
 
-	pattern_ApplicationPackageRegistry_GetDefaultAssociation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"as", "applications", "ids.application_ids.application_id", "packages", "associations", "ids.f_port"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationPackageRegistry_GetDefaultAssociation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"as", "applications", "ids.application_ids.application_id", "packages", "associations", "ids.f_port"}, ""))
 
-	pattern_ApplicationPackageRegistry_ListDefaultAssociations_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4}, []string{"as", "applications", "ids.application_id", "packages", "associations"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationPackageRegistry_ListDefaultAssociations_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4}, []string{"as", "applications", "ids.application_id", "packages", "associations"}, ""))
 
-	pattern_ApplicationPackageRegistry_SetDefaultAssociation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"as", "applications", "default.ids.application_ids.application_id", "packages", "associations", "default.ids.f_port"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationPackageRegistry_SetDefaultAssociation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"as", "applications", "default.ids.application_ids.application_id", "packages", "associations", "default.ids.f_port"}, ""))
 
-	pattern_ApplicationPackageRegistry_DeleteDefaultAssociation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"as", "applications", "application_ids.application_id", "packages", "associations", "f_port"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationPackageRegistry_DeleteDefaultAssociation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"as", "applications", "application_ids.application_id", "packages", "associations", "f_port"}, ""))
 )
 
 var (

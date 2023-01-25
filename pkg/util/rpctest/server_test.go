@@ -20,7 +20,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/rpctest"
@@ -29,6 +28,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func TestFooBarExampleServer(t *testing.T) {
@@ -90,7 +90,7 @@ func TestFooBarExampleServer(t *testing.T) {
 			err = stream.Send(&rpctest.Foo{Message: "foo"})
 			a.So(err, should.BeNil)
 			time.Sleep(150 * time.Millisecond)
-			err = stream.RecvMsg(&empty.Empty{})
+			err = stream.RecvMsg(&emptypb.Empty{})
 			a.So(status.Code(err), should.Equal, codes.Unknown)
 		}
 	})

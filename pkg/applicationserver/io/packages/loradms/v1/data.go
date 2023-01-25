@@ -18,8 +18,8 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 type packageData struct {
@@ -48,13 +48,13 @@ var (
 	errInvalidFieldType = errors.DefineCorruption("invalid_field_type", "field `{field}` has the wrong type `{type}`")
 )
 
-func (d *packageData) fromStruct(st *types.Struct) (err error) {
+func (d *packageData) fromStruct(st *structpb.Struct) (err error) {
 	fields := st.GetFields()
 	value, ok := fields[tokenField]
 	if !ok {
 		return errFieldNotFound.WithAttributes("field", tokenField)
 	}
-	stringValue, ok := value.GetKind().(*types.Value_StringValue)
+	stringValue, ok := value.GetKind().(*structpb.Value_StringValue)
 	if !ok {
 		return errInvalidFieldType.WithAttributes(
 			"field", tokenField,
@@ -64,7 +64,7 @@ func (d *packageData) fromStruct(st *types.Struct) (err error) {
 	d.token = stringValue.StringValue
 	value, ok = fields[serverURLField]
 	if ok {
-		stringValue, ok := value.GetKind().(*types.Value_StringValue)
+		stringValue, ok := value.GetKind().(*structpb.Value_StringValue)
 		if !ok {
 			return errInvalidFieldType.WithAttributes(
 				"field", serverURLField,
@@ -77,7 +77,7 @@ func (d *packageData) fromStruct(st *types.Struct) (err error) {
 	}
 	value, ok = fields[useTLVEncodingField]
 	if ok {
-		boolValue, ok := value.GetKind().(*types.Value_BoolValue)
+		boolValue, ok := value.GetKind().(*structpb.Value_BoolValue)
 		if !ok {
 			return errInvalidFieldType.WithAttributes(
 				"field", useTLVEncodingField,
@@ -88,7 +88,7 @@ func (d *packageData) fromStruct(st *types.Struct) (err error) {
 	}
 	value, ok = fields[fPortSetField]
 	if ok {
-		listValue, ok := value.GetKind().(*types.Value_ListValue)
+		listValue, ok := value.GetKind().(*structpb.Value_ListValue)
 		if !ok {
 			return errInvalidFieldType.WithAttributes(
 				"field", fPortSetField,
@@ -98,7 +98,7 @@ func (d *packageData) fromStruct(st *types.Struct) (err error) {
 		listValues := listValue.ListValue.GetValues()
 		d.fPortSet = make(map[uint32]struct{}, len(listValues))
 		for _, v := range listValues {
-			numberValue, ok := v.GetKind().(*types.Value_NumberValue)
+			numberValue, ok := v.GetKind().(*structpb.Value_NumberValue)
 			if !ok {
 				return errInvalidFieldType.WithAttributes(
 					"field", fPortSetField,

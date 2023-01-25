@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (
@@ -245,7 +246,7 @@ func (is *IdentityServer) createLoginToken(ctx context.Context, req *ttnpb.Creat
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
 		_, err := st.CreateLoginToken(ctx, &ttnpb.LoginToken{
 			UserIds:   req.GetUserIds(),
-			ExpiresAt: ttnpb.ProtoTimePtr(expiresAt),
+			ExpiresAt: timestamppb.New(expiresAt),
 			Token:     token,
 		})
 		return err

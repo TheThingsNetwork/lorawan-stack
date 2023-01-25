@@ -19,12 +19,13 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (
@@ -214,7 +215,7 @@ func (r PubSubRegistry) Set(ctx context.Context, ids *ttnpb.ApplicationPubSubIde
 				pb = &ttnpb.ApplicationPubSub{}
 			}
 
-			pb.UpdatedAt = ttnpb.ProtoTimePtr(time.Now())
+			pb.UpdatedAt = timestamppb.Now()
 			sets = append(append(sets[:0:0], sets...),
 				"updated_at",
 			)

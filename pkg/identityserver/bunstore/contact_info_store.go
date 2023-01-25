@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // ContactInfo is the contact info model in the database.
@@ -368,7 +369,7 @@ func (s *contactInfoStore) CreateValidation(
 		Token:       model.Token,
 		Entity:      pb.Entity,
 		ContactInfo: pb.ContactInfo,
-		CreatedAt:   ttnpb.ProtoTimePtr(model.CreatedAt),
+		CreatedAt:   timestamppb.New(model.CreatedAt),
 		ExpiresAt:   ttnpb.ProtoTime(model.ExpiresAt),
 	}, nil
 }

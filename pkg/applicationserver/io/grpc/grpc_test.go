@@ -21,7 +21,6 @@ import (
 	"testing"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	. "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/grpc"
@@ -42,6 +41,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 var (
@@ -589,10 +589,10 @@ func TestMessageProcessors(t *testing.T) {
 				DeviceId:       "foobar",
 			},
 			Downlink: &ttnpb.ApplicationDownlink{
-				DecodedPayload: &pbtypes.Struct{
-					Fields: map[string]*pbtypes.Value{
+				DecodedPayload: &structpb.Struct{
+					Fields: map[string]*structpb.Value{
 						"value_2": {
-							Kind: &pbtypes.Value_NumberValue{
+							Kind: &structpb.Value_NumberValue{
 								NumberValue: -50.51,
 							},
 						},
@@ -634,10 +634,10 @@ func TestMessageProcessors(t *testing.T) {
 		}
 		if a.So(resp.Uplink, should.NotBeNil) {
 			a.So(resp.Uplink.FPort, should.Equal, 1)
-			a.So(resp.Uplink.DecodedPayload, should.Resemble, &pbtypes.Struct{
-				Fields: map[string]*pbtypes.Value{
+			a.So(resp.Uplink.DecodedPayload, should.Resemble, &structpb.Struct{
+				Fields: map[string]*structpb.Value{
 					"digital_in_1": {
-						Kind: &pbtypes.Value_NumberValue{NumberValue: 255},
+						Kind: &structpb.Value_NumberValue{NumberValue: 255},
 					},
 				},
 			})
@@ -661,10 +661,10 @@ func TestMessageProcessors(t *testing.T) {
 		}
 		if a.So(resp.Downlink, should.NotBeNil) {
 			a.So(resp.Downlink.FPort, should.Equal, 1)
-			a.So(resp.Downlink.DecodedPayload, should.Resemble, &pbtypes.Struct{
-				Fields: map[string]*pbtypes.Value{
+			a.So(resp.Downlink.DecodedPayload, should.Resemble, &structpb.Struct{
+				Fields: map[string]*structpb.Value{
 					"value_2": {
-						Kind: &pbtypes.Value_NumberValue{
+						Kind: &structpb.Value_NumberValue{
 							NumberValue: -50.51,
 						},
 					},

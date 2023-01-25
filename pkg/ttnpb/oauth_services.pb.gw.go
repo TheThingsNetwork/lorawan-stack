@@ -13,15 +13,14 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/golang/protobuf/descriptor"
-	"github.com/golang/protobuf/proto"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/grpc-ecosystem/grpc-gateway/utilities"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/utilities"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 )
 
 // Suppress "imported and not used" errors
@@ -30,7 +29,6 @@ var _ io.Reader
 var _ status.Status
 var _ = runtime.String
 var _ = utilities.NewDoubleArray
-var _ = descriptor.ForMessage
 var _ = metadata.Join
 
 var (
@@ -54,7 +52,6 @@ func request_OAuthAuthorizationRegistry_List_0(ctx context.Context, marshaler ru
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "user_ids.user_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_ids.user_id", err)
 	}
@@ -88,7 +85,6 @@ func local_request_OAuthAuthorizationRegistry_List_0(ctx context.Context, marsha
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "user_ids.user_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_ids.user_id", err)
 	}
@@ -126,7 +122,6 @@ func request_OAuthAuthorizationRegistry_ListTokens_0(ctx context.Context, marsha
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "user_ids.user_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_ids.user_id", err)
 	}
@@ -137,7 +132,6 @@ func request_OAuthAuthorizationRegistry_ListTokens_0(ctx context.Context, marsha
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "client_ids.client_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "client_ids.client_id", err)
 	}
@@ -171,7 +165,6 @@ func local_request_OAuthAuthorizationRegistry_ListTokens_0(ctx context.Context, 
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "user_ids.user_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_ids.user_id", err)
 	}
@@ -182,7 +175,6 @@ func local_request_OAuthAuthorizationRegistry_ListTokens_0(ctx context.Context, 
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "client_ids.client_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "client_ids.client_id", err)
 	}
@@ -220,7 +212,6 @@ func request_OAuthAuthorizationRegistry_Delete_0(ctx context.Context, marshaler 
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "user_ids.user_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_ids.user_id", err)
 	}
@@ -231,7 +222,6 @@ func request_OAuthAuthorizationRegistry_Delete_0(ctx context.Context, marshaler 
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "client_ids.client_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "client_ids.client_id", err)
 	}
@@ -265,7 +255,6 @@ func local_request_OAuthAuthorizationRegistry_Delete_0(ctx context.Context, mars
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "user_ids.user_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_ids.user_id", err)
 	}
@@ -276,7 +265,6 @@ func local_request_OAuthAuthorizationRegistry_Delete_0(ctx context.Context, mars
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "client_ids.client_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "client_ids.client_id", err)
 	}
@@ -314,7 +302,6 @@ func request_OAuthAuthorizationRegistry_DeleteToken_0(ctx context.Context, marsh
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "user_ids.user_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_ids.user_id", err)
 	}
@@ -325,7 +312,6 @@ func request_OAuthAuthorizationRegistry_DeleteToken_0(ctx context.Context, marsh
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "client_ids.client_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "client_ids.client_id", err)
 	}
@@ -336,7 +322,6 @@ func request_OAuthAuthorizationRegistry_DeleteToken_0(ctx context.Context, marsh
 	}
 
 	protoReq.Id, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
@@ -370,7 +355,6 @@ func local_request_OAuthAuthorizationRegistry_DeleteToken_0(ctx context.Context,
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "user_ids.user_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_ids.user_id", err)
 	}
@@ -381,7 +365,6 @@ func local_request_OAuthAuthorizationRegistry_DeleteToken_0(ctx context.Context,
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "client_ids.client_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "client_ids.client_id", err)
 	}
@@ -392,7 +375,6 @@ func local_request_OAuthAuthorizationRegistry_DeleteToken_0(ctx context.Context,
 	}
 
 	protoReq.Id, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
@@ -421,20 +403,22 @@ func RegisterOAuthAuthorizationRegistryHandlerServer(ctx context.Context, mux *r
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.OAuthAuthorizationRegistry/List", runtime.WithHTTPPathPattern("/users/{user_ids.user_id}/authorizations"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_OAuthAuthorizationRegistry_List_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_OAuthAuthorizationRegistry_List_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_OAuthAuthorizationRegistry_List_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_OAuthAuthorizationRegistry_List_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -444,20 +428,22 @@ func RegisterOAuthAuthorizationRegistryHandlerServer(ctx context.Context, mux *r
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.OAuthAuthorizationRegistry/ListTokens", runtime.WithHTTPPathPattern("/users/{user_ids.user_id}/authorizations/{client_ids.client_id}/tokens"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_OAuthAuthorizationRegistry_ListTokens_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_OAuthAuthorizationRegistry_ListTokens_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_OAuthAuthorizationRegistry_ListTokens_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_OAuthAuthorizationRegistry_ListTokens_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -467,20 +453,22 @@ func RegisterOAuthAuthorizationRegistryHandlerServer(ctx context.Context, mux *r
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.OAuthAuthorizationRegistry/Delete", runtime.WithHTTPPathPattern("/users/{user_ids.user_id}/authorizations/{client_ids.client_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_OAuthAuthorizationRegistry_Delete_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_OAuthAuthorizationRegistry_Delete_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_OAuthAuthorizationRegistry_Delete_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_OAuthAuthorizationRegistry_Delete_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -490,20 +478,22 @@ func RegisterOAuthAuthorizationRegistryHandlerServer(ctx context.Context, mux *r
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.OAuthAuthorizationRegistry/DeleteToken", runtime.WithHTTPPathPattern("/users/{user_ids.user_id}/authorizations/{client_ids.client_id}/tokens/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_OAuthAuthorizationRegistry_DeleteToken_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_OAuthAuthorizationRegistry_DeleteToken_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_OAuthAuthorizationRegistry_DeleteToken_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_OAuthAuthorizationRegistry_DeleteToken_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -552,19 +542,21 @@ func RegisterOAuthAuthorizationRegistryHandlerClient(ctx context.Context, mux *r
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.OAuthAuthorizationRegistry/List", runtime.WithHTTPPathPattern("/users/{user_ids.user_id}/authorizations"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_OAuthAuthorizationRegistry_List_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_OAuthAuthorizationRegistry_List_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_OAuthAuthorizationRegistry_List_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_OAuthAuthorizationRegistry_List_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -572,19 +564,21 @@ func RegisterOAuthAuthorizationRegistryHandlerClient(ctx context.Context, mux *r
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.OAuthAuthorizationRegistry/ListTokens", runtime.WithHTTPPathPattern("/users/{user_ids.user_id}/authorizations/{client_ids.client_id}/tokens"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_OAuthAuthorizationRegistry_ListTokens_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_OAuthAuthorizationRegistry_ListTokens_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_OAuthAuthorizationRegistry_ListTokens_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_OAuthAuthorizationRegistry_ListTokens_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -592,19 +586,21 @@ func RegisterOAuthAuthorizationRegistryHandlerClient(ctx context.Context, mux *r
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.OAuthAuthorizationRegistry/Delete", runtime.WithHTTPPathPattern("/users/{user_ids.user_id}/authorizations/{client_ids.client_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_OAuthAuthorizationRegistry_Delete_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_OAuthAuthorizationRegistry_Delete_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_OAuthAuthorizationRegistry_Delete_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_OAuthAuthorizationRegistry_Delete_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -612,19 +608,21 @@ func RegisterOAuthAuthorizationRegistryHandlerClient(ctx context.Context, mux *r
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.OAuthAuthorizationRegistry/DeleteToken", runtime.WithHTTPPathPattern("/users/{user_ids.user_id}/authorizations/{client_ids.client_id}/tokens/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_OAuthAuthorizationRegistry_DeleteToken_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_OAuthAuthorizationRegistry_DeleteToken_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_OAuthAuthorizationRegistry_DeleteToken_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_OAuthAuthorizationRegistry_DeleteToken_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -632,13 +630,13 @@ func RegisterOAuthAuthorizationRegistryHandlerClient(ctx context.Context, mux *r
 }
 
 var (
-	pattern_OAuthAuthorizationRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_ids.user_id", "authorizations"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_OAuthAuthorizationRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_ids.user_id", "authorizations"}, ""))
 
-	pattern_OAuthAuthorizationRegistry_ListTokens_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"users", "user_ids.user_id", "authorizations", "client_ids.client_id", "tokens"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_OAuthAuthorizationRegistry_ListTokens_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"users", "user_ids.user_id", "authorizations", "client_ids.client_id", "tokens"}, ""))
 
-	pattern_OAuthAuthorizationRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"users", "user_ids.user_id", "authorizations", "client_ids.client_id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_OAuthAuthorizationRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"users", "user_ids.user_id", "authorizations", "client_ids.client_id"}, ""))
 
-	pattern_OAuthAuthorizationRegistry_DeleteToken_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"users", "user_ids.user_id", "authorizations", "client_ids.client_id", "tokens", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_OAuthAuthorizationRegistry_DeleteToken_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"users", "user_ids.user_id", "authorizations", "client_ids.client_id", "tokens", "id"}, ""))
 )
 
 var (

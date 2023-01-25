@@ -19,12 +19,12 @@ import (
 	"reflect"
 	"testing"
 
-	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/smartystreets/assertions"
 	"github.com/spf13/cast"
 	"go.thethings.network/lorawan-stack/v3/pkg/goproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 type jsonMarshaler struct {

@@ -15,25 +15,15 @@
 package ttnpb
 
 import (
-	proto "github.com/gogo/protobuf/proto"
-	pbtypes "github.com/gogo/protobuf/types"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
-// MarshalAny wraps the MarshalAny func in the protobuf library.
-func MarshalAny(pb proto.Message) (*pbtypes.Any, error) {
-	return pbtypes.MarshalAny(pb)
-}
-
 // MustMarshalAny converts the proto message to an Any, or panics.
-func MustMarshalAny(pb proto.Message) *pbtypes.Any {
-	any, err := MarshalAny(pb)
+func MustMarshalAny(pb proto.Message) *anypb.Any {
+	any, err := anypb.New(pb)
 	if err != nil {
 		panic(err)
 	}
 	return any
-}
-
-// UnmarshalAny wraps the UnmarshalAny func in the protobuf library.
-func UnmarshalAny(any *pbtypes.Any, pb proto.Message) error {
-	return pbtypes.UnmarshalAny(any, pb)
 }

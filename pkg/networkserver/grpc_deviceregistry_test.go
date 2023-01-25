@@ -35,6 +35,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func TestDeviceRegistryGet(t *testing.T) {
@@ -410,7 +411,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 		SessionOptions.WithLastNFCntDown(0x24),
 	}
 	activeSessionOptsWithStartedAt := append(activeSessionOpts,
-		SessionOptions.WithStartedAt(ttnpb.ProtoTimePtr(time.Unix(0, 42))),
+		SessionOptions.WithStartedAt(timestamppb.New(time.Unix(0, 42))),
 	)
 
 	activateOpt := EndDeviceOptions.Activate(customMACSettings, false, activeSessionOpts, activeMACStateOpts...)
@@ -850,7 +851,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					clock := test.NewMockClock(time.Now())
 					defer SetMockClock(clock)()
 
-					withCreatedAt := test.EndDeviceOptions.WithCreatedAt(ttnpb.ProtoTimePtr(clock.Now()))
+					withCreatedAt := test.EndDeviceOptions.WithCreatedAt(timestamppb.New(clock.Now()))
 					if createDevice != nil {
 						_, ctx = MustCreateDevice(ctx, env.Devices, createDevice)
 						clock.Add(time.Nanosecond)
@@ -858,11 +859,11 @@ func TestDeviceRegistrySet(t *testing.T) {
 
 					now := clock.Now()
 					withTimestamps := withCreatedAt.Compose(
-						test.EndDeviceOptions.WithUpdatedAt(ttnpb.ProtoTimePtr(now)),
+						test.EndDeviceOptions.WithUpdatedAt(timestamppb.New(now)),
 						func(dev *ttnpb.EndDevice) *ttnpb.EndDevice {
 							dev = ttnpb.Clone(dev)
 							if dev.Session != nil && dev.Session.StartedAt == nil {
-								dev.Session.StartedAt = ttnpb.ProtoTimePtr(now)
+								dev.Session.StartedAt = timestamppb.New(now)
 							}
 							return dev
 						},
@@ -925,7 +926,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					if !a.So(ok, should.BeTrue) || !a.So(err, should.BeNil) || !a.So(dev, should.NotBeNil) {
 						return
 					}
-					a.So(dev, should.Resemble, EndDeviceOptions.WithUpdatedAt(ttnpb.ProtoTimePtr(now))(expectedReturn))
+					a.So(dev, should.Resemble, EndDeviceOptions.WithUpdatedAt(timestamppb.New(now))(expectedReturn))
 				},
 			})
 		}
@@ -1175,7 +1176,7 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 							DevAddr:                    created.Session.DevAddr,
 							QueuedApplicationDownlinks: created.Session.QueuedApplicationDownlinks,
 							Keys:                       created.Session.Keys,
-							StartedAt:                  ttnpb.ProtoTimePtr(now),
+							StartedAt:                  timestamppb.New(now),
 						}
 					}
 					if !a.So(err, should.BeNil) {
@@ -1192,7 +1193,7 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 					expected.PendingSession = nil
 					expected.PowerState = ttnpb.PowerState_POWER_UNKNOWN
 					expected.Session = session
-					expected.UpdatedAt = ttnpb.ProtoTimePtr(clock.Now())
+					expected.UpdatedAt = timestamppb.New(clock.Now())
 					if !a.So(dev, should.Resemble, test.Must(ttnpb.ApplyEndDeviceFieldMask(nil, expected, ttnpb.AddImplicitEndDeviceGetFields(conf.Paths...)...)).(*ttnpb.EndDevice)) {
 						return
 					}

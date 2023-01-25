@@ -16,7 +16,6 @@ package blob
 
 import (
 	"context"
-	"net/url"
 	"os"
 	"path/filepath"
 
@@ -61,15 +60,17 @@ func AWS(ctx context.Context, bucket string, conf *aws.Config) (*blob.Bucket, er
 
 // Azure returns an open bucket that is connected to container containerName in storage account accountName.
 func Azure(ctx context.Context, accountName, containerName string) (*blob.Bucket, error) {
-	o, err := openerFromMSI(azureblob.AccountName(accountName), "", azureblob.Options{})
+	serviceURL, err := azureblob.NewServiceURL(&azureblob.ServiceURLOptions{
+		AccountName: accountName,
+	})
 	if err != nil {
 		return nil, err
 	}
-	url, err := url.Parse("azblob://" + containerName)
+	serviceClient, err := azureblob.NewDefaultServiceClient(serviceURL)
 	if err != nil {
 		return nil, err
 	}
-	return o.OpenBucketURL(ctx, url)
+	return azureblob.OpenBucket(ctx, serviceClient, containerName, &azureblob.Options{})
 }
 
 func GCP(ctx context.Context, bucket string, jsonCredentials []byte) (*blob.Bucket, error) {

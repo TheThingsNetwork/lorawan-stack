@@ -22,14 +22,14 @@ import (
 	"runtime/trace"
 	"strings"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
+	"go.thethings.network/lorawan-stack/v3/pkg/goproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/normalizedpayload"
 	"go.thethings.network/lorawan-stack/v3/pkg/scripting"
 	js "go.thethings.network/lorawan-stack/v3/pkg/scripting/javascript"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 type host struct {
@@ -133,7 +133,7 @@ func (*host) encodeDownlink(
 	if decoded == nil {
 		return nil
 	}
-	data, err := gogoproto.Map(decoded)
+	data, err := goproto.Map(decoded)
 	if err != nil {
 		return errInput.WithCause(err)
 	}
@@ -305,7 +305,7 @@ func (*host) decodeUplink(
 	if errs := output.Decoded.Errors; len(errs) > 0 {
 		return errOutputErrors.WithAttributes("errors", strings.Join(errs, ", "))
 	}
-	decodedPayload, err := gogoproto.Struct(output.Decoded.Data)
+	decodedPayload, err := goproto.Struct(output.Decoded.Data)
 	if err != nil {
 		return errOutput.WithCause(err)
 	}
@@ -337,9 +337,9 @@ func (*host) decodeUplink(
 			}
 			measurements = []map[string]interface{}{measurement}
 		}
-		normalizedPayload := make([]*pbtypes.Struct, len(measurements))
+		normalizedPayload := make([]*structpb.Struct, len(measurements))
 		for i := range measurements {
-			pb, err := gogoproto.Struct(measurements[i])
+			pb, err := goproto.Struct(measurements[i])
 			if err != nil {
 				return errOutput.WithCause(err)
 			}
@@ -350,7 +350,7 @@ func (*host) decodeUplink(
 		if err != nil {
 			return errOutput.WithCause(err)
 		}
-		msg.NormalizedPayload = make([]*pbtypes.Struct, 0, len(normalizedMeasurements))
+		msg.NormalizedPayload = make([]*structpb.Struct, 0, len(normalizedMeasurements))
 		for _, measurement := range normalizedMeasurements {
 			if len(measurement.Valid.GetFields()) == 0 {
 				continue
@@ -364,12 +364,12 @@ func (*host) decodeUplink(
 		// If the normalizer is not set, the decoder may return already normalized payload.
 		// This is a best effort attempt to parse the decoded payload as normalized payload.
 		// If that does not return an error, the decoded payload is assumed to be normalized.
-		normalizedPayload := []*pbtypes.Struct{
+		normalizedPayload := []*structpb.Struct{
 			decodedPayload,
 		}
 		normalizedMeasurements, err := normalizedpayload.Parse(normalizedPayload)
 		if err == nil {
-			msg.NormalizedPayload = make([]*pbtypes.Struct, 0, len(normalizedMeasurements))
+			msg.NormalizedPayload = make([]*structpb.Struct, 0, len(normalizedMeasurements))
 			for _, measurement := range normalizedMeasurements {
 				if len(measurement.Valid.GetFields()) == 0 {
 					continue
@@ -474,7 +474,7 @@ func (*host) decodeDownlink(
 		return errOutputErrors.WithAttributes("errors", strings.Join(output.Errors, ", "))
 	}
 
-	s, err := gogoproto.Struct(output.Data)
+	s, err := goproto.Struct(output.Data)
 	if err != nil {
 		return errOutput.WithCause(err)
 	}

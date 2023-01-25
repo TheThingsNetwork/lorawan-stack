@@ -21,6 +21,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // HealthStatusRegistry is a registry for webhook health status.
@@ -190,7 +191,7 @@ func (hcs *healthCheckSink) executeAndRecord(r *http.Request, healthy bool) erro
 			Status: &ttnpb.ApplicationWebhookHealth_Unhealthy{
 				Unhealthy: &ttnpb.ApplicationWebhookHealth_WebhookHealthStatusUnhealthy{
 					FailedAttempts:           h.GetUnhealthy().GetFailedAttempts() + 1,
-					LastFailedAttemptAt:      ttnpb.ProtoTimePtr(time.Now()),
+					LastFailedAttemptAt:      timestamppb.Now(),
 					LastFailedAttemptDetails: details,
 				},
 			},

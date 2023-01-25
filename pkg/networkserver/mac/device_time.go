@@ -17,10 +17,9 @@ package mac
 import (
 	"context"
 
-	pbtypes "github.com/gogo/protobuf/types"
-
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (
@@ -44,8 +43,8 @@ func HandleDeviceTimeReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.U
 	}, nil
 }
 
-func messageTimestamp(msg *ttnpb.UplinkMessage) *pbtypes.Timestamp {
-	var ts *pbtypes.Timestamp
+func messageTimestamp(msg *ttnpb.UplinkMessage) *timestamppb.Timestamp {
+	var ts *timestamppb.Timestamp
 	for _, md := range msg.RxMetadata {
 		if t := md.GpsTime; t != nil {
 			return t

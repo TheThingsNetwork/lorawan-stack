@@ -824,8 +824,7 @@ func (dst *ApplicationPubSub_MQTTProvider) SetFields(src *ApplicationPubSub_MQTT
 			if src != nil {
 				dst.SubscribeQos = src.SubscribeQos
 			} else {
-				var zero ApplicationPubSub_MQTTProvider_QoS
-				dst.SubscribeQos = zero
+				dst.SubscribeQos = 0
 			}
 		case "publish_qos":
 			if len(subs) > 0 {
@@ -834,8 +833,7 @@ func (dst *ApplicationPubSub_MQTTProvider) SetFields(src *ApplicationPubSub_MQTT
 			if src != nil {
 				dst.PublishQos = src.PublishQos
 			} else {
-				var zero ApplicationPubSub_MQTTProvider_QoS
-				dst.PublishQos = zero
+				dst.PublishQos = 0
 			}
 		case "use_tls":
 			if len(subs) > 0 {

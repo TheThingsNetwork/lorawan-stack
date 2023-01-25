@@ -14,7 +14,7 @@
 
 package ttnpb
 
-import "github.com/gogo/protobuf/types"
+import emptypb "google.golang.org/protobuf/types/known/emptypb"
 
 // Empty message in an RPC call.
-var Empty = new(types.Empty)
+var Empty = new(emptypb.Empty)

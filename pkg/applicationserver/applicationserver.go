@@ -22,8 +22,7 @@ import (
 	"runtime/trace"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/distribution"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	iogrpc "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/grpc"
@@ -54,6 +53,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // ApplicationServer implements the Application Server component.
@@ -358,7 +359,7 @@ func (as *ApplicationServer) processUpAsync(ctx context.Context, up *ttnpb.Appli
 // lastSeenAtInfo holds the information needed for a worker to store entry in the LastSeen map.
 type lastSeenAtInfo struct {
 	ids        *ttnpb.EndDeviceIdentifiers
-	lastSeenAt *pbtypes.Timestamp
+	lastSeenAt *timestamppb.Timestamp
 }
 
 func (as *ApplicationServer) storeDeviceLastSeen(ctx context.Context, lastSeenEntry lastSeenAtInfo) {
@@ -537,7 +538,7 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 
 type downlinkQueueOperation struct {
 	Items             []*ttnpb.ApplicationDownlink
-	Operation         func(ttnpb.AsNsClient, context.Context, *ttnpb.DownlinkQueueRequest, ...grpc.CallOption) (*pbtypes.Empty, error)
+	Operation         func(ttnpb.AsNsClient, context.Context, *ttnpb.DownlinkQueueRequest, ...grpc.CallOption) (*emptypb.Empty, error)
 	SkipSessionKeyIDs [][]byte
 	ResultFunc        func(decrypted, encrypted []*ttnpb.ApplicationDownlink, err error)
 }
@@ -615,7 +616,7 @@ func (as *ApplicationServer) attemptDownlinkQueueOp(ctx context.Context, dev *tt
 	}
 }
 
-func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink, op func(ttnpb.AsNsClient, context.Context, *ttnpb.DownlinkQueueRequest, ...grpc.CallOption) (*pbtypes.Empty, error)) error {
+func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink, op func(ttnpb.AsNsClient, context.Context, *ttnpb.DownlinkQueueRequest, ...grpc.CallOption) (*emptypb.Empty, error)) error {
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("as:downlink:%s", events.NewCorrelationID()))
 	link, err := as.getLink(ctx, ids.ApplicationIds, []string{
 		"default_formatters",
@@ -1032,7 +1033,7 @@ func (as *ApplicationServer) setActivated(ctx context.Context, ids *ttnpb.EndDev
 	_, err = ttnpb.NewEndDeviceRegistryClient(cc).Update(ctx, &ttnpb.UpdateEndDeviceRequest{
 		EndDevice: &ttnpb.EndDevice{
 			Ids:         ids,
-			ActivatedAt: ttnpb.ProtoTimePtr(now),
+			ActivatedAt: timestamppb.New(now),
 		},
 		FieldMask: ttnpb.FieldMask(mask...),
 	}, as.WithClusterAuth())
@@ -1045,7 +1046,7 @@ func (as *ApplicationServer) setActivated(ctx context.Context, ids *ttnpb.EndDev
 			if dev == nil {
 				return nil, nil, errDeviceNotFound.WithAttributes("device_uid", unique.ID(ctx, ids))
 			}
-			dev.ActivatedAt = ttnpb.ProtoTimePtr(now)
+			dev.ActivatedAt = timestamppb.New(now)
 			return dev, mask, nil
 		},
 	); err != nil {
@@ -1088,7 +1089,7 @@ func (as *ApplicationServer) publishNormalizedUplink(ctx context.Context, info u
 
 type uplinkInfo struct {
 	ids        *ttnpb.EndDeviceIdentifiers
-	receivedAt *pbtypes.Timestamp
+	receivedAt *timestamppb.Timestamp
 	uplink     *ttnpb.ApplicationUplink
 	simulated  bool
 	link       *ttnpb.ApplicationLink

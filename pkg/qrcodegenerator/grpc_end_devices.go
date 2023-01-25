@@ -17,11 +17,11 @@ package qrcodegenerator
 import (
 	"context"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	qrcodegen "github.com/skip2/go-qrcode"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var errUnauthenticated = errors.DefineUnauthenticated("unauthenticated", "call was not authenticated")
@@ -46,7 +46,7 @@ func (s *endDeviceQRCodeGeneratorServer) GetFormat(ctx context.Context, req *ttn
 }
 
 // ListFormats implements EndDeviceQRCodeGenerator.
-func (s *endDeviceQRCodeGeneratorServer) ListFormats(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.QRCodeFormats, error) {
+func (s *endDeviceQRCodeGeneratorServer) ListFormats(ctx context.Context, _ *emptypb.Empty) (*ttnpb.QRCodeFormats, error) {
 	_, err := rpcmetadata.WithForwardedAuth(ctx, s.QRG.AllowInsecureForCredentials())
 	if err != nil {
 		return nil, err

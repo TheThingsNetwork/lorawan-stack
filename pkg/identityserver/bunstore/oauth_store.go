@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // ClientAuthorization is the OAuth client authorization model in the database.
@@ -57,8 +58,8 @@ func clientAuthorizationToPB(
 		UserIds:   userIDs,
 		ClientIds: clientIDs,
 		Rights:    convertIntSlice[int, ttnpb.Right](m.Rights),
-		CreatedAt: ttnpb.ProtoTimePtr(m.CreatedAt),
-		UpdatedAt: ttnpb.ProtoTimePtr(m.UpdatedAt),
+		CreatedAt: timestamppb.New(m.CreatedAt),
+		UpdatedAt: timestamppb.New(m.UpdatedAt),
 	}
 	if pb.UserIds == nil && m.User != nil {
 		pb.UserIds = &ttnpb.UserIdentifiers{
@@ -116,7 +117,7 @@ func authorizationCodeToPB(
 		Code:          m.Code,
 		RedirectUri:   m.RedirectURI,
 		State:         m.State,
-		CreatedAt:     ttnpb.ProtoTimePtr(m.CreatedAt),
+		CreatedAt:     timestamppb.New(m.CreatedAt),
 		ExpiresAt:     ttnpb.ProtoTime(m.ExpiresAt),
 	}
 	if pb.UserIds == nil && m.User != nil {
@@ -179,7 +180,7 @@ func accessTokenToPB(
 		AccessToken:   m.AccessToken,
 		RefreshToken:  m.RefreshToken,
 		Rights:        convertIntSlice[int, ttnpb.Right](m.Rights),
-		CreatedAt:     ttnpb.ProtoTimePtr(m.CreatedAt),
+		CreatedAt:     timestamppb.New(m.CreatedAt),
 		ExpiresAt:     ttnpb.ProtoTime(m.ExpiresAt),
 	}
 	if pb.UserIds == nil && m.User != nil {

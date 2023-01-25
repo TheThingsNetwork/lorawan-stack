@@ -17,9 +17,10 @@ package band
 import (
 	"context"
 
-	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"golang.org/x/exp/maps"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // GetPhyVersions returns the list of supported phy versions for the given band.
@@ -128,15 +129,15 @@ func (b Band) BandDescription() *ttnpb.BandDescription {
 		FreqMultiplier:         b.FreqMultiplier,
 		ImplementsCfList:       b.ImplementsCFList,
 		CfListType:             b.CFListType,
-		ReceiveDelay_1:         types.DurationProto(b.ReceiveDelay1),
-		ReceiveDelay_2:         types.DurationProto(b.ReceiveDelay2),
-		JoinAcceptDelay_1:      types.DurationProto(b.JoinAcceptDelay1),
-		JoinAcceptDelay_2:      types.DurationProto(b.JoinAcceptDelay2),
+		ReceiveDelay_1:         durationpb.New(b.ReceiveDelay1),
+		ReceiveDelay_2:         durationpb.New(b.ReceiveDelay2),
+		JoinAcceptDelay_1:      durationpb.New(b.JoinAcceptDelay1),
+		JoinAcceptDelay_2:      durationpb.New(b.JoinAcceptDelay2),
 		MaxFcntGap:             uint64(b.MaxFCntGap),
 		SupportsDynamicAdr:     b.SupportsDynamicADR,
 		AdrAckLimit:            b.ADRAckLimit,
-		MinRetransmitTimeout:   types.DurationProto(b.MinRetransmitTimeout),
-		MaxRetransmitTimeout:   types.DurationProto(b.MaxRetransmitTimeout),
+		MinRetransmitTimeout:   durationpb.New(b.MinRetransmitTimeout),
+		MaxRetransmitTimeout:   durationpb.New(b.MaxRetransmitTimeout),
 		TxOffset:               b.TxOffset,
 		MaxAdrDataRateIndex:    b.MaxADRDataRateIndex,
 		TxParamSetupReqSupport: b.TxParamSetupReqSupport,
@@ -182,13 +183,13 @@ func (b Band) BandDescription() *ttnpb.BandDescription {
 	}
 
 	if b.BootDwellTime.Uplinks != nil {
-		bandDescription.BootDwellTime.Uplinks = &types.BoolValue{
+		bandDescription.BootDwellTime.Uplinks = &wrapperspb.BoolValue{
 			Value: *b.BootDwellTime.Uplinks,
 		}
 	}
 
 	if b.BootDwellTime.Downlinks != nil {
-		bandDescription.BootDwellTime.Downlinks = &types.BoolValue{
+		bandDescription.BootDwellTime.Downlinks = &wrapperspb.BoolValue{
 			Value: *b.BootDwellTime.Downlinks,
 		}
 	}

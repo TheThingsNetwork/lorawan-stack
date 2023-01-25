@@ -15,13 +15,13 @@
 package networkserver
 
 import (
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // ApplicationUplinkQueueConfig defines application uplink queue configuration.
@@ -61,7 +61,7 @@ func (c MACSettingConfig) Parse() *ttnpb.MACSettings {
 		StatusTimePeriodicity: ttnpb.ProtoDuration(c.StatusTimePeriodicity),
 	}
 	if c.ADRMargin != nil {
-		p.AdrMargin = &pbtypes.FloatValue{Value: *c.ADRMargin}
+		p.AdrMargin = &wrapperspb.FloatValue{Value: *c.ADRMargin}
 	}
 	if c.DesiredRx1Delay != nil {
 		p.DesiredRx1Delay = &ttnpb.RxDelayValue{Value: *c.DesiredRx1Delay}
@@ -76,7 +76,7 @@ func (c MACSettingConfig) Parse() *ttnpb.MACSettings {
 		p.DesiredAdrAckDelayExponent = &ttnpb.ADRAckDelayExponentValue{Value: *c.DesiredADRAckDelayExponent}
 	}
 	if c.StatusCountPeriodicity != nil {
-		p.StatusCountPeriodicity = &pbtypes.UInt32Value{Value: *c.StatusCountPeriodicity}
+		p.StatusCountPeriodicity = &wrapperspb.UInt32Value{Value: *c.StatusCountPeriodicity}
 	}
 	return p
 }

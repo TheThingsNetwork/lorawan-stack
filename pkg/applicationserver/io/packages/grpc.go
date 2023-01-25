@@ -18,11 +18,11 @@ import (
 	"context"
 	"strconv"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // appendImplicitAssociationsGetPaths appends implicit ttnpb.ApplicationPackageAssociation get paths to paths.
@@ -92,7 +92,7 @@ func (s *server) SetAssociation(ctx context.Context, req *ttnpb.SetApplicationPa
 }
 
 // DeleteAssociation implements ttnpb.ApplicationPackageRegistryServer.
-func (s *server) DeleteAssociation(ctx context.Context, ids *ttnpb.ApplicationPackageAssociationIdentifiers) (*pbtypes.Empty, error) {
+func (s *server) DeleteAssociation(ctx context.Context, ids *ttnpb.ApplicationPackageAssociationIdentifiers) (*emptypb.Empty, error) {
 	if err := rights.RequireApplication(ctx, ids.EndDeviceIds.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
 		return nil, err
 	}
@@ -155,7 +155,7 @@ func (s *server) SetDefaultAssociation(ctx context.Context, req *ttnpb.SetApplic
 }
 
 // DeleteDefaultAssociation implements ttnpb.ApplicationPackageRegistryServer.
-func (s *server) DeleteDefaultAssociation(ctx context.Context, ids *ttnpb.ApplicationPackageDefaultAssociationIdentifiers) (*pbtypes.Empty, error) {
+func (s *server) DeleteDefaultAssociation(ctx context.Context, ids *ttnpb.ApplicationPackageDefaultAssociationIdentifiers) (*emptypb.Empty, error) {
 	if err := rights.RequireApplication(ctx, ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
 		return nil, err
 	}

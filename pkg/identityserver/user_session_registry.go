@@ -17,10 +17,10 @@ package identityserver
 import (
 	"context"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func (is *IdentityServer) listUserSessions(ctx context.Context, req *ttnpb.ListUserSessionsRequest) (sessions *ttnpb.UserSessions, err error) {
@@ -53,7 +53,7 @@ func (is *IdentityServer) listUserSessions(ctx context.Context, req *ttnpb.ListU
 	return sessions, nil
 }
 
-func (is *IdentityServer) deleteUserSession(ctx context.Context, req *ttnpb.UserSessionIdentifiers) (*pbtypes.Empty, error) {
+func (is *IdentityServer) deleteUserSession(ctx context.Context, req *ttnpb.UserSessionIdentifiers) (*emptypb.Empty, error) {
 	if err := rights.RequireUser(ctx, req.GetUserIds(), ttnpb.Right_RIGHT_USER_ALL); err != nil {
 		return nil, err
 	}
@@ -76,6 +76,6 @@ func (ur *userSessionRegistry) List(ctx context.Context, req *ttnpb.ListUserSess
 	return ur.listUserSessions(ctx, req)
 }
 
-func (ur *userSessionRegistry) Delete(ctx context.Context, req *ttnpb.UserSessionIdentifiers) (*pbtypes.Empty, error) {
+func (ur *userSessionRegistry) Delete(ctx context.Context, req *ttnpb.UserSessionIdentifiers) (*emptypb.Empty, error) {
 	return ur.deleteUserSession(ctx, req)
 }

@@ -28,6 +28,7 @@ import (
 	bunstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/bunstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var errPasswordMismatch = errors.DefineInvalidArgument("password_mismatch", "password did not match")
@@ -107,9 +108,9 @@ var createAdminUserCommand = &cobra.Command{
 			usrExists = true
 		}
 		usr.PrimaryEmailAddress = email
-		usr.PrimaryEmailAddressValidatedAt = ttnpb.ProtoTimePtr(now)
+		usr.PrimaryEmailAddressValidatedAt = timestamppb.New(now)
 		usr.Password = hashedPassword
-		usr.PasswordUpdatedAt = ttnpb.ProtoTimePtr(now)
+		usr.PasswordUpdatedAt = timestamppb.New(now)
 		usr.State = ttnpb.State_STATE_APPROVED
 		usr.Admin = true
 

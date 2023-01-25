@@ -18,7 +18,6 @@ import (
 	"context"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
 	"go.thethings.network/lorawan-stack/v3/pkg/email/templates"
@@ -26,6 +25,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var evtCreateInvitation = events.Define(
@@ -57,7 +58,7 @@ func (is *IdentityServer) sendInvitation(ctx context.Context, in *ttnpb.SendInvi
 	invitation := &ttnpb.Invitation{
 		Email:     in.Email,
 		Token:     token,
-		ExpiresAt: ttnpb.ProtoTimePtr(expires),
+		ExpiresAt: timestamppb.New(expires),
 	}
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		invitation, err = st.CreateInvitation(ctx, invitation)
@@ -104,7 +105,7 @@ func (is *IdentityServer) listInvitations(ctx context.Context, req *ttnpb.ListIn
 	return invitations, nil
 }
 
-func (is *IdentityServer) deleteInvitation(ctx context.Context, in *ttnpb.DeleteInvitationRequest) (*pbtypes.Empty, error) {
+func (is *IdentityServer) deleteInvitation(ctx context.Context, in *ttnpb.DeleteInvitationRequest) (*emptypb.Empty, error) {
 	authInfo, err := is.authInfo(ctx)
 	if err != nil {
 		return nil, err
@@ -135,6 +136,6 @@ func (ir *invitationRegistry) List(ctx context.Context, req *ttnpb.ListInvitatio
 	return ir.listInvitations(ctx, req)
 }
 
-func (ir *invitationRegistry) Delete(ctx context.Context, req *ttnpb.DeleteInvitationRequest) (*pbtypes.Empty, error) {
+func (ir *invitationRegistry) Delete(ctx context.Context, req *ttnpb.DeleteInvitationRequest) (*emptypb.Empty, error) {
 	return ir.deleteInvitation(ctx, req)
 }

@@ -152,8 +152,7 @@ func (dst *User) SetFields(src *User, paths ...string) error {
 			if src != nil {
 				dst.State = src.State
 			} else {
-				var zero State
-				dst.State = zero
+				dst.State = 0
 			}
 		case "state_description":
 			if len(subs) > 0 {

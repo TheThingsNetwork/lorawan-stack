@@ -13,15 +13,14 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/golang/protobuf/descriptor"
-	"github.com/golang/protobuf/proto"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/grpc-ecosystem/grpc-gateway/utilities"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/utilities"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 )
 
 // Suppress "imported and not used" errors
@@ -30,7 +29,6 @@ var _ io.Reader
 var _ status.Status
 var _ = runtime.String
 var _ = utilities.NewDoubleArray
-var _ = descriptor.ForMessage
 var _ = metadata.Join
 
 var (
@@ -54,7 +52,6 @@ func request_ApplicationUpStorage_GetStoredApplicationUp_0(ctx context.Context, 
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "end_device_ids.application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device_ids.application_ids.application_id", err)
 	}
@@ -65,7 +62,6 @@ func request_ApplicationUpStorage_GetStoredApplicationUp_0(ctx context.Context, 
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "end_device_ids.device_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device_ids.device_id", err)
 	}
@@ -76,7 +72,6 @@ func request_ApplicationUpStorage_GetStoredApplicationUp_0(ctx context.Context, 
 	}
 
 	protoReq.Type, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "type", err)
 	}
@@ -122,7 +117,6 @@ func request_ApplicationUpStorage_GetStoredApplicationUp_1(ctx context.Context, 
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
@@ -133,7 +127,6 @@ func request_ApplicationUpStorage_GetStoredApplicationUp_1(ctx context.Context, 
 	}
 
 	protoReq.Type, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "type", err)
 	}
@@ -179,7 +172,6 @@ func request_ApplicationUpStorage_GetStoredApplicationUpCount_0(ctx context.Cont
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "end_device_ids.application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device_ids.application_ids.application_id", err)
 	}
@@ -190,7 +182,6 @@ func request_ApplicationUpStorage_GetStoredApplicationUpCount_0(ctx context.Cont
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "end_device_ids.device_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device_ids.device_id", err)
 	}
@@ -201,7 +192,6 @@ func request_ApplicationUpStorage_GetStoredApplicationUpCount_0(ctx context.Cont
 	}
 
 	protoReq.Type, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "type", err)
 	}
@@ -235,7 +225,6 @@ func local_request_ApplicationUpStorage_GetStoredApplicationUpCount_0(ctx contex
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "end_device_ids.application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device_ids.application_ids.application_id", err)
 	}
@@ -246,7 +235,6 @@ func local_request_ApplicationUpStorage_GetStoredApplicationUpCount_0(ctx contex
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "end_device_ids.device_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device_ids.device_id", err)
 	}
@@ -257,7 +245,6 @@ func local_request_ApplicationUpStorage_GetStoredApplicationUpCount_0(ctx contex
 	}
 
 	protoReq.Type, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "type", err)
 	}
@@ -295,7 +282,6 @@ func request_ApplicationUpStorage_GetStoredApplicationUpCount_1(ctx context.Cont
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
@@ -306,7 +292,6 @@ func request_ApplicationUpStorage_GetStoredApplicationUpCount_1(ctx context.Cont
 	}
 
 	protoReq.Type, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "type", err)
 	}
@@ -340,7 +325,6 @@ func local_request_ApplicationUpStorage_GetStoredApplicationUpCount_1(ctx contex
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
@@ -351,7 +335,6 @@ func local_request_ApplicationUpStorage_GetStoredApplicationUpCount_1(ctx contex
 	}
 
 	protoReq.Type, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "type", err)
 	}
@@ -394,20 +377,22 @@ func RegisterApplicationUpStorageHandlerServer(ctx context.Context, mux *runtime
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.ApplicationUpStorage/GetStoredApplicationUpCount", runtime.WithHTTPPathPattern("/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/packages/storage/{type}/count"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ApplicationUpStorage_GetStoredApplicationUpCount_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ApplicationUpStorage_GetStoredApplicationUpCount_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationUpStorage_GetStoredApplicationUpCount_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationUpStorage_GetStoredApplicationUpCount_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -417,20 +402,22 @@ func RegisterApplicationUpStorageHandlerServer(ctx context.Context, mux *runtime
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.ApplicationUpStorage/GetStoredApplicationUpCount", runtime.WithHTTPPathPattern("/as/applications/{application_ids.application_id}/packages/storage/{type}/count"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ApplicationUpStorage_GetStoredApplicationUpCount_1(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ApplicationUpStorage_GetStoredApplicationUpCount_1(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationUpStorage_GetStoredApplicationUpCount_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationUpStorage_GetStoredApplicationUpCount_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -479,19 +466,21 @@ func RegisterApplicationUpStorageHandlerClient(ctx context.Context, mux *runtime
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.ApplicationUpStorage/GetStoredApplicationUp", runtime.WithHTTPPathPattern("/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/packages/storage/{type}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationUpStorage_GetStoredApplicationUp_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_ApplicationUpStorage_GetStoredApplicationUp_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationUpStorage_GetStoredApplicationUp_0(ctx, mux, outboundMarshaler, w, req, func() (proto.Message, error) { return resp.Recv() }, mux.GetForwardResponseOptions()...)
+		forward_ApplicationUpStorage_GetStoredApplicationUp_0(annotatedContext, mux, outboundMarshaler, w, req, func() (proto.Message, error) { return resp.Recv() }, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -499,19 +488,21 @@ func RegisterApplicationUpStorageHandlerClient(ctx context.Context, mux *runtime
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.ApplicationUpStorage/GetStoredApplicationUp", runtime.WithHTTPPathPattern("/as/applications/{application_ids.application_id}/packages/storage/{type}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationUpStorage_GetStoredApplicationUp_1(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_ApplicationUpStorage_GetStoredApplicationUp_1(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationUpStorage_GetStoredApplicationUp_1(ctx, mux, outboundMarshaler, w, req, func() (proto.Message, error) { return resp.Recv() }, mux.GetForwardResponseOptions()...)
+		forward_ApplicationUpStorage_GetStoredApplicationUp_1(annotatedContext, mux, outboundMarshaler, w, req, func() (proto.Message, error) { return resp.Recv() }, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -519,19 +510,21 @@ func RegisterApplicationUpStorageHandlerClient(ctx context.Context, mux *runtime
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.ApplicationUpStorage/GetStoredApplicationUpCount", runtime.WithHTTPPathPattern("/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/packages/storage/{type}/count"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationUpStorage_GetStoredApplicationUpCount_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_ApplicationUpStorage_GetStoredApplicationUpCount_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationUpStorage_GetStoredApplicationUpCount_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationUpStorage_GetStoredApplicationUpCount_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -539,19 +532,21 @@ func RegisterApplicationUpStorageHandlerClient(ctx context.Context, mux *runtime
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.ApplicationUpStorage/GetStoredApplicationUpCount", runtime.WithHTTPPathPattern("/as/applications/{application_ids.application_id}/packages/storage/{type}/count"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationUpStorage_GetStoredApplicationUpCount_1(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_ApplicationUpStorage_GetStoredApplicationUpCount_1(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApplicationUpStorage_GetStoredApplicationUpCount_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApplicationUpStorage_GetStoredApplicationUpCount_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -559,13 +554,13 @@ func RegisterApplicationUpStorageHandlerClient(ctx context.Context, mux *runtime
 }
 
 var (
-	pattern_ApplicationUpStorage_GetStoredApplicationUp_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 2, 6, 1, 0, 4, 1, 5, 7}, []string{"as", "applications", "end_device_ids.application_ids.application_id", "devices", "end_device_ids.device_id", "packages", "storage", "type"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationUpStorage_GetStoredApplicationUp_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 2, 6, 1, 0, 4, 1, 5, 7}, []string{"as", "applications", "end_device_ids.application_ids.application_id", "devices", "end_device_ids.device_id", "packages", "storage", "type"}, ""))
 
-	pattern_ApplicationUpStorage_GetStoredApplicationUp_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"as", "applications", "application_ids.application_id", "packages", "storage", "type"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationUpStorage_GetStoredApplicationUp_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"as", "applications", "application_ids.application_id", "packages", "storage", "type"}, ""))
 
-	pattern_ApplicationUpStorage_GetStoredApplicationUpCount_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8}, []string{"as", "applications", "end_device_ids.application_ids.application_id", "devices", "end_device_ids.device_id", "packages", "storage", "type", "count"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationUpStorage_GetStoredApplicationUpCount_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8}, []string{"as", "applications", "end_device_ids.application_ids.application_id", "devices", "end_device_ids.device_id", "packages", "storage", "type", "count"}, ""))
 
-	pattern_ApplicationUpStorage_GetStoredApplicationUpCount_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"as", "applications", "application_ids.application_id", "packages", "storage", "type", "count"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationUpStorage_GetStoredApplicationUpCount_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"as", "applications", "application_ids.application_id", "packages", "storage", "type", "count"}, ""))
 )
 
 var (

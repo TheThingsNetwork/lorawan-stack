@@ -25,11 +25,12 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
 var (
@@ -100,7 +101,7 @@ func validateMessage(ctx context.Context, fullMethod string, msg interface{}) er
 	var paths []string
 	switch v := msg.(type) {
 	case interface {
-		GetFieldMask() *types.FieldMask
+		GetFieldMask() *fieldmaskpb.FieldMask
 	}:
 		paths = v.GetFieldMask().GetPaths()
 	}
@@ -173,7 +174,7 @@ func validateMessage(ctx context.Context, fullMethod string, msg interface{}) er
 		}
 		return nil
 
-	case *types.Empty:
+	case *emptypb.Empty:
 		return nil
 
 	default:
@@ -194,7 +195,7 @@ func validateMessage(ctx context.Context, fullMethod string, msg interface{}) er
 // if that error is a TTN error, or with an `InvalidArgument` if it isn't.
 //
 // If the RPC's FullPath has a registered list of allowed field mask paths (see
-// RegisterAllowedFieldMaskPaths) and the message implements GetFieldMask() types.FieldMask
+// RegisterAllowedFieldMaskPaths) and the message implements GetFieldMask() fieldmaskpb.FieldMask
 // then the field mask paths are validated according to the registered list.
 func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
@@ -238,7 +239,7 @@ func (s *recvWrapper) RecvMsg(msg interface{}) error {
 // RPCs, the messages will be rejected on calls to `stream.Recv()`.
 //
 // If the RPC's FullPath has a registered list of allowed field mask paths (see
-// RegisterAllowedFieldMaskPaths) and the message implements GetFieldMask() types.FieldMask
+// RegisterAllowedFieldMaskPaths) and the message implements GetFieldMask() fieldmaskpb.FieldMask
 // then the field mask paths are validated according to the registered list.
 func StreamServerInterceptor() grpc.StreamServerInterceptor {
 	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {

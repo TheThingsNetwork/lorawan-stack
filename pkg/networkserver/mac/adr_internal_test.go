@@ -22,11 +22,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 func NewADRUplink(
@@ -558,7 +558,7 @@ func TestClampTxPowerRange(t *testing.T) {
 					Adr: &ttnpb.ADRSettings{
 						Mode: &ttnpb.ADRSettings_Dynamic{
 							Dynamic: &ttnpb.ADRSettings_DynamicMode{
-								MinTxPowerIndex: &types.UInt32Value{
+								MinTxPowerIndex: &wrapperspb.UInt32Value{
 									Value: 3,
 								},
 							},
@@ -581,7 +581,7 @@ func TestClampTxPowerRange(t *testing.T) {
 					Adr: &ttnpb.ADRSettings{
 						Mode: &ttnpb.ADRSettings_Dynamic{
 							Dynamic: &ttnpb.ADRSettings_DynamicMode{
-								MinTxPowerIndex: &types.UInt32Value{
+								MinTxPowerIndex: &wrapperspb.UInt32Value{
 									Value: 5,
 								},
 							},
@@ -604,7 +604,7 @@ func TestClampTxPowerRange(t *testing.T) {
 					Adr: &ttnpb.ADRSettings{
 						Mode: &ttnpb.ADRSettings_Dynamic{
 							Dynamic: &ttnpb.ADRSettings_DynamicMode{
-								MinTxPowerIndex: &types.UInt32Value{
+								MinTxPowerIndex: &wrapperspb.UInt32Value{
 									Value: 12,
 								},
 							},
@@ -628,7 +628,7 @@ func TestClampTxPowerRange(t *testing.T) {
 					Adr: &ttnpb.ADRSettings{
 						Mode: &ttnpb.ADRSettings_Dynamic{
 							Dynamic: &ttnpb.ADRSettings_DynamicMode{
-								MaxTxPowerIndex: &types.UInt32Value{
+								MaxTxPowerIndex: &wrapperspb.UInt32Value{
 									Value: 3,
 								},
 							},
@@ -652,7 +652,7 @@ func TestClampTxPowerRange(t *testing.T) {
 					Adr: &ttnpb.ADRSettings{
 						Mode: &ttnpb.ADRSettings_Dynamic{
 							Dynamic: &ttnpb.ADRSettings_DynamicMode{
-								MaxTxPowerIndex: &types.UInt32Value{
+								MaxTxPowerIndex: &wrapperspb.UInt32Value{
 									Value: 5,
 								},
 							},
@@ -675,7 +675,7 @@ func TestClampTxPowerRange(t *testing.T) {
 					Adr: &ttnpb.ADRSettings{
 						Mode: &ttnpb.ADRSettings_Dynamic{
 							Dynamic: &ttnpb.ADRSettings_DynamicMode{
-								MaxTxPowerIndex: &types.UInt32Value{
+								MaxTxPowerIndex: &wrapperspb.UInt32Value{
 									Value: 12,
 								},
 							},
@@ -698,10 +698,10 @@ func TestClampTxPowerRange(t *testing.T) {
 					Adr: &ttnpb.ADRSettings{
 						Mode: &ttnpb.ADRSettings_Dynamic{
 							Dynamic: &ttnpb.ADRSettings_DynamicMode{
-								MinTxPowerIndex: &types.UInt32Value{
+								MinTxPowerIndex: &wrapperspb.UInt32Value{
 									Value: 2,
 								},
-								MaxTxPowerIndex: &types.UInt32Value{
+								MaxTxPowerIndex: &wrapperspb.UInt32Value{
 									Value: 3,
 								},
 							},
@@ -725,10 +725,10 @@ func TestClampTxPowerRange(t *testing.T) {
 					Adr: &ttnpb.ADRSettings{
 						Mode: &ttnpb.ADRSettings_Dynamic{
 							Dynamic: &ttnpb.ADRSettings_DynamicMode{
-								MinTxPowerIndex: &types.UInt32Value{
+								MinTxPowerIndex: &wrapperspb.UInt32Value{
 									Value: 3,
 								},
-								MaxTxPowerIndex: &types.UInt32Value{
+								MaxTxPowerIndex: &wrapperspb.UInt32Value{
 									Value: 6,
 								},
 							},
@@ -751,10 +751,10 @@ func TestClampTxPowerRange(t *testing.T) {
 					Adr: &ttnpb.ADRSettings{
 						Mode: &ttnpb.ADRSettings_Dynamic{
 							Dynamic: &ttnpb.ADRSettings_DynamicMode{
-								MinTxPowerIndex: &types.UInt32Value{
+								MinTxPowerIndex: &wrapperspb.UInt32Value{
 									Value: 7,
 								},
-								MaxTxPowerIndex: &types.UInt32Value{
+								MaxTxPowerIndex: &wrapperspb.UInt32Value{
 									Value: 9,
 								},
 							},
@@ -777,10 +777,10 @@ func TestClampTxPowerRange(t *testing.T) {
 					Adr: &ttnpb.ADRSettings{
 						Mode: &ttnpb.ADRSettings_Dynamic{
 							Dynamic: &ttnpb.ADRSettings_DynamicMode{
-								MinTxPowerIndex: &types.UInt32Value{
+								MinTxPowerIndex: &wrapperspb.UInt32Value{
 									Value: 7,
 								},
-								MaxTxPowerIndex: &types.UInt32Value{
+								MaxTxPowerIndex: &wrapperspb.UInt32Value{
 									Value: 11,
 								},
 							},
@@ -803,10 +803,10 @@ func TestClampTxPowerRange(t *testing.T) {
 					Adr: &ttnpb.ADRSettings{
 						Mode: &ttnpb.ADRSettings_Dynamic{
 							Dynamic: &ttnpb.ADRSettings_DynamicMode{
-								MinTxPowerIndex: &types.UInt32Value{
+								MinTxPowerIndex: &wrapperspb.UInt32Value{
 									Value: 12,
 								},
-								MaxTxPowerIndex: &types.UInt32Value{
+								MaxTxPowerIndex: &wrapperspb.UInt32Value{
 									Value: 15,
 								},
 							},
@@ -859,7 +859,7 @@ func TestClampNbTrans(t *testing.T) {
 					Adr: &ttnpb.ADRSettings{
 						Mode: &ttnpb.ADRSettings_Dynamic{
 							Dynamic: &ttnpb.ADRSettings_DynamicMode{
-								MinNbTrans: &types.UInt32Value{
+								MinNbTrans: &wrapperspb.UInt32Value{
 									Value: 1,
 								},
 							},
@@ -880,7 +880,7 @@ func TestClampNbTrans(t *testing.T) {
 					Adr: &ttnpb.ADRSettings{
 						Mode: &ttnpb.ADRSettings_Dynamic{
 							Dynamic: &ttnpb.ADRSettings_DynamicMode{
-								MinNbTrans: &types.UInt32Value{
+								MinNbTrans: &wrapperspb.UInt32Value{
 									Value: 3,
 								},
 							},
@@ -901,7 +901,7 @@ func TestClampNbTrans(t *testing.T) {
 					Adr: &ttnpb.ADRSettings{
 						Mode: &ttnpb.ADRSettings_Dynamic{
 							Dynamic: &ttnpb.ADRSettings_DynamicMode{
-								MaxNbTrans: &types.UInt32Value{
+								MaxNbTrans: &wrapperspb.UInt32Value{
 									Value: 3,
 								},
 							},
@@ -922,7 +922,7 @@ func TestClampNbTrans(t *testing.T) {
 					Adr: &ttnpb.ADRSettings{
 						Mode: &ttnpb.ADRSettings_Dynamic{
 							Dynamic: &ttnpb.ADRSettings_DynamicMode{
-								MaxNbTrans: &types.UInt32Value{
+								MaxNbTrans: &wrapperspb.UInt32Value{
 									Value: 7,
 								},
 							},
@@ -943,10 +943,10 @@ func TestClampNbTrans(t *testing.T) {
 					Adr: &ttnpb.ADRSettings{
 						Mode: &ttnpb.ADRSettings_Dynamic{
 							Dynamic: &ttnpb.ADRSettings_DynamicMode{
-								MinNbTrans: &types.UInt32Value{
+								MinNbTrans: &wrapperspb.UInt32Value{
 									Value: 2,
 								},
-								MaxNbTrans: &types.UInt32Value{
+								MaxNbTrans: &wrapperspb.UInt32Value{
 									Value: 3,
 								},
 							},
@@ -967,10 +967,10 @@ func TestClampNbTrans(t *testing.T) {
 					Adr: &ttnpb.ADRSettings{
 						Mode: &ttnpb.ADRSettings_Dynamic{
 							Dynamic: &ttnpb.ADRSettings_DynamicMode{
-								MinNbTrans: &types.UInt32Value{
+								MinNbTrans: &wrapperspb.UInt32Value{
 									Value: 7,
 								},
-								MaxNbTrans: &types.UInt32Value{
+								MaxNbTrans: &wrapperspb.UInt32Value{
 									Value: 9,
 								},
 							},
@@ -991,10 +991,10 @@ func TestClampNbTrans(t *testing.T) {
 					Adr: &ttnpb.ADRSettings{
 						Mode: &ttnpb.ADRSettings_Dynamic{
 							Dynamic: &ttnpb.ADRSettings_DynamicMode{
-								MinNbTrans: &types.UInt32Value{
+								MinNbTrans: &wrapperspb.UInt32Value{
 									Value: 12,
 								},
-								MaxNbTrans: &types.UInt32Value{
+								MaxNbTrans: &wrapperspb.UInt32Value{
 									Value: 15,
 								},
 							},

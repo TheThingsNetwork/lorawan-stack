@@ -18,13 +18,13 @@ import (
 	"context"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/blocklist"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var (
@@ -273,7 +273,7 @@ func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.Upd
 	return org, nil
 }
 
-func (is *IdentityServer) deleteOrganization(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*pbtypes.Empty, error) {
+func (is *IdentityServer) deleteOrganization(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*emptypb.Empty, error) {
 	if err := rights.RequireOrganization(ctx, ids, ttnpb.Right_RIGHT_ORGANIZATION_DELETE); err != nil {
 		return nil, err
 	}
@@ -287,7 +287,7 @@ func (is *IdentityServer) deleteOrganization(ctx context.Context, ids *ttnpb.Org
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) restoreOrganization(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*pbtypes.Empty, error) {
+func (is *IdentityServer) restoreOrganization(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*emptypb.Empty, error) {
 	if err := rights.RequireOrganization(store.WithSoftDeleted(ctx, false), ids, ttnpb.Right_RIGHT_ORGANIZATION_DELETE); err != nil {
 		return nil, err
 	}
@@ -312,7 +312,7 @@ func (is *IdentityServer) restoreOrganization(ctx context.Context, ids *ttnpb.Or
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) purgeOrganization(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*pbtypes.Empty, error) {
+func (is *IdentityServer) purgeOrganization(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*emptypb.Empty, error) {
 	if !is.IsAdmin(ctx) {
 		return nil, errAdminsPurgeOrganizations.New()
 	}
@@ -361,14 +361,14 @@ func (or *organizationRegistry) Update(ctx context.Context, req *ttnpb.UpdateOrg
 	return or.updateOrganization(ctx, req)
 }
 
-func (or *organizationRegistry) Delete(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*pbtypes.Empty, error) {
+func (or *organizationRegistry) Delete(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*emptypb.Empty, error) {
 	return or.deleteOrganization(ctx, req)
 }
 
-func (or *organizationRegistry) Restore(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*pbtypes.Empty, error) {
+func (or *organizationRegistry) Restore(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*emptypb.Empty, error) {
 	return or.restoreOrganization(ctx, req)
 }
 
-func (or *organizationRegistry) Purge(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*pbtypes.Empty, error) {
+func (or *organizationRegistry) Purge(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*emptypb.Empty, error) {
 	return or.purgeOrganization(ctx, req)
 }

@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	oauth_store "go.thethings.network/lorawan-stack/v3/pkg/oauth/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const redirectURISeparator = ";"
@@ -107,8 +108,8 @@ func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
 			Code:          data.Code,
 			RedirectUri:   data.RedirectUri,
 			State:         data.State,
-			CreatedAt:     ttnpb.ProtoTimePtr(data.CreatedAt),
-			ExpiresAt:     ttnpb.ProtoTimePtr(data.CreatedAt.Add(time.Duration(data.ExpiresIn) * time.Second)),
+			CreatedAt:     timestamppb.New(data.CreatedAt),
+			ExpiresAt:     timestamppb.New(data.CreatedAt.Add(time.Duration(data.ExpiresIn) * time.Second)),
 		})
 		return err
 	})
@@ -232,8 +233,8 @@ func (s *storage) SaveAccess(data *osin.AccessData) error {
 			Id:            accessID,
 			AccessToken:   accessHash,
 			RefreshToken:  refreshHash,
-			CreatedAt:     ttnpb.ProtoTimePtr(data.CreatedAt),
-			ExpiresAt:     ttnpb.ProtoTimePtr(data.CreatedAt.Add(time.Duration(data.ExpiresIn) * time.Second)),
+			CreatedAt:     timestamppb.New(data.CreatedAt),
+			ExpiresAt:     timestamppb.New(data.CreatedAt.Add(time.Duration(data.ExpiresIn) * time.Second)),
 		}, previousID)
 		return err
 	})

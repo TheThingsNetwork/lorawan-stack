@@ -43,7 +43,7 @@ func init() {
 
 func newClientRequestedData(_ context.Context, data email.NotificationTemplateData) (email.NotificationTemplateData, error) {
 	var emailMsg ttnpb.CreateClientEmailMessage
-	if err := ttnpb.UnmarshalAny(data.Notification().GetData(), &emailMsg); err != nil {
+	if err := data.Notification().GetData().UnmarshalTo(&emailMsg); err != nil {
 		return nil, err
 	}
 	return &ClientRequestedData{

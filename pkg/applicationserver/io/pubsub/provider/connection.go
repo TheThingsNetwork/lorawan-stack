@@ -18,11 +18,11 @@ import (
 	"context"
 	"reflect"
 
-	"github.com/golang/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"gocloud.dev/pubsub"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/proto"
 )
 
 // DownlinkSubscriptions contains the subscriptions for the push and replace queue operations.

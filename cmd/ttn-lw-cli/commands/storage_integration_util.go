@@ -19,10 +19,12 @@ import (
 	"sort"
 	"strings"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 var applicationUpFlags = util.NormalizedFlagSet()
@@ -67,7 +69,7 @@ func getStoredUpRequest(flags *pflag.FlagSet) (*ttnpb.GetStoredApplicationUpRequ
 
 	if flags.Changed("f-port") {
 		fport, _ := flags.GetUint32("f-port")
-		req.FPort = &pbtypes.UInt32Value{
+		req.FPort = &wrapperspb.UInt32Value{
 			Value: fport,
 		}
 	}
@@ -80,7 +82,7 @@ func getStoredUpRequest(flags *pflag.FlagSet) (*ttnpb.GetStoredApplicationUpRequ
 
 	if flags.Changed("limit") {
 		limit, _ := flags.GetUint32("limit")
-		req.Limit = &pbtypes.UInt32Value{
+		req.Limit = &wrapperspb.UInt32Value{
 			Value: limit,
 		}
 	}
@@ -117,7 +119,7 @@ func countStoredUpRequest(flags *pflag.FlagSet) (*ttnpb.GetStoredApplicationUpCo
 	}
 	if flags.Changed("f-port") {
 		fport, _ := flags.GetUint32("f-port")
-		req.FPort = &pbtypes.UInt32Value{
+		req.FPort = &wrapperspb.UInt32Value{
 			Value: fport,
 		}
 	}
@@ -126,7 +128,7 @@ func countStoredUpRequest(flags *pflag.FlagSet) (*ttnpb.GetStoredApplicationUpCo
 	return req, nil
 }
 
-func timeRangeFromFlags(flags *pflag.FlagSet) (beforePB *pbtypes.Timestamp, afterPB *pbtypes.Timestamp, lastPB *pbtypes.Duration, err error) {
+func timeRangeFromFlags(flags *pflag.FlagSet) (beforePB *timestamppb.Timestamp, afterPB *timestamppb.Timestamp, lastPB *durationpb.Duration, err error) {
 	if flags.Changed("last") && (hasTimestampFlags(flags, "after") || hasTimestampFlags(flags, "before")) {
 		return nil, nil, nil, fmt.Errorf("--last cannot be used with --after or --before flags")
 	}
@@ -135,18 +137,14 @@ func timeRangeFromFlags(flags *pflag.FlagSet) (beforePB *pbtypes.Timestamp, afte
 		return nil, nil, nil, err
 	}
 	if after != nil {
-		if afterPB, err = pbtypes.TimestampProto(*after); err != nil {
-			return nil, nil, nil, err
-		}
+		afterPB = timestamppb.New(*after)
 	}
 	before, err := getTimestampFlags(flags, "before")
 	if err != nil {
 		return nil, nil, nil, err
 	}
 	if before != nil {
-		if beforePB, err = pbtypes.TimestampProto(*before); err != nil {
-			return nil, nil, nil, err
-		}
+		beforePB = timestamppb.New(*before)
 	}
 
 	if flags.Changed("last") {
@@ -154,7 +152,7 @@ func timeRangeFromFlags(flags *pflag.FlagSet) (beforePB *pbtypes.Timestamp, afte
 		if err != nil {
 			return nil, nil, nil, err
 		}
-		lastPB = pbtypes.DurationProto(d)
+		lastPB = durationpb.New(d)
 	}
 	return
 }

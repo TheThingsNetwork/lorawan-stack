@@ -17,11 +17,11 @@ package mock
 import (
 	"context"
 
-	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // NetworkServer is a mock Network Server.
@@ -65,7 +65,7 @@ func (ns *NetworkServer) Publish(ctx context.Context, down *ttnpb.DownlinkMessag
 }
 
 // HandleUplink implements ttnpb.GsNsServer.
-func (ns *NetworkServer) HandleUplink(ctx context.Context, req *ttnpb.UplinkMessage) (*pbtypes.Empty, error) {
+func (ns *NetworkServer) HandleUplink(ctx context.Context, req *ttnpb.UplinkMessage) (*emptypb.Empty, error) {
 	select {
 	case ns.Uplink <- req:
 	default:
@@ -74,7 +74,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, req *ttnpb.UplinkMess
 }
 
 // ReportTxAcknowledgment implements ttnpb.GsNsServer.
-func (ns *NetworkServer) ReportTxAcknowledgment(_ context.Context, req *ttnpb.GatewayTxAcknowledgment) (*pbtypes.Empty, error) {
+func (ns *NetworkServer) ReportTxAcknowledgment(_ context.Context, req *ttnpb.GatewayTxAcknowledgment) (*emptypb.Empty, error) {
 	select {
 	case ns.TxAck <- req:
 	default:

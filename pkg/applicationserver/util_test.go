@@ -21,7 +21,6 @@ import (
 	"sync"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcserver"
@@ -29,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var testRights = []ttnpb.Right{
@@ -126,14 +126,14 @@ func (ns *mockNS) reset() {
 	ns.downlinkQueueMu.Unlock()
 }
 
-func (ns *mockNS) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
+func (ns *mockNS) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*emptypb.Empty, error) {
 	ns.downlinkQueueMu.Lock()
 	ns.downlinkQueue[unique.ID(ctx, req.EndDeviceIds)] = req.Downlinks
 	ns.downlinkQueueMu.Unlock()
 	return ttnpb.Empty, nil
 }
 
-func (ns *mockNS) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
+func (ns *mockNS) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*emptypb.Empty, error) {
 	ns.downlinkQueueMu.Lock()
 	uid := unique.ID(ctx, req.EndDeviceIds)
 	ns.downlinkQueue[uid] = append(ns.downlinkQueue[uid], req.Downlinks...)

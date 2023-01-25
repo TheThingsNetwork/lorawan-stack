@@ -20,7 +20,6 @@ import (
 	"testing"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -29,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 func DeleteDevice(ctx context.Context, r DeviceRegistry, ids *ttnpb.EndDeviceIdentifiers) error {
@@ -54,7 +54,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 				SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 			},
 		},
-		SkipPayloadCryptoOverride: &pbtypes.BoolValue{Value: true},
+		SkipPayloadCryptoOverride: &wrapperspb.BoolValue{Value: true},
 	}
 
 	ret, err := reg.Get(ctx, pb.Ids, ttnpb.EndDeviceFieldPathsTopLevel)
@@ -234,7 +234,7 @@ func handleLinkRegistryTest(t *testing.T, reg LinkRegistry) {
 		ApplicationId: "app-1",
 	}
 	app1 := &ttnpb.ApplicationLink{
-		SkipPayloadCrypto: &pbtypes.BoolValue{
+		SkipPayloadCrypto: &wrapperspb.BoolValue{
 			Value: true,
 		},
 	}
@@ -242,7 +242,7 @@ func handleLinkRegistryTest(t *testing.T, reg LinkRegistry) {
 		ApplicationId: "app-2",
 	}
 	app2 := &ttnpb.ApplicationLink{
-		SkipPayloadCrypto: &pbtypes.BoolValue{
+		SkipPayloadCrypto: &wrapperspb.BoolValue{
 			Value: false,
 		},
 	}

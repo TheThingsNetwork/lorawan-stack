@@ -22,7 +22,6 @@ import (
 	"net/url"
 	"strings"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -33,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var (
@@ -414,7 +414,7 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 	return dev, nil
 }
 
-func (is *IdentityServer) batchUpdateEndDeviceLastSeen(ctx context.Context, req *ttnpb.BatchUpdateEndDeviceLastSeenRequest) (*pbtypes.Empty, error) {
+func (is *IdentityServer) batchUpdateEndDeviceLastSeen(ctx context.Context, req *ttnpb.BatchUpdateEndDeviceLastSeenRequest) (*emptypb.Empty, error) {
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}
@@ -430,7 +430,7 @@ func (is *IdentityServer) batchUpdateEndDeviceLastSeen(ctx context.Context, req 
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) deleteEndDevice(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
+func (is *IdentityServer) deleteEndDevice(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*emptypb.Empty, error) {
 	if err := rights.RequireApplication(ctx, ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
@@ -480,10 +480,10 @@ func (dr *endDeviceRegistry) Update(ctx context.Context, req *ttnpb.UpdateEndDev
 	return dr.updateEndDevice(ctx, req)
 }
 
-func (dr *endDeviceRegistry) BatchUpdateLastSeen(ctx context.Context, req *ttnpb.BatchUpdateEndDeviceLastSeenRequest) (*pbtypes.Empty, error) {
+func (dr *endDeviceRegistry) BatchUpdateLastSeen(ctx context.Context, req *ttnpb.BatchUpdateEndDeviceLastSeenRequest) (*emptypb.Empty, error) {
 	return dr.batchUpdateEndDeviceLastSeen(ctx, req)
 }
 
-func (dr *endDeviceRegistry) Delete(ctx context.Context, req *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
+func (dr *endDeviceRegistry) Delete(ctx context.Context, req *ttnpb.EndDeviceIdentifiers) (*emptypb.Empty, error) {
 	return dr.deleteEndDevice(ctx, req)
 }

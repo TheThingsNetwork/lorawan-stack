@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (st *StoreTest) TestOAuthStore(t *T) {
@@ -193,7 +194,7 @@ func (st *StoreTest) TestOAuthStore(t *T) {
 			Code:          "CODE",
 			RedirectUri:   "https://example.com",
 			State:         "state",
-			ExpiresAt:     ttnpb.ProtoTimePtr(start.Add(5 * time.Minute)),
+			ExpiresAt:     timestamppb.New(start.Add(5 * time.Minute)),
 		})
 		if a.So(err, should.BeNil) && a.So(createdAuthorizationCode, should.NotBeNil) {
 			a.So(createdAuthorizationCode.UserIds, should.Resemble, usr1.GetIds())
@@ -273,7 +274,7 @@ func (st *StoreTest) TestOAuthStore(t *T) {
 			AccessToken:   "access_token",
 			RefreshToken:  "refresh_token",
 			Rights:        []ttnpb.Right{ttnpb.Right_RIGHT_USER_ALL},
-			ExpiresAt:     ttnpb.ProtoTimePtr(start.Add(5 * time.Minute)),
+			ExpiresAt:     timestamppb.New(start.Add(5 * time.Minute)),
 		}, "")
 		if a.So(err, should.BeNil) && a.So(createdAccessToken, should.NotBeNil) {
 			a.So(createdAccessToken.UserIds, should.Resemble, usr1.GetIds())

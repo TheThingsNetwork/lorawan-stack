@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // APIKey is the API key model in the database.
@@ -61,8 +62,8 @@ func apiKeyToPB(m *APIKey) (*ttnpb.APIKey, error) {
 		Key:       m.Key,
 		Name:      m.Name,
 		Rights:    convertIntSlice[int, ttnpb.Right](m.Rights),
-		CreatedAt: ttnpb.ProtoTimePtr(m.CreatedAt),
-		UpdatedAt: ttnpb.ProtoTimePtr(m.UpdatedAt),
+		CreatedAt: timestamppb.New(m.CreatedAt),
+		UpdatedAt: timestamppb.New(m.UpdatedAt),
 		ExpiresAt: ttnpb.ProtoTime(m.ExpiresAt),
 	}
 	return pb, nil

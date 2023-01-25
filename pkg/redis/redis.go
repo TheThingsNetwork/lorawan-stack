@@ -29,10 +29,10 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/gogo/protobuf/proto"
 	"github.com/oklog/ulid/v2"
 	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"google.golang.org/protobuf/proto"
 )
 
 const (

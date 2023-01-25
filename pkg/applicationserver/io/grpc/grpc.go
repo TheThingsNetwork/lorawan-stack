@@ -16,9 +16,7 @@ package grpc
 
 import (
 	"context"
-	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
@@ -28,6 +26,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"google.golang.org/grpc/peer"
+	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // Option represents an option for the gRPC frontend.
@@ -157,7 +157,7 @@ func (s *impl) Subscribe(ids *ttnpb.ApplicationIdentifiers, stream ttnpb.AppAs_S
 	}
 }
 
-func (s *impl) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
+func (s *impl) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*emptypb.Empty, error) {
 	if err := rights.RequireApplication(ctx, req.EndDeviceIds.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE); err != nil {
 		return nil, err
 	}
@@ -167,7 +167,7 @@ func (s *impl) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRe
 	return ttnpb.Empty, nil
 }
 
-func (s *impl) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
+func (s *impl) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*emptypb.Empty, error) {
 	if err := rights.RequireApplication(ctx, req.EndDeviceIds.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE); err != nil {
 		return nil, err
 	}
@@ -212,7 +212,7 @@ func (s *impl) GetMQTTConnectionInfo(ctx context.Context, ids *ttnpb.Application
 
 var errPayloadCryptoSkipped = errors.DefineFailedPrecondition("payload_crypto_skipped", "payload crypto skipped")
 
-func (s *impl) SimulateUplink(ctx context.Context, up *ttnpb.ApplicationUp) (*pbtypes.Empty, error) {
+func (s *impl) SimulateUplink(ctx context.Context, up *ttnpb.ApplicationUp) (*emptypb.Empty, error) {
 	if err := rights.RequireApplication(ctx, up.EndDeviceIds.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_UP_WRITE); err != nil {
 		return nil, err
 	}
@@ -223,7 +223,7 @@ func (s *impl) SimulateUplink(ctx context.Context, up *ttnpb.ApplicationUp) (*pb
 		return nil, errPayloadCryptoSkipped.New()
 	}
 	if up.ReceivedAt == nil {
-		up.ReceivedAt = ttnpb.ProtoTimePtr(time.Now())
+		up.ReceivedAt = timestamppb.Now()
 	}
 	up.Simulated = true
 	ids, err := s.getIdentifiers(ctx, up.EndDeviceIds)

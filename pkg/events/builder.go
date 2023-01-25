@@ -16,9 +16,9 @@ package events
 
 import (
 	"context"
-	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type builder struct {
@@ -45,7 +45,7 @@ func (b *builder) New(ctx context.Context, opts ...Option) Event {
 		innerEvent: &ttnpb.Event{
 			UniqueId:       NewCorrelationID(),
 			Name:           b.definition.name,
-			Time:           ttnpb.ProtoTimePtr(time.Now()),
+			Time:           timestamppb.Now(),
 			Origin:         hostname,
 			CorrelationIds: CorrelationIDsFromContext(ctx),
 		},

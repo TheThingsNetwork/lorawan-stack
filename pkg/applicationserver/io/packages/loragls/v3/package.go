@@ -19,20 +19,21 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gogo/protobuf/types"
-	"github.com/golang/protobuf/proto"
 	apppayload "go.thethings.network/lorawan-application-payload"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v3/api"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
-	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
+	"go.thethings.network/lorawan-stack/v3/pkg/goproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	urlutil "go.thethings.network/lorawan-stack/v3/pkg/util/url"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // PackageName defines the package name.
@@ -111,7 +112,7 @@ func (p *GeolocationPackage) gnssQuery(ctx context.Context, ids *ttnpb.EndDevice
 	if up.DecodedPayload == nil {
 		req.Payload = up.FrmPayload
 	} else {
-		m, err := gogoproto.Map(up.DecodedPayload)
+		m, err := goproto.Map(up.DecodedPayload)
 		if err != nil {
 			return nil, err
 		}
@@ -173,7 +174,7 @@ func (p *GeolocationPackage) multiFrameQuery(ctx context.Context, ids *ttnpb.End
 }
 
 func (p *GeolocationPackage) wifiQuery(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data, client *api.Client) (api.AbstractLocationSolverResponse, error) {
-	m, err := gogoproto.Map(up.DecodedPayload)
+	m, err := goproto.Map(up.DecodedPayload)
 	if err != nil {
 		return nil, err
 	}
@@ -272,11 +273,11 @@ func (p *GeolocationPackage) sendQuery(ctx context.Context, ids *ttnpb.EndDevice
 	return nil
 }
 
-func (p *GeolocationPackage) sendServiceData(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, data *types.Struct) error {
+func (p *GeolocationPackage) sendServiceData(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, data *structpb.Struct) error {
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIds:   ids,
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
-		ReceivedAt:     ttnpb.ProtoTimePtr(time.Now()),
+		ReceivedAt:     timestamppb.Now(),
 		Up: &ttnpb.ApplicationUp_ServiceData{
 			ServiceData: &ttnpb.ApplicationServiceData{
 				Data:    data,
@@ -291,7 +292,7 @@ func (p *GeolocationPackage) sendLocationSolved(ctx context.Context, ids *ttnpb.
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIds:   ids,
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
-		ReceivedAt:     ttnpb.ProtoTimePtr(time.Now()),
+		ReceivedAt:     timestamppb.Now(),
 		Up: &ttnpb.ApplicationUp_LocationSolved{
 			LocationSolved: &ttnpb.ApplicationLocation{
 				Service:  fmt.Sprintf("%v-%s", PackageName, result.Algorithm()),
@@ -334,15 +335,15 @@ func (p *GeolocationPackage) mergePackageData(def *ttnpb.ApplicationPackageDefau
 	return &merged, nil
 }
 
-func toStruct(i interface{}) (*types.Struct, error) {
+func toStruct(i interface{}) (*structpb.Struct, error) {
 	b, err := jsonpb.TTN().Marshal(i)
 	if err != nil {
 		return nil, err
 	}
-	var st types.Struct
-	err = jsonpb.TTN().Unmarshal(b, &st)
+	st := &structpb.Struct{}
+	err = jsonpb.TTN().Unmarshal(b, st)
 	if err != nil {
 		return nil, err
 	}
-	return &st, nil
+	return st, nil
 }

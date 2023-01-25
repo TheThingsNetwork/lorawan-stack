@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func TestFromDownlinkMessage(t *testing.T) {
@@ -106,7 +107,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 						Downlink: &ttnpb.TxSettings_Downlink{
 							AntennaIndex: 2,
 						},
-						Time: ttnpb.ProtoTimePtr(time.Unix(0x42424242, 0x42424242)),
+						Time: timestamppb.New(time.Unix(0x42424242, 0x42424242)),
 					},
 				},
 				CorrelationIds: []string{"correlation2"},
@@ -220,7 +221,7 @@ func TestToDownlinkMessage(t *testing.T) {
 						Downlink: &ttnpb.TxSettings_Downlink{
 							AntennaIndex: 2,
 						},
-						Time: ttnpb.ProtoTimePtr(time.Unix(0x42424242, 0x42424242).Truncate(time.Microsecond)),
+						Time: timestamppb.New(time.Unix(0x42424242, 0x42424242).Truncate(time.Microsecond)),
 					},
 				},
 			},

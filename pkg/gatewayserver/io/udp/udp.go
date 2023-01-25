@@ -34,6 +34,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
 	"golang.org/x/exp/slices"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type srv struct {
@@ -301,7 +302,7 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 			return err
 		}
 		for _, up := range io.UniqueUplinkMessagesByRSSI(msg.UplinkMessages) {
-			up.ReceivedAt = ttnpb.ProtoTimePtr(packet.ReceivedAt)
+			up.ReceivedAt = timestamppb.New(packet.ReceivedAt)
 			if err := state.io.HandleUp(up, nil); err != nil {
 				logger.WithError(err).Warn("Failed to handle uplink message")
 			}

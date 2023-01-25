@@ -19,7 +19,6 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/gogo/protobuf/types"
 	"github.com/uptrace/bun"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -27,6 +26,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
+	"google.golang.org/protobuf/types/known/anypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // Notification is the notification model in the database.
@@ -84,26 +85,26 @@ func (NotificationReceiver) _isModel() {} // It doesn't embed Model, but it's st
 func notificationToPB(m *Notification, r *NotificationReceiver) (*ttnpb.Notification, error) {
 	pb := &ttnpb.Notification{
 		Id:               m.ID,
-		CreatedAt:        ttnpb.ProtoTimePtr(m.CreatedAt),
+		CreatedAt:        timestamppb.New(m.CreatedAt),
 		EntityIds:        getEntityIdentifiers(m.EntityType, m.EntityUID),
 		NotificationType: m.NotificationType,
 		Receivers:        convertIntSlice[int, ttnpb.NotificationReceiver](m.Receivers),
 		Email:            m.Email,
 	}
 	if len(m.Data) > 0 {
-		var anyPB types.Any
-		err := jsonpb.TTN().Unmarshal(m.Data, &anyPB)
+		anyPB := &anypb.Any{}
+		err := jsonpb.TTN().Unmarshal(m.Data, anyPB)
 		if err != nil {
 			return nil, err
 		}
-		pb.Data = &anyPB
+		pb.Data = anyPB
 	}
 	if m.SenderUID != "" {
 		pb.SenderIds = &ttnpb.UserIdentifiers{UserId: m.SenderUID}
 	}
 	if r != nil {
 		pb.Status = ttnpb.NotificationStatus(r.Status)
-		pb.StatusUpdatedAt = ttnpb.ProtoTimePtr(r.StatusUpdatedAt)
+		pb.StatusUpdatedAt = timestamppb.New(r.StatusUpdatedAt)
 	}
 	return pb, nil
 }

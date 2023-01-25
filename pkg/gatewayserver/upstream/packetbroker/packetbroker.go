@@ -19,7 +19,6 @@ import (
 	"context"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
@@ -28,6 +27,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 const (
@@ -84,15 +85,13 @@ func (h *Handler) Setup(context.Context) error {
 	return nil
 }
 
-func (h *Handler) nextUpdateGateway(onlineTTL *pbtypes.Duration) <-chan time.Time {
+func (h *Handler) nextUpdateGateway(onlineTTL *durationpb.Duration) <-chan time.Time {
 	d := random.Jitter(h.UpdateInterval, h.UpdateJitter)
 	if onlineTTL != nil {
-		ttl, err := pbtypes.DurationFromProto(onlineTTL)
-		if err == nil {
-			ttl -= h.OnlineTTLMargin
-			if ttl < d {
-				d = ttl
-			}
+		ttl := onlineTTL.AsDuration()
+		ttl -= h.OnlineTTLMargin
+		if ttl < d {
+			d = ttl
 		}
 	}
 	return time.After(d)
@@ -125,10 +124,10 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids *ttnpb.GatewayIdentifi
 			StatusPublic:     gtw.StatusPublic,
 			LocationPublic:   gtw.LocationPublic,
 			Online:           true,
-			RxRate: &pbtypes.FloatValue{
+			RxRate: &wrapperspb.FloatValue{
 				Value: 0,
 			},
-			TxRate: &pbtypes.FloatValue{
+			TxRate: &wrapperspb.FloatValue{
 				Value: 0,
 			},
 		},
@@ -195,14 +194,14 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids *ttnpb.GatewayIdentifi
 		uplinkCount, _, haveUplinkCount := conn.UpStats()
 		downlinkCount, _, haveDownlinkCount := conn.DownStats()
 		if haveUplinkCount {
-			req.Gateway.RxRate = &pbtypes.FloatValue{
+			req.Gateway.RxRate = &wrapperspb.FloatValue{
 				Value: (float32(uplinkCount) - float32(lastUplinkCount)) * float32(time.Hour) / float32(now.Sub(lastCounters)),
 			}
 			req.FieldMask.Paths = append(req.FieldMask.Paths, "rx_rate")
 			lastUplinkCount = uplinkCount
 		}
 		if haveDownlinkCount {
-			req.Gateway.TxRate = &pbtypes.FloatValue{
+			req.Gateway.TxRate = &wrapperspb.FloatValue{
 				Value: (float32(downlinkCount) - float32(lastDownlinkCount)) * float32(time.Hour) / float32(now.Sub(lastCounters)),
 			}
 			req.FieldMask.Paths = append(req.FieldMask.Paths, "tx_rate")

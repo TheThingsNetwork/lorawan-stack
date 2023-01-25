@@ -29,6 +29,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // Gateway is the gateway model in the database.
@@ -114,8 +116,8 @@ func gatewayToPB(m *Gateway, fieldMask ...string) (*ttnpb.Gateway, error) {
 			Eui:       eui,
 		},
 
-		CreatedAt: ttnpb.ProtoTimePtr(m.CreatedAt),
-		UpdatedAt: ttnpb.ProtoTimePtr(m.UpdatedAt),
+		CreatedAt: timestamppb.New(m.CreatedAt),
+		UpdatedAt: timestamppb.New(m.UpdatedAt),
 		DeletedAt: ttnpb.ProtoTime(m.DeletedAt),
 
 		Name:        m.Name,
@@ -141,7 +143,7 @@ func gatewayToPB(m *Gateway, fieldMask ...string) (*ttnpb.Gateway, error) {
 
 		ScheduleDownlinkLate:   m.ScheduleDownlinkLate,
 		EnforceDutyCycle:       m.EnforceDutyCycle,
-		ScheduleAnytimeDelay:   ttnpb.ProtoDurationPtr(time.Duration(m.ScheduleAnytimeDelay)),
+		ScheduleAnytimeDelay:   durationpb.New(time.Duration(m.ScheduleAnytimeDelay)),
 		DownlinkPathConstraint: ttnpb.DownlinkPathConstraint(m.DownlinkPathConstraint),
 
 		UpdateLocationFromStatus: m.UpdateLocationFromStatus,

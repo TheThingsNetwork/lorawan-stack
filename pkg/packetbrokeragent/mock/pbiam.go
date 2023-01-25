@@ -18,11 +18,11 @@ import (
 	"context"
 	"testing"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	iampb "go.packetbroker.org/api/iam"
 	iampbv2 "go.packetbroker.org/api/iam/v2"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // PBIAM is a mock Packet Broker IAM.
@@ -32,13 +32,13 @@ type PBIAM struct {
 		ListNetworksHandler  func(ctx context.Context, req *iampb.ListNetworksRequest) (*iampb.ListNetworksResponse, error)
 		CreateNetworkHandler func(ctx context.Context, req *iampb.CreateNetworkRequest) (*iampb.CreateNetworkResponse, error)
 		GetNetworkHandler    func(ctx context.Context, req *iampb.NetworkRequest) (*iampb.GetNetworkResponse, error)
-		UpdateNetworkHandler func(ctx context.Context, req *iampb.UpdateNetworkRequest) (*pbtypes.Empty, error)
-		DeleteNetworkHandler func(ctx context.Context, req *iampb.NetworkRequest) (*pbtypes.Empty, error)
+		UpdateNetworkHandler func(ctx context.Context, req *iampb.UpdateNetworkRequest) (*emptypb.Empty, error)
+		DeleteNetworkHandler func(ctx context.Context, req *iampb.NetworkRequest) (*emptypb.Empty, error)
 		ListTenantsHandler   func(ctx context.Context, req *iampb.ListTenantsRequest) (*iampb.ListTenantsResponse, error)
 		CreateTenantHandler  func(ctx context.Context, req *iampb.CreateTenantRequest) (*iampb.CreateTenantResponse, error)
 		GetTenantHandler     func(ctx context.Context, req *iampb.TenantRequest) (*iampb.GetTenantResponse, error)
-		UpdateTenantHandler  func(ctx context.Context, req *iampb.UpdateTenantRequest) (*pbtypes.Empty, error)
-		DeleteTenantHandler  func(ctx context.Context, req *iampb.TenantRequest) (*pbtypes.Empty, error)
+		UpdateTenantHandler  func(ctx context.Context, req *iampb.UpdateTenantRequest) (*emptypb.Empty, error)
+		DeleteTenantHandler  func(ctx context.Context, req *iampb.TenantRequest) (*emptypb.Empty, error)
 	}
 	Catalog struct {
 		ListNetworksHandler     func(ctx context.Context, req *iampbv2.ListNetworksRequest) (*iampbv2.ListNetworksResponse, error)
@@ -91,14 +91,14 @@ func (s *pbIAMRegistry) GetNetwork(ctx context.Context, req *iampb.NetworkReques
 	return s.Registry.GetNetworkHandler(ctx, req)
 }
 
-func (s *pbIAMRegistry) UpdateNetwork(ctx context.Context, req *iampb.UpdateNetworkRequest) (*pbtypes.Empty, error) {
+func (s *pbIAMRegistry) UpdateNetwork(ctx context.Context, req *iampb.UpdateNetworkRequest) (*emptypb.Empty, error) {
 	if s.Registry.UpdateNetworkHandler == nil {
 		panic("UpdateNetwork called but not set")
 	}
 	return s.Registry.UpdateNetworkHandler(ctx, req)
 }
 
-func (s *pbIAMRegistry) DeleteNetwork(ctx context.Context, req *iampb.NetworkRequest) (*pbtypes.Empty, error) {
+func (s *pbIAMRegistry) DeleteNetwork(ctx context.Context, req *iampb.NetworkRequest) (*emptypb.Empty, error) {
 	if s.Registry.DeleteNetworkHandler == nil {
 		panic("DeleteNetwork called but not set")
 	}
@@ -126,14 +126,14 @@ func (s *pbIAMRegistry) GetTenant(ctx context.Context, req *iampb.TenantRequest)
 	return s.Registry.GetTenantHandler(ctx, req)
 }
 
-func (s *pbIAMRegistry) UpdateTenant(ctx context.Context, req *iampb.UpdateTenantRequest) (*pbtypes.Empty, error) {
+func (s *pbIAMRegistry) UpdateTenant(ctx context.Context, req *iampb.UpdateTenantRequest) (*emptypb.Empty, error) {
 	if s.Registry.UpdateTenantHandler == nil {
 		panic("UpdateTenant called but not set")
 	}
 	return s.Registry.UpdateTenantHandler(ctx, req)
 }
 
-func (s *pbIAMRegistry) DeleteTenant(ctx context.Context, req *iampb.TenantRequest) (*pbtypes.Empty, error) {
+func (s *pbIAMRegistry) DeleteTenant(ctx context.Context, req *iampb.TenantRequest) (*emptypb.Empty, error) {
 	if s.Registry.DeleteTenantHandler == nil {
 		panic("DeleteTenant called but not set")
 	}

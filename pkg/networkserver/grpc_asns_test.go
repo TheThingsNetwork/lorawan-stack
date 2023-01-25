@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func TestDownlinkQueueReplace(t *testing.T) {
@@ -47,7 +48,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 		},
 		Settings:   DefaultTxSettings,
 		RxMetadata: DefaultRxMetadata[:],
-		ReceivedAt: ttnpb.ProtoTimePtr(time.Time{}),
+		ReceivedAt: timestamppb.New(time.Time{}),
 	}
 	ups := ToMACStateUplinkMessages(up)
 
@@ -769,7 +770,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 			},
 		},
 		RxMetadata: DefaultRxMetadata[:],
-		ReceivedAt: ttnpb.ProtoTimePtr(time.Time{}),
+		ReceivedAt: timestamppb.New(time.Time{}),
 	}
 	ups := ToMACStateUplinkMessages(up)
 

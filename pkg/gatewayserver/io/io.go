@@ -22,7 +22,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
@@ -33,6 +32,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const (
@@ -246,7 +247,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 	}
 
 	receivedAt := *ttnpb.StdTime(up.ReceivedAt)
-	gpsTime := func(mds []*ttnpb.RxMetadata) *types.Timestamp {
+	gpsTime := func(mds []*ttnpb.RxMetadata) *timestamppb.Timestamp {
 		for _, md := range mds {
 			if gpsTime := md.GpsTime; gpsTime != nil {
 				return gpsTime
@@ -295,7 +296,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 		receivedAtGateway = receivedAt.Add(-median / 2)
 	}
 	for _, md := range up.RxMetadata {
-		md.ReceivedAt = ttnpb.ProtoTimePtr(receivedAtGateway)
+		md.ReceivedAt = timestamppb.New(receivedAtGateway)
 
 		if md.AntennaIndex != 0 {
 			// TODO: Support downlink path to multiple antennas (https://github.com/TheThingsNetwork/lorawan-stack/issues/48)
@@ -754,7 +755,7 @@ func (c *Connection) RTTStats(percentile int, t time.Time) (min, max, median, np
 func (c *Connection) Stats() (*ttnpb.GatewayConnectionStats, []string) {
 	ct := c.ConnectTime()
 	stats := &ttnpb.GatewayConnectionStats{
-		ConnectedAt:          ttnpb.ProtoTimePtr(ct),
+		ConnectedAt:          timestamppb.New(ct),
 		Protocol:             c.Frontend().Protocol(),
 		GatewayRemoteAddress: c.GatewayRemoteAddress(),
 	}
@@ -762,17 +763,17 @@ func (c *Connection) Stats() (*ttnpb.GatewayConnectionStats, []string) {
 	paths = append(paths, "connected_at", "disconnected_at", "protocol", "gateway_remote_address")
 
 	if s, t, ok := c.StatusStats(); ok {
-		stats.LastStatusReceivedAt = ttnpb.ProtoTimePtr(t)
+		stats.LastStatusReceivedAt = timestamppb.New(t)
 		stats.LastStatus = s
 		paths = append(paths, "last_status_received_at", "last_status")
 	}
 	if count, t, ok := c.UpStats(); ok {
-		stats.LastUplinkReceivedAt = ttnpb.ProtoTimePtr(t)
+		stats.LastUplinkReceivedAt = timestamppb.New(t)
 		stats.UplinkCount = count
 		paths = append(paths, "last_uplink_received_at", "uplink_count")
 	}
 	if count, t, ok := c.DownStats(); ok {
-		stats.LastDownlinkReceivedAt = ttnpb.ProtoTimePtr(t)
+		stats.LastDownlinkReceivedAt = timestamppb.New(t)
 		stats.DownlinkCount = count
 		paths = append(paths, "last_downlink_received_at", "downlink_count")
 		if c.scheduler != nil {
@@ -783,9 +784,9 @@ func (c *Connection) Stats() (*ttnpb.GatewayConnectionStats, []string) {
 	}
 	if min, max, median, _, count := c.RTTStats(100, time.Now()); count > 0 {
 		stats.RoundTripTimes = &ttnpb.GatewayConnectionStats_RoundTripTimes{
-			Min:    ttnpb.ProtoDurationPtr(min),
-			Max:    ttnpb.ProtoDurationPtr(max),
-			Median: ttnpb.ProtoDurationPtr(median),
+			Min:    durationpb.New(min),
+			Max:    durationpb.New(max),
+			Median: durationpb.New(median),
 			Count:  uint32(count),
 		}
 		paths = append(paths, "round_trip_times")

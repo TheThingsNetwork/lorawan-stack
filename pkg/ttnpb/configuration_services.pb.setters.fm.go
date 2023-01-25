@@ -157,8 +157,7 @@ func (dst *ListBandsRequest) SetFields(src *ListBandsRequest, paths ...string) e
 			if src != nil {
 				dst.PhyVersion = src.PhyVersion
 			} else {
-				var zero PHYVersion
-				dst.PhyVersion = zero
+				dst.PhyVersion = 0
 			}
 
 		default:
@@ -298,8 +297,7 @@ func (dst *BandDescription) SetFields(src *BandDescription, paths ...string) err
 			if src != nil {
 				dst.CfListType = src.CfListType
 			} else {
-				var zero CFListType
-				dst.CfListType = zero
+				dst.CfListType = 0
 			}
 		case "receive_delay_1":
 			if len(subs) > 0 {
@@ -364,8 +362,7 @@ func (dst *BandDescription) SetFields(src *BandDescription, paths ...string) err
 			if src != nil {
 				dst.AdrAckLimit = src.AdrAckLimit
 			} else {
-				var zero ADRAckLimitExponent
-				dst.AdrAckLimit = zero
+				dst.AdrAckLimit = 0
 			}
 		case "min_retransmit_timeout":
 			if len(subs) > 0 {
@@ -401,8 +398,7 @@ func (dst *BandDescription) SetFields(src *BandDescription, paths ...string) err
 			if src != nil {
 				dst.MaxAdrDataRateIndex = src.MaxAdrDataRateIndex
 			} else {
-				var zero DataRateIndex
-				dst.MaxAdrDataRateIndex = zero
+				dst.MaxAdrDataRateIndex = 0
 			}
 		case "tx_param_setup_req_support":
 			if len(subs) > 0 {
@@ -542,8 +538,7 @@ func (dst *BandDescription_Beacon) SetFields(src *BandDescription_Beacon, paths 
 			if src != nil {
 				dst.DataRateIndex = src.DataRateIndex
 			} else {
-				var zero DataRateIndex
-				dst.DataRateIndex = zero
+				dst.DataRateIndex = 0
 			}
 		case "coding_rate":
 			if len(subs) > 0 {
@@ -592,8 +587,7 @@ func (dst *BandDescription_Channel) SetFields(src *BandDescription_Channel, path
 			if src != nil {
 				dst.MinDataRate = src.MinDataRate
 			} else {
-				var zero DataRateIndex
-				dst.MinDataRate = zero
+				dst.MinDataRate = 0
 			}
 		case "max_data_rate":
 			if len(subs) > 0 {
@@ -602,8 +596,7 @@ func (dst *BandDescription_Channel) SetFields(src *BandDescription_Channel, path
 			if src != nil {
 				dst.MaxDataRate = src.MaxDataRate
 			} else {
-				var zero DataRateIndex
-				dst.MaxDataRate = zero
+				dst.MaxDataRate = 0
 			}
 
 		default:
@@ -710,8 +703,7 @@ func (dst *BandDescription_Rx2Parameters) SetFields(src *BandDescription_Rx2Para
 			if src != nil {
 				dst.DataRateIndex = src.DataRateIndex
 			} else {
-				var zero DataRateIndex
-				dst.DataRateIndex = zero
+				dst.DataRateIndex = 0
 			}
 		case "frequency":
 			if len(subs) > 0 {

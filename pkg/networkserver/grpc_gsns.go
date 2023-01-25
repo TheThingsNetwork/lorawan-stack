@@ -20,8 +20,6 @@ import (
 	"fmt"
 	"runtime/trace"
 
-	"github.com/gogo/protobuf/proto"
-	pbtypes "github.com/gogo/protobuf/types"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
@@ -40,6 +38,10 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"golang.org/x/exp/slices"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const (
@@ -1007,7 +1009,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 				return nil, nil, errOutdatedData.New()
 			}
 
-			if !matched.Device.CreatedAt.Equal(stored.CreatedAt) || !matched.Device.UpdatedAt.Equal(stored.UpdatedAt) {
+			if !proto.Equal(matched.Device.CreatedAt, stored.CreatedAt) || !proto.Equal(matched.Device.UpdatedAt, stored.UpdatedAt) {
 				matched, ok, err = ns.matchAndHandleDataUplink(ctx, stored, up, true, matched.cmacFMatchingResult)
 				if err != nil {
 					return nil, nil, err
@@ -1398,7 +1400,7 @@ func (ns *NetworkServer) handleRejoinRequest(ctx context.Context, up *ttnpb.Upli
 }
 
 // HandleUplink is called by the Gateway Server when an uplink message arrives.
-func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessage) (_ *pbtypes.Empty, err error) {
+func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessage) (_ *emptypb.Empty, err error) {
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}
@@ -1410,7 +1412,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	up.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 
 	registerUplinkLatency(ctx, up)
-	up.ReceivedAt = ttnpb.ProtoTimePtr(time.Now())
+	up.ReceivedAt = timestamppb.New(time.Now()) // NOTE: This is not equivalent to timestamppb.Now().
 
 	up.Payload = &ttnpb.Message{}
 	if err := lorawan.UnmarshalMessage(up.RawPayload, up.Payload); err != nil {
@@ -1461,7 +1463,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	if t, err := toa.Compute(len(up.RawPayload), up.Settings); err != nil {
 		log.FromContext(ctx).WithError(err).Debug("Failed to compute time-on-air")
 	} else {
-		up.ConsumedAirtime = ttnpb.ProtoDurationPtr(t)
+		up.ConsumedAirtime = durationpb.New(t)
 	}
 	switch up.Payload.MHdr.MType {
 	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
@@ -1480,7 +1482,7 @@ var errTransmission = errors.Define("transmission", "downlink transmission faile
 // ReportTxAcknowledgment is called by the Gateway Server when a tx acknowledgment arrives.
 func (ns *NetworkServer) ReportTxAcknowledgment(
 	ctx context.Context, txAck *ttnpb.GatewayTxAcknowledgment,
-) (*pbtypes.Empty, error) {
+) (*emptypb.Empty, error) {
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}

@@ -29,6 +29,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (
@@ -209,7 +211,7 @@ func (r *DeviceRegistry) set(ctx context.Context, tx *redis.Tx, uid string, gets
 			pb = &ttnpb.EndDevice{}
 		}
 
-		pb.UpdatedAt = ttnpb.ProtoTimePtr(time.Now())
+		pb.UpdatedAt = timestamppb.Now()
 		sets = append(append(sets[:0:0], sets...),
 			"updated_at",
 		)
@@ -256,7 +258,7 @@ func (r *DeviceRegistry) set(ctx context.Context, tx *redis.Tx, uid string, gets
 			if ttnpb.HasAnyField(sets, "provisioner_id") && pb.ProvisionerId != stored.ProvisionerId {
 				return nil, errReadOnlyField.WithAttributes("field", "provisioner_id")
 			}
-			if ttnpb.HasAnyField(sets, "provisioning_data") && !pb.ProvisioningData.Equal(stored.ProvisioningData) {
+			if ttnpb.HasAnyField(sets, "provisioning_data") && !proto.Equal(pb.ProvisioningData, stored.ProvisioningData) {
 				return nil, errReadOnlyField.WithAttributes("field", "provisioning_data")
 			}
 			if err := cmd.ScanProto(updated); err != nil {

@@ -18,11 +18,11 @@ import (
 	"context"
 	"fmt"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type nsPbaServer struct {
@@ -34,7 +34,7 @@ type nsPbaServer struct {
 }
 
 // PublishDownlink is called by the Network Server when a downlink message needs to get scheduled via Packet Broker.
-func (s *nsPbaServer) PublishDownlink(ctx context.Context, down *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
+func (s *nsPbaServer) PublishDownlink(ctx context.Context, down *ttnpb.DownlinkMessage) (*emptypb.Empty, error) {
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}

@@ -15,13 +15,11 @@
 package test
 
 import (
-	"bytes"
 	"context"
 	"reflect"
 	"testing"
 	"time"
 
-	"github.com/gogo/protobuf/proto"
 	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -31,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/proto"
 )
 
 func isNil(c interface{}) bool {
@@ -53,35 +52,18 @@ func nilEquality(a interface{}, b interface{}) (bool, bool) {
 	return false, false
 }
 
-func protoEquals(a proto.Message, b proto.Message) bool {
-	if eq, ok := nilEquality(a, b); ok {
-		return eq
-	}
-
-	ab, err := proto.Marshal(a)
-	if err != nil {
-		panic(err)
-	}
-	bb, err := proto.Marshal(b)
-	if err != nil {
-		panic(err)
-	}
-
-	return bytes.Equal(ab, bb)
-}
-
 func uplinkMatchEquals(a *UplinkMatch, b *UplinkMatch) bool {
 	if m, ok := nilEquality(a, b); ok {
 		return m
 	}
 
-	return protoEquals(a.ApplicationIdentifiers, b.ApplicationIdentifiers) &&
+	return proto.Equal(a.ApplicationIdentifiers, b.ApplicationIdentifiers) &&
 		a.DeviceID == b.DeviceID &&
 		a.LoRaWANVersion == b.LoRaWANVersion &&
-		protoEquals(a.FNwkSIntKey, b.FNwkSIntKey) &&
+		proto.Equal(a.FNwkSIntKey, b.FNwkSIntKey) &&
 		a.LastFCnt == b.LastFCnt &&
-		protoEquals(a.ResetsFCnt, b.ResetsFCnt) &&
-		protoEquals(a.Supports32BitFCnt, b.Supports32BitFCnt) &&
+		proto.Equal(a.ResetsFCnt, b.ResetsFCnt) &&
+		proto.Equal(a.Supports32BitFCnt, b.Supports32BitFCnt) &&
 		a.IsPending == b.IsPending
 }
 

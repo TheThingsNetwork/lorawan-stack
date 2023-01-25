@@ -22,7 +22,6 @@ import (
 	"testing"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
@@ -40,6 +39,9 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 func TestAppendRecentDownlink(t *testing.T) {
@@ -240,7 +242,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DevAddr:        devAddr.Bytes(),
 				},
 				MacSettings: &ttnpb.MACSettings{
-					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 3},
+					StatusCountPeriodicity: &wrapperspb.UInt32Value{Value: 3},
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters:   &ttnpb.MACParameters{},
@@ -265,7 +267,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				},
 				LorawanPhyVersion:       ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				FrequencyPlanId:         band.EU_863_870,
-				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(time.Unix(42, 0)),
+				LastDevStatusReceivedAt: timestamppb.New(time.Unix(42, 0)),
 			},
 			Error: errNoDownlink,
 		},
@@ -278,7 +280,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DevAddr:        devAddr.Bytes(),
 				},
 				MacSettings: &ttnpb.MACSettings{
-					StatusTimePeriodicity: ttnpb.ProtoDurationPtr(24 * time.Hour),
+					StatusTimePeriodicity: durationpb.New(24 * time.Hour),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{},
@@ -299,7 +301,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				},
 				LorawanPhyVersion:       ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				FrequencyPlanId:         band.EU_863_870,
-				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(time.Now()),
+				LastDevStatusReceivedAt: timestamppb.Now(),
 				Session:                 generateSession(),
 			},
 			Error: errNoDownlink,
@@ -930,7 +932,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DevAddr:        devAddr.Bytes(),
 				},
 				MacSettings: &ttnpb.MACSettings{
-					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 3},
+					StatusCountPeriodicity: &wrapperspb.UInt32Value{Value: 3},
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters:   &ttnpb.MACParameters{},
@@ -1009,7 +1011,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						DevAddr:        devAddr.Bytes(),
 					},
 					MacSettings: &ttnpb.MACSettings{
-						StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 3},
+						StatusCountPeriodicity: &wrapperspb.UInt32Value{Value: 3},
 					},
 					MacState: &ttnpb.MACState{
 						CurrentParameters:   &ttnpb.MACParameters{},
@@ -1065,7 +1067,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DevAddr:        devAddr.Bytes(),
 				},
 				MacSettings: &ttnpb.MACSettings{
-					StatusTimePeriodicity: ttnpb.ProtoDurationPtr(time.Nanosecond),
+					StatusTimePeriodicity: durationpb.New(time.Nanosecond),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{},
@@ -1142,7 +1144,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						DevAddr:        devAddr.Bytes(),
 					},
 					MacSettings: &ttnpb.MACSettings{
-						StatusTimePeriodicity: ttnpb.ProtoDurationPtr(time.Nanosecond),
+						StatusTimePeriodicity: durationpb.New(time.Nanosecond),
 					},
 					MacState: &ttnpb.MACState{
 						CurrentParameters: &ttnpb.MACParameters{},
@@ -1216,8 +1218,8 @@ func TestGenerateDataDownlink(t *testing.T) {
 					Component: c,
 					ctx:       ctx,
 					defaultMACSettings: &ttnpb.MACSettings{
-						StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
-						StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
+						StatusTimePeriodicity:  durationpb.New(0),
+						StatusCountPeriodicity: &wrapperspb.UInt32Value{Value: 0},
 					},
 				}
 
@@ -1307,7 +1309,7 @@ func generateSession() *ttnpb.Session {
 		LastFCntUp:                 randomVal,
 		LastNFCntDown:              randomVal,
 		LastAFCntDown:              randomVal,
-		StartedAt:                  ttnpb.ProtoTimePtr(time.Now()),
+		StartedAt:                  timestamppb.Now(),
 		QueuedApplicationDownlinks: queuedDownlinks,
 	}
 }

@@ -17,7 +17,6 @@ package deviceclaimingserver
 import (
 	"context"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -25,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var (
@@ -39,8 +39,8 @@ var (
 type Fallback interface {
 	web.Registerer
 	Claim(ctx context.Context, req *ttnpb.ClaimEndDeviceRequest) (ids *ttnpb.EndDeviceIdentifiers, err error)
-	AuthorizeApplication(context.Context, *ttnpb.AuthorizeApplicationRequest) (*pbtypes.Empty, error)
-	UnauthorizeApplication(context.Context, *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error)
+	AuthorizeApplication(context.Context, *ttnpb.AuthorizeApplicationRequest) (*emptypb.Empty, error)
+	UnauthorizeApplication(context.Context, *ttnpb.ApplicationIdentifiers) (*emptypb.Empty, error)
 }
 
 // noopEDCS is a no-op EDCS.
@@ -61,7 +61,7 @@ func (noopEDCS) Claim(ctx context.Context, req *ttnpb.ClaimEndDeviceRequest) (id
 }
 
 // Unclaim implements EndDeviceClaimingServer.
-func (noopEDCS) Unclaim(ctx context.Context, in *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
+func (noopEDCS) Unclaim(ctx context.Context, in *ttnpb.EndDeviceIdentifiers) (*emptypb.Empty, error) {
 	return nil, errMethodUnavailable.New()
 }
 
@@ -76,12 +76,12 @@ func (noopEDCS) GetClaimStatus(ctx context.Context, in *ttnpb.EndDeviceIdentifie
 }
 
 // AuthorizeApplication implements EndDeviceClaimingServer.
-func (noopEDCS) AuthorizeApplication(ctx context.Context, req *ttnpb.AuthorizeApplicationRequest) (*pbtypes.Empty, error) {
+func (noopEDCS) AuthorizeApplication(ctx context.Context, req *ttnpb.AuthorizeApplicationRequest) (*emptypb.Empty, error) {
 	return nil, errMethodUnavailable.New()
 }
 
 // UnauthorizeApplication implements EndDeviceClaimingServer.
-func (noopEDCS) UnauthorizeApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error) {
+func (noopEDCS) UnauthorizeApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*emptypb.Empty, error) {
 	return nil, errMethodUnavailable.New()
 }
 
@@ -154,7 +154,7 @@ func (edcs *endDeviceClaimingServer) Claim(ctx context.Context, req *ttnpb.Claim
 }
 
 // Unclaim implements EndDeviceClaimingServer.
-func (edcs *endDeviceClaimingServer) Unclaim(ctx context.Context, in *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
+func (edcs *endDeviceClaimingServer) Unclaim(ctx context.Context, in *ttnpb.EndDeviceIdentifiers) (*emptypb.Empty, error) {
 	return edcs.DCS.endDeviceClaimingUpstream.Unclaim(ctx, in)
 }
 
@@ -169,11 +169,11 @@ func (edcs *endDeviceClaimingServer) GetClaimStatus(ctx context.Context, in *ttn
 }
 
 // AuthorizeApplication implements EndDeviceClaimingServer.
-func (edcs *endDeviceClaimingServer) AuthorizeApplication(ctx context.Context, req *ttnpb.AuthorizeApplicationRequest) (*pbtypes.Empty, error) {
+func (edcs *endDeviceClaimingServer) AuthorizeApplication(ctx context.Context, req *ttnpb.AuthorizeApplicationRequest) (*emptypb.Empty, error) {
 	return edcs.DCS.endDeviceClaimingFallback.AuthorizeApplication(ctx, req)
 }
 
 // UnauthorizeApplication implements EndDeviceClaimingServer.
-func (edcs *endDeviceClaimingServer) UnauthorizeApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error) {
+func (edcs *endDeviceClaimingServer) UnauthorizeApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*emptypb.Empty, error) {
 	return edcs.DCS.endDeviceClaimingFallback.UnauthorizeApplication(ctx, ids)
 }

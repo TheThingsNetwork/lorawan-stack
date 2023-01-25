@@ -17,15 +17,15 @@ package javascript
 import (
 	"testing"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
+	"go.thethings.network/lorawan-stack/v3/pkg/goproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/normalizedpayload"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 func TestLegacyEncodeDownlink(t *testing.T) {
@@ -45,10 +45,10 @@ func TestLegacyEncodeDownlink(t *testing.T) {
 	}
 
 	message := &ttnpb.ApplicationDownlink{
-		DecodedPayload: &pbtypes.Struct{
-			Fields: map[string]*pbtypes.Value{
+		DecodedPayload: &structpb.Struct{
+			Fields: map[string]*structpb.Value{
 				"temperature": {
-					Kind: &pbtypes.Value_NumberValue{
+					Kind: &structpb.Value_NumberValue{
 						NumberValue: -21.3,
 					},
 				},
@@ -115,10 +115,10 @@ func TestEncodeDownlink(t *testing.T) {
 	}
 
 	message := &ttnpb.ApplicationDownlink{
-		DecodedPayload: &pbtypes.Struct{
-			Fields: map[string]*pbtypes.Value{
+		DecodedPayload: &structpb.Struct{
+			Fields: map[string]*structpb.Value{
 				"temperature": {
-					Kind: &pbtypes.Value_NumberValue{
+					Kind: &structpb.Value_NumberValue{
 						NumberValue: -21.3,
 					},
 				},
@@ -172,10 +172,10 @@ func TestEncodeDownlink(t *testing.T) {
 	// The Things Node example.
 	{
 		message := &ttnpb.ApplicationDownlink{
-			DecodedPayload: &pbtypes.Struct{
-				Fields: map[string]*pbtypes.Value{
+			DecodedPayload: &structpb.Struct{
+				Fields: map[string]*structpb.Value{
 					"color": {
-						Kind: &pbtypes.Value_StringValue{
+						Kind: &structpb.Value_StringValue{
 							StringValue: "blue",
 						},
 					},
@@ -265,7 +265,7 @@ func TestLegacyDecodeUplink(t *testing.T) {
 		`
 		err := host.DecodeUplink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
-		m, err := gogoproto.Map(message.DecodedPayload)
+		m, err := goproto.Map(message.DecodedPayload)
 		a.So(err, should.BeNil)
 		a.So(m, should.Resemble, map[string]interface{}{
 			"temperature": -21.3,
@@ -283,7 +283,7 @@ func TestLegacyDecodeUplink(t *testing.T) {
 		`
 		err := host.DecodeUplink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
-		m, err := gogoproto.Map(message.DecodedPayload)
+		m, err := goproto.Map(message.DecodedPayload)
 		a.So(err, should.BeNil)
 		a.So(m, should.Resemble, map[string]interface{}{
 			"temperature": -21.3,
@@ -367,10 +367,10 @@ func TestDecodeUplink(t *testing.T) {
 		err := host.DecodeUplink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
 
-		a.So(message.DecodedPayload, should.Resemble, &pbtypes.Struct{
-			Fields: map[string]*pbtypes.Value{
+		a.So(message.DecodedPayload, should.Resemble, &structpb.Struct{
+			Fields: map[string]*structpb.Value{
 				"temperature": {
-					Kind: &pbtypes.Value_NumberValue{
+					Kind: &structpb.Value_NumberValue{
 						NumberValue: -21.3,
 					},
 				},
@@ -378,15 +378,15 @@ func TestDecodeUplink(t *testing.T) {
 		})
 		a.So(message.DecodedPayloadWarnings, should.Resemble, []string{"it's cold"})
 
-		a.So(message.NormalizedPayload, should.Resemble, []*pbtypes.Struct{
+		a.So(message.NormalizedPayload, should.Resemble, []*structpb.Struct{
 			{
-				Fields: map[string]*pbtypes.Value{
+				Fields: map[string]*structpb.Value{
 					"air": {
-						Kind: &pbtypes.Value_StructValue{
-							StructValue: &pbtypes.Struct{
-								Fields: map[string]*pbtypes.Value{
+						Kind: &structpb.Value_StructValue{
+							StructValue: &structpb.Struct{
+								Fields: map[string]*structpb.Value{
 									"temperature": {
-										Kind: &pbtypes.Value_NumberValue{
+										Kind: &structpb.Value_NumberValue{
 											NumberValue: -21.3,
 										},
 									},
@@ -427,14 +427,14 @@ func TestDecodeUplink(t *testing.T) {
 		err := host.DecodeUplink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
 
-		a.So(message.DecodedPayload, should.Resemble, &pbtypes.Struct{
-			Fields: map[string]*pbtypes.Value{
+		a.So(message.DecodedPayload, should.Resemble, &structpb.Struct{
+			Fields: map[string]*structpb.Value{
 				"air": {
-					Kind: &pbtypes.Value_StructValue{
-						StructValue: &pbtypes.Struct{
-							Fields: map[string]*pbtypes.Value{
+					Kind: &structpb.Value_StructValue{
+						StructValue: &structpb.Struct{
+							Fields: map[string]*structpb.Value{
 								"temperature": {
-									Kind: &pbtypes.Value_NumberValue{
+									Kind: &structpb.Value_NumberValue{
 										NumberValue: -21.3,
 									},
 								},
@@ -443,24 +443,24 @@ func TestDecodeUplink(t *testing.T) {
 					},
 				},
 				"wind": {
-					Kind: &pbtypes.Value_StructValue{
-						StructValue: &pbtypes.Struct{
-							Fields: map[string]*pbtypes.Value{},
+					Kind: &structpb.Value_StructValue{
+						StructValue: &structpb.Struct{
+							Fields: map[string]*structpb.Value{},
 						},
 					},
 				},
 			},
 		})
 		a.So(message.DecodedPayloadWarnings, should.BeEmpty)
-		a.So(message.NormalizedPayload, should.Resemble, []*pbtypes.Struct{
+		a.So(message.NormalizedPayload, should.Resemble, []*structpb.Struct{
 			{
-				Fields: map[string]*pbtypes.Value{
+				Fields: map[string]*structpb.Value{
 					"air": {
-						Kind: &pbtypes.Value_StructValue{
-							StructValue: &pbtypes.Struct{
-								Fields: map[string]*pbtypes.Value{
+						Kind: &structpb.Value_StructValue{
+							StructValue: &structpb.Struct{
+								Fields: map[string]*structpb.Value{
 									"temperature": {
-										Kind: &pbtypes.Value_NumberValue{
+										Kind: &structpb.Value_NumberValue{
 											NumberValue: -21.3,
 										},
 									},
@@ -513,19 +513,19 @@ func TestDecodeUplink(t *testing.T) {
 		err := host.DecodeUplink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
 
-		a.So(message.DecodedPayload, should.Resemble, &pbtypes.Struct{
-			Fields: map[string]*pbtypes.Value{
+		a.So(message.DecodedPayload, should.Resemble, &structpb.Struct{
+			Fields: map[string]*structpb.Value{
 				"temperatures": {
-					Kind: &pbtypes.Value_ListValue{
-						ListValue: &pbtypes.ListValue{
-							Values: []*pbtypes.Value{
+					Kind: &structpb.Value_ListValue{
+						ListValue: &structpb.ListValue{
+							Values: []*structpb.Value{
 								{
-									Kind: &pbtypes.Value_NumberValue{
+									Kind: &structpb.Value_NumberValue{
 										NumberValue: -21.3,
 									},
 								},
 								{
-									Kind: &pbtypes.Value_NumberValue{
+									Kind: &structpb.Value_NumberValue{
 										NumberValue: -20.88,
 									},
 								},
@@ -536,15 +536,15 @@ func TestDecodeUplink(t *testing.T) {
 			},
 		})
 		a.So(message.DecodedPayloadWarnings, should.BeEmpty)
-		a.So(message.NormalizedPayload, should.Resemble, []*pbtypes.Struct{
+		a.So(message.NormalizedPayload, should.Resemble, []*structpb.Struct{
 			{
-				Fields: map[string]*pbtypes.Value{
+				Fields: map[string]*structpb.Value{
 					"air": {
-						Kind: &pbtypes.Value_StructValue{
-							StructValue: &pbtypes.Struct{
-								Fields: map[string]*pbtypes.Value{
+						Kind: &structpb.Value_StructValue{
+							StructValue: &structpb.Struct{
+								Fields: map[string]*structpb.Value{
 									"temperature": {
-										Kind: &pbtypes.Value_NumberValue{
+										Kind: &structpb.Value_NumberValue{
 											NumberValue: -21.3,
 										},
 									},
@@ -555,13 +555,13 @@ func TestDecodeUplink(t *testing.T) {
 				},
 			},
 			{
-				Fields: map[string]*pbtypes.Value{
+				Fields: map[string]*structpb.Value{
 					"air": {
-						Kind: &pbtypes.Value_StructValue{
-							StructValue: &pbtypes.Struct{
-								Fields: map[string]*pbtypes.Value{
+						Kind: &structpb.Value_StructValue{
+							StructValue: &structpb.Struct{
+								Fields: map[string]*structpb.Value{
 									"temperature": {
-										Kind: &pbtypes.Value_NumberValue{
+										Kind: &structpb.Value_NumberValue{
 											NumberValue: -20.88,
 										},
 									},
@@ -712,7 +712,7 @@ func TestDecodeUplink(t *testing.T) {
 		err := host.DecodeUplink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
 
-		a.So(message.NormalizedPayload, should.Resemble, []*pbtypes.Struct{})
+		a.So(message.NormalizedPayload, should.Resemble, []*structpb.Struct{})
 		a.So(message.NormalizedPayloadWarnings, should.Resemble, []string{
 			"measurement 1: `air.temperature` should be equal or greater than `-273.15`",
 		})
@@ -753,7 +753,7 @@ func TestDecodeUplink(t *testing.T) {
 		`
 		err := host.DecodeUplink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
-		m, err := gogoproto.Map(message.DecodedPayload)
+		m, err := goproto.Map(message.DecodedPayload)
 		a.So(err, should.BeNil)
 		a.So(m, should.Resemble, map[string]interface{}{
 			"event":       "button",
@@ -850,7 +850,7 @@ func TestDecodeDownlink(t *testing.T) {
 		`
 		err := host.DecodeDownlink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
-		m, err := gogoproto.Map(message.DecodedPayload)
+		m, err := goproto.Map(message.DecodedPayload)
 		a.So(err, should.BeNil)
 		a.So(m, should.Resemble, map[string]interface{}{
 			"value": -21.3,
@@ -887,7 +887,7 @@ func TestDecodeDownlink(t *testing.T) {
 		`
 		err := host.DecodeDownlink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
-		m, err := gogoproto.Map(message.DecodedPayload)
+		m, err := goproto.Map(message.DecodedPayload)
 		a.So(err, should.BeNil)
 		a.So(m, should.Resemble, map[string]interface{}{
 			"color": "blue",

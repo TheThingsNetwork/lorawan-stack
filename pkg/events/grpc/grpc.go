@@ -24,19 +24,20 @@ import (
 	"strings"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
-	grpc_runtime "github.com/grpc-ecosystem/grpc-gateway/runtime"
+	grpc_runtime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights/rightsutil"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
-	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
+	"go.thethings.network/lorawan-stack/v3/pkg/goproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/types/known/anypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // NewEventsServer returns a new EventsServer on the given PubSub.
@@ -150,7 +151,7 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 	if hasStore {
 		if req.After == nil && req.Tail == 0 {
 			now := time.Now()
-			req.After = ttnpb.ProtoTimePtr(now)
+			req.After = timestamppb.New(now)
 		}
 		group, ctx = errgroup.WithContext(ctx)
 		group.Go(func() error {
@@ -176,18 +177,18 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 	startEvent := &ttnpb.Event{
 		UniqueId:       events.NewCorrelationID(),
 		Name:           "events.stream.start",
-		Time:           ttnpb.ProtoTimePtr(time.Now()),
+		Time:           timestamppb.Now(),
 		Identifiers:    req.Identifiers,
 		Origin:         hostname,
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
 	}
 
 	if len(names) > 0 {
-		value, err := gogoproto.Value(names)
+		value, err := goproto.Value(names)
 		if err != nil {
 			return err
 		}
-		startEvent.Data, err = pbtypes.MarshalAny(value)
+		startEvent.Data, err = anypb.New(value)
 		if err != nil {
 			return err
 		}

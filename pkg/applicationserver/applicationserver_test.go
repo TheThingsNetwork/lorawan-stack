@@ -28,7 +28,6 @@ import (
 	mqttnet "github.com/TheThingsIndustries/mystique/pkg/net"
 	mqttserver "github.com/TheThingsIndustries/mystique/pkg/server"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	pbtypes "github.com/gogo/protobuf/types"
 	nats_server "github.com/nats-io/nats-server/v2/server"
 	nats_test_server "github.com/nats-io/nats-server/v2/test"
 	nats_client "github.com/nats-io/nats.go"
@@ -58,6 +57,9 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 type connChannels struct {
@@ -949,7 +951,7 @@ func TestApplicationServer(t *testing.T) {
 							Up: &ttnpb.ApplicationUp_JoinAccept{
 								JoinAccept: &ttnpb.ApplicationJoinAccept{
 									SessionKeyId: []byte{0x11},
-									ReceivedAt:   ttnpb.ProtoTimePtr(now),
+									ReceivedAt:   timestamppb.New(now),
 								},
 							},
 						},
@@ -997,7 +999,7 @@ func TestApplicationServer(t *testing.T) {
 										EncryptedKey: []byte{0x39, 0x11, 0x40, 0x98, 0xa1, 0x5d, 0x6f, 0x92, 0xd7, 0xf0, 0x13, 0x21, 0x5b, 0x5b, 0x41, 0xa8, 0x98, 0x2d, 0xac, 0x59, 0x34, 0x76, 0x36, 0x18},
 										KekLabel:     "test",
 									},
-									ReceivedAt: ttnpb.ProtoTimePtr(now),
+									ReceivedAt: timestamppb.New(now),
 								},
 							},
 						},
@@ -1045,7 +1047,7 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        22,
 									FCnt:         22,
 									FrmPayload:   []byte{0x01},
-									ReceivedAt:   ttnpb.ProtoTimePtr(now),
+									ReceivedAt:   timestamppb.New(now),
 								},
 							},
 						},
@@ -1061,10 +1063,10 @@ func TestApplicationServer(t *testing.T) {
 										FPort:        22,
 										FCnt:         22,
 										FrmPayload:   []byte{0xc1},
-										DecodedPayload: &pbtypes.Struct{
-											Fields: map[string]*pbtypes.Value{
+										DecodedPayload: &structpb.Struct{
+											Fields: map[string]*structpb.Value{
 												"sum": {
-													Kind: &pbtypes.Value_NumberValue{
+													Kind: &structpb.Value_NumberValue{
 														NumberValue: 193, // Payload formatter sums the bytes in FRMPayload.
 													},
 												},
@@ -1120,7 +1122,7 @@ func TestApplicationServer(t *testing.T) {
 											FrmPayload:   []byte{0xb, 0x8f, 0x94, 0xe6},
 										},
 									},
-									ReceivedAt: ttnpb.ProtoTimePtr(now),
+									ReceivedAt: timestamppb.New(now),
 								},
 							},
 						},
@@ -1168,10 +1170,10 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        11,
 									FCnt:         11,
 									FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
-									DecodedPayload: &pbtypes.Struct{
-										Fields: map[string]*pbtypes.Value{
+									DecodedPayload: &structpb.Struct{
+										Fields: map[string]*structpb.Value{
 											"sum": {
-												Kind: &pbtypes.Value_NumberValue{
+												Kind: &structpb.Value_NumberValue{
 													NumberValue: 4,
 												},
 											},
@@ -1183,10 +1185,10 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        22,
 									FCnt:         22,
 									FrmPayload:   []byte{0x2, 0x2, 0x2, 0x2},
-									DecodedPayload: &pbtypes.Struct{
-										Fields: map[string]*pbtypes.Value{
+									DecodedPayload: &structpb.Struct{
+										Fields: map[string]*structpb.Value{
 											"sum": {
-												Kind: &pbtypes.Value_NumberValue{
+												Kind: &structpb.Value_NumberValue{
 													NumberValue: 8,
 												},
 											},
@@ -1209,7 +1211,7 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        42,
 									FCnt:         42,
 									FrmPayload:   []byte{0xca, 0xa9, 0x42},
-									ReceivedAt:   ttnpb.ProtoTimePtr(now),
+									ReceivedAt:   timestamppb.New(now),
 								},
 							},
 						},
@@ -1225,10 +1227,10 @@ func TestApplicationServer(t *testing.T) {
 										FPort:        42,
 										FCnt:         42,
 										FrmPayload:   []byte{0x01, 0x02, 0x03},
-										DecodedPayload: &pbtypes.Struct{
-											Fields: map[string]*pbtypes.Value{
+										DecodedPayload: &structpb.Struct{
+											Fields: map[string]*structpb.Value{
 												"sum": {
-													Kind: &pbtypes.Value_NumberValue{
+													Kind: &structpb.Value_NumberValue{
 														NumberValue: 6, // Payload formatter sums the bytes in FRMPayload.
 													},
 												},
@@ -1276,10 +1278,10 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        42,
 									FCnt:         42,
 									FrmPayload:   []byte{0x50, 0xd, 0x40, 0xd5},
-									DecodedPayload: &pbtypes.Struct{
-										Fields: map[string]*pbtypes.Value{
+									DecodedPayload: &structpb.Struct{
+										Fields: map[string]*structpb.Value{
 											"sum": {
-												Kind: &pbtypes.Value_NumberValue{
+												Kind: &structpb.Value_NumberValue{
 													NumberValue: 370,
 												},
 											},
@@ -1298,10 +1300,10 @@ func TestApplicationServer(t *testing.T) {
 										FPort:        42,
 										FCnt:         42,
 										FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
-										DecodedPayload: &pbtypes.Struct{
-											Fields: map[string]*pbtypes.Value{
+										DecodedPayload: &structpb.Struct{
+											Fields: map[string]*structpb.Value{
 												"sum": {
-													Kind: &pbtypes.Value_NumberValue{
+													Kind: &structpb.Value_NumberValue{
 														NumberValue: 4, // Payload formatter sums the bytes in FRMPayload.
 													},
 												},
@@ -1344,10 +1346,10 @@ func TestApplicationServer(t *testing.T) {
 											FPort:        42,
 											FCnt:         42,
 											FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
-											DecodedPayload: &pbtypes.Struct{
-												Fields: map[string]*pbtypes.Value{
+											DecodedPayload: &structpb.Struct{
+												Fields: map[string]*structpb.Value{
 													"sum": {
-														Kind: &pbtypes.Value_NumberValue{
+														Kind: &structpb.Value_NumberValue{
 															NumberValue: 4, // Payload formatter sums the bytes in FRMPayload.
 														},
 													},
@@ -1388,10 +1390,10 @@ func TestApplicationServer(t *testing.T) {
 										FPort:        42,
 										FCnt:         42,
 										FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
-										DecodedPayload: &pbtypes.Struct{
-											Fields: map[string]*pbtypes.Value{
+										DecodedPayload: &structpb.Struct{
+											Fields: map[string]*structpb.Value{
 												"sum": {
-													Kind: &pbtypes.Value_NumberValue{
+													Kind: &structpb.Value_NumberValue{
 														NumberValue: 4, // Payload formatter sums the bytes in FRMPayload.
 													},
 												},
@@ -1436,10 +1438,10 @@ func TestApplicationServer(t *testing.T) {
 										FPort:        11,
 										FCnt:         1,
 										FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
-										DecodedPayload: &pbtypes.Struct{
-											Fields: map[string]*pbtypes.Value{
+										DecodedPayload: &structpb.Struct{
+											Fields: map[string]*structpb.Value{
 												"sum": {
-													Kind: &pbtypes.Value_NumberValue{
+													Kind: &structpb.Value_NumberValue{
 														NumberValue: 4, // Payload formatter sums the bytes in FRMPayload.
 													},
 												},
@@ -1459,10 +1461,10 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        22,
 									FCnt:         2,
 									FrmPayload:   []byte{0x2, 0x2, 0x2, 0x2},
-									DecodedPayload: &pbtypes.Struct{
-										Fields: map[string]*pbtypes.Value{
+									DecodedPayload: &structpb.Struct{
+										Fields: map[string]*structpb.Value{
 											"sum": {
-												Kind: &pbtypes.Value_NumberValue{
+												Kind: &structpb.Value_NumberValue{
 													NumberValue: 8, // Payload formatter sums the bytes in FRMPayload.
 												},
 											},
@@ -1474,10 +1476,10 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        11,
 									FCnt:         44,
 									FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
-									DecodedPayload: &pbtypes.Struct{
-										Fields: map[string]*pbtypes.Value{
+									DecodedPayload: &structpb.Struct{
+										Fields: map[string]*structpb.Value{
 											"sum": {
-												Kind: &pbtypes.Value_NumberValue{
+												Kind: &structpb.Value_NumberValue{
 													NumberValue: 4, // Payload formatter sums the bytes in FRMPayload.
 												},
 											},
@@ -1515,7 +1517,7 @@ func TestApplicationServer(t *testing.T) {
 											FrmPayload:   []byte{0x2f, 0x3f, 0x31, 0x2c},
 										},
 									},
-									ReceivedAt: ttnpb.ProtoTimePtr(now),
+									ReceivedAt: timestamppb.New(now),
 								},
 							},
 						},
@@ -1564,10 +1566,10 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        22,
 									FCnt:         2,
 									FrmPayload:   []byte{0x2, 0x2, 0x2, 0x2},
-									DecodedPayload: &pbtypes.Struct{
-										Fields: map[string]*pbtypes.Value{
+									DecodedPayload: &structpb.Struct{
+										Fields: map[string]*structpb.Value{
 											"sum": {
-												Kind: &pbtypes.Value_NumberValue{
+												Kind: &structpb.Value_NumberValue{
 													NumberValue: 8, // Payload formatter sums the bytes in FRMPayload.
 												},
 											},
@@ -1579,10 +1581,10 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        11,
 									FCnt:         44,
 									FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
-									DecodedPayload: &pbtypes.Struct{
-										Fields: map[string]*pbtypes.Value{
+									DecodedPayload: &structpb.Struct{
+										Fields: map[string]*structpb.Value{
 											"sum": {
-												Kind: &pbtypes.Value_NumberValue{
+												Kind: &structpb.Value_NumberValue{
 													NumberValue: 4, // Payload formatter sums the bytes in FRMPayload.
 												},
 											},
@@ -1605,7 +1607,7 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        24,
 									FCnt:         24,
 									FrmPayload:   []byte{0x14, 0x4e, 0x3c},
-									ReceivedAt:   ttnpb.ProtoTimePtr(now),
+									ReceivedAt:   timestamppb.New(now),
 								},
 							},
 						},
@@ -1621,10 +1623,10 @@ func TestApplicationServer(t *testing.T) {
 										FPort:        24,
 										FCnt:         24,
 										FrmPayload:   []byte{0x64, 0x64, 0x64},
-										DecodedPayload: &pbtypes.Struct{
-											Fields: map[string]*pbtypes.Value{
+										DecodedPayload: &structpb.Struct{
+											Fields: map[string]*structpb.Value{
 												"sum": {
-													Kind: &pbtypes.Value_NumberValue{
+													Kind: &structpb.Value_NumberValue{
 														NumberValue: 300, // Payload formatter sums the bytes in FRMPayload.
 													},
 												},
@@ -1658,10 +1660,10 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        11,
 									FCnt:         1,
 									FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
-									DecodedPayload: &pbtypes.Struct{
-										Fields: map[string]*pbtypes.Value{
+									DecodedPayload: &structpb.Struct{
+										Fields: map[string]*structpb.Value{
 											"sum": {
-												Kind: &pbtypes.Value_NumberValue{
+												Kind: &structpb.Value_NumberValue{
 													NumberValue: 4, // Payload formatter sums the bytes in FRMPayload.
 												},
 											},
@@ -1673,10 +1675,10 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        22,
 									FCnt:         2,
 									FrmPayload:   []byte{0x2, 0x2, 0x2, 0x2},
-									DecodedPayload: &pbtypes.Struct{
-										Fields: map[string]*pbtypes.Value{
+									DecodedPayload: &structpb.Struct{
+										Fields: map[string]*structpb.Value{
 											"sum": {
-												Kind: &pbtypes.Value_NumberValue{
+												Kind: &structpb.Value_NumberValue{
 													NumberValue: 8, // Payload formatter sums the bytes in FRMPayload.
 												},
 											},
@@ -1722,10 +1724,10 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        11,
 									FCnt:         43,
 									FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
-									DecodedPayload: &pbtypes.Struct{
-										Fields: map[string]*pbtypes.Value{
+									DecodedPayload: &structpb.Struct{
+										Fields: map[string]*structpb.Value{
 											"sum": {
-												Kind: &pbtypes.Value_NumberValue{
+												Kind: &structpb.Value_NumberValue{
 													NumberValue: 4, // Payload formatter sums the bytes in FRMPayload.
 												},
 											},
@@ -1737,10 +1739,10 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        22,
 									FCnt:         44,
 									FrmPayload:   []byte{0x2, 0x2, 0x2, 0x2},
-									DecodedPayload: &pbtypes.Struct{
-										Fields: map[string]*pbtypes.Value{
+									DecodedPayload: &structpb.Struct{
+										Fields: map[string]*structpb.Value{
 											"sum": {
-												Kind: &pbtypes.Value_NumberValue{
+												Kind: &structpb.Value_NumberValue{
 													NumberValue: 8, // Payload formatter sums the bytes in FRMPayload.
 												},
 											},
@@ -1811,10 +1813,10 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        11,
 									FCnt:         85,
 									FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
-									DecodedPayload: &pbtypes.Struct{
-										Fields: map[string]*pbtypes.Value{
+									DecodedPayload: &structpb.Struct{
+										Fields: map[string]*structpb.Value{
 											"sum": {
-												Kind: &pbtypes.Value_NumberValue{
+												Kind: &structpb.Value_NumberValue{
 													NumberValue: 4, // Payload formatter sums the bytes in FRMPayload.
 												},
 											},
@@ -1826,10 +1828,10 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        22,
 									FCnt:         86,
 									FrmPayload:   []byte{0x2, 0x2, 0x2, 0x2},
-									DecodedPayload: &pbtypes.Struct{
-										Fields: map[string]*pbtypes.Value{
+									DecodedPayload: &structpb.Struct{
+										Fields: map[string]*structpb.Value{
 											"sum": {
-												Kind: &pbtypes.Value_NumberValue{
+												Kind: &structpb.Value_NumberValue{
 													NumberValue: 8, // Payload formatter sums the bytes in FRMPayload.
 												},
 											},
@@ -1852,7 +1854,7 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        42,
 									FCnt:         42,
 									FrmPayload:   []byte{0xd1, 0x43, 0x6a},
-									ReceivedAt:   ttnpb.ProtoTimePtr(now),
+									ReceivedAt:   timestamppb.New(now),
 								},
 							},
 						},
@@ -1868,10 +1870,10 @@ func TestApplicationServer(t *testing.T) {
 										FPort:        42,
 										FCnt:         42,
 										FrmPayload:   []byte{0x2a, 0x2a, 0x2a},
-										DecodedPayload: &pbtypes.Struct{
-											Fields: map[string]*pbtypes.Value{
+										DecodedPayload: &structpb.Struct{
+											Fields: map[string]*structpb.Value{
 												"sum": {
-													Kind: &pbtypes.Value_NumberValue{
+													Kind: &structpb.Value_NumberValue{
 														NumberValue: 126, // Payload formatter sums the bytes in FRMPayload.
 													},
 												},
@@ -1915,7 +1917,7 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        42,
 									FCnt:         42,
 									FrmPayload:   []byte{0xd1, 0x43, 0x6a},
-									ReceivedAt:   ttnpb.ProtoTimePtr(now),
+									ReceivedAt:   timestamppb.New(now),
 								},
 							},
 						},
@@ -1931,10 +1933,10 @@ func TestApplicationServer(t *testing.T) {
 										FPort:        42,
 										FCnt:         42,
 										FrmPayload:   []byte{0x2a, 0x2a, 0x2a},
-										DecodedPayload: &pbtypes.Struct{
-											Fields: map[string]*pbtypes.Value{
+										DecodedPayload: &structpb.Struct{
+											Fields: map[string]*structpb.Value{
 												"sum": {
-													Kind: &pbtypes.Value_NumberValue{
+													Kind: &structpb.Value_NumberValue{
 														NumberValue: 126, // Payload formatter sums the bytes in FRMPayload.
 													},
 												},
@@ -1979,7 +1981,7 @@ func TestApplicationServer(t *testing.T) {
 										EncryptedKey: []byte{0x56, 0x15, 0xaa, 0x22, 0xb7, 0x5f, 0xc, 0x24, 0x79, 0x6, 0x84, 0x68, 0x89, 0x0, 0xa6, 0x16, 0x4a, 0x9c, 0xef, 0xdb, 0xbf, 0x61, 0x6f, 0x0},
 										KekLabel:     "test",
 									},
-									ReceivedAt: ttnpb.ProtoTimePtr(now),
+									ReceivedAt: timestamppb.New(now),
 								},
 							},
 						},
@@ -1998,7 +2000,7 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        11,
 									FCnt:         11,
 									FrmPayload:   []byte{0xaa, 0x64, 0xb7, 0x7},
-									ReceivedAt:   ttnpb.ProtoTimePtr(now),
+									ReceivedAt:   timestamppb.New(now),
 								},
 							},
 						},
@@ -2103,10 +2105,10 @@ func TestApplicationServer(t *testing.T) {
 						{
 							{
 								FPort: 33,
-								DecodedPayload: &pbtypes.Struct{
-									Fields: map[string]*pbtypes.Value{
+								DecodedPayload: &structpb.Struct{
+									Fields: map[string]*structpb.Value{
 										"sum": {
-											Kind: &pbtypes.Value_NumberValue{
+											Kind: &structpb.Value_NumberValue{
 												NumberValue: 6, // Payload formatter returns a byte slice with this many 1s.
 											},
 										},
@@ -2145,10 +2147,10 @@ func TestApplicationServer(t *testing.T) {
 								FPort:        11,
 								FCnt:         1,
 								FrmPayload:   []byte{0x1, 0x1, 0x1},
-								DecodedPayload: &pbtypes.Struct{
-									Fields: map[string]*pbtypes.Value{
+								DecodedPayload: &structpb.Struct{
+									Fields: map[string]*structpb.Value{
 										"sum": {
-											Kind: &pbtypes.Value_NumberValue{
+											Kind: &structpb.Value_NumberValue{
 												NumberValue: 3,
 											},
 										},
@@ -2161,10 +2163,10 @@ func TestApplicationServer(t *testing.T) {
 								FPort:        22,
 								FCnt:         2,
 								FrmPayload:   []byte{0x2, 0x2, 0x2},
-								DecodedPayload: &pbtypes.Struct{
-									Fields: map[string]*pbtypes.Value{
+								DecodedPayload: &structpb.Struct{
+									Fields: map[string]*structpb.Value{
 										"sum": {
-											Kind: &pbtypes.Value_NumberValue{
+											Kind: &structpb.Value_NumberValue{
 												NumberValue: 6,
 											},
 										},
@@ -2177,10 +2179,10 @@ func TestApplicationServer(t *testing.T) {
 								FPort:        33,
 								FCnt:         3,
 								FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1, 0x1, 0x1},
-								DecodedPayload: &pbtypes.Struct{
-									Fields: map[string]*pbtypes.Value{
+								DecodedPayload: &structpb.Struct{
+									Fields: map[string]*structpb.Value{
 										"sum": {
-											Kind: &pbtypes.Value_NumberValue{
+											Kind: &structpb.Value_NumberValue{
 												NumberValue: 6,
 											},
 										},
@@ -2231,10 +2233,10 @@ func TestApplicationServer(t *testing.T) {
 								FPort:        11,
 								FCnt:         4,
 								FrmPayload:   []byte{0x1, 0x1, 0x1},
-								DecodedPayload: &pbtypes.Struct{
-									Fields: map[string]*pbtypes.Value{
+								DecodedPayload: &structpb.Struct{
+									Fields: map[string]*structpb.Value{
 										"sum": {
-											Kind: &pbtypes.Value_NumberValue{
+											Kind: &structpb.Value_NumberValue{
 												NumberValue: 3,
 											},
 										},
@@ -2247,10 +2249,10 @@ func TestApplicationServer(t *testing.T) {
 								FPort:        22,
 								FCnt:         5,
 								FrmPayload:   []byte{0x2, 0x2, 0x2},
-								DecodedPayload: &pbtypes.Struct{
-									Fields: map[string]*pbtypes.Value{
+								DecodedPayload: &structpb.Struct{
+									Fields: map[string]*structpb.Value{
 										"sum": {
-											Kind: &pbtypes.Value_NumberValue{
+											Kind: &structpb.Value_NumberValue{
 												NumberValue: 6,
 											},
 										},
@@ -2342,7 +2344,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 	}
 	_, err := linkRegistry.Set(ctx, registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 		return &ttnpb.ApplicationLink{
-			SkipPayloadCrypto: &pbtypes.BoolValue{Value: true},
+			SkipPayloadCrypto: &wrapperspb.BoolValue{Value: true},
 		}, []string{"skip_payload_crypto"}, nil
 	})
 	if err != nil {
@@ -2470,7 +2472,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 		}
 	}()
 
-	for _, override := range []*pbtypes.BoolValue{
+	for _, override := range []*wrapperspb.BoolValue{
 		nil,
 		{Value: true},
 		{Value: false},
@@ -2512,7 +2514,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 										EncryptedKey: []byte{0x39, 0x11, 0x40, 0x98, 0xa1, 0x5d, 0x6f, 0x92, 0xd7, 0xf0, 0x13, 0x21, 0x5b, 0x5b, 0x41, 0xa8, 0x98, 0x2d, 0xac, 0x59, 0x34, 0x76, 0x36, 0x18},
 										KekLabel:     kekLabel,
 									},
-									ReceivedAt: ttnpb.ProtoTimePtr(now),
+									ReceivedAt: timestamppb.New(now),
 								},
 							},
 						},
@@ -2578,7 +2580,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 									FPort:        22,
 									FCnt:         22,
 									FrmPayload:   []byte{0x01},
-									ReceivedAt:   ttnpb.ProtoTimePtr(now),
+									ReceivedAt:   timestamppb.New(now),
 								},
 							},
 						},
@@ -2929,7 +2931,7 @@ func TestLocationFromPayload(t *testing.T) {
 				FPort:        11,
 				FCnt:         11,
 				FrmPayload:   []byte{0x11},
-				ReceivedAt:   ttnpb.ProtoTimePtr(now),
+				ReceivedAt:   timestamppb.New(now),
 			},
 		},
 	})
@@ -3120,7 +3122,7 @@ func TestUplinkNormalized(t *testing.T) {
 				FPort:        11,
 				FCnt:         11,
 				FrmPayload:   []byte{0x11},
-				ReceivedAt:   ttnpb.ProtoTimePtr(now),
+				ReceivedAt:   timestamppb.New(now),
 			},
 		},
 	})
@@ -3142,14 +3144,14 @@ func TestUplinkNormalized(t *testing.T) {
 	if normalized == nil {
 		t.Fatalf("Expected uplink normalized message")
 	}
-	a.So(normalized.NormalizedPayload, should.Resemble, &pbtypes.Struct{
-		Fields: map[string]*pbtypes.Value{
+	a.So(normalized.NormalizedPayload, should.Resemble, &structpb.Struct{
+		Fields: map[string]*structpb.Value{
 			"air": {
-				Kind: &pbtypes.Value_StructValue{
-					StructValue: &pbtypes.Struct{
-						Fields: map[string]*pbtypes.Value{
+				Kind: &structpb.Value_StructValue{
+					StructValue: &structpb.Struct{
+						Fields: map[string]*structpb.Value{
 							"temperature": {
-								Kind: &pbtypes.Value_NumberValue{
+								Kind: &structpb.Value_NumberValue{
 									NumberValue: 21.5,
 								},
 							},

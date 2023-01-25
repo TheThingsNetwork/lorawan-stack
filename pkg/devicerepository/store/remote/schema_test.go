@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"gopkg.in/yaml.v2"
 )
 
@@ -118,7 +119,7 @@ func TestProfile(t *testing.T) {
 					SupportsClassB:    true,
 					SupportsJoin:      true,
 					MacSettings: &ttnpb.MACSettings{
-						ClassBTimeout:         ttnpb.ProtoDurationPtr(8 * time.Second),
+						ClassBTimeout:         durationpb.New(8 * time.Second),
 						PingSlotPeriodicity:   &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_16S},
 						PingSlotDataRateIndex: &ttnpb.DataRateIndexValue{Value: ttnpb.DataRateIndex_DATA_RATE_3},
 						PingSlotFrequency:     &ttnpb.ZeroableFrequencyValue{Value: 868300000},
@@ -147,7 +148,7 @@ func TestProfile(t *testing.T) {
 					SupportsClassC:    true,
 					SupportsJoin:      true,
 					MacSettings: &ttnpb.MACSettings{
-						ClassCTimeout: ttnpb.ProtoDurationPtr(64 * time.Second),
+						ClassCTimeout: durationpb.New(64 * time.Second),
 					},
 				},
 				FieldMask: ttnpb.FieldMask(

@@ -17,13 +17,13 @@ package identityserver
 import (
 	"context"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var (
@@ -240,7 +240,7 @@ var errApplicationNeedsCollaborator = errors.DefineFailedPrecondition("applicati
 
 func (is *IdentityServer) setApplicationCollaborator(
 	ctx context.Context, req *ttnpb.SetApplicationCollaboratorRequest,
-) (_ *pbtypes.Empty, err error) {
+) (_ *emptypb.Empty, err error) {
 	// Require that caller has rights to manage collaborators.
 	err = rights.RequireApplication(ctx, req.GetApplicationIds(), ttnpb.Right_RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
 	if err != nil {
@@ -391,7 +391,7 @@ func (aa *applicationAccess) GetCollaborator(ctx context.Context, req *ttnpb.Get
 	return aa.getApplicationCollaborator(ctx, req)
 }
 
-func (aa *applicationAccess) SetCollaborator(ctx context.Context, req *ttnpb.SetApplicationCollaboratorRequest) (*pbtypes.Empty, error) {
+func (aa *applicationAccess) SetCollaborator(ctx context.Context, req *ttnpb.SetApplicationCollaboratorRequest) (*emptypb.Empty, error) {
 	return aa.setApplicationCollaborator(ctx, req)
 }
 

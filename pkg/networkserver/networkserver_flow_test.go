@@ -38,6 +38,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 // frequencyPlanMACCommands generates the MAC command and event builders that are expected
@@ -205,7 +206,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 					SessionKeys: test.MakeSessionKeys(
 						test.SessionKeysOptions.WithDefaultNwkKeys(dev.LorawanVersion),
 					),
-					Lifetime:       ttnpb.ProtoDurationPtr(time.Hour),
+					Lifetime:       durationpb.New(time.Hour),
 					CorrelationIds: []string{"NsJs-1", "NsJs-2"},
 				},
 			},

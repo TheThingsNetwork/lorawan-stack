@@ -21,7 +21,6 @@ import (
 	"strings"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -30,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var (
@@ -435,6 +435,6 @@ type entityAccess struct {
 	*IdentityServer
 }
 
-func (ea *entityAccess) AuthInfo(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.AuthInfoResponse, error) {
+func (ea *entityAccess) AuthInfo(ctx context.Context, _ *emptypb.Empty) (*ttnpb.AuthInfoResponse, error) {
 	return ea.authInfo(ctx)
 }

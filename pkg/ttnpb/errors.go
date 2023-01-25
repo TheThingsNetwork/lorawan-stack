@@ -17,10 +17,10 @@ package ttnpb
 import (
 	"fmt"
 
-	"github.com/gogo/protobuf/types"
-	proto "github.com/golang/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
+	"go.thethings.network/lorawan-stack/v3/pkg/goproto"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 const valueKey = "value"
@@ -36,9 +36,9 @@ func (e errorDetails) Namespace() string     { return e.GetNamespace() }
 func (e errorDetails) Name() string          { return e.GetName() }
 func (e errorDetails) MessageFormat() string { return e.GetMessageFormat() }
 func (e errorDetails) PublicAttributes() map[string]interface{} {
-	attributes, err := gogoproto.Map(e.GetAttributes())
+	attributes, err := goproto.Map(e.GetAttributes())
 	if err != nil {
-		panic(fmt.Sprintf("Failed to decode error attributes: %s", err)) // Likely a bug in gogoproto.
+		panic(fmt.Sprintf("Failed to decode error attributes: %s", err)) // Likely a bug in goproto.
 	}
 	return attributes
 }
@@ -60,12 +60,11 @@ func (e errorDetails) Details() []proto.Message {
 
 	msgs := make([]proto.Message, 0, len(details))
 	for _, dAny := range details {
-		var msg types.DynamicAny
-		err := types.UnmarshalAny(dAny, &msg)
+		msg, err := dAny.UnmarshalNew()
 		if err != nil {
 			panic(fmt.Sprintf("Failed to decode error details: %s", err))
 		}
-		msgs = append(msgs, msg.Message)
+		msgs = append(msgs, msg)
 	}
 	return msgs
 }
@@ -79,7 +78,7 @@ func ErrorDetailsToProto(e errors.ErrorDetails) *ErrorDetails {
 		Code:          e.Code(),
 	}
 	if attributes := e.PublicAttributes(); len(attributes) > 0 {
-		attributesStruct, err := gogoproto.Struct(attributes)
+		attributesStruct, err := goproto.Struct(attributes)
 		if err != nil {
 			panic(fmt.Sprintf("Failed to encode error attributes: %s", err)) // Likely a bug in ttn (invalid attribute type).
 		}
@@ -91,7 +90,7 @@ func ErrorDetailsToProto(e errors.ErrorDetails) *ErrorDetails {
 		}
 	}
 	for _, d := range e.Details() {
-		dAny, err := types.MarshalAny(d)
+		dAny, err := anypb.New(d)
 		if err != nil {
 			panic(fmt.Sprintf("Failed to encode error details: %s", err))
 		}

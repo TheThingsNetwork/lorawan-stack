@@ -13,15 +13,14 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/golang/protobuf/descriptor"
-	"github.com/golang/protobuf/proto"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/grpc-ecosystem/grpc-gateway/utilities"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/utilities"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 )
 
 // Suppress "imported and not used" errors
@@ -30,7 +29,6 @@ var _ io.Reader
 var _ status.Status
 var _ = runtime.String
 var _ = utilities.NewDoubleArray
-var _ = descriptor.ForMessage
 var _ = metadata.Join
 
 var (
@@ -54,7 +52,6 @@ func request_GatewayConfigurationService_GetGatewayConfiguration_0(ctx context.C
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "gateway_ids.gateway_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_ids.gateway_id", err)
 	}
@@ -65,7 +62,6 @@ func request_GatewayConfigurationService_GetGatewayConfiguration_0(ctx context.C
 	}
 
 	protoReq.Format, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "format", err)
 	}
@@ -76,7 +72,6 @@ func request_GatewayConfigurationService_GetGatewayConfiguration_0(ctx context.C
 	}
 
 	protoReq.Filename, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "filename", err)
 	}
@@ -110,7 +105,6 @@ func local_request_GatewayConfigurationService_GetGatewayConfiguration_0(ctx con
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "gateway_ids.gateway_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_ids.gateway_id", err)
 	}
@@ -121,7 +115,6 @@ func local_request_GatewayConfigurationService_GetGatewayConfiguration_0(ctx con
 	}
 
 	protoReq.Format, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "format", err)
 	}
@@ -132,7 +125,6 @@ func local_request_GatewayConfigurationService_GetGatewayConfiguration_0(ctx con
 	}
 
 	protoReq.Filename, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "filename", err)
 	}
@@ -170,7 +162,6 @@ func request_GatewayConfigurationService_GetGatewayConfiguration_1(ctx context.C
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "gateway_ids.gateway_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_ids.gateway_id", err)
 	}
@@ -181,7 +172,6 @@ func request_GatewayConfigurationService_GetGatewayConfiguration_1(ctx context.C
 	}
 
 	protoReq.Format, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "format", err)
 	}
@@ -192,7 +182,6 @@ func request_GatewayConfigurationService_GetGatewayConfiguration_1(ctx context.C
 	}
 
 	protoReq.Type, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "type", err)
 	}
@@ -203,7 +192,6 @@ func request_GatewayConfigurationService_GetGatewayConfiguration_1(ctx context.C
 	}
 
 	protoReq.Filename, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "filename", err)
 	}
@@ -237,7 +225,6 @@ func local_request_GatewayConfigurationService_GetGatewayConfiguration_1(ctx con
 	}
 
 	err = runtime.PopulateFieldFromPath(&protoReq, "gateway_ids.gateway_id", val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_ids.gateway_id", err)
 	}
@@ -248,7 +235,6 @@ func local_request_GatewayConfigurationService_GetGatewayConfiguration_1(ctx con
 	}
 
 	protoReq.Format, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "format", err)
 	}
@@ -259,7 +245,6 @@ func local_request_GatewayConfigurationService_GetGatewayConfiguration_1(ctx con
 	}
 
 	protoReq.Type, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "type", err)
 	}
@@ -270,7 +255,6 @@ func local_request_GatewayConfigurationService_GetGatewayConfiguration_1(ctx con
 	}
 
 	protoReq.Filename, err = runtime.String(val)
-
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "filename", err)
 	}
@@ -299,20 +283,22 @@ func RegisterGatewayConfigurationServiceHandlerServer(ctx context.Context, mux *
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.GatewayConfigurationService/GetGatewayConfiguration", runtime.WithHTTPPathPattern("/gcs/gateways/configuration/{gateway_ids.gateway_id}/{format}/{filename}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_GatewayConfigurationService_GetGatewayConfiguration_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_GatewayConfigurationService_GetGatewayConfiguration_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_GatewayConfigurationService_GetGatewayConfiguration_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_GatewayConfigurationService_GetGatewayConfiguration_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -322,20 +308,22 @@ func RegisterGatewayConfigurationServiceHandlerServer(ctx context.Context, mux *
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.GatewayConfigurationService/GetGatewayConfiguration", runtime.WithHTTPPathPattern("/gcs/gateways/configuration/{gateway_ids.gateway_id}/{format}/{type}/{filename}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_GatewayConfigurationService_GetGatewayConfiguration_1(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_GatewayConfigurationService_GetGatewayConfiguration_1(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_GatewayConfigurationService_GetGatewayConfiguration_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_GatewayConfigurationService_GetGatewayConfiguration_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -384,19 +372,21 @@ func RegisterGatewayConfigurationServiceHandlerClient(ctx context.Context, mux *
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.GatewayConfigurationService/GetGatewayConfiguration", runtime.WithHTTPPathPattern("/gcs/gateways/configuration/{gateway_ids.gateway_id}/{format}/{filename}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_GatewayConfigurationService_GetGatewayConfiguration_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_GatewayConfigurationService_GetGatewayConfiguration_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_GatewayConfigurationService_GetGatewayConfiguration_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_GatewayConfigurationService_GetGatewayConfiguration_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -404,19 +394,21 @@ func RegisterGatewayConfigurationServiceHandlerClient(ctx context.Context, mux *
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.GatewayConfigurationService/GetGatewayConfiguration", runtime.WithHTTPPathPattern("/gcs/gateways/configuration/{gateway_ids.gateway_id}/{format}/{type}/{filename}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_GatewayConfigurationService_GetGatewayConfiguration_1(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_GatewayConfigurationService_GetGatewayConfiguration_1(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_GatewayConfigurationService_GetGatewayConfiguration_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_GatewayConfigurationService_GetGatewayConfiguration_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -424,9 +416,9 @@ func RegisterGatewayConfigurationServiceHandlerClient(ctx context.Context, mux *
 }
 
 var (
-	pattern_GatewayConfigurationService_GetGatewayConfiguration_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"gcs", "gateways", "configuration", "gateway_ids.gateway_id", "format", "filename"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_GatewayConfigurationService_GetGatewayConfiguration_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"gcs", "gateways", "configuration", "gateway_ids.gateway_id", "format", "filename"}, ""))
 
-	pattern_GatewayConfigurationService_GetGatewayConfiguration_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"gcs", "gateways", "configuration", "gateway_ids.gateway_id", "format", "type", "filename"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_GatewayConfigurationService_GetGatewayConfiguration_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"gcs", "gateways", "configuration", "gateway_ids.gateway_id", "format", "type", "filename"}, ""))
 )
 
 var (

@@ -26,6 +26,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mqtt/topics"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/datarate"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // eirpDelta is the delta between EIRP and ERP.
@@ -82,12 +84,12 @@ func (protobufv2) FromDownlink(down *ttnpb.DownlinkMessage, _ *ttnpb.GatewayIden
 			Lorawan: lorawan,
 		},
 	}
-	return v2downlink.Marshal()
+	return proto.Marshal(v2downlink)
 }
 
 func (protobufv2) ToUplink(message []byte, ids *ttnpb.GatewayIdentifiers) (*ttnpb.UplinkMessage, error) {
 	v2uplink := &ttnpbv2.UplinkMessage{}
-	err := v2uplink.Unmarshal(message)
+	err := proto.Unmarshal(message, v2uplink)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +127,7 @@ func (protobufv2) ToUplink(message []byte, ids *ttnpb.GatewayIdentifiers) (*ttnp
 		return nil, errModulation.WithAttributes("modulation", lorawanMetadata.Modulation)
 	}
 
-	mdTime := ttnpb.ProtoTimePtr(time.Unix(0, gwMetadata.Time))
+	mdTime := timestamppb.New(time.Unix(0, gwMetadata.Time))
 	if antennas := gwMetadata.Antennas; len(antennas) > 0 {
 		for _, antenna := range antennas {
 			rssi := antenna.ChannelRssi
@@ -163,7 +165,7 @@ var ttkgPlatformRegex = regexp.MustCompile(`The Things Gateway v1 - BL (r[0-9]+\
 
 func (protobufv2) ToStatus(message []byte, _ *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayStatus, error) {
 	v2status := &ttnpbv2.StatusMessage{}
-	err := v2status.Unmarshal(message)
+	err := proto.Unmarshal(message, v2status)
 	if err != nil {
 		return nil, err
 	}
@@ -219,10 +221,10 @@ func (protobufv2) ToStatus(message []byte, _ *ttnpb.GatewayIdentifiers) (*ttnpb.
 	}
 	return &ttnpb.GatewayStatus{
 		AntennaLocations: antennasLocation,
-		BootTime:         ttnpb.ProtoTimePtr(time.Unix(0, v2status.BootTime)),
+		BootTime:         timestamppb.New(time.Unix(0, v2status.BootTime)),
 		Ip:               v2status.Ip,
 		Metrics:          metrics,
-		Time:             ttnpb.ProtoTimePtr(time.Unix(0, v2status.Time)),
+		Time:             timestamppb.New(time.Unix(0, v2status.Time)),
 		Versions:         versions,
 	}, nil
 }

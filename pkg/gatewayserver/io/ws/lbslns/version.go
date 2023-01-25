@@ -21,12 +21,13 @@ import (
 	"strings"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	pfconfig "go.thethings.network/lorawan-stack/v3/pkg/pfconfig/lbslns"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // Version contains version information.
@@ -93,22 +94,22 @@ func (*lbsLNS) GetRouterConfig(
 	}
 	// TODO: Revisit these fields for v3 events (https://github.com/TheThingsNetwork/lorawan-stack/issues/2629)
 	stat := &ttnpb.GatewayStatus{
-		Time: ttnpb.ProtoTimePtr(receivedAt),
+		Time: timestamppb.New(receivedAt),
 		Versions: map[string]string{
 			"station":  version.Station,
 			"firmware": version.Firmware,
 			"package":  version.Package,
 			"platform": fmt.Sprintf("%s - Firmware %s - Protocol %d", version.Model, version.Firmware, version.Protocol),
 		},
-		Advanced: &pbtypes.Struct{
-			Fields: map[string]*pbtypes.Value{
+		Advanced: &structpb.Struct{
+			Fields: map[string]*structpb.Value{
 				"model": {
-					Kind: &pbtypes.Value_StringValue{
+					Kind: &structpb.Value_StringValue{
 						StringValue: version.Model,
 					},
 				},
 				"features": {
-					Kind: &pbtypes.Value_StringValue{
+					Kind: &structpb.Value_StringValue{
 						StringValue: version.Features,
 					},
 				},

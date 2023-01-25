@@ -274,8 +274,7 @@ func (dst *EndDeviceModel) SetFields(src *EndDeviceModel, paths ...string) error
 			if src != nil {
 				dst.KeySecurity = src.KeySecurity
 			} else {
-				var zero KeySecurity
-				dst.KeySecurity = zero
+				dst.KeySecurity = 0
 			}
 		case "photos":
 			if len(subs) > 0 {
@@ -990,8 +989,7 @@ func (dst *MessagePayloadDecoder) SetFields(src *MessagePayloadDecoder, paths ..
 			if src != nil {
 				dst.Formatter = src.Formatter
 			} else {
-				var zero PayloadFormatter
-				dst.Formatter = zero
+				dst.Formatter = 0
 			}
 		case "formatter_parameter":
 			if len(subs) > 0 {
@@ -1040,8 +1038,7 @@ func (dst *MessagePayloadEncoder) SetFields(src *MessagePayloadEncoder, paths ..
 			if src != nil {
 				dst.Formatter = src.Formatter
 			} else {
-				var zero PayloadFormatter
-				dst.Formatter = zero
+				dst.Formatter = 0
 			}
 		case "formatter_parameter":
 			if len(subs) > 0 {

@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 type mockInteropHandler struct {
@@ -103,7 +104,7 @@ func TestInteropJoinRequest(t *testing.T) {
 			HandleJoinFunc: func() (*ttnpb.JoinResponse, error) {
 				return &ttnpb.JoinResponse{
 					RawPayload: []byte{0x1, 0x2, 0x3, 0x4},
-					Lifetime:   ttnpb.ProtoDurationPtr(1 * time.Hour),
+					Lifetime:   durationpb.New(1 * time.Hour),
 					SessionKeys: &ttnpb.SessionKeys{
 						SessionKeyId: []byte{0x1, 0x2, 0x3, 0x4},
 						FNwkSIntKey: &ttnpb.KeyEnvelope{
@@ -180,7 +181,7 @@ func TestInteropJoinRequest(t *testing.T) {
 			HandleJoinFunc: func() (*ttnpb.JoinResponse, error) {
 				return &ttnpb.JoinResponse{
 					RawPayload: []byte{0x1, 0x2, 0x3, 0x4},
-					Lifetime:   ttnpb.ProtoDurationPtr(1 * time.Hour),
+					Lifetime:   durationpb.New(1 * time.Hour),
 					SessionKeys: &ttnpb.SessionKeys{
 						SessionKeyId: []byte{0x1, 0x2, 0x3, 0x4},
 						FNwkSIntKey: &ttnpb.KeyEnvelope{

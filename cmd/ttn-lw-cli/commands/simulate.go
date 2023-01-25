@@ -35,6 +35,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (
@@ -666,7 +667,7 @@ var (
 				return err
 			}
 			if uplinkMessage.ReceivedAt == nil {
-				uplinkMessage.ReceivedAt = ttnpb.ProtoTimePtr(time.Now())
+				uplinkMessage.ReceivedAt = timestamppb.Now()
 			}
 			_, err = ttnpb.NewAppAsClient(cc).SimulateUplink(ctx, up)
 			return err

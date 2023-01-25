@@ -27,7 +27,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
@@ -56,6 +56,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // GatewayServer implements the Gateway Server component.
@@ -521,7 +522,7 @@ func (gs *GatewayServer) Connect(
 	}
 
 	registerGatewayConnect(ctx, ids, &ttnpb.GatewayConnectionStats{
-		ConnectedAt:          ttnpb.ProtoTimePtr(conn.ConnectTime()),
+		ConnectedAt:          timestamppb.New(conn.ConnectTime()),
 		Protocol:             conn.Frontend().Protocol(),
 		GatewayRemoteAddress: conn.GatewayRemoteAddress(),
 	})
@@ -937,7 +938,7 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 
 	// Initial update, so that the gateway appears connected.
 	stats := &ttnpb.GatewayConnectionStats{
-		ConnectedAt:          ttnpb.ProtoTimePtr(connectTime),
+		ConnectedAt:          timestamppb.New(connectTime),
 		Protocol:             conn.Connection.Frontend().Protocol(),
 		GatewayRemoteAddress: conn.Connection.GatewayRemoteAddress(),
 	}
@@ -952,7 +953,7 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 		logger.Debug("Delete connection stats")
 		stats := &ttnpb.GatewayConnectionStats{
 			ConnectedAt:    nil,
-			DisconnectedAt: ttnpb.ProtoTimePtr(time.Now()),
+			DisconnectedAt: timestamppb.Now(),
 		}
 		registerGatewayConnectionStats(decoupledCtx, ids, stats)
 		if gs.statsRegistry == nil {

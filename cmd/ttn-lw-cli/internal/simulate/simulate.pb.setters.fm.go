@@ -4,7 +4,7 @@ package simulate
 
 import (
 	fmt "fmt"
-	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	ttnpb "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 func (dst *SimulateMetadataParams) SetFields(src *SimulateMetadataParams, paths ...string) error {
@@ -56,8 +56,7 @@ func (dst *SimulateMetadataParams) SetFields(src *SimulateMetadataParams, paths 
 			if src != nil {
 				dst.LoRaWANVersion = src.LoRaWANVersion
 			} else {
-				var zero ttnpb.MACVersion
-				dst.LoRaWANVersion = zero
+				dst.LoRaWANVersion = 0
 			}
 		case "loRaWAN_PHY_version":
 			if len(subs) > 0 {
@@ -66,8 +65,7 @@ func (dst *SimulateMetadataParams) SetFields(src *SimulateMetadataParams, paths 
 			if src != nil {
 				dst.LoRaWAN_PHYVersion = src.LoRaWAN_PHYVersion
 			} else {
-				var zero ttnpb.PHYVersion
-				dst.LoRaWAN_PHYVersion = zero
+				dst.LoRaWAN_PHYVersion = 0
 			}
 		case "band_id":
 			if len(subs) > 0 {

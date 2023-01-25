@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var writeGolden = flag.Bool("write-golden", false, "Write golden files")
@@ -132,7 +133,7 @@ func TestNotificationEmailTemplates(t *testing.T) {
 	usrIDs := &ttnpb.UserIdentifiers{
 		UserId: "foo-usr",
 	}
-	now := ttnpb.ProtoTimePtr(time.Now())
+	now := timestamppb.Now()
 
 	for _, notification := range []*ttnpb.Notification{
 		{

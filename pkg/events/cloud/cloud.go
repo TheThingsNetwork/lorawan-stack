@@ -21,7 +21,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/events/basic"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -29,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"gocloud.dev/pubsub"
+	"google.golang.org/protobuf/proto"
 )
 
 // NewPubSub creates a new PubSub that publishes and subscribes to Go Cloud.

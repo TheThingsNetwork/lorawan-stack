@@ -40,6 +40,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/webui"
 	"golang.org/x/net/publicsuffix"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type loginFormData struct {
@@ -63,7 +64,7 @@ var (
 	mockSession = &ttnpb.UserSession{
 		UserIds:   &ttnpb.UserIdentifiers{UserId: "user"},
 		SessionId: "session_id",
-		CreatedAt: ttnpb.ProtoTimePtr(now),
+		CreatedAt: timestamppb.New(now),
 	}
 	mockUser = &ttnpb.User{
 		Ids: &ttnpb.UserIdentifiers{UserId: "user"},

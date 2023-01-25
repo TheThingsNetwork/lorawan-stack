@@ -18,10 +18,10 @@ import (
 	"bytes"
 	"context"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicetemplateconverter/profilefetcher"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicetemplates"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type endDeviceTemplateConverterServer struct {
@@ -33,7 +33,7 @@ type endDeviceTemplateConverterServer struct {
 // ListFormats implements ttnpb.DeviceTemplateServiceServer.
 func (s *endDeviceTemplateConverterServer) ListFormats(
 	context.Context,
-	*pbtypes.Empty,
+	*emptypb.Empty,
 ) (*ttnpb.EndDeviceTemplateFormats, error) {
 	formats := make(map[string]*ttnpb.EndDeviceTemplateFormat, len(s.DTC.converters))
 	for id, converter := range s.DTC.converters {

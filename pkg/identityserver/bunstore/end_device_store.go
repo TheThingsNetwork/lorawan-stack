@@ -28,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // EndDevice is the end_device model in the database.
@@ -103,8 +104,8 @@ func endDeviceToPB(m *EndDevice, fieldMask ...string) (*ttnpb.EndDevice, error) 
 			JoinEui:  joinEUI,
 		},
 
-		CreatedAt: ttnpb.ProtoTimePtr(m.CreatedAt),
-		UpdatedAt: ttnpb.ProtoTimePtr(m.UpdatedAt),
+		CreatedAt: timestamppb.New(m.CreatedAt),
+		UpdatedAt: timestamppb.New(m.UpdatedAt),
 
 		Name:        m.Name,
 		Description: m.Description,

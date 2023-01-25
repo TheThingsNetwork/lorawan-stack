@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // LoginToken is the login token model in the database.
@@ -56,8 +57,8 @@ func loginTokenToPB(m *LoginToken, userIDs *ttnpb.UserIdentifiers) (*ttnpb.Login
 		Token:     m.Token,
 		ExpiresAt: ttnpb.ProtoTime(m.ExpiresAt),
 		Used:      m.Used,
-		CreatedAt: ttnpb.ProtoTimePtr(m.CreatedAt),
-		UpdatedAt: ttnpb.ProtoTimePtr(m.UpdatedAt),
+		CreatedAt: timestamppb.New(m.CreatedAt),
+		UpdatedAt: timestamppb.New(m.UpdatedAt),
 	}
 	if userIDs == nil && m.User != nil {
 		pb.UserIds = &ttnpb.UserIdentifiers{

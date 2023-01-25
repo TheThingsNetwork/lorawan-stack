@@ -18,17 +18,13 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
-	"testing"
 
-	"github.com/kr/pretty"
-	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
 const (
-	shouldHaveEmptyDiff    = "Expected: '%#v'\nActual:   '%#v'\nDiff:  '%s'\n(should resemble diff)!"
 	shouldNotHaveEmptyDiff = "Expected '%#v'\nto diff  '%#v'\n(but it did)!"
 
-	needProtoMessage                   = "This assertion requires a proto.Message (and %T isn't one)."
 	needPointer                        = "This assertion requires a pointer type (you provided %T)."
 	needSetFielderCompatible           = "This assertion requires a SetFielder-compatible comparison type (you provided %T)."
 	needStringCompatible               = "This assertion requires a string-compatible comparison type (you provided %T)."
@@ -47,31 +43,21 @@ func lastLine(s string) string {
 
 // ShouldResemble wraps assertions.ShouldResemble and prepends a diff if assertion fails.
 func ShouldResemble(actual interface{}, expected ...interface{}) (message string) {
-	if message = assertions.ShouldResemble(actual, expected...); message == success {
-		return success
-	}
-
-	if expectedMessage := getProtoMessage(expected[0]); expectedMessage != nil {
-		if actualMessage := getProtoMessage(actual); actualMessage != nil {
-			return shouldEqualProto(actualMessage, expectedMessage)
-		}
-	}
-
-	diff := pretty.Diff(actual, expected[0])
-	if len(diff) == 0 {
+	if message := need(1, expected); message != success {
 		return message
 	}
+	return test.Diff(actual, expected[0])
+}
 
-	lines := make([]string, 1, len(diff)+2)
-	lines[0] = "Diff:"
-	for _, d := range diff {
-		lines = append(lines, fmt.Sprintf("   %s", d))
+// ShouldNotResemble receives exactly two parameters and does an inverse deep equal check (see test.DiffEqual).
+func ShouldNotResemble(actual interface{}, expected ...interface{}) string {
+	if message := need(1, expected); message != success {
+		return message
 	}
-	if testing.Verbose() {
-		lines = append(lines, fmt.Sprintf("Actual: %s", pretty.Sprint(actual)))
-		lines = append(lines, fmt.Sprintf("Expected: %s", pretty.Sprint(expected[0])))
+	if ShouldResemble(actual, expected[0]) == success {
+		return fmt.Sprintf(shouldNotHaveResembled, actual, expected[0])
 	}
-	return strings.Join(append(lines, lastLine(message)), "\n")
+	return success
 }
 
 // ShouldResembleFields is same as ShouldResemble, but only compares the specified fields for 2 given SetFielders.
@@ -132,31 +118,17 @@ func ShouldResembleFields(actual interface{}, expected ...interface{}) (message 
 	return ShouldResemble(actualCmp, expectedCmp)
 }
 
-// ShouldHaveEmptyDiff compares the pretty.Diff of values.
+// ShouldHaveEmptyDiff compares the test.Diff of values.
 func ShouldHaveEmptyDiff(actual interface{}, expected ...interface{}) (message string) {
-	if message = need(1, expected); message != success {
-		return
-	}
-
-	if expectedMessage := getProtoMessage(expected[0]); expectedMessage != nil {
-		if actualMessage := getProtoMessage(actual); actualMessage != nil {
-			return shouldEqualProto(actualMessage, expectedMessage)
-		}
-	}
-
-	diff := pretty.Diff(expected[0], actual)
-	if len(diff) != 0 {
-		return fmt.Sprintf(shouldHaveEmptyDiff, expected[0], actual, diff)
-	}
-	return success
+	return test.Diff(actual, expected[0])
 }
 
-// ShouldNotHaveEmptyDiff compares the pretty.Diff of values.
+// ShouldNotHaveEmptyDiff compares the test.Diff of values.
 func ShouldNotHaveEmptyDiff(actual interface{}, expected ...interface{}) (message string) {
 	if message = need(1, expected); message != success {
 		return
 	}
-	diff := pretty.Diff(expected[0], actual)
+	diff := test.Diff(expected[0], actual)
 	if len(diff) == 0 {
 		return fmt.Sprintf(shouldNotHaveEmptyDiff, expected[0], actual)
 	}

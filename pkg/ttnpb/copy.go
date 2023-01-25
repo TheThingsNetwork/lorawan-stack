@@ -14,7 +14,7 @@
 
 package ttnpb
 
-import "github.com/gogo/protobuf/proto"
+import "google.golang.org/protobuf/proto"
 
 // Clone creates a deep copy of the given message.
 func Clone[X proto.Message](in X) X {

@@ -16,14 +16,14 @@
 package provisioning
 
 import (
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // Provisioner is a device provisioner based on vendor-specific data.
 type Provisioner interface {
 	// UniqueID returns the vendor-specific unique ID for the given entry.
-	UniqueID(entry *pbtypes.Struct) (string, error)
+	UniqueID(entry *structpb.Struct) (string, error)
 }
 
 var (

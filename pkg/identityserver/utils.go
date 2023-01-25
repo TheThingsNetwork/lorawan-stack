@@ -18,13 +18,13 @@ import (
 	"context"
 	"strconv"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/golang/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/validate"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
 var (
@@ -32,7 +32,7 @@ var (
 	updatePaths = []string{"updated_at"}
 )
 
-func cleanFieldMaskPaths(allowedPaths []string, requestedPaths *pbtypes.FieldMask, addPaths, removePaths []string) *pbtypes.FieldMask {
+func cleanFieldMaskPaths(allowedPaths []string, requestedPaths *fieldmaskpb.FieldMask, addPaths, removePaths []string) *fieldmaskpb.FieldMask {
 	selected := make(map[string]struct{})
 	for _, path := range addPaths {
 		selected[path] = struct{}{}

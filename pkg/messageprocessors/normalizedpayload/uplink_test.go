@@ -18,11 +18,11 @@ import (
 	"testing"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/normalizedpayload"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 func timePtr(t time.Time) *time.Time {
@@ -38,18 +38,18 @@ func TestUplink(t *testing.T) {
 
 	for _, tc := range []struct {
 		name                     string
-		normalizedPayload        []*pbtypes.Struct
+		normalizedPayload        []*structpb.Struct
 		expected                 []normalizedpayload.Measurement
 		expectedValidationErrors [][]error
 		errorAssertion           func(error) bool
 	}{
 		{
 			name: "single timestamp",
-			normalizedPayload: []*pbtypes.Struct{
+			normalizedPayload: []*structpb.Struct{
 				{
-					Fields: map[string]*pbtypes.Value{
+					Fields: map[string]*structpb.Value{
 						"time": {
-							Kind: &pbtypes.Value_StringValue{
+							Kind: &structpb.Value_StringValue{
 								StringValue: "2022-08-23T17:13:42Z",
 							},
 						},
@@ -64,15 +64,15 @@ func TestUplink(t *testing.T) {
 		},
 		{
 			name: "two air temperatures",
-			normalizedPayload: []*pbtypes.Struct{
+			normalizedPayload: []*structpb.Struct{
 				{
-					Fields: map[string]*pbtypes.Value{
+					Fields: map[string]*structpb.Value{
 						"air": {
-							Kind: &pbtypes.Value_StructValue{
-								StructValue: &pbtypes.Struct{
-									Fields: map[string]*pbtypes.Value{
+							Kind: &structpb.Value_StructValue{
+								StructValue: &structpb.Struct{
+									Fields: map[string]*structpb.Value{
 										"temperature": {
-											Kind: &pbtypes.Value_NumberValue{
+											Kind: &structpb.Value_NumberValue{
 												NumberValue: 20.42,
 											},
 										},
@@ -83,13 +83,13 @@ func TestUplink(t *testing.T) {
 					},
 				},
 				{
-					Fields: map[string]*pbtypes.Value{
+					Fields: map[string]*structpb.Value{
 						"air": {
-							Kind: &pbtypes.Value_StructValue{
-								StructValue: &pbtypes.Struct{
-									Fields: map[string]*pbtypes.Value{
+							Kind: &structpb.Value_StructValue{
+								StructValue: &structpb.Struct{
+									Fields: map[string]*structpb.Value{
 										"temperature": {
-											Kind: &pbtypes.Value_NumberValue{
+											Kind: &structpb.Value_NumberValue{
 												NumberValue: 19.61,
 											},
 										},
@@ -115,7 +115,7 @@ func TestUplink(t *testing.T) {
 		},
 		{
 			name: "no fields",
-			normalizedPayload: []*pbtypes.Struct{
+			normalizedPayload: []*structpb.Struct{
 				{},
 			},
 			expected: []normalizedpayload.Measurement{
@@ -124,15 +124,15 @@ func TestUplink(t *testing.T) {
 		},
 		{
 			name: "below absolute zero",
-			normalizedPayload: []*pbtypes.Struct{
+			normalizedPayload: []*structpb.Struct{
 				{
-					Fields: map[string]*pbtypes.Value{
+					Fields: map[string]*structpb.Value{
 						"air": {
-							Kind: &pbtypes.Value_StructValue{
-								StructValue: &pbtypes.Struct{
-									Fields: map[string]*pbtypes.Value{
+							Kind: &structpb.Value_StructValue{
+								StructValue: &structpb.Struct{
+									Fields: map[string]*structpb.Value{
 										"temperature": {
-											Kind: &pbtypes.Value_NumberValue{
+											Kind: &structpb.Value_NumberValue{
 												NumberValue: -300,
 											},
 										},
@@ -157,15 +157,15 @@ func TestUplink(t *testing.T) {
 		},
 		{
 			name: "invalid direction",
-			normalizedPayload: []*pbtypes.Struct{
+			normalizedPayload: []*structpb.Struct{
 				{
-					Fields: map[string]*pbtypes.Value{
+					Fields: map[string]*structpb.Value{
 						"wind": {
-							Kind: &pbtypes.Value_StructValue{
-								StructValue: &pbtypes.Struct{
-									Fields: map[string]*pbtypes.Value{
+							Kind: &structpb.Value_StructValue{
+								StructValue: &structpb.Struct{
+									Fields: map[string]*structpb.Value{
 										"direction": {
-											Kind: &pbtypes.Value_NumberValue{
+											Kind: &structpb.Value_NumberValue{
 												NumberValue: 360, // this is 0 degrees
 											},
 										},
@@ -190,15 +190,15 @@ func TestUplink(t *testing.T) {
 		},
 		{
 			name: "invalid type",
-			normalizedPayload: []*pbtypes.Struct{
+			normalizedPayload: []*structpb.Struct{
 				{
-					Fields: map[string]*pbtypes.Value{
+					Fields: map[string]*structpb.Value{
 						"air": {
-							Kind: &pbtypes.Value_StructValue{
-								StructValue: &pbtypes.Struct{
-									Fields: map[string]*pbtypes.Value{
+							Kind: &structpb.Value_StructValue{
+								StructValue: &structpb.Struct{
+									Fields: map[string]*structpb.Value{
 										"temperature": {
-											Kind: &pbtypes.Value_StringValue{
+											Kind: &structpb.Value_StringValue{
 												StringValue: "test",
 											},
 										},
@@ -213,15 +213,15 @@ func TestUplink(t *testing.T) {
 		},
 		{
 			name: "unknown field",
-			normalizedPayload: []*pbtypes.Struct{
+			normalizedPayload: []*structpb.Struct{
 				{
-					Fields: map[string]*pbtypes.Value{
+					Fields: map[string]*structpb.Value{
 						"air": {
-							Kind: &pbtypes.Value_StructValue{
-								StructValue: &pbtypes.Struct{
-									Fields: map[string]*pbtypes.Value{
+							Kind: &structpb.Value_StructValue{
+								StructValue: &structpb.Struct{
+									Fields: map[string]*structpb.Value{
 										"unknown": {
-											Kind: &pbtypes.Value_StringValue{
+											Kind: &structpb.Value_StringValue{
 												StringValue: "test",
 											},
 										},

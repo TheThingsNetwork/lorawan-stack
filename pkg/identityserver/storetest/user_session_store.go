@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (st *StoreTest) TestUserSessionStore(t *T) {
@@ -50,7 +51,7 @@ func (st *StoreTest) TestUserSessionStore(t *T) {
 		created, err = s.CreateSession(ctx, &ttnpb.UserSession{
 			UserIds:       usr1.GetIds(),
 			SessionSecret: "secret",
-			ExpiresAt:     ttnpb.ProtoTimePtr(start.Add(5 * time.Minute)),
+			ExpiresAt:     timestamppb.New(start.Add(5 * time.Minute)),
 		})
 		if a.So(err, should.BeNil) && a.So(created, should.NotBeNil) {
 			a.So(created.UserIds, should.Resemble, usr1.GetIds())

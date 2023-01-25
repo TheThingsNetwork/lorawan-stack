@@ -35,5 +35,22 @@
       "down_formatter": "FORMATTER_REPOSITORY"
     }
   },
-  "field_mask": "version_ids,supports_join,supports_class_b,supports_class_c,lorawan_version,lorawan_phy_version,formatters,mac_settings.rx1_delay,mac_settings.rx1_data_rate_offset,mac_settings.rx2_data_rate_index,mac_settings.rx2_frequency,mac_settings.supports_32_bit_f_cnt,mac_settings.factory_preset_frequencies,mac_state.desired_parameters.max_eirp"
+  "field_mask": {
+    "paths": [
+      "version_ids",
+      "supports_join",
+      "supports_class_b",
+      "supports_class_c",
+      "lorawan_version",
+      "lorawan_phy_version",
+      "formatters",
+      "mac_settings.rx1_delay",
+      "mac_settings.rx1_data_rate_offset",
+      "mac_settings.rx2_data_rate_index",
+      "mac_settings.rx2_frequency",
+      "mac_settings.supports_32_bit_f_cnt",
+      "mac_settings.factory_preset_frequencies",
+      "mac_state.desired_parameters.max_eirp"
+    ]
+  }
 }

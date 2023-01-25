@@ -441,8 +441,7 @@ func (dst *EncodeDownlinkRequest) SetFields(src *EncodeDownlinkRequest, paths ..
 			if src != nil {
 				dst.Formatter = src.Formatter
 			} else {
-				var zero PayloadFormatter
-				dst.Formatter = zero
+				dst.Formatter = 0
 			}
 		case "parameter":
 			if len(subs) > 0 {
@@ -583,8 +582,7 @@ func (dst *DecodeUplinkRequest) SetFields(src *DecodeUplinkRequest, paths ...str
 			if src != nil {
 				dst.Formatter = src.Formatter
 			} else {
-				var zero PayloadFormatter
-				dst.Formatter = zero
+				dst.Formatter = 0
 			}
 		case "parameter":
 			if len(subs) > 0 {
@@ -725,8 +723,7 @@ func (dst *DecodeDownlinkRequest) SetFields(src *DecodeDownlinkRequest, paths ..
 			if src != nil {
 				dst.Formatter = src.Formatter
 			} else {
-				var zero PayloadFormatter
-				dst.Formatter = zero
+				dst.Formatter = 0
 			}
 		case "parameter":
 			if len(subs) > 0 {
@@ -858,8 +855,7 @@ func (dst *AsConfiguration_PubSub_Providers) SetFields(src *AsConfiguration_PubS
 			if src != nil {
 				dst.Mqtt = src.Mqtt
 			} else {
-				var zero AsConfiguration_PubSub_Providers_Status
-				dst.Mqtt = zero
+				dst.Mqtt = 0
 			}
 		case "nats":
 			if len(subs) > 0 {
@@ -868,8 +864,7 @@ func (dst *AsConfiguration_PubSub_Providers) SetFields(src *AsConfiguration_PubS
 			if src != nil {
 				dst.Nats = src.Nats
 			} else {
-				var zero AsConfiguration_PubSub_Providers_Status
-				dst.Nats = zero
+				dst.Nats = 0
 			}
 
 		default:

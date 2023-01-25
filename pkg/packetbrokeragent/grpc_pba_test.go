@@ -22,7 +22,6 @@ import (
 	"testing"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	iampb "go.packetbroker.org/api/iam"
 	iampbv2 "go.packetbroker.org/api/iam/v2"
@@ -42,6 +41,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 func TestPba(t *testing.T) {
@@ -224,12 +226,12 @@ func TestPba(t *testing.T) {
 						},
 					}, nil
 				}
-				p.Registry.UpdateTenantHandler = func(ctx context.Context, req *iampb.UpdateTenantRequest) (*pbtypes.Empty, error) {
+				p.Registry.UpdateTenantHandler = func(ctx context.Context, req *iampb.UpdateTenantRequest) (*emptypb.Empty, error) {
 					_, a := test.MustNewTFromContext(ctx)
 					a.So(req, should.Resemble, &iampb.UpdateTenantRequest{
 						NetId:    0x13,
 						TenantId: "foo-tenant",
-						Name: &pbtypes.StringValue{
+						Name: &wrapperspb.StringValue{
 							Value: "Test Network",
 						},
 						// NOTE: DevAddrBlocks are not updated here, as the tenant cannot change their own DevAddr blocks.
@@ -243,7 +245,7 @@ func TestPba(t *testing.T) {
 								Email: "tech@example.com",
 							},
 						},
-						Listed: &pbtypes.BoolValue{
+						Listed: &wrapperspb.BoolValue{
 							Value: true,
 						},
 					})
@@ -290,7 +292,7 @@ func TestPba(t *testing.T) {
 		{
 			name: "Deregister",
 			withIAMHandlers: func(p *mock.PBIAM) {
-				p.Registry.DeleteTenantHandler = func(ctx context.Context, req *iampb.TenantRequest) (*pbtypes.Empty, error) {
+				p.Registry.DeleteTenantHandler = func(ctx context.Context, req *iampb.TenantRequest) (*emptypb.Empty, error) {
 					_, a := test.MustNewTFromContext(ctx)
 					a.So(req.NetId, should.Equal, 0x13)
 					a.So(req.TenantId, should.Equal, "foo-tenant")
@@ -314,7 +316,7 @@ func TestPba(t *testing.T) {
 						Policy: &packetbroker.RoutingPolicy{
 							ForwarderNetId:    0x13,
 							ForwarderTenantId: "foo-tenant",
-							UpdatedAt:         pbtypes.TimestampNow(),
+							UpdatedAt:         timestamppb.Now(),
 							Uplink: &packetbroker.RoutingPolicy_Uplink{
 								JoinRequest:     true,
 								MacData:         true,
@@ -346,13 +348,13 @@ func TestPba(t *testing.T) {
 						MacData:    true,
 					},
 				})
-				a.So(test.Must(pbtypes.TimestampFromProto(res.UpdatedAt)).(time.Time), should.HappenBetween, time.Now().Add(-1*time.Second), time.Now())
+				a.So(res.UpdatedAt.AsTime(), should.HappenBetween, time.Now().Add(-1*time.Second), time.Now())
 			},
 		},
 		{
 			name: "RoutingPolicy/Default/Set",
 			withControlPlaneHandlers: func(p *mock.PBControlPlane) {
-				p.SetDefaultPolicyHandler = func(ctx context.Context, req *routingpb.SetPolicyRequest) (*pbtypes.Empty, error) {
+				p.SetDefaultPolicyHandler = func(ctx context.Context, req *routingpb.SetPolicyRequest) (*emptypb.Empty, error) {
 					_, a := test.MustNewTFromContext(ctx)
 					a.So(req.Policy, should.Resemble, &packetbroker.RoutingPolicy{
 						ForwarderNetId:    0x13,
@@ -385,7 +387,7 @@ func TestPba(t *testing.T) {
 		{
 			name: "RoutingPolicy/Default/Delete",
 			withControlPlaneHandlers: func(p *mock.PBControlPlane) {
-				p.SetDefaultPolicyHandler = func(ctx context.Context, req *routingpb.SetPolicyRequest) (*pbtypes.Empty, error) {
+				p.SetDefaultPolicyHandler = func(ctx context.Context, req *routingpb.SetPolicyRequest) (*emptypb.Empty, error) {
 					_, a := test.MustNewTFromContext(ctx)
 					a.So(req.Policy, should.Resemble, &packetbroker.RoutingPolicy{
 						ForwarderNetId:    0x13,
@@ -411,7 +413,7 @@ func TestPba(t *testing.T) {
 						ForwarderNetId:    0x13,
 						ForwarderTenantId: "foo-tenant",
 						HomeNetworkNetId:  uint32(i) + 1,
-						UpdatedAt:         test.Must(pbtypes.TimestampProto(time.Unix(int64(i), 0))).(*pbtypes.Timestamp),
+						UpdatedAt:         timestamppb.New(time.Unix(int64(i), 0)),
 						Uplink: &packetbroker.RoutingPolicy_Uplink{
 							JoinRequest:     i%2 == 0,
 							MacData:         i%3 == 0,
@@ -438,9 +440,10 @@ func TestPba(t *testing.T) {
 						Total: uint32(len(policies)),
 					}
 					for _, p := range policies {
-						if p.UpdatedAt.Compare(req.UpdatedSince) > 0 {
-							res.Policies = append(res.Policies, p)
+						if req.UpdatedSince != nil && p.UpdatedAt.AsTime().Sub(req.UpdatedSince.AsTime()) <= 0 {
+							continue
 						}
+						res.Policies = append(res.Policies, p)
 						if len(res.Policies) >= int(limit) {
 							break
 						}
@@ -484,7 +487,7 @@ func TestPba(t *testing.T) {
 								HomeNetworkId: &ttnpb.PacketBrokerNetworkIdentifier{
 									NetId: uint32(i) + 1,
 								},
-								UpdatedAt: test.Must(pbtypes.TimestampProto(time.Unix(int64(i), 0))).(*pbtypes.Timestamp),
+								UpdatedAt: timestamppb.New(time.Unix(int64(i), 0)),
 								Uplink: &ttnpb.PacketBrokerRoutingPolicyUplink{
 									JoinRequest:     i%2 == 0,
 									MacData:         i%3 == 0,

@@ -193,10 +193,17 @@ class Http {
   _payloadToQueryParams(payload) {
     const res = { ...payload }
     if (payload && Object.keys(payload).length > 0) {
-      if ('field_mask' in payload) {
-        // Convert field mask prop to a query param friendly format
-        res.field_mask = payload.field_mask.paths.join(',')
+      const { field_mask } = payload
+      if (!field_mask) {
+        return res
       }
+      const { paths } = field_mask
+      delete res.field_mask
+      if (!Array.isArray(paths) || paths.length === 0) {
+        return res
+      }
+      // Convert field mask prop to a query param friendly format
+      res.field_mask = paths.join(',')
       return res
     }
   }

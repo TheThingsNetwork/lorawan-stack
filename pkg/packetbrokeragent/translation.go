@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	packetbroker "go.packetbroker.org/api/v3"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
@@ -33,6 +32,9 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 	"gopkg.in/square/go-jose.v2"
 )
 
@@ -232,7 +234,7 @@ func toPBGatewayIdentifier(ids gatewayIdentifier, config ForwarderConfig) *packe
 	if config.IncludeGatewayEUI && ids.GetEui() != nil {
 		eui := types.MustEUI64(ids.GetEui())
 		res = &packetbroker.GatewayIdentifier{
-			Eui: &pbtypes.UInt64Value{
+			Eui: &wrapperspb.UInt64Value{
 				Value: eui.MarshalNumber(),
 			},
 		}
@@ -335,9 +337,9 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 		var signalQuality packetbroker.GatewayMetadataSignalQuality_Terrestrial
 		var localization *packetbroker.GatewayMetadataLocalization_Terrestrial
 		for _, md := range msg.Message.RxMetadata {
-			var rssiStandardDeviation *pbtypes.FloatValue
+			var rssiStandardDeviation *wrapperspb.FloatValue
 			if md.RssiStandardDeviation > 0 {
-				rssiStandardDeviation = &pbtypes.FloatValue{
+				rssiStandardDeviation = &wrapperspb.FloatValue{
 					Value: md.RssiStandardDeviation,
 				}
 			}
@@ -365,14 +367,14 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 				}
 				if md.FineTimestamp > 0 {
 					teaser.FineTimestamp = true
-					locAnt.FineTimestamp = &pbtypes.UInt64Value{
+					locAnt.FineTimestamp = &wrapperspb.UInt64Value{
 						Value: md.FineTimestamp,
 					}
 				}
 				localization.Antennas = append(localization.Antennas, locAnt)
 			}
 
-			earlierGatewayReceiveTime := func(t *pbtypes.Timestamp) bool {
+			earlierGatewayReceiveTime := func(t *timestamppb.Timestamp) bool {
 				g := gatewayReceiveTime
 				return g == nil || t != nil && ttnpb.StdTime(t).Before(*g)
 			}
@@ -476,14 +478,11 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 			DataRate:  dataRate,
 			Frequency: msg.Message.Frequency,
 		},
-		ReceivedAt:     ttnpb.ProtoTimePtr(receivedAt),
+		ReceivedAt:     timestamppb.New(receivedAt),
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
 	}
 
-	var receiveTime *pbtypes.Timestamp
-	if t, err := pbtypes.TimestampFromProto(msg.Message.GatewayReceiveTime); err == nil {
-		receiveTime = ttnpb.ProtoTimePtr(t)
-	}
+	receiveTime := msg.Message.GatewayReceiveTime
 	if gtwMd := msg.Message.GatewayMetadata; gtwMd != nil {
 		pbMD := &ttnpb.PacketBrokerMetadata{
 			MessageId:            msg.Id,
@@ -502,11 +501,11 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 			}
 			switch s := id.Id.(type) {
 			case *packetbroker.GatewayIdentifier_Hash:
-				pbMD.ForwarderGatewayId = &pbtypes.StringValue{
+				pbMD.ForwarderGatewayId = &wrapperspb.StringValue{
 					Value: base64.StdEncoding.EncodeToString(s.Hash),
 				}
 			case *packetbroker.GatewayIdentifier_Plain:
-				pbMD.ForwarderGatewayId = &pbtypes.StringValue{
+				pbMD.ForwarderGatewayId = &wrapperspb.StringValue{
 					Value: s.Plain,
 				}
 			}
@@ -514,12 +513,8 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 		if includeHops {
 			pbMD.Hops = make([]*ttnpb.PacketBrokerRouteHop, 0, len(msg.Hops))
 			for _, h := range msg.Hops {
-				receivedAt, err := pbtypes.TimestampFromProto(h.ReceivedAt)
-				if err != nil {
-					continue
-				}
 				pbMD.Hops = append(pbMD.Hops, &ttnpb.PacketBrokerRouteHop{
-					ReceivedAt:    ttnpb.ProtoTimePtr(receivedAt),
+					ReceivedAt:    h.ReceivedAt,
 					SenderName:    h.SenderName,
 					SenderAddress: h.SenderAddress,
 					ReceiverName:  h.ReceiverName,
@@ -634,7 +629,7 @@ func toPBDownlink(ctx context.Context, msg *ttnpb.DownlinkMessage, fps frequency
 
 	down := &packetbroker.DownlinkMessage{
 		PhyPayload: msg.RawPayload,
-		Rx1Delay:   pbtypes.DurationProto(req.Rx1Delay.Duration()),
+		Rx1Delay:   durationpb.New(req.Rx1Delay.Duration()),
 	}
 	var ok bool
 	if down.Region, ok = toPBRegion[fp.BandID]; !ok {
@@ -714,10 +709,7 @@ func fromPBDownlink(ctx context.Context, msg *packetbroker.DownlinkMessage, rece
 	if req.Priority, ok = fromPBPriority[msg.Priority]; !ok {
 		return "", nil, errUnknownPriority.WithAttributes("priority", msg.Priority)
 	}
-	rx1Delay, err := pbtypes.DurationFromProto(msg.Rx1Delay)
-	if err != nil {
-		return "", nil, errInvalidRx1Delay.WithCause(err)
-	}
+	rx1Delay := msg.Rx1Delay.AsDuration()
 	req.Rx1Delay = ttnpb.RxDelay(rx1Delay / time.Second)
 	for i, rx := range []struct {
 		settings  *packetbroker.DownlinkMessage_RXSettings

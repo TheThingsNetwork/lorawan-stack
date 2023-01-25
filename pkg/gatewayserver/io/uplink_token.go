@@ -17,9 +17,10 @@ package io
 import (
 	"time"
 
-	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // UplinkToken returns an uplink token from the given downlink path.
@@ -27,7 +28,7 @@ func UplinkToken(ids *ttnpb.GatewayAntennaIdentifiers, timestamp uint32, concent
 	token := ttnpb.UplinkToken{
 		Ids:              ids,
 		Timestamp:        timestamp,
-		ServerTime:       ttnpb.ProtoTimePtr(serverTime),
+		ServerTime:       timestamppb.New(serverTime),
 		ConcentratorTime: int64(concentratorTime),
 		GatewayTime:      ttnpb.ProtoTime(gatewayTime),
 	}

@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (st *StoreTest) TestUserStoreCRUD(t *T) {
@@ -60,16 +61,16 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 			Description:                    "Foo Description",
 			Attributes:                     attributes,
 			PrimaryEmailAddress:            "foo@example.com",
-			PrimaryEmailAddressValidatedAt: ttnpb.ProtoTimePtr(stamp),
+			PrimaryEmailAddressValidatedAt: timestamppb.New(stamp),
 			Password:                       "password_hash",
-			PasswordUpdatedAt:              ttnpb.ProtoTimePtr(stamp),
+			PasswordUpdatedAt:              timestamppb.New(stamp),
 			RequirePasswordUpdate:          true,
 			State:                          ttnpb.State_STATE_APPROVED,
 			StateDescription:               "welcome!",
 			Admin:                          true,
 			TemporaryPassword:              "temporary_hash",
-			TemporaryPasswordCreatedAt:     ttnpb.ProtoTimePtr(stamp),
-			TemporaryPasswordExpiresAt:     ttnpb.ProtoTimePtr(stamp.Add(time.Hour)),
+			TemporaryPasswordCreatedAt:     timestamppb.New(stamp),
+			TemporaryPasswordExpiresAt:     timestamppb.New(stamp.Add(time.Hour)),
 			ProfilePicture:                 picture,
 		})
 
@@ -196,16 +197,16 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 			Description:                    "New Foo Description",
 			Attributes:                     updatedAttributes,
 			PrimaryEmailAddress:            "updated@example.com",
-			PrimaryEmailAddressValidatedAt: ttnpb.ProtoTimePtr(stamp),
+			PrimaryEmailAddressValidatedAt: timestamppb.New(stamp),
 			Password:                       "updated_password_hash",
-			PasswordUpdatedAt:              ttnpb.ProtoTimePtr(stamp),
+			PasswordUpdatedAt:              timestamppb.New(stamp),
 			RequirePasswordUpdate:          false,
 			State:                          ttnpb.State_STATE_FLAGGED,
 			StateDescription:               "flagged",
 			Admin:                          false,
 			TemporaryPassword:              "updated_temporary_hash",
-			TemporaryPasswordCreatedAt:     ttnpb.ProtoTimePtr(stamp),
-			TemporaryPasswordExpiresAt:     ttnpb.ProtoTimePtr(stamp.Add(time.Hour)),
+			TemporaryPasswordCreatedAt:     timestamppb.New(stamp),
+			TemporaryPasswordExpiresAt:     timestamppb.New(stamp.Add(time.Hour)),
 			ProfilePicture:                 updatedPicture,
 		}, mask)
 		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {

@@ -41,6 +41,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (
@@ -232,7 +233,7 @@ func TestTraffic(t *testing.T) {
 			{
 				GatewayStatus: &ttnpb.GatewayStatus{
 					Ip:   []string{"1.1.1.1"},
-					Time: ttnpb.ProtoTimePtr(time.Now()),
+					Time: timestamppb.Now(),
 				},
 			},
 			{
@@ -284,7 +285,7 @@ func TestTraffic(t *testing.T) {
 				},
 				GatewayStatus: &ttnpb.GatewayStatus{
 					Ip:   []string{"2.2.2.2"},
-					Time: ttnpb.ProtoTimePtr(time.Now()),
+					Time: timestamppb.Now(),
 				},
 			},
 			{
@@ -352,7 +353,7 @@ func TestTraffic(t *testing.T) {
 				},
 				GatewayStatus: &ttnpb.GatewayStatus{
 					Ip:   []string{"3.3.3.3"},
-					Time: ttnpb.ProtoTimePtr(time.Now()),
+					Time: timestamppb.Now(),
 				},
 			},
 			{

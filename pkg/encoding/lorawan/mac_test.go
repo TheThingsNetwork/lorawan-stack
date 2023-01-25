@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func TestLoRaWANEncodingMAC(t *testing.T) {
@@ -259,7 +260,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		{
 			"DeviceTimeAns",
 			&ttnpb.MACCommand_DeviceTimeAns{
-				Time: ttnpb.ProtoTimePtr(gpstime.Parse(0x42ffffff*time.Second + 0x42*time.Duration(math.Pow(0.5, 8)*float64(time.Second)))),
+				Time: timestamppb.New(gpstime.Parse(0x42ffffff*time.Second + 0x42*time.Duration(math.Pow(0.5, 8)*float64(time.Second)))),
 			},
 			[]byte{0x0D, 0xff, 0xff, 0xff, 0x42, 0x42},
 			false,

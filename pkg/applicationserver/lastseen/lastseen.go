@@ -19,21 +19,21 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/metadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // LastSeenProvider is an interface for storing device last seen timestamp from uplink.
 type LastSeenProvider interface {
-	PushLastSeenFromUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, lastSeen *types.Timestamp) error
+	PushLastSeenFromUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, lastSeen *timestamppb.Timestamp) error
 }
 
 type noopLastSeenProvider struct{}
 
-func (noopLastSeenProvider) PushLastSeenFromUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, lastSeen *types.Timestamp) error {
+func (noopLastSeenProvider) PushLastSeenFromUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, lastSeen *timestamppb.Timestamp) error {
 	return nil
 }
 
@@ -53,7 +53,7 @@ type BatchLastSeenProvider struct {
 	lsMu        sync.Mutex
 }
 
-func (ls *BatchLastSeenProvider) push(uid string, lastSeen *types.Timestamp) (map[string]*ttnpb.EndDevice, error) {
+func (ls *BatchLastSeenProvider) push(uid string, lastSeen *timestamppb.Timestamp) (map[string]*ttnpb.EndDevice, error) {
 	ls.lsMu.Lock()
 	defer ls.lsMu.Unlock()
 	currentTimestamp := ttnpb.StdTime(lastSeen)
@@ -78,7 +78,7 @@ func (ls *BatchLastSeenProvider) push(uid string, lastSeen *types.Timestamp) (ma
 // PushLastSeenFromUplink pushes the timestamp of the device uplink to the last seen provider.
 // If the data structure for storing last seen timestamps is full, the timestamps
 // are updated in batch in Identity Server.
-func (ls *BatchLastSeenProvider) PushLastSeenFromUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, lastSeen *types.Timestamp) error {
+func (ls *BatchLastSeenProvider) PushLastSeenFromUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, lastSeen *timestamppb.Timestamp) error {
 	if ls.batchSize == 0 {
 		if err := ls.updateEndDeviceLastSeen(ctx, &ttnpb.EndDevice{
 			Ids:        ids,

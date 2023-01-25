@@ -19,15 +19,17 @@ import (
 	"fmt"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func removeDeprecatedPaths(ctx context.Context, fieldMask *pbtypes.FieldMask) *pbtypes.FieldMask {
+func removeDeprecatedPaths(ctx context.Context, fieldMask *fieldmaskpb.FieldMask) *fieldmaskpb.FieldMask {
 	validPaths := make([]string, 0, len(fieldMask.GetPaths()))
 nextPath:
 	for _, path := range fieldMask.GetPaths() {
@@ -95,7 +97,7 @@ func (as *ApplicationServer) SetLink(ctx context.Context, req *ttnpb.SetApplicat
 }
 
 // DeleteLink implements ttnpb.AsServer.
-func (as *ApplicationServer) DeleteLink(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error) {
+func (as *ApplicationServer) DeleteLink(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*emptypb.Empty, error) {
 	if err := rights.RequireApplication(ctx, ids, ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
@@ -125,7 +127,7 @@ func (as *ApplicationServer) GetConfiguration(ctx context.Context, _ *ttnpb.GetA
 }
 
 // HandleUplink implements ttnpb.NsAsServer.
-func (as *ApplicationServer) HandleUplink(ctx context.Context, req *ttnpb.NsAsHandleUplinkRequest) (*pbtypes.Empty, error) {
+func (as *ApplicationServer) HandleUplink(ctx context.Context, req *ttnpb.NsAsHandleUplinkRequest) (*emptypb.Empty, error) {
 	now := time.Now()
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
@@ -138,7 +140,7 @@ func (as *ApplicationServer) HandleUplink(ctx context.Context, req *ttnpb.NsAsHa
 		return nil, err
 	}
 	for _, up := range req.ApplicationUps {
-		up.ReceivedAt = ttnpb.ProtoTimePtr(now)
+		up.ReceivedAt = timestamppb.New(now)
 		if err := as.processUp(ctx, up, link); err != nil {
 			return nil, err
 		}

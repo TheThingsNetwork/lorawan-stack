@@ -44,7 +44,7 @@ func init() {
 
 func newAPIKeyChangedData(_ context.Context, data email.NotificationTemplateData) (email.NotificationTemplateData, error) {
 	var nData ttnpb.APIKey
-	if err := ttnpb.UnmarshalAny(data.Notification().GetData(), &nData); err != nil {
+	if err := data.Notification().GetData().UnmarshalTo(&nData); err != nil {
 		return nil, err
 	}
 	return &APIKeyChangedData{

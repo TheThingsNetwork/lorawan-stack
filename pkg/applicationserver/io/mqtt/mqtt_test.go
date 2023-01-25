@@ -22,7 +22,6 @@ import (
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/mock"
@@ -38,6 +37,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 var (
@@ -221,14 +221,14 @@ func TestTraffic(t *testing.T) {
 							FPort:        42,
 							FCnt:         42,
 							FrmPayload:   []byte{0x1, 0x2, 0x3},
-							NormalizedPayload: &pbtypes.Struct{
-								Fields: map[string]*pbtypes.Value{
+							NormalizedPayload: &structpb.Struct{
+								Fields: map[string]*structpb.Value{
 									"air": {
-										Kind: &pbtypes.Value_StructValue{
-											StructValue: &pbtypes.Struct{
-												Fields: map[string]*pbtypes.Value{
+										Kind: &structpb.Value_StructValue{
+											StructValue: &structpb.Struct{
+												Fields: map[string]*structpb.Value{
 													"temperature": {
-														Kind: &pbtypes.Value_NumberValue{
+														Kind: &structpb.Value_NumberValue{
 															NumberValue: 21.5,
 														},
 													},

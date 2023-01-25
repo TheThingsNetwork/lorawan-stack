@@ -18,7 +18,6 @@ import (
 	"context"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -26,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/blocklist"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var (
@@ -303,7 +303,7 @@ func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.Upda
 
 var errApplicationHasDevices = errors.DefineFailedPrecondition("application_has_devices", "application still has `{count}` devices")
 
-func (is *IdentityServer) deleteApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error) {
+func (is *IdentityServer) deleteApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*emptypb.Empty, error) {
 	if err := rights.RequireApplication(ctx, ids, ttnpb.Right_RIGHT_APPLICATION_DELETE); err != nil {
 		return nil, err
 	}
@@ -324,7 +324,7 @@ func (is *IdentityServer) deleteApplication(ctx context.Context, ids *ttnpb.Appl
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) restoreApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error) {
+func (is *IdentityServer) restoreApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*emptypb.Empty, error) {
 	if err := rights.RequireApplication(store.WithSoftDeleted(ctx, false), ids, ttnpb.Right_RIGHT_APPLICATION_DELETE); err != nil {
 		return nil, err
 	}
@@ -349,7 +349,7 @@ func (is *IdentityServer) restoreApplication(ctx context.Context, ids *ttnpb.App
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) purgeApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error) {
+func (is *IdentityServer) purgeApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*emptypb.Empty, error) {
 	if !is.IsAdmin(ctx) {
 		return nil, errAdminsPurgeApplications.New()
 	}
@@ -430,15 +430,15 @@ func (ar *applicationRegistry) Update(ctx context.Context, req *ttnpb.UpdateAppl
 	return ar.updateApplication(ctx, req)
 }
 
-func (ar *applicationRegistry) Delete(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error) {
+func (ar *applicationRegistry) Delete(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*emptypb.Empty, error) {
 	return ar.deleteApplication(ctx, req)
 }
 
-func (ar *applicationRegistry) Purge(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error) {
+func (ar *applicationRegistry) Purge(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*emptypb.Empty, error) {
 	return ar.purgeApplication(ctx, req)
 }
 
-func (ar *applicationRegistry) Restore(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error) {
+func (ar *applicationRegistry) Restore(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*emptypb.Empty, error) {
 	return ar.restoreApplication(ctx, req)
 }
 

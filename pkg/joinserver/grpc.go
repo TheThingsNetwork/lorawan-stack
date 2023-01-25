@@ -17,8 +17,8 @@ package joinserver
 import (
 	"context"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type jsServer struct {
@@ -28,7 +28,7 @@ type jsServer struct {
 }
 
 // GetJoinEUIPrefixes returns the JoinEUIPrefixes associated with the join server.
-func (srv jsServer) GetJoinEUIPrefixes(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.JoinEUIPrefixes, error) {
+func (srv jsServer) GetJoinEUIPrefixes(ctx context.Context, _ *emptypb.Empty) (*ttnpb.JoinEUIPrefixes, error) {
 	prefixes := make([]*ttnpb.JoinEUIPrefix, 0, len(srv.JS.euiPrefixes))
 	for _, p := range srv.JS.euiPrefixes {
 		prefixes = append(prefixes, &ttnpb.JoinEUIPrefix{
@@ -42,7 +42,7 @@ func (srv jsServer) GetJoinEUIPrefixes(ctx context.Context, _ *pbtypes.Empty) (*
 }
 
 // GetDefaultJoinEUI returns the default JoinEUI that is configured for this Join Server.
-func (srv jsServer) GetDefaultJoinEUI(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.GetDefaultJoinEUIResponse, error) {
+func (srv jsServer) GetDefaultJoinEUI(ctx context.Context, _ *emptypb.Empty) (*ttnpb.GetDefaultJoinEUIResponse, error) {
 	return &ttnpb.GetDefaultJoinEUIResponse{
 		JoinEui: srv.JS.defaultJoinEUI.Bytes(),
 	}, nil

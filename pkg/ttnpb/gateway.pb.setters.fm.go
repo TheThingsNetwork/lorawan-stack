@@ -549,8 +549,7 @@ func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
 			if src != nil {
 				dst.DownlinkPathConstraint = src.DownlinkPathConstraint
 			} else {
-				var zero DownlinkPathConstraint
-				dst.DownlinkPathConstraint = zero
+				dst.DownlinkPathConstraint = 0
 			}
 		case "schedule_anytime_delay":
 			if len(subs) > 0 {
@@ -1473,8 +1472,7 @@ func (dst *GatewayAntenna) SetFields(src *GatewayAntenna, paths ...string) error
 			if src != nil {
 				dst.Placement = src.Placement
 			} else {
-				var zero GatewayAntennaPlacement
-				dst.Placement = zero
+				dst.Placement = 0
 			}
 
 		default:

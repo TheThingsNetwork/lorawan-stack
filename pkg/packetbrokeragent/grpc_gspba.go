@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	mappingpb "go.packetbroker.org/api/mapping/v2"
 	packetbroker "go.packetbroker.org/api/v3"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
@@ -30,6 +29,9 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // DefaultGatewayOnlineTTL is the default time-to-live of the online status reported to Packet Broker.
@@ -64,7 +66,7 @@ type gsPbaServer struct {
 }
 
 // PublishUplink is called by the Gateway Server when an uplink message arrives and needs to get forwarded to Packet Broker.
-func (s *gsPbaServer) PublishUplink(ctx context.Context, up *ttnpb.GatewayUplinkMessage) (*pbtypes.Empty, error) {
+func (s *gsPbaServer) PublishUplink(ctx context.Context, up *ttnpb.GatewayUplinkMessage) (*emptypb.Empty, error) {
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}
@@ -127,7 +129,7 @@ func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacket
 		var val *packetbroker.GatewayLocation_Terrestrial
 		if req.Gateway.LocationPublic && ttnpb.HasAnyField(req.FieldMask.GetPaths(), "antennas") && len(req.Gateway.Antennas) > 0 {
 			val = &packetbroker.GatewayLocation_Terrestrial{
-				AntennaCount: &pbtypes.UInt32Value{
+				AntennaCount: &wrapperspb.UInt32Value{
 					Value: uint32(len(req.Gateway.Antennas)),
 				},
 				AntennaPlacement: toPBTerrestrialAntennaPlacement(req.Gateway.Antennas[0].Placement),
@@ -137,7 +139,7 @@ func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacket
 			}
 		} else {
 			val = &packetbroker.GatewayLocation_Terrestrial{
-				AntennaCount: &pbtypes.UInt32Value{Value: 0},
+				AntennaCount: &wrapperspb.UInt32Value{Value: 0},
 			}
 		}
 		updateReq.GatewayLocation.Location = &packetbroker.GatewayLocation{
@@ -148,10 +150,10 @@ func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacket
 	}
 
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "status_public") && ttnpb.HasAnyField(req.FieldMask.GetPaths(), "online") {
-		updateReq.Online = &pbtypes.BoolValue{}
+		updateReq.Online = &wrapperspb.BoolValue{}
 		if req.Gateway.StatusPublic && req.Gateway.Online {
 			updateReq.Online.Value = true
-			updateReq.OnlineTtl = pbtypes.DurationProto(s.config.GatewayOnlineTTL)
+			updateReq.OnlineTtl = durationpb.New(s.config.GatewayOnlineTTL)
 		}
 	}
 
@@ -205,7 +207,7 @@ func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacket
 
 	res := &ttnpb.UpdatePacketBrokerGatewayResponse{}
 	if updateReq.Online.GetValue() {
-		res.OnlineTtl = pbtypes.DurationProto(s.config.GatewayOnlineTTL)
+		res.OnlineTtl = durationpb.New(s.config.GatewayOnlineTTL)
 	}
 	return res, nil
 }

@@ -16,7 +16,6 @@ package assertions
 
 import (
 	"fmt"
-	"reflect"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
@@ -70,28 +69,28 @@ func ShouldNotHaveSameElementsFunc(actual interface{}, expected ...interface{}) 
 }
 
 // ShouldHaveSameElementsDeep takes as arguments the actual value and the expected value.
-// If the actual value equals the expected value using reflect.DeepEqual, this
+// If the actual value equals the expected value using test.DiffEqual, this
 // function returns an empty string. Otherwise, it returns a string describing the error.
 func ShouldHaveSameElementsDeep(actual interface{}, expected ...interface{}) (message string) {
 	if message = need(1, expected); message != success {
 		return
 	}
-	return ShouldHaveSameElementsFunc(actual, reflect.DeepEqual, expected[0])
+	return ShouldHaveSameElementsFunc(actual, test.DiffEqual, expected[0])
 }
 
 // ShouldNotHaveSameElementsDeep takes as arguments the actual value and the expected
 // value.
-// If the actual value does not equal the expected value using reflect.DeepEqual, this
+// If the actual value does not equal the expected value using test.DiffEqual, this
 // function returns an empty string. Otherwise, it returns a string describing the error.
 func ShouldNotHaveSameElementsDeep(actual interface{}, expected ...interface{}) (message string) {
 	if message = need(1, expected); message != success {
 		return
 	}
-	return ShouldNotHaveSameElementsFunc(actual, reflect.DeepEqual, expected[0])
+	return ShouldNotHaveSameElementsFunc(actual, test.DiffEqual, expected[0])
 }
 
 // ShouldHaveSameElementsDiff takes as arguments the actual value and the expected value.
-// If the actual value equals the expected value using pretty.Diff, this
+// If the actual value equals the expected value using test.Diff, this
 // function returns an empty string. Otherwise, it returns a string describing the error.
 func ShouldHaveSameElementsDiff(actual interface{}, expected ...interface{}) (message string) {
 	if message = need(1, expected); message != success {
@@ -102,7 +101,7 @@ func ShouldHaveSameElementsDiff(actual interface{}, expected ...interface{}) (me
 
 // ShouldNotHaveSameElementsDiff takes as arguments the actual value and the expected
 // value.
-// If the actual value does not equal the expected value using pretty.Diff, this
+// If the actual value does not equal the expected value using test.Diff, this
 // function returns an empty string. Otherwise, it returns a string describing the error.
 func ShouldNotHaveSameElementsDiff(actual interface{}, expected ...interface{}) (message string) {
 	if message = need(1, expected); message != success {

@@ -17,9 +17,7 @@ package loraclouddevicemanagementv1
 import (
 	"context"
 	"fmt"
-	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loradms/v1/api"
@@ -31,6 +29,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	urlutil "go.thethings.network/lorawan-stack/v3/pkg/util/url"
+	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // PackageName defines the package name.
@@ -179,12 +179,12 @@ func (p *DeviceManagementPackage) sendDownlink(ctx context.Context, ids *ttnpb.E
 func (p *DeviceManagementPackage) sendServiceData(
 	ctx context.Context,
 	ids *ttnpb.EndDeviceIdentifiers,
-	data *pbtypes.Struct,
+	data *structpb.Struct,
 ) error {
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIds:   ids,
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
-		ReceivedAt:     ttnpb.ProtoTimePtr(time.Now()),
+		ReceivedAt:     timestamppb.Now(),
 		Up: &ttnpb.ApplicationUp_ServiceData{
 			ServiceData: &ttnpb.ApplicationServiceData{
 				Data:    data,
@@ -212,7 +212,7 @@ func (p *DeviceManagementPackage) sendLocationSolved(ctx context.Context, ids *t
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIds:   ids,
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
-		ReceivedAt:     ttnpb.ProtoTimePtr(time.Now()),
+		ReceivedAt:     timestamppb.Now(),
 		Up: &ttnpb.ApplicationUp_LocationSolved{
 			LocationSolved: &ttnpb.ApplicationLocation{
 				Service: fmt.Sprintf("%v-%s", PackageName, position.Algorithm),
@@ -330,7 +330,7 @@ func uint32Ptr(x uint32) *uint32 {
 	return &x
 }
 
-func float64PtrOfTimestamp(x *pbtypes.Timestamp) *float64 {
+func float64PtrOfTimestamp(x *timestamppb.Timestamp) *float64 {
 	if x == nil {
 		return nil
 	}
@@ -342,15 +342,15 @@ func hexPtr(x objects.Hex) *objects.Hex {
 	return &x
 }
 
-func toStruct(i interface{}) (*pbtypes.Struct, error) {
+func toStruct(i interface{}) (*structpb.Struct, error) {
 	b, err := jsonpb.TTN().Marshal(i)
 	if err != nil {
 		return nil, err
 	}
-	var st pbtypes.Struct
-	err = jsonpb.TTN().Unmarshal(b, &st)
+	st := &structpb.Struct{}
+	err = jsonpb.TTN().Unmarshal(b, st)
 	if err != nil {
 		return nil, err
 	}
-	return &st, nil
+	return st, nil
 }

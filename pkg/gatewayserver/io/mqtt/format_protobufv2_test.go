@@ -28,6 +28,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func TestProtobufV2Downlink(t *testing.T) {
@@ -80,7 +82,7 @@ func TestProtobufV2Downlink(t *testing.T) {
 			},
 		},
 	}
-	expectedBuf, err := Expected.Marshal()
+	expectedBuf, err := proto.Marshal(Expected)
 	if !a.So(err, should.BeNil) {
 		t.Fatal("Could not marshal the v2 struct")
 	}
@@ -129,7 +131,7 @@ func TestProtobufV2Uplinks(t *testing.T) {
 		},
 		Timestamp: validV2Metadata.Timestamp,
 	}
-	nilTime := ttnpb.ProtoTimePtr(time.Unix(0, 0))
+	nilTime := timestamppb.New(time.Unix(0, 0))
 	ids := ttnpb.GatewayIdentifiers{
 		GatewayId: "gateway-id",
 	}
@@ -202,7 +204,7 @@ func TestProtobufV2Uplinks(t *testing.T) {
 	} {
 		tcok := t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			buf, err := tc.Input.Marshal()
+			buf, err := proto.Marshal(tc.Input)
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
@@ -243,8 +245,8 @@ func TestProtobufV2Status(t *testing.T) {
 				RxOk: 14,
 			},
 			Expected: &ttnpb.GatewayStatus{
-				BootTime: ttnpb.ProtoTimePtr(time.Unix(0, 0)),
-				Time:     ttnpb.ProtoTimePtr(time.Unix(0, 0)),
+				BootTime: timestamppb.New(time.Unix(0, 0)),
+				Time:     timestamppb.New(time.Unix(0, 0)),
 				Metrics: map[string]float32{
 					"lmnw": 0.0,
 					"lmst": 0.0,
@@ -266,8 +268,8 @@ func TestProtobufV2Status(t *testing.T) {
 				Fpga:     4,
 			},
 			Expected: &ttnpb.GatewayStatus{
-				BootTime: ttnpb.ProtoTimePtr(time.Unix(0, 0)),
-				Time:     ttnpb.ProtoTimePtr(time.Unix(0, 0)),
+				BootTime: timestamppb.New(time.Unix(0, 0)),
+				Time:     timestamppb.New(time.Unix(0, 0)),
 				Metrics: map[string]float32{
 					"lmnw": 0.0,
 					"lmst": 0.0,
@@ -302,8 +304,8 @@ func TestProtobufV2Status(t *testing.T) {
 				Rtt: 3,
 			},
 			Expected: &ttnpb.GatewayStatus{
-				BootTime: ttnpb.ProtoTimePtr(time.Unix(0, 0)),
-				Time:     ttnpb.ProtoTimePtr(time.Unix(0, 0)),
+				BootTime: timestamppb.New(time.Unix(0, 0)),
+				Time:     timestamppb.New(time.Unix(0, 0)),
 				Metrics: map[string]float32{
 					"lmnw":              0.0,
 					"lmst":              0.0,
@@ -334,8 +336,8 @@ func TestProtobufV2Status(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.GatewayStatus{
-				BootTime: ttnpb.ProtoTimePtr(time.Unix(0, 0)),
-				Time:     ttnpb.ProtoTimePtr(time.Unix(0, 0)),
+				BootTime: timestamppb.New(time.Unix(0, 0)),
+				Time:     timestamppb.New(time.Unix(0, 0)),
 				Metrics: map[string]float32{
 					"lmnw": 0.0,
 					"lmst": 0.0,
@@ -359,7 +361,7 @@ func TestProtobufV2Status(t *testing.T) {
 	} {
 		tcok := t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			buf, err := tc.input.Marshal()
+			buf, err := proto.Marshal(tc.input)
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}

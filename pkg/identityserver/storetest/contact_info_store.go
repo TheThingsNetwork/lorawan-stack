@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
@@ -93,7 +94,7 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 					Token:       "EXPIRED_TOKEN",
 					Entity:      ids,
 					ContactInfo: []*ttnpb.ContactInfo{info},
-					ExpiresAt:   ttnpb.ProtoTimePtr(start.Add(-1 * time.Minute)),
+					ExpiresAt:   timestamppb.New(start.Add(-1 * time.Minute)),
 				})
 				if !a.So(err, should.BeNil) {
 					t.FailNow()
@@ -107,7 +108,7 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 					Token:       "TOKEN",
 					Entity:      ids,
 					ContactInfo: []*ttnpb.ContactInfo{info},
-					ExpiresAt:   ttnpb.ProtoTimePtr(start.Add(5 * time.Minute)),
+					ExpiresAt:   timestamppb.New(start.Add(5 * time.Minute)),
 				})
 				if a.So(err, should.BeNil) && a.So(created, should.NotBeNil) {
 					a.So(created.Id, should.Equal, validationID)
@@ -126,7 +127,7 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 					Token:       "OTHER_TOKEN",
 					Entity:      ids,
 					ContactInfo: []*ttnpb.ContactInfo{info},
-					ExpiresAt:   ttnpb.ProtoTimePtr(start.Add(5 * time.Minute)),
+					ExpiresAt:   timestamppb.New(start.Add(5 * time.Minute)),
 				})
 				if a.So(err, should.NotBeNil) {
 					a.So(errors.IsAlreadyExists(err), should.BeTrue)
@@ -198,14 +199,14 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 				ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
 				Value:         "foo@example.com",
 				Public:        false,
-				ValidatedAt:   ttnpb.ProtoTimePtr(start.Add(time.Minute)),
+				ValidatedAt:   timestamppb.New(start.Add(time.Minute)),
 			}
 			extraInfo := &ttnpb.ContactInfo{
 				ContactType:   ttnpb.ContactType_CONTACT_TYPE_TECHNICAL,
 				ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
 				Value:         "extra@example.com",
 				Public:        true,
-				ValidatedAt:   ttnpb.ProtoTimePtr(start.Add(time.Minute)),
+				ValidatedAt:   timestamppb.New(start.Add(time.Minute)),
 			}
 
 			t.Run("UpdateContactInfo", func(t *T) {

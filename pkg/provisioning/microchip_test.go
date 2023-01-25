@@ -17,10 +17,10 @@ package provisioning_test
 import (
 	"testing"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	. "go.thethings.network/lorawan-stack/v3/pkg/provisioning"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 func TestMicrochip(t *testing.T) {
@@ -31,10 +31,10 @@ func TestMicrochip(t *testing.T) {
 		t.FailNow()
 	}
 
-	entry := &pbtypes.Struct{
-		Fields: map[string]*pbtypes.Value{
+	entry := &structpb.Struct{
+		Fields: map[string]*structpb.Value{
 			"uniqueId": {
-				Kind: &pbtypes.Value_StringValue{
+				Kind: &structpb.Value_StringValue{
 					StringValue: "abcd",
 				},
 			},

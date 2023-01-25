@@ -25,7 +25,6 @@ import (
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/gogo/protobuf/proto"
 	"github.com/gorilla/websocket"
 	"github.com/smartystreets/assertions"
 	ttnpbv2 "go.thethings.network/lorawan-stack-legacy/v2/pkg/ttnpb"
@@ -57,6 +56,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (
@@ -777,7 +778,7 @@ func TestGatewayServer(t *testing.T) {
 									UpdateLocation: false,
 									Up: &ttnpb.GatewayUp{
 										GatewayStatus: &ttnpb.GatewayStatus{
-											Time: ttnpb.ProtoTimePtr(time.Unix(424242, 0)),
+											Time: timestamppb.New(time.Unix(424242, 0)),
 											AntennaLocations: []*ttnpb.Location{
 												{
 													Source:    ttnpb.LocationSource_SOURCE_GPS,
@@ -797,7 +798,7 @@ func TestGatewayServer(t *testing.T) {
 									UpdateLocation: true,
 									Up: &ttnpb.GatewayUp{
 										GatewayStatus: &ttnpb.GatewayStatus{
-											Time: ttnpb.ProtoTimePtr(time.Unix(424242, 0)),
+											Time: timestamppb.New(time.Unix(424242, 0)),
 										},
 									},
 									ExpectLocation: &ttnpb.Location{
@@ -809,7 +810,7 @@ func TestGatewayServer(t *testing.T) {
 									UpdateLocation: true,
 									Up: &ttnpb.GatewayUp{
 										GatewayStatus: &ttnpb.GatewayStatus{
-											Time: ttnpb.ProtoTimePtr(time.Unix(42424242, 0)),
+											Time: timestamppb.New(time.Unix(42424242, 0)),
 											AntennaLocations: []*ttnpb.Location{
 												{
 													Source:    ttnpb.LocationSource_SOURCE_GPS,
@@ -1035,7 +1036,7 @@ func TestGatewayServer(t *testing.T) {
 								Name: "GatewayStatus",
 								Up: &ttnpb.GatewayUp{
 									GatewayStatus: &ttnpb.GatewayStatus{
-										Time: ttnpb.ProtoTimePtr(time.Unix(424242, 0)),
+										Time: timestamppb.New(time.Unix(424242, 0)),
 									},
 								},
 							},
@@ -1288,7 +1289,7 @@ func TestGatewayServer(t *testing.T) {
 										},
 									},
 									GatewayStatus: &ttnpb.GatewayStatus{
-										Time: ttnpb.ProtoTimePtr(time.Unix(4242424, 0)),
+										Time: timestamppb.New(time.Unix(4242424, 0)),
 									},
 								},
 								Forwards: []uint32{200, 300},
@@ -1907,7 +1908,7 @@ func TestUpdateVersionInfo(t *testing.T) { //nolint:paralleltest
 				case <-ctx.Done():
 					return
 				case stat := <-statCh:
-					buf, err := stat.Marshal()
+					buf, err := proto.Marshal(stat)
 					if err != nil {
 						cancel(err)
 						return
@@ -2112,7 +2113,7 @@ func TestBatchGetStatus(t *testing.T) {
 						case <-ctx.Done():
 							return
 						case stat := <-statCh:
-							buf, err := stat.Marshal()
+							buf, err := proto.Marshal(stat)
 							if err != nil {
 								cancel(err)
 								return

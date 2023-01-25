@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (st *StoreTest) TestInvitationStore(t *T) {
@@ -52,7 +53,7 @@ func (st *StoreTest) TestInvitationStore(t *T) {
 		created, err = s.CreateInvitation(ctx, &ttnpb.Invitation{
 			Email:     "foo@example.com",
 			Token:     "TOKEN",
-			ExpiresAt: ttnpb.ProtoTimePtr(start.Add(5 * time.Minute)),
+			ExpiresAt: timestamppb.New(start.Add(5 * time.Minute)),
 		})
 
 		if a.So(err, should.BeNil) && a.So(created, should.NotBeNil) {
@@ -197,7 +198,7 @@ func (st *StoreTest) TestInvitationStore(t *T) {
 		_, err := s.CreateInvitation(ctx, &ttnpb.Invitation{
 			Email:     "expired@example.com",
 			Token:     "EXPIRED_TOKEN",
-			ExpiresAt: ttnpb.ProtoTimePtr(start.Add(-1 * time.Minute)),
+			ExpiresAt: timestamppb.New(start.Add(-1 * time.Minute)),
 		})
 		if !a.So(err, should.BeNil) {
 			t.FailNow()
@@ -234,7 +235,7 @@ func (st *StoreTest) TestInvitationStorePagination(t *T) {
 		created, err := s.CreateInvitation(ctx, &ttnpb.Invitation{
 			Email:     fmt.Sprintf("user%d@example.com", i+1),
 			Token:     fmt.Sprintf("TOKEN%d", i+1),
-			ExpiresAt: ttnpb.ProtoTimePtr(start.Add(time.Minute)),
+			ExpiresAt: timestamppb.New(start.Add(time.Minute)),
 		})
 		if !a.So(err, should.BeNil) {
 			t.FailNow()

@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func TestHandleDeviceTimeReq(t *testing.T) {
@@ -46,18 +47,18 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_DeviceTimeAns{
-							Time: ttnpb.ProtoTimePtr(recvAt),
+							Time: timestamppb.New(recvAt),
 						}).MACCommand(),
 					},
 				},
 			},
 			Message: &ttnpb.UplinkMessage{
-				ReceivedAt: ttnpb.ProtoTimePtr(recvAt),
+				ReceivedAt: timestamppb.New(recvAt),
 			},
 			Events: events.Builders{
 				EvtReceiveDeviceTimeRequest,
 				EvtEnqueueDeviceTimeAnswer.With(events.WithData(&ttnpb.MACCommand_DeviceTimeAns{
-					Time: ttnpb.ProtoTimePtr(recvAt),
+					Time: timestamppb.New(recvAt),
 				})),
 			},
 		},
@@ -79,18 +80,18 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 						{},
 						{},
 						(&ttnpb.MACCommand_DeviceTimeAns{
-							Time: ttnpb.ProtoTimePtr(recvAt),
+							Time: timestamppb.New(recvAt),
 						}).MACCommand(),
 					},
 				},
 			},
 			Message: &ttnpb.UplinkMessage{
-				ReceivedAt: ttnpb.ProtoTimePtr(recvAt),
+				ReceivedAt: timestamppb.New(recvAt),
 			},
 			Events: events.Builders{
 				EvtReceiveDeviceTimeRequest,
 				EvtEnqueueDeviceTimeAnswer.With(events.WithData(&ttnpb.MACCommand_DeviceTimeAns{
-					Time: ttnpb.ProtoTimePtr(recvAt),
+					Time: timestamppb.New(recvAt),
 				})),
 			},
 		},
@@ -112,18 +113,18 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 						{},
 						{},
 						(&ttnpb.MACCommand_DeviceTimeAns{
-							Time: ttnpb.ProtoTimePtr(recvAt),
+							Time: timestamppb.New(recvAt),
 						}).MACCommand(),
 					},
 				},
 			},
 			Message: &ttnpb.UplinkMessage{
-				ReceivedAt: ttnpb.ProtoTimePtr(recvAt),
+				ReceivedAt: timestamppb.New(recvAt),
 			},
 			Events: events.Builders{
 				EvtReceiveDeviceTimeRequest,
 				EvtEnqueueDeviceTimeAnswer.With(events.WithData(&ttnpb.MACCommand_DeviceTimeAns{
-					Time: ttnpb.ProtoTimePtr(recvAt),
+					Time: timestamppb.New(recvAt),
 				})),
 			},
 		},
@@ -136,26 +137,26 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_DeviceTimeAns{
-							Time: ttnpb.ProtoTimePtr(mdRecvAt),
+							Time: timestamppb.New(mdRecvAt),
 						}).MACCommand(),
 					},
 				},
 			},
 			Message: &ttnpb.UplinkMessage{
-				ReceivedAt: ttnpb.ProtoTimePtr(recvAt),
+				ReceivedAt: timestamppb.New(recvAt),
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
-						ReceivedAt: ttnpb.ProtoTimePtr(mdRecvAt),
+						ReceivedAt: timestamppb.New(mdRecvAt),
 					},
 					{
-						ReceivedAt: ttnpb.ProtoTimePtr(mdRecvAt.Add(200)),
+						ReceivedAt: timestamppb.New(mdRecvAt.Add(200)),
 					},
 				},
 			},
 			Events: events.Builders{
 				EvtReceiveDeviceTimeRequest,
 				EvtEnqueueDeviceTimeAnswer.With(events.WithData(&ttnpb.MACCommand_DeviceTimeAns{
-					Time: ttnpb.ProtoTimePtr(mdRecvAt),
+					Time: timestamppb.New(mdRecvAt),
 				})),
 			},
 		},
@@ -168,30 +169,30 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_DeviceTimeAns{
-							Time: ttnpb.ProtoTimePtr(gpsTime),
+							Time: timestamppb.New(gpsTime),
 						}).MACCommand(),
 					},
 				},
 			},
 			Message: &ttnpb.UplinkMessage{
-				ReceivedAt: ttnpb.ProtoTimePtr(recvAt),
+				ReceivedAt: timestamppb.New(recvAt),
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
-						GpsTime:    ttnpb.ProtoTimePtr(gpsTime),
-						ReceivedAt: ttnpb.ProtoTimePtr(mdRecvAt),
+						GpsTime:    timestamppb.New(gpsTime),
+						ReceivedAt: timestamppb.New(mdRecvAt),
 					},
 					{
-						ReceivedAt: ttnpb.ProtoTimePtr(mdRecvAt.Add(200)),
+						ReceivedAt: timestamppb.New(mdRecvAt.Add(200)),
 					},
 					{
-						GpsTime: ttnpb.ProtoTimePtr(gpsTime.Add(150)),
+						GpsTime: timestamppb.New(gpsTime.Add(150)),
 					},
 				},
 			},
 			Events: events.Builders{
 				EvtReceiveDeviceTimeRequest,
 				EvtEnqueueDeviceTimeAnswer.With(events.WithData(&ttnpb.MACCommand_DeviceTimeAns{
-					Time: ttnpb.ProtoTimePtr(gpsTime),
+					Time: timestamppb.New(gpsTime),
 				})),
 			},
 		},

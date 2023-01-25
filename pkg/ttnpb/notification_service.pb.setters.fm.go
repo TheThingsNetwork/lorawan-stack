@@ -121,8 +121,7 @@ func (dst *Notification) SetFields(src *Notification, paths ...string) error {
 			if src != nil {
 				dst.Status = src.Status
 			} else {
-				var zero NotificationStatus
-				dst.Status = zero
+				dst.Status = 0
 			}
 		case "status_updated_at":
 			if len(subs) > 0 {
@@ -390,8 +389,7 @@ func (dst *UpdateNotificationStatusRequest) SetFields(src *UpdateNotificationSta
 			if src != nil {
 				dst.Status = src.Status
 			} else {
-				var zero NotificationStatus
-				dst.Status = zero
+				dst.Status = 0
 			}
 
 		default:
@@ -411,8 +409,7 @@ func (dst *EntityStateChangedNotification) SetFields(src *EntityStateChangedNoti
 			if src != nil {
 				dst.State = src.State
 			} else {
-				var zero State
-				dst.State = zero
+				dst.State = 0
 			}
 		case "state_description":
 			if len(subs) > 0 {

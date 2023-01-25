@@ -24,7 +24,6 @@ import (
 	"testing"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	mappingpb "go.packetbroker.org/api/mapping/v2"
 	packetbroker "go.packetbroker.org/api/v3"
@@ -42,6 +41,10 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 	"gopkg.in/square/go-jose.v2"
 )
 
@@ -127,7 +130,7 @@ func TestForwarder(t *testing.T) {
 				GatewayMessage: &ttnpb.GatewayUplinkMessage{
 					Message: &ttnpb.UplinkMessage{
 						RawPayload: []byte{0x40, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
-						ReceivedAt: ttnpb.ProtoTimePtr(receivedAt),
+						ReceivedAt: timestamppb.New(receivedAt),
 						RxMetadata: []*ttnpb.RxMetadata{
 							{
 								GatewayIds: &ttnpb.GatewayIdentifiers{
@@ -167,14 +170,14 @@ func TestForwarder(t *testing.T) {
 					ForwarderClusterId: "test",
 					Message: &packetbroker.UplinkMessage{
 						GatewayId: &packetbroker.GatewayIdentifier{
-							Eui: &pbtypes.UInt64Value{
+							Eui: &wrapperspb.UInt64Value{
 								Value: 0x1122334455667788,
 							},
 							Id: &packetbroker.GatewayIdentifier_Hash{
 								Hash: []byte{0xc7, 0x4a, 0x72, 0x7c, 0xe5, 0x01, 0xe9, 0xc1, 0x20, 0x6b, 0xb2, 0x81, 0x82, 0xeb, 0x06, 0x91, 0x7f, 0x94, 0x43, 0x54, 0x30, 0x90, 0x78, 0x0f, 0x3a, 0x39, 0x3d, 0xeb, 0xad, 0x91, 0xad, 0x96},
 							},
 						},
-						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
+						ForwarderReceiveTime: timestamppb.New(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC)),
 						DataRate:             packetbroker.NewLoRaDataRate(7, 125000, band.Cr4_5),
 						Frequency:            869525000,
 						GatewayMetadata: &packetbroker.UplinkMessage_GatewayMetadata{
@@ -251,7 +254,7 @@ func TestForwarder(t *testing.T) {
 				GatewayMessage: &ttnpb.GatewayUplinkMessage{
 					Message: &ttnpb.UplinkMessage{
 						RawPayload: []byte{0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42, 0x22, 0x11, 0x1, 0x2, 0x3, 0x4},
-						ReceivedAt: ttnpb.ProtoTimePtr(receivedAt),
+						ReceivedAt: timestamppb.New(receivedAt),
 						RxMetadata: []*ttnpb.RxMetadata{
 							{
 								GatewayIds: &ttnpb.GatewayIdentifiers{
@@ -286,14 +289,14 @@ func TestForwarder(t *testing.T) {
 					ForwarderClusterId: "test",
 					Message: &packetbroker.UplinkMessage{
 						GatewayId: &packetbroker.GatewayIdentifier{
-							Eui: &pbtypes.UInt64Value{
+							Eui: &wrapperspb.UInt64Value{
 								Value: 0x1122334455667788,
 							},
 							Id: &packetbroker.GatewayIdentifier_Hash{
 								Hash: []byte{0xc7, 0x4a, 0x72, 0x7c, 0xe5, 0x01, 0xe9, 0xc1, 0x20, 0x6b, 0xb2, 0x81, 0x82, 0xeb, 0x06, 0x91, 0x7f, 0x94, 0x43, 0x54, 0x30, 0x90, 0x78, 0x0f, 0x3a, 0x39, 0x3d, 0xeb, 0xad, 0x91, 0xad, 0x96},
 							},
 						},
-						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
+						ForwarderReceiveTime: timestamppb.New(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC)),
 						DataRate:             packetbroker.NewLoRaDataRate(9, 125000, band.Cr4_5),
 						Frequency:            868300000,
 						GatewayMetadata: &packetbroker.UplinkMessage_GatewayMetadata{
@@ -390,7 +393,7 @@ func TestForwarder(t *testing.T) {
 					Frequency: 869525000,
 					DataRate:  packetbroker.NewLoRaDataRate(12, 125000, ""),
 				},
-				Rx1Delay:           pbtypes.DurationProto(5 * time.Second),
+				Rx1Delay:           durationpb.New(5 * time.Second),
 				GatewayUplinkToken: []byte(tokenCompact),
 			},
 		}
@@ -451,7 +454,7 @@ func TestForwarder(t *testing.T) {
 		a := assertions.New(t)
 
 		updateCh := make(chan *mappingpb.UpdateGatewayRequest, 1)
-		mp.UpdateGatewayHandler = func(ctx context.Context, req *mappingpb.UpdateGatewayRequest, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
+		mp.UpdateGatewayHandler = func(ctx context.Context, req *mappingpb.UpdateGatewayRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 			updateCh <- req
 			return ttnpb.Empty, nil
 		}
@@ -501,7 +504,7 @@ func TestForwarder(t *testing.T) {
 			),
 		})
 		a.So(err, should.BeNil)
-		a.So(test.Must(pbtypes.DurationFromProto(res.OnlineTtl)).(time.Duration), should.NotBeZeroValue)
+		a.So(res.OnlineTtl.AsDuration(), should.NotBeZeroValue)
 
 		select {
 		case update := <-updateCh:
@@ -567,7 +570,7 @@ func TestHomeNetwork(t *testing.T) {
 					Id:                   "test",
 					Message: &packetbroker.UplinkMessage{
 						GatewayId: &packetbroker.GatewayIdentifier{
-							Eui: &pbtypes.UInt64Value{
+							Eui: &wrapperspb.UInt64Value{
 								Value: 0x1122334455667788,
 							},
 							Id: &packetbroker.GatewayIdentifier_Plain{
@@ -575,7 +578,7 @@ func TestHomeNetwork(t *testing.T) {
 							},
 						},
 						DataRate:             packetbroker.NewLoRaDataRate(7, 125000, band.Cr4_5),
-						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
+						ForwarderReceiveTime: timestamppb.New(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC)),
 						Frequency:            869525000,
 						CodingRate:           band.Cr4_5,
 						GatewayMetadata: &packetbroker.UplinkMessage_GatewayMetadata{
@@ -667,7 +670,7 @@ func TestHomeNetwork(t *testing.T) {
 								ForwarderTenantId:   "foo-tenant",
 								ForwarderClusterId:  "test",
 								ForwarderGatewayEui: types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}.Bytes(),
-								ForwarderGatewayId: &pbtypes.StringValue{
+								ForwarderGatewayId: &wrapperspb.StringValue{
 									Value: "foo-gateway",
 								},
 								HomeNetworkNetId:     types.NetID{0x0, 0x0, 0x13}.Bytes(),
@@ -697,7 +700,7 @@ func TestHomeNetwork(t *testing.T) {
 								ForwarderTenantId:   "foo-tenant",
 								ForwarderClusterId:  "test",
 								ForwarderGatewayEui: types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}.Bytes(),
-								ForwarderGatewayId: &pbtypes.StringValue{
+								ForwarderGatewayId: &wrapperspb.StringValue{
 									Value: "foo-gateway",
 								},
 								HomeNetworkNetId:     types.NetID{0x0, 0x0, 0x13}.Bytes(),
@@ -741,7 +744,7 @@ func TestHomeNetwork(t *testing.T) {
 					Id:                   "test",
 					Message: &packetbroker.UplinkMessage{
 						GatewayId: &packetbroker.GatewayIdentifier{
-							Eui: &pbtypes.UInt64Value{
+							Eui: &wrapperspb.UInt64Value{
 								Value: 0x1122334455667788,
 							},
 							Id: &packetbroker.GatewayIdentifier_Plain{
@@ -749,7 +752,7 @@ func TestHomeNetwork(t *testing.T) {
 							},
 						},
 						DataRate:             packetbroker.NewLoRaDataRate(9, 125000, band.Cr4_5),
-						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
+						ForwarderReceiveTime: timestamppb.New(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC)),
 						Frequency:            869525000,
 						CodingRate:           band.Cr4_5,
 						GatewayMetadata: &packetbroker.UplinkMessage_GatewayMetadata{
@@ -809,7 +812,7 @@ func TestHomeNetwork(t *testing.T) {
 								ForwarderTenantId:   "foo-tenant",
 								ForwarderClusterId:  "test",
 								ForwarderGatewayEui: types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}.Bytes(),
-								ForwarderGatewayId: &pbtypes.StringValue{
+								ForwarderGatewayId: &wrapperspb.StringValue{
 									Value: "foo-gateway",
 								},
 								HomeNetworkNetId:     types.NetID{0x0, 0x0, 0x13}.Bytes(),
@@ -953,7 +956,7 @@ func TestHomeNetwork(t *testing.T) {
 					Frequency: 869525000,
 					DataRate:  packetbroker.NewLoRaDataRate(12, 125000, band.Cr4_5),
 				},
-				Rx1Delay:           pbtypes.DurationProto(5 * time.Second),
+				Rx1Delay:           durationpb.New(5 * time.Second),
 				GatewayUplinkToken: []byte(`test-token`),
 			},
 		})

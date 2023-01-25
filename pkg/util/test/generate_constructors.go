@@ -25,7 +25,6 @@ import (
 	"reflect"
 	"text/template"
 
-	_ "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -39,9 +38,6 @@ var bytesTyp = reflect.TypeOf([]byte{})
 func typeString(typ reflect.Type) string {
 	if typ.Kind() == reflect.Ptr {
 		return "*" + typeString(typ.Elem())
-	}
-	if typ.PkgPath() == "github.com/gogo/protobuf/types" {
-		return "pbtypes." + typ.Name()
 	}
 	return typ.String()
 }
@@ -62,8 +58,7 @@ func main() {
 			for i := 0; i < numFields; i++ {
 				f := typ.Field(i)
 				switch f.Name {
-				case "XXX_NoUnkeyedLiteral", "XXX_sizecache", "XXX_unrecognized",
-					"NoUnkeyedLiterals", "DoNotCompare", "DoNotCopy":
+				case "state", "sizeCache", "unknownFields":
 					continue // internal protobuf fields
 				}
 
@@ -94,7 +89,9 @@ package test
 
 import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	pbtypes "github.com/gogo/protobuf/types"
+	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 {{ range . }}
 {{ with $type := typeOf . -}}
@@ -103,7 +100,7 @@ import (
 {{ with $optionsType := printf "%sOptionNamespace" $type.Name -}}
 type (
 	// {{ $optionType }} transforms {{ $typeString }} and returns it.
-	// Implemetations must be pure functions with no side-effects.
+	// Implementations must be pure functions with no side-effects.
 	{{ $optionType }} func(*{{ $typeString }}) *{{ $typeString }}
 
 	// {{ $optionsType }} represents the namespace, on which various {{ $optionType }} are defined.

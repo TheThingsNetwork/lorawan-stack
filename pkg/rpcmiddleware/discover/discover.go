@@ -267,10 +267,9 @@ func (r *clusterResolver) lookup() (*resolver.State, error) {
 			state.Addresses[i] = resolver.Address{
 				Addr:       fmt.Sprintf("%s:%d", name, addr.Port),
 				ServerName: name,
-				Attributes: attributes.New(
-					"priority", int(addr.Priority),
-					"weight", int(addr.Weight),
-				),
+				Attributes: attributes.
+					New("priority", int(addr.Priority)).
+					WithValue("weight", int(addr.Weight)),
 			}
 		}
 	}

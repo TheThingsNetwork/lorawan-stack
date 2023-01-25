@@ -18,7 +18,6 @@ import (
 	"context"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -26,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/blocklist"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var (
@@ -371,7 +371,7 @@ func (is *IdentityServer) updateClient(
 	return cli, nil
 }
 
-func (is *IdentityServer) deleteClient(ctx context.Context, ids *ttnpb.ClientIdentifiers) (*pbtypes.Empty, error) {
+func (is *IdentityServer) deleteClient(ctx context.Context, ids *ttnpb.ClientIdentifiers) (*emptypb.Empty, error) {
 	if err := rights.RequireClient(ctx, ids, ttnpb.Right_RIGHT_CLIENT_DELETE); err != nil {
 		return nil, err
 	}
@@ -385,7 +385,7 @@ func (is *IdentityServer) deleteClient(ctx context.Context, ids *ttnpb.ClientIde
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) restoreClient(ctx context.Context, ids *ttnpb.ClientIdentifiers) (*pbtypes.Empty, error) {
+func (is *IdentityServer) restoreClient(ctx context.Context, ids *ttnpb.ClientIdentifiers) (*emptypb.Empty, error) {
 	if err := rights.RequireClient(store.WithSoftDeleted(ctx, false), ids, ttnpb.Right_RIGHT_CLIENT_DELETE); err != nil {
 		return nil, err
 	}
@@ -410,7 +410,7 @@ func (is *IdentityServer) restoreClient(ctx context.Context, ids *ttnpb.ClientId
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) purgeClient(ctx context.Context, ids *ttnpb.ClientIdentifiers) (*pbtypes.Empty, error) {
+func (is *IdentityServer) purgeClient(ctx context.Context, ids *ttnpb.ClientIdentifiers) (*emptypb.Empty, error) {
 	if !is.IsAdmin(ctx) {
 		return nil, errAdminsPurgeClients.New()
 	}
@@ -461,14 +461,14 @@ func (cr *clientRegistry) Update(ctx context.Context, req *ttnpb.UpdateClientReq
 	return cr.updateClient(ctx, req)
 }
 
-func (cr *clientRegistry) Delete(ctx context.Context, req *ttnpb.ClientIdentifiers) (*pbtypes.Empty, error) {
+func (cr *clientRegistry) Delete(ctx context.Context, req *ttnpb.ClientIdentifiers) (*emptypb.Empty, error) {
 	return cr.deleteClient(ctx, req)
 }
 
-func (cr *clientRegistry) Purge(ctx context.Context, req *ttnpb.ClientIdentifiers) (*pbtypes.Empty, error) {
+func (cr *clientRegistry) Purge(ctx context.Context, req *ttnpb.ClientIdentifiers) (*emptypb.Empty, error) {
 	return cr.purgeClient(ctx, req)
 }
 
-func (cr *clientRegistry) Restore(ctx context.Context, req *ttnpb.ClientIdentifiers) (*pbtypes.Empty, error) {
+func (cr *clientRegistry) Restore(ctx context.Context, req *ttnpb.ClientIdentifiers) (*emptypb.Empty, error) {
 	return cr.restoreClient(ctx, req)
 }

@@ -57,8 +57,7 @@ func (dst *JoinRequest) SetFields(src *JoinRequest, paths ...string) error {
 			if src != nil {
 				dst.SelectedMacVersion = src.SelectedMacVersion
 			} else {
-				var zero MACVersion
-				dst.SelectedMacVersion = zero
+				dst.SelectedMacVersion = 0
 			}
 		case "net_id":
 			if len(subs) > 0 {
@@ -101,8 +100,7 @@ func (dst *JoinRequest) SetFields(src *JoinRequest, paths ...string) error {
 			if src != nil {
 				dst.RxDelay = src.RxDelay
 			} else {
-				var zero RxDelay
-				dst.RxDelay = zero
+				dst.RxDelay = 0
 			}
 		case "cf_list":
 			if len(subs) > 0 {
