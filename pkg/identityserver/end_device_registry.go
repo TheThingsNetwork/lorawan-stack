@@ -163,7 +163,7 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 	// Create the CAC only if the value is set.
 	if req.EndDevice.GetClaimAuthenticationCode().GetValue() != "" {
 		ptCACSecret = req.EndDevice.ClaimAuthenticationCode.Value
-		if err = validateEndDeviceAuthenticationCode(*req.EndDevice.ClaimAuthenticationCode); err != nil {
+		if err = validateEndDeviceAuthenticationCode(req.EndDevice.ClaimAuthenticationCode); err != nil {
 			return nil, err
 		}
 		if is.config.EndDevices.EncryptionKeyID != "" {
@@ -369,7 +369,7 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 		req.FieldMask.GetPaths(),
 		"claim_authentication_code",
 	) && req.EndDevice.ClaimAuthenticationCode != nil {
-		if err = validateEndDeviceAuthenticationCode(*req.EndDevice.ClaimAuthenticationCode); err != nil {
+		if err = validateEndDeviceAuthenticationCode(req.EndDevice.ClaimAuthenticationCode); err != nil {
 			return nil, err
 		}
 		if req.EndDevice.ClaimAuthenticationCode.Value != "" {
@@ -444,7 +444,7 @@ func (is *IdentityServer) deleteEndDevice(ctx context.Context, ids *ttnpb.EndDev
 	return ttnpb.Empty, nil
 }
 
-func validateEndDeviceAuthenticationCode(authCode ttnpb.EndDeviceAuthenticationCode) error {
+func validateEndDeviceAuthenticationCode(authCode *ttnpb.EndDeviceAuthenticationCode) error {
 	if validFrom, validTo := ttnpb.StdTime(authCode.ValidFrom), ttnpb.StdTime(authCode.ValidTo); validFrom != nil &&
 		validTo != nil {
 		if validTo.Before(*validFrom) || authCode.Value == "" {
