@@ -20,7 +20,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// JSONCodec can be used to override the default gogoproto/jsonpb.
+// JSONCodec can be used to override the jsonpb codec.
 var JSONCodec interface {
 	Marshal(v interface{}) ([]byte, error)
 	Unmarshal(data []byte, v interface{}) error

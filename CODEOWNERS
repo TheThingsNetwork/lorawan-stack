@@ -29,7 +29,6 @@
 /pkg/**/config.go @adriansmares
 /pkg/**/registry.go @adriansmares
 /pkg/config/shared.go @adriansmares
-/pkg/gogoproto @johanstokking @adriansmares
 /pkg/goproto @johanstokking @adriansmares
 /pkg/identityserver/store @johanstokking @adriansmares
 /pkg/jsonpb @johanstokking @adriansmares
