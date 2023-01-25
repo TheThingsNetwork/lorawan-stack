@@ -17,7 +17,6 @@ package packetbrokeragent_test
 import (
 	"context"
 	"fmt"
-	"net"
 	"strconv"
 	"testing"
 	"time"
@@ -681,27 +680,17 @@ func TestPba(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			a, ctx := test.NewWithContext(ctx, t)
 
-			iamLis, err := net.Listen("tcp", ":0")
-			if !a.So(err, should.BeNil) {
-				t.FailNow()
-			}
-			iam := mock.NewPBIAM(t)
+			iam, iamAddr := mustServePBIAM(ctx, t)
 			if tc.withIAMHandlers != nil {
 				tc.withIAMHandlers(iam)
 			}
-			go iam.Serve(iamLis)
-			defer iam.GracefulStop()
 
-			cpLis, err := net.Listen("tcp", ":0")
-			if err != nil {
-				t.Fatalf("Listen Control Plane: %v", err)
-			}
-			controlplane := mock.NewPBControlPlane(t)
+			controlplane, cpAddr := mustServePBControlPane(ctx, t)
 			if tc.withControlPlaneHandlers != nil {
 				tc.withControlPlaneHandlers(controlplane)
 			}
-			go controlplane.Serve(cpLis)
-			defer controlplane.GracefulStop()
+
+			_, mpAddr := mustServePBMapper(ctx, t)
 
 			c := componenttest.NewComponent(t, &component.Config{})
 			c.AddContextFiller(func(ctx context.Context) context.Context {
@@ -712,9 +701,10 @@ func TestPba(t *testing.T) {
 			c.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithTB(ctx, t)
 			})
-			_, err = New(c, &Config{
-				IAMAddress:          iamLis.Addr().String(),
-				ControlPlaneAddress: cpLis.Addr().String(),
+			_, err := New(c, &Config{
+				IAMAddress:          iamAddr.String(),
+				ControlPlaneAddress: cpAddr.String(),
+				MapperAddress:       mpAddr.String(),
 				NetID:               types.NetID{0x0, 0x0, 0x13},
 				TenantID:            "foo-tenant",
 				ClusterID:           "test-cluster",

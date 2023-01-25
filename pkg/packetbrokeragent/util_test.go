@@ -36,32 +36,38 @@ func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.Cluste
 	panic("could not connect to peer")
 }
 
-func mustServePBDataPlane(ctx context.Context, tb testing.TB) (*mock.PBDataPlane, net.Addr) {
+func mustServe[S interface {
+	Serve(net.Listener) error
+	GracefulStop()
+}](ctx context.Context, tb testing.TB, create func(testing.TB) S,
+) (S, net.Addr) {
 	lis, err := net.Listen("tcp", ":0")
 	if err != nil {
 		panic(err)
 	}
-	dp := mock.NewPBDataPlane(tb)
-	go dp.Serve(lis)
+	server := create(tb)
+	go server.Serve(lis)
 	go func() {
 		<-ctx.Done()
-		dp.GracefulStop()
+		server.GracefulStop()
 	}()
-	return dp, lis.Addr()
+	return server, lis.Addr()
+}
+
+func mustServePBIAM(ctx context.Context, tb testing.TB) (*mock.PBIAM, net.Addr) {
+	return mustServe(ctx, tb, mock.NewPBIAM)
+}
+
+func mustServePBControlPane(ctx context.Context, tb testing.TB) (*mock.PBControlPlane, net.Addr) {
+	return mustServe(ctx, tb, mock.NewPBControlPlane)
+}
+
+func mustServePBDataPlane(ctx context.Context, tb testing.TB) (*mock.PBDataPlane, net.Addr) {
+	return mustServe(ctx, tb, mock.NewPBDataPlane)
 }
 
 func mustServePBMapper(ctx context.Context, tb testing.TB) (*mock.PBMapper, net.Addr) {
-	lis, err := net.Listen("tcp", ":0")
-	if err != nil {
-		panic(err)
-	}
-	mp := mock.NewPBMapper(tb)
-	go mp.Serve(lis)
-	go func() {
-		<-ctx.Done()
-		mp.GracefulStop()
-	}()
-	return mp, lis.Addr()
+	return mustServe(ctx, tb, mock.NewPBMapper)
 }
 
 func eui64Ptr(v types.EUI64) *types.EUI64 {
