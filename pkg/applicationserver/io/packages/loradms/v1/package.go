@@ -204,7 +204,7 @@ func (p *DeviceManagementPackage) sendLocationSolved(ctx context.Context, ids *t
 	}
 	source := ttnpb.LocationSource_SOURCE_UNKNOWN
 	switch position.Algorithm {
-	case objects.GNSSPositionSolutionType:
+	case objects.GNSSPositionSolutionType, objects.GNSSNGPositionSolutionType:
 		source = ttnpb.LocationSource_SOURCE_GPS
 	case objects.WiFiPositionSolutionType:
 		source = ttnpb.LocationSource_SOURCE_WIFI_RSSI_GEOLOCATION
