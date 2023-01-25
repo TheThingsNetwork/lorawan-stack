@@ -5,9 +5,6 @@ go 1.19
 // Use our fork of throttled/throttled/v2.
 replace github.com/throttled/throttled/v2 => github.com/TheThingsIndustries/throttled/v2 v2.7.1-noredis
 
-// See https://github.com/mattn/go-ieproxy/issues/31
-replace github.com/mattn/go-ieproxy => github.com/mattn/go-ieproxy v0.0.1
-
 // See https://github.com/mitchellh/mapstructure/pull/278
 replace github.com/mitchellh/mapstructure v1.4.3 => github.com/TheThingsIndustries/mapstructure v0.0.0-20220329135826-c42f9f170b2a
 
