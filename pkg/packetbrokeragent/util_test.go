@@ -41,12 +41,13 @@ func mustServe[S interface {
 	GracefulStop()
 }](ctx context.Context, tb testing.TB, create func(testing.TB) S,
 ) (S, net.Addr) {
-	lis, err := net.Listen("tcp", ":0")
+	tb.Helper()
+	lis, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		panic(err)
 	}
 	server := create(tb)
-	go server.Serve(lis)
+	go server.Serve(lis) //nolint:errcheck
 	go func() {
 		<-ctx.Done()
 		server.GracefulStop()
@@ -55,18 +56,22 @@ func mustServe[S interface {
 }
 
 func mustServePBIAM(ctx context.Context, tb testing.TB) (*mock.PBIAM, net.Addr) {
+	tb.Helper()
 	return mustServe(ctx, tb, mock.NewPBIAM)
 }
 
 func mustServePBControlPane(ctx context.Context, tb testing.TB) (*mock.PBControlPlane, net.Addr) {
+	tb.Helper()
 	return mustServe(ctx, tb, mock.NewPBControlPlane)
 }
 
 func mustServePBDataPlane(ctx context.Context, tb testing.TB) (*mock.PBDataPlane, net.Addr) {
+	tb.Helper()
 	return mustServe(ctx, tb, mock.NewPBDataPlane)
 }
 
 func mustServePBMapper(ctx context.Context, tb testing.TB) (*mock.PBMapper, net.Addr) {
+	tb.Helper()
 	return mustServe(ctx, tb, mock.NewPBMapper)
 }
 
