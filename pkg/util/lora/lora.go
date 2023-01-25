@@ -34,11 +34,11 @@ func AdjustedRSSI(channelRSSI, snr float32) float32 {
 	return rssi
 }
 
-// ExtractUplinkReceivedAt returns the correct ReceivedAt timestamp based on
-// the uplink's RxMetadata and actual time of receival.
-func ExtractUplinkReceivedAt(msg *ttnpb.UplinkMessage) *pbtypes.Timestamp {
+// ExtractRxMetadataReceivedAt returns the ReceivedAt timestamp based on the
+// provided metadatas or nil if no md.GpsTime nor md.ReceivedAt is found.
+func ExtractRxMetadataReceivedAt(mds []*ttnpb.RxMetadata) *pbtypes.Timestamp {
 	var ts *pbtypes.Timestamp
-	for _, md := range msg.RxMetadata {
+	for _, md := range mds {
 		if t := md.GpsTime; t != nil {
 			return t
 		}
@@ -46,8 +46,25 @@ func ExtractUplinkReceivedAt(msg *ttnpb.UplinkMessage) *pbtypes.Timestamp {
 			ts = md.ReceivedAt
 		}
 	}
-	if ts != nil {
-		return ts
+	return ts
+}
+
+// ExtractUplinkReceivedAt returns the correct ReceivedAt timestamp based on
+// the uplink message's RxMetadata and the msg.ReceivedAt.
+func ExtractUplinkReceivedAt(msg *ttnpb.UplinkMessage) *pbtypes.Timestamp {
+	mdReceivedAt := ExtractRxMetadataReceivedAt(msg.RxMetadata)
+	if mdReceivedAt != nil {
+		return mdReceivedAt
+	}
+	return msg.ReceivedAt
+}
+
+// ExtractApplicationUplinkReceivedAt returns the correct ReceivedAt timestamp based on
+// the application uplink message's RxMetadata and the msg.ReceivedAt.
+func ExtractApplicationUplinkReceivedAt(msg *ttnpb.ApplicationUplink) *pbtypes.Timestamp {
+	mdReceivedAt := ExtractRxMetadataReceivedAt(msg.RxMetadata)
+	if mdReceivedAt != nil {
+		return mdReceivedAt
 	}
 	return msg.ReceivedAt
 }

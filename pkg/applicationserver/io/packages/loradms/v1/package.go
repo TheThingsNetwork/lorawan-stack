@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	lorautil "go.thethings.network/lorawan-stack/v3/pkg/util/lora"
 	urlutil "go.thethings.network/lorawan-stack/v3/pkg/util/url"
 )
 
@@ -84,13 +85,14 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.Appli
 	case *ttnpb.ApplicationUp_UplinkMessage:
 		msg := m.UplinkMessage
 		settings := msg.GetSettings()
+		receivedAt := lorautil.ExtractApplicationUplinkReceivedAt(msg)
 		loraUp := &objects.LoRaUplink{
 			Type:      objects.UplinkUplinkType,
 			FCnt:      uint32Ptr(msg.GetFCnt()),
 			Port:      uint8Ptr(uint8(msg.GetFPort())),
 			Payload:   hexPtr(objects.Hex(msg.FrmPayload)),
 			Freq:      uint32Ptr(uint32(settings.Frequency)),
-			Timestamp: float64PtrOfTimestamp(msg.ReceivedAt),
+			Timestamp: float64PtrOfTimestamp(receivedAt),
 		}
 
 		if _, ok := data.fPortSet[msg.FPort]; !ok && fPort != msg.FPort {
@@ -334,7 +336,7 @@ func float64PtrOfTimestamp(x *pbtypes.Timestamp) *float64 {
 	if x == nil {
 		return nil
 	}
-	f := float64(ttnpb.StdTime(x).Unix())
+	f := float64(ttnpb.StdTime(x).UnixNano())
 	return &f
 }
 
