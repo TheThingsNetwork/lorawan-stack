@@ -15,6 +15,12 @@
 // Package lora contains LoRa modulation utilities.
 package lora
 
+import (
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+
+	pbtypes "github.com/gogo/protobuf/types"
+)
+
 // AdjustedRSSI returns the LoRa RSSI: the channel RSSI adjusted for SNR.
 // Below -5 dB, the SNR is added to the channel RSSI.
 // Between -5 dB and 10 dB, the SNR is scaled to 0 and added to the channel RSSI.
@@ -26,4 +32,22 @@ func AdjustedRSSI(channelRSSI, snr float32) float32 {
 		rssi += snr/3.0 - 10.0/3.0
 	}
 	return rssi
+}
+
+// ExtractUplinkReceivedAt returns the correct ReceivedAt timestamp based on
+// the uplink's RxMetadata and actual time of receival.
+func ExtractUplinkReceivedAt(msg *ttnpb.UplinkMessage) *pbtypes.Timestamp {
+	var ts *pbtypes.Timestamp
+	for _, md := range msg.RxMetadata {
+		if t := md.GpsTime; t != nil {
+			return t
+		}
+		if ts == nil && md.ReceivedAt != nil {
+			ts = md.ReceivedAt
+		}
+	}
+	if ts != nil {
+		return ts
+	}
+	return msg.ReceivedAt
 }
