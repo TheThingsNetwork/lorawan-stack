@@ -336,7 +336,7 @@ func float64PtrOfTimestamp(x *pbtypes.Timestamp) *float64 {
 	if x == nil {
 		return nil
 	}
-	f := float64(ttnpb.StdTime(x).UnixNano())
+	f := float64(ttnpb.StdTime(x).UnixNano()) / float64(1e9)
 	return &f
 }
 
