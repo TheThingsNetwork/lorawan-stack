@@ -21,23 +21,20 @@ import (
 	"github.com/uptrace/bun"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
-	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 	"google.golang.org/grpc/codes"
 )
 
-var _ bun.QueryHook = (*LoggerHook)(nil)
-
-// LoggerHook is a bun.QueryHook that logs the queries.
-type LoggerHook struct {
+// loggerHook is a bun.QueryHook that logs the queries.
+type loggerHook struct {
 	logger log.Interface
 }
 
 // LoggerHookOption is an option for the LoggerHook.
-type LoggerHookOption func(*LoggerHook)
+type LoggerHookOption func(*loggerHook)
 
-// NewLoggerHook returns a new LoggerHook that logs queries to the logger.
-func NewLoggerHook(logger log.Interface, opts ...LoggerHookOption) *LoggerHook {
-	h := &LoggerHook{
+// NewLoggerHook returns a new bun.QueryHook that logs queries to the logger.
+func NewLoggerHook(logger log.Interface, opts ...LoggerHookOption) bun.QueryHook {
+	h := &loggerHook{
 		logger: logger,
 	}
 	for _, opt := range opts {
@@ -47,12 +44,12 @@ func NewLoggerHook(logger log.Interface, opts ...LoggerHookOption) *LoggerHook {
 }
 
 // BeforeQuery is the hook that is executed before the query runs.
-func (*LoggerHook) BeforeQuery(ctx context.Context, _ *bun.QueryEvent) context.Context {
+func (*loggerHook) BeforeQuery(ctx context.Context, _ *bun.QueryEvent) context.Context {
 	return ctx
 }
 
 // AfterQuery is the hook that is executed after the query runs.
-func (h *LoggerHook) AfterQuery(_ context.Context, event *bun.QueryEvent) {
+func (h *loggerHook) AfterQuery(_ context.Context, event *bun.QueryEvent) {
 	operation := event.Operation()
 	switch operation {
 	case "BEGIN", "COMMIT", "ROLLBACK":
@@ -69,7 +66,7 @@ func (h *LoggerHook) AfterQuery(_ context.Context, event *bun.QueryEvent) {
 		}
 	}
 	if event.Err != nil {
-		err := storeutil.WrapDriverError(event.Err)
+		err := WrapDriverError(event.Err)
 		logFields = logFields.WithError(err)
 		switch errors.Code(err) {
 		case uint32(codes.Canceled),

@@ -33,7 +33,7 @@ func (is *IdentityServer) setupBunStore() (err error) {
 	}
 	bunDB := bun.NewDB(is.db, pgdialect.New())
 	if is.LogDebug() {
-		bunDB.AddQueryHook(bunstore.NewLoggerHook(log.FromContext(is.Context()).WithField("namespace", "db")))
+		bunDB.AddQueryHook(storeutil.NewLoggerHook(log.FromContext(is.Context()).WithField("namespace", "db")))
 	}
 	bunStore, err := bunstore.NewStore(is.Context(), bunDB)
 	if err != nil {

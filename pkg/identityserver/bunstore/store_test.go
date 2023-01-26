@@ -56,7 +56,7 @@ func newTestStore(t *testing.T, dsn *url.URL) storetest.Store {
 	}
 	db := bun.NewDB(sqldb, pgdialect.New())
 
-	db.AddQueryHook(NewLoggerHook(test.GetLogger(t)))
+	db.AddQueryHook(storeutil.NewLoggerHook(test.GetLogger(t)))
 
 	store, err := NewStore(ctx, db)
 	if err != nil {
