@@ -10,6 +10,7 @@ import (
 	flagsplugin "github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	gogo "github.com/TheThingsIndustries/protoc-gen-go-flags/gogo"
 	pflag "github.com/spf13/pflag"
+	customflags "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags"
 )
 
 // AddSelectFlagsForSimulateMetadataParams adds flags to select fields in SimulateMetadataParams.
@@ -199,10 +200,8 @@ func AddSelectFlagsForSimulateJoinRequestParams(flags *pflag.FlagSet, prefix str
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("join-eui", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("join-eui", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("dev-eui", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("dev-eui", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("dev-nonce", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("dev-nonce", prefix), false), flagsplugin.WithHidden(hidden)))
-	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("app-key", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("app-key", prefix), true), flagsplugin.WithHidden(hidden)))
-	AddSelectFlagsForKeyEnvelope(flags, flagsplugin.Prefix("app-key", prefix), hidden)
-	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("nwk-key", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("nwk-key", prefix), true), flagsplugin.WithHidden(hidden)))
-	AddSelectFlagsForKeyEnvelope(flags, flagsplugin.Prefix("nwk-key", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("app-key", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("app-key", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("nwk-key", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("nwk-key", prefix), false), flagsplugin.WithHidden(hidden)))
 }
 
 // SelectFromFlags outputs the fieldmask paths forSimulateJoinRequestParams message from select flags.
@@ -227,72 +226,54 @@ func PathsFromSelectFlagsForSimulateJoinRequestParams(flags *pflag.FlagSet, pref
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("app_key", prefix))
 	}
-	if selectPaths, err := PathsFromSelectFlagsForKeyEnvelope(flags, flagsplugin.Prefix("app_key", prefix)); err != nil {
-		return nil, err
-	} else {
-		paths = append(paths, selectPaths...)
-	}
 	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("nwk_key", prefix)); err != nil {
 		return nil, err
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("nwk_key", prefix))
-	}
-	if selectPaths, err := PathsFromSelectFlagsForKeyEnvelope(flags, flagsplugin.Prefix("nwk_key", prefix)); err != nil {
-		return nil, err
-	} else {
-		paths = append(paths, selectPaths...)
 	}
 	return paths, nil
 }
 
 // AddSetFlagsForSimulateJoinRequestParams adds flags to select fields in SimulateJoinRequestParams.
 func AddSetFlagsForSimulateJoinRequestParams(flags *pflag.FlagSet, prefix string, hidden bool) {
-	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("join-eui", prefix), "", flagsplugin.WithHidden(hidden)))
-	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("dev-eui", prefix), "", flagsplugin.WithHidden(hidden)))
-	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("dev-nonce", prefix), "", flagsplugin.WithHidden(hidden)))
-	AddSetFlagsForKeyEnvelope(flags, flagsplugin.Prefix("app-key", prefix), hidden)
-	AddSetFlagsForKeyEnvelope(flags, flagsplugin.Prefix("nwk-key", prefix), hidden)
+	flags.AddFlag(customflags.New8BytesFlag(flagsplugin.Prefix("join-eui", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(customflags.New8BytesFlag(flagsplugin.Prefix("dev-eui", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(customflags.New2BytesFlag(flagsplugin.Prefix("dev-nonce", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(customflags.New16BytesFlag(flagsplugin.Prefix("app-key", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(customflags.New16BytesFlag(flagsplugin.Prefix("nwk-key", prefix), "", flagsplugin.WithHidden(hidden)))
 }
 
 // SetFromFlags sets the SimulateJoinRequestParams message from flags.
 func (m *SimulateJoinRequestParams) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
-	if val, changed, err := flagsplugin.GetBytes(flags, flagsplugin.Prefix("join_eui", prefix)); err != nil {
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("join_eui", prefix)); err != nil {
 		return nil, err
 	} else if changed {
 		m.JoinEui = val
 		paths = append(paths, flagsplugin.Prefix("join_eui", prefix))
 	}
-	if val, changed, err := flagsplugin.GetBytes(flags, flagsplugin.Prefix("dev_eui", prefix)); err != nil {
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("dev_eui", prefix)); err != nil {
 		return nil, err
 	} else if changed {
 		m.DevEui = val
 		paths = append(paths, flagsplugin.Prefix("dev_eui", prefix))
 	}
-	if val, changed, err := flagsplugin.GetBytes(flags, flagsplugin.Prefix("dev_nonce", prefix)); err != nil {
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("dev_nonce", prefix)); err != nil {
 		return nil, err
 	} else if changed {
 		m.DevNonce = val
 		paths = append(paths, flagsplugin.Prefix("dev_nonce", prefix))
 	}
-	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("app_key", prefix)); changed {
-		if m.AppKey == nil {
-			m.AppKey = &KeyEnvelope{}
-		}
-		if setPaths, err := m.AppKey.SetFromFlags(flags, flagsplugin.Prefix("app_key", prefix)); err != nil {
-			return nil, err
-		} else {
-			paths = append(paths, setPaths...)
-		}
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("app_key", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.AppKey = val
+		paths = append(paths, flagsplugin.Prefix("app_key", prefix))
 	}
-	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("nwk_key", prefix)); changed {
-		if m.NwkKey == nil {
-			m.NwkKey = &KeyEnvelope{}
-		}
-		if setPaths, err := m.NwkKey.SetFromFlags(flags, flagsplugin.Prefix("nwk_key", prefix)); err != nil {
-			return nil, err
-		} else {
-			paths = append(paths, setPaths...)
-		}
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("nwk_key", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.NwkKey = val
+		paths = append(paths, flagsplugin.Prefix("nwk_key", prefix))
 	}
 	return paths, nil
 }
@@ -300,14 +281,10 @@ func (m *SimulateJoinRequestParams) SetFromFlags(flags *pflag.FlagSet, prefix st
 // AddSelectFlagsForSimulateDataUplinkParams adds flags to select fields in SimulateDataUplinkParams.
 func AddSelectFlagsForSimulateDataUplinkParams(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("dev-addr", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("dev-addr", prefix), false), flagsplugin.WithHidden(hidden)))
-	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("f-nwk-s-int-key", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("f-nwk-s-int-key", prefix), true), flagsplugin.WithHidden(hidden)))
-	AddSelectFlagsForKeyEnvelope(flags, flagsplugin.Prefix("f-nwk-s-int-key", prefix), hidden)
-	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("s-nwk-s-int-key", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("s-nwk-s-int-key", prefix), true), flagsplugin.WithHidden(hidden)))
-	AddSelectFlagsForKeyEnvelope(flags, flagsplugin.Prefix("s-nwk-s-int-key", prefix), hidden)
-	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("nwk-s-enc-key", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("nwk-s-enc-key", prefix), true), flagsplugin.WithHidden(hidden)))
-	AddSelectFlagsForKeyEnvelope(flags, flagsplugin.Prefix("nwk-s-enc-key", prefix), hidden)
-	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("app-s-key", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("app-s-key", prefix), true), flagsplugin.WithHidden(hidden)))
-	AddSelectFlagsForKeyEnvelope(flags, flagsplugin.Prefix("app-s-key", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("f-nwk-s-int-key", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("f-nwk-s-int-key", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("s-nwk-s-int-key", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("s-nwk-s-int-key", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("nwk-s-enc-key", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("nwk-s-enc-key", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("app-s-key", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("app-s-key", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("adr", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("adr", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("adr-ack-req", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("adr-ack-req", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("confirmed", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("confirmed", prefix), false), flagsplugin.WithHidden(hidden)))
@@ -333,40 +310,20 @@ func PathsFromSelectFlagsForSimulateDataUplinkParams(flags *pflag.FlagSet, prefi
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("f_nwk_s_int_key", prefix))
 	}
-	if selectPaths, err := PathsFromSelectFlagsForKeyEnvelope(flags, flagsplugin.Prefix("f_nwk_s_int_key", prefix)); err != nil {
-		return nil, err
-	} else {
-		paths = append(paths, selectPaths...)
-	}
 	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("s_nwk_s_int_key", prefix)); err != nil {
 		return nil, err
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("s_nwk_s_int_key", prefix))
-	}
-	if selectPaths, err := PathsFromSelectFlagsForKeyEnvelope(flags, flagsplugin.Prefix("s_nwk_s_int_key", prefix)); err != nil {
-		return nil, err
-	} else {
-		paths = append(paths, selectPaths...)
 	}
 	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("nwk_s_enc_key", prefix)); err != nil {
 		return nil, err
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("nwk_s_enc_key", prefix))
 	}
-	if selectPaths, err := PathsFromSelectFlagsForKeyEnvelope(flags, flagsplugin.Prefix("nwk_s_enc_key", prefix)); err != nil {
-		return nil, err
-	} else {
-		paths = append(paths, selectPaths...)
-	}
 	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("app_s_key", prefix)); err != nil {
 		return nil, err
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("app_s_key", prefix))
-	}
-	if selectPaths, err := PathsFromSelectFlagsForKeyEnvelope(flags, flagsplugin.Prefix("app_s_key", prefix)); err != nil {
-		return nil, err
-	} else {
-		paths = append(paths, selectPaths...)
 	}
 	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("adr", prefix)); err != nil {
 		return nil, err
@@ -428,11 +385,11 @@ func PathsFromSelectFlagsForSimulateDataUplinkParams(flags *pflag.FlagSet, prefi
 
 // AddSetFlagsForSimulateDataUplinkParams adds flags to select fields in SimulateDataUplinkParams.
 func AddSetFlagsForSimulateDataUplinkParams(flags *pflag.FlagSet, prefix string, hidden bool) {
-	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("dev-addr", prefix), "", flagsplugin.WithHidden(hidden)))
-	AddSetFlagsForKeyEnvelope(flags, flagsplugin.Prefix("f-nwk-s-int-key", prefix), hidden)
-	AddSetFlagsForKeyEnvelope(flags, flagsplugin.Prefix("s-nwk-s-int-key", prefix), hidden)
-	AddSetFlagsForKeyEnvelope(flags, flagsplugin.Prefix("nwk-s-enc-key", prefix), hidden)
-	AddSetFlagsForKeyEnvelope(flags, flagsplugin.Prefix("app-s-key", prefix), hidden)
+	flags.AddFlag(customflags.New4BytesFlag(flagsplugin.Prefix("dev-addr", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(customflags.New16BytesFlag(flagsplugin.Prefix("f-nwk-s-int-key", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(customflags.New16BytesFlag(flagsplugin.Prefix("s-nwk-s-int-key", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(customflags.New16BytesFlag(flagsplugin.Prefix("nwk-s-enc-key", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(customflags.New16BytesFlag(flagsplugin.Prefix("app-s-key", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("adr", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("adr-ack-req", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("confirmed", prefix), "", flagsplugin.WithHidden(hidden)))
@@ -448,51 +405,35 @@ func AddSetFlagsForSimulateDataUplinkParams(flags *pflag.FlagSet, prefix string,
 
 // SetFromFlags sets the SimulateDataUplinkParams message from flags.
 func (m *SimulateDataUplinkParams) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
-	if val, changed, err := flagsplugin.GetBytes(flags, flagsplugin.Prefix("dev_addr", prefix)); err != nil {
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("dev_addr", prefix)); err != nil {
 		return nil, err
 	} else if changed {
 		m.DevAddr = val
 		paths = append(paths, flagsplugin.Prefix("dev_addr", prefix))
 	}
-	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("f_nwk_s_int_key", prefix)); changed {
-		if m.FNwkSIntKey == nil {
-			m.FNwkSIntKey = &KeyEnvelope{}
-		}
-		if setPaths, err := m.FNwkSIntKey.SetFromFlags(flags, flagsplugin.Prefix("f_nwk_s_int_key", prefix)); err != nil {
-			return nil, err
-		} else {
-			paths = append(paths, setPaths...)
-		}
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("f_nwk_s_int_key", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.FNwkSIntKey = val
+		paths = append(paths, flagsplugin.Prefix("f_nwk_s_int_key", prefix))
 	}
-	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("s_nwk_s_int_key", prefix)); changed {
-		if m.SNwkSIntKey == nil {
-			m.SNwkSIntKey = &KeyEnvelope{}
-		}
-		if setPaths, err := m.SNwkSIntKey.SetFromFlags(flags, flagsplugin.Prefix("s_nwk_s_int_key", prefix)); err != nil {
-			return nil, err
-		} else {
-			paths = append(paths, setPaths...)
-		}
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("s_nwk_s_int_key", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.SNwkSIntKey = val
+		paths = append(paths, flagsplugin.Prefix("s_nwk_s_int_key", prefix))
 	}
-	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("nwk_s_enc_key", prefix)); changed {
-		if m.NwkSEncKey == nil {
-			m.NwkSEncKey = &KeyEnvelope{}
-		}
-		if setPaths, err := m.NwkSEncKey.SetFromFlags(flags, flagsplugin.Prefix("nwk_s_enc_key", prefix)); err != nil {
-			return nil, err
-		} else {
-			paths = append(paths, setPaths...)
-		}
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("nwk_s_enc_key", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.NwkSEncKey = val
+		paths = append(paths, flagsplugin.Prefix("nwk_s_enc_key", prefix))
 	}
-	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("app_s_key", prefix)); changed {
-		if m.AppSKey == nil {
-			m.AppSKey = &KeyEnvelope{}
-		}
-		if setPaths, err := m.AppSKey.SetFromFlags(flags, flagsplugin.Prefix("app_s_key", prefix)); err != nil {
-			return nil, err
-		} else {
-			paths = append(paths, setPaths...)
-		}
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("app_s_key", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.AppSKey = val
+		paths = append(paths, flagsplugin.Prefix("app_s_key", prefix))
 	}
 	if val, changed, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("adr", prefix)); err != nil {
 		return nil, err

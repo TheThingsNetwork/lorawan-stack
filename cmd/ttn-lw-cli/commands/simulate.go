@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/simulate"
+	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
@@ -38,11 +39,11 @@ import (
 )
 
 var (
-	simulateUplinkFlags      = &pflag.FlagSet{}
-	simulateJoinRequestFlags = &pflag.FlagSet{}
-	simulateDataUplinkFlags  = &pflag.FlagSet{}
+	simulateUplinkFlags      = util.NormalizedFlagSet()
+	simulateJoinRequestFlags = util.NormalizedFlagSet()
+	simulateDataUplinkFlags  = util.NormalizedFlagSet()
 
-	applicationUplinkFlags = &pflag.FlagSet{}
+	applicationUplinkFlags = util.NormalizedFlagSet()
 
 	errApplicationServerDisabled = errors.DefineFailedPrecondition("application_server_disabled", "Application Server is disabled")
 )
@@ -419,14 +420,14 @@ var (
 					if err != nil {
 						return err
 					}
-					var key *ttnpb.KeyEnvelope
+					var key []byte
 					if macspec.UseNwkKey(uplinkParams.LorawanVersion) {
 						key = joinParams.NwkKey
 					} else {
 						key = joinParams.AppKey
 					}
 
-					nwkKey, err := types.GetAES128Key(key.EncryptedKey)
+					nwkKey, err := types.GetAES128Key(key)
 					if err != nil {
 						return err
 					}
@@ -449,8 +450,8 @@ var (
 							DevEui:  joinParams.DevEui,
 						},
 						RootKeys: &ttnpb.RootKeys{
-							NwkKey: joinParams.NwkKey,
-							AppKey: joinParams.AppKey,
+							NwkKey: &ttnpb.KeyEnvelope{Key: joinParams.NwkKey},
+							AppKey: &ttnpb.KeyEnvelope{Key: joinParams.AppKey},
 						},
 						Session: &ttnpb.Session{},
 					}, joinRequest, downMsg); err != nil {
@@ -499,7 +500,7 @@ var (
 							dataUplinkParams.FPort,
 							true,
 						)
-						nwkSEncKey, err := types.GetAES128Key(dataUplinkParams.NwkSEncKey.EncryptedKey)
+						nwkSEncKey, err := types.GetAES128Key(dataUplinkParams.NwkSEncKey)
 						if err != nil {
 							return err
 						}
@@ -520,14 +521,14 @@ var (
 						fOpts = buf
 					}
 
-					var key *ttnpb.KeyEnvelope
+					var key []byte
 					if dataUplinkParams.FPort == 0 {
 						key = dataUplinkParams.NwkSEncKey
 					} else {
 						key = dataUplinkParams.AppSKey
 					}
 
-					nwkKey, err := types.GetAES128Key(key.EncryptedKey)
+					nwkKey, err := types.GetAES128Key(key)
 					if err != nil {
 						return err
 					}
@@ -584,7 +585,7 @@ var (
 						sNwkSIntKey *types.AES128Key
 					)
 
-					fNwkSIntKey, err = types.GetAES128Key(dataUplinkParams.FNwkSIntKey.EncryptedKey)
+					fNwkSIntKey, err = types.GetAES128Key(dataUplinkParams.FNwkSIntKey)
 					if err != nil {
 						return err
 					}
@@ -596,7 +597,7 @@ var (
 							buf,
 						)
 					} else {
-						sNwkSIntKey, err = types.GetAES128Key(dataUplinkParams.SNwkSIntKey.EncryptedKey)
+						sNwkSIntKey, err = types.GetAES128Key(dataUplinkParams.SNwkSIntKey)
 						if err != nil {
 							return err
 						}
@@ -629,10 +630,10 @@ var (
 							LastNFCntDown: lastNFCntDown,
 							LastFCntUp:    lastAFCntDown,
 							Keys: &ttnpb.SessionKeys{
-								FNwkSIntKey: dataUplinkParams.FNwkSIntKey,
-								SNwkSIntKey: dataUplinkParams.SNwkSIntKey,
-								NwkSEncKey:  dataUplinkParams.NwkSEncKey,
-								AppSKey:     dataUplinkParams.AppSKey,
+								FNwkSIntKey: &ttnpb.KeyEnvelope{Key: dataUplinkParams.FNwkSIntKey},
+								SNwkSIntKey: &ttnpb.KeyEnvelope{Key: dataUplinkParams.SNwkSIntKey},
+								NwkSEncKey:  &ttnpb.KeyEnvelope{Key: dataUplinkParams.NwkSEncKey},
+								AppSKey:     &ttnpb.KeyEnvelope{Key: dataUplinkParams.AppSKey},
 							},
 						},
 					}, dataUplink, downMsg); err != nil {

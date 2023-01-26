@@ -9117,10 +9117,10 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `dev_addr` | [`bytes`](#bytes) |  |  |
-| `f_nwk_s_int_key` | [`KeyEnvelope`](#ttn.lorawan.v3.KeyEnvelope) |  |  |
-| `s_nwk_s_int_key` | [`KeyEnvelope`](#ttn.lorawan.v3.KeyEnvelope) |  |  |
-| `nwk_s_enc_key` | [`KeyEnvelope`](#ttn.lorawan.v3.KeyEnvelope) |  |  |
-| `app_s_key` | [`KeyEnvelope`](#ttn.lorawan.v3.KeyEnvelope) |  |  |
+| `f_nwk_s_int_key` | [`bytes`](#bytes) |  |  |
+| `s_nwk_s_int_key` | [`bytes`](#bytes) |  |  |
+| `nwk_s_enc_key` | [`bytes`](#bytes) |  |  |
+| `app_s_key` | [`bytes`](#bytes) |  |  |
 | `adr` | [`bool`](#bool) |  |  |
 | `adr_ack_req` | [`bool`](#bool) |  |  |
 | `confirmed` | [`bool`](#bool) |  |  |
@@ -9133,6 +9133,17 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 | `tx_ch_idx` | [`uint32`](#uint32) |  |  |
 | `f_opts` | [`bytes`](#bytes) |  |  |
 
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `dev_addr` | <p>`bytes.len`: `4`</p> |
+| `f_nwk_s_int_key` | <p>`bytes.len`: `16`</p> |
+| `s_nwk_s_int_key` | <p>`bytes.len`: `16`</p> |
+| `nwk_s_enc_key` | <p>`bytes.len`: `16`</p> |
+| `app_s_key` | <p>`bytes.len`: `16`</p> |
+| `f_opts` | <p>`bytes.max_len`: `15`</p> |
+
 ### <a name="ttn.lorawan.v3.SimulateJoinRequestParams">Message `SimulateJoinRequestParams`</a>
 
 | Field | Type | Label | Description |
@@ -9140,8 +9151,18 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 | `join_eui` | [`bytes`](#bytes) |  |  |
 | `dev_eui` | [`bytes`](#bytes) |  |  |
 | `dev_nonce` | [`bytes`](#bytes) |  |  |
-| `app_key` | [`KeyEnvelope`](#ttn.lorawan.v3.KeyEnvelope) |  |  |
-| `nwk_key` | [`KeyEnvelope`](#ttn.lorawan.v3.KeyEnvelope) |  |  |
+| `app_key` | [`bytes`](#bytes) |  |  |
+| `nwk_key` | [`bytes`](#bytes) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `join_eui` | <p>`bytes.len`: `8`</p> |
+| `dev_eui` | <p>`bytes.len`: `8`</p> |
+| `dev_nonce` | <p>`bytes.len`: `2`</p> |
+| `app_key` | <p>`bytes.len`: `16`</p> |
+| `nwk_key` | <p>`bytes.len`: `16`</p> |
 
 ### <a name="ttn.lorawan.v3.SimulateMetadataParams">Message `SimulateMetadataParams`</a>
 

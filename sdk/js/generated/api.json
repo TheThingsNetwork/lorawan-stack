@@ -43030,55 +43030,95 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 4
+                  }
+                ]
+              }
             },
             {
               "name": "f_nwk_s_int_key",
               "description": "",
               "label": "",
-              "type": "KeyEnvelope",
-              "longType": "KeyEnvelope",
-              "fullType": "ttn.lorawan.v3.KeyEnvelope",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 16
+                  }
+                ]
+              }
             },
             {
               "name": "s_nwk_s_int_key",
               "description": "",
               "label": "",
-              "type": "KeyEnvelope",
-              "longType": "KeyEnvelope",
-              "fullType": "ttn.lorawan.v3.KeyEnvelope",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 16
+                  }
+                ]
+              }
             },
             {
               "name": "nwk_s_enc_key",
               "description": "",
               "label": "",
-              "type": "KeyEnvelope",
-              "longType": "KeyEnvelope",
-              "fullType": "ttn.lorawan.v3.KeyEnvelope",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 16
+                  }
+                ]
+              }
             },
             {
               "name": "app_s_key",
               "description": "",
               "label": "",
-              "type": "KeyEnvelope",
-              "longType": "KeyEnvelope",
-              "fullType": "ttn.lorawan.v3.KeyEnvelope",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 16
+                  }
+                ]
+              }
             },
             {
               "name": "adr",
@@ -43210,7 +43250,15 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.max_len",
+                    "value": 15
+                  }
+                ]
+              }
             }
           ]
         },
@@ -43234,7 +43282,15 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 8
+                  }
+                ]
+              }
             },
             {
               "name": "dev_eui",
@@ -43246,7 +43302,15 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 8
+                  }
+                ]
+              }
             },
             {
               "name": "dev_nonce",
@@ -43258,31 +43322,55 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 2
+                  }
+                ]
+              }
             },
             {
               "name": "app_key",
               "description": "",
               "label": "",
-              "type": "KeyEnvelope",
-              "longType": "KeyEnvelope",
-              "fullType": "ttn.lorawan.v3.KeyEnvelope",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 16
+                  }
+                ]
+              }
             },
             {
               "name": "nwk_key",
               "description": "",
               "label": "",
-              "type": "KeyEnvelope",
-              "longType": "KeyEnvelope",
-              "fullType": "ttn.lorawan.v3.KeyEnvelope",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 16
+                  }
+                ]
+              }
             }
           ]
         },

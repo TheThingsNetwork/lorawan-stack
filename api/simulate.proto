@@ -15,9 +15,11 @@
 syntax = "proto3";
 
 import "github.com/TheThingsIndustries/protoc-gen-go-flags/annotations.proto";
+import "github.com/TheThingsIndustries/protoc-gen-go-json/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 import "google/protobuf/timestamp.proto";
 import "lorawan-stack/api/lorawan.proto";
-import "lorawan-stack/api/keys.proto";
+import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 
 package ttn.lorawan.v3;
 
@@ -41,20 +43,150 @@ message SimulateMetadataParams {
 
 message SimulateJoinRequestParams {
   option (thethings.flags.message) = { select: true, set: true };
-  bytes join_eui = 1;
-  bytes dev_eui = 2;
-  bytes dev_nonce = 3;
-  ttn.lorawan.v3.KeyEnvelope app_key = 4;
-  ttn.lorawan.v3.KeyEnvelope nwk_key = 5;
+  bytes join_eui = 1 [
+      (validate.rules).bytes = { len: 8, ignore_empty: true },
+      (thethings.json.field) = {
+        marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+        unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal8Bytes"
+      },
+      (thethings.flags.field) = {
+        set_flag_new_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.New8BytesFlag",
+        set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
+      },
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        type: STRING, format: "string", example: "\"70B3D57ED000ABCD\""
+      }
+    ];
+  bytes dev_eui = 2[
+    (validate.rules).bytes = { len: 8, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal8Bytes"
+    },
+    (thethings.flags.field) = {
+      set_flag_new_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.New8BytesFlag",
+      set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"70B3D57ED000ABCD\""
+    }
+  ];
+  bytes dev_nonce = 3 [
+    (validate.rules).bytes = { len: 2, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal2Bytes"
+    },
+    (thethings.flags.field) = {
+      set_flag_new_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.New2BytesFlag",
+      set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"ABCD\""
+    }
+  ];
+  bytes app_key = 4 [
+    (validate.rules).bytes = { len: 16, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal16Bytes"
+    },
+    (thethings.flags.field) = {
+      set_flag_new_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.New16BytesFlag",
+      set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"0123456789ABCDEF0123456789ABCDEF\""
+    }
+  ];
+  bytes nwk_key = 5 [
+    (validate.rules).bytes = { len: 16, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal16Bytes"
+    },
+    (thethings.flags.field) = {
+      set_flag_new_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.New16BytesFlag",
+      set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"0123456789ABCDEF0123456789ABCDEF\""
+    }
+  ];
 }
 
 message SimulateDataUplinkParams {
   option (thethings.flags.message) = { select: true, set: true };
-  bytes dev_addr = 1;
-  ttn.lorawan.v3.KeyEnvelope f_nwk_s_int_key = 2;
-  ttn.lorawan.v3.KeyEnvelope s_nwk_s_int_key = 3;
-  ttn.lorawan.v3.KeyEnvelope nwk_s_enc_key = 4;
-  ttn.lorawan.v3.KeyEnvelope app_s_key = 5;
+  bytes dev_addr = 1[
+    (validate.rules).bytes = { len: 4, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal4Bytes"
+    },
+    (thethings.flags.field) = {
+      set_flag_new_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.New4BytesFlag",
+      set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"2600ABCD\""
+    }
+  ];
+  bytes f_nwk_s_int_key = 2 [
+    (validate.rules).bytes = { len: 16, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal16Bytes"
+    },
+    (thethings.flags.field) = {
+      set_flag_new_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.New16BytesFlag",
+      set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"0123456789ABCDEF0123456789ABCDEF\""
+    }
+  ];
+  bytes s_nwk_s_int_key = 3 [
+    (validate.rules).bytes = { len: 16, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal16Bytes"
+    },
+    (thethings.flags.field) = {
+      set_flag_new_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.New16BytesFlag",
+      set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"0123456789ABCDEF0123456789ABCDEF\""
+    }
+  ];
+  bytes nwk_s_enc_key = 4 [
+    (validate.rules).bytes = { len: 16, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal16Bytes"
+    },
+    (thethings.flags.field) = {
+      set_flag_new_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.New16BytesFlag",
+      set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"0123456789ABCDEF0123456789ABCDEF\""
+    }
+  ];
+  bytes app_s_key = 5 [
+    (validate.rules).bytes = { len: 16, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal16Bytes"
+    },
+    (thethings.flags.field) = {
+      set_flag_new_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.New16BytesFlag",
+      set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING, format: "string", example: "\"0123456789ABCDEF0123456789ABCDEF\""
+    }
+  ];
   bool adr = 6;
   bool adr_ack_req = 7;
   bool confirmed = 8;
@@ -65,5 +197,5 @@ message SimulateDataUplinkParams {
   uint32 conf_f_cnt = 13;
   uint32 tx_dr_idx = 14;
   uint32 tx_ch_idx = 15;
-  bytes f_opts = 16;
+  bytes f_opts = 16 [(validate.rules).bytes.max_len = 15];
 }
