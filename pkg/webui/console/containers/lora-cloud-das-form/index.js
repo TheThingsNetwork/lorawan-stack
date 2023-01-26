@@ -95,7 +95,7 @@ const defaultValues = {
   data: {
     token: '',
     server_url: LORA_CLOUD_DAS.DEFAULT_SERVER_URL,
-    f_port_set: LORA_CLOUD_DAS.DEFAULT_PORT,
+    f_port_set: LORA_CLOUD_DAS.DEFAULT_PORT_SET,
   },
 }
 
