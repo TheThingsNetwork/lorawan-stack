@@ -85,7 +85,7 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.Appli
 	case *ttnpb.ApplicationUp_UplinkMessage:
 		msg := m.UplinkMessage
 		settings := msg.GetSettings()
-		receivedAt := lorautil.ExtractApplicationUplinkReceivedAt(msg)
+		receivedAt := lorautil.GetAdjustedReceivedAt(msg)
 		loraUp := &objects.LoRaUplink{
 			Type:      objects.UplinkUplinkType,
 			FCnt:      uint32Ptr(msg.GetFCnt()),

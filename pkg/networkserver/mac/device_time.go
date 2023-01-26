@@ -34,7 +34,7 @@ var (
 
 func HandleDeviceTimeReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.UplinkMessage) (events.Builders, error) {
 	ans := &ttnpb.MACCommand_DeviceTimeAns{
-		Time: lorautil.ExtractUplinkReceivedAt(msg),
+		Time: lorautil.GetAdjustedReceivedAt(msg),
 	}
 	dev.MacState.QueuedResponses = append(dev.MacState.QueuedResponses, ans.MACCommand())
 	return events.Builders{
