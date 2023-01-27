@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.24.0] - unreleased
+
+### Added
+
 - List of end-devices can now be sorted by `last_seen_at` field. Unseen devices will be shown last.
 - End devices now contain `lora_alliance_profile_ids` field.
 - Add `source` config option for TLS certificates in LoRaWAN Backend Interfaces interop client configuration. This value can be `file` (existing behavior) or `key-vault`.
@@ -28,10 +42,6 @@ For details about compatibility between different releases, see the **Commitment
 ### Removed
 
 - The device version identifiers no longer have the `serial_number`, `vendor_id` and `vendor_profile_id` fields.
-
-### Fixed
-
-### Security
 
 ## [3.23.2] - 2023-01-18
 
@@ -2464,7 +2474,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.23.2...v3.23
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.24.0...v3.24
+[3.24.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.23.2...v3.24.0
 [3.23.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.23.1...v3.23.2
 [3.23.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.23.0...v3.23.1
 [3.23.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.22.2...v3.23.0
