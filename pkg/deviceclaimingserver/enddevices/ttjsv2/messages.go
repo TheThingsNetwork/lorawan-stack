@@ -14,20 +14,38 @@
 
 package ttjsv2
 
-type claimData struct {
+// ClaimData contains information about the claim.
+type ClaimData struct {
 	HomeNetID string  `json:"homeNetID"`
 	HomeNSID  *string `json:"homeNSID,omitempty"`
 	Locked    bool    `json:"locked"`
 }
 
-type claimRequest struct {
-	OwnerToken string  `json:"ownerToken"`
-	HomeNetID  string  `json:"homeNetID"`
-	HomeNSID   *string `json:"homeNSID,omitempty"`
-	Lock       bool    `json:"lock"`
+// KEK contains the key encryption key.
+type KEK struct {
+	Label string `json:"label"`
+	Key   string `json:"key"`
 }
 
-// errorResponse is a message that may be returned by The Things Join Server in case of an error.
-type errorResponse struct {
+// ClaimRequest is the claim request message.
+type ClaimRequest struct {
+	OwnerToken           string  `json:"ownerToken"`
+	HomeNetID            string  `json:"homeNetID"`
+	HomeNSID             *string `json:"homeNSID,omitempty"`
+	RegenerateOwnerToken *bool   `json:"regenerateOwnerToken,omitempty"`
+	Lock                 *bool   `json:"lock,omitempty"`
+	KEK                  *KEK    `json:"kek,omitempty"`
+}
+
+// ErrorResponse is a message that may be returned by The Things Join Server in case of an error.
+type ErrorResponse struct {
 	Message string `json:"message"`
+}
+
+func boolValue(b bool) *bool {
+	return &b
+}
+
+func stringValue(s string) *string {
+	return &s
 }

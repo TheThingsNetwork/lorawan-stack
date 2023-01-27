@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices/ttjsv2"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
@@ -51,6 +52,7 @@ type EndDeviceClaimer interface {
 // Component abstracts the underlying *component.Component.
 type Component interface {
 	httpclient.Provider
+	KeyService() crypto.KeyService
 	GetBaseConfig(ctx context.Context) config.ServiceBase
 	GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (*grpc.ClientConn, error)
 	AllowInsecureForCredentials() bool
@@ -68,7 +70,7 @@ type Upstream struct {
 }
 
 // NewUpstream returns a new Upstream.
-func NewUpstream(ctx context.Context, conf Config, c Component, opts ...Option) (*Upstream, error) {
+func NewUpstream(ctx context.Context, c Component, conf Config, opts ...Option) (*Upstream, error) {
 	upstream := &Upstream{
 		Component: c,
 		servers:   make(map[string]EndDeviceClaimer),
@@ -103,18 +105,17 @@ func NewUpstream(ctx context.Context, conf Config, c Component, opts ...Option) 
 		var claimer EndDeviceClaimer
 		switch js.Type {
 		case ttjsV2Type:
-			var cfg ttjsv2.Config
-			if err := yaml.UnmarshalStrict(configBytes, &cfg); err != nil {
+			var ttjsConf ttjsv2.ConfigFile
+			if err := yaml.UnmarshalStrict(configBytes, &ttjsConf); err != nil {
 				return nil, err
 			}
-			cfg.NetID = conf.NetID
-			cfg.JoinEUIPrefixes = js.JoinEUIs
-			cfg.NetworkServer.Hostname = conf.NetworkServer.Hostname
-			cfg.NetworkServer.HomeNSID = conf.NetworkServer.HomeNSID
-			claimer, err = cfg.NewClient(ctx, c)
-			if err != nil {
-				return nil, err
-			}
+			claimer = ttjsv2.NewClient(c, fetcher, ttjsv2.Config{
+				NetID:           conf.NetID,
+				HomeNSID:        conf.NetworkServer.HomeNSID,
+				Hostname:        conf.NetworkServer.Hostname,
+				JoinEUIPrefixes: js.JoinEUIs,
+				ConfigFile:      ttjsConf,
+			})
 		default:
 			log.FromContext(ctx).WithField("type", js.Type).Warn("Unknown Join Server type")
 			continue
@@ -147,7 +148,7 @@ var (
 	errClaimingNotSupported = errors.DefineAborted("claiming_not_supported", "claiming not supported for JoinEUI `{eui}`")
 )
 
-func (upstream *Upstream) joinEUIClaimer(ctx context.Context, joinEUI types.EUI64) EndDeviceClaimer {
+func (upstream *Upstream) joinEUIClaimer(_ context.Context, joinEUI types.EUI64) EndDeviceClaimer {
 	for _, srv := range upstream.servers {
 		if srv.SupportsJoinEUI(joinEUI) {
 			return srv
