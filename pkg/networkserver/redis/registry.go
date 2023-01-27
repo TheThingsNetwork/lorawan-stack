@@ -41,7 +41,12 @@ var (
 )
 
 // SchemaVersion is the Network Server database schema version. Bump when a migration is required.
-const SchemaVersion = 1
+const SchemaVersion = 2
+
+// UnsupportedMigrationVersionBreakpoint indicates the breakpoint for versions that
+// cannot be auto-migrated to latest. Use v3.23.0 of The Things Stack to migrate
+// to a supported SchemaVersion before migrating to latest.
+const UnsupportedMigrationVersionBreakpoint = 1
 
 // DeviceRegistry is an implementation of networkserver.DeviceRegistry.
 type DeviceRegistry struct {
