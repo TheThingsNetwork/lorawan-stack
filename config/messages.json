@@ -3266,6 +3266,15 @@
       "file": "listeners.go"
     }
   },
+  "error:pkg/config/tlsconfig:fetch_file": {
+    "translations": {
+      "en": "fetch file `{name}`"
+    },
+    "description": {
+      "package": "pkg/config/tlsconfig",
+      "file": "config.go"
+    }
+  },
   "error:pkg/config/tlsconfig:missing_acme_dir": {
     "translations": {
       "en": "missing ACME storage directory"
@@ -6027,15 +6036,6 @@
     "description": {
       "package": "pkg/interop",
       "file": "errors.go"
-    }
-  },
-  "error:pkg/interop:fetch_file": {
-    "translations": {
-      "en": "fetch file `{name}`"
-    },
-    "description": {
-      "package": "pkg/interop",
-      "file": "config.go"
     }
   },
   "error:pkg/interop:frame_replayed": {
