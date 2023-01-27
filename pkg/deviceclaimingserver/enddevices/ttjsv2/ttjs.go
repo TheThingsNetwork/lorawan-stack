@@ -104,8 +104,8 @@ func (c *TTJS) httpClient(ctx context.Context) (*http.Client, error) {
 var (
 	errDeviceNotProvisioned = errors.DefineNotFound("device_not_provisioned", "device with EUI `{dev_eui}` not provisioned") //nolint:lll
 	errDeviceNotClaimed     = errors.DefineNotFound("device_not_claimed", "device with EUI `{dev_eui}` not claimed")
-	errDeviceAccessDenied   = errors.DefinePermissionDenied("device_access_denied", "access to device with `{dev_eui}` denied. Either device is already claimed or owner token is invalid") //nolint:lll
-	errUnauthorized         = errors.DefineUnauthenticated("unauthorized", "client API Key missing or invalid")
+	errDeviceAccessDenied   = errors.DefinePermissionDenied("device_access_denied", "access to device with `{dev_eui}` denied: device is already claimed or the owner token is invalid") //nolint:lll
+	errUnauthenticated      = errors.DefineUnauthenticated("unauthenticated", "unauthenticated")
 )
 
 // Claim implements EndDeviceClaimer.
@@ -170,7 +170,7 @@ func (c *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, claimAuth
 	case http.StatusForbidden:
 		return errDeviceAccessDenied.WithAttributes("dev_eui", devEUI)
 	case http.StatusUnauthorized:
-		return errUnauthorized.New()
+		return errUnauthenticated.New()
 	default:
 		return errors.FromHTTPStatusCode(resp.StatusCode)
 	}
@@ -225,7 +225,7 @@ func (c *TTJS) Unclaim(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) err
 	case http.StatusForbidden:
 		return errDeviceAccessDenied.WithAttributes("dev_eui", devEUI)
 	case http.StatusUnauthorized:
-		return errUnauthorized.New()
+		return errUnauthenticated.New()
 	default:
 		return errors.FromHTTPStatusCode(resp.StatusCode)
 	}
@@ -306,7 +306,7 @@ func (c *TTJS) GetClaimStatus(
 	case http.StatusForbidden:
 		return nil, errDeviceAccessDenied.WithAttributes("dev_eui", devEUI)
 	case http.StatusUnauthorized:
-		return nil, errUnauthorized.New()
+		return nil, errUnauthenticated.New()
 	default:
 		return nil, errors.FromHTTPStatusCode(resp.StatusCode)
 	}

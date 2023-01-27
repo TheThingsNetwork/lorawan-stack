@@ -3520,7 +3520,7 @@
   },
   "error:pkg/deviceclaimingserver/enddevices/ttjsv2:device_access_denied": {
     "translations": {
-      "en": "access to device with `{dev_eui}` denied. Either device is already claimed or owner token is invalid"
+      "en": "access to device with `{dev_eui}` denied: device is already claimed or the owner token is invalid"
     },
     "description": {
       "package": "pkg/deviceclaimingserver/enddevices/ttjsv2",
@@ -3545,9 +3545,9 @@
       "file": "ttjs.go"
     }
   },
-  "error:pkg/deviceclaimingserver/enddevices/ttjsv2:unauthorized": {
+  "error:pkg/deviceclaimingserver/enddevices/ttjsv2:unauthenticated": {
     "translations": {
-      "en": "client API Key missing or invalid"
+      "en": "unauthenticated"
     },
     "description": {
       "package": "pkg/deviceclaimingserver/enddevices/ttjsv2",
