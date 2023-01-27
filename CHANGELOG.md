@@ -27,7 +27,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - List of end-devices can now be sorted by `last_seen_at` field. Unseen devices will be shown last.
 - End devices now contain `lora_alliance_profile_ids` field.
-- Add `source` config option for TLS certificates in LoRaWAN Backend Interfaces interop client configuration. This value can be `file` (existing behavior) or `key-vault`.
+- Add `source` config option for TLS certificates in LoRaWAN Backend Interfaces interop client and The Things Join Server device claiming configuration. This value can be `file` (existing behavior) or `key-vault`.
 
 ### Changed
 
