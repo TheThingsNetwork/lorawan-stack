@@ -302,15 +302,14 @@ func (s *Server) updateInfo(w http.ResponseWriter, r *http.Request) (err error) 
 				gtw.GatewayServerAddress = s.defaultLNSURI
 			}
 		}
-		var scheme, host, port string
-		if gtw.GatewayServerAddress != req.LNSURI {
-			scheme, host, port, err = parseAddress("wss", gtw.GatewayServerAddress)
-			if err != nil {
-				return err
-			}
-			address := host
-			address = net.JoinHostPort(host, port)
-			res.LNSURI = fmt.Sprintf("%s://%s", scheme, address)
+
+		scheme, host, port, err := parseAddress("wss", gtw.GatewayServerAddress)
+		if err != nil {
+			return err
+		}
+		lnsURI := fmt.Sprintf("%s://%s", scheme, net.JoinHostPort(host, port))
+		if lnsURI != req.LNSURI {
+			res.LNSURI = lnsURI
 		}
 
 		// Only fetch Trust and Credentials for TLS end points.
