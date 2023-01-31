@@ -19,8 +19,8 @@ import (
 	"context"
 	"runtime/trace"
 
-	"github.com/go-redis/redis/v8"
 	"github.com/gogo/protobuf/proto"
+	"github.com/redis/go-redis/v9"
 	"github.com/vmihailenco/msgpack/v5"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -472,7 +472,9 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 		UID     string
 		Session string
 	}
-	buildSortedSessionSet := func(scoresCmd *redis.ZSliceCmd, mappingCmd *redis.StringStringMapCmd, usePivot bool, pivot uint16) ([]sessionEntry, error) {
+	buildSortedSessionSet := func(
+		scoresCmd *redis.ZSliceCmd, mappingCmd *redis.MapStringStringCmd, usePivot bool, pivot uint16,
+	) ([]sessionEntry, error) {
 		scores, err := scoresCmd.Result()
 		if err != nil {
 			if err != redis.Nil {
@@ -538,9 +540,9 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 
 	var (
 		currentSessionScoresCmd  *redis.ZSliceCmd
-		currentSessionMappingCmd *redis.StringStringMapCmd
+		currentSessionMappingCmd *redis.MapStringStringCmd
 		pendingSessionScoresCmd  *redis.ZSliceCmd
-		pendingSessionMappingCmd *redis.StringStringMapCmd
+		pendingSessionMappingCmd *redis.MapStringStringCmd
 	)
 	if _, err := r.Redis.TxPipelined(ctx, func(p redis.Pipeliner) error {
 		currentSessionScoresCmd = ZRangeArgsWithScores(ctx, p, addrKeyCurrent)
@@ -838,7 +840,8 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 					removeAddrMapping(ctx, p, PendingAddrKey(r.addrKey(types.MustDevAddr(storedPendingSession.DevAddr).OrZero())), uid)
 				}
 				if setAddr {
-					p.ZAdd(ctx, PendingAddrKey(r.addrKey(types.MustDevAddr(updated.PendingSession.DevAddr).OrZero())), &redis.Z{
+					pendingDevAddr := types.MustDevAddr(updated.PendingSession.DevAddr).OrZero()
+					p.ZAdd(ctx, PendingAddrKey(r.addrKey(pendingDevAddr)), redis.Z{
 						Score:  float64(time.Now().UnixNano()),
 						Member: uid,
 					})
@@ -877,7 +880,8 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 					removeAddrMapping(ctx, p, CurrentAddrKey(r.addrKey(types.MustDevAddr(storedSession.DevAddr).OrZero())), uid)
 				}
 				if setAddr {
-					p.ZAdd(ctx, CurrentAddrKey(r.addrKey(types.MustDevAddr(updated.Session.DevAddr).OrZero())), &redis.Z{
+					devAddr := types.MustDevAddr(updated.Session.DevAddr).OrZero()
+					p.ZAdd(ctx, CurrentAddrKey(r.addrKey(devAddr)), redis.Z{
 						Score:  float64(updated.Session.LastFCntUp & 0xffff),
 						Member: uid,
 					})

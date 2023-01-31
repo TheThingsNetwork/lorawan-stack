@@ -18,7 +18,7 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
 	asredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/redis"

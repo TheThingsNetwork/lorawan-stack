@@ -20,6 +20,7 @@ import (
 	"crypto/rand"
 	"crypto/tls"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"net"
 	"runtime/trace"
@@ -28,9 +29,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/go-redis/redis/v8"
 	"github.com/gogo/protobuf/proto"
 	"github.com/oklog/ulid/v2"
+	"github.com/redis/go-redis/v9"
 	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
@@ -38,6 +39,11 @@ import (
 const (
 	// separator is character used to separate the keys.
 	separator = ':'
+
+	// DefaultStreamBlockLimit is the duration for which stream blocking operations
+	// such as XRead and XReadGroup should block. Note that Redis operations cannot be
+	// asynchronously cancelled using context.WithCancel, so long-polling is required.
+	DefaultStreamBlockLimit time.Duration = 0
 )
 
 var encoding = base64.RawStdEncoding
@@ -192,22 +198,22 @@ func debugLogFunc(ctx context.Context, format string, v ...interface{}) {
 func newRedisClient(conf *Config) *redis.Client {
 	if conf.Failover.Enable {
 		return redis.NewFailoverClient(&redis.FailoverOptions{
-			Dialer:        conf.makeDialer(),
-			MasterName:    conf.Failover.MasterName,
-			SentinelAddrs: conf.Failover.Addresses,
-			Password:      conf.Password,
-			DB:            conf.Database,
-			PoolSize:      conf.PoolSize,
-			IdleTimeout:   conf.IdleTimeout,
+			Dialer:          conf.makeDialer(),
+			MasterName:      conf.Failover.MasterName,
+			SentinelAddrs:   conf.Failover.Addresses,
+			Password:        conf.Password,
+			DB:              conf.Database,
+			PoolSize:        conf.PoolSize,
+			ConnMaxIdleTime: conf.IdleTimeout,
 		})
 	}
 	return redis.NewClient(&redis.Options{
-		Dialer:      conf.makeDialer(),
-		Addr:        conf.Address,
-		Password:    conf.Password,
-		DB:          conf.Database,
-		PoolSize:    conf.PoolSize,
-		IdleTimeout: conf.IdleTimeout,
+		Dialer:          conf.makeDialer(),
+		Addr:            conf.Address,
+		Password:        conf.Password,
+		DB:              conf.Database,
+		PoolSize:        conf.PoolSize,
+		ConnMaxIdleTime: conf.IdleTimeout,
 	})
 }
 
@@ -461,9 +467,10 @@ func addTask(ctx context.Context, r redis.Cmdable, k string, maxLen int64, paylo
 		m[startAtKey] = startAt.UnixNano()
 	}
 	return ConvertError(r.XAdd(ctx, &redis.XAddArgs{
-		Stream:       InputTaskKey(k),
-		MaxLenApprox: maxLen,
-		Values:       m,
+		Stream: InputTaskKey(k),
+		MaxLen: maxLen,
+		Approx: true,
+		Values: m,
 	}).Err())
 }
 
@@ -481,19 +488,34 @@ func parseTime(s string) (time.Time, error) {
 // consumer is the consumer ID.
 // maxLen represents the maximum size of the streams used for dispatching.
 // minIdleTime is used for automatic task reclaiming. Only tasks older than minIdleTime will be redispatched from the input stream to the waiting stream.
-func dispatchTask(ctx context.Context, r redis.Cmdable, group, consumer string, maxLen int64, k string) error {
+func dispatchTask(
+	ctx context.Context,
+	r redis.Cmdable,
+	group, consumer string,
+	maxLen int64,
+	k string,
+	blockLimit time.Duration,
+) error {
 	var (
 		readyStream   = ReadyTaskKey(k)
 		inputStream   = InputTaskKey(k)
 		waitingStream = WaitingTaskKey(k)
 	)
 	for {
-		ret, err := dispatchTaskScript.Run(ctx, r, []string{readyStream, inputStream, waitingStream}, group, consumer, time.Now().UnixNano(), maxLen).Result()
-		if err != nil && err != redis.Nil {
+		ret, err := dispatchTaskScript.Run(
+			ctx,
+			r,
+			[]string{readyStream, inputStream, waitingStream},
+			group,
+			consumer,
+			time.Now().UnixNano(),
+			maxLen,
+		).Result()
+		if err != nil && !errors.Is(err, redis.Nil) {
 			return ConvertError(err)
 		}
 
-		var block time.Duration
+		block := blockLimit
 		if ret != nil {
 			s, ok := ret.(string)
 			if !ok {
@@ -509,8 +531,12 @@ func dispatchTask(ctx context.Context, r redis.Cmdable, group, consumer string, 
 				now := time.Now()
 				if nextAt.Before(now) {
 					continue
-				} else {
-					block = nextAt.Sub(now)
+				}
+				// If we have a task that we may dispatch into the future, we will block the
+				// input stream only for the duration between the current time and that future
+				// time.
+				if d := nextAt.Sub(now); block == 0 || d < block {
+					block = d
 				}
 			}
 		}
@@ -522,7 +548,7 @@ func dispatchTask(ctx context.Context, r redis.Cmdable, group, consumer string, 
 			Count:    1,
 			Block:    block,
 		}).Result()
-		if err != nil && err != redis.Nil {
+		if err != nil && !errors.Is(err, redis.Nil) {
 			return ConvertError(err)
 		}
 	}
@@ -534,7 +560,14 @@ func dispatchTask(ctx context.Context, r redis.Cmdable, group, consumer string, 
 // ReadyTaskKey(k) is the keys to pop from.
 // Pipeline is executed even if f returns an error.
 // Tasks are acked only if f returns without error.
-func popTask(ctx context.Context, r redis.Cmdable, group, consumer string, maxLen int64, f func(p redis.Pipeliner, payload string, startAt time.Time) error, k string) (err error) {
+func popTask(
+	ctx context.Context,
+	r redis.Cmdable,
+	group, consumer string,
+	f func(p redis.Pipeliner, payload string, startAt time.Time) error,
+	k string,
+	blockLimit time.Duration,
+) (err error) {
 	readyStream := ReadyTaskKey(k)
 
 	processMessage := func(message redis.XMessage) error {
@@ -562,7 +595,6 @@ func popTask(ctx context.Context, r redis.Cmdable, group, consumer string, maxLe
 			if err == nil && pErr != nil {
 				err = ConvertError(pErr)
 			}
-			p.Close()
 		}()
 
 		if err = f(p, fields[payloadKey], startAt); err != nil {
@@ -575,15 +607,18 @@ func popTask(ctx context.Context, r redis.Cmdable, group, consumer string, maxLe
 		return nil
 	}
 
-	xs, err := r.XReadGroup(ctx, &redis.XReadGroupArgs{
-		Group:    group,
-		Consumer: consumer,
-		Streams:  []string{readyStream, ">"},
-		Count:    1,
-		Block:    0,
-	}).Result()
-	if err != nil && err != redis.Nil {
-		return ConvertError(err)
+	var xs []redis.XStream
+	for len(xs) == 0 {
+		xs, err = r.XReadGroup(ctx, &redis.XReadGroupArgs{
+			Group:    group,
+			Consumer: consumer,
+			Streams:  []string{readyStream, ">"},
+			Count:    1,
+			Block:    blockLimit,
+		}).Result()
+		if err != nil && !errors.Is(err, redis.Nil) {
+			return ConvertError(err)
+		}
 	}
 
 	for _, x := range xs {
@@ -599,10 +634,11 @@ func popTask(ctx context.Context, r redis.Cmdable, group, consumer string, maxLe
 
 // TaskQueue is a task queue.
 type TaskQueue struct {
-	Redis  WatchCmdable
-	MaxLen int64
-	Group  string
-	Key    string
+	Redis            WatchCmdable
+	MaxLen           int64
+	Group            string
+	Key              string
+	StreamBlockLimit time.Duration
 
 	consumerIDs sync.Map // map[string]struct{} of all used consumer ids
 }
@@ -641,7 +677,7 @@ func (q *TaskQueue) Dispatch(ctx context.Context, consumerID string, r redis.Cmd
 	if r == nil {
 		r = q.Redis
 	}
-	return dispatchTask(ctx, r, q.Group, consumerID, q.MaxLen, q.Key)
+	return dispatchTask(ctx, r, q.Group, consumerID, q.MaxLen, q.Key, q.StreamBlockLimit)
 }
 
 // Pop calls f on the most recent task in the queue, for which timestamp is in range [0, time.Now()],
@@ -653,15 +689,7 @@ func (q *TaskQueue) Pop(ctx context.Context, consumerID string, r redis.Cmdable,
 	if r == nil {
 		r = q.Redis
 	}
-	return popTask(ctx, r, q.Group, consumerID, q.MaxLen, f, q.Key)
-}
-
-// Scripter is redis.scripter.
-type Scripter interface {
-	Eval(ctx context.Context, script string, keys []string, args ...interface{}) *redis.Cmd
-	EvalSha(ctx context.Context, sha1 string, keys []string, args ...interface{}) *redis.Cmd
-	ScriptExists(ctx context.Context, hashes ...string) *redis.BoolSliceCmd
-	ScriptLoad(ctx context.Context, script string) *redis.StringCmd
+	return popTask(ctx, r, q.Group, consumerID, f, q.Key, q.StreamBlockLimit)
 }
 
 var deduplicateProtosScript = redis.NewScript(`local exp = ARGV[1]
@@ -697,7 +725,9 @@ func milliseconds(d time.Duration) int64 {
 }
 
 // DeduplicateProtos deduplicates protos using key k. It stores a lock at LockKey(k) and the list of collected protos at ListKey(k).
-func DeduplicateProtos(ctx context.Context, r Scripter, k string, window time.Duration, msgs ...proto.Message) (bool, error) {
+func DeduplicateProtos(
+	ctx context.Context, r redis.Scripter, k string, window time.Duration, msgs ...proto.Message,
+) (bool, error) {
 	args := make([]interface{}, 0, 1+len(msgs))
 	args = append(args, milliseconds(window))
 	for _, msg := range msgs {
@@ -779,12 +809,12 @@ func LockMutex(ctx context.Context, r redis.Cmdable, k, id string, expiration ti
 			}
 		}
 		popRes, err := r.BLPop(ctx, timeout, listKey).Result()
-		if err != nil && err != redis.Nil {
+		if err != nil && !errors.Is(err, redis.Nil) {
 			return ConvertError(err)
 		}
 		select {
 		case <-ctx.Done():
-			if err == redis.Nil {
+			if errors.Is(err, redis.Nil) {
 				return ctx.Err()
 			}
 			// Pass the lock to next caller.
@@ -794,7 +824,7 @@ func LockMutex(ctx context.Context, r redis.Cmdable, k, id string, expiration ti
 			return ctx.Err()
 		default:
 		}
-		if err == redis.Nil {
+		if errors.Is(err, redis.Nil) {
 			continue
 		}
 
@@ -810,7 +840,7 @@ func LockMutex(ctx context.Context, r redis.Cmdable, k, id string, expiration ti
 }
 
 // UnlockMutex unlocks the key k with identifier id.
-func UnlockMutex(ctx context.Context, r Scripter, k, id string, expiration time.Duration) error {
+func UnlockMutex(ctx context.Context, r redis.Scripter, k, id string, expiration time.Duration) error {
 	defer trace.StartRegion(ctx, "unlock mutex").End()
 	if err := unlockMutexScript.Run(ctx, r, []string{LockKey(k), ListKey(k)}, id, milliseconds(expiration)).Err(); err != nil {
 		return ConvertError(err)
@@ -820,7 +850,7 @@ func UnlockMutex(ctx context.Context, r Scripter, k, id string, expiration time.
 
 // InitMutex initializes the mutex scripts at r.
 // InitMutex must be called before mutex functionality is used in a transaction or pipeline.
-func InitMutex(ctx context.Context, r Scripter) error {
+func InitMutex(ctx context.Context, r redis.Scripter) error {
 	if err := lockMutexScript.Load(ctx, r).Err(); err != nil {
 		return ConvertError(err)
 	}
@@ -918,7 +948,7 @@ outer:
 			Block:    -1, // do not block
 		}).Result()
 		if err != nil {
-			if err == redis.Nil {
+			if errors.Is(err, redis.Nil) {
 				return nil
 			}
 			return ConvertError(err)

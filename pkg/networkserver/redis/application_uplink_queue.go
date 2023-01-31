@@ -17,7 +17,7 @@ package redis
 import (
 	"context"
 
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
@@ -41,13 +41,20 @@ const (
 )
 
 // NewApplicationUplinkQueue returns new application uplink queue.
-func NewApplicationUplinkQueue(cl *ttnredis.Client, maxLen int64, group string, minIdle time.Duration) *ApplicationUplinkQueue {
+func NewApplicationUplinkQueue(
+	cl *ttnredis.Client,
+	maxLen int64,
+	group string,
+	minIdle time.Duration,
+	streamBlockLimit time.Duration,
+) *ApplicationUplinkQueue {
 	return &ApplicationUplinkQueue{
 		applicationQueue: &ttnredis.TaskQueue{
-			Redis:  cl,
-			MaxLen: maxLen,
-			Group:  group,
-			Key:    cl.Key("application"),
+			Redis:            cl,
+			MaxLen:           maxLen,
+			Group:            group,
+			Key:              cl.Key("application"),
+			StreamBlockLimit: streamBlockLimit,
 		},
 		redis:   cl,
 		maxLen:  maxLen,
@@ -108,8 +115,9 @@ func (q *ApplicationUplinkQueue) Add(ctx context.Context, ups ...*ttnpb.Applicat
 				uidStreamID = q.uidGenericUplinkKey(uid)
 			}
 			p.XAdd(ctx, &redis.XAddArgs{
-				Stream:       uidStreamID,
-				MaxLenApprox: q.maxLen,
+				Stream: uidStreamID,
+				MaxLen: q.maxLen,
+				Approx: true,
 				Values: map[string]interface{}{
 					payloadKey: s,
 				},
