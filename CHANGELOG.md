@@ -31,9 +31,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
-- `serial_number` field is now moved to the root of the end device structure. `vendor_id` and `vendor_profile_id` are now moved to the `lora_alliance_profile_ids`. This requires a database migration in the Identity Server.
-- Deletion of the last admin user or removal of its admin status via an update operation now returns an error.
-- Do not allow to remove the collaborator of an entity if it is the last collaborator (in the Console).
+- `serial_number` field is now moved to the root of the end device structure. `vendor_id` and `vendor_profile_id` are now moved to the `lora_alliance_profile_ids`.
+  - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of added columns and views.
 
 ### Deprecated
 
