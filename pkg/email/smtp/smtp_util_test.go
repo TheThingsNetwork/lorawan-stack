@@ -24,26 +24,18 @@ type backend struct {
 	messages chan *message
 }
 
-func (bkd *backend) newSession() (smtp.Session, error) {
+func (bkd *backend) NewSession(_ *smtp.Conn) (smtp.Session, error) {
 	s := &session{
 		msgs: bkd.messages,
 	}
 	return s, nil
 }
 
-func (bkd *backend) Login(_ *smtp.ConnectionState, _ string, _ string) (smtp.Session, error) {
-	return bkd.newSession()
-}
-
-func (bkd *backend) AnonymousLogin(_ *smtp.ConnectionState) (smtp.Session, error) {
-	return bkd.newSession()
-}
-
 type message struct {
 	Sender     string
 	Recipients []string
 	Data       []byte
-	Opts       smtp.MailOptions
+	Opts       *smtp.MailOptions
 }
 
 type session struct {
@@ -51,7 +43,11 @@ type session struct {
 	msgs chan *message
 }
 
-func (s *session) Mail(from string, opts smtp.MailOptions) error {
+func (*session) AuthPlain(_, _ string) error {
+	return nil
+}
+
+func (s *session) Mail(from string, opts *smtp.MailOptions) error {
 	s.Reset()
 	s.msg.Sender = from
 	s.msg.Opts = opts
@@ -77,6 +73,6 @@ func (s *session) Reset() {
 	s.msg = &message{}
 }
 
-func (s *session) Logout() error {
+func (*session) Logout() error {
 	return nil
 }

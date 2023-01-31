@@ -18,8 +18,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
-	"net"
 	"strconv"
 	"testing"
 	"time"
@@ -86,6 +84,8 @@ func TestForwarder(t *testing.T) {
 		},
 	})
 
+	_, iamAddr := mustServePBIAM(ctx, t)
+	_, cpAddr := mustServePBControlPane(ctx, t)
 	dp, dpAddr := mustServePBDataPlane(ctx, t)
 	mp, mpAddr := mustServePBMapper(ctx, t)
 
@@ -96,11 +96,13 @@ func TestForwarder(t *testing.T) {
 		Key:       tokenKey,
 	}, nil)).(jose.Encrypter)
 	test.Must(New(c, &Config{
-		DataPlaneAddress: fmt.Sprintf("localhost:%d", dpAddr.(*net.TCPAddr).Port),
-		MapperAddress:    fmt.Sprintf("localhost:%d", mpAddr.(*net.TCPAddr).Port),
-		NetID:            types.NetID{0x0, 0x0, 0x13},
-		TenantID:         "foo-tenant",
-		ClusterID:        "test",
+		IAMAddress:          iamAddr.String(),
+		ControlPlaneAddress: cpAddr.String(),
+		DataPlaneAddress:    dpAddr.String(),
+		MapperAddress:       mpAddr.String(),
+		NetID:               types.NetID{0x0, 0x0, 0x13},
+		TenantID:            "foo-tenant",
+		ClusterID:           "test",
 		Forwarder: ForwarderConfig{
 			Enable: true,
 			WorkerPool: WorkerPoolConfig{
@@ -533,14 +535,18 @@ func TestHomeNetwork(t *testing.T) {
 		},
 	})
 
-	dp, addr := mustServePBDataPlane(ctx, t)
+	_, iamAddr := mustServePBIAM(ctx, t)
+	_, cpAddr := mustServePBControlPane(ctx, t)
+	dp, dpAddr := mustServePBDataPlane(ctx, t)
 
 	ns := test.Must(mock.NewNetworkServer(c)).(*mock.NetworkServer)
 	test.Must(New(c, &Config{
-		DataPlaneAddress: fmt.Sprintf("localhost:%d", addr.(*net.TCPAddr).Port),
-		NetID:            types.NetID{0x0, 0x0, 0x13},
-		TenantID:         "foo-tenant",
-		ClusterID:        "test",
+		IAMAddress:          iamAddr.String(),
+		ControlPlaneAddress: cpAddr.String(),
+		DataPlaneAddress:    dpAddr.String(),
+		NetID:               types.NetID{0x0, 0x0, 0x13},
+		TenantID:            "foo-tenant",
+		ClusterID:           "test",
 		HomeNetwork: HomeNetworkConfig{
 			Enable: true,
 			WorkerPool: WorkerPoolConfig{

@@ -66,11 +66,11 @@ func Azure(ctx context.Context, accountName, containerName string) (*blob.Bucket
 	if err != nil {
 		return nil, err
 	}
-	serviceClient, err := azureblob.NewDefaultServiceClient(serviceURL)
+	serviceClient, err := azureblob.NewDefaultClient(serviceURL, azureblob.ContainerName(containerName))
 	if err != nil {
 		return nil, err
 	}
-	return azureblob.OpenBucket(ctx, serviceClient, containerName, &azureblob.Options{})
+	return azureblob.OpenBucket(ctx, serviceClient, &azureblob.Options{})
 }
 
 func GCP(ctx context.Context, bucket string, jsonCredentials []byte) (*blob.Bucket, error) {
