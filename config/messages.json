@@ -3518,6 +3518,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/deviceclaimingserver/enddevices/ttjsv2:bad_request": {
+    "translations": {
+      "en": "bad request"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/enddevices/ttjsv2",
+      "file": "ttjs.go"
+    }
+  },
   "error:pkg/deviceclaimingserver/enddevices/ttjsv2:device_access_denied": {
     "translations": {
       "en": "access to device with `{dev_eui}` denied: device is already claimed or the owner token is invalid"
