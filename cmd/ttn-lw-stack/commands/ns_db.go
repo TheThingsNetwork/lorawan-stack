@@ -104,8 +104,11 @@ var (
 					return nil
 				}
 				if schemaVersion < nsredis.UnsupportedMigrationVersionBreakpoint {
-					return fmt.Errorf(
-						"you are currently running version %d of the Network Server database. This version cannot be auto-migrated to latest. Use v3.23.0 of The Things Stack to migrate to a supported one before migrating to latest", //nolint:lll
+					return fmt.Errorf( //nolint:stylecheck
+						"You are currently running version schema %d of the Network Server database. "+
+							"This version cannot be auto-migrated to latest. "+
+							"Database needs to be upgraded using v3.19 of The Things Stack before upgrading to latest. "+
+							"If you are not upgrading from versions before v3.19 please run with `--force` flag",
 						schemaVersion,
 					)
 				}
