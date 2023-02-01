@@ -28,8 +28,9 @@ const JSClientConfigurationName = "config.yml"
 
 // NetworkServer contains information related to the Network Server.
 type NetworkServer struct {
-	Hostname string       `name:"hostname" description:"Hostname of the Network Server. Must not contain a port"`
 	HomeNSID *types.EUI64 `name:"home-ns-id" description:"HomeNSID of the Network Server (EUI)"`
+
+	Hostname string `name:"hostname" description:"DEPRECATED"`
 }
 
 // Config contains options for end device claiming clients.

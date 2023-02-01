@@ -54,9 +54,6 @@ func TestUpstream(t *testing.T) {
 		NetID:     test.DefaultNetID,
 		Source:    "directory",
 		Directory: "testdata",
-		NetworkServer: NetworkServer{
-			Hostname: "localhost",
-		},
 	}, WithDeviceRegistry(&mockDeviceRegistry{}))).(*Upstream)
 
 	ctx = rights.NewContext(ctx, &rights.Rights{

@@ -48,7 +48,6 @@ type ConfigFile struct {
 type Config struct {
 	NetID           types.NetID
 	HomeNSID        *types.EUI64
-	Hostname        string
 	JoinEUIPrefixes []types.EUI64Prefix
 	ConfigFile
 }

@@ -112,7 +112,6 @@ func NewUpstream(ctx context.Context, c Component, conf Config, opts ...Option) 
 			claimer = ttjsv2.NewClient(c, fetcher, ttjsv2.Config{
 				NetID:           conf.NetID,
 				HomeNSID:        conf.NetworkServer.HomeNSID,
-				Hostname:        conf.NetworkServer.Hostname,
 				JoinEUIPrefixes: js.JoinEUIs,
 				ConfigFile:      ttjsConf,
 			})
