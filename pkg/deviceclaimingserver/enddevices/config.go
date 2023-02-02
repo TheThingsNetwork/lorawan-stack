@@ -37,8 +37,9 @@ type NetworkServer struct {
 //
 //nolint:lll
 type Config struct {
-	NetID         types.NetID   `name:"net-id" description:"NetID of this network to configure as home NetID when claiming"`
+	NetID         types.NetID   `name:"net-id" description:"NetID of the Network Server to configure when claiming"`
 	NetworkServer NetworkServer `name:"network-server" description:"Network Server of the cluster that handles claimed device traffic"`
+	ASID          string        `name:"as-id" description:"AS-ID of the Application Server to configure when claiming"`
 
 	Source    string                `name:"source" description:"Source of the file containing Join Server settings (directory, url, blob)"`
 	Directory string                `name:"directory" description:"OS filesystem directory, which contains the config.yml and the client-specific files"`

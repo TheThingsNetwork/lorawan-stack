@@ -48,6 +48,7 @@ type ConfigFile struct {
 type Config struct {
 	NetID           types.NetID
 	HomeNSID        *types.EUI64
+	ASID            string
 	JoinEUIPrefixes []types.EUI64Prefix
 	ConfigFile
 }
@@ -121,6 +122,7 @@ func (c *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, claimAuth
 		OwnerToken: claimAuthenticationCode,
 		Lock:       boolValue(true),
 		HomeNetID:  c.config.NetID.String(),
+		ASID:       c.config.ASID,
 	}
 	if c.config.HomeNSID != nil {
 		claimReq.HomeNSID = stringValue(c.config.HomeNSID.String())

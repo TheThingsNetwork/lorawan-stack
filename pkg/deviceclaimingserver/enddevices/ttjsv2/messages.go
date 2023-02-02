@@ -32,6 +32,7 @@ type ClaimRequest struct {
 	OwnerToken           string  `json:"ownerToken"`
 	HomeNetID            string  `json:"homeNetID"`
 	HomeNSID             *string `json:"homeNSID,omitempty"`
+	ASID                 string  `json:"asID"`
 	RegenerateOwnerToken *bool   `json:"regenerateOwnerToken,omitempty"`
 	Lock                 *bool   `json:"lock,omitempty"`
 	KEK                  *KEK    `json:"kek,omitempty"`
