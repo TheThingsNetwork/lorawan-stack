@@ -34,7 +34,7 @@ import (
 type mockKeyVault struct {
 	KeyFunc               func(ctx context.Context, label string) ([]byte, error)
 	ServerCertificateFunc func(ctx context.Context, label string) (tls.Certificate, error)
-	ClientCertificateFunc func(ctx context.Context) (tls.Certificate, error)
+	ClientCertificateFunc func(ctx context.Context, label string) (tls.Certificate, error)
 }
 
 func (m *mockKeyVault) Key(ctx context.Context, label string) ([]byte, error) {
@@ -51,11 +51,11 @@ func (m *mockKeyVault) ServerCertificate(ctx context.Context, label string) (tls
 	return m.ServerCertificateFunc(ctx, label)
 }
 
-func (m *mockKeyVault) ClientCertificate(ctx context.Context) (tls.Certificate, error) {
+func (m *mockKeyVault) ClientCertificate(ctx context.Context, label string) (tls.Certificate, error) {
 	if m.ClientCertificateFunc == nil {
 		panic("ClientCertificate called but not set")
 	}
-	return m.ClientCertificateFunc(ctx)
+	return m.ClientCertificateFunc(ctx, label)
 }
 
 var _ crypto.KeyVault = (*mockKeyVault)(nil)

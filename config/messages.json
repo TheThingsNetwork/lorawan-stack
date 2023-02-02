@@ -3401,15 +3401,6 @@
       "file": "cryptoutil.go"
     }
   },
-  "error:pkg/crypto/cryptoutil:client_certificate_not_found": {
-    "translations": {
-      "en": "client certificate not found"
-    },
-    "description": {
-      "package": "pkg/crypto/cryptoutil",
-      "file": "cryptoutil.go"
-    }
-  },
   "error:pkg/crypto/cryptoutil:invalid_length": {
     "translations": {
       "en": "invalid slice length"

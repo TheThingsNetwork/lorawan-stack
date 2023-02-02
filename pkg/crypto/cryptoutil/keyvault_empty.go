@@ -34,8 +34,8 @@ func (emptyKeyVault) ServerCertificate(_ context.Context, label string) (tls.Cer
 }
 
 // ClientCertificate implements crypto.KeyVault.
-func (emptyKeyVault) ClientCertificate(_ context.Context) (tls.Certificate, error) {
-	return tls.Certificate{}, errClientCertificateNotFound.New()
+func (emptyKeyVault) ClientCertificate(_ context.Context, label string) (tls.Certificate, error) {
+	return tls.Certificate{}, errCertificateNotFound.WithAttributes("label", label)
 }
 
 // EmptyKeyVault is an empty key vault.
