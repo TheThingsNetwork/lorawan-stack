@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ttjsv2
+package ttjsv2_test
 
 import (
 	"context"
@@ -22,7 +22,10 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices/ttjsv2"
+	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices/ttjsv2/testdata"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -31,10 +34,8 @@ import (
 
 var (
 	serverAddress           = "127.0.0.1:0"
-	password                = "secret"
-	asID                    = "localhost"
-	otherClientPassword     = "other-secret"
-	otherClientASID         = "localhost-other"
+	client1ASID             = "client1.local"
+	client2ASID             = "client2.local"
 	claimAuthenticationCode = "SECRET"
 	homeNSID                = types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}
 	supportedJoinEUI        = types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0C}
@@ -50,9 +51,7 @@ var (
 	}
 )
 
-func TestTTJS(t *testing.T) { //nolint:tparallel
-	t.Parallel()
-
+func TestTTJS(t *testing.T) { //nolint:paralleltest
 	a, ctx := test.New(t)
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
@@ -75,11 +74,11 @@ func TestTTJS(t *testing.T) { //nolint:tparallel
 		},
 		lis: lis,
 		clients: map[string]clientData{
-			password: {
-				asID: asID,
+			client1ASID: {
+				cert: testdata.Client1Cert,
 			},
-			otherClientPassword: {
-				asID: otherClientASID,
+			client2ASID: {
+				cert: testdata.Client2Cert,
 			},
 		},
 		provisonedDevices: map[types.EUI64]device{
@@ -90,49 +89,29 @@ func TestTTJS(t *testing.T) { //nolint:tparallel
 	}
 
 	go mockTTJS.Start(ctx) //nolint:errcheck
+	fetcher := fetch.FromFilesystem("testdata")
 
-	// Valid Config
-	ttJSConfig := Config{
-		NetworkServer: NetworkServer{
-			Hostname: "localhost",
-			HomeNSID: &homeNSID,
-		},
-		NetID: test.DefaultNetID,
+	client1 := ttjsv2.NewClient(c, fetcher, ttjsv2.Config{
+		NetID:    test.DefaultNetID,
+		HomeNSID: &homeNSID,
+		ASID:     "localhost",
 		JoinEUIPrefixes: []types.EUI64Prefix{
 			supportedJoinEUIPrefix,
 		},
-		BasicAuth: BasicAuth{
-			Username: asID,
-			Password: "invalid",
+		ConfigFile: ttjsv2.ConfigFile{
+			URL: fmt.Sprintf("https://%s", lis.Addr().String()),
+			TLS: ttjsv2.TLSConfig{
+				RootCA:      "rootCA.pem",
+				Source:      "file",
+				Certificate: "clientcert-1.pem",
+				Key:         "clientkey-1.pem",
+			},
 		},
-		URL: fmt.Sprintf("http://%s", lis.Addr().String()),
-	}
-
-	// Invalid client API key.
-	unauthenticatedClient, err := ttJSConfig.NewClient(ctx, c)
-	test.Must(unauthenticatedClient, err)
-	err = unauthenticatedClient.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode)
-	a.So(errors.IsUnauthenticated(err), should.BeTrue)
-	err = unauthenticatedClient.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
-		DevEui:  devEUI.Bytes(),
-		JoinEui: supportedJoinEUI.Bytes(),
 	})
-	a.So(errors.IsUnauthenticated(err), should.BeTrue)
-	ret, err := unauthenticatedClient.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
-		DevEui:  devEUI.Bytes(),
-		JoinEui: supportedJoinEUI.Bytes(),
-	})
-	a.So(errors.IsUnauthenticated(err), should.BeTrue)
-	a.So(ret, should.BeNil)
-
-	// With Valid Key
-	ttJSConfig.Password = password
-	client, err := ttJSConfig.NewClient(ctx, c)
-	test.Must(client, err)
 
 	// Check JoinEUI support.
-	a.So(client.SupportsJoinEUI(unsupportedJoinEUI), should.BeFalse)
-	a.So(client.SupportsJoinEUI(supportedJoinEUI), should.BeTrue)
+	a.So(client1.SupportsJoinEUI(unsupportedJoinEUI), should.BeFalse)
+	a.So(client1.SupportsJoinEUI(supportedJoinEUI), should.BeTrue)
 
 	// Test Claiming
 	for _, tc := range []struct { //nolint:paralleltest
@@ -177,7 +156,7 @@ func TestTTJS(t *testing.T) { //nolint:tparallel
 		},
 	} {
 		t.Run(fmt.Sprintf("Claim/%s", tc.Name), func(t *testing.T) {
-			err := client.Claim(ctx, tc.JoinEUI, tc.DevEUI, tc.AuthenticationCode)
+			err := client1.Claim(ctx, tc.JoinEUI, tc.DevEUI, tc.AuthenticationCode)
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
@@ -189,62 +168,62 @@ func TestTTJS(t *testing.T) { //nolint:tparallel
 	}
 
 	// Claim locked.
-	otherClientConfig := Config{
-		NetworkServer: NetworkServer{
-			Hostname: "localhost",
-			HomeNSID: &homeNSID,
-		},
-		NetID: test.DefaultNetID,
+	client2 := ttjsv2.NewClient(c, fetcher, ttjsv2.Config{
+		NetID:    test.DefaultNetID,
+		HomeNSID: &homeNSID,
+		ASID:     "localhost",
 		JoinEUIPrefixes: []types.EUI64Prefix{
 			supportedJoinEUIPrefix,
 		},
-		BasicAuth: BasicAuth{
-			Username: otherClientASID,
-			Password: otherClientPassword,
+		ConfigFile: ttjsv2.ConfigFile{
+			URL: fmt.Sprintf("https://%s", lis.Addr().String()),
+			TLS: ttjsv2.TLSConfig{
+				RootCA:      "rootCA.pem",
+				Source:      "file",
+				Certificate: "clientcert-2.pem",
+				Key:         "clientkey-2.pem",
+			},
 		},
-		URL: fmt.Sprintf("http://%s", lis.Addr().String()),
-	}
-	otherClient, err := otherClientConfig.NewClient(ctx, c)
-	test.Must(otherClient, err)
-	err = otherClient.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode)
+	})
+	err = client2.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode)
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
-	ret, err = otherClient.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
+	ret, err := client2.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
 		DevEui:  devEUI.Bytes(),
 		JoinEui: supportedJoinEUI.Bytes(),
 	})
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 	a.So(ret, should.BeNil)
-	err = otherClient.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
+	err = client2.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
 		DevEui:  devEUI.Bytes(),
 		JoinEui: supportedJoinEUI.Bytes(),
 	})
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
 	// Unclaim
-	err = client.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
+	err = client1.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
 		DevEui:  devEUI.Bytes(),
 		JoinEui: supportedJoinEUI.Bytes(),
 	})
 	a.So(err, should.BeNil)
-	_, err = otherClient.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
+	_, err = client2.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
 		DevEui:  devEUI.Bytes(),
 		JoinEui: supportedJoinEUI.Bytes(),
 	})
 	a.So(errors.IsNotFound(err), should.BeTrue)
 
 	// Try to unclaim again
-	err = client.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
+	err = client1.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
 		DevEui:  devEUI.Bytes(),
 		JoinEui: supportedJoinEUI.Bytes(),
 	})
 	a.So(errors.IsNotFound(err), should.BeTrue)
 
 	// Try to claim
-	err = client.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode)
+	err = client1.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode)
 	a.So(err, should.BeNil)
 
 	// Get valid status
-	ret, err = client.GetClaimStatus(ctx, validEndDeviceIds)
+	ret, err = client1.GetClaimStatus(ctx, validEndDeviceIds)
 	a.So(err, should.BeNil)
 	a.So(ret, should.NotBeNil)
 	a.So(ret.EndDeviceIds, should.Resemble, validEndDeviceIds)

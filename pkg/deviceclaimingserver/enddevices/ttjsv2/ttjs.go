@@ -1,4 +1,4 @@
-// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,78 +22,63 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
-	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
-	"google.golang.org/grpc"
 )
 
-// BasicAuth contains HTTP basic auth settings.
-type BasicAuth struct {
-	Username string `yaml:"username"`
-	Password string `yaml:"password"`
+// ConfigFile defines the configuration file for The Things Join Server claiming client.
+type ConfigFile struct {
+	URL string    `yaml:"url"`
+	TLS TLSConfig `yaml:"tls"`
+
+	// BasicAuth is no longer used and is only kept for backwards compatibility.
+	BasicAuth struct {
+		Username string `yaml:"username"`
+		Password string `yaml:"password"`
+	} `yaml:"basic-auth"`
 }
 
-// NetworkServer contains information related to the Network Server.
-type NetworkServer struct {
-	Hostname string
-	HomeNSID *types.EUI64
-}
-
-// Config is the configuration to communicate with The Things Join Server End Device Claming API.
+// Config is the configuration for The Things Join Server claiming client.
 type Config struct {
-	NetID           types.NetID         `yaml:"-"`
-	JoinEUIPrefixes []types.EUI64Prefix `yaml:"-"`
-	NetworkServer   NetworkServer       `yaml:"-"`
-
-	BasicAuth `yaml:"basic-auth"`
-	URL       string `yaml:"url"`
+	NetID           types.NetID
+	HomeNSID        *types.EUI64
+	ASID            string
+	JoinEUIPrefixes []types.EUI64Prefix
+	ConfigFile
 }
 
-// Component abstracts the underlying *component.Component.
+// Component abstracts the component.
 type Component interface {
 	httpclient.Provider
-	GetBaseConfig(ctx context.Context) config.ServiceBase
-	GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (*grpc.ClientConn, error)
-	AllowInsecureForCredentials() bool
+	KeyService() crypto.KeyService
 }
 
 // TTJS is a client that claims end devices on a The Things Join Server.
 type TTJS struct {
 	Component
 
-	httpClient *http.Client
-	baseURL    *url.URL
-	config     Config
+	fetcher fetch.Interface
+	config  Config
 }
 
 // NewClient applies the config and returns a new TTJS client.
-func (cfg *Config) NewClient(ctx context.Context, c Component) (*TTJS, error) {
-	httpClient, err := c.HTTPClient(ctx)
-	if err != nil {
-		return nil, err
-	}
-	baseURL, err := url.Parse(cfg.URL)
-	if err != nil {
-		return nil, err
-	}
+func NewClient(c Component, fetcher fetch.Interface, conf Config) *TTJS {
 	return &TTJS{
-		config:     *cfg,
-		httpClient: httpClient,
-		baseURL:    baseURL,
-		Component:  c,
-	}, nil
+		Component: c,
+		fetcher:   fetcher,
+		config:    conf,
+	}
 }
 
 // SupportsJoinEUI implements EndDeviceClaimer.
-func (client *TTJS) SupportsJoinEUI(eui types.EUI64) bool {
-	for _, prefix := range client.config.JoinEUIPrefixes {
+func (c *TTJS) SupportsJoinEUI(eui types.EUI64) bool {
+	for _, prefix := range c.config.JoinEUIPrefixes {
 		if eui.HasPrefix(prefix) {
 			return true
 		}
@@ -101,30 +86,46 @@ func (client *TTJS) SupportsJoinEUI(eui types.EUI64) bool {
 	return false
 }
 
+func (c *TTJS) httpClient(ctx context.Context) (*http.Client, error) {
+	var opts []httpclient.Option
+	if !c.config.TLS.IsZero() {
+		tlsConf, err := c.config.TLS.TLSConfig(c.fetcher, c.KeyService())
+		if err != nil {
+			return nil, err
+		}
+		opts = append(opts, httpclient.WithTLSConfig(tlsConf))
+	}
+	if c.config.BasicAuth.Username != "" || c.config.BasicAuth.Password != "" {
+		log.FromContext(ctx).Warn("Basic authentication with The Things Join Server is no longer supported and will be removed in a future version.") //nolint:lll
+	}
+	return c.HTTPClient(ctx, opts...)
+}
+
 var (
+	errBadRequest           = errors.DefineInvalidArgument("bad_request", "bad request", "message")
 	errDeviceNotProvisioned = errors.DefineNotFound("device_not_provisioned", "device with EUI `{dev_eui}` not provisioned") //nolint:lll
 	errDeviceNotClaimed     = errors.DefineNotFound("device_not_claimed", "device with EUI `{dev_eui}` not claimed")
-	errDeviceAccessDenied   = errors.DefinePermissionDenied("device_access_denied", "access to device with `{dev_eui}` denied. Either device is already claimed or owner token is invalid") //nolint:lll
-	errUnauthorized         = errors.DefineUnauthenticated("unauthorized", "client API Key missing or invalid")
+	errDeviceAccessDenied   = errors.DefinePermissionDenied("device_access_denied", "access to device with `{dev_eui}` denied: device is already claimed or the owner token is invalid") //nolint:lll
+	errUnauthenticated      = errors.DefineUnauthenticated("unauthenticated", "unauthenticated")
 )
 
 // Claim implements EndDeviceClaimer.
-func (client *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, claimAuthenticationCode string) error {
-	reqURL := fmt.Sprintf("%s/api/v2/devices/%s/claim", client.baseURL.String(), devEUI.String())
+func (c *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, claimAuthenticationCode string) error {
+	reqURL := fmt.Sprintf("%s/api/v2/devices/%s/claim", c.config.URL, devEUI.String())
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"dev_eui", devEUI,
 		"join_eui", joinEUI,
 		"url", reqURL,
 	))
 
-	claimReq := &claimRequest{
+	claimReq := &ClaimRequest{
 		OwnerToken: claimAuthenticationCode,
-		Lock:       true,
-		HomeNetID:  client.config.NetID.String(),
+		Lock:       boolValue(true),
+		HomeNetID:  c.config.NetID.String(),
+		ASID:       c.config.ASID,
 	}
-	if client.config.NetworkServer.HomeNSID != nil {
-		claimReq.HomeNSID = new(string)
-		*claimReq.HomeNSID = client.config.NetworkServer.HomeNSID.String()
+	if c.config.HomeNSID != nil {
+		claimReq.HomeNSID = stringValue(c.config.HomeNSID.String())
 	}
 	buf, err := json.Marshal(claimReq)
 	if err != nil {
@@ -136,10 +137,13 @@ func (client *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, clai
 	if err != nil {
 		return err
 	}
-	request.SetBasicAuth(client.config.BasicAuth.Username, client.config.BasicAuth.Password)
 	request.Header.Set("Content-Type", "application/json")
 
-	resp, err := client.httpClient.Do(request)
+	client, err := c.httpClient(ctx)
+	if err != nil {
+		return err
+	}
+	resp, err := client.Do(request)
 	if err != nil {
 		return err
 	}
@@ -154,7 +158,7 @@ func (client *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, clai
 		return nil
 	}
 
-	var errResp errorResponse
+	var errResp ErrorResponse
 	err = json.Unmarshal(respBody, &errResp)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to decode error message")
@@ -163,21 +167,23 @@ func (client *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, clai
 	}
 
 	switch resp.StatusCode {
+	case http.StatusBadRequest:
+		return errBadRequest.WithAttributes("message", errResp.Message)
 	case http.StatusNotFound:
 		return errDeviceNotProvisioned.WithAttributes("dev_eui", devEUI)
 	case http.StatusForbidden:
 		return errDeviceAccessDenied.WithAttributes("dev_eui", devEUI)
 	case http.StatusUnauthorized:
-		return errUnauthorized.New()
+		return errUnauthenticated.New()
 	default:
 		return errors.FromHTTPStatusCode(resp.StatusCode)
 	}
 }
 
 // Unclaim implements EndDeviceClaimer.
-func (client *TTJS) Unclaim(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) error {
+func (c *TTJS) Unclaim(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) error {
 	devEUI := types.MustEUI64(ids.DevEui)
-	reqURL := fmt.Sprintf("%s/api/v2/devices/%s/claim", client.baseURL.String(), devEUI.String())
+	reqURL := fmt.Sprintf("%s/api/v2/devices/%s/claim", c.config.URL, devEUI.String())
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"dev_eui", devEUI,
 		"join_eui", ids.JoinEui,
@@ -190,8 +196,11 @@ func (client *TTJS) Unclaim(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers
 		return err
 	}
 
-	request.SetBasicAuth(client.config.BasicAuth.Username, client.config.BasicAuth.Password)
-	resp, err := client.httpClient.Do(request)
+	client, err := c.httpClient(ctx)
+	if err != nil {
+		return err
+	}
+	resp, err := client.Do(request)
 	if err != nil {
 		return err
 	}
@@ -206,7 +215,7 @@ func (client *TTJS) Unclaim(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers
 		return nil
 	}
 
-	var errResp errorResponse
+	var errResp ErrorResponse
 	err = json.Unmarshal(respBody, &errResp)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to decode error message")
@@ -215,23 +224,25 @@ func (client *TTJS) Unclaim(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers
 	}
 
 	switch resp.StatusCode {
+	case http.StatusBadRequest:
+		return errBadRequest.WithAttributes("message", errResp.Message)
 	case http.StatusNotFound:
 		return errDeviceNotClaimed.WithAttributes("dev_eui", devEUI)
 	case http.StatusForbidden:
 		return errDeviceAccessDenied.WithAttributes("dev_eui", devEUI)
 	case http.StatusUnauthorized:
-		return errUnauthorized.New()
+		return errUnauthenticated.New()
 	default:
 		return errors.FromHTTPStatusCode(resp.StatusCode)
 	}
 }
 
 // GetClaimStatus implements EndDeviceClaimer.
-func (client *TTJS) GetClaimStatus(
+func (c *TTJS) GetClaimStatus(
 	ctx context.Context, ids *ttnpb.EndDeviceIdentifiers,
 ) (*ttnpb.GetClaimStatusResponse, error) {
 	devEUI := types.MustEUI64(ids.DevEui)
-	reqURL := fmt.Sprintf("%s/api/v2/devices/%s/claim", client.baseURL.String(), devEUI.String())
+	reqURL := fmt.Sprintf("%s/api/v2/devices/%s/claim", c.config.URL, devEUI.String())
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"dev_eui", devEUI,
 		"join_eui", ids.JoinEui,
@@ -244,8 +255,11 @@ func (client *TTJS) GetClaimStatus(
 		return nil, err
 	}
 
-	request.SetBasicAuth(client.config.BasicAuth.Username, client.config.BasicAuth.Password)
-	resp, err := client.httpClient.Do(request)
+	client, err := c.httpClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := client.Do(request)
 	if err != nil {
 		return nil, err
 	}
@@ -258,7 +272,7 @@ func (client *TTJS) GetClaimStatus(
 
 	if isSuccess(resp.StatusCode) {
 		var (
-			claimData claimData
+			claimData ClaimData
 			ret       = ttnpb.GetClaimStatusResponse{
 				EndDeviceIds: ids,
 			}
@@ -284,7 +298,7 @@ func (client *TTJS) GetClaimStatus(
 		return &ret, nil
 	}
 
-	var errResp errorResponse
+	var errResp ErrorResponse
 	err = json.Unmarshal(respBody, &errResp)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to decode error message")
@@ -293,12 +307,14 @@ func (client *TTJS) GetClaimStatus(
 	}
 
 	switch resp.StatusCode {
+	case http.StatusBadRequest:
+		return nil, errBadRequest.WithAttributes("message", errResp.Message)
 	case http.StatusNotFound:
 		return nil, errDeviceNotClaimed.WithAttributes("dev_eui", devEUI)
 	case http.StatusForbidden:
 		return nil, errDeviceAccessDenied.WithAttributes("dev_eui", devEUI)
 	case http.StatusUnauthorized:
-		return nil, errUnauthorized.New()
+		return nil, errUnauthenticated.New()
 	default:
 		return nil, errors.FromHTTPStatusCode(resp.StatusCode)
 	}

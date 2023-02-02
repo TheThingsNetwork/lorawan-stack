@@ -12,16 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ttjsv2
+package ttjsv2_test
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"net"
 	"net/http"
 	"time"
 
 	"github.com/gorilla/mux"
+	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices/ttjsv2"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
@@ -35,14 +38,14 @@ type device struct {
 }
 
 type clientData struct {
-	asID string
+	cert *x509.Certificate
 }
 
 type mockTTJS struct {
 	provisonedDevices map[types.EUI64]device
 	joinEUIPrefixes   []types.EUI64Prefix
 	lis               net.Listener
-	clients           map[string]clientData // key is the auth token.
+	clients           map[string]clientData // the key is the AS-ID
 }
 
 func (srv *mockTTJS) Start(ctx context.Context) error {
@@ -52,16 +55,20 @@ func (srv *mockTTJS) Start(ctx context.Context) error {
 		Handler:           r,
 		ReadTimeout:       60 * time.Second,
 		ReadHeaderTimeout: 5 * time.Second,
+		TLSConfig: &tls.Config{
+			MinVersion: tls.VersionTLS12,
+			ClientAuth: tls.RequireAnyClientCert,
+		},
 	}
 	go func() {
 		<-ctx.Done()
 		s.Close()
 	}()
-	return s.Serve(srv.lis)
+	return s.ServeTLS(srv.lis, "testdata/servercert.pem", "testdata/serverkey.pem")
 }
 
 func writeResponse(w http.ResponseWriter, statusCode int, message string) {
-	resp := errorResponse{
+	resp := ttjsv2.ErrorResponse{
 		Message: message,
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -70,20 +77,18 @@ func writeResponse(w http.ResponseWriter, statusCode int, message string) {
 }
 
 func (srv *mockTTJS) handleClaim(w http.ResponseWriter, r *http.Request) { //nolint:gocyclo
-	asID, password, ok := r.BasicAuth()
-	if !ok {
-		writeResponse(w, http.StatusUnauthorized, "API Key not found")
-		return
-	}
-	var client *clientData
-	for token, cl := range srv.clients {
-		cl := cl
-		if password == token && cl.asID == asID {
-			client = &cl
+	var (
+		found bool
+		asID  string
+	)
+	for registeredASID, data := range srv.clients {
+		if len(r.TLS.PeerCertificates) > 0 && r.TLS.PeerCertificates[0].Equal(data.cert) {
+			found = true
+			asID = registeredASID
 			break
 		}
 	}
-	if client == nil {
+	if !found {
 		writeResponse(w, http.StatusUnauthorized, "Invalid API Key")
 		return
 	}
@@ -108,7 +113,7 @@ func (srv *mockTTJS) handleClaim(w http.ResponseWriter, r *http.Request) { //nol
 			writeResponse(w, http.StatusNotFound, "Device not claimed")
 			return
 		}
-		if dev.asID != client.asID {
+		if dev.asID != asID {
 			writeResponse(w, http.StatusForbidden, "Client not allowed to unclaim")
 			return
 		}
@@ -127,11 +132,11 @@ func (srv *mockTTJS) handleClaim(w http.ResponseWriter, r *http.Request) { //nol
 			writeResponse(w, http.StatusNotFound, "Device not claimed")
 			return
 		}
-		if dev.asID != client.asID {
+		if dev.asID != asID {
 			writeResponse(w, http.StatusForbidden, "Client not allowed to get status")
 			return
 		}
-		res := claimData{
+		res := ttjsv2.ClaimData{
 			HomeNetID: dev.homeNetID.String(),
 			Locked:    dev.locked,
 		}
@@ -144,7 +149,7 @@ func (srv *mockTTJS) handleClaim(w http.ResponseWriter, r *http.Request) { //nol
 		json.NewEncoder(w).Encode(res) //nolint:errcheck
 
 	case http.MethodPut:
-		var req claimRequest
+		var req ttjsv2.ClaimRequest
 		err = json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
 			writeResponse(w, http.StatusBadRequest, "Invalid request")
@@ -157,7 +162,7 @@ func (srv *mockTTJS) handleClaim(w http.ResponseWriter, r *http.Request) { //nol
 			return
 		}
 
-		if dev.asID != "" && dev.asID != client.asID && dev.locked {
+		if dev.asID != "" && dev.asID != asID && dev.locked {
 			writeResponse(w, http.StatusForbidden, "Client not allowed to claim")
 			return
 		}
@@ -172,8 +177,8 @@ func (srv *mockTTJS) handleClaim(w http.ResponseWriter, r *http.Request) { //nol
 			dev.homeNSID = new(types.EUI64)
 			test.Must(nil, dev.homeNSID.UnmarshalText([]byte(*req.HomeNSID)))
 		}
-		dev.asID = client.asID
-		dev.locked = req.Lock
+		dev.asID = asID
+		dev.locked = req.Lock != nil && *req.Lock
 
 		// Update
 		srv.provisonedDevices[reqDevEUI] = dev

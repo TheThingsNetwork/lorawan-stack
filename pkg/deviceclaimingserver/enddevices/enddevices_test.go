@@ -18,9 +18,12 @@ import (
 	"testing"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
@@ -34,34 +37,39 @@ func TestUpstream(t *testing.T) {
 	t.Parallel()
 	a, ctx := test.New(t)
 
-	mock := mockEDCS{}
+	c := componenttest.NewComponent(t, &component.Config{})
+	componenttest.StartComponent(t, c)
+	t.Cleanup(func() {
+		c.Close()
+	})
 
 	// Invalid configs
-	conf := &Config{
+	_, err := NewUpstream(ctx, c, Config{
 		Source: "directory",
-	}
-	_, err := NewUpstream(ctx, *conf, mock)
+	})
 	a.So(err, should.NotBeNil)
 
 	// Upstream test
-	conf = &Config{
+	upstream := test.Must(NewUpstream(ctx, c, Config{
 		NetID:     test.DefaultNetID,
 		Source:    "directory",
 		Directory: "testdata",
-		NetworkServer: NetworkServer{
-			Hostname: "localhost",
-		},
-	}
+	}, WithDeviceRegistry(&mockDeviceRegistry{}))).(*Upstream)
 
-	upstream, err := NewUpstream(ctx, *conf, mock, WithDeviceRegistry(mock))
-
-	test.Must(upstream, err)
-	ctx = rights.NewContextWithFetcher(ctx, mock)
+	ctx = rights.NewContext(ctx, &rights.Rights{
+		ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
+			unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"}): ttnpb.RightsFrom(
+				ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
+				ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+			),
+		}),
+	})
 
 	// Invalid JoinEUI.
 	err = upstream.Claim(ctx, *unsupportedJoinEUI,
 		types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30},
-		"secret")
+		"secret",
+	)
 	a.So(errors.IsAborted(err), should.BeTrue)
 
 	_, err = upstream.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
@@ -90,7 +98,8 @@ func TestUpstream(t *testing.T) {
 
 	err = upstream.Claim(ctx, *supportedJoinEUI,
 		types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30},
-		"secret")
+		"secret",
+	)
 	a.So(!errors.IsUnimplemented(err), should.BeTrue)
 
 	_, err = upstream.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{

@@ -3266,6 +3266,15 @@
       "file": "listeners.go"
     }
   },
+  "error:pkg/config/tlsconfig:fetch_file": {
+    "translations": {
+      "en": "fetch file `{name}`"
+    },
+    "description": {
+      "package": "pkg/config/tlsconfig",
+      "file": "config.go"
+    }
+  },
   "error:pkg/config/tlsconfig:missing_acme_dir": {
     "translations": {
       "en": "missing ACME storage directory"
@@ -3509,9 +3518,18 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/deviceclaimingserver/enddevices/ttjsv2:bad_request": {
+    "translations": {
+      "en": "bad request"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/enddevices/ttjsv2",
+      "file": "ttjs.go"
+    }
+  },
   "error:pkg/deviceclaimingserver/enddevices/ttjsv2:device_access_denied": {
     "translations": {
-      "en": "access to device with `{dev_eui}` denied. Either device is already claimed or owner token is invalid"
+      "en": "access to device with `{dev_eui}` denied: device is already claimed or the owner token is invalid"
     },
     "description": {
       "package": "pkg/deviceclaimingserver/enddevices/ttjsv2",
@@ -3536,9 +3554,9 @@
       "file": "ttjs.go"
     }
   },
-  "error:pkg/deviceclaimingserver/enddevices/ttjsv2:unauthorized": {
+  "error:pkg/deviceclaimingserver/enddevices/ttjsv2:unauthenticated": {
     "translations": {
-      "en": "client API Key missing or invalid"
+      "en": "unauthenticated"
     },
     "description": {
       "package": "pkg/deviceclaimingserver/enddevices/ttjsv2",
@@ -6027,15 +6045,6 @@
     "description": {
       "package": "pkg/interop",
       "file": "errors.go"
-    }
-  },
-  "error:pkg/interop:fetch_file": {
-    "translations": {
-      "en": "fetch file `{name}`"
-    },
-    "description": {
-      "package": "pkg/interop",
-      "file": "config.go"
     }
   },
   "error:pkg/interop:frame_replayed": {
