@@ -88,11 +88,6 @@ type ServerKeyVault struct {
 	ID string `name:"id" description:"ID of the certificate"`
 }
 
-// IsZero returns whether the TLS server key vault is empty.
-func (t ServerKeyVault) IsZero() bool {
-	return t.ID == ""
-}
-
 // Config represents TLS configuration.
 type Config struct {
 	Client     `name:",squash"`
@@ -293,8 +288,9 @@ func (c *ServerAuth) ApplyTo(tlsConfig *tls.Config) error {
 // ClientKeyVault defines configuration for loading a TLS client certificate from the key vault.
 type ClientKeyVault struct {
 	CertificateProvider interface {
-		ClientCertificate(ctx context.Context) (tls.Certificate, error)
+		ClientCertificate(ctx context.Context, label string) (tls.Certificate, error)
 	} `name:"-"`
+	ID string `name:"id" description:"ID of the certificate"`
 }
 
 // ClientAuth is (client-side) configuration for TLS client authentication.
@@ -329,7 +325,7 @@ func (c *ClientAuth) ApplyTo(tlsConfig *tls.Config) error {
 		}
 	case "key-vault":
 		tlsConfig.GetClientCertificate = func(r *tls.CertificateRequestInfo) (*tls.Certificate, error) {
-			cert, err := c.KeyVault.CertificateProvider.ClientCertificate(r.Context())
+			cert, err := c.KeyVault.CertificateProvider.ClientCertificate(r.Context(), c.KeyVault.ID)
 			if err != nil {
 				return nil, err
 			}

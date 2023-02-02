@@ -35,6 +35,6 @@ func TestEmptyKeyVault(t *testing.T) {
 	_, err = cryptoutil.EmptyKeyVault.ServerCertificate(test.Context(), "test")
 	a.So(errors.IsNotFound(err), should.BeTrue)
 
-	_, err = cryptoutil.EmptyKeyVault.ClientCertificate(test.Context())
+	_, err = cryptoutil.EmptyKeyVault.ClientCertificate(test.Context(), "test")
 	a.So(errors.IsNotFound(err), should.BeTrue)
 }

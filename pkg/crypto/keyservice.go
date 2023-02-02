@@ -41,7 +41,10 @@ type KeyService interface {
 	ServerCertificate(ctx context.Context, label string) (tls.Certificate, error)
 
 	// ClientCertificate returns the X.509 client certificate and private key.
-	ClientCertificate(ctx context.Context) (tls.Certificate, error)
+	// If the label is empty, the default client certificate is returned. This can be an issued certificate or a
+	// self-signed certificate, depending on the underlying key vault.
+	// If the label is not empty, the certificate with the given label is returned.
+	ClientCertificate(ctx context.Context, label string) (tls.Certificate, error)
 
 	// HMACHash calculates the Keyed-Hash Message Authentication Code (HMAC, RFC 2104) hash of the data.
 	// The AES key used for hashing is referenced using the label.
@@ -91,8 +94,8 @@ func (ks *keyService) ServerCertificate(ctx context.Context, label string) (tls.
 	return ks.vault.ServerCertificate(ctx, label)
 }
 
-func (ks *keyService) ClientCertificate(ctx context.Context) (tls.Certificate, error) {
-	return ks.vault.ClientCertificate(ctx)
+func (ks *keyService) ClientCertificate(ctx context.Context, label string) (tls.Certificate, error) {
+	return ks.vault.ClientCertificate(ctx, label)
 }
 
 func (ks *keyService) HMACHash(ctx context.Context, payload []byte, label string) ([]byte, error) {

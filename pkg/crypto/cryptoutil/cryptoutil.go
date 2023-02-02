@@ -31,7 +31,6 @@ var (
 	errCertificateNotFound = errors.DefineNotFound(
 		"certificate_not_found", "certificate with label `{label}` not found",
 	)
-	errClientCertificateNotFound = errors.DefineNotFound("client_certificate_not_found", "client certificate not found")
 )
 
 // WrapAES128Key performs the RFC 3394 Wrap algorithm on the given key using the given key service and KEK label.

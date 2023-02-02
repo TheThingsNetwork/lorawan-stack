@@ -63,7 +63,7 @@ func (*mockKeyService) ServerCertificate(context.Context, string) (tls.Certifica
 	return tls.Certificate{}, errors.New("not implemented")
 }
 
-func (*mockKeyService) ClientCertificate(context.Context) (tls.Certificate, error) {
+func (*mockKeyService) ClientCertificate(context.Context, string) (tls.Certificate, error) {
 	return tls.Certificate{}, errors.New("not implemented")
 }
 
