@@ -92,9 +92,9 @@ func TestTTJS(t *testing.T) { //nolint:paralleltest
 	fetcher := fetch.FromFilesystem("testdata")
 
 	client1 := ttjsv2.NewClient(c, fetcher, ttjsv2.Config{
-		NetID:    test.DefaultNetID,
-		HomeNSID: &homeNSID,
-		ASID:     "localhost",
+		NetID: test.DefaultNetID,
+		NSID:  &homeNSID,
+		ASID:  "localhost",
 		JoinEUIPrefixes: []types.EUI64Prefix{
 			supportedJoinEUIPrefix,
 		},
@@ -169,9 +169,9 @@ func TestTTJS(t *testing.T) { //nolint:paralleltest
 
 	// Claim locked.
 	client2 := ttjsv2.NewClient(c, fetcher, ttjsv2.Config{
-		NetID:    test.DefaultNetID,
-		HomeNSID: &homeNSID,
-		ASID:     "localhost",
+		NetID: test.DefaultNetID,
+		NSID:  &homeNSID,
+		ASID:  "localhost",
 		JoinEUIPrefixes: []types.EUI64Prefix{
 			supportedJoinEUIPrefix,
 		},

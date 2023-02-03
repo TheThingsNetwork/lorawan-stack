@@ -122,6 +122,12 @@ func (c DownlinkPriorityConfig) Parse() (DownlinkPriorities, error) {
 	return p, nil
 }
 
+// InteropConfig represents interoperability client configuration.
+type InteropConfig struct {
+	config.InteropClient `name:",squash"`
+	ID                   *types.EUI64 `name:"id" description:"NSID of this Network Server (EUI)"`
+}
+
 // Config represents the NetworkServer configuration.
 type Config struct {
 	ApplicationUplinkQueue   ApplicationUplinkQueueConfig `name:"application-uplink-queue"`
@@ -136,7 +142,7 @@ type Config struct {
 	CooldownWindow           time.Duration                `name:"cooldown-window" description:"Time window starting right after deduplication window, during which, duplicate messages are discarded"`
 	DownlinkPriorities       DownlinkPriorityConfig       `name:"downlink-priorities" description:"Downlink message priorities"`
 	DefaultMACSettings       MACSettingConfig             `name:"default-mac-settings" description:"Default MAC settings to fallback to if not specified by device, band or frequency plan"`
-	Interop                  config.InteropClient         `name:"interop" description:"Interop client configuration"`
+	Interop                  InteropConfig                `name:"interop" description:"Interop client configuration"`
 	DeviceKEKLabel           string                       `name:"device-kek-label" description:"Label of KEK used to encrypt device keys at rest"`
 	DownlinkQueueCapacity    int                          `name:"downlink-queue-capacity" description:"Maximum downlink queue size per-session"`
 }
