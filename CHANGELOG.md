@@ -11,6 +11,9 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Network Server ID (NSID) used for Backend Interfaces interoperability via the `ns.interop.id` and `dcs.edcs.ns-id` configuration options.
+  - In the Network Server, `ns.interop.id` acts as a fallback value for `sender-ns-id` in Join Server interoperability configuration.
+
 ### Changed
 
 ### Deprecated

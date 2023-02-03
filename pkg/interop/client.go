@@ -223,13 +223,21 @@ var (
 
 // HandleJoinRequest performs Join request according to LoRaWAN Backend Interfaces specification.
 func (cl joinServerHTTPClient) HandleJoinRequest(
-	ctx context.Context, netID types.NetID, req *ttnpb.JoinRequest,
+	ctx context.Context, netID types.NetID, nsID *types.EUI64, req *ttnpb.JoinRequest,
 ) (*ttnpb.JoinResponse, error) {
-	if cl.protocol.RequiresNSID() && cl.senderNSID == nil {
+	if cl.senderNSID != nil {
+		nsID = cl.senderNSID
+	}
+	if cl.protocol.RequiresNSID() && nsID == nil {
 		return nil, errMissingNSID.New()
 	}
-	if !cl.protocol.RequiresNSID() && cl.senderNSID != nil {
-		return nil, errNSIDNotSupported.New()
+	if !cl.protocol.RequiresNSID() {
+		if cl.senderNSID != nil {
+			// This is bad configuration that should fail to avoid unintended behavior.
+			return nil, errNSIDNotSupported.New()
+		}
+		// If the protocol does not require NSID, we can safely set it to nil.
+		nsID = nil
 	}
 
 	pld := req.Payload.GetJoinRequestPayload()
@@ -258,7 +266,7 @@ func (cl joinServerHTTPClient) HandleJoinRequest(
 				MessageType:     MessageTypeJoinReq,
 			},
 			SenderID:   NetID(netID),
-			SenderNSID: (*EUI64)(cl.senderNSID),
+			SenderNSID: (*EUI64)(nsID),
 			ReceiverID: EUI64(types.MustEUI64(pld.JoinEui).OrZero()),
 		},
 		MACVersion: MACVersion(req.SelectedMacVersion),
@@ -310,7 +318,9 @@ func GeneratedSessionKeyID(id []byte) bool {
 }
 
 type joinServerClient interface {
-	HandleJoinRequest(ctx context.Context, netID types.NetID, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error)
+	HandleJoinRequest(
+		ctx context.Context, netID types.NetID, nsID *types.EUI64, req *ttnpb.JoinRequest,
+	) (*ttnpb.JoinResponse, error)
 	GetAppSKey(ctx context.Context, asID string, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error)
 }
 
@@ -529,7 +539,7 @@ func (cl Client) GetAppSKey(
 
 // HandleJoinRequest performs Join request to Join Server associated with req.JoinEUI.
 func (cl Client) HandleJoinRequest(
-	ctx context.Context, netID types.NetID, req *ttnpb.JoinRequest,
+	ctx context.Context, netID types.NetID, nsID *types.EUI64, req *ttnpb.JoinRequest,
 ) (*ttnpb.JoinResponse, error) {
 	pld := req.Payload.GetJoinRequestPayload()
 	if pld == nil {
@@ -540,6 +550,6 @@ func (cl Client) HandleJoinRequest(
 		return nil, errNotRegistered.New()
 	}
 	return joinServerRace(ctx, func(js joinServerClient) (*ttnpb.JoinResponse, error) {
-		return js.HandleJoinRequest(ctx, netID, req)
+		return js.HandleJoinRequest(ctx, netID, nsID, req)
 	}, jss)
 }

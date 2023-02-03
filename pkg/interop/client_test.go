@@ -275,6 +275,7 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 		Name              string
 		NewServer         func(*assertions.Assertion) *httptest.Server
 		NetID             types.NetID
+		NSID              *types.EUI64
 		Request           *ttnpb.JoinRequest
 		ResponseAssertion func(*assertions.Assertion, *ttnpb.JoinResponse) bool
 		ErrorAssertion    func(*assertions.Assertion, error) bool
@@ -442,6 +443,7 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 				}))
 			},
 			NetID: types.NetID{0x42, 0xff, 0xff},
+			NSID:  types.MustEUI64([]byte{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0xFF}),
 			Request: &ttnpb.JoinRequest{
 				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0_3,
 				DevAddr:            types.DevAddr{0x01, 0x02, 0x03, 0x04}.Bytes(),
@@ -527,6 +529,7 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 				}))
 			},
 			NetID: types.NetID{0x42, 0xff, 0xff},
+			NSID:  types.MustEUI64([]byte{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0xFF}),
 			Request: &ttnpb.JoinRequest{
 				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0_3,
 				DevAddr:            types.DevAddr{0x01, 0x02, 0x03, 0x04}.Bytes(),
@@ -673,7 +676,7 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 				t.Fatalf("Failed to create new client: %s", err)
 			}
 
-			res, err := cl.HandleJoinRequest(ctx, tc.NetID, tc.Request)
+			res, err := cl.HandleJoinRequest(ctx, tc.NetID, tc.NSID, tc.Request)
 			if a.So(tc.ErrorAssertion(a, err), should.BeTrue) {
 				a.So(tc.ResponseAssertion(a, res), should.BeTrue)
 			} else if err != nil {
@@ -852,7 +855,7 @@ func TestJoinServerRace(t *testing.T) { //nolint:paralleltest
 				t.Fatalf("Failed to create new client: %s", err)
 			}
 
-			res, err := cl.HandleJoinRequest(ctx, tc.NetID, tc.Request)
+			res, err := cl.HandleJoinRequest(ctx, tc.NetID, nil, tc.Request)
 			if a.So(tc.ErrorAssertion(a, err), should.BeTrue) {
 				a.So(tc.ResponseAssertion(a, res), should.BeTrue)
 			} else if err != nil {
