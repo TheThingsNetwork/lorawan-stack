@@ -75,6 +75,7 @@ func NewUpstream(ctx context.Context, c Component, conf Config, opts ...Option) 
 		Component: c,
 		servers:   make(map[string]EndDeviceClaimer),
 	}
+
 	fetcher, err := conf.Fetcher(ctx, c.GetBaseConfig(ctx).Blob, c)
 	if err != nil {
 		return nil, err
@@ -89,6 +90,12 @@ func NewUpstream(ctx context.Context, c Component, conf Config, opts ...Option) 
 	var baseConfig baseConfig
 	if err := yaml.UnmarshalStrict(baseConfigBytes, &baseConfig); err != nil {
 		return nil, err
+	}
+
+	nsID := conf.NSID
+	// TODO: Remove fallback logic (https://github.com/TheThingsNetwork/lorawan-stack/issues/6048)
+	if nsID == nil {
+		nsID = conf.NetworkServer.HomeNSID
 	}
 
 	// Setup upstreams.
@@ -111,7 +118,7 @@ func NewUpstream(ctx context.Context, c Component, conf Config, opts ...Option) 
 			}
 			claimer = ttjsv2.NewClient(c, fetcher, ttjsv2.Config{
 				NetID:           conf.NetID,
-				HomeNSID:        conf.NetworkServer.HomeNSID,
+				NSID:            nsID,
 				ASID:            conf.ASID,
 				JoinEUIPrefixes: js.JoinEUIs,
 				ConfigFile:      ttjsConf,

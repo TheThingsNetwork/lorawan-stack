@@ -41,7 +41,7 @@ type InteropClient interface {
 // InteropConfig represents interoperability client configuration.
 type InteropConfig struct {
 	config.InteropClient `name:",squash"`
-	ID                   string `name:"id" description:"AS-ID used for interoperability"`
+	ID                   string `name:"id" description:"AS-ID of this Application Server"`
 }
 
 // EndDeviceFetcherConfig represents configuration for the end device fetcher in Application Server.

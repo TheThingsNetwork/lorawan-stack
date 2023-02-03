@@ -18,6 +18,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Deprecated
 
+- Device Claiming Server configuration option `dcs.edcs.network-server.home-ns-id`. Use `dcs.edcs.ns-id` instead.
+
 ### Removed
 
 ### Fixed

@@ -38,6 +38,7 @@ type ConfigFile struct {
 	TLS TLSConfig `yaml:"tls"`
 
 	// BasicAuth is no longer used and is only kept for backwards compatibility.
+	// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/6049)
 	BasicAuth struct {
 		Username string `yaml:"username"`
 		Password string `yaml:"password"`
@@ -47,7 +48,7 @@ type ConfigFile struct {
 // Config is the configuration for The Things Join Server claiming client.
 type Config struct {
 	NetID           types.NetID
-	HomeNSID        *types.EUI64
+	NSID            *types.EUI64
 	ASID            string
 	JoinEUIPrefixes []types.EUI64Prefix
 	ConfigFile
@@ -95,6 +96,7 @@ func (c *TTJS) httpClient(ctx context.Context) (*http.Client, error) {
 		}
 		opts = append(opts, httpclient.WithTLSConfig(tlsConf))
 	}
+	// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/6049)
 	if c.config.BasicAuth.Username != "" || c.config.BasicAuth.Password != "" {
 		log.FromContext(ctx).Warn("Basic authentication with The Things Join Server is no longer supported and will be removed in a future version.") //nolint:lll
 	}
@@ -124,8 +126,8 @@ func (c *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, claimAuth
 		HomeNetID:  c.config.NetID.String(),
 		ASID:       c.config.ASID,
 	}
-	if c.config.HomeNSID != nil {
-		claimReq.HomeNSID = stringValue(c.config.HomeNSID.String())
+	if c.config.NSID != nil {
+		claimReq.HomeNSID = stringValue(c.config.NSID.String())
 	}
 	buf, err := json.Marshal(claimReq)
 	if err != nil {
