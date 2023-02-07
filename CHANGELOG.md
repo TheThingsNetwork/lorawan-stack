@@ -13,6 +13,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Network Server ID (NSID) used for Backend Interfaces interoperability via the `ns.interop.id` and `dcs.edcs.ns-id` configuration options.
   - In the Network Server, `ns.interop.id` acts as a fallback value for `sender-ns-id` in Join Server interoperability configuration.
+- Optional Network Server database migration that removes obsolete last invalidation keys is now available.
 
 ### Changed
 
@@ -48,7 +49,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Removed
 
 - The device version identifiers no longer have the `serial_number`, `vendor_id` and `vendor_profile_id` fields.
-- Automatic migrations of the Network Server database using `ns-db migrate` from versions prior to v3.23 are removed. Migrating from prior versions should be done through v3.23 instead.
+- Automatic migrations of the Network Server database using `ns-db migrate` from versions prior to v3.24 are removed. Migrating from prior versions should be done through v3.24 instead.
 
 ## [3.23.2] - 2023-01-18
 
