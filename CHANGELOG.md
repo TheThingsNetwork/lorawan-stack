@@ -36,6 +36,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Key unwrap caching.
+- Desired RX1 delay and desired beacon frequency not being possible to set for OTAA devices.
 
 ### Security
 
