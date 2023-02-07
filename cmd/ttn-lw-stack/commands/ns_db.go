@@ -16,7 +16,6 @@ package commands
 
 import (
 	"fmt"
-	"regexp"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -90,46 +89,52 @@ var (
 				panic("Only Redis is supported by this command")
 			}
 
-			logger.Info("Checking Network Server db version...")
+			logger.Info("Connecting to Network Server database...")
 			devicesClient := NewNetworkServerDeviceRegistryRedis(config)
+			uplinkClient := NewNetworkServerApplicationUplinkQueueRedis(config)
 			defer devicesClient.Close()
+			defer uplinkClient.Close()
 
 			if force, _ := cmd.Flags().GetBool("force"); !force {
-				schemaVersion, err := getSchemaVersion(devicesClient)
+				logger.Info("Checking devices namespace schema version...")
+				devicesSchemaVersion, err := getSchemaVersion(devicesClient)
 				if err != nil {
 					return err
 				}
-				if schemaVersion >= nsredis.SchemaVersion {
-					logger.Info("Database schema version is already in latest version")
-					return nil
+
+				if devicesSchemaVersion >= nsredis.DeviceSchemaVersion {
+					logger.Info("Devices namespace schema version is already in latest version")
 				}
-				if schemaVersion < nsredis.UnsupportedMigrationVersionBreakpoint {
-					return fmt.Errorf( //nolint:stylecheck
-						"You are currently running version schema %d of the Network Server database. "+
-							"This version cannot be auto-migrated to latest. "+
-							"Database needs to be upgraded using v3.19 of The Things Stack before upgrading to latest. "+
-							"If you are not upgrading from versions before v3.19 please run with `--force` flag",
-						schemaVersion,
+
+				if devicesSchemaVersion < nsredis.UnsupportedDeviceMigrationVersionBreakpoint {
+					return fmt.Errorf( // nolint:stylecheck
+						"You are currently running devices namespace schema version %d of the Network Server database. "+
+							"This devices namespace schema cannot be auto-migrated to latest. "+
+							"Use v3.24.0 of The Things Stack to upgrade the devices namespace version before upgrading to latest. "+
+							"If you are not upgrading from a version preceding v3.11 of The Things Stack please use the --force flag.", // nolint:lll
+						devicesSchemaVersion,
 					)
 				}
-			}
 
-			logger.Info("Connecting to Redis database...")
-			uplinkClient := NewNetworkServerApplicationUplinkQueueRedis(config)
-			defer uplinkClient.Close()
+				logger.Info("Checking uplink namespace schema version...")
+				uplinkSchemaVersion, err := getSchemaVersion(uplinkClient)
+				if err != nil {
+					return err
+				}
+				if uplinkSchemaVersion >= nsredis.DeviceSchemaVersion {
+					logger.Info("Uplink namespace schema version is already in latest version")
+					return nil
+				}
+			}
 
 			var removed uint64
 			defer func() { logger.Debugf("%d keys removed", removed) }()
 
-			uidLastInvalidationKey := regexp.MustCompile(uplinkClient.Key("uid", ".*", "last-invalidation$"))
-
+			uidLastInvalidationKey := uplinkClient.Key("uid", "*", "last-invalidation")
 			pipeliner := uplinkClient.Pipeline()
-			err := ttnredis.RangeRedisKeys(ctx, uplinkClient, uplinkClient.Key("*"), ttnredis.DefaultRangeCount,
+			err := ttnredis.RangeRedisKeys(ctx, uplinkClient, uidLastInvalidationKey, ttnredis.DefaultRangeCount,
 				func(k string) (bool, error) {
 					logger := logger.WithField("key", k)
-					if !uidLastInvalidationKey.MatchString(k) {
-						return true, nil
-					}
 					if err := pipeliner.Del(ctx, k).Err(); err != nil {
 						logger.WithError(err).Error("Failed to delete key")
 						return true, nil
@@ -144,10 +149,10 @@ var (
 				return err
 			}
 
-			if err := recordSchemaVersion(uplinkClient, nsredis.SchemaVersion); err != nil {
+			if err := recordSchemaVersion(uplinkClient, nsredis.UplinkSchemaVersion); err != nil {
 				return err
 			}
-			return recordSchemaVersion(devicesClient, nsredis.SchemaVersion)
+			return recordSchemaVersion(devicesClient, nsredis.DeviceSchemaVersion)
 		},
 	}
 	nsDBCleanupCommand = &cobra.Command{
