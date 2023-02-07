@@ -26,6 +26,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Security
 
+- Fix open redirect vulnerability for Console/Account App logins.
+
 ## [3.24.0] - 2023-02-02
 
 ### Added
