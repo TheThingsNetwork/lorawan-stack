@@ -72,6 +72,11 @@ const url = (location, omitQuery = false) => {
     return next.split('?')[0]
   }
 
+  // Only allow relative redirects to prevent open redirects.
+  if (!next.startsWith('/') || next.startsWith('//')) {
+    return appRoot
+  }
+
   return next
 }
 

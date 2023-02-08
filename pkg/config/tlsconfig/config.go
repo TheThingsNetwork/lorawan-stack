@@ -23,6 +23,7 @@ import (
 	"sync/atomic"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"golang.org/x/crypto/acme"
 	"golang.org/x/crypto/acme/autocert"
 )
@@ -87,11 +88,6 @@ type ServerKeyVault struct {
 	ID string `name:"id" description:"ID of the certificate"`
 }
 
-// IsZero returns whether the TLS server key vault is empty.
-func (t ServerKeyVault) IsZero() bool {
-	return t.ID == ""
-}
-
 // Config represents TLS configuration.
 type Config struct {
 	Client     `name:",squash"`
@@ -101,6 +97,25 @@ type Config struct {
 // FileReader is the interface used to read TLS certificates and keys.
 type FileReader interface {
 	ReadFile(filename string) ([]byte, error)
+}
+
+type fetcherFileReader struct {
+	fetcher fetch.Interface
+}
+
+var errFetchFile = errors.Define("fetch_file", "fetch file `{name}`")
+
+func (r fetcherFileReader) ReadFile(name string) ([]byte, error) {
+	b, err := r.fetcher.File(name)
+	if err != nil {
+		return nil, errFetchFile.WithCause(err).WithAttributes("name", name)
+	}
+	return b, nil
+}
+
+// FromFetcher returns a FileReader that reads files from the given fetcher.
+func FromFetcher(fetcher fetch.Interface) FileReader {
+	return fetcherFileReader{fetcher}
 }
 
 // Client is client-side configuration for server TLS.
@@ -273,8 +288,9 @@ func (c *ServerAuth) ApplyTo(tlsConfig *tls.Config) error {
 // ClientKeyVault defines configuration for loading a TLS client certificate from the key vault.
 type ClientKeyVault struct {
 	CertificateProvider interface {
-		ClientCertificate(ctx context.Context) (tls.Certificate, error)
+		ClientCertificate(ctx context.Context, label string) (tls.Certificate, error)
 	} `name:"-"`
+	ID string `name:"id" description:"ID of the certificate"`
 }
 
 // ClientAuth is (client-side) configuration for TLS client authentication.
@@ -309,7 +325,7 @@ func (c *ClientAuth) ApplyTo(tlsConfig *tls.Config) error {
 		}
 	case "key-vault":
 		tlsConfig.GetClientCertificate = func(r *tls.CertificateRequestInfo) (*tls.Certificate, error) {
-			cert, err := c.KeyVault.CertificateProvider.ClientCertificate(r.Context())
+			cert, err := c.KeyVault.CertificateProvider.ClientCertificate(r.Context(), c.KeyVault.ID)
 			if err != nil {
 				return nil, err
 			}

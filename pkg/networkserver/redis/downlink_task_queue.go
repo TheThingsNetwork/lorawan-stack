@@ -17,7 +17,7 @@ package redis
 import (
 	"context"
 
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -34,13 +34,16 @@ const (
 )
 
 // NewDownlinkTaskQueue returns new downlink task queue.
-func NewDownlinkTaskQueue(cl *ttnredis.Client, maxLen int64, group string) *DownlinkTaskQueue {
+func NewDownlinkTaskQueue(
+	cl *ttnredis.Client, maxLen int64, group string, streamBlockLimit time.Duration,
+) *DownlinkTaskQueue {
 	return &DownlinkTaskQueue{
 		queue: &ttnredis.TaskQueue{
-			Redis:  cl,
-			MaxLen: maxLen,
-			Group:  group,
-			Key:    cl.Key(downlinkKey),
+			Redis:            cl,
+			MaxLen:           maxLen,
+			Group:            group,
+			Key:              cl.Key(downlinkKey),
+			StreamBlockLimit: streamBlockLimit,
 		},
 	}
 }

@@ -68,12 +68,12 @@ func (kv *memKeyVault) ServerCertificate(_ context.Context, label string) (tls.C
 }
 
 // ClientCertificate implements crypto.KeyVault.
-func (kv *memKeyVault) ClientCertificate(context.Context) (tls.Certificate, error) {
-	return kv.certificate("client")
+func (kv *memKeyVault) ClientCertificate(_ context.Context, label string) (tls.Certificate, error) {
+	return kv.certificate(label)
 }
 
 // NewMemKeyVault returns a crypto.KeyVault that stores keys in memory.
-// Certificates must be PEM encoded. The client certificate must be labeled "client".
+// Certificates must be PEM encoded.
 // The given map must not be modified after calling this function.
 func NewMemKeyVault(m map[string][]byte) crypto.KeyVault {
 	return &memKeyVault{

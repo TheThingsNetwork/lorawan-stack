@@ -299,15 +299,15 @@ var _ InteropClient = MockInteropClient{}
 
 // MockInteropClient is a mock InteropClient used for testing.
 type MockInteropClient struct {
-	HandleJoinRequestFunc func(context.Context, types.NetID, *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error)
+	HandleJoinRequestFunc func(context.Context, types.NetID, *types.EUI64, *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error)
 }
 
 // HandleJoinRequest calls HandleJoinRequestFunc if set and panics otherwise.
-func (m MockInteropClient) HandleJoinRequest(ctx context.Context, netID types.NetID, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
+func (m MockInteropClient) HandleJoinRequest(ctx context.Context, netID types.NetID, nsID *types.EUI64, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
 	if m.HandleJoinRequestFunc == nil {
 		panic("HandleJoinRequest called, but not set")
 	}
-	return m.HandleJoinRequestFunc(ctx, netID, req)
+	return m.HandleJoinRequestFunc(ctx, netID, nsID, req)
 }
 
 type InteropClientHandleJoinRequestResponse struct {
@@ -322,8 +322,8 @@ type InteropClientHandleJoinRequestRequest struct {
 	Response chan<- InteropClientHandleJoinRequestResponse
 }
 
-func MakeInteropClientHandleJoinRequestChFunc(reqCh chan<- InteropClientHandleJoinRequestRequest) func(context.Context, types.NetID, *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
-	return func(ctx context.Context, netID types.NetID, msg *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
+func MakeInteropClientHandleJoinRequestChFunc(reqCh chan<- InteropClientHandleJoinRequestRequest) func(context.Context, types.NetID, *types.EUI64, *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
+	return func(ctx context.Context, netID types.NetID, nsID *types.EUI64, msg *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
 		respCh := make(chan InteropClientHandleJoinRequestResponse)
 		reqCh <- InteropClientHandleJoinRequestRequest{
 			Context:  ctx,

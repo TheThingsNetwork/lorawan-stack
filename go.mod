@@ -27,7 +27,6 @@ require (
 	github.com/envoyproxy/protoc-gen-validate v0.9.1
 	github.com/felixge/httpsnoop v1.0.3
 	github.com/getsentry/sentry-go v0.17.0
-	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang/gddo v0.0.0-20210115222349-20d68f94ee1f
 	github.com/golang/protobuf v1.5.2
 	github.com/google/go-cmp v0.5.9
@@ -64,6 +63,7 @@ require (
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.14.0
+	github.com/redis/go-redis/v9 v9.0.2
 	github.com/satori/go.uuid v1.2.0
 	github.com/sendgrid/sendgrid-go v3.12.0+incompatible
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
@@ -152,7 +152,7 @@ require (
 	github.com/blevesearch/zap/v13 v13.0.6 // indirect
 	github.com/blevesearch/zap/v14 v14.0.5 // indirect
 	github.com/blevesearch/zap/v15 v15.0.3 // indirect
-	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/couchbase/vellum v1.0.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect

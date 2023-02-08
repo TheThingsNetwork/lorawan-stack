@@ -208,7 +208,7 @@ BQApUt5UZZkvwrTGD5Ez4KM=
 
 	// Export existing client certificate.
 	{
-		cert, err := ks.ClientCertificate(test.Context())
+		cert, err := ks.ClientCertificate(test.Context(), "client")
 		a.So(err, should.BeNil)
 		a.So(len(cert.Certificate), should.Equal, 2)
 		a.So(cert.PrivateKey, should.HaveSameTypeAs, &rsa.PrivateKey{})

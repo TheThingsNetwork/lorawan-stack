@@ -261,7 +261,10 @@ var startCommand = &cobra.Command{
 			}
 			applicationUplinkQueue := nsredis.NewApplicationUplinkQueue(
 				NewNetworkServerApplicationUplinkQueueRedis(config),
-				int64(applicationUplinkQueueSize), redisConsumerGroup, time.Minute,
+				int64(applicationUplinkQueueSize),
+				redisConsumerGroup,
+				time.Minute,
+				redis.DefaultStreamBlockLimit,
 			)
 			if err := applicationUplinkQueue.Init(ctx); err != nil {
 				return shared.ErrInitializeNetworkServer.WithCause(err)
@@ -281,7 +284,9 @@ var startCommand = &cobra.Command{
 			}
 			downlinkTasks := nsredis.NewDownlinkTaskQueue(
 				NewNetworkServerDownlinkTaskRedis(config),
-				100000, redisConsumerGroup,
+				100000,
+				redisConsumerGroup,
+				redis.DefaultStreamBlockLimit,
 			)
 			if err := downlinkTasks.Init(ctx); err != nil {
 				return shared.ErrInitializeNetworkServer.WithCause(err)

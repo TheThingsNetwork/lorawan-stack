@@ -58,6 +58,8 @@ type PositionSolutionType uint8
 const (
 	// GNSSPositionSolutionType is GNSS position solution type.
 	GNSSPositionSolutionType PositionSolutionType = iota
+	// GNSSNGPositionSolutionType is GNSSNG position solution type.
+	GNSSNGPositionSolutionType
 	// WiFiPositionSolutionType is WiFi position solution type.
 	WiFiPositionSolutionType
 	// UnknownPositionSolutionType is used when the position solution type is unknown.
@@ -73,6 +75,7 @@ type PositionSolution struct {
 
 const (
 	gnssPositionSolutionType    = "gnss"
+	gnssngPositionSolutionType  = "gnssng"
 	wifiPositionSolutionType    = "wifi"
 	unknownPositionSolutionType = "unknown"
 )
@@ -83,6 +86,8 @@ func (t PositionSolutionType) MarshalJSON() ([]byte, error) {
 	switch t {
 	case GNSSPositionSolutionType:
 		tp = gnssPositionSolutionType
+	case GNSSNGPositionSolutionType:
+		tp = gnssngPositionSolutionType
 	case WiFiPositionSolutionType:
 		tp = wifiPositionSolutionType
 	default:
@@ -101,6 +106,8 @@ func (t *PositionSolutionType) UnmarshalJSON(b []byte) error {
 	switch tp {
 	case gnssPositionSolutionType:
 		*t = GNSSPositionSolutionType
+	case gnssngPositionSolutionType:
+		*t = GNSSNGPositionSolutionType
 	case wifiPositionSolutionType:
 		*t = WiFiPositionSolutionType
 	default:
@@ -114,6 +121,8 @@ func (t PositionSolutionType) String() string {
 	switch t {
 	case GNSSPositionSolutionType:
 		return gnssPositionSolutionType
+	case GNSSNGPositionSolutionType:
+		return gnssngPositionSolutionType
 	case WiFiPositionSolutionType:
 		return wifiPositionSolutionType
 	default:

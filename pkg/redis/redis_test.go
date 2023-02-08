@@ -20,7 +20,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	. "go.thethings.network/lorawan-stack/v3/pkg/redis"
@@ -150,6 +150,10 @@ func TestAddTask(t *testing.T) {
 	}
 }
 
+func testStreamBlockLimit() time.Duration {
+	return (1 << 5) * test.Delay
+}
+
 func TestPopTask(t *testing.T) {
 	a, ctx := test.New(t)
 
@@ -171,18 +175,30 @@ func TestPopTask(t *testing.T) {
 		var called bool
 		errCh := make(chan error, 1)
 		go func() {
-			errCh <- PopTask(ctx, cl.Client, testGroup, "testID", 10, func(p redis.Pipeliner, payload string, startAt time.Time) error {
-				p.Ping(ctx)
-				if !test.AllTrue(
-					a.So(called, should.BeFalse),
-					a.So(payload, should.Equal, expectedPayload),
-					a.So(startAt, should.Resemble, expectedStartAt),
-				) {
-					t.Errorf("PopTask assertion failed for task with expected payload %s and expected starting time of %s", expectedPayload, expectedStartAt)
-				}
-				called = true
-				return nil
-			}, inputKey)
+			errCh <- PopTask(
+				ctx,
+				cl.Client,
+				testGroup,
+				"testID",
+				func(p redis.Pipeliner, payload string, startAt time.Time) error {
+					p.Ping(ctx)
+					if !test.AllTrue(
+						a.So(called, should.BeFalse),
+						a.So(payload, should.Equal, expectedPayload),
+						a.So(startAt, should.Resemble, expectedStartAt),
+					) {
+						t.Errorf(
+							"PopTask assertion failed for task with expected payload %s and expected starting time of %s", //nolint:lll
+							expectedPayload,
+							expectedStartAt,
+						)
+					}
+					called = true
+					return nil
+				},
+				inputKey,
+				testStreamBlockLimit(),
+			)
 		}()
 
 		select {
@@ -216,9 +232,9 @@ func TestPopTask(t *testing.T) {
 		timeout := (1 << 5) * test.Delay
 
 		timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
-		err = PopTask(timeoutCtx, cl.Client, testGroup, "testID", 10, func(redis.Pipeliner, string, time.Time) error {
+		err = PopTask(timeoutCtx, cl.Client, testGroup, "testID", func(redis.Pipeliner, string, time.Time) error {
 			panic("must not be called")
-		}, k)
+		}, k, testStreamBlockLimit())
 		cancel()
 		if a.So(err, should.BeError) {
 			if !a.So(errors.IsDeadlineExceeded(err) || errors.IsUnavailable(err), should.BeTrue) {
@@ -228,9 +244,9 @@ func TestPopTask(t *testing.T) {
 
 		cancelCtx, cancel := context.WithCancel(ctx)
 		time.AfterFunc(timeout, cancel)
-		err = PopTask(cancelCtx, cl.Client, testGroup, "testID", 10, func(redis.Pipeliner, string, time.Time) error {
+		err = PopTask(cancelCtx, cl.Client, testGroup, "testID", func(redis.Pipeliner, string, time.Time) error {
 			panic("must not be called")
-		}, k)
+		}, k, testStreamBlockLimit())
 		cancel()
 		if a.So(err, should.BeError) {
 			a.So(errors.IsCanceled(err), should.BeTrue)
@@ -321,7 +337,9 @@ func TestPopTask(t *testing.T) {
 		cancelCtx, cancel := context.WithCancel(ctx)
 		inputKey := k
 		go func() {
-			errCh <- DispatchTask(cancelCtx, cl.Client, testGroup, "testID", 10, inputKey)
+			errCh <- DispatchTask(
+				cancelCtx, cl.Client, testGroup, "testID", 10, inputKey, testStreamBlockLimit(),
+			)
 		}()
 
 		defer func() {
@@ -351,10 +369,11 @@ func TestTaskQueue(t *testing.T) {
 	defer cl.Close()
 
 	q := &TaskQueue{
-		Redis:  cl,
-		MaxLen: 16384,
-		Group:  "testGroup",
-		Key:    cl.Key("test"),
+		Redis:            cl,
+		MaxLen:           16384,
+		Group:            "testGroup",
+		Key:              cl.Key("test"),
+		StreamBlockLimit: testStreamBlockLimit(),
 	}
 
 	err := q.Init(ctx)

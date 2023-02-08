@@ -1148,7 +1148,7 @@ func (ns *NetworkServer) sendJoinRequest(ctx context.Context, ids *ttnpb.EndDevi
 	}
 	if ns.interopClient != nil {
 		queuedEvents = append(queuedEvents, evtInteropJoinAttempt.NewWithIdentifiersAndData(ctx, ids, req))
-		resp, err := ns.interopClient.HandleJoinRequest(ctx, ns.netID, req)
+		resp, err := ns.interopClient.HandleJoinRequest(ctx, ns.netID, ns.interopNSID, req)
 		if err == nil {
 			logger.Debug("Join-request accepted by interop Join Server")
 			queuedEvents = append(queuedEvents, evtInteropJoinSuccess.NewWithIdentifiersAndData(ctx, ids, joinResponseWithoutKeys(resp)))

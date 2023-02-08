@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package deviceclaimingserver implements the Device Claiming Server component.
 package deviceclaimingserver
 
 import (
@@ -44,10 +45,6 @@ type DeviceClaimingServer struct {
 	}
 }
 
-const (
-	defaultType = "default"
-)
-
 // New returns a new Device Claiming component.
 func New(c *component.Component, conf *Config, opts ...Option) (*DeviceClaimingServer, error) {
 	ctx := log.NewContextWithField(c.Context(), "namespace", "deviceclaimingserver")
@@ -63,7 +60,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*DeviceClaimingS
 
 	dcs.gatewayClaimingServerUpstream = noopGCLS{}
 
-	upstream, err := enddevices.NewUpstream(ctx, conf.EndDeviceClaimingServerConfig, c)
+	upstream, err := enddevices.NewUpstream(ctx, c, conf.EndDeviceClaimingServerConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +89,7 @@ func (dcs *DeviceClaimingServer) Context() context.Context {
 }
 
 // Roles returns the roles that the Device Claiming Server fulfills.
-func (dcs *DeviceClaimingServer) Roles() []ttnpb.ClusterRole {
+func (*DeviceClaimingServer) Roles() []ttnpb.ClusterRole {
 	return []ttnpb.ClusterRole{ttnpb.ClusterRole_DEVICE_CLAIMING_SERVER}
 }
 
@@ -103,6 +100,8 @@ func (dcs *DeviceClaimingServer) RegisterServices(s *grpc.Server) {
 }
 
 // RegisterHandlers registers gRPC handlers.
+//
+//nolint:errcheck
 func (dcs *DeviceClaimingServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 	ttnpb.RegisterEndDeviceClaimingServerHandler(dcs.Context(), s, conn)
 	ttnpb.RegisterGatewayClaimingServerHandler(dcs.Context(), s, conn)
