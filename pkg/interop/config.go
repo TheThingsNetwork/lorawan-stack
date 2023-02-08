@@ -24,7 +24,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	yaml "gopkg.in/yaml.v2"
@@ -41,26 +40,12 @@ func (conf tlsConfig) IsZero() bool {
 	return conf == (tlsConfig{})
 }
 
-type fetcherFileReader struct {
-	fetcher fetch.Interface
-}
-
-var errFetchFile = errors.Define("fetch_file", "fetch file `{name}`")
-
-func (r fetcherFileReader) ReadFile(name string) ([]byte, error) {
-	b, err := r.fetcher.File(name)
-	if err != nil {
-		return nil, errFetchFile.WithCause(err).WithAttributes("name", name)
-	}
-	return b, nil
-}
-
 func (conf tlsConfig) TLSConfig(fetcher fetch.Interface, ks crypto.KeyService) (*tls.Config, error) {
 	res := &tls.Config{
 		MinVersion: tls.VersionTLS12,
 	}
 	clientConfig := &tlsconfig.Client{
-		FileReader: fetcherFileReader{fetcher: fetcher},
+		FileReader: tlsconfig.FromFetcher(fetcher),
 		RootCA:     conf.RootCA,
 	}
 	if err := clientConfig.ApplyTo(res); err != nil {
@@ -74,7 +59,7 @@ func (conf tlsConfig) TLSConfig(fetcher fetch.Interface, ks crypto.KeyService) (
 	}
 	clientAuthConfig := &tlsconfig.ClientAuth{
 		Source:      source,
-		FileReader:  fetcherFileReader{fetcher: fetcher},
+		FileReader:  tlsconfig.FromFetcher(fetcher),
 		Certificate: conf.Certificate,
 		Key:         conf.Key,
 		KeyVault: tlsconfig.ClientKeyVault{

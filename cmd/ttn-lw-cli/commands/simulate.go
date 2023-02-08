@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/simulate"
+	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
@@ -39,11 +40,11 @@ import (
 )
 
 var (
-	simulateUplinkFlags      = &pflag.FlagSet{}
-	simulateJoinRequestFlags = &pflag.FlagSet{}
-	simulateDataUplinkFlags  = &pflag.FlagSet{}
+	simulateUplinkFlags      = util.NormalizedFlagSet()
+	simulateJoinRequestFlags = util.NormalizedFlagSet()
+	simulateDataUplinkFlags  = util.NormalizedFlagSet()
 
-	applicationUplinkFlags = &pflag.FlagSet{}
+	applicationUplinkFlags = util.NormalizedFlagSet()
 
 	errApplicationServerDisabled = errors.DefineFailedPrecondition("application_server_disabled", "Application Server is disabled")
 )
@@ -77,11 +78,11 @@ func startSimulation(
 		return err
 	}
 
-	var uplinkParams simulate.SimulateMetadataParams
+	var uplinkParams ttnpb.SimulateMetadataParams
 	if _, err := uplinkParams.SetFromFlags(simulateUplinkFlags, ""); err != nil {
 		return err
 	}
-	if err := uplinkParams.SetDefaults(); err != nil {
+	if err := simulate.SetDefaults(&uplinkParams); err != nil {
 		return err
 	}
 
@@ -173,6 +174,7 @@ func startSimulation(
 	return ctx.Err()
 }
 
+//nolint:gocyclo
 func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *ttnpb.DownlinkMessage) error {
 	phy, err := band.Get(dev.FrequencyPlanId, dev.LorawanPhyVersion)
 	if err != nil {
@@ -379,23 +381,23 @@ var (
 		Hidden: true,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			var (
-				uplinkParams simulate.SimulateMetadataParams
-				joinParams   simulate.SimulateJoinRequestParams
+				uplinkParams ttnpb.SimulateMetadataParams
+				joinParams   ttnpb.SimulateJoinRequestParams
 				joinRequest  *ttnpb.Message
 			)
 			if _, err := uplinkParams.SetFromFlags(simulateUplinkFlags, ""); err != nil {
 				return err
 			}
-			if err := uplinkParams.SetDefaults(); err != nil {
+			if err := simulate.SetDefaults(&uplinkParams); err != nil {
 				return err
 			}
 			if _, err := joinParams.SetFromFlags(simulateJoinRequestFlags, ""); err != nil {
 				return err
 			}
-			if err := uplinkParams.LoRaWANVersion.Validate(); err != nil {
+			if err := uplinkParams.LorawanVersion.Validate(); err != nil {
 				return errInvalidMACVersion.WithCause(err)
 			}
-			if err := uplinkParams.LoRaWAN_PHYVersion.Validate(); err != nil {
+			if err := uplinkParams.LorawanPhyVersion.Validate(); err != nil {
 				return errInvalidPHYVersion.WithCause(err)
 			}
 
@@ -419,14 +421,14 @@ var (
 					if err != nil {
 						return err
 					}
-					var key *ttnpb.KeyEnvelope
-					if macspec.UseNwkKey(uplinkParams.LoRaWANVersion) {
+					var key []byte
+					if macspec.UseNwkKey(uplinkParams.LorawanVersion) {
 						key = joinParams.NwkKey
 					} else {
 						key = joinParams.AppKey
 					}
 
-					nwkKey, err := types.GetAES128Key(key.EncryptedKey)
+					nwkKey, err := types.GetAES128Key(key)
 					if err != nil {
 						return err
 					}
@@ -441,16 +443,16 @@ var (
 				},
 				func(downMsg *ttnpb.DownlinkMessage) error {
 					if err := processDownlink(&ttnpb.EndDevice{
-						LorawanVersion:    uplinkParams.LoRaWANVersion,
-						LorawanPhyVersion: uplinkParams.LoRaWAN_PHYVersion,
+						LorawanVersion:    uplinkParams.LorawanVersion,
+						LorawanPhyVersion: uplinkParams.LorawanPhyVersion,
 						FrequencyPlanId:   uplinkParams.BandId,
 						Ids: &ttnpb.EndDeviceIdentifiers{
 							JoinEui: joinParams.JoinEui,
 							DevEui:  joinParams.DevEui,
 						},
 						RootKeys: &ttnpb.RootKeys{
-							NwkKey: joinParams.NwkKey,
-							AppKey: joinParams.AppKey,
+							NwkKey: &ttnpb.KeyEnvelope{Key: joinParams.NwkKey},
+							AppKey: &ttnpb.KeyEnvelope{Key: joinParams.AppKey},
 						},
 						Session: &ttnpb.Session{},
 					}, joinRequest, downMsg); err != nil {
@@ -469,32 +471,37 @@ var (
 		Hidden: true,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			var (
-				uplinkParams     simulate.SimulateMetadataParams
-				dataUplinkParams simulate.SimulateDataUplinkParams
+				uplinkParams     ttnpb.SimulateMetadataParams
+				dataUplinkParams ttnpb.SimulateDataUplinkParams
 				dataUplink       *ttnpb.Message
 			)
 			if _, err := uplinkParams.SetFromFlags(simulateUplinkFlags, ""); err != nil {
 				return err
 			}
-			if err := uplinkParams.SetDefaults(); err != nil {
+			if err := simulate.SetDefaults(&uplinkParams); err != nil {
 				return err
 			}
 			if _, err := dataUplinkParams.SetFromFlags(simulateDataUplinkFlags, ""); err != nil {
 				return err
 			}
-			if err := uplinkParams.LoRaWANVersion.Validate(); err != nil {
+			if err := uplinkParams.LorawanVersion.Validate(); err != nil {
 				return errInvalidMACVersion.WithCause(err)
 			}
-			if err := uplinkParams.LoRaWAN_PHYVersion.Validate(); err != nil {
+			if err := uplinkParams.LorawanPhyVersion.Validate(); err != nil {
 				return errInvalidPHYVersion.WithCause(err)
 			}
 
 			return startSimulation(cmd,
 				func(upMsg *ttnpb.UplinkMessage) error {
 					fOpts := dataUplinkParams.FOpts
-					if len(fOpts) > 0 && macspec.EncryptFOpts(uplinkParams.LoRaWANVersion) {
-						encOpts := macspec.EncryptionOptions(uplinkParams.LoRaWANVersion, macspec.UplinkFrame, dataUplinkParams.FPort, true)
-						nwkSEncKey, err := types.GetAES128Key(dataUplinkParams.NwkSEncKey.EncryptedKey)
+					if len(fOpts) > 0 && macspec.EncryptFOpts(uplinkParams.LorawanVersion) {
+						encOpts := macspec.EncryptionOptions(
+							uplinkParams.LorawanVersion,
+							macspec.UplinkFrame,
+							dataUplinkParams.FPort,
+							true,
+						)
+						nwkSEncKey, err := types.GetAES128Key(dataUplinkParams.NwkSEncKey)
 						if err != nil {
 							return err
 						}
@@ -515,14 +522,14 @@ var (
 						fOpts = buf
 					}
 
-					var key *ttnpb.KeyEnvelope
+					var key []byte
 					if dataUplinkParams.FPort == 0 {
 						key = dataUplinkParams.NwkSEncKey
 					} else {
 						key = dataUplinkParams.AppSKey
 					}
 
-					nwkKey, err := types.GetAES128Key(key.EncryptedKey)
+					nwkKey, err := types.GetAES128Key(key)
 					if err != nil {
 						return err
 					}
@@ -579,11 +586,11 @@ var (
 						sNwkSIntKey *types.AES128Key
 					)
 
-					fNwkSIntKey, err = types.GetAES128Key(dataUplinkParams.FNwkSIntKey.EncryptedKey)
+					fNwkSIntKey, err = types.GetAES128Key(dataUplinkParams.FNwkSIntKey)
 					if err != nil {
 						return err
 					}
-					if macspec.UseLegacyMIC(uplinkParams.LoRaWANVersion) {
+					if macspec.UseLegacyMIC(uplinkParams.LorawanVersion) {
 						mic, err = crypto.ComputeLegacyUplinkMIC(
 							*fNwkSIntKey,
 							*devAddr,
@@ -591,7 +598,7 @@ var (
 							buf,
 						)
 					} else {
-						sNwkSIntKey, err = types.GetAES128Key(dataUplinkParams.SNwkSIntKey.EncryptedKey)
+						sNwkSIntKey, err = types.GetAES128Key(dataUplinkParams.SNwkSIntKey)
 						if err != nil {
 							return err
 						}
@@ -617,17 +624,17 @@ var (
 					lastNFCntDown, _ := cmd.Flags().GetUint32("n_f_cnt_down")
 					lastAFCntDown, _ := cmd.Flags().GetUint32("a_f_cnt_down")
 					if err := processDownlink(&ttnpb.EndDevice{
-						LorawanVersion:    uplinkParams.LoRaWANVersion,
-						LorawanPhyVersion: uplinkParams.LoRaWAN_PHYVersion,
+						LorawanVersion:    uplinkParams.LorawanVersion,
+						LorawanPhyVersion: uplinkParams.LorawanPhyVersion,
 						FrequencyPlanId:   uplinkParams.BandId,
 						Session: &ttnpb.Session{
 							LastNFCntDown: lastNFCntDown,
 							LastFCntUp:    lastAFCntDown,
 							Keys: &ttnpb.SessionKeys{
-								FNwkSIntKey: dataUplinkParams.FNwkSIntKey,
-								SNwkSIntKey: dataUplinkParams.SNwkSIntKey,
-								NwkSEncKey:  dataUplinkParams.NwkSEncKey,
-								AppSKey:     dataUplinkParams.AppSKey,
+								FNwkSIntKey: &ttnpb.KeyEnvelope{Key: dataUplinkParams.FNwkSIntKey},
+								SNwkSIntKey: &ttnpb.KeyEnvelope{Key: dataUplinkParams.SNwkSIntKey},
+								NwkSEncKey:  &ttnpb.KeyEnvelope{Key: dataUplinkParams.NwkSEncKey},
+								AppSKey:     &ttnpb.KeyEnvelope{Key: dataUplinkParams.AppSKey},
 							},
 						},
 					}, dataUplink, downMsg); err != nil {
@@ -676,9 +683,9 @@ var (
 )
 
 func init() {
-	simulate.AddSetFlagsForSimulateMetadataParams(simulateUplinkFlags, "", false)
-	simulate.AddSetFlagsForSimulateJoinRequestParams(simulateJoinRequestFlags, "", false)
-	simulate.AddSetFlagsForSimulateDataUplinkParams(simulateDataUplinkFlags, "", false)
+	ttnpb.AddSetFlagsForSimulateMetadataParams(simulateUplinkFlags, "", false)
+	ttnpb.AddSetFlagsForSimulateJoinRequestParams(simulateJoinRequestFlags, "", false)
+	ttnpb.AddSetFlagsForSimulateDataUplinkParams(simulateDataUplinkFlags, "", false)
 	ttnpb.AddSetFlagsForApplicationUplink(applicationUplinkFlags, "", false)
 
 	simulateJoinRequestCommand.Flags().AddFlagSet(gatewayIDFlags())

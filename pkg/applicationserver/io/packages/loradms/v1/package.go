@@ -28,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	lorautil "go.thethings.network/lorawan-stack/v3/pkg/util/lora"
 	urlutil "go.thethings.network/lorawan-stack/v3/pkg/util/url"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -84,13 +85,14 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.Appli
 	case *ttnpb.ApplicationUp_UplinkMessage:
 		msg := m.UplinkMessage
 		settings := msg.GetSettings()
+		receivedAt := lorautil.GetAdjustedReceivedAt(msg)
 		loraUp := &objects.LoRaUplink{
 			Type:      objects.UplinkUplinkType,
 			FCnt:      uint32Ptr(msg.GetFCnt()),
 			Port:      uint8Ptr(uint8(msg.GetFPort())),
 			Payload:   hexPtr(objects.Hex(msg.FrmPayload)),
 			Freq:      uint32Ptr(uint32(settings.Frequency)),
-			Timestamp: float64PtrOfTimestamp(msg.ReceivedAt),
+			Timestamp: float64PtrOfTimestamp(receivedAt),
 		}
 
 		if _, ok := data.fPortSet[msg.FPort]; !ok && fPort != msg.FPort {
@@ -204,7 +206,7 @@ func (p *DeviceManagementPackage) sendLocationSolved(ctx context.Context, ids *t
 	}
 	source := ttnpb.LocationSource_SOURCE_UNKNOWN
 	switch position.Algorithm {
-	case objects.GNSSPositionSolutionType:
+	case objects.GNSSPositionSolutionType, objects.GNSSNGPositionSolutionType:
 		source = ttnpb.LocationSource_SOURCE_GPS
 	case objects.WiFiPositionSolutionType:
 		source = ttnpb.LocationSource_SOURCE_WIFI_RSSI_GEOLOCATION
@@ -215,7 +217,7 @@ func (p *DeviceManagementPackage) sendLocationSolved(ctx context.Context, ids *t
 		ReceivedAt:     timestamppb.Now(),
 		Up: &ttnpb.ApplicationUp_LocationSolved{
 			LocationSolved: &ttnpb.ApplicationLocation{
-				Service: fmt.Sprintf("%v-%s", PackageName, position.Algorithm),
+				Service: PackageName,
 				Location: &ttnpb.Location{
 					Latitude:  position.LLH[0],
 					Longitude: position.LLH[1],
@@ -334,7 +336,7 @@ func float64PtrOfTimestamp(x *timestamppb.Timestamp) *float64 {
 	if x == nil {
 		return nil
 	}
-	f := float64(ttnpb.StdTime(x).Unix())
+	f := float64(ttnpb.StdTime(x).UnixNano()) / float64(1e9)
 	return &f
 }
 

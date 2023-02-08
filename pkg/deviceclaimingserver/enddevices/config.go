@@ -27,17 +27,22 @@ import (
 const JSClientConfigurationName = "config.yml"
 
 // NetworkServer contains information related to the Network Server.
+// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/6048)
 type NetworkServer struct {
-	Hostname string       `name:"hostname" description:"Hostname of the Network Server. Must not contain a port"`
-	HomeNSID *types.EUI64 `name:"home-ns-id" description:"HomeNSID of the Network Server (EUI)"`
+	HomeNSID *types.EUI64 `name:"home-ns-id" description:"DEPRECATED"`
+	Hostname string       `name:"hostname" description:"DEPRECATED"`
 }
 
 // Config contains options for end device claiming clients.
 //
 //nolint:lll
 type Config struct {
-	NetID         types.NetID   `name:"net-id" description:"NetID of this network to configure as home NetID when claiming"`
-	NetworkServer NetworkServer `name:"network-server" description:"Network Server of the cluster that handles claimed device traffic"`
+	NetID types.NetID  `name:"net-id" description:"NetID of the Network Server to configure when claiming"`
+	NSID  *types.EUI64 `name:"ns-id" description:"NSID of the Network Server to configure when claiming"`
+	ASID  string       `name:"as-id" description:"AS-ID of the Application Server to configure when claiming"`
+
+	// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/6048)
+	NetworkServer NetworkServer `name:"network-server" description:"DEPRECATED"`
 
 	Source    string                `name:"source" description:"Source of the file containing Join Server settings (directory, url, blob)"`
 	Directory string                `name:"directory" description:"OS filesystem directory, which contains the config.yml and the client-specific files"`

@@ -167,9 +167,9 @@ func (c *cacheKeyVault) ServerCertificate(ctx context.Context, label string) (tl
 }
 
 // ClientCertificate implements crypto.KeyVault.
-func (c *cacheKeyVault) ClientCertificate(ctx context.Context) (tls.Certificate, error) {
-	val, err := c.getOrLoad(ctx, crypto.CacheClientCertificate, "", func() (any, time.Duration, error) {
-		val, err := c.inner.ClientCertificate(ctx)
+func (c *cacheKeyVault) ClientCertificate(ctx context.Context, label string) (tls.Certificate, error) {
+	val, err := c.getOrLoad(ctx, crypto.CacheClientCertificate, label, func() (any, time.Duration, error) {
+		val, err := c.inner.ClientCertificate(ctx, label)
 		ttl := time.Duration(0)
 		if err == nil {
 			if certTTL, ok := c.cacheCertificateTTL(val); ok {

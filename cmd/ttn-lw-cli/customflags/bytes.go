@@ -53,7 +53,10 @@ func (ebv *ExactBytesValue) Set(s string) error {
 		}
 		ebv.Value = b
 	default:
-		return fmt.Errorf("Invalid bytes length: want %d got %d", ebv.length, len(trimmed))
+		return fmt.Errorf("invalid bytes length: want %d (hex) or %d (base64) got %d",
+			hex.EncodedLen(ebv.length),
+			base64.RawStdEncoding.EncodedLen(ebv.length),
+			len(trimmed))
 	}
 	return nil
 }

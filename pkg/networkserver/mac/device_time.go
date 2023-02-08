@@ -19,7 +19,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"google.golang.org/protobuf/types/known/timestamppb"
+	lorautil "go.thethings.network/lorawan-stack/v3/pkg/util/lora"
 )
 
 var (
@@ -34,27 +34,11 @@ var (
 
 func HandleDeviceTimeReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.UplinkMessage) (events.Builders, error) {
 	ans := &ttnpb.MACCommand_DeviceTimeAns{
-		Time: messageTimestamp(msg),
+		Time: lorautil.GetAdjustedReceivedAt(msg),
 	}
 	dev.MacState.QueuedResponses = append(dev.MacState.QueuedResponses, ans.MACCommand())
 	return events.Builders{
 		EvtReceiveDeviceTimeRequest,
 		EvtEnqueueDeviceTimeAnswer.With(events.WithData(ans)),
 	}, nil
-}
-
-func messageTimestamp(msg *ttnpb.UplinkMessage) *timestamppb.Timestamp {
-	var ts *timestamppb.Timestamp
-	for _, md := range msg.RxMetadata {
-		if t := md.GpsTime; t != nil {
-			return t
-		}
-		if ts == nil && md.ReceivedAt != nil {
-			ts = md.ReceivedAt
-		}
-	}
-	if ts != nil {
-		return ts
-	}
-	return msg.ReceivedAt
 }

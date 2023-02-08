@@ -23,5 +23,5 @@ import (
 type KeyVault interface {
 	Key(ctx context.Context, label string) ([]byte, error)
 	ServerCertificate(ctx context.Context, label string) (tls.Certificate, error)
-	ClientCertificate(ctx context.Context) (tls.Certificate, error)
+	ClientCertificate(ctx context.Context, label string) (tls.Certificate, error)
 }

@@ -106,7 +106,9 @@ type DownlinkPriorities struct {
 
 // InteropClient is a client, which Network Server can use for interoperability.
 type InteropClient interface {
-	HandleJoinRequest(context.Context, types.NetID, *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error)
+	HandleJoinRequest(
+		ctx context.Context, netID types.NetID, nsID *types.EUI64, req *ttnpb.JoinRequest,
+	) (*ttnpb.JoinResponse, error)
 }
 
 // NetworkServer implements the Network Server component.
@@ -140,6 +142,7 @@ type NetworkServer struct {
 	defaultMACSettings *ttnpb.MACSettings
 
 	interopClient InteropClient
+	interopNSID   *types.EUI64
 
 	uplinkDeduplicator UplinkDeduplicator
 
@@ -219,7 +222,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 
 	var interopCl InteropClient
 	if !conf.Interop.IsZero() {
-		interopConf := conf.Interop
+		interopConf := conf.Interop.InteropClient
 		interopConf.BlobConfig = c.GetBaseConfig(ctx).Blob
 
 		interopCl, err = interop.NewClient(ctx, interopConf, c, interop.SelectorNetworkServer)
@@ -244,6 +247,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		downlinkPriorities:       downlinkPriorities,
 		defaultMACSettings:       conf.DefaultMACSettings.Parse(),
 		interopClient:            interopCl,
+		interopNSID:              conf.Interop.ID,
 		uplinkDeduplicator:       conf.UplinkDeduplicator,
 		deviceKEKLabel:           conf.DeviceKEKLabel,
 		downlinkQueueCapacity:    conf.DownlinkQueueCapacity,

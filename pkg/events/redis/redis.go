@@ -22,7 +22,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -312,8 +312,5 @@ func (*PubSub) runTransaction(ctx context.Context, tx redis.Pipeliner) {
 	logger := log.FromContext(ctx)
 	if _, err := tx.Exec(ctx); err != nil {
 		logger.WithError(err).Warn("Failed to run transaction")
-	}
-	if err := tx.Close(); err != nil {
-		logger.WithError(err).Warn("Failed to close transaction")
 	}
 }

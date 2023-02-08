@@ -295,7 +295,7 @@ func (p *GeolocationPackage) sendLocationSolved(ctx context.Context, ids *ttnpb.
 		ReceivedAt:     timestamppb.Now(),
 		Up: &ttnpb.ApplicationUp_LocationSolved{
 			LocationSolved: &ttnpb.ApplicationLocation{
-				Service:  fmt.Sprintf("%v-%s", PackageName, result.Algorithm()),
+				Service:  PackageName,
 				Location: loc,
 			},
 		},

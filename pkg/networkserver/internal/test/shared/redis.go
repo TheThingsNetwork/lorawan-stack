@@ -16,6 +16,7 @@ package test
 
 import (
 	"context"
+	"time"
 
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/redis"
@@ -26,15 +27,16 @@ var redisNamespace = [...]string{
 	"networkserver_test",
 }
 
-const (
-	redisConsumerGroup = "ns"
-	redisConsumerID    = "test"
-)
+const redisConsumerGroup = "ns"
+
+func testStreamBlockLimit() time.Duration {
+	return (1 << 5) * test.Delay
+}
 
 func NewRedisApplicationUplinkQueue(ctx context.Context) (ApplicationUplinkQueue, func()) {
 	tb := test.MustTBFromContext(ctx)
 	cl, flush := test.NewRedis(ctx, append(redisNamespace[:], "application-uplinks")...)
-	q := redis.NewApplicationUplinkQueue(cl, 100, redisConsumerGroup, 0)
+	q := redis.NewApplicationUplinkQueue(cl, 100, redisConsumerGroup, 0, testStreamBlockLimit())
 	if err := q.Init(ctx); err != nil {
 		tb.Fatalf("Failed to initialize Redis application uplink queue: %s", test.FormatError(err))
 	}
@@ -68,7 +70,7 @@ func NewRedisDeviceRegistry(ctx context.Context) (DeviceRegistry, func()) {
 func NewRedisDownlinkTaskQueue(ctx context.Context) (DownlinkTaskQueue, func()) {
 	tb := test.MustTBFromContext(ctx)
 	cl, flush := test.NewRedis(ctx, append(redisNamespace[:], "downlink-tasks")...)
-	q := redis.NewDownlinkTaskQueue(cl, 10000, redisConsumerGroup)
+	q := redis.NewDownlinkTaskQueue(cl, 10000, redisConsumerGroup, testStreamBlockLimit())
 	if err := q.Init(ctx); err != nil {
 		tb.Fatalf("Failed to initialize Redis downlink task queue: %s", test.FormatError(err))
 	}

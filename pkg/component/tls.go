@@ -30,7 +30,7 @@ func (c *Component) getTLSConfig(ctx context.Context) tlsconfig.Config {
 			conf.Source = "acme"
 		case conf.Certificate != "" && conf.Key != "":
 			conf.Source = "file"
-		case !conf.KeyVault.IsZero():
+		case conf.KeyVault.ID != "":
 			conf.Source = "key-vault"
 		}
 	}

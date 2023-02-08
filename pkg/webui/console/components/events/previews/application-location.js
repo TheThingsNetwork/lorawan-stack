@@ -29,7 +29,12 @@ const ApplicationLocationPreview = React.memo(({ event }) => {
       <DescriptionList.Item title={sharedMessages.longitude} data={longitude} />
       <DescriptionList.Item title={sharedMessages.altitude} data={altitude} />
       <DescriptionList.Item title={sharedMessages.accuracy} data={accuracy} />
-      <DescriptionList.Item title={sharedMessages.source} data={source.replace(/^(SOURCE_)/, '')} />
+      {source && (
+        <DescriptionList.Item
+          title={sharedMessages.source}
+          data={source.replace(/^(SOURCE_)/, '')}
+        />
+      )}
     </DescriptionList>
   )
 })
