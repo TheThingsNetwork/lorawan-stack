@@ -11,18 +11,26 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
-- Network Server ID (NSID) used for Backend Interfaces interoperability via the `ns.interop.id` and `dcs.edcs.ns-id` configuration options.
-  - In the Network Server, `ns.interop.id` acts as a fallback value for `sender-ns-id` in Join Server interoperability configuration.
-
 ### Changed
 
 ### Deprecated
 
-- Device Claiming Server configuration option `dcs.edcs.network-server.home-ns-id`. Use `dcs.edcs.ns-id` instead.
-
 ### Removed
 
 ### Fixed
+
+### Security
+
+## [3.24.1] - unreleased
+
+### Added
+
+- Network Server ID (NSID) used for Backend Interfaces interoperability via the `ns.interop.id` and `dcs.edcs.ns-id` configuration options.
+  - In the Network Server, `ns.interop.id` acts as a fallback value for `sender-ns-id` in Join Server interoperability configuration.
+
+### Deprecated
+
+- Device Claiming Server configuration option `dcs.edcs.network-server.home-ns-id`. Use `dcs.edcs.ns-id` instead.
 
 ### Security
 
@@ -2480,7 +2488,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.24.0...v3.24
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.24.1...v3.24
+[3.24.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.24.0...v3.24.1
 [3.24.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.23.2...v3.24.0
 [3.23.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.23.1...v3.23.2
 [3.23.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.23.0...v3.23.1
