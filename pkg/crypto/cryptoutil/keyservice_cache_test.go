@@ -97,6 +97,15 @@ func TestCacheUsed(t *testing.T) {
 	a.So(err, should.Equal, m.results.err)
 	a.So(m.calls.count, should.Equal, 1)
 
+	// Expect a cache miss with the same KEK label but different ciphertext
+	m.results.key = []byte{0x04, 0x05, 0x06}
+	m.results.err = nil
+	key, err = ck.Unwrap(ctx, []byte{0x05, 0x06, 0x07}, "foo")
+
+	a.So(key, should.Resemble, m.results.key)
+	a.So(err, should.Equal, m.results.err)
+	a.So(m.calls.count, should.Equal, 2)
+
 	// Expect the old element to be evicted, and a cache miss to occur
 	m.results.key = []byte{0x05, 0x06, 0x07}
 	m.results.err = nil
