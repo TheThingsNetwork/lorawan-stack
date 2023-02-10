@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Key vault cache time-to-live for errors configuration option `key-vault.cache.error-ttl`. This defaults to `key-vault.cache.ttl`.
+
 ### Changed
 
 ### Deprecated
