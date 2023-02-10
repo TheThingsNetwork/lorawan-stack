@@ -11,8 +11,6 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
-- Key vault cache time-to-live for errors configuration option `key-vault.cache.error-ttl`. This defaults to `key-vault.cache.ttl`.
-
 ### Changed
 
 ### Deprecated
@@ -20,8 +18,6 @@ For details about compatibility between different releases, see the **Commitment
 ### Removed
 
 ### Fixed
-
-- Key unwrap caching.
 
 ### Security
 
@@ -35,6 +31,10 @@ For details about compatibility between different releases, see the **Commitment
 ### Deprecated
 
 - Device Claiming Server configuration option `dcs.edcs.network-server.home-ns-id`. Use `dcs.edcs.ns-id` instead.
+
+### Fixed
+
+- Key unwrap caching.
 
 ### Security
 
