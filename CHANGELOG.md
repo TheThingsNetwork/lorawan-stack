@@ -21,6 +21,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Key unwrap caching.
+
 ### Security
 
 ## [3.24.1] - unreleased
