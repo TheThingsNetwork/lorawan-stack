@@ -160,8 +160,9 @@ type Rights struct {
 
 // KeyVaultCache represents the configuration for key vault caching.
 type KeyVaultCache struct {
-	Size int           `name:"size" description:"Cache size. Caching is disabled if size is 0"`
-	TTL  time.Duration `name:"ttl" description:"Cache elements time to live. No expiration mechanism is used if TTL is 0"`
+	Size     int           `name:"size" description:"Cache size. Caching is disabled if size is 0"`
+	TTL      time.Duration `name:"ttl" description:"Cache elements time to live. No expiration mechanism is used if TTL is 0"` //nolint:lll
+	ErrorTTL time.Duration `name:"error-ttl" description:"Cache elements time to live for errors. If 0, the TTL is used"`
 }
 
 // KeyVault represents configuration for key vaults.
@@ -192,8 +193,12 @@ func (v KeyVault) KeyService(ctx context.Context, httpClientProvider httpclient.
 		kv = cryptoutil.EmptyKeyVault
 	}
 	if v.Cache.Size > 0 {
+		errTTL := v.Cache.ErrorTTL
+		if errTTL == 0 {
+			errTTL = v.Cache.TTL
+		}
 		kv = cryptoutil.NewCacheKeyVault(kv,
-			cryptoutil.WithCacheKeyVaultTTL(v.Cache.TTL),
+			cryptoutil.WithCacheKeyVaultTTL(v.Cache.TTL, errTTL),
 			cryptoutil.WithCacheKeyVaultSize(v.Cache.Size),
 		)
 	}
