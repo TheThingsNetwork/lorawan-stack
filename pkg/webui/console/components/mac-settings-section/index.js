@@ -150,7 +150,7 @@ const MacSettingsSection = props => {
   const [isCollapsed, setIsCollapsed] = React.useState(initiallyCollapsed)
   const handleIsCollapsedChange = React.useCallback(() => {
     if (!isCollapsed && pingPeriodicityRequired) {
-      // Do not close section if `ping_slot_perdiodicity` is required.
+      // Do not close section if `ping_slot_periodicity` is required.
       return
     }
 

@@ -146,7 +146,7 @@ const validationSchema = Yup.object()
             )
           }),
           desired_beacon_frequency: Yup.lazy(() => {
-            if (!isClassB || mode !== ACTIVATION_MODES.MULTICAST) {
+            if (!isClassB || mode === ACTIVATION_MODES.MULTICAST) {
               return Yup.number().strip()
             }
 
@@ -180,7 +180,7 @@ const validationSchema = Yup.object()
               .max(15, Yup.passValues(sharedMessages.validateNumberLte))
           }),
           desired_rx1_delay: Yup.lazy(delay => {
-            if (delay === undefined || delay === '' || mode !== ACTIVATION_MODES.MULTICAST) {
+            if (delay === undefined || delay === '' || mode === ACTIVATION_MODES.MULTICAST) {
               return Yup.number().strip()
             }
 

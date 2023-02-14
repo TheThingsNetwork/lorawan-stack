@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Desired RX1 delay and desired beacon frequency not being possible to set for OTAA devices.
+
 ### Security
 
 ## [3.24.1] - unreleased
