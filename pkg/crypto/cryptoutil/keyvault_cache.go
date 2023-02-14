@@ -44,15 +44,16 @@ func (f CacheKeyVaultClockFunc) Now() time.Time {
 }
 
 type cacheKeyVault struct {
-	inner crypto.KeyVault
-	cache gcache.Cache
-	clock CacheKeyVaultClock
+	inner       crypto.KeyVault
+	cache       gcache.Cache
+	ttl, errTTL time.Duration
+	clock       CacheKeyVaultClock
 }
 
 type cacheKeyVaultOptions struct {
-	ttl   time.Duration
-	size  int
-	clock CacheKeyVaultClock
+	ttl, errTTL time.Duration
+	size        int
+	clock       CacheKeyVaultClock
 }
 
 // CacheKeyVaultOption configures CacheKeyVault.
@@ -74,9 +75,10 @@ func WithCacheKeyVaultSize(size int) CacheKeyVaultOption {
 }
 
 // WithCacheKeyVaultTTL configures the time-to-live of the cache. If 0, no expiry is used.
-func WithCacheKeyVaultTTL(ttl time.Duration) CacheKeyVaultOption {
+func WithCacheKeyVaultTTL(ttl, errTTL time.Duration) CacheKeyVaultOption {
 	return cacheKeyVaultOptionFunc(func(opts *cacheKeyVaultOptions) {
 		opts.ttl = ttl
+		opts.errTTL = errTTL
 	})
 }
 
@@ -99,16 +101,15 @@ func NewCacheKeyVault(inner crypto.KeyVault, opts ...CacheKeyVaultOption) crypto
 		opt.apply(options)
 	}
 	builder := gcache.New(options.size).ARC()
-	if options.ttl != 0 {
-		builder = builder.Expiration(options.ttl)
-	}
 	if options.clock != nil {
 		builder = builder.Clock(options.clock)
 	}
 	return &cacheKeyVault{
-		inner: inner,
-		cache: builder.Build(),
-		clock: options.clock,
+		inner:  inner,
+		cache:  builder.Build(),
+		ttl:    options.ttl,
+		errTTL: options.errTTL,
+		clock:  options.clock,
 	}
 }
 
@@ -124,11 +125,14 @@ func (c *cacheKeyVault) getOrLoad(
 	}
 	crypto.RegisterCacheMiss(ctx, cache)
 	val, ttl, err := loaderFn()
-	if ttl != 0 {
-		c.cache.SetWithExpire(cacheKey, &cacheKeyCacheEntry{val, err}, ttl) //nolint:errcheck
-	} else {
-		c.cache.Set(cacheKey, &cacheKeyCacheEntry{val, err}) //nolint:errcheck
+	if ttl == 0 {
+		if err == nil {
+			ttl = c.ttl
+		} else {
+			ttl = c.errTTL
+		}
 	}
+	c.cache.SetWithExpire(cacheKey, &cacheKeyCacheEntry{val, err}, ttl) //nolint:errcheck
 	return val, err
 }
 

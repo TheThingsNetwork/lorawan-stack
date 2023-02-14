@@ -21,6 +21,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
+	"errors"
 	"math/big"
 	"testing"
 	"time"
@@ -74,44 +75,53 @@ func TestCacheKeyVault(t *testing.T) {
 
 	var (
 		keys, serverCerts []string
-		now               = &mockClock{time.Now()}
+		ref               = time.Now()
+		now               = &mockClock{ref}
+		err               error
 	)
-	kv := cryptoutil.NewCacheKeyVault(&mockKeyVault{
-		KeyFunc: func(ctx context.Context, label string) ([]byte, error) {
-			keys = append(keys, label)
-			return []byte(label), nil
+	kv := cryptoutil.NewCacheKeyVault(
+		&mockKeyVault{
+			KeyFunc: func(ctx context.Context, label string) ([]byte, error) {
+				keys = append(keys, label)
+				if label == "error" {
+					return nil, errors.New("error")
+				}
+				return []byte(label), nil
+			},
+			ServerCertificateFunc: func(ctx context.Context, label string) (tls.Certificate, error) {
+				serverCerts = append(serverCerts, label)
+				tmpl := &x509.Certificate{
+					IsCA: true,
+					Subject: pkix.Name{
+						CommonName: label,
+					},
+					DNSNames: []string{label},
+					NotAfter: time.Now().Add(3 * time.Hour),
+					ExtKeyUsage: []x509.ExtKeyUsage{
+						x509.ExtKeyUsageServerAuth,
+					},
+					SerialNumber: big.NewInt(1),
+				}
+				key, err := rsa.GenerateKey(rand.Reader, 2048)
+				if err != nil {
+					return tls.Certificate{}, err
+				}
+				cert, err := x509.CreateCertificate(rand.Reader, tmpl, tmpl, &key.PublicKey, key)
+				if err != nil {
+					return tls.Certificate{}, err
+				}
+				return tls.Certificate{Certificate: [][]byte{cert}}, nil
+			},
 		},
-		ServerCertificateFunc: func(ctx context.Context, label string) (tls.Certificate, error) {
-			serverCerts = append(serverCerts, label)
-			tmpl := &x509.Certificate{
-				IsCA: true,
-				Subject: pkix.Name{
-					CommonName: label,
-				},
-				DNSNames: []string{label},
-				NotAfter: time.Now().Add(3 * time.Hour),
-				ExtKeyUsage: []x509.ExtKeyUsage{
-					x509.ExtKeyUsageServerAuth,
-				},
-				SerialNumber: big.NewInt(1),
-			}
-			key, err := rsa.GenerateKey(rand.Reader, 2048)
-			if err != nil {
-				return tls.Certificate{}, err
-			}
-			cert, err := x509.CreateCertificate(rand.Reader, tmpl, tmpl, &key.PublicKey, key)
-			if err != nil {
-				return tls.Certificate{}, err
-			}
-			return tls.Certificate{Certificate: [][]byte{cert}}, nil
-		},
-	}, cryptoutil.WithCacheKeyVaultClock(now))
+		cryptoutil.WithCacheKeyVaultClock(now),
+		cryptoutil.WithCacheKeyVaultTTL(4*time.Hour, 5*time.Minute),
+	)
 
-	test.Must(kv.Key(ctx, "key1"))
-	test.Must(kv.Key(ctx, "key1"))
-	test.Must(kv.Key(ctx, "key2"))
-	test.Must(kv.Key(ctx, "key1"))
-	test.Must(kv.Key(ctx, "key2"))
+	a.So(test.Must(kv.Key(ctx, "key1")).([]byte), should.Resemble, []byte("key1"))
+	a.So(test.Must(kv.Key(ctx, "key1")).([]byte), should.Resemble, []byte("key1"))
+	a.So(test.Must(kv.Key(ctx, "key2")).([]byte), should.Resemble, []byte("key2"))
+	a.So(test.Must(kv.Key(ctx, "key1")).([]byte), should.Resemble, []byte("key1"))
+	a.So(test.Must(kv.Key(ctx, "key2")).([]byte), should.Resemble, []byte("key2"))
 	a.So(keys, should.Resemble, []string{"key1", "key2"})
 
 	test.Must(kv.ServerCertificate(ctx, "server1.example.com"))
@@ -119,14 +129,27 @@ func TestCacheKeyVault(t *testing.T) {
 	test.Must(kv.ServerCertificate(ctx, "server1.example.com"))
 	a.So(serverCerts, should.Resemble, []string{"server1.example.com", "server2.example.com"})
 
-	// 1 hour later, the certficates are still valid.
-	now.Time = time.Now().Add(1 * time.Hour)
+	// Errors are also cached.
+	_, err = kv.Key(ctx, "error")
+	a.So(err, should.NotBeNil)
+	_, err = kv.Key(ctx, "error")
+	a.So(err, should.NotBeNil)
+	a.So(keys, should.Resemble, []string{"key1", "key2", "error"})
+
+	// 10 minutes after reference time, the error is no longer cached.
+	now.Time = ref.Add(10 * time.Minute)
+	_, err = kv.Key(ctx, "error")
+	a.So(err, should.NotBeNil)
+	a.So(keys, should.Resemble, []string{"key1", "key2", "error", "error"})
+
+	// 1 hour after reference time, the certficates are still valid.
+	now.Time = ref.Add(1 * time.Hour)
 	test.Must(kv.ServerCertificate(ctx, "server1.example.com"))
 	test.Must(kv.ServerCertificate(ctx, "server2.example.com"))
 	a.So(serverCerts, should.Resemble, []string{"server1.example.com", "server2.example.com"})
 
-	// 3 hours later, the certificates are expired.
-	now.Time = time.Now().Add(3 * time.Hour)
+	// 3 hours after reference time, the certificates are expired.
+	now.Time = ref.Add(3 * time.Hour)
 	test.Must(kv.ServerCertificate(ctx, "server1.example.com"))
 	test.Must(kv.ServerCertificate(ctx, "server2.example.com"))
 	a.So(serverCerts, should.Resemble, []string{

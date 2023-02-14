@@ -61,8 +61,10 @@ func (c *cacheKeyService) getOrLoad(
 }
 
 func (c *cacheKeyService) Unwrap(ctx context.Context, ciphertext []byte, kekLabel string) ([]byte, error) {
-	res, err := c.getOrLoad(ctx, crypto.CacheUnwrap, kekLabel, func() (interface{}, error) {
-		return c.KeyService.Unwrap(ctx, ciphertext, kekLabel)
-	})
+	res, err := c.getOrLoad(ctx, crypto.CacheUnwrap, fmt.Sprintf("%s:%X", kekLabel, ciphertext),
+		func() (interface{}, error) {
+			return c.KeyService.Unwrap(ctx, ciphertext, kekLabel)
+		},
+	)
 	return res.([]byte), err
 }
