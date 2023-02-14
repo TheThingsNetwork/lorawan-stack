@@ -40,8 +40,18 @@ var (
 	errReadOnlyField        = errors.DefineInvalidArgument("read_only_field", "read-only field `{field}`")
 )
 
-// SchemaVersion is the Network Server database schema version. Bump when a migration is required.
-const SchemaVersion = 1
+// DeviceSchemaVersion is the Network Server database schema version regarding the devices namespace.
+// Bump when a migration is required to the devices namespace.
+const DeviceSchemaVersion = 1
+
+// UplinkSchemaVersion is the Network Server database schema version regarding the uplink namespace.
+// Bump when a migration is required to the uplink namespace.
+const UplinkSchemaVersion = 1
+
+// UnsupportedDeviceMigrationVersionBreakpoint indicates the breakpoint for versions that
+// cannot be auto-migrated to latest. Use v3.24.0 of The Things Stack to migrate
+// to a supported SchemaVersion before migrating to latest.
+const UnsupportedDeviceMigrationVersionBreakpoint = 1
 
 // DeviceRegistry is an implementation of networkserver.DeviceRegistry.
 type DeviceRegistry struct {
