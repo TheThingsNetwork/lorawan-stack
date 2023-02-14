@@ -16,7 +16,6 @@
 package simulate
 
 import (
-	"strings"
 	"time"
 
 	"github.com/gogo/protobuf/types"
@@ -24,31 +23,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
-
-func _processPaths(paths []string) map[string][]string {
-	if len(paths) == 0 {
-		return nil
-	}
-	pathMap := make(map[string][]string, len(paths))
-	for _, p := range paths {
-		if !strings.Contains(p, ".") {
-			pathMap[p] = nil
-			continue
-		}
-		parts := strings.SplitN(p, ".", 2)
-		h, t := parts[0], parts[1]
-		if val, ok := pathMap[h]; ok {
-			if val == nil {
-				continue
-			}
-			pathMap[h] = append(pathMap[h], t)
-		} else {
-			pathMap[h] = []string{t}
-		}
-	}
-
-	return pathMap
-}
 
 var (
 	errDataRate             = errors.DefineInvalidArgument("data_rate", "data rate is invalid")
@@ -59,7 +33,7 @@ var (
 // SetDefaults sets the defaults for the struct where relevant.
 //
 //nolint:gocyclo
-func (m *SimulateMetadataParams) SetDefaults() error {
+func SetDefaults(m *ttnpb.SimulateMetadataParams) error {
 	if m.Time == nil || (m.Time.Nanos == 0 && m.Time.Seconds == 0) {
 		now := time.Now()
 		m.Time = ttnpb.ProtoTime(&now)
@@ -72,10 +46,10 @@ func (m *SimulateMetadataParams) SetDefaults() error {
 	if m.BandId == "" {
 		m.BandId = band.EU_863_870
 	}
-	if m.LoRaWAN_PHYVersion == ttnpb.PHYVersion_PHY_UNKNOWN {
-		m.LoRaWAN_PHYVersion = ttnpb.PHYVersion_RP001_V1_0_2_REV_B
+	if m.LorawanPhyVersion == ttnpb.PHYVersion_PHY_UNKNOWN {
+		m.LorawanPhyVersion = ttnpb.PHYVersion_RP001_V1_0_2_REV_B
 	}
-	phy, err := band.Get(m.BandId, m.LoRaWAN_PHYVersion)
+	phy, err := band.Get(m.BandId, m.LorawanPhyVersion)
 	if err != nil {
 		return err
 	}
