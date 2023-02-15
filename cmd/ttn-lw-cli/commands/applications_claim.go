@@ -22,12 +22,14 @@ import (
 
 var (
 	applicationClaim = &cobra.Command{
-		Use:   "claim",
-		Short: "Manage claim settings in applications",
+		Use:        "claim",
+		Deprecated: "Device claiming is deprecated and will be removed.",
+		Short:      "Manage claim settings in applications",
 	}
 	applicationClaimAuthorize = &cobra.Command{
-		Use:   "authorize [application-id]",
-		Short: "Authorize an application for claiming (EXPERIMENTAL)",
+		Use:        "authorize [application-id]",
+		Deprecated: "Device claiming is deprecated and will be removed.",
+		Short:      "Authorize an application for claiming (EXPERIMENTAL)",
 		Long: `Authorize an application for claiming (EXPERIMENTAL)
 
 The given API key must have devices and device keys read/write rights. If no API
@@ -79,8 +81,9 @@ key is provided, a new API key will be created.`,
 		},
 	}
 	applicationClaimUnauthorize = &cobra.Command{
-		Use:   "unauthorize [application-id]",
-		Short: "Unauthorize an application for claiming (EXPERIMENTAL)",
+		Use:        "unauthorize [application-id]",
+		Short:      "Unauthorize an application for claiming (EXPERIMENTAL)",
+		Deprecated: "Device claiming is deprecated and will be removed.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			appID := getApplicationID(cmd.Flags(), args)
 			if appID == nil {
@@ -102,7 +105,7 @@ key is provided, a new API key will be created.`,
 
 func init() {
 	applicationClaimAuthorize.Flags().String("api-key", "", "")
-	applicationClaimAuthorize.Flags().String("api-key-expiry", "", "API key expiry date (YYYY-MM-DD:HH:mm) - only applicable when creating API Key")
+	applicationClaimAuthorize.Flags().String("api-key-expiry", "", "API key expiry date (YYYY-MM-DD:HH:mm) - only applicable when creating API Key") //nolint:lll
 	applicationClaim.AddCommand(applicationClaimAuthorize)
 	applicationClaim.AddCommand(applicationClaimUnauthorize)
 	applicationClaim.PersistentFlags().AddFlagSet(applicationIDFlags())
