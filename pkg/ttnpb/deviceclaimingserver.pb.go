@@ -256,6 +256,8 @@ func (m *ClaimEndDeviceRequest_AuthenticatedIdentifiers) GetAuthenticationCode()
 	return ""
 }
 
+// DEPRECATED: Device claiming that transfers devices between applications is no longer supported and will be removed
+// in a future version of The Things Stack.
 type AuthorizeApplicationRequest struct {
 	ApplicationIds       *ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,proto3" json:"application_ids,omitempty"`
 	ApiKey               string                  `protobuf:"bytes,2,opt,name=api_key,json=apiKey,proto3" json:"api_key,omitempty"`
@@ -1057,9 +1059,13 @@ type EndDeviceClaimingServerClient interface {
 	// identifiers are the source application, where the devices are registered before they are claimed.
 	// The API key is used to access the application, find the device, verify the claim request and delete the end device
 	// from the source application.
+	// DEPRECATED: Device claiming that transfers devices between applications is no longer supported and will be removed
+	// in a future version of The Things Stack.
 	AuthorizeApplication(ctx context.Context, in *AuthorizeApplicationRequest, opts ...grpc.CallOption) (*types.Empty, error)
 	// Unauthorize the End Device Claiming Server to claim devices in the given application.
 	// This reverts the authorization given with rpc AuthorizeApplication.
+	// DEPRECATED: Device claiming that transfers devices between applications is no longer supported and will be removed
+	// in a future version of The Things Stack.
 	UnauthorizeApplication(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*types.Empty, error)
 }
 
@@ -1139,9 +1145,13 @@ type EndDeviceClaimingServerServer interface {
 	// identifiers are the source application, where the devices are registered before they are claimed.
 	// The API key is used to access the application, find the device, verify the claim request and delete the end device
 	// from the source application.
+	// DEPRECATED: Device claiming that transfers devices between applications is no longer supported and will be removed
+	// in a future version of The Things Stack.
 	AuthorizeApplication(context.Context, *AuthorizeApplicationRequest) (*types.Empty, error)
 	// Unauthorize the End Device Claiming Server to claim devices in the given application.
 	// This reverts the authorization given with rpc AuthorizeApplication.
+	// DEPRECATED: Device claiming that transfers devices between applications is no longer supported and will be removed
+	// in a future version of The Things Stack.
 	UnauthorizeApplication(context.Context, *ApplicationIdentifiers) (*types.Empty, error)
 }
 

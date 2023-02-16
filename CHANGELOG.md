@@ -15,6 +15,10 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Deprecated
 
+- Device claiming that transfer devices between applications is now deprecated and will be removed in a future version of The Things Stack. Device claiming on Join Servers, including The Things Join Server, remains functional. This deprecates the following components:
+  - API for managing application claim authorization (`EndDeviceClaimingServer.AuthorizeApplication` and `EndDeviceClaimingServer.UnauthorizeApplication`)
+  - CLI commands to manage application claim settings (`ttn-lw-cli application claim [authorize|unauthorize]`)
+
 ### Removed
 
 ### Fixed

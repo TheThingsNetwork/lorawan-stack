@@ -7714,7 +7714,7 @@
     },
     "/edcs/applications/{application_ids.application_id}/authorize": {
       "post": {
-        "summary": "Authorize the End Device Claiming Server to claim devices registered in the given application. The application\nidentifiers are the source application, where the devices are registered before they are claimed.\nThe API key is used to access the application, find the device, verify the claim request and delete the end device\nfrom the source application.",
+        "summary": "Authorize the End Device Claiming Server to claim devices registered in the given application. The application\nidentifiers are the source application, where the devices are registered before they are claimed.\nThe API key is used to access the application, find the device, verify the claim request and delete the end device\nfrom the source application.\nDEPRECATED: Device claiming that transfers devices between applications is no longer supported and will be removed\nin a future version of The Things Stack.",
         "operationId": "EndDeviceClaimingServer_AuthorizeApplication",
         "responses": {
           "200": {
@@ -7751,7 +7751,8 @@
                 "api_key": {
                   "type": "string"
                 }
-              }
+              },
+              "description": "DEPRECATED: Device claiming that transfers devices between applications is no longer supported and will be removed\nin a future version of The Things Stack."
             }
           }
         ],
@@ -7762,7 +7763,7 @@
     },
     "/edcs/applications/{application_id}/authorize": {
       "delete": {
-        "summary": "Unauthorize the End Device Claiming Server to claim devices in the given application.\nThis reverts the authorization given with rpc AuthorizeApplication.",
+        "summary": "Unauthorize the End Device Claiming Server to claim devices in the given application.\nThis reverts the authorization given with rpc AuthorizeApplication.\nDEPRECATED: Device claiming that transfers devices between applications is no longer supported and will be removed\nin a future version of The Things Stack.",
         "operationId": "EndDeviceClaimingServer_UnauthorizeApplication",
         "responses": {
           "200": {
