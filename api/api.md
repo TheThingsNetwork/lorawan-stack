@@ -4104,7 +4104,7 @@ After registering an end device, it also needs to be registered in the NsEndDevi
 | `BatchUpdateLastSeen` | [`BatchUpdateEndDeviceLastSeenRequest`](#ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Update the last seen timestamp for a batch of end devices. |
 | `Delete` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the end device with the given IDs.
 
-Before deleting an end device it first needs to be deleted from the NsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry. This is NOT done automatically. |
+Before deleting an end device it first needs to be deleted from the NsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry. In addition, if the device claimed on a Join Server, it also needs to be unclaimed via the DeviceClaimingServer so it can be claimed in the future. This is NOT done automatically. |
 
 #### HTTP bindings
 

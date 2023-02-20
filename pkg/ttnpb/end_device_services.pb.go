@@ -114,6 +114,8 @@ type EndDeviceRegistryClient interface {
 	//
 	// Before deleting an end device it first needs to be deleted from the
 	// NsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry.
+	// In addition, if the device claimed on a Join Server, it also needs to be
+	// unclaimed via the DeviceClaimingServer so it can be claimed in the future.
 	// This is NOT done automatically.
 	Delete(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*types.Empty, error)
 }
@@ -216,6 +218,8 @@ type EndDeviceRegistryServer interface {
 	//
 	// Before deleting an end device it first needs to be deleted from the
 	// NsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry.
+	// In addition, if the device claimed on a Join Server, it also needs to be
+	// unclaimed via the DeviceClaimingServer so it can be claimed in the future.
 	// This is NOT done automatically.
 	Delete(context.Context, *EndDeviceIdentifiers) (*types.Empty, error)
 }

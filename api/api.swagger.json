@@ -986,7 +986,7 @@
     "/applications/{application_ids.application_id}/devices/{device_id}": {
       "delete": {
         "summary": "Delete the end device with the given IDs.",
-        "description": "Before deleting an end device it first needs to be deleted from the\nNsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry.\nThis is NOT done automatically.",
+        "description": "Before deleting an end device it first needs to be deleted from the\nNsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry.\nIn addition, if the device claimed on a Join Server, it also needs to be\nunclaimed via the DeviceClaimingServer so it can be claimed in the future.\nThis is NOT done automatically.",
         "operationId": "EndDeviceRegistry_Delete",
         "responses": {
           "200": {
