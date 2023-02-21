@@ -23,6 +23,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- The CLI now continues deleting devices when unclaiming from the Join Server fails. This resembles the behavior in the Console. This no longer stops devices from being deleted if the Join Server is unavailable or the claim is not held.
+
 ### Security
 
 ## [3.24.1] - 2023-02-16
