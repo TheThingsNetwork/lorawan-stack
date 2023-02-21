@@ -1098,9 +1098,10 @@ var (
 				if claimInfoResp.SupportsClaiming {
 					_, err = ttnpb.NewEndDeviceClaimingServerClient(dcs).Unclaim(ctx, devID)
 					if err != nil {
-						return errEndDeviceUnclaim.WithCause(err)
+						logger.WithError(err).Warn("Failed to unclaim end device")
+					} else {
+						logger.Info("Device successfully unclaimed")
 					}
-					logger.Info("Device successfully unclaimed")
 					skipClusterJS = true
 				}
 			} else if jsMismatch {
