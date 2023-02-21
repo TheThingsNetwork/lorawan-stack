@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+const extensionValue = (parts, letter) => parts.find(part => part.startsWith(letter))?.substring(1)
+
 // Parse the QR code using the LoRa Alliance TR005 Draft 3 and final specifications.
 // See https://lora-alliance.org/wp-content/uploads/2020/11/TR005_LoRaWAN_Device_Identification_QR_Codes.pdf
 // If the prefix is not recognized, this function returns undefined.
+// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/6059).
 // eslint-disable-next-line import/prefer-default-export
 export const readDeviceQr = qrCode => {
   if (Boolean(qrCode.match(/^LW:D0:/))) {
@@ -25,11 +28,12 @@ export const readDeviceQr = qrCode => {
     // of the corresponding field. So when parsing we need to also split that
     // and only include the actual field data.
     // e.g `LW:D0:1122334455667788:AABBCCDDEEFF0011:AABB1122:OAABBCCDDEEFF:SYYWWNNNNNN:PFOOBAR:CAF2C`
+    const extensions = parts.slice(5)
     const optionalTags = {
-      ownerToken: parts[5]?.split('O')[1],
-      serNum: parts[6]?.split('S')[1],
-      proprietary: parts[7]?.split('P')[1],
-      checkSum: parts[8]?.split('C')[1],
+      ownerToken: extensionValue(extensions, 'O'),
+      serNum: extensionValue(extensions, 'S'),
+      proprietary: extensionValue(extensions, 'P'),
+      checkSum: extensionValue(extensions, 'C'),
     }
     return {
       formatId: 'tr005',
@@ -45,6 +49,7 @@ export const readDeviceQr = qrCode => {
   } else if (Boolean(qrCode.match(/^URN:DEV:LW:/))) {
     // Good to know: draft versions are deprecated.
     const parts = qrCode.split(':')[3].split('_')
+    const extensions = parts.slice(3)
     return {
       formatId: 'tr005draft3',
       joinEUI: parts[0],
@@ -53,7 +58,7 @@ export const readDeviceQr = qrCode => {
         vendorID: parts[2].substring(0, 4),
         vendorProfileID: parts[2].substring(4, 8),
       },
-      ownerToken: parts[3],
+      ownerToken: extensionValue(extensions, 'V'),
       qrCode,
     }
   } else if (Boolean(qrCode.match(/^URN:LW:DP:/))) {
