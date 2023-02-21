@@ -24,6 +24,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
+const tracerNamespace = "go.thethings.network/lorawan-stack/pkg/gatewayserver"
+
 var (
 	evtGatewayConnect = events.Define(
 		"gs.gateway.connect", "connect gateway",

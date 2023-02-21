@@ -47,6 +47,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/devicerepository"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/javascript"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -105,7 +106,12 @@ var errListenFrontend = errors.DefineFailedPrecondition("listen_frontend", "fail
 
 // New returns new *ApplicationServer.
 func New(c *component.Component, conf *Config) (as *ApplicationServer, err error) {
-	ctx := log.NewContextWithField(c.Context(), "namespace", "applicationserver")
+	c.AddContextFiller(func(ctx context.Context) context.Context {
+		return tracer.NewContextWithTracer(ctx, tracerNamespace)
+	})
+	ctx := tracer.NewContextWithTracer(c.Context(), tracerNamespace)
+
+	ctx = log.NewContextWithField(ctx, "namespace", "applicationserver")
 
 	baseConf := c.GetBaseConfig(ctx)
 

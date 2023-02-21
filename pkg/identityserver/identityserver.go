@@ -35,6 +35,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/webui"
 	"google.golang.org/grpc"
@@ -137,9 +138,14 @@ var errDBNeedsMigration = errors.Define("db_needs_migration", "the database need
 
 // New returns new *IdentityServer.
 func New(c *component.Component, config *Config) (is *IdentityServer, err error) {
+	c.AddContextFiller(func(ctx context.Context) context.Context {
+		return tracer.NewContextWithTracer(ctx, tracerNamespace)
+	})
+	ctx := tracer.NewContextWithTracer(c.Context(), tracerNamespace)
+
 	is = &IdentityServer{
 		Component: c,
-		ctx:       log.NewContextWithField(c.Context(), "namespace", "identityserver"),
+		ctx:       log.NewContextWithField(ctx, "namespace", "identityserver"),
 		config:    config,
 	}
 

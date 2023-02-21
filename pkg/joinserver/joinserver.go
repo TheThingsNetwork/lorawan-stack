@@ -34,6 +34,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"google.golang.org/grpc"
@@ -82,12 +83,17 @@ func validateConfig(conf *Config) error {
 
 // New returns new *JoinServer.
 func New(c *component.Component, conf *Config) (*JoinServer, error) {
+	c.AddContextFiller(func(ctx context.Context) context.Context {
+		return tracer.NewContextWithTracer(ctx, tracerNamespace)
+	})
+	ctx := tracer.NewContextWithTracer(c.Context(), tracerNamespace)
+
 	if err := validateConfig(conf); err != nil {
 		return nil, err
 	}
 	js := &JoinServer{
 		Component: c,
-		ctx:       log.NewContextWithField(c.Context(), "namespace", "joinserver"),
+		ctx:       log.NewContextWithField(ctx, "namespace", "joinserver"),
 
 		devices:                       conf.Devices,
 		keys:                          conf.Keys,

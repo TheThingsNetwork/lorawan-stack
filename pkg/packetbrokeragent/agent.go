@@ -24,6 +24,9 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	routingpb "go.packetbroker.org/api/routing"
 	packetbroker "go.packetbroker.org/api/v3"
+	"google.golang.org/grpc"
+	"gopkg.in/square/go-jose.v2"
+
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
@@ -33,12 +36,11 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
-	"google.golang.org/grpc"
-	"gopkg.in/square/go-jose.v2"
 )
 
 const (
@@ -151,7 +153,9 @@ var (
 
 // New returns a new Packet Broker Agent.
 func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
-	ctx := log.NewContextWithField(c.Context(), "namespace", "packetbrokeragent")
+	ctx := tracer.NewContextWithTracer(c.Context(), tracerNamespace)
+
+	ctx = log.NewContextWithField(ctx, "namespace", logNamespace)
 	logger := log.FromContext(ctx)
 
 	var devAddrPrefixes []types.DevAddrPrefix

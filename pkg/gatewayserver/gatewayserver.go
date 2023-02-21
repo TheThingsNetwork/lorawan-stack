@@ -50,6 +50,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -113,6 +114,11 @@ var (
 
 // New returns new *GatewayServer.
 func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServer, err error) {
+	c.AddContextFiller(func(ctx context.Context) context.Context {
+		return tracer.NewContextWithTracer(ctx, tracerNamespace)
+	})
+	ctx := tracer.NewContextWithTracer(c.Context(), tracerNamespace)
+
 	forward, err := conf.ForwardDevAddrPrefixes()
 	if err != nil {
 		return nil, err
@@ -121,7 +127,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 		forward[""] = []types.DevAddrPrefix{{}}
 	}
 
-	ctx := log.NewContextWithField(c.Context(), "namespace", "gatewayserver")
+	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver")
 
 	gs = &GatewayServer{
 		Component:                 c,
