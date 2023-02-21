@@ -26,6 +26,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
@@ -237,7 +238,7 @@ func newGatewayStore(baseStore *baseStore) *gatewayStore {
 func (s *gatewayStore) CreateGateway(
 	ctx context.Context, pb *ttnpb.Gateway,
 ) (*ttnpb.Gateway, error) {
-	ctx, span := tracer.Start(ctx, "CreateGateway", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "CreateGateway", trace.WithAttributes(
 		attribute.String("gateway_id", pb.GetIds().GetGatewayId()),
 	))
 	defer span.End()
@@ -510,7 +511,7 @@ func (*gatewayStore) selectWithEUI(
 func (s *gatewayStore) FindGateways(
 	ctx context.Context, ids []*ttnpb.GatewayIdentifiers, fieldMask store.FieldMask,
 ) ([]*ttnpb.Gateway, error) {
-	ctx, span := tracer.Start(ctx, "FindGateways", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "FindGateways", trace.WithAttributes(
 		attribute.StringSlice("gateway_ids", idStrings(ids...)),
 	))
 	defer span.End()
@@ -541,7 +542,7 @@ func (s *gatewayStore) getGatewayModelBy(
 func (s *gatewayStore) GetGateway(
 	ctx context.Context, id *ttnpb.GatewayIdentifiers, fieldMask store.FieldMask,
 ) (*ttnpb.Gateway, error) {
-	ctx, span := tracer.Start(ctx, "GetGateway", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "GetGateway", trace.WithAttributes(
 		attribute.String("gateway_id", id.GetGatewayId()),
 	))
 	defer span.End()
@@ -771,7 +772,7 @@ func (s *gatewayStore) updateGatewayModel( //nolint:gocyclo
 func (s *gatewayStore) UpdateGateway(
 	ctx context.Context, pb *ttnpb.Gateway, fieldMask store.FieldMask,
 ) (*ttnpb.Gateway, error) {
-	ctx, span := tracer.Start(ctx, "UpdateGateway", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "UpdateGateway", trace.WithAttributes(
 		attribute.String("gateway_id", pb.GetIds().GetGatewayId()),
 	))
 	defer span.End()
@@ -802,7 +803,7 @@ func (s *gatewayStore) UpdateGateway(
 }
 
 func (s *gatewayStore) DeleteGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) error {
-	ctx, span := tracer.Start(ctx, "DeleteGateway", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "DeleteGateway", trace.WithAttributes(
 		attribute.String("gateway_id", id.GetGatewayId()),
 	))
 	defer span.End()
@@ -828,7 +829,7 @@ func (s *gatewayStore) DeleteGateway(ctx context.Context, id *ttnpb.GatewayIdent
 }
 
 func (s *gatewayStore) RestoreGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) error {
-	ctx, span := tracer.Start(ctx, "RestoreGateway", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "RestoreGateway", trace.WithAttributes(
 		attribute.String("gateway_id", id.GetGatewayId()),
 	))
 	defer span.End()
@@ -877,7 +878,7 @@ func (s *gatewayStore) RestoreGateway(ctx context.Context, id *ttnpb.GatewayIden
 }
 
 func (s *gatewayStore) PurgeGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) error {
-	ctx, span := tracer.Start(ctx, "PurgeGateway", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "PurgeGateway", trace.WithAttributes(
 		attribute.String("gateway_id", id.GetGatewayId()),
 	))
 	defer span.End()

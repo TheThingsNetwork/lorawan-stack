@@ -21,6 +21,7 @@ import (
 	"github.com/uptrace/bun"
 	"go.opentelemetry.io/otel/attribute"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 )
@@ -123,7 +124,7 @@ func getIDs[A interface{ GetIds() B }, B ttnpb.IDStringer](in []A, mods ...func(
 func (s *entitySearch) SearchApplications(
 	ctx context.Context, accountID *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchApplicationsRequest,
 ) ([]*ttnpb.ApplicationIdentifiers, error) {
-	ctx, span := tracer.Start(ctx, "SearchApplications")
+	ctx, span := tracer.StartFromContext(ctx, "SearchApplications")
 	defer span.End()
 
 	var selectors []func(*bun.SelectQuery) *bun.SelectQuery
@@ -164,7 +165,7 @@ func (s *entitySearch) SearchApplications(
 func (s *entitySearch) SearchClients(
 	ctx context.Context, accountID *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchClientsRequest,
 ) ([]*ttnpb.ClientIdentifiers, error) {
-	ctx, span := tracer.Start(ctx, "SearchClients")
+	ctx, span := tracer.StartFromContext(ctx, "SearchClients")
 	defer span.End()
 
 	var selectors []func(*bun.SelectQuery) *bun.SelectQuery
@@ -206,7 +207,7 @@ func (s *entitySearch) SearchClients(
 func (s *entitySearch) SearchEndDevices(
 	ctx context.Context, req *ttnpb.SearchEndDevicesRequest,
 ) ([]*ttnpb.EndDeviceIdentifiers, error) {
-	ctx, span := tracer.Start(ctx, "SearchEndDevices")
+	ctx, span := tracer.StartFromContext(ctx, "SearchEndDevices")
 	defer span.End()
 
 	var selectors []func(*bun.SelectQuery) *bun.SelectQuery
@@ -253,7 +254,7 @@ func (s *entitySearch) SearchEndDevices(
 func (s *entitySearch) SearchGateways(
 	ctx context.Context, accountID *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchGatewaysRequest,
 ) ([]*ttnpb.GatewayIdentifiers, error) {
-	ctx, span := tracer.Start(ctx, "SearchGateways")
+	ctx, span := tracer.StartFromContext(ctx, "SearchGateways")
 	defer span.End()
 
 	var selectors []func(*bun.SelectQuery) *bun.SelectQuery
@@ -299,7 +300,7 @@ func (s *entitySearch) SearchGateways(
 func (s *entitySearch) SearchOrganizations(
 	ctx context.Context, accountID *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchOrganizationsRequest,
 ) ([]*ttnpb.OrganizationIdentifiers, error) {
-	ctx, span := tracer.Start(ctx, "SearchOrganizations")
+	ctx, span := tracer.StartFromContext(ctx, "SearchOrganizations")
 	defer span.End()
 
 	var selectors []func(*bun.SelectQuery) *bun.SelectQuery
@@ -335,7 +336,7 @@ func (s *entitySearch) SearchOrganizations(
 func (s *entitySearch) SearchUsers(
 	ctx context.Context, req *ttnpb.SearchUsersRequest,
 ) ([]*ttnpb.UserIdentifiers, error) {
-	ctx, span := tracer.Start(ctx, "SearchUsers")
+	ctx, span := tracer.StartFromContext(ctx, "SearchUsers")
 	defer span.End()
 
 	var selectors []func(*bun.SelectQuery) *bun.SelectQuery
@@ -365,7 +366,7 @@ func (s *entitySearch) SearchUsers(
 func (s *entitySearch) SearchAccounts(
 	ctx context.Context, req *ttnpb.SearchAccountsRequest,
 ) ([]*ttnpb.OrganizationOrUserIdentifiers, error) {
-	ctx, span := tracer.Start(ctx, "SearchAccounts")
+	ctx, span := tracer.StartFromContext(ctx, "SearchAccounts")
 	defer span.End()
 
 	var selectQuery *bun.SelectQuery

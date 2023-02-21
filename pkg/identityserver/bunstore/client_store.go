@@ -24,6 +24,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -155,7 +156,7 @@ func newClientStore(baseStore *baseStore) *clientStore {
 func (s *clientStore) CreateClient(
 	ctx context.Context, pb *ttnpb.Client,
 ) (*ttnpb.Client, error) {
-	ctx, span := tracer.Start(ctx, "CreateClient", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "CreateClient", trace.WithAttributes(
 		attribute.String("client_id", pb.GetIds().GetClientId()),
 	))
 	defer span.End()
@@ -353,7 +354,7 @@ func (*clientStore) selectWithID(
 func (s *clientStore) FindClients(
 	ctx context.Context, ids []*ttnpb.ClientIdentifiers, fieldMask store.FieldMask,
 ) ([]*ttnpb.Client, error) {
-	ctx, span := tracer.Start(ctx, "FindClients", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "FindClients", trace.WithAttributes(
 		attribute.StringSlice("client_ids", idStrings(ids...)),
 	))
 	defer span.End()
@@ -384,7 +385,7 @@ func (s *clientStore) getClientModelBy(
 func (s *clientStore) GetClient(
 	ctx context.Context, id *ttnpb.ClientIdentifiers, fieldMask store.FieldMask,
 ) (*ttnpb.Client, error) {
-	ctx, span := tracer.Start(ctx, "GetClient", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "GetClient", trace.WithAttributes(
 		attribute.String("client_id", id.GetClientId()),
 	))
 	defer span.End()
@@ -515,7 +516,7 @@ func (s *clientStore) updateClientModel( //nolint:gocyclo
 func (s *clientStore) UpdateClient(
 	ctx context.Context, pb *ttnpb.Client, fieldMask store.FieldMask,
 ) (*ttnpb.Client, error) {
-	ctx, span := tracer.Start(ctx, "UpdateClient", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "UpdateClient", trace.WithAttributes(
 		attribute.String("client_id", pb.GetIds().GetClientId()),
 	))
 	defer span.End()
@@ -546,7 +547,7 @@ func (s *clientStore) UpdateClient(
 }
 
 func (s *clientStore) DeleteClient(ctx context.Context, id *ttnpb.ClientIdentifiers) error {
-	ctx, span := tracer.Start(ctx, "DeleteClient", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "DeleteClient", trace.WithAttributes(
 		attribute.String("client_id", id.GetClientId()),
 	))
 	defer span.End()
@@ -573,7 +574,7 @@ func (s *clientStore) DeleteClient(ctx context.Context, id *ttnpb.ClientIdentifi
 }
 
 func (s *clientStore) RestoreClient(ctx context.Context, id *ttnpb.ClientIdentifiers) error {
-	ctx, span := tracer.Start(ctx, "RestoreClient", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "RestoreClient", trace.WithAttributes(
 		attribute.String("client_id", id.GetClientId()),
 	))
 	defer span.End()
@@ -606,7 +607,7 @@ func (s *clientStore) RestoreClient(ctx context.Context, id *ttnpb.ClientIdentif
 }
 
 func (s *clientStore) PurgeClient(ctx context.Context, id *ttnpb.ClientIdentifiers) error {
-	ctx, span := tracer.Start(ctx, "PurgeClient", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "PurgeClient", trace.WithAttributes(
 		attribute.String("client_id", id.GetClientId()),
 	))
 	defer span.End()

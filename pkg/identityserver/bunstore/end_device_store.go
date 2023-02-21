@@ -25,6 +25,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
@@ -204,7 +205,7 @@ func newEndDeviceStore(baseStore *baseStore) *endDeviceStore {
 func (s *endDeviceStore) CreateEndDevice(
 	ctx context.Context, pb *ttnpb.EndDevice,
 ) (*ttnpb.EndDevice, error) {
-	ctx, span := tracer.Start(ctx, "CreateEndDevice", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "CreateEndDevice", trace.WithAttributes(
 		attribute.String("application_id", pb.GetIds().GetApplicationIds().GetApplicationId()),
 		attribute.String("device_id", pb.GetIds().GetDeviceId()),
 	))
@@ -429,7 +430,7 @@ func (*endDeviceStore) selectWithDevEUI(
 }
 
 func (s *endDeviceStore) CountEndDevices(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (uint64, error) {
-	ctx, span := tracer.Start(ctx, "CountEndDevices", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "CountEndDevices", trace.WithAttributes(
 		attribute.String("application_id", ids.GetApplicationId()),
 	))
 	defer span.End()
@@ -453,7 +454,7 @@ func (s *endDeviceStore) CountEndDevices(ctx context.Context, ids *ttnpb.Applica
 func (s *endDeviceStore) ListEndDevices(
 	ctx context.Context, ids *ttnpb.ApplicationIdentifiers, fieldMask store.FieldMask,
 ) ([]*ttnpb.EndDevice, error) {
-	ctx, span := tracer.Start(ctx, "ListEndDevices", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "ListEndDevices", trace.WithAttributes(
 		attribute.String("application_id", ids.GetApplicationId()),
 	))
 	defer span.End()
@@ -469,7 +470,7 @@ func (s *endDeviceStore) ListEndDevices(
 func (s *endDeviceStore) FindEndDevices(
 	ctx context.Context, ids []*ttnpb.EndDeviceIdentifiers, fieldMask store.FieldMask,
 ) ([]*ttnpb.EndDevice, error) {
-	ctx, span := tracer.Start(ctx, "FindEndDevices", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "FindEndDevices", trace.WithAttributes(
 		attribute.StringSlice("end_device_ids", idStrings(ids...)),
 	))
 	defer span.End()
@@ -520,7 +521,7 @@ func (s *endDeviceStore) getEndDeviceModelBy(
 func (s *endDeviceStore) GetEndDevice(
 	ctx context.Context, id *ttnpb.EndDeviceIdentifiers, fieldMask store.FieldMask,
 ) (*ttnpb.EndDevice, error) {
-	ctx, span := tracer.Start(ctx, "GetEndDevice", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "GetEndDevice", trace.WithAttributes(
 		attribute.String("application_id", id.GetApplicationIds().GetApplicationId()),
 		attribute.String("device_id", id.GetDeviceId()),
 	))
@@ -746,7 +747,7 @@ func (s *endDeviceStore) updateEndDeviceModel( //nolint:gocyclo
 func (s *endDeviceStore) UpdateEndDevice(
 	ctx context.Context, pb *ttnpb.EndDevice, fieldMask store.FieldMask,
 ) (*ttnpb.EndDevice, error) {
-	ctx, span := tracer.Start(ctx, "UpdateEndDevice", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "UpdateEndDevice", trace.WithAttributes(
 		attribute.String("application_id", pb.GetIds().GetApplicationIds().GetApplicationId()),
 		attribute.String("device_id", pb.GetIds().GetDeviceId()),
 	))
@@ -783,7 +784,7 @@ func (s *endDeviceStore) UpdateEndDevice(
 }
 
 func (s *endDeviceStore) DeleteEndDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) error {
-	ctx, span := tracer.Start(ctx, "DeleteEndDevice", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "DeleteEndDevice", trace.WithAttributes(
 		attribute.String("application_id", id.GetApplicationIds().GetApplicationId()),
 		attribute.String("device_id", id.GetDeviceId()),
 	))
@@ -840,7 +841,7 @@ func (s *endDeviceStore) BatchUpdateEndDeviceLastSeen(
 	ctx context.Context,
 	devsLastSeen []*ttnpb.BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate,
 ) error {
-	ctx, span := tracer.Start(ctx, "BatchUpdateEndDeviceLastSeen", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "BatchUpdateEndDeviceLastSeen", trace.WithAttributes(
 		attribute.Int("count", len(devsLastSeen)),
 	))
 	defer span.End()

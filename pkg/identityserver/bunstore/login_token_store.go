@@ -23,6 +23,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -81,7 +82,7 @@ func newLoginTokenStore(baseStore *baseStore) *loginTokenStore {
 func (s *loginTokenStore) FindActiveLoginTokens(
 	ctx context.Context, userIDs *ttnpb.UserIdentifiers,
 ) ([]*ttnpb.LoginToken, error) {
-	ctx, span := tracer.Start(ctx, "FindActiveLoginTokens", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "FindActiveLoginTokens", trace.WithAttributes(
 		attribute.String("user_id", userIDs.GetUserId()),
 	))
 	defer span.End()
@@ -114,7 +115,7 @@ func (s *loginTokenStore) FindActiveLoginTokens(
 }
 
 func (s *loginTokenStore) CreateLoginToken(ctx context.Context, pb *ttnpb.LoginToken) (*ttnpb.LoginToken, error) {
-	ctx, span := tracer.Start(ctx, "CreateLoginToken", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "CreateLoginToken", trace.WithAttributes(
 		attribute.String("user_id", pb.GetUserIds().GetUserId()),
 	))
 	defer span.End()
@@ -146,7 +147,7 @@ func (s *loginTokenStore) CreateLoginToken(ctx context.Context, pb *ttnpb.LoginT
 }
 
 func (s *loginTokenStore) ConsumeLoginToken(ctx context.Context, token string) (*ttnpb.LoginToken, error) {
-	ctx, span := tracer.Start(ctx, "ConsumeLoginToken")
+	ctx, span := tracer.StartFromContext(ctx, "ConsumeLoginToken")
 	defer span.End()
 
 	model := &LoginToken{}

@@ -23,6 +23,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -82,7 +83,7 @@ func newAPIKeyStore(baseStore *baseStore) *apiKeyStore {
 func (s *apiKeyStore) CreateAPIKey(
 	ctx context.Context, entityID *ttnpb.EntityIdentifiers, pb *ttnpb.APIKey,
 ) (*ttnpb.APIKey, error) {
-	ctx, span := tracer.Start(ctx, "CreateAPIKey", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "CreateAPIKey", trace.WithAttributes(
 		attribute.String("entity_type", entityID.EntityType()),
 		attribute.String("entity_id", entityID.IDString()),
 	))
@@ -180,7 +181,7 @@ func (*apiKeyStore) selectWithAPIKeyID(
 func (s *apiKeyStore) FindAPIKeys(
 	ctx context.Context, entityID *ttnpb.EntityIdentifiers,
 ) ([]*ttnpb.APIKey, error) {
-	ctx, span := tracer.Start(ctx, "FindAPIKeys", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "FindAPIKeys", trace.WithAttributes(
 		attribute.String("entity_type", entityID.EntityType()),
 		attribute.String("entity_id", entityID.IDString()),
 	))
@@ -211,7 +212,7 @@ func (s *apiKeyStore) getAPIKeyModelBy(
 func (s *apiKeyStore) GetAPIKey(
 	ctx context.Context, entityID *ttnpb.EntityIdentifiers, id string,
 ) (*ttnpb.APIKey, error) {
-	ctx, span := tracer.Start(ctx, "GetAPIKey", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "GetAPIKey", trace.WithAttributes(
 		attribute.String("entity_type", entityID.EntityType()),
 		attribute.String("entity_id", entityID.IDString()),
 		attribute.String("api_key_id", id),
@@ -248,7 +249,7 @@ func (s *apiKeyStore) GetAPIKey(
 func (s *apiKeyStore) GetAPIKeyByID(
 	ctx context.Context, id string,
 ) (*ttnpb.EntityIdentifiers, *ttnpb.APIKey, error) {
-	ctx, span := tracer.Start(ctx, "GetAPIKeyByID", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "GetAPIKeyByID", trace.WithAttributes(
 		attribute.String("api_key_id", id),
 	))
 	defer span.End()
@@ -278,7 +279,7 @@ func (s *apiKeyStore) GetAPIKeyByID(
 func (s *apiKeyStore) UpdateAPIKey(
 	ctx context.Context, entityID *ttnpb.EntityIdentifiers, pb *ttnpb.APIKey, fieldMask store.FieldMask,
 ) (*ttnpb.APIKey, error) {
-	ctx, span := tracer.Start(ctx, "UpdateAPIKey", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "UpdateAPIKey", trace.WithAttributes(
 		attribute.String("entity_type", entityID.EntityType()),
 		attribute.String("entity_id", entityID.IDString()),
 		attribute.String("api_key_id", pb.Id),
@@ -355,7 +356,7 @@ func (s *apiKeyStore) UpdateAPIKey(
 }
 
 func (s *apiKeyStore) DeleteEntityAPIKeys(ctx context.Context, entityID *ttnpb.EntityIdentifiers) error {
-	ctx, span := tracer.Start(ctx, "DeleteEntityAPIKeys", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "DeleteEntityAPIKeys", trace.WithAttributes(
 		attribute.String("entity_type", entityID.EntityType()),
 		attribute.String("entity_id", entityID.IDString()),
 	))

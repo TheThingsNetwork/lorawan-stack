@@ -23,6 +23,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 )
@@ -159,7 +160,7 @@ func (s *membershipStore) CountMemberships(
 func (s *membershipStore) FindMemberships(
 	ctx context.Context, accountID *ttnpb.OrganizationOrUserIdentifiers, entityType string, includeIndirect bool,
 ) ([]*ttnpb.EntityIdentifiers, error) {
-	ctx, span := tracer.Start(ctx, "FindMemberships", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "FindMemberships", trace.WithAttributes(
 		attribute.String("account_type", accountID.EntityType()),
 		attribute.String("account_id", accountID.IDString()),
 		attribute.String("entity_type", entityType),
@@ -219,7 +220,7 @@ func (*membershipStore) getOrganizationOrUserIdentifiers(
 func (s *membershipStore) FindAccountMembershipChains(
 	ctx context.Context, accountID *ttnpb.OrganizationOrUserIdentifiers, entityType string, entityIDs ...string,
 ) ([]*store.MembershipChain, error) {
-	ctx, span := tracer.Start(ctx, "FindAccountMembershipChains", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "FindAccountMembershipChains", trace.WithAttributes(
 		attribute.String("account_type", accountID.EntityType()),
 		attribute.String("account_id", accountID.IDString()),
 		attribute.String("entity_type", entityType),
@@ -312,7 +313,7 @@ func (s *membershipStore) FindAccountMembershipChains(
 func (s *membershipStore) FindMembers(
 	ctx context.Context, entityID *ttnpb.EntityIdentifiers,
 ) ([]*store.MemberByID, error) {
-	ctx, span := tracer.Start(ctx, "FindMembers", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "FindMembers", trace.WithAttributes(
 		attribute.String("entity_type", entityID.EntityType()),
 		attribute.String("entity_id", entityID.IDString()),
 	))
@@ -362,7 +363,7 @@ func (s *membershipStore) FindMembers(
 func (s *membershipStore) GetMember(
 	ctx context.Context, accountID *ttnpb.OrganizationOrUserIdentifiers, entityID *ttnpb.EntityIdentifiers,
 ) (*ttnpb.Rights, error) {
-	ctx, span := tracer.Start(ctx, "GetMember", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "GetMember", trace.WithAttributes(
 		attribute.String("account_type", accountID.EntityType()),
 		attribute.String("account_id", accountID.IDString()),
 		attribute.String("entity_type", entityID.EntityType()),
@@ -410,7 +411,7 @@ func (s *membershipStore) SetMember(
 	entityID *ttnpb.EntityIdentifiers,
 	rights *ttnpb.Rights,
 ) error {
-	ctx, span := tracer.Start(ctx, "SetMember", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "SetMember", trace.WithAttributes(
 		attribute.String("account_type", accountID.EntityType()),
 		attribute.String("account_id", accountID.IDString()),
 		attribute.String("entity_type", entityID.EntityType()),
@@ -483,7 +484,7 @@ func (s *membershipStore) SetMember(
 func (s *membershipStore) DeleteEntityMembers(
 	ctx context.Context, entityID *ttnpb.EntityIdentifiers,
 ) error {
-	ctx, span := tracer.Start(ctx, "DeleteEntityMembers", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "DeleteEntityMembers", trace.WithAttributes(
 		attribute.String("entity_type", entityID.EntityType()),
 		attribute.String("entity_id", entityID.IDString()),
 	))
@@ -509,7 +510,7 @@ func (s *membershipStore) DeleteEntityMembers(
 func (s *membershipStore) DeleteAccountMembers(
 	ctx context.Context, accountID *ttnpb.OrganizationOrUserIdentifiers,
 ) error {
-	ctx, span := tracer.Start(ctx, "DeleteAccountMembers", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "DeleteAccountMembers", trace.WithAttributes(
 		attribute.String("account_type", accountID.EntityType()),
 		attribute.String("account_id", accountID.IDString()),
 	))

@@ -24,6 +24,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -127,7 +128,7 @@ func newOrganizationStore(baseStore *baseStore) *organizationStore {
 func (s *organizationStore) CreateOrganization(
 	ctx context.Context, pb *ttnpb.Organization,
 ) (*ttnpb.Organization, error) {
-	ctx, span := tracer.Start(ctx, "CreateOrganization", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "CreateOrganization", trace.WithAttributes(
 		attribute.String("organization_id", pb.GetIds().GetOrganizationId()),
 	))
 	defer span.End()
@@ -328,7 +329,7 @@ func (*organizationStore) selectWithID(
 func (s *organizationStore) FindOrganizations(
 	ctx context.Context, ids []*ttnpb.OrganizationIdentifiers, fieldMask store.FieldMask,
 ) ([]*ttnpb.Organization, error) {
-	ctx, span := tracer.Start(ctx, "FindOrganizations", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "FindOrganizations", trace.WithAttributes(
 		attribute.StringSlice("organization_ids", idStrings(ids...)),
 	))
 	defer span.End()
@@ -359,7 +360,7 @@ func (s *organizationStore) getOrganizationModelBy(
 func (s *organizationStore) GetOrganization(
 	ctx context.Context, id *ttnpb.OrganizationIdentifiers, fieldMask store.FieldMask,
 ) (*ttnpb.Organization, error) {
-	ctx, span := tracer.Start(ctx, "GetOrganization", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "GetOrganization", trace.WithAttributes(
 		attribute.String("organization_id", id.GetOrganizationId()),
 	))
 	defer span.End()
@@ -458,7 +459,7 @@ func (s *organizationStore) updateOrganizationModel( //nolint:gocyclo
 func (s *organizationStore) UpdateOrganization(
 	ctx context.Context, pb *ttnpb.Organization, fieldMask store.FieldMask,
 ) (*ttnpb.Organization, error) {
-	ctx, span := tracer.Start(ctx, "UpdateOrganization", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "UpdateOrganization", trace.WithAttributes(
 		attribute.String("organization_id", pb.GetIds().GetOrganizationId()),
 	))
 	defer span.End()
@@ -489,7 +490,7 @@ func (s *organizationStore) UpdateOrganization(
 }
 
 func (s *organizationStore) DeleteOrganization(ctx context.Context, id *ttnpb.OrganizationIdentifiers) error {
-	ctx, span := tracer.Start(ctx, "DeleteOrganization", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "DeleteOrganization", trace.WithAttributes(
 		attribute.String("organization_id", id.GetOrganizationId()),
 	))
 	defer span.End()
@@ -534,7 +535,7 @@ func (s *organizationStore) DeleteOrganization(ctx context.Context, id *ttnpb.Or
 }
 
 func (s *organizationStore) RestoreOrganization(ctx context.Context, id *ttnpb.OrganizationIdentifiers) error {
-	ctx, span := tracer.Start(ctx, "RestoreOrganization", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "RestoreOrganization", trace.WithAttributes(
 		attribute.String("organization_id", id.GetOrganizationId()),
 	))
 	defer span.End()
@@ -589,7 +590,7 @@ func (s *organizationStore) RestoreOrganization(ctx context.Context, id *ttnpb.O
 }
 
 func (s *organizationStore) PurgeOrganization(ctx context.Context, id *ttnpb.OrganizationIdentifiers) error {
-	ctx, span := tracer.Start(ctx, "PurgeOrganization", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "PurgeOrganization", trace.WithAttributes(
 		attribute.String("organization_id", id.GetOrganizationId()),
 	))
 	defer span.End()
