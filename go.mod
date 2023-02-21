@@ -79,8 +79,11 @@ require (
 	github.com/uptrace/bun/driver/pgdriver v1.1.10
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	go.opencensus.io v0.24.0
-	go.opentelemetry.io/otel v1.11.2
-	go.opentelemetry.io/otel/trace v1.11.2
+	go.opentelemetry.io/otel v1.13.0
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.13.0
+	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.13.0
+	go.opentelemetry.io/otel/sdk v1.13.0
+	go.opentelemetry.io/otel/trace v1.13.0
 	go.packetbroker.org/api/iam v1.5.27
 	go.packetbroker.org/api/iam/v2 v2.7.8
 	go.packetbroker.org/api/mapping/v2 v2.1.27
@@ -97,7 +100,7 @@ require (
 	golang.org/x/oauth2 v0.5.0
 	golang.org/x/sync v0.1.0
 	google.golang.org/genproto v0.0.0-20230124163310-31e0e69b6fc2
-	google.golang.org/grpc v1.52.1
+	google.golang.org/grpc v1.52.3
 	google.golang.org/protobuf v1.28.1
 	gopkg.in/mail.v2 v2.3.1
 	gopkg.in/square/go-jose.v2 v2.6.0
@@ -152,6 +155,7 @@ require (
 	github.com/blevesearch/zap/v13 v13.0.6 // indirect
 	github.com/blevesearch/zap/v14 v14.0.5 // indirect
 	github.com/blevesearch/zap/v15 v15.0.3 // indirect
+	github.com/cenkalti/backoff/v4 v4.2.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/couchbase/vellum v1.0.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
@@ -225,6 +229,9 @@ require (
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/willf/bitset v1.1.11 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.13.0 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.13.0 // indirect
+	go.opentelemetry.io/proto/otlp v0.19.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/image v0.5.0 // indirect

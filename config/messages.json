@@ -8369,6 +8369,15 @@
       "file": "task.go"
     }
   },
+  "error:pkg/telemetry/tracing:unknown_exporter": {
+    "translations": {
+      "en": "unknown exporter {exporter}"
+    },
+    "description": {
+      "package": "pkg/telemetry/tracing",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/toa:bandwidth": {
     "translations": {
       "en": "invalid bandwidth `{bandwidth}`"

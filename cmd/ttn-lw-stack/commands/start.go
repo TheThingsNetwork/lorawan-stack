@@ -49,6 +49,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator"
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 )
 
@@ -178,11 +179,23 @@ var startCommand = &cobra.Command{
 			start.DeviceClaimingServer = true
 		}
 
+		tp, shutdown, err := telemetry.InitTelemetry(ctx, &config.Telemetry)
+		if err != nil {
+			return err
+		}
+		defer func() {
+			if err := shutdown(ctx); err != nil {
+				logger.WithError(err).Error("Failed to shutdown tracing")
+			}
+		}()
+
 		logger.Info("Setting up core component")
 
 		var rootRedirect web.Registerer
 
-		var componentOptions []component.Option
+		componentOptions := []component.Option{
+			component.WithTracerProvider(tp),
+		}
 
 		cookieHashKey, cookieBlockKey := config.ServiceBase.HTTP.Cookie.HashKey, config.ServiceBase.HTTP.Cookie.BlockKey
 
