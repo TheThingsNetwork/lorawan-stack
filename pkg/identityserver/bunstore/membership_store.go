@@ -265,17 +265,25 @@ func (s *membershipStore) FindAccountMembershipChains(
 	membershipChains := make([]*store.MembershipChain, 0, len(directMemberships)+len(indirectMemberships))
 
 	for _, directMembership := range directMemberships {
-		membershipChains = append(membershipChains, &store.MembershipChain{
-			UserIdentifiers: &ttnpb.UserIdentifiers{
-				UserId: directMembership.AccountFriendlyID,
-			},
+		mc := &store.MembershipChain{
 			RightsOnEntity: &ttnpb.Rights{
 				Rights: convertIntSlice[int, ttnpb.Right](directMembership.Rights),
 			},
 			EntityIdentifiers: getEntityIdentifiers(
 				directMembership.EntityType, directMembership.EntityFriendlyID,
 			),
-		})
+		}
+		switch directMembership.AccountType {
+		case "organization":
+			mc.OrganizationIdentifiers = &ttnpb.OrganizationIdentifiers{
+				OrganizationId: directMembership.AccountFriendlyID,
+			}
+		default:
+			mc.UserIdentifiers = &ttnpb.UserIdentifiers{
+				UserId: directMembership.AccountFriendlyID,
+			}
+		}
+		membershipChains = append(membershipChains, mc)
 	}
 
 	for _, indirectMembership := range indirectMemberships {
