@@ -25,5 +25,7 @@ jobs:
         run: tools/bin/mage headers:check
       - name: Fix common spelling mistakes
         run: tools/bin/mage dev:misspell
+      - name: Format SQL files
+        run: tools/bin/mage sql:fmt
       - name: Check for diff
         run: tools/bin/mage git:diff
