@@ -21,6 +21,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Removed
 
+- Deprecated home-ns-id and hostname fields and respective fallback from The Device Claiming Server component 
+
 ### Fixed
 
 - The CLI now continues deleting devices when unclaiming from the Join Server fails. This resembles the behavior in the Console. This no longer stops devices from being deleted if the Join Server is unavailable or the claim is not held.
