@@ -46,6 +46,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/cayennelpp"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/devicerepository"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/javascript"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpctracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -106,9 +107,6 @@ var errListenFrontend = errors.DefineFailedPrecondition("listen_frontend", "fail
 
 // New returns new *ApplicationServer.
 func New(c *component.Component, conf *Config) (as *ApplicationServer, err error) {
-	c.AddContextFiller(func(ctx context.Context) context.Context {
-		return tracer.NewContextWithTracer(ctx, tracerNamespace)
-	})
 	ctx := tracer.NewContextWithTracer(c.Context(), tracerNamespace)
 
 	ctx = log.NewContextWithField(ctx, "namespace", "applicationserver")
@@ -272,6 +270,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		return nil, err
 	}
 
+	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.NsAs", rpctracer.TracerHook, rpctracer.UnaryTracerHook(tracerNamespace))
 	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.NsAs", cluster.HookName, c.ClusterAuthUnaryHook())
 
 	c.RegisterGRPC(as)

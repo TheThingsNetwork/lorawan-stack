@@ -49,6 +49,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpctracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -114,9 +115,6 @@ var (
 
 // New returns new *GatewayServer.
 func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServer, err error) {
-	c.AddContextFiller(func(ctx context.Context) context.Context {
-		return tracer.NewContextWithTracer(ctx, tracerNamespace)
-	})
 	ctx := tracer.NewContextWithTracer(c.Context(), tracerNamespace)
 
 	forward, err := conf.ForwardDevAddrPrefixes()
@@ -174,6 +172,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 	}
 
 	// Register gRPC services.
+	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", rpctracer.TracerHook, rpctracer.UnaryTracerHook(tracerNamespace))
 	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("gatewayserver"))
 	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", cluster.HookName, c.ClusterAuthUnaryHook())
 	c.RegisterGRPC(gs)
