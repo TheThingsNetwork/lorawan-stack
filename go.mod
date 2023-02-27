@@ -132,7 +132,7 @@ require (
 	gocloud.dev v0.20.0
 	// NOTE: gocloud.dev/pubsub/natspubsub is actually a different version (see above).
 	gocloud.dev/pubsub/natspubsub v0.19.0
-	golang.org/x/crypto v0.5.0
+	golang.org/x/crypto v0.6.0
 	golang.org/x/exp v0.0.0-20220706164943-b4a6d9510983
 	golang.org/x/net v0.7.0
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5

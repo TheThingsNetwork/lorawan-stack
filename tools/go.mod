@@ -219,7 +219,7 @@ require (
 	go.uber.org/zap v1.21.0 // indirect
 	gocloud.dev v0.20.0 // indirect
 	gocloud.dev/pubsub/natspubsub v0.19.0 // indirect
-	golang.org/x/crypto v0.5.0 // indirect
+	golang.org/x/crypto v0.6.0 // indirect
 	golang.org/x/exp v0.0.0-20220706164943-b4a6d9510983 // indirect
 	golang.org/x/image v0.5.0 // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
