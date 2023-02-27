@@ -217,7 +217,7 @@ func (ps *PubSubStore) FetchHistory(
 		afterMS := after.Truncate(time.Millisecond)
 		after = &afterMS
 		// Account for a clock skew on the Redis server of up to 1 second.
-		start = strconv.FormatInt(after.Add(-1*time.Second).UnixNano()/1_000_000, 10)
+		start = formatStreamTime(after.Add(-1 * time.Second))
 	}
 	var evts []events.Event
 	for _, id := range ids {
@@ -331,7 +331,7 @@ func (ps *PubSubStore) SubscribeWithHistory(
 		afterMS := after.Truncate(time.Millisecond)
 		after = &afterMS
 		// Account for a clock skew on the Redis server of up to 1 second.
-		start = strconv.FormatInt(after.Add(-1*time.Second).UnixNano()/1_000_000, 10)
+		start = formatStreamTime(after.Add(-1 * time.Second))
 	}
 
 	states := make([]*streamState, len(ids))
@@ -504,4 +504,11 @@ func (ps *PubSubStore) Publish(evs ...events.Event) {
 	if err := ps.transactionPool.Publish(ps.ctx, tx); err != nil {
 		logger.WithError(err).Warn("Failed to publish transaction")
 	}
+}
+
+// formatStreamTime constructs the minimal stream ID from the provided timestamp.
+// Redis stream identifiers are by default built from the number of milliseconds since
+// the UNIX epoch, and a sequence number.
+func formatStreamTime(t time.Time) string {
+	return strconv.FormatInt(t.UnixNano()/int64(time.Millisecond), 10)
 }
