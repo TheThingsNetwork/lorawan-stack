@@ -136,7 +136,7 @@ require (
 	golang.org/x/exp v0.0.0-20230224173230-c95f2b4c22f2
 	golang.org/x/net v0.7.0
 	golang.org/x/oauth2 v0.5.0
-	golang.org/x/sync v0.0.0-20220923202941-7f9b1623fab7
+	golang.org/x/sync v0.1.0
 	// NOTE: google.golang.org/genproto is actually a different version (see above).
 	google.golang.org/genproto v0.0.0-20220519153652-3a47de7e79bd
 	// NOTE: google.golang.org/grpc is actually a different version (see above).
