@@ -12,7 +12,6 @@ FROM
   AND acc.account_type = 'user';
 
 --bun:split
-
 CREATE OR REPLACE VIEW organization_accounts AS
 SELECT
   acc.id AS account_id,
