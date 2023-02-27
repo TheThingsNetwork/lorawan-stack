@@ -455,9 +455,9 @@ func (ps *PubSubStore) FindRelated(ctx context.Context, correlationID string) ([
 func (ps *PubSubStore) Publish(evs ...events.Event) {
 	logger := log.FromContext(ps.ctx)
 
-	ttl := random.Jitter(ps.entityHistoryTTL, ttlJitter)
 	tx := ps.client.TxPipeline()
 
+	eventStreams := make(map[string]struct{}, len(evs))
 	for _, evt := range evs {
 		if err := ps.storeEvent(ps.ctx, tx, evt); err != nil {
 			logger.WithError(err).Warn("Failed to store event")
@@ -487,18 +487,25 @@ func (ps *PubSubStore) Publish(evs ...events.Event) {
 				Approx: true,
 				Values: streamValues,
 			})
-			tx.PExpire(ps.ctx, eventStream, ttl)
+			eventStreams[eventStream] = struct{}{}
 			if devID := id.GetDeviceIds(); devID != nil && definition != nil && definition.PropagateToParent() {
 				eventStream := ps.eventStream(evt.Context(), devID.ApplicationIds.GetEntityIdentifiers())
+				eventStreams[eventStream] = struct{}{}
 				tx.XAdd(ps.ctx, &redis.XAddArgs{
 					Stream: eventStream,
 					MaxLen: int64(ps.entityHistoryCount),
 					Approx: true,
 					Values: streamValues,
 				})
-				tx.PExpire(ps.ctx, eventStream, ttl)
 			}
 		}
+	}
+
+	entityHistoryTTL := random.Jitter(ps.entityHistoryTTL, ttlJitter)
+	entityHistoryMinID := formatStreamTime(time.Now().Add(-entityHistoryTTL))
+	for eventStream := range eventStreams {
+		tx.PExpire(ps.ctx, eventStream, entityHistoryTTL)
+		tx.XTrimMinIDApprox(ps.ctx, eventStream, entityHistoryMinID, 0)
 	}
 
 	if err := ps.transactionPool.Publish(ps.ctx, tx); err != nil {
