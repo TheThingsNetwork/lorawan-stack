@@ -22,6 +22,7 @@ import errorMessages from './error-messages'
 import grpcErrToHttpErr from './grpc-error-map'
 import { TokenError } from './custom-errors'
 import sentryFilters from './sentry-filters'
+import defaultErrorValues from './default-error-values'
 
 /**
  * Returns whether the given object has a valid `details` prop.
@@ -506,7 +507,7 @@ export const toMessageProps = (error, each = false) => {
             id: getBackendErrorDetailsId(rootCause),
             defaultMessage: rootCause.message_format,
           },
-          values: rootCause.attributes,
+          values: { ...rootCause.attributes, ...defaultErrorValues },
         })
       }
 
@@ -515,7 +516,7 @@ export const toMessageProps = (error, each = false) => {
           id: getBackendErrorDetailsId(errorDetails),
           defaultMessage: errorDetails.message_format,
         },
-        values: errorDetails.attributes,
+        values: { ...errorDetails.attributes, ...defaultErrorValues },
       })
     } else {
       props.push({
