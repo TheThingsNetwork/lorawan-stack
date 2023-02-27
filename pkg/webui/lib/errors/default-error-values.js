@@ -13,5 +13,6 @@
 // limitations under the License.
 
 export default Object.freeze({
-  delta: '{delta}',
+  delay: '{delay}',
+  min: '{min}',
 })
