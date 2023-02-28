@@ -48,7 +48,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/javascript"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpctracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
-	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracer"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"

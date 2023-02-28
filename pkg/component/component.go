@@ -39,7 +39,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
-	"go.thethings.network/lorawan-stack/v3/pkg/telemetry"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 	"golang.org/x/crypto/acme/autocert"
@@ -140,9 +140,9 @@ func WithBaseConfigGetter(f func(ctx context.Context) config.ServiceBase) Option
 // in the component's context.
 func WithTracerProvider(tp trace.TracerProvider) Option {
 	return func(c *Component) {
-		c.ctx = telemetry.NewContextWithTracerProvider(c.ctx, tp)
+		c.ctx = tracing.NewContextWithTracerProvider(c.ctx, tp)
 		c.AddContextFiller(func(ctx context.Context) context.Context {
-			return telemetry.NewContextWithTracerProvider(ctx, tp)
+			return tracing.NewContextWithTracerProvider(ctx, tp)
 		})
 	}
 }

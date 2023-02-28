@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package telemetry provides tools for working with tracing.
-package telemetry
+// Package tracing provides tools for working with tracing.
+package tracing
 
 import (
 	"context"
@@ -45,9 +45,9 @@ func initResource(ctx context.Context) (*resource.Resource, error) {
 	return resource.Merge(resource.Default(), rsc)
 }
 
-// InitTelemetry initializes the telemetry package and returns the tracer provider.
-// If telemetry is not enabled it returns a noop tracer provider instead.
-func InitTelemetry(ctx context.Context, config *Config) (otrace.TracerProvider, func(context.Context) error, error) {
+// Initialize initializes the tracing package and returns the tracer provider.
+// If tracing is not enabled it returns a noop tracer provider instead.
+func Initialize(ctx context.Context, config *Config) (otrace.TracerProvider, func(context.Context) error, error) {
 	if !config.Enable {
 		return otrace.NewNoopTracerProvider(), func(_ context.Context) error { return nil }, nil
 	}

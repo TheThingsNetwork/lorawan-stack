@@ -36,7 +36,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpctracer"
-	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracer"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/webui"
 	"google.golang.org/grpc"

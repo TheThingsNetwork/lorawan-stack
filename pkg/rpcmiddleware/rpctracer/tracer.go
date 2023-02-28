@@ -21,7 +21,7 @@ import (
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"go.opentelemetry.io/otel/trace"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
-	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracer"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing/tracer"
 	"google.golang.org/grpc"
 )
 

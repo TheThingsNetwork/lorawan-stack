@@ -26,7 +26,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
-	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracer"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"

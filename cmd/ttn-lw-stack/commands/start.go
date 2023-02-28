@@ -49,7 +49,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator"
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/redis"
-	"go.thethings.network/lorawan-stack/v3/pkg/telemetry"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 )
 
@@ -179,7 +179,7 @@ var startCommand = &cobra.Command{
 			start.DeviceClaimingServer = true
 		}
 
-		tp, shutdown, err := telemetry.InitTelemetry(ctx, &config.Telemetry)
+		tp, shutdown, err := tracing.Initialize(ctx, &config.Tracing)
 		if err != nil {
 			return err
 		}

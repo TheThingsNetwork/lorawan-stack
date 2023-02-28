@@ -19,7 +19,7 @@ import (
 	"context"
 
 	otrace "go.opentelemetry.io/otel/trace"
-	"go.thethings.network/lorawan-stack/v3/pkg/telemetry"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing"
 )
 
 type tracerKeyType struct{}
@@ -33,7 +33,7 @@ func NewContext(ctx context.Context, t otrace.Tracer) context.Context {
 
 // NewContextWithTracer returns a derived context with a new tracer set.
 func NewContextWithTracer(ctx context.Context, name string, opts ...otrace.TracerOption) context.Context {
-	t := telemetry.FromContext(ctx).Tracer(name, opts...)
+	t := tracing.FromContext(ctx).Tracer(name, opts...)
 	return NewContext(ctx, t)
 }
 
