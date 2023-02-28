@@ -22,7 +22,6 @@ import errorMessages from './error-messages'
 import grpcErrToHttpErr from './grpc-error-map'
 import { TokenError } from './custom-errors'
 import sentryFilters from './sentry-filters'
-import defaultErrorValues from './default-error-values'
 
 /**
  * Returns whether the given object has a valid `details` prop.
@@ -502,6 +501,13 @@ export const toMessageProps = (error, each = false) => {
       if (hasCauses(errorDetails)) {
         // Use the root cause if any.
         const rootCause = getBackendErrorRootCause(errorDetails)
+        const messageValues = rootCause.message_format.match(/[^{}]+(?=})/g) || []
+        const hasMissingValues = Object.keys(rootCause.attributes).length < messageValues.length
+        const missingValues = messageValues.filter(val => !(val in rootCause.attributes))
+        const defaultErrorValues = hasMissingValues
+          ? missingValues.reduce((acc, curr) => ((acc[curr] = `{${curr}}`), acc), {})
+          : {}
+
         props.push({
           content: {
             id: getBackendErrorDetailsId(rootCause),
@@ -516,7 +522,7 @@ export const toMessageProps = (error, each = false) => {
           id: getBackendErrorDetailsId(errorDetails),
           defaultMessage: errorDetails.message_format,
         },
-        values: { ...errorDetails.attributes, ...defaultErrorValues },
+        values: errorDetails.attributes,
       })
     } else {
       props.push({
