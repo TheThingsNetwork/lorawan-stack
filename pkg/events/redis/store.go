@@ -501,8 +501,8 @@ func (ps *PubSubStore) Publish(evs ...events.Event) {
 		}
 	}
 
+	entityHistoryMinID := formatStreamTime(time.Now().Add(-ps.entityHistoryTTL))
 	entityHistoryTTL := random.Jitter(ps.entityHistoryTTL, ttlJitter)
-	entityHistoryMinID := formatStreamTime(time.Now().Add(-entityHistoryTTL))
 	for eventStream := range eventStreams {
 		tx.PExpire(ps.ctx, eventStream, entityHistoryTTL)
 		tx.XTrimMinIDApprox(ps.ctx, eventStream, entityHistoryMinID, 0)
