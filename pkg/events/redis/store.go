@@ -16,9 +16,9 @@ package redis
 
 import (
 	"context"
-	"crypto/sha1"
-	"encoding/base32"
+	"encoding/base64"
 	"errors"
+	"hash/fnv"
 	"strconv"
 	"strings"
 	"sync"
@@ -58,9 +58,9 @@ func (ps *PubSubStore) eventDataKey(_ context.Context, uid string) string {
 // Since correlation IDs are user input (and can therefore contain characters that
 // we may not want in Redis keys) we hash them.
 func (ps *PubSubStore) eventIndexKey(_ context.Context, correlationID string) string {
-	h := sha1.New()
+	h := fnv.New128a()
 	h.Write([]byte(correlationID))
-	return ps.client.Key("event_index", base32.StdEncoding.EncodeToString(h.Sum(nil)))
+	return ps.client.Key("event_index", base64.RawStdEncoding.EncodeToString(h.Sum(nil)))
 }
 
 func (ps *PubSubStore) eventStream(ctx context.Context, ids *ttnpb.EntityIdentifiers) string {
@@ -75,12 +75,21 @@ func (ps *PubSubStore) storeEvent(ctx context.Context, tx redis.Cmdable, evt eve
 	if err != nil {
 		return err
 	}
+	expiration := strconv.FormatInt(time.Now().Add(-ps.historyTTL).UnixNano(), 10)
 	ttl := random.Jitter(ps.historyTTL, ttlJitter)
 	tx.Set(ctx, ps.eventDataKey(evt.Context(), evt.UniqueID()), b, ttl)
 	for _, cid := range evt.CorrelationIds() {
 		key := ps.eventIndexKey(evt.Context(), cid)
-		tx.LPush(ctx, key, evt.UniqueID())
-		tx.LTrim(ctx, key, 0, int64(ps.correlationIDHistoryCount))
+		tx.ZAdd(ctx, key, redis.Z{
+			Score:  float64(evt.Time().UnixNano()),
+			Member: evt.UniqueID(),
+		})
+		// Delete the oldest entries in the sorted set, by rank. Note that the range
+		// is inclusive, and as such we subtract one in order to keep only the last
+		// ps.correlationIDHistoryCount elements.
+		tx.ZRemRangeByRank(ctx, key, 0, int64(-ps.correlationIDHistoryCount-1))
+		// Delete the oldest entries in the sorted set, by time.
+		tx.ZRemRangeByScore(ctx, key, "-inf", expiration)
 		tx.PExpire(ctx, key, ttl)
 	}
 	return nil
@@ -424,7 +433,12 @@ func (ps *PubSubStore) SubscribeWithHistory(
 
 // FindRelated finds events with matching correlation IDs.
 func (ps *PubSubStore) FindRelated(ctx context.Context, correlationID string) ([]events.Event, error) {
-	uids, err := ps.client.LRange(ctx, ps.eventIndexKey(ctx, correlationID), 0, -1).Result()
+	uids, err := ps.client.ZRangeArgs(ctx, redis.ZRangeArgs{
+		Key:     ps.eventIndexKey(ctx, correlationID),
+		Start:   "-inf",
+		Stop:    "inf",
+		ByScore: true,
+	}).Result()
 	if err != nil {
 		return nil, err
 	}
