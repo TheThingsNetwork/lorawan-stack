@@ -501,11 +501,13 @@ export const toMessageProps = (error, each = false) => {
       if (hasCauses(errorDetails)) {
         // Use the root cause if any.
         const rootCause = getBackendErrorRootCause(errorDetails)
+
+        // If the attributes are missing values, use the generated default values based on the message.
         const messageValues = rootCause.message_format.match(/[^{}]+(?=})/g) || []
         const hasMissingValues = Object.keys(rootCause.attributes).length < messageValues.length
         const missingValues = messageValues.filter(val => !(val in rootCause.attributes))
         const defaultErrorValues = hasMissingValues
-          ? missingValues.reduce((acc, curr) => ((acc[curr] = `{${curr}}`), acc), {})
+          ? missingValues.reduce((obj, val) => ((obj[val] = `{${val}}`), obj), {})
           : {}
 
         props.push({
