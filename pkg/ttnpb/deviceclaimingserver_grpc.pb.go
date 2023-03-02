@@ -35,9 +35,13 @@ type EndDeviceClaimingServerClient interface {
 	// identifiers are the source application, where the devices are registered before they are claimed.
 	// The API key is used to access the application, find the device, verify the claim request and delete the end device
 	// from the source application.
+	// DEPRECATED: Device claiming that transfers devices between applications is no longer supported and will be removed
+	// in a future version of The Things Stack.
 	AuthorizeApplication(ctx context.Context, in *AuthorizeApplicationRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// Unauthorize the End Device Claiming Server to claim devices in the given application.
 	// This reverts the authorization given with rpc AuthorizeApplication.
+	// DEPRECATED: Device claiming that transfers devices between applications is no longer supported and will be removed
+	// in a future version of The Things Stack.
 	UnauthorizeApplication(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -119,9 +123,13 @@ type EndDeviceClaimingServerServer interface {
 	// identifiers are the source application, where the devices are registered before they are claimed.
 	// The API key is used to access the application, find the device, verify the claim request and delete the end device
 	// from the source application.
+	// DEPRECATED: Device claiming that transfers devices between applications is no longer supported and will be removed
+	// in a future version of The Things Stack.
 	AuthorizeApplication(context.Context, *AuthorizeApplicationRequest) (*emptypb.Empty, error)
 	// Unauthorize the End Device Claiming Server to claim devices in the given application.
 	// This reverts the authorization given with rpc AuthorizeApplication.
+	// DEPRECATED: Device claiming that transfers devices between applications is no longer supported and will be removed
+	// in a future version of The Things Stack.
 	UnauthorizeApplication(context.Context, *ApplicationIdentifiers) (*emptypb.Empty, error)
 	mustEmbedUnimplementedEndDeviceClaimingServerServer()
 }

@@ -98,7 +98,9 @@ message ClaimEndDeviceRequest {
   bool invalidate_authentication_code = 5;
 }
 
-message AuthorizeApplicationRequest {
+  // DEPRECATED: Device claiming that transfers devices between applications is no longer supported and will be removed
+  // in a future version of The Things Stack.
+  message AuthorizeApplicationRequest {
   ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
   string api_key = 2 [
     (validate.rules).string = { min_len: 1, max_len: 128 }
@@ -203,6 +205,8 @@ service EndDeviceClaimingServer {
   // identifiers are the source application, where the devices are registered before they are claimed.
   // The API key is used to access the application, find the device, verify the claim request and delete the end device
   // from the source application.
+  // DEPRECATED: Device claiming that transfers devices between applications is no longer supported and will be removed
+  // in a future version of The Things Stack.
   rpc AuthorizeApplication(AuthorizeApplicationRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/edcs/applications/{application_ids.application_id}/authorize",
@@ -212,6 +216,8 @@ service EndDeviceClaimingServer {
 
   // Unauthorize the End Device Claiming Server to claim devices in the given application.
   // This reverts the authorization given with rpc AuthorizeApplication.
+  // DEPRECATED: Device claiming that transfers devices between applications is no longer supported and will be removed
+  // in a future version of The Things Stack.
   rpc UnauthorizeApplication(ApplicationIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/edcs/applications/{application_id}/authorize"

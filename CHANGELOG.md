@@ -17,15 +17,22 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Deprecated
 
+- Device claiming that transfer devices between applications is now deprecated and will be removed in a future version of The Things Stack. Device claiming on Join Servers, including The Things Join Server, remains functional. This deprecates the following components:
+  - API for managing application claim authorization (`EndDeviceClaimingServer.AuthorizeApplication` and `EndDeviceClaimingServer.UnauthorizeApplication`)
+  - CLI commands to manage application claim settings (`ttn-lw-cli application claim [authorize|unauthorize]`)
+
 ### Removed
 
 - Automatic migrations of the Network Server database using `ns-db migrate` from versions prior to v3.24 are removed. Migrating from prior versions should be done through v3.24 instead.
 
 ### Fixed
 
+- The CLI now continues deleting devices when unclaiming from the Join Server fails. This resembles the behavior in the Console. This no longer stops devices from being deleted if the Join Server is unavailable or the claim is not held.
+- Organization API Keys' rights no longer are considered invalid during fetch operations. If the proper right is attached to said API key it is possible to fetch all fields of an entity, previous to this fix only public safe fields were fetchable.
+
 ### Security
 
-## [3.24.1] - unreleased
+## [3.24.1] - 2023-02-16
 
 ### Added
 
@@ -43,6 +50,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Key unwrap caching.
+- Desired RX1 delay and desired beacon frequency not being possible to set for OTAA devices.
 
 ### Security
 

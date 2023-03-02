@@ -4933,7 +4933,7 @@
   },
   "error:pkg/gatewayserver/scheduling:too_late": {
     "translations": {
-      "en": "too late to transmission scheduled time (delta is `{delta}`, min is `{min}`)"
+      "en": "too late to transmission scheduled time"
     },
     "description": {
       "package": "pkg/gatewayserver/scheduling",

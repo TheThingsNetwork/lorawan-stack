@@ -226,7 +226,7 @@ func (ps *PubSubStore) FetchHistory(
 		afterMS := after.Truncate(time.Millisecond)
 		after = &afterMS
 		// Account for a clock skew on the Redis server of up to 1 second.
-		start = strconv.FormatInt(after.Add(-1*time.Second).UnixNano()/1_000_000, 10)
+		start = formatStreamTime(after.Add(-1 * time.Second))
 	}
 	var evts []events.Event
 	for _, id := range ids {
@@ -340,7 +340,7 @@ func (ps *PubSubStore) SubscribeWithHistory(
 		afterMS := after.Truncate(time.Millisecond)
 		after = &afterMS
 		// Account for a clock skew on the Redis server of up to 1 second.
-		start = strconv.FormatInt(after.Add(-1*time.Second).UnixNano()/1_000_000, 10)
+		start = formatStreamTime(after.Add(-1 * time.Second))
 	}
 
 	states := make([]*streamState, len(ids))
@@ -469,9 +469,9 @@ func (ps *PubSubStore) FindRelated(ctx context.Context, correlationID string) ([
 func (ps *PubSubStore) Publish(evs ...events.Event) {
 	logger := log.FromContext(ps.ctx)
 
-	ttl := random.Jitter(ps.entityHistoryTTL, ttlJitter)
 	tx := ps.client.TxPipeline()
 
+	eventStreams := make(map[string]struct{}, len(evs))
 	for _, evt := range evs {
 		if err := ps.storeEvent(ps.ctx, tx, evt); err != nil {
 			logger.WithError(err).Warn("Failed to store event")
@@ -501,21 +501,35 @@ func (ps *PubSubStore) Publish(evs ...events.Event) {
 				Approx: true,
 				Values: streamValues,
 			})
-			tx.PExpire(ps.ctx, eventStream, ttl)
+			eventStreams[eventStream] = struct{}{}
 			if devID := id.GetDeviceIds(); devID != nil && definition != nil && definition.PropagateToParent() {
 				eventStream := ps.eventStream(evt.Context(), devID.ApplicationIds.GetEntityIdentifiers())
+				eventStreams[eventStream] = struct{}{}
 				tx.XAdd(ps.ctx, &redis.XAddArgs{
 					Stream: eventStream,
 					MaxLen: int64(ps.entityHistoryCount),
 					Approx: true,
 					Values: streamValues,
 				})
-				tx.PExpire(ps.ctx, eventStream, ttl)
 			}
 		}
+	}
+
+	entityHistoryMinID := formatStreamTime(time.Now().Add(-ps.entityHistoryTTL))
+	entityHistoryTTL := random.Jitter(ps.entityHistoryTTL, ttlJitter)
+	for eventStream := range eventStreams {
+		tx.PExpire(ps.ctx, eventStream, entityHistoryTTL)
+		tx.XTrimMinIDApprox(ps.ctx, eventStream, entityHistoryMinID, 0)
 	}
 
 	if err := ps.transactionPool.Publish(ps.ctx, tx); err != nil {
 		logger.WithError(err).Warn("Failed to publish transaction")
 	}
+}
+
+// formatStreamTime constructs the minimal stream ID from the provided timestamp.
+// Redis stream identifiers are by default built from the number of milliseconds since
+// the UNIX epoch, and a sequence number.
+func formatStreamTime(t time.Time) string {
+	return strconv.FormatInt(t.UnixNano()/int64(time.Millisecond), 10)
 }

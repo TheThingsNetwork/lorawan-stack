@@ -3,7 +3,6 @@ DROP VIEW IF EXISTS indirect_entity_memberships CASCADE;
 DROP VIEW IF EXISTS entity_friendly_ids CASCADE;
 
 --bun:split
-
 CREATE VIEW entity_friendly_ids AS
 SELECT
   'application' AS entity_type,
@@ -45,7 +44,6 @@ WHERE
   account_type = 'user';
 
 --bun:split
-
 CREATE VIEW direct_entity_memberships AS
 SELECT
   acc.account_type AS account_type,
@@ -64,7 +62,6 @@ WHERE
   acc.deleted_at IS NULL;
 
 --bun:split
-
 CREATE VIEW indirect_entity_memberships AS
 SELECT
   usr_acc.id AS user_account_id,
