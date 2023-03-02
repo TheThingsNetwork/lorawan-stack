@@ -9900,7 +9900,7 @@
           "name": "AuthorizeApplicationRequest",
           "longName": "AuthorizeApplicationRequest",
           "fullName": "ttn.lorawan.v3.AuthorizeApplicationRequest",
-          "description": "",
+          "description": "DEPRECATED: Device claiming that transfers devices between applications is no longer supported and will be removed\nin a future version of The Things Stack.",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
@@ -10949,7 +10949,7 @@
             },
             {
               "name": "AuthorizeApplication",
-              "description": "Authorize the End Device Claiming Server to claim devices registered in the given application. The application\nidentifiers are the source application, where the devices are registered before they are claimed.\nThe API key is used to access the application, find the device, verify the claim request and delete the end device\nfrom the source application.",
+              "description": "Authorize the End Device Claiming Server to claim devices registered in the given application. The application\nidentifiers are the source application, where the devices are registered before they are claimed.\nThe API key is used to access the application, find the device, verify the claim request and delete the end device\nfrom the source application.\nDEPRECATED: Device claiming that transfers devices between applications is no longer supported and will be removed\nin a future version of The Things Stack.",
               "requestType": "AuthorizeApplicationRequest",
               "requestLongType": "AuthorizeApplicationRequest",
               "requestFullType": "ttn.lorawan.v3.AuthorizeApplicationRequest",
@@ -10972,7 +10972,7 @@
             },
             {
               "name": "UnauthorizeApplication",
-              "description": "Unauthorize the End Device Claiming Server to claim devices in the given application.\nThis reverts the authorization given with rpc AuthorizeApplication.",
+              "description": "Unauthorize the End Device Claiming Server to claim devices in the given application.\nThis reverts the authorization given with rpc AuthorizeApplication.\nDEPRECATED: Device claiming that transfers devices between applications is no longer supported and will be removed\nin a future version of The Things Stack.",
               "requestType": "ApplicationIdentifiers",
               "requestLongType": "ApplicationIdentifiers",
               "requestFullType": "ttn.lorawan.v3.ApplicationIdentifiers",
@@ -18235,7 +18235,7 @@
             },
             {
               "name": "Delete",
-              "description": "Delete the end device with the given IDs.\n\nBefore deleting an end device it first needs to be deleted from the\nNsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry.\nThis is NOT done automatically.",
+              "description": "Delete the end device with the given IDs.\n\nBefore deleting an end device it first needs to be deleted from the\nNsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry.\nIn addition, if the device claimed on a Join Server, it also needs to be\nunclaimed via the DeviceClaimingServer so it can be claimed in the future.\nThis is NOT done automatically.",
               "requestType": "EndDeviceIdentifiers",
               "requestLongType": "EndDeviceIdentifiers",
               "requestFullType": "ttn.lorawan.v3.EndDeviceIdentifiers",

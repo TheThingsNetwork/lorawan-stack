@@ -2597,6 +2597,9 @@ ApplicationRegistry, ClientRegistry, GatewayRegistry, OrganizationRegistry and U
 
 ### <a name="ttn.lorawan.v3.AuthorizeApplicationRequest">Message `AuthorizeApplicationRequest`</a>
 
+DEPRECATED: Device claiming that transfers devices between applications is no longer supported and will be removed
+in a future version of The Things Stack.
+
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
@@ -2797,8 +2800,8 @@ and allows clients to claim end devices.
 | `Unclaim` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Unclaims the end device on a Join Server. |
 | `GetInfoByJoinEUI` | [`GetInfoByJoinEUIRequest`](#ttn.lorawan.v3.GetInfoByJoinEUIRequest) | [`GetInfoByJoinEUIResponse`](#ttn.lorawan.v3.GetInfoByJoinEUIResponse) | Return whether claiming is available for a given JoinEUI. |
 | `GetClaimStatus` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`GetClaimStatusResponse`](#ttn.lorawan.v3.GetClaimStatusResponse) | Gets the claim status of an end device. |
-| `AuthorizeApplication` | [`AuthorizeApplicationRequest`](#ttn.lorawan.v3.AuthorizeApplicationRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Authorize the End Device Claiming Server to claim devices registered in the given application. The application identifiers are the source application, where the devices are registered before they are claimed. The API key is used to access the application, find the device, verify the claim request and delete the end device from the source application. |
-| `UnauthorizeApplication` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Unauthorize the End Device Claiming Server to claim devices in the given application. This reverts the authorization given with rpc AuthorizeApplication. |
+| `AuthorizeApplication` | [`AuthorizeApplicationRequest`](#ttn.lorawan.v3.AuthorizeApplicationRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Authorize the End Device Claiming Server to claim devices registered in the given application. The application identifiers are the source application, where the devices are registered before they are claimed. The API key is used to access the application, find the device, verify the claim request and delete the end device from the source application. DEPRECATED: Device claiming that transfers devices between applications is no longer supported and will be removed in a future version of The Things Stack. |
+| `UnauthorizeApplication` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Unauthorize the End Device Claiming Server to claim devices in the given application. This reverts the authorization given with rpc AuthorizeApplication. DEPRECATED: Device claiming that transfers devices between applications is no longer supported and will be removed in a future version of The Things Stack. |
 
 #### HTTP bindings
 
@@ -4101,7 +4104,7 @@ After registering an end device, it also needs to be registered in the NsEndDevi
 | `BatchUpdateLastSeen` | [`BatchUpdateEndDeviceLastSeenRequest`](#ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Update the last seen timestamp for a batch of end devices. |
 | `Delete` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the end device with the given IDs.
 
-Before deleting an end device it first needs to be deleted from the NsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry. This is NOT done automatically. |
+Before deleting an end device it first needs to be deleted from the NsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry. In addition, if the device claimed on a Join Server, it also needs to be unclaimed via the DeviceClaimingServer so it can be claimed in the future. This is NOT done automatically. |
 
 #### HTTP bindings
 

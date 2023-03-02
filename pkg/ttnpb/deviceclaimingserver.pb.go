@@ -207,6 +207,8 @@ func (*ClaimEndDeviceRequest_AuthenticatedIdentifiers_) isClaimEndDeviceRequest_
 
 func (*ClaimEndDeviceRequest_QrCode) isClaimEndDeviceRequest_SourceDevice() {}
 
+// DEPRECATED: Device claiming that transfers devices between applications is no longer supported and will be removed
+// in a future version of The Things Stack.
 type AuthorizeApplicationRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

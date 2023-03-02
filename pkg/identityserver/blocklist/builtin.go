@@ -371,6 +371,8 @@ var builtin = New(
 	"mis",
 	"mob",
 	"mobile",
+	"monitor",
+	"monitoring",
 	"moderator",
 	"moderators",
 	"movie",

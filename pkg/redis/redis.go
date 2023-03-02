@@ -90,14 +90,15 @@ type Client struct {
 
 // Config represents Redis configuration.
 type Config struct {
-	Address       string         `name:"address" description:"Address of the Redis server"`
-	Password      string         `name:"password" description:"Password of the Redis server"`
-	Database      int            `name:"database" description:"Redis database to use"`
-	RootNamespace []string       `name:"namespace" description:"Namespace for Redis keys"`
-	PoolSize      int            `name:"pool-size" description:"The maximum number of database connections"`
-	IdleTimeout   time.Duration  `name:"idle-timeout" description:"Idle connection timeout"`
-	Failover      FailoverConfig `name:"failover" description:"Redis failover configuration"`
-	TLS           struct {
+	Address         string         `name:"address" description:"Address of the Redis server"`
+	Password        string         `name:"password" description:"Password of the Redis server"`
+	Database        int            `name:"database" description:"Redis database to use"`
+	RootNamespace   []string       `name:"namespace" description:"Namespace for Redis keys"`
+	PoolSize        int            `name:"pool-size" description:"The maximum number of database connections"`
+	IdleTimeout     time.Duration  `name:"idle-timeout" description:"Idle connection timeout"`
+	ConnMaxLifetime time.Duration  `name:"conn-max-lifetime" description:"Maximum lifetime of a connection"`
+	Failover        FailoverConfig `name:"failover" description:"Redis failover configuration"`
+	TLS             struct {
 		Require          bool `name:"require" description:"Require TLS"`
 		tlsconfig.Client `name:",squash"`
 	} `name:"tls"`
@@ -124,6 +125,7 @@ func (c Config) Equals(other Config) bool {
 		equalsStringSlice(c.RootNamespace, other.RootNamespace) &&
 		c.PoolSize == other.PoolSize &&
 		c.IdleTimeout == other.IdleTimeout &&
+		c.ConnMaxLifetime == other.ConnMaxLifetime &&
 		c.Failover.Equals(other.Failover) &&
 		c.TLS.Require == other.TLS.Require &&
 		c.TLS.Client.Equals(other.TLS.Client)
@@ -205,6 +207,7 @@ func newRedisClient(conf *Config) *redis.Client {
 			DB:              conf.Database,
 			PoolSize:        conf.PoolSize,
 			ConnMaxIdleTime: conf.IdleTimeout,
+			ConnMaxLifetime: conf.ConnMaxLifetime,
 		})
 	}
 	return redis.NewClient(&redis.Options{
@@ -214,6 +217,7 @@ func newRedisClient(conf *Config) *redis.Client {
 		DB:              conf.Database,
 		PoolSize:        conf.PoolSize,
 		ConnMaxIdleTime: conf.IdleTimeout,
+		ConnMaxLifetime: conf.ConnMaxLifetime,
 	})
 }
 
