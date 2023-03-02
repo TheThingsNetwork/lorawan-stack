@@ -23,6 +23,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ## [3.24.2] - unreleased
 
+## [3.24.2] - unreleased
+
 ### Deprecated
 
 - Device claiming that transfer devices between applications is now deprecated and will be removed in a future version of The Things Stack. Device claiming on Join Servers, including The Things Join Server, remains functional. This deprecates the following components:
@@ -2508,6 +2510,7 @@ NOTE: These links should respect backports. See https://github.com/TheThingsNetw
 -->
 
 [unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.24.2...v3.24
+[3.24.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.24.2...v3.24.2
 [3.24.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.24.1...v3.24.2
 [3.24.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.24.0...v3.24.1
 [3.24.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.23.2...v3.24.0
