@@ -104,7 +104,7 @@
     "lottie-web": "^5.9.2",
     "md5": "^2.3.0",
     "prop-types": "^15.8.1",
-    "query-string": "^7.1.1",
+    "query-string": "^8.1.0",
     "react": "^17.0.1",
     "react-ace": "^6.6.0",
     "react-display-name": "^0.2.5",
