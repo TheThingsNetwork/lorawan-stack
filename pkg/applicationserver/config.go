@@ -21,6 +21,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/distribution"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
+	alcsyncv1 "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/alcsync/v1"
 	loraclouddevicemanagementv1 "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loradms/v1"
 	loracloudgeolocationv3 "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v3"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub"
@@ -285,6 +286,9 @@ func (c ApplicationPackagesConfig) NewApplicationPackages(ctx context.Context, s
 
 	// Initialize LoRa Cloud Geolocation v3 package handler
 	handlers[loracloudgeolocationv3.PackageName] = loracloudgeolocationv3.New(server, c.Registry)
+
+	// Initialize LoRa Application Layer Clock Synchronization v1 package handler.
+	handlers[alcsyncv1.PackageName] = alcsyncv1.New(server, c.Registry)
 
 	return packages.New(ctx, server, c.Registry, handlers, c.Workers, c.Timeout)
 }
