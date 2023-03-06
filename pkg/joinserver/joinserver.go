@@ -124,20 +124,21 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 	}{
 		{rpctracer.TracerHook, rpctracer.UnaryTracerHook(tracerNamespace)},
 		{rpclog.NamespaceHook, rpclog.UnaryNamespaceHook(logNamespace)},
-		{cluster.HookName, c.ClusterAuthUnaryHook()},
 	} {
-		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.NsJs", hook.name, hook.middleware)
-		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.AsJs", hook.name, hook.middleware)
-		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.Js", hook.name, hook.middleware)
+		for _, filter := range []string{
+			"/ttn.lorawan.v3.AsJs",
+			"/ttn.lorawan.v3.AppJs",
+			"/ttn.lorawan.v3.NsJs",
+			"/ttn.lorawan.v3.JsEndDeviceRegistry",
+			"/ttn.lorawan.v3.Js",
+			"/ttn.lorawan.v3.ApplicationActivationSettingRegistry",
+		} {
+			c.GRPC.RegisterUnaryHook(filter, hook.name, hook.middleware)
+		}
 	}
-	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.AppJs",
-		rpctracer.TracerHook, rpctracer.UnaryTracerHook(tracerNamespace))
-	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.ApplicationActivationSettingsRegistry",
-		rpctracer.TracerHook, rpctracer.UnaryTracerHook(tracerNamespace))
-	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.AppJs",
-		rpclog.NamespaceHook, rpclog.UnaryNamespaceHook(logNamespace))
-	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.ApplicationActivationSettingsRegistry",
-		rpclog.NamespaceHook, rpclog.UnaryNamespaceHook(logNamespace))
+	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.AsJs", cluster.HookName, c.ClusterAuthUnaryHook())
+	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.NsJs", cluster.HookName, c.ClusterAuthUnaryHook())
+	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.Js", cluster.HookName, c.ClusterAuthUnaryHook())
 
 	c.RegisterGRPC(js)
 	c.RegisterInterop(js)

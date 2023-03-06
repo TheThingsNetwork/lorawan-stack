@@ -281,12 +281,20 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	}{
 		{rpctracer.TracerHook, rpctracer.UnaryTracerHook(tracerNamespace)},
 		{rpclog.NamespaceHook, rpclog.UnaryNamespaceHook(logNamespace)},
-		{cluster.HookName, c.ClusterAuthUnaryHook()},
 	} {
-		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.GsNs", hook.name, hook.middleware)
-		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.AsNs", hook.name, hook.middleware)
-		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.Ns", hook.name, hook.middleware)
+		for _, filter := range []string{
+			"/ttn.lorawan.v3.GsNs",
+			"/ttn.lorawan.v3.AsNs",
+			"/ttn.lorawan.v3.NsEndDeviceRegistry",
+			"/ttn.lorawan.v3.Ns",
+		} {
+			c.GRPC.RegisterUnaryHook(filter, hook.name, hook.middleware)
+		}
 	}
+	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.GsNs", cluster.HookName, c.ClusterAuthUnaryHook())
+	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.AsNs", cluster.HookName, c.ClusterAuthUnaryHook())
+	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.Ns", cluster.HookName, c.ClusterAuthUnaryHook())
+
 	c.GRPC.RegisterStreamHook("/ttn.lorawan.v3.AsNs", rpctracer.TracerHook, rpctracer.StreamTracerHook(tracerNamespace))
 	c.GRPC.RegisterStreamHook("/ttn.lorawan.v3.AsNs", rpclog.NamespaceHook, rpclog.StreamNamespaceHook(logNamespace))
 	c.GRPC.RegisterStreamHook("/ttn.lorawan.v3.AsNs", cluster.HookName, c.ClusterAuthStreamHook())

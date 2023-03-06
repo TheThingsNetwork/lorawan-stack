@@ -48,6 +48,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpctracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
@@ -172,9 +173,23 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 	}
 
 	// Register gRPC services.
-	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", rpctracer.TracerHook, rpctracer.UnaryTracerHook(tracerNamespace))
-	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook(logNamespace))
+	for _, hook := range []struct {
+		name       string
+		middleware hooks.UnaryHandlerMiddleware
+	}{
+		{rpctracer.TracerHook, rpctracer.UnaryTracerHook(tracerNamespace)},
+		{rpclog.NamespaceHook, rpclog.UnaryNamespaceHook(logNamespace)},
+	} {
+		for _, filter := range []string{
+			"/ttn.lorawan.v3.Ns",
+			"/ttn.lorawan.v3.NsGs",
+			"/ttn.lorawan.v3.GtwGs",
+		} {
+			c.GRPC.RegisterUnaryHook(filter, hook.name, hook.middleware)
+		}
+	}
 	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", cluster.HookName, c.ClusterAuthUnaryHook())
+
 	c.RegisterGRPC(gs)
 
 	// Start UDP listeners.
