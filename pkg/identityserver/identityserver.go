@@ -143,7 +143,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 
 	is = &IdentityServer{
 		Component: c,
-		ctx:       log.NewContextWithField(ctx, "namespace", "identityserver"),
+		ctx:       log.NewContextWithField(ctx, "namespace", logNamespace),
 		config:    config,
 	}
 
@@ -175,7 +175,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		middleware hooks.UnaryHandlerMiddleware
 	}{
 		{rpctracer.TracerHook, rpctracer.UnaryTracerHook(tracerNamespace)},
-		{rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("identityserver")},
+		{rpclog.NamespaceHook, rpclog.UnaryNamespaceHook(logNamespace)},
 		{cluster.HookName, c.ClusterAuthUnaryHook()},
 	} {
 		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.Is", hook.name, hook.middleware)
@@ -193,9 +193,9 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.UserSessionRegistry", hook.name, hook.middleware)
 		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.NotificationService", hook.name, hook.middleware)
 	}
-	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.EntityAccess", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("identityserver"))
+	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.EntityAccess", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook(logNamespace))
 	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.EntityAccess", cluster.HookName, c.ClusterAuthUnaryHook())
-	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.OAuthAuthorizationRegistry", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("identityserver"))
+	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.OAuthAuthorizationRegistry", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook(logNamespace))
 
 	c.RegisterGRPC(is)
 	c.RegisterWeb(is.oauth)

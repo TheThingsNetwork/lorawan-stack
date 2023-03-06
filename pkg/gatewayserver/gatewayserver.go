@@ -125,7 +125,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 		forward[""] = []types.DevAddrPrefix{{}}
 	}
 
-	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver")
+	ctx = log.NewContextWithField(ctx, "namespace", logNamespace)
 
 	gs = &GatewayServer{
 		Component:                 c,
@@ -173,7 +173,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 
 	// Register gRPC services.
 	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", rpctracer.TracerHook, rpctracer.UnaryTracerHook(tracerNamespace))
-	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("gatewayserver"))
+	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook(logNamespace))
 	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", cluster.HookName, c.ClusterAuthUnaryHook())
 	c.RegisterGRPC(gs)
 

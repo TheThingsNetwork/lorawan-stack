@@ -92,7 +92,7 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 	}
 	js := &JoinServer{
 		Component: c,
-		ctx:       log.NewContextWithField(ctx, "namespace", "joinserver"),
+		ctx:       log.NewContextWithField(ctx, "namespace", logNamespace),
 
 		devices:                       conf.Devices,
 		keys:                          conf.Keys,
@@ -123,7 +123,7 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 		middleware hooks.UnaryHandlerMiddleware
 	}{
 		{rpctracer.TracerHook, rpctracer.UnaryTracerHook(tracerNamespace)},
-		{rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("joinserver")},
+		{rpclog.NamespaceHook, rpclog.UnaryNamespaceHook(logNamespace)},
 		{cluster.HookName, c.ClusterAuthUnaryHook()},
 	} {
 		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.NsJs", hook.name, hook.middleware)
@@ -135,9 +135,9 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.ApplicationActivationSettingsRegistry",
 		rpctracer.TracerHook, rpctracer.UnaryTracerHook(tracerNamespace))
 	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.AppJs",
-		rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("joinserver"))
+		rpclog.NamespaceHook, rpclog.UnaryNamespaceHook(logNamespace))
 	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.ApplicationActivationSettingsRegistry",
-		rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("joinserver"))
+		rpclog.NamespaceHook, rpclog.UnaryNamespaceHook(logNamespace))
 
 	c.RegisterGRPC(js)
 	c.RegisterInterop(js)

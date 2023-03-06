@@ -109,7 +109,7 @@ var errListenFrontend = errors.DefineFailedPrecondition("listen_frontend", "fail
 func New(c *component.Component, conf *Config) (as *ApplicationServer, err error) {
 	ctx := tracer.NewContextWithTracer(c.Context(), tracerNamespace)
 
-	ctx = log.NewContextWithField(ctx, "namespace", "applicationserver")
+	ctx = log.NewContextWithField(ctx, "namespace", logNamespace)
 
 	baseConf := c.GetBaseConfig(ctx)
 

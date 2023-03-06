@@ -25,7 +25,10 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
-const tracerNamespace = "go.thethings.network/lorawan-stack/pkg/joinserver"
+const (
+	logNamespace    = "joinserver"
+	tracerNamespace = "go.thethings.network/lorawan-stack/pkg/joinserver"
+)
 
 var (
 	evtRejectJoin = events.Define(

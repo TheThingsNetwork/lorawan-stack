@@ -27,7 +27,10 @@ import (
 	"google.golang.org/grpc/peer"
 )
 
-const tracerNamespace = "go.thethings.network/lorawan-stack/pkg/applicationserver"
+const (
+	logNamespace    = "applicationserver"
+	tracerNamespace = "go.thethings.network/lorawan-stack/pkg/applicationserver"
+)
 
 var (
 	evtReceiveDataUp = events.Define(

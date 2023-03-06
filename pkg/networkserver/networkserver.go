@@ -182,7 +182,7 @@ const (
 func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, error) {
 	ctx := tracer.NewContextWithTracer(c.Context(), tracerNamespace)
 
-	ctx = log.NewContextWithField(ctx, "namespace", "networkserver")
+	ctx = log.NewContextWithField(ctx, "namespace", logNamespace)
 
 	switch {
 	case conf.DeduplicationWindow == 0:
@@ -280,7 +280,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		middleware hooks.UnaryHandlerMiddleware
 	}{
 		{rpctracer.TracerHook, rpctracer.UnaryTracerHook(tracerNamespace)},
-		{rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("networkserver")},
+		{rpclog.NamespaceHook, rpclog.UnaryNamespaceHook(logNamespace)},
 		{cluster.HookName, c.ClusterAuthUnaryHook()},
 	} {
 		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.GsNs", hook.name, hook.middleware)
@@ -288,7 +288,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.Ns", hook.name, hook.middleware)
 	}
 	c.GRPC.RegisterStreamHook("/ttn.lorawan.v3.AsNs", rpctracer.TracerHook, rpctracer.StreamTracerHook(tracerNamespace))
-	c.GRPC.RegisterStreamHook("/ttn.lorawan.v3.AsNs", rpclog.NamespaceHook, rpclog.StreamNamespaceHook("networkserver"))
+	c.GRPC.RegisterStreamHook("/ttn.lorawan.v3.AsNs", rpclog.NamespaceHook, rpclog.StreamNamespaceHook(logNamespace))
 	c.GRPC.RegisterStreamHook("/ttn.lorawan.v3.AsNs", cluster.HookName, c.ClusterAuthStreamHook())
 
 	hostname, err := os.Hostname()
