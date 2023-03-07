@@ -97,45 +97,164 @@ func TestPackageDataHandlesInvalidValues(t *testing.T) {
 
 func TestPackageDataMerge(t *testing.T) {
 	t.Parallel()
-	a, _ := test.New(t)
-	defaultAssoc := &ttnpb.ApplicationPackageDefaultAssociation{
-		Data: &structpb.Struct{
-			Fields: map[string]*structpb.Value{
-				"f_port": {
-					Kind: &structpb.Value_NumberValue{
-						NumberValue: float64(202),
+	testCases := []struct {
+		Name string
+		In   struct {
+			DefaultAssoc *ttnpb.ApplicationPackageDefaultAssociation
+			PkgAssoc     *ttnpb.ApplicationPackageAssociation
+		}
+		Expected *packageData
+	}{
+		{
+			Name: "PopulatesValuesFromDefaultAssocOnly",
+			In: struct {
+				DefaultAssoc *ttnpb.ApplicationPackageDefaultAssociation
+				PkgAssoc     *ttnpb.ApplicationPackageAssociation
+			}{
+				DefaultAssoc: &ttnpb.ApplicationPackageDefaultAssociation{
+					Data: &structpb.Struct{
+						Fields: map[string]*structpb.Value{
+							"f_port": {
+								Kind: &structpb.Value_NumberValue{
+									NumberValue: 202,
+								},
+							},
+							"threshold": {
+								Kind: &structpb.Value_NumberValue{
+									NumberValue: 4,
+								},
+							},
+						},
 					},
 				},
-				"threshold": {
-					Kind: &structpb.Value_NumberValue{
-						NumberValue: 10,
+			},
+			Expected: &packageData{
+				FPort:     202,
+				Threshold: time.Duration(4) * time.Second,
+			},
+		},
+		{
+			Name: "PopulatesValuesFromPkgAssocOnly",
+			In: struct {
+				DefaultAssoc *ttnpb.ApplicationPackageDefaultAssociation
+				PkgAssoc     *ttnpb.ApplicationPackageAssociation
+			}{
+				PkgAssoc: &ttnpb.ApplicationPackageAssociation{
+					Data: &structpb.Struct{
+						Fields: map[string]*structpb.Value{
+							"f_port": {
+								Kind: &structpb.Value_NumberValue{
+									NumberValue: 202,
+								},
+							},
+							"threshold": {
+								Kind: &structpb.Value_NumberValue{
+									NumberValue: 4,
+								},
+							},
+						},
 					},
 				},
+			},
+			Expected: &packageData{
+				FPort:     202,
+				Threshold: time.Duration(4) * time.Second,
+			},
+		},
+		{
+			Name: "PopulatesValuesFromPkgAssocOverridingDefaultAssoc",
+			In: struct {
+				DefaultAssoc *ttnpb.ApplicationPackageDefaultAssociation
+				PkgAssoc     *ttnpb.ApplicationPackageAssociation
+			}{
+				DefaultAssoc: &ttnpb.ApplicationPackageDefaultAssociation{
+					Data: &structpb.Struct{
+						Fields: map[string]*structpb.Value{
+							"f_port": {
+								Kind: &structpb.Value_NumberValue{
+									NumberValue: 202,
+								},
+							},
+							"threshold": {
+								Kind: &structpb.Value_NumberValue{
+									NumberValue: 4,
+								},
+							},
+						},
+					},
+				},
+				PkgAssoc: &ttnpb.ApplicationPackageAssociation{
+					Data: &structpb.Struct{
+						Fields: map[string]*structpb.Value{
+							"f_port": {
+								Kind: &structpb.Value_NumberValue{
+									NumberValue: 203,
+								},
+							},
+							"threshold": {
+								Kind: &structpb.Value_NumberValue{
+									NumberValue: 5,
+								},
+							},
+						},
+					},
+				},
+			},
+			Expected: &packageData{
+				FPort:     203,
+				Threshold: time.Duration(5) * time.Second,
+			},
+		},
+		{
+			Name: "PopulatesDefaultValueForThreshold",
+			In: struct {
+				DefaultAssoc *ttnpb.ApplicationPackageDefaultAssociation
+				PkgAssoc     *ttnpb.ApplicationPackageAssociation
+			}{
+				DefaultAssoc: &ttnpb.ApplicationPackageDefaultAssociation{
+					Data: &structpb.Struct{
+						Fields: map[string]*structpb.Value{
+							"f_port": {
+								Kind: &structpb.Value_NumberValue{
+									NumberValue: 202,
+								},
+							},
+						},
+					},
+				},
+			},
+			Expected: &packageData{
+				FPort:     202,
+				Threshold: defaultThreshold,
+			},
+		},
+		{
+			Name: "PopulatesDefaultValueForFPortFromDefaultAssocIds",
+			In: struct {
+				DefaultAssoc *ttnpb.ApplicationPackageDefaultAssociation
+				PkgAssoc     *ttnpb.ApplicationPackageAssociation
+			}{
+				DefaultAssoc: &ttnpb.ApplicationPackageDefaultAssociation{
+					Ids: &ttnpb.ApplicationPackageDefaultAssociationIdentifiers{
+						FPort: 218,
+					},
+				},
+			},
+			Expected: &packageData{
+				FPort:     218,
+				Threshold: defaultThreshold,
 			},
 		},
 	}
 
-	pkgAssoc := &ttnpb.ApplicationPackageAssociation{
-		Data: &structpb.Struct{
-			Fields: map[string]*structpb.Value{
-				"f_port": {
-					Kind: &structpb.Value_NumberValue{
-						NumberValue: float64(203),
-					},
-				},
-				"threshold": {
-					Kind: &structpb.Value_NumberValue{
-						NumberValue: float64(20),
-					},
-				},
-			},
-		},
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+			a, _ := test.New(t)
+			actual, err := mergePackageData(tc.In.DefaultAssoc, tc.In.PkgAssoc)
+			a.So(err, should.BeNil)
+			a.So(actual, should.Resemble, tc.Expected)
+		})
 	}
-	expected := &packageData{
-		FPort:     203,
-		Threshold: time.Duration(20) * time.Second,
-	}
-	actual, err := mergePackageData(defaultAssoc, pkgAssoc)
-	a.So(err, should.BeNil)
-	a.So(actual, should.Resemble, expected)
 }

@@ -24,6 +24,8 @@ import (
 
 var errInvalidFieldType = errors.DefineCorruption("invalid_field_type", "field `{field}` has the wrong type `{type}`")
 
+var defaultThreshold = time.Duration(4) * time.Second
+
 type packageData struct {
 	FPort     uint32
 	Threshold time.Duration
@@ -77,6 +79,12 @@ func mergePackageData(
 		if data.Threshold != 0 {
 			merged.Threshold = data.Threshold
 		}
+	}
+	if merged.Threshold == 0 {
+		merged.Threshold = defaultThreshold
+	}
+	if merged.FPort == 0 {
+		merged.FPort = def.Ids.FPort
 	}
 	return merged, nil
 }
