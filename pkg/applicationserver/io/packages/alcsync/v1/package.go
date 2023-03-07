@@ -79,11 +79,16 @@ func (a *alcsyncpkg) HandleUp(
 		return err
 	}
 	for _, cmd := range commands {
-		if err := cmd.Execute(ctx, func(ctx context.Context, ad *ttnpb.ApplicationDownlink) error {
-			return a.server.DownlinkQueuePush(ctx, up.EndDeviceIds, []*ttnpb.ApplicationDownlink{ad})
-		}); err != nil {
-			logger.WithError(err).Debug("Failed to handle command")
+		downlinks, err := cmd.Execute()
+		if err != nil {
+			logger.WithError(err).Debug("Failed to execute command")
 			continue
+		}
+		if len(downlinks) == 0 {
+			continue
+		}
+		if err := a.server.DownlinkQueuePush(ctx, up.EndDeviceIds, downlinks); err != nil {
+			logger.WithError(err).Debug("Failed to push downlinks to queue")
 		}
 	}
 	return nil

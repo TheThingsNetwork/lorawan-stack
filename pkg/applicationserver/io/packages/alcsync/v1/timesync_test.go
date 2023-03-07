@@ -15,13 +15,11 @@
 package alcsyncv1
 
 import (
-	"context"
 	"encoding/binary"
 	"testing"
 	"time"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
@@ -97,12 +95,12 @@ func TestTimeSynchronizationCommandCalculatesCorrection(t *testing.T) {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
-			a, ctx := test.New(t)
-			err := tc.Command.Execute(ctx, func(ctx context.Context, ad *ttnpb.ApplicationDownlink) error {
-				assertCorrectAns(a, ad.FrmPayload, tc.Expected)
-				return nil
-			})
+			a, _ := test.New(t)
+			downlinks, err := tc.Command.Execute()
 			a.So(err, should.BeNil)
+			a.So(len(downlinks), should.Equal, 1)
+			downlinkFrmPayload := downlinks[0].GetFrmPayload()
+			assertCorrectAns(a, downlinkFrmPayload, tc.Expected)
 		})
 	}
 }
@@ -158,12 +156,10 @@ func TestTimeSynchronizationCommandRespectsThreshold(t *testing.T) {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
-			a, ctx := test.New(t)
-			err := tc.Command.Execute(ctx, func(ctx context.Context, ad *ttnpb.ApplicationDownlink) error {
-				a.So(ad, should.BeNil)
-				return nil
-			})
+			a, _ := test.New(t)
+			downlinks, err := tc.Command.Execute()
 			a.So(err, should.BeNil)
+			a.So(downlinks, should.BeEmpty)
 		})
 	}
 }
@@ -219,12 +215,10 @@ func TestTimeSynchronizationCommandRespectsAnsRequired(t *testing.T) {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
-			a, ctx := test.New(t)
-			err := tc.Command.Execute(ctx, func(ctx context.Context, ad *ttnpb.ApplicationDownlink) error {
-				a.So(ad, should.NotBeNil)
-				return nil
-			})
+			a, _ := test.New(t)
+			downlinks, err := tc.Command.Execute()
 			a.So(err, should.BeNil)
+			a.So(downlinks, should.NotBeEmpty)
 		})
 	}
 }

@@ -15,7 +15,6 @@
 package alcsyncv1
 
 import (
-	"context"
 	"math"
 	"time"
 
@@ -39,14 +38,11 @@ func (*TimeSyncCommand) Code() uint8 {
 }
 
 // Execute implements commands.Command.
-func (cmd *TimeSyncCommand) Execute(
-	ctx context.Context,
-	onDownlink func(context.Context, *ttnpb.ApplicationDownlink) error,
-) error {
+func (cmd *TimeSyncCommand) Execute() ([]*ttnpb.ApplicationDownlink, error) {
 	difference := cmd.receivedAt.Sub(cmd.req.DeviceTime)
 	exceedsThreshold := math.Abs(difference.Seconds()) > cmd.threshold.Seconds()
 	if !cmd.req.AnsRequired && !exceedsThreshold {
-		return nil
+		return nil, nil
 	}
 
 	ans := &AppTimeAns{
@@ -55,10 +51,11 @@ func (cmd *TimeSyncCommand) Execute(
 	}
 	frmPayload, err := ans.MarshalBinary()
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return onDownlink(ctx, &ttnpb.ApplicationDownlink{
+	downlink := &ttnpb.ApplicationDownlink{
 		FPort:      cmd.fPort,
 		FrmPayload: frmPayload,
-	})
+	}
+	return []*ttnpb.ApplicationDownlink{downlink}, nil
 }

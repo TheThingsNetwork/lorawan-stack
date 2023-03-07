@@ -15,8 +15,6 @@
 package alcsyncv1
 
 import (
-	"context"
-
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -26,8 +24,5 @@ type Command interface {
 	Code() uint8
 
 	// Execute runs the command logic.
-	Execute(
-		ctx context.Context,
-		onDownlink func(context.Context, *ttnpb.ApplicationDownlink) error,
-	) error
+	Execute() ([]*ttnpb.ApplicationDownlink, error)
 }
