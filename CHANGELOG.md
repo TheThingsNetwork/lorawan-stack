@@ -29,6 +29,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - The CLI now continues deleting devices when unclaiming from the Join Server fails. This resembles the behavior in the Console. This no longer stops devices from being deleted if the Join Server is unavailable or the claim is not held.
 - Organization API Keys' rights no longer are considered invalid during fetch operations. If the proper right is attached to said API key it is possible to fetch all fields of an entity, previous to this fix only public safe fields were fetchable.
+- Use new total number of entities actions for the entity title section in the Console.
 
 ### Security
 
