@@ -27,25 +27,12 @@ var errInvalidFieldType = errors.DefineCorruption("invalid_field_type", "field `
 var defaultThreshold = time.Duration(4) * time.Second
 
 type packageData struct {
-	FPort     uint32
 	Threshold time.Duration
 }
 
 func (d *packageData) fromStruct(st *structpb.Struct) error {
 	fields := st.GetFields()
-	value, ok := fields["f_port"]
-	if ok {
-		numberValue, ok := value.GetKind().(*structpb.Value_NumberValue)
-		if !ok {
-			return errInvalidFieldType.WithAttributes(
-				"field", "f_port",
-				"type", "number",
-			)
-		}
-		d.FPort = uint32(numberValue.NumberValue)
-	}
-
-	value, ok = fields["threshold"]
+	value, ok := fields["threshold"]
 	if ok {
 		numberValue, ok := value.GetKind().(*structpb.Value_NumberValue)
 		if !ok {
@@ -62,29 +49,27 @@ func (d *packageData) fromStruct(st *structpb.Struct) error {
 func mergePackageData(
 	def *ttnpb.ApplicationPackageDefaultAssociation,
 	assoc *ttnpb.ApplicationPackageAssociation,
-) (*packageData, error) {
+) (*packageData, uint32, error) {
 	var defaultData, associationData packageData
 	if err := defaultData.fromStruct(def.GetData()); err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	if err := associationData.fromStruct(assoc.GetData()); err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	merged := &packageData{}
+	merged := &packageData{
+		Threshold: defaultThreshold,
+	}
 	for _, data := range []packageData{defaultData, associationData} {
-		if data.FPort != 0 {
-			merged.FPort = data.FPort
-		}
 		if data.Threshold != 0 {
 			merged.Threshold = data.Threshold
 		}
 	}
-	if merged.Threshold == 0 {
-		merged.Threshold = defaultThreshold
+	fPort := def.GetIds().GetFPort()
+	assocFPort := assoc.GetIds().GetFPort()
+	if assocFPort != 0 {
+		fPort = assocFPort
 	}
-	if merged.FPort == 0 {
-		merged.FPort = def.Ids.FPort
-	}
-	return merged, nil
+	return merged, fPort, nil
 }

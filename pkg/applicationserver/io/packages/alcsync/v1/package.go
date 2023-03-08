@@ -57,13 +57,13 @@ func (a *alcsyncpkg) HandleUp(
 		return nil
 	}
 
-	data, err := mergePackageData(def, assoc)
+	data, fPort, err := mergePackageData(def, assoc)
 	if err != nil {
 		logger.Error("Failed to merge package data")
 		return err
 	}
 
-	if msg.GetFPort() != data.FPort {
+	if msg.GetFPort() != fPort {
 		logger.Debug("Uplink received on unhadled FPort")
 		return nil
 	}
@@ -73,7 +73,7 @@ func (a *alcsyncpkg) HandleUp(
 		return nil
 	}
 
-	commands, err := MakeCommands(msg, data)
+	commands, err := MakeCommands(msg, fPort, data)
 	if err != nil {
 		logger.WithError(err).Debug("Failed to parse frame payload into commands")
 		return err
@@ -93,7 +93,7 @@ func (a *alcsyncpkg) HandleUp(
 			results = append(results, result)
 		}
 	}
-	downlink, err := MakeDownlink(results, data.FPort)
+	downlink, err := MakeDownlink(results, fPort)
 	if err != nil {
 		logger.WithError(err).Debug("Failed to create downlink from results")
 		return err

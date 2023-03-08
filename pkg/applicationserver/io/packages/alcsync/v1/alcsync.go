@@ -60,11 +60,11 @@ func newTimeSyncCommand(
 }
 
 // MakeCommands parses the uplink payload and returns the commands.
-func MakeCommands(up *ttnpb.ApplicationUplink, data *packageData) ([]Command, error) {
+func MakeCommands(up *ttnpb.ApplicationUplink, fPort uint32, data *packageData) ([]Command, error) {
 	cID, cPayload := up.FrmPayload[0], up.FrmPayload[1:]
 	commands := make([]Command, 0)
 	for {
-		cmd, rest, err := makeCommand(cID, cPayload, up, data)
+		cmd, rest, err := makeCommand(cID, cPayload, up, fPort, data)
 		if err != nil {
 			return commands, err
 		}
@@ -79,9 +79,14 @@ func MakeCommands(up *ttnpb.ApplicationUplink, data *packageData) ([]Command, er
 }
 
 // makeCommand parses the payload based on the command ID.
-func makeCommand(cID byte, cPayload []byte, up *ttnpb.ApplicationUplink, data *packageData) (Command, []byte, error) {
+func makeCommand(
+	cID byte,
+	cPayload []byte,
+	up *ttnpb.ApplicationUplink,
+	fPort uint32,
+	data *packageData,
+) (Command, []byte, error) {
 	receivedAt := lorautil.GetAdjustedReceivedAt(up)
-	fPort := data.FPort
 	threshold := data.Threshold
 	switch cID {
 	case 0x01:

@@ -28,16 +28,10 @@ func TestPackageDataExtractsStructCorrectly(t *testing.T) {
 	t.Parallel()
 	a, _ := test.New(t)
 	expected := &packageData{
-		FPort:     202,
 		Threshold: time.Duration(10) * time.Second,
 	}
 	st := &structpb.Struct{
 		Fields: map[string]*structpb.Value{
-			"f_port": {
-				Kind: &structpb.Value_NumberValue{
-					NumberValue: float64(expected.FPort),
-				},
-			},
 			"threshold": {
 				Kind: &structpb.Value_NumberValue{
 					NumberValue: 10,
@@ -69,18 +63,6 @@ func TestPackageDataHandlesInvalidValues(t *testing.T) {
 				},
 			},
 		},
-		{
-			Name: "InvalidFPort",
-			St: &structpb.Struct{
-				Fields: map[string]*structpb.Value{
-					"f_port": {
-						Kind: &structpb.Value_StringValue{
-							StringValue: "202",
-						},
-					},
-				},
-			},
-		},
 	}
 
 	for _, tc := range testCases {
@@ -103,7 +85,10 @@ func TestPackageDataMerge(t *testing.T) {
 			DefaultAssoc *ttnpb.ApplicationPackageDefaultAssociation
 			PkgAssoc     *ttnpb.ApplicationPackageAssociation
 		}
-		Expected *packageData
+		Expected struct {
+			Data  *packageData
+			FPort uint32
+		}
 	}{
 		{
 			Name: "PopulatesValuesFromDefaultAssocOnly",
@@ -112,13 +97,11 @@ func TestPackageDataMerge(t *testing.T) {
 				PkgAssoc     *ttnpb.ApplicationPackageAssociation
 			}{
 				DefaultAssoc: &ttnpb.ApplicationPackageDefaultAssociation{
+					Ids: &ttnpb.ApplicationPackageDefaultAssociationIdentifiers{
+						FPort: 202,
+					},
 					Data: &structpb.Struct{
 						Fields: map[string]*structpb.Value{
-							"f_port": {
-								Kind: &structpb.Value_NumberValue{
-									NumberValue: 202,
-								},
-							},
 							"threshold": {
 								Kind: &structpb.Value_NumberValue{
 									NumberValue: 4,
@@ -128,9 +111,14 @@ func TestPackageDataMerge(t *testing.T) {
 					},
 				},
 			},
-			Expected: &packageData{
-				FPort:     202,
-				Threshold: time.Duration(4) * time.Second,
+			Expected: struct {
+				Data  *packageData
+				FPort uint32
+			}{
+				Data: &packageData{
+					Threshold: time.Duration(4) * time.Second,
+				},
+				FPort: 202,
 			},
 		},
 		{
@@ -140,13 +128,11 @@ func TestPackageDataMerge(t *testing.T) {
 				PkgAssoc     *ttnpb.ApplicationPackageAssociation
 			}{
 				PkgAssoc: &ttnpb.ApplicationPackageAssociation{
+					Ids: &ttnpb.ApplicationPackageAssociationIdentifiers{
+						FPort: 202,
+					},
 					Data: &structpb.Struct{
 						Fields: map[string]*structpb.Value{
-							"f_port": {
-								Kind: &structpb.Value_NumberValue{
-									NumberValue: 202,
-								},
-							},
 							"threshold": {
 								Kind: &structpb.Value_NumberValue{
 									NumberValue: 4,
@@ -156,9 +142,14 @@ func TestPackageDataMerge(t *testing.T) {
 					},
 				},
 			},
-			Expected: &packageData{
-				FPort:     202,
-				Threshold: time.Duration(4) * time.Second,
+			Expected: struct {
+				Data  *packageData
+				FPort uint32
+			}{
+				Data: &packageData{
+					Threshold: time.Duration(4) * time.Second,
+				},
+				FPort: 202,
 			},
 		},
 		{
@@ -168,13 +159,11 @@ func TestPackageDataMerge(t *testing.T) {
 				PkgAssoc     *ttnpb.ApplicationPackageAssociation
 			}{
 				DefaultAssoc: &ttnpb.ApplicationPackageDefaultAssociation{
+					Ids: &ttnpb.ApplicationPackageDefaultAssociationIdentifiers{
+						FPort: 202,
+					},
 					Data: &structpb.Struct{
 						Fields: map[string]*structpb.Value{
-							"f_port": {
-								Kind: &structpb.Value_NumberValue{
-									NumberValue: 202,
-								},
-							},
 							"threshold": {
 								Kind: &structpb.Value_NumberValue{
 									NumberValue: 4,
@@ -184,13 +173,11 @@ func TestPackageDataMerge(t *testing.T) {
 					},
 				},
 				PkgAssoc: &ttnpb.ApplicationPackageAssociation{
+					Ids: &ttnpb.ApplicationPackageAssociationIdentifiers{
+						FPort: 203,
+					},
 					Data: &structpb.Struct{
 						Fields: map[string]*structpb.Value{
-							"f_port": {
-								Kind: &structpb.Value_NumberValue{
-									NumberValue: 203,
-								},
-							},
 							"threshold": {
 								Kind: &structpb.Value_NumberValue{
 									NumberValue: 5,
@@ -200,9 +187,14 @@ func TestPackageDataMerge(t *testing.T) {
 					},
 				},
 			},
-			Expected: &packageData{
-				FPort:     203,
-				Threshold: time.Duration(5) * time.Second,
+			Expected: struct {
+				Data  *packageData
+				FPort uint32
+			}{
+				Data: &packageData{
+					Threshold: time.Duration(5) * time.Second,
+				},
+				FPort: 203,
 			},
 		},
 		{
@@ -212,37 +204,19 @@ func TestPackageDataMerge(t *testing.T) {
 				PkgAssoc     *ttnpb.ApplicationPackageAssociation
 			}{
 				DefaultAssoc: &ttnpb.ApplicationPackageDefaultAssociation{
-					Data: &structpb.Struct{
-						Fields: map[string]*structpb.Value{
-							"f_port": {
-								Kind: &structpb.Value_NumberValue{
-									NumberValue: 202,
-								},
-							},
-						},
-					},
-				},
-			},
-			Expected: &packageData{
-				FPort:     202,
-				Threshold: defaultThreshold,
-			},
-		},
-		{
-			Name: "PopulatesDefaultValueForFPortFromDefaultAssocIds",
-			In: struct {
-				DefaultAssoc *ttnpb.ApplicationPackageDefaultAssociation
-				PkgAssoc     *ttnpb.ApplicationPackageAssociation
-			}{
-				DefaultAssoc: &ttnpb.ApplicationPackageDefaultAssociation{
 					Ids: &ttnpb.ApplicationPackageDefaultAssociationIdentifiers{
-						FPort: 218,
+						FPort: 202,
 					},
 				},
 			},
-			Expected: &packageData{
-				FPort:     218,
-				Threshold: defaultThreshold,
+			Expected: struct {
+				Data  *packageData
+				FPort uint32
+			}{
+				Data: &packageData{
+					Threshold: defaultThreshold,
+				},
+				FPort: 202,
 			},
 		},
 	}
@@ -252,9 +226,10 @@ func TestPackageDataMerge(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a, _ := test.New(t)
-			actual, err := mergePackageData(tc.In.DefaultAssoc, tc.In.PkgAssoc)
+			data, fPort, err := mergePackageData(tc.In.DefaultAssoc, tc.In.PkgAssoc)
 			a.So(err, should.BeNil)
-			a.So(actual, should.Resemble, tc.Expected)
+			a.So(data, should.Resemble, tc.Expected.Data)
+			a.So(fPort, should.Equal, tc.Expected.FPort)
 		})
 	}
 }

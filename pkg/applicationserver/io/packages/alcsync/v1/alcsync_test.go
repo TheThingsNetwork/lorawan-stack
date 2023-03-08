@@ -35,93 +35,117 @@ var (
 func TestNewTimeSyncCommandValidInput(t *testing.T) {
 	t.Parallel()
 	testCases := []struct {
-		name     string
-		uplink   *ttnpb.ApplicationUplink
-		expected struct {
-			cmd  Command
-			rest []byte
-			err  error
+		Name string
+		In   struct {
+			TimeSyncPayload []byte
+			ReceivedAt      time.Time
+			Threshold       time.Duration
+			FPort           uint32
+		}
+		Expected struct {
+			Cmd  Command
+			Rest []byte
+			Err  error
 		}
 	}{
 		{
-			name: "WithNoExtraBytes",
-			uplink: &ttnpb.ApplicationUplink{
-				FrmPayload: frmPayload,
-				FPort:      202,
-				ReceivedAt: timestamppb.New(receivedAtTime),
-			},
-			expected: struct {
-				cmd  Command
-				rest []byte
-				err  error
+			Name: "WithNoExtraBytes",
+			In: struct {
+				TimeSyncPayload []byte
+				ReceivedAt      time.Time
+				Threshold       time.Duration
+				FPort           uint32
 			}{
-				cmd: &TimeSyncCommand{
+				TimeSyncPayload: timeSyncPayload,
+				ReceivedAt:      receivedAtTime,
+				Threshold:       threeSecondsDuration,
+				FPort:           202,
+			},
+			Expected: struct {
+				Cmd  Command
+				Rest []byte
+				Err  error
+			}{
+				Cmd: &TimeSyncCommand{
 					req: &AppTimeReq{
 						DeviceTime:  receivedAtTime,
 						TokenReq:    2,
 						AnsRequired: true,
 					},
+					threshold:  threeSecondsDuration,
 					receivedAt: receivedAtTime,
 					fPort:      202,
 				},
-				rest: []byte{},
-				err:  nil,
+				Rest: []byte{},
+				Err:  nil,
 			},
 		},
 		{
-			name: "WithExtraBytes",
-			uplink: &ttnpb.ApplicationUplink{
-				FrmPayload: append(frmPayload, 0x53, 0x31),
-				FPort:      202,
-				ReceivedAt: timestamppb.New(receivedAtTime),
-			},
-			expected: struct {
-				cmd  Command
-				rest []byte
-				err  error
+			Name: "WithExtraBytes",
+			In: struct {
+				TimeSyncPayload []byte
+				ReceivedAt      time.Time
+				Threshold       time.Duration
+				FPort           uint32
 			}{
-				cmd: &TimeSyncCommand{
+				TimeSyncPayload: append(timeSyncPayload, 0x53, 0x31),
+				Threshold:       threeSecondsDuration,
+				ReceivedAt:      receivedAtTime,
+				FPort:           202,
+			},
+			Expected: struct {
+				Cmd  Command
+				Rest []byte
+				Err  error
+			}{
+				Cmd: &TimeSyncCommand{
 					req: &AppTimeReq{
 						DeviceTime:  receivedAtTime,
 						TokenReq:    2,
 						AnsRequired: true,
 					},
+					threshold:  threeSecondsDuration,
 					receivedAt: receivedAtTime,
 					fPort:      202,
 				},
-				rest: []byte{0x53, 0x31},
-				err:  nil,
+				Rest: []byte{0x53, 0x31},
+				Err:  nil,
 			},
 		},
 		{
-			name: "WithPayloadTooShort",
-			uplink: &ttnpb.ApplicationUplink{
-				FrmPayload: frmPayload[:4],
-				FPort:      202,
-				ReceivedAt: timestamppb.New(receivedAtTime),
-			},
-			expected: struct {
-				cmd  Command
-				rest []byte
-				err  error
+			Name: "WithPayloadTooShort",
+			In: struct {
+				TimeSyncPayload []byte
+				ReceivedAt      time.Time
+				Threshold       time.Duration
+				FPort           uint32
 			}{
-				cmd:  (*TimeSyncCommand)(nil),
-				rest: frmPayload[1:4],
-				err:  errUnknownCommand.New(),
+				TimeSyncPayload: timeSyncPayload[:4],
+				ReceivedAt:      receivedAtTime,
+				Threshold:       threeSecondsDuration,
+				FPort:           202,
+			},
+			Expected: struct {
+				Cmd  Command
+				Rest []byte
+				Err  error
+			}{
+				Cmd:  (*TimeSyncCommand)(nil),
+				Rest: timeSyncPayload[:4],
+				Err:  errUnknownCommand,
 			},
 		},
 	}
+
 	for _, tc := range testCases {
 		tc := tc
-		t.Run(tc.name, func(t *testing.T) {
+		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a, _ := test.New(t)
-			cPayload := tc.uplink.FrmPayload[1:]
-			cmd, rest, err := newTimeSyncCommand(cPayload, 0, tc.uplink.ReceivedAt.AsTime(), tc.uplink.FPort)
-
-			a.So(cmd, should.Resemble, tc.expected.cmd)
-			a.So(rest, should.Resemble, tc.expected.rest)
-			a.So(err, should.Resemble, tc.expected.err)
+			cmd, rest, err := newTimeSyncCommand(tc.In.TimeSyncPayload, tc.In.Threshold, tc.In.ReceivedAt, tc.In.FPort)
+			a.So(cmd, should.Resemble, tc.Expected.Cmd)
+			a.So(rest, should.Resemble, tc.Expected.Rest)
+			a.So(err, should.Resemble, tc.Expected.Err)
 		})
 	}
 }
@@ -129,70 +153,67 @@ func TestNewTimeSyncCommandValidInput(t *testing.T) {
 func TestMakeCommandValidInput(t *testing.T) {
 	t.Parallel()
 	testCases := []struct {
-		name string
-		in   struct {
-			cID      byte
-			cPayload []byte
+		Name string
+		In   struct {
+			CID      byte
+			CPayload []byte
 		}
-		expected struct {
-			cID  byte
-			rest []byte
+		Expected struct {
+			CID  byte
+			Rest []byte
 		}
 	}{
 		{
-			name: "TimeSyncCommandWithNoExtraBytes",
-			in: struct {
-				cID      byte
-				cPayload []byte
+			Name: "TimeSyncCommandWithNoExtraBytes",
+			In: struct {
+				CID      byte
+				CPayload []byte
 			}{
-				cID:      timeSyncCID,
-				cPayload: timeSyncPayload,
+				CID:      timeSyncCID,
+				CPayload: timeSyncPayload,
 			},
-			expected: struct {
-				cID  byte
-				rest []byte
+			Expected: struct {
+				CID  byte
+				Rest []byte
 			}{
-				cID:  timeSyncCID,
-				rest: []byte{},
+				CID:  timeSyncCID,
+				Rest: []byte{},
 			},
 		},
 		{
-			name: "TimeSyncCommandWithExtraBytes",
-			in: struct {
-				cID      byte
-				cPayload []byte
+			Name: "TimeSyncCommandWithExtraBytes",
+			In: struct {
+				CID      byte
+				CPayload []byte
 			}{
-				cID:      timeSyncCID,
-				cPayload: append(timeSyncPayload, 0x53, 0x31),
+				CID:      timeSyncCID,
+				CPayload: append(timeSyncPayload, 0x53, 0x31),
 			},
-			expected: struct {
-				cID  byte
-				rest []byte
+			Expected: struct {
+				CID  byte
+				Rest []byte
 			}{
-				cID:  timeSyncCID,
-				rest: []byte{0x53, 0x31},
+				CID:  timeSyncCID,
+				Rest: []byte{0x53, 0x31},
 			},
 		},
 	}
 
-	uplink := &ttnpb.ApplicationUplink{
-		FPort:      202,
-		ReceivedAt: timestamppb.New(receivedAtTime),
-	}
-	data := &packageData{
-		FPort:     202,
-		Threshold: threeSecondsDuration,
-	}
+	// The uplink, fPort and data can be omitted since they are not targeted by this test.
+
+	uplink := &ttnpb.ApplicationUplink{}
+	data := &packageData{}
+	var fPort uint32
 
 	for _, tc := range testCases {
 		tc := tc
-		t.Run(tc.name, func(t *testing.T) {
+		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a, _ := test.New(t)
-			cmd, rest, err := makeCommand(tc.in.cID, tc.in.cPayload, uplink, data)
+			cmd, rest, err := makeCommand(tc.In.CID, tc.In.CPayload, uplink, fPort, data)
 			a.So(err, should.Equal, nil)
-			a.So(cmd.Code(), should.Resemble, tc.expected.cID)
-			a.So(rest, should.Resemble, tc.expected.rest)
+			a.So(cmd.Code(), should.Resemble, tc.Expected.CID)
+			a.So(rest, should.Resemble, tc.Expected.Rest)
 		})
 	}
 }
@@ -200,54 +221,53 @@ func TestMakeCommandValidInput(t *testing.T) {
 func TestMakeCommandInvalidInput(t *testing.T) {
 	t.Parallel()
 	testCases := []struct {
-		name string
-		in   struct {
-			cID      byte
-			cPayload []byte
+		Name string
+		In   struct {
+			CID      byte
+			CPayload []byte
 		}
-		expected struct {
-			cID  byte
-			rest []byte
-			err  error
+		Expected struct {
+			CID  byte
+			Rest []byte
+			Err  error
 		}
 	}{
 		{
-			name: "WithUnknownCID",
-			in: struct {
-				cID      byte
-				cPayload []byte
+			Name: "WithUnknownCID",
+			In: struct {
+				CID      byte
+				CPayload []byte
 			}{
-				cID:      0x43,
-				cPayload: timeSyncPayload,
+				CID:      0x43,
+				CPayload: timeSyncPayload,
 			},
-			expected: struct {
-				cID  byte
-				rest []byte
-				err  error
+			Expected: struct {
+				CID  byte
+				Rest []byte
+				Err  error
 			}{
-				cID:  0x43,
-				rest: timeSyncPayload,
-				err:  errUnknownCommand.New(),
+				CID:  0x43,
+				Rest: timeSyncPayload,
+				Err:  errUnknownCommand.New(),
 			},
 		},
 	}
-	uplink := &ttnpb.ApplicationUplink{
-		FPort:      202,
-		ReceivedAt: timestamppb.New(receivedAtTime),
-	}
-	data := &packageData{
-		FPort:     202,
-		Threshold: threeSecondsDuration,
-	}
+
+	// The uplink, fPort and data can be omitted since they are not targeted by this test.
+
+	uplink := &ttnpb.ApplicationUplink{}
+	data := &packageData{}
+	var fPort uint32
+
 	for _, tc := range testCases {
 		tc := tc
-		t.Run(tc.name, func(t *testing.T) {
+		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a, _ := test.New(t)
-			cmd, rest, err := makeCommand(tc.in.cID, tc.in.cPayload, uplink, data)
+			cmd, rest, err := makeCommand(tc.In.CID, tc.In.CPayload, uplink, fPort, data)
 			a.So(cmd, should.Equal, nil)
-			a.So(rest, should.Resemble, tc.expected.rest)
-			a.So(err, should.Resemble, tc.expected.err)
+			a.So(rest, should.Resemble, tc.Expected.Rest)
+			a.So(err, should.Resemble, tc.Expected.Err)
 		})
 	}
 }
@@ -255,37 +275,38 @@ func TestMakeCommandInvalidInput(t *testing.T) {
 func TestMakeCommandsValidInput(t *testing.T) {
 	t.Parallel()
 	testCases := []struct {
-		name string
-		in   struct {
-			uplink *ttnpb.ApplicationUplink
-			data   *packageData
+		Name string
+		In   struct {
+			Uplink *ttnpb.ApplicationUplink
+			FPort  uint32
+			Data   *packageData
 		}
-		expected struct {
-			cmds []Command
-			err  error
+		Expected struct {
+			Cmds []Command
+			Err  error
 		}
 	}{
 		{
-			name: "HandlesSingleCommand",
-			in: struct {
-				uplink *ttnpb.ApplicationUplink
-				data   *packageData
+			Name: "HandlesSingleCommand",
+			In: struct {
+				Uplink *ttnpb.ApplicationUplink
+				FPort  uint32
+				Data   *packageData
 			}{
-				uplink: &ttnpb.ApplicationUplink{
+				Uplink: &ttnpb.ApplicationUplink{
 					FrmPayload: frmPayload,
-					FPort:      202,
 					ReceivedAt: timestamppb.New(receivedAtTime),
 				},
-				data: &packageData{
-					FPort:     202,
+				Data: &packageData{
 					Threshold: threeSecondsDuration,
 				},
+				FPort: 202,
 			},
-			expected: struct {
-				cmds []Command
-				err  error
+			Expected: struct {
+				Cmds []Command
+				Err  error
 			}{
-				cmds: []Command{
+				Cmds: []Command{
 					&TimeSyncCommand{
 						req: &AppTimeReq{
 							DeviceTime:  receivedAtTime,
@@ -297,30 +318,30 @@ func TestMakeCommandsValidInput(t *testing.T) {
 						threshold:  threeSecondsDuration,
 					},
 				},
-				err: nil,
+				Err: nil,
 			},
 		},
 		{
-			name: "HandlesSingleCommandAndRest",
-			in: struct {
-				uplink *ttnpb.ApplicationUplink
-				data   *packageData
+			Name: "HandlesSingleCommandAndRest",
+			In: struct {
+				Uplink *ttnpb.ApplicationUplink
+				FPort  uint32
+				Data   *packageData
 			}{
-				uplink: &ttnpb.ApplicationUplink{
+				Uplink: &ttnpb.ApplicationUplink{
 					FrmPayload: append(frmPayload, 0x53, 0x31),
-					FPort:      202,
 					ReceivedAt: timestamppb.New(receivedAtTime),
 				},
-				data: &packageData{
-					FPort:     202,
+				Data: &packageData{
 					Threshold: threeSecondsDuration,
 				},
+				FPort: 202,
 			},
-			expected: struct {
-				cmds []Command
-				err  error
+			Expected: struct {
+				Cmds []Command
+				Err  error
 			}{
-				cmds: []Command{
+				Cmds: []Command{
 					&TimeSyncCommand{
 						req: &AppTimeReq{
 							DeviceTime:  receivedAtTime,
@@ -332,30 +353,31 @@ func TestMakeCommandsValidInput(t *testing.T) {
 						threshold:  threeSecondsDuration,
 					},
 				},
-				err: errUnknownCommand.New(),
+				Err: errUnknownCommand.New(),
 			},
 		},
 		{
-			name: "HandlesMultipleCommands",
-			in: struct {
-				uplink *ttnpb.ApplicationUplink
-				data   *packageData
+			Name: "HandlesMultipleCommands",
+			In: struct {
+				Uplink *ttnpb.ApplicationUplink
+				FPort  uint32
+				Data   *packageData
 			}{
-				uplink: &ttnpb.ApplicationUplink{
+				Uplink: &ttnpb.ApplicationUplink{
 					FrmPayload: append(frmPayload, frmPayload...),
 					FPort:      202,
 					ReceivedAt: timestamppb.New(receivedAtTime),
 				},
-				data: &packageData{
-					FPort:     202,
+				Data: &packageData{
 					Threshold: threeSecondsDuration,
 				},
+				FPort: 202,
 			},
-			expected: struct {
-				cmds []Command
-				err  error
+			Expected: struct {
+				Cmds []Command
+				Err  error
 			}{
-				cmds: []Command{
+				Cmds: []Command{
 					&TimeSyncCommand{
 						req: &AppTimeReq{
 							DeviceTime:  receivedAtTime,
@@ -377,16 +399,17 @@ func TestMakeCommandsValidInput(t *testing.T) {
 						threshold:  threeSecondsDuration,
 					},
 				},
-				err: nil,
+				Err: nil,
 			},
 		},
 		{
-			name: "HandlesMultipleCommandsAndRest",
-			in: struct {
-				uplink *ttnpb.ApplicationUplink
-				data   *packageData
+			Name: "HandlesMultipleCommandsAndRest",
+			In: struct {
+				Uplink *ttnpb.ApplicationUplink
+				FPort  uint32
+				Data   *packageData
 			}{
-				uplink: &ttnpb.ApplicationUplink{
+				Uplink: &ttnpb.ApplicationUplink{
 					FrmPayload: append(
 						append(frmPayload, frmPayload...),
 						0x53, 0x31,
@@ -394,16 +417,16 @@ func TestMakeCommandsValidInput(t *testing.T) {
 					FPort:      202,
 					ReceivedAt: timestamppb.New(receivedAtTime),
 				},
-				data: &packageData{
-					FPort:     202,
+				Data: &packageData{
 					Threshold: threeSecondsDuration,
 				},
+				FPort: 202,
 			},
-			expected: struct {
-				cmds []Command
-				err  error
+			Expected: struct {
+				Cmds []Command
+				Err  error
 			}{
-				cmds: []Command{
+				Cmds: []Command{
 					&TimeSyncCommand{
 						req: &AppTimeReq{
 							DeviceTime:  receivedAtTime,
@@ -425,19 +448,19 @@ func TestMakeCommandsValidInput(t *testing.T) {
 						threshold:  threeSecondsDuration,
 					},
 				},
-				err: errUnknownCommand.New(),
+				Err: errUnknownCommand.New(),
 			},
 		},
 	}
 
 	for _, tc := range testCases {
 		tc := tc
-		t.Run(tc.name, func(t *testing.T) {
+		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a, _ := test.New(t)
-			cmds, err := MakeCommands(tc.in.uplink, tc.in.data)
-			a.So(err, should.Resemble, tc.expected.err)
-			a.So(cmds, should.Resemble, tc.expected.cmds)
+			cmds, err := MakeCommands(tc.In.Uplink, tc.In.FPort, tc.In.Data)
+			a.So(err, should.Resemble, tc.Expected.Err)
+			a.So(cmds, should.Resemble, tc.Expected.Cmds)
 		})
 	}
 }
