@@ -86,8 +86,16 @@ class Marshaler {
     return this.payloadListResponse('applications', result)
   }
 
+  static unwrapTotalApplicationCount(result) {
+    return this.payloadListResponse('applications', result).totalCount
+  }
+
   static unwrapApplication(result) {
     return this.payloadSingleResponse(result)
+  }
+
+  static unwrapTotalDeviceCount(result) {
+    return this.payloadListResponse('end_devices', result).totalCount
   }
 
   static unwrapDevices(result) {
@@ -98,12 +106,20 @@ class Marshaler {
     return this.payloadSingleResponse(result)
   }
 
+  static unwrapTotalGatewayCount(result) {
+    return this.payloadListResponse('gateways', result).totalCount
+  }
+
   static unwrapGateways(result) {
     return this.payloadListResponse('gateways', result)
   }
 
   static unwrapGateway(result) {
     return this.payloadSingleResponse(result)
+  }
+
+  static unwrapTotalOrganizationCount(result) {
+    return this.payloadListResponse('organizations', result).totalCount
   }
 
   static unwrapUser(result) {

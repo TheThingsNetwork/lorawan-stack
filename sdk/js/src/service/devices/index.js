@@ -254,6 +254,20 @@ class Devices {
     return Marshaler.unwrapDevices(response)
   }
 
+  async getTotalCount(applicationId, params, selector) {
+    const response = await this._api.EndDeviceRegistry.List(
+      {
+        routeParams: { 'application_ids.application_id': applicationId },
+      },
+      {
+        ...params,
+        ...Marshaler.selectorToFieldMask(selector),
+      },
+    )
+
+    return Marshaler.unwrapTotalDeviceCount(response)
+  }
+
   async search(applicationId, params, selector) {
     const response = await this._api.EndDeviceRegistrySearch.SearchEndDevices(
       {

@@ -70,6 +70,15 @@ const updateDeviceLogic = createRequestLogic(
   devices.updateDeviceSuccess,
 )
 
+const getTotalDeviceCountLogic = createRequestLogic({
+  type: devices.GET_TOTAL_DEVICE_COUNT,
+  process: async ({ action }) => {
+    const { applicationId } = action.payload
+
+    return await tts.Applications.Devices.getTotalCount(applicationId)
+  },
+})
+
 const getDevicesListLogic = createRequestLogic({
   type: devices.GET_DEVICES_LIST,
   process: async ({ action }) => {
@@ -178,6 +187,7 @@ const getDeviceSessionLogic = createLogic({
 
 export default [
   createDeviceLogic,
+  getTotalDeviceCountLogic,
   getDevicesListLogic,
   getDeviceTemplateFormatsLogic,
   convertTemplateLogic,

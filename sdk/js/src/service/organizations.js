@@ -43,6 +43,15 @@ class Organizations {
 
   // Retrieval.
 
+  async getTotalCount(params, selector) {
+    const response = await this._api.OrganizationRegistry.List(undefined, {
+      ...params,
+      ...Marshaler.selectorToFieldMask(selector),
+    })
+
+    return Marshaler.unwrapTotalOrganizationCount(response)
+  }
+
   async getAll(params, selector) {
     const response = await this._api.OrganizationRegistry.List(undefined, {
       ...params,

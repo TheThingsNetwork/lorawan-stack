@@ -90,6 +90,20 @@ export const [
   { request: restoreGateway, success: restoreGatewaySuccess, failure: restoreGatewayFailure },
 ] = createPaginationRestoreActions(SHARED_NAME, id => ({ id }))
 
+export const GET_TOTAL_GATEWAY_COUNT_BASE = 'GET_TOTAL_GATEWAY_COUNT'
+export const [
+  {
+    request: GET_TOTAL_GATEWAY_COUNT,
+    success: GET_TOTAL_GATEWAY_COUNT_SUCCESS,
+    failure: GET_TOTAL_GATEWAY_COUNT_BASE_FAILURE,
+  },
+  {
+    request: getTotalGatewayCount,
+    success: getTotalGatewayCountSuccess,
+    failure: getTotalGatewayCountFailure,
+  },
+] = createRequestActions(GET_TOTAL_GATEWAY_COUNT_BASE)
+
 export const GET_GTWS_LIST_BASE = createPaginationBaseActionType(SHARED_NAME)
 export const [
   { request: GET_GTWS_LIST, success: GET_GTWS_LIST_SUCCESS, failure: GET_GTWS_LIST_FAILURE },

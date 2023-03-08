@@ -25,6 +25,7 @@ import {
   UPDATE_GTW_STATS_FAILURE,
   START_GTW_STATS_SUCCESS,
   START_GTW_STATS_FAILURE,
+  GET_TOTAL_GATEWAY_COUNT_SUCCESS,
 } from '@console/store/actions/gateways'
 
 const defaultStatisticsState = {
@@ -36,6 +37,7 @@ const defaultState = {
   entities: {},
   selectedGateway: null,
   statistics: defaultStatisticsState,
+  totalCount: undefined,
 }
 
 const gateway = (state = {}, gateway) => ({
@@ -121,6 +123,11 @@ const gateways = (state = defaultState, action) => {
       return {
         ...state,
         statistics: statistics(state.statistics, action),
+      }
+    case GET_TOTAL_GATEWAY_COUNT_SUCCESS:
+      return {
+        ...state,
+        totalCount: payload,
       }
     default:
       return state

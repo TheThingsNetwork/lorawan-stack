@@ -29,6 +29,7 @@ import {
   UPDATE_DEV_SUCCESS,
   RESET_DEV_SUCCESS,
   GET_DEVICE_EVENT_MESSAGE_SUCCESS,
+  GET_TOTAL_DEVICE_COUNT_SUCCESS,
 } from '@console/store/actions/devices'
 import { GET_APP_EVENT_MESSAGE_SUCCESS } from '@console/store/actions/applications'
 
@@ -37,6 +38,7 @@ const defaultState = {
   derived: {},
   selectedDevice: undefined,
   selectedDeviceClaimable: undefined,
+  totalCount: undefined,
 }
 const defaultDerived = {
   uplinkFrameCount: undefined,
@@ -208,6 +210,11 @@ const devices = (state = defaultState, { type, payload, event }) => {
       }
 
       return state
+    case GET_TOTAL_DEVICE_COUNT_SUCCESS:
+      return {
+        ...state,
+        totalCount: payload,
+      }
     default:
       return state
   }

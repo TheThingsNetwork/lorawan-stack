@@ -18,11 +18,13 @@ import {
   GET_API_KEYS_LIST_SUCCESS,
   GET_API_KEY_SUCCESS,
   GET_API_KEY,
+  GET_TOTAL_API_KEYS_COUNT_SUCCESS,
 } from '@console/store/actions/api-keys'
 
 const defaultState = {
   entities: {},
   selectedApiKey: null,
+  totalCount: undefined,
 }
 
 const apiKey = (state = {}, apiKey) => ({
@@ -59,6 +61,11 @@ const apiKeys = (state = defaultState, { type, payload }) => {
             { ...state.entities },
           ),
         },
+      }
+    case GET_TOTAL_API_KEYS_COUNT_SUCCESS:
+      return {
+        ...state,
+        totalCount: payload,
       }
     default:
       return state

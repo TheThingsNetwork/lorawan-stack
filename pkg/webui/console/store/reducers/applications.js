@@ -23,6 +23,7 @@ import {
   GET_APP_DEV_COUNT_SUCCESS,
   GET_APP_DEV_EUI_COUNT_SUCCESS,
   GET_APPS_LIST_SUCCESS,
+  GET_TOTAL_APPLICATION_COUNT_SUCCESS,
   UPDATE_APP_SUCCESS,
   DELETE_APP_SUCCESS,
   GET_APP_EVENT_MESSAGE_SUCCESS,
@@ -38,6 +39,7 @@ const defaultState = {
   derived: {},
   selectedApplication: null,
   applicationDeviceCounts: {},
+  totalCount: undefined,
 }
 
 const applications = (state = defaultState, { type, payload, event }) => {
@@ -120,6 +122,11 @@ const applications = (state = defaultState, { type, payload, event }) => {
         }
       }
       return state
+    case GET_TOTAL_APPLICATION_COUNT_SUCCESS:
+      return {
+        ...state,
+        totalCount: payload,
+      }
     default:
       return state
   }

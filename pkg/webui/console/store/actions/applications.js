@@ -131,6 +131,20 @@ export const [
   },
 ] = createPaginationRestoreActions(SHARED_NAME, id => ({ id }))
 
+export const GET_TOTAL_APPLICATION_COUNT_BASE = 'GET_TOTAL_APPLICATION_COUNT'
+export const [
+  {
+    request: GET_TOTAL_APPLICATION_COUNT,
+    success: GET_TOTAL_APPLICATION_COUNT_SUCCESS,
+    failure: GET_TOTAL_APPLICATION_COUNT_FAILURE,
+  },
+  {
+    request: getTotalApplicationCount,
+    success: getTotalApplicationCountSuccess,
+    failure: getTotalApplicationCountFailure,
+  },
+] = createRequestActions(GET_TOTAL_APPLICATION_COUNT_BASE)
+
 export const GET_APPS_LIST_BASE = createPaginationBaseActionType(SHARED_NAME)
 export const [
   { request: GET_APPS_LIST, success: GET_APPS_LIST_SUCCESS, failure: GET_APPS_LIST_FAILURE },

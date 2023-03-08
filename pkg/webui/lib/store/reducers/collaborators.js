@@ -17,6 +17,7 @@ import {
   GET_COLLABORATORS_LIST_SUCCESS,
   GET_COLLABORATOR_SUCCESS,
   GET_COLLABORATOR,
+  GET_TOTAL_COLLABORATOR_COUNT_SUCCESS,
 } from '@ttn-lw/lib/store/actions/collaborators'
 
 const defaultState = {
@@ -60,6 +61,11 @@ const collaborators = (state = defaultState, { type, payload }) => {
           ),
         },
         totalCount: payload.totalCount,
+      }
+    case GET_TOTAL_COLLABORATOR_COUNT_SUCCESS:
+      return {
+        ...state,
+        totalCount: payload,
       }
     default:
       return state

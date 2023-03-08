@@ -47,6 +47,15 @@ class Collaborators {
     return this._getById(entityId, organizationId, false)
   }
 
+  async getTotalCount(entityId) {
+    const entityIdRoute = this._parentRoutes.list
+    const result = await this._api.ListCollaborators({
+      routeParams: { [entityIdRoute]: entityId },
+    })
+
+    return Marshaler.payloadListResponse('collaborators', result).totalCount
+  }
+
   async getAll(entityId, params) {
     const entityIdRoute = this._parentRoutes.list
     const result = await this._api.ListCollaborators(

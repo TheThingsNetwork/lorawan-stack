@@ -36,6 +36,23 @@ export const [
   (parentType, parentId, collaboratorId, isUser, selector) => ({ selector }),
 )
 
+export const GET_TOTAL_COLLABORATOR_COUNT_BASE = 'GET_TOTAL_COLLABORATOR_COUNT'
+export const [
+  {
+    request: GET_TOTAL_COLLABORATOR_COUNT,
+    success: GET_TOTAL_COLLABORATOR_COUNT_SUCCESS,
+    failure: GET_TOTAL_COLLABORATOR_COUNT_FAILURE,
+  },
+  {
+    request: getTotalCollaboratorCount,
+    success: getTotalCollaboratorCountSuccess,
+    failure: getTotalCollaboratorCountFailure,
+  },
+] = createRequestActions(GET_TOTAL_COLLABORATOR_COUNT_BASE, (parentType, parentId) => ({
+  parentType,
+  parentId,
+}))
+
 export const GET_COLLABORATORS_LIST_BASE = 'GET_COLLABORATORS_LIST'
 export const [
   {

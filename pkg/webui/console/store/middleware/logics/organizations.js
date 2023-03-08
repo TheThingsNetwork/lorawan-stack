@@ -36,6 +36,11 @@ const getOrganizationLogic = createRequestLogic({
   },
 })
 
+const getTotalOrganizationCountLogic = createRequestLogic({
+  type: organizations.GET_TOTAL_ORGS_COUNT,
+  process: async () => await tts.Organizations.getTotalCount(),
+})
+
 const getOrganizationsLogic = createRequestLogic({
   type: organizations.GET_ORGS_LIST,
   latest: true,
@@ -138,6 +143,7 @@ const getOrganizationsRightsLogic = createRequestLogic({
 
 export default [
   getOrganizationLogic,
+  getTotalOrganizationCountLogic,
   getOrganizationsLogic,
   getOrganizationsCollaboratorCountLogic,
   createOrganizationLogic,

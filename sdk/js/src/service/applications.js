@@ -81,6 +81,15 @@ class Applications {
     return Marshaler.unwrapApplications(response)
   }
 
+  async getTotalCount(params, selector) {
+    const response = await this._api.ApplicationRegistry.List(undefined, {
+      ...params,
+      ...Marshaler.selectorToFieldMask(selector),
+    })
+
+    return Marshaler.unwrapTotalApplicationCount(response)
+  }
+
   async getById(id, selector) {
     const fieldMask = Marshaler.selectorToFieldMask(selector)
     const response = await this._api.ApplicationRegistry.Get(

@@ -136,6 +136,11 @@ const getApplicationsLogic = createRequestLogic({
   },
 })
 
+const getTotalApplicationCountLogic = createRequestLogic({
+  type: applications.GET_TOTAL_APPLICATION_COUNT,
+  process: async () => await tts.Applications.getTotalCount(),
+})
+
 const getApplicationDeviceCountLogic = createRequestLogic({
   type: applications.GET_APP_DEV_COUNT,
   process: async ({ action }) => {
@@ -218,6 +223,7 @@ export default [
   deleteApplicationLogic,
   restoreApplicationLogic,
   getApplicationsLogic,
+  getTotalApplicationCountLogic,
   getApplicationsRightsLogic,
   getApplicationLinkLogic,
   updateApplicationLinkLogic,

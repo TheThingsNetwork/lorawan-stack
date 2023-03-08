@@ -14,10 +14,7 @@
 
 import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
 import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
-import {
-  createPaginationIdsSelectorByEntity,
-  createPaginationTotalCountSelectorByEntity,
-} from '@ttn-lw/lib/store/selectors/pagination'
+import { createPaginationIdsSelectorByEntity } from '@ttn-lw/lib/store/selectors/pagination'
 import {
   GET_COLLABORATOR_BASE,
   GET_COLLABORATORS_LIST_BASE,
@@ -52,8 +49,6 @@ export const selectOrganizationCollaborator = state => {
 
 // Collaborators.
 const createSelectCollaboratorsIdsSelector = createPaginationIdsSelectorByEntity(ENTITY)
-const createSelectCollaboratorsTotalCountSelector =
-  createPaginationTotalCountSelectorByEntity(ENTITY)
 const createSelectCollaboratorsFetchingSelector = createFetchingSelector(
   GET_COLLABORATORS_LIST_BASE,
 )
@@ -61,7 +56,6 @@ const createSelectCollaboratorsErrorSelector = createErrorSelector(GET_COLLABORA
 
 export const selectCollaborators = state =>
   createSelectCollaboratorsIdsSelector(state).map(id => selectCollaboratorById(state, id))
-export const selectCollaboratorsTotalCount = state =>
-  createSelectCollaboratorsTotalCountSelector(state)
+export const selectCollaboratorsTotalCount = state => selectCollaboratorsStore(state).totalCount
 export const selectCollaboratorsFetching = state => createSelectCollaboratorsFetchingSelector(state)
 export const selectCollaboratorsError = state => createSelectCollaboratorsErrorSelector(state)

@@ -22,6 +22,7 @@ import {
   UPDATE_ORG_SUCCESS,
   DELETE_ORG_SUCCESS,
   GET_ORG_COLLABORATOR_COUNT_SUCCESS,
+  GET_TOTAL_ORGS_COUNT_SUCCESS,
 } from '@console/store/actions/organizations'
 
 const organization = (state = {}, organization) => ({
@@ -33,6 +34,7 @@ const defaultState = {
   entities: {},
   selectedOrganization: null,
   collaboratorCounts: {},
+  totalCount: undefined,
 }
 
 const organizations = (state = defaultState, { type, payload }) => {
@@ -83,6 +85,11 @@ const organizations = (state = defaultState, { type, payload }) => {
       return {
         selectedOrganization: null,
         entities: rest,
+      }
+    case GET_TOTAL_ORGS_COUNT_SUCCESS:
+      return {
+        ...state,
+        totalCount: payload,
       }
     default:
       return state

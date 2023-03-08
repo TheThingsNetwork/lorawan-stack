@@ -30,6 +30,15 @@ const parentTypeValidator = ({ action }, allow) => {
   allow(action)
 }
 
+const getTotalApiKeysCountLogic = createRequestLogic({
+  type: apiKeys.GET_TOTAL_API_KEYS_COUNT,
+  process: async ({ action }) => {
+    const { parentType, parentId } = action.payload
+
+    return await tts[entitySdkServiceMap[parentType]].ApiKeys.getTotalCount(parentId)
+  },
+})
+
 const getApiKeysLogic = createRequestLogic({
   type: apiKeys.GET_API_KEYS_LIST,
   validate: parentTypeValidator,
@@ -79,6 +88,7 @@ const createGatewayApiKeyLogic = createRequestLogic({
 
 export default [
   getApiKeyLogic,
+  getTotalApiKeysCountLogic,
   getApiKeysLogic,
   createApplicationApiKeyLogic,
   createGatewayApiKeyLogic,

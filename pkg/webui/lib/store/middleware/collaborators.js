@@ -57,6 +57,19 @@ export default tts => {
     },
   })
 
+  const getTotalCollaboratorCountLogic = createRequestLogic({
+    type: collaborators.GET_TOTAL_COLLABORATOR_COUNT,
+    process: async ({ action }) => {
+      const { parentType, parentId } = action.payload
+
+      const totalCount = await tts[entitySdkServiceMap[parentType]].Collaborators.getTotalCount(
+        parentId,
+      )
+
+      return totalCount
+    },
+  })
+
   const getCollaboratorsLogic = createRequestLogic({
     type: collaborators.GET_COLLABORATORS_LIST,
     process: async ({ action }) => {
@@ -81,5 +94,10 @@ export default tts => {
     },
   })
 
-  return [getCollaboratorLogic, getCollaboratorsLogic, deleteCollaboratorLogic]
+  return [
+    getCollaboratorLogic,
+    getCollaboratorsLogic,
+    deleteCollaboratorLogic,
+    getTotalCollaboratorCountLogic,
+  ]
 }

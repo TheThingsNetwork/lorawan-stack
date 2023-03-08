@@ -32,6 +32,15 @@ class ApiKeys {
     return Marshaler.payloadSingleResponse(result)
   }
 
+  async getTotalCount(entityId) {
+    const entityIdRoute = this._parentRoutes.list
+    const result = await this._api.ListAPIKeys({
+      routeParams: { [entityIdRoute]: entityId },
+    })
+
+    return Marshaler.payloadListResponse('api_keys', result).totalCount
+  }
+
   async getAll(entityId, params) {
     const entityIdRoute = this._parentRoutes.list
     const result = await this._api.ListAPIKeys(

@@ -92,6 +92,11 @@ const restoreGatewayLogic = createRequestLogic({
   },
 })
 
+const getTotalGatewayCountLogic = createRequestLogic({
+  type: gateways.GET_TOTAL_GATEWAY_COUNT,
+  process: async () => await tts.Gateways.getTotalCount(),
+})
+
 const getGatewaysLogic = createRequestLogic({
   type: gateways.GET_GTWS_LIST,
   latest: true,
@@ -254,6 +259,7 @@ export default [
   updateGatewayLogic,
   deleteGatewayLogic,
   restoreGatewayLogic,
+  getTotalGatewayCountLogic,
   getGatewaysLogic,
   getGatewaysRightsLogic,
   startGatewayStatisticsLogic,

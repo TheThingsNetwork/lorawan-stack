@@ -27,6 +27,23 @@ export const [
   (parentType, parentId, keyId, selector) => ({ selector }),
 )
 
+export const GET_TOTAL_API_KEYS_COUNT_BASE = 'GET_TOTAL_API_KEYS_COUNT'
+export const [
+  {
+    request: GET_TOTAL_API_KEYS_COUNT,
+    success: GET_TOTAL_API_KEYS_COUNT_SUCCESS,
+    failure: GET_TOTAL_API_KEYS_COUNT_FAILURE,
+  },
+  {
+    request: getTotalApiKeysCount,
+    success: getTotalApiKeysCountSuccess,
+    failure: getTotalApiKeysCountFailure,
+  },
+] = createRequestActions(GET_TOTAL_API_KEYS_COUNT_BASE, (parentType, parentId) => ({
+  parentType,
+  parentId,
+}))
+
 export const GET_API_KEYS_LIST_BASE = 'GET_API_KEYS_LIST'
 export const [
   {

@@ -107,6 +107,15 @@ class Gateways {
 
   // Retrieval.
 
+  async getTotalCount(params, selector) {
+    const response = await this._api.GatewayRegistry.List(undefined, {
+      ...params,
+      ...Marshaler.selectorToFieldMask(selector),
+    })
+
+    return Marshaler.unwrapTotalGatewayCount(response)
+  }
+
   async getAll(params, selector) {
     const response = await this._api.GatewayRegistry.List(undefined, {
       ...params,

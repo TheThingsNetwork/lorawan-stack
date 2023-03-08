@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  createPaginationIdsSelectorByEntity,
-  createPaginationTotalCountSelectorByEntity,
-} from '@ttn-lw/lib/store/selectors/pagination'
+import { createPaginationIdsSelectorByEntity } from '@ttn-lw/lib/store/selectors/pagination'
 import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
 import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
 
@@ -34,12 +31,11 @@ export const selectApiKeyError = createErrorSelector(GET_API_KEY_BASE)
 
 // Api keys.
 const createSelectApiKeysIdsSelector = createPaginationIdsSelectorByEntity(ENTITY)
-const createSelectApiKeysTotalCountSelector = createPaginationTotalCountSelectorByEntity(ENTITY)
 const createSelectApiKeysFetchingSelector = createFetchingSelector(GET_API_KEYS_LIST_BASE)
 const createSelectApiKeysErrorSelector = createErrorSelector(GET_API_KEYS_LIST_BASE)
 
 export const selectApiKeys = state =>
   createSelectApiKeysIdsSelector(state).map(id => selectApiKeyById(state, id))
-export const selectApiKeysTotalCount = state => createSelectApiKeysTotalCountSelector(state)
+export const selectApiKeysTotalCount = state => selectApiKeysStore(state).totalCount
 export const selectApiKeysFetching = state => createSelectApiKeysFetchingSelector(state)
 export const selectApiKeysError = state => createSelectApiKeysErrorSelector(state)

@@ -68,6 +68,20 @@ export const [
   (appId, deviceId, patch, selector) => ({ selector }),
 )
 
+export const GET_TOTAL_DEVICE_COUNT_BASE = 'GET_TOTAL_DEVICE_COUNT'
+export const [
+  {
+    request: GET_TOTAL_DEVICE_COUNT,
+    success: GET_TOTAL_DEVICE_COUNT_SUCCESS,
+    failure: GET_TOTAL_DEVICE_COUNT_FAILURE,
+  },
+  {
+    request: getTotalDeviceCount,
+    success: getTotalDeviceCountSuccess,
+    failure: getTotalDeviceCountFailure,
+  },
+] = createRequestActions(GET_TOTAL_DEVICE_COUNT_BASE, applicationId => ({ applicationId }))
+
 export const GET_DEVICES_LIST_BASE = createPaginationBaseActionType(SHARED_NAME)
 export const [
   {
