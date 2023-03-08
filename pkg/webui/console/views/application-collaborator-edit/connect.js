@@ -52,7 +52,7 @@ const mapStateToProps = (state, props) => {
     collaboratorId,
     collaboratorType,
     collaborator,
-    collaboratorsTotalCount: selectCollaboratorsTotalCount(state, { id: appId }),
+    collaboratorsTotalCount: selectCollaboratorsTotalCount(state),
     appId,
     rights: selectApplicationRights(state),
     pseudoRights: selectApplicationPseudoRights(state),

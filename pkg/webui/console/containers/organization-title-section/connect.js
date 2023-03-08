@@ -16,7 +16,7 @@ import { connect } from 'react-redux'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
 
-import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
+import { getTotalCollaboratorCount } from '@ttn-lw/lib/store/actions/collaborators'
 import {
   selectCollaboratorsTotalCount,
   selectCollaboratorsFetching,
@@ -29,7 +29,7 @@ import {
   mayViewOrEditOrganizationCollaborators,
 } from '@console/lib/feature-checks'
 
-import { getApiKeysList } from '@console/store/actions/api-keys'
+import { getTotalApiKeysCount } from '@console/store/actions/api-keys'
 
 import { selectOrganizationById } from '@console/store/selectors/organizations'
 import {
@@ -42,7 +42,7 @@ const mapStateToProps = (state, props) => {
   const apiKeysTotalCount = selectApiKeysTotalCount(state)
   const apiKeysFetching = selectApiKeysFetching(state)
   const apiKeysError = selectApiKeysError(state)
-  const collaboratorsTotalCount = selectCollaboratorsTotalCount(state, { id: props.appId })
+  const collaboratorsTotalCount = selectCollaboratorsTotalCount(state)
   const collaboratorsFetching = selectCollaboratorsFetching(state)
   const collaboratorsError = selectCollaboratorsError(state)
 
@@ -63,11 +63,11 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = dispatch => ({
   loadData: (mayViewCollaborators, mayViewApiKeys, orgId) => {
     if (mayViewCollaborators) {
-      dispatch(getCollaboratorsList('organization', orgId))
+      dispatch(getTotalCollaboratorCount('organization', orgId))
     }
 
     if (mayViewApiKeys) {
-      dispatch(getApiKeysList('organization', orgId))
+      dispatch(getTotalApiKeysCount('organization', orgId))
     }
   },
 })

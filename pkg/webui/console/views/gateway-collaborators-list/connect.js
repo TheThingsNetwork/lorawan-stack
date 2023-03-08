@@ -39,7 +39,7 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
 
     return {
       collaborators: selectCollaborators(state, id),
-      totalCount: selectCollaboratorsTotalCount(state, id),
+      totalCount: selectCollaboratorsTotalCount(state),
       fetching: selectCollaboratorsFetching(state),
       error: selectCollaboratorsError(state),
     }

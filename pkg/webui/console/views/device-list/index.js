@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { connect } from 'react-redux'
 import { Col, Row, Container } from 'react-grid-system'
 
 import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
@@ -24,24 +23,15 @@ import DevicesTable from '@console/containers/devices-table'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { selectSelectedApplication } from '@console/store/selectors/applications'
-
-@connect(state => ({
-  application: selectSelectedApplication(state),
-}))
-class ApplicationDeviceList extends React.Component {
-  render() {
-    return (
-      <Container>
-        <Row>
-          <IntlHelmet title={sharedMessages.devices} />
-          <Col>
-            <DevicesTable pageSize={PAGE_SIZES.REGULAR} />
-          </Col>
-        </Row>
-      </Container>
-    )
-  }
-}
+const ApplicationDeviceList = () => (
+  <Container>
+    <Row>
+      <IntlHelmet title={sharedMessages.devices} />
+      <Col>
+        <DevicesTable pageSize={PAGE_SIZES.REGULAR} />
+      </Col>
+    </Row>
+  </Container>
+)
 
 export default ApplicationDeviceList

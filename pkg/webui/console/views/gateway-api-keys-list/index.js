@@ -45,7 +45,7 @@ const GatewayApiKeysList = props => {
       const id = { id: gtwId }
       return {
         keys: selectApiKeys(state, id),
-        totalCount: selectApiKeysTotalCount(state, id),
+        totalCount: selectApiKeysTotalCount(state),
         fetching: selectApiKeysFetching(state),
       }
     },

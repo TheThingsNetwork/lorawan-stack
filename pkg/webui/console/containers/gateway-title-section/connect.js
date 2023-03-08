@@ -16,7 +16,7 @@ import { connect } from 'react-redux'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
 
-import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
+import { getTotalCollaboratorCount } from '@ttn-lw/lib/store/actions/collaborators'
 import {
   selectCollaboratorsTotalCount,
   selectCollaboratorsFetching,
@@ -29,7 +29,7 @@ import {
   mayViewOrEditGatewayCollaborators,
 } from '@console/lib/feature-checks'
 
-import { getApiKeysList } from '@console/store/actions/api-keys'
+import { getTotalApiKeysCount } from '@console/store/actions/api-keys'
 
 import { selectGatewayById } from '@console/store/selectors/gateways'
 import {
@@ -63,11 +63,11 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = dispatch => ({
   loadData: (mayViewCollaborators, mayViewApiKeys, gtwId) => {
     if (mayViewCollaborators) {
-      dispatch(getCollaboratorsList('gateway', gtwId))
+      dispatch(getTotalCollaboratorCount('gateway', gtwId))
     }
 
     if (mayViewApiKeys) {
-      dispatch(getApiKeysList('gateway', gtwId))
+      dispatch(getTotalApiKeysCount('gateway', gtwId))
     }
   },
 })

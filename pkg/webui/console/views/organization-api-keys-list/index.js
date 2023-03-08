@@ -46,7 +46,7 @@ const OrganizationApiKeysList = props => {
       const id = { id: orgId }
       return {
         keys: selectApiKeys(state, id),
-        totalCount: selectApiKeysTotalCount(state, id),
+        totalCount: selectApiKeysTotalCount(state),
         fetching: selectApiKeysFetching(state),
         error: selectApiKeysError(state),
       }

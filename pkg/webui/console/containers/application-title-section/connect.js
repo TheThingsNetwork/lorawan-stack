@@ -16,7 +16,7 @@ import { connect } from 'react-redux'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
 
-import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
+import { getTotalCollaboratorCount } from '@ttn-lw/lib/store/actions/collaborators'
 import {
   selectCollaboratorsTotalCount,
   selectCollaboratorsFetching,
@@ -30,12 +30,11 @@ import {
   mayViewApplicationDevices,
 } from '@console/lib/feature-checks'
 
-import { getApiKeysList } from '@console/store/actions/api-keys'
-import { getApplicationDeviceCount } from '@console/store/actions/applications'
+import { getTotalApiKeysCount } from '@console/store/actions/api-keys'
+import { getTotalDeviceCount } from '@console/store/actions/devices'
 
 import {
   selectApplicationById,
-  selectApplicationDeviceCount,
   selectApplicationDeviceCountFetching,
   selectApplicationDeviceCountError,
   selectApplicationDerivedLastSeen,
@@ -45,15 +44,16 @@ import {
   selectApiKeysFetching,
   selectApiKeysError,
 } from '@console/store/selectors/api-keys'
+import { selectDevicesTotalCount } from '@console/store/selectors/devices'
 
 const mapStateToProps = (state, props) => {
   const apiKeysTotalCount = selectApiKeysTotalCount(state)
   const apiKeysFetching = selectApiKeysFetching(state)
   const apiKeysError = selectApiKeysError(state)
-  const collaboratorsTotalCount = selectCollaboratorsTotalCount(state, { id: props.appId })
+  const collaboratorsTotalCount = selectCollaboratorsTotalCount(state)
   const collaboratorsFetching = selectCollaboratorsFetching(state)
   const collaboratorsError = selectCollaboratorsError(state)
-  const devicesTotalCount = selectApplicationDeviceCount(state, props.appId)
+  const devicesTotalCount = selectDevicesTotalCount(state)
   const devicesFetching = selectApplicationDeviceCountFetching(state)
   const devicesError = selectApplicationDeviceCountError(state)
 
@@ -78,15 +78,15 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = dispatch => ({
   loadData: (mayViewCollaborators, mayViewApiKeys, mayViewDevices, appId) => {
     if (mayViewCollaborators) {
-      dispatch(getCollaboratorsList('application', appId))
+      dispatch(getTotalCollaboratorCount('application', appId))
     }
 
     if (mayViewApiKeys) {
-      dispatch(getApiKeysList('application', appId))
+      dispatch(getTotalApiKeysCount('application', appId))
     }
 
     if (mayViewDevices) {
-      dispatch(getApplicationDeviceCount(appId))
+      dispatch(getTotalDeviceCount(appId))
     }
   },
 })
