@@ -14,15 +14,16 @@
 
 package alcsyncv1
 
-import (
-	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-)
+// Result is the result of a command execution.
+type Result interface {
+	// MarshalBinary marshals the result into a binary representation.
+	MarshalBinary() ([]byte, error)
+}
 
 // Command is the interface for commands.
 type Command interface {
 	// Code returns the command code.
 	Code() uint8
-
 	// Execute runs the command logic.
-	Execute() ([]*ttnpb.ApplicationDownlink, error)
+	Execute() (Result, error)
 }

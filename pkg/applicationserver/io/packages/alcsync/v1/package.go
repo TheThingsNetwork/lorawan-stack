@@ -78,18 +78,28 @@ func (a *alcsyncpkg) HandleUp(
 		logger.WithError(err).Debug("Failed to parse frame payload into commands")
 		return err
 	}
+
+	results := make([]Result, 0, len(commands))
 	for _, cmd := range commands {
-		downlinks, err := cmd.Execute()
+		result, err := cmd.Execute()
+		if errors.IsUnavailable(err) {
+			continue
+		}
 		if err != nil {
 			logger.WithError(err).Debug("Failed to execute command")
 			continue
 		}
-		if len(downlinks) == 0 {
-			continue
+		if result != nil {
+			results = append(results, result)
 		}
-		if err := a.server.DownlinkQueuePush(ctx, up.EndDeviceIds, downlinks); err != nil {
-			logger.WithError(err).Debug("Failed to push downlinks to queue")
-		}
+	}
+	downlink, err := MakeDownlink(results, data.FPort)
+	if err != nil {
+		logger.WithError(err).Debug("Failed to create downlink from results")
+		return err
+	}
+	if err := a.server.DownlinkQueuePush(ctx, up.EndDeviceIds, []*ttnpb.ApplicationDownlink{downlink}); err != nil {
+		logger.WithError(err).Debug("Failed to push downlinks to queue")
 	}
 	return nil
 }

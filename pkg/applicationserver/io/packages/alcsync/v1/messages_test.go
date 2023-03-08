@@ -24,7 +24,7 @@ import (
 func TestAppTimeAnsMarshalsBytesCorrectly(t *testing.T) {
 	t.Parallel()
 	a, _ := test.New(t)
-	expected := []byte{0x05, 0x00, 0x00, 0x00, 0x02}
+	expected := []byte{0x01, 0x05, 0x00, 0x00, 0x00, 0x02}
 	ans := &AppTimeAns{
 		TimeCorrection: 5,
 		TokenAns:       2,

@@ -19,10 +19,14 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-var errUnknownCommand = errors.DefineNotFound("unknown_command", "unknown command")
+var (
+	errUnknownCommand = errors.DefineNotFound("unknown_command", "unknown command")
+
+	// ErrIgnoreDownlink is a sentinel error returned when the command result should be ignored.
+	errIgnoreDownlink = errors.DefineUnavailable("downlink_unavailable", "downlink unavailable")
+)
 
 // TimeSyncCommand is the command for time synchronization.
 type TimeSyncCommand struct {
@@ -38,24 +42,16 @@ func (*TimeSyncCommand) Code() uint8 {
 }
 
 // Execute implements commands.Command.
-func (cmd *TimeSyncCommand) Execute() ([]*ttnpb.ApplicationDownlink, error) {
+func (cmd *TimeSyncCommand) Execute() (Result, error) {
 	difference := cmd.receivedAt.Sub(cmd.req.DeviceTime)
 	exceedsThreshold := math.Abs(difference.Seconds()) > cmd.threshold.Seconds()
 	if !cmd.req.AnsRequired && !exceedsThreshold {
-		return nil, nil
+		return nil, errIgnoreDownlink.New()
 	}
 
 	ans := &AppTimeAns{
 		TimeCorrection: int32(difference.Seconds()),
 		TokenAns:       cmd.req.TokenReq,
 	}
-	frmPayload, err := ans.MarshalBinary()
-	if err != nil {
-		return nil, err
-	}
-	downlink := &ttnpb.ApplicationDownlink{
-		FPort:      cmd.fPort,
-		FrmPayload: frmPayload,
-	}
-	return []*ttnpb.ApplicationDownlink{downlink}, nil
+	return ans, nil
 }

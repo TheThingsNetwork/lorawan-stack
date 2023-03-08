@@ -441,3 +441,115 @@ func TestMakeCommandsValidInput(t *testing.T) {
 		})
 	}
 }
+
+func TestMakeDownlinkSerializesAppTimeAns(t *testing.T) {
+	t.Parallel()
+	testCases := []struct {
+		Name string
+		In   struct {
+			Ans   []Result
+			FPort uint32
+		}
+		Expected struct {
+			Downlink *ttnpb.ApplicationDownlink
+		}
+	}{
+		{
+			Name: "SingleResult",
+			In: struct {
+				Ans   []Result
+				FPort uint32
+			}{
+				Ans: []Result{
+					&AppTimeAns{
+						TimeCorrection: 1,
+						TokenAns:       2,
+					},
+				},
+				FPort: 202,
+			},
+			Expected: struct {
+				Downlink *ttnpb.ApplicationDownlink
+			}{
+				Downlink: &ttnpb.ApplicationDownlink{
+					FPort: 202,
+					FrmPayload: []byte{
+						0x01, 0x01, 0x00, 0x00, 0x00, 0x02,
+					},
+				},
+			},
+		},
+		{
+			Name: "MultipleResults",
+			In: struct {
+				Ans   []Result
+				FPort uint32
+			}{
+				Ans: []Result{
+					&AppTimeAns{
+						TimeCorrection: 1,
+						TokenAns:       2,
+					},
+					&AppTimeAns{
+						TimeCorrection: 3,
+						TokenAns:       4,
+					},
+				},
+				FPort: 202,
+			},
+			Expected: struct {
+				Downlink *ttnpb.ApplicationDownlink
+			}{
+				Downlink: &ttnpb.ApplicationDownlink{
+					FPort: 202,
+					FrmPayload: []byte{
+						0x01, 0x01, 0x00, 0x00, 0x00, 0x02,
+						0x01, 0x03, 0x00, 0x00, 0x00, 0x04,
+					},
+				},
+			},
+		},
+		{
+			Name: "MultipleResultsContainingNil",
+			In: struct {
+				Ans   []Result
+				FPort uint32
+			}{
+				Ans: []Result{
+					&AppTimeAns{
+						TimeCorrection: 1,
+						TokenAns:       2,
+					},
+					nil,
+					&AppTimeAns{
+						TimeCorrection: 3,
+						TokenAns:       4,
+					},
+				},
+				FPort: 202,
+			},
+			Expected: struct {
+				Downlink *ttnpb.ApplicationDownlink
+			}{
+				Downlink: &ttnpb.ApplicationDownlink{
+					FPort: 202,
+					FrmPayload: []byte{
+						0x01, 0x01, 0x00, 0x00, 0x00, 0x02,
+						0x01, 0x03, 0x00, 0x00, 0x00, 0x04,
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+			a, _ := test.New(t)
+			downlink, err := MakeDownlink(tc.In.Ans, tc.In.FPort)
+			a.So(err, should.BeNil)
+			a.So(downlink, should.Resemble, tc.Expected.Downlink)
+		})
+	}
+}

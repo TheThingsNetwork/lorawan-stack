@@ -32,13 +32,17 @@ type AppTimeAns struct {
 	TokenAns       uint8
 }
 
+var _ Result = (*AppTimeAns)(nil)
+
 // MarshalBinary marshals the AppTimeAns into a byte slice.
 func (ans *AppTimeAns) MarshalBinary() ([]byte, error) {
-	// DeviceTime - bytes [0,3].
-	// Param - byte 4 (bits: RFU [7,4]; TokenAns [3,0]).
+	// CID - byte 0.
+	// DeviceTime - bytes [1,4].
+	// Param - byte 5 (bits: RFU [7,4]; TokenAns [3,0]).
 
-	cPayload := make([]byte, 5)
-	binary.LittleEndian.PutUint32(cPayload, uint32(ans.TimeCorrection))
-	cPayload[4] = ans.TokenAns & 0x0F
+	cPayload := make([]byte, 6)
+	cPayload[0] = 0x01
+	binary.LittleEndian.PutUint32(cPayload[1:5], uint32(ans.TimeCorrection))
+	cPayload[5] = ans.TokenAns & 0x0F
 	return cPayload, nil
 }

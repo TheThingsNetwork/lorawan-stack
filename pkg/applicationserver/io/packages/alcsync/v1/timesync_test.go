@@ -15,28 +15,20 @@
 package alcsyncv1
 
 import (
-	"encoding/binary"
 	"testing"
 	"time"
 
-	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
-
-func assertCorrectAns(a *assertions.Assertion, ans []byte, expected AppTimeAns) {
-	var actual AppTimeAns
-	actual.TimeCorrection = int32(binary.LittleEndian.Uint32(ans))
-	actual.TokenAns = ans[4] & 0x0F
-	a.So(actual, should.Resemble, expected)
-}
 
 func TestTimeSynchronizationCommandCalculatesCorrection(t *testing.T) {
 	t.Parallel()
 	testCases := []struct {
 		Name     string
 		Command  TimeSyncCommand
-		Expected AppTimeAns
+		Expected *AppTimeAns
 	}{
 		{
 			Name: "NegativeTimeCorrection",
@@ -50,7 +42,7 @@ func TestTimeSynchronizationCommandCalculatesCorrection(t *testing.T) {
 				fPort:      202,
 				threshold:  threeSecondsDuration,
 			},
-			Expected: AppTimeAns{
+			Expected: &AppTimeAns{
 				TimeCorrection: -10,
 				TokenAns:       1,
 			},
@@ -67,7 +59,7 @@ func TestTimeSynchronizationCommandCalculatesCorrection(t *testing.T) {
 				fPort:      202,
 				threshold:  threeSecondsDuration,
 			},
-			Expected: AppTimeAns{
+			Expected: &AppTimeAns{
 				TimeCorrection: 10,
 				TokenAns:       1,
 			},
@@ -84,7 +76,7 @@ func TestTimeSynchronizationCommandCalculatesCorrection(t *testing.T) {
 				fPort:      202,
 				threshold:  threeSecondsDuration,
 			},
-			Expected: AppTimeAns{
+			Expected: &AppTimeAns{
 				TimeCorrection: 0,
 				TokenAns:       1,
 			},
@@ -96,11 +88,12 @@ func TestTimeSynchronizationCommandCalculatesCorrection(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a, _ := test.New(t)
-			downlinks, err := tc.Command.Execute()
+			result, err := tc.Command.Execute()
 			a.So(err, should.BeNil)
-			a.So(len(downlinks), should.Equal, 1)
-			downlinkFrmPayload := downlinks[0].GetFrmPayload()
-			assertCorrectAns(a, downlinkFrmPayload, tc.Expected)
+			a.So(result, should.NotBeNil)
+			ans, ok := result.(*AppTimeAns)
+			a.So(ok, should.BeTrue)
+			a.So(ans, should.Resemble, tc.Expected)
 		})
 	}
 }
@@ -157,9 +150,10 @@ func TestTimeSynchronizationCommandRespectsThreshold(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a, _ := test.New(t)
-			downlinks, err := tc.Command.Execute()
-			a.So(err, should.BeNil)
-			a.So(downlinks, should.BeEmpty)
+			result, err := tc.Command.Execute()
+			a.So(err, should.NotBeNil)
+			a.So(errors.IsUnavailable(err), should.BeTrue)
+			a.So(result, should.BeNil)
 		})
 	}
 }
@@ -216,9 +210,9 @@ func TestTimeSynchronizationCommandRespectsAnsRequired(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a, _ := test.New(t)
-			downlinks, err := tc.Command.Execute()
+			result, err := tc.Command.Execute()
 			a.So(err, should.BeNil)
-			a.So(downlinks, should.NotBeEmpty)
+			a.So(result, should.NotBeNil)
 		})
 	}
 }

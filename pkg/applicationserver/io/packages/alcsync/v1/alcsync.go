@@ -90,3 +90,23 @@ func makeCommand(cID byte, cPayload []byte, up *ttnpb.ApplicationUplink, data *p
 		return nil, cPayload, errUnknownCommand.New()
 	}
 }
+
+// MakeDownlink builds a single downlink message from the results.
+func MakeDownlink(results []Result, fPort uint32) (*ttnpb.ApplicationDownlink, error) {
+	frmPayload := make([]byte, 0)
+	for _, result := range results {
+		if result == nil {
+			continue
+		}
+		b, err := result.MarshalBinary()
+		if err != nil {
+			return nil, err
+		}
+		frmPayload = append(frmPayload, b...)
+	}
+	downlink := &ttnpb.ApplicationDownlink{
+		FPort:      fPort,
+		FrmPayload: frmPayload,
+	}
+	return downlink, nil
+}
