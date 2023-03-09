@@ -73,7 +73,7 @@
     "webpack-dev-server": "^3.11.0",
     "webpack-plugin-hash-output": "^3.1.0",
     "webpack-shell-plugin": "https://github.com/cdeutsch/webpack-shell-plugin.git#bee537d",
-    "yargs": "^17.5.1"
+    "yargs": "^17.7.1"
   },
   "dependencies": {
     "@formatjs/intl-datetimeformat": "^4.2.6",
