@@ -100,7 +100,7 @@ service ApplicationRegistry {
     option (google.api.http) = {
       delete: "/applications/{application_id}/purge"
     };
-  };
+};
 
   // Request DevEUI from the configured address block for a device inside the application.
   // The maximum number of DevEUI's issued per application can be configured.

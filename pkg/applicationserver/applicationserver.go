@@ -46,7 +46,11 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/cayennelpp"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/devicerepository"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/javascript"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpctracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -105,7 +109,9 @@ var errListenFrontend = errors.DefineFailedPrecondition("listen_frontend", "fail
 
 // New returns new *ApplicationServer.
 func New(c *component.Component, conf *Config) (as *ApplicationServer, err error) {
-	ctx := log.NewContextWithField(c.Context(), "namespace", "applicationserver")
+	ctx := tracer.NewContextWithTracer(c.Context(), tracerNamespace)
+
+	ctx = log.NewContextWithField(ctx, "namespace", logNamespace)
 
 	baseConf := c.GetBaseConfig(ctx)
 
@@ -266,7 +272,28 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		return nil, err
 	}
 
+	for _, hook := range []struct {
+		name       string
+		middleware hooks.UnaryHandlerMiddleware
+	}{
+		{rpctracer.TracerHook, rpctracer.UnaryTracerHook(tracerNamespace)},
+		{rpclog.NamespaceHook, rpclog.UnaryNamespaceHook(logNamespace)},
+	} {
+		for _, filter := range []string{
+			"/ttn.lorawan.v3.As",
+			"/ttn.lorawan.v3.NsAs",
+			"/ttn.lorawan.v3.AsEndDeviceRegistry",
+			"/ttn.lorawan.v3.AppAs",
+			"/ttn.lorawan.v3.ApplicationWebhookRegistry",
+			"/ttn.lorawan.v3.ApplicationPubSubRegistry",
+		} {
+			c.GRPC.RegisterUnaryHook(filter, hook.name, hook.middleware)
+		}
+	}
 	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.NsAs", cluster.HookName, c.ClusterAuthUnaryHook())
+
+	c.GRPC.RegisterStreamHook("/ttn.lorawan.v3.AppAs", rpctracer.TracerHook, rpctracer.StreamTracerHook(tracerNamespace))
+	c.GRPC.RegisterStreamHook("/ttn.lorawan.v3.AppAs", rpclog.NamespaceHook, rpclog.StreamNamespaceHook(logNamespace))
 
 	c.RegisterGRPC(as)
 	c.RegisterWeb(as)

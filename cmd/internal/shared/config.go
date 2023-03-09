@@ -23,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/packetbroker"
 	"go.thethings.network/lorawan-stack/v3/pkg/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing"
 	"golang.org/x/crypto/acme"
 )
 
@@ -141,6 +142,19 @@ var DefaultKeyVaultConfig = config.KeyVault{
 	Provider: "static",
 }
 
+// DefaultTracingConfig is the default config for telemetry tracing.
+var DefaultTracingConfig = tracing.Config{
+	Enable:   false,
+	Exporter: "otlp",
+	WriterConfig: tracing.WriterConfig{
+		Destination: "stderr",
+	},
+	CollectorConfig: tracing.CollectorConfig{
+		EndpointURL: "localhost:4317",
+	},
+	SampleProbability: 1.,
+}
+
 // DefaultServiceBase is the default base config for a service.
 var DefaultServiceBase = config.ServiceBase{
 	Base:           DefaultBaseConfig,
@@ -156,6 +170,7 @@ var DefaultServiceBase = config.ServiceBase{
 	FrequencyPlans: DefaultFrequencyPlansConfig,
 	Rights:         DefaultRightsConfig,
 	KeyVault:       DefaultKeyVaultConfig,
+	Tracing:        DefaultTracingConfig,
 }
 
 // DefaultPublicHost is the default public host where The Things Stack is served.

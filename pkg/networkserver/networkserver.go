@@ -30,8 +30,11 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpctracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
@@ -177,7 +180,9 @@ const (
 
 // New returns new NetworkServer.
 func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, error) {
-	ctx := log.NewContextWithField(c.Context(), "namespace", "networkserver")
+	ctx := tracer.NewContextWithTracer(c.Context(), tracerNamespace)
+
+	ctx = log.NewContextWithField(ctx, "namespace", logNamespace)
 
 	switch {
 	case conf.DeduplicationWindow == 0:
@@ -270,14 +275,29 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		opt(ns)
 	}
 
-	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.GsNs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("networkserver"))
-	c.GRPC.RegisterStreamHook("/ttn.lorawan.v3.AsNs", rpclog.NamespaceHook, rpclog.StreamNamespaceHook("networkserver"))
-	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.AsNs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("networkserver"))
-	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.Ns", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("networkserver"))
+	for _, hook := range []struct {
+		name       string
+		middleware hooks.UnaryHandlerMiddleware
+	}{
+		{rpctracer.TracerHook, rpctracer.UnaryTracerHook(tracerNamespace)},
+		{rpclog.NamespaceHook, rpclog.UnaryNamespaceHook(logNamespace)},
+	} {
+		for _, filter := range []string{
+			"/ttn.lorawan.v3.GsNs",
+			"/ttn.lorawan.v3.AsNs",
+			"/ttn.lorawan.v3.NsEndDeviceRegistry",
+			"/ttn.lorawan.v3.Ns",
+		} {
+			c.GRPC.RegisterUnaryHook(filter, hook.name, hook.middleware)
+		}
+	}
 	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.GsNs", cluster.HookName, c.ClusterAuthUnaryHook())
-	c.GRPC.RegisterStreamHook("/ttn.lorawan.v3.AsNs", cluster.HookName, c.ClusterAuthStreamHook())
 	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.AsNs", cluster.HookName, c.ClusterAuthUnaryHook())
 	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.Ns", cluster.HookName, c.ClusterAuthUnaryHook())
+
+	c.GRPC.RegisterStreamHook("/ttn.lorawan.v3.AsNs", rpctracer.TracerHook, rpctracer.StreamTracerHook(tracerNamespace))
+	c.GRPC.RegisterStreamHook("/ttn.lorawan.v3.AsNs", rpclog.NamespaceHook, rpclog.StreamNamespaceHook(logNamespace))
+	c.GRPC.RegisterStreamHook("/ttn.lorawan.v3.AsNs", cluster.HookName, c.ClusterAuthStreamHook())
 
 	hostname, err := os.Hostname()
 	if err != nil {

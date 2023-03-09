@@ -19,6 +19,11 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
 )
 
+const (
+	logNamespace    = "packetbrokeragent"
+	tracerNamespace = "go.thethings.network/lorawan-stack/pkg/packetbrokeragent"
+)
+
 const subsystem = "pba"
 
 var pbaMetrics = &messageMetrics{

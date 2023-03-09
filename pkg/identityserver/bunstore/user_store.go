@@ -25,6 +25,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -156,7 +157,7 @@ func newUserStore(baseStore *baseStore) *userStore {
 }
 
 func (s *userStore) CreateUser(ctx context.Context, pb *ttnpb.User) (*ttnpb.User, error) {
-	ctx, span := tracer.Start(ctx, "CreateUser", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "CreateUser", trace.WithAttributes(
 		attribute.String("user_id", pb.GetIds().GetUserId()),
 	))
 	defer span.End()
@@ -378,7 +379,7 @@ func (*userStore) selectWithID(
 func (s *userStore) FindUsers(
 	ctx context.Context, ids []*ttnpb.UserIdentifiers, fieldMask store.FieldMask,
 ) ([]*ttnpb.User, error) {
-	ctx, span := tracer.Start(ctx, "FindUsers", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "FindUsers", trace.WithAttributes(
 		attribute.StringSlice("user_ids", idStrings(ids...)),
 	))
 	defer span.End()
@@ -389,7 +390,7 @@ func (s *userStore) FindUsers(
 func (s *userStore) ListAdmins(
 	ctx context.Context, fieldMask store.FieldMask,
 ) ([]*ttnpb.User, error) {
-	ctx, span := tracer.Start(ctx, "ListAdmins")
+	ctx, span := tracer.StartFromContext(ctx, "ListAdmins")
 	defer span.End()
 
 	return s.listUsersBy(ctx, func(q *bun.SelectQuery) *bun.SelectQuery {
@@ -420,7 +421,7 @@ func (s *userStore) getUserModelBy(
 func (s *userStore) GetUser(
 	ctx context.Context, id *ttnpb.UserIdentifiers, fieldMask store.FieldMask,
 ) (*ttnpb.User, error) {
-	ctx, span := tracer.Start(ctx, "GetUser", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "GetUser", trace.WithAttributes(
 		attribute.String("user_id", id.GetUserId()),
 	))
 	defer span.End()
@@ -452,7 +453,7 @@ func (*userStore) selectWithPrimaryEmailAddress(
 func (s *userStore) GetUserByPrimaryEmailAddress(
 	ctx context.Context, primaryEmailAddress string, fieldMask store.FieldMask,
 ) (*ttnpb.User, error) {
-	ctx, span := tracer.Start(ctx, "GetUserByPrimaryEmailAddress", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "GetUserByPrimaryEmailAddress", trace.WithAttributes(
 		attribute.String("primary_email_address", primaryEmailAddress),
 	))
 	defer span.End()
@@ -596,7 +597,7 @@ func (s *userStore) updateUserModel( //nolint:gocyclo
 func (s *userStore) UpdateUser(
 	ctx context.Context, pb *ttnpb.User, fieldMask store.FieldMask,
 ) (*ttnpb.User, error) {
-	ctx, span := tracer.Start(ctx, "UpdateUser", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "UpdateUser", trace.WithAttributes(
 		attribute.String("user_id", pb.GetIds().GetUserId()),
 	))
 	defer span.End()
@@ -625,7 +626,7 @@ func (s *userStore) UpdateUser(
 }
 
 func (s *userStore) DeleteUser(ctx context.Context, id *ttnpb.UserIdentifiers) error {
-	ctx, span := tracer.Start(ctx, "DeleteUser", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "DeleteUser", trace.WithAttributes(
 		attribute.String("user_id", id.GetUserId()),
 	))
 	defer span.End()
@@ -680,7 +681,7 @@ func (s *userStore) DeleteUser(ctx context.Context, id *ttnpb.UserIdentifiers) e
 }
 
 func (s *userStore) RestoreUser(ctx context.Context, id *ttnpb.UserIdentifiers) error {
-	ctx, span := tracer.Start(ctx, "RestoreUser", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "RestoreUser", trace.WithAttributes(
 		attribute.String("user_id", id.GetUserId()),
 	))
 	defer span.End()
@@ -747,7 +748,7 @@ func (s *userStore) RestoreUser(ctx context.Context, id *ttnpb.UserIdentifiers) 
 }
 
 func (s *userStore) PurgeUser(ctx context.Context, id *ttnpb.UserIdentifiers) error {
-	ctx, span := tracer.Start(ctx, "PurgeUser", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "PurgeUser", trace.WithAttributes(
 		attribute.String("user_id", id.GetUserId()),
 	))
 	defer span.End()

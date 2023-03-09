@@ -23,6 +23,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -217,7 +218,7 @@ func (*oauthStore) selectWithUserIDs(
 func (s *oauthStore) ListAuthorizations(
 	ctx context.Context, userIDs *ttnpb.UserIdentifiers,
 ) ([]*ttnpb.OAuthClientAuthorization, error) {
-	ctx, span := tracer.Start(ctx, "ListAuthorizations", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "ListAuthorizations", trace.WithAttributes(
 		attribute.String("user_id", userIDs.GetUserId()),
 	))
 	defer span.End()
@@ -296,7 +297,7 @@ func (*oauthStore) selectWithClientIDs(
 func (s *oauthStore) GetAuthorization(
 	ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers,
 ) (*ttnpb.OAuthClientAuthorization, error) {
-	ctx, span := tracer.Start(ctx, "GetAuthorization", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "GetAuthorization", trace.WithAttributes(
 		attribute.String("user_id", userIDs.GetUserId()),
 		attribute.String("client_id", clientIDs.GetClientId()),
 	))
@@ -339,7 +340,7 @@ func (s *oauthStore) GetAuthorization(
 func (s *oauthStore) Authorize(
 	ctx context.Context, pb *ttnpb.OAuthClientAuthorization,
 ) (authorization *ttnpb.OAuthClientAuthorization, err error) {
-	ctx, span := tracer.Start(ctx, "Authorize", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "Authorize", trace.WithAttributes(
 		attribute.String("user_id", pb.GetUserIds().GetUserId()),
 		attribute.String("client_id", pb.GetClientIds().GetClientId()),
 	))
@@ -399,7 +400,7 @@ func (s *oauthStore) Authorize(
 func (s *oauthStore) DeleteAuthorization(
 	ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers,
 ) error {
-	ctx, span := tracer.Start(ctx, "DeleteAuthorization", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "DeleteAuthorization", trace.WithAttributes(
 		attribute.String("user_id", userIDs.GetUserId()),
 		attribute.String("client_id", clientIDs.GetClientId()),
 	))
@@ -445,7 +446,7 @@ func (s *oauthStore) DeleteAuthorization(
 func (s *oauthStore) CreateAuthorizationCode(
 	ctx context.Context, pb *ttnpb.OAuthAuthorizationCode,
 ) (*ttnpb.OAuthAuthorizationCode, error) {
-	ctx, span := tracer.Start(ctx, "CreateAuthorizationCode", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "CreateAuthorizationCode", trace.WithAttributes(
 		attribute.String("user_id", pb.GetUserIds().GetUserId()),
 		attribute.String("client_id", pb.GetClientIds().GetClientId()),
 	))
@@ -488,7 +489,7 @@ func (s *oauthStore) CreateAuthorizationCode(
 }
 
 func (s *oauthStore) GetAuthorizationCode(ctx context.Context, code string) (*ttnpb.OAuthAuthorizationCode, error) {
-	ctx, span := tracer.Start(ctx, "GetAuthorizationCode")
+	ctx, span := tracer.StartFromContext(ctx, "GetAuthorizationCode")
 	defer span.End()
 
 	model := &AuthorizationCode{}
@@ -524,7 +525,7 @@ func (s *oauthStore) GetAuthorizationCode(ctx context.Context, code string) (*tt
 }
 
 func (s *oauthStore) DeleteAuthorizationCode(ctx context.Context, code string) error {
-	ctx, span := tracer.Start(ctx, "DeleteAuthorizationCode")
+	ctx, span := tracer.StartFromContext(ctx, "DeleteAuthorizationCode")
 	defer span.End()
 
 	model := &AuthorizationCode{}
@@ -553,7 +554,7 @@ func (s *oauthStore) DeleteAuthorizationCode(ctx context.Context, code string) e
 func (s *oauthStore) CreateAccessToken(
 	ctx context.Context, pb *ttnpb.OAuthAccessToken, previousID string,
 ) (*ttnpb.OAuthAccessToken, error) {
-	ctx, span := tracer.Start(ctx, "CreateAccessToken", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "CreateAccessToken", trace.WithAttributes(
 		attribute.String("user_id", pb.GetUserIds().GetUserId()),
 		attribute.String("client_id", pb.GetClientIds().GetClientId()),
 	))
@@ -599,7 +600,7 @@ func (s *oauthStore) CreateAccessToken(
 func (s *oauthStore) ListAccessTokens(
 	ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers,
 ) ([]*ttnpb.OAuthAccessToken, error) {
-	ctx, span := tracer.Start(ctx, "ListAccessTokens", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "ListAccessTokens", trace.WithAttributes(
 		attribute.String("user_id", userIDs.GetUserId()),
 		attribute.String("client_id", clientIDs.GetClientId()),
 	))
@@ -655,7 +656,7 @@ func (s *oauthStore) ListAccessTokens(
 }
 
 func (s *oauthStore) GetAccessToken(ctx context.Context, id string) (*ttnpb.OAuthAccessToken, error) {
-	ctx, span := tracer.Start(ctx, "GetAccessToken")
+	ctx, span := tracer.StartFromContext(ctx, "GetAccessToken")
 	defer span.End()
 
 	model := &AccessToken{}
@@ -693,7 +694,7 @@ func (s *oauthStore) GetAccessToken(ctx context.Context, id string) (*ttnpb.OAut
 }
 
 func (s *oauthStore) DeleteAccessToken(ctx context.Context, id string) error {
-	ctx, span := tracer.Start(ctx, "DeleteAccessToken")
+	ctx, span := tracer.StartFromContext(ctx, "DeleteAccessToken")
 	defer span.End()
 
 	model := &AccessToken{}
@@ -722,7 +723,7 @@ func (s *oauthStore) DeleteAccessToken(ctx context.Context, id string) error {
 }
 
 func (s *oauthStore) DeleteUserAuthorizations(ctx context.Context, userIDs *ttnpb.UserIdentifiers) error {
-	ctx, span := tracer.Start(ctx, "DeleteUserAuthorizations", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "DeleteUserAuthorizations", trace.WithAttributes(
 		attribute.String("user_id", userIDs.GetUserId()),
 	))
 	defer span.End()
@@ -760,7 +761,7 @@ func (s *oauthStore) DeleteUserAuthorizations(ctx context.Context, userIDs *ttnp
 }
 
 func (s *oauthStore) DeleteClientAuthorizations(ctx context.Context, clientIDs *ttnpb.ClientIdentifiers) error {
-	ctx, span := tracer.Start(ctx, "DeleteClientAuthorizations", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "DeleteClientAuthorizations", trace.WithAttributes(
 		attribute.String("client_id", clientIDs.GetClientId()),
 	))
 	defer span.End()

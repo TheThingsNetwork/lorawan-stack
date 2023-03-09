@@ -23,6 +23,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -82,7 +83,7 @@ func newInvitationStore(baseStore *baseStore) *invitationStore {
 func (s *invitationStore) CreateInvitation(
 	ctx context.Context, pb *ttnpb.Invitation,
 ) (*ttnpb.Invitation, error) {
-	ctx, span := tracer.Start(ctx, "CreateInvitation")
+	ctx, span := tracer.StartFromContext(ctx, "CreateInvitation")
 	defer span.End()
 
 	model := &Invitation{
@@ -111,7 +112,7 @@ func (s *invitationStore) CreateInvitation(
 }
 
 func (s *invitationStore) FindInvitations(ctx context.Context) ([]*ttnpb.Invitation, error) {
-	ctx, span := tracer.Start(ctx, "FindInvitations")
+	ctx, span := tracer.StartFromContext(ctx, "FindInvitations")
 	defer span.End()
 
 	models := []*Invitation{}
@@ -174,7 +175,7 @@ func (s *invitationStore) getInvitationModelBy(
 }
 
 func (s *invitationStore) GetInvitation(ctx context.Context, token string) (*ttnpb.Invitation, error) {
-	ctx, span := tracer.Start(ctx, "GetInvitation", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "GetInvitation", trace.WithAttributes(
 		attribute.String("invitation_token", token),
 	))
 	defer span.End()
@@ -206,7 +207,7 @@ func (s *invitationStore) GetInvitation(ctx context.Context, token string) (*ttn
 func (s *invitationStore) SetInvitationAcceptedBy(
 	ctx context.Context, token string, accepter *ttnpb.UserIdentifiers,
 ) error {
-	ctx, span := tracer.Start(ctx, "SetInvitationAcceptedBy", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "SetInvitationAcceptedBy", trace.WithAttributes(
 		attribute.String("invitation_token", token),
 		attribute.String("user_id", accepter.GetUserId()),
 	))
@@ -250,7 +251,7 @@ func (s *invitationStore) SetInvitationAcceptedBy(
 }
 
 func (s *invitationStore) DeleteInvitation(ctx context.Context, email string) error {
-	ctx, span := tracer.Start(ctx, "DeleteInvitation")
+	ctx, span := tracer.StartFromContext(ctx, "DeleteInvitation")
 	defer span.End()
 
 	model, err := s.getInvitationModelBy(ctx, func(q *bun.SelectQuery) *bun.SelectQuery {

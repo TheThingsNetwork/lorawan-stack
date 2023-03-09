@@ -23,6 +23,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -80,7 +81,7 @@ func newUserSessionStore(baseStore *baseStore) *userSessionStore {
 func (s *userSessionStore) CreateSession(
 	ctx context.Context, pb *ttnpb.UserSession,
 ) (*ttnpb.UserSession, error) {
-	ctx, span := tracer.Start(ctx, "CreateSession", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "CreateSession", trace.WithAttributes(
 		attribute.String("user_id", pb.GetUserIds().GetUserId()),
 	))
 	defer span.End()
@@ -172,7 +173,7 @@ func (*userSessionStore) selectWithSessionID(
 func (s *userSessionStore) FindSessions(
 	ctx context.Context, userIDs *ttnpb.UserIdentifiers,
 ) ([]*ttnpb.UserSession, error) {
-	ctx, span := tracer.Start(ctx, "FindSessions", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "FindSessions", trace.WithAttributes(
 		attribute.String("user_id", userIDs.GetUserId()),
 	))
 	defer span.End()
@@ -211,7 +212,7 @@ func (s *userSessionStore) getUserSessionModelBy(
 func (s *userSessionStore) GetSession(
 	ctx context.Context, userIDs *ttnpb.UserIdentifiers, sessionID string,
 ) (*ttnpb.UserSession, error) {
-	ctx, span := tracer.Start(ctx, "GetSession", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "GetSession", trace.WithAttributes(
 		attribute.String("user_id", userIDs.GetUserId()),
 		attribute.String("session_id", sessionID),
 	))
@@ -245,7 +246,7 @@ func (s *userSessionStore) GetSession(
 }
 
 func (s *userSessionStore) GetSessionByID(ctx context.Context, sessionID string) (*ttnpb.UserSession, error) {
-	ctx, span := tracer.Start(ctx, "GetSessionByID", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "GetSessionByID", trace.WithAttributes(
 		attribute.String("session_id", sessionID),
 	))
 	defer span.End()
@@ -274,7 +275,7 @@ func (s *userSessionStore) GetSessionByID(ctx context.Context, sessionID string)
 }
 
 func (s *userSessionStore) DeleteSession(ctx context.Context, userIDs *ttnpb.UserIdentifiers, sessionID string) error {
-	ctx, span := tracer.Start(ctx, "DeleteSession", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "DeleteSession", trace.WithAttributes(
 		attribute.String("user_id", userIDs.GetUserId()),
 		attribute.String("session_id", sessionID),
 	))
@@ -310,7 +311,7 @@ func (s *userSessionStore) DeleteSession(ctx context.Context, userIDs *ttnpb.Use
 }
 
 func (s *userSessionStore) DeleteAllUserSessions(ctx context.Context, userIDs *ttnpb.UserIdentifiers) error {
-	ctx, span := tracer.Start(ctx, "DeleteAllUserSessions", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "DeleteAllUserSessions", trace.WithAttributes(
 		attribute.String("user_id", userIDs.GetUserId()),
 	))
 	defer span.End()

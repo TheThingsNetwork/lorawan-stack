@@ -24,6 +24,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -139,7 +140,7 @@ func newApplicationStore(baseStore *baseStore) *applicationStore {
 func (s *applicationStore) CreateApplication(
 	ctx context.Context, pb *ttnpb.Application,
 ) (*ttnpb.Application, error) {
-	ctx, span := tracer.Start(ctx, "CreateApplication", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "CreateApplication", trace.WithAttributes(
 		attribute.String("application_id", pb.GetIds().GetApplicationId()),
 	))
 	defer span.End()
@@ -325,7 +326,7 @@ func (*applicationStore) selectWithID(
 func (s *applicationStore) FindApplications(
 	ctx context.Context, ids []*ttnpb.ApplicationIdentifiers, fieldMask store.FieldMask,
 ) ([]*ttnpb.Application, error) {
-	ctx, span := tracer.Start(ctx, "FindApplications", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "FindApplications", trace.WithAttributes(
 		attribute.StringSlice("application_ids", idStrings(ids...)),
 	))
 	defer span.End()
@@ -356,7 +357,7 @@ func (s *applicationStore) getApplicationModelBy(
 func (s *applicationStore) GetApplication(
 	ctx context.Context, id *ttnpb.ApplicationIdentifiers, fieldMask store.FieldMask,
 ) (*ttnpb.Application, error) {
-	ctx, span := tracer.Start(ctx, "GetApplication", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "GetApplication", trace.WithAttributes(
 		attribute.String("application_id", id.GetApplicationId()),
 	))
 	defer span.End()
@@ -470,7 +471,7 @@ func (s *applicationStore) updateApplicationModel( //nolint:gocyclo
 func (s *applicationStore) UpdateApplication(
 	ctx context.Context, pb *ttnpb.Application, fieldMask store.FieldMask,
 ) (*ttnpb.Application, error) {
-	ctx, span := tracer.Start(ctx, "UpdateApplication", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "UpdateApplication", trace.WithAttributes(
 		attribute.String("application_id", pb.GetIds().GetApplicationId()),
 	))
 	defer span.End()
@@ -501,7 +502,7 @@ func (s *applicationStore) UpdateApplication(
 }
 
 func (s *applicationStore) DeleteApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers) error {
-	ctx, span := tracer.Start(ctx, "DeleteApplication", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "DeleteApplication", trace.WithAttributes(
 		attribute.String("application_id", id.GetApplicationId()),
 	))
 	defer span.End()
@@ -528,7 +529,7 @@ func (s *applicationStore) DeleteApplication(ctx context.Context, id *ttnpb.Appl
 }
 
 func (s *applicationStore) RestoreApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers) error {
-	ctx, span := tracer.Start(ctx, "RestoreApplication", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "RestoreApplication", trace.WithAttributes(
 		attribute.String("application_id", id.GetApplicationId()),
 	))
 	defer span.End()
@@ -561,7 +562,7 @@ func (s *applicationStore) RestoreApplication(ctx context.Context, id *ttnpb.App
 }
 
 func (s *applicationStore) PurgeApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers) error {
-	ctx, span := tracer.Start(ctx, "PurgeApplication", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "PurgeApplication", trace.WithAttributes(
 		attribute.String("application_id", id.GetApplicationId()),
 	))
 	defer span.End()

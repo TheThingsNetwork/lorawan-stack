@@ -32,8 +32,11 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/interop"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpctracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"google.golang.org/grpc"
@@ -82,12 +85,14 @@ func validateConfig(conf *Config) error {
 
 // New returns new *JoinServer.
 func New(c *component.Component, conf *Config) (*JoinServer, error) {
+	ctx := tracer.NewContextWithTracer(c.Context(), tracerNamespace)
+
 	if err := validateConfig(conf); err != nil {
 		return nil, err
 	}
 	js := &JoinServer{
 		Component: c,
-		ctx:       log.NewContextWithField(c.Context(), "namespace", "joinserver"),
+		ctx:       log.NewContextWithField(ctx, "namespace", logNamespace),
 
 		devices:                       conf.Devices,
 		keys:                          conf.Keys,
@@ -113,13 +118,26 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 	js.interop = interopServer{JS: js}
 
 	// TODO: Support authentication from non-cluster-local NS and AS (https://github.com/TheThingsNetwork/lorawan-stack/issues/4).
-	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.NsJs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("joinserver"))
-	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.AsJs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("joinserver"))
-	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.AppJs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("joinserver"))
-	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.Js", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("joinserver"))
-	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.ApplicationActivationSettingsRegistry", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("joinserver"))
-	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.NsJs", cluster.HookName, c.ClusterAuthUnaryHook())
+	for _, hook := range []struct {
+		name       string
+		middleware hooks.UnaryHandlerMiddleware
+	}{
+		{rpctracer.TracerHook, rpctracer.UnaryTracerHook(tracerNamespace)},
+		{rpclog.NamespaceHook, rpclog.UnaryNamespaceHook(logNamespace)},
+	} {
+		for _, filter := range []string{
+			"/ttn.lorawan.v3.AsJs",
+			"/ttn.lorawan.v3.AppJs",
+			"/ttn.lorawan.v3.NsJs",
+			"/ttn.lorawan.v3.JsEndDeviceRegistry",
+			"/ttn.lorawan.v3.Js",
+			"/ttn.lorawan.v3.ApplicationActivationSettingRegistry",
+		} {
+			c.GRPC.RegisterUnaryHook(filter, hook.name, hook.middleware)
+		}
+	}
 	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.AsJs", cluster.HookName, c.ClusterAuthUnaryHook())
+	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.NsJs", cluster.HookName, c.ClusterAuthUnaryHook())
 	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.Js", cluster.HookName, c.ClusterAuthUnaryHook())
 
 	c.RegisterGRPC(js)

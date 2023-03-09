@@ -24,6 +24,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 	"google.golang.org/protobuf/types/known/anypb"
@@ -122,7 +123,7 @@ func newNotificationStore(baseStore *baseStore) *notificationStore {
 func (s *notificationStore) CreateNotification(
 	ctx context.Context, pb *ttnpb.Notification, receiverIDs []*ttnpb.UserIdentifiers,
 ) (*ttnpb.Notification, error) {
-	ctx, span := tracer.Start(ctx, "CreateNotification", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "CreateNotification", trace.WithAttributes(
 		attribute.String("entity_type", pb.EntityIds.EntityType()),
 		attribute.String("entity_id", pb.EntityIds.IDString()),
 		attribute.String("notification_type", pb.NotificationType),
@@ -211,7 +212,7 @@ func (s *notificationStore) CreateNotification(
 func (s *notificationStore) ListNotifications(
 	ctx context.Context, receiverIDs *ttnpb.UserIdentifiers, statuses []ttnpb.NotificationStatus,
 ) ([]*ttnpb.Notification, error) {
-	ctx, span := tracer.Start(ctx, "ListNotifications", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "ListNotifications", trace.WithAttributes(
 		attribute.String("receiver_id", receiverIDs.GetUserId()),
 	))
 	defer span.End()
@@ -273,7 +274,7 @@ func (s *notificationStore) UpdateNotificationStatus(
 	notificationIDs []string,
 	status ttnpb.NotificationStatus,
 ) error {
-	ctx, span := tracer.Start(ctx, "UpdateNotificationStatus", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "UpdateNotificationStatus", trace.WithAttributes(
 		attribute.String("receiver_id", receiverIDs.GetUserId()),
 	))
 	defer span.End()

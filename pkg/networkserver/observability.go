@@ -28,6 +28,11 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
+const (
+	logNamespace    = "networkserver"
+	tracerNamespace = "go.thethings.network/lorawan-stack/pkg/networkserver"
+)
+
 var (
 	evtReceiveDataUplink = events.Define(
 		"ns.up.data.receive", "receive data message",

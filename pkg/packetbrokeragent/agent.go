@@ -32,7 +32,11 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcclient"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpctracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -151,7 +155,9 @@ var (
 
 // New returns a new Packet Broker Agent.
 func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
-	ctx := log.NewContextWithField(c.Context(), "namespace", "packetbrokeragent")
+	ctx := tracer.NewContextWithTracer(c.Context(), tracerNamespace)
+
+	ctx = log.NewContextWithField(ctx, "namespace", logNamespace)
 	logger := log.FromContext(ctx)
 
 	var devAddrPrefixes []types.DevAddrPrefix
@@ -362,8 +368,23 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		c.RegisterTask(newTaskConfig("pb_publish_downlink", a.publishDownlink))
 	}
 
-	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.GsPba", cluster.HookName, c.ClusterAuthUnaryHook())
+	for _, hook := range []struct {
+		name       string
+		middleware hooks.UnaryHandlerMiddleware
+	}{
+		{rpctracer.TracerHook, rpctracer.UnaryTracerHook(tracerNamespace)},
+		{rpclog.NamespaceHook, rpclog.UnaryNamespaceHook(logNamespace)},
+	} {
+		for _, filter := range []string{
+			"/ttn.lorawan.v3.Pba",
+			"/ttn.lorawan.v3.NsPba",
+			"/ttn.lorawan.v3.GsPba",
+		} {
+			c.GRPC.RegisterUnaryHook(filter, hook.name, hook.middleware)
+		}
+	}
 	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.NsPba", cluster.HookName, c.ClusterAuthUnaryHook())
+	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.GsPba", cluster.HookName, c.ClusterAuthUnaryHook())
 
 	c.RegisterGRPC(a)
 	return a, nil

@@ -26,6 +26,7 @@ import (
 	"sync"
 	"syscall"
 
+	"go.opentelemetry.io/otel/trace"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
@@ -38,6 +39,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 	"golang.org/x/crypto/acme/autocert"
@@ -131,6 +133,17 @@ func WithTaskStarter(s task.Starter) Option {
 func WithBaseConfigGetter(f func(ctx context.Context) config.ServiceBase) Option {
 	return func(c *Component) {
 		c.getBaseConfig = f
+	}
+}
+
+// WithTracerProvider returns an option that stores the given trace provider
+// in the component's context.
+func WithTracerProvider(tp trace.TracerProvider) Option {
+	return func(c *Component) {
+		c.ctx = tracing.NewContextWithTracerProvider(c.ctx, tp)
+		c.AddContextFiller(func(ctx context.Context) context.Context {
+			return tracing.NewContextWithTracerProvider(ctx, tp)
+		})
 	}
 }
 

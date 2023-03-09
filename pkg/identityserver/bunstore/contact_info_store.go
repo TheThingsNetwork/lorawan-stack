@@ -25,6 +25,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -248,7 +249,7 @@ func (*contactInfoStore) selectWithEntityIDs(
 func (s *contactInfoStore) GetContactInfo(
 	ctx context.Context, entityID ttnpb.IDStringer,
 ) ([]*ttnpb.ContactInfo, error) {
-	ctx, span := tracer.Start(ctx, "GetContactInfo", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "GetContactInfo", trace.WithAttributes(
 		attribute.String("entity_type", entityID.EntityType()),
 		attribute.String("entity_id", entityID.IDString()),
 	))
@@ -276,7 +277,7 @@ func (s *contactInfoStore) GetContactInfo(
 func (s *contactInfoStore) SetContactInfo(
 	ctx context.Context, entityID ttnpb.IDStringer, pbs []*ttnpb.ContactInfo,
 ) ([]*ttnpb.ContactInfo, error) {
-	ctx, span := tracer.Start(ctx, "SetContactInfo", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "SetContactInfo", trace.WithAttributes(
 		attribute.String("entity_type", entityID.EntityType()),
 		attribute.String("entity_id", entityID.IDString()),
 	))
@@ -309,7 +310,7 @@ func (s *contactInfoStore) SetContactInfo(
 func (s *contactInfoStore) CreateValidation(
 	ctx context.Context, pb *ttnpb.ContactInfoValidation,
 ) (*ttnpb.ContactInfoValidation, error) {
-	ctx, span := tracer.Start(ctx, "CreateValidation", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "CreateValidation", trace.WithAttributes(
 		attribute.String("entity_type", pb.GetEntity().EntityType()),
 		attribute.String("entity_id", pb.GetEntity().IDString()),
 	))
@@ -375,7 +376,7 @@ func (s *contactInfoStore) CreateValidation(
 }
 
 func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.ContactInfoValidation) error {
-	ctx, span := tracer.Start(ctx, "Validate")
+	ctx, span := tracer.StartFromContext(ctx, "Validate")
 	defer span.End()
 
 	// TODO: Refactor store interface to split this ito a separate methods.
@@ -445,7 +446,7 @@ func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.Conta
 }
 
 func (s *contactInfoStore) DeleteEntityContactInfo(ctx context.Context, entityID ttnpb.IDStringer) error {
-	ctx, span := tracer.Start(ctx, "DeleteEntityContactInfo", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "DeleteEntityContactInfo", trace.WithAttributes(
 		attribute.String("entity_type", entityID.EntityType()),
 		attribute.String("entity_id", entityID.IDString()),
 	))

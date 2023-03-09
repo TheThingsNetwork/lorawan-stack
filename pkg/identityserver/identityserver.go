@@ -35,6 +35,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpctracer"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/webui"
 	"google.golang.org/grpc"
@@ -137,9 +139,11 @@ var errDBNeedsMigration = errors.Define("db_needs_migration", "the database need
 
 // New returns new *IdentityServer.
 func New(c *component.Component, config *Config) (is *IdentityServer, err error) {
+	ctx := tracer.NewContextWithTracer(c.Context(), tracerNamespace)
+
 	is = &IdentityServer{
 		Component: c,
-		ctx:       log.NewContextWithField(c.Context(), "namespace", "identityserver"),
+		ctx:       log.NewContextWithField(ctx, "namespace", logNamespace),
 		config:    config,
 	}
 
@@ -170,27 +174,47 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		name       string
 		middleware hooks.UnaryHandlerMiddleware
 	}{
-		{rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("identityserver")},
+		{rpctracer.TracerHook, rpctracer.UnaryTracerHook(tracerNamespace)},
+		{rpclog.NamespaceHook, rpclog.UnaryNamespaceHook(logNamespace)},
 		{cluster.HookName, c.ClusterAuthUnaryHook()},
 	} {
-		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.Is", hook.name, hook.middleware)
-		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.ApplicationRegistry", hook.name, hook.middleware)
-		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.ApplicationAccess", hook.name, hook.middleware)
-		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.ClientRegistry", hook.name, hook.middleware)
-		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.ClientAccess", hook.name, hook.middleware)
-		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.EndDeviceRegistry", hook.name, hook.middleware)
-		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.GatewayRegistry", hook.name, hook.middleware)
-		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.GatewayAccess", hook.name, hook.middleware)
-		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.OrganizationRegistry", hook.name, hook.middleware)
-		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.OrganizationAccess", hook.name, hook.middleware)
-		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.UserRegistry", hook.name, hook.middleware)
-		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.UserAccess", hook.name, hook.middleware)
-		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.UserSessionRegistry", hook.name, hook.middleware)
-		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.NotificationService", hook.name, hook.middleware)
+		for _, filter := range []string{
+			"/ttn.lorawan.v3.Is",
+			"/ttn.lorawan.v3.EntityAccess",
+			"/ttn.lorawan.v3.ApplicationRegistry",
+			"/ttn.lorawan.v3.ApplicationAccess",
+			"/ttn.lorawan.v3.ClientRegistry",
+			"/ttn.lorawan.v3.ClientAccess",
+			"/ttn.lorawan.v3.EndDeviceRegistry",
+			"/ttn.lorawan.v3.GatewayRegistry",
+			"/ttn.lorawan.v3.GatewayAccess",
+			"/ttn.lorawan.v3.OrganizationRegistry",
+			"/ttn.lorawan.v3.OrganizationAccess",
+			"/ttn.lorawan.v3.UserRegistry",
+			"/ttn.lorawan.v3.UserAccess",
+			"/ttn.lorawan.v3.UserSessionRegistry",
+			"/ttn.lorawan.v3.NotificationService",
+		} {
+			c.GRPC.RegisterUnaryHook(filter, hook.name, hook.middleware)
+		}
 	}
-	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.EntityAccess", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("identityserver"))
-	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.EntityAccess", cluster.HookName, c.ClusterAuthUnaryHook())
-	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.OAuthAuthorizationRegistry", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("identityserver"))
+	for _, hook := range []struct {
+		name       string
+		middleware hooks.UnaryHandlerMiddleware
+	}{
+		{rpctracer.TracerHook, rpctracer.UnaryTracerHook(tracerNamespace)},
+		{rpclog.NamespaceHook, rpclog.UnaryNamespaceHook(logNamespace)},
+	} {
+		for _, filter := range []string{
+			"/ttn.lorawan.v3.UserInvitationRegistry",
+			"/ttn.lorawan.v3.EntityRegistrySearch",
+			"/ttn.lorawan.v3.EndDeviceRegistrySearch",
+			"/ttn.lorawan.v3.ContactInfoRegistry",
+			"/ttn.lorawan.v3.OAuthAuthorizationRegistry",
+		} {
+			c.GRPC.RegisterUnaryHook(filter, hook.name, hook.middleware)
+		}
+	}
 
 	c.RegisterGRPC(is)
 	c.RegisterWeb(is.oauth)

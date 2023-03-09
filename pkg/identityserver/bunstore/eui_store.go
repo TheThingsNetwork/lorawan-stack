@@ -22,6 +22,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
@@ -64,7 +65,7 @@ func newEUIStore(baseStore *baseStore) *euiStore {
 func (s *euiStore) CreateEUIBlock(
 	ctx context.Context, prefix types.EUI64Prefix, initCounter int64, euiType string,
 ) error {
-	ctx, span := tracer.Start(ctx, "CreateEUIBlock")
+	ctx, span := tracer.StartFromContext(ctx, "CreateEUIBlock")
 	defer span.End()
 
 	model := &EUIBlock{}
@@ -102,7 +103,7 @@ func (s *euiStore) CreateEUIBlock(
 func (s *euiStore) IssueDevEUIForApplication(
 	ctx context.Context, id *ttnpb.ApplicationIdentifiers, applicationLimit int,
 ) (*types.EUI64, error) {
-	ctx, span := tracer.Start(ctx, "IssueDevEUIForApplication", trace.WithAttributes(
+	ctx, span := tracer.StartFromContext(ctx, "IssueDevEUIForApplication", trace.WithAttributes(
 		attribute.String("application_id", id.GetApplicationId()),
 	))
 	defer span.End()
