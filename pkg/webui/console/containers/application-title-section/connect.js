@@ -31,10 +31,11 @@ import {
 } from '@console/lib/feature-checks'
 
 import { getTotalApiKeysCount } from '@console/store/actions/api-keys'
-import { getTotalDeviceCount } from '@console/store/actions/devices'
+import { getApplicationDeviceCount } from '@console/store/actions/applications'
 
 import {
   selectApplicationById,
+  selectApplicationDeviceCount,
   selectApplicationDeviceCountFetching,
   selectApplicationDeviceCountError,
   selectApplicationDerivedLastSeen,
@@ -53,7 +54,7 @@ const mapStateToProps = (state, props) => {
   const collaboratorsTotalCount = selectCollaboratorsTotalCount(state)
   const collaboratorsFetching = selectCollaboratorsFetching(state)
   const collaboratorsError = selectCollaboratorsError(state)
-  const devicesTotalCount = selectDevicesTotalCount(state)
+  const devicesTotalCount = selectApplicationDeviceCount(state, props.appId)
   const devicesFetching = selectApplicationDeviceCountFetching(state)
   const devicesError = selectApplicationDeviceCountError(state)
 
@@ -86,7 +87,7 @@ const mapDispatchToProps = dispatch => ({
     }
 
     if (mayViewDevices) {
-      dispatch(getTotalDeviceCount(appId))
+      dispatch(getApplicationDeviceCount(appId))
     }
   },
 })
