@@ -18,6 +18,7 @@ import { isUndefined } from 'lodash'
 
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { id as deviceIdRegexp } from '@ttn-lw/lib/regexp'
 
 import { parseLorawanMacVersion } from '@console/lib/device-utils'
 
@@ -73,7 +74,11 @@ const sessionKeysVersion110Schema = Yup.object({
 
 const validationSchema = Yup.object({
   ids: Yup.object({
-    device_id: Yup.string().required(sharedMessages.validateRequired),
+    device_id: Yup.string()
+      .matches(deviceIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
+      .min(2, Yup.passValues(sharedMessages.validateTooShort))
+      .max(36, Yup.passValues(sharedMessages.validateTooLong))
+      .required(sharedMessages.validateRequired),
   }).when(['supports_join', 'lorawan_version'], (supportsJoin, lorawanVersion, schema) => {
     let newSchema = schema
     if (supportsJoin) {
