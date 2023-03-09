@@ -17,20 +17,26 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Deprecated
 
-- Device claiming that transfer devices between applications is now deprecated and will be removed in a future version of The Things Stack. Device claiming on Join Servers, including The Things Join Server, remains functional. This deprecates the following components:
-  - API for managing application claim authorization (`EndDeviceClaimingServer.AuthorizeApplication` and `EndDeviceClaimingServer.UnauthorizeApplication`)
-  - CLI commands to manage application claim settings (`ttn-lw-cli application claim [authorize|unauthorize]`)
-
 ### Removed
 
 - Automatic migrations of the Network Server database using `ns-db migrate` from versions prior to v3.24 are removed. Migrating from prior versions should be done through v3.24 instead.
 
 ### Fixed
 
+### Security
+
+## [3.24.2] - 2023-03-09
+
+### Deprecated
+
+- Device claiming that transfer devices between applications is now deprecated and will be removed in a future version of The Things Stack. Device claiming on Join Servers, including The Things Join Server, remains functional. This deprecates the following components:
+  - API for managing application claim authorization (`EndDeviceClaimingServer.AuthorizeApplication` and `EndDeviceClaimingServer.UnauthorizeApplication`)
+  - CLI commands to manage application claim settings (`ttn-lw-cli application claim [authorize|unauthorize]`)
+
+### Fixed
+
 - The CLI now continues deleting devices when unclaiming from the Join Server fails. This resembles the behavior in the Console. This no longer stops devices from being deleted if the Join Server is unavailable or the claim is not held.
 - Organization API Keys' rights no longer are considered invalid during fetch operations. If the proper right is attached to said API key it is possible to fetch all fields of an entity, previous to this fix only public safe fields were fetchable.
-
-### Security
 
 ## [3.24.1] - 2023-02-16
 
@@ -2508,7 +2514,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.24.1...v3.24
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.24.2...v3.24
+[3.24.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.24.1...v3.24.2
 [3.24.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.24.0...v3.24.1
 [3.24.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.23.2...v3.24.0
 [3.23.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.23.1...v3.23.2
