@@ -2105,6 +2105,42 @@
       "file": "mqtt.go"
     }
   },
+  "error:pkg/applicationserver/io/packages/alcsync/v1:downlink_unavailable": {
+    "translations": {
+      "en": "downlink unavailable"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/alcsync/v1",
+      "file": "timesync.go"
+    }
+  },
+  "error:pkg/applicationserver/io/packages/alcsync/v1:invalid_field_type": {
+    "translations": {
+      "en": "field `{field}` has the wrong type `{type}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/alcsync/v1",
+      "file": "data.go"
+    }
+  },
+  "error:pkg/applicationserver/io/packages/alcsync/v1:no_association": {
+    "translations": {
+      "en": "no association available"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/alcsync/v1",
+      "file": "package.go"
+    }
+  },
+  "error:pkg/applicationserver/io/packages/alcsync/v1:unknown_command": {
+    "translations": {
+      "en": "unknown command"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/alcsync/v1",
+      "file": "timesync.go"
+    }
+  },
   "error:pkg/applicationserver/io/packages/loradms/v1/api/objects:invalid_stream_record": {
     "translations": {
       "en": "invalid stream record"
