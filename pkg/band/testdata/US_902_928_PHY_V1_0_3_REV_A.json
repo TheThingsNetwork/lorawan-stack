@@ -564,8 +564,8 @@
     },
     "8": {
       "MaxMACPayloadSize": {
-        "false": 41,
-        "true": 41
+        "false": 61,
+        "true": 61
       },
       "Rate": {
         "lora": {
@@ -577,8 +577,8 @@
     },
     "9": {
       "MaxMACPayloadSize": {
-        "false": 117,
-        "true": 117
+        "false": 137,
+        "true": 137
       },
       "Rate": {
         "lora": {
