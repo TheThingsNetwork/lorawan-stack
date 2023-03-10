@@ -195,7 +195,6 @@ const LocaleLoader = ({ children }) => {
     error(err)
     if (err.code === ReactIntlErrorCode.FORMAT_ERROR && !isDevelopment) {
       ingestError(err, { ingestedBy: 'IntlFormat' })
-      return
     }
   }, [])
 
