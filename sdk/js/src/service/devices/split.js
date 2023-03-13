@@ -236,14 +236,17 @@ export const makeRequests = async (
       params.routeParams['end_device.ids.device_id'] = result[3].device.ids.device_id
     }
 
-    // Avoid unnecessary requests component requests if the IS does not know about them.
+    // Avoid unnecessary component requests if the IS does not know about them.
     makeJsRequest =
+      'device' in result[3] &&
       Boolean(result[3].device.join_server_address) &&
       stackConfig.isSameHost(JS, result[3].device.join_server_address)
     makeNsRequest =
+      'device' in result[3] &&
       Boolean(result[3].device.application_server_address) &&
       stackConfig.isSameHost(AS, result[3].device.application_server_address)
     makeAsRequest =
+      'device' in result[3] &&
       Boolean(result[3].device.network_server_address) &&
       stackConfig.isSameHost(NS, result[3].device.network_server_address)
   }
