@@ -159,10 +159,6 @@ const Form = props => {
     enableReinitialize,
   })
 
-  if (!isEmpty(formik.errors)) {
-    console.log(formik.errors)
-  }
-
   const {
     isSubmitting,
     isValid,
