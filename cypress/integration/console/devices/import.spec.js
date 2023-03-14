@@ -108,7 +108,7 @@ describe('End device messaging', () => {
       cy.findByLabelText('Enter LoRaWAN versions and frequency plan manually').check()
       cy.findByLabelText('Frequency plan').selectOption(fallbackValues.frequency_plan_id)
       cy.findByLabelText('LoRaWAN version').selectOption(fallbackValues.lorawan_version)
-
+      cy.findByLabelText('LoRaWAN version').blur()
       cy.findByRole('button', { name: 'Import end devices' }).click()
       cy.findByTestId('progress-bar').should('be.visible')
       cy.wait('@importDevice')
