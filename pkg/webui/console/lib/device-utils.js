@@ -178,6 +178,12 @@ const ALL_ZERO_KEY = '0'.repeat(32)
  */
 export const isNonZeroSessionKey = key => key !== ALL_ZERO_KEY
 
+/**
+ * @param {string} value - The frequency value.
+ * @returns {boolean} - True if the frequency value is valid, false otherwise.
+ */
+export const dynamicFrequencyTest = value => value === 0 || value >= 100000
+
 // End device profile utils.
 
 export const SELECT_OTHER_OPTION = '_other_'
