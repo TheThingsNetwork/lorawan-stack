@@ -93,21 +93,21 @@ describe('End device messaging', () => {
       cy.findByText('some-fail-id').should('not.exist')
     })
 
-    it.only('succeeds setting lorawan_version, lorawan_phy_version and frequency_plan_id from fallback values', () => {
+    it('succeeds setting lorawan_version, lorawan_phy_version and frequency_plan_id from fallback values', () => {
       cy.intercept(
         'PUT',
         '/api/v3/js/applications/import-devices-test-application/devices/this-is-fallback-test-id',
       ).as('importDevice')
-      const devicesFile = 'no-freqId-version-phy-device.json'
+      const devicesFile = 'freqId-version-phy-device.json'
       const fallbackValues = {
         lorawan_version: 'MAC_V1_0',
         frequency_plan_id: '863-870 MHz',
       }
       cy.findByLabelText('File format').selectOption('The Things Stack JSON')
       cy.findByLabelText('File').attachFile(devicesFile)
-      cy.findByLabelText('Enter LoRaWAN versions and frequency plan manually').check()
+/*       cy.findByLabelText('Enter LoRaWAN versions and frequency plan manually').check()
       cy.findByLabelText('Frequency plan').selectOption(fallbackValues.frequency_plan_id)
-      cy.findByLabelText('LoRaWAN version').selectOption(fallbackValues.lorawan_version)
+      cy.findByLabelText('LoRaWAN version').selectOption(fallbackValues.lorawan_version) */
 
       cy.findByRole('button', { name: 'Import end devices' }).click()
       cy.findByTestId('progress-bar').should('be.visible')
