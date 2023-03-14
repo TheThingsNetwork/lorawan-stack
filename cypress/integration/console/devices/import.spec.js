@@ -98,7 +98,7 @@ describe('End device messaging', () => {
         'PUT',
         '/api/v3/js/applications/import-devices-test-application/devices/this-is-fallback-test-id',
       ).as('importDevice')
-      const devicesFile = 'freqId-version-phy-device.json'
+      const devicesFile = 'no-freqId-version-phy-device.json'
       const fallbackValues = {
         lorawan_version: 'MAC_V1_0',
         frequency_plan_id: '863-870 MHz',
