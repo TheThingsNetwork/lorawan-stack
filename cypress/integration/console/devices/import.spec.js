@@ -105,9 +105,9 @@ describe('End device messaging', () => {
       }
       cy.findByLabelText('File format').selectOption('The Things Stack JSON')
       cy.findByLabelText('File').attachFile(devicesFile)
-/*       cy.findByLabelText('Enter LoRaWAN versions and frequency plan manually').check()
+      cy.findByLabelText('Enter LoRaWAN versions and frequency plan manually').check()
       cy.findByLabelText('Frequency plan').selectOption(fallbackValues.frequency_plan_id)
-      cy.findByLabelText('LoRaWAN version').selectOption(fallbackValues.lorawan_version) */
+      cy.findByLabelText('LoRaWAN version').selectOption(fallbackValues.lorawan_version)
 
       cy.findByRole('button', { name: 'Import end devices' }).click()
       cy.findByTestId('progress-bar').should('be.visible')
