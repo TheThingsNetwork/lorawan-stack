@@ -178,11 +178,23 @@ const ALL_ZERO_KEY = '0'.repeat(32)
  */
 export const isNonZeroSessionKey = key => key !== ALL_ZERO_KEY
 
-/**
- * @param {string} value - The frequency value.
- * @returns {boolean} - True if the frequency value is valid, false otherwise.
- */
-export const dynamicFrequencyTest = value => value === 0 || value >= 100000
+// End device profile utils.
+
+export const SELECT_OTHER_OPTION = '_other_'
+export const isOtherOption = option => option === SELECT_OTHER_OPTION
+export const hasSelectedDeviceRepositoryOther = version =>
+  version && Object.values(version).some(value => isOtherOption(value))
+
+/*
+  `hardware_version` is not required when registering an end device in the device repository, so for 
+  certain end device models it can be missing. When this is the case, we still want to allow the users
+  to select such models because `firmware_version` (that might depend on hw version) and `band_id`
+  are required. `SELECT_UNKNOWN_HW_OPTION` option represents such end devices.
+*/
+export const SELECT_UNKNOWN_HW_OPTION = '_unknown_hw_version_'
+export const isUnknownHwVersion = option => option === SELECT_UNKNOWN_HW_OPTION
+
+// End device lorawan version, phy version and frequency plan utils.
 
 export const getLorawanVersionLabel = ({ lorawan_version }) => {
   const { label } = LORAWAN_VERSIONS.find(version => version.value === lorawan_version) || {}
@@ -222,14 +234,3 @@ export const lorawanVersionValueSetter = ({ setValues, setFieldTouched }, { valu
     lorawan_phy_version: phyVersions.length === 1 ? phyVersions[0].value : '',
   }))
 }
-
-export const SELECT_UNKNOWN_HW_OPTION = '_unknown_'
-
-export const SELECT_OTHER_OPTION = '_other_'
-
-export const isUnknownHwVersion = option => option === SELECT_UNKNOWN_HW_OPTION
-
-export const isOtherOption = option => option === SELECT_OTHER_OPTION
-
-export const hasSelectedDeviceRepositoryOther = version =>
-  version && Object.values(version).some(value => isOtherOption(value))
