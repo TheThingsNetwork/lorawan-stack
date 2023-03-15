@@ -70,17 +70,23 @@ The topic is typically a few characters long and should always be present. Accep
 - `ci`: Continuous Integration tooling
 - `cli`: Command-line Interface
 - `console`: The Console component including backend and frontend
+- `cs`: The Crypto Server component
 - `data`: Data from external repositories
 - `dcs`: The Device Claiming Server component
 - `dev`: Development tooling
+- `dr`: The Device Repository component
 - `dtc`: The Device Template Converter component
+- `es`: The Events Server component
 - `gcs`: The Gateway Configuration Server component
 - `gs`: The Gateway Server component
 - `is`: The Identity Server component
 - `js`: The Join Server component
+- `noc`: The Network Operations Center component
 - `ns`: The Network Server component
+- `pba`: The Packet Broker Agent component
 - `qrg`: The QR Code Generator component
-- `util`: utilities
+- `tbs`: The Tenant Billing Server component
+- `util`: Utilities
 
 Changes that affect multiple components can be comma separated.
 
