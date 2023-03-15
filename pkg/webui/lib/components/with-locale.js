@@ -15,7 +15,7 @@
 /* eslint-disable capitalized-comments */
 
 import React, { useState, useCallback, useEffect, createContext, useMemo } from 'react'
-import { IntlProvider, defineMessages } from 'react-intl'
+import { IntlProvider, defineMessages, ReactIntlErrorCode } from 'react-intl'
 import { uniq } from 'lodash'
 
 import Overlay from '@ttn-lw/components/overlay'
@@ -23,6 +23,8 @@ import Spinner from '@ttn-lw/components/spinner'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import log, { error } from '@ttn-lw/lib/log'
+import isDevelopment from '@ttn-lw/lib/dev'
+import { ingestError } from '@ttn-lw/lib/errors/utils'
 
 const SUPPORTED_LOCALES = process.predefined.SUPPORTED_LOCALES // Note: defined by webpack define plugin.
 const defaultLanguage = 'en'
@@ -191,6 +193,9 @@ const LocaleLoader = ({ children }) => {
 
   const handleIntlError = useCallback(err => {
     error(err)
+    if (err.code === ReactIntlErrorCode.FORMAT_ERROR && !isDevelopment) {
+      ingestError(err, { ingestedBy: 'IntlFormat' })
+    }
   }, [])
 
   const setLocale = useCallback(
