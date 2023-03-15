@@ -22,7 +22,7 @@ import {
 } from 'formik'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import { defineMessages } from 'react-intl'
-import { isPlainObject, isFunction, pick, omitBy, pull, merge, isEmpty } from 'lodash'
+import { isPlainObject, isFunction, pick, omitBy, pull, merge } from 'lodash'
 
 import Notification from '@ttn-lw/components/notification'
 import ErrorNotification from '@ttn-lw/components/error-notification'
