@@ -504,10 +504,16 @@ export const toMessageProps = (error, each = false) => {
 
         // If the attributes are missing values, use the generated default values based on the message.
         const messageValues = rootCause?.message_format?.match(/[^{}]+(?=})/g) || []
-        const fallbackValues = messageValues.reduce((obj, val) => ((obj[val] = `{${val}}`), obj), {
-          ...rootCause.attributes,
-        })
-        const values = { ...fallbackValues, ...rootCause.attributes }
+        const values = messageValues.reduce(
+          (obj, val) => {
+            if (!(val in obj)) {
+              obj[val] = `{${val}}`
+            }
+
+            return obj
+          },
+          { ...rootCause.attributes },
+        )
 
         props.push({
           content: {
