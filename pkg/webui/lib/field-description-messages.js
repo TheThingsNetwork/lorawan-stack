@@ -284,6 +284,9 @@ const m = defineMessages({
 
   resetUsedDevNoncesDescription:
     'The device nonces ensure that join requests cannot be replayed by attackers. Resetting the device nonces enables the end device to re-use a previously used nonce. Do not use this option unless you are sure that you would like the nonces to be usable again.',
+
+  alcsyncDescription:
+    'The Application Layer Clock Synchronization package is part of the LoRa TS003 specification, it synchronizes the real-time clock of an end-device to the network’s Global Positioning System (GPS) clock with near-second accuracy. It is useful for end-devices that do not have access to another accurate time source',
 })
 
 const descriptions = Object.freeze({
@@ -551,6 +554,9 @@ const descriptions = Object.freeze({
   },
   [TOOLTIP_IDS.RESET_USED_DEV_NONCES]: {
     description: m.resetUsedDevNoncesDescription,
+  },
+  [TOOLTIP_IDS.ALCSYNC]: {
+    description: m.alcsyncDescription,
   },
 })
 
