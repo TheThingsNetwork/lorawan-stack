@@ -40,6 +40,7 @@ import {
 const m = defineMessages({
   basics: 'Basics',
   deleteApp: 'Delete application',
+  useAlcsync: 'Use LoRa Application Layer Clock Synchronization package',
 })
 
 const validationSchema = Yup.object().shape({
@@ -140,7 +141,7 @@ const ApplicationGeneralSettingsForm = ({
       />
     )}
     <Form.Field
-      title={'Use LoRa Application Layer Clock Synchronization package'}
+      title={m.useAlcsync}
       name="alcsync"
       component={Checkbox}
       tooltipId={tooltipIds.ALCSYNC}

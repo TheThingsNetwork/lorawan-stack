@@ -74,6 +74,8 @@ const ApplicationGeneralSettings = () => {
       featureCheck={mayEditBasicApplicationInfo}
       otherwise={{ redirect: `/applications/${appId}` }}
     >
+      {/* The request getApplicationLink returns 404 when there is no `skip_payload_crypto`. */}
+      {/* This is expected behavior and should not be treated as an error. */}
       <RequireRequest requestAction={requestsList} handleErrors={false}>
         <Container>
           <PageTitle title={sharedMessages.generalSettings} />
