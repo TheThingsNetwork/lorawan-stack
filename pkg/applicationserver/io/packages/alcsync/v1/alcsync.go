@@ -22,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gpstime"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	lorautil "go.thethings.network/lorawan-stack/v3/pkg/util/lora"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // newTimeSyncCommand builds a new TimeSyncCommand.
@@ -47,9 +48,9 @@ func newTimeSyncCommand(
 	ansRequired := (cPayload[4] & 0x10) != 0
 
 	cmd := &TimeSyncCommand{
-		req: &AppTimeReq{
-			DeviceTime:  deviceTime,
-			TokenReq:    tokenReq,
+		req: &ttnpb.ALCSyncCommand_AppTimeReq{
+			DeviceTime:  timestamppb.New(deviceTime),
+			TokenReq:    uint32(tokenReq),
 			AnsRequired: ansRequired,
 		},
 		receivedAt: receivedAt,
@@ -61,9 +62,10 @@ func newTimeSyncCommand(
 
 // MakeCommands parses the uplink payload and returns the commands.
 func MakeCommands(up *ttnpb.ApplicationUplink, fPort uint32, data *packageData) ([]Command, error) {
-	cID, cPayload := up.FrmPayload[0], up.FrmPayload[1:]
+	cIDByte, cPayload := up.FrmPayload[0], up.FrmPayload[1:]
 	commands := make([]Command, 0)
 	for {
+		cID := ttnpb.ALCSyncCommandIdentifier(cIDByte)
 		cmd, rest, err := makeCommand(cID, cPayload, up, fPort, data)
 		if err != nil {
 			return commands, err
@@ -73,14 +75,14 @@ func MakeCommands(up *ttnpb.ApplicationUplink, fPort uint32, data *packageData) 
 		if len(rest) == 0 { // No commands left.
 			break
 		}
-		cID, cPayload = rest[0], rest[1:]
+		cIDByte, cPayload = rest[0], rest[1:]
 	}
 	return commands, nil
 }
 
 // makeCommand parses the payload based on the command ID.
 func makeCommand(
-	cID byte,
+	cID ttnpb.ALCSyncCommandIdentifier,
 	cPayload []byte,
 	up *ttnpb.ApplicationUplink,
 	fPort uint32,
@@ -89,7 +91,7 @@ func makeCommand(
 	receivedAt := lorautil.GetAdjustedReceivedAt(up)
 	threshold := data.Threshold
 	switch cID {
-	case 0x01:
+	case ttnpb.ALCSyncCommandIdentifier_CID_APP_TIME:
 		return newTimeSyncCommand(cPayload, threshold, receivedAt.AsTime(), fPort)
 	default:
 		return nil, cPayload, errUnknownCommand.New()

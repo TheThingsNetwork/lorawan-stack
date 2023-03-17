@@ -2784,6 +2784,213 @@
       ]
     },
     {
+      "name": "lorawan-stack/api/applicationserver_integrations_alcsync.proto",
+      "description": "",
+      "package": "ttn.lorawan.v3",
+      "hasEnums": true,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [
+        {
+          "name": "ALCSyncCommandIdentifier",
+          "longName": "ALCSyncCommandIdentifier",
+          "fullName": "ttn.lorawan.v3.ALCSyncCommandIdentifier",
+          "description": "",
+          "values": [
+            {
+              "name": "CID_PKG_VERSION",
+              "number": "0",
+              "description": ""
+            },
+            {
+              "name": "CID_APP_TIME",
+              "number": "1",
+              "description": ""
+            },
+            {
+              "name": "CID_APP_DEV_TIME_PERIODICITY",
+              "number": "2",
+              "description": ""
+            },
+            {
+              "name": "CID_FORCE_DEV_RESYNC",
+              "number": "3",
+              "description": ""
+            }
+          ]
+        }
+      ],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "ALCSyncCommand",
+          "longName": "ALCSyncCommand",
+          "fullName": "ttn.lorawan.v3.ALCSyncCommand",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "cid",
+              "description": "",
+              "label": "",
+              "type": "ALCSyncCommandIdentifier",
+              "longType": "ALCSyncCommandIdentifier",
+              "fullType": "ttn.lorawan.v3.ALCSyncCommandIdentifier",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "app_time_req",
+              "description": "",
+              "label": "",
+              "type": "AppTimeReq",
+              "longType": "ALCSyncCommand.AppTimeReq",
+              "fullType": "ttn.lorawan.v3.ALCSyncCommand.AppTimeReq",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "payload",
+              "defaultValue": ""
+            },
+            {
+              "name": "app_time_ans",
+              "description": "",
+              "label": "",
+              "type": "AppTimeAns",
+              "longType": "ALCSyncCommand.AppTimeAns",
+              "fullType": "ttn.lorawan.v3.ALCSyncCommand.AppTimeAns",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "payload",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "AppTimeAns",
+          "longName": "ALCSyncCommand.AppTimeAns",
+          "fullName": "ttn.lorawan.v3.ALCSyncCommand.AppTimeAns",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "TimeCorrection",
+              "description": "",
+              "label": "",
+              "type": "int32",
+              "longType": "int32",
+              "fullType": "int32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "TokenAns",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 255
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "AppTimeReq",
+          "longName": "ALCSyncCommand.AppTimeReq",
+          "fullName": "ttn.lorawan.v3.ALCSyncCommand.AppTimeReq",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "DeviceTime",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "timestamp.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "TokenReq",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 255
+                  }
+                ]
+              }
+            },
+            {
+              "name": "AnsRequired",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
       "name": "lorawan-stack/api/applicationserver_integrations_storage.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
