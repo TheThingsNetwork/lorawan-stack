@@ -37,7 +37,10 @@ func newTimeSyncCommand(
 
 	lenBytes := 5
 	if len(data) < lenBytes {
-		return nil, data, errUnknownCommand.New()
+		return nil, data, errTimeSyncCommandPayloadInsufficientLength.WithAttributes(
+			"expected_length", lenBytes,
+			"actual_length", len(data),
+		).New()
 	}
 
 	cPayload, rest := data[:lenBytes], data[lenBytes:]
@@ -68,7 +71,12 @@ func MakeCommands(up *ttnpb.ApplicationUplink, fPort uint32, data *packageData) 
 		cID := ttnpb.ALCSyncCommandIdentifier(cIDByte)
 		cmd, rest, err := makeCommand(cID, cPayload, up, fPort, data)
 		if err != nil {
-			return commands, err
+			return commands, errCommandCreationFailed.WithCause(err).WithAttributes(
+				"command_id", cID,
+				"command_payload", cPayload,
+				"remaining_payload", rest,
+				"received_at", up.ReceivedAt,
+			).New()
 		}
 		commands = append(commands, cmd)
 
@@ -93,8 +101,18 @@ func makeCommand(
 	switch cID {
 	case ttnpb.ALCSyncCommandIdentifier_CID_APP_TIME:
 		return newTimeSyncCommand(cPayload, threshold, receivedAt.AsTime(), fPort)
+	case ttnpb.ALCSyncCommandIdentifier_CID_PKG_VERSION,
+		ttnpb.ALCSyncCommandIdentifier_CID_APP_DEV_TIME_PERIODICITY,
+		ttnpb.ALCSyncCommandIdentifier_CID_FORCE_DEV_RESYNC:
+		return nil, cPayload, errUnsuportedCommand.WithAttributes(
+			"command_id", cID,
+			"command_payload", cPayload,
+		).New()
 	default:
-		return nil, cPayload, errUnknownCommand.New()
+		return nil, cPayload, errUnknownCommand.WithAttributes(
+			"command_id", cID,
+			"command_payload", cPayload,
+		).New()
 	}
 }
 
@@ -107,7 +125,7 @@ func MakeDownlink(results []Result, fPort uint32) (*ttnpb.ApplicationDownlink, e
 		}
 		b, err := result.MarshalBinary()
 		if err != nil {
-			return nil, err
+			return nil, errDownlinkCreationFailed.WithCause(err).New()
 		}
 		frmPayload = append(frmPayload, b...)
 	}

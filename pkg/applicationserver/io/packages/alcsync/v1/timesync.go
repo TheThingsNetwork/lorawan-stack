@@ -19,15 +19,7 @@ import (
 	"math"
 	"time"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-)
-
-var (
-	errUnknownCommand = errors.DefineNotFound("unknown_command", "unknown command")
-
-	// ErrIgnoreDownlink is a sentinel error returned when the command result should be ignored.
-	errIgnoreDownlink = errors.DefineUnavailable("downlink_unavailable", "downlink unavailable")
 )
 
 // TimeSyncCommand is the command for time synchronization.

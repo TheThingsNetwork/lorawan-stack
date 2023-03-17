@@ -31,7 +31,7 @@ var (
 	threeSecondsDuration = time.Duration(3) * time.Second
 )
 
-func TestNewTimeSyncCommandValidInput(t *testing.T) {
+func TestNewTimeSyncCommand(t *testing.T) {
 	t.Parallel()
 	testCases := []struct {
 		Name string
@@ -131,7 +131,7 @@ func TestNewTimeSyncCommandValidInput(t *testing.T) {
 			}{
 				Cmd:  (*TimeSyncCommand)(nil),
 				Rest: timeSyncPayload[:4],
-				Err:  errUnknownCommand,
+				Err:  errTimeSyncCommandPayloadInsufficientLength.New(),
 			},
 		},
 	}
@@ -244,7 +244,7 @@ func TestMakeCommandInvalidInput(t *testing.T) {
 				Err  error
 			}{
 				Rest: timeSyncPayload,
-				Err:  errUnknownCommand.New(),
+				Err:  errUnsuportedCommand.New(),
 			},
 		},
 		{
@@ -366,7 +366,7 @@ func TestMakeCommandsValidInput(t *testing.T) {
 						threshold:  threeSecondsDuration,
 					},
 				},
-				Err: errUnknownCommand.New(),
+				Err: errCommandCreationFailed.New(),
 			},
 		},
 		{
@@ -461,7 +461,7 @@ func TestMakeCommandsValidInput(t *testing.T) {
 						threshold:  threeSecondsDuration,
 					},
 				},
-				Err: errUnknownCommand.New(),
+				Err: errCommandCreationFailed.New(),
 			},
 		},
 	}

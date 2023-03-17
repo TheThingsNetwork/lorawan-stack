@@ -2105,13 +2105,31 @@
       "file": "mqtt.go"
     }
   },
+  "error:pkg/applicationserver/io/packages/alcsync/v1:command_creation_failed": {
+    "translations": {
+      "en": "failed to create command"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/alcsync/v1",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/applicationserver/io/packages/alcsync/v1:downlink_creation_failed": {
+    "translations": {
+      "en": "failed to create downlink"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/alcsync/v1",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/applicationserver/io/packages/alcsync/v1:downlink_unavailable": {
     "translations": {
       "en": "downlink unavailable"
     },
     "description": {
       "package": "pkg/applicationserver/io/packages/alcsync/v1",
-      "file": "timesync.go"
+      "file": "errors.go"
     }
   },
   "error:pkg/applicationserver/io/packages/alcsync/v1:invalid_field_type": {
@@ -2120,7 +2138,7 @@
     },
     "description": {
       "package": "pkg/applicationserver/io/packages/alcsync/v1",
-      "file": "data.go"
+      "file": "errors.go"
     }
   },
   "error:pkg/applicationserver/io/packages/alcsync/v1:no_association": {
@@ -2129,7 +2147,25 @@
     },
     "description": {
       "package": "pkg/applicationserver/io/packages/alcsync/v1",
-      "file": "package.go"
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/applicationserver/io/packages/alcsync/v1:pkg_data_merge": {
+    "translations": {
+      "en": "failed to merge package data"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/alcsync/v1",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/applicationserver/io/packages/alcsync/v1:time_sync_command_payload_insufficient_length": {
+    "translations": {
+      "en": "time sync command payload insufficient length"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/alcsync/v1",
+      "file": "errors.go"
     }
   },
   "error:pkg/applicationserver/io/packages/alcsync/v1:unknown_command": {
@@ -2138,7 +2174,16 @@
     },
     "description": {
       "package": "pkg/applicationserver/io/packages/alcsync/v1",
-      "file": "timesync.go"
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/applicationserver/io/packages/alcsync/v1:unsupported_command": {
+    "translations": {
+      "en": "unsupported command"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/alcsync/v1",
+      "file": "errors.go"
     }
   },
   "error:pkg/applicationserver/io/packages/loradms/v1/api/objects:invalid_stream_record": {
