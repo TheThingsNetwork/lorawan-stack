@@ -12,6 +12,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - Optional Network Server database migration that removes obsolete last invalidation keys is now available.
+- `Use LoRa Application Layer Clock Sync package` field is now available in the console.
 
 ### Changed
 
