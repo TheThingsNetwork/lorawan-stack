@@ -27,8 +27,6 @@ import (
 // PackageName is the name of the package.
 const PackageName = "alcsync-v1"
 
-var errNoAssociation = errors.DefineInternal("no_association", "no association available")
-
 type alcsyncpkg struct {
 	server   io.Server
 	registry packages.Registry
@@ -59,12 +57,15 @@ func (a *alcsyncpkg) HandleUp(
 
 	data, fPort, err := mergePackageData(def, assoc)
 	if err != nil {
-		logger.Error("Failed to merge package data")
+		logger.WithError(err).Error("Failed to merge package data")
 		return err
 	}
 
 	if msg.GetFPort() != fPort {
-		logger.Debug("Uplink received on unhadled FPort")
+		logger.WithFields(log.Fields(
+			"expected_fport", fPort,
+			"received_fport", msg.GetFPort(),
+		)).Debug("Uplink received on unhadled FPort")
 		return nil
 	}
 
@@ -86,7 +87,7 @@ func (a *alcsyncpkg) HandleUp(
 			continue
 		}
 		if err != nil {
-			logger.WithError(err).Debug("Failed to execute command")
+			logger.WithError(err).WithField("command_id", cmd.Code()).Error("Failed to execute command")
 			continue
 		}
 		if result != nil {
@@ -95,11 +96,11 @@ func (a *alcsyncpkg) HandleUp(
 	}
 	downlink, err := MakeDownlink(results, fPort)
 	if err != nil {
-		logger.WithError(err).Debug("Failed to create downlink from results")
+		logger.WithError(err).Error("Failed to create downlink from results")
 		return err
 	}
 	if err := a.server.DownlinkQueuePush(ctx, up.EndDeviceIds, []*ttnpb.ApplicationDownlink{downlink}); err != nil {
-		logger.WithError(err).Debug("Failed to push downlinks to queue")
+		logger.WithError(err).Error("Failed to push downlinks to queue")
 	}
 	return nil
 }

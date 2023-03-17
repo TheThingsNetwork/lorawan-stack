@@ -17,12 +17,9 @@ package alcsyncv1
 import (
 	"time"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/protobuf/types/known/structpb"
 )
-
-var errInvalidFieldType = errors.DefineCorruption("invalid_field_type", "field `{field}` has the wrong type `{type}`")
 
 var defaultThreshold = time.Duration(4) * time.Second
 
@@ -52,10 +49,10 @@ func mergePackageData(
 ) (*packageData, uint32, error) {
 	var defaultData, associationData packageData
 	if err := defaultData.fromStruct(def.GetData()); err != nil {
-		return nil, 0, err
+		return nil, 0, errPkgDataMerge.WithCause(err).New()
 	}
 	if err := associationData.fromStruct(assoc.GetData()); err != nil {
-		return nil, 0, err
+		return nil, 0, errPkgDataMerge.WithCause(err).New()
 	}
 
 	merged := &packageData{
