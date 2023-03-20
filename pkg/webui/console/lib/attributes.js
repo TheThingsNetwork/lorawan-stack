@@ -39,24 +39,28 @@ export const mapAttributesToFormValue = attributesType =>
 
 export const attributeValidCheck = attributes =>
   attributes === undefined ||
+  attributes === null ||
   (attributes instanceof Array &&
     (attributes.length === 0 ||
       attributes.every(attribute => Boolean(attribute.key) && Boolean(attribute.value))))
 
 export const attributeTooShortCheck = attributes =>
   attributes === undefined ||
+  attributes === null ||
   (attributes instanceof Array &&
     (attributes.length === 0 ||
       attributes.every(attribute => RegExp(idRegexp).test(attribute.key))))
 
 export const attributeKeyTooLongCheck = attributes =>
   attributes === undefined ||
+  attributes === null ||
   (attributes instanceof Array &&
     (attributes.length === 0 ||
       attributes.every(attribute => attribute.key && attribute.key.length <= 36)))
 
 export const attributeValueTooLongCheck = attributes =>
   attributes === undefined ||
+  attributes === null ||
   (attributes instanceof Array &&
     (attributes.length === 0 ||
       attributes.every(attribute => attribute.value && attribute.value.length <= 200)))

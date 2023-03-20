@@ -13,6 +13,7 @@
 // limitations under the License.
 
 export default Object.freeze({
+  ALCSYNC: 'alcsync',
   ACTIVATION_MODE: 'activation-mode',
   ADR_ACK_DELAY: 'adr-ack-delay',
   ADR_ACK_LIMIT: 'adr-ack-limit',
