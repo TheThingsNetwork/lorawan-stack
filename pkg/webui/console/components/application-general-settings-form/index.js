@@ -133,15 +133,14 @@ const ApplicationGeneralSettingsForm = ({
     />
     {mayViewApplicationLink && (
       <Form.Field
-        title={sharedMessages.skipCryptoTitle}
+        label={sharedMessages.skipCryptoTitle}
         name="skip_payload_crypto"
-        description={sharedMessages.skipCryptoDescription}
         component={Checkbox}
         tooltipId={tooltipIds.SKIP_PAYLOAD_CRYPTO_OVERRIDE}
       />
     )}
     <Form.Field
-      title={m.useAlcsync}
+      label={m.useAlcsync}
       name="alcsync"
       component={Checkbox}
       tooltipId={tooltipIds.ALCSYNC}
