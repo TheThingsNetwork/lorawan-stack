@@ -68,7 +68,7 @@ describe('Application general settings', () => {
   it('suceeds at changing skip payload crypto', () => {
     cy.visit(`${Cypress.config('consoleRootPath')}/applications/${applicationId}/general-settings`)
 
-    cy.findByLabelText('Skip payload encryption and decryption').click()
+    cy.findByText('Skip payload encryption and decryption').click()
 
     cy.findByRole('button', { name: 'Save changes' }).click()
 
