@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Fallback end device version identifiers to be used while importing end devices using the Console.
+
 ### Changed
 
 ### Deprecated
@@ -194,7 +196,6 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - Add more specific rights for OAuth clients.
-- Fallback `version_ids` to load end device profile from DR when importing a device in the Console.
 
 ### Changed
 
