@@ -63,7 +63,8 @@ export default defineMessages({
   typeToSearch: 'Type to search…',
   unknownHwOption: 'Unknown ver.',
   // QR code section.
-  hasEndDeviceQR: 'Does your end device have a QR code? Scan it to speed up onboarding.',
+  hasEndDeviceQR:
+    'Does your end device have a LoRaWAN® Device Identification QR Code? Scan it to speed up onboarding.',
   deviceGuide: 'Device registration help',
   scanEndDevice: 'Scan end device QR code',
   deviceInfo: 'Found QR code data',

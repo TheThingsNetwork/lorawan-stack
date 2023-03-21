@@ -36,7 +36,8 @@ const QrScanDoc = (
 const m = defineMessages({
   scanEndDevice: 'Scan end device QR code',
   scanEndDeviceContinue: 'Please scan the QR code to continue. {qrScanDoc}',
-  invalidData: 'Invalid QR data please try again',
+  invalidData:
+    'Invalid QR code data. Please note that only TR005 LoRaWAN® Device Identification QR Code can be scanned. Some devices have unrelated QR codes printed on them that cannot be used.',
   apply: 'Apply',
   scanAgain: 'Scan again',
 })
