@@ -19,6 +19,7 @@ import (
 	"math"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -53,12 +54,22 @@ func (cmd *TimeSyncCommand) Execute() (Result, error) {
 	return result, nil
 }
 
+// GetEvtSuccessfullyParsed implements commands.Command.
+func (cmd *TimeSyncCommand) GetEvtSuccessfullyParsed() events.Builder {
+	return EvtTimeSyncCmdParsed.With(events.WithData(cmd.req))
+}
+
 // Ensure that TimeSyncCommand implements commands.Command.
 var _ Command = (*TimeSyncCommand)(nil)
 
 // TimeSyncCommandResult is the result of the time synchronization command.
 type TimeSyncCommandResult struct {
 	ans *ttnpb.ALCSyncCommand_AppTimeAns
+}
+
+// GetEvtSuccessfullyExecuted implements commands.Command.
+func (r *TimeSyncCommandResult) GetEvtSuccessfullyExecuted() events.Builder {
+	return EvtTimeSyncCmdHandled.With(events.WithData(r.ans))
 }
 
 // MarshalBinary implements Result.

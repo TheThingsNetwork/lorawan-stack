@@ -471,7 +471,7 @@ func TestMakeCommandsValidInput(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a, _ := test.New(t)
-			cmds, err := MakeCommands(tc.In.Uplink, tc.In.FPort, tc.In.Data)
+			cmds, _, err := MakeCommands(tc.In.Uplink, tc.In.FPort, tc.In.Data)
 			a.So(err, should.Resemble, tc.Expected.Err)
 			a.So(cmds, should.Resemble, tc.Expected.Cmds)
 		})
