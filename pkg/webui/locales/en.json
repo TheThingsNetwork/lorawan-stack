@@ -553,7 +553,7 @@
   "console.containers.device-onboarding-form.messages.defaultNetworksSettings": "Use network's default MAC settings",
   "console.containers.device-onboarding-form.messages.clusterSettings": "Cluster settings",
   "console.containers.device-onboarding-form.messages.networkDefaults": "Network defaults",
-  "console.containers.device-onboarding-form.messages.hasEndDeviceQR": "Does your end device have a QR code? Scan it to speed up onboarding.",
+  "console.containers.device-onboarding-form.messages.hasEndDeviceQR": "Does your end device have a LoRaWAN® Device Identification QR Code? Scan it to speed up onboarding.",
   "console.containers.device-onboarding-form.messages.deviceGuide": "Device registration help",
   "console.containers.device-onboarding-form.messages.scanEndDevice": "Scan end device QR code",
   "console.containers.device-onboarding-form.messages.deviceInfo": "Found QR code data",
