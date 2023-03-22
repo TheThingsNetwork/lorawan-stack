@@ -72,58 +72,56 @@ const VersionIdsSection = ({ isImport }) => {
   const hasFwVersion = Boolean(firmwareVersion) && !isOtherOption(firmwareVersion)
 
   return (
-    <>
-      <div className={style.configurationSection}>
-        <BrandSelect
+    <div className={style.configurationSection}>
+      <BrandSelect
+        className={classnames(style.select, style.selectS)}
+        name="version_ids.brand_id"
+        required={!isImport}
+        tooltipId={tooltipIds.DEVICE_BRAND}
+        valueSetter={brandValueSetter}
+      />
+      {hasBrand && (
+        <ModelSelect
           className={classnames(style.select, style.selectS)}
-          name="version_ids.brand_id"
+          name="version_ids.model_id"
           required={!isImport}
-          tooltipId={tooltipIds.DEVICE_BRAND}
-          valueSetter={brandValueSetter}
+          brandId={brand}
+          tooltipId={tooltipIds.DEVICE_MODEL}
+          valueSetter={modelValueSetter}
         />
-        {hasBrand && (
-          <ModelSelect
-            className={classnames(style.select, style.selectS)}
-            name="version_ids.model_id"
-            required={!isImport}
-            brandId={brand}
-            tooltipId={tooltipIds.DEVICE_MODEL}
-            valueSetter={modelValueSetter}
-          />
-        )}
-        {hasModel && (
-          <HardwareVersionSelect
-            className={classnames(style.select, style.selectXs)}
-            required={!isImport}
-            brandId={brand}
-            modelId={model}
-            name="version_ids.hardware_version"
-            tooltipId={tooltipIds.DEVICE_HARDWARE_VERSION}
-          />
-        )}
-        {hasHwVersion && (
-          <FirmwareVersionSelect
-            className={classnames(style.select, style.selectXs)}
-            required={!isImport}
-            name="version_ids.firmware_version"
-            brandId={brand}
-            modelId={model}
-            hwVersion={hardwareVersion}
-            tooltipId={tooltipIds.DEVICE_FIRMWARE_VERSION}
-          />
-        )}
-        {hasFwVersion && (
-          <BandSelect
-            className={classnames(style.select, style.selectS)}
-            required={!isImport}
-            name="version_ids.band_id"
-            fwVersion={firmwareVersion}
-            brandId={brand}
-            modelId={model}
-          />
-        )}
-      </div>
-    </>
+      )}
+      {hasModel && (
+        <HardwareVersionSelect
+          className={classnames(style.select, style.selectXs)}
+          required={!isImport}
+          brandId={brand}
+          modelId={model}
+          name="version_ids.hardware_version"
+          tooltipId={tooltipIds.DEVICE_HARDWARE_VERSION}
+        />
+      )}
+      {hasHwVersion && (
+        <FirmwareVersionSelect
+          className={classnames(style.select, style.selectXs)}
+          required={!isImport}
+          name="version_ids.firmware_version"
+          brandId={brand}
+          modelId={model}
+          hwVersion={hardwareVersion}
+          tooltipId={tooltipIds.DEVICE_FIRMWARE_VERSION}
+        />
+      )}
+      {hasFwVersion && (
+        <BandSelect
+          className={classnames(style.select, style.selectS)}
+          required={!isImport}
+          name="version_ids.band_id"
+          fwVersion={firmwareVersion}
+          brandId={brand}
+          modelId={model}
+        />
+      )}
+    </div>
   )
 }
 
