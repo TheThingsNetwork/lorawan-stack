@@ -33,7 +33,7 @@ type TimeSyncCommand struct {
 
 // Code implements commands.Command.
 func (*TimeSyncCommand) Code() ttnpb.ALCSyncCommandIdentifier {
-	return ttnpb.ALCSyncCommandIdentifier_CID_APP_TIME
+	return ttnpb.ALCSyncCommandIdentifier_ALCSYNC_CID_APP_TIME
 }
 
 // Execute implements commands.Command.

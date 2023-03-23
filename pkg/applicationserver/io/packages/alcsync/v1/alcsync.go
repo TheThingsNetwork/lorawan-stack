@@ -98,7 +98,7 @@ func MakeCommands(up *ttnpb.ApplicationUplink, fPort uint32, data *packageData) 
 // makeParsingFailedEvtBuilder returns an event builder for a failed command ID.
 func makeParsingFailedEvtBuilder(cID ttnpb.ALCSyncCommandIdentifier, err error) events.Builder {
 	switch cID {
-	case ttnpb.ALCSyncCommandIdentifier_CID_APP_TIME:
+	case ttnpb.ALCSyncCommandIdentifier_ALCSYNC_CID_APP_TIME:
 		return EvtTimeSyncCmdParsed.With(events.WithData(err))
 	default:
 		return EvtALCSyncCmdParsedFail.With(events.WithData(err))
@@ -107,7 +107,7 @@ func makeParsingFailedEvtBuilder(cID ttnpb.ALCSyncCommandIdentifier, err error) 
 
 func makeExecutionFailedEvtBuilder(cID ttnpb.ALCSyncCommandIdentifier, err error) events.Builder {
 	switch cID {
-	case ttnpb.ALCSyncCommandIdentifier_CID_APP_TIME:
+	case ttnpb.ALCSyncCommandIdentifier_ALCSYNC_CID_APP_TIME:
 		return EvtTimeSyncCmdHandledFail.With(events.WithData(err))
 	default:
 		return EvtALCSyncPkgFail.With(events.WithData(err))
@@ -125,11 +125,11 @@ func makeCommand(
 	receivedAt := lorautil.GetAdjustedReceivedAt(up)
 	threshold := data.Threshold
 	switch cID {
-	case ttnpb.ALCSyncCommandIdentifier_CID_APP_TIME:
+	case ttnpb.ALCSyncCommandIdentifier_ALCSYNC_CID_APP_TIME:
 		return newTimeSyncCommand(cPayload, threshold, receivedAt.AsTime(), fPort)
-	case ttnpb.ALCSyncCommandIdentifier_CID_PKG_VERSION,
-		ttnpb.ALCSyncCommandIdentifier_CID_APP_DEV_TIME_PERIODICITY,
-		ttnpb.ALCSyncCommandIdentifier_CID_FORCE_DEV_RESYNC:
+	case ttnpb.ALCSyncCommandIdentifier_ALCSYNC_CID_PKG_VERSION,
+		ttnpb.ALCSyncCommandIdentifier_ALCSYNC_CID_APP_DEV_TIME_PERIODICITY,
+		ttnpb.ALCSyncCommandIdentifier_ALCSYNC_CID_FORCE_DEV_RESYNC:
 		return nil, cPayload, errUnsuportedCommand.WithAttributes(
 			"command_id", cID,
 			"command_payload", cPayload,

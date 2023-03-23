@@ -1292,10 +1292,10 @@ The NsAs service connects a Network Server to an Application Server.
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
-| `CID_PKG_VERSION` | 0 |  |
-| `CID_APP_TIME` | 1 |  |
-| `CID_APP_DEV_TIME_PERIODICITY` | 2 |  |
-| `CID_FORCE_DEV_RESYNC` | 3 |  |
+| `ALCSYNC_CID_PKG_VERSION` | 0 |  |
+| `ALCSYNC_CID_APP_TIME` | 1 |  |
+| `ALCSYNC_CID_APP_DEV_TIME_PERIODICITY` | 2 |  |
+| `ALCSYNC_CID_FORCE_DEV_RESYNC` | 3 |  |
 
 ## <a name="lorawan-stack/api/applicationserver_integrations_storage.proto">File `lorawan-stack/api/applicationserver_integrations_storage.proto`</a>
 

@@ -23,12 +23,12 @@ package ttn.lorawan.v3;
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
 enum ALCSyncCommandIdentifier {
-  option (thethings.json.enum) = { marshal_as_string: true, prefix: "CID" };
+  option (thethings.json.enum) = { marshal_as_string: true, prefix: "ALCSYNC_CID" };
 
-  CID_PKG_VERSION = 0;
-  CID_APP_TIME = 1;
-  CID_APP_DEV_TIME_PERIODICITY = 2;
-  CID_FORCE_DEV_RESYNC = 3;
+  ALCSYNC_CID_PKG_VERSION = 0;
+  ALCSYNC_CID_APP_TIME = 1;
+  ALCSYNC_CID_APP_DEV_TIME_PERIODICITY = 2;
+  ALCSYNC_CID_FORCE_DEV_RESYNC = 3;
 }
 
 message ALCSyncCommand {
