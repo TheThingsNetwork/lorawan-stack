@@ -59,7 +59,7 @@ require (
 	github.com/nats-io/nats-server/v2 v2.9.11
 	github.com/nats-io/nats.go v1.23.0
 	github.com/oklog/ulid/v2 v2.1.0
-	github.com/openshift/osin v1.0.1
+	github.com/openshift/osin v1.0.2-0.20220317075346-0f4d38c6e53f
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.14.0
