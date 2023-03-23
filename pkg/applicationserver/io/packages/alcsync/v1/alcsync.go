@@ -66,11 +66,10 @@ func newTimeSyncCommand(
 
 // MakeCommands parses the uplink payload and returns the commands.
 func MakeCommands(up *ttnpb.ApplicationUplink, fPort uint32, data *packageData) ([]Command, []events.Builder, error) {
-	cIDByte, cPayload := up.FrmPayload[0], up.FrmPayload[1:]
+	cID, cPayload := ttnpb.ALCSyncCommandIdentifier(up.FrmPayload[0]), up.FrmPayload[1:]
 	commands := make([]Command, 0)
 	evts := make([]events.Builder, 0)
 	for {
-		cID := ttnpb.ALCSyncCommandIdentifier(cIDByte)
 		cmd, rest, err := makeCommand(cID, cPayload, up, fPort, data)
 		if err != nil {
 			err := errCommandCreationFailed.WithCause(err).WithAttributes(
@@ -90,7 +89,7 @@ func MakeCommands(up *ttnpb.ApplicationUplink, fPort uint32, data *packageData) 
 		if len(rest) == 0 { // No commands left.
 			break
 		}
-		cIDByte, cPayload = rest[0], rest[1:]
+		cID, cPayload = ttnpb.ALCSyncCommandIdentifier(rest[0]), rest[1:]
 	}
 	return commands, evts, nil
 }
