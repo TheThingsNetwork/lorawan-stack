@@ -47,6 +47,8 @@ var (
 	errRequest = Define("request", "request to `{url}` failed", "op")
 	errURL     = DefineInvalidArgument("url", "invalid url `{url}`", "op")
 
+	errSyscall = Define("syscall", "`{syscall}` failed", "syscall", "error", "timeout")
+
 	errX509UnknownAuthority = DefineUnavailable(
 		"x509_unknown_authority", "unknown certificate authority",
 	)
@@ -169,6 +171,14 @@ func From(err error) (out *Error, ok bool) { //nolint:gocyclo
 	}
 	if matched := (net.Error)(nil); errors.As(err, &matched) && matched.Timeout() {
 		return build(errNetTimeout, 0), true
+	}
+	if matched := (*os.SyscallError)(nil); errors.As(err, &matched) {
+		e := build(errSyscall, 0).WithAttributes("syscall", matched.Syscall)
+		if err := matched.Err; err != nil {
+			e = e.WithAttributes(syscallErrorAttributes(err)...)
+			e = e.WithCause(err)
+		}
+		return e, true
 	}
 	if matched := (x509.CertificateInvalidError{}); errors.As(err, &matched) {
 		return build(errX509CertificateInvalid, 0).WithAttributes(

@@ -4175,6 +4175,15 @@
       "file": "conversion.go"
     }
   },
+  "error:pkg/errors:syscall": {
+    "translations": {
+      "en": "`{syscall}` failed"
+    },
+    "description": {
+      "package": "pkg/errors",
+      "file": "conversion.go"
+    }
+  },
   "error:pkg/errors:url": {
     "translations": {
       "en": "invalid url `{url}`"
