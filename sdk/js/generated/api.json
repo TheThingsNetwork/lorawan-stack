@@ -2799,22 +2799,22 @@
           "description": "",
           "values": [
             {
-              "name": "CID_PKG_VERSION",
+              "name": "ALCSYNC_CID_PKG_VERSION",
               "number": "0",
               "description": ""
             },
             {
-              "name": "CID_APP_TIME",
+              "name": "ALCSYNC_CID_APP_TIME",
               "number": "1",
               "description": ""
             },
             {
-              "name": "CID_APP_DEV_TIME_PERIODICITY",
+              "name": "ALCSYNC_CID_APP_DEV_TIME_PERIODICITY",
               "number": "2",
               "description": ""
             },
             {
-              "name": "CID_FORCE_DEV_RESYNC",
+              "name": "ALCSYNC_CID_FORCE_DEV_RESYNC",
               "number": "3",
               "description": ""
             }

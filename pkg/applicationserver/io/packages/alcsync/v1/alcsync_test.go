@@ -168,14 +168,14 @@ func TestMakeCommandValidInput(t *testing.T) {
 				CID      ttnpb.ALCSyncCommandIdentifier
 				CPayload []byte
 			}{
-				CID:      ttnpb.ALCSyncCommandIdentifier_CID_APP_TIME,
+				CID:      ttnpb.ALCSyncCommandIdentifier_ALCSYNC_CID_APP_TIME,
 				CPayload: timeSyncPayload,
 			},
 			Expected: struct {
 				CID  ttnpb.ALCSyncCommandIdentifier
 				Rest []byte
 			}{
-				CID:  ttnpb.ALCSyncCommandIdentifier_CID_APP_TIME,
+				CID:  ttnpb.ALCSyncCommandIdentifier_ALCSYNC_CID_APP_TIME,
 				Rest: []byte{},
 			},
 		},
@@ -185,14 +185,14 @@ func TestMakeCommandValidInput(t *testing.T) {
 				CID      ttnpb.ALCSyncCommandIdentifier
 				CPayload []byte
 			}{
-				CID:      ttnpb.ALCSyncCommandIdentifier_CID_APP_TIME,
+				CID:      ttnpb.ALCSyncCommandIdentifier_ALCSYNC_CID_APP_TIME,
 				CPayload: append(timeSyncPayload, 0x53, 0x31),
 			},
 			Expected: struct {
 				CID  ttnpb.ALCSyncCommandIdentifier
 				Rest []byte
 			}{
-				CID:  ttnpb.ALCSyncCommandIdentifier_CID_APP_TIME,
+				CID:  ttnpb.ALCSyncCommandIdentifier_ALCSYNC_CID_APP_TIME,
 				Rest: []byte{0x53, 0x31},
 			},
 		},
@@ -236,7 +236,7 @@ func TestMakeCommandInvalidInput(t *testing.T) {
 				CID      ttnpb.ALCSyncCommandIdentifier
 				CPayload []byte
 			}{
-				CID:      ttnpb.ALCSyncCommandIdentifier_CID_PKG_VERSION,
+				CID:      ttnpb.ALCSyncCommandIdentifier_ALCSYNC_CID_PKG_VERSION,
 				CPayload: timeSyncPayload,
 			},
 			Expected: struct {
