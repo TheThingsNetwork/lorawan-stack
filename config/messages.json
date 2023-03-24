@@ -9260,63 +9260,27 @@
       "file": "observability.go"
     }
   },
-  "event:as.packages.alcsync.alcsync.failed": {
+  "event:as.packages.alcsync.v1.fail": {
     "translations": {
-      "en": "alcsync package failed"
+      "en": "package failed due to error"
     },
     "description": {
       "package": "pkg/applicationserver/io/packages/alcsync/v1",
       "file": "observability.go"
     }
   },
-  "event:as.packages.alcsync.cmd.alcsync.accept": {
+  "event:as.packages.alcsync.v1.time_correction.answer_enqueued": {
     "translations": {
-      "en": "alcsync package command received"
+      "en": "time correction command answer enqueued"
     },
     "description": {
       "package": "pkg/applicationserver/io/packages/alcsync/v1",
       "file": "observability.go"
     }
   },
-  "event:as.packages.alcsync.cmd.alcsync.parse.failed": {
+  "event:as.packages.alcsync.v1.time_correction.cmd_received": {
     "translations": {
-      "en": "alcsync package command failed when parsing"
-    },
-    "description": {
-      "package": "pkg/applicationserver/io/packages/alcsync/v1",
-      "file": "observability.go"
-    }
-  },
-  "event:as.packages.alcsync.cmd.time_sync.handled": {
-    "translations": {
-      "en": "Time Synchonization command handled"
-    },
-    "description": {
-      "package": "pkg/applicationserver/io/packages/alcsync/v1",
-      "file": "observability.go"
-    }
-  },
-  "event:as.packages.alcsync.cmd.time_sync.handled.failed": {
-    "translations": {
-      "en": "Time Synchonization command handled"
-    },
-    "description": {
-      "package": "pkg/applicationserver/io/packages/alcsync/v1",
-      "file": "observability.go"
-    }
-  },
-  "event:as.packages.alcsync.cmd.time_sync.parse.failed": {
-    "translations": {
-      "en": "Time Synchonization command failed when parsing"
-    },
-    "description": {
-      "package": "pkg/applicationserver/io/packages/alcsync/v1",
-      "file": "observability.go"
-    }
-  },
-  "event:as.packages.alcsync.cmd.time_sync.parsed": {
-    "translations": {
-      "en": "Time Synchonization command parsed"
+      "en": "time correction command received"
     },
     "description": {
       "package": "pkg/applicationserver/io/packages/alcsync/v1",

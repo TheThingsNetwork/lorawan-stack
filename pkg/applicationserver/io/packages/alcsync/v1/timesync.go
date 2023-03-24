@@ -54,9 +54,9 @@ func (cmd *TimeSyncCommand) Execute() (Result, error) {
 	return result, nil
 }
 
-// GetEvtSuccessfullyParsed implements commands.Command.
-func (cmd *TimeSyncCommand) GetEvtSuccessfullyParsed() events.Builder {
-	return EvtTimeSyncCmdParsed.With(events.WithData(cmd.req))
+// CommandReceivedEventBuilder implements commands.Command.
+func (cmd *TimeSyncCommand) CommandReceivedEventBuilder() events.Builder {
+	return EvtTimeCorrectionCmdReceived.With(events.WithData(cmd.req))
 }
 
 // Ensure that TimeSyncCommand implements commands.Command.
@@ -67,9 +67,9 @@ type TimeSyncCommandResult struct {
 	ans *ttnpb.ALCSyncCommand_AppTimeAns
 }
 
-// GetEvtSuccessfullyExecuted implements commands.Command.
-func (r *TimeSyncCommandResult) GetEvtSuccessfullyExecuted() events.Builder {
-	return EvtTimeSyncCmdHandled.With(events.WithData(r.ans))
+// AnswerEnqueuedEventBuilder implements commands.Command.
+func (r *TimeSyncCommandResult) AnswerEnqueuedEventBuilder() events.Builder {
+	return EvtTimeCorrectionAnsEnqueue.With(events.WithData(r.ans))
 }
 
 // MarshalBinary implements Result.
