@@ -112,6 +112,15 @@ func (dst *UplinkMessage) SetFields(src *UplinkMessage, paths ...string) error {
 			} else {
 				dst.ConsumedAirtime = nil
 			}
+		case "crc_status":
+			if len(subs) > 0 {
+				return fmt.Errorf("'crc_status' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CrcStatus = src.CrcStatus
+			} else {
+				dst.CrcStatus = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
