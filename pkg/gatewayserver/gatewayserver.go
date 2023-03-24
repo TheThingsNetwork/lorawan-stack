@@ -894,6 +894,7 @@ func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntr
 			correlationIDs = append(correlationIDs, fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()))
 			ctx = events.ContextWithCorrelationID(ctx, correlationIDs...)
 			msg.Message.CorrelationIds = events.CorrelationIDsFromContext(ctx)
+			registerReceiveUplink(ctx, gtw, msg, protocol)
 			if msg.Message.Payload == nil {
 				msg.Message.Payload = &ttnpb.Message{}
 				if err := lorawan.UnmarshalMessage(msg.Message.RawPayload, msg.Message.Payload); err != nil {
@@ -906,7 +907,6 @@ func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntr
 				continue
 			}
 			val = msg
-			registerReceiveUplink(ctx, gtw, msg, protocol)
 		case msg := <-conn.Status():
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:status:%s", events.NewCorrelationID()))
 			val = msg
@@ -921,13 +921,13 @@ func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntr
 			if d := msg.DownlinkMessage; d != nil {
 				d.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 			}
+			registerReceiveTxAck(ctx, gtw, msg, protocol)
 			if msg.Result == ttnpb.TxAcknowledgment_SUCCESS {
 				registerSuccessDownlink(ctx, gtw, protocol)
 			} else {
 				registerFailDownlink(ctx, gtw, msg, protocol)
 			}
 			val = msg
-			registerReceiveTxAck(ctx, gtw, msg, protocol)
 		}
 		for _, host := range hosts {
 			err := host.pool.Publish(ctx, val)
