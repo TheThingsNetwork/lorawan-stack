@@ -70,7 +70,7 @@ func (a *alcsyncpkg) HandleUp(
 
 	data, fPort, err := mergePackageData(def, assoc)
 	if err != nil {
-		logger.WithError(err).Error("Failed to merge package data")
+		logger.WithError(err).Debug("Failed to merge package data")
 		return err
 	}
 
@@ -101,7 +101,7 @@ func (a *alcsyncpkg) HandleUp(
 			continue
 		}
 		if err != nil {
-			logger.WithError(err).WithField("command_id", cmd.Code()).Error("Failed to execute command")
+			logger.WithError(err).WithField("command_id", cmd.Code()).Debug("Failed to execute command")
 			eventBuilders = append(eventBuilders, EvtPkgFail.With(
 				events.WithIdentifiers(up.GetEndDeviceIds()),
 				events.WithData(err)),
@@ -115,11 +115,11 @@ func (a *alcsyncpkg) HandleUp(
 	}
 	downlink, err := MakeDownlink(results, fPort)
 	if err != nil {
-		logger.WithError(err).Error("Failed to create downlink from results")
+		logger.WithError(err).Debug("Failed to create downlink from results")
 		return err
 	}
 	if err := a.server.DownlinkQueuePush(ctx, up.EndDeviceIds, []*ttnpb.ApplicationDownlink{downlink}); err != nil {
-		logger.WithError(err).Error("Failed to push downlinks to queue")
+		logger.WithError(err).Debug("Failed to push downlinks to queue")
 		return err
 	}
 	return nil
