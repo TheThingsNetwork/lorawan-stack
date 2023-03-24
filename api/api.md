@@ -47,6 +47,11 @@
   - [Service `As`](#ttn.lorawan.v3.As)
   - [Service `AsEndDeviceRegistry`](#ttn.lorawan.v3.AsEndDeviceRegistry)
   - [Service `NsAs`](#ttn.lorawan.v3.NsAs)
+- [File `lorawan-stack/api/applicationserver_integrations_alcsync.proto`](#lorawan-stack/api/applicationserver_integrations_alcsync.proto)
+  - [Message `ALCSyncCommand`](#ttn.lorawan.v3.ALCSyncCommand)
+  - [Message `ALCSyncCommand.AppTimeAns`](#ttn.lorawan.v3.ALCSyncCommand.AppTimeAns)
+  - [Message `ALCSyncCommand.AppTimeReq`](#ttn.lorawan.v3.ALCSyncCommand.AppTimeReq)
+  - [Enum `ALCSyncCommandIdentifier`](#ttn.lorawan.v3.ALCSyncCommandIdentifier)
 - [File `lorawan-stack/api/applicationserver_integrations_storage.proto`](#lorawan-stack/api/applicationserver_integrations_storage.proto)
   - [Message `GetStoredApplicationUpCountRequest`](#ttn.lorawan.v3.GetStoredApplicationUpCountRequest)
   - [Message `GetStoredApplicationUpCountResponse`](#ttn.lorawan.v3.GetStoredApplicationUpCountResponse)
@@ -1238,6 +1243,59 @@ The NsAs service connects a Network Server to an Application Server.
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `HandleUplink` | [`NsAsHandleUplinkRequest`](#ttn.lorawan.v3.NsAsHandleUplinkRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Handle Application uplink messages. |
+
+## <a name="lorawan-stack/api/applicationserver_integrations_alcsync.proto">File `lorawan-stack/api/applicationserver_integrations_alcsync.proto`</a>
+
+### <a name="ttn.lorawan.v3.ALCSyncCommand">Message `ALCSyncCommand`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `cid` | [`ALCSyncCommandIdentifier`](#ttn.lorawan.v3.ALCSyncCommandIdentifier) |  |  |
+| `app_time_req` | [`ALCSyncCommand.AppTimeReq`](#ttn.lorawan.v3.ALCSyncCommand.AppTimeReq) |  |  |
+| `app_time_ans` | [`ALCSyncCommand.AppTimeAns`](#ttn.lorawan.v3.ALCSyncCommand.AppTimeAns) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `cid` | <p>`enum.defined_only`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.ALCSyncCommand.AppTimeAns">Message `ALCSyncCommand.AppTimeAns`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `TimeCorrection` | [`int32`](#int32) |  |  |
+| `TokenAns` | [`uint32`](#uint32) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `TokenAns` | <p>`uint32.lte`: `255`</p> |
+
+### <a name="ttn.lorawan.v3.ALCSyncCommand.AppTimeReq">Message `ALCSyncCommand.AppTimeReq`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `DeviceTime` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `TokenReq` | [`uint32`](#uint32) |  |  |
+| `AnsRequired` | [`bool`](#bool) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `DeviceTime` | <p>`timestamp.required`: `true`</p> |
+| `TokenReq` | <p>`uint32.lte`: `255`</p> |
+
+### <a name="ttn.lorawan.v3.ALCSyncCommandIdentifier">Enum `ALCSyncCommandIdentifier`</a>
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `ALCSYNC_CID_PKG_VERSION` | 0 |  |
+| `ALCSYNC_CID_APP_TIME` | 1 |  |
+| `ALCSYNC_CID_APP_DEV_TIME_PERIODICITY` | 2 |  |
+| `ALCSYNC_CID_FORCE_DEV_RESYNC` | 3 |  |
 
 ## <a name="lorawan-stack/api/applicationserver_integrations_storage.proto">File `lorawan-stack/api/applicationserver_integrations_storage.proto`</a>
 

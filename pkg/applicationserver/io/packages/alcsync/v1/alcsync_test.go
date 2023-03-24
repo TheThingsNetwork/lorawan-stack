@@ -25,14 +25,13 @@ import (
 )
 
 var (
-	timeSyncCID          = byte(0x01)
 	timeSyncPayload      = []byte{0xB2, 0x87, 0x2C, 0x51, 0x12}
 	frmPayload           = []byte{0x01, 0xB2, 0x87, 0x2C, 0x51, 0x12}
 	receivedAtTime       = time.Date(2023, 3, 3, 10, 0, 0, 0, time.UTC)
 	threeSecondsDuration = time.Duration(3) * time.Second
 )
 
-func TestNewTimeSyncCommandValidInput(t *testing.T) {
+func TestNewTimeSyncCommand(t *testing.T) {
 	t.Parallel()
 	testCases := []struct {
 		Name string
@@ -67,8 +66,8 @@ func TestNewTimeSyncCommandValidInput(t *testing.T) {
 				Err  error
 			}{
 				Cmd: &TimeSyncCommand{
-					req: &AppTimeReq{
-						DeviceTime:  receivedAtTime,
+					req: &ttnpb.ALCSyncCommand_AppTimeReq{
+						DeviceTime:  timestamppb.New(receivedAtTime),
 						TokenReq:    2,
 						AnsRequired: true,
 					},
@@ -99,8 +98,8 @@ func TestNewTimeSyncCommandValidInput(t *testing.T) {
 				Err  error
 			}{
 				Cmd: &TimeSyncCommand{
-					req: &AppTimeReq{
-						DeviceTime:  receivedAtTime,
+					req: &ttnpb.ALCSyncCommand_AppTimeReq{
+						DeviceTime:  timestamppb.New(receivedAtTime),
 						TokenReq:    2,
 						AnsRequired: true,
 					},
@@ -132,7 +131,7 @@ func TestNewTimeSyncCommandValidInput(t *testing.T) {
 			}{
 				Cmd:  (*TimeSyncCommand)(nil),
 				Rest: timeSyncPayload[:4],
-				Err:  errUnknownCommand,
+				Err:  errInsufficientLength.New(),
 			},
 		},
 	}
@@ -155,45 +154,45 @@ func TestMakeCommandValidInput(t *testing.T) {
 	testCases := []struct {
 		Name string
 		In   struct {
-			CID      byte
+			CID      ttnpb.ALCSyncCommandIdentifier
 			CPayload []byte
 		}
 		Expected struct {
-			CID  byte
+			CID  ttnpb.ALCSyncCommandIdentifier
 			Rest []byte
 		}
 	}{
 		{
 			Name: "TimeSyncCommandWithNoExtraBytes",
 			In: struct {
-				CID      byte
+				CID      ttnpb.ALCSyncCommandIdentifier
 				CPayload []byte
 			}{
-				CID:      timeSyncCID,
+				CID:      ttnpb.ALCSyncCommandIdentifier_ALCSYNC_CID_APP_TIME,
 				CPayload: timeSyncPayload,
 			},
 			Expected: struct {
-				CID  byte
+				CID  ttnpb.ALCSyncCommandIdentifier
 				Rest []byte
 			}{
-				CID:  timeSyncCID,
+				CID:  ttnpb.ALCSyncCommandIdentifier_ALCSYNC_CID_APP_TIME,
 				Rest: []byte{},
 			},
 		},
 		{
 			Name: "TimeSyncCommandWithExtraBytes",
 			In: struct {
-				CID      byte
+				CID      ttnpb.ALCSyncCommandIdentifier
 				CPayload []byte
 			}{
-				CID:      timeSyncCID,
+				CID:      ttnpb.ALCSyncCommandIdentifier_ALCSYNC_CID_APP_TIME,
 				CPayload: append(timeSyncPayload, 0x53, 0x31),
 			},
 			Expected: struct {
-				CID  byte
+				CID  ttnpb.ALCSyncCommandIdentifier
 				Rest []byte
 			}{
-				CID:  timeSyncCID,
+				CID:  ttnpb.ALCSyncCommandIdentifier_ALCSYNC_CID_APP_TIME,
 				Rest: []byte{0x53, 0x31},
 			},
 		},
@@ -223,30 +222,44 @@ func TestMakeCommandInvalidInput(t *testing.T) {
 	testCases := []struct {
 		Name string
 		In   struct {
-			CID      byte
+			CID      ttnpb.ALCSyncCommandIdentifier
 			CPayload []byte
 		}
 		Expected struct {
-			CID  byte
 			Rest []byte
 			Err  error
 		}
 	}{
 		{
-			Name: "WithUnknownCID",
+			Name: "WithUnsupportedCID",
 			In: struct {
-				CID      byte
+				CID      ttnpb.ALCSyncCommandIdentifier
 				CPayload []byte
 			}{
-				CID:      0x43,
+				CID:      ttnpb.ALCSyncCommandIdentifier_ALCSYNC_CID_PKG_VERSION,
 				CPayload: timeSyncPayload,
 			},
 			Expected: struct {
-				CID  byte
 				Rest []byte
 				Err  error
 			}{
-				CID:  0x43,
+				Rest: timeSyncPayload,
+				Err:  errUnsuportedCommand.New(),
+			},
+		},
+		{
+			Name: "WithUnknownCID",
+			In: struct {
+				CID      ttnpb.ALCSyncCommandIdentifier
+				CPayload []byte
+			}{
+				CID:      42,
+				CPayload: timeSyncPayload,
+			},
+			Expected: struct {
+				Rest []byte
+				Err  error
+			}{
 				Rest: timeSyncPayload,
 				Err:  errUnknownCommand.New(),
 			},
@@ -308,8 +321,8 @@ func TestMakeCommandsValidInput(t *testing.T) {
 			}{
 				Cmds: []Command{
 					&TimeSyncCommand{
-						req: &AppTimeReq{
-							DeviceTime:  receivedAtTime,
+						req: &ttnpb.ALCSyncCommand_AppTimeReq{
+							DeviceTime:  timestamppb.New(receivedAtTime),
 							TokenReq:    2,
 							AnsRequired: true,
 						},
@@ -343,8 +356,8 @@ func TestMakeCommandsValidInput(t *testing.T) {
 			}{
 				Cmds: []Command{
 					&TimeSyncCommand{
-						req: &AppTimeReq{
-							DeviceTime:  receivedAtTime,
+						req: &ttnpb.ALCSyncCommand_AppTimeReq{
+							DeviceTime:  timestamppb.New(receivedAtTime),
 							TokenReq:    2,
 							AnsRequired: true,
 						},
@@ -353,7 +366,7 @@ func TestMakeCommandsValidInput(t *testing.T) {
 						threshold:  threeSecondsDuration,
 					},
 				},
-				Err: errUnknownCommand.New(),
+				Err: errCommandCreationFailed.New(),
 			},
 		},
 		{
@@ -379,8 +392,8 @@ func TestMakeCommandsValidInput(t *testing.T) {
 			}{
 				Cmds: []Command{
 					&TimeSyncCommand{
-						req: &AppTimeReq{
-							DeviceTime:  receivedAtTime,
+						req: &ttnpb.ALCSyncCommand_AppTimeReq{
+							DeviceTime:  timestamppb.New(receivedAtTime),
 							TokenReq:    2,
 							AnsRequired: true,
 						},
@@ -389,8 +402,8 @@ func TestMakeCommandsValidInput(t *testing.T) {
 						threshold:  threeSecondsDuration,
 					},
 					&TimeSyncCommand{
-						req: &AppTimeReq{
-							DeviceTime:  receivedAtTime,
+						req: &ttnpb.ALCSyncCommand_AppTimeReq{
+							DeviceTime:  timestamppb.New(receivedAtTime),
 							TokenReq:    2,
 							AnsRequired: true,
 						},
@@ -428,8 +441,8 @@ func TestMakeCommandsValidInput(t *testing.T) {
 			}{
 				Cmds: []Command{
 					&TimeSyncCommand{
-						req: &AppTimeReq{
-							DeviceTime:  receivedAtTime,
+						req: &ttnpb.ALCSyncCommand_AppTimeReq{
+							DeviceTime:  timestamppb.New(receivedAtTime),
 							TokenReq:    2,
 							AnsRequired: true,
 						},
@@ -438,8 +451,8 @@ func TestMakeCommandsValidInput(t *testing.T) {
 						threshold:  threeSecondsDuration,
 					},
 					&TimeSyncCommand{
-						req: &AppTimeReq{
-							DeviceTime:  receivedAtTime,
+						req: &ttnpb.ALCSyncCommand_AppTimeReq{
+							DeviceTime:  timestamppb.New(receivedAtTime),
 							TokenReq:    2,
 							AnsRequired: true,
 						},
@@ -448,7 +461,7 @@ func TestMakeCommandsValidInput(t *testing.T) {
 						threshold:  threeSecondsDuration,
 					},
 				},
-				Err: errUnknownCommand.New(),
+				Err: errCommandCreationFailed.New(),
 			},
 		},
 	}
@@ -458,7 +471,7 @@ func TestMakeCommandsValidInput(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a, _ := test.New(t)
-			cmds, err := MakeCommands(tc.In.Uplink, tc.In.FPort, tc.In.Data)
+			cmds, _, err := MakeCommands(tc.In.Uplink, tc.In.FPort, tc.In.Data)
 			a.So(err, should.Resemble, tc.Expected.Err)
 			a.So(cmds, should.Resemble, tc.Expected.Cmds)
 		})
@@ -484,9 +497,11 @@ func TestMakeDownlinkSerializesAppTimeAns(t *testing.T) {
 				FPort uint32
 			}{
 				Ans: []Result{
-					&AppTimeAns{
-						TimeCorrection: 1,
-						TokenAns:       2,
+					&TimeSyncCommandResult{
+						ans: &ttnpb.ALCSyncCommand_AppTimeAns{
+							TimeCorrection: 1,
+							TokenAns:       2,
+						},
 					},
 				},
 				FPort: 202,
@@ -509,13 +524,17 @@ func TestMakeDownlinkSerializesAppTimeAns(t *testing.T) {
 				FPort uint32
 			}{
 				Ans: []Result{
-					&AppTimeAns{
-						TimeCorrection: 1,
-						TokenAns:       2,
+					&TimeSyncCommandResult{
+						ans: &ttnpb.ALCSyncCommand_AppTimeAns{
+							TimeCorrection: 1,
+							TokenAns:       2,
+						},
 					},
-					&AppTimeAns{
-						TimeCorrection: 3,
-						TokenAns:       4,
+					&TimeSyncCommandResult{
+						ans: &ttnpb.ALCSyncCommand_AppTimeAns{
+							TimeCorrection: 3,
+							TokenAns:       4,
+						},
 					},
 				},
 				FPort: 202,
@@ -539,14 +558,18 @@ func TestMakeDownlinkSerializesAppTimeAns(t *testing.T) {
 				FPort uint32
 			}{
 				Ans: []Result{
-					&AppTimeAns{
-						TimeCorrection: 1,
-						TokenAns:       2,
+					&TimeSyncCommandResult{
+						ans: &ttnpb.ALCSyncCommand_AppTimeAns{
+							TimeCorrection: 1,
+							TokenAns:       2,
+						},
 					},
 					nil,
-					&AppTimeAns{
-						TimeCorrection: 3,
-						TokenAns:       4,
+					&TimeSyncCommandResult{
+						ans: &ttnpb.ALCSyncCommand_AppTimeAns{
+							TimeCorrection: 3,
+							TokenAns:       4,
+						},
 					},
 				},
 				FPort: 202,

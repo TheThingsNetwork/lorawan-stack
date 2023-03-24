@@ -20,14 +20,13 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // PackageName is the name of the package.
 const PackageName = "alcsync-v1"
-
-var errNoAssociation = errors.DefineInternal("no_association", "no association available")
 
 type alcsyncpkg struct {
 	server   io.Server
@@ -40,7 +39,7 @@ func (a *alcsyncpkg) HandleUp(
 	def *ttnpb.ApplicationPackageDefaultAssociation,
 	assoc *ttnpb.ApplicationPackageAssociation,
 	up *ttnpb.ApplicationUp,
-) error {
+) (err error) {
 	ctx = log.NewContextWithField(ctx, "namespace", "applicationserver/io/packages/alcsync/v1")
 	logger := log.FromContext(ctx)
 
@@ -57,14 +56,29 @@ func (a *alcsyncpkg) HandleUp(
 		return nil
 	}
 
+	eventBuilders := make(events.Builders, 0)
+
+	defer func(ids *ttnpb.EndDeviceIdentifiers) {
+		if err != nil {
+			eventBuilders = append(eventBuilders, EvtPkgFail.With(
+				events.WithIdentifiers(ids),
+				events.WithData(err),
+			))
+		}
+		publishEvents(ctx, eventBuilders...)
+	}(up.GetEndDeviceIds())
+
 	data, fPort, err := mergePackageData(def, assoc)
 	if err != nil {
-		logger.Error("Failed to merge package data")
+		logger.WithError(err).Debug("Failed to merge package data")
 		return err
 	}
 
 	if msg.GetFPort() != fPort {
-		logger.Debug("Uplink received on unhadled FPort")
+		logger.WithFields(log.Fields(
+			"expected_fport", fPort,
+			"received_fport", msg.GetFPort(),
+		)).Debug("Uplink received on unhadled FPort")
 		return nil
 	}
 
@@ -73,7 +87,8 @@ func (a *alcsyncpkg) HandleUp(
 		return nil
 	}
 
-	commands, err := MakeCommands(msg, fPort, data)
+	commands, evts, err := MakeCommands(msg, fPort, data)
+	eventBuilders = append(eventBuilders, evts...)
 	if err != nil {
 		logger.WithError(err).Debug("Failed to parse frame payload into commands")
 		return err
@@ -86,11 +101,16 @@ func (a *alcsyncpkg) HandleUp(
 			continue
 		}
 		if err != nil {
-			logger.WithError(err).Debug("Failed to execute command")
+			logger.WithError(err).WithField("command_id", cmd.Code()).Debug("Failed to execute command")
+			eventBuilders = append(eventBuilders, EvtPkgFail.With(
+				events.WithIdentifiers(up.GetEndDeviceIds()),
+				events.WithData(err)),
+			)
 			continue
 		}
 		if result != nil {
 			results = append(results, result)
+			eventBuilders = append(eventBuilders, result.AnswerEnqueuedEventBuilder())
 		}
 	}
 	downlink, err := MakeDownlink(results, fPort)
@@ -100,6 +120,7 @@ func (a *alcsyncpkg) HandleUp(
 	}
 	if err := a.server.DownlinkQueuePush(ctx, up.EndDeviceIds, []*ttnpb.ApplicationDownlink{downlink}); err != nil {
 		logger.WithError(err).Debug("Failed to push downlinks to queue")
+		return err
 	}
 	return nil
 }

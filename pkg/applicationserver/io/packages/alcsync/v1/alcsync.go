@@ -19,9 +19,11 @@ import (
 	"encoding/binary"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/gpstime"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	lorautil "go.thethings.network/lorawan-stack/v3/pkg/util/lora"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // newTimeSyncCommand builds a new TimeSyncCommand.
@@ -36,7 +38,10 @@ func newTimeSyncCommand(
 
 	lenBytes := 5
 	if len(data) < lenBytes {
-		return nil, data, errUnknownCommand.New()
+		return nil, data, errInsufficientLength.WithAttributes(
+			"expected_length", lenBytes,
+			"actual_length", len(data),
+		).New()
 	}
 
 	cPayload, rest := data[:lenBytes], data[lenBytes:]
@@ -47,9 +52,9 @@ func newTimeSyncCommand(
 	ansRequired := (cPayload[4] & 0x10) != 0
 
 	cmd := &TimeSyncCommand{
-		req: &AppTimeReq{
-			DeviceTime:  deviceTime,
-			TokenReq:    tokenReq,
+		req: &ttnpb.ALCSyncCommand_AppTimeReq{
+			DeviceTime:  timestamppb.New(deviceTime),
+			TokenReq:    uint32(tokenReq),
 			AnsRequired: ansRequired,
 		},
 		receivedAt: receivedAt,
@@ -60,27 +65,35 @@ func newTimeSyncCommand(
 }
 
 // MakeCommands parses the uplink payload and returns the commands.
-func MakeCommands(up *ttnpb.ApplicationUplink, fPort uint32, data *packageData) ([]Command, error) {
-	cID, cPayload := up.FrmPayload[0], up.FrmPayload[1:]
+func MakeCommands(up *ttnpb.ApplicationUplink, fPort uint32, data *packageData) ([]Command, events.Builders, error) {
+	cID, cPayload := ttnpb.ALCSyncCommandIdentifier(up.FrmPayload[0]), up.FrmPayload[1:]
 	commands := make([]Command, 0)
+	evts := make(events.Builders, 0)
 	for {
 		cmd, rest, err := makeCommand(cID, cPayload, up, fPort, data)
 		if err != nil {
-			return commands, err
+			err := errCommandCreationFailed.WithCause(err).WithAttributes(
+				"command_id", cID,
+				"command_payload", cPayload,
+				"remaining_payload", rest,
+			).New()
+			evts = append(evts, EvtPkgFail.With(events.WithData(err)))
+			return commands, evts, err
 		}
 		commands = append(commands, cmd)
+		evts = append(evts, cmd.CommandReceivedEventBuilder())
 
 		if len(rest) == 0 { // No commands left.
 			break
 		}
-		cID, cPayload = rest[0], rest[1:]
+		cID, cPayload = ttnpb.ALCSyncCommandIdentifier(rest[0]), rest[1:]
 	}
-	return commands, nil
+	return commands, evts, nil
 }
 
 // makeCommand parses the payload based on the command ID.
 func makeCommand(
-	cID byte,
+	cID ttnpb.ALCSyncCommandIdentifier,
 	cPayload []byte,
 	up *ttnpb.ApplicationUplink,
 	fPort uint32,
@@ -89,10 +102,20 @@ func makeCommand(
 	receivedAt := lorautil.GetAdjustedReceivedAt(up)
 	threshold := data.Threshold
 	switch cID {
-	case 0x01:
+	case ttnpb.ALCSyncCommandIdentifier_ALCSYNC_CID_APP_TIME:
 		return newTimeSyncCommand(cPayload, threshold, receivedAt.AsTime(), fPort)
+	case ttnpb.ALCSyncCommandIdentifier_ALCSYNC_CID_PKG_VERSION,
+		ttnpb.ALCSyncCommandIdentifier_ALCSYNC_CID_APP_DEV_TIME_PERIODICITY,
+		ttnpb.ALCSyncCommandIdentifier_ALCSYNC_CID_FORCE_DEV_RESYNC:
+		return nil, cPayload, errUnsuportedCommand.WithAttributes(
+			"command_id", cID,
+			"command_payload", cPayload,
+		).New()
 	default:
-		return nil, cPayload, errUnknownCommand.New()
+		return nil, cPayload, errUnknownCommand.WithAttributes(
+			"command_id", cID,
+			"command_payload", cPayload,
+		).New()
 	}
 }
 
@@ -105,7 +128,7 @@ func MakeDownlink(results []Result, fPort uint32) (*ttnpb.ApplicationDownlink, e
 		}
 		b, err := result.MarshalBinary()
 		if err != nil {
-			return nil, err
+			return nil, errDownlinkCreationFailed.WithCause(err).New()
 		}
 		frmPayload = append(frmPayload, b...)
 	}
