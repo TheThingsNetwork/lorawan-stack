@@ -40,7 +40,7 @@ import {
 const m = defineMessages({
   basics: 'Basics',
   deleteApp: 'Delete application',
-  useAlcsync: 'Use LoRa Application Layer Clock Synchronization package',
+  useAlcsync: 'Use Application Layer Clock Synchronization',
 })
 
 const validationSchema = Yup.object().shape({
