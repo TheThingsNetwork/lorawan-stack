@@ -219,6 +219,14 @@ func convertUplink(rx RxPacket, md UpstreamMetadata) (*ttnpb.UplinkMessage, erro
 			md.GpsTime = protoTime
 		}
 	}
+
+	switch rx.Stat {
+	case 1:
+		up.CrcStatus = wrapperspb.Bool(true)
+	case -1:
+		up.CrcStatus = wrapperspb.Bool(false)
+	}
+
 	return up, nil
 }
 
@@ -322,9 +330,18 @@ func FromGatewayUp(up *ttnpb.GatewayUp) (rxs []*RxPacket, stat *Stat, ack *TxPac
 		if i := int32(msg.RxMetadata[0].FrequencyOffset); i != 0 {
 			foff = &i
 		}
+		crcStatus := int8(0)
+		if msg.CrcStatus != nil {
+			if msg.CrcStatus.Value {
+				crcStatus = 1
+			} else {
+				crcStatus = -1
+			}
+		}
 		rxs = append(rxs, &RxPacket{
 			Freq:  float64(msg.Settings.Frequency) / 1000000,
 			Chan:  uint8(msg.RxMetadata[0].ChannelIndex),
+			Stat:  crcStatus,
 			Modu:  modulation,
 			DatR:  datarate.DR{DataRate: msg.Settings.DataRate},
 			CodR:  codr,
