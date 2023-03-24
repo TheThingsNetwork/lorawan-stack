@@ -898,12 +898,12 @@ func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntr
 			if msg.Message.Payload == nil {
 				msg.Message.Payload = &ttnpb.Message{}
 				if err := lorawan.UnmarshalMessage(msg.Message.RawPayload, msg.Message.Payload); err != nil {
-					registerDropUplink(ctx, gtw, msg, "validation", err)
+					registerDropUplink(ctx, gtw, msg, "", err)
 					continue
 				}
 			}
 			if err := msg.Message.Payload.ValidateFields(); err != nil {
-				registerDropUplink(ctx, gtw, msg, "validation", err)
+				registerDropUplink(ctx, gtw, msg, "", err)
 				continue
 			}
 			val = msg
