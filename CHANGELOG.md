@@ -11,20 +11,26 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
-- Optional Network Server database migration that removes obsolete last invalidation keys is now available.
-- `Use LoRa Application Layer Clock Sync package` field is now available in the Console.
-
 ### Changed
 
 ### Deprecated
 
 ### Removed
 
-- Automatic migrations of the Network Server database using `ns-db migrate` from versions prior to v3.24 are removed. Migrating from prior versions should be done through v3.24 instead.
-
 ### Fixed
 
 ### Security
+
+## [3.25.0] - unreleased
+
+### Added
+
+- Optional Network Server database migration that removes obsolete last invalidation keys is now available.
+- `Use LoRa Application Layer Clock Sync package` field is now available in the Console.
+
+### Removed
+
+- Automatic migrations of the Network Server database using `ns-db migrate` from versions prior to v3.24 are removed. Migrating from prior versions should be done through v3.24 instead.
 
 ## [3.24.2] - 2023-03-09
 
@@ -2516,7 +2522,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.24.2...v3.24
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.25.0...v3.25
+[3.25.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.24.2...v3.25.0
 [3.24.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.24.1...v3.24.2
 [3.24.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.24.0...v3.24.1
 [3.24.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.23.2...v3.24.0
