@@ -131,7 +131,7 @@ func TestNewTimeSyncCommand(t *testing.T) {
 			}{
 				Cmd:  (*TimeSyncCommand)(nil),
 				Rest: timeSyncPayload[:4],
-				Err:  errTimeSyncCommandPayloadInsufficientLength.New(),
+				Err:  errInsufficientLength.New(),
 			},
 		},
 	}

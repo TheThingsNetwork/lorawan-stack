@@ -2132,6 +2132,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/applicationserver/io/packages/alcsync/v1:insufficient_length": {
+    "translations": {
+      "en": "command payload has insufficient length"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/alcsync/v1",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/applicationserver/io/packages/alcsync/v1:invalid_field_type": {
     "translations": {
       "en": "field `{field}` has the wrong type `{type}`"
@@ -2153,15 +2162,6 @@
   "error:pkg/applicationserver/io/packages/alcsync/v1:pkg_data_merge": {
     "translations": {
       "en": "failed to merge package data"
-    },
-    "description": {
-      "package": "pkg/applicationserver/io/packages/alcsync/v1",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/applicationserver/io/packages/alcsync/v1:time_sync_command_payload_insufficient_length": {
-    "translations": {
-      "en": "time sync command payload insufficient length"
     },
     "description": {
       "package": "pkg/applicationserver/io/packages/alcsync/v1",
