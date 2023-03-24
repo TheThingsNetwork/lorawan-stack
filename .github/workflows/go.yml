@@ -64,8 +64,7 @@ jobs:
           POSTGRES_PASSWORD: root
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
       redis:
-        # TODO: Support latest Redis (7.x is not supported, see https://github.com/TheThingsNetwork/lorawan-stack/issues/5416)
-        image: redis:6.2
+        image: redis:7
         ports:
           - "6379/tcp"
     timeout-minutes: 15
