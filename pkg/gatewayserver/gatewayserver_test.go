@@ -58,6 +58,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 var (
@@ -1027,7 +1028,8 @@ func TestGatewayServer(t *testing.T) {
 						for _, tc := range []struct {
 							Name           string
 							Up             *ttnpb.GatewayUp
-							Forwards       []uint32 // Timestamps of uplink messages in Up that are being forwarded.
+							Received       []uint32 // Timestamps of uplink messages in Up that are received.
+							Dropped        []uint32 // Timestamps of uplink messages in Up that are dropped.
 							PublicLocation bool     // If gateway location is public, it should be in RxMetadata
 							UplinkCount    int      // Number of expected uplinks
 							RepeatUpEvent  bool     // Expect event for repeated uplinks
@@ -1047,6 +1049,42 @@ func TestGatewayServer(t *testing.T) {
 										Result: ttnpb.TxAcknowledgment_SUCCESS,
 									},
 								},
+							},
+							{
+								Name: "CRCFailure",
+								Up: &ttnpb.GatewayUp{
+									UplinkMessages: []*ttnpb.UplinkMessage{
+										{
+											Settings: &ttnpb.TxSettings{
+												DataRate: &ttnpb.DataRate{
+													Modulation: &ttnpb.DataRate_Lora{
+														Lora: &ttnpb.LoRaDataRate{
+															SpreadingFactor: 7,
+															Bandwidth:       250000,
+															CodingRate:      band.Cr4_5,
+														},
+													},
+												},
+												Frequency: 867900000,
+												Timestamp: 100,
+											},
+											RxMetadata: []*ttnpb.RxMetadata{
+												{
+													GatewayIds:  ids,
+													Timestamp:   100,
+													Rssi:        -69,
+													ChannelRssi: -69,
+													Snr:         11,
+													Location:    location,
+												},
+											},
+											RawPayload: randomUpDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 2, 2),
+											CrcStatus:  wrapperspb.Bool(false),
+										},
+									},
+								},
+								Received: []uint32{100},
+								Dropped:  []uint32{100},
 							},
 							{
 								Name: "OneValidLoRa",
@@ -1080,7 +1118,7 @@ func TestGatewayServer(t *testing.T) {
 										},
 									},
 								},
-								Forwards: []uint32{100},
+								Received: []uint32{100},
 							},
 							{
 								Name: "OneValidLoRaAndTwoRepeated",
@@ -1166,7 +1204,7 @@ func TestGatewayServer(t *testing.T) {
 										},
 									},
 								},
-								Forwards:      []uint32{101},
+								Received:      []uint32{101},
 								UplinkCount:   1,
 								RepeatUpEvent: true,
 							},
@@ -1200,7 +1238,7 @@ func TestGatewayServer(t *testing.T) {
 										},
 									},
 								},
-								Forwards: []uint32{100},
+								Received: []uint32{100},
 							},
 							{
 								Name: "OneGarbageWithStatus",
@@ -1292,7 +1330,8 @@ func TestGatewayServer(t *testing.T) {
 										Time: timestamppb.New(time.Unix(4242424, 0)),
 									},
 								},
-								Forwards: []uint32{200, 300},
+								Received: []uint32{100, 200, 300},
+								Dropped:  []uint32{100},
 							},
 						} {
 							t.Run(tc.Name, func(t *testing.T) {
@@ -1306,7 +1345,6 @@ func TestGatewayServer(t *testing.T) {
 									PublishFunc: func(evs ...events.Event) {
 										for _, ev := range evs {
 											ev := ev
-
 											switch name := ev.Name(); name {
 											case "gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive", "gs.io.up.repeat":
 												go func() {
@@ -1327,7 +1365,7 @@ func TestGatewayServer(t *testing.T) {
 								if tc.UplinkCount > 0 {
 									uplinkCount += tc.UplinkCount
 								} else if ptc.DetectsInvalidMessages {
-									uplinkCount += len(tc.Forwards)
+									uplinkCount += len(tc.Received)
 								} else {
 									uplinkCount += len(tc.Up.UplinkMessages)
 								}
@@ -1341,43 +1379,52 @@ func TestGatewayServer(t *testing.T) {
 									}
 								}
 
-								notSeen := make(map[uint32]struct{})
-								for _, t := range tc.Forwards {
-									notSeen[t] = struct{}{}
+								received := make(map[uint32]struct{})
+								forwarded := make(map[uint32]struct{})
+								for _, t := range tc.Received {
+									received[t] = struct{}{}
+									forwarded[t] = struct{}{}
 								}
-								for len(notSeen) > 0 {
-									select {
-									case msg := <-ns.Up():
-										var expected *ttnpb.UplinkMessage
-										for _, up := range tc.Up.UplinkMessages {
-											if ts := up.Settings.Timestamp; ts == msg.Settings.Timestamp {
-												if _, ok := notSeen[ts]; !ok {
-													t.Fatalf("Not expecting message %v", msg)
+								for _, t := range tc.Dropped {
+									delete(forwarded, t)
+								}
+								for len(received) > 0 {
+									if len(forwarded) > 0 {
+										select {
+										case msg := <-ns.Up():
+											var expected *ttnpb.UplinkMessage
+											for _, up := range tc.Up.UplinkMessages {
+												if ts := up.Settings.Timestamp; ts == msg.Settings.Timestamp {
+													if _, ok := forwarded[ts]; !ok {
+														t.Fatalf("Not expecting message %v", msg)
+													}
+													expected = up
+													delete(forwarded, ts)
+													break
 												}
-												expected = up
-												delete(notSeen, ts)
-												break
 											}
+											if expected == nil {
+												t.Fatalf("Received unexpected message")
+											}
+											a.So(time.Since(*ttnpb.StdTime(msg.ReceivedAt)), should.BeLessThan, timeout)
+											a.So(msg.Settings, should.Resemble, expected.Settings)
+											a.So(len(msg.RxMetadata), should.Equal, len(expected.RxMetadata))
+											for i, md := range msg.RxMetadata {
+												a.So(md.UplinkToken, should.NotBeEmpty)
+												md.UplinkToken = nil
+												md.ReceivedAt = nil
+												a.So(md, should.Resemble, expected.RxMetadata[i])
+											}
+											a.So(msg.RawPayload, should.Resemble, expected.RawPayload)
+										case <-time.After(timeout):
+											t.Fatal("Expected uplink timeout")
 										}
-										if expected == nil {
-											t.Fatalf("Received unexpected message")
-										}
-										a.So(time.Since(*ttnpb.StdTime(msg.ReceivedAt)), should.BeLessThan, timeout)
-										a.So(msg.Settings, should.Resemble, expected.Settings)
-										a.So(len(msg.RxMetadata), should.Equal, len(expected.RxMetadata))
-										for i, md := range msg.RxMetadata {
-											a.So(md.UplinkToken, should.NotBeEmpty)
-											md.UplinkToken = nil
-											md.ReceivedAt = nil
-											a.So(md, should.Resemble, expected.RxMetadata[i])
-										}
-										a.So(msg.RawPayload, should.Resemble, expected.RawPayload)
-									case <-time.After(timeout):
-										t.Fatal("Expected uplink timeout")
 									}
 									select {
 									case evt := <-upEvents["gs.up.receive"]:
 										a.So(evt.Name(), should.Equal, "gs.up.receive")
+										msg := evt.Data().(*ttnpb.GatewayUplinkMessage)
+										delete(received, msg.Message.Settings.Timestamp)
 									case <-time.After(timeout):
 										t.Fatal("Expected uplink event timeout")
 									}
