@@ -18533,6 +18533,10 @@
         "consumed_airtime": {
           "type": "string",
           "description": "Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings."
+        },
+        "crc_status": {
+          "type": "boolean",
+          "description": "Cyclic Redundancy Check (CRC) status of demodulating the frame.\nIf unset, the modulation does not support CRC or the gateway did not provide a CRC status.\nIf set to false, this message should not be processed."
         }
       },
       "title": "Uplink message from the end device to the network"

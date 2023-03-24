@@ -33573,6 +33573,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "crc_status",
+              "description": "Cyclic Redundancy Check (CRC) status of demodulating the frame.\nIf unset, the modulation does not support CRC or the gateway did not provide a CRC status.\nIf set to false, this message should not be processed.",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         }

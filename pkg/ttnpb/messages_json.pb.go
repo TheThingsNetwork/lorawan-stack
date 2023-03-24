@@ -10,6 +10,7 @@ import (
 	golang "github.com/TheThingsIndustries/protoc-gen-go-json/golang"
 	jsonplugin "github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
 	types "go.thethings.network/lorawan-stack/v3/pkg/types"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // MarshalProtoJSON marshals the PayloadFormatter to JSON.
@@ -124,6 +125,15 @@ func (x *UplinkMessage) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 			golang.MarshalDuration(s, x.ConsumedAirtime)
 		}
 	}
+	if x.CrcStatus != nil || s.HasField("crc_status") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("crc_status")
+		if x.CrcStatus == nil {
+			s.WriteNil()
+		} else {
+			s.WriteBool(x.CrcStatus.Value)
+		}
+	}
 	s.WriteObjectEnd()
 }
 
@@ -211,6 +221,17 @@ func (x *UplinkMessage) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				return
 			}
 			x.ConsumedAirtime = v
+		case "crc_status", "crcStatus":
+			s.AddField("crc_status")
+			if s.ReadNil() {
+				x.CrcStatus = nil
+				return
+			}
+			v := s.ReadWrappedBool()
+			if s.Err() != nil {
+				return
+			}
+			x.CrcStatus = &wrapperspb.BoolValue{Value: v}
 		}
 	})
 }

@@ -144,6 +144,18 @@ func (m *UplinkMessage) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "crc_status":
+
+			if v, ok := interface{}(m.GetCrcStatus()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return UplinkMessageValidationError{
+						field:  "crc_status",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return UplinkMessageValidationError{
 				field:  name,

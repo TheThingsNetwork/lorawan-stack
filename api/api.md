@@ -7321,6 +7321,7 @@ Uplink message from the end device to the network
 | `correlation_ids` | [`string`](#string) | repeated |  |
 | `device_channel_index` | [`uint32`](#uint32) |  | Index of the device channel that received the message. Set by Network Server. |
 | `consumed_airtime` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings. |
+| `crc_status` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  | Cyclic Redundancy Check (CRC) status of demodulating the frame. If unset, the modulation does not support CRC or the gateway did not provide a CRC status. If set to false, this message should not be processed. |
 
 #### Field Rules
 
