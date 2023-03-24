@@ -29,7 +29,5 @@ var (
 	errInvalidFieldType = errors.DefineCorruption("invalid_field_type", "field `{field}` has the wrong type `{type}`")
 	errPkgDataMerge     = errors.DefineCorruption("pkg_data_merge", "failed to merge package data")
 
-	errTimeSyncCommandPayloadInsufficientLength = errors.DefineInvalidArgument(
-		"time_sync_command_payload_insufficient_length", "time sync command payload insufficient length",
-	)
+	errInsufficientLength = errors.DefineInvalidArgument("insufficient_length", "command payload has insufficient length")
 )

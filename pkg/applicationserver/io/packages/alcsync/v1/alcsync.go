@@ -38,7 +38,7 @@ func newTimeSyncCommand(
 
 	lenBytes := 5
 	if len(data) < lenBytes {
-		return nil, data, errTimeSyncCommandPayloadInsufficientLength.WithAttributes(
+		return nil, data, errInsufficientLength.WithAttributes(
 			"expected_length", lenBytes,
 			"actual_length", len(data),
 		).New()
