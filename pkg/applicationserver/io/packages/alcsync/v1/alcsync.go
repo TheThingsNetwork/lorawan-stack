@@ -76,7 +76,6 @@ func MakeCommands(up *ttnpb.ApplicationUplink, fPort uint32, data *packageData) 
 				"command_id", cID,
 				"command_payload", cPayload,
 				"remaining_payload", rest,
-				"received_at", up.ReceivedAt,
 			).New()
 			evts = append(evts, EvtPkgFail.With(events.WithData(err)))
 			return commands, evts, err
