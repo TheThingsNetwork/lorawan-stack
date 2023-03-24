@@ -39,7 +39,7 @@ func (a *alcsyncpkg) HandleUp(
 	def *ttnpb.ApplicationPackageDefaultAssociation,
 	assoc *ttnpb.ApplicationPackageAssociation,
 	up *ttnpb.ApplicationUp,
-) error {
+) (err error) {
 	ctx = log.NewContextWithField(ctx, "namespace", "applicationserver/io/packages/alcsync/v1")
 	logger := log.FromContext(ctx)
 
@@ -55,6 +55,18 @@ func (a *alcsyncpkg) HandleUp(
 		logger.Debug("Uplink is not an uplink message")
 		return nil
 	}
+
+	eventBuilders := make(events.Builders, 0)
+
+	defer func(ids *ttnpb.EndDeviceIdentifiers) {
+		if err != nil {
+			eventBuilders = append(eventBuilders, EvtPkgFail.With(
+				events.WithIdentifiers(ids),
+				events.WithData(err),
+			))
+		}
+		publishEvents(ctx, eventBuilders...)
+	}(up.GetEndDeviceIds())
 
 	data, fPort, err := mergePackageData(def, assoc)
 	if err != nil {
@@ -75,23 +87,11 @@ func (a *alcsyncpkg) HandleUp(
 		return nil
 	}
 
-	eventBuilders := []events.Builder{
-		EvtALCSyncCmdReceived.With(
-			events.WithIdentifiers(up.GetEndDeviceIds()),
-			events.WithData(up),
-		),
-	}
-
 	commands, evts, err := MakeCommands(msg, fPort, data)
+	eventBuilders = append(eventBuilders, evts...)
 	if err != nil {
 		logger.WithError(err).Debug("Failed to parse frame payload into commands")
-	}
-
-	eventBuilders = append(eventBuilders, evts...)
-
-	if err != nil && len(commands) == 0 {
-		logger.WithError(err).Error("Parsing uplink frame payload resulted in no executable commands")
-		return a.publishAndExit(ctx, eventBuilders, err)
+		return err
 	}
 
 	results := make([]Result, 0, len(commands))
@@ -102,34 +102,27 @@ func (a *alcsyncpkg) HandleUp(
 		}
 		if err != nil {
 			logger.WithError(err).WithField("command_id", cmd.Code()).Error("Failed to execute command")
-			evt := makeExecutionFailedEvtBuilder(cmd.Code(), err)
-			eventBuilders = append(eventBuilders, evt)
+			eventBuilders = append(eventBuilders, EvtPkgFail.With(
+				events.WithIdentifiers(up.GetEndDeviceIds()),
+				events.WithData(err)),
+			)
 			continue
 		}
 		if result != nil {
 			results = append(results, result)
-			eventBuilders = append(eventBuilders, result.GetEvtSuccessfullyExecuted())
+			eventBuilders = append(eventBuilders, result.AnswerEnqueuedEventBuilder())
 		}
 	}
 	downlink, err := MakeDownlink(results, fPort)
 	if err != nil {
 		logger.WithError(err).Error("Failed to create downlink from results")
-		eventBuilders = append(eventBuilders, EvtALCSyncPkgFail.With(
-			events.WithIdentifiers(up.GetEndDeviceIds()),
-			events.WithData(err),
-		))
-		return a.publishAndExit(ctx, eventBuilders, err)
+		return err
 	}
 	if err := a.server.DownlinkQueuePush(ctx, up.EndDeviceIds, []*ttnpb.ApplicationDownlink{downlink}); err != nil {
 		logger.WithError(err).Error("Failed to push downlinks to queue")
+		return err
 	}
-	return a.publishAndExit(ctx, eventBuilders, nil)
-}
-
-func (*alcsyncpkg) publishAndExit(ctx context.Context, builders []events.Builder, err error) error {
-	log.FromContext(ctx).WithError(err).Debug("Publishing events and exiting")
-	publishEvents(ctx, builders...)
-	return err
+	return nil
 }
 
 // Package implements packages.ApplicationPackageHandler.

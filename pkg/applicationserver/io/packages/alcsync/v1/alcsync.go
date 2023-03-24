@@ -65,10 +65,10 @@ func newTimeSyncCommand(
 }
 
 // MakeCommands parses the uplink payload and returns the commands.
-func MakeCommands(up *ttnpb.ApplicationUplink, fPort uint32, data *packageData) ([]Command, []events.Builder, error) {
+func MakeCommands(up *ttnpb.ApplicationUplink, fPort uint32, data *packageData) ([]Command, events.Builders, error) {
 	cID, cPayload := ttnpb.ALCSyncCommandIdentifier(up.FrmPayload[0]), up.FrmPayload[1:]
 	commands := make([]Command, 0)
-	evts := make([]events.Builder, 0)
+	evts := make(events.Builders, 0)
 	for {
 		cmd, rest, err := makeCommand(cID, cPayload, up, fPort, data)
 		if err != nil {
@@ -78,13 +78,11 @@ func MakeCommands(up *ttnpb.ApplicationUplink, fPort uint32, data *packageData) 
 				"remaining_payload", rest,
 				"received_at", up.ReceivedAt,
 			).New()
-			evt := makeParsingFailedEvtBuilder(cID, err)
-			evts = append(evts, evt)
+			evts = append(evts, EvtPkgFail.With(events.WithData(err)))
 			return commands, evts, err
 		}
 		commands = append(commands, cmd)
-		evt := cmd.GetEvtSuccessfullyParsed()
-		evts = append(evts, evt)
+		evts = append(evts, cmd.CommandReceivedEventBuilder())
 
 		if len(rest) == 0 { // No commands left.
 			break
@@ -92,25 +90,6 @@ func MakeCommands(up *ttnpb.ApplicationUplink, fPort uint32, data *packageData) 
 		cID, cPayload = ttnpb.ALCSyncCommandIdentifier(rest[0]), rest[1:]
 	}
 	return commands, evts, nil
-}
-
-// makeParsingFailedEvtBuilder returns an event builder for a failed command ID.
-func makeParsingFailedEvtBuilder(cID ttnpb.ALCSyncCommandIdentifier, err error) events.Builder {
-	switch cID {
-	case ttnpb.ALCSyncCommandIdentifier_ALCSYNC_CID_APP_TIME:
-		return EvtTimeSyncCmdParsed.With(events.WithData(err))
-	default:
-		return EvtALCSyncCmdParsedFail.With(events.WithData(err))
-	}
-}
-
-func makeExecutionFailedEvtBuilder(cID ttnpb.ALCSyncCommandIdentifier, err error) events.Builder {
-	switch cID {
-	case ttnpb.ALCSyncCommandIdentifier_ALCSYNC_CID_APP_TIME:
-		return EvtTimeSyncCmdHandledFail.With(events.WithData(err))
-	default:
-		return EvtALCSyncPkgFail.With(events.WithData(err))
-	}
 }
 
 // makeCommand parses the payload based on the command ID.

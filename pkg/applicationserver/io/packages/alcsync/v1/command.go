@@ -24,8 +24,8 @@ type Result interface {
 	// MarshalBinary marshals the result into a binary representation.
 	MarshalBinary() ([]byte, error)
 
-	// GetEvtSuccessfullyExecuted returns the event that should be emitted when the result is successful.
-	GetEvtSuccessfullyExecuted() events.Builder
+	// AnswerEnqueuedEventBuilder returns the event that should be emitted when the answer is enqueued or executed.
+	AnswerEnqueuedEventBuilder() events.Builder
 }
 
 // Command is the interface for commands.
@@ -33,8 +33,8 @@ type Command interface {
 	// Code returns the command code.
 	Code() ttnpb.ALCSyncCommandIdentifier
 
-	// GetEvtSuccessfullyParsed returns the event that should be emitted when the command is successfully parsed.
-	GetEvtSuccessfullyParsed() events.Builder
+	// CommandReceivedEventBuilder returns the event that should be emitted when the command is successfully parsed.
+	CommandReceivedEventBuilder() events.Builder
 
 	// Execute runs the command logic.
 	Execute() (Result, error)
