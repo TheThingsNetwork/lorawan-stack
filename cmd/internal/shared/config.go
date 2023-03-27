@@ -23,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/packetbroker"
 	"go.thethings.network/lorawan-stack/v3/pkg/redis"
+	telemetry "go.thethings.network/lorawan-stack/v3/pkg/telemetry/exporter"
 	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing"
 	"golang.org/x/crypto/acme"
 )
@@ -155,6 +156,19 @@ var DefaultTracingConfig = tracing.Config{
 	SampleProbability: 1.,
 }
 
+// DefaultTelemetryConfig  is the default config for telemetry.
+var DefaultTelemetryConfig = telemetry.Config{
+	// TODO: After (https://github.com/TheThingsNetwork/lorawan-stack/issues/6081) is no longer blocked.
+	// Enable the telemetry and define the target.
+	Enable:       false,
+	Target:       "",
+	NumConsumers: 1,
+	EntityCountTelemetry: telemetry.EntityCountTelemetry{
+		Enable:   false,
+		Interval: 24 * time.Hour,
+	},
+}
+
 // DefaultServiceBase is the default base config for a service.
 var DefaultServiceBase = config.ServiceBase{
 	Base:           DefaultBaseConfig,
@@ -171,6 +185,7 @@ var DefaultServiceBase = config.ServiceBase{
 	Rights:         DefaultRightsConfig,
 	KeyVault:       DefaultKeyVaultConfig,
 	Tracing:        DefaultTracingConfig,
+	Telemetry:      DefaultTelemetryConfig,
 }
 
 // DefaultPublicHost is the default public host where The Things Stack is served.

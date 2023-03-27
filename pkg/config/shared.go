@@ -32,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/redis"
+	telemetry "go.thethings.network/lorawan-stack/v3/pkg/telemetry/exporter"
 	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing"
 	"gocloud.dev/blob"
 )
@@ -507,6 +508,7 @@ type ServiceBase struct {
 	RateLimiting     RateLimiting         `name:"rate-limiting" description:"Rate limiting configuration"`
 	Tracing          tracing.Config       `name:"tracing" yaml:"tracing" description:"Tracing configuration"`
 	SkipVersionCheck bool                 `name:"skip-version-check" yaml:"skip-version-check" description:"Skip version checks"` //nolint:lll
+	Telemetry        telemetry.Config     `name:"telemetry" yaml:"telemetry" description:"Telemetry configuration"`
 }
 
 // FrequencyPlansFetcher returns a fetch.Interface based on the frequency plans configuration.

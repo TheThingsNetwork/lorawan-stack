@@ -8468,6 +8468,15 @@
       "file": "task.go"
     }
   },
+  "error:pkg/telemetry/exporter:callback_not_registered": {
+    "translations": {
+      "en": "callback not registered"
+    },
+    "description": {
+      "package": "pkg/telemetry/exporter",
+      "file": "task_queue.go"
+    }
+  },
   "error:pkg/telemetry/tracing:unknown_exporter": {
     "translations": {
       "en": "unknown exporter {exporter}"
