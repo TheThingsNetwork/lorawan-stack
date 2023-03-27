@@ -379,6 +379,11 @@ func (*host) decodeUplink(
 			msg.NormalizedPayloadWarnings = appendValidationErrors(msg.NormalizedPayloadWarnings, normalizedMeasurements)
 		}
 	}
+
+	// Roundtrip the message in order to convert special number values such as NaN and Infinity to their string form.
+	// TODO: Clean up, or fail, the message (https://github.com/TheThingsNetwork/lorawan-stack/issues/6128).
+	msg.DecodedPayload, _ = structpb.NewStruct(msg.DecodedPayload.AsMap())
+
 	return nil
 }
 
@@ -480,5 +485,10 @@ func (*host) decodeDownlink(
 	}
 	msg.DecodedPayload = s
 	msg.DecodedPayloadWarnings = output.Warnings
+
+	// Roundtrip the message in order to convert special number values such as NaN and Infinity to their string form.
+	// TODO: Clean up, or fail, the message (https://github.com/TheThingsNetwork/lorawan-stack/issues/6128).
+	msg.DecodedPayload, _ = structpb.NewStruct(msg.DecodedPayload.AsMap())
+
 	return nil
 }
