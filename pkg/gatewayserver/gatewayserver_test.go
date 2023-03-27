@@ -1330,8 +1330,7 @@ func TestGatewayServer(t *testing.T) {
 										Time: timestamppb.New(time.Unix(4242424, 0)),
 									},
 								},
-								Received: []uint32{100, 200, 300},
-								Dropped:  []uint32{100},
+								Received: []uint32{200, 300},
 							},
 						} {
 							t.Run(tc.Name, func(t *testing.T) {
