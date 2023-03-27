@@ -151,3 +151,16 @@ func getSchemaVersion(cl *ttnredis.Client) (int, error) {
 	logger.WithField("version", schemaVersion).Info("Existing database schema version")
 	return int(schemaVersion), nil
 }
+
+// telemetryConfigFallback sets the UID elements for telemetry if they are empty.
+func telemetryConfigFallback(_ context.Context, cfg *Config) {
+	if cfg != nil && len(cfg.ServiceBase.Telemetry.UIDElements) == 0 {
+		cfg.ServiceBase.Telemetry.UIDElements = []string{
+			cfg.Console.UI.IS.BaseURL,
+			cfg.Console.UI.GS.BaseURL,
+			cfg.Console.UI.NS.BaseURL,
+			cfg.Console.UI.AS.BaseURL,
+			cfg.Console.UI.JS.BaseURL,
+		}
+	}
+}
