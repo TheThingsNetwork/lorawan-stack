@@ -896,17 +896,16 @@ func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntr
 			correlationIDs = append(correlationIDs, fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()))
 			ctx = events.ContextWithCorrelationID(ctx, correlationIDs...)
 			msg.Message.CorrelationIds = events.CorrelationIDsFromContext(ctx)
+			if msg.Message.Payload == nil {
+				msg.Message.Payload = &ttnpb.Message{}
+				if err := lorawan.UnmarshalMessage(msg.Message.RawPayload, msg.Message.Payload); err != nil {
+					continue
+				}
+			}
 			registerReceiveUplink(ctx, gtw, msg, protocol)
 			if crcStatus := msg.Message.CrcStatus; crcStatus != nil && !crcStatus.Value {
 				registerDropUplink(ctx, gtw, msg, "", errMessageCRC.New())
 				continue
-			}
-			if msg.Message.Payload == nil {
-				msg.Message.Payload = &ttnpb.Message{}
-				if err := lorawan.UnmarshalMessage(msg.Message.RawPayload, msg.Message.Payload); err != nil {
-					registerDropUplink(ctx, gtw, msg, "", err)
-					continue
-				}
 			}
 			if err := msg.Message.Payload.ValidateFields(); err != nil {
 				registerDropUplink(ctx, gtw, msg, "", err)
