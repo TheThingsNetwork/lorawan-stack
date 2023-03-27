@@ -1137,6 +1137,7 @@ As part of claiming, you can optionally provide the target NetID, Network Server
 KEK label and Application Server ID and KEK label. The Network Server and
 Application Server addresses will be taken from the CLI configuration. These
 values will be stored in the Join Server.`,
+		Deprecated: "End device claiming is integrated into the device creation flow.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			targetAppID := getApplicationID(cmd.Flags(), args)
 			if targetAppID == nil {
