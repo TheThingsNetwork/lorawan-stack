@@ -8468,6 +8468,15 @@
       "file": "task.go"
     }
   },
+  "error:pkg/telemetry/exporter/istelemetry:insufficient_configuration": {
+    "translations": {
+      "en": "insufficient configuration to start task, missing `{field}`"
+    },
+    "description": {
+      "package": "pkg/telemetry/exporter/istelemetry",
+      "file": "is.go"
+    }
+  },
   "error:pkg/telemetry/exporter:callback_not_registered": {
     "translations": {
       "en": "callback not registered"
