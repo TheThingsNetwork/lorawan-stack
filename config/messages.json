@@ -5111,6 +5111,15 @@
       "file": "gatewayserver.go"
     }
   },
+  "error:pkg/gatewayserver:message_crc": {
+    "translations": {
+      "en": "message CRC failed"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "gatewayserver.go"
+    }
+  },
   "error:pkg/gatewayserver:new_connection": {
     "translations": {
       "en": "new connection from same gateway"
