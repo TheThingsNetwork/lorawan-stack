@@ -166,11 +166,14 @@ func generateKey() *types.AES128Key {
 }
 
 var (
-	errJoinServerDisabled    = errors.DefineFailedPrecondition("join_server_disabled", "Join Server is disabled")
-	errNetworkServerDisabled = errors.DefineFailedPrecondition("network_server_disabled", "Network Server is disabled")
-	errEndDeviceClaimInfo    = errors.DefineFailedPrecondition("end_device_claim_info", "could not get end device claim info from DCS")
-	errEndDeviceClaim        = errors.DefineFailedPrecondition("end_device_claim", "could not claim end device")
-	errEndDeviceUnclaim      = errors.DefineFailedPrecondition("end_device_unclaim", "could not unclaim end device")
+	errJoinServerDisabled         = errors.DefineFailedPrecondition("join_server_disabled", "Join Server is disabled")
+	errNetworkServerDisabled      = errors.DefineFailedPrecondition("network_server_disabled", "Network Server is disabled")
+	errEndDeviceClaimInfo         = errors.DefineFailedPrecondition("end_device_claim_info", "could not get end device claim info from DCS")
+	errEndDeviceClaim             = errors.DefineFailedPrecondition("end_device_claim", "could not claim end device")
+	errEndDeviceClaimGeneratedEUI = errors.DefineInvalidArgument(
+		"claim_generated_eui",
+		"cannot claim end device with a randomly generated DevEUI. Use a valid DevEUI registered with a Join Server",
+	)
 )
 
 var (
@@ -564,6 +567,9 @@ var (
 
 			requestDevEUI, _ := cmd.Flags().GetBool("request-dev-eui")
 			if requestDevEUI {
+				if claimOnExternalJS {
+					return errEndDeviceClaimGeneratedEUI.New()
+				}
 				logger.Debug("request-dev-eui flag set, requesting a DevEUI")
 				devEUIResponse, err := ttnpb.NewApplicationRegistryClient(is).IssueDevEUI(ctx, devID.ApplicationIds)
 				if err != nil {
