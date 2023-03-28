@@ -381,8 +381,12 @@ func (*host) decodeUplink(
 	}
 
 	// Roundtrip the message in order to convert special number values such as NaN and Infinity to their string form.
-	// TODO: Clean up, or fail, the message (https://github.com/TheThingsNetwork/lorawan-stack/issues/6128).
-	msg.DecodedPayload, _ = structpb.NewStruct(msg.DecodedPayload.AsMap())
+	// TODO: Clean up the message and emit warning (https://github.com/TheThingsNetwork/lorawan-stack/issues/6128).
+	msg.DecodedPayload, err = structpb.NewStruct(decodedPayload.AsMap())
+	if err != nil {
+		return errOutput.WithCause(err)
+	}
+	msg.DecodedPayloadWarnings = append(msg.DecodedPayloadWarnings, goproto.ValidateStruct(decodedPayload)...)
 
 	return nil
 }
@@ -487,8 +491,12 @@ func (*host) decodeDownlink(
 	msg.DecodedPayloadWarnings = output.Warnings
 
 	// Roundtrip the message in order to convert special number values such as NaN and Infinity to their string form.
-	// TODO: Clean up, or fail, the message (https://github.com/TheThingsNetwork/lorawan-stack/issues/6128).
-	msg.DecodedPayload, _ = structpb.NewStruct(msg.DecodedPayload.AsMap())
+	// TODO: Clean up the message and emit warning (https://github.com/TheThingsNetwork/lorawan-stack/issues/6128).
+	msg.DecodedPayload, err = structpb.NewStruct(s.AsMap())
+	if err != nil {
+		return errOutput.WithCause(err)
+	}
+	msg.DecodedPayloadWarnings = append(msg.DecodedPayloadWarnings, goproto.ValidateStruct(s)...)
 
 	return nil
 }
