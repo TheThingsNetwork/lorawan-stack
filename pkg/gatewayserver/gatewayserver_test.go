@@ -1103,12 +1103,12 @@ func TestGatewayServer(t *testing.T) {
 													},
 												},
 												Frequency: 867900000,
-												Timestamp: 100,
+												Timestamp: 200,
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
 													GatewayIds:  ids,
-													Timestamp:   100,
+													Timestamp:   200,
 													Rssi:        -69,
 													ChannelRssi: -69,
 													Snr:         11,
@@ -1119,7 +1119,7 @@ func TestGatewayServer(t *testing.T) {
 										},
 									},
 								},
-								Received: []uint32{100},
+								Received: []uint32{200},
 							},
 							{
 								Name: "OneValidLoRaAndTwoRepeated",
@@ -1137,12 +1137,12 @@ func TestGatewayServer(t *testing.T) {
 													},
 												},
 												Frequency: 867900000,
-												Timestamp: 101,
+												Timestamp: 301,
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
 													GatewayIds:  ids,
-													Timestamp:   101,
+													Timestamp:   301,
 													Rssi:        -42,
 													ChannelRssi: -42,
 													Snr:         11,
@@ -1163,12 +1163,12 @@ func TestGatewayServer(t *testing.T) {
 													},
 												},
 												Frequency: 867900000,
-												Timestamp: 100,
+												Timestamp: 300,
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
 													GatewayIds:  ids,
-													Timestamp:   100,
+													Timestamp:   300,
 													Rssi:        -69,
 													ChannelRssi: -69,
 													Snr:         11,
@@ -1189,12 +1189,12 @@ func TestGatewayServer(t *testing.T) {
 													},
 												},
 												Frequency: 867900000,
-												Timestamp: 100,
+												Timestamp: 300,
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
 													GatewayIds:  ids,
-													Timestamp:   100,
+													Timestamp:   300,
 													Rssi:        -69,
 													ChannelRssi: -69,
 													Snr:         11,
@@ -1205,7 +1205,7 @@ func TestGatewayServer(t *testing.T) {
 										},
 									},
 								},
-								Received:      []uint32{101},
+								Received:      []uint32{301},
 								UplinkCount:   1,
 								RepeatUpEvent: true,
 							},
@@ -1223,12 +1223,12 @@ func TestGatewayServer(t *testing.T) {
 													},
 												},
 												Frequency: 867900000,
-												Timestamp: 100,
+												Timestamp: 400,
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
 													GatewayIds:  ids,
-													Timestamp:   100,
+													Timestamp:   400,
 													Rssi:        -69,
 													ChannelRssi: -69,
 													Snr:         11,
@@ -1239,7 +1239,7 @@ func TestGatewayServer(t *testing.T) {
 										},
 									},
 								},
-								Received: []uint32{100},
+								Received: []uint32{400},
 							},
 							{
 								Name: "OneGarbageWithStatus",
@@ -1257,12 +1257,12 @@ func TestGatewayServer(t *testing.T) {
 													},
 												},
 												Frequency: 868500000,
-												Timestamp: 100,
+												Timestamp: 500,
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
 													GatewayIds:  ids,
-													Timestamp:   100,
+													Timestamp:   500,
 													Rssi:        -112,
 													ChannelRssi: -112,
 													Snr:         2,
@@ -1283,12 +1283,12 @@ func TestGatewayServer(t *testing.T) {
 													},
 												},
 												Frequency: 868100000,
-												Timestamp: 200,
+												Timestamp: 501,
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
 													GatewayIds:  ids,
-													Timestamp:   200,
+													Timestamp:   501,
 													Rssi:        -69,
 													ChannelRssi: -69,
 													Snr:         11,
@@ -1309,12 +1309,12 @@ func TestGatewayServer(t *testing.T) {
 													},
 												},
 												Frequency: 867700000,
-												Timestamp: 300,
+												Timestamp: 502,
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
 													GatewayIds:  ids,
-													Timestamp:   300,
+													Timestamp:   502,
 													Rssi:        -36,
 													ChannelRssi: -36,
 													Snr:         5,
@@ -1331,7 +1331,7 @@ func TestGatewayServer(t *testing.T) {
 										Time: timestamppb.New(time.Unix(4242424, 0)),
 									},
 								},
-								Received: []uint32{200, 300},
+								Received: []uint32{501, 502},
 							},
 						} {
 							t.Run(tc.Name, func(t *testing.T) {
@@ -1404,7 +1404,7 @@ func TestGatewayServer(t *testing.T) {
 												}
 											}
 											if expected == nil {
-												t.Fatalf("Received unexpected message")
+												t.Fatalf("Received unexpected message with timestamp %d", msg.Settings.Timestamp)
 											}
 											a.So(time.Since(*ttnpb.StdTime(msg.ReceivedAt)), should.BeLessThan, timeout)
 											a.So(msg.Settings, should.Resemble, expected.Settings)
