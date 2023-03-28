@@ -2331,6 +2331,13 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "continuation_token",
+            "description": "The continuation token, which is used to retrieve the next page. If provided, other fields are ignored.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -3932,6 +3939,13 @@
           {
             "name": "last",
             "description": "Query upstream messages that have arrived in the last minutes or hours. Cannot be used in conjunction with after and before.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "continuation_token",
+            "description": "The continuation token, which is used to retrieve the next page. If provided, other fields are ignored.",
             "in": "query",
             "required": false,
             "type": "string"

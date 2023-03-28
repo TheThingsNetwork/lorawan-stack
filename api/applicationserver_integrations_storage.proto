@@ -27,6 +27,20 @@ package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
+message ContinuationTokenPayload {
+  ApplicationIdentifiers application_ids = 1;
+  EndDeviceIdentifiers end_device_ids = 2;
+  string type = 3;
+  google.protobuf.UInt32Value limit = 4;
+  google.protobuf.Timestamp after = 5;
+  google.protobuf.Timestamp before = 6;
+  google.protobuf.UInt32Value f_port = 7;
+  string order = 8;
+  google.protobuf.FieldMask field_mask = 9;
+  google.protobuf.Duration last = 10;
+  int64 last_received_id = 11;
+}
+
 message GetStoredApplicationUpRequest {
   // Query upstream messages from all end devices of an application. Cannot be used in conjunction with end_device_ids.
   ApplicationIdentifiers application_ids = 1;
@@ -69,6 +83,9 @@ message GetStoredApplicationUpRequest {
 
   // Query upstream messages that have arrived in the last minutes or hours. Cannot be used in conjunction with after and before.
   google.protobuf.Duration last = 10;
+
+  // The continuation token, which is used to retrieve the next page. If provided, other fields are ignored.
+  string continuation_token = 11;
 }
 
 message GetStoredApplicationUpCountRequest {

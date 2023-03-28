@@ -53,6 +53,7 @@
   - [Message `ALCSyncCommand.AppTimeReq`](#ttn.lorawan.v3.ALCSyncCommand.AppTimeReq)
   - [Enum `ALCSyncCommandIdentifier`](#ttn.lorawan.v3.ALCSyncCommandIdentifier)
 - [File `lorawan-stack/api/applicationserver_integrations_storage.proto`](#lorawan-stack/api/applicationserver_integrations_storage.proto)
+  - [Message `ContinuationTokenPayload`](#ttn.lorawan.v3.ContinuationTokenPayload)
   - [Message `GetStoredApplicationUpCountRequest`](#ttn.lorawan.v3.GetStoredApplicationUpCountRequest)
   - [Message `GetStoredApplicationUpCountResponse`](#ttn.lorawan.v3.GetStoredApplicationUpCountResponse)
   - [Message `GetStoredApplicationUpCountResponse.CountEntry`](#ttn.lorawan.v3.GetStoredApplicationUpCountResponse.CountEntry)
@@ -1294,6 +1295,22 @@ The NsAs service connects a Network Server to an Application Server.
 
 ## <a name="lorawan-stack/api/applicationserver_integrations_storage.proto">File `lorawan-stack/api/applicationserver_integrations_storage.proto`</a>
 
+### <a name="ttn.lorawan.v3.ContinuationTokenPayload">Message `ContinuationTokenPayload`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
+| `type` | [`string`](#string) |  |  |
+| `limit` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  |  |
+| `after` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `before` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `f_port` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  |  |
+| `order` | [`string`](#string) |  |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
+| `last` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
+| `last_received_id` | [`int64`](#int64) |  |  |
+
 ### <a name="ttn.lorawan.v3.GetStoredApplicationUpCountRequest">Message `GetStoredApplicationUpCountRequest`</a>
 
 | Field | Type | Label | Description |
@@ -1339,6 +1356,7 @@ The NsAs service connects a Network Server to an Application Server.
 | `order` | [`string`](#string) |  | Order results. |
 | `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the upstream message fields that should be returned. See the API reference for allowed field names for each type of upstream message. |
 | `last` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Query upstream messages that have arrived in the last minutes or hours. Cannot be used in conjunction with after and before. |
+| `continuation_token` | [`string`](#string) |  | The continuation token, which is used to retrieve the next page. If provided, other fields are ignored. |
 
 #### Field Rules
 

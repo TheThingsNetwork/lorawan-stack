@@ -32,6 +32,190 @@ var (
 	_ = anypb.Any{}
 )
 
+// ValidateFields checks the field values on ContinuationTokenPayload with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ContinuationTokenPayload) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ContinuationTokenPayloadFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "application_ids":
+
+			if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ContinuationTokenPayloadValidationError{
+						field:  "application_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "end_device_ids":
+
+			if v, ok := interface{}(m.GetEndDeviceIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ContinuationTokenPayloadValidationError{
+						field:  "end_device_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "type":
+			// no validation rules for Type
+		case "limit":
+
+			if v, ok := interface{}(m.GetLimit()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ContinuationTokenPayloadValidationError{
+						field:  "limit",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "after":
+
+			if v, ok := interface{}(m.GetAfter()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ContinuationTokenPayloadValidationError{
+						field:  "after",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "before":
+
+			if v, ok := interface{}(m.GetBefore()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ContinuationTokenPayloadValidationError{
+						field:  "before",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "f_port":
+
+			if v, ok := interface{}(m.GetFPort()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ContinuationTokenPayloadValidationError{
+						field:  "f_port",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "order":
+			// no validation rules for Order
+		case "field_mask":
+
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ContinuationTokenPayloadValidationError{
+						field:  "field_mask",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "last":
+
+			if v, ok := interface{}(m.GetLast()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ContinuationTokenPayloadValidationError{
+						field:  "last",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "last_received_id":
+			// no validation rules for LastReceivedId
+		default:
+			return ContinuationTokenPayloadValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ContinuationTokenPayloadValidationError is the validation error returned by
+// ContinuationTokenPayload.ValidateFields if the designated constraints
+// aren't met.
+type ContinuationTokenPayloadValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ContinuationTokenPayloadValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ContinuationTokenPayloadValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ContinuationTokenPayloadValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ContinuationTokenPayloadValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ContinuationTokenPayloadValidationError) ErrorName() string {
+	return "ContinuationTokenPayloadValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ContinuationTokenPayloadValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sContinuationTokenPayload.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ContinuationTokenPayloadValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ContinuationTokenPayloadValidationError{}
+
 // ValidateFields checks the field values on GetStoredApplicationUpRequest with
 // the rules defined in the proto definition for this message. If any rules
 // are violated, an error is returned.
@@ -161,6 +345,8 @@ func (m *GetStoredApplicationUpRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "continuation_token":
+			// no validation rules for ContinuationToken
 		default:
 			return GetStoredApplicationUpRequestValidationError{
 				field:  name,
