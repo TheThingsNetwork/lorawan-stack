@@ -103,6 +103,7 @@ func TestGatewayServer(t *testing.T) {
 				gsConfig := &gatewayserver.Config{
 					RequireRegisteredGateways:         false,
 					UpdateGatewayLocationDebounceTime: 0,
+					UpdateConnectionStatsInterval:     time.Second,
 					ConnectionStatsTTL:                (1 << 3) * test.Delay,
 					ConnectionStatsDisconnectTTL:      (1 << 6) * test.Delay,
 					Stats:                             statsRegistry,
