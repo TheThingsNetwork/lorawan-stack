@@ -843,6 +843,8 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item any) {
 	}
 }
 
+var errMessageCRC = errors.DefineInvalidArgument("message_crc", "message CRC failed")
+
 func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntry) {
 	var (
 		gtw      = conn.Gateway()
@@ -897,16 +899,19 @@ func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntr
 			if msg.Message.Payload == nil {
 				msg.Message.Payload = &ttnpb.Message{}
 				if err := lorawan.UnmarshalMessage(msg.Message.RawPayload, msg.Message.Payload); err != nil {
-					registerDropUplink(ctx, gtw, msg, "validation", err)
 					continue
 				}
 			}
+			registerReceiveUplink(ctx, gtw, msg, protocol)
+			if crcStatus := msg.Message.CrcStatus; crcStatus != nil && !crcStatus.Value {
+				registerDropUplink(ctx, gtw, msg, "", errMessageCRC.New())
+				continue
+			}
 			if err := msg.Message.Payload.ValidateFields(); err != nil {
-				registerDropUplink(ctx, gtw, msg, "validation", err)
+				registerDropUplink(ctx, gtw, msg, "", err)
 				continue
 			}
 			val = msg
-			registerReceiveUplink(ctx, gtw, msg, protocol)
 		case msg := <-conn.Status():
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:status:%s", events.NewCorrelationID()))
 			val = msg
@@ -921,13 +926,13 @@ func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntr
 			if d := msg.DownlinkMessage; d != nil {
 				d.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 			}
+			registerReceiveTxAck(ctx, gtw, msg, protocol)
 			if msg.Result == ttnpb.TxAcknowledgment_SUCCESS {
 				registerSuccessDownlink(ctx, gtw, protocol)
 			} else {
 				registerFailDownlink(ctx, gtw, msg, protocol)
 			}
 			val = msg
-			registerReceiveTxAck(ctx, gtw, msg, protocol)
 		}
 		for _, host := range hosts {
 			err := host.pool.Publish(ctx, val)

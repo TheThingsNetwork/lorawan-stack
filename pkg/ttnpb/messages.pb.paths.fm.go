@@ -5,6 +5,7 @@ package ttnpb
 var UplinkMessageFieldPathsNested = []string{
 	"consumed_airtime",
 	"correlation_ids",
+	"crc_status",
 	"device_channel_index",
 	"payload",
 	"payload.Payload",
@@ -81,6 +82,7 @@ var UplinkMessageFieldPathsNested = []string{
 var UplinkMessageFieldPathsTopLevel = []string{
 	"consumed_airtime",
 	"correlation_ids",
+	"crc_status",
 	"device_channel_index",
 	"payload",
 	"raw_payload",
@@ -465,6 +467,7 @@ var GatewayUplinkMessageFieldPathsNested = []string{
 	"message",
 	"message.consumed_airtime",
 	"message.correlation_ids",
+	"message.crc_status",
 	"message.device_channel_index",
 	"message.payload",
 	"message.payload.Payload",

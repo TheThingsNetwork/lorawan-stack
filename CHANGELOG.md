@@ -26,7 +26,8 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - Optional Network Server database migration that removes obsolete last invalidation keys is now available.
-- `Use LoRa Application Layer Clock Sync package` field is now available in the Console.
+- **Use LoRa Application Layer Clock Sync package** field is now available in the Console.
+- Drop uplink frames with CRC failure.
 
 ### Removed
 

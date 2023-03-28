@@ -20,6 +20,7 @@ import "github.com/TheThingsIndustries/protoc-gen-go-flags/annotations.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
+import "google/protobuf/wrappers.proto";
 import "lorawan-stack/api/error.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/keys.proto";
@@ -89,6 +90,11 @@ message UplinkMessage {
 
   // Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings.
   google.protobuf.Duration consumed_airtime = 10;
+
+  // Cyclic Redundancy Check (CRC) status of demodulating the frame.
+  // If unset, the modulation does not support CRC or the gateway did not provide a CRC status.
+  // If set to false, this message should not be processed.
+  google.protobuf.BoolValue crc_status = 11;
 }
 
 // Downlink message from the network to the end device

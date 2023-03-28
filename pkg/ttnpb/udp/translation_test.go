@@ -234,6 +234,7 @@ func TestToGatewayUpRoundtrip(t *testing.T) {
 					{
 						Freq: 868.0,
 						Chan: 2,
+						Stat: 1,
 						Modu: "LORA",
 						DatR: datarate.DR{
 							DataRate: &ttnpb.DataRate{
@@ -312,6 +313,7 @@ func TestToGatewayUpRaw(t *testing.T) {
 	a.So(msg.Settings.Frequency, should.Equal, 868100000)
 	a.So(msg.RxMetadata[0].Timestamp, should.Equal, 368384825)
 	a.So(len(msg.RawPayload), should.Equal, base64.StdEncoding.DecodedLen(len("Wqish6GVYpKy6o9WFHingeTJ1oh+ABc8iALBvwz44yxZP+BKDocaC5VQT5Y6dDdUaBILVjRMz0Ynzow1U/Kkts9AoZh3Ja3DX+DyY27exB+BKpSx2rXJ2vs9svm/EKYIsPF0RG1E+7lBYaD9"))) //nolint:lll
+	a.So(msg.CrcStatus.GetValue(), should.BeTrue)
 }
 
 func TestToGatewayUpRawLRFHSS(t *testing.T) {
@@ -339,6 +341,7 @@ func TestToGatewayUpRawLRFHSS(t *testing.T) {
 	a.So(msg.RxMetadata[0].Timestamp, should.Equal, 368384825)
 	a.So(msg.RxMetadata[0].HoppingWidth, should.Equal, 52)
 	a.So(len(msg.RawPayload), should.Equal, base64.StdEncoding.DecodedLen(len("Wqish6GVYpKy6o9WFHingeTJ1oh+ABc8iALBvwz44yxZP+BKDocaC5VQT5Y6dDdUaBILVjRMz0Ynzow1U/Kkts9AoZh3Ja3DX+DyY27exB+BKpSx2rXJ2vs9svm/EKYIsPF0RG1E+7lBYaD9"))) //nolint:lll
+	a.So(msg.CrcStatus.GetValue(), should.BeTrue)
 }
 
 func TestToGatewayUpRawMultiAntenna(t *testing.T) {
@@ -452,6 +455,7 @@ func TestToGatewayUpRawMultiAntenna(t *testing.T) {
 						FrequencyOffset:             -8898,
 					},
 				},
+				CrcStatus: wrapperspb.Bool(true),
 			},
 		},
 	})
