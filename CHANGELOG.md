@@ -29,6 +29,14 @@ For details about compatibility between different releases, see the **Commitment
 - **Use LoRa Application Layer Clock Sync package** field is now available in the Console.
 - Drop uplink frames with CRC failure.
 
+### Deprecated
+
+- Returning special float values, such as `NaN` and `Infinity` as part of the decoded payloads.
+  - While the concepts of `NaN` and `Infinity` are part of JavaScript, JSON does not have a dedicated value for such values.
+  - Historically we have rendered them in their string form, i.e. `"NaN"` and `"Infinity"`, but this form is not standard nor accepted by the standard libraries of most programming languages (at least by default).
+  - Most usages of `NaN` are actually result of operations with the JavaScript concept of `undefined`, and are not intentional. Mathematical operations that interact with `undefined` return `NaN` - for example `undefined * 5` is `NaN`. It is not hard to reach `undefined` in JavaScript, as array access to undefined indices is `undefined`, and payload decoders generally work by consuming the frame payload bytes.
+  - Future The Things Stack versions may not render such values, or may discard the decoded payload completely. The deprecation discussion can be tracked [on GitHub](https://github.com/TheThingsNetwork/lorawan-stack/issues/6128).
+
 ### Removed
 
 - Automatic migrations of the Network Server database using `ns-db migrate` from versions prior to v3.24 are removed. Migrating from prior versions should be done through v3.24 instead.
