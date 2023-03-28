@@ -1027,13 +1027,14 @@ func TestGatewayServer(t *testing.T) {
 					t.Run("Upstream", func(t *testing.T) {
 						uplinkCount := 0
 						for _, tc := range []struct {
-							Name           string
-							Up             *ttnpb.GatewayUp
-							Received       []uint32 // Timestamps of uplink messages in Up that are received.
-							Dropped        []uint32 // Timestamps of uplink messages in Up that are dropped.
-							PublicLocation bool     // If gateway location is public, it should be in RxMetadata
-							UplinkCount    int      // Number of expected uplinks
-							RepeatUpEvent  bool     // Expect event for repeated uplinks
+							Name                         string
+							Up                           *ttnpb.GatewayUp
+							Received                     []uint32 // Timestamps of uplink messages in Up that are received.
+							Dropped                      []uint32 // Timestamps of uplink messages in Up that are dropped.
+							PublicLocation               bool     // If gateway location is public, it should be in RxMetadata
+							UplinkCount                  int      // Number of expected uplinks
+							RepeatUpEvent                bool     // Expect event for repeated uplinks
+							SkipIfDetectsInvalidMessages bool     // Skip this test if the frontend detects invalid messages
 						}{
 							{
 								Name: "GatewayStatus",
@@ -1079,13 +1080,14 @@ func TestGatewayServer(t *testing.T) {
 													Location:    location,
 												},
 											},
-											RawPayload: randomUpDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 2, 2),
+											RawPayload: randomUpDataPayload(types.DevAddr{0x26, 0x02, 0xff, 0xff}, 2, 2),
 											CrcStatus:  wrapperspb.Bool(false),
 										},
 									},
 								},
-								Received: []uint32{100},
-								Dropped:  []uint32{100},
+								Received:                     []uint32{100},
+								Dropped:                      []uint32{100},
+								SkipIfDetectsInvalidMessages: true,
 							},
 							{
 								Name: "OneValidLoRa",
@@ -1336,6 +1338,10 @@ func TestGatewayServer(t *testing.T) {
 						} {
 							t.Run(tc.Name, func(t *testing.T) {
 								a := assertions.New(t)
+
+								if tc.SkipIfDetectsInvalidMessages && ptc.DetectsInvalidMessages {
+									t.Skip("Skipping test case because gateway detects invalid messages")
+								}
 
 								upEvents := map[string]events.Channel{}
 								for _, event := range []string{"gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive", "gs.io.up.repeat"} {
