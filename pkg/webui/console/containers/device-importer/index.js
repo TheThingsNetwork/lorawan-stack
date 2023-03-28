@@ -46,8 +46,10 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import randomByteString from '@console/lib/random-bytes'
 
 import { convertTemplate } from '@console/store/actions/device-template-formats'
+import { getTemplate } from '@console/store/actions/device-repository'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+import { selectDeviceTemplate } from '@console/store/selectors/device-repository'
 
 import style from './device-importer.styl'
 
@@ -117,6 +119,7 @@ const docLinkValue = msg => (
     const asConfig = selectAsConfig()
     const nsConfig = selectNsConfig()
     const jsConfig = selectJsConfig()
+    const deviceRepoTemplate = selectDeviceTemplate(state)
     const availableComponents = ['is']
     if (nsConfig.enabled) availableComponents.push('ns')
     if (jsConfig.enabled) availableComponents.push('js')
@@ -128,11 +131,14 @@ const docLinkValue = msg => (
       jsConfig,
       asConfig,
       availableComponents,
+      deviceRepoTemplate,
     }
   },
   dispatch => ({
     redirectToList: appId => dispatch(push(`/applications/${appId}/devices`)),
     convertTemplate: (format_id, data) => dispatch(attachPromise(convertTemplate(format_id, data))),
+    getRegistrationTemplate: (appId, version_ids) =>
+      dispatch(attachPromise(getTemplate(appId, version_ids))),
   }),
   (stateProps, dispatchProps, ownProps) => ({
     ...stateProps,
@@ -147,6 +153,7 @@ export default class DeviceImporter extends Component {
     asConfig: PropTypes.stackComponent.isRequired,
     availableComponents: PropTypes.components.isRequired,
     convertTemplate: PropTypes.func.isRequired,
+    getRegistrationTemplate: PropTypes.func.isRequired,
     jsConfig: PropTypes.stackComponent.isRequired,
     nsConfig: PropTypes.stackComponent.isRequired,
     redirectToList: PropTypes.func.isRequired,
@@ -220,7 +227,8 @@ export default class DeviceImporter extends Component {
 
   @bind
   async handleSubmit(values) {
-    const { appId, jsConfig, nsConfig, asConfig, convertTemplate } = this.props
+    const { appId, jsConfig, nsConfig, asConfig, convertTemplate, getRegistrationTemplate } =
+      this.props
     const {
       format_id,
       data,
@@ -234,11 +242,17 @@ export default class DeviceImporter extends Component {
 
     let devices = []
 
+    let template
+    if (Boolean(version_ids) && _inputMethod === 'device-repository') {
+      template = await getRegistrationTemplate(appId, version_ids)
+    }
+
     try {
       // Start template conversion.
       this.setState({ step: 'conversion', status: 'processing' })
       this.appendToLog('Converting end device templates…')
       const templateStream = await convertTemplate(format_id, data)
+
       devices = await new Promise((resolve, reject) => {
         const chunks = []
 
@@ -302,7 +316,28 @@ export default class DeviceImporter extends Component {
         }
         if (!device.version_ids && Boolean(version_ids) && _inputMethod === 'device-repository') {
           device.version_ids = version_ids
-          field_mask = `${field_mask},version_ids`
+          field_mask.paths.push('version_ids')
+
+          if (!device.lorawan_version) {
+            device.lorawan_version = template.end_device.lorawan_version
+            field_mask.paths.push('lorawan_version')
+          }
+          if (!device.lorawan_phy_version) {
+            device.lorawan_phy_version = template.end_device.lorawan_phy_version
+            field_mask.paths.push('lorawan_phy_version')
+          }
+          if (!device.supports_join) {
+            device.supports_join = template.end_device.supports_join
+            field_mask.paths.push('supports_join')
+          }
+          if (!device.mac_settings) {
+            device.mac_settings = template.end_device.mac_settings
+            field_mask.paths.push('mac_settings')
+          }
+          if (!device.frequency_plan_id) {
+            device.frequency_plan_id = frequency_plan_id
+            field_mask.paths.push('frequency_plan_id')
+          }
         }
       }
     } catch (error) {
