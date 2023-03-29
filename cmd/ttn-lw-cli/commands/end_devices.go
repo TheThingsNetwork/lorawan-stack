@@ -19,6 +19,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/rand"
+	"encoding/hex"
 	stdio "io"
 	"mime"
 	"os"
@@ -32,6 +33,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -519,7 +521,17 @@ var (
 					)
 				}
 			}
+
 			claimOnExternalJS := len(device.ClaimAuthenticationCode.GetValue()) > 0
+
+			// TODO: Remove this flag once the legacy DCS is deprecated (https://github.com/TheThingsIndustries/lorawan-stack/issues/3036).
+			if withClaimAuthenticationCode, _ := cmd.Flags().GetBool("with-claim-authentication-code"); withClaimAuthenticationCode {
+				device.ClaimAuthenticationCode = &ttnpb.EndDeviceAuthenticationCode{
+					Value: strings.ToUpper(hex.EncodeToString(random.Bytes(4))),
+				}
+				paths = append(paths, "claim_authentication_code")
+				logger.Warn("Generating claim authentication codes will be deprecated in the future. Use a valid claim authentication code registered with a Join Server instead.")
+			}
 
 			if hasUpdateDeviceLocationFlags(cmd.Flags()) {
 				updateDeviceLocation(device, cmd.Flags())
@@ -1661,13 +1673,6 @@ func init() {
 
 	endDevicesListPhyVersionsCommand.Flags().AddFlagSet(listPhyVersionFlags)
 	endDevicesCommand.AddCommand(endDevicesListPhyVersionsCommand)
-
-	// Deprecate flags.
-	util.DeprecateWithoutForwarding(
-		endDevicesCreateCommand.Flags(),
-		"with-claim-authentication-code",
-		"use a valid claim authentication code registered with a Join Server instead",
-	)
 
 	Root.AddCommand(endDevicesCommand)
 

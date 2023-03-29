@@ -40,8 +40,8 @@ func DeprecateFlag(flagSet *pflag.FlagSet, old string, new string) {
 	}
 }
 
-// DeprecateWithoutForwarding deprecates a CLI flag without forwarding it to a new flag.
-func DeprecateWithoutForwarding(flagSet *pflag.FlagSet, flag string, reason string) {
+// DeprecateFlagWithoutForwarding deprecates a CLI flag without forwarding it to a new flag.
+func DeprecateFlagWithoutForwarding(flagSet *pflag.FlagSet, flag string, reason string) {
 	if flag := flagSet.Lookup(flag); flag != nil {
 		flag.Deprecated = reason
 		flag.Hidden = true

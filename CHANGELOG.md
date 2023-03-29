@@ -21,7 +21,7 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
-- Attempting to claim an end device with a generate DevEUI will now result in an error.
+- Attempting to claim an end device with a generated DevEUI will now result in an error.
 
 ### Security
 
