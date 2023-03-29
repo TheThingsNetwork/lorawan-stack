@@ -70,27 +70,19 @@ func (ps *PubSubStore) eventStream(ctx context.Context, ids *ttnpb.EntityIdentif
 	return ps.client.Key("event_stream", ids.EntityType(), unique.ID(ctx, ids))
 }
 
-func (ps *PubSubStore) storeEvent(ctx context.Context, tx redis.Cmdable, evt events.Event) error {
+func (ps *PubSubStore) storeEvent(
+	ctx context.Context, tx redis.Cmdable, evt events.Event, correlationIDKeys map[string]struct{},
+) error {
 	b, err := encodeEventData(evt)
 	if err != nil {
 		return err
 	}
-	expiration := strconv.FormatInt(time.Now().Add(-ps.historyTTL).UnixNano(), 10)
 	ttl := random.Jitter(ps.historyTTL, ttlJitter)
 	tx.Set(ctx, ps.eventDataKey(evt.Context(), evt.UniqueID()), b, ttl)
 	for _, cid := range evt.CorrelationIds() {
 		key := ps.eventIndexKey(evt.Context(), cid)
-		tx.ZAdd(ctx, key, redis.Z{
-			Score:  float64(evt.Time().UnixNano()),
-			Member: evt.UniqueID(),
-		})
-		// Delete the oldest entries in the sorted set, by rank. Note that the range
-		// is inclusive, and as such we subtract one in order to keep only the last
-		// ps.correlationIDHistoryCount elements.
-		tx.ZRemRangeByRank(ctx, key, 0, int64(-ps.correlationIDHistoryCount-1))
-		// Delete the oldest entries in the sorted set, by time.
-		tx.ZRemRangeByScore(ctx, key, "-inf", expiration)
-		tx.PExpire(ctx, key, ttl)
+		tx.LPush(ctx, key, evt.UniqueID())
+		correlationIDKeys[key] = struct{}{}
 	}
 	return nil
 }
@@ -433,12 +425,7 @@ func (ps *PubSubStore) SubscribeWithHistory(
 
 // FindRelated finds events with matching correlation IDs.
 func (ps *PubSubStore) FindRelated(ctx context.Context, correlationID string) ([]events.Event, error) {
-	uids, err := ps.client.ZRangeArgs(ctx, redis.ZRangeArgs{
-		Key:     ps.eventIndexKey(ctx, correlationID),
-		Start:   "-inf",
-		Stop:    "inf",
-		ByScore: true,
-	}).Result()
+	uids, err := ps.client.LRange(ctx, ps.eventIndexKey(ctx, correlationID), 0, -1).Result()
 	if err != nil {
 		return nil, err
 	}
@@ -472,8 +459,9 @@ func (ps *PubSubStore) Publish(evs ...events.Event) {
 	tx := ps.client.TxPipeline()
 
 	eventStreams := make(map[string]struct{}, len(evs))
+	correlationIDKeys := make(map[string]struct{}, len(evs))
 	for _, evt := range evs {
-		if err := ps.storeEvent(ps.ctx, tx, evt); err != nil {
+		if err := ps.storeEvent(ps.ctx, tx, evt, correlationIDKeys); err != nil {
 			logger.WithError(err).Warn("Failed to store event")
 			continue
 		}
@@ -515,11 +503,15 @@ func (ps *PubSubStore) Publish(evs ...events.Event) {
 		}
 	}
 
-	entityHistoryMinID := formatStreamTime(time.Now().Add(-ps.entityHistoryTTL))
 	entityHistoryTTL := random.Jitter(ps.entityHistoryTTL, ttlJitter)
 	for eventStream := range eventStreams {
 		tx.PExpire(ps.ctx, eventStream, entityHistoryTTL)
-		tx.XTrimMinIDApprox(ps.ctx, eventStream, entityHistoryMinID, 0)
+	}
+
+	historyTTL := random.Jitter(ps.historyTTL, ttlJitter)
+	for correlationIDKey := range correlationIDKeys {
+		tx.LTrim(ps.ctx, correlationIDKey, 0, int64(ps.correlationIDHistoryCount))
+		tx.PExpire(ps.ctx, correlationIDKey, historyTTL)
 	}
 
 	if err := ps.transactionPool.Publish(ps.ctx, tx); err != nil {
