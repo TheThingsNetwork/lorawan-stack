@@ -1,0 +1,15 @@
+{
+    "ids": {
+      "device_id": "device-from-device-repo",
+      "dev_eui": "0102030405060709",
+      "join_eui": "0102030405060709"
+    },
+    "name": "Device from device repository",
+    "description": "Load fallback values from the device repository",
+    "supports_join": true,
+    "root_keys": {
+      "app_key": {
+        "key": "01020304050607080102030405060709"
+      }
+    }
+  }

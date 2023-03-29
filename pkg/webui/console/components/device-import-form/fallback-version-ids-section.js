@@ -78,16 +78,15 @@ const FallbackVersionIdsSection = () => {
       <Col>
         <VersionIdsSection />
         {showOtherHint && <OtherHint manualGuideDocsPath="/devices/adding-devices/" />}
-        {hasValidType && (
-          <FreqPlansSelect
-            required
-            className="mt-ls-xxs"
-            tooltipId={tooltipIds.FREQUENCY_PLAN}
-            name="frequency_plan_id"
-            bandId={version_ids.band_id}
-            autoFocus
-          />
-        )}
+        <FreqPlansSelect
+          required
+          disabled={!hasValidType}
+          className="mt-ls-xxs"
+          tooltipId={tooltipIds.FREQUENCY_PLAN}
+          name="frequency_plan_id"
+          bandId={version_ids.band_id}
+          autoFocus
+        />
       </Col>
     </Row>
   )
