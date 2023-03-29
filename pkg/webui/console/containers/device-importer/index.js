@@ -241,7 +241,6 @@ export default class DeviceImporter extends Component {
     } = values
 
     let devices = []
-    const template = deviceRepoTemplate
 
     try {
       // Start template conversion.
