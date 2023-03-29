@@ -46,7 +46,6 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import randomByteString from '@console/lib/random-bytes'
 
 import { convertTemplate } from '@console/store/actions/device-template-formats'
-import { getTemplate } from '@console/store/actions/device-repository'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 import { selectDeviceTemplate } from '@console/store/selectors/device-repository'
@@ -137,8 +136,6 @@ const docLinkValue = msg => (
   dispatch => ({
     redirectToList: appId => dispatch(push(`/applications/${appId}/devices`)),
     convertTemplate: (format_id, data) => dispatch(attachPromise(convertTemplate(format_id, data))),
-    getRegistrationTemplate: (appId, version_ids) =>
-      dispatch(attachPromise(getTemplate(appId, version_ids))),
   }),
   (stateProps, dispatchProps, ownProps) => ({
     ...stateProps,
@@ -153,10 +150,14 @@ export default class DeviceImporter extends Component {
     asConfig: PropTypes.stackComponent.isRequired,
     availableComponents: PropTypes.components.isRequired,
     convertTemplate: PropTypes.func.isRequired,
-    getRegistrationTemplate: PropTypes.func.isRequired,
+    deviceRepoTemplate: PropTypes.deviceTemplate,
     jsConfig: PropTypes.stackComponent.isRequired,
     nsConfig: PropTypes.stackComponent.isRequired,
     redirectToList: PropTypes.func.isRequired,
+  }
+
+  static defaultProps = {
+    deviceRepoTemplate: undefined,
   }
 
   constructor(props) {
@@ -227,8 +228,7 @@ export default class DeviceImporter extends Component {
 
   @bind
   async handleSubmit(values) {
-    const { appId, jsConfig, nsConfig, asConfig, convertTemplate, getRegistrationTemplate } =
-      this.props
+    const { appId, jsConfig, nsConfig, asConfig, convertTemplate, deviceRepoTemplate } = this.props
     const {
       format_id,
       data,
@@ -241,11 +241,7 @@ export default class DeviceImporter extends Component {
     } = values
 
     let devices = []
-
-    let template
-    if (Boolean(version_ids) && _inputMethod === 'device-repository') {
-      template = await getRegistrationTemplate(appId, version_ids)
-    }
+    const template = deviceRepoTemplate
 
     try {
       // Start template conversion.
@@ -318,23 +314,23 @@ export default class DeviceImporter extends Component {
           device.version_ids = version_ids
           field_mask.paths.push('version_ids')
 
-          if (!device.lorawan_version) {
-            device.lorawan_version = template.end_device.lorawan_version
+          if (!device.lorawan_version && deviceRepoTemplate) {
+            device.lorawan_version = deviceRepoTemplate.end_device.lorawan_version
             field_mask.paths.push('lorawan_version')
           }
-          if (!device.lorawan_phy_version) {
-            device.lorawan_phy_version = template.end_device.lorawan_phy_version
+          if (!device.lorawan_phy_version && deviceRepoTemplate) {
+            device.lorawan_phy_version = deviceRepoTemplate.end_device.lorawan_phy_version
             field_mask.paths.push('lorawan_phy_version')
           }
-          if (!device.supports_join) {
-            device.supports_join = template.end_device.supports_join
+          if (!device.supports_join && deviceRepoTemplate) {
+            device.supports_join = deviceRepoTemplate.end_device.supports_join
             field_mask.paths.push('supports_join')
           }
-          if (!device.mac_settings) {
-            device.mac_settings = template.end_device.mac_settings
+          if (!device.mac_settings && deviceRepoTemplate) {
+            device.mac_settings = deviceRepoTemplate.end_device.mac_settings
             field_mask.paths.push('mac_settings')
           }
-          if (!device.frequency_plan_id) {
+          if (!device.frequency_plan_id && Boolean(frequency_plan_id)) {
             device.frequency_plan_id = frequency_plan_id
             field_mask.paths.push('frequency_plan_id')
           }
