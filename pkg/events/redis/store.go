@@ -81,10 +81,7 @@ func (ps *PubSubStore) storeEvent(
 	tx.Set(ctx, ps.eventDataKey(evt.Context(), evt.UniqueID()), b, ttl)
 	for _, cid := range evt.CorrelationIds() {
 		key := ps.eventIndexKey(evt.Context(), cid)
-		tx.ZAdd(ctx, key, redis.Z{
-			Score:  float64(evt.Time().UnixNano()),
-			Member: evt.UniqueID(),
-		})
+		tx.LPush(ctx, key, evt.UniqueID())
 		correlationIDKeys[key] = struct{}{}
 	}
 	return nil
@@ -428,12 +425,7 @@ func (ps *PubSubStore) SubscribeWithHistory(
 
 // FindRelated finds events with matching correlation IDs.
 func (ps *PubSubStore) FindRelated(ctx context.Context, correlationID string) ([]events.Event, error) {
-	uids, err := ps.client.ZRangeArgs(ctx, redis.ZRangeArgs{
-		Key:     ps.eventIndexKey(ctx, correlationID),
-		Start:   "-inf",
-		Stop:    "inf",
-		ByScore: true,
-	}).Result()
+	uids, err := ps.client.LRange(ctx, ps.eventIndexKey(ctx, correlationID), 0, -1).Result()
 	if err != nil {
 		return nil, err
 	}
@@ -511,24 +503,15 @@ func (ps *PubSubStore) Publish(evs ...events.Event) {
 		}
 	}
 
-	now := time.Now()
-	entityHistoryMinID := formatStreamTime(now.Add(-ps.entityHistoryTTL))
 	entityHistoryTTL := random.Jitter(ps.entityHistoryTTL, ttlJitter)
 	for eventStream := range eventStreams {
 		tx.PExpire(ps.ctx, eventStream, entityHistoryTTL)
-		tx.XTrimMinIDApprox(ps.ctx, eventStream, entityHistoryMinID, 0)
 	}
 
-	historyExpiration := strconv.FormatInt(now.Add(-ps.historyTTL).UnixNano(), 10)
 	historyTTL := random.Jitter(ps.historyTTL, ttlJitter)
-	for key := range correlationIDKeys {
-		// Delete the oldest entries in the sorted set, by rank. Note that the range
-		// is inclusive, and as such we subtract one in order to keep only the last
-		// ps.correlationIDHistoryCount elements.
-		tx.ZRemRangeByRank(ps.ctx, key, 0, int64(-ps.correlationIDHistoryCount-1))
-		// Delete the oldest entries in the sorted set, by time.
-		tx.ZRemRangeByScore(ps.ctx, key, "-inf", historyExpiration)
-		tx.PExpire(ps.ctx, key, historyTTL)
+	for correlationIDKey := range correlationIDKeys {
+		tx.LTrim(ps.ctx, correlationIDKey, 0, int64(ps.correlationIDHistoryCount))
+		tx.PExpire(ps.ctx, correlationIDKey, historyTTL)
 	}
 
 	if err := ps.transactionPool.Publish(ps.ctx, tx); err != nil {
