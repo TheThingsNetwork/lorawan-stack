@@ -38,6 +38,48 @@ describe('End device messaging', () => {
       cy.visit(`${Cypress.config('consoleRootPath')}/applications/${appId}/devices/import`)
     })
 
+    it('succeeds importing a device with fallback values from the device repository', () => {
+      cy.intercept(
+        'GET',
+        '/api/v3/dr/applications/import-devices-test-application/brands/the-things-products/models/the-things-uno/quickstart/EU_863_870/template',
+      ).as('fetchTemplate')
+      const devicesFile = 'fallback-from-device-repo.json'
+      cy.findByLabelText('File format').selectOption('The Things Stack JSON')
+      cy.findByLabelText('File').attachFile(devicesFile)
+      cy.findByLabelText('Load end device profile from the LoRaWAN Device Repository').check()
+      cy.findByLabelText('End device brand').selectOption('the-things-products')
+      cy.findByLabelText('Model').selectOption('The Things Uno')
+      cy.findByLabelText('Hardware Ver.').selectOption('1.0')
+      cy.findByLabelText('Firmware Ver.').selectOption('quickstart')
+      cy.findByLabelText('Profile (Region)').selectOption('EU_863_870')
+      cy.wait('@fetchTemplate')
+      cy.findByLabelText('Frequency plan').selectOption('EU_863_870_TTN')
+      cy.findByRole('button', { name: 'Import end devices' }).click()
+      cy.findByTestId('progress-bar').should('be.visible')
+      cy.findByTestId('notification')
+        .findByText('All end devices imported successfully')
+        .should('be.visible')
+      cy.findByRole('button', { name: 'Proceed to end device list' }).click()
+      cy.location('pathname').should(
+        'eq',
+        `${Cypress.config('consoleRootPath')}/applications/${appId}/devices`,
+      )
+      cy.findByTestId('error-notification').should('not.exist')
+      cy.visit(
+        `${Cypress.config(
+          'consoleRootPath',
+        )}/applications/${appId}/devices/device-from-device-repo/general-settings`,
+      )
+      cy.findByText('Network layer', { selector: 'h3' })
+        .closest('[data-test-id="collapsible-section"]')
+        .within(() => {
+          cy.findByRole('button', { name: 'Expand' }).click()
+          cy.findByText(/Europe 863-870 MHz/).should('be.visible')
+          cy.findByText('LoRaWAN Specification 1.0.2').should('be.visible')
+          cy.findByText('RP001 Regional Parameters 1.0.2 revision B').should('be.visible')
+        })
+    })
+
     it('succeeds uploading a device file', () => {
       cy.findByText('Import end devices').should('be.visible')
       cy.findByLabelText('File format').selectOption('The Things Stack JSON')
@@ -94,6 +136,10 @@ describe('End device messaging', () => {
     })
 
     it('succeeds setting lorawan_version, lorawan_phy_version and frequency_plan_id from fallback values', () => {
+      cy.intercept(
+        'PUT',
+        '/api/v3/js/applications/import-devices-test-application/devices/this-is-fallback-test-id',
+      ).as('importDevice')
       const devicesFile = 'freqId-version-phy-device.json'
       const fallbackValues = {
         lorawan_version: 'MAC_V1_0',
@@ -101,12 +147,13 @@ describe('End device messaging', () => {
       }
       cy.findByLabelText('File format').selectOption('The Things Stack JSON')
       cy.findByLabelText('File').attachFile(devicesFile)
+      cy.findByLabelText('Enter LoRaWAN versions and frequency plan manually').check()
       cy.findByLabelText('Frequency plan').selectOption(fallbackValues.frequency_plan_id)
       cy.findByLabelText('LoRaWAN version').selectOption(fallbackValues.lorawan_version)
-
+      cy.findByLabelText('LoRaWAN version').blur()
       cy.findByRole('button', { name: 'Import end devices' }).click()
-      cy.findByText('Operation finished').should('be.visible')
-      cy.findByText('3 of 3 (100.00% finished)').should('be.visible')
+      cy.findByTestId('progress-bar').should('be.visible')
+      cy.wait('@importDevice')
       cy.findByTestId('notification')
         .findByText('All end devices imported successfully')
         .should('be.visible')

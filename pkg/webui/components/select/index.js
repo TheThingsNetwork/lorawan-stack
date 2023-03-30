@@ -48,6 +48,7 @@ class Select extends React.PureComponent {
     intl: PropTypes.shape({
       formatMessage: PropTypes.func,
     }).isRequired,
+    menuPlacement: PropTypes.string,
     name: PropTypes.string.isRequired,
     onBlur: PropTypes.func,
     onChange: PropTypes.func,
@@ -76,6 +77,7 @@ class Select extends React.PureComponent {
     id: undefined,
     inputWidth: 'm',
     placeholder: undefined,
+    menuPlacement: 'auto',
   }
 
   constructor(props) {

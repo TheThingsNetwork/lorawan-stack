@@ -13,7 +13,7 @@
 // limitations under the License.
 
 const { cypressBrowserPermissionsPlugin } = require('cypress-browser-permissions')
-const logToOutput = require('cypress-log-to-output')
+const cypressLogToOutput = require('cypress-log-to-output')
 
 const tasks = require('./tasks')
 
@@ -30,6 +30,10 @@ module.exports = (on, config) => {
   }
 
   on('before:browser:launch', (browser = {}, launchOptions) => {
+    // Log console log to output when debug mode is enabled.
+    if (process.env.RUNNER_DEBUG) {
+      launchOptions.args = cypressLogToOutput.browserLaunchHandler(browser, launchOptions.args)
+    }
     if (browser.family === 'chromium' && browser.name !== 'electron') {
       launchOptions.args.push(
         '--use-file-for-fake-video-capture=cypress/fixtures/qr-code-mock-feed.y4m',
@@ -38,11 +42,6 @@ module.exports = (on, config) => {
 
     if (browser.name === 'chrome' && browser.isHeadless) {
       launchOptions.args.push('--disable-gpu')
-    }
-
-    if (browser.name === 'chrome' && process.env.RUNNER_DEBUG) {
-      // eslint-disable-next-line no-param-reassign
-      launchOptions = logToOutput.browserLaunchHandler(browser, launchOptions)
     }
 
     return launchOptions

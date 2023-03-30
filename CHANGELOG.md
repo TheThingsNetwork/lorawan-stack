@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Fallback end device version identifiers to be used while importing end devices using the Console.
+
 ### Changed
 
 ### Deprecated

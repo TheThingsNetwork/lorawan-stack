@@ -16,16 +16,21 @@ import React, { useCallback, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Col, Row } from 'react-grid-system'
 import { useFormikContext } from 'formik'
-import classnames from 'classnames'
 import { get, set } from 'lodash'
 
 import { useFormContext } from '@ttn-lw/components/form'
 
 import FreqPlansSelect from '@console/containers/device-freq-plans-select'
+import VersionIdsSection, { initialValues } from '@console/containers/device-profile-section'
+import ProgressHint from '@console/containers/device-profile-section/hints/progress-hint'
+import OtherHint from '@console/containers/device-profile-section/hints/other-hint'
+import Card from '@console/containers/device-profile-section/device-card'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import { selectSupportLinkConfig } from '@ttn-lw/lib/selectors/env'
+
+import { hasSelectedDeviceRepositoryOther } from '@console/lib/device-utils'
 
 import { getTemplate } from '@console/store/actions/device-repository'
 
@@ -33,51 +38,7 @@ import { selectDeviceTemplate } from '@console/store/selectors/device-repository
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
 import { initialValues as provisioningInitialValues } from '../../provisioning-form-section'
-import {
-  hasCompletedDeviceRepositorySelection,
-  hasSelectedDeviceRepositoryOther,
-  hasValidDeviceRepositoryType,
-  isOtherOption,
-} from '../../utils'
-
-import ProgressHint from './hints/progress-hint'
-import OtherHint from './hints/other-hint'
-import Card from './device-card'
-import BrandSelect from './device-selection/brand-select'
-import ModelSelect from './device-selection/model-select'
-import HardwareVersionSelect from './device-selection/hw-version-select'
-import FirmwareVersionSelect from './device-selection/fw-version-select'
-import BandSelect from './device-selection/band-select'
-
-import style from './repository.styl'
-
-const brandValueSetter = ({ setValues }, { value }) =>
-  setValues(values => ({
-    ...values,
-    version_ids: {
-      ...initialValues.version_ids,
-      brand_id: value,
-    },
-  }))
-const modelValueSetter = ({ setValues }, { value }) =>
-  setValues(values => ({
-    ...values,
-    version_ids: {
-      ...initialValues.version_ids,
-      brand_id: values.version_ids.brand_id,
-      model_id: value,
-    },
-  }))
-
-const initialValues = {
-  version_ids: {
-    brand_id: '',
-    model_id: '',
-    hardware_version: '',
-    firmware_version: '',
-    band_id: '',
-  },
-}
+import { hasCompletedDeviceRepositorySelection, hasValidDeviceRepositoryType } from '../../utils'
 
 const DeviceTypeRepositoryFormSection = () => {
   const appId = useSelector(selectSelectedApplicationId)
@@ -94,16 +55,10 @@ const DeviceTypeRepositoryFormSection = () => {
   const version = version_ids
   const brand = version_ids?.brand_id
   const model = version_ids?.model_id
-  const hardwareVersion = version_ids?.hardware_version
   const firmwareVersion = version_ids?.firmware_version
   const band = version_ids?.band_id
   const template = useSelector(selectDeviceTemplate)
   const supportLink = useSelector(selectSupportLinkConfig)
-
-  const hasBrand = Boolean(brand) && !isOtherOption(brand)
-  const hasModel = Boolean(model) && !isOtherOption(model)
-  const hasHwVersion = Boolean(hardwareVersion) && !isOtherOption(hardwareVersion)
-  const hasFwVersion = Boolean(firmwareVersion) && !isOtherOption(firmwareVersion)
 
   const hasSelectedOther = hasSelectedDeviceRepositoryOther(version)
   const hasCompleted = hasCompletedDeviceRepositorySelection(version)
@@ -180,56 +135,7 @@ const DeviceTypeRepositoryFormSection = () => {
   return (
     <Row>
       <Col>
-        <div className={style.configurationSection}>
-          <BrandSelect
-            className={classnames(style.select, style.selectS)}
-            name="version_ids.brand_id"
-            required
-            tooltipId={tooltipIds.DEVICE_BRAND}
-            valueSetter={brandValueSetter}
-          />
-          {hasBrand && (
-            <ModelSelect
-              className={classnames(style.select, style.selectS)}
-              name="version_ids.model_id"
-              required
-              brandId={brand}
-              tooltipId={tooltipIds.DEVICE_MODEL}
-              valueSetter={modelValueSetter}
-            />
-          )}
-          {hasModel && (
-            <HardwareVersionSelect
-              className={classnames(style.select, style.selectXs)}
-              required
-              brandId={brand}
-              modelId={model}
-              name="version_ids.hardware_version"
-              tooltipId={tooltipIds.DEVICE_HARDWARE_VERSION}
-            />
-          )}
-          {hasHwVersion && (
-            <FirmwareVersionSelect
-              className={classnames(style.select, style.selectXs)}
-              required
-              name="version_ids.firmware_version"
-              brandId={brand}
-              modelId={model}
-              hwVersion={hardwareVersion}
-              tooltipId={tooltipIds.DEVICE_FIRMWARE_VERSION}
-            />
-          )}
-          {hasFwVersion && (
-            <BandSelect
-              className={classnames(style.select, style.selectS)}
-              required
-              name="version_ids.band_id"
-              fwVersion={firmwareVersion}
-              brandId={brand}
-              modelId={model}
-            />
-          )}
-        </div>
+        <VersionIdsSection />
         {showProgressHint && <ProgressHint supportLink={supportLink} />}
         {showOtherHint && <OtherHint manualGuideDocsPath="/devices/adding-devices/" />}
         {showDeviceCard && <Card brandId={brand} modelId={model} template={template} />}

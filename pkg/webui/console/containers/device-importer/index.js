@@ -48,6 +48,7 @@ import randomByteString from '@console/lib/random-bytes'
 import { convertTemplate } from '@console/store/actions/device-template-formats'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+import { selectDeviceTemplate } from '@console/store/selectors/device-repository'
 
 import style from './device-importer.styl'
 
@@ -117,6 +118,7 @@ const docLinkValue = msg => (
     const asConfig = selectAsConfig()
     const nsConfig = selectNsConfig()
     const jsConfig = selectJsConfig()
+    const deviceRepoTemplate = selectDeviceTemplate(state)
     const availableComponents = ['is']
     if (nsConfig.enabled) availableComponents.push('ns')
     if (jsConfig.enabled) availableComponents.push('js')
@@ -128,6 +130,7 @@ const docLinkValue = msg => (
       jsConfig,
       asConfig,
       availableComponents,
+      deviceRepoTemplate,
     }
   },
   dispatch => ({
@@ -147,9 +150,14 @@ export default class DeviceImporter extends Component {
     asConfig: PropTypes.stackComponent.isRequired,
     availableComponents: PropTypes.components.isRequired,
     convertTemplate: PropTypes.func.isRequired,
+    deviceRepoTemplate: PropTypes.deviceTemplate,
     jsConfig: PropTypes.stackComponent.isRequired,
     nsConfig: PropTypes.stackComponent.isRequired,
     redirectToList: PropTypes.func.isRequired,
+  }
+
+  static defaultProps = {
+    deviceRepoTemplate: undefined,
   }
 
   constructor(props) {
@@ -220,7 +228,7 @@ export default class DeviceImporter extends Component {
 
   @bind
   async handleSubmit(values) {
-    const { appId, jsConfig, nsConfig, asConfig, convertTemplate } = this.props
+    const { appId, jsConfig, nsConfig, asConfig, convertTemplate, deviceRepoTemplate } = this.props
     const {
       format_id,
       data,
@@ -228,6 +236,8 @@ export default class DeviceImporter extends Component {
       frequency_plan_id,
       lorawan_version,
       lorawan_phy_version,
+      version_ids,
+      _inputMethod,
     } = values
 
     let devices = []
@@ -237,6 +247,7 @@ export default class DeviceImporter extends Component {
       this.setState({ step: 'conversion', status: 'processing' })
       this.appendToLog('Converting end device templates…')
       const templateStream = await convertTemplate(format_id, data)
+
       devices = await new Promise((resolve, reject) => {
         const chunks = []
 
@@ -254,7 +265,7 @@ export default class DeviceImporter extends Component {
         throw conversionError
       }
 
-      await this.setState({ convertedDevices: devices })
+      this.setState({ convertedDevices: devices })
       // Apply default values.
       for (const deviceAndFieldMask of devices) {
         const { end_device: device, field_mask } = deviceAndFieldMask
@@ -275,17 +286,53 @@ export default class DeviceImporter extends Component {
           device.network_server_address = new URL(nsConfig.base_url).hostname
           field_mask.paths.push('network_server_address')
         }
-        if (!device.frequency_plan_id && Boolean(frequency_plan_id) && nsConfig.enabled) {
+
+        // Fallback values
+        if (
+          !device.frequency_plan_id &&
+          Boolean(frequency_plan_id) &&
+          nsConfig.enabled &&
+          _inputMethod === 'manual'
+        ) {
           device.frequency_plan_id = frequency_plan_id
           field_mask.paths.push('frequency_plan_id')
         }
-        if (!device.lorawan_version && Boolean(lorawan_version)) {
+        if (!device.lorawan_version && Boolean(lorawan_version) && _inputMethod === 'manual') {
           device.lorawan_version = lorawan_version
           field_mask.paths.push('lorawan_version')
         }
-        if (!device.lorawan_phy_version && Boolean(lorawan_phy_version)) {
+        if (
+          !device.lorawan_phy_version &&
+          Boolean(lorawan_phy_version) &&
+          _inputMethod === 'manual'
+        ) {
           device.lorawan_phy_version = lorawan_phy_version
           field_mask.paths.push('lorawan_phy_version')
+        }
+        if (!device.version_ids && Boolean(version_ids) && _inputMethod === 'device-repository') {
+          device.version_ids = version_ids
+          field_mask.paths.push('version_ids')
+
+          if (!device.lorawan_version && deviceRepoTemplate) {
+            device.lorawan_version = deviceRepoTemplate.end_device.lorawan_version
+            field_mask.paths.push('lorawan_version')
+          }
+          if (!device.lorawan_phy_version && deviceRepoTemplate) {
+            device.lorawan_phy_version = deviceRepoTemplate.end_device.lorawan_phy_version
+            field_mask.paths.push('lorawan_phy_version')
+          }
+          if (!device.supports_join && deviceRepoTemplate) {
+            device.supports_join = deviceRepoTemplate.end_device.supports_join
+            field_mask.paths.push('supports_join')
+          }
+          if (!device.mac_settings && deviceRepoTemplate) {
+            device.mac_settings = deviceRepoTemplate.end_device.mac_settings
+            field_mask.paths.push('mac_settings')
+          }
+          if (!device.frequency_plan_id && Boolean(frequency_plan_id)) {
+            device.frequency_plan_id = frequency_plan_id
+            field_mask.paths.push('frequency_plan_id')
+          }
         }
       }
     } catch (error) {
@@ -490,6 +537,17 @@ export default class DeviceImporter extends Component {
       format_id: '',
       data: '',
       set_claim_auth_code: true,
+      _inputMethod: 'no-fallback',
+      frequency_plan_id: '',
+      lorawan_version: '',
+      lorawan_phy_version: '',
+      version_ids: {
+        brand_id: '',
+        model_id: '',
+        firmware_version: '',
+        hardware_version: '',
+        band_id: '',
+      },
     }
     const largeFile = 10 * 1024 * 1024
     return (
