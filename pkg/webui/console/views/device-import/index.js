@@ -21,11 +21,12 @@ import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import Notification from '@ttn-lw/components/notification'
 import PageTitle from '@ttn-lw/components/page-title'
-import ErrorNotification from '@ttn-lw/components/error-notification'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import DeviceImporter from '@console/containers/device-importer'
+
+import SubViewError from '@console/views/sub-view-error'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -58,7 +59,7 @@ const DeviceAddBulk = () => {
   return (
     <RequireRequest
       requestAction={listBrands(appId, {}, ['name', 'lora_alliance_vendor_id'])}
-      errorRenderFunction={ErrorNotification}
+      errorRenderFunction={SubViewError}
       spinnerProps={{ center: false, inline: true }}
     >
       <Container>

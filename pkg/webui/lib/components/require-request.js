@@ -44,7 +44,7 @@ const RequireRequest = ({
   }
 
   if (error && handleErrors) {
-    return <ErrorRenderFunction error={error} content={error} />
+    return <ErrorRenderFunction error={error} />
   }
 
   return children
