@@ -1331,6 +1331,15 @@
       "file": "simulate.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:claim_generated_eui": {
+    "translations": {
+      "en": "cannot claim end device with a randomly generated DevEUI. Use a valid DevEUI registered with a Join Server"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "end_devices.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:conflicting_paths": {
     "translations": {
       "en": "conflicting set and unset field mask paths"
@@ -1406,15 +1415,6 @@
   "error:cmd/ttn-lw-cli/commands:end_device_server_address_mismatch": {
     "translations": {
       "en": "Network/Application/Join Server address mismatch"
-    },
-    "description": {
-      "package": "cmd/ttn-lw-cli/commands",
-      "file": "end_devices.go"
-    }
-  },
-  "error:cmd/ttn-lw-cli/commands:end_device_unclaim": {
-    "translations": {
-      "en": "could not unclaim end device"
     },
     "description": {
       "package": "cmd/ttn-lw-cli/commands",
