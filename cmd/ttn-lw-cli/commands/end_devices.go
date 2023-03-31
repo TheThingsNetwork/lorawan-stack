@@ -168,10 +168,22 @@ func generateKey() *types.AES128Key {
 }
 
 var (
-	errJoinServerDisabled         = errors.DefineFailedPrecondition("join_server_disabled", "Join Server is disabled")
-	errNetworkServerDisabled      = errors.DefineFailedPrecondition("network_server_disabled", "Network Server is disabled")
-	errEndDeviceClaimInfo         = errors.DefineFailedPrecondition("end_device_claim_info", "could not get end device claim info from DCS")
-	errEndDeviceClaim             = errors.DefineFailedPrecondition("end_device_claim", "could not claim end device")
+	errJoinServerDisabled = errors.DefineFailedPrecondition(
+		"join_server_disabled",
+		"Join Server is disabled",
+	)
+	errNetworkServerDisabled = errors.DefineFailedPrecondition(
+		"network_server_disabled",
+		"Network Server is disabled",
+	)
+	errEndDeviceClaimInfo = errors.DefineFailedPrecondition(
+		"end_device_claim_info",
+		"could not get end device claim info from DCS",
+	)
+	errEndDeviceClaim = errors.DefineFailedPrecondition(
+		"end_device_claim",
+		"could not claim end device",
+	)
 	errEndDeviceClaimGeneratedEUI = errors.DefineInvalidArgument(
 		"claim_generated_eui",
 		"cannot claim end device with a randomly generated DevEUI. Use a valid DevEUI registered with a Join Server",
@@ -524,13 +536,14 @@ var (
 
 			claimOnExternalJS := len(device.ClaimAuthenticationCode.GetValue()) > 0
 
-			// TODO: Remove this flag once the legacy DCS is deprecated (https://github.com/TheThingsIndustries/lorawan-stack/issues/3036).
+			// TODO: Remove this flag once the legacy DCS is deprecated
+			// https://github.com/TheThingsIndustries/lorawan-stack/issues/3036
 			if withClaimAuthenticationCode, _ := cmd.Flags().GetBool("with-claim-authentication-code"); withClaimAuthenticationCode {
 				device.ClaimAuthenticationCode = &ttnpb.EndDeviceAuthenticationCode{
 					Value: strings.ToUpper(hex.EncodeToString(random.Bytes(4))),
 				}
 				paths = append(paths, "claim_authentication_code")
-				logger.Warn("Generating claim authentication codes will be deprecated in the future. Use a valid claim authentication code registered with a Join Server instead.")
+				logger.Warn("Generating claim authentication codes will be deprecated in the future. Use a valid claim authentication code registered with a Join Server instead.") //nolint:lll
 			}
 
 			if hasUpdateDeviceLocationFlags(cmd.Flags()) {
