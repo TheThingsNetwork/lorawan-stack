@@ -87,7 +87,7 @@ func path(u string) (string, error) {
 	return p.Path, nil
 }
 
-func generateConsoleCSPString(config *Config, nonce string) string {
+func generateConsoleCSPString(config *Config, nonce string, others ...webui.ContentSecurityPolicy) string {
 	return webui.ContentSecurityPolicy{
 		ConnectionSource: []string{
 			"'self'",
@@ -124,7 +124,7 @@ func generateConsoleCSPString(config *Config, nonce string) string {
 		FrameAncestors: []string{
 			"'none'",
 		},
-	}.Clean().String()
+	}.Merge(others...).Clean().String()
 }
 
 // RegisterRoutes implements web.Registerer. It registers the Console to the web server.

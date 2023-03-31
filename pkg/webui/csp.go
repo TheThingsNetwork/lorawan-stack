@@ -83,6 +83,19 @@ func (csp ContentSecurityPolicy) Clean() ContentSecurityPolicy {
 	return derived
 }
 
+// Merge merges the provided policies into the existing one.
+func (csp ContentSecurityPolicy) Merge(others ...ContentSecurityPolicy) ContentSecurityPolicy {
+	derived := csp
+	for _, other := range others {
+		derived.ConnectionSource = append(derived.ConnectionSource, other.ConnectionSource...)
+		derived.StyleSource = append(derived.StyleSource, other.StyleSource...)
+		derived.ScriptSource = append(derived.ScriptSource, other.ScriptSource...)
+		derived.BaseURI = append(derived.BaseURI, other.BaseURI...)
+		derived.FrameAncestors = append(derived.FrameAncestors, other.FrameAncestors...)
+	}
+	return derived
+}
+
 // String returns the policy in string form.
 func (csp ContentSecurityPolicy) String() string {
 	appendPolicy := func(all []string, name string, contents []string) []string {
