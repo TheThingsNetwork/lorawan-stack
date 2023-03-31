@@ -168,11 +168,26 @@ func generateKey() *types.AES128Key {
 }
 
 var (
-	errJoinServerDisabled    = errors.DefineFailedPrecondition("join_server_disabled", "Join Server is disabled")
-	errNetworkServerDisabled = errors.DefineFailedPrecondition("network_server_disabled", "Network Server is disabled")
-	errEndDeviceClaimInfo    = errors.DefineFailedPrecondition("end_device_claim_info", "could not get end device claim info from DCS")
-	errEndDeviceClaim        = errors.DefineFailedPrecondition("end_device_claim", "could not claim end device")
-	errEndDeviceUnclaim      = errors.DefineFailedPrecondition("end_device_unclaim", "could not unclaim end device")
+	errJoinServerDisabled = errors.DefineFailedPrecondition(
+		"join_server_disabled",
+		"Join Server is disabled",
+	)
+	errNetworkServerDisabled = errors.DefineFailedPrecondition(
+		"network_server_disabled",
+		"Network Server is disabled",
+	)
+	errEndDeviceClaimInfo = errors.DefineFailedPrecondition(
+		"end_device_claim_info",
+		"could not get end device claim info from DCS",
+	)
+	errEndDeviceClaim = errors.DefineFailedPrecondition(
+		"end_device_claim",
+		"could not claim end device",
+	)
+	errEndDeviceClaimGeneratedEUI = errors.DefineInvalidArgument(
+		"claim_generated_eui",
+		"cannot claim end device with a randomly generated DevEUI. Use a valid DevEUI registered with a Join Server",
+	)
 )
 
 var (
@@ -518,14 +533,18 @@ var (
 					)
 				}
 			}
+
+			claimOnExternalJS := len(device.ClaimAuthenticationCode.GetValue()) > 0
+
+			// TODO: Remove this flag once the legacy DCS is deprecated
+			// https://github.com/TheThingsIndustries/lorawan-stack/issues/3036
 			if withClaimAuthenticationCode, _ := cmd.Flags().GetBool("with-claim-authentication-code"); withClaimAuthenticationCode {
 				device.ClaimAuthenticationCode = &ttnpb.EndDeviceAuthenticationCode{
 					Value: strings.ToUpper(hex.EncodeToString(random.Bytes(4))),
 				}
 				paths = append(paths, "claim_authentication_code")
+				logger.Warn("Generating claim authentication codes will be deprecated in the future. Use a valid claim authentication code registered with a Join Server instead.") //nolint:lll
 			}
-
-			claimOnExternalJS := len(device.ClaimAuthenticationCode.GetValue()) > 0
 
 			if hasUpdateDeviceLocationFlags(cmd.Flags()) {
 				updateDeviceLocation(device, cmd.Flags())
@@ -573,6 +592,9 @@ var (
 
 			requestDevEUI, _ := cmd.Flags().GetBool("request-dev-eui")
 			if requestDevEUI {
+				if claimOnExternalJS {
+					return errEndDeviceClaimGeneratedEUI.New()
+				}
 				logger.Debug("request-dev-eui flag set, requesting a DevEUI")
 				devEUIResponse, err := ttnpb.NewApplicationRegistryClient(is).IssueDevEUI(ctx, devID.ApplicationIds)
 				if err != nil {

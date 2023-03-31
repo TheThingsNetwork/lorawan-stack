@@ -17,9 +17,13 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Deprecated
 
+- `--with-claim-authentication-code` flag for the end device `create` command via the CLI. Users must use a valid claim authentication code that is registered on a Join Server instead of generating one during end device creation.
+
 ### Removed
 
 ### Fixed
+
+- Attempting to claim an end device with a generated DevEUI will now result in an error.
 
 ### Security
 
