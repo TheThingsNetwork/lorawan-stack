@@ -51,7 +51,7 @@ func local_request_ApplicationWebhookRegistry_GetFormats_0(ctx context.Context, 
 }
 
 var (
-	filter_ApplicationWebhookRegistry_GetTemplate_0 = &utilities.DoubleArray{Encoding: map[string]int{"ids": 0, "template_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
+	filter_ApplicationWebhookRegistry_GetTemplate_0 = &utilities.DoubleArray{Encoding: map[string]int{"ids": 0, "template_id": 1, "templateId": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_ApplicationWebhookRegistry_GetTemplate_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationWebhookRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -157,7 +157,7 @@ func local_request_ApplicationWebhookRegistry_ListTemplates_0(ctx context.Contex
 }
 
 var (
-	filter_ApplicationWebhookRegistry_Get_0 = &utilities.DoubleArray{Encoding: map[string]int{"ids": 0, "application_ids": 1, "application_id": 2, "webhook_id": 3}, Base: []int{1, 1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 3, 2, 4, 5}}
+	filter_ApplicationWebhookRegistry_Get_0 = &utilities.DoubleArray{Encoding: map[string]int{"ids": 0, "application_ids": 1, "application_id": 2, "applicationId": 3, "webhook_id": 4, "webhookId": 5}, Base: []int{1, 1, 1, 1, 3, 2, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 3, 1, 2, 1, 4, 6, 5, 7}}
 )
 
 func request_ApplicationWebhookRegistry_Get_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationWebhookRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -247,7 +247,7 @@ func local_request_ApplicationWebhookRegistry_Get_0(ctx context.Context, marshal
 }
 
 var (
-	filter_ApplicationWebhookRegistry_List_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
+	filter_ApplicationWebhookRegistry_List_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "applicationId": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_ApplicationWebhookRegistry_List_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationWebhookRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -473,7 +473,7 @@ func local_request_ApplicationWebhookRegistry_Set_1(ctx context.Context, marshal
 }
 
 var (
-	filter_ApplicationWebhookRegistry_Delete_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "webhook_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
+	filter_ApplicationWebhookRegistry_Delete_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "applicationId": 2, "webhook_id": 3, "webhookId": 4}, Base: []int{1, 1, 1, 2, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 1, 3, 4, 5, 6}}
 )
 
 func request_ApplicationWebhookRegistry_Delete_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationWebhookRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -774,7 +774,7 @@ func RegisterApplicationWebhookRegistryHandlerServer(ctx context.Context, mux *r
 // RegisterApplicationWebhookRegistryHandlerFromEndpoint is same as RegisterApplicationWebhookRegistryHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterApplicationWebhookRegistryHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.Dial(endpoint, opts...)
+	conn, err := grpc.DialContext(ctx, endpoint, opts...)
 	if err != nil {
 		return err
 	}

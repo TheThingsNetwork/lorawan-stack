@@ -139,7 +139,7 @@ func RegisterIsHandlerServer(ctx context.Context, mux *runtime.ServeMux, server 
 // RegisterEntityAccessHandlerFromEndpoint is same as RegisterEntityAccessHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterEntityAccessHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.Dial(endpoint, opts...)
+	conn, err := grpc.DialContext(ctx, endpoint, opts...)
 	if err != nil {
 		return err
 	}
@@ -210,7 +210,7 @@ var (
 // RegisterIsHandlerFromEndpoint is same as RegisterIsHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterIsHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.Dial(endpoint, opts...)
+	conn, err := grpc.DialContext(ctx, endpoint, opts...)
 	if err != nil {
 		return err
 	}

@@ -334,6 +334,7 @@
                     "contact_info": {
                       "type": "array",
                       "items": {
+                        "type": "object",
                         "$ref": "#/definitions/v3ContactInfo"
                       },
                       "description": "Contact information for this application. Typically used to indicate who to contact with technical/security questions about the application.\nThis field is deprecated. Use administrative_contact and technical_contact instead."
@@ -1454,6 +1455,7 @@
                     "queued_application_downlinks": {
                       "type": "array",
                       "items": {
+                        "type": "object",
                         "$ref": "#/definitions/v3ApplicationDownlink"
                       },
                       "description": "Queued Application downlink messages. Stored in Application Server,\nwhich sets them on the Network Server.\nThis field is deprecated and is always set equal to session.queued_application_downlinks."
@@ -1765,6 +1767,7 @@
                     "queued_application_downlinks": {
                       "type": "array",
                       "items": {
+                        "type": "object",
                         "$ref": "#/definitions/v3ApplicationDownlink"
                       },
                       "description": "Queued Application downlink messages. Stored in Application Server,\nwhich sets them on the Network Server.\nThis field is deprecated and is always set equal to session.queued_application_downlinks."
@@ -2961,6 +2964,7 @@
                     "queued_application_downlinks": {
                       "type": "array",
                       "items": {
+                        "type": "object",
                         "$ref": "#/definitions/v3ApplicationDownlink"
                       },
                       "description": "Queued Application downlink messages. Stored in Application Server,\nwhich sets them on the Network Server.\nThis field is deprecated and is always set equal to session.queued_application_downlinks."
@@ -3276,6 +3280,7 @@
                     "queued_application_downlinks": {
                       "type": "array",
                       "items": {
+                        "type": "object",
                         "$ref": "#/definitions/v3ApplicationDownlink"
                       },
                       "description": "Queued Application downlink messages. Stored in Application Server,\nwhich sets them on the Network Server.\nThis field is deprecated and is always set equal to session.queued_application_downlinks."
@@ -3644,6 +3649,7 @@
                 "downlinks": {
                   "type": "array",
                   "items": {
+                    "type": "object",
                     "$ref": "#/definitions/v3ApplicationDownlink"
                   }
                 }
@@ -3724,6 +3730,7 @@
                 "downlinks": {
                   "type": "array",
                   "items": {
+                    "type": "object",
                     "$ref": "#/definitions/v3ApplicationDownlink"
                   }
                 }
@@ -5564,6 +5571,7 @@
                     "contact_info": {
                       "type": "array",
                       "items": {
+                        "type": "object",
                         "$ref": "#/definitions/v3ContactInfo"
                       },
                       "description": "Contact information for this client. Typically used to indicate who to contact with technical/security questions about the application.\nThis information is public and can be seen by any authenticated user in the network.\nThis field is deprecated. Use administrative_contact and technical_contact instead."
@@ -8289,6 +8297,7 @@
                     "contact_info": {
                       "type": "array",
                       "items": {
+                        "type": "object",
                         "$ref": "#/definitions/v3ContactInfo"
                       },
                       "description": "Contact information for this gateway. Typically used to indicate who to contact with technical/security questions about the gateway.\nThis field is deprecated. Use administrative_contact and technical_contact instead."
@@ -8326,6 +8335,7 @@
                     "antennas": {
                       "type": "array",
                       "items": {
+                        "type": "object",
                         "$ref": "#/definitions/v3GatewayAntenna"
                       },
                       "description": "Antennas of the gateway. Location information of the antennas is public and can be seen by any authenticated user in the network if location_public=true."
@@ -10192,6 +10202,7 @@
                     "queued_application_downlinks": {
                       "type": "array",
                       "items": {
+                        "type": "object",
                         "$ref": "#/definitions/v3ApplicationDownlink"
                       },
                       "description": "Queued Application downlink messages. Stored in Application Server,\nwhich sets them on the Network Server.\nThis field is deprecated and is always set equal to session.queued_application_downlinks."
@@ -10507,6 +10518,7 @@
                     "queued_application_downlinks": {
                       "type": "array",
                       "items": {
+                        "type": "object",
                         "$ref": "#/definitions/v3ApplicationDownlink"
                       },
                       "description": "Queued Application downlink messages. Stored in Application Server,\nwhich sets them on the Network Server.\nThis field is deprecated and is always set equal to session.queued_application_downlinks."
@@ -10995,6 +11007,7 @@
                     "queued_application_downlinks": {
                       "type": "array",
                       "items": {
+                        "type": "object",
                         "$ref": "#/definitions/v3ApplicationDownlink"
                       },
                       "description": "Queued Application downlink messages. Stored in Application Server,\nwhich sets them on the Network Server.\nThis field is deprecated and is always set equal to session.queued_application_downlinks."
@@ -11310,6 +11323,7 @@
                     "queued_application_downlinks": {
                       "type": "array",
                       "items": {
+                        "type": "object",
                         "$ref": "#/definitions/v3ApplicationDownlink"
                       },
                       "description": "Queued Application downlink messages. Stored in Application Server,\nwhich sets them on the Network Server.\nThis field is deprecated and is always set equal to session.queued_application_downlinks."
@@ -12216,6 +12230,7 @@
                     "contact_info": {
                       "type": "array",
                       "items": {
+                        "type": "object",
                         "$ref": "#/definitions/v3ContactInfo"
                       },
                       "description": "Contact information for this organization. Typically used to indicate who to contact with security/billing questions about the organization.\nThis field is deprecated. Use administrative_contact and technical_contact instead."
@@ -15539,6 +15554,7 @@
                     "contact_info": {
                       "type": "array",
                       "items": {
+                        "type": "object",
                         "$ref": "#/definitions/v3ContactInfo"
                       },
                       "description": "Contact information for this user. Typically used to indicate who to contact with security/billing questions about the user.\nThis field is deprecated."
@@ -16669,6 +16685,7 @@
         "gateways": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3ClassBCGatewayIdentifiers"
           },
           "description": "Possible gateway identifiers, antenna index, and group index to use for this downlink message.\nThe Network Server selects one of these gateways for downlink, based on connectivity, signal quality, channel utilization and an available slot.\nIf none of the gateways can be selected, the downlink message fails.\nIf empty, a gateway and antenna is selected automatically from the gateways seen in recent uplinks.\nIf group index is set, gateways will be grouped by the index for the Network Server to select one gateway per group."
@@ -17037,6 +17054,7 @@
         "safety": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/CompliancesCompliance"
           },
           "description": "List of safety standards the device is compliant with."
@@ -17044,6 +17062,7 @@
         "radio_equipment": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/CompliancesCompliance"
           },
           "description": "List of radio equipment standards the device is compliant with."
@@ -17473,7 +17492,8 @@
       "properties": {
         "frequency": {
           "type": "string",
-          "format": "uint64"
+          "format": "uint64",
+          "description": "Frequency of the Class B beacons (Hz)."
         }
       }
     },
@@ -17482,7 +17502,8 @@
       "properties": {
         "delay": {
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "description": "(uint16) See LoRaWAN specification."
         },
         "channel_index": {
           "type": "integer",
@@ -17510,7 +17531,8 @@
         },
         "frequency": {
           "type": "string",
-          "format": "uint64"
+          "format": "uint64",
+          "description": "Downlink channel frequency (Hz)."
         }
       }
     },
@@ -17655,7 +17677,8 @@
         },
         "frequency": {
           "type": "string",
-          "format": "uint64"
+          "format": "uint64",
+          "description": "Channel frequency (Hz)."
         },
         "min_data_rate_index": {
           "$ref": "#/definitions/v3DataRateIndex"
@@ -17681,7 +17704,8 @@
       "properties": {
         "frequency": {
           "type": "string",
-          "format": "uint64"
+          "format": "uint64",
+          "description": "Ping slot channel frequency (Hz)."
         },
         "data_rate_index": {
           "$ref": "#/definitions/v3DataRateIndex"
@@ -17774,7 +17798,8 @@
         },
         "rx2_frequency": {
           "type": "string",
-          "format": "uint64"
+          "format": "uint64",
+          "description": "Rx2 frequency (Hz)."
         }
       }
     },
@@ -17818,6 +17843,7 @@
         "ranges": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/MACStateDataRateRange"
           }
         }
@@ -17960,6 +17986,7 @@
         "end_device_ids": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3EndDeviceIdentifiers"
           }
         }
@@ -18086,6 +18113,7 @@
         "details": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/protobufAny"
           }
         }
@@ -18114,6 +18142,7 @@
         "contact_info": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3ContactInfo"
           }
         },
@@ -18340,6 +18369,7 @@
         "hops": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3PacketBrokerRouteHop"
           },
           "description": "Hops that the message passed. Each Packet Broker Router service appends an entry."
@@ -18511,6 +18541,7 @@
         "rx_metadata": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/lorawanv3RxMetadata"
           }
         },
@@ -18550,7 +18581,7 @@
         }
       },
       "additionalProperties": {},
-      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n\nExample 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\nExample 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\n\nJSON\n\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\nExample 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\nExample 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
     },
     "protobufNullValue": {
       "type": "string",
@@ -18677,6 +18708,7 @@
         "api_keys": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3APIKey"
           }
         }
@@ -18702,7 +18734,8 @@
         "DUTY_CYCLE_16384",
         "DUTY_CYCLE_32768"
       ],
-      "default": "DUTY_CYCLE_1"
+      "default": "DUTY_CYCLE_1",
+      "description": " - DUTY_CYCLE_1: 100%.\n - DUTY_CYCLE_2: 50%.\n - DUTY_CYCLE_4: 25%.\n - DUTY_CYCLE_8: 12.5%.\n - DUTY_CYCLE_16: 6.25%.\n - DUTY_CYCLE_32: 3.125%.\n - DUTY_CYCLE_64: 1.5625%.\n - DUTY_CYCLE_128: Roughly 0.781%.\n - DUTY_CYCLE_256: Roughly 0.390%.\n - DUTY_CYCLE_512: Roughly 0.195%.\n - DUTY_CYCLE_1024: Roughly 0.098%.\n - DUTY_CYCLE_2048: Roughly 0.049%.\n - DUTY_CYCLE_4096: Roughly 0.024%.\n - DUTY_CYCLE_8192: Roughly 0.012%.\n - DUTY_CYCLE_16384: Roughly 0.006%.\n - DUTY_CYCLE_32768: Roughly 0.003%."
     },
     "v3AggregatedDutyCycleValue": {
       "type": "object",
@@ -18761,6 +18794,7 @@
         "contact_info": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3ContactInfo"
           },
           "description": "Contact information for this application. Typically used to indicate who to contact with technical/security questions about the application.\nThis field is deprecated. Use administrative_contact and technical_contact instead."
@@ -18881,6 +18915,7 @@
         "downlinks": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3ApplicationDownlink"
           }
         }
@@ -18900,6 +18935,7 @@
         "downlinks": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3ApplicationDownlink"
           }
         },
@@ -18928,6 +18964,7 @@
         "invalidated_downlinks": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3ApplicationDownlink"
           },
           "description": "Downlink messages in the queue that got invalidated because of the session change."
@@ -19058,6 +19095,7 @@
         "associations": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3ApplicationPackageAssociation"
           }
         }
@@ -19103,6 +19141,7 @@
         "defaults": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3ApplicationPackageDefaultAssociation"
           }
         }
@@ -19114,6 +19153,7 @@
         "packages": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3ApplicationPackage"
           }
         }
@@ -19231,6 +19271,7 @@
         "pubsubs": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3ApplicationPubSub"
           }
         }
@@ -19355,6 +19396,7 @@
         "rx_metadata": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/lorawanv3RxMetadata"
           },
           "description": "A list of metadata for each antenna of each gateway that received this message."
@@ -19439,6 +19481,7 @@
         "rx_metadata": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/lorawanv3RxMetadata"
           },
           "description": "A list of metadata for each antenna of each gateway that received this message."
@@ -19643,6 +19686,7 @@
         "fields": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3ApplicationWebhookTemplateField"
           }
         },
@@ -19736,6 +19780,7 @@
         "templates": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3ApplicationWebhookTemplate"
           }
         }
@@ -19747,6 +19792,7 @@
         "webhooks": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3ApplicationWebhook"
           }
         }
@@ -19758,6 +19804,7 @@
         "applications": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3Application"
           }
         }
@@ -19822,6 +19869,7 @@
         "uplink_channels": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3BandDescriptionChannel"
           }
         },
@@ -19832,12 +19880,14 @@
         "downlink_channels": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3BandDescriptionChannel"
           }
         },
         "sub_bands": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/BandDescriptionSubBandParameters"
           }
         },
@@ -19931,6 +19981,7 @@
         "gateway_ids": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/lorawanv3GatewayIdentifiers"
           }
         },
@@ -20193,6 +20244,7 @@
         "contact_info": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3ContactInfo"
           },
           "description": "Contact information for this client. Typically used to indicate who to contact with technical/security questions about the application.\nThis information is public and can be seen by any authenticated user in the network.\nThis field is deprecated. Use administrative_contact and technical_contact instead."
@@ -20268,6 +20320,7 @@
         "clients": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3Client"
           }
         }
@@ -20293,6 +20346,7 @@
         "collaborators": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3Collaborator"
           }
         }
@@ -20304,6 +20358,7 @@
         "channels": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3ConcentratorConfigChannel"
           }
         },
@@ -20322,6 +20377,7 @@
         "radios": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3GatewayRadio"
           }
         },
@@ -20621,7 +20677,8 @@
         "DEVICE_EIRP_33",
         "DEVICE_EIRP_36"
       ],
-      "default": "DEVICE_EIRP_8"
+      "default": "DEVICE_EIRP_8",
+      "description": " - DEVICE_EIRP_8: 8 dBm.\n - DEVICE_EIRP_10: 10 dBm.\n - DEVICE_EIRP_12: 12 dBm.\n - DEVICE_EIRP_13: 13 dBm.\n - DEVICE_EIRP_14: 14 dBm.\n - DEVICE_EIRP_16: 16 dBm.\n - DEVICE_EIRP_18: 18 dBm.\n - DEVICE_EIRP_20: 20 dBm.\n - DEVICE_EIRP_21: 21 dBm.\n - DEVICE_EIRP_24: 24 dBm.\n - DEVICE_EIRP_26: 26 dBm.\n - DEVICE_EIRP_27: 27 dBm.\n - DEVICE_EIRP_29: 29 dBm.\n - DEVICE_EIRP_30: 30 dBm.\n - DEVICE_EIRP_33: 33 dBm.\n - DEVICE_EIRP_36: 36 dBm."
     },
     "v3DeviceEIRPValue": {
       "type": "object",
@@ -20876,6 +20933,7 @@
         "queued_application_downlinks": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3ApplicationDownlink"
           },
           "description": "Queued Application downlink messages. Stored in Application Server,\nwhich sets them on the Network Server.\nThis field is deprecated and is always set equal to session.queued_application_downlinks."
@@ -21037,6 +21095,7 @@
         "hardware_versions": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/EndDeviceModelHardwareVersion"
           },
           "description": "Available hardware versions."
@@ -21044,6 +21103,7 @@
         "firmware_versions": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/EndDeviceModelFirmwareVersion"
           },
           "description": "Available firmware versions."
@@ -21106,6 +21166,7 @@
         "resellers": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/EndDeviceModelReseller"
           },
           "description": "Reseller URLs."
@@ -21192,6 +21253,7 @@
         "end_devices": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3EndDevice"
           }
         }
@@ -21256,6 +21318,7 @@
         "details": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/protobufAny"
           },
           "description": "The details of the error."
@@ -21278,6 +21341,7 @@
         "identifiers": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3EntityIdentifiers"
           },
           "description": "Identifiers of the entity (or entities) involved."
@@ -21334,16 +21398,19 @@
           "type": "boolean"
         },
         "adr_ack_req": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Only on uplink."
         },
         "ack": {
           "type": "boolean"
         },
         "f_pending": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Only on downlink."
         },
         "class_b": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Only on uplink."
         }
       }
     },
@@ -21384,6 +21451,7 @@
         "events": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3Event"
           }
         }
@@ -21458,6 +21526,7 @@
         "contact_info": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3ContactInfo"
           },
           "description": "Contact information for this gateway. Typically used to indicate who to contact with technical/security questions about the gateway.\nThis field is deprecated. Use administrative_contact and technical_contact instead."
@@ -21495,6 +21564,7 @@
         "antennas": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3GatewayAntenna"
           },
           "description": "Antennas of the gateway. Location information of the antennas is public and can be seen by any authenticated user in the network if location_public=true."
@@ -21629,7 +21699,8 @@
           "format": "date-time"
         },
         "protocol": {
-          "type": "string"
+          "type": "string",
+          "title": "Protocol used to connect (for example, udp, mqtt, grpc)"
         },
         "last_status_received_at": {
           "type": "string",
@@ -21660,6 +21731,7 @@
         "sub_bands": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/GatewayConnectionStatsSubBand"
           },
           "description": "Statistics for each sub band."
@@ -21707,7 +21779,8 @@
       "type": "object",
       "properties": {
         "ip": {
-          "type": "string"
+          "type": "string",
+          "description": "IPv4 or IPv6 address."
         }
       },
       "description": "Remote Address of the Gateway, as seen by the Gateway Server."
@@ -21735,6 +21808,7 @@
         "antenna_locations": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/lorawanv3Location"
           },
           "title": "Location of each gateway's antenna\n- if left out, server uses registry-set location as fallback"
@@ -21784,6 +21858,7 @@
         "gateways": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3Gateway"
           }
         }
@@ -21955,6 +22030,7 @@
         "version_info": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/GetPhyVersionsResponseVersionInfo"
           }
         }
@@ -21989,6 +22065,7 @@
         "invitations": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/lorawanv3Invitation"
           }
         }
@@ -22080,6 +22157,7 @@
         "prefixes": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3JoinEUIPrefix"
           }
         }
@@ -22113,7 +22191,8 @@
         "REJOIN_KEYS",
         "JOIN"
       ],
-      "default": "REJOIN_CONTEXT"
+      "default": "REJOIN_CONTEXT",
+      "description": " - REJOIN_CONTEXT: Resets DevAddr, Session Keys, Frame Counters, Radio Parameters.\n - REJOIN_SESSION: Equivalent to the initial JoinRequest.\n - REJOIN_KEYS: Resets DevAddr, Session Keys, Frame Counters, while keeping the Radio Parameters.\n - JOIN: Normal join-request."
     },
     "v3JoinResponse": {
       "type": "object",
@@ -22211,6 +22290,7 @@
         "brands": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3EndDeviceBrand"
           }
         }
@@ -22222,6 +22302,7 @@
         "models": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3EndDeviceModel"
           }
         }
@@ -22233,6 +22314,7 @@
         "frequency_plans": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3FrequencyPlanDescription"
           }
         }
@@ -22244,6 +22326,7 @@
         "notifications": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3Notification"
           }
         }
@@ -22295,7 +22378,7 @@
         "SOURCE_COMBINED_GEOLOCATION"
       ],
       "default": "SOURCE_UNKNOWN",
-      "description": " - SOURCE_UNKNOWN: The source of the location is not known or not set.\n - SOURCE_GPS: The location is determined by GPS.\n - SOURCE_REGISTRY: The location is set in and updated from a registry.\n - SOURCE_IP_GEOLOCATION: The location is estimated with IP geolocation.\n - SOURCE_WIFI_RSSI_GEOLOCATION: The location is estimated with WiFi RSSI geolocation.\n - SOURCE_BT_RSSI_GEOLOCATION: The location is estimated with BT/BLE RSSI geolocation.\n - SOURCE_LORA_RSSI_GEOLOCATION: The location is estimated with LoRa RSSI geolocation.\n - SOURCE_LORA_TDOA_GEOLOCATION: The location is estimated with LoRa TDOA geolocation.\n - SOURCE_COMBINED_GEOLOCATION: The location is estimated by a combination of geolocation sources."
+      "description": " - SOURCE_UNKNOWN: The source of the location is not known or not set.\n - SOURCE_GPS: The location is determined by GPS.\n - SOURCE_REGISTRY: The location is set in and updated from a registry.\n - SOURCE_IP_GEOLOCATION: The location is estimated with IP geolocation.\n - SOURCE_WIFI_RSSI_GEOLOCATION: The location is estimated with WiFi RSSI geolocation.\n - SOURCE_BT_RSSI_GEOLOCATION: The location is estimated with BT/BLE RSSI geolocation.\n - SOURCE_LORA_RSSI_GEOLOCATION: The location is estimated with LoRa RSSI geolocation.\n - SOURCE_LORA_TDOA_GEOLOCATION: The location is estimated with LoRa TDOA geolocation.\n - SOURCE_COMBINED_GEOLOCATION: The location is estimated by a combination of geolocation sources.\n\nMore estimation methods can be added."
     },
     "v3MACCommand": {
       "type": "object",
@@ -22424,7 +22507,8 @@
         "CID_BEACON_FREQ",
         "CID_DEVICE_MODE"
       ],
-      "default": "CID_RFU_0"
+      "default": "CID_RFU_0",
+      "title": "- CID_BEACON_TIMING: Deprecated"
     },
     "v3MACParameters": {
       "type": "object",
@@ -22504,6 +22588,7 @@
         "channels": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3MACParametersChannel"
           },
           "description": "Configured uplink channels and optionally Rx1 frequency."
@@ -22745,6 +22830,7 @@
         "queued_responses": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3MACCommand"
           },
           "description": "Queued MAC responses.\nRegenerated on each uplink."
@@ -22752,6 +22838,7 @@
         "pending_requests": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3MACCommand"
           },
           "description": "Pending MAC requests(i.e. sent requests, for which no response has been received yet).\nRegenerated on each downlink."
@@ -22771,6 +22858,7 @@
         "recent_uplinks": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3MACStateUplinkMessage"
           },
           "description": "Recent data uplink messages sorted by time.\nThe number of messages stored may depend on configuration."
@@ -22778,6 +22866,7 @@
         "recent_downlinks": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3MACStateDownlinkMessage"
           },
           "description": "Recent data downlink messages sorted by time.\nThe number of messages stored may depend on configuration."
@@ -22878,6 +22967,7 @@
         "rx_metadata": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/MACStateUplinkMessageRxMetadata"
           }
         },
@@ -22967,6 +23057,7 @@
         "examples": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3MessagePayloadDecoderExample"
           }
         }
@@ -23003,6 +23094,7 @@
         "examples": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3MessagePayloadEncoderExample"
           }
         }
@@ -23223,6 +23315,7 @@
         "tokens": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3OAuthAccessToken"
           }
         }
@@ -23259,6 +23352,7 @@
         "authorizations": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3OAuthClientAuthorization"
           }
         }
@@ -23304,6 +23398,7 @@
         "contact_info": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3ContactInfo"
           },
           "description": "Contact information for this organization. Typically used to indicate who to contact with security/billing questions about the organization.\nThis field is deprecated. Use administrative_contact and technical_contact instead."
@@ -23343,6 +23438,7 @@
         "organizations": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3Organization"
           }
         }
@@ -23424,6 +23520,7 @@
         "contact_info": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3ContactInfo"
           },
           "description": "This field is deprecated. Use administrative_contact and technical_contact instead."
@@ -23437,6 +23534,7 @@
         "antennas": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3GatewayAntenna"
           }
         },
@@ -23556,6 +23654,7 @@
         "dev_addr_blocks": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3PacketBrokerDevAddrBlock"
           },
           "description": "DevAddr blocks that are assigned to this registration."
@@ -23563,6 +23662,7 @@
         "contact_info": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3ContactInfo"
           },
           "description": "Contact information.\nThis field is deprecated. Use administrative_contact and technical_contact instead."
@@ -23599,6 +23699,7 @@
         "networks": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3PacketBrokerNetwork"
           }
         }
@@ -23645,6 +23746,7 @@
         "policies": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3PacketBrokerRoutingPolicy"
           }
         }
@@ -23754,7 +23856,7 @@
         "FORMATTER_CAYENNELPP"
       ],
       "default": "FORMATTER_NONE",
-      "description": " - FORMATTER_NONE: No payload formatter to work with raw payload only.\n - FORMATTER_REPOSITORY: Use payload formatter for the end device type from a repository.\n - FORMATTER_GRPC_SERVICE: gRPC service payload formatter. The parameter is the host:port of the service.\n - FORMATTER_JAVASCRIPT: Custom payload formatter that executes Javascript code. The parameter is a JavaScript filename.\n - FORMATTER_CAYENNELPP: CayenneLPP payload formatter."
+      "description": " - FORMATTER_NONE: No payload formatter to work with raw payload only.\n - FORMATTER_REPOSITORY: Use payload formatter for the end device type from a repository.\n - FORMATTER_GRPC_SERVICE: gRPC service payload formatter. The parameter is the host:port of the service.\n - FORMATTER_JAVASCRIPT: Custom payload formatter that executes Javascript code. The parameter is a JavaScript filename.\n - FORMATTER_CAYENNELPP: CayenneLPP payload formatter.\n\nMore payload formatters can be added."
     },
     "v3Picture": {
       "type": "object",
@@ -23784,7 +23886,8 @@
         "PING_EVERY_64S",
         "PING_EVERY_128S"
       ],
-      "default": "PING_EVERY_1S"
+      "default": "PING_EVERY_1S",
+      "description": " - PING_EVERY_1S: Every second.\n - PING_EVERY_2S: Every 2 seconds.\n - PING_EVERY_4S: Every 4 seconds.\n - PING_EVERY_8S: Every 8 seconds.\n - PING_EVERY_16S: Every 16 seconds.\n - PING_EVERY_32S: Every 32 seconds.\n - PING_EVERY_64S: Every 64 seconds.\n - PING_EVERY_128S: Every 128 seconds."
     },
     "v3PingSlotPeriodValue": {
       "type": "object",
@@ -23865,7 +23968,8 @@
         "REJOIN_PERIOD_6",
         "REJOIN_PERIOD_7"
       ],
-      "default": "REJOIN_PERIOD_0"
+      "default": "REJOIN_PERIOD_0",
+      "description": " - REJOIN_PERIOD_0: Every 32 to 64 seconds.\n - REJOIN_PERIOD_1: Every 64 to 96 seconds.\n - REJOIN_PERIOD_2: Every 128 to 160 seconds.\n - REJOIN_PERIOD_3: Every 256 to 288 seconds.\n - REJOIN_PERIOD_4: Every 512 to 544 seconds.\n - REJOIN_PERIOD_5: Every 1024 to 1056 seconds.\n - REJOIN_PERIOD_6: Every 2048 to 2080 seconds.\n - REJOIN_PERIOD_7: Every 4096 to 4128 seconds."
     },
     "v3RejoinRequestPayload": {
       "type": "object",
@@ -23890,7 +23994,8 @@
         },
         "rejoin_cnt": {
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "description": "Contains RJCount0 or RJCount1 depending on rejoin_type."
         }
       }
     },
@@ -23901,7 +24006,8 @@
         "SESSION",
         "KEYS"
       ],
-      "default": "CONTEXT"
+      "default": "CONTEXT",
+      "description": " - CONTEXT: Resets DevAddr, Session Keys, Frame Counters, Radio Parameters.\n - SESSION: Equivalent to the initial JoinRequest.\n - KEYS: Resets DevAddr, Session Keys, Frame Counters, while keeping the Radio Parameters."
     },
     "v3RejoinTimeExponent": {
       "type": "string",
@@ -23923,7 +24029,8 @@
         "REJOIN_TIME_14",
         "REJOIN_TIME_15"
       ],
-      "default": "REJOIN_TIME_0"
+      "default": "REJOIN_TIME_0",
+      "description": " - REJOIN_TIME_0: Every ~17.1 minutes.\n - REJOIN_TIME_1: Every ~34.1 minutes.\n - REJOIN_TIME_2: Every ~1.1 hours.\n - REJOIN_TIME_3: Every ~2.3 hours.\n - REJOIN_TIME_4: Every ~4.6 hours.\n - REJOIN_TIME_5: Every ~9.1 hours.\n - REJOIN_TIME_6: Every ~18.2 hours.\n - REJOIN_TIME_7: Every ~1.5 days.\n - REJOIN_TIME_8: Every ~3.0 days.\n - REJOIN_TIME_9: Every ~6.1 days.\n - REJOIN_TIME_10: Every ~12.1 days.\n - REJOIN_TIME_11: Every ~3.5 weeks.\n - REJOIN_TIME_12: Every ~1.6 months.\n - REJOIN_TIME_13: Every ~3.2 months.\n - REJOIN_TIME_14: Every ~6.4 months.\n - REJOIN_TIME_15: Every ~1.1 year."
     },
     "v3Right": {
       "type": "string",
@@ -24045,7 +24152,8 @@
         "RX_DELAY_14",
         "RX_DELAY_15"
       ],
-      "default": "RX_DELAY_0"
+      "default": "RX_DELAY_0",
+      "description": " - RX_DELAY_0: 1 second.\n - RX_DELAY_1: 1 second.\n - RX_DELAY_2: 2 seconds.\n - RX_DELAY_3: 3 seconds.\n - RX_DELAY_4: 4 seconds.\n - RX_DELAY_5: 5 seconds.\n - RX_DELAY_6: 6 seconds.\n - RX_DELAY_7: 7 seconds.\n - RX_DELAY_8: 8 seconds.\n - RX_DELAY_9: 9 seconds.\n - RX_DELAY_10: 10 seconds.\n - RX_DELAY_11: 11 seconds.\n - RX_DELAY_12: 12 seconds.\n - RX_DELAY_13: 13 seconds.\n - RX_DELAY_14: 14 seconds.\n - RX_DELAY_15: 15 seconds."
     },
     "v3RxDelayValue": {
       "type": "object",
@@ -24082,6 +24190,7 @@
         "account_ids": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3OrganizationOrUserIdentifiers"
           }
         }
@@ -24149,6 +24258,7 @@
         "queued_application_downlinks": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3ApplicationDownlink"
           },
           "description": "Queued Application downlink messages. Stored in Application Server and Network Server."
@@ -24221,6 +24331,7 @@
         "identifiers": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3EntityIdentifiers"
           }
         },
@@ -24271,6 +24382,7 @@
         "downlink_paths": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3DownlinkPath"
           },
           "description": "Downlink paths used to select a gateway for downlink.\nIn class A, the downlink paths are required to only contain uplink tokens.\nIn class B and C, the downlink paths may contain uplink tokens and fixed gateways antenna identifiers."
@@ -24379,6 +24491,7 @@
         "contact_info": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3ContactInfo"
           },
           "description": "Contact information for this user. Typically used to indicate who to contact with security/billing questions about the user.\nThis field is deprecated."
@@ -24480,6 +24593,7 @@
         "sessions": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3UserSession"
           }
         }
@@ -24491,6 +24605,7 @@
         "users": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/v3User"
           }
         }

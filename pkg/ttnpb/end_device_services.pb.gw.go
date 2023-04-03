@@ -101,7 +101,7 @@ func local_request_EndDeviceRegistry_Create_0(ctx context.Context, marshaler run
 }
 
 var (
-	filter_EndDeviceRegistry_Get_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device_ids": 0, "application_ids": 1, "application_id": 2, "device_id": 3}, Base: []int{1, 1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 3, 2, 4, 5}}
+	filter_EndDeviceRegistry_Get_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device_ids": 0, "application_ids": 1, "application_id": 2, "applicationId": 3, "device_id": 4, "deviceId": 5}, Base: []int{1, 1, 1, 1, 3, 2, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 3, 1, 2, 1, 4, 6, 5, 7}}
 )
 
 func request_EndDeviceRegistry_Get_0(ctx context.Context, marshaler runtime.Marshaler, client EndDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -191,7 +191,7 @@ func local_request_EndDeviceRegistry_Get_0(ctx context.Context, marshaler runtim
 }
 
 var (
-	filter_EndDeviceRegistry_List_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
+	filter_EndDeviceRegistry_List_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "applicationId": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_EndDeviceRegistry_List_0(ctx context.Context, marshaler runtime.Marshaler, client EndDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -349,7 +349,7 @@ func local_request_EndDeviceRegistry_Update_0(ctx context.Context, marshaler run
 }
 
 var (
-	filter_EndDeviceRegistry_Delete_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "device_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
+	filter_EndDeviceRegistry_Delete_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "applicationId": 2, "device_id": 3, "deviceId": 4}, Base: []int{1, 1, 1, 2, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 1, 3, 4, 5, 6}}
 )
 
 func request_EndDeviceRegistry_Delete_0(ctx context.Context, marshaler runtime.Marshaler, client EndDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -659,7 +659,7 @@ func RegisterEndDeviceTemplateConverterHandlerServer(ctx context.Context, mux *r
 // RegisterEndDeviceRegistryHandlerFromEndpoint is same as RegisterEndDeviceRegistryHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterEndDeviceRegistryHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.Dial(endpoint, opts...)
+	conn, err := grpc.DialContext(ctx, endpoint, opts...)
 	if err != nil {
 		return err
 	}
@@ -834,7 +834,7 @@ var (
 // RegisterEndDeviceTemplateConverterHandlerFromEndpoint is same as RegisterEndDeviceTemplateConverterHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterEndDeviceTemplateConverterHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.Dial(endpoint, opts...)
+	conn, err := grpc.DialContext(ctx, endpoint, opts...)
 	if err != nil {
 		return err
 	}

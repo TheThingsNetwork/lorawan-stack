@@ -32,7 +32,7 @@ var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
 var (
-	filter_GtwGs_GetMQTTConnectionInfo_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_GtwGs_GetMQTTConnectionInfo_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0, "gatewayId": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
 )
 
 func request_GtwGs_GetMQTTConnectionInfo_0(ctx context.Context, marshaler runtime.Marshaler, client GtwGsClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -102,7 +102,7 @@ func local_request_GtwGs_GetMQTTConnectionInfo_0(ctx context.Context, marshaler 
 }
 
 var (
-	filter_GtwGs_GetMQTTV2ConnectionInfo_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_GtwGs_GetMQTTV2ConnectionInfo_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0, "gatewayId": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
 )
 
 func request_GtwGs_GetMQTTV2ConnectionInfo_0(ctx context.Context, marshaler runtime.Marshaler, client GtwGsClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -172,7 +172,7 @@ func local_request_GtwGs_GetMQTTV2ConnectionInfo_0(ctx context.Context, marshale
 }
 
 var (
-	filter_Gs_GetGatewayConnectionStats_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_Gs_GetGatewayConnectionStats_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0, "gatewayId": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
 )
 
 func request_Gs_GetGatewayConnectionStats_0(ctx context.Context, marshaler runtime.Marshaler, client GsClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -396,7 +396,7 @@ func RegisterGsHandlerServer(ctx context.Context, mux *runtime.ServeMux, server 
 // RegisterGtwGsHandlerFromEndpoint is same as RegisterGtwGsHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterGtwGsHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.Dial(endpoint, opts...)
+	conn, err := grpc.DialContext(ctx, endpoint, opts...)
 	if err != nil {
 		return err
 	}
@@ -493,7 +493,7 @@ var (
 // RegisterGsHandlerFromEndpoint is same as RegisterGsHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterGsHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.Dial(endpoint, opts...)
+	conn, err := grpc.DialContext(ctx, endpoint, opts...)
 	if err != nil {
 		return err
 	}

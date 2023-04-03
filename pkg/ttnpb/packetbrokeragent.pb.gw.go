@@ -173,7 +173,7 @@ func local_request_Pba_ListHomeNetworkRoutingPolicies_0(ctx context.Context, mar
 }
 
 var (
-	filter_Pba_GetHomeNetworkRoutingPolicy_0 = &utilities.DoubleArray{Encoding: map[string]int{"net_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_Pba_GetHomeNetworkRoutingPolicy_0 = &utilities.DoubleArray{Encoding: map[string]int{"net_id": 0, "netId": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
 )
 
 func request_Pba_GetHomeNetworkRoutingPolicy_0(ctx context.Context, marshaler runtime.Marshaler, client PbaClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -627,7 +627,7 @@ func local_request_Pba_SetHomeNetworkRoutingPolicy_3(ctx context.Context, marsha
 }
 
 var (
-	filter_Pba_DeleteHomeNetworkRoutingPolicy_0 = &utilities.DoubleArray{Encoding: map[string]int{"net_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_Pba_DeleteHomeNetworkRoutingPolicy_0 = &utilities.DoubleArray{Encoding: map[string]int{"net_id": 0, "netId": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
 )
 
 func request_Pba_DeleteHomeNetworkRoutingPolicy_0(ctx context.Context, marshaler runtime.Marshaler, client PbaClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -1696,7 +1696,7 @@ func RegisterPbaHandlerServer(ctx context.Context, mux *runtime.ServeMux, server
 // RegisterPbaHandlerFromEndpoint is same as RegisterPbaHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterPbaHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.Dial(endpoint, opts...)
+	conn, err := grpc.DialContext(ctx, endpoint, opts...)
 	if err != nil {
 		return err
 	}

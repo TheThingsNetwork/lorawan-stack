@@ -188,7 +188,7 @@ func local_request_EndDeviceClaimingServer_GetInfoByJoinEUI_0(ctx context.Contex
 }
 
 var (
-	filter_EndDeviceClaimingServer_GetClaimStatus_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "device_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
+	filter_EndDeviceClaimingServer_GetClaimStatus_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "applicationId": 2, "device_id": 3, "deviceId": 4}, Base: []int{1, 1, 1, 2, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 1, 3, 4, 5, 6}}
 )
 
 func request_EndDeviceClaimingServer_GetClaimStatus_0(ctx context.Context, marshaler runtime.Marshaler, client EndDeviceClaimingServerClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -500,7 +500,7 @@ func local_request_GatewayClaimingServer_AuthorizeGateway_0(ctx context.Context,
 }
 
 var (
-	filter_GatewayClaimingServer_UnauthorizeGateway_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_GatewayClaimingServer_UnauthorizeGateway_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0, "gatewayId": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
 )
 
 func request_GatewayClaimingServer_UnauthorizeGateway_0(ctx context.Context, marshaler runtime.Marshaler, client GatewayClaimingServerClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -815,7 +815,7 @@ func RegisterGatewayClaimingServerHandlerServer(ctx context.Context, mux *runtim
 // RegisterEndDeviceClaimingServerHandlerFromEndpoint is same as RegisterEndDeviceClaimingServerHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterEndDeviceClaimingServerHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.Dial(endpoint, opts...)
+	conn, err := grpc.DialContext(ctx, endpoint, opts...)
 	if err != nil {
 		return err
 	}
@@ -1016,7 +1016,7 @@ var (
 // RegisterGatewayClaimingServerHandlerFromEndpoint is same as RegisterGatewayClaimingServerHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterGatewayClaimingServerHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.Dial(endpoint, opts...)
+	conn, err := grpc.DialContext(ctx, endpoint, opts...)
 	if err != nil {
 		return err
 	}

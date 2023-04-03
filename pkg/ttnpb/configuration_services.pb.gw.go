@@ -140,7 +140,7 @@ func local_request_Configuration_ListBands_0(ctx context.Context, marshaler runt
 }
 
 var (
-	filter_Configuration_ListBands_1 = &utilities.DoubleArray{Encoding: map[string]int{"band_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_Configuration_ListBands_1 = &utilities.DoubleArray{Encoding: map[string]int{"band_id": 0, "bandId": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
 )
 
 func request_Configuration_ListBands_1(ctx context.Context, marshaler runtime.Marshaler, client ConfigurationClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -424,7 +424,7 @@ func RegisterConfigurationHandlerServer(ctx context.Context, mux *runtime.ServeM
 // RegisterConfigurationHandlerFromEndpoint is same as RegisterConfigurationHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterConfigurationHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.Dial(endpoint, opts...)
+	conn, err := grpc.DialContext(ctx, endpoint, opts...)
 	if err != nil {
 		return err
 	}
