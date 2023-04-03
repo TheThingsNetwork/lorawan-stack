@@ -255,15 +255,6 @@ type PbaClient interface {
 	// Packet Broker deregistration is only supported for tenants and requires Packet Broker Agent to be configured with
 	// NetID level authentication. Use rpc GetInfo and check register_enabled to check whether this rpc is enabled.
 	Deregister(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// Get the default routing policy.
-	// Getting routing policies requires administrative access.
-	GetHomeNetworkDefaultRoutingPolicy(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PacketBrokerDefaultRoutingPolicy, error)
-	// Set the default routing policy.
-	// Setting routing policies requires administrative access.
-	SetHomeNetworkDefaultRoutingPolicy(ctx context.Context, in *SetPacketBrokerDefaultRoutingPolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// Deletes the default routing policy.
-	// Deleting routing policies requires administrative access.
-	DeleteHomeNetworkDefaultRoutingPolicy(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// List the routing policies that Packet Broker Agent as Forwarder configured with Home Networks.
 	// Listing routing policies requires administrative access.
 	ListHomeNetworkRoutingPolicies(ctx context.Context, in *ListHomeNetworkRoutingPoliciesRequest, opts ...grpc.CallOption) (*PacketBrokerRoutingPolicies, error)
@@ -276,6 +267,15 @@ type PbaClient interface {
 	// Delete the routing policy for the given Home Network.
 	// Deleting routing policies requires administrative access.
 	DeleteHomeNetworkRoutingPolicy(ctx context.Context, in *PacketBrokerNetworkIdentifier, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Get the default routing policy.
+	// Getting routing policies requires administrative access.
+	GetHomeNetworkDefaultRoutingPolicy(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PacketBrokerDefaultRoutingPolicy, error)
+	// Set the default routing policy.
+	// Setting routing policies requires administrative access.
+	SetHomeNetworkDefaultRoutingPolicy(ctx context.Context, in *SetPacketBrokerDefaultRoutingPolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Deletes the default routing policy.
+	// Deleting routing policies requires administrative access.
+	DeleteHomeNetworkDefaultRoutingPolicy(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// Get the default gateway visibility.
 	// Getting gateway visibilities requires administrative access.
 	GetHomeNetworkDefaultGatewayVisibility(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PacketBrokerDefaultGatewayVisibility, error)
@@ -331,33 +331,6 @@ func (c *pbaClient) Deregister(ctx context.Context, in *emptypb.Empty, opts ...g
 	return out, nil
 }
 
-func (c *pbaClient) GetHomeNetworkDefaultRoutingPolicy(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PacketBrokerDefaultRoutingPolicy, error) {
-	out := new(PacketBrokerDefaultRoutingPolicy)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.Pba/GetHomeNetworkDefaultRoutingPolicy", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *pbaClient) SetHomeNetworkDefaultRoutingPolicy(ctx context.Context, in *SetPacketBrokerDefaultRoutingPolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.Pba/SetHomeNetworkDefaultRoutingPolicy", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *pbaClient) DeleteHomeNetworkDefaultRoutingPolicy(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.Pba/DeleteHomeNetworkDefaultRoutingPolicy", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *pbaClient) ListHomeNetworkRoutingPolicies(ctx context.Context, in *ListHomeNetworkRoutingPoliciesRequest, opts ...grpc.CallOption) (*PacketBrokerRoutingPolicies, error) {
 	out := new(PacketBrokerRoutingPolicies)
 	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.Pba/ListHomeNetworkRoutingPolicies", in, out, opts...)
@@ -388,6 +361,33 @@ func (c *pbaClient) SetHomeNetworkRoutingPolicy(ctx context.Context, in *SetPack
 func (c *pbaClient) DeleteHomeNetworkRoutingPolicy(ctx context.Context, in *PacketBrokerNetworkIdentifier, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.Pba/DeleteHomeNetworkRoutingPolicy", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *pbaClient) GetHomeNetworkDefaultRoutingPolicy(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PacketBrokerDefaultRoutingPolicy, error) {
+	out := new(PacketBrokerDefaultRoutingPolicy)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.Pba/GetHomeNetworkDefaultRoutingPolicy", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *pbaClient) SetHomeNetworkDefaultRoutingPolicy(ctx context.Context, in *SetPacketBrokerDefaultRoutingPolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.Pba/SetHomeNetworkDefaultRoutingPolicy", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *pbaClient) DeleteHomeNetworkDefaultRoutingPolicy(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.Pba/DeleteHomeNetworkDefaultRoutingPolicy", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -466,15 +466,6 @@ type PbaServer interface {
 	// Packet Broker deregistration is only supported for tenants and requires Packet Broker Agent to be configured with
 	// NetID level authentication. Use rpc GetInfo and check register_enabled to check whether this rpc is enabled.
 	Deregister(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
-	// Get the default routing policy.
-	// Getting routing policies requires administrative access.
-	GetHomeNetworkDefaultRoutingPolicy(context.Context, *emptypb.Empty) (*PacketBrokerDefaultRoutingPolicy, error)
-	// Set the default routing policy.
-	// Setting routing policies requires administrative access.
-	SetHomeNetworkDefaultRoutingPolicy(context.Context, *SetPacketBrokerDefaultRoutingPolicyRequest) (*emptypb.Empty, error)
-	// Deletes the default routing policy.
-	// Deleting routing policies requires administrative access.
-	DeleteHomeNetworkDefaultRoutingPolicy(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	// List the routing policies that Packet Broker Agent as Forwarder configured with Home Networks.
 	// Listing routing policies requires administrative access.
 	ListHomeNetworkRoutingPolicies(context.Context, *ListHomeNetworkRoutingPoliciesRequest) (*PacketBrokerRoutingPolicies, error)
@@ -487,6 +478,15 @@ type PbaServer interface {
 	// Delete the routing policy for the given Home Network.
 	// Deleting routing policies requires administrative access.
 	DeleteHomeNetworkRoutingPolicy(context.Context, *PacketBrokerNetworkIdentifier) (*emptypb.Empty, error)
+	// Get the default routing policy.
+	// Getting routing policies requires administrative access.
+	GetHomeNetworkDefaultRoutingPolicy(context.Context, *emptypb.Empty) (*PacketBrokerDefaultRoutingPolicy, error)
+	// Set the default routing policy.
+	// Setting routing policies requires administrative access.
+	SetHomeNetworkDefaultRoutingPolicy(context.Context, *SetPacketBrokerDefaultRoutingPolicyRequest) (*emptypb.Empty, error)
+	// Deletes the default routing policy.
+	// Deleting routing policies requires administrative access.
+	DeleteHomeNetworkDefaultRoutingPolicy(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	// Get the default gateway visibility.
 	// Getting gateway visibilities requires administrative access.
 	GetHomeNetworkDefaultGatewayVisibility(context.Context, *emptypb.Empty) (*PacketBrokerDefaultGatewayVisibility, error)
@@ -521,15 +521,6 @@ func (UnimplementedPbaServer) Register(context.Context, *PacketBrokerRegisterReq
 func (UnimplementedPbaServer) Deregister(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Deregister not implemented")
 }
-func (UnimplementedPbaServer) GetHomeNetworkDefaultRoutingPolicy(context.Context, *emptypb.Empty) (*PacketBrokerDefaultRoutingPolicy, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetHomeNetworkDefaultRoutingPolicy not implemented")
-}
-func (UnimplementedPbaServer) SetHomeNetworkDefaultRoutingPolicy(context.Context, *SetPacketBrokerDefaultRoutingPolicyRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SetHomeNetworkDefaultRoutingPolicy not implemented")
-}
-func (UnimplementedPbaServer) DeleteHomeNetworkDefaultRoutingPolicy(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteHomeNetworkDefaultRoutingPolicy not implemented")
-}
 func (UnimplementedPbaServer) ListHomeNetworkRoutingPolicies(context.Context, *ListHomeNetworkRoutingPoliciesRequest) (*PacketBrokerRoutingPolicies, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListHomeNetworkRoutingPolicies not implemented")
 }
@@ -541,6 +532,15 @@ func (UnimplementedPbaServer) SetHomeNetworkRoutingPolicy(context.Context, *SetP
 }
 func (UnimplementedPbaServer) DeleteHomeNetworkRoutingPolicy(context.Context, *PacketBrokerNetworkIdentifier) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteHomeNetworkRoutingPolicy not implemented")
+}
+func (UnimplementedPbaServer) GetHomeNetworkDefaultRoutingPolicy(context.Context, *emptypb.Empty) (*PacketBrokerDefaultRoutingPolicy, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetHomeNetworkDefaultRoutingPolicy not implemented")
+}
+func (UnimplementedPbaServer) SetHomeNetworkDefaultRoutingPolicy(context.Context, *SetPacketBrokerDefaultRoutingPolicyRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetHomeNetworkDefaultRoutingPolicy not implemented")
+}
+func (UnimplementedPbaServer) DeleteHomeNetworkDefaultRoutingPolicy(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteHomeNetworkDefaultRoutingPolicy not implemented")
 }
 func (UnimplementedPbaServer) GetHomeNetworkDefaultGatewayVisibility(context.Context, *emptypb.Empty) (*PacketBrokerDefaultGatewayVisibility, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetHomeNetworkDefaultGatewayVisibility not implemented")
@@ -627,60 +627,6 @@ func _Pba_Deregister_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Pba_GetHomeNetworkDefaultRoutingPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PbaServer).GetHomeNetworkDefaultRoutingPolicy(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.Pba/GetHomeNetworkDefaultRoutingPolicy",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PbaServer).GetHomeNetworkDefaultRoutingPolicy(ctx, req.(*emptypb.Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Pba_SetHomeNetworkDefaultRoutingPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SetPacketBrokerDefaultRoutingPolicyRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PbaServer).SetHomeNetworkDefaultRoutingPolicy(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.Pba/SetHomeNetworkDefaultRoutingPolicy",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PbaServer).SetHomeNetworkDefaultRoutingPolicy(ctx, req.(*SetPacketBrokerDefaultRoutingPolicyRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Pba_DeleteHomeNetworkDefaultRoutingPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PbaServer).DeleteHomeNetworkDefaultRoutingPolicy(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.Pba/DeleteHomeNetworkDefaultRoutingPolicy",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PbaServer).DeleteHomeNetworkDefaultRoutingPolicy(ctx, req.(*emptypb.Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _Pba_ListHomeNetworkRoutingPolicies_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListHomeNetworkRoutingPoliciesRequest)
 	if err := dec(in); err != nil {
@@ -749,6 +695,60 @@ func _Pba_DeleteHomeNetworkRoutingPolicy_Handler(srv interface{}, ctx context.Co
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PbaServer).DeleteHomeNetworkRoutingPolicy(ctx, req.(*PacketBrokerNetworkIdentifier))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Pba_GetHomeNetworkDefaultRoutingPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PbaServer).GetHomeNetworkDefaultRoutingPolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.lorawan.v3.Pba/GetHomeNetworkDefaultRoutingPolicy",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PbaServer).GetHomeNetworkDefaultRoutingPolicy(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Pba_SetHomeNetworkDefaultRoutingPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetPacketBrokerDefaultRoutingPolicyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PbaServer).SetHomeNetworkDefaultRoutingPolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.lorawan.v3.Pba/SetHomeNetworkDefaultRoutingPolicy",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PbaServer).SetHomeNetworkDefaultRoutingPolicy(ctx, req.(*SetPacketBrokerDefaultRoutingPolicyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Pba_DeleteHomeNetworkDefaultRoutingPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PbaServer).DeleteHomeNetworkDefaultRoutingPolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.lorawan.v3.Pba/DeleteHomeNetworkDefaultRoutingPolicy",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PbaServer).DeleteHomeNetworkDefaultRoutingPolicy(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -881,18 +881,6 @@ var Pba_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Pba_Deregister_Handler,
 		},
 		{
-			MethodName: "GetHomeNetworkDefaultRoutingPolicy",
-			Handler:    _Pba_GetHomeNetworkDefaultRoutingPolicy_Handler,
-		},
-		{
-			MethodName: "SetHomeNetworkDefaultRoutingPolicy",
-			Handler:    _Pba_SetHomeNetworkDefaultRoutingPolicy_Handler,
-		},
-		{
-			MethodName: "DeleteHomeNetworkDefaultRoutingPolicy",
-			Handler:    _Pba_DeleteHomeNetworkDefaultRoutingPolicy_Handler,
-		},
-		{
 			MethodName: "ListHomeNetworkRoutingPolicies",
 			Handler:    _Pba_ListHomeNetworkRoutingPolicies_Handler,
 		},
@@ -907,6 +895,18 @@ var Pba_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteHomeNetworkRoutingPolicy",
 			Handler:    _Pba_DeleteHomeNetworkRoutingPolicy_Handler,
+		},
+		{
+			MethodName: "GetHomeNetworkDefaultRoutingPolicy",
+			Handler:    _Pba_GetHomeNetworkDefaultRoutingPolicy_Handler,
+		},
+		{
+			MethodName: "SetHomeNetworkDefaultRoutingPolicy",
+			Handler:    _Pba_SetHomeNetworkDefaultRoutingPolicy_Handler,
+		},
+		{
+			MethodName: "DeleteHomeNetworkDefaultRoutingPolicy",
+			Handler:    _Pba_DeleteHomeNetworkDefaultRoutingPolicy_Handler,
 		},
 		{
 			MethodName: "GetHomeNetworkDefaultGatewayVisibility",

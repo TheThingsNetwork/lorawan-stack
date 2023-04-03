@@ -39309,78 +39309,6 @@
               }
             },
             {
-              "name": "GetHomeNetworkDefaultRoutingPolicy",
-              "description": "Get the default routing policy.\nGetting routing policies requires administrative access.",
-              "requestType": "Empty",
-              "requestLongType": ".google.protobuf.Empty",
-              "requestFullType": "google.protobuf.Empty",
-              "requestStreaming": false,
-              "responseType": "PacketBrokerDefaultRoutingPolicy",
-              "responseLongType": "PacketBrokerDefaultRoutingPolicy",
-              "responseFullType": "ttn.lorawan.v3.PacketBrokerDefaultRoutingPolicy",
-              "responseStreaming": false,
-              "options": {
-                "google.api.http": {
-                  "rules": [
-                    {
-                      "method": "GET",
-                      "pattern": "/pba/home-networks/policies/default"
-                    }
-                  ]
-                }
-              }
-            },
-            {
-              "name": "SetHomeNetworkDefaultRoutingPolicy",
-              "description": "Set the default routing policy.\nSetting routing policies requires administrative access.",
-              "requestType": "SetPacketBrokerDefaultRoutingPolicyRequest",
-              "requestLongType": "SetPacketBrokerDefaultRoutingPolicyRequest",
-              "requestFullType": "ttn.lorawan.v3.SetPacketBrokerDefaultRoutingPolicyRequest",
-              "requestStreaming": false,
-              "responseType": "Empty",
-              "responseLongType": ".google.protobuf.Empty",
-              "responseFullType": "google.protobuf.Empty",
-              "responseStreaming": false,
-              "options": {
-                "google.api.http": {
-                  "rules": [
-                    {
-                      "method": "PUT",
-                      "pattern": "/pba/home-networks/policies/default",
-                      "body": "*"
-                    },
-                    {
-                      "method": "POST",
-                      "pattern": "/pba/home-networks/policies/default",
-                      "body": "*"
-                    }
-                  ]
-                }
-              }
-            },
-            {
-              "name": "DeleteHomeNetworkDefaultRoutingPolicy",
-              "description": "Deletes the default routing policy.\nDeleting routing policies requires administrative access.",
-              "requestType": "Empty",
-              "requestLongType": ".google.protobuf.Empty",
-              "requestFullType": "google.protobuf.Empty",
-              "requestStreaming": false,
-              "responseType": "Empty",
-              "responseLongType": ".google.protobuf.Empty",
-              "responseFullType": "google.protobuf.Empty",
-              "responseStreaming": false,
-              "options": {
-                "google.api.http": {
-                  "rules": [
-                    {
-                      "method": "DELETE",
-                      "pattern": "/pba/home-networks/policies/default"
-                    }
-                  ]
-                }
-              }
-            },
-            {
               "name": "ListHomeNetworkRoutingPolicies",
               "description": "List the routing policies that Packet Broker Agent as Forwarder configured with Home Networks.\nListing routing policies requires administrative access.",
               "requestType": "ListHomeNetworkRoutingPoliciesRequest",
@@ -39487,6 +39415,78 @@
                     {
                       "method": "DELETE",
                       "pattern": "/pba/home-networks/policies/{net_id}/{tenant_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetHomeNetworkDefaultRoutingPolicy",
+              "description": "Get the default routing policy.\nGetting routing policies requires administrative access.",
+              "requestType": "Empty",
+              "requestLongType": ".google.protobuf.Empty",
+              "requestFullType": "google.protobuf.Empty",
+              "requestStreaming": false,
+              "responseType": "PacketBrokerDefaultRoutingPolicy",
+              "responseLongType": "PacketBrokerDefaultRoutingPolicy",
+              "responseFullType": "ttn.lorawan.v3.PacketBrokerDefaultRoutingPolicy",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/pba/home-networks/policies/default"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "SetHomeNetworkDefaultRoutingPolicy",
+              "description": "Set the default routing policy.\nSetting routing policies requires administrative access.",
+              "requestType": "SetPacketBrokerDefaultRoutingPolicyRequest",
+              "requestLongType": "SetPacketBrokerDefaultRoutingPolicyRequest",
+              "requestFullType": "ttn.lorawan.v3.SetPacketBrokerDefaultRoutingPolicyRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PUT",
+                      "pattern": "/pba/home-networks/policies/default",
+                      "body": "*"
+                    },
+                    {
+                      "method": "POST",
+                      "pattern": "/pba/home-networks/policies/default",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DeleteHomeNetworkDefaultRoutingPolicy",
+              "description": "Deletes the default routing policy.\nDeleting routing policies requires administrative access.",
+              "requestType": "Empty",
+              "requestLongType": ".google.protobuf.Empty",
+              "requestFullType": "google.protobuf.Empty",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/pba/home-networks/policies/default"
                     }
                   ]
                 }
