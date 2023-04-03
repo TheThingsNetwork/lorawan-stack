@@ -166,20 +166,22 @@ type clusterBuilder struct {
 	options options
 }
 
-func (r *clusterBuilder) Build(target resolver.Target, cc resolver.ClientConn, opts resolver.BuildOptions) (resolver.Resolver, error) {
+func (r *clusterBuilder) Build(
+	target resolver.Target, cc resolver.ClientConn, opts resolver.BuildOptions,
+) (resolver.Resolver, error) {
 	// Use passthrough when the endpoint is an address.
-	if _, _, err := net.SplitHostPort(target.Endpoint); err == nil {
+	if _, _, err := net.SplitHostPort(target.Endpoint()); err == nil {
 		return resolver.Get("passthrough").Build(target, cc, opts)
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
-	service := target.Scheme + "-grpc"
+	service := target.URL.Scheme + "-grpc"
 	res := &clusterResolver{
 		ctx:     ctx,
 		cancel:  cancel,
 		dns:     r.options.dns,
 		service: service,
-		name:    target.Endpoint,
+		name:    target.Endpoint(),
 		cc:      cc,
 		rn:      make(chan struct{}, 1),
 	}
@@ -204,7 +206,7 @@ type clusterResolver struct {
 	wg sync.WaitGroup
 }
 
-func (r *clusterResolver) ResolveNow(opts resolver.ResolveNowOptions) {
+func (r *clusterResolver) ResolveNow(resolver.ResolveNowOptions) {
 	select {
 	case r.rn <- struct{}{}:
 	default:
