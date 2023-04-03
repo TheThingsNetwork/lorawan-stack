@@ -335,35 +335,6 @@ service Pba {
     };
   };
 
-  // Get the default routing policy.
-  // Getting routing policies requires administrative access.
-  rpc GetHomeNetworkDefaultRoutingPolicy(google.protobuf.Empty) returns (PacketBrokerDefaultRoutingPolicy) {
-    option (google.api.http) = {
-      get: "/pba/home-networks/policies/default"
-    };
-  };
-
-  // Set the default routing policy.
-  // Setting routing policies requires administrative access.
-  rpc SetHomeNetworkDefaultRoutingPolicy(SetPacketBrokerDefaultRoutingPolicyRequest) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      put: "/pba/home-networks/policies/default"
-      body: "*"
-      additional_bindings {
-        post: "/pba/home-networks/policies/default"
-        body: "*"
-      }
-    };
-  };
-
-  // Deletes the default routing policy.
-  // Deleting routing policies requires administrative access.
-  rpc DeleteHomeNetworkDefaultRoutingPolicy(google.protobuf.Empty) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      delete: "/pba/home-networks/policies/default"
-    };
-  };
-
   // List the routing policies that Packet Broker Agent as Forwarder configured with Home Networks.
   // Listing routing policies requires administrative access.
   rpc ListHomeNetworkRoutingPolicies(ListHomeNetworkRoutingPoliciesRequest) returns (PacketBrokerRoutingPolicies) {
@@ -412,6 +383,35 @@ service Pba {
       additional_bindings {
         delete: "/pba/home-networks/policies/{net_id}/{tenant_id}"
       }
+    };
+  };
+
+  // Get the default routing policy.
+  // Getting routing policies requires administrative access.
+  rpc GetHomeNetworkDefaultRoutingPolicy(google.protobuf.Empty) returns (PacketBrokerDefaultRoutingPolicy) {
+    option (google.api.http) = {
+      get: "/pba/home-networks/policies/default"
+    };
+  };
+
+  // Set the default routing policy.
+  // Setting routing policies requires administrative access.
+  rpc SetHomeNetworkDefaultRoutingPolicy(SetPacketBrokerDefaultRoutingPolicyRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/pba/home-networks/policies/default"
+      body: "*"
+      additional_bindings {
+        post: "/pba/home-networks/policies/default"
+        body: "*"
+      }
+    };
+  };
+
+  // Deletes the default routing policy.
+  // Deleting routing policies requires administrative access.
+  rpc DeleteHomeNetworkDefaultRoutingPolicy(google.protobuf.Empty) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/pba/home-networks/policies/default"
     };
   };
 

@@ -5254,43 +5254,6 @@
         }
       ]
     },
-    "GetHomeNetworkDefaultRoutingPolicy": {
-      "file": "lorawan-stack/api/packetbrokeragent.proto",
-      "http": [
-        {
-          "method": "get",
-          "pattern": "/pba/home-networks/policies/default",
-          "parameters": []
-        }
-      ]
-    },
-    "SetHomeNetworkDefaultRoutingPolicy": {
-      "file": "lorawan-stack/api/packetbrokeragent.proto",
-      "http": [
-        {
-          "method": "put",
-          "pattern": "/pba/home-networks/policies/default",
-          "body": "*",
-          "parameters": []
-        },
-        {
-          "method": "post",
-          "pattern": "/pba/home-networks/policies/default",
-          "body": "*",
-          "parameters": []
-        }
-      ]
-    },
-    "DeleteHomeNetworkDefaultRoutingPolicy": {
-      "file": "lorawan-stack/api/packetbrokeragent.proto",
-      "http": [
-        {
-          "method": "delete",
-          "pattern": "/pba/home-networks/policies/default",
-          "parameters": []
-        }
-      ]
-    },
     "ListHomeNetworkRoutingPolicies": {
       "file": "lorawan-stack/api/packetbrokeragent.proto",
       "http": [
@@ -5377,6 +5340,43 @@
             "net_id",
             "tenant_id"
           ]
+        }
+      ]
+    },
+    "GetHomeNetworkDefaultRoutingPolicy": {
+      "file": "lorawan-stack/api/packetbrokeragent.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/pba/home-networks/policies/default",
+          "parameters": []
+        }
+      ]
+    },
+    "SetHomeNetworkDefaultRoutingPolicy": {
+      "file": "lorawan-stack/api/packetbrokeragent.proto",
+      "http": [
+        {
+          "method": "put",
+          "pattern": "/pba/home-networks/policies/default",
+          "body": "*",
+          "parameters": []
+        },
+        {
+          "method": "post",
+          "pattern": "/pba/home-networks/policies/default",
+          "body": "*",
+          "parameters": []
+        }
+      ]
+    },
+    "DeleteHomeNetworkDefaultRoutingPolicy": {
+      "file": "lorawan-stack/api/packetbrokeragent.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/pba/home-networks/policies/default",
+          "parameters": []
         }
       ]
     },
