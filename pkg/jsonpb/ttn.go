@@ -37,7 +37,8 @@ func TTN() *TTNMarshaler {
 				UseEnumNumbers: true,
 			},
 			UnmarshalOptions: protojson.UnmarshalOptions{
-				AllowPartial: true,
+				AllowPartial:   true,
+				DiscardUnknown: true,
 			},
 		},
 	}
