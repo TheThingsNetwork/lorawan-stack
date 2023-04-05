@@ -534,6 +534,11 @@ var (
 				}
 			}
 
+			_, err = device.SetFromFlags(cmd.Flags(), "")
+			if err != nil {
+				return err
+			}
+
 			claimOnExternalJS := len(device.ClaimAuthenticationCode.GetValue()) > 0
 
 			// TODO: Remove this flag once the legacy DCS is deprecated
@@ -549,11 +554,6 @@ var (
 			if hasUpdateDeviceLocationFlags(cmd.Flags()) {
 				updateDeviceLocation(device, cmd.Flags())
 				paths = append(paths, "locations")
-			}
-
-			_, err = device.SetFromFlags(cmd.Flags(), "")
-			if err != nil {
-				return err
 			}
 
 			device.Attributes = mergeAttributes(device.Attributes, cmd.Flags())
