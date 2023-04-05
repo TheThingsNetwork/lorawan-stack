@@ -43,12 +43,21 @@ func WithNonce(r *http.Request) (*http.Request, string) {
 	return r.WithContext(context.WithValue(r.Context(), nonceKey, nonce)), nonce
 }
 
-// CleanCSP de-duplicates and removes empty entries from the CSP directive map.
-func CleanCSP(csp map[string][]string) map[string][]string {
-	for directive, entries := range csp {
+// ContentSecurityPolicy contains the Content Security Policy.
+type ContentSecurityPolicy struct {
+	ConnectionSource []string
+	StyleSource      []string
+	ScriptSource     []string
+	BaseURI          []string
+	FrameAncestors   []string
+}
+
+// Clean de-duplicates and removes empty entries from the policy.
+func (csp ContentSecurityPolicy) Clean() ContentSecurityPolicy {
+	cleanDirective := func(contents []string) []string {
 		added := map[string]struct{}{}
-		cleanedDirective := []string{}
-		for _, entry := range entries {
+		cleanContents := []string{}
+		for _, entry := range contents {
 			if entry == "" || strings.HasPrefix(entry, "/") {
 				continue // Skip empty and relative locations.
 			}
@@ -61,18 +70,45 @@ func CleanCSP(csp map[string][]string) map[string][]string {
 				continue // Skip already added locations.
 			}
 			added[entry] = struct{}{}
-			cleanedDirective = append(cleanedDirective, entry)
+			cleanContents = append(cleanContents, entry)
 		}
-		csp[directive] = cleanedDirective
+		return cleanContents
 	}
-	return csp
+	derived := csp
+	derived.ConnectionSource = cleanDirective(csp.ConnectionSource)
+	derived.StyleSource = cleanDirective(csp.StyleSource)
+	derived.ScriptSource = cleanDirective(csp.ScriptSource)
+	derived.BaseURI = cleanDirective(csp.BaseURI)
+	derived.FrameAncestors = cleanDirective(csp.FrameAncestors)
+	return derived
 }
 
-// GenerateCSPNonce returns a final csp string from map of directives.
-func GenerateCSPString(csp map[string][]string) string {
-	resultList := make([]string, 0)
-	for key, value := range csp {
-		resultList = append(resultList, fmt.Sprintf("%s %s;", key, strings.Join(value, " ")))
+// Merge merges the provided policies into the existing one.
+func (csp ContentSecurityPolicy) Merge(others ...ContentSecurityPolicy) ContentSecurityPolicy {
+	derived := csp
+	for _, other := range others {
+		derived.ConnectionSource = append(derived.ConnectionSource, other.ConnectionSource...)
+		derived.StyleSource = append(derived.StyleSource, other.StyleSource...)
+		derived.ScriptSource = append(derived.ScriptSource, other.ScriptSource...)
+		derived.BaseURI = append(derived.BaseURI, other.BaseURI...)
+		derived.FrameAncestors = append(derived.FrameAncestors, other.FrameAncestors...)
 	}
-	return strings.Join(resultList, " ")
+	return derived
+}
+
+// String returns the policy in string form.
+func (csp ContentSecurityPolicy) String() string {
+	appendPolicy := func(all []string, name string, contents []string) []string {
+		if len(contents) == 0 {
+			return all
+		}
+		return append(all, fmt.Sprintf("%s %s;", name, strings.Join(contents, " ")))
+	}
+	result := make([]string, 0, 5)
+	result = appendPolicy(result, "connect-src", csp.ConnectionSource)
+	result = appendPolicy(result, "style-src", csp.StyleSource)
+	result = appendPolicy(result, "script-src", csp.ScriptSource)
+	result = appendPolicy(result, "base-uri", csp.BaseURI)
+	result = appendPolicy(result, "frame-ancestors", csp.FrameAncestors)
+	return strings.Join(result, " ")
 }

@@ -85,21 +85,21 @@ func (is *IdentityServer) configFromContext(ctx context.Context) *Config {
 // GenerateCSPString returns a Content-Security-Policy header value
 // for OAuth and Account app template.
 func GenerateCSPString(config *oauth.Config, nonce string) string {
-	cspMap := webui.CleanCSP(map[string][]string{
-		"connect-src": {
+	return webui.ContentSecurityPolicy{
+		ConnectionSource: []string{
 			"'self'",
 			config.UI.StackConfig.IS.BaseURL,
 			config.UI.SentryDSN,
 			"gravatar.com",
 			"www.gravatar.com",
 		},
-		"style-src": {
+		StyleSource: []string{
 			"'self'",
 			config.UI.AssetsBaseURL,
 			config.UI.BrandingBaseURL,
 			"'unsafe-inline'",
 		},
-		"script-src": {
+		ScriptSource: []string{
 			"'self'",
 			config.UI.AssetsBaseURL,
 			config.UI.BrandingBaseURL,
@@ -107,14 +107,13 @@ func GenerateCSPString(config *oauth.Config, nonce string) string {
 			"'strict-dynamic'",
 			fmt.Sprintf("'nonce-%s'", nonce),
 		},
-		"base-uri": {
+		BaseURI: []string{
 			"'self'",
 		},
-		"frame-ancestors": {
+		FrameAncestors: []string{
 			"'none'",
 		},
-	})
-	return webui.GenerateCSPString(cspMap)
+	}.Clean().String()
 }
 
 type accountAppStore struct {

@@ -87,9 +87,9 @@ func path(u string) (string, error) {
 	return p.Path, nil
 }
 
-func generateConsoleCSPString(config *Config, nonce string) string {
-	cspMap := webui.CleanCSP(map[string][]string{
-		"connect-src": {
+func generateConsoleCSPString(config *Config, nonce string, others ...webui.ContentSecurityPolicy) string {
+	return webui.ContentSecurityPolicy{
+		ConnectionSource: []string{
 			"'self'",
 			config.UI.StackConfig.GS.BaseURL,
 			config.UI.StackConfig.IS.BaseURL,
@@ -104,13 +104,13 @@ func generateConsoleCSPString(config *Config, nonce string) string {
 			"gravatar.com",
 			"www.gravatar.com",
 		},
-		"style-src": {
+		StyleSource: []string{
 			"'self'",
 			config.UI.AssetsBaseURL,
 			config.UI.BrandingBaseURL,
 			"'unsafe-inline'",
 		},
-		"script-src": {
+		ScriptSource: []string{
 			"'self'",
 			config.UI.AssetsBaseURL,
 			config.UI.BrandingBaseURL,
@@ -118,15 +118,13 @@ func generateConsoleCSPString(config *Config, nonce string) string {
 			"'strict-dynamic'",
 			fmt.Sprintf("'nonce-%s'", nonce),
 		},
-		"base-uri": {
+		BaseURI: []string{
 			"'self'",
 		},
-		"frame-ancestors": {
+		FrameAncestors: []string{
 			"'none'",
 		},
-	})
-
-	return webui.GenerateCSPString(cspMap)
+	}.Merge(others...).Clean().String()
 }
 
 // RegisterRoutes implements web.Registerer. It registers the Console to the web server.
