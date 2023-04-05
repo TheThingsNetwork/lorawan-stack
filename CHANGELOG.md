@@ -24,6 +24,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Attempting to claim an end device with a generated DevEUI will now result in an error.
+- Claiming an end device using command line flags.
 
 ### Security
 
