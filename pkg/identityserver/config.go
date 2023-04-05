@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/oauth"
+	telemetry "go.thethings.network/lorawan-stack/v3/pkg/telemetry/exporter"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	ttntypes "go.thethings.network/lorawan-stack/v3/pkg/types"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -113,6 +114,7 @@ type Config struct {
 		NetID    ttntypes.NetID `name:"net-id" description:"NetID of this network"`
 		TenantID string         `name:"tenant-id" description:"Tenant ID in the host NetID"`
 	} `name:"network"`
+	TelemetryQueue telemetry.TaskQueue `name:"-"`
 }
 
 type emailTemplatesConfig struct {

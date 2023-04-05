@@ -39,6 +39,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	telemetry_cli "go.thethings.network/lorawan-stack/v3/pkg/telemetry/exporter/cli"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/io"
 	pkgversion "go.thethings.network/lorawan-stack/v3/pkg/version"
 	"golang.org/x/oauth2"
@@ -78,6 +79,12 @@ var (
 
 			// clean up the API
 			api.CloseAll()
+
+			if config.Telemetry.Enable {
+				telemetry_cli.NewCLITelemetry(
+					telemetry_cli.WithCLITarget(config.Telemetry.Target),
+				).Run(ctx)
+			}
 
 			select {
 			case <-ctx.Done():

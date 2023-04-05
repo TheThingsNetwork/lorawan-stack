@@ -36,6 +36,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpctracer"
+	telemetry "go.thethings.network/lorawan-stack/v3/pkg/telemetry/exporter"
 	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/webui"
@@ -59,6 +60,8 @@ type IdentityServer struct {
 	redis   *redis.Client
 	account account.Server
 	oauth   oauth.Server
+
+	telemetryQueue telemetry.TaskQueue
 }
 
 // Context returns the context of the Identity Server.
@@ -141,9 +144,10 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 	ctx := tracer.NewContextWithTracer(c.Context(), tracerNamespace)
 
 	is = &IdentityServer{
-		Component: c,
-		ctx:       log.NewContextWithField(ctx, "namespace", logNamespace),
-		config:    config,
+		Component:      c,
+		ctx:            log.NewContextWithField(ctx, "namespace", logNamespace),
+		config:         config,
+		telemetryQueue: config.TelemetryQueue,
 	}
 
 	if err := is.setupStore(); err != nil {
@@ -168,6 +172,11 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		ctx = rights.NewContextWithCache(ctx)
 		return ctx
 	})
+
+	// Tasks initialization.
+	if err := is.initilizeTelemetryTasks(is.Context()); err != nil {
+		return nil, err
+	}
 
 	for _, hook := range []struct {
 		name       string

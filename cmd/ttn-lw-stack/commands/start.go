@@ -49,6 +49,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator"
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/redis"
+	telemetry "go.thethings.network/lorawan-stack/v3/pkg/telemetry/exporter"
 	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 )
@@ -76,6 +77,12 @@ func NewNetworkServerApplicationUplinkQueueRedis(conf *Config) *redis.Client {
 // with the Network Server Downlink Task namespace.
 func NewNetworkServerDownlinkTaskRedis(conf *Config) *redis.Client {
 	return redis.New(conf.Redis.WithNamespace("ns", "tasks"))
+}
+
+// NewIdentityServerTelemetryTaskRedis instantiates a new redis client
+// with the Identity Server Telemetry Task namespace.
+func NewIdentityServerTelemetryTaskRedis(conf *Config) *redis.Client {
+	return redis.New(conf.Cache.Redis.WithNamespace("is", "tasks"))
 }
 
 // NewApplicationServerDeviceRegistryRedis instantiates a new redis client
@@ -228,6 +235,24 @@ var startCommand = &cobra.Command{
 			if config.IS.OAuth.UI.TemplateData.SentryDSN == "" {
 				config.IS.OAuth.UI.TemplateData.SentryDSN = config.Sentry.DSN
 			}
+
+			if config.Cache.Redis.Address != "" {
+				redisConsumerGroup := "is"
+				// Initiate the redis task queue for telemetry tasks.
+				telemetryTaskQueue, tqCloser, err := telemetry.NewRedisTaskQueue(
+					ctx,
+					NewIdentityServerTelemetryTaskRedis(config),
+					100000,
+					redisConsumerGroup,
+					redis.DefaultStreamBlockLimit,
+				)
+				if err != nil {
+					return shared.ErrInitializeIdentityServer.WithCause(err)
+				}
+				config.IS.TelemetryQueue = telemetryTaskQueue
+				defer tqCloser(ctx) // nolint:errcheck
+			}
+
 			is, err := identityserver.New(c, &config.IS)
 			if err != nil {
 				return shared.ErrInitializeIdentityServer.WithCause(err)

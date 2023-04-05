@@ -125,6 +125,8 @@ var (
 				}(ctx)
 			}
 
+			telemetryConfigFallback(ctx, config)
+
 			return nil
 		},
 		PersistentPostRunE: func(cmd *cobra.Command, args []string) error {
