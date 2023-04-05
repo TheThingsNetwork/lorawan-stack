@@ -41,7 +41,7 @@
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 {{- range .Fields }}
-| `{{ .Name }}` | [`{{ .LongType }}`](#{{ .FullType }}) | {{ .Label }} | {{ nobr .Description }}{{ if .DefaultValue }} Default: {{ .DefaultValue }}{{ end }} |
+| `{{ .Name }}` | [`{{ .LongType }}`](#{{ .FullType }}) | {{ .Label }} | {{ nobr (.Description | replace "\n\n" "\n") }}{{ if .DefaultValue }} Default: {{ .DefaultValue }}{{ end }} |
 {{- end -}}
 
 {{- if $message.FieldsWithOption "validate.rules" }}
@@ -70,7 +70,7 @@
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 {{- range .Values }}
-| `{{ .Name }}` | {{ .Number }} | {{ nobr .Description }} |
+| `{{ .Name }}` | {{ .Number }} | {{ nobr (.Description | replace "\n\n" "\n") }} |
 {{- end -}}
 {{ end -}}
 
@@ -86,7 +86,7 @@
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 {{- range .Methods }}
-| `{{ .Name }}` | [`{{ .RequestLongType }}`](#{{ .RequestFullType }}){{ if .RequestStreaming }} _stream_{{ end }} | [`{{ .ResponseLongType }}`](#{{ .ResponseFullType }}){{ if .ResponseStreaming }} _stream_{{ end }} | {{ nobr .Description }} |
+| `{{ .Name }}` | [`{{ .RequestLongType }}`](#{{ .RequestFullType }}){{ if .RequestStreaming }} _stream_{{ end }} | [`{{ .ResponseLongType }}`](#{{ .ResponseFullType }}){{ if .ResponseStreaming }} _stream_{{ end }} | {{ nobr (.Description | replace "\n\n" "\n") }} |
 {{- end -}}
 
 {{- if $service.MethodsWithOption "google.api.http" }}
