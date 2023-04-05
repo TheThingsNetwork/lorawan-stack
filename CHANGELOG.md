@@ -27,12 +27,14 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Security
 
-## [3.25.0] - unreleased
+## [3.25.0] - 2023-04-05
 
 ### Added
 
 - Optional Network Server database migration that removes obsolete last invalidation keys is now available.
-- **Use LoRa Application Layer Clock Sync package** field is now available in the Console.
+- LoRaWAN Application Layer Clock Synchronization support.
+  - It is available using the `alcsync-v1` application package.
+  - Can be enabled using the Console by visiting the application settings and ticking the **Use Application Layer Clock Synchronization** checkbox. By default, the package will operate on FPort 202.
 - Drop uplink frames with CRC failure.
 
 ### Deprecated

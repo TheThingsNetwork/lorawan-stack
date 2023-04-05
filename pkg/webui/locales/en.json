@@ -219,7 +219,7 @@
   "console.components.api-key-modal.index.description": "Your API key has been created successfully.\nNote: After closing this window, the value of the key secret will not be accessible anymore.\nMake sure to copy and store it in a safe place now.",
   "console.components.application-general-settings-form.index.basics": "Basics",
   "console.components.application-general-settings-form.index.deleteApp": "Delete application",
-  "console.components.application-general-settings-form.index.useAlcsync": "Use LoRa Application Layer Clock Synchronization package",
+  "console.components.application-general-settings-form.index.useAlcsync": "Use Application Layer Clock Synchronization",
   "console.components.device-import-form.index.file": "File",
   "console.components.device-import-form.index.formatInfo": "Format information",
   "console.components.device-import-form.index.selectAFile": "Please select a template file",
