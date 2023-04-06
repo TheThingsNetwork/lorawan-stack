@@ -15,6 +15,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- The Things Stack is now built with Go 1.20.
+
 ### Deprecated
 
 - `--with-claim-authentication-code` flag for the end device `create` command via the CLI. Users must use a valid claim authentication code that is registered on a Join Server instead of generating one during end device creation.
