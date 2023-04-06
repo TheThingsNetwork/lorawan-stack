@@ -39,7 +39,7 @@ require (
 	github.com/RoaringBitmap/roaring v0.4.23 // indirect
 	github.com/TheThingsIndustries/mystique v0.0.0-20221125120501-80ab21781b6d // indirect
 	github.com/TheThingsIndustries/protoc-gen-go-flags v1.1.0 // indirect
-	github.com/TheThingsIndustries/protoc-gen-go-json v1.5.0 // indirect
+	github.com/TheThingsIndustries/protoc-gen-go-json v1.5.1 // indirect
 	github.com/TheThingsNetwork/go-cayenne-lib v1.1.0 // indirect
 	github.com/aws/aws-sdk-go v1.44.186 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.17.1 // indirect

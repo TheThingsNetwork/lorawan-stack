@@ -32,7 +32,7 @@ const (
 	protocOut             = "/out"
 	goProtoImage          = "ghcr.io/thethingsindustries/protoc:22.2-gen-go-1.30.0"
 	goGrpcProtoImage      = "ghcr.io/thethingsindustries/protoc:22.2-gen-go-grpc-1.54.0"
-	jsonProtoImage        = "ghcr.io/thethingsindustries/protoc:22.2-gen-go-json-1.5.0"
+	jsonProtoImage        = "ghcr.io/thethingsindustries/protoc:22.2-gen-go-json-1.5.1"
 	fieldMaskProtoImage   = "ghcr.io/thethingsindustries/protoc:22.2-gen-fieldmask-0.7.3"
 	grpcGatewayProtoImage = "ghcr.io/thethingsindustries/protoc:22.0-gen-grpc-gateway-2.15.2"
 	openAPIv2ProtoImage   = "ghcr.io/thethingsindustries/protoc:22.0-gen-grpc-gateway-2.15.2"
