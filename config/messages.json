@@ -8722,7 +8722,7 @@
   },
   "error:pkg/types:invalid_length": {
     "translations": {
-      "en": "invalid length: want {want} bytes, got {got}"
+      "en": "invalid length: want {want} bytes, got {got} {got_type}"
     },
     "description": {
       "package": "pkg/types",
@@ -8772,15 +8772,6 @@
     "description": {
       "package": "pkg/types",
       "file": "devaddr.go"
-    }
-  },
-  "error:pkg/types:src_type": {
-    "translations": {
-      "en": "invalid type for src"
-    },
-    "description": {
-      "package": "pkg/types",
-      "file": "types.go"
     }
   },
   "error:pkg/unique:format": {

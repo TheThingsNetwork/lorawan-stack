@@ -121,7 +121,9 @@ func (jn *JoinNonce) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		return
 	}
 	if len(b) != 3 {
-		s.SetError(errInvalidDevAddr.WithCause(errInvalidLength.WithAttributes("want", 3, "got", len(b))))
+		s.SetError(errInvalidDevAddr.WithCause(errInvalidLength.WithAttributes(
+			"want", 3, "got", len(b), "got_type", "bytes",
+		)))
 		return
 	}
 	copy(jn[:], b)

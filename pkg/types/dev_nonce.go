@@ -122,7 +122,9 @@ func (dn *DevNonce) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		return
 	}
 	if len(b) != 2 {
-		s.SetError(errInvalidDevAddr.WithCause(errInvalidLength.WithAttributes("want", 2, "got", len(b))))
+		s.SetError(errInvalidDevAddr.WithCause(errInvalidLength.WithAttributes(
+			"want", 2, "got", len(b), "got_type", "bytes",
+		)))
 		return
 	}
 	copy(dn[:], b)
