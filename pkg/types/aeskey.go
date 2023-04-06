@@ -122,7 +122,9 @@ func (key *AES128Key) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		return
 	}
 	if len(b) != 16 {
-		s.SetError(errInvalidDevAddr.WithCause(errInvalidLength.WithAttributes("want", 16, "got", len(b))))
+		s.SetError(errInvalidDevAddr.WithCause(errInvalidLength.WithAttributes(
+			"want", 16, "got", len(b), "got_type", "bytes",
+		)))
 		return
 	}
 	copy(key[:], b)

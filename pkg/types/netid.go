@@ -122,7 +122,9 @@ func (id *NetID) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		return
 	}
 	if len(b) != 3 {
-		s.SetError(errInvalidNetID.WithCause(errInvalidLength.WithAttributes("want", 3, "got", len(b))))
+		s.SetError(errInvalidNetID.WithCause(errInvalidLength.WithAttributes(
+			"want", 3, "got", len(b), "got_type", "bytes",
+		)))
 		return
 	}
 	copy(id[:], b)

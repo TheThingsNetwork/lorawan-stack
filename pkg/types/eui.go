@@ -124,7 +124,9 @@ func (eui *EUI64) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		return
 	}
 	if len(b) != 8 {
-		s.SetError(errInvalidEUI.WithCause(errInvalidLength.WithAttributes("want", 8, "got", len(b))))
+		s.SetError(errInvalidEUI.WithCause(errInvalidLength.WithAttributes(
+			"want", 8, "got", len(b), "got_type", "bytes",
+		)))
 		return
 	}
 	copy(eui[:], b)

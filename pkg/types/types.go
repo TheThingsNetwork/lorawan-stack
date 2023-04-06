@@ -44,9 +44,10 @@ type Interface interface {
 }
 
 var (
-	errScanArgumentType = errors.DefineInternal("src_type", "invalid type for src") // DB schema problem.
-	errInvalidJSON      = errors.DefineInvalidArgument("invalid_json", "invalid JSON: `{json}`")
-	errInvalidLength    = errors.DefineInvalidArgument("invalid_length", "invalid length: want {want} bytes, got {got}")
+	errInvalidJSON   = errors.DefineInvalidArgument("invalid_json", "invalid JSON: `{json}`")
+	errInvalidLength = errors.DefineInvalidArgument(
+		"invalid_length", "invalid length: want {want} bytes, got {got} {got_type}",
+	)
 )
 
 func marshalJSONHexBytes(data []byte) ([]byte, error) {
@@ -87,7 +88,7 @@ func unmarshalTextBytes(dst, data []byte) error {
 		return err
 	}
 	if n != len(dst) || copy(dst, b) != len(dst) {
-		return errInvalidLength.WithAttributes("want", len(dst), "got", n)
+		return errInvalidLength.WithAttributes("want", len(dst), "got", n, "got_type", "bytes")
 	}
 	return nil
 }
@@ -100,7 +101,7 @@ func marshalBinaryBytes(data []byte) ([]byte, error) {
 
 func marshalBinaryBytesTo(dst, src []byte) (int, error) {
 	if len(dst) < len(src) {
-		return 0, errInvalidLength.WithAttributes("want", len(dst), "got", len(src))
+		return 0, errInvalidLength.WithAttributes("want", len(dst), "got", len(src), "got_type", "bytes")
 	}
 	return copy(dst, src), nil
 }
@@ -110,7 +111,7 @@ func unmarshalBinaryBytes(dst, data []byte) error {
 		return nil
 	}
 	if len(data) != len(dst) || copy(dst[:], data) != len(dst) {
-		return errInvalidLength.WithAttributes("want", len(dst), "got", len(data))
+		return errInvalidLength.WithAttributes("want", len(dst), "got", len(data), "got_type", "bytes")
 	}
 	return nil
 }
@@ -149,7 +150,9 @@ func unmarshalNBytes(s *jsonplugin.UnmarshalState, n int) []byte {
 		}
 		return b
 	default:
-		s.SetError(errInvalidLength.WithAttributes("want", n, "got", len(enc)))
+		s.SetError(errInvalidLength.WithAttributes(
+			"want", n, "got", len(enc), "got_type", "runes",
+		))
 		return nil
 	}
 }

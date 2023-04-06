@@ -128,7 +128,9 @@ func (addr *DevAddr) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		return
 	}
 	if len(b) != 4 {
-		s.SetError(errInvalidDevAddr.WithCause(errInvalidLength.WithAttributes("want", 4, "got", len(b))))
+		s.SetError(errInvalidDevAddr.WithCause(errInvalidLength.WithAttributes(
+			"want", 4, "got", len(b), "got_type", "bytes",
+		)))
 		return
 	}
 	copy(addr[:], b)
