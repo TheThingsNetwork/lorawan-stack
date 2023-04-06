@@ -15,9 +15,11 @@
 package email_test
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
+	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -31,6 +33,8 @@ type welcomeEmailData struct {
 }
 
 func TestEmail(t *testing.T) {
+	t.Parallel()
+
 	a, ctx := test.New(t)
 
 	registry := email.NewTemplateRegistry()
@@ -51,25 +55,33 @@ func TestEmail(t *testing.T) {
 	registry.RegisterTemplate(welcomeEmailTemplate)
 
 	a.So(registry.RegisteredTemplates(), should.Contain, "welcome")
-	a.So(registry.GetTemplate(ctx, "welcome"), should.Resemble, welcomeEmailTemplate)
+	returnedTemplate := registry.GetTemplate(ctx, "welcome")
 
-	message, err := welcomeEmailTemplate.Execute(&welcomeEmailData{
-		TemplateData: email.NewTemplateData(&email.NetworkConfig{
-			Name:              "The Things Network",
-			IdentityServerURL: "https://eu1.cloud.thethings.network/oauth",
-			ConsoleURL:        "https://console.cloud.thethings.network",
-		}, &ttnpb.User{
-			Name:                "John Doe",
-			PrimaryEmailAddress: "john.doe@example.com",
-		}),
-	})
+	for i, template := range []*email.Template{welcomeEmailTemplate, returnedTemplate} {
+		template := template
+		t.Run(fmt.Sprint(i), func(t *testing.T) {
+			t.Parallel()
+			a := assertions.New(t)
 
-	if a.So(err, should.BeNil) && a.So(message, should.NotBeNil) {
-		a.So(message.Subject, should.Equal, "Welcome to The Things Network")
-		a.So(message.HTMLBody, should.ContainSubstring, `<div class="header">`)
-		a.So(message.HTMLBody, should.ContainSubstring, "Welcome to The Things Network, John Doe!")
-		a.So(message.HTMLBody, should.ContainSubstring, `<div class="footer">`)
-		a.So(message.TextBody, should.ContainSubstring, "==================")
-		a.So(message.TextBody, should.ContainSubstring, "Welcome to The Things Network, John Doe!")
+			message, err := template.Execute(&welcomeEmailData{
+				TemplateData: email.NewTemplateData(&email.NetworkConfig{
+					Name:              "The Things Network",
+					IdentityServerURL: "https://eu1.cloud.thethings.network/oauth",
+					ConsoleURL:        "https://console.cloud.thethings.network",
+				}, &ttnpb.User{
+					Name:                "John Doe",
+					PrimaryEmailAddress: "john.doe@example.com",
+				}),
+			})
+
+			if a.So(err, should.BeNil) && a.So(message, should.NotBeNil) {
+				a.So(message.Subject, should.Equal, "Welcome to The Things Network")
+				a.So(message.HTMLBody, should.ContainSubstring, `<div class="header">`)
+				a.So(message.HTMLBody, should.ContainSubstring, "Welcome to The Things Network, John Doe!")
+				a.So(message.HTMLBody, should.ContainSubstring, `<div class="footer">`)
+				a.So(message.TextBody, should.ContainSubstring, "==================")
+				a.So(message.TextBody, should.ContainSubstring, "Welcome to The Things Network, John Doe!")
+			}
+		})
 	}
 }
