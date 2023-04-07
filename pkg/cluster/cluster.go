@@ -27,7 +27,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials"
 )
 
@@ -317,18 +316,16 @@ func (c *cluster) Leave() error {
 }
 
 func (c *cluster) GetPeers(ctx context.Context, role ttnpb.ClusterRole) ([]Peer, error) {
-	var matches []Peer
+	matches := make([]Peer, 0, len(c.peers))
 	for _, peer := range c.peers {
 		if !peer.HasRole(role) {
 			continue
 		}
-		conn, err := peer.Conn()
+		_, err := peer.Conn()
 		if err != nil {
 			continue
 		}
-		if conn.GetState() == connectivity.Ready {
-			matches = append(matches, peer)
-		}
+		matches = append(matches, peer)
 	}
 	return matches, nil
 }

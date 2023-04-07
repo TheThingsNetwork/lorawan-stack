@@ -28,7 +28,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpcretry"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials"
 )
 
@@ -184,7 +183,7 @@ func CloseAll() {
 	defer connMu.Unlock()
 	for target, conn := range conns {
 		delete(conns, target)
-		if conn == nil || conn.GetState() == connectivity.Shutdown {
+		if conn == nil {
 			continue
 		}
 		conn.Close()
