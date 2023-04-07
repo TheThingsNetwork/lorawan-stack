@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.25.1] - unreleased
+
+### Added
+
 - Fallback end device version identifiers to be used while importing end devices using the Console.
 
 ### Changed
@@ -21,14 +35,10 @@ For details about compatibility between different releases, see the **Commitment
 
 - `--with-claim-authentication-code` flag for the end device `create` command via the CLI. Users must use a valid claim authentication code that is registered on a Join Server instead of generating one during end device creation.
 
-### Removed
-
 ### Fixed
 
 - Attempting to claim an end device with a generated DevEUI will now result in an error.
 - Claiming an end device using command line flags.
-
-### Security
 
 ## [3.25.0] - 2023-04-05
 
@@ -2543,7 +2553,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.25.0...v3.25
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.25.1...v3.25
+[3.25.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.25.0...v3.25.1
 [3.25.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.24.2...v3.25.0
 [3.24.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.24.1...v3.24.2
 [3.24.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.24.0...v3.24.1
