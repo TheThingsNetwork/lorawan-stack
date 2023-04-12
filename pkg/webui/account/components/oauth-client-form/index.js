@@ -45,6 +45,7 @@ const OAuthClientForm = props => {
     initialValues: values,
     onSubmit,
     onDelete,
+    mayEditBasicInformation,
   } = props
   const { formatMessage } = useIntl()
 
@@ -105,6 +106,22 @@ const OAuthClientForm = props => {
         description={m.clientDescDescription}
         component={Input}
       />
+      {update && mayEditBasicInformation && (
+        <>
+          <Form.Field
+            name="administrative_contact"
+            component={Input}
+            title={sharedMessages.adminContact}
+            description={sharedMessages.administrativeEmailAddressDescription}
+          />
+          <Form.Field
+            name="technical_contact"
+            component={Input}
+            title={sharedMessages.technicalContact}
+            description={sharedMessages.technicalEmailAddressDescription}
+          />
+        </>
+      )}
       <Form.Field
         name="redirect_uris"
         title={m.redirectUrls}
@@ -214,6 +231,7 @@ OAuthClientForm.propTypes = {
     description: PropTypes.string,
   }),
   isAdmin: PropTypes.bool.isRequired,
+  mayEditBasicInformation: PropTypes.bool,
   onDelete: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   pseudoRights: PropTypes.rights.isRequired,
@@ -238,6 +256,7 @@ OAuthClientForm.defaultProps = {
     state_description: '',
   },
   update: false,
+  mayEditBasicInformation: false,
   rights: undefined,
   error: undefined,
   onDelete: () => null,

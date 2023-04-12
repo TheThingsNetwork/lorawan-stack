@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, { useState, useCallback } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
 
@@ -24,6 +24,8 @@ import OAuthClientForm from '@account/components/oauth-client-form'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import diff from '@ttn-lw/lib/diff'
+
+import { mayEditBasicClientInformation, checkFromState } from '@account/lib/feature-checks'
 
 import { deleteClient, updateClient } from '@account/store/actions/clients'
 
@@ -58,6 +60,9 @@ const checkChanged = (changed, values) => {
 const ClientAdd = props => {
   const { userId, isAdmin, rights, pseudoRights, initialValues } = props
 
+  const mayEditBasicInformation = useSelector(state =>
+    checkFromState(mayEditBasicClientInformation, state),
+  )
   const [error, setError] = useState()
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -138,6 +143,7 @@ const ClientAdd = props => {
       isAdmin={isAdmin}
       rights={rights}
       pseudoRights={pseudoRights}
+      mayEditBasicInformation={mayEditBasicInformation}
     />
   )
 }

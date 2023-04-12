@@ -125,6 +125,7 @@ const OrganizationUpdateForm = ({ onDeleteSuccess }) => {
 
   return (
     <OrganizationForm
+      update
       onSubmit={handleUpdate}
       error={error}
       submitBarItems={deleteButton}

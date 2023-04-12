@@ -56,7 +56,7 @@ const initialValues = {
 }
 
 const OrganizationForm = props => {
-  const { onSubmit, error, submitBarItems, initialValues, submitMessage } = props
+  const { onSubmit, error, submitBarItems, initialValues, submitMessage, update } = props
 
   const isUpdate = Boolean(initialValues.ids.organization_id)
 
@@ -90,6 +90,22 @@ const OrganizationForm = props => {
         description={m.orgDescDescription}
         component={Input}
       />
+      {update && (
+        <>
+          <Form.Field
+            name="administrative_contact"
+            component={Input}
+            title={sharedMessages.adminContact}
+            description={sharedMessages.administrativeEmailAddressDescription}
+          />
+          <Form.Field
+            name="technical_contact"
+            component={Input}
+            title={sharedMessages.technicalContact}
+            description={sharedMessages.technicalEmailAddressDescription}
+          />
+        </>
+      )}
       <SubmitBar>
         <Form.Submit message={submitMessage} component={SubmitButton} />
         {submitBarItems}
@@ -109,6 +125,7 @@ OrganizationForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   submitBarItems: PropTypes.element,
   submitMessage: PropTypes.message,
+  update: PropTypes.bool,
 }
 
 OrganizationForm.defaultProps = {
@@ -116,6 +133,7 @@ OrganizationForm.defaultProps = {
   error: undefined,
   submitBarItems: null,
   submitMessage: sharedMessages.createOrganization,
+  update: false,
 }
 
 export { OrganizationForm as default, initialValues }
