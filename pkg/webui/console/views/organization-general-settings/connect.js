@@ -26,6 +26,7 @@ import {
   mayDeleteOrganization,
   mayViewOrEditOrganizationApiKeys,
   mayViewOrEditOrganizationCollaborators,
+  mayEditBasicOrganizationInformation,
 } from '@console/lib/feature-checks'
 
 import { updateOrganization, deleteOrganization } from '@console/store/actions/organizations'
@@ -50,6 +51,7 @@ import {
 const mapStateToProps = state => {
   const mayViewApiKeys = checkFromState(mayViewOrEditOrganizationApiKeys, state)
   const mayViewCollaborators = checkFromState(mayViewOrEditOrganizationCollaborators, state)
+  const mayEditBasicInformation = checkFromState(mayEditBasicOrganizationInformation, state)
   const apiKeysCount = selectApiKeysTotalCount(state)
   const collaboratorsCount = selectCollaboratorsTotalCount(state)
   const mayPurgeOrg = checkFromState(mayPurgeEntities, state)
@@ -76,6 +78,7 @@ const mapStateToProps = state => {
     mayPurge: mayPurgeOrg,
     shouldConfirmDelete: !isPristine || !mayViewCollaborators || !mayViewApiKeys || Boolean(error),
     mayDeleteOrganization: mayDeleteOrg,
+    mayEditBasicInformation,
   }
 }
 

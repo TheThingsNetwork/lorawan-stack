@@ -81,6 +81,8 @@ const validationSchema = Yup.object().shape({
       attributeValueTooLongCheck,
     ),
   skip_payload_crypto: Yup.boolean(),
+  administrative_contact: Yup.string().email(sharedMessages.validateEmail),
+  technical_contact: Yup.string().email(sharedMessages.validateEmail),
 })
 
 const ApplicationGeneralSettings = props => {
@@ -203,6 +205,18 @@ const ApplicationGeneralSettings = props => {
               addMessage={sharedMessages.addAttributes}
               component={KeyValueMap}
               description={sharedMessages.attributeDescription}
+            />
+            <Form.Field
+              name="administrative_contact"
+              component={Input}
+              title={sharedMessages.adminContact}
+              description={sharedMessages.administrativeEmailAddressDescription}
+            />
+            <Form.Field
+              name="technical_contact"
+              component={Input}
+              title={sharedMessages.technicalContact}
+              description={sharedMessages.technicalEmailAddressDescription}
             />
             <SubmitBar>
               <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />

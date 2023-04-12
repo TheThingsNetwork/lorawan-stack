@@ -226,6 +226,18 @@ const BasicSettingsForm = React.memo(props => {
         description={m.disablePacketBrokerForwarding}
         tooltipId={tooltipIds.DISABLE_PACKET_BROKER_FORWARDING}
       />
+      <Form.Field
+        name="administrative_contact"
+        component={Input}
+        title={sharedMessages.adminContact}
+        description={sharedMessages.administrativeEmailAddressDescription}
+      />
+      <Form.Field
+        name="technical_contact"
+        component={Input}
+        title={sharedMessages.technicalContact}
+        description={sharedMessages.technicalEmailAddressDescription}
+      />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
         <Require featureCheck={mayDeleteGateway}>

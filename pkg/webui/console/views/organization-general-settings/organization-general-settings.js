@@ -53,6 +53,7 @@ const GeneralSettings = props => {
     updateOrganization,
     deleteOrganization,
     deleteOrganizationSuccess,
+    mayEditBasicInformation,
   } = props
 
   useBreadcrumbs(
@@ -120,6 +121,7 @@ const GeneralSettings = props => {
             onSubmit={handleUpdate}
             onSubmitSuccess={handleUpdateSuccess}
             onSubmitFailure={handleUpdateFailure}
+            mayEditBasicInformation={mayEditBasicInformation}
           >
             <SubmitBar>
               <Form.Submit message={sharedMessages.saveChanges} component={SubmitButton} />
@@ -144,6 +146,7 @@ const GeneralSettings = props => {
 GeneralSettings.propTypes = {
   deleteOrganization: PropTypes.func.isRequired,
   deleteOrganizationSuccess: PropTypes.func.isRequired,
+  mayEditBasicInformation: PropTypes.bool.isRequired,
   mayPurge: PropTypes.bool.isRequired,
   orgId: PropTypes.string.isRequired,
   organization: PropTypes.organization.isRequired,

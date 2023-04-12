@@ -35,6 +35,8 @@ const validationSchema = Yup.object().shape({
     .min(2, Yup.passValues(sharedMessages.validateTooShort))
     .max(50, Yup.passValues(sharedMessages.validateTooLong)),
   description: Yup.string().max(2000, Yup.passValues(sharedMessages.validateTooLong)),
+  administrative_contact: Yup.string().email(sharedMessages.validateEmail),
+  technical_contact: Yup.string().email(sharedMessages.validateEmail),
 })
 
 const m = defineMessages({
@@ -55,6 +57,7 @@ const OrganizationForm = props => {
     onSubmit,
     onSubmitSuccess,
     onSubmitFailure,
+    mayEditBasicInformation,
   } = props
 
   const handleSubmit = useCallback(
@@ -103,6 +106,22 @@ const OrganizationForm = props => {
         description={m.orgDescDescription}
         component={Input}
       />
+      {update && mayEditBasicInformation && (
+        <>
+          <Form.Field
+            name="administrative_contact"
+            component={Input}
+            title={sharedMessages.adminContact}
+            description={sharedMessages.administrativeEmailAddressDescription}
+          />
+          <Form.Field
+            name="technical_contact"
+            component={Input}
+            title={sharedMessages.technicalContact}
+            description={sharedMessages.technicalEmailAddressDescription}
+          />
+        </>
+      )}
       {children}
     </Form>
   )
@@ -118,6 +137,7 @@ OrganizationForm.propTypes = {
     name: PropTypes.string,
     description: PropTypes.string,
   }).isRequired,
+  mayEditBasicInformation: PropTypes.bool.isRequired,
   onSubmit: PropTypes.func.isRequired,
   onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
