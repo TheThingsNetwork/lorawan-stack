@@ -28,7 +28,6 @@ require (
 	github.com/felixge/httpsnoop v1.0.3
 	github.com/getsentry/sentry-go v0.17.0
 	github.com/golang/gddo v0.0.0-20210115222349-20d68f94ee1f
-	github.com/golang/protobuf v1.5.3
 	github.com/google/go-cmp v0.5.9
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/csrf v1.7.1
@@ -172,6 +171,7 @@ require (
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/golang-jwt/jwt/v4 v4.4.3 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
+	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gomodule/redigo v1.8.9 // indirect
 	github.com/google/wire v0.5.0 // indirect

@@ -17,11 +17,11 @@ package errors
 import (
 	"context"
 
-	protov1 "github.com/golang/protobuf/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/protoadapt"
 )
 
 // FromGRPCStatus converts the gRPC status message into an Error.
@@ -71,7 +71,7 @@ func (d *Definition) setGRPCStatus() {
 	if ErrorDetailsToProto != nil {
 		if pb := ErrorDetailsToProto(d); pb != nil {
 			var err error
-			s, err = s.WithDetails(protov1.MessageV1(pb))
+			s, err = s.WithDetails(protoadapt.MessageV1Of(pb))
 			if err != nil {
 				panic(err) // ErrorDetailsToProto generated an invalid proto.
 			}
@@ -101,7 +101,7 @@ func (e *Error) GRPCStatus() *status.Status {
 	if ErrorDetailsToProto != nil {
 		if pb := ErrorDetailsToProto(e); pb != nil {
 			var err error
-			s, err = s.WithDetails(protov1.MessageV1(pb))
+			s, err = s.WithDetails(protoadapt.MessageV1Of(pb))
 			if err != nil {
 				panic(err) // ErrorDetailsToProto generated an invalid proto.
 			}
