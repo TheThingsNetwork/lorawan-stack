@@ -36,6 +36,9 @@ export default defineMessages({
   addressPlaceholder: 'host',
   addWebhook: 'Add webhook',
   admin: 'Admin',
+  adminContact: 'Administrative contact',
+  administrativeEmailAddressDescription:
+    'Email address associated with your account for administrative purposes',
   all: 'All',
   allAdmin: 'All (Admin)',
   altitude: 'Altitude',
@@ -386,6 +389,9 @@ export default defineMessages({
   supportsClassB: 'Supports class B',
   supportsClassC: 'Supports class C',
   takeMeBack: 'Take me back',
+  technicalContact: 'Technical contact',
+  technicalEmailAddressDescription:
+    'Email address associated with your account for technical purposes',
   tenantId: 'Tenant ID',
   termsAndCondition: 'Terms and conditions',
   time: 'Time',
