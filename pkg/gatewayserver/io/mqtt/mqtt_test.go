@@ -202,7 +202,10 @@ func TestTraffic(t *testing.T) {
 				Topic: fmt.Sprintf("v3/%v/up", registeredGatewayUID),
 				Message: &ttnpb.UplinkMessage{
 					RawPayload: []byte{0x01},
-					Settings:   &ttnpb.TxSettings{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+					Settings: &ttnpb.TxSettings{
+						DataRate:  &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}},
+						Frequency: 868000000,
+					},
 				},
 				OK: true,
 			},

@@ -6591,6 +6591,7 @@ On downlink, this is a scheduled transmission.
 | Field | Validations |
 | ----- | ----------- |
 | `data_rate` | <p>`message.required`: `true`</p> |
+| `frequency` | <p>`uint64.gte`: `100000`</p> |
 
 ### <a name="ttn.lorawan.v3.TxSettings.Downlink">Message `TxSettings.Downlink`</a>
 

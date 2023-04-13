@@ -66,7 +66,10 @@ const UplinkForm = props => {
           rx_metadata: [
             { gateway_ids: { gateway_id: 'test' }, rssi: 42, channel_rssi: 42, snr: 4.2 },
           ],
-          settings: { data_rate: { lora: { bandwidth: 125000, spreading_factor: 7 } } },
+          settings: {
+            data_rate: { lora: { bandwidth: 125000, spreading_factor: 7 } },
+            frequency: 868000000,
+          },
         })
         toast({
           title: sharedMessages.success,

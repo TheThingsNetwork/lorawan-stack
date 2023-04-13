@@ -13,6 +13,10 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Uplink and downlink message frequencies are now validated and zero values are dropped.
+  - Such traffic would have always been dropped by the Network Server, but it is now dropped in the Gateway Server.
+  - Simulated uplink traffic now requires a frequency value as well.
+
 ### Deprecated
 
 ### Removed
