@@ -15,10 +15,10 @@
 package io
 
 import (
-	"bytes"
 	"context"
 	"encoding/base64"
 	"fmt"
+	"hash/fnv"
 	"sync/atomic"
 	"time"
 
@@ -121,9 +121,9 @@ type Connection struct {
 }
 
 type uplinkMessage struct {
-	payload   []byte
-	frequency uint64
-	antennas  []uint32
+	payloadHash uint64
+	frequency   uint64
+	antennas    []uint32
 }
 
 var (
@@ -829,11 +829,17 @@ func (c *Connection) notifyStatsChanged() {
 	}
 }
 
+func payloadHash(b []byte) uint64 {
+	h := fnv.New64a()
+	_, _ = h.Write(b)
+	return h.Sum64()
+}
+
 func uplinkMessageFromProto(pb *ttnpb.UplinkMessage) *uplinkMessage {
 	up := &uplinkMessage{
-		payload:   pb.GetRawPayload(),
-		frequency: pb.GetSettings().Frequency,
-		antennas:  make([]uint32, 0, len(pb.GetRxMetadata())),
+		payloadHash: payloadHash(pb.GetRawPayload()),
+		frequency:   pb.GetSettings().Frequency,
+		antennas:    make([]uint32, 0, len(pb.GetRxMetadata())),
 	}
 	for _, md := range pb.GetRxMetadata() {
 		up.antennas = append(up.antennas, md.GetAntennaIndex())
@@ -842,7 +848,16 @@ func uplinkMessageFromProto(pb *ttnpb.UplinkMessage) *uplinkMessage {
 }
 
 func isRepeatedUplink(this *uplinkMessage, that *uplinkMessage) bool {
-	if this == nil || that == nil || this.frequency != that.frequency || len(this.antennas) != len(that.antennas) || !bytes.Equal(this.payload, that.payload) {
+	if this == nil || that == nil {
+		return false
+	}
+	if this.frequency != that.frequency {
+		return false
+	}
+	if len(this.antennas) != len(that.antennas) {
+		return false
+	}
+	if this.payloadHash != that.payloadHash {
 		return false
 	}
 	for idx, antenna := range this.antennas {
