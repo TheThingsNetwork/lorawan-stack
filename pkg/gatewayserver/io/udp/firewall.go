@@ -29,6 +29,11 @@ type Firewall interface {
 	Filter(packet encoding.Packet) error
 }
 
+type noopFirewall struct{}
+
+// Filter implements Firewall.
+func (noopFirewall) Filter(encoding.Packet) error { return nil }
+
 type addrTime struct {
 	net.IP
 	lastSeen time.Time

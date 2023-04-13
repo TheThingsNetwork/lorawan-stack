@@ -16,6 +16,7 @@ package udp
 
 import (
 	"context"
+	"encoding/binary"
 	"net"
 	"sync"
 	"sync/atomic"
@@ -59,16 +60,16 @@ var (
 )
 
 // Serve serves the UDP frontend.
-func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, config Config) error {
+func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, conf Config) error {
 	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/udp")
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	var firewall Firewall
-	if config.AddrChangeBlock > 0 {
-		firewall = NewMemoryFirewall(ctx, config.AddrChangeBlock)
+	var firewall Firewall = noopFirewall{}
+	if conf.AddrChangeBlock > 0 {
+		firewall = NewMemoryFirewall(ctx, conf.AddrChangeBlock)
 	}
-	if config.RateLimiting.Enable {
-		firewall = NewRateLimitingFirewall(firewall, config.RateLimiting.Messages, config.RateLimiting.Threshold)
+	if conf.RateLimiting.Enable {
+		firewall = NewRateLimitingFirewall(firewall, conf.RateLimiting.Messages, conf.RateLimiting.Threshold)
 	}
 	limitLogs, err := ratelimit.NewProfile(ctx, limitLogsConfig, limitLogsSize)
 	if err != nil {
@@ -76,7 +77,7 @@ func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, config Conf
 	}
 	s := &srv{
 		ctx:      ctx,
-		config:   config,
+		config:   conf,
 		server:   server,
 		conn:     conn,
 		firewall: firewall,
@@ -88,8 +89,8 @@ func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, config Conf
 		Context:    ctx,
 		Name:       "udp",
 		Handler:    s.handlePacket,
-		MaxWorkers: config.PacketHandlers,
-		QueueSize:  config.PacketBuffer,
+		MaxWorkers: conf.PacketHandlers,
+		QueueSize:  conf.PacketBuffer,
 	})
 	go s.gc()
 	go func() {
@@ -169,13 +170,16 @@ func (s *srv) handlePacket(ctx context.Context, packet encoding.Packet) {
 		}
 	}
 
-	if s.firewall != nil {
-		if err := s.firewall.Filter(packet); err != nil {
-			if !errors.IsResourceExhausted(err) || ratelimit.Require(s.limitLogs, ratelimit.NewCustomResource(eui.String())) == nil {
-				logger.WithError(err).Warn("Packet filtered")
-			}
+	if err := s.firewall.Filter(packet); err != nil {
+		if !errors.IsResourceExhausted(err) {
+			goto filtered
+		}
+		if ratelimit.Require(s.limitLogs, ratelimit.NewCustomResource(eui.String())) != nil {
 			return
 		}
+	filtered:
+		logger.WithError(err).Warn("Packet filtered")
+		return
 	}
 
 	cs, err := s.connect(ctx, eui, packet.GatewayAddr)
@@ -206,11 +210,11 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64, addr *net.UDPAddr) (
 		var err error
 		defer func() {
 			if err != nil {
-				delete := func() { s.connections.Delete(eui) }
+				del := func() { s.connections.Delete(eui) }
 				if expiration := s.config.ConnectionErrorExpires; expiration != 0 {
-					time.AfterFunc(expiration, delete)
+					time.AfterFunc(expiration, del)
 				} else {
-					delete()
+					del()
 				}
 			}
 			cs.io, cs.ioErr = conn, err
@@ -334,7 +338,7 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 			}
 		}
 		var rtt *time.Duration
-		if downlink, delta, ok := state.tokens.Get(uint16(packet.Token[0])<<8|uint16(packet.Token[1]), packet.ReceivedAt); ok {
+		if downlink, delta, ok := state.tokens.Get(binary.BigEndian.Uint16(packet.Token[:]), packet.ReceivedAt); ok {
 			msg.TxAcknowledgment.DownlinkMessage = downlink
 			msg.TxAcknowledgment.CorrelationIds = downlink.CorrelationIds
 			rtt = &delta
@@ -405,7 +409,7 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 			write := func() {
 				logger.Debug("Write downlink message")
 				token := state.tokens.Next(down, time.Now())
-				packet.Token = [2]byte{byte(token >> 8), byte(token)}
+				packet.Token = [2]byte(binary.BigEndian.AppendUint16(nil, token))
 				if err := s.write(packet); err != nil {
 					logger.WithError(err).Warn("Failed to write downlink message")
 					// TODO: Report to Network Server: https://github.com/TheThingsNetwork/lorawan-stack/issues/76
