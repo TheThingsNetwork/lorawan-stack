@@ -444,7 +444,7 @@ message TxSettings {
   reserved 2; // data_rate_index
   reserved 3; // coding_rate
   // Frequency (Hz).
-  uint64 frequency = 4;
+  uint64 frequency = 4 [(validate.rules).uint64.gte = 100000];
   // Send a CRC in the packet; only on uplink; on downlink, CRC should not be enabled.
   bool enable_crc = 5;
   // Timestamp of the gateway concentrator when the uplink message was received, or when the downlink message should be transmitted (microseconds).

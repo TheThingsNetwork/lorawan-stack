@@ -31257,7 +31257,15 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint64.gte",
+                    "value": 100000
+                  }
+                ]
+              }
             },
             {
               "name": "enable_crc",

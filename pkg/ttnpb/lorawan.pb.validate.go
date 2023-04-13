@@ -1690,7 +1690,14 @@ func (m *TxSettings) ValidateFields(paths ...string) error {
 			}
 
 		case "frequency":
-			// no validation rules for Frequency
+
+			if m.GetFrequency() < 100000 {
+				return TxSettingsValidationError{
+					field:  "frequency",
+					reason: "value must be greater than or equal to 100000",
+				}
+			}
+
 		case "enable_crc":
 			// no validation rules for EnableCrc
 		case "timestamp":
