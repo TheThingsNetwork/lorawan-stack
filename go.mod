@@ -6,7 +6,7 @@ go 1.20
 replace github.com/throttled/throttled/v2 => github.com/TheThingsIndustries/throttled/v2 v2.7.1-noredis
 
 // See https://github.com/mitchellh/mapstructure/pull/278
-replace github.com/mitchellh/mapstructure v1.4.3 => github.com/TheThingsIndustries/mapstructure v0.0.0-20220329135826-c42f9f170b2a
+replace github.com/mitchellh/mapstructure => github.com/TheThingsIndustries/mapstructure v0.0.0-20230413130846-941bcd1deec3
 
 require (
 	contrib.go.opencensus.io/exporter/prometheus v0.4.2
