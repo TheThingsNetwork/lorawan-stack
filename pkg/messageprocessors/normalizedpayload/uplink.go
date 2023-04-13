@@ -141,6 +141,24 @@ func parseNumber(selector func(dst *Measurement) **float64, vals ...fieldValidat
 	}
 }
 
+// parsePercentage parses and validates a percentage.
+func parsePercentage(selector func(dst *Measurement) **float64) fieldParser {
+	return parseNumber(
+		selector,
+		minimum(0.0),
+		maximum(100.0),
+	)
+}
+
+// parseConcentration parses and validates a concentration. Concentration must be in ppm between 0 and 1000000.
+func parseConcentration(selector func(dst *Measurement) **float64) fieldParser {
+	return parseNumber(
+		selector,
+		minimum(0.0),
+		maximum(1000000.0),
+	)
+}
+
 // minimum returns a field validator that checks the inclusive minimum.
 func minimum[T constraints.Ordered](min T) fieldValidator[T] {
 	return func(v T, path string) error {
@@ -212,12 +230,10 @@ var fieldParsers = map[string]fieldParser{
 		},
 		minimum(0.0),
 	),
-	"soil.moisture": parseNumber(
+	"soil.moisture": parsePercentage(
 		func(dst *Measurement) **float64 {
 			return &dst.Soil.Moisture
 		},
-		minimum(0.0),
-		maximum(100.0),
 	),
 	"soil.temperature": parseNumber(
 		func(dst *Measurement) **float64 {
@@ -239,26 +255,20 @@ var fieldParsers = map[string]fieldParser{
 		minimum(0.0),
 		maximum(14.0),
 	),
-	"soil.n": parseNumber(
+	"soil.n": parseConcentration(
 		func(dst *Measurement) **float64 {
 			return &dst.Soil.Nitrogen
 		},
-		minimum(0.0),
-		maximum(1000000.0),
 	),
-	"soil.p": parseNumber(
+	"soil.p": parseConcentration(
 		func(dst *Measurement) **float64 {
 			return &dst.Soil.Phosphorus
 		},
-		minimum(0.0),
-		maximum(1000000.0),
 	),
-	"soil.k": parseNumber(
+	"soil.k": parseConcentration(
 		func(dst *Measurement) **float64 {
 			return &dst.Soil.Potassium
 		},
-		minimum(0.0),
-		maximum(1000000.0),
 	),
 	"air": object(
 		func(dst *Measurement) *Air {
@@ -271,12 +281,10 @@ var fieldParsers = map[string]fieldParser{
 		},
 		minimum(-273.15),
 	),
-	"air.relativeHumidity": parseNumber(
+	"air.relativeHumidity": parsePercentage(
 		func(dst *Measurement) **float64 {
 			return &dst.Air.RelativeHumidity
 		},
-		minimum(0.0),
-		maximum(100.0),
 	),
 	"air.pressure": parseNumber(
 		func(dst *Measurement) **float64 {
@@ -285,12 +293,10 @@ var fieldParsers = map[string]fieldParser{
 		minimum(900.0),
 		maximum(1100.0),
 	),
-	"air.co2": parseNumber(
+	"air.co2": parseConcentration(
 		func(dst *Measurement) **float64 {
 			return &dst.Air.CO2
 		},
-		minimum(0.0),
-		maximum(1000000.0),
 	),
 	"air.lightIntensity": parseNumber(
 		func(dst *Measurement) **float64 {

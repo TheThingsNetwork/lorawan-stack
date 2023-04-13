@@ -63,6 +63,35 @@ func TestUplink(t *testing.T) {
 			},
 		},
 		{
+			name: "one soil nutrient concentration",
+			normalizedPayload: []*structpb.Struct{
+				{
+					Fields: map[string]*structpb.Value{
+						"soil": {
+							Kind: &structpb.Value_StructValue{
+								StructValue: &structpb.Struct{
+									Fields: map[string]*structpb.Value{
+										"n": {
+											Kind: &structpb.Value_NumberValue{
+												NumberValue: 999999.99,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expected: []normalizedpayload.Measurement{
+				{
+					Soil: normalizedpayload.Soil{
+						Nitrogen: float64Ptr(999999.99),
+					},
+				},
+			},
+		},
+		{
 			name: "two air temperatures",
 			normalizedPayload: []*structpb.Struct{
 				{
@@ -120,6 +149,39 @@ func TestUplink(t *testing.T) {
 			},
 			expected: []normalizedpayload.Measurement{
 				{},
+			},
+		},
+		{
+			name: "above 100 percent soil moisture",
+			normalizedPayload: []*structpb.Struct{
+				{
+					Fields: map[string]*structpb.Value{
+						"soil": {
+							Kind: &structpb.Value_StructValue{
+								StructValue: &structpb.Struct{
+									Fields: map[string]*structpb.Value{
+										"moisture": {
+											Kind: &structpb.Value_NumberValue{
+												NumberValue: 120,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expected: []normalizedpayload.Measurement{
+				{},
+			},
+			expectedValidationErrors: [][]error{
+				{
+					normalizedpayload.ErrFieldMaximum.WithAttributes(
+						"path", "soil.moisture",
+						"maximum", 100.0,
+					),
+				},
 			},
 		},
 		{
