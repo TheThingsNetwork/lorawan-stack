@@ -271,7 +271,7 @@ func (s *srv) handleUp(ctx context.Context, st *state, packet encoding.Packet) e
 	switch packet.PacketType {
 	case encoding.PullData:
 		atomic.StoreInt64(&st.lastSeenPull, now.UnixNano())
-		st.lastDownlinkPath.Store(downlinkPath{
+		st.lastDownlinkPath.Store(&downlinkPath{
 			addr:    *packet.GatewayAddr,
 			version: packet.ProtocolVersion,
 		})
@@ -362,7 +362,7 @@ var (
 
 func (s *srv) handleDown(ctx context.Context, st *state) error {
 	defer func() {
-		st.lastDownlinkPath.Store(downlinkPath{})
+		st.lastDownlinkPath.Store(nil)
 		st.startHandleDownMu.Lock()
 		st.startHandleDown = &sync.Once{}
 		st.startHandleDownMu.Unlock()
@@ -396,7 +396,11 @@ func (s *srv) handleDown(ctx context.Context, st *state) error {
 				// TODO: Report to Network Server: https://github.com/TheThingsNetwork/lorawan-stack/issues/76
 				break
 			}
-			downlinkPath := st.lastDownlinkPath.Load().(downlinkPath)
+			downlinkPath := st.lastDownlinkPath.Load()
+			if downlinkPath == nil {
+				logger.Debug("Received downlink message without an active downlink path")
+				break
+			}
 			logger := logger.WithField("remote_addr", downlinkPath.addr.String())
 			packet := encoding.Packet{
 				GatewayAddr:     &downlinkPath.addr,
@@ -526,7 +530,7 @@ type state struct {
 	clockMu sync.RWMutex
 
 	downlinkTaskDone  *sync.WaitGroup
-	lastDownlinkPath  atomic.Value // downlinkPath
+	lastDownlinkPath  atomic.Pointer[downlinkPath]
 	startHandleDown   *sync.Once
 	startHandleDownMu sync.RWMutex
 

@@ -91,7 +91,7 @@ type Connection struct {
 	lastUplinkTime,
 	lastDownlinkTime,
 	lastRepeatUpTime int64
-	lastStatus atomic.Value // *ttnpb.GatewayStatus
+	lastStatus atomic.Pointer[ttnpb.GatewayStatus]
 
 	ctx       context.Context
 	cancelCtx errorcontext.CancelFunc
@@ -116,7 +116,7 @@ type Connection struct {
 
 	versionInfoCh chan struct{}
 
-	lastUplink atomic.Value // *uplinkMessage
+	lastUplink atomic.Pointer[uplinkMessage]
 }
 
 type uplinkMessage struct {
@@ -721,7 +721,8 @@ func (c *Connection) GatewayRemoteAddress() *ttnpb.GatewayRemoteAddress { return
 
 // StatusStats returns the status statistics.
 func (c *Connection) StatusStats() (last *ttnpb.GatewayStatus, t time.Time, ok bool) {
-	if last, ok = c.lastStatus.Load().(*ttnpb.GatewayStatus); ok {
+	last = c.lastStatus.Load()
+	if ok = last != nil; ok {
 		t = time.Unix(0, atomic.LoadInt64(&c.lastStatusTime))
 	}
 	return
@@ -873,12 +874,11 @@ func isRepeatedUplink(this *uplinkMessage, that *uplinkMessage) bool {
 func (c *Connection) discardRepeatedUplink(up *ttnpb.UplinkMessage) bool {
 	uplink := uplinkMessageFromProto(up)
 	repeated := false
-	for last := c.lastUplink.Load(); ; last = c.lastUplink.Load() {
-		lastUplink, _ := last.(*uplinkMessage)
+	for lastUplink := c.lastUplink.Load(); ; lastUplink = c.lastUplink.Load() {
 		if repeated = isRepeatedUplink(lastUplink, uplink); repeated {
 			break
 		}
-		if c.lastUplink.CompareAndSwap(last, uplink) {
+		if c.lastUplink.CompareAndSwap(lastUplink, uplink) {
 			break
 		}
 	}
