@@ -68,6 +68,8 @@ const validationSchema = Yup.object().shape({
     ),
   skip_payload_crypto: Yup.boolean(),
   alcsync: Yup.boolean(),
+  administrative_contact: Yup.string().email(sharedMessages.validateEmail),
+  technical_contact: Yup.string().email(sharedMessages.validateEmail),
 })
 
 const encodeAttributes = formValue =>

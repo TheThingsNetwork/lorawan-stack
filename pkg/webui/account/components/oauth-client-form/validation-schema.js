@@ -52,6 +52,8 @@ const validationSchema = Yup.object().shape({
     return Yup.string()
   }),
   rights: Yup.array().min(1, sharedMessages.validateRights),
+  administrative_contact: Yup.string().email(sharedMessages.validateEmail),
+  technical_contact: Yup.string().email(sharedMessages.validateEmail),
 })
 
 export default validationSchema

@@ -141,6 +141,18 @@ const BasicSettingsForm = React.memo(props => {
         tooltipId={tooltipIds.GATEWAY_DESCRIPTION}
       />
       <Form.Field
+        name="administrative_contact"
+        component={Input}
+        title={sharedMessages.adminContact}
+        description={sharedMessages.administrativeEmailAddressDescription}
+      />
+      <Form.Field
+        name="technical_contact"
+        component={Input}
+        title={sharedMessages.technicalContact}
+        description={sharedMessages.technicalEmailAddressDescription}
+      />
+      <Form.Field
         title={sharedMessages.gatewayServerAddress}
         description={sharedMessages.gsServerAddressDescription}
         placeholder={sharedMessages.addressPlaceholder}

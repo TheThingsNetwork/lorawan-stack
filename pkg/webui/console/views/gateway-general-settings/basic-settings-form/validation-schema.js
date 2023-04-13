@@ -84,6 +84,8 @@ const validationSchema = Yup.object().shape({
       sharedMessages.attributeValueValidateTooLong,
       attributeValueTooLongCheck,
     ),
+  administrative_contact: Yup.string().email(sharedMessages.validateEmail),
+  technical_contact: Yup.string().email(sharedMessages.validateEmail),
 })
 
 export default validationSchema
