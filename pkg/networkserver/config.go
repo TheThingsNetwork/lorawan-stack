@@ -54,7 +54,7 @@ type MACSettingConfig struct {
 }
 
 // Parse parses the configuration and returns ttnpb.MACSettings.
-func (c MACSettingConfig) Parse() *ttnpb.MACSettings {
+func (c MACSettingConfig) Parse() (*ttnpb.MACSettings, error) {
 	p := &ttnpb.MACSettings{
 		ClassBTimeout:         ttnpb.ProtoDuration(c.ClassBTimeout),
 		ClassCTimeout:         ttnpb.ProtoDuration(c.ClassCTimeout),
@@ -78,7 +78,10 @@ func (c MACSettingConfig) Parse() *ttnpb.MACSettings {
 	if c.StatusCountPeriodicity != nil {
 		p.StatusCountPeriodicity = &wrapperspb.UInt32Value{Value: *c.StatusCountPeriodicity}
 	}
-	return p
+	if err := p.ValidateFields(); err != nil {
+		return nil, err
+	}
+	return p, nil
 }
 
 // DownlinkPriorityConfig defines priorities for downlink messages.
