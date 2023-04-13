@@ -29,6 +29,8 @@ type Air struct {
 	Temperature      *float64
 	RelativeHumidity *float64
 	Pressure         *float64
+	CO2              *float64
+	LightIntensity   *float64
 }
 
 // Wind is a wind measurement.
@@ -210,6 +212,19 @@ var fieldParsers = map[string]fieldParser{
 		},
 		minimum(900.0),
 		maximum(1100.0),
+	),
+	"air.co2": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Air.CO2
+		},
+		minimum(0.0),
+		maximum(1000000.0),
+	),
+	"air.lightIntensity": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Air.LightIntensity
+		},
+		minimum(0.0),
 	),
 	"wind": object(
 		func(dst *Measurement) *Wind {
