@@ -107,7 +107,10 @@ func TestFlow(t *testing.T) {
 					Timestamp:    100,
 				},
 			},
-			Settings: &ttnpb.TxSettings{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+			Settings: &ttnpb.TxSettings{
+				DataRate:  &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}},
+				Frequency: 868000000,
+			},
 		}
 		select {
 		case up := <-conn.Up():
@@ -596,7 +599,10 @@ func TestSubBandEIRPOverride(t *testing.T) {
 					Timestamp:    100,
 				},
 			},
-			Settings: &ttnpb.TxSettings{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+			Settings: &ttnpb.TxSettings{
+				DataRate:  &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}},
+				Frequency: 868000000,
+			},
 		}
 		select {
 		case up := <-conn.Up():
