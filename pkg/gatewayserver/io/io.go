@@ -89,8 +89,9 @@ type Connection struct {
 	connectTime,
 	lastStatusTime,
 	lastUplinkTime,
-	lastDownlinkTime int64
-	lastStatus atomic.Value
+	lastDownlinkTime,
+	lastRepeatUpTime int64
+	lastStatus atomic.Value // *ttnpb.GatewayStatus
 
 	ctx       context.Context
 	cancelCtx errorcontext.CancelFunc
@@ -103,6 +104,7 @@ type Connection struct {
 	fps              *frequencyplans.Store
 	scheduler        *scheduling.Scheduler
 	rtts             *rtts
+	addr             *ttnpb.GatewayRemoteAddress
 
 	upCh     chan *ttnpb.GatewayUplinkMessage
 	downCh   chan *ttnpb.DownlinkMessage
@@ -114,10 +116,7 @@ type Connection struct {
 
 	versionInfoCh chan struct{}
 
-	lastUplink            *uplinkMessage
-	lastRepeatUpEventTime time.Time
-
-	addr *ttnpb.GatewayRemoteAddress
+	lastUplink atomic.Value // *uplinkMessage
 }
 
 type uplinkMessage struct {
@@ -871,22 +870,37 @@ func isRepeatedUplink(this *uplinkMessage, that *uplinkMessage) bool {
 // discardRepeatedUplink will discard repeated uplinks from faulty gateway
 // implementations. It returns true if the uplink message is the same as the
 // last uplink message that was received by the connection.
-//
-// discardRepeatedUplink is not goroutine safe.
 func (c *Connection) discardRepeatedUplink(up *ttnpb.UplinkMessage) bool {
 	uplink := uplinkMessageFromProto(up)
-	shouldDiscard := isRepeatedUplink(c.lastUplink, uplink)
-	c.lastUplink = uplink
-	if shouldDiscard {
-		shouldEmitEvent := false
-		if time.Since(c.lastRepeatUpEventTime) >= consecutiveRepeatUpEventsInterval {
-			log.FromContext(c.ctx).Debug("Dropped repeated gateway uplink")
-			shouldEmitEvent = true
-			c.lastRepeatUpEventTime = time.Now()
+	repeated := false
+	for last := c.lastUplink.Load(); ; last = c.lastUplink.Load() {
+		lastUplink, _ := last.(*uplinkMessage)
+		if repeated = isRepeatedUplink(lastUplink, uplink); repeated {
+			break
 		}
-		registerRepeatUp(c.ctx, shouldEmitEvent, c.gateway, c.frontend.Protocol())
+		if c.lastUplink.CompareAndSwap(last, uplink) {
+			break
+		}
 	}
-	return shouldDiscard
+	if !repeated {
+		return false
+	}
+	emitEvent := false
+	now := time.Now()
+	for last := atomic.LoadInt64(&c.lastRepeatUpTime); ; last = atomic.LoadInt64(&c.lastRepeatUpTime) {
+		lastRepeatUpTime := time.Unix(0, last)
+		if emitEvent = now.Sub(lastRepeatUpTime) >= consecutiveRepeatUpEventsInterval; !emitEvent {
+			break
+		}
+		if atomic.CompareAndSwapInt64(&c.lastRepeatUpTime, last, now.UnixNano()) {
+			break
+		}
+	}
+	if emitEvent {
+		log.FromContext(c.ctx).Debug("Dropped repeated gateway uplink")
+	}
+	registerRepeatUp(c.ctx, emitEvent, c.gateway, c.frontend.Protocol())
+	return true
 }
 
 type rssiAndIndex struct {
