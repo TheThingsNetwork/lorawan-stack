@@ -24,6 +24,18 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
+// Soil is an soil measurement.
+type Soil struct {
+	Depth                  *float64
+	Moisture               *float64
+	Temperature            *float64
+	ElectricalConductivity *float64
+	PHLevel                *float64
+	Nitrogen               *float64
+	Phosphorus             *float64
+	Potassium              *float64
+}
+
 // Air is an air measurement.
 type Air struct {
 	Temperature      *float64
@@ -42,6 +54,7 @@ type Wind struct {
 // Measurement is a measurement.
 type Measurement struct {
 	Time *time.Time
+	Soil Soil
 	Air  Air
 	Wind Wind
 }
@@ -187,6 +200,65 @@ var fieldParsers = map[string]fieldParser{
 		func(dst *Measurement) **time.Time {
 			return &dst.Time
 		},
+	),
+	"soil": object(
+		func(dst *Measurement) *Soil {
+			return &dst.Soil
+		},
+	),
+	"soil.depth": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Soil.Depth
+		},
+		minimum(0.0),
+	),
+	"soil.moisture": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Soil.Moisture
+		},
+		minimum(0.0),
+		maximum(100.0),
+	),
+	"soil.temperature": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Soil.Temperature
+		},
+		minimum(-273.15),
+	),
+	"soil.ec": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Soil.ElectricalConductivity
+		},
+		minimum(0.0),
+		maximum(621.0),
+	),
+	"soil.pH": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Soil.PHLevel
+		},
+		minimum(0.0),
+		maximum(14.0),
+	),
+	"soil.n": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Soil.Nitrogen
+		},
+		minimum(0.0),
+		maximum(1000000.0),
+	),
+	"soil.p": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Soil.Phosphorus
+		},
+		minimum(0.0),
+		maximum(1000000.0),
+	),
+	"soil.k": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Soil.Potassium
+		},
+		minimum(0.0),
+		maximum(1000000.0),
 	),
 	"air": object(
 		func(dst *Measurement) *Air {
