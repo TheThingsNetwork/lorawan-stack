@@ -624,6 +624,7 @@ func TestMessageProcessors(t *testing.T) {
 					DataRate: &ttnpb.DataRate{
 						Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}},
 					},
+					Frequency: 868000000,
 				},
 				FPort: 1,
 			},
