@@ -452,6 +452,7 @@ func (gs *GatewayServer) Connect(
 	frontend io.Frontend,
 	ids *ttnpb.GatewayIdentifiers,
 	addr *ttnpb.GatewayRemoteAddress,
+	opts ...io.ConnectionOption,
 ) (*io.Connection, error) {
 	if err := gs.entityRegistry.AssertGatewayRights(ctx, ids, ttnpb.Right_RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
@@ -520,7 +521,7 @@ func (gs *GatewayServer) Connect(
 	}
 
 	conn, err := io.NewConnection(
-		ctx, frontend, gtw, fps, gtw.EnforceDutyCycle, ttnpb.StdDuration(gtw.ScheduleAnytimeDelay), addr,
+		ctx, frontend, gtw, fps, gtw.EnforceDutyCycle, ttnpb.StdDuration(gtw.ScheduleAnytimeDelay), addr, opts...,
 	)
 	if err != nil {
 		return nil, err
