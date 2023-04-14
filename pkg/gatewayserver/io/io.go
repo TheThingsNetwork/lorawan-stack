@@ -85,10 +85,12 @@ type Server interface {
 type Connection struct {
 	// Align for sync/atomic.
 	uplinks,
-	downlinks uint64
+	downlinks,
+	txAcknowledgments uint64
 	lastStatusTime,
 	lastUplinkTime,
 	lastDownlinkTime,
+	lastTxAcknowledgmentTime,
 	lastRepeatUpTime int64
 
 	lastStatus atomic.Pointer[ttnpb.GatewayStatus]
@@ -399,6 +401,8 @@ func (c *Connection) HandleTxAck(ack *ttnpb.TxAcknowledgment) (err error) {
 	case <-c.ctx.Done():
 		return c.ctx.Err()
 	case c.txAckCh <- ack:
+		atomic.AddUint64(&c.txAcknowledgments, 1)
+		atomic.StoreInt64(&c.lastTxAcknowledgmentTime, time.Now().UnixNano())
 		c.notifyStatsChanged()
 	default:
 		return errBufferFull.New()
@@ -458,7 +462,6 @@ func (c *Connection) SendDown(msg *ttnpb.DownlinkMessage) error {
 	case c.downCh <- msg:
 		atomic.AddUint64(&c.downlinks, 1)
 		atomic.StoreInt64(&c.lastDownlinkTime, time.Now().UnixNano())
-
 		c.notifyStatsChanged()
 	default:
 		return errBufferFull.New()
@@ -746,6 +749,15 @@ func (c *Connection) DownStats() (total uint64, t time.Time, ok bool) {
 	return
 }
 
+// TxAckStats return the transmission acknowledgement statistics.
+func (c *Connection) TxAckStats() (total uint64, t time.Time, ok bool) {
+	total = atomic.LoadUint64(&c.txAcknowledgments)
+	if ok = total > 0; ok {
+		t = time.Unix(0, atomic.LoadInt64(&c.lastTxAcknowledgmentTime))
+	}
+	return
+}
+
 // RTTStats returns the recorded round-trip time statistics.
 func (c *Connection) RTTStats(percentile int, t time.Time) (min, max, median, np time.Duration, count int) {
 	return c.rtts.Stats(percentile, t)
@@ -780,6 +792,11 @@ func (c *Connection) Stats() (*ttnpb.GatewayConnectionStats, []string) {
 			stats.SubBands = c.scheduler.SubBandStats()
 			paths = append(paths, "sub_bands")
 		}
+	}
+	if count, t, ok := c.TxAckStats(); ok {
+		stats.LastTxAcknowledgmentReceivedAt = timestamppb.New(t)
+		stats.TxAcknowledgmentCount = count
+		paths = append(paths, "last_tx_acknowledgment_received_at", "tx_acknowledgment_count")
 	}
 	if min, max, median, _, count := c.RTTStats(100, time.Now()); count > 0 {
 		stats.RoundTripTimes = &ttnpb.GatewayConnectionStats_RoundTripTimes{
