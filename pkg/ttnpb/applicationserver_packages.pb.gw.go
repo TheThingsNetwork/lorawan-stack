@@ -32,7 +32,7 @@ var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
 var (
-	filter_ApplicationPackageRegistry_List_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "device_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
+	filter_ApplicationPackageRegistry_List_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "applicationId": 2, "device_id": 3, "deviceId": 4}, Base: []int{1, 1, 1, 2, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 1, 3, 4, 5, 6}}
 )
 
 func request_ApplicationPackageRegistry_List_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationPackageRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -122,7 +122,7 @@ func local_request_ApplicationPackageRegistry_List_0(ctx context.Context, marsha
 }
 
 var (
-	filter_ApplicationPackageRegistry_GetAssociation_0 = &utilities.DoubleArray{Encoding: map[string]int{"ids": 0, "end_device_ids": 1, "application_ids": 2, "application_id": 3, "device_id": 4, "f_port": 5}, Base: []int{1, 4, 1, 1, 1, 2, 2, 0, 0, 4, 0}, Check: []int{0, 1, 2, 3, 4, 2, 6, 5, 7, 2, 10}}
+	filter_ApplicationPackageRegistry_GetAssociation_0 = &utilities.DoubleArray{Encoding: map[string]int{"ids": 0, "end_device_ids": 1, "application_ids": 2, "application_id": 3, "applicationId": 4, "device_id": 5, "deviceId": 6, "f_port": 7, "fPort": 8}, Base: []int{1, 5, 1, 1, 1, 5, 3, 6, 2, 7, 0, 0, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 3, 4, 1, 2, 1, 7, 1, 5, 9, 2, 13, 6, 8, 10}}
 )
 
 func request_ApplicationPackageRegistry_GetAssociation_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationPackageRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -232,7 +232,7 @@ func local_request_ApplicationPackageRegistry_GetAssociation_0(ctx context.Conte
 }
 
 var (
-	filter_ApplicationPackageRegistry_ListAssociations_0 = &utilities.DoubleArray{Encoding: map[string]int{"ids": 0, "application_ids": 1, "application_id": 2, "device_id": 3}, Base: []int{1, 1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 3, 2, 4, 5}}
+	filter_ApplicationPackageRegistry_ListAssociations_0 = &utilities.DoubleArray{Encoding: map[string]int{"ids": 0, "application_ids": 1, "application_id": 2, "applicationId": 3, "device_id": 4, "deviceId": 5}, Base: []int{1, 1, 1, 1, 3, 2, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 3, 1, 2, 1, 4, 6, 5, 7}}
 )
 
 func request_ApplicationPackageRegistry_ListAssociations_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationPackageRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -430,7 +430,7 @@ func local_request_ApplicationPackageRegistry_SetAssociation_0(ctx context.Conte
 }
 
 var (
-	filter_ApplicationPackageRegistry_DeleteAssociation_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device_ids": 0, "application_ids": 1, "application_id": 2, "device_id": 3, "f_port": 4}, Base: []int{1, 1, 1, 1, 2, 3, 0, 0, 0}, Check: []int{0, 1, 2, 3, 2, 1, 4, 5, 6}}
+	filter_ApplicationPackageRegistry_DeleteAssociation_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device_ids": 0, "application_ids": 1, "application_id": 2, "applicationId": 3, "device_id": 4, "deviceId": 5, "f_port": 6, "fPort": 7}, Base: []int{1, 1, 1, 1, 3, 2, 4, 5, 6, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 2, 3, 1, 2, 1, 1, 1, 4, 6, 5, 7, 8, 9}}
 )
 
 func request_ApplicationPackageRegistry_DeleteAssociation_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationPackageRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -540,7 +540,7 @@ func local_request_ApplicationPackageRegistry_DeleteAssociation_0(ctx context.Co
 }
 
 var (
-	filter_ApplicationPackageRegistry_GetDefaultAssociation_0 = &utilities.DoubleArray{Encoding: map[string]int{"ids": 0, "application_ids": 1, "application_id": 2, "f_port": 3}, Base: []int{1, 1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 3, 2, 4, 5}}
+	filter_ApplicationPackageRegistry_GetDefaultAssociation_0 = &utilities.DoubleArray{Encoding: map[string]int{"ids": 0, "application_ids": 1, "application_id": 2, "applicationId": 3, "f_port": 4, "fPort": 5}, Base: []int{1, 1, 1, 1, 3, 2, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 3, 1, 2, 1, 4, 6, 5, 7}}
 )
 
 func request_ApplicationPackageRegistry_GetDefaultAssociation_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationPackageRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -630,7 +630,7 @@ func local_request_ApplicationPackageRegistry_GetDefaultAssociation_0(ctx contex
 }
 
 var (
-	filter_ApplicationPackageRegistry_ListDefaultAssociations_0 = &utilities.DoubleArray{Encoding: map[string]int{"ids": 0, "application_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
+	filter_ApplicationPackageRegistry_ListDefaultAssociations_0 = &utilities.DoubleArray{Encoding: map[string]int{"ids": 0, "application_id": 1, "applicationId": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_ApplicationPackageRegistry_ListDefaultAssociations_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationPackageRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -788,7 +788,7 @@ func local_request_ApplicationPackageRegistry_SetDefaultAssociation_0(ctx contex
 }
 
 var (
-	filter_ApplicationPackageRegistry_DeleteDefaultAssociation_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "f_port": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
+	filter_ApplicationPackageRegistry_DeleteDefaultAssociation_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "applicationId": 2, "f_port": 3, "fPort": 4}, Base: []int{1, 1, 1, 2, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 1, 3, 4, 5, 6}}
 )
 
 func request_ApplicationPackageRegistry_DeleteDefaultAssociation_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationPackageRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -1114,7 +1114,7 @@ func RegisterApplicationPackageRegistryHandlerServer(ctx context.Context, mux *r
 // RegisterApplicationPackageRegistryHandlerFromEndpoint is same as RegisterApplicationPackageRegistryHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterApplicationPackageRegistryHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.Dial(endpoint, opts...)
+	conn, err := grpc.DialContext(ctx, endpoint, opts...)
 	if err != nil {
 		return err
 	}

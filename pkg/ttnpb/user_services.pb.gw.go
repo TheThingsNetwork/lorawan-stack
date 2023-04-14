@@ -66,7 +66,7 @@ func local_request_UserRegistry_Create_0(ctx context.Context, marshaler runtime.
 }
 
 var (
-	filter_UserRegistry_Get_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_ids": 0, "user_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
+	filter_UserRegistry_Get_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_ids": 0, "user_id": 1, "userId": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_UserRegistry_Get_0(ctx context.Context, marshaler runtime.Marshaler, client UserRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -240,7 +240,7 @@ func local_request_UserRegistry_Update_0(ctx context.Context, marshaler runtime.
 }
 
 var (
-	filter_UserRegistry_CreateTemporaryPassword_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_ids": 0, "user_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
+	filter_UserRegistry_CreateTemporaryPassword_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_ids": 0, "user_id": 1, "userId": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_UserRegistry_CreateTemporaryPassword_0(ctx context.Context, marshaler runtime.Marshaler, client UserRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -378,7 +378,7 @@ func local_request_UserRegistry_UpdatePassword_0(ctx context.Context, marshaler 
 }
 
 var (
-	filter_UserRegistry_Delete_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_UserRegistry_Delete_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_id": 0, "userId": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
 )
 
 func request_UserRegistry_Delete_0(ctx context.Context, marshaler runtime.Marshaler, client UserRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -448,7 +448,7 @@ func local_request_UserRegistry_Delete_0(ctx context.Context, marshaler runtime.
 }
 
 var (
-	filter_UserRegistry_Restore_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_UserRegistry_Restore_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_id": 0, "userId": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
 )
 
 func request_UserRegistry_Restore_0(ctx context.Context, marshaler runtime.Marshaler, client UserRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -518,7 +518,7 @@ func local_request_UserRegistry_Restore_0(ctx context.Context, marshaler runtime
 }
 
 var (
-	filter_UserRegistry_Purge_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_UserRegistry_Purge_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_id": 0, "userId": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
 )
 
 func request_UserRegistry_Purge_0(ctx context.Context, marshaler runtime.Marshaler, client UserRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -588,7 +588,7 @@ func local_request_UserRegistry_Purge_0(ctx context.Context, marshaler runtime.M
 }
 
 var (
-	filter_UserAccess_ListRights_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_UserAccess_ListRights_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_id": 0, "userId": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
 )
 
 func request_UserAccess_ListRights_0(ctx context.Context, marshaler runtime.Marshaler, client UserAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -726,7 +726,7 @@ func local_request_UserAccess_CreateAPIKey_0(ctx context.Context, marshaler runt
 }
 
 var (
-	filter_UserAccess_ListAPIKeys_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_ids": 0, "user_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
+	filter_UserAccess_ListAPIKeys_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_ids": 0, "user_id": 1, "userId": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_UserAccess_ListAPIKeys_0(ctx context.Context, marshaler runtime.Marshaler, client UserAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -796,7 +796,7 @@ func local_request_UserAccess_ListAPIKeys_0(ctx context.Context, marshaler runti
 }
 
 var (
-	filter_UserAccess_GetAPIKey_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_ids": 0, "user_id": 1, "key_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
+	filter_UserAccess_GetAPIKey_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_ids": 0, "user_id": 1, "userId": 2, "key_id": 3, "keyId": 4}, Base: []int{1, 1, 1, 2, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 1, 3, 4, 5, 6}}
 )
 
 func request_UserAccess_GetAPIKey_0(ctx context.Context, marshaler runtime.Marshaler, client UserAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -974,7 +974,7 @@ func local_request_UserAccess_UpdateAPIKey_0(ctx context.Context, marshaler runt
 }
 
 var (
-	filter_UserAccess_CreateLoginToken_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_ids": 0, "user_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
+	filter_UserAccess_CreateLoginToken_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_ids": 0, "user_id": 1, "userId": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_UserAccess_CreateLoginToken_0(ctx context.Context, marshaler runtime.Marshaler, client UserAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -1150,7 +1150,7 @@ func local_request_UserInvitationRegistry_Delete_0(ctx context.Context, marshale
 }
 
 var (
-	filter_UserSessionRegistry_List_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_ids": 0, "user_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
+	filter_UserSessionRegistry_List_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_ids": 0, "user_id": 1, "userId": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_UserSessionRegistry_List_0(ctx context.Context, marshaler runtime.Marshaler, client UserSessionRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -1220,7 +1220,7 @@ func local_request_UserSessionRegistry_List_0(ctx context.Context, marshaler run
 }
 
 var (
-	filter_UserSessionRegistry_Delete_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_ids": 0, "user_id": 1, "session_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
+	filter_UserSessionRegistry_Delete_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_ids": 0, "user_id": 1, "userId": 2, "session_id": 3, "sessionId": 4}, Base: []int{1, 1, 1, 2, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 1, 3, 4, 5, 6}}
 )
 
 func request_UserSessionRegistry_Delete_0(ctx context.Context, marshaler runtime.Marshaler, client UserSessionRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -1848,7 +1848,7 @@ func RegisterUserSessionRegistryHandlerServer(ctx context.Context, mux *runtime.
 // RegisterUserRegistryHandlerFromEndpoint is same as RegisterUserRegistryHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterUserRegistryHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.Dial(endpoint, opts...)
+	conn, err := grpc.DialContext(ctx, endpoint, opts...)
 	if err != nil {
 		return err
 	}
@@ -2127,7 +2127,7 @@ var (
 // RegisterUserAccessHandlerFromEndpoint is same as RegisterUserAccessHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterUserAccessHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.Dial(endpoint, opts...)
+	conn, err := grpc.DialContext(ctx, endpoint, opts...)
 	if err != nil {
 		return err
 	}
@@ -2328,7 +2328,7 @@ var (
 // RegisterUserInvitationRegistryHandlerFromEndpoint is same as RegisterUserInvitationRegistryHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterUserInvitationRegistryHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.Dial(endpoint, opts...)
+	conn, err := grpc.DialContext(ctx, endpoint, opts...)
 	if err != nil {
 		return err
 	}
@@ -2451,7 +2451,7 @@ var (
 // RegisterUserSessionRegistryHandlerFromEndpoint is same as RegisterUserSessionRegistryHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterUserSessionRegistryHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.Dial(endpoint, opts...)
+	conn, err := grpc.DialContext(ctx, endpoint, opts...)
 	if err != nil {
 		return err
 	}

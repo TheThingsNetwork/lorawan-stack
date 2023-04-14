@@ -68,7 +68,7 @@ func local_request_DeviceRepository_ListBrands_0(ctx context.Context, marshaler 
 }
 
 var (
-	filter_DeviceRepository_ListBrands_1 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
+	filter_DeviceRepository_ListBrands_1 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "applicationId": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_DeviceRepository_ListBrands_1(ctx context.Context, marshaler runtime.Marshaler, client DeviceRepositoryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -138,7 +138,7 @@ func local_request_DeviceRepository_ListBrands_1(ctx context.Context, marshaler 
 }
 
 var (
-	filter_DeviceRepository_GetBrand_0 = &utilities.DoubleArray{Encoding: map[string]int{"brand_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_DeviceRepository_GetBrand_0 = &utilities.DoubleArray{Encoding: map[string]int{"brand_id": 0, "brandId": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
 )
 
 func request_DeviceRepository_GetBrand_0(ctx context.Context, marshaler runtime.Marshaler, client DeviceRepositoryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -208,7 +208,7 @@ func local_request_DeviceRepository_GetBrand_0(ctx context.Context, marshaler ru
 }
 
 var (
-	filter_DeviceRepository_GetBrand_1 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "brand_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
+	filter_DeviceRepository_GetBrand_1 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "applicationId": 2, "brand_id": 3, "brandId": 4}, Base: []int{1, 1, 1, 2, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 1, 3, 4, 5, 6}}
 )
 
 func request_DeviceRepository_GetBrand_1(ctx context.Context, marshaler runtime.Marshaler, client DeviceRepositoryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -334,7 +334,7 @@ func local_request_DeviceRepository_ListModels_0(ctx context.Context, marshaler 
 }
 
 var (
-	filter_DeviceRepository_ListModels_1 = &utilities.DoubleArray{Encoding: map[string]int{"brand_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_DeviceRepository_ListModels_1 = &utilities.DoubleArray{Encoding: map[string]int{"brand_id": 0, "brandId": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
 )
 
 func request_DeviceRepository_ListModels_1(ctx context.Context, marshaler runtime.Marshaler, client DeviceRepositoryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -404,7 +404,7 @@ func local_request_DeviceRepository_ListModels_1(ctx context.Context, marshaler 
 }
 
 var (
-	filter_DeviceRepository_ListModels_2 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
+	filter_DeviceRepository_ListModels_2 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "applicationId": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_DeviceRepository_ListModels_2(ctx context.Context, marshaler runtime.Marshaler, client DeviceRepositoryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -474,7 +474,7 @@ func local_request_DeviceRepository_ListModels_2(ctx context.Context, marshaler 
 }
 
 var (
-	filter_DeviceRepository_ListModels_3 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "brand_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
+	filter_DeviceRepository_ListModels_3 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "applicationId": 2, "brand_id": 3, "brandId": 4}, Base: []int{1, 1, 1, 2, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 1, 3, 4, 5, 6}}
 )
 
 func request_DeviceRepository_ListModels_3(ctx context.Context, marshaler runtime.Marshaler, client DeviceRepositoryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -564,7 +564,7 @@ func local_request_DeviceRepository_ListModels_3(ctx context.Context, marshaler 
 }
 
 var (
-	filter_DeviceRepository_GetModel_0 = &utilities.DoubleArray{Encoding: map[string]int{"brand_id": 0, "model_id": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+	filter_DeviceRepository_GetModel_0 = &utilities.DoubleArray{Encoding: map[string]int{"brand_id": 0, "brandId": 1, "model_id": 2, "modelId": 3}, Base: []int{1, 1, 2, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 1, 1, 1, 2, 3, 4, 5}}
 )
 
 func request_DeviceRepository_GetModel_0(ctx context.Context, marshaler runtime.Marshaler, client DeviceRepositoryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -654,7 +654,7 @@ func local_request_DeviceRepository_GetModel_0(ctx context.Context, marshaler ru
 }
 
 var (
-	filter_DeviceRepository_GetModel_1 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "brand_id": 2, "model_id": 3}, Base: []int{1, 1, 1, 2, 3, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 3, 4, 5}}
+	filter_DeviceRepository_GetModel_1 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "applicationId": 2, "brand_id": 3, "brandId": 4, "model_id": 5, "modelId": 6}, Base: []int{1, 1, 1, 2, 3, 4, 5, 6, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 1, 1, 1, 3, 4, 5, 6, 7, 8}}
 )
 
 func request_DeviceRepository_GetModel_1(ctx context.Context, marshaler runtime.Marshaler, client DeviceRepositoryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -764,7 +764,7 @@ func local_request_DeviceRepository_GetModel_1(ctx context.Context, marshaler ru
 }
 
 var (
-	filter_DeviceRepository_GetTemplate_0 = &utilities.DoubleArray{Encoding: map[string]int{"version_ids": 0, "brand_id": 1, "model_id": 2, "firmware_version": 3, "band_id": 4}, Base: []int{1, 1, 1, 2, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 2, 2, 2, 3, 4, 5, 6}}
+	filter_DeviceRepository_GetTemplate_0 = &utilities.DoubleArray{Encoding: map[string]int{"version_ids": 0, "brand_id": 1, "brandId": 2, "model_id": 3, "modelId": 4, "firmware_version": 5, "firmwareVersion": 6, "band_id": 7, "bandId": 8}, Base: []int{1, 1, 1, 5, 2, 6, 3, 7, 4, 8, 0, 0, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 2, 1, 2, 1, 2, 1, 3, 5, 7, 9, 4, 6, 8, 10}}
 )
 
 func request_DeviceRepository_GetTemplate_0(ctx context.Context, marshaler runtime.Marshaler, client DeviceRepositoryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -894,7 +894,7 @@ func local_request_DeviceRepository_GetTemplate_0(ctx context.Context, marshaler
 }
 
 var (
-	filter_DeviceRepository_GetTemplate_1 = &utilities.DoubleArray{Encoding: map[string]int{"end_device_profile_ids": 0, "vendor_id": 1, "vendor_profile_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 2, 3, 4}}
+	filter_DeviceRepository_GetTemplate_1 = &utilities.DoubleArray{Encoding: map[string]int{"end_device_profile_ids": 0, "vendor_id": 1, "vendorId": 2, "vendor_profile_id": 3, "vendorProfileId": 4}, Base: []int{1, 1, 1, 3, 2, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 2, 1, 3, 5, 4, 6}}
 )
 
 func request_DeviceRepository_GetTemplate_1(ctx context.Context, marshaler runtime.Marshaler, client DeviceRepositoryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -984,7 +984,7 @@ func local_request_DeviceRepository_GetTemplate_1(ctx context.Context, marshaler
 }
 
 var (
-	filter_DeviceRepository_GetTemplate_2 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "version_ids": 2, "brand_id": 3, "model_id": 4, "firmware_version": 5, "band_id": 6}, Base: []int{1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 4, 4, 4, 4, 3, 5, 6, 7, 8}}
+	filter_DeviceRepository_GetTemplate_2 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "applicationId": 2, "version_ids": 3, "brand_id": 4, "brandId": 5, "model_id": 6, "modelId": 7, "firmware_version": 8, "firmwareVersion": 9, "band_id": 10, "bandId": 11}, Base: []int{1, 1, 1, 2, 1, 3, 7, 4, 8, 5, 9, 6, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 5, 1, 5, 1, 5, 1, 5, 1, 3, 4, 6, 8, 10, 12, 7, 9, 11, 13}}
 )
 
 func request_DeviceRepository_GetTemplate_2(ctx context.Context, marshaler runtime.Marshaler, client DeviceRepositoryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -1134,7 +1134,7 @@ func local_request_DeviceRepository_GetTemplate_2(ctx context.Context, marshaler
 }
 
 var (
-	filter_DeviceRepository_GetTemplate_3 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "end_device_profile_ids": 2, "vendor_id": 3, "vendor_profile_id": 4}, Base: []int{1, 1, 1, 1, 2, 3, 0, 0, 0}, Check: []int{0, 1, 2, 1, 4, 4, 3, 5, 6}}
+	filter_DeviceRepository_GetTemplate_3 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "applicationId": 2, "end_device_profile_ids": 3, "vendor_id": 4, "vendorId": 5, "vendor_profile_id": 6, "vendorProfileId": 7}, Base: []int{1, 1, 1, 2, 1, 3, 5, 4, 6, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 5, 1, 5, 1, 3, 4, 6, 8, 7, 9}}
 )
 
 func request_DeviceRepository_GetTemplate_3(ctx context.Context, marshaler runtime.Marshaler, client DeviceRepositoryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -1244,7 +1244,7 @@ func local_request_DeviceRepository_GetTemplate_3(ctx context.Context, marshaler
 }
 
 var (
-	filter_DeviceRepository_GetUplinkDecoder_0 = &utilities.DoubleArray{Encoding: map[string]int{"version_ids": 0, "brand_id": 1, "model_id": 2, "firmware_version": 3, "band_id": 4}, Base: []int{1, 1, 1, 2, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 2, 2, 2, 3, 4, 5, 6}}
+	filter_DeviceRepository_GetUplinkDecoder_0 = &utilities.DoubleArray{Encoding: map[string]int{"version_ids": 0, "brand_id": 1, "brandId": 2, "model_id": 3, "modelId": 4, "firmware_version": 5, "firmwareVersion": 6, "band_id": 7, "bandId": 8}, Base: []int{1, 1, 1, 5, 2, 6, 3, 7, 4, 8, 0, 0, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 2, 1, 2, 1, 2, 1, 3, 5, 7, 9, 4, 6, 8, 10}}
 )
 
 func request_DeviceRepository_GetUplinkDecoder_0(ctx context.Context, marshaler runtime.Marshaler, client DeviceRepositoryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -1374,7 +1374,7 @@ func local_request_DeviceRepository_GetUplinkDecoder_0(ctx context.Context, mars
 }
 
 var (
-	filter_DeviceRepository_GetUplinkDecoder_1 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "version_ids": 2, "brand_id": 3, "model_id": 4, "firmware_version": 5, "band_id": 6}, Base: []int{1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 4, 4, 4, 4, 3, 5, 6, 7, 8}}
+	filter_DeviceRepository_GetUplinkDecoder_1 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "applicationId": 2, "version_ids": 3, "brand_id": 4, "brandId": 5, "model_id": 6, "modelId": 7, "firmware_version": 8, "firmwareVersion": 9, "band_id": 10, "bandId": 11}, Base: []int{1, 1, 1, 2, 1, 3, 7, 4, 8, 5, 9, 6, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 5, 1, 5, 1, 5, 1, 5, 1, 3, 4, 6, 8, 10, 12, 7, 9, 11, 13}}
 )
 
 func request_DeviceRepository_GetUplinkDecoder_1(ctx context.Context, marshaler runtime.Marshaler, client DeviceRepositoryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -1524,7 +1524,7 @@ func local_request_DeviceRepository_GetUplinkDecoder_1(ctx context.Context, mars
 }
 
 var (
-	filter_DeviceRepository_GetDownlinkDecoder_0 = &utilities.DoubleArray{Encoding: map[string]int{"version_ids": 0, "brand_id": 1, "model_id": 2, "firmware_version": 3, "band_id": 4}, Base: []int{1, 1, 1, 2, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 2, 2, 2, 3, 4, 5, 6}}
+	filter_DeviceRepository_GetDownlinkDecoder_0 = &utilities.DoubleArray{Encoding: map[string]int{"version_ids": 0, "brand_id": 1, "brandId": 2, "model_id": 3, "modelId": 4, "firmware_version": 5, "firmwareVersion": 6, "band_id": 7, "bandId": 8}, Base: []int{1, 1, 1, 5, 2, 6, 3, 7, 4, 8, 0, 0, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 2, 1, 2, 1, 2, 1, 3, 5, 7, 9, 4, 6, 8, 10}}
 )
 
 func request_DeviceRepository_GetDownlinkDecoder_0(ctx context.Context, marshaler runtime.Marshaler, client DeviceRepositoryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -1654,7 +1654,7 @@ func local_request_DeviceRepository_GetDownlinkDecoder_0(ctx context.Context, ma
 }
 
 var (
-	filter_DeviceRepository_GetDownlinkDecoder_1 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "version_ids": 2, "brand_id": 3, "model_id": 4, "firmware_version": 5, "band_id": 6}, Base: []int{1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 4, 4, 4, 4, 3, 5, 6, 7, 8}}
+	filter_DeviceRepository_GetDownlinkDecoder_1 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "applicationId": 2, "version_ids": 3, "brand_id": 4, "brandId": 5, "model_id": 6, "modelId": 7, "firmware_version": 8, "firmwareVersion": 9, "band_id": 10, "bandId": 11}, Base: []int{1, 1, 1, 2, 1, 3, 7, 4, 8, 5, 9, 6, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 5, 1, 5, 1, 5, 1, 5, 1, 3, 4, 6, 8, 10, 12, 7, 9, 11, 13}}
 )
 
 func request_DeviceRepository_GetDownlinkDecoder_1(ctx context.Context, marshaler runtime.Marshaler, client DeviceRepositoryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -1804,7 +1804,7 @@ func local_request_DeviceRepository_GetDownlinkDecoder_1(ctx context.Context, ma
 }
 
 var (
-	filter_DeviceRepository_GetDownlinkEncoder_0 = &utilities.DoubleArray{Encoding: map[string]int{"version_ids": 0, "brand_id": 1, "model_id": 2, "firmware_version": 3, "band_id": 4}, Base: []int{1, 1, 1, 2, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 2, 2, 2, 3, 4, 5, 6}}
+	filter_DeviceRepository_GetDownlinkEncoder_0 = &utilities.DoubleArray{Encoding: map[string]int{"version_ids": 0, "brand_id": 1, "brandId": 2, "model_id": 3, "modelId": 4, "firmware_version": 5, "firmwareVersion": 6, "band_id": 7, "bandId": 8}, Base: []int{1, 1, 1, 5, 2, 6, 3, 7, 4, 8, 0, 0, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 2, 1, 2, 1, 2, 1, 3, 5, 7, 9, 4, 6, 8, 10}}
 )
 
 func request_DeviceRepository_GetDownlinkEncoder_0(ctx context.Context, marshaler runtime.Marshaler, client DeviceRepositoryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -1934,7 +1934,7 @@ func local_request_DeviceRepository_GetDownlinkEncoder_0(ctx context.Context, ma
 }
 
 var (
-	filter_DeviceRepository_GetDownlinkEncoder_1 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "version_ids": 2, "brand_id": 3, "model_id": 4, "firmware_version": 5, "band_id": 6}, Base: []int{1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 4, 4, 4, 4, 3, 5, 6, 7, 8}}
+	filter_DeviceRepository_GetDownlinkEncoder_1 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "applicationId": 2, "version_ids": 3, "brand_id": 4, "brandId": 5, "model_id": 6, "modelId": 7, "firmware_version": 8, "firmwareVersion": 9, "band_id": 10, "bandId": 11}, Base: []int{1, 1, 1, 2, 1, 3, 7, 4, 8, 5, 9, 6, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 5, 1, 5, 1, 5, 1, 5, 1, 3, 4, 6, 8, 10, 12, 7, 9, 11, 13}}
 )
 
 func request_DeviceRepository_GetDownlinkEncoder_1(ctx context.Context, marshaler runtime.Marshaler, client DeviceRepositoryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -2595,7 +2595,7 @@ func RegisterDeviceRepositoryHandlerServer(ctx context.Context, mux *runtime.Ser
 // RegisterDeviceRepositoryHandlerFromEndpoint is same as RegisterDeviceRepositoryHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterDeviceRepositoryHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.Dial(endpoint, opts...)
+	conn, err := grpc.DialContext(ctx, endpoint, opts...)
 	if err != nil {
 		return err
 	}

@@ -375,7 +375,7 @@ func RegisterEndDeviceQRCodeGeneratorHandlerServer(ctx context.Context, mux *run
 // RegisterEndDeviceQRCodeGeneratorHandlerFromEndpoint is same as RegisterEndDeviceQRCodeGeneratorHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterEndDeviceQRCodeGeneratorHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.Dial(endpoint, opts...)
+	conn, err := grpc.DialContext(ctx, endpoint, opts...)
 	if err != nil {
 		return err
 	}
