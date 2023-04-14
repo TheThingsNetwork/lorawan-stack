@@ -697,15 +697,9 @@ Application is the message that defines an Application in the network.
 | `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | Contact information for this application. Typically used to indicate who to contact with technical/security questions about the application. This field is deprecated. Use administrative_contact and technical_contact instead. |
 | `administrative_contact` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
 | `technical_contact` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
-| `network_server_address` | [`string`](#string) |  | The address of the Network Server where this application is supposed to be registered. If set, this fields indicates where end devices for this application should be registered.
-
-Stored in Entity Registry. The typical format of the address is "host:port". If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. The connection shall be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
-| `application_server_address` | [`string`](#string) |  | The address of the Application Server where this application is supposed to be registered. If set, this fields indicates where end devices for this application should be registered.
-
-Stored in Entity Registry. The typical format of the address is "host:port". If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. The connection shall be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
-| `join_server_address` | [`string`](#string) |  | The address of the Join Server where this application is supposed to be registered. If set, this fields indicates where end devices for this application should be registered.
-
-Stored in Entity Registry. The typical format of the address is "host:port". If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. The connection shall be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
+| `network_server_address` | [`string`](#string) |  | The address of the Network Server where this application is supposed to be registered. If set, this fields indicates where end devices for this application should be registered. Stored in Entity Registry. The typical format of the address is "host:port". If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. The connection shall be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
+| `application_server_address` | [`string`](#string) |  | The address of the Application Server where this application is supposed to be registered. If set, this fields indicates where end devices for this application should be registered. Stored in Entity Registry. The typical format of the address is "host:port". If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. The connection shall be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
+| `join_server_address` | [`string`](#string) |  | The address of the Join Server where this application is supposed to be registered. If set, this fields indicates where end devices for this application should be registered. Stored in Entity Registry. The typical format of the address is "host:port". If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. The connection shall be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
 | `dev_eui_counter` | [`uint32`](#uint32) |  |  |
 
 #### Field Rules
@@ -957,9 +951,7 @@ application registrations.
 | `List` | [`ListApplicationsRequest`](#ttn.lorawan.v3.ListApplicationsRequest) | [`Applications`](#ttn.lorawan.v3.Applications) | List applications where the given user or organization is a direct collaborator. If no user or organization is given, this returns the applications the caller has access to. Similar to Get, this selects the fields given by the field mask. More or less fields may be returned, depending on the rights of the caller. |
 | `Update` | [`UpdateApplicationRequest`](#ttn.lorawan.v3.UpdateApplicationRequest) | [`Application`](#ttn.lorawan.v3.Application) | Update the application, changing the fields specified by the field mask to the provided values. |
 | `Delete` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the application. This may not release the application ID for reuse. All end devices must be deleted from the application before it can be deleted. |
-| `Restore` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Restore a recently deleted application.
-
-Deployment configuration may specify if, and for how long after deletion, entities can be restored. |
+| `Restore` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Restore a recently deleted application. Deployment configuration may specify if, and for how long after deletion, entities can be restored. |
 | `Purge` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Purge the application. This will release the application ID for reuse. All end devices must be deleted from the application before it can be deleted. The application owner is responsible for clearing data from any (external) integrations that may store and expose data by application ID |
 | `IssueDevEUI` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`IssueDevEUIResponse`](#ttn.lorawan.v3.IssueDevEUIResponse) | Request DevEUI from the configured address block for a device inside the application. The maximum number of DevEUI's issued per application can be configured. |
 
@@ -2353,9 +2345,7 @@ OAuth client registrations.
 | `List` | [`ListClientsRequest`](#ttn.lorawan.v3.ListClientsRequest) | [`Clients`](#ttn.lorawan.v3.Clients) | List OAuth clients where the given user or organization is a direct collaborator. If no user or organization is given, this returns the OAuth clients the caller has access to. Similar to Get, this selects the fields specified in the field mask. More or less fields may be returned, depending on the rights of the caller. |
 | `Update` | [`UpdateClientRequest`](#ttn.lorawan.v3.UpdateClientRequest) | [`Client`](#ttn.lorawan.v3.Client) | Update the OAuth client, changing the fields specified by the field mask to the provided values. |
 | `Delete` | [`ClientIdentifiers`](#ttn.lorawan.v3.ClientIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the OAuth client. This may not release the client ID for reuse. |
-| `Restore` | [`ClientIdentifiers`](#ttn.lorawan.v3.ClientIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Restore a recently deleted client.
-
-Deployment configuration may specify if, and for how long after deletion, entities can be restored. |
+| `Restore` | [`ClientIdentifiers`](#ttn.lorawan.v3.ClientIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Restore a recently deleted client. Deployment configuration may specify if, and for how long after deletion, entities can be restored. |
 | `Purge` | [`ClientIdentifiers`](#ttn.lorawan.v3.ClientIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Purge the client. This will release the client ID for reuse. |
 
 #### HTTP bindings
@@ -4152,17 +4142,13 @@ NsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `Create` | [`CreateEndDeviceRequest`](#ttn.lorawan.v3.CreateEndDeviceRequest) | [`EndDevice`](#ttn.lorawan.v3.EndDevice) | Create a new end device within an application.
-
-After registering an end device, it also needs to be registered in the NsEndDeviceRegistry that is exposed by the Network Server, the AsEndDeviceRegistry that is exposed by the Application Server, and the JsEndDeviceRegistry that is exposed by the Join Server. |
+| `Create` | [`CreateEndDeviceRequest`](#ttn.lorawan.v3.CreateEndDeviceRequest) | [`EndDevice`](#ttn.lorawan.v3.EndDevice) | Create a new end device within an application. After registering an end device, it also needs to be registered in the NsEndDeviceRegistry that is exposed by the Network Server, the AsEndDeviceRegistry that is exposed by the Application Server, and the JsEndDeviceRegistry that is exposed by the Join Server. |
 | `Get` | [`GetEndDeviceRequest`](#ttn.lorawan.v3.GetEndDeviceRequest) | [`EndDevice`](#ttn.lorawan.v3.EndDevice) | Get the end device with the given identifiers, selecting the fields specified in the field mask. More or less fields may be returned, depending on the rights of the caller. |
 | `GetIdentifiersForEUIs` | [`GetEndDeviceIdentifiersForEUIsRequest`](#ttn.lorawan.v3.GetEndDeviceIdentifiersForEUIsRequest) | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | Get the identifiers of the end device that has the given EUIs registered. |
 | `List` | [`ListEndDevicesRequest`](#ttn.lorawan.v3.ListEndDevicesRequest) | [`EndDevices`](#ttn.lorawan.v3.EndDevices) | List end devices in the given application. Similar to Get, this selects the fields given by the field mask. More or less fields may be returned, depending on the rights of the caller. |
 | `Update` | [`UpdateEndDeviceRequest`](#ttn.lorawan.v3.UpdateEndDeviceRequest) | [`EndDevice`](#ttn.lorawan.v3.EndDevice) | Update the end device, changing the fields specified by the field mask to the provided values. |
 | `BatchUpdateLastSeen` | [`BatchUpdateEndDeviceLastSeenRequest`](#ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Update the last seen timestamp for a batch of end devices. |
-| `Delete` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the end device with the given IDs.
-
-Before deleting an end device it first needs to be deleted from the NsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry. In addition, if the device claimed on a Join Server, it also needs to be unclaimed via the DeviceClaimingServer so it can be claimed in the future. This is NOT done automatically. |
+| `Delete` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the end device with the given IDs. Before deleting an end device it first needs to be deleted from the NsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry. In addition, if the device claimed on a Join Server, it also needs to be unclaimed via the DeviceClaimingServer so it can be claimed in the future. This is NOT done automatically. |
 
 #### HTTP bindings
 
@@ -4878,9 +4864,7 @@ gateway registrations.
 | `List` | [`ListGatewaysRequest`](#ttn.lorawan.v3.ListGatewaysRequest) | [`Gateways`](#ttn.lorawan.v3.Gateways) | List gateways where the given user or organization is a direct collaborator. If no user or organization is given, this returns the gateways the caller has access to. Similar to Get, this selects the fields given by the field mask. More or less fields may be returned, depending on the rights of the caller. |
 | `Update` | [`UpdateGatewayRequest`](#ttn.lorawan.v3.UpdateGatewayRequest) | [`Gateway`](#ttn.lorawan.v3.Gateway) | Update the gateway, changing the fields specified by the field mask to the provided values. |
 | `Delete` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the gateway. This may not release the gateway ID for reuse, but it does release the EUI. |
-| `Restore` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Restore a recently deleted gateway. This does not restore the EUI, as that was released when deleting the gateway.
-
-Deployment configuration may specify if, and for how long after deletion, entities can be restored. |
+| `Restore` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Restore a recently deleted gateway. This does not restore the EUI, as that was released when deleting the gateway. Deployment configuration may specify if, and for how long after deletion, entities can be restored. |
 | `Purge` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Purge the gateway. This will release both gateway ID and EUI for reuse. The gateway owner is responsible for clearing data from any (external) integrations that may store and expose data by gateway ID. |
 
 #### HTTP bindings
@@ -7340,9 +7324,7 @@ Uplink message from the end device to the network
 | `FORMATTER_REPOSITORY` | 1 | Use payload formatter for the end device type from a repository. |
 | `FORMATTER_GRPC_SERVICE` | 2 | gRPC service payload formatter. The parameter is the host:port of the service. |
 | `FORMATTER_JAVASCRIPT` | 3 | Custom payload formatter that executes Javascript code. The parameter is a JavaScript filename. |
-| `FORMATTER_CAYENNELPP` | 4 | CayenneLPP payload formatter.
-
-More payload formatters can be added. |
+| `FORMATTER_CAYENNELPP` | 4 | CayenneLPP payload formatter. More payload formatters can be added. |
 
 ### <a name="ttn.lorawan.v3.TxAcknowledgment.Result">Enum `TxAcknowledgment.Result`</a>
 
@@ -7462,9 +7444,7 @@ a message corresponds to one RxMetadata.
 | `SOURCE_BT_RSSI_GEOLOCATION` | 6 | The location is estimated with BT/BLE RSSI geolocation. |
 | `SOURCE_LORA_RSSI_GEOLOCATION` | 7 | The location is estimated with LoRa RSSI geolocation. |
 | `SOURCE_LORA_TDOA_GEOLOCATION` | 8 | The location is estimated with LoRa TDOA geolocation. |
-| `SOURCE_COMBINED_GEOLOCATION` | 9 | The location is estimated by a combination of geolocation sources.
-
-More estimation methods can be added. |
+| `SOURCE_COMBINED_GEOLOCATION` | 9 | The location is estimated by a combination of geolocation sources. More estimation methods can be added. |
 
 ## <a name="lorawan-stack/api/mqtt.proto">File `lorawan-stack/api/mqtt.proto`</a>
 
@@ -8143,9 +8123,7 @@ organization registrations.
 | `List` | [`ListOrganizationsRequest`](#ttn.lorawan.v3.ListOrganizationsRequest) | [`Organizations`](#ttn.lorawan.v3.Organizations) | List organizations where the given user or organization is a direct collaborator. If no user or organization is given, this returns the organizations the caller has access to. Similar to Get, this selects the fields given by the field mask. More or less fields may be returned, depending on the rights of the caller. |
 | `Update` | [`UpdateOrganizationRequest`](#ttn.lorawan.v3.UpdateOrganizationRequest) | [`Organization`](#ttn.lorawan.v3.Organization) | Update the organization, changing the fields specified by the field mask to the provided values. |
 | `Delete` | [`OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the organization. This may not release the organization ID for reuse. |
-| `Restore` | [`OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Restore a recently deleted organization.
-
-Deployment configuration may specify if, and for how long after deletion, entities can be restored. |
+| `Restore` | [`OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Restore a recently deleted organization. Deployment configuration may specify if, and for how long after deletion, entities can be restored. |
 | `Purge` | [`OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Purge the organization. This will release the organization ID for reuse. The user is responsible for clearing data from any (external) integrations that may store and expose data by user or organization ID. |
 
 #### HTTP bindings
@@ -8430,11 +8408,7 @@ There is no (longer) wire compatibility needed; new fields may use any tag.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `gateway` | [`PacketBrokerGateway`](#ttn.lorawan.v3.PacketBrokerGateway) |  |  |
-| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the gateway fields that are considered for update.
-
-Online status is only updated if status_public is set. If status_public is set and false, the status will be reset. If status_public is set and true, the online status is taken from the online field. The return message contains the duration online_ttl for how long the gateway is considered online.
-
-Location is only updated if location_public is set. If location_public is set and false, the location will be reset. If location_public is set and true, the first antenna location will be used as gateway location. |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the gateway fields that are considered for update. Online status is only updated if status_public is set. If status_public is set and false, the status will be reset. If status_public is set and true, the online status is taken from the online field. The return message contains the duration online_ttl for how long the gateway is considered online. Location is only updated if location_public is set. If location_public is set and false, the location will be reset. If location_public is set and true, the first antenna location will be used as gateway location. |
 
 #### Field Rules
 
@@ -9658,9 +9632,7 @@ user registrations.
 | `CreateTemporaryPassword` | [`CreateTemporaryPasswordRequest`](#ttn.lorawan.v3.CreateTemporaryPasswordRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Create a temporary password that can be used for updating a forgotten password. The generated password is sent to the user's email address. |
 | `UpdatePassword` | [`UpdateUserPasswordRequest`](#ttn.lorawan.v3.UpdateUserPasswordRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Update the password of the user. |
 | `Delete` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the user. This may not release the user ID for reuse. |
-| `Restore` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Restore a recently deleted user.
-
-Deployment configuration may specify if, and for how long after deletion, entities can be restored. |
+| `Restore` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Restore a recently deleted user. Deployment configuration may specify if, and for how long after deletion, entities can be restored. |
 | `Purge` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Purge the user. This will release the user ID for reuse. The user is responsible for clearing data from any (external) integrations that may store and expose data by user or organization ID. |
 
 #### HTTP bindings
