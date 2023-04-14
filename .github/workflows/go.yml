@@ -84,6 +84,7 @@ jobs:
           entrypoint: /usr/bin/createdb
           args: -h postgres -U root ttn_lorawan_is_store_test
       - name: Configure AWS Credentials
+        if: "${{ secrets.AWS_REGION != '' }}"
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-region: "${{ secrets.AWS_REGION }}"
