@@ -375,15 +375,15 @@ func TestDeviceRegistryGet(t *testing.T) {
 }
 
 func TestDeviceRegistrySet(t *testing.T) {
-	defaultMACSettings := DefaultConfig.DefaultMACSettings.Parse()
+	defaultMACSettings := test.Must(DefaultConfig.DefaultMACSettings.Parse()).(*ttnpb.MACSettings)
 
-	customMACSettings := DefaultConfig.DefaultMACSettings.Parse()
+	customMACSettings := test.Must(DefaultConfig.DefaultMACSettings.Parse()).(*ttnpb.MACSettings)
 	customMACSettings.Rx1Delay = &ttnpb.RxDelayValue{Value: ttnpb.RxDelay_RX_DELAY_2}
 	customMACSettings.Rx1DataRateOffset = nil
 
 	customMACSettingsOpt := EndDeviceOptions.WithMacSettings(customMACSettings)
 
-	multicastClassBMACSettings := DefaultConfig.DefaultMACSettings.Parse()
+	multicastClassBMACSettings := test.Must(DefaultConfig.DefaultMACSettings.Parse()).(*ttnpb.MACSettings)
 	multicastClassBMACSettings.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{
 		Value: ttnpb.PingSlotPeriod_PING_EVERY_16S,
 	}
@@ -939,7 +939,7 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 		SessionOptions.WithLastNFCntDown(0x24),
 		SessionOptions.WithDefaultQueuedApplicationDownlinks(),
 	}
-	macSettings := DefaultConfig.DefaultMACSettings.Parse()
+	macSettings := test.Must(DefaultConfig.DefaultMACSettings.Parse()).(*ttnpb.MACSettings)
 	activateOpt := EndDeviceOptions.Activate(macSettings, true, activeSessionOpts)
 
 	// TODO: Refactor into same structure as Set
@@ -1166,7 +1166,8 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 							return
 						}
 						var newErr error
-						macState, newErr = mac.NewState(created, fps, DefaultConfig.DefaultMACSettings.Parse())
+						defaultMACSettings := test.Must(DefaultConfig.DefaultMACSettings.Parse()).(*ttnpb.MACSettings)
+						macState, newErr = mac.NewState(created, fps, defaultMACSettings)
 						if newErr != nil {
 							a.So(err, should.NotBeNil)
 							a.So(err, should.HaveSameErrorDefinitionAs, newErr)

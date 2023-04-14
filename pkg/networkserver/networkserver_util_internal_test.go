@@ -1602,7 +1602,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 			t, a := test.MustNewTFromContext(ctx)
 			t.Helper()
 
-			defaultMACSettings := env.Config.DefaultMACSettings.Parse()
+			defaultMACSettings := test.Must(env.Config.DefaultMACSettings.Parse()).(*ttnpb.MACSettings)
 
 			defaultLoRaWANVersion := mac.DeviceDefaultLoRaWANVersion(conf.Device)
 

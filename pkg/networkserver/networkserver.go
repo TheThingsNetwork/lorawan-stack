@@ -236,6 +236,11 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		}
 	}
 
+	defaultMACSettings, err := conf.DefaultMACSettings.Parse()
+	if err != nil {
+		return nil, err
+	}
+
 	ns := &NetworkServer{
 		Component:                c,
 		ctx:                      ctx,
@@ -250,7 +255,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		devices:                  wrapEndDeviceRegistryWithReplacedFields(conf.Devices, replacedEndDeviceFields...),
 		downlinkTasks:            conf.DownlinkTaskQueue.Queue,
 		downlinkPriorities:       downlinkPriorities,
-		defaultMACSettings:       conf.DefaultMACSettings.Parse(),
+		defaultMACSettings:       defaultMACSettings,
 		interopClient:            interopCl,
 		interopNSID:              conf.Interop.ID,
 		uplinkDeduplicator:       conf.UplinkDeduplicator,
