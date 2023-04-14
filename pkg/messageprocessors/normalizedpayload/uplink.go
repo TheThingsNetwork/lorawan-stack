@@ -24,11 +24,25 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
+// Soil is an soil measurement.
+type Soil struct {
+	Depth                  *float64
+	Moisture               *float64
+	Temperature            *float64
+	ElectricalConductivity *float64
+	PHLevel                *float64
+	Nitrogen               *float64
+	Phosphorus             *float64
+	Potassium              *float64
+}
+
 // Air is an air measurement.
 type Air struct {
 	Temperature      *float64
 	RelativeHumidity *float64
 	Pressure         *float64
+	CO2              *float64
+	LightIntensity   *float64
 }
 
 // Wind is a wind measurement.
@@ -40,6 +54,7 @@ type Wind struct {
 // Measurement is a measurement.
 type Measurement struct {
 	Time *time.Time
+	Soil Soil
 	Air  Air
 	Wind Wind
 }
@@ -126,6 +141,24 @@ func parseNumber(selector func(dst *Measurement) **float64, vals ...fieldValidat
 	}
 }
 
+// parsePercentage parses and validates a percentage.
+func parsePercentage(selector func(dst *Measurement) **float64) fieldParser {
+	return parseNumber(
+		selector,
+		minimum(0.0),
+		maximum(100.0),
+	)
+}
+
+// parseConcentration parses and validates a concentration. Concentration must be in ppm between 0 and 1000000.
+func parseConcentration(selector func(dst *Measurement) **float64) fieldParser {
+	return parseNumber(
+		selector,
+		minimum(0.0),
+		maximum(1000000.0),
+	)
+}
+
 // minimum returns a field validator that checks the inclusive minimum.
 func minimum[T constraints.Ordered](min T) fieldValidator[T] {
 	return func(v T, path string) error {
@@ -186,6 +219,57 @@ var fieldParsers = map[string]fieldParser{
 			return &dst.Time
 		},
 	),
+	"soil": object(
+		func(dst *Measurement) *Soil {
+			return &dst.Soil
+		},
+	),
+	"soil.depth": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Soil.Depth
+		},
+		minimum(0.0),
+	),
+	"soil.moisture": parsePercentage(
+		func(dst *Measurement) **float64 {
+			return &dst.Soil.Moisture
+		},
+	),
+	"soil.temperature": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Soil.Temperature
+		},
+		minimum(-273.15),
+	),
+	"soil.ec": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Soil.ElectricalConductivity
+		},
+		minimum(0.0),
+		maximum(621.0),
+	),
+	"soil.pH": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Soil.PHLevel
+		},
+		minimum(0.0),
+		maximum(14.0),
+	),
+	"soil.n": parseConcentration(
+		func(dst *Measurement) **float64 {
+			return &dst.Soil.Nitrogen
+		},
+	),
+	"soil.p": parseConcentration(
+		func(dst *Measurement) **float64 {
+			return &dst.Soil.Phosphorus
+		},
+	),
+	"soil.k": parseConcentration(
+		func(dst *Measurement) **float64 {
+			return &dst.Soil.Potassium
+		},
+	),
 	"air": object(
 		func(dst *Measurement) *Air {
 			return &dst.Air
@@ -197,12 +281,10 @@ var fieldParsers = map[string]fieldParser{
 		},
 		minimum(-273.15),
 	),
-	"air.relativeHumidity": parseNumber(
+	"air.relativeHumidity": parsePercentage(
 		func(dst *Measurement) **float64 {
 			return &dst.Air.RelativeHumidity
 		},
-		minimum(0.0),
-		maximum(100.0),
 	),
 	"air.pressure": parseNumber(
 		func(dst *Measurement) **float64 {
@@ -210,6 +292,17 @@ var fieldParsers = map[string]fieldParser{
 		},
 		minimum(900.0),
 		maximum(1100.0),
+	),
+	"air.co2": parseConcentration(
+		func(dst *Measurement) **float64 {
+			return &dst.Air.CO2
+		},
+	),
+	"air.lightIntensity": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Air.LightIntensity
+		},
+		minimum(0.0),
 	),
 	"wind": object(
 		func(dst *Measurement) *Wind {
