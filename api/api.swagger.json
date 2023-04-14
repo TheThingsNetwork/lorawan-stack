@@ -21725,6 +21725,14 @@
           "type": "string",
           "format": "uint64"
         },
+        "last_tx_acknowledgment_received_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "tx_acknowledgment_count": {
+          "type": "string",
+          "format": "uint64"
+        },
         "round_trip_times": {
           "$ref": "#/definitions/GatewayConnectionStatsRoundTripTimes"
         },

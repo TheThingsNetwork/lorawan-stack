@@ -1680,6 +1680,25 @@ func (dst *GatewayConnectionStats) SetFields(src *GatewayConnectionStats, paths 
 				var zero uint64
 				dst.DownlinkCount = zero
 			}
+		case "last_tx_acknowledgment_received_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'last_tx_acknowledgment_received_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LastTxAcknowledgmentReceivedAt = src.LastTxAcknowledgmentReceivedAt
+			} else {
+				dst.LastTxAcknowledgmentReceivedAt = nil
+			}
+		case "tx_acknowledgment_count":
+			if len(subs) > 0 {
+				return fmt.Errorf("'tx_acknowledgment_count' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TxAcknowledgmentCount = src.TxAcknowledgmentCount
+			} else {
+				var zero uint64
+				dst.TxAcknowledgmentCount = zero
+			}
 		case "round_trip_times":
 			if len(subs) > 0 {
 				var newDst, newSrc *GatewayConnectionStats_RoundTripTimes

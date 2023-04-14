@@ -413,6 +413,8 @@ message GatewayConnectionStats {
   uint64 uplink_count = 6;
   google.protobuf.Timestamp last_downlink_received_at = 7;
   uint64 downlink_count = 8;
+  google.protobuf.Timestamp last_tx_acknowledgment_received_at = 13;
+  uint64 tx_acknowledgment_count = 14;
 
   message RoundTripTimes {
     google.protobuf.Duration min = 1 [(validate.rules).duration.required = true];

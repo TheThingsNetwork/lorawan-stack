@@ -1834,16 +1834,18 @@ type GatewayConnectionStats struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	ConnectedAt            *timestamppb.Timestamp                 `protobuf:"bytes,1,opt,name=connected_at,json=connectedAt,proto3" json:"connected_at,omitempty"`
-	DisconnectedAt         *timestamppb.Timestamp                 `protobuf:"bytes,11,opt,name=disconnected_at,json=disconnectedAt,proto3" json:"disconnected_at,omitempty"`
-	Protocol               string                                 `protobuf:"bytes,2,opt,name=protocol,proto3" json:"protocol,omitempty"` // Protocol used to connect (for example, udp, mqtt, grpc)
-	LastStatusReceivedAt   *timestamppb.Timestamp                 `protobuf:"bytes,3,opt,name=last_status_received_at,json=lastStatusReceivedAt,proto3" json:"last_status_received_at,omitempty"`
-	LastStatus             *GatewayStatus                         `protobuf:"bytes,4,opt,name=last_status,json=lastStatus,proto3" json:"last_status,omitempty"`
-	LastUplinkReceivedAt   *timestamppb.Timestamp                 `protobuf:"bytes,5,opt,name=last_uplink_received_at,json=lastUplinkReceivedAt,proto3" json:"last_uplink_received_at,omitempty"`
-	UplinkCount            uint64                                 `protobuf:"varint,6,opt,name=uplink_count,json=uplinkCount,proto3" json:"uplink_count,omitempty"`
-	LastDownlinkReceivedAt *timestamppb.Timestamp                 `protobuf:"bytes,7,opt,name=last_downlink_received_at,json=lastDownlinkReceivedAt,proto3" json:"last_downlink_received_at,omitempty"`
-	DownlinkCount          uint64                                 `protobuf:"varint,8,opt,name=downlink_count,json=downlinkCount,proto3" json:"downlink_count,omitempty"`
-	RoundTripTimes         *GatewayConnectionStats_RoundTripTimes `protobuf:"bytes,9,opt,name=round_trip_times,json=roundTripTimes,proto3" json:"round_trip_times,omitempty"`
+	ConnectedAt                    *timestamppb.Timestamp                 `protobuf:"bytes,1,opt,name=connected_at,json=connectedAt,proto3" json:"connected_at,omitempty"`
+	DisconnectedAt                 *timestamppb.Timestamp                 `protobuf:"bytes,11,opt,name=disconnected_at,json=disconnectedAt,proto3" json:"disconnected_at,omitempty"`
+	Protocol                       string                                 `protobuf:"bytes,2,opt,name=protocol,proto3" json:"protocol,omitempty"` // Protocol used to connect (for example, udp, mqtt, grpc)
+	LastStatusReceivedAt           *timestamppb.Timestamp                 `protobuf:"bytes,3,opt,name=last_status_received_at,json=lastStatusReceivedAt,proto3" json:"last_status_received_at,omitempty"`
+	LastStatus                     *GatewayStatus                         `protobuf:"bytes,4,opt,name=last_status,json=lastStatus,proto3" json:"last_status,omitempty"`
+	LastUplinkReceivedAt           *timestamppb.Timestamp                 `protobuf:"bytes,5,opt,name=last_uplink_received_at,json=lastUplinkReceivedAt,proto3" json:"last_uplink_received_at,omitempty"`
+	UplinkCount                    uint64                                 `protobuf:"varint,6,opt,name=uplink_count,json=uplinkCount,proto3" json:"uplink_count,omitempty"`
+	LastDownlinkReceivedAt         *timestamppb.Timestamp                 `protobuf:"bytes,7,opt,name=last_downlink_received_at,json=lastDownlinkReceivedAt,proto3" json:"last_downlink_received_at,omitempty"`
+	DownlinkCount                  uint64                                 `protobuf:"varint,8,opt,name=downlink_count,json=downlinkCount,proto3" json:"downlink_count,omitempty"`
+	LastTxAcknowledgmentReceivedAt *timestamppb.Timestamp                 `protobuf:"bytes,13,opt,name=last_tx_acknowledgment_received_at,json=lastTxAcknowledgmentReceivedAt,proto3" json:"last_tx_acknowledgment_received_at,omitempty"`
+	TxAcknowledgmentCount          uint64                                 `protobuf:"varint,14,opt,name=tx_acknowledgment_count,json=txAcknowledgmentCount,proto3" json:"tx_acknowledgment_count,omitempty"`
+	RoundTripTimes                 *GatewayConnectionStats_RoundTripTimes `protobuf:"bytes,9,opt,name=round_trip_times,json=roundTripTimes,proto3" json:"round_trip_times,omitempty"`
 	// Statistics for each sub band.
 	SubBands []*GatewayConnectionStats_SubBand `protobuf:"bytes,10,rep,name=sub_bands,json=subBands,proto3" json:"sub_bands,omitempty"`
 	// Gateway Remote Address.
@@ -1941,6 +1943,20 @@ func (x *GatewayConnectionStats) GetLastDownlinkReceivedAt() *timestamppb.Timest
 func (x *GatewayConnectionStats) GetDownlinkCount() uint64 {
 	if x != nil {
 		return x.DownlinkCount
+	}
+	return 0
+}
+
+func (x *GatewayConnectionStats) GetLastTxAcknowledgmentReceivedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.LastTxAcknowledgmentReceivedAt
+	}
+	return nil
+}
+
+func (x *GatewayConnectionStats) GetTxAcknowledgmentCount() uint64 {
+	if x != nil {
+		return x.TxAcknowledgmentCount
 	}
 	return 0
 }
@@ -2718,7 +2734,7 @@ var file_lorawan_stack_api_gateway_proto_rawDesc = []byte{
 	0x18, 0x02, 0x20, 0x01, 0x28, 0x02, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38,
 	0x01, 0x22, 0x26, 0x0a, 0x14, 0x47, 0x61, 0x74, 0x65, 0x77, 0x61, 0x79, 0x52, 0x65, 0x6d, 0x6f,
 	0x74, 0x65, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x70, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x70, 0x22, 0xe4, 0x09, 0x0a, 0x16, 0x47, 0x61,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x70, 0x22, 0x84, 0x0b, 0x0a, 0x16, 0x47, 0x61,
 	0x74, 0x65, 0x77, 0x61, 0x79, 0x43, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x53,
 	0x74, 0x61, 0x74, 0x73, 0x12, 0x3d, 0x0a, 0x0c, 0x63, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x65,
 	0x64, 0x5f, 0x61, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f,
@@ -2754,7 +2770,17 @@ var file_lorawan_stack_api_gateway_proto_rawDesc = []byte{
 	0x73, 0x74, 0x44, 0x6f, 0x77, 0x6e, 0x6c, 0x69, 0x6e, 0x6b, 0x52, 0x65, 0x63, 0x65, 0x69, 0x76,
 	0x65, 0x64, 0x41, 0x74, 0x12, 0x25, 0x0a, 0x0e, 0x64, 0x6f, 0x77, 0x6e, 0x6c, 0x69, 0x6e, 0x6b,
 	0x5f, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x08, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0d, 0x64, 0x6f,
-	0x77, 0x6e, 0x6c, 0x69, 0x6e, 0x6b, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x12, 0x5f, 0x0a, 0x10, 0x72,
+	0x77, 0x6e, 0x6c, 0x69, 0x6e, 0x6b, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x12, 0x66, 0x0a, 0x22, 0x6c,
+	0x61, 0x73, 0x74, 0x5f, 0x74, 0x78, 0x5f, 0x61, 0x63, 0x6b, 0x6e, 0x6f, 0x77, 0x6c, 0x65, 0x64,
+	0x67, 0x6d, 0x65, 0x6e, 0x74, 0x5f, 0x72, 0x65, 0x63, 0x65, 0x69, 0x76, 0x65, 0x64, 0x5f, 0x61,
+	0x74, 0x18, 0x0d, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74,
+	0x61, 0x6d, 0x70, 0x52, 0x1e, 0x6c, 0x61, 0x73, 0x74, 0x54, 0x78, 0x41, 0x63, 0x6b, 0x6e, 0x6f,
+	0x77, 0x6c, 0x65, 0x64, 0x67, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x63, 0x65, 0x69, 0x76, 0x65,
+	0x64, 0x41, 0x74, 0x12, 0x36, 0x0a, 0x17, 0x74, 0x78, 0x5f, 0x61, 0x63, 0x6b, 0x6e, 0x6f, 0x77,
+	0x6c, 0x65, 0x64, 0x67, 0x6d, 0x65, 0x6e, 0x74, 0x5f, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x0e,
+	0x20, 0x01, 0x28, 0x04, 0x52, 0x15, 0x74, 0x78, 0x41, 0x63, 0x6b, 0x6e, 0x6f, 0x77, 0x6c, 0x65,
+	0x64, 0x67, 0x6d, 0x65, 0x6e, 0x74, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x12, 0x5f, 0x0a, 0x10, 0x72,
 	0x6f, 0x75, 0x6e, 0x64, 0x5f, 0x74, 0x72, 0x69, 0x70, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x18,
 	0x09, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x35, 0x2e, 0x74, 0x74, 0x6e, 0x2e, 0x6c, 0x6f, 0x72, 0x61,
 	0x77, 0x61, 0x6e, 0x2e, 0x76, 0x33, 0x2e, 0x47, 0x61, 0x74, 0x65, 0x77, 0x61, 0x79, 0x43, 0x6f,
@@ -2928,17 +2954,18 @@ var file_lorawan_stack_api_gateway_proto_depIdxs = []int32{
 	21, // 54: ttn.lorawan.v3.GatewayConnectionStats.last_status:type_name -> ttn.lorawan.v3.GatewayStatus
 	33, // 55: ttn.lorawan.v3.GatewayConnectionStats.last_uplink_received_at:type_name -> google.protobuf.Timestamp
 	33, // 56: ttn.lorawan.v3.GatewayConnectionStats.last_downlink_received_at:type_name -> google.protobuf.Timestamp
-	30, // 57: ttn.lorawan.v3.GatewayConnectionStats.round_trip_times:type_name -> ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes
-	31, // 58: ttn.lorawan.v3.GatewayConnectionStats.sub_bands:type_name -> ttn.lorawan.v3.GatewayConnectionStats.SubBand
-	22, // 59: ttn.lorawan.v3.GatewayConnectionStats.gateway_remote_address:type_name -> ttn.lorawan.v3.GatewayRemoteAddress
-	38, // 60: ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes.min:type_name -> google.protobuf.Duration
-	38, // 61: ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes.max:type_name -> google.protobuf.Duration
-	38, // 62: ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes.median:type_name -> google.protobuf.Duration
-	63, // [63:63] is the sub-list for method output_type
-	63, // [63:63] is the sub-list for method input_type
-	63, // [63:63] is the sub-list for extension type_name
-	63, // [63:63] is the sub-list for extension extendee
-	0,  // [0:63] is the sub-list for field type_name
+	33, // 57: ttn.lorawan.v3.GatewayConnectionStats.last_tx_acknowledgment_received_at:type_name -> google.protobuf.Timestamp
+	30, // 58: ttn.lorawan.v3.GatewayConnectionStats.round_trip_times:type_name -> ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes
+	31, // 59: ttn.lorawan.v3.GatewayConnectionStats.sub_bands:type_name -> ttn.lorawan.v3.GatewayConnectionStats.SubBand
+	22, // 60: ttn.lorawan.v3.GatewayConnectionStats.gateway_remote_address:type_name -> ttn.lorawan.v3.GatewayRemoteAddress
+	38, // 61: ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes.min:type_name -> google.protobuf.Duration
+	38, // 62: ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes.max:type_name -> google.protobuf.Duration
+	38, // 63: ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes.median:type_name -> google.protobuf.Duration
+	64, // [64:64] is the sub-list for method output_type
+	64, // [64:64] is the sub-list for method input_type
+	64, // [64:64] is the sub-list for extension type_name
+	64, // [64:64] is the sub-list for extension extendee
+	0,  // [0:64] is the sub-list for field type_name
 }
 
 func init() { file_lorawan_stack_api_gateway_proto_init() }
