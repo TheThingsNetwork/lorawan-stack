@@ -21,6 +21,7 @@ import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import Checkbox from '@ttn-lw/components/checkbox'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
+import ContactFields from '@ttn-lw/components/contact-fields'
 
 import Require from '@console/lib/components/require'
 
@@ -81,7 +82,9 @@ const BasicSettingsForm = React.memo(props => {
 
   const onFormSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
+      console.log(values)
       const castedValues = validationSchema.cast(values)
+      console.log(castedValues)
       if (castedValues?.lbs_lns_secret?.value === '') {
         castedValues.lbs_lns_secret = null
       }
@@ -139,18 +142,6 @@ const BasicSettingsForm = React.memo(props => {
         type="textarea"
         component={Input}
         tooltipId={tooltipIds.GATEWAY_DESCRIPTION}
-      />
-      <Form.Field
-        name="administrative_contact"
-        component={Input}
-        title={sharedMessages.adminContact}
-        description={sharedMessages.administrativeEmailAddressDescription}
-      />
-      <Form.Field
-        name="technical_contact"
-        component={Input}
-        title={sharedMessages.technicalContact}
-        description={sharedMessages.technicalEmailAddressDescription}
       />
       <Form.Field
         title={sharedMessages.gatewayServerAddress}
@@ -227,6 +218,20 @@ const BasicSettingsForm = React.memo(props => {
         description={m.disablePacketBrokerForwarding}
         tooltipId={tooltipIds.DISABLE_PACKET_BROKER_FORWARDING}
       />
+      <Form.SubTitle title={sharedMessages.adminContact} />
+      <div>
+        <ContactFields
+          name="administrative"
+          hasInitialValue={Boolean(initialValues.administrative_contact)}
+        />
+      </div>
+      <Form.SubTitle title={sharedMessages.technicalContact} />
+      <div>
+        <ContactFields
+          name="technical"
+          hasInitialValue={Boolean(initialValues.technical_contact)}
+        />
+      </div>
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
         <Require condition={mayDeleteGateway}>

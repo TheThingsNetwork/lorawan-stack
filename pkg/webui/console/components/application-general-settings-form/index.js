@@ -22,6 +22,7 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
 import Checkbox from '@ttn-lw/components/checkbox'
+import ContactFields from '@ttn-lw/components/contact-fields'
 
 import Require from '@console/lib/components/require'
 
@@ -29,6 +30,7 @@ import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import { userId as contactIdRegex } from '@ttn-lw/lib/regexp'
 
 import {
   attributeValidCheck,
@@ -68,8 +70,16 @@ const validationSchema = Yup.object().shape({
     ),
   skip_payload_crypto: Yup.boolean(),
   alcsync: Yup.boolean(),
-  administrative_contact: Yup.string().email(sharedMessages.validateEmail),
-  technical_contact: Yup.string().email(sharedMessages.validateEmail),
+  _administrative_contact_id: Yup.string().matches(
+    contactIdRegex,
+    Yup.passValues(sharedMessages.validateIdFormat),
+  ),
+  _technical_contact_id: Yup.string(),
+  _administrative_contact_type: Yup.string().matches(
+    contactIdRegex,
+    Yup.passValues(sharedMessages.validateIdFormat),
+  ),
+  _technical_contact_type: Yup.string(),
 })
 
 const encodeAttributes = formValue =>
@@ -153,18 +163,17 @@ const ApplicationGeneralSettingsForm = ({
       encode={encodeAttributes}
       decode={decodeAttributes}
     />
-    <Form.Field
-      name="administrative_contact"
-      component={Input}
-      title={sharedMessages.adminContact}
-      description={sharedMessages.administrativeEmailAddressDescription}
-    />
-    <Form.Field
-      name="technical_contact"
-      component={Input}
-      title={sharedMessages.technicalContact}
-      description={sharedMessages.technicalEmailAddressDescription}
-    />
+    <Form.SubTitle title={sharedMessages.adminContact} />
+    <div>
+      <ContactFields
+        name="administrative"
+        hasInitialValue={Boolean(initialValues.administrative_contact)}
+      />
+    </div>
+    <Form.SubTitle title={sharedMessages.technicalContact} />
+    <div>
+      <ContactFields name="technical" hasInitialValue={Boolean(initialValues.technical_contact)} />
+    </div>
     <SubmitBar>
       <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
       <Require featureCheck={mayDeleteApplication}>
@@ -193,6 +202,8 @@ ApplicationGeneralSettingsForm.propTypes = {
     attributes: PropTypes.shape({}),
     skip_payload_crypto: PropTypes.bool,
     alcsync: PropTypes.bool,
+    administrative_contact: PropTypes.shape({}),
+    technical_contact: PropTypes.shape({}),
   }).isRequired,
   mayDeleteApplication: PropTypes.shape({}).isRequired,
   mayPurge: PropTypes.bool.isRequired,

@@ -90,7 +90,37 @@ const ApplicationGeneralSettingsContainer = ({ appId }) => {
   const packageAssoc = useSelector(state => selectApplicationPackageDefaultAssociation(state, 202))
   const alcsync =
     packageAssoc?.package_name === alcsyncPackageName ? { alcsync: true } : { alcsync: false }
+
+  // Add technical and administrative contact to the initial values.
+  const technicalContact =
+    application.technical_contact !== undefined && application.technical_contact !== null
+      ? {
+          _technical_contact_id: application.technical_contact.user_ids
+            ? application.technical_contact.user_ids.user_id
+            : application.technical_contact.organization_ids.organization_id,
+          _technical_contact_type: application.technical_contact.user_ids ? 'user' : 'organization',
+        }
+      : {
+          _technical_contact_id: '',
+          _technical_contact_type: '',
+        }
+  const administrativeContact =
+    application.administrative_contact !== undefined && application.administrative_contact !== null
+      ? {
+          _administrative_contact_id: application.administrative_contact.user_ids
+            ? application.administrative_contact.user_ids.user_id
+            : application.administrative_contact.organization_ids.organization_id,
+          _administrative_contact_type: application.administrative_contact.user_ids
+            ? 'user'
+            : 'organization',
+        }
+      : {
+          _administrative_contact_id: '',
+          _administrative_contact_type: '',
+        }
   const initialValues = {
+    ...technicalContact,
+    ...administrativeContact,
     ...application,
     ...link,
     ...alcsync,
@@ -119,7 +149,43 @@ const ApplicationGeneralSettingsContainer = ({ appId }) => {
     async (values, { resetForm, setSubmitting }) => {
       setError(undefined)
 
-      const changed = diff(application, values)
+      const {
+        _administrative_contact_id,
+        _administrative_contact_type,
+        _technical_contact_id,
+        _technical_contact_type,
+      } = values
+
+      const administrative_contact =
+        _administrative_contact_id !== ''
+          ? {
+              [`${_administrative_contact_type}_ids`]: {
+                [`${_administrative_contact_type}_id`]: _administrative_contact_id,
+              },
+            }
+          : ''
+
+      const technical_contact =
+        _technical_contact_id !== ''
+          ? {
+              [`${_technical_contact_type}_ids`]: {
+                [`${_technical_contact_type}_id`]: _technical_contact_id,
+              },
+            }
+          : ''
+
+      const changed = diff(
+        application,
+        { administrative_contact, technical_contact, ...values },
+        {
+          exclude: [
+            '_administrative_contact_id',
+            '_administrative_contact_type',
+            '_technical_contact_id',
+            '_technical_contact_type',
+          ],
+        },
+      )
 
       // If there is a change in attributes, copy all attributes so they don't get
       // overwritten.
@@ -130,6 +196,13 @@ const ApplicationGeneralSettingsContainer = ({ appId }) => {
               attributes: values.attributes,
             }
           : changed
+
+      if (technical_contact === '') {
+        update.technical_contact = null
+      }
+      if (administrative_contact === '') {
+        update.administrative_contact = null
+      }
 
       const {
         ids: { application_id },
