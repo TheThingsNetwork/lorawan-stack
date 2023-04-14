@@ -19,8 +19,6 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
-
-	_ "go.uber.org/automaxprocs" // Automatically set `GOMAXPROCS` in derived commands.
 )
 
 // InitializeFallbacks initializes configuration fallbacks.

@@ -32,6 +32,7 @@ import (
 	logobservability "go.thethings.network/lorawan-stack/v3/pkg/log/middleware/observability"
 	logsentry "go.thethings.network/lorawan-stack/v3/pkg/log/middleware/sentry"
 	pkgversion "go.thethings.network/lorawan-stack/v3/pkg/version"
+	"go.uber.org/automaxprocs/maxprocs"
 )
 
 var errMissingFlag = errors.DefineInvalidArgument("missing_flag", "missing CLI flag `{flag}`")
@@ -103,6 +104,10 @@ var (
 					return err
 				}
 				logger.Use(logsentry.New())
+			}
+
+			if _, err := maxprocs.Set(); err != nil {
+				logger.WithError(err).Debug("Failed to set GOMAXPROCS")
 			}
 
 			ctx = log.NewContext(ctx, logger)
