@@ -86,16 +86,18 @@ type Connection struct {
 	// Align for sync/atomic.
 	uplinks,
 	downlinks uint64
-	connectTime,
 	lastStatusTime,
 	lastUplinkTime,
 	lastDownlinkTime,
 	lastRepeatUpTime int64
+
 	lastStatus atomic.Pointer[ttnpb.GatewayStatus]
+	lastUplink atomic.Pointer[uplinkMessage]
 
 	ctx       context.Context
 	cancelCtx errorcontext.CancelFunc
 
+	connectTime      time.Time
 	frontend         Frontend
 	gateway          *ttnpb.Gateway
 	gatewayPrimaryFP *frequencyplans.FrequencyPlan
@@ -111,12 +113,9 @@ type Connection struct {
 	statusCh chan *ttnpb.GatewayStatus
 	txAckCh  chan *ttnpb.TxAcknowledgment
 
-	statsChangedCh chan struct{}
-	locCh          chan struct{}
-
-	versionInfoCh chan struct{}
-
-	lastUplink atomic.Pointer[uplinkMessage]
+	statsChangedCh       chan struct{}
+	locChangedCh         chan struct{}
+	versionInfoChangedCh chan struct{}
 }
 
 type uplinkMessage struct {
@@ -182,6 +181,7 @@ func NewConnection(
 		ctx:       ctx,
 		cancelCtx: cancelCtx,
 
+		connectTime:      time.Now(),
 		frontend:         frontend,
 		gateway:          gateway,
 		gatewayPrimaryFP: fp0,
@@ -191,15 +191,15 @@ func NewConnection(
 		scheduler:        scheduler,
 		addr:             addr,
 		rtts:             newRTTs(maxRTTs, rttTTL),
-		upCh:             make(chan *ttnpb.GatewayUplinkMessage, bufferSize),
-		downCh:           make(chan *ttnpb.DownlinkMessage, bufferSize),
-		statusCh:         make(chan *ttnpb.GatewayStatus, bufferSize),
-		txAckCh:          make(chan *ttnpb.TxAcknowledgment, bufferSize),
-		locCh:            make(chan struct{}, 1),
-		versionInfoCh:    make(chan struct{}, 1),
-		connectTime:      time.Now().UnixNano(),
 
-		statsChangedCh: make(chan struct{}, 1),
+		upCh:     make(chan *ttnpb.GatewayUplinkMessage, bufferSize),
+		downCh:   make(chan *ttnpb.DownlinkMessage, bufferSize),
+		statusCh: make(chan *ttnpb.GatewayStatus, bufferSize),
+		txAckCh:  make(chan *ttnpb.TxAcknowledgment, bufferSize),
+
+		statsChangedCh:       make(chan struct{}, 1),
+		locChangedCh:         make(chan struct{}, 1),
+		versionInfoChangedCh: make(chan struct{}, 1),
 	}, nil
 }
 
@@ -367,7 +367,7 @@ func (c *Connection) HandleStatus(status *ttnpb.GatewayStatus) (err error) {
 
 		if len(status.AntennaLocations) > 0 && c.gateway.UpdateLocationFromStatus {
 			select {
-			case c.locCh <- struct{}{}:
+			case c.locChangedCh <- struct{}{}:
 			default:
 			}
 		}
@@ -375,7 +375,7 @@ func (c *Connection) HandleStatus(status *ttnpb.GatewayStatus) (err error) {
 		// The channel is only written to once, after which there is no longer a recipient.
 		// For all subsequent status messages, the default branch is chosen.
 		select {
-		case c.versionInfoCh <- struct{}{}:
+		case c.versionInfoChangedCh <- struct{}{}:
 		default:
 		}
 
@@ -705,16 +705,16 @@ func (c *Connection) StatsChanged() <-chan struct{} {
 
 // LocationChanged returns the location updates channel.
 func (c *Connection) LocationChanged() <-chan struct{} {
-	return c.locCh
+	return c.locChangedCh
 }
 
 // VersionInfoChanged returns the version info updates channel.
 func (c *Connection) VersionInfoChanged() <-chan struct{} {
-	return c.versionInfoCh
+	return c.versionInfoChangedCh
 }
 
 // ConnectTime returns the time the gateway connected.
-func (c *Connection) ConnectTime() time.Time { return time.Unix(0, c.connectTime) }
+func (c *Connection) ConnectTime() time.Time { return c.connectTime }
 
 // GatewayRemoteAddress returns the time the remote address of the gateway as seen by the server.
 func (c *Connection) GatewayRemoteAddress() *ttnpb.GatewayRemoteAddress { return c.addr }
