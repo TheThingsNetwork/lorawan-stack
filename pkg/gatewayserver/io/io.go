@@ -753,9 +753,8 @@ func (c *Connection) RTTStats(percentile int, t time.Time) (min, max, median, np
 
 // Stats collects and returns the gateway connection statistics and the field mask paths.
 func (c *Connection) Stats() (*ttnpb.GatewayConnectionStats, []string) {
-	ct := c.ConnectTime()
 	stats := &ttnpb.GatewayConnectionStats{
-		ConnectedAt:          timestamppb.New(ct),
+		ConnectedAt:          timestamppb.New(c.ConnectTime()),
 		Protocol:             c.Frontend().Protocol(),
 		GatewayRemoteAddress: c.GatewayRemoteAddress(),
 	}
