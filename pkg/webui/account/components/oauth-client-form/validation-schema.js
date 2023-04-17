@@ -14,6 +14,7 @@
 
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { userId as contactIdRegex } from '@ttn-lw/lib/regexp'
 
 import { approvalStates } from './utils'
 
@@ -52,8 +53,16 @@ const validationSchema = Yup.object().shape({
     return Yup.string()
   }),
   rights: Yup.array().min(1, sharedMessages.validateRights),
-  administrative_contact: Yup.string().email(sharedMessages.validateEmail),
-  technical_contact: Yup.string().email(sharedMessages.validateEmail),
+  _administrative_contact_id: Yup.string().matches(
+    contactIdRegex,
+    Yup.passValues(sharedMessages.validateIdFormat),
+  ),
+  _administrative_contact_type: Yup.string(),
+  _technical_contact_id: Yup.string().matches(
+    contactIdRegex,
+    Yup.passValues(sharedMessages.validateIdFormat),
+  ),
+  _technical_contact_type: Yup.string(),
 })
 
 export default validationSchema

@@ -27,7 +27,7 @@ import Message from '@ttn-lw/lib/components/message'
 import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import { id as organizationIdRegexp } from '@ttn-lw/lib/regexp'
+import { id as organizationIdRegexp, userId as contactIdRegex } from '@ttn-lw/lib/regexp'
 
 const validationSchema = Yup.object().shape({
   ids: Yup.object().shape({
@@ -41,8 +41,16 @@ const validationSchema = Yup.object().shape({
     .min(2, Yup.passValues(sharedMessages.validateTooShort))
     .max(50, Yup.passValues(sharedMessages.validateTooLong)),
   description: Yup.string().max(2000, Yup.passValues(sharedMessages.validateTooLong)),
-  administrative_contact: Yup.string().email(sharedMessages.validateEmail),
-  technical_contact: Yup.string().email(sharedMessages.validateEmail),
+  _administrative_contact_id: Yup.string().matches(
+    contactIdRegex,
+    Yup.passValues(sharedMessages.validateIdFormat),
+  ),
+  _administrative_contact_type: Yup.string(),
+  _technical_contact_id: Yup.string().matches(
+    contactIdRegex,
+    Yup.passValues(sharedMessages.validateIdFormat),
+  ),
+  _technical_contact_type: Yup.string(),
 })
 
 const m = defineMessages({
