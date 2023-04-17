@@ -126,6 +126,44 @@ const generateJoinServerOnlyConfig = config => {
  */
 const generateHexValue = length => crypto.randomBytes(Math.floor(length / 2)).toString('hex')
 
+const generateCollaborator = (entity, type) => {
+  const collabUserId = 'test-collab-user'
+  const organizationId = 'test-collab-org'
+
+  const applicationRights = ['RIGHT_APPLICATION_ALL']
+  const gatewayRights = ['RIGHT_GATEWAY_ALL']
+  const organizationRights = [
+    'RIGHT_APPLICATION_ALL',
+    'RIGHT_CLIENT_ALL',
+    'RIGHT_GATEWAY_ALL',
+    'RIGHT_ORGANIZATION_ALL',
+  ]
+
+  const userIds = {
+    user_ids: {
+      user_id: collabUserId,
+    },
+  }
+
+  const orgIds = {
+    organization_ids: {
+      organization_id: organizationId,
+    },
+  }
+
+  return {
+    collaborator: {
+      ids: type === 'user' ? userIds : orgIds,
+      rights:
+        entity === 'applications'
+          ? applicationRights
+          : entity === 'gateways'
+          ? gatewayRights
+          : organizationRights,
+    },
+  }
+}
+
 export {
   disableIdentityServer,
   disableNetworkServer,
@@ -134,4 +172,5 @@ export {
   disableGatewayServer,
   generateHexValue,
   generateJoinServerOnlyConfig,
+  generateCollaborator,
 }

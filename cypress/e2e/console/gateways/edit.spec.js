@@ -12,9 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { generateCollaborator } from '../../../support/utils'
+
 describe('Gateway general settings', () => {
   let user
   let gateway
+  const collabUserId = 'test-collab-user'
+  const collabUser = {
+    ids: { user_id: collabUserId },
+    primary_email_address: 'test-collab-user@example.com',
+    password: 'ABCDefg123!',
+    password_confirm: 'ABCDefg123!',
+  }
 
   before(() => {
     cy.dropAndSeedDatabase()
@@ -25,6 +34,7 @@ describe('Gateway general settings', () => {
       password_confirm: 'ABCDefg123!',
     }
     cy.createUser(user)
+    cy.createUser(collabUser)
     gateway = {
       ids: { gateway_id: 'test-gateway', eui: '0000000000000000' },
       name: 'Test Gateway',
@@ -201,6 +211,41 @@ describe('Gateway general settings', () => {
       })
   })
 
+  it('fails adding non-collaborator contact information', () => {
+    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(
+      `${Cypress.config('consoleRootPath')}/gateways/${gateway.ids.gateway_id}/general-settings`,
+    )
+
+    cy.findByText('Contact information').should('be.visible')
+    cy.findByLabelText('Administrative contact ID').clear().type(collabUserId)
+    cy.findByLabelText('Technical contact ID').clear().type(collabUserId)
+
+    cy.findByRole('button', { name: 'Save changes' }).click()
+
+    cy.findByTestId('toast-notification').should('not.exist')
+  })
+
+  it('suceeds adding contact information', () => {
+    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+    const entity = 'gateways'
+    const userCollaborator = generateCollaborator(entity, 'user')
+    cy.createCollaborator(entity, gateway.ids.gateway_id, userCollaborator)
+
+    cy.visit(
+      `${Cypress.config('consoleRootPath')}/gateways/${gateway.ids.gateway_id}/general-settings`,
+    )
+
+    cy.findByText('Contact information').should('be.visible')
+    cy.findByLabelText('Administrative contact ID').clear().type(collabUserId)
+    cy.findByLabelText('Technical contact ID').clear().type(collabUserId)
+
+    cy.findByRole('button', { name: 'Save changes' }).click()
+
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('toast-notification').findByText(`Gateway updated`).should('be.visible')
+  })
+
   it('succeeds deleting the gateway', () => {
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
     cy.visit(
@@ -213,6 +258,7 @@ describe('Gateway general settings', () => {
         cy.findByText('Confirm deletion', { selector: 'h1' }).should('be.visible')
 
         cy.findByRole('button', { name: /Cancel/ }).should('be.visible')
+        cy.get('input').type(gateway.ids.gateway_id)
         cy.findByRole('button', { name: /Delete gateway/ })
           .should('be.visible')
           .click()

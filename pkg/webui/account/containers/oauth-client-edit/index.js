@@ -102,7 +102,7 @@ const ClientAdd = props => {
 
       const changed = diff(
         initialValues,
-        { administrative_contact, technical_contact, ...values },
+        { ...values, administrative_contact, technical_contact },
         {
           exclude: [
             '_administrative_contact_id',

@@ -42,6 +42,6 @@ export const getAdministrativeContact = values =>
 
 export const composeContact = (type, id) => ({
   [`${type}_ids`]: {
-    [`${id}_id`]: id,
+    [`${type}_id`]: id,
   },
 })

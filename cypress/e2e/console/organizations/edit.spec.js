@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { generateCollaborator } from '../../../support/utils'
+
 describe('Organization general settings', () => {
   const organizationId = 'test-organization'
   const organization = { ids: { organization_id: organizationId } }
@@ -22,10 +24,18 @@ describe('Organization general settings', () => {
     password: 'ABCDefg123!',
     password_confirm: 'ABCDefg123!',
   }
+  const collabUserId = 'test-collab-user'
+  const collabUser = {
+    ids: { user_id: collabUserId },
+    primary_email_address: 'test-collab-user@example.com',
+    password: 'ABCDefg123!',
+    password_confirm: 'ABCDefg123!',
+  }
 
   before(() => {
     cy.dropAndSeedDatabase()
     cy.createUser(user)
+    cy.createUser(collabUser)
     cy.createOrganization(organization, userId)
   })
 
@@ -49,6 +59,35 @@ describe('Organization general settings', () => {
       .should('be.visible')
   })
 
+  it('fails adding non-collaborator contact information', () => {
+    cy.findByText('Contact information').should('be.visible')
+    cy.findByLabelText('Administrative contact ID').clear().type(collabUserId)
+    cy.findByLabelText('Technical contact ID').clear().type(collabUserId)
+
+    cy.findByRole('button', { name: 'Save changes' }).click()
+
+    cy.findByTestId('toast-notification').should('not.exist')
+  })
+
+  it('suceeds adding contact information', () => {
+    const entity = 'organizations'
+    const userCollaborator = generateCollaborator(entity, 'user')
+    cy.createCollaborator(entity, organizationId, userCollaborator)
+
+    cy.visit(
+      `${Cypress.config('consoleRootPath')}/organizations/${organizationId}/general-settings`,
+    )
+
+    cy.findByText('Contact information').should('be.visible')
+    cy.findByLabelText('Administrative contact ID').clear().type(collabUserId)
+    cy.findByLabelText('Technical contact ID').clear().type(collabUserId)
+
+    cy.findByRole('button', { name: 'Save changes' }).click()
+
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('toast-notification').findByText(`Organization updated`).should('be.visible')
+  })
+
   it('succeeds deleting organization', () => {
     cy.findByRole('button', { name: /Delete organization/ }).click()
 
@@ -56,6 +95,7 @@ describe('Organization general settings', () => {
       .should('be.visible')
       .within(() => {
         cy.findByText('Confirm deletion', { selector: 'h1' }).should('be.visible')
+        cy.get('input').type(organizationId)
         cy.findByRole('button', { name: /Delete organization/ }).click()
       })
 

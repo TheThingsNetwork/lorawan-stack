@@ -172,9 +172,10 @@ const ApplicationGeneralSettingsForm = ({
       encode={encodeAttributes}
       decode={decodeAttributes}
     />
-    <Notification small warning content={m.contactWarning} className="mt-cs-xl" />
-    <Form.SubTitle title={sharedMessages.adminContact} className="mt-cs-xs" />
+    <Form.SubTitle title={sharedMessages.contactInformation} className="mb-cs-s" />
+    <Notification small warning content={m.contactWarning} />
     <div>
+      <Message content={sharedMessages.adminContact} component="h4" className="mt-cs-xs" />
       <ContactFields
         name="administrative"
         hasInitialValue={Boolean(initialValues._administrative_contact_id)}
@@ -185,8 +186,8 @@ const ApplicationGeneralSettingsForm = ({
         className="mt-cs-xs tc-subtle-gray"
       />
     </div>
-    <Form.SubTitle title={sharedMessages.technicalContact} />
     <div>
+      <Message content={sharedMessages.technicalContact} component="h4" />
       <ContactFields
         name="technical"
         hasInitialValue={Boolean(initialValues._technical_contact_id)}

@@ -102,7 +102,7 @@ const OrganizationUpdateForm = ({ onDeleteSuccess }) => {
 
         const changed = diff(
           organization,
-          { administrative_contact, technical_contact, ...updated },
+          { ...updated, administrative_contact, technical_contact },
           {
             exclude: [
               'created_at',

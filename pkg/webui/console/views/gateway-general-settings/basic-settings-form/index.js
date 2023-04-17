@@ -24,6 +24,7 @@ import KeyValueMap from '@ttn-lw/components/key-value-map'
 import ContactFields from '@ttn-lw/components/contact-fields'
 import Notification from '@ttn-lw/components/notification'
 import {
+  composeContact,
   getAdministrativeContact,
   getTechnicalContact,
 } from '@ttn-lw/components/contact-fields/utils'
@@ -93,9 +94,28 @@ const BasicSettingsForm = React.memo(props => {
       if (castedValues?.lbs_lns_secret?.value === '') {
         castedValues.lbs_lns_secret = null
       }
+
+      const {
+        _administrative_contact_id,
+        _administrative_contact_type,
+        _technical_contact_id,
+        _technical_contact_type,
+      } = castedValues
+
+      const administrative_contact =
+        _administrative_contact_id !== ''
+          ? composeContact(_administrative_contact_type, _administrative_contact_id)
+          : ''
+
+      const technical_contact =
+        _technical_contact_id !== ''
+          ? composeContact(_technical_contact_type, _technical_contact_id)
+          : ''
+
+      const update = { ...castedValues, technical_contact, administrative_contact }
       setError(undefined)
       try {
-        await onSubmit(castedValues)
+        await onSubmit(update)
         resetForm({ values: castedValues })
       } catch (err) {
         setSubmitting(false)
@@ -223,9 +243,10 @@ const BasicSettingsForm = React.memo(props => {
         description={m.disablePacketBrokerForwarding}
         tooltipId={tooltipIds.DISABLE_PACKET_BROKER_FORWARDING}
       />
-      <Notification small warning content={m.contactWarning} className="mt-cs-xl" />
-      <Form.SubTitle title={sharedMessages.adminContact} className="mt-cs-xs" />
+      <Form.SubTitle title={sharedMessages.contactInformation} className="mb-cs-s" />
+      <Notification small warning content={m.contactWarning} />
       <div>
+        <Message content={sharedMessages.adminContact} component="h4" className="mt-cs-xs" />
         <ContactFields
           name="administrative"
           hasInitialValue={Boolean(initialValues._administrative_contact_id)}
@@ -236,8 +257,8 @@ const BasicSettingsForm = React.memo(props => {
           className="mt-cs-xs tc-subtle-gray"
         />
       </div>
-      <Form.SubTitle title={sharedMessages.technicalContact} />
       <div>
+        <Message content={sharedMessages.technicalContact} component="h4" />
         <ContactFields
           name="technical"
           hasInitialValue={Boolean(initialValues._technical_contact_id)}
