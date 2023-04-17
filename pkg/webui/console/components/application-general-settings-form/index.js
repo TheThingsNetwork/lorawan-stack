@@ -23,6 +23,9 @@ import SubmitBar from '@ttn-lw/components/submit-bar'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
 import Checkbox from '@ttn-lw/components/checkbox'
 import ContactFields from '@ttn-lw/components/contact-fields'
+import Notification from '@ttn-lw/components/notification'
+
+import Message from '@ttn-lw/lib/components/message'
 
 import Require from '@console/lib/components/require'
 
@@ -43,6 +46,12 @@ const m = defineMessages({
   basics: 'Basics',
   deleteApp: 'Delete application',
   useAlcsync: 'Use Application Layer Clock Synchronization',
+  contactWarning:
+    'Note that if no contact is provided, it will default to the first collaborator of the application.',
+  adminContactDescription:
+    'Administrative contact information for this application. Typically used to indicate who to contact with administrative questions about the application.',
+  techContactDescription:
+    'Technical contact information for this application. Typically used to indicate who to contact with technical/security questions about the application.',
 })
 
 const validationSchema = Yup.object().shape({
@@ -163,16 +172,30 @@ const ApplicationGeneralSettingsForm = ({
       encode={encodeAttributes}
       decode={decodeAttributes}
     />
-    <Form.SubTitle title={sharedMessages.adminContact} />
+    <Notification small warning content={m.contactWarning} className="mt-cs-xl" />
+    <Form.SubTitle title={sharedMessages.adminContact} className="mt-cs-xs" />
     <div>
       <ContactFields
         name="administrative"
-        hasInitialValue={Boolean(initialValues.administrative_contact)}
+        hasInitialValue={Boolean(initialValues._administrative_contact_id)}
+      />
+      <Message
+        content={m.adminContactDescription}
+        component="p"
+        className="mt-cs-xs tc-subtle-gray"
       />
     </div>
     <Form.SubTitle title={sharedMessages.technicalContact} />
     <div>
-      <ContactFields name="technical" hasInitialValue={Boolean(initialValues.technical_contact)} />
+      <ContactFields
+        name="technical"
+        hasInitialValue={Boolean(initialValues._technical_contact_id)}
+      />
+      <Message
+        content={m.techContactDescription}
+        component="p"
+        className="mt-cs-xs tc-subtle-gray"
+      />
     </div>
     <SubmitBar>
       <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
@@ -202,8 +225,8 @@ ApplicationGeneralSettingsForm.propTypes = {
     attributes: PropTypes.shape({}),
     skip_payload_crypto: PropTypes.bool,
     alcsync: PropTypes.bool,
-    administrative_contact: PropTypes.shape({}),
-    technical_contact: PropTypes.shape({}),
+    _administrative_contact_id: PropTypes.string,
+    _technical_contact_id: PropTypes.string,
   }).isRequired,
   mayDeleteApplication: PropTypes.shape({}).isRequired,
   mayPurge: PropTypes.bool.isRequired,

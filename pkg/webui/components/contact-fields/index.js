@@ -35,7 +35,7 @@ const m = defineMessages({
 })
 
 const ContactFields = ({ name, hasInitialValue }) => {
-  const { values, setFieldValue } = useFormContext()
+  const { setFieldValue } = useFormContext()
   const [isAddingContact, setIsAddingContact] = useState(hasInitialValue)
   const addContact = useCallback(e => {
     e.preventDefault()

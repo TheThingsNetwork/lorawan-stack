@@ -84,9 +84,15 @@ const validationSchema = Yup.object().shape({
       sharedMessages.attributeValueValidateTooLong,
       attributeValueTooLongCheck,
     ),
-  _administrative_contact_id: Yup.string(),
+  _administrative_contact_id: Yup.string().matches(
+    contactIdRegex,
+    Yup.passValues(sharedMessages.validateIdFormat),
+  ),
   _administrative_contact_type: Yup.string(),
-  _technical_contact_id: Yup.string(),
+  _technical_contact_id: Yup.string().matches(
+    contactIdRegex,
+    Yup.passValues(sharedMessages.validateIdFormat),
+  ),
   _technical_contact_type: Yup.string(),
 })
 

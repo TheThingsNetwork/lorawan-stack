@@ -82,9 +82,7 @@ const BasicSettingsForm = React.memo(props => {
 
   const onFormSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
-      console.log(values)
       const castedValues = validationSchema.cast(values)
-      console.log(castedValues)
       if (castedValues?.lbs_lns_secret?.value === '') {
         castedValues.lbs_lns_secret = null
       }
@@ -222,14 +220,14 @@ const BasicSettingsForm = React.memo(props => {
       <div>
         <ContactFields
           name="administrative"
-          hasInitialValue={Boolean(initialValues.administrative_contact)}
+          hasInitialValue={Boolean(initialValues._administrative_contact_id)}
         />
       </div>
       <Form.SubTitle title={sharedMessages.technicalContact} />
       <div>
         <ContactFields
           name="technical"
-          hasInitialValue={Boolean(initialValues.technical_contact)}
+          hasInitialValue={Boolean(initialValues._technical_contact_id)}
         />
       </div>
       <SubmitBar>
