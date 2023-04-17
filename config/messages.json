@@ -2780,6 +2780,15 @@
       "file": "grpc_deviceregistry.go"
     }
   },
+  "error:pkg/applicationserver:invalid_max_retries": {
+    "translations": {
+      "en": "maximum number of retries cannot be less than 0"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "applicationserver.go"
+    }
+  },
   "error:pkg/applicationserver:invalid_timeout": {
     "translations": {
       "en": "invalid timeout `{timeout}`"
@@ -2882,6 +2891,15 @@
   "error:pkg/applicationserver:rebuild": {
     "translations": {
       "en": "could not rebuild device session; check device address"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "applicationserver.go"
+    }
+  },
+  "error:pkg/applicationserver:retry_attempts_missing": {
+    "translations": {
+      "en": "either default or maximum number of retries must be set"
     },
     "description": {
       "package": "pkg/applicationserver",
