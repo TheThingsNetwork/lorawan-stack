@@ -15,6 +15,7 @@ For details about compatibility between different releases, see the **Commitment
 - RPCs and CLI command to delete a batch of end devices within an application.
   - Check `ttn-lw-cli end-devices batch-delete` for more details.
 - Add `UserInput` component to the Console to handle user id input fields by implementing an autosuggest.
+- Add support for `administrative_contact` and `technical_contact` in the Console
 
 ### Changed
 
