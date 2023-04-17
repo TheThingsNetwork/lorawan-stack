@@ -77,13 +77,53 @@ const ClientAdd = props => {
     async (values, resetForm, setSubmitting) => {
       const { client_id } = values.ids
       setError(undefined)
+      const {
+        _administrative_contact_id,
+        _administrative_contact_type,
+        _technical_contact_id,
+        _technical_contact_type,
+      } = values
 
-      const changed = diff(initialValues, values)
+      const administrative_contact =
+        _administrative_contact_id !== ''
+          ? {
+              [`${_administrative_contact_type}_ids`]: {
+                [`${_administrative_contact_type}_id`]: _administrative_contact_id,
+              },
+            }
+          : ''
+
+      const technical_contact =
+        _technical_contact_id !== ''
+          ? {
+              [`${_technical_contact_type}_ids`]: {
+                [`${_technical_contact_type}_id`]: _technical_contact_id,
+              },
+            }
+          : ''
+
+      const changed = diff(
+        initialValues,
+        { administrative_contact, technical_contact, ...values },
+        {
+          exclude: [
+            '_administrative_contact_id',
+            '_administrative_contact_type',
+            '_technical_contact_id',
+            '_technical_contact_type',
+          ],
+        },
+      )
 
       // If there is a change in `redirect_uris`, `logout_redirect_uris` or `grants`,
       // copy all values so they don't get overwritten.
       const update = checkChanged(changed, values)
-
+      if (technical_contact === '') {
+        changed.technical_contact = null
+      }
+      if (administrative_contact === '') {
+        changed.administrative_contact = null
+      }
       const { owner_id, ...newClient } = update
 
       try {
@@ -131,10 +171,48 @@ const ClientAdd = props => {
     [dispatch, navigate],
   )
 
+  // Add technical and administrative contact to the initial values.
+  const { administrative_contact, technical_contact, ...restInitialValues } = initialValues
+  const technicalContact =
+    initialValues.technical_contact !== undefined && initialValues.technical_contact !== null
+      ? {
+          _technical_contact_id: initialValues.technical_contact.user_ids
+            ? initialValues.technical_contact.user_ids.user_id
+            : initialValues.technical_contact.organization_ids.organization_id,
+          _technical_contact_type: initialValues.technical_contact.user_ids
+            ? 'user'
+            : 'organization',
+        }
+      : {
+          _technical_contact_id: '',
+          _technical_contact_type: '',
+        }
+  const administrativeContact =
+    initialValues.administrative_contact !== undefined &&
+    initialValues.administrative_contact !== null
+      ? {
+          _administrative_contact_id: initialValues.administrative_contact.user_ids
+            ? initialValues.administrative_contact.user_ids.user_id
+            : initialValues.administrative_contact.organization_ids.organization_id,
+          _administrative_contact_type: initialValues.administrative_contact.user_ids
+            ? 'user'
+            : 'organization',
+        }
+      : {
+          _administrative_contact_id: '',
+          _administrative_contact_type: '',
+        }
+
+  const composedInitialValues = {
+    ...technicalContact,
+    ...administrativeContact,
+    ...restInitialValues,
+  }
+
   return (
     <OAuthClientForm
       update
-      initialValues={initialValues}
+      initialValues={composedInitialValues}
       onSubmit={handleSubmit}
       onDelete={handleDelete}
       navigateToOAuthClient={navigateToOAuthClient}
@@ -151,6 +229,26 @@ const ClientAdd = props => {
 ClientAdd.propTypes = {
   initialValues: PropTypes.shape({
     grants: PropTypes.arrayOf(PropTypes.string),
+    technical_contact: PropTypes.shape({
+      user_ids: PropTypes.shape({
+        user_id: PropTypes.string,
+      }),
+      organization_ids: PropTypes.shape({
+        organization_id: PropTypes.string,
+      }),
+    }),
+    administrative_contact: PropTypes.shape({
+      user_ids: PropTypes.shape({
+        user_id: PropTypes.string,
+      }),
+      organization_ids: PropTypes.shape({
+        organization_id: PropTypes.string,
+      }),
+    }),
+    _administrative_contact_id: PropTypes.string,
+    _administrative_contact_type: PropTypes.string,
+    _technical_contact_id: PropTypes.string,
+    _technical_contact_type: PropTypes.string,
   }).isRequired,
   isAdmin: PropTypes.bool.isRequired,
   pseudoRights: PropTypes.rights.isRequired,

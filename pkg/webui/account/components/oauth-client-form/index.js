@@ -25,6 +25,9 @@ import Select from '@ttn-lw/components/select'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import RightsGroup from '@ttn-lw/components/rights-group'
+import ContactFields from '@ttn-lw/components/contact-fields'
+
+import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -108,18 +111,31 @@ const OAuthClientForm = props => {
       />
       {update && mayEditBasicInformation && (
         <>
-          <Form.Field
-            name="administrative_contact"
-            component={Input}
-            title={sharedMessages.adminContact}
-            description={sharedMessages.administrativeEmailAddressDescription}
-          />
-          <Form.Field
-            name="technical_contact"
-            component={Input}
-            title={sharedMessages.technicalContact}
-            description={sharedMessages.technicalEmailAddressDescription}
-          />
+          <Notification small warning content={m.contactWarning} className="mt-cs-xl" />
+          <Form.SubTitle title={sharedMessages.adminContact} className="mt-cs-xs" />
+          <div>
+            <ContactFields
+              name="administrative"
+              hasInitialValue={Boolean(initialValues._administrative_contact_id)}
+            />
+            <Message
+              content={m.adminContactDescription}
+              component="p"
+              className="mt-cs-xs tc-subtle-gray"
+            />
+          </div>
+          <Form.SubTitle title={sharedMessages.technicalContact} className="mt-cs-s" />
+          <div>
+            <ContactFields
+              name="technical"
+              hasInitialValue={Boolean(initialValues._technical_contact_id)}
+            />
+            <Message
+              content={m.techContactDescription}
+              component="p"
+              className="mt-cs-xs tc-subtle-gray"
+            />
+          </div>
         </>
       )}
       <Form.Field

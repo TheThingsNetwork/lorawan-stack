@@ -107,6 +107,8 @@ const OAuthClient = () => {
     'endorsed',
     'grants',
     'rights',
+    'administrative_contact',
+    'technical_contact',
   ]
 
   return (

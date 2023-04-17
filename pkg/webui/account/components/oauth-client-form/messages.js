@@ -54,4 +54,10 @@ export default defineMessages({
   grantTypeAndRights: 'Grant types and rights',
   stateDescriptionDesc:
     'You can use this field to save additional information about the state of this OAuth client, e.g. why it has been flagged',
+  contactWarning:
+    'Note that if no contact is provided, it will default to the first collaborator of the organization.',
+  adminContactDescription:
+    'Administrative contact information for this application. Typically used to indicate who to contact with administrative questions about the application.',
+  techContactDescription:
+    'Technical contact information for this application. Typically used to indicate who to contact with technical/security questions about the application.',
 })
