@@ -1586,6 +1586,18 @@ func (m *ApplicationDownlink) ValidateFields(paths ...string) error {
 
 			}
 
+		case "confirmed_retry":
+
+			if v, ok := interface{}(m.GetConfirmedRetry()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationDownlinkValidationError{
+						field:  "confirmed_retry",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return ApplicationDownlinkValidationError{
 				field:  name,
@@ -2880,3 +2892,99 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ApplicationDownlink_ClassBCValidationError{}
+
+// ValidateFields checks the field values on ApplicationDownlink_ConfirmedRetry
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *ApplicationDownlink_ConfirmedRetry) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ApplicationDownlink_ConfirmedRetryFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "attempt":
+			// no validation rules for Attempt
+		case "max_attempts":
+
+			if v, ok := interface{}(m.GetMaxAttempts()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationDownlink_ConfirmedRetryValidationError{
+						field:  "max_attempts",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return ApplicationDownlink_ConfirmedRetryValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ApplicationDownlink_ConfirmedRetryValidationError is the validation error
+// returned by ApplicationDownlink_ConfirmedRetry.ValidateFields if the
+// designated constraints aren't met.
+type ApplicationDownlink_ConfirmedRetryValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ApplicationDownlink_ConfirmedRetryValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ApplicationDownlink_ConfirmedRetryValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ApplicationDownlink_ConfirmedRetryValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ApplicationDownlink_ConfirmedRetryValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ApplicationDownlink_ConfirmedRetryValidationError) ErrorName() string {
+	return "ApplicationDownlink_ConfirmedRetryValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ApplicationDownlink_ConfirmedRetryValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sApplicationDownlink_ConfirmedRetry.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ApplicationDownlink_ConfirmedRetryValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ApplicationDownlink_ConfirmedRetryValidationError{}

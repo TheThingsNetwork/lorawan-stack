@@ -384,7 +384,19 @@ message ApplicationDownlink {
 
   repeated string correlation_ids = 9 [(validate.rules).repeated.items.string.max_len = 100];
 
-  // next: 11
+  message ConfirmedRetry {
+    option (thethings.flags.message) = { select: true, set: true };
+
+    // The number of confirmed downlink acknowledgement attempts done so far.
+    uint32 attempt = 1;
+    // The maximum number of confirmed downlink acknowledgement attempts.
+    // If null, the Application Server configuration is used instead.
+    google.protobuf.UInt32Value max_attempts = 2;
+  }
+
+  ConfirmedRetry confirmed_retry = 11;
+
+  // next: 12
 }
 
 message ApplicationDownlinks {
