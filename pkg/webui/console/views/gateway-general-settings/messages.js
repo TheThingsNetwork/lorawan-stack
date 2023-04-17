@@ -27,6 +27,12 @@ const messages = defineMessages({
     'Are you sure you want to delete "{gtwName}"? This action cannot be undone and it will not be possible to reuse the gateway ID.',
   disablePacketBrokerForwarding:
     'Disable forwarding uplink messages received from this gateway to the Packet Broker',
+  contactWarning:
+    'Note that if no contact is provided, it will default to the first collaborator of the gateway.',
+  adminContactDescription:
+    'Administrative contact information for this application. Typically used to indicate who to contact with administrative questions about the application.',
+  techContactDescription:
+    'Technical contact information for this application. Typically used to indicate who to contact with technical/security questions about the application.',
 })
 
 export default messages

@@ -19,6 +19,10 @@ import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
+import ContactFields from '@ttn-lw/components/contact-fields'
+import Notification from '@ttn-lw/components/notification'
+
+import Message from '@ttn-lw/lib/components/message'
 
 import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -47,6 +51,12 @@ const m = defineMessages({
     'Optional organization description; can also be used to save notes about the organization',
   orgIdPlaceholder: 'my-new-organization',
   orgNamePlaceholder: 'My new organization',
+  contactWarning:
+    'Note that if no contact is provided, it will default to the first collaborator of the organization.',
+  adminContactDescription:
+    'Administrative contact information for this application. Typically used to indicate who to contact with administrative questions about the application.',
+  techContactDescription:
+    'Technical contact information for this application. Typically used to indicate who to contact with technical/security questions about the application.',
 })
 
 const initialValues = {
@@ -94,18 +104,31 @@ const OrganizationForm = props => {
       />
       {update && (
         <>
-          <Form.Field
-            name="administrative_contact"
-            component={Input}
-            title={sharedMessages.adminContact}
-            description={sharedMessages.administrativeEmailAddressDescription}
-          />
-          <Form.Field
-            name="technical_contact"
-            component={Input}
-            title={sharedMessages.technicalContact}
-            description={sharedMessages.technicalEmailAddressDescription}
-          />
+          <Notification small warning content={m.contactWarning} className="mt-cs-xl" />
+          <Form.SubTitle title={sharedMessages.adminContact} className="mt-cs-xs" />
+          <div>
+            <ContactFields
+              name="administrative"
+              hasInitialValue={Boolean(initialValues._administrative_contact_id)}
+            />
+            <Message
+              content={m.adminContactDescription}
+              component="p"
+              className="mt-cs-xs tc-subtle-gray"
+            />
+          </div>
+          <Form.SubTitle title={sharedMessages.technicalContact} className="mt-cs-s" />
+          <div>
+            <ContactFields
+              name="technical"
+              hasInitialValue={Boolean(initialValues._technical_contact_id)}
+            />
+            <Message
+              content={m.techContactDescription}
+              component="p"
+              className="mt-cs-xs tc-subtle-gray"
+            />
+          </div>
         </>
       )}
       <SubmitBar>
@@ -123,6 +146,8 @@ OrganizationForm.propTypes = {
     }),
     name: PropTypes.string,
     description: PropTypes.string,
+    _administrative_contact_id: PropTypes.string,
+    _technical_contact_id: PropTypes.string,
   }),
   onSubmit: PropTypes.func.isRequired,
   submitBarItems: PropTypes.element,

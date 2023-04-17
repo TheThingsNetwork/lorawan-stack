@@ -78,7 +78,52 @@ const OrganizationUpdateForm = ({ onDeleteSuccess }) => {
       try {
         setError()
 
-        const changed = diff(organization, updated, { exclude: ['created_at', 'updated_at'] })
+        const {
+          _administrative_contact_id,
+          _administrative_contact_type,
+          _technical_contact_id,
+          _technical_contact_type,
+        } = updated
+
+        const administrative_contact =
+          _administrative_contact_id !== ''
+            ? {
+                [`${_administrative_contact_type}_ids`]: {
+                  [`${_administrative_contact_type}_id`]: _administrative_contact_id,
+                },
+              }
+            : ''
+
+        const technical_contact =
+          _technical_contact_id !== ''
+            ? {
+                [`${_technical_contact_type}_ids`]: {
+                  [`${_technical_contact_type}_id`]: _technical_contact_id,
+                },
+              }
+            : ''
+
+        const changed = diff(
+          organization,
+          { administrative_contact, technical_contact, ...updated },
+          {
+            exclude: [
+              'created_at',
+              'updated_at',
+              '_administrative_contact_id',
+              '_administrative_contact_type',
+              '_technical_contact_id',
+              '_technical_contact_type',
+            ],
+          },
+        )
+
+        if (technical_contact === '') {
+          changed.technical_contact = null
+        }
+        if (administrative_contact === '') {
+          changed.administrative_contact = null
+        }
         await dispatch(attachPromise(updateOrganization(orgId, changed)))
 
         toast({
@@ -123,13 +168,52 @@ const OrganizationUpdateForm = ({ onDeleteSuccess }) => {
     </Require>
   )
 
+  // Add technical and administrative contact to the initial values.
+  const { administrative_contact, technical_contact, ...organizationValues } = organization
+  const technicalContact =
+    organization.technical_contact !== undefined && organization.technical_contact !== null
+      ? {
+          _technical_contact_id: organization.technical_contact.user_ids
+            ? organization.technical_contact.user_ids.user_id
+            : organization.technical_contact.organization_ids.organization_id,
+          _technical_contact_type: organization.technical_contact.user_ids
+            ? 'user'
+            : 'organization',
+        }
+      : {
+          _technical_contact_id: '',
+          _technical_contact_type: '',
+        }
+  const administrativeContact =
+    organization.administrative_contact !== undefined &&
+    organization.administrative_contact !== null
+      ? {
+          _administrative_contact_id: organization.administrative_contact.user_ids
+            ? organization.administrative_contact.user_ids.user_id
+            : organization.administrative_contact.organization_ids.organization_id,
+          _administrative_contact_type: organization.administrative_contact.user_ids
+            ? 'user'
+            : 'organization',
+        }
+      : {
+          _administrative_contact_id: '',
+          _administrative_contact_type: '',
+        }
+
+  const composedInitialValues = {
+    ...initialValues,
+    ...technicalContact,
+    ...administrativeContact,
+    ...organizationValues,
+  }
+
   return (
     <OrganizationForm
       update
       onSubmit={handleUpdate}
       error={error}
       submitBarItems={deleteButton}
-      initialValues={{ ...initialValues, ...organization }}
+      initialValues={composedInitialValues}
       submitMessage={sharedMessages.saveChanges}
     />
   )

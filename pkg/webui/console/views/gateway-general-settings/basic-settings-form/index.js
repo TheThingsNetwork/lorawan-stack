@@ -22,6 +22,9 @@ import Input from '@ttn-lw/components/input'
 import Checkbox from '@ttn-lw/components/checkbox'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
 import ContactFields from '@ttn-lw/components/contact-fields'
+import Notification from '@ttn-lw/components/notification'
+
+import Message from '@ttn-lw/lib/components/message'
 
 import Require from '@console/lib/components/require'
 
@@ -216,11 +219,17 @@ const BasicSettingsForm = React.memo(props => {
         description={m.disablePacketBrokerForwarding}
         tooltipId={tooltipIds.DISABLE_PACKET_BROKER_FORWARDING}
       />
-      <Form.SubTitle title={sharedMessages.adminContact} />
+      <Notification small warning content={m.contactWarning} className="mt-cs-xl" />
+      <Form.SubTitle title={sharedMessages.adminContact} className="mt-cs-xs" />
       <div>
         <ContactFields
           name="administrative"
           hasInitialValue={Boolean(initialValues._administrative_contact_id)}
+        />
+        <Message
+          content={m.adminContactDescription}
+          component="p"
+          className="mt-cs-xs tc-subtle-gray"
         />
       </div>
       <Form.SubTitle title={sharedMessages.technicalContact} />
@@ -228,6 +237,11 @@ const BasicSettingsForm = React.memo(props => {
         <ContactFields
           name="technical"
           hasInitialValue={Boolean(initialValues._technical_contact_id)}
+        />
+        <Message
+          content={m.techContactDescription}
+          component="p"
+          className="mt-cs-xs tc-subtle-gray"
         />
       </div>
       <SubmitBar>
