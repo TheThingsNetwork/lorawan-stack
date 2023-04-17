@@ -302,6 +302,12 @@ func TestDeviceRegistryGet(t *testing.T) {
 							return tc.GetFunc(ctx, ids, paths)
 						},
 					},
+					Downlinks: applicationserver.DownlinksConfig{
+						ConfirmationConfig: applicationserver.ConfirmationConfig{
+							DefaultRetryAttempts: 3,
+							MaxRetryAttempts:     10,
+						},
+					},
 				}))
 
 			as.AddContextFiller(tc.ContextFunc)
@@ -583,6 +589,12 @@ func TestDeviceRegistrySet(t *testing.T) {
 					Formatters: applicationserver.FormattersConfig{
 						MaxParameterLength: maxParameterLength,
 					},
+					Downlinks: applicationserver.DownlinksConfig{
+						ConfirmationConfig: applicationserver.ConfirmationConfig{
+							DefaultRetryAttempts: 3,
+							MaxRetryAttempts:     10,
+						},
+					},
 				}))
 
 			as.AddContextFiller(tc.ContextFunc)
@@ -771,6 +783,12 @@ func TestDeviceRegistryDelete(t *testing.T) {
 						SetFunc: func(ctx context.Context, deviceIds *ttnpb.EndDeviceIdentifiers, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 							atomic.AddUint64(&setCalls, 1)
 							return tc.SetFunc(ctx, deviceIds, paths, cb)
+						},
+					},
+					Downlinks: applicationserver.DownlinksConfig{
+						ConfirmationConfig: applicationserver.ConfirmationConfig{
+							DefaultRetryAttempts: 3,
+							MaxRetryAttempts:     10,
 						},
 					},
 				}))

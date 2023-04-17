@@ -322,6 +322,12 @@ func TestApplicationServer(t *testing.T) {
 				Registry: metadata.NewNoopEndDeviceLocationRegistry(),
 			},
 		},
+		Downlinks: applicationserver.DownlinksConfig{
+			ConfirmationConfig: applicationserver.ConfirmationConfig{
+				DefaultRetryAttempts: 3,
+				MaxRetryAttempts:     10,
+			},
+		},
 	}
 	as, err := applicationserver.New(c, config)
 	if !a.So(err, should.BeNil) {
@@ -2433,6 +2439,12 @@ func TestSkipPayloadCrypto(t *testing.T) {
 				Registry: metadata.NewNoopEndDeviceLocationRegistry(),
 			},
 		},
+		Downlinks: applicationserver.DownlinksConfig{
+			ConfirmationConfig: applicationserver.ConfirmationConfig{
+				DefaultRetryAttempts: 3,
+				MaxRetryAttempts:     10,
+			},
+		},
 	}
 	as, err := applicationserver.New(c, config)
 	if !a.So(err, should.BeNil) {
@@ -2944,6 +2956,12 @@ func TestLocationFromPayload(t *testing.T) {
 				Registry: metadata.NewClusterEndDeviceLocationRegistry(c, (1<<4)*Timeout),
 			},
 		},
+		Downlinks: applicationserver.DownlinksConfig{
+			ConfirmationConfig: applicationserver.ConfirmationConfig{
+				DefaultRetryAttempts: 3,
+				MaxRetryAttempts:     10,
+			},
+		},
 	}
 	as, err := applicationserver.New(c, config)
 	if !a.So(err, should.BeNil) {
@@ -3136,6 +3154,12 @@ func TestUplinkNormalized(t *testing.T) {
 		EndDeviceMetadataStorage: applicationserver.EndDeviceMetadataStorageConfig{
 			Location: applicationserver.EndDeviceLocationStorageConfig{
 				Registry: metadata.NewClusterEndDeviceLocationRegistry(c, (1<<4)*Timeout),
+			},
+		},
+		Downlinks: applicationserver.DownlinksConfig{
+			ConfirmationConfig: applicationserver.ConfirmationConfig{
+				DefaultRetryAttempts: 3,
+				MaxRetryAttempts:     10,
 			},
 		},
 	}

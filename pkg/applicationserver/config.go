@@ -93,6 +93,17 @@ type FormattersConfig struct {
 	MaxParameterLength int `name:"max-parameter-length" description:"Maximum allowed size for length of formatter parameters (payload formatter scripts)"`
 }
 
+// ConfirmationConfig represents the configuration for downlink confirmations.
+type ConfirmationConfig struct {
+	DefaultRetryAttempts int `name:"default-retry-attempts" description:"Default number of retry attempts for downlink confirmation"` // nolint:lll
+	MaxRetryAttempts     int `name:"max-retry-attempts" description:"Maximum number of retry attempts for downlink confirmation"`     // nolint:lll
+}
+
+// DownlinksConfig represents the configuration for downlinks.
+type DownlinksConfig struct {
+	ConfirmationConfig ConfirmationConfig `name:"confirmation" description:"Configuration for downlink confirmation"`
+}
+
 // Config represents the ApplicationServer configuration.
 type Config struct {
 	LinkMode                 string                         `name:"link-mode" description:"Deprecated - mode to link applications to their Network Server (all, explicit)"`
@@ -110,6 +121,7 @@ type Config struct {
 	Interop                  InteropConfig                  `name:"interop" description:"Interop client configuration"`
 	DeviceKEKLabel           string                         `name:"device-kek-label" description:"Label of KEK used to encrypt device keys at rest"`
 	DeviceLastSeen           LastSeenConfig                 `name:"device-last-seen" description:"End Device last seen batch update configuration"`
+	Downlinks                DownlinksConfig                `name:"downlinks" description:"Downlink configuration"`
 }
 
 func (c Config) toProto() *ttnpb.AsConfiguration {
