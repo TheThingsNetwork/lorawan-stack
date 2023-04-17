@@ -109,35 +109,6 @@ const OAuthClientForm = props => {
         description={m.clientDescDescription}
         component={Input}
       />
-      {update && mayEditBasicInformation && (
-        <>
-          <Notification small warning content={m.contactWarning} className="mt-cs-xl" />
-          <Form.SubTitle title={sharedMessages.adminContact} className="mt-cs-xs" />
-          <div>
-            <ContactFields
-              name="administrative"
-              hasInitialValue={Boolean(initialValues._administrative_contact_id)}
-            />
-            <Message
-              content={m.adminContactDescription}
-              component="p"
-              className="mt-cs-xs tc-subtle-gray"
-            />
-          </div>
-          <Form.SubTitle title={sharedMessages.technicalContact} className="mt-cs-s" />
-          <div>
-            <ContactFields
-              name="technical"
-              hasInitialValue={Boolean(initialValues._technical_contact_id)}
-            />
-            <Message
-              content={m.techContactDescription}
-              component="p"
-              className="mt-cs-xs tc-subtle-gray"
-            />
-          </div>
-        </>
-      )}
       <Form.Field
         name="redirect_uris"
         title={m.redirectUrls}
@@ -187,6 +158,35 @@ const OAuthClientForm = props => {
             description={m.endorsedDesc}
             disabled={!isAdmin}
           />
+        </>
+      )}
+      {update && mayEditBasicInformation && (
+        <>
+          <Notification small warning content={m.contactWarning} className="mt-cs-xl" />
+          <Form.SubTitle title={sharedMessages.adminContact} className="mt-cs-xs" />
+          <div>
+            <ContactFields
+              name="administrative"
+              hasInitialValue={Boolean(initialValues._administrative_contact_id)}
+            />
+            <Message
+              content={m.adminContactDescription}
+              component="p"
+              className="mt-cs-xs tc-subtle-gray"
+            />
+          </div>
+          <Form.SubTitle title={sharedMessages.technicalContact} className="mt-cs-s" />
+          <div>
+            <ContactFields
+              name="technical"
+              hasInitialValue={Boolean(initialValues._technical_contact_id)}
+            />
+            <Message
+              content={m.techContactDescription}
+              component="p"
+              className="mt-cs-xs tc-subtle-gray"
+            />
+          </div>
         </>
       )}
       {((isAdmin && update) || !update) && (

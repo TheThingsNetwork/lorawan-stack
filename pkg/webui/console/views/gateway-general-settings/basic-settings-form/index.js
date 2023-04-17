@@ -23,6 +23,10 @@ import Checkbox from '@ttn-lw/components/checkbox'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
 import ContactFields from '@ttn-lw/components/contact-fields'
 import Notification from '@ttn-lw/components/notification'
+import {
+  getAdministrativeContact,
+  getTechnicalContact,
+} from '@ttn-lw/components/contact-fields/utils'
 
 import Message from '@ttn-lw/lib/components/message'
 

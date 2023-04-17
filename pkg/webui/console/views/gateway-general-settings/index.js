@@ -23,6 +23,7 @@ import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import PageTitle from '@ttn-lw/components/page-title'
 import Collapse from '@ttn-lw/components/collapse'
+import { composeContact } from '@ttn-lw/components/contact-fields/utils'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 

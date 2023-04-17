@@ -18,6 +18,11 @@ import { useNavigate } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
 
 import toast from '@ttn-lw/components/toast'
+import {
+  composeContact,
+  getAdministrativeContact,
+  getTechnicalContact,
+} from '@ttn-lw/components/contact-fields/utils'
 
 import ApplicationGeneralSettingsForm from '@console/components/application-general-settings-form'
 
@@ -93,36 +98,12 @@ const ApplicationGeneralSettingsContainer = ({ appId }) => {
 
   // Add technical and administrative contact to the initial values.
   const { administrative_contact, technical_contact, ...applicationValues } = application
-  const technicalContact =
-    application.technical_contact !== undefined && application.technical_contact !== null
-      ? {
-          _technical_contact_id: application.technical_contact.user_ids
-            ? application.technical_contact.user_ids.user_id
-            : application.technical_contact.organization_ids.organization_id,
-          _technical_contact_type: application.technical_contact.user_ids ? 'user' : 'organization',
-        }
-      : {
-          _technical_contact_id: '',
-          _technical_contact_type: '',
-        }
-  const administrativeContact =
-    application.administrative_contact !== undefined && application.administrative_contact !== null
-      ? {
-          _administrative_contact_id: application.administrative_contact.user_ids
-            ? application.administrative_contact.user_ids.user_id
-            : application.administrative_contact.organization_ids.organization_id,
-          _administrative_contact_type: application.administrative_contact.user_ids
-            ? 'user'
-            : 'organization',
-        }
-      : {
-          _administrative_contact_id: '',
-          _administrative_contact_type: '',
-        }
+  const technicalContact = getTechnicalContact(application)
+  const administrativeContact = getAdministrativeContact(application)
   const initialValues = {
+    ...applicationValues,
     ...technicalContact,
     ...administrativeContact,
-    ...applicationValues,
     ...link,
     ...alcsync,
   }
@@ -159,20 +140,12 @@ const ApplicationGeneralSettingsContainer = ({ appId }) => {
 
       const administrative_contact =
         _administrative_contact_id !== ''
-          ? {
-              [`${_administrative_contact_type}_ids`]: {
-                [`${_administrative_contact_type}_id`]: _administrative_contact_id,
-              },
-            }
+          ? composeContact(_administrative_contact_type, _administrative_contact_id)
           : ''
 
       const technical_contact =
         _technical_contact_id !== ''
-          ? {
-              [`${_technical_contact_type}_ids`]: {
-                [`${_technical_contact_type}_id`]: _technical_contact_id,
-              },
-            }
+          ? composeContact(_technical_contact_type, _technical_contact_id)
           : ''
 
       const changed = diff(

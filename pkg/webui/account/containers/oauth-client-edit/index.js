@@ -18,6 +18,11 @@ import { useNavigate } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
 
 import toast from '@ttn-lw/components/toast'
+import {
+  composeContact,
+  getAdministrativeContact,
+  getTechnicalContact,
+} from '@ttn-lw/components/contact-fields/utils'
 
 import OAuthClientForm from '@account/components/oauth-client-form'
 
@@ -77,6 +82,7 @@ const ClientAdd = props => {
     async (values, resetForm, setSubmitting) => {
       const { client_id } = values.ids
       setError(undefined)
+
       const {
         _administrative_contact_id,
         _administrative_contact_type,
@@ -86,20 +92,12 @@ const ClientAdd = props => {
 
       const administrative_contact =
         _administrative_contact_id !== ''
-          ? {
-              [`${_administrative_contact_type}_ids`]: {
-                [`${_administrative_contact_type}_id`]: _administrative_contact_id,
-              },
-            }
+          ? composeContact(_administrative_contact_type, _administrative_contact_id)
           : ''
 
       const technical_contact =
         _technical_contact_id !== ''
-          ? {
-              [`${_technical_contact_type}_ids`]: {
-                [`${_technical_contact_type}_id`]: _technical_contact_id,
-              },
-            }
+          ? composeContact(_technical_contact_type, _technical_contact_id)
           : ''
 
       const changed = diff(
@@ -173,36 +171,8 @@ const ClientAdd = props => {
 
   // Add technical and administrative contact to the initial values.
   const { administrative_contact, technical_contact, ...restInitialValues } = initialValues
-  const technicalContact =
-    initialValues.technical_contact !== undefined && initialValues.technical_contact !== null
-      ? {
-          _technical_contact_id: initialValues.technical_contact.user_ids
-            ? initialValues.technical_contact.user_ids.user_id
-            : initialValues.technical_contact.organization_ids.organization_id,
-          _technical_contact_type: initialValues.technical_contact.user_ids
-            ? 'user'
-            : 'organization',
-        }
-      : {
-          _technical_contact_id: '',
-          _technical_contact_type: '',
-        }
-  const administrativeContact =
-    initialValues.administrative_contact !== undefined &&
-    initialValues.administrative_contact !== null
-      ? {
-          _administrative_contact_id: initialValues.administrative_contact.user_ids
-            ? initialValues.administrative_contact.user_ids.user_id
-            : initialValues.administrative_contact.organization_ids.organization_id,
-          _administrative_contact_type: initialValues.administrative_contact.user_ids
-            ? 'user'
-            : 'organization',
-        }
-      : {
-          _administrative_contact_id: '',
-          _administrative_contact_type: '',
-        }
-
+  const technicalContact = getTechnicalContact(initialValues)
+  const administrativeContact = getAdministrativeContact(initialValues)
   const composedInitialValues = {
     ...technicalContact,
     ...administrativeContact,
