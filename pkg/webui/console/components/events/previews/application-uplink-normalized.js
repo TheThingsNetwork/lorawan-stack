@@ -33,6 +33,11 @@ const ApplicationUplinkNormalizedPreview = React.memo(({ event }) => {
   return (
     <DescriptionList>
       <DescriptionList.Byte title={messages.devAddr} data={deviceIds.dev_addr} />
+      {data.normalized_payload.soil && (
+        <DescriptionList.Item title={sharedMessages.normalizedPayloadSoil}>
+          <JSONPayload data={data.normalized_payload.soil} />
+        </DescriptionList.Item>
+      )}
       {data.normalized_payload.air && (
         <DescriptionList.Item title={sharedMessages.normalizedPayloadAir}>
           <JSONPayload data={data.normalized_payload.air} />

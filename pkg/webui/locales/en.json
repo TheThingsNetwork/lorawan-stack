@@ -1366,6 +1366,7 @@
   "lib.shared-messages.noLocation": "No location information available",
   "lib.shared-messages.noMatch": "No items found",
   "lib.shared-messages.none": "None",
+  "lib.shared-messages.normalizedPayloadSoil": "Soil",
   "lib.shared-messages.normalizedPayloadAir": "Air",
   "lib.shared-messages.normalizedPayloadWind": "Wind",
   "lib.shared-messages.notAvailable": "n/a",
