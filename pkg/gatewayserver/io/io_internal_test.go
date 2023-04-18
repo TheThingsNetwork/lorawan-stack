@@ -18,6 +18,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
@@ -34,68 +35,76 @@ func TestIsRepeatedUplink(t *testing.T) {
 		{
 			name: "Repeated",
 			this: &uplinkMessage{
-				payloadHash: 123,
-				frequency:   1000000,
-				antennas:    []uint32{1},
+				payloadHash:   123,
+				frequency:     1000000,
+				dataRateIndex: 234,
+				antennas:      []uint32{1},
 			},
 			that: &uplinkMessage{
-				payloadHash: 123,
-				frequency:   1000000,
-				antennas:    []uint32{1},
+				payloadHash:   123,
+				frequency:     1000000,
+				dataRateIndex: 234,
+				antennas:      []uint32{1},
 			},
 			repeated: true,
 		},
 		{
 			name: "DifferentFrequency",
 			this: &uplinkMessage{
-				payloadHash: 123,
-				frequency:   1000000,
+				payloadHash:   123,
+				frequency:     1000000,
+				dataRateIndex: 234,
 			},
 			that: &uplinkMessage{
-				payloadHash: 123,
-				frequency:   1100000,
+				payloadHash:   123,
+				frequency:     1100000,
+				dataRateIndex: 234,
+			},
+			repeated: false,
+		},
+		{
+			name: "DifferentDataRate",
+			this: &uplinkMessage{
+				payloadHash:   123,
+				frequency:     100000,
+				dataRateIndex: 234,
+			},
+			that: &uplinkMessage{
+				payloadHash:   123,
+				frequency:     100000,
+				dataRateIndex: 235,
 			},
 			repeated: false,
 		},
 		{
 			name: "DifferentAntenna",
 			this: &uplinkMessage{
-				payloadHash: 123,
-				frequency:   1000000,
-				antennas:    []uint32{1},
+				payloadHash:   123,
+				frequency:     1000000,
+				dataRateIndex: 234,
+				antennas:      []uint32{1},
 			},
 			that: &uplinkMessage{
-				payloadHash: 123,
-				frequency:   1000000,
-				antennas:    []uint32{1, 2},
+				payloadHash:   123,
+				frequency:     1000000,
+				dataRateIndex: 234,
+				antennas:      []uint32{1, 2},
 			},
 			repeated: false,
 		},
 		{
 			name: "DifferentPayload",
 			this: &uplinkMessage{
-				payloadHash: 124,
-				frequency:   1000000,
-				antennas:    []uint32{1},
+				payloadHash:   124,
+				frequency:     1000000,
+				dataRateIndex: 234,
+				antennas:      []uint32{1},
 			},
 			that: &uplinkMessage{
-				payloadHash: 123,
-				frequency:   1000000,
-				antennas:    []uint32{1},
-			},
-			repeated: false,
-		},
-		{
-			name: "DifferentPayloadSize",
-			this: &uplinkMessage{
-				payloadHash: 12,
-				frequency:   1000000,
-				antennas:    []uint32{1},
-			},
-			that: &uplinkMessage{
-				payloadHash: 123,
-				frequency:   1000000,
-				antennas:    []uint32{1},
+				payloadHash:   123,
+				frequency:     1000000,
+				dataRateIndex: 234,
+				antennas:      []uint32{1},
 			},
 			repeated: false,
 		},
@@ -103,8 +112,9 @@ func TestIsRepeatedUplink(t *testing.T) {
 			name: "NilMessage",
 			this: nil,
 			that: &uplinkMessage{
-				payloadHash: 123,
-				frequency:   1000000,
+				payloadHash:   123,
+				frequency:     1000000,
+				dataRateIndex: 234,
 			},
 			repeated: false,
 		},
@@ -125,13 +135,20 @@ func TestUplinkMessageFromProto(t *testing.T) {
 	t.Parallel()
 
 	a := assertions.New(t)
+
+	phy, err := band.GetLatest(band.EU_863_870)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
 	a.So(uplinkMessageFromProto(&ttnpb.UplinkMessage{
 		RawPayload: []byte{1, 2, 3},
-		Settings:   &ttnpb.TxSettings{Frequency: 100000},
+		Settings:   &ttnpb.TxSettings{Frequency: 100000, DataRate: phy.DataRates[ttnpb.DataRateIndex_DATA_RATE_1].Rate},
 		RxMetadata: []*ttnpb.RxMetadata{{AntennaIndex: 0}, {AntennaIndex: 3}},
-	}), should.Resemble, &uplinkMessage{
-		payloadHash: 15035938162879559083,
-		frequency:   100000,
-		antennas:    []uint32{0, 3},
+	}, &phy), should.Resemble, &uplinkMessage{
+		payloadHash:   15035938162879559083,
+		frequency:     100000,
+		dataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+		antennas:      []uint32{0, 3},
 	})
 }

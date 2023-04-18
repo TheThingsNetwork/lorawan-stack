@@ -104,7 +104,7 @@ type Connection struct {
 	gateway          *ttnpb.Gateway
 	gatewayPrimaryFP *frequencyplans.FrequencyPlan
 	gatewayFPs       map[string]*frequencyplans.FrequencyPlan
-	bandID           string
+	band             *band.Band
 	fps              *frequencyplans.Store
 	scheduler        *scheduling.Scheduler
 	rtts             *rtts
@@ -121,9 +121,10 @@ type Connection struct {
 }
 
 type uplinkMessage struct {
-	payloadHash uint64
-	frequency   uint64
-	antennas    []uint32
+	payloadHash   uint64
+	frequency     uint64
+	dataRateIndex ttnpb.DataRateIndex
+	antennas      []uint32
 }
 
 var (
@@ -154,7 +155,10 @@ func NewConnection(
 		return nil, err
 	}
 	gatewayFPs[fp0ID] = fp0
-	bandID := fp0.BandID
+	phy, err := band.GetLatest(fp0.BandID)
+	if err != nil {
+		return nil, err
+	}
 
 	if len(gateway.FrequencyPlanIds) > 0 {
 		if gateway.FrequencyPlanIds[0] != fp0ID {
@@ -188,7 +192,7 @@ func NewConnection(
 		gateway:          gateway,
 		gatewayPrimaryFP: fp0,
 		gatewayFPs:       gatewayFPs,
-		bandID:           bandID,
+		band:             &phy,
 		fps:              fps,
 		scheduler:        scheduler,
 		addr:             addr,
@@ -332,7 +336,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 
 	msg := &ttnpb.GatewayUplinkMessage{
 		Message: up,
-		BandId:  c.bandID,
+		BandId:  c.band.ID,
 	}
 
 	select {
@@ -502,7 +506,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			if err != nil {
 				return false, false, 0, errFrequencyPlanNotConfigured.WithCause(err).WithAttributes("id", request.FrequencyPlanId)
 			}
-			if fp.BandID != c.bandID {
+			if fp.BandID != c.band.ID {
 				return false, false, 0, errFrequencyPlansNotFromSameBand.New()
 			}
 		}
@@ -525,10 +529,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 	// between the Network Server and the end device. However, Gateway Server does enforce spectrum regulations that are
 	// defined in Regional Parameters. These include maximum EIRP and maximum payload length. These are taken from the
 	// last known LoRaWAN Regional Parameters version.
-	phy, err := band.GetLatest(fp.BandID)
-	if err != nil {
-		return false, false, 0, err
-	}
+	phy := c.band
 
 	var rxErrs []errors.ErrorDetails
 	for i, rx := range []struct {
@@ -818,7 +819,7 @@ func (c *Connection) PrimaryFrequencyPlan() *frequencyplans.FrequencyPlan { retu
 
 // BandID returns the common band ID for the frequency plans in this connection.
 // TODO: Handle mixed bands (https://github.com/TheThingsNetwork/lorawan-stack/issues/1394)
-func (c *Connection) BandID() string { return c.bandID }
+func (c *Connection) BandID() string { return c.band.ID }
 
 // SyncWithGatewayConcentrator synchronizes the clock with the given concentrator timestamp, the server time and the
 // relative gateway time that corresponds to the given timestamp.
@@ -851,11 +852,13 @@ func payloadHash(b []byte) uint64 {
 	return h.Sum64()
 }
 
-func uplinkMessageFromProto(pb *ttnpb.UplinkMessage) *uplinkMessage {
+func uplinkMessageFromProto(pb *ttnpb.UplinkMessage, phy *band.Band) *uplinkMessage {
+	drIdx, _, _ := phy.FindUplinkDataRate(pb.GetSettings().GetDataRate())
 	up := &uplinkMessage{
-		payloadHash: payloadHash(pb.GetRawPayload()),
-		frequency:   pb.GetSettings().Frequency,
-		antennas:    make([]uint32, 0, len(pb.GetRxMetadata())),
+		payloadHash:   payloadHash(pb.GetRawPayload()),
+		frequency:     pb.GetSettings().GetFrequency(),
+		dataRateIndex: drIdx,
+		antennas:      make([]uint32, 0, len(pb.GetRxMetadata())),
 	}
 	for _, md := range pb.GetRxMetadata() {
 		up.antennas = append(up.antennas, md.GetAntennaIndex())
@@ -868,6 +871,9 @@ func isRepeatedUplink(this *uplinkMessage, that *uplinkMessage) bool {
 		return false
 	}
 	if this.frequency != that.frequency {
+		return false
+	}
+	if this.dataRateIndex != that.dataRateIndex {
 		return false
 	}
 	if len(this.antennas) != len(that.antennas) {
@@ -888,7 +894,7 @@ func isRepeatedUplink(this *uplinkMessage, that *uplinkMessage) bool {
 // implementations. It returns true if the uplink message is the same as the
 // last uplink message that was received by the connection.
 func (c *Connection) discardRepeatedUplink(up *ttnpb.UplinkMessage) bool {
-	uplink := uplinkMessageFromProto(up)
+	uplink := uplinkMessageFromProto(up, c.band)
 	repeated := false
 	for lastUplink := c.lastUplink.Load(); ; lastUplink = c.lastUplink.Load() {
 		if repeated = isRepeatedUplink(lastUplink, uplink); repeated {
