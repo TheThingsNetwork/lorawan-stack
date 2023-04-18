@@ -14,8 +14,6 @@
 
 import React from 'react'
 
-import { getDataRate, getSignalInformation } from '@console/components/events/utils'
-
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -27,8 +25,6 @@ import JSONPayload from './shared/json-payload'
 const ApplicationUplinkNormalizedPreview = React.memo(({ event }) => {
   const { data, identifiers } = event
   const deviceIds = identifiers[0].device_ids
-  const { snr, rssi } = getSignalInformation(data)
-  const dataRate = getDataRate(data)
 
   return (
     <DescriptionList>
@@ -48,10 +44,6 @@ const ApplicationUplinkNormalizedPreview = React.memo(({ event }) => {
           <JSONPayload data={data.normalized_payload.wind} />
         </DescriptionList.Item>
       )}
-      <DescriptionList.Item title={messages.fPort} data={data.f_port} />
-      <DescriptionList.Item title={messages.dataRate} data={dataRate} />
-      <DescriptionList.Item title={messages.snr} data={snr} />
-      <DescriptionList.Item title={messages.rssi} data={rssi} />
     </DescriptionList>
   )
 })
