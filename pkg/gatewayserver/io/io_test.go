@@ -154,6 +154,12 @@ func TestFlow(t *testing.T) {
 		case <-time.After(timeout):
 			t.Fatalf("Expected Tx acknowledgment time-out")
 		}
+		time.Sleep(timeout / 2)
+		total, t, ok := conn.TxAckStats()
+		a.So(ok, should.BeTrue)
+		a.So(total, should.Equal, 1)
+		a.So(time.Since(t), should.BeLessThan, timeout)
+		assertStatsIncludePaths(a, conn, []string{"last_tx_acknowledgment_received_at", "tx_acknowledgment_count"})
 	}
 
 	received := 0

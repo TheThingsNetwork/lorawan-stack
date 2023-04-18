@@ -15,10 +15,10 @@
 package io
 
 import (
-	"bytes"
 	"context"
 	"encoding/base64"
 	"fmt"
+	"hash/fnv"
 	"sync/atomic"
 	"time"
 
@@ -85,45 +85,46 @@ type Server interface {
 type Connection struct {
 	// Align for sync/atomic.
 	uplinks,
-	downlinks uint64
-	connectTime,
+	downlinks,
+	txAcknowledgments uint64
 	lastStatusTime,
 	lastUplinkTime,
-	lastDownlinkTime int64
-	lastStatus atomic.Value
+	lastDownlinkTime,
+	lastTxAcknowledgmentTime,
+	lastRepeatUpTime int64
+
+	lastStatus atomic.Pointer[ttnpb.GatewayStatus]
+	lastUplink atomic.Pointer[uplinkMessage]
 
 	ctx       context.Context
 	cancelCtx errorcontext.CancelFunc
 
+	connectTime      time.Time
 	frontend         Frontend
 	gateway          *ttnpb.Gateway
 	gatewayPrimaryFP *frequencyplans.FrequencyPlan
 	gatewayFPs       map[string]*frequencyplans.FrequencyPlan
-	bandID           string
+	band             *band.Band
 	fps              *frequencyplans.Store
 	scheduler        *scheduling.Scheduler
 	rtts             *rtts
+	addr             *ttnpb.GatewayRemoteAddress
 
 	upCh     chan *ttnpb.GatewayUplinkMessage
 	downCh   chan *ttnpb.DownlinkMessage
 	statusCh chan *ttnpb.GatewayStatus
 	txAckCh  chan *ttnpb.TxAcknowledgment
 
-	statsChangedCh chan struct{}
-	locCh          chan struct{}
-
-	versionInfoCh chan struct{}
-
-	lastUplink            *uplinkMessage
-	lastRepeatUpEventTime time.Time
-
-	addr *ttnpb.GatewayRemoteAddress
+	statsChangedCh       chan struct{}
+	locChangedCh         chan struct{}
+	versionInfoChangedCh chan struct{}
 }
 
 type uplinkMessage struct {
-	payload   []byte
-	frequency uint64
-	antennas  []uint32
+	payloadHash   uint64
+	frequency     uint64
+	dataRateIndex ttnpb.DataRateIndex
+	antennas      []uint32
 }
 
 var (
@@ -154,7 +155,10 @@ func NewConnection(
 		return nil, err
 	}
 	gatewayFPs[fp0ID] = fp0
-	bandID := fp0.BandID
+	phy, err := band.GetLatest(fp0.BandID)
+	if err != nil {
+		return nil, err
+	}
 
 	if len(gateway.FrequencyPlanIds) > 0 {
 		if gateway.FrequencyPlanIds[0] != fp0ID {
@@ -183,24 +187,25 @@ func NewConnection(
 		ctx:       ctx,
 		cancelCtx: cancelCtx,
 
+		connectTime:      time.Now(),
 		frontend:         frontend,
 		gateway:          gateway,
 		gatewayPrimaryFP: fp0,
 		gatewayFPs:       gatewayFPs,
-		bandID:           bandID,
+		band:             &phy,
 		fps:              fps,
 		scheduler:        scheduler,
 		addr:             addr,
 		rtts:             newRTTs(maxRTTs, rttTTL),
-		upCh:             make(chan *ttnpb.GatewayUplinkMessage, bufferSize),
-		downCh:           make(chan *ttnpb.DownlinkMessage, bufferSize),
-		statusCh:         make(chan *ttnpb.GatewayStatus, bufferSize),
-		txAckCh:          make(chan *ttnpb.TxAcknowledgment, bufferSize),
-		locCh:            make(chan struct{}, 1),
-		versionInfoCh:    make(chan struct{}, 1),
-		connectTime:      time.Now().UnixNano(),
 
-		statsChangedCh: make(chan struct{}, 1),
+		upCh:     make(chan *ttnpb.GatewayUplinkMessage, bufferSize),
+		downCh:   make(chan *ttnpb.DownlinkMessage, bufferSize),
+		statusCh: make(chan *ttnpb.GatewayStatus, bufferSize),
+		txAckCh:  make(chan *ttnpb.TxAcknowledgment, bufferSize),
+
+		statsChangedCh:       make(chan struct{}, 1),
+		locChangedCh:         make(chan struct{}, 1),
+		versionInfoChangedCh: make(chan struct{}, 1),
 	}, nil
 }
 
@@ -331,7 +336,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 
 	msg := &ttnpb.GatewayUplinkMessage{
 		Message: up,
-		BandId:  c.bandID,
+		BandId:  c.band.ID,
 	}
 
 	select {
@@ -368,7 +373,7 @@ func (c *Connection) HandleStatus(status *ttnpb.GatewayStatus) (err error) {
 
 		if len(status.AntennaLocations) > 0 && c.gateway.UpdateLocationFromStatus {
 			select {
-			case c.locCh <- struct{}{}:
+			case c.locChangedCh <- struct{}{}:
 			default:
 			}
 		}
@@ -376,7 +381,7 @@ func (c *Connection) HandleStatus(status *ttnpb.GatewayStatus) (err error) {
 		// The channel is only written to once, after which there is no longer a recipient.
 		// For all subsequent status messages, the default branch is chosen.
 		select {
-		case c.versionInfoCh <- struct{}{}:
+		case c.versionInfoChangedCh <- struct{}{}:
 		default:
 		}
 
@@ -400,6 +405,8 @@ func (c *Connection) HandleTxAck(ack *ttnpb.TxAcknowledgment) (err error) {
 	case <-c.ctx.Done():
 		return c.ctx.Err()
 	case c.txAckCh <- ack:
+		atomic.AddUint64(&c.txAcknowledgments, 1)
+		atomic.StoreInt64(&c.lastTxAcknowledgmentTime, time.Now().UnixNano())
 		c.notifyStatsChanged()
 	default:
 		return errBufferFull.New()
@@ -459,7 +466,6 @@ func (c *Connection) SendDown(msg *ttnpb.DownlinkMessage) error {
 	case c.downCh <- msg:
 		atomic.AddUint64(&c.downlinks, 1)
 		atomic.StoreInt64(&c.lastDownlinkTime, time.Now().UnixNano())
-
 		c.notifyStatsChanged()
 	default:
 		return errBufferFull.New()
@@ -500,7 +506,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			if err != nil {
 				return false, false, 0, errFrequencyPlanNotConfigured.WithCause(err).WithAttributes("id", request.FrequencyPlanId)
 			}
-			if fp.BandID != c.bandID {
+			if fp.BandID != c.band.ID {
 				return false, false, 0, errFrequencyPlansNotFromSameBand.New()
 			}
 		}
@@ -523,10 +529,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 	// between the Network Server and the end device. However, Gateway Server does enforce spectrum regulations that are
 	// defined in Regional Parameters. These include maximum EIRP and maximum payload length. These are taken from the
 	// last known LoRaWAN Regional Parameters version.
-	phy, err := band.GetLatest(fp.BandID)
-	if err != nil {
-		return false, false, 0, err
-	}
+	phy := c.band
 
 	var rxErrs []errors.ErrorDetails
 	for i, rx := range []struct {
@@ -706,23 +709,24 @@ func (c *Connection) StatsChanged() <-chan struct{} {
 
 // LocationChanged returns the location updates channel.
 func (c *Connection) LocationChanged() <-chan struct{} {
-	return c.locCh
+	return c.locChangedCh
 }
 
 // VersionInfoChanged returns the version info updates channel.
 func (c *Connection) VersionInfoChanged() <-chan struct{} {
-	return c.versionInfoCh
+	return c.versionInfoChangedCh
 }
 
 // ConnectTime returns the time the gateway connected.
-func (c *Connection) ConnectTime() time.Time { return time.Unix(0, c.connectTime) }
+func (c *Connection) ConnectTime() time.Time { return c.connectTime }
 
 // GatewayRemoteAddress returns the time the remote address of the gateway as seen by the server.
 func (c *Connection) GatewayRemoteAddress() *ttnpb.GatewayRemoteAddress { return c.addr }
 
 // StatusStats returns the status statistics.
 func (c *Connection) StatusStats() (last *ttnpb.GatewayStatus, t time.Time, ok bool) {
-	if last, ok = c.lastStatus.Load().(*ttnpb.GatewayStatus); ok {
+	last = c.lastStatus.Load()
+	if ok = last != nil; ok {
 		t = time.Unix(0, atomic.LoadInt64(&c.lastStatusTime))
 	}
 	return
@@ -746,6 +750,15 @@ func (c *Connection) DownStats() (total uint64, t time.Time, ok bool) {
 	return
 }
 
+// TxAckStats return the transmission acknowledgement statistics.
+func (c *Connection) TxAckStats() (total uint64, t time.Time, ok bool) {
+	total = atomic.LoadUint64(&c.txAcknowledgments)
+	if ok = total > 0; ok {
+		t = time.Unix(0, atomic.LoadInt64(&c.lastTxAcknowledgmentTime))
+	}
+	return
+}
+
 // RTTStats returns the recorded round-trip time statistics.
 func (c *Connection) RTTStats(percentile int, t time.Time) (min, max, median, np time.Duration, count int) {
 	return c.rtts.Stats(percentile, t)
@@ -753,9 +766,8 @@ func (c *Connection) RTTStats(percentile int, t time.Time) (min, max, median, np
 
 // Stats collects and returns the gateway connection statistics and the field mask paths.
 func (c *Connection) Stats() (*ttnpb.GatewayConnectionStats, []string) {
-	ct := c.ConnectTime()
 	stats := &ttnpb.GatewayConnectionStats{
-		ConnectedAt:          timestamppb.New(ct),
+		ConnectedAt:          timestamppb.New(c.ConnectTime()),
 		Protocol:             c.Frontend().Protocol(),
 		GatewayRemoteAddress: c.GatewayRemoteAddress(),
 	}
@@ -782,6 +794,11 @@ func (c *Connection) Stats() (*ttnpb.GatewayConnectionStats, []string) {
 			paths = append(paths, "sub_bands")
 		}
 	}
+	if count, t, ok := c.TxAckStats(); ok {
+		stats.LastTxAcknowledgmentReceivedAt = timestamppb.New(t)
+		stats.TxAcknowledgmentCount = count
+		paths = append(paths, "last_tx_acknowledgment_received_at", "tx_acknowledgment_count")
+	}
 	if min, max, median, _, count := c.RTTStats(100, time.Now()); count > 0 {
 		stats.RoundTripTimes = &ttnpb.GatewayConnectionStats_RoundTripTimes{
 			Min:    durationpb.New(min),
@@ -802,7 +819,7 @@ func (c *Connection) PrimaryFrequencyPlan() *frequencyplans.FrequencyPlan { retu
 
 // BandID returns the common band ID for the frequency plans in this connection.
 // TODO: Handle mixed bands (https://github.com/TheThingsNetwork/lorawan-stack/issues/1394)
-func (c *Connection) BandID() string { return c.bandID }
+func (c *Connection) BandID() string { return c.band.ID }
 
 // SyncWithGatewayConcentrator synchronizes the clock with the given concentrator timestamp, the server time and the
 // relative gateway time that corresponds to the given timestamp.
@@ -829,11 +846,19 @@ func (c *Connection) notifyStatsChanged() {
 	}
 }
 
-func uplinkMessageFromProto(pb *ttnpb.UplinkMessage) *uplinkMessage {
+func payloadHash(b []byte) uint64 {
+	h := fnv.New64a()
+	_, _ = h.Write(b)
+	return h.Sum64()
+}
+
+func uplinkMessageFromProto(pb *ttnpb.UplinkMessage, phy *band.Band) *uplinkMessage {
+	drIdx, _, _ := phy.FindUplinkDataRate(pb.GetSettings().GetDataRate())
 	up := &uplinkMessage{
-		payload:   pb.GetRawPayload(),
-		frequency: pb.GetSettings().Frequency,
-		antennas:  make([]uint32, 0, len(pb.GetRxMetadata())),
+		payloadHash:   payloadHash(pb.GetRawPayload()),
+		frequency:     pb.GetSettings().GetFrequency(),
+		dataRateIndex: drIdx,
+		antennas:      make([]uint32, 0, len(pb.GetRxMetadata())),
 	}
 	for _, md := range pb.GetRxMetadata() {
 		up.antennas = append(up.antennas, md.GetAntennaIndex())
@@ -842,7 +867,19 @@ func uplinkMessageFromProto(pb *ttnpb.UplinkMessage) *uplinkMessage {
 }
 
 func isRepeatedUplink(this *uplinkMessage, that *uplinkMessage) bool {
-	if this == nil || that == nil || this.frequency != that.frequency || len(this.antennas) != len(that.antennas) || !bytes.Equal(this.payload, that.payload) {
+	if this == nil || that == nil {
+		return false
+	}
+	if this.frequency != that.frequency {
+		return false
+	}
+	if this.dataRateIndex != that.dataRateIndex {
+		return false
+	}
+	if len(this.antennas) != len(that.antennas) {
+		return false
+	}
+	if this.payloadHash != that.payloadHash {
 		return false
 	}
 	for idx, antenna := range this.antennas {
@@ -856,22 +893,36 @@ func isRepeatedUplink(this *uplinkMessage, that *uplinkMessage) bool {
 // discardRepeatedUplink will discard repeated uplinks from faulty gateway
 // implementations. It returns true if the uplink message is the same as the
 // last uplink message that was received by the connection.
-//
-// discardRepeatedUplink is not goroutine safe.
 func (c *Connection) discardRepeatedUplink(up *ttnpb.UplinkMessage) bool {
-	uplink := uplinkMessageFromProto(up)
-	shouldDiscard := isRepeatedUplink(c.lastUplink, uplink)
-	c.lastUplink = uplink
-	if shouldDiscard {
-		shouldEmitEvent := false
-		if time.Since(c.lastRepeatUpEventTime) >= consecutiveRepeatUpEventsInterval {
-			log.FromContext(c.ctx).Debug("Dropped repeated gateway uplink")
-			shouldEmitEvent = true
-			c.lastRepeatUpEventTime = time.Now()
+	uplink := uplinkMessageFromProto(up, c.band)
+	repeated := false
+	for lastUplink := c.lastUplink.Load(); ; lastUplink = c.lastUplink.Load() {
+		if repeated = isRepeatedUplink(lastUplink, uplink); repeated {
+			break
 		}
-		registerRepeatUp(c.ctx, shouldEmitEvent, c.gateway, c.frontend.Protocol())
+		if c.lastUplink.CompareAndSwap(lastUplink, uplink) {
+			break
+		}
 	}
-	return shouldDiscard
+	if !repeated {
+		return false
+	}
+	emitEvent := false
+	now := time.Now()
+	for last := atomic.LoadInt64(&c.lastRepeatUpTime); ; last = atomic.LoadInt64(&c.lastRepeatUpTime) {
+		lastRepeatUpTime := time.Unix(0, last)
+		if emitEvent = now.Sub(lastRepeatUpTime) >= consecutiveRepeatUpEventsInterval; !emitEvent {
+			break
+		}
+		if atomic.CompareAndSwapInt64(&c.lastRepeatUpTime, last, now.UnixNano()) {
+			break
+		}
+	}
+	if emitEvent {
+		log.FromContext(c.ctx).Debug("Dropped repeated gateway uplink")
+	}
+	registerRepeatUp(c.ctx, emitEvent, c.gateway, c.frontend.Protocol())
+	return true
 }
 
 type rssiAndIndex struct {

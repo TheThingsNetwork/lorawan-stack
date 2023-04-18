@@ -1022,6 +1022,7 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 		lastUpdate = time.Now()
 
 		stats, paths := conn.Stats()
+		paths = ttnpb.ExcludeFields(paths, "connected_at", "disconnected_at", "protocol", "gateway_remote_address")
 		registerGatewayConnectionStats(decoupledCtx, ids, stats)
 		if gs.statsRegistry == nil {
 			continue

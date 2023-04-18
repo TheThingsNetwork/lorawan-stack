@@ -527,6 +527,7 @@ var GatewayConnectionStatsFieldPathsNested = []string{
 	"last_status.time",
 	"last_status.versions",
 	"last_status_received_at",
+	"last_tx_acknowledgment_received_at",
 	"last_uplink_received_at",
 	"protocol",
 	"round_trip_times",
@@ -535,6 +536,7 @@ var GatewayConnectionStatsFieldPathsNested = []string{
 	"round_trip_times.median",
 	"round_trip_times.min",
 	"sub_bands",
+	"tx_acknowledgment_count",
 	"uplink_count",
 }
 
@@ -546,10 +548,12 @@ var GatewayConnectionStatsFieldPathsTopLevel = []string{
 	"last_downlink_received_at",
 	"last_status",
 	"last_status_received_at",
+	"last_tx_acknowledgment_received_at",
 	"last_uplink_received_at",
 	"protocol",
 	"round_trip_times",
 	"sub_bands",
+	"tx_acknowledgment_count",
 	"uplink_count",
 }
 var GatewayRadio_TxConfigurationFieldPathsNested = []string{

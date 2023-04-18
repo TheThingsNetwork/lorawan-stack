@@ -1732,6 +1732,20 @@ func (x *GatewayConnectionStats) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("downlink_count")
 		s.WriteUint64(x.DownlinkCount)
 	}
+	if x.LastTxAcknowledgmentReceivedAt != nil || s.HasField("last_tx_acknowledgment_received_at") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("last_tx_acknowledgment_received_at")
+		if x.LastTxAcknowledgmentReceivedAt == nil {
+			s.WriteNil()
+		} else {
+			golang.MarshalTimestamp(s, x.LastTxAcknowledgmentReceivedAt)
+		}
+	}
+	if x.TxAcknowledgmentCount != 0 || s.HasField("tx_acknowledgment_count") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("tx_acknowledgment_count")
+		s.WriteUint64(x.TxAcknowledgmentCount)
+	}
 	if x.RoundTripTimes != nil || s.HasField("round_trip_times") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("round_trip_times")
@@ -1844,6 +1858,20 @@ func (x *GatewayConnectionStats) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 		case "downlink_count", "downlinkCount":
 			s.AddField("downlink_count")
 			x.DownlinkCount = s.ReadUint64()
+		case "last_tx_acknowledgment_received_at", "lastTxAcknowledgmentReceivedAt":
+			s.AddField("last_tx_acknowledgment_received_at")
+			if s.ReadNil() {
+				x.LastTxAcknowledgmentReceivedAt = nil
+				return
+			}
+			v := golang.UnmarshalTimestamp(s)
+			if s.Err() != nil {
+				return
+			}
+			x.LastTxAcknowledgmentReceivedAt = v
+		case "tx_acknowledgment_count", "txAcknowledgmentCount":
+			s.AddField("tx_acknowledgment_count")
+			x.TxAcknowledgmentCount = s.ReadUint64()
 		case "round_trip_times", "roundTripTimes":
 			s.AddField("round_trip_times")
 			if s.ReadNil() {

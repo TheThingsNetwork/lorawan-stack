@@ -4479,6 +4479,8 @@ Connection stats as monitored by the Gateway Server.
 | `uplink_count` | [`uint64`](#uint64) |  |  |
 | `last_downlink_received_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `downlink_count` | [`uint64`](#uint64) |  |  |
+| `last_tx_acknowledgment_received_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `tx_acknowledgment_count` | [`uint64`](#uint64) |  |  |
 | `round_trip_times` | [`GatewayConnectionStats.RoundTripTimes`](#ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes) |  |  |
 | `sub_bands` | [`GatewayConnectionStats.SubBand`](#ttn.lorawan.v3.GatewayConnectionStats.SubBand) | repeated | Statistics for each sub band. |
 | `gateway_remote_address` | [`GatewayRemoteAddress`](#ttn.lorawan.v3.GatewayRemoteAddress) |  | Gateway Remote Address. |

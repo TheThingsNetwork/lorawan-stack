@@ -3142,6 +3142,20 @@ func (m *GatewayConnectionStats) ValidateFields(paths ...string) error {
 
 		case "downlink_count":
 			// no validation rules for DownlinkCount
+		case "last_tx_acknowledgment_received_at":
+
+			if v, ok := interface{}(m.GetLastTxAcknowledgmentReceivedAt()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GatewayConnectionStatsValidationError{
+						field:  "last_tx_acknowledgment_received_at",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "tx_acknowledgment_count":
+			// no validation rules for TxAcknowledgmentCount
 		case "round_trip_times":
 
 			if v, ok := interface{}(m.GetRoundTripTimes()).(interface{ ValidateFields(...string) error }); ok {
