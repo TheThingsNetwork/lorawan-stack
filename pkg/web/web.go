@@ -27,10 +27,12 @@ import (
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fillcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing"
 	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 	"go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
 	"go.thethings.network/lorawan-stack/v3/pkg/webui"
@@ -177,6 +179,7 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 			"text/html": webhandlers.Template,
 		}),
 		mux.MiddlewareFunc(webmiddleware.Recover()),
+		otelmux.Middleware("ttn-lw-stack", otelmux.WithTracerProvider(tracing.FromContext(ctx))),
 		mux.MiddlewareFunc(webmiddleware.FillContext(options.contextFillers...)),
 		mux.MiddlewareFunc(webmiddleware.Peer()),
 		mux.MiddlewareFunc(webmiddleware.RequestURL()),
