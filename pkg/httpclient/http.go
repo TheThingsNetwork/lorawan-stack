@@ -23,7 +23,9 @@ import (
 	"time"
 
 	"github.com/gregjones/httpcache"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing"
 	"go.thethings.network/lorawan-stack/v3/pkg/version"
 )
 
@@ -93,7 +95,11 @@ func (p *provider) HTTPClient(ctx context.Context, opts ...Option) (*http.Client
 	transport := http.DefaultTransport.(*http.Transport).Clone()
 	transport.TLSClientConfig = options.tlsConfig
 
-	rt := http.RoundTripper(transport)
+	otelTransport := otelhttp.NewTransport(transport,
+		otelhttp.WithTracerProvider(tracing.FromContext(ctx)),
+	)
+
+	rt := http.RoundTripper(otelTransport)
 	if options.cache {
 		rt = &httpcache.Transport{
 			Transport:           rt,
