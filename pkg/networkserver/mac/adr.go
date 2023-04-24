@@ -328,7 +328,7 @@ func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 		return nil
 	}
 
-	minDataRateIndex, maxDataRateIndex, ok := channelDataRateRange(currentParameters.Channels...)
+	minDataRateIndex, maxDataRateIndex, ok := channelDataRateRange(desiredParameters.Channels...)
 	if !ok {
 		return internal.ErrCorruptedMACState.
 			WithCause(internal.ErrChannelDataRateRange)
