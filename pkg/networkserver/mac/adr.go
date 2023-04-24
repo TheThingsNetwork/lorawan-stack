@@ -57,7 +57,7 @@ var demodulationFloor = map[uint32]map[uint32]float32{
 	12: {
 		125000: -20,
 		250000: -17,
-		500000: -24,
+		500000: -14,
 	},
 }
 
