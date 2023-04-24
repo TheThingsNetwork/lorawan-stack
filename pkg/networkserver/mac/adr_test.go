@@ -30,6 +30,8 @@ import (
 )
 
 func TestAdaptDataRate(t *testing.T) {
+	t.Parallel()
+
 	semtechPaperUplinks := ADRMatrixToUplinks([]ADRMatrixRow{
 		{FCnt: 10, MaxSNR: -6, GtwDiversity: 2},
 		{FCnt: 11, MaxSNR: -7, GtwDiversity: 2},
@@ -286,52 +288,52 @@ func TestAdaptDataRate(t *testing.T) {
 }
 
 func TestIssue458(t *testing.T) {
-	issue458Uplinks := ADRMatrixToUplinks([]ADRMatrixRow{
-		{
-			FCnt: 1, MaxSNR: -7.2, GtwDiversity: 1,
-			TxSettings: &ttnpb.TxSettings{
-				DataRate: &ttnpb.DataRate{
-					Modulation: &ttnpb.DataRate_Lora{
-						Lora: &ttnpb.LoRaDataRate{
-							SpreadingFactor: 10,
-							Bandwidth:       125000,
-							CodingRate:      band.Cr4_5,
-						},
-					},
+	t.Parallel()
+
+	txSettings := &ttnpb.TxSettings{
+		DataRate: &ttnpb.DataRate{
+			Modulation: &ttnpb.DataRate_Lora{
+				Lora: &ttnpb.LoRaDataRate{
+					SpreadingFactor: 10,
+					Bandwidth:       125000,
+					CodingRate:      band.Cr4_5,
 				},
 			},
 		},
-		{FCnt: 8, MaxSNR: -3, GtwDiversity: 2},
-		{FCnt: 11, MaxSNR: -7, GtwDiversity: 1},
-		{FCnt: 13, MaxSNR: -13.5, GtwDiversity: 1},
-		{FCnt: 16, MaxSNR: -6.8, GtwDiversity: 1},
-		{FCnt: 17, MaxSNR: -3, GtwDiversity: 2},
-		{FCnt: 18, MaxSNR: -4, GtwDiversity: 1},
-		{FCnt: 26, MaxSNR: -5.5, GtwDiversity: 1},
-		{FCnt: 27, MaxSNR: -7.8, GtwDiversity: 1},
-		{FCnt: 28, MaxSNR: -6.5, GtwDiversity: 1},
-		{FCnt: 33, MaxSNR: -9.5, GtwDiversity: 1},
-		{FCnt: 36, MaxSNR: -6.8, GtwDiversity: 1},
-		{FCnt: 114, MaxSNR: -1.2, GtwDiversity: 1},
-		{FCnt: 141, MaxSNR: -4, GtwDiversity: 1},
-		{FCnt: 203, MaxSNR: -7.5, GtwDiversity: 1},
-		{FCnt: 204, MaxSNR: -4.2, GtwDiversity: 1},
-		{FCnt: 208, MaxSNR: -5.8, GtwDiversity: 1},
-		{FCnt: 209, MaxSNR: -5, GtwDiversity: 1},
-		{FCnt: 210, MaxSNR: -6, GtwDiversity: 1},
-		{FCnt: 211, MaxSNR: -7.5, GtwDiversity: 1},
-		{FCnt: 212, MaxSNR: -7.5, GtwDiversity: 1},
-		{FCnt: 213, MaxSNR: -7.2, GtwDiversity: 1},
-		{FCnt: 215, MaxSNR: -6.2, GtwDiversity: 1},
-		{FCnt: 216, MaxSNR: -6.5, GtwDiversity: 1},
-		{FCnt: 217, MaxSNR: -3, GtwDiversity: 1},
-		{FCnt: 219, MaxSNR: -5.2, GtwDiversity: 1},
-		{FCnt: 220, MaxSNR: -5.5, GtwDiversity: 1},
-		{FCnt: 222, MaxSNR: -4.5, GtwDiversity: 1},
-		{FCnt: 224, MaxSNR: -9.2, GtwDiversity: 1},
-		{FCnt: 225, MaxSNR: -7.8, GtwDiversity: 1},
-		{FCnt: 226, MaxSNR: -7.8, GtwDiversity: 1},
-		{FCnt: 228, MaxSNR: -8.8, GtwDiversity: 1},
+	}
+	issue458Uplinks := ADRMatrixToUplinks([]ADRMatrixRow{
+		{FCnt: 1, MaxSNR: -7.2, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 8, MaxSNR: -3, GtwDiversity: 2, TxSettings: txSettings},
+		{FCnt: 11, MaxSNR: -7, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 13, MaxSNR: -13.5, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 16, MaxSNR: -6.8, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 17, MaxSNR: -3, GtwDiversity: 2, TxSettings: txSettings},
+		{FCnt: 18, MaxSNR: -4, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 26, MaxSNR: -5.5, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 27, MaxSNR: -7.8, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 28, MaxSNR: -6.5, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 33, MaxSNR: -9.5, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 36, MaxSNR: -6.8, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 114, MaxSNR: -1.2, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 141, MaxSNR: -4, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 203, MaxSNR: -7.5, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 204, MaxSNR: -4.2, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 208, MaxSNR: -5.8, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 209, MaxSNR: -5, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 210, MaxSNR: -6, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 211, MaxSNR: -7.5, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 212, MaxSNR: -7.5, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 213, MaxSNR: -7.2, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 215, MaxSNR: -6.2, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 216, MaxSNR: -6.5, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 217, MaxSNR: -3, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 219, MaxSNR: -5.2, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 220, MaxSNR: -5.5, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 222, MaxSNR: -4.5, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 224, MaxSNR: -9.2, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 225, MaxSNR: -7.8, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 226, MaxSNR: -7.8, GtwDiversity: 1, TxSettings: txSettings},
+		{FCnt: 228, MaxSNR: -8.8, GtwDiversity: 1, TxSettings: txSettings},
 	})
 	for _, tc := range []struct {
 		Name       string
