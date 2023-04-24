@@ -20,7 +20,6 @@ import (
 	"hash/fnv"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 )
 
 type keyer interface {
@@ -29,10 +28,6 @@ type keyer interface {
 
 func UIDKey(r keyer, uid string) string {
 	return r.Key("uid", uid)
-}
-
-func uidLastInvalidationKey(r keyer, uid string) string {
-	return ttnredis.Key(UIDKey(r, uid), "last-invalidation")
 }
 
 var keyEncoding = base64.RawStdEncoding

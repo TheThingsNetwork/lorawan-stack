@@ -749,7 +749,6 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 			if pb == nil && len(sets) == 0 {
 				trace.Log(ctx, "ns:redis", "delete end device")
 				p.Del(ctx, uk)
-				p.Del(ctx, uidLastInvalidationKey(r.Redis, uid))
 				if stored.Ids.JoinEui != nil && stored.Ids.DevEui != nil {
 					p.Del(
 						ctx,
