@@ -392,10 +392,9 @@ export default class WebhookForm extends Component {
 
     const hasTemplate = Boolean(webhookTemplate)
 
-    const mayReactivate =
-      update && hasUnhealthyWebhookConfig && !initialWebhookValue?.health_status?.healthy
-
-    const isPending = healthStatusEnabled && update && !initialWebhookValue?.health_status
+    const healthStatus = initialWebhookValue?.health_status
+    const mayReactivate = update && hasUnhealthyWebhookConfig && healthStatus?.unhealthy
+    const isPending = update && healthStatusEnabled && !healthStatus
 
     return (
       <>
