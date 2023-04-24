@@ -69,13 +69,8 @@ func HasMaxFCntGap(v ttnpb.MACVersion) bool {
 	return compareMACVersion(v, ttnpb.MACVersion_MAC_V1_0_4) < 0
 }
 
-// HasNoChangeTXPowerIndex reports whether v defines a no-change TxPowerIndex value.
-func HasNoChangeTXPowerIndex(v ttnpb.MACVersion) bool {
-	return compareMACVersion(v, ttnpb.MACVersion_MAC_V1_0_4) >= 0
-}
-
-// HasNoChangeDataRateIndex reports whether v defines a no-change DataRateIndex value.
-func HasNoChangeDataRateIndex(v ttnpb.MACVersion) bool {
+// HasNoChangeADRIndices reports whether v defines a no-change TxPowerIndex and DataRateIndexValue.
+func HasNoChangeADRIndices(v ttnpb.MACVersion) bool {
 	return compareMACVersion(v, ttnpb.MACVersion_MAC_V1_0_4) >= 0
 }
 

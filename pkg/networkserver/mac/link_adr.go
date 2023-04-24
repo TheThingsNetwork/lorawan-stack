@@ -166,9 +166,6 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Ban
 		}
 	}
 
-	hasNoChangeDataRateIndex := macspec.HasNoChangeDataRateIndex(macState.LorawanVersion)
-	hasNoChangeTXPowerIndex := macspec.HasNoChangeTXPowerIndex(macState.LorawanVersion)
-
 	drIdx = desiredParameters.AdrDataRateIndex
 	txPowerIdx = desiredParameters.AdrTxPowerIndex
 	nbTrans = desiredParameters.AdrNbTrans
@@ -176,6 +173,7 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Ban
 		drIdx = currentParameters.AdrDataRateIndex
 		txPowerIdx = currentParameters.AdrTxPowerIndex
 	}
+	hasNoChangeADRIndices := macspec.HasNoChangeADRIndices(macState.LorawanVersion)
 	switch {
 	case !deviceRejectedADRDataRateIndex(dev, drIdx) && !deviceRejectedADRTXPowerIndex(dev, txPowerIdx):
 		// Only send the desired DataRateIndex and TXPowerIndex if neither of them were rejected.
@@ -184,8 +182,9 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Ban
 		log.FromContext(ctx).Debug("Either desired data rate index or TX power output index have been rejected and there are no channel mask and NbTrans changes desired, avoid enqueueing LinkADRReq")
 		return linkADRReqParameters{}, false, nil
 
-	case hasNoChangeDataRateIndex && !deviceRejectedADRDataRateIndex(dev, noChangeDataRateIndex) &&
-		hasNoChangeTXPowerIndex && !deviceRejectedADRTXPowerIndex(dev, noChangeTXPowerIndex):
+	case hasNoChangeADRIndices &&
+		!deviceRejectedADRDataRateIndex(dev, noChangeDataRateIndex) &&
+		!deviceRejectedADRTXPowerIndex(dev, noChangeTXPowerIndex):
 		drIdx = noChangeDataRateIndex
 		txPowerIdx = noChangeTXPowerIndex
 
@@ -220,11 +219,13 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Ban
 			}
 		}
 	}
-	if drIdx == currentParameters.AdrDataRateIndex && hasNoChangeDataRateIndex && !deviceRejectedADRDataRateIndex(dev, noChangeDataRateIndex) {
-		drIdx = noChangeDataRateIndex
-	}
-	if txPowerIdx == currentParameters.AdrTxPowerIndex && hasNoChangeTXPowerIndex && !deviceRejectedADRTXPowerIndex(dev, noChangeTXPowerIndex) {
-		txPowerIdx = noChangeTXPowerIndex
+	if hasNoChangeADRIndices {
+		if drIdx == currentParameters.AdrDataRateIndex && !deviceRejectedADRDataRateIndex(dev, noChangeDataRateIndex) {
+			drIdx = noChangeDataRateIndex
+		}
+		if txPowerIdx == currentParameters.AdrTxPowerIndex && !deviceRejectedADRTXPowerIndex(dev, noChangeTXPowerIndex) {
+			txPowerIdx = noChangeTXPowerIndex
+		}
 	}
 	return linkADRReqParameters{
 		Masks:         desiredMasks,
@@ -406,11 +407,12 @@ func HandleLinkADRAns(
 	if !pld.ChannelMaskAck || !pld.DataRateIndexAck || !pld.TxPowerIndexAck {
 		return evs, nil
 	}
-	if !macspec.HasNoChangeDataRateIndex(macState.LorawanVersion) || req.DataRateIndex != noChangeDataRateIndex {
+	hasNoChangeADRIndices := macspec.HasNoChangeADRIndices(macState.LorawanVersion)
+	if !hasNoChangeADRIndices || req.DataRateIndex != noChangeDataRateIndex {
 		currentParameters.AdrDataRateIndex = req.DataRateIndex
 		macState.LastAdrChangeFCntUp = fCntUp
 	}
-	if !macspec.HasNoChangeTXPowerIndex(macState.LorawanVersion) || req.TxPowerIndex != noChangeTXPowerIndex {
+	if !hasNoChangeADRIndices || req.TxPowerIndex != noChangeTXPowerIndex {
 		currentParameters.AdrTxPowerIndex = req.TxPowerIndex
 		macState.LastAdrChangeFCntUp = fCntUp
 	}
