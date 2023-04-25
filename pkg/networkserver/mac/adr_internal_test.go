@@ -23,6 +23,7 @@ import (
 
 var (
 	ADRLossRate = adrLossRate
+	ADRUplinks  = adrUplinks
 
 	ClampDataRateRange = clampDataRateRange
 	ClampTxPowerRange  = clampTxPowerRange

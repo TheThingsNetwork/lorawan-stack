@@ -1329,3 +1329,124 @@ func TestClampNbTrans(t *testing.T) {
 		})
 	}
 }
+
+func TestADRUplinks(t *testing.T) {
+	t.Parallel()
+
+	newUplink := func(mType ttnpb.MType, spreadingFactor uint32, fCnt uint32) *ttnpb.MACState_UplinkMessage {
+		up := &ttnpb.MACState_UplinkMessage{
+			Payload: &ttnpb.Message{
+				MHdr: &ttnpb.MHDR{
+					MType: mType,
+					Major: ttnpb.Major_LORAWAN_R1,
+				},
+			},
+			Settings: &ttnpb.MACState_UplinkMessage_TxSettings{
+				DataRate: &ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
+							Bandwidth:       125_000,
+							SpreadingFactor: spreadingFactor,
+							CodingRate:      band.Cr4_5,
+						},
+					},
+				},
+			},
+		}
+		switch mType {
+		case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
+			up.Payload.Payload = &ttnpb.Message_MacPayload{
+				MacPayload: &ttnpb.MACPayload{
+					FullFCnt: fCnt,
+				},
+			}
+		default:
+		}
+		return up
+	}
+
+	for _, tc := range []struct {
+		Name string
+
+		MACState *ttnpb.MACState
+		Band     *band.Band
+
+		ExpectedUplinks []*ttnpb.MACState_UplinkMessage
+	}{
+		{
+			Name: "no uplinks",
+
+			MACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{},
+			},
+		},
+		{
+			Name: "from join request",
+
+			MACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{},
+				RecentUplinks: []*ttnpb.MACState_UplinkMessage{
+					newUplink(ttnpb.MType_JOIN_REQUEST, 12, 0),
+					newUplink(ttnpb.MType_UNCONFIRMED_UP, 12, 0),
+				},
+			},
+			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
+
+			ExpectedUplinks: []*ttnpb.MACState_UplinkMessage{
+				newUplink(ttnpb.MType_UNCONFIRMED_UP, 12, 0),
+			},
+		},
+		{
+			Name: "from last change",
+
+			MACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{},
+				RecentUplinks: []*ttnpb.MACState_UplinkMessage{
+					newUplink(ttnpb.MType_UNCONFIRMED_UP, 12, 0),
+					newUplink(ttnpb.MType_UNCONFIRMED_UP, 12, 1),
+					newUplink(ttnpb.MType_UNCONFIRMED_UP, 12, 2),
+					newUplink(ttnpb.MType_UNCONFIRMED_UP, 12, 3),
+					newUplink(ttnpb.MType_UNCONFIRMED_UP, 12, 4),
+				},
+				LastAdrChangeFCntUp: 2,
+			},
+			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
+
+			ExpectedUplinks: []*ttnpb.MACState_UplinkMessage{
+				newUplink(ttnpb.MType_UNCONFIRMED_UP, 12, 3),
+				newUplink(ttnpb.MType_UNCONFIRMED_UP, 12, 4),
+			},
+		},
+		{
+			Name: "from data rate change",
+
+			MACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+				},
+				RecentUplinks: []*ttnpb.MACState_UplinkMessage{
+					newUplink(ttnpb.MType_UNCONFIRMED_UP, 12, 0),
+					newUplink(ttnpb.MType_UNCONFIRMED_UP, 12, 1),
+					newUplink(ttnpb.MType_UNCONFIRMED_UP, 10, 2),
+					newUplink(ttnpb.MType_UNCONFIRMED_UP, 10, 3),
+				},
+			},
+			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
+
+			ExpectedUplinks: []*ttnpb.MACState_UplinkMessage{
+				newUplink(ttnpb.MType_UNCONFIRMED_UP, 10, 2),
+				newUplink(ttnpb.MType_UNCONFIRMED_UP, 10, 3),
+			},
+		},
+	} {
+		tc := tc
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
+			a := assertions.New(t)
+
+			ups := ADRUplinks(tc.MACState, tc.Band)
+			a.So(ups, should.Resemble, tc.ExpectedUplinks)
+		})
+	}
+}
