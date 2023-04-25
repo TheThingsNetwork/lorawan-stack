@@ -18,6 +18,7 @@ import bind from 'autobind-decorator'
 
 import Message from '@ttn-lw/lib/components/message'
 
+import { ingestError } from '@ttn-lw/lib/errors/utils'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { warn } from '@ttn-lw/lib/log'
@@ -41,6 +42,12 @@ class DateTime extends React.PureComponent {
     )
   }
 
+  componentDidCatch(error, info) {
+    const { value } = this.props
+    warn(`Error rendering date time with value: "${value}"`, error, info)
+    ingestError(error, { ingestedBy: 'DateTimeComponent', value, info })
+  }
+
   renderDateTime(formattedDate, formattedTime, dateValue) {
     const { className, children, date, time, noTitle } = this.props
 
@@ -55,11 +62,6 @@ class DateTime extends React.PureComponent {
       }
 
       result += formattedTime
-    }
-
-    if (isNaN(dateValue)) {
-      warn('Invalid date passed to DateTime component')
-      return this.renderUnknown()
     }
 
     return (
