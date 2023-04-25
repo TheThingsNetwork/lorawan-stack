@@ -101,8 +101,9 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Ban
 		desiredChs[i] = isEnabled
 	}
 
+	equalMasks := band.EqualChMasks(currentChs, desiredChs)
 	switch {
-	case !band.EqualChMasks(currentChs, desiredChs):
+	case !equalMasks:
 		// NOTE: LinkADRReq is scheduled regardless of ADR settings if channel mask is required,
 		// which often is the case with ABP devices or when ChMask CFList is not supported/used.
 	case desiredParameters.AdrNbTrans != currentParameters.AdrNbTrans,
@@ -129,41 +130,29 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Ban
 		txPowerIdx uint32
 		nbTrans    uint32
 	)
-	minDataRateIndex, maxDataRateIndex, ok := channelDataRateRange(desiredParameters.Channels...)
+	minDataRateIndex, _, allowedDataRateIndices, ok := channelDataRateRange(desiredParameters.Channels...)
 	if !ok {
 		return linkADRReqParameters{}, false, internal.ErrCorruptedMACState.
 			WithCause(internal.ErrChannelDataRateRange)
 	}
 
-	if desiredParameters.AdrTxPowerIndex != currentParameters.AdrTxPowerIndex {
-		attributes := []interface{}{
-			"current_adr_tx_power_index", currentParameters.AdrTxPowerIndex,
-			"desired_adr_tx_power_index", desiredParameters.AdrTxPowerIndex,
-		}
-		if desiredParameters.AdrTxPowerIndex > uint32(phy.MaxTxPowerIndex()) {
-			return linkADRReqParameters{}, false, internal.ErrCorruptedMACState.
-				WithAttributes(append(attributes,
-					"phy_max_tx_power_index", phy.MaxTxPowerIndex(),
-				)...)
-		}
+	// We need to check if the data rate index is valid with respect to the desired channels even in situations
+	// in which the data rate index does not change, as it may be invalid with respect to the desired channel
+	// mask.
+	if _, ok := allowedDataRateIndices[desiredParameters.AdrDataRateIndex]; !ok {
+		return linkADRReqParameters{}, false, internal.ErrCorruptedMACState.
+			WithAttributes(
+				"current_adr_data_rate_index", currentParameters.AdrDataRateIndex,
+				"desired_adr_data_rate_index", desiredParameters.AdrDataRateIndex,
+			)
 	}
-	if desiredParameters.AdrDataRateIndex != currentParameters.AdrDataRateIndex {
-		attributes := []interface{}{
-			"current_adr_data_rate_index", currentParameters.AdrDataRateIndex,
-			"desired_adr_data_rate_index", desiredParameters.AdrDataRateIndex,
-		}
-		switch {
-		case desiredParameters.AdrDataRateIndex < minDataRateIndex:
-			return linkADRReqParameters{}, false, internal.ErrCorruptedMACState.
-				WithAttributes(append(attributes,
-					"min_adr_data_rate_index", minDataRateIndex,
-				)...)
-		case desiredParameters.AdrDataRateIndex > maxDataRateIndex:
-			return linkADRReqParameters{}, false, internal.ErrCorruptedMACState.
-				WithAttributes(append(attributes,
-					"max_adr_data_rate_index", maxDataRateIndex,
-				)...)
-		}
+	if desiredParameters.AdrTxPowerIndex > uint32(phy.MaxTxPowerIndex()) {
+		return linkADRReqParameters{}, false, internal.ErrCorruptedMACState.
+			WithAttributes(
+				"current_adr_tx_power_index", currentParameters.AdrTxPowerIndex,
+				"desired_adr_tx_power_index", desiredParameters.AdrTxPowerIndex,
+				"phy_max_tx_power_index", phy.MaxTxPowerIndex(),
+			)
 	}
 
 	drIdx = desiredParameters.AdrDataRateIndex
@@ -178,15 +167,13 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Ban
 	case !deviceRejectedADRDataRateIndex(dev, drIdx) && !deviceRejectedADRTXPowerIndex(dev, txPowerIdx):
 		// Only send the desired DataRateIndex and TXPowerIndex if neither of them were rejected.
 
-	case len(desiredMasks) == 0 && desiredParameters.AdrNbTrans == currentParameters.AdrNbTrans:
+	case equalMasks && desiredParameters.AdrNbTrans == currentParameters.AdrNbTrans:
 		log.FromContext(ctx).Debug("Either desired data rate index or TX power output index have been rejected and there are no channel mask and NbTrans changes desired, avoid enqueueing LinkADRReq")
 		return linkADRReqParameters{}, false, nil
 
 	case hasNoChangeADRIndices &&
 		!deviceRejectedADRDataRateIndex(dev, noChangeDataRateIndex) &&
 		!deviceRejectedADRTXPowerIndex(dev, noChangeTXPowerIndex):
-		drIdx = noChangeDataRateIndex
-		txPowerIdx = noChangeTXPowerIndex
 
 	default:
 		logger := log.FromContext(ctx).WithFields(log.Fields(
@@ -218,6 +205,14 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Ban
 				txPowerIdx--
 			}
 		}
+	}
+	if _, ok := allowedDataRateIndices[drIdx]; !ok {
+		return linkADRReqParameters{}, false, internal.ErrCorruptedMACState.
+			WithAttributes(
+				"current_adr_data_rate_index", currentParameters.AdrDataRateIndex,
+				"desired_adr_data_rate_index", desiredParameters.AdrDataRateIndex,
+				"adr_data_rate_index", drIdx,
+			)
 	}
 	if hasNoChangeADRIndices {
 		if drIdx == currentParameters.AdrDataRateIndex && !deviceRejectedADRDataRateIndex(dev, noChangeDataRateIndex) {
