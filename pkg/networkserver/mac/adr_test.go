@@ -841,11 +841,11 @@ func TestClampTxPowerRange(t *testing.T) {
 		Device   *ttnpb.EndDevice
 		Defaults *ttnpb.MACSettings
 
-		InputMinTxPowerIndex uint8
-		InputMaxTxPowerIndex uint8
+		InputMinTxPowerIndex uint32
+		InputMaxTxPowerIndex uint32
 
-		ExpectedMinTxPowerIndex uint8
-		ExpectedMaxTxPowerIndex uint8
+		ExpectedMinTxPowerIndex uint32
+		ExpectedMaxTxPowerIndex uint32
 	}{
 		{
 			Name: "no device",
