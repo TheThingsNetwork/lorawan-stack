@@ -22,6 +22,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
@@ -1447,6 +1448,211 @@ func TestADRUplinks(t *testing.T) {
 
 			ups := ADRUplinks(tc.MACState, tc.Band)
 			a.So(ups, should.Resemble, tc.ExpectedUplinks)
+		})
+	}
+}
+
+func TestADRDataRange(t *testing.T) {
+	t.Parallel()
+
+	for _, tc := range []struct {
+		Name string
+
+		Device   *ttnpb.EndDevice
+		Band     *band.Band
+		Defaults *ttnpb.MACSettings
+
+		AssertError func(error) bool
+
+		Min, Max ttnpb.DataRateIndex
+		Rejected map[ttnpb.DataRateIndex]struct{}
+		Ok       bool
+	}{
+		{
+			Name: "invalid desired channels",
+
+			Device: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					DesiredParameters: &ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								EnableUplink: false,
+							},
+						},
+					},
+				},
+			},
+
+			AssertError: errors.IsDataLoss,
+		},
+		{
+			Name: "clamping mismatch",
+
+			Device: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					DesiredParameters: &ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+								MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+							},
+						},
+					},
+				},
+				MacSettings: &ttnpb.MACSettings{
+					Adr: &ttnpb.ADRSettings{
+						Mode: &ttnpb.ADRSettings_Dynamic{
+							Dynamic: &ttnpb.ADRSettings_DynamicMode{
+								MaxDataRateIndex: &ttnpb.DataRateIndexValue{
+									Value: ttnpb.DataRateIndex_DATA_RATE_0,
+								},
+							},
+						},
+					},
+				},
+			},
+
+			AssertError: errors.IsDataLoss,
+		},
+		{
+			Name: "clamp to max",
+
+			Device: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+								MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_6,
+								EnableUplink:     true,
+							},
+						},
+					},
+				},
+			},
+			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
+
+			Min: ttnpb.DataRateIndex_DATA_RATE_1,
+			Max: ttnpb.DataRateIndex_DATA_RATE_5,
+			Ok:  true,
+		},
+		{
+			Name: "clamp to current",
+
+			Device: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{
+						AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+					},
+					DesiredParameters: &ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+								MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_6,
+								EnableUplink:     true,
+							},
+						},
+					},
+				},
+			},
+			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
+
+			Min: ttnpb.DataRateIndex_DATA_RATE_2,
+			Max: ttnpb.DataRateIndex_DATA_RATE_5,
+			Ok:  true,
+		},
+		{
+			Name: "rejected; ok",
+
+			Device: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{
+						AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					},
+					DesiredParameters: &ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+								MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+								EnableUplink:     true,
+							},
+							{
+								MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_6,
+								MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_6,
+								EnableUplink:     true,
+							},
+						},
+					},
+					RejectedAdrDataRateIndexes: []ttnpb.DataRateIndex{
+						ttnpb.DataRateIndex_DATA_RATE_0,
+						ttnpb.DataRateIndex_DATA_RATE_3,
+						ttnpb.DataRateIndex_DATA_RATE_6,
+					},
+				},
+			},
+			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
+
+			Min: ttnpb.DataRateIndex_DATA_RATE_1,
+			Max: ttnpb.DataRateIndex_DATA_RATE_5,
+			Rejected: map[ttnpb.DataRateIndex]struct{}{
+				ttnpb.DataRateIndex_DATA_RATE_0: {},
+				ttnpb.DataRateIndex_DATA_RATE_3: {},
+				ttnpb.DataRateIndex_DATA_RATE_6: {},
+			},
+			Ok: true,
+		},
+		{
+			Name: "rejected; no overlap",
+
+			Device: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{
+						AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					},
+					DesiredParameters: &ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+								MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+								EnableUplink:     true,
+							},
+							{
+								MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_6,
+								MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_6,
+								EnableUplink:     true,
+							},
+						},
+					},
+					RejectedAdrDataRateIndexes: []ttnpb.DataRateIndex{
+						ttnpb.DataRateIndex_DATA_RATE_0,
+						ttnpb.DataRateIndex_DATA_RATE_1,
+						ttnpb.DataRateIndex_DATA_RATE_2,
+						ttnpb.DataRateIndex_DATA_RATE_3,
+						ttnpb.DataRateIndex_DATA_RATE_4,
+						ttnpb.DataRateIndex_DATA_RATE_5,
+						ttnpb.DataRateIndex_DATA_RATE_6,
+					},
+				},
+			},
+			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
+		},
+	} {
+		tc := tc
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
+			a, ctx := test.New(t)
+			min, max, rejected, ok, err := ADRDataRateRange(ctx, tc.Device, tc.Band, tc.Defaults)
+			if assertError := tc.AssertError; assertError != nil {
+				a.So(assertError(err), should.BeTrue)
+			} else {
+				a.So(min, should.Equal, tc.Min)
+				a.So(max, should.Equal, tc.Max)
+				a.So(rejected, should.Resemble, tc.Rejected)
+				a.So(ok, should.Equal, tc.Ok)
+				a.So(err, should.BeNil)
+			}
 		})
 	}
 }
