@@ -525,6 +525,115 @@ func TestADRLossRate(t *testing.T) {
 	}
 }
 
+func TestADRInstability(t *testing.T) {
+	t.Parallel()
+
+	a, ctx := test.New(t)
+
+	makeUplink := func(i int, penalty float32) *ttnpb.MACState_UplinkMessage {
+		up := &ttnpb.MACState_UplinkMessage{
+			Payload: &ttnpb.Message{
+				MHdr: &ttnpb.MHDR{
+					MType: ttnpb.MType_UNCONFIRMED_UP,
+					Major: ttnpb.Major_LORAWAN_R1,
+				},
+				Payload: &ttnpb.Message_MacPayload{
+					MacPayload: &ttnpb.MACPayload{
+						FullFCnt: uint32(i),
+					},
+				},
+			},
+			Settings: &ttnpb.MACState_UplinkMessage_TxSettings{
+				DataRate: &ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
+							Bandwidth:       125_000,
+							SpreadingFactor: 7,
+							CodingRate:      band.Cr4_5,
+						},
+					},
+				},
+			},
+			RxMetadata: []*ttnpb.MACState_UplinkMessage_RxMetadata{
+				{
+					Snr: 14.0 - penalty,
+				},
+			},
+		}
+		return up
+	}
+
+	channels := []*ttnpb.MACParameters_Channel{
+		{
+			EnableUplink:     true,
+			MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+		},
+	}
+	currentParameters, desiredParameters := &ttnpb.MACParameters{
+		AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+		AdrTxPowerIndex:  0,
+		AdrNbTrans:       1,
+		Channels:         channels,
+	}, &ttnpb.MACParameters{
+		AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+		AdrTxPowerIndex:  0,
+		AdrNbTrans:       1,
+		Channels:         channels,
+	}
+	macState := &ttnpb.MACState{
+		CurrentParameters: currentParameters,
+		DesiredParameters: desiredParameters,
+	}
+	dev := &ttnpb.EndDevice{
+		MacState: macState,
+	}
+	phy := &band.EU_863_870_RP1_V1_0_2_Rev_B
+
+	expectedTxPowers := []uint32{
+		// Jump from transmission power 0 to 2 due to extra budget of 4 dB.
+		2,
+		// Do nothing while the ADR safety margin is in place.
+		2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+		// Jump from transmission power 2 to 3 due to extra budget of 2 dB (removed safety margin).
+		3,
+		// Jump from transmission power 3 to 2 due to missing budget of 2 dB (added safety margin).
+		2,
+		// Do nothing while the ADR safety margin is in place.
+		2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+		// Jump from transmission power 2 to 3 due to extra budget of 2 dB (removed safety margin).
+		3,
+		// Jump from transmission power 3 to 2 due to missing budget of 2 dB (added safety margin).
+		2,
+		// Do nothing while the ADR safety margin is in place.
+		2, 2, 2, 2, 2, 2, 2,
+	}
+
+	penalty := float32(0)
+	for i := 0; i < 50; i++ {
+		macState.RecentUplinks = append(macState.RecentUplinks, makeUplink(i, penalty))
+		err := AdaptDataRate(ctx, dev, phy, nil)
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+		a.So(desiredParameters.AdrDataRateIndex, should.Equal, ttnpb.DataRateIndex_DATA_RATE_5)
+		a.So(desiredParameters.AdrTxPowerIndex, should.Equal, expectedTxPowers[i])
+		a.So(desiredParameters.AdrNbTrans, should.Equal, 1)
+
+		if currentParameters.AdrDataRateIndex != desiredParameters.AdrDataRateIndex ||
+			currentParameters.AdrTxPowerIndex != desiredParameters.AdrTxPowerIndex ||
+			currentParameters.AdrNbTrans != desiredParameters.AdrNbTrans {
+			diff := TxPowerStep(phy, currentParameters.AdrTxPowerIndex, desiredParameters.AdrTxPowerIndex)
+			penalty += diff
+
+			currentParameters.AdrDataRateIndex = desiredParameters.AdrDataRateIndex
+			currentParameters.AdrTxPowerIndex = desiredParameters.AdrTxPowerIndex
+			currentParameters.AdrNbTrans = desiredParameters.AdrNbTrans
+			macState.LastAdrChangeFCntUp = uint32(i + 1)
+		}
+	}
+}
+
 func TestClampDataRateRange(t *testing.T) {
 	t.Parallel()
 

@@ -31,6 +31,8 @@ var (
 	ClampDataRateRange = clampDataRateRange
 	ClampTxPowerRange  = clampTxPowerRange
 	ClampNbTrans       = clampNbTrans
+
+	TxPowerStep = txPowerStep
 )
 
 func NewADRUplink(
