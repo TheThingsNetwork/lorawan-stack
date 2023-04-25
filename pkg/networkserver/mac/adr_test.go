@@ -1656,3 +1656,91 @@ func TestADRDataRange(t *testing.T) {
 		})
 	}
 }
+
+func TestADRTxPowerRange(t *testing.T) {
+	t.Parallel()
+
+	for _, tc := range []struct {
+		Name string
+
+		Device   *ttnpb.EndDevice
+		Band     *band.Band
+		Defaults *ttnpb.MACSettings
+
+		Min, Max uint32
+		Rejected map[uint32]struct{}
+		Ok       bool
+	}{
+		{
+			Name: "clamping mismatch",
+
+			Device: &ttnpb.EndDevice{
+				MacSettings: &ttnpb.MACSettings{
+					Adr: &ttnpb.ADRSettings{
+						Mode: &ttnpb.ADRSettings_Dynamic{
+							Dynamic: &ttnpb.ADRSettings_DynamicMode{
+								MinTxPowerIndex: wrapperspb.UInt32(8),
+								MaxTxPowerIndex: wrapperspb.UInt32(10),
+							},
+						},
+					},
+				},
+			},
+			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
+		},
+		{
+			Name: "rejected; ok",
+
+			Device: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					RejectedAdrTxPowerIndexes: []uint32{
+						0,
+						4,
+						7,
+					},
+				},
+			},
+			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
+
+			Min: 1,
+			Max: 6,
+			Rejected: map[uint32]struct{}{
+				0: {},
+				4: {},
+				7: {},
+			},
+			Ok: true,
+		},
+		{
+			Name: "rejected; no overlap",
+
+			Device: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					RejectedAdrTxPowerIndexes: []uint32{
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+					},
+				},
+			},
+			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
+		},
+	} {
+		tc := tc
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
+			a, ctx := test.New(t)
+			min, max, rejected, ok := ADRTxPowerRange(ctx, tc.Device, tc.Band, tc.Defaults)
+			a.So(min, should.Equal, tc.Min)
+			a.So(max, should.Equal, tc.Max)
+			a.So(rejected, should.Resemble, tc.Rejected)
+			a.So(ok, should.Equal, tc.Ok)
+		})
+	}
+}
