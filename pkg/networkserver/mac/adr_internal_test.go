@@ -26,6 +26,7 @@ var (
 	ADRUplinks       = adrUplinks
 	ADRDataRateRange = adrDataRateRange
 	ADRTxPowerRange  = adrTxPowerRange
+	ADRMargin        = adrMargin
 
 	ClampDataRateRange = clampDataRateRange
 	ClampTxPowerRange  = clampTxPowerRange

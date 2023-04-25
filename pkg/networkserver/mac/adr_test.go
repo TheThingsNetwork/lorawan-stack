@@ -1744,3 +1744,132 @@ func TestADRTxPowerRange(t *testing.T) {
 		})
 	}
 }
+
+func TestADRMargin(t *testing.T) {
+	t.Parallel()
+
+	float32Ptr := func(f float32) *float32 { return &f }
+	newUplink := func(maxSNR *float32, spreadingFactor, bandwidth uint32) *ttnpb.MACState_UplinkMessage {
+		up := &ttnpb.MACState_UplinkMessage{
+			Settings: &ttnpb.MACState_UplinkMessage_TxSettings{
+				DataRate: &ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
+							Bandwidth:       bandwidth,
+							SpreadingFactor: spreadingFactor,
+							CodingRate:      band.Cr4_5,
+						},
+					},
+				},
+			},
+		}
+		if maxSNR != nil {
+			up.RxMetadata = []*ttnpb.MACState_UplinkMessage_RxMetadata{
+				{
+					Snr: *maxSNR,
+				},
+			}
+		}
+		return up
+	}
+	repeatUplink := func(up *ttnpb.MACState_UplinkMessage, count int) []*ttnpb.MACState_UplinkMessage {
+		ups := make([]*ttnpb.MACState_UplinkMessage, 0, count)
+		for i := 0; i != count; i++ {
+			ups = append(ups, up)
+		}
+		return ups
+	}
+
+	for _, tc := range []struct {
+		Name string
+
+		Device   *ttnpb.EndDevice
+		Defaults *ttnpb.MACSettings
+		Uplinks  []*ttnpb.MACState_UplinkMessage
+
+		AssertError func(error) bool
+
+		Margin float32
+		Ok     bool
+	}{
+		{
+			Name: "no max SNR",
+
+			Uplinks: []*ttnpb.MACState_UplinkMessage{
+				newUplink(nil, 7, 125_000),
+			},
+		},
+		{
+			Name: "unknown demodulation floor",
+
+			Uplinks: []*ttnpb.MACState_UplinkMessage{
+				newUplink(float32Ptr(7.125), 5, 125_000),
+			},
+
+			AssertError: errors.IsInvalidArgument,
+		},
+		{
+			Name: "SF7BW125 suboptimal",
+
+			Device: &ttnpb.EndDevice{
+				MacSettings: &ttnpb.MACSettings{
+					Adr: &ttnpb.ADRSettings{
+						Mode: &ttnpb.ADRSettings_Dynamic{
+							Dynamic: &ttnpb.ADRSettings_DynamicMode{
+								Margin: wrapperspb.Float(15),
+							},
+						},
+					},
+				},
+			},
+			Uplinks: repeatUplink(
+				newUplink(float32Ptr(7.125), 7, 125_000),
+				5,
+			),
+
+			// Best SNR of 7.125 dB, demodulation floor of -7.5 dB, margin of 15 dB
+			// and a safety margin of 2.5 dB. 7.125 - (-7.5) - 15 - 2.5 = -2.875.
+			Margin: 7.125 - (-7.5) - 15 - 2.5,
+			Ok:     true,
+		},
+		{
+			Name: "SF7BW125 optimal",
+
+			Device: &ttnpb.EndDevice{
+				MacSettings: &ttnpb.MACSettings{
+					Adr: &ttnpb.ADRSettings{
+						Mode: &ttnpb.ADRSettings_Dynamic{
+							Dynamic: &ttnpb.ADRSettings_DynamicMode{
+								Margin: wrapperspb.Float(15),
+							},
+						},
+					},
+				},
+			},
+			Uplinks: repeatUplink(
+				newUplink(float32Ptr(7.125), 7, 125_000),
+				20,
+			),
+
+			// Best SNR of 7.125 dB, demodulation floor of -7.5 dB, margin of 15 dB.
+			// 7.125 - (-7.5) - 15 = -0.375.
+			Margin: 7.125 - (-7.5) - 15,
+			Ok:     true,
+		},
+	} {
+		tc := tc
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
+			a, ctx := test.New(t)
+			margin, ok, err := ADRMargin(ctx, tc.Device, tc.Defaults, tc.Uplinks...)
+			if assertError := tc.AssertError; assertError != nil {
+				a.So(assertError(err), should.BeTrue)
+			} else {
+				a.So(margin, should.Equal, tc.Margin)
+				a.So(ok, should.Equal, tc.Ok)
+				a.So(err, should.BeNil)
+			}
+		})
+	}
+}
