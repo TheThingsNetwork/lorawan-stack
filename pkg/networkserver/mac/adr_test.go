@@ -1980,3 +1980,192 @@ func TestADRMargin(t *testing.T) {
 		})
 	}
 }
+
+func TestADRAdaptDataRate(t *testing.T) {
+	t.Parallel()
+
+	for _, tc := range []struct {
+		Name string
+
+		MACState                           *ttnpb.MACState
+		Band                               *band.Band
+		MinDataRateIndex, MaxDataRateIndex ttnpb.DataRateIndex
+		RejectedDataRateIndices            map[ttnpb.DataRateIndex]struct{}
+		MinTxPowerIndex                    uint32
+		InitialMargin                      float32
+
+		OutputMACState *ttnpb.MACState
+		OutputMargin   float32
+	}{
+		{
+			Name: "below min data rate index",
+
+			MACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrTxPowerIndex:  1,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrTxPowerIndex:  1,
+				},
+			},
+			Band:             &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+			InitialMargin:    -5.0,
+
+			OutputMACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrTxPowerIndex:  1,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					AdrTxPowerIndex:  0,
+				},
+			},
+			OutputMargin: -7.5,
+		},
+		{
+			Name: "positive steps",
+
+			MACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrTxPowerIndex:  1,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrTxPowerIndex:  1,
+				},
+			},
+			Band:             &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+			InitialMargin:    15.0,
+
+			OutputMACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrTxPowerIndex:  1,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+					AdrTxPowerIndex:  0,
+				},
+			},
+			OutputMargin: 2.5,
+		},
+		{
+			Name: "negative steps",
+
+			MACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
+					AdrTxPowerIndex:  1,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
+					AdrTxPowerIndex:  1,
+				},
+			},
+			Band:             &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
+			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+			InitialMargin:    -7.5,
+
+			OutputMACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
+					AdrTxPowerIndex:  1,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
+					AdrTxPowerIndex:  1,
+				},
+			},
+			OutputMargin: -7.5,
+		},
+		{
+			Name: "rejected min",
+
+			MACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrTxPowerIndex:  1,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrTxPowerIndex:  1,
+				},
+			},
+			Band:             &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+			RejectedDataRateIndices: map[ttnpb.DataRateIndex]struct{}{
+				ttnpb.DataRateIndex_DATA_RATE_0: {},
+			},
+			InitialMargin: 2.5,
+
+			OutputMACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrTxPowerIndex:  1,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					AdrTxPowerIndex:  0,
+				},
+			},
+			OutputMargin: 0.0,
+		},
+		{
+			Name: "rejected max",
+
+			MACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrTxPowerIndex:  1,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrTxPowerIndex:  1,
+				},
+			},
+			Band:             &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+			RejectedDataRateIndices: map[ttnpb.DataRateIndex]struct{}{
+				ttnpb.DataRateIndex_DATA_RATE_5: {},
+			},
+			InitialMargin: 15.0,
+
+			OutputMACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrTxPowerIndex:  1,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_4,
+					AdrTxPowerIndex:  0,
+				},
+			},
+			OutputMargin: 5.0,
+		},
+	} {
+		tc := tc
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
+			a := assertions.New(t)
+			margin := ADRAdaptDataRate(
+				tc.MACState,
+				tc.Band,
+				tc.MinDataRateIndex, tc.MaxDataRateIndex,
+				tc.RejectedDataRateIndices,
+				tc.MinTxPowerIndex,
+				tc.InitialMargin,
+			)
+			a.So(margin, should.Equal, tc.OutputMargin)
+			a.So(tc.MACState, should.Resemble, tc.OutputMACState)
+		})
+	}
+}
