@@ -33,7 +33,11 @@ import style from './details.styl'
 const EventDetails = ({ className, children, event }) => {
   const hasChildren = Boolean(children)
   const dataFormatsDocumentationLink = (
-    <Link.DocLink secondary path="/the-things-stack/concepts/data-formats/" title={messages.dataFormats}>
+    <Link.DocLink
+      secondary
+      path="/the-things-stack/concepts/data-formats/"
+      title={messages.dataFormats}
+    >
       <Message content={messages.dataFormats} />
     </Link.DocLink>
   )
