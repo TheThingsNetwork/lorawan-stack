@@ -25,39 +25,39 @@ import (
 
 var demodulationFloor = map[uint32]map[uint32]float32{
 	6: {
-		125000: -5,
-		250000: -2,
-		500000: 1,
+		125_000: -5,
+		250_000: -2,
+		500_000: 1,
 	},
 	7: {
-		125000: -7.5,
-		250000: -4.5,
-		500000: -1.5,
+		125_000: -7.5,
+		250_000: -4.5,
+		500_000: -1.5,
 	},
 	8: {
-		125000: -10,
-		250000: -7,
-		500000: -4,
+		125_000: -10,
+		250_000: -7,
+		500_000: -4,
 	},
 	9: {
-		125000: -12.5,
-		250000: -9.5,
-		500000: -6.5,
+		125_000: -12.5,
+		250_000: -9.5,
+		500_000: -6.5,
 	},
 	10: {
-		125000: -15,
-		250000: -12,
-		500000: -9,
+		125_000: -15,
+		250_000: -12,
+		500_000: -9,
 	},
 	11: {
-		125000: -17.5,
-		250000: -14.5,
-		500000: -11.5,
+		125_000: -17.5,
+		250_000: -14.5,
+		500_000: -11.5,
 	},
 	12: {
-		125000: -20,
-		250000: -17,
-		500000: -24,
+		125_000: -20,
+		250_000: -17,
+		500_000: -14,
 	},
 }
 
@@ -300,12 +300,13 @@ func clampNbTrans(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings, nbTrans uin
 
 // AdaptDataRate adapts the end device desired ADR parameters based on previous transmissions and device settings.
 func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, defaults *ttnpb.MACSettings) error {
-	if dev.MacState == nil {
+	macState := dev.MacState
+	if macState == nil {
 		return nil
 	}
 
-	macState := dev.MacState
 	currentParameters, desiredParameters := macState.CurrentParameters, macState.DesiredParameters
+	currentDataRateIndex := currentParameters.AdrDataRateIndex
 
 	adrUplinks := func() []*ttnpb.MACState_UplinkMessage {
 		for i := len(macState.RecentUplinks) - 1; i >= 0; i-- {
@@ -317,7 +318,7 @@ func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 			switch {
 			case up.Payload.MHdr.MType != ttnpb.MType_UNCONFIRMED_UP && up.Payload.MHdr.MType != ttnpb.MType_CONFIRMED_UP,
 				macState.LastAdrChangeFCntUp != 0 && up.Payload.GetMacPayload().FullFCnt <= macState.LastAdrChangeFCntUp,
-				drIdx != currentParameters.AdrDataRateIndex:
+				drIdx != currentDataRateIndex:
 				return macState.RecentUplinks[i+1:]
 			}
 		}
@@ -327,7 +328,7 @@ func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 		return nil
 	}
 
-	minDataRateIndex, maxDataRateIndex, ok := channelDataRateRange(currentParameters.Channels...)
+	minDataRateIndex, maxDataRateIndex, ok := channelDataRateRange(desiredParameters.Channels...)
 	if !ok {
 		return internal.ErrCorruptedMACState.
 			WithCause(internal.ErrChannelDataRateRange)
@@ -340,8 +341,8 @@ func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 	if maxDataRateIndex > phy.MaxADRDataRateIndex {
 		maxDataRateIndex = phy.MaxADRDataRateIndex
 	}
-	rejectedDataRateIndexes := make(map[ttnpb.DataRateIndex]struct{}, len(dev.MacState.RejectedAdrDataRateIndexes))
-	for _, idx := range dev.MacState.RejectedAdrDataRateIndexes {
+	rejectedDataRateIndexes := make(map[ttnpb.DataRateIndex]struct{}, len(macState.RejectedAdrDataRateIndexes))
+	for _, idx := range macState.RejectedAdrDataRateIndexes {
 		rejectedDataRateIndexes[idx] = struct{}{}
 	}
 	_, ok = rejectedDataRateIndexes[minDataRateIndex]
@@ -355,11 +356,13 @@ func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 		_, ok = rejectedDataRateIndexes[maxDataRateIndex]
 	}
 	if minDataRateIndex > maxDataRateIndex {
-		log.FromContext(ctx).Debug("Device has rejected all possible data rate values given the channels enabled, avoid ADR")
+		log.FromContext(ctx).Debug(
+			"Device has rejected all possible data rate values given the channels enabled, avoid ADR",
+		)
 		return nil
 	}
-	if currentParameters.AdrDataRateIndex > minDataRateIndex {
-		minDataRateIndex = currentParameters.AdrDataRateIndex
+	if currentDataRateIndex > minDataRateIndex {
+		minDataRateIndex = currentDataRateIndex
 	}
 
 	minTxPowerIndex := uint8(0)
@@ -399,7 +402,7 @@ func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 	// configurable margin, and an extra safety margin if we're afraid that we
 	// don't have enough data for our decision.
 	var margin float32
-	// NOTE: We currently assume that the uplink's SF and BW correspond to CurrentParameters.ADRDataRateIndex.
+	// NOTE: We currently assume that the uplink's SF and BW correspond to currentDataRateIndex.
 	if dr := internal.LastUplink(adrUplinks...).Settings.DataRate.GetLora(); dr != nil {
 		var ok bool
 		df, ok := demodulationFloor[dr.SpreadingFactor][dr.Bandwidth]
@@ -414,14 +417,16 @@ func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 
 	// NOTE: Network Server may only increase the data rate index of the device.
 	// NOTE(2): TX output power is reset whenever data rate is increased.
-	desiredParameters.AdrDataRateIndex = currentParameters.AdrDataRateIndex
+	desiredParameters.AdrDataRateIndex = currentDataRateIndex
 	desiredParameters.AdrTxPowerIndex = currentParameters.AdrTxPowerIndex
-	if currentParameters.AdrDataRateIndex < minDataRateIndex {
-		margin -= float32(minDataRateIndex-currentParameters.AdrDataRateIndex) * drStep
+	if currentDataRateIndex < minDataRateIndex {
+		margin -= float32(minDataRateIndex-currentDataRateIndex) * drStep
 		desiredParameters.AdrDataRateIndex = minDataRateIndex
 		desiredParameters.AdrTxPowerIndex = 0
 	}
-	if marginSteps := (margin - txPowerStep(phy, 0, minTxPowerIndex)) / drStep; marginSteps >= 0 && marginSteps < float32(maxDataRateIndex-desiredParameters.AdrDataRateIndex) {
+	maxMarginSteps := float32(maxDataRateIndex - desiredParameters.AdrDataRateIndex)
+	marginSteps := (margin - txPowerStep(phy, 0, minTxPowerIndex)) / drStep
+	if marginSteps >= 0 && marginSteps < maxMarginSteps {
 		maxDataRateIndex = desiredParameters.AdrDataRateIndex + ttnpb.DataRateIndex(marginSteps)
 	} else if marginSteps < 0 {
 		maxDataRateIndex = minDataRateIndex
@@ -450,7 +455,7 @@ func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 		if _, ok := rejectedTxPowerIndexes[txPowerIdx]; ok || diff > margin {
 			continue
 		}
-		margin -= diff
+		margin -= diff // nolint:ineffassign
 		desiredParameters.AdrTxPowerIndex = uint32(txPowerIdx)
 		break
 	}
