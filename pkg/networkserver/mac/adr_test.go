@@ -597,16 +597,9 @@ func TestADRInstability(t *testing.T) {
 		2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 		// Jump from transmission power 2 to 3 due to extra budget of 2 dB (removed safety margin).
 		3,
-		// Jump from transmission power 3 to 2 due to missing budget of 2 dB (added safety margin).
-		2,
-		// Do nothing while the ADR safety margin is in place.
-		2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-		// Jump from transmission power 2 to 3 due to extra budget of 2 dB (removed safety margin).
-		3,
-		// Jump from transmission power 3 to 2 due to missing budget of 2 dB (added safety margin).
-		2,
-		// Do nothing while the ADR safety margin is in place.
-		2, 2, 2, 2, 2, 2, 2,
+		// Do nothing as the transmission power change is under the safety margin, or we have enough
+		// uplinks to trust our SNR estimate.
+		3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	}
 
 	penalty := float32(0)
@@ -1899,8 +1892,9 @@ func TestADRMargin(t *testing.T) {
 
 		AssertError func(error) bool
 
-		Margin float32
-		Ok     bool
+		Margin  float32
+		Optimal bool
+		Ok      bool
 	}{
 		{
 			Name: "no max SNR",
@@ -1939,8 +1933,9 @@ func TestADRMargin(t *testing.T) {
 
 			// Best SNR of 7.125 dB, demodulation floor of -7.5 dB, margin of 15 dB
 			// and a safety margin of 2.5 dB. 7.125 - (-7.5) - 15 - 2.5 = -2.875.
-			Margin: 7.125 - (-7.5) - 15 - 2.5,
-			Ok:     true,
+			Margin:  7.125 - (-7.5) - 15 - 2.5,
+			Optimal: false,
+			Ok:      true,
 		},
 		{
 			Name: "SF7BW125 optimal",
@@ -1963,8 +1958,9 @@ func TestADRMargin(t *testing.T) {
 
 			// Best SNR of 7.125 dB, demodulation floor of -7.5 dB, margin of 15 dB.
 			// 7.125 - (-7.5) - 15 = -0.375.
-			Margin: 7.125 - (-7.5) - 15,
-			Ok:     true,
+			Margin:  7.125 - (-7.5) - 15,
+			Optimal: true,
+			Ok:      true,
 		},
 	} {
 		tc := tc
@@ -1972,11 +1968,12 @@ func TestADRMargin(t *testing.T) {
 			t.Parallel()
 
 			a, ctx := test.New(t)
-			margin, ok, err := ADRMargin(ctx, tc.Device, tc.Defaults, tc.Uplinks...)
+			margin, optimal, ok, err := ADRMargin(ctx, tc.Device, tc.Defaults, tc.Uplinks...)
 			if assertError := tc.AssertError; assertError != nil {
 				a.So(assertError(err), should.BeTrue)
 			} else {
 				a.So(margin, should.Equal, tc.Margin)
+				a.So(optimal, should.Equal, tc.Optimal)
 				a.So(ok, should.Equal, tc.Ok)
 				a.So(err, should.BeNil)
 			}

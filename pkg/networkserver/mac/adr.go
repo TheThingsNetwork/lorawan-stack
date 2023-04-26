@@ -402,29 +402,31 @@ func adrTxPowerRange(
 
 func adrMargin(
 	ctx context.Context, dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings, adrUplinks ...*ttnpb.MACState_UplinkMessage,
-) (margin float32, ok bool, err error) {
+) (margin float32, optimal bool, ok bool, err error) {
 	maxSNR, ok := maxSNRFromMetadata(uplinkMetadata(adrUplinks...)...)
 	if !ok {
 		log.FromContext(ctx).Debug("Failed to determine max SNR, avoid ADR")
-		return 0, false, nil
+		return 0, false, false, nil
 	}
 	// The link margin indicates how much stronger the signal (SNR) is than the
 	// minimum (floor) that we need to demodulate the signal. We subtract a
-	// configurable margin, and an extra safety margin if we're afraid that we
-	// don't have enough data for our decision.
+	// configurable margin.
 	// NOTE: We currently assume that the uplink's SF and BW correspond to currentDataRateIndex.
 	if dr := internal.LastUplink(adrUplinks...).Settings.DataRate.GetLora(); dr != nil {
 		var ok bool
 		df, ok := demodulationFloor[dr.SpreadingFactor][dr.Bandwidth]
 		if !ok {
-			return 0, false, internal.ErrInvalidDataRate.New()
+			return 0, false, false, internal.ErrInvalidDataRate.New()
 		}
 		margin = maxSNR - df - DeviceADRMargin(dev, defaults)
 	}
-	if len(adrUplinks) < OptimalADRUplinkCount {
+	// We subtract an extra safety margin if we're afraid that we  don't have enough data
+	// for our decision.
+	optimal = len(adrUplinks) >= OptimalADRUplinkCount
+	if !optimal {
 		margin -= safetyMargin
 	}
-	return margin, true, nil
+	return margin, optimal, true, nil
 }
 
 func adrAdaptDataRate(
@@ -471,6 +473,7 @@ func adrAdaptTxPowerIndex(
 	min, max uint32,
 	rejected map[uint32]struct{},
 	margin float32,
+	optimal bool,
 ) float32 {
 	desiredParameters := macState.DesiredParameters
 	if desiredParameters.AdrTxPowerIndex < min {
@@ -486,6 +489,12 @@ func adrAdaptTxPowerIndex(
 		diff := txPowerStep(phy, desiredParameters.AdrTxPowerIndex, txPowerIdx)
 		if _, ok := rejected[txPowerIdx]; ok || diff > margin {
 			continue
+		}
+		if !optimal && diff < 0 && -diff <= safetyMargin {
+			// If the transmission power is increased by a value lower than the safety margin
+			// while the number of observed uplinks is not optimal, we avoid changing the
+			// transmission power in order to avoid flip-flopping.
+			break
 		}
 		margin -= diff
 		desiredParameters.AdrTxPowerIndex = txPowerIdx
@@ -528,7 +537,7 @@ func adaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 	if !ok {
 		return nil
 	}
-	margin, ok, err := adrMargin(ctx, dev, defaults, adrUplinks...)
+	margin, optimal, ok, err := adrMargin(ctx, dev, defaults, adrUplinks...)
 	if err != nil || !ok {
 		return err
 	}
@@ -536,7 +545,7 @@ func adaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 		macState, phy, minDataRateIndex, maxDataRateIndex, rejectedDataRateIndices, minTxPowerIndex, margin,
 	)
 	margin = adrAdaptTxPowerIndex(
-		macState, phy, minTxPowerIndex, maxTxPowerIndex, rejectedTxPowerIndices, margin,
+		macState, phy, minTxPowerIndex, maxTxPowerIndex, rejectedTxPowerIndices, margin, optimal,
 	)
 	_ = margin
 	adrAdaptNbTrans(dev, defaults, adrUplinks)
