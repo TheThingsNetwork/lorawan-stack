@@ -18,11 +18,11 @@ package io
 type MessageStream uint32
 
 const (
-	UplinkStream   MessageStream = 0 // UplinkStream is the uplink message stream.
-	DownlinkStream MessageStream = 1 // DownlinkStream is the downlink message stream.
-	TxAckStream    MessageStream = 2 // TxAckStream is the transmission acknowledgment stream.
-	StatusStream   MessageStream = 3 // StatusStream is the status message stream.
-	RTTStream      MessageStream = 4 // RTTStream is the round-trip times stream.
+	UplinkStream   MessageStream = iota // UplinkStream is the uplink message stream.
+	DownlinkStream                      // DownlinkStream is the downlink message stream.
+	TxAckStream                         // TxAckStream is the transmission acknowledgment stream.
+	StatusStream                        // StatusStream is the status message stream.
+	RTTStream                           // RTTStream is the round-trip times stream.
 )
 
 func alwaysOnStreamState(MessageStream) bool { return true }
