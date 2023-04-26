@@ -485,9 +485,12 @@ func adrAdaptTxPowerIndex(
 		desiredParameters.AdrTxPowerIndex = max
 	}
 	// If we still have margin left, we decrease the TX output power (increase the index).
-	for txPowerIdx := max; txPowerIdx > min; txPowerIdx-- {
+	// We can also compensate the missing margin by increasing the TX output power (decreasing the index).
+	for txPowerIdx := max; txPowerIdx >= min; txPowerIdx-- {
 		diff := txPowerStep(phy, desiredParameters.AdrTxPowerIndex, txPowerIdx)
-		if _, ok := rejected[txPowerIdx]; ok || diff > margin {
+		// As long as we are not at the minimal transmission power index, we skip
+		// rejected indices or indices which do not fit in the margin.
+		if _, ok := rejected[txPowerIdx]; (ok || diff > margin) && txPowerIdx != min {
 			continue
 		}
 		if !optimal && diff < 0 && -diff <= safetyMargin {
