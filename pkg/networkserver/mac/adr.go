@@ -312,7 +312,7 @@ func adrUplinks(macState *ttnpb.MACState, phy *band.Band) []*ttnpb.MACState_Upli
 		}
 		switch {
 		case up.Payload.MHdr.MType != ttnpb.MType_UNCONFIRMED_UP && up.Payload.MHdr.MType != ttnpb.MType_CONFIRMED_UP,
-			macState.LastAdrChangeFCntUp != 0 && up.Payload.GetMacPayload().FullFCnt <= macState.LastAdrChangeFCntUp,
+			macState.LastAdrChangeFCntUp != 0 && up.Payload.GetMacPayload().FullFCnt < macState.LastAdrChangeFCntUp,
 			drIdx != currentDataRateIndex:
 			return macState.RecentUplinks[i+1:]
 		}

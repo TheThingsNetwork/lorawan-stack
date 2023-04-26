@@ -43,7 +43,7 @@ func legacyDeviceADRMargin(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings) fl
 	switch {
 	case dev.GetMacSettings().GetAdrMargin() != nil:
 		return dev.MacSettings.AdrMargin.Value
-	case defaults.AdrMargin != nil:
+	case defaults.GetAdrMargin() != nil:
 		return defaults.AdrMargin.Value
 	default:
 		return DefaultADRMargin

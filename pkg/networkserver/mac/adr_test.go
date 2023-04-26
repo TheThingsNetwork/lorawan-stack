@@ -1414,6 +1414,7 @@ func TestADRUplinks(t *testing.T) {
 			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
 
 			ExpectedUplinks: []*ttnpb.MACState_UplinkMessage{
+				newUplink(ttnpb.MType_UNCONFIRMED_UP, 12, 2),
 				newUplink(ttnpb.MType_UNCONFIRMED_UP, 12, 3),
 				newUplink(ttnpb.MType_UNCONFIRMED_UP, 12, 4),
 			},
