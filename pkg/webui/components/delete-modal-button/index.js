@@ -110,7 +110,7 @@ const DeleteModalButton = props => {
                   messageValues={{
                     strong: txt => <strong>{txt}</strong>,
                     DocLink: txt => (
-                      <Link.DocLink primary raw path="/reference/purge">
+                      <Link.DocLink primary raw path="/the-things-stack/management/purge/">
                         {txt}
                       </Link.DocLink>
                     ),
