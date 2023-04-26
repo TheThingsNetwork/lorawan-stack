@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package io contains the interface between server implementations and the gateway frontends.
 package io
 
 import (
@@ -63,8 +64,13 @@ type Server interface {
 		ids *ttnpb.GatewayIdentifiers) (context.Context, *ttnpb.GatewayIdentifiers, error)
 	// Connect connects a gateway by its identifiers to the Gateway Server, and returns a Connection for traffic and
 	// control.
-	Connect(ctx context.Context,
-		frontend Frontend, ids *ttnpb.GatewayIdentifiers, addr *ttnpb.GatewayRemoteAddress) (*Connection, error)
+	Connect(
+		ctx context.Context,
+		frontend Frontend,
+		ids *ttnpb.GatewayIdentifiers,
+		addr *ttnpb.GatewayRemoteAddress,
+		opts ...ConnectionOption,
+	) (*Connection, error)
 	// GetFrequencyPlans gets the frequency plans by the gateway identifiers.
 	GetFrequencyPlans(ctx context.Context,
 		ids *ttnpb.GatewayIdentifiers) (map[string]*frequencyplans.FrequencyPlan, error)
@@ -109,6 +115,7 @@ type Connection struct {
 	scheduler        *scheduling.Scheduler
 	rtts             *rtts
 	addr             *ttnpb.GatewayRemoteAddress
+	streamActive     func(MessageStream) bool
 
 	upCh     chan *ttnpb.GatewayUplinkMessage
 	downCh   chan *ttnpb.DownlinkMessage
@@ -138,6 +145,21 @@ var (
 	)
 )
 
+type connectionOptions struct {
+	streamActive func(MessageStream) bool
+}
+
+// ConnectionOption is a Connection option.
+type ConnectionOption func(*connectionOptions)
+
+// WithStreamActive overrides the stream activity check function.
+// By default, the streams are always on.
+func WithStreamActive(f func(MessageStream) bool) ConnectionOption {
+	return ConnectionOption(func(opts *connectionOptions) {
+		opts.streamActive = f
+	})
+}
+
 // NewConnection instantiates a new gateway connection.
 func NewConnection(
 	ctx context.Context,
@@ -147,7 +169,15 @@ func NewConnection(
 	enforceDutyCycle bool,
 	scheduleAnytimeDelay *time.Duration,
 	addr *ttnpb.GatewayRemoteAddress,
+	opts ...ConnectionOption,
 ) (*Connection, error) {
+	connectionOptions := &connectionOptions{
+		streamActive: alwaysOnStreamState,
+	}
+	for _, opt := range opts {
+		opt(connectionOptions)
+	}
+
 	gatewayFPs := make(map[string]*frequencyplans.FrequencyPlan, len(gateway.FrequencyPlanIds))
 	fp0ID := gateway.FrequencyPlanId
 	fp0, err := fps.GetByID(fp0ID)
@@ -197,6 +227,7 @@ func NewConnection(
 		scheduler:        scheduler,
 		addr:             addr,
 		rtts:             newRTTs(maxRTTs, rttTTL),
+		streamActive:     connectionOptions.streamActive,
 
 		upCh:     make(chan *ttnpb.GatewayUplinkMessage, bufferSize),
 		downCh:   make(chan *ttnpb.DownlinkMessage, bufferSize),
@@ -725,6 +756,9 @@ func (c *Connection) GatewayRemoteAddress() *ttnpb.GatewayRemoteAddress { return
 
 // StatusStats returns the status statistics.
 func (c *Connection) StatusStats() (last *ttnpb.GatewayStatus, t time.Time, ok bool) {
+	if !c.streamActive(StatusStream) {
+		return
+	}
 	last = c.lastStatus.Load()
 	if ok = last != nil; ok {
 		t = time.Unix(0, atomic.LoadInt64(&c.lastStatusTime))
@@ -734,6 +768,9 @@ func (c *Connection) StatusStats() (last *ttnpb.GatewayStatus, t time.Time, ok b
 
 // UpStats returns the upstream statistics.
 func (c *Connection) UpStats() (total uint64, t time.Time, ok bool) {
+	if !c.streamActive(UplinkStream) {
+		return
+	}
 	total = atomic.LoadUint64(&c.uplinks)
 	if ok = total > 0; ok {
 		t = time.Unix(0, atomic.LoadInt64(&c.lastUplinkTime))
@@ -743,6 +780,9 @@ func (c *Connection) UpStats() (total uint64, t time.Time, ok bool) {
 
 // DownStats returns the downstream statistics.
 func (c *Connection) DownStats() (total uint64, t time.Time, ok bool) {
+	if !c.streamActive(DownlinkStream) {
+		return
+	}
 	total = atomic.LoadUint64(&c.downlinks)
 	if ok = total > 0; ok {
 		t = time.Unix(0, atomic.LoadInt64(&c.lastDownlinkTime))
@@ -752,6 +792,9 @@ func (c *Connection) DownStats() (total uint64, t time.Time, ok bool) {
 
 // TxAckStats return the transmission acknowledgement statistics.
 func (c *Connection) TxAckStats() (total uint64, t time.Time, ok bool) {
+	if !c.streamActive(TxAckStream) {
+		return
+	}
 	total = atomic.LoadUint64(&c.txAcknowledgments)
 	if ok = total > 0; ok {
 		t = time.Unix(0, atomic.LoadInt64(&c.lastTxAcknowledgmentTime))
@@ -761,6 +804,9 @@ func (c *Connection) TxAckStats() (total uint64, t time.Time, ok bool) {
 
 // RTTStats returns the recorded round-trip time statistics.
 func (c *Connection) RTTStats(percentile int, t time.Time) (min, max, median, np time.Duration, count int) {
+	if !c.streamActive(RTTStream) {
+		return
+	}
 	return c.rtts.Stats(percentile, t)
 }
 

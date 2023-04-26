@@ -235,9 +235,10 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64, addr *net.UDPAddr) (
 			}),
 		})
 
+		streamActive := cs.createStreamActive(s.config.ConnectionExpires, s.config.DownlinkPathExpires)
 		conn, err = s.server.Connect(ctx, s, ids, &ttnpb.GatewayRemoteAddress{
 			Ip: addr.IP.String(),
-		})
+		}, io.WithStreamActive(streamActive))
 		if err != nil {
 			return nil, err
 		}
@@ -549,4 +550,17 @@ func (st *state) isPushPathActive(timeout time.Duration) bool {
 
 func (st *state) isAnyPathActive(timeout time.Duration) bool {
 	return st.isPullPathActive(timeout) || st.isPushPathActive(timeout)
+}
+
+func (st *state) createStreamActive(pushTimeout, pullTimeout time.Duration) func(io.MessageStream) bool {
+	return func(stream io.MessageStream) bool {
+		switch stream {
+		case io.UplinkStream, io.StatusStream:
+			return st.isPushPathActive(pushTimeout)
+		case io.DownlinkStream, io.TxAckStream, io.RTTStream:
+			return st.isPullPathActive(pullTimeout)
+		default:
+			panic("unknown stream")
+		}
+	}
 }

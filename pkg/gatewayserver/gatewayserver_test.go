@@ -116,10 +116,10 @@ func TestGatewayServer(t *testing.T) {
 						Config: udp.Config{
 							PacketHandlers:      2,
 							PacketBuffer:        10,
-							DownlinkPathExpires: 100 * time.Millisecond,
-							ConnectionExpires:   250 * time.Millisecond,
+							DownlinkPathExpires: 1 * time.Second,
+							ConnectionExpires:   2 * time.Second,
 							ScheduleLateTime:    0,
-							AddrChangeBlock:     250 * time.Millisecond,
+							AddrChangeBlock:     2 * time.Second,
 						},
 						Listeners: map[string]string{
 							":1700": test.EUFrequencyPlanID,

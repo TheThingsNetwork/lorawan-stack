@@ -82,6 +82,7 @@ func (s *server) Connect(
 	frontend io.Frontend,
 	ids *ttnpb.GatewayIdentifiers,
 	addr *ttnpb.GatewayRemoteAddress,
+	opts ...io.ConnectionOption,
 ) (*io.Connection, error) {
 	if err := rights.RequireGateway(ctx, ids, ttnpb.Right_RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
@@ -98,7 +99,7 @@ func (s *server) Connect(
 		return nil, err
 	}
 
-	conn, err := io.NewConnection(ctx, frontend, gtw, fps, true, nil, addr)
+	conn, err := io.NewConnection(ctx, frontend, gtw, fps, true, nil, addr, opts...)
 	if err != nil {
 		return nil, err
 	}
