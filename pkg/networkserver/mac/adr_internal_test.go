@@ -22,12 +22,13 @@ import (
 )
 
 var (
-	ADRLossRate      = adrLossRate
-	ADRUplinks       = adrUplinks
-	ADRDataRateRange = adrDataRateRange
-	ADRTxPowerRange  = adrTxPowerRange
-	ADRMargin        = adrMargin
-	ADRAdaptDataRate = adrAdaptDataRate
+	ADRLossRate          = adrLossRate
+	ADRUplinks           = adrUplinks
+	ADRDataRateRange     = adrDataRateRange
+	ADRTxPowerRange      = adrTxPowerRange
+	ADRMargin            = adrMargin
+	ADRAdaptDataRate     = adrAdaptDataRate
+	ADRAdaptTxPowerIndex = adrAdaptTxPowerIndex
 
 	ClampDataRateRange = clampDataRateRange
 	ClampTxPowerRange  = clampTxPowerRange

@@ -2169,3 +2169,180 @@ func TestADRAdaptDataRate(t *testing.T) {
 		})
 	}
 }
+
+func TestADRAdaptTxPowerIndex(t *testing.T) {
+	t.Parallel()
+
+	for _, tc := range []struct {
+		Name string
+
+		MACState      *ttnpb.MACState
+		Band          *band.Band
+		Min, Max      uint32
+		Rejected      map[uint32]struct{}
+		InitialMargin float32
+		Optimal       bool
+
+		OutputMACState *ttnpb.MACState
+		OutputMargin   float32
+	}{
+		{
+			Name: "min clamping",
+
+			MACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 0,
+				},
+			},
+			Band:          &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			Min:           1,
+			Max:           7,
+			InitialMargin: 0.0,
+
+			OutputMACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 1,
+				},
+			},
+			OutputMargin: -2.0,
+		},
+		{
+			Name: "max clamping",
+			MACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 7,
+				},
+			},
+			Band:          &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			Max:           6,
+			InitialMargin: 0.0,
+
+			OutputMACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 6,
+				},
+			},
+			OutputMargin: 2.0,
+		},
+		{
+			Name: "one step forward",
+			MACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 2,
+				},
+			},
+			Band:          &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			Max:           7,
+			InitialMargin: 3.0,
+
+			OutputMACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 3,
+				},
+			},
+			OutputMargin: 1.0,
+		},
+		{
+			Name: "two steps forward",
+			MACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 2,
+				},
+			},
+			Band:          &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			Max:           7,
+			InitialMargin: 5.0,
+
+			OutputMACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 4,
+				},
+			},
+			OutputMargin: 1.0,
+		},
+		{
+			Name: "one step backward; suboptimal",
+			MACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 3,
+				},
+			},
+			Band:          &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			Max:           7,
+			InitialMargin: -1.5,
+			Optimal:       false,
+
+			OutputMACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 3,
+				},
+			},
+			OutputMargin: -1.5,
+		},
+		{
+			Name: "one step backward; optimal",
+			MACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 3,
+				},
+			},
+			Band:          &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			Max:           7,
+			InitialMargin: -1.5,
+			Optimal:       true,
+
+			OutputMACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 2,
+				},
+			},
+			OutputMargin: 0.5,
+		},
+		{
+			Name: "two steps backward",
+			MACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 3,
+				},
+			},
+			Band:          &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			Max:           7,
+			InitialMargin: -3.5,
+
+			OutputMACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 1,
+				},
+			},
+			OutputMargin: 0.5,
+		},
+		{
+			Name: "backward to zero",
+			MACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 3,
+				},
+			},
+			Band:          &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			Max:           7,
+			InitialMargin: -20.5,
+
+			OutputMACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 0,
+				},
+			},
+			OutputMargin: -14.5,
+		},
+	} {
+		tc := tc
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
+			a := assertions.New(t)
+			margin := ADRAdaptTxPowerIndex(tc.MACState, tc.Band, tc.Min, tc.Max, tc.Rejected, tc.InitialMargin, tc.Optimal)
+			a.So(margin, should.Equal, tc.OutputMargin)
+			a.So(tc.MACState, should.Resemble, tc.OutputMACState)
+		})
+	}
+}
