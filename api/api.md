@@ -1299,9 +1299,6 @@ The NsAs service connects a Network Server to an Application Server.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
-| `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
-| `type` | [`string`](#string) |  |  |
 | `limit` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  |  |
 | `after` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `before` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |

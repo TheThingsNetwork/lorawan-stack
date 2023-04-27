@@ -47,32 +47,6 @@ func (m *ContinuationTokenPayload) ValidateFields(paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
-		case "application_ids":
-
-			if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
-				if err := v.ValidateFields(subs...); err != nil {
-					return ContinuationTokenPayloadValidationError{
-						field:  "application_ids",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
-				}
-			}
-
-		case "end_device_ids":
-
-			if v, ok := interface{}(m.GetEndDeviceIds()).(interface{ ValidateFields(...string) error }); ok {
-				if err := v.ValidateFields(subs...); err != nil {
-					return ContinuationTokenPayloadValidationError{
-						field:  "end_device_ids",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
-				}
-			}
-
-		case "type":
-			// no validation rules for Type
 		case "limit":
 
 			if v, ok := interface{}(m.GetLimit()).(interface{ ValidateFields(...string) error }); ok {

@@ -3012,42 +3012,6 @@
           "extensions": [],
           "fields": [
             {
-              "name": "application_ids",
-              "description": "",
-              "label": "",
-              "type": "ApplicationIdentifiers",
-              "longType": "ApplicationIdentifiers",
-              "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "end_device_ids",
-              "description": "",
-              "label": "",
-              "type": "EndDeviceIdentifiers",
-              "longType": "EndDeviceIdentifiers",
-              "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "type",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
               "name": "limit",
               "description": "",
               "label": "",

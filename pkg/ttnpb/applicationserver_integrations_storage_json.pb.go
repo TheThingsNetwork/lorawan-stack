@@ -20,22 +20,6 @@ func (x *ContinuationTokenPayload) MarshalProtoJSON(s *jsonplugin.MarshalState) 
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if x.ApplicationIds != nil || s.HasField("application_ids") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("application_ids")
-		// NOTE: ApplicationIdentifiers does not seem to implement MarshalProtoJSON.
-		golang.MarshalMessage(s, x.ApplicationIds)
-	}
-	if x.EndDeviceIds != nil || s.HasField("end_device_ids") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("end_device_ids")
-		x.EndDeviceIds.MarshalProtoJSON(s.WithField("end_device_ids"))
-	}
-	if x.Type != "" || s.HasField("type") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("type")
-		s.WriteString(x.Type)
-	}
 	if x.Limit != nil || s.HasField("limit") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("limit")
@@ -117,26 +101,6 @@ func (x *ContinuationTokenPayload) UnmarshalProtoJSON(s *jsonplugin.UnmarshalSta
 		switch key {
 		default:
 			s.ReadAny() // ignore unknown field
-		case "application_ids", "applicationIds":
-			s.AddField("application_ids")
-			if s.ReadNil() {
-				x.ApplicationIds = nil
-				return
-			}
-			// NOTE: ApplicationIdentifiers does not seem to implement UnmarshalProtoJSON.
-			var v ApplicationIdentifiers
-			golang.UnmarshalMessage(s, &v)
-			x.ApplicationIds = &v
-		case "end_device_ids", "endDeviceIds":
-			if s.ReadNil() {
-				x.EndDeviceIds = nil
-				return
-			}
-			x.EndDeviceIds = &EndDeviceIdentifiers{}
-			x.EndDeviceIds.UnmarshalProtoJSON(s.WithField("end_device_ids", true))
-		case "type":
-			s.AddField("type")
-			x.Type = s.ReadString()
 		case "limit":
 			s.AddField("limit")
 			if s.ReadNil() {

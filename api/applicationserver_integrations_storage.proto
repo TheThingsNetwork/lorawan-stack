@@ -28,17 +28,14 @@ package ttn.lorawan.v3;
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
 message ContinuationTokenPayload {
-  ApplicationIdentifiers application_ids = 1;
-  EndDeviceIdentifiers end_device_ids = 2;
-  string type = 3;
-  google.protobuf.UInt32Value limit = 4;
-  google.protobuf.Timestamp after = 5;
-  google.protobuf.Timestamp before = 6;
-  google.protobuf.UInt32Value f_port = 7;
-  string order = 8;
-  google.protobuf.FieldMask field_mask = 9;
-  google.protobuf.Duration last = 10;
-  int64 last_received_id = 11;
+  google.protobuf.UInt32Value limit = 1;
+  google.protobuf.Timestamp after = 2;
+  google.protobuf.Timestamp before = 3;
+  google.protobuf.UInt32Value f_port = 4;
+  string order = 5;
+  google.protobuf.FieldMask field_mask = 6;
+  google.protobuf.Duration last = 7;
+  int64 last_received_id = 8;
 }
 
 message GetStoredApplicationUpRequest {
