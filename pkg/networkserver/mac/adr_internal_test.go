@@ -29,6 +29,7 @@ var (
 	ADRMargin            = adrMargin
 	ADRAdaptDataRate     = adrAdaptDataRate
 	ADRAdaptTxPowerIndex = adrAdaptTxPowerIndex
+	ADRAdaptNbTrans      = adrAdaptNbTrans
 
 	ClampDataRateRange = clampDataRateRange
 	ClampTxPowerRange  = clampTxPowerRange

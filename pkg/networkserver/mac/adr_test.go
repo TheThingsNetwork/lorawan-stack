@@ -2346,3 +2346,162 @@ func TestADRAdaptTxPowerIndex(t *testing.T) {
 		})
 	}
 }
+
+func TestADRAdaptNbTrans(t *testing.T) {
+	t.Parallel()
+
+	newUplink := func(fCnt uint32) *ttnpb.MACState_UplinkMessage {
+		up := &ttnpb.MACState_UplinkMessage{
+			Payload: &ttnpb.Message{
+				Payload: &ttnpb.Message_MacPayload{
+					MacPayload: &ttnpb.MACPayload{
+						FullFCnt: fCnt,
+					},
+				},
+			},
+		}
+		return up
+	}
+	newUplinkSeries := func(n uint32) []*ttnpb.MACState_UplinkMessage {
+		ups := make([]*ttnpb.MACState_UplinkMessage, 0, n)
+		for i := uint32(0); i != n; i++ {
+			ups = append(ups, newUplink(i))
+		}
+		return ups
+	}
+	newEndDevice := func(current, desired uint32) *ttnpb.EndDevice {
+		return &ttnpb.EndDevice{
+			MacState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrNbTrans: current,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrNbTrans: desired,
+				},
+			},
+		}
+	}
+
+	for _, tc := range []struct {
+		Name string
+
+		Device   *ttnpb.EndDevice
+		Defaults *ttnpb.MACSettings
+		Uplinks  []*ttnpb.MACState_UplinkMessage
+
+		ExpectedDevice *ttnpb.EndDevice
+	}{
+		{
+			Name: "not enough uplinks",
+
+			Device: newEndDevice(2, 2),
+
+			ExpectedDevice: newEndDevice(2, 2),
+		},
+		{
+			Name: "under 5% loss rate; 3 to 2",
+
+			Device:  newEndDevice(3, 3),
+			Uplinks: newUplinkSeries(10),
+
+			ExpectedDevice: newEndDevice(3, 2),
+		},
+		{
+			Name: "under 5% loss rate; 2 to 1",
+
+			Device:  newEndDevice(2, 2),
+			Uplinks: newUplinkSeries(10),
+
+			ExpectedDevice: newEndDevice(2, 1),
+		},
+		{
+			Name: "under 5% loss rate; 1 to 1",
+
+			Device:  newEndDevice(1, 1),
+			Uplinks: newUplinkSeries(10),
+
+			ExpectedDevice: newEndDevice(1, 1),
+		},
+		{
+			Name: "under 10% loss rate; 3 to 3",
+
+			Device:  newEndDevice(3, 3),
+			Uplinks: append(newUplinkSeries(20), newUplink(22)), // 2 / 22 = 9% loss rate
+
+			ExpectedDevice: newEndDevice(3, 3),
+		},
+		{
+			Name: "under 10% loss rate; 2 to 2",
+
+			Device:  newEndDevice(2, 2),
+			Uplinks: append(newUplinkSeries(20), newUplink(22)), // 2 / 22 = 9% loss rate
+
+			ExpectedDevice: newEndDevice(2, 2),
+		},
+		{
+			Name: "under 10% loss rate; 1 to 1",
+
+			Device:  newEndDevice(1, 1),
+			Uplinks: append(newUplinkSeries(20), newUplink(22)), // 3 / 22 = 13% loss rate
+
+			ExpectedDevice: newEndDevice(1, 1),
+		},
+		{
+			Name: "under 30% loss rate; 3 to 3",
+
+			Device:  newEndDevice(3, 3),
+			Uplinks: append(newUplinkSeries(20), newUplink(23)), // 3 / 22 = 13% loss rate
+
+			ExpectedDevice: newEndDevice(3, 3),
+		},
+		{
+			Name: "under 30% loss rate; 2 to 3",
+
+			Device:  newEndDevice(2, 2),
+			Uplinks: append(newUplinkSeries(20), newUplink(23)), // 3 / 22 = 13% loss rate
+
+			ExpectedDevice: newEndDevice(2, 3),
+		},
+		{
+			Name: "under 30% loss rate; 1 to 2",
+
+			Device:  newEndDevice(1, 1),
+			Uplinks: append(newUplinkSeries(20), newUplink(23)), // 3 / 22 = 13% loss rate
+
+			ExpectedDevice: newEndDevice(1, 2),
+		},
+		{
+			Name: "over 30% loss rate; 1 to 3",
+
+			Device:  newEndDevice(1, 1),
+			Uplinks: append(newUplinkSeries(10), newUplink(15)), // 5 / 16 = 31% loss rate
+
+			ExpectedDevice: newEndDevice(1, 3),
+		},
+		{
+			Name: "over 30% loss rate; 2 to 3",
+
+			Device:  newEndDevice(2, 2),
+			Uplinks: append(newUplinkSeries(10), newUplink(15)), // 5 / 16 = 31% loss rate
+
+			ExpectedDevice: newEndDevice(2, 3),
+		},
+		{
+			Name: "over 30% loss rate; 3 to 3",
+
+			Device:  newEndDevice(3, 3),
+			Uplinks: append(newUplinkSeries(10), newUplink(15)), // 5 / 16 = 31% loss rate
+
+			ExpectedDevice: newEndDevice(3, 3),
+		},
+	} {
+		tc := tc
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
+			a := assertions.New(t)
+			ADRAdaptNbTrans(tc.Device, tc.Defaults, tc.Uplinks)
+			a.So(tc.Device, should.Resemble, tc.ExpectedDevice)
+		})
+	}
+}
