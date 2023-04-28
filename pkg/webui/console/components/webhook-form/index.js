@@ -317,7 +317,7 @@ export default class WebhookForm extends Component {
     const encodedValues = encodeValues(castedWebhookValues)
     const webhookId = encodedValues.ids.webhook_id
     const exists = await existCheck(webhookId)
-    this.setState({ showDecodeError: decodeValues(encodedValues).headers.Authorization === '' })
+    this.setState({ showDecodeError: decodeValues(encodedValues).headers.Authorization === null })
     if (exists) {
       this.setState({ displayOverwriteModal: true, existingId: webhookId })
       await new Promise((resolve, reject) => {
