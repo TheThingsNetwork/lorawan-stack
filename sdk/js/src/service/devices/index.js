@@ -23,6 +23,7 @@ import combineStreams from '../../util/combine-streams'
 import deviceEntityMap from '../../../generated/device-entity-map.json'
 import DownlinkQueue from '../downlink-queue'
 import { STACK_COMPONENTS_MAP } from '../../util/constants'
+import DeviceClaim from '../claim'
 
 import Repository from './repository'
 import { splitSetPaths, splitGetPaths, makeRequests } from './split'
@@ -45,6 +46,7 @@ class Devices {
 
     this.DownlinkQueue = new DownlinkQueue(api.AppAs, { stackConfig })
     this.Repository = new Repository(api.DeviceRepository)
+    this.DeviceClaim = new DeviceClaim(api.DeviceClaim, { stackConfig })
 
     this.deviceCreationAllowedFieldMaskPaths = [
       ...this._api.EndDeviceRegistry.UpdateAllowedFieldMaskPaths,
@@ -513,6 +515,29 @@ class Devices {
         'end_device.ids.application_ids.application_id': applicationId,
       },
     }
+
+    // If CAC is set, attempt to claim the End Device via the DCS.
+    if (devicePayload.end_device.claim_authentication_code) {
+      try {
+        const payload = {
+          authenticated_identifiers: {
+            authentication_code: devicePayload.end_device.claim_authentication_code.value,
+          },
+          target_device_id: deviceId,
+          target_application_ids: {
+            application_id: applicationId,
+          },
+        }
+        const response = await this._api.EndDeviceClaimingServer.Claim(undefined, payload)
+
+        return Marshaler.payloadSingleResponse(response)
+      } catch (error) {
+        if (error.statusCode === 400) {
+          throw error
+        }
+      }
+    }
+
     const setParts = await makeRequests(
       this._api,
       this._stackConfig,
