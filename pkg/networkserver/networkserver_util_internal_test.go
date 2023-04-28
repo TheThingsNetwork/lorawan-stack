@@ -32,7 +32,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
-	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
@@ -211,6 +210,10 @@ func MakeCFList(conf CFListConfig) *ttnpb.CFList {
 	if conf.MACState != nil {
 		conf.DataRateOffset = conf.MACState.CurrentParameters.Rx1DataRateOffset
 	}
+	channels, err := mac.DeviceDesiredChannels(&ttnpb.EndDevice{}, &phy, fp, nil)
+	if err != nil {
+		panic(fmt.Sprintf("Cannot generate desired channels: %v", err))
+	}
 	drIdx, err := phy.Rx1DataRate(conf.DataRateIndex, conf.DataRateOffset, downlinkDwellTime)
 	if err != nil {
 		panic(fmt.Sprintf("Cannot compute RX1 data rate: %v", err))
@@ -222,7 +225,7 @@ func MakeCFList(conf CFListConfig) *ttnpb.CFList {
 	if dr.MaxMACPayloadSize(downlinkDwellTime)+5 < lorawan.JoinAcceptWithCFListLength {
 		return nil
 	}
-	return frequencyplans.CFList(fp, conf.PHYVersion)
+	return mac.CFList(&phy, channels...)
 }
 
 type NsJsJoinRequestConfig struct {

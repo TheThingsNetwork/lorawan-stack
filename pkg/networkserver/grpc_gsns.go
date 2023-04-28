@@ -27,7 +27,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
-	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
@@ -1278,7 +1277,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	// NOTE: The 5 bytes added to the maximum represent the MHDR (1 byte) and the MIC (4 bytes).
 	var cfList *ttnpb.CFList
 	if maxMACPayloadSize+5 >= lorawan.JoinAcceptWithCFListLength {
-		cfList = frequencyplans.CFList(fp, matched.LorawanPhyVersion)
+		cfList = mac.CFList(phy, macState.DesiredParameters.Channels...)
 	}
 	dlSettings := &ttnpb.DLSettings{
 		Rx1DrOffset: macState.DesiredParameters.Rx1DataRateOffset,
