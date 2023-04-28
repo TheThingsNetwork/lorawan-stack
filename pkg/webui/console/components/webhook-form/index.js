@@ -293,6 +293,7 @@ export default class WebhookForm extends Component {
       shouldShowCredentialsInput: Boolean(
         initialWebhookValue?.headers?.Authorization?.startsWith('Basic '),
       ),
+      showDecodeError: decodeValues(initialWebhookValue).headers?.Authorization === '',
       displayOverwriteModal: false,
       existingId: undefined,
       error: undefined,
@@ -316,6 +317,7 @@ export default class WebhookForm extends Component {
     const encodedValues = encodeValues(castedWebhookValues)
     const webhookId = encodedValues.ids.webhook_id
     const exists = await existCheck(webhookId)
+    this.setState({ showDecodeError: decodeValues(encodedValues).headers.Authorization === '' })
     if (exists) {
       this.setState({ displayOverwriteModal: true, existingId: webhookId })
       await new Promise((resolve, reject) => {
@@ -368,6 +370,11 @@ export default class WebhookForm extends Component {
       ])
     }
     this.setState({ shouldShowCredentialsInput: event.target.checked })
+  }
+
+  @bind
+  handleHeadersChange() {
+    this.setState({ showDecodeError: !hasNoEmptyEntry })
   }
 
   render() {
@@ -512,6 +519,16 @@ export default class WebhookForm extends Component {
                 sensitive
               />
             </Form.FieldContainer>
+          )}
+          {this.state.showDecodeError && (
+            <Notification
+              warning
+              content={
+                'Something went wrong and the contents of the Authorization header could not be decoded.'
+              }
+              small
+              className="mt-cs-xl"
+            />
           )}
           <Form.Field
             name="_headers"

@@ -85,12 +85,20 @@ export const decodeValues = backendValues => {
   if (backendValues?.headers?.Authorization?.startsWith('Basic ')) {
     const encodedCredentials = backendValues.headers.Authorization.split('Basic ')[1]
     if (encodedCredentials) {
-      const decodedCredentials = atob(encodedCredentials)
-      formValues._basic_auth_enabled = true
-      formValues._basic_auth_username = decodedCredentials.slice(0, decodedCredentials.indexOf(':'))
-      formValues._basic_auth_password = decodedCredentials.slice(
-        decodedCredentials.indexOf(':') + 1,
-      )
+      let decodedCredentials
+      try {
+        decodedCredentials = atob(encodedCredentials)
+        formValues._basic_auth_enabled = true
+        formValues._basic_auth_username = decodedCredentials.slice(
+          0,
+          decodedCredentials.indexOf(':'),
+        )
+        formValues._basic_auth_password = decodedCredentials.slice(
+          decodedCredentials.indexOf(':') + 1,
+        )
+      } catch (err) {
+        backendValues.headers.Authorization = null
+      }
     }
   } else {
     formValues._basic_auth_enabled = false
