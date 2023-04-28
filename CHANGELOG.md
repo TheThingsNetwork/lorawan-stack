@@ -20,6 +20,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Console not applying webhook field masks when creating a webhook from a template that has field masks set.
+- Fix crash of "Edit webhook" view due to invalid Authorization header encoding in the Console.
 
 ### Security
 
