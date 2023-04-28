@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Support claim in device import in the Console.
+
 ### Changed
 
 ### Deprecated
