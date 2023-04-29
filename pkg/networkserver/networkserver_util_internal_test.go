@@ -32,7 +32,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
-	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
@@ -222,7 +221,7 @@ func MakeCFList(conf CFListConfig) *ttnpb.CFList {
 	if dr.MaxMACPayloadSize(downlinkDwellTime)+5 < lorawan.JoinAcceptWithCFListLength {
 		return nil
 	}
-	return frequencyplans.CFList(fp, conf.PHYVersion)
+	return mac.CFList(&phy, mac.DeviceDesiredChannels(&ttnpb.EndDevice{}, &phy, fp, nil)...)
 }
 
 type NsJsJoinRequestConfig struct {
@@ -1712,7 +1711,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 					RejoinCountPeriodicity:     ttnpb.RejoinCountExponent_REJOIN_COUNT_16,
 					PingSlotFrequency:          mac.DeviceDesiredPingSlotFrequency(dev, phy, fp, defaultMACSettings),
 					BeaconFrequency:            mac.DeviceDesiredBeaconFrequency(dev, phy, defaultMACSettings),
-					Channels:                   test.Must(mac.DeviceDesiredChannels(dev, phy, fp, defaultMACSettings)).([]*ttnpb.MACParameters_Channel),
+					Channels:                   mac.DeviceDesiredChannels(dev, phy, fp, defaultMACSettings),
 					UplinkDwellTime:            mac.DeviceDesiredUplinkDwellTime(phy, fp),
 					DownlinkDwellTime:          mac.DeviceDesiredDownlinkDwellTime(phy, fp),
 					AdrAckLimitExponent:        mac.DeviceDesiredADRAckLimitExponent(dev, phy, defaultMACSettings),

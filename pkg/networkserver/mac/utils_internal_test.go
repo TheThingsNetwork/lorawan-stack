@@ -130,7 +130,7 @@ func TestDeviceDesiredChannels(t *testing.T) {
 			DownlinkFrequency: au915928Pre102BDownlinkChannels[i%8].Frequency,
 			MinDataRateIndex:  minDataRate,
 			MaxDataRateIndex:  maxDataRate,
-			EnableUplink:      i >= 8 && i < 16, // FSB2
+			EnableUplink:      i >= 8 && i < 16 || i == 65, // FSB2
 		})
 	}
 
@@ -148,7 +148,7 @@ func TestDeviceDesiredChannels(t *testing.T) {
 			DownlinkFrequency: au915928Post102BDownlinkChannels[i%8].Frequency,
 			MinDataRateIndex:  minDataRate,
 			MaxDataRateIndex:  maxDataRate,
-			EnableUplink:      i >= 8 && i < 16, // FSB2
+			EnableUplink:      i >= 8 && i < 16 || i == 65, // FSB2
 		})
 	}
 
@@ -190,8 +190,7 @@ func TestDeviceDesiredChannels(t *testing.T) {
 
 				pb := ttnpb.Clone(tc.Device)
 
-				deviceDesiredChannels, err := DeviceDesiredChannels(pb, tc.Band, tc.FrequencyPlan, &ttnpb.MACSettings{})
-				a.So(err, should.BeNil)
+				deviceDesiredChannels := DeviceDesiredChannels(pb, tc.Band, tc.FrequencyPlan, &ttnpb.MACSettings{})
 				a.So(deviceDesiredChannels, should.Resemble, tc.Channels)
 				a.So(pb, should.Resemble, tc.Device)
 			},
@@ -602,6 +601,7 @@ func TestNewState(t *testing.T) {
 									904100000,
 									904300000,
 									904500000,
+									904600000,
 									904700000,
 									904900000,
 									905100000,

@@ -246,7 +246,7 @@ downlink-channels:
   max-data-rate: 13
 lora-standard-channel:
   frequency: 904600000
-  data-rate: 12
+  data-rate: 4
   radio: 0
 dwell-time:
   uplinks: true
@@ -394,7 +394,7 @@ uplink-channels:
   radio: 1
 lora-standard-channel:
   frequency: 917500000
-  data-rate: 12
+  data-rate: 6
   radio: 0
 radios:
 - enable: true
