@@ -591,7 +591,7 @@ outer:
 
 func DeviceDesiredChannels(
 	dev *ttnpb.EndDevice, phy *band.Band, fp *frequencyplans.FrequencyPlan, defaults *ttnpb.MACSettings,
-) ([]*ttnpb.MACParameters_Channel, error) {
+) []*ttnpb.MACParameters_Channel {
 	if len(phy.DownlinkChannels) > len(phy.UplinkChannels) ||
 		len(phy.UplinkChannels) > int(phy.MaxUplinkChannels) ||
 		len(phy.DownlinkChannels) > int(phy.MaxDownlinkChannels) ||
@@ -615,44 +615,51 @@ func DeviceDesiredChannels(
 		})
 	}
 
-	latestPhy, err := band.GetLatest(phy.ID)
-	if err != nil {
-		return nil, err
-	}
-
-outer:
-	for i, fpUpCh := range fp.UplinkChannels {
-		minDataRateIndex, maxDataRateIndex, err := mapDataRateIndices(
-			&latestPhy,
-			ttnpb.DataRateIndex(fpUpCh.MinDataRate),
-			ttnpb.DataRateIndex(fpUpCh.MaxDataRate),
-			phy,
-		)
-		if err != nil {
-			return nil, err
-		}
-		for _, ch := range chs {
-			if ch.UplinkFrequency == fpUpCh.Frequency {
-				ch.MinDataRateIndex = minDataRateIndex
-				ch.MaxDataRateIndex = maxDataRateIndex
-				ch.EnableUplink = true
-				// NOTE: duplicates should not be allowed.
-				continue outer
+	switch phy.CFListType {
+	case ttnpb.CFListType_CHANNEL_MASKS:
+		// Mask based regions at the moment of writing cannot have extra channels,
+		// nor any custom data rate ranges. As such, we only enable the channels.
+	outerMasks:
+		for _, fpUpCh := range fp.UplinkChannels {
+			for _, ch := range chs {
+				if ch.UplinkFrequency == fpUpCh.Frequency {
+					ch.EnableUplink = true
+					// NOTE: duplicates should not be allowed.
+					continue outerMasks
+				}
 			}
 		}
-		downFreq := fpUpCh.Frequency
-		if i < len(fp.DownlinkChannels) {
-			downFreq = fp.DownlinkChannels[i].Frequency
+	case ttnpb.CFListType_FREQUENCIES:
+	outerFreqs:
+		for i, fpUpCh := range fp.UplinkChannels {
+			minDataRateIndex := ttnpb.DataRateIndex(fpUpCh.MinDataRate)
+			maxDataRateIndex := ttnpb.DataRateIndex(fpUpCh.MaxDataRate)
+			for _, ch := range chs {
+				if ch.UplinkFrequency == fpUpCh.Frequency {
+					ch.MinDataRateIndex = minDataRateIndex
+					ch.MaxDataRateIndex = maxDataRateIndex
+					ch.EnableUplink = true
+					// NOTE: duplicates should not be allowed.
+					continue outerFreqs
+				}
+			}
+			downFreq := fpUpCh.Frequency
+			if i < len(fp.DownlinkChannels) {
+				downFreq = fp.DownlinkChannels[i].Frequency
+			}
+			chs = append(chs, &ttnpb.MACParameters_Channel{
+				MinDataRateIndex:  minDataRateIndex,
+				MaxDataRateIndex:  maxDataRateIndex,
+				UplinkFrequency:   fpUpCh.Frequency,
+				DownlinkFrequency: downFreq,
+				EnableUplink:      true,
+			})
 		}
-		chs = append(chs, &ttnpb.MACParameters_Channel{
-			MinDataRateIndex:  minDataRateIndex,
-			MaxDataRateIndex:  maxDataRateIndex,
-			UplinkFrequency:   fpUpCh.Frequency,
-			DownlinkFrequency: downFreq,
-			EnableUplink:      true,
-		})
+	default:
+		panic("unreachable")
 	}
-	return chs, nil
+
+	return chs
 }
 
 const defaultClassBCDownlinkInterval = time.Second
@@ -699,10 +706,6 @@ func NewState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults *ttnpb.M
 	}
 	desired := current
 	if !dev.Multicast {
-		deviceDesiredChannels, err := DeviceDesiredChannels(dev, phy, fp, defaults)
-		if err != nil {
-			return nil, err
-		}
 		desired = &ttnpb.MACParameters{
 			MaxEirp:                    DeviceDesiredMaxEIRP(dev, phy, fp, defaults),
 			AdrDataRateIndex:           ttnpb.DataRateIndex_DATA_RATE_0,
@@ -716,7 +719,7 @@ func NewState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults *ttnpb.M
 			RejoinCountPeriodicity:     ttnpb.RejoinCountExponent_REJOIN_COUNT_16,
 			PingSlotFrequency:          DeviceDesiredPingSlotFrequency(dev, phy, fp, defaults),
 			BeaconFrequency:            DeviceDesiredBeaconFrequency(dev, phy, defaults),
-			Channels:                   deviceDesiredChannels,
+			Channels:                   DeviceDesiredChannels(dev, phy, fp, defaults),
 			UplinkDwellTime:            DeviceDesiredUplinkDwellTime(phy, fp),
 			DownlinkDwellTime:          DeviceDesiredDownlinkDwellTime(phy, fp),
 			AdrAckLimitExponent:        DeviceDesiredADRAckLimitExponent(dev, phy, defaults),
@@ -771,26 +774,6 @@ func DeviceScheduleDownlinks(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings) 
 	default:
 		return true
 	}
-}
-
-// mapDataRateIndices maps the provided data rate indices from the latest version
-// of the band to the provided target band. If the minimum data rate index is not
-// available, ttnpb.DataRateIndex_DATA_RATE_0 will be used.
-func mapDataRateIndices(
-	sourceBand *band.Band,
-	sourceMinDataRateIndex,
-	sourceMaxDataRateIndex ttnpb.DataRateIndex,
-	targetBand *band.Band,
-) (targetMinDataRateIndex, targetMaxDataRateIndex ttnpb.DataRateIndex, err error) {
-	targetMinDataRateIndex, err = band.MapDataRateIndex(sourceBand, sourceMinDataRateIndex, targetBand)
-	if err != nil {
-		targetMinDataRateIndex = ttnpb.DataRateIndex_DATA_RATE_0
-	}
-	targetMaxDataRateIndex, err = band.MapDataRateIndex(sourceBand, sourceMaxDataRateIndex, targetBand)
-	if err != nil {
-		return 0, 0, err
-	}
-	return targetMinDataRateIndex, targetMaxDataRateIndex, nil
 }
 
 func containsMACCommandIdentifier(cid ttnpb.MACCommandIdentifier) func(...ttnpb.MACCommandIdentifier) bool {

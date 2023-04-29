@@ -1239,8 +1239,6 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		return err
 	}
 
-	enableLoRaStandardChannel(up.Settings.Frequency, macState, phy, fp)
-
 	chIdx, err := searchUplinkChannel(up.Settings.Frequency, macState)
 	if err != nil {
 		return err

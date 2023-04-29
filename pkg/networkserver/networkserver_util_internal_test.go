@@ -210,10 +210,6 @@ func MakeCFList(conf CFListConfig) *ttnpb.CFList {
 	if conf.MACState != nil {
 		conf.DataRateOffset = conf.MACState.CurrentParameters.Rx1DataRateOffset
 	}
-	channels, err := mac.DeviceDesiredChannels(&ttnpb.EndDevice{}, &phy, fp, nil)
-	if err != nil {
-		panic(fmt.Sprintf("Cannot generate desired channels: %v", err))
-	}
 	drIdx, err := phy.Rx1DataRate(conf.DataRateIndex, conf.DataRateOffset, downlinkDwellTime)
 	if err != nil {
 		panic(fmt.Sprintf("Cannot compute RX1 data rate: %v", err))
@@ -225,7 +221,7 @@ func MakeCFList(conf CFListConfig) *ttnpb.CFList {
 	if dr.MaxMACPayloadSize(downlinkDwellTime)+5 < lorawan.JoinAcceptWithCFListLength {
 		return nil
 	}
-	return mac.CFList(&phy, channels...)
+	return mac.CFList(&phy, mac.DeviceDesiredChannels(&ttnpb.EndDevice{}, &phy, fp, nil)...)
 }
 
 type NsJsJoinRequestConfig struct {
@@ -1715,7 +1711,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 					RejoinCountPeriodicity:     ttnpb.RejoinCountExponent_REJOIN_COUNT_16,
 					PingSlotFrequency:          mac.DeviceDesiredPingSlotFrequency(dev, phy, fp, defaultMACSettings),
 					BeaconFrequency:            mac.DeviceDesiredBeaconFrequency(dev, phy, defaultMACSettings),
-					Channels:                   test.Must(mac.DeviceDesiredChannels(dev, phy, fp, defaultMACSettings)).([]*ttnpb.MACParameters_Channel),
+					Channels:                   mac.DeviceDesiredChannels(dev, phy, fp, defaultMACSettings),
 					UplinkDwellTime:            mac.DeviceDesiredUplinkDwellTime(phy, fp),
 					DownlinkDwellTime:          mac.DeviceDesiredDownlinkDwellTime(phy, fp),
 					AdrAckLimitExponent:        mac.DeviceDesiredADRAckLimitExponent(dev, phy, defaultMACSettings),

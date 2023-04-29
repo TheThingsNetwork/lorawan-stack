@@ -35,8 +35,6 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
-var EnableLoRaStandardChannel = enableLoRaStandardChannel
-
 func TestNextDataDownlinkSlot(t *testing.T) {
 	nextPingSlotAt := func(ctx context.Context, dev *ttnpb.EndDevice, earliestAt time.Time) time.Time {
 		pingSlotAt, ok := mac.NextPingSlotAt(ctx, dev, earliestAt)

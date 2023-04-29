@@ -20,7 +20,6 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
-	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
@@ -46,27 +45,6 @@ func searchUplinkChannel(freq uint64, macState *ttnpb.MACState) (uint8, error) {
 		return uint8(i), nil
 	}
 	return 0, errUplinkChannelNotFound.WithAttributes("frequency", freq)
-}
-
-// The bands which use fixed channel plans may send join requests via the LoRa standard channel.
-// We need to enable the channel as part of the desired MAC state, in order to avoid generating
-// an invalid CFList.
-func enableLoRaStandardChannel(
-	freq uint64, macState *ttnpb.MACState, phy *band.Band, fp *frequencyplans.FrequencyPlan,
-) {
-	if phy.CFListType != ttnpb.CFListType_CHANNEL_MASKS {
-		return
-	}
-	if ch := fp.LoRaStandardChannel; ch == nil || ch.Frequency != freq {
-		return
-	}
-	for _, ch := range macState.DesiredParameters.Channels {
-		if ch == nil || ch.UplinkFrequency != freq {
-			continue
-		}
-		ch.EnableUplink = true
-		break
-	}
 }
 
 type downlinkSlot interface {

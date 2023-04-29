@@ -190,8 +190,7 @@ func TestDeviceDesiredChannels(t *testing.T) {
 
 				pb := ttnpb.Clone(tc.Device)
 
-				deviceDesiredChannels, err := DeviceDesiredChannels(pb, tc.Band, tc.FrequencyPlan, &ttnpb.MACSettings{})
-				a.So(err, should.BeNil)
+				deviceDesiredChannels := DeviceDesiredChannels(pb, tc.Band, tc.FrequencyPlan, &ttnpb.MACSettings{})
 				a.So(deviceDesiredChannels, should.Resemble, tc.Channels)
 				a.So(pb, should.Resemble, tc.Device)
 			},
