@@ -629,6 +629,16 @@ func DeviceDesiredChannels(
 				}
 			}
 		}
+		stdCh := fp.LoRaStandardChannel
+		if stdCh == nil {
+			break
+		}
+		for _, ch := range chs {
+			if ch.UplinkFrequency == stdCh.Frequency {
+				ch.EnableUplink = true
+				break
+			}
+		}
 	case ttnpb.CFListType_FREQUENCIES:
 	outerFreqs:
 		for i, fpUpCh := range fp.UplinkChannels {

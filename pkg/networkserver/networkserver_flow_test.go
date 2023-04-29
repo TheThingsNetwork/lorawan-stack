@@ -82,7 +82,7 @@ func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYV
 		if !otaa || beforeRP001_V1_0_3_REV_A {
 			linkADRReqs = append([]MACCommander{
 				&ttnpb.MACCommand_LinkADRReq{
-					ChannelMask:        []bool{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+					ChannelMask:        []bool{false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
 					ChannelMaskControl: 7,
 					DataRateIndex:      ttnpb.DataRateIndex_DATA_RATE_3,
 					TxPowerIndex:       1,

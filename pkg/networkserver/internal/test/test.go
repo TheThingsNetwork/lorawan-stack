@@ -365,6 +365,7 @@ func MakeDefaultUS915FSB2DesiredChannels() []*ttnpb.MACParameters_Channel {
 			904100000,
 			904300000,
 			904500000,
+			904600000,
 			904700000,
 			904900000,
 			905100000,

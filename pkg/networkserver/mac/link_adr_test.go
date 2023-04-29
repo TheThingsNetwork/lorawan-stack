@@ -142,7 +142,7 @@ func TestLinkADRReq(t *testing.T) {
 			Commands: []*ttnpb.MACCommand_LinkADRReq{
 				{
 					ChannelMask: []bool{
-						false, false, false, false, false, false, false, false,
+						false, true, false, false, false, false, false, false,
 						false, false, false, false, false, false, false, false,
 					},
 					ChannelMaskControl: 7,
@@ -169,7 +169,7 @@ func TestLinkADRReq(t *testing.T) {
 			Commands: []*ttnpb.MACCommand_LinkADRReq{
 				{
 					ChannelMask: []bool{
-						false, false, false, false, false, false, false, false,
+						false, true, false, false, false, false, false, false,
 						false, false, false, false, false, false, false, false,
 					},
 					ChannelMaskControl: 7,
@@ -292,7 +292,7 @@ func TestLinkADRReq(t *testing.T) {
 			Commands: []*ttnpb.MACCommand_LinkADRReq{
 				{
 					ChannelMask: []bool{
-						false, false, false, false, false, false, false, false,
+						false, true, false, false, false, false, false, false,
 						false, false, false, false, false, false, false, false,
 					},
 					ChannelMaskControl: 7,
@@ -503,10 +503,8 @@ func TestHandleLinkADRAns(t *testing.T) {
 							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_4,
 							TxPowerIndex:  42,
 							ChannelMask: []bool{
-								false, true, false, false,
-								false, false, false, false,
-								false, false, false, false,
-								false, false, false, false,
+								false, true, false, false, false, false, false, false,
+								false, false, false, false, false, false, false, false,
 							},
 						}).MACCommand(),
 					},
@@ -581,20 +579,16 @@ func TestHandleLinkADRAns(t *testing.T) {
 							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 							TxPowerIndex:  42,
 							ChannelMask: []bool{
-								true, true, true, false,
-								true, true, true, true,
-								true, true, true, true,
-								true, true, false, false,
+								true, true, true, false, true, true, true, true,
+								true, true, true, true, true, true, false, false,
 							},
 						}).MACCommand(),
 						(&ttnpb.MACCommand_LinkADRReq{
 							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_10,
 							TxPowerIndex:  43,
 							ChannelMask: []bool{
-								false, true, true, false,
-								true, true, true, true,
-								true, true, true, true,
-								true, true, false, false,
+								false, true, true, false, true, true, true, true,
+								true, true, true, true, true, true, false, false,
 							},
 						}).MACCommand(),
 					},
@@ -675,20 +669,16 @@ func TestHandleLinkADRAns(t *testing.T) {
 							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 							TxPowerIndex:  42,
 							ChannelMask: []bool{
-								true, true, true, false,
-								true, true, true, true,
-								true, true, true, true,
-								true, true, false, false,
+								true, true, true, false, true, true, true, true,
+								true, true, true, true, true, true, false, false,
 							},
 						}).MACCommand(),
 						(&ttnpb.MACCommand_LinkADRReq{
 							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_10,
 							TxPowerIndex:  43,
 							ChannelMask: []bool{
-								false, true, true, false,
-								true, true, true, true,
-								true, true, true, true,
-								true, true, false, false,
+								false, true, true, false, true, true, true, true,
+								true, true, true, true, true, true, false, false,
 							},
 						}).MACCommand(),
 					},
@@ -768,20 +758,16 @@ func TestHandleLinkADRAns(t *testing.T) {
 							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 							TxPowerIndex:  42,
 							ChannelMask: []bool{
-								true, true, true, false,
-								true, true, true, true,
-								true, true, true, true,
-								true, true, false, false,
+								true, true, true, false, true, true, true, true,
+								true, true, true, true, true, true, false, false,
 							},
 						}).MACCommand(),
 						(&ttnpb.MACCommand_LinkADRReq{
 							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_10,
 							TxPowerIndex:  43,
 							ChannelMask: []bool{
-								false, true, true, false,
-								true, true, true, true,
-								true, true, true, true,
-								true, true, false, false,
+								false, true, true, false, true, true, true, true,
+								true, true, true, true, true, true, false, false,
 							},
 						}).MACCommand(),
 					},
@@ -819,10 +805,8 @@ func TestHandleLinkADRAns(t *testing.T) {
 							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_10,
 							TxPowerIndex:  43,
 							ChannelMask: []bool{
-								false, true, true, false,
-								true, true, true, true,
-								true, true, true, true,
-								true, true, false, false,
+								false, true, true, false, true, true, true, true,
+								true, true, true, true, true, true, false, false,
 							},
 						}).MACCommand(),
 					},
@@ -858,10 +842,8 @@ func TestHandleLinkADRAns(t *testing.T) {
 							ChannelMaskControl: 7,
 							NbTrans:            3,
 							ChannelMask: []bool{
-								false, false, false, false,
-								false, false, false, false,
-								false, false, false, false,
-								false, false, false, false,
+								false, true, false, false, false, false, false, false,
+								false, false, false, false, false, false, false, false,
 							},
 						}).MACCommand(),
 						(&ttnpb.MACCommand_LinkADRReq{
@@ -869,10 +851,8 @@ func TestHandleLinkADRAns(t *testing.T) {
 							TxPowerIndex:  1,
 							NbTrans:       3,
 							ChannelMask: []bool{
-								false, false, false, false,
-								false, false, false, false,
-								true, true, true, true,
-								true, true, true, true,
+								false, false, false, false, false, false, false, false,
+								true, true, true, true, true, true, true, true,
 							},
 						}).MACCommand(),
 					},

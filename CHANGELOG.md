@@ -27,7 +27,7 @@ For details about compatibility between different releases, see the **Commitment
   - An off-by-one error which caused the ADR algorithm to not take into consideration the signal qualities of the uplink which confirmed a parameter change. In effect, this fix improves the quality of the link budget estimation.
   - A flip-flop condition which caused the algorithm to swap back and forth between a higher and a lower transmission power index every 20 uplinks. In effect, this fix will cause the algorithm to change the transmission power index less often.
   - A condition mistake which caused the algorithm to avoid increasing the transmission power if it would not completely fix the missing link budget. In effect, this will cause the algorithm to increase the transmission power in situations in which the link budget deteriorates rapidly.
-- In fixed channel plans such as US915 and AU915, the join accept CFList no longer disables the associated wide (500KHz) channel.
+- In fixed channel plans such as US915 and AU915, the the associated wide (500KHz) channel is now enabled by default.
 
 ### Security
 
