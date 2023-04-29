@@ -34,11 +34,13 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-func channelDataRateRange(chs ...*ttnpb.MACParameters_Channel) (min, max ttnpb.DataRateIndex, ok bool) {
+func channelDataRateRange(
+	chs ...*ttnpb.MACParameters_Channel,
+) (min, max ttnpb.DataRateIndex, allowed map[ttnpb.DataRateIndex]struct{}, ok bool) {
 	i := 0
 	for {
 		if i >= len(chs) {
-			return 0, 0, false
+			return 0, 0, nil, false
 		}
 		if chs[i].GetEnableUplink() {
 			break
@@ -46,8 +48,24 @@ func channelDataRateRange(chs ...*ttnpb.MACParameters_Channel) (min, max ttnpb.D
 		i++
 	}
 
-	min = chs[i].MinDataRateIndex
-	max = chs[i].MaxDataRateIndex
+	allowed = make(map[ttnpb.DataRateIndex]struct{})
+	marked := make(map[struct{ min, max ttnpb.DataRateIndex }]struct{})
+	mark := func(min, max ttnpb.DataRateIndex) {
+		idx := struct{ min, max ttnpb.DataRateIndex }{
+			min: min,
+			max: max,
+		}
+		if _, ok := marked[idx]; ok {
+			return
+		}
+		marked[idx] = struct{}{}
+		for idx := min; idx <= max; idx++ {
+			allowed[idx] = struct{}{}
+		}
+	}
+
+	min, max = chs[i].MinDataRateIndex, chs[i].MaxDataRateIndex
+	mark(min, max)
 	for _, ch := range chs[i+1:] {
 		if !ch.GetEnableUplink() {
 			continue
@@ -58,11 +76,12 @@ func channelDataRateRange(chs ...*ttnpb.MACParameters_Channel) (min, max ttnpb.D
 		if ch.MinDataRateIndex < min {
 			min = ch.MinDataRateIndex
 		}
+		mark(min, max)
 	}
 	if min > max {
-		return 0, 0, false
+		return 0, 0, nil, false
 	}
-	return min, max, true
+	return min, max, allowed, true
 }
 
 // DefaultClassBTimeout is the default time-out for the device to respond to class B downlink messages.

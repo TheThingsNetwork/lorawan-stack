@@ -22,6 +22,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
@@ -524,6 +525,108 @@ func TestADRLossRate(t *testing.T) {
 	}
 }
 
+func TestADRInstability(t *testing.T) {
+	t.Parallel()
+
+	a, ctx := test.New(t)
+
+	makeUplink := func(i int, penalty float32) *ttnpb.MACState_UplinkMessage {
+		up := &ttnpb.MACState_UplinkMessage{
+			Payload: &ttnpb.Message{
+				MHdr: &ttnpb.MHDR{
+					MType: ttnpb.MType_UNCONFIRMED_UP,
+					Major: ttnpb.Major_LORAWAN_R1,
+				},
+				Payload: &ttnpb.Message_MacPayload{
+					MacPayload: &ttnpb.MACPayload{
+						FullFCnt: uint32(i),
+					},
+				},
+			},
+			Settings: &ttnpb.MACState_UplinkMessage_TxSettings{
+				DataRate: &ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
+							Bandwidth:       125_000,
+							SpreadingFactor: 7,
+							CodingRate:      band.Cr4_5,
+						},
+					},
+				},
+			},
+			RxMetadata: []*ttnpb.MACState_UplinkMessage_RxMetadata{
+				{
+					Snr: 14.0 - penalty,
+				},
+			},
+		}
+		return up
+	}
+
+	channels := []*ttnpb.MACParameters_Channel{
+		{
+			EnableUplink:     true,
+			MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+		},
+	}
+	currentParameters, desiredParameters := &ttnpb.MACParameters{
+		AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+		AdrTxPowerIndex:  0,
+		AdrNbTrans:       1,
+		Channels:         channels,
+	}, &ttnpb.MACParameters{
+		AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+		AdrTxPowerIndex:  0,
+		AdrNbTrans:       1,
+		Channels:         channels,
+	}
+	macState := &ttnpb.MACState{
+		CurrentParameters: currentParameters,
+		DesiredParameters: desiredParameters,
+	}
+	dev := &ttnpb.EndDevice{
+		MacState: macState,
+	}
+	phy := &band.EU_863_870_RP1_V1_0_2_Rev_B
+
+	expectedTxPowers := []uint32{
+		// Jump from transmission power 0 to 2 due to extra budget of 4 dB.
+		2,
+		// Do nothing while the ADR safety margin is in place.
+		2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+		// Jump from transmission power 2 to 3 due to extra budget of 2 dB (removed safety margin).
+		3,
+		// Do nothing as the transmission power change is under the safety margin, or we have enough
+		// uplinks to trust our SNR estimate.
+		3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	}
+
+	penalty := float32(0)
+	for i := 0; i < 50; i++ {
+		macState.RecentUplinks = append(macState.RecentUplinks, makeUplink(i, penalty))
+		err := AdaptDataRate(ctx, dev, phy, nil)
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+		a.So(desiredParameters.AdrDataRateIndex, should.Equal, ttnpb.DataRateIndex_DATA_RATE_5)
+		a.So(desiredParameters.AdrTxPowerIndex, should.Equal, expectedTxPowers[i])
+		a.So(desiredParameters.AdrNbTrans, should.Equal, 1)
+
+		if currentParameters.AdrDataRateIndex != desiredParameters.AdrDataRateIndex ||
+			currentParameters.AdrTxPowerIndex != desiredParameters.AdrTxPowerIndex ||
+			currentParameters.AdrNbTrans != desiredParameters.AdrNbTrans {
+			diff := TxPowerStep(phy, currentParameters.AdrTxPowerIndex, desiredParameters.AdrTxPowerIndex)
+			penalty += diff
+
+			currentParameters.AdrDataRateIndex = desiredParameters.AdrDataRateIndex
+			currentParameters.AdrTxPowerIndex = desiredParameters.AdrTxPowerIndex
+			currentParameters.AdrNbTrans = desiredParameters.AdrNbTrans
+			macState.LastAdrChangeFCntUp = uint32(i + 1)
+		}
+	}
+}
+
 func TestClampDataRateRange(t *testing.T) {
 	t.Parallel()
 
@@ -841,11 +944,11 @@ func TestClampTxPowerRange(t *testing.T) {
 		Device   *ttnpb.EndDevice
 		Defaults *ttnpb.MACSettings
 
-		InputMinTxPowerIndex uint8
-		InputMaxTxPowerIndex uint8
+		InputMinTxPowerIndex uint32
+		InputMaxTxPowerIndex uint32
 
-		ExpectedMinTxPowerIndex uint8
-		ExpectedMaxTxPowerIndex uint8
+		ExpectedMinTxPowerIndex uint32
+		ExpectedMaxTxPowerIndex uint32
 	}{
 		{
 			Name: "no device",
@@ -1326,6 +1429,1079 @@ func TestClampNbTrans(t *testing.T) {
 
 			value := ClampNbTrans(tc.Device, tc.Defaults, tc.InputNbTrans)
 			a.So(value, should.Equal, tc.ExpectedNbTrans)
+		})
+	}
+}
+
+func TestADRUplinks(t *testing.T) {
+	t.Parallel()
+
+	newUplink := func(mType ttnpb.MType, spreadingFactor uint32, fCnt uint32) *ttnpb.MACState_UplinkMessage {
+		up := &ttnpb.MACState_UplinkMessage{
+			Payload: &ttnpb.Message{
+				MHdr: &ttnpb.MHDR{
+					MType: mType,
+					Major: ttnpb.Major_LORAWAN_R1,
+				},
+			},
+			Settings: &ttnpb.MACState_UplinkMessage_TxSettings{
+				DataRate: &ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
+							Bandwidth:       125_000,
+							SpreadingFactor: spreadingFactor,
+							CodingRate:      band.Cr4_5,
+						},
+					},
+				},
+			},
+		}
+		switch mType {
+		case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
+			up.Payload.Payload = &ttnpb.Message_MacPayload{
+				MacPayload: &ttnpb.MACPayload{
+					FullFCnt: fCnt,
+				},
+			}
+		default:
+		}
+		return up
+	}
+
+	for _, tc := range []struct {
+		Name string
+
+		MACState *ttnpb.MACState
+		Band     *band.Band
+
+		ExpectedUplinks []*ttnpb.MACState_UplinkMessage
+	}{
+		{
+			Name: "no uplinks",
+
+			MACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{},
+			},
+		},
+		{
+			Name: "from join request",
+
+			MACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{},
+				RecentUplinks: []*ttnpb.MACState_UplinkMessage{
+					newUplink(ttnpb.MType_JOIN_REQUEST, 12, 0),
+					newUplink(ttnpb.MType_UNCONFIRMED_UP, 12, 0),
+				},
+			},
+			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
+
+			ExpectedUplinks: []*ttnpb.MACState_UplinkMessage{
+				newUplink(ttnpb.MType_UNCONFIRMED_UP, 12, 0),
+			},
+		},
+		{
+			Name: "from last change",
+
+			MACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{},
+				RecentUplinks: []*ttnpb.MACState_UplinkMessage{
+					newUplink(ttnpb.MType_UNCONFIRMED_UP, 12, 0),
+					newUplink(ttnpb.MType_UNCONFIRMED_UP, 12, 1),
+					newUplink(ttnpb.MType_UNCONFIRMED_UP, 12, 2),
+					newUplink(ttnpb.MType_UNCONFIRMED_UP, 12, 3),
+					newUplink(ttnpb.MType_UNCONFIRMED_UP, 12, 4),
+				},
+				LastAdrChangeFCntUp: 2,
+			},
+			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
+
+			ExpectedUplinks: []*ttnpb.MACState_UplinkMessage{
+				newUplink(ttnpb.MType_UNCONFIRMED_UP, 12, 2),
+				newUplink(ttnpb.MType_UNCONFIRMED_UP, 12, 3),
+				newUplink(ttnpb.MType_UNCONFIRMED_UP, 12, 4),
+			},
+		},
+		{
+			Name: "from data rate change",
+
+			MACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+				},
+				RecentUplinks: []*ttnpb.MACState_UplinkMessage{
+					newUplink(ttnpb.MType_UNCONFIRMED_UP, 12, 0),
+					newUplink(ttnpb.MType_UNCONFIRMED_UP, 12, 1),
+					newUplink(ttnpb.MType_UNCONFIRMED_UP, 10, 2),
+					newUplink(ttnpb.MType_UNCONFIRMED_UP, 10, 3),
+				},
+			},
+			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
+
+			ExpectedUplinks: []*ttnpb.MACState_UplinkMessage{
+				newUplink(ttnpb.MType_UNCONFIRMED_UP, 10, 2),
+				newUplink(ttnpb.MType_UNCONFIRMED_UP, 10, 3),
+			},
+		},
+	} {
+		tc := tc
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
+			a := assertions.New(t)
+
+			ups := ADRUplinks(tc.MACState, tc.Band)
+			a.So(ups, should.Resemble, tc.ExpectedUplinks)
+		})
+	}
+}
+
+func TestADRDataRange(t *testing.T) {
+	t.Parallel()
+
+	for _, tc := range []struct {
+		Name string
+
+		Device   *ttnpb.EndDevice
+		Band     *band.Band
+		Defaults *ttnpb.MACSettings
+
+		AssertError func(error) bool
+
+		Min, Max ttnpb.DataRateIndex
+		Rejected map[ttnpb.DataRateIndex]struct{}
+		Ok       bool
+	}{
+		{
+			Name: "invalid desired channels",
+
+			Device: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					DesiredParameters: &ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								EnableUplink: false,
+							},
+						},
+					},
+				},
+			},
+
+			AssertError: errors.IsDataLoss,
+		},
+		{
+			Name: "clamping mismatch",
+
+			Device: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					DesiredParameters: &ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+								MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+							},
+						},
+					},
+				},
+				MacSettings: &ttnpb.MACSettings{
+					Adr: &ttnpb.ADRSettings{
+						Mode: &ttnpb.ADRSettings_Dynamic{
+							Dynamic: &ttnpb.ADRSettings_DynamicMode{
+								MaxDataRateIndex: &ttnpb.DataRateIndexValue{
+									Value: ttnpb.DataRateIndex_DATA_RATE_0,
+								},
+							},
+						},
+					},
+				},
+			},
+
+			AssertError: errors.IsDataLoss,
+		},
+		{
+			Name: "clamp to max",
+
+			Device: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+								MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_6,
+								EnableUplink:     true,
+							},
+						},
+					},
+				},
+			},
+			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
+
+			Min: ttnpb.DataRateIndex_DATA_RATE_1,
+			Max: ttnpb.DataRateIndex_DATA_RATE_5,
+			Ok:  true,
+		},
+		{
+			Name: "clamp to current",
+
+			Device: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{
+						AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+					},
+					DesiredParameters: &ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+								MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_6,
+								EnableUplink:     true,
+							},
+						},
+					},
+				},
+			},
+			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
+
+			Min: ttnpb.DataRateIndex_DATA_RATE_2,
+			Max: ttnpb.DataRateIndex_DATA_RATE_5,
+			Ok:  true,
+		},
+		{
+			Name: "rejected; ok",
+
+			Device: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{
+						AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					},
+					DesiredParameters: &ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+								MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+								EnableUplink:     true,
+							},
+							{
+								MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_6,
+								MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_6,
+								EnableUplink:     true,
+							},
+						},
+					},
+					RejectedAdrDataRateIndexes: []ttnpb.DataRateIndex{
+						ttnpb.DataRateIndex_DATA_RATE_0,
+						ttnpb.DataRateIndex_DATA_RATE_3,
+						ttnpb.DataRateIndex_DATA_RATE_6,
+					},
+				},
+			},
+			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
+
+			Min: ttnpb.DataRateIndex_DATA_RATE_1,
+			Max: ttnpb.DataRateIndex_DATA_RATE_5,
+			Rejected: map[ttnpb.DataRateIndex]struct{}{
+				ttnpb.DataRateIndex_DATA_RATE_0: {},
+				ttnpb.DataRateIndex_DATA_RATE_3: {},
+				ttnpb.DataRateIndex_DATA_RATE_6: {},
+			},
+			Ok: true,
+		},
+		{
+			Name: "rejected; no overlap",
+
+			Device: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{
+						AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					},
+					DesiredParameters: &ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+								MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+								EnableUplink:     true,
+							},
+							{
+								MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_6,
+								MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_6,
+								EnableUplink:     true,
+							},
+						},
+					},
+					RejectedAdrDataRateIndexes: []ttnpb.DataRateIndex{
+						ttnpb.DataRateIndex_DATA_RATE_0,
+						ttnpb.DataRateIndex_DATA_RATE_1,
+						ttnpb.DataRateIndex_DATA_RATE_2,
+						ttnpb.DataRateIndex_DATA_RATE_3,
+						ttnpb.DataRateIndex_DATA_RATE_4,
+						ttnpb.DataRateIndex_DATA_RATE_5,
+						ttnpb.DataRateIndex_DATA_RATE_6,
+					},
+				},
+			},
+			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
+		},
+	} {
+		tc := tc
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
+			a, ctx := test.New(t)
+			min, max, rejected, ok, err := ADRDataRateRange(ctx, tc.Device, tc.Band, tc.Defaults)
+			if assertError := tc.AssertError; assertError != nil {
+				a.So(assertError(err), should.BeTrue)
+			} else {
+				a.So(min, should.Equal, tc.Min)
+				a.So(max, should.Equal, tc.Max)
+				a.So(rejected, should.Resemble, tc.Rejected)
+				a.So(ok, should.Equal, tc.Ok)
+				a.So(err, should.BeNil)
+			}
+		})
+	}
+}
+
+func TestADRTxPowerRange(t *testing.T) {
+	t.Parallel()
+
+	for _, tc := range []struct {
+		Name string
+
+		Device   *ttnpb.EndDevice
+		Band     *band.Band
+		Defaults *ttnpb.MACSettings
+
+		Min, Max uint32
+		Rejected map[uint32]struct{}
+		Ok       bool
+	}{
+		{
+			Name: "clamping mismatch",
+
+			Device: &ttnpb.EndDevice{
+				MacSettings: &ttnpb.MACSettings{
+					Adr: &ttnpb.ADRSettings{
+						Mode: &ttnpb.ADRSettings_Dynamic{
+							Dynamic: &ttnpb.ADRSettings_DynamicMode{
+								MinTxPowerIndex: wrapperspb.UInt32(8),
+								MaxTxPowerIndex: wrapperspb.UInt32(10),
+							},
+						},
+					},
+				},
+			},
+			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
+		},
+		{
+			Name: "rejected; ok",
+
+			Device: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					RejectedAdrTxPowerIndexes: []uint32{
+						0,
+						4,
+						7,
+					},
+				},
+			},
+			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
+
+			Min: 1,
+			Max: 6,
+			Rejected: map[uint32]struct{}{
+				0: {},
+				4: {},
+				7: {},
+			},
+			Ok: true,
+		},
+		{
+			Name: "rejected; no overlap",
+
+			Device: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					RejectedAdrTxPowerIndexes: []uint32{
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+					},
+				},
+			},
+			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
+		},
+	} {
+		tc := tc
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
+			a, ctx := test.New(t)
+			min, max, rejected, ok := ADRTxPowerRange(ctx, tc.Device, tc.Band, tc.Defaults)
+			a.So(min, should.Equal, tc.Min)
+			a.So(max, should.Equal, tc.Max)
+			a.So(rejected, should.Resemble, tc.Rejected)
+			a.So(ok, should.Equal, tc.Ok)
+		})
+	}
+}
+
+func TestADRMargin(t *testing.T) {
+	t.Parallel()
+
+	float32Ptr := func(f float32) *float32 { return &f }
+	newUplink := func(maxSNR *float32, spreadingFactor, bandwidth uint32) *ttnpb.MACState_UplinkMessage {
+		up := &ttnpb.MACState_UplinkMessage{
+			Settings: &ttnpb.MACState_UplinkMessage_TxSettings{
+				DataRate: &ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
+							Bandwidth:       bandwidth,
+							SpreadingFactor: spreadingFactor,
+							CodingRate:      band.Cr4_5,
+						},
+					},
+				},
+			},
+		}
+		if maxSNR != nil {
+			up.RxMetadata = []*ttnpb.MACState_UplinkMessage_RxMetadata{
+				{
+					Snr: *maxSNR,
+				},
+			}
+		}
+		return up
+	}
+	repeatUplink := func(up *ttnpb.MACState_UplinkMessage, count int) []*ttnpb.MACState_UplinkMessage {
+		ups := make([]*ttnpb.MACState_UplinkMessage, 0, count)
+		for i := 0; i != count; i++ {
+			ups = append(ups, up)
+		}
+		return ups
+	}
+
+	for _, tc := range []struct {
+		Name string
+
+		Device   *ttnpb.EndDevice
+		Defaults *ttnpb.MACSettings
+		Uplinks  []*ttnpb.MACState_UplinkMessage
+
+		AssertError func(error) bool
+
+		Margin  float32
+		Optimal bool
+		Ok      bool
+	}{
+		{
+			Name: "no max SNR",
+
+			Uplinks: []*ttnpb.MACState_UplinkMessage{
+				newUplink(nil, 7, 125_000),
+			},
+		},
+		{
+			Name: "unknown demodulation floor",
+
+			Uplinks: []*ttnpb.MACState_UplinkMessage{
+				newUplink(float32Ptr(7.125), 5, 125_000),
+			},
+
+			AssertError: errors.IsInvalidArgument,
+		},
+		{
+			Name: "SF7BW125 suboptimal",
+
+			Device: &ttnpb.EndDevice{
+				MacSettings: &ttnpb.MACSettings{
+					Adr: &ttnpb.ADRSettings{
+						Mode: &ttnpb.ADRSettings_Dynamic{
+							Dynamic: &ttnpb.ADRSettings_DynamicMode{
+								Margin: wrapperspb.Float(15),
+							},
+						},
+					},
+				},
+			},
+			Uplinks: repeatUplink(
+				newUplink(float32Ptr(7.125), 7, 125_000),
+				5,
+			),
+
+			// Best SNR of 7.125 dB, demodulation floor of -7.5 dB, margin of 15 dB
+			// and a safety margin of 2.5 dB. 7.125 - (-7.5) - 15 - 2.5 = -2.875.
+			Margin:  7.125 - (-7.5) - 15 - 2.5,
+			Optimal: false,
+			Ok:      true,
+		},
+		{
+			Name: "SF7BW125 optimal",
+
+			Device: &ttnpb.EndDevice{
+				MacSettings: &ttnpb.MACSettings{
+					Adr: &ttnpb.ADRSettings{
+						Mode: &ttnpb.ADRSettings_Dynamic{
+							Dynamic: &ttnpb.ADRSettings_DynamicMode{
+								Margin: wrapperspb.Float(15),
+							},
+						},
+					},
+				},
+			},
+			Uplinks: repeatUplink(
+				newUplink(float32Ptr(7.125), 7, 125_000),
+				20,
+			),
+
+			// Best SNR of 7.125 dB, demodulation floor of -7.5 dB, margin of 15 dB.
+			// 7.125 - (-7.5) - 15 = -0.375.
+			Margin:  7.125 - (-7.5) - 15,
+			Optimal: true,
+			Ok:      true,
+		},
+	} {
+		tc := tc
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
+			a, ctx := test.New(t)
+			margin, optimal, ok, err := ADRMargin(ctx, tc.Device, tc.Defaults, tc.Uplinks...)
+			if assertError := tc.AssertError; assertError != nil {
+				a.So(assertError(err), should.BeTrue)
+			} else {
+				a.So(margin, should.Equal, tc.Margin)
+				a.So(optimal, should.Equal, tc.Optimal)
+				a.So(ok, should.Equal, tc.Ok)
+				a.So(err, should.BeNil)
+			}
+		})
+	}
+}
+
+func TestADRAdaptDataRate(t *testing.T) {
+	t.Parallel()
+
+	for _, tc := range []struct {
+		Name string
+
+		MACState                           *ttnpb.MACState
+		Band                               *band.Band
+		MinDataRateIndex, MaxDataRateIndex ttnpb.DataRateIndex
+		RejectedDataRateIndices            map[ttnpb.DataRateIndex]struct{}
+		MinTxPowerIndex                    uint32
+		InitialMargin                      float32
+
+		OutputMACState *ttnpb.MACState
+		OutputMargin   float32
+	}{
+		{
+			Name: "below min data rate index",
+
+			MACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrTxPowerIndex:  1,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrTxPowerIndex:  1,
+				},
+			},
+			Band:             &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+			InitialMargin:    -5.0,
+
+			OutputMACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrTxPowerIndex:  1,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					AdrTxPowerIndex:  0,
+				},
+			},
+			OutputMargin: -7.5,
+		},
+		{
+			Name: "positive steps",
+
+			MACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrTxPowerIndex:  1,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrTxPowerIndex:  1,
+				},
+			},
+			Band:             &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+			InitialMargin:    15.0,
+
+			OutputMACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrTxPowerIndex:  1,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+					AdrTxPowerIndex:  0,
+				},
+			},
+			OutputMargin: 2.5,
+		},
+		{
+			Name: "negative steps",
+
+			MACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
+					AdrTxPowerIndex:  1,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
+					AdrTxPowerIndex:  1,
+				},
+			},
+			Band:             &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
+			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+			InitialMargin:    -7.5,
+
+			OutputMACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
+					AdrTxPowerIndex:  1,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
+					AdrTxPowerIndex:  1,
+				},
+			},
+			OutputMargin: -7.5,
+		},
+		{
+			Name: "rejected min",
+
+			MACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrTxPowerIndex:  1,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrTxPowerIndex:  1,
+				},
+			},
+			Band:             &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+			RejectedDataRateIndices: map[ttnpb.DataRateIndex]struct{}{
+				ttnpb.DataRateIndex_DATA_RATE_0: {},
+			},
+			InitialMargin: 2.5,
+
+			OutputMACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrTxPowerIndex:  1,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					AdrTxPowerIndex:  0,
+				},
+			},
+			OutputMargin: 0.0,
+		},
+		{
+			Name: "rejected max",
+
+			MACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrTxPowerIndex:  1,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrTxPowerIndex:  1,
+				},
+			},
+			Band:             &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+			RejectedDataRateIndices: map[ttnpb.DataRateIndex]struct{}{
+				ttnpb.DataRateIndex_DATA_RATE_5: {},
+			},
+			InitialMargin: 15.0,
+
+			OutputMACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrTxPowerIndex:  1,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_4,
+					AdrTxPowerIndex:  0,
+				},
+			},
+			OutputMargin: 5.0,
+		},
+	} {
+		tc := tc
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
+			a := assertions.New(t)
+			margin := ADRAdaptDataRate(
+				tc.MACState,
+				tc.Band,
+				tc.MinDataRateIndex, tc.MaxDataRateIndex,
+				tc.RejectedDataRateIndices,
+				tc.MinTxPowerIndex,
+				tc.InitialMargin,
+			)
+			a.So(margin, should.Equal, tc.OutputMargin)
+			a.So(tc.MACState, should.Resemble, tc.OutputMACState)
+		})
+	}
+}
+
+func TestADRAdaptTxPowerIndex(t *testing.T) {
+	t.Parallel()
+
+	for _, tc := range []struct {
+		Name string
+
+		MACState      *ttnpb.MACState
+		Band          *band.Band
+		Min, Max      uint32
+		Rejected      map[uint32]struct{}
+		InitialMargin float32
+		Optimal       bool
+
+		OutputMACState *ttnpb.MACState
+		OutputMargin   float32
+	}{
+		{
+			Name: "min clamping",
+
+			MACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 0,
+				},
+			},
+			Band:          &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			Min:           1,
+			Max:           7,
+			InitialMargin: 0.0,
+
+			OutputMACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 1,
+				},
+			},
+			OutputMargin: -2.0,
+		},
+		{
+			Name: "max clamping",
+			MACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 7,
+				},
+			},
+			Band:          &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			Max:           6,
+			InitialMargin: 0.0,
+
+			OutputMACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 6,
+				},
+			},
+			OutputMargin: 2.0,
+		},
+		{
+			Name: "one step forward",
+			MACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 2,
+				},
+			},
+			Band:          &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			Max:           7,
+			InitialMargin: 3.0,
+
+			OutputMACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 3,
+				},
+			},
+			OutputMargin: 1.0,
+		},
+		{
+			Name: "two steps forward",
+			MACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 2,
+				},
+			},
+			Band:          &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			Max:           7,
+			InitialMargin: 5.0,
+
+			OutputMACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 4,
+				},
+			},
+			OutputMargin: 1.0,
+		},
+		{
+			Name: "one step backward; suboptimal",
+			MACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 3,
+				},
+			},
+			Band:          &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			Max:           7,
+			InitialMargin: -1.5,
+			Optimal:       false,
+
+			OutputMACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 3,
+				},
+			},
+			OutputMargin: -1.5,
+		},
+		{
+			Name: "one step backward; optimal",
+			MACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 3,
+				},
+			},
+			Band:          &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			Max:           7,
+			InitialMargin: -1.5,
+			Optimal:       true,
+
+			OutputMACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 2,
+				},
+			},
+			OutputMargin: 0.5,
+		},
+		{
+			Name: "two steps backward",
+			MACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 3,
+				},
+			},
+			Band:          &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			Max:           7,
+			InitialMargin: -3.5,
+
+			OutputMACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 1,
+				},
+			},
+			OutputMargin: 0.5,
+		},
+		{
+			Name: "backward to zero",
+			MACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 3,
+				},
+			},
+			Band:          &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			Max:           7,
+			InitialMargin: -20.5,
+
+			OutputMACState: &ttnpb.MACState{
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrTxPowerIndex: 0,
+				},
+			},
+			OutputMargin: -14.5,
+		},
+	} {
+		tc := tc
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
+			a := assertions.New(t)
+			margin := ADRAdaptTxPowerIndex(tc.MACState, tc.Band, tc.Min, tc.Max, tc.Rejected, tc.InitialMargin, tc.Optimal)
+			a.So(margin, should.Equal, tc.OutputMargin)
+			a.So(tc.MACState, should.Resemble, tc.OutputMACState)
+		})
+	}
+}
+
+func TestADRAdaptNbTrans(t *testing.T) {
+	t.Parallel()
+
+	newUplink := func(fCnt uint32) *ttnpb.MACState_UplinkMessage {
+		up := &ttnpb.MACState_UplinkMessage{
+			Payload: &ttnpb.Message{
+				Payload: &ttnpb.Message_MacPayload{
+					MacPayload: &ttnpb.MACPayload{
+						FullFCnt: fCnt,
+					},
+				},
+			},
+		}
+		return up
+	}
+	newUplinkSeries := func(n uint32) []*ttnpb.MACState_UplinkMessage {
+		ups := make([]*ttnpb.MACState_UplinkMessage, 0, n)
+		for i := uint32(0); i != n; i++ {
+			ups = append(ups, newUplink(i))
+		}
+		return ups
+	}
+	newEndDevice := func(current, desired uint32) *ttnpb.EndDevice {
+		return &ttnpb.EndDevice{
+			MacState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrNbTrans: current,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrNbTrans: desired,
+				},
+			},
+		}
+	}
+
+	for _, tc := range []struct {
+		Name string
+
+		Device   *ttnpb.EndDevice
+		Defaults *ttnpb.MACSettings
+		Uplinks  []*ttnpb.MACState_UplinkMessage
+
+		ExpectedDevice *ttnpb.EndDevice
+	}{
+		{
+			Name: "not enough uplinks",
+
+			Device: newEndDevice(2, 2),
+
+			ExpectedDevice: newEndDevice(2, 2),
+		},
+		{
+			Name: "under 5% loss rate; 3 to 2",
+
+			Device:  newEndDevice(3, 3),
+			Uplinks: newUplinkSeries(10),
+
+			ExpectedDevice: newEndDevice(3, 2),
+		},
+		{
+			Name: "under 5% loss rate; 2 to 1",
+
+			Device:  newEndDevice(2, 2),
+			Uplinks: newUplinkSeries(10),
+
+			ExpectedDevice: newEndDevice(2, 1),
+		},
+		{
+			Name: "under 5% loss rate; 1 to 1",
+
+			Device:  newEndDevice(1, 1),
+			Uplinks: newUplinkSeries(10),
+
+			ExpectedDevice: newEndDevice(1, 1),
+		},
+		{
+			Name: "under 10% loss rate; 3 to 3",
+
+			Device:  newEndDevice(3, 3),
+			Uplinks: append(newUplinkSeries(20), newUplink(22)), // 2 / 22 = 9% loss rate
+
+			ExpectedDevice: newEndDevice(3, 3),
+		},
+		{
+			Name: "under 10% loss rate; 2 to 2",
+
+			Device:  newEndDevice(2, 2),
+			Uplinks: append(newUplinkSeries(20), newUplink(22)), // 2 / 22 = 9% loss rate
+
+			ExpectedDevice: newEndDevice(2, 2),
+		},
+		{
+			Name: "under 10% loss rate; 1 to 1",
+
+			Device:  newEndDevice(1, 1),
+			Uplinks: append(newUplinkSeries(20), newUplink(22)), // 3 / 22 = 13% loss rate
+
+			ExpectedDevice: newEndDevice(1, 1),
+		},
+		{
+			Name: "under 30% loss rate; 3 to 3",
+
+			Device:  newEndDevice(3, 3),
+			Uplinks: append(newUplinkSeries(20), newUplink(23)), // 3 / 22 = 13% loss rate
+
+			ExpectedDevice: newEndDevice(3, 3),
+		},
+		{
+			Name: "under 30% loss rate; 2 to 3",
+
+			Device:  newEndDevice(2, 2),
+			Uplinks: append(newUplinkSeries(20), newUplink(23)), // 3 / 22 = 13% loss rate
+
+			ExpectedDevice: newEndDevice(2, 3),
+		},
+		{
+			Name: "under 30% loss rate; 1 to 2",
+
+			Device:  newEndDevice(1, 1),
+			Uplinks: append(newUplinkSeries(20), newUplink(23)), // 3 / 22 = 13% loss rate
+
+			ExpectedDevice: newEndDevice(1, 2),
+		},
+		{
+			Name: "over 30% loss rate; 1 to 3",
+
+			Device:  newEndDevice(1, 1),
+			Uplinks: append(newUplinkSeries(10), newUplink(15)), // 5 / 16 = 31% loss rate
+
+			ExpectedDevice: newEndDevice(1, 3),
+		},
+		{
+			Name: "over 30% loss rate; 2 to 3",
+
+			Device:  newEndDevice(2, 2),
+			Uplinks: append(newUplinkSeries(10), newUplink(15)), // 5 / 16 = 31% loss rate
+
+			ExpectedDevice: newEndDevice(2, 3),
+		},
+		{
+			Name: "over 30% loss rate; 3 to 3",
+
+			Device:  newEndDevice(3, 3),
+			Uplinks: append(newUplinkSeries(10), newUplink(15)), // 5 / 16 = 31% loss rate
+
+			ExpectedDevice: newEndDevice(3, 3),
+		},
+	} {
+		tc := tc
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
+			a := assertions.New(t)
+			ADRAdaptNbTrans(tc.Device, tc.Defaults, tc.Uplinks)
+			a.So(tc.Device, should.Resemble, tc.ExpectedDevice)
 		})
 	}
 }

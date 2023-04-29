@@ -23,6 +23,11 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Multiple ADR algorithm bugs:
+  - An off-by-one error which caused the ADR algorithm to not take into consideration the signal qualities of the uplink which confirmed a parameter change. In effect, this fix improves the quality of the link budget estimation.
+  - A flip-flop condition which caused the algorithm to swap back and forth between a higher and a lower transmission power index every 20 uplinks. In effect, this fix will cause the algorithm to change the transmission power index less often.
+  - A condition mistake which caused the algorithm to avoid increasing the transmission power if it would not completely fix the missing link budget. In effect, this will cause the algorithm to increase the transmission power in situations in which the link budget deteriorates rapidly.
+
 ### Security
 
 ## [3.25.1] - 2023-04-18
