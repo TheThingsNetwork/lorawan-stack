@@ -180,7 +180,7 @@ class Marshaler {
    */
   static pathsToFieldMask(paths) {
     if (!paths) {
-      return
+      return null
     }
     return { field_mask: { paths: paths.map(e => e.join('.')) } }
   }
