@@ -225,6 +225,31 @@ message ADRSettings {
     // Maximum number of retransmissions.
     // If unset, the default value from Network Server configuration will be used.
     google.protobuf.UInt32Value max_nb_trans = 7 [(validate.rules).uint32 = {gte: 1, lte: 3}];
+
+    // EXPERIMENTAL: Channel steering settings.
+    message ChannelSteeringSettings {
+      option (thethings.flags.message) = { select: true, set: true, semantical: true };
+
+      // Configuration options for narrow channels steering.
+      // The narrow mode attempts to steer the end device towards
+      // using the LoRa modulated, 125kHz bandwidth channels.
+      message NarrowMode {
+        option (thethings.flags.message) = { select: true, set: true };
+      }
+
+      // Configuration options for cases in which ADR is not supposed to steer the end device
+      // to another set of channels.
+      message DisabledMode {
+        option (thethings.flags.message) = { select: true, set: true };
+      }
+
+      oneof mode {
+        NarrowMode narrow = 1;
+        DisabledMode disabled = 2;
+      }
+    }
+
+    ChannelSteeringSettings channel_steering = 8;
   }
 
   // Configuration options for cases in which ADR is to be disabled

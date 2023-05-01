@@ -14088,8 +14088,78 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "channel_steering",
+              "description": "",
+              "label": "",
+              "type": "ChannelSteeringSettings",
+              "longType": "ADRSettings.DynamicMode.ChannelSteeringSettings",
+              "fullType": "ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
+        },
+        {
+          "name": "ChannelSteeringSettings",
+          "longName": "ADRSettings.DynamicMode.ChannelSteeringSettings",
+          "fullName": "ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings",
+          "description": "EXPERIMENTAL: Channel steering settings.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "narrow",
+              "description": "",
+              "label": "",
+              "type": "NarrowMode",
+              "longType": "ADRSettings.DynamicMode.ChannelSteeringSettings.NarrowMode",
+              "fullType": "ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.NarrowMode",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "mode",
+              "defaultValue": ""
+            },
+            {
+              "name": "disabled",
+              "description": "",
+              "label": "",
+              "type": "DisabledMode",
+              "longType": "ADRSettings.DynamicMode.ChannelSteeringSettings.DisabledMode",
+              "fullType": "ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.DisabledMode",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "mode",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "DisabledMode",
+          "longName": "ADRSettings.DynamicMode.ChannelSteeringSettings.DisabledMode",
+          "fullName": "ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.DisabledMode",
+          "description": "Configuration options for cases in which ADR is not supposed to steer the end device\nto another set of channels.",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "NarrowMode",
+          "longName": "ADRSettings.DynamicMode.ChannelSteeringSettings.NarrowMode",
+          "fullName": "ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.NarrowMode",
+          "description": "Configuration options for narrow channels steering.\nThe narrow mode attempts to steer the end device towards\nusing the LoRa modulated, 125kHz bandwidth channels.",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
         },
         {
           "name": "StaticMode",

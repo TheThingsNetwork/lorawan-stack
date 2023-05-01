@@ -112,6 +112,10 @@ var EndDeviceVersionFieldPathsNested = []string{
 	"default_mac_settings.adr.mode",
 	"default_mac_settings.adr.mode.disabled",
 	"default_mac_settings.adr.mode.dynamic",
+	"default_mac_settings.adr.mode.dynamic.channel_steering",
+	"default_mac_settings.adr.mode.dynamic.channel_steering.mode",
+	"default_mac_settings.adr.mode.dynamic.channel_steering.mode.disabled",
+	"default_mac_settings.adr.mode.dynamic.channel_steering.mode.narrow",
 	"default_mac_settings.adr.mode.dynamic.margin",
 	"default_mac_settings.adr.mode.dynamic.max_data_rate_index",
 	"default_mac_settings.adr.mode.dynamic.max_data_rate_index.value",
@@ -221,6 +225,10 @@ var ADRSettingsFieldPathsNested = []string{
 	"mode",
 	"mode.disabled",
 	"mode.dynamic",
+	"mode.dynamic.channel_steering",
+	"mode.dynamic.channel_steering.mode",
+	"mode.dynamic.channel_steering.mode.disabled",
+	"mode.dynamic.channel_steering.mode.narrow",
 	"mode.dynamic.margin",
 	"mode.dynamic.max_data_rate_index",
 	"mode.dynamic.max_data_rate_index.value",
@@ -244,6 +252,10 @@ var MACSettingsFieldPathsNested = []string{
 	"adr.mode",
 	"adr.mode.disabled",
 	"adr.mode.dynamic",
+	"adr.mode.dynamic.channel_steering",
+	"adr.mode.dynamic.channel_steering.mode",
+	"adr.mode.dynamic.channel_steering.mode.disabled",
+	"adr.mode.dynamic.channel_steering.mode.narrow",
 	"adr.mode.dynamic.margin",
 	"adr.mode.dynamic.max_data_rate_index",
 	"adr.mode.dynamic.max_data_rate_index.value",
@@ -569,6 +581,10 @@ var EndDeviceFieldPathsNested = []string{
 	"mac_settings.adr.mode",
 	"mac_settings.adr.mode.disabled",
 	"mac_settings.adr.mode.dynamic",
+	"mac_settings.adr.mode.dynamic.channel_steering",
+	"mac_settings.adr.mode.dynamic.channel_steering.mode",
+	"mac_settings.adr.mode.dynamic.channel_steering.mode.disabled",
+	"mac_settings.adr.mode.dynamic.channel_steering.mode.narrow",
 	"mac_settings.adr.mode.dynamic.margin",
 	"mac_settings.adr.mode.dynamic.max_data_rate_index",
 	"mac_settings.adr.mode.dynamic.max_data_rate_index.value",
@@ -1118,6 +1134,10 @@ var CreateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.mac_settings.adr.mode",
 	"end_device.mac_settings.adr.mode.disabled",
 	"end_device.mac_settings.adr.mode.dynamic",
+	"end_device.mac_settings.adr.mode.dynamic.channel_steering",
+	"end_device.mac_settings.adr.mode.dynamic.channel_steering.mode",
+	"end_device.mac_settings.adr.mode.dynamic.channel_steering.mode.disabled",
+	"end_device.mac_settings.adr.mode.dynamic.channel_steering.mode.narrow",
 	"end_device.mac_settings.adr.mode.dynamic.margin",
 	"end_device.mac_settings.adr.mode.dynamic.max_data_rate_index",
 	"end_device.mac_settings.adr.mode.dynamic.max_data_rate_index.value",
@@ -1599,6 +1619,10 @@ var UpdateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.mac_settings.adr.mode",
 	"end_device.mac_settings.adr.mode.disabled",
 	"end_device.mac_settings.adr.mode.dynamic",
+	"end_device.mac_settings.adr.mode.dynamic.channel_steering",
+	"end_device.mac_settings.adr.mode.dynamic.channel_steering.mode",
+	"end_device.mac_settings.adr.mode.dynamic.channel_steering.mode.disabled",
+	"end_device.mac_settings.adr.mode.dynamic.channel_steering.mode.narrow",
 	"end_device.mac_settings.adr.mode.dynamic.margin",
 	"end_device.mac_settings.adr.mode.dynamic.max_data_rate_index",
 	"end_device.mac_settings.adr.mode.dynamic.max_data_rate_index.value",
@@ -2129,6 +2153,10 @@ var SetEndDeviceRequestFieldPathsNested = []string{
 	"end_device.mac_settings.adr.mode",
 	"end_device.mac_settings.adr.mode.disabled",
 	"end_device.mac_settings.adr.mode.dynamic",
+	"end_device.mac_settings.adr.mode.dynamic.channel_steering",
+	"end_device.mac_settings.adr.mode.dynamic.channel_steering.mode",
+	"end_device.mac_settings.adr.mode.dynamic.channel_steering.mode.disabled",
+	"end_device.mac_settings.adr.mode.dynamic.channel_steering.mode.narrow",
 	"end_device.mac_settings.adr.mode.dynamic.margin",
 	"end_device.mac_settings.adr.mode.dynamic.max_data_rate_index",
 	"end_device.mac_settings.adr.mode.dynamic.max_data_rate_index.value",
@@ -2627,6 +2655,10 @@ var EndDeviceTemplateFieldPathsNested = []string{
 	"end_device.mac_settings.adr.mode",
 	"end_device.mac_settings.adr.mode.disabled",
 	"end_device.mac_settings.adr.mode.dynamic",
+	"end_device.mac_settings.adr.mode.dynamic.channel_steering",
+	"end_device.mac_settings.adr.mode.dynamic.channel_steering.mode",
+	"end_device.mac_settings.adr.mode.dynamic.channel_steering.mode.disabled",
+	"end_device.mac_settings.adr.mode.dynamic.channel_steering.mode.narrow",
 	"end_device.mac_settings.adr.mode.dynamic.margin",
 	"end_device.mac_settings.adr.mode.dynamic.max_data_rate_index",
 	"end_device.mac_settings.adr.mode.dynamic.max_data_rate_index.value",
@@ -3127,6 +3159,10 @@ var ADRSettings_StaticModeFieldPathsTopLevel = []string{
 	"tx_power_index",
 }
 var ADRSettings_DynamicModeFieldPathsNested = []string{
+	"channel_steering",
+	"channel_steering.mode",
+	"channel_steering.mode.disabled",
+	"channel_steering.mode.narrow",
 	"margin",
 	"max_data_rate_index",
 	"max_data_rate_index.value",
@@ -3139,6 +3175,7 @@ var ADRSettings_DynamicModeFieldPathsNested = []string{
 }
 
 var ADRSettings_DynamicModeFieldPathsTopLevel = []string{
+	"channel_steering",
 	"margin",
 	"max_data_rate_index",
 	"max_nb_trans",
@@ -3149,6 +3186,19 @@ var ADRSettings_DynamicModeFieldPathsTopLevel = []string{
 }
 var ADRSettings_DisabledModeFieldPathsNested []string
 var ADRSettings_DisabledModeFieldPathsTopLevel []string
+var ADRSettings_DynamicMode_ChannelSteeringSettingsFieldPathsNested = []string{
+	"mode",
+	"mode.disabled",
+	"mode.narrow",
+}
+
+var ADRSettings_DynamicMode_ChannelSteeringSettingsFieldPathsTopLevel = []string{
+	"mode",
+}
+var ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowModeFieldPathsNested []string
+var ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowModeFieldPathsTopLevel []string
+var ADRSettings_DynamicMode_ChannelSteeringSettings_DisabledModeFieldPathsNested []string
+var ADRSettings_DynamicMode_ChannelSteeringSettings_DisabledModeFieldPathsTopLevel []string
 var MACState_JoinRequestFieldPathsNested = []string{
 	"cf_list",
 	"cf_list.ch_masks",

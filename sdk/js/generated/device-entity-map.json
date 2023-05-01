@@ -549,6 +549,26 @@
             "ns",
             "ns"
           ],
+          "channel_steering": {
+            "_root": [
+              "ns",
+              "ns"
+            ],
+            "mode": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "disabled": [
+                "ns",
+                "ns"
+              ],
+              "narrow": [
+                "ns",
+                "ns"
+              ]
+            }
+          },
           "margin": [
             "ns",
             "ns"
