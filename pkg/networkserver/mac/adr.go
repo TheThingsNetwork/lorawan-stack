@@ -173,6 +173,90 @@ func DeviceADRMargin(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings) float32 
 	return legacyDeviceADRMargin(dev, defaults)
 }
 
+func deviceADRChannelSteering(
+	dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings,
+) *ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings {
+	switch {
+	case dev.GetMacSettings().GetAdr().GetDynamic().GetChannelSteering() != nil:
+		return dev.MacSettings.Adr.GetDynamic().ChannelSteering
+
+	case defaults.GetAdr().GetDynamic().GetChannelSteering() != nil:
+		return defaults.Adr.GetDynamic().ChannelSteering
+
+	default:
+		return nil
+	}
+}
+
+func isNarrowDataRateIndex(phy *band.Band, idx ttnpb.DataRateIndex) (lora, ok bool) {
+	dr, ok := phy.DataRates[idx]
+	if !ok {
+		return false, false
+	}
+	mod := dr.Rate.GetLora()
+	if mod == nil {
+		return false, false
+	}
+	return true, mod.Bandwidth == 125_000
+}
+
+func demodulationFloorStep(phy *band.Band, from, to ttnpb.DataRateIndex) float32 {
+	fromDR, ok := phy.DataRates[from]
+	if !ok {
+		panic("from data rate not found")
+	}
+	fromLoRa := fromDR.Rate.GetLora()
+	if fromLoRa == nil {
+		panic("from data rate not LoRa modulated")
+	}
+	toDR, ok := phy.DataRates[to]
+	if !ok {
+		panic("to data rate not found")
+	}
+	toLoRa := toDR.Rate.GetLora()
+	if toLoRa == nil {
+		panic("to data rate not LoRa modulated")
+	}
+	return demodulationFloor[fromLoRa.SpreadingFactor][fromLoRa.Bandwidth] -
+		demodulationFloor[toLoRa.SpreadingFactor][toLoRa.Bandwidth]
+}
+
+func adrSteerDeviceChannels(
+	dev *ttnpb.EndDevice,
+	defaults *ttnpb.MACSettings,
+	phy *band.Band,
+	allowed map[ttnpb.DataRateIndex]struct{},
+	margin float32,
+) (float32, bool) {
+	channelSteering := deviceADRChannelSteering(dev, defaults)
+	switch {
+	case channelSteering.GetNarrow() != nil:
+		macState := dev.MacState
+		currentParameters, desiredParameters := macState.CurrentParameters, macState.DesiredParameters
+		currentDataRateIndex := currentParameters.AdrDataRateIndex
+		if lora, ok := isNarrowDataRateIndex(phy, currentDataRateIndex); !lora || ok {
+			return margin, false
+		}
+		var drIdx ttnpb.DataRateIndex
+		for drIdx = phy.MaxADRDataRateIndex; drIdx >= ttnpb.DataRateIndex_DATA_RATE_0; drIdx-- {
+			if _, ok := allowed[drIdx]; ok {
+				break
+			}
+			if drIdx == ttnpb.DataRateIndex_DATA_RATE_0 {
+				return margin, false
+			}
+		}
+		margin -= demodulationFloorStep(phy, currentDataRateIndex, drIdx)
+		desiredParameters.AdrDataRateIndex = drIdx
+		desiredParameters.AdrTxPowerIndex = 0
+		return margin, true
+	case channelSteering.GetDisabled() != nil, channelSteering.GetMode() == nil:
+		return margin, false
+	default:
+		panic("unreachable")
+	}
+}
+
 func adrLossRate(ups ...*ttnpb.MACState_UplinkMessage) float32 {
 	if len(ups) < 2 {
 		return 0
@@ -552,9 +636,12 @@ func adaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 	if err != nil || !ok {
 		return err
 	}
-	margin = adrAdaptDataRate(
-		macState, phy, minDataRateIndex, maxDataRateIndex, allowedDataRateIndices, minTxPowerIndex, margin,
-	)
+	margin, ok = adrSteerDeviceChannels(dev, defaults, phy, allowedDataRateIndices, margin)
+	if !ok {
+		margin = adrAdaptDataRate(
+			macState, phy, minDataRateIndex, maxDataRateIndex, allowedDataRateIndices, minTxPowerIndex, margin,
+		)
+	}
 	margin = adrAdaptTxPowerIndex(
 		macState, phy, minTxPowerIndex, maxTxPowerIndex, rejectedTxPowerIndices, margin, optimal,
 	)

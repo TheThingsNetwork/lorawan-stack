@@ -22,20 +22,23 @@ import (
 )
 
 var (
-	ADRLossRate          = adrLossRate
-	ADRUplinks           = adrUplinks
-	ADRDataRateRange     = adrDataRateRange
-	ADRTxPowerRange      = adrTxPowerRange
-	ADRMargin            = adrMargin
-	ADRAdaptDataRate     = adrAdaptDataRate
-	ADRAdaptTxPowerIndex = adrAdaptTxPowerIndex
-	ADRAdaptNbTrans      = adrAdaptNbTrans
+	ADRLossRate            = adrLossRate
+	ADRUplinks             = adrUplinks
+	ADRDataRateRange       = adrDataRateRange
+	ADRTxPowerRange        = adrTxPowerRange
+	ADRMargin              = adrMargin
+	ADRAdaptDataRate       = adrAdaptDataRate
+	ADRAdaptTxPowerIndex   = adrAdaptTxPowerIndex
+	ADRAdaptNbTrans        = adrAdaptNbTrans
+	ADRSteerDeviceChannels = adrSteerDeviceChannels
 
 	ClampDataRateRange = clampDataRateRange
 	ClampTxPowerRange  = clampTxPowerRange
 	ClampNbTrans       = clampNbTrans
 
-	TxPowerStep = txPowerStep
+	TxPowerStep           = txPowerStep
+	DemodulationFloorStep = demodulationFloorStep
+	IsNarrowDataRateIndex = isNarrowDataRateIndex
 )
 
 func NewADRUplink(
