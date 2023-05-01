@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 const fs = require('fs')
 const path = require('path')
+
 const yargs = require('yargs')
 const mkdirp = require('mkdirp')
 const g = require('glob')
@@ -25,7 +26,7 @@ const argv = yargs.argv
 const env = process.env
 
 /**
- * flatten a string or list of strings into a list of strings,
+ * Flatten a string or list of strings into a list of strings,
  * split by , and trimmed.
  *
  * @param {string|Array<string>} s - The string or array to flatten.
@@ -37,7 +38,7 @@ const flatten = function (s) {
   }
 
   if (Array.isArray(s)) {
-    return s.map(flatten).reduce((a, n) => [ ...a, ...n ], [])
+    return s.map(flatten).reduce((a, n) => [...a, ...n], [])
   }
 
   return s.split(',').map(s => s.trim())
@@ -45,11 +46,12 @@ const flatten = function (s) {
 
 const localesDir = argv.locales || env.LOCALES_DIR || 'pkg/webui/locales'
 const support = flatten(argv.support || env.SUPPORT_LOCALES || 'en')
-const backendOnly = 'backend-only' in argv && argv['backend-only'] !== false || false
+const backendOnly = ('backend-only' in argv && argv['backend-only'] !== false) || false
 const messagesDir = !backendOnly && (argv.messages || env.MESSAGES || '.cache/messages')
 const backendMessages = argv.backendMessages || env.MESSAGES_BACKEND
 const defaultLocale = argv.default || env.DEFAULT_LOCALE || 'en'
-const verbose = 'verbose' in argv && argv.verbose !== 'false' || false
+const exportForTranslation = argv['export-for-interpreters'] || env.EXPORT_FOR_INTERPRETERS || false
+const verbose = ('verbose' in argv && argv.verbose !== 'false') || false
 
 if (argv.help) {
   console.log(`Usage: translations [opts]
@@ -73,6 +75,7 @@ Options:
   --messages <file>         directory where the messages are extracted to by react-intl (default: .cache/message) [$MESSAGES]
   --backend-only <flag>.    Flag that determines whether only backend messages will be processed
   --verbose                 verbose output for debugging purposes
+  --export-for-translation  Flag that determines whether the messages will be exported for interpreters
   --help                    show this help message
 `)
 }
@@ -80,7 +83,7 @@ Options:
 /**
  * Find a list of files based on a glob pattern.
  *
- * @param {string} pat - The glob pattern, eg. "./foo/*.js"
+ * @param {string} pat - The glob pattern, eg. "./foo/*.js".
  * @returns {Promise<Array<string>>} - A promise that resolves to an array of
  *   filenames that match the pattern.
  */
@@ -143,22 +146,23 @@ const write = function (filename, content) {
  * have an corresponding file in the localesDir will be filled in.
  * Locales that are in the localesDir but not in --support will be omitted.
  *
- * @returns {Object} - The locales, keyed by locale name.
- *   For example: `{ en: { ... }, ja: { ... }}`
+ * @returns {object} - The locales, keyed by locale name.
+ *   For example: `{ en: { ... }, ja: { ... }}`.
  */
 const readLocales = async function () {
-  const loc = await Promise.all(support.map(async function (locale) {
-    let parsed = {}
-    try {
-      const content = await read(`${path.resolve(localesDir)}/${locale}.json`)
-      parsed = JSON.parse(content)
-    } catch (err) {}
+  const loc = await Promise.all(
+    support.map(async function (locale) {
+      let parsed = {}
+      try {
+        const content = await read(`${path.resolve(localesDir)}/${locale}.json`)
+        parsed = JSON.parse(content)
+      } catch (err) {}
 
-    parsed.__locale = locale
+      parsed.__locale = locale
 
-    return parsed
-  }))
-
+      return parsed
+    }),
+  )
 
   return loc.reduce(function (acc, next) {
     const locale = next.__locale
@@ -175,7 +179,7 @@ const readLocales = async function () {
  * Read and parse messages that were exported by babel-plugin-react-intl, located in
  * messagesDir (specified by --messages).
  *
- * @returns {Object} - The messages, keyed by message id.
+ * @returns {object} - The messages, keyed by message id.
  */
 const readMessages = async function () {
   if (!messagesDir) {
@@ -186,7 +190,7 @@ const readMessages = async function () {
     .map(f => fs.readFileSync(f, 'utf-8'))
     .map(c => JSON.parse(c))
     .reduce(function (acc, next) {
-      return [ ...acc, ...next ]
+      return [...acc, ...next]
     }, [])
     .reduce(function (acc, next) {
       if (next.id in acc) {
@@ -201,9 +205,9 @@ const readMessages = async function () {
 }
 
 /**
- * Read and parse (and marshal) the backend messages, coming from `tools/bin/mage go:messages`
+ * Read and parse (and marshal) the backend messages, coming from `tools/bin/mage go:messages`.
  *
- * @returns {Object} - The backend messages, keyed by message id.
+ * @returns {object} - The backend messages, keyed by message id.
  */
 const readBackendMessages = async function () {
   if (!backendMessages) {
@@ -224,9 +228,9 @@ const readBackendMessages = async function () {
 }
 
 /**
- * get a nested key in an object or return null if not found.
+ * Get a nested key in an object or return null if not found.
  *
- * @param {Object} object - The object to find the key in.
+ * @param {object} object - The object to find the key in.
  * @param {Array<string>} pth - The path to find in the object.
  * @returns {any} - The value of the key at the path, or null if not found.
  */
@@ -239,7 +243,7 @@ const get = function (object, ...pth) {
     return object
   }
 
-  const [ head, ...tail ] = pth
+  const [head, ...tail] = pth
 
   if (head in object) {
     return get(object[head], ...tail)
@@ -251,21 +255,51 @@ const get = function (object, ...pth) {
 /**
  * Write locales to their corresponding file in the localesDir (specified by --locales).
  *
- * @param {Object} locales - The locales to write.
+ * @param {object} locales - The locales to write.
  * @returns {Promise<undefined>} - A promise that resolves when all locales have been written.
  */
 const writeLocales = async function (locales) {
-  return Promise.all(Object.keys(locales).map(async function (key) {
-    const locale = locales[key]
-    const content = JSON.stringify(locale, null, 2).concat('\n')
-    await mkdirp(localesDir)
-    await write(`${localesDir}/${key}.json`, content)
-  }))
+  return Promise.all(
+    Object.keys(locales).map(async function (key) {
+      const locale = locales[key]
+      const content = JSON.stringify(locale, null, 2).concat('\n')
+      await mkdirp(localesDir)
+      await write(`${localesDir}/${key}.json`, content)
+    }),
+  )
 }
 
-// main function.
+/**
+ * Write messages out for supported locales as CSV, for use when translating.
+ *
+ * @param {object} locales - The locales to write.
+ * @param targetLanguage - The language (locale) to translate to.
+ * @returns {Promise<undefined>} - A promise that resolves when the file has been written.
+ */
+const writeInterpreterFile = async function (locales, targetLanguage) {
+  // Write the data as CSV, the first column being the message id
+  // the second column being the English message, and the third being the target language message.
+
+  const locale = locales[targetLanguage]
+  const content = Object.keys(locale)
+    .map(function (id) {
+      const message = locale[id] || ''
+      // Add proper escapes
+      const english = locales[defaultLocale][id].replace(/"/g, '""')
+      const target = message.replace ? message.replace(/"/g, '""') : message
+      return `"${id}","${english}","${target}"`
+    })
+    .join('\n')
+  await write(`./${targetLanguage}.csv`, `id,default,${targetLanguage}\n${content}`)
+}
+
+// Main function.
 const main = async function () {
-  const [ locales, messages, backend ] = await Promise.all([ readLocales(), readMessages(), readBackendMessages() ])
+  const [locales, messages, backend] = await Promise.all([
+    readLocales(),
+    readMessages(),
+    readBackendMessages(),
+  ])
   const updated = {}
 
   // Merge backend messages into messages
@@ -299,6 +333,13 @@ const main = async function () {
   }
 
   await writeLocales(updated)
+
+  if (exportForTranslation) {
+    const supportWithoutDefault = support.filter(s => s !== defaultLocale)
+    supportWithoutDefault.forEach(async function (targetLanguage) {
+      await writeInterpreterFile(updated, targetLanguage)
+    })
+  }
   console.log('Locale files updated.')
 }
 
