@@ -453,9 +453,6 @@ func adrDataRateRange(
 		)
 		return 0, 0, nil, false, nil
 	}
-	if currentDataRateIndex := macState.CurrentParameters.AdrDataRateIndex; currentDataRateIndex > min {
-		min = currentDataRateIndex
-	}
 	return min, max, allowed, true, nil
 }
 
@@ -526,23 +523,18 @@ func adrAdaptDataRate(
 	currentParameters, desiredParameters := macState.CurrentParameters, macState.DesiredParameters
 	currentDataRateIndex := currentParameters.AdrDataRateIndex
 	// NOTE: Network Server may only increase the data rate index of the device.
+	if currentDataRateIndex > minDataRateIndex {
+		minDataRateIndex = currentDataRateIndex
+	}
 	// NOTE(2): TX output power is reset whenever data rate is increased.
 	desiredParameters.AdrDataRateIndex = currentDataRateIndex
 	desiredParameters.AdrTxPowerIndex = currentParameters.AdrTxPowerIndex
-	if currentDataRateIndex < minDataRateIndex {
-		margin -= float32(minDataRateIndex-currentDataRateIndex) * drStep
-		// NOTE: The margin is not adjusted for the transmission power index change
-		// in order to encourage data rate increases instead of transmission power
-		// decreases.
-		desiredParameters.AdrDataRateIndex = minDataRateIndex
-		desiredParameters.AdrTxPowerIndex = 0
-	}
 	maxMarginSteps := float32(maxDataRateIndex - desiredParameters.AdrDataRateIndex)
 	marginSteps := (margin - txPowerStep(phy, 0, minTxPowerIndex)) / drStep
-	if marginSteps >= 0 && marginSteps < maxMarginSteps {
+	if marginSteps > 0 && marginSteps < maxMarginSteps {
 		maxDataRateIndex = desiredParameters.AdrDataRateIndex + ttnpb.DataRateIndex(marginSteps)
-	} else if marginSteps < 0 {
-		maxDataRateIndex = minDataRateIndex
+	} else if marginSteps <= 0 {
+		return margin
 	}
 	for drIdx := maxDataRateIndex; drIdx > minDataRateIndex; drIdx-- {
 		if _, ok := allowedDataRateIndices[drIdx]; !ok {

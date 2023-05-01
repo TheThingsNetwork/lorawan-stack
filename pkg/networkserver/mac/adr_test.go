@@ -1642,32 +1642,6 @@ func TestADRDataRange(t *testing.T) {
 			Ok:      true,
 		},
 		{
-			Name: "clamp to current",
-
-			Device: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{
-					CurrentParameters: &ttnpb.MACParameters{
-						AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
-					},
-					DesiredParameters: &ttnpb.MACParameters{
-						Channels: []*ttnpb.MACParameters_Channel{
-							{
-								MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
-								MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_6,
-								EnableUplink:     true,
-							},
-						},
-					},
-				},
-			},
-			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
-
-			Min:     ttnpb.DataRateIndex_DATA_RATE_2,
-			Max:     ttnpb.DataRateIndex_DATA_RATE_5,
-			Allowed: newDataRateIndexRange(ttnpb.DataRateIndex_DATA_RATE_1, ttnpb.DataRateIndex_DATA_RATE_6),
-			Ok:      true,
-		},
-		{
 			Name: "rejected; ok",
 
 			Device: &ttnpb.EndDevice{
@@ -2001,35 +1975,35 @@ func TestADRAdaptDataRate(t *testing.T) {
 		OutputMargin   float32
 	}{
 		{
-			Name: "below min data rate index",
+			Name: "below current data rate index",
 
 			MACState: &ttnpb.MACState{
 				CurrentParameters: &ttnpb.MACParameters{
-					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
-					AdrTxPowerIndex:  1,
-				},
-				DesiredParameters: &ttnpb.MACParameters{
-					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
-					AdrTxPowerIndex:  1,
-				},
-			},
-			Band:                   &band.EU_863_870_RP1_V1_0_2_Rev_B,
-			MinDataRateIndex:       ttnpb.DataRateIndex_DATA_RATE_1,
-			MaxDataRateIndex:       ttnpb.DataRateIndex_DATA_RATE_5,
-			AllowedDataRateIndices: newDataRateIndexRange(ttnpb.DataRateIndex_DATA_RATE_1, ttnpb.DataRateIndex_DATA_RATE_5),
-			InitialMargin:          -5.0,
-
-			OutputMACState: &ttnpb.MACState{
-				CurrentParameters: &ttnpb.MACParameters{
-					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
 					AdrTxPowerIndex:  1,
 				},
 				DesiredParameters: &ttnpb.MACParameters{
 					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
-					AdrTxPowerIndex:  0,
+					AdrTxPowerIndex:  1,
 				},
 			},
-			OutputMargin: -7.5,
+			Band:                   &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			MinDataRateIndex:       ttnpb.DataRateIndex_DATA_RATE_0,
+			MaxDataRateIndex:       ttnpb.DataRateIndex_DATA_RATE_5,
+			AllowedDataRateIndices: newDataRateIndexRange(ttnpb.DataRateIndex_DATA_RATE_0, ttnpb.DataRateIndex_DATA_RATE_5),
+			InitialMargin:          -15.0,
+
+			OutputMACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					AdrTxPowerIndex:  1,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					AdrTxPowerIndex:  1,
+				},
+			},
+			OutputMargin: -15.0,
 		},
 		{
 			Name: "positive steps",
