@@ -445,6 +445,9 @@ func adrAdaptDataRate(
 	desiredParameters.AdrTxPowerIndex = currentParameters.AdrTxPowerIndex
 	if currentDataRateIndex < minDataRateIndex {
 		margin -= float32(minDataRateIndex-currentDataRateIndex) * drStep
+		// NOTE: The margin is not adjusted for the transmission power index change
+		// in order to encourage data rate increases instead of transmission power
+		// decreases.
 		desiredParameters.AdrDataRateIndex = minDataRateIndex
 		desiredParameters.AdrTxPowerIndex = 0
 	}
@@ -460,6 +463,9 @@ func adrAdaptDataRate(
 			continue
 		}
 		margin -= float32(drIdx-desiredParameters.AdrDataRateIndex) * drStep
+		// NOTE: The margin is not adjusted for the transmission power index change
+		// in order to encourage data rate increases instead of transmission power
+		// decreases.
 		desiredParameters.AdrDataRateIndex = drIdx
 		desiredParameters.AdrTxPowerIndex = 0
 		break
