@@ -58,7 +58,7 @@ const OrganizationAdd = () => {
             content={m.orgDescription}
             values={{
               Link: content => (
-                <Link.DocLink secondary path="/getting-started/user-management/org">
+                <Link.DocLink secondary path="/the-things-stack/management/user-management/org/">
                   {content}
                 </Link.DocLink>
               ),

@@ -108,7 +108,7 @@ const statusMap = {
 
 const conversionError = createFrontendError(m.conversionErrorTitle, m.conversionErrorMessage)
 const docLinkValue = msg => (
-  <Link.DocLink secondary path="/getting-started/migrating/import-devices/">
+  <Link.DocLink secondary path="/the-thing-stack/migrating/import-devices/">
     {msg}
   </Link.DocLink>
 )
