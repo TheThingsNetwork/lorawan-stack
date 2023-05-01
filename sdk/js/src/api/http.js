@@ -206,6 +206,7 @@ class Http {
       res.field_mask = paths.join(',')
       return res
     }
+    return {}
   }
 
   /**

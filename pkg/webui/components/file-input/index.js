@@ -46,7 +46,7 @@ export default class FileInput extends Component {
     accept: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
     center: PropTypes.bool,
     changeMessage: PropTypes.message,
-    /** `dataTransform` is a marshaler used to transform the raw field value into.
+    /** `dataTransform` is a marshaler used to transform the raw field value into
      * a value matching the field schema. */
     dataTransform: PropTypes.func,
     disabled: PropTypes.bool,

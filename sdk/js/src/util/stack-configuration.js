@@ -58,6 +58,7 @@ class StackConfiguration {
       return new URL(url).hostname
     } catch (error) {
       // Do not propagate the error, simply return `undefined`.
+      return undefined
     }
   }
 
