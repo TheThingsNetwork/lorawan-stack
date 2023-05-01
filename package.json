@@ -125,7 +125,7 @@
     "react-toastify": "^8.1.0",
     "react-virtualized-auto-sizer": "^1.0.4",
     "react-window": "^1.8.6",
-    "redux": "^4.2.0",
+    "redux": "^4.2.1",
     "redux-actions": "^2.6.5",
     "redux-logic": "^3.0.2",
     "redux-sentry-middleware": "^0.2.2",
