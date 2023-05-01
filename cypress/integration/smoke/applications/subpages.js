@@ -29,11 +29,15 @@ const applicationSubpages = defineSmokeTest('check all application sub-pages', (
   cy.visit(Cypress.config('consoleRootPath'))
 
   cy.get('header').within(() => {
-    cy.findByRole('link', { name: /Applications/ }).click()
+    cy.findAllByRole('link', { name: /Applications/ })
+      .first()
+      .click()
   })
   cy.findByRole('cell', { name: application.ids.application_id }).click()
 
-  cy.findByRole('link', { name: /End devices/ }).click()
+  cy.findAllByRole('link', { name: /End devices/ })
+    .first()
+    .click()
   cy.findByText('End devices (0)').should('be.visible')
   cy.findByRole('link', { name: /Register end device/ })
     .should('be.visible')
