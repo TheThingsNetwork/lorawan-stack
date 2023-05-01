@@ -25,14 +25,15 @@ import (
 	"time"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	"go.opencensus.io/plugin/ocgrpc"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware"
 	_ "go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/discover" // Register service discovery resolvers
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing"
 	"go.thethings.network/lorawan-stack/v3/pkg/version"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
@@ -42,7 +43,7 @@ import (
 func DefaultDialOptions(ctx context.Context) []grpc.DialOption {
 	streamInterceptors := []grpc.StreamClientInterceptor{
 		metrics.StreamClientInterceptor,
-		grpc_opentracing.StreamClientInterceptor(),
+		otelgrpc.StreamClientInterceptor(otelgrpc.WithTracerProvider(tracing.FromContext(ctx))),
 		rpclog.StreamClientInterceptor(ctx), // Gets logger from global context
 		warning.StreamClientInterceptor,
 		errors.StreamClientInterceptor(),
@@ -50,7 +51,7 @@ func DefaultDialOptions(ctx context.Context) []grpc.DialOption {
 
 	unaryInterceptors := []grpc.UnaryClientInterceptor{
 		metrics.UnaryClientInterceptor,
-		grpc_opentracing.UnaryClientInterceptor(),
+		otelgrpc.UnaryClientInterceptor(otelgrpc.WithTracerProvider(tracing.FromContext(ctx))),
 		rpclog.UnaryClientInterceptor(ctx), // Gets logger from global context
 		warning.UnaryClientInterceptor,
 		errors.UnaryClientInterceptor(),
