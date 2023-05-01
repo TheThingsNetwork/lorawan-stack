@@ -2603,6 +2603,7 @@ func TestADRSteerDeviceChannels(t *testing.T) {
 		InputDevice *ttnpb.EndDevice
 		Defaults    *ttnpb.MACSettings
 		Band        *band.Band
+		Min, Max    ttnpb.DataRateIndex
 		Allowed     map[ttnpb.DataRateIndex]struct{}
 		InputMargin float32
 
@@ -2745,6 +2746,8 @@ func TestADRSteerDeviceChannels(t *testing.T) {
 				},
 			},
 			Band:        &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			Min:         ttnpb.DataRateIndex_DATA_RATE_0,
+			Max:         ttnpb.DataRateIndex_DATA_RATE_5,
 			Allowed:     newDataRateIndexRange(ttnpb.DataRateIndex_DATA_RATE_0, ttnpb.DataRateIndex_DATA_RATE_6),
 			InputMargin: 5.0,
 
@@ -2804,6 +2807,8 @@ func TestADRSteerDeviceChannels(t *testing.T) {
 				},
 			},
 			Band:        &band.US_902_928_RP1_V1_0_2_Rev_B,
+			Min:         ttnpb.DataRateIndex_DATA_RATE_0,
+			Max:         ttnpb.DataRateIndex_DATA_RATE_3,
 			Allowed:     newDataRateIndexRange(ttnpb.DataRateIndex_DATA_RATE_0, ttnpb.DataRateIndex_DATA_RATE_4),
 			InputMargin: 5.0,
 
@@ -2842,7 +2847,9 @@ func TestADRSteerDeviceChannels(t *testing.T) {
 
 			a := assertions.New(t)
 			device := ttnpb.Clone(tc.InputDevice)
-			margin, ok := ADRSteerDeviceChannels(device, tc.Defaults, tc.Band, tc.Allowed, tc.InputMargin)
+			margin, ok := ADRSteerDeviceChannels(
+				device, tc.Defaults, tc.Band, tc.Min, tc.Max, tc.Allowed, tc.InputMargin,
+			)
 			a.So(margin, should.Equal, tc.OutputMargin)
 			a.So(ok, should.Equal, tc.Ok)
 			if tc.OutputDevice != nil {

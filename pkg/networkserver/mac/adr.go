@@ -225,6 +225,7 @@ func adrSteerDeviceChannels(
 	dev *ttnpb.EndDevice,
 	defaults *ttnpb.MACSettings,
 	phy *band.Band,
+	min, max ttnpb.DataRateIndex,
 	allowed map[ttnpb.DataRateIndex]struct{},
 	margin float32,
 ) (float32, bool) {
@@ -238,11 +239,11 @@ func adrSteerDeviceChannels(
 			return margin, false
 		}
 		var drIdx ttnpb.DataRateIndex
-		for drIdx = phy.MaxADRDataRateIndex; drIdx >= ttnpb.DataRateIndex_DATA_RATE_0; drIdx-- {
+		for drIdx = max; drIdx >= min; drIdx-- {
 			if _, ok := allowed[drIdx]; ok {
 				break
 			}
-			if drIdx == ttnpb.DataRateIndex_DATA_RATE_0 {
+			if drIdx == min {
 				return margin, false
 			}
 		}
@@ -628,7 +629,9 @@ func adaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 	if err != nil || !ok {
 		return err
 	}
-	margin, ok = adrSteerDeviceChannels(dev, defaults, phy, allowedDataRateIndices, margin)
+	margin, ok = adrSteerDeviceChannels(
+		dev, defaults, phy, minDataRateIndex, maxDataRateIndex, allowedDataRateIndices, margin,
+	)
 	if !ok {
 		margin = adrAdaptDataRate(
 			macState, phy, minDataRateIndex, maxDataRateIndex, allowedDataRateIndices, minTxPowerIndex, margin,
