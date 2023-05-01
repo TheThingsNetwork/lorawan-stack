@@ -333,9 +333,9 @@ func indicesMap[T comparable](indices ...T) map[T]struct{} {
 
 func adrDataRateRange(
 	ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, defaults *ttnpb.MACSettings,
-) (min, max ttnpb.DataRateIndex, rejected map[ttnpb.DataRateIndex]struct{}, ok bool, err error) {
+) (min, max ttnpb.DataRateIndex, allowed map[ttnpb.DataRateIndex]struct{}, ok bool, err error) {
 	macState := dev.MacState
-	min, max, _, ok = channelDataRateRange(
+	min, max, allowed, ok = channelDataRateRange(
 		macState.DesiredParameters.Channels...,
 	)
 	if !ok {
@@ -350,16 +350,18 @@ func adrDataRateRange(
 	if max > phy.MaxADRDataRateIndex {
 		max = phy.MaxADRDataRateIndex
 	}
-	rejected = indicesMap(macState.RejectedAdrDataRateIndexes...)
-	_, ok = rejected[min]
-	for ok && min <= max {
-		min++
-		_, ok = rejected[min]
+	for _, idx := range macState.RejectedAdrDataRateIndexes {
+		delete(allowed, idx)
 	}
-	_, ok = rejected[max]
-	for ok && max >= min {
+	_, ok = allowed[min]
+	for !ok && min <= max {
+		min++
+		_, ok = allowed[min]
+	}
+	_, ok = allowed[max]
+	for !ok && max >= min {
 		max--
-		_, ok = rejected[max]
+		_, ok = allowed[max]
 	}
 	if min > max {
 		log.FromContext(ctx).Debug(
@@ -370,7 +372,7 @@ func adrDataRateRange(
 	if currentDataRateIndex := macState.CurrentParameters.AdrDataRateIndex; currentDataRateIndex > min {
 		min = currentDataRateIndex
 	}
-	return min, max, rejected, true, nil
+	return min, max, allowed, true, nil
 }
 
 func adrTxPowerRange(
@@ -433,7 +435,7 @@ func adrAdaptDataRate(
 	macState *ttnpb.MACState,
 	phy *band.Band,
 	minDataRateIndex, maxDataRateIndex ttnpb.DataRateIndex,
-	rejectedDataRateIndices map[ttnpb.DataRateIndex]struct{},
+	allowedDataRateIndices map[ttnpb.DataRateIndex]struct{},
 	minTxPowerIndex uint32,
 	margin float32,
 ) float32 {
@@ -459,7 +461,7 @@ func adrAdaptDataRate(
 		maxDataRateIndex = minDataRateIndex
 	}
 	for drIdx := maxDataRateIndex; drIdx > minDataRateIndex; drIdx-- {
-		if _, ok := rejectedDataRateIndices[drIdx]; ok {
+		if _, ok := allowedDataRateIndices[drIdx]; !ok {
 			continue
 		}
 		margin -= float32(drIdx-desiredParameters.AdrDataRateIndex) * drStep
@@ -538,7 +540,7 @@ func adaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 	if len(adrUplinks) == 0 {
 		return nil
 	}
-	minDataRateIndex, maxDataRateIndex, rejectedDataRateIndices, ok, err := adrDataRateRange(ctx, dev, phy, defaults)
+	minDataRateIndex, maxDataRateIndex, allowedDataRateIndices, ok, err := adrDataRateRange(ctx, dev, phy, defaults)
 	if err != nil || !ok {
 		return err
 	}
@@ -551,7 +553,7 @@ func adaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 		return err
 	}
 	margin = adrAdaptDataRate(
-		macState, phy, minDataRateIndex, maxDataRateIndex, rejectedDataRateIndices, minTxPowerIndex, margin,
+		macState, phy, minDataRateIndex, maxDataRateIndex, allowedDataRateIndices, minTxPowerIndex, margin,
 	)
 	margin = adrAdaptTxPowerIndex(
 		macState, phy, minTxPowerIndex, maxTxPowerIndex, rejectedTxPowerIndices, margin, optimal,

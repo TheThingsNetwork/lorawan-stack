@@ -1568,7 +1568,7 @@ func TestADRDataRange(t *testing.T) {
 		AssertError func(error) bool
 
 		Min, Max ttnpb.DataRateIndex
-		Rejected map[ttnpb.DataRateIndex]struct{}
+		Allowed  map[ttnpb.DataRateIndex]struct{}
 		Ok       bool
 	}{
 		{
@@ -1636,9 +1636,10 @@ func TestADRDataRange(t *testing.T) {
 			},
 			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
 
-			Min: ttnpb.DataRateIndex_DATA_RATE_1,
-			Max: ttnpb.DataRateIndex_DATA_RATE_5,
-			Ok:  true,
+			Min:     ttnpb.DataRateIndex_DATA_RATE_1,
+			Max:     ttnpb.DataRateIndex_DATA_RATE_5,
+			Allowed: newDataRateIndexRange(ttnpb.DataRateIndex_DATA_RATE_1, ttnpb.DataRateIndex_DATA_RATE_6),
+			Ok:      true,
 		},
 		{
 			Name: "clamp to current",
@@ -1661,9 +1662,10 @@ func TestADRDataRange(t *testing.T) {
 			},
 			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
 
-			Min: ttnpb.DataRateIndex_DATA_RATE_2,
-			Max: ttnpb.DataRateIndex_DATA_RATE_5,
-			Ok:  true,
+			Min:     ttnpb.DataRateIndex_DATA_RATE_2,
+			Max:     ttnpb.DataRateIndex_DATA_RATE_5,
+			Allowed: newDataRateIndexRange(ttnpb.DataRateIndex_DATA_RATE_1, ttnpb.DataRateIndex_DATA_RATE_6),
+			Ok:      true,
 		},
 		{
 			Name: "rejected; ok",
@@ -1698,10 +1700,11 @@ func TestADRDataRange(t *testing.T) {
 
 			Min: ttnpb.DataRateIndex_DATA_RATE_1,
 			Max: ttnpb.DataRateIndex_DATA_RATE_5,
-			Rejected: map[ttnpb.DataRateIndex]struct{}{
-				ttnpb.DataRateIndex_DATA_RATE_0: {},
-				ttnpb.DataRateIndex_DATA_RATE_3: {},
-				ttnpb.DataRateIndex_DATA_RATE_6: {},
+			Allowed: map[ttnpb.DataRateIndex]struct{}{
+				ttnpb.DataRateIndex_DATA_RATE_1: {},
+				ttnpb.DataRateIndex_DATA_RATE_2: {},
+				ttnpb.DataRateIndex_DATA_RATE_4: {},
+				ttnpb.DataRateIndex_DATA_RATE_5: {},
 			},
 			Ok: true,
 		},
@@ -1746,13 +1749,13 @@ func TestADRDataRange(t *testing.T) {
 			t.Parallel()
 
 			a, ctx := test.New(t)
-			min, max, rejected, ok, err := ADRDataRateRange(ctx, tc.Device, tc.Band, tc.Defaults)
+			min, max, allowed, ok, err := ADRDataRateRange(ctx, tc.Device, tc.Band, tc.Defaults)
 			if assertError := tc.AssertError; assertError != nil {
 				a.So(assertError(err), should.BeTrue)
 			} else {
 				a.So(min, should.Equal, tc.Min)
 				a.So(max, should.Equal, tc.Max)
-				a.So(rejected, should.Resemble, tc.Rejected)
+				a.So(allowed, should.Resemble, tc.Allowed)
 				a.So(ok, should.Equal, tc.Ok)
 				a.So(err, should.BeNil)
 			}
@@ -1990,7 +1993,7 @@ func TestADRAdaptDataRate(t *testing.T) {
 		MACState                           *ttnpb.MACState
 		Band                               *band.Band
 		MinDataRateIndex, MaxDataRateIndex ttnpb.DataRateIndex
-		RejectedDataRateIndices            map[ttnpb.DataRateIndex]struct{}
+		AllowedDataRateIndices             map[ttnpb.DataRateIndex]struct{}
 		MinTxPowerIndex                    uint32
 		InitialMargin                      float32
 
@@ -2010,10 +2013,11 @@ func TestADRAdaptDataRate(t *testing.T) {
 					AdrTxPowerIndex:  1,
 				},
 			},
-			Band:             &band.EU_863_870_RP1_V1_0_2_Rev_B,
-			MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
-			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
-			InitialMargin:    -5.0,
+			Band:                   &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			MinDataRateIndex:       ttnpb.DataRateIndex_DATA_RATE_1,
+			MaxDataRateIndex:       ttnpb.DataRateIndex_DATA_RATE_5,
+			AllowedDataRateIndices: newDataRateIndexRange(ttnpb.DataRateIndex_DATA_RATE_1, ttnpb.DataRateIndex_DATA_RATE_5),
+			InitialMargin:          -5.0,
 
 			OutputMACState: &ttnpb.MACState{
 				CurrentParameters: &ttnpb.MACParameters{
@@ -2040,9 +2044,10 @@ func TestADRAdaptDataRate(t *testing.T) {
 					AdrTxPowerIndex:  1,
 				},
 			},
-			Band:             &band.EU_863_870_RP1_V1_0_2_Rev_B,
-			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
-			InitialMargin:    15.0,
+			Band:                   &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			MaxDataRateIndex:       ttnpb.DataRateIndex_DATA_RATE_5,
+			AllowedDataRateIndices: newDataRateIndexRange(ttnpb.DataRateIndex_DATA_RATE_0, ttnpb.DataRateIndex_DATA_RATE_5),
+			InitialMargin:          15.0,
 
 			OutputMACState: &ttnpb.MACState{
 				CurrentParameters: &ttnpb.MACParameters{
@@ -2069,10 +2074,11 @@ func TestADRAdaptDataRate(t *testing.T) {
 					AdrTxPowerIndex:  1,
 				},
 			},
-			Band:             &band.EU_863_870_RP1_V1_0_2_Rev_B,
-			MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
-			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
-			InitialMargin:    -7.5,
+			Band:                   &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			MinDataRateIndex:       ttnpb.DataRateIndex_DATA_RATE_3,
+			MaxDataRateIndex:       ttnpb.DataRateIndex_DATA_RATE_5,
+			AllowedDataRateIndices: newDataRateIndexRange(ttnpb.DataRateIndex_DATA_RATE_3, ttnpb.DataRateIndex_DATA_RATE_5),
+			InitialMargin:          -7.5,
 
 			OutputMACState: &ttnpb.MACState{
 				CurrentParameters: &ttnpb.MACParameters{
@@ -2099,12 +2105,10 @@ func TestADRAdaptDataRate(t *testing.T) {
 					AdrTxPowerIndex:  1,
 				},
 			},
-			Band:             &band.EU_863_870_RP1_V1_0_2_Rev_B,
-			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
-			RejectedDataRateIndices: map[ttnpb.DataRateIndex]struct{}{
-				ttnpb.DataRateIndex_DATA_RATE_0: {},
-			},
-			InitialMargin: 2.5,
+			Band:                   &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			MaxDataRateIndex:       ttnpb.DataRateIndex_DATA_RATE_5,
+			AllowedDataRateIndices: newDataRateIndexRange(ttnpb.DataRateIndex_DATA_RATE_1, ttnpb.DataRateIndex_DATA_RATE_5),
+			InitialMargin:          2.5,
 
 			OutputMACState: &ttnpb.MACState{
 				CurrentParameters: &ttnpb.MACParameters{
@@ -2131,12 +2135,10 @@ func TestADRAdaptDataRate(t *testing.T) {
 					AdrTxPowerIndex:  1,
 				},
 			},
-			Band:             &band.EU_863_870_RP1_V1_0_2_Rev_B,
-			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
-			RejectedDataRateIndices: map[ttnpb.DataRateIndex]struct{}{
-				ttnpb.DataRateIndex_DATA_RATE_5: {},
-			},
-			InitialMargin: 15.0,
+			Band:                   &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			MaxDataRateIndex:       ttnpb.DataRateIndex_DATA_RATE_5,
+			AllowedDataRateIndices: newDataRateIndexRange(ttnpb.DataRateIndex_DATA_RATE_0, ttnpb.DataRateIndex_DATA_RATE_4),
+			InitialMargin:          15.0,
 
 			OutputMACState: &ttnpb.MACState{
 				CurrentParameters: &ttnpb.MACParameters{
@@ -2160,7 +2162,7 @@ func TestADRAdaptDataRate(t *testing.T) {
 				tc.MACState,
 				tc.Band,
 				tc.MinDataRateIndex, tc.MaxDataRateIndex,
-				tc.RejectedDataRateIndices,
+				tc.AllowedDataRateIndices,
 				tc.MinTxPowerIndex,
 				tc.InitialMargin,
 			)
@@ -2504,4 +2506,12 @@ func TestADRAdaptNbTrans(t *testing.T) {
 			a.So(tc.Device, should.Resemble, tc.ExpectedDevice)
 		})
 	}
+}
+
+func newDataRateIndexRange(min, max ttnpb.DataRateIndex) map[ttnpb.DataRateIndex]struct{} {
+	m := make(map[ttnpb.DataRateIndex]struct{})
+	for idx := min; idx <= max; idx++ {
+		m[idx] = struct{}{}
+	}
+	return m
 }
