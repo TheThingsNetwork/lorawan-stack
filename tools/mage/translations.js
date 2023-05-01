@@ -19,7 +19,7 @@ const fs = require('fs')
 const path = require('path')
 
 const yargs = require('yargs')
-const mkdirp = require('mkdirp')
+const { mkdirp } = require('mkdirp')
 const g = require('glob')
 
 const argv = yargs.argv
