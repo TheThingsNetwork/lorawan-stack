@@ -13558,10 +13558,10 @@ redux-sentry-middleware@^0.2.2:
   resolved "https://registry.yarnpkg.com/redux-sentry-middleware/-/redux-sentry-middleware-0.2.2.tgz#79140377b4fa6a606797cb2a13cc1b8ab7d68cec"
   integrity sha512-SOxNkPNgU+zZT6cW4XV1+B2IpWrVXW4yuFHzOJvVjHn4yRV71nAj0Clj6XjhD0K2TKUxvwmjLn01mDL2RarMUQ==
 
-redux@^4.0.0, redux@^4.2.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/redux/-/redux-4.2.0.tgz#46f10d6e29b6666df758780437651eeb2b969f13"
-  integrity sha512-oSBmcKKIuIR4ME29/AeNUnl5L+hvBq7OaJWzaptTQJAntaPvxIJqfnjbaEiCzzaIz+XmVILfqAM3Ob0aXLPfjA==
+redux@^4.0.0, redux@^4.2.1:
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/redux/-/redux-4.2.1.tgz#c08f4306826c49b5e9dc901dee0452ea8fce6197"
+  integrity sha512-LAUYz4lc+Do8/g7aeRa8JkyDErK6ekstQaqWQrNRW//MY1TvCEpMtpTWvlQ+FPbWCx+Xixu/6SHt5N0HR+SB4w==
   dependencies:
     "@babel/runtime" "^7.9.2"
 
