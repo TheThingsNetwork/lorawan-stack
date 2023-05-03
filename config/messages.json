@@ -1340,6 +1340,15 @@
       "file": "end_devices.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:claiming_not_supported": {
+    "translations": {
+      "en": "claiming not supported for JoinEUI `{join_eui}`"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "end_devices.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:conflicting_paths": {
     "translations": {
       "en": "conflicting set and unset field mask paths"
