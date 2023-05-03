@@ -2668,8 +2668,8 @@ func TestADRSteerDeviceChannels(t *testing.T) {
 						Mode: &ttnpb.ADRSettings_Dynamic{
 							Dynamic: &ttnpb.ADRSettings_DynamicMode{
 								ChannelSteering: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings{
-									Mode: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_Narrow{
-										Narrow: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode{},
+									Mode: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_LoraNarrow{
+										LoraNarrow: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode{},
 									},
 								},
 							},
@@ -2702,8 +2702,8 @@ func TestADRSteerDeviceChannels(t *testing.T) {
 						Mode: &ttnpb.ADRSettings_Dynamic{
 							Dynamic: &ttnpb.ADRSettings_DynamicMode{
 								ChannelSteering: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings{
-									Mode: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_Narrow{
-										Narrow: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode{},
+									Mode: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_LoraNarrow{
+										LoraNarrow: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode{},
 									},
 								},
 							},
@@ -2736,8 +2736,8 @@ func TestADRSteerDeviceChannels(t *testing.T) {
 						Mode: &ttnpb.ADRSettings_Dynamic{
 							Dynamic: &ttnpb.ADRSettings_DynamicMode{
 								ChannelSteering: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings{
-									Mode: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_Narrow{
-										Narrow: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode{},
+									Mode: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_LoraNarrow{
+										LoraNarrow: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode{},
 									},
 								},
 							},
@@ -2769,8 +2769,8 @@ func TestADRSteerDeviceChannels(t *testing.T) {
 						Mode: &ttnpb.ADRSettings_Dynamic{
 							Dynamic: &ttnpb.ADRSettings_DynamicMode{
 								ChannelSteering: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings{
-									Mode: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_Narrow{
-										Narrow: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode{},
+									Mode: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_LoraNarrow{
+										LoraNarrow: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode{},
 									},
 								},
 							},
@@ -2797,8 +2797,8 @@ func TestADRSteerDeviceChannels(t *testing.T) {
 						Mode: &ttnpb.ADRSettings_Dynamic{
 							Dynamic: &ttnpb.ADRSettings_DynamicMode{
 								ChannelSteering: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings{
-									Mode: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_Narrow{
-										Narrow: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode{},
+									Mode: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_LoraNarrow{
+										LoraNarrow: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode{},
 									},
 								},
 							},
@@ -2830,8 +2830,8 @@ func TestADRSteerDeviceChannels(t *testing.T) {
 						Mode: &ttnpb.ADRSettings_Dynamic{
 							Dynamic: &ttnpb.ADRSettings_DynamicMode{
 								ChannelSteering: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings{
-									Mode: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_Narrow{
-										Narrow: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode{},
+									Mode: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_LoraNarrow{
+										LoraNarrow: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode{},
 									},
 								},
 							},

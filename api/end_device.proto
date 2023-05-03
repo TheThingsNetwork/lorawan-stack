@@ -230,10 +230,10 @@ message ADRSettings {
     message ChannelSteeringSettings {
       option (thethings.flags.message) = { select: true, set: true, semantical: true };
 
-      // Configuration options for narrow channels steering.
+      // Configuration options for LoRa narrow channels steering.
       // The narrow mode attempts to steer the end device towards
       // using the LoRa modulated, 125kHz bandwidth channels.
-      message NarrowMode {
+      message LoRaNarrowMode {
         option (thethings.flags.message) = { select: true, set: true };
       }
 
@@ -244,7 +244,7 @@ message ADRSettings {
       }
 
       oneof mode {
-        NarrowMode narrow = 1;
+        LoRaNarrowMode lora_narrow = 1;
         DisabledMode disabled = 2;
       }
     }

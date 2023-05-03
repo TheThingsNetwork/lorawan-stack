@@ -3374,28 +3374,28 @@ func (dst *ADRSettings_DynamicMode_ChannelSteeringSettings) SetFields(src *ADRSe
 			}
 			for oneofName, oneofSubs := range subPathMap {
 				switch oneofName {
-				case "narrow":
+				case "lora_narrow":
 					var srcTypeOk bool
 					if src != nil {
-						_, srcTypeOk = src.Mode.(*ADRSettings_DynamicMode_ChannelSteeringSettings_Narrow)
+						_, srcTypeOk = src.Mode.(*ADRSettings_DynamicMode_ChannelSteeringSettings_LoraNarrow)
 					}
 					if srcValid := srcTypeOk || src == nil || src.Mode == nil || len(oneofSubs) == 0; !srcValid {
-						return fmt.Errorf("attempt to set oneof 'narrow', while different oneof is set in source")
+						return fmt.Errorf("attempt to set oneof 'lora_narrow', while different oneof is set in source")
 					}
-					_, dstTypeOk := dst.Mode.(*ADRSettings_DynamicMode_ChannelSteeringSettings_Narrow)
+					_, dstTypeOk := dst.Mode.(*ADRSettings_DynamicMode_ChannelSteeringSettings_LoraNarrow)
 					if dstValid := dstTypeOk || dst.Mode == nil || len(oneofSubs) == 0; !dstValid {
-						return fmt.Errorf("attempt to set oneof 'narrow', while different oneof is set in destination")
+						return fmt.Errorf("attempt to set oneof 'lora_narrow', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
-						var newDst, newSrc *ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode
+						var newDst, newSrc *ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode
 						if srcTypeOk {
-							newSrc = src.Mode.(*ADRSettings_DynamicMode_ChannelSteeringSettings_Narrow).Narrow
+							newSrc = src.Mode.(*ADRSettings_DynamicMode_ChannelSteeringSettings_LoraNarrow).LoraNarrow
 						}
 						if dstTypeOk {
-							newDst = dst.Mode.(*ADRSettings_DynamicMode_ChannelSteeringSettings_Narrow).Narrow
+							newDst = dst.Mode.(*ADRSettings_DynamicMode_ChannelSteeringSettings_LoraNarrow).LoraNarrow
 						} else if srcTypeOk {
-							newDst = &ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode{}
-							dst.Mode = &ADRSettings_DynamicMode_ChannelSteeringSettings_Narrow{Narrow: newDst}
+							newDst = &ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode{}
+							dst.Mode = &ADRSettings_DynamicMode_ChannelSteeringSettings_LoraNarrow{LoraNarrow: newDst}
 						} else {
 							dst.Mode = nil
 							continue
@@ -3459,9 +3459,9 @@ func (dst *ADRSettings_DynamicMode_ChannelSteeringSettings) SetFields(src *ADRSe
 	return nil
 }
 
-func (dst *ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode) SetFields(src *ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode, paths ...string) error {
+func (dst *ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode) SetFields(src *ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode, paths ...string) error {
 	if len(paths) != 0 {
-		return fmt.Errorf("message ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode has no fields, but paths %s were specified", paths)
+		return fmt.Errorf("message ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode has no fields, but paths %s were specified", paths)
 	}
 	return nil
 }

@@ -219,7 +219,7 @@
   - [Message `ADRSettings.DynamicMode`](#ttn.lorawan.v3.ADRSettings.DynamicMode)
   - [Message `ADRSettings.DynamicMode.ChannelSteeringSettings`](#ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings)
   - [Message `ADRSettings.DynamicMode.ChannelSteeringSettings.DisabledMode`](#ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.DisabledMode)
-  - [Message `ADRSettings.DynamicMode.ChannelSteeringSettings.NarrowMode`](#ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.NarrowMode)
+  - [Message `ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode`](#ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode)
   - [Message `ADRSettings.StaticMode`](#ttn.lorawan.v3.ADRSettings.StaticMode)
   - [Message `BatchUpdateEndDeviceLastSeenRequest`](#ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest)
   - [Message `BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate`](#ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate)
@@ -3401,7 +3401,7 @@ EXPERIMENTAL: Channel steering settings.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `narrow` | [`ADRSettings.DynamicMode.ChannelSteeringSettings.NarrowMode`](#ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.NarrowMode) |  |  |
+| `lora_narrow` | [`ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode`](#ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode) |  |  |
 | `disabled` | [`ADRSettings.DynamicMode.ChannelSteeringSettings.DisabledMode`](#ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.DisabledMode) |  |  |
 
 ### <a name="ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.DisabledMode">Message `ADRSettings.DynamicMode.ChannelSteeringSettings.DisabledMode`</a>
@@ -3409,9 +3409,9 @@ EXPERIMENTAL: Channel steering settings.
 Configuration options for cases in which ADR is not supposed to steer the end device
 to another set of channels.
 
-### <a name="ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.NarrowMode">Message `ADRSettings.DynamicMode.ChannelSteeringSettings.NarrowMode`</a>
+### <a name="ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode">Message `ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode`</a>
 
-Configuration options for narrow channels steering.
+Configuration options for LoRa narrow channels steering.
 The narrow mode attempts to steer the end device towards
 using the LoRa modulated, 125kHz bandwidth channels.
 

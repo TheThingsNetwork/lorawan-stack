@@ -16941,9 +16941,9 @@
         }
       }
     },
-    "ChannelSteeringSettingsNarrowMode": {
+    "ChannelSteeringSettingsLoRaNarrowMode": {
       "type": "object",
-      "description": "Configuration options for narrow channels steering.\nThe narrow mode attempts to steer the end device towards\nusing the LoRa modulated, 125kHz bandwidth channels."
+      "description": "Configuration options for LoRa narrow channels steering.\nThe narrow mode attempts to steer the end device towards\nusing the LoRa modulated, 125kHz bandwidth channels."
     },
     "CompliancesCompliance": {
       "type": "object",
@@ -17041,8 +17041,8 @@
     "DynamicModeChannelSteeringSettings": {
       "type": "object",
       "properties": {
-        "narrow": {
-          "$ref": "#/definitions/ChannelSteeringSettingsNarrowMode"
+        "lora_narrow": {
+          "$ref": "#/definitions/ChannelSteeringSettingsLoRaNarrowMode"
         },
         "disabled": {
           "$ref": "#/definitions/DynamicModeChannelSteeringSettingsDisabledMode"

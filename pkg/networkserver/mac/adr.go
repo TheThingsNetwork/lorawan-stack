@@ -231,7 +231,7 @@ func adrSteerDeviceChannels(
 ) (float32, bool) {
 	channelSteering := deviceADRChannelSteering(dev, defaults)
 	switch {
-	case channelSteering.GetNarrow() != nil:
+	case channelSteering.GetLoraNarrow() != nil:
 		macState := dev.MacState
 		currentParameters, desiredParameters := macState.CurrentParameters, macState.DesiredParameters
 		currentDataRateIndex := currentParameters.AdrDataRateIndex

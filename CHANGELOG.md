@@ -14,9 +14,9 @@ For details about compatibility between different releases, see the **Commitment
 - Experimental channel steering API, which allows steering end devices from the wide (250kHz or 500kHz) channels towards the narrow (125kHz) channels.
   - This API is mainly relevant for end devices operating in the US915 and AU915 regions, as they may join via a wide channel, but users may want to steer them towards the narrow channels.
   - The new settings can be found under `mac-settings.adr.mode.dynamic.channel-steering`.
-  - `mac-settings.adr.mode.dynamic.channel-steering.mode.narrow` steers the end devices towards the narrow channels.
+  - `mac-settings.adr.mode.dynamic.channel-steering.mode.lora-narrow` steers the end devices towards the LoRa modulated narrow channels.
   - `mac-settings.adr.mode.dynamic.channel-steering.mode.disabled` does not steer the end devices - end devices are left to operate in their currently active channels, wide or narrow.
-  - The default behavior is to avoid steering the end devices, but this is subject to change in future versions. Consider explicitly specifying a certain behavior (`narrow` or `disabled`) if you depend on not steering the end devices.
+  - The default behavior is to avoid steering the end devices, but this is subject to change in future versions. Consider explicitly specifying a certain behavior (`lora-narrow` or `disabled`) if you depend on not steering the end devices.
 
 ### Changed
 

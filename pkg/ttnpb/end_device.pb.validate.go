@@ -4510,22 +4510,22 @@ func (m *ADRSettings_DynamicMode_ChannelSteeringSettings) ValidateFields(paths .
 		case "mode":
 			if len(subs) == 0 {
 				subs = []string{
-					"narrow", "disabled",
+					"lora_narrow", "disabled",
 				}
 			}
 			for name, subs := range _processPaths(subs) {
 				_ = subs
 				switch name {
-				case "narrow":
-					w, ok := m.Mode.(*ADRSettings_DynamicMode_ChannelSteeringSettings_Narrow)
+				case "lora_narrow":
+					w, ok := m.Mode.(*ADRSettings_DynamicMode_ChannelSteeringSettings_LoraNarrow)
 					if !ok || w == nil {
 						continue
 					}
 
-					if v, ok := interface{}(m.GetNarrow()).(interface{ ValidateFields(...string) error }); ok {
+					if v, ok := interface{}(m.GetLoraNarrow()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
 							return ADRSettings_DynamicMode_ChannelSteeringSettingsValidationError{
-								field:  "narrow",
+								field:  "lora_narrow",
 								reason: "embedded message failed validation",
 								cause:  err,
 							}
@@ -4623,21 +4623,21 @@ var _ interface {
 } = ADRSettings_DynamicMode_ChannelSteeringSettingsValidationError{}
 
 // ValidateFields checks the field values on
-// ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode with the rules
-// defined in the proto definition for this message. If any rules are
+// ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode with the
+// rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
-func (m *ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode) ValidateFields(paths ...string) error {
+func (m *ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode) ValidateFields(paths ...string) error {
 	if len(paths) > 0 {
-		return fmt.Errorf("message ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode has no fields, but paths %s were specified", paths)
+		return fmt.Errorf("message ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode has no fields, but paths %s were specified", paths)
 	}
 	return nil
 }
 
-// ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowModeValidationError is
-// the validation error returned by
-// ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode.ValidateFields
+// ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowModeValidationError
+// is the validation error returned by
+// ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode.ValidateFields
 // if the designated constraints aren't met.
-type ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowModeValidationError struct {
+type ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowModeValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -4645,32 +4645,32 @@ type ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowModeValidationError s
 }
 
 // Field function returns field value.
-func (e ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowModeValidationError) Field() string {
+func (e ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowModeValidationError) Field() string {
 	return e.field
 }
 
 // Reason function returns reason value.
-func (e ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowModeValidationError) Reason() string {
+func (e ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowModeValidationError) Reason() string {
 	return e.reason
 }
 
 // Cause function returns cause value.
-func (e ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowModeValidationError) Cause() error {
+func (e ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowModeValidationError) Cause() error {
 	return e.cause
 }
 
 // Key function returns key value.
-func (e ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowModeValidationError) Key() bool {
+func (e ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowModeValidationError) Key() bool {
 	return e.key
 }
 
 // ErrorName returns error name.
-func (e ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowModeValidationError) ErrorName() string {
-	return "ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowModeValidationError"
+func (e ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowModeValidationError) ErrorName() string {
+	return "ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowModeValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowModeValidationError) Error() string {
+func (e ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowModeValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -4682,14 +4682,14 @@ func (e ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowModeValidationErro
 	}
 
 	return fmt.Sprintf(
-		"invalid %sADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode.%s: %s%s",
+		"invalid %sADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowModeValidationError{}
+var _ error = ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowModeValidationError{}
 
 var _ interface {
 	Field() string
@@ -4697,7 +4697,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowModeValidationError{}
+} = ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowModeValidationError{}
 
 // ValidateFields checks the field values on
 // ADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode with the rules

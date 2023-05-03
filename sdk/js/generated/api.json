@@ -14114,12 +14114,12 @@
           "extensions": [],
           "fields": [
             {
-              "name": "narrow",
+              "name": "lora_narrow",
               "description": "",
               "label": "",
-              "type": "NarrowMode",
-              "longType": "ADRSettings.DynamicMode.ChannelSteeringSettings.NarrowMode",
-              "fullType": "ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.NarrowMode",
+              "type": "LoRaNarrowMode",
+              "longType": "ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode",
+              "fullType": "ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode",
               "ismap": false,
               "isoneof": true,
               "oneofdecl": "mode",
@@ -14151,10 +14151,10 @@
           "fields": []
         },
         {
-          "name": "NarrowMode",
-          "longName": "ADRSettings.DynamicMode.ChannelSteeringSettings.NarrowMode",
-          "fullName": "ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.NarrowMode",
-          "description": "Configuration options for narrow channels steering.\nThe narrow mode attempts to steer the end device towards\nusing the LoRa modulated, 125kHz bandwidth channels.",
+          "name": "LoRaNarrowMode",
+          "longName": "ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode",
+          "fullName": "ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode",
+          "description": "Configuration options for LoRa narrow channels steering.\nThe narrow mode attempts to steer the end device towards\nusing the LoRa modulated, 125kHz bandwidth channels.",
           "hasExtensions": false,
           "hasFields": false,
           "hasOneofs": false,

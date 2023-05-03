@@ -710,21 +710,21 @@ func (m *ADRSettings_StaticMode) SetFromFlags(flags *pflag.FlagSet, prefix strin
 	return paths, nil
 }
 
-// AddSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode adds flags to select fields in ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode.
-func AddSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode(flags *pflag.FlagSet, prefix string, hidden bool) {
+// AddSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode adds flags to select fields in ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode.
+func AddSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode(flags *pflag.FlagSet, prefix string, hidden bool) {
 }
 
-// SelectFromFlags outputs the fieldmask paths forADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode message from select flags.
-func PathsFromSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+// SelectFromFlags outputs the fieldmask paths forADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode message from select flags.
+func PathsFromSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
 	return paths, nil
 }
 
-// AddSetFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode adds flags to select fields in ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode.
-func AddSetFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode(flags *pflag.FlagSet, prefix string, hidden bool) {
+// AddSetFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode adds flags to select fields in ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode.
+func AddSetFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode(flags *pflag.FlagSet, prefix string, hidden bool) {
 }
 
-// SetFromFlags sets the ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode message from flags.
-func (m *ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+// SetFromFlags sets the ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode message from flags.
+func (m *ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
 	return paths, nil
 }
 
@@ -748,20 +748,20 @@ func (m *ADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode) SetFromFl
 
 // AddSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings adds flags to select fields in ADRSettings_DynamicMode_ChannelSteeringSettings.
 func AddSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings(flags *pflag.FlagSet, prefix string, hidden bool) {
-	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("mode.narrow", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("mode.narrow", prefix), true), flagsplugin.WithHidden(hidden)))
-	AddSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode(flags, flagsplugin.Prefix("mode.narrow", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("mode.lora-narrow", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("mode.lora-narrow", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode(flags, flagsplugin.Prefix("mode.lora-narrow", prefix), hidden)
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("mode.disabled", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("mode.disabled", prefix), true), flagsplugin.WithHidden(hidden)))
 	AddSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode(flags, flagsplugin.Prefix("mode.disabled", prefix), hidden)
 }
 
 // SelectFromFlags outputs the fieldmask paths forADRSettings_DynamicMode_ChannelSteeringSettings message from select flags.
 func PathsFromSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
-	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("mode.narrow", prefix)); err != nil {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("mode.lora_narrow", prefix)); err != nil {
 		return nil, err
 	} else if selected && val {
-		paths = append(paths, flagsplugin.Prefix("mode.narrow", prefix))
+		paths = append(paths, flagsplugin.Prefix("mode.lora_narrow", prefix))
 	}
-	if selectPaths, err := PathsFromSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode(flags, flagsplugin.Prefix("mode.narrow", prefix)); err != nil {
+	if selectPaths, err := PathsFromSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode(flags, flagsplugin.Prefix("mode.lora_narrow", prefix)); err != nil {
 		return nil, err
 	} else {
 		paths = append(paths, selectPaths...)
@@ -781,23 +781,23 @@ func PathsFromSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings(flag
 
 // AddSetFlagsForADRSettings_DynamicMode_ChannelSteeringSettings adds flags to select fields in ADRSettings_DynamicMode_ChannelSteeringSettings.
 func AddSetFlagsForADRSettings_DynamicMode_ChannelSteeringSettings(flags *pflag.FlagSet, prefix string, hidden bool) {
-	AddSetFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode(flags, flagsplugin.Prefix("mode.narrow", prefix), hidden)
-	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("mode.narrow", prefix), "", flagsplugin.WithHidden(hidden)))
+	AddSetFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode(flags, flagsplugin.Prefix("mode.lora-narrow", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("mode.lora-narrow", prefix), "", flagsplugin.WithHidden(hidden)))
 	AddSetFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode(flags, flagsplugin.Prefix("mode.disabled", prefix), hidden)
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("mode.disabled", prefix), "", flagsplugin.WithHidden(hidden)))
 }
 
 // SetFromFlags sets the ADRSettings_DynamicMode_ChannelSteeringSettings message from flags.
 func (m *ADRSettings_DynamicMode_ChannelSteeringSettings) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
-	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("mode.narrow", prefix)); changed {
-		ov := &ADRSettings_DynamicMode_ChannelSteeringSettings_Narrow{}
-		if ov.Narrow == nil {
-			ov.Narrow = &ADRSettings_DynamicMode_ChannelSteeringSettings_NarrowMode{}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("mode.lora_narrow", prefix)); changed {
+		ov := &ADRSettings_DynamicMode_ChannelSteeringSettings_LoraNarrow{}
+		if ov.LoraNarrow == nil {
+			ov.LoraNarrow = &ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode{}
 		}
-		if setPaths, err := ov.Narrow.SetFromFlags(flags, flagsplugin.Prefix("mode.narrow", prefix)); err != nil {
+		if setPaths, err := ov.LoraNarrow.SetFromFlags(flags, flagsplugin.Prefix("mode.lora_narrow", prefix)); err != nil {
 			return nil, err
 		} else if len(setPaths) == 0 {
-			paths = append(paths, "mode.narrow")
+			paths = append(paths, "mode.lora_narrow")
 		} else {
 			paths = append(paths, setPaths...)
 		}

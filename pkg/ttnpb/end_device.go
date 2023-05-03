@@ -119,8 +119,8 @@ func (v *ADRSettings_DynamicMode_ChannelSteeringSettings) FieldIsZero(p string) 
 		return v.Mode == nil
 	case "mode.disabled":
 		return v.GetDisabled() == nil
-	case "mode.narrow":
-		return v.GetNarrow() == nil
+	case "mode.lora_narrow":
+		return v.GetLoraNarrow() == nil
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }
@@ -139,8 +139,8 @@ func (v *ADRSettings_DynamicMode) FieldIsZero(p string) bool {
 		return v.ChannelSteering.FieldIsZero("mode")
 	case "channel_steering.mode.disabled":
 		return v.ChannelSteering.FieldIsZero("mode.disabled")
-	case "channel_steering.mode.narrow":
-		return v.ChannelSteering.FieldIsZero("mode.narrow")
+	case "channel_steering.mode.lora_narrow":
+		return v.ChannelSteering.FieldIsZero("mode.lora_narrow")
 	case "min_data_rate_index":
 		return v.MinDataRateIndex == nil
 	case "min_data_rate_index.value":
@@ -175,8 +175,8 @@ func (v *ADRSettings_Dynamic) FieldIsZero(p string) bool {
 		return v.Dynamic.FieldIsZero("channel_steering.mode")
 	case "dynamic.channel_steering.mode.disabled":
 		return v.Dynamic.FieldIsZero("channel_steering.mode.disabled")
-	case "dynamic.channel_steering.mode.narrow":
-		return v.Dynamic.FieldIsZero("channel_steering.mode.narrow")
+	case "dynamic.channel_steering.mode.lora_narrow":
+		return v.Dynamic.FieldIsZero("channel_steering.mode.lora_narrow")
 	case "dynamic.margin":
 		return v.Dynamic.FieldIsZero("margin")
 	case "dynamic.min_data_rate_index":
@@ -235,8 +235,8 @@ func (v *ADRSettings) FieldIsZero(p string) bool {
 		return v.GetDynamic().FieldIsZero("channel_steering.mode")
 	case "mode.dynamic.channel_steering.mode.disabled":
 		return v.GetDynamic().FieldIsZero("channel_steering.mode.disabled")
-	case "mode.dynamic.channel_steering.mode.narrow":
-		return v.GetDynamic().FieldIsZero("channel_steering.mode.narrow")
+	case "mode.dynamic.channel_steering.mode.lora_narrow":
+		return v.GetDynamic().FieldIsZero("channel_steering.mode.lora_narrow")
 	case "mode.dynamic.margin":
 		return v.GetDynamic().FieldIsZero("margin")
 	case "mode.dynamic.min_data_rate_index":
@@ -287,8 +287,8 @@ func (v *MACSettings) FieldIsZero(p string) bool {
 		return v.Adr.FieldIsZero("mode.dynamic.channel_steering.mode")
 	case "adr.mode.dynamic.channel_steering.mode.disabled":
 		return v.Adr.FieldIsZero("mode.dynamic.channel_steering.mode.disabled")
-	case "adr.mode.dynamic.channel_steering.mode.narrow":
-		return v.Adr.FieldIsZero("mode.dynamic.channel_steering.mode.narrow")
+	case "adr.mode.dynamic.channel_steering.mode.lora_narrow":
+		return v.Adr.FieldIsZero("mode.dynamic.channel_steering.mode.lora_narrow")
 	case "adr.mode.dynamic.margin":
 		return v.Adr.FieldIsZero("mode.dynamic.margin")
 	case "adr.mode.dynamic.min_data_rate_index":
@@ -1165,8 +1165,8 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 		return v.MacSettings.FieldIsZero("adr.mode.dynamic.channel_steering.mode")
 	case "mac_settings.adr.mode.dynamic.channel_steering.mode.disabled":
 		return v.MacSettings.FieldIsZero("adr.mode.dynamic.channel_steering.mode.disabled")
-	case "mac_settings.adr.mode.dynamic.channel_steering.mode.narrow":
-		return v.MacSettings.FieldIsZero("adr.mode.dynamic.channel_steering.mode.narrow")
+	case "mac_settings.adr.mode.dynamic.channel_steering.mode.lora_narrow":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.channel_steering.mode.lora_narrow")
 	case "mac_settings.adr.mode.dynamic.margin":
 		return v.MacSettings.FieldIsZero("adr.mode.dynamic.margin")
 	case "mac_settings.adr.mode.dynamic.min_data_rate_index":
