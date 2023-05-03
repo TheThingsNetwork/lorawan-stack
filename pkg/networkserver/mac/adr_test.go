@@ -1568,7 +1568,7 @@ func TestADRDataRange(t *testing.T) {
 		AssertError func(error) bool
 
 		Min, Max ttnpb.DataRateIndex
-		Rejected map[ttnpb.DataRateIndex]struct{}
+		Allowed  map[ttnpb.DataRateIndex]struct{}
 		Ok       bool
 	}{
 		{
@@ -1636,34 +1636,10 @@ func TestADRDataRange(t *testing.T) {
 			},
 			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
 
-			Min: ttnpb.DataRateIndex_DATA_RATE_1,
-			Max: ttnpb.DataRateIndex_DATA_RATE_5,
-			Ok:  true,
-		},
-		{
-			Name: "clamp to current",
-
-			Device: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{
-					CurrentParameters: &ttnpb.MACParameters{
-						AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
-					},
-					DesiredParameters: &ttnpb.MACParameters{
-						Channels: []*ttnpb.MACParameters_Channel{
-							{
-								MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
-								MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_6,
-								EnableUplink:     true,
-							},
-						},
-					},
-				},
-			},
-			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
-
-			Min: ttnpb.DataRateIndex_DATA_RATE_2,
-			Max: ttnpb.DataRateIndex_DATA_RATE_5,
-			Ok:  true,
+			Min:     ttnpb.DataRateIndex_DATA_RATE_1,
+			Max:     ttnpb.DataRateIndex_DATA_RATE_5,
+			Allowed: newDataRateIndexRange(ttnpb.DataRateIndex_DATA_RATE_1, ttnpb.DataRateIndex_DATA_RATE_6),
+			Ok:      true,
 		},
 		{
 			Name: "rejected; ok",
@@ -1698,10 +1674,11 @@ func TestADRDataRange(t *testing.T) {
 
 			Min: ttnpb.DataRateIndex_DATA_RATE_1,
 			Max: ttnpb.DataRateIndex_DATA_RATE_5,
-			Rejected: map[ttnpb.DataRateIndex]struct{}{
-				ttnpb.DataRateIndex_DATA_RATE_0: {},
-				ttnpb.DataRateIndex_DATA_RATE_3: {},
-				ttnpb.DataRateIndex_DATA_RATE_6: {},
+			Allowed: map[ttnpb.DataRateIndex]struct{}{
+				ttnpb.DataRateIndex_DATA_RATE_1: {},
+				ttnpb.DataRateIndex_DATA_RATE_2: {},
+				ttnpb.DataRateIndex_DATA_RATE_4: {},
+				ttnpb.DataRateIndex_DATA_RATE_5: {},
 			},
 			Ok: true,
 		},
@@ -1746,13 +1723,13 @@ func TestADRDataRange(t *testing.T) {
 			t.Parallel()
 
 			a, ctx := test.New(t)
-			min, max, rejected, ok, err := ADRDataRateRange(ctx, tc.Device, tc.Band, tc.Defaults)
+			min, max, allowed, ok, err := ADRDataRateRange(ctx, tc.Device, tc.Band, tc.Defaults)
 			if assertError := tc.AssertError; assertError != nil {
 				a.So(assertError(err), should.BeTrue)
 			} else {
 				a.So(min, should.Equal, tc.Min)
 				a.So(max, should.Equal, tc.Max)
-				a.So(rejected, should.Resemble, tc.Rejected)
+				a.So(allowed, should.Resemble, tc.Allowed)
 				a.So(ok, should.Equal, tc.Ok)
 				a.So(err, should.BeNil)
 			}
@@ -1990,7 +1967,7 @@ func TestADRAdaptDataRate(t *testing.T) {
 		MACState                           *ttnpb.MACState
 		Band                               *band.Band
 		MinDataRateIndex, MaxDataRateIndex ttnpb.DataRateIndex
-		RejectedDataRateIndices            map[ttnpb.DataRateIndex]struct{}
+		AllowedDataRateIndices             map[ttnpb.DataRateIndex]struct{}
 		MinTxPowerIndex                    uint32
 		InitialMargin                      float32
 
@@ -1998,34 +1975,35 @@ func TestADRAdaptDataRate(t *testing.T) {
 		OutputMargin   float32
 	}{
 		{
-			Name: "below min data rate index",
+			Name: "below current data rate index",
 
 			MACState: &ttnpb.MACState{
 				CurrentParameters: &ttnpb.MACParameters{
-					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
-					AdrTxPowerIndex:  1,
-				},
-				DesiredParameters: &ttnpb.MACParameters{
-					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
-					AdrTxPowerIndex:  1,
-				},
-			},
-			Band:             &band.EU_863_870_RP1_V1_0_2_Rev_B,
-			MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
-			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
-			InitialMargin:    -5.0,
-
-			OutputMACState: &ttnpb.MACState{
-				CurrentParameters: &ttnpb.MACParameters{
-					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
 					AdrTxPowerIndex:  1,
 				},
 				DesiredParameters: &ttnpb.MACParameters{
 					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
-					AdrTxPowerIndex:  0,
+					AdrTxPowerIndex:  1,
 				},
 			},
-			OutputMargin: -7.5,
+			Band:                   &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			MinDataRateIndex:       ttnpb.DataRateIndex_DATA_RATE_0,
+			MaxDataRateIndex:       ttnpb.DataRateIndex_DATA_RATE_5,
+			AllowedDataRateIndices: newDataRateIndexRange(ttnpb.DataRateIndex_DATA_RATE_0, ttnpb.DataRateIndex_DATA_RATE_5),
+			InitialMargin:          -15.0,
+
+			OutputMACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					AdrTxPowerIndex:  1,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					AdrTxPowerIndex:  1,
+				},
+			},
+			OutputMargin: -15.0,
 		},
 		{
 			Name: "positive steps",
@@ -2040,9 +2018,10 @@ func TestADRAdaptDataRate(t *testing.T) {
 					AdrTxPowerIndex:  1,
 				},
 			},
-			Band:             &band.EU_863_870_RP1_V1_0_2_Rev_B,
-			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
-			InitialMargin:    15.0,
+			Band:                   &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			MaxDataRateIndex:       ttnpb.DataRateIndex_DATA_RATE_5,
+			AllowedDataRateIndices: newDataRateIndexRange(ttnpb.DataRateIndex_DATA_RATE_0, ttnpb.DataRateIndex_DATA_RATE_5),
+			InitialMargin:          15.0,
 
 			OutputMACState: &ttnpb.MACState{
 				CurrentParameters: &ttnpb.MACParameters{
@@ -2069,10 +2048,11 @@ func TestADRAdaptDataRate(t *testing.T) {
 					AdrTxPowerIndex:  1,
 				},
 			},
-			Band:             &band.EU_863_870_RP1_V1_0_2_Rev_B,
-			MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
-			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
-			InitialMargin:    -7.5,
+			Band:                   &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			MinDataRateIndex:       ttnpb.DataRateIndex_DATA_RATE_3,
+			MaxDataRateIndex:       ttnpb.DataRateIndex_DATA_RATE_5,
+			AllowedDataRateIndices: newDataRateIndexRange(ttnpb.DataRateIndex_DATA_RATE_3, ttnpb.DataRateIndex_DATA_RATE_5),
+			InitialMargin:          -7.5,
 
 			OutputMACState: &ttnpb.MACState{
 				CurrentParameters: &ttnpb.MACParameters{
@@ -2099,12 +2079,10 @@ func TestADRAdaptDataRate(t *testing.T) {
 					AdrTxPowerIndex:  1,
 				},
 			},
-			Band:             &band.EU_863_870_RP1_V1_0_2_Rev_B,
-			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
-			RejectedDataRateIndices: map[ttnpb.DataRateIndex]struct{}{
-				ttnpb.DataRateIndex_DATA_RATE_0: {},
-			},
-			InitialMargin: 2.5,
+			Band:                   &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			MaxDataRateIndex:       ttnpb.DataRateIndex_DATA_RATE_5,
+			AllowedDataRateIndices: newDataRateIndexRange(ttnpb.DataRateIndex_DATA_RATE_1, ttnpb.DataRateIndex_DATA_RATE_5),
+			InitialMargin:          2.5,
 
 			OutputMACState: &ttnpb.MACState{
 				CurrentParameters: &ttnpb.MACParameters{
@@ -2131,12 +2109,10 @@ func TestADRAdaptDataRate(t *testing.T) {
 					AdrTxPowerIndex:  1,
 				},
 			},
-			Band:             &band.EU_863_870_RP1_V1_0_2_Rev_B,
-			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
-			RejectedDataRateIndices: map[ttnpb.DataRateIndex]struct{}{
-				ttnpb.DataRateIndex_DATA_RATE_5: {},
-			},
-			InitialMargin: 15.0,
+			Band:                   &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			MaxDataRateIndex:       ttnpb.DataRateIndex_DATA_RATE_5,
+			AllowedDataRateIndices: newDataRateIndexRange(ttnpb.DataRateIndex_DATA_RATE_0, ttnpb.DataRateIndex_DATA_RATE_4),
+			InitialMargin:          15.0,
 
 			OutputMACState: &ttnpb.MACState{
 				CurrentParameters: &ttnpb.MACParameters{
@@ -2160,7 +2136,7 @@ func TestADRAdaptDataRate(t *testing.T) {
 				tc.MACState,
 				tc.Band,
 				tc.MinDataRateIndex, tc.MaxDataRateIndex,
-				tc.RejectedDataRateIndices,
+				tc.AllowedDataRateIndices,
 				tc.MinTxPowerIndex,
 				tc.InitialMargin,
 			)
@@ -2504,4 +2480,391 @@ func TestADRAdaptNbTrans(t *testing.T) {
 			a.So(tc.Device, should.Resemble, tc.ExpectedDevice)
 		})
 	}
+}
+
+func TestDemodulationFloorStep(t *testing.T) {
+	t.Parallel()
+
+	for _, tc := range []struct {
+		Name string
+
+		Band     *band.Band
+		From, To ttnpb.DataRateIndex
+
+		Step float32
+	}{
+		{
+			Name: "EU868; SF7BW250 to SF7BW125",
+
+			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			From: ttnpb.DataRateIndex_DATA_RATE_6,
+			To:   ttnpb.DataRateIndex_DATA_RATE_5,
+
+			Step: 3.0,
+		},
+		{
+			Name: "EU868; SF7BW250 to SF8BW125",
+
+			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			From: ttnpb.DataRateIndex_DATA_RATE_6,
+			To:   ttnpb.DataRateIndex_DATA_RATE_4,
+
+			Step: 5.5,
+		},
+		{
+			Name: "US915; SF8BW500 to SF7BW125",
+
+			Band: &band.US_902_928_RP1_V1_0_2_Rev_B,
+			From: ttnpb.DataRateIndex_DATA_RATE_4,
+			To:   ttnpb.DataRateIndex_DATA_RATE_3,
+
+			Step: 3.5,
+		},
+		{
+			Name: "US915; SF8BW500 to SF8BW125",
+
+			Band: &band.US_902_928_RP1_V1_0_2_Rev_B,
+			From: ttnpb.DataRateIndex_DATA_RATE_4,
+			To:   ttnpb.DataRateIndex_DATA_RATE_2,
+
+			Step: 6.0,
+		},
+	} {
+		tc := tc
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
+			a := assertions.New(t)
+			step := DemodulationFloorStep(tc.Band, tc.From, tc.To)
+			a.So(step, should.Equal, tc.Step)
+			reverseStep := DemodulationFloorStep(tc.Band, tc.To, tc.From)
+			a.So(reverseStep, should.Equal, -step)
+		})
+	}
+}
+
+func TestIsNarrowDataRateIndex(t *testing.T) {
+	t.Parallel()
+
+	for _, tc := range []struct {
+		Name string
+
+		Band  *band.Band
+		Index ttnpb.DataRateIndex
+
+		LoRa, Ok bool
+	}{
+		{
+			Name: "EU868; SF7BW125",
+
+			Band:  &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			Index: ttnpb.DataRateIndex_DATA_RATE_5,
+
+			LoRa: true,
+			Ok:   true,
+		},
+		{
+			Name: "EU868; SF7BW250",
+
+			Band:  &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			Index: ttnpb.DataRateIndex_DATA_RATE_6,
+
+			LoRa: true,
+			Ok:   false,
+		},
+		{
+			Name: "EU868; 50000",
+
+			Band:  &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			Index: ttnpb.DataRateIndex_DATA_RATE_7,
+
+			LoRa: false,
+			Ok:   false,
+		},
+	} {
+		tc := tc
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
+			a := assertions.New(t)
+			lora, ok := IsNarrowDataRateIndex(tc.Band, tc.Index)
+			a.So(lora, should.Equal, tc.LoRa)
+			a.So(ok, should.Equal, tc.Ok)
+		})
+	}
+}
+
+func TestADRSteerDeviceChannels(t *testing.T) {
+	t.Parallel()
+
+	for _, tc := range []struct {
+		Name string
+
+		InputDevice *ttnpb.EndDevice
+		Defaults    *ttnpb.MACSettings
+		Band        *band.Band
+		Min, Max    ttnpb.DataRateIndex
+		Allowed     map[ttnpb.DataRateIndex]struct{}
+		InputMargin float32
+
+		OutputMargin float32
+		Ok           bool
+		OutputDevice *ttnpb.EndDevice
+	}{
+		{
+			Name: "no mode",
+
+			InputDevice: &ttnpb.EndDevice{
+				MacSettings: &ttnpb.MACSettings{
+					Adr: &ttnpb.ADRSettings{
+						Mode: &ttnpb.ADRSettings_Dynamic{
+							Dynamic: &ttnpb.ADRSettings_DynamicMode{},
+						},
+					},
+				},
+			},
+			InputMargin: 5.0,
+
+			OutputMargin: 5.0,
+			Ok:           false,
+		},
+		{
+			Name: "disabled",
+			InputDevice: &ttnpb.EndDevice{
+				MacSettings: &ttnpb.MACSettings{
+					Adr: &ttnpb.ADRSettings{
+						Mode: &ttnpb.ADRSettings_Dynamic{
+							Dynamic: &ttnpb.ADRSettings_DynamicMode{
+								ChannelSteering: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings{
+									Mode: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_Disabled{
+										Disabled: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode{},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			InputMargin: 5.0,
+
+			OutputMargin: 5.0,
+			Ok:           false,
+		},
+		{
+			Name: "already narrow",
+			InputDevice: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{
+						AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+						AdrTxPowerIndex:  1,
+					},
+					DesiredParameters: &ttnpb.MACParameters{
+						AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+						AdrTxPowerIndex:  1,
+					},
+				},
+				MacSettings: &ttnpb.MACSettings{
+					Adr: &ttnpb.ADRSettings{
+						Mode: &ttnpb.ADRSettings_Dynamic{
+							Dynamic: &ttnpb.ADRSettings_DynamicMode{
+								ChannelSteering: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings{
+									Mode: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_LoraNarrow{
+										LoraNarrow: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode{},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			Band:        &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			Allowed:     newDataRateIndexRange(ttnpb.DataRateIndex_DATA_RATE_0, ttnpb.DataRateIndex_DATA_RATE_6),
+			InputMargin: 5.0,
+
+			OutputMargin: 5.0,
+			Ok:           false,
+		},
+		{
+			Name: "not LoRa modulated",
+			InputDevice: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{
+						AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_7,
+						AdrTxPowerIndex:  1,
+					},
+					DesiredParameters: &ttnpb.MACParameters{
+						AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_7,
+						AdrTxPowerIndex:  1,
+					},
+				},
+				MacSettings: &ttnpb.MACSettings{
+					Adr: &ttnpb.ADRSettings{
+						Mode: &ttnpb.ADRSettings_Dynamic{
+							Dynamic: &ttnpb.ADRSettings_DynamicMode{
+								ChannelSteering: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings{
+									Mode: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_LoraNarrow{
+										LoraNarrow: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode{},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			Band:        &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			Allowed:     newDataRateIndexRange(ttnpb.DataRateIndex_DATA_RATE_0, ttnpb.DataRateIndex_DATA_RATE_7),
+			InputMargin: 5.0,
+
+			OutputMargin: 5.0,
+			Ok:           false,
+		},
+		{
+			Name: "EU868; SF7BW250 to SF7BW125",
+			InputDevice: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{
+						AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_6,
+						AdrTxPowerIndex:  1,
+					},
+					DesiredParameters: &ttnpb.MACParameters{
+						AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_6,
+						AdrTxPowerIndex:  1,
+					},
+				},
+				MacSettings: &ttnpb.MACSettings{
+					Adr: &ttnpb.ADRSettings{
+						Mode: &ttnpb.ADRSettings_Dynamic{
+							Dynamic: &ttnpb.ADRSettings_DynamicMode{
+								ChannelSteering: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings{
+									Mode: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_LoraNarrow{
+										LoraNarrow: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode{},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			Band:        &band.EU_863_870_RP1_V1_0_2_Rev_B,
+			Min:         ttnpb.DataRateIndex_DATA_RATE_0,
+			Max:         ttnpb.DataRateIndex_DATA_RATE_5,
+			Allowed:     newDataRateIndexRange(ttnpb.DataRateIndex_DATA_RATE_0, ttnpb.DataRateIndex_DATA_RATE_6),
+			InputMargin: 5.0,
+
+			OutputMargin: 2.0,
+			Ok:           true,
+			OutputDevice: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{
+						AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_6,
+						AdrTxPowerIndex:  1,
+					},
+					DesiredParameters: &ttnpb.MACParameters{
+						AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+						AdrTxPowerIndex:  0,
+					},
+				},
+				MacSettings: &ttnpb.MACSettings{
+					Adr: &ttnpb.ADRSettings{
+						Mode: &ttnpb.ADRSettings_Dynamic{
+							Dynamic: &ttnpb.ADRSettings_DynamicMode{
+								ChannelSteering: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings{
+									Mode: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_LoraNarrow{
+										LoraNarrow: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode{},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			Name: "US915; SF8BW500 to SF7BW125",
+			InputDevice: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{
+						AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_4,
+						AdrTxPowerIndex:  1,
+					},
+					DesiredParameters: &ttnpb.MACParameters{
+						AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_4,
+						AdrTxPowerIndex:  1,
+					},
+				},
+				MacSettings: &ttnpb.MACSettings{
+					Adr: &ttnpb.ADRSettings{
+						Mode: &ttnpb.ADRSettings_Dynamic{
+							Dynamic: &ttnpb.ADRSettings_DynamicMode{
+								ChannelSteering: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings{
+									Mode: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_LoraNarrow{
+										LoraNarrow: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode{},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			Band:        &band.US_902_928_RP1_V1_0_2_Rev_B,
+			Min:         ttnpb.DataRateIndex_DATA_RATE_0,
+			Max:         ttnpb.DataRateIndex_DATA_RATE_3,
+			Allowed:     newDataRateIndexRange(ttnpb.DataRateIndex_DATA_RATE_0, ttnpb.DataRateIndex_DATA_RATE_4),
+			InputMargin: 5.0,
+
+			OutputMargin: 1.5,
+			Ok:           true,
+			OutputDevice: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{
+						AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_4,
+						AdrTxPowerIndex:  1,
+					},
+					DesiredParameters: &ttnpb.MACParameters{
+						AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
+						AdrTxPowerIndex:  0,
+					},
+				},
+				MacSettings: &ttnpb.MACSettings{
+					Adr: &ttnpb.ADRSettings{
+						Mode: &ttnpb.ADRSettings_Dynamic{
+							Dynamic: &ttnpb.ADRSettings_DynamicMode{
+								ChannelSteering: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings{
+									Mode: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_LoraNarrow{
+										LoraNarrow: &ttnpb.ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode{},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	} {
+		tc := tc
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
+			a := assertions.New(t)
+			device := ttnpb.Clone(tc.InputDevice)
+			margin, ok := ADRSteerDeviceChannels(
+				device, tc.Defaults, tc.Band, tc.Min, tc.Max, tc.Allowed, tc.InputMargin,
+			)
+			a.So(margin, should.Equal, tc.OutputMargin)
+			a.So(ok, should.Equal, tc.Ok)
+			if tc.OutputDevice != nil {
+				a.So(device, should.Resemble, tc.OutputDevice)
+			} else {
+				a.So(device, should.Resemble, tc.InputDevice)
+			}
+		})
+	}
+}
+
+func newDataRateIndexRange(min, max ttnpb.DataRateIndex) map[ttnpb.DataRateIndex]struct{} {
+	m := make(map[ttnpb.DataRateIndex]struct{})
+	for idx := min; idx <= max; idx++ {
+		m[idx] = struct{}{}
+	}
+	return m
 }

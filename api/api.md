@@ -217,6 +217,9 @@
   - [Message `ADRSettings`](#ttn.lorawan.v3.ADRSettings)
   - [Message `ADRSettings.DisabledMode`](#ttn.lorawan.v3.ADRSettings.DisabledMode)
   - [Message `ADRSettings.DynamicMode`](#ttn.lorawan.v3.ADRSettings.DynamicMode)
+  - [Message `ADRSettings.DynamicMode.ChannelSteeringSettings`](#ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings)
+  - [Message `ADRSettings.DynamicMode.ChannelSteeringSettings.DisabledMode`](#ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.DisabledMode)
+  - [Message `ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode`](#ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode)
   - [Message `ADRSettings.StaticMode`](#ttn.lorawan.v3.ADRSettings.StaticMode)
   - [Message `BatchUpdateEndDeviceLastSeenRequest`](#ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest)
   - [Message `BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate`](#ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate)
@@ -3381,6 +3384,7 @@ Configuration options for dynamic ADR.
 | `max_tx_power_index` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Maximum transmission power index. If unset, the default value from Network Server configuration will be used. |
 | `min_nb_trans` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Minimum number of retransmissions. If unset, the default value from Network Server configuration will be used. |
 | `max_nb_trans` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Maximum number of retransmissions. If unset, the default value from Network Server configuration will be used. |
+| `channel_steering` | [`ADRSettings.DynamicMode.ChannelSteeringSettings`](#ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings) |  |  |
 
 #### Field Rules
 
@@ -3390,6 +3394,26 @@ Configuration options for dynamic ADR.
 | `max_tx_power_index` | <p>`uint32.lte`: `15`</p> |
 | `min_nb_trans` | <p>`uint32.lte`: `3`</p><p>`uint32.gte`: `1`</p> |
 | `max_nb_trans` | <p>`uint32.lte`: `3`</p><p>`uint32.gte`: `1`</p> |
+
+### <a name="ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings">Message `ADRSettings.DynamicMode.ChannelSteeringSettings`</a>
+
+EXPERIMENTAL: Channel steering settings.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `lora_narrow` | [`ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode`](#ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode) |  |  |
+| `disabled` | [`ADRSettings.DynamicMode.ChannelSteeringSettings.DisabledMode`](#ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.DisabledMode) |  |  |
+
+### <a name="ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.DisabledMode">Message `ADRSettings.DynamicMode.ChannelSteeringSettings.DisabledMode`</a>
+
+Configuration options for cases in which ADR is not supposed to steer the end device
+to another set of channels.
+
+### <a name="ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode">Message `ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode`</a>
+
+Configuration options for LoRa narrow channels steering.
+The narrow mode attempts to steer the end device towards
+using the LoRa modulated, 125kHz bandwidth channels.
 
 ### <a name="ttn.lorawan.v3.ADRSettings.StaticMode">Message `ADRSettings.StaticMode`</a>
 

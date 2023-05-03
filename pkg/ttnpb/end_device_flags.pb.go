@@ -710,6 +710,116 @@ func (m *ADRSettings_StaticMode) SetFromFlags(flags *pflag.FlagSet, prefix strin
 	return paths, nil
 }
 
+// AddSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode adds flags to select fields in ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode.
+func AddSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode(flags *pflag.FlagSet, prefix string, hidden bool) {
+}
+
+// SelectFromFlags outputs the fieldmask paths forADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode message from select flags.
+func PathsFromSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	return paths, nil
+}
+
+// AddSetFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode adds flags to select fields in ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode.
+func AddSetFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode(flags *pflag.FlagSet, prefix string, hidden bool) {
+}
+
+// SetFromFlags sets the ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode message from flags.
+func (m *ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	return paths, nil
+}
+
+// AddSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode adds flags to select fields in ADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode.
+func AddSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode(flags *pflag.FlagSet, prefix string, hidden bool) {
+}
+
+// SelectFromFlags outputs the fieldmask paths forADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode message from select flags.
+func PathsFromSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	return paths, nil
+}
+
+// AddSetFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode adds flags to select fields in ADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode.
+func AddSetFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode(flags *pflag.FlagSet, prefix string, hidden bool) {
+}
+
+// SetFromFlags sets the ADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode message from flags.
+func (m *ADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	return paths, nil
+}
+
+// AddSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings adds flags to select fields in ADRSettings_DynamicMode_ChannelSteeringSettings.
+func AddSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("mode.lora-narrow", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("mode.lora-narrow", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode(flags, flagsplugin.Prefix("mode.lora-narrow", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("mode.disabled", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("mode.disabled", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode(flags, flagsplugin.Prefix("mode.disabled", prefix), hidden)
+}
+
+// SelectFromFlags outputs the fieldmask paths forADRSettings_DynamicMode_ChannelSteeringSettings message from select flags.
+func PathsFromSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("mode.lora_narrow", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("mode.lora_narrow", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode(flags, flagsplugin.Prefix("mode.lora_narrow", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("mode.disabled", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("mode.disabled", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode(flags, flagsplugin.Prefix("mode.disabled", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForADRSettings_DynamicMode_ChannelSteeringSettings adds flags to select fields in ADRSettings_DynamicMode_ChannelSteeringSettings.
+func AddSetFlagsForADRSettings_DynamicMode_ChannelSteeringSettings(flags *pflag.FlagSet, prefix string, hidden bool) {
+	AddSetFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode(flags, flagsplugin.Prefix("mode.lora-narrow", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("mode.lora-narrow", prefix), "", flagsplugin.WithHidden(hidden)))
+	AddSetFlagsForADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode(flags, flagsplugin.Prefix("mode.disabled", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("mode.disabled", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the ADRSettings_DynamicMode_ChannelSteeringSettings message from flags.
+func (m *ADRSettings_DynamicMode_ChannelSteeringSettings) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("mode.lora_narrow", prefix)); changed {
+		ov := &ADRSettings_DynamicMode_ChannelSteeringSettings_LoraNarrow{}
+		if ov.LoraNarrow == nil {
+			ov.LoraNarrow = &ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode{}
+		}
+		if setPaths, err := ov.LoraNarrow.SetFromFlags(flags, flagsplugin.Prefix("mode.lora_narrow", prefix)); err != nil {
+			return nil, err
+		} else if len(setPaths) == 0 {
+			paths = append(paths, "mode.lora_narrow")
+		} else {
+			paths = append(paths, setPaths...)
+		}
+		m.Mode = ov
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("mode.disabled", prefix)); changed {
+		ov := &ADRSettings_DynamicMode_ChannelSteeringSettings_Disabled{}
+		if ov.Disabled == nil {
+			ov.Disabled = &ADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode{}
+		}
+		if setPaths, err := ov.Disabled.SetFromFlags(flags, flagsplugin.Prefix("mode.disabled", prefix)); err != nil {
+			return nil, err
+		} else if len(setPaths) == 0 {
+			paths = append(paths, "mode.disabled")
+		} else {
+			paths = append(paths, setPaths...)
+		}
+		m.Mode = ov
+	}
+	return paths, nil
+}
+
 // AddSelectFlagsForADRSettings_DynamicMode adds flags to select fields in ADRSettings_DynamicMode.
 func AddSelectFlagsForADRSettings_DynamicMode(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("margin", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("margin", prefix), false), flagsplugin.WithHidden(hidden)))
@@ -721,6 +831,8 @@ func AddSelectFlagsForADRSettings_DynamicMode(flags *pflag.FlagSet, prefix strin
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("max-tx-power-index", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("max-tx-power-index", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("min-nb-trans", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("min-nb-trans", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("max-nb-trans", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("max-nb-trans", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("channel-steering", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("channel-steering", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings(flags, flagsplugin.Prefix("channel-steering", prefix), hidden)
 }
 
 // SelectFromFlags outputs the fieldmask paths forADRSettings_DynamicMode message from select flags.
@@ -770,6 +882,16 @@ func PathsFromSelectFlagsForADRSettings_DynamicMode(flags *pflag.FlagSet, prefix
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("max_nb_trans", prefix))
 	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("channel_steering", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("channel_steering", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings(flags, flagsplugin.Prefix("channel_steering", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
 	return paths, nil
 }
 
@@ -784,6 +906,7 @@ func AddSetFlagsForADRSettings_DynamicMode(flags *pflag.FlagSet, prefix string, 
 	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("max-tx-power-index", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("min-nb-trans", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("max-nb-trans", prefix), "", flagsplugin.WithHidden(hidden)))
+	AddSetFlagsForADRSettings_DynamicMode_ChannelSteeringSettings(flags, flagsplugin.Prefix("channel-steering", prefix), hidden)
 }
 
 // SetFromFlags sets the ADRSettings_DynamicMode message from flags.
@@ -837,6 +960,16 @@ func (m *ADRSettings_DynamicMode) SetFromFlags(flags *pflag.FlagSet, prefix stri
 	} else if changed {
 		m.MaxNbTrans = &wrapperspb.UInt32Value{Value: val}
 		paths = append(paths, flagsplugin.Prefix("max_nb_trans", prefix))
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("channel_steering", prefix)); changed {
+		if m.ChannelSteering == nil {
+			m.ChannelSteering = &ADRSettings_DynamicMode_ChannelSteeringSettings{}
+		}
+		if setPaths, err := m.ChannelSteering.SetFromFlags(flags, flagsplugin.Prefix("channel_steering", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
 	}
 	return paths, nil
 }

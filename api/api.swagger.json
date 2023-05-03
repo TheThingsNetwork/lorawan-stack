@@ -16579,10 +16579,6 @@
     }
   },
   "definitions": {
-    "ADRSettingsDisabledMode": {
-      "type": "object",
-      "description": "Configuration options for cases in which ADR is to be disabled\ncompletely."
-    },
     "ADRSettingsDynamicMode": {
       "type": "object",
       "properties": {
@@ -16618,6 +16614,9 @@
           "type": "integer",
           "format": "int64",
           "description": "Maximum number of retransmissions.\nIf unset, the default value from Network Server configuration will be used."
+        },
+        "channel_steering": {
+          "$ref": "#/definitions/DynamicModeChannelSteeringSettings"
         }
       },
       "description": "Configuration options for dynamic ADR."
@@ -16942,6 +16941,10 @@
         }
       }
     },
+    "ChannelSteeringSettingsLoRaNarrowMode": {
+      "type": "object",
+      "description": "Configuration options for LoRa narrow channels steering.\nThe narrow mode attempts to steer the end device towards\nusing the LoRa modulated, 125kHz bandwidth channels."
+    },
     "CompliancesCompliance": {
       "type": "object",
       "properties": {
@@ -17034,6 +17037,22 @@
           "$ref": "#/definitions/v3MType"
         }
       }
+    },
+    "DynamicModeChannelSteeringSettings": {
+      "type": "object",
+      "properties": {
+        "lora_narrow": {
+          "$ref": "#/definitions/ChannelSteeringSettingsLoRaNarrowMode"
+        },
+        "disabled": {
+          "$ref": "#/definitions/DynamicModeChannelSteeringSettingsDisabledMode"
+        }
+      },
+      "description": "EXPERIMENTAL: Channel steering settings."
+    },
+    "DynamicModeChannelSteeringSettingsDisabledMode": {
+      "type": "object",
+      "description": "Configuration options for cases in which ADR is not supposed to steer the end device\nto another set of channels."
     },
     "EndDeviceModelBattery": {
       "type": "object",
@@ -18661,10 +18680,14 @@
           "$ref": "#/definitions/ADRSettingsDynamicMode"
         },
         "disabled": {
-          "$ref": "#/definitions/ADRSettingsDisabledMode"
+          "$ref": "#/definitions/v3ADRSettingsDisabledMode"
         }
       },
       "description": "Adaptive Data Rate settings."
+    },
+    "v3ADRSettingsDisabledMode": {
+      "type": "object",
+      "description": "Configuration options for cases in which ADR is to be disabled\ncompletely."
     },
     "v3APIKey": {
       "type": "object",

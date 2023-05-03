@@ -833,6 +833,12 @@ func (x *ADRSettings_DynamicMode) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 			s.WriteUint32(x.MaxNbTrans.Value)
 		}
 	}
+	if x.ChannelSteering != nil || s.HasField("channel_steering") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("channel_steering")
+		// NOTE: ADRSettings_DynamicMode_ChannelSteeringSettings does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.ChannelSteering)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -921,6 +927,16 @@ func (x *ADRSettings_DynamicMode) UnmarshalProtoJSON(s *jsonplugin.UnmarshalStat
 				return
 			}
 			x.MaxNbTrans = &wrapperspb.UInt32Value{Value: v}
+		case "channel_steering", "channelSteering":
+			s.AddField("channel_steering")
+			if s.ReadNil() {
+				x.ChannelSteering = nil
+				return
+			}
+			// NOTE: ADRSettings_DynamicMode_ChannelSteeringSettings does not seem to implement UnmarshalProtoJSON.
+			var v ADRSettings_DynamicMode_ChannelSteeringSettings
+			golang.UnmarshalMessage(s, &v)
+			x.ChannelSteering = &v
 		}
 	})
 }

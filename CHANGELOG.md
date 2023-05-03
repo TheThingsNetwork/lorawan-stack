@@ -11,6 +11,13 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Experimental channel steering API, which allows steering end devices from the wide (250kHz or 500kHz) channels towards the narrow (125kHz) channels.
+  - This API is mainly relevant for end devices operating in the US915 and AU915 regions, as they may join via a wide channel, but users may want to steer them towards the narrow channels.
+  - The new settings can be found under `mac-settings.adr.mode.dynamic.channel-steering`.
+  - `mac-settings.adr.mode.dynamic.channel-steering.mode.lora-narrow` steers the end devices towards the LoRa modulated narrow channels.
+  - `mac-settings.adr.mode.dynamic.channel-steering.mode.disabled` does not steer the end devices - end devices are left to operate in their currently active channels, wide or narrow.
+  - The default behavior is to avoid steering the end devices, but this is subject to change in future versions. Consider explicitly specifying a certain behavior (`lora-narrow` or `disabled`) if you depend on not steering the end devices.
+
 ### Changed
 
 - Uplink and downlink message frequencies are now validated and zero values are dropped.
@@ -27,7 +34,7 @@ For details about compatibility between different releases, see the **Commitment
   - An off-by-one error which caused the ADR algorithm to not take into consideration the signal qualities of the uplink which confirmed a parameter change. In effect, this fix improves the quality of the link budget estimation.
   - A flip-flop condition which caused the algorithm to swap back and forth between a higher and a lower transmission power index every 20 uplinks. In effect, this fix will cause the algorithm to change the transmission power index less often.
   - A condition mistake which caused the algorithm to avoid increasing the transmission power if it would not completely fix the missing link budget. In effect, this will cause the algorithm to increase the transmission power in situations in which the link budget deteriorates rapidly.
-- In fixed channel plans such as US915 and AU915, the the associated wide (500KHz) channel is now enabled by default.
+- In fixed channel plans such as US915 and AU915, the the associated wide (500kHz) channel is now enabled by default.
 
 ### Security
 

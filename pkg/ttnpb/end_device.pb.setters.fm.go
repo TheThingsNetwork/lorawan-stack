@@ -3315,6 +3315,31 @@ func (dst *ADRSettings_DynamicMode) SetFields(src *ADRSettings_DynamicMode, path
 			} else {
 				dst.MaxNbTrans = nil
 			}
+		case "channel_steering":
+			if len(subs) > 0 {
+				var newDst, newSrc *ADRSettings_DynamicMode_ChannelSteeringSettings
+				if (src == nil || src.ChannelSteering == nil) && dst.ChannelSteering == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.ChannelSteering
+				}
+				if dst.ChannelSteering != nil {
+					newDst = dst.ChannelSteering
+				} else {
+					newDst = &ADRSettings_DynamicMode_ChannelSteeringSettings{}
+					dst.ChannelSteering = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ChannelSteering = src.ChannelSteering
+				} else {
+					dst.ChannelSteering = nil
+				}
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -3326,6 +3351,124 @@ func (dst *ADRSettings_DynamicMode) SetFields(src *ADRSettings_DynamicMode, path
 func (dst *ADRSettings_DisabledMode) SetFields(src *ADRSettings_DisabledMode, paths ...string) error {
 	if len(paths) != 0 {
 		return fmt.Errorf("message ADRSettings_DisabledMode has no fields, but paths %s were specified", paths)
+	}
+	return nil
+}
+
+func (dst *ADRSettings_DynamicMode_ChannelSteeringSettings) SetFields(src *ADRSettings_DynamicMode_ChannelSteeringSettings, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+
+		case "mode":
+			if len(subs) == 0 && src == nil {
+				dst.Mode = nil
+				continue
+			} else if len(subs) == 0 {
+				dst.Mode = src.Mode
+				continue
+			}
+
+			subPathMap := _processPaths(subs)
+			if len(subPathMap) > 1 {
+				return fmt.Errorf("more than one field specified for oneof field '%s'", name)
+			}
+			for oneofName, oneofSubs := range subPathMap {
+				switch oneofName {
+				case "lora_narrow":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Mode.(*ADRSettings_DynamicMode_ChannelSteeringSettings_LoraNarrow)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Mode == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'lora_narrow', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.Mode.(*ADRSettings_DynamicMode_ChannelSteeringSettings_LoraNarrow)
+					if dstValid := dstTypeOk || dst.Mode == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'lora_narrow', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode
+						if srcTypeOk {
+							newSrc = src.Mode.(*ADRSettings_DynamicMode_ChannelSteeringSettings_LoraNarrow).LoraNarrow
+						}
+						if dstTypeOk {
+							newDst = dst.Mode.(*ADRSettings_DynamicMode_ChannelSteeringSettings_LoraNarrow).LoraNarrow
+						} else if srcTypeOk {
+							newDst = &ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode{}
+							dst.Mode = &ADRSettings_DynamicMode_ChannelSteeringSettings_LoraNarrow{LoraNarrow: newDst}
+						} else {
+							dst.Mode = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.Mode = src.Mode
+						} else {
+							dst.Mode = nil
+						}
+					}
+				case "disabled":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Mode.(*ADRSettings_DynamicMode_ChannelSteeringSettings_Disabled)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Mode == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'disabled', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.Mode.(*ADRSettings_DynamicMode_ChannelSteeringSettings_Disabled)
+					if dstValid := dstTypeOk || dst.Mode == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'disabled', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *ADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode
+						if srcTypeOk {
+							newSrc = src.Mode.(*ADRSettings_DynamicMode_ChannelSteeringSettings_Disabled).Disabled
+						}
+						if dstTypeOk {
+							newDst = dst.Mode.(*ADRSettings_DynamicMode_ChannelSteeringSettings_Disabled).Disabled
+						} else if srcTypeOk {
+							newDst = &ADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode{}
+							dst.Mode = &ADRSettings_DynamicMode_ChannelSteeringSettings_Disabled{Disabled: newDst}
+						} else {
+							dst.Mode = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.Mode = src.Mode
+						} else {
+							dst.Mode = nil
+						}
+					}
+
+				default:
+					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode) SetFields(src *ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode, paths ...string) error {
+	if len(paths) != 0 {
+		return fmt.Errorf("message ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode has no fields, but paths %s were specified", paths)
+	}
+	return nil
+}
+
+func (dst *ADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode) SetFields(src *ADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode, paths ...string) error {
+	if len(paths) != 0 {
+		return fmt.Errorf("message ADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode has no fields, but paths %s were specified", paths)
 	}
 	return nil
 }

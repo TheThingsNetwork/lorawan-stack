@@ -949,6 +949,10 @@ var (
 		"mac_settings.adr.mode",
 		"mac_settings.adr.mode.disabled",
 		"mac_settings.adr.mode.dynamic",
+		"mac_settings.adr.mode.dynamic.channel_steering",
+		"mac_settings.adr.mode.dynamic.channel_steering.mode",
+		"mac_settings.adr.mode.dynamic.channel_steering.mode.disabled",
+		"mac_settings.adr.mode.dynamic.channel_steering.mode.lora_narrow",
 		"mac_settings.adr.mode.dynamic.margin",
 		"mac_settings.adr.mode.dynamic.max_data_rate_index",
 		"mac_settings.adr.mode.dynamic.max_data_rate_index.value",
@@ -966,6 +970,10 @@ var (
 
 	dynamicADRSettingsFields = []string{
 		"mac_settings.adr.mode.dynamic",
+		"mac_settings.adr.mode.dynamic.channel_steering",
+		"mac_settings.adr.mode.dynamic.channel_steering.mode",
+		"mac_settings.adr.mode.dynamic.channel_steering.mode.disabled",
+		"mac_settings.adr.mode.dynamic.channel_steering.mode.lora_narrow",
 		"mac_settings.adr.mode.dynamic.margin",
 		"mac_settings.adr.mode.dynamic.max_data_rate_index.value",
 		"mac_settings.adr.mode.dynamic.max_nb_trans",
@@ -1232,6 +1240,10 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		"mac_settings.adr.mode",
 		"mac_settings.adr.mode.disabled",
 		"mac_settings.adr.mode.dynamic",
+		"mac_settings.adr.mode.dynamic.channel_steering",
+		"mac_settings.adr.mode.dynamic.channel_steering.mode",
+		"mac_settings.adr.mode.dynamic.channel_steering.mode.disabled",
+		"mac_settings.adr.mode.dynamic.channel_steering.mode.lora_narrow",
 		"mac_settings.adr.mode.dynamic.margin",
 		"mac_settings.adr.mode.dynamic.max_data_rate_index",
 		"mac_settings.adr.mode.dynamic.max_data_rate_index.value",
@@ -1435,8 +1447,9 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 					if dev.GetMacSettings().GetAdr().GetDynamic().GetMaxDataRateIndex() == nil {
 						return nil
 					}
-					_, ok := phy.DataRates[dev.MacSettings.Adr.GetDynamic().MaxDataRateIndex.Value]
-					if !ok {
+					drIdx := dev.MacSettings.Adr.GetDynamic().MaxDataRateIndex.Value
+					_, ok := phy.DataRates[drIdx]
+					if !ok || drIdx > phy.MaxADRDataRateIndex {
 						return newInvalidFieldValueError(field)
 					}
 					return nil
@@ -1453,8 +1466,9 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 					if dev.GetMacSettings().GetAdr().GetDynamic().GetMinDataRateIndex() == nil {
 						return nil
 					}
-					_, ok := phy.DataRates[dev.MacSettings.Adr.GetDynamic().MinDataRateIndex.Value]
-					if !ok {
+					drIdx := dev.MacSettings.Adr.GetDynamic().MinDataRateIndex.Value
+					_, ok := phy.DataRates[drIdx]
+					if !ok || drIdx > phy.MaxADRDataRateIndex {
 						return newInvalidFieldValueError(field)
 					}
 					return nil
