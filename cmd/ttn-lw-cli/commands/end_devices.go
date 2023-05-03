@@ -15,11 +15,10 @@
 package commands
 
 import (
-	"bufio"
 	"bytes"
 	"context"
 	"crypto/rand"
-	"encoding/hex"
+	"fmt"
 	stdio "io"
 	"mime"
 	"os"
@@ -33,7 +32,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
-	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -187,6 +185,10 @@ var (
 	errEndDeviceClaimGeneratedEUI = errors.DefineInvalidArgument(
 		"claim_generated_eui",
 		"cannot claim end device with a randomly generated DevEUI. Use a valid DevEUI registered with a Join Server",
+	)
+	errClaimingNotSupported = errors.DefineInvalidArgument(
+		"claiming_not_supported",
+		"claiming not supported for JoinEUI `{join_eui}`",
 	)
 )
 
@@ -541,16 +543,6 @@ var (
 
 			claimOnExternalJS := len(device.ClaimAuthenticationCode.GetValue()) > 0
 
-			// TODO: Remove this flag once the legacy DCS is deprecated
-			// https://github.com/TheThingsIndustries/lorawan-stack/issues/3036
-			if withClaimAuthenticationCode, _ := cmd.Flags().GetBool("with-claim-authentication-code"); withClaimAuthenticationCode {
-				device.ClaimAuthenticationCode = &ttnpb.EndDeviceAuthenticationCode{
-					Value: strings.ToUpper(hex.EncodeToString(random.Bytes(4))),
-				}
-				paths = append(paths, "claim_authentication_code")
-				logger.Warn("Generating claim authentication codes will be deprecated in the future. Use a valid claim authentication code registered with a Join Server instead.") //nolint:lll
-			}
-
 			if hasUpdateDeviceLocationFlags(cmd.Flags()) {
 				updateDeviceLocation(device, cmd.Flags())
 				paths = append(paths, "locations")
@@ -632,30 +624,28 @@ var (
 				if err != nil {
 					return errEndDeviceClaimInfo.WithCause(err)
 				}
-				if claimInfoResp.SupportsClaiming {
-					_, err = ttnpb.NewEndDeviceClaimingServerClient(dcs).Claim(ctx, &ttnpb.ClaimEndDeviceRequest{
-						TargetApplicationIds: device.Ids.ApplicationIds,
-						TargetDeviceId:       device.Ids.DeviceId,
-						SourceDevice: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers_{
-							AuthenticatedIdentifiers: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers{
-								JoinEui:            device.Ids.JoinEui,
-								DevEui:             device.Ids.DevEui,
-								AuthenticationCode: device.ClaimAuthenticationCode.Value,
-							},
-						},
-					})
-					if err != nil {
-						return errEndDeviceClaim.WithCause(err)
-					}
-					logger.Info("Device successfully claimed, skip registering on the cluster Join Server")
-					// Remove Cluster Join Server related paths.
-					jsPaths = []string{}
-					isPaths = ttnpb.ExcludeFields(isPaths, "join_server_address")
-					device.JoinServerAddress = ""
-				} else {
-					// TODO: Remove this path once the legacy DCS is deprecated (https://github.com/TheThingsIndustries/lorawan-stack/issues/3036).
-					logger.Info("Device not configured for claiming, register in the cluster Join Server")
+				if !claimInfoResp.SupportsClaiming {
+					return errClaimingNotSupported.WithAttributes("join_eui", types.MustEUI64(device.Ids.JoinEui).String())
 				}
+				_, err = ttnpb.NewEndDeviceClaimingServerClient(dcs).Claim(ctx, &ttnpb.ClaimEndDeviceRequest{
+					TargetApplicationIds: device.Ids.ApplicationIds,
+					TargetDeviceId:       device.Ids.DeviceId,
+					SourceDevice: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers_{
+						AuthenticatedIdentifiers: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers{
+							JoinEui:            device.Ids.JoinEui,
+							DevEui:             device.Ids.DevEui,
+							AuthenticationCode: device.ClaimAuthenticationCode.Value,
+						},
+					},
+				})
+				if err != nil {
+					return errEndDeviceClaim.WithCause(err)
+				}
+				logger.Info("Device successfully claimed on an external Join Server")
+				// Remove Cluster Join Server related paths.
+				jsPaths = []string{}
+				isPaths = ttnpb.ExcludeFields(isPaths, "join_server_address")
+				device.JoinServerAddress = ""
 			}
 			// Require EUIs for devices that need to be added to the Join Server.
 			if len(jsPaths) > 0 && (device.Ids.JoinEui == nil || device.Ids.DevEui == nil) {
@@ -1135,112 +1125,13 @@ var (
 		},
 	}
 	endDevicesClaimCommand = &cobra.Command{
-		Use:   "claim [application-id]",
-		Short: "Claim an end device (EXPERIMENTAL)",
-		Long: `Claim an end device (EXPERIMENTAL)
-
-The claiming procedure transfers devices from the source application to the
-target application using the Device Claiming Server, thereby transferring
-ownership of the device.
-
-Authentication of device claiming is by the device's JoinEUI, DevEUI and claim
-authentication code as stored in the Join Server. This information is typically
-encoded in a QR code. This command supports claiming by QR code (via stdin), as
-well as providing the claim information through the flags --source-join-eui,
---source-dev-eui, --source-authentication-code.
-
-Claim authentication code validity is controlled by the owner of the device by
-setting the value and optionally a time window when the code is valid. As part
-of the claiming, the claim authentication code is invalidated by default to
-block subsequent claiming attempts. You can keep the claim authentication code
-valid by specifying --invalidate-authentication-code=false.
-
-As part of claiming, you can optionally provide the target NetID, Network Server
-KEK label and Application Server ID and KEK label. The Network Server and
-Application Server addresses will be taken from the CLI configuration. These
-values will be stored in the Join Server.`,
-		Deprecated: "End device claiming is integrated into the device creation flow.",
+		Use:    "claim [application-id]",
+		Short:  "Claim an end device (DEPRECATED)",
+		Hidden: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			targetAppID := getApplicationID(cmd.Flags(), args)
-			if targetAppID == nil {
-				return errNoApplicationID.New()
-			}
-
-			req := &ttnpb.ClaimEndDeviceRequest{
-				TargetApplicationIds: targetAppID,
-			}
-
-			var joinEUI, devEUI *types.EUI64
-			if joinEUIHex, _ := cmd.Flags().GetString("source-join-eui"); joinEUIHex != "" {
-				joinEUI = new(types.EUI64)
-				if err := joinEUI.UnmarshalText([]byte(joinEUIHex)); err != nil {
-					return errInvalidJoinEUI.WithCause(err)
-				}
-			}
-			if devEUIHex, _ := cmd.Flags().GetString("source-dev-eui"); devEUIHex != "" {
-				devEUI = new(types.EUI64)
-				if err := devEUI.UnmarshalText([]byte(devEUIHex)); err != nil {
-					return errInvalidDevEUI.WithCause(err)
-				}
-			}
-			if joinEUI != nil && devEUI != nil {
-				authenticationCode, _ := cmd.Flags().GetString("source-authentication-code")
-				req.SourceDevice = &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers_{
-					AuthenticatedIdentifiers: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers{
-						JoinEui:            joinEUI.Bytes(),
-						DevEui:             devEUI.Bytes(),
-						AuthenticationCode: authenticationCode,
-					},
-				}
-			} else {
-				if joinEUI != nil || devEUI != nil {
-					logger.Warn("Either target JoinEUI or DevEUI specified but need both, not considering any and using scan mode")
-				}
-				rd, ok := io.BufferedPipe(os.Stdin)
-				if !ok {
-					logger.Info("Scan QR code")
-					rd = bufio.NewReader(os.Stdin)
-				}
-				qrCode, err := rd.ReadBytes('\n')
-				if err != nil {
-					return err
-				}
-				qrCode = qrCode[:len(qrCode)-1]
-				logger.WithField("code", string(qrCode)).Debug("Scanned QR code")
-				req.SourceDevice = &ttnpb.ClaimEndDeviceRequest_QrCode{
-					QrCode: qrCode,
-				}
-			}
-
-			req.TargetDeviceId, _ = cmd.Flags().GetString("target-device-id")
-			if netIDHex, _ := cmd.Flags().GetString("target-net-id"); netIDHex != "" {
-				var netID types.NetID
-				if err := netID.UnmarshalText([]byte(netIDHex)); err != nil {
-					return err
-				}
-				req.TargetNetId = netID.Bytes()
-			}
-			if config.NetworkServerEnabled {
-				req.TargetNetworkServerAddress = config.NetworkServerGRPCAddress
-			}
-			req.TargetNetworkServerKekLabel, _ = cmd.Flags().GetString("target-network-server-kek-label")
-			if config.ApplicationServerEnabled {
-				req.TargetApplicationServerAddress = config.ApplicationServerGRPCAddress
-			}
-			req.TargetApplicationServerKekLabel, _ = cmd.Flags().GetString("target-application-server-kek-label")
-			req.TargetApplicationServerId, _ = cmd.Flags().GetString("target-application-server-id")
-			req.InvalidateAuthenticationCode, _ = cmd.Flags().GetBool("invalidate-authentication-code")
-
-			dcs, err := api.Dial(ctx, config.DeviceClaimingServerGRPCAddress)
-			if err != nil {
-				return err
-			}
-			ids, err := ttnpb.NewEndDeviceClaimingServerClient(dcs).Claim(ctx, req)
-			if err != nil {
-				return err
-			}
-
-			return io.Write(os.Stdout, config.OutputFormat, ids)
+			return fmt.Errorf(
+				"this command is no longer supported. End device claiming is integrated into the device creation flow",
+			)
 		},
 	}
 	endDevicesListQRCodeFormatsCommand = &cobra.Command{
@@ -1360,6 +1251,13 @@ This command may take end device identifiers from stdin.`,
 			if err := device.SetFields(dev, append(append(nsPaths, asPaths...), jsPaths...)...); err != nil {
 				return err
 			}
+
+			if device.ClaimAuthenticationCode.GetValue() == "" {
+				// Unset the field since qrcodegenerator.Generate does not support fieldmask
+				// and an empty field would result in a validation error.
+				device.ClaimAuthenticationCode = nil
+			}
+
 			size, _ := cmd.Flags().GetUint32("size")
 			res, err := client.Generate(ctx, &ttnpb.GenerateEndDeviceQRCodeRequest{
 				FormatId:  formatID,
@@ -1686,6 +1584,13 @@ func init() {
 
 	endDevicesListPhyVersionsCommand.Flags().AddFlagSet(listPhyVersionFlags)
 	endDevicesCommand.AddCommand(endDevicesListPhyVersionsCommand)
+
+	// Deprecate flags.
+	util.DeprecateFlagWithoutForwarding(
+		endDevicesCreateCommand.Flags(),
+		"with-claim-authentication-code",
+		"use a valid claim authentication code registered with a Join Server instead",
+	)
 
 	Root.AddCommand(endDevicesCommand)
 
