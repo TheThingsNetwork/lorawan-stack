@@ -80,8 +80,10 @@ var (
 			if err != nil {
 				return err
 			}
-
-			return getStoredUp(cmd, args, client, os.Stdout)
+			if err := getStoredUp(cmd, args, client, os.Stdout); err != nil {
+				return err
+			}
+			return printContinuationToken(client, os.Stdout)
 		},
 	}
 	endDeviceStorageCountCommand = &cobra.Command{
@@ -136,7 +138,10 @@ var (
 				return err
 			}
 
-			return getStoredUp(cmd, args, client, os.Stdout)
+			if err := getStoredUp(cmd, args, client, os.Stdout); err != nil {
+				return err
+			}
+			return printContinuationToken(client, os.Stdout)
 		},
 	}
 	applicationsStorageCountCommand = &cobra.Command{
