@@ -69,10 +69,16 @@ const RelativeTime = props => {
   }, [showLessThan, absDelta, updateIntervalInSeconds])
 
   return (
-    <DateTime className={className} value={value} firstToLower={firstToLower} noTitle={noTitle}>
+    <DateTime
+      className={className}
+      value={value}
+      firstToLower={firstToLower}
+      noTitle={noTitle}
+      {...dateTimeProps}
+    >
       {dateTime =>
         absDelta >= 60 * 60 * 24 * showAbsoluteAfter ? (
-          <DateTime value={dateTime} {...dateTimeProps} />
+          dateTime
         ) : (
           <FormattedRelativeTime
             key={dateTime}
