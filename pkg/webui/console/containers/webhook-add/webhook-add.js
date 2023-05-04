@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, { useState } from 'react'
-import urlTemplate from 'url-template'
+import { parseTemplate } from 'url-template'
 
 import WebhookForm from '@console/components/webhook-form'
 import WebhookTemplateForm from '@console/components/webhook-template-form'
@@ -22,7 +22,7 @@ import { isNotFoundError } from '@ttn-lw/lib/errors/utils'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 const pathExpand = (url, fields) =>
-  Boolean(url) && url.path ? { path: urlTemplate.parse(url.path).expand(fields) } : url
+  Boolean(url) && url.path ? { path: parseTemplate(url.path).expand(fields) } : url
 
 const WebhookAdd = props => {
   const {
@@ -57,7 +57,7 @@ const WebhookAdd = props => {
         format: template.format,
         headers,
         template_fields: fields,
-        base_url: urlTemplate.parse(template.base_url).expand(fields),
+        base_url: parseTemplate(template.base_url).expand(fields),
         uplink_message: pathExpand(template.uplink_message, fields),
         uplink_normalized: pathExpand(template.uplink_normalized, fields),
         join_accept: pathExpand(template.join_accept, fields),
