@@ -54,8 +54,11 @@ RequireRequest.propTypes = {
   children: PropTypes.node.isRequired,
   errorRenderFunction: PropTypes.func,
   handleErrors: PropTypes.bool,
-  requestAction: PropTypes.oneOfType([PropTypes.shape({}), PropTypes.arrayOf(PropTypes.shape({}))])
-    .isRequired,
+  requestAction: PropTypes.oneOfType([
+    PropTypes.shape({}),
+    PropTypes.arrayOf(PropTypes.shape({})),
+    PropTypes.func,
+  ]).isRequired,
   spinnerProps: PropTypes.shape(Spinner.propTypes),
 }
 

@@ -28,6 +28,8 @@ const useRequest = requestAction => {
     const promise = (
       requestAction instanceof Array
         ? CancelablePromise.all(requestAction.map(req => dispatch(attachPromise(req))))
+        : typeof requestAction === 'function'
+        ? requestAction(dispatch)
         : dispatch(attachPromise(requestAction))
     )
       .then(() => {
