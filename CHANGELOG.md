@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.25.2] - unreleased
+
+### Added
+
 - Experimental channel steering API, which allows steering end devices from the wide (250kHz or 500kHz) channels towards the narrow (125kHz) channels.
   - This API is mainly relevant for end devices operating in the US915 and AU915 regions, as they may join via a wide channel, but users may want to steer them towards the narrow channels.
   - The new settings can be found under `mac-settings.adr.mode.dynamic.channel-steering`.
@@ -24,10 +38,6 @@ For details about compatibility between different releases, see the **Commitment
   - Such traffic would have always been dropped by the Network Server, but it is now dropped in the Gateway Server.
   - Simulated uplink traffic now requires a frequency value as well.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Multiple ADR algorithm bugs:
@@ -35,8 +45,6 @@ For details about compatibility between different releases, see the **Commitment
   - A flip-flop condition which caused the algorithm to swap back and forth between a higher and a lower transmission power index every 20 uplinks. In effect, this fix will cause the algorithm to change the transmission power index less often.
   - A condition mistake which caused the algorithm to avoid increasing the transmission power if it would not completely fix the missing link budget. In effect, this will cause the algorithm to increase the transmission power in situations in which the link budget deteriorates rapidly.
 - In fixed channel plans such as US915 and AU915, the the associated wide (500kHz) channel is now enabled by default.
-
-### Security
 
 ## [3.25.1] - 2023-04-18
 
@@ -2571,7 +2579,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.25.1...v3.25
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.25.2...v3.25
+[3.25.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.25.1...v3.25.2
 [3.25.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.25.0...v3.25.1
 [3.25.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.24.2...v3.25.0
 [3.24.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.24.1...v3.24.2
