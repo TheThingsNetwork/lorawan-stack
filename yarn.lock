@@ -1968,14 +1968,14 @@
     "@formatjs/intl-localematcher" "0.2.21"
     tslib "^2.1.0"
 
-"@formatjs/intl-relativetimeformat@^11.1.3":
-  version "11.1.3"
-  resolved "https://registry.yarnpkg.com/@formatjs/intl-relativetimeformat/-/intl-relativetimeformat-11.1.3.tgz#a265154ce66f66d1b37745783282003a8013c46e"
-  integrity sha512-P4NLw7NEny3Z+y5IUzPHClcSJE+tuiRBMILXGA5KHayOzzIecm5MO44cOH6aDotunXu43W43Sk7IHHFBlYokBA==
+"@formatjs/intl-relativetimeformat@^11.2.2":
+  version "11.2.2"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-relativetimeformat/-/intl-relativetimeformat-11.2.2.tgz#0928c9aa69392ccdb4b25866d5800e92f27ac583"
+  integrity sha512-iRLKWFcMsMtThZOv5kI1Zpz9Ns09nAibL/nJfnCGyXub5GGrCAbvK59V6p+7umM4v2lwqNCM7p++EPNO8CSTFA==
   dependencies:
-    "@formatjs/ecma402-abstract" "1.12.0"
-    "@formatjs/intl-localematcher" "0.2.31"
-    tslib "2.4.0"
+    "@formatjs/ecma402-abstract" "1.15.0"
+    "@formatjs/intl-localematcher" "0.2.32"
+    tslib "^2.4.0"
 
 "@formatjs/intl@2.6.2":
   version "2.6.2"
