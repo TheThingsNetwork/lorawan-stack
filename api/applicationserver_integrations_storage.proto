@@ -79,7 +79,7 @@ message GetStoredApplicationUpRequest {
   google.protobuf.FieldMask field_mask = 9;
 
   // Query upstream messages that have arrived in the last minutes or hours. Cannot be used in conjunction with after and before.
-  google.protobuf.Duration last = 10;
+  google.protobuf.Duration last = 10 [deprecated = true];
 
   // The continuation token, which is used to retrieve the next page. If provided, other fields are ignored.
   string continuation_token = 11;
