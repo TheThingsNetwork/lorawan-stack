@@ -16,13 +16,14 @@ package commands
 
 import (
 	"fmt"
-	"io"
 	"sort"
 	"strings"
 
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
@@ -41,7 +42,10 @@ func getStoredUpFlags() *pflag.FlagSet {
 	flags.AddFlagSet(timestampFlags("after", "query upstream messages after specified timestamp"))
 	flags.AddFlagSet(timestampFlags("before", "query upstream messages before specified timestamp"))
 	flags.Duration("last", 0, "query upstream messages in the last hours or minutes")
-	flags.String("continuation-token", "", "continuation token for pagination (if used additional flags other than the type are ignored)")
+	flags.String(
+		"continuation-token", "",
+		"continuation token for pagination (if used additional flags other than the type are ignored)",
+	)
 
 	ttnpb.AddSelectFlagsForApplicationUp(flags, "", false)
 
@@ -70,7 +74,7 @@ func getStoredUpRequest(flags *pflag.FlagSet) (*ttnpb.GetStoredApplicationUpRequ
 	}
 	req.Before = before
 	req.After = after
-	req.Last = last
+	req.Last = last //nolint
 	req.Order, _ = flags.GetString("order")
 
 	if flags.Changed("f-port") {
@@ -161,14 +165,18 @@ func timeRangeFromFlags(flags *pflag.FlagSet) (beforePB *timestamppb.Timestamp, 
 	return
 }
 
-func printContinuationToken(client ttnpb.ApplicationUpStorage_GetStoredApplicationUpClient, w io.Writer) error {
-	md, err := client.Header()
-	if err != nil {
-		return err
-	}
+type continuationToken struct {
+	ContinuationToken string `json:"continuation_token,omitempty"`
+}
+
+var errNoContinuationToken = errors.DefineUnavailable("no_continuation_token", "no continuation token")
+
+func newContinuationTokenFromMD(md metadata.MD) (*continuationToken, error) {
 	continuationTokenHeaderValues := md.Get("x-continuation-token")
 	if len(continuationTokenHeaderValues) == 1 {
-		fmt.Fprintf(w, "Continuation token: %s\n", continuationTokenHeaderValues[0])
+		return &continuationToken{
+			ContinuationToken: continuationTokenHeaderValues[0],
+		}, nil
 	}
-	return nil
+	return nil, errNoContinuationToken
 }
