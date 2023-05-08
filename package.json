@@ -6,7 +6,7 @@
   "repository": "https://github.com/TheThingsNetwork/lorawan-stack.git",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@babel/cli": "^7.17.6",
+    "@babel/cli": "^7.21.5",
     "@babel/core": "^7.18.0",
     "@babel/eslint-parser": "^7.12.17",
     "@babel/plugin-proposal-class-properties": "^7.14.5",
