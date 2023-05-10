@@ -22,6 +22,7 @@
         "description":"Akenza Core device ID"
       }
     ],
+    "field_mask":  { "paths": ["up.uplink_message.decoded_payload"] },
     "uplink_message":{"path":"/"}
   }]
 }
