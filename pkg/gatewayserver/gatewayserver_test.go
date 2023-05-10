@@ -103,9 +103,9 @@ func TestGatewayServer(t *testing.T) {
 				gsConfig := &gatewayserver.Config{
 					RequireRegisteredGateways:         false,
 					UpdateGatewayLocationDebounceTime: 0,
-					UpdateConnectionStatsInterval:     time.Second,
-					ConnectionStatsTTL:                (1 << 3) * test.Delay,
-					ConnectionStatsDisconnectTTL:      (1 << 6) * test.Delay,
+					UpdateConnectionStatsInterval:     (1 << 5) * test.Delay,
+					ConnectionStatsTTL:                (1 << 6) * test.Delay,
+					ConnectionStatsDisconnectTTL:      (1 << 7) * test.Delay,
 					Stats:                             statsRegistry,
 					FetchGatewayInterval:              time.Minute,
 					FetchGatewayJitter:                1,
@@ -734,7 +734,7 @@ func TestGatewayServer(t *testing.T) {
 				})
 
 				// Wait for gateway disconnection to be processed.
-				time.Sleep(6 * timeout)
+				time.Sleep(2 * config.ConnectionStatsDisconnectTTL)
 
 				t.Run(fmt.Sprintf("Traffic/%v", ptc.Protocol), func(t *testing.T) {
 					a := assertions.New(t)
@@ -1472,9 +1472,7 @@ func TestGatewayServer(t *testing.T) {
 
 								stats, paths := conn.Stats()
 								a.So(stats, should.NotBeNil)
-								if statsRegistry != nil {
-									a.So(statsRegistry.Set(conn.Context(), ids, stats, paths, 0), should.BeNil)
-								}
+								a.So(paths, should.NotBeEmpty)
 
 								stats, err := statsClient.GetGatewayConnectionStats(statsCtx, ids)
 								if !a.So(err, should.BeNil) {
@@ -1803,9 +1801,7 @@ func TestGatewayServer(t *testing.T) {
 
 								stats, paths := conn.Stats()
 								a.So(stats, should.NotBeNil)
-								if config.Stats != nil {
-									a.So(config.Stats.Set(conn.Context(), ids, stats, paths, 0), should.BeNil)
-								}
+								a.So(paths, should.NotBeEmpty)
 
 								stats, err = statsClient.GetGatewayConnectionStats(statsCtx, ids)
 								if !a.So(err, should.BeNil) {
@@ -1823,7 +1819,7 @@ func TestGatewayServer(t *testing.T) {
 					}
 
 					// Wait for disconnection to be processed.
-					time.Sleep(4 * config.ConnectionStatsDisconnectTTL)
+					time.Sleep(2 * config.ConnectionStatsDisconnectTTL)
 
 					// After canceling the context and awaiting the link, the connection should be gone.
 					t.Run("Disconnected", func(t *testing.T) {

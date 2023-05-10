@@ -35,10 +35,7 @@ type GatewayConnectionStatsRegistry struct {
 
 // Init initializes the GatewayConnectionStatsRegistry.
 func (r *GatewayConnectionStatsRegistry) Init(ctx context.Context) error {
-	if err := ttnredis.InitMutex(ctx, r.Redis); err != nil {
-		return err
-	}
-	return nil
+	return ttnredis.InitMutex(ctx, r.Redis)
 }
 
 func (r *GatewayConnectionStatsRegistry) key(uid string) string {
@@ -46,7 +43,13 @@ func (r *GatewayConnectionStatsRegistry) key(uid string) string {
 }
 
 // Set sets or clears the connection stats for a gateway.
-func (r *GatewayConnectionStatsRegistry) Set(ctx context.Context, ids *ttnpb.GatewayIdentifiers, stats *ttnpb.GatewayConnectionStats, paths []string, ttl time.Duration) error {
+func (r *GatewayConnectionStatsRegistry) Set(
+	ctx context.Context,
+	ids *ttnpb.GatewayIdentifiers,
+	f func(*ttnpb.GatewayConnectionStats) (*ttnpb.GatewayConnectionStats, []string, error),
+	ttl time.Duration,
+	gets ...string,
+) error {
 	uid := unique.ID(ctx, ids)
 
 	lockerID, err := ttnredis.GenerateLockerID()
@@ -57,21 +60,61 @@ func (r *GatewayConnectionStatsRegistry) Set(ctx context.Context, ids *ttnpb.Gat
 	defer trace.StartRegion(ctx, "set gateway connection stats").End()
 
 	uk := r.key(uid)
-	if stats == nil {
-		err = r.Redis.Del(ctx, uk).Err()
-	} else {
-		err = ttnredis.LockedWatch(ctx, r.Redis, uk, lockerID, r.LockTTL, func(tx *redis.Tx) error {
-			pb := &ttnpb.GatewayConnectionStats{}
-			if err := ttnredis.GetProto(ctx, tx, uk).ScanProto(pb); err != nil && !errors.IsNotFound(err) {
-				return err
-			}
-			if err := pb.SetFields(stats, paths...); err != nil {
-				return err
-			}
-			_, err := ttnredis.SetProto(ctx, tx, uk, pb, ttl)
+	err = ttnredis.LockedWatch(ctx, r.Redis, uk, lockerID, r.LockTTL, func(tx *redis.Tx) error {
+		stored := &ttnpb.GatewayConnectionStats{}
+		cmd := ttnredis.GetProto(ctx, tx, uk)
+		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
+			stored = nil
+		} else if err != nil {
 			return err
-		})
-	}
+		}
+
+		var pb *ttnpb.GatewayConnectionStats
+		if stored != nil {
+			pb = &ttnpb.GatewayConnectionStats{}
+			if err := cmd.ScanProto(pb); err != nil {
+				return err
+			}
+			if pb, err = applyGatewayConnectionStatsFieldMask(nil, pb, gets...); err != nil {
+				return err
+			}
+		}
+
+		var sets []string
+		pb, sets, err = f(pb)
+		if err != nil {
+			return err
+		}
+		if stored == nil && pb == nil {
+			return nil
+		}
+		var pipelined func(redis.Pipeliner) error
+		if pb == nil {
+			pipelined = func(p redis.Pipeliner) error {
+				p.Del(ctx, uk)
+				return nil
+			}
+		} else {
+			updated := &ttnpb.GatewayConnectionStats{}
+			if stored != nil {
+				if err := cmd.ScanProto(updated); err != nil {
+					return err
+				}
+			}
+			if updated, err = applyGatewayConnectionStatsFieldMask(updated, pb, sets...); err != nil {
+				return err
+			}
+			if err := updated.ValidateFields(); err != nil {
+				return err
+			}
+			pipelined = func(p redis.Pipeliner) error {
+				_, err = ttnredis.SetProto(ctx, p, uk, updated, ttl)
+				return err
+			}
+		}
+		_, err = tx.TxPipelined(ctx, pipelined)
+		return err
+	})
 	if err != nil {
 		return ttnredis.ConvertError(err)
 	}
@@ -79,7 +122,9 @@ func (r *GatewayConnectionStatsRegistry) Set(ctx context.Context, ids *ttnpb.Gat
 }
 
 // Get returns the connection stats for a gateway.
-func (r *GatewayConnectionStatsRegistry) Get(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayConnectionStats, error) {
+func (r *GatewayConnectionStatsRegistry) Get(
+	ctx context.Context, ids *ttnpb.GatewayIdentifiers,
+) (*ttnpb.GatewayConnectionStats, error) {
 	uid := unique.ID(ctx, ids)
 	result := &ttnpb.GatewayConnectionStats{}
 	if err := ttnredis.GetProto(ctx, r.Redis, r.key(uid)).ScanProto(result); err != nil {
@@ -104,7 +149,7 @@ func applyGatewayConnectionStatsFieldMask(
 func (r *GatewayConnectionStatsRegistry) BatchGet(
 	ctx context.Context,
 	ids []*ttnpb.GatewayIdentifiers,
-	paths []string,
+	paths ...string,
 ) (map[string]*ttnpb.GatewayConnectionStats, error) {
 	ret := make(map[string]*ttnpb.GatewayConnectionStats, len(ids))
 	keys := make([]string, 0, len(ids))
