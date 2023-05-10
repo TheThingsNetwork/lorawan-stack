@@ -29,10 +29,16 @@ type GatewayConnectionStatsRegistry interface {
 	BatchGet(
 		ctx context.Context,
 		ids []*ttnpb.GatewayIdentifiers,
-		paths []string,
+		paths ...string,
 	) (map[string]*ttnpb.GatewayConnectionStats, error)
 	// Set sets, updates or clears the connection stats for a gateway. Only fields specified in the field mask paths are set.
-	Set(ctx context.Context, ids *ttnpb.GatewayIdentifiers, stats *ttnpb.GatewayConnectionStats, paths []string, ttl time.Duration) error
+	Set(
+		ctx context.Context,
+		ids *ttnpb.GatewayIdentifiers,
+		f func(*ttnpb.GatewayConnectionStats) (*ttnpb.GatewayConnectionStats, []string, error),
+		ttl time.Duration,
+		gets ...string,
+	) error
 }
 
 // EntityRegistry abstracts the Identity server gateway functions.

@@ -80,7 +80,7 @@ func (gs *GatewayServer) BatchGetGatewayConnectionStats(
 	}
 
 	if gs.statsRegistry != nil {
-		entries, err := gs.statsRegistry.BatchGet(ctx, req.GatewayIds, req.FieldMask.GetPaths())
+		entries, err := gs.statsRegistry.BatchGet(ctx, req.GatewayIds, req.FieldMask.GetPaths()...)
 		if err != nil {
 			return nil, err
 		}

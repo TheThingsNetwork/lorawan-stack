@@ -970,7 +970,14 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 	}
 	registerGatewayConnectionStats(ctx, ids, stats)
 	if gs.statsRegistry != nil {
-		if err := gs.statsRegistry.Set(decoupledCtx, ids, stats, ttnpb.GatewayConnectionStatsFieldPathsTopLevel, gs.config.ConnectionStatsTTL); err != nil {
+		if err := gs.statsRegistry.Set(
+			decoupledCtx,
+			ids,
+			func(*ttnpb.GatewayConnectionStats) (*ttnpb.GatewayConnectionStats, []string, error) {
+				return stats, ttnpb.GatewayConnectionStatsFieldPathsTopLevel, nil
+			},
+			gs.config.ConnectionStatsTTL,
+		); err != nil {
 			logger.WithError(err).Warn("Failed to initialize connection stats")
 		}
 	}
@@ -986,8 +993,11 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 			return
 		}
 		if err := gs.statsRegistry.Set(
-			decoupledCtx, ids, stats,
-			[]string{"connected_at", "disconnected_at"},
+			decoupledCtx,
+			ids,
+			func(*ttnpb.GatewayConnectionStats) (*ttnpb.GatewayConnectionStats, []string, error) {
+				return stats, []string{"connected_at", "disconnected_at"}, nil
+			},
 			gs.config.ConnectionStatsDisconnectTTL,
 		); err != nil {
 			logger.WithError(err).Warn("Failed to clear connection stats")
@@ -1028,7 +1038,14 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 		if gs.statsRegistry == nil {
 			continue
 		}
-		if err := gs.statsRegistry.Set(decoupledCtx, ids, stats, paths, gs.config.ConnectionStatsTTL); err != nil {
+		if err := gs.statsRegistry.Set(
+			decoupledCtx,
+			ids,
+			func(*ttnpb.GatewayConnectionStats) (*ttnpb.GatewayConnectionStats, []string, error) {
+				return stats, paths, nil
+			},
+			gs.config.ConnectionStatsTTL,
+		); err != nil {
 			logger.WithError(err).Warn("Failed to update connection stats")
 		}
 	}
