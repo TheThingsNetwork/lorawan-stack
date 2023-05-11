@@ -71,35 +71,52 @@ func TestRegistry(t *testing.T) {
 		a.So(errors.IsNotFound(err), should.BeTrue)
 		batchStats, err := registry.BatchGet(ctx, []*ttnpb.GatewayIdentifiers{
 			ids,
-		}, nil)
+		})
 		a.So(err, should.BeNil)
 		a.So(len(batchStats), should.Equal, 0)
 	})
 
+	emptyStatsClearUpdate := func(pb *ttnpb.GatewayConnectionStats) (*ttnpb.GatewayConnectionStats, []string, error) {
+		a.So(pb, should.BeNil)
+		return nil, nil, nil
+	}
+	nonEmptyStatsCleanUpdate := func(pb *ttnpb.GatewayConnectionStats) (*ttnpb.GatewayConnectionStats, []string, error) {
+		a.So(pb, should.NotBeNil)
+		return nil, nil, nil
+	}
+
 	t.Run("EmptyStats", func(t *testing.T) {
 		a, ctx := test.New(t)
-		err := registry.Set(ctx, ids3, nil, []string{}, 0)
+		err := registry.Set(ctx, ids3, emptyStatsClearUpdate, 0)
 		a.So(err, should.BeNil)
 		retrieved, err := registry.Get(ctx, ids3)
 		a.So(retrieved, should.BeNil)
 		a.So(errors.IsNotFound(err), should.BeTrue)
 		batchStats, err := registry.BatchGet(ctx, []*ttnpb.GatewayIdentifiers{
 			ids3,
-		}, nil)
+		})
 		a.So(err, should.BeNil)
 		a.So(len(batchStats), should.Equal, 0)
 	})
 
 	t.Run("SetAndClear", func(t *testing.T) {
 		a, ctx := test.New(t)
-		err := registry.Set(ctx, ids, initialStats, []string{
-			"connected_at",
-			"protocol",
-			"last_downlink_received_at",
-			"downlink_count",
-			"last_uplink_received_at",
-			"uplink_count",
-		}, 0)
+		err := registry.Set(
+			ctx,
+			ids,
+			func(pb *ttnpb.GatewayConnectionStats) (*ttnpb.GatewayConnectionStats, []string, error) {
+				a.So(pb, should.BeNil)
+				return initialStats, []string{
+					"connected_at",
+					"protocol",
+					"last_downlink_received_at",
+					"downlink_count",
+					"last_uplink_received_at",
+					"uplink_count",
+				}, nil
+			},
+			0,
+		)
 		a.So(err, should.BeNil)
 		retrieved, err := registry.Get(ctx, ids)
 		a.So(err, should.BeNil)
@@ -115,12 +132,12 @@ func TestRegistry(t *testing.T) {
 			ids,
 			ids2,
 			ids3,
-		}, nil)
+		})
 		a.So(err, should.BeNil)
 		a.So(len(batchStats), should.Equal, 1)
 
 		// Unset
-		err = registry.Set(ctx, ids, nil, nil, 0)
+		err = registry.Set(ctx, ids, nonEmptyStatsCleanUpdate, 0)
 		a.So(err, should.BeNil)
 		retrieved, err = registry.Get(ctx, ids)
 		a.So(errors.IsNotFound(err), should.BeTrue)
@@ -129,8 +146,8 @@ func TestRegistry(t *testing.T) {
 
 	t.Run("ClearManyTimes", func(t *testing.T) {
 		a, ctx := test.New(t)
-		a.So(registry.Set(ctx, ids, nil, nil, 0), should.BeNil)
-		a.So(registry.Set(ctx, ids, nil, nil, 0), should.BeNil)
+		a.So(registry.Set(ctx, ids, emptyStatsClearUpdate, 0), should.BeNil)
+		a.So(registry.Set(ctx, ids, emptyStatsClearUpdate, 0), should.BeNil)
 	})
 
 	t.Run("SetWithTTL", func(t *testing.T) {
@@ -139,7 +156,15 @@ func TestRegistry(t *testing.T) {
 			DisconnectedAt: timestamppb.New(time.Date(2021, 12, 2, 11, 24, 58, 0, time.UTC)),
 		}
 
-		err := registry.Set(ctx, ids, stats, []string{"disconnected_at"}, Timeout)
+		err := registry.Set(
+			ctx,
+			ids,
+			func(pb *ttnpb.GatewayConnectionStats) (*ttnpb.GatewayConnectionStats, []string, error) {
+				a.So(pb, should.BeNil)
+				return stats, []string{"disconnected_at"}, nil
+			},
+			Timeout,
+		)
 		a.So(err, should.BeNil)
 
 		// all data should exist
@@ -164,10 +189,18 @@ func TestRegistry(t *testing.T) {
 			DownlinkCount:        1,
 		}
 
-		err := registry.Set(ctx, ids, stats, []string{
-			"uplink_count",
-			"last_uplink_received_at",
-		}, 0)
+		err := registry.Set(
+			ctx,
+			ids,
+			func(pb *ttnpb.GatewayConnectionStats) (*ttnpb.GatewayConnectionStats, []string, error) {
+				a.So(pb, should.BeNil)
+				return stats, []string{
+					"uplink_count",
+					"last_uplink_received_at",
+				}, nil
+			},
+			0,
+		)
 		a.So(err, should.BeNil)
 		retrieved, err := registry.Get(ctx, ids)
 		a.So(err, should.BeNil)
@@ -177,7 +210,15 @@ func TestRegistry(t *testing.T) {
 		})
 
 		// Now update downlink also
-		err = registry.Set(ctx, ids, stats, []string{"downlink_count"}, 0)
+		err = registry.Set(
+			ctx,
+			ids,
+			func(pb *ttnpb.GatewayConnectionStats) (*ttnpb.GatewayConnectionStats, []string, error) {
+				a.So(pb, should.NotBeNil)
+				return stats, []string{"downlink_count"}, nil
+			},
+			0,
+		)
 		a.So(err, should.BeNil)
 		retrieved, err = registry.Get(ctx, ids)
 		a.So(err, should.BeNil)
@@ -191,11 +232,19 @@ func TestRegistry(t *testing.T) {
 		stats.LastUplinkReceivedAt = nil
 		stats.UplinkCount = 0
 		stats.DownlinkCount = 2
-		err = registry.Set(ctx, ids, stats, []string{
-			"uplink_count",
-			"last_uplink_received_at",
-			"downlink_count",
-		}, 0)
+		err = registry.Set(
+			ctx,
+			ids,
+			func(pb *ttnpb.GatewayConnectionStats) (*ttnpb.GatewayConnectionStats, []string, error) {
+				a.So(pb, should.NotBeNil)
+				return stats, []string{
+					"uplink_count",
+					"last_uplink_received_at",
+					"downlink_count",
+				}, nil
+			},
+			0,
+		)
 		a.So(err, should.BeNil)
 		retrieved, err = registry.Get(ctx, ids)
 		a.So(err, should.BeNil)
