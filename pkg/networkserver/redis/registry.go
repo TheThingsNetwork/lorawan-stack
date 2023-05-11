@@ -844,7 +844,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 					storedPendingMACState := stored.GetPendingMacState()
 					return false, false, storedPendingMACState == nil ||
 						updated.PendingMacState.LorawanVersion != storedPendingMACState.LorawanVersion ||
-						!equalKeys(updated.PendingSession.Keys.FNwkSIntKey, storedPendingSession.Keys.FNwkSIntKey)
+						!proto.Equal(updated.PendingSession.Keys.FNwkSIntKey, storedPendingSession.Keys.FNwkSIntKey)
 				}()
 				if removeStored {
 					removeAddrMapping(ctx, p, PendingAddrKey(r.addrKey(types.MustDevAddr(storedPendingSession.DevAddr).OrZero())), uid)
@@ -882,7 +882,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 					storedMACSettings := stored.GetMacSettings()
 					return false, false, storedMACState == nil ||
 						updated.MacState.LorawanVersion != storedMACState.LorawanVersion ||
-						!equalKeys(updated.Session.Keys.FNwkSIntKey, storedSession.Keys.FNwkSIntKey) ||
+						!proto.Equal(updated.Session.Keys.FNwkSIntKey, storedSession.Keys.FNwkSIntKey) ||
 						!proto.Equal(updated.MacSettings.GetResetsFCnt(), storedMACSettings.GetResetsFCnt()) ||
 						!proto.Equal(updated.MacSettings.GetSupports_32BitFCnt(), storedMACSettings.GetSupports_32BitFCnt())
 				}()
@@ -942,25 +942,4 @@ func (r *DeviceRegistry) Range(ctx context.Context, paths []string, f func(conte
 		}
 		return true, nil
 	})
-}
-
-// TODO: Use proto.Equal instead.
-// https://github.com/TheThingsNetwork/lorawan-stack/issues/2798
-func equalKeys(a, b *ttnpb.KeyEnvelope) bool {
-	if a == b {
-		return true
-	}
-	if a == nil || b == nil {
-		return false
-	}
-	if !bytes.Equal(a.EncryptedKey, b.EncryptedKey) || a.KekLabel != b.KekLabel {
-		return false
-	}
-	if a.Key == nil && b.Key == nil {
-		return true
-	}
-	if a.Key == nil || b.Key == nil {
-		return false
-	}
-	return bytes.Equal(a.Key, b.Key)
 }
