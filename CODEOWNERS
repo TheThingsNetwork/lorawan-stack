@@ -11,17 +11,17 @@
 /go.mod @johanstokking @adriansmares
 /go.sum @johanstokking @adriansmares
 /package.json @kschiffer @ryaplots
-/yarn.lock @kschiffer @ryaplots
-/sdk/js/package.json @kschiffer @ryaplots
-/sdk/js/yarn.lock @kschiffer @ryaplots
+/yarn.lock @kschiffer @ryaplots @mjamescompton
+/sdk/js/package.json @kschiffer @ryaplots @mjamescompton
+/sdk/js/yarn.lock @kschiffer @ryaplots @mjamescompton
 
 # Build pipeline and tooling
 /Makefile @adriansmares
 /tools @adriansmares
 /.github/workflows @adriansmares
-/config @kschiffer @ryaplots
+/config @kschiffer @ryaplots @mjamescompton
 /config/stack @benolayinka @KrishnaIyer
-/cypress @kschiffer @ryaplots
+/cypress @kschiffer @ryaplots @mjamescompton
 
 # API, configuration, CLI and storage compatibility
 /api/*.proto @johanstokking @adriansmares
@@ -49,7 +49,7 @@
 /pkg/rpcmiddleware @johanstokking @adriansmares
 /pkg/rpcserver @johanstokking @adriansmares
 /pkg/types @johanstokking
-/pkg/web @kschiffer @ryaplots
+/pkg/web @kschiffer @ryaplots @mjamescompton
 /pkg/webmiddleware @KrishnaIyer @kschiffer
 /pkg/webui @kschiffer @ryaplots @mjamescompton
 /pkg/ratelimit @johanstokking @KrishnaIyer
@@ -77,7 +77,7 @@
 
 /pkg/joinserver @johanstokking @adriansmares
 
-/pkg/console @kschiffer @ryaplots
+/pkg/console @kschiffer @ryaplots @mjamescompton
 
 /pkg/packetbrokeragent @johanstokking @adriansmares
 
