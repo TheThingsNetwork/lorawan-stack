@@ -35,11 +35,9 @@ describe('Application Webhook create', () => {
 
   beforeEach(() => {
     cy.loginConsole({ user_id: userId, password: user.password })
-    cy.intercept(
-      'GET',
-      `/api/v3/as/webhook-templates?field_mask=base_url,create_downlink_api_key,description,documentation_url,downlink_ack,downlink_failed,downlink_nack,downlink_queue_invalidated,downlink_queued,downlink_sent,fields,format,headers,ids,info_url,join_accept,location_solved,logo_url,name,service_data,uplink_message,uplink_normalized`,
-      { fixture: 'console/application/integrations/webhook/template.json' },
-    )
+    cy.intercept('GET', `/api/v3/as/webhook-templates?*`, {
+      fixture: 'console/application/integrations/webhook/template.json',
+    })
     cy.visit(
       `${Cypress.config(
         'consoleRootPath',
