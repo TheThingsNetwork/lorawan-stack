@@ -375,15 +375,15 @@ func TestDeviceRegistryGet(t *testing.T) {
 }
 
 func TestDeviceRegistrySet(t *testing.T) {
-	defaultMACSettings := test.Must(DefaultConfig.DefaultMACSettings.Parse()).(*ttnpb.MACSettings)
+	defaultMACSettings := test.Must(DefaultConfig.DefaultMACSettings.Parse())
 
-	customMACSettings := test.Must(DefaultConfig.DefaultMACSettings.Parse()).(*ttnpb.MACSettings)
+	customMACSettings := test.Must(DefaultConfig.DefaultMACSettings.Parse())
 	customMACSettings.Rx1Delay = &ttnpb.RxDelayValue{Value: ttnpb.RxDelay_RX_DELAY_2}
 	customMACSettings.Rx1DataRateOffset = nil
 
 	customMACSettingsOpt := EndDeviceOptions.WithMacSettings(customMACSettings)
 
-	multicastClassBMACSettings := test.Must(DefaultConfig.DefaultMACSettings.Parse()).(*ttnpb.MACSettings)
+	multicastClassBMACSettings := test.Must(DefaultConfig.DefaultMACSettings.Parse())
 	multicastClassBMACSettings.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{
 		Value: ttnpb.PingSlotPeriod_PING_EVERY_16S,
 	}
@@ -898,7 +898,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					rights := append([]ttnpb.Right{
 						ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 					}, tc.RequiredRights...)
-					expectedReturn := test.Must(ttnpb.ApplyEndDeviceFieldMask(nil, withTimestamps(tc.ReturnedDevice), ttnpb.AddImplicitEndDeviceGetFields(tc.SetDevice.Paths...)...)).(*ttnpb.EndDevice)
+					expectedReturn := test.Must(ttnpb.ApplyEndDeviceFieldMask(nil, withTimestamps(tc.ReturnedDevice), ttnpb.AddImplicitEndDeviceGetFields(tc.SetDevice.Paths...)...))
 
 					dev, err, ok = env.AssertSetDevice(ctx, createDevice == nil, req, rights...)
 					if !a.So(ok, should.BeTrue) || !a.So(err, should.BeNil) || !a.So(dev, should.NotBeNil) {
@@ -939,7 +939,7 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 		SessionOptions.WithLastNFCntDown(0x24),
 		SessionOptions.WithDefaultQueuedApplicationDownlinks(),
 	}
-	macSettings := test.Must(DefaultConfig.DefaultMACSettings.Parse()).(*ttnpb.MACSettings)
+	macSettings := test.Must(DefaultConfig.DefaultMACSettings.Parse())
 	activateOpt := EndDeviceOptions.Activate(macSettings, true, activeSessionOpts)
 
 	// TODO: Refactor into same structure as Set
@@ -1166,7 +1166,7 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 							return
 						}
 						var newErr error
-						defaultMACSettings := test.Must(DefaultConfig.DefaultMACSettings.Parse()).(*ttnpb.MACSettings)
+						defaultMACSettings := test.Must(DefaultConfig.DefaultMACSettings.Parse())
 						macState, newErr = mac.NewState(created, fps, defaultMACSettings)
 						if newErr != nil {
 							a.So(err, should.NotBeNil)
@@ -1195,7 +1195,7 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 					expected.PowerState = ttnpb.PowerState_POWER_UNKNOWN
 					expected.Session = session
 					expected.UpdatedAt = timestamppb.New(clock.Now())
-					if !a.So(dev, should.Resemble, test.Must(ttnpb.ApplyEndDeviceFieldMask(nil, expected, ttnpb.AddImplicitEndDeviceGetFields(conf.Paths...)...)).(*ttnpb.EndDevice)) {
+					if !a.So(dev, should.Resemble, test.Must(ttnpb.ApplyEndDeviceFieldMask(nil, expected, ttnpb.AddImplicitEndDeviceGetFields(conf.Paths...)...))) {
 						return
 					}
 					updated, _, err := env.Devices.GetByID(ctx, tc.CreateDevice.Ids.ApplicationIds, tc.CreateDevice.Ids.DeviceId, ttnpb.EndDeviceFieldPathsTopLevel)

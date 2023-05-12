@@ -58,31 +58,11 @@ var Delay = time.Millisecond * func() time.Duration {
 }()
 
 // Must returns v if err is nil and panics otherwise.
-func Must(v interface{}, err error) interface{} {
+func Must[T any](v T, err error) T {
 	if err != nil {
 		panic(fmt.Sprintf("Must received error: %v", FormatError(err)))
 	}
 	return v
-}
-
-// MustMultiple is like Must, but operates on arbitrary amount of values.
-// It assumes that last value in vs is an error.
-// It panics if len(vs) == 0.
-func MustMultiple(vs ...interface{}) []interface{} {
-	n := len(vs)
-	if n == 0 {
-		panic("MustMultiple requires at least 1 argument")
-	}
-
-	err, ok := vs[n-1].(error)
-	if !ok && vs[n-1] != nil {
-		panic(fmt.Sprintf("MustMultiple expected last argument to be an error, got %T", vs[n-1]))
-	}
-
-	if err != nil {
-		panic(fmt.Sprintf("MustMultiple received error: %s", FormatError(err)))
-	}
-	return vs[:n-1]
 }
 
 // WaitTimeout returns true if f returns after at most d or false otherwise.

@@ -50,9 +50,9 @@ func TestGetAppSKey(t *testing.T) { //nolint:paralleltest
 			NewServer: func(a *assertions.Assertion) *httptest.Server {
 				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a.So(r.Method, should.Equal, http.MethodPost)
-					b := test.Must(io.ReadAll(r.Body)).([]byte)
+					b := test.Must(io.ReadAll(r.Body))
 					var req map[string]interface{}
-					test.Must(nil, json.Unmarshal(b, &req))
+					test.Must[any](nil, json.Unmarshal(b, &req))
 					a.So(req, should.Resemble, map[string]interface{}{
 						"ProtocolVersion": "1.0",
 						"TransactionID":   0.0,
@@ -62,7 +62,7 @@ func TestGetAppSKey(t *testing.T) { //nolint:paralleltest
 						"DevEUI":          "0102030405060708",
 						"SessionKeyID":    "016BFA7BAD4756346A674981E75CDBDC",
 					})
-					test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
+					test.Must[any](nil, json.NewEncoder(w).Encode(map[string]interface{}{
 						"ProtocolVersion": "1.0",
 						"TransactionID":   0.0,
 						"MessageType":     "AppSKeyAns",
@@ -93,9 +93,9 @@ func TestGetAppSKey(t *testing.T) { //nolint:paralleltest
 				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := a
 					a.So(r.Method, should.Equal, http.MethodPost)
-					b := test.Must(io.ReadAll(r.Body)).([]byte)
+					b := test.Must(io.ReadAll(r.Body))
 					var req map[string]interface{}
-					test.Must(nil, json.Unmarshal(b, &req))
+					test.Must[any](nil, json.Unmarshal(b, &req))
 					a.So(req, should.Resemble, map[string]interface{}{
 						"ProtocolVersion": "1.1",
 						"TransactionID":   0.0,
@@ -105,7 +105,7 @@ func TestGetAppSKey(t *testing.T) { //nolint:paralleltest
 						"DevEUI":          "0102030405060708",
 						"SessionKeyID":    "016BFA7BAD4756346A674981E75CDBDC",
 					})
-					test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
+					test.Must[any](nil, json.NewEncoder(w).Encode(map[string]interface{}{
 						"ProtocolVersion": "1.1",
 						"TransactionID":   0.0,
 						"MessageType":     "AppSKeyAns",
@@ -136,9 +136,9 @@ func TestGetAppSKey(t *testing.T) { //nolint:paralleltest
 				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := a
 					a.So(r.Method, should.Equal, http.MethodPost)
-					b := test.Must(io.ReadAll(r.Body)).([]byte)
+					b := test.Must(io.ReadAll(r.Body))
 					var req map[string]interface{}
-					test.Must(nil, json.Unmarshal(b, &req))
+					test.Must[any](nil, json.Unmarshal(b, &req))
 					a.So(req, should.Resemble, map[string]interface{}{
 						"ProtocolVersion": "1.0",
 						"TransactionID":   0.0,
@@ -148,7 +148,7 @@ func TestGetAppSKey(t *testing.T) { //nolint:paralleltest
 						"DevEUI":          "0102030405060708",
 						"SessionKeyID":    "016BFA7BAD4756346A674981E75CDBDC",
 					})
-					test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
+					test.Must[any](nil, json.NewEncoder(w).Encode(map[string]interface{}{
 						"ProtocolVersion": "1.0",
 						"TransactionID":   0.0,
 						"MessageType":     "AppSKeyAns",
@@ -190,9 +190,9 @@ func TestGetAppSKey(t *testing.T) { //nolint:paralleltest
 				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := a
 					a.So(r.Method, should.Equal, http.MethodPost)
-					b := test.Must(io.ReadAll(r.Body)).([]byte)
+					b := test.Must(io.ReadAll(r.Body))
 					var req map[string]interface{}
-					test.Must(nil, json.Unmarshal(b, &req))
+					test.Must[any](nil, json.Unmarshal(b, &req))
 					a.So(req, should.Resemble, map[string]interface{}{
 						"ProtocolVersion": "1.1",
 						"TransactionID":   0.0,
@@ -202,7 +202,7 @@ func TestGetAppSKey(t *testing.T) { //nolint:paralleltest
 						"DevEUI":          "0102030405060708",
 						"SessionKeyID":    "016BFA7BAD4756346A674981E75CDBDC",
 					})
-					test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
+					test.Must[any](nil, json.NewEncoder(w).Encode(map[string]interface{}{
 						"ProtocolVersion": "1.1",
 						"TransactionID":   0.0,
 						"MessageType":     "AppSKeyAns",
@@ -287,9 +287,9 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := a
 					a.So(r.Method, should.Equal, http.MethodPost)
-					b := test.Must(io.ReadAll(r.Body)).([]byte)
+					b := test.Must(io.ReadAll(r.Body))
 					var req map[string]interface{}
-					test.Must(nil, json.Unmarshal(b, &req))
+					test.Must[any](nil, json.Unmarshal(b, &req))
 					a.So(req, should.Resemble, map[string]interface{}{
 						"ProtocolVersion": "1.0",
 						"TransactionID":   0.0,
@@ -303,7 +303,7 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 						"DLSettings":      "00",
 						"RxDelay":         5.0,
 					})
-					test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
+					test.Must[any](nil, json.NewEncoder(w).Encode(map[string]interface{}{
 						"ProtocolVersion": "1.0",
 						"TransactionID":   0.0,
 						"MessageType":     "JoinAns",
@@ -344,9 +344,9 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := a
 					a.So(r.Method, should.Equal, http.MethodPost)
-					b := test.Must(io.ReadAll(r.Body)).([]byte)
+					b := test.Must(io.ReadAll(r.Body))
 					var req map[string]interface{}
-					test.Must(nil, json.Unmarshal(b, &req))
+					test.Must[any](nil, json.Unmarshal(b, &req))
 					a.So(req, should.Resemble, map[string]interface{}{
 						"ProtocolVersion": "1.1",
 						"TransactionID":   0.0,
@@ -361,7 +361,7 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 						"DLSettings":      "00",
 						"RxDelay":         5.0,
 					})
-					test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
+					test.Must[any](nil, json.NewEncoder(w).Encode(map[string]interface{}{
 						"ProtocolVersion": "1.1",
 						"TransactionID":   0.0,
 						"MessageType":     "JoinAns",
@@ -403,9 +403,9 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := a
 					a.So(r.Method, should.Equal, http.MethodPost)
-					b := test.Must(io.ReadAll(r.Body)).([]byte)
+					b := test.Must(io.ReadAll(r.Body))
 					var req map[string]interface{}
-					test.Must(nil, json.Unmarshal(b, &req))
+					test.Must[any](nil, json.Unmarshal(b, &req))
 					a.So(req, should.Resemble, map[string]interface{}{
 						"ProtocolVersion": "1.0",
 						"TransactionID":   0.0,
@@ -419,7 +419,7 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 						"DLSettings":      "00",
 						"RxDelay":         5.0,
 					})
-					test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
+					test.Must[any](nil, json.NewEncoder(w).Encode(map[string]interface{}{
 						"ProtocolVersion": "1.0",
 						"TransactionID":   0,
 						"MessageType":     "JoinAns",
@@ -487,9 +487,9 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := a
 					a.So(r.Method, should.Equal, http.MethodPost)
-					b := test.Must(io.ReadAll(r.Body)).([]byte)
+					b := test.Must(io.ReadAll(r.Body))
 					var req map[string]interface{}
-					test.Must(nil, json.Unmarshal(b, &req))
+					test.Must[any](nil, json.Unmarshal(b, &req))
 					a.So(req, should.Resemble, map[string]interface{}{
 						"ProtocolVersion": "1.1",
 						"TransactionID":   0.0,
@@ -504,7 +504,7 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 						"DLSettings":      "00",
 						"RxDelay":         5.0,
 					})
-					test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
+					test.Must[any](nil, json.NewEncoder(w).Encode(map[string]interface{}{
 						"ProtocolVersion": "1.1",
 						"TransactionID":   0,
 						"MessageType":     "JoinAns",
@@ -573,9 +573,9 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := a
 					a.So(r.Method, should.Equal, http.MethodPost)
-					b := test.Must(io.ReadAll(r.Body)).([]byte)
+					b := test.Must(io.ReadAll(r.Body))
 					var req map[string]interface{}
-					test.Must(nil, json.Unmarshal(b, &req))
+					test.Must[any](nil, json.Unmarshal(b, &req))
 					a.So(req, should.Resemble, map[string]interface{}{
 						"ProtocolVersion": "1.1",
 						"TransactionID":   0.0,
@@ -590,7 +590,7 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 						"DLSettings":      "00",
 						"RxDelay":         5.0,
 					})
-					test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
+					test.Must[any](nil, json.NewEncoder(w).Encode(map[string]interface{}{
 						"ProtocolVersion": "1.1",
 						"TransactionID":   0,
 						"MessageType":     "JoinAns",
@@ -702,7 +702,7 @@ func TestJoinServerRace(t *testing.T) { //nolint:paralleltest
 				return []*httptest.Server{
 					newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 						time.Sleep(test.Delay << 4)
-						test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
+						test.Must[any](nil, json.NewEncoder(w).Encode(map[string]interface{}{
 							"ProtocolVersion": "1.0",
 							"TransactionID":   0,
 							"MessageType":     "JoinAns",
@@ -726,7 +726,7 @@ func TestJoinServerRace(t *testing.T) { //nolint:paralleltest
 						}))
 					})),
 					newTLSServer(9184, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-						test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
+						test.Must[any](nil, json.NewEncoder(w).Encode(map[string]interface{}{
 							"ProtocolVersion": "1.0",
 							"TransactionID":   0.0,
 							"MessageType":     "JoinAns",
@@ -783,7 +783,7 @@ func TestJoinServerRace(t *testing.T) { //nolint:paralleltest
 					newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 						// This is the slowest response.
 						time.Sleep(test.Delay << 4)
-						test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
+						test.Must[any](nil, json.NewEncoder(w).Encode(map[string]interface{}{
 							"ProtocolVersion": "1.0",
 							"TransactionID":   0.0,
 							"MessageType":     "JoinAns",
@@ -795,7 +795,7 @@ func TestJoinServerRace(t *testing.T) { //nolint:paralleltest
 						}))
 					})),
 					newTLSServer(9184, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-						test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
+						test.Must[any](nil, json.NewEncoder(w).Encode(map[string]interface{}{
 							"ProtocolVersion": "1.0",
 							"TransactionID":   0.0,
 							"MessageType":     "JoinAns",

@@ -117,11 +117,11 @@ func TestCacheKeyVault(t *testing.T) {
 		cryptoutil.WithCacheKeyVaultTTL(4*time.Hour, 5*time.Minute),
 	)
 
-	a.So(test.Must(kv.Key(ctx, "key1")).([]byte), should.Resemble, []byte("key1"))
-	a.So(test.Must(kv.Key(ctx, "key1")).([]byte), should.Resemble, []byte("key1"))
-	a.So(test.Must(kv.Key(ctx, "key2")).([]byte), should.Resemble, []byte("key2"))
-	a.So(test.Must(kv.Key(ctx, "key1")).([]byte), should.Resemble, []byte("key1"))
-	a.So(test.Must(kv.Key(ctx, "key2")).([]byte), should.Resemble, []byte("key2"))
+	a.So(test.Must(kv.Key(ctx, "key1")), should.Resemble, []byte("key1"))
+	a.So(test.Must(kv.Key(ctx, "key1")), should.Resemble, []byte("key1"))
+	a.So(test.Must(kv.Key(ctx, "key2")), should.Resemble, []byte("key2"))
+	a.So(test.Must(kv.Key(ctx, "key1")), should.Resemble, []byte("key1"))
+	a.So(test.Must(kv.Key(ctx, "key2")), should.Resemble, []byte("key2"))
 	a.So(keys, should.Resemble, []string{"key1", "key2"})
 
 	test.Must(kv.ServerCertificate(ctx, "server1.example.com"))

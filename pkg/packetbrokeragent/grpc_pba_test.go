@@ -465,7 +465,7 @@ func TestPba(t *testing.T) {
 							if !a.So(err, should.BeNil) {
 								t.FailNow()
 							}
-							if !a.So(test.Must(strconv.ParseInt(md.Get("x-total-count")[0], 10, 32)).(int64), should.Equal, 42) {
+							if !a.So(test.Must(strconv.ParseInt(md.Get("x-total-count")[0], 10, 32)), should.Equal, 42) {
 								t.FailNow()
 							}
 							if !a.So(len(res.Policies), should.BeLessThanOrEqualTo, limit) {
@@ -580,7 +580,7 @@ func TestPba(t *testing.T) {
 							if !a.So(err, should.BeNil) {
 								t.FailNow()
 							}
-							if !a.So(test.Must(strconv.ParseInt(md.Get("x-total-count")[0], 10, 32)).(int64), should.Equal, req.expectedTotal) {
+							if !a.So(test.Must(strconv.ParseInt(md.Get("x-total-count")[0], 10, 32)), should.Equal, req.expectedTotal) {
 								t.FailNow()
 							}
 							if !a.So(len(res.Networks), should.BeLessThanOrEqualTo, req.limit) {
@@ -647,7 +647,7 @@ func TestPba(t *testing.T) {
 							if !a.So(err, should.BeNil) {
 								t.FailNow()
 							}
-							if !a.So(test.Must(strconv.ParseInt(md.Get("x-total-count")[0], 10, 32)).(int64), should.Equal, 42) {
+							if !a.So(test.Must(strconv.ParseInt(md.Get("x-total-count")[0], 10, 32)), should.Equal, 42) {
 								t.FailNow()
 							}
 							if !a.So(len(res.Networks), should.BeLessThanOrEqualTo, limit) {

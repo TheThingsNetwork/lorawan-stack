@@ -54,7 +54,7 @@ func TestUpstream(t *testing.T) {
 		NetID:     test.DefaultNetID,
 		Source:    "directory",
 		Directory: "testdata",
-	}, WithDeviceRegistry(&mockDeviceRegistry{}))).(*Upstream)
+	}, WithDeviceRegistry(&mockDeviceRegistry{})))
 
 	ctx = rights.NewContext(ctx, &rights.Rights{
 		ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{

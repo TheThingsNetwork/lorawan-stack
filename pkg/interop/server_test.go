@@ -341,7 +341,7 @@ func TestServer(t *testing.T) { //nolint:gocyclo
 				if !a.So(err, should.BeNil) {
 					t.Fatal("Failed to marshal request body")
 				}
-				req := test.Must(http.NewRequest(http.MethodPost, srv.URL, bytes.NewReader(buf))).(*http.Request)
+				req := test.Must(http.NewRequest(http.MethodPost, srv.URL, bytes.NewReader(buf)))
 				req.Header.Set("Content-Type", "application/json")
 
 				client := srv.Client()

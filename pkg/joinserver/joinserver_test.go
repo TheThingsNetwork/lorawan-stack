@@ -55,15 +55,15 @@ var (
 func keyToBytes(key types.AES128Key) []byte { return key[:] }
 
 func mustWrapKey(key types.AES128Key, kek []byte) []byte {
-	return test.Must(crypto.WrapKey(key[:], kek)).([]byte)
+	return test.Must(crypto.WrapKey(key[:], kek))
 }
 
 func mustWrapAES128KeyWithKEK(ctx context.Context, key types.AES128Key, kekLabel string, kek types.AES128Key) *ttnpb.KeyEnvelope {
-	return test.Must(cryptoutil.WrapAES128KeyWithKEK(ctx, key, kekLabel, kek)).(*ttnpb.KeyEnvelope)
+	return test.Must(cryptoutil.WrapAES128KeyWithKEK(ctx, key, kekLabel, kek))
 }
 
 func mustEncryptJoinAccept(key types.AES128Key, pld []byte) []byte {
-	return test.Must(crypto.EncryptJoinAccept(key, pld)).([]byte)
+	return test.Must(crypto.EncryptJoinAccept(key, pld))
 }
 
 func TestInvalidJoinRequests(t *testing.T) {
@@ -161,7 +161,7 @@ func TestInvalidJoinRequests(t *testing.T) {
 						JoinEUIPrefixes:               joinEUIPrefixes,
 						DevNonceLimit:                 defaultDevNonceLimit,
 					},
-				)).(*joinserver.JoinServer)
+				))
 				componenttest.StartComponent(t, c)
 
 				ctx = clusterauth.NewContext(ctx, nil)
@@ -2437,7 +2437,7 @@ func TestHandleJoin(t *testing.T) {
 						JoinEUIPrefixes:               joinEUIPrefixes,
 						DevNonceLimit:                 defaultDevNonceLimit,
 					},
-				)).(*joinserver.JoinServer)
+				))
 				componenttest.StartComponent(t, c)
 
 				pb := ttnpb.Clone(tc.Device)
@@ -2756,7 +2756,7 @@ func TestGetNwkSKeys(t *testing.T) {
 						Devices:       &joinserver.MockDeviceRegistry{},
 						DevNonceLimit: defaultDevNonceLimit,
 					},
-				)).(*joinserver.JoinServer)
+				))
 				componenttest.StartComponent(t, c)
 				res, err := js.GetNwkSKeys(ctx, tc.KeyRequest, tc.Authorizer)
 
@@ -3168,7 +3168,7 @@ func TestGetAppSKey(t *testing.T) {
 						Devices:       &joinserver.MockDeviceRegistry{GetByEUIFunc: tc.GetDeviceByEUI},
 						DevNonceLimit: defaultDevNonceLimit,
 					},
-				)).(*joinserver.JoinServer)
+				))
 				res, err := js.GetAppSKey(ctx, tc.KeyRequest, tc.Authorizer)
 
 				if tc.ErrorAssertion != nil {
@@ -3269,7 +3269,7 @@ func TestGetHomeNetID(t *testing.T) {
 						},
 						DevNonceLimit: defaultDevNonceLimit,
 					},
-				)).(*joinserver.JoinServer)
+				))
 				homeNetwork, err := js.GetHomeNetwork(ctx, tc.JoinEUI, tc.DevEUI, tc.Authorizer)
 
 				if tc.ErrorAssertion != nil {

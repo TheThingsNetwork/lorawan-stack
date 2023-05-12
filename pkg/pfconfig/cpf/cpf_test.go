@@ -33,7 +33,7 @@ func TestBuildLorad(t *testing.T) {
 	fps := frequencyplans.NewStore(test.FrequencyPlansFetcher)
 
 	sx1301Config := func(fpID string) shared.SX1301Config {
-		return *test.Must(shared.BuildSX1301Config(test.Must(fps.GetByID(fpID)).(*frequencyplans.FrequencyPlan))).(*shared.SX1301Config)
+		return *test.Must(shared.BuildSX1301Config(test.Must(fps.GetByID(fpID))))
 	}
 
 	for _, tc := range []struct {

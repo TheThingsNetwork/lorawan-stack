@@ -126,8 +126,8 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 	t.Parallel()
 
 	key := types.AES128Key{0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF}
-	kekKey := test.Must(hex.DecodeString("000102030405060708090A0B0C0D0E0F")).([]byte)
-	cipherKey := test.Must(hex.DecodeString("1FA68B0A8112B447AEF34BD8FB5A7B829D3E862371D2CFE5")).([]byte)
+	kekKey := test.Must(hex.DecodeString("000102030405060708090A0B0C0D0E0F"))
+	cipherKey := test.Must(hex.DecodeString("1FA68B0A8112B447AEF34BD8FB5A7B829D3E862371D2CFE5"))
 
 	kv := NewMemKeyVault(map[string][]byte{
 		"key": kekKey,
