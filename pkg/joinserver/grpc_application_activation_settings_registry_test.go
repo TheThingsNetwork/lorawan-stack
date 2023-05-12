@@ -108,7 +108,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 										Rights: rights,
 									}, nil
 								},
-							}, ttnpb.RegisterApplicationAccessServer)).(cluster.Peer), nil
+							}, ttnpb.RegisterApplicationAccessServer)), nil
 						},
 					}, nil
 				}),
@@ -118,7 +118,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 				DeviceKEKLabel:                jsKEKLabel,
 				DevNonceLimit:                 defaultDevNonceLimit,
 			},
-		)).(*JoinServer)
+		))
 		componenttest.StartComponent(t, js.Component)
 		return ttnpb.NewApplicationActivationSettingRegistryClient(js.LoopbackConn()), reg, func() {
 			js.Close()

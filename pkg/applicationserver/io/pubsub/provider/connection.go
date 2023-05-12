@@ -125,7 +125,7 @@ func toProtoMessage(err error) proto.Message {
 	}
 }
 
-func isNil(c interface{}) bool {
+func isNil(c any) bool {
 	if c == nil {
 		return true
 	}

@@ -106,7 +106,7 @@ func (c *Component) WithClusterAuth() grpc.CallOption {
 // If a call can't be identified as coming from the cluster, it will be discarded.
 func (c *Component) ClusterAuthUnaryHook() hooks.UnaryHandlerMiddleware {
 	return func(next grpc.UnaryHandler) grpc.UnaryHandler {
-		return func(ctx context.Context, req interface{}) (interface{}, error) {
+		return func(ctx context.Context, req any) (any, error) {
 			ctx = c.cluster.WithVerifiedSource(ctx)
 			return next(ctx, req)
 		}
@@ -117,7 +117,7 @@ func (c *Component) ClusterAuthUnaryHook() hooks.UnaryHandlerMiddleware {
 // If a call can't be identified as coming from the cluster, it will be discarded.
 func (c *Component) ClusterAuthStreamHook() hooks.StreamHandlerMiddleware {
 	return func(hdl grpc.StreamHandler) grpc.StreamHandler {
-		return func(srv interface{}, stream grpc.ServerStream) error {
+		return func(srv any, stream grpc.ServerStream) error {
 			wrapped := grpc_middleware.WrapServerStream(stream)
 			ctx := c.cluster.WithVerifiedSource(stream.Context())
 			wrapped.WrappedContext = ctx

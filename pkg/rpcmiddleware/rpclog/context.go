@@ -21,7 +21,7 @@ type requestFieldsKeyType struct{}
 var requestFieldsKey requestFieldsKeyType
 
 type requestFieldsValue struct {
-	fields map[string]interface{}
+	fields map[string]any
 }
 
 func requestFieldsFromContext(ctx context.Context) (*requestFieldsValue, bool) {
@@ -31,13 +31,13 @@ func requestFieldsFromContext(ctx context.Context) (*requestFieldsValue, bool) {
 
 func newContextWithRequestFields(parent context.Context) context.Context {
 	return context.WithValue(parent, requestFieldsKey, &requestFieldsValue{
-		fields: make(map[string]interface{}),
+		fields: make(map[string]any),
 	})
 }
 
 // AddField adds a log field to the fields in the request context.
 // Not safe for concurrent use.
-func AddField(ctx context.Context, key string, value interface{}) {
+func AddField(ctx context.Context, key string, value any) {
 	if v, ok := requestFieldsFromContext(ctx); ok {
 		v.fields[key] = value
 	}

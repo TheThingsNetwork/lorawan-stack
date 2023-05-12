@@ -47,13 +47,13 @@ func (r *mockResolver) LookupSRV(ctx context.Context, service, proto, name strin
 func TestDialContext(t *testing.T) {
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
-	serverCert := test.Must(tls.LoadX509KeyPair("testdata/servercert.pem", "testdata/serverkey.pem")).(tls.Certificate)
+	serverCert := test.Must(tls.LoadX509KeyPair("testdata/servercert.pem", "testdata/serverkey.pem"))
 	serverTLSConfig := &tls.Config{
 		Certificates: []tls.Certificate{serverCert},
 	}
 
 	listen := func(addr string) (port int, address string, lis net.Listener) {
-		lis = test.Must(tls.Listen("tcp", addr, serverTLSConfig)).(net.Listener)
+		lis = test.Must(tls.Listen("tcp", addr, serverTLSConfig))
 		go grpc.NewServer().Serve(lis)
 		port = lis.Addr().(*net.TCPAddr).Port
 		address = fmt.Sprintf("localhost:%d", port)
@@ -186,7 +186,7 @@ func TestDialContext(t *testing.T) {
 			clientTLSConfig := &tls.Config{
 				RootCAs: x509.NewCertPool(),
 			}
-			serverCA := test.Must(os.ReadFile("testdata/serverca.pem")).([]byte)
+			serverCA := test.Must(os.ReadFile("testdata/serverca.pem"))
 			clientTLSConfig.RootCAs.AppendCertsFromPEM(serverCA)
 
 			var dialAddresses []string

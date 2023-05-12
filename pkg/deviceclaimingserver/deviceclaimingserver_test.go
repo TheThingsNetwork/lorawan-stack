@@ -81,7 +81,7 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 	// Test API Validation here. Functionality is tested in the implementations.
 	for _, tc := range []struct {
 		Name           string
-		Req            interface{}
+		Req            any
 		ErrorAssertion func(err error) bool
 	}{
 		{
@@ -203,7 +203,7 @@ func TestGatewayClaimingServer(t *testing.T) {
 	// Test API Validation here. Functionality is tested in the implementations.
 	for _, tc := range []struct {
 		Name           string
-		Req            interface{}
+		Req            any
 		ErrorAssertion func(err error) bool
 	}{
 		{

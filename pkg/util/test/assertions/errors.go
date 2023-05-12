@@ -39,7 +39,7 @@ const (
 )
 
 // ShouldHaveSameErrorDefinitionAs is used to assert that an error resembles the given Error or Definition.
-func ShouldHaveSameErrorDefinitionAs(actual interface{}, expected ...interface{}) string {
+func ShouldHaveSameErrorDefinitionAs(actual any, expected ...any) string {
 	if len(expected) != 1 {
 		return fmt.Sprintf(needExactValues, 1, len(expected))
 	}
@@ -84,7 +84,7 @@ func assertErrorCompatibleEquals(actual, expected errors.Interface) string {
 }
 
 // ShouldEqualErrorOrDefinition is used to assert that an error equals the given Error or Definition.
-func ShouldEqualErrorOrDefinition(actual interface{}, expected ...interface{}) string {
+func ShouldEqualErrorOrDefinition(actual any, expected ...any) string {
 	if len(expected) != 1 {
 		return fmt.Sprintf(needExactValues, 1, len(expected))
 	}

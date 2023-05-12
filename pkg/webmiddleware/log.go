@@ -67,7 +67,7 @@ func Log(logger log.Interface, ignorePathsArray []string) MiddlewareFunc {
 				return
 			}
 
-			logFields = logFields.With(map[string]interface{}{
+			logFields = logFields.With(map[string]any{
 				"http.status": metrics.Code,
 				"duration":    metrics.Duration.Round(time.Microsecond * 100),
 			})

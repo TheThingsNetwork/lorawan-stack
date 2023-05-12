@@ -47,7 +47,7 @@ func (s *Server) RegisterRoutes(server *web.Server) {
 	}
 
 	router.Handle("/semtechudp/global_conf.json",
-		s.makeJSONHandler(func(ctx context.Context, gtw *ttnpb.Gateway) (interface{}, error) {
+		s.makeJSONHandler(func(ctx context.Context, gtw *ttnpb.Gateway) (any, error) {
 			fps, err := s.FrequencyPlansStore(ctx)
 			if err != nil {
 				return nil, err
@@ -57,7 +57,7 @@ func (s *Server) RegisterRoutes(server *web.Server) {
 	).Methods(http.MethodGet)
 
 	router.Handle("/kerlink-cpf/lorad/lorad.json",
-		s.makeJSONHandler(func(ctx context.Context, gtw *ttnpb.Gateway) (interface{}, error) {
+		s.makeJSONHandler(func(ctx context.Context, gtw *ttnpb.Gateway) (any, error) {
 			fps, err := s.FrequencyPlansStore(ctx)
 			if err != nil {
 				return nil, err
@@ -95,7 +95,7 @@ func (s *Server) withGateway(next func(http.ResponseWriter, *http.Request, *ttnp
 	}
 }
 
-func (s *Server) makeJSONHandler(f func(context.Context, *ttnpb.Gateway) (interface{}, error)) http.HandlerFunc {
+func (s *Server) makeJSONHandler(f func(context.Context, *ttnpb.Gateway) (any, error)) http.HandlerFunc {
 	return s.withGateway(func(w http.ResponseWriter, r *http.Request, gtw *ttnpb.Gateway) {
 		msg, err := f(r.Context(), gtw)
 		if err != nil {

@@ -271,8 +271,8 @@ func TestClient(t *testing.T) {
 		func(ctx context.Context, t *testing.T, reqChan <-chan *http.Request, respChan chan<- *http.Response, errChan chan<- error, cl *api.Client) {
 			for _, tc := range []struct {
 				name          string
-				request       interface{}
-				response      interface{}
+				request       any
+				response      any
 				do            func(ctx context.Context, a *assertions.Assertion)
 				assertRequest func(t *testing.T, a *assertions.Assertion, req *http.Request)
 			}{

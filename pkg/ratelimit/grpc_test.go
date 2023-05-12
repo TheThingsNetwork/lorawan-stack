@@ -40,7 +40,7 @@ func (ss *serverStream) Context() context.Context {
 	return ss.ctx
 }
 
-func (ss *serverStream) RecvMsg(_ interface{}) error {
+func (*serverStream) RecvMsg(any) error {
 	return nil
 }
 
@@ -65,9 +65,9 @@ func grpcClusterContext() context.Context {
 	))
 }
 
-func grpcUnaryHandler(context.Context, interface{}) (interface{}, error) { return "response", nil }
+func grpcUnaryHandler(context.Context, any) (any, error) { return "response", nil }
 
-func grpcStreamHandler(interface{}, grpc.ServerStream) error { return nil }
+func grpcStreamHandler(any, grpc.ServerStream) error { return nil }
 
 type mockRequestWithKeyer struct {
 	key string
@@ -78,6 +78,8 @@ func (r *mockRequestWithKeyer) RateLimitKey() string {
 }
 
 func TestGRPC(t *testing.T) {
+	t.Parallel()
+
 	const (
 		unaryMethod  = "/Service/UnaryMethod"
 		authTokenID  = "my-token-id"
@@ -85,18 +87,22 @@ func TestGRPC(t *testing.T) {
 	)
 
 	t.Run("UnaryServerInterceptor", func(t *testing.T) {
+		t.Parallel()
+
 		for _, tc := range []struct {
 			name    string
 			limiter *mockLimiter
 			cluster bool
-			assert  func(t *testing.T, limiter *mockLimiter, resp interface{}, err error)
-			request interface{}
+			assert  func(t *testing.T, limiter *mockLimiter, resp any, err error)
+			request any
 		}{
 			{
 				name:    "Cluster",
 				limiter: &mockLimiter{limit: true},
 				cluster: true,
-				assert: func(t *testing.T, limiter *mockLimiter, resp interface{}, err error) {
+				assert: func(t *testing.T, limiter *mockLimiter, resp any, err error) {
+					t.Helper()
+
 					a := assertions.New(t)
 					a.So(resp, should.Resemble, "response")
 					a.So(err, should.BeNil)
@@ -106,7 +112,9 @@ func TestGRPC(t *testing.T) {
 			{
 				name:    "Pass",
 				limiter: &mockLimiter{},
-				assert: func(t *testing.T, limiter *mockLimiter, resp interface{}, err error) {
+				assert: func(t *testing.T, limiter *mockLimiter, resp any, err error) {
+					t.Helper()
+
 					a := assertions.New(t)
 					a.So(resp, should.Resemble, "response")
 					a.So(err, should.BeNil)
@@ -114,13 +122,19 @@ func TestGRPC(t *testing.T) {
 					a.So(limiter.calledWithResource, should.NotBeNil)
 					a.So(limiter.calledWithResource.Key(), should.ContainSubstring, unaryMethod)
 					a.So(limiter.calledWithResource.Key(), should.ContainSubstring, authTokenID)
-					a.So(limiter.calledWithResource.Classes(), should.Resemble, []string{fmt.Sprintf("grpc:method:%s", unaryMethod), "grpc:method"})
+					a.So(
+						limiter.calledWithResource.Classes(),
+						should.Resemble,
+						[]string{fmt.Sprintf("grpc:method:%s", unaryMethod), "grpc:method"},
+					)
 				},
 			},
 			{
 				name:    "Limit",
 				limiter: &mockLimiter{limit: true},
-				assert: func(t *testing.T, limiter *mockLimiter, resp interface{}, err error) {
+				assert: func(t *testing.T, limiter *mockLimiter, resp any, err error) {
+					t.Helper()
+
 					a := assertions.New(t)
 					a.So(resp, should.BeNil)
 					a.So(errors.IsResourceExhausted(err), should.BeTrue)
@@ -132,7 +146,9 @@ func TestGRPC(t *testing.T) {
 				name:    "Keyer",
 				limiter: &mockLimiter{limit: true},
 				request: &mockRequestWithKeyer{key: "test_keyer"},
-				assert: func(t *testing.T, limiter *mockLimiter, resp interface{}, err error) {
+				assert: func(t *testing.T, limiter *mockLimiter, resp any, err error) {
+					t.Helper()
+
 					a := assertions.New(t)
 					a.So(limiter.calledWithResource.Key(), should.ContainSubstring, "test_keyer")
 				},
@@ -152,6 +168,8 @@ func TestGRPC(t *testing.T) {
 		}
 	})
 	t.Run("StreamServerInterceptor", func(t *testing.T) {
+		t.Parallel()
+
 		t.Run("Streams", func(t *testing.T) {
 			for _, tc := range []struct {
 				name    string
@@ -164,6 +182,8 @@ func TestGRPC(t *testing.T) {
 					limiter: &mockLimiter{limit: true},
 					cluster: true,
 					assert: func(t *testing.T, limiter *mockLimiter, err error) {
+						t.Helper()
+
 						a := assertions.New(t)
 						a.So(err, should.BeNil)
 						a.So(limiter.calledWithResource, should.BeNil)
@@ -173,18 +193,26 @@ func TestGRPC(t *testing.T) {
 					name:    "Pass",
 					limiter: &mockLimiter{result: ratelimit.Result{Limit: 10}},
 					assert: func(t *testing.T, limiter *mockLimiter, err error) {
+						t.Helper()
+
 						a := assertions.New(t)
 						a.So(err, should.BeNil)
 
 						a.So(limiter.calledWithResource.Key(), should.ContainSubstring, streamMethod)
 						a.So(limiter.calledWithResource.Key(), should.ContainSubstring, authTokenID)
-						a.So(limiter.calledWithResource.Classes(), should.Resemble, []string{fmt.Sprintf("grpc:stream:accept:%s", streamMethod), "grpc:stream:accept"})
+						a.So(
+							limiter.calledWithResource.Classes(),
+							should.Resemble,
+							[]string{fmt.Sprintf("grpc:stream:accept:%s", streamMethod), "grpc:stream:accept"},
+						)
 					},
 				},
 				{
 					name:    "Limit",
 					limiter: &mockLimiter{limit: true, result: ratelimit.Result{Limit: 10}},
 					assert: func(t *testing.T, limiter *mockLimiter, err error) {
+						t.Helper()
+
 						assertions.New(t).So(errors.IsResourceExhausted(err), should.BeTrue)
 					},
 				},
@@ -214,7 +242,7 @@ func TestGRPC(t *testing.T) {
 			info := &grpc.StreamServerInfo{FullMethod: streamMethod}
 
 			keyFromFirstStream := ""
-			intercept(nil, ss, info, func(req interface{}, stream grpc.ServerStream) error {
+			_ = intercept(nil, ss, info, func(req any, stream grpc.ServerStream) error {
 				// Assert traffic limiter unused
 				a.So(limiter["grpc:stream:up"].calledWithResource, should.BeNil)
 
@@ -223,7 +251,11 @@ func TestGRPC(t *testing.T) {
 				keyFromFirstStream = limiter["grpc:stream:up"].calledWithResource.Key()
 
 				a.So(limiter["grpc:stream:up"].calledWithResource.Key(), should.ContainSubstring, streamMethod)
-				a.So(limiter["grpc:stream:up"].calledWithResource.Classes(), should.Resemble, []string{fmt.Sprintf("grpc:stream:up:%s", streamMethod), "grpc:stream:up"})
+				a.So(
+					limiter["grpc:stream:up"].calledWithResource.Classes(),
+					should.Resemble,
+					[]string{fmt.Sprintf("grpc:stream:up:%s", streamMethod), "grpc:stream:up"},
+				)
 
 				// Enable rate limits
 				limiter["grpc:stream:up"].limit = true
@@ -234,7 +266,7 @@ func TestGRPC(t *testing.T) {
 				return nil
 			})
 
-			intercept(nil, ss, info, func(req interface{}, stream grpc.ServerStream) error {
+			_ = intercept(nil, ss, info, func(req any, stream grpc.ServerStream) error {
 				// receive message to use rate limiter
 				a.So(errors.IsResourceExhausted(stream.RecvMsg(nil)), should.BeTrue)
 

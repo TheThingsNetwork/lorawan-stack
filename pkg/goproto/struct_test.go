@@ -44,7 +44,7 @@ func TestStructProto(t *testing.T) {
 	a := assertions.New(t)
 
 	ptr := "ptr"
-	m := map[string]interface{}{
+	m := map[string]any{
 		"foo":            "bar",
 		"ptr":            &ptr,
 		"answer":         42,
@@ -94,7 +94,7 @@ func TestStructProto(t *testing.T) {
 			a.So(sm[k], should.Equal, rv.String())
 
 		case reflect.Slice, reflect.Array:
-			var vt []interface{}
+			var vt []any
 			a.So(s.Fields[k].Kind, should.HaveSameTypeAs, &structpb.Value_ListValue{})
 			a.So(sm[k], should.HaveSameTypeAs, vt)
 			if a.So(sm[k], should.HaveLength, rv.Len()) {
@@ -106,7 +106,7 @@ func TestStructProto(t *testing.T) {
 			}
 
 		case reflect.Struct, reflect.Map:
-			var vt map[string]interface{}
+			var vt map[string]any
 			a.So(s.Fields[k].Kind, should.HaveSameTypeAs, &structpb.Value_StructValue{})
 			a.So(sm[k], should.HaveSameTypeAs, vt)
 			if kind == reflect.Map {
@@ -154,9 +154,9 @@ func TestRecursiveStructures(t *testing.T) {
 		},
 	}
 
-	recursiveMap := make(map[string]interface{})
+	recursiveMap := make(map[string]any)
 	recursiveMap["test"] = recursiveMap
-	recursiveSlice := make([]interface{}, 1)
+	recursiveSlice := make([]any, 1)
 	recursiveSlice[0] = recursiveSlice
 	type recursiveGoStruct struct {
 		self *recursiveGoStruct

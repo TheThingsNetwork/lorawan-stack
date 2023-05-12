@@ -43,7 +43,7 @@ type Error struct {
 	correlationID string
 	cause         error
 	details       []proto.Message
-	attributes    map[string]interface{}
+	attributes    map[string]any
 	grpcStatus    *atomic.Value
 }
 
@@ -63,11 +63,11 @@ func (e *Error) Error() string {
 }
 
 // Fields implements the log.Fielder interface.
-func (e *Error) Fields() map[string]interface{} {
+func (e *Error) Fields() map[string]any {
 	if e == nil {
 		return nil
 	}
-	res := make(map[string]interface{})
+	res := make(map[string]any)
 	pref := "error_cause"
 	for cause := Cause(e); cause != nil; cause = Cause(cause) {
 		res[pref] = cause.Error()
@@ -82,7 +82,7 @@ func (e *Error) Fields() map[string]interface{} {
 // Interface is the interface of an error.
 type Interface interface {
 	DefinitionInterface
-	Attributes() map[string]interface{}
+	Attributes() map[string]any
 	Cause() error
 	Details() (details []proto.Message)
 }

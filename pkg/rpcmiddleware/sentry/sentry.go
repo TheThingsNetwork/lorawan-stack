@@ -137,7 +137,7 @@ func reportError(ctx context.Context, method string, err error) {
 
 // UnaryServerInterceptor forwards errors in Unary RPCs to Sentry
 func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 		resp, err := handler(ctx, req)
 		reportError(ctx, info.FullMethod, err)
 		return resp, err
@@ -146,7 +146,7 @@ func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 
 // StreamServerInterceptor forwards errors in Stream RPCs to Sentry
 func StreamServerInterceptor() grpc.StreamServerInterceptor {
-	return func(srv interface{}, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+	return func(srv any, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 		err := handler(srv, ss)
 		reportError(ss.Context(), info.FullMethod, err)
 		return err

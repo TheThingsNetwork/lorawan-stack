@@ -282,7 +282,7 @@ func TestNewChannelReq(t *testing.T) {
 		test.RunSubtest(t, test.SubtestConfig{
 			Name: func() string {
 				formatChannels := func(chs ...*ttnpb.MACParameters_Channel) string {
-					return fmt.Sprintf("[%s]", test.JoinStringsMap(func(_, v interface{}) string {
+					return fmt.Sprintf("[%s]", test.JoinStringsMap(func(_, v any) string {
 						ch := v.(*ttnpb.MACParameters_Channel)
 						if ch == nil {
 							return "nil"
@@ -294,10 +294,10 @@ func TestNewChannelReq(t *testing.T) {
 					formatChannels(tc.CurrentChannels...),
 					formatChannels(tc.DesiredChannels...),
 					test.JoinStringsf("%d", ",", false, tc.RejectedFrequencies),
-					test.JoinStringsMap(func(freq, rs interface{}) string {
+					test.JoinStringsMap(func(freq, rs any) string {
 						return fmt.Sprintf("%d:[%s]",
 							freq,
-							test.JoinStringsMap(func(_, v interface{}) string {
+							test.JoinStringsMap(func(_, v any) string {
 								r := v.(*ttnpb.MACState_DataRateRange)
 								return fmt.Sprintf("%d-%d", r.MinDataRateIndex, r.MaxDataRateIndex)
 							}, "", rs.(*ttnpb.MACState_DataRateRanges).Ranges),
@@ -335,7 +335,7 @@ func TestNewChannelReq(t *testing.T) {
 							needs[int(cmd.ChannelIndex)] = struct{}{}
 						}
 						for i := 0; i <= max+1; i++ {
-							a.So(DeviceNeedsNewChannelReqAtIndex(dev, i), func() func(interface{}, ...interface{}) string {
+							a.So(DeviceNeedsNewChannelReqAtIndex(dev, i), func() func(any, ...any) string {
 								if _, ok := needs[i]; ok {
 									return should.BeTrue
 								}
@@ -351,7 +351,7 @@ func TestNewChannelReq(t *testing.T) {
 					Parallel: true,
 					Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 						dev := makeDevice()
-						a.So(DeviceNeedsNewChannelReq(dev, phy), func() func(interface{}, ...interface{}) string {
+						a.So(DeviceNeedsNewChannelReq(dev, phy), func() func(any, ...any) string {
 							if len(tc.Commands) > 0 {
 								return should.BeTrue
 							}

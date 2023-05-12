@@ -19,7 +19,7 @@ import "github.com/gotnospirit/messageformat"
 var formatter, _ = messageformat.New()
 
 // FormatMessage formats the message using the given attributes.
-func (d *Definition) FormatMessage(attributes map[string]interface{}) string {
+func (d *Definition) FormatMessage(attributes map[string]any) string {
 	if d == nil {
 		return ""
 	}

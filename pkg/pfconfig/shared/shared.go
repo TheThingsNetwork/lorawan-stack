@@ -47,14 +47,14 @@ var errInvalidKey = errors.DefineInvalidArgument("invalid_key", "key `{key}` inv
 
 type kv struct {
 	key   string
-	value interface{}
+	value any
 }
 
 type orderedMap struct {
 	kv []kv
 }
 
-func (m *orderedMap) add(k string, v interface{}) {
+func (m *orderedMap) add(k string, v any) {
 	m.kv = append(m.kv, kv{key: k, value: v})
 }
 

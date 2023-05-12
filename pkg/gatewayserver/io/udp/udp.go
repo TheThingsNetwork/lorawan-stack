@@ -481,7 +481,7 @@ func (s *srv) gc() {
 			connectionsTicker.Stop()
 			return
 		case <-connectionsTicker.C:
-			s.connections.Range(func(k, v interface{}) bool {
+			s.connections.Range(func(k, v any) bool {
 				logger := logger.WithField("gateway_eui", k.(types.EUI64))
 				st := v.(*state)
 				select {

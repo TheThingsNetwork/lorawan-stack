@@ -267,7 +267,7 @@ func TestLegacyDecodeUplink(t *testing.T) {
 		a.So(err, should.BeNil)
 		m, err := goproto.Map(message.DecodedPayload)
 		a.So(err, should.BeNil)
-		a.So(m, should.Resemble, map[string]interface{}{
+		a.So(m, should.Resemble, map[string]any{
 			"temperature": -21.3,
 		})
 	}
@@ -285,7 +285,7 @@ func TestLegacyDecodeUplink(t *testing.T) {
 		a.So(err, should.BeNil)
 		m, err := goproto.Map(message.DecodedPayload)
 		a.So(err, should.BeNil)
-		a.So(m, should.Resemble, map[string]interface{}{
+		a.So(m, should.Resemble, map[string]any{
 			"temperature": -21.3,
 		})
 	}
@@ -755,7 +755,7 @@ func TestDecodeUplink(t *testing.T) {
 		a.So(err, should.BeNil)
 		m, err := goproto.Map(message.DecodedPayload)
 		a.So(err, should.BeNil)
-		a.So(m, should.Resemble, map[string]interface{}{
+		a.So(m, should.Resemble, map[string]any{
 			"event":       "button",
 			"battery":     3250.0,
 			"light":       1152.0,
@@ -852,7 +852,7 @@ func TestDecodeDownlink(t *testing.T) {
 		a.So(err, should.BeNil)
 		m, err := goproto.Map(message.DecodedPayload)
 		a.So(err, should.BeNil)
-		a.So(m, should.Resemble, map[string]interface{}{
+		a.So(m, should.Resemble, map[string]any{
 			"value": -21.3,
 		})
 	}
@@ -889,7 +889,7 @@ func TestDecodeDownlink(t *testing.T) {
 		a.So(err, should.BeNil)
 		m, err := goproto.Map(message.DecodedPayload)
 		a.So(err, should.BeNil)
-		a.So(m, should.Resemble, map[string]interface{}{
+		a.So(m, should.Resemble, map[string]any{
 			"color": "blue",
 		})
 		a.So(message.DecodedPayloadWarnings, should.Resemble, []string{"this is my favorite color"})

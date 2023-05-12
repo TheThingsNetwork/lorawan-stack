@@ -68,7 +68,7 @@ func (d *Cookie) new(r *http.Request) http.Cookie {
 }
 
 // Get decodes the cookie into the value. Returns false if the cookie is not there.
-func (d *Cookie) Get(w http.ResponseWriter, r *http.Request, v interface{}) (bool, error) {
+func (d *Cookie) Get(w http.ResponseWriter, r *http.Request, v any) (bool, error) {
 	s, err := webmiddleware.GetSecureCookie(r.Context())
 	if err != nil {
 		return false, err
@@ -89,7 +89,7 @@ func (d *Cookie) Get(w http.ResponseWriter, r *http.Request, v interface{}) (boo
 }
 
 // Set the value of the cookie.
-func (d *Cookie) Set(w http.ResponseWriter, r *http.Request, v interface{}) error {
+func (d *Cookie) Set(w http.ResponseWriter, r *http.Request, v any) error {
 	s, err := webmiddleware.GetSecureCookie(r.Context())
 	if err != nil {
 		return err

@@ -176,7 +176,7 @@ var (
 							logger.WithField("count", len(sids[:d])).Debug("Deleted old session keys")
 							sids = sids[d:]
 						}
-						sidVals := make([]interface{}, len(sids))
+						sidVals := make([]any, len(sids))
 						for i := range sids {
 							sidVals[i] = base64.RawStdEncoding.EncodeToString(sids[i])
 						}

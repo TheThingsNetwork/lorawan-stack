@@ -21,16 +21,16 @@ import (
 )
 
 type attributer interface {
-	Attributes() map[string]interface{}
+	Attributes() map[string]any
 }
 
 type publicAttributer interface {
-	PublicAttributes() map[string]interface{}
+	PublicAttributes() map[string]any
 }
 
 var errOddKV = DefineInvalidArgument("odd_kv", "Odd number of key-value elements")
 
-func supported(v interface{}) interface{} {
+func supported(v any) any {
 	if v == nil {
 		return "<nil>"
 	}
@@ -47,11 +47,11 @@ func supported(v interface{}) interface{} {
 	}
 }
 
-func kvToMap(kv ...interface{}) (map[string]interface{}, error) {
+func kvToMap(kv ...any) (map[string]any, error) {
 	if len(kv)%2 != 0 {
 		return nil, errOddKV.New()
 	}
-	m := make(map[string]interface{}, len(kv)/2)
+	m := make(map[string]any, len(kv)/2)
 	var key string
 	for i, node := range kv {
 		if i%2 == 0 {
@@ -63,7 +63,7 @@ func kvToMap(kv ...interface{}) (map[string]interface{}, error) {
 	return m, nil
 }
 
-func (e *Error) mergeAttributes(kv ...interface{}) {
+func (e *Error) mergeAttributes(kv ...any) {
 	if len(kv) == 0 {
 		return
 	}
@@ -101,7 +101,7 @@ func (e *Error) mergeAttributes(kv ...interface{}) {
 
 // WithAttributes returns the error with the given attributes set.
 // Any conflicting attributes in the Error will be overwritten.
-func (e *Error) WithAttributes(kv ...interface{}) *Error {
+func (e *Error) WithAttributes(kv ...any) *Error {
 	if e == nil {
 		return e
 	}
@@ -111,7 +111,7 @@ func (e *Error) WithAttributes(kv ...interface{}) *Error {
 }
 
 // WithAttributes returns a new error from the definition, and sets the given attributes.
-func (d *Definition) WithAttributes(kv ...interface{}) *Error {
+func (d *Definition) WithAttributes(kv ...any) *Error {
 	if d == nil {
 		return nil
 	}
@@ -121,7 +121,7 @@ func (d *Definition) WithAttributes(kv ...interface{}) *Error {
 }
 
 // Attributes of the error.
-func (e *Error) Attributes() map[string]interface{} {
+func (e *Error) Attributes() map[string]any {
 	if e == nil {
 		return nil
 	}
@@ -129,14 +129,14 @@ func (e *Error) Attributes() map[string]interface{} {
 }
 
 // PublicAttributes of the error.
-func (e *Error) PublicAttributes() map[string]interface{} {
+func (e *Error) PublicAttributes() map[string]any {
 	if e == nil {
 		return nil
 	}
 	if len(e.attributes) == 0 {
 		return nil
 	}
-	publicAttributes := make(map[string]interface{}, len(e.attributes))
+	publicAttributes := make(map[string]any, len(e.attributes))
 nextAttr:
 	for k, v := range e.attributes {
 		for _, public := range e.publicAttributes {
@@ -153,15 +153,15 @@ nextAttr:
 }
 
 // Attributes are not present in the error definition, so this just returns nil.
-func (*Definition) Attributes() map[string]interface{} { return nil }
+func (*Definition) Attributes() map[string]any { return nil }
 
 // PublicAttributes are not present in the error definition, so this just returns nil.
-func (*Definition) PublicAttributes() map[string]interface{} { return nil }
+func (*Definition) PublicAttributes() map[string]any { return nil }
 
 // Attributes returns the attributes of the errors, if they implement Attributes().
 // If more than one error is passed, subsequent error attributes will be added if not set.
-func Attributes(err ...error) map[string]interface{} {
-	attributes := make(map[string]interface{})
+func Attributes(err ...error) map[string]any {
+	attributes := make(map[string]any)
 	for _, err := range err {
 		if attrErr := (attributer)(nil); errors.As(err, &attrErr) {
 			for k, v := range attrErr.Attributes() {
@@ -176,8 +176,8 @@ func Attributes(err ...error) map[string]interface{} {
 
 // PublicAttributes returns the public attributes of the errors, if they implement PublicAttributes().
 // If more than one error is passed, subsequent error attributes will be added if not set.
-func PublicAttributes(err ...error) map[string]interface{} {
-	attributes := make(map[string]interface{})
+func PublicAttributes(err ...error) map[string]any {
+	attributes := make(map[string]any)
 	for _, err := range err {
 		if attrErr := (publicAttributer)(nil); errors.As(err, &attrErr) {
 			for k, v := range attrErr.PublicAttributes() {

@@ -43,7 +43,7 @@ type PBControlPlane struct {
 func NewPBControlPlane(tb testing.TB) *PBControlPlane {
 	cp := &PBControlPlane{
 		Server: grpc.NewServer(
-			grpc.UnaryInterceptor(func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
+			grpc.UnaryInterceptor(func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {
 				ctx = test.ContextWithTB(ctx, tb)
 				return handler(ctx, req)
 			}),

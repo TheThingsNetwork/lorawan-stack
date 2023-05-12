@@ -46,7 +46,7 @@ func WithIdentifiers(identifiers ...EntityIdentifiers) Option {
 }
 
 // WithData returns an option that sets the data of the event.
-func WithData(data interface{}) Option {
+func WithData(data any) Option {
 	return optionFunc(func(e *event) {
 		e.data = data
 		if data, ok := data.(interface{ GetCorrelationIds() []string }); ok {
@@ -118,7 +118,7 @@ func (definitionOptionFunc) applyTo(*event) {}
 func (f definitionOptionFunc) applyToDefinition(d *definition) { f(d) }
 
 // WithDataType returns an option that sets the data type of the event (for documentation).
-func WithDataType(t interface{}) DefinitionOption {
+func WithDataType(t any) DefinitionOption {
 	msg, err := marshalData(t)
 	if err != nil {
 		panic(err)

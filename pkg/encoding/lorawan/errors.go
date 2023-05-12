@@ -36,46 +36,46 @@ var (
 
 const valueKey = "value"
 
-type valueErr func(interface{}) *errors.Error
+type valueErr func(any) *errors.Error
 
 func unexpectedValue(err interface {
-	WithAttributes(kv ...interface{}) *errors.Error
+	WithAttributes(kv ...any) *errors.Error
 },
 ) valueErr {
-	return func(value interface{}) *errors.Error {
+	return func(value any) *errors.Error {
 		return err.WithAttributes(valueKey, value)
 	}
 }
 
-func errExpectedLowerOrEqual(lorawanField string, max interface{}) valueErr {
+func errExpectedLowerOrEqual(lorawanField string, max any) valueErr {
 	return unexpectedValue(errFieldHasMax.WithAttributes("lorawan_field", lorawanField, "max", max))
 }
 
-func errExpectedLengthEqual(lorawanField string, expected interface{}) valueErr {
+func errExpectedLengthEqual(lorawanField string, expected any) valueErr {
 	return unexpectedValue(errFieldLengthEqual.WithAttributes("lorawan_field", lorawanField, "expected", expected))
 }
 
-func errExpectedLengthLowerOrEqual(lorawanField string, max interface{}) valueErr {
+func errExpectedLengthLowerOrEqual(lorawanField string, max any) valueErr {
 	return unexpectedValue(errFieldLengthHasMax.WithAttributes("lorawan_field", lorawanField, "max", max))
 }
 
-func errExpectedLengthHigherOrEqual(lorawanField string, min interface{}) valueErr {
+func errExpectedLengthHigherOrEqual(lorawanField string, min any) valueErr {
 	return unexpectedValue(errFieldLengthHasMin.WithAttributes("lorawan_field", lorawanField, "min", min))
 }
 
-func errExpectedLengthTwoChoices(lorawanField string, expected1, expected2 interface{}) valueErr {
+func errExpectedLengthTwoChoices(lorawanField string, expected1, expected2 any) valueErr {
 	return unexpectedValue(errFieldLengthTwoChoices.WithAttributes("lorawan_field", lorawanField, "expected_1", expected1, "expected_2", expected2))
 }
 
-func errExpectedLengthEncodedBound(lorawanField string, min, max interface{}) valueErr {
+func errExpectedLengthEncodedBound(lorawanField string, min, max any) valueErr {
 	return unexpectedValue(errEncodedFieldLengthBound.WithAttributes("lorawan_field", lorawanField, "min", min, "max", max))
 }
 
-func errExpectedLengthEncodedEqual(lorawanField string, expected interface{}) valueErr {
+func errExpectedLengthEncodedEqual(lorawanField string, expected any) valueErr {
 	return unexpectedValue(errEncodedFieldLengthEqual.WithAttributes("lorawan_field", lorawanField, "expected", expected))
 }
 
-func errExpectedLengthEncodedTwoChoices(lorawanField string, expected1, expected2 interface{}) valueErr {
+func errExpectedLengthEncodedTwoChoices(lorawanField string, expected1, expected2 any) valueErr {
 	return unexpectedValue(errEncodedFieldLengthTwoChoices.WithAttributes("lorawan_field", lorawanField, "expected_1", expected1, "expected_2", expected2))
 }
 
@@ -95,6 +95,6 @@ func errMissing(lorawanField string) *errors.Error {
 	return errUnknownField.WithAttributes("lorawan_field", lorawanField)
 }
 
-func errExpectedBetween(lorawanField string, min, max interface{}) valueErr {
+func errExpectedBetween(lorawanField string, min, max any) valueErr {
 	return unexpectedValue(errFieldBound.WithAttributes("lorawan_field", lorawanField, "min", min, "max", max))
 }

@@ -23,11 +23,11 @@ var _ Fielder = &F{}
 
 // Fielder is the interface for anything that can have fields.
 type Fielder interface {
-	Fields() map[string]interface{}
+	Fields() map[string]any
 }
 
 // Fields returns a new immutable fields structure.
-func Fields(pairs ...interface{}) *F {
+func Fields(pairs ...any) *F {
 	return &F{
 		nodes: pairsToMap(pairs...),
 	}
@@ -38,11 +38,11 @@ func Fields(pairs ...interface{}) *F {
 // but we only use this to accumulate fields so that's ok.
 type F struct {
 	parent *F
-	nodes  map[string]interface{}
+	nodes  map[string]any
 }
 
 // Get returns the key from the fields in O(n), where n is the number of entries.
-func (f *F) Get(key string) (interface{}, bool) {
+func (f *F) Get(key string) (any, bool) {
 	val, ok := f.nodes[key]
 	if ok {
 		return val, true
@@ -55,11 +55,11 @@ func (f *F) Get(key string) (interface{}, bool) {
 	return nil, false
 }
 
-func pairsToMap(pairs ...interface{}) map[string]interface{} {
+func pairsToMap(pairs ...any) map[string]any {
 	if len(pairs)%2 != 0 {
 		panic("Uneven number of key-value pairs passed")
 	}
-	nodes := make(map[string]interface{})
+	nodes := make(map[string]any)
 	var key string
 	for i, node := range pairs {
 		if i%2 == 0 {
@@ -72,13 +72,13 @@ func pairsToMap(pairs ...interface{}) map[string]interface{} {
 }
 
 // Fields implements Fielder. Returns all fields in O(n), where n is the number of entries in the map.
-func (f *F) Fields() map[string]interface{} {
-	var r map[string]interface{}
+func (f *F) Fields() map[string]any {
+	var r map[string]any
 
 	if f.parent != nil {
 		r = f.parent.Fields()
 	} else {
-		r = make(map[string]interface{})
+		r = make(map[string]any)
 	}
 
 	for k, v := range f.nodes {
@@ -89,7 +89,7 @@ func (f *F) Fields() map[string]interface{} {
 }
 
 // With returns a new F that has the fields in nodes.
-func (f *F) With(nodes map[string]interface{}) *F {
+func (f *F) With(nodes map[string]any) *F {
 	return &F{
 		parent: f,
 		nodes:  nodes,
@@ -97,8 +97,8 @@ func (f *F) With(nodes map[string]interface{}) *F {
 }
 
 // WithField returns a new fielder that has the key set to value.
-func (f *F) WithField(name string, val interface{}) *F {
-	nodes := map[string]interface{}{
+func (f *F) WithField(name string, val any) *F {
+	nodes := map[string]any{
 		name: val,
 	}
 

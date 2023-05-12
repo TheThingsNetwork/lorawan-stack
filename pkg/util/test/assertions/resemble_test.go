@@ -25,10 +25,10 @@ import (
 
 func TestHaveEmptyDiff(t *testing.T) {
 	for _, tc := range []struct {
-		A                interface{}
-		B                interface{}
-		Assertion        func(interface{}, ...interface{}) string
-		InverseAssertion func(interface{}, ...interface{}) string
+		A                any
+		B                any
+		Assertion        func(any, ...any) string
+		InverseAssertion func(any, ...any) string
 	}{
 		{
 			A:                "test",
@@ -123,10 +123,10 @@ func (dst *testSetFielder) SetFields(src *testSetFielder, paths ...string) error
 
 func TestShouldResembleFields(t *testing.T) {
 	for _, tc := range []struct {
-		A         interface{}
-		B         interface{}
-		Paths     []interface{}
-		Assertion func(interface{}, ...interface{}) string
+		A         any
+		B         any
+		Paths     []any
+		Assertion func(any, ...any) string
 	}{
 		{
 			A:         &testSetFielder{},
@@ -156,7 +156,7 @@ func TestShouldResembleFields(t *testing.T) {
 			B: &testSetFielder{
 				A: 42,
 			},
-			Paths:     []interface{}{"a"},
+			Paths:     []any{"a"},
 			Assertion: should.BeEmpty,
 		},
 		{
@@ -166,7 +166,7 @@ func TestShouldResembleFields(t *testing.T) {
 			B: &testSetFielder{
 				A: 42,
 			},
-			Paths:     []interface{}{[]string{"a"}},
+			Paths:     []any{[]string{"a"}},
 			Assertion: should.BeEmpty,
 		},
 		{
@@ -176,7 +176,7 @@ func TestShouldResembleFields(t *testing.T) {
 			B: &testSetFielder{
 				A: 42,
 			},
-			Paths:     []interface{}{[1]string{"a"}},
+			Paths:     []any{[1]string{"a"}},
 			Assertion: should.BeEmpty,
 		},
 		{
@@ -186,7 +186,7 @@ func TestShouldResembleFields(t *testing.T) {
 			B: &testSetFielder{
 				A: 42,
 			},
-			Paths:     []interface{}{"b"},
+			Paths:     []any{"b"},
 			Assertion: should.BeEmpty,
 		},
 		{
@@ -196,17 +196,7 @@ func TestShouldResembleFields(t *testing.T) {
 			B: &testSetFielder{
 				A: 42,
 			},
-			Paths:     []interface{}{"a", "b"},
-			Assertion: should.BeEmpty,
-		},
-		{
-			A: &testSetFielder{
-				A: 42,
-			},
-			B: &testSetFielder{
-				A: 43,
-			},
-			Paths:     []interface{}{[]string{"b"}, "c"},
+			Paths:     []any{"a", "b"},
 			Assertion: should.BeEmpty,
 		},
 		{
@@ -216,7 +206,17 @@ func TestShouldResembleFields(t *testing.T) {
 			B: &testSetFielder{
 				A: 43,
 			},
-			Paths:     []interface{}{"a", "b"},
+			Paths:     []any{[]string{"b"}, "c"},
+			Assertion: should.BeEmpty,
+		},
+		{
+			A: &testSetFielder{
+				A: 42,
+			},
+			B: &testSetFielder{
+				A: 43,
+			},
+			Paths:     []any{"a", "b"},
 			Assertion: should.NotBeEmpty,
 		},
 		{
@@ -226,13 +226,13 @@ func TestShouldResembleFields(t *testing.T) {
 			B: &testSetFielder{
 				A: 43,
 			},
-			Paths:     []interface{}{[2]string{"a", "a"}, []string{"b"}, "c"},
+			Paths:     []any{[2]string{"a", "a"}, []string{"b"}, "c"},
 			Assertion: should.NotBeEmpty,
 		},
 	} {
 		t.Run(fmt.Sprintf("%+v/%+v/%+v", tc.A, tc.B, tc.Paths), func(t *testing.T) {
 			a := assertions.New(t)
-			a.So(ShouldResembleFields(tc.A, append([]interface{}{tc.B}, tc.Paths...)...), tc.Assertion)
+			a.So(ShouldResembleFields(tc.A, append([]any{tc.B}, tc.Paths...)...), tc.Assertion)
 		})
 	}
 }

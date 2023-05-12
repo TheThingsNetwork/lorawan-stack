@@ -80,7 +80,7 @@ var errCannotOpenIndex = errors.DefineNotFound("cannot_open_index", "cannot open
 
 func openIndex(ctx context.Context, path string) (bleve.Index, error) {
 	log.FromContext(ctx).WithField("path", path).Debug("Loading index")
-	index, err := bleve.OpenUsing(path, map[string]interface{}{"read_only": true, "bolt_timeout": "60s"})
+	index, err := bleve.OpenUsing(path, map[string]any{"read_only": true, "bolt_timeout": "60s"})
 	if err != nil {
 		return nil, errCannotOpenIndex.WithAttributes("path", path).WithCause(err)
 	}

@@ -485,5 +485,5 @@ var (
 )
 
 func FrequencyPlan(id string) *frequencyplans.FrequencyPlan {
-	return Must(FrequencyPlanStore.GetByID(id)).(*frequencyplans.FrequencyPlan)
+	return Must(FrequencyPlanStore.GetByID(id))
 }

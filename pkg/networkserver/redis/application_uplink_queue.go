@@ -118,7 +118,7 @@ func (q *ApplicationUplinkQueue) Add(ctx context.Context, ups ...*ttnpb.Applicat
 				Stream: uidStreamID,
 				MaxLen: q.maxLen,
 				Approx: true,
-				Values: map[string]interface{}{
+				Values: map[string]any{
 					payloadKey: s,
 				},
 			})

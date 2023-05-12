@@ -59,7 +59,7 @@ func (b *builder) New(ctx context.Context, opts ...Option) Event {
 	return evt
 }
 
-func (b *builder) NewWithIdentifiersAndData(ctx context.Context, ids EntityIdentifiers, data interface{}) Event {
+func (b *builder) NewWithIdentifiersAndData(ctx context.Context, ids EntityIdentifiers, data any) Event {
 	e := local(b.New(ctx))
 	if ids != nil {
 		e.innerEvent.Identifiers = append(e.innerEvent.Identifiers, ids.GetEntityIdentifiers())
@@ -70,7 +70,7 @@ func (b *builder) NewWithIdentifiersAndData(ctx context.Context, ids EntityIdent
 	return e
 }
 
-func (b *builder) BindData(data interface{}) Builder {
+func (b *builder) BindData(data any) Builder {
 	return b.With(WithData(data))
 }
 
@@ -82,9 +82,9 @@ type Builder interface {
 	New(ctx context.Context, opts ...Option) Event
 
 	// Convenience function for legacy code. Same as New(ctx, WithIdentifiers(ids), WithData(data)).
-	NewWithIdentifiersAndData(ctx context.Context, ids EntityIdentifiers, data interface{}) Event
+	NewWithIdentifiersAndData(ctx context.Context, ids EntityIdentifiers, data any) Event
 	// Convenience function for legacy code. Same as With(WithData(data)).
-	BindData(data interface{}) Builder
+	BindData(data any) Builder
 }
 
 // Builders makes it easier to create multiple events at once.

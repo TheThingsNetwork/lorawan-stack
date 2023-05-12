@@ -21,16 +21,16 @@ import (
 )
 
 type mockHandler struct {
-	call func(ctx context.Context, req interface{})
+	call func(ctx context.Context, req any)
 
 	ctx context.Context
-	req interface{}
+	req any
 
-	res interface{}
+	res any
 	err error
 }
 
-func (h *mockHandler) Handler(ctx context.Context, req interface{}) (interface{}, error) {
+func (h *mockHandler) Handler(ctx context.Context, req any) (any, error) {
 	h.ctx, h.req = ctx, req
 	if h.call != nil {
 		h.call(ctx, req)

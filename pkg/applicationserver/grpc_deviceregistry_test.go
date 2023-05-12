@@ -302,7 +302,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 							return tc.GetFunc(ctx, ids, paths)
 						},
 					},
-				})).(*applicationserver.ApplicationServer)
+				}))
 
 			as.AddContextFiller(tc.ContextFunc)
 			as.AddContextFiller(func(ctx context.Context) context.Context {
@@ -583,7 +583,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					Formatters: applicationserver.FormattersConfig{
 						MaxParameterLength: maxParameterLength,
 					},
-				})).(*applicationserver.ApplicationServer)
+				}))
 
 			as.AddContextFiller(tc.ContextFunc)
 			as.AddContextFiller(func(ctx context.Context) context.Context {
@@ -773,7 +773,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 							return tc.SetFunc(ctx, deviceIds, paths, cb)
 						},
 					},
-				})).(*applicationserver.ApplicationServer)
+				}))
 
 			as.AddContextFiller(tc.ContextFunc)
 			as.AddContextFiller(func(ctx context.Context) context.Context {

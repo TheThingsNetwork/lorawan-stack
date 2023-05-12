@@ -27,7 +27,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-func grpcEntityFromRequest(ctx context.Context, req interface{}) string {
+func grpcEntityFromRequest(ctx context.Context, req any) string {
 	if r, ok := req.(RateLimitKeyer); ok {
 		return r.RateLimitKey()
 	}
@@ -57,7 +57,7 @@ func grpcAuthTokenID(ctx context.Context) string {
 
 // UnaryServerInterceptor returns a gRPC unary server interceptor that rate limits incoming gRPC requests.
 func UnaryServerInterceptor(limiter Interface) grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
+	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {
 		if grpcIsClusterAuthCall(ctx) {
 			return handler(ctx, req)
 		}
@@ -81,7 +81,7 @@ type rateLimitedServerStream struct {
 	resource Resource
 }
 
-func (s *rateLimitedServerStream) RecvMsg(msg interface{}) error {
+func (s *rateLimitedServerStream) RecvMsg(msg any) error {
 	if err := Require(s.limiter, s.resource); err != nil {
 		return err
 	}
@@ -91,7 +91,7 @@ func (s *rateLimitedServerStream) RecvMsg(msg interface{}) error {
 // StreamServerInterceptor is a grpc.StreamServerInterceptor that rate limits new gRPC requests and messages sent by the client.
 // If the X-Real-IP header is not set, it is assumed that the gRPC request originates from the cluster, and no rate limits are enforced.
 func StreamServerInterceptor(limiter Interface) grpc.StreamServerInterceptor {
-	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+	return func(srv any, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 		ctx := stream.Context()
 
 		if grpcIsClusterAuthCall(ctx) {

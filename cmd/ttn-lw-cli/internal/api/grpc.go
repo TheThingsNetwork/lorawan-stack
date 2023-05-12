@@ -102,7 +102,7 @@ func SetAuth(authType, authValue string) {
 }
 
 // requestInterceptor is a gRPC interceptor logging the request payload
-func requestInterceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+func requestInterceptor(ctx context.Context, method string, req, reply any, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 	logger := log.FromContext(ctx)
 	if b, err := jsonpb.TTN().Marshal(req); err == nil {
 		logger.WithFields(log.Fields("grpc_payload", string(b))).Debug("Request payload")

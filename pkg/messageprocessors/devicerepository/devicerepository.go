@@ -108,7 +108,7 @@ func (h *host) retrieve(ctx context.Context, codec codecType, ids *ttnpb.Applica
 	if err != nil {
 		return nil, err
 	}
-	result, err, _ := h.singleflight.Do(key, func() (interface{}, error) {
+	result, err, _ := h.singleflight.Do(key, func() (any, error) {
 		var (
 			formatter interface {
 				GetFormatter() ttnpb.PayloadFormatter

@@ -270,28 +270,28 @@ func NewISPeer(ctx context.Context, is interface {
 	ttnpb.ApplicationAccessServer
 },
 ) cluster.Peer {
-	return test.Must(test.NewGRPCServerPeer(ctx, is, ttnpb.RegisterApplicationAccessServer)).(cluster.Peer)
+	return test.Must(test.NewGRPCServerPeer(ctx, is, ttnpb.RegisterApplicationAccessServer))
 }
 
 func NewGSPeer(ctx context.Context, gs interface {
 	ttnpb.NsGsServer
 },
 ) cluster.Peer {
-	return test.Must(test.NewGRPCServerPeer(ctx, gs, ttnpb.RegisterNsGsServer)).(cluster.Peer)
+	return test.Must(test.NewGRPCServerPeer(ctx, gs, ttnpb.RegisterNsGsServer))
 }
 
 func NewJSPeer(ctx context.Context, js interface {
 	ttnpb.NsJsServer
 },
 ) cluster.Peer {
-	return test.Must(test.NewGRPCServerPeer(ctx, js, ttnpb.RegisterNsJsServer)).(cluster.Peer)
+	return test.Must(test.NewGRPCServerPeer(ctx, js, ttnpb.RegisterNsJsServer))
 }
 
 func NewASPeer(ctx context.Context, as interface {
 	ttnpb.NsAsServer
 },
 ) cluster.Peer {
-	return test.Must(test.NewGRPCServerPeer(ctx, as, ttnpb.RegisterNsAsServer)).(cluster.Peer)
+	return test.Must(test.NewGRPCServerPeer(ctx, as, ttnpb.RegisterNsAsServer))
 }
 
 var _ InteropClient = MockInteropClient{}
@@ -1136,10 +1136,10 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 											drIdx,
 											conf.MACState.CurrentParameters.Rx1DataRateOffset,
 											mac.DeviceExpectedDownlinkDwellTime(conf.MACState, fp, phy)),
-										).(ttnpb.DataRateIndex)
+										)
 										rx1DR := phy.DataRates[rx1DRIdx]
 										txReq.Rx1DataRate = rx1DR.Rate
-										txReq.Rx1Frequency = conf.MACState.CurrentParameters.Channels[test.Must(phy.Rx1Channel(uint8(conf.Uplink.DeviceChannelIndex))).(uint8)].DownlinkFrequency
+										txReq.Rx1Frequency = conf.MACState.CurrentParameters.Channels[test.Must(phy.Rx1Channel(uint8(conf.Uplink.DeviceChannelIndex)))].DownlinkFrequency
 									}
 									if conf.SetRX2 {
 										rx2DRIdx := conf.MACState.CurrentParameters.Rx2DataRateIndex
@@ -1601,7 +1601,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 			t, a := test.MustNewTFromContext(ctx)
 			t.Helper()
 
-			defaultMACSettings := test.Must(env.Config.DefaultMACSettings.Parse()).(*ttnpb.MACSettings)
+			defaultMACSettings := test.Must(env.Config.DefaultMACSettings.Parse())
 
 			defaultLoRaWANVersion := mac.DeviceDefaultLoRaWANVersion(conf.Device)
 
@@ -1718,7 +1718,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 					AdrAckDelayExponent:        mac.DeviceDesiredADRAckDelayExponent(dev, phy, defaultMACSettings),
 					PingSlotDataRateIndexValue: mac.DeviceDesiredPingSlotDataRateIndexValue(dev, phy, fp, defaultMACSettings),
 				},
-				DeviceClass:    test.Must(mac.DeviceDefaultClass(dev)).(ttnpb.Class),
+				DeviceClass:    test.Must(mac.DeviceDefaultClass(dev)),
 				LorawanVersion: defaultLoRaWANVersion,
 				QueuedJoinAccept: &ttnpb.MACState_JoinAccept{
 					Payload: joinResp.RawPayload,
@@ -2108,7 +2108,7 @@ func StartTest(ctx context.Context, conf TestConfig) (*NetworkServer, context.Co
 		componenttest.NewComponent(tb, &conf.Component, cmpOpts...),
 		&conf.NetworkServer,
 		conf.NetworkServerOptions...,
-	)).(*NetworkServer)
+	))
 
 	env := TestEnvironment{
 		Config: conf.NetworkServer,
@@ -2178,7 +2178,7 @@ func LogEvents(t *testing.T, ch <-chan test.EventPubSubPublishRequest) {
 var MACStateOptions = test.MACStateOptions
 
 func MakeMACState(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings, opts ...test.MACStateOption) *ttnpb.MACState {
-	return MACStateOptions.Compose(opts...)(test.Must(mac.NewState(dev, test.FrequencyPlanStore, defaults)).(*ttnpb.MACState))
+	return MACStateOptions.Compose(opts...)(test.Must(mac.NewState(dev, test.FrequencyPlanStore, defaults)))
 }
 
 type SessionOptionNamespace struct{ test.SessionOptionNamespace }
@@ -2470,7 +2470,7 @@ type ContextualEndDevice struct {
 
 func MustCreateDevice(ctx context.Context, r DeviceRegistry, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, context.Context) {
 	dev, ctx, err := CreateDevice(ctx, r, dev, ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.NsEndDeviceRegistry/Set"].Allowed...)
-	test.Must(nil, err)
+	test.Must[any](nil, err)
 	return dev, ctx
 }
 

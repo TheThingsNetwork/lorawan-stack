@@ -354,7 +354,7 @@ func TestLinkADRReq(t *testing.T) {
 					Parallel: true,
 					Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 						dev := makeDevice()
-						a.So(DeviceNeedsLinkADRReq(ctx, dev, phy), func() func(interface{}, ...interface{}) string {
+						a.So(DeviceNeedsLinkADRReq(ctx, dev, phy), func() func(any, ...any) string {
 							if len(tc.Commands) > 0 {
 								return should.BeTrue
 							}

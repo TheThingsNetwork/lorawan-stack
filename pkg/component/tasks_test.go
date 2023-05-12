@@ -85,7 +85,7 @@ func TestTasks(t *testing.T) {
 	})
 
 	// Wait for all invocations.
-	test.Must(nil, c.Start())
+	test.Must[any](nil, c.Start())
 	defer c.Close()
 	oneOffWg.Wait()
 	restartingWg.Wait()

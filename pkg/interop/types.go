@@ -37,7 +37,7 @@ const (
 var errUnknownProtocol = errors.DefineInvalidArgument("unknown_protocol", "unknown protocol")
 
 // UnmarshalYAML implements yaml.Unmarshaler.
-func (p *ProtocolVersion) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (p *ProtocolVersion) UnmarshalYAML(unmarshal func(any) error) error {
 	var s string
 	if err := unmarshal(&s); err != nil {
 		return err

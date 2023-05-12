@@ -458,7 +458,7 @@ func TestFlow(t *testing.T) {
 						}
 						return &d
 					}()
-					nsConf.NetID = test.Must(types.NewNetID(2, []byte{3})).(types.NetID)
+					nsConf.NetID = test.Must(types.NewNetID(2, []byte{3}))
 					nsConf.ClusterID = "test-cluster"
 					nsConf.DeduplicationWindow = (1 << 8) * test.Delay
 					nsConf.CooldownWindow = (1 << 11) * test.Delay

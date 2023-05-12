@@ -28,7 +28,7 @@ import (
 
 func TestMust(t *testing.T) {
 	for i, tc := range []struct {
-		Value       interface{}
+		Value       any
 		Error       error
 		ShouldPanic bool
 	}{
@@ -58,59 +58,6 @@ func TestMust(t *testing.T) {
 			} else if a.So(fn, should.NotPanic) {
 				v := Must(tc.Value, tc.Error)
 				a.So(v, should.Resemble, tc.Value)
-			}
-		})
-	}
-}
-
-func TestMustMultiple(t *testing.T) {
-	for i, tc := range []struct {
-		Values      []interface{}
-		ShouldPanic bool
-	}{
-		{
-			nil,
-			true,
-		},
-		{
-			[]interface{}{},
-			true,
-		},
-		{
-			[]interface{}{(error)(nil)},
-			false,
-		},
-		{
-			[]interface{}{errors.New("42")},
-			true,
-		},
-		{
-			[]interface{}{42, (error)(nil)},
-			false,
-		},
-		{
-			[]interface{}{errors.New("42"), nil},
-			false,
-		},
-		{
-			[]interface{}{(error)(nil), errors.New("test")},
-			true,
-		},
-		{
-			[]interface{}{(error)(nil), (error)(nil), errors.New("test")},
-			true,
-		},
-	} {
-		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			a := assertions.New(t)
-
-			fn := func() { MustMultiple(tc.Values...) }
-
-			if tc.ShouldPanic {
-				a.So(fn, should.Panic)
-			} else if a.So(fn, should.NotPanic) {
-				vs := MustMultiple(tc.Values...)
-				a.So(vs, should.Resemble, tc.Values[:len(tc.Values)-1])
 			}
 		})
 	}

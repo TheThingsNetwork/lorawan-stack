@@ -36,19 +36,19 @@ import (
 
 var (
 	RootCAPath = filepath.Join("testdata", "rootCA.pem")
-	RootCA     = test.Must(os.ReadFile(RootCAPath)).([]byte)
+	RootCA     = test.Must(os.ReadFile(RootCAPath))
 
 	ClientCertPath = filepath.Join("testdata", "clientcert.pem")
-	ClientCert     = test.Must(os.ReadFile(ClientCertPath)).([]byte)
+	ClientCert     = test.Must(os.ReadFile(ClientCertPath))
 
 	ClientKeyPath = filepath.Join("testdata", "clientkey.pem")
-	ClientKey     = test.Must(os.ReadFile(ClientKeyPath)).([]byte)
+	ClientKey     = test.Must(os.ReadFile(ClientKeyPath))
 
 	ServerCertPath = filepath.Join("testdata", "servercert.pem")
-	ServerCert     = test.Must(os.ReadFile(ServerCertPath)).([]byte)
+	ServerCert     = test.Must(os.ReadFile(ServerCertPath))
 
 	ServerKeyPath = filepath.Join("testdata", "serverkey.pem")
-	ServerKey     = test.Must(os.ReadFile(ServerKeyPath)).([]byte)
+	ServerKey     = test.Must(os.ReadFile(ServerKeyPath))
 )
 
 func makeCertPool() *x509.CertPool {
@@ -62,7 +62,7 @@ func makeClientCertificates() []tls.Certificate {
 		test.Must(tls.X509KeyPair(
 			ClientCert,
 			ClientKey,
-		)).(tls.Certificate),
+		)),
 	}
 }
 
@@ -71,7 +71,7 @@ func makeServerCertificates() []tls.Certificate {
 		test.Must(tls.X509KeyPair(
 			ServerCert,
 			ServerKey,
-		)).(tls.Certificate),
+		)),
 	}
 }
 
@@ -151,6 +151,6 @@ func makePacketBrokerTokenIssuer(ctx context.Context, subject string) (iss strin
 				Cluster: true,
 			},
 		}
-		return test.Must(jwt.Signed(sig).Claims(claims).CompactSerialize()).(string)
+		return test.Must(jwt.Signed(sig).Claims(claims).CompactSerialize())
 	}
 }

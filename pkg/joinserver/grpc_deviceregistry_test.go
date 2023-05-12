@@ -408,7 +408,7 @@ func TestDeviceRegistryGet(t *testing.T) { //nolint:paralleltest
 					},
 					DevNonceLimit: defaultDevNonceLimit,
 				},
-			)).(*JoinServer)
+			))
 
 			js.AddContextFiller(tc.ContextFunc)
 			js.AddContextFiller(func(ctx context.Context) context.Context {
@@ -821,7 +821,7 @@ func TestDeviceRegistrySet(t *testing.T) { //nolint:paralleltest
 					},
 					DevNonceLimit: defaultDevNonceLimit,
 				},
-			)).(*JoinServer)
+			))
 
 			js.AddContextFiller(tc.ContextFunc)
 			js.AddContextFiller(func(ctx context.Context) context.Context {
@@ -1023,7 +1023,7 @@ func TestDeviceRegistryDelete(t *testing.T) { //nolint:paralleltest
 					},
 					DevNonceLimit: defaultDevNonceLimit,
 				},
-			)).(*JoinServer)
+			))
 
 			js.AddContextFiller(tc.ContextFunc)
 			js.AddContextFiller(func(ctx context.Context) context.Context {

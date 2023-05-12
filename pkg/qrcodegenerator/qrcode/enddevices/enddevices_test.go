@@ -56,7 +56,7 @@ func TestParseEndDeviceAuthenticationCodes(t *testing.T) {
 			qrCode := New(context.Background())
 
 			d, err := qrCode.Parse("", tc.Data)
-			data := test.Must(d, err).(Data)
+			data := test.Must(d, err)
 
 			edt := data.EndDeviceTemplate()
 			a.So(edt, should.NotBeNil)

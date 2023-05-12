@@ -26,7 +26,7 @@ var colorTerm = os.Getenv("COLORTERM") != "0"
 
 type kv struct {
 	k string
-	v interface{}
+	v any
 }
 
 type fields []kv
@@ -36,7 +36,7 @@ func (f fields) Swap(i, j int)      { f[i], f[j] = f[j], f[i] }
 func (f fields) Less(i, j int) bool { return f[i].k < f[j].k }
 
 func (f fields) unique() fields {
-	uniqueMap := make(map[string]interface{}, len(f))
+	uniqueMap := make(map[string]any, len(f))
 	for _, kv := range f {
 		uniqueMap[kv.k] = kv.v
 	}

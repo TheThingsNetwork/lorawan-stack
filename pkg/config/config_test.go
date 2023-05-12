@@ -83,7 +83,7 @@ type example struct {
 	Custom  Custom   `name:"custom" description:"A custom type"`
 	Customs []Custom `name:"customs" description:"A slice of custom types"`
 
-	FileOnly interface{} `name:"file-only" file-only:"true"`
+	FileOnly any `name:"file-only" file-only:"true"`
 }
 
 var (

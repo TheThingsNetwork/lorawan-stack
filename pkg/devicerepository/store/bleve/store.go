@@ -37,7 +37,7 @@ var (
 // retrieve returns the resulting document from the cache, if available. Otherwise,
 // it extracts it from the appropriate field of the document match result and stores
 // in the cache for future use.
-func (s *bleveStore) retrieve(hit *search.DocumentMatch, fieldName string, newValue func() interface{}) (interface{}, error) {
+func (s *bleveStore) retrieve(hit *search.DocumentMatch, fieldName string, newValue func() any) (any, error) {
 	cached, err := s.cache.Get(hit.ID)
 	if err != nil {
 		jsonString, ok := hit.Fields[fieldName].(string)
@@ -99,7 +99,7 @@ func (s *bleveStore) GetBrands(req store.GetBrandsRequest) (*store.GetBrandsResp
 
 	brands := make([]*ttnpb.EndDeviceBrand, 0, len(result.Hits))
 	for _, hit := range result.Hits {
-		brand, err := s.retrieve(hit, "BrandJSON", func() interface{} { return &ttnpb.EndDeviceBrand{} })
+		brand, err := s.retrieve(hit, "BrandJSON", func() any { return &ttnpb.EndDeviceBrand{} })
 		if err != nil {
 			return nil, err
 		}
@@ -165,7 +165,7 @@ func (s *bleveStore) GetModels(req store.GetModelsRequest) (*store.GetModelsResp
 
 	models := make([]*ttnpb.EndDeviceModel, 0, len(result.Hits))
 	for _, hit := range result.Hits {
-		model, err := s.retrieve(hit, "ModelJSON", func() interface{} { return &ttnpb.EndDeviceModel{} })
+		model, err := s.retrieve(hit, "ModelJSON", func() any { return &ttnpb.EndDeviceModel{} })
 		if err != nil {
 			return nil, err
 		}
@@ -233,7 +233,7 @@ func (s *bleveStore) GetTemplate(req *ttnpb.GetTemplateRequest, _ *store.EndDevi
 			BrandId: brandID,
 		}
 
-		model, err := s.retrieve(result.Hits[0], "ProfileJSON", func() interface{} { return &store.EndDeviceProfile{} })
+		model, err := s.retrieve(result.Hits[0], "ProfileJSON", func() any { return &store.EndDeviceProfile{} })
 		if err != nil {
 			return nil, err
 		}

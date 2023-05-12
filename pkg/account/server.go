@@ -90,7 +90,7 @@ func (s *server) configFromContext(ctx context.Context) *oauth.Config {
 	return &s.config
 }
 
-func (s *server) Printf(format string, v ...interface{}) {
+func (s *server) Printf(format string, v ...any) {
 	log.FromContext(s.c.Context()).Warnf(format, v...)
 }
 

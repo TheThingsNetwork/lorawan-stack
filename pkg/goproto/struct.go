@@ -57,7 +57,7 @@ func createSerializationState(opts ...Option) (*serializationState, error) {
 }
 
 // Map returns the Struct proto as a map[string]interface{}.
-func Map(p *structpb.Struct, opts ...Option) (map[string]interface{}, error) {
+func Map(p *structpb.Struct, opts ...Option) (map[string]any, error) {
 	if p == nil || len(p.Fields) == 0 {
 		return nil, nil
 	}
@@ -65,7 +65,7 @@ func Map(p *structpb.Struct, opts ...Option) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	m := make(map[string]interface{}, len(p.Fields))
+	m := make(map[string]any, len(p.Fields))
 	for k, v := range p.Fields {
 		if v == nil {
 			continue
@@ -80,7 +80,7 @@ func Map(p *structpb.Struct, opts ...Option) (map[string]interface{}, error) {
 }
 
 // Slice returns the ListValue proto as a []interface{}.
-func Slice(l *structpb.ListValue, opts ...Option) ([]interface{}, error) {
+func Slice(l *structpb.ListValue, opts ...Option) ([]any, error) {
 	if l == nil || len(l.Values) == 0 {
 		return nil, nil
 	}
@@ -88,7 +88,7 @@ func Slice(l *structpb.ListValue, opts ...Option) ([]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	s := make([]interface{}, len(l.Values))
+	s := make([]any, len(l.Values))
 	for i, v := range l.Values {
 		gv, err := Interface(v, state.Recurse())
 		if err != nil {
@@ -100,7 +100,7 @@ func Slice(l *structpb.ListValue, opts ...Option) ([]interface{}, error) {
 }
 
 // Interface returns the Value proto as an interface{}.
-func Interface(v *structpb.Value, opts ...Option) (interface{}, error) {
+func Interface(v *structpb.Value, opts ...Option) (any, error) {
 	switch v := v.GetKind().(type) {
 	case *structpb.Value_NullValue:
 		return nil, nil
@@ -120,7 +120,7 @@ func Interface(v *structpb.Value, opts ...Option) (interface{}, error) {
 }
 
 // Struct returns the map as a Struct proto.
-func Struct(m map[string]interface{}, opts ...Option) (*structpb.Struct, error) {
+func Struct(m map[string]any, opts ...Option) (*structpb.Struct, error) {
 	state, err := createSerializationState(opts...)
 	if err != nil {
 		return nil, err
@@ -139,7 +139,7 @@ func Struct(m map[string]interface{}, opts ...Option) (*structpb.Struct, error) 
 }
 
 // List returns the slice as a ListValue proto.
-func List(s []interface{}, opts ...Option) (*structpb.ListValue, error) {
+func List(s []any, opts ...Option) (*structpb.ListValue, error) {
 	state, err := createSerializationState(opts...)
 	if err != nil {
 		return nil, err
@@ -178,7 +178,7 @@ func valueFromReflect(rv reflect.Value, opts ...Option) (*structpb.Value, error)
 		if k == reflect.Slice && rv.IsNil() {
 			return &structpb.Value{Kind: &structpb.Value_NullValue{}}, nil
 		}
-		s := make([]interface{}, rv.Len())
+		s := make([]any, rv.Len())
 		for i := 0; i < rv.Len(); i++ {
 			s[i] = rv.Index(i).Interface()
 		}
@@ -192,7 +192,7 @@ func valueFromReflect(rv reflect.Value, opts ...Option) (*structpb.Value, error)
 		if rv.IsNil() {
 			return &structpb.Value{Kind: &structpb.Value_NullValue{}}, nil
 		}
-		m := make(map[string]interface{}, rv.Len())
+		m := make(map[string]any, rv.Len())
 		for _, key := range rv.MapKeys() {
 			m[fmt.Sprint(key.Interface())] = rv.MapIndex(key).Interface()
 		}
@@ -242,7 +242,7 @@ func valueFromReflect(rv reflect.Value, opts ...Option) (*structpb.Value, error)
 }
 
 // Value returns the value as a Value proto.
-func Value(v interface{}, opts ...Option) (*structpb.Value, error) {
+func Value(v any, opts ...Option) (*structpb.Value, error) {
 	if v == nil {
 		return &structpb.Value{Kind: &structpb.Value_NullValue{}}, nil
 	}

@@ -109,21 +109,21 @@ func TestWeb(t *testing.T) {
 
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 
-	mustMarshal := func(b []byte, err error) []byte { return test.Must(b, err).([]byte) }
-	marshalJSON := func(v interface{}) string {
+	mustMarshal := func(b []byte, err error) []byte { return test.Must(b, err) }
+	marshalJSON := func(v any) string {
 		return string(mustMarshal(json.MarshalIndent(v, "", "\t")))
 	}
 	marshalText := func(v encoding.TextMarshaler) string {
 		return string(mustMarshal(v.MarshalText()))
 	}
 	semtechUDPConfig := func(gtw *ttnpb.Gateway) string {
-		return marshalJSON(test.Must(semtechudp.Build(gtw, fps)).(*semtechudp.Config))
+		return marshalJSON(test.Must(semtechudp.Build(gtw, fps)))
 	}
 	cpfLoradConfig := func(gtw *ttnpb.Gateway) string {
-		return marshalJSON(test.Must(cpf.BuildLorad(gtw, fps)).(*cpf.LoradConfig))
+		return marshalJSON(test.Must(cpf.BuildLorad(gtw, fps)))
 	}
 	cpfLorafwdConfig := func(gtw *ttnpb.Gateway) string {
-		return marshalText(test.Must(cpf.BuildLorafwd(gtw)).(*cpf.LorafwdConfig))
+		return marshalText(test.Must(cpf.BuildLorafwd(gtw)))
 	}
 
 	t.Run("Authorization", func(t *testing.T) {
@@ -332,21 +332,21 @@ func TestGRPC(t *testing.T) {
 		}
 	})
 
-	mustMarshal := func(b []byte, err error) []byte { return test.Must(b, err).([]byte) }
-	marshalJSON := func(v interface{}) string {
+	mustMarshal := func(b []byte, err error) []byte { return test.Must(b, err) }
+	marshalJSON := func(v any) string {
 		return string(mustMarshal(json.Marshal(v)))
 	}
 	marshalText := func(v encoding.TextMarshaler) string {
 		return string(mustMarshal(v.MarshalText()))
 	}
 	semtechUDPConfig := func(gtw *ttnpb.Gateway) string {
-		return marshalJSON(test.Must(semtechudp.Build(gtw, fps)).(*semtechudp.Config))
+		return marshalJSON(test.Must(semtechudp.Build(gtw, fps)))
 	}
 	cpfLoradConfig := func(gtw *ttnpb.Gateway) string {
-		return marshalJSON(test.Must(cpf.BuildLorad(gtw, fps)).(*cpf.LoradConfig))
+		return marshalJSON(test.Must(cpf.BuildLorad(gtw, fps)))
 	}
 	cpfLorafwdConfig := func(gtw *ttnpb.Gateway) string {
-		return marshalText(test.Must(cpf.BuildLorafwd(gtw)).(*cpf.LorafwdConfig))
+		return marshalText(test.Must(cpf.BuildLorafwd(gtw)))
 	}
 
 	t.Run("Request", func(t *testing.T) {

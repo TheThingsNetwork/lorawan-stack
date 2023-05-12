@@ -114,8 +114,8 @@ func (e *Error) GRPCStatus() *status.Status {
 // UnaryServerInterceptor makes sure that returned TTN errors contain a CorrelationID.
 func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 	return func(
-		ctx context.Context, req interface{}, _ *grpc.UnaryServerInfo, handler grpc.UnaryHandler,
-	) (interface{}, error) {
+		ctx context.Context, req any, _ *grpc.UnaryServerInfo, handler grpc.UnaryHandler,
+	) (any, error) {
 		res, err := handler(ctx, req)
 		if ttnErr, ok := From(err); ok {
 			err = ttnErr
@@ -127,7 +127,7 @@ func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 // StreamServerInterceptor makes sure that returned TTN errors contain a CorrelationID.
 func StreamServerInterceptor() grpc.StreamServerInterceptor {
 	return func(
-		srv interface{}, stream grpc.ServerStream, _ *grpc.StreamServerInfo, handler grpc.StreamHandler,
+		srv any, stream grpc.ServerStream, _ *grpc.StreamServerInfo, handler grpc.StreamHandler,
 	) error {
 		err := handler(srv, stream)
 		if ttnErr, ok := From(err); ok {
@@ -142,7 +142,7 @@ func UnaryClientInterceptor() grpc.UnaryClientInterceptor {
 	return func(
 		ctx context.Context,
 		method string,
-		req, reply interface{},
+		req, reply any,
 		cc *grpc.ClientConn,
 		invoker grpc.UnaryInvoker,
 		opts ...grpc.CallOption,
@@ -159,7 +159,7 @@ type wrappedStream struct {
 	grpc.ClientStream
 }
 
-func (w wrappedStream) SendMsg(m interface{}) error {
+func (w wrappedStream) SendMsg(m any) error {
 	err := w.ClientStream.SendMsg(m)
 	if ttnErr, ok := From(err); ok {
 		return ttnErr
@@ -167,7 +167,7 @@ func (w wrappedStream) SendMsg(m interface{}) error {
 	return err
 }
 
-func (w wrappedStream) RecvMsg(m interface{}) error {
+func (w wrappedStream) RecvMsg(m any) error {
 	err := w.ClientStream.RecvMsg(m)
 	if ttnErr, ok := From(err); ok {
 		return ttnErr

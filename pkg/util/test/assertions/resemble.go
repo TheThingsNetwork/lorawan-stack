@@ -42,7 +42,7 @@ func lastLine(s string) string {
 }
 
 // ShouldResemble wraps assertions.ShouldResemble and prepends a diff if assertion fails.
-func ShouldResemble(actual interface{}, expected ...interface{}) (message string) {
+func ShouldResemble(actual any, expected ...any) (message string) {
 	if message := need(1, expected); message != success {
 		return message
 	}
@@ -50,7 +50,7 @@ func ShouldResemble(actual interface{}, expected ...interface{}) (message string
 }
 
 // ShouldNotResemble receives exactly two parameters and does an inverse deep equal check (see test.DiffEqual).
-func ShouldNotResemble(actual interface{}, expected ...interface{}) string {
+func ShouldNotResemble(actual any, expected ...any) string {
 	if message := need(1, expected); message != success {
 		return message
 	}
@@ -61,7 +61,7 @@ func ShouldNotResemble(actual interface{}, expected ...interface{}) string {
 }
 
 // ShouldResembleFields is same as ShouldResemble, but only compares the specified fields for 2 given SetFielders.
-func ShouldResembleFields(actual interface{}, expected ...interface{}) (message string) {
+func ShouldResembleFields(actual any, expected ...any) (message string) {
 	if len(expected) < 1 {
 		return fmt.Sprintf(needAtLeastValues, 1, len(expected))
 	}
@@ -88,7 +88,7 @@ func ShouldResembleFields(actual interface{}, expected ...interface{}) (message 
 			return fmt.Sprintf(needStringCompatibleOrArrayOrSlice, p)
 		}
 	}
-	selectFields := func(v interface{}) (interface{}, string) {
+	selectFields := func(v any) (any, string) {
 		t := reflect.TypeOf(v)
 		if t.Kind() != reflect.Ptr {
 			return nil, fmt.Sprintf(needPointer, v)
@@ -119,12 +119,12 @@ func ShouldResembleFields(actual interface{}, expected ...interface{}) (message 
 }
 
 // ShouldHaveEmptyDiff compares the test.Diff of values.
-func ShouldHaveEmptyDiff(actual interface{}, expected ...interface{}) (message string) {
+func ShouldHaveEmptyDiff(actual any, expected ...any) (message string) {
 	return test.Diff(actual, expected[0])
 }
 
 // ShouldNotHaveEmptyDiff compares the test.Diff of values.
-func ShouldNotHaveEmptyDiff(actual interface{}, expected ...interface{}) (message string) {
+func ShouldNotHaveEmptyDiff(actual any, expected ...any) (message string) {
 	if message = need(1, expected); message != success {
 		return
 	}

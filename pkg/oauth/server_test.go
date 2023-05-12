@@ -183,7 +183,7 @@ func TestOAuthFlow(t *testing.T) {
 		UseCookie        *http.Cookie
 		Method           string
 		Path             string
-		Body             interface{}
+		Body             any
 		ExpectedCode     int
 		ExpectedRedirect string
 		ExpectedBody     string
@@ -577,7 +577,7 @@ func TestTokenExchange(t *testing.T) {
 		StoreCheck   func(*testing.T, *mockStore)
 		Method       string
 		Path         string
-		Body         interface{}
+		Body         any
 		RequestSetup func(*http.Request)
 		ExpectedCode int
 		ExpectedBody string

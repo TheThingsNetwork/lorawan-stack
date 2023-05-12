@@ -117,7 +117,7 @@ func TestStackOverflow(t *testing.T) {
 	as, err := e.Run(ctx, script, "test")
 	a.So(err, should.BeNil)
 
-	m := make(map[string]interface{})
+	m := make(map[string]any)
 	err = as(&m)
 	a.So(err, should.BeNil)
 

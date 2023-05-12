@@ -203,7 +203,7 @@ func TestGetFrequencyPlan(t *testing.T) {
 	for _, tc := range []struct {
 		Name              string
 		SetupRequest      func(*http.Request)
-		ErrorAssertion    func(actual interface{}, expected ...interface{}) string
+		ErrorAssertion    func(actual any, expected ...any) string
 		ResponseAssertion func(*assertions.Assertion, *httptest.ResponseRecorder) bool
 	}{
 		{

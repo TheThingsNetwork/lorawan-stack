@@ -288,7 +288,7 @@ var (
 			if err != nil {
 				return err
 			}
-			var res interface{}
+			var res any
 			if id == nil {
 				res, err = ttnpb.NewPbaClient(pba).GetHomeNetworkDefaultRoutingPolicy(ctx, ttnpb.Empty)
 			} else {

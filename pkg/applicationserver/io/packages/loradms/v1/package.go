@@ -344,7 +344,7 @@ func hexPtr(x objects.Hex) *objects.Hex {
 	return &x
 }
 
-func toStruct(i interface{}) (*structpb.Struct, error) {
+func toStruct(i any) (*structpb.Struct, error) {
 	b, err := jsonpb.TTN().Marshal(i)
 	if err != nil {
 		return nil, err
