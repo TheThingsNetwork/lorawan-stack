@@ -52,6 +52,20 @@ func (v *ApplicationDownlink_ClassBC) FieldIsZero(p string) bool {
 }
 
 // FieldIsZero returns whether path p is zero.
+func (v *ApplicationDownlink_ConfirmedRetry) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "attempt":
+		return v.Attempt == 0
+	case "max_attempts":
+		return v.MaxAttempts.GetValue() == 0
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
 func (v *ApplicationDownlink) FieldIsZero(p string) bool {
 	if v == nil {
 		return true
@@ -81,6 +95,12 @@ func (v *ApplicationDownlink) FieldIsZero(p string) bool {
 		return v.Priority == 0
 	case "session_key_id":
 		return v.SessionKeyId == nil
+	case "confirmed_retry":
+		return v.ConfirmedRetry == nil
+	case "confirmed_retry.attempt":
+		return v.ConfirmedRetry.FieldIsZero("attempt")
+	case "confirmed_retry.max_attempts":
+		return v.ConfirmedRetry.FieldIsZero("max_attempts")
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }
