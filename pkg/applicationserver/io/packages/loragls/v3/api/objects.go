@@ -47,7 +47,7 @@ type Uplink struct {
 
 // MarshalJSON implements json.Marshaler.
 func (u *Uplink) MarshalJSON() ([]byte, error) {
-	return json.Marshal([]interface{}{
+	return json.Marshal([]any{
 		u.GatewayID,
 		u.AntennaID,
 		u.TDOA,
@@ -65,7 +65,7 @@ func (u *Uplink) UnmarshalJSON(b []byte) error {
 	if n := len(components); n != 5 {
 		return fmt.Errorf("invalid field count %d", n)
 	}
-	for i, c := range []interface{}{
+	for i, c := range []any{
 		&u.GatewayID,
 		&u.AntennaID,
 		&u.TDOA,

@@ -24,9 +24,9 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type configYml map[string]interface{}
+type configYml map[string]any
 
-func (c configYml) add(key string, value interface{}) {
+func (c configYml) add(key string, value any) {
 	k := strings.SplitN(key, ".", 2)
 	if len(k) > 1 {
 		sub, ok := c[k[0]]

@@ -97,7 +97,7 @@ func contextRoot(ctx context.Context) context.Context {
 // If the arguments are valid and the actual context has the expected context as
 // parent, this function returns an empty string.
 // Otherwise, it returns a string describing the error.
-func ShouldHaveParentContext(actual interface{}, expected ...interface{}) string {
+func ShouldHaveParentContext(actual any, expected ...any) string {
 	if len(expected) != 1 {
 		return fmt.Sprintf(needExactValues, 1, len(expected))
 	}
@@ -122,7 +122,7 @@ func ShouldHaveParentContext(actual interface{}, expected ...interface{}) string
 // If the arguments are valid and the actual context has the expected context as
 // parent or if they are equal, this function returns an empty string.
 // Otherwise, it returns a string describing the error.
-func ShouldHaveParentContextOrEqual(actual interface{}, expected ...interface{}) string {
+func ShouldHaveParentContextOrEqual(actual any, expected ...any) string {
 	if len(expected) != 1 {
 		return fmt.Sprintf(needExactValues, 1, len(expected))
 	}

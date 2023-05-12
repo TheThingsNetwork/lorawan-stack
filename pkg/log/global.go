@@ -42,32 +42,32 @@ func Fatal(ctx context.Context, msg string) {
 }
 
 // Debugf calls FromContext(ctx).Debugf
-func Debugf(ctx context.Context, msg string, v ...interface{}) {
+func Debugf(ctx context.Context, msg string, v ...any) {
 	FromContext(ctx).Debugf(msg, v...)
 }
 
 // Infof calls FromContext(ctx).Infof
-func Infof(ctx context.Context, msg string, v ...interface{}) {
+func Infof(ctx context.Context, msg string, v ...any) {
 	FromContext(ctx).Infof(msg, v...)
 }
 
 // Warnf calls FromContext(ctx).Warnf
-func Warnf(ctx context.Context, msg string, v ...interface{}) {
+func Warnf(ctx context.Context, msg string, v ...any) {
 	FromContext(ctx).Warnf(msg, v...)
 }
 
 // Errorf calls FromContext(ctx).Errorf
-func Errorf(ctx context.Context, msg string, v ...interface{}) {
+func Errorf(ctx context.Context, msg string, v ...any) {
 	FromContext(ctx).Errorf(msg, v...)
 }
 
 // Fatalf calls FromContext(ctx).Fatalf
-func Fatalf(ctx context.Context, msg string, v ...interface{}) {
+func Fatalf(ctx context.Context, msg string, v ...any) {
 	FromContext(ctx).Fatalf(msg, v...)
 }
 
 // WithField calls FromContext(ctx).WithField
-func WithField(ctx context.Context, k string, v interface{}) Interface {
+func WithField(ctx context.Context, k string, v any) Interface {
 	return FromContext(ctx).WithField(k, v)
 }
 

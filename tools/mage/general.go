@@ -20,7 +20,7 @@ import (
 	"github.com/magefile/mage/mg"
 )
 
-var initDeps []interface{}
+var initDeps []any
 
 // Init initializes the tooling.
 func Init() {

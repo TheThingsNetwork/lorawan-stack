@@ -80,12 +80,12 @@ func TestFields(t *testing.T) {
 	a.So(ok, should.BeTrue)
 	a.So(got, should.Equal, 20)
 
-	a.So(i.Fields(), should.Resemble, map[string]interface{}{
+	a.So(i.Fields(), should.Resemble, map[string]any{
 		"a": 10,
 		"b": 20,
 	})
 
-	a.So(g.Fields(), should.Resemble, map[string]interface{}{
+	a.So(g.Fields(), should.Resemble, map[string]any{
 		"a": 10,
 	})
 }

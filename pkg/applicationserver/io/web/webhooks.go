@@ -60,7 +60,7 @@ var errRequest = errors.DefineUnavailable("request", "request")
 
 func createRequestErrorDetails(req *http.Request, res *http.Response) []proto.Message {
 	ctx := req.Context()
-	m := map[string]interface{}{
+	m := map[string]any{
 		"webhook_id": webhookIDFromContext(ctx).WebhookId,
 		"url":        req.URL.String(),
 	}
@@ -504,7 +504,7 @@ func expandVariables(u string, up *ttnpb.ApplicationUp) (*url.URL, error) {
 	if err != nil {
 		return nil, err
 	}
-	expanded, err := tmpl.Expand(map[string]interface{}{
+	expanded, err := tmpl.Expand(map[string]any{
 		"appID":         up.EndDeviceIds.ApplicationIds.ApplicationId,
 		"applicationID": up.EndDeviceIds.ApplicationIds.ApplicationId,
 		"appEUI":        joinEUI,

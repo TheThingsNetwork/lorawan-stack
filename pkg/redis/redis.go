@@ -186,13 +186,13 @@ func (c Config) makeDialer() func(ctx context.Context, network, addr string) (ne
 	}
 }
 
-type logFunc func(context.Context, string, ...interface{})
+type logFunc func(context.Context, string, ...any)
 
-func (f logFunc) Printf(ctx context.Context, format string, v ...interface{}) {
+func (f logFunc) Printf(ctx context.Context, format string, v ...any) {
 	f(ctx, format, v...)
 }
 
-func debugLogFunc(ctx context.Context, format string, v ...interface{}) {
+func debugLogFunc(ctx context.Context, format string, v ...any) {
 	log.FromContext(ctx).WithField("origin", "go-redis").Debugf(format, v...)
 }
 
@@ -462,7 +462,7 @@ func initTaskGroup(ctx context.Context, r redis.Cmdable, group, k string) error 
 // addTask adds a task identified by payload with timestamp startAt to the stream at InputTaskKey(k).
 // maxLen is the approximate length of the stream, to which it may be trimmed.
 func addTask(ctx context.Context, r redis.Cmdable, k string, maxLen int64, payload string, startAt time.Time, replace bool) error {
-	m := make(map[string]interface{}, 2)
+	m := make(map[string]any, 2)
 	m[payloadKey] = payload
 	if replace {
 		m[replaceKey] = replace
@@ -656,7 +656,7 @@ func (q *TaskQueue) Init(ctx context.Context) error {
 // Close closes the TaskQueue.
 func (q *TaskQueue) Close(ctx context.Context) error {
 	_, err := q.Redis.Pipelined(ctx, func(p redis.Pipeliner) error {
-		q.consumerIDs.Range(func(k, v interface{}) bool {
+		q.consumerIDs.Range(func(k, v any) bool {
 			p.XGroupDelConsumer(ctx, InputTaskKey(q.Key), q.Group, k.(string))
 			p.XGroupDelConsumer(ctx, ReadyTaskKey(q.Key), q.Group, k.(string))
 			return true
@@ -732,7 +732,7 @@ func milliseconds(d time.Duration) int64 {
 func DeduplicateProtos(
 	ctx context.Context, r redis.Scripter, k string, window time.Duration, msgs ...proto.Message,
 ) (bool, error) {
-	args := make([]interface{}, 0, 1+len(msgs))
+	args := make([]any, 0, 1+len(msgs))
 	args = append(args, milliseconds(window))
 	for _, msg := range msgs {
 		s, err := MarshalProto(msg)

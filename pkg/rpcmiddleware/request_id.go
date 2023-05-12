@@ -44,7 +44,7 @@ func extractOrGenerateRequestID(ctx context.Context) (context.Context, error) {
 
 // RequestIDUnaryServerInterceptor returns a new unary server interceptor that inserts Request IDs if not present.
 func RequestIDUnaryServerInterceptor() grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 		ctx, err := extractOrGenerateRequestID(ctx)
 		if err != nil {
 			return nil, err
@@ -55,7 +55,7 @@ func RequestIDUnaryServerInterceptor() grpc.UnaryServerInterceptor {
 
 // RequestIDStreamServerInterceptor returns a new streaming server interceptor that that inserts Request IDs if not present.
 func RequestIDStreamServerInterceptor() grpc.StreamServerInterceptor {
-	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+	return func(srv any, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 		ctx, err := extractOrGenerateRequestID(stream.Context())
 		if err != nil {
 			return err

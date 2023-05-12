@@ -97,7 +97,7 @@ var (
 	errNonZeroPath = errors.DefineInvalidArgument("non_zero_path", "path `{path}` is not zero")
 )
 
-func validateMessage(ctx context.Context, fullMethod string, msg interface{}) error {
+func validateMessage(ctx context.Context, fullMethod string, msg any) error {
 	var paths []string
 	switch v := msg.(type) {
 	case interface {
@@ -198,7 +198,7 @@ func validateMessage(ctx context.Context, fullMethod string, msg interface{}) er
 // RegisterAllowedFieldMaskPaths) and the message implements GetFieldMask() fieldmaskpb.FieldMask
 // then the field mask paths are validated according to the registered list.
 func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 		if err := validateMessage(ctx, info.FullMethod, req); err != nil {
 			return nil, err
 		}
@@ -211,7 +211,7 @@ type recvWrapper struct {
 	fullMethod string
 }
 
-func (s *recvWrapper) RecvMsg(msg interface{}) error {
+func (s *recvWrapper) RecvMsg(msg any) error {
 	if err := s.ServerStream.RecvMsg(msg); err != nil {
 		return err
 	}
@@ -242,7 +242,7 @@ func (s *recvWrapper) RecvMsg(msg interface{}) error {
 // RegisterAllowedFieldMaskPaths) and the message implements GetFieldMask() fieldmaskpb.FieldMask
 // then the field mask paths are validated according to the registered list.
 func StreamServerInterceptor() grpc.StreamServerInterceptor {
-	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+	return func(srv any, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 		return handler(srv, &recvWrapper{
 			ServerStream: stream,
 			fullMethod:   info.FullMethod,

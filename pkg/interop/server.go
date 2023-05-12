@@ -233,7 +233,7 @@ func (s *Server) handle() http.Handler {
 			return
 		}
 
-		var msg interface{}
+		var msg any
 		switch header.MessageType {
 		case MessageTypeJoinReq, MessageTypeRejoinReq:
 			msg = &JoinReq{}
@@ -251,7 +251,7 @@ func (s *Server) handle() http.Handler {
 			return
 		}
 
-		var ans interface{}
+		var ans any
 		switch req := msg.(type) {
 		case *JoinReq:
 			ans, err = s.js.JoinRequest(ctx, req)
@@ -280,7 +280,7 @@ func (s *Server) handle() http.Handler {
 
 func logRPCError(logger log.Interface, err error, msg string) {
 	logger = logger.WithError(err)
-	var printLog func(args ...interface{})
+	var printLog func(args ...any)
 	switch {
 	case errors.IsNotFound(err), errors.IsInvalidArgument(err), errors.IsCanceled(err):
 		printLog = logger.Debug

@@ -29,7 +29,7 @@ import (
 // retry attempt will only occur if any of the validators define the error as a trigger.
 func UnaryClientInterceptor(opts ...Option) grpc.UnaryClientInterceptor {
 	callOpts := evaluateClientOpt(opts...)
-	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+	return func(ctx context.Context, method string, req, reply any, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 		var md metadata.MD
 		var err error
 		logger := log.FromContext(ctx)

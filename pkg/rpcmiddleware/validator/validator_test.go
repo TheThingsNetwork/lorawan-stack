@@ -80,7 +80,7 @@ func (m *msgWithFieldMask) FieldIsZero(s string) bool {
 	return v
 }
 
-func handler(ctx context.Context, req interface{}) (interface{}, error) {
+func handler(ctx context.Context, req any) (any, error) {
 	res := req.(interface{ getResult() *testSubject }).getResult()
 	res.handlerCalled = true
 	return res, nil
@@ -201,7 +201,7 @@ func (ss *ss) Context() context.Context {
 	return ss.ctx
 }
 
-func (ss *ss) RecvMsg(_ interface{}) error {
+func (ss *ss) RecvMsg(_ any) error {
 	return nil
 }
 
@@ -227,7 +227,7 @@ func TestStreamServerInterceptor(t *testing.T) {
 
 	intercept := StreamServerInterceptor()
 
-	err := intercept(nil, &ss{ctx: ctx}, info, func(_ interface{}, stream grpc.ServerStream) error {
+	err := intercept(nil, &ss{ctx: ctx}, info, func(_ any, stream grpc.ServerStream) error {
 		var subject interface{ getResult() *testSubject }
 
 		subject = &testSubject{}

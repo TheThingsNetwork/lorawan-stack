@@ -22,8 +22,8 @@ import (
 
 // JSONCodec can be used to override the jsonpb codec.
 var JSONCodec interface {
-	Marshal(v interface{}) ([]byte, error)
-	Unmarshal(data []byte, v interface{}) error
+	Marshal(v any) ([]byte, error)
+	Unmarshal(data []byte, v any) error
 } = jsonpb.TTN()
 
 // MarshalJSON implements json.Marshaler.

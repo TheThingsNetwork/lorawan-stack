@@ -17,17 +17,17 @@ package log
 
 // Interface is the interface for logging TTN.
 type Interface interface {
-	Debug(args ...interface{})
-	Info(args ...interface{})
-	Warn(args ...interface{})
-	Error(args ...interface{})
-	Fatal(args ...interface{})
-	Debugf(msg string, v ...interface{})
-	Infof(msg string, v ...interface{})
-	Warnf(msg string, v ...interface{})
-	Errorf(msg string, v ...interface{})
-	Fatalf(msg string, v ...interface{})
-	WithField(string, interface{}) Interface
+	Debug(args ...any)
+	Info(args ...any)
+	Warn(args ...any)
+	Error(args ...any)
+	Fatal(args ...any)
+	Debugf(msg string, v ...any)
+	Infof(msg string, v ...any)
+	Warnf(msg string, v ...any)
+	Errorf(msg string, v ...any)
+	Fatalf(msg string, v ...any)
+	WithField(string, any) Interface
 	WithFields(Fielder) Interface
 	WithError(error) Interface
 }

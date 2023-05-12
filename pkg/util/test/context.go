@@ -64,12 +64,12 @@ func MustTFromContext(ctx context.Context) *testing.T {
 }
 
 // ContextWithCounterRef adds the given counter to ctx under key specified.
-func ContextWithCounterRef(ctx context.Context, key interface{}, i *int64) context.Context {
+func ContextWithCounterRef(ctx context.Context, key any, i *int64) context.Context {
 	return context.WithValue(ctx, key, i)
 }
 
 // IncrementContextCounter increments the counter in the context.
-func IncrementContextCounter(ctx context.Context, key interface{}, v int64) (int64, bool) {
+func IncrementContextCounter(ctx context.Context, key any, v int64) (int64, bool) {
 	i, ok := ctx.Value(key).(*int64)
 	if !ok {
 		return 0, false
@@ -78,7 +78,7 @@ func IncrementContextCounter(ctx context.Context, key interface{}, v int64) (int
 }
 
 // MustIncrementContextCounter increments the counter in the context, and panics if it is not present in the context.
-func MustIncrementContextCounter(ctx context.Context, key interface{}, v int64) int64 {
+func MustIncrementContextCounter(ctx context.Context, key any, v int64) int64 {
 	i, ok := IncrementContextCounter(ctx, key, v)
 	if !ok {
 		panic("counter not present in the context")

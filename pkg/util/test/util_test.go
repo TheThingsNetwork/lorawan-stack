@@ -28,7 +28,7 @@ import (
 
 func TestMust(t *testing.T) {
 	for i, tc := range []struct {
-		Value       interface{}
+		Value       any
 		Error       error
 		ShouldPanic bool
 	}{

@@ -61,7 +61,7 @@ func convertError(err error) error {
 }
 
 // Run executes the Javascript script and returns the output.
-func (j *js) Run(ctx context.Context, script, fn string, params ...interface{}) (as func(target interface{}) error, err error) {
+func (j *js) Run(ctx context.Context, script, fn string, params ...any) (as func(target any) error, err error) {
 	run := func(vm *goja.Runtime) (goja.Value, error) {
 		return vm.RunString(script)
 	}
@@ -69,7 +69,7 @@ func (j *js) Run(ctx context.Context, script, fn string, params ...interface{}) 
 }
 
 // Compile compiles the Javascript script and returns the compiled program.
-func (j *js) Compile(ctx context.Context, script string) (run func(context.Context, string, ...interface{}) (func(interface{}) error, error), err error) {
+func (j *js) Compile(ctx context.Context, script string) (run func(context.Context, string, ...any) (func(any) error, error), err error) {
 	defer trace.StartRegion(ctx, "compile javascript").End()
 
 	start := time.Now()
@@ -87,7 +87,7 @@ func (j *js) Compile(ctx context.Context, script string) (run func(context.Conte
 		return nil, err
 	}
 
-	return func(ctx context.Context, fn string, params ...interface{}) (func(interface{}) error, error) {
+	return func(ctx context.Context, fn string, params ...any) (func(any) error, error) {
 		run := func(vm *goja.Runtime) (goja.Value, error) {
 			return vm.RunProgram(program)
 		}
@@ -95,7 +95,7 @@ func (j *js) Compile(ctx context.Context, script string) (run func(context.Conte
 	}, nil
 }
 
-func (j *js) run(ctx context.Context, f func(*goja.Runtime) (goja.Value, error), fn string, params ...interface{}) (as func(target interface{}) error, err error) {
+func (j *js) run(ctx context.Context, f func(*goja.Runtime) (goja.Value, error), fn string, params ...any) (as func(target any) error, err error) {
 	defer trace.StartRegion(ctx, "run javascript").End()
 
 	start := time.Now()
@@ -147,7 +147,7 @@ func (j *js) run(ctx context.Context, f func(*goja.Runtime) (goja.Value, error),
 		return nil, convertError(err)
 	}
 
-	return func(target interface{}) (err error) {
+	return func(target any) (err error) {
 		defer func() {
 			if caught := recover(); caught != nil {
 				switch val := caught.(type) {

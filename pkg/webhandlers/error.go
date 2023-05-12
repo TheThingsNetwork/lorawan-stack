@@ -145,7 +145,7 @@ func Error(w http.ResponseWriter, r *http.Request, err error) {
 
 // JSON encodes the provided message as JSON. When a marshalling error
 // is encountered, Error is used in order to handle the error.
-func JSON(w http.ResponseWriter, r *http.Request, i interface{}) {
+func JSON(w http.ResponseWriter, r *http.Request, i any) {
 	b, err := json.Marshal(i)
 	if err != nil {
 		Error(w, r, err)

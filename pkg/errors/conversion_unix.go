@@ -22,10 +22,10 @@ import (
 	"syscall"
 )
 
-func syscallErrorAttributes(err error) []interface{} {
+func syscallErrorAttributes(err error) []any {
 	if matched := (syscall.Errno)(0); errors.As(err, &matched) {
 		// syscall.Errono do not contain any sensitive information and are safe to render.
-		return []interface{}{
+		return []any{
 			"error", matched.Error(),
 			"timeout", matched.Timeout(),
 		}

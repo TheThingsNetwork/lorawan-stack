@@ -32,7 +32,7 @@ var errFormat = errors.DefineInvalidArgument("format", "invalid format `{input}`
 
 // stringToTimeHookFunc is a hook for mapstructure that decodes strings to time.Time.
 func stringToTimeHookFunc(layout string) mapstructure.DecodeHookFuncType {
-	return func(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+	return func(f reflect.Type, t reflect.Type, data any) (any, error) {
 		if f.Kind() != reflect.String {
 			return data, nil
 		}
@@ -44,7 +44,7 @@ func stringToTimeHookFunc(layout string) mapstructure.DecodeHookFuncType {
 }
 
 // stringSliceToStringMapHookFunc is a hook for mapstructure that decodes []string to map[string]string.
-func stringSliceToStringMapHookFunc(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+func stringSliceToStringMapHookFunc(f reflect.Type, t reflect.Type, data any) (any, error) {
 	if f.Kind() != reflect.Slice || f.Elem().Kind() != reflect.String ||
 		t.Kind() != reflect.Map || t.Elem().Kind() != reflect.String {
 		return data, nil
@@ -64,7 +64,7 @@ func stringSliceToStringMapHookFunc(f reflect.Type, t reflect.Type, data interfa
 
 // stringSliceToStringMapSliceHookFunc is a hook for mapstructure that decodes []string to map[string][]string.
 // For example: [a=b a=c d=e] -> map[string][]string{a:[b c], d:[e]}.
-func stringSliceToStringMapStringSliceHookFunc(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+func stringSliceToStringMapStringSliceHookFunc(f reflect.Type, t reflect.Type, data any) (any, error) {
 	if (f.Kind() != reflect.String && (f.Kind() != reflect.Slice || f.Elem().Kind() != reflect.String)) ||
 		t.Kind() != reflect.Map ||
 		t.Elem().Kind() != reflect.Slice ||
@@ -98,7 +98,7 @@ func stringSliceToStringMapStringSliceHookFunc(f reflect.Type, t reflect.Type, d
 }
 
 // stringSliceToStringHookFunc is a hook for mapstructure that decodes []string to string by picking the first element.
-func stringSliceToStringHookFunc(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+func stringSliceToStringHookFunc(f reflect.Type, t reflect.Type, data any) (any, error) {
 	if f.Kind() != reflect.Slice || f.Elem().Kind() != reflect.String || t.Kind() != reflect.String {
 		return data, nil
 	}
@@ -113,7 +113,7 @@ func stringSliceToStringHookFunc(f reflect.Type, t reflect.Type, data interface{
 }
 
 // stringToStringMapHookFunc is a hook for mapstructure that decodes string to map[string]string.
-func stringToStringMapHookFunc(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+func stringToStringMapHookFunc(f reflect.Type, t reflect.Type, data any) (any, error) {
 	if f.Kind() != reflect.String || t.Kind() != reflect.Map || t.Elem().Kind() != reflect.String {
 		return data, nil
 	}
@@ -134,7 +134,7 @@ func stringToStringMapHookFunc(f reflect.Type, t reflect.Type, data interface{})
 }
 
 // stringToBufferMapHookFunc is a hook for mapstructure that decodes string or []string to map[string][]byte.
-func stringToBufferMapHookFunc(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+func stringToBufferMapHookFunc(f reflect.Type, t reflect.Type, data any) (any, error) {
 	if (f.Kind() != reflect.String && (f.Kind() != reflect.Slice || f.Elem().Kind() != reflect.String)) ||
 		t.Kind() != reflect.Map || t.Elem().Kind() != reflect.Slice || t.Elem().Elem().Kind() != reflect.Uint8 {
 		return data, nil
@@ -165,7 +165,7 @@ func stringToBufferMapHookFunc(f reflect.Type, t reflect.Type, data interface{})
 	return m, nil
 }
 
-func configurableInterfaceHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+func configurableInterfaceHook(f reflect.Type, t reflect.Type, data any) (any, error) {
 	if f.Kind() != reflect.String || !isConfigurableType(t) {
 		return data, nil
 	}
@@ -186,7 +186,7 @@ func configurableInterfaceHook(f reflect.Type, t reflect.Type, data interface{})
 	return rv.Elem().Interface(), nil
 }
 
-func configurableInterfaceSliceHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+func configurableInterfaceSliceHook(f reflect.Type, t reflect.Type, data any) (any, error) {
 	if f.Kind() != reflect.Slice ||
 		f.Elem().Kind() != reflect.String ||
 		t.Kind() != reflect.Slice ||
@@ -218,7 +218,7 @@ func configurableInterfaceSliceHook(f reflect.Type, t reflect.Type, data interfa
 	return res.Interface(), nil
 }
 
-func stringToByteSliceHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+func stringToByteSliceHook(f reflect.Type, t reflect.Type, data any) (any, error) {
 	if f.Kind() != reflect.String || t.Kind() != reflect.Slice || t.Elem().Kind() != reflect.Uint8 {
 		return data, nil
 	}
@@ -232,7 +232,7 @@ func stringToByteSliceHook(f reflect.Type, t reflect.Type, data interface{}) (in
 	return slice, nil
 }
 
-func stringToByteArrayHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+func stringToByteArrayHook(f reflect.Type, t reflect.Type, data any) (any, error) {
 	if f.Kind() != reflect.String || t.Kind() != reflect.Array || t.Elem().Kind() != reflect.Uint8 {
 		return data, nil
 	}
@@ -253,7 +253,7 @@ func stringToByteArrayHook(f reflect.Type, t reflect.Type, data interface{}) (in
 	return rv.Interface(), nil
 }
 
-func stringToTimeDurationPointerHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+func stringToTimeDurationPointerHook(f reflect.Type, t reflect.Type, data any) (any, error) {
 	d := time.Duration(0)
 	if f.Kind() != reflect.String || t != reflect.TypeOf(&d) {
 		return data, nil
@@ -269,7 +269,7 @@ func stringToTimeDurationPointerHook(f reflect.Type, t reflect.Type, data interf
 	return &d, nil
 }
 
-func stringToRxDelayPointerHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+func stringToRxDelayPointerHook(f reflect.Type, t reflect.Type, data any) (any, error) {
 	var enum ttnpb.RxDelay
 	if f.Kind() != reflect.String || t != reflect.TypeOf(&enum) {
 		return data, nil
@@ -288,7 +288,7 @@ func stringToRxDelayPointerHook(f reflect.Type, t reflect.Type, data interface{}
 	return &enum, nil
 }
 
-func stringToEUI64PointerHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+func stringToEUI64PointerHook(f reflect.Type, t reflect.Type, data any) (any, error) {
 	var eui types.EUI64
 	if f.Kind() != reflect.String || t != reflect.TypeOf(&eui) {
 		return data, nil
@@ -303,7 +303,7 @@ func stringToEUI64PointerHook(f reflect.Type, t reflect.Type, data interface{}) 
 	return &eui, nil
 }
 
-func stringToADRAckDelayExponentPointerHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+func stringToADRAckDelayExponentPointerHook(f reflect.Type, t reflect.Type, data any) (any, error) {
 	var enum ttnpb.ADRAckDelayExponent
 	if f.Kind() != reflect.String || t != reflect.TypeOf(&enum) {
 		return data, nil
@@ -322,7 +322,7 @@ func stringToADRAckDelayExponentPointerHook(f reflect.Type, t reflect.Type, data
 	return &enum, nil
 }
 
-func stringToADRAckLimitExponentPointerHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+func stringToADRAckLimitExponentPointerHook(f reflect.Type, t reflect.Type, data any) (any, error) {
 	var enum ttnpb.ADRAckLimitExponent
 	if f.Kind() != reflect.String || t != reflect.TypeOf(&enum) {
 		return data, nil
@@ -341,7 +341,7 @@ func stringToADRAckLimitExponentPointerHook(f reflect.Type, t reflect.Type, data
 	return &enum, nil
 }
 
-func stringToAggregatedDutyCyclePointerHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+func stringToAggregatedDutyCyclePointerHook(f reflect.Type, t reflect.Type, data any) (any, error) {
 	var enum ttnpb.AggregatedDutyCycle
 	if f.Kind() != reflect.String || t != reflect.TypeOf(&enum) {
 		return data, nil

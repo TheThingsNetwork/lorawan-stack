@@ -43,7 +43,7 @@ func (m logWrapper) Fatal(msg string) {
 	m.Interface.Fatal(msg)
 }
 
-func (m logWrapper) WithField(str string, v interface{}) mqttlog.Interface {
+func (m logWrapper) WithField(str string, v any) mqttlog.Interface {
 	return logWrapper{
 		Interface: m.Interface.WithField(str, v),
 	}

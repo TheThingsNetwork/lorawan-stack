@@ -87,7 +87,7 @@ func (Git) selectStaged() error {
 	return nil
 }
 
-var preCommitChecks []interface{}
+var preCommitChecks []any
 
 func (g Git) preCommit() error {
 	if mg.Verbose() {

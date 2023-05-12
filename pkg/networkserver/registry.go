@@ -66,7 +66,7 @@ func DeleteDevice(ctx context.Context, r DeviceRegistry, appID *ttnpb.Applicatio
 
 func logRegistryRPCError(ctx context.Context, err error, msg string) {
 	logger := log.FromContext(ctx).WithError(err)
-	var printLog func(args ...interface{})
+	var printLog func(args ...any)
 	switch {
 	case errors.IsNotFound(err), errors.IsInvalidArgument(err), errors.IsCanceled(err):
 		printLog = logger.Debug

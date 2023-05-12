@@ -83,13 +83,13 @@ func TestAtomicConditionals(t *testing.T) {
 	release.Done()
 	wg.Wait()
 
-	increaseFailures.Range(func(ki interface{}, vi interface{}) bool {
+	increaseFailures.Range(func(ki any, vi any) bool {
 		k, v := ki.(int), vi.(int32)
 		t.Errorf("Value %v exceeded upper bound %v in test %v", v, upperBound, k)
 		return true
 	})
 
-	decreaseFailures.Range(func(ki interface{}, vi interface{}) bool {
+	decreaseFailures.Range(func(ki any, vi any) bool {
 		k, v := ki.(int), vi.(int32)
 		t.Errorf("Value %v exceeded lower bound %v in test %v", v, lowerBound, k)
 		return true
@@ -176,7 +176,7 @@ func testWorkerPool(t *testing.T, minWorkers int, maxWorkers int, queueSize int,
 	wp.Wait()
 
 	var countDone, countToBeDone, countFailed int
-	workDone.Range(func(k, v interface{}) bool {
+	workDone.Range(func(k, v any) bool {
 		_, failed := workFailed.Load(k)
 		a.So(failed, should.BeFalse)
 
@@ -187,7 +187,7 @@ func testWorkerPool(t *testing.T, minWorkers int, maxWorkers int, queueSize int,
 
 		return true
 	})
-	workToBeDone.Range(func(k, v interface{}) bool {
+	workToBeDone.Range(func(k, v any) bool {
 		_, done := workDone.Load(k)
 		a.So(done, should.BeTrue)
 
@@ -195,12 +195,12 @@ func testWorkerPool(t *testing.T, minWorkers int, maxWorkers int, queueSize int,
 
 		return true
 	})
-	workFailed.Range(func(k, v interface{}) bool {
+	workFailed.Range(func(k, v any) bool {
 		countFailed++
 
 		return true
 	})
-	duplicatedWork.Range(func(k, v interface{}) bool {
+	duplicatedWork.Range(func(k, v any) bool {
 		t.Fatalf("Item %v was processed multiple times", k)
 		return true
 	})

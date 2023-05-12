@@ -54,15 +54,15 @@ func (l *ttnGrpcLogger) info(msg string) {
 	l.logger.Debug(msg)
 }
 
-func (l *ttnGrpcLogger) Info(args ...interface{}) {
+func (l *ttnGrpcLogger) Info(args ...any) {
 	l.info(fmt.Sprint(args...))
 }
 
-func (l *ttnGrpcLogger) Infoln(args ...interface{}) {
+func (l *ttnGrpcLogger) Infoln(args ...any) {
 	l.info(fmt.Sprint(args...))
 }
 
-func (l *ttnGrpcLogger) Infof(format string, args ...interface{}) {
+func (l *ttnGrpcLogger) Infof(format string, args ...any) {
 	l.info(fmt.Sprintf(format, args...))
 }
 
@@ -75,39 +75,39 @@ func (l *ttnGrpcLogger) warn(msg string) {
 	l.logger.Warn(msg)
 }
 
-func (l *ttnGrpcLogger) Warning(args ...interface{}) {
+func (l *ttnGrpcLogger) Warning(args ...any) {
 	l.warn(fmt.Sprint(args...))
 }
 
-func (l *ttnGrpcLogger) Warningln(args ...interface{}) {
+func (l *ttnGrpcLogger) Warningln(args ...any) {
 	l.warn(fmt.Sprint(args...))
 }
 
-func (l *ttnGrpcLogger) Warningf(format string, args ...interface{}) {
+func (l *ttnGrpcLogger) Warningf(format string, args ...any) {
 	l.warn(fmt.Sprintf(format, args...))
 }
 
-func (l *ttnGrpcLogger) Error(args ...interface{}) {
+func (l *ttnGrpcLogger) Error(args ...any) {
 	l.logger.Error(fmt.Sprint(args...))
 }
 
-func (l *ttnGrpcLogger) Errorln(args ...interface{}) {
+func (l *ttnGrpcLogger) Errorln(args ...any) {
 	l.logger.Error(fmt.Sprint(args...))
 }
 
-func (l *ttnGrpcLogger) Errorf(format string, args ...interface{}) {
+func (l *ttnGrpcLogger) Errorf(format string, args ...any) {
 	l.logger.Errorf(format, args...)
 }
 
-func (l *ttnGrpcLogger) Fatal(args ...interface{}) {
+func (l *ttnGrpcLogger) Fatal(args ...any) {
 	l.logger.Fatal(fmt.Sprint(args...))
 }
 
-func (l *ttnGrpcLogger) Fatalln(args ...interface{}) {
+func (l *ttnGrpcLogger) Fatalln(args ...any) {
 	l.logger.Fatal(fmt.Sprint(args...))
 }
 
-func (l *ttnGrpcLogger) Fatalf(format string, args ...interface{}) {
+func (l *ttnGrpcLogger) Fatalf(format string, args ...any) {
 	l.logger.Fatalf(format, args...)
 }
 

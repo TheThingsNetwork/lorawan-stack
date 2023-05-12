@@ -88,7 +88,7 @@ func encodeEventMeta(evt events.Event, id *ttnpb.EntityIdentifiers) ([]string, e
 	return append(meta, eventSparseKey, base64.StdEncoding.EncodeToString(rb)), nil
 }
 
-func decodeEventMeta(values map[string]interface{}) (*ttnpb.Event, error) {
+func decodeEventMeta(values map[string]any) (*ttnpb.Event, error) {
 	var (
 		sparseEvent string
 		pb          ttnpb.Event

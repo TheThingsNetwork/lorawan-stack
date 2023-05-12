@@ -46,8 +46,8 @@ func NewCacheKeyService(inner crypto.KeyService, ttl time.Duration, size int) cr
 }
 
 func (c *cacheKeyService) getOrLoad(
-	ctx context.Context, cache crypto.CacheKey, key string, loaderFunc func() (interface{}, error),
-) (interface{}, error) {
+	ctx context.Context, cache crypto.CacheKey, key string, loaderFunc func() (any, error),
+) (any, error) {
 	cacheKey := fmt.Sprintf("%s:%s", cache, key)
 	if val, err := c.cache.Get(cacheKey); err == nil {
 		crypto.RegisterCacheHit(ctx, cache)
@@ -62,7 +62,7 @@ func (c *cacheKeyService) getOrLoad(
 
 func (c *cacheKeyService) Unwrap(ctx context.Context, ciphertext []byte, kekLabel string) ([]byte, error) {
 	res, err := c.getOrLoad(ctx, crypto.CacheUnwrap, fmt.Sprintf("%s:%X", kekLabel, ciphertext),
-		func() (interface{}, error) {
+		func() (any, error) {
 			return c.KeyService.Unwrap(ctx, ciphertext, kekLabel)
 		},
 	)

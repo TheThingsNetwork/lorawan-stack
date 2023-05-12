@@ -467,12 +467,12 @@ func TestRemoteStore(t *testing.T) {
 		})
 		for _, tc := range []struct {
 			name  string
-			f     func(store.GetCodecRequest) (interface{}, error)
-			codec interface{}
+			f     func(store.GetCodecRequest) (any, error)
+			codec any
 		}{
 			{
 				name: "UplinkDecoder",
-				f:    func(req store.GetCodecRequest) (interface{}, error) { return s.GetUplinkDecoder(req) },
+				f:    func(req store.GetCodecRequest) (any, error) { return s.GetUplinkDecoder(req) },
 				codec: &ttnpb.MessagePayloadDecoder{
 					Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
 					FormatterParameter: "// uplink decoder\n",
@@ -480,7 +480,7 @@ func TestRemoteStore(t *testing.T) {
 			},
 			{
 				name: "DownlinkDecoder",
-				f:    func(req store.GetCodecRequest) (interface{}, error) { return s.GetDownlinkDecoder(req) },
+				f:    func(req store.GetCodecRequest) (any, error) { return s.GetDownlinkDecoder(req) },
 				codec: &ttnpb.MessagePayloadDecoder{
 					Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
 					FormatterParameter: "// downlink decoder\n",
@@ -488,7 +488,7 @@ func TestRemoteStore(t *testing.T) {
 			},
 			{
 				name: "DownlinkEncoder",
-				f:    func(req store.GetCodecRequest) (interface{}, error) { return s.GetDownlinkEncoder(req) },
+				f:    func(req store.GetCodecRequest) (any, error) { return s.GetDownlinkEncoder(req) },
 				codec: &ttnpb.MessagePayloadEncoder{
 					Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
 					FormatterParameter: "// downlink encoder\n",
@@ -513,12 +513,12 @@ func TestRemoteStore(t *testing.T) {
 		t.Run("Examples", func(t *testing.T) {
 			for _, tc := range []struct {
 				name  string
-				f     func(store.GetCodecRequest) (interface{}, error)
-				codec interface{}
+				f     func(store.GetCodecRequest) (any, error)
+				codec any
 			}{
 				{
 					name: "UplinkDecoder",
-					f:    func(req store.GetCodecRequest) (interface{}, error) { return s.GetUplinkDecoder(req) },
+					f:    func(req store.GetCodecRequest) (any, error) { return s.GetUplinkDecoder(req) },
 					codec: &ttnpb.MessagePayloadDecoder{
 						Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
 						FormatterParameter: "// uplink decoder\n",
@@ -529,10 +529,10 @@ func TestRemoteStore(t *testing.T) {
 								FrmPayload: []byte{1, 1, 100},
 							},
 							Output: &ttnpb.DecodedMessagePayload{
-								Data: mustStruct(map[string]interface{}{
+								Data: mustStruct(map[string]any{
 									"type":  "BATTERY_STATUS",
 									"value": 100,
-									"nested": map[string]interface{}{
+									"nested": map[string]any{
 										"key":  "value",
 										"list": []int{1, 2, 3},
 									},
@@ -545,7 +545,7 @@ func TestRemoteStore(t *testing.T) {
 				},
 				{
 					name: "DownlinkDecoder",
-					f:    func(req store.GetCodecRequest) (interface{}, error) { return s.GetDownlinkDecoder(req) },
+					f:    func(req store.GetCodecRequest) (any, error) { return s.GetDownlinkDecoder(req) },
 					codec: &ttnpb.MessagePayloadDecoder{
 						Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
 						FormatterParameter: "// downlink decoder\n",
@@ -556,7 +556,7 @@ func TestRemoteStore(t *testing.T) {
 								FrmPayload: []byte{1, 5},
 							},
 							Output: &ttnpb.DecodedMessagePayload{
-								Data: mustStruct(map[string]interface{}{
+								Data: mustStruct(map[string]any{
 									"action": "DIM",
 									"value":  5,
 								}),
@@ -568,14 +568,14 @@ func TestRemoteStore(t *testing.T) {
 				},
 				{
 					name: "DownlinkEncoder",
-					f:    func(req store.GetCodecRequest) (interface{}, error) { return s.GetDownlinkEncoder(req) },
+					f:    func(req store.GetCodecRequest) (any, error) { return s.GetDownlinkEncoder(req) },
 					codec: &ttnpb.MessagePayloadEncoder{
 						Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
 						FormatterParameter: "// downlink encoder\n",
 						Examples: []*ttnpb.MessagePayloadEncoder_Example{{
 							Description: "downlink encode example",
 							Input: &ttnpb.DecodedMessagePayload{
-								Data: mustStruct(map[string]interface{}{
+								Data: mustStruct(map[string]any{
 									"action": "DIM",
 									"value":  5,
 								}),
@@ -611,7 +611,7 @@ func TestRemoteStore(t *testing.T) {
 	})
 }
 
-func mustStruct(d map[string]interface{}) *structpb.Struct {
+func mustStruct(d map[string]any) *structpb.Struct {
 	v, err := goproto.Struct(d)
 	if err != nil {
 		panic(err)

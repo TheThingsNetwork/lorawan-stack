@@ -77,7 +77,7 @@ func (m MockPeer) Tags() map[string]string {
 // NewGRPCServerPeer creates a new MockPeer with ConnFunc, which always returns the same loopback connection to the server itself.
 // srv is the implementation of the gRPC interface.
 // registrators represents a slice of functions, which register the gRPC interface implementation at a gRPC server.
-func NewGRPCServerPeer(ctx context.Context, srv interface{}, registrators ...interface{}) (*MockPeer, error) {
+func NewGRPCServerPeer(ctx context.Context, srv any, registrators ...any) (*MockPeer, error) {
 	grpcSrv := rpcserver.New(ctx).Server
 	for _, r := range registrators {
 		reflect.ValueOf(r).Call([]reflect.Value{

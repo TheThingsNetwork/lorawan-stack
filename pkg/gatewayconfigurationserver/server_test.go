@@ -110,7 +110,7 @@ func TestWeb(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 
 	mustMarshal := func(b []byte, err error) []byte { return test.Must(b, err) }
-	marshalJSON := func(v interface{}) string {
+	marshalJSON := func(v any) string {
 		return string(mustMarshal(json.MarshalIndent(v, "", "\t")))
 	}
 	marshalText := func(v encoding.TextMarshaler) string {
@@ -333,7 +333,7 @@ func TestGRPC(t *testing.T) {
 	})
 
 	mustMarshal := func(b []byte, err error) []byte { return test.Must(b, err) }
-	marshalJSON := func(v interface{}) string {
+	marshalJSON := func(v any) string {
 		return string(mustMarshal(json.Marshal(v)))
 	}
 	marshalText := func(v encoding.TextMarshaler) string {

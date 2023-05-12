@@ -29,7 +29,7 @@ import (
 
 func newCallbackUnaryHook(name string, callback func(string)) func(h grpc.UnaryHandler) grpc.UnaryHandler {
 	return func(h grpc.UnaryHandler) grpc.UnaryHandler {
-		return func(ctx context.Context, req interface{}) (interface{}, error) {
+		return func(ctx context.Context, req any) (any, error) {
 			callback(name)
 			return h(ctx, req)
 		}
@@ -38,7 +38,7 @@ func newCallbackUnaryHook(name string, callback func(string)) func(h grpc.UnaryH
 
 func newCallbackStreamHook(name string, callback func(string)) func(h grpc.StreamHandler) grpc.StreamHandler {
 	return func(h grpc.StreamHandler) grpc.StreamHandler {
-		return func(srv interface{}, stream grpc.ServerStream) error {
+		return func(srv any, stream grpc.ServerStream) error {
 			callback(name)
 			return h(srv, stream)
 		}
@@ -46,16 +46,16 @@ func newCallbackStreamHook(name string, callback func(string)) func(h grpc.Strea
 }
 
 func errorHook(h grpc.UnaryHandler) grpc.UnaryHandler {
-	return func(ctx context.Context, _ interface{}) (interface{}, error) {
+	return func(ctx context.Context, _ any) (any, error) {
 		return nil, errors.New("failed")
 	}
 }
 
-func noopUnaryHandler(_ context.Context, _ interface{}) (interface{}, error) {
+func noopUnaryHandler(_ context.Context, _ any) (any, error) {
 	return 42, nil
 }
 
-func noopStreamHandler(_ interface{}, _ grpc.ServerStream) error {
+func noopStreamHandler(_ any, _ grpc.ServerStream) error {
 	return nil
 }
 
@@ -64,8 +64,8 @@ type mockStream struct {
 }
 
 func (s *mockStream) Context() context.Context     { return s.ctx }
-func (s *mockStream) SendMsg(m interface{}) error  { return nil }
-func (s *mockStream) RecvMsg(m interface{}) error  { return nil }
+func (s *mockStream) SendMsg(m any) error          { return nil }
+func (s *mockStream) RecvMsg(m any) error          { return nil }
 func (s *mockStream) SetHeader(metadata.MD) error  { return nil }
 func (s *mockStream) SendHeader(metadata.MD) error { return nil }
 func (s *mockStream) SetTrailer(metadata.MD)       {}
@@ -211,14 +211,14 @@ func TestHookContext(t *testing.T) {
 	}
 
 	h.RegisterUnaryHook("/ttn.lorawan.v3.TestService", "producer", func(h grpc.UnaryHandler) grpc.UnaryHandler {
-		return func(ctx context.Context, req interface{}) (interface{}, error) {
+		return func(ctx context.Context, req any) (any, error) {
 			ctx = context.WithValue(ctx, "produced-value", 42)
 			return h(ctx, req)
 		}
 	})
 
 	h.RegisterUnaryHook("/ttn.lorawan.v3.TestService", "consumer", func(h grpc.UnaryHandler) grpc.UnaryHandler {
-		return func(ctx context.Context, req interface{}) (interface{}, error) {
+		return func(ctx context.Context, req any) (any, error) {
 			a.So(ctx.Value("global-value"), should.Equal, 1337)
 			a.So(ctx.Value("produced-value"), should.Equal, 42)
 			return h(ctx, req)

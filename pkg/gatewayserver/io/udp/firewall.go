@@ -98,7 +98,7 @@ func (f *memoryFirewall) Filter(packet encoding.Packet) error {
 
 func (f *memoryFirewall) gc() {
 	now := time.Now().UTC()
-	f.m.Range(func(k, val interface{}) bool {
+	f.m.Range(func(k, val any) bool {
 		a := val.(addrTime)
 		if a.lastSeen.Add(f.addrChangeBlock).Before(now) {
 			f.m.Delete(k)

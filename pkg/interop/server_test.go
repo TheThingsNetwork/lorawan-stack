@@ -87,7 +87,7 @@ func TestServer(t *testing.T) { //nolint:gocyclo
 		JS                interop.JoinServer
 		ClientTLSConfig   *tls.Config
 		PacketBrokerToken bool
-		RequestBody       interface{}
+		RequestBody       any
 		ResponseAssertion func(*assertions.Assertion, *http.Response) bool
 	}{
 		{

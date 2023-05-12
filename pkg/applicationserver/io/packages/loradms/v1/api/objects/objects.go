@@ -138,7 +138,7 @@ type StreamRecord struct {
 
 // MarshalJSON implements json.Marshaler.
 func (r StreamRecord) MarshalJSON() ([]byte, error) {
-	return json.Marshal([]interface{}{r.Offset, r.Data})
+	return json.Marshal([]any{r.Offset, r.Data})
 }
 
 var errInvalidStreamRecord = errors.DefineCorruption("invalid_stream_record", "invalid stream record")
@@ -300,8 +300,8 @@ type LoRaDnlink struct {
 }
 
 // Fields implements log.Fielder.
-func (u LoRaDnlink) Fields() map[string]interface{} {
-	return map[string]interface{}{
+func (u LoRaDnlink) Fields() map[string]any {
+	return map[string]any{
 		"port":    u.Port,
 		"payload": u.Payload,
 	}

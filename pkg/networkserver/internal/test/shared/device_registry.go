@@ -32,7 +32,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func isNil(c interface{}) bool {
+func isNil(c any) bool {
 	if c == nil {
 		return true
 	}
@@ -42,7 +42,7 @@ func isNil(c interface{}) bool {
 	return false
 }
 
-func nilEquality(a interface{}, b interface{}) (bool, bool) {
+func nilEquality(a any, b any) (bool, bool) {
 	if isNil(a) != isNil(b) {
 		return false, true
 	}

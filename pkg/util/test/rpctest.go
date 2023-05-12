@@ -23,8 +23,8 @@ import (
 // MockStream is a mock grpc.Stream.
 type MockStream struct {
 	ContextFunc func() context.Context
-	SendMsgFunc func(m interface{}) error
-	RecvMsgFunc func(m interface{}) error
+	SendMsgFunc func(m any) error
+	RecvMsgFunc func(m any) error
 }
 
 // Context calls ContextFunc if set and panics otherwise.
@@ -36,7 +36,7 @@ func (m MockStream) Context() context.Context {
 }
 
 // SendMsg calls SendMsgFunc if set and panics otherwise.
-func (m MockStream) SendMsg(msg interface{}) error {
+func (m MockStream) SendMsg(msg any) error {
 	if m.SendMsgFunc == nil {
 		panic("SendMsg called, but not set")
 	}
@@ -44,7 +44,7 @@ func (m MockStream) SendMsg(msg interface{}) error {
 }
 
 // RecvMsg calls RecvMsgFunc if set and panics otherwise.
-func (m MockStream) RecvMsg(msg interface{}) error {
+func (m MockStream) RecvMsg(msg any) error {
 	if m.RecvMsgFunc == nil {
 		panic("RecvMsg called, but not set")
 	}

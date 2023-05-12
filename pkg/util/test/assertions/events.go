@@ -32,7 +32,7 @@ const (
 )
 
 // ShouldResembleEvent is used to assert that an events.Event resembles another events.Event.
-func ShouldResembleEvent(actual interface{}, expected ...interface{}) string {
+func ShouldResembleEvent(actual any, expected ...any) string {
 	if len(expected) != 1 {
 		return fmt.Sprintf(needExactValues, 1, len(expected))
 	}
@@ -66,7 +66,7 @@ func ShouldResembleEvent(actual interface{}, expected ...interface{}) string {
 }
 
 // ShouldResembleEventBuilder is used to assert that an events.Builder resembles another events.Builder.
-func ShouldResembleEventBuilder(actual interface{}, expected ...interface{}) string {
+func ShouldResembleEventBuilder(actual any, expected ...any) string {
 	if len(expected) != 1 {
 		return fmt.Sprintf(needExactValues, 1, len(expected))
 	}
@@ -83,7 +83,7 @@ func ShouldResembleEventBuilder(actual interface{}, expected ...interface{}) str
 }
 
 // ShouldResembleEventBuilders is like ShouldResembleEventBuilders, but for events.Builders
-func ShouldResembleEventBuilders(actual interface{}, expected ...interface{}) string {
+func ShouldResembleEventBuilders(actual any, expected ...any) string {
 	if len(expected) != 1 {
 		return fmt.Sprintf(needExactValues, 1, len(expected))
 	}
@@ -109,7 +109,7 @@ func ShouldResembleEventBuilders(actual interface{}, expected ...interface{}) st
 
 var eventTimeout = test.Delay << 7
 
-func receiveEvent(v interface{}) (events.Event, string) {
+func receiveEvent(v any) (events.Event, string) {
 	switch ch := v.(type) {
 	case <-chan events.Event:
 		select {
@@ -136,7 +136,7 @@ func receiveEvent(v interface{}) (events.Event, string) {
 
 // ShouldReceiveEventFunc receives 3 parameters. The first being a channel of either events.Event or test.EventPubSubPublishRequest,
 // the second being the equality function of type func(events.Event, events.Event) bool and third being the expected events.Event.
-func ShouldReceiveEventFunc(actual interface{}, expected ...interface{}) string {
+func ShouldReceiveEventFunc(actual any, expected ...any) string {
 	if len(expected) != 2 {
 		return fmt.Sprintf(needExactValues, 2, len(expected))
 	}
@@ -156,7 +156,7 @@ func ShouldReceiveEventFunc(actual interface{}, expected ...interface{}) string 
 }
 
 // ShouldReceiveEventResembling is like ShouldReceiveEventFunc, but uses same resemblance function as ShouldResembleEvent.
-func ShouldReceiveEventResembling(actual interface{}, expected ...interface{}) string {
+func ShouldReceiveEventResembling(actual any, expected ...any) string {
 	if len(expected) != 1 {
 		return fmt.Sprintf(needExactValues, 1, len(expected))
 	}
@@ -167,7 +167,7 @@ func ShouldReceiveEventResembling(actual interface{}, expected ...interface{}) s
 	return ShouldResembleEvent(ae, expected[0])
 }
 
-func eventSlice(vs ...interface{}) ([]events.Event, string) {
+func eventSlice(vs ...any) ([]events.Event, string) {
 	var evs []events.Event
 	for _, v := range vs {
 		ev, ok := v.(events.Event)
@@ -180,7 +180,7 @@ func eventSlice(vs ...interface{}) ([]events.Event, string) {
 			return nil, fmt.Sprintf("Cannot range over values of type %T", v)
 		}
 		s := success
-		r.Range(func(_, v interface{}) bool {
+		r.Range(func(_, v any) bool {
 			ev, ok := v.(events.Event)
 			if !ok {
 				s = fmt.Sprintf(needEventCompatible, v)
@@ -198,7 +198,7 @@ func eventSlice(vs ...interface{}) ([]events.Event, string) {
 
 // ShouldReceiveEventsFunc is like ShouldReceiveEventFunc, but allows for several expected events to be specified.
 // Expected events should be passed as variadic parameters, which can be wrapped any collection of events.Event, that test.WrapRanger can range over.
-func ShouldReceiveEventsFunc(actual interface{}, expected ...interface{}) string {
+func ShouldReceiveEventsFunc(actual any, expected ...any) string {
 	if len(expected) < 2 {
 		return fmt.Sprintf(needAtLeastValues, 2, len(expected))
 	}
@@ -215,7 +215,7 @@ func ShouldReceiveEventsFunc(actual interface{}, expected ...interface{}) string
 }
 
 // ShouldReceiveEventsResembling is like ShouldReceiveEventsFunc, but uses same resemblance function as ShouldResembleEvent.
-func ShouldReceiveEventsResembling(actual interface{}, expected ...interface{}) string {
+func ShouldReceiveEventsResembling(actual any, expected ...any) string {
 	if len(expected) == 0 {
 		return fmt.Sprintf(needAtLeastValues, 1, len(expected))
 	}

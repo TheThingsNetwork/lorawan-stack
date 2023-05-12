@@ -66,7 +66,7 @@ func (s *SendGrid) Send(message *email.Message) error {
 	}
 
 	if response.StatusCode >= 300 {
-		attributes := []interface{}{
+		attributes := []any{
 			"status_code", response.StatusCode,
 			"response", response.Body,
 		}

@@ -203,7 +203,7 @@ type ErrorDetails interface {
 	Namespace() string
 	Name() string
 	MessageFormat() string
-	PublicAttributes() map[string]interface{}
+	PublicAttributes() map[string]any
 	CorrelationID() string
 	Cause() error
 	Code() uint32
@@ -243,8 +243,8 @@ func setErrorDetails(err *Error, details ErrorDetails) {
 	err.details = append(err.details, details.Details()...)
 }
 
-func netErrorDetails(err net.Error) []interface{} {
-	return []interface{}{
+func netErrorDetails(err net.Error) []any {
+	return []any{
 		"message", err.Error(),
 		"timeout", err.Timeout(),
 	}

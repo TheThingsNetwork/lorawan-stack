@@ -26,7 +26,7 @@ var sessionKey sessionKeyType
 // Session contains the session state for a single gateway.
 type Session struct {
 	DataMu sync.RWMutex
-	Data   interface{}
+	Data   any
 }
 
 // NewContextWithSession returns a new context with the session.

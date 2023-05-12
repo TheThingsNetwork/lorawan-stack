@@ -125,13 +125,13 @@ func AllTrue(vs ...bool) bool {
 }
 
 // JoinStringsMap maps contents of xs to strings using f and joins them with sep.
-func JoinStringsMap(f func(k interface{}, v interface{}) string, sep string, xs interface{}) string {
+func JoinStringsMap(f func(k any, v any) string, sep string, xs any) string {
 	r, ok := WrapRanger(xs)
 	if !ok {
 		panic(fmt.Sprintf("cannot range over values of type %T", xs))
 	}
 	var ss []string
-	r.Range(func(k, v interface{}) bool {
+	r.Range(func(k, v any) bool {
 		ss = append(ss, f(k, v))
 		return true
 	})
@@ -139,8 +139,8 @@ func JoinStringsMap(f func(k interface{}, v interface{}) string, sep string, xs 
 }
 
 // JoinStringsf formats contents of xs using format and joins them with sep.
-func JoinStringsf(format, sep string, withKeys bool, xs interface{}) string {
-	return JoinStringsMap(func(k, v interface{}) string {
+func JoinStringsf(format, sep string, withKeys bool, xs any) string {
+	return JoinStringsMap(func(k, v any) string {
 		if withKeys {
 			return fmt.Sprintf(format, k, v)
 		}

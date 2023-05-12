@@ -26,7 +26,7 @@ func NewContext(ctx context.Context, logger Interface) context.Context {
 }
 
 // NewContextWithField returns a derived context with the given field added to the logger.
-func NewContextWithField(ctx context.Context, k string, v interface{}) context.Context {
+func NewContextWithField(ctx context.Context, k string, v any) context.Context {
 	return NewContext(ctx, FromContext(ctx).WithField(k, v))
 }
 

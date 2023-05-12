@@ -243,7 +243,7 @@ func (p *Population) NewUserSession(user *ttnpb.UserIdentifiers) *ttnpb.UserSess
 
 // Populate creates the population in the database.
 // After calling Populate, the entities in the population should no longer be modified.
-func (p *Population) Populate(ctx context.Context, st interface{}) error { //nolint:gocyclo
+func (p *Population) Populate(ctx context.Context, st any) error { //nolint:gocyclo
 	if len(p.Users) > 0 {
 		s, ok := st.(store.UserStore)
 		if !ok {

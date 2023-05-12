@@ -104,7 +104,7 @@ func TestAddTask(t *testing.T) {
 			msg := rets[0].Messages[0]
 			a.So(msg, should.Resemble, redis.XMessage{
 				ID: msg.ID,
-				Values: map[string]interface{}{
+				Values: map[string]any{
 					"start_at": fmt.Sprintf("%d", time.Unix(0, 42).UnixNano()),
 					"payload":  "testPayload",
 				},
@@ -132,7 +132,7 @@ func TestAddTask(t *testing.T) {
 			msg0 := rets[0].Messages[0]
 			a.So(msg0, should.Resemble, redis.XMessage{
 				ID: msg0.ID,
-				Values: map[string]interface{}{
+				Values: map[string]any{
 					"start_at": fmt.Sprintf("%d", time.Unix(0, 42).UnixNano()),
 					"payload":  "testPayload",
 				},
@@ -140,7 +140,7 @@ func TestAddTask(t *testing.T) {
 			msg1 := rets[0].Messages[1]
 			a.So(msg1, should.Resemble, redis.XMessage{
 				ID: msg1.ID,
-				Values: map[string]interface{}{
+				Values: map[string]any{
 					"start_at": fmt.Sprintf("%d", time.Unix(0, 42).UnixNano()),
 					"payload":  "testPayload",
 					"replace":  "1",
@@ -270,56 +270,56 @@ func TestPopTask(t *testing.T) {
 	for _, x := range []*redis.XAddArgs{
 		{
 			Stream: inputKeys[0],
-			Values: map[string]interface{}{
+			Values: map[string]any{
 				"start_at": fmt.Sprintf("%d", time.Unix(0, 42).UnixNano()),
 				"payload":  payloads[0],
 			},
 		},
 		{
 			Stream: inputKeys[0],
-			Values: map[string]interface{}{
+			Values: map[string]any{
 				"start_at": fmt.Sprintf("%d", time.Unix(0, 43).UnixNano()),
 				"payload":  payloads[0],
 			},
 		},
 		{
 			Stream: inputKeys[0],
-			Values: map[string]interface{}{
+			Values: map[string]any{
 				"start_at": fmt.Sprintf("%d", time.Unix(0, 41).UnixNano()),
 				"payload":  payloads[0],
 			},
 		},
 		{
 			Stream: inputKeys[0],
-			Values: map[string]interface{}{
+			Values: map[string]any{
 				"start_at": fmt.Sprintf("%d", time.Unix(0, 41).UnixNano()),
 				"payload":  payloads[0],
 			},
 		},
 		{
 			Stream: inputKeys[1],
-			Values: map[string]interface{}{
+			Values: map[string]any{
 				"start_at": fmt.Sprintf("%d", time.Unix(0, 66).UnixNano()),
 				"payload":  payloads[0],
 			},
 		},
 		{
 			Stream: inputKeys[0],
-			Values: map[string]interface{}{
+			Values: map[string]any{
 				"start_at": nextMin.UnixNano(),
 				"payload":  payloads[1],
 			},
 		},
 		{
 			Stream: inputKeys[0],
-			Values: map[string]interface{}{
+			Values: map[string]any{
 				"start_at": "0",
 				"payload":  payloads[2],
 			},
 		},
 		{
 			Stream: InputTaskKey(cl.Key("testKeyUnrelated")),
-			Values: map[string]interface{}{
+			Values: map[string]any{
 				"start_at": "0",
 				"payload":  "testPayloadUnrelated",
 			},

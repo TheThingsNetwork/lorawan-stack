@@ -289,7 +289,7 @@ func TestDiscover(t *testing.T) {
 	// Test Queries
 	for _, tc := range []struct {
 		Name     string
-		Query    interface{}
+		Query    any
 		Response lbslns.DiscoverResponse
 	}{
 		{
@@ -361,7 +361,7 @@ func TestDiscover(t *testing.T) {
 
 	for _, tc := range []struct {
 		Name  string
-		Query interface{}
+		Query any
 	}{
 		{
 			Name: "InvalidLength",
@@ -414,7 +414,7 @@ func TestDiscover(t *testing.T) {
 	for i, tc := range []struct {
 		EndPointEUI string
 		EUI         types.EUI64
-		Query       interface{}
+		Query       any
 	}{
 		{
 			EndPointEUI: "1111111111111111",
@@ -550,8 +550,8 @@ func TestVersion(t *testing.T) {
 
 	for _, tc := range []struct {
 		Name                  string
-		VersionQuery          interface{}
-		ExpectedRouterConfig  interface{}
+		VersionQuery          any
+		ExpectedRouterConfig  any
 		ExpectedStatusMessage *ttnpb.GatewayStatus
 	}{
 		{
@@ -829,9 +829,9 @@ func TestTraffic(t *testing.T) {
 
 	for _, tc := range []struct {
 		Name                    string
-		InputBSUpstream         interface{}
+		InputBSUpstream         any
 		InputNetworkDownstream  *ttnpb.DownlinkMessage
-		ExpectedBSDownstream    interface{}
+		ExpectedBSDownstream    any
 		ExpectedNetworkUpstream proto.Message
 	}{
 		{
@@ -1427,7 +1427,7 @@ func TestRTT(t *testing.T) {
 
 	for _, tc := range []struct {
 		Name                   string
-		InputBSUpstream        interface{}
+		InputBSUpstream        any
 		InputNetworkDownstream *ttnpb.DownlinkMessage
 		InputDownlinkPath      *ttnpb.DownlinkPath
 		GatewayClockDrift      time.Duration

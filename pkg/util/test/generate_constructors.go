@@ -150,7 +150,7 @@ func Make{{ $type.Name }}(opts ...{{ $optionType }}) *{{ $typeString }} {
 {{ end -}}
 {{ end -}}
 {{ end -}}
-{{ end }}`)).Execute(buf, []interface{}{
+{{ end }}`)).Execute(buf, []any{
 		ttnpb.RootKeys{},
 		ttnpb.SessionKeys{},
 		ttnpb.Session{},
