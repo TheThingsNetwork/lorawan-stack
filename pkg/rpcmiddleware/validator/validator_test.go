@@ -40,7 +40,7 @@ func (t testSubject) getResult() *testSubject {
 	return &t
 }
 
-func (t *testSubject) ValidateFields(...string) error { return nil }
+func (*testSubject) ValidateFields(...string) error { return nil }
 
 type msgWithValidate struct {
 	testSubject
@@ -70,7 +70,7 @@ type msgWithFieldMask struct {
 
 func (m *msgWithFieldMask) GetFieldMask() *fieldmaskpb.FieldMask { return m.fieldMask }
 
-func (m *msgWithFieldMask) ValidateFields(...string) error { return nil }
+func (*msgWithFieldMask) ValidateFields(...string) error { return nil }
 
 func (m *msgWithFieldMask) FieldIsZero(s string) bool {
 	v, ok := m.fieldIsZero[s]
@@ -80,7 +80,7 @@ func (m *msgWithFieldMask) FieldIsZero(s string) bool {
 	return v
 }
 
-func handler(ctx context.Context, req any) (any, error) {
+func handler(_ context.Context, req any) (any, error) {
 	res := req.(interface{ getResult() *testSubject }).getResult()
 	res.handlerCalled = true
 	return res, nil
@@ -201,7 +201,7 @@ func (ss *ss) Context() context.Context {
 	return ss.ctx
 }
 
-func (ss *ss) RecvMsg(_ any) error {
+func (*ss) RecvMsg(any) error {
 	return nil
 }
 

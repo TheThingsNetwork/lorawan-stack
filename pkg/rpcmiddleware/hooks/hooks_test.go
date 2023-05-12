@@ -45,7 +45,7 @@ func newCallbackStreamHook(name string, callback func(string)) func(h grpc.Strea
 	}
 }
 
-func errorHook(h grpc.UnaryHandler) grpc.UnaryHandler {
+func errorHook(grpc.UnaryHandler) grpc.UnaryHandler {
 	return func(ctx context.Context, _ any) (any, error) {
 		return nil, errors.New("failed")
 	}
@@ -63,14 +63,16 @@ type mockStream struct {
 	ctx context.Context
 }
 
-func (s *mockStream) Context() context.Context     { return s.ctx }
-func (s *mockStream) SendMsg(m any) error          { return nil }
-func (s *mockStream) RecvMsg(m any) error          { return nil }
-func (s *mockStream) SetHeader(metadata.MD) error  { return nil }
-func (s *mockStream) SendHeader(metadata.MD) error { return nil }
-func (s *mockStream) SetTrailer(metadata.MD)       {}
+func (s *mockStream) Context() context.Context   { return s.ctx }
+func (*mockStream) SendMsg(any) error            { return nil }
+func (*mockStream) RecvMsg(any) error            { return nil }
+func (*mockStream) SetHeader(metadata.MD) error  { return nil }
+func (*mockStream) SendHeader(metadata.MD) error { return nil }
+func (*mockStream) SetTrailer(metadata.MD)       {}
 
 func TestRegistration(t *testing.T) {
+	t.Parallel()
+
 	a := assertions.New(t)
 
 	h := &Hooks{}
@@ -78,13 +80,13 @@ func TestRegistration(t *testing.T) {
 	ctx := test.Context()
 	unaryInterceptor := h.UnaryServerInterceptor()
 	callUnary := func(fullMethod string) {
-		unaryInterceptor(ctx, "test", &grpc.UnaryServerInfo{
+		_, _ = unaryInterceptor(ctx, "test", &grpc.UnaryServerInfo{
 			FullMethod: fullMethod,
 		}, noopUnaryHandler)
 	}
 	streamInterceptor := h.StreamServerInterceptor()
 	callStream := func(fullMethod string) {
-		streamInterceptor(nil, &mockStream{ctx}, &grpc.StreamServerInfo{
+		_ = streamInterceptor(nil, &mockStream{ctx}, &grpc.StreamServerInfo{
 			FullMethod: fullMethod,
 		}, noopStreamHandler)
 	}
@@ -109,7 +111,7 @@ func TestRegistration(t *testing.T) {
 	a.So(actual, should.Equal, expected)
 
 	callStream("/ttn.lorawan.v3.TestService/BarStream")
-	expected += 1 // hook4
+	expected++ // hook4
 	a.So(actual, should.Equal, expected)
 
 	callStream("/ttn.lorawan.v3.TestService/FooStream")
@@ -132,6 +134,8 @@ func TestRegistration(t *testing.T) {
 }
 
 func TestErrorHook(t *testing.T) {
+	t.Parallel()
+
 	a := assertions.New(t)
 
 	h := &Hooks{}
@@ -164,6 +168,8 @@ func TestErrorHook(t *testing.T) {
 }
 
 func TestOrder(t *testing.T) {
+	t.Parallel()
+
 	a := assertions.New(t)
 
 	h := &Hooks{}
@@ -184,10 +190,10 @@ func TestOrder(t *testing.T) {
 
 	h.RegisterUnaryHook("/ttn.lorawan.v3.TestService/Foo", "hook3", newCallbackUnaryHook("hook3", callback))
 	h.RegisterUnaryHook("/ttn.lorawan.v3.TestService/Foo", "hook4", newCallbackUnaryHook("hook4", callback))
-	h.RegisterUnaryHook("/ttn.lorawan.v3.TestService", "hook1", newCallbackUnaryHook("hook1", callback)) // service hooks go first
+	h.RegisterUnaryHook("/ttn.lorawan.v3.TestService", "hook1", newCallbackUnaryHook("hook1", callback))
 	h.RegisterUnaryHook("/ttn.lorawan.v3.TestService", "hook2", newCallbackUnaryHook("hook2", callback))
 
-	call("/ttn.lorawan.v3.TestService/Foo")
+	_ = call("/ttn.lorawan.v3.TestService/Foo")
 	a.So(actual, should.Resemble, []string{"hook1", "hook2", "hook3", "hook4"})
 
 	h.UnregisterUnaryHook("/ttn.lorawan.v3.TestService/Foo", "hook3")
@@ -196,12 +202,19 @@ func TestOrder(t *testing.T) {
 	h.UnregisterUnaryHook("/ttn.lorawan.v3.TestService", "hook2")
 }
 
+type (
+	globalValueKey   struct{}
+	producedValueKey struct{}
+)
+
 func TestHookContext(t *testing.T) {
+	t.Parallel()
+
 	a := assertions.New(t)
 
 	h := &Hooks{}
 
-	ctx := context.WithValue(test.Context(), "global-value", 1337)
+	ctx := context.WithValue(test.Context(), globalValueKey{}, 1337)
 	interceptor := h.UnaryServerInterceptor()
 	call := func(fullMethod string) error {
 		_, err := interceptor(ctx, "test", &grpc.UnaryServerInfo{
@@ -212,20 +225,20 @@ func TestHookContext(t *testing.T) {
 
 	h.RegisterUnaryHook("/ttn.lorawan.v3.TestService", "producer", func(h grpc.UnaryHandler) grpc.UnaryHandler {
 		return func(ctx context.Context, req any) (any, error) {
-			ctx = context.WithValue(ctx, "produced-value", 42)
+			ctx = context.WithValue(ctx, producedValueKey{}, 42)
 			return h(ctx, req)
 		}
 	})
 
 	h.RegisterUnaryHook("/ttn.lorawan.v3.TestService", "consumer", func(h grpc.UnaryHandler) grpc.UnaryHandler {
 		return func(ctx context.Context, req any) (any, error) {
-			a.So(ctx.Value("global-value"), should.Equal, 1337)
-			a.So(ctx.Value("produced-value"), should.Equal, 42)
+			a.So(ctx.Value(globalValueKey{}), should.Equal, 1337)
+			a.So(ctx.Value(producedValueKey{}), should.Equal, 42)
 			return h(ctx, req)
 		}
 	})
 
-	call("/ttn.lorawan.v3.TestService/Test")
+	_ = call("/ttn.lorawan.v3.TestService/Test")
 
 	h.UnregisterUnaryHook("/ttn.lorawan.v3.TestService", "producer")
 	h.UnregisterUnaryHook("/ttn.lorawan.v3.TestService", "consumer")

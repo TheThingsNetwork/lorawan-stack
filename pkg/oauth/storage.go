@@ -54,7 +54,7 @@ func (cli osinClient) GetRedirectUri() string {
 	return strings.Join(cli.RedirectUris, redirectURISeparator)
 }
 
-func (cli osinClient) GetUserData() any { return nil }
+func (osinClient) GetUserData() any { return nil }
 
 // userData is used as the UserData interface in osin structs.
 type userData struct {

@@ -21,34 +21,34 @@ var Noop = &noop{}
 type noop struct{}
 
 // Debug implements log.Interface.
-func (n noop) Debug(args ...any) {}
+func (noop) Debug(...any) {}
 
 // Info implements log.Interface.
-func (n noop) Info(args ...any) {}
+func (noop) Info(...any) {}
 
 // Warn implements log.Interface.
-func (n noop) Warn(args ...any) {}
+func (noop) Warn(...any) {}
 
 // Error implements log.Interface.
-func (n noop) Error(args ...any) {}
+func (noop) Error(...any) {}
 
 // Fatal implements log.Interface.
-func (n noop) Fatal(args ...any) {}
+func (noop) Fatal(...any) {}
 
 // Debugf implements log.Interface.
-func (n noop) Debugf(msg string, v ...any) {}
+func (noop) Debugf(string, ...any) {}
 
 // Infof implements log.Interface.
-func (n noop) Infof(msg string, v ...any) {}
+func (noop) Infof(string, ...any) {}
 
 // Warnf implements log.Interface.
-func (n noop) Warnf(msg string, v ...any) {}
+func (noop) Warnf(string, ...any) {}
 
 // Errorf implements log.Interface.
-func (n noop) Errorf(msg string, v ...any) {}
+func (noop) Errorf(string, ...any) {}
 
 // Fatalf implements log.Interface.
-func (n noop) Fatalf(msg string, v ...any) {}
+func (noop) Fatalf(string, ...any) {}
 
 // WithField implements log.Interface.
 func (n noop) WithField(string, any) Interface { return n }
@@ -60,4 +60,4 @@ func (n noop) WithFields(Fielder) Interface { return n }
 func (n noop) WithError(error) Interface { return n }
 
 // Use implements log.Stack
-func (n noop) Use(Middleware) {}
+func (noop) Use(Middleware) {}
