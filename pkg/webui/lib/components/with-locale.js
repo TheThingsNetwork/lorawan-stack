@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -115,13 +115,14 @@ const WithLocale = ({ children }) => {
           await import(
             /* webpackChunkName: "locale-display-names" */ '@formatjs/intl-displaynames/polyfill'
           )
-          await Promise.all(
-            supportedLanguages.map(async supportedLanguage => {
-              log(`Polyfilling Intl.DisplayNames for locale "${supportedLanguage}"`)
-              await import(
-                /* webpackChunkName: "locale-display-names.[request]" */ `@formatjs/intl-displaynames/locale-data/${supportedLanguage}`
-              )
-            }),
+          // Instead of using dynamic imports that would cause all possible locales to be bundled
+          // we only load the ones we want to support which as of now are English and Japanese.
+          // This means that these imports need to be revisited if we choose to support more locales.
+          await import(
+            /* webpackChunkName: "locale-display-names.en" */ '@formatjs/intl-displaynames/locale-data/en'
+          )
+          await import(
+            /* webpackChunkName: "locale-display-names.ja" */ '@formatjs/intl-displaynames/locale-data/ja'
           )
         }
 
@@ -231,30 +232,64 @@ const LocaleLoader = ({ children }) => {
       // Load locale specific polyfills if needed.
       if (window.Intl.NumberFormat.polyfilled) {
         log(`Polyfilling NumberFormat for language ${language}`)
-        promises.push(
-          import(
-            /* webpackChunkName: "locale.[request]" */ `@formatjs/intl-numberformat/locale-data/${language}`
-          ),
-        )
+        if (language === 'ja') {
+          promises.push(
+            import(
+              /* webpackChunkName: "locale.ja" */ '@formatjs/intl-numberformat/locale-data/ja'
+            ),
+          )
+        } else {
+          promises.push(
+            import(
+              /* webpackChunkName: "locale.en" */ '@formatjs/intl-numberformat/locale-data/en'
+            ),
+          )
+        }
       }
 
       if (window.Intl.DateTimeFormat.polyfilled) {
         log(`Polyfilling DateTimeFormat for language ${language}`)
         promises.push(
           import(/* webpackChunkName: "locale" */ '@formatjs/intl-datetimeformat/add-all-tz'),
-          import(
-            /* webpackChunkName: "locale.[request]" */ `@formatjs/intl-datetimeformat/locale-data/${language}`
-          ),
         )
+        switch (language) {
+          case 'ja':
+            promises.push(
+              import(
+                /* webpackChunkName: "locale.ja" */ '@formatjs/intl-datetimeformat/locale-data/ja'
+              ),
+            )
+            break
+          case 'en':
+          default:
+            promises.push(
+              import(
+                /* webpackChunkName: "locale.en" */ '@formatjs/intl-datetimeformat/locale-data/en'
+              ),
+            )
+            break
+        }
       }
 
       if (window.Intl.RelativeTimeFormat.polyfilled) {
         log(`Polyfilling RelativeTimeFormat for language ${language}`)
-        promises.push(
-          import(
-            /* webpackChunkName: "locale.[request]" */ `@formatjs/intl-relativetimeformat/locale-data/${language}`
-          ),
-        )
+        switch (language) {
+          case 'ja':
+            promises.push(
+              import(
+                /* webpackChunkName: "locale.ja" */ '@formatjs/intl-relativetimeformat/locale-data/ja'
+              ),
+            )
+            break
+          case 'en':
+          default:
+            promises.push(
+              import(
+                /* webpackChunkName: "locale.en" */ '@formatjs/intl-relativetimeformat/locale-data/en'
+              ),
+            )
+            break
+        }
       }
 
       try {
