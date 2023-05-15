@@ -82,6 +82,7 @@ export const encodeValues = formValues => {
 
 export const decodeValues = backendValues => {
   const formValues = { ...backendValues }
+  let decodeError = false
   if (backendValues?.headers?.Authorization?.startsWith('Basic ')) {
     const encodedCredentials = backendValues.headers.Authorization.split('Basic ')[1]
     if (encodedCredentials) {
@@ -97,7 +98,7 @@ export const decodeValues = backendValues => {
           decodedCredentials.indexOf(':') + 1,
         )
       } catch (err) {
-        backendValues.headers.Authorization = null
+        decodeError = true
       }
     }
   } else {
@@ -108,7 +109,8 @@ export const decodeValues = backendValues => {
 
   formValues._headers = decodeHeaders(backendValues?.headers)
   if (hasBasicAuth(formValues._headers)) {
-    formValues._headers.find(isBasicAuth).readOnly = true
+    formValues._headers.find(isBasicAuth).readOnly = !decodeError
+    formValues._headers.find(isBasicAuth).decodeError = decodeError
   }
 
   return formValues
