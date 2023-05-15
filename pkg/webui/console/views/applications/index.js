@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
@@ -38,12 +38,12 @@ const Applications = props => {
   useBreadcrumbs('apps', <Breadcrumb path="/applications" content={sharedMessages.applications} />)
 
   return (
-    <Switch>
+    <Routes>
       <Route exact path={`${path}`} component={ApplicationsList} />
       <Route exact path={`${path}/add`} component={ApplicationAdd} />
       <Route path={`${path}/:appId${pathIdRegexp}`} component={Application} sensitive />
       <NotFoundRoute />
-    </Switch>
+    </Routes>
   )
 }
 Applications.propTypes = {

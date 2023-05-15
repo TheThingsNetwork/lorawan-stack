@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
@@ -43,7 +43,7 @@ const ApplicationCollaborators = props => {
 
   return (
     <ErrorView errorRender={SubViewError}>
-      <Switch>
+      <Routes>
         <Route exact path={`${match.path}`} component={ApplicationCollaboratorsList} />
         <Route exact path={`${match.path}/add`} component={ApplicationCollaboratorAdd} />
         <Route
@@ -52,7 +52,7 @@ const ApplicationCollaborators = props => {
           sensitive
         />
         <NotFoundRoute />
-      </Switch>
+      </Routes>
     </ErrorView>
   )
 }

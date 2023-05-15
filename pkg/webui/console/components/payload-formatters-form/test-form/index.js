@@ -57,7 +57,7 @@ const validationSchema = Yup.object({
   f_port: Yup.number()
     .min(1, Yup.passValues(sharedMessages.validateNumberGte))
     .max(223, Yup.passValues(sharedMessages.validateNumberLte)),
-  payload: Yup.string().when(['$isUplink'], (isUplink, schema) => {
+  payload: Yup.string().when(['$isUplink'], ([isUplink], schema) => {
     if (isUplink) {
       return schema.test(
         'len',

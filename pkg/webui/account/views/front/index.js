@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route, Redirect } from 'react-router-dom'
+import { Routes, Route, Redirect } from 'react-router-dom'
 
 import authRoutes from '@account/constants/auth-routes'
 
@@ -39,7 +39,7 @@ const FrontView = ({ location }) => (
     <section className={style.content}>
       <Header />
       <div className={style.main}>
-        <Switch>
+        <Routes>
           <Route path="/login" component={Login} />
           <Route path="/token-login" component={TokenLogin} />
           <Route path="/register" component={CreateAccount} />
@@ -53,7 +53,7 @@ const FrontView = ({ location }) => (
             </Route>
           ))}
           <Route component={FrontNotFound} />
-        </Switch>
+        </Routes>
       </div>
     </section>
     <section className={style.visual} />

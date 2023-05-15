@@ -14,7 +14,7 @@
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Switch, Route, Redirect } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -64,12 +64,12 @@ export default class DevicePayloadFormatters extends Component {
     return (
       <div className={style.fullWidth}>
         <Tab className={style.tabs} tabs={tabs} divider />
-        <Switch>
-          <Redirect exact from={url} to={`${url}/uplink`} />
+        <Routes>
+          <Route path="*" element={<Navigate to={`${url}uplink`} replace />} />
           <Route exact path={`${url}/uplink`} component={DeviceUplinkPayloadFormatters} />
           <Route exact path={`${url}/downlink`} component={DeviceDownlinkPayloadFormatters} />
           <NotFoundRoute />
-        </Switch>
+        </Routes>
       </div>
     )
   }

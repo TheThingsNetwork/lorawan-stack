@@ -14,7 +14,7 @@
 
 import React from 'react'
 import { Container, Col, Row } from 'react-grid-system'
-import { Switch, Route, Redirect } from 'react-router-dom'
+import { Routes, Route, Redirect } from 'react-router-dom'
 
 import Tabs from '@ttn-lw/components/tabs'
 
@@ -57,12 +57,12 @@ const DeviceMessaging = ({ match, mayScheduleDownlinks, maySendUplink }) => {
           </Col>
         )}
         <Col lg={8} md={12}>
-          <Switch>
+          <Routes>
             <Redirect exact from={url} to={maySendUplink ? uplinkPath : downlinkPath} />
             {maySendUplink && <Route path={uplinkPath} component={UplinkForm} />}
             {mayScheduleDownlinks && <Route path={downlinkPath} component={DownlinkForm} />}
             <NotFoundRoute />
-          </Switch>
+          </Routes>
         </Col>
       </Row>
     </Container>

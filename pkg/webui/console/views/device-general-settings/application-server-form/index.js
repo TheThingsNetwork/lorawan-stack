@@ -44,7 +44,7 @@ const validationSchema = Yup.object()
     skip_payload_crypto_override: Yup.boolean().nullable().default(null),
     session: Yup.object().when(
       ['skip_payload_crypto_override', '$mayEditKeys'],
-      (skipPayloadCrypto, mayEditKeys, schema) => {
+      ([skipPayloadCrypto, mayEditKeys], schema) => {
         if (skipPayloadCrypto || !mayEditKeys) {
           return schema.strip()
         }

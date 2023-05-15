@@ -15,7 +15,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { ConnectedRouter } from 'connected-react-router'
-import { Route, Switch, Redirect } from 'react-router-dom'
+import { Route, Routes, Redirect } from 'react-router-dom'
 import classnames from 'classnames'
 import bind from 'autobind-decorator'
 
@@ -166,7 +166,7 @@ class ConsoleApp extends React.PureComponent {
                   <div className={style.content}>
                     <div className={classnames('breadcrumbs', style.desktopBreadcrumbs)} />
                     <div className={style.stage} id="stage">
-                      <Switch>
+                      <Routes>
                         <Redirect from="/:url*(/+)" to={pathname.slice(0, -1)} />
                         <Route exact path="/" component={Overview} />
                         <Route path="/applications" component={Applications} />
@@ -175,7 +175,7 @@ class ConsoleApp extends React.PureComponent {
                         <Route path="/admin-panel" component={AdminPanel} />
                         <Route path="/user" component={User} />
                         <Route component={GenericNotFound} />
-                      </Switch>
+                      </Routes>
                     </div>
                   </div>
                 </WithAuth>

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
@@ -36,11 +36,11 @@ const OAuthClientAuthorizations = props => {
   )
 
   return (
-    <Switch>
+    <Routes>
       <Route exact path={`${path}`} component={AuthorizationsList} />
       <Route path={`${path}/:clientId${pathIdRegexp}`} component={AuthorizationOverview} />
       <NotFoundRoute />
-    </Switch>
+    </Routes>
   )
 }
 OAuthClientAuthorizations.propTypes = {

@@ -13,10 +13,11 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { Breadcrumbs } from '@ttn-lw/components/breadcrumbs/breadcrumbs'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
@@ -42,14 +43,15 @@ const PacketBrokerRouter = ({ match }) => {
   return (
     <Require featureCheck={mayConfigurePacketBroker} otherwise={{ redirect: '/' }}>
       <RequireRequest requestAction={getPacketBrokerInfo()}>
-        <Switch>
+        <Breadcrumbs />
+        <Routes>
           <Route
             exact
             path={`${match.path}/networks/:netId([0-9]+)/:tenantId${pathIdRegexp}?`}
             component={NetworkRoutingPolicy}
           />
           <Route path={`${match.path}`} component={PacketBroker} />
-        </Switch>
+        </Routes>
       </RequireRequest>
     </Require>
   )

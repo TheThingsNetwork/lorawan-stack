@@ -24,7 +24,7 @@ const validationSchema = Yup.object()
       .default(null),
     root_keys: Yup.object().when(
       ['$externalJs', '$lorawanVersion', '$mayEditKeys', '$mayReadKeys'],
-      (externalJs, lorawanVersion, mayEditKeys, mayReadKeys, schema) => {
+      ([externalJs, lorawanVersion, mayEditKeys, mayReadKeys], schema) => {
         const strippedSchema = Yup.object().strip()
         const keySchema = Yup.lazy(value =>
           !externalJs && Boolean(value) && Boolean(value.key)

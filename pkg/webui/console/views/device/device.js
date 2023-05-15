@@ -14,7 +14,7 @@
 
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { Switch, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import { Col, Row, Container } from 'react-grid-system'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
@@ -126,7 +126,7 @@ const Device = props => {
           </Row>
         </Container>
       </div>
-      <Switch>
+      <Routes>
         <Route exact path={basePath} component={DeviceOverview} />
         <Route exact path={`${basePath}/data`} component={DeviceData} />
         {!hideMessaging && <Route path={`${basePath}/messaging`} component={DeviceMessaging} />}
@@ -136,7 +136,7 @@ const Device = props => {
           <Route path={`${basePath}/payload-formatters`} component={DevicePayloadFormatters} />
         )}
         <NotFoundRoute />
-      </Switch>
+      </Routes>
     </>
   )
 }

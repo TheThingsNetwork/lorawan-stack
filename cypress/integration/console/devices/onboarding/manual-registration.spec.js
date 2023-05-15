@@ -776,7 +776,8 @@ describe('End device manual create', () => {
         cy.findByRole('button', { name: 'Register end device' }).should('not.be.disabled')
 
         // Device 3
-        cy.findByLabelText('Device address').clear().type(device3.dev_addr)
+        cy.findByLabelText('Device address').clear()
+        cy.findByLabelText('Device address').type(device3.dev_addr)
         cy.findByLabelText('End device ID').type(device3.id)
         cy.findByLabelText('View registered end device').check()
 

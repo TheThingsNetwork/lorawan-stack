@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route, Redirect } from 'react-router-dom'
+import { Routes, Route, Redirect } from 'react-router-dom'
 import { Container, Col, Row } from 'react-grid-system'
 
 import Spinner from '@ttn-lw/components/spinner'
@@ -57,7 +57,7 @@ const ApplicationPayloadFormatters = props => {
     <Container>
       <Row>
         <Col>
-          <Switch>
+          <Routes>
             <Redirect exact from={url} to={`${url}/uplink`} />
             <Route path={`${match.url}/uplink`} component={ApplicationUplinkPayloadFormatters} />
             <Route
@@ -65,7 +65,7 @@ const ApplicationPayloadFormatters = props => {
               component={ApplicationDownlinkPayloadFormatters}
             />
             <NotFoundRoute />
-          </Switch>
+          </Routes>
         </Col>
       </Row>
     </Container>

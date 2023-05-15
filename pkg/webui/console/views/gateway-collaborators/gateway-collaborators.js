@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
@@ -40,7 +40,7 @@ const GatewayCollaborators = props => {
 
   return (
     <ErrorView errorRender={SubViewError}>
-      <Switch>
+      <Routes>
         <Route exact path={`${match.path}`} component={GatewayCollaboratorsList} />
         <Route exact path={`${match.path}/add`} component={GatewayCollaboratorAdd} />
         <Route
@@ -48,7 +48,7 @@ const GatewayCollaborators = props => {
           component={GatewayCollaboratorEdit}
         />
         <NotFoundRoute />
-      </Switch>
+      </Routes>
     </ErrorView>
   )
 }

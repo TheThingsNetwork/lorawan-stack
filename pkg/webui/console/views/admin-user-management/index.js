@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -43,13 +43,13 @@ const UserManagementRouter = ({ match }) => {
   return (
     <Require featureCheck={mayManageUsers} otherwise={{ redirect: '/' }}>
       <IntlHelmet title={sharedMessages.userManagement} />
-      <Switch>
+      <Routes>
         <Route exact path={`${match.path}`} component={UserManagement} />
         <Route path={`${match.path}/add`} component={UserAdd} />
         <Route path={`${match.path}/invitations/add`} component={InvitationSend} />
         <Route path={`${match.path}/:userId${userPathIdRegexp}`} component={UserEdit} sensitive />
         <NotFoundRoute />
-      </Switch>
+      </Routes>
     </Require>
   )
 }

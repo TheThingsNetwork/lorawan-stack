@@ -44,16 +44,16 @@ const validationSchema = Yup.object()
     lorawan_version: Yup.string().required(sharedMessages.validateRequired),
     lorawan_phy_version: Yup.string().required(sharedMessages.validateRequired),
     frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
-    supports_class_b: Yup.boolean().when(['_device_classes'], (deviceClasses = {}, schema) =>
+    supports_class_b: Yup.boolean().when(['_device_classes'], ([deviceClasses = {}], schema) =>
       schema.transform(() => undefined).default(deviceClasses.class_b || false),
     ),
-    supports_class_c: Yup.boolean().when(['_device_classes'], (deviceClasses = {}, schema) =>
+    supports_class_c: Yup.boolean().when(['_device_classes'], ([deviceClasses = {}], schema) =>
       schema.transform(() => undefined).default(deviceClasses.class_c || false),
     ),
     _device_classes: Yup.object({
       class_b: Yup.boolean(),
       class_c: Yup.boolean(),
-    }).when(['_activation_mode'], (mode, schema) => {
+    }).when(['_activation_mode'], ([mode], schema) => {
       if (mode === ACTIVATION_MODES.MULTICAST) {
         return schema.test(
           'has-class-checked',
@@ -67,7 +67,7 @@ const validationSchema = Yup.object()
     }),
     session: Yup.object().when(
       ['_activation_mode', 'lorawan_version', '$isJoined', '$mayEditKeys', '$mayReadKeys'],
-      (mode, version, isJoined, mayEditKeys, mayReadKeys, schema) => {
+      ([mode, version, isJoined, mayEditKeys, mayReadKeys], schema) => {
         if (mode === ACTIVATION_MODES.ABP || mode === ACTIVATION_MODES.MULTICAST || isJoined) {
           const isNewVersion = parseLorawanMacVersion(version) >= 110
           return schema.shape({
@@ -130,7 +130,7 @@ const validationSchema = Yup.object()
     ),
     mac_settings: Yup.object().when(
       ['_activation_mode', 'supports_class_b', 'supports_class_c', 'lorawan_version'],
-      (mode, isClassB, isClassC, version, schema) => {
+      ([mode, isClassB, isClassC, version], schema) => {
         const isNewVersion = parseLorawanMacVersion(version) >= 110
 
         return schema.shape({
@@ -369,14 +369,14 @@ const validationSchema = Yup.object()
               }),
             })
           }),
-          desired_adr_ack_limit_exponent: Yup.string().when(['adr'], (adr, schema) => {
+          desired_adr_ack_limit_exponent: Yup.string().when(['adr'], ([adr], schema) => {
             if (!('dynamic' in adr) || !isNewVersion || mode === ACTIVATION_MODES.MULTICAST) {
               return schema.strip()
             }
 
             return schema
           }),
-          desired_adr_ack_delay_exponent: Yup.string().when(['adr'], (adr, schema) => {
+          desired_adr_ack_delay_exponent: Yup.string().when(['adr'], ([adr], schema) => {
             if (!('dynamic' in adr) || !isNewVersion || mode === ACTIVATION_MODES.MULTICAST) {
               return schema.strip()
             }

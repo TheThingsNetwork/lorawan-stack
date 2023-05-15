@@ -69,7 +69,8 @@ describe('Account App profile settings', () => {
 
     cy.findByLabelText('Use Gravatar').check()
     cy.findByLabelText('Name').type(userUpdate.name)
-    cy.findByLabelText('Email address').clear().type(userUpdate.primary_email_address)
+    cy.findByLabelText('Email address').clear()
+    cy.findByLabelText('Email address').type(userUpdate.primary_email_address)
 
     // Check if the profile picture (preview) was updated properly.
     cy.get('form').within(() => {

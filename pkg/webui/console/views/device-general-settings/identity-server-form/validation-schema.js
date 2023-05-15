@@ -49,7 +49,7 @@ const validationSchema = Yup.object()
       Yup.passValues(sharedMessages.validateAddressFormat),
     ),
     _external_js: Yup.boolean(),
-    join_server_address: Yup.string().when(['$supportsJoin'], (supportsJoin, schema) => {
+    join_server_address: Yup.string().when(['$supportsJoin'], ([supportsJoin], schema) => {
       if (!supportsJoin) {
         return schema.strip()
       }
@@ -60,7 +60,7 @@ const validationSchema = Yup.object()
     }),
     resets_join_nonces: Yup.bool().when(
       ['$supportsJoin', '$lorawanVersion', '_external_js'],
-      (supportsJoin, lorawanVersion, externalJs, schema) => {
+      ([supportsJoin, lorawanVersion, externalJs], schema) => {
         if (!supportsJoin || parseLorawanMacVersion(lorawanVersion) < 110) {
           return schema.strip()
         }
@@ -74,7 +74,7 @@ const validationSchema = Yup.object()
     ),
     root_keys: Yup.object().when(
       ['_external_js', '$lorawanVersion', '$supportsJoin'],
-      (externalJs, version, supportsJoin, schema) => {
+      ([externalJs, version, supportsJoin], schema) => {
         if (!supportsJoin) {
           return schema.strip()
         }

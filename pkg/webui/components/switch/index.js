@@ -19,7 +19,7 @@ import COLORS from '@ttn-lw/constants/colors'
 
 import Icon from '@ttn-lw/components/icon'
 
-const Switch = props => (
+const Routes = props => (
   <ReactSwitch
     {...props}
     uncheckedIcon={
@@ -39,4 +39,4 @@ const Switch = props => (
 Switch.propTypes = ReactSwitch.propTypes
 Switch.defaultProps = ReactSwitch.defaultProps
 
-export default Switch
+export default Routes

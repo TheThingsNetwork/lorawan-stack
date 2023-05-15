@@ -111,8 +111,8 @@ describe('Application Pub/Sub create', () => {
         cy.findByLabelText('Subscribe QoS').selectOption(pubSub.subscribe_qos)
         cy.findByLabelText('Publish QoS').selectOption(pubSub.publish_qos)
         cy.findByLabelText('Pub/Sub format').selectOption(pubSub.format)
+        cy.findByLabelText('Uplink message').check()
         cy.findByLabelText('Uplink message')
-          .check()
           .parents('[data-test-id="form-field"]')
           .within(() => {
             cy.findByPlaceholderText('sub-topic').type(pubSub.uplinkSubTopic)
@@ -173,8 +173,8 @@ describe('Application Pub/Sub create', () => {
         cy.findByLabelText('Subscribe QoS').selectOption(pubSub.subscribe_qos)
         cy.findByLabelText('Publish QoS').selectOption(pubSub.publish_qos)
         cy.findByLabelText('Pub/Sub format').selectOption(pubSub.format)
+        cy.findByLabelText('Uplink message').check()
         cy.findByLabelText('Uplink message')
-          .check()
           .parents('[data-test-id="form-field"]')
           .within(() => {
             cy.findByPlaceholderText('sub-topic').type(pubSub.uplinkSubTopic)
@@ -258,8 +258,8 @@ describe('Application Pub/Sub create', () => {
         cy.findByLabelText('Address').type(pubSub.address)
         cy.findByLabelText('Port').type(pubSub.port)
         cy.findByLabelText('Pub/Sub format').selectOption(pubSub.format)
+        cy.findByLabelText('Uplink message').check()
         cy.findByLabelText('Uplink message')
-          .check()
           .parents('[data-test-id="form-field"]')
           .within(() => {
             cy.findByPlaceholderText('sub-topic').type(pubSub.uplinkSubTopic)
@@ -307,8 +307,8 @@ describe('Application Pub/Sub create', () => {
         cy.findByLabelText('Address').type(pubSub.address)
         cy.findByLabelText('Port').type(pubSub.port)
         cy.findByLabelText('Pub/Sub format').selectOption(pubSub.format)
+        cy.findByLabelText('Uplink message').check()
         cy.findByLabelText('Uplink message')
-          .check()
           .parents('[data-test-id="form-field"]')
           .within(() => {
             cy.findByPlaceholderText('sub-topic').type(pubSub.uplinkSubTopic)

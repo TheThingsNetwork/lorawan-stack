@@ -19,7 +19,7 @@ import EVENT_STORE_LIMIT from '@console/constants/event-store-limit'
 import hamburgerMenuClose from '@assets/misc/hamburger-menu-close.svg'
 
 import Button from '@ttn-lw/components/button'
-import Switch from '@ttn-lw/components/switch'
+import Routes from '@ttn-lw/components/switch'
 import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -89,7 +89,7 @@ const Events = React.memo(
                 {!disableFiltering && (
                   <label className={style.toggleContainer}>
                     <Message content={m.verboseStream} className={style.toggleLabel} />
-                    <Switch onChange={handleVerboseFilterChange} checked={!Boolean(filter)} />
+                    <Routes onChange={handleVerboseFilterChange} checked={!Boolean(filter)} />
                   </label>
                 )}
                 <Button

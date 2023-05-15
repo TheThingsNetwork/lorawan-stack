@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
@@ -43,7 +43,7 @@ const OrganizationCollaborators = props => {
 
   return (
     <ErrorView errorRender={SubViewError}>
-      <Switch>
+      <Routes>
         <Route exact path={`${match.path}`} component={OrganizationCollaboratorsList} />
         <Route exact path={`${match.path}/add`} component={OrganizationCollaboratorAdd} />
         <Route
@@ -51,7 +51,7 @@ const OrganizationCollaborators = props => {
           component={OrganizationCollaboratorEdit}
         />
         <NotFoundRoute />
-      </Switch>
+      </Routes>
     </ErrorView>
   )
 }

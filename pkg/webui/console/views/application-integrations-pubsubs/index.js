@@ -14,7 +14,7 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Switch, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
@@ -57,7 +57,7 @@ export default class ApplicationPubsubs extends React.Component {
 
     return (
       <ErrorView errorRender={SubViewError}>
-        <Switch>
+        <Routes>
           <Route exact path={`${match.path}`} component={ApplicationPubsubsList} />
           <Route exact path={`${match.path}/add`} component={ApplicationPubsubAdd} />
           <Route
@@ -66,7 +66,7 @@ export default class ApplicationPubsubs extends React.Component {
             sensitive
           />
           <NotFoundRoute />
-        </Switch>
+        </Routes>
       </ErrorView>
     )
   }

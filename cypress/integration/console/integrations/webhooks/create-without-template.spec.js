@@ -104,8 +104,8 @@ describe('Application Webhook create without template', () => {
     cy.findByLabelText('Webhook ID').type(webhook.id)
     cy.findByLabelText('Webhook format').selectOption(webhook.format)
     cy.findByLabelText('Base URL').type(webhook.baseUrl)
+    cy.findByLabelText('Uplink message').check()
     cy.findByLabelText('Uplink message')
-      .check()
       .parents('[data-test-id="form-field"]')
       .within(() => {
         cy.findByPlaceholderText('/path/to/webhook').type(webhook.path)
@@ -146,8 +146,8 @@ describe('Application Webhook create without template', () => {
       .and('have.attr', 'value')
       .and('eq', webhook.id)
     cy.findByLabelText('Base URL').and('have.attr', 'value', webhook.baseUrl)
+    cy.findByLabelText('Uplink message').check()
     cy.findByLabelText('Uplink message')
-      .check()
       .parents('[data-test-id="form-field"]')
       .within(() => {
         cy.findByPlaceholderText('/path/to/webhook').should('have.attr', 'value', webhook.path)

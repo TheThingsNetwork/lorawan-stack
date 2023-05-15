@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,29 +15,32 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 
-import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
-
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 
-import UserApiKeys from '@console/views/user-api-keys'
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+
+import UserManagement from '@console/views/admin-user-management'
+import PacketBroker from '@console/views/admin-packet-broker'
 
 import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-const UserView = ({ match }) => (
-  <>
-    <Breadcrumbs />
-    <IntlHelmet titleTemplate={`%s - User - ${selectApplicationSiteName()}`} />
+import { mayPerformAdminActions } from '@console/lib/feature-checks'
+
+const AdminView = ({ match }) => (
+  <React.Fragment>
+    <IntlHelmet titleTemplate={`%s - Admin Configurations - ${selectApplicationSiteName()}`} />
     <Routes>
-      <Route path={`${match.path}/api-keys`} component={UserApiKeys} />
+      <Route path={`${match.path}/user-management`} component={UserManagement} />
+      <Route path={`${match.path}/packet-broker`} component={PacketBroker} />
       <NotFoundRoute />
     </Routes>
-  </>
+  </React.Fragment>
 )
 
-UserView.propTypes = {
+AdminView.propTypes = {
   match: PropTypes.match.isRequired,
 }
 
-export default UserView
+export default withFeatureRequirement(mayPerformAdminActions, { redirect: '/' })(AdminView)

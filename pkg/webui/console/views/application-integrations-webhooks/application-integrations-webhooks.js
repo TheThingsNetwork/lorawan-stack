@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
@@ -43,7 +43,7 @@ const ApplicationWebhooks = props => {
 
   return (
     <ErrorView errorRender={SubViewError}>
-      <Switch>
+      <Routes>
         <Route exact path={`${match.path}`} component={ApplicationWebhooksList} />
         <Route exact path={`${match.path}/add`} component={ApplicationWebhookAdd} />
         <Route
@@ -53,7 +53,7 @@ const ApplicationWebhooks = props => {
           sensitive
         />
         <Route path={`${match.path}/add/template`} component={ApplicationWebhookChoose} />
-      </Switch>
+      </Routes>
     </ErrorView>
   )
 }

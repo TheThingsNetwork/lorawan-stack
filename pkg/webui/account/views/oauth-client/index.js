@@ -14,7 +14,7 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Switch, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 import applicationIcon from '@assets/misc/application.svg'
 
@@ -98,13 +98,13 @@ const OAuthClient = props => {
           />
         )}
       </SideNavigation>
-      <Switch>
+      <Routes>
         <Route exact path={`${path}`} component={OAuthClientOverview} />
         <Route exact path={`${path}/collaborators`} component={OAuthClientCollaboratorsList} />
         <Route exact path={`${path}/collaborators/add`} component={OAuthClientCollaboratorAdd} />
         <Route exact path={`${path}/general-settings`} component={OAuthClientGeneralSettings} />
         <NotFoundRoute />
-      </Switch>
+      </Routes>
     </React.Fragment>
   )
 }

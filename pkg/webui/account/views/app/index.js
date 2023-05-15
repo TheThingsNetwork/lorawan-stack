@@ -14,7 +14,7 @@
 
 import { useSelector, useDispatch } from 'react-redux'
 import React, { useEffect } from 'react'
-import { Switch, Route, Redirect } from 'react-router-dom'
+import { Routes, Route, Redirect } from 'react-router-dom'
 import { ConnectedRouter } from 'connected-react-router'
 import { Helmet } from 'react-helmet'
 
@@ -85,11 +85,11 @@ const AccountApp = ({ history }) => {
               titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
               defaultTitle={`${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
             />
-            <Switch>
-              <Redirect from="/:url*(/+)" to={pathname.slice(0, -1)} />
+            <Routes>
+              <Route path="/:url*(/+)" render={() => (window.location = pathname.slice(0, -1))} />
               <Route path="/authorize" component={Authorize} />
               <Route path="/" component={Boolean(user) ? Landing : Front} />
-            </Switch>
+            </Routes>
           </React.Fragment>
         </ErrorView>
       </ConnectedRouter>

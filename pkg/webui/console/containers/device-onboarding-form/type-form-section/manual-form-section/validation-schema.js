@@ -56,7 +56,7 @@ const macSettingsSchema = Yup.object({
   mac_settings: Yup.lazy(macSettings =>
     Yup.object().when(
       ['multicast', 'supports_join', 'supports_class_b', '$defaultMacSettings'],
-      (multicast, supports_join, supports_class_b, defaultMacSettings, schema) => {
+      ([multicast, supports_join, supports_class_b, defaultMacSettings], schema) => {
         if (!defaultMacSettings || !macSettings) {
           return schema
         }

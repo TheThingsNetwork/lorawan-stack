@@ -89,7 +89,8 @@ describe('Packet Broker registration', () => {
     cy.loginConsole({ user_id: 'admin', password: 'admin' })
     cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/packet-broker`)
 
-    cy.findByText('Register network').click().next().findByTestId('switch').should('be.checked')
+    cy.findByText('Register network').click()
+    cy.findByText('Register network').next().findByTestId('switch').should('be.checked')
     cy.findByText('List network publicly')
       .should('be.visible')
       .next()

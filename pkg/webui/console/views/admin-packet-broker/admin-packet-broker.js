@@ -15,7 +15,7 @@
 import React, { useCallback, useState } from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 import { useSelector, useDispatch } from 'react-redux'
-import { Switch as RouteSwitch, Route } from 'react-router-dom'
+import { Routes as RouteSwitch, Route } from 'react-router-dom'
 import classnames from 'classnames'
 
 import PacketBrokerLogo from '@assets/misc/packet-broker.svg'
@@ -23,7 +23,7 @@ import PacketBrokerLogo from '@assets/misc/packet-broker.svg'
 import Link from '@ttn-lw/components/link'
 import PageTitle from '@ttn-lw/components/page-title'
 import Icon from '@ttn-lw/components/icon'
-import Switch from '@ttn-lw/components/switch'
+import Routes from '@ttn-lw/components/switch'
 import Tabs from '@ttn-lw/components/tabs'
 import PortalledModal from '@ttn-lw/components/modal/portalled'
 import Notification from '@ttn-lw/components/notification'
@@ -169,7 +169,7 @@ const PacketBroker = ({ match }) => {
                     })}
                   >
                     <Message content={m.registerNetwork} component="span" />
-                    <Switch
+                    <Routes
                       onChange={handleRegisterChange}
                       checked={registered}
                       className={style.toggle}
@@ -256,7 +256,7 @@ const PacketBroker = ({ match }) => {
                 <Col md={4}>
                   <label className={style.toggleContainer}>
                     <Message content={m.listNetwork} component="span" />
-                    <Switch
+                    <Routes
                       onChange={handleListedChange}
                       checked={listed}
                       className={style.toggle}

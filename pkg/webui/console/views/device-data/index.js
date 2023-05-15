@@ -53,6 +53,7 @@ import style from './device-data.styl'
 export default class Data extends React.Component {
   static propTypes = {
     device: PropTypes.device.isRequired,
+    match: PropTypes.match.isRequired,
   }
 
   render() {

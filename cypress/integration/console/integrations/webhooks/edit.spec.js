@@ -65,9 +65,10 @@ describe('Application Webhook', () => {
     }
 
     cy.findByLabelText('Webhook format').selectOption(webhook.format)
-    cy.findByLabelText('Base URL').clear().type(webhook.url)
+    cy.findByLabelText('Base URL').clear()
+    cy.findByLabelText('Base URL').type(webhook.url)
+    cy.findByLabelText('Uplink message').check()
     cy.findByLabelText('Uplink message')
-      .check()
       .parents('[data-test-id="form-field"]')
       .within(() => {
         cy.findByPlaceholderText('/path/to/webhook').type(webhook.path)

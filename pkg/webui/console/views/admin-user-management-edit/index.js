@@ -70,6 +70,7 @@ const m = defineMessages({
 export default class UserManagementEdit extends Component {
   static propTypes = {
     deleteUser: PropTypes.func.isRequired,
+    match: PropTypes.match.isRequired,
     navigateToList: PropTypes.func.isRequired,
     updateUser: PropTypes.func.isRequired,
     user: PropTypes.user.isRequired,

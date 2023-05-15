@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -41,11 +41,11 @@ export default class Gateways extends React.Component {
     const { path } = this.props.match
 
     return (
-      <Switch>
+      <Routes>
         <Route exact path={`${path}`} component={GatewaysList} />
         <Route exact path={`${path}/add`} component={GatewayAdd} />
         <Route path={`${path}/:gtwId${pathIdRegexp}`} component={Gateway} sensitive />
-      </Switch>
+      </Routes>
     )
   }
 }

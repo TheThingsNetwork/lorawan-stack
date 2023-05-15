@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
@@ -33,7 +33,7 @@ import { apiKeyPath as apiKeyPathRegexp } from '@console/lib/regexp'
 
 const UserApiKeys = ({ match }) => (
   <ErrorView errorRender={SubViewError}>
-    <Switch>
+    <Routes>
       <Route exact path={match.path} component={UserApiKeysList} />
       <Route exact path={`${match.path}/add`} component={UserApiKeyAdd} />
       <Route
@@ -42,7 +42,7 @@ const UserApiKeys = ({ match }) => (
         sensitive
       />
       <NotFoundRoute />
-    </Switch>
+    </Routes>
   </ErrorView>
 )
 

@@ -81,8 +81,8 @@ import m from './messages'
 
     const fetching =
       entitiesFetching ||
-      (mayViewApiKeys && typeof apiKeysCount === undefined) ||
-      (mayViewCollaborators && typeof collaboratorsCount === undefined)
+      (mayViewApiKeys && apiKeysCount === undefined) ||
+      (mayViewCollaborators && collaboratorsCount === undefined)
     const hasApiKeys = apiKeysCount > 0
     // Note: there is always at least one collaborator.
     const hasAddedCollaborators = collaboratorsCount > 1

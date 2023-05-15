@@ -50,7 +50,8 @@ describe('Gateway create', () => {
       eui: generateHexValue(16),
     }
 
-    cy.findByLabelText('Gateway EUI').type(gateway.eui).blur()
+    cy.findByLabelText('Gateway EUI').type(gateway.eui)
+    cy.findByLabelText('Gateway EUI').blur()
     cy.findByLabelText('Gateway ID').should('have.value', `eui-${gateway.eui}`)
     cy.findByLabelText('Gateway name').type('Test Gateway')
     cy.findByLabelText('Frequency plan').selectOption(gateway.frequency_plan)
@@ -71,7 +72,8 @@ describe('Gateway create', () => {
       eui: generateHexValue(16),
     }
 
-    cy.findByLabelText('Gateway EUI').type(gateway.eui).blur()
+    cy.findByLabelText('Gateway EUI').type(gateway.eui)
+    cy.findByLabelText('Gateway EUI').blur()
     cy.findByLabelText('Gateway ID').should('have.value', `eui-${gateway.eui}`)
     cy.findByLabelText('Gateway name').type('Test Gateway')
     cy.findByLabelText('Frequency plan').selectOption(gateway.frequency_plan)

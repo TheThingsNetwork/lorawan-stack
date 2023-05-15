@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { withRouter } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 
 import { ingestError } from '@ttn-lw/lib/errors/utils'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -22,11 +22,11 @@ class ErrorView extends React.Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
     errorRender: PropTypes.func.isRequired,
-    history: PropTypes.history,
+    location: PropTypes.location,
   }
 
   static defaultProps = {
-    history: undefined,
+    location: undefined,
   }
 
   state = {
@@ -40,6 +40,13 @@ class ErrorView extends React.Component {
     this.unlisten()
   }
 
+  componentDidUpdate({ location: prevLocation }) {
+    const { location } = this.props
+    if (location !== prevLocation) {
+      this.setState({ hasCaught: false, error: undefined })
+    }
+  }
+
   componentDidCatch(error) {
     ingestError(error, { ingestedBy: 'ErrorView' })
 
@@ -47,17 +54,6 @@ class ErrorView extends React.Component {
       hasCaught: true,
       error,
     })
-
-    // Clear the error when the route changes (e.g. user clicking a link).
-    const { history } = this.props
-    if (history) {
-      this.unlisten = history.listen(() => {
-        if (this.state.hasCaught) {
-          this.setState({ hasCaught: false, error: undefined })
-          this.unlisten()
-        }
-      })
-    }
   }
 
   render() {
@@ -72,6 +68,9 @@ class ErrorView extends React.Component {
   }
 }
 
-const ErrorViewWithRouter = withRouter(ErrorView)
+const ErrorViewWithRouter = props => {
+  const location = useLocation()
+  return <ErrorView {...props} location={location} />
+}
 
 export { ErrorViewWithRouter as default, ErrorView }

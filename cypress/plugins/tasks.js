@@ -19,7 +19,6 @@ const util = require('util')
 
 const { Client } = require('pg')
 const yaml = require('js-yaml')
-const codeCoverageTask = require('@cypress/code-coverage/task')
 
 const isCI = process.env.CI === 'true' || process.env.CI === '1'
 
@@ -141,7 +140,6 @@ const fileExistsTask = on => {
 
 module.exports = {
   stackConfigTask,
-  codeCoverageTask,
   sqlTask,
   fileExistsTask,
   emailTask,

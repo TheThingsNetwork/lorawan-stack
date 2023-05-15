@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, { useEffect } from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 import organizationIcon from '@assets/misc/organization.svg'
 
@@ -107,14 +107,14 @@ const Organization = props => {
           />
         )}
       </SideNavigation>
-      <Switch>
+      <Routes>
         <Route exact path={`${path}`} component={OrganizationOverview} />
         <Route path={`${path}/data`} component={OrganizationData} />
         <Route path={`${path}/general-settings`} component={OrganizationGeneralSettings} />
         <Route path={`${path}/api-keys`} component={OrganizationApiKeys} />
         <Route path={`${path}/collaborators`} component={OrganizationCollaborators} />
         <NotFoundRoute />
-      </Switch>
+      </Routes>
     </React.Fragment>
   )
 }

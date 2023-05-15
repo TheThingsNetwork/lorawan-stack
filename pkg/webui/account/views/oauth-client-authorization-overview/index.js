@@ -16,7 +16,7 @@ import React from 'react'
 import { connect, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { Col, Row, Container } from 'react-grid-system'
-import { Switch, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Tabs from '@ttn-lw/components/tabs'
@@ -93,11 +93,11 @@ const AuthorizationOverview = props => {
           </Row>
         </Container>
       </div>
-      <Switch>
+      <Routes>
         <Route exact path={path} component={AuthorizationSettings} />
         <Route exact path={`${path}/access-tokens`} component={TokensTable} />
         <NotFoundRoute />
-      </Switch>
+      </Routes>
     </>
   )
 }

@@ -136,9 +136,12 @@ describe('Gateway general settings', () => {
     const address = 'otherhost'
     const lnsKey = '1234'
 
-    cy.findByLabelText('Gateway name').clear().type(newGatewayName)
-    cy.findByLabelText('Gateway description').clear().type(newGatewayDesc)
-    cy.findByLabelText('Gateway Server address').clear().type(address)
+    cy.findByLabelText('Gateway name').clear()
+    cy.findByLabelText('Gateway name').type(newGatewayName)
+    cy.findByLabelText('Gateway description').clear()
+    cy.findByLabelText('Gateway description').type(newGatewayDesc)
+    cy.findByLabelText('Gateway Server address').clear()
+    cy.findByLabelText('Gateway Server address').type(address)
     cy.findByLabelText('Require authenticated connection').check()
     cy.findByLabelText('LoRa Basics Station LNS Authentication Key').type(lnsKey)
     cy.findByLabelText('Gateway status').check()
@@ -177,7 +180,8 @@ describe('Gateway general settings', () => {
         cy.findByRole('button', { name: 'Expand' }).click()
         cy.findByLabelText('Schedule downlink late').check()
         cy.findByLabelText(/Enforce duty cycle/).uncheck()
-        cy.findByLabelText('Schedule any time delay').clear().type('1')
+        cy.findByLabelText('Schedule any time delay').clear()
+        cy.findByLabelText('Schedule any time delay').type('1')
         cy.findByLabelText('Frequency plan').type(`${newFrequencyPlan}{enter}`)
         cy.findByRole('button', { name: 'Save changes' }).click()
       })

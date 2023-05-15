@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import { connect } from 'react-redux'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -51,13 +51,13 @@ export default class Devices extends React.Component {
   render() {
     const { path } = this.props.match
     return (
-      <Switch>
+      <Routes>
         <Route path={`${path}/add`} component={DeviceAdd} />
         <Route path={`${path}/import`} component={DeviceImport} />
         <Route path={`${path}/:devId${pathIdRegexp}`} component={Device} sensitive />
         <Route path={`${path}`} component={DeviceList} exact />
         <NotFoundRoute />
-      </Switch>
+      </Routes>
     )
   }
 }

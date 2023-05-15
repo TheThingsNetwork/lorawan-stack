@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, { useEffect } from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 import applicationIcon from '@assets/misc/application.svg'
 
@@ -169,7 +169,7 @@ const Application = props => {
           />
         )}
       </SideNavigation>
-      <Switch>
+      <Routes>
         <Route exact path={`${path}`} component={ApplicationOverview} />
         <Route path={`${path}/general-settings`} component={ApplicationGeneralSettings} />
         <Route path={`${path}/api-keys`} component={ApplicationApiKeys} />
@@ -187,7 +187,7 @@ const Application = props => {
           component={ApplicationIntegrationsLoRaCloud}
         />
         <NotFoundRoute />
-      </Switch>
+      </Routes>
     </React.Fragment>
   )
 }

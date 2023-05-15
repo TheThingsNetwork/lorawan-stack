@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import { connect } from 'react-redux'
 
 import gatewayIcon from '@assets/misc/gateway.svg'
@@ -208,7 +208,7 @@ export default class Gateway extends React.Component {
             />
           )}
         </SideNavigation>
-        <Switch>
+        <Routes>
           <Route exact path={`${match.path}`} component={GatewayOverview} />
           <Route path={`${match.path}/api-keys`} component={GatewayApiKeys} />
           <Route path={`${match.path}/collaborators`} component={GatewayCollaborators} />
@@ -216,7 +216,7 @@ export default class Gateway extends React.Component {
           <Route path={`${match.path}/data`} component={GatewayData} />
           <Route path={`${match.path}/general-settings`} component={GatewayGeneralSettings} />
           <NotFoundRoute />
-        </Switch>
+        </Routes>
       </React.Fragment>
     )
   }

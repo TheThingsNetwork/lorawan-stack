@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
@@ -41,12 +41,12 @@ const Organizations = props => {
   )
 
   return (
-    <Switch>
+    <Routes>
       <Route exact path={`${match.path}`} component={OrganizationsList} />
       <Route exact path={`${match.path}/add`} component={OrganizationAdd} />
       <Route path={`${match.path}/:orgId${pathIdRegexp}`} component={Organization} sensitive />
       <NotFoundRoute />
-    </Switch>
+    </Routes>
   )
 }
 

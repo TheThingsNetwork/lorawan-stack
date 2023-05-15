@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
@@ -41,7 +41,7 @@ const GatewayApiKeys = props => {
 
   return (
     <ErrorView errorRender={SubViewError}>
-      <Switch>
+      <Routes>
         <Route exact path={`${match.path}`} component={GatewayApiKeysList} />
         <Route exact path={`${match.path}/add`} component={GatewayApiKeyAdd} />
         <Route
@@ -50,7 +50,7 @@ const GatewayApiKeys = props => {
           sensitive
         />
         <NotFoundRoute />
-      </Switch>
+      </Routes>
     </ErrorView>
   )
 }

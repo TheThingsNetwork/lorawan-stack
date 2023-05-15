@@ -82,6 +82,7 @@ class FetchTable extends Component {
   static propTypes = {
     actionItems: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
     addMessage: PropTypes.message,
+    baseDataSelector: PropTypes.func.isRequired,
     clickable: PropTypes.bool,
     defaultOrder: PropTypes.string,
     dispatch: PropTypes.func.isRequired,

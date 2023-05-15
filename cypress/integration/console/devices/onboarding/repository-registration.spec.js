@@ -318,7 +318,8 @@ describe('End device repository manual registration', () => {
         cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('DevEUI').type(generateHexValue(16))
         cy.findByLabelText('AppKey').type(generateHexValue(32))
-        cy.findByLabelText('End device ID').clear().type(devId)
+        cy.findByLabelText('End device ID').clear()
+        cy.findByLabelText('End device ID').type(devId)
 
         cy.findByRole('button', { name: 'Register end device' }).click()
 
@@ -458,7 +459,8 @@ describe('End device repository manual registration', () => {
         // handler got attached, which is what happens in slow CI environments.
         // Unfortunately there is currently no good workaround for this.
         // See also: https://www.cypress.io/blog/2019/01/22/when-can-the-test-click/
-        cy.findByLabelText('End device ID').type('type-and-remove').clear()
+        cy.findByLabelText('End device ID').type('type-and-remove')
+        cy.findByLabelText('End device ID').clear()
         cy.findByRole('button', { name: 'Register end device' }).click()
 
         cy.location('pathname').should(
