@@ -47,10 +47,13 @@ func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.Cluste
 }
 
 func TestEndDeviceClaimingServer(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	ctx, cancelCtx := context.WithCancel(ctx)
-	defer cancelCtx()
+	t.Cleanup(func() {
+		cancelCtx()
+	})
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -61,7 +64,9 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 	})
 	test.Must(New(c, &Config{}))
 	componenttest.StartComponent(t, c)
-	defer c.Close()
+	t.Cleanup(func() {
+		c.Close()
+	})
 
 	// Wait for server to be ready.
 	time.Sleep(timeout)
@@ -143,7 +148,9 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 			ErrorAssertion: errors.IsInvalidArgument,
 		},
 	} {
+		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
 			var err error
 			switch req := tc.Req.(type) {
 			case *ttnpb.AuthorizeApplicationRequest:
@@ -178,10 +185,13 @@ var (
 )
 
 func TestGatewayClaimingServer(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	ctx, cancelCtx := context.WithCancel(ctx)
-	defer cancelCtx()
+	t.Cleanup(func() {
+		cancelCtx()
+	})
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -192,7 +202,9 @@ func TestGatewayClaimingServer(t *testing.T) {
 	})
 	test.Must(New(c, &Config{}))
 	componenttest.StartComponent(t, c)
-	defer c.Close()
+	t.Cleanup(func() {
+		c.Close()
+	})
 
 	// Wait for server to be ready.
 	time.Sleep(timeout)
@@ -257,7 +269,9 @@ func TestGatewayClaimingServer(t *testing.T) {
 			ErrorAssertion: errors.IsInvalidArgument,
 		},
 	} {
+		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
 			var err error
 			switch req := tc.Req.(type) {
 			case *ttnpb.AuthorizeGatewayRequest:

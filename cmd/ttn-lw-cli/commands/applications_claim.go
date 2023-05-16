@@ -15,90 +15,40 @@
 package commands
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
-	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
-	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 var (
 	applicationClaim = &cobra.Command{
-		Use:        "claim",
-		Deprecated: "Device claiming is deprecated and will be removed.",
-		Short:      "Manage claim settings in applications",
+		Use:    "claim",
+		Short:  "Manage claim settings in applications (DEPRECATED)",
+		Hidden: true,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return fmt.Errorf(
+				"this command is no longer supported. End device claiming is integrated into the device creation flow",
+			)
+		},
 	}
 	applicationClaimAuthorize = &cobra.Command{
-		Use:        "authorize [application-id]",
-		Deprecated: "Device claiming is deprecated and will be removed.",
-		Short:      "Authorize an application for claiming (EXPERIMENTAL)",
-		Long: `Authorize an application for claiming (EXPERIMENTAL)
-
-The given API key must have devices and device keys read/write rights. If no API
-key is provided, a new API key will be created.`,
+		Use:    "authorize [application-id]",
+		Short:  "Authorize an application for claiming (DEPRECATED)",
+		Hidden: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			appID := getApplicationID(cmd.Flags(), args)
-			if appID == nil {
-				return errNoApplicationID.New()
-			}
-
-			expiryDate, err := getAPIKeyExpiry(cmd.Flags())
-			if err != nil {
-				return err
-			}
-
-			key, _ := cmd.Flags().GetString("api-key")
-			if key == "" {
-				is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
-				if err != nil {
-					return err
-				}
-				logger.Info("Creating API key")
-				apiKey, err := ttnpb.NewApplicationAccessClient(is).CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
-					ApplicationIds: appID,
-					Name:           "Device Claiming",
-					Rights: []ttnpb.Right{
-						ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
-						ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS,
-						ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
-						ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
-					},
-					ExpiresAt: ttnpb.ProtoTime(expiryDate),
-				})
-				if err != nil {
-					return err
-				}
-				key = apiKey.Key
-			}
-
-			dcs, err := api.Dial(ctx, config.DeviceClaimingServerGRPCAddress)
-			if err != nil {
-				return err
-			}
-			_, err = ttnpb.NewEndDeviceClaimingServerClient(dcs).AuthorizeApplication(ctx, &ttnpb.AuthorizeApplicationRequest{
-				ApplicationIds: appID,
-				ApiKey:         key,
-			})
-			return err
+			return fmt.Errorf(
+				"this command is no longer supported. End device claiming is integrated into the device creation flow",
+			)
 		},
 	}
 	applicationClaimUnauthorize = &cobra.Command{
-		Use:        "unauthorize [application-id]",
-		Short:      "Unauthorize an application for claiming (EXPERIMENTAL)",
-		Deprecated: "Device claiming is deprecated and will be removed.",
+		Use:    "unauthorize [application-id]",
+		Short:  "Unauthorize an application for claiming (DEPRECATED)",
+		Hidden: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			appID := getApplicationID(cmd.Flags(), args)
-			if appID == nil {
-				return errNoApplicationID.New()
-			}
-
-			dcs, err := api.Dial(ctx, config.DeviceClaimingServerGRPCAddress)
-			if err != nil {
-				return err
-			}
-
-			logger.Warn("Make sure to delete the API Key used for authorizing claiming as this is not done automatically")
-
-			_, err = ttnpb.NewEndDeviceClaimingServerClient(dcs).UnauthorizeApplication(ctx, appID)
-			return err
+			return fmt.Errorf(
+				"this command is no longer supported. End device claiming is integrated into the device creation flow",
+			)
 		},
 	}
 )

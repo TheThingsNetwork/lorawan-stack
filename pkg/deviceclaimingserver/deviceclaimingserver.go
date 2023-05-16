@@ -23,7 +23,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/web"
 	"google.golang.org/grpc"
 )
 
@@ -35,7 +34,6 @@ type DeviceClaimingServer struct {
 	config Config
 
 	endDeviceClaimingUpstream *enddevices.Upstream
-	endDeviceClaimingFallback Fallback
 
 	gatewayClaimingServerUpstream ttnpb.GatewayClaimingServerServer
 
@@ -64,7 +62,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*DeviceClaimingS
 	if err != nil {
 		return nil, err
 	}
-	dcs.endDeviceClaimingFallback = noopEDCS{}
+
 	dcs.endDeviceClaimingUpstream = upstream
 
 	dcs.grpc.endDeviceClaimingServer = &endDeviceClaimingServer{
@@ -76,7 +74,6 @@ func New(c *component.Component, conf *Config, opts ...Option) (*DeviceClaimingS
 	}
 
 	c.RegisterGRPC(dcs)
-	c.RegisterWeb(dcs)
 	return dcs, nil
 }
 
@@ -105,9 +102,4 @@ func (dcs *DeviceClaimingServer) RegisterServices(s *grpc.Server) {
 func (dcs *DeviceClaimingServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 	ttnpb.RegisterEndDeviceClaimingServerHandler(dcs.Context(), s, conn)
 	ttnpb.RegisterGatewayClaimingServerHandler(dcs.Context(), s, conn)
-}
-
-// RegisterRoutes implements web.Registerer. It registers the Device Claiming Server to the web server.
-func (dcs *DeviceClaimingServer) RegisterRoutes(server *web.Server) {
-	dcs.endDeviceClaimingFallback.RegisterRoutes(server)
 }
