@@ -31,16 +31,11 @@ import DeviceGeneralSettings from '@console/views/device-general-settings'
 import DeviceMessaging from '@console/views/device-messaging'
 import DeviceLocation from '@console/views/device-location'
 import DevicePayloadFormatters from '@console/views/device-payload-formatters'
-import DeviceClaimAuthenticationCode from '@console/views/device-claim-authentication-code'
 import DeviceOverview from '@console/views/device-overview'
 
 import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import {
-  selectApplicationSiteName,
-  selectAsConfig,
-  selectJsConfig,
-} from '@ttn-lw/lib/selectors/env'
+import { selectApplicationSiteName, selectAsConfig } from '@ttn-lw/lib/selectors/env'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import {
@@ -59,7 +54,7 @@ const Device = props => {
   const appId = useSelector(selectSelectedApplicationId)
   const device = useSelector(state => selectSelectedDevice(state))
 
-  const { name, join_server_address, supports_join, root_keys, application_server_address } = device
+  const { name, application_server_address } = device
 
   const mayScheduleDownlinks = useSelector(state =>
     checkFromState(mayScheduleDownlinksCheck, state),
@@ -70,20 +65,12 @@ const Device = props => {
     location: { pathname },
   } = props
 
-  const jsConfig = selectJsConfig()
-  const hasJs =
-    jsConfig.enabled &&
-    join_server_address === getHostnameFromUrl(jsConfig.base_url) &&
-    supports_join &&
-    Boolean(root_keys)
-
   const siteName = selectApplicationSiteName()
   const asConfig = selectAsConfig()
   const hasAs =
     asConfig.enabled && application_server_address === getHostnameFromUrl(asConfig.base_url)
   const hideMessaging = !hasAs || !(mayScheduleDownlinks || maySendUplink)
   const hidePayloadFormatters = !hasAs
-  const hideClaiming = !hasJs
 
   const basePath = `/applications/${appId}/devices/${devId}`
 
@@ -119,12 +106,6 @@ const Device = props => {
       hidden: hidePayloadFormatters,
     },
     {
-      title: sharedMessages.claiming,
-      name: 'claim-auth-code',
-      link: `${basePath}/claim-auth-code`,
-      hidden: hideClaiming,
-    },
-    {
       title: sharedMessages.generalSettings,
       name: 'general-settings',
       link: `${basePath}/general-settings`,
@@ -153,9 +134,6 @@ const Device = props => {
         <Route exact path={`${basePath}/general-settings`} component={DeviceGeneralSettings} />
         {!hidePayloadFormatters && (
           <Route path={`${basePath}/payload-formatters`} component={DevicePayloadFormatters} />
-        )}
-        {!hideClaiming && (
-          <Route path={`${basePath}/claim-auth-code`} component={DeviceClaimAuthenticationCode} />
         )}
         <NotFoundRoute />
       </Switch>
