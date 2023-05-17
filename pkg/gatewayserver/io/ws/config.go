@@ -29,8 +29,6 @@ type Config struct {
 var DefaultConfig = Config{
 	UseTrafficTLSAddress: false,
 	WSPingInterval:       30 * time.Second,
-	// Assuming 5ppm of drift, this means a drift of 5 microseconds in one second.
-	// A drift of 1 millisecond would occur every 200 seconds in such a situation.
 	MissedPongThreshold:  2,
 	TimeSyncInterval:     200 * time.Second,
 	AllowUnauthenticated: false,
