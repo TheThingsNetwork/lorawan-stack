@@ -20,6 +20,8 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Console not applying webhook field masks when creating a webhook from a template that has field masks set.
+- LoRa Basics Station `PONG` messages will now contain the application payload of the associated `PING`, as required by the WebSockets specification.
+  - This fix enables `PING`/`PONG` behavior for non reference implementations of the LNS protocol.
 
 ### Security
 

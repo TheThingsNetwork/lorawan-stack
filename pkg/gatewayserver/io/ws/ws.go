@@ -170,7 +170,7 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 		ctx          = r.Context()
 		eps          = s.formatter.Endpoints()
 		missedPongs  = noPongReceived
-		pongCh       = make(chan struct{}, 1)
+		pongCh       = make(chan []byte, 1)
 		downstreamCh = make(chan []byte, 1)
 	)
 
@@ -291,7 +291,7 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
-		case pongCh <- struct{}{}:
+		case pongCh <- []byte(data):
 		}
 		return nil
 	})
@@ -333,8 +333,8 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 					logger.WithError(err).Warn("Disconnect gateway")
 					return err
 				}
-			case <-pongCh:
-				if err := ws.WriteMessage(websocket.PongMessage, nil); err != nil {
+			case data := <-pongCh:
+				if err := ws.WriteMessage(websocket.PongMessage, []byte(data)); err != nil {
 					logger.WithError(err).Warn("Failed to send pong")
 					return err
 				}
