@@ -488,7 +488,44 @@ class Devices {
       throw new Error('Missing application ID for device')
     }
 
-    const { supports_join = false, ids = {} } = device
+    const { supports_join = false, ids = {}, authenticated_identifiers, target_device_id } = device
+
+    // Initiate claiming, if the device is claimable.
+    const claim = await this._api.EndDeviceClaimingServer.GetInfoByJoinEUI({
+      join_eui: ids.join_eui,
+    })
+    const supportsClaiming = claim.supports_claiming ?? false
+
+    let claimDeviceIds
+    if (supportsClaiming && device.claim_authentication_code?.value) {
+      // Since this device is claimable, the creation on the join server needs to be skipped.
+      device.join_server_address = undefined
+      const claimPayload =
+        'authenticated_identifiers' in device
+          ? {
+              authenticated_identifiers,
+              target_device_id,
+            }
+          : {
+              authenticated_identifiers: {
+                authentication_code: device.claim_authentication_code?.value,
+              },
+              target_device_id: device.ids.end_device_id,
+              target_application_ids: {
+                application_id: applicationId,
+              },
+            }
+      try {
+        claimDeviceIds = await this._api.EndDeviceClaimingServer.Claim(undefined, claimPayload)
+      } catch (error) {
+        throw error
+      }
+    }
+
+    // Apply the resulting IDs to the end_device.
+    if (claimDeviceIds) {
+      ids = { ...ids, ...claimDeviceIds }
+    }
 
     const deviceId = ids.device_id
     if (!Boolean(deviceId)) {
@@ -514,28 +551,6 @@ class Devices {
       routeParams: {
         'end_device.ids.application_ids.application_id': applicationId,
       },
-    }
-
-    // If CAC is set, attempt to claim the End Device via the DCS.
-    if (devicePayload.end_device.claim_authentication_code) {
-      try {
-        const payload = {
-          authenticated_identifiers: {
-            authentication_code: devicePayload.end_device.claim_authentication_code.value,
-          },
-          target_device_id: deviceId,
-          target_application_ids: {
-            application_id: applicationId,
-          },
-        }
-        const response = await this._api.EndDeviceClaimingServer.Claim(undefined, payload)
-
-        return Marshaler.payloadSingleResponse(response)
-      } catch (error) {
-        if (error.statusCode === 400) {
-          throw error
-        }
-      }
     }
 
     const setParts = await makeRequests(
