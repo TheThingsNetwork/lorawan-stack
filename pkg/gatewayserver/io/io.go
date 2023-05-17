@@ -635,13 +635,16 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		default:
 		}
 		var f func(context.Context, scheduling.Options) (scheduling.Emission, scheduling.ConcentratorTime, error)
+		var maxDelay time.Duration
 		switch request.Class {
 		case ttnpb.Class_CLASS_A:
 			f = c.scheduler.ScheduleAt
 			if request.Rx1Delay == ttnpb.RxDelay_RX_DELAY_0 {
 				return false, false, 0, errNoRxDelay.New()
 			}
-			settings.Timestamp = uplinkToken.Timestamp + uint32((time.Duration(request.Rx1Delay)*time.Second+rx.delay)/time.Microsecond)
+			rxDelay := time.Duration(request.Rx1Delay)*time.Second + rx.delay
+			settings.Timestamp = uplinkToken.Timestamp + uint32(rxDelay/time.Microsecond)
+			maxDelay = rx.delay
 		case ttnpb.Class_CLASS_B:
 			if request.AbsoluteTime == nil {
 				return false, false, 0, errNoAbsoluteTime.New()
@@ -652,12 +655,15 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			}
 			f = c.scheduler.ScheduleAt
 			settings.Time = request.AbsoluteTime
+			maxDelay = time.Until(request.AbsoluteTime.AsTime())
 		case ttnpb.Class_CLASS_C:
 			if request.AbsoluteTime != nil {
 				f = c.scheduler.ScheduleAt
 				settings.Time = request.AbsoluteTime
+				maxDelay = time.Until(request.AbsoluteTime.AsTime())
 			} else {
 				f = c.scheduler.ScheduleAnytime
+				maxDelay = scheduling.DutyCycleWindow + 5*time.Second
 			}
 		default:
 			panic(fmt.Sprintf("proto: unexpected class %v in oneof", request.Class))
@@ -688,13 +694,19 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		rx2 = i == 1
 		rxErrs = nil
 		delay = time.Duration(em.Starts() - now)
-		logger.WithFields(log.Fields(
+		logger = logger.WithFields(log.Fields(
 			"rx_window", i+1,
 			"starts", em.Starts(),
 			"duration", em.Duration(),
 			"now", now,
 			"delay", delay,
-		)).Debug("Scheduled downlink")
+			"max_delay", maxDelay,
+		))
+		if delay >= maxDelay {
+			delay = maxDelay
+			logger.Error("Scheduling delay above maximum delay")
+		}
+		logger.Debug("Scheduled downlink")
 		break
 	}
 	if len(rxErrs) > 0 {
