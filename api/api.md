@@ -2717,13 +2717,6 @@ in a future version of The Things Stack.
 | `qr_code` | [`bytes`](#bytes) |  | Raw QR code contents. |
 | `target_application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  | Application identifiers of the target end device. |
 | `target_device_id` | [`string`](#string) |  | End device ID of the target end device. If empty, use the source device ID. |
-| `target_network_server_address` | [`string`](#string) |  | The address of the Network Server where the device will be registered. If set and if the source device is currently registered on a Network Server, settings will be transferred. If not set, the device shall not be registered on a Network Server. |
-| `target_network_server_kek_label` | [`string`](#string) |  | The KEK label of the Network Server to use for wrapping network session keys. |
-| `target_application_server_address` | [`string`](#string) |  | The address of the Application Server where the device will be registered. If set and if the source device is currently registered on an Application Server, settings will be transferred. If not set, the device shall not be registered on an Application Server. |
-| `target_application_server_kek_label` | [`string`](#string) |  | The KEK label of the Application Server to use for wrapping the application session key. |
-| `target_application_server_id` | [`string`](#string) |  | The AS-ID of the Application Server to use. |
-| `target_net_id` | [`bytes`](#bytes) |  | Home NetID. |
-| `invalidate_authentication_code` | [`bool`](#bool) |  | If set, invalidate the authentication code with which the device gets claimed. This prohibits subsequent claiming requests. |
 
 #### Field Rules
 
@@ -2732,12 +2725,6 @@ in a future version of The Things Stack.
 | `qr_code` | <p>`bytes.min_len`: `0`</p><p>`bytes.max_len`: `1024`</p> |
 | `target_application_ids` | <p>`message.required`: `true`</p> |
 | `target_device_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`</p> |
-| `target_network_server_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
-| `target_network_server_kek_label` | <p>`string.max_len`: `2048`</p> |
-| `target_application_server_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
-| `target_application_server_kek_label` | <p>`string.max_len`: `2048`</p> |
-| `target_application_server_id` | <p>`string.max_len`: `100`</p> |
-| `target_net_id` | <p>`bytes.len`: `3`</p> |
 
 ### <a name="ttn.lorawan.v3.ClaimEndDeviceRequest.AuthenticatedIdentifiers">Message `ClaimEndDeviceRequest.AuthenticatedIdentifiers`</a>
 
