@@ -290,8 +290,11 @@ export default class WebhookForm extends Component {
     const { initialWebhookValue } = this.props
 
     this.state = {
-      shouldShowCredentialsInput: Boolean(
-        initialWebhookValue?.headers?.Authorization?.startsWith('Basic '),
+      shouldShowCredentialsInput:
+        Boolean(initialWebhookValue?.headers?.Authorization?.startsWith('Basic ')) &&
+        Boolean(!decodeValues(initialWebhookValue)._headers.find(i => i.decodeError)?.decodeError),
+      showDecodeError: Boolean(
+        decodeValues(initialWebhookValue)._headers.find(i => i.decodeError)?.decodeError,
       ),
       displayOverwriteModal: false,
       existingId: undefined,
@@ -316,6 +319,11 @@ export default class WebhookForm extends Component {
     const encodedValues = encodeValues(castedWebhookValues)
     const webhookId = encodedValues.ids.webhook_id
     const exists = await existCheck(webhookId)
+    this.setState({
+      showDecodeError: Boolean(
+        decodeValues(encodedValues)._headers.find(i => i.decodeError)?.decodeError,
+      ),
+    })
     if (exists) {
       this.setState({ displayOverwriteModal: true, existingId: webhookId })
       await new Promise((resolve, reject) => {
@@ -368,6 +376,11 @@ export default class WebhookForm extends Component {
       ])
     }
     this.setState({ shouldShowCredentialsInput: event.target.checked })
+  }
+
+  @bind
+  handleHeadersChange() {
+    this.setState({ showDecodeError: !hasNoEmptyEntry })
   }
 
   render() {
@@ -512,6 +525,16 @@ export default class WebhookForm extends Component {
                 sensitive
               />
             </Form.FieldContainer>
+          )}
+          {this.state.showDecodeError && (
+            <Notification
+              warning
+              content={
+                'Something went wrong and the contents of the Authorization header could not be decoded.'
+              }
+              small
+              className="mt-cs-xl"
+            />
           )}
           <Form.Field
             name="_headers"
