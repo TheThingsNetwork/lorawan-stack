@@ -510,7 +510,7 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids *ttnpb.GatewayIde
 			conn.RecordRTT(delta, receivedAt)
 		}
 	}
-	syncClock := func(xTime int64, gpsTime int64, rxTime float64, onlyWithGPS bool) *io.FrontendClockSynchronization {
+	syncClock := func(xTime int64, gpsTime int64, onlyWithGPS bool) *io.FrontendClockSynchronization {
 		if onlyWithGPS && gpsTime == 0 {
 			return nil
 		}
@@ -523,9 +523,9 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids *ttnpb.GatewayIde
 			ConcentratorTime: ws.ConcentratorTimeFromXTime(xTime),
 		}
 	}
-	recordTime := func(refTimeUnix float64, xTime int64, gpsTime int64, rxTime float64) *io.FrontendClockSynchronization {
+	recordTime := func(refTimeUnix float64, xTime int64, gpsTime int64) *io.FrontendClockSynchronization {
 		recordRTT(refTimeUnix)
-		return syncClock(xTime, gpsTime, rxTime, false)
+		return syncClock(xTime, gpsTime, false)
 	}
 
 	switch typ {
@@ -567,7 +567,7 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids *ttnpb.GatewayIde
 			return nil, err
 		}
 		ws.UpdateSessionID(ctx, ws.SessionIDFromXTime(jreq.UpInfo.XTime))
-		ct := recordTime(jreq.RefTime, jreq.UpInfo.XTime, jreq.UpInfo.GPSTime, jreq.UpInfo.RxTime)
+		ct := recordTime(jreq.RefTime, jreq.UpInfo.XTime, jreq.UpInfo.GPSTime)
 		if err := conn.HandleUp(up, ct); err != nil {
 			logger.WithError(err).Warn("Failed to handle upstream message")
 		}
@@ -588,7 +588,7 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids *ttnpb.GatewayIde
 			return nil, err
 		}
 		ws.UpdateSessionID(ctx, ws.SessionIDFromXTime(updf.UpInfo.XTime))
-		ct := recordTime(updf.RefTime, updf.UpInfo.XTime, updf.UpInfo.GPSTime, updf.UpInfo.RxTime)
+		ct := recordTime(updf.RefTime, updf.UpInfo.XTime, updf.UpInfo.GPSTime)
 		if err := conn.HandleUp(up, ct); err != nil {
 			logger.WithError(err).Warn("Failed to handle upstream message")
 		}
@@ -611,7 +611,7 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids *ttnpb.GatewayIde
 		// RTT computations. The GPS timestamp is present only if the downlink is a class
 		// B downlink. We allow clock synchronization to occur only if GPSTime is present.
 		// References https://github.com/lorabasics/basicstation/issues/134.
-		syncClock(txConf.XTime, txConf.GPSTime, 0.0, true)
+		syncClock(txConf.XTime, txConf.GPSTime, true)
 
 	case TypeUpstreamTimeSync:
 		// If the gateway sends a `timesync` request, it means that it has access to a PPS
