@@ -245,3 +245,165 @@ func TestFieldsWithoutWrappers(t *testing.T) {
 	}
 	a.So(FieldsWithoutWrappers(paths), should.Resemble, []string{"a", "a.c.value", "a.c.d"})
 }
+
+func TestFieldMaskPathsSet(t *testing.T) {
+	t.Parallel()
+
+	a := assertions.New(t)
+	testCases := []struct {
+		Name   string
+		Paths  []string
+		Result map[string]struct{}
+	}{
+		{
+			Name:   "Empty",
+			Paths:  []string{},
+			Result: map[string]struct{}{},
+		},
+		{
+			Name:   "Nil",
+			Paths:  nil,
+			Result: map[string]struct{}{},
+		},
+		{
+			Name: "Valid",
+			Paths: []string{
+				"a",
+				"a.b.value",
+				"a.c.value",
+				"a.c.d",
+			},
+			Result: map[string]struct{}{
+				"a":         {},
+				"a.b.value": {},
+				"a.c.value": {},
+				"a.c.d":     {},
+			},
+		},
+	}
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+			actual := FieldMaskPathsSet(tc.Paths)
+			a.So(actual, should.Resemble, tc.Result)
+		})
+	}
+}
+
+func TestFieldMaskPathsSetContainsAll(t *testing.T) {
+	t.Parallel()
+
+	testSet := map[string]struct{}{
+		"a":         {},
+		"a.b.value": {},
+		"a.c.value": {},
+	}
+
+	a := assertions.New(t)
+	testCases := []struct {
+		Name                string
+		Set                 map[string]struct{}
+		Subset              []string
+		ExpectedContainsAll bool
+		ExpectedMissing     string
+	}{
+		{
+			Name:                "Empty",
+			Set:                 map[string]struct{}{},
+			Subset:              []string{},
+			ExpectedContainsAll: true,
+			ExpectedMissing:     "",
+		},
+		{
+			Name:                "EmptySet",
+			Set:                 map[string]struct{}{},
+			Subset:              []string{"a"},
+			ExpectedContainsAll: false,
+			ExpectedMissing:     "a",
+		},
+		{
+			Name:                "EmptySubset",
+			Set:                 testSet,
+			Subset:              []string{},
+			ExpectedContainsAll: true,
+			ExpectedMissing:     "",
+		},
+		{
+			Name:                "Nil",
+			Set:                 nil,
+			Subset:              nil,
+			ExpectedContainsAll: true,
+			ExpectedMissing:     "",
+		},
+		{
+			Name:                "NilSet",
+			Set:                 nil,
+			Subset:              []string{"a"},
+			ExpectedContainsAll: false,
+			ExpectedMissing:     "a",
+		},
+		{
+			Name:                "NilSubset",
+			Set:                 testSet,
+			Subset:              nil,
+			ExpectedContainsAll: true,
+			ExpectedMissing:     "",
+		},
+		{
+			Name: "MissingSingle",
+			Set:  testSet,
+			Subset: []string{
+				"a",
+				"a.b.value",
+				"a.c.value",
+				"a.c.d",
+			},
+			ExpectedContainsAll: false,
+			ExpectedMissing:     "a.c.d",
+		},
+		{
+			Name: "MissingMultiple",
+			Set:  testSet,
+			Subset: []string{
+				"a",
+				"a.b.value",
+				"a.c.value",
+				"a.c.d",
+				"a.c.e",
+			},
+			ExpectedContainsAll: false,
+			ExpectedMissing:     "a.c.d",
+		},
+		{
+			Name: "All",
+			Set:  testSet,
+			Subset: []string{
+				"a",
+				"a.b.value",
+				"a.c.value",
+			},
+			ExpectedContainsAll: true,
+			ExpectedMissing:     "",
+		},
+		{
+			Name: "Subset",
+			Set:  testSet,
+			Subset: []string{
+				"a",
+				"a.b.value",
+			},
+			ExpectedContainsAll: true,
+			ExpectedMissing:     "",
+		},
+	}
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+			actualContainsAll, actualMissing := FieldMaskPathsSetContainsAll(tc.Set, tc.Subset...)
+			a.So(actualContainsAll, should.Equal, tc.ExpectedContainsAll)
+			a.So(actualMissing, should.Equal, tc.ExpectedMissing)
+		})
+	}
+}
