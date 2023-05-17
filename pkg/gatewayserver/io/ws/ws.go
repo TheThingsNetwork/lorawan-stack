@@ -334,7 +334,7 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 					return err
 				}
 			case data := <-pongCh:
-				if err := ws.WriteMessage(websocket.PongMessage, []byte(data)); err != nil {
+				if err := ws.WriteMessage(websocket.PongMessage, data); err != nil {
 					logger.WithError(err).Warn("Failed to send pong")
 					return err
 				}
