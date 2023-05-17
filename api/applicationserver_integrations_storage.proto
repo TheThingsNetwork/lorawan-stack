@@ -82,7 +82,7 @@ message GetStoredApplicationUpRequest {
   google.protobuf.Duration last = 10 [deprecated = true];
 
   // The continuation token, which is used to retrieve the next page. If provided, other fields are ignored.
-  string continuation_token = 11;
+  string continuation_token = 11 [(validate.rules).string.max_len = 16000];
 }
 
 message GetStoredApplicationUpCountRequest {

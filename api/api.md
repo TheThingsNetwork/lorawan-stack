@@ -1361,6 +1361,7 @@ The NsAs service connects a Network Server to an Application Server.
 | ----- | ----------- |
 | `type` | <p>`string.in`: `[ uplink_message uplink_normalized join_accept downlink_ack downlink_nack downlink_sent downlink_failed downlink_queued downlink_queue_invalidated location_solved service_data]`</p> |
 | `order` | <p>`string.in`: `[ -received_at received_at]`</p> |
+| `continuation_token` | <p>`string.max_len`: `16000`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationUpStorage">Service `ApplicationUpStorage`</a>
 

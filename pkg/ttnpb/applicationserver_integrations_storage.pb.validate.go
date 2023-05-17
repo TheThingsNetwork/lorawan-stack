@@ -320,7 +320,14 @@ func (m *GetStoredApplicationUpRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "continuation_token":
-			// no validation rules for ContinuationToken
+
+			if utf8.RuneCountInString(m.GetContinuationToken()) > 16000 {
+				return GetStoredApplicationUpRequestValidationError{
+					field:  "continuation_token",
+					reason: "value length must be at most 16000 runes",
+				}
+			}
+
 		default:
 			return GetStoredApplicationUpRequestValidationError{
 				field:  name,
