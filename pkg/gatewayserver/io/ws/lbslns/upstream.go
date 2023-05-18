@@ -499,14 +499,19 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids *ttnpb.GatewayIde
 			return
 		}
 		refTime := ws.TimeFromUnixSeconds(refTimeUnix)
-		if delta := receivedAt.Sub(refTime); delta > f.maxRoundTripDelay {
-			logger.WithFields(log.Fields(
-				"delta", delta,
-				"ref_time_unix", refTimeUnix,
-				"ref_time", refTime,
-				"received_at", receivedAt,
-			)).Warn("Gateway reported RefTime greater than the valid maximum. Skip RTT measurement")
-		} else {
+		delta := receivedAt.Sub(refTime)
+		logger := logger.WithFields(log.Fields(
+			"delta", delta,
+			"ref_time_unix", refTimeUnix,
+			"ref_time", refTime,
+			"received_at", receivedAt,
+		))
+		switch {
+		case delta <= 0:
+			logger.Warn("Gateway reported RefTime in the past. Skip RTT measurement")
+		case delta > f.maxRoundTripDelay:
+			logger.Warn("Gateway reported RefTime too far into the future. Skip RTT measurement")
+		default:
 			conn.RecordRTT(delta, receivedAt)
 		}
 	}
