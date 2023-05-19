@@ -24,7 +24,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/eclipse/paho.mqtt.golang v1.4.2
 	github.com/emersion/go-smtp v0.16.0
-	github.com/envoyproxy/protoc-gen-validate v0.9.1
+	github.com/envoyproxy/protoc-gen-validate v1.0.1
 	github.com/felixge/httpsnoop v1.0.3
 	github.com/getsentry/sentry-go v0.17.0
 	github.com/golang/gddo v0.0.0-20210115222349-20d68f94ee1f
