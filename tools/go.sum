@@ -2421,10 +2421,10 @@ go.packetbroker.org/api/iam/v2 v2.7.8 h1:7ejsuOcxfxc3qiuIfwjXLukcGrN60walAi9Gb8C
 go.packetbroker.org/api/iam/v2 v2.7.8/go.mod h1:zU/7Ec1x/71YncuQrm2vxlYJiCpj1gZzitOSFr6BVuM=
 go.packetbroker.org/api/mapping/v2 v2.1.27 h1:j4swqJJPN74W28bRMtVM5o/Ms8XVFS7PXgIymR7yWF0=
 go.packetbroker.org/api/mapping/v2 v2.1.27/go.mod h1:O1M0oa+6Pn7HjmnhlKv6qzGVjpecU8YcPkv76W+WH78=
-go.packetbroker.org/api/routing v1.8.18 h1:U6ctgJcTS3wEJ4rqNwM/j2XUGouOL59Zl0zO/RxKdjA=
-go.packetbroker.org/api/routing v1.8.18/go.mod h1:mwfrtAZH5kFGd4HXpKYFOgMbQ5tiA/n+soS7ajG0azU=
-go.packetbroker.org/api/v3 v3.12.4 h1:3BGiYBgN20SaUrlucpIZ+PWy7Az/foM/ilM4zRs2iEk=
-go.packetbroker.org/api/v3 v3.12.4/go.mod h1:ovVOyAdBDz8eT6B6JIOnDefQRTcGl42vhszDlbqTxGY=
+go.packetbroker.org/api/routing v1.8.20 h1:nIbVrj3D//Y4lRcH2KazeVOyapUtaLY50T5GGapnRXI=
+go.packetbroker.org/api/routing v1.8.20/go.mod h1:cDGUBlDBV0canSuzfNwWU/onEIXq4EwsdZqbnT/FZy0=
+go.packetbroker.org/api/v3 v3.13.0 h1:YAlRUK38sUOsXpEz2Pk8BANvHjRUh6yeUMvfliGcl/0=
+go.packetbroker.org/api/v3 v3.13.0/go.mod h1:Ocd3Ia7E8c/1zZ4h/8LL9o4I/dDFdpSW8WGqMtTh6Jw=
 go.thethings.network/lorawan-application-payload v0.0.0-20220125153912-1198ff1e403e h1:TWGQ3lh7gI2W5hnb6qPdpoAa0d7s/XPwvgf2VVCMJaY=
 go.thethings.network/lorawan-application-payload v0.0.0-20220125153912-1198ff1e403e/go.mod h1:/smENFuESiJCyWRsHRLBjbZGMN889BORQXIPP6NlpZE=
 go.thethings.network/lorawan-stack-legacy/v2 v2.1.0 h1:xP1fElQiH8/6GWXg6JG8UqRD0uluhmicIRS4e/BzcAw=
