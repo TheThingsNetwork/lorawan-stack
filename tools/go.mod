@@ -209,7 +209,7 @@ require (
 	go.opentelemetry.io/proto/otlp v0.19.0 // indirect
 	go.packetbroker.org/api/iam v1.5.27 // indirect
 	go.packetbroker.org/api/iam/v2 v2.7.8 // indirect
-	go.packetbroker.org/api/mapping/v2 v2.1.27 // indirect
+	go.packetbroker.org/api/mapping/v2 v2.1.29 // indirect
 	go.packetbroker.org/api/routing v1.8.20 // indirect
 	go.packetbroker.org/api/v3 v3.13.0 // indirect
 	go.thethings.network/lorawan-application-payload v0.0.0-20220125153912-1198ff1e403e // indirect
