@@ -635,7 +635,6 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		default:
 		}
 		var f func(context.Context, scheduling.Options) (scheduling.Emission, scheduling.ConcentratorTime, error)
-		var maxDelay time.Duration
 		switch request.Class {
 		case ttnpb.Class_CLASS_A:
 			f = c.scheduler.ScheduleAt
@@ -644,7 +643,6 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			}
 			rxDelay := time.Duration(request.Rx1Delay)*time.Second + rx.delay
 			settings.Timestamp = uplinkToken.Timestamp + uint32(rxDelay/time.Microsecond)
-			maxDelay = rx.delay
 		case ttnpb.Class_CLASS_B:
 			if request.AbsoluteTime == nil {
 				return false, false, 0, errNoAbsoluteTime.New()
@@ -655,15 +653,12 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			}
 			f = c.scheduler.ScheduleAt
 			settings.Time = request.AbsoluteTime
-			maxDelay = time.Until(request.AbsoluteTime.AsTime())
 		case ttnpb.Class_CLASS_C:
 			if request.AbsoluteTime != nil {
 				f = c.scheduler.ScheduleAt
 				settings.Time = request.AbsoluteTime
-				maxDelay = time.Until(request.AbsoluteTime.AsTime())
 			} else {
 				f = c.scheduler.ScheduleAnytime
-				maxDelay = scheduling.DutyCycleWindow + 5*time.Second
 			}
 		default:
 			panic(fmt.Sprintf("proto: unexpected class %v in oneof", request.Class))
@@ -700,11 +695,9 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			"duration", em.Duration(),
 			"now", now,
 			"delay", delay,
-			"max_delay", maxDelay,
 		))
-		if delay >= maxDelay {
-			delay = maxDelay
-			logger.Error("Scheduling delay above maximum delay")
+		if delay >= scheduling.DutyCycleWindow {
+			logger.Info("Scheduling delay beyond duty cycle window")
 		}
 		logger.Debug("Scheduled downlink")
 		break
