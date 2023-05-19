@@ -123,7 +123,7 @@
     "react-text-mask": "^5.5.0",
     "react-toastify": "^8.1.0",
     "react-virtualized-auto-sizer": "^1.0.4",
-    "react-window": "^1.8.6",
+    "react-window": "^1.8.9",
     "redux": "^4.2.1",
     "redux-actions": "^2.6.5",
     "redux-logic": "^3.0.2",
