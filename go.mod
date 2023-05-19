@@ -74,8 +74,8 @@ require (
 	github.com/throttled/throttled v2.2.5+incompatible
 	github.com/throttled/throttled/v2 v2.0.0-00010101000000-000000000000
 	github.com/uptrace/bun v1.1.13
-	github.com/uptrace/bun/dialect/pgdialect v1.1.10
-	github.com/uptrace/bun/driver/pgdriver v1.1.10
+	github.com/uptrace/bun/dialect/pgdialect v1.1.13
+	github.com/uptrace/bun/driver/pgdriver v1.1.13
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	go.opencensus.io v0.24.0
 	go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux v0.41.0
@@ -97,7 +97,7 @@ require (
 	go.uber.org/zap v1.24.0
 	gocloud.dev v0.28.0
 	gocloud.dev/pubsub/natspubsub v0.28.0
-	golang.org/x/crypto v0.6.0
+	golang.org/x/crypto v0.8.0
 	golang.org/x/exp v0.0.0-20230224173230-c95f2b4c22f2
 	golang.org/x/net v0.9.0
 	golang.org/x/oauth2 v0.6.0

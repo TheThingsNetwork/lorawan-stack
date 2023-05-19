@@ -186,8 +186,8 @@ require (
 	github.com/tinylib/msgp v1.1.0 // indirect
 	github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc // indirect
 	github.com/uptrace/bun v1.1.13 // indirect
-	github.com/uptrace/bun/dialect/pgdialect v1.1.10 // indirect
-	github.com/uptrace/bun/driver/pgdriver v1.1.10 // indirect
+	github.com/uptrace/bun/dialect/pgdialect v1.1.13 // indirect
+	github.com/uptrace/bun/driver/pgdriver v1.1.13 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/weppos/publicsuffix-go v0.15.1-0.20210511084619-b1f36a2d6c0b // indirect
@@ -221,7 +221,7 @@ require (
 	go.uber.org/zap v1.24.0 // indirect
 	gocloud.dev v0.28.0 // indirect
 	gocloud.dev/pubsub/natspubsub v0.28.0 // indirect
-	golang.org/x/crypto v0.6.0 // indirect
+	golang.org/x/crypto v0.8.0 // indirect
 	golang.org/x/exp v0.0.0-20230224173230-c95f2b4c22f2 // indirect
 	golang.org/x/image v0.5.0 // indirect
 	golang.org/x/mod v0.10.0 // indirect
