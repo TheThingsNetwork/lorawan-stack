@@ -113,7 +113,6 @@ const DeviceOnboardingForm = () => {
           delete mac_state.current_parameters
         }
 
-        // Create the device in the stack (skipping JS, if claimed previously).
         await dispatch(attachPromise(createDevice(appId, cleanedValues)))
         switch (_registration) {
           case REGISTRATION_TYPES.MULTIPLE:

@@ -101,6 +101,7 @@ describe('Device onboarding with QR scan', () => {
         'eq',
         `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/eui-${device.devEui}`,
       )
+    cy.findByTestId('toast-notification').findByText('End device registered').should('be.visible')
   })
 
   it('succeeds scanning again', () => {
@@ -213,5 +214,6 @@ describe('Device onboarding with QR scan', () => {
     cy.wait('@claim-request')
       .its('request.body')
       .should('deep.equal', composeExpectedRequest(device))
+    cy.findByTestId('toast-notification').findByText('End device registered').should('be.visible')
   })
 })
