@@ -73,7 +73,7 @@ require (
 	github.com/spf13/viper v1.15.0
 	github.com/throttled/throttled v2.2.5+incompatible
 	github.com/throttled/throttled/v2 v2.0.0-00010101000000-000000000000
-	github.com/uptrace/bun v1.1.10
+	github.com/uptrace/bun v1.1.13
 	github.com/uptrace/bun/dialect/pgdialect v1.1.10
 	github.com/uptrace/bun/driver/pgdriver v1.1.10
 	github.com/vmihailenco/msgpack/v5 v5.3.5
@@ -239,7 +239,7 @@ require (
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/image v0.5.0 // indirect
-	golang.org/x/sys v0.7.0 // indirect
+	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/term v0.7.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
