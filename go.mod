@@ -86,7 +86,7 @@ require (
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.13.0
 	go.opentelemetry.io/otel/sdk v1.15.1
 	go.opentelemetry.io/otel/trace v1.15.1
-	go.packetbroker.org/api/iam v1.5.27
+	go.packetbroker.org/api/iam v1.6.0
 	go.packetbroker.org/api/iam/v2 v2.7.8
 	go.packetbroker.org/api/mapping/v2 v2.1.29
 	go.packetbroker.org/api/routing v1.8.20

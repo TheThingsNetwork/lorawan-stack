@@ -207,7 +207,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.15.1 // indirect
 	go.opentelemetry.io/otel/trace v1.15.1 // indirect
 	go.opentelemetry.io/proto/otlp v0.19.0 // indirect
-	go.packetbroker.org/api/iam v1.5.27 // indirect
+	go.packetbroker.org/api/iam v1.6.0 // indirect
 	go.packetbroker.org/api/iam/v2 v2.7.8 // indirect
 	go.packetbroker.org/api/mapping/v2 v2.1.29 // indirect
 	go.packetbroker.org/api/routing v1.8.20 // indirect
