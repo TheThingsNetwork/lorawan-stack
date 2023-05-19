@@ -185,7 +185,7 @@ require (
 	github.com/throttled/throttled/v2 v2.0.0-00010101000000-000000000000 // indirect
 	github.com/tinylib/msgp v1.1.0 // indirect
 	github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc // indirect
-	github.com/uptrace/bun v1.1.10 // indirect
+	github.com/uptrace/bun v1.1.13 // indirect
 	github.com/uptrace/bun/dialect/pgdialect v1.1.10 // indirect
 	github.com/uptrace/bun/driver/pgdriver v1.1.10 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
@@ -228,7 +228,7 @@ require (
 	golang.org/x/net v0.9.0 // indirect
 	golang.org/x/oauth2 v0.6.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.7.0 // indirect
+	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/term v0.7.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
