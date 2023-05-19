@@ -1392,8 +1392,8 @@ github.com/hashicorp/serf v0.9.5/go.mod h1:UWDWwZeL5cuWDJdl0C6wrvrUwEqtQ4ZKBKKEN
 github.com/hashicorp/serf v0.9.6/go.mod h1:TXZNMjZQijwlDvp+r0b63xZ45H7JmCmgg4gpTwn9UV4=
 github.com/hashicorp/serf v0.9.7/go.mod h1:TXZNMjZQijwlDvp+r0b63xZ45H7JmCmgg4gpTwn9UV4=
 github.com/hashicorp/serf v0.10.1/go.mod h1:yL2t6BqATOLGc5HF7qbFkTfXoPIY0WZdWHfEvMqbG+4=
-github.com/hellofresh/health-go/v5 v5.0.0 h1:jxjllHekqEU4VYIajKJtFoOxDp1YaaygNWwAoZwWFh0=
-github.com/hellofresh/health-go/v5 v5.0.0/go.mod h1:9hFVIBdKkxrg1bJurUPlw1D/0FWhl47IVfGYPy4Op9o=
+github.com/hellofresh/health-go/v5 v5.1.1 h1:Ss0EQekzT45NVgk1hSgbXAa1LBaagZhqJ4Xql8bxxBA=
+github.com/hellofresh/health-go/v5 v5.1.1/go.mod h1:ZUymhy/viIPx3xmGT9EkWny0CUZq9GLxqasC4Y2xdSc=
 github.com/hetznercloud/hcloud-go v1.33.1/go.mod h1:XX/TQub3ge0yWR2yHWmnDVIrB+MQbda1pHxkUmDlUME=
 github.com/hetznercloud/hcloud-go v1.39.0/go.mod h1:mepQwR6va27S3UQthaEPGS86jtzSY9xWL1e9dyxXpgA=
 github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef h1:A9HsByNhogrvm9cWb28sjiS3i7tcKCkflWFEkHfuAgM=
