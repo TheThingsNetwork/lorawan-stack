@@ -96,7 +96,7 @@ require (
 	go.uber.org/automaxprocs v1.5.2
 	go.uber.org/zap v1.24.0
 	gocloud.dev v0.29.0
-	gocloud.dev/pubsub/natspubsub v0.28.0
+	gocloud.dev/pubsub/natspubsub v0.29.0
 	golang.org/x/crypto v0.9.0
 	golang.org/x/exp v0.0.0-20230224173230-c95f2b4c22f2
 	golang.org/x/net v0.10.0

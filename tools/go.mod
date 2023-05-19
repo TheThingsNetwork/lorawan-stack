@@ -219,7 +219,7 @@ require (
 	go.uber.org/multierr v1.9.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect
 	gocloud.dev v0.29.0 // indirect
-	gocloud.dev/pubsub/natspubsub v0.28.0 // indirect
+	gocloud.dev/pubsub/natspubsub v0.29.0 // indirect
 	golang.org/x/crypto v0.9.0 // indirect
 	golang.org/x/exp v0.0.0-20230224173230-c95f2b4c22f2 // indirect
 	golang.org/x/image v0.5.0 // indirect
