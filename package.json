@@ -32,7 +32,7 @@
     "babel-plugin-react-intl": "^3.0.1",
     "babel-plugin-react-intl-auto": "^3.3.0",
     "clean-webpack-plugin": "^4.0.0",
-    "copy-webpack-plugin": "^6.4.0",
+    "copy-webpack-plugin": "^11.0.0",
     "css-hot-loader": "^1.4.4",
     "css-loader": "^5.2.7",
     "cypress": "7.7.0",
