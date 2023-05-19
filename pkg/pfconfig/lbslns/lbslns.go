@@ -30,9 +30,21 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-const (
-	configHardwareSpecPrefix = "sx1301"
-)
+const configHardwareSpecPrefix = "sx1301"
+
+// Based on
+// https://github.com/lorabasics/basicstation/blob/ba4f85d80a438a5c2b659e568cd2d0f0de08e5a7/src/s2e.c#L973-L1041 .
+// Note that versions 2.0.6 or higher will reject any downstream messages such as downlinks if the
+// region ID is unknown, while older versions will be more forgiving.
+// Non standard names are used for backwards compatibility reasons.
+var bandIDToRegionID = map[string]string{
+	band.EU_863_870: "EU863", // Non standard name, officially `EU868`.
+	band.AS_923_4:   "IL915", // Non standard name, officially `AS923-4`.
+	band.KR_920_923: "KR920",
+	band.AS_923:     "AS923JP", // Non standard name, officially `AS923-1`.
+	band.US_902_928: "US902",   // Non standard name, officially `US915`.
+	band.AU_915_928: "AU915",
+}
 
 var errFrequencyPlan = errors.DefineInvalidArgument("frequency_plan", "invalid frequency plan `{name}`")
 
@@ -275,11 +287,15 @@ func GetRouterConfig(
 	if err != nil {
 		return RouterConfig{}, errFrequencyPlan.New()
 	}
-	s := strings.Split(phy.ID, "_")
-	if len(s) < 2 {
-		return RouterConfig{}, errFrequencyPlan.New()
+	if regionID, ok := bandIDToRegionID[phy.ID]; ok {
+		conf.Region = regionID
+	} else {
+		s := strings.Split(phy.ID, "_")
+		if len(s) < 2 {
+			return RouterConfig{}, errFrequencyPlan.New()
+		}
+		conf.Region = fmt.Sprintf("%s%s", s[0], s[1])
 	}
-	conf.Region = fmt.Sprintf("%s%s", s[0], s[1])
 
 	min, max, err := getMinMaxFrequencies(fps)
 	if err != nil {
