@@ -23,7 +23,7 @@
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.8",
     "@storybook/addon-actions": "^6.4.9",
     "@storybook/addon-info": "6.0.0-alpha.2",
-    "@storybook/react": "^7.0.9",
+    "@storybook/react": "^7.0.12",
     "@testing-library/cypress": "^8.0.3",
     "add-asset-html-webpack-plugin": "^4.0.1",
     "babel-jest": "^29.3.1",
