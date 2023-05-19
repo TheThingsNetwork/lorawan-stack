@@ -12,7 +12,7 @@ require (
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/client9/misspell v0.3.4
 	github.com/cloudflare/cfssl v1.6.4
-	github.com/magefile/mage v1.14.0
+	github.com/magefile/mage v1.15.0
 	github.com/mattn/goveralls v0.0.11
 	go.thethings.network/lorawan-stack/v3 v3.0.0-00010101000000-000000000000
 	gopkg.in/yaml.v2 v2.4.0
