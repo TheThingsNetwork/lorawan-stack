@@ -47,7 +47,7 @@ require (
 	github.com/jackc/pgerrcode v0.0.0-20220416144525-469b46aa5efa
 	github.com/jackc/pgx/v5 v5.2.0
 	github.com/jacobsa/crypto v0.0.0-20190317225127-9f44e2d11115
-	github.com/jarcoal/httpmock v1.2.0
+	github.com/jarcoal/httpmock v1.3.0
 	github.com/jaytaylor/html2text v0.0.0-20211105163654-bc68cce691ba
 	github.com/json-iterator/go v1.1.12
 	github.com/jtacoma/uritemplates v1.0.0
