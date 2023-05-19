@@ -89,8 +89,8 @@ require (
 	go.packetbroker.org/api/iam v1.5.27
 	go.packetbroker.org/api/iam/v2 v2.7.8
 	go.packetbroker.org/api/mapping/v2 v2.1.27
-	go.packetbroker.org/api/routing v1.8.18
-	go.packetbroker.org/api/v3 v3.12.4
+	go.packetbroker.org/api/routing v1.8.20
+	go.packetbroker.org/api/v3 v3.13.0
 	go.thethings.network/lorawan-application-payload v0.0.0-20220125153912-1198ff1e403e
 	go.thethings.network/lorawan-stack-legacy/v2 v2.1.0
 	go.uber.org/automaxprocs v1.5.2
