@@ -13,3 +13,24 @@ updates:
       interval: "monthly"
     commit-message:
       prefix: "dev"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "dev"
+
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "dev"
+
+  - package-ecosystem: "gomod"
+    directory: "/tools"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "dev"
