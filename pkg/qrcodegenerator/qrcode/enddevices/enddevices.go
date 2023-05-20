@@ -72,6 +72,10 @@ func New(ctx context.Context) *Server {
 				id:     formatIDLoRaAllianceTR005Draft3,
 				format: new(LoRaAllianceTR005Draft3Format),
 			},
+			{
+				id:     formatIDDevEUI,
+				format: new(devEUIFormat),
+			},
 		},
 	}
 	return s
