@@ -174,7 +174,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 	})
 
 	// Tasks initialization.
-	if err := is.initilizeTelemetryTasks(is.Context()); err != nil {
+	if err := is.initializeTelemetryTasks(is.Context()); err != nil {
 		return nil, err
 	}
 

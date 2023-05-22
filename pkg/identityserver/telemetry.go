@@ -28,8 +28,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/exporter/istelemetry"
 )
 
-// initilizeTelemetryTasks starts the telemetry dispatcher, consumers and Identity Server's tasks.
-func (is *IdentityServer) initilizeTelemetryTasks(ctx context.Context) error {
+// initializeTelemetryTasks starts the telemetry dispatcher, consumers and Identity Server's tasks.
+func (is *IdentityServer) initializeTelemetryTasks(ctx context.Context) error {
 	logger := log.FromContext(ctx)
 
 	tmCfg := is.GetBaseConfig(is.Context()).Telemetry
