@@ -80,9 +80,6 @@ func NewASDeviceRegistryCleaner(ctx context.Context, config *redis.Config) (*as.
 	}
 	cleaner := &as.RegistryCleaner{
 		DevRegistry: deviceRegistry,
-		AppUpsRegistry: &asredis.ApplicationUplinkRegistry{
-			Redis: redis.New(config.WithNamespace("as", "applicationups")),
-		},
 	}
 	err := cleaner.RangeToLocalSet(ctx)
 	if err != nil {

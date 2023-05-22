@@ -75,7 +75,6 @@ type ApplicationServer struct {
 
 	linkRegistry           LinkRegistry
 	deviceRegistry         DeviceRegistry
-	appUpsRegistry         ApplicationUplinkRegistry
 	locationRegistry       metadata.EndDeviceLocationRegistry
 	formatters             messageprocessors.MapPayloadProcessor
 	webhooks               ioweb.Webhooks
@@ -153,7 +152,6 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		config:           conf,
 		linkRegistry:     conf.Links,
 		deviceRegistry:   wrapEndDeviceRegistryWithReplacedFields(conf.Devices, replacedEndDeviceFields...),
-		appUpsRegistry:   conf.UplinkStorage.Registry,
 		locationRegistry: conf.EndDeviceMetadataStorage.Location.Registry,
 		formatters:       make(messageprocessors.MapPayloadProcessor),
 		clusterDistributor: distribution.NewPubSubDistributor(
@@ -1101,7 +1099,8 @@ func (as *ApplicationServer) storeUplink(
 			Snr:           md.Snr,
 		})
 	}
-	return as.appUpsRegistry.Push(ctx, ids, cleanUplink)
+	// TODO (Uplink Storage Removal): Persist uplink metadata in storage.
+	return nil
 }
 
 // setActivated attempts to mark the end device as activated in the Entity Registry.
@@ -1509,11 +1508,6 @@ func (as *ApplicationServer) GetMQTTConfig(ctx context.Context) (*config.MQTT, e
 		return nil, err
 	}
 	return &cfg.MQTT, nil
-}
-
-// RangeUplinks ranges the application uplinks and calls the callback function, until false is returned.
-func (as *ApplicationServer) RangeUplinks(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(ctx context.Context, up *ttnpb.ApplicationUplink) bool) error {
-	return as.appUpsRegistry.Range(ctx, ids, paths, f)
 }
 
 // GetEndDevice retrieves the end device associated with the provided identifiers from the end device registry.

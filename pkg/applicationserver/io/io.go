@@ -53,12 +53,6 @@ type DownlinkQueueOperator interface {
 	DownlinkQueueList(context.Context, *ttnpb.EndDeviceIdentifiers) ([]*ttnpb.ApplicationDownlink, error)
 }
 
-// UplinkStorage represents the Application Server uplink storage to application frontends.
-type UplinkStorage interface {
-	// RangeUplinks ranges the application uplinks and calls the callback function, until false is returned.
-	RangeUplinks(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(ctx context.Context, up *ttnpb.ApplicationUplink) bool) error
-}
-
 // Cluster represents the Application Server cluster peers to application frontends.
 type Cluster interface {
 	// GetPeers returns peers with the given role.
@@ -86,7 +80,6 @@ type Server interface {
 	httpclient.Provider
 	PubSub
 	DownlinkQueueOperator
-	UplinkStorage
 	Cluster
 	EndDeviceRegistry
 	// FromRequestContext decouples the lifetime of the provided context from the values found in the context.

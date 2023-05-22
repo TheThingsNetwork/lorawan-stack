@@ -771,14 +771,6 @@ func TestDeviceRegistryDelete(t *testing.T) {
 
 			as := test.Must(applicationserver.New(componenttest.NewComponent(t, &component.Config{}),
 				&applicationserver.Config{
-					UplinkStorage: applicationserver.UplinkStorageConfig{
-						Registry: &MockApplicationUplinkRegistry{
-							ClearFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) error {
-								atomic.AddUint64(&upClearCalls, 1)
-								return tc.UpClearFunc(ctx, ids)
-							},
-						},
-					},
 					Devices: &MockDeviceRegistry{
 						SetFunc: func(ctx context.Context, deviceIds *ttnpb.EndDeviceIdentifiers, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 							atomic.AddUint64(&setCalls, 1)

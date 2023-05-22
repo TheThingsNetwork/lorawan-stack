@@ -17,7 +17,6 @@ package loracloudgeolocationv3
 import (
 	"context"
 	"fmt"
-	"time"
 
 	apppayload "go.thethings.network/lorawan-application-payload"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
@@ -146,21 +145,9 @@ func (p *GeolocationPackage) multiFrameQuery(ctx context.Context, ids *ttnpb.End
 		return nil, nil
 	}
 
-	now := time.Now()
 	var mds [][]*ttnpb.RxMetadata
-	if err := p.server.RangeUplinks(ctx, ids, []string{"rx_metadata", "received_at"},
-		func(ctx context.Context, up *ttnpb.ApplicationUplink) bool {
-			if now.Sub(*ttnpb.StdTime(up.ReceivedAt)) > data.MultiFrameWindowAge {
-				return true
-			}
-			mds = append(mds, up.RxMetadata)
-			if len(mds) == count {
-				return false
-			}
-			return true
-		}); err != nil {
-		return nil, err
-	}
+
+	// TODO (Uplink Storage Removal): Retrieve uplink metadata from storage.
 
 	req := api.BuildMultiFrameRequest(ctx, mds)
 	if len(req.Gateways) < 1 {

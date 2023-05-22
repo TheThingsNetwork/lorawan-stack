@@ -302,8 +302,6 @@ func (r asEndDeviceRegistryServer) Delete(ctx context.Context, ids *ttnpb.EndDev
 	if evt != nil {
 		events.Publish(evt)
 	}
-	if err := r.AS.appUpsRegistry.Clear(ctx, ids); err != nil {
-		return nil, err
-	}
+	// TODO (Uplink Storage Removal): Implement Clear API.
 	return ttnpb.Empty, nil
 }
