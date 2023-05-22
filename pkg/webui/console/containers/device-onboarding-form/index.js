@@ -113,7 +113,7 @@ const DeviceOnboardingForm = () => {
           delete mac_state.current_parameters
         }
 
-        await dispatch(attachPromise(createDevice(appId, cleanedValues)))
+        const endDevice = await dispatch(attachPromise(createDevice(appId, cleanedValues)))
         switch (_registration) {
           case REGISTRATION_TYPES.MULTIPLE:
             toast({
@@ -145,7 +145,7 @@ const DeviceOnboardingForm = () => {
             break
           case REGISTRATION_TYPES.SINGLE:
           default:
-            navigateToDevice(appId, cleanedValues.ids.device_id)
+            navigateToDevice(appId, endDevice.ids.device_id)
         }
       } catch (error) {
         setError(error)

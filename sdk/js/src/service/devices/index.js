@@ -490,6 +490,7 @@ class Devices {
 
     const { authenticated_identifiers, target_device_id, ...submitValues } = device
     const { supports_join = false, ids = {} } = submitValues
+
     // Initiate claiming, if the device is claimable.
     const hasAuthenticatedIdentifiers = Boolean(authenticated_identifiers)
     const claimInfoResponse = await this._api.EndDeviceClaimingServer.GetInfoByJoinEUI({
@@ -528,9 +529,14 @@ class Devices {
       }
     }
 
+    let newFieldmasks = mask
     // Apply the resulting IDs to the end_device.
     if (claimDeviceIds) {
       submitValues.ids = { ...ids, ...claimDeviceIds }
+      newFieldmasks = Marshaler.fieldMaskFromPatch(
+        submitValues,
+        this.deviceCreationAllowedFieldMaskPaths,
+      )
     }
 
     const deviceId = submitValues.ids.device_id
@@ -538,7 +544,7 @@ class Devices {
       throw new Error('Missing end device ID')
     }
 
-    const requestTree = splitSetPaths(Marshaler.selectorToPaths(mask))
+    const requestTree = splitSetPaths(Marshaler.selectorToPaths(newFieldmasks))
 
     if (!supports_join || device.join_server_address !== this._stackConfig.jsHost) {
       delete requestTree.js
