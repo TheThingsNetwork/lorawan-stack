@@ -43,7 +43,11 @@ const useRequest = requestAction => {
 
     return () => {
       // Cancel the promise on unmount (if still pending).
-      promise.cancel()
+      try {
+        promise.cancel()
+      } catch (err) {
+        // Do nothing, the promise is no longer pending.
+      }
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
