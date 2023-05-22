@@ -32,6 +32,7 @@ import DeviceClaim from './service/claim'
 import EventHandler from './util/events'
 import StackConfiguration from './util/stack-configuration'
 import { STACK_COMPONENTS_MAP, AUTHORIZATION_MODES } from './util/constants'
+import QRCodeGenerator from './service/qr-code-generator'
 
 class TTS {
   constructor({ authorization, stackConfig, connectionType, defaultUserId, axiosConfig }) {
@@ -62,6 +63,9 @@ class TTS {
     this.Clients = new Clients(this.api)
     this.Authorizations = new Authorizations(this.api)
     this.DeviceClaim = new DeviceClaim(this.api, {
+      stackConfig: stackConfiguration,
+    })
+    this.QRCodeGenerator = new QRCodeGenerator(this.api, {
       stackConfig: stackConfiguration,
     })
 
