@@ -2845,10 +2845,10 @@ func TestADRSteerDeviceChannels(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 
-			a := assertions.New(t)
+			a, ctx := test.New(t)
 			device := ttnpb.Clone(tc.InputDevice)
 			margin, ok := ADRSteerDeviceChannels(
-				device, tc.Defaults, tc.Band, tc.Min, tc.Max, tc.Allowed, tc.InputMargin,
+				ctx, device, tc.Defaults, tc.Band, tc.Min, tc.Max, tc.Allowed, tc.InputMargin,
 			)
 			a.So(margin, should.Equal, tc.OutputMargin)
 			a.So(ok, should.Equal, tc.Ok)
