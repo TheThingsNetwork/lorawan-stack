@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Support for scanning a QR code that only contains the hexadecimal encoded DevEUI.
+
 ### Changed
 
 ### Deprecated
