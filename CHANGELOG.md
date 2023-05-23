@@ -12,7 +12,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - Support for scanning a QR code that only contains the hexadecimal encoded DevEUI.
-- Experimental flag `ns.adr.auto-narrow-steer`. When enabled, end devices which do not have an explicit channel steering mode will be steered towards the LoRa narrow channels.
+- Experimental flag `ns.adr.auto_narrow_steer`. When enabled, end devices which do not have an explicit channel steering mode will be steered towards the LoRa narrow channels.
 
 ### Changed
 

@@ -222,7 +222,7 @@ func demodulationFloorStep(phy *band.Band, from, to ttnpb.DataRateIndex) float32
 		demodulationFloor[toLoRa.SpreadingFactor][toLoRa.Bandwidth]
 }
 
-var automaticSteeringFeatureFlag = experimental.DefineFeature("ns.adr.auto-narrow-steer", false)
+var automaticSteeringFeatureFlag = experimental.DefineFeature("ns.adr.auto_narrow_steer", false)
 
 func adrSteerDeviceChannels(
 	ctx context.Context,
