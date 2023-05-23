@@ -107,6 +107,11 @@ func (it *isTelemetry) countEndDevices(ctx context.Context) (uint64, error) {
 	return uint64(n), storeutil.WrapDriverError(err)
 }
 
+func (it *isTelemetry) countGateways(ctx context.Context) (uint64, error) {
+	n, err := it.DB.NewSelect().Model(&store.Gateway{}).Count(ctx)
+	return uint64(n), storeutil.WrapDriverError(err)
+}
+
 func (it *isTelemetry) countOrganizations(ctx context.Context) (resp models.OrganizationsCount, err error) {
 	for _, q := range []struct {
 		query *bun.SelectQuery
@@ -243,7 +248,11 @@ func (it *isTelemetry) CountEntities(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	gtws, err := it.countGatewaysByFreqPlan(ctx)
+	gtws, err := it.countGateways(ctx)
+	if err != nil {
+		return err
+	}
+	gtwsByFreqID, err := it.countGatewaysByFreqPlan(ctx)
 	if err != nil {
 		return err
 	}
@@ -265,7 +274,8 @@ func (it *isTelemetry) CountEntities(ctx context.Context) error {
 		OS:  telemetry.OSTelemetryData(),
 		EntitiesCount: &models.EntitiesCount{
 			Gateways: models.GatewaysCount{
-				GatewaysByFrequencyPlanID: gtws,
+				Total:                     gtws,
+				GatewaysByFrequencyPlanID: gtwsByFreqID,
 			},
 			EndDevices: models.EndDevicesCount{
 				Total:              devs,
