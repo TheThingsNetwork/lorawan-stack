@@ -18,6 +18,7 @@ import {
   interceptDeviceRepo,
   selectDevice,
   composeClaimResponse,
+  composeQRGeneratorParseResponse,
   composeExpectedRequest,
 } from './utils'
 
@@ -52,12 +53,18 @@ describe('Device onboarding with QR scan', () => {
 
   beforeEach(() => {
     interceptDeviceRepo(appId)
+    cy.intercept(
+      'POST',
+      '/api/v3/qr-code/end-devices/parse',
+      composeQRGeneratorParseResponse({ ...device, vendorId: 428 }),
+    ).as('qr-code-parse-request')
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
     cy.visit(`${Cypress.config('consoleRootPath')}/applications/${appId}/devices/add`)
   })
 
   it('succeeds registering a device via a qr code', () => {
     cy.intercept('POST', `/api/v3/applications/${appId}/devices`).as('registerDevice')
+
     cy.findByTestId('full-error-view').should('not.exist')
     cy.findByTestId('error-notification').should('not.exist')
 
@@ -67,6 +74,7 @@ describe('Device onboarding with QR scan', () => {
     cy.findByText('Please scan the QR code to continue.').should('exist')
     cy.findByTestId('webcam-feed').should('be.visible')
     cy.findByText('Found QR code data').should('be.visible')
+    cy.wait('@qr-code-parse-request')
     cy.findByText('Apply').should('not.be.disabled').click()
 
     // Display scanned data in form.
@@ -113,6 +121,7 @@ describe('Device onboarding with QR scan', () => {
     cy.findByText('Please scan the QR code to continue.').should('exist')
     cy.findByTestId('webcam-feed').should('be.visible')
     cy.findByText('Found QR code data').should('be.visible')
+    cy.wait('@qr-code-parse-request')
     cy.findByRole('button', { name: /Scan again/g }).click()
     cy.findByTestId('webcam-feed').should('be.visible')
   })
@@ -127,6 +136,7 @@ describe('Device onboarding with QR scan', () => {
     cy.findByText('Please scan the QR code to continue.').should('exist')
     cy.findByTestId('webcam-feed').should('be.visible')
     cy.findByText('Found QR code data').should('be.visible')
+    cy.wait('@qr-code-parse-request')
     cy.findByText('Apply').should('not.be.disabled').click()
 
     // Display scanned data in form.
@@ -185,6 +195,7 @@ describe('Device onboarding with QR scan', () => {
     cy.findByText('Please scan the QR code to continue.').should('exist')
     cy.findByTestId('webcam-feed').should('be.visible')
     cy.findByText('Found QR code data').should('be.visible')
+    cy.wait('@qr-code-parse-request')
     cy.findByText('Apply').should('not.be.disabled').click()
 
     cy.findByLabelText('End device brand')
