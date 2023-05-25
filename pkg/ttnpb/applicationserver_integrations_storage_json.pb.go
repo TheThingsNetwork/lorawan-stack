@@ -12,6 +12,176 @@ import (
 	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 )
 
+// MarshalProtoJSON marshals the ContinuationTokenPayload message to JSON.
+func (x *ContinuationTokenPayload) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Limit != nil || s.HasField("limit") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("limit")
+		if x.Limit == nil {
+			s.WriteNil()
+		} else {
+			s.WriteUint32(x.Limit.Value)
+		}
+	}
+	if x.After != nil || s.HasField("after") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("after")
+		if x.After == nil {
+			s.WriteNil()
+		} else {
+			golang.MarshalTimestamp(s, x.After)
+		}
+	}
+	if x.Before != nil || s.HasField("before") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("before")
+		if x.Before == nil {
+			s.WriteNil()
+		} else {
+			golang.MarshalTimestamp(s, x.Before)
+		}
+	}
+	if x.FPort != nil || s.HasField("f_port") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("f_port")
+		if x.FPort == nil {
+			s.WriteNil()
+		} else {
+			s.WriteUint32(x.FPort.Value)
+		}
+	}
+	if x.Order != "" || s.HasField("order") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("order")
+		s.WriteString(x.Order)
+	}
+	if x.FieldMask != nil || s.HasField("field_mask") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("field_mask")
+		if x.FieldMask == nil {
+			s.WriteNil()
+		} else {
+			golang.MarshalLegacyFieldMask(s, x.FieldMask)
+		}
+	}
+	if x.Last != nil || s.HasField("last") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("last")
+		if x.Last == nil {
+			s.WriteNil()
+		} else {
+			golang.MarshalDuration(s, x.Last)
+		}
+	}
+	if x.LastReceivedId != 0 || s.HasField("last_received_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("last_received_id")
+		s.WriteInt64(x.LastReceivedId)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ContinuationTokenPayload to JSON.
+func (x *ContinuationTokenPayload) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ContinuationTokenPayload message from JSON.
+func (x *ContinuationTokenPayload) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "limit":
+			s.AddField("limit")
+			if s.ReadNil() {
+				x.Limit = nil
+				return
+			}
+			v := s.ReadWrappedUint32()
+			if s.Err() != nil {
+				return
+			}
+			x.Limit = &wrapperspb.UInt32Value{Value: v}
+		case "after":
+			s.AddField("after")
+			if s.ReadNil() {
+				x.After = nil
+				return
+			}
+			v := golang.UnmarshalTimestamp(s)
+			if s.Err() != nil {
+				return
+			}
+			x.After = v
+		case "before":
+			s.AddField("before")
+			if s.ReadNil() {
+				x.Before = nil
+				return
+			}
+			v := golang.UnmarshalTimestamp(s)
+			if s.Err() != nil {
+				return
+			}
+			x.Before = v
+		case "f_port", "fPort":
+			s.AddField("f_port")
+			if s.ReadNil() {
+				x.FPort = nil
+				return
+			}
+			v := s.ReadWrappedUint32()
+			if s.Err() != nil {
+				return
+			}
+			x.FPort = &wrapperspb.UInt32Value{Value: v}
+		case "order":
+			s.AddField("order")
+			x.Order = s.ReadString()
+		case "field_mask", "fieldMask":
+			s.AddField("field_mask")
+			if s.ReadNil() {
+				x.FieldMask = nil
+				return
+			}
+			v := golang.UnmarshalFieldMask(s)
+			if s.Err() != nil {
+				return
+			}
+			x.FieldMask = v
+		case "last":
+			s.AddField("last")
+			if s.ReadNil() {
+				x.Last = nil
+				return
+			}
+			v := golang.UnmarshalDuration(s)
+			if s.Err() != nil {
+				return
+			}
+			x.Last = v
+		case "last_received_id", "lastReceivedId":
+			s.AddField("last_received_id")
+			x.LastReceivedId = s.ReadInt64()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ContinuationTokenPayload from JSON.
+func (x *ContinuationTokenPayload) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the GetStoredApplicationUpRequest message to JSON.
 func (x *GetStoredApplicationUpRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -94,6 +264,11 @@ func (x *GetStoredApplicationUpRequest) MarshalProtoJSON(s *jsonplugin.MarshalSt
 		} else {
 			golang.MarshalDuration(s, x.Last)
 		}
+	}
+	if x.ContinuationToken != "" || s.HasField("continuation_token") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("continuation_token")
+		s.WriteString(x.ContinuationToken)
 	}
 	s.WriteObjectEnd()
 }
@@ -201,6 +376,9 @@ func (x *GetStoredApplicationUpRequest) UnmarshalProtoJSON(s *jsonplugin.Unmarsh
 				return
 			}
 			x.Last = v
+		case "continuation_token", "continuationToken":
+			s.AddField("continuation_token")
+			x.ContinuationToken = s.ReadString()
 		}
 	})
 }

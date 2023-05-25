@@ -14,7 +14,6 @@
 
 import { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
-import CancelablePromise from 'cancelable-promise'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
@@ -25,13 +24,14 @@ const useRequest = requestAction => {
   const [result, setResult] = useState()
 
   useEffect(() => {
-    const promise = (
+    const promise =
       requestAction instanceof Array
-        ? CancelablePromise.all(requestAction.map(req => dispatch(attachPromise(req))))
+        ? Promise.all(requestAction.map(req => dispatch(attachPromise(req))))
         : typeof requestAction === 'function'
         ? requestAction(dispatch)
         : dispatch(attachPromise(requestAction))
-    )
+
+    promise
       .then(() => {
         setResult(result)
         setFetching(false)
@@ -40,15 +40,6 @@ const useRequest = requestAction => {
         setError(error)
         setFetching(false)
       })
-
-    return () => {
-      // Cancel the promise on unmount (if still pending).
-      try {
-        promise.cancel()
-      } catch (err) {
-        // Do nothing, the promise is no longer pending.
-      }
-    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

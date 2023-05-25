@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, { useCallback, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import QRModalButton from '@ttn-lw/components/qr-modal-button'
 import { useFormContext } from '@ttn-lw/components/form'
@@ -24,15 +24,14 @@ import ButtonGroup from '@ttn-lw/components/button/group'
 
 import Message from '@ttn-lw/lib/components/message'
 
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { readDeviceQr } from '@console/lib/device-claiming-parse-qr'
+import { parseQRCode } from '@console/store/actions/qr-code-generator'
 
 import { selectDeviceBrands } from '@console/store/selectors/device-repository'
 
 import m from '../messages'
-
-const hexToDecimal = hex => parseInt(hex, 16)
 
 const qrDataInitialState = {
   valid: false,
@@ -42,6 +41,7 @@ const qrDataInitialState = {
 }
 
 const DeviceQRScanFormSection = () => {
+  const dispatch = useDispatch()
   const { resetForm, setValues } = useFormContext()
   const brands = useSelector(selectDeviceBrands)
   const [qrData, setQrData] = useState(qrDataInitialState)
@@ -53,7 +53,7 @@ const DeviceQRScanFormSection = () => {
 
   const getBrand = useCallback(
     vendorId => {
-      const brand = brands.find(brand => brand?.lora_alliance_vendor_id === hexToDecimal(vendorId))
+      const brand = brands.find(brand => brand?.lora_alliance_vendor_id === vendorId)
 
       return brand
     },
@@ -62,22 +62,27 @@ const DeviceQRScanFormSection = () => {
 
   const handleQRCodeApprove = useCallback(() => {
     const { device } = qrData
-    const brand = getBrand(device.profileID.vendorID)
+    const { end_device } = device.end_device_template
+    const { lora_alliance_profile_ids } = end_device
+
+    const brand = getBrand(lora_alliance_profile_ids.vendor_id)
 
     setValues(values => ({
       ...values,
       _withQRdata: true,
       ids: {
         ...values.ids,
-        join_eui: device.joinEUI,
-        dev_eui: device.devEUI,
-        device_id: `eui-${device.devEUI.toLowerCase()}`,
+        join_eui: end_device.ids.join_eui,
+        dev_eui: end_device.ids.dev_eui,
+        device_id: `eui-${end_device.ids.dev_eui.toLowerCase()}`,
       },
-      target_device_id: `eui-${device.devEUI.toLowerCase()}`,
+      target_device_id: `eui-${end_device.ids.dev_eui.toLowerCase()}`,
       authenticated_identifiers: {
-        dev_eui: device.devEUI,
-        authentication_code: device.ownerToken ? device.ownerToken : '',
-        join_eui: device.joinEUI,
+        dev_eui: end_device.ids.dev_eui,
+        authentication_code: end_device.claim_authentication_code.value
+          ? end_device.claim_authentication_code.value
+          : '',
+        join_eui: end_device.ids.join_eui,
       },
       version_ids: {
         ...values.version_ids,
@@ -93,27 +98,37 @@ const DeviceQRScanFormSection = () => {
   }, [])
 
   const handleQRCodeRead = useCallback(
-    qrCode => {
-      const device = readDeviceQr(qrCode)
-      if (device && device.devEUI) {
-        const brand = getBrand(device.profileID.vendorID)
+    async qrCode => {
+      try {
+        // Get end device template from QR code
+        const device = await dispatch(attachPromise(parseQRCode(qrCode)))
+
+        const { end_device } = device.end_device_template
+        const { lora_alliance_profile_ids } = end_device
+
+        const brand = getBrand(lora_alliance_profile_ids.vendor_id)
         const sheetData = [
           {
             header: m.deviceInfo,
             items: [
               {
                 key: sharedMessages.claimAuthCode,
-                value: device.ownerToken,
+                value: end_device.claim_authentication_code.value,
                 type: 'code',
                 sensitive: true,
               },
               {
                 key: sharedMessages.joinEUI,
-                value: device.joinEUI,
+                value: end_device.ids.join_eui,
                 type: 'byte',
                 sensitive: false,
               },
-              { key: sharedMessages.devEUI, value: device.devEUI, type: 'byte', sensitive: false },
+              {
+                key: sharedMessages.devEUI,
+                value: end_device.ids.dev_eui,
+                type: 'byte',
+                sensitive: false,
+              },
               { key: sharedMessages.brand, value: brand?.name },
             ],
           },
@@ -124,11 +139,11 @@ const DeviceQRScanFormSection = () => {
           data: sheetData,
           device,
         })
-      } else {
+      } catch (error) {
         setQrData({ ...qrData, data: [], valid: false })
       }
     },
-    [getBrand, qrData],
+    [dispatch, getBrand, qrData],
   )
 
   return (

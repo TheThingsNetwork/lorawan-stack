@@ -21,7 +21,9 @@ import (
 
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
@@ -40,6 +42,10 @@ func getStoredUpFlags() *pflag.FlagSet {
 	flags.AddFlagSet(timestampFlags("after", "query upstream messages after specified timestamp"))
 	flags.AddFlagSet(timestampFlags("before", "query upstream messages before specified timestamp"))
 	flags.Duration("last", 0, "query upstream messages in the last hours or minutes")
+	flags.String(
+		"continuation-token", "",
+		"continuation token for pagination (if used additional flags other than the type are ignored)",
+	)
 
 	ttnpb.AddSelectFlagsForApplicationUp(flags, "", false)
 
@@ -54,24 +60,26 @@ func getStoredUpFlags() *pflag.FlagSet {
 }
 
 func getStoredUpRequest(flags *pflag.FlagSet) (*ttnpb.GetStoredApplicationUpRequest, error) {
+	req := &ttnpb.GetStoredApplicationUpRequest{}
+
+	req.Type, _ = flags.GetString("type")
+	req.ContinuationToken, _ = flags.GetString("continuation-token")
+	if req.ContinuationToken != "" {
+		return req, nil
+	}
+
 	before, after, last, err := timeRangeFromFlags(flags)
 	if err != nil {
 		return nil, err
 	}
-	req := &ttnpb.GetStoredApplicationUpRequest{
-		Before: before,
-		After:  after,
-		Last:   last,
-	}
-
+	req.Before = before
+	req.After = after
+	req.Last = last //nolint
 	req.Order, _ = flags.GetString("order")
-	req.Type, _ = flags.GetString("type")
 
 	if flags.Changed("f-port") {
 		fport, _ := flags.GetUint32("f-port")
-		req.FPort = &wrapperspb.UInt32Value{
-			Value: fport,
-		}
+		req.FPort = wrapperspb.UInt32(fport)
 	}
 	req.FieldMask = ttnpb.FieldMask(
 		ttnpb.AllowedFields(
@@ -155,4 +163,20 @@ func timeRangeFromFlags(flags *pflag.FlagSet) (beforePB *timestamppb.Timestamp, 
 		lastPB = durationpb.New(d)
 	}
 	return
+}
+
+type continuationToken struct {
+	ContinuationToken string `json:"continuation_token,omitempty"`
+}
+
+var errNoContinuationToken = errors.DefineUnavailable("no_continuation_token", "no continuation token")
+
+func newContinuationTokenFromMD(md metadata.MD) (*continuationToken, error) {
+	continuationTokenHeaderValues := md.Get("x-continuation-token")
+	if len(continuationTokenHeaderValues) == 1 {
+		return &continuationToken{
+			ContinuationToken: continuationTokenHeaderValues[0],
+		}, nil
+	}
+	return nil, errNoContinuationToken
 }

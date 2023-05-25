@@ -2,11 +2,33 @@
 
 package ttnpb
 
+var ContinuationTokenPayloadFieldPathsNested = []string{
+	"after",
+	"before",
+	"f_port",
+	"field_mask",
+	"last",
+	"last_received_id",
+	"limit",
+	"order",
+}
+
+var ContinuationTokenPayloadFieldPathsTopLevel = []string{
+	"after",
+	"before",
+	"f_port",
+	"field_mask",
+	"last",
+	"last_received_id",
+	"limit",
+	"order",
+}
 var GetStoredApplicationUpRequestFieldPathsNested = []string{
 	"after",
 	"application_ids",
 	"application_ids.application_id",
 	"before",
+	"continuation_token",
 	"end_device_ids",
 	"end_device_ids.application_ids",
 	"end_device_ids.application_ids.application_id",
@@ -26,6 +48,7 @@ var GetStoredApplicationUpRequestFieldPathsTopLevel = []string{
 	"after",
 	"application_ids",
 	"before",
+	"continuation_token",
 	"end_device_ids",
 	"f_port",
 	"field_mask",

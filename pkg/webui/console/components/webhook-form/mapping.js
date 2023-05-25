@@ -82,15 +82,24 @@ export const encodeValues = formValues => {
 
 export const decodeValues = backendValues => {
   const formValues = { ...backendValues }
+  let decodeError = false
   if (backendValues?.headers?.Authorization?.startsWith('Basic ')) {
     const encodedCredentials = backendValues.headers.Authorization.split('Basic ')[1]
     if (encodedCredentials) {
-      const decodedCredentials = atob(encodedCredentials)
-      formValues._basic_auth_enabled = true
-      formValues._basic_auth_username = decodedCredentials.slice(0, decodedCredentials.indexOf(':'))
-      formValues._basic_auth_password = decodedCredentials.slice(
-        decodedCredentials.indexOf(':') + 1,
-      )
+      let decodedCredentials
+      try {
+        decodedCredentials = atob(encodedCredentials)
+        formValues._basic_auth_enabled = true
+        formValues._basic_auth_username = decodedCredentials.slice(
+          0,
+          decodedCredentials.indexOf(':'),
+        )
+        formValues._basic_auth_password = decodedCredentials.slice(
+          decodedCredentials.indexOf(':') + 1,
+        )
+      } catch (err) {
+        decodeError = true
+      }
     }
   } else {
     formValues._basic_auth_enabled = false
@@ -100,7 +109,8 @@ export const decodeValues = backendValues => {
 
   formValues._headers = decodeHeaders(backendValues?.headers)
   if (hasBasicAuth(formValues._headers)) {
-    formValues._headers.find(isBasicAuth).readOnly = true
+    formValues._headers.find(isBasicAuth).readOnly = !decodeError
+    formValues._headers.find(isBasicAuth).decodeError = decodeError
   }
 
   return formValues

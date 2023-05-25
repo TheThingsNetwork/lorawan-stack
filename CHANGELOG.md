@@ -12,6 +12,8 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - Support claim in device import in the Console.
+- Support for scanning a QR code that only contains the hexadecimal encoded DevEUI.
+- Experimental flag `ns.adr.auto_narrow_steer`. When enabled, end devices which do not have an explicit channel steering mode will be steered towards the LoRa narrow channels.
 
 ### Changed
 
@@ -24,6 +26,8 @@ For details about compatibility between different releases, see the **Commitment
 - Console not applying webhook field masks when creating a webhook from a template that has field masks set.
 - LoRa Basics Station `PONG` messages will now contain the application payload of the associated `PING`, as required by the WebSockets specification.
   - This fix enables `PING`/`PONG` behavior for non reference implementations of the LNS protocol.
+- Fix crash of "Edit webhook" view due to invalid Authorization header encoding in the Console.
+- LoRa Basics Station 2.0.6 downlink support in the `AS923` region.
 
 ### Security
 

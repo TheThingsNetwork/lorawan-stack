@@ -1655,6 +1655,15 @@
       "file": "applications.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:no_continuation_token": {
+    "translations": {
+      "en": "no continuation token"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "storage_integration_util.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:no_data": {
     "translations": {
       "en": "no data for `{name}`"
