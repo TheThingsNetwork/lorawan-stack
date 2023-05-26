@@ -293,6 +293,10 @@ func (is *IdentityServer) setGatewayCollaborator(
 			}
 		}
 
+		if len(req.GetCollaborator().GetRights()) == 0 {
+			return st.DeleteMember(ctx, req.GetCollaborator().GetIds(), req.GetGatewayIds().GetEntityIdentifiers())
+		}
+
 		return st.SetMember(
 			ctx,
 			req.GetCollaborator().GetIds(),

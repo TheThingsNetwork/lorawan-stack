@@ -297,6 +297,10 @@ func (is *IdentityServer) setOrganizationCollaborator( //nolint:gocyclo
 			}
 		}
 
+		if len(req.Collaborator.Rights) == 0 {
+			return st.DeleteMember(ctx, req.GetCollaborator().GetIds(), req.GetOrganizationIds().GetEntityIdentifiers())
+		}
+
 		return st.SetMember(
 			ctx,
 			req.GetCollaborator().GetIds(),
