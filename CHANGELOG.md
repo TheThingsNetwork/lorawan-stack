@@ -11,9 +11,6 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
-- Support for scanning a QR code that only contains the hexadecimal encoded DevEUI.
-- Experimental flag `ns.adr.auto_narrow_steer`. When enabled, end devices which do not have an explicit channel steering mode will be steered towards the LoRa narrow channels.
-
 ### Changed
 
 ### Deprecated
@@ -22,13 +19,22 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+### Security
+
+## [3.26.0] - unreleased
+
+### Added
+
+- Support for scanning a QR code that only contains the hexadecimal encoded DevEUI.
+- Experimental flag `ns.adr.auto_narrow_steer`. When enabled, end devices which do not have an explicit channel steering mode will be steered towards the LoRa narrow channels.
+
+### Fixed
+
 - Console not applying webhook field masks when creating a webhook from a template that has field masks set.
 - LoRa Basics Station `PONG` messages will now contain the application payload of the associated `PING`, as required by the WebSockets specification.
   - This fix enables `PING`/`PONG` behavior for non reference implementations of the LNS protocol.
 - Fix crash of "Edit webhook" view due to invalid Authorization header encoding in the Console.
 - LoRa Basics Station 2.0.6 downlink support in the `AS923` region.
-
-### Security
 
 ## [3.25.2] - 2023-05-16
 
@@ -2588,7 +2594,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.25.2...v3.25
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.26.0...v3.26
+[3.26.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.25.2...v3.26.0
 [3.25.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.25.1...v3.25.2
 [3.25.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.25.0...v3.25.1
 [3.25.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.24.2...v3.25.0
