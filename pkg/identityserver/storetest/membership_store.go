@@ -202,7 +202,7 @@ func (st *StoreTest) TestMembershipStoreCRUD(t *T) {
 
 			t.Run("SetMember_Delete", func(t *T) {
 				a, ctx := test.New(t)
-				err := s.SetMember(ctx, usr1.GetOrganizationOrUserIdentifiers(), ids, &ttnpb.Rights{})
+				err := s.DeleteMember(ctx, usr1.GetOrganizationOrUserIdentifiers(), ids)
 				a.So(err, should.BeNil)
 			})
 
@@ -254,7 +254,7 @@ func (st *StoreTest) TestMembershipStoreCRUD(t *T) {
 		})
 	}
 
-	err = s.SetMember(ctx, usr2.GetOrganizationOrUserIdentifiers(), org2.GetEntityIdentifiers(), &ttnpb.Rights{})
+	err = s.DeleteMember(ctx, usr2.GetOrganizationOrUserIdentifiers(), org2.GetEntityIdentifiers())
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
