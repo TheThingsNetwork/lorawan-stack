@@ -2834,6 +2834,15 @@
       "file": "applicationserver.go"
     }
   },
+  "error:pkg/applicationserver:max_retries_reached": {
+    "translations": {
+      "en": "maximum number of retries reached"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "applicationserver.go"
+    }
+  },
   "error:pkg/applicationserver:no_app_s_key": {
     "translations": {
       "en": "no AppSKey"
