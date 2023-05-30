@@ -107,7 +107,7 @@ jobs:
       - name: Run Goreleaser
         uses: goreleaser/goreleaser-action@v4
         with:
-          version: "v1.9.2"
+          version: "v1.18.2"
           args: release --config .goreleaser.release.yml --release-notes /tmp/release-notes.md --timeout 120m
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_LOGIN }}
