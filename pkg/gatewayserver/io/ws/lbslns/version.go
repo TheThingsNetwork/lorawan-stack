@@ -77,7 +77,7 @@ func (*lbsLNS) GetRouterConfig(
 	// to gateways that signal the presence of a PPS.
 	// References https://github.com/lorabasics/basicstation/issues/135.
 	ws.UpdateSessionTimeSync(ctx, true)
-	cfg, err := pfconfig.GetRouterConfig(bandID, fps, version, time.Now(), antennaGain)
+	cfg, err := pfconfig.GetRouterConfig(ctx, bandID, fps, version, time.Now(), antennaGain)
 	if err != nil {
 		return ctx, nil, nil, err
 	}

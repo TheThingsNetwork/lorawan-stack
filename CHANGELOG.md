@@ -34,7 +34,6 @@ For details about compatibility between different releases, see the **Commitment
 - LoRa Basics Station `PONG` messages will now contain the application payload of the associated `PING`, as required by the WebSockets specification.
   - This fix enables `PING`/`PONG` behavior for non reference implementations of the LNS protocol.
 - Fix crash of "Edit webhook" view due to invalid Authorization header encoding in the Console.
-- LoRa Basics Station 2.0.6 downlink support in the `AS923` region.
 
 ## [3.25.2] - 2023-05-16
 

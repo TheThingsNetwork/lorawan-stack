@@ -17,6 +17,7 @@ package lbslns
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"math"
@@ -25,6 +26,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/pfconfig/shared"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -45,6 +47,8 @@ var bandIDToRegionID = map[string]string{
 	band.US_902_928: "US902",   // Non standard name, officially `US915`.
 	band.AU_915_928: "AU915",
 }
+
+var referenceRegionNamesFeatureFlag = experimental.DefineFeature("gs.lbslns.reference_region_names", false)
 
 var errFrequencyPlan = errors.DefineInvalidArgument("frequency_plan", "invalid frequency plan `{name}`")
 
@@ -268,6 +272,7 @@ type RouterFeatures interface {
 // Currently as per the LBS docs, all frequency plans have to be from the same region (band).
 // https://doc.sm.tc/station/tcproto.html#router-config-message.
 func GetRouterConfig(
+	ctx context.Context,
 	bandID string,
 	fps map[string]*frequencyplans.FrequencyPlan,
 	features RouterFeatures,
@@ -287,7 +292,7 @@ func GetRouterConfig(
 	if err != nil {
 		return RouterConfig{}, errFrequencyPlan.New()
 	}
-	if regionID, ok := bandIDToRegionID[phy.ID]; ok {
+	if regionID, ok := bandIDToRegionID[phy.ID]; ok && referenceRegionNamesFeatureFlag.GetValue(ctx) {
 		conf.Region = regionID
 	} else {
 		s := strings.Split(phy.ID, "_")

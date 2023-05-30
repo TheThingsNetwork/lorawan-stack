@@ -270,9 +270,9 @@ func TestGetRouterConfig(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 
-			a := assertions.New(t)
+			a, ctx := test.New(t)
 			fps := map[string]*frequencyplans.FrequencyPlan{tc.FrequencyPlanID: &tc.FrequencyPlan}
-			cfg, err := GetRouterConfig(tc.FrequencyPlan.BandID, fps, tc.Features, time.Now(), 0)
+			cfg, err := GetRouterConfig(ctx, tc.FrequencyPlan.BandID, fps, tc.Features, time.Now(), 0)
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
@@ -468,8 +468,8 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 
-			a := assertions.New(t)
-			cfg, err := GetRouterConfig(tc.BandID, tc.FrequencyPlans, tc.Features, time.Now(), 3)
+			a, ctx := test.New(t)
+			cfg, err := GetRouterConfig(ctx, tc.BandID, tc.FrequencyPlans, tc.Features, time.Now(), 3)
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
