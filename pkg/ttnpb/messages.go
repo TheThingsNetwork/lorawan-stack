@@ -60,7 +60,7 @@ func (v *ApplicationDownlink_ConfirmedRetry) FieldIsZero(p string) bool {
 	case "attempt":
 		return v.Attempt == 0
 	case "max_attempts":
-		return v.MaxAttempts.GetValue() == 0
+		return v.MaxAttempts == nil
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }

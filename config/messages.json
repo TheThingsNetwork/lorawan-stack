@@ -2753,6 +2753,15 @@
       "file": "applicationserver.go"
     }
   },
+  "error:pkg/applicationserver:downlink_max_retries_invalid": {
+    "translations": {
+      "en": "downlink maximum retries exceed configured maximum of {max}"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "applicationserver.go"
+    }
+  },
   "error:pkg/applicationserver:field_mask": {
     "translations": {
       "en": "invalid field mask"
@@ -2778,15 +2787,6 @@
     "description": {
       "package": "pkg/applicationserver",
       "file": "grpc_deviceregistry.go"
-    }
-  },
-  "error:pkg/applicationserver:invalid_max_retries": {
-    "translations": {
-      "en": "maximum number of retries cannot be less than 0"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "applicationserver.go"
     }
   },
   "error:pkg/applicationserver:invalid_timeout": {
@@ -2836,7 +2836,16 @@
   },
   "error:pkg/applicationserver:max_retries_reached": {
     "translations": {
-      "en": "maximum number of retries reached"
+      "en": "maximum number of retries ({max_retries}) reached"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "applicationserver.go"
+    }
+  },
+  "error:pkg/applicationserver:negative_value": {
+    "translations": {
+      "en": "value for {field} must not be less than zero"
     },
     "description": {
       "package": "pkg/applicationserver",
