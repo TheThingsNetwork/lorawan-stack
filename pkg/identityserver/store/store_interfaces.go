@@ -323,18 +323,16 @@ type EntitySearch interface {
 
 // ContactInfoStore interface for contact info validation.
 type ContactInfoStore interface {
-	GetContactInfo(
-		ctx context.Context, entityID ttnpb.IDStringer,
-	) ([]*ttnpb.ContactInfo, error)
+	GetContactInfo(ctx context.Context, entityID ttnpb.IDStringer) ([]*ttnpb.ContactInfo, error)
 	SetContactInfo(
 		ctx context.Context, entityID ttnpb.IDStringer, contactInfo []*ttnpb.ContactInfo,
 	) ([]*ttnpb.ContactInfo, error)
-	CreateValidation(
-		ctx context.Context, validation *ttnpb.ContactInfoValidation,
-	) (*ttnpb.ContactInfoValidation, error)
-	// Confirm a validation. Only the ID and Token need to be set.
-	Validate(ctx context.Context, validation *ttnpb.ContactInfoValidation) error
+	ValidateContactInfo(ctx context.Context, validation *ttnpb.ContactInfoValidation) error
 	DeleteEntityContactInfo(ctx context.Context, entityID ttnpb.IDStringer) error
+
+	CreateValidation(ctx context.Context, validation *ttnpb.ContactInfoValidation) (*ttnpb.ContactInfoValidation, error)
+	GetValidation(ctx context.Context, validation *ttnpb.ContactInfoValidation) (*ttnpb.ContactInfoValidation, error)
+	ExpireValidation(ctx context.Context, validation *ttnpb.ContactInfoValidation) error
 }
 
 // EUIStore interface for assigning DevEUI blocks and addresses.
