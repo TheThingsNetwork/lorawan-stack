@@ -89,6 +89,9 @@ var (
 	ErrValidationTokenAlreadyUsed = errors.DefineFailedPrecondition(
 		"validation_token_already_used", "validation token already used", "validation_id",
 	)
+	ErrValidationWithoutContactInfo = errors.DefineNotFound(
+		"validation_without_contact_info", "validation does not reference any valid contact information",
+	)
 
 	ErrLoginTokenNotFound = errors.DefineNotFound(
 		"login_token_not_found", "login token not found",
