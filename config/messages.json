@@ -2744,6 +2744,15 @@
       "file": "applicationserver.go"
     }
   },
+  "error:pkg/applicationserver:default_retry_count_larger_than_max": {
+    "translations": {
+      "en": "the default number of retries cannot be larger than the maximum number of retries"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "applicationserver.go"
+    }
+  },
   "error:pkg/applicationserver:device_not_found": {
     "translations": {
       "en": "device `{device_uid}` not found"
@@ -2906,15 +2915,6 @@
       "file": "applicationserver.go"
     }
   },
-  "error:pkg/applicationserver:retry_attempts_missing": {
-    "translations": {
-      "en": "either default or maximum number of retries must be set"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "applicationserver.go"
-    }
-  },
   "error:pkg/applicationserver:unknown_session": {
     "translations": {
       "en": "unknown session"
@@ -2940,6 +2940,15 @@
     "description": {
       "package": "pkg/applicationserver",
       "file": "config.go"
+    }
+  },
+  "error:pkg/applicationserver:zero_attempt_counts": {
+    "translations": {
+      "en": "the default and maximum number of retries cannot be zero"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "applicationserver.go"
     }
   },
   "error:pkg/auth/cluster:auth_type": {

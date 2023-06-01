@@ -116,7 +116,10 @@ var (
 
 func validateDownlinkConfirmationConfig(c ConfirmationConfig) error {
 	if c.DefaultRetryAttempts == 0 && c.MaxRetryAttempts == 0 {
-		return errRetryAttemptCountMissing.New()
+		return errZeroAttemptCounts.New()
+	}
+	if c.DefaultRetryAttempts > c.MaxRetryAttempts {
+		return errDefaultRetryCountLargerThanMax.New()
 	}
 	return nil
 }
@@ -485,8 +488,12 @@ var (
 	errRebuild = errors.DefineAborted(
 		"rebuild", "could not rebuild device session; check device address",
 	)
-	errRetryAttemptCountMissing = errors.DefineFailedPrecondition(
-		"retry_attempts_missing", "either default or maximum number of retries must be set",
+	errZeroAttemptCounts = errors.DefineFailedPrecondition(
+		"zero_attempt_counts", "the default and maximum number of retries cannot be zero",
+	)
+	errDefaultRetryCountLargerThanMax = errors.DefineFailedPrecondition(
+		"default_retry_count_larger_than_max",
+		"the default number of retries cannot be larger than the maximum number of retries",
 	)
 	errDownlinkMaxRetriesInvalid = errors.DefineInvalidArgument(
 		"downlink_max_retries_invalid", "downlink maximum retries exceed configured maximum of {max}",
