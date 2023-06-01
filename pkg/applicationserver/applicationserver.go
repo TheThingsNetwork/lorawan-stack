@@ -118,12 +118,6 @@ func validateDownlinkConfirmationConfig(c ConfirmationConfig) error {
 	if c.DefaultRetryAttempts == 0 && c.MaxRetryAttempts == 0 {
 		return errRetryAttemptCountMissing.New()
 	}
-	if c.MaxRetryAttempts < 0 {
-		return errNegativeValue.WithAttributes("field", "max_retry_attempts")
-	}
-	if c.DefaultRetryAttempts < 0 {
-		return errNegativeValue.WithAttributes("field", "default_retry_attempts")
-	}
 	return nil
 }
 
@@ -491,9 +485,6 @@ var (
 	errRebuild = errors.DefineAborted(
 		"rebuild", "could not rebuild device session; check device address",
 	)
-	errNegativeValue = errors.DefineFailedPrecondition(
-		"negative_value", "value for {field} must not be less than zero",
-	)
 	errRetryAttemptCountMissing = errors.DefineFailedPrecondition(
 		"retry_attempts_missing", "either default or maximum number of retries must be set",
 	)
@@ -694,7 +685,7 @@ func (as *ApplicationServer) initAndValidateConfirmationRetriesConfig(item *ttnp
 	}
 
 	maxAttemptsAllowed := as.config.Downlinks.ConfirmationConfig.MaxRetryAttempts
-	if item.ConfirmedRetry.MaxAttempts.GetValue() > uint32(maxAttemptsAllowed) {
+	if item.ConfirmedRetry.MaxAttempts.GetValue() > maxAttemptsAllowed {
 		return errDownlinkMaxRetriesInvalid.WithAttributes("max", maxAttemptsAllowed)
 	}
 	return nil
@@ -1423,11 +1414,11 @@ func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids *ttnpb.
 				}
 				msg.ConfirmedRetry.Attempt++
 
-				maxRetries := uint32(as.config.Downlinks.ConfirmationConfig.DefaultRetryAttempts)
-				if msg.ConfirmedRetry.MaxAttempts.GetValue() > 0 {
-					maxRetries = msg.ConfirmedRetry.MaxAttempts.GetValue()
+				maxRetries := as.config.Downlinks.ConfirmationConfig.DefaultRetryAttempts
+				if maxAttempts := msg.ConfirmedRetry.MaxAttempts; maxAttempts != nil {
+					maxRetries = maxAttempts.Value
 				}
-				if maxRetries != 0 && msg.ConfirmedRetry.Attempt > maxRetries {
+				if msg.ConfirmedRetry.Attempt > maxRetries {
 					as.registerDropDownlinks(
 						ctx, ids, items,
 						errMaxRetriesReached.WithAttributes("max_retries", maxRetries),

@@ -2843,15 +2843,6 @@
       "file": "applicationserver.go"
     }
   },
-  "error:pkg/applicationserver:negative_value": {
-    "translations": {
-      "en": "value for {field} must not be less than zero"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "applicationserver.go"
-    }
-  },
   "error:pkg/applicationserver:no_app_s_key": {
     "translations": {
       "en": "no AppSKey"

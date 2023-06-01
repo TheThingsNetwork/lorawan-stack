@@ -93,15 +93,15 @@ type FormattersConfig struct {
 	MaxParameterLength int `name:"max-parameter-length" description:"Maximum allowed size for length of formatter parameters (payload formatter scripts)"`
 }
 
-// ConfirmationConfig represents the configuration for downlink confirmations.
+// ConfirmationConfig represents the configuration for confirmed downlink.
 type ConfirmationConfig struct {
-	DefaultRetryAttempts int `name:"default-retry-attempts" description:"Default number of retry attempts for downlink confirmation"` // nolint:lll
-	MaxRetryAttempts     int `name:"max-retry-attempts" description:"Maximum number of retry attempts for downlink confirmation"`     // nolint:lll
+	DefaultRetryAttempts uint32 `name:"default-retry-attempts" description:"Default number of retry attempts for confirmed downlink"` // nolint:lll
+	MaxRetryAttempts     uint32 `name:"max-retry-attempts" description:"Maximum number of retry attempts for confirmed downlink"`     // nolint:lll
 }
 
 // DownlinksConfig represents the configuration for downlinks.
 type DownlinksConfig struct {
-	ConfirmationConfig ConfirmationConfig `name:"confirmation" description:"Configuration for downlink confirmation"`
+	ConfirmationConfig ConfirmationConfig `name:"confirmation" description:"Configuration for confirmed downlink"`
 }
 
 // Config represents the ApplicationServer configuration.
