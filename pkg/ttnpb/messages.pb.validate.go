@@ -2912,14 +2912,15 @@ func (m *ApplicationDownlink_ConfirmedRetry) ValidateFields(paths ...string) err
 			// no validation rules for Attempt
 		case "max_attempts":
 
-			if v, ok := interface{}(m.GetMaxAttempts()).(interface{ ValidateFields(...string) error }); ok {
-				if err := v.ValidateFields(subs...); err != nil {
+			if wrapper := m.GetMaxAttempts(); wrapper != nil {
+
+				if val := wrapper.GetValue(); val <= 0 || val > 100 {
 					return ApplicationDownlink_ConfirmedRetryValidationError{
 						field:  "max_attempts",
-						reason: "embedded message failed validation",
-						cause:  err,
+						reason: "value must be inside range (0, 100]",
 					}
 				}
+
 			}
 
 		default:

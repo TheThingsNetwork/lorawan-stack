@@ -7039,6 +7039,12 @@ Transmission settings for downlink.
 | `attempt` | [`uint32`](#uint32) |  | The number of confirmed downlink acknowledgement attempts done so far. |
 | `max_attempts` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | The maximum number of confirmed downlink acknowledgement attempts. If null, the Application Server configuration is used instead. |
 
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `max_attempts` | <p>`uint32.lte`: `100`</p><p>`uint32.gt`: `0`</p> |
+
 ### <a name="ttn.lorawan.v3.ApplicationDownlinkFailed">Message `ApplicationDownlinkFailed`</a>
 
 | Field | Type | Label | Description |

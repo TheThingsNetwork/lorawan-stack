@@ -391,7 +391,7 @@ message ApplicationDownlink {
     uint32 attempt = 1;
     // The maximum number of confirmed downlink acknowledgement attempts.
     // If null, the Application Server configuration is used instead.
-    google.protobuf.UInt32Value max_attempts = 2;
+    google.protobuf.UInt32Value max_attempts = 2 [(validate.rules).uint32 = {gt: 0, lte: 100}];
   }
 
   ConfirmedRetry confirmed_retry = 11;

@@ -31937,7 +31937,19 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 100
+                  },
+                  {
+                    "name": "uint32.gt",
+                    "value": 0
+                  }
+                ]
+              }
             }
           ]
         },
