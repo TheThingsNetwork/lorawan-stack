@@ -184,9 +184,9 @@ require (
 	github.com/throttled/throttled/v2 v2.0.0-00010101000000-000000000000 // indirect
 	github.com/tinylib/msgp v1.1.0 // indirect
 	github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc // indirect
-	github.com/uptrace/bun v1.1.13 // indirect
-	github.com/uptrace/bun/dialect/pgdialect v1.1.13 // indirect
-	github.com/uptrace/bun/driver/pgdriver v1.1.13 // indirect
+	github.com/uptrace/bun v1.1.14 // indirect
+	github.com/uptrace/bun/dialect/pgdialect v1.1.14 // indirect
+	github.com/uptrace/bun/driver/pgdriver v1.1.14 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/weppos/publicsuffix-go v0.15.1-0.20210511084619-b1f36a2d6c0b // indirect
