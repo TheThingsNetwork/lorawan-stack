@@ -115,7 +115,7 @@ var (
 )
 
 func validateDownlinkConfirmationConfig(c ConfirmationConfig) error {
-	if c.DefaultRetryAttempts == 0 && c.MaxRetryAttempts == 0 {
+	if c.DefaultRetryAttempts == 0 || c.MaxRetryAttempts == 0 {
 		return errZeroAttemptCounts.New()
 	}
 	if c.DefaultRetryAttempts > c.MaxRetryAttempts {
