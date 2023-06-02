@@ -1411,27 +1411,24 @@ func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids *ttnpb.
 				return nil, nil, err
 			}
 
+			if msg.ConfirmedRetry == nil {
+				msg.ConfirmedRetry = &ttnpb.ApplicationDownlink_ConfirmedRetry{
+					Attempt: 0,
+				}
+			}
+			msg.ConfirmedRetry.Attempt++
 			items := []*ttnpb.ApplicationDownlink{msg}
 
-			if msg.Confirmed {
-				if msg.ConfirmedRetry == nil {
-					msg.ConfirmedRetry = &ttnpb.ApplicationDownlink_ConfirmedRetry{
-						Attempt: 0,
-					}
-				}
-				msg.ConfirmedRetry.Attempt++
-
-				maxRetries := as.config.Downlinks.ConfirmationConfig.DefaultRetryAttempts
-				if maxAttempts := msg.ConfirmedRetry.MaxAttempts; maxAttempts != nil {
-					maxRetries = maxAttempts.Value
-				}
-				if msg.ConfirmedRetry.Attempt > maxRetries {
-					as.registerDropDownlinks(
-						ctx, ids, items,
-						errMaxRetriesReached.WithAttributes("max_retries", maxRetries),
-					)
-					return dev, nil, nil
-				}
+			maxRetries := as.config.Downlinks.ConfirmationConfig.DefaultRetryAttempts
+			if maxAttempts := msg.ConfirmedRetry.MaxAttempts; maxAttempts != nil {
+				maxRetries = maxAttempts.Value
+			}
+			if msg.ConfirmedRetry.Attempt > maxRetries {
+				as.registerDropDownlinks(
+					ctx, ids, items,
+					errMaxRetriesReached.WithAttributes("max_retries", maxRetries),
+				)
+				return dev, nil, nil
 			}
 
 			pushMask, err := as.attemptDownlinkQueueOp(ctx, dev, link, peer, downlinkQueueOperation{
