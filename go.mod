@@ -40,7 +40,7 @@ require (
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.2
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.0
 	github.com/hellofresh/health-go/v5 v5.1.1
 	github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef
 	github.com/iancoleman/strcase v0.2.0
@@ -102,7 +102,9 @@ require (
 	golang.org/x/net v0.10.0
 	golang.org/x/oauth2 v0.8.0
 	golang.org/x/sync v0.2.0
-	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
+	google.golang.org/genproto v0.0.0-20230526203410-71b5a4ffd15e
+	google.golang.org/genproto/googleapis/api v0.0.0-20230530153820-e85fd2cbaebc
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20230530153820-e85fd2cbaebc
 	google.golang.org/grpc v1.55.0
 	google.golang.org/protobuf v1.30.0
 	gopkg.in/mail.v2 v2.3.1
