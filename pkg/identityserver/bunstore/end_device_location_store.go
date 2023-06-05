@@ -70,11 +70,11 @@ func endDeviceLocationMap(models []*EndDeviceLocation) map[string]*EndDeviceLoca
 }
 
 func (s *endDeviceStore) replaceEndDeviceLocations(
-	ctx context.Context, current []*EndDeviceLocation, desired map[string]*ttnpb.Location, gatewayID string,
+	ctx context.Context, current []*EndDeviceLocation, desired map[string]*ttnpb.Location, endDeviceID string,
 ) ([]*EndDeviceLocation, error) {
 	var (
 		oldMap   = endDeviceLocationMap(current)
-		newMap   = endDeviceLocationMap(endDeviceLocationSliceFromPB(desired, gatewayID))
+		newMap   = endDeviceLocationMap(endDeviceLocationSliceFromPB(desired, endDeviceID))
 		toCreate = make([]*EndDeviceLocation, 0, len(newMap))
 		toUpdate = make([]*EndDeviceLocation, 0, len(newMap))
 		toDelete = make([]*EndDeviceLocation, 0, len(oldMap))

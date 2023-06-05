@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package applicationserver provides a LoRaWAN-compliant Application Server implementation.
 package applicationserver
 
 import (

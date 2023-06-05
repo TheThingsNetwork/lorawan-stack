@@ -134,7 +134,12 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 		t, a := test.MustNewTFromContext(ctx)
 		t.Helper()
 
-		stored, storedCtx, err := reg.GetByID(ctx, pb.Ids.ApplicationIds, pb.Ids.DeviceId, ttnpb.EndDeviceFieldPathsTopLevel)
+		stored, storedCtx, err := reg.GetByID(
+			ctx,
+			pb.Ids.ApplicationIds,
+			pb.Ids.DeviceId,
+			ttnpb.EndDeviceFieldPathsTopLevel,
+		)
 		if !test.AllTrue(
 			a.So(err, should.NotBeNil),
 			a.So(errors.IsNotFound(err), should.BeTrue),
@@ -272,25 +277,39 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 				},
 			},
 		},
-		MacState: MakeDefaultEU868MACState(ttnpb.Class_CLASS_A, ttnpb.MACVersion_MAC_V1_0_3, ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
+		MacState: MakeDefaultEU868MACState(
+			ttnpb.Class_CLASS_A,
+			ttnpb.MACVersion_MAC_V1_0_3,
+			ttnpb.PHYVersion_RP001_V1_0_3_REV_A,
+		),
 		PendingSession: &ttnpb.Session{
 			DevAddr: types.DevAddr{0x43, 0xff, 0xff, 0xff}.Bytes(),
 			Keys: &ttnpb.SessionKeys{
 				FNwkSIntKey: &ttnpb.KeyEnvelope{
-					EncryptedKey: []byte{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe},
-					KekLabel:     "kek-label",
+					EncryptedKey: []byte{
+						0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe,
+					},
+					KekLabel: "kek-label",
 				},
 				SNwkSIntKey: &ttnpb.KeyEnvelope{
-					EncryptedKey: []byte{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfd},
-					KekLabel:     "kek-label",
+					EncryptedKey: []byte{
+						0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfd,
+					},
+					KekLabel: "kek-label",
 				},
 				NwkSEncKey: &ttnpb.KeyEnvelope{
-					EncryptedKey: []byte{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfc},
-					KekLabel:     "kek-label",
+					EncryptedKey: []byte{
+						0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfc,
+					},
+					KekLabel: "kek-label",
 				},
 			},
 		},
-		PendingMacState: MakeDefaultEU868MACState(ttnpb.Class_CLASS_A, ttnpb.MACVersion_MAC_V1_1, ttnpb.PHYVersion_RP001_V1_1_REV_B),
+		PendingMacState: MakeDefaultEU868MACState(
+			ttnpb.Class_CLASS_A,
+			ttnpb.MACVersion_MAC_V1_1,
+			ttnpb.PHYVersion_RP001_V1_1_REV_B,
+		),
 	}
 	pbFields := []string{
 		"frequency_plan_id",

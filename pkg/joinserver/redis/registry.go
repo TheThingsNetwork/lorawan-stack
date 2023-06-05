@@ -592,7 +592,11 @@ func (r *KeyRegistry) SetByID(ctx context.Context, joinEUI, devEUI types.EUI64, 
 	return pb, nil
 }
 
+// Delete implements KeyRegistry.
 func (r *KeyRegistry) Delete(ctx context.Context, joinEUI, devEUI types.EUI64) error {
+	if r.Limit == 0 {
+		return nil
+	}
 	if devEUI.IsZero() {
 		return errInvalidIdentifiers.New()
 	}
@@ -606,7 +610,7 @@ func (r *KeyRegistry) Delete(ctx context.Context, joinEUI, devEUI types.EUI64) e
 	defer trace.StartRegion(ctx, "delete session keys").End()
 
 	err = ttnredis.LockedWatch(ctx, r.Redis, sk, lockerID, r.LockTTL, func(tx *redis.Tx) error {
-		sids, err := tx.LRange(ctx, sk, 0, 1<<24).Result()
+		sids, err := tx.LRange(ctx, sk, 0, int64(r.Limit)).Result()
 		if err != nil {
 			return err
 		}
