@@ -525,7 +525,7 @@ class Devices {
         const claimResponse = await this._api.EndDeviceClaimingServer.Claim(undefined, claimPayload)
         claimDeviceIds = Marshaler.payloadSingleResponse(claimResponse)
       } catch (error) {
-        throw new Error('Unable to claim end device',  { cause: error })
+        throw new Error('Unable to claim end device', { cause: error })
       }
     }
 
