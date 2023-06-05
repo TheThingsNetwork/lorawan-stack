@@ -14,13 +14,23 @@
 
 import React from 'react'
 import ReactSelect, { components } from 'react-select'
-import { injectIntl } from 'react-intl'
+import AsyncSelect from 'react-select/async'
+import { defineMessage, injectIntl } from 'react-intl'
 import bind from 'autobind-decorator'
 import classnames from 'classnames'
 
+import Message from '@ttn-lw/lib/components/message'
+
 import PropTypes from '@ttn-lw/lib/prop-types'
 
+import Icon from '../icon'
+import Button from '../button'
+
 import style from './select.styl'
+
+const m = defineMessage({
+  remove: 'Remove',
+})
 
 const Input = props => {
   const { selectProps } = props
@@ -41,13 +51,19 @@ const getValue = (opts, val) => opts.find(o => o.value === val)
 class Select extends React.PureComponent {
   static propTypes = {
     className: PropTypes.string,
+    customComponents: PropTypes.shape({
+      Option: PropTypes.func,
+      SingleValue: PropTypes.func,
+    }),
     disabled: PropTypes.bool,
     error: PropTypes.bool,
+    hasAutosuggest: PropTypes.bool,
     id: PropTypes.string,
     inputWidth: PropTypes.inputWidth,
     intl: PropTypes.shape({
       formatMessage: PropTypes.func,
     }).isRequired,
+    loadOptions: PropTypes.func,
     menuPlacement: PropTypes.string,
     name: PropTypes.string.isRequired,
     onBlur: PropTypes.func,
@@ -60,7 +76,8 @@ class Select extends React.PureComponent {
       }),
     ),
     placeholder: PropTypes.message,
-    value: PropTypes.string,
+    showOptionIcon: PropTypes.bool,
+    value: PropTypes.oneOf([PropTypes.string, PropTypes.shape({})]),
     warning: PropTypes.bool,
   }
 
@@ -78,6 +95,10 @@ class Select extends React.PureComponent {
     inputWidth: 'm',
     placeholder: undefined,
     menuPlacement: 'auto',
+    hasAutosuggest: false,
+    loadOptions: () => null,
+    showOptionIcon: false,
+    customComponents: {},
   }
 
   constructor(props) {
@@ -104,14 +125,15 @@ class Select extends React.PureComponent {
   }
 
   @bind
-  async onChange({ value }) {
-    const { onChange } = this.props
+  async onChange(value) {
+    const { onChange, hasAutosuggest } = this.props
 
     if (!('value' in this.props)) {
-      await this.setState({ value })
+      // The Autosuggest Select (AsyncSelect) relies on the whole object to decode the selected option.
+      this.setState({ value: hasAutosuggest ? value : value?.value })
     }
 
-    onChange(value, true)
+    onChange(hasAutosuggest ? value : value?.value, true)
   }
 
   @bind
@@ -131,6 +153,21 @@ class Select extends React.PureComponent {
     onBlur(event)
   }
 
+  @bind
+  loadOptions(inputValue, callback) {
+    const { loadOptions } = this.props
+    const requestResults = loadOptions(inputValue)
+
+    callback(requestResults)
+  }
+
+  @bind
+  async handleRemoveSelected(e, option) {
+    const newValue = this.state.value.filter(o => o.value !== option.value)
+
+    this.onChange(newValue)
+  }
+
   render() {
     const {
       className,
@@ -147,6 +184,9 @@ class Select extends React.PureComponent {
       name,
       id,
       placeholder,
+      hasAutosuggest,
+      showOptionIcon,
+      customComponents,
       ...rest
     } = this.props
 
@@ -155,6 +195,13 @@ class Select extends React.PureComponent {
       [style.error]: error,
       [style.warning]: warning,
     })
+    const selectedOptionsClasses = classnames(
+      style.container,
+      style.selectedOptionsContainer,
+      style[`input-width-${inputWidth}`],
+      'mt-cs-xs',
+    )
+
     const translatedOptions = options.map(option => {
       const { label, labelValues = {} } = option
       if (typeof label === 'object' && label.id && label.defaultMessage) {
@@ -164,7 +211,48 @@ class Select extends React.PureComponent {
       return option
     })
 
-    return (
+    const customOption = props => (
+      <components.Option {...props}>
+        {showOptionIcon && <Icon icon={props.data.icon} className="mr-cs-xs" />}
+        <b>{props.label}</b>
+      </components.Option>
+    )
+
+    return hasAutosuggest ? (
+      <>
+        <AsyncSelect
+          loadOptions={this.loadOptions}
+          className={cls}
+          inputId={id}
+          classNamePrefix="select"
+          onChange={this.onChange}
+          onBlur={this.onBlur}
+          onFocus={onFocus}
+          isDisabled={disabled}
+          value={value}
+          name={name}
+          components={{ Input, Option: customOption, ...customComponents }}
+          aria-describedby={rest['aria-describedby']}
+          placeholder={Boolean(placeholder) ? formatMessage(placeholder) : undefined}
+          {...rest}
+        />
+        {rest.isMulti &&
+          this.state.value?.map(option => (
+            <div key={option.value} className={selectedOptionsClasses}>
+              <Icon icon={option.icon} className="mr-cs-s" />
+              <Message content={option.description ?? option.label} />
+              <Button
+                type="button"
+                naked
+                message={m.remove}
+                value={option}
+                onClick={this.handleRemoveSelected}
+                className={style.removeOptionButton}
+              />
+            </div>
+          ))}
+      </>
+    ) : (
       <ReactSelect
         className={cls}
         inputId={id}
