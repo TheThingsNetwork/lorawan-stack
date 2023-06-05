@@ -289,7 +289,7 @@ type InvitationStore interface {
 	CreateInvitation(ctx context.Context, invitation *ttnpb.Invitation) (*ttnpb.Invitation, error)
 	FindInvitations(ctx context.Context) ([]*ttnpb.Invitation, error)
 	GetInvitation(ctx context.Context, token string) (*ttnpb.Invitation, error)
-	SetInvitationAcceptedBy(ctx context.Context, token string, accepter *ttnpb.UserIdentifiers) error
+	SetInvitationAcceptedBy(ctx context.Context, token string, usrIDs *ttnpb.UserIdentifiers) error
 	DeleteInvitation(ctx context.Context, email string) error
 }
 
