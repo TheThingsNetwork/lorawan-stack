@@ -30,7 +30,6 @@ import { selectAsEnabled, selectJsEnabled, selectNsEnabled } from '@ttn-lw/lib/s
 import { checkFromState } from '@account/lib/feature-checks'
 import { mayEditApplicationDeviceKeys } from '@console/lib/feature-checks'
 
-import { claimDevice } from '@console/store/actions/claim'
 import { createDevice } from '@console/store/actions/devices'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
@@ -98,29 +97,14 @@ const DeviceOnboardingForm = () => {
     async (values, { resetForm }, cleanedValues) => {
       const { _registration } = values
       const applicationIds = { application_id: appId }
-      const { authenticated_identifiers, target_device_id, ...submitValues } = cleanedValues
-      const { mac_state = {} } = submitValues
+      const { mac_state = {} } = cleanedValues
 
       setError()
 
       // Set the application ID.
-      submitValues.ids.application_ids = applicationIds
+      cleanedValues.ids.application_ids = applicationIds
 
       try {
-        // Initiate claiming, if the device is claimable.
-        if (values._claim) {
-          const claimValues = {
-            authenticated_identifiers,
-            target_device_id,
-          }
-          // Provision (claim) the device on the Join Server.
-          const deviceIds = await dispatch(
-            attachPromise(claimDevice(appId, undefined, claimValues)),
-          )
-          // Apply the resulting IDs to the submit values.
-          submitValues.ids = deviceIds
-        }
-
         //  Do not attempt to set empty `current_parameters` on device creation.
         if (
           mac_state.current_parameters &&
@@ -129,8 +113,7 @@ const DeviceOnboardingForm = () => {
           delete mac_state.current_parameters
         }
 
-        // Create the device in the stack (skipping JS, if claimed previously).
-        await dispatch(attachPromise(createDevice(appId, submitValues)))
+        const endDevice = await dispatch(attachPromise(createDevice(appId, cleanedValues)))
         switch (_registration) {
           case REGISTRATION_TYPES.MULTIPLE:
             toast({
@@ -162,7 +145,7 @@ const DeviceOnboardingForm = () => {
             break
           case REGISTRATION_TYPES.SINGLE:
           default:
-            navigateToDevice(appId, submitValues.ids.device_id)
+            navigateToDevice(appId, endDevice.ids.device_id)
         }
       } catch (error) {
         setError(error)
