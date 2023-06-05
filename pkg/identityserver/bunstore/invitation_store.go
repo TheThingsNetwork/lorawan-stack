@@ -179,7 +179,6 @@ func (s *invitationStore) GetInvitation(ctx context.Context, token string) (*ttn
 		attribute.String("invitation_token", token),
 	))
 	defer span.End()
-
 	model, err := s.getInvitationModelBy(ctx, func(q *bun.SelectQuery) *bun.SelectQuery {
 		return q.
 			Where("token = ?", token).
@@ -189,27 +188,19 @@ func (s *invitationStore) GetInvitation(ctx context.Context, token string) (*ttn
 	})
 	if err != nil {
 		if errors.IsNotFound(err) {
-			return nil, store.ErrInvitationNotFound.WithAttributes(
-				"invitation_token", token,
-			)
+			return nil, store.ErrInvitationNotFound.WithAttributes("invitation_token", token)
 		}
 		return nil, err
 	}
-
-	pb, err := invitationToPB(model)
-	if err != nil {
-		return nil, err
-	}
-
-	return pb, nil
+	return invitationToPB(model)
 }
 
 func (s *invitationStore) SetInvitationAcceptedBy(
-	ctx context.Context, token string, accepter *ttnpb.UserIdentifiers,
+	ctx context.Context, token string, usrIDs *ttnpb.UserIdentifiers,
 ) error {
 	ctx, span := tracer.StartFromContext(ctx, "SetInvitationAcceptedBy", trace.WithAttributes(
 		attribute.String("invitation_token", token),
-		attribute.String("user_id", accepter.GetUserId()),
+		attribute.String("user_id", usrIDs.GetUserId()),
 	))
 	defer span.End()
 
@@ -218,22 +209,11 @@ func (s *invitationStore) SetInvitationAcceptedBy(
 	})
 	if err != nil {
 		if errors.IsNotFound(err) {
-			return store.ErrInvitationNotFound.WithAttributes(
-				"invitation_token", token,
-			)
+			return store.ErrInvitationNotFound.WithAttributes("invitation_token", token)
 		}
 		return err
 	}
-
-	if model.ExpiresAt != nil && model.ExpiresAt.Before(s.now()) {
-		return store.ErrInvitationExpired.WithAttributes("invitation_token", token)
-	}
-
-	if model.AcceptedByID != nil {
-		return store.ErrInvitationAlreadyUsed.WithAttributes("invitation_token", token)
-	}
-
-	_, userUUID, err := s.getEntity(ctx, accepter)
+	_, userUUID, err := s.getEntity(ctx, usrIDs)
 	if err != nil {
 		return err
 	}
@@ -246,7 +226,6 @@ func (s *invitationStore) SetInvitationAcceptedBy(
 	if err != nil {
 		return storeutil.WrapDriverError(err)
 	}
-
 	return nil
 }
 
