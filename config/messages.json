@@ -5750,15 +5750,6 @@
       "file": "entity_access.go"
     }
   },
-  "error:pkg/identityserver:invitation_token_expired": {
-    "translations": {
-      "en": "invitation token expired"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "user_registry.go"
-    }
-  },
   "error:pkg/identityserver:invitation_token_required": {
     "translations": {
       "en": "invitation token required"
