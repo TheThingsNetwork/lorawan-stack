@@ -66,7 +66,7 @@ const UserInput = ({ onlyCollaborators, onlyUsers, entity, entityId, ...rest }) 
         {...rest}
         initialOptions={onlyCollaborators ? collaboratorOptions : []}
         onlyCollaborators={onlyCollaborators}
-        optionWithIcon
+        showOptionIcon
         className={styles.userInput}
         userInputCustomComponent={{ SingleValue }}
         entity={entity}
