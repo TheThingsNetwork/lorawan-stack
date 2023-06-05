@@ -13,8 +13,6 @@
 // limitations under the License.
 
 describe('Collaborators', () => {
-  const userNotExist = 'not-exist-user'
-  const orgNotExist = 'not-exist-org'
   const userId = 'main-collab-user'
   const user = {
     ids: { user_id: userId },
@@ -66,8 +64,7 @@ describe('Collaborators', () => {
     })
 
     it('succeeds adding user as a collaborator', () => {
-      cy.findByLabelText('Collaborator ID').type(collaboratorId)
-      cy.findByLabelText('User').check()
+      cy.findByLabelText('Collaborator').selectOption(collaboratorId)
       cy.findByLabelText('Grant all current and future rights').check()
       cy.findByRole('button', { name: 'Add collaborator' }).click()
 
@@ -75,27 +72,11 @@ describe('Collaborators', () => {
       cy.location('pathname').should(
         'eq',
         `${Cypress.config('consoleRootPath')}/applications/${applicationId}/collaborators`,
-      )
-    })
-
-    it('fails adding non-existent user', () => {
-      cy.findByLabelText('Collaborator ID').type(userNotExist)
-      cy.findByLabelText('User').check()
-      cy.findByLabelText('Grant all current and future rights').check()
-      cy.findByRole('button', { name: 'Add collaborator' }).click()
-
-      cy.findByTestId('error-notification')
-        .should('be.visible')
-        .findByText(userNotExist)
-        .should('be.visible')
-      cy.visit(
-        `${Cypress.config('consoleRootPath')}/applications/${applicationId}/collaborators/add`,
       )
     })
 
     it('succeeds adding organization as a collaborator', () => {
-      cy.findByLabelText('Collaborator ID').type(organizationId)
-      cy.findByLabelText('Organization').check()
+      cy.findByLabelText('Collaborator').selectOption(organizationId)
       cy.findByLabelText('Grant all current and future rights').check()
       cy.findByRole('button', { name: 'Add collaborator' }).click()
 
@@ -103,21 +84,6 @@ describe('Collaborators', () => {
       cy.location('pathname').should(
         'eq',
         `${Cypress.config('consoleRootPath')}/applications/${applicationId}/collaborators`,
-      )
-    })
-
-    it('fails adding non-existent organization', () => {
-      cy.findByLabelText('Collaborator ID').type(orgNotExist)
-      cy.findByLabelText('Organization').check()
-      cy.findByLabelText('Grant all current and future rights').check()
-      cy.findByRole('button', { name: 'Add collaborator' }).click()
-
-      cy.findByTestId('error-notification')
-        .should('be.visible')
-        .findByText(orgNotExist)
-        .should('be.visible')
-      cy.visit(
-        `${Cypress.config('consoleRootPath')}/applications/${applicationId}/collaborators/add`,
       )
     })
   })
@@ -136,8 +102,7 @@ describe('Collaborators', () => {
     })
 
     it('succeeds adding user as a collaborator', () => {
-      cy.findByLabelText('Collaborator ID').type(collaboratorId)
-      cy.findByLabelText('User').check()
+      cy.findByLabelText('Collaborator').selectOption(collaboratorId)
       cy.findByLabelText('Grant all current and future rights').check()
       cy.findByRole('button', { name: 'Add collaborator' }).click()
 
@@ -146,24 +111,11 @@ describe('Collaborators', () => {
         'eq',
         `${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/collaborators`,
       )
-    })
-
-    it('fails adding non-existent user', () => {
-      cy.findByLabelText('Collaborator ID').type(userNotExist)
-      cy.findByLabelText('User').check()
-      cy.findByLabelText('Grant all current and future rights').check()
-      cy.findByRole('button', { name: 'Add collaborator' }).click()
-
-      cy.findByTestId('error-notification')
-        .should('be.visible')
-        .findByText(userNotExist)
-        .should('be.visible')
-      cy.visit(`${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/collaborators/add`)
     })
 
     it('succeeds adding organization as a collaborator', () => {
-      cy.findByLabelText('Collaborator ID').type(organizationId)
-      cy.findByLabelText('Organization').check()
+      cy.findByLabelText('Collaborator').selectOption(organizationId)
+
       cy.findByLabelText('Grant all current and future rights').check()
       cy.findByRole('button', { name: 'Add collaborator' }).click()
 
@@ -172,19 +124,6 @@ describe('Collaborators', () => {
         'eq',
         `${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/collaborators`,
       )
-    })
-
-    it('fails adding non-existent organization', () => {
-      cy.findByLabelText('Collaborator ID').type(orgNotExist)
-      cy.findByLabelText('Organization').check()
-      cy.findByLabelText('Grant all current and future rights').check()
-      cy.findByRole('button', { name: 'Add collaborator' }).click()
-
-      cy.findByTestId('error-notification')
-        .should('be.visible')
-        .findByText(orgNotExist)
-        .should('be.visible')
-      cy.visit(`${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/collaborators/add`)
     })
   })
 
@@ -204,8 +143,7 @@ describe('Collaborators', () => {
     })
 
     it('succeeds adding user as a collaborator', () => {
-      cy.findByLabelText('Collaborator ID').type(collaboratorId)
-      cy.findByLabelText('User').check()
+      cy.findByLabelText('Collaborator').selectOption(collaboratorId)
       cy.findByLabelText('Grant all current and future rights').check()
       cy.findByRole('button', { name: 'Add collaborator' }).click()
 
@@ -216,22 +154,8 @@ describe('Collaborators', () => {
       )
     })
 
-    it('fails adding non-existent user', () => {
-      cy.findByLabelText('Collaborator ID').type(userNotExist)
-      cy.findByLabelText('User').check()
-      cy.findByLabelText('Grant all current and future rights').check()
-      cy.findByRole('button', { name: 'Add collaborator' }).click()
-
-      cy.findByTestId('error-notification')
-        .should('be.visible')
-        .findByText(userNotExist)
-        .should('be.visible')
-      cy.visit(`${Cypress.config('consoleRootPath')}/organizations/${testOrgId}/collaborators/add`)
-    })
-
     it('fails adding organization as a collaborator', () => {
-      cy.findByLabelText('Collaborator ID').type(organizationId)
-      cy.findByLabelText('Organization').check()
+      cy.findByLabelText('Collaborator').selectOption(organizationId)
       cy.findByLabelText('Grant all current and future rights').check()
       cy.findByRole('button', { name: 'Add collaborator' }).click()
 
@@ -239,16 +163,6 @@ describe('Collaborators', () => {
         .should('be.visible')
         .findByText(/organizations can not be nested/i)
         .should('be.visible')
-      cy.visit(`${Cypress.config('consoleRootPath')}/organizations/${testOrgId}/collaborators/add`)
-    })
-
-    it('fails adding non-existent organization', () => {
-      cy.findByLabelText('Collaborator ID').type(orgNotExist)
-      cy.findByLabelText('Organization').check()
-      cy.findByLabelText('Grant all current and future rights').check()
-      cy.findByRole('button', { name: 'Add collaborator' }).click()
-
-      cy.findByTestId('error-notification').should('be.visible')
       cy.visit(`${Cypress.config('consoleRootPath')}/organizations/${testOrgId}/collaborators/add`)
     })
   })
