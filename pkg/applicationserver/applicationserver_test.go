@@ -1456,6 +1456,9 @@ func TestApplicationServer(t *testing.T) {
 										FPort:        11,
 										FCnt:         1,
 										FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
+										ConfirmedRetry: &ttnpb.ApplicationDownlink_ConfirmedRetry{
+											Attempt: 1,
+										},
 										DecodedPayload: &structpb.Struct{
 											Fields: map[string]*structpb.Value{
 												"sum": {
@@ -1494,6 +1497,9 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        11,
 									FCnt:         44,
 									FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
+									ConfirmedRetry: &ttnpb.ApplicationDownlink_ConfirmedRetry{
+										Attempt: 1,
+									},
 									DecodedPayload: &structpb.Struct{
 										Fields: map[string]*structpb.Value{
 											"sum": {
@@ -1599,6 +1605,9 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        11,
 									FCnt:         44,
 									FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
+									ConfirmedRetry: &ttnpb.ApplicationDownlink_ConfirmedRetry{
+										Attempt: 1,
+									},
 									DecodedPayload: &structpb.Struct{
 										Fields: map[string]*structpb.Value{
 											"sum": {
