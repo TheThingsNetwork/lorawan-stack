@@ -357,10 +357,7 @@ type ContactInfoValidation struct {
 
 // BeforeAppendModel is a hook that modifies the model on SELECT and UPDATE queries.
 func (m *ContactInfoValidation) BeforeAppendModel(ctx context.Context, query bun.Query) error {
-	if err := m.Model.BeforeAppendModel(ctx, query); err != nil {
-		return err
-	}
-	return nil
+	return m.Model.BeforeAppendModel(ctx, query)
 }
 
 func validationToPB(m *ContactInfoValidation) *ttnpb.ContactInfoValidation {
@@ -375,15 +372,15 @@ func validationToPB(m *ContactInfoValidation) *ttnpb.ContactInfoValidation {
 		}},
 	}
 	switch m.EntityType {
-	case "application":
+	case store.EntityApplication:
 		val.Entity = (&ttnpb.ApplicationIdentifiers{ApplicationId: m.EntityID}).GetEntityIdentifiers()
-	case "client":
+	case store.EntityClient:
 		val.Entity = (&ttnpb.ClientIdentifiers{ClientId: m.EntityID}).GetEntityIdentifiers()
-	case "gateway":
+	case store.EntityGateway:
 		val.Entity = (&ttnpb.GatewayIdentifiers{GatewayId: m.EntityID}).GetEntityIdentifiers()
-	case "organization":
+	case store.EntityOrganization:
 		val.Entity = (&ttnpb.OrganizationIdentifiers{OrganizationId: m.EntityID}).GetEntityIdentifiers()
-	case "user":
+	case store.EntityUser:
 		val.Entity = (&ttnpb.UserIdentifiers{UserId: m.EntityID}).GetEntityIdentifiers()
 	}
 	return val
