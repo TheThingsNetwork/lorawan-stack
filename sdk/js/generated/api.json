@@ -31917,7 +31917,7 @@
           "fields": [
             {
               "name": "attempt",
-              "description": "The number of confirmed downlink acknowledgement attempts done so far.",
+              "description": "The number of attempted confirmed downlink acknowledgements.",
               "label": "",
               "type": "uint32",
               "longType": "uint32",

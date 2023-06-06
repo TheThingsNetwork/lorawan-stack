@@ -2003,7 +2003,7 @@ type ApplicationDownlink_ConfirmedRetry struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The number of confirmed downlink acknowledgement attempts done so far.
+	// The number of attempted confirmed downlink acknowledgements.
 	Attempt uint32 `protobuf:"varint,1,opt,name=attempt,proto3" json:"attempt,omitempty"`
 	// The maximum number of confirmed downlink acknowledgement attempts.
 	// If null, the Application Server configuration is used instead.

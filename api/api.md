@@ -7036,7 +7036,7 @@ Transmission settings for downlink.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `attempt` | [`uint32`](#uint32) |  | The number of confirmed downlink acknowledgement attempts done so far. |
+| `attempt` | [`uint32`](#uint32) |  | The number of attempted confirmed downlink acknowledgements. |
 | `max_attempts` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | The maximum number of confirmed downlink acknowledgement attempts. If null, the Application Server configuration is used instead. |
 
 #### Field Rules

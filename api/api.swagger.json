@@ -16716,7 +16716,7 @@
         "attempt": {
           "type": "integer",
           "format": "int64",
-          "description": "The number of confirmed downlink acknowledgement attempts done so far."
+          "description": "The number of attempted confirmed downlink acknowledgements."
         },
         "max_attempts": {
           "type": "integer",
