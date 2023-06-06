@@ -1,4 +1,4 @@
-// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,49 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import connect from './connect'
-import ApplicationData from './application-data'
+import React from 'react'
+import { defineMessages } from 'react-intl'
+import { useParams } from 'react-router-dom'
 
-const ConnectedApplicationData = connect(ApplicationData)
+import PageTitle from '@ttn-lw/components/page-title'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
-export { ConnectedApplicationData as default, ApplicationData }
+import WithRootClass from '@ttn-lw/lib/components/with-root-class'
+
+import ApplicationEvents from '@console/containers/application-events'
+
+import Require from '@console/lib/components/require'
+
+import style from '@console/views/app/app.styl'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { mayViewApplicationEvents } from '@console/lib/feature-checks'
+
+const m = defineMessages({
+  appData: 'Application data',
+})
+
+const ApplicationData = () => {
+  const { appId } = useParams()
+
+  useBreadcrumbs(
+    'apps.single.data',
+    <Breadcrumb path={`/applications/${appId}/data`} content={sharedMessages.liveData} />,
+  )
+
+  return (
+    <Require
+      featureCheck={mayViewApplicationEvents}
+      otherwise={{ redirect: `/applications/${appId}` }}
+    >
+      <WithRootClass className={style.stageFlex} id="stage">
+        <PageTitle hideHeading title={m.appData} />
+        <ApplicationEvents appId={appId} />
+      </WithRootClass>
+    </Require>
+  )
+}
+
+export default ApplicationData

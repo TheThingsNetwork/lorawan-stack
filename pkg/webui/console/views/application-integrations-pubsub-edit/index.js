@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,126 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ApplicationPubsubEdit from './application-integrations-pubsub-edit'
-import connect from './connect'
+import React, { useCallback } from 'react'
+import { Container, Col, Row } from 'react-grid-system'
+import { defineMessages } from 'react-intl'
+import { useNavigate, useParams } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
 
-const ConnectedApplicationPubsubEdit = connect(ApplicationPubsubEdit)
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import PageTitle from '@ttn-lw/components/page-title'
+import toast from '@ttn-lw/components/toast'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
-export { ConnectedApplicationPubsubEdit as default, ApplicationPubsubEdit }
+import RequireRequest from '@ttn-lw/lib/components/require-request'
+
+import PubsubForm from '@console/components/pubsub-form'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+
+import { deletePubsub, getPubsub, updatePubsub } from '@console/store/actions/pubsubs'
+
+import {
+  selectMqttProviderDisabled,
+  selectNatsProviderDisabled,
+} from '@console/store/selectors/application-server'
+import { selectSelectedPubsub } from '@console/store/selectors/pubsubs'
+
+const pubsubEntitySelector = [
+  'base_topic',
+  'format',
+  'provider.nats',
+  'provider.mqtt',
+  'downlink_ack',
+  'downlink_failed',
+  'downlink_nack',
+  'downlink_push',
+  'downlink_queued',
+  'downlink_queue_invalidated',
+  'downlink_replace',
+  'downlink_sent',
+  'join_accept',
+  'location_solved',
+  'service_data',
+  'uplink_message',
+  'uplink_normalized',
+]
+
+const m = defineMessages({
+  editPubsub: 'Edit Pub/Sub',
+  updateSuccess: 'Pub/Sub updated',
+  deleteSuccess: 'Pub/Sub deleted',
+})
+
+const EditPubsubInner = () => {
+  const { appId, pubsubId } = useParams()
+  const pubsub = useSelector(selectSelectedPubsub)
+  const mqttDisabled = useSelector(selectMqttProviderDisabled)
+  const natsDisabled = useSelector(selectNatsProviderDisabled)
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  const getPubsub = useCallback(() => {
+    dispatch(getPubsub(appId, pubsubId, pubsubEntitySelector))
+  }, [dispatch, appId, pubsubId])
+
+  useBreadcrumbs(
+    'apps.single.integrations.edit',
+    <Breadcrumb
+      path={`/applications/${appId}/integrations/${pubsubId}`}
+      content={sharedMessages.edit}
+    />,
+  )
+
+  const handleSubmit = useCallback(
+    async patch => {
+      await dispatch(attachPromise(updatePubsub(appId, pubsubId, patch)))
+      toast({
+        message: m.updateSuccess,
+        type: toast.types.SUCCESS,
+      })
+    },
+    [appId, dispatch, pubsubId],
+  )
+
+  const handleDelete = useCallback(async () => {
+    await dispatch(attachPromise(deletePubsub(appId, pubsubId)))
+    toast({
+      message: m.deleteSuccess,
+      type: toast.types.SUCCESS,
+    })
+    navigate(`/applications/${appId}/integrations/pubsubs`)
+  }, [appId, dispatch, navigate, pubsubId])
+
+  return (
+    <Container>
+      <PageTitle title={m.editPubsub} className="mb-0" />
+      <Row>
+        <Col lg={8} md={12}>
+          <PubsubForm
+            update
+            appId={appId}
+            initialPubsubValue={pubsub}
+            onSubmit={handleSubmit}
+            onDelete={handleDelete}
+            mqttDisabled={mqttDisabled}
+            natsDisabled={natsDisabled}
+          />
+        </Col>
+      </Row>
+    </Container>
+  )
+}
+
+const EditPubsub = () => {
+  const { appId, pubsubId } = useParams()
+
+  return (
+    <RequireRequest requestAction={getPubsub(appId, pubsubId, pubsubEntitySelector)}>
+      <EditPubsubInner />
+    </RequireRequest>
+  )
+}
+
+export default EditPubsub

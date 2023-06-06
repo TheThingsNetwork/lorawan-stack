@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ApplicationApiKeyAdd from './application-api-key-add'
-import connect from './connect'
+import React from 'react'
+import { Container, Col, Row } from 'react-grid-system'
+import { useParams } from 'react-router-dom'
 
-const ConnectedApplicationApiKeyAdd = connect(ApplicationApiKeyAdd)
+import { APPLICATION } from '@console/constants/entities'
 
-export { ConnectedApplicationApiKeyAdd as default, ApplicationApiKeyAdd }
+import PageTitle from '@ttn-lw/components/page-title'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+
+import { ApiKeyCreateForm } from '@console/containers/api-key-form'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+const ApplicationApiKeyAdd = () => {
+  const { appId } = useParams()
+
+  useBreadcrumbs(
+    'apps.single.api-keys.add',
+    <Breadcrumb path={`/applications/${appId}/api-keys/add`} content={sharedMessages.add} />,
+  )
+
+  return (
+    <Container>
+      <PageTitle title={sharedMessages.addApiKey} />
+      <Row>
+        <Col lg={8} md={12}>
+          <ApiKeyCreateForm entityId={appId} entity={APPLICATION} />
+        </Col>
+      </Row>
+    </Container>
+  )
+}
+
+export default ApplicationApiKeyAdd
