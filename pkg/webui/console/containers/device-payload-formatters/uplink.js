@@ -15,6 +15,7 @@
 import React from 'react'
 import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
+import { isEmpty } from 'lodash'
 
 import PAYLOAD_FORMATTER_TYPES from '@console/constants/formatter-types'
 import tts from '@console/api/tts'
@@ -75,9 +76,11 @@ import m from './messages'
     getRepositoryPayloadFormatters,
   },
 )
-@withRequest(({ appId, device, getRepositoryPayloadFormatters }) =>
-  getRepositoryPayloadFormatters(appId, device.version_ids),
-)
+@withRequest(({ appId, device, getRepositoryPayloadFormatters }) => {
+  if (!isEmpty(device.version_ids)) {
+    return getRepositoryPayloadFormatters(appId, device.version_ids)
+  }
+})
 @withBreadcrumb('device.single.payload-formatters.uplink', props => {
   const { appId, devId } = props
 
