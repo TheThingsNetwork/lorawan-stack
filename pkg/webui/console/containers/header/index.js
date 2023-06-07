@@ -103,9 +103,7 @@ class Header extends Component {
       mayViewApplications,
       mayViewGateways,
       mayViewOrganizations,
-      mayManageUsers,
       mayViewOrEditApiKeys,
-      mayConfigurePacketBroker,
     } = this.props
 
     const navigation = [
@@ -152,27 +150,21 @@ class Header extends Component {
           path={`${accountUrl}/profile-settings`}
           external
         />
-        {mayManageUsers && (
-          <Dropdown.Item
-            title={sharedMessages.userManagement}
-            icon="user_management"
-            path="/admin/user-management"
-          />
-        )}
-        {mayViewOrEditApiKeys && (
-          <Dropdown.Item
-            title={sharedMessages.personalApiKeys}
-            icon="api_keys"
-            path="/user/api-keys"
-          />
-        )}
-        {mayConfigurePacketBroker && (
-          <Dropdown.Item
-            title={sharedMessages.packetBroker}
-            icon="packet_broker"
-            path="/admin/packet-broker"
-          />
-        )}
+        <Dropdown.Item title={'Admin panel'} icon="lock" path="/admin-panel/network-information" />
+        <hr />
+        <Dropdown.Item
+          title={'Get support'}
+          icon="help"
+          path="https://thethingsindustries.com/support"
+          external
+        />
+        <Dropdown.Item
+          title={'Documentation'}
+          icon="description"
+          path="https://thethingsindustries.com/docs"
+          external
+        />
+        <hr />
         <Dropdown.Item title={sharedMessages.logout} icon="logout" action={handleLogout} />
       </React.Fragment>
     )
@@ -191,25 +183,12 @@ class Header extends Component {
             external
           />
         </React.Fragment>
-        {mayManageUsers && (
-          <Dropdown.Item
-            title={sharedMessages.userManagement}
-            icon="user_management"
-            path="/admin/user-management"
-          />
-        )}
+        <Dropdown.Item title={'Admin panel'} icon="lock" path="/admin-panel/network-information" />
         {mayViewOrEditApiKeys && (
           <Dropdown.Item
             title={sharedMessages.personalApiKeys}
             icon="api_keys"
             path="/user/api-keys"
-          />
-        )}
-        {mayConfigurePacketBroker && (
-          <Dropdown.Item
-            title={sharedMessages.packetBroker}
-            icon="packet_broker"
-            path="/admin/packet-broker"
           />
         )}
       </React.Fragment>

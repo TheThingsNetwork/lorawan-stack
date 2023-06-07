@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,34 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.container
-  width: 100%
+import React from 'react'
 
-.bar
-  width: 100%
-  height: 1rem
-  border: $c-input-border
-  border-radius: $br.s
+import RegistryTotals from './registry-totals'
 
-.filler
-  background-color: $c-active-blue
-  border: 1px solid white
-  height: 100%
-  box-sizing: border-box
-  transition: width $ad.s
+const NetworkInformationContainer = () => <RegistryTotals />
 
-  &.warn
-    background-color: $tc-warning
-
-  &.limit
-    background-color: $c-error
-
-.status
-  horizontalize()
-  div
-    display: flex
-
-.progress-bar-values
-  display: flex
-  justify-content: space-between
-  margin-bottom: $cs.xs
+export default NetworkInformationContainer

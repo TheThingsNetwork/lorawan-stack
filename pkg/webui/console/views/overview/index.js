@@ -18,13 +18,11 @@ import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 
-import ServerIcon from '@assets/auxiliary-icons/server.svg'
 import AppAnimation from '@assets/animations/illustrations/app.json'
 import GatewayAnimation from '@assets/animations/illustrations/gateway.json'
 
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import Status from '@ttn-lw/components/status'
 import Spinner from '@ttn-lw/components/spinner'
 import Link from '@ttn-lw/components/link'
 
@@ -32,6 +30,8 @@ import Message from '@ttn-lw/lib/components/message'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import { withEnv } from '@ttn-lw/lib/components/env'
 import Animation from '@ttn-lw/lib/components/animation'
+
+import DeploymentComponentStatus from '@console/containers/deployment-component-status'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -67,14 +67,6 @@ const m = defineMessages({
   componentStatus: 'Component status',
   versionInfo: 'Version info',
 })
-
-const componentMap = {
-  is: sharedMessages.componentIs,
-  gs: sharedMessages.componentGs,
-  ns: sharedMessages.componentNs,
-  as: sharedMessages.componentAs,
-  js: sharedMessages.componentJs,
-}
 
 const overviewFetchingSelector = createFetchingSelector([GET_APPS_LIST_BASE, GET_GTWS_LIST_BASE])
 
@@ -204,7 +196,7 @@ export default class Overview extends React.Component {
 
   render() {
     const {
-      config: { stack: stackConfig, supportLink, documentationBaseUrl },
+      config: { stack: supportLink, documentationBaseUrl },
     } = this.props.env
     const {
       fetching,
@@ -252,61 +244,10 @@ export default class Overview extends React.Component {
           </Row>
           {this.chooser}
         </div>
-        <hr />
-        <Row className={style.componentSection}>
-          <Col sm={4} className={style.versionInfoSection}>
-            <Message content={m.versionInfo} component="h3" />
-            <span className={style.versionValue}>v{process.env.VERSION}</span>
-          </Col>
-          <Col sm={8}>
-            <Message className={style.componentStatus} content={m.componentStatus} component="h3" />
-            <div className={style.componentCards}>
-              {Object.keys(stackConfig).map(componentKey => {
-                if (componentKey === 'language') {
-                  return null
-                }
-                const component = stackConfig[componentKey]
-                const name = componentMap[componentKey]
-                const host = component.enabled ? new URL(component.base_url).host : undefined
-                return (
-                  <ComponentCard
-                    key={componentKey}
-                    name={name}
-                    host={host}
-                    enabled={component.enabled}
-                  />
-                )
-              })}
-            </div>
-          </Col>
-        </Row>
+        <DeploymentComponentStatus />
       </Container>
     )
   }
-}
-
-const ComponentCard = ({ name, enabled, host }) => (
-  <div className={style.componentCard}>
-    <img src={ServerIcon} className={style.componentCardIcon} />
-    <div className={style.componentCardDesc}>
-      <div className={style.componentCardName}>
-        <Status label={name} status={enabled ? 'good' : 'unknown'} flipped />
-      </div>
-      <span className={style.componentCardHost} title={host}>
-        {enabled ? host : <Message content={sharedMessages.disabled} />}
-      </span>
-    </div>
-  </div>
-)
-
-ComponentCard.propTypes = {
-  enabled: PropTypes.bool.isRequired,
-  host: PropTypes.string,
-  name: PropTypes.message.isRequired,
-}
-
-ComponentCard.defaultProps = {
-  host: undefined,
 }
 
 const HelpLink = ({ supportLink, documentationLink }) => {

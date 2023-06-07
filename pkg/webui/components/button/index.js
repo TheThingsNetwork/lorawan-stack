@@ -153,7 +153,7 @@ const LinkButton = props => {
 }
 
 const AnchorLinkButton = props => {
-  const { target, title, name, href, ...rest } = props
+  const { target, title, name, href, external, ...rest } = props
   const dataProps = useMemo(() => filterDataProps(rest), [rest])
   const htmlProps = { target, title, name, ...dataProps }
   const buttonClassNames = assembleClassnames(props)
@@ -162,6 +162,7 @@ const AnchorLinkButton = props => {
       className={buttonClassNames}
       href={href}
       children={buttonChildren(props)}
+      external={external}
       {...htmlProps}
     />
   )

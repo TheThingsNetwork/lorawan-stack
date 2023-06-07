@@ -98,5 +98,5 @@ InviteForm.propTypes = {
 
 export default connect(null, {
   sendInvite: email => attachPromise(sendInvite(email)),
-  navigateToList: () => push(`/admin/user-management`),
+  navigateToList: () => push(`/admin-panel/user-management`),
 })(InviteForm)
