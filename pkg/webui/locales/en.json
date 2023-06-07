@@ -656,6 +656,8 @@
   "console.containers.lora-cloud-gls-form.index.determineWindowSizeAutomatically": "Determine window size automatically",
   "console.containers.lora-cloud-gls-form.index.enableMultiFrame": "Enable multiframe",
   "console.containers.lora-cloud-gls-form.index.automaticMultiFrameDescription": "Determines the count of sent historical messages considered for geolocation based on the first byte of the payload",
+  "console.containers.network-information-container.index.openSourceInfo": "You are currently using The Things Stack Open Source. More features can be unlocked by using The Things Stack Cloud.",
+  "console.containers.network-information-container.index.plansButton": "Get started with The things Stack Cloud",
   "console.containers.network-information-container.registry-totals.applicationsUsed": "Total applications",
   "console.containers.network-information-container.registry-totals.gatewaysUsed": "Total gateways",
   "console.containers.network-information-container.registry-totals.registeredUsers": "Registered users",
