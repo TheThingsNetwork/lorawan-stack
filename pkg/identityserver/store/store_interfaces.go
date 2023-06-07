@@ -204,13 +204,15 @@ type MembershipStore interface {
 	GetMember(
 		ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID *ttnpb.EntityIdentifiers,
 	) (*ttnpb.Rights, error)
-	// Set direct member rights on an entity. Rights can be deleted by not passing any rights.
+	// Set direct member rights on an entity.
 	SetMember(
 		ctx context.Context,
 		id *ttnpb.OrganizationOrUserIdentifiers,
 		entityID *ttnpb.EntityIdentifiers,
 		rights *ttnpb.Rights,
 	) error
+	// DeleteMember elminates the direct member rights attached to an entity.
+	DeleteMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID *ttnpb.EntityIdentifiers) error
 	// Delete all member rights on an entity. Used for purging entities.
 	DeleteEntityMembers(ctx context.Context, entityID *ttnpb.EntityIdentifiers) error
 	// Delete all user rights for an entity.

@@ -301,6 +301,10 @@ func (is *IdentityServer) setApplicationCollaborator(
 			}
 		}
 
+		if len(req.Collaborator.Rights) == 0 {
+			return st.DeleteMember(ctx, req.GetCollaborator().GetIds(), req.GetApplicationIds().GetEntityIdentifiers())
+		}
+
 		return st.SetMember(
 			ctx,
 			req.GetCollaborator().GetIds(),

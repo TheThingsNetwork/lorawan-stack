@@ -146,6 +146,10 @@ func (is *IdentityServer) setClientCollaborator(
 			}
 		}
 
+		if len(req.Collaborator.Rights) == 0 {
+			return st.DeleteMember(ctx, req.GetCollaborator().GetIds(), req.GetClientIds().GetEntityIdentifiers())
+		}
+
 		return st.SetMember(
 			ctx,
 			req.GetCollaborator().GetIds(),
