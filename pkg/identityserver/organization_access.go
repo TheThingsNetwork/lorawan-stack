@@ -185,6 +185,10 @@ func (is *IdentityServer) updateOrganizationAPIKey(ctx context.Context, req *ttn
 			}
 		}
 
+		if len(req.ApiKey.Rights) == 0 && ttnpb.HasAnyField(req.GetFieldMask().GetPaths(), "rights") {
+			return st.DeleteAPIKey(ctx, req.GetOrganizationIds().GetEntityIdentifiers(), req.ApiKey)
+		}
+
 		key, err = st.UpdateAPIKey(ctx, req.GetOrganizationIds().GetEntityIdentifiers(), req.ApiKey, req.FieldMask.GetPaths())
 		return err
 	})

@@ -241,6 +241,8 @@ type APIKeyStore interface {
 	UpdateAPIKey(
 		ctx context.Context, entityID *ttnpb.EntityIdentifiers, key *ttnpb.APIKey, fieldMask FieldMask,
 	) (*ttnpb.APIKey, error)
+	// DeleteAPIKey deletes key rights on an entity.
+	DeleteAPIKey(ctx context.Context, entityID *ttnpb.EntityIdentifiers, key *ttnpb.APIKey) error
 	// Delete api keys deletes all api keys tied to an entity. Used when purging entities.
 	DeleteEntityAPIKeys(ctx context.Context, entityID *ttnpb.EntityIdentifiers) error
 }
