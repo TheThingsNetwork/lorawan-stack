@@ -107,30 +107,38 @@ func (st *StoreTest) TestInvitationStore(t *T) {
 
 	t.Run("SetInvitationAcceptedBy", func(t *T) {
 		a, ctx := test.New(t)
-		err := s.SetInvitationAcceptedBy(ctx, "TOKEN", usr1.GetIds())
+		invitation, err := s.GetInvitation(ctx, "TOKEN")
+		a.So(err, should.BeNil)
+		err = s.SetInvitationAcceptedBy(ctx, invitation.Token, usr1.GetIds())
 		a.So(err, should.BeNil)
 	})
 
-	t.Run("SetInvitationAcceptedBy_Again", func(t *T) {
+	t.Run("GetInvitation_Used", func(t *T) {
 		a, ctx := test.New(t)
-		err := s.SetInvitationAcceptedBy(ctx, "TOKEN", usr1.GetIds())
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsFailedPrecondition(err), should.BeTrue)
-		}
+		invitation, err := s.GetInvitation(ctx, "TOKEN")
+		a.So(err, should.BeNil)
+		a.So(invitation.ExpiresAt, should.NotBeNil)
+		a.So(invitation.ExpiresAt.Nanos, should.BeLessThan, time.Now().Nanosecond())
 	})
 
+	t.Run("GetInvitation_NotFound", func(t *T) {
+		a, ctx := test.New(t)
+		r, err := s.GetInvitation(ctx, "OTHER")
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
+		a.So(r, should.BeNil)
+	})
 	t.Run("SetInvitationAcceptedBy_Other", func(t *T) {
 		a, ctx := test.New(t)
 		err := s.SetInvitationAcceptedBy(ctx, "OTHER", usr1.GetIds())
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
-		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
-		// err = s.SetInvitationAcceptedBy(ctx, "", usr1.GetIds())
-		// a.So(err, should.BeNil)
-		// if a.So(err, should.NotBeNil) {
-		// 	a.So(errors.IsNotFound(err), should.BeTrue)
-		// }
+		err = s.SetInvitationAcceptedBy(ctx, "", usr1.GetIds())
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 	})
 
 	var accepted *ttnpb.Invitation
@@ -189,29 +197,6 @@ func (st *StoreTest) TestInvitationStore(t *T) {
 		got, err := s.FindInvitations(ctx)
 		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
 			a.So(got, should.BeEmpty)
-		}
-	})
-
-	t.Run("SetInvitationAcceptedBy_Expired", func(t *T) {
-		a, ctx := test.New(t)
-
-		_, err := s.CreateInvitation(ctx, &ttnpb.Invitation{
-			Email:     "expired@example.com",
-			Token:     "EXPIRED_TOKEN",
-			ExpiresAt: timestamppb.New(start.Add(-1 * time.Minute)),
-		})
-		if !a.So(err, should.BeNil) {
-			t.FailNow()
-		}
-
-		err = s.SetInvitationAcceptedBy(ctx, "EXPIRED_TOKEN", usr1.GetIds())
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsFailedPrecondition(err), should.BeTrue)
-		}
-
-		err = s.DeleteInvitation(ctx, "expired@example.com")
-		if !a.So(err, should.BeNil) {
-			t.FailNow()
 		}
 	})
 }

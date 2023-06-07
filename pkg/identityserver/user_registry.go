@@ -80,7 +80,6 @@ var (
 var (
 	errUserRegistrationDisabled  = errors.DefineInvalidArgument("user_registration_disabled", "user registration disabled")
 	errInvitationTokenRequired   = errors.DefineInvalidArgument("invitation_token_required", "invitation token required")
-	errInvitationTokenExpired    = errors.DefineInvalidArgument("invitation_token_expired", "invitation token expired")
 	errPasswordStrengthMinLength = errors.DefineInvalidArgument("password_strength_min_length", "need at least `{n}` characters")
 	errPasswordStrengthMaxLength = errors.DefineInvalidArgument("password_strength_max_length", "need at most `{n}` characters")
 	errPasswordStrengthUppercase = errors.DefineInvalidArgument("password_strength_uppercase", "need at least `{n}` uppercase letter(s)")
@@ -248,16 +247,19 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 	defer func() { is.setFullProfilePictureURL(ctx, usr) }()
 
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		var invitation *ttnpb.Invitation
 		if req.InvitationToken != "" {
-			invitationToken, err := st.GetInvitation(ctx, req.InvitationToken)
+			invitation, err = st.GetInvitation(ctx, req.InvitationToken)
 			if err != nil {
 				return err
 			}
-			if expiresAt := ttnpb.StdTime(invitationToken.ExpiresAt); expiresAt != nil && expiresAt.Before(time.Now()) {
-				return errInvitationTokenExpired.New()
+			if invitation.ExpiresAt != nil && invitation.ExpiresAt.AsTime().Before(time.Now()) {
+				return store.ErrInvitationExpired.WithAttributes("invitation_token", req.InvitationToken)
+			}
+			if invitation.AcceptedBy != nil {
+				return store.ErrInvitationAlreadyUsed.WithAttributes("invitation_token", req.InvitationToken)
 			}
 		}
-
 		usr, err = st.CreateUser(ctx, req.User)
 		if err != nil {
 			return err
@@ -270,8 +272,8 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 			}
 		}
 
-		if req.InvitationToken != "" {
-			if err = st.SetInvitationAcceptedBy(ctx, req.InvitationToken, usr.GetIds()); err != nil {
+		if invitation != nil {
+			if err = st.SetInvitationAcceptedBy(ctx, invitation.Token, usr.GetIds()); err != nil {
 				return err
 			}
 		}
