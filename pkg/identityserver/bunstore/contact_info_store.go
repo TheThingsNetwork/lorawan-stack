@@ -183,36 +183,6 @@ func (s *baseStore) replaceContactInfo(
 	return result, nil
 }
 
-// ContactInfoValidation is the contact info validation model in the database.
-type ContactInfoValidation struct {
-	bun.BaseModel `bun:"table:contact_info_validations,alias:civ"`
-
-	Model
-
-	Reference string `bun:"reference,nullzero"`
-	Token     string `bun:"token,nullzero"`
-
-	// EntityType is "application", "client", "gateway", "organization" or "user".
-	EntityType string `bun:"entity_type,notnull"`
-	// EntityID is Application.ID, Client.ID, Gateway.ID, Organization.ID or User.ID.
-	EntityID string `bun:"entity_id,notnull"`
-
-	ContactMethod int    `bun:"contact_method,notnull"`
-	Value         string `bun:"value,nullzero"`
-
-	Used bool `bun:"used,nullzero"`
-
-	ExpiresAt *time.Time `bun:"expires_at"`
-}
-
-// BeforeAppendModel is a hook that modifies the model on SELECT and UPDATE queries.
-func (m *ContactInfoValidation) BeforeAppendModel(ctx context.Context, query bun.Query) error {
-	if err := m.Model.BeforeAppendModel(ctx, query); err != nil {
-		return err
-	}
-	return nil
-}
-
 type contactInfoStore struct {
 	*entityStore
 }
@@ -307,6 +277,115 @@ func (s *contactInfoStore) SetContactInfo(
 	return pbs, nil
 }
 
+func (s *contactInfoStore) ValidateContactInfo(ctx context.Context, pb *ttnpb.ContactInfoValidation) error {
+	ctx, span := tracer.StartFromContext(ctx, "ValidateContactInfo", trace.WithAttributes(
+		attribute.String("entity_type", pb.GetEntity().EntityType()),
+		attribute.String("entity_id", pb.GetEntity().IDString()),
+	))
+	defer span.End()
+	if len(pb.GetContactInfo()) != 1 {
+		return store.ErrValidationWithoutContactInfo.New()
+	}
+	contactInfo := pb.GetContactInfo()[0]
+	_, err := s.DB.NewUpdate().
+		Model(&ContactInfo{}).
+		Where("entity_type = ? AND entity_id = ?", pb.GetEntity().EntityType(), pb.GetEntity().IDString()).
+		Where("contact_method = ? AND LOWER(value) = LOWER(?)", contactInfo.GetContactMethod(), contactInfo.GetValue()).
+		Set("validated_at = ?", pb.ExpiresAt.AsTime()).
+		Exec(ctx)
+	if err != nil {
+		return storeutil.WrapDriverError(err)
+	}
+
+	if pb.Entity.EntityType() == "user" && contactInfo.ContactMethod == ttnpb.ContactMethod_CONTACT_METHOD_EMAIL {
+		_, err = s.DB.NewUpdate().
+			Model(&User{}).
+			Where("lower(primary_email_address) = lower(?)", contactInfo.Value).
+			Set("primary_email_address_validated_at = ?", now()).
+			Exec(ctx)
+		if err != nil {
+			return storeutil.WrapDriverError(err)
+		}
+	}
+	return nil
+}
+
+func (s *contactInfoStore) DeleteEntityContactInfo(ctx context.Context, entityID ttnpb.IDStringer) error {
+	ctx, span := tracer.StartFromContext(ctx, "DeleteEntityContactInfo", trace.WithAttributes(
+		attribute.String("entity_type", entityID.EntityType()),
+		attribute.String("entity_id", entityID.IDString()),
+	))
+	defer span.End()
+
+	entityType, entityUUID, err := s.getEntity(store.WithSoftDeleted(ctx, false), entityID)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.DB.NewDelete().
+		Model(&ContactInfo{}).
+		Where("entity_type = ? AND entity_id = ?", entityType, entityUUID).
+		Exec(ctx)
+	if err != nil {
+		return storeutil.WrapDriverError(err)
+	}
+
+	return nil
+}
+
+// ContactInfoValidation is the contact info validation model in the database.
+type ContactInfoValidation struct {
+	bun.BaseModel `bun:"table:contact_info_validations,alias:civ"`
+
+	Model
+
+	Reference string `bun:"reference,nullzero"`
+	Token     string `bun:"token,nullzero"`
+
+	// EntityType is "application", "client", "gateway", "organization" or "user".
+	EntityType string `bun:"entity_type,notnull"`
+	// EntityID is Application.ID, Client.ID, Gateway.ID, Organization.ID or User.ID.
+	EntityID string `bun:"entity_id,notnull"`
+
+	ContactMethod int    `bun:"contact_method,notnull"`
+	Value         string `bun:"value,nullzero"`
+
+	Used bool `bun:"used,nullzero"`
+
+	ExpiresAt *time.Time `bun:"expires_at"`
+}
+
+// BeforeAppendModel is a hook that modifies the model on SELECT and UPDATE queries.
+func (m *ContactInfoValidation) BeforeAppendModel(ctx context.Context, query bun.Query) error {
+	return m.Model.BeforeAppendModel(ctx, query)
+}
+
+func validationToPB(m *ContactInfoValidation) *ttnpb.ContactInfoValidation {
+	val := &ttnpb.ContactInfoValidation{
+		Id:        m.Reference,
+		Token:     m.Token,
+		CreatedAt: ttnpb.ProtoTime(&m.CreatedAt),
+		ExpiresAt: ttnpb.ProtoTime(m.ExpiresAt),
+		ContactInfo: []*ttnpb.ContactInfo{{
+			ContactMethod: ttnpb.ContactMethod(m.ContactMethod),
+			Value:         m.Value,
+		}},
+	}
+	switch m.EntityType {
+	case store.EntityApplication:
+		val.Entity = (&ttnpb.ApplicationIdentifiers{ApplicationId: m.EntityID}).GetEntityIdentifiers()
+	case store.EntityClient:
+		val.Entity = (&ttnpb.ClientIdentifiers{ClientId: m.EntityID}).GetEntityIdentifiers()
+	case store.EntityGateway:
+		val.Entity = (&ttnpb.GatewayIdentifiers{GatewayId: m.EntityID}).GetEntityIdentifiers()
+	case store.EntityOrganization:
+		val.Entity = (&ttnpb.OrganizationIdentifiers{OrganizationId: m.EntityID}).GetEntityIdentifiers()
+	case store.EntityUser:
+		val.Entity = (&ttnpb.UserIdentifiers{UserId: m.EntityID}).GetEntityIdentifiers()
+	}
+	return val
+}
+
 func (s *contactInfoStore) CreateValidation(
 	ctx context.Context, pb *ttnpb.ContactInfoValidation,
 ) (*ttnpb.ContactInfoValidation, error) {
@@ -375,95 +454,55 @@ func (s *contactInfoStore) CreateValidation(
 	}, nil
 }
 
-func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.ContactInfoValidation) error {
-	ctx, span := tracer.StartFromContext(ctx, "Validate")
+func (s *contactInfoStore) GetValidation(
+	ctx context.Context, pb *ttnpb.ContactInfoValidation,
+) (*ttnpb.ContactInfoValidation, error) {
+	ctx, span := tracer.StartFromContext(ctx, "GetValidation", trace.WithAttributes(
+		attribute.String("entity_type", pb.GetEntity().EntityType()),
+		attribute.String("entity_id", pb.GetEntity().IDString()),
+	))
 	defer span.End()
-
-	// TODO: Refactor store interface to split this ito a separate methods.
-	// (https://github.com/TheThingsNetwork/lorawan-stack/issues/5587)
-
 	model := &ContactInfoValidation{}
-
 	err := s.newSelectModel(ctx, model).
-		Where("reference = ? AND token = ?", validation.Id, validation.Token).
+		Where("reference = ? AND token = ?", pb.Id, pb.Token).
 		Scan(ctx)
 	if err != nil {
 		err = storeutil.WrapDriverError(err)
 		if errors.IsNotFound(err) {
-			return store.ErrValidationTokenNotFound.WithAttributes(
-				"validation_id", validation.Id,
+			return nil, store.ErrValidationTokenNotFound.WithAttributes(
+				"validation_id", pb.Id,
 			)
 		}
-		return err
+		return nil, err
 	}
 
 	if model.Used {
-		return store.ErrValidationTokenAlreadyUsed.WithAttributes(
-			"validation_id", validation.Id,
+		return nil, store.ErrValidationTokenAlreadyUsed.WithAttributes(
+			"validation_id", pb.Id,
 		)
 	}
 
 	if model.ExpiresAt != nil && model.ExpiresAt.Before(s.now()) {
-		return store.ErrValidationTokenExpired.WithAttributes(
-			"validation_id", validation.Id,
+		return nil, store.ErrValidationTokenExpired.WithAttributes(
+			"validation_id", pb.Id,
 		)
 	}
-
-	now := s.now()
-
-	_, err = s.DB.NewUpdate().
-		Model(&ContactInfo{}).
-		Where("entity_type = ? AND entity_id = ?", model.EntityType, model.EntityID).
-		Where("contact_method = ? AND LOWER(value) = LOWER(?)", model.ContactMethod, model.Value).
-		Set("validated_at = ?", now).
-		Exec(ctx)
-	if err != nil {
-		return storeutil.WrapDriverError(err)
-	}
-
-	if model.EntityType == "user" &&
-		ttnpb.ContactMethod(model.ContactMethod) == ttnpb.ContactMethod_CONTACT_METHOD_EMAIL {
-		_, err = s.DB.NewUpdate().
-			Model(&User{}).
-			Where("lower(primary_email_address) = lower(?)", model.Value).
-			Set("primary_email_address_validated_at = ?", now).
-			Exec(ctx)
-		if err != nil {
-			return storeutil.WrapDriverError(err)
-		}
-	}
-
-	_, err = s.DB.NewUpdate().
-		Model(model).
-		WherePK().
-		Set("expires_at = ?, used = true", now).
-		Exec(ctx)
-	if err != nil {
-		return storeutil.WrapDriverError(err)
-	}
-
-	return nil
+	return validationToPB(model), nil
 }
 
-func (s *contactInfoStore) DeleteEntityContactInfo(ctx context.Context, entityID ttnpb.IDStringer) error {
-	ctx, span := tracer.StartFromContext(ctx, "DeleteEntityContactInfo", trace.WithAttributes(
-		attribute.String("entity_type", entityID.EntityType()),
-		attribute.String("entity_id", entityID.IDString()),
+func (s *contactInfoStore) ExpireValidation(ctx context.Context, pb *ttnpb.ContactInfoValidation) error {
+	ctx, span := tracer.StartFromContext(ctx, "ExpireValidation", trace.WithAttributes(
+		attribute.String("entity_type", pb.GetEntity().EntityType()),
+		attribute.String("entity_id", pb.GetEntity().IDString()),
 	))
 	defer span.End()
-
-	entityType, entityUUID, err := s.getEntity(store.WithSoftDeleted(ctx, false), entityID)
-	if err != nil {
-		return err
-	}
-
-	_, err = s.DB.NewDelete().
-		Model(&ContactInfo{}).
-		Where("entity_type = ? AND entity_id = ?", entityType, entityUUID).
+	_, err := s.DB.NewUpdate().
+		Model(&ContactInfoValidation{}).
+		Where("reference = ? AND token = ?", pb.Id, pb.Token).
+		Set("expires_at = ?, used = true", now()).
 		Exec(ctx)
 	if err != nil {
 		return storeutil.WrapDriverError(err)
 	}
-
 	return nil
 }

@@ -134,9 +134,9 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 				}
 			})
 
-			t.Run("Validate_Expired", func(t *T) {
+			t.Run("FetchExpiredValidation", func(t *T) {
 				a, ctx := test.New(t)
-				err := s.Validate(ctx, &ttnpb.ContactInfoValidation{
+				_, err := s.GetValidation(ctx, &ttnpb.ContactInfoValidation{
 					Id:    validationID,
 					Token: "EXPIRED_TOKEN",
 				})
@@ -146,17 +146,33 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 			})
 
 			t.Run("Validate", func(t *T) {
-				a, ctx := test.New(t)
-				err := s.Validate(ctx, &ttnpb.ContactInfoValidation{
+				validation := &ttnpb.ContactInfoValidation{
 					Id:    validationID,
 					Token: "TOKEN",
+				}
+				t.Run("GetValidation", func(t *T) {
+					a, ctx := test.New(t)
+					var err error
+					validation, err = s.GetValidation(ctx, validation)
+					a.So(err, should.BeNil)
+					a.So(validation.Id, should.Equal, validationID)
+					a.So(validation.Token, should.Equal, "TOKEN")
+					a.So(len(validation.ContactInfo), should.Equal, 1)
 				})
-				a.So(err, should.BeNil)
+				t.Run("ValidateContactInfo", func(t *T) {
+					a, ctx := test.New(t)
+					err := s.ValidateContactInfo(ctx, validation)
+					a.So(err, should.BeNil)
+				})
+				t.Run("ExpireValidation", func(t *T) {
+					a, ctx := test.New(t)
+					err := s.ExpireValidation(ctx, validation)
+					a.So(err, should.BeNil)
+				})
 			})
-
-			t.Run("Validate_AfterValidate", func(t *T) {
+			t.Run("FetchUsedValidation_AfterValidate", func(t *T) {
 				a, ctx := test.New(t)
-				err := s.Validate(ctx, &ttnpb.ContactInfoValidation{
+				_, err := s.GetValidation(ctx, &ttnpb.ContactInfoValidation{
 					Id:    validationID,
 					Token: "TOKEN",
 				})
@@ -164,10 +180,9 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 					a.So(errors.IsFailedPrecondition(err), should.BeTrue)
 				}
 			})
-
-			t.Run("Validate_Other", func(t *T) {
+			t.Run("FetchNonExistentValidation", func(t *T) {
 				a, ctx := test.New(t)
-				err := s.Validate(ctx, &ttnpb.ContactInfoValidation{
+				_, err := s.GetValidation(ctx, &ttnpb.ContactInfoValidation{
 					Id:    validationID,
 					Token: "OTHER_TOKEN",
 				})

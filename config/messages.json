@@ -5507,6 +5507,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/identityserver/store:validation_without_contact_info": {
+    "translations": {
+      "en": "validation does not reference any valid contact information"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/identityserver:access_token_mismatch": {
     "translations": {
       "en": "access token ID did not match user or client identifiers"

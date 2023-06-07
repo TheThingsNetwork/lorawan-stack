@@ -177,25 +177,25 @@ func (s *membershipStore) FindMemberships(
 	switch entityType {
 	default:
 		return nil, fmt.Errorf("invalid entity type %q", entityType)
-	case "application":
+	case store.EntityApplication:
 		res, err := s.listApplicationsBy(ctx, selectWithUUID, store.FieldMask{"ids"})
 		if err != nil {
 			return nil, err
 		}
 		return mapSlice(res, (*ttnpb.Application).GetEntityIdentifiers), nil
-	case "client":
+	case store.EntityClient:
 		res, err := s.listClientsBy(ctx, selectWithUUID, store.FieldMask{"ids"})
 		if err != nil {
 			return nil, err
 		}
 		return mapSlice(res, (*ttnpb.Client).GetEntityIdentifiers), nil
-	case "gateway":
+	case store.EntityGateway:
 		res, err := s.listGatewaysBy(ctx, selectWithUUID, store.FieldMask{"ids"})
 		if err != nil {
 			return nil, err
 		}
 		return mapSlice(res, (*ttnpb.Gateway).GetEntityIdentifiers), nil
-	case "organization":
+	case store.EntityOrganization:
 		res, err := s.listOrganizationsBy(ctx, selectWithUUID, store.FieldMask{"ids"})
 		if err != nil {
 			return nil, err
