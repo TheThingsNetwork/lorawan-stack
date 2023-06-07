@@ -31,7 +31,9 @@ describe('Packet Broker routing policies', () => {
     })
     cy.intercept('GET', '/api/v3/pba/home-networks/policies/default', { statusCode: 404 })
     cy.intercept('PUT', '/api/v3/pba/home-networks/gateway-visibilities/default', {}).as('putCall')
-    cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker/default-gateway-visibility`)
+    cy.visit(
+      `${Cypress.config('consoleRootPath')}/admin-panel/packet-broker/default-gateway-visibility`,
+    )
 
     cy.findByLabelText('Location').check()
     cy.findByLabelText('Antenna placement').check()
@@ -53,7 +55,9 @@ describe('Packet Broker routing policies', () => {
       fixture: 'console/packet-broker/default-gateway-visibility.json',
     })
     cy.intercept('PUT', '/api/v3/pba/home-networks/gateway-visibilities/default', {}).as('putCall')
-    cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker/default-gateway-visibility`)
+    cy.visit(
+      `${Cypress.config('consoleRootPath')}/admin-panel/packet-broker/default-gateway-visibility`,
+    )
 
     cy.findByLabelText('Location').uncheck()
     cy.findByLabelText('Antenna placement').uncheck()
