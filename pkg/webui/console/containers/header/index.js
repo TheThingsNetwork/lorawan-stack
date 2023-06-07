@@ -150,16 +150,20 @@ class Header extends Component {
           path={`${accountUrl}/profile-settings`}
           external
         />
-        <Dropdown.Item title={'Admin panel'} icon="lock" path="/admin-panel/network-information" />
+        <Dropdown.Item
+          title={sharedMessages.adminPanel}
+          icon="lock"
+          path="/admin-panel/network-information"
+        />
         <hr />
         <Dropdown.Item
-          title={'Get support'}
+          title={sharedMessages.getSupport}
           icon="help"
           path="https://thethingsindustries.com/support"
           external
         />
         <Dropdown.Item
-          title={'Documentation'}
+          title={sharedMessages.documentation}
           icon="description"
           path="https://thethingsindustries.com/docs"
           external
@@ -183,7 +187,11 @@ class Header extends Component {
             external
           />
         </React.Fragment>
-        <Dropdown.Item title={'Admin panel'} icon="lock" path="/admin-panel/network-information" />
+        <Dropdown.Item
+          title={sharedMessages.adminPanel}
+          icon="lock"
+          path="/admin-panel/network-information"
+        />
         {mayViewOrEditApiKeys && (
           <Dropdown.Item
             title={sharedMessages.personalApiKeys}
