@@ -57,7 +57,7 @@ var udpMetrics = &messageMetrics{
 			Name:      "unmarshal_type_errors_total",
 			Help:      "Total number of unmarshal type errors",
 		},
-		[]string{"value", "field"},
+		[]string{"type", "struct", "field"},
 	),
 }
 
@@ -107,7 +107,7 @@ func registerMessageDropped(_ context.Context, err error) {
 		errorLabel = "encoding/json:syntax"
 	} else if jsonErr := (&json.UnmarshalTypeError{}); errors.As(err, &jsonErr) {
 		errorLabel = "encoding/json:unmarshal_type"
-		udpMetrics.unmarshalTypeErrors.WithLabelValues(jsonErr.Value, jsonErr.Field).Inc()
+		udpMetrics.unmarshalTypeErrors.WithLabelValues(jsonErr.Type.Name(), jsonErr.Struct, jsonErr.Field).Inc()
 	}
 	udpMetrics.messageDropped.WithLabelValues(errorLabel).Inc()
 }

@@ -152,7 +152,6 @@ const (
 	subsystem     = "as"
 	unknown       = "unknown"
 	networkServer = "network_server"
-	applicationID = "application_id"
 )
 
 var asMetrics = &messageMetrics{
@@ -170,7 +169,7 @@ var asMetrics = &messageMetrics{
 			Name:      "uplink_forwarded_total",
 			Help:      "Total number of forwarded uplinks (join-accepts and data)",
 		},
-		[]string{applicationID},
+		[]string{},
 	),
 	uplinkDropped: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
@@ -204,7 +203,7 @@ var asMetrics = &messageMetrics{
 			Name:      "downlink_received_total",
 			Help:      "Total number of received downlinks",
 		},
-		[]string{applicationID},
+		[]string{},
 	),
 	downlinkForwarded: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
@@ -292,7 +291,7 @@ func registerForwardUp(ctx context.Context, msg *ttnpb.ApplicationUp) {
 	default:
 		return
 	}
-	asMetrics.uplinkForwarded.WithLabelValues(ctx, msg.EndDeviceIds.ApplicationIds.ApplicationId).Inc()
+	asMetrics.uplinkForwarded.WithLabelValues(ctx).Inc()
 }
 
 func registerDropUp(ctx context.Context, msg *ttnpb.ApplicationUp, err error) {
@@ -322,7 +321,7 @@ func registerUplinkLatency(ctx context.Context, msg *ttnpb.ApplicationUplink) {
 
 func registerReceiveDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink) {
 	events.Publish(evtReceiveDataDown.NewWithIdentifiersAndData(ctx, ids, msg))
-	asMetrics.downlinkReceived.WithLabelValues(ctx, ids.ApplicationIds.ApplicationId).Inc()
+	asMetrics.downlinkReceived.WithLabelValues(ctx).Inc()
 }
 
 func registerReceiveDownlinks(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink) {
