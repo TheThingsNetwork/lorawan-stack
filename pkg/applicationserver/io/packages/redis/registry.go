@@ -585,3 +585,44 @@ func (r ApplicationPackagesRegistry) Range(
 		return true, nil
 	})
 }
+
+func (r ApplicationPackagesRegistry) clearAssociations(ctx context.Context, id ttnpb.IDStringer) error {
+	uid := unique.ID(ctx, id)
+	uidKey := r.uidKey(uid)
+
+	return r.Redis.Watch(ctx, func(tx *redis.Tx) error {
+		// Retrieve the list of fPorts from the uidKey set.
+		fPorts, err := tx.SMembers(ctx, uidKey).Result()
+		if err != nil {
+			return err
+		}
+		// Build all the association keys.
+		keys := make([]string, 0, len(fPorts))
+		for _, fPort := range fPorts {
+			keys = append(keys, r.associationKey(uid, fPort))
+		}
+		keys = append(keys, uidKey)
+
+		if _, err := tx.TxPipelined(ctx, func(p redis.Pipeliner) error {
+			p.Del(ctx, keys...)
+			return nil
+		}); err != nil {
+			return err
+		}
+		return nil
+	}, uidKey)
+}
+
+// ClearAssociations clears all the associations for an end device.
+func (r ApplicationPackagesRegistry) ClearAssociations(
+	ctx context.Context, ids *ttnpb.EndDeviceIdentifiers,
+) error {
+	return r.clearAssociations(ctx, ids)
+}
+
+// ClearDefaultAssociations clears all package associations for an application.
+func (r ApplicationPackagesRegistry) ClearDefaultAssociations(
+	ctx context.Context, ids *ttnpb.ApplicationIdentifiers,
+) error {
+	return r.clearAssociations(ctx, ids)
+}
