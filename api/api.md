@@ -337,6 +337,7 @@
   - [Message `ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers)
   - [Message `ClientIdentifiers`](#ttn.lorawan.v3.ClientIdentifiers)
   - [Message `EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers)
+  - [Message `EndDeviceIdentifiersList`](#ttn.lorawan.v3.EndDeviceIdentifiersList)
   - [Message `EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers)
   - [Message `EntityIdentifiers`](#ttn.lorawan.v3.EntityIdentifiers)
   - [Message `GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers)
@@ -5063,6 +5064,12 @@ The NsGs service connects a Network Server to a Gateway Server.
 | `dev_eui` | <p>`bytes.len`: `8`</p> |
 | `join_eui` | <p>`bytes.len`: `8`</p> |
 | `dev_addr` | <p>`bytes.len`: `4`</p> |
+
+### <a name="ttn.lorawan.v3.EndDeviceIdentifiersList">Message `EndDeviceIdentifiersList`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | repeated |  |
 
 ### <a name="ttn.lorawan.v3.EndDeviceVersionIdentifiers">Message `EndDeviceVersionIdentifiers`</a>
 

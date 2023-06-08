@@ -1399,3 +1399,102 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = LoRaAllianceProfileIdentifiersValidationError{}
+
+// ValidateFields checks the field values on EndDeviceIdentifiersList with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *EndDeviceIdentifiersList) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = EndDeviceIdentifiersListFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "end_device_ids":
+
+			for idx, item := range m.GetEndDeviceIds() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return EndDeviceIdentifiersListValidationError{
+							field:  fmt.Sprintf("end_device_ids[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		default:
+			return EndDeviceIdentifiersListValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// EndDeviceIdentifiersListValidationError is the validation error returned by
+// EndDeviceIdentifiersList.ValidateFields if the designated constraints
+// aren't met.
+type EndDeviceIdentifiersListValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e EndDeviceIdentifiersListValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e EndDeviceIdentifiersListValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e EndDeviceIdentifiersListValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e EndDeviceIdentifiersListValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e EndDeviceIdentifiersListValidationError) ErrorName() string {
+	return "EndDeviceIdentifiersListValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e EndDeviceIdentifiersListValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sEndDeviceIdentifiersList.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = EndDeviceIdentifiersListValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = EndDeviceIdentifiersListValidationError{}

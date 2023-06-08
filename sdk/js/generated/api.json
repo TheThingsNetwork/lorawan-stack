@@ -23060,6 +23060,30 @@
           ]
         },
         {
+          "name": "EndDeviceIdentifiersList",
+          "longName": "EndDeviceIdentifiersList",
+          "fullName": "ttn.lorawan.v3.EndDeviceIdentifiersList",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "end_device_ids",
+              "description": "",
+              "label": "repeated",
+              "type": "EndDeviceIdentifiers",
+              "longType": "EndDeviceIdentifiers",
+              "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "EndDeviceVersionIdentifiers",
           "longName": "EndDeviceVersionIdentifiers",
           "fullName": "ttn.lorawan.v3.EndDeviceVersionIdentifiers",

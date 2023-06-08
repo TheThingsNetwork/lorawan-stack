@@ -193,3 +193,7 @@ message LoRaAllianceProfileIdentifiers {
   // ID of the LoRaWAN end device profile assigned by the vendor.
   uint32 vendor_profile_id = 2;
 }
+
+message EndDeviceIdentifiersList{
+  repeated EndDeviceIdentifiers end_device_ids = 1;
+}

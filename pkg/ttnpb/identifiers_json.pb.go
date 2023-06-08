@@ -349,3 +349,66 @@ func (x *NetworkIdentifiers) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 func (x *NetworkIdentifiers) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
+
+// MarshalProtoJSON marshals the EndDeviceIdentifiersList message to JSON.
+func (x *EndDeviceIdentifiersList) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.EndDeviceIds) > 0 || s.HasField("end_device_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("end_device_ids")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.EndDeviceIds {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("end_device_ids"))
+		}
+		s.WriteArrayEnd()
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the EndDeviceIdentifiersList to JSON.
+func (x *EndDeviceIdentifiersList) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the EndDeviceIdentifiersList message from JSON.
+func (x *EndDeviceIdentifiersList) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "end_device_ids", "endDeviceIds":
+			s.AddField("end_device_ids")
+			if s.ReadNil() {
+				x.EndDeviceIds = nil
+				return
+			}
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.EndDeviceIds = append(x.EndDeviceIds, nil)
+					return
+				}
+				v := &EndDeviceIdentifiers{}
+				v.UnmarshalProtoJSON(s.WithField("end_device_ids", false))
+				if s.Err() != nil {
+					return
+				}
+				x.EndDeviceIds = append(x.EndDeviceIds, v)
+			})
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the EndDeviceIdentifiersList from JSON.
+func (x *EndDeviceIdentifiersList) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}

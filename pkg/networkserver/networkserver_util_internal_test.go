@@ -2511,8 +2511,18 @@ var _ DeviceRegistry = MockDeviceRegistry{}
 
 // MockDeviceRegistry is a mock DeviceRegistry used for testing.
 type MockDeviceRegistry struct {
-	GetByIDFunc func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error)
-	SetByIDFunc func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)
+	GetByIDFunc func(
+		ctx context.Context,
+		appID *ttnpb.ApplicationIdentifiers,
+		devID string, paths []string,
+	) (*ttnpb.EndDevice, context.Context, error)
+	SetByIDFunc func(
+		ctx context.Context,
+		appID *ttnpb.ApplicationIdentifiers,
+		devID string,
+		paths []string,
+		f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error),
+	) (*ttnpb.EndDevice, context.Context, error)
 }
 
 // GetByEUI panics.

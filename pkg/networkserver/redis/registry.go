@@ -920,26 +920,35 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 }
 
 // Range ranges over device uid keys in DeviceRegistry.
-func (r *DeviceRegistry) Range(ctx context.Context, paths []string, f func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
+func (r *DeviceRegistry) Range(
+	ctx context.Context,
+	paths []string,
+	f func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool,
+) error {
 	deviceEntityRegex, err := ttnredis.EntityRegex((r.uidKey(unique.GenericID(ctx, "*"))))
 	if err != nil {
 		return err
 	}
-	return ttnredis.RangeRedisKeys(ctx, r.Redis, r.uidKey(unique.GenericID(ctx, "*")), ttnredis.DefaultRangeCount, func(key string) (bool, error) {
-		if !deviceEntityRegex.MatchString(key) {
+	return ttnredis.RangeRedisKeys(
+		ctx,
+		r.Redis,
+		r.uidKey(unique.GenericID(ctx, "*")),
+		ttnredis.DefaultRangeCount,
+		func(key string) (bool, error) {
+			if !deviceEntityRegex.MatchString(key) {
+				return true, nil
+			}
+			dev := &ttnpb.EndDevice{}
+			if err := ttnredis.GetProto(ctx, r.Redis, key).ScanProto(dev); err != nil {
+				return false, err
+			}
+			dev, err := ttnpb.FilterGetEndDevice(dev, paths...)
+			if err != nil {
+				return false, err
+			}
+			if !f(ctx, dev.Ids, dev) {
+				return false, nil
+			}
 			return true, nil
-		}
-		dev := &ttnpb.EndDevice{}
-		if err := ttnredis.GetProto(ctx, r.Redis, key).ScanProto(dev); err != nil {
-			return false, err
-		}
-		dev, err := ttnpb.FilterGetEndDevice(dev, paths...)
-		if err != nil {
-			return false, err
-		}
-		if !f(ctx, dev.Ids, dev) {
-			return false, nil
-		}
-		return true, nil
-	})
+		})
 }
