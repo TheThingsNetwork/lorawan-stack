@@ -286,21 +286,45 @@ func (s *contactInfoStore) ValidateContactInfo(ctx context.Context, pb *ttnpb.Co
 	if len(pb.GetContactInfo()) != 1 {
 		return store.ErrValidationWithoutContactInfo.New()
 	}
-	contactInfo := pb.GetContactInfo()[0]
-	_, err := s.DB.NewUpdate().
-		Model(&ContactInfo{}).
-		Where("entity_type = ? AND entity_id = ?", pb.GetEntity().EntityType(), pb.GetEntity().IDString()).
-		Where("contact_method = ? AND LOWER(value) = LOWER(?)", contactInfo.GetContactMethod(), contactInfo.GetValue()).
+	contInfo := pb.GetContactInfo()[0]
+
+	entityType, entityUUID, err := s.getEntity(ctx, pb.GetEntity())
+	if err != nil {
+		return err
+	}
+
+	models, err := s.getContactInfoModelsBy(ctx, func(q *bun.SelectQuery) *bun.SelectQuery {
+		return q.
+			Where("entity_type = ? AND entity_id = ?", entityType, entityUUID).
+			Where("contact_method = ? AND LOWER(value) = LOWER(?)", contInfo.GetContactMethod(), contInfo.GetValue())
+	})
+	if err != nil {
+		return err
+	}
+	if len(models) != 1 {
+		return store.ErrContactInfoNotFound.New()
+	}
+
+	model := models[0]
+	_, err = s.DB.NewUpdate().
+		Model(model).
+		WherePK().
 		Set("validated_at = ?", pb.ExpiresAt.AsTime()).
 		Exec(ctx)
 	if err != nil {
 		return storeutil.WrapDriverError(err)
 	}
 
-	if pb.Entity.EntityType() == "user" && contactInfo.ContactMethod == ttnpb.ContactMethod_CONTACT_METHOD_EMAIL {
+	if pb.Entity.EntityType() == "user" && contInfo.ContactMethod == ttnpb.ContactMethod_CONTACT_METHOD_EMAIL {
+		usrModel, err := s.getUserModelBy(ctx, func(q *bun.SelectQuery) *bun.SelectQuery {
+			return q.Where("lower(primary_email_address) = lower(?)", contInfo.Value)
+		}, nil)
+		if err != nil {
+			return err
+		}
 		_, err = s.DB.NewUpdate().
-			Model(&User{}).
-			Where("lower(primary_email_address) = lower(?)", contactInfo.Value).
+			Model(usrModel).
+			WherePK().
 			Set("primary_email_address_validated_at = ?", now()).
 			Exec(ctx)
 		if err != nil {
@@ -386,6 +410,19 @@ func validationToPB(m *ContactInfoValidation) *ttnpb.ContactInfoValidation {
 	return val
 }
 
+func (s *contactInfoStore) getContactInfoValidationModelBy(
+	ctx context.Context,
+	by func(*bun.SelectQuery) *bun.SelectQuery,
+) (*ContactInfoValidation, error) {
+	model := &ContactInfoValidation{}
+	selectQuery := newSelectModel(ctx, s.DB, model).Apply(by)
+	err := selectQuery.Scan(ctx)
+	if err != nil {
+		return nil, storeutil.WrapDriverError(err)
+	}
+	return model, nil
+}
+
 func (s *contactInfoStore) CreateValidation(
 	ctx context.Context, pb *ttnpb.ContactInfoValidation,
 ) (*ttnpb.ContactInfoValidation, error) {
@@ -462,12 +499,11 @@ func (s *contactInfoStore) GetValidation(
 		attribute.String("entity_id", pb.GetEntity().IDString()),
 	))
 	defer span.End()
-	model := &ContactInfoValidation{}
-	err := s.newSelectModel(ctx, model).
-		Where("reference = ? AND token = ?", pb.Id, pb.Token).
-		Scan(ctx)
+
+	model, err := s.getContactInfoValidationModelBy(ctx, func(q *bun.SelectQuery) *bun.SelectQuery {
+		return q.Where("reference = ? AND token = ?", pb.Id, pb.Token)
+	})
 	if err != nil {
-		err = storeutil.WrapDriverError(err)
 		if errors.IsNotFound(err) {
 			return nil, store.ErrValidationTokenNotFound.WithAttributes(
 				"validation_id", pb.Id,
@@ -496,9 +532,16 @@ func (s *contactInfoStore) ExpireValidation(ctx context.Context, pb *ttnpb.Conta
 		attribute.String("entity_id", pb.GetEntity().IDString()),
 	))
 	defer span.End()
-	_, err := s.DB.NewUpdate().
-		Model(&ContactInfoValidation{}).
-		Where("reference = ? AND token = ?", pb.Id, pb.Token).
+	model, err := s.getContactInfoValidationModelBy(ctx, func(q *bun.SelectQuery) *bun.SelectQuery {
+		return q.Where("reference = ? AND token = ?", pb.Id, pb.Token)
+	})
+	if err != nil {
+		return err
+	}
+
+	_, err = s.DB.NewUpdate().
+		Model(model).
+		WherePK().
 		Set("expires_at = ?, used = true", now()).
 		Exec(ctx)
 	if err != nil {

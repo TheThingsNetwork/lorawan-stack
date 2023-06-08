@@ -5309,6 +5309,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/identityserver/store:contact_info_not_found": {
+    "translations": {
+      "en": "contact information with id `{contact_info_id}` not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/identityserver/store:end_device_not_found": {
     "translations": {
       "en": "end device with id `{device_id}` not found in application with id `{application_id}`"
