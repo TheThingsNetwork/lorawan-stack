@@ -17,6 +17,7 @@ package loracloudgeolocationv3
 import (
 	"context"
 	"fmt"
+	"time"
 
 	apppayload "go.thethings.network/lorawan-application-payload"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
@@ -72,6 +73,10 @@ func (p *GeolocationPackage) HandleUp(ctx context.Context, def *ttnpb.Applicatio
 
 	switch m := up.Up.(type) {
 	case *ttnpb.ApplicationUp_UplinkMessage:
+		if err := p.pushUplink(ctx, assoc.Ids, m.UplinkMessage, data); err != nil {
+			return err
+		}
+
 		return p.sendQuery(ctx, up.EndDeviceIds, m.UplinkMessage, data)
 	default:
 		return nil
@@ -135,6 +140,43 @@ func minInt(a int, b int) int {
 	return b
 }
 
+// pushUplink updates the package data with the given uplink.
+func (p *GeolocationPackage) pushUplink(
+	ctx context.Context,
+	pkgAssocIDs *ttnpb.ApplicationPackageAssociationIdentifiers,
+	up *ttnpb.ApplicationUplink,
+	data *Data,
+) error {
+	maxUplinkCount := minInt(data.MultiFrameWindowSize, 16)
+
+	setter := func(apa *ttnpb.ApplicationPackageAssociation) (*ttnpb.ApplicationPackageAssociation, []string, error) {
+		if apa == nil {
+			return nil, nil, errNoAssociation.New()
+		}
+
+		data := &Data{}
+		if err := data.FromStruct(apa.Data); err != nil {
+			return nil, nil, err
+		}
+
+		if maxUplinkCount != 0 && len(data.UplinkMDs) >= maxUplinkCount {
+			data.UplinkMDs = data.UplinkMDs[1:]
+		}
+
+		storedMD := &UplinkMD{
+			ReceivedAt: up.ReceivedAt.AsTime(),
+			RxMetadata: up.RxMetadata,
+		}
+		data.UplinkMDs = append(data.UplinkMDs, storedMD)
+		apa.Data = data.Struct()
+
+		return apa, []string{"data"}, nil
+	}
+
+	_, err := p.registry.SetAssociation(ctx, pkgAssocIDs, nil, setter)
+	return err
+}
+
 func (p *GeolocationPackage) multiFrameQuery(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data, client *api.Client) (api.AbstractLocationSolverResponse, error) {
 	count := data.MultiFrameWindowSize
 	if count == 0 && len(up.FrmPayload) > 0 {
@@ -145,9 +187,18 @@ func (p *GeolocationPackage) multiFrameQuery(ctx context.Context, ids *ttnpb.End
 		return nil, nil
 	}
 
-	var mds [][]*ttnpb.RxMetadata
+	now := time.Now()
+	mds := make([][]*ttnpb.RxMetadata, 0, count)
 
-	// TODO (Uplink Storage Removal): Retrieve uplink metadata from storage.
+	for _, up := range data.UplinkMDs {
+		if now.Sub(up.ReceivedAt) > data.MultiFrameWindowAge {
+			break
+		}
+		mds = append(mds, up.RxMetadata)
+		if len(mds) >= count {
+			break
+		}
+	}
 
 	req := api.BuildMultiFrameRequest(ctx, mds)
 	if len(req.Gateways) < 1 {

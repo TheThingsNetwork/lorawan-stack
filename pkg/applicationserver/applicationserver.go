@@ -1070,39 +1070,6 @@ func (as *ApplicationServer) matchSession(ctx context.Context, ids *ttnpb.EndDev
 	return mask, nil
 }
 
-// storeUplink stores the provided *ttnpb.ApplicationUplink in the device uplink storage.
-// Only fields which are used by integrations are stored.
-// The fields which are stored are based on the following usages:
-// - io/packages/loragls/v3/package.go#multiFrameQuery
-// - io/packages/loragls/v3/api/objects.go#parseRxMetadata.
-func (as *ApplicationServer) storeUplink(
-	ctx context.Context,
-	ids *ttnpb.EndDeviceIdentifiers,
-	uplink *ttnpb.ApplicationUplink,
-) error {
-	cleanUplink := &ttnpb.ApplicationUplink{
-		RxMetadata: make([]*ttnpb.RxMetadata, 0, len(uplink.RxMetadata)),
-		ReceivedAt: uplink.ReceivedAt,
-	}
-	for _, md := range uplink.RxMetadata {
-		if md.GatewayIds == nil {
-			continue
-		}
-		cleanUplink.RxMetadata = append(cleanUplink.RxMetadata, &ttnpb.RxMetadata{
-			GatewayIds: &ttnpb.GatewayIdentifiers{
-				GatewayId: md.GatewayIds.GatewayId,
-			},
-			AntennaIndex:  md.AntennaIndex,
-			FineTimestamp: md.FineTimestamp,
-			Location:      md.Location,
-			Rssi:          md.Rssi,
-			Snr:           md.Snr,
-		})
-	}
-	// TODO (Uplink Storage Removal): Persist uplink metadata in storage.
-	return nil
-}
-
 // setActivated attempts to mark the end device as activated in the Entity Registry.
 // If the update succeeds, the end device will be updated in the Application Server end device registry
 // in order to avoid subsequent calls.
@@ -1217,9 +1184,6 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, info uplinkInfo) 
 			return err
 		}
 		if err := as.publishNormalizedUplink(ctx, info); err != nil {
-			return err
-		}
-		if err := as.storeUplink(ctx, info.ids, info.uplink); err != nil {
 			return err
 		}
 	} else if appSKey := dev.GetSession().GetKeys().GetAppSKey(); appSKey != nil {
