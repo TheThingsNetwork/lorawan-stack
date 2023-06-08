@@ -152,9 +152,10 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 					ContactInfo: []*ttnpb.ContactInfo{info},
 				}
 				t.Run("GetValidation", func(t *T) {
+					// This test is meant to impact `validation` and must run before any other test within `Validate`.
 					a, ctx := test.New(t)
 					var err error
-					validation, err := s.GetValidation(ctx, validation)
+					validation, err = s.GetValidation(ctx, validation)
 					a.So(err, should.BeNil)
 					a.So(validation.Id, should.Equal, validationID)
 					a.So(validation.Token, should.Equal, "TOKEN")
