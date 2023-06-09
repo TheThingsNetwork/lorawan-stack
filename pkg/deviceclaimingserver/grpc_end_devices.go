@@ -45,7 +45,8 @@ func (edcs *endDeviceClaimingServer) Claim(
 	req *ttnpb.ClaimEndDeviceRequest,
 ) (*ttnpb.EndDeviceIdentifiers, error) {
 	// Check that the collaborator has necessary rights before attempting to claim it on an upstream.
-	// Since this is part of the create device flow, we check that the collaborator has the rights to create devices in the application.
+	// Since this is part of the create device flow,
+	// we check that the collaborator has the rights to create devices in the application.
 	targetAppID := req.GetTargetApplicationIds()
 	if err := rights.RequireApplication(ctx, targetAppID,
 		ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,

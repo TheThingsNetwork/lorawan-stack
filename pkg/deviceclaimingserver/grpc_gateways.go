@@ -27,17 +27,26 @@ type noopGCLS struct {
 }
 
 // Claim implements GatewayClaimingServer.
-func (noopGCLS) Claim(ctx context.Context, req *ttnpb.ClaimGatewayRequest) (ids *ttnpb.GatewayIdentifiers, retErr error) {
+func (noopGCLS) Claim(
+	_ context.Context,
+	_ *ttnpb.ClaimGatewayRequest,
+) (ids *ttnpb.GatewayIdentifiers, retErr error) {
 	return nil, errMethodUnavailable.New()
 }
 
 // AuthorizeGateway implements GatewayClaimingServer.
-func (noopGCLS) AuthorizeGateway(ctx context.Context, req *ttnpb.AuthorizeGatewayRequest) (*emptypb.Empty, error) {
+func (noopGCLS) AuthorizeGateway(
+	_ context.Context,
+	_ *ttnpb.AuthorizeGatewayRequest,
+) (*emptypb.Empty, error) {
 	return nil, errMethodUnavailable.New()
 }
 
 // UnauthorizeGateway implements GatewayClaimingServer.
-func (noopGCLS) UnauthorizeGateway(ctx context.Context, gtwIDs *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
+func (noopGCLS) UnauthorizeGateway(
+	_ context.Context,
+	_ *ttnpb.GatewayIdentifiers,
+) (*emptypb.Empty, error) {
 	return nil, errMethodUnavailable.New()
 }
 
@@ -49,16 +58,25 @@ type gatewayClaimingServer struct {
 }
 
 // Claim implements GatewayClaimingServer.
-func (gcls gatewayClaimingServer) Claim(ctx context.Context, req *ttnpb.ClaimGatewayRequest) (ids *ttnpb.GatewayIdentifiers, retErr error) {
+func (gcls gatewayClaimingServer) Claim(
+	ctx context.Context,
+	req *ttnpb.ClaimGatewayRequest,
+) (ids *ttnpb.GatewayIdentifiers, retErr error) {
 	return gcls.DCS.gatewayClaimingServerUpstream.Claim(ctx, req)
 }
 
 // AuthorizeGateway implements GatewayClaimingServer.
-func (gcls gatewayClaimingServer) AuthorizeGateway(ctx context.Context, req *ttnpb.AuthorizeGatewayRequest) (*emptypb.Empty, error) {
+func (gcls gatewayClaimingServer) AuthorizeGateway(
+	ctx context.Context,
+	req *ttnpb.AuthorizeGatewayRequest,
+) (*emptypb.Empty, error) {
 	return gcls.DCS.gatewayClaimingServerUpstream.AuthorizeGateway(ctx, req)
 }
 
 // UnauthorizeGateway implements GatewayClaimingServer.
-func (gcls gatewayClaimingServer) UnauthorizeGateway(ctx context.Context, gtwIDs *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
+func (gcls gatewayClaimingServer) UnauthorizeGateway(
+	ctx context.Context,
+	gtwIDs *ttnpb.GatewayIdentifiers,
+) (*emptypb.Empty, error) {
 	return gcls.DCS.gatewayClaimingServerUpstream.UnauthorizeGateway(ctx, gtwIDs)
 }
