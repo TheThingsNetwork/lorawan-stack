@@ -100,4 +100,10 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 		BatchSize:     1000,
 		FlushInterval: 10 * time.Second,
 	},
+	Downlinks: applicationserver.DownlinksConfig{
+		ConfirmationConfig: applicationserver.ConfirmationConfig{
+			DefaultRetryAttempts: 8,
+			MaxRetryAttempts:     32,
+		},
+	},
 }

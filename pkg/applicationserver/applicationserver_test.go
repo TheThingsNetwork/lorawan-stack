@@ -322,6 +322,12 @@ func TestApplicationServer(t *testing.T) {
 				Registry: metadata.NewNoopEndDeviceLocationRegistry(),
 			},
 		},
+		Downlinks: applicationserver.DownlinksConfig{
+			ConfirmationConfig: applicationserver.ConfirmationConfig{
+				DefaultRetryAttempts: 3,
+				MaxRetryAttempts:     10,
+			},
+		},
 	}
 	as, err := applicationserver.New(c, config)
 	if !a.So(err, should.BeNil) {
@@ -1450,6 +1456,9 @@ func TestApplicationServer(t *testing.T) {
 										FPort:        11,
 										FCnt:         1,
 										FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
+										ConfirmedRetry: &ttnpb.ApplicationDownlink_ConfirmedRetry{
+											Attempt: 1,
+										},
 										DecodedPayload: &structpb.Struct{
 											Fields: map[string]*structpb.Value{
 												"sum": {
@@ -1488,6 +1497,9 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        11,
 									FCnt:         44,
 									FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
+									ConfirmedRetry: &ttnpb.ApplicationDownlink_ConfirmedRetry{
+										Attempt: 1,
+									},
 									DecodedPayload: &structpb.Struct{
 										Fields: map[string]*structpb.Value{
 											"sum": {
@@ -1593,6 +1605,9 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        11,
 									FCnt:         44,
 									FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
+									ConfirmedRetry: &ttnpb.ApplicationDownlink_ConfirmedRetry{
+										Attempt: 1,
+									},
 									DecodedPayload: &structpb.Struct{
 										Fields: map[string]*structpb.Value{
 											"sum": {
@@ -2433,6 +2448,12 @@ func TestSkipPayloadCrypto(t *testing.T) {
 				Registry: metadata.NewNoopEndDeviceLocationRegistry(),
 			},
 		},
+		Downlinks: applicationserver.DownlinksConfig{
+			ConfirmationConfig: applicationserver.ConfirmationConfig{
+				DefaultRetryAttempts: 3,
+				MaxRetryAttempts:     10,
+			},
+		},
 	}
 	as, err := applicationserver.New(c, config)
 	if !a.So(err, should.BeNil) {
@@ -2944,6 +2965,12 @@ func TestLocationFromPayload(t *testing.T) {
 				Registry: metadata.NewClusterEndDeviceLocationRegistry(c, (1<<4)*Timeout),
 			},
 		},
+		Downlinks: applicationserver.DownlinksConfig{
+			ConfirmationConfig: applicationserver.ConfirmationConfig{
+				DefaultRetryAttempts: 3,
+				MaxRetryAttempts:     10,
+			},
+		},
 	}
 	as, err := applicationserver.New(c, config)
 	if !a.So(err, should.BeNil) {
@@ -3136,6 +3163,12 @@ func TestUplinkNormalized(t *testing.T) {
 		EndDeviceMetadataStorage: applicationserver.EndDeviceMetadataStorageConfig{
 			Location: applicationserver.EndDeviceLocationStorageConfig{
 				Registry: metadata.NewClusterEndDeviceLocationRegistry(c, (1<<4)*Timeout),
+			},
+		},
+		Downlinks: applicationserver.DownlinksConfig{
+			ConfirmationConfig: applicationserver.ConfirmationConfig{
+				DefaultRetryAttempts: 3,
+				MaxRetryAttempts:     10,
 			},
 		},
 	}

@@ -741,6 +741,12 @@ func (v *MACState) FieldIsZero(p string) bool {
 		return v.PendingApplicationDownlink.FieldIsZero("confirmed")
 	case "pending_application_downlink.correlation_ids":
 		return v.PendingApplicationDownlink.FieldIsZero("correlation_ids")
+	case "pending_application_downlink.confirmed_retry":
+		return v.PendingApplicationDownlink.FieldIsZero("confirmed_retry")
+	case "pending_application_downlink.confirmed_retry.attempt":
+		return v.PendingApplicationDownlink.FieldIsZero("confirmed_retry.attempt")
+	case "pending_application_downlink.confirmed_retry.max_attempts":
+		return v.PendingApplicationDownlink.FieldIsZero("confirmed_retry.max_attempts")
 	case "pending_application_downlink.decoded_payload":
 		return v.PendingApplicationDownlink.FieldIsZero("decoded_payload")
 	case "pending_application_downlink.decoded_payload_warnings":

@@ -10,6 +10,7 @@ import (
 	flagsplugin "github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	golang "github.com/TheThingsIndustries/protoc-gen-go-flags/golang"
 	pflag "github.com/spf13/pflag"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // AddSelectFlagsForApplicationUplink adds flags to select fields in ApplicationUplink.
@@ -494,6 +495,50 @@ func (m *ApplicationDownlink_ClassBC) SetFromFlags(flags *pflag.FlagSet, prefix 
 	return paths, nil
 }
 
+// AddSelectFlagsForApplicationDownlink_ConfirmedRetry adds flags to select fields in ApplicationDownlink_ConfirmedRetry.
+func AddSelectFlagsForApplicationDownlink_ConfirmedRetry(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("attempt", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("attempt", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("max-attempts", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("max-attempts", prefix), false), flagsplugin.WithHidden(hidden)))
+}
+
+// SelectFromFlags outputs the fieldmask paths forApplicationDownlink_ConfirmedRetry message from select flags.
+func PathsFromSelectFlagsForApplicationDownlink_ConfirmedRetry(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("attempt", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("attempt", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("max_attempts", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("max_attempts", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForApplicationDownlink_ConfirmedRetry adds flags to select fields in ApplicationDownlink_ConfirmedRetry.
+func AddSetFlagsForApplicationDownlink_ConfirmedRetry(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("attempt", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("max-attempts", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the ApplicationDownlink_ConfirmedRetry message from flags.
+func (m *ApplicationDownlink_ConfirmedRetry) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("attempt", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Attempt = val
+		paths = append(paths, flagsplugin.Prefix("attempt", prefix))
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("max_attempts", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.MaxAttempts = &wrapperspb.UInt32Value{Value: val}
+		paths = append(paths, flagsplugin.Prefix("max_attempts", prefix))
+	}
+	return paths, nil
+}
+
 // AddSelectFlagsForApplicationDownlink adds flags to select fields in ApplicationDownlink.
 func AddSelectFlagsForApplicationDownlink(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("session-key-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("session-key-id", prefix), false), flagsplugin.WithHidden(hidden)))
@@ -507,6 +552,8 @@ func AddSelectFlagsForApplicationDownlink(flags *pflag.FlagSet, prefix string, h
 	AddSelectFlagsForApplicationDownlink_ClassBC(flags, flagsplugin.Prefix("class-b-c", prefix), hidden)
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("priority", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("priority", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("correlation-ids", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("correlation-ids", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("confirmed-retry", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("confirmed-retry", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForApplicationDownlink_ConfirmedRetry(flags, flagsplugin.Prefix("confirmed-retry", prefix), hidden)
 }
 
 // SelectFromFlags outputs the fieldmask paths forApplicationDownlink message from select flags.
@@ -566,6 +613,16 @@ func PathsFromSelectFlagsForApplicationDownlink(flags *pflag.FlagSet, prefix str
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("correlation_ids", prefix))
 	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("confirmed_retry", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("confirmed_retry", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForApplicationDownlink_ConfirmedRetry(flags, flagsplugin.Prefix("confirmed_retry", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
 	return paths, nil
 }
 
@@ -581,6 +638,7 @@ func AddSetFlagsForApplicationDownlink(flags *pflag.FlagSet, prefix string, hidd
 	AddSetFlagsForApplicationDownlink_ClassBC(flags, flagsplugin.Prefix("class-b-c", prefix), hidden)
 	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("priority", prefix), flagsplugin.EnumValueDesc(TxSchedulePriority_value), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewStringSliceFlag(flagsplugin.Prefix("correlation-ids", prefix), "", flagsplugin.WithHidden(hidden)))
+	AddSetFlagsForApplicationDownlink_ConfirmedRetry(flags, flagsplugin.Prefix("confirmed-retry", prefix), hidden)
 }
 
 // SetFromFlags sets the ApplicationDownlink message from flags.
@@ -647,6 +705,16 @@ func (m *ApplicationDownlink) SetFromFlags(flags *pflag.FlagSet, prefix string) 
 	} else if changed {
 		m.CorrelationIds = val
 		paths = append(paths, flagsplugin.Prefix("correlation_ids", prefix))
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("confirmed_retry", prefix)); changed {
+		if m.ConfirmedRetry == nil {
+			m.ConfirmedRetry = &ApplicationDownlink_ConfirmedRetry{}
+		}
+		if setPaths, err := m.ConfirmedRetry.SetFromFlags(flags, flagsplugin.Prefix("confirmed_retry", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
 	}
 	return paths, nil
 }

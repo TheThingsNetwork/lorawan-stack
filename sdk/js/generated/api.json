@@ -31854,6 +31854,18 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "confirmed_retry",
+              "description": "",
+              "label": "",
+              "type": "ConfirmedRetry",
+              "longType": "ApplicationDownlink.ConfirmedRetry",
+              "fullType": "ttn.lorawan.v3.ApplicationDownlink.ConfirmedRetry",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -31890,6 +31902,54 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ConfirmedRetry",
+          "longName": "ApplicationDownlink.ConfirmedRetry",
+          "fullName": "ttn.lorawan.v3.ApplicationDownlink.ConfirmedRetry",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "attempt",
+              "description": "The number of attempted confirmed downlink acknowledgements.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "max_attempts",
+              "description": "The maximum number of confirmed downlink acknowledgement attempts.\nIf null, the Application Server configuration is used instead.",
+              "label": "",
+              "type": "UInt32Value",
+              "longType": "google.protobuf.UInt32Value",
+              "fullType": "google.protobuf.UInt32Value",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 100
+                  },
+                  {
+                    "name": "uint32.gt",
+                    "value": 0
+                  }
+                ]
+              }
             }
           ]
         },

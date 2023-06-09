@@ -1140,6 +1140,31 @@ func (dst *ApplicationDownlink) SetFields(src *ApplicationDownlink, paths ...str
 			} else {
 				dst.CorrelationIds = nil
 			}
+		case "confirmed_retry":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationDownlink_ConfirmedRetry
+				if (src == nil || src.ConfirmedRetry == nil) && dst.ConfirmedRetry == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.ConfirmedRetry
+				}
+				if dst.ConfirmedRetry != nil {
+					newDst = dst.ConfirmedRetry
+				} else {
+					newDst = &ApplicationDownlink_ConfirmedRetry{}
+					dst.ConfirmedRetry = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ConfirmedRetry = src.ConfirmedRetry
+				} else {
+					dst.ConfirmedRetry = nil
+				}
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -1960,6 +1985,36 @@ func (dst *ApplicationDownlink_ClassBC) SetFields(src *ApplicationDownlink_Class
 				dst.AbsoluteTime = src.AbsoluteTime
 			} else {
 				dst.AbsoluteTime = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ApplicationDownlink_ConfirmedRetry) SetFields(src *ApplicationDownlink_ConfirmedRetry, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "attempt":
+			if len(subs) > 0 {
+				return fmt.Errorf("'attempt' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Attempt = src.Attempt
+			} else {
+				var zero uint32
+				dst.Attempt = zero
+			}
+		case "max_attempts":
+			if len(subs) > 0 {
+				return fmt.Errorf("'max_attempts' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MaxAttempts = src.MaxAttempts
+			} else {
+				dst.MaxAttempts = nil
 			}
 
 		default:

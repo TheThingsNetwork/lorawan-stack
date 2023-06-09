@@ -84,6 +84,7 @@ func (as *ApplicationServer) encryptDownlinks(ctx context.Context, dev *ttnpb.En
 				ClassBC:        item.ClassBC,
 				Priority:       item.Priority,
 				CorrelationIds: item.CorrelationIds,
+				ConfirmedRetry: item.ConfirmedRetry,
 			}
 			if !skipPayloadCrypto {
 				if err := as.encryptDownlink(ctx, dev, session, encryptedItem, link.DefaultFormatters); err != nil {

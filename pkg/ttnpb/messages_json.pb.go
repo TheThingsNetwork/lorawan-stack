@@ -1457,6 +1457,12 @@ func (x *ApplicationDownlink) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("correlation_ids")
 		s.WriteStringArray(x.CorrelationIds)
 	}
+	if x.ConfirmedRetry != nil || s.HasField("confirmed_retry") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("confirmed_retry")
+		// NOTE: ApplicationDownlink_ConfirmedRetry does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.ConfirmedRetry)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -1524,6 +1530,16 @@ func (x *ApplicationDownlink) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				return
 			}
 			x.CorrelationIds = s.ReadStringArray()
+		case "confirmed_retry", "confirmedRetry":
+			s.AddField("confirmed_retry")
+			if s.ReadNil() {
+				x.ConfirmedRetry = nil
+				return
+			}
+			// NOTE: ApplicationDownlink_ConfirmedRetry does not seem to implement UnmarshalProtoJSON.
+			var v ApplicationDownlink_ConfirmedRetry
+			golang.UnmarshalMessage(s, &v)
+			x.ConfirmedRetry = &v
 		}
 	})
 }

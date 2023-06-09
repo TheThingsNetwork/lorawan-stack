@@ -16710,6 +16710,21 @@
         }
       }
     },
+    "ApplicationDownlinkConfirmedRetry": {
+      "type": "object",
+      "properties": {
+        "attempt": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The number of attempted confirmed downlink acknowledgements."
+        },
+        "max_attempts": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The maximum number of confirmed downlink acknowledgement attempts.\nIf null, the Application Server configuration is used instead."
+        }
+      }
+    },
     "ApplicationPubSubAWSIoTProvider": {
       "type": "object",
       "properties": {
@@ -18932,6 +18947,9 @@
           "items": {
             "type": "string"
           }
+        },
+        "confirmed_retry": {
+          "$ref": "#/definitions/ApplicationDownlinkConfirmedRetry"
         }
       }
     },

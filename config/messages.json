@@ -2744,9 +2744,27 @@
       "file": "applicationserver.go"
     }
   },
+  "error:pkg/applicationserver:default_retry_count_larger_than_max": {
+    "translations": {
+      "en": "the default number of retries cannot be larger than the maximum number of retries"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "applicationserver.go"
+    }
+  },
   "error:pkg/applicationserver:device_not_found": {
     "translations": {
       "en": "device `{device_uid}` not found"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "applicationserver.go"
+    }
+  },
+  "error:pkg/applicationserver:downlink_max_retries_invalid": {
+    "translations": {
+      "en": "downlink maximum retries exceed configured maximum of {max}"
     },
     "description": {
       "package": "pkg/applicationserver",
@@ -2819,6 +2837,15 @@
   "error:pkg/applicationserver:listen_frontend": {
     "translations": {
       "en": "failed to start frontend listener `{protocol}` on address `{address}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "applicationserver.go"
+    }
+  },
+  "error:pkg/applicationserver:max_retries_reached": {
+    "translations": {
+      "en": "maximum number of retries ({max_retries}) reached"
     },
     "description": {
       "package": "pkg/applicationserver",
@@ -2913,6 +2940,15 @@
     "description": {
       "package": "pkg/applicationserver",
       "file": "config.go"
+    }
+  },
+  "error:pkg/applicationserver:zero_attempt_counts": {
+    "translations": {
+      "en": "the default and maximum number of retries cannot be zero"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "applicationserver.go"
     }
   },
   "error:pkg/auth/cluster:auth_type": {

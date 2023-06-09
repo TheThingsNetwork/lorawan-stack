@@ -105,7 +105,24 @@ func (as *ApplicationServer) Context() context.Context {
 	return as.ctx
 }
 
-var errListenFrontend = errors.DefineFailedPrecondition("listen_frontend", "failed to start frontend listener `{protocol}` on address `{address}`")
+var (
+	errListenFrontend = errors.DefineFailedPrecondition(
+		"listen_frontend", "failed to start frontend listener `{protocol}` on address `{address}`",
+	)
+	errMaxRetriesReached = errors.DefineAborted(
+		"max_retries_reached", "maximum number of retries ({max_retries}) reached",
+	)
+)
+
+func validateDownlinkConfirmationConfig(c ConfirmationConfig) error {
+	if c.DefaultRetryAttempts == 0 || c.MaxRetryAttempts == 0 {
+		return errZeroAttemptCounts.New()
+	}
+	if c.DefaultRetryAttempts > c.MaxRetryAttempts {
+		return errDefaultRetryCountLargerThanMax.New()
+	}
+	return nil
+}
 
 // New returns new *ApplicationServer.
 func New(c *component.Component, conf *Config) (as *ApplicationServer, err error) {
@@ -124,6 +141,10 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		if err != nil {
 			return nil, err
 		}
+	}
+
+	if err := validateDownlinkConfirmationConfig(conf.Downlinks.ConfirmationConfig); err != nil {
+		return nil, err
 	}
 
 	as = &ApplicationServer{
@@ -461,8 +482,22 @@ func lastAFCntDownFromMinFCnt(min uint32) uint32 {
 
 var (
 	errDeviceNotFound  = errors.DefineNotFound("device_not_found", "device `{device_uid}` not found")
-	errNoDeviceSession = errors.DefineFailedPrecondition("no_device_session", "no device session; check device activation")
-	errRebuild         = errors.DefineAborted("rebuild", "could not rebuild device session; check device address")
+	errNoDeviceSession = errors.DefineFailedPrecondition(
+		"no_device_session", "no device session; check device activation",
+	)
+	errRebuild = errors.DefineAborted(
+		"rebuild", "could not rebuild device session; check device address",
+	)
+	errZeroAttemptCounts = errors.DefineFailedPrecondition(
+		"zero_attempt_counts", "the default and maximum number of retries cannot be zero",
+	)
+	errDefaultRetryCountLargerThanMax = errors.DefineFailedPrecondition(
+		"default_retry_count_larger_than_max",
+		"the default number of retries cannot be larger than the maximum number of retries",
+	)
+	errDownlinkMaxRetriesInvalid = errors.DefineInvalidArgument(
+		"downlink_max_retries_invalid", "downlink maximum retries exceed configured maximum of {max}",
+	)
 )
 
 // buildSessionsFromError attempts to rebuild the end device session and pending session based on the error
@@ -643,6 +678,26 @@ func (as *ApplicationServer) attemptDownlinkQueueOp(ctx context.Context, dev *tt
 	}
 }
 
+// initAndValidateConfirmationRetriesConfig initializes and validates the confirmation
+// retries configuration for the given downlink.
+func (as *ApplicationServer) initAndValidateConfirmationRetriesConfig(item *ttnpb.ApplicationDownlink) error {
+	if !item.Confirmed {
+		return nil
+	}
+
+	if item.ConfirmedRetry == nil {
+		item.ConfirmedRetry = &ttnpb.ApplicationDownlink_ConfirmedRetry{
+			Attempt: 1,
+		}
+	}
+
+	maxAttemptsAllowed := as.config.Downlinks.ConfirmationConfig.MaxRetryAttempts
+	if item.ConfirmedRetry.MaxAttempts.GetValue() > maxAttemptsAllowed {
+		return errDownlinkMaxRetriesInvalid.WithAttributes("max", maxAttemptsAllowed)
+	}
+	return nil
+}
+
 func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink, op func(ttnpb.AsNsClient, context.Context, *ttnpb.DownlinkQueueRequest, ...grpc.CallOption) (*emptypb.Empty, error)) error {
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("as:downlink:%s", events.NewCorrelationID()))
 	link, err := as.getLink(ctx, ids.ApplicationIds, []string{
@@ -683,8 +738,13 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids *ttnpb.End
 					log.FromContext(ctx).WithError(err).Warn("Encoding or decoding downlink message failed")
 					return nil, nil, err
 				}
+				if err := as.initAndValidateConfirmationRetriesConfig(item); err != nil {
+					return nil, nil, err
+				}
 			}
+
 			registerReceiveDownlinks(ctx, ids, items)
+
 			mask, err := as.attemptDownlinkQueueOp(ctx, dev, link, peer, downlinkQueueOperation{
 				Items:     items,
 				Operation: op,
@@ -1351,7 +1411,26 @@ func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids *ttnpb.
 				return nil, nil, err
 			}
 
+			if msg.ConfirmedRetry == nil {
+				msg.ConfirmedRetry = &ttnpb.ApplicationDownlink_ConfirmedRetry{
+					Attempt: 0,
+				}
+			}
+			msg.ConfirmedRetry.Attempt++
 			items := []*ttnpb.ApplicationDownlink{msg}
+
+			maxRetries := as.config.Downlinks.ConfirmationConfig.DefaultRetryAttempts
+			if maxAttempts := msg.ConfirmedRetry.MaxAttempts; maxAttempts != nil {
+				maxRetries = maxAttempts.Value
+			}
+			if msg.ConfirmedRetry.Attempt > maxRetries {
+				as.registerDropDownlinks(
+					ctx, ids, items,
+					errMaxRetriesReached.WithAttributes("max_retries", maxRetries),
+				)
+				return dev, nil, nil
+			}
+
 			pushMask, err := as.attemptDownlinkQueueOp(ctx, dev, link, peer, downlinkQueueOperation{
 				Items:     items,
 				Operation: ttnpb.AsNsClient.DownlinkQueuePush,

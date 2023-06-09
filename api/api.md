@@ -488,6 +488,7 @@
 - [File `lorawan-stack/api/messages.proto`](#lorawan-stack/api/messages.proto)
   - [Message `ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink)
   - [Message `ApplicationDownlink.ClassBC`](#ttn.lorawan.v3.ApplicationDownlink.ClassBC)
+  - [Message `ApplicationDownlink.ConfirmedRetry`](#ttn.lorawan.v3.ApplicationDownlink.ConfirmedRetry)
   - [Message `ApplicationDownlinkFailed`](#ttn.lorawan.v3.ApplicationDownlinkFailed)
   - [Message `ApplicationDownlinks`](#ttn.lorawan.v3.ApplicationDownlinks)
   - [Message `ApplicationInvalidatedDownlinks`](#ttn.lorawan.v3.ApplicationInvalidatedDownlinks)
@@ -7013,6 +7014,7 @@ Transmission settings for downlink.
 | `class_b_c` | [`ApplicationDownlink.ClassBC`](#ttn.lorawan.v3.ApplicationDownlink.ClassBC) |  | Optional gateway and timing information for class B and C. If set, this downlink message will only be transmitted as class B or C downlink. If not set, this downlink message may be transmitted in class A, B and C. |
 | `priority` | [`TxSchedulePriority`](#ttn.lorawan.v3.TxSchedulePriority) |  | Priority for scheduling the downlink message. |
 | `correlation_ids` | [`string`](#string) | repeated |  |
+| `confirmed_retry` | [`ApplicationDownlink.ConfirmedRetry`](#ttn.lorawan.v3.ApplicationDownlink.ConfirmedRetry) |  |  |
 
 #### Field Rules
 
@@ -7029,6 +7031,19 @@ Transmission settings for downlink.
 | ----- | ---- | ----- | ----------- |
 | `gateways` | [`ClassBCGatewayIdentifiers`](#ttn.lorawan.v3.ClassBCGatewayIdentifiers) | repeated | Possible gateway identifiers, antenna index, and group index to use for this downlink message. The Network Server selects one of these gateways for downlink, based on connectivity, signal quality, channel utilization and an available slot. If none of the gateways can be selected, the downlink message fails. If empty, a gateway and antenna is selected automatically from the gateways seen in recent uplinks. If group index is set, gateways will be grouped by the index for the Network Server to select one gateway per group. |
 | `absolute_time` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Absolute time when the downlink message should be transmitted. This requires the gateway to have GPS time synchronization. If the time is in the past or if there is a scheduling conflict, the downlink message fails. If null, the time is selected based on slot availability. This is recommended in class B mode. |
+
+### <a name="ttn.lorawan.v3.ApplicationDownlink.ConfirmedRetry">Message `ApplicationDownlink.ConfirmedRetry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `attempt` | [`uint32`](#uint32) |  | The number of attempted confirmed downlink acknowledgements. |
+| `max_attempts` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | The maximum number of confirmed downlink acknowledgement attempts. If null, the Application Server configuration is used instead. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `max_attempts` | <p>`uint32.lte`: `100`</p><p>`uint32.gt`: `0`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationDownlinkFailed">Message `ApplicationDownlinkFailed`</a>
 
