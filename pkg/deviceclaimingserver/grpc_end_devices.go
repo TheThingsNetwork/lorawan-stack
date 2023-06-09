@@ -94,11 +94,7 @@ func (edcs *endDeviceClaimingServer) Claim(
 		return nil, errNoJoinEUI.New()
 	}
 
-	claimer := edcs.DCS.endDeviceClaimingUpstream.JoinEUIClaimer(
-		ctx,
-		joinEUI,
-	)
-
+	claimer := edcs.DCS.endDeviceClaimingUpstream.JoinEUIClaimer(ctx, joinEUI)
 	if claimer == nil {
 		return nil, errClaimingNotSupported.WithAttributes("eui", joinEUI)
 	}
@@ -125,7 +121,6 @@ func (edcs *endDeviceClaimingServer) Unclaim(
 	if in.DevEui == nil || in.JoinEui == nil {
 		return nil, errNoEUI.New()
 	}
-
 	if err := rights.RequireApplication(ctx, in.GetApplicationIds(),
 		ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 	); err != nil {
@@ -133,11 +128,7 @@ func (edcs *endDeviceClaimingServer) Unclaim(
 	}
 
 	joinEUI := types.MustEUI64(in.JoinEui).OrZero()
-	claimer := edcs.DCS.endDeviceClaimingUpstream.JoinEUIClaimer(
-		ctx,
-		joinEUI,
-	)
-
+	claimer := edcs.DCS.endDeviceClaimingUpstream.JoinEUIClaimer(ctx, joinEUI)
 	if claimer == nil {
 		return nil, errClaimingNotSupported.WithAttributes("eui", joinEUI)
 	}
@@ -153,10 +144,7 @@ func (edcs *endDeviceClaimingServer) GetInfoByJoinEUI(
 	in *ttnpb.GetInfoByJoinEUIRequest,
 ) (*ttnpb.GetInfoByJoinEUIResponse, error) {
 	joinEUI := types.MustEUI64(in.JoinEui).OrZero()
-	claimer := edcs.DCS.endDeviceClaimingUpstream.JoinEUIClaimer(
-		ctx,
-		joinEUI,
-	)
+	claimer := edcs.DCS.endDeviceClaimingUpstream.JoinEUIClaimer(ctx, joinEUI)
 	return &ttnpb.GetInfoByJoinEUIResponse{
 		JoinEui:          joinEUI.Bytes(),
 		SupportsClaiming: claimer != nil,
@@ -194,10 +182,7 @@ func (edcs *endDeviceClaimingServer) GetClaimStatus(
 		return nil, errNoEUI.New()
 	}
 	joinEUI := types.MustEUI64(dev.GetIds().JoinEui).OrZero()
-	claimer := edcs.DCS.endDeviceClaimingUpstream.JoinEUIClaimer(
-		ctx,
-		joinEUI,
-	)
+	claimer := edcs.DCS.endDeviceClaimingUpstream.JoinEUIClaimer(ctx, joinEUI)
 	if claimer == nil {
 		return nil, errClaimingNotSupported.WithAttributes("eui", joinEUI)
 	}
