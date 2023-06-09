@@ -151,7 +151,7 @@ func WithDeviceRegistry(reg ttnpb.EndDeviceRegistryClient) Option {
 }
 
 var (
-	errNoEUI                = errors.DefineInvalidArgument("no_eui", "DevEUI/JoinEUI not found in request")
+	errNoEUI                = errors.DefineInvalidArgument("no_eui", "DevEUI/JoinEUI not set for device")
 	errClaimingNotSupported = errors.DefineAborted("claiming_not_supported", "claiming not supported for JoinEUI `{eui}`")
 )
 
@@ -177,22 +177,33 @@ func (upstream *Upstream) Claim(
 
 // Unclaim implements EndDeviceClaimingServer.
 func (upstream *Upstream) Unclaim(ctx context.Context, in *ttnpb.EndDeviceIdentifiers) (*emptypb.Empty, error) {
-	if in.DevEui == nil || in.JoinEui == nil {
-		return nil, errNoEUI.New()
-	}
 	err := upstream.requireRights(ctx, in, &ttnpb.Rights{
 		Rights: []ttnpb.Right{
+			ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
 			ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 		},
 	})
 	if err != nil {
 		return nil, err
 	}
-	claimer := upstream.joinEUIClaimer(ctx, types.MustEUI64(in.JoinEui).OrZero())
-	if claimer == nil {
-		return nil, errClaimingNotSupported.WithAttributes("eui", in.JoinEui)
+
+	dev, err := upstream.deviceRegistry.Get(ctx, &ttnpb.GetEndDeviceRequest{
+		EndDeviceIds: in,
+	})
+	if err != nil {
+		return nil, err
 	}
-	err = claimer.Unclaim(ctx, in)
+
+	if dev.GetIds().DevEui == nil || dev.GetIds().JoinEui == nil {
+		return nil, errNoEUI.New()
+	}
+
+	joinEUI := types.MustEUI64(dev.GetIds().JoinEui).OrZero()
+	claimer := upstream.joinEUIClaimer(ctx, joinEUI)
+	if claimer == nil {
+		return nil, errClaimingNotSupported.WithAttributes("eui", joinEUI)
+	}
+	err = claimer.Unclaim(ctx, dev.GetIds())
 	if err != nil {
 		return nil, err
 	}
