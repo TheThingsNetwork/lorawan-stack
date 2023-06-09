@@ -20,20 +20,16 @@ import (
 	"path/filepath"
 	"strings"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices/ttjsv2"
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
-	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/types/known/emptypb"
 	"gopkg.in/yaml.v2"
 )
 
@@ -64,16 +60,13 @@ const (
 
 // Upstream abstracts EndDeviceClaimingServer.
 type Upstream struct {
-	Component
-	deviceRegistry ttnpb.EndDeviceRegistryClient
-	servers        map[string]EndDeviceClaimer
+	claimers map[string]EndDeviceClaimer
 }
 
 // NewUpstream returns a new Upstream.
 func NewUpstream(ctx context.Context, c Component, conf Config, opts ...Option) (*Upstream, error) {
 	upstream := &Upstream{
-		Component: c,
-		servers:   make(map[string]EndDeviceClaimer),
+		claimers: make(map[string]EndDeviceClaimer),
 	}
 
 	fetcher, err := conf.Fetcher(ctx, c.GetBaseConfig(ctx).Blob, c)
@@ -130,7 +123,7 @@ func NewUpstream(ctx context.Context, c Component, conf Config, opts ...Option) 
 
 		// The file for each client will be unique.
 		clientName := strings.Trim(fileName, filepath.Ext(fileName))
-		upstream.servers[clientName] = claimer
+		upstream.claimers[clientName] = claimer
 	}
 
 	for _, opt := range opts {
@@ -143,139 +136,12 @@ func NewUpstream(ctx context.Context, c Component, conf Config, opts ...Option) 
 // Option configures Upstream.
 type Option func(*Upstream)
 
-// WithDeviceRegistry overrides the device registry of the Upstream.
-func WithDeviceRegistry(reg ttnpb.EndDeviceRegistryClient) Option {
-	return func(upstream *Upstream) {
-		upstream.deviceRegistry = reg
-	}
-}
-
-var (
-	errNoEUI                = errors.DefineInvalidArgument("no_eui", "DevEUI/JoinEUI not set for device")
-	errClaimingNotSupported = errors.DefineAborted("claiming_not_supported", "claiming not supported for JoinEUI `{eui}`")
-)
-
-func (upstream *Upstream) joinEUIClaimer(_ context.Context, joinEUI types.EUI64) EndDeviceClaimer {
-	for _, srv := range upstream.servers {
-		if srv.SupportsJoinEUI(joinEUI) {
-			return srv
+// JoinEUIClaimer returns the EndDeviceClaimer for the given JoinEUI.
+func (upstream *Upstream) JoinEUIClaimer(_ context.Context, joinEUI types.EUI64) EndDeviceClaimer {
+	for _, claimer := range upstream.claimers {
+		if claimer.SupportsJoinEUI(joinEUI) {
+			return claimer
 		}
 	}
 	return nil
-}
-
-// Claim implements EndDeviceClaimingServer.
-func (upstream *Upstream) Claim(
-	ctx context.Context, joinEUI, devEUI types.EUI64, claimAuthenticationCode string,
-) error {
-	claimer := upstream.joinEUIClaimer(ctx, joinEUI)
-	if claimer == nil {
-		return errClaimingNotSupported.WithAttributes("eui", joinEUI)
-	}
-	return claimer.Claim(ctx, joinEUI, devEUI, claimAuthenticationCode)
-}
-
-// Unclaim implements EndDeviceClaimingServer.
-func (upstream *Upstream) Unclaim(ctx context.Context, in *ttnpb.EndDeviceIdentifiers) (*emptypb.Empty, error) {
-	err := upstream.requireRights(ctx, in, &ttnpb.Rights{
-		Rights: []ttnpb.Right{
-			ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
-			ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	dev, err := upstream.deviceRegistry.Get(ctx, &ttnpb.GetEndDeviceRequest{
-		EndDeviceIds: in,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	if dev.GetIds().DevEui == nil || dev.GetIds().JoinEui == nil {
-		return nil, errNoEUI.New()
-	}
-
-	joinEUI := types.MustEUI64(dev.GetIds().JoinEui).OrZero()
-	claimer := upstream.joinEUIClaimer(ctx, joinEUI)
-	if claimer == nil {
-		return nil, errClaimingNotSupported.WithAttributes("eui", joinEUI)
-	}
-	err = claimer.Unclaim(ctx, dev.GetIds())
-	if err != nil {
-		return nil, err
-	}
-	return ttnpb.Empty, nil
-}
-
-// GetInfoByJoinEUI implements EndDeviceClaimingServer.
-func (upstream *Upstream) GetInfoByJoinEUI(
-	ctx context.Context, in *ttnpb.GetInfoByJoinEUIRequest,
-) (*ttnpb.GetInfoByJoinEUIResponse, error) {
-	joinEUI := types.MustEUI64(in.JoinEui).OrZero()
-	claimer := upstream.joinEUIClaimer(ctx, joinEUI)
-	return &ttnpb.GetInfoByJoinEUIResponse{
-		JoinEui:          joinEUI.Bytes(),
-		SupportsClaiming: (claimer != nil),
-	}, nil
-}
-
-// GetClaimStatus implements EndDeviceClaimingServer.
-func (upstream *Upstream) GetClaimStatus(
-	ctx context.Context, in *ttnpb.EndDeviceIdentifiers,
-) (*ttnpb.GetClaimStatusResponse, error) {
-	if in.DevEui == nil || in.JoinEui == nil {
-		return nil, errNoEUI.New()
-	}
-	err := upstream.requireRights(ctx, in, &ttnpb.Rights{
-		Rights: []ttnpb.Right{
-			ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
-	claimer := upstream.joinEUIClaimer(ctx, types.MustEUI64(in.JoinEui).OrZero())
-	if claimer == nil {
-		return nil, errClaimingNotSupported.WithAttributes("eui", in.JoinEui)
-	}
-	return claimer.GetClaimStatus(ctx, in)
-}
-
-func (upstream *Upstream) requireRights(
-	ctx context.Context, in *ttnpb.EndDeviceIdentifiers, appRights *ttnpb.Rights,
-) error {
-	// Collaborator must have the required rights on the application.
-	if err := rights.RequireApplication(ctx, in.ApplicationIds,
-		appRights.Rights...,
-	); err != nil {
-		return err
-	}
-	// Check that the device actually exists in the application.
-	// If the EUIs are set in the request, the IS also checks that they match the stored device.
-	callOpt, err := rpcmetadata.WithForwardedAuth(ctx, upstream.Component.AllowInsecureForCredentials())
-	if err != nil {
-		return err
-	}
-	er, err := upstream.getDeviceRegistry(ctx)
-	if err != nil {
-		return err
-	}
-	_, err = er.Get(ctx, &ttnpb.GetEndDeviceRequest{
-		EndDeviceIds: in,
-	}, callOpt)
-	return err
-}
-
-func (upstream *Upstream) getDeviceRegistry(ctx context.Context) (ttnpb.EndDeviceRegistryClient, error) {
-	if upstream.deviceRegistry != nil {
-		return upstream.deviceRegistry, nil
-	}
-	conn, err := upstream.Component.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
-	if err != nil {
-		return nil, err
-	}
-	return ttnpb.NewEndDeviceRegistryClient(conn), nil
 }
