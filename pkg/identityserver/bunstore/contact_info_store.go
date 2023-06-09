@@ -304,8 +304,8 @@ func (s *contactInfoStore) ValidateContactInfo(ctx context.Context, pb *ttnpb.Co
 	if len(models) != 1 {
 		return store.ErrContactInfoNotFound.New()
 	}
-
 	model := models[0]
+
 	_, err = s.DB.NewUpdate().
 		Model(model).
 		WherePK().
@@ -395,6 +395,7 @@ func validationToPB(m *ContactInfoValidation) *ttnpb.ContactInfoValidation {
 			Value:         m.Value,
 		}},
 	}
+
 	switch m.EntityType {
 	case store.EntityApplication:
 		val.Entity = (&ttnpb.ApplicationIdentifiers{ApplicationId: m.EntityID}).GetEntityIdentifiers()
@@ -523,6 +524,13 @@ func (s *contactInfoStore) GetValidation(
 			"validation_id", pb.Id,
 		)
 	}
+
+	friendlyID, err := s.getEntityID(ctx, model.EntityType, model.EntityID)
+	if err != nil {
+		return nil, err
+	}
+
+	model.EntityID = friendlyID
 	return validationToPB(model), nil
 }
 
