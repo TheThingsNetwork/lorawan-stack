@@ -159,16 +159,21 @@ func (p *GeolocationPackage) pushUplink(
 			return nil, nil, err
 		}
 
-		if maxUplinkCount != 0 && len(data.UplinkMDs) >= maxUplinkCount {
-			data.UplinkMDs = data.UplinkMDs[1:]
+		if maxUplinkCount != 0 && len(data.RecentMetadata) >= maxUplinkCount {
+			data.RecentMetadata = data.RecentMetadata[1:]
 		}
 
-		storedMD := &UplinkMD{
-			ReceivedAt: up.ReceivedAt.AsTime(),
-			RxMetadata: up.RxMetadata,
+		storedMD := &UplinkMetadata{}
+		if err := storedMD.FromApplicationUplink(up); err != nil {
+			return nil, nil, err
 		}
-		data.UplinkMDs = append(data.UplinkMDs, storedMD)
-		apa.Data = data.Struct()
+
+		data.RecentMetadata = append(data.RecentMetadata, storedMD)
+		st, err := data.Struct()
+		if err != nil {
+			return nil, nil, err
+		}
+		apa.Data = st
 
 		return apa, []string{"data"}, nil
 	}
@@ -177,7 +182,13 @@ func (p *GeolocationPackage) pushUplink(
 	return err
 }
 
-func (p *GeolocationPackage) multiFrameQuery(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data, client *api.Client) (api.AbstractLocationSolverResponse, error) {
+func (*GeolocationPackage) multiFrameQuery(
+	ctx context.Context,
+	_ *ttnpb.EndDeviceIdentifiers,
+	up *ttnpb.ApplicationUplink,
+	data *Data,
+	client *api.Client,
+) (api.AbstractLocationSolverResponse, error) {
 	count := data.MultiFrameWindowSize
 	if count == 0 && len(up.FrmPayload) > 0 {
 		count = int(up.FrmPayload[0])
@@ -190,11 +201,14 @@ func (p *GeolocationPackage) multiFrameQuery(ctx context.Context, ids *ttnpb.End
 	now := time.Now()
 	mds := make([][]*ttnpb.RxMetadata, 0, count)
 
-	for _, up := range data.UplinkMDs {
-		if now.Sub(up.ReceivedAt) > data.MultiFrameWindowAge {
-			break
+	for _, md := range data.RecentMetadata {
+		if now.Sub(md.ReceivedAt) > data.MultiFrameWindowAge {
+			continue
 		}
-		mds = append(mds, up.RxMetadata)
+
+		cleanUplink := md.ToProto()
+		mds = append(mds, cleanUplink.RxMetadata)
+
 		if len(mds) >= count {
 			break
 		}

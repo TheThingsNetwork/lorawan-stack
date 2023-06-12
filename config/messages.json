@@ -2285,6 +2285,15 @@
       "file": "messages.go"
     }
   },
+  "error:pkg/applicationserver/io/packages/loragls/v3:encoding_recent_uplinks": {
+    "translations": {
+      "en": "encoding recent uplinks"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/loragls/v3",
+      "file": "data.go"
+    }
+  },
   "error:pkg/applicationserver/io/packages/loragls/v3:field_not_found": {
     "translations": {
       "en": "field `{field}` not found"

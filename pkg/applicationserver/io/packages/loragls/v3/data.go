@@ -15,12 +15,13 @@
 package loracloudgeolocationv3
 
 import (
+	"bytes"
+	"encoding/gob"
 	"fmt"
 	"net/url"
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
@@ -28,6 +29,7 @@ var (
 	errFieldNotFound = errors.DefineNotFound("field_not_found", "field `{field}` not found")
 	errInvalidType   = errors.DefineCorruption("invalid_type", "wrong type `{type}`")
 	errInvalidValue  = errors.DefineCorruption("invalid_value", "wrong value `{value}`")
+	errEncoding      = errors.DefineCorruption("encoding_recent_uplinks", "encoding recent uplinks")
 )
 
 // QueryType enum defines the location query types of the package.
@@ -81,12 +83,6 @@ const (
 	QUERY_TOAWIFI
 )
 
-// UplinkMD contains the uplink metadata stored by the package.
-type UplinkMD struct {
-	RxMetadata []*ttnpb.RxMetadata
-	ReceivedAt time.Time
-}
-
 // Data contains the package configuration.
 type Data struct {
 	// Query is the query type used by the package.
@@ -103,8 +99,8 @@ type Data struct {
 	ServerURL *url.URL
 	// Token is the API token to be used when comunicating with the GLS server.
 	Token string
-	// UplinkMDs are the metadatas from the recent uplink messages received by the gateway.
-	UplinkMDs []*UplinkMD
+	// RecentMetadata are the metadatas from the recent uplink messages received by the gateway.
+	RecentMetadata []*UplinkMetadata
 }
 
 const (
@@ -114,7 +110,7 @@ const (
 	multiFrameWindowAge  = "multi_frame_window_age"
 	serverURLField       = "server_url"
 	tokenField           = "token"
-	uplinksField         = "uplinks"
+	recentMDField        = "recent_metadata"
 )
 
 func toString(s string) *structpb.Value {
@@ -141,97 +137,17 @@ func toFloat64(f float64) *structpb.Value {
 	}
 }
 
-func toGatewayIDsStruct(gatewayIDs *ttnpb.GatewayIdentifiers) *structpb.Value {
-	gatewayIDsMap := make(map[string]*structpb.Value)
-	gatewayIDsMap["gateway_id"] = toString(gatewayIDs.GatewayId)
-
-	return &structpb.Value{
-		Kind: &structpb.Value_StructValue{
-			StructValue: &structpb.Struct{
-				Fields: gatewayIDsMap,
-			},
-		},
+func toRecentMD(mds []*UplinkMetadata) (*structpb.Value, error) {
+	gobBytes := new(bytes.Buffer)
+	gobEncoder := gob.NewEncoder(gobBytes)
+	if err := gobEncoder.Encode(mds); err != nil {
+		return nil, errEncoding.WithCause(err)
 	}
-}
-
-func toLocationStruct(location *ttnpb.Location) *structpb.Value {
-	locationMap := make(map[string]*structpb.Value)
-	locationMap["latitude"] = toFloat64(location.Latitude)
-	locationMap["longitude"] = toFloat64(location.Longitude)
-	locationMap["altitude"] = toFloat64(float64(location.Altitude))
-	locationMap["accuracy"] = toFloat64(float64(location.Accuracy))
-	locationMap["source"] = toFloat64(float64(location.Source))
-
-	return &structpb.Value{
-		Kind: &structpb.Value_StructValue{
-			StructValue: &structpb.Struct{
-				Fields: locationMap,
-			},
-		},
-	}
-}
-
-func toRxMetadataStruct(rx *ttnpb.RxMetadata) *structpb.Value {
-	rxMetadataMap := make(map[string]*structpb.Value)
-	rxMetadataMap["gateway_ids"] = toGatewayIDsStruct(rx.GatewayIds)
-	rxMetadataMap["antenna_index"] = toFloat64(float64(rx.AntennaIndex))
-	rxMetadataMap["fine_timestamp"] = toFloat64(float64(rx.FineTimestamp))
-	rxMetadataMap["location"] = toLocationStruct(rx.Location)
-	rxMetadataMap["rssi"] = toFloat64(float64(rx.Rssi))
-	rxMetadataMap["snr"] = toFloat64(float64(rx.Snr))
-
-	return &structpb.Value{
-		Kind: &structpb.Value_StructValue{
-			StructValue: &structpb.Struct{
-				Fields: rxMetadataMap,
-			},
-		},
-	}
-}
-
-func toRxMetadataStructs(rxs []*ttnpb.RxMetadata) *structpb.Value {
-	rxMetadataList := make([]*structpb.Value, 0, len(rxs))
-	for _, rx := range rxs {
-		rxMetadataList = append(rxMetadataList, toRxMetadataStruct(rx))
-	}
-	return &structpb.Value{
-		Kind: &structpb.Value_ListValue{
-			ListValue: &structpb.ListValue{
-				Values: rxMetadataList,
-			},
-		},
-	}
-}
-
-func toUplinkStruct(up *UplinkMD) *structpb.Value {
-	uplinkMap := make(map[string]*structpb.Value)
-	uplinkMap["received_at"] = toString(up.ReceivedAt.Format(time.RFC3339Nano))
-	uplinkMap["rx_metadata"] = toRxMetadataStructs(up.RxMetadata)
-	return &structpb.Value{
-		Kind: &structpb.Value_StructValue{
-			StructValue: &structpb.Struct{
-				Fields: uplinkMap,
-			},
-		},
-	}
-}
-
-func toUplinkStructs(ups []*UplinkMD) *structpb.Value {
-	uplinkList := make([]*structpb.Value, len(ups))
-	for i, up := range ups {
-		uplinkList[i] = toUplinkStruct(up)
-	}
-	return &structpb.Value{
-		Kind: &structpb.Value_ListValue{
-			ListValue: &structpb.ListValue{
-				Values: uplinkList,
-			},
-		},
-	}
+	return toString(gobBytes.String()), nil
 }
 
 // Struct serializes the configuration to *structpb.Struct.
-func (d *Data) Struct() *structpb.Struct {
+func (d *Data) Struct() (*structpb.Struct, error) {
 	st := &structpb.Struct{
 		Fields: map[string]*structpb.Value{
 			queryField: d.Query.Value(),
@@ -250,10 +166,14 @@ func (d *Data) Struct() *structpb.Struct {
 	if d.MultiFrameWindowAge > 0 {
 		st.Fields[multiFrameWindowAge] = toFloat64(float64(d.MultiFrameWindowAge / time.Minute))
 	}
-	if len(d.UplinkMDs) > 0 {
-		st.Fields[uplinksField] = toUplinkStructs(d.UplinkMDs)
+	if len(d.RecentMetadata) > 0 {
+		recentMD, err := toRecentMD(d.RecentMetadata)
+		if err != nil {
+			return nil, err
+		}
+		st.Fields[recentMDField] = recentMD
 	}
-	return st
+	return st, nil
 }
 
 func stringFromValue(v *structpb.Value) (string, error) {
@@ -280,166 +200,18 @@ func float64FromValue(v *structpb.Value) (float64, error) {
 	return fv.NumberValue, nil
 }
 
-func gatewayIDsFromValue(v *structpb.Value) (*ttnpb.GatewayIdentifiers, error) {
-	sv, ok := v.Kind.(*structpb.Value_StructValue)
+func recentMDFromValue(v *structpb.Value) ([]*UplinkMetadata, error) {
+	sv, ok := v.Kind.(*structpb.Value_StringValue)
 	if !ok {
 		return nil, errInvalidType.WithAttributes("type", fmt.Sprintf("%T", v.Kind))
 	}
-	gatewayIDs := &ttnpb.GatewayIdentifiers{}
-	if v, ok := sv.StructValue.Fields["gateway_id"]; ok {
-		sv, ok := v.Kind.(*structpb.Value_StringValue)
-		if !ok {
-			return nil, errInvalidType.WithAttributes("type", fmt.Sprintf("%T", v.Kind))
-		}
-		gatewayIDs.GatewayId = sv.StringValue
+	byteV := bytes.NewBufferString(sv.StringValue)
+	dec := gob.NewDecoder(byteV)
+	var mds []*UplinkMetadata
+	if err := dec.Decode(&mds); err != nil {
+		return nil, err
 	}
-	return gatewayIDs, nil
-}
-
-func locationFromValue(v *structpb.Value) (*ttnpb.Location, error) {
-	sv, ok := v.Kind.(*structpb.Value_StructValue)
-	if !ok {
-		return nil, errInvalidType.WithAttributes("type", fmt.Sprintf("%T", v.Kind))
-	}
-	location := &ttnpb.Location{}
-	if v, ok := sv.StructValue.Fields["latitude"]; ok {
-		sv, ok := v.Kind.(*structpb.Value_NumberValue)
-		if !ok {
-			return nil, errInvalidType.WithAttributes("type", fmt.Sprintf("%T", v.Kind))
-		}
-		location.Latitude = sv.NumberValue
-	}
-	if v, ok := sv.StructValue.Fields["longitude"]; ok {
-		sv, ok := v.Kind.(*structpb.Value_NumberValue)
-		if !ok {
-			return nil, errInvalidType.WithAttributes("type", fmt.Sprintf("%T", v.Kind))
-		}
-		location.Longitude = sv.NumberValue
-	}
-	if v, ok := sv.StructValue.Fields["altitude"]; ok {
-		sv, ok := v.Kind.(*structpb.Value_NumberValue)
-		if !ok {
-			return nil, errInvalidType.WithAttributes("type", fmt.Sprintf("%T", v.Kind))
-		}
-		location.Altitude = int32(sv.NumberValue)
-	}
-	if v, ok := sv.StructValue.Fields["accuracy"]; ok {
-		sv, ok := v.Kind.(*structpb.Value_NumberValue)
-		if !ok {
-			return nil, errInvalidType.WithAttributes("type", fmt.Sprintf("%T", v.Kind))
-		}
-		location.Accuracy = int32(sv.NumberValue)
-	}
-	if v, ok := sv.StructValue.Fields["source"]; ok {
-		sv, ok := v.Kind.(*structpb.Value_NumberValue)
-		if !ok {
-			return nil, errInvalidType.WithAttributes("type", fmt.Sprintf("%T", v.Kind))
-		}
-		location.Source = ttnpb.LocationSource(sv.NumberValue)
-	}
-	return location, nil
-}
-
-func rxMetadataFromValue(v *structpb.Value) (*ttnpb.RxMetadata, error) {
-	sv, ok := v.Kind.(*structpb.Value_StructValue)
-	if !ok {
-		return nil, errInvalidType.WithAttributes("type", fmt.Sprintf("%T", v.Kind))
-	}
-	rxMetadata := &ttnpb.RxMetadata{}
-	if v, ok := sv.StructValue.Fields["gateway_ids"]; ok {
-		gatewayIDs, err := gatewayIDsFromValue(v)
-		if err != nil {
-			return nil, err
-		}
-		rxMetadata.GatewayIds = gatewayIDs
-	}
-	if v, ok := sv.StructValue.Fields["antenna_index"]; ok {
-		sv, ok := v.Kind.(*structpb.Value_NumberValue)
-		if !ok {
-			return nil, errInvalidType.WithAttributes("type", fmt.Sprintf("%T", v.Kind))
-		}
-		rxMetadata.AntennaIndex = uint32(sv.NumberValue)
-	}
-	if v, ok := sv.StructValue.Fields["fine_timestamp"]; ok {
-		sv, ok := v.Kind.(*structpb.Value_NumberValue)
-		if !ok {
-			return nil, errInvalidType.WithAttributes("type", fmt.Sprintf("%T", v.Kind))
-		}
-		rxMetadata.FineTimestamp = uint64(sv.NumberValue)
-	}
-	if v, ok := sv.StructValue.Fields["location"]; ok {
-		location, err := locationFromValue(v)
-		if err != nil {
-			return nil, err
-		}
-		rxMetadata.Location = location
-	}
-	if v, ok := sv.StructValue.Fields["rssi"]; ok {
-		sv, ok := v.Kind.(*structpb.Value_NumberValue)
-		if !ok {
-			return nil, errInvalidType.WithAttributes("type", fmt.Sprintf("%T", v.Kind))
-		}
-		rxMetadata.Rssi = float32(sv.NumberValue)
-	}
-	if v, ok := sv.StructValue.Fields["snr"]; ok {
-		sv, ok := v.Kind.(*structpb.Value_NumberValue)
-		if !ok {
-			return nil, errInvalidType.WithAttributes("type", fmt.Sprintf("%T", v.Kind))
-		}
-		rxMetadata.Snr = float32(sv.NumberValue)
-	}
-	return rxMetadata, nil
-}
-
-func rxMetadataFromValues(vs []*structpb.Value) ([]*ttnpb.RxMetadata, error) {
-	rxs := make([]*ttnpb.RxMetadata, 0, len(vs))
-	for _, v := range vs {
-		rx, err := rxMetadataFromValue(v)
-		if err != nil {
-			return nil, err
-		}
-		rxs = append(rxs, rx)
-	}
-	return rxs, nil
-}
-
-func uplinkFromValue(v *structpb.Value) (*UplinkMD, error) {
-	sv, ok := v.Kind.(*structpb.Value_StructValue)
-	if !ok {
-		return nil, errInvalidType.WithAttributes("type", fmt.Sprintf("%T", v.Kind))
-	}
-	uplink := &UplinkMD{}
-	if v, ok := sv.StructValue.Fields["received_at"]; ok {
-		sv, ok := v.Kind.(*structpb.Value_StringValue)
-		if !ok {
-			return nil, errInvalidType.WithAttributes("type", fmt.Sprintf("%T", v.Kind))
-		}
-		receivedAt, err := time.Parse(time.RFC3339Nano, sv.StringValue)
-		if err != nil {
-			return nil, err
-		}
-		uplink.ReceivedAt = receivedAt
-	}
-	if v, ok := sv.StructValue.Fields["rx_metadata"]; ok {
-		rxMetadata, err := rxMetadataFromValues(v.GetListValue().GetValues())
-		if err != nil {
-			return nil, err
-		}
-		uplink.RxMetadata = rxMetadata
-	}
-	return uplink, nil
-}
-
-func uplinkFromValues(vs []*structpb.Value) ([]*UplinkMD, error) {
-	ups := make([]*UplinkMD, 0, len(vs))
-	for _, v := range vs {
-		up, err := uplinkFromValue(v)
-		if err != nil {
-			return nil, err
-		}
-		ups = append(ups, up)
-	}
-	return ups, nil
+	return mds, nil
 }
 
 // FromStruct deserializes the configuration from *structpb.Struct.
@@ -510,13 +282,13 @@ func (d *Data) FromStruct(st *structpb.Struct) error {
 		}
 	}
 	{
-		value, ok := fields[uplinksField]
+		value, ok := fields[recentMDField]
 		if ok {
-			uplinks, err := uplinkFromValues(value.GetListValue().GetValues())
+			uplinks, err := recentMDFromValue(value)
 			if err != nil {
 				return err
 			}
-			d.UplinkMDs = uplinks
+			d.RecentMetadata = uplinks
 		}
 	}
 	return nil
