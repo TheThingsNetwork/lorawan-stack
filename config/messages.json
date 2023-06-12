@@ -3644,27 +3644,27 @@
       "file": "ttjs.go"
     }
   },
-  "error:pkg/deviceclaimingserver/enddevices:claiming_not_supported": {
+  "error:pkg/deviceclaimingserver:claiming_not_supported": {
     "translations": {
       "en": "claiming not supported for JoinEUI `{eui}`"
     },
     "description": {
-      "package": "pkg/deviceclaimingserver/enddevices",
-      "file": "enddevices.go"
-    }
-  },
-  "error:pkg/deviceclaimingserver/enddevices:no_eui": {
-    "translations": {
-      "en": "DevEUI/JoinEUI not found in request"
-    },
-    "description": {
-      "package": "pkg/deviceclaimingserver/enddevices",
-      "file": "enddevices.go"
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_end_devices.go"
     }
   },
   "error:pkg/deviceclaimingserver:method_unavailable": {
     "translations": {
       "en": "method unavailable"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_end_devices.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver:no_eui": {
+    "translations": {
+      "en": "DevEUI/JoinEUI not set for device"
     },
     "description": {
       "package": "pkg/deviceclaimingserver",
