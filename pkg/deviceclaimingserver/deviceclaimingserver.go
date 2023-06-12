@@ -56,19 +56,18 @@ func New(c *component.Component, conf *Config, opts ...Option) (*DeviceClaimingS
 		opt(dcs)
 	}
 
-	dcs.gatewayClaimingServerUpstream = noopGCLS{}
-
-	upstream, err := enddevices.NewUpstream(ctx, c, conf.EndDeviceClaimingServerConfig)
-	if err != nil {
-		return nil, err
+	if dcs.endDeviceClaimingUpstream == nil {
+		upstream, err := enddevices.NewUpstream(ctx, c, conf.EndDeviceClaimingServerConfig)
+		if err != nil {
+			return nil, err
+		}
+		dcs.endDeviceClaimingUpstream = upstream
 	}
-
-	dcs.endDeviceClaimingUpstream = upstream
-
 	dcs.grpc.endDeviceClaimingServer = &endDeviceClaimingServer{
 		DCS: dcs,
 	}
 
+	dcs.gatewayClaimingServerUpstream = noopGCLS{}
 	dcs.grpc.gatewayClaimingServer = &gatewayClaimingServer{
 		DCS: dcs,
 	}
@@ -79,6 +78,13 @@ func New(c *component.Component, conf *Config, opts ...Option) (*DeviceClaimingS
 
 // Option configures GatewayClaimingServer.
 type Option func(*DeviceClaimingServer)
+
+// WithEndDeviceClaimingUpstream configures the upstream for end device claiming.
+func WithEndDeviceClaimingUpstream(upstream *enddevices.Upstream) Option {
+	return func(dcs *DeviceClaimingServer) {
+		dcs.endDeviceClaimingUpstream = upstream
+	}
+}
 
 // Context returns the context of the Device Claiming Server.
 func (dcs *DeviceClaimingServer) Context() context.Context {

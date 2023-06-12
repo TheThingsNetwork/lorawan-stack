@@ -68,6 +68,9 @@ func NewUpstream(ctx context.Context, c Component, conf Config, opts ...Option) 
 	upstream := &Upstream{
 		claimers: make(map[string]EndDeviceClaimer),
 	}
+	for _, opt := range opts {
+		opt(upstream)
+	}
 
 	fetcher, err := conf.Fetcher(ctx, c.GetBaseConfig(ctx).Blob, c)
 	if err != nil {
@@ -126,15 +129,18 @@ func NewUpstream(ctx context.Context, c Component, conf Config, opts ...Option) 
 		upstream.claimers[clientName] = claimer
 	}
 
-	for _, opt := range opts {
-		opt(upstream)
-	}
-
 	return upstream, nil
 }
 
 // Option configures Upstream.
 type Option func(*Upstream)
+
+// WithClaimer adds a claimer to Upstream.
+func WithClaimer(name string, claimer EndDeviceClaimer) Option {
+	return func(upstream *Upstream) {
+		upstream.claimers[name] = claimer
+	}
+}
 
 // JoinEUIClaimer returns the EndDeviceClaimer for the given JoinEUI.
 func (upstream *Upstream) JoinEUIClaimer(_ context.Context, joinEUI types.EUI64) EndDeviceClaimer {
