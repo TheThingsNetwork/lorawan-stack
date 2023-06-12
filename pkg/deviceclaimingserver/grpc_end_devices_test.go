@@ -230,6 +230,8 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 	_, err = edcsClient.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
 		ApplicationIds: registeredApplicationIDs,
 		DeviceId:       registeredEndDeviceID,
+		JoinEui:        registeredJoinEUI.Bytes(),
+		DevEui:         registeredDevEUI.Bytes(),
 	}, authorizedCallOpt)
 	a.So(err, should.BeNil)
 }
