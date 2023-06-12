@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Fix payload formatter page launching malformed requests in the Console.
+
 ### Security
 
 ## [3.26.1] - unreleased
