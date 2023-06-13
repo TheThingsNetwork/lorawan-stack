@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import classnames from 'classnames'
 import { NavLink } from 'react-router-dom'
 
@@ -64,6 +64,10 @@ const DropdownItem = ({
   const activeClassName = classnames({
     [style.active]: (!Boolean(action) && showActive) || active,
   })
+  const cls = useCallback(
+    ({ isActive }) => classnames(style.button, { [activeClassName]: isActive }),
+    [activeClassName],
+  )
   const ItemElement = action ? (
     <button
       onClick={action}
@@ -81,13 +85,7 @@ const DropdownItem = ({
       <Message content={title} />
     </Link.Anchor>
   ) : (
-    <NavLink
-      className={style.button}
-      activeClassName={activeClassName}
-      to={path}
-      exact={exact}
-      tabIndex={tabIndex}
-    >
+    <NavLink className={cls} to={path} end={exact} tabIndex={tabIndex}>
       {iconElement}
       <Message content={title} />
     </NavLink>

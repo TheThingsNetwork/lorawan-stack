@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,10 +13,11 @@
 // limitations under the License.
 
 import React from 'react'
-import { Prompt as RouterPrompt, useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import PortalledModal from '@ttn-lw/components/modal/portalled'
 
+import { usePrompt } from '@ttn-lw/lib/hooks/use-prompt'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 /*
@@ -27,7 +28,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 const Prompt = props => {
   const { modal, children, when, shouldBlockNavigation, onApprove, onCancel } = props
 
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const [state, setState] = React.useState({
     showModal: false,
@@ -65,21 +66,20 @@ const Prompt = props => {
     [handleModalShow, shouldBlockNavigation, confirmedLocationChange],
   )
 
+  usePrompt(handlePromptTrigger, when)
+
   React.useEffect(() => {
     if (confirmedLocationChange) {
-      onApprove(nextLocation, history)
+      onApprove(nextLocation, navigate)
     } else {
-      onCancel(nextLocation, history)
+      onCancel(nextLocation, navigate)
     }
-  }, [confirmedLocationChange, history, nextLocation, onApprove, onCancel])
+  }, [confirmedLocationChange, navigate, nextLocation, onApprove, onCancel])
 
   return (
-    <>
-      <RouterPrompt when={when} message={handlePromptTrigger} />
-      <PortalledModal visible={showModal} {...modal} approval onComplete={handleModalComplete}>
-        {children}
-      </PortalledModal>
-    </>
+    <PortalledModal visible={showModal} {...modal} approval onComplete={handleModalComplete}>
+      {children}
+    </PortalledModal>
   )
 }
 
@@ -95,8 +95,8 @@ Prompt.propTypes = {
 Prompt.defaultProps = {
   children: undefined,
   shouldBlockNavigation: () => true,
-  onApprove: (location, history) => {
-    history.push(location)
+  onApprove: (location, navigate) => {
+    navigate(location)
   },
   onCancel: () => null,
 }
