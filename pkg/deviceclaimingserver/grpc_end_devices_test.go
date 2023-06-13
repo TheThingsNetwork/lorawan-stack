@@ -37,7 +37,18 @@ import (
 	"google.golang.org/grpc"
 )
 
-var timeout = (1 << 5) * test.Delay
+var (
+	timeout = (1 << 5) * test.Delay
+
+	registeredApplicationIDs = &ttnpb.ApplicationIdentifiers{
+		ApplicationId: "test-application",
+	}
+	registeredApplicationKey = "test-key"
+	registeredEndDeviceID    = "test-end-device"
+	registeredJoinEUI        = types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0C}
+	unRegisteredJoinEUI      = types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0D}
+	registeredDevEUI         = types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30}
+)
 
 func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.ClusterRole) {
 	for i := 0; i < 20; i++ {
@@ -48,17 +59,6 @@ func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.Cluste
 	}
 	panic("could not connect to peer")
 }
-
-var (
-	registeredApplicationIDs = &ttnpb.ApplicationIdentifiers{
-		ApplicationId: "test-application",
-	}
-	registeredApplicationKey = "test-key"
-	registeredEndDeviceID    = "test-end-device"
-	registeredJoinEUI        = types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0C}
-	unRegisteredJoinEUI      = types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0D}
-	registeredDevEUI         = types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30}
-)
 
 func TestEndDeviceClaimingServer(t *testing.T) {
 	t.Parallel()
@@ -95,9 +95,7 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 	test.Must(dcs, err)
 
 	componenttest.StartComponent(t, c)
-	t.Cleanup(func() {
-		c.Close()
-	})
+	t.Cleanup(c.Close)
 
 	// Wait for server to be ready.
 	time.Sleep(timeout)
@@ -110,12 +108,18 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 		AuthValue: registeredApplicationKey,
 	})
 
+	unAuthorizedCallOpt := grpc.PerRPCCredentials(rpcmetadata.MD{
+		AuthType:  "Bearer",
+		AuthValue: "invalid-key",
+	})
+
 	// Register entities.
 	is.ApplicationRegistry().Add(
 		ctx,
 		registeredApplicationIDs,
 		registeredApplicationKey,
 		ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+		ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
 	)
 	is.EndDeviceRegistry().Add(
 		ctx,
@@ -150,11 +154,13 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 	for _, tc := range []struct {
 		Name           string
 		Req            *ttnpb.ClaimEndDeviceRequest
+		CallOpts       grpc.CallOption
 		ErrorAssertion func(err error) bool
 	}{
 		{
 			Name:           "EmptyRequest",
 			Req:            &ttnpb.ClaimEndDeviceRequest{},
+			CallOpts:       authorizedCallOpt,
 			ErrorAssertion: errors.IsInvalidArgument,
 		},
 		{
@@ -165,6 +171,7 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 				},
 				TargetApplicationIds: nil,
 			},
+			CallOpts:       authorizedCallOpt,
 			ErrorAssertion: errors.IsInvalidArgument,
 		},
 		{
@@ -175,6 +182,7 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 					ApplicationId: "target-app",
 				},
 			},
+			CallOpts:       authorizedCallOpt,
 			ErrorAssertion: errors.IsInvalidArgument,
 		},
 		{
@@ -187,7 +195,26 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 					ApplicationId: "target-app",
 				},
 			},
+			CallOpts:       authorizedCallOpt,
 			ErrorAssertion: errors.IsInvalidArgument,
+		},
+		{
+			Name: "PermissionDenied",
+			Req: &ttnpb.ClaimEndDeviceRequest{
+				SourceDevice: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers_{
+					AuthenticatedIdentifiers: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers{
+						JoinEui:            registeredJoinEUI.Bytes(),
+						DevEui:             registeredDevEUI.Bytes(),
+						AuthenticationCode: "TEST1234",
+					},
+				},
+				TargetApplicationIds: registeredApplicationIDs,
+				TargetDeviceId:       "target-device",
+			},
+			CallOpts: unAuthorizedCallOpt,
+			ErrorAssertion: func(err error) bool {
+				return errors.IsPermissionDenied(err)
+			},
 		},
 		{
 			Name: "ValidDevice",
@@ -202,12 +229,13 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 				TargetApplicationIds: registeredApplicationIDs,
 				TargetDeviceId:       "target-device",
 			},
+			CallOpts: authorizedCallOpt,
 		},
 	} {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
-			_, err := edcsClient.Claim(ctx, tc.Req, authorizedCallOpt)
+			_, err := edcsClient.Claim(ctx, tc.Req, tc.CallOpts)
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
@@ -223,10 +251,42 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 		ApplicationIds: registeredApplicationIDs,
 		DeviceId:       registeredEndDeviceID,
 	}, authorizedCallOpt)
+	a.So(errors.IsInvalidArgument(err), should.BeTrue)
+	a.So(status, should.BeNil)
+
+	status, err = edcsClient.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
+		ApplicationIds: registeredApplicationIDs,
+		DeviceId:       registeredEndDeviceID,
+		JoinEui:        registeredJoinEUI.Bytes(),
+		DevEui:         registeredDevEUI.Bytes(),
+	}, unAuthorizedCallOpt)
+	a.So(errors.IsPermissionDenied(err), should.BeTrue)
+	a.So(status, should.BeNil)
+
+	status, err = edcsClient.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
+		ApplicationIds: registeredApplicationIDs,
+		DeviceId:       registeredEndDeviceID,
+		JoinEui:        registeredJoinEUI.Bytes(),
+		DevEui:         registeredDevEUI.Bytes(),
+	}, authorizedCallOpt)
 	a.So(err, should.BeNil)
 	a.So(status, should.NotBeNil)
 
 	// Unclaim.
+	_, err = edcsClient.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
+		ApplicationIds: registeredApplicationIDs,
+		DeviceId:       registeredEndDeviceID,
+	}, authorizedCallOpt)
+	a.So(errors.IsInvalidArgument(err), should.BeTrue)
+
+	_, err = edcsClient.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
+		ApplicationIds: registeredApplicationIDs,
+		DeviceId:       registeredEndDeviceID,
+		JoinEui:        registeredJoinEUI.Bytes(),
+		DevEui:         registeredDevEUI.Bytes(),
+	}, unAuthorizedCallOpt)
+	a.So(errors.IsPermissionDenied(err), should.BeTrue)
+
 	_, err = edcsClient.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
 		ApplicationIds: registeredApplicationIDs,
 		DeviceId:       registeredEndDeviceID,

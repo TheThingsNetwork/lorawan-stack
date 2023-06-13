@@ -156,35 +156,18 @@ func (edcs *endDeviceClaimingServer) GetClaimStatus(
 	ctx context.Context,
 	in *ttnpb.EndDeviceIdentifiers,
 ) (*ttnpb.GetClaimStatusResponse, error) {
+	if in.DevEui == nil || in.JoinEui == nil {
+		return nil, errNoEUI.New()
+	}
 	if err := rights.RequireApplication(ctx, in.GetApplicationIds(),
-		ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+		ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
 	); err != nil {
 		return nil, err
 	}
-	if err := in.ValidateContext(ctx); err != nil {
-		return nil, err
-	}
-
-	// Get the device from the Entity Registry.
-	conn, err := edcs.DCS.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
-	if err != nil {
-		return nil, err
-	}
-	reg := ttnpb.NewEndDeviceRegistryClient(conn)
-
-	dev, err := reg.Get(ctx, &ttnpb.GetEndDeviceRequest{
-		EndDeviceIds: in,
-	})
-	if err != nil {
-		return nil, err
-	}
-	if dev.GetIds().DevEui == nil || dev.GetIds().JoinEui == nil {
-		return nil, errNoEUI.New()
-	}
-	joinEUI := types.MustEUI64(dev.GetIds().JoinEui).OrZero()
+	joinEUI := types.MustEUI64(in.JoinEui).OrZero()
 	claimer := edcs.DCS.endDeviceClaimingUpstream.JoinEUIClaimer(ctx, joinEUI)
 	if claimer == nil {
 		return nil, errClaimingNotSupported.WithAttributes("eui", joinEUI)
 	}
-	return claimer.GetClaimStatus(ctx, dev.GetIds())
+	return claimer.GetClaimStatus(ctx, in)
 }
