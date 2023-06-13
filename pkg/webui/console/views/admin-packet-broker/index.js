@@ -17,14 +17,13 @@ import { Routes, Route } from 'react-router-dom'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import { Breadcrumbs } from '@ttn-lw/components/breadcrumbs/breadcrumbs'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
+import ValidateRouteParam from '@ttn-lw/lib/components/validate-route-param'
 
 import Require from '@console/lib/components/require'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
 import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
 
 import { mayConfigurePacketBroker } from '@console/lib/feature-checks'
@@ -34,7 +33,7 @@ import { getPacketBrokerInfo } from '@console/store/actions/packet-broker'
 import PacketBroker from './admin-packet-broker'
 import NetworkRoutingPolicy from './network-routing-policy'
 
-const PacketBrokerRouter = ({ match }) => {
+const PacketBrokerRouter = () => {
   useBreadcrumbs(
     'admin-panel.packet-broker',
     <Breadcrumb path={'/admin-panel/packet-broker'} content={sharedMessages.packetBroker} />,
@@ -43,22 +42,21 @@ const PacketBrokerRouter = ({ match }) => {
   return (
     <Require featureCheck={mayConfigurePacketBroker} otherwise={{ redirect: '/' }}>
       <RequireRequest requestAction={getPacketBrokerInfo()}>
-        <Breadcrumbs />
         <Routes>
           <Route
-            exact
-            path={`${match.path}/networks/:netId([0-9]+)/:tenantId${pathIdRegexp}?`}
-            component={NetworkRoutingPolicy}
+            path="networks/:netId/:tenantId?"
+            element={
+              <ValidateRouteParam
+                check={{ tenantId: pathIdRegexp, netId: /^\d+$/ }}
+                Component={NetworkRoutingPolicy}
+              />
+            }
           />
-          <Route path={`${match.path}`} component={PacketBroker} />
+          <Route path="*" Component={PacketBroker} />
         </Routes>
       </RequireRequest>
     </Require>
   )
-}
-
-PacketBrokerRouter.propTypes = {
-  match: PropTypes.match.isRequired,
 }
 
 export default PacketBrokerRouter

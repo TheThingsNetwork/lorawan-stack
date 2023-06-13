@@ -15,7 +15,7 @@
 import React, { useCallback, useState } from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 import { useSelector, useDispatch } from 'react-redux'
-import { Routes as RouteSwitch, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import classnames from 'classnames'
 
 import PacketBrokerLogo from '@assets/misc/packet-broker.svg'
@@ -23,7 +23,7 @@ import PacketBrokerLogo from '@assets/misc/packet-broker.svg'
 import Link from '@ttn-lw/components/link'
 import PageTitle from '@ttn-lw/components/page-title'
 import Icon from '@ttn-lw/components/icon'
-import Routes from '@ttn-lw/components/switch'
+import Switch from '@ttn-lw/components/switch'
 import Tabs from '@ttn-lw/components/tabs'
 import PortalledModal from '@ttn-lw/components/modal/portalled'
 import Notification from '@ttn-lw/components/notification'
@@ -31,12 +31,11 @@ import ErrorNotification from '@ttn-lw/components/error-notification'
 
 import Message from '@ttn-lw/lib/components/message'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
-import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
+import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 
 import SubViewErrorComponent from '@console/views/sub-view-error'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { isNotEnabledError } from '@console/lib/packet-broker/utils'
 
@@ -63,7 +62,7 @@ import m from './messages'
 
 import style from './admin-packet-broker.styl'
 
-const PacketBroker = ({ match }) => {
+const PacketBroker = () => {
   const [activeTab, setActiveTab] = useState('default-routing-policy')
   const [deregisterModalVisible, setDeregisterModalVisible] = useState(false)
   const registered = useSelector(selectRegistered)
@@ -74,7 +73,6 @@ const PacketBroker = ({ match }) => {
   const info = useSelector(selectInfo)
   const infoError = useSelector(selectInfoError)
   const dispatch = useDispatch()
-  const { url } = match
   const showError = Boolean(infoError) && !isNotEnabledError(infoError)
 
   const handleRegisterChange = useCallback(() => {
@@ -113,18 +111,20 @@ const PacketBroker = ({ match }) => {
     [dispatch, setUnlistModalVisible],
   )
 
-  const tabs = React.useMemo(
-    () => [
-      { title: m.defaultRoutingPolicy, link: url, name: 'default' },
-      {
-        title: m.defaultGatewayVisibility,
-        link: `${url}/default-gateway-visibility`,
-        name: 'default-gateway-visibility',
-      },
-      { title: sharedMessages.networks, link: `${url}/networks`, name: 'networks', exact: false },
-    ],
-    [url],
-  )
+  const tabs = [
+    { title: m.defaultRoutingPolicy, link: '/admin/packet-broker', name: 'default' },
+    {
+      title: m.defaultGatewayVisibility,
+      link: '/admin/packet-broker/default-gateway-visibility',
+      name: 'default-gateway-visibility',
+    },
+    {
+      title: sharedMessages.networks,
+      link: '/admin/packet-broker/networks',
+      name: 'networks',
+      exact: false,
+    },
+  ]
 
   const boldMessage = { b: msg => <b>{msg}</b> }
 
@@ -169,7 +169,7 @@ const PacketBroker = ({ match }) => {
                     })}
                   >
                     <Message content={m.registerNetwork} component="span" />
-                    <Routes
+                    <Switch
                       onChange={handleRegisterChange}
                       checked={registered}
                       className={style.toggle}
@@ -256,7 +256,7 @@ const PacketBroker = ({ match }) => {
                 <Col md={4}>
                   <label className={style.toggleContainer}>
                     <Message content={m.listNetwork} component="span" />
-                    <Routes
+                    <Switch
                       onChange={handleListedChange}
                       checked={listed}
                       className={style.toggle}
@@ -292,16 +292,15 @@ const PacketBroker = ({ match }) => {
                 ]}
                 errorRenderFunction={SubViewErrorComponent}
               >
-                <RouteSwitch>
-                  <Route path={url} exact component={DefaultRoutingPolicyView} />
+                <Routes>
+                  <Route index Component={DefaultRoutingPolicyView} />
                   <Route
-                    path={`${url}/default-gateway-visibility`}
-                    exact
-                    component={DefaultGatewayVisibilityView}
+                    path="default-gateway-visibility"
+                    Component={DefaultGatewayVisibilityView}
                   />
-                  <Route path={`${url}/networks`} exact component={NetworkRoutingPoliciesView} />
-                  <NotFoundRoute />
-                </RouteSwitch>
+                  <Route path="networks/*" Component={NetworkRoutingPoliciesView} />
+                  <Route path="*" component={GenericNotFound} />
+                </Routes>
               </RequireRequest>
             </Col>
           </>
@@ -309,10 +308,6 @@ const PacketBroker = ({ match }) => {
       </Row>
     </Container>
   )
-}
-
-PacketBroker.propTypes = {
-  match: PropTypes.match.isRequired,
 }
 
 export default PacketBroker

@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { ConnectedRouter } from 'connected-react-router'
-import { Route, Routes, Redirect } from 'react-router-dom'
+import { Route, Routes, BrowserRouter } from 'react-router-dom'
 import classnames from 'classnames'
 import bind from 'autobind-decorator'
+import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 
 import { ToastContainer } from '@ttn-lw/components/toast'
 import sidebarStyle from '@ttn-lw/components/navigation/side/side.styl'
@@ -55,7 +55,6 @@ import {
 
 import style from './app.styl'
 
-const GenericNotFound = () => <FullViewErrorInner error={{ statusCode: 404 }} />
 const errorRender = error => <FullViewError error={error} header={<Header />} />
 
 @withEnv
@@ -123,18 +122,15 @@ class ConsoleApp extends React.PureComponent {
       rights,
       isAdmin,
       history,
-      history: {
-        location: { pathname },
-      },
       env: { siteTitle, pageData, siteName },
       status,
     } = this.props
 
     if (pageData && pageData.error) {
       return (
-        <ConnectedRouter history={history}>
+        <BrowserRouter history={history} basename="/console">
           <FullViewError error={pageData.error} header={<Header />} />
-        </ConnectedRouter>
+        </BrowserRouter>
       )
     }
 
@@ -142,7 +138,7 @@ class ConsoleApp extends React.PureComponent {
       <React.Fragment>
         {status.isLoginRequired && <LogBackInModal />}
         <ToastContainer />
-        <ConnectedRouter history={history}>
+        <BrowserRouter history={history} basename="/console">
           <ScrollToTop />
           <ErrorView errorRender={errorRender}>
             <div className={style.app}>
@@ -167,14 +163,13 @@ class ConsoleApp extends React.PureComponent {
                     <div className={classnames('breadcrumbs', style.desktopBreadcrumbs)} />
                     <div className={style.stage} id="stage">
                       <Routes>
-                        <Redirect from="/:url*(/+)" to={pathname.slice(0, -1)} />
-                        <Route exact path="/" component={Overview} />
-                        <Route path="/applications" component={Applications} />
-                        <Route path="/gateways" component={Gateways} />
-                        <Route path="/organizations" component={Organizations} />
-                        <Route path="/admin-panel" component={AdminPanel} />
-                        <Route path="/user" component={User} />
-                        <Route component={GenericNotFound} />
+                        <Route index Component={Overview} />
+                        <Route path="/applications/*" Component={Applications} />
+                        <Route path="/gateways/*" Component={Gateways} />
+                        <Route path="/organizations/*" Component={Organizations} />
+                        <Route path="/admin-panel/*" component={AdminPanel} />
+                        <Route path="/user/" Component={User} />
+                        <Route path="*" Component={GenericNotFound} />
                       </Routes>
                     </div>
                   </div>
@@ -183,7 +178,7 @@ class ConsoleApp extends React.PureComponent {
               <Footer className={style.footer} />
             </div>
           </ErrorView>
-        </ConnectedRouter>
+        </BrowserRouter>
       </React.Fragment>
     )
   }

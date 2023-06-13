@@ -16,31 +16,26 @@ import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
-import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
+import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 
-import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+import Require from '@console/lib/components/require'
 
 import UserManagement from '@console/views/admin-user-management'
 import PacketBroker from '@console/views/admin-packet-broker'
 
 import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
-import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { mayPerformAdminActions } from '@console/lib/feature-checks'
 
-const AdminView = ({ match }) => (
-  <React.Fragment>
+const AdminView = () => (
+  <Require featureCheck={mayPerformAdminActions} otherwise={{ redirect: '/' }}>
     <IntlHelmet titleTemplate={`%s - Admin Configurations - ${selectApplicationSiteName()}`} />
     <Routes>
-      <Route path={`${match.path}/user-management`} component={UserManagement} />
-      <Route path={`${match.path}/packet-broker`} component={PacketBroker} />
-      <NotFoundRoute />
+      <Route path="user-management/*" Component={UserManagement} />
+      <Route path="packet-broker/*" Component={PacketBroker} />
+      <Route path="*" Component={GenericNotFound} />
     </Routes>
-  </React.Fragment>
+  </Require>
 )
 
-AdminView.propTypes = {
-  match: PropTypes.match.isRequired,
-}
-
-export default withFeatureRequirement(mayPerformAdminActions, { redirect: '/' })(AdminView)
+export default AdminView

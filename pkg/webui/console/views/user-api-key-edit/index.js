@@ -12,9 +12,59 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import UserApiKeyEdit from './user-api-keys-edit'
-import connect from './connect'
+import React from 'react'
+import { Container, Col, Row } from 'react-grid-system'
+import { useSelector } from 'react-redux'
+import { useParams } from 'react-router-dom'
 
-const ConnectedUserApiKeyEdit = connect(UserApiKeyEdit)
+import { USER } from '@console/constants/entities'
 
-export { ConnectedUserApiKeyEdit as default, UserApiKeyEdit }
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import PageTitle from '@ttn-lw/components/page-title'
+
+import RequireRequest from '@ttn-lw/lib/components/require-request'
+
+import { ApiKeyEditForm } from '@console/containers/api-key-form'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { getUsersRightsList } from '@console/store/actions/users'
+import { getApiKey } from '@console/store/actions/api-keys'
+
+import { selectUserId } from '@account/store/selectors/user'
+
+const UserApiKeyEditInner = () => {
+  const userId = useSelector(selectUserId)
+  const { apiKeyId } = useParams()
+
+  useBreadcrumbs(
+    'usr.single.api-keys.add',
+    <Breadcrumb path={`/users/api-keys/edit/${apiKeyId}`} content={sharedMessages.add} />,
+  )
+
+  return (
+    <Container>
+      <PageTitle title={sharedMessages.addApiKey} />
+      <Row>
+        <Col lg={8} md={12}>
+          <ApiKeyEditForm entity={USER} entityId={userId} />
+        </Col>
+      </Row>
+    </Container>
+  )
+}
+
+const UserApiKeyEdit = () => {
+  const userId = useSelector(selectUserId)
+  const { apiKeyId } = useParams()
+  return (
+    <RequireRequest
+      requestAction={[getUsersRightsList(userId), getApiKey('users', userId, apiKeyId)]}
+    >
+      <UserApiKeyEditInner />
+    </RequireRequest>
+  )
+}
+
+export default UserApiKeyEdit

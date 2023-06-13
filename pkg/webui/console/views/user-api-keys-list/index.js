@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,64 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import UserApiKeysList from './user-api-keys-list'
-import connect from './connect'
+import React from 'react'
+import { Container, Row, Col } from 'react-grid-system'
+import { useSelector } from 'react-redux'
 
-const ConnectedUserApiKeysList = connect(UserApiKeysList)
+import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
 
-export { ConnectedUserApiKeysList as default, UserApiKeysList }
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+
+import ApiKeysTable from '@console/containers/api-keys-table'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { getApiKeysList } from '@console/store/actions/api-keys'
+
+import {
+  selectApiKeys,
+  selectApiKeysTotalCount,
+  selectApiKeysFetching,
+  selectApiKeysError,
+} from '@console/store/selectors/api-keys'
+import { selectUserId } from '@account/store/selectors/user'
+
+const UserApiKeysList = () => {
+  const userId = useSelector(selectUserId)
+
+  const baseDataSelector = React.useCallback(
+    state => {
+      const id = { id: userId }
+
+      return {
+        keys: selectApiKeys(state, id),
+        totalCount: selectApiKeysTotalCount(state, id),
+        fetching: selectApiKeysFetching(state),
+        error: selectApiKeysError(state),
+      }
+    },
+    [userId],
+  )
+
+  const getApiKeys = React.useCallback(
+    filters => getApiKeysList('users', userId, filters),
+    [userId],
+  )
+
+  return (
+    <Container>
+      <Row>
+        <IntlHelmet title={sharedMessages.personalApiKeys} />
+        <Col>
+          <ApiKeysTable
+            pageSize={PAGE_SIZES.REGULAR}
+            baseDataSelector={baseDataSelector}
+            getItemsAction={getApiKeys}
+          />
+        </Col>
+      </Row>
+    </Container>
+  )
+}
+
+export default UserApiKeysList
