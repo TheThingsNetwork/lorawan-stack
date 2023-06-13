@@ -33,7 +33,7 @@ const ENTITY = 'users'
 const selectUserStore = state => state.users
 
 // User.
-export const selectUserEntitiesStore = state => selectUserStore(state).entities
+export const selectUserEntitiesStore = state => selectUserStore(state)?.entities || {}
 export const selectUserById = (state, id) => selectUserEntitiesStore(state)[id]
 export const selectSelectedUserId = state => selectUserStore(state).selectedUser
 export const selectSelectedUser = state => selectUserById(state, selectSelectedUserId(state))

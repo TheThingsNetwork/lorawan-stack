@@ -74,6 +74,11 @@ export const selectApplications = state =>
 export const selectApplicationsTotalCount = state => selectAppsTotalCount(state)
 export const selectApplicationsFetching = state => selectAppsFetching(state)
 export const selectApplicationsError = state => selectAppsError(state)
+export const selectApplicationsWithDeviceCounts = state =>
+  selectApplications(state).map(app => ({
+    ...app,
+    _devices: selectApplicationDeviceCount(state, app.ids.application_id),
+  }))
 
 // Events.
 export const selectApplicationEvents = createEventsSelector(ENTITY)

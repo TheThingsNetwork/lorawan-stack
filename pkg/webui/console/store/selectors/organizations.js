@@ -18,6 +18,7 @@ import {
 } from '@ttn-lw/lib/store/selectors/pagination'
 import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
 import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
+import { getOrganizationId } from '@ttn-lw/lib/selectors/id'
 
 import {
   GET_ORGS_LIST_BASE,
@@ -64,6 +65,11 @@ export const selectOrganizations = state =>
 export const selectOrganizationsTotalCount = state => selectOrgsTotalCount(state)
 export const selectOrganizationsFetching = state => selectOrgsFetching(state)
 export const selectOrganizationsError = state => selectOrgsError(state)
+export const selectOrganizationsWithCollaboratorCount = state =>
+  selectOrganizations(state).map(org => ({
+    ...org,
+    _collaboratorCount: selectOrganizationCollaboratorCount(state, getOrganizationId(org)),
+  }))
 
 // Rights.
 export const selectOrganizationRights = createRightsSelector(ENTITY)
