@@ -7974,35 +7974,28 @@
             "type": "string"
           },
           {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "application_ids": {
-                  "type": "object"
-                },
-                "dev_eui": {
-                  "type": "string",
-                  "format": "string",
-                  "example": "70B3D57ED000ABCD",
-                  "description": "The LoRaWAN DevEUI."
-                },
-                "join_eui": {
-                  "type": "string",
-                  "format": "string",
-                  "example": "70B3D57ED000ABCD",
-                  "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices)."
-                },
-                "dev_addr": {
-                  "type": "string",
-                  "format": "string",
-                  "example": "2600ABCD",
-                  "description": "The LoRaWAN DevAddr."
-                }
-              }
-            }
+            "name": "dev_eui",
+            "description": "The LoRaWAN DevEUI.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "join_eui",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "dev_addr",
+            "description": "The LoRaWAN DevAddr.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
           }
         ],
         "tags": [
