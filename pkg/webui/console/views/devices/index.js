@@ -13,22 +13,22 @@
 // limitations under the License.
 
 import React from 'react'
-import { Routes, Route } from 'react-router-dom'
-import { connect } from 'react-redux'
+import { Route, Routes } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
-import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
+import ValidateRouteParam from '@ttn-lw/lib/components/validate-route-param'
+import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 
-import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+import Require from '@console/lib/components/require'
 
 import Device from '@console/views/device'
 import DeviceImport from '@console/views/device-import'
 import DeviceAdd from '@console/views/device-add'
 import DeviceList from '@console/views/device-list'
 
-import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
 
@@ -36,28 +36,31 @@ import { mayViewApplicationDevices } from '@console/lib/feature-checks'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
-@connect(state => ({ appId: selectSelectedApplicationId(state) }))
-@withFeatureRequirement(mayViewApplicationDevices, {
-  redirect: ({ appId }) => `/applications/${appId}`,
-})
-@withBreadcrumb('devices', ({ appId }) => (
-  <Breadcrumb path={`/applications/${appId}/devices`} content={sharedMessages.devices} />
-))
-export default class Devices extends React.Component {
-  static propTypes = {
-    match: PropTypes.match.isRequired,
-  }
+const Devices = () => {
+  const appId = useSelector(selectSelectedApplicationId)
 
-  render() {
-    const { path } = this.props.match
-    return (
+  useBreadcrumbs(
+    'devices',
+    <Breadcrumb path={`/applications/${appId}/devices`} content={sharedMessages.devices} />,
+  )
+
+  return (
+    <Require
+      featureCheck={mayViewApplicationDevices}
+      otherwise={{ redirect: `/applications/${appId}` }}
+    >
       <Routes>
-        <Route path={`${path}/add`} component={DeviceAdd} />
-        <Route path={`${path}/import`} component={DeviceImport} />
-        <Route path={`${path}/:devId${pathIdRegexp}`} component={Device} sensitive />
-        <Route path={`${path}`} component={DeviceList} exact />
-        <NotFoundRoute />
+        <Route index Component={DeviceList} />
+        <Route path="add" Component={DeviceAdd} />
+        <Route path="import" Component={DeviceImport} />
+        <Route
+          path=":devId/*"
+          element={<ValidateRouteParam check={{ devId: pathIdRegexp }} Component={Device} />}
+        />
+        <Route path="*" element={<GenericNotFound />} />
       </Routes>
-    )
-  }
+    </Require>
+  )
 }
+
+export default Devices

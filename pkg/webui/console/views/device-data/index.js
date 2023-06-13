@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,61 +13,54 @@
 // limitations under the License.
 
 import React from 'react'
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
+import { useParams } from 'react-router-dom'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
-import WithRootClass from '@ttn-lw/lib/components/with-root-class'
+import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+import WithRootClass from '@ttn-lw/lib/components/with-root-class'
 
 import DeviceEvents from '@console/containers/device-events'
 
 import appStyle from '@console/views/app/app.styl'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { selectSelectedDevice, selectSelectedDeviceId } from '@console/store/selectors/devices'
 
 import style from './device-data.styl'
 
-@connect(state => {
-  const device = selectSelectedDevice(state)
-  return {
-    device,
-    devId: selectSelectedDeviceId(state),
-    devIds: device && device.ids,
-  }
-})
-@withBreadcrumb('device.single.data', props => {
-  const { devId } = props
-  const { appId } = props.match.params
-  return (
+const Data = () => {
+  const { appId } = useParams()
+
+  const device = useSelector(selectSelectedDevice)
+  const devId = useSelector(selectSelectedDeviceId)
+
+  useBreadcrumbs(
+    'device.single.data',
     <Breadcrumb
       path={`/applications/${appId}/devices/${devId}/data`}
       content={sharedMessages.liveData}
-    />
+    />,
   )
-})
-export default class Data extends React.Component {
-  static propTypes = {
-    device: PropTypes.device.isRequired,
-    match: PropTypes.match.isRequired,
+
+  if (!device) {
+    return <GenericNotFound />
   }
 
-  render() {
-    const {
-      device: { ids },
-    } = this.props
+  const { ids } = device
 
-    return (
-      <WithRootClass className={appStyle.stageFlex} id="stage">
-        <div className={style.overflowContainer}>
-          <IntlHelmet hideHeading title={sharedMessages.liveData} />
-          <DeviceEvents devIds={ids} />
-        </div>
-      </WithRootClass>
-    )
-  }
+  return (
+    <WithRootClass className={appStyle.stageFlex} id="stage">
+      <div className={style.overflowContainer}>
+        <IntlHelmet hideHeading title={sharedMessages.liveData} />
+        <DeviceEvents devIds={ids} />
+      </div>
+    </WithRootClass>
+  )
 }
+
+export default Data

@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,65 +12,54 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
+import React from 'react'
+import { useSelector } from 'react-redux'
 import { Routes, Route, Navigate } from 'react-router-dom'
 
-import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import Tab from '@ttn-lw/components/tabs'
 
-import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
+import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 
-import DeviceUplinkPayloadFormatters from '@console/containers/device-payload-formatters/uplink'
 import DeviceDownlinkPayloadFormatters from '@console/containers/device-payload-formatters/downlink'
+import DeviceUplinkPayloadFormatters from '@console/containers/device-payload-formatters/uplink'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 import { selectSelectedDeviceId } from '@console/store/selectors/devices'
 
 import style from './device-payload-formatters.styl'
 
-@connect(state => ({
-  appId: selectSelectedApplicationId(state),
-  devId: selectSelectedDeviceId(state),
-}))
-@withBreadcrumb('device.single.payload-formatters', props => {
-  const { appId, devId } = props
-  return (
+const DevicePayloadFormatters = () => {
+  const appId = useSelector(selectSelectedApplicationId)
+  const devId = useSelector(selectSelectedDeviceId)
+
+  useBreadcrumbs(
+    'device.single.payload-formatters',
     <Breadcrumb
       path={`/applications/${appId}/devices/${devId}/payload-formatters`}
       content={sharedMessages.payloadFormatters}
-    />
+    />,
   )
-})
-export default class DevicePayloadFormatters extends Component {
-  static propTypes = {
-    match: PropTypes.match.isRequired,
-  }
 
-  render() {
-    const {
-      match: { url },
-    } = this.props
+  const tabs = [
+    { title: sharedMessages.uplink, name: 'uplink', link: 'uplink' },
+    { title: sharedMessages.downlink, name: 'downlink', link: 'downlink' },
+  ]
 
-    const tabs = [
-      { title: sharedMessages.uplink, name: 'uplink', link: `${url}/uplink` },
-      { title: sharedMessages.downlink, name: 'downlink', link: `${url}/downlink` },
-    ]
-
-    return (
-      <div className={style.fullWidth}>
-        <Tab className={style.tabs} tabs={tabs} divider />
-        <Routes>
-          <Route path="*" element={<Navigate to={`${url}uplink`} replace />} />
-          <Route exact path={`${url}/uplink`} component={DeviceUplinkPayloadFormatters} />
-          <Route exact path={`${url}/downlink`} component={DeviceDownlinkPayloadFormatters} />
-          <NotFoundRoute />
-        </Routes>
-      </div>
-    )
-  }
+  return (
+    <div className={style.fullWidth}>
+      <Tab className={style.tabs} tabs={tabs} divider />
+      <Routes>
+        <Route path="uplink" Component={DeviceUplinkPayloadFormatters} />
+        <Route path="downlink" Component={DeviceDownlinkPayloadFormatters} />
+        <Route index element={<Navigate to="uplink" replace />} />
+        <Route path="*" element={<GenericNotFound />} />
+      </Routes>
+    </div>
+  )
 }
+
+export default DevicePayloadFormatters

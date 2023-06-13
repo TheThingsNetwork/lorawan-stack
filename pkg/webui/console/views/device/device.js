@@ -14,15 +14,15 @@
 
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { Routes, Route } from 'react-router-dom'
+import { useLocation, useParams, Routes, Route } from 'react-router-dom'
 import { Col, Row, Container } from 'react-grid-system'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import Tabs from '@ttn-lw/components/tabs'
 
+import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
-import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 
 import DeviceTitleSection from '@console/containers/device-title-section'
 
@@ -36,7 +36,6 @@ import DeviceOverview from '@console/views/device-overview'
 import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectApplicationSiteName, selectAsConfig } from '@ttn-lw/lib/selectors/env'
-import PropTypes from '@ttn-lw/lib/prop-types'
 
 import {
   mayScheduleDownlinks as mayScheduleDownlinksCheck,
@@ -49,8 +48,8 @@ import { selectSelectedApplicationId } from '@console/store/selectors/applicatio
 
 import style from './device.styl'
 
-const Device = props => {
-  const devId = props.match.params.devId
+const Device = () => {
+  const { devId } = useParams()
   const appId = useSelector(selectSelectedApplicationId)
   const device = useSelector(state => selectSelectedDevice(state))
 
@@ -61,9 +60,7 @@ const Device = props => {
   )
   const maySendUplink = useSelector(state => checkFromState(maySendUplinkCheck, state))
 
-  const {
-    location: { pathname },
-  } = props
+  const location = useLocation()
 
   const siteName = selectApplicationSiteName()
   const asConfig = selectAsConfig()
@@ -74,13 +71,12 @@ const Device = props => {
 
   const basePath = `/applications/${appId}/devices/${devId}`
 
-  // Prevent default redirect to uplink when tab is already open.
-  const payloadFormattersLink = pathname.startsWith(`${basePath}/payload-formatters`)
-    ? pathname
-    : `${basePath}/payload-formatters`
-  const messagingLink = pathname.startsWith(`${basePath}/messaging`)
-    ? pathname
-    : `${basePath}/messaging`
+  const payloadFormattersLink = location.pathname.startsWith(`${basePath}/payload-formatters`)
+    ? location.pathname
+    : 'payload-formatters'
+  const messagingLink = location.pathname.startsWith(`${basePath}/messaging`)
+    ? location.pathname
+    : 'messaging'
 
   useBreadcrumbs(
     'device.single',
@@ -127,23 +123,18 @@ const Device = props => {
         </Container>
       </div>
       <Routes>
-        <Route exact path={basePath} component={DeviceOverview} />
-        <Route exact path={`${basePath}/data`} component={DeviceData} />
-        {!hideMessaging && <Route path={`${basePath}/messaging`} component={DeviceMessaging} />}
-        <Route exact path={`${basePath}/location`} component={DeviceLocation} />
-        <Route exact path={`${basePath}/general-settings`} component={DeviceGeneralSettings} />
+        <Route index Component={DeviceOverview} />
+        <Route path="data" Component={DeviceData} />
+        {!hideMessaging && <Route path="messaging/*" Component={DeviceMessaging} />}
+        <Route path="location" Component={DeviceLocation} />
+        <Route path="general-settings" Component={DeviceGeneralSettings} />
         {!hidePayloadFormatters && (
-          <Route path={`${basePath}/payload-formatters`} component={DevicePayloadFormatters} />
+          <Route path="payload-formatters/*" Component={DevicePayloadFormatters} />
         )}
-        <NotFoundRoute />
+        <Route path="*" element={<GenericNotFound />} />
       </Routes>
     </>
   )
-}
-
-Device.propTypes = {
-  location: PropTypes.location.isRequired,
-  match: PropTypes.match.isRequired,
 }
 
 export default Device
