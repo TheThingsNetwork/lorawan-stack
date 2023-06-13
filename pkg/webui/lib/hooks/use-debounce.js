@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,10 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const hostname =
-  /^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9-]*[A-Za-z0-9])$/
-export const url = /^\b((http|https):\/\/?)[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|\/?))$/
-export const id = /^[a-z0-9](?:[-]?[a-z0-9]){2,}$/
-export const userId = /^[a-z0-9](?:[-]?[a-z0-9]){1,}$/
-export const pathId = /([a-z0-9-]{3,})/
-export const userPathId = /([a-z0-9-]{2,})/
+import { useEffect, useState } from 'react'
+
+const useDebounce = (value, delay = 350, sideEffects) => {
+  const [debouncedValue, setDebouncedValue] = useState(value)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedValue(value)
+      if (sideEffects) {
+        sideEffects()
+      }
+    }, delay)
+
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [value, delay, sideEffects])
+
+  return debouncedValue
+}
+
+export default useDebounce
