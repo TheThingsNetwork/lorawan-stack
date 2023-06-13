@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { Routes, Route, Redirect } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 
 import authRoutes from '@account/constants/auth-routes'
 
@@ -30,39 +30,42 @@ import FrontNotFound from '@account/views/front-not-found'
 import Validate from '@account/views/validate'
 
 import { selectApplicationRootPath } from '@ttn-lw/lib/selectors/env'
-import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './front.styl'
 
-const FrontView = ({ location }) => (
-  <div className={style.container}>
-    <section className={style.content}>
-      <Header />
-      <div className={style.main}>
-        <Routes>
-          <Route path="/login" component={Login} />
-          <Route path="/token-login" component={TokenLogin} />
-          <Route path="/register" component={CreateAccount} />
-          <Route path="/forgot-password" component={ForgotPassword} />
-          <Route path="/update-password" component={UpdatePassword} />
-          <Route path="/validate" component={Validate} />
-          <Redirect exact from="/" to="/login" />
-          {authRoutes.map(({ path, exact }) => (
-            <Route path={path} exact={exact} key={path}>
-              <Redirect to={`/login?n=${selectApplicationRootPath()}${location.pathname}`} />
-            </Route>
-          ))}
-          <Route component={FrontNotFound} />
-        </Routes>
-      </div>
-    </section>
-    <section className={style.visual} />
-    <Footer className={style.footer} transparent />
-  </div>
-)
+const FrontView = () => {
+  const location = useLocation()
 
-FrontView.propTypes = {
-  location: PropTypes.location.isRequired,
+  return (
+    <div className={style.container}>
+      <section className={style.content}>
+        <Header />
+        <div className={style.main}>
+          <Routes>
+            <Route path="/login" Component={Login} />
+            <Route path="/token-login" Component={TokenLogin} />
+            <Route path="/register" Component={CreateAccount} />
+            <Route path="/forgot-password" Component={ForgotPassword} />
+            <Route path="/update-password" Component={UpdatePassword} />
+            <Route path="/validate" Component={Validate} />
+            <Route index element={<Navigate to="/login" />} />
+            {authRoutes.map(({ path }) => (
+              <Route
+                path={path}
+                key={path}
+                element={
+                  <Navigate to={`/login?n=${selectApplicationRootPath()}${location.pathname}`} />
+                }
+              />
+            ))}
+            <Route Component={FrontNotFound} />
+          </Routes>
+        </div>
+      </section>
+      <section className={style.visual} />
+      <Footer className={style.footer} transparent />
+    </div>
+  )
 }
 
 export default FrontView

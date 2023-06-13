@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,11 +32,10 @@ const m = defineMessages({
 })
 
 const ProfileCard = () => {
-  const { userId, userName, profilePicture } = useSelector(state => ({
-    userId: selectUserId(state),
-    userName: selectUserName(state),
-    profilePicture: selectUserProfilePicture(state),
-  }))
+  const userId = useSelector(selectUserId)
+  const userName = useSelector(selectUserName)
+  const profilePicture = useSelector(selectUserProfilePicture)
+
   return (
     <section className={style.container} data-test-id="profile-card">
       <ProfilePicture profilePicture={profilePicture} className={style.profilePicture} />

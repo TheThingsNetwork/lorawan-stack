@@ -66,7 +66,7 @@ const Overview = () => {
           <Message
             content={m.accountAppInfoMessage}
             values={{
-              p: msg => <p>{msg}</p>,
+              p: msg => <p key={msg}>{msg}</p>,
               ul: msg => <ol key="list">{msg}</ol>,
               li: msg => <li>{msg}</li>,
             }}

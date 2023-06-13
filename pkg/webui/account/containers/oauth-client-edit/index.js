@@ -1,4 +1,4 @@
-// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,8 @@
 // limitations under the License.
 
 import React, { useState, useCallback } from 'react'
-import { connect } from 'react-redux'
-import { push, replace } from 'connected-react-router'
+import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
 
 import toast from '@ttn-lw/components/toast'
@@ -56,19 +56,18 @@ const checkChanged = (changed, values) => {
 }
 
 const ClientAdd = props => {
-  const {
-    userId,
-    isAdmin,
-    rights,
-    pseudoRights,
-    navigateToOAuthClient,
-    deleteOAuthClient,
-    onDeleteSuccess,
-    initialValues,
-    updateOauthClient,
-  } = props
+  const { userId, isAdmin, rights, pseudoRights, initialValues } = props
 
   const [error, setError] = useState()
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+
+  const navigateToOAuthClient = useCallback(
+    clientId => {
+      navigate(`/oauth-clients/${clientId}`)
+    },
+    [navigate],
+  )
   const handleSubmit = useCallback(
     async (values, resetForm, setSubmitting) => {
       const { client_id } = values.ids
@@ -83,7 +82,7 @@ const ClientAdd = props => {
       const { owner_id, ...newClient } = update
 
       try {
-        await updateOauthClient(client_id, newClient)
+        await dispatch(attachPromise(updateClient(client_id, newClient)))
         resetForm({ values })
         toast({
           title: client_id,
@@ -100,7 +99,7 @@ const ClientAdd = props => {
         })
       }
     },
-    [initialValues, updateOauthClient],
+    [dispatch, initialValues],
   )
 
   const handleDelete = useCallback(
@@ -108,8 +107,8 @@ const ClientAdd = props => {
       setError(undefined)
 
       try {
-        await deleteOAuthClient(clientId, shouldPurge)
-        onDeleteSuccess()
+        await dispatch(attachPromise(deleteClient(clientId, shouldPurge)))
+        navigate('/oauth-clients')
         toast({
           title: clientId,
           message: m.deleteSuccess,
@@ -124,7 +123,7 @@ const ClientAdd = props => {
         })
       }
     },
-    [deleteOAuthClient, onDeleteSuccess],
+    [dispatch, navigate],
   )
 
   return (
@@ -133,7 +132,6 @@ const ClientAdd = props => {
       initialValues={initialValues}
       onSubmit={handleSubmit}
       onDelete={handleDelete}
-      onDeleteSuccess={onDeleteSuccess}
       navigateToOAuthClient={navigateToOAuthClient}
       error={error}
       userId={userId}
@@ -145,16 +143,12 @@ const ClientAdd = props => {
 }
 
 ClientAdd.propTypes = {
-  deleteOAuthClient: PropTypes.func.isRequired,
   initialValues: PropTypes.shape({
     grants: PropTypes.arrayOf(PropTypes.string),
   }).isRequired,
   isAdmin: PropTypes.bool.isRequired,
-  navigateToOAuthClient: PropTypes.func.isRequired,
-  onDeleteSuccess: PropTypes.func.isRequired,
   pseudoRights: PropTypes.rights.isRequired,
   rights: PropTypes.rights,
-  updateOauthClient: PropTypes.func.isRequired,
   userId: PropTypes.string.isRequired,
 }
 
@@ -162,9 +156,4 @@ ClientAdd.defaultProps = {
   rights: undefined,
 }
 
-export default connect(null, dispatch => ({
-  navigateToOAuthClient: clientId => dispatch(push(`/oauth-clients/${clientId}`)),
-  deleteOAuthClient: (id, shouldPurge) => dispatch(attachPromise(deleteClient(id, shouldPurge))),
-  onDeleteSuccess: () => dispatch(replace(`/oauth-clients`)),
-  updateOauthClient: (id, patch) => dispatch(attachPromise(updateClient(id, patch))),
-}))(ClientAdd)
+export default ClientAdd

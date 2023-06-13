@@ -1,4 +1,4 @@
-// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,9 +13,10 @@
 // limitations under the License.
 
 import React from 'react'
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
 import { Col, Row, Container } from 'react-grid-system'
+import { useParams } from 'react-router-dom'
 
 import applicationIcon from '@assets/misc/application.svg'
 
@@ -23,10 +24,10 @@ import DataSheet from '@ttn-lw/components/data-sheet'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import DateTime from '@ttn-lw/lib/components/date-time'
+import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import EntityTitleSection from '@console/components/entity-title-section'
 
-import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import capitalizeMessage from '@ttn-lw/lib/capitalize-message'
 import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
@@ -44,14 +45,15 @@ import style from './oauth-client-overview.styl'
 
 const { Content } = EntityTitleSection
 
-const OAuthClientOverview = props => {
-  const {
-    oauthClientId,
-    oauthClient: { created_at, updated_at, state, state_description, secret, name },
-    fetching,
-    includeStateDescription,
-    collaboratorsTotalCount,
-  } = props
+const OAuthClientOverviewInner = () => {
+  const oauthClient = useSelector(selectSelectedClient)
+  const oauthClientId = oauthClient.ids.client_id || oauthClient.name
+  const { created_at, updated_at, state, state_description, secret, name } = oauthClient
+  const rights = useSelector(selectClientRights)
+  const includeStateDescription = rights.includes('RIGHT_CLIENT_ALL')
+  const collaboratorsTotalCount = useSelector(selectCollaboratorsTotalCount)
+  const fetching = useSelector(selectClientFetching)
+
   const { formatMessage } = useIntl()
 
   const sheetData = [
@@ -132,49 +134,14 @@ const OAuthClientOverview = props => {
   )
 }
 
-OAuthClientOverview.propTypes = {
-  collaboratorsTotalCount: PropTypes.number,
-  fetching: PropTypes.bool.isRequired,
-  includeStateDescription: PropTypes.bool.isRequired,
-  oauthClient: PropTypes.shape({
-    created_at: PropTypes.string,
-    updated_at: PropTypes.string,
-    state: PropTypes.string,
-    state_description: PropTypes.string,
-    secret: PropTypes.string,
-    name: PropTypes.string,
-  }).isRequired,
-  oauthClientId: PropTypes.string.isRequired,
+const OAuthClientOverview = () => {
+  const { clientId } = useParams()
+
+  return (
+    <RequireRequest requestAction={getCollaboratorsList('client', clientId)}>
+      <OAuthClientOverviewInner />
+    </RequireRequest>
+  )
 }
 
-OAuthClientOverview.defaultProps = {
-  collaboratorsTotalCount: undefined,
-}
-
-export default connect(
-  state => {
-    const oauthClient = selectSelectedClient(state)
-    const oauthClientId = oauthClient.ids.client_id || oauthClient.name
-    const rights = selectClientRights(state)
-    const includeStateDescription = rights.includes('RIGHT_CLIENT_ALL')
-
-    return {
-      includeStateDescription,
-      oauthClientId,
-      oauthClient,
-      fetching: selectClientFetching(state),
-      collaboratorsTotalCount: selectCollaboratorsTotalCount(state),
-    }
-  },
-  dispatch => ({
-    loadData: oauthClientId => {
-      dispatch(getCollaboratorsList('client', oauthClientId))
-    },
-  }),
-  (stateProps, dispatchProps, ownProps) => ({
-    ...stateProps,
-    ...dispatchProps,
-    ...ownProps,
-    loadData: id => dispatchProps.loadData(id),
-  }),
-)(OAuthClientOverview)
+export default OAuthClientOverview

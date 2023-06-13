@@ -14,7 +14,7 @@
 
 import React from 'react'
 import { Container, Row, Col } from 'react-grid-system'
-import { connect } from 'react-redux'
+import { useParams } from 'react-router-dom'
 
 import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
 
@@ -26,12 +26,9 @@ import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import CollaboratorsTable from '@account/containers/collaborators-table'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
 
-import { selectSelectedClientId } from '@account/store/selectors/clients'
-
-const OAuthClientCollaboratorsList = props => {
-  const { clientId } = props
+const OAuthClientCollaboratorsList = () => {
+  const { clientId } = useParams()
 
   useBreadcrumbs(
     'clients.single.collaborators',
@@ -53,10 +50,4 @@ const OAuthClientCollaboratorsList = props => {
   )
 }
 
-OAuthClientCollaboratorsList.propTypes = {
-  clientId: PropTypes.string.isRequired,
-}
-
-export default connect(state => ({
-  clientId: selectSelectedClientId(state),
-}))(OAuthClientCollaboratorsList)
+export default OAuthClientCollaboratorsList
