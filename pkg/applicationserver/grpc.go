@@ -105,6 +105,9 @@ func (as *ApplicationServer) DeleteLink(ctx context.Context, ids *ttnpb.Applicat
 	if err != nil {
 		return nil, err
 	}
+	if err := as.appPkgRegistry.ClearDefaultAssociations(ctx, ids); err != nil {
+		return nil, err
+	}
 	return ttnpb.Empty, nil
 }
 

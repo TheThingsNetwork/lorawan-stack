@@ -98,8 +98,8 @@ func TestAuthentication(t *testing.T) {
 	redisClient, flush := test.NewRedis(ctx, "applicationserver_test")
 	defer flush()
 	defer redisClient.Close()
-	apRegistry := &redis.ApplicationPackagesRegistry{Redis: redisClient, LockTTL: 10 * time.Second}
-	if err := apRegistry.Init(ctx); !a.So(err, should.BeNil) {
+	apRegistry, err := redis.NewApplicationPackagesRegistry(ctx, redisClient, 10*time.Second)
+	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 	srv, err := packages.New(ctx, as, apRegistry, map[string]packages.ApplicationPackageHandler{}, 1, 10*time.Second)
@@ -180,8 +180,8 @@ func TestAssociations(t *testing.T) {
 	redisClient, flush := test.NewRedis(ctx, "applicationserver_test")
 	defer flush()
 	defer redisClient.Close()
-	apRegistry := &redis.ApplicationPackagesRegistry{Redis: redisClient, LockTTL: 10 * time.Second}
-	if err := apRegistry.Init(ctx); !a.So(err, should.BeNil) {
+	apRegistry, err := redis.NewApplicationPackagesRegistry(ctx, redisClient, 10*time.Second)
+	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 	handleUpCh := make(chan *handleUpRequest, 4)

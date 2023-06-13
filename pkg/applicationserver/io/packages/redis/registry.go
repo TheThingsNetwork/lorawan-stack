@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
@@ -66,6 +67,22 @@ func applyDefaultAssociationFieldMask(dst, src *ttnpb.ApplicationPackageDefaultA
 type ApplicationPackagesRegistry struct {
 	Redis   *ttnredis.Client
 	LockTTL time.Duration
+}
+
+// NewApplicationPackagesRegistry creates, initializes and returns a new ApplicationPackagesRegistry.
+func NewApplicationPackagesRegistry(
+	ctx context.Context,
+	cl *ttnredis.Client,
+	lockTTL time.Duration,
+) (packages.Registry, error) {
+	reg := &ApplicationPackagesRegistry{
+		Redis:   cl,
+		LockTTL: lockTTL,
+	}
+	if err := reg.Init(ctx); err != nil {
+		return nil, err
+	}
+	return reg, nil
 }
 
 // Init initializes the ApplicationPackagesRegistry.

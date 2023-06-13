@@ -370,11 +370,12 @@ var startCommand = &cobra.Command{
 				return shared.ErrInitializeApplicationServer.WithCause(err)
 			}
 			config.AS.PubSub.Registry = pubsubRegistry
-			applicationPackagesRegistry := &asioapredis.ApplicationPackagesRegistry{
-				Redis:   redis.New(config.Redis.WithNamespace("as", "io", "applicationpackages")),
-				LockTTL: defaultLockTTL,
-			}
-			if err := applicationPackagesRegistry.Init(ctx); err != nil {
+			applicationPackagesRegistry, err := asioapredis.NewApplicationPackagesRegistry(
+				ctx,
+				redis.New(config.Redis.WithNamespace("as", "io", "applicationpackages")),
+				defaultLockTTL,
+			)
+			if err != nil {
 				return shared.ErrInitializeApplicationServer.WithCause(err)
 			}
 			config.AS.Packages.Registry = applicationPackagesRegistry

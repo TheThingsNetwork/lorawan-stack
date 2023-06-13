@@ -81,6 +81,7 @@ type ApplicationServer struct {
 	webhookTemplates       ioweb.TemplateStore
 	pubsub                 *pubsub.PubSub
 	appPackages            packages.Server
+	appPkgRegistry         packages.Registry
 	deviceLastSeenProvider lastseen.LastSeenProvider
 
 	clusterDistributor distribution.Distributor
@@ -152,6 +153,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		config:           conf,
 		linkRegistry:     conf.Links,
 		deviceRegistry:   wrapEndDeviceRegistryWithReplacedFields(conf.Devices, replacedEndDeviceFields...),
+		appPkgRegistry:   conf.Packages.Registry,
 		locationRegistry: conf.EndDeviceMetadataStorage.Location.Registry,
 		formatters:       make(messageprocessors.MapPayloadProcessor),
 		clusterDistributor: distribution.NewPubSubDistributor(

@@ -3347,11 +3347,10 @@ func TestApplicationServerCleanup(t *testing.T) {
 	applicationPackagesRedisClient, applicationPackagesFlush := test.NewRedis(ctx, "applicationserver_test", "applicationpackages")
 	defer applicationPackagesFlush()
 	defer applicationPackagesRedisClient.Close()
-	applicationPackagesRegistry := &asioapredis.ApplicationPackagesRegistry{
-		Redis:   applicationPackagesRedisClient,
-		LockTTL: test.Delay << 10,
-	}
-	if err := applicationPackagesRegistry.Init(ctx); !a.So(err, should.BeNil) {
+	applicationPackagesRegistry, err := asioapredis.NewApplicationPackagesRegistry(
+		ctx, applicationPackagesRedisClient, test.Delay<<10,
+	)
+	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
@@ -3482,7 +3481,7 @@ func TestApplicationServerCleanup(t *testing.T) {
 	pubsubCleaner := &pubsub.RegistryCleaner{
 		PubSubRegistry: pubsubRegistry,
 	}
-	err := pubsubCleaner.RangeToLocalSet(ctx)
+	err = pubsubCleaner.RangeToLocalSet(ctx)
 	a.So(err, should.BeNil)
 	a.So(pubsubCleaner.LocalSet, should.HaveLength, 3)
 
