@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -56,21 +56,13 @@ export default class PubsubForm extends Component {
     mqttDisabled: PropTypes.bool.isRequired,
     natsDisabled: PropTypes.bool.isRequired,
     onDelete: PropTypes.func,
-    onDeleteFailure: PropTypes.func,
-    onDeleteSuccess: PropTypes.func,
     onSubmit: PropTypes.func.isRequired,
-    onSubmitFailure: PropTypes.func,
-    onSubmitSuccess: PropTypes.func,
     update: PropTypes.bool.isRequired,
   }
 
   static defaultProps = {
     initialPubsubValue: undefined,
     existCheck: () => false,
-    onSubmitSuccess: () => null,
-    onSubmitFailure: () => null,
-    onDeleteSuccess: () => null,
-    onDeleteFailure: () => null,
     onDelete: () => null,
   }
 
@@ -115,12 +107,12 @@ export default class PubsubForm extends Component {
 
   @bind
   async handleSubmit(values, { resetForm }) {
-    const { appId, onSubmit, onSubmitSuccess, onSubmitFailure, existCheck, update } = this.props
+    const { appId, onSubmit, existCheck, update } = this.props
 
     const castedValues = validationSchema.cast(values)
     const pubsub = mapFormValuesToPubsub(castedValues, appId)
 
-    await this.setState({ error: '' })
+    this.setState({ error: '' })
 
     try {
       if (!update) {
@@ -134,28 +126,24 @@ export default class PubsubForm extends Component {
           })
         }
       }
-      const result = await onSubmit(pubsub)
+      await onSubmit(pubsub)
 
       resetForm({ values })
-      await onSubmitSuccess(result)
     } catch (error) {
       resetForm({ values })
 
-      await this.setState({ error })
-      await onSubmitFailure(error)
+      this.setState({ error })
     }
   }
 
   @bind
   async handleDelete() {
-    const { onDelete, onDeleteSuccess, onDeleteFailure } = this.props
+    const { onDelete } = this.props
     try {
       await onDelete()
       this.form.current.resetForm()
-      onDeleteSuccess()
     } catch (error) {
-      await this.setState({ error })
-      onDeleteFailure()
+      this.setState({ error })
     }
   }
 

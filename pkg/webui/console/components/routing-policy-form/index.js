@@ -48,7 +48,7 @@ const validationSchema = Yup.object({
   policy: Yup.object({
     uplink: Yup.object({}),
     downlink: Yup.object({}),
-  }).when('_use_default_policy', { is: 'default', then: Yup.object().strip() }),
+  }).when('_use_default_policy', { is: 'default', then: schema => schema.strip() }),
 })
 
 const policySourceEncode = val => val === 'default'

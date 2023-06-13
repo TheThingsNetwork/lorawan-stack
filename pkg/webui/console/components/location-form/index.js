@@ -185,7 +185,6 @@ class LocationForm extends Component {
 
   @bind
   handleClick(event) {
-    console.log('tstst', event)
     const { updatesDisabled } = this.props
     const { setValues, values } = this.form.current
     const latitude = isNaN(event.latlng.lat) ? defaultLocation[0] : event.latlng.lat
