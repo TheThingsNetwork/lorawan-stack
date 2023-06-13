@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import React from 'react'
-import { connect, useDispatch } from 'react-redux'
-import { bindActionCreators } from 'redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
+import { createSelector } from 'reselect'
 
 import Status from '@ttn-lw/components/status'
 import Icon from '@ttn-lw/components/icon'
@@ -44,7 +44,7 @@ import {
   restoreUser,
 } from '@console/store/actions/users'
 
-import { selectUserId, selectUserIsAdmin } from '@console/store/selectors/logout'
+import { selectUserId } from '@console/store/selectors/logout'
 import {
   selectUsers,
   selectUsersTotalCount,
@@ -114,15 +114,10 @@ const state = {
 }
 
 const UsersTable = props => {
-  const {
-    pageSize,
-    currentUserId,
-    maySendInvites,
-    handleDeleteInvitation,
-    restoreUser,
-    purgeUser,
-  } = props
+  const { pageSize } = props
   const dispatch = useDispatch()
+  const currentUserId = useSelector(selectUserId)
+  const mayInvite = useSelector(state => checkFromState(maySendInvites, state))
 
   const [tab, setTab] = React.useState(USERS_TAB)
   const isInvitationsTab = tab === INVITATIONS_TAB
@@ -131,7 +126,7 @@ const UsersTable = props => {
   const handleRestore = React.useCallback(
     async id => {
       try {
-        await restoreUser(id)
+        await dispatch(attachPromise(restoreUser(id)))
         toast({
           title: id,
           message: m.restoreSuccess,
@@ -145,13 +140,13 @@ const UsersTable = props => {
         })
       }
     },
-    [restoreUser],
+    [dispatch],
   )
 
   const handlePurge = React.useCallback(
     async id => {
       try {
-        await purgeUser(id)
+        await dispatch(attachPromise(deleteUser(id)), { purge: true })
         toast({
           title: id,
           message: m.purgeSuccess,
@@ -165,13 +160,13 @@ const UsersTable = props => {
         })
       }
     },
-    [purgeUser],
+    [dispatch],
   )
 
   const onDeleteInvite = React.useCallback(
     async email => {
       try {
-        await handleDeleteInvitation(email)
+        await dispatch(attachPromise(deleteInvite(email)))
         toast({
           message: m.revokeSuccess,
           type: toast.types.SUCCESS,
@@ -185,7 +180,7 @@ const UsersTable = props => {
         })
       }
     },
-    [handleDeleteInvitation, dispatch],
+    [dispatch],
   )
 
   const headers = React.useMemo(() => {
@@ -318,26 +313,28 @@ const UsersTable = props => {
     )
   }, [])
 
-  const baseDataSelector = React.useCallback(
-    state => {
-      if (tab === INVITATIONS_TAB) {
-        return {
-          invitations: selectUserInvitations(state),
-          totalCount: selectUserInvitationsTotalCount(state),
-          fetching: selectUserInvitationsFetching(state),
-          mayAdd: maySendInvites,
-          mayLink: false,
-        }
-      }
-
-      return {
-        users: selectUsers(state),
-        totalCount: selectUsersTotalCount(state),
-        fetching: selectUsersFetching(state),
-        mayAdd: checkFromState(mayManageUsers, state),
-      }
-    },
-    [tab, maySendInvites],
+  const invitationsBaseDataSelector = createSelector(
+    selectUserInvitations,
+    selectUserInvitationsTotalCount,
+    selectUserInvitationsFetching,
+    (invitations, totalCount, fetching) => ({
+      invitations,
+      totalCount,
+      fetching,
+      mayAdd: mayInvite,
+      mayLink: false,
+    }),
+  )
+  const usersBaseDataSelector = createSelector(
+    selectUsers,
+    selectUsersTotalCount,
+    selectUsersFetching,
+    (users, totalCount, fetching) => ({
+      users,
+      totalCount,
+      fetching,
+      mayAdd: mayManageUsers,
+    }),
   )
 
   const getItemPathPrefix = item => `/${item.email}`
@@ -348,12 +345,12 @@ const UsersTable = props => {
       defaultOrder={isInvitationsTab ? '' : '-user_id'}
       headers={headers}
       addMessage={isInvitationsTab ? m.invite : sharedMessages.userAdd}
-      itemPathPrefix={isInvitationsTab ? '/invitations' : ''}
+      itemPathPrefix={isInvitationsTab ? 'invitations/' : ''}
       getItemPathPrefix={isInvitationsTab ? getItemPathPrefix : undefined}
       tableTitle={<Message content={sharedMessages.users} />}
       getItemsAction={getItems}
       searchItemsAction={getItems}
-      baseDataSelector={baseDataSelector}
+      baseDataSelector={isInvitationsTab ? invitationsBaseDataSelector : usersBaseDataSelector}
       pageSize={pageSize}
       clickable={!isDeletedTab}
       tabs={maySendInvites ? tabs : []}
@@ -363,36 +360,11 @@ const UsersTable = props => {
 }
 
 UsersTable.propTypes = {
-  currentUserId: PropTypes.string.isRequired,
-  handleDeleteInvitation: PropTypes.func.isRequired,
-  maySendInvites: PropTypes.bool.isRequired,
-  pageSize: PropTypes.number.isRequired,
-  purgeUser: PropTypes.func.isRequired,
-  restoreUser: PropTypes.func.isRequired,
+  pageSize: PropTypes.number,
 }
 
-export default connect(
-  state => ({
-    currentUserId: selectUserId(state),
-    isAdmin: selectUserIsAdmin(state),
-    maySendInvites: checkFromState(maySendInvites, state),
-  }),
-  dispatch => ({
-    ...bindActionCreators(
-      {
-        purgeUser: attachPromise(deleteUser),
-        restoreUser: attachPromise(restoreUser),
-        handleDeleteInvitation: attachPromise(deleteInvite),
-      },
-      dispatch,
-    ),
-  }),
-  (stateProps, dispatchProps, ownProps) => ({
-    ...stateProps,
-    ...dispatchProps,
-    ...ownProps,
-    purgeUser: id => dispatchProps.purgeUser(id, { purge: true }),
-    restoreUser: id => dispatchProps.restoreUser(id),
-    handleDeleteInvitation: email => dispatchProps.handleDeleteInvitation(email),
-  }),
-)(UsersTable)
+UsersTable.defaultProps = {
+  pageSize: undefined,
+}
+
+export default UsersTable

@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { defineMessages } from 'react-intl'
-import { connect } from 'react-redux'
-import { push } from 'connected-react-router'
+import { useNavigate } from 'react-router-dom'
+import * as Yup from 'yup'
+import { useDispatch } from 'react-redux'
 
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
@@ -24,8 +25,6 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 
 import Message from '@ttn-lw/lib/components/message'
 
-import Yup from '@ttn-lw/lib/yup'
-import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
@@ -41,17 +40,18 @@ const validationSchema = Yup.object().shape({
   email: Yup.string().email(sharedMessages.validateEmail).required(sharedMessages.validateRequired),
 })
 
-const InviteForm = props => {
-  const { sendInvite, navigateToList } = props
+const InviteForm = () => {
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
 
-  const onSubmitSuccess = React.useCallback(() => navigateToList(), [navigateToList])
+  const onSubmitSuccess = useCallback(() => navigate(`/admin-panel/user-management`), [navigate])
 
   const [error, setError] = useState()
   const handleSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
       setError(undefined)
       try {
-        const result = await sendInvite(values)
+        const result = await dispatch(attachPromise(sendInvite(values)))
         resetForm({ values })
         onSubmitSuccess(result)
       } catch (error) {
@@ -59,7 +59,7 @@ const InviteForm = props => {
         setError({ error })
       }
     },
-    [sendInvite, onSubmitSuccess],
+    [dispatch, onSubmitSuccess],
   )
 
   const initialValues = {
@@ -91,12 +91,4 @@ const InviteForm = props => {
   )
 }
 
-InviteForm.propTypes = {
-  navigateToList: PropTypes.func.isRequired,
-  sendInvite: PropTypes.func.isRequired,
-}
-
-export default connect(null, {
-  sendInvite: email => attachPromise(sendInvite(email)),
-  navigateToList: () => push(`/admin-panel/user-management`),
-})(InviteForm)
+export default InviteForm

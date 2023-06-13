@@ -14,7 +14,7 @@
 
 import React, { useCallback, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { replace } from 'connected-react-router'
+import { useNavigate } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
 
 import toast from '@ttn-lw/components/toast'
@@ -64,6 +64,7 @@ const m = defineMessages({
 
 const ApplicationGeneralSettingsContainer = ({ appId }) => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const [error, setError] = useState()
   const application = useSelector(selectSelectedApplication)
   const link = useSelector(selectApplicationLink)
@@ -156,7 +157,7 @@ const ApplicationGeneralSettingsContainer = ({ appId }) => {
     [application, handleAlcsyncUpdate, dispatch],
   )
 
-  const onDeleteSuccess = useCallback(() => dispatch(replace(`/applications`)), [dispatch])
+  const onDeleteSuccess = useCallback(() => navigate(`/applications`), [navigate])
   const handleDelete = useCallback(
     async shouldPurge => {
       setError(undefined)

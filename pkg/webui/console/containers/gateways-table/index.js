@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 
 import React from 'react'
 import { defineMessages } from 'react-intl'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { createSelector } from 'reselect'
 
 import Status from '@ttn-lw/components/status'
 import toast from '@ttn-lw/components/toast'
@@ -31,7 +31,6 @@ import DateTime from '@ttn-lw/lib/components/date-time'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { checkFromState, mayCreateGateways } from '@console/lib/feature-checks'
 
@@ -66,17 +65,18 @@ const tabs = [
   },
   { title: sharedMessages.deleted, name: DELETED_TAB },
 ]
+const mayAddSelector = state => checkFromState(mayCreateGateways, state)
 
-const GatewaysTable = props => {
-  const { isAdmin, restoreGateway, purgeGateway, ...rest } = props
-
+const GatewaysTable = () => {
+  const dispatch = useDispatch()
+  const isAdmin = useSelector(selectUserIsAdmin)
   const [tab, setTab] = React.useState(OWNED_TAB)
   const isDeletedTab = tab === DELETED_TAB
 
   const handleRestore = React.useCallback(
     async id => {
       try {
-        await restoreGateway(id)
+        await dispatch(attachPromise(restoreGateway(id)))
         toast({
           title: id,
           message: m.restoreSuccess,
@@ -90,13 +90,13 @@ const GatewaysTable = props => {
         })
       }
     },
-    [restoreGateway],
+    [dispatch],
   )
 
   const handlePurge = React.useCallback(
     async id => {
       try {
-        await purgeGateway(id)
+        await dispatch(attachPromise(deleteGateway(id, { purge: true })))
         toast({
           title: id,
           message: m.purgeSuccess,
@@ -110,7 +110,7 @@ const GatewaysTable = props => {
         })
       }
     },
-    [purgeGateway],
+    [dispatch],
   )
 
   const headers = React.useMemo(() => {
@@ -213,14 +213,17 @@ const GatewaysTable = props => {
     return baseHeaders
   }, [handlePurge, handleRestore, tab])
 
-  const baseDataSelector = React.useCallback(
-    state => ({
-      gateways: selectGateways(state),
-      totalCount: selectGatewaysTotalCount(state),
-      fetching: selectGatewaysFetching(state),
-      mayAdd: checkFromState(mayCreateGateways, state),
+  const baseDataSelector = createSelector(
+    selectGateways,
+    selectGatewaysTotalCount,
+    selectGatewaysFetching,
+    mayAddSelector,
+    (gateways, totalCount, fetching, mayAdd) => ({
+      gateways,
+      totalCount,
+      fetching,
+      mayAdd,
     }),
-    [],
   )
 
   const getGateways = React.useCallback(filters => {
@@ -251,35 +254,8 @@ const GatewaysTable = props => {
       searchable
       clickable={!isDeletedTab}
       tabs={isAdmin ? tabs : []}
-      {...rest}
     />
   )
 }
 
-GatewaysTable.propTypes = {
-  isAdmin: PropTypes.bool.isRequired,
-  purgeGateway: PropTypes.func.isRequired,
-  restoreGateway: PropTypes.func.isRequired,
-}
-
-export default connect(
-  state => ({
-    isAdmin: selectUserIsAdmin(state),
-  }),
-  dispatch => ({
-    ...bindActionCreators(
-      {
-        purgeGateway: attachPromise(deleteGateway),
-        restoreGateway: attachPromise(restoreGateway),
-      },
-      dispatch,
-    ),
-  }),
-  (stateProps, dispatchProps, ownProps) => ({
-    ...stateProps,
-    ...dispatchProps,
-    ...ownProps,
-    purgeGateway: id => dispatchProps.purgeGateway(id, { purge: true }),
-    restoreGateway: id => dispatchProps.restoreGateway(id),
-  }),
-)(GatewaysTable)
+export default GatewaysTable
