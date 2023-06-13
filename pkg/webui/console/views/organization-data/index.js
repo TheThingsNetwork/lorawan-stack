@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Data from './organization-data'
-import connect from './connect'
+import React from 'react'
+import { defineMessages } from 'react-intl'
+import { useParams } from 'react-router-dom'
 
-const ConnectedOrganizationData = connect(Data)
+import PageTitle from '@ttn-lw/components/page-title'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
-export { ConnectedOrganizationData as default, Data }
+import WithRootClass from '@ttn-lw/lib/components/with-root-class'
+
+import OrganizationEvents from '@console/containers/organization-events'
+
+import style from '@console/views/app/app.styl'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+const m = defineMessages({
+  orgData: 'Organization data',
+})
+
+const Data = () => {
+  const { orgId } = useParams()
+
+  useBreadcrumbs(
+    'orgs.single.data',
+    <Breadcrumb path={`/organizations/${orgId}/data`} content={sharedMessages.liveData} />,
+  )
+
+  return (
+    <WithRootClass className={style.stageFlex} id="stage">
+      <PageTitle hideHeading title={m.orgData} />
+      <OrganizationEvents orgId={orgId} />
+    </WithRootClass>
+  )
+}
+
+export default Data

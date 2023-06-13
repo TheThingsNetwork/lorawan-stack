@@ -18,40 +18,39 @@ import { Routes, Route } from 'react-router-dom'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
-import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
+import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
+import ValidateRouteParam from '@ttn-lw/lib/components/validate-route-param'
 
-import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+import Require from '@console/lib/components/require'
 
 import Organization from '@console/views/organization'
 import OrganizationAdd from '@console/views/organization-add'
 import OrganizationsList from '@console/views/organizations-list'
 
-import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
 
 import { mayViewOrganizationsOfUser } from '@console/lib/feature-checks'
 
-const Organizations = props => {
-  const { match } = props
-
+const Organizations = () => {
   useBreadcrumbs(
     'orgs',
     <Breadcrumb path="/organizations" content={sharedMessages.organizations} />,
   )
 
   return (
-    <Routes>
-      <Route exact path={`${match.path}`} component={OrganizationsList} />
-      <Route exact path={`${match.path}/add`} component={OrganizationAdd} />
-      <Route path={`${match.path}/:orgId${pathIdRegexp}`} component={Organization} sensitive />
-      <NotFoundRoute />
-    </Routes>
+    <Require featureCheck={mayViewOrganizationsOfUser} otherwise={{ redirect: '/' }}>
+      <Routes>
+        <Route index Component={OrganizationsList} />
+        <Route path="add" Component={OrganizationAdd} />
+        <Route
+          path=":orgId/*"
+          element={<ValidateRouteParam check={{ orgId: pathIdRegexp }} Component={Organization} />}
+        />
+        <Route path="*" element={<GenericNotFound />} />
+      </Routes>
+    </Require>
   )
 }
 
-Organizations.propTypes = {
-  match: PropTypes.match.isRequired,
-}
-
-export default withFeatureRequirement(mayViewOrganizationsOfUser, { redirect: '/' })(Organizations)
+export default Organizations
