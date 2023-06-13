@@ -43,12 +43,14 @@ var (
 	registeredApplicationIDs = &ttnpb.ApplicationIdentifiers{
 		ApplicationId: "test-application",
 	}
-	registeredApplicationKey = "test-key"
-	registeredEndDeviceID    = "test-end-device"
-	registeredJoinEUI        = types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0C}
-	unRegisteredJoinEUI      = types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0D}
-	registeredDevEUI         = types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30}
-	authenticationCode       = "BEEF1234"
+	registeredApplicationKey     = "test-key"
+	registeredEndDeviceID        = "test-end-device"
+	registeredJoinEUI            = types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0C}
+	unRegisteredJoinEUI          = types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0D}
+	registeredDevEUI             = types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30}
+	deviceIDWithoutEUIs          = "test-device-without-euis"
+	deviceIDClaimingNotSupported = "test-device-without-claiming-support"
+	authenticationCode           = "BEEF1234"
 )
 
 func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.ClusterRole) {
@@ -141,6 +143,26 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 			},
 		},
 	)
+	is.EndDeviceRegistry().Add(
+		ctx,
+		&ttnpb.EndDevice{
+			Ids: &ttnpb.EndDeviceIdentifiers{
+				ApplicationIds: registeredApplicationIDs,
+				DeviceId:       deviceIDClaimingNotSupported,
+				JoinEui:        unRegisteredJoinEUI.Bytes(),
+				DevEui:         registeredDevEUI.Bytes(),
+			},
+		},
+	)
+	is.EndDeviceRegistry().Add(
+		ctx,
+		&ttnpb.EndDevice{
+			Ids: &ttnpb.EndDeviceIdentifiers{
+				ApplicationIds: registeredApplicationIDs,
+				DeviceId:       deviceIDWithoutEUIs,
+			},
+		},
+	)
 
 	// GetInfoByJoinEUI.
 	resp, err := edcsClient.GetInfoByJoinEUI(ctx, &ttnpb.GetInfoByJoinEUIRequest{
@@ -226,6 +248,24 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 			},
 		},
 		{
+			Name: "WrongEUI",
+			Req: &ttnpb.ClaimEndDeviceRequest{
+				SourceDevice: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers_{
+					AuthenticatedIdentifiers: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers{
+						JoinEui:            unRegisteredJoinEUI.Bytes(),
+						DevEui:             registeredDevEUI.Bytes(),
+						AuthenticationCode: "TEST1234",
+					},
+				},
+				TargetApplicationIds: registeredApplicationIDs,
+				TargetDeviceId:       "target-device",
+			},
+			CallOpts: authorizedCallOpt,
+			ErrorAssertion: func(err error) bool {
+				return errors.IsAborted(err)
+			},
+		},
+		{
 			Name: "ValidDevice",
 			Req: &ttnpb.ClaimEndDeviceRequest{
 				SourceDevice: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers_{
@@ -258,9 +298,16 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 	// GetClaimStatus.
 	status, err := edcsClient.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
 		ApplicationIds: registeredApplicationIDs,
-		DeviceId:       registeredEndDeviceID,
+		DeviceId:       deviceIDWithoutEUIs,
 	}, authorizedCallOpt)
-	a.So(errors.IsInvalidArgument(err), should.BeTrue)
+	a.So(errors.IsFailedPrecondition(err), should.BeTrue)
+	a.So(status, should.BeNil)
+
+	status, err = edcsClient.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
+		ApplicationIds: registeredApplicationIDs,
+		DeviceId:       deviceIDClaimingNotSupported,
+	}, authorizedCallOpt)
+	a.So(errors.IsAborted(err), should.BeTrue)
 	a.So(status, should.BeNil)
 
 	status, err = edcsClient.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
@@ -284,9 +331,15 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 	// Unclaim.
 	_, err = edcsClient.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
 		ApplicationIds: registeredApplicationIDs,
-		DeviceId:       registeredEndDeviceID,
+		DeviceId:       deviceIDWithoutEUIs,
 	}, authorizedCallOpt)
-	a.So(errors.IsInvalidArgument(err), should.BeTrue)
+	a.So(errors.IsFailedPrecondition(err), should.BeTrue)
+
+	_, err = edcsClient.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
+		ApplicationIds: registeredApplicationIDs,
+		DeviceId:       deviceIDClaimingNotSupported,
+	}, authorizedCallOpt)
+	a.So(errors.IsAborted(err), should.BeTrue)
 
 	_, err = edcsClient.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
 		ApplicationIds: registeredApplicationIDs,
