@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,52 +13,45 @@
 // limitations under the License.
 
 import React from 'react'
-import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
+import { useParams } from 'react-router-dom'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import WithRootClass from '@ttn-lw/lib/components/with-root-class'
 
 import GatewayEvents from '@console/containers/gateway-events'
 
-import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+import Require from '@console/lib/components/require'
 
 import style from '@console/views/app/app.styl'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { mayViewGatewayEvents } from '@console/lib/feature-checks'
-
-import { selectSelectedGatewayId } from '@console/store/selectors/gateways'
 
 const m = defineMessages({
   gtwData: 'Gateway data',
 })
 
-@connect(state => ({ gtwId: selectSelectedGatewayId(state) }))
-@withFeatureRequirement(mayViewGatewayEvents, {
-  redirect: ({ gtwId }) => `/gateways/${gtwId}`,
-})
-@withBreadcrumb('gateways.single.data', ({ gtwId }) => (
-  <Breadcrumb path={`/gateways/${gtwId}/data`} content={sharedMessages.liveData} />
-))
-export default class Data extends React.Component {
-  static propTypes = {
-    gtwId: PropTypes.string.isRequired,
-  }
+const GatewayData = () => {
+  const { gtwId } = useParams()
 
-  render() {
-    const { gtwId } = this.props
+  useBreadcrumbs(
+    'gateways.single.data',
+    <Breadcrumb path={`/gateways/${gtwId}/data`} content={sharedMessages.liveData} />,
+  )
 
-    return (
+  return (
+    <Require featureCheck={mayViewGatewayEvents} otherwise={{ redirect: `/gateways/${gtwId}` }}>
       <WithRootClass className={style.stageFlex} id="stage">
         <PageTitle hideHeading title={m.gtwData} />
         <GatewayEvents gtwId={gtwId} />
       </WithRootClass>
-    )
-  }
+    </Require>
+  )
 }
+
+export default GatewayData

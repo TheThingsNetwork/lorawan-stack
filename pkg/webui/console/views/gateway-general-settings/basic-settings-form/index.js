@@ -55,10 +55,7 @@ const BasicSettingsForm = React.memo(props => {
     gateway,
     gtwId,
     onSubmit,
-    onSubmitSuccess,
     onDelete,
-    onDeleteFailure,
-    onDeleteSuccess,
     mayDeleteGateway,
     mayEditSecrets,
     shouldConfirmDelete,
@@ -73,13 +70,11 @@ const BasicSettingsForm = React.memo(props => {
         setError(undefined)
 
         await onDelete(shouldPurge)
-        onDeleteSuccess()
       } catch (error) {
-        onDeleteFailure()
         setError(error)
       }
     },
-    [onDelete, onDeleteFailure, onDeleteSuccess],
+    [onDelete],
   )
 
   const initialValues = React.useMemo(() => {
@@ -101,13 +96,12 @@ const BasicSettingsForm = React.memo(props => {
       try {
         await onSubmit(castedValues)
         resetForm({ values: castedValues })
-        onSubmitSuccess()
       } catch (err) {
         setSubmitting(false)
         setError(err)
       }
     },
-    [onSubmit, onSubmitSuccess],
+    [onSubmit],
   )
 
   return (
@@ -228,7 +222,7 @@ const BasicSettingsForm = React.memo(props => {
       />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
-        <Require featureCheck={mayDeleteGateway}>
+        <Require condition={mayDeleteGateway}>
           <DeleteModalButton
             entityId={gtwId}
             entityName={gateway.name}
@@ -246,14 +240,11 @@ const BasicSettingsForm = React.memo(props => {
 BasicSettingsForm.propTypes = {
   gateway: PropTypes.gateway.isRequired,
   gtwId: PropTypes.string.isRequired,
-  mayDeleteGateway: PropTypes.shape({}).isRequired,
+  mayDeleteGateway: PropTypes.bool.isRequired,
   mayEditSecrets: PropTypes.bool.isRequired,
   mayPurge: PropTypes.bool.isRequired,
   onDelete: PropTypes.func.isRequired,
-  onDeleteFailure: PropTypes.func.isRequired,
-  onDeleteSuccess: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  onSubmitSuccess: PropTypes.func.isRequired,
   shouldConfirmDelete: PropTypes.bool.isRequired,
 }
 

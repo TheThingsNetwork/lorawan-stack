@@ -66,7 +66,7 @@ const isNotValidDuration = value => {
 }
 
 const LorawanSettingsForm = React.memo(props => {
-  const { gateway, onSubmit, onSubmitSuccess } = props
+  const { gateway, onSubmit } = props
 
   const [error, setError] = React.useState(undefined)
 
@@ -106,13 +106,12 @@ const LorawanSettingsForm = React.memo(props => {
       try {
         await onSubmit(castedValues)
         resetForm({ values: castedValues })
-        onSubmitSuccess()
       } catch (err) {
         setSubmitting(false)
         setError(err)
       }
     },
-    [onSubmit, onSubmitSuccess],
+    [onSubmit],
   )
 
   return (
@@ -184,7 +183,6 @@ const LorawanSettingsForm = React.memo(props => {
 LorawanSettingsForm.propTypes = {
   gateway: PropTypes.gateway.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  onSubmitSuccess: PropTypes.func.isRequired,
 }
 
 export default LorawanSettingsForm

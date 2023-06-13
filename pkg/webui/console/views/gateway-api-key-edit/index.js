@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,52 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import GatewayApiKeyEdit from './gateway-api-key-edit'
-import connect from './connect'
+import React from 'react'
+import { Container, Col, Row } from 'react-grid-system'
+import { useParams } from 'react-router-dom'
 
-const ConnectedGatewayApiKeyEdit = connect(GatewayApiKeyEdit)
+import { GATEWAY } from '@console/constants/entities'
 
-export { ConnectedGatewayApiKeyEdit as default, GatewayApiKeyEdit }
+import PageTitle from '@ttn-lw/components/page-title'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+
+import RequireRequest from '@ttn-lw/lib/components/require-request'
+
+import { ApiKeyEditForm } from '@console/containers/api-key-form'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { getApiKey } from '@console/store/actions/api-keys'
+
+const GatewayApiKeyEditInner = () => {
+  const { gtwId, apiKeyId } = useParams()
+
+  useBreadcrumbs(
+    'gtws.single.api-keys.edit',
+    <Breadcrumb path={`/gateways/${gtwId}/api-keys/${apiKeyId}`} content={sharedMessages.edit} />,
+  )
+
+  return (
+    <Container>
+      <PageTitle title={sharedMessages.keyEdit} />
+      <Row>
+        <Col lg={8} md={12}>
+          <ApiKeyEditForm entity={GATEWAY} entityId={gtwId} />
+        </Col>
+      </Row>
+    </Container>
+  )
+}
+
+const GatewayApiKeyEdit = () => {
+  const { gtwId, apiKeyId } = useParams()
+
+  return (
+    <RequireRequest requestAction={getApiKey('gateway', gtwId, apiKeyId)}>
+      <GatewayApiKeyEditInner />
+    </RequireRequest>
+  )
+}
+
+export default GatewayApiKeyEdit

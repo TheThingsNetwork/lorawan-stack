@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,37 +15,36 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 
-import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
-import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+import ValidateRouteParam from '@ttn-lw/lib/components/validate-route-param'
+
+import Require from '@console/lib/components/require'
 
 import Gateway from '@console/views/gateway'
 import GatewayAdd from '@console/views/gateway-add'
 import GatewaysList from '@console/views/gateways-list'
 
-import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
 
 import { mayViewGateways } from '@console/lib/feature-checks'
 
-@withFeatureRequirement(mayViewGateways, { redirect: '/' })
-@withBreadcrumb('gateways', () => <Breadcrumb path="/gateways" content={sharedMessages.gateways} />)
-export default class Gateways extends React.Component {
-  static propTypes = {
-    match: PropTypes.match.isRequired,
-  }
-
-  render() {
-    const { path } = this.props.match
-
-    return (
+const Gateways = () => {
+  useBreadcrumbs('gateways', <Breadcrumb path="/gateways" content={sharedMessages.gateways} />)
+  return (
+    <Require featureCheck={mayViewGateways} otherwise={{ redirect: '/' }}>
       <Routes>
-        <Route exact path={`${path}`} component={GatewaysList} />
-        <Route exact path={`${path}/add`} component={GatewayAdd} />
-        <Route path={`${path}/:gtwId${pathIdRegexp}`} component={Gateway} sensitive />
+        <Route index Component={GatewaysList} />
+        <Route path="add" Component={GatewayAdd} />
+        <Route
+          path={`:gtwId/*`}
+          element={<ValidateRouteParam check={{ gtwId: pathIdRegexp }} Component={Gateway} />}
+        />
       </Routes>
-    )
-  }
+    </Require>
+  )
 }
+
+export default Gateways
