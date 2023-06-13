@@ -15,7 +15,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
-import { Redirect } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 
 import toast from '@ttn-lw/components/toast'
 
@@ -56,7 +56,7 @@ export default class Require extends Component {
       }
 
       if (typeof redirect === 'string') {
-        return <Redirect to={redirect} />
+        return <Navigate to={redirect} />
       } else if (typeof render === 'function') {
         return render()
       }
