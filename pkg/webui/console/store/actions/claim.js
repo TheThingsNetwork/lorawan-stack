@@ -28,11 +28,9 @@ const UNCLAIM_DEVICE_BASE = 'UNCLAIM_DEVICE'
 export const [
   { request: UNCLAIM_DEVICE, success: UNCLAIM_DEVICE_SUCCESS, failure: UNCLAIM_DEVICE_FAILURE },
   { request: unclaimDevice, success: unclaimDeviceSuccess, failure: unclaimDeviceFailure },
-] = createRequestActions(UNCLAIM_DEVICE_BASE, (applicationId, deviceId, devEui, joinEui) => ({
+] = createRequestActions(UNCLAIM_DEVICE_BASE, (applicationId, deviceId) => ({
   applicationId,
   deviceId,
-  devEui,
-  joinEui,
 }))
 
 const GET_INFO_BY_JOIN_EUI_BASE = 'GET_INFO_BY_JOIN_EUI'

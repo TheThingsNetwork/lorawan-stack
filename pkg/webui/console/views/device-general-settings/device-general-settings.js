@@ -101,10 +101,10 @@ export default class DeviceGeneralSettings extends React.Component {
     const { appId, device, unclaimDevice } = this.props
 
     const {
-      ids: { device_id: deviceId, dev_eui: devEui, join_eui: joinEui },
+      ids: { device_id: deviceId },
     } = device
 
-    unclaimDevice(appId, deviceId, devEui, joinEui)
+    unclaimDevice(appId, deviceId)
   }
 
   @bind

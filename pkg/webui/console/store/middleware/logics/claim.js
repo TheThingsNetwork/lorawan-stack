@@ -30,9 +30,9 @@ const claimDeviceLogic = createRequestLogic({
 const unclaimDeviceLogic = createRequestLogic({
   type: claim.UNCLAIM_DEVICE,
   process: async ({ action }) => {
-    const { applicationId, deviceId, devEui, joinEui } = action.payload
+    const { applicationId, deviceId } = action.payload
 
-    return await tts.DeviceClaim.unclaim(applicationId, deviceId, devEui, joinEui)
+    return await tts.DeviceClaim.unclaim(applicationId, deviceId)
   },
 })
 
