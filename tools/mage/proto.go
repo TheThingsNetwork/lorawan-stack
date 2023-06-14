@@ -152,6 +152,7 @@ func (p Proto) fieldMask(context.Context) error {
 func (p Proto) grpcGateway(context.Context) error {
 	return withProtoc(grpcGatewayProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
+			fmt.Sprintf("--grpc-gateway_out=:%s", protocOut),
 			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
 			return fmt.Errorf("failed to generate protos: %w", err)
