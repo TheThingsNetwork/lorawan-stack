@@ -21,6 +21,9 @@
   },
   "eslintConfig": {
     "extends": "../../config/eslintrc.yaml",
+    "parserOptions": {
+      "requireConfigFile": false
+    },
     "settings": {
       "import/ignore": [
         "node_modules"
