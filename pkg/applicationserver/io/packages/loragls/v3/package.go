@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package loracloudgeolocationv3 enables LoRa Cloud Geolocation Services integration.
 package loracloudgeolocationv3
 
 import (
