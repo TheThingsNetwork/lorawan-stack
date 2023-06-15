@@ -327,7 +327,7 @@ func RegisterEndDeviceQRCodeGeneratorHandlerServer(ctx context.Context, mux *run
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.EndDeviceQRCodeGenerator/Parse", runtime.WithHTTPPathPattern("/qr-code/end-devices/parse"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.EndDeviceQRCodeGenerator/Parse", runtime.WithHTTPPathPattern("/qr-codes/end-devices/parse"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -352,7 +352,7 @@ func RegisterEndDeviceQRCodeGeneratorHandlerServer(ctx context.Context, mux *run
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.EndDeviceQRCodeGenerator/Parse", runtime.WithHTTPPathPattern("/qr-code/end-devices/{format_id}/parse"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.EndDeviceQRCodeGenerator/Parse", runtime.WithHTTPPathPattern("/qr-codes/end-devices/{format_id}/parse"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -482,7 +482,7 @@ func RegisterEndDeviceQRCodeGeneratorHandlerClient(ctx context.Context, mux *run
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.EndDeviceQRCodeGenerator/Parse", runtime.WithHTTPPathPattern("/qr-code/end-devices/parse"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.EndDeviceQRCodeGenerator/Parse", runtime.WithHTTPPathPattern("/qr-codes/end-devices/parse"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -504,7 +504,7 @@ func RegisterEndDeviceQRCodeGeneratorHandlerClient(ctx context.Context, mux *run
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.EndDeviceQRCodeGenerator/Parse", runtime.WithHTTPPathPattern("/qr-code/end-devices/{format_id}/parse"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.EndDeviceQRCodeGenerator/Parse", runtime.WithHTTPPathPattern("/qr-codes/end-devices/{format_id}/parse"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -530,9 +530,9 @@ var (
 
 	pattern_EndDeviceQRCodeGenerator_Generate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"qr-codes", "end-devices"}, ""))
 
-	pattern_EndDeviceQRCodeGenerator_Parse_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"qr-code", "end-devices", "parse"}, ""))
+	pattern_EndDeviceQRCodeGenerator_Parse_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"qr-codes", "end-devices", "parse"}, ""))
 
-	pattern_EndDeviceQRCodeGenerator_Parse_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"qr-code", "end-devices", "format_id", "parse"}, ""))
+	pattern_EndDeviceQRCodeGenerator_Parse_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"qr-codes", "end-devices", "format_id", "parse"}, ""))
 )
 
 var (
