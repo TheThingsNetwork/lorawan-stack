@@ -24,7 +24,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
 import { selectCollaborators } from '@ttn-lw/lib/store/selectors/collaborators'
 
-import AutoSuggest from '../autosuggest/autosuggest'
+import AutoSuggest from '../autosuggest'
 
 import composeOption from './util'
 

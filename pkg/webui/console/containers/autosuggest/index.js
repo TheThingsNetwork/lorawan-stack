@@ -51,11 +51,8 @@ const AutoSuggest = ({
   const dispatch = useDispatch()
   const searchResults = useSelector(selectSearchResults)
   const { formatMessage } = useIntl()
-
   const handleNoOptions = useCallback(() => formatMessage(m.noOptionsMessage), [formatMessage])
-
   const searchResultsRef = useRef(searchResults)
-
   const collaboratorOf = onlyCollaborators
     ? {
         path: `${entity}_ids.${entity}_id`,
