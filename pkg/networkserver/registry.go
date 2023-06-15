@@ -43,6 +43,11 @@ type DeviceRegistry interface {
 	RangeByUplinkMatches(ctx context.Context, up *ttnpb.UplinkMessage, f func(context.Context, *UplinkMatch) (bool, error)) error
 	SetByID(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)
 	Range(ctx context.Context, paths []string, f func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error
+	BatchDelete(
+		ctx context.Context,
+		appIDs *ttnpb.ApplicationIdentifiers,
+		deviceIDs []string,
+	) ([]*ttnpb.EndDeviceIdentifiers, error)
 }
 
 var errDeviceExists = errors.DefineAlreadyExists("device_exists", "device already exists")
@@ -133,6 +138,14 @@ func (w replacedEndDeviceFieldRegistryWrapper) SetByID(ctx context.Context, appI
 		d.GetTransform(dev)
 	}
 	return dev, ctx, nil
+}
+
+func (w replacedEndDeviceFieldRegistryWrapper) BatchDelete(
+	ctx context.Context,
+	appIDs *ttnpb.ApplicationIdentifiers,
+	deviceIDs []string,
+) ([]*ttnpb.EndDeviceIdentifiers, error) {
+	return w.DeviceRegistry.BatchDelete(ctx, appIDs, deviceIDs)
 }
 
 func (w replacedEndDeviceFieldRegistryWrapper) Range(ctx context.Context, paths []string, f func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {

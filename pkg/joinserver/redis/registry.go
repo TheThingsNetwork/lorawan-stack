@@ -24,6 +24,7 @@ import (
 
 	"github.com/redis/go-redis/v9"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/provisioning"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -592,7 +593,11 @@ func (r *KeyRegistry) SetByID(ctx context.Context, joinEUI, devEUI types.EUI64, 
 	return pb, nil
 }
 
+// Delete implements KeyRegistry.
 func (r *KeyRegistry) Delete(ctx context.Context, joinEUI, devEUI types.EUI64) error {
+	if r.Limit == 0 {
+		return nil
+	}
 	if devEUI.IsZero() {
 		return errInvalidIdentifiers.New()
 	}
@@ -606,7 +611,7 @@ func (r *KeyRegistry) Delete(ctx context.Context, joinEUI, devEUI types.EUI64) e
 	defer trace.StartRegion(ctx, "delete session keys").End()
 
 	err = ttnredis.LockedWatch(ctx, r.Redis, sk, lockerID, r.LockTTL, func(tx *redis.Tx) error {
-		sids, err := tx.LRange(ctx, sk, 0, 1<<24).Result()
+		sids, err := tx.LRange(ctx, sk, 0, int64(r.Limit)).Result()
 		if err != nil {
 			return err
 		}
@@ -809,4 +814,157 @@ func (r *ApplicationActivationSettingRegistry) Range(ctx context.Context, paths 
 		}
 		return true, nil
 	})
+}
+
+// BatchDelete implements DeviceRegistry.
+// This function deletes all the devices in a single transaction.
+func (r *DeviceRegistry) BatchDelete(
+	ctx context.Context,
+	appIDs *ttnpb.ApplicationIdentifiers,
+	deviceIDs []string,
+) ([]*ttnpb.EndDeviceIdentifiers, error) {
+	var (
+		uidKeys = make([]string, 0, len(deviceIDs))
+		ret     = make([]*ttnpb.EndDeviceIdentifiers, 0)
+	)
+	for _, devID := range deviceIDs {
+		uidKeys = append(
+			uidKeys,
+			r.uidKey(
+				unique.ID(
+					ctx,
+					&ttnpb.EndDeviceIdentifiers{
+						ApplicationIds: appIDs,
+						DeviceId:       devID,
+					}),
+			),
+		)
+	}
+
+	// Delete the devices in a single transaction.
+	transaction := func(tx *redis.Tx) error {
+		keys := make([]string, 0)
+		// Read the devices to delete.
+		raw, err := tx.MGet(ctx, uidKeys...).Result()
+		if err != nil {
+			return err
+		}
+		for _, raw := range raw {
+			switch val := raw.(type) {
+			case nil:
+				continue
+			case string:
+				dev := &ttnpb.EndDevice{}
+				if err := ttnredis.UnmarshalProto(val, dev); err != nil {
+					log.FromContext(ctx).WithError(err).Warn("Failed to decode stored end device")
+					continue
+				}
+				ret = append(ret, dev.Ids)
+				if dev.Ids.JoinEui != nil && dev.Ids.DevEui != nil {
+					keys = append(keys, r.euiKey(
+						types.MustEUI64(dev.GetIds().GetJoinEui()).OrZero(),
+						types.MustEUI64(dev.GetIds().GetDevEui()).OrZero(),
+					))
+				}
+				pid, err := provisionerUniqueID(dev)
+				if err != nil {
+					log.FromContext(ctx).WithError(err).Warn("Failed to get provisioner unique ID")
+					continue
+				}
+				if pid != "" {
+					keys = append(keys, r.provisionerKey(dev.ProvisionerId, pid))
+				}
+			}
+		}
+		if err := tx.Watch(ctx, keys...).Err(); err != nil {
+			return err
+		}
+		if _, err := tx.TxPipelined(ctx, func(p redis.Pipeliner) error {
+			p.Del(ctx, append(uidKeys, keys...)...)
+			return nil
+		}); err != nil {
+			return err
+		}
+		return nil
+	}
+
+	err := r.Redis.Watch(ctx, transaction, uidKeys...)
+	if err != nil {
+		return nil, ttnredis.ConvertError(err)
+	}
+	return ret, nil
+}
+
+// BatchDelete implements KeyRegistry.
+func (r *KeyRegistry) BatchDelete(ctx context.Context, devIDs []*ttnpb.EndDeviceIdentifiers) error {
+	if r.Limit == 0 {
+		return nil
+	}
+	rangeRes := make([]*redis.StringSliceCmd, 0, len(devIDs))
+	_, err := r.Redis.Pipelined(ctx, func(p redis.Pipeliner) error {
+		for _, devID := range devIDs {
+			rangeRes = append(rangeRes, p.LRange(
+				ctx,
+				r.idSetKey(
+					types.MustEUI64(devID.JoinEui).OrZero(),
+					types.MustEUI64(devID.DevEui).OrZero(),
+				),
+				0,
+				int64(r.Limit),
+			))
+		}
+		return nil
+	})
+	if err != nil {
+		return ttnredis.ConvertError(err)
+	}
+
+	delItems := make(map[string][]string, 0)
+	for i, res := range rangeRes {
+		if res == nil {
+			continue
+		}
+		sids, err := res.Result()
+		if err != nil {
+			return ttnredis.ConvertError(err)
+		}
+		idSetKey := r.idSetKey(
+			types.MustEUI64(devIDs[i].JoinEui).OrZero(),
+			types.MustEUI64(devIDs[i].DevEui).OrZero(),
+		)
+		sidKeys := make([]string, 0, len(sids))
+		for _, sid := range sids {
+			sidKeys = append(sidKeys, r.idKey(
+				types.MustEUI64(devIDs[i].JoinEui).OrZero(),
+				types.MustEUI64(devIDs[i].DevEui).OrZero(),
+				sid,
+			))
+		}
+		delItems[idSetKey] = sidKeys
+	}
+
+	// Delete all the keys for all the selected EUI pairs in a single transaction.
+	transaction := func(tx *redis.Tx) error {
+		if _, err := tx.TxPipelined(ctx, func(p redis.Pipeliner) error {
+			for key, sidKeys := range delItems {
+				p.Del(ctx, sidKeys...)
+				p.Del(ctx, key)
+			}
+			return nil
+		}); err != nil {
+			return ttnredis.ConvertError(err)
+		}
+		return nil
+	}
+
+	defer trace.StartRegion(ctx, "batch delete session keys").End()
+	watched := make([]string, 0, len(delItems))
+	for k := range delItems {
+		watched = append(watched, k)
+	}
+	err = r.Redis.Watch(ctx, transaction, watched...)
+	if err != nil {
+		return ttnredis.ConvertError(err)
+	}
+	return nil
 }

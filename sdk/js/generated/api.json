@@ -2682,6 +2682,36 @@
           ]
         },
         {
+          "name": "AsEndDeviceBatchRegistry",
+          "longName": "AsEndDeviceBatchRegistry",
+          "fullName": "ttn.lorawan.v3.AsEndDeviceBatchRegistry",
+          "description": "The AsEndDeviceBatchRegistry service allows clients to manage batches end devices on the Application Server.",
+          "methods": [
+            {
+              "name": "Delete",
+              "description": "Delete a list of devices within the same application.\nThis operation is atomic; either all devices are deleted or none.\nDevices not found are skipped and no error is returned.",
+              "requestType": "BatchDeleteEndDevicesRequest",
+              "requestLongType": "BatchDeleteEndDevicesRequest",
+              "requestFullType": "ttn.lorawan.v3.BatchDeleteEndDevicesRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/as/applications/{application_ids.application_id}/devices/batch"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
           "name": "AsEndDeviceRegistry",
           "longName": "AsEndDeviceRegistry",
           "fullName": "ttn.lorawan.v3.AsEndDeviceRegistry",
@@ -14237,6 +14267,70 @@
           ]
         },
         {
+          "name": "BatchDeleteEndDevicesRequest",
+          "longName": "BatchDeleteEndDevicesRequest",
+          "fullName": "ttn.lorawan.v3.BatchDeleteEndDevicesRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "application_ids",
+              "description": "",
+              "label": "",
+              "type": "ApplicationIdentifiers",
+              "longType": "ApplicationIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "device_ids",
+              "description": "",
+              "label": "repeated",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.min_items",
+                    "value": 1
+                  },
+                  {
+                    "name": "repeated.max_items",
+                    "value": 20
+                  },
+                  {
+                    "name": "repeated.items.string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "repeated.items.string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "BatchUpdateEndDeviceLastSeenRequest",
           "longName": "BatchUpdateEndDeviceLastSeenRequest",
           "fullName": "ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest",
@@ -18389,6 +18483,36 @@
       "extensions": [],
       "messages": [],
       "services": [
+        {
+          "name": "EndDeviceBatchRegistry",
+          "longName": "EndDeviceBatchRegistry",
+          "fullName": "ttn.lorawan.v3.EndDeviceBatchRegistry",
+          "description": "The EndDeviceBatchRegistry service, exposed by the Identity Server, is used to manage\nend device registrations in batches.",
+          "methods": [
+            {
+              "name": "Delete",
+              "description": "Delete a batch of end devices with the given IDs.\n\nThis operation is atomic; either all devices are deleted or none.\nDevices not found are skipped and no error is returned.\nBefore calling this RPC, use the corresponding BatchDelete RPCs\nof NsEndDeviceRegistry, AsEndDeviceRegistry and\noptionally the JsEndDeviceRegistry to delete the end devices.\nIf the devices were claimed on a Join Server, use the BatchUnclaim RPC\nof the DeviceClaimingServer.\nThis is NOT done automatically.",
+              "requestType": "BatchDeleteEndDevicesRequest",
+              "requestLongType": "BatchDeleteEndDevicesRequest",
+              "requestFullType": "ttn.lorawan.v3.BatchDeleteEndDevicesRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/applications/{application_ids.application_id}/devices/batch"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
         {
           "name": "EndDeviceRegistry",
           "longName": "EndDeviceRegistry",
@@ -23060,6 +23184,30 @@
           ]
         },
         {
+          "name": "EndDeviceIdentifiersList",
+          "longName": "EndDeviceIdentifiersList",
+          "fullName": "ttn.lorawan.v3.EndDeviceIdentifiersList",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "end_device_ids",
+              "description": "",
+              "label": "repeated",
+              "type": "EndDeviceIdentifiers",
+              "longType": "EndDeviceIdentifiers",
+              "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "EndDeviceVersionIdentifiers",
           "longName": "EndDeviceVersionIdentifiers",
           "fullName": "ttn.lorawan.v3.EndDeviceVersionIdentifiers",
@@ -26006,6 +26154,36 @@
                     {
                       "method": "GET",
                       "pattern": "/js/default_join_eui"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "JsEndDeviceBatchRegistry",
+          "longName": "JsEndDeviceBatchRegistry",
+          "fullName": "ttn.lorawan.v3.JsEndDeviceBatchRegistry",
+          "description": "JsEndDeviceBatchRegistry service allows clients to manage batches of end devices on the Join Server.",
+          "methods": [
+            {
+              "name": "Delete",
+              "description": "Delete a list of devices within the same application.\nThis operation is atomic; either all devices are deleted or none.\nDevices not found are skipped and no error is returned.",
+              "requestType": "BatchDeleteEndDevicesRequest",
+              "requestLongType": "BatchDeleteEndDevicesRequest",
+              "requestFullType": "ttn.lorawan.v3.BatchDeleteEndDevicesRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/js/applications/{application_ids.application_id}/devices/batch"
                     }
                   ]
                 }
@@ -34868,6 +35046,36 @@
                     {
                       "method": "GET",
                       "pattern": "/ns/dev_addr_prefixes"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "NsEndDeviceBatchRegistry",
+          "longName": "NsEndDeviceBatchRegistry",
+          "fullName": "ttn.lorawan.v3.NsEndDeviceBatchRegistry",
+          "description": "The NsEndDeviceBatchRegistry service allows clients to manage batches of end devices on the Network Server.",
+          "methods": [
+            {
+              "name": "Delete",
+              "description": "Delete a list of devices within the same application.\nThis operation is atomic; either all devices are deleted or none.\nDevices not found are skipped and no error is returned.",
+              "requestType": "BatchDeleteEndDevicesRequest",
+              "requestLongType": "BatchDeleteEndDevicesRequest",
+              "requestFullType": "ttn.lorawan.v3.BatchDeleteEndDevicesRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/ns/applications/{application_ids.application_id}/devices/batch"
                     }
                   ]
                 }

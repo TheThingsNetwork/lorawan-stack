@@ -62,6 +62,14 @@ var (
 		events.WithClientInfoFromContext(),
 		events.WithPropagateToParent(),
 	)
+	evtBatchDeleteEndDevices = events.Define(
+		"ns.end_device.batch.delete", "batch delete end devices",
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ),
+		events.WithDataType(&ttnpb.EndDeviceIdentifiersList{}),
+		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
+		events.WithPropagateToParent(),
+	)
 )
 
 const maxRequiredDeviceReadRightCount = 3
@@ -2890,6 +2898,44 @@ func (ns *NetworkServer) Delete(ctx context.Context, req *ttnpb.EndDeviceIdentif
 	if evt != nil {
 		events.Publish(evt)
 	}
+	return ttnpb.Empty, nil
+}
+
+type nsEndDeviceBatchRegistry struct {
+	ttnpb.UnimplementedNsEndDeviceBatchRegistryServer
+
+	NS *NetworkServer
+}
+
+// Delete implements ttipb.NsEndDeviceBatchRegistryServer.
+func (srv *nsEndDeviceBatchRegistry) Delete(
+	ctx context.Context,
+	req *ttnpb.BatchDeleteEndDevicesRequest,
+) (*emptypb.Empty, error) {
+	// Check if the user has rights on the application.
+	if err := rights.RequireApplication(
+		ctx,
+		req.ApplicationIds,
+		ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+	); err != nil {
+		return nil, err
+	}
+	deleted, err := srv.NS.devices.BatchDelete(ctx, req.ApplicationIds, req.DeviceIds)
+	if err != nil {
+		logRegistryRPCError(ctx, err, "Failed to delete device from registry")
+		return nil, err
+	}
+
+	if len(deleted) != 0 {
+		events.Publish(
+			evtBatchDeleteEndDevices.NewWithIdentifiersAndData(
+				ctx, req.ApplicationIds, &ttnpb.EndDeviceIdentifiersList{
+					EndDeviceIds: deleted,
+				},
+			),
+		)
+	}
+
 	return ttnpb.Empty, nil
 }
 

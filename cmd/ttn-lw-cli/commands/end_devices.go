@@ -1123,6 +1123,127 @@ var (
 			return deleteEndDevice(ctx, devID, skipClusterJS)
 		},
 	}
+	endDevicesBatchDeleteCommand = &cobra.Command{
+		Use:   "batch-delete [application-id] [device-ids]",
+		Short: "Delete a batch of end devices within the same application (EXPERIMENTAL).",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := checkComponentsEnabled(); err != nil {
+				return err
+			}
+			var (
+				appID  *ttnpb.ApplicationIdentifiers
+				devIDs = make([]*ttnpb.EndDeviceIdentifiers, 0)
+			)
+			if inputDecoder != nil {
+				dec := struct {
+					ApplicationID string   `json:"application_id"`
+					DeviceIDs     []string `json:"device_ids"`
+				}{}
+				err := inputDecoder.Decode(&dec)
+				if err != nil {
+					return err
+				}
+				appID = &ttnpb.ApplicationIdentifiers{
+					ApplicationId: dec.ApplicationID,
+				}
+				for _, devID := range dec.DeviceIDs {
+					devIDs = append(devIDs, &ttnpb.EndDeviceIdentifiers{
+						ApplicationIds: appID,
+						DeviceId:       devID,
+					})
+				}
+			} else if len(args) < 2 {
+				return errNoIDs.New()
+			} else {
+				appID = &ttnpb.ApplicationIdentifiers{
+					ApplicationId: args[0],
+				}
+				for _, arg := range args[1:] {
+					devIDs = append(devIDs, &ttnpb.EndDeviceIdentifiers{
+						ApplicationIds: appID,
+						DeviceId:       arg,
+					})
+				}
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			del := make([]string, 0)
+			for _, devID := range devIDs {
+				dev, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
+					EndDeviceIds: devID,
+					FieldMask: ttnpb.FieldMask(
+						"ids",
+						"network_server_address",
+						"application_server_address",
+						"join_server_address",
+					),
+				})
+				if err != nil && !errors.IsNotFound(err) {
+					return err
+				}
+				// Check if the device is in the configured cluster.
+				nsMismatch, asMismatch, jsMismatch := compareServerAddressesEndDevice(dev, config)
+				if nsMismatch || asMismatch || jsMismatch {
+					return errAddressMismatchEndDevice.New()
+				}
+				del = append(del, devID.DeviceId)
+			}
+
+			// Batch Delete from JS.
+			if len(del) > 0 {
+				js, err := api.Dial(ctx, config.JoinServerGRPCAddress)
+				if err != nil {
+					return err
+				}
+				_, err = ttnpb.NewJsEndDeviceBatchRegistryClient(js).Delete(ctx, &ttnpb.BatchDeleteEndDevicesRequest{
+					ApplicationIds: appID,
+					DeviceIds:      del,
+				})
+				if err != nil {
+					return err
+				}
+			}
+
+			// Batch Delete from AS.
+			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewAsEndDeviceBatchRegistryClient(as).Delete(ctx, &ttnpb.BatchDeleteEndDevicesRequest{
+				ApplicationIds: appID,
+				DeviceIds:      del,
+			})
+			if err != nil {
+				return err
+			}
+
+			// Batch Delete from NS.
+			ns, err := api.Dial(ctx, config.NetworkServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewNsEndDeviceBatchRegistryClient(ns).Delete(ctx, &ttnpb.BatchDeleteEndDevicesRequest{
+				ApplicationIds: appID,
+				DeviceIds:      del,
+			})
+			if err != nil {
+				return err
+			}
+
+			// Delete from IS.
+			_, err = ttnpb.NewEndDeviceBatchRegistryClient(is).Delete(ctx, &ttnpb.BatchDeleteEndDevicesRequest{
+				ApplicationIds: appID,
+				DeviceIds:      del,
+			})
+			if err != nil {
+				return err
+			}
+			return nil
+		},
+	}
 	endDevicesClaimCommand = &cobra.Command{
 		Use:    "claim [application-id]",
 		Short:  "Claim an end device (DEPRECATED)",
@@ -1446,6 +1567,8 @@ func init() {
 	endDevicesListPhyVersionsCommand.Flags().AddFlagSet(listPhyVersionFlags)
 	endDevicesCommand.AddCommand(endDevicesListPhyVersionsCommand)
 
+	endDevicesCommand.AddCommand(endDevicesBatchDeleteCommand)
+
 	// Deprecate flags.
 	util.DeprecateFlagWithoutForwarding(
 		endDevicesCreateCommand.Flags(),
@@ -1486,4 +1609,17 @@ func compareServerAddressesEndDevice(device *ttnpb.EndDevice, config *Config) (n
 		)).Warnf("Registered Join Server address of end device %q does not match CLI configuration", device.GetIds().GetDeviceId())
 	}
 	return
+}
+
+func checkComponentsEnabled() error {
+	if !config.NetworkServerEnabled {
+		return errNetworkServerDisabled.New()
+	}
+	if !config.ApplicationServerEnabled {
+		return errApplicationServerDisabled.New()
+	}
+	if !config.JoinServerEnabled {
+		return errJoinServerDisabled.New()
+	}
+	return nil
 }

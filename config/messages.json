@@ -9314,6 +9314,15 @@
       "file": "observability.go"
     }
   },
+  "event:as.end_device.batch.delete": {
+    "translations": {
+      "en": "batch delete end devices"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "grpc_deviceregistry.go"
+    }
+  },
   "event:as.end_device.create": {
     "translations": {
       "en": "create end device"
@@ -9926,6 +9935,24 @@
       "file": "invitation_registry.go"
     }
   },
+  "event:is.end_device.batch.delete": {
+    "translations": {
+      "en": "batch delete end devices"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "end_device_registry.go"
+    }
+  },
+  "event:js.end_device.batch.delete": {
+    "translations": {
+      "en": "batch delete end devices"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "grpc_deviceregistry.go"
+    }
+  },
   "event:js.end_device.create": {
     "translations": {
       "en": "create end device"
@@ -10077,6 +10104,15 @@
     "description": {
       "package": "pkg/networkserver",
       "file": "observability.go"
+    }
+  },
+  "event:ns.end_device.batch.delete": {
+    "translations": {
+      "en": "batch delete end devices"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "grpc_deviceregistry.go"
     }
   },
   "event:ns.end_device.create": {

@@ -58,6 +58,14 @@ var (
 		events.WithClientInfoFromContext(),
 		events.WithPropagateToParent(),
 	)
+	evtBatchDeleteEndDevices = events.Define(
+		"is.end_device.batch.delete", "batch delete end devices",
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ),
+		events.WithDataType(&ttnpb.EndDeviceIdentifiersList{}),
+		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
+		events.WithPropagateToParent(),
+	)
 )
 
 var errEndDeviceEUIsTaken = errors.DefineAlreadyExists(
@@ -460,6 +468,48 @@ type endDeviceRegistry struct {
 	*IdentityServer
 }
 
+type endDeviceBatchRegistry struct {
+	ttnpb.UnimplementedEndDeviceBatchRegistryServer
+
+	*IdentityServer
+}
+
+func (is *IdentityServer) batchDeleteEndDevice(
+	ctx context.Context,
+	req *ttnpb.BatchDeleteEndDevicesRequest,
+) (*emptypb.Empty, error) {
+	if err := rights.RequireApplication(ctx,
+		req.ApplicationIds,
+		ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+	); err != nil {
+		return nil, err
+	}
+	var (
+		err     error
+		deleted = []*ttnpb.EndDeviceIdentifiers{}
+	)
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		deleted, err = st.BatchDeleteEndDevices(ctx, req.ApplicationIds, req.DeviceIds)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if len(deleted) != 0 {
+		events.Publish(
+			evtBatchDeleteEndDevices.NewWithIdentifiersAndData(
+				ctx, req.ApplicationIds, &ttnpb.EndDeviceIdentifiersList{
+					EndDeviceIds: deleted,
+				},
+			),
+		)
+	}
+	return ttnpb.Empty, nil
+}
+
 func (dr *endDeviceRegistry) Create(ctx context.Context, req *ttnpb.CreateEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	return dr.createEndDevice(ctx, req)
 }
@@ -486,4 +536,11 @@ func (dr *endDeviceRegistry) BatchUpdateLastSeen(ctx context.Context, req *ttnpb
 
 func (dr *endDeviceRegistry) Delete(ctx context.Context, req *ttnpb.EndDeviceIdentifiers) (*emptypb.Empty, error) {
 	return dr.deleteEndDevice(ctx, req)
+}
+
+func (reg *endDeviceBatchRegistry) Delete(
+	ctx context.Context,
+	req *ttnpb.BatchDeleteEndDevicesRequest,
+) (*emptypb.Empty, error) {
+	return reg.batchDeleteEndDevice(ctx, req)
 }

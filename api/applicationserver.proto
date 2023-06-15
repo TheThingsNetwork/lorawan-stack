@@ -289,3 +289,15 @@ service AsEndDeviceRegistry {
     };
   };
 }
+
+// The AsEndDeviceBatchRegistry service allows clients to manage batches end devices on the Application Server.
+service AsEndDeviceBatchRegistry {
+  // Delete a list of devices within the same application.
+  // This operation is atomic; either all devices are deleted or none.
+  // Devices not found are skipped and no error is returned.
+  rpc Delete(BatchDeleteEndDevicesRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/as/applications/{application_ids.application_id}/devices/batch"
+    };
+  };
+}

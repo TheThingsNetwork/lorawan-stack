@@ -53,6 +53,14 @@ var (
 		events.WithClientInfoFromContext(),
 		events.WithPropagateToParent(),
 	)
+	evtBatchDeleteEndDevices = events.Define(
+		"js.end_device.batch.delete", "batch delete end devices",
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ),
+		events.WithDataType(&ttnpb.EndDeviceIdentifiersList{}),
+		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
+		events.WithPropagateToParent(),
+	)
 )
 
 type jsEndDeviceRegistryServer struct {
@@ -352,4 +360,53 @@ func (srv jsEndDeviceRegistryServer) Delete(ctx context.Context, ids *ttnpb.EndD
 		events.Publish(evt)
 	}
 	return ttnpb.Empty, err
+}
+
+type jsEndDeviceBatchRegistryServer struct {
+	ttnpb.UnimplementedJsEndDeviceBatchRegistryServer
+
+	JS *JoinServer
+}
+
+// Delete implements ttipb.JsEndDeviceBatchRegistryServer.
+func (srv jsEndDeviceBatchRegistryServer) Delete(
+	ctx context.Context,
+	req *ttnpb.BatchDeleteEndDevicesRequest,
+) (*emptypb.Empty, error) {
+	// Check if the user has rights on the application.
+	if err := rights.RequireApplication(
+		ctx,
+		req.ApplicationIds,
+		ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+	); err != nil {
+		return nil, err
+	}
+	deleted, err := srv.JS.devices.BatchDelete(ctx, req.ApplicationIds, req.DeviceIds)
+	if err != nil {
+		return nil, err
+	}
+	if len(deleted) != 0 {
+		events.Publish(
+			evtBatchDeleteEndDevices.NewWithIdentifiersAndData(
+				ctx, req.ApplicationIds, &ttnpb.EndDeviceIdentifiersList{
+					EndDeviceIds: deleted,
+				},
+			),
+		)
+	}
+
+	// Try deleting the session keys in a batch.
+	devices := []*ttnpb.EndDeviceIdentifiers{}
+	for _, devID := range deleted {
+		if devID.DevEui == nil && devID.JoinEui == nil || types.MustEUI64(devID.DevEui).IsZero() {
+			continue
+		}
+		devices = append(devices, devID)
+	}
+	if err := srv.JS.keys.BatchDelete(ctx, devices); err != nil {
+		// We don't return an error since this is an internal cleanup.
+		log.FromContext(ctx).WithError(err).Warn("Failed to delete session keys")
+	}
+
+	return ttnpb.Empty, nil
 }

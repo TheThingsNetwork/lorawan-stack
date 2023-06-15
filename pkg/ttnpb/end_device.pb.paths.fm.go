@@ -3165,6 +3165,16 @@ var ConvertEndDeviceTemplateRequestFieldPathsTopLevel = []string{
 	"end_device_version_ids",
 	"format_id",
 }
+var BatchDeleteEndDevicesRequestFieldPathsNested = []string{
+	"application_ids",
+	"application_ids.application_id",
+	"device_ids",
+}
+
+var BatchDeleteEndDevicesRequestFieldPathsTopLevel = []string{
+	"application_ids",
+	"device_ids",
+}
 var MACParameters_ChannelFieldPathsNested = []string{
 	"downlink_frequency",
 	"enable_uplink",

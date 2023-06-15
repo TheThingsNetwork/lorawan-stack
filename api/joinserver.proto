@@ -321,6 +321,18 @@ service JsEndDeviceRegistry {
   };
 }
 
+// JsEndDeviceBatchRegistry service allows clients to manage batches of end devices on the Join Server.
+service JsEndDeviceBatchRegistry {
+  // Delete a list of devices within the same application.
+  // This operation is atomic; either all devices are deleted or none.
+  // Devices not found are skipped and no error is returned.
+  rpc Delete(BatchDeleteEndDevicesRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/js/applications/{application_ids.application_id}/devices/batch"
+    };
+  };
+}
+
 message ApplicationActivationSettings {
   option (thethings.flags.message) = { select: true, set: true };
   // The KEK label to use for wrapping application keys.

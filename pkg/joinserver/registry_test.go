@@ -204,6 +204,98 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 		t.Fatalf("Error received: %v", err)
 	}
 	a.So(retCtx, should.BeNil)
+
+	// Batch Operations
+	pb1 := ttnpb.Clone(pb)
+	pb1.Ids.DeviceId = "test-dev-1"
+	pb1.Ids.DevEui = types.EUI64{0x42, 0x43, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes()
+	pb1.ProvisionerId = "mock-provisioner-1"
+
+	pb2 := ttnpb.Clone(pb)
+	pb2.Ids.DeviceId = "test-dev-2"
+	pb2.Ids.DevEui = types.EUI64{0x42, 0x44, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes()
+	pb1.ProvisionerId = "mock-provisioner-2"
+
+	pb3 := ttnpb.Clone(pb)
+	pb3.Ids.DeviceId = "test-dev-3"
+	pb3.Ids.DevEui = types.EUI64{0x42, 0x45, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes()
+	pb3.ProvisionerId = "mock-provisioner-3"
+
+	// Create the devices
+	for _, dev := range []*ttnpb.EndDevice{pb1, pb2, pb3} {
+		devEUI := types.EUI64(dev.GetIds().DevEui)
+		retCtx, err := reg.GetByEUI(ctx, joinEUI, devEUI, ttnpb.EndDeviceFieldPathsTopLevel)
+		if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
+			t.Fatalf("Error received: %v", err)
+		}
+		a.So(retCtx, should.BeNil)
+		ret, err := reg.SetByID(ctx, dev.Ids.ApplicationIds, dev.Ids.DeviceId,
+			[]string{
+				"provisioner_id",
+				"provisioning_data",
+			},
+			func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+				if !a.So(stored, should.BeNil) {
+					t.Fatal("Registry is not empty")
+				}
+				return ttnpb.Clone(dev), []string{
+					"ids.application_ids",
+					"ids.dev_eui",
+					"ids.device_id",
+					"ids.join_eui",
+					"provisioner_id",
+					"provisioning_data",
+				}, nil
+			},
+		)
+		if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
+			t.Fatalf("Failed to create device: %s", err)
+		}
+		a.So(*ttnpb.StdTime(ret.CreatedAt), should.HappenAfter, start)
+		a.So(*ttnpb.StdTime(ret.UpdatedAt), should.HappenAfter, start)
+		a.So(ret.UpdatedAt, should.Equal, ret.CreatedAt)
+		dev.CreatedAt = ret.CreatedAt
+		dev.UpdatedAt = ret.UpdatedAt
+		a.So(ret, should.HaveEmptyDiff, dev)
+
+		retCtx, err = reg.GetByEUI(ctx, joinEUI, devEUI, ttnpb.EndDeviceFieldPathsTopLevel)
+		if !a.So(err, should.BeNil) {
+			t.Fatalf("Failed to get device: %s", err)
+		}
+		a.So(retCtx.EndDevice, should.HaveEmptyDiff, dev)
+	}
+
+	// Batch Delete
+	deleted, err := reg.BatchDelete(
+		ctx,
+		pb.Ids.ApplicationIds,
+		[]string{
+			pb1.Ids.DeviceId,
+			pb2.Ids.DeviceId,
+			pb3.Ids.DeviceId,
+			// This unknown device will be ignored.
+			"test-dev-4",
+		},
+	)
+	if !a.So(err, should.BeNil) {
+		t.Fatalf("BatchDelete failed with: %s", errors.Stack(err))
+	}
+	if !a.So(deleted, should.HaveLength, 3) {
+		t.Fatalf("BatchDelete returned wrong number of devices: %d", len(deleted))
+	}
+	if !a.So(deleted, should.Resemble, []*ttnpb.EndDeviceIdentifiers{pb1.Ids, pb2.Ids, pb3.Ids}) {
+		t.Fatalf("Unexpected response from BatchDelete: %s", deleted)
+	}
+
+	// Check that the devices are deleted
+	for _, pb := range []*ttnpb.EndDevice{pb1, pb2, pb3} {
+		devEUI := types.EUI64(pb.GetIds().DevEui)
+		retCtx, err := reg.GetByEUI(ctx, joinEUI, devEUI, ttnpb.EndDeviceFieldPathsTopLevel)
+		if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
+			t.Fatalf("Error received: %v", err)
+		}
+		a.So(retCtx, should.BeNil)
+	}
 }
 
 func TestDeviceRegistries(t *testing.T) {
@@ -430,6 +522,81 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 		_, err := reg.GetByID(ctx, joinEUI, devEUI, bytes.Repeat([]byte{i}, 4), ttnpb.SessionKeysFieldPathsTopLevel)
 		if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 			t.Fatalf("Error received: %v", err)
+		}
+	}
+
+	// Batch Operations
+	noOfKeysPerDevice := uint8(10)
+	devEUI1 := types.EUI64{0x44, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	devEUI2 := types.EUI64{0x45, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	devEUI3 := types.EUI64{0x46, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+
+	// Create keys for each device
+	for _, devEUI := range []types.EUI64{devEUI1, devEUI2, devEUI3} {
+		for i := byte(0); i < noOfKeysPerDevice; i++ {
+			sid := bytes.Repeat([]byte{i}, 4)
+			_, err := reg.SetByID(ctx, joinEUI, devEUI, sid, []string{
+				"app_s_key",
+				"f_nwk_s_int_key",
+				"nwk_s_enc_key",
+				"s_nwk_s_int_key",
+			},
+				func(stored *ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error) {
+					if !a.So(stored, should.BeNil) {
+						t.Fatal("Registry is not empty")
+					}
+					return &ttnpb.SessionKeys{
+							SessionKeyId: sid,
+							FNwkSIntKey:  test.DefaultFNwkSIntKeyEnvelope,
+							SNwkSIntKey:  test.DefaultSNwkSIntKeyEnvelope,
+							NwkSEncKey:   test.DefaultNwkSEncKeyEnvelope,
+							AppSKey:      test.DefaultAppSKeyEnvelope,
+						}, []string{
+							"app_s_key",
+							"f_nwk_s_int_key",
+							"nwk_s_enc_key",
+							"s_nwk_s_int_key",
+							"session_key_id",
+						}, nil
+				})
+			if err != nil {
+				t.Fatalf("Error creating session key with ID %v for devEUI %v: %v", sid, devEUI, err)
+			}
+			// Read the keys back
+			_, err = reg.GetByID(ctx, joinEUI, devEUI, sid, ttnpb.SessionKeysFieldPathsTopLevel)
+			if err != nil {
+				t.Fatalf("Error reading session key with ID %v for devEUI %v: %v", sid, devEUI, err)
+			}
+		}
+	}
+
+	// Batch Delete
+	err = reg.BatchDelete(ctx, []*ttnpb.EndDeviceIdentifiers{
+		{
+			JoinEui: joinEUI.Bytes(),
+			DevEui:  devEUI1.Bytes(),
+		},
+		{
+			JoinEui: joinEUI.Bytes(),
+			DevEui:  devEUI2.Bytes(),
+		},
+		{
+			JoinEui: joinEUI.Bytes(),
+			DevEui:  devEUI3.Bytes(),
+		},
+	})
+	if !a.So(err, should.BeNil) {
+		t.Fatalf("Could not BatchDelete keys: %v", err)
+	}
+
+	// Check if all keys are deleted
+	for _, devEUI := range []types.EUI64{devEUI1, devEUI2, devEUI3} {
+		for i := byte(0); i < noOfKeysPerDevice; i++ {
+			sid := bytes.Repeat([]byte{i}, 4)
+			_, err := reg.GetByID(ctx, joinEUI, devEUI, sid, ttnpb.SessionKeysFieldPathsTopLevel)
+			if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
+				t.Fatalf("Error received: %v", err)
+			}
 		}
 	}
 }

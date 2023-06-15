@@ -885,3 +885,73 @@ func (s *endDeviceStore) BatchUpdateEndDeviceLastSeen(
 
 	return nil
 }
+
+// BatchDeleteEndDevices implements EndDeviceStore.
+func (s *endDeviceStore) BatchDeleteEndDevices(
+	ctx context.Context,
+	appIDs *ttnpb.ApplicationIdentifiers,
+	deviceIDs []string,
+) ([]*ttnpb.EndDeviceIdentifiers, error) {
+	ctx, span := tracer.StartFromContext(ctx, "BatchDeleteEndDevices", trace.WithAttributes(
+		attribute.String("application_ids", appIDs.String()),
+		attribute.Int("count", len(deviceIDs)),
+	))
+	defer span.End()
+
+	// Sort end devices by ID to avoid deadlocks.
+	sort.Strings(deviceIDs)
+
+	deleted := make([]*ttnpb.EndDeviceIdentifiers, 0, len(deviceIDs))
+	for _, devID := range deviceIDs {
+		model, err := s.getEndDeviceModelBy(ctx, s.selectWithID(
+			ctx,
+			appIDs.GetApplicationId(),
+			devID,
+		), store.FieldMask{"ids", "attributes", "locations"})
+		if err != nil {
+			if errors.IsNotFound(err) {
+				continue
+			}
+			return nil, storeutil.WrapDriverError(err)
+		}
+		if len(model.Attributes) > 0 {
+			_, err = s.replaceAttributes(ctx, model.Attributes, nil, "device", model.ID)
+			if err != nil {
+				return nil, storeutil.WrapDriverError(err)
+			}
+		}
+		_, err = s.DB.NewDelete().
+			Model(model).
+			WherePK().
+			Exec(ctx)
+		if err != nil {
+			return nil, storeutil.WrapDriverError(err)
+		}
+
+		if len(model.Locations) > 0 {
+			_, err := s.DB.NewDelete().
+				Model(&model.Locations).
+				WherePK().
+				Exec(ctx)
+			if err != nil {
+				return nil, storeutil.WrapDriverError(err)
+			}
+		}
+
+		if model.PictureID != nil {
+			_, err = s.DB.NewDelete().
+				Model((*Picture)(nil)).
+				Where("id = ?", *model.PictureID).
+				Exec(ctx)
+			if err != nil {
+				return nil, storeutil.WrapDriverError(err)
+			}
+		}
+
+		deleted = append(deleted, &ttnpb.EndDeviceIdentifiers{
+			ApplicationIds: appIDs,
+			DeviceId:       devID,
+		})
+	}
+	return deleted, nil
+}

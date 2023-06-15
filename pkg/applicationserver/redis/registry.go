@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package redis provides interfaces to Redis.
 package redis
 
 import (
@@ -22,6 +23,7 @@ import (
 
 	"github.com/redis/go-redis/v9"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -447,4 +449,75 @@ func (r *LinkRegistry) Set(ctx context.Context, ids *ttnpb.ApplicationIdentifier
 		return nil, ttnredis.ConvertError(err)
 	}
 	return pb, nil
+}
+
+// BatchDelete implements Registry.
+func (r *DeviceRegistry) BatchDelete(
+	ctx context.Context,
+	appIDs *ttnpb.ApplicationIdentifiers,
+	deviceIDs []string,
+) ([]*ttnpb.EndDeviceIdentifiers, error) {
+	var (
+		uidKeys = make([]string, 0, len(deviceIDs))
+		ret     = make([]*ttnpb.EndDeviceIdentifiers, 0)
+	)
+	for _, devID := range deviceIDs {
+		uidKeys = append(
+			uidKeys,
+			r.uidKey(
+				unique.ID(
+					ctx,
+					&ttnpb.EndDeviceIdentifiers{
+						ApplicationIds: appIDs,
+						DeviceId:       devID,
+					}),
+			),
+		)
+	}
+
+	// Delete the devices in a single transaction.
+	transaction := func(tx *redis.Tx) error {
+		// Read the devices to delete.
+		raw, err := tx.MGet(ctx, uidKeys...).Result()
+		if err != nil {
+			return err
+		}
+		euiKeys := make([]string, 0, len(raw))
+		for _, raw := range raw {
+			switch val := raw.(type) {
+			case nil:
+				continue
+			case string:
+				dev := &ttnpb.EndDevice{}
+				if err := ttnredis.UnmarshalProto(val, dev); err != nil {
+					log.FromContext(ctx).WithError(err).Warn("Failed to decode stored end device")
+					continue
+				}
+				ret = append(ret, dev.Ids)
+				if dev.Ids.JoinEui != nil && dev.Ids.DevEui != nil {
+					euiKeys = append(euiKeys, r.euiKey(
+						types.MustEUI64(dev.GetIds().GetJoinEui()).OrZero(),
+						types.MustEUI64(dev.GetIds().GetDevEui()).OrZero(),
+					))
+				}
+			}
+		}
+		if err := tx.Watch(ctx, euiKeys...).Err(); err != nil {
+			return err
+		}
+		if _, err := tx.TxPipelined(ctx, func(p redis.Pipeliner) error {
+			p.Del(ctx, append(uidKeys, euiKeys...)...)
+			return nil
+		}); err != nil {
+			return err
+		}
+		return nil
+	}
+
+	defer trace.StartRegion(ctx, "batch delete end device").End()
+	err := r.Redis.Watch(ctx, transaction, uidKeys...)
+	if err != nil {
+		return nil, ttnredis.ConvertError(err)
+	}
+	return ret, nil
 }

@@ -832,3 +832,387 @@ func TestDeviceRegistryDelete(t *testing.T) {
 		})
 	}
 }
+
+func TestDeviceRegistryBatchDelete(t *testing.T) { // nolint:paralleltest
+	registeredApplicationID := "test-app"
+	registeredApplicationIDs := &ttnpb.ApplicationIdentifiers{
+		ApplicationId: registeredApplicationID,
+	}
+	dev1 := &ttnpb.EndDevice{
+		Ids: &ttnpb.EndDeviceIdentifiers{
+			ApplicationIds: &ttnpb.ApplicationIdentifiers{
+				ApplicationId: registeredApplicationID,
+			},
+			DeviceId: "test-device-1",
+			JoinEui:  types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
+			DevEui:   types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
+		},
+		RootKeys: &ttnpb.RootKeys{
+			RootKeyId: "testKey",
+			NwkKey: &ttnpb.KeyEnvelope{
+				Key: types.AES128Key{
+					0xff, 0xee, 0xdd, 0xcc, 0xbb, 0xaa, 0x99, 0x88, 0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11, 0x0,
+				}.Bytes(),
+				KekLabel: "test",
+			},
+			AppKey: &ttnpb.KeyEnvelope{
+				Key: types.AES128Key{
+					0x0, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
+				}.Bytes(),
+				KekLabel: "test",
+			},
+		},
+	}
+	dev2 := ttnpb.Clone(dev1)
+	dev2.Ids.DeviceId = "test-device-2"
+	dev2.Ids.JoinEui = types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes()
+	dev2.Ids.DevEui = types.EUI64{0x42, 0x43, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes()
+
+	dev3 := ttnpb.Clone(dev1)
+	dev3.Ids.DeviceId = "test-device-3"
+	dev3.Ids.JoinEui = types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes()
+	dev3.Ids.DevEui = types.EUI64{0x42, 0x44, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes()
+
+	for _, tc := range []struct {
+		Name            string
+		ContextFunc     func(context.Context) context.Context
+		BatchDeleteFunc func(
+			ctx context.Context,
+			appIDs *ttnpb.ApplicationIdentifiers,
+			deviceIDs []string,
+		) ([]*ttnpb.EndDeviceIdentifiers, error)
+		Request          *ttnpb.BatchDeleteEndDevicesRequest
+		ErrorAssertion   func(*testing.T, error) bool
+		BatchDeleteCalls uint64
+	}{
+		{
+			Name: "No device write rights",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
+						unique.ID(test.Context(), registeredApplicationIDs): {
+							Rights: []ttnpb.Right{
+								ttnpb.Right_RIGHT_GATEWAY_SETTINGS_BASIC,
+							},
+						},
+					}),
+				})
+			},
+			BatchDeleteFunc: func(
+				ctx context.Context,
+				appIDs *ttnpb.ApplicationIdentifiers,
+				deviceIDs []string,
+			) ([]*ttnpb.EndDeviceIdentifiers, error) {
+				err := errors.New("BatchDeleteFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return nil, err
+			},
+			Request: &ttnpb.BatchDeleteEndDevicesRequest{
+				ApplicationIds: registeredApplicationIDs,
+				DeviceIds: []string{
+					dev1.Ids.DeviceId,
+					dev2.Ids.DeviceId,
+					dev3.Ids.DeviceId,
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
+				if !assertions.New(t).So(errors.IsPermissionDenied(err), should.BeTrue) {
+					t.Errorf("Received error: %s", err)
+					return false
+				}
+				return true
+			},
+			BatchDeleteCalls: 0,
+		},
+		{
+			Name: "Non-existing device",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
+						unique.ID(test.Context(), registeredApplicationIDs): {
+							Rights: []ttnpb.Right{
+								ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+							},
+						},
+					}),
+				})
+			},
+			BatchDeleteFunc: func(ctx context.Context,
+				appIDs *ttnpb.ApplicationIdentifiers,
+				deviceIDs []string,
+			) ([]*ttnpb.EndDeviceIdentifiers, error) {
+				// Devices not found are skipped.
+				return nil, nil
+			},
+			Request: &ttnpb.BatchDeleteEndDevicesRequest{
+				ApplicationIds: registeredApplicationIDs,
+				DeviceIds: []string{
+					dev1.Ids.DeviceId,
+					dev2.Ids.DeviceId,
+					dev3.Ids.DeviceId,
+				},
+			},
+			BatchDeleteCalls: 1,
+		},
+		{
+			Name: "Wrong application ID",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
+						unique.ID(test.Context(), registeredApplicationIDs): {
+							Rights: []ttnpb.Right{
+								ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+							},
+						},
+					}),
+				})
+			},
+			Request: &ttnpb.BatchDeleteEndDevicesRequest{
+				ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-unknown-app-id"},
+				DeviceIds: []string{
+					dev1.Ids.DeviceId,
+					dev2.Ids.DeviceId,
+					dev3.Ids.DeviceId,
+				},
+			},
+			BatchDeleteFunc: func(
+				ctx context.Context,
+				appIDs *ttnpb.ApplicationIdentifiers,
+				deviceIDs []string,
+			) ([]*ttnpb.EndDeviceIdentifiers, error) {
+				err := errors.New("BatchDeleteFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return nil, err
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
+				if !assertions.New(t).So(errors.IsPermissionDenied(err), should.BeTrue) {
+					t.Errorf("Received error: %s", err)
+					return false
+				}
+				return true
+			},
+			BatchDeleteCalls: 0,
+		},
+		{
+			Name: "Invalid Device",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
+						unique.ID(test.Context(), registeredApplicationIDs): {
+							Rights: []ttnpb.Right{
+								ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+							},
+						},
+					}),
+				})
+			},
+			Request: &ttnpb.BatchDeleteEndDevicesRequest{
+				ApplicationIds: registeredApplicationIDs,
+				DeviceIds: []string{
+					"test-dev-&*@(#)",
+				},
+			},
+			BatchDeleteFunc: func(
+				ctx context.Context,
+				appIDs *ttnpb.ApplicationIdentifiers,
+				deviceIDs []string,
+			) ([]*ttnpb.EndDeviceIdentifiers, error) {
+				err := errors.New("BatchDeleteFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return nil, err
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
+				if !assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue) {
+					t.Errorf("Received error: %s", err)
+					return false
+				}
+				return true
+			},
+			BatchDeleteCalls: 0,
+		},
+		{
+			Name: "Existing device",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
+						unique.ID(test.Context(), registeredApplicationIDs): {
+							Rights: []ttnpb.Right{
+								ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+							},
+						},
+					}),
+				})
+			},
+			BatchDeleteFunc: func(
+				ctx context.Context,
+				appIDs *ttnpb.ApplicationIdentifiers,
+				deviceIDs []string,
+			) ([]*ttnpb.EndDeviceIdentifiers, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(deviceIDs, should.HaveLength, 1)
+				a.So(appIDs, should.Resemble, registeredApplicationIDs)
+				a.So(deviceIDs[0], should.Equal, dev1.GetIds().DeviceId)
+				return []*ttnpb.EndDeviceIdentifiers{
+					dev1.Ids,
+				}, nil
+			},
+			Request: &ttnpb.BatchDeleteEndDevicesRequest{
+				ApplicationIds: registeredApplicationIDs,
+				DeviceIds: []string{
+					dev1.Ids.DeviceId,
+				},
+			},
+			BatchDeleteCalls: 1,
+		},
+		{
+			Name: "One invalid device in batch",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
+						unique.ID(test.Context(), registeredApplicationIDs): {
+							Rights: []ttnpb.Right{
+								ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+							},
+						},
+					}),
+				})
+			},
+			BatchDeleteFunc: func(
+				ctx context.Context,
+				appIDs *ttnpb.ApplicationIdentifiers,
+				deviceIDs []string,
+			) ([]*ttnpb.EndDeviceIdentifiers, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(deviceIDs, should.HaveLength, 3)
+				a.So(appIDs, should.Resemble, registeredApplicationIDs)
+
+				for _, devID := range deviceIDs {
+					switch devID {
+					case dev1.GetIds().DeviceId:
+					case dev2.GetIds().DeviceId:
+						t.Log("Known device ID")
+					case "test-dev-unknown-id":
+						t.Log("Ignore expected unknown device ID")
+					default:
+						t.Log("Unexpected device ID")
+					}
+				}
+				return []*ttnpb.EndDeviceIdentifiers{
+					dev1.Ids,
+					dev2.Ids,
+				}, nil
+			},
+			Request: &ttnpb.BatchDeleteEndDevicesRequest{
+				ApplicationIds: registeredApplicationIDs,
+				DeviceIds: []string{
+					dev1.Ids.DeviceId,
+					dev2.Ids.DeviceId,
+					"test-dev-unknown-id",
+				},
+			},
+			BatchDeleteCalls: 1,
+		},
+		{
+			Name: "Valid Batch",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
+						unique.ID(test.Context(), registeredApplicationIDs): {
+							Rights: []ttnpb.Right{
+								ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+							},
+						},
+					}),
+				})
+			},
+			BatchDeleteFunc: func(
+				ctx context.Context,
+				appIDs *ttnpb.ApplicationIdentifiers,
+				deviceIDs []string,
+			) ([]*ttnpb.EndDeviceIdentifiers, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(appIDs, should.Resemble, registeredApplicationIDs)
+				a.So(deviceIDs, should.HaveLength, 3)
+				for _, devID := range deviceIDs {
+					switch devID {
+					case dev1.GetIds().DeviceId:
+					case dev2.GetIds().DeviceId:
+					case dev3.GetIds().DeviceId:
+						// Known device ID
+					default:
+						t.Error("Unknown device ID: ", devID)
+					}
+				}
+				return []*ttnpb.EndDeviceIdentifiers{
+					dev1.Ids,
+					dev2.Ids,
+					dev3.Ids,
+				}, nil
+			},
+			Request: &ttnpb.BatchDeleteEndDevicesRequest{
+				ApplicationIds: registeredApplicationIDs,
+				DeviceIds: []string{
+					dev1.Ids.DeviceId,
+					dev2.Ids.DeviceId,
+					dev3.Ids.DeviceId,
+				},
+			},
+			BatchDeleteCalls: 1,
+		},
+	} {
+		tc := tc
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				t.Helper()
+				var batchDeleteCalls uint64
+				as := test.Must(applicationserver.New(componenttest.NewComponent(t, &component.Config{}),
+					&applicationserver.Config{
+						Devices: &MockDeviceRegistry{
+							BatchDeleteFunc: func(
+								ctx context.Context,
+								appIDs *ttnpb.ApplicationIdentifiers,
+								deviceIDs []string,
+							) ([]*ttnpb.EndDeviceIdentifiers, error) {
+								atomic.AddUint64(&batchDeleteCalls, 1)
+								return tc.BatchDeleteFunc(ctx, appIDs, deviceIDs)
+							},
+						},
+						Downlinks: applicationserver.DownlinksConfig{
+							ConfirmationConfig: applicationserver.ConfirmationConfig{
+								DefaultRetryAttempts: 3,
+								MaxRetryAttempts:     10,
+							},
+						},
+					}))
+
+				as.AddContextFiller(tc.ContextFunc)
+				as.AddContextFiller(func(ctx context.Context) context.Context {
+					ctx, cancel := context.WithDeadline(ctx, time.Now().Add(Timeout))
+					_ = cancel
+					return ctx
+				})
+				as.AddContextFiller(func(ctx context.Context) context.Context {
+					return test.ContextWithTB(ctx, t)
+				})
+				componenttest.StartComponent(t, as.Component)
+				defer as.Close()
+
+				ctx = as.FillContext(ctx)
+				req := ttnpb.Clone(tc.Request)
+
+				_, err := ttnpb.NewAsEndDeviceBatchRegistryClient(as.LoopbackConn()).Delete(ctx, req)
+				a.So(batchDeleteCalls, should.Equal, tc.BatchDeleteCalls)
+				if tc.ErrorAssertion != nil {
+					a.So(tc.ErrorAssertion(t, err), should.BeTrue)
+				} else {
+					a.So(err, should.BeNil)
+				}
+			},
+		})
+	}
+}

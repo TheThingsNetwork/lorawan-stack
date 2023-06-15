@@ -15,9 +15,11 @@
 package storetest
 
 import (
+	"context"
 	. "testing"
 	"time"
 
+	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	is "go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
@@ -729,4 +731,133 @@ func (st *StoreTest) TestEndDeviceCAC(t *T) { //nolint:revive
 			a.So(got.ClaimAuthenticationCode, should.BeNil)
 		}
 	})
+}
+
+// TestEndDeviceBatchOperations tests the EndDeviceBatchStore implementation.
+func (st *StoreTest) TestEndDeviceBatchOperations(t *T) { // nolint:gocyclo
+	a, ctx := test.New(t)
+
+	s, ok := st.PrepareDB(t).(interface {
+		Store
+		is.EndDeviceStore
+		is.ApplicationStore
+	})
+	defer st.DestroyDB(t, false)
+	if !ok {
+		t.Skip("Store does not implement TestEndDeviceBatchOperations")
+	}
+	defer s.Close()
+
+	for _, ctx := range []context.Context{
+		ctx,
+	} {
+		application, err := s.CreateApplication(ctx, &ttnpb.Application{
+			Ids: &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
+		})
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+
+		dev1, err := s.CreateEndDevice(ctx, &ttnpb.EndDevice{
+			Ids: &ttnpb.EndDeviceIdentifiers{
+				ApplicationIds: application.GetIds(),
+				DeviceId:       "foo-1",
+			},
+		})
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+
+		dev2, err := s.CreateEndDevice(ctx, &ttnpb.EndDevice{
+			Ids: &ttnpb.EndDeviceIdentifiers{
+				ApplicationIds: application.GetIds(),
+				DeviceId:       "bar-1",
+			},
+		})
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+
+		dev1.LastSeenAt = timestamppb.New(time.Now().Truncate(time.Millisecond))
+		dev2.LastSeenAt = timestamppb.New(time.Now().Add(-1 * time.Second).Truncate(time.Millisecond))
+
+		batch := []*ttnpb.BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate{
+			{Ids: dev1.Ids, LastSeenAt: dev1.LastSeenAt},
+			{Ids: dev2.Ids, LastSeenAt: dev2.LastSeenAt},
+		}
+		err = s.BatchUpdateEndDeviceLastSeen(ctx, batch)
+		a.So(err, should.BeNil)
+
+		devs, err := s.ListEndDevices(ctx, application.Ids, []string{"last_seen_at"})
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+		a.So(devs, should.HaveLength, 2)
+
+		for _, dev := range devs {
+			if dev.Ids.DeviceId == dev1.Ids.DeviceId {
+				a.So(dev.LastSeenAt, should.Resemble, dev1.LastSeenAt)
+			} else if dev.Ids.DeviceId == dev2.Ids.DeviceId {
+				a.So(dev.LastSeenAt, should.Resemble, dev2.LastSeenAt)
+			} else {
+				t.FailNow()
+			}
+		}
+
+		// Batch Delete
+		for _, tc := range []struct { // nolint:paralleltest
+			Name            string
+			Context         context.Context
+			BatchDeleteFunc func(context.Context, []*ttnpb.EndDeviceIdentifiers) ([]*ttnpb.EndDeviceIdentifiers, error)
+			ApplicationIDs  *ttnpb.ApplicationIdentifiers
+			DeviceIDs       []string
+			Response        []*ttnpb.EndDeviceIdentifiers
+			ErrorAssertion  func(*T, error) bool
+		}{
+			{
+				Name:           "Not Found",
+				Context:        ctx,
+				ApplicationIDs: application.Ids,
+				DeviceIDs: []string{
+					"unknown",
+				},
+				Response: []*ttnpb.EndDeviceIdentifiers{},
+			},
+			{
+				Name:           "Valid Batch",
+				Context:        ctx,
+				ApplicationIDs: application.Ids,
+				DeviceIDs: []string{
+					dev1.Ids.DeviceId,
+					dev2.Ids.DeviceId,
+				},
+				Response: []*ttnpb.EndDeviceIdentifiers{
+					dev2.Ids,
+					dev1.Ids,
+				},
+			},
+		} {
+			tc := tc
+			t.Run(tc.Name, func(t *T) {
+				a := assertions.New(t)
+				deleted, err := s.BatchDeleteEndDevices(tc.Context, tc.ApplicationIDs, tc.DeviceIDs)
+				if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
+					a.So(deleted, should.BeNil)
+				} else if a.So(err, should.BeNil) {
+					if tc.Response != nil {
+						a.So(deleted, should.Resemble, tc.Response)
+					} else {
+						a.So(deleted, should.BeNil)
+					}
+				}
+			})
+		}
+
+		// Check that the devices are deleted.
+		devs, err = s.ListEndDevices(ctx, application.Ids, []string{"last_seen_at", "locations"})
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+		a.So(devs, should.HaveLength, 0)
+	}
 }

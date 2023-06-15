@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package applicationserver provides a LoRaWAN-compliant Application Server implementation.
 package applicationserver
 
 import (
@@ -90,6 +91,8 @@ type ApplicationServer struct {
 	grpc struct {
 		asDevices asEndDeviceRegistryServer
 		appAs     ttnpb.AppAsServer
+
+		asBatchDevices asEndDeviceBatchRegistryServer
 	}
 
 	interopClient InteropClient
@@ -224,6 +227,10 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		}),
 	)
 
+	as.grpc.asBatchDevices = asEndDeviceBatchRegistryServer{
+		AS: as,
+	}
+
 	ctx, cancel := context.WithCancel(as.Context())
 	defer func() {
 		if err != nil {
@@ -304,6 +311,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 			"/ttn.lorawan.v3.As",
 			"/ttn.lorawan.v3.NsAs",
 			"/ttn.lorawan.v3.AsEndDeviceRegistry",
+			"/ttn.lorawan.v3.AsEndDeviceBatchRegistry",
 			"/ttn.lorawan.v3.AppAs",
 			"/ttn.lorawan.v3.ApplicationWebhookRegistry",
 			"/ttn.lorawan.v3.ApplicationPubSubRegistry",
@@ -336,6 +344,7 @@ func (as *ApplicationServer) RegisterServices(s *grpc.Server) {
 	if pkgs := as.appPackages; pkgs != nil {
 		pkgs.RegisterServices(s)
 	}
+	ttnpb.RegisterAsEndDeviceBatchRegistryServer(s, as.grpc.asBatchDevices)
 }
 
 // RegisterHandlers registers gRPC handlers.
@@ -352,6 +361,7 @@ func (as *ApplicationServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Cl
 	if pkgs := as.appPackages; pkgs != nil {
 		pkgs.RegisterHandlers(s, conn)
 	}
+	ttnpb.RegisterAsEndDeviceBatchRegistryHandler(as.Context(), s, conn) // nolint:errcheck
 }
 
 // RegisterRoutes registers HTTP routes.

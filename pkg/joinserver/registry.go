@@ -28,6 +28,12 @@ type DeviceRegistry interface {
 	SetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.ContextualEndDevice, error)
 	SetByID(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
 	RangeByID(ctx context.Context, paths []string, f func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error
+	// BatchDelete deletes a batch of end devices.
+	BatchDelete(
+		ctx context.Context,
+		appIDs *ttnpb.ApplicationIdentifiers,
+		deviceIDs []string,
+	) ([]*ttnpb.EndDeviceIdentifiers, error)
 }
 
 // DeleteDevice deletes device identified by joinEUI, devEUI from r.
@@ -43,6 +49,7 @@ type KeyRegistry interface {
 	GetByID(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error)
 	SetByID(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string, f func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error)) (*ttnpb.SessionKeys, error)
 	Delete(ctx context.Context, joinEUI, devEUI types.EUI64) error
+	BatchDelete(ctx context.Context, devIDs []*ttnpb.EndDeviceIdentifiers) error
 }
 
 // DeleteKeys deletes session keys identified by devEUI, id pair from r.

@@ -134,3 +134,10 @@ var LoRaAllianceProfileIdentifiersFieldPathsTopLevel = []string{
 	"vendor_id",
 	"vendor_profile_id",
 }
+var EndDeviceIdentifiersListFieldPathsNested = []string{
+	"end_device_ids",
+}
+
+var EndDeviceIdentifiersListFieldPathsTopLevel = []string{
+	"end_device_ids",
+}

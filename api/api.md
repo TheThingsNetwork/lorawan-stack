@@ -45,6 +45,7 @@
   - [Enum `AsConfiguration.PubSub.Providers.Status`](#ttn.lorawan.v3.AsConfiguration.PubSub.Providers.Status)
   - [Service `AppAs`](#ttn.lorawan.v3.AppAs)
   - [Service `As`](#ttn.lorawan.v3.As)
+  - [Service `AsEndDeviceBatchRegistry`](#ttn.lorawan.v3.AsEndDeviceBatchRegistry)
   - [Service `AsEndDeviceRegistry`](#ttn.lorawan.v3.AsEndDeviceRegistry)
   - [Service `NsAs`](#ttn.lorawan.v3.NsAs)
 - [File `lorawan-stack/api/applicationserver_integrations_alcsync.proto`](#lorawan-stack/api/applicationserver_integrations_alcsync.proto)
@@ -222,6 +223,7 @@
   - [Message `ADRSettings.DynamicMode.ChannelSteeringSettings.DisabledMode`](#ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.DisabledMode)
   - [Message `ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode`](#ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode)
   - [Message `ADRSettings.StaticMode`](#ttn.lorawan.v3.ADRSettings.StaticMode)
+  - [Message `BatchDeleteEndDevicesRequest`](#ttn.lorawan.v3.BatchDeleteEndDevicesRequest)
   - [Message `BatchUpdateEndDeviceLastSeenRequest`](#ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest)
   - [Message `BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate`](#ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate)
   - [Message `BoolValue`](#ttn.lorawan.v3.BoolValue)
@@ -264,6 +266,7 @@
   - [Message `UpdateEndDeviceRequest`](#ttn.lorawan.v3.UpdateEndDeviceRequest)
   - [Enum `PowerState`](#ttn.lorawan.v3.PowerState)
 - [File `lorawan-stack/api/end_device_services.proto`](#lorawan-stack/api/end_device_services.proto)
+  - [Service `EndDeviceBatchRegistry`](#ttn.lorawan.v3.EndDeviceBatchRegistry)
   - [Service `EndDeviceRegistry`](#ttn.lorawan.v3.EndDeviceRegistry)
   - [Service `EndDeviceTemplateConverter`](#ttn.lorawan.v3.EndDeviceTemplateConverter)
 - [File `lorawan-stack/api/enums.proto`](#lorawan-stack/api/enums.proto)
@@ -337,6 +340,7 @@
   - [Message `ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers)
   - [Message `ClientIdentifiers`](#ttn.lorawan.v3.ClientIdentifiers)
   - [Message `EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers)
+  - [Message `EndDeviceIdentifiersList`](#ttn.lorawan.v3.EndDeviceIdentifiersList)
   - [Message `EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers)
   - [Message `EntityIdentifiers`](#ttn.lorawan.v3.EntityIdentifiers)
   - [Message `GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers)
@@ -392,6 +396,7 @@
   - [Service `ApplicationCryptoService`](#ttn.lorawan.v3.ApplicationCryptoService)
   - [Service `AsJs`](#ttn.lorawan.v3.AsJs)
   - [Service `Js`](#ttn.lorawan.v3.Js)
+  - [Service `JsEndDeviceBatchRegistry`](#ttn.lorawan.v3.JsEndDeviceBatchRegistry)
   - [Service `JsEndDeviceRegistry`](#ttn.lorawan.v3.JsEndDeviceRegistry)
   - [Service `NetworkCryptoService`](#ttn.lorawan.v3.NetworkCryptoService)
   - [Service `NsJs`](#ttn.lorawan.v3.NsJs)
@@ -527,6 +532,7 @@
   - [Service `AsNs`](#ttn.lorawan.v3.AsNs)
   - [Service `GsNs`](#ttn.lorawan.v3.GsNs)
   - [Service `Ns`](#ttn.lorawan.v3.Ns)
+  - [Service `NsEndDeviceBatchRegistry`](#ttn.lorawan.v3.NsEndDeviceBatchRegistry)
   - [Service `NsEndDeviceRegistry`](#ttn.lorawan.v3.NsEndDeviceRegistry)
 - [File `lorawan-stack/api/notification_service.proto`](#lorawan-stack/api/notification_service.proto)
   - [Message `CreateNotificationRequest`](#ttn.lorawan.v3.CreateNotificationRequest)
@@ -1213,6 +1219,20 @@ The As service manages the Application Server.
 | `DeleteLink` | `DELETE` | `/api/v3/as/applications/{application_id}/link` |  |
 | `GetLinkStats` | `GET` | `/api/v3/as/applications/{application_id}/link/stats` |  |
 | `GetConfiguration` | `GET` | `/api/v3/as/configuration` |  |
+
+### <a name="ttn.lorawan.v3.AsEndDeviceBatchRegistry">Service `AsEndDeviceBatchRegistry`</a>
+
+The AsEndDeviceBatchRegistry service allows clients to manage batches end devices on the Application Server.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `Delete` | [`BatchDeleteEndDevicesRequest`](#ttn.lorawan.v3.BatchDeleteEndDevicesRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete a list of devices within the same application. This operation is atomic; either all devices are deleted or none. Devices not found are skipped and no error is returned. |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `Delete` | `DELETE` | `/api/v3/as/applications/{application_ids.application_id}/devices/batch` |  |
 
 ### <a name="ttn.lorawan.v3.AsEndDeviceRegistry">Service `AsEndDeviceRegistry`</a>
 
@@ -3437,6 +3457,20 @@ Configuration options for static ADR.
 | `tx_power_index` | <p>`uint32.lte`: `15`</p> |
 | `nb_trans` | <p>`uint32.lte`: `15`</p><p>`uint32.gte`: `1`</p> |
 
+### <a name="ttn.lorawan.v3.BatchDeleteEndDevicesRequest">Message `BatchDeleteEndDevicesRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| `device_ids` | [`string`](#string) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `application_ids` | <p>`message.required`: `true`</p> |
+| `device_ids` | <p>`repeated.min_items`: `1`</p><p>`repeated.max_items`: `20`</p><p>`repeated.items.string.max_len`: `36`</p><p>`repeated.items.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+
 ### <a name="ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest">Message `BatchUpdateEndDeviceLastSeenRequest`</a>
 
 | Field | Type | Label | Description |
@@ -4154,6 +4188,21 @@ Power state of the device.
 | `POWER_EXTERNAL` | 2 |  |
 
 ## <a name="lorawan-stack/api/end_device_services.proto">File `lorawan-stack/api/end_device_services.proto`</a>
+
+### <a name="ttn.lorawan.v3.EndDeviceBatchRegistry">Service `EndDeviceBatchRegistry`</a>
+
+The EndDeviceBatchRegistry service, exposed by the Identity Server, is used to manage
+end device registrations in batches.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `Delete` | [`BatchDeleteEndDevicesRequest`](#ttn.lorawan.v3.BatchDeleteEndDevicesRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete a batch of end devices with the given IDs. This operation is atomic; either all devices are deleted or none. Devices not found are skipped and no error is returned. Before calling this RPC, use the corresponding BatchDelete RPCs of NsEndDeviceRegistry, AsEndDeviceRegistry and optionally the JsEndDeviceRegistry to delete the end devices. If the devices were claimed on a Join Server, use the BatchUnclaim RPC of the DeviceClaimingServer. This is NOT done automatically. |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `Delete` | `DELETE` | `/api/v3/applications/{application_ids.application_id}/devices/batch` |  |
 
 ### <a name="ttn.lorawan.v3.EndDeviceRegistry">Service `EndDeviceRegistry`</a>
 
@@ -5065,6 +5114,12 @@ The NsGs service connects a Network Server to a Gateway Server.
 | `join_eui` | <p>`bytes.len`: `8`</p> |
 | `dev_addr` | <p>`bytes.len`: `4`</p> |
 
+### <a name="ttn.lorawan.v3.EndDeviceIdentifiersList">Message `EndDeviceIdentifiersList`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | repeated |  |
+
 ### <a name="ttn.lorawan.v3.EndDeviceVersionIdentifiers">Message `EndDeviceVersionIdentifiers`</a>
 
 Identifies an end device model with version information.
@@ -5704,6 +5759,20 @@ The AsJs service connects an Application Server to a Join Server.
 | ----------- | ------ | ------- | ---- |
 | `GetJoinEUIPrefixes` | `GET` | `/api/v3/js/join_eui_prefixes` |  |
 | `GetDefaultJoinEUI` | `GET` | `/api/v3/js/default_join_eui` |  |
+
+### <a name="ttn.lorawan.v3.JsEndDeviceBatchRegistry">Service `JsEndDeviceBatchRegistry`</a>
+
+JsEndDeviceBatchRegistry service allows clients to manage batches of end devices on the Join Server.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `Delete` | [`BatchDeleteEndDevicesRequest`](#ttn.lorawan.v3.BatchDeleteEndDevicesRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete a list of devices within the same application. This operation is atomic; either all devices are deleted or none. Devices not found are skipped and no error is returned. |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `Delete` | `DELETE` | `/api/v3/js/applications/{application_ids.application_id}/devices/batch` |  |
 
 ### <a name="ttn.lorawan.v3.JsEndDeviceRegistry">Service `JsEndDeviceRegistry`</a>
 
@@ -7603,6 +7672,20 @@ The Ns service manages the Network Server.
 | `GetDefaultMACSettings` | `GET` | `/api/v3/ns/default_mac_settings/{frequency_plan_id}/{lorawan_phy_version}` |  |
 | `GetNetID` | `GET` | `/api/v3/ns/net_id` |  |
 | `GetDeviceAddressPrefixes` | `GET` | `/api/v3/ns/dev_addr_prefixes` |  |
+
+### <a name="ttn.lorawan.v3.NsEndDeviceBatchRegistry">Service `NsEndDeviceBatchRegistry`</a>
+
+The NsEndDeviceBatchRegistry service allows clients to manage batches of end devices on the Network Server.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `Delete` | [`BatchDeleteEndDevicesRequest`](#ttn.lorawan.v3.BatchDeleteEndDevicesRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete a list of devices within the same application. This operation is atomic; either all devices are deleted or none. Devices not found are skipped and no error is returned. |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `Delete` | `DELETE` | `/api/v3/ns/applications/{application_ids.application_id}/devices/batch` |  |
 
 ### <a name="ttn.lorawan.v3.NsEndDeviceRegistry">Service `NsEndDeviceRegistry`</a>
 

@@ -53,6 +53,14 @@ var (
 		events.WithClientInfoFromContext(),
 		events.WithPropagateToParent(),
 	)
+	evtBatchDeleteEndDevices = events.Define(
+		"as.end_device.batch.delete", "batch delete end devices",
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ),
+		events.WithDataType(&ttnpb.EndDeviceIdentifiersList{}),
+		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
+		events.WithPropagateToParent(),
+	)
 )
 
 type asEndDeviceRegistryServer struct {
@@ -304,6 +312,42 @@ func (r asEndDeviceRegistryServer) Delete(ctx context.Context, ids *ttnpb.EndDev
 	}
 	if err := r.AS.appPkgRegistry.ClearAssociations(ctx, ids); err != nil {
 		return nil, err
+	}
+	return ttnpb.Empty, nil
+}
+
+type asEndDeviceBatchRegistryServer struct {
+	ttnpb.UnimplementedAsEndDeviceBatchRegistryServer
+
+	AS *ApplicationServer
+}
+
+// Delete implements ttipb.AsEndDeviceBatchRegistryServer.
+func (r asEndDeviceBatchRegistryServer) Delete(
+	ctx context.Context,
+	req *ttnpb.BatchDeleteEndDevicesRequest,
+) (*emptypb.Empty, error) {
+	// Check if the user has rights on the application.
+	if err := rights.RequireApplication(
+		ctx,
+		req.ApplicationIds,
+		ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+	); err != nil {
+		return nil, err
+	}
+
+	deleted, err := r.AS.deviceRegistry.BatchDelete(ctx, req.ApplicationIds, req.DeviceIds)
+	if err != nil {
+		return nil, err
+	}
+	if len(deleted) != 0 {
+		events.Publish(
+			evtBatchDeleteEndDevices.NewWithIdentifiersAndData(
+				ctx, req.ApplicationIds, &ttnpb.EndDeviceIdentifiersList{
+					EndDeviceIds: deleted,
+				},
+			),
+		)
 	}
 	return ttnpb.Empty, nil
 }
