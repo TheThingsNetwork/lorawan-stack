@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package redis provides implementation of the application packages registry using Redis.
 package redis
 
 import (
