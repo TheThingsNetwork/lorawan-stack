@@ -29,7 +29,7 @@ COPY public /srv/ttn-lorawan/public
 COPY --from=builder /srv/ttn-lorawan/lorawan-frequency-plans /srv/ttn-lorawan/lorawan-frequency-plans
 COPY --from=builder /srv/ttn-lorawan/lorawan-webhook-templates /srv/ttn-lorawan/lorawan-webhook-templates
 COPY data/lorawan-devices-index /srv/ttn-lorawan/lorawan-devices-index
-RUN chown thethings:thethings -R /srv/ttn-lorawan/lorawan-devices-index
+RUN chmod 755 -R /srv/ttn-lorawan/lorawan-devices-index
 
 EXPOSE 1700/udp 1881 8881 1882 8882 1883 8883 1884 8884 1885 8885 1887 8887
 

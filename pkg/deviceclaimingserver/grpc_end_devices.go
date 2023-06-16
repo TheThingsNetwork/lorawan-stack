@@ -26,10 +26,15 @@ import (
 )
 
 var (
-	errParseQRCode       = errors.Define("parse_qr_code", "parse QR code failed")
-	errQRCodeData        = errors.DefineInvalidArgument("qr_code_data", "invalid QR code data")
-	errNoJoinEUI         = errors.DefineInvalidArgument("no_join_eui", "failed to extract JoinEUI from request")
-	errMethodUnavailable = errors.DefineUnimplemented("method_unavailable", "method unavailable")
+	errParseQRCode          = errors.Define("parse_qr_code", "parse QR code failed")
+	errQRCodeData           = errors.DefineInvalidArgument("qr_code_data", "invalid QR code data")
+	errNoJoinEUI            = errors.DefineInvalidArgument("no_join_eui", "failed to extract JoinEUI from request")
+	errNoEUI                = errors.DefineInvalidArgument("no_eui", "DevEUI/JoinEUI not set for device")
+	errMethodUnavailable    = errors.DefineUnimplemented("method_unavailable", "method unavailable")
+	errClaimingNotSupported = errors.DefineAborted(
+		"claiming_not_supported",
+		"claiming not supported for JoinEUI `{eui}`",
+	)
 )
 
 // endDeviceClaimingServer is the front facing entity for gRPC requests.
@@ -45,7 +50,8 @@ func (edcs *endDeviceClaimingServer) Claim(
 	req *ttnpb.ClaimEndDeviceRequest,
 ) (*ttnpb.EndDeviceIdentifiers, error) {
 	// Check that the collaborator has necessary rights before attempting to claim it on an upstream.
-	// Since this is part of the create device flow, we check that the collaborator has the rights to create devices in the application.
+	// Since this is part of the create device flow,
+	// we check that the collaborator has the rights to create devices in the application.
 	targetAppID := req.GetTargetApplicationIds()
 	if err := rights.RequireApplication(ctx, targetAppID,
 		ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
@@ -88,7 +94,12 @@ func (edcs *endDeviceClaimingServer) Claim(
 		return nil, errNoJoinEUI.New()
 	}
 
-	err := edcs.DCS.endDeviceClaimingUpstream.Claim(ctx, joinEUI, devEUI, claimAuthenticationCode)
+	claimer := edcs.DCS.endDeviceClaimingUpstream.JoinEUIClaimer(ctx, joinEUI)
+	if claimer == nil {
+		return nil, errClaimingNotSupported.WithAttributes("eui", joinEUI)
+	}
+
+	err := claimer.Claim(ctx, devEUI, joinEUI, claimAuthenticationCode)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +118,24 @@ func (edcs *endDeviceClaimingServer) Unclaim(
 	ctx context.Context,
 	in *ttnpb.EndDeviceIdentifiers,
 ) (*emptypb.Empty, error) {
-	return edcs.DCS.endDeviceClaimingUpstream.Unclaim(ctx, in)
+	if in.DevEui == nil || in.JoinEui == nil {
+		return nil, errNoEUI.New()
+	}
+	if err := rights.RequireApplication(ctx, in.GetApplicationIds(),
+		ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+	); err != nil {
+		return nil, err
+	}
+
+	joinEUI := types.MustEUI64(in.JoinEui).OrZero()
+	claimer := edcs.DCS.endDeviceClaimingUpstream.JoinEUIClaimer(ctx, joinEUI)
+	if claimer == nil {
+		return nil, errClaimingNotSupported.WithAttributes("eui", joinEUI)
+	}
+	if err := claimer.Unclaim(ctx, in); err != nil {
+		return nil, err
+	}
+	return ttnpb.Empty, nil
 }
 
 // GetInfoByJoinEUI implements EndDeviceClaimingServer.
@@ -115,7 +143,12 @@ func (edcs *endDeviceClaimingServer) GetInfoByJoinEUI(
 	ctx context.Context,
 	in *ttnpb.GetInfoByJoinEUIRequest,
 ) (*ttnpb.GetInfoByJoinEUIResponse, error) {
-	return edcs.DCS.endDeviceClaimingUpstream.GetInfoByJoinEUI(ctx, in)
+	joinEUI := types.MustEUI64(in.JoinEui).OrZero()
+	claimer := edcs.DCS.endDeviceClaimingUpstream.JoinEUIClaimer(ctx, joinEUI)
+	return &ttnpb.GetInfoByJoinEUIResponse{
+		JoinEui:          joinEUI.Bytes(),
+		SupportsClaiming: claimer != nil,
+	}, nil
 }
 
 // GetClaimStatus implements EndDeviceClaimingServer.
@@ -123,5 +156,18 @@ func (edcs *endDeviceClaimingServer) GetClaimStatus(
 	ctx context.Context,
 	in *ttnpb.EndDeviceIdentifiers,
 ) (*ttnpb.GetClaimStatusResponse, error) {
-	return edcs.DCS.endDeviceClaimingUpstream.GetClaimStatus(ctx, in)
+	if in.DevEui == nil || in.JoinEui == nil {
+		return nil, errNoEUI.New()
+	}
+	if err := rights.RequireApplication(ctx, in.GetApplicationIds(),
+		ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
+	); err != nil {
+		return nil, err
+	}
+	joinEUI := types.MustEUI64(in.JoinEui).OrZero()
+	claimer := edcs.DCS.endDeviceClaimingUpstream.JoinEUIClaimer(ctx, joinEUI)
+	if claimer == nil {
+		return nil, errClaimingNotSupported.WithAttributes("eui", joinEUI)
+	}
+	return claimer.GetClaimStatus(ctx, in)
 }

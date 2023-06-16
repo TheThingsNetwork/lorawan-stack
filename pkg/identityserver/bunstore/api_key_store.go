@@ -306,20 +306,6 @@ func (s *apiKeyStore) UpdateAPIKey(
 		return nil, err
 	}
 
-	// If empty rights are passed and rights are in the fieldmask, delete the key.
-	// TODO: Refactor store interface to move this to a DeleteAPIKey method.
-	// (https://github.com/TheThingsNetwork/lorawan-stack/issues/5587)
-	if len(pb.Rights) == 0 && ttnpb.HasAnyField(fieldMask, "rights") {
-		_, err = s.DB.NewDelete().
-			Model(model).
-			WherePK().
-			Exec(ctx)
-		if err != nil {
-			return nil, storeutil.WrapDriverError(err)
-		}
-		return nil, nil //nolint:nilnil // This will be fixed by the refactor mentioned above.
-	}
-
 	columns := store.FieldMask{"updated_at"}
 
 	for _, field := range fieldMask {
@@ -353,6 +339,45 @@ func (s *apiKeyStore) UpdateAPIKey(
 	}
 
 	return updatedPB, nil
+}
+
+func (s *apiKeyStore) DeleteAPIKey(
+	ctx context.Context, entityID *ttnpb.EntityIdentifiers, pb *ttnpb.APIKey,
+) error {
+	ctx, span := tracer.StartFromContext(ctx, "DeleteAPIKey", trace.WithAttributes(
+		attribute.String("entity_type", entityID.EntityType()),
+		attribute.String("entity_id", entityID.IDString()),
+	))
+	defer span.End()
+
+	entityType, entityUUID, err := s.getEntity(store.WithSoftDeleted(ctx, false), entityID)
+	if err != nil {
+		return err
+	}
+
+	model, err := s.getAPIKeyModelBy(ctx, combineApply(
+		s.selectWithEntityIDs(ctx, entityType, entityUUID),
+		s.selectWithAPIKeyID(ctx, pb.Id),
+	))
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrAPIKeyNotFound.WithAttributes(
+				"entity_type", entityType,
+				"entity_id", entityID.IDString(),
+				"api_key_id", pb.Id,
+			)
+		}
+		return err
+	}
+
+	_, err = s.DB.NewDelete().
+		Model(model).
+		WherePK().
+		Exec(ctx)
+	if err != nil {
+		return storeutil.WrapDriverError(err)
+	}
+	return nil
 }
 
 func (s *apiKeyStore) DeleteEntityAPIKeys(ctx context.Context, entityID *ttnpb.EntityIdentifiers) error {

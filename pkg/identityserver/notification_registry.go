@@ -105,15 +105,15 @@ func (is *IdentityServer) lookupNotificationReceivers(ctx context.Context, req *
 			switch req.EntityIds.EntityType() {
 			default:
 				// Entity doesn't have contacts. Just ignore.
-			case "application":
+			case store.EntityApplication:
 				entity, err = st.GetApplication(ctx, req.EntityIds.GetApplicationIds(), entityMask)
-			case "client":
+			case store.EntityClient:
 				entity, err = st.GetClient(ctx, req.EntityIds.GetClientIds(), entityMask)
-			case "end device":
+			case store.EntityEndDevice:
 				entity, err = st.GetApplication(ctx, req.EntityIds.GetDeviceIds().GetApplicationIds(), entityMask)
-			case "gateway":
+			case store.EntityGateway:
 				entity, err = st.GetGateway(ctx, req.EntityIds.GetGatewayIds(), entityMask)
-			case "organization":
+			case store.EntityOrganization:
 				entity, err = st.GetOrganization(ctx, req.EntityIds.GetOrganizationIds(), entityMask)
 			}
 			if err != nil {
@@ -134,7 +134,7 @@ func (is *IdentityServer) lookupNotificationReceivers(ctx context.Context, req *
 			switch req.EntityIds.EntityType() {
 			default:
 				// Entity doesn't have collaborators. Just ignore.
-			case "application", "client", "gateway", "organization":
+			case store.EntityApplication, store.EntityClient, store.EntityGateway, store.EntityOrganization:
 				members, err := st.FindMembers(ctx, req.EntityIds)
 				if err != nil {
 					return err
@@ -147,7 +147,7 @@ func (is *IdentityServer) lookupNotificationReceivers(ctx context.Context, req *
 
 		// Expand organization IDs to organization collaborator IDs.
 		for _, ids := range uniqueOrganizationOrUserIdentifiers(ctx, receiverIDs) {
-			if ids.EntityType() != "organization" {
+			if ids.EntityType() != store.EntityOrganization {
 				continue
 			}
 			members, err := st.FindMembers(ctx, ids.GetEntityIdentifiers())
