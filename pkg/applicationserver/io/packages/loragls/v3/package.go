@@ -53,9 +53,19 @@ var (
 )
 
 // HandleUp implements packages.ApplicationPackageHandler.
-func (p *GeolocationPackage) HandleUp(ctx context.Context, def *ttnpb.ApplicationPackageDefaultAssociation, assoc *ttnpb.ApplicationPackageAssociation, up *ttnpb.ApplicationUp) (err error) {
+func (p *GeolocationPackage) HandleUp(
+	ctx context.Context,
+	def *ttnpb.ApplicationPackageDefaultAssociation,
+	assoc *ttnpb.ApplicationPackageAssociation,
+	up *ttnpb.ApplicationUp,
+) (err error) {
 	ctx = log.NewContextWithField(ctx, "namespace", "applicationserver/io/packages/loragls/v1")
-	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIds, fmt.Sprintf("as:packages:loracloudglsv3:%s", events.NewCorrelationID()))...)
+	ctx = events.ContextWithCorrelationID(
+		ctx, append(
+			up.CorrelationIds,
+			fmt.Sprintf("as:packages:loracloudglsv3:%s", events.NewCorrelationID()),
+		)...,
+	)
 
 	if def == nil && assoc == nil {
 		return errNoAssociation.New()
@@ -74,7 +84,13 @@ func (p *GeolocationPackage) HandleUp(ctx context.Context, def *ttnpb.Applicatio
 
 	switch m := up.Up.(type) {
 	case *ttnpb.ApplicationUp_UplinkMessage:
-		if err := p.pushUplink(ctx, assoc.Ids, m.UplinkMessage, data); err != nil {
+		assoc, err := p.pushUplink(ctx, assoc.Ids, m.UplinkMessage, data)
+		if err != nil {
+			return err
+		}
+
+		data, err = p.mergePackageData(def, assoc)
+		if err != nil {
 			return err
 		}
 
@@ -144,19 +160,19 @@ func minInt(a int, b int) int {
 // pushUplink updates the package data with the given uplink.
 func (p *GeolocationPackage) pushUplink(
 	ctx context.Context,
-	pkgAssocIDs *ttnpb.ApplicationPackageAssociationIdentifiers,
+	ids *ttnpb.ApplicationPackageAssociationIdentifiers,
 	up *ttnpb.ApplicationUplink,
 	data *Data,
-) error {
+) (*ttnpb.ApplicationPackageAssociation, error) {
 	maxUplinkCount := minInt(data.MultiFrameWindowSize, 16)
 
-	setter := func(apa *ttnpb.ApplicationPackageAssociation) (*ttnpb.ApplicationPackageAssociation, []string, error) {
-		if apa == nil {
+	setter := func(assoc *ttnpb.ApplicationPackageAssociation) (*ttnpb.ApplicationPackageAssociation, []string, error) {
+		if assoc == nil {
 			return nil, nil, errNoAssociation.New()
 		}
 
 		data := &Data{}
-		if err := data.FromStruct(apa.Data); err != nil {
+		if err := data.FromStruct(assoc.Data); err != nil {
 			return nil, nil, err
 		}
 
@@ -164,23 +180,22 @@ func (p *GeolocationPackage) pushUplink(
 			data.RecentMetadata = data.RecentMetadata[1:]
 		}
 
-		storedMD := &UplinkMetadata{}
-		if err := storedMD.FromApplicationUplink(up); err != nil {
+		md := &UplinkMetadata{}
+		if err := md.FromApplicationUplink(up); err != nil {
 			return nil, nil, err
 		}
 
-		data.RecentMetadata = append(data.RecentMetadata, storedMD)
+		data.RecentMetadata = append(data.RecentMetadata, md)
 		st, err := data.Struct()
 		if err != nil {
 			return nil, nil, err
 		}
-		apa.Data = st
+		assoc.Data = st
 
-		return apa, []string{"data"}, nil
+		return assoc, []string{"data"}, nil
 	}
 
-	_, err := p.registry.SetAssociation(ctx, pkgAssocIDs, nil, setter)
-	return err
+	return p.registry.SetAssociation(ctx, ids, []string{"data"}, setter)
 }
 
 func (*GeolocationPackage) multiFrameQuery(
@@ -355,7 +370,10 @@ func (p *GeolocationPackage) sendLocationSolved(ctx context.Context, ids *ttnpb.
 	})
 }
 
-func (p *GeolocationPackage) mergePackageData(def *ttnpb.ApplicationPackageDefaultAssociation, assoc *ttnpb.ApplicationPackageAssociation) (*Data, error) {
+func (*GeolocationPackage) mergePackageData(
+	def *ttnpb.ApplicationPackageDefaultAssociation,
+	assoc *ttnpb.ApplicationPackageAssociation,
+) (*Data, error) {
 	var defaultData, associationData Data
 	if def != nil {
 		if err := defaultData.FromStruct(def.Data); err != nil {
@@ -380,6 +398,9 @@ func (p *GeolocationPackage) mergePackageData(def *ttnpb.ApplicationPackageDefau
 		}
 		if data.Token != "" {
 			merged.Token = data.Token
+		}
+		if len(data.RecentMetadata) > 0 {
+			merged.RecentMetadata = data.RecentMetadata
 		}
 	}
 	if merged.ServerURL == nil {
