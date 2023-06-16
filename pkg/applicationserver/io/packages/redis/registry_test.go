@@ -52,37 +52,35 @@ func TestPkgRegistryClearDefaultAssociations(t *testing.T) {
 		ApplicationIds: appIDs,
 		FPort:          201,
 	}
-	_, err = registry.SetDefaultAssociation(
-		ctx, appPkgIds, nil, func(apa *ttnpb.ApplicationPackageDefaultAssociation) (
+	expected := &ttnpb.ApplicationPackageDefaultAssociation{
+		Ids:         appPkgIds,
+		PackageName: "lora-cloud-geolocation-v3",
+		Data: &structpb.Struct{
+			Fields: map[string]*structpb.Value{
+				"key": {
+					Kind: &structpb.Value_StringValue{
+						StringValue: "value",
+					},
+				},
+			},
+		},
+	}
+	_, err = registry.SetDefaultAssociation(ctx, appPkgIds, nil,
+		func(apa *ttnpb.ApplicationPackageDefaultAssociation) (
 			*ttnpb.ApplicationPackageDefaultAssociation, []string, error,
 		) {
-			return &ttnpb.ApplicationPackageDefaultAssociation{
-					Ids:         appPkgIds,
-					PackageName: "lora-cloud-geolocation-v3",
-					Data: &structpb.Struct{
-						Fields: map[string]*structpb.Value{
-							"key": {
-								Kind: &structpb.Value_StringValue{
-									StringValue: "value",
-								},
-							},
-						},
-					},
-				}, []string{
-					"ids",
-					"package_name",
-					"data",
-				}, nil
+			return expected, []string{"ids", "package_name", "data"}, nil
 		},
 	)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	actual, err := registry.ListDefaultAssociations(ctx, appIDs, nil)
+	actual, err := registry.ListDefaultAssociations(ctx, appIDs, []string{"data"})
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 	a.So(len(actual), should.Equal, 1)
+	a.So(actual[0], should.Resemble, expected)
 
 	err = registry.ClearDefaultAssociations(ctx, appIDs)
 	if !a.So(err, should.BeNil) {
@@ -114,37 +112,35 @@ func TestPackageClearAssociations(t *testing.T) {
 		EndDeviceIds: devIDs,
 		FPort:        201,
 	}
-	_, err = registry.SetAssociation(
-		ctx, appPkgIds, nil, func(apa *ttnpb.ApplicationPackageAssociation) (
+	expected := &ttnpb.ApplicationPackageAssociation{
+		Ids:         appPkgIds,
+		PackageName: "lora-cloud-geolocation-v3",
+		Data: &structpb.Struct{
+			Fields: map[string]*structpb.Value{
+				"key": {
+					Kind: &structpb.Value_StringValue{
+						StringValue: "value",
+					},
+				},
+			},
+		},
+	}
+	_, err = registry.SetAssociation(ctx, appPkgIds, nil,
+		func(apa *ttnpb.ApplicationPackageAssociation) (
 			*ttnpb.ApplicationPackageAssociation, []string, error,
 		) {
-			return &ttnpb.ApplicationPackageAssociation{
-					Ids:         appPkgIds,
-					PackageName: "lora-cloud-geolocation-v3",
-					Data: &structpb.Struct{
-						Fields: map[string]*structpb.Value{
-							"key": {
-								Kind: &structpb.Value_StringValue{
-									StringValue: "value",
-								},
-							},
-						},
-					},
-				}, []string{
-					"ids",
-					"package_name",
-					"data",
-				}, nil
+			return expected, []string{"ids", "package_name", "data"}, nil
 		},
 	)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	actual, err := registry.ListAssociations(ctx, devIDs, nil)
+	actual, err := registry.ListAssociations(ctx, devIDs, []string{"data"})
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 	a.So(len(actual), should.Equal, 1)
+	a.So(actual[0], should.Resemble, expected)
 
 	err = registry.ClearAssociations(ctx, devIDs)
 	if !a.So(err, should.BeNil) {
