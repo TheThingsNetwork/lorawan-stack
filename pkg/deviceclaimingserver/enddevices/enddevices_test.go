@@ -17,20 +17,12 @@ package enddevices
 import (
 	"testing"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
-	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
-)
-
-var (
-	supportedJoinEUI   = &types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0C}
-	unsupportedJoinEUI = &types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0D}
 )
 
 func TestUpstream(t *testing.T) {
@@ -47,68 +39,20 @@ func TestUpstream(t *testing.T) {
 	_, err := NewUpstream(ctx, c, Config{
 		Source: "directory",
 	})
-	a.So(err, should.NotBeNil)
+	a.So(errors.IsNotFound(err), should.BeTrue)
 
-	// Upstream test
+	// Test Upstream.
 	upstream := test.Must(NewUpstream(ctx, c, Config{
 		NetID:     test.DefaultNetID,
 		Source:    "directory",
 		Directory: "testdata",
-	}, WithDeviceRegistry(&mockDeviceRegistry{})))
+	}))
 
-	ctx = rights.NewContext(ctx, &rights.Rights{
-		ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
-			unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"}): ttnpb.RightsFrom(
-				ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
-				ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
-			),
-		}),
-	})
+	unsupportedJoinEUI := types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0D}
+	claimer := upstream.JoinEUIClaimer(ctx, unsupportedJoinEUI)
+	a.So(claimer, should.BeNil)
 
-	// Invalid JoinEUI.
-	err = upstream.Claim(ctx, *unsupportedJoinEUI,
-		types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30},
-		"secret",
-	)
-	a.So(errors.IsAborted(err), should.BeTrue)
-
-	_, err = upstream.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
-		DeviceId: "test-dev",
-		ApplicationIds: &ttnpb.ApplicationIdentifiers{
-			ApplicationId: "test-app",
-		},
-		JoinEui: unsupportedJoinEUI.Bytes(),
-		DevEui:  types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30}.Bytes(),
-	})
-	a.So(errors.IsUnauthenticated(err), should.BeTrue)
-
-	resp, err := upstream.GetInfoByJoinEUI(ctx, &ttnpb.GetInfoByJoinEUIRequest{
-		JoinEui: unsupportedJoinEUI.Bytes(),
-	})
-	a.So(err, should.BeNil)
-	a.So(resp.SupportsClaiming, should.BeFalse)
-
-	// Valid JoinEUI.
-	inf, err := upstream.GetInfoByJoinEUI(ctx, &ttnpb.GetInfoByJoinEUIRequest{
-		JoinEui: supportedJoinEUI.Bytes(),
-	})
-	a.So(err, should.BeNil)
-	a.So(inf.JoinEui, should.Resemble, supportedJoinEUI.Bytes())
-	a.So(inf.SupportsClaiming, should.BeTrue)
-
-	err = upstream.Claim(ctx, *supportedJoinEUI,
-		types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30},
-		"secret",
-	)
-	a.So(!errors.IsUnimplemented(err), should.BeTrue)
-
-	_, err = upstream.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
-		DeviceId: "test-dev",
-		ApplicationIds: &ttnpb.ApplicationIdentifiers{
-			ApplicationId: "test-app",
-		},
-		JoinEui: supportedJoinEUI.Bytes(),
-		DevEui:  types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30}.Bytes(),
-	})
-	a.So(!errors.IsUnavailable(err), should.BeTrue)
+	supportedJoinEUI := types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0C}
+	claimer = upstream.JoinEUIClaimer(ctx, supportedJoinEUI)
+	a.So(claimer, should.NotBeNil)
 }

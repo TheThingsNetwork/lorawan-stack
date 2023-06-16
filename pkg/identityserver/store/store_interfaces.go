@@ -204,13 +204,15 @@ type MembershipStore interface {
 	GetMember(
 		ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID *ttnpb.EntityIdentifiers,
 	) (*ttnpb.Rights, error)
-	// Set direct member rights on an entity. Rights can be deleted by not passing any rights.
+	// Set direct member rights on an entity.
 	SetMember(
 		ctx context.Context,
 		id *ttnpb.OrganizationOrUserIdentifiers,
 		entityID *ttnpb.EntityIdentifiers,
 		rights *ttnpb.Rights,
 	) error
+	// DeleteMember elminates the direct member rights attached to an entity.
+	DeleteMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID *ttnpb.EntityIdentifiers) error
 	// Delete all member rights on an entity. Used for purging entities.
 	DeleteEntityMembers(ctx context.Context, entityID *ttnpb.EntityIdentifiers) error
 	// Delete all user rights for an entity.
@@ -241,6 +243,8 @@ type APIKeyStore interface {
 	UpdateAPIKey(
 		ctx context.Context, entityID *ttnpb.EntityIdentifiers, key *ttnpb.APIKey, fieldMask FieldMask,
 	) (*ttnpb.APIKey, error)
+	// DeleteAPIKey deletes key rights on an entity.
+	DeleteAPIKey(ctx context.Context, entityID *ttnpb.EntityIdentifiers, key *ttnpb.APIKey) error
 	// Delete api keys deletes all api keys tied to an entity. Used when purging entities.
 	DeleteEntityAPIKeys(ctx context.Context, entityID *ttnpb.EntityIdentifiers) error
 }
@@ -285,7 +289,7 @@ type InvitationStore interface {
 	CreateInvitation(ctx context.Context, invitation *ttnpb.Invitation) (*ttnpb.Invitation, error)
 	FindInvitations(ctx context.Context) ([]*ttnpb.Invitation, error)
 	GetInvitation(ctx context.Context, token string) (*ttnpb.Invitation, error)
-	SetInvitationAcceptedBy(ctx context.Context, token string, accepter *ttnpb.UserIdentifiers) error
+	SetInvitationAcceptedBy(ctx context.Context, token string, usrIDs *ttnpb.UserIdentifiers) error
 	DeleteInvitation(ctx context.Context, email string) error
 }
 
@@ -323,18 +327,16 @@ type EntitySearch interface {
 
 // ContactInfoStore interface for contact info validation.
 type ContactInfoStore interface {
-	GetContactInfo(
-		ctx context.Context, entityID ttnpb.IDStringer,
-	) ([]*ttnpb.ContactInfo, error)
+	GetContactInfo(ctx context.Context, entityID ttnpb.IDStringer) ([]*ttnpb.ContactInfo, error)
 	SetContactInfo(
 		ctx context.Context, entityID ttnpb.IDStringer, contactInfo []*ttnpb.ContactInfo,
 	) ([]*ttnpb.ContactInfo, error)
-	CreateValidation(
-		ctx context.Context, validation *ttnpb.ContactInfoValidation,
-	) (*ttnpb.ContactInfoValidation, error)
-	// Confirm a validation. Only the ID and Token need to be set.
-	Validate(ctx context.Context, validation *ttnpb.ContactInfoValidation) error
+	ValidateContactInfo(ctx context.Context, validation *ttnpb.ContactInfoValidation) error
 	DeleteEntityContactInfo(ctx context.Context, entityID ttnpb.IDStringer) error
+
+	CreateValidation(ctx context.Context, validation *ttnpb.ContactInfoValidation) (*ttnpb.ContactInfoValidation, error)
+	GetValidation(ctx context.Context, validation *ttnpb.ContactInfoValidation) (*ttnpb.ContactInfoValidation, error)
+	ExpireValidation(ctx context.Context, validation *ttnpb.ContactInfoValidation) error
 }
 
 // EUIStore interface for assigning DevEUI blocks and addresses.

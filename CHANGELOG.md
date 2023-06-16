@@ -23,9 +23,17 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Fix payload formatter page launching malformed requests in the Console.
+
 ### Security
 
-## [3.26.0] - unreleased
+## [3.26.1] - unreleased
+
+### Added
+
+- Support claim in device import in the Console.
+
+## [3.26.0] - 2023-06-06
 
 ### Added
 
@@ -2597,7 +2605,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.26.0...v3.26
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.26.1...v3.26
+[3.26.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.26.0...v3.26.1
 [3.26.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.25.2...v3.26.0
 [3.25.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.25.1...v3.25.2
 [3.25.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.25.0...v3.25.1

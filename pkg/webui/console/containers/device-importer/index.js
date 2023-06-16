@@ -536,7 +536,7 @@ export default class DeviceImporter extends Component {
     const initialValues = {
       format_id: '',
       data: '',
-      set_claim_auth_code: true,
+      set_claim_auth_code: false,
       _inputMethod: 'no-fallback',
       frequency_plan_id: '',
       lorawan_version: '',

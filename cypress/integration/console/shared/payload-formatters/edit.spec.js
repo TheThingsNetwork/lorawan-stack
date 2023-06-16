@@ -30,6 +30,13 @@ describe('Payload formatters', () => {
       multicast: false,
       supports_join: true,
       lorawan_version: 'MAC_V1_0_2',
+      version_ids: {
+        brand_id: 'the-things-products',
+        model_id: 'the-things-uno',
+        hw_version: '1.0',
+        fw_version: 'quickstart',
+        band_id: 'EU_863_870',
+      },
       ids: {
         device_id: 'device-all-components',
         dev_eui: '70B3D57ED8000013',
@@ -47,6 +54,11 @@ describe('Payload formatters', () => {
     },
     field_mask: {
       paths: [
+        'version_ids.brand_id',
+        'version_ids.model_id',
+        'version_ids.hardware_version',
+        'version_ids.firmware_version',
+        'version_ids.band_id',
         'frequency_plan_id',
         'lorawan_phy_version',
         'multicast',

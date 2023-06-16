@@ -31,9 +31,15 @@ import (
 )
 
 var (
-	errContactNoCollaborator  = errors.DefineInvalidArgument("contact_no_collaborator", "contact `{contact}` is not a collaborator")
-	errNoValidationNeeded     = errors.DefineInvalidArgument("no_validation_needed", "no validation needed for this contact info")
-	errValidationsAlreadySent = errors.DefineAlreadyExists("validations_already_sent", "validations for this contact info already sent")
+	errContactNoCollaborator = errors.DefineInvalidArgument(
+		"contact_no_collaborator", "contact `{contact}` is not a collaborator",
+	)
+	errNoValidationNeeded = errors.DefineInvalidArgument(
+		"no_validation_needed", "no validation needed for this contact info",
+	)
+	errValidationsAlreadySent = errors.DefineAlreadyExists(
+		"validations_already_sent", "validations for this contact info already sent",
+	)
 )
 
 func validateCollaboratorEqualsContact(collaborator, contact *ttnpb.OrganizationOrUserIdentifiers) error {
@@ -152,9 +158,21 @@ func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids 
 	}, nil
 }
 
-func (is *IdentityServer) validateContactInfo(ctx context.Context, req *ttnpb.ContactInfoValidation) (*emptypb.Empty, error) {
+func (is *IdentityServer) validateContactInfo(
+	ctx context.Context, req *ttnpb.ContactInfoValidation,
+) (*emptypb.Empty, error) {
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
-		return st.Validate(ctx, req)
+		validation, err := st.GetValidation(ctx, req)
+		if err != nil {
+			return err
+		}
+
+		err = st.ValidateContactInfo(ctx, validation)
+		if err != nil {
+			return err
+		}
+
+		return st.ExpireValidation(ctx, validation)
 	})
 	if err != nil {
 		return nil, err
