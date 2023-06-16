@@ -44,7 +44,6 @@ func generateRandomizedMD(count int) [][]*api.RxMetadata {
 					Longitude: rand.Float64()*360 - 180,
 					Altitude:  rand.Int31(),
 					Accuracy:  rand.Int31(),
-					Source:    rand.Int31n(10),
 				},
 			}
 		}

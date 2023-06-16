@@ -161,7 +161,6 @@ type RxMDLocation struct {
 	Longitude float64 `json:"longitude"`
 	Altitude  int32   `json:"altitude"`
 	Accuracy  int32   `json:"accuracy"`
-	Source    int32   `json:"source"`
 }
 
 // FromProto converts the Location from a protobuf representation.
@@ -170,7 +169,6 @@ func (l *RxMDLocation) FromProto(pb *ttnpb.Location) error {
 	l.Longitude = pb.Longitude
 	l.Altitude = pb.Altitude
 	l.Accuracy = pb.Accuracy
-	l.Source = int32(pb.Source)
 	return nil
 }
 
