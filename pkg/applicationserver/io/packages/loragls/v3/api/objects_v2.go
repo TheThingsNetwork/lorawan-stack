@@ -17,12 +17,10 @@ package api
 import (
 	"context"
 	"encoding/json"
-
-	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // BuildWiFiRequest builds a WiFiRequest from the provided metadata and payload.
-func BuildWiFiRequest(ctx context.Context, metadata []*ttnpb.RxMetadata, accessPoints []AccessPoint) *WiFiRequest {
+func BuildWiFiRequest(ctx context.Context, metadata []*RxMetadata, accessPoints []AccessPoint) *WiFiRequest {
 	removeNil := func(v *uint64) uint64 {
 		if v == nil {
 			return 0
@@ -34,7 +32,7 @@ func BuildWiFiRequest(ctx context.Context, metadata []*ttnpb.RxMetadata, accessP
 		WiFiAccessPoints: accessPoints,
 	}
 	for _, m := range metadata {
-		if m.Location == nil || m.GatewayIds == nil {
+		if m.Location == nil || m.GatewayIDs == nil {
 			continue
 		}
 		gtw, up := parseRxMetadata(ctx, m)

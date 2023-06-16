@@ -90,8 +90,9 @@ type SingleFrameRequest struct {
 	Frame    Frame     `json:"frame"`
 }
 
-func parseRxMetadata(ctx context.Context, m *ttnpb.RxMetadata) (Gateway, Uplink) {
-	gtwUID := unique.ID(ctx, m.GatewayIds)
+func parseRxMetadata(ctx context.Context, m *RxMetadata) (Gateway, Uplink) {
+	ids := m.GatewayIDs.ToProto()
+	gtwUID := unique.ID(ctx, ids)
 	hashed := sha256.Sum256([]byte(gtwUID))
 	hashedUID := hex.EncodeToString(hashed[:])
 	var tdoa *uint64
@@ -107,19 +108,19 @@ func parseRxMetadata(ctx context.Context, m *ttnpb.RxMetadata) (Gateway, Uplink)
 			GatewayID: hashedUID,
 			AntennaID: &m.AntennaIndex,
 			TDOA:      tdoa,
-			RSSI:      float64(m.Rssi),
-			SNR:       float64(m.Snr),
+			RSSI:      float64(m.RSSI),
+			SNR:       float64(m.SNR),
 		}
 }
 
 // BuildSingleFrameRequest builds a SingleFrameRequest from the provided metadata.
-func BuildSingleFrameRequest(ctx context.Context, metadata []*ttnpb.RxMetadata) *SingleFrameRequest {
+func BuildSingleFrameRequest(ctx context.Context, metadata []*RxMetadata) *SingleFrameRequest {
 	r := &SingleFrameRequest{
 		Gateways: []Gateway{},
 		Frame:    Frame{},
 	}
 	for _, m := range metadata {
-		if m.Location == nil || m.GatewayIds == nil {
+		if m.Location == nil || m.GatewayIDs == nil {
 			continue
 		}
 		gtw, up := parseRxMetadata(ctx, m)
@@ -136,8 +137,75 @@ type MultiFrameRequest struct {
 	Frames   []Frame   `json:"frames"`
 }
 
+// GatewayIDs contains the fields of the gateway identifiers used by the package.
+type GatewayIDs struct {
+	GatewayID string `json:"gateway_id"`
+}
+
+// ToProto converts the GatewayIDs to a protobuf representation.
+func (g *GatewayIDs) ToProto() *ttnpb.GatewayIdentifiers {
+	return &ttnpb.GatewayIdentifiers{
+		GatewayId: g.GatewayID,
+	}
+}
+
+// FromProto converts the GatewayIDs from a protobuf representation.
+func (g *GatewayIDs) FromProto(pb *ttnpb.GatewayIdentifiers) error {
+	g.GatewayID = pb.GatewayId
+	return nil
+}
+
+// RxMDLocation contains the metadata location fields used by the package.
+type RxMDLocation struct {
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+	Altitude  int32   `json:"altitude"`
+	Accuracy  int32   `json:"accuracy"`
+	Source    int32   `json:"source"`
+}
+
+// FromProto converts the Location from a protobuf representation.
+func (l *RxMDLocation) FromProto(pb *ttnpb.Location) error {
+	l.Latitude = pb.Latitude
+	l.Longitude = pb.Longitude
+	l.Altitude = pb.Altitude
+	l.Accuracy = pb.Accuracy
+	l.Source = int32(pb.Source)
+	return nil
+}
+
+// RxMetadata contains the fields of the RxMetadata used by the package.
+type RxMetadata struct {
+	GatewayIDs    *GatewayIDs   `json:"gateway_ids"`
+	AntennaIndex  uint32        `json:"antenna_index"`
+	FineTimestamp uint64        `json:"fine_timestamp"`
+	Location      *RxMDLocation `json:"location"`
+	RSSI          float32       `json:"rssi"`
+	SNR           float32       `json:"snr"`
+}
+
+// FromProto converts the RxMetadata from a protobuf representation.
+func (r *RxMetadata) FromProto(pb *ttnpb.RxMetadata) error {
+	r.GatewayIDs = &GatewayIDs{}
+	if err := r.GatewayIDs.FromProto(pb.GatewayIds); err != nil {
+		return err
+	}
+
+	r.Location = &RxMDLocation{}
+	if err := r.Location.FromProto(pb.Location); err != nil {
+		return err
+	}
+
+	r.AntennaIndex = pb.AntennaIndex
+	r.FineTimestamp = pb.FineTimestamp
+	r.RSSI = pb.Rssi
+	r.SNR = pb.Snr
+
+	return nil
+}
+
 // BuildMultiFrameRequest builds a MultiFrameRequest from the provided metadata.
-func BuildMultiFrameRequest(ctx context.Context, mds [][]*ttnpb.RxMetadata) *MultiFrameRequest {
+func BuildMultiFrameRequest(ctx context.Context, mds [][]*RxMetadata) *MultiFrameRequest {
 	r := &MultiFrameRequest{
 		Gateways: []Gateway{},
 		Frames:   []Frame{},
@@ -146,7 +214,7 @@ func BuildMultiFrameRequest(ctx context.Context, mds [][]*ttnpb.RxMetadata) *Mul
 	for _, metadata := range mds {
 		frame := Frame{}
 		for _, m := range metadata {
-			if m.Location == nil || m.GatewayIds == nil {
+			if m.Location == nil || m.GatewayIDs == nil {
 				continue
 			}
 			gtw, up := parseRxMetadata(ctx, m)

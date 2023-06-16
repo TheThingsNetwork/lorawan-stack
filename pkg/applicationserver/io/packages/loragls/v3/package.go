@@ -117,7 +117,11 @@ func New(server io.Server, registry packages.Registry) packages.ApplicationPacka
 }
 
 func (p *GeolocationPackage) singleFrameQuery(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data, client *api.Client) (api.AbstractLocationSolverResponse, error) {
-	req := api.BuildSingleFrameRequest(ctx, up.RxMetadata)
+	mds, err := RxMDSliceFromProto(up.RxMetadata)
+	if err != nil {
+		return nil, err
+	}
+	req := api.BuildSingleFrameRequest(ctx, mds)
 	if len(req.Gateways) < 1 {
 		return nil, nil
 	}
@@ -215,15 +219,14 @@ func (*GeolocationPackage) multiFrameQuery(
 	}
 
 	now := time.Now()
-	mds := make([][]*ttnpb.RxMetadata, 0, count)
+	mds := make([][]*api.RxMetadata, 0, count)
 
 	for _, md := range data.RecentMetadata {
 		if now.Sub(md.ReceivedAt) > data.MultiFrameWindowAge {
 			continue
 		}
 
-		cleanUplink := md.ToProto()
-		mds = append(mds, cleanUplink.RxMetadata)
+		mds = append(mds, md.RxMetadata)
 
 		if len(mds) >= count {
 			break
@@ -267,7 +270,11 @@ func (p *GeolocationPackage) wifiQuery(ctx context.Context, ids *ttnpb.EndDevice
 			SignalStrength: int64(accessPoint.RSSI),
 		})
 	}
-	req := api.BuildWiFiRequest(ctx, up.RxMetadata, accessPoints)
+	mds, err := RxMDSliceFromProto(up.RxMetadata)
+	if err != nil {
+		return nil, err
+	}
+	req := api.BuildWiFiRequest(ctx, mds, accessPoints)
 	if len(req.LoRaWAN) < 1 {
 		return nil, nil
 	}
@@ -420,4 +427,16 @@ func toStruct(i any) (*structpb.Struct, error) {
 		return nil, err
 	}
 	return st, nil
+}
+
+// RxMDSliceFromProto converts a slice of RxMetadata from a protobuf representation.
+func RxMDSliceFromProto(pb []*ttnpb.RxMetadata) ([]*api.RxMetadata, error) {
+	md := make([]*api.RxMetadata, len(pb))
+	for i, m := range pb {
+		md[i] = &api.RxMetadata{}
+		if err := md[i].FromProto(m); err != nil {
+			return nil, err
+		}
+	}
+	return md, nil
 }

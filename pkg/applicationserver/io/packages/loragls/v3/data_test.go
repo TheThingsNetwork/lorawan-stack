@@ -20,25 +20,26 @@ import (
 	"testing"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v3/api"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 // nolint: gosec
-func generateRandomizedMD(count int) [][]*RxMetadata {
-	md := make([][]*RxMetadata, count)
+func generateRandomizedMD(count int) [][]*api.RxMetadata {
+	md := make([][]*api.RxMetadata, count)
 	for i := range md {
-		md[i] = make([]*RxMetadata, rand.Intn(10))
+		md[i] = make([]*api.RxMetadata, rand.Intn(10))
 		for j := range md[i] {
-			md[i][j] = &RxMetadata{
-				GatewayIDs: &GatewayIDs{
+			md[i][j] = &api.RxMetadata{
+				GatewayIDs: &api.GatewayIDs{
 					GatewayID: "test-gateway-id",
 				},
 				AntennaIndex:  rand.Uint32(),
 				FineTimestamp: rand.Uint64(),
 				RSSI:          rand.Float32(),
 				SNR:           rand.Float32(),
-				Location: &Location{
+				Location: &api.RxMDLocation{
 					Latitude:  rand.Float64()*180 - 90,
 					Longitude: rand.Float64()*360 - 180,
 					Altitude:  rand.Int31(),

@@ -24,7 +24,6 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v3/api"
-	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
@@ -98,31 +97,31 @@ func TestAuth(t *testing.T) {
 }
 
 var (
-	singleFrameRequest = api.BuildSingleFrameRequest(test.Context(), []*ttnpb.RxMetadata{
+	singleFrameRequest = api.BuildSingleFrameRequest(test.Context(), []*api.RxMetadata{
 		{
-			GatewayIds: &ttnpb.GatewayIdentifiers{
-				GatewayId: "gtw1",
+			GatewayIDs: &api.GatewayIDs{
+				GatewayID: "gtw1",
 			},
-			Location: &ttnpb.Location{
+			Location: &api.RxMDLocation{
 				Latitude:  123.4,
 				Longitude: 234.5,
 				Altitude:  345,
 			},
-			Rssi: 567.8,
-			Snr:  678.9,
+			RSSI: 567.8,
+			SNR:  678.9,
 		},
 		{
-			GatewayIds: &ttnpb.GatewayIdentifiers{
-				GatewayId: "gtw2",
+			GatewayIDs: &api.GatewayIDs{
+				GatewayID: "gtw2",
 			},
-			Location: &ttnpb.Location{
+			Location: &api.RxMDLocation{
 				Latitude:  234.5,
 				Longitude: 345.6,
 				Altitude:  456,
 			},
 			FineTimestamp: 890,
-			Rssi:          678.9,
-			Snr:           789.1,
+			RSSI:          678.9,
+			SNR:           789.1,
 		},
 	})
 	singleFrameResponse = api.LocationSolverResponse{
@@ -138,59 +137,59 @@ var (
 		},
 	}
 
-	multiFrameRequest = api.BuildMultiFrameRequest(test.Context(), [][]*ttnpb.RxMetadata{
+	multiFrameRequest = api.BuildMultiFrameRequest(test.Context(), [][]*api.RxMetadata{
 		{
 			{
-				GatewayIds: &ttnpb.GatewayIdentifiers{
-					GatewayId: "gtw1",
+				GatewayIDs: &api.GatewayIDs{
+					GatewayID: "gtw1",
 				},
-				Location: &ttnpb.Location{
+				Location: &api.RxMDLocation{
 					Latitude:  123.4,
 					Longitude: 234.5,
 					Altitude:  345,
 				},
-				Rssi: 567.8,
-				Snr:  678.9,
+				RSSI: 567.8,
+				SNR:  678.9,
 			},
 			{
-				GatewayIds: &ttnpb.GatewayIdentifiers{
-					GatewayId: "gtw2",
+				GatewayIDs: &api.GatewayIDs{
+					GatewayID: "gtw2",
 				},
-				Location: &ttnpb.Location{
+				Location: &api.RxMDLocation{
 					Latitude:  234.5,
 					Longitude: 345.6,
 					Altitude:  456,
 				},
 				FineTimestamp: 890,
-				Rssi:          678.9,
-				Snr:           789.1,
+				RSSI:          678.9,
+				SNR:           789.1,
 			},
 		},
 		{
 			{
-				GatewayIds: &ttnpb.GatewayIdentifiers{
-					GatewayId: "gtw1",
+				GatewayIDs: &api.GatewayIDs{
+					GatewayID: "gtw1",
 				},
-				Location: &ttnpb.Location{
+				Location: &api.RxMDLocation{
 					Latitude:  123.4,
 					Longitude: 234.5,
 					Altitude:  345,
 				},
-				Rssi: 890.1,
-				Snr:  910.1,
+				RSSI: 890.1,
+				SNR:  910.1,
 			},
 			{
-				GatewayIds: &ttnpb.GatewayIdentifiers{
-					GatewayId: "gtw2",
+				GatewayIDs: &api.GatewayIDs{
+					GatewayID: "gtw2",
 				},
-				Location: &ttnpb.Location{
+				Location: &api.RxMDLocation{
 					Latitude:  234.5,
 					Longitude: 345.6,
 					Altitude:  456,
 				},
 				FineTimestamp: 910,
-				Rssi:          789.1,
-				Snr:           890.1,
+				RSSI:          789.1,
+				SNR:           890.1,
 			},
 		},
 	})

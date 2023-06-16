@@ -21,7 +21,9 @@ import (
 	"net/url"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v3/api"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
@@ -31,6 +33,26 @@ var (
 	errInvalidValue  = errors.DefineCorruption("invalid_value", "wrong value `{value}`")
 	errEncoding      = errors.DefineCorruption("encoding_recent_uplinks", "encoding recent uplinks")
 )
+
+// UplinkMetadata contains the uplink metadata stored by the package.
+type UplinkMetadata struct {
+	RxMetadata []*api.RxMetadata `json:"rx_metadata"`
+	ReceivedAt time.Time         `json:"received_at"`
+}
+
+// FromApplicationUplink cleans the ApplicationUplink to stored values for the UpLinkMetadata.
+func (u *UplinkMetadata) FromApplicationUplink(msg *ttnpb.ApplicationUplink) error {
+	u.ReceivedAt = msg.ReceivedAt.AsTime()
+
+	for _, md := range msg.RxMetadata {
+		rxmd := &api.RxMetadata{}
+		if err := rxmd.FromProto(md); err != nil {
+			return err
+		}
+		u.RxMetadata = append(u.RxMetadata, rxmd)
+	}
+	return nil
+}
 
 // QueryType enum defines the location query types of the package.
 type QueryType uint8
