@@ -607,8 +607,12 @@ func (r ApplicationPackagesRegistry) Range(
 func (r ApplicationPackagesRegistry) clearAssociations(ctx context.Context, id ttnpb.IDStringer) error {
 	uid := unique.ID(ctx, id)
 	uidKey := r.uidKey(uid)
+	lockerID, err := ttnredis.GenerateLockerID()
+	if err != nil {
+		return err
+	}
 
-	return r.Redis.Watch(ctx, func(tx *redis.Tx) error {
+	return ttnredis.LockedWatch(ctx, r.Redis, uidKey, lockerID, r.LockTTL, func(tx *redis.Tx) error {
 		// Retrieve the list of fPorts from the uidKey set.
 		fPorts, err := tx.SMembers(ctx, uidKey).Result()
 		if err != nil {
@@ -628,7 +632,7 @@ func (r ApplicationPackagesRegistry) clearAssociations(ctx context.Context, id t
 			return err
 		}
 		return nil
-	}, uidKey)
+	})
 }
 
 // ClearAssociations clears all the associations for an end device.
