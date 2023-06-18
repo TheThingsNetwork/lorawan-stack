@@ -20,6 +20,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Console not applying webhook field masks when creating a webhook from a template that has field masks set.
+- Removing user invitations not working in the user management panel for administrators.
 
 ### Security
 
