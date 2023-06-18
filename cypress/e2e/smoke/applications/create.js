@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { disableApplicationServer } from '../../../support/utils'
 import { defineSmokeTest } from '../utils'
 
 const applicationCreate = defineSmokeTest('succeeds creating application', () => {
@@ -23,7 +22,6 @@ const applicationCreate = defineSmokeTest('succeeds creating application', () =>
     password_confirm: 'ABCDefg123!',
     email: 'app-create-test-user@example.com',
   }
-  cy.augmentStackConfig(disableApplicationServer)
   cy.createUser(user)
   cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
   cy.visit(Cypress.config('consoleRootPath'))

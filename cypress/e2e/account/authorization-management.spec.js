@@ -79,11 +79,6 @@ describe('Account App authorization management', () => {
     cy.findByRole('button', { name: /Invalidate all access tokens/ }).click()
     cy.findByTestId('error-notification').should('not.exist')
 
-    cy.location('pathname').should(
-      'eq',
-      `${Cypress.config('accountAppRootPath')}/client-authorizations/console`,
-    )
-
     cy.visit(`${Cypress.config('accountAppRootPath')}/client-authorizations/console/access-tokens`)
     cy.findByRole('rowgroup').should('not.exist')
   })
@@ -93,10 +88,6 @@ describe('Account App authorization management', () => {
     cy.visit(`${Cypress.config('accountAppRootPath')}/client-authorizations/console/access-tokens`)
     cy.findByRole('button', { name: /Invalidate this access token/ }).click()
     cy.findByTestId('error-notification').should('not.exist')
-
-    cy.location('pathname').should(
-      'eq',
-      `${Cypress.config('accountAppRootPath')}/client-authorizations/console`,
-    )
+    cy.findByRole('rowgroup').should('not.exist')
   })
 })

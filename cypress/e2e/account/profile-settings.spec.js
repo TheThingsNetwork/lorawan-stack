@@ -163,7 +163,6 @@ describe('Account App profile settings', () => {
 describe('Account App profile settings with disabled upload', () => {
   before(() => {
     cy.dropAndSeedDatabase()
-    cy.server()
     cy.augmentIsConfig({ profile_picture: { disable_upload: true } })
   })
   it('displays UI elements in place', () => {
@@ -201,7 +200,6 @@ describe('Account App profile settings with disabled upload', () => {
 describe('Account App profile settings without gravatar', () => {
   before(() => {
     cy.dropAndSeedDatabase()
-    cy.server()
     cy.augmentIsConfig({ profile_picture: { use_gravatar: false } })
   })
   it('displays UI elements in place', () => {

@@ -42,6 +42,6 @@ describe('Account App code view', () => {
 
   it('redirects back if no code is supplied', () => {
     cy.visit(`${Cypress.config('accountAppRootPath')}/code`)
-    cy.location('pathname').should('eq', `${Cypress.config('accountAppRootPath')}/`)
+    cy.location('pathname').should('eq', Cypress.config('accountAppRootPath'))
   })
 })

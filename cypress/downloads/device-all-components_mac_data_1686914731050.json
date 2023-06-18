@@ -1,0 +1,98 @@
+{
+  "mac_state": {
+    "current_parameters": {
+      "max_eirp": 16,
+      "adr_nb_trans": 1,
+      "rx1_delay": 1,
+      "rx2_frequency": "869525000",
+      "ping_slot_frequency": "869525000",
+      "beacon_frequency": "869525000",
+      "channels": [
+        {
+          "uplink_frequency": "868100000",
+          "downlink_frequency": "868100000",
+          "max_data_rate_index": 5,
+          "enable_uplink": true
+        },
+        {
+          "uplink_frequency": "868300000",
+          "downlink_frequency": "868300000",
+          "max_data_rate_index": 5,
+          "enable_uplink": true
+        },
+        {
+          "uplink_frequency": "868500000",
+          "downlink_frequency": "868500000",
+          "max_data_rate_index": 5,
+          "enable_uplink": true
+        }
+      ],
+      "adr_ack_limit_exponent": "ADR_ACK_LIMIT_64",
+      "adr_ack_delay_exponent": "ADR_ACK_DELAY_32",
+      "ping_slot_data_rate_index_value": 3
+    },
+    "desired_parameters": {
+      "max_eirp": 16,
+      "adr_nb_trans": 1,
+      "rx1_delay": 5,
+      "rx2_data_rate_index": 3,
+      "rx2_frequency": "869525000",
+      "ping_slot_frequency": "869525000",
+      "beacon_frequency": "869525000",
+      "channels": [
+        {
+          "uplink_frequency": "868100000",
+          "downlink_frequency": "868100000",
+          "max_data_rate_index": 5,
+          "enable_uplink": true
+        },
+        {
+          "uplink_frequency": "868300000",
+          "downlink_frequency": "868300000",
+          "max_data_rate_index": 5,
+          "enable_uplink": true
+        },
+        {
+          "uplink_frequency": "868500000",
+          "downlink_frequency": "868500000",
+          "max_data_rate_index": 5,
+          "enable_uplink": true
+        },
+        {
+          "uplink_frequency": "867100000",
+          "downlink_frequency": "867100000",
+          "max_data_rate_index": 5,
+          "enable_uplink": true
+        },
+        {
+          "uplink_frequency": "867300000",
+          "downlink_frequency": "867300000",
+          "max_data_rate_index": 5,
+          "enable_uplink": true
+        },
+        {
+          "uplink_frequency": "867500000",
+          "downlink_frequency": "867500000",
+          "max_data_rate_index": 5,
+          "enable_uplink": true
+        },
+        {
+          "uplink_frequency": "867700000",
+          "downlink_frequency": "867700000",
+          "max_data_rate_index": 5,
+          "enable_uplink": true
+        },
+        {
+          "uplink_frequency": "867900000",
+          "downlink_frequency": "867900000",
+          "max_data_rate_index": 5,
+          "enable_uplink": true
+        }
+      ],
+      "adr_ack_limit_exponent": "ADR_ACK_LIMIT_64",
+      "adr_ack_delay_exponent": "ADR_ACK_DELAY_32",
+      "ping_slot_data_rate_index_value": 3
+    },
+    "lorawan_version": "MAC_V1_0_2"
+  }
+}
