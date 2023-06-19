@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func TestValidatePasswordStrength(t *testing.T) {
@@ -125,10 +126,70 @@ func TestUserCreate(t *testing.T) {
 		is.config.UserRegistration.Enabled = true
 		is.config.UserRegistration.Invitation.Required = true
 
-		_, err = reg.Create(ctx, req)
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.Resemble(err, errInvitationTokenRequired), should.BeTrue)
-		}
+		t.Run("InvitationRequired", func(t *testing.T) { // nolint:paralleltest
+			t.Run("WithoutInvitation", func(t *testing.T) { // nolint:paralleltest
+				a, ctx := test.New(t)
+				_, err = reg.Create(ctx, req)
+				if a.So(err, should.NotBeNil) {
+					a.So(errors.Resemble(err, errInvitationTokenRequired), should.BeTrue)
+				}
+			})
+			t.Run("WithInvitation", func(t *testing.T) { // nolint:paralleltest
+				t.Run("Expired", func(t *testing.T) { // nolint:paralleltest
+					a, ctx := test.New(t)
+					req := &ttnpb.CreateUserRequest{
+						User: &ttnpb.User{
+							Ids:                 &ttnpb.UserIdentifiers{UserId: "test-invitation-expired"},
+							PrimaryEmailAddress: "test-invitation-expired@example.com",
+							Password:            "test-invitation-expired",
+						},
+						InvitationToken: "TOKEN_EXPIRED",
+					}
+					_, err := is.store.CreateInvitation(
+						ctx, &ttnpb.Invitation{
+							Email: req.User.PrimaryEmailAddress,
+							Token: "TOKEN_EXPIRED", ExpiresAt: timestamppb.New(time.Now().Add(-5 * time.Minute)),
+						},
+					)
+					a.So(err, should.BeNil)
+					_, err = reg.Create(ctx, req)
+					a.So(errors.IsFailedPrecondition(err), should.BeTrue)
+				})
+				t.Run("Valid token", func(t *testing.T) { // nolint:paralleltest
+					a, ctx := test.New(t)
+					req := &ttnpb.CreateUserRequest{
+						User: &ttnpb.User{
+							Ids:                 &ttnpb.UserIdentifiers{UserId: "test-invitation-valid"},
+							PrimaryEmailAddress: "test-invitation-valid@example.com",
+							Password:            "test-invitation-valid",
+						},
+						InvitationToken: "VALID",
+					}
+					_, err := is.store.CreateInvitation(
+						ctx, &ttnpb.Invitation{
+							Email: req.User.PrimaryEmailAddress,
+							Token: "VALID", ExpiresAt: timestamppb.New(time.Now().Add(5 * time.Minute)),
+						},
+					)
+					a.So(err, should.BeNil)
+					_, err = reg.Create(ctx, req)
+					a.So(err, should.BeNil)
+				})
+				t.Run("Already_Accepted", func(t *testing.T) { // nolint:paralleltest
+					a, ctx := test.New(t)
+					req := &ttnpb.CreateUserRequest{
+						User: &ttnpb.User{
+							Ids:                 &ttnpb.UserIdentifiers{UserId: "test-invitation-already-accepted"},
+							PrimaryEmailAddress: "test-invitation-already-accepted@example.com",
+							Password:            "test-invitation-already-accepted",
+						},
+						InvitationToken: "VALID",
+					}
+					_, err = reg.Create(ctx, req)
+					a.So(errors.IsFailedPrecondition(err), should.BeTrue)
+				})
+			})
+		})
 
 		is.config.UserRegistration.Invitation.Required = false
 
@@ -150,7 +211,7 @@ func TestUserUpdateInvalidPassword(t *testing.T) {
 	testWithIdentityServer(t, func(_ *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewUserRegistryClient(cc)
 
-		t.Run("Incorrect", func(t *testing.T) {
+		t.Run("Incorrect", func(t *testing.T) { // nolint:paralleltest
 			a, ctx := test.New(t)
 
 			_, err := reg.UpdatePassword(ctx, &ttnpb.UpdateUserPasswordRequest{
@@ -163,7 +224,7 @@ func TestUserUpdateInvalidPassword(t *testing.T) {
 			}
 		})
 
-		t.Run("Weak", func(t *testing.T) {
+		t.Run("Weak", func(t *testing.T) { // nolint:paralleltest
 			a, ctx := test.New(t)
 
 			_, err := reg.UpdatePassword(ctx, &ttnpb.UpdateUserPasswordRequest{

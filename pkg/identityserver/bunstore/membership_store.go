@@ -177,25 +177,25 @@ func (s *membershipStore) FindMemberships(
 	switch entityType {
 	default:
 		return nil, fmt.Errorf("invalid entity type %q", entityType)
-	case "application":
+	case store.EntityApplication:
 		res, err := s.listApplicationsBy(ctx, selectWithUUID, store.FieldMask{"ids"})
 		if err != nil {
 			return nil, err
 		}
 		return mapSlice(res, (*ttnpb.Application).GetEntityIdentifiers), nil
-	case "client":
+	case store.EntityClient:
 		res, err := s.listClientsBy(ctx, selectWithUUID, store.FieldMask{"ids"})
 		if err != nil {
 			return nil, err
 		}
 		return mapSlice(res, (*ttnpb.Client).GetEntityIdentifiers), nil
-	case "gateway":
+	case store.EntityGateway:
 		res, err := s.listGatewaysBy(ctx, selectWithUUID, store.FieldMask{"ids"})
 		if err != nil {
 			return nil, err
 		}
 		return mapSlice(res, (*ttnpb.Gateway).GetEntityIdentifiers), nil
-	case "organization":
+	case store.EntityOrganization:
 		res, err := s.listOrganizationsBy(ctx, selectWithUUID, store.FieldMask{"ids"})
 		if err != nil {
 			return nil, err
@@ -454,19 +454,6 @@ func (s *membershipStore) SetMember(
 		return err
 	}
 
-	// TODO: Refactor store interface to move this to a DeleteCollaborator method.
-	// (https://github.com/TheThingsNetwork/lorawan-stack/issues/5587)
-	if len(rights.GetRights()) == 0 {
-		_, err = s.DB.NewDelete().
-			Model(model).
-			WherePK().
-			Exec(ctx)
-		if err != nil {
-			return storeutil.WrapDriverError(err)
-		}
-		return nil
-	}
-
 	model.Rights = convertIntSlice[ttnpb.Right, int](rights.GetRights())
 
 	_, err = s.DB.NewUpdate().
@@ -478,6 +465,38 @@ func (s *membershipStore) SetMember(
 		return storeutil.WrapDriverError(err)
 	}
 
+	return nil
+}
+
+// DeleteMember elminates the direct member rights attached to an entity.
+func (s *membershipStore) DeleteMember(
+	ctx context.Context, ids *ttnpb.OrganizationOrUserIdentifiers, entityID *ttnpb.EntityIdentifiers,
+) error {
+	ctx, span := tracer.StartFromContext(ctx, "DeleteMember", trace.WithAttributes(
+		attribute.String("account_type", ids.EntityType()),
+		attribute.String("account_id", ids.IDString()),
+		attribute.String("entity_type", entityID.EntityType()),
+		attribute.String("entity_id", entityID.IDString()),
+	))
+	defer span.End()
+
+	account, err := s.getAccountModel(ctx, ids.EntityType(), ids.IDString())
+	if err != nil {
+		return err
+	}
+	entityType, entityUUID, err := s.getEntity(ctx, entityID)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.DB.NewDelete().Model(&Membership{}).
+		Where("account_id = ?", account.ID).
+		Where("entity_type = ?", entityType).
+		Where("entity_id = ?", entityUUID).
+		Exec(ctx)
+	if err != nil {
+		return storeutil.WrapDriverError(err)
+	}
 	return nil
 }
 

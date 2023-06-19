@@ -86,6 +86,7 @@ var (
 		"ns.up.join.process", "successfully processed join-request",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.UplinkMessage{}),
+		events.WithPropagateToParent(),
 	)
 	evtClusterJoinAttempt = events.Define(
 		"ns.up.join.cluster.attempt", "send join-request to cluster-local Join Server",
