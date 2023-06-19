@@ -68,7 +68,7 @@ const m = defineMessages({
     'An error occurred while processing the provided end device template. This could be due to invalid format, syntax or file encoding. Please check the provided template file and try again. See also our documentation on <DocLink>Importing End Devices</DocLink> for more information.',
   incompleteWarningTitle: 'Not all devices imported successfully',
   incompleteWarningMessage:
-    '{count} {count, plural, one {end device} other {end devices}} could not be imported successfully, because {count, plural, one {its} other {their}} registration attempt resulted in an error',
+    '{count, number} {count, plural, one {end device} other {end devices}} could not be imported successfully, because {count, plural, one {its} other {their}} registration attempt resulted in an error',
   incompleteStatus:
     'The registration of the following {count, plural, one {end device} other {end devices}} failed:',
   noneWarningTitle: 'No end device was created',
@@ -76,7 +76,7 @@ const m = defineMessages({
     'None of your specified end devices was imported, because each registration attempt resulted in an error',
   processLog: 'Process log',
   progress:
-    'Successfully converted {errorCount} of {deviceCount} {deviceCount, plural, one {end device} other {end devices}}',
+    'Successfully converted {errorCount, number} of {deviceCount, number} {deviceCount, plural, one {end device} other {end devices}}',
   successInfoTitle: 'All end devices imported successfully',
   successInfoMessage:
     'All of the specified end devices have been converted and imported successfully',
@@ -84,7 +84,7 @@ const m = defineMessages({
     'Please also see our documentation on <DocLink>Importing End Devices</DocLink> for more information and possible resolutions.',
   abortWarningTitle: 'Device import aborted',
   abortWarningMessage:
-    'The end device import was aborted and the remaining {count} {count, plural, one {end device} other {end devices}} have not been imported',
+    'The end device import was aborted and the remaining {count, number} {count, plural, one {end device} other {end devices}} have not been imported',
   largeFileWarningMessage:
     'Providing files larger than {warningThreshold} can cause issues during the import process. We recommend you to split such files up into multiple smaller files and importing them one by one.',
 })

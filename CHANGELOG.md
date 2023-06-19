@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- New Admin Panel in the Console.
+
 ### Changed
 
 ### Deprecated

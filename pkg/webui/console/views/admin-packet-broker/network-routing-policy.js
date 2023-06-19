@@ -74,11 +74,11 @@ const NetworkRoutingPolicyViewInner = ({ match }) => {
   const defaultRoutingPolicy = useSelector(selectHomeNetworkDefaultRoutingPolicy)
 
   useBreadcrumbs(
-    'admin.packet-broker.networks.single',
+    'admin-panel.packet-broker.networks.single',
     <>
-      <Breadcrumb path={'/admin/packet-broker/networks'} content={m.networks} />
+      <Breadcrumb path={'/admin-panel/packet-broker/networks'} content={m.networks} />
       <Breadcrumb
-        path={`/admin/packet-broker/networks/${match.params.netId}${
+        path={`/admin-panel/packet-broker/networks/${match.params.netId}${
           match.params.tenantId ? `/${match.params.tenantId}` : ''
         }`}
         content={network.name || displayId}
@@ -163,7 +163,7 @@ const NetworkRoutingPolicyViewInner = ({ match }) => {
       <Row>
         <Col md={12}>
           <PageTitle title={m.network} values={{ network: network.name || displayId }}>
-            <Link to="/admin/packet-broker/networks" secondary className={style.backLink}>
+            <Link to="/admin-panel/packet-broker/networks" secondary className={style.backLink}>
               ← <Message content={m.backToAllNetworks} />
             </Link>
           </PageTitle>
@@ -236,7 +236,7 @@ const NetworkRoutingPolicyView = props => {
   const registered = useSelector(selectRegistered)
 
   return (
-    <Require condition={registered} otherwise={{ redirect: '/admin/packet-broker' }}>
+    <Require condition={registered} otherwise={{ redirect: '/admin-panel/packet-broker' }}>
       <RequireRequest
         requestAction={[
           getPacketBrokerNetwork(combinedId, { fetchPolicies: true }),

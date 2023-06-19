@@ -34,7 +34,11 @@ class BreadcrumbsProvider extends React.Component {
     this.setState(prev => {
       const index = prev.breadcrumbs.findIndex(({ id: breadcrumbId }) => breadcrumbId === id)
       if (index === -1) {
-        return { breadcrumbs: [...prev.breadcrumbs, { id, breadcrumb }] }
+        return {
+          breadcrumbs: [...prev.breadcrumbs, { id, breadcrumb }].sort((a, b) =>
+            a.id < b.id ? -1 : 1,
+          ),
+        }
       }
 
       // Replace breadcrumb with existing id.

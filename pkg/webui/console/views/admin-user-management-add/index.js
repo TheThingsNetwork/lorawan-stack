@@ -47,13 +47,13 @@ import {
   }),
   {
     createUser: attachPromise(createUser),
-    navigateToList: () => push(`/admin/user-management`),
+    navigateToList: () => push(`/admin-panel/user-management`),
     getConfiguration: () => getIsConfiguration(),
   },
 )
 @withRequest(({ getConfiguration }) => getConfiguration())
-@withBreadcrumb('admin.user-management.add', () => (
-  <Breadcrumb path={`/admin/user-management/add`} content={sharedMessages.add} />
+@withBreadcrumb('admin-panel.user-management.add', () => (
+  <Breadcrumb path={`/admin-panel/user-management/add`} content={sharedMessages.add} />
 ))
 export default class UserManagementAdd extends Component {
   static propTypes = {
@@ -87,7 +87,7 @@ export default class UserManagementAdd extends Component {
       <Container>
         <PageTitle title={sharedMessages.userAdd} />
         <Row>
-          <Col lg={8} md={12}>
+          <Col>
             <UserDataForm
               passwordRequirements={passwordRequirements}
               onSubmit={this.onSubmit}
