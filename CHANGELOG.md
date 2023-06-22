@@ -22,6 +22,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Fix payload formatter page launching malformed requests in the Console.
+- Fix end device claiming issues in the Console and improve error messaging.
 
 ### Security
 

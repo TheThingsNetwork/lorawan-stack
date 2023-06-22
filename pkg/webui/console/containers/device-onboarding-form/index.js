@@ -95,9 +95,10 @@ const DeviceOnboardingForm = () => {
 
   const handleSubmit = useCallback(
     async (values, { resetForm }, cleanedValues) => {
-      const { _registration } = values
+      const { _registration, _claim } = values
       const applicationIds = { application_id: appId }
       const { mac_state = {} } = cleanedValues
+      const isClaiming = _claim === true
 
       setError()
 
@@ -111,6 +112,15 @@ const DeviceOnboardingForm = () => {
           Object.keys(mac_state.current_parameters).length === 0
         ) {
           delete mac_state.current_parameters
+        }
+
+        // Obtain the device ID from authenticated identifiers when claiming.
+        if (isClaiming) {
+          cleanedValues.ids = {
+            ...cleanedValues.ids,
+            dev_eui: values.authenticated_identifiers.dev_eui,
+            device_id: values.target_device_id,
+          }
         }
 
         const endDevice = await dispatch(attachPromise(createDevice(appId, cleanedValues)))
