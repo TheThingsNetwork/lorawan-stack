@@ -104,10 +104,10 @@ service EndDeviceQRCodeGenerator {
   // Parse QR Codes of known formats and return the information contained within.
   rpc Parse(ParseEndDeviceQRCodeRequest) returns (ParseEndDeviceQRCodeResponse){
     option (google.api.http) = {
-      post: "/qr-code/end-devices/parse",
+      post: "/qr-codes/end-devices/parse",
       body: "*"
       additional_bindings {
-        post: "/qr-code/end-devices/{format_id}/parse"
+        post: "/qr-codes/end-devices/{format_id}/parse"
         body: "*"
       }
     };
