@@ -40391,12 +40391,12 @@
                   "rules": [
                     {
                       "method": "POST",
-                      "pattern": "/qr-code/end-devices/parse",
+                      "pattern": "/qr-codes/end-devices/parse",
                       "body": "*"
                     },
                     {
                       "method": "POST",
-                      "pattern": "/qr-code/end-devices/{format_id}/parse",
+                      "pattern": "/qr-codes/end-devices/{format_id}/parse",
                       "body": "*"
                     }
                   ]

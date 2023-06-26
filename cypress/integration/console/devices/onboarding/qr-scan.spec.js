@@ -55,7 +55,7 @@ describe('Device onboarding with QR scan', () => {
     interceptDeviceRepo(appId)
     cy.intercept(
       'POST',
-      '/api/v3/qr-code/end-devices/parse',
+      '/api/v3/qr-codes/end-devices/parse',
       composeQRGeneratorParseResponse({ ...device, vendorId: 428 }),
     ).as('qr-code-parse-request')
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
