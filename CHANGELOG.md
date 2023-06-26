@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- The `as-db purge` command to purge unused data from the Application Server database.
+
 ### Changed
 
 - Instead of retrying application downlinks indefinitely, the Application Server now retries them for a configured number of times. Each `ApplicationDownlink` message contains the `attempt` and `max_attempts` fields to indicate the current and maximum number of attempts for a specific `application downlink`.
@@ -18,6 +20,8 @@ For details about compatibility between different releases, see the **Commitment
 - The `as.downlinks.confirmation.default-retry-attempts` field is used for all application downlinks that were scheduled before this change and for every application downlink that does not have the `max_attempts` field set. On the other hand, the `as.downlinks.confirmation.max-retry-attempts` field ensures that the `max_attempts` field's upper bound is contained and does not exceed its value.
 
 ### Deprecated
+
+- The `as.uplink-storage.limit` configuration option.
 
 ### Removed
 
