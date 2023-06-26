@@ -172,10 +172,10 @@ func (srv *mockTTJS) handleClaim(w http.ResponseWriter, r *http.Request) { //nol
 			return
 		}
 
-		test.Must(nil, dev.homeNetID.UnmarshalText([]byte(req.HomeNetID)))
+		test.Must[any](nil, dev.homeNetID.UnmarshalText([]byte(req.HomeNetID)))
 		if req.HomeNSID != nil {
 			dev.homeNSID = new(types.EUI64)
-			test.Must(nil, dev.homeNSID.UnmarshalText([]byte(*req.HomeNSID)))
+			test.Must[any](nil, dev.homeNSID.UnmarshalText([]byte(*req.HomeNSID)))
 		}
 		dev.asID = asID
 		dev.locked = req.Lock != nil && *req.Lock

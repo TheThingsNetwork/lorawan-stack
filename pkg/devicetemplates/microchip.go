@@ -162,7 +162,7 @@ var (
 
 // microchipATECC608AMAHTNT is a Microchip ATECC608A-MAHTN-T device provisioner.
 type microchipATECC608AMAHTNT struct {
-	keys map[string]interface{}
+	keys map[string]any
 }
 
 func (*microchipATECC608AMAHTNT) Format() *ttnpb.EndDeviceTemplateFormat {
@@ -236,7 +236,7 @@ func (m *microchipATECC608AMAHTNT) Convert(
 
 // microchipATECC608TNGLORA is a Microchip ATECC608A-TNGLORA-B and -C device provisioner.
 type microchipATECC608TNGLORA struct {
-	keys map[string]interface{}
+	keys map[string]any
 }
 
 func (*microchipATECC608TNGLORA) Format() *ttnpb.EndDeviceTemplateFormat {
@@ -397,8 +397,8 @@ func (m *microchipATECC608TNGLORA) Convert( //nolint:gocyclo
 }
 
 func init() {
-	getKeys := func(raw map[string][]byte) map[string]interface{} {
-		keys := make(map[string]interface{}, len(raw))
+	getKeys := func(raw map[string][]byte) map[string]any {
+		keys := make(map[string]any, len(raw))
 		for kid, key := range raw {
 			block, _ := pem.Decode(key)
 			if block == nil {

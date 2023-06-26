@@ -89,7 +89,7 @@ func TestForwarder(t *testing.T) {
 	dp, dpAddr := mustServePBDataPlane(ctx, t)
 	mp, mpAddr := mustServePBMapper(ctx, t)
 
-	gs := test.Must(mock.NewGatewayServer(c)).(*mock.GatewayServer)
+	gs := test.Must(mock.NewGatewayServer(c))
 	tokenKey := bytes.Repeat([]byte{0x42}, 16)
 	tokenEncrypter := test.Must(jose.NewEncrypter(jose.A128GCM, jose.Recipient{
 		Algorithm: jose.A128GCMKW,
@@ -371,9 +371,9 @@ func TestForwarder(t *testing.T) {
 		token := test.Must(json.Marshal(GatewayUplinkToken{
 			GatewayUID: unique.ID(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}),
 			Token:      []byte{0x1, 0x2, 0x3, 0x4},
-		})).([]byte)
-		tokenObj := test.Must(tokenEncrypter.Encrypt(token)).(*jose.JSONWebEncryption)
-		tokenCompact := test.Must(tokenObj.CompactSerialize()).(string)
+		}))
+		tokenObj := test.Must(tokenEncrypter.Encrypt(token))
+		tokenCompact := test.Must(tokenObj.CompactSerialize())
 
 		dp.ForwarderDown <- &packetbroker.RoutedDownlinkMessage{
 			ForwarderNetId:      0x000013,
@@ -539,7 +539,7 @@ func TestHomeNetwork(t *testing.T) {
 	_, cpAddr := mustServePBControlPane(ctx, t)
 	dp, dpAddr := mustServePBDataPlane(ctx, t)
 
-	ns := test.Must(mock.NewNetworkServer(c)).(*mock.NetworkServer)
+	ns := test.Must(mock.NewNetworkServer(c))
 	test.Must(New(c, &Config{
 		IAMAddress:          iamAddr.String(),
 		ControlPlaneAddress: cpAddr.String(),
@@ -695,7 +695,7 @@ func TestHomeNetwork(t *testing.T) {
 								ForwarderNetID:     [3]byte{0x0, 0x0, 0x42},
 								ForwarderTenantID:  "foo-tenant",
 								ForwarderClusterID: "test",
-							})).([]byte),
+							})),
 						},
 						{
 							GatewayIds:   cluster.PacketBrokerGatewayID,
@@ -721,7 +721,7 @@ func TestHomeNetwork(t *testing.T) {
 								ForwarderNetID:     [3]byte{0x0, 0x0, 0x42},
 								ForwarderTenantID:  "foo-tenant",
 								ForwarderClusterID: "test",
-							})).([]byte),
+							})),
 						},
 					},
 					Settings: &ttnpb.TxSettings{
@@ -832,7 +832,7 @@ func TestHomeNetwork(t *testing.T) {
 								ForwarderNetID:     [3]byte{0x0, 0x0, 0x42},
 								ForwarderTenantID:  "foo-tenant",
 								ForwarderClusterID: "test",
-							})).([]byte),
+							})),
 						},
 					},
 					Settings: &ttnpb.TxSettings{
@@ -901,7 +901,7 @@ func TestHomeNetwork(t *testing.T) {
 									ForwarderNetID:     [3]byte{0x0, 0x0, 0x42},
 									ForwarderTenantID:  "foo-tenant",
 									ForwarderClusterID: "test",
-								})).([]byte),
+								})),
 							},
 						},
 					},

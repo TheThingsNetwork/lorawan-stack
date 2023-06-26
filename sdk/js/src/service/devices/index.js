@@ -23,6 +23,7 @@ import combineStreams from '../../util/combine-streams'
 import deviceEntityMap from '../../../generated/device-entity-map.json'
 import DownlinkQueue from '../downlink-queue'
 import { STACK_COMPONENTS_MAP } from '../../util/constants'
+import DeviceClaim from '../claim'
 
 import Repository from './repository'
 import { splitSetPaths, splitGetPaths, makeRequests } from './split'
@@ -45,6 +46,7 @@ class Devices {
 
     this.DownlinkQueue = new DownlinkQueue(api.AppAs, { stackConfig })
     this.Repository = new Repository(api.DeviceRepository)
+    this.DeviceClaim = new DeviceClaim(api.DeviceClaim, { stackConfig })
 
     this.deviceCreationAllowedFieldMaskPaths = [
       ...this._api.EndDeviceRegistry.UpdateAllowedFieldMaskPaths,
@@ -486,14 +488,63 @@ class Devices {
       throw new Error('Missing application ID for device')
     }
 
-    const { supports_join = false, ids = {} } = device
+    const { authenticated_identifiers, target_device_id, ...submitValues } = device
+    const { supports_join = false, ids = {} } = submitValues
 
-    const deviceId = ids.device_id
+    // Initiate claiming, if the device is claimable.
+    const hasAuthenticatedIdentifiers = Boolean(authenticated_identifiers)
+    const claimInfoResponse = await this._api.EndDeviceClaimingServer.GetInfoByJoinEUI({
+      join_eui: ids.join_eui,
+    })
+    const claim = Marshaler.payloadSingleResponse(claimInfoResponse)
+    const supportsClaiming = claim?.supports_claiming ?? false
+    let claimDeviceIds
+    if (supportsClaiming) {
+      // Since this device is claimable, the creation on the join server needs to be skipped.
+      submitValues.join_server_address = undefined
+      const claimPayload = hasAuthenticatedIdentifiers
+        ? {
+            authenticated_identifiers,
+            target_device_id,
+            target_application_ids: {
+              application_id: applicationId,
+            },
+          }
+        : {
+            authenticated_identifiers: {
+              dev_eui: ids.dev_eui,
+              authentication_code: device.claim_authentication_code?.value,
+              join_eui: ids.join_eui,
+            },
+            target_device_id: ids.device_id,
+            target_application_ids: {
+              application_id: applicationId,
+            },
+          }
+      try {
+        const claimResponse = await this._api.EndDeviceClaimingServer.Claim(undefined, claimPayload)
+        claimDeviceIds = Marshaler.payloadSingleResponse(claimResponse)
+      } catch (error) {
+        throw new Error('Unable to claim end device', { cause: error })
+      }
+    }
+
+    let newFieldmasks = mask
+    // Apply the resulting IDs to the end_device.
+    if (claimDeviceIds) {
+      submitValues.ids = { ...ids, ...claimDeviceIds }
+      newFieldmasks = Marshaler.fieldMaskFromPatch(
+        submitValues,
+        this.deviceCreationAllowedFieldMaskPaths,
+      )
+    }
+
+    const deviceId = submitValues.ids.device_id
     if (!Boolean(deviceId)) {
       throw new Error('Missing end device ID')
     }
 
-    const requestTree = splitSetPaths(Marshaler.selectorToPaths(mask))
+    const requestTree = splitSetPaths(Marshaler.selectorToPaths(newFieldmasks))
 
     if (!supports_join || device.join_server_address !== this._stackConfig.jsHost) {
       delete requestTree.js
@@ -507,12 +558,13 @@ class Devices {
       delete requestTree.as
     }
 
-    const devicePayload = Marshaler.payload(device, 'end_device')
+    const devicePayload = Marshaler.payload(submitValues, 'end_device')
     const routeParams = {
       routeParams: {
         'end_device.ids.application_ids.application_id': applicationId,
       },
     }
+
     const setParts = await makeRequests(
       this._api,
       this._stackConfig,

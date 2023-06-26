@@ -16,8 +16,8 @@ package rpcserver
 
 import (
 	"context"
+	"fmt"
 	"net"
-	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/version"
 	"google.golang.org/grpc"
@@ -34,7 +34,9 @@ type inProcessCredentials struct {
 	ServerName string
 }
 
-func (inProcessCredentials) ClientHandshake(_ context.Context, _ string, conn net.Conn) (net.Conn, credentials.AuthInfo, error) {
+func (inProcessCredentials) ClientHandshake(
+	_ context.Context, _ string, conn net.Conn,
+) (net.Conn, credentials.AuthInfo, error) {
 	return conn, inProcessAuthInfo{}, nil
 }
 
@@ -91,14 +93,14 @@ type inProcessAddr string
 func (inProcessAddr) Network() string  { return "in-process" }
 func (a inProcessAddr) String() string { return string(a) }
 
-func (l inProcessListener) Addr() net.Addr { return inProcessAddr("in-process") }
+func (inProcessListener) Addr() net.Addr { return inProcessAddr("in-process") }
 
-func inProcessDialer(lis *inProcessListener) func(string, time.Duration) (net.Conn, error) {
-	return func(addr string, timeout time.Duration) (net.Conn, error) {
+func inProcessDialer(lis *inProcessListener) func(context.Context, string) (net.Conn, error) {
+	return func(ctx context.Context, addr string) (net.Conn, error) {
 		server, client := net.Pipe()
 		select {
-		case <-time.After(timeout):
-			return nil, context.DeadlineExceeded
+		case <-ctx.Done():
+			return nil, ctx.Err()
 		case lis.ch <- server:
 			return client, nil
 		}
@@ -111,9 +113,9 @@ func StartLoopback(ctx context.Context, s *grpc.Server, opts ...grpc.DialOption)
 	lis := newInProcessListener(ctx)
 	go s.Serve(lis)
 	return grpc.Dial(
-		lis.Addr().String(),
+		fmt.Sprintf("passthrough:///%v", lis.Addr()),
 		append([]grpc.DialOption{
-			grpc.WithDialer(inProcessDialer(lis)),
+			grpc.WithContextDialer(inProcessDialer(lis)),
 			grpc.WithTransportCredentials(&inProcessCredentials{}),
 		}, opts...)...)
 }

@@ -44,7 +44,7 @@ func TestMsgpackCompatibility(t *testing.T) {
 		}
 		return fmt.Sprintf("%s\nand n == %d", strings.Join(exprs, "\nand "), len(exprs))
 	}
-	makeNumericExpr := func(name string, v interface{}) string {
+	makeNumericExpr := func(name string, v any) string {
 		return fmt.Sprintf("x.%s == %d", name, v)
 	}
 	makeStringExpr := func(name string, v string) string {
@@ -93,7 +93,7 @@ func TestMsgpackCompatibility(t *testing.T) {
 	}
 
 	for _, tc := range []struct {
-		Value   interface{}
+		Value   any
 		LuaExpr string
 	}{
 		{

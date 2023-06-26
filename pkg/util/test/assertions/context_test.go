@@ -273,8 +273,8 @@ func TestContextHasParent(t *testing.T) {
 func TestShouldHaveParentContext(t *testing.T) {
 	for i, tc := range []struct {
 		Actual,
-		Expected interface{}
-		Test func(actual interface{}, expected ...interface{}) string
+		Expected any
+		Test func(actual any, expected ...any) string
 	}{
 		{
 			Actual:   "string",

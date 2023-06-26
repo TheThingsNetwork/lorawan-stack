@@ -69,7 +69,7 @@ func TestI18N(t *testing.T) {
 func Example() {
 	i18n.Define("welcome_message", "Welcome, {name}!")
 
-	fmt.Println(i18n.Format("welcome_message", "en", map[string]interface{}{"name": "Alice"}))
+	fmt.Println(i18n.Format("welcome_message", "en", map[string]any{"name": "Alice"}))
 
 	// Output:
 	// Welcome, Alice!

@@ -81,7 +81,7 @@ func (h *ProxyHeaders) ParseAndAddTrusted(cidrs ...string) error {
 
 // UnaryServerInterceptor is the interceptor for unary RPCs.
 func (h *ProxyHeaders) UnaryServerInterceptor() grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 		md := h.intercept(ctx)
 		ctx = metadata.NewIncomingContext(ctx, md)
 		return handler(ctx, req)
@@ -90,7 +90,7 @@ func (h *ProxyHeaders) UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 
 // StreamServerInterceptor is the interceptor for streaming RPCs.
 func (h *ProxyHeaders) StreamServerInterceptor() grpc.StreamServerInterceptor {
-	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+	return func(srv any, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 		ctx := stream.Context()
 		wrapped := grpc_middleware.WrapServerStream(stream)
 		md := h.intercept(ctx)

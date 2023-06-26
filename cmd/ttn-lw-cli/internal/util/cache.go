@@ -25,10 +25,10 @@ import (
 
 // AuthData is the stored auth data.
 type AuthData struct {
-	OAuthToken *oauth2.Token          `json:"oauth_token,omitempty"`
-	APIKey     string                 `json:"api_key,omitempty"`
-	Hosts      []string               `json:"hosts,omitempty"`
-	Other      map[string]interface{} `json:"other,omitempty"`
+	OAuthToken *oauth2.Token  `json:"oauth_token,omitempty"`
+	APIKey     string         `json:"api_key,omitempty"`
+	Hosts      []string       `json:"hosts,omitempty"`
+	Other      map[string]any `json:"other,omitempty"`
 }
 
 // AuthCache stores auth for the CLI.
@@ -65,7 +65,7 @@ func (c *AuthCache) getData() *AuthData {
 }
 
 // Get gets a key from the auth cache.
-func (c *AuthCache) Get(key string) interface{} {
+func (c *AuthCache) Get(key string) any {
 	authData := c.getData()
 	switch key {
 	case "oauth_token":
@@ -79,19 +79,19 @@ func (c *AuthCache) Get(key string) interface{} {
 	}
 }
 
-func getFromMap(m map[string]interface{}, path []string) interface{} {
+func getFromMap(m map[string]any, path []string) any {
 	item := m[path[0]]
 	if len(path) == 1 {
 		return item
 	}
-	if m, ok := item.(map[string]interface{}); ok {
+	if m, ok := item.(map[string]any); ok {
 		return getFromMap(m, path[1:])
 	}
 	return nil
 }
 
 // Set sets keys in the auth cache.
-func (c *AuthCache) Set(key string, value interface{}) {
+func (c *AuthCache) Set(key string, value any) {
 	authData := c.getData()
 	switch key {
 	case "oauth_token":
@@ -102,7 +102,7 @@ func (c *AuthCache) Set(key string, value interface{}) {
 		authData.Hosts = value.([]string)
 	default:
 		if authData.Other == nil {
-			authData.Other = make(map[string]interface{})
+			authData.Other = make(map[string]any)
 		}
 		setInMap(authData.Other, strings.Split(key, "."), value)
 	}
@@ -134,7 +134,7 @@ func (c *AuthCache) unset(key string) {
 	c.changed = true
 }
 
-func setInMap(m map[string]interface{}, path []string, value interface{}) {
+func setInMap(m map[string]any, path []string, value any) {
 	if len(path) == 1 {
 		if value == nil {
 			delete(m, path[0])
@@ -143,9 +143,9 @@ func setInMap(m map[string]interface{}, path []string, value interface{}) {
 		}
 	}
 	if m[path[0]] == nil {
-		m[path[0]] = make(map[string]interface{})
+		m[path[0]] = make(map[string]any)
 	}
-	if m, ok := m[path[0]].(map[string]interface{}); ok {
+	if m, ok := m[path[0]].(map[string]any); ok {
 		setInMap(m, path[1:], value)
 	}
 }

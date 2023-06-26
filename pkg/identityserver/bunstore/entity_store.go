@@ -54,19 +54,19 @@ func (s *entityStore) query(ctx context.Context, entityType string, entityIDs ..
 	switch entityType {
 	default:
 		panic(fmt.Errorf("invalid entity type: %s", entityType))
-	case "application":
+	case store.EntityApplication:
 		query = s.newSelectModel(ctx, &Application{}).
 			Column("id").
 			Apply(s.applicationStore.selectWithID(ctx, entityIDs...))
-	case "client":
+	case store.EntityClient:
 		query = s.newSelectModel(ctx, &Client{}).
 			Column("id").
 			Apply(s.clientStore.selectWithID(ctx, entityIDs...))
-	case "gateway":
+	case store.EntityGateway:
 		query = s.newSelectModel(ctx, &Gateway{}).
 			Column("id").
 			Apply(s.gatewayStore.selectWithID(ctx, entityIDs...))
-	case "organization", "user":
+	case store.EntityOrganization, store.EntityUser:
 		query = s.newSelectModel(ctx, &Account{}).
 			Column("account_id").
 			Where("?TableAlias.account_type = ?", entityType)
@@ -142,19 +142,19 @@ func (s *entityStore) getEntityID(ctx context.Context, entityType, entityUUID st
 	switch entityType {
 	default:
 		panic(fmt.Errorf("invalid entity type: %s", entityType))
-	case "application":
+	case store.EntityApplication:
 		query = s.newSelectModel(ctx, &Application{}).
 			Column("application_id").
 			Where("id = ?", entityUUID)
-	case "client":
+	case store.EntityClient:
 		query = s.newSelectModel(ctx, &Client{}).
 			Column("client_id").
 			Where("id = ?", entityUUID)
-	case "gateway":
+	case store.EntityGateway:
 		query = s.newSelectModel(ctx, &Gateway{}).
 			Column("gateway_id").
 			Where("id = ?", entityUUID)
-	case "organization", "user":
+	case store.EntityOrganization, store.EntityUser:
 		query = s.newSelectModel(ctx, &Account{}).
 			Column("uid").
 			Where("account_id = ?", entityUUID).
@@ -174,11 +174,11 @@ func getEntityIdentifiers(entityType string, friendlyID string) *ttnpb.EntityIde
 	switch entityType {
 	default:
 		panic(fmt.Errorf("invalid entity type: %s", entityType))
-	case "application":
+	case store.EntityApplication:
 		return (&ttnpb.ApplicationIdentifiers{ApplicationId: friendlyID}).GetEntityIdentifiers()
-	case "client":
+	case store.EntityClient:
 		return (&ttnpb.ClientIdentifiers{ClientId: friendlyID}).GetEntityIdentifiers()
-	case "end_device", "end device":
+	case "end_device", store.EntityEndDevice:
 		parts := strings.SplitN(friendlyID, ".", 2)
 		return (&ttnpb.EndDeviceIdentifiers{
 			ApplicationIds: &ttnpb.ApplicationIdentifiers{
@@ -186,11 +186,11 @@ func getEntityIdentifiers(entityType string, friendlyID string) *ttnpb.EntityIde
 			},
 			DeviceId: parts[1],
 		}).GetEntityIdentifiers()
-	case "gateway":
+	case store.EntityGateway:
 		return (&ttnpb.GatewayIdentifiers{GatewayId: friendlyID}).GetEntityIdentifiers()
-	case "organization":
+	case store.EntityOrganization:
 		return (&ttnpb.OrganizationIdentifiers{OrganizationId: friendlyID}).GetEntityIdentifiers()
-	case "user":
+	case store.EntityUser:
 		return (&ttnpb.UserIdentifiers{UserId: friendlyID}).GetEntityIdentifiers()
 	}
 }

@@ -30,9 +30,9 @@ import (
 // Data contains data to render templates.
 type Data struct {
 	TemplateData
-	AppConfig            interface{}
+	AppConfig            any
 	ExperimentalFeatures map[string]bool
-	PageData             interface{}
+	PageData             any
 	CSPNonce             string
 }
 
@@ -165,7 +165,7 @@ type appConfigKeyType struct{}
 var appConfigKey appConfigKeyType
 
 // WithAppConfig constructs a *http.Request which has the provided app config attached.
-func WithAppConfig(r *http.Request, cfg interface{}) *http.Request {
+func WithAppConfig(r *http.Request, cfg any) *http.Request {
 	return r.WithContext(context.WithValue(r.Context(), appConfigKey, cfg))
 }
 
@@ -174,7 +174,7 @@ type pageDataKeyType struct{}
 var pageDataKey pageDataKeyType
 
 // WithPageData constructs a *http.Request which has the provided page data attached.
-func WithPageData(r *http.Request, pageData interface{}) *http.Request {
+func WithPageData(r *http.Request, pageData any) *http.Request {
 	return r.WithContext(context.WithValue(r.Context(), pageDataKey, pageData))
 }
 
@@ -207,7 +207,7 @@ func (t *AppTemplate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	templateData.JSFiles = jsFiles
 	pageData := ctx.Value(pageDataKey)
 	if err := webhandlers.RetrieveError(r); err != nil {
-		pageData = map[string]interface{}{
+		pageData = map[string]any{
 			"error": err,
 		}
 	}

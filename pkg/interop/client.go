@@ -73,7 +73,7 @@ func serverURL(scheme, fqdn, path string, port uint32) string {
 }
 
 func newHTTPRequest(
-	url string, pld interface{}, headers map[string]string, username, password string,
+	url string, pld any, headers map[string]string, username, password string,
 ) (*http.Request, error) {
 	buf := &bytes.Buffer{}
 	if err := json.NewEncoder(buf).Encode(pld); err != nil {
@@ -94,7 +94,7 @@ func newHTTPRequest(
 }
 
 func httpExchange(
-	ctx context.Context, httpReq *http.Request, res interface{}, do func(*http.Request) (*http.Response, error),
+	ctx context.Context, httpReq *http.Request, res any, do func(*http.Request) (*http.Response, error),
 ) error {
 	logger := log.FromContext(ctx).WithField("url", httpReq.URL)
 
@@ -145,7 +145,7 @@ type joinServerHTTPClient struct {
 }
 
 func (cl joinServerHTTPClient) exchange(
-	ctx context.Context, pathFunc func(jsRPCPaths) string, pld, res interface{},
+	ctx context.Context, pathFunc func(jsRPCPaths) string, pld, res any,
 ) error {
 	client, err := cl.clientProvider.HTTPClient(ctx, cl.clientOpts...)
 	if err != nil {

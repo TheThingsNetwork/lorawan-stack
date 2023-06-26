@@ -38,7 +38,7 @@ func updateState(ctx context.Context, f func(*state)) {
 }
 
 // GetState returns the session state.
-func getState(ctx context.Context, f func(*state) interface{}) interface{} {
+func getState(ctx context.Context, f func(*state) any) any {
 	session := SessionFromContext(ctx)
 	session.DataMu.RLock()
 	defer session.DataMu.RUnlock()
@@ -65,7 +65,7 @@ func UpdateSessionTimeSync(ctx context.Context, b bool) {
 
 // GetSessionID returns the session ID.
 func GetSessionID(ctx context.Context) (int32, bool) {
-	i, ok := getState(ctx, func(st *state) interface{} {
+	i, ok := getState(ctx, func(st *state) any {
 		if st.ID != nil {
 			return *st.ID
 		}
@@ -76,7 +76,7 @@ func GetSessionID(ctx context.Context) (int32, bool) {
 
 // GetSessionTimeSync returns the session time sync.
 func GetSessionTimeSync(ctx context.Context) (enabled bool, ok bool) {
-	d, ok := getState(ctx, func(st *state) interface{} {
+	d, ok := getState(ctx, func(st *state) any {
 		if st.TimeSync != nil {
 			return *st.TimeSync
 		}

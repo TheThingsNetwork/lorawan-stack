@@ -27,7 +27,7 @@ import (
 func UnaryServerInterceptor(ctx context.Context, opts ...Option) grpc.UnaryServerInterceptor {
 	o := evaluateServerOpt(opts)
 	logger := log.FromContext(ctx).WithField("namespace", "grpc")
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 		ctx = newContextWithRequestFields(ctx)
 		onceFields, propagatedFields := logFieldsForCall(ctx, info.FullMethod)
 		logger := logger.WithFields(propagatedFields)
@@ -75,7 +75,7 @@ func UnaryServerInterceptor(ctx context.Context, opts ...Option) grpc.UnaryServe
 func StreamServerInterceptor(ctx context.Context, opts ...Option) grpc.StreamServerInterceptor {
 	o := evaluateServerOpt(opts)
 	logger := log.FromContext(ctx).WithField("namespace", "grpc")
-	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+	return func(srv any, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 		ctx := newContextWithRequestFields(stream.Context())
 		onceFields, propagatedFields := logFieldsForCall(ctx, info.FullMethod)
 		logger := logger.WithFields(propagatedFields)

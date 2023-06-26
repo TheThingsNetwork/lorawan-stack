@@ -121,7 +121,7 @@ func TestInteropTLS(t *testing.T) {
 	c := component.MustNew(test.GetLogger(t), config)
 	c.RegisterInterop(mockInterop)
 
-	test.Must(nil, c.Start())
+	test.Must[any](nil, c.Start())
 	defer c.Close()
 
 	certPool := x509.NewCertPool()

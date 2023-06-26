@@ -42,7 +42,7 @@ type Manager struct {
 	viper        *viper.Viper
 	flags        *pflag.FlagSet
 	replacer     *strings.Replacer
-	defaults     interface{}
+	defaults     any
 	defaultPaths []string
 	configFlag   string
 }
@@ -85,7 +85,7 @@ func (m *Manager) EnvironmentForKey(key string) string {
 }
 
 // Get returns the current value of the given config key.
-func (m *Manager) Get(key string) interface{} {
+func (m *Manager) Get(key string) any {
 	return m.viper.Get(key)
 }
 
@@ -147,7 +147,7 @@ var DefaultOptions = []Option{
 //   - structs with fields of these types: The nested config names will be prefixed
 //     by the name of this struct, unless it is `name:",squash"` in which case
 //     the names are merged into the parent struct.
-func Initialize(name, envPrefix string, defaults interface{}, opts ...Option) *Manager {
+func Initialize(name, envPrefix string, defaults any, opts ...Option) *Manager {
 	m := &Manager{
 		name:      name,
 		envPrefix: envPrefix,
@@ -186,7 +186,7 @@ func Initialize(name, envPrefix string, defaults interface{}, opts ...Option) *M
 // WithConfig returns a new flagset with has the flags of the Manager as well as the additional flags defined
 // from the defaults passed along.
 // Use this to build derived flagsets with a shared base config (for instance with cobra).
-func (m *Manager) WithConfig(defaults interface{}) *pflag.FlagSet {
+func (m *Manager) WithConfig(defaults any) *pflag.FlagSet {
 	flags := pflag.NewFlagSet(m.name, pflag.ExitOnError)
 	flags.AddFlagSet(m.flags)
 
@@ -204,7 +204,7 @@ func (m *Manager) WithConfig(defaults interface{}) *pflag.FlagSet {
 
 // InitializeWithDefaults is the same as Initialize but it sets some sane default options (see DefaultOptions)
 // alongside the passed in options.
-func InitializeWithDefaults(name, envPrefix string, defaults interface{}, opts ...Option) *Manager {
+func InitializeWithDefaults(name, envPrefix string, defaults any, opts ...Option) *Manager {
 	return Initialize(name, envPrefix, defaults, append(DefaultOptions, opts...)...)
 }
 
@@ -215,7 +215,7 @@ func (m *Manager) Parse(flags ...string) error {
 
 // Unmarshal unmarshals the available config keys into the result.
 // It matches the names of fields based on the name struct tag.
-func (m *Manager) Unmarshal(result interface{}) error {
+func (m *Manager) Unmarshal(result any) error {
 	d, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
 		TagName:          "name",
 		ZeroFields:       true,
@@ -305,7 +305,7 @@ func (m *Manager) mergeConfig(in io.Reader) error {
 // UnmarshalKey unmarshals a specific key into a destination, which must have a matching type.
 // This is useful for fields which have the `file-only:"true"` tag set and so are ignored when
 // Unmarshalling them to a struct.
-func (m *Manager) UnmarshalKey(key string, raw interface{}) error {
+func (m *Manager) UnmarshalKey(key string, raw any) error {
 	return m.viper.UnmarshalKey(key, raw)
 }
 
@@ -332,7 +332,7 @@ func isConfigurableType(t reflect.Type) bool {
 	return t.Implements(configurableI) || reflect.PtrTo(t).Implements(configurableI)
 }
 
-func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interface{}) {
+func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config any) {
 	configValue := reflect.ValueOf(config)
 	configKind := configValue.Type().Kind()
 

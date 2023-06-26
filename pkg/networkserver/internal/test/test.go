@@ -425,7 +425,7 @@ func MakeUplinkMessage(conf UplinkMessageConfig) *ttnpb.UplinkMessage {
 		CorrelationIds:     CopyStrings(conf.CorrelationIDs),
 		DeviceChannelIndex: uint32(conf.ChannelIndex),
 		ConsumedAirtime: durationpb.New(
-			test.Must(toa.Compute(len(conf.RawPayload), settings)).(time.Duration),
+			test.Must(toa.Compute(len(conf.RawPayload), settings)),
 		),
 	}
 }
@@ -450,7 +450,7 @@ func AppendMACCommanders(queue []*ttnpb.MACCommand, cmds ...MACCommander) []*ttn
 func MakeUplinkMACBuffer(phy *band.Band, cmds ...MACCommander) []byte {
 	var b []byte
 	for _, cmd := range cmds {
-		b = test.Must(lorawan.DefaultMACCommands.AppendUplink(*phy, b, cmd.MACCommand())).([]byte)
+		b = test.Must(lorawan.DefaultMACCommands.AppendUplink(*phy, b, cmd.MACCommand()))
 	}
 	return b
 }
@@ -458,7 +458,7 @@ func MakeUplinkMACBuffer(phy *band.Band, cmds ...MACCommander) []byte {
 func MakeDownlinkMACBuffer(phy *band.Band, cmds ...MACCommander) []byte {
 	var b []byte
 	for _, cmd := range cmds {
-		b = test.Must(lorawan.DefaultMACCommands.AppendDownlink(*phy, b, cmd.MACCommand())).([]byte)
+		b = test.Must(lorawan.DefaultMACCommands.AppendDownlink(*phy, b, cmd.MACCommand()))
 	}
 	return b
 }
@@ -493,7 +493,7 @@ func messageGenerationKeys(sk *ttnpb.SessionKeys, macVersion ttnpb.MACVersion) t
 			return types.MustAES128Key(ke.Key).Bytes()
 		case len(ke.EncryptedKey) > 0:
 			k := &types.AES128Key{}
-			test.Must(nil, k.UnmarshalBinary(ke.EncryptedKey))
+			test.Must[any](nil, k.UnmarshalBinary(ke.EncryptedKey))
 			return k.Bytes()
 		default:
 			return nil
@@ -514,11 +514,11 @@ func messageGenerationKeys(sk *ttnpb.SessionKeys, macVersion ttnpb.MACVersion) t
 }
 
 func MustEncryptUplink(key types.AES128Key, devAddr types.DevAddr, fCnt uint32, encOpts []crypto.EncryptionOption, b ...byte) []byte {
-	return test.Must(crypto.EncryptUplink(key, devAddr, fCnt, b, encOpts...)).([]byte)
+	return test.Must(crypto.EncryptUplink(key, devAddr, fCnt, b, encOpts...))
 }
 
 func MustComputeUplinkCMACF(key types.AES128Key, devAddr types.DevAddr, fCnt uint32, b ...byte) [4]byte {
-	return test.Must(crypto.ComputeLegacyUplinkMIC(key, devAddr, fCnt, b)).([4]byte)
+	return test.Must(crypto.ComputeLegacyUplinkMIC(key, devAddr, fCnt, b))
 }
 
 type DataUplinkConfig struct {
@@ -605,18 +605,18 @@ func MakeDataUplink(conf DataUplinkConfig) *ttnpb.UplinkMessage {
 				FrmPayload: frmPayload,
 			},
 		},
-	})).([]byte)
+	}))
 	var mic [4]byte
 	switch {
 	case macspec.UseLegacyMIC(conf.MACVersion):
 		mic = test.Must(
 			crypto.ComputeLegacyUplinkMIC(*types.MustAES128Key(keys.FNwkSIntKey.Key), devAddr, conf.FCnt, phyPayload),
-		).([4]byte)
+		)
 	default:
 		mic = test.Must(
 			crypto.ComputeUplinkMIC(*types.MustAES128Key(keys.SNwkSIntKey.Key), *types.MustAES128Key(keys.FNwkSIntKey.Key),
 				conf.ConfFCntDown, uint8(conf.DataRateIndex), conf.ChannelIndex, devAddr, conf.FCnt, phyPayload),
-		).([4]byte)
+		)
 	}
 
 	phyPayload = append(phyPayload, mic[:]...)
@@ -665,7 +665,7 @@ func MakeDataUplink(conf DataUplinkConfig) *ttnpb.UplinkMessage {
 }
 
 func MustEncryptDownlink(key types.AES128Key, devAddr types.DevAddr, fCnt uint32, encOpts []crypto.EncryptionOption, b ...byte) []byte {
-	return test.Must(crypto.EncryptDownlink(key, devAddr, fCnt, b, encOpts...)).([]byte)
+	return test.Must(crypto.EncryptDownlink(key, devAddr, fCnt, b, encOpts...))
 }
 
 type DataDownlinkConfig struct {
@@ -726,18 +726,18 @@ func MakeDataDownlink(conf *DataDownlinkConfig) *ttnpb.DownlinkMessage {
 			},
 		},
 	}
-	phyPayload := test.Must(lorawan.MarshalMessage(msg)).([]byte)
+	phyPayload := test.Must(lorawan.MarshalMessage(msg))
 	var mic [4]byte
 	switch {
 	case macspec.UseLegacyMIC(conf.MACVersion):
 		mic = test.Must(
 			crypto.ComputeLegacyDownlinkMIC(*types.MustAES128Key(keys.FNwkSIntKey.Key), devAddr, conf.FCnt, phyPayload),
-		).([4]byte)
+		)
 	default:
 		mic = test.Must(
 			crypto.ComputeDownlinkMIC(*types.MustAES128Key(keys.SNwkSIntKey.Key),
 				devAddr, conf.ConfFCntUp, conf.FCnt, phyPayload),
-		).([4]byte)
+		)
 	}
 	msg.Mic = mic[:]
 	return &ttnpb.DownlinkMessage{

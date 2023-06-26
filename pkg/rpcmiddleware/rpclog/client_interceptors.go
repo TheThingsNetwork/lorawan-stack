@@ -27,7 +27,7 @@ import (
 func UnaryClientInterceptor(ctx context.Context, opts ...Option) grpc.UnaryClientInterceptor {
 	o := evaluateClientOpt(opts)
 	logger := log.FromContext(ctx).WithField("namespace", "grpc")
-	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+	return func(ctx context.Context, method string, req, reply any, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 		onceFields, propagatedFields := logFieldsForCall(ctx, method)
 		logger := logger.WithFields(propagatedFields)
 		newCtx := log.NewContext(ctx, logger)

@@ -40,6 +40,6 @@ func (ctx *crossContext) Err() error {
 }
 
 // Value implements context.Context using the value context.
-func (ctx *crossContext) Value(key interface{}) interface{} {
+func (ctx *crossContext) Value(key any) any {
 	return ctx.valueCtx.Value(key)
 }

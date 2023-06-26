@@ -20,9 +20,9 @@ import (
 	"github.com/uptrace/bun"
 )
 
-var models []interface{}
+var models []any
 
-func registerModels(m ...interface{}) {
+func registerModels(m ...any) {
 	models = append(models, m...)
 }
 
@@ -57,7 +57,7 @@ func init() {
 
 // clear database tables for the given models.
 // This should be used with caution.
-func clear(ctx context.Context, db *bun.DB, models ...interface{}) (err error) {
+func clear(ctx context.Context, db *bun.DB, models ...any) (err error) {
 	md, err := getDBMetadata(ctx, db)
 	if err != nil {
 		return err

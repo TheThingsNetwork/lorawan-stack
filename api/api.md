@@ -53,6 +53,7 @@
   - [Message `ALCSyncCommand.AppTimeReq`](#ttn.lorawan.v3.ALCSyncCommand.AppTimeReq)
   - [Enum `ALCSyncCommandIdentifier`](#ttn.lorawan.v3.ALCSyncCommandIdentifier)
 - [File `lorawan-stack/api/applicationserver_integrations_storage.proto`](#lorawan-stack/api/applicationserver_integrations_storage.proto)
+  - [Message `ContinuationTokenPayload`](#ttn.lorawan.v3.ContinuationTokenPayload)
   - [Message `GetStoredApplicationUpCountRequest`](#ttn.lorawan.v3.GetStoredApplicationUpCountRequest)
   - [Message `GetStoredApplicationUpCountResponse`](#ttn.lorawan.v3.GetStoredApplicationUpCountResponse)
   - [Message `GetStoredApplicationUpCountResponse.CountEntry`](#ttn.lorawan.v3.GetStoredApplicationUpCountResponse.CountEntry)
@@ -1294,6 +1295,19 @@ The NsAs service connects a Network Server to an Application Server.
 
 ## <a name="lorawan-stack/api/applicationserver_integrations_storage.proto">File `lorawan-stack/api/applicationserver_integrations_storage.proto`</a>
 
+### <a name="ttn.lorawan.v3.ContinuationTokenPayload">Message `ContinuationTokenPayload`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `limit` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  |  |
+| `after` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `before` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `f_port` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  |  |
+| `order` | [`string`](#string) |  |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
+| `last` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
+| `last_received_id` | [`int64`](#int64) |  |  |
+
 ### <a name="ttn.lorawan.v3.GetStoredApplicationUpCountRequest">Message `GetStoredApplicationUpCountRequest`</a>
 
 | Field | Type | Label | Description |
@@ -1339,6 +1353,7 @@ The NsAs service connects a Network Server to an Application Server.
 | `order` | [`string`](#string) |  | Order results. |
 | `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the upstream message fields that should be returned. See the API reference for allowed field names for each type of upstream message. |
 | `last` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Query upstream messages that have arrived in the last minutes or hours. Cannot be used in conjunction with after and before. |
+| `continuation_token` | [`string`](#string) |  | The continuation token, which is used to retrieve the next page. If provided, other fields are ignored. |
 
 #### Field Rules
 
@@ -1346,6 +1361,7 @@ The NsAs service connects a Network Server to an Application Server.
 | ----- | ----------- |
 | `type` | <p>`string.in`: `[ uplink_message uplink_normalized join_accept downlink_ack downlink_nack downlink_sent downlink_failed downlink_queued downlink_queue_invalidated location_solved service_data]`</p> |
 | `order` | <p>`string.in`: `[ -received_at received_at]`</p> |
+| `continuation_token` | <p>`string.max_len`: `16000`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationUpStorage">Service `ApplicationUpStorage`</a>
 
@@ -2717,13 +2733,6 @@ in a future version of The Things Stack.
 | `qr_code` | [`bytes`](#bytes) |  | Raw QR code contents. |
 | `target_application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  | Application identifiers of the target end device. |
 | `target_device_id` | [`string`](#string) |  | End device ID of the target end device. If empty, use the source device ID. |
-| `target_network_server_address` | [`string`](#string) |  | The address of the Network Server where the device will be registered. If set and if the source device is currently registered on a Network Server, settings will be transferred. If not set, the device shall not be registered on a Network Server. |
-| `target_network_server_kek_label` | [`string`](#string) |  | The KEK label of the Network Server to use for wrapping network session keys. |
-| `target_application_server_address` | [`string`](#string) |  | The address of the Application Server where the device will be registered. If set and if the source device is currently registered on an Application Server, settings will be transferred. If not set, the device shall not be registered on an Application Server. |
-| `target_application_server_kek_label` | [`string`](#string) |  | The KEK label of the Application Server to use for wrapping the application session key. |
-| `target_application_server_id` | [`string`](#string) |  | The AS-ID of the Application Server to use. |
-| `target_net_id` | [`bytes`](#bytes) |  | Home NetID. |
-| `invalidate_authentication_code` | [`bool`](#bool) |  | If set, invalidate the authentication code with which the device gets claimed. This prohibits subsequent claiming requests. |
 
 #### Field Rules
 
@@ -2732,12 +2741,6 @@ in a future version of The Things Stack.
 | `qr_code` | <p>`bytes.min_len`: `0`</p><p>`bytes.max_len`: `1024`</p> |
 | `target_application_ids` | <p>`message.required`: `true`</p> |
 | `target_device_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`</p> |
-| `target_network_server_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
-| `target_network_server_kek_label` | <p>`string.max_len`: `2048`</p> |
-| `target_application_server_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
-| `target_application_server_kek_label` | <p>`string.max_len`: `2048`</p> |
-| `target_application_server_id` | <p>`string.max_len`: `100`</p> |
-| `target_net_id` | <p>`bytes.len`: `3`</p> |
 
 ### <a name="ttn.lorawan.v3.ClaimEndDeviceRequest.AuthenticatedIdentifiers">Message `ClaimEndDeviceRequest.AuthenticatedIdentifiers`</a>
 
@@ -8672,8 +8675,8 @@ The Pba service allows clients to manage peering through Packet Broker.
 | `GetFormat` | `GET` | `/api/v3/qr-codes/end-devices/formats/{format_id}` |  |
 | `ListFormats` | `GET` | `/api/v3/qr-codes/end-devices/formats` |  |
 | `Generate` | `POST` | `/api/v3/qr-codes/end-devices` | `*` |
-| `Parse` | `POST` | `/api/v3/qr-code/end-devices/parse` | `*` |
-| `Parse` | `POST` | `/api/v3/qr-code/end-devices/{format_id}/parse` | `*` |
+| `Parse` | `POST` | `/api/v3/qr-codes/end-devices/parse` | `*` |
+| `Parse` | `POST` | `/api/v3/qr-codes/end-devices/{format_id}/parse` | `*` |
 
 ## <a name="lorawan-stack/api/regional.proto">File `lorawan-stack/api/regional.proto`</a>
 

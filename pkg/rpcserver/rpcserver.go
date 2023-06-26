@@ -142,7 +142,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 	var proxyHeaders rpcmiddleware.ProxyHeaders
 	proxyHeaders.ParseAndAddTrusted(options.trustedProxies...)
 	recoveryOpts := []grpc_recovery.Option{
-		grpc_recovery.WithRecoveryHandler(func(p interface{}) (err error) {
+		grpc_recovery.WithRecoveryHandler(func(p any) (err error) {
 			fmt.Fprintln(os.Stderr, p)
 			os.Stderr.Write(debug.Stack())
 			if pErr, ok := p.(error); ok {

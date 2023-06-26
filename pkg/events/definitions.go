@@ -69,11 +69,11 @@ type EntityIdentifiers interface {
 	GetEntityIdentifiers() *ttnpb.EntityIdentifiers
 }
 
-func (d *definition) NewWithIdentifiersAndData(ctx context.Context, ids EntityIdentifiers, data interface{}) Event {
+func (d *definition) NewWithIdentifiersAndData(ctx context.Context, ids EntityIdentifiers, data any) Event {
 	return d.With(defaultOptions...).NewWithIdentifiersAndData(ctx, ids, data)
 }
 
-func (d *definition) BindData(data interface{}) Builder {
+func (d *definition) BindData(data any) Builder {
 	return d.With(defaultOptions...).BindData(data)
 }
 

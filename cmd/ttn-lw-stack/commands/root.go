@@ -20,6 +20,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/KimMachineGun/automemlimit/memlimit"
 	"github.com/getsentry/sentry-go"
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/commands"
@@ -107,7 +108,10 @@ var (
 			}
 
 			if _, err := maxprocs.Set(); err != nil {
-				logger.WithError(err).Debug("Failed to set GOMAXPROCS")
+				logger.WithError(err).Info("Failed to set GOMAXPROCS")
+			}
+			if _, err := memlimit.SetGoMemLimit(0.9); err != nil {
+				logger.WithError(err).Info("Failed to set GOMEMLIMIT")
 			}
 
 			ctx = log.NewContext(ctx, logger)

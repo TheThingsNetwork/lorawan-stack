@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- New Admin Panel in the Console.
+
 ### Changed
 
 ### Deprecated
@@ -21,10 +23,34 @@ For details about compatibility between different releases, see the **Commitment
 
 - Console not applying webhook field masks when creating a webhook from a template that has field masks set.
 - Removing user invitations not working in the user management panel for administrators.
+- Fix payload formatter page launching malformed requests in the Console.
+- HTTP API routes for parsing QR codes for the QR Generator service. We exercise our right to break compatibility with third party HTTP clients since this is a bug.
+  - `/qr-code/end-devices/parse` is changed to `/qr-codes/end-devices/parse`.
+  - `/qr-code/end-devices/{format_id}/parse` is changed to `/qr-codes/end-devices/{format_id}/parse`.
 
 ### Security
 
-## [3.25.2] - unreleased
+## [3.26.1] - 2023-06-20
+
+### Added
+
+- Support claim in device import in the Console.
+
+## [3.26.0] - 2023-06-06
+
+### Added
+
+- Support for scanning a QR code that only contains the hexadecimal encoded DevEUI.
+- Experimental flag `ns.adr.auto_narrow_steer`. When enabled, end devices which do not have an explicit channel steering mode will be steered towards the LoRa narrow channels.
+
+### Fixed
+
+- Console not applying webhook field masks when creating a webhook from a template that has field masks set.
+- LoRa Basics Station `PONG` messages will now contain the application payload of the associated `PING`, as required by the WebSockets specification.
+  - This fix enables `PING`/`PONG` behavior for non reference implementations of the LNS protocol.
+- Fix crash of "Edit webhook" view due to invalid Authorization header encoding in the Console.
+
+## [3.25.2] - 2023-05-16
 
 ### Added
 
@@ -98,7 +124,7 @@ For details about compatibility between different releases, see the **Commitment
 - Device claiming that transfer devices between applications is now deprecated and will be removed in a future version of The Things Stack. Device claiming on Join Servers, including The Things Join Server, remains functional. This deprecates the following components:
   - API for managing application claim authorization (`EndDeviceClaimingServer.AuthorizeApplication` and `EndDeviceClaimingServer.UnauthorizeApplication`)
   - CLI commands to manage application claim settings (`ttn-lw-cli application claim [authorize|unauthorize]`)
-  - CLI command to claim end devices  (`ttn-lw-cli devices claim`)
+  - CLI command to claim end devices (`ttn-lw-cli devices claim`)
 
 ### Fixed
 
@@ -232,10 +258,10 @@ For details about compatibility between different releases, see the **Commitment
 ### Changed
 
 - Option to ignore logs from selected gRPC methods now supports ignoring logs for selected errors on method.
-    Examples:
-    - `--grpc.log-ignore-methods="/ttn.lorawan.v3.GsNs/HandleUplink"`: log is skipped when no error occurs.
-    - `--grpc.log-ignore-methods="/ttn.lorawan.v3.GsNs/HandleUplink:pkg/networkserver:duplicate_uplink;pkg/networkserver:device_not_found"`: log is skipped when either `pkg/networkserver:duplicate_uplink` or `pkg/networkserver:device_not_found` error occurs (but not on success).
-    - `--grpc.log-ignore-methods="/ttn.lorawan.v3.GsNs/HandleUplink:;pkg/networkserver:duplicate_uplink"`: log is skipped on success or when `pkg/networkserver:duplicate_uplink` error occurs.
+  Examples:
+  - `--grpc.log-ignore-methods="/ttn.lorawan.v3.GsNs/HandleUplink"`: log is skipped when no error occurs.
+  - `--grpc.log-ignore-methods="/ttn.lorawan.v3.GsNs/HandleUplink:pkg/networkserver:duplicate_uplink;pkg/networkserver:device_not_found"`: log is skipped when either `pkg/networkserver:duplicate_uplink` or `pkg/networkserver:device_not_found` error occurs (but not on success).
+  - `--grpc.log-ignore-methods="/ttn.lorawan.v3.GsNs/HandleUplink:;pkg/networkserver:duplicate_uplink"`: log is skipped on success or when `pkg/networkserver:duplicate_uplink` error occurs.
 - The Gateway Server now takes into consideration the extra duty cycle checks present in the LoRa Basics Station forwarder. Previously the Gateway Server may accept the scheduling of downlinks which the packet forwarder would silently drop.
   - Note that in some rare cases in which the LoRa Basics Station duty cycle is stricter than the windowed approach used by The Things Stack, the scheduling will fail and this will be visible via `ns.down.data.schedule.fail` events. Note that this is actually a positive outcome - it allows the Network Server to schedule the downlink via another gateway, while previously the downlink would be scheduled but get silently dropped on the gateway.
 
@@ -2582,7 +2608,9 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.25.2...v3.25
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.26.1...v3.26
+[3.26.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.26.0...v3.26.1
+[3.26.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.25.2...v3.26.0
 [3.25.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.25.1...v3.25.2
 [3.25.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.25.0...v3.25.1
 [3.25.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.24.2...v3.25.0

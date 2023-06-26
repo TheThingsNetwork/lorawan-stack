@@ -711,7 +711,7 @@ func TestBeaconTimeBefore(t *testing.T) {
 }
 
 func computePingOffset(beaconTime uint32, devAddr types.DevAddr, pingPeriod uint16) uint16 {
-	return test.Must(crypto.ComputePingOffset(beaconTime, devAddr, pingPeriod)).(uint16)
+	return test.Must(crypto.ComputePingOffset(beaconTime, devAddr, pingPeriod))
 }
 
 func TestNextPingSlotAt(t *testing.T) {

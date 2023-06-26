@@ -1,4 +1,4 @@
-// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,23 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package enddevices
+import tts from '@console/api/tts'
 
-import (
-	"context"
+import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
-	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"google.golang.org/grpc"
-)
+import * as QRCodeGenerator from '@console/store/actions/qr-code-generator'
 
-type mockDeviceRegistry struct {
-	ttnpb.EndDeviceRegistryClient
-}
+const parseQRCodeLogic = createRequestLogic({
+  type: QRCodeGenerator.PARSE_QR_CODE,
+  process: async ({ action }) => {
+    const { qrCode } = action.payload
+    return await tts.QRCodeGenerator.parse(qrCode)
+  },
+})
 
-func (mockDeviceRegistry) Get(
-	_ context.Context, in *ttnpb.GetEndDeviceRequest, _ ...grpc.CallOption,
-) (*ttnpb.EndDevice, error) {
-	return &ttnpb.EndDevice{
-		Ids: in.EndDeviceIds,
-	}, nil
-}
+export default [parseQRCodeLogic]

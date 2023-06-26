@@ -17,6 +17,6 @@
 
 package errors
 
-func syscallErrorAttributes(error) []interface{} {
+func syscallErrorAttributes(error) []any {
 	return nil
 }

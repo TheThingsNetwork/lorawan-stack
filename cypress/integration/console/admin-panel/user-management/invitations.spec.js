@@ -22,7 +22,7 @@ describe('Send invite', () => {
   })
 
   it('displays UI elements in place', () => {
-    cy.visit(`${Cypress.config('consoleRootPath')}/admin/user-management/invitations/add`)
+    cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/user-management/invitations/add`)
 
     cy.findByText('Invite', { selector: 'h1' }).should('be.visible')
     cy.findByLabelText('Email address')
@@ -33,7 +33,7 @@ describe('Send invite', () => {
   })
 
   it('validates before submitting an empty form', () => {
-    cy.visit(`${Cypress.config('consoleRootPath')}/admin/user-management/invitations/add`)
+    cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/user-management/invitations/add`)
 
     cy.findByRole('button', { name: 'Invite' }).should('be.visible').click()
 
@@ -42,12 +42,12 @@ describe('Send invite', () => {
       .and('be.visible')
     cy.location('pathname').should(
       'eq',
-      `${Cypress.config('consoleRootPath')}/admin/user-management/invitations/add`,
+      `${Cypress.config('consoleRootPath')}/admin-panel/user-management/invitations/add`,
     )
   })
 
   it('succeeds inviting a user', () => {
-    cy.visit(`${Cypress.config('consoleRootPath')}/admin/user-management/invitations/add`)
+    cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/user-management/invitations/add`)
     cy.findByLabelText('Email address').type('mail@example.com')
 
     cy.findByRole('button', { name: 'Invite' }).click()
@@ -56,7 +56,7 @@ describe('Send invite', () => {
     cy.findByTestId('full-error-view').should('not.exist')
     cy.location('pathname').should(
       'eq',
-      `${Cypress.config('consoleRootPath')}/admin/user-management`,
+      `${Cypress.config('consoleRootPath')}/admin-panel/user-management`,
     )
     cy.findByText('User invitations').click()
     cy.findByRole('cell', { name: 'mail@example.com' }).should('be.visible')

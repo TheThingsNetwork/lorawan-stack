@@ -96,7 +96,7 @@ func main() {
 }
 
 // printYAML prints the nested config struct.
-func printYAML(in interface{}) error {
+func printYAML(in any) error {
 	bs, err := yaml.Marshal(in)
 	if err != nil {
 		return err

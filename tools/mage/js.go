@@ -189,7 +189,6 @@ func (js Js) Serve() error {
 	os.Setenv("DEV_SERVER_BUILD", "true")
 	return js.runYarnCommandV("webpack-dev-server",
 		"--config", "config/webpack.config.babel.js",
-		"-w",
 	)
 }
 

@@ -40,8 +40,8 @@ func extractOrGenerateCorrelationID(ctx context.Context, fullMethod string) cont
 // UnaryServerInterceptor returns a new unary server interceptor
 // that modifies the context to include a correlation ID.
 func UnaryServerInterceptor(
-	ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler,
-) (interface{}, error) {
+	ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler,
+) (any, error) {
 	ctx = extractOrGenerateCorrelationID(ctx, info.FullMethod)
 	return handler(ctx, req)
 }
@@ -49,7 +49,7 @@ func UnaryServerInterceptor(
 // StreamServerInterceptor returns a new streaming server interceptor
 // that that modifies the context.
 func StreamServerInterceptor(
-	srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler,
+	srv any, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler,
 ) error {
 	wrapped := grpc_middleware.WrapServerStream(stream)
 	wrapped.WrappedContext = extractOrGenerateCorrelationID(stream.Context(), info.FullMethod)

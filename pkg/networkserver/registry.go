@@ -15,7 +15,6 @@
 package networkserver
 
 import (
-	"bytes"
 	"context"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -66,7 +65,7 @@ func DeleteDevice(ctx context.Context, r DeviceRegistry, appID *ttnpb.Applicatio
 
 func logRegistryRPCError(ctx context.Context, err error, msg string) {
 	logger := log.FromContext(ctx).WithError(err)
-	var printLog func(args ...interface{})
+	var printLog func(args ...any)
 	switch {
 	case errors.IsNotFound(err), errors.IsInvalidArgument(err), errors.IsCanceled(err):
 		printLog = logger.Debug
@@ -248,17 +247,7 @@ var replacedEndDeviceFields = []registry.ReplacedEndDeviceField{
 					return errInvalidFieldValue.WithAttributes("field", "queued_application_downlinks")
 				}
 				for i := 0; i < n; i++ {
-					// TODO: Use proto.Equal instead.
-					// https://github.com/TheThingsNetwork/lorawan-stack/issues/2798
-					oldBinary, err := proto.Marshal(oldValue[i])
-					if err != nil {
-						return err
-					}
-					newBinary, err := proto.Marshal(newValue[i])
-					if err != nil {
-						return err
-					}
-					if !bytes.Equal(oldBinary, newBinary) {
+					if !proto.Equal(oldValue[i], newValue[i]) {
 						return errInvalidFieldValue.WithAttributes("field", "queued_application_downlinks")
 					}
 				}

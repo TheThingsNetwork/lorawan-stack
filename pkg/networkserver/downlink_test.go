@@ -172,8 +172,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 		t.Helper()
 		a := assertions.New(t)
 		return func(x, y events.Event) bool {
-			xProto := test.Must(events.Proto(x)).(*ttnpb.Event)
-			yProto := test.Must(events.Proto(y)).(*ttnpb.Event)
+			xProto := test.Must(events.Proto(x))
+			yProto := test.Must(events.Proto(y))
 			xProto.Time = nil
 			yProto.Time = nil
 			xProto.Data = nil
@@ -833,7 +833,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								0x06,
 							},
 							macspec.EncryptionOptions(ttnpb.MACVersion_MAC_V1_1, macspec.DownlinkFrame, 0x1, true)...,
-						)).([]byte)...)
+						))...)
 
 						/** FPort **/
 						b = append(b, 0x1)
@@ -848,7 +848,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							0,
 							0x42,
 							b,
-						)).([4]byte)
+						))
 						return append(b, mic[:]...)
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
@@ -984,7 +984,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								0x06,
 							},
 							macspec.EncryptionOptions(ttnpb.MACVersion_MAC_V1_1, macspec.DownlinkFrame, 0x1, true)...,
-						)).([]byte)...)
+						))...)
 
 						/** FPort **/
 						b = append(b, 0x1)
@@ -999,7 +999,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							0,
 							0x42,
 							b,
-						)).([4]byte)
+						))
 						return append(b, mic[:]...)
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
@@ -1145,7 +1145,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								0x06,
 							},
 							macspec.EncryptionOptions(ttnpb.MACVersion_MAC_V1_1, macspec.DownlinkFrame, 0, true)...,
-						)).([]byte)...)
+						))...)
 
 						/* MIC */
 						mic := test.Must(crypto.ComputeDownlinkMIC(
@@ -1154,7 +1154,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							0,
 							0x25,
 							b,
-						)).([4]byte)
+						))
 						return append(b, mic[:]...)
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
@@ -1300,7 +1300,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								0x06,
 							},
 							macspec.EncryptionOptions(ttnpb.MACVersion_MAC_V1_1, macspec.DownlinkFrame, 0x15, true)...,
-						)).([]byte)...)
+						))...)
 
 						/** FPort **/
 						b = append(b, 0x15)
@@ -1315,7 +1315,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							0,
 							0x42,
 							b,
-						)).([4]byte)
+						))
 						return append(b, mic[:]...)
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
@@ -1461,7 +1461,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							0,
 							0x42,
 							b,
-						)).([4]byte)
+						))
 						return append(b, mic[:]...)
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
@@ -1607,7 +1607,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								0x06,
 							},
 							macspec.EncryptionOptions(ttnpb.MACVersion_MAC_V1_1, macspec.DownlinkFrame, 0x1, true)...,
-						)).([]byte)...)
+						))...)
 
 						/** FPort **/
 						b = append(b, 0x1)
@@ -1622,7 +1622,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							0,
 							0x42,
 							b,
-						)).([4]byte)
+						))
 						return append(b, mic[:]...)
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
@@ -1768,7 +1768,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							0,
 							0x42,
 							b,
-						)).([4]byte)
+						))
 						return append(b, mic[:]...)
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
@@ -1900,7 +1900,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							0,
 							0x42,
 							b,
-						)).([4]byte)
+						))
 						return append(b, mic[:]...)
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
@@ -2038,7 +2038,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							0,
 							0x42,
 							b,
-						)).([4]byte)
+						))
 						return append(b, mic[:]...)
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
@@ -2198,7 +2198,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							0,
 							0x42,
 							b,
-						)).([4]byte)
+						))
 						return append(b, mic[:]...)
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
@@ -2585,7 +2585,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				if tc.CreateDevice != nil {
 					created, ctx = MustCreateDevice(ctx, env.Devices, tc.CreateDevice)
 				}
-				test.Must(nil, env.DownlinkTaskQueue.Queue.Add(ctx, &ttnpb.EndDeviceIdentifiers{
+				test.Must[any](nil, env.DownlinkTaskQueue.Queue.Add(ctx, &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 				}, time.Now(), true))
@@ -2634,7 +2634,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					expected.UpdatedAt = timestamppb.New(now)
 					if down != nil {
 						msg := &ttnpb.Message{}
-						test.Must(nil, lorawan.UnmarshalMessage(down.RawPayload, msg))
+						test.Must[any](nil, lorawan.UnmarshalMessage(down.RawPayload, msg))
 						switch msg.MHdr.MType {
 						case ttnpb.MType_CONFIRMED_DOWN, ttnpb.MType_UNCONFIRMED_DOWN:
 							pld := msg.GetMacPayload()

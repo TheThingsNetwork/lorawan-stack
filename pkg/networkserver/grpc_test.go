@@ -39,7 +39,7 @@ func TestGenerateDevAddr(t *testing.T) {
 			Name:  "Prefix from NS NetID 1",
 			NetID: types.NetID{0x00, 0x00, 0x13},
 			DevAddrPrefix: types.DevAddrPrefix{
-				DevAddr: test.Must(types.NewDevAddr(types.NetID{0x00, 0x00, 0x13}, nil)).(types.DevAddr),
+				DevAddr: test.Must(types.NewDevAddr(types.NetID{0x00, 0x00, 0x13}, nil)),
 				Length:  uint8(32 - types.NwkAddrBits(types.NetID{0x00, 0x00, 0x13})),
 			},
 		},
@@ -47,7 +47,7 @@ func TestGenerateDevAddr(t *testing.T) {
 			Name:  "Prefix from NS NetID 2",
 			NetID: types.NetID{0x00, 0x00, 0x14},
 			DevAddrPrefix: types.DevAddrPrefix{
-				DevAddr: test.Must(types.NewDevAddr(types.NetID{0x00, 0x00, 0x14}, nil)).(types.DevAddr),
+				DevAddr: test.Must(types.NewDevAddr(types.NetID{0x00, 0x00, 0x14}, nil)),
 				Length:  uint8(32 - types.NwkAddrBits(types.NetID{0x00, 0x00, 0x14})),
 			},
 		},
@@ -55,7 +55,7 @@ func TestGenerateDevAddr(t *testing.T) {
 			Name:  "Prefix from NS NetID 3",
 			NetID: types.NetID{0x12, 0x34, 0x56},
 			DevAddrPrefix: types.DevAddrPrefix{
-				DevAddr: test.Must(types.NewDevAddr(types.NetID{0x12, 0x34, 0x56}, nil)).(types.DevAddr),
+				DevAddr: test.Must(types.NewDevAddr(types.NetID{0x12, 0x34, 0x56}, nil)),
 				Length:  uint8(32 - types.NwkAddrBits(types.NetID{0x12, 0x34, 0x56})),
 			},
 		},

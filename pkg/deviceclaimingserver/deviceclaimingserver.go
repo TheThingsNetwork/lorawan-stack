@@ -23,7 +23,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/web"
 	"google.golang.org/grpc"
 )
 
@@ -35,7 +34,6 @@ type DeviceClaimingServer struct {
 	config Config
 
 	endDeviceClaimingUpstream *enddevices.Upstream
-	endDeviceClaimingFallback Fallback
 
 	gatewayClaimingServerUpstream ttnpb.GatewayClaimingServerServer
 
@@ -58,30 +56,35 @@ func New(c *component.Component, conf *Config, opts ...Option) (*DeviceClaimingS
 		opt(dcs)
 	}
 
-	dcs.gatewayClaimingServerUpstream = noopGCLS{}
-
-	upstream, err := enddevices.NewUpstream(ctx, c, conf.EndDeviceClaimingServerConfig)
-	if err != nil {
-		return nil, err
+	if dcs.endDeviceClaimingUpstream == nil {
+		upstream, err := enddevices.NewUpstream(ctx, c, conf.EndDeviceClaimingServerConfig)
+		if err != nil {
+			return nil, err
+		}
+		dcs.endDeviceClaimingUpstream = upstream
 	}
-	dcs.endDeviceClaimingFallback = noopEDCS{}
-	dcs.endDeviceClaimingUpstream = upstream
-
 	dcs.grpc.endDeviceClaimingServer = &endDeviceClaimingServer{
 		DCS: dcs,
 	}
 
+	dcs.gatewayClaimingServerUpstream = noopGCLS{}
 	dcs.grpc.gatewayClaimingServer = &gatewayClaimingServer{
 		DCS: dcs,
 	}
 
 	c.RegisterGRPC(dcs)
-	c.RegisterWeb(dcs)
 	return dcs, nil
 }
 
 // Option configures GatewayClaimingServer.
 type Option func(*DeviceClaimingServer)
+
+// WithEndDeviceClaimingUpstream configures the upstream for end device claiming.
+func WithEndDeviceClaimingUpstream(upstream *enddevices.Upstream) Option {
+	return func(dcs *DeviceClaimingServer) {
+		dcs.endDeviceClaimingUpstream = upstream
+	}
+}
 
 // Context returns the context of the Device Claiming Server.
 func (dcs *DeviceClaimingServer) Context() context.Context {
@@ -105,9 +108,4 @@ func (dcs *DeviceClaimingServer) RegisterServices(s *grpc.Server) {
 func (dcs *DeviceClaimingServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 	ttnpb.RegisterEndDeviceClaimingServerHandler(dcs.Context(), s, conn)
 	ttnpb.RegisterGatewayClaimingServerHandler(dcs.Context(), s, conn)
-}
-
-// RegisterRoutes implements web.Registerer. It registers the Device Claiming Server to the web server.
-func (dcs *DeviceClaimingServer) RegisterRoutes(server *web.Server) {
-	dcs.endDeviceClaimingFallback.RegisterRoutes(server)
 }

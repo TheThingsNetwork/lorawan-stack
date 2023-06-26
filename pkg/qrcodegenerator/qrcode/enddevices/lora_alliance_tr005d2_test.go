@@ -165,7 +165,7 @@ func TestLoRaAllianceTR005Draft2(t *testing.T) {
 					canonical = tc.Data
 				}
 
-				text := test.Must(data.MarshalText()).([]byte)
+				text := test.Must(data.MarshalText())
 				a.So(string(text), should.Equal, string(canonical))
 			})
 		}

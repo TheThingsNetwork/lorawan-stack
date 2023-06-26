@@ -44,8 +44,8 @@ func New() messageprocessors.CompilablePayloadEncoderDecoder {
 }
 
 type encodeDownlinkInput struct {
-	Data  map[string]interface{} `json:"data"`
-	FPort *uint8                 `json:"fPort"`
+	Data  map[string]any `json:"data"`
+	FPort *uint8         `json:"fPort"`
 }
 
 type encodeDownlinkOutput struct {
@@ -116,7 +116,7 @@ func (h *host) EncodeDownlink(
 	msg *ttnpb.ApplicationDownlink,
 	script string,
 ) error {
-	run := func(ctx context.Context, fn string, params ...interface{}) (func(interface{}) error, error) {
+	run := func(ctx context.Context, fn string, params ...any) (func(any) error, error) {
 		return h.engine.Run(ctx, wrapDownlinkEncoderScript(script), fn, params...)
 	}
 	return h.encodeDownlink(ctx, msg, run)
@@ -125,7 +125,7 @@ func (h *host) EncodeDownlink(
 func (*host) encodeDownlink(
 	ctx context.Context,
 	msg *ttnpb.ApplicationDownlink,
-	run func(context.Context, string, ...interface{}) (func(interface{}) error, error),
+	run func(context.Context, string, ...any) (func(any) error, error),
 ) error {
 	defer trace.StartRegion(ctx, "encode downlink message").End()
 
@@ -174,15 +174,15 @@ type decodeUplinkInput struct {
 }
 
 type decodeUplinkOutput struct {
-	Data     map[string]interface{} `json:"data"`
-	Warnings []string               `json:"warnings"`
-	Errors   []string               `json:"errors"`
+	Data     map[string]any `json:"data"`
+	Warnings []string       `json:"warnings"`
+	Errors   []string       `json:"errors"`
 }
 
 type normalizeUplinkOutput struct {
-	Data     interface{} `json:"data"`
-	Warnings []string    `json:"warnings"`
-	Errors   []string    `json:"errors"`
+	Data     any      `json:"data"`
+	Warnings []string `json:"warnings"`
+	Errors   []string `json:"errors"`
 }
 
 type uplinkDecoderOutput struct {
@@ -255,7 +255,7 @@ func (h *host) DecodeUplink(
 	msg *ttnpb.ApplicationUplink,
 	script string,
 ) error {
-	run := func(ctx context.Context, fn string, params ...interface{}) (func(interface{}) error, error) {
+	run := func(ctx context.Context, fn string, params ...any) (func(any) error, error) {
 		return h.engine.Run(ctx, wrapUplinkDecoderScript(script), fn, params...)
 	}
 	return h.decodeUplink(ctx, msg, run)
@@ -282,7 +282,7 @@ func appendValidationErrors(dst []string, measurements []normalizedpayload.Parse
 func (*host) decodeUplink(
 	ctx context.Context,
 	msg *ttnpb.ApplicationUplink,
-	run func(context.Context, string, ...interface{}) (func(interface{}) error, error),
+	run func(context.Context, string, ...any) (func(any) error, error),
 ) error {
 	defer trace.StartRegion(ctx, "decode uplink message").End()
 
@@ -320,22 +320,22 @@ func (*host) decodeUplink(
 			return nil
 		}
 		// The returned data can be an array of measurements or a single measurement object.
-		var measurements []map[string]interface{}
+		var measurements []map[string]any
 		if val := reflect.ValueOf(normalized.Data); val.Kind() == reflect.Slice {
-			measurements = make([]map[string]interface{}, val.Len())
+			measurements = make([]map[string]any, val.Len())
 			for i := 0; i < val.Len(); i++ {
-				measurement, ok := val.Index(i).Interface().(map[string]interface{})
+				measurement, ok := val.Index(i).Interface().(map[string]any)
 				if !ok {
 					return errOutput.New()
 				}
 				measurements[i] = measurement
 			}
 		} else {
-			measurement, ok := normalized.Data.(map[string]interface{})
+			measurement, ok := normalized.Data.(map[string]any)
 			if !ok {
 				return errOutput.New()
 			}
-			measurements = []map[string]interface{}{measurement}
+			measurements = []map[string]any{measurement}
 		}
 		normalizedPayload := make([]*structpb.Struct, len(measurements))
 		for i := range measurements {
@@ -397,9 +397,9 @@ type decodeDownlinkInput struct {
 }
 
 type decodeDownlinkOutput struct {
-	Data     map[string]interface{} `json:"data"`
-	Warnings []string               `json:"warnings"`
-	Errors   []string               `json:"errors"`
+	Data     map[string]any `json:"data"`
+	Warnings []string       `json:"warnings"`
+	Errors   []string       `json:"errors"`
 }
 
 func wrapDownlinkDecoderScript(script string) string {
@@ -451,7 +451,7 @@ func (h *host) DecodeDownlink(
 	msg *ttnpb.ApplicationDownlink,
 	script string,
 ) error {
-	run := func(ctx context.Context, fn string, params ...interface{}) (func(interface{}) error, error) {
+	run := func(ctx context.Context, fn string, params ...any) (func(any) error, error) {
 		return h.engine.Run(ctx, wrapDownlinkDecoderScript(script), fn, params...)
 	}
 	return h.decodeDownlink(ctx, msg, run)
@@ -460,7 +460,7 @@ func (h *host) DecodeDownlink(
 func (*host) decodeDownlink(
 	ctx context.Context,
 	msg *ttnpb.ApplicationDownlink,
-	run func(context.Context, string, ...interface{}) (func(interface{}) error, error),
+	run func(context.Context, string, ...any) (func(any) error, error),
 ) error {
 	defer trace.StartRegion(ctx, "decode downlink message").End()
 

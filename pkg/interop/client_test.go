@@ -50,10 +50,10 @@ func TestGetAppSKey(t *testing.T) { //nolint:paralleltest
 			NewServer: func(a *assertions.Assertion) *httptest.Server {
 				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a.So(r.Method, should.Equal, http.MethodPost)
-					b := test.Must(io.ReadAll(r.Body)).([]byte)
-					var req map[string]interface{}
-					test.Must(nil, json.Unmarshal(b, &req))
-					a.So(req, should.Resemble, map[string]interface{}{
+					b := test.Must(io.ReadAll(r.Body))
+					var req map[string]any
+					test.Must[any](nil, json.Unmarshal(b, &req))
+					a.So(req, should.Resemble, map[string]any{
 						"ProtocolVersion": "1.0",
 						"TransactionID":   0.0,
 						"MessageType":     "AppSKeyReq",
@@ -62,13 +62,13 @@ func TestGetAppSKey(t *testing.T) { //nolint:paralleltest
 						"DevEUI":          "0102030405060708",
 						"SessionKeyID":    "016BFA7BAD4756346A674981E75CDBDC",
 					})
-					test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
+					test.Must[any](nil, json.NewEncoder(w).Encode(map[string]any{
 						"ProtocolVersion": "1.0",
 						"TransactionID":   0.0,
 						"MessageType":     "AppSKeyAns",
 						"SenderID":        "70B3D57ED0000000",
 						"ReceiverID":      "test-as",
-						"Result": map[string]interface{}{
+						"Result": map[string]any{
 							"ResultCode": "UnknownDevEUI",
 						},
 					}))
@@ -93,10 +93,10 @@ func TestGetAppSKey(t *testing.T) { //nolint:paralleltest
 				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := a
 					a.So(r.Method, should.Equal, http.MethodPost)
-					b := test.Must(io.ReadAll(r.Body)).([]byte)
-					var req map[string]interface{}
-					test.Must(nil, json.Unmarshal(b, &req))
-					a.So(req, should.Resemble, map[string]interface{}{
+					b := test.Must(io.ReadAll(r.Body))
+					var req map[string]any
+					test.Must[any](nil, json.Unmarshal(b, &req))
+					a.So(req, should.Resemble, map[string]any{
 						"ProtocolVersion": "1.1",
 						"TransactionID":   0.0,
 						"MessageType":     "AppSKeyReq",
@@ -105,13 +105,13 @@ func TestGetAppSKey(t *testing.T) { //nolint:paralleltest
 						"DevEUI":          "0102030405060708",
 						"SessionKeyID":    "016BFA7BAD4756346A674981E75CDBDC",
 					})
-					test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
+					test.Must[any](nil, json.NewEncoder(w).Encode(map[string]any{
 						"ProtocolVersion": "1.1",
 						"TransactionID":   0.0,
 						"MessageType":     "AppSKeyAns",
 						"SenderID":        "EC656E0000000000",
 						"ReceiverID":      "test-as",
-						"Result": map[string]interface{}{
+						"Result": map[string]any{
 							"ResultCode": "UnknownDevEUI",
 						},
 					}))
@@ -136,10 +136,10 @@ func TestGetAppSKey(t *testing.T) { //nolint:paralleltest
 				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := a
 					a.So(r.Method, should.Equal, http.MethodPost)
-					b := test.Must(io.ReadAll(r.Body)).([]byte)
-					var req map[string]interface{}
-					test.Must(nil, json.Unmarshal(b, &req))
-					a.So(req, should.Resemble, map[string]interface{}{
+					b := test.Must(io.ReadAll(r.Body))
+					var req map[string]any
+					test.Must[any](nil, json.Unmarshal(b, &req))
+					a.So(req, should.Resemble, map[string]any{
 						"ProtocolVersion": "1.0",
 						"TransactionID":   0.0,
 						"MessageType":     "AppSKeyReq",
@@ -148,17 +148,17 @@ func TestGetAppSKey(t *testing.T) { //nolint:paralleltest
 						"DevEUI":          "0102030405060708",
 						"SessionKeyID":    "016BFA7BAD4756346A674981E75CDBDC",
 					})
-					test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
+					test.Must[any](nil, json.NewEncoder(w).Encode(map[string]any{
 						"ProtocolVersion": "1.0",
 						"TransactionID":   0.0,
 						"MessageType":     "AppSKeyAns",
 						"SenderID":        "70B3D57ED0000000",
 						"ReceiverID":      "test-as",
-						"Result": map[string]interface{}{
+						"Result": map[string]any{
 							"ResultCode": "Success",
 						},
 						"Lifetime": 0,
-						"AppSKey": map[string]interface{}{
+						"AppSKey": map[string]any{
 							"KEKLabel": "as:010042",
 							"AESKey":   "2A195CC93CA54AD82CFB36C83D91450F3D2D523556F13E69",
 						},
@@ -190,10 +190,10 @@ func TestGetAppSKey(t *testing.T) { //nolint:paralleltest
 				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := a
 					a.So(r.Method, should.Equal, http.MethodPost)
-					b := test.Must(io.ReadAll(r.Body)).([]byte)
-					var req map[string]interface{}
-					test.Must(nil, json.Unmarshal(b, &req))
-					a.So(req, should.Resemble, map[string]interface{}{
+					b := test.Must(io.ReadAll(r.Body))
+					var req map[string]any
+					test.Must[any](nil, json.Unmarshal(b, &req))
+					a.So(req, should.Resemble, map[string]any{
 						"ProtocolVersion": "1.1",
 						"TransactionID":   0.0,
 						"MessageType":     "AppSKeyReq",
@@ -202,17 +202,17 @@ func TestGetAppSKey(t *testing.T) { //nolint:paralleltest
 						"DevEUI":          "0102030405060708",
 						"SessionKeyID":    "016BFA7BAD4756346A674981E75CDBDC",
 					})
-					test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
+					test.Must[any](nil, json.NewEncoder(w).Encode(map[string]any{
 						"ProtocolVersion": "1.1",
 						"TransactionID":   0.0,
 						"MessageType":     "AppSKeyAns",
 						"SenderID":        "EC656E0000000000",
 						"ReceiverID":      "test-as",
-						"Result": map[string]interface{}{
+						"Result": map[string]any{
 							"ResultCode": "Success",
 						},
 						"Lifetime": 0,
-						"AppSKey": map[string]interface{}{
+						"AppSKey": map[string]any{
 							"KEKLabel": "as:010042",
 							"AESKey":   "2A195CC93CA54AD82CFB36C83D91450F3D2D523556F13E69",
 						},
@@ -287,10 +287,10 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := a
 					a.So(r.Method, should.Equal, http.MethodPost)
-					b := test.Must(io.ReadAll(r.Body)).([]byte)
-					var req map[string]interface{}
-					test.Must(nil, json.Unmarshal(b, &req))
-					a.So(req, should.Resemble, map[string]interface{}{
+					b := test.Must(io.ReadAll(r.Body))
+					var req map[string]any
+					test.Must[any](nil, json.Unmarshal(b, &req))
+					a.So(req, should.Resemble, map[string]any{
 						"ProtocolVersion": "1.0",
 						"TransactionID":   0.0,
 						"MessageType":     "JoinReq",
@@ -303,13 +303,13 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 						"DLSettings":      "00",
 						"RxDelay":         5.0,
 					})
-					test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
+					test.Must[any](nil, json.NewEncoder(w).Encode(map[string]any{
 						"ProtocolVersion": "1.0",
 						"TransactionID":   0.0,
 						"MessageType":     "JoinAns",
 						"SenderID":        "70B3D57ED0000000",
 						"ReceiverID":      "42FFFF",
-						"Result": map[string]interface{}{
+						"Result": map[string]any{
 							"ResultCode": "MICFailed",
 						},
 					}))
@@ -344,10 +344,10 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := a
 					a.So(r.Method, should.Equal, http.MethodPost)
-					b := test.Must(io.ReadAll(r.Body)).([]byte)
-					var req map[string]interface{}
-					test.Must(nil, json.Unmarshal(b, &req))
-					a.So(req, should.Resemble, map[string]interface{}{
+					b := test.Must(io.ReadAll(r.Body))
+					var req map[string]any
+					test.Must[any](nil, json.Unmarshal(b, &req))
+					a.So(req, should.Resemble, map[string]any{
 						"ProtocolVersion": "1.1",
 						"TransactionID":   0.0,
 						"MessageType":     "JoinReq",
@@ -361,14 +361,14 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 						"DLSettings":      "00",
 						"RxDelay":         5.0,
 					})
-					test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
+					test.Must[any](nil, json.NewEncoder(w).Encode(map[string]any{
 						"ProtocolVersion": "1.1",
 						"TransactionID":   0.0,
 						"MessageType":     "JoinAns",
 						"SenderID":        "EC656E0000000000",
 						"ReceiverID":      "42FFFF",
 						"ReceiverNSID":    "70B3D57ED0000001",
-						"Result": map[string]interface{}{
+						"Result": map[string]any{
 							"ResultCode": "MICFailed",
 						},
 					}))
@@ -403,10 +403,10 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := a
 					a.So(r.Method, should.Equal, http.MethodPost)
-					b := test.Must(io.ReadAll(r.Body)).([]byte)
-					var req map[string]interface{}
-					test.Must(nil, json.Unmarshal(b, &req))
-					a.So(req, should.Resemble, map[string]interface{}{
+					b := test.Must(io.ReadAll(r.Body))
+					var req map[string]any
+					test.Must[any](nil, json.Unmarshal(b, &req))
+					a.So(req, should.Resemble, map[string]any{
 						"ProtocolVersion": "1.0",
 						"TransactionID":   0.0,
 						"MessageType":     "JoinReq",
@@ -419,7 +419,7 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 						"DLSettings":      "00",
 						"RxDelay":         5.0,
 					})
-					test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
+					test.Must[any](nil, json.NewEncoder(w).Encode(map[string]any{
 						"ProtocolVersion": "1.0",
 						"TransactionID":   0,
 						"MessageType":     "JoinAns",
@@ -427,15 +427,15 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 						"SenderID":        "70B3D57ED0000000",
 						"ReceiverID":      "42FFFF",
 						"PHYPayload":      "204D675073BB4153B23653EFA82C1F3A49E19C2A8696C9A34BF492674779E4BEFA",
-						"Result": map[string]interface{}{
+						"Result": map[string]any{
 							"ResultCode": "Success",
 						},
 						"Lifetime": 0,
-						"NwkSKey": map[string]interface{}{
+						"NwkSKey": map[string]any{
 							"KEKLabel": "ns:42ffff",
 							"AESKey":   "EB56FE6681999F25D548CFEDD4A6528B331BB5ADE1CAF17F",
 						},
-						"AppSKey": map[string]interface{}{
+						"AppSKey": map[string]any{
 							"KEKLabel": "as:010042",
 							"AESKey":   "2A195CC93CA54AD82CFB36C83D91450F3D2D523556F13E69",
 						},
@@ -487,10 +487,10 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := a
 					a.So(r.Method, should.Equal, http.MethodPost)
-					b := test.Must(io.ReadAll(r.Body)).([]byte)
-					var req map[string]interface{}
-					test.Must(nil, json.Unmarshal(b, &req))
-					a.So(req, should.Resemble, map[string]interface{}{
+					b := test.Must(io.ReadAll(r.Body))
+					var req map[string]any
+					test.Must[any](nil, json.Unmarshal(b, &req))
+					a.So(req, should.Resemble, map[string]any{
 						"ProtocolVersion": "1.1",
 						"TransactionID":   0.0,
 						"MessageType":     "JoinReq",
@@ -504,7 +504,7 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 						"DLSettings":      "00",
 						"RxDelay":         5.0,
 					})
-					test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
+					test.Must[any](nil, json.NewEncoder(w).Encode(map[string]any{
 						"ProtocolVersion": "1.1",
 						"TransactionID":   0,
 						"MessageType":     "JoinAns",
@@ -513,15 +513,15 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 						"ReceiverID":      "42FFFF",
 						"ReceiverNSID":    "70B3D57ED0000001",
 						"PHYPayload":      "204D675073BB4153B23653EFA82C1F3A49E19C2A8696C9A34BF492674779E4BEFA",
-						"Result": map[string]interface{}{
+						"Result": map[string]any{
 							"ResultCode": "Success",
 						},
 						"Lifetime": 0,
-						"NwkSKey": map[string]interface{}{
+						"NwkSKey": map[string]any{
 							"KEKLabel": "ns:42ffff",
 							"AESKey":   "EB56FE6681999F25D548CFEDD4A6528B331BB5ADE1CAF17F",
 						},
-						"AppSKey": map[string]interface{}{
+						"AppSKey": map[string]any{
 							"KEKLabel": "as:010042",
 							"AESKey":   "2A195CC93CA54AD82CFB36C83D91450F3D2D523556F13E69",
 						},
@@ -573,10 +573,10 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := a
 					a.So(r.Method, should.Equal, http.MethodPost)
-					b := test.Must(io.ReadAll(r.Body)).([]byte)
-					var req map[string]interface{}
-					test.Must(nil, json.Unmarshal(b, &req))
-					a.So(req, should.Resemble, map[string]interface{}{
+					b := test.Must(io.ReadAll(r.Body))
+					var req map[string]any
+					test.Must[any](nil, json.Unmarshal(b, &req))
+					a.So(req, should.Resemble, map[string]any{
 						"ProtocolVersion": "1.1",
 						"TransactionID":   0.0,
 						"MessageType":     "JoinReq",
@@ -590,7 +590,7 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 						"DLSettings":      "00",
 						"RxDelay":         5.0,
 					})
-					test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
+					test.Must[any](nil, json.NewEncoder(w).Encode(map[string]any{
 						"ProtocolVersion": "1.1",
 						"TransactionID":   0,
 						"MessageType":     "JoinAns",
@@ -599,15 +599,15 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 						"ReceiverID":      "42FFFF",
 						"ReceiverNSID":    "70B3D57ED0000001",
 						"PHYPayload":      "204D675073BB4153B23653EFA82C1F3A49E19C2A8696C9A34BF492674779E4BEFA",
-						"Result": map[string]interface{}{
+						"Result": map[string]any{
 							"ResultCode": "Success",
 						},
 						"Lifetime": 0,
-						"NwkSKey": map[string]interface{}{
+						"NwkSKey": map[string]any{
 							"KEKLabel": "ns:42ffff",
 							"AESKey":   "EB56FE6681999F25D548CFEDD4A6528B331BB5ADE1CAF17F",
 						},
-						"AppSKey": map[string]interface{}{
+						"AppSKey": map[string]any{
 							"KEKLabel": "as:010042",
 							"AESKey":   "2A195CC93CA54AD82CFB36C83D91450F3D2D523556F13E69",
 						},
@@ -702,7 +702,7 @@ func TestJoinServerRace(t *testing.T) { //nolint:paralleltest
 				return []*httptest.Server{
 					newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 						time.Sleep(test.Delay << 4)
-						test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
+						test.Must[any](nil, json.NewEncoder(w).Encode(map[string]any{
 							"ProtocolVersion": "1.0",
 							"TransactionID":   0,
 							"MessageType":     "JoinAns",
@@ -710,15 +710,15 @@ func TestJoinServerRace(t *testing.T) { //nolint:paralleltest
 							"SenderID":        "70B3D57ED0000000",
 							"ReceiverID":      "42FFFF",
 							"PHYPayload":      "204D675073BB4153B23653EFA82C1F3A49E19C2A8696C9A34BF492674779E4BEFA",
-							"Result": map[string]interface{}{
+							"Result": map[string]any{
 								"ResultCode": "Success",
 							},
 							"Lifetime": 0,
-							"NwkSKey": map[string]interface{}{
+							"NwkSKey": map[string]any{
 								"KEKLabel": "ns:42ffff",
 								"AESKey":   "EB56FE6681999F25D548CFEDD4A6528B331BB5ADE1CAF17F",
 							},
-							"AppSKey": map[string]interface{}{
+							"AppSKey": map[string]any{
 								"KEKLabel": "as:010042",
 								"AESKey":   "2A195CC93CA54AD82CFB36C83D91450F3D2D523556F13E69",
 							},
@@ -726,13 +726,13 @@ func TestJoinServerRace(t *testing.T) { //nolint:paralleltest
 						}))
 					})),
 					newTLSServer(9184, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-						test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
+						test.Must[any](nil, json.NewEncoder(w).Encode(map[string]any{
 							"ProtocolVersion": "1.0",
 							"TransactionID":   0.0,
 							"MessageType":     "JoinAns",
 							"SenderID":        "EC656E0000000001",
 							"ReceiverID":      "42FFFF",
-							"Result": map[string]interface{}{
+							"Result": map[string]any{
 								"ResultCode": "MICFailed",
 							},
 						}))
@@ -783,25 +783,25 @@ func TestJoinServerRace(t *testing.T) { //nolint:paralleltest
 					newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 						// This is the slowest response.
 						time.Sleep(test.Delay << 4)
-						test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
+						test.Must[any](nil, json.NewEncoder(w).Encode(map[string]any{
 							"ProtocolVersion": "1.0",
 							"TransactionID":   0.0,
 							"MessageType":     "JoinAns",
 							"SenderID":        "EC656E0000000001",
 							"ReceiverID":      "42FFFF",
-							"Result": map[string]interface{}{
+							"Result": map[string]any{
 								"ResultCode": "JoinReqFailed",
 							},
 						}))
 					})),
 					newTLSServer(9184, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-						test.Must(nil, json.NewEncoder(w).Encode(map[string]interface{}{
+						test.Must[any](nil, json.NewEncoder(w).Encode(map[string]any{
 							"ProtocolVersion": "1.0",
 							"TransactionID":   0.0,
 							"MessageType":     "JoinAns",
 							"SenderID":        "EC656E0000000001",
 							"ReceiverID":      "42FFFF",
-							"Result": map[string]interface{}{
+							"Result": map[string]any{
 								"ResultCode": "MICFailed",
 							},
 						}))

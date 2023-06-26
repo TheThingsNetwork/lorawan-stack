@@ -253,7 +253,7 @@ func (s *Server) getTrust(address string) (*x509.Certificate, error) {
 	}
 	address = net.JoinHostPort(host, port)
 
-	trustI, err, _ := s.getTrustOnce.Do(address, func() (interface{}, error) {
+	trustI, err, _ := s.getTrustOnce.Do(address, func() (any, error) {
 		s.trustCacheMu.RLock()
 		trust, ok := s.trustCache[address]
 		s.trustCacheMu.RUnlock()

@@ -53,7 +53,7 @@ func httpRequestResource(r *http.Request, class string) Resource {
 }
 
 // grpcMethodResource represents a gRPC request.
-func grpcMethodResource(ctx context.Context, fullMethod string, req interface{}) Resource {
+func grpcMethodResource(ctx context.Context, fullMethod string, req any) Resource {
 	key := fmt.Sprintf("grpc:method:%s:%s", fullMethod, grpcEntityFromRequest(ctx, req))
 	if authTokenID := grpcAuthTokenID(ctx); authTokenID != "" {
 		key = fmt.Sprintf("%s:token:%s", key, authTokenID)

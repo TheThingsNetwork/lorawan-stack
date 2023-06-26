@@ -81,57 +81,57 @@ func (l *Logger) commit(e *entry) {
 }
 
 // Debug implements log.Interface.
-func (l *Logger) Debug(args ...interface{}) {
+func (l *Logger) Debug(args ...any) {
 	l.entry().commit(DebugLevel, fmt.Sprint(args...))
 }
 
 // Info implements log.Interface.
-func (l *Logger) Info(args ...interface{}) {
+func (l *Logger) Info(args ...any) {
 	l.entry().commit(InfoLevel, fmt.Sprint(args...))
 }
 
 // Warn implements log.Interface.
-func (l *Logger) Warn(args ...interface{}) {
+func (l *Logger) Warn(args ...any) {
 	l.entry().commit(WarnLevel, fmt.Sprint(args...))
 }
 
 // Error implements log.Interface.
-func (l *Logger) Error(args ...interface{}) {
+func (l *Logger) Error(args ...any) {
 	l.entry().commit(ErrorLevel, fmt.Sprint(args...))
 }
 
 // Fatal implements log.Interface.
-func (l *Logger) Fatal(args ...interface{}) {
+func (l *Logger) Fatal(args ...any) {
 	l.entry().commit(FatalLevel, fmt.Sprint(args...))
 }
 
 // Debugf implements log.Interface.
-func (l *Logger) Debugf(msg string, v ...interface{}) {
+func (l *Logger) Debugf(msg string, v ...any) {
 	l.Debug(fmt.Sprintf(msg, v...))
 }
 
 // Infof implements log.Interface.
-func (l *Logger) Infof(msg string, v ...interface{}) {
+func (l *Logger) Infof(msg string, v ...any) {
 	l.Info(fmt.Sprintf(msg, v...))
 }
 
 // Warnf implements log.Interface.
-func (l *Logger) Warnf(msg string, v ...interface{}) {
+func (l *Logger) Warnf(msg string, v ...any) {
 	l.Warn(fmt.Sprintf(msg, v...))
 }
 
 // Errorf implements log.Interface.
-func (l *Logger) Errorf(msg string, v ...interface{}) {
+func (l *Logger) Errorf(msg string, v ...any) {
 	l.Error(fmt.Sprintf(msg, v...))
 }
 
 // Fatalf implements log.Interface.
-func (l *Logger) Fatalf(msg string, v ...interface{}) {
+func (l *Logger) Fatalf(msg string, v ...any) {
 	l.Fatal(fmt.Sprintf(msg, v...))
 }
 
 // WithField implements log.Interface.
-func (l *Logger) WithField(name string, val interface{}) Interface {
+func (l *Logger) WithField(name string, val any) Interface {
 	return l.entry().WithField(name, val)
 }
 

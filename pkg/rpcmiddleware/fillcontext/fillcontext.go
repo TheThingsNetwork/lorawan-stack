@@ -25,7 +25,7 @@ import (
 
 // UnaryServerInterceptor returns a new unary server interceptor that modifies the context.
 func UnaryServerInterceptor(fillers ...fillcontext.Filler) grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 		if fillers != nil {
 			for _, fill := range fillers {
 				ctx = fill(ctx)
@@ -37,7 +37,7 @@ func UnaryServerInterceptor(fillers ...fillcontext.Filler) grpc.UnaryServerInter
 
 // StreamServerInterceptor returns a new streaming server interceptor that that modifies the context.
 func StreamServerInterceptor(fillers ...fillcontext.Filler) grpc.StreamServerInterceptor {
-	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+	return func(srv any, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 		if fillers != nil {
 			ctx := stream.Context()
 			for _, fill := range fillers {

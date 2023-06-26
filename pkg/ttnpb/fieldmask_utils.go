@@ -356,3 +356,23 @@ func FieldsWithoutWrappers(paths []string) []string {
 	}
 	return result
 }
+
+// FieldMaskPathsSet returns a set of paths.
+func FieldMaskPathsSet(paths []string) map[string]struct{} {
+	set := make(map[string]struct{}, len(paths))
+	for _, path := range paths {
+		set[path] = struct{}{}
+	}
+	return set
+}
+
+// FieldMaskPathsSetContainsAll returns whether the set contains all of the given paths
+// and the first path that is not contained.
+func FieldMaskPathsSetContainsAll(set map[string]struct{}, paths ...string) (bool, string) {
+	for _, path := range paths {
+		if _, ok := set[path]; !ok {
+			return false, path
+		}
+	}
+	return true, ""
+}

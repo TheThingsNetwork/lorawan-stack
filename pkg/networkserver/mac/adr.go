@@ -18,6 +18,7 @@ import (
 	"context"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
+	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -221,7 +222,10 @@ func demodulationFloorStep(phy *band.Band, from, to ttnpb.DataRateIndex) float32
 		demodulationFloor[toLoRa.SpreadingFactor][toLoRa.Bandwidth]
 }
 
+var automaticSteeringFeatureFlag = experimental.DefineFeature("ns.adr.auto_narrow_steer", false)
+
 func adrSteerDeviceChannels(
+	ctx context.Context,
 	dev *ttnpb.EndDevice,
 	defaults *ttnpb.MACSettings,
 	phy *band.Band,
@@ -231,7 +235,8 @@ func adrSteerDeviceChannels(
 ) (float32, bool) {
 	channelSteering := deviceADRChannelSteering(dev, defaults)
 	switch {
-	case channelSteering.GetLoraNarrow() != nil:
+	case channelSteering.GetLoraNarrow() != nil,
+		channelSteering.GetMode() == nil && automaticSteeringFeatureFlag.GetValue(ctx):
 		macState := dev.MacState
 		currentParameters, desiredParameters := macState.CurrentParameters, macState.DesiredParameters
 		currentDataRateIndex := currentParameters.AdrDataRateIndex
@@ -630,7 +635,7 @@ func adaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 		return err
 	}
 	margin, ok = adrSteerDeviceChannels(
-		dev, defaults, phy, minDataRateIndex, maxDataRateIndex, allowedDataRateIndices, margin,
+		ctx, dev, defaults, phy, minDataRateIndex, maxDataRateIndex, allowedDataRateIndices, margin,
 	)
 	if !ok {
 		margin = adrAdaptDataRate(

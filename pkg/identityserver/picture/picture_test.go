@@ -80,7 +80,7 @@ func TestMakeSquare(t *testing.T) {
 	}
 }
 
-func beSameColorAs(actual interface{}, expected ...interface{}) (message string) {
+func beSameColorAs(actual any, expected ...any) (message string) {
 	actualR, actualG, actualB, actualA := actual.(color.Color).RGBA()
 	expectedR, expectedG, expectedB, expectedA := expected[0].(color.Color).RGBA()
 	if eq := should.Equal(actualR, expectedR); eq != "" {

@@ -58,31 +58,11 @@ var Delay = time.Millisecond * func() time.Duration {
 }()
 
 // Must returns v if err is nil and panics otherwise.
-func Must(v interface{}, err error) interface{} {
+func Must[T any](v T, err error) T {
 	if err != nil {
 		panic(fmt.Sprintf("Must received error: %v", FormatError(err)))
 	}
 	return v
-}
-
-// MustMultiple is like Must, but operates on arbitrary amount of values.
-// It assumes that last value in vs is an error.
-// It panics if len(vs) == 0.
-func MustMultiple(vs ...interface{}) []interface{} {
-	n := len(vs)
-	if n == 0 {
-		panic("MustMultiple requires at least 1 argument")
-	}
-
-	err, ok := vs[n-1].(error)
-	if !ok && vs[n-1] != nil {
-		panic(fmt.Sprintf("MustMultiple expected last argument to be an error, got %T", vs[n-1]))
-	}
-
-	if err != nil {
-		panic(fmt.Sprintf("MustMultiple received error: %s", FormatError(err)))
-	}
-	return vs[:n-1]
 }
 
 // WaitTimeout returns true if f returns after at most d or false otherwise.
@@ -145,13 +125,13 @@ func AllTrue(vs ...bool) bool {
 }
 
 // JoinStringsMap maps contents of xs to strings using f and joins them with sep.
-func JoinStringsMap(f func(k interface{}, v interface{}) string, sep string, xs interface{}) string {
+func JoinStringsMap(f func(k any, v any) string, sep string, xs any) string {
 	r, ok := WrapRanger(xs)
 	if !ok {
 		panic(fmt.Sprintf("cannot range over values of type %T", xs))
 	}
 	var ss []string
-	r.Range(func(k, v interface{}) bool {
+	r.Range(func(k, v any) bool {
 		ss = append(ss, f(k, v))
 		return true
 	})
@@ -159,8 +139,8 @@ func JoinStringsMap(f func(k interface{}, v interface{}) string, sep string, xs 
 }
 
 // JoinStringsf formats contents of xs using format and joins them with sep.
-func JoinStringsf(format, sep string, withKeys bool, xs interface{}) string {
-	return JoinStringsMap(func(k, v interface{}) string {
+func JoinStringsf(format, sep string, withKeys bool, xs any) string {
+	return JoinStringsMap(func(k, v any) string {
 		if withKeys {
 			return fmt.Sprintf(format, k, v)
 		}

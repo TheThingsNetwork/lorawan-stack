@@ -53,17 +53,17 @@ func (conf LorafwdConfig) MarshalText() ([]byte, error) {
 
 // LoradGatewayConf contains the Lorad configuration for the gateway's server connection.
 type LoradGatewayConf struct {
-	BeaconEnable    bool        `json:"beacon_enable"`
-	BeaconPeriod    uint        `json:"beacon_period,omitempty"`
-	BeaconFreqHz    uint        `json:"beacon_freq_hz,omitempty"`
-	BeaconFreqNb    uint        `json:"beacon_freq_nb,omitempty"`
-	BeaconStep      uint        `json:"beacon_step,omitempty"`
-	BeaconDatarate  uint        `json:"beacon_datarate,omitempty"`
-	BeaconBwHz      uint        `json:"beacon_bw_hz,omitempty"`
-	BeaconPower     uint        `json:"beacon_power,omitempty"`
-	BeaconInfodesc  interface{} `json:"beacon_infodesc,omitempty"`
-	BeaconLatitude  float64     `json:"beacon_latitude,omitempty"`
-	BeaconLongitude float64     `json:"beacon_longitude,omitempty"`
+	BeaconEnable    bool    `json:"beacon_enable"`
+	BeaconPeriod    uint    `json:"beacon_period,omitempty"`
+	BeaconFreqHz    uint    `json:"beacon_freq_hz,omitempty"`
+	BeaconFreqNb    uint    `json:"beacon_freq_nb,omitempty"`
+	BeaconStep      uint    `json:"beacon_step,omitempty"`
+	BeaconDatarate  uint    `json:"beacon_datarate,omitempty"`
+	BeaconBwHz      uint    `json:"beacon_bw_hz,omitempty"`
+	BeaconPower     uint    `json:"beacon_power,omitempty"`
+	BeaconInfodesc  any     `json:"beacon_infodesc,omitempty"`
+	BeaconLatitude  float64 `json:"beacon_latitude,omitempty"`
+	BeaconLongitude float64 `json:"beacon_longitude,omitempty"`
 }
 
 type LoradSX1301Conf struct {

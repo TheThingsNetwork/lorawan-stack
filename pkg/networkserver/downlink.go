@@ -61,7 +61,7 @@ type DownlinkTaskQueue interface {
 }
 
 func loggerWithApplicationDownlinkFields(logger log.Interface, down *ttnpb.ApplicationDownlink) log.Interface {
-	pairs := []interface{}{
+	pairs := []any{
 		"confirmed", down.Confirmed,
 		"f_cnt", down.FCnt,
 		"f_port", down.FPort,
@@ -1024,7 +1024,7 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(
 }
 
 func loggerWithTxRequestFields(logger log.Interface, req *ttnpb.TxRequest, rx1, rx2 bool) log.Interface {
-	pairs := []interface{}{
+	pairs := []any{
 		"attempt_rx1", rx1,
 		"attempt_rx2", rx2,
 		"downlink_class", req.Class,
@@ -1052,7 +1052,7 @@ func loggerWithTxRequestFields(logger log.Interface, req *ttnpb.TxRequest, rx1, 
 }
 
 func loggerWithDownlinkSchedulingErrorFields(logger log.Interface, errs downlinkSchedulingError) log.Interface {
-	pairs := []interface{}{
+	pairs := []any{
 		"attempts", len(errs),
 	}
 	for i, err := range errs {

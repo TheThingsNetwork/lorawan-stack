@@ -101,41 +101,6 @@ func (x *ClaimEndDeviceRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("target_device_id")
 		s.WriteString(x.TargetDeviceId)
 	}
-	if x.TargetNetworkServerAddress != "" || s.HasField("target_network_server_address") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("target_network_server_address")
-		s.WriteString(x.TargetNetworkServerAddress)
-	}
-	if x.TargetNetworkServerKekLabel != "" || s.HasField("target_network_server_kek_label") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("target_network_server_kek_label")
-		s.WriteString(x.TargetNetworkServerKekLabel)
-	}
-	if x.TargetApplicationServerAddress != "" || s.HasField("target_application_server_address") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("target_application_server_address")
-		s.WriteString(x.TargetApplicationServerAddress)
-	}
-	if x.TargetApplicationServerKekLabel != "" || s.HasField("target_application_server_kek_label") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("target_application_server_kek_label")
-		s.WriteString(x.TargetApplicationServerKekLabel)
-	}
-	if x.TargetApplicationServerId != "" || s.HasField("target_application_server_id") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("target_application_server_id")
-		s.WriteString(x.TargetApplicationServerId)
-	}
-	if len(x.TargetNetId) > 0 || s.HasField("target_net_id") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("target_net_id")
-		types.MarshalHEXBytes(s.WithField("target_net_id"), x.TargetNetId)
-	}
-	if x.InvalidateAuthenticationCode || s.HasField("invalidate_authentication_code") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("invalidate_authentication_code")
-		s.WriteBool(x.InvalidateAuthenticationCode)
-	}
 	s.WriteObjectEnd()
 }
 
@@ -180,27 +145,6 @@ func (x *ClaimEndDeviceRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState)
 		case "target_device_id", "targetDeviceId":
 			s.AddField("target_device_id")
 			x.TargetDeviceId = s.ReadString()
-		case "target_network_server_address", "targetNetworkServerAddress":
-			s.AddField("target_network_server_address")
-			x.TargetNetworkServerAddress = s.ReadString()
-		case "target_network_server_kek_label", "targetNetworkServerKekLabel":
-			s.AddField("target_network_server_kek_label")
-			x.TargetNetworkServerKekLabel = s.ReadString()
-		case "target_application_server_address", "targetApplicationServerAddress":
-			s.AddField("target_application_server_address")
-			x.TargetApplicationServerAddress = s.ReadString()
-		case "target_application_server_kek_label", "targetApplicationServerKekLabel":
-			s.AddField("target_application_server_kek_label")
-			x.TargetApplicationServerKekLabel = s.ReadString()
-		case "target_application_server_id", "targetApplicationServerId":
-			s.AddField("target_application_server_id")
-			x.TargetApplicationServerId = s.ReadString()
-		case "target_net_id", "targetNetId":
-			s.AddField("target_net_id")
-			x.TargetNetId = types.Unmarshal3Bytes(s.WithField("target_net_id", false))
-		case "invalidate_authentication_code", "invalidateAuthenticationCode":
-			s.AddField("invalidate_authentication_code")
-			x.InvalidateAuthenticationCode = s.ReadBool()
 		}
 	})
 }

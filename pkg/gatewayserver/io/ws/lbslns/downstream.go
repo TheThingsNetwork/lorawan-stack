@@ -169,14 +169,10 @@ func (dnmsg *DownlinkMessage) ToDownlinkMessage(bandID string) (*ttnpb.DownlinkM
 	return down, nil
 }
 
-const (
-	// transferTimeMinRTTCount is the minimum number of observed round-trip times that are taken into account before using
-	// their statistics to determine the gateway GPS time.
-	transferTimeMinRTTCount = 5
-)
-
 // TransferTime implements Formatter.
-func (*lbsLNS) TransferTime(ctx context.Context, serverTime time.Time, gpsTime *time.Time, concentratorTime *scheduling.ConcentratorTime) ([]byte, error) {
+func (*lbsLNS) TransferTime(
+	ctx context.Context, serverTime time.Time, gpsTime *time.Time, concentratorTime *scheduling.ConcentratorTime,
+) ([]byte, error) {
 	if enabled, ok := ws.GetSessionTimeSync(ctx); !ok || !enabled {
 		return nil, nil
 	}

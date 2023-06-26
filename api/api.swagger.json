@@ -2331,6 +2331,13 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "continuation_token",
+            "description": "The continuation token, which is used to retrieve the next page. If provided, other fields are ignored.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -3932,6 +3939,13 @@
           {
             "name": "last",
             "description": "Query upstream messages that have arrived in the last minutes or hours. Cannot be used in conjunction with after and before.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "continuation_token",
+            "description": "The continuation token, which is used to retrieve the next page. If provided, other fields are ignored.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -13832,86 +13846,6 @@
         ]
       }
     },
-    "/qr-code/end-devices/parse": {
-      "post": {
-        "summary": "Parse QR Codes of known formats and return the information contained within.",
-        "operationId": "EndDeviceQRCodeGenerator_Parse",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v3ParseEndDeviceQRCodeResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v3ParseEndDeviceQRCodeRequest"
-            }
-          }
-        ],
-        "tags": [
-          "EndDeviceQRCodeGenerator"
-        ]
-      }
-    },
-    "/qr-code/end-devices/{format_id}/parse": {
-      "post": {
-        "summary": "Parse QR Codes of known formats and return the information contained within.",
-        "operationId": "EndDeviceQRCodeGenerator_Parse2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v3ParseEndDeviceQRCodeResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "format_id",
-            "description": "QR code format identifier.\nEnumerate available formats with the rpc `ListFormats`.\nIf this field is not specified, the server will attempt to parse the data with each known format.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "qr_code": {
-                  "type": "string",
-                  "format": "byte",
-                  "description": "Raw QR code contents."
-                }
-              }
-            }
-          }
-        ],
-        "tags": [
-          "EndDeviceQRCodeGenerator"
-        ]
-      }
-    },
     "/qr-codes/end-devices": {
       "post": {
         "summary": "Generates a QR code.",
@@ -13993,6 +13927,86 @@
             "in": "path",
             "required": true,
             "type": "string"
+          }
+        ],
+        "tags": [
+          "EndDeviceQRCodeGenerator"
+        ]
+      }
+    },
+    "/qr-codes/end-devices/parse": {
+      "post": {
+        "summary": "Parse QR Codes of known formats and return the information contained within.",
+        "operationId": "EndDeviceQRCodeGenerator_Parse",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ParseEndDeviceQRCodeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3ParseEndDeviceQRCodeRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EndDeviceQRCodeGenerator"
+        ]
+      }
+    },
+    "/qr-codes/end-devices/{format_id}/parse": {
+      "post": {
+        "summary": "Parse QR Codes of known formats and return the information contained within.",
+        "operationId": "EndDeviceQRCodeGenerator_Parse2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ParseEndDeviceQRCodeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "format_id",
+            "description": "QR code format identifier.\nEnumerate available formats with the rpc `ListFormats`.\nIf this field is not specified, the server will attempt to parse the data with each known format.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "qr_code": {
+                  "type": "string",
+                  "format": "byte",
+                  "description": "Raw QR code contents."
+                }
+              }
+            }
           }
         ],
         "tags": [
@@ -20102,36 +20116,6 @@
         "target_device_id": {
           "type": "string",
           "description": "End device ID of the target end device. If empty, use the source device ID."
-        },
-        "target_network_server_address": {
-          "type": "string",
-          "description": "The address of the Network Server where the device will be registered.\nIf set and if the source device is currently registered on a Network Server, settings will be transferred.\nIf not set, the device shall not be registered on a Network Server."
-        },
-        "target_network_server_kek_label": {
-          "type": "string",
-          "description": "The KEK label of the Network Server to use for wrapping network session keys."
-        },
-        "target_application_server_address": {
-          "type": "string",
-          "description": "The address of the Application Server where the device will be registered.\nIf set and if the source device is currently registered on an Application Server, settings will be transferred.\nIf not set, the device shall not be registered on an Application Server."
-        },
-        "target_application_server_kek_label": {
-          "type": "string",
-          "description": "The KEK label of the Application Server to use for wrapping the application session key."
-        },
-        "target_application_server_id": {
-          "type": "string",
-          "description": "The AS-ID of the Application Server to use."
-        },
-        "target_net_id": {
-          "type": "string",
-          "format": "string",
-          "example": "000013",
-          "description": "Home NetID."
-        },
-        "invalidate_authentication_code": {
-          "type": "boolean",
-          "description": "If set, invalidate the authentication code with which the device gets claimed. This prohibits subsequent claiming requests."
         }
       }
     },

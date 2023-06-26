@@ -87,7 +87,7 @@ func TestGetJoinEUIPrefixes(t *testing.T) {
 				&Config{
 					JoinEUIPrefixes: tc.JoinEUIPrefixes,
 					DevNonceLimit:   defaultDevNonceLimit,
-				})).(*JoinServer)
+				}))
 			componenttest.StartComponent(t, js.Component)
 			defer js.Close()
 
@@ -128,7 +128,7 @@ func TestGetDefaultJoinEUI(t *testing.T) {
 				&Config{
 					DefaultJoinEUI: tc.DefaultJoinEUI,
 					DevNonceLimit:  defaultDevNonceLimit,
-				})).(*JoinServer)
+				}))
 			componenttest.StartComponent(t, js.Component)
 			defer js.Close()
 

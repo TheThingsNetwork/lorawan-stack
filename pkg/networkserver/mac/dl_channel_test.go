@@ -303,7 +303,7 @@ func TestDLChannelReq(t *testing.T) {
 		test.RunSubtest(t, test.SubtestConfig{
 			Name: func() string {
 				formatChannels := func(chs ...*ttnpb.MACParameters_Channel) string {
-					return fmt.Sprintf("[%s]", test.JoinStringsMap(func(_, v interface{}) string {
+					return fmt.Sprintf("[%s]", test.JoinStringsMap(func(_, v any) string {
 						ch := v.(*ttnpb.MACParameters_Channel)
 						if ch == nil {
 							return "nil"
@@ -369,7 +369,7 @@ func TestDLChannelReq(t *testing.T) {
 					Parallel: true,
 					Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 						dev := makeDevice()
-						a.So(DeviceNeedsDLChannelReq(dev, phy), func() func(interface{}, ...interface{}) string {
+						a.So(DeviceNeedsDLChannelReq(dev, phy), func() func(any, ...any) string {
 							if len(tc.Commands) > 0 {
 								return should.BeTrue
 							}

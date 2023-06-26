@@ -29,9 +29,9 @@ import { maySendInvites } from '@console/lib/feature-checks'
 
 const InvitationSend = () => {
   useBreadcrumbs(
-    'admin.user-management.invitations.send',
+    'admin-panel.user-management.invitations.send',
     <Breadcrumb
-      path={`/admin/user-management/invitations/send`}
+      path={`/admin-panel/user-management/invitations/send`}
       content={sharedMessages.sendInvitation}
     />,
   )
@@ -41,7 +41,7 @@ const InvitationSend = () => {
       <Container>
         <PageTitle title={sharedMessages.invite} />
         <Row>
-          <Col lg={8} md={12}>
+          <Col>
             <InviteForm />
           </Col>
         </Row>

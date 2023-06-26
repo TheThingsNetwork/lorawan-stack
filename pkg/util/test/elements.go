@@ -33,7 +33,7 @@ var (
 	// cmp.Equal does not - only nil function pointers are equal, otherwise they are unequal.
 	equateFuncs = cmp.FilterPath(func(p cmp.Path) bool {
 		return p.Last().Type().Kind() == reflect.Func
-	}, cmp.Comparer(func(x, y interface{}) bool {
+	}, cmp.Comparer(func(x, y any) bool {
 		px := uintptr(reflect.ValueOf(x).UnsafePointer())
 		py := uintptr(reflect.ValueOf(y).UnsafePointer())
 		return px == py
@@ -56,25 +56,25 @@ var (
 )
 
 // Diff returns the cmp.Diff between x and y.
-func Diff(x, y interface{}) string {
+func Diff(x, y any) string {
 	return cmp.Diff(x, y, cmpOpts...)
 }
 
 // DiffEqual returns true iff Diff of x and y is empty and false otherwise.
-func DiffEqual(x, y interface{}) bool {
+func DiffEqual(x, y any) bool {
 	return len(Diff(x, y)) == 0
 }
 
 // Ranger represents an entity, which can be ranged over(e.g. sync.Map).
 type Ranger interface {
-	Range(f func(k, v interface{}) bool)
+	Range(f func(k, v any) bool)
 }
 
 type indexRanger struct {
 	reflect.Value
 }
 
-func (rv indexRanger) Range(f func(k, v interface{}) bool) {
+func (rv indexRanger) Range(f func(k, v any) bool) {
 	for i := 0; i < rv.Len(); i++ {
 		if !f(i, rv.Index(i).Interface()) {
 			return
@@ -86,7 +86,7 @@ type mapRanger struct {
 	reflect.Value
 }
 
-func (rv mapRanger) Range(f func(k, v interface{}) bool) {
+func (rv mapRanger) Range(f func(k, v any) bool) {
 	for _, k := range rv.MapKeys() {
 		if !f(k.Interface(), rv.MapIndex(k).Interface()) {
 			return
@@ -95,7 +95,7 @@ func (rv mapRanger) Range(f func(k, v interface{}) bool) {
 }
 
 // WrapRanger returns Ranger, true if v can be ranged over and nil, false otherwise.
-func WrapRanger(v interface{}) (Ranger, bool) {
+func WrapRanger(v any) (Ranger, bool) {
 	r, ok := v.(Ranger)
 	if ok {
 		return r, ok
@@ -112,7 +112,7 @@ func WrapRanger(v interface{}) (Ranger, bool) {
 }
 
 // MapKeys returns the keys of a map as a slice.
-func MapKeys(m interface{}) []interface{} {
+func MapKeys(m any) []any {
 	if m == nil {
 		return nil
 	}
@@ -120,7 +120,7 @@ func MapKeys(m interface{}) []interface{} {
 	if rv.Kind() != reflect.Map {
 		panic(fmt.Errorf("expected %T to be of map type", m))
 	}
-	ks := make([]interface{}, 0, rv.Len())
+	ks := make([]any, 0, rv.Len())
 	for _, k := range rv.MapKeys() {
 		ks = append(ks, k.Interface())
 	}
@@ -135,7 +135,7 @@ func MapKeys(m interface{}) []interface{} {
 // 1. string, slice, array or map kind
 // 2. value, which implements Ranger interface(e.g. sync.Map)
 // NOTE: Map key values are not taken into account.
-func IsSubsetOfElements(eq interface{}, sub, super interface{}) bool {
+func IsSubsetOfElements(eq any, sub, super any) bool {
 	if sub == nil {
 		// NOTE: Empty set is a subset of any set.
 		return true
@@ -173,7 +173,7 @@ func IsSubsetOfElements(eq interface{}, sub, super interface{}) bool {
 		return nil
 	}
 
-	subR.Range(func(_, v interface{}) bool {
+	subR.Range(func(_, v any) bool {
 		rv := reflect.ValueOf(v)
 		e := findEntry(rv)
 		if e == nil {
@@ -186,7 +186,7 @@ func IsSubsetOfElements(eq interface{}, sub, super interface{}) bool {
 		}
 		return true
 	})
-	supR.Range(func(_, v interface{}) bool {
+	supR.Range(func(_, v any) bool {
 		rv := reflect.ValueOf(v)
 		e := findEntry(rv)
 		if e == nil {
@@ -203,11 +203,11 @@ func IsSubsetOfElements(eq interface{}, sub, super interface{}) bool {
 }
 
 // IsProperSubsetOfElements is like IsSubsetOfElements, but checks for proper subset.
-func IsProperSubsetOfElements(eq interface{}, sub, super interface{}) bool {
+func IsProperSubsetOfElements(eq any, sub, super any) bool {
 	return IsSubsetOfElements(eq, sub, super) && !IsSubsetOfElements(eq, super, sub)
 }
 
 // SameElements returns true iff IsSubsetOfElements(eq, xs, ys) returns true and IsSubsetOfElements(eq, ys, xs) returns true and false otherwise.
-func SameElements(eq interface{}, xs, ys interface{}) bool {
+func SameElements(eq any, xs, ys any) bool {
 	return IsSubsetOfElements(eq, xs, ys) && IsSubsetOfElements(eq, ys, xs)
 }

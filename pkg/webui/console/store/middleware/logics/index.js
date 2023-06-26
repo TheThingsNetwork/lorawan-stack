@@ -34,6 +34,7 @@ import as from './application-server'
 import deviceRepository from './device-repository'
 import packetBroker from './packet-broker'
 import networkServer from './network-server'
+import qrCodeGenerator from './qr-code-generator'
 
 export default [
   ...status,
@@ -57,4 +58,5 @@ export default [
   ...packetBroker,
   ...collaborators,
   ...networkServer,
+  ...qrCodeGenerator,
 ]

@@ -77,7 +77,7 @@ func (c *Client) newRequest(ctx context.Context, method, category, entity, opera
 }
 
 // Do executes a new HTTP request with the given parameters and body and returns the response.
-func (c *Client) Do(ctx context.Context, method, category, entity, operation string, body interface{}) (*http.Response, error) {
+func (c *Client) Do(ctx context.Context, method, category, entity, operation string, body any) (*http.Response, error) {
 	buffer := bytes.NewBuffer(nil)
 	err := json.NewEncoder(buffer).Encode(body)
 	if err != nil {

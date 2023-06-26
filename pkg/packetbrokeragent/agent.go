@@ -688,7 +688,7 @@ func (a *Agent) handleDownlinkMessage(
 	report.ForwarderGatewayId = toPBGatewayIdentifier(ids, a.forwarderConfig)
 
 	req := msg.GetRequest()
-	pairs := []interface{}{
+	pairs := []any{
 		"gateway_uid", uid,
 		"attempt_rx1", req.Rx1Frequency != 0,
 		"attempt_rx2", req.Rx2Frequency != 0,
@@ -808,7 +808,7 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 		}
 		var (
 			messageType string
-			message     interface{}
+			message     any
 		)
 		switch msg := f.Message.(type) {
 		case *packetbroker.RoutingFilter_JoinRequest_:

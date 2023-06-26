@@ -114,7 +114,7 @@ func createFilters(fullMethod string) []string {
 
 // UnaryServerInterceptor returns a new unary server interceptor that executes registered hooks.
 func (h *Hooks) UnaryServerInterceptor() grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (res interface{}, err error) {
+	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (res any, err error) {
 		var middleware []UnaryHandlerMiddleware
 		h.mu.RLock()
 		for _, filter := range createFilters(info.FullMethod) {
@@ -132,7 +132,7 @@ func (h *Hooks) UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 
 // StreamServerInterceptor returns a new stream server interceptor that executes registered hooks.
 func (h *Hooks) StreamServerInterceptor() grpc.StreamServerInterceptor {
-	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) (err error) {
+	return func(srv any, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) (err error) {
 		var middleware []StreamHandlerMiddleware
 		h.mu.RLock()
 		for _, filter := range createFilters(info.FullMethod) {

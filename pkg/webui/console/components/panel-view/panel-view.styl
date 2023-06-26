@@ -1,0 +1,67 @@
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.panel-view
+  .menu
+    padding: 0
+    margin-top: $cs.xl
+
+.panel-view-menu-item
+  margin-bottom: 15px
+
+.link
+  text-decoration: none
+  color: $tc-black
+  display: flex
+  align-items: center
+  padding: $cs.s $cs.m
+  position: relative
+
+  &::after
+    content: ''
+    position: absolute
+    top: 0
+    left: 0
+    width: 3px
+    height: 100%
+    background-color: $c-subtle-fill
+    transform: scaleY(0)
+    transform-origin: center
+    transition: transform $ad.m ease-in-out, background-color $ad.s linear
+
+  &:hover:not(.active)::after // @stylint ignore
+    transform: scaleY(1)
+
+  &.active
+    font-weight: $fw.bold
+    background-color: $c-backdrop-lighter
+
+    &::before
+      content: ''
+      z-index: $zi.slight
+      position: absolute
+      bottom: 0
+      left: 0
+      display: block
+      height: 100%
+      width: 3px
+      background: $c-active-blue !important
+
+  &:hover,
+  &:visited
+    color: $tc-black
+    text-decoration: none
+
+  &:hover
+    background-color: $c-backdrop

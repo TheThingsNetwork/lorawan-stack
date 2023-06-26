@@ -66,7 +66,6 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 			if ids.EntityType() == "user" && ids.IDString() == usr1.IDString() {
 				info.Value = usr1.PrimaryEmailAddress
 			}
-
 			t.Run("SetContactInfo", func(t *T) {
 				a, ctx := test.New(t)
 				created, err := s.SetContactInfo(ctx, ids, []*ttnpb.ContactInfo{
@@ -134,9 +133,9 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 				}
 			})
 
-			t.Run("Validate_Expired", func(t *T) {
+			t.Run("FetchExpiredValidation", func(t *T) {
 				a, ctx := test.New(t)
-				err := s.Validate(ctx, &ttnpb.ContactInfoValidation{
+				_, err := s.GetValidation(ctx, &ttnpb.ContactInfoValidation{
 					Id:    validationID,
 					Token: "EXPIRED_TOKEN",
 				})
@@ -146,17 +145,68 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 			})
 
 			t.Run("Validate", func(t *T) {
-				a, ctx := test.New(t)
-				err := s.Validate(ctx, &ttnpb.ContactInfoValidation{
-					Id:    validationID,
-					Token: "TOKEN",
+				validation := &ttnpb.ContactInfoValidation{
+					Id:          validationID,
+					Token:       "TOKEN",
+					Entity:      ids,
+					ContactInfo: []*ttnpb.ContactInfo{info},
+				}
+				t.Run("GetValidation", func(t *T) {
+					// This test is meant to impact `validation` and must run before any other test within `Validate`.
+					a, ctx := test.New(t)
+					var err error
+					validation, err = s.GetValidation(ctx, validation)
+					a.So(err, should.BeNil)
+					a.So(validation.Id, should.Equal, validationID)
+					a.So(validation.Token, should.Equal, "TOKEN")
+					a.So(len(validation.ContactInfo), should.Equal, 1)
 				})
-				a.So(err, should.BeNil)
-			})
 
-			t.Run("Validate_AfterValidate", func(t *T) {
+				t.Run("ValidateContactInfo", func(t *T) {
+					t.Run("ContactInfoDoesNotExist", func(t *T) {
+						a, ctx := test.New(t)
+						v := &ttnpb.ContactInfoValidation{
+							Id:          validationID,
+							Token:       "TOKEN",
+							Entity:      ids,
+							ContactInfo: []*ttnpb.ContactInfo{{}}, // Empty contact info.
+						}
+						err := s.ValidateContactInfo(ctx, v)
+						a.So(errors.IsNotFound(err), should.BeTrue)
+					})
+
+					t.Run("NoContactInfo", func(t *T) {
+						a, ctx := test.New(t)
+						v := &ttnpb.ContactInfoValidation{
+							Id:          validationID,
+							Token:       "TOKEN",
+							Entity:      ids,
+							ContactInfo: []*ttnpb.ContactInfo{},
+						}
+						err := s.ValidateContactInfo(ctx, v)
+						a.So(errors.IsFailedPrecondition(err), should.BeTrue)
+					})
+
+					t.Run("Valid", func(t *T) {
+						a, ctx := test.New(t)
+						err := s.ValidateContactInfo(ctx, validation)
+						a.So(err, should.BeNil)
+						// Checks if contactInfo was validated.
+						got, err := s.GetContactInfo(ctx, ids)
+						if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) && a.So(got, should.HaveLength, 1) {
+							a.So(got[0].ValidatedAt, should.NotBeNil)
+						}
+					})
+				})
+				t.Run("ExpireValidation", func(t *T) {
+					a, ctx := test.New(t)
+					err := s.ExpireValidation(ctx, validation)
+					a.So(err, should.BeNil)
+				})
+			})
+			t.Run("FetchUsedValidation_AfterValidate", func(t *T) {
 				a, ctx := test.New(t)
-				err := s.Validate(ctx, &ttnpb.ContactInfoValidation{
+				_, err := s.GetValidation(ctx, &ttnpb.ContactInfoValidation{
 					Id:    validationID,
 					Token: "TOKEN",
 				})
@@ -164,10 +214,9 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 					a.So(errors.IsFailedPrecondition(err), should.BeTrue)
 				}
 			})
-
-			t.Run("Validate_Other", func(t *T) {
+			t.Run("FetchNonExistentValidation", func(t *T) {
 				a, ctx := test.New(t)
-				err := s.Validate(ctx, &ttnpb.ContactInfoValidation{
+				_, err := s.GetValidation(ctx, &ttnpb.ContactInfoValidation{
 					Id:    validationID,
 					Token: "OTHER_TOKEN",
 				})

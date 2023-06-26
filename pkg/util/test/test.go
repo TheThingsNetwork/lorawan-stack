@@ -84,18 +84,18 @@ var (
 		Key: DefaultSNwkSIntKey.Bytes(),
 	}
 
-	DefaultAppSKeyEnvelopeWrapped     = Must(cryptoutil.WrapAES128KeyWithKEK(Context(), DefaultAppSKey, DefaultKEKLabel, DefaultKEK)).(*ttnpb.KeyEnvelope)
-	DefaultFNwkSIntKeyEnvelopeWrapped = Must(cryptoutil.WrapAES128KeyWithKEK(Context(), DefaultFNwkSIntKey, DefaultKEKLabel, DefaultKEK)).(*ttnpb.KeyEnvelope)
-	DefaultNwkSEncKeyEnvelopeWrapped  = Must(cryptoutil.WrapAES128KeyWithKEK(Context(), DefaultNwkSEncKey, DefaultKEKLabel, DefaultKEK)).(*ttnpb.KeyEnvelope)
-	DefaultSNwkSIntKeyEnvelopeWrapped = Must(cryptoutil.WrapAES128KeyWithKEK(Context(), DefaultSNwkSIntKey, DefaultKEKLabel, DefaultKEK)).(*ttnpb.KeyEnvelope)
+	DefaultAppSKeyEnvelopeWrapped     = Must(cryptoutil.WrapAES128KeyWithKEK(Context(), DefaultAppSKey, DefaultKEKLabel, DefaultKEK))
+	DefaultFNwkSIntKeyEnvelopeWrapped = Must(cryptoutil.WrapAES128KeyWithKEK(Context(), DefaultFNwkSIntKey, DefaultKEKLabel, DefaultKEK))
+	DefaultNwkSEncKeyEnvelopeWrapped  = Must(cryptoutil.WrapAES128KeyWithKEK(Context(), DefaultNwkSEncKey, DefaultKEKLabel, DefaultKEK))
+	DefaultSNwkSIntKeyEnvelopeWrapped = Must(cryptoutil.WrapAES128KeyWithKEK(Context(), DefaultSNwkSIntKey, DefaultKEKLabel, DefaultKEK))
 
 	DefaultAppSKeyWrapped     = DefaultAppSKeyEnvelopeWrapped.EncryptedKey
 	DefaultFNwkSIntKeyWrapped = DefaultFNwkSIntKeyEnvelopeWrapped.EncryptedKey
 	DefaultNwkSEncKeyWrapped  = DefaultNwkSEncKeyEnvelopeWrapped.EncryptedKey
 	DefaultSNwkSIntKeyWrapped = DefaultSNwkSIntKeyEnvelopeWrapped.EncryptedKey
 
-	DefaultNetID   = Must(types.NewNetID(2, []byte{0x00, 0x42, 0xff})).(types.NetID)
-	DefaultDevAddr = Must(types.NewDevAddr(DefaultNetID, []byte{0x00, 0x02, 0xff, 0xff})).(types.DevAddr)
+	DefaultNetID   = Must(types.NewNetID(2, []byte{0x00, 0x42, 0xff}))
+	DefaultDevAddr = Must(types.NewDevAddr(DefaultNetID, []byte{0x00, 0x02, 0xff, 0xff}))
 
 	DefaultLegacyAppSKey = crypto.DeriveLegacyAppSKey(DefaultNwkKey, DefaultJoinNonce, DefaultNetID, DefaultDevNonce)
 	DefaultLegacyNwkSKey = crypto.DeriveLegacyNwkSKey(DefaultNwkKey, DefaultJoinNonce, DefaultNetID, DefaultDevNonce)

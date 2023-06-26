@@ -36,13 +36,13 @@ func TestAttributesError(t *testing.T) {
 	err2 := err1.WithAttributes("bar", "baz")
 
 	a.So(err1, should.HaveSameErrorDefinitionAs, errInvalidFoo)
-	a.So(errors.Attributes(err1), should.Resemble, map[string]interface{}{"foo": "bar"})
-	a.So(errors.PublicAttributes(err1), should.Resemble, map[string]interface{}{"foo": "bar"})
+	a.So(errors.Attributes(err1), should.Resemble, map[string]any{"foo": "bar"})
+	a.So(errors.PublicAttributes(err1), should.Resemble, map[string]any{"foo": "bar"})
 
 	a.So(err2, should.HaveSameErrorDefinitionAs, err1)
 	a.So(err2, should.HaveSameErrorDefinitionAs, errInvalidFoo)
-	a.So(errors.Attributes(err2), should.Resemble, map[string]interface{}{"foo": "bar", "bar": "baz"})
-	a.So(errors.PublicAttributes(err2), should.Resemble, map[string]interface{}{"foo": "bar"})
+	a.So(errors.Attributes(err2), should.Resemble, map[string]any{"foo": "bar", "bar": "baz"})
+	a.So(errors.PublicAttributes(err2), should.Resemble, map[string]any{"foo": "bar"})
 }
 
 func TestAttributes(t *testing.T) {
@@ -50,8 +50,8 @@ func TestAttributes(t *testing.T) {
 
 	tcs := []struct {
 		Name   string
-		V      interface{}
-		Expect interface{}
+		V      any
+		Expect any
 	}{
 		{"int", int(42), int(42)},
 		{"float64", float64(42), float64(42)},

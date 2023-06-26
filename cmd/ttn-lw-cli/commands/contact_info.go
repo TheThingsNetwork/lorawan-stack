@@ -31,7 +31,7 @@ func listContactInfo(entityID *ttnpb.EntityIdentifiers) ([]*ttnpb.ContactInfo, e
 		return nil, err
 	}
 	fieldMask := ttnpb.FieldMask("contact_info")
-	var res interface{}
+	var res any
 	switch id := entityID.GetIds().(type) {
 	case *ttnpb.EntityIdentifiers_ApplicationIds:
 		res, err = ttnpb.NewApplicationRegistryClient(is).Get(ctx, &ttnpb.GetApplicationRequest{ApplicationIds: id.ApplicationIds, FieldMask: fieldMask})
@@ -58,7 +58,7 @@ func updateContactInfo(entityID *ttnpb.EntityIdentifiers, updater func([]*ttnpb.
 		return nil, err
 	}
 	fieldMask := ttnpb.FieldMask("contact_info")
-	var res interface{}
+	var res any
 	switch id := entityID.GetIds().(type) {
 	case *ttnpb.EntityIdentifiers_ApplicationIds:
 		res, err = ttnpb.NewApplicationRegistryClient(is).Get(ctx, &ttnpb.GetApplicationRequest{ApplicationIds: id.ApplicationIds, FieldMask: fieldMask})

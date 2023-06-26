@@ -29,7 +29,7 @@ import (
 
 type host struct{}
 
-type decodedMap map[string]interface{}
+type decodedMap map[string]any
 
 // New creates and returns a new CayenneLPP payload encoder and decoder.
 func New() messageprocessors.PayloadEncoderDecoder {
@@ -75,7 +75,7 @@ func (h *host) DecodeUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers
 	defer trace.StartRegion(ctx, "decode uplink message").End()
 
 	decoder := lpp.NewDecoder(bytes.NewBuffer(msg.FrmPayload))
-	m := decodedMap(make(map[string]interface{}))
+	m := decodedMap(make(map[string]any))
 	if err := decoder.DecodeUplink(m); err != nil {
 		return errOutput.WithCause(err)
 	}
@@ -92,7 +92,7 @@ func (h *host) DecodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifie
 	defer trace.StartRegion(ctx, "decode downlink message").End()
 
 	decoder := lpp.NewDecoder(bytes.NewBuffer(msg.FrmPayload))
-	m := decodedMap(make(map[string]interface{}))
+	m := decodedMap(make(map[string]any))
 	if err := decoder.DecodeDownlink(m); err != nil {
 		return errOutput.WithCause(err)
 	}

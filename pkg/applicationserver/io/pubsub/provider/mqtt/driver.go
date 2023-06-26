@@ -69,7 +69,7 @@ func (t *topic) SendBatch(ctx context.Context, msgs []*driver.Message) error {
 			return ctx.Err()
 		}
 		if msg.BeforeSend != nil {
-			asFunc := func(i interface{}) bool { return false }
+			asFunc := func(i any) bool { return false }
 			if err := msg.BeforeSend(asFunc); err != nil {
 				return err
 			}
@@ -104,7 +104,7 @@ func encodeMessage(dm *driver.Message) ([]byte, error) {
 }
 
 func decodeMessage(message mqtt.Message) (*driver.Message, error) {
-	asFunc := func(i interface{}) bool {
+	asFunc := func(i any) bool {
 		p, ok := i.(*mqtt.Message)
 		if !ok {
 			return false
@@ -131,7 +131,7 @@ func decodeMessage(message mqtt.Message) (*driver.Message, error) {
 func (*topic) IsRetryable(error) bool { return false }
 
 // As implements driver.Topic.
-func (t *topic) As(i interface{}) bool {
+func (t *topic) As(i any) bool {
 	c, ok := i.(*mqtt.Client)
 	if !ok {
 		return false
@@ -141,7 +141,7 @@ func (t *topic) As(i interface{}) bool {
 }
 
 // ErrorAs implements driver.Topic.
-func (*topic) ErrorAs(error, interface{}) bool { return false }
+func (*topic) ErrorAs(error, any) bool { return false }
 
 // ErrorCode implements driver.Topic.
 func (*topic) ErrorCode(err error) gcerrors.ErrorCode {
@@ -235,7 +235,7 @@ func (*subscription) SendNacks(context.Context, []driver.AckID) error { panic("u
 func (*subscription) IsRetryable(error) bool { return false }
 
 // As implements driver.Subscription.
-func (s *subscription) As(i interface{}) bool {
+func (s *subscription) As(i any) bool {
 	c, ok := i.(*mqtt.Client)
 	if !ok {
 		return false
@@ -245,7 +245,7 @@ func (s *subscription) As(i interface{}) bool {
 }
 
 // ErrorAs implements driver.Subscription.
-func (*subscription) ErrorAs(error, interface{}) bool { return false }
+func (*subscription) ErrorAs(error, any) bool { return false }
 
 // ErrorCode implements driver.Subscription.
 func (*subscription) ErrorCode(err error) gcerrors.ErrorCode {

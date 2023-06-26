@@ -71,7 +71,7 @@ func (m *MessageDescriptor) Load() error {
 }
 
 // Format a message descriptor in the given language.
-func (m *MessageDescriptor) Format(language string, data map[string]interface{}) (msg string) {
+func (m *MessageDescriptor) Format(language string, data map[string]any) (msg string) {
 	var err error
 	if fmt := m.translationFormats[language]; fmt != nil {
 		msg, err = fmt.FormatMap(data)
@@ -85,7 +85,7 @@ func (m *MessageDescriptor) Format(language string, data map[string]interface{})
 }
 
 // Format a message from the global registry in the given language.
-func Format(id, language string, data map[string]interface{}) (msg string) {
+func Format(id, language string, data map[string]any) (msg string) {
 	return Get(id).Format(language, data)
 }
 

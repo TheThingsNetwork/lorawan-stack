@@ -22,6 +22,7 @@ import (
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -80,8 +81,23 @@ var (
 			if err != nil {
 				return err
 			}
+			if err := getStoredUp(cmd, args, client, os.Stdout); err != nil {
+				return err
+			}
 
-			return getStoredUp(cmd, args, client, os.Stdout)
+			md, err := client.Header()
+			if err != nil {
+				return err
+			}
+
+			token, err := newContinuationTokenFromMD(md)
+			if errors.IsUnavailable(err) {
+				return nil
+			}
+			if err != nil {
+				return err
+			}
+			return io.Write(os.Stdout, config.OutputFormat, token)
 		},
 	}
 	endDeviceStorageCountCommand = &cobra.Command{
@@ -136,7 +152,23 @@ var (
 				return err
 			}
 
-			return getStoredUp(cmd, args, client, os.Stdout)
+			if err := getStoredUp(cmd, args, client, os.Stdout); err != nil {
+				return err
+			}
+
+			md, err := client.Header()
+			if err != nil {
+				return err
+			}
+
+			token, err := newContinuationTokenFromMD(md)
+			if errors.IsUnavailable(err) {
+				return nil
+			}
+			if err != nil {
+				return err
+			}
+			return io.Write(os.Stdout, config.OutputFormat, token)
 		},
 	}
 	applicationsStorageCountCommand = &cobra.Command{

@@ -73,7 +73,7 @@ func TestFields(t *testing.T) {
 
 	err := errFront.WithCause(errIntermediary.WithCause(errBack))
 	fields := err.Fields()
-	a.So(fields, should.HaveEmptyDiff, map[string]interface{}{
+	a.So(fields, should.HaveEmptyDiff, map[string]any{
 		"error_cause":       "error:pkg/errors_test:intermediary (intermediary)",
 		"error_cause_cause": "back",
 	})
@@ -133,7 +133,7 @@ func TestNetErrors(t *testing.T) {
 			Validate: func(err error, e *errors.Error, a *assertions.Assertion) {
 				a.So(e.FullName(), should.Equal, "pkg/errors:net_dns")
 				a.So(errors.IsUnavailable(e), should.BeTrue)
-				a.So(e.PublicAttributes(), should.Resemble, map[string]interface{}{
+				a.So(e.PublicAttributes(), should.Resemble, map[string]any{
 					"message":   err.Error(),
 					"timeout":   false,
 					"not_found": true,
@@ -146,7 +146,7 @@ func TestNetErrors(t *testing.T) {
 			Validate: func(err error, e *errors.Error, a *assertions.Assertion) {
 				a.So(e.FullName(), should.Equal, "pkg/errors:net_unknown_network")
 				a.So(errors.IsNotFound(e), should.BeTrue)
-				a.So(e.PublicAttributes(), should.Resemble, map[string]interface{}{
+				a.So(e.PublicAttributes(), should.Resemble, map[string]any{
 					"message": err.Error(),
 					"timeout": false,
 				})
@@ -158,7 +158,7 @@ func TestNetErrors(t *testing.T) {
 			Validate: func(err error, e *errors.Error, a *assertions.Assertion) {
 				a.So(e.FullName(), should.Equal, "pkg/errors:net_invalid_addr")
 				a.So(errors.IsInvalidArgument(e), should.BeTrue)
-				a.So(e.PublicAttributes(), should.Resemble, map[string]interface{}{
+				a.So(e.PublicAttributes(), should.Resemble, map[string]any{
 					"message": err.Error(),
 					"timeout": false,
 				})
@@ -173,7 +173,7 @@ func TestNetErrors(t *testing.T) {
 			Validate: func(err error, e *errors.Error, a *assertions.Assertion) {
 				a.So(e.FullName(), should.Equal, "pkg/errors:net_addr")
 				a.So(errors.IsUnavailable(e), should.BeTrue)
-				a.So(e.PublicAttributes(), should.Resemble, map[string]interface{}{
+				a.So(e.PublicAttributes(), should.Resemble, map[string]any{
 					"message": err.Error(),
 					"timeout": false,
 				})
@@ -191,7 +191,7 @@ func TestNetErrors(t *testing.T) {
 			Validate: func(_ error, e *errors.Error, a *assertions.Assertion) {
 				a.So(e.FullName(), should.Equal, "pkg/errors:net_operation")
 				a.So(errors.IsUnavailable(e), should.BeTrue)
-				a.So(e.PublicAttributes(), should.Resemble, map[string]interface{}{
+				a.So(e.PublicAttributes(), should.Resemble, map[string]any{
 					"timeout": false,
 					"address": "1.1.1.1",
 					"source":  "2.2.2.2",
@@ -212,7 +212,7 @@ func TestNetErrors(t *testing.T) {
 			Validate: func(_ error, e *errors.Error, a *assertions.Assertion) {
 				a.So(e.FullName(), should.Equal, "pkg/errors:net_operation")
 				a.So(errors.IsUnavailable(e), should.BeTrue)
-				a.So(e.PublicAttributes(), should.Resemble, map[string]interface{}{
+				a.So(e.PublicAttributes(), should.Resemble, map[string]any{
 					"timeout": false,
 					"address": "1.1.1.1",
 					"source":  "2.2.2.2",

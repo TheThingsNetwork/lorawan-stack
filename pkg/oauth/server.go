@@ -135,7 +135,7 @@ type osinLogger struct {
 	ctx context.Context
 }
 
-func (l *osinLogger) Printf(format string, v ...interface{}) {
+func (l *osinLogger) Printf(format string, v ...any) {
 	logger := log.FromContext(l.ctx)
 	if strings.HasPrefix(format, osinErrorFormat) && len(v) >= 2 {
 		format = strings.TrimPrefix(format, osinErrorFormat)

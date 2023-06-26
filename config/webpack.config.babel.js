@@ -109,7 +109,6 @@ const env = (obj = {}) => {
   }
 }
 
-// Export the style config for usage in the storybook config.
 export const styleConfig = {
   test: /\.(styl|css)$/,
   include,
@@ -127,7 +126,7 @@ export const styleConfig = {
           exportLocalsConvention: 'camelCase',
           localIdentName: env({
             production: '[hash:base64:10]',
-            development: '[path][local]-[hash:base64:10]',
+            development: '[local]-[hash:base64:4]',
           }),
         },
       },
@@ -151,10 +150,6 @@ export default {
   stats: 'minimal',
   target: 'web',
   devtool: production ? false : 'eval-source-map',
-  node: {
-    fs: 'empty',
-    module: 'empty',
-  },
   resolve: {
     alias: env({
       all: {
@@ -169,11 +164,11 @@ export default {
     }),
   },
   devServer: {
+    devMiddleware: {
+      publicPath: `${ASSETS_ROOT}/`,
+    },
     port: 8080,
-    inline: true,
     hot: !WEBPACK_DEV_SERVER_DISABLE_HMR,
-    stats: 'minimal',
-    publicPath: `${ASSETS_ROOT}/`,
     proxy: [
       {
         context: ['/console', '/account', '/oauth', '/api', '/assets/blob'],
@@ -200,8 +195,6 @@ export default {
   output: {
     filename: production ? '[name].[chunkhash].js' : '[name].js',
     chunkFilename: production ? '[name].[chunkhash].js' : '[name].js',
-    hashDigest: 'hex',
-    hashDigestLength: 20,
     path: path.resolve(context, PUBLIC_DIR),
     crossOriginLoading: 'anonymous',
     publicPath: ASSETS_ROOT,
@@ -216,7 +209,7 @@ export default {
         },
       },
     },
-    removeAvailableModules: false,
+    removeEmptyChunks: false,
   },
   module: {
     rules: [
@@ -238,9 +231,9 @@ export default {
       },
       {
         test: /\.(woff|woff2|ttf|eot|jpg|jpeg|png|svg)$/i,
-        loader: 'file-loader',
-        options: {
-          name: '[name].[hash:hex:20].[ext]',
+        type: 'asset/resource',
+        generator: {
+          filename: '[name].[contenthash:20][ext]',
         },
       },
       styleConfig,
@@ -261,8 +254,6 @@ export default {
   },
   plugins: env({
     all: [
-      new webpack.NamedModulesPlugin(),
-      new webpack.NamedChunksPlugin(),
       new webpack.EnvironmentPlugin({
         NODE_ENV,
         VERSION: version,
@@ -293,8 +284,9 @@ export default {
           production: ['!libs.*.bundle.js', '!libs.*.bundle.js.map'],
         }),
       }),
-      // Copy static assets to output directory.
-      new CopyWebpackPlugin({ patterns: [{ from: `${src}/assets/static` }] }),
+      new CopyWebpackPlugin({
+        patterns: [{ from: `${src}/assets/static` }],
+      }),
       new webpack.DllReferencePlugin({
         context,
         manifest: path.resolve(context, CACHE_DIR, 'dll.json'),
@@ -315,11 +307,9 @@ export default {
     ],
     development: [
       ...(!WEBPACK_DEV_SERVER_DISABLE_HMR ? [new ReactRefreshWebpackPlugin()] : []),
-      new webpack.WatchIgnorePlugin([
-        /node_modules/,
-        /locales/,
-        new RegExp(path.resolve(context, PUBLIC_DIR)),
-      ]),
+      new webpack.WatchIgnorePlugin({
+        paths: [/node_modules/, /locales/, path.resolve(context, PUBLIC_DIR)],
+      }),
       new ShellPlugin({
         onBuildExit: [`${MAGE} js:extractLocaleFiles`],
       }),

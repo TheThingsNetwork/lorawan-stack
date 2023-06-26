@@ -641,7 +641,8 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			if request.Rx1Delay == ttnpb.RxDelay_RX_DELAY_0 {
 				return false, false, 0, errNoRxDelay.New()
 			}
-			settings.Timestamp = uplinkToken.Timestamp + uint32((time.Duration(request.Rx1Delay)*time.Second+rx.delay)/time.Microsecond)
+			rxDelay := time.Duration(request.Rx1Delay)*time.Second + rx.delay
+			settings.Timestamp = uplinkToken.Timestamp + uint32(rxDelay/time.Microsecond)
 		case ttnpb.Class_CLASS_B:
 			if request.AbsoluteTime == nil {
 				return false, false, 0, errNoAbsoluteTime.New()
@@ -688,13 +689,17 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		rx2 = i == 1
 		rxErrs = nil
 		delay = time.Duration(em.Starts() - now)
-		logger.WithFields(log.Fields(
+		logger = logger.WithFields(log.Fields(
 			"rx_window", i+1,
 			"starts", em.Starts(),
 			"duration", em.Duration(),
 			"now", now,
 			"delay", delay,
-		)).Debug("Scheduled downlink")
+		))
+		if delay >= scheduling.DutyCycleWindow {
+			logger.Info("Scheduling delay beyond duty cycle window")
+		}
+		logger.Debug("Scheduled downlink")
 		break
 	}
 	if len(rxErrs) > 0 {

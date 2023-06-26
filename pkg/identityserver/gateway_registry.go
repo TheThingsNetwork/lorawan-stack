@@ -182,7 +182,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 				}, []string{"ids.gateway_id", "ids.eui", "administrative_contact"})
 				return err
 			}); err == nil {
-				attributes := []interface{}{
+				attributes := []any{
 					"gateway_eui", types.MustEUI64(reqGtw.GetIds().GetEui()).OrZero().String(),
 					"gateway_id", existing.GetIds().GetGatewayId(),
 				}

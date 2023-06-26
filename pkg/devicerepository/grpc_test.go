@@ -182,18 +182,18 @@ func TestGRPC(t *testing.T) {
 	t.Run("Auth", func(t *testing.T) {
 		for _, atc := range []struct {
 			name    string
-			execute func(opts ...grpc.CallOption) (interface{}, error)
+			execute func(opts ...grpc.CallOption) (any, error)
 		}{
 			{
 				name: "ListBrands",
-				execute: func(opts ...grpc.CallOption) (interface{}, error) {
+				execute: func(opts ...grpc.CallOption) (any, error) {
 					response, err := cl.ListBrands(ctx, &ttnpb.ListEndDeviceBrandsRequest{}, opts...)
 					return response, err
 				},
 			},
 			{
 				name: "GetBrand",
-				execute: func(opts ...grpc.CallOption) (interface{}, error) {
+				execute: func(opts ...grpc.CallOption) (any, error) {
 					response, err := cl.GetBrand(ctx, &ttnpb.GetEndDeviceBrandRequest{
 						BrandId: "brand1",
 					}, opts...)
@@ -202,7 +202,7 @@ func TestGRPC(t *testing.T) {
 			},
 			{
 				name: "ListModels",
-				execute: func(opts ...grpc.CallOption) (interface{}, error) {
+				execute: func(opts ...grpc.CallOption) (any, error) {
 					response, err := cl.ListModels(ctx, &ttnpb.ListEndDeviceModelsRequest{
 						BrandId: "brand1",
 					}, opts...)
@@ -211,7 +211,7 @@ func TestGRPC(t *testing.T) {
 			},
 			{
 				name: "GetModel",
-				execute: func(opts ...grpc.CallOption) (interface{}, error) {
+				execute: func(opts ...grpc.CallOption) (any, error) {
 					response, err := cl.GetModel(ctx, &ttnpb.GetEndDeviceModelRequest{
 						BrandId: "brand1",
 						ModelId: "model1",
@@ -221,7 +221,7 @@ func TestGRPC(t *testing.T) {
 			},
 			{
 				name: "GetTemplate",
-				execute: func(opts ...grpc.CallOption) (interface{}, error) {
+				execute: func(opts ...grpc.CallOption) (any, error) {
 					response, err := cl.GetTemplate(ctx, &ttnpb.GetTemplateRequest{
 						VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
 							BrandId: "brand1",
@@ -233,7 +233,7 @@ func TestGRPC(t *testing.T) {
 			},
 			{
 				name: "GetUplinkDecoder",
-				execute: func(opts ...grpc.CallOption) (interface{}, error) {
+				execute: func(opts ...grpc.CallOption) (any, error) {
 					response, err := cl.GetUplinkDecoder(ctx, &ttnpb.GetPayloadFormatterRequest{
 						VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
 							BrandId: "brand1",
@@ -245,7 +245,7 @@ func TestGRPC(t *testing.T) {
 			},
 			{
 				name: "GetDownlinkDecoder",
-				execute: func(opts ...grpc.CallOption) (interface{}, error) {
+				execute: func(opts ...grpc.CallOption) (any, error) {
 					response, err := cl.GetDownlinkDecoder(ctx, &ttnpb.GetPayloadFormatterRequest{
 						VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
 							BrandId: "brand1",
@@ -257,7 +257,7 @@ func TestGRPC(t *testing.T) {
 			},
 			{
 				name: "GetDownlinkEncoder",
-				execute: func(opts ...grpc.CallOption) (interface{}, error) {
+				execute: func(opts ...grpc.CallOption) (any, error) {
 					response, err := cl.GetDownlinkEncoder(ctx, &ttnpb.GetPayloadFormatterRequest{
 						VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
 							BrandId: "brand1",

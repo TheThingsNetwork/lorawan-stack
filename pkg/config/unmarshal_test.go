@@ -36,7 +36,7 @@ func TestUnmarshal(t *testing.T) {
 	err = mgr.MergeConfig(strings.NewReader(`file-only: 10`))
 	a.So(err, should.BeNil)
 
-	var res map[string]interface{}
+	var res map[string]any
 	err = mgr.Unmarshal(&res)
 	a.So(err, should.BeNil)
 	a.So(res, should.ContainKey, "file-only")

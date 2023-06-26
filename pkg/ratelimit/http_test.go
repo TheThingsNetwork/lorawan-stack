@@ -68,7 +68,7 @@ func TestHTTP(t *testing.T) {
 			name   string
 			req1   *http.Request
 			req2   *http.Request
-			assert func(interface{}, ...interface{}) string
+			assert func(any, ...any) string
 		}{
 			{
 				name:   "ByIP",

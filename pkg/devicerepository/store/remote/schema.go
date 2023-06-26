@@ -294,9 +294,9 @@ type EncodedCodecData struct {
 }
 
 type DecodedCodecData struct {
-	Data     map[string]interface{} `yaml:"data"`
-	Warnings []string               `yaml:"warnings"`
-	Errors   []string               `yaml:"errors"`
+	Data     map[string]any `yaml:"data"`
+	Warnings []string       `yaml:"warnings"`
+	Errors   []string       `yaml:"errors"`
 }
 
 type DecoderCodecExample struct {

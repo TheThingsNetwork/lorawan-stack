@@ -96,7 +96,7 @@ func TestNewRPCServer(t *testing.T) {
 
 		a.So(mock.pushCtx, should.NotBeNil)
 		a.So(mock.pushCtx.Value(&mockKey{}), should.Resemble, "foo")
-		a.So(grpc_ctxtags.Extract(mock.pushCtx).Values(), should.Resemble, map[string]interface{}{
+		a.So(grpc_ctxtags.Extract(mock.pushCtx).Values(), should.Resemble, map[string]any{
 			"peer.address":                "pipe",
 			"grpc.request.device_id":      "foo",
 			"grpc.request.application_id": "bar",
@@ -124,7 +124,7 @@ func TestNewRPCServer(t *testing.T) {
 		a.So(msg, should.Resemble, applicationUp)
 
 		a.So(mock.subCtx.Value(&mockKey{}), should.Resemble, "foo")
-		a.So(grpc_ctxtags.Extract(mock.subCtx).Values(), should.Resemble, map[string]interface{}{
+		a.So(grpc_ctxtags.Extract(mock.subCtx).Values(), should.Resemble, map[string]any{
 			"peer.address":                "pipe",
 			"grpc.request.application_id": "bar",
 		})
@@ -152,12 +152,12 @@ type mockServer struct {
 	subIDs *ttnpb.ApplicationIdentifiers
 }
 
-func UnaryServerInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+func UnaryServerInterceptor(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 	ctx = context.WithValue(ctx, &mockKey2{}, "bar")
 	return handler(ctx, req)
 }
 
-func StreamServerInterceptor(srv interface{}, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+func StreamServerInterceptor(srv any, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 	wrapped := grpc_middleware.WrapServerStream(ss)
 	wrapped.WrappedContext = context.WithValue(ss.Context(), &mockKey2{}, "foo")
 	return handler(srv, wrapped)

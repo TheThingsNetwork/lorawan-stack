@@ -43,7 +43,7 @@ type Event interface {
 	Name() string
 	Time() time.Time
 	Identifiers() []*ttnpb.EntityIdentifiers
-	Data() interface{}
+	Data() any
 	CorrelationIds() []string
 	Origin() string
 	Caller() string
@@ -90,7 +90,7 @@ func local(evt Event) *event {
 type event struct {
 	ctx        context.Context
 	innerEvent *ttnpb.Event
-	data       interface{}
+	data       any
 	caller     string
 }
 
@@ -152,7 +152,7 @@ func (e event) Time() time.Time {
 	return time.Time{}
 }
 func (e event) Identifiers() []*ttnpb.EntityIdentifiers { return e.innerEvent.Identifiers }
-func (e event) Data() interface{}                       { return e.data }
+func (e event) Data() any                               { return e.data }
 func (e event) CorrelationIds() []string                { return e.innerEvent.CorrelationIds }
 func (e event) Origin() string                          { return e.innerEvent.Origin }
 func (e event) Caller() string                          { return e.caller }
@@ -176,7 +176,7 @@ func New(ctx context.Context, name, description string, opts ...Option) Event {
 	return (&definition{name: name, description: description}).New(ctx, opts...)
 }
 
-func marshalData(data interface{}) (anyPB *anypb.Any, err error) {
+func marshalData(data any) (anyPB *anypb.Any, err error) {
 	if protoMessage, ok := data.(proto.Message); ok {
 		anyPB, err = anypb.New(protoMessage)
 		if err != nil {
@@ -234,7 +234,7 @@ func FromProto(pb *ttnpb.Event) (Event, error) {
 	if err != nil {
 		return nil, err
 	}
-	var data interface{}
+	var data any
 	if pb.Data != nil {
 		anyMsg, err := pb.Data.UnmarshalNew()
 		if err != nil {

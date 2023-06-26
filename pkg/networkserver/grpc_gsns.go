@@ -1171,8 +1171,8 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 
 	pld := up.Payload.GetJoinRequestPayload()
 	ctx = log.NewContextWithFields(ctx, log.Fields(
-		"dev_eui", pld.DevEui,
-		"join_eui", pld.JoinEui,
+		"dev_eui", types.MustEUI64(pld.DevEui).OrZero(),
+		"join_eui", types.MustEUI64(pld.JoinEui).OrZero(),
 	))
 
 	ok, err := ns.deduplicateUplink(ctx, up, joinRequestCollectionWindow, initialDeduplicationRound)

@@ -28,8 +28,8 @@ import (
 
 func TestSetRelations(t *testing.T) {
 	for _, tc := range []struct {
-		A            interface{}
-		B            interface{}
+		A            any
+		B            any
 		AIsSubsetOfB bool
 		BIsSubsetOfA bool
 	}{
@@ -78,14 +78,14 @@ func TestSetRelations(t *testing.T) {
 			B: [][]byte{{'a'}, {'b'}},
 		},
 		{
-			A: map[string]interface{}{"a": 42, "d": 77},
+			A: map[string]any{"a": 42, "d": 77},
 			B: map[string]int{"a": 42, "b": 77},
 
 			AIsSubsetOfB: true,
 			BIsSubsetOfA: true,
 		},
 		{
-			A: map[string]interface{}{"a": 42, "d": 77},
+			A: map[string]any{"a": 42, "d": 77},
 			B: []int{42, 77},
 
 			AIsSubsetOfB: true,
@@ -100,14 +100,14 @@ func TestSetRelations(t *testing.T) {
 		},
 		{
 			A: func() *sync.Map { m := &sync.Map{}; m.Store("42", 42); m.Store("77", "b"); return m }(),
-			B: map[string]interface{}{"42": 42, "77": "b"},
+			B: map[string]any{"42": 42, "77": "b"},
 
 			AIsSubsetOfB: true,
 			BIsSubsetOfA: true,
 		},
 		{
 			A: func() *sync.Map { m := &sync.Map{}; m.Store("42", 42); m.Store("77", "b"); return m }(),
-			B: map[string]interface{}{"42": 42.2, "77": "b"},
+			B: map[string]any{"42": 42.2, "77": "b"},
 		},
 		{
 			A: []int{42},
@@ -153,7 +153,7 @@ func TestSetRelations(t *testing.T) {
 		},
 	} {
 		t.Run(fmt.Sprintf("%v/%v", tc.A, tc.B), func(t *testing.T) {
-			for _, eq := range []interface{}{
+			for _, eq := range []any{
 				reflect.DeepEqual,
 				DiffEqual,
 			} {

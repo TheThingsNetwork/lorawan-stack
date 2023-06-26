@@ -179,12 +179,9 @@ func (st *StoreTest) TestAPIKeyStoreCRUD(t *T) {
 				}
 			})
 
-			t.Run("UpdateAPIKey_Delete", func(t *T) {
+			t.Run("DeleteAPIKey", func(t *T) {
 				a, ctx := test.New(t)
-				_, err := s.UpdateAPIKey(ctx, ids, &ttnpb.APIKey{
-					Id:     id,
-					Rights: nil,
-				}, fieldMask("rights"))
+				err := s.DeleteAPIKey(ctx, ids, &ttnpb.APIKey{Id: id})
 				a.So(err, should.BeNil)
 			})
 

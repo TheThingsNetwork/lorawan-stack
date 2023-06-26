@@ -28,7 +28,7 @@ import (
 
 // Write output to Stdout.
 // Uses either JSON or formats using the configured template.
-func Write(w io.Writer, format string, data interface{}) (err error) {
+func Write(w io.Writer, format string, data any) (err error) {
 	defer func() {
 		fmt.Fprintln(w)
 	}()
@@ -40,14 +40,14 @@ func Write(w io.Writer, format string, data interface{}) (err error) {
 		panic(fmt.Sprintf("unsupported value: %T", data))
 	}
 	var prefix, sep, suffix []byte
-	var writeItem func(interface{}) error
+	var writeItem func(any) error
 	switch format {
 	case "json":
 		jsonpb := jsonpb.TTN()
 		jsonpb.Indent = "  "
 		encoder := jsonpb.NewEncoder(w)
 		prefix, sep, suffix = []byte("["), []byte(", "), []byte("]")
-		writeItem = func(v interface{}) error {
+		writeItem = func(v any) error {
 			return encoder.Encode(v)
 		}
 	default:
@@ -57,7 +57,7 @@ func Write(w io.Writer, format string, data interface{}) (err error) {
 			return err
 		}
 		sep = []byte("\n")
-		writeItem = func(v interface{}) error {
+		writeItem = func(v any) error {
 			return tmpl.Execute(w, v)
 		}
 	}

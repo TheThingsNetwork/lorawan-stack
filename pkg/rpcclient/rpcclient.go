@@ -37,6 +37,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/version"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
+	"google.golang.org/grpc/resolver"
 )
 
 // DefaultDialOptions for gRPC clients
@@ -77,4 +78,8 @@ func DefaultDialOptions(ctx context.Context) []grpc.DialOption {
 			PermitWithoutStream: false,
 		}),
 	}
+}
+
+func init() {
+	resolver.SetDefaultScheme("dns")
 }
