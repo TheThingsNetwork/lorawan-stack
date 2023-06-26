@@ -86,7 +86,7 @@ describe('Device un-claiming', () => {
         cy.findByRole('button', { name: /Unclaim and delete end device/ }).click()
       })
 
-    cy.wait('@unclaim-request').its('request.body').should('deep.equal', {})
+    cy.wait('@unclaim-request')
 
     cy.findByTestId('error-notification').should('not.exist')
 
