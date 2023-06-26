@@ -2285,9 +2285,18 @@
       "file": "messages.go"
     }
   },
-  "error:pkg/applicationserver/io/packages/loragls/v3:encoding_recent_uplinks": {
+  "error:pkg/applicationserver/io/packages/loragls/v3:decoding_field": {
     "translations": {
-      "en": "encoding recent uplinks"
+      "en": "decoding field `{field}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/loragls/v3",
+      "file": "data.go"
+    }
+  },
+  "error:pkg/applicationserver/io/packages/loragls/v3:encoding_field": {
+    "translations": {
+      "en": "encoding field `{field}`"
     },
     "description": {
       "package": "pkg/applicationserver/io/packages/loragls/v3",

@@ -16,6 +16,7 @@ package loracloudgeolocationv3
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/gob"
 	"fmt"
 	"net/url"
@@ -31,7 +32,8 @@ var (
 	errFieldNotFound = errors.DefineNotFound("field_not_found", "field `{field}` not found")
 	errInvalidType   = errors.DefineCorruption("invalid_type", "wrong type `{type}`")
 	errInvalidValue  = errors.DefineCorruption("invalid_value", "wrong value `{value}`")
-	errEncoding      = errors.DefineCorruption("encoding_recent_uplinks", "encoding recent uplinks")
+	errEncodingField = errors.DefineCorruption("encoding_field", "encoding field `{field}`")
+	errDecodingField = errors.DefineCorruption("decoding_field", "decoding field `{field}`")
 )
 
 // UplinkMetadata contains the uplink metadata stored by the package.
@@ -163,9 +165,20 @@ func toRecentMD(mds []*UplinkMetadata) (*structpb.Value, error) {
 	gobBytes := new(bytes.Buffer)
 	gobEncoder := gob.NewEncoder(gobBytes)
 	if err := gobEncoder.Encode(mds); err != nil {
-		return nil, errEncoding.WithCause(err)
+		return nil, errEncodingField.WithCause(err)
 	}
-	return toString(gobBytes.String()), nil
+
+	base64Bytes := new(bytes.Buffer)
+	base64Encoder := base64.NewEncoder(base64.RawStdEncoding, base64Bytes)
+	if _, err := base64Encoder.Write(gobBytes.Bytes()); err != nil {
+		return nil, errEncodingField.WithCause(err).WithAttributes("field", recentMDField)
+	}
+
+	if err := base64Encoder.Close(); err != nil {
+		return nil, errEncodingField.WithCause(err).WithAttributes("field", recentMDField)
+	}
+
+	return toString(base64Bytes.String()), nil
 }
 
 // Struct serializes the configuration to *structpb.Struct.
@@ -227,11 +240,18 @@ func recentMDFromValue(v *structpb.Value) ([]*UplinkMetadata, error) {
 	if !ok {
 		return nil, errInvalidType.WithAttributes("type", fmt.Sprintf("%T", v.Kind))
 	}
-	byteV := bytes.NewBufferString(sv.StringValue)
-	dec := gob.NewDecoder(byteV)
+
+	base64Bytes := bytes.NewBufferString(sv.StringValue)
+	base64Decoder := base64.NewDecoder(base64.RawStdEncoding, base64Bytes)
+	gobBytes := new(bytes.Buffer)
+	if _, err := gobBytes.ReadFrom(base64Decoder); err != nil {
+		return nil, errDecodingField.WithCause(err).WithAttributes("field", recentMDField)
+	}
+
 	var mds []*UplinkMetadata
-	if err := dec.Decode(&mds); err != nil {
-		return nil, err
+	gobDecoder := gob.NewDecoder(gobBytes)
+	if err := gobDecoder.Decode(&mds); err != nil {
+		return nil, errDecodingField.WithCause(err).WithAttributes("field", recentMDField)
 	}
 	return mds, nil
 }
