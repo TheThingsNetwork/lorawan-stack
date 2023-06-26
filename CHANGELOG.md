@@ -21,7 +21,6 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
-- Console not applying webhook field masks when creating a webhook from a template that has field masks set.
 - Removing user invitations not working in the user management panel for administrators.
 - Fix payload formatter page launching malformed requests in the Console.
 - HTTP API routes for parsing QR codes for the QR Generator service. We exercise our right to break compatibility with third party HTTP clients since this is a bug.
