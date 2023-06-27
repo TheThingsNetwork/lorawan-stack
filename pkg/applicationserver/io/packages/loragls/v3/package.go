@@ -415,23 +415,28 @@ func (*GeolocationPackage) mergePackageData(
 			return nil, err
 		}
 	}
-	var merged Data
-	for _, data := range []*Data{
-		&defaultData,
-		&associationData,
-	} {
-		if data.Query != 0 {
-			merged.Query = data.Query
-		}
-		if data.ServerURL != nil {
-			merged.ServerURL = urlutil.CloneURL(data.ServerURL)
-		}
-		if data.Token != "" {
-			merged.Token = data.Token
-		}
-		if len(data.RecentMetadata) > 0 {
-			merged.RecentMetadata = data.RecentMetadata
-		}
+
+	merged := Data{
+		Query:                defaultData.Query,
+		MultiFrame:           defaultData.MultiFrame,
+		MultiFrameWindowSize: defaultData.MultiFrameWindowSize,
+		MultiFrameWindowAge:  defaultData.MultiFrameWindowAge,
+		ServerURL:            defaultData.ServerURL,
+		Token:                defaultData.Token,
+		RecentMetadata:       defaultData.RecentMetadata,
+	}
+
+	if associationData.Query != 0 {
+		merged.Query = associationData.Query
+	}
+	if associationData.ServerURL != nil {
+		merged.ServerURL = urlutil.CloneURL(associationData.ServerURL)
+	}
+	if associationData.Token != "" {
+		merged.Token = associationData.Token
+	}
+	if len(associationData.RecentMetadata) > 0 {
+		merged.RecentMetadata = associationData.RecentMetadata
 	}
 	if merged.ServerURL == nil {
 		merged.ServerURL = urlutil.CloneURL(api.DefaultServerURL)
