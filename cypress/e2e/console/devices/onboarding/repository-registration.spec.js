@@ -262,9 +262,7 @@ describe('End device repository manual registration', () => {
 
       beforeEach(() => {
         cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
-        cy.visit(
-          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/add/repository`,
-        )
+        cy.visit(`${Cypress.config('consoleRootPath')}/applications/${appId}/devices/add`)
       })
 
       it('displays UI elements in place', () => {
@@ -443,9 +441,7 @@ describe('End device repository manual registration', () => {
         })
 
         cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
-        cy.visit(
-          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/add/repository`,
-        )
+        cy.visit(`${Cypress.config('consoleRootPath')}/applications/${appId}/devices/add`)
       })
 
       it('validates before submitting an empty form', () => {
@@ -465,7 +461,7 @@ describe('End device repository manual registration', () => {
 
         cy.location('pathname').should(
           'eq',
-          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/add/repository`,
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/add`,
         )
 
         cy.findErrorByLabelText('Device address')

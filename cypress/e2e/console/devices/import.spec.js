@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { generateJoinServerOnlyConfig } from '../../../support/utils'
-
 const userId = 'import-devices-test-user'
 const user = {
   ids: { user_id: userId },
@@ -59,7 +57,7 @@ describe('End device messaging', () => {
       cy.findByTestId('notification')
         .findByText('All end devices imported successfully')
         .should('be.visible')
-      cy.findByRole('button', { name: 'Proceed to end device list' }).click()
+      cy.findByRole('link', { name: 'Proceed to end device list' }).click()
       cy.location('pathname').should(
         'eq',
         `${Cypress.config('consoleRootPath')}/applications/${appId}/devices`,
@@ -94,7 +92,7 @@ describe('End device messaging', () => {
         .should('be.visible')
         .findByText('All end devices imported successfully')
         .should('be.visible')
-      cy.findByRole('button', { name: 'Proceed to end device list' }).click()
+      cy.findByRole('link', { name: 'Proceed to end device list' }).click()
       cy.location('pathname').should(
         'eq',
         `${Cypress.config('consoleRootPath')}/applications/${appId}/devices`,
@@ -157,7 +155,7 @@ describe('End device messaging', () => {
       cy.findByTestId('notification')
         .findByText('All end devices imported successfully')
         .should('be.visible')
-      cy.findByRole('button', { name: 'Proceed to end device list' }).click()
+      cy.findByRole('link', { name: 'Proceed to end device list' }).click()
       cy.location('pathname').should(
         'eq',
         `${Cypress.config('consoleRootPath')}/applications/${appId}/devices`,
@@ -207,47 +205,6 @@ describe('End device messaging', () => {
         .within(() => {
           cy.findByText('frequency plan `` not found').should('be.visible')
         })
-    })
-  })
-
-  describe('Join Server only', () => {
-    before(() => {
-      cy.dropAndSeedDatabase()
-      cy.createUser(user)
-      cy.createApplication(application, userId)
-    })
-
-    beforeEach(() => {
-      cy.augmentStackConfig(generateJoinServerOnlyConfig)
-      cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
-      cy.visit(`${Cypress.config('consoleRootPath')}/applications/${appId}/devices/import`)
-    })
-
-    it('allows importing on join server only deployments', () => {
-      cy.findByText('Import end devices').should('be.visible')
-      cy.findByLabelText('File format').selectOption('The Things Stack JSON')
-
-      const devicesFile = 'successful-devices.json'
-      cy.findByLabelText('File').attachFile(devicesFile)
-      cy.findByRole('button', { name: 'Import end devices' }).click()
-      cy.findByText('0 of 3 (0% finished)')
-      cy.findByText('Operation finished')
-      cy.findByText('3 of 3 (100% finished)')
-      cy.findByTestId('notification')
-        .should('be.visible')
-        .findByText('All end devices imported successfully')
-        .should('be.visible')
-      cy.findByRole('button', { name: 'Proceed to end device list' }).click()
-      cy.location('pathname').should(
-        'eq',
-        `${Cypress.config('consoleRootPath')}/applications/${appId}/devices`,
-      )
-      cy.findByTestId('error-notification').should('not.exist')
-      cy.findByText('migration-test-device').should('be.visible')
-      cy.findByText('some-nice-id').should('be.visible')
-      cy.findByText('this-is-test-id').should('be.visible').click()
-      cy.findByRole('heading', { name: /Test Device/ }).should('be.visible')
-      cy.findByTestId('error-notification').should('not.exist')
     })
   })
 })

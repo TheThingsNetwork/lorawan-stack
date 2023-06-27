@@ -211,7 +211,7 @@ describe('End device repository claiming', () => {
     cy.findByLabelText('JoinEUI').type(`${device3.joinEui}{enter}`)
     cy.findByLabelText('DevEUI').type(device3.devEui)
     cy.findByLabelText('Claim authentication code').type(device3.cac)
-    cy.findByLabelText('Claim authentication code').clear()
+    cy.findByLabelText('End device ID').clear()
     cy.findByLabelText('End device ID').type(device3.id)
     cy.findByLabelText('View registered end device').check()
     cy.findByRole('button', { name: 'Register end device' }).click()

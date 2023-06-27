@@ -30,7 +30,7 @@ describe('Account App login', () => {
 
     cy.get('header').within(() => {
       cy.findByRole('link')
-        .should('have.attr', 'href', `${Cypress.config('accountAppRootPath')}/`)
+        .should('have.attr', 'href', Cypress.config('accountAppRootPath'))
         .findByRole('img')
         .should('be.visible')
         .should('have.attr', 'src', `${Cypress.config('accountAppAssetsRootPath')}/account.svg`)

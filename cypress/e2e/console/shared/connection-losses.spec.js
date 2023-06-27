@@ -30,8 +30,11 @@ describe('Connection loss detection', () => {
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
     cy.visit(Cypress.config('consoleRootPath'))
     cy.findByText('Welcome to the Console!').should('be.visible')
-    cy.intercept('/api/v3/application*', { forceNetworkError: true })
-    cy.intercept('/api/v3/auth_info', { times: 2 }, { forceNetworkError: true })
+
+    cy.intercept('/api/v3/application*', { forceNetworkError: true }).as('offlineIntercept')
+    cy.intercept('/api/v3/auth_info', { times: 2 }, { forceNetworkError: true }).as(
+      'reconnectionIntercept',
+    )
 
     cy.get('header').within(() => {
       cy.findByRole('link', { name: /Applications/ }).click()
@@ -41,13 +44,19 @@ describe('Connection loss detection', () => {
       cy.findByText(/Connection issues/).should('be.visible')
       cy.findByText(/Offline/).should('be.visible')
     })
+
     cy.findByTestId('toast-notification')
       .as('offlineToast')
       .findByText(/offline/)
       .should('be.visible')
 
-    cy.get('@offlineToast', { timeout: 20000 }).should('not.be.visible')
+    // Use an assertion to check that the 'offline' toast notification is no longer in the DOM.
+    cy.get('@offlineToast').should('not.exist')
 
+    // After the 'offline' toast has disappeared, wait for the reconnection intercept to resolve.
+    cy.wait('@reconnectionIntercept')
+
+    // Now the 'online' toast should appear.
     cy.findByTestId('toast-notification')
       .findByText(/online/)
       .should('be.visible')
@@ -70,7 +79,7 @@ describe('Connection loss detection', () => {
 
     cy.get('footer').within(() => {
       // Connection issue note will appear in the footer and
-      // dissappear shortly thereafter.
+      // disappear shortly thereafter.
       cy.findByText(/Connection issues/).should('be.visible')
       cy.findByText(/Connection issues/).should('not.exist')
 

@@ -13,6 +13,9 @@
 // limitations under the License.
 
 describe('Header', () => {
+  before(() => {
+    cy.dropAndSeedDatabase()
+  })
   describe('Console logout', () => {
     const logout = userName => {
       cy.get('header').within(() => {
@@ -49,14 +52,11 @@ describe('Header', () => {
       const baseUrl = Cypress.config('baseUrl')
       const consoleRootPath = Cypress.config('consoleRootPath')
       const accountAppRootPath = Cypress.config('accountAppRootPath')
-      cy.server()
-      cy.route({
-        method: 'POST',
-        url: `${baseUrl}${consoleRootPath}/api/auth/logout`,
-        onRequest: req => {
-          expect(req.request.headers).to.have.property('X-CSRF-Token')
-        },
-      })
+
+      cy.intercept('POST', `${baseUrl}${consoleRootPath}/api/auth/logout`, req => {
+        // Asserting on the request headers
+        expect(req.headers).to.have.property('x-csrf-token')
+      }).as('logout')
 
       cy.createUser(user)
       cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
