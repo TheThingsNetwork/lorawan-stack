@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable import/no-commonjs */
+
 const { defineConfig } = require('cypress')
 const { cypressBrowserPermissionsPlugin } = require('cypress-browser-permissions')
 const cypressLogToOutput = require('cypress-log-to-output')

@@ -46,8 +46,8 @@ describe('Connection loss detection', () => {
     })
 
     cy.findByTestId('toast-notification')
-      .as('offlineToast')
       .findByText(/offline/)
+      .as('offlineToast')
       .should('be.visible')
 
     // Use an assertion to check that the 'offline' toast notification is no longer in the DOM.
@@ -66,7 +66,6 @@ describe('Connection loss detection', () => {
       cy.findByText(/Offline/).should('not.exist')
     })
   })
-
   it('does not see individual network errors as connection loss', () => {
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
     cy.visit(Cypress.config('consoleRootPath'))
@@ -79,7 +78,7 @@ describe('Connection loss detection', () => {
 
     cy.get('footer').within(() => {
       // Connection issue note will appear in the footer and
-      // disappear shortly thereafter.
+      // dissappear shortly thereafter.
       cy.findByText(/Connection issues/).should('be.visible')
       cy.findByText(/Connection issues/).should('not.exist')
 

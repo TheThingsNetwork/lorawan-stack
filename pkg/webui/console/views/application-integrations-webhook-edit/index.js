@@ -109,15 +109,10 @@ const webhookEntitySelector = [
 const ApplicationWebhookEdit = () => {
   const { appId, webhookId } = useParams()
 
-  const healthStatusEnabled = useSelector(selectWebhooksHealthStatusEnabled)
-  const hasUnhealthyWebhookConfig = useSelector(selectWebhookHasUnhealthyConfig)
-
   return (
-    <Require featureCheck={healthStatusEnabled && !hasUnhealthyWebhookConfig}>
-      <RequireRequest requestAction={getWebhook(appId, webhookId, webhookEntitySelector)}>
-        <ApplicationWebhookEditInner />
-      </RequireRequest>
-    </Require>
+    <RequireRequest requestAction={getWebhook(appId, webhookId, webhookEntitySelector)}>
+      <ApplicationWebhookEditInner />
+    </RequireRequest>
   )
 }
 

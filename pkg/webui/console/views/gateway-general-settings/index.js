@@ -43,7 +43,6 @@ import {
   mayViewOrEditGatewayApiKeys,
   mayViewOrEditGatewayCollaborators,
 } from '@console/lib/feature-checks'
-import { mapFormValueToAttributes } from '@console/lib/attributes'
 
 import { updateGateway, deleteGateway } from '@console/store/actions/gateways'
 import { getApiKeysList } from '@console/store/actions/api-keys'
@@ -77,7 +76,7 @@ const GatewayGeneralSettingsInner = () => {
   const handleSubmit = useCallback(
     async values => {
       const formValues = { ...values }
-      const attributes = mapFormValueToAttributes(formValues.attributes)
+      const { attributes } = formValues
       if (isEqual(gateway.attributes || {}, attributes)) {
         delete formValues.attributes
       }

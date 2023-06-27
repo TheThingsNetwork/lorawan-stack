@@ -21,6 +21,7 @@ import {
   attributeTooShortCheck,
   attributeKeyTooLongCheck,
   attributeValueTooLongCheck,
+  attributesCountCheck,
 } from '@console/lib/attributes'
 import { address as addressRegexp } from '@console/lib/regexp'
 import { parseLorawanMacVersion, generate16BytesKey } from '@console/lib/device-utils'
@@ -110,13 +111,14 @@ const validationSchema = Yup.object()
         })
       },
     ),
-    attributes: Yup.array()
-      .max(10, Yup.passValues(sharedMessages.attributesValidateTooMany))
+    attributes: Yup.object()
+      .nullable()
       .test(
-        'has no empty string values',
-        sharedMessages.attributesValidateRequired,
-        attributeValidCheck,
+        'has no more than 10 keys',
+        sharedMessages.attributesValidateTooMany,
+        attributesCountCheck,
       )
+      .test('has no null values', sharedMessages.attributesValidateRequired, attributeValidCheck)
       .test(
         'has key length longer than 2',
         sharedMessages.attributeKeyValidateTooShort,

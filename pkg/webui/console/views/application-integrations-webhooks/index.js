@@ -54,9 +54,8 @@ const ApplicationWebhooksInner = () => {
         <Route index Component={ApplicationWebhooksList} />
         <Route path="add" Component={ApplicationWebhookAdd} />
         <Route
-          exact
           path=":webhookId"
-          component={
+          element={
             <ValidateRouteParam
               check={{ webhookId: pathIdRegexp }}
               Component={ApplicationWebhookEdit}

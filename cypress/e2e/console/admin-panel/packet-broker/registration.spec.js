@@ -37,10 +37,10 @@ describe('Packet Broker registration', () => {
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
 
     cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/packet-broker`)
-    cy.location('pathname').should('eq', `${Cypress.config('consoleRootPath')}/`)
+    cy.location('pathname').should('eq', Cypress.config('consoleRootPath'))
 
     cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/packet-broker/networks/19`)
-    cy.location('pathname').should('eq', `${Cypress.config('consoleRootPath')}/`)
+    cy.location('pathname').should('eq', Cypress.config('consoleRootPath'))
   })
 
   it('displays a notification when Packet Broker is not set up', () => {

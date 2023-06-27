@@ -39,13 +39,13 @@ const UserApiKeyEditInner = () => {
   const { apiKeyId } = useParams()
 
   useBreadcrumbs(
-    'usr.single.api-keys.add',
-    <Breadcrumb path={`/users/api-keys/edit/${apiKeyId}`} content={sharedMessages.add} />,
+    'usr.single.api-keys.edit',
+    <Breadcrumb path={`/users/api-keys/edit/${apiKeyId}`} content={sharedMessages.edit} />,
   )
 
   return (
     <Container>
-      <PageTitle title={sharedMessages.addApiKey} />
+      <PageTitle title={sharedMessages.keyEdit} />
       <Row>
         <Col lg={8} md={12}>
           <ApiKeyEditForm entity={USER} entityId={userId} />

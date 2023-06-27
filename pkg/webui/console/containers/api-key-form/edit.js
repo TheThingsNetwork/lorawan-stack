@@ -60,7 +60,7 @@ const ApiKeyEditForm = ({ entity, entityId }) => {
       message: m.deleteSuccess,
       type: toast.types.SUCCESS,
     })
-    navigate('../')
+    navigate('..')
   }, [navigate])
 
   const handleEditSuccess = useCallback(async () => {

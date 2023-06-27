@@ -29,7 +29,7 @@ const UserView = () => (
     <Breadcrumbs />
     <IntlHelmet titleTemplate={`%s - User - ${selectApplicationSiteName()}`} />
     <Routes>
-      <Route path="/api-keys/*" Component={UserApiKeys} />
+      <Route path="api-keys/*" Component={UserApiKeys} />
       <Route path="*" Component={GenericNotFound} />
     </Routes>
   </>

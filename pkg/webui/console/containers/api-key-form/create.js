@@ -40,7 +40,7 @@ const CreateForm = ({ entity, entityId }) => {
   const handleModalApprove = useCallback(async () => {
     setModal(null)
     // Navigate back to list
-    navigate('../')
+    navigate('..')
   }, [navigate])
 
   const handleCreate = useCallback(

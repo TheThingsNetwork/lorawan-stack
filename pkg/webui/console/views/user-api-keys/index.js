@@ -41,7 +41,7 @@ const UserApiKeys = () => {
     <ErrorView errorRender={SubViewError}>
       <Routes>
         <Route index Component={UserApiKeysList} />
-        <Route path="/add" Component={UserApiKeyAdd} />
+        <Route path="add" Component={UserApiKeyAdd} />
         <Route
           path=":apiKeyId/*"
           element={

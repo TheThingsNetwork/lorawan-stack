@@ -27,7 +27,11 @@ import { qosLevels } from './qos-options'
 import providers from './providers'
 
 export default Yup.object().shape({
-  pub_sub_id: Yup.string(),
+  pub_sub_id: Yup.string()
+    .matches(idRegexp, Yup.passValues(sharedMessages.validateIdFormat))
+    .required(sharedMessages.validateRequired)
+    .min(2, Yup.passValues(sharedMessages.validateTooShort))
+    .max(36, Yup.passValues(sharedMessages.validateTooLong)),
   format: Yup.string().required(sharedMessages.validateRequired),
   base_topic: Yup.string(),
   nats: Yup.object().when('_provider', {

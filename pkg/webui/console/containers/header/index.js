@@ -29,12 +29,11 @@ import {
   mayViewGateways,
   mayViewOrganizationsOfUser,
   mayViewOrEditApiKeys,
-  mayConfigurePacketBroker,
 } from '@console/lib/feature-checks'
 
 import { logout } from '@console/store/actions/logout'
 
-import { selectUser } from '@console/store/selectors/logout'
+import { selectUser, selectUserIsAdmin } from '@console/store/selectors/logout'
 
 import Logo from '../logo'
 
@@ -45,6 +44,7 @@ const Header = ({ searchable, handleSearchRequest }) => {
 
   const handleLogout = useCallback(() => dispatch(logout()), [dispatch])
   const user = useSelector(selectUser)
+  const isUserAdmin = useSelector(selectUserIsAdmin)
   const mayViewApps = useSelector(state =>
     user ? checkFromState(mayViewApplications, state) : false,
   )
@@ -54,9 +54,6 @@ const Header = ({ searchable, handleSearchRequest }) => {
   )
   const mayHandleApiKeys = useSelector(state =>
     user ? checkFromState(mayViewOrEditApiKeys, state) : false,
-  )
-  const mayConfigurePB = useSelector(state =>
-    user ? checkFromState(mayConfigurePacketBroker, state) : false,
   )
 
   const navigation = [
@@ -103,6 +100,13 @@ const Header = ({ searchable, handleSearchRequest }) => {
         path={`${accountUrl}/profile-settings`}
         external
       />
+      {mayHandleApiKeys && (
+        <Dropdown.Item
+          title={sharedMessages.apiKeys}
+          icon="api_keys"
+          path={`${accountUrl}/api-keys`}
+        />
+      )}
       <Dropdown.Item
         title={sharedMessages.adminPanel}
         icon="lock"
@@ -140,11 +144,6 @@ const Header = ({ searchable, handleSearchRequest }) => {
           external
         />
       </React.Fragment>
-      <Dropdown.Item
-        title={sharedMessages.adminPanel}
-        icon="lock"
-        path="/admin-panel/network-information"
-      />
       {mayHandleApiKeys && (
         <Dropdown.Item
           title={sharedMessages.personalApiKeys}
@@ -152,13 +151,26 @@ const Header = ({ searchable, handleSearchRequest }) => {
           path="/user/api-keys"
         />
       )}
-      {mayConfigurePB && (
+      {isUserAdmin && (
         <Dropdown.Item
-          title={sharedMessages.packetBroker}
-          icon="packet_broker"
-          path="/admin/packet-broker"
+          title={sharedMessages.adminPanel}
+          icon="lock"
+          path="/admin-panel/network-information"
         />
       )}
+      <hr />
+      <Dropdown.Item
+        title={sharedMessages.getSupport}
+        icon="help"
+        path="https://thethingsindustries.com/support"
+        external
+      />
+      <Dropdown.Item
+        title={sharedMessages.documentation}
+        icon="description"
+        path="https://thethingsindustries.com/docs"
+        external
+      />
     </React.Fragment>
   )
 

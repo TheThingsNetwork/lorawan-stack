@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import { Container, Row, Col } from 'react-grid-system'
 import { useSelector } from 'react-redux'
-
-import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
+import { createSelector } from 'reselect'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
@@ -37,18 +36,19 @@ import { selectUserId } from '@account/store/selectors/user'
 const UserApiKeysList = () => {
   const userId = useSelector(selectUserId)
 
-  const baseDataSelector = React.useCallback(
-    state => {
-      const id = { id: userId }
+  const baseDataSelectors = createSelector(
+    [selectApiKeys, selectApiKeysTotalCount, selectApiKeysFetching, selectApiKeysError],
+    (keys, totalCount, fetching, error) => ({
+      keys,
+      totalCount,
+      fetching,
+      error,
+    }),
+  )
 
-      return {
-        keys: selectApiKeys(state, id),
-        totalCount: selectApiKeysTotalCount(state, id),
-        fetching: selectApiKeysFetching(state),
-        error: selectApiKeysError(state),
-      }
-    },
-    [userId],
+  const baseDataSelector = useCallback(
+    state => baseDataSelectors(state, userId),
+    [baseDataSelectors, userId],
   )
 
   const getApiKeys = React.useCallback(
@@ -61,11 +61,7 @@ const UserApiKeysList = () => {
       <Row>
         <IntlHelmet title={sharedMessages.personalApiKeys} />
         <Col>
-          <ApiKeysTable
-            pageSize={PAGE_SIZES.REGULAR}
-            baseDataSelector={baseDataSelector}
-            getItemsAction={getApiKeys}
-          />
+          <ApiKeysTable baseDataSelector={baseDataSelector} getItemsAction={getApiKeys} />
         </Col>
       </Row>
     </Container>

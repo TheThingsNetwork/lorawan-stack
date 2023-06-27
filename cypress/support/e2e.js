@@ -29,7 +29,11 @@ afterEach(function () {
   // Enable fail-early, if set.:
   if (this.currentTest.state === 'failed' && Cypress.env('FAIL_FAST')) {
     cy.log('Skipping rest of run due to test failure (fail fast)')
-    cy.writeFile(failedSpecsFilename, this.currentTest.invocationDetails.relativeFile)
+    const file = this.currentTest.invocationDetails.relativeFile
+    // The file will be relative to the `./config` directory, so we need to
+    // remove the `../` prefix.
+    const relativeFile = file.replace(/^\.\.\//, '')
+    cy.writeFile(failedSpecsFilename, relativeFile)
   } else {
     // Apply a workaround for requests spilling over to the subsequent test.
     // See also https://github.com/cypress-io/cypress/issues/686.

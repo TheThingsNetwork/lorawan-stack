@@ -14,7 +14,7 @@
 
 import { id as idRegexp } from '@ttn-lw/lib/regexp'
 
-export const mapFormValueToAttributes = formValue =>
+export const encodeAttributes = formValue =>
   (Array.isArray(formValue) &&
     formValue.reduce(
       (result, { key, value }) => ({
@@ -23,9 +23,9 @@ export const mapFormValueToAttributes = formValue =>
       }),
       {},
     )) ||
-  null
+  undefined
 
-export const mapAttributesToFormValue = attributesType =>
+export const decodeAttributes = attributesType =>
   (attributesType &&
     Object.keys(attributesType).reduce(
       (result, key) =>
@@ -37,30 +37,26 @@ export const mapAttributesToFormValue = attributesType =>
     )) ||
   []
 
-export const attributeValidCheck = attributes =>
-  attributes === undefined ||
-  attributes === null ||
-  (attributes instanceof Array &&
-    (attributes.length === 0 ||
-      attributes.every(attribute => Boolean(attribute.key) && Boolean(attribute.value))))
+export const attributesCountCheck = object =>
+  object === undefined ||
+  object === null ||
+  (object instanceof Object && Object.keys(object).length <= 10)
+export const attributeValidCheck = object =>
+  object === undefined ||
+  object === null ||
+  (object instanceof Object && Object.values(object).every(attribute => Boolean(attribute)))
 
-export const attributeTooShortCheck = attributes =>
-  attributes === undefined ||
-  attributes === null ||
-  (attributes instanceof Array &&
-    (attributes.length === 0 ||
-      attributes.every(attribute => RegExp(idRegexp).test(attribute.key))))
+export const attributeTooShortCheck = object =>
+  object === undefined ||
+  object === null ||
+  (object instanceof Object && Object.keys(object).every(key => RegExp(idRegexp).test(key)))
 
-export const attributeKeyTooLongCheck = attributes =>
-  attributes === undefined ||
-  attributes === null ||
-  (attributes instanceof Array &&
-    (attributes.length === 0 ||
-      attributes.every(attribute => attribute.key && attribute.key.length <= 36)))
+export const attributeKeyTooLongCheck = object =>
+  object === undefined ||
+  object === null ||
+  (object instanceof Object && Object.keys(object).every(key => key.length <= 36))
 
-export const attributeValueTooLongCheck = attributes =>
-  attributes === undefined ||
-  attributes === null ||
-  (attributes instanceof Array &&
-    (attributes.length === 0 ||
-      attributes.every(attribute => attribute.value && attribute.value.length <= 200)))
+export const attributeValueTooLongCheck = object =>
+  object === undefined ||
+  object === null ||
+  (object instanceof Object && Object.values(object).every(value => value.length <= 200))

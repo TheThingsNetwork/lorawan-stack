@@ -19,7 +19,6 @@ import { Col, Row } from 'react-grid-system'
 
 import TYPES from '@console/constants/formatter-types'
 
-import Prompt from '@ttn-lw/components/prompt'
 import Select from '@ttn-lw/components/select'
 import Form from '@ttn-lw/components/form'
 import SubmitButton from '@ttn-lw/components/submit-button'
@@ -104,9 +103,10 @@ const validationSchema = Yup.object().shape({
     .matches(addressRegexp, Yup.passValues(sharedMessages.validateAddressFormat))
     .when(FIELD_NAMES.SELECT, {
       is: TYPES.GRPC,
-      then: Yup.string()
-        .required(sharedMessages.validateRequired)
-        .max(40960, Yup.passValues(sharedMessages.validateTooLong)),
+      then: schema =>
+        schema
+          .required(sharedMessages.validateRequired)
+          .max(40960, Yup.passValues(sharedMessages.validateTooLong)),
     }),
 })
 
@@ -422,6 +422,12 @@ class PayloadFormattersForm extends React.Component {
                     />
                   )}
                   {this.formatter}
+                  {/*
+                      // TODO: Refactor to use data API and re-enable prompt.
+                      // NOTE: Unfortunately react router v6 requires us to do further
+                      // refactoring to use the data API to be able to use `usePrompt`
+                      // again, which is required to make the Prompt component work.
+                      // For now we will disable the prompt.
                   <Prompt
                     when={Boolean(touched['javascript-formatter'] || touched['grpc-formatter'])}
                     modal={{
@@ -430,6 +436,7 @@ class PayloadFormattersForm extends React.Component {
                       buttonMessage: m.confirmNavigationTitle,
                     }}
                   />
+                  */}
                 </>
               )}
             </Form>

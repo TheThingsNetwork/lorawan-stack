@@ -28,7 +28,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
-import { mapAttributesToFormValue } from '@console/lib/attributes'
+import { encodeAttributes, decodeAttributes } from '@console/lib/attributes'
 
 import m from '../messages'
 
@@ -77,14 +77,7 @@ const BasicSettingsForm = React.memo(props => {
     [onDelete],
   )
 
-  const initialValues = React.useMemo(() => {
-    const initialValues = {
-      ...gateway,
-      attributes: mapAttributesToFormValue(gateway.attributes),
-    }
-
-    return validationSchema.cast(initialValues)
-  }, [gateway])
+  const initialValues = React.useMemo(() => validationSchema.cast(gateway), [gateway])
 
   const onFormSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
@@ -197,6 +190,8 @@ const BasicSettingsForm = React.memo(props => {
         component={KeyValueMap}
         description={sharedMessages.attributeDescription}
         tooltipId={tooltipIds.GATEWAY_ATTRIBUTES}
+        encode={encodeAttributes}
+        decode={decodeAttributes}
       />
       <Form.Field
         title={sharedMessages.automaticUpdates}

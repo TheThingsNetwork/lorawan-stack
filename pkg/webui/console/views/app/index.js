@@ -12,20 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import { connect } from 'react-redux'
+import React, { useCallback, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Route, Routes, BrowserRouter } from 'react-router-dom'
 import classnames from 'classnames'
-import bind from 'autobind-decorator'
-import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 
 import { ToastContainer } from '@ttn-lw/components/toast'
 import sidebarStyle from '@ttn-lw/components/navigation/side/side.styl'
 
 import Footer from '@ttn-lw/containers/footer'
 
+import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
-import { withEnv } from '@ttn-lw/lib/components/env'
 import ErrorView from '@ttn-lw/lib/components/error-view'
 import ScrollToTop from '@ttn-lw/lib/components/scroll-to-top'
 import WithAuth from '@ttn-lw/lib/components/with-auth'
@@ -41,9 +39,13 @@ import Organizations from '@console/views/organizations'
 import AdminPanel from '@console/views/admin-panel'
 import User from '@console/views/user'
 
-import PropTypes from '@ttn-lw/lib/prop-types'
 import { setStatusOnline } from '@ttn-lw/lib/store/actions/status'
 import { selectStatusStore } from '@ttn-lw/lib/store/selectors/status'
+import {
+  selectApplicationSiteName,
+  selectApplicationSiteTitle,
+  selectPageData,
+} from '@ttn-lw/lib/selectors/env'
 
 import {
   selectUser,
@@ -57,131 +59,89 @@ import style from './app.styl'
 
 const errorRender = error => <FullViewError error={error} header={<Header />} />
 
-@withEnv
-@connect(
-  state => ({
-    user: selectUser(state),
-    fetching: selectUserFetching(state),
-    error: selectUserError(state),
-    rights: selectUserRights(state),
-    isAdmin: selectUserIsAdmin(state),
-    status: selectStatusStore(state),
-  }),
-  {
-    setStatusOnline,
-  },
-)
-class ConsoleApp extends React.PureComponent {
-  static propTypes = {
-    env: PropTypes.env.isRequired,
-    error: PropTypes.error,
-    fetching: PropTypes.bool.isRequired,
-    history: PropTypes.shape({
-      push: PropTypes.func,
-      replace: PropTypes.func,
-      location: PropTypes.shape({
-        pathname: PropTypes.string.isRequired,
-      }).isRequired,
-    }).isRequired,
-    isAdmin: PropTypes.bool,
-    rights: PropTypes.rights,
-    setStatusOnline: PropTypes.func.isRequired,
-    status: PropTypes.shape({ onlineStatus: PropTypes.string, isLoginRequired: PropTypes.bool }),
-    user: PropTypes.user,
-  }
-  static defaultProps = {
-    user: undefined,
-    error: undefined,
-    isAdmin: undefined,
-    rights: undefined,
-    status: {},
-  }
+const ConsoleApp = () => {
+  const user = useSelector(selectUser)
+  const fetching = useSelector(selectUserFetching)
+  const error = useSelector(selectUserError)
+  const rights = useSelector(selectUserRights)
+  const isAdmin = useSelector(selectUserIsAdmin)
+  const status = useSelector(selectStatusStore)
+  const siteTitle = selectApplicationSiteTitle()
+  const pageData = selectPageData()
+  const siteName = selectApplicationSiteName()
+  const dispatch = useDispatch()
 
-  @bind
-  handleConnectionStatusChange({ type }) {
-    const { setStatusOnline } = this.props
+  const handleConnectionStatusChange = useCallback(
+    ({ type }) => {
+      dispatch(setStatusOnline(type === 'online'))
+    },
+    [dispatch],
+  )
 
-    setStatusOnline(type === 'online')
-  }
-
-  componentDidMount() {
-    window.addEventListener('online', this.handleConnectionStatusChange)
-    window.addEventListener('offline', this.handleConnectionStatusChange)
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('online', this.handleConnectionStatusChange)
-    window.removeEventListener('offline', this.handleConnectionStatusChange)
-  }
-
-  render() {
-    const {
-      user,
-      fetching,
-      error,
-      rights,
-      isAdmin,
-      history,
-      env: { siteTitle, pageData, siteName },
-      status,
-    } = this.props
-
-    if (pageData && pageData.error) {
-      return (
-        <BrowserRouter history={history} basename="/console">
-          <FullViewError error={pageData.error} header={<Header />} />
-        </BrowserRouter>
-      )
+  useEffect(() => {
+    window.addEventListener('online', handleConnectionStatusChange)
+    window.addEventListener('offline', handleConnectionStatusChange)
+    return () => {
+      window.removeEventListener('online', handleConnectionStatusChange)
+      window.removeEventListener('offline', handleConnectionStatusChange)
     }
+  }, [handleConnectionStatusChange])
 
+  if (pageData && pageData.error) {
     return (
-      <React.Fragment>
-        {status.isLoginRequired && <LogBackInModal />}
-        <ToastContainer />
-        <BrowserRouter history={history} basename="/console">
-          <ScrollToTop />
-          <ErrorView errorRender={errorRender}>
-            <div className={style.app}>
-              <IntlHelmet
-                titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
-                defaultTitle={siteName}
-              />
-              <div id="modal-container" />
-              <Header />
-              <main className={style.main}>
-                <WithAuth
-                  user={user}
-                  fetching={fetching}
-                  error={error}
-                  errorComponent={FullViewErrorInner}
-                  rights={rights}
-                  isAdmin={isAdmin}
-                >
-                  <div className={classnames('breadcrumbs', style.mobileBreadcrumbs)} />
-                  <div id="sidebar" className={sidebarStyle.container} />
-                  <div className={style.content}>
-                    <div className={classnames('breadcrumbs', style.desktopBreadcrumbs)} />
-                    <div className={style.stage} id="stage">
-                      <Routes>
-                        <Route index Component={Overview} />
-                        <Route path="/applications/*" Component={Applications} />
-                        <Route path="/gateways/*" Component={Gateways} />
-                        <Route path="/organizations/*" Component={Organizations} />
-                        <Route path="/admin-panel/*" component={AdminPanel} />
-                        <Route path="/user/" Component={User} />
-                        <Route path="*" Component={GenericNotFound} />
-                      </Routes>
-                    </div>
-                  </div>
-                </WithAuth>
-              </main>
-              <Footer className={style.footer} />
-            </div>
-          </ErrorView>
-        </BrowserRouter>
-      </React.Fragment>
+      <BrowserRouter history={history} basename="/console">
+        <FullViewError error={pageData.error} header={<Header />} />
+      </BrowserRouter>
     )
   }
+
+  return (
+    <React.Fragment>
+      {status.isLoginRequired && <LogBackInModal />}
+      <ToastContainer />
+      <BrowserRouter history={history} basename="/console">
+        <ScrollToTop />
+        <ErrorView errorRender={errorRender}>
+          <div className={style.app}>
+            <IntlHelmet
+              titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
+              defaultTitle={siteName}
+            />
+            <div id="modal-container" />
+            <Header />
+            <main className={style.main}>
+              <WithAuth
+                user={user}
+                fetching={fetching}
+                error={error}
+                errorComponent={FullViewErrorInner}
+                rights={rights}
+                isAdmin={isAdmin}
+              >
+                <div className={classnames('breadcrumbs', style.mobileBreadcrumbs)} />
+                <div id="sidebar" className={sidebarStyle.container} />
+                <div className={style.content}>
+                  <div className={classnames('breadcrumbs', style.desktopBreadcrumbs)} />
+                  <div className={style.stage} id="stage">
+                    <Routes>
+                      <Route index Component={Overview} />
+                      <Route path="/applications/*" Component={Applications} />
+                      <Route path="/gateways/*" Component={Gateways} />
+                      <Route path="/organizations/*" Component={Organizations} />
+                      <Route path="/admin-panel/*" Component={AdminPanel} />
+                      <Route path="/user/*" Component={User} />
+                      <Route path="*" Component={GenericNotFound} />
+                    </Routes>
+                  </div>
+                </div>
+              </WithAuth>
+            </main>
+            <Footer className={style.footer} />
+          </div>
+        </ErrorView>
+      </BrowserRouter>
+    </React.Fragment>
+  )
 }
 
 export default ConsoleApp
