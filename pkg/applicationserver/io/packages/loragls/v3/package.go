@@ -84,7 +84,8 @@ func (p *GeolocationPackage) HandleUp(
 
 	switch m := up.Up.(type) {
 	case *ttnpb.ApplicationUp_UplinkMessage:
-		assoc, err := p.pushUplink(ctx, assoc.Ids, m.UplinkMessage, data)
+		pkgAssocIDs := assocIDs(def, assoc, up.EndDeviceIds)
+		assoc, err := p.pushUplink(ctx, pkgAssocIDs, m.UplinkMessage, data)
 		if err != nil {
 			return err
 		}
@@ -106,6 +107,22 @@ func (p *GeolocationPackage) Package() *ttnpb.ApplicationPackage {
 		Name:         PackageName,
 		DefaultFPort: 197,
 	}
+}
+
+// assocIDs returns the identifiers of the given association. If the association is nil, new identifiers are created.
+func assocIDs(
+	def *ttnpb.ApplicationPackageDefaultAssociation,
+	assoc *ttnpb.ApplicationPackageAssociation,
+	ids *ttnpb.EndDeviceIdentifiers,
+) *ttnpb.ApplicationPackageAssociationIdentifiers {
+	assocIDs := assoc.GetIds()
+	if assocIDs == nil {
+		assocIDs = &ttnpb.ApplicationPackageAssociationIdentifiers{
+			EndDeviceIds: ids,
+			FPort:        def.Ids.FPort,
+		}
+	}
+	return assocIDs
 }
 
 // New instantiates the LoRa Cloud Geolocation package.
@@ -171,13 +188,19 @@ func (p *GeolocationPackage) pushUplink(
 	maxUplinkCount := minInt(data.MultiFrameWindowSize, 16)
 
 	setter := func(assoc *ttnpb.ApplicationPackageAssociation) (*ttnpb.ApplicationPackageAssociation, []string, error) {
-		if assoc == nil {
-			return nil, nil, errNoAssociation.New()
-		}
-
 		data := &Data{}
-		if err := data.FromStruct(assoc.Data); err != nil {
-			return nil, nil, err
+		fieldMask := []string{"data"}
+
+		if assoc == nil {
+			assoc = &ttnpb.ApplicationPackageAssociation{
+				Ids:         ids,
+				PackageName: PackageName,
+			}
+			fieldMask = []string{"data", "ids", "package_name"}
+		} else {
+			if err := data.FromStruct(assoc.Data); err != nil {
+				return nil, nil, err
+			}
 		}
 
 		if maxUplinkCount != 0 && len(data.RecentMetadata) >= maxUplinkCount {
@@ -196,7 +219,7 @@ func (p *GeolocationPackage) pushUplink(
 		}
 		assoc.Data = st
 
-		return assoc, []string{"data"}, nil
+		return assoc, fieldMask, nil
 	}
 
 	return p.registry.SetAssociation(ctx, ids, []string{"data"}, setter)
