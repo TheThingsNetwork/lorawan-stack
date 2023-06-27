@@ -114,8 +114,6 @@ type Data struct {
 	// MultiFrame enables multi frame requests for TOARSSI queries.
 	MultiFrame bool
 	// MultiFrameWindowSize represents the number of historical frames to consider for the query.
-	// A window size of 0 automatically determines the number of frames based on the first byte
-	// of the uplink message.
 	MultiFrameWindowSize int
 	// MultiFrameWindowAge limits the maximum age of the historical frames considered for the query.
 	MultiFrameWindowAge time.Duration

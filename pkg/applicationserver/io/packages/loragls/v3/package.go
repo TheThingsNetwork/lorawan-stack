@@ -40,6 +40,9 @@ import (
 // PackageName defines the package name.
 const PackageName = "lora-cloud-geolocation-v3"
 
+// defaultMultiFrameWindowSize is the default number of frames to use for multi-frame queries.
+const defaultMultiFrameWindowSize = 16
+
 // GeolocationPackage is the LoRa Cloud Geolocation application package.
 type GeolocationPackage struct {
 	server   io.Server
@@ -171,11 +174,12 @@ func (p *GeolocationPackage) gnssQuery(ctx context.Context, ids *ttnpb.EndDevice
 	return resp.AbstractResponse(), nil
 }
 
-func minInt(a int, b int) int {
-	if a <= b {
-		return a
+// constrainedWindowSize returns the given window size if it is within the allowed range, or the default size otherwise.
+func constrainedWindowSize(size int) int {
+	if size > 0 && size < defaultMultiFrameWindowSize {
+		return size
 	}
-	return b
+	return defaultMultiFrameWindowSize
 }
 
 // pushUplink updates the package data with the given uplink.
@@ -185,7 +189,7 @@ func (p *GeolocationPackage) pushUplink(
 	up *ttnpb.ApplicationUplink,
 	data *Data,
 ) (*ttnpb.ApplicationPackageAssociation, error) {
-	maxUplinkCount := minInt(data.MultiFrameWindowSize, 16)
+	windowSize := constrainedWindowSize(data.MultiFrameWindowSize)
 
 	setter := func(assoc *ttnpb.ApplicationPackageAssociation) (*ttnpb.ApplicationPackageAssociation, []string, error) {
 		data := &Data{}
@@ -203,7 +207,7 @@ func (p *GeolocationPackage) pushUplink(
 			}
 		}
 
-		if maxUplinkCount != 0 && len(data.RecentMetadata) >= maxUplinkCount {
+		if len(data.RecentMetadata) >= windowSize {
 			data.RecentMetadata = data.RecentMetadata[1:]
 		}
 
@@ -228,21 +232,14 @@ func (p *GeolocationPackage) pushUplink(
 func (*GeolocationPackage) multiFrameQuery(
 	ctx context.Context,
 	_ *ttnpb.EndDeviceIdentifiers,
-	up *ttnpb.ApplicationUplink,
+	_ *ttnpb.ApplicationUplink,
 	data *Data,
 	client *api.Client,
 ) (api.AbstractLocationSolverResponse, error) {
-	count := data.MultiFrameWindowSize
-	if count == 0 && len(up.FrmPayload) > 0 {
-		count = int(up.FrmPayload[0])
-		count = minInt(count, 16)
-	}
-	if count == 0 {
-		return nil, nil
-	}
+	windowSize := constrainedWindowSize(data.MultiFrameWindowSize)
 
 	now := time.Now()
-	mds := make([][]*api.RxMetadata, 0, count)
+	mds := make([][]*api.RxMetadata, 0, windowSize)
 
 	for _, md := range data.RecentMetadata {
 		if now.Sub(md.ReceivedAt) > data.MultiFrameWindowAge {
@@ -251,7 +248,7 @@ func (*GeolocationPackage) multiFrameQuery(
 
 		mds = append(mds, md.RxMetadata)
 
-		if len(mds) >= count {
+		if len(mds) >= windowSize {
 			break
 		}
 	}
