@@ -24,7 +24,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"google.golang.org/grpc/peer"
 )
 
 const (
@@ -149,9 +148,8 @@ var (
 )
 
 const (
-	subsystem     = "as"
-	unknown       = "unknown"
-	networkServer = "network_server"
+	subsystem = "as"
+	unknown   = "unknown"
 )
 
 var asMetrics = &messageMetrics{
@@ -161,7 +159,7 @@ var asMetrics = &messageMetrics{
 			Name:      "uplink_received_total",
 			Help:      "Total number of received uplinks (join-accepts and data)",
 		},
-		[]string{networkServer},
+		[]string{},
 	),
 	uplinkForwarded: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
@@ -211,7 +209,7 @@ var asMetrics = &messageMetrics{
 			Name:      "downlink_forwarded_total",
 			Help:      "Total number of forwarded downlinks",
 		},
-		[]string{networkServer},
+		[]string{},
 	),
 	downlinkDropped: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
@@ -261,10 +259,6 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 }
 
 func registerReceiveUp(ctx context.Context, msg *ttnpb.ApplicationUp) {
-	ns := "application"
-	if p, ok := peer.FromContext(ctx); ok {
-		ns = p.Addr.String()
-	}
 	switch msg.Up.(type) {
 	case *ttnpb.ApplicationUp_JoinAccept:
 		events.Publish(evtReceiveJoinAccept.NewWithIdentifiersAndData(ctx, msg.EndDeviceIds, nil))
@@ -273,7 +267,7 @@ func registerReceiveUp(ctx context.Context, msg *ttnpb.ApplicationUp) {
 	default:
 		return
 	}
-	asMetrics.uplinkReceived.WithLabelValues(ctx, ns).Inc()
+	asMetrics.uplinkReceived.WithLabelValues(ctx).Inc()
 }
 
 func registerForwardUp(ctx context.Context, msg *ttnpb.ApplicationUp) {
@@ -330,9 +324,9 @@ func registerReceiveDownlinks(ctx context.Context, ids *ttnpb.EndDeviceIdentifie
 	}
 }
 
-func registerForwardDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, ns string) {
+func registerForwardDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink) {
 	events.Publish(evtForwardDataDown.NewWithIdentifiersAndData(ctx, ids, msg))
-	asMetrics.downlinkForwarded.WithLabelValues(ctx, ns).Inc()
+	asMetrics.downlinkForwarded.WithLabelValues(ctx).Inc()
 }
 
 func registerDropDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, err error) {
@@ -369,7 +363,9 @@ func (as *ApplicationServer) registerDropDownlinks(ctx context.Context, ids *ttn
 	}
 }
 
-func (as *ApplicationServer) registerForwardDownlinks(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, decrypted, encrypted []*ttnpb.ApplicationDownlink, peerName string) {
+func (as *ApplicationServer) registerForwardDownlinks(
+	ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, decrypted, encrypted []*ttnpb.ApplicationDownlink,
+) {
 	for _, item := range decrypted {
 		if err := as.publishUp(ctx, &ttnpb.ApplicationUp{
 			EndDeviceIds:   ids,
@@ -382,6 +378,6 @@ func (as *ApplicationServer) registerForwardDownlinks(ctx context.Context, ids *
 		}
 	}
 	for _, item := range encrypted {
-		registerForwardDownlink(ctx, ids, item, peerName)
+		registerForwardDownlink(ctx, ids, item)
 	}
 }
