@@ -88,13 +88,7 @@ func (p *GeolocationPackage) HandleUp(
 	switch m := up.Up.(type) {
 	case *ttnpb.ApplicationUp_UplinkMessage:
 		pkgAssocIDs := assocIDs(def, assoc, up.EndDeviceIds)
-		assoc, err := p.pushUplink(ctx, pkgAssocIDs, m.UplinkMessage, data)
-		if err != nil {
-			return err
-		}
-
-		data, err = p.mergePackageData(def, assoc)
-		if err != nil {
+		if err := p.pushUplink(ctx, pkgAssocIDs, m.UplinkMessage, data); err != nil {
 			return err
 		}
 
@@ -188,36 +182,45 @@ func (p *GeolocationPackage) pushUplink(
 	ids *ttnpb.ApplicationPackageAssociationIdentifiers,
 	up *ttnpb.ApplicationUplink,
 	data *Data,
-) (*ttnpb.ApplicationPackageAssociation, error) {
+) error {
 	windowSize := constrainedWindowSize(data.MultiFrameWindowSize)
 
 	setter := func(assoc *ttnpb.ApplicationPackageAssociation) (*ttnpb.ApplicationPackageAssociation, []string, error) {
-		data := &Data{}
+		assocData := &Data{}
 		fieldMask := []string{"data"}
 
 		if assoc == nil {
+			if !data.MultiFrame {
+				return nil, nil, nil
+			}
+
 			assoc = &ttnpb.ApplicationPackageAssociation{
 				Ids:         ids,
 				PackageName: PackageName,
 			}
 			fieldMask = []string{"data", "ids", "package_name"}
 		} else {
-			if err := data.FromStruct(assoc.Data); err != nil {
+			if err := assocData.FromStruct(assoc.Data); err != nil {
 				return nil, nil, err
 			}
 		}
 
-		if len(data.RecentMetadata) >= windowSize {
-			data.RecentMetadata = data.RecentMetadata[1:]
-		}
+		if data.MultiFrame {
+			if len(assocData.RecentMetadata) >= windowSize {
+				assocData.RecentMetadata = assocData.RecentMetadata[1:]
+			}
 
-		md := &UplinkMetadata{}
-		if err := md.FromApplicationUplink(up); err != nil {
-			return nil, nil, err
+			md := &UplinkMetadata{}
+			if err := md.FromApplicationUplink(up); err != nil {
+				return nil, nil, err
+			}
+			assocData.RecentMetadata = append(assocData.RecentMetadata, md)
+		} else {
+			assocData.RecentMetadata = nil
 		}
+		data.RecentMetadata = assocData.RecentMetadata
 
-		data.RecentMetadata = append(data.RecentMetadata, md)
-		st, err := data.Struct()
+		st, err := assocData.Struct()
 		if err != nil {
 			return nil, nil, err
 		}
@@ -226,7 +229,8 @@ func (p *GeolocationPackage) pushUplink(
 		return assoc, fieldMask, nil
 	}
 
-	return p.registry.SetAssociation(ctx, ids, []string{"data"}, setter)
+	_, err := p.registry.SetAssociation(ctx, ids, []string{"data"}, setter)
+	return err
 }
 
 func (*GeolocationPackage) multiFrameQuery(
