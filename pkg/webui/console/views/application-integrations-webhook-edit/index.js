@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@ import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import WebhookEdit from '@console/containers/webhook-edit'
-
-import Require from '@console/lib/components/require'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { getWebhookTemplateId } from '@ttn-lw/lib/selectors/id'

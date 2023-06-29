@@ -48,8 +48,8 @@ const NetworkInformation = () => {
 
   return (
     <>
-      <PageTitle title={m.title} className="panel-title mb-0" />
       <RequireRequest requestAction={requestActions}>
+        <PageTitle title={m.title} className="panel-title mb-0" />
         <NetworkInformationContainer />
         <DeploymentComponentStatus />
       </RequireRequest>

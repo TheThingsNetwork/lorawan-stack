@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import { Col, Container, Row } from 'react-grid-system'
-import { NavLink, Switch, Route, useRouteMatch } from 'react-router-dom'
+import { useRoutes, NavLink, Navigate } from 'react-router-dom'
 import classNames from 'classnames'
 
 import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
-import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 import { ErrorView } from '@ttn-lw/lib/components/error-view'
+import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 
 import SubViewError from '@console/views/sub-view-error'
 
@@ -30,49 +30,53 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import style from './panel-view.styl'
 
 const PanelView = ({ children, className }) => {
-  const { path } = useRouteMatch()
-  const firstChild = React.Children.toArray(children)[0]
+  const childrenArray = React.Children.toArray(children)
+  const firstChild = childrenArray[0]
+
+  const routes = useRoutes([
+    { path: '', element: <Navigate to={firstChild.props.path} replace /> },
+    ...childrenArray.map(child => ({
+      path: `${child.props.path}/*`,
+      element: React.cloneElement(child, { _isRoute: false }),
+    })),
+    { path: '*', element: <GenericNotFound /> },
+  ])
 
   return (
     <Container className={classNames(className, style.panelView)}>
       <Row>
         <Col className={style.menu} lg={3} xl={2}>
-          {React.Children.toArray(children).map(child =>
-            React.cloneElement(child, { path: `${path}${child.props.path}`, _isRoute: true }),
+          {childrenArray.map(child =>
+            React.cloneElement(child, { path: child.props.path, _isRoute: true }),
           )}
         </Col>
         <Col className={style.panelViewMenuItem} lg={9} xl={10}>
-          <ErrorView errorRender={SubViewError}>
-            <Switch>
-              <Route exact path={path} redirect={`${path}${firstChild.path}`} />
-              {React.Children.toArray(children).map(child =>
-                React.cloneElement(child, { path: `${path}${child.props.path}`, _isRoute: false }),
-              )}
-              <NotFoundRoute />
-            </Switch>
-          </ErrorView>
+          <ErrorView errorRender={SubViewError}>{routes}</ErrorView>
         </Col>
       </Row>
     </Container>
   )
 }
 
-const PanelViewItem = ({ icon, title, path, exact, component: Component, _isRoute }) => {
+const PanelViewItem = ({ icon, title, path, Component, _isRoute }) => {
+  const className = useCallback(
+    ({ isActive }) => classNames(style.link, { [style.active]: isActive }),
+    [],
+  )
   if (_isRoute) {
     return (
-      <NavLink to={path} className={style.link} activeClassName={style.active} exact={exact}>
+      <NavLink to={path} className={className}>
         {icon && <Icon icon={icon} className="mr-cs-xs" />} <Message content={title} />
       </NavLink>
     )
   }
 
-  return <Route path={path} component={Component} exact={exact} />
+  return React.createElement(Component)
 }
 
 PanelViewItem.propTypes = {
+  Component: PropTypes.func.isRequired,
   _isRoute: PropTypes.bool,
-  component: PropTypes.func.isRequired,
-  exact: PropTypes.bool,
   icon: PropTypes.string.isRequired,
   path: PropTypes.string.isRequired,
   title: PropTypes.message.isRequired,
@@ -80,7 +84,6 @@ PanelViewItem.propTypes = {
 
 PanelViewItem.defaultProps = {
   _isRoute: false,
-  exact: false,
 }
 
 PanelView.propTypes = {

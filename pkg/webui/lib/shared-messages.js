@@ -107,6 +107,8 @@ export default defineMessages({
   componentJs: 'Join Server',
   componentNs: 'Network Server',
   componentQrg: 'QR Code Generator',
+  componentDcs: 'Device Claiming Server',
+  componentGcs: 'Gateway Claiming Server',
   confirm: 'Confirm',
   confirmPassword: 'Confirm password',
   connected: 'Connected',

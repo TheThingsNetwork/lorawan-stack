@@ -388,7 +388,7 @@ class PayloadFormattersForm extends React.Component {
               formikRef={this.formRef}
               id="payload-formatter-form"
             >
-              {({ touched }) => (
+              {() => (
                 <>
                   <Form.SubTitle title={m.setupSubTitle} />
                   <Form.Field

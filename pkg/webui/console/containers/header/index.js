@@ -101,11 +101,7 @@ const Header = ({ searchable, handleSearchRequest }) => {
         external
       />
       {mayHandleApiKeys && (
-        <Dropdown.Item
-          title={sharedMessages.apiKeys}
-          icon="api_keys"
-          path={`${accountUrl}/api-keys`}
-        />
+        <Dropdown.Item title={sharedMessages.apiKeys} icon="api_keys" path="/user/api-keys" />
       )}
       <Dropdown.Item
         title={sharedMessages.adminPanel}

@@ -112,15 +112,15 @@ const PacketBroker = () => {
   )
 
   const tabs = [
-    { title: m.defaultRoutingPolicy, link: '/admin/packet-broker', name: 'default' },
+    { title: m.defaultRoutingPolicy, link: '/admin-panel/packet-broker', name: 'default' },
     {
       title: m.defaultGatewayVisibility,
-      link: '/admin/packet-broker/default-gateway-visibility',
+      link: '/admin-panel/packet-broker/default-gateway-visibility',
       name: 'default-gateway-visibility',
     },
     {
       title: sharedMessages.networks,
-      link: '/admin/packet-broker/networks',
+      link: '/admin-panel/packet-broker/networks',
       name: 'networks',
       exact: false,
     },
@@ -131,7 +131,7 @@ const PacketBroker = () => {
   return (
     <Container>
       <Row>
-        <Col lg={8} md={12}>
+        <Col md={12}>
           <PageTitle title={sharedMessages.packetBroker} />
           <div className={style.introduction}>
             <Message content={m.packetBrokerInfoText} className={style.info} />
@@ -250,7 +250,7 @@ const PacketBroker = () => {
         </Col>
         {registered && (
           <>
-            <Col lg={8} md={12}>
+            <Col md={12}>
               <Message content={m.networkVisibility} component="h3" className={style.subTitle} />
               <Row gutterWidth={48}>
                 <Col md={4}>

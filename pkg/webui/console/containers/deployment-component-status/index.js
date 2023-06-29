@@ -51,9 +51,8 @@ const componentMap = {
   js: sharedMessages.componentJs,
   edtc: sharedMessages.componentEdtc,
   qrg: sharedMessages.componentQrg,
-  gcs: sharedMessages.claimGateway,
-  dcs: sharedMessages.claimDevice,
-  noc: sharedMessages.noc,
+  gcs: sharedMessages.componentGcs,
+  dcs: sharedMessages.componentDcs,
 }
 
 const DeploymentComponentStatus = () => (
