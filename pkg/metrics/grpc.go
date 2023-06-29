@@ -19,7 +19,7 @@ import (
 	"net"
 	"runtime/pprof"
 
-	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus"
 	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/stats"
