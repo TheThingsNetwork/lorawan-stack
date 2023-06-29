@@ -90,6 +90,22 @@ const SuggestedSelect = props => {
     [setInputValue, value, onChange],
   )
 
+  const handleBlur = useCallback(
+    event => {
+      // https://github.com/JedWatson/react-select/issues/3523
+      // Make sure the input name is always present in the event object.
+      event.target.name = name
+
+      if (typeof inputValue !== 'undefined') {
+        // https://github.com/JedWatson/react-select/issues/3175
+        event.target.value = inputValue
+      }
+
+      onBlur(event)
+    },
+    [onBlur, name, inputValue],
+  )
+
   const debouncedFetch = debounce((query, callback) => {
     loadOptions(query).then(result => callback(result))
   }, 500)
@@ -108,6 +124,7 @@ const SuggestedSelect = props => {
       classNamePrefix="select"
       onChange={handleChange}
       onFocus={onFocus}
+      onBlur={handleBlur}
       isDisabled={disabled}
       value={inputValue}
       name={name}

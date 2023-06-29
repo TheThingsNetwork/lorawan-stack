@@ -69,11 +69,10 @@ class TTS {
     this.QRCodeGenerator = new QRCodeGenerator(this.api, {
       stackConfig: stackConfiguration,
     })
+    this.SearchAccounts = new SearchAccounts(this.api)
 
     this.subscribe = EventHandler.subscribe
     this.unsubscribe = EventHandler.unsubscribe
-
-    this.SearchAccounts = new SearchAccounts(this.api)
   }
 }
 

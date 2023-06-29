@@ -120,4 +120,5 @@ export default combineReducers({
   deviceRepository,
   packetBroker,
   ns,
+  searchAccounts,
 })

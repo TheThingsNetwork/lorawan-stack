@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Add `UserInput` component to the Console to handle user id input fields by implementing an autosuggest.
+
 ### Changed
 
 - Instead of retrying application downlinks indefinitely, the Application Server now retries them for a configured number of times. Each `ApplicationDownlink` message contains the `attempt` and `max_attempts` fields to indicate the current and maximum number of attempts for a specific `application downlink`.

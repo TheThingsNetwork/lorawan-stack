@@ -12,63 +12,56 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { useCallback, useRef } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import { components } from 'react-select'
 
 import Field from '@ttn-lw/components/form/field'
 import Select from '@ttn-lw/components/select'
-
-import Message from '@ttn-lw/lib/components/message'
+import Icon from '@ttn-lw/components/icon'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { searchAccounts } from '@ttn-lw/lib/store/actions/search-accounts'
 import { selectSearchResults } from '@ttn-lw/lib/store/selectors/search-accounts'
 
+import styles from './user-select.styl'
+
+const SingleValue = props => (
+  <components.SingleValue {...props}>
+    <Icon icon={props.data.icon} className="mr-cs-xs" />
+    {props.data.label}
+  </components.SingleValue>
+)
+
+SingleValue.propTypes = {
+  data: PropTypes.shape({
+    icon: PropTypes.string.isRequired,
+    description: PropTypes.string,
+    label: PropTypes.string.isRequired,
+    value: PropTypes.string.isRequired,
+  }).isRequired,
+}
+
 const m = defineMessages({
   noOptionsMessage: 'No matching user or organization was found',
   suggestions: 'Suggestions',
 })
 
-const customMenu = props => (
-  <components.Menu {...props}>
-    <Message content={m.suggestions} className="ml-cs-s mt-cs-s mb-cs-s" component="h4" />
-    {props.children}
-  </components.Menu>
-)
-
-const AutoSuggest = ({
-  initialOptions,
-  onlyCollaborators,
-  onlyUsers,
-  userInputCustomComponent,
-  entity,
-  entityId,
-  ...rest
-}) => {
+const Suggest = ({ ...rest }) => {
   const dispatch = useDispatch()
   const searchResults = useSelector(selectSearchResults)
+  const searchResultsRef = useRef()
+  searchResultsRef.current = searchResults
   const { formatMessage } = useIntl()
   const handleNoOptions = useCallback(() => formatMessage(m.noOptionsMessage), [formatMessage])
-  const searchResultsRef = useRef(searchResults)
-  const collaboratorOf = onlyCollaborators
-    ? {
-        path: `${entity}_ids.${entity}_id`,
-        id: entityId,
-      }
-    : undefined
-
-  useEffect(() => {
-    searchResultsRef.current = searchResults
-  }, [searchResults])
 
   const handleLoadingOptions = useCallback(
     async value => {
       if (value.length >= 1) {
-        await dispatch(attachPromise(searchAccounts(value, onlyUsers, collaboratorOf)))
-        const newOptions = searchResults.map(account => ({
+        await dispatch(attachPromise(searchAccounts(value)))
+        const newOptions = searchResultsRef.current.map(account => ({
           value:
             'user_ids' in account
               ? account.user_ids?.user_id
@@ -80,7 +73,7 @@ const AutoSuggest = ({
           icon: 'user_ids' in account ? 'user' : 'organization',
         }))
 
-        const translatedOptions = newOptions.map(option => {
+        const translatedOptions = newOptions?.map(option => {
           const { label, labelValues = {} } = option
           if (typeof label === 'object' && label.id && label.defaultMessage) {
             return { ...option, label: formatMessage(label, labelValues) }
@@ -92,50 +85,24 @@ const AutoSuggest = ({
         return translatedOptions
       }
     },
-    [dispatch, onlyUsers, searchResults, collaboratorOf, formatMessage],
+    [dispatch, searchResultsRef, formatMessage],
   )
 
   return (
     <Field
       {...rest}
-      defaultOptions={initialOptions}
-      component={Select}
+      component={Select.Suggested}
       noOptionsMessage={handleNoOptions}
       loadOptions={handleLoadingOptions}
       autoFocus
       maxMenuHeight={300}
-      hasAutosuggest
-      customComponents={
-        onlyCollaborators
-          ? { ...userInputCustomComponent, Menu: customMenu }
-          : { ...userInputCustomComponent }
-      }
+      customComponents={{ SingleValue }}
     />
   )
 }
 
-AutoSuggest.propTypes = {
-  entity: PropTypes.string,
-  entityId: PropTypes.string,
-  fetching: PropTypes.bool,
-  initialOptions: PropTypes.arrayOf(
-    PropTypes.shape({ value: PropTypes.string, label: PropTypes.message }),
-  ),
-  onlyCollaborators: PropTypes.bool,
-  onlyUsers: PropTypes.bool,
-  userInputCustomComponent: PropTypes.shape({
-    SingleValue: PropTypes.func,
-  }),
-}
+const UserSelect = ({ ...rest }) => (
+  <Suggest {...rest} showOptionIcon className={styles.userSelect} />
+)
 
-AutoSuggest.defaultProps = {
-  fetching: false,
-  initialOptions: [],
-  onlyCollaborators: false,
-  onlyUsers: false,
-  userInputCustomComponent: {},
-  entity: undefined,
-  entityId: undefined,
-}
-
-export default AutoSuggest
+export default UserSelect
