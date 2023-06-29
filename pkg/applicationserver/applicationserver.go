@@ -692,7 +692,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids *ttnpb.End
 					if err != nil {
 						as.registerDropDownlinks(ctx, ids, decrypted, err)
 					} else {
-						as.registerForwardDownlinks(ctx, ids, decrypted, encrypted, peer.Name())
+						as.registerForwardDownlinks(ctx, ids, decrypted, encrypted)
 					}
 				},
 			})
