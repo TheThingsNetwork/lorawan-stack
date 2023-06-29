@@ -23,6 +23,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Removing user invitations not working in the user management panel for administrators.
 - Fix payload formatter page launching malformed requests in the Console.
+- Fix end device claiming issues in the Console and improve error messaging.
 - HTTP API routes for parsing QR codes for the QR Generator service. We exercise our right to break compatibility with third party HTTP clients since this is a bug.
   - `/qr-code/end-devices/parse` is changed to `/qr-codes/end-devices/parse`.
   - `/qr-code/end-devices/{format_id}/parse` is changed to `/qr-codes/end-devices/{format_id}/parse`.
