@@ -11,13 +11,21 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
-- New Admin Panel in the Console.
-
 ### Changed
 
 ### Deprecated
 
 ### Removed
+
+### Fixed
+
+### Security
+
+## [3.26.2] - unreleased
+
+### Added
+
+- New Admin Panel in the Console.
 
 ### Fixed
 
@@ -27,8 +35,6 @@ For details about compatibility between different releases, see the **Commitment
 - HTTP API routes for parsing QR codes for the QR Generator service. We exercise our right to break compatibility with third party HTTP clients since this is a bug.
   - `/qr-code/end-devices/parse` is changed to `/qr-codes/end-devices/parse`.
   - `/qr-code/end-devices/{format_id}/parse` is changed to `/qr-codes/end-devices/{format_id}/parse`.
-
-### Security
 
 ## [3.26.1] - 2023-06-20
 
@@ -2608,7 +2614,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.26.1...v3.26
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.26.2...v3.26
+[3.26.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.26.1...v3.26.2
 [3.26.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.26.0...v3.26.1
 [3.26.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.25.2...v3.26.0
 [3.25.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.25.1...v3.25.2
