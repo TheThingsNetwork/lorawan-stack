@@ -86,6 +86,39 @@ func TestToken(t *testing.T) {
 			},
 		},
 		{
+			name:         "SuccessWithDialerScheme",
+			clientID:     "test",
+			clientSecret: "secret",
+			opts: []packetbroker.TokenOption{
+				packetbroker.WithScope(packetbroker.ScopeNetworks),
+				packetbroker.WithAudienceFromAddresses("passthrough:///iam.packetbroker.net:443"),
+			},
+			tokenRequestAssertion: func(a *assertions.Assertion, vars url.Values) bool {
+				return a.So(vars["scope"], should.Resemble, []string{"networks"}) &&
+					a.So(vars["audience"], should.Resemble, []string{"iam.packetbroker.net"})
+			},
+			tokenClaims: func() packetbroker.IAMTokenClaims {
+				return packetbroker.IAMTokenClaims{
+					Networks: []packetbroker.TokenNetworkClaim{
+						{
+							NetID:    0x000013,
+							TenantID: "ttn",
+						},
+					},
+				}
+			},
+			audience: "iam.packetbroker.net",
+			tokenAssertion: func(a *assertions.Assertion, token string) bool {
+				id, err := packetbroker.UnverifiedNetworkIdentifier(token)
+				return a.So(err, should.BeNil) &&
+					a.So(id.NetId, should.Equal, 0x000013) &&
+					a.So(id.TenantId, should.Equal, "ttn")
+			},
+			tokenClaimsAssertion: func(a *assertions.Assertion, claims packetbroker.TokenClaims) bool {
+				return a.So(claims.PacketBroker.Cluster, should.BeFalse)
+			},
+		},
+		{
 			name:         "BadRequest",
 			clientID:     "test",
 			clientSecret: "secret",
