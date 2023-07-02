@@ -82,7 +82,7 @@ const AccountApp = ({ history }) => {
               defaultTitle={`${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
             />
             <Routes>
-              <Route path="/authorize" Component={Authorize} />
+              <Route path="/authorize/*" Component={Authorize} />
               <Route path="*" Component={Boolean(user) ? Landing : Front} />
             </Routes>
           </React.Fragment>

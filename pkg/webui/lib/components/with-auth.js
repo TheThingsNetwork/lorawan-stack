@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { useLocation, Navigate } from 'react-router-dom'
+import { useLocation, Navigate, useSearchParams } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
 
 import Spinner from '@ttn-lw/components/spinner'
@@ -47,6 +47,7 @@ const m = defineMessages({
 // `Auth` is a component that wraps a tree that requires the user to be authenticated.
 const Auth = ({ user, fetching, userError, errorComponent, children, rights, isAdmin }) => {
   const location = useLocation()
+  const [searchParams] = useSearchParams()
   if (fetching) {
     return (
       <Spinner center>
@@ -56,8 +57,14 @@ const Auth = ({ user, fetching, userError, errorComponent, children, rights, isA
   }
 
   let error
+  const errorParam = searchParams.get('error')
+  const errorDesriptionParam = searchParams.get('error_description')
+  const isCallback = location.pathname.endsWith('/oauth/callback')
+  const hasCallbackError = isCallback && Boolean(errorParam)
 
-  if (userError) {
+  if (hasCallbackError) {
+    error = { error: errorParam, error_description: errorDesriptionParam }
+  } else if (userError) {
     error = userError
   } else if (
     // Check whether the user has at least basic rights, without which it
@@ -82,7 +89,7 @@ const Auth = ({ user, fetching, userError, errorComponent, children, rights, isA
 
   if (error) {
     // Redirect to root to prevent side effects.
-    if (location.pathname !== '/') {
+    if (!hasCallbackError && location.pathname !== '/') {
       return <Navigate to="" replace />
     }
 
