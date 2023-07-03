@@ -264,12 +264,15 @@ func TestOrganizationsCRUD(t *testing.T) {
 			a.So(err, should.BeNil)
 		})
 
-		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{nil, usr1.GetOrganizationOrUserIdentifiers()} {
+		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{
+			nil, usr1.GetOrganizationOrUserIdentifiers(),
+		} {
 			list, err := reg.List(ctx, &ttnpb.ListOrganizationsRequest{
 				FieldMask:    ttnpb.FieldMask("name"),
 				Collaborator: collaborator,
 			}, creds)
-			if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) && a.So(list.Organizations, should.HaveLength, 6) {
+			if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) &&
+				a.So(list.Organizations, should.HaveLength, 6) {
 				var found bool
 				for _, item := range list.Organizations {
 					if item.GetIds().GetOrganizationId() == created.GetIds().GetOrganizationId() {
