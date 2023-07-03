@@ -2717,9 +2717,9 @@
       "file": "registry.go"
     }
   },
-  "error:pkg/applicationserver/redis:duplicate_identifiers": {
+  "error:pkg/applicationserver/redis:end_device_euis_taken": {
     "translations": {
-      "en": "duplicate identifiers"
+      "en": "an end device with JoinEUI `{join_eui}` and DevEUI `{dev_eui}` is already registered as `{device_id}` in application `{application_id}`"
     },
     "description": {
       "package": "pkg/applicationserver/redis",
@@ -6497,9 +6497,9 @@
       "file": "registry.go"
     }
   },
-  "error:pkg/joinserver/redis:duplicate_identifiers": {
+  "error:pkg/joinserver/redis:end_device_euis_taken": {
     "translations": {
-      "en": "duplicate identifiers"
+      "en": "an end device with JoinEUI `{join_eui}` and DevEUI `{dev_eui}` is already registered as `{device_id}` in application `{application_id}`"
     },
     "description": {
       "package": "pkg/joinserver/redis",
@@ -7208,9 +7208,9 @@
       "file": "redis.go"
     }
   },
-  "error:pkg/networkserver/redis:duplicate_identifiers": {
+  "error:pkg/networkserver/redis:end_device_euis_taken": {
     "translations": {
-      "en": "duplicate identifiers"
+      "en": "an end device with JoinEUI `{join_eui}` and DevEUI `{dev_eui}` is already registered as `{device_id}` in application `{application_id}`"
     },
     "description": {
       "package": "pkg/networkserver/redis",

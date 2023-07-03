@@ -35,12 +35,16 @@ import (
 )
 
 var (
-	errAlreadyProvisioned   = errors.DefineAlreadyExists("already_provisioned", "device already provisioned")
-	errDuplicateIdentifiers = errors.DefineAlreadyExists("duplicate_identifiers", "duplicate identifiers")
-	errInvalidFieldmask     = errors.DefineInvalidArgument("invalid_fieldmask", "invalid fieldmask")
-	errInvalidIdentifiers   = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
-	errReadOnlyField        = errors.DefineInvalidArgument("read_only_field", "read-only field `{field}`")
-	errProvisionerNotFound  = errors.DefineNotFound("provisioner_not_found", "provisioner `{id}` not found")
+	errAlreadyProvisioned  = errors.DefineAlreadyExists("already_provisioned", "device already provisioned")
+	errInvalidFieldmask    = errors.DefineInvalidArgument("invalid_fieldmask", "invalid fieldmask")
+	errInvalidIdentifiers  = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
+	errReadOnlyField       = errors.DefineInvalidArgument("read_only_field", "read-only field `{field}`")
+	errProvisionerNotFound = errors.DefineNotFound("provisioner_not_found", "provisioner `{id}` not found")
+)
+
+var errEndDeviceEUIsTaken = errors.DefineAlreadyExists(
+	"end_device_euis_taken",
+	"an end device with JoinEUI `{join_eui}` and DevEUI `{dev_eui}` is already registered as `{device_id}` in application `{application_id}`", // nolint:lll
 )
 
 // SchemaVersion is the Network Server database schema version. Bump when a migration is required.
@@ -280,14 +284,24 @@ func (r *DeviceRegistry) set(ctx context.Context, tx *redis.Tx, uid string, gets
 				if err := tx.Watch(ctx, ek).Err(); err != nil {
 					return err
 				}
-				i, err := tx.Exists(ctx, ek).Result()
-				if err != nil {
+
+				storedUIDStr, err := tx.Get(ctx, ek).Result()
+				if errors.Is(err, redis.Nil) {
+					p.SetNX(ctx, ek, uid, 0)
+				} else if err != nil {
 					return err
+				} else {
+					storedUID, err := unique.ToDeviceID(storedUIDStr)
+					if err != nil {
+						return err
+					}
+					return errEndDeviceEUIsTaken.WithAttributes(
+						"join_eui", storedUID.GetJoinEui(),
+						"dev_eui", storedUID.GetDevEui(),
+						"device_id", storedUID.GetDeviceId(),
+						"application_id", storedUID.GetApplicationIds().GetApplicationId(),
+					)
 				}
-				if i != 0 {
-					return errDuplicateIdentifiers.New()
-				}
-				p.SetNX(ctx, ek, uid, 0)
 			}
 
 			if updatedPID != "" {

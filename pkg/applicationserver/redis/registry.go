@@ -32,10 +32,14 @@ import (
 )
 
 var (
-	errInvalidFieldmask     = errors.DefineInvalidArgument("invalid_fieldmask", "invalid fieldmask")
-	errInvalidIdentifiers   = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
-	errDuplicateIdentifiers = errors.DefineAlreadyExists("duplicate_identifiers", "duplicate identifiers")
-	errReadOnlyField        = errors.DefineInvalidArgument("read_only_field", "read-only field `{field}`")
+	errInvalidFieldmask   = errors.DefineInvalidArgument("invalid_fieldmask", "invalid fieldmask")
+	errInvalidIdentifiers = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
+	errReadOnlyField      = errors.DefineInvalidArgument("read_only_field", "read-only field `{field}`")
+)
+
+var errEndDeviceEUIsTaken = errors.DefineAlreadyExists(
+	"end_device_euis_taken",
+	"an end device with JoinEUI `{join_eui}` and DevEUI `{dev_eui}` is already registered as `{device_id}` in application `{application_id}`", // nolint:lll
 )
 
 // SchemaVersion is the Application Server database schema version. Bump when a migration is required.
@@ -221,14 +225,24 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids *ttnpb.EndDeviceIdentifier
 					if err := tx.Watch(ctx, ek).Err(); err != nil {
 						return err
 					}
-					i, err := tx.Exists(ctx, ek).Result()
-					if err != nil {
+
+					storedUIDStr, err := tx.Get(ctx, ek).Result()
+					if errors.Is(err, redis.Nil) {
+						p.SetNX(ctx, ek, uid, 0)
+					} else if err != nil {
 						return err
+					} else {
+						storedUID, err := unique.ToDeviceID(storedUIDStr)
+						if err != nil {
+							return err
+						}
+						return errEndDeviceEUIsTaken.WithAttributes(
+							"join_eui", storedUID.GetJoinEui(),
+							"dev_eui", storedUID.GetDevEui(),
+							"device_id", storedUID.GetDeviceId(),
+							"application_id", storedUID.GetApplicationIds().GetApplicationId(),
+						)
 					}
-					if i != 0 {
-						return errDuplicateIdentifiers.New()
-					}
-					p.SetNX(ctx, ek, uid, 0)
 				}
 
 				if _, err := ttnredis.SetProto(ctx, p, uk, updated, 0); err != nil {
