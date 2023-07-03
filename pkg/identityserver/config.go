@@ -83,13 +83,16 @@ type Config struct {
 	AdminRights struct {
 		All bool `name:"all" description:"Grant all rights to admins, including _KEYS and _ALL"`
 	} `name:"admin-rights"`
+	CollaboratorRights struct {
+		SetOthersAsContacts bool `name:"set-others-as-contacts" description:"Allow users to set other users as entity contacts"` //nolint:lll
+	} `name:"collaborator-rights"`
 	LoginTokens struct {
 		Enabled  bool          `name:"enabled" description:"enable users requesting login tokens"`
 		TokenTTL time.Duration `name:"token-ttl" description:"TTL of login tokens"`
 	} `name:"login-tokens"`
 	Email struct {
 		email.Config `name:",squash"`
-		Dir          string               `name:"dir" description:"Directory to write emails to if the dir provider is used (development only)"` //nolint:lll
+		Dir          string               `name:"dir" description:"Directory to write emails to if the dir provider is used (development only)"` // nolint:lll
 		SendGrid     sendgrid.Config      `name:"sendgrid"`
 		SMTP         smtp.Config          `name:"smtp"`
 		Templates    emailTemplatesConfig `name:"templates"`
@@ -206,6 +209,9 @@ func (c Config) toProto() *ttnpb.IsConfiguration {
 		},
 		AdminRights: &ttnpb.IsConfiguration_AdminRights{
 			All: &wrapperspb.BoolValue{Value: c.AdminRights.All},
+		},
+		CollaboratorRights: &ttnpb.IsConfiguration_CollaboratorRights{
+			SetOthersAsContacts: &wrapperspb.BoolValue{Value: c.CollaboratorRights.SetOthersAsContacts},
 		},
 	}
 }
