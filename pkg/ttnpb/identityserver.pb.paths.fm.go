@@ -76,6 +76,8 @@ var GetIsConfigurationRequestFieldPathsTopLevel []string
 var IsConfigurationFieldPathsNested = []string{
 	"admin_rights",
 	"admin_rights.all",
+	"collaborator_rights",
+	"collaborator_rights.set_others_as_contacts",
 	"end_device_picture",
 	"end_device_picture.disable_upload",
 	"profile_picture",
@@ -107,6 +109,7 @@ var IsConfigurationFieldPathsNested = []string{
 
 var IsConfigurationFieldPathsTopLevel = []string{
 	"admin_rights",
+	"collaborator_rights",
 	"end_device_picture",
 	"profile_picture",
 	"user_login",
@@ -117,6 +120,8 @@ var GetIsConfigurationResponseFieldPathsNested = []string{
 	"configuration",
 	"configuration.admin_rights",
 	"configuration.admin_rights.all",
+	"configuration.collaborator_rights",
+	"configuration.collaborator_rights.set_others_as_contacts",
 	"configuration.end_device_picture",
 	"configuration.end_device_picture.disable_upload",
 	"configuration.profile_picture",
@@ -262,6 +267,13 @@ var IsConfiguration_AdminRightsFieldPathsNested = []string{
 
 var IsConfiguration_AdminRightsFieldPathsTopLevel = []string{
 	"all",
+}
+var IsConfiguration_CollaboratorRightsFieldPathsNested = []string{
+	"set_others_as_contacts",
+}
+
+var IsConfiguration_CollaboratorRightsFieldPathsTopLevel = []string{
+	"set_others_as_contacts",
 }
 var IsConfiguration_UserRegistration_InvitationFieldPathsNested = []string{
 	"required",
