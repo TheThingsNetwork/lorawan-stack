@@ -79,7 +79,7 @@ func getHealthCheckerWithPassingCheck(t *testing.T) healthcheck.HealthChecker {
 	err := hc.AddCheck("test-check", func(ctx context.Context) error {
 		return nil
 	})
-	a.So(err, should.Equal, nil)
+	a.So(err, should.BeNil)
 	return hc
 }
 
@@ -90,7 +90,7 @@ func getHealthCheckerWithFailngCheck(t *testing.T) healthcheck.HealthChecker {
 	err := hc.AddCheck("test-fail-check", func(ctx context.Context) error {
 		return errors.New("failed")
 	})
-	a.So(err, should.Equal, nil)
+	a.So(err, should.BeNil)
 	return hc
 }
 
@@ -100,7 +100,7 @@ func getHealthCheckerWithPassingPgCheck(t *testing.T) healthcheck.HealthChecker 
 	hc := getDefaultHealthChecker(t)
 	dsn := GetDSN(defaultDB)
 	err := hc.AddPgCheck("test-pg-check", dsn.String())
-	a.So(err, should.Equal, nil)
+	a.So(err, should.BeNil)
 	return hc
 }
 
@@ -118,7 +118,7 @@ func getHealthCheckerWithFailingPgCheck(t *testing.T) healthcheck.HealthChecker 
 	query.Add("sslmode", "disable")
 	dsn.RawQuery = query.Encode()
 	err := hc.AddPgCheck("test-pg-fail-check", dsn.String())
-	a.So(err, should.Equal, nil)
+	a.So(err, should.BeNil)
 	return hc
 }
 
@@ -127,7 +127,7 @@ func getHealthCheckerWithPassingHTTPCheck(t *testing.T) healthcheck.HealthChecke
 	a := assertions.New(t)
 	hc := getDefaultHealthChecker(t)
 	err := hc.AddHTTPCheck("test-http-check", "http://localhost:3324")
-	a.So(err, should.Equal, nil)
+	a.So(err, should.BeNil)
 	return hc
 }
 
@@ -136,7 +136,7 @@ func getHealthCheckerWithFailingHTTPCheck(t *testing.T) healthcheck.HealthChecke
 	a := assertions.New(t)
 	hc := getDefaultHealthChecker(t)
 	err := hc.AddHTTPCheck("test-http-fail-check", "bad_addr")
-	a.So(err, should.Equal, nil)
+	a.So(err, should.BeNil)
 	return hc
 }
 
@@ -154,7 +154,7 @@ func getServerWithHandler(t *testing.T, hc healthcheck.HealthChecker, addr strin
 // nolint:gosec
 func assertGetStatusCode(a *assertions.Assertion, requestURL string, code int) {
 	resp, err := http.Get(requestURL)
-	a.So(err, should.Equal, nil)
+	a.So(err, should.BeNil)
 	a.So(resp.StatusCode, should.Equal, code)
 	resp.Body.Close()
 }

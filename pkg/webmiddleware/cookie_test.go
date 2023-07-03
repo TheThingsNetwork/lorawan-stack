@@ -70,7 +70,7 @@ func TestCookies(t *testing.T) {
 			if cookie.Name == "cookie-name" {
 				value := make(map[string]string)
 				err := sc.Decode("cookie-name", cookie.Value, &value)
-				a.So(err, should.Equal, nil)
+				a.So(err, should.BeNil)
 				a.So(value["foo"], should.Equal, "bar")
 			}
 		}

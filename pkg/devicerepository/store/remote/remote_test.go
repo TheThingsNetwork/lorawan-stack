@@ -462,7 +462,7 @@ func TestRemoteStore(t *testing.T) {
 			} {
 				codec, err := s.GetDownlinkDecoder(&ttnpb.GetPayloadFormatterRequest{VersionIds: ids})
 				a.So(errors.IsNotFound(err), should.BeTrue)
-				a.So(codec, should.Equal, nil)
+				a.So(codec, should.BeNil)
 			}
 		})
 		for _, tc := range []struct {

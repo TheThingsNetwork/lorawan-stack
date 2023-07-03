@@ -60,7 +60,7 @@ func TestFields(t *testing.T) {
 
 	got, ok := f.Get("a")
 	a.So(ok, should.BeFalse)
-	a.So(got, should.Equal, nil)
+	a.So(got, should.BeNil)
 
 	got, ok = g.Get("a")
 	a.So(ok, should.BeTrue)
