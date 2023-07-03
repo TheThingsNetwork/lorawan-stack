@@ -23,7 +23,7 @@ import (
 	"testing"
 
 	"github.com/redis/go-redis/v9"
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 	"github.com/vmihailenco/msgpack/v5"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"

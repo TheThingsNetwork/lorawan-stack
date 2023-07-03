@@ -19,7 +19,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 	. "go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"

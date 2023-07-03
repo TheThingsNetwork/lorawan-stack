@@ -26,7 +26,7 @@ import (
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/gorilla/websocket"
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 	ttnpbv2 "go.thethings.network/lorawan-stack-legacy/v2/pkg/ttnpb"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"

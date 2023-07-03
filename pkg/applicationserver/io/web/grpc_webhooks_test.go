@@ -18,7 +18,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"

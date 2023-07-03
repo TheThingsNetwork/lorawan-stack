@@ -28,7 +28,7 @@ import (
 	"time"
 
 	"github.com/gorilla/securecookie"
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/pbkdf2"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"

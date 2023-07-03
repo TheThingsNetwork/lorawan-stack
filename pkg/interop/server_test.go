@@ -23,7 +23,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/interop"

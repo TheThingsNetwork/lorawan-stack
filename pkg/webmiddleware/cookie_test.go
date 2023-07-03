@@ -20,7 +20,7 @@ import (
 	"testing"
 
 	"github.com/gorilla/securecookie"
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	. "go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
 )
@@ -70,7 +70,7 @@ func TestCookies(t *testing.T) {
 			if cookie.Name == "cookie-name" {
 				value := make(map[string]string)
 				err := sc.Decode("cookie-name", cookie.Value, &value)
-				a.So(err, should.Equal, nil)
+				a.So(err, should.BeNil)
 				a.So(value["foo"], should.Equal, "bar")
 			}
 		}

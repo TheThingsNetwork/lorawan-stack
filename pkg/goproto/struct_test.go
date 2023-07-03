@@ -19,7 +19,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 	"github.com/spf13/cast"
 	"go.thethings.network/lorawan-stack/v3/pkg/goproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
