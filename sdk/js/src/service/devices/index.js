@@ -493,7 +493,7 @@ class Devices {
 
     // Initiate claiming, if the device is claimable.
     const hasAuthenticatedIdentifiers = Boolean(authenticated_identifiers)
-    const claimInfoResponse = await this._api.EndDeviceClaimingServer.GetInfoByJoinEUI({
+    const claimInfoResponse = await this._api.EndDeviceClaimingServer.GetInfoByJoinEUI(undefined, {
       join_eui: ids.join_eui,
     })
     const claim = Marshaler.payloadSingleResponse(claimInfoResponse)
@@ -521,12 +521,8 @@ class Devices {
               application_id: applicationId,
             },
           }
-      try {
-        const claimResponse = await this._api.EndDeviceClaimingServer.Claim(undefined, claimPayload)
-        claimDeviceIds = Marshaler.payloadSingleResponse(claimResponse)
-      } catch (error) {
-        throw new Error('Unable to claim end device', { cause: error })
-      }
+      const claimResponse = await this._api.EndDeviceClaimingServer.Claim(undefined, claimPayload)
+      claimDeviceIds = Marshaler.payloadSingleResponse(claimResponse)
     }
 
     let newFieldmasks = mask

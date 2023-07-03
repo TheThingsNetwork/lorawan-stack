@@ -48,6 +48,7 @@ var (
 	registeredJoinEUI        = types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0C}
 	unRegisteredJoinEUI      = types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0D}
 	registeredDevEUI         = types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30}
+	authenticationCode       = "BEEF1234"
 )
 
 func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.ClusterRole) {
@@ -88,6 +89,14 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 		enddevices.Config{},
 		enddevices.WithClaimer("test", &MockClaimer{
 			JoinEUI: registeredJoinEUI,
+			ClaimFunc: func(
+				ctx context.Context, joinEUI, devEUI types.EUI64, claimAuthenticationCode string,
+			) error {
+				a.So(joinEUI, should.Equal, registeredJoinEUI)
+				a.So(devEUI, should.Resemble, registeredDevEUI)
+				a.So(claimAuthenticationCode, should.Equal, authenticationCode)
+				return nil
+			},
 		}),
 	)
 	a.So(err, should.BeNil)
@@ -205,7 +214,7 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 					AuthenticatedIdentifiers: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers{
 						JoinEui:            registeredJoinEUI.Bytes(),
 						DevEui:             registeredDevEUI.Bytes(),
-						AuthenticationCode: "TEST1234",
+						AuthenticationCode: authenticationCode,
 					},
 				},
 				TargetApplicationIds: registeredApplicationIDs,
@@ -223,7 +232,7 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 					AuthenticatedIdentifiers: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers{
 						JoinEui:            registeredJoinEUI.Bytes(),
 						DevEui:             registeredDevEUI.Bytes(),
-						AuthenticationCode: "TEST1234",
+						AuthenticationCode: authenticationCode,
 					},
 				},
 				TargetApplicationIds: registeredApplicationIDs,

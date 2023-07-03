@@ -73,7 +73,7 @@ describe('Device un-claiming', () => {
   })
 
   it('succeeds un-claiming and deleting an end device', () => {
-    cy.intercept('DELETE', `/api/v3/edcs/claim/${appId}/devices/${endDeviceId}`, {}).as(
+    cy.intercept('DELETE', `/api/v3/edcs/claim/${appId}/devices/${endDeviceId}?*`, {}).as(
       'unclaim-request',
     )
 
@@ -86,10 +86,14 @@ describe('Device un-claiming', () => {
         cy.findByRole('button', { name: /Unclaim and delete end device/ }).click()
       })
 
-    cy.wait('@unclaim-request').its('request.body').should('deep.equal', {
-      dev_eui: ns.end_device.ids.dev_eui,
-      join_eui: '0000000000000000',
-    })
+    cy.wait('@unclaim-request')
+      .its('request.url')
+      .then(url => {
+        const params = new URLSearchParams(new URL(url).search)
+
+        expect(params.get('dev_eui')).to.equal(ns.end_device.ids.dev_eui)
+        expect(params.get('join_eui')).to.equal('0000000000000000')
+      })
 
     cy.findByTestId('error-notification').should('not.exist')
 

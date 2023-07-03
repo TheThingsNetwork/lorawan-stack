@@ -32,9 +32,22 @@ const PageTitle = ({
   className,
   colProps,
   rowProps,
+  noGrid,
 }) => {
   const titleClass = classnames(style.title, className, { [style.tall]: tall })
   const pageTitle = <IntlHelmet title={title} values={values} />
+
+  if (noGrid) {
+    return (
+      <>
+        {pageTitle}
+        {!hideHeading && (
+          <Message component="h1" className={titleClass} content={title} values={values} />
+        )}
+        {children}
+      </>
+    )
+  }
 
   return hideHeading ? (
     pageTitle
@@ -56,6 +69,7 @@ PageTitle.propTypes = {
   className: PropTypes.string,
   colProps: PropTypes.shape({}),
   hideHeading: PropTypes.bool,
+  noGrid: PropTypes.bool,
   rowProps: PropTypes.shape({}),
   tall: PropTypes.bool,
   title: PropTypes.message.isRequired,
@@ -67,6 +81,7 @@ PageTitle.defaultProps = {
   className: undefined,
   colProps: {},
   hideHeading: false,
+  noGrid: false,
   rowProps: {},
   tall: false,
   values: undefined,

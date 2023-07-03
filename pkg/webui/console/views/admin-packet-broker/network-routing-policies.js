@@ -23,8 +23,8 @@ import m from './messages'
 
 const NetworkRoutingPoliciesView = () => {
   useBreadcrumbs(
-    'admin.packet-broker.networks',
-    <Breadcrumb path={'/admin/packet-broker/networks'} content={m.networks} />,
+    'admin-panel.packet-broker.networks',
+    <Breadcrumb path={'/admin-panel/packet-broker/networks'} content={m.networks} />,
   )
 
   return <PacketBrokerNetworksTable />

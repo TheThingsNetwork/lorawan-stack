@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { Component } from 'react'
+import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 
-import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 
-import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+import Require from '@console/lib/components/require'
 
 import UserAdd from '@console/views/admin-user-management-add'
 import UserEdit from '@console/views/admin-user-management-edit'
@@ -36,28 +35,27 @@ import { mayManageUsers } from '@console/lib/feature-checks'
 
 import UserManagement from './admin-user-management'
 
-@withFeatureRequirement(mayManageUsers, { redirect: '/' })
-@withBreadcrumb('admin.user-management', () => (
-  <Breadcrumb path={'/admin/user-management'} content={sharedMessages.userManagement} />
-))
-export default class UserManagementRouter extends Component {
-  static propTypes = {
-    match: PropTypes.match.isRequired,
-  }
-  render() {
-    const { match } = this.props
-    return (
-      <React.Fragment>
-        <Breadcrumbs />
-        <IntlHelmet title={sharedMessages.userManagement} />
-        <Switch>
-          <Route exact path={`${match.path}`} component={UserManagement} />
-          <Route path={`${match.path}/add`} component={UserAdd} />
-          <Route path={`${match.path}/invitations/add`} component={InvitationSend} />
-          <Route path={`${match.path}/:userId${userPathIdRegexp}`} component={UserEdit} sensitive />
-          <NotFoundRoute />
-        </Switch>
-      </React.Fragment>
-    )
-  }
+const UserManagementRouter = ({ match }) => {
+  useBreadcrumbs(
+    'admin-panel.user-management',
+    <Breadcrumb path={'/admin-panel/user-management'} content={sharedMessages.userManagement} />,
+  )
+  return (
+    <Require featureCheck={mayManageUsers} otherwise={{ redirect: '/' }}>
+      <IntlHelmet title={sharedMessages.userManagement} />
+      <Switch>
+        <Route exact path={`${match.path}`} component={UserManagement} />
+        <Route path={`${match.path}/add`} component={UserAdd} />
+        <Route path={`${match.path}/invitations/add`} component={InvitationSend} />
+        <Route path={`${match.path}/:userId${userPathIdRegexp}`} component={UserEdit} sensitive />
+        <NotFoundRoute />
+      </Switch>
+    </Require>
+  )
 }
+
+UserManagementRouter.propTypes = {
+  match: PropTypes.match.isRequired,
+}
+
+export default UserManagementRouter

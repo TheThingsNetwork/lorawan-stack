@@ -28,7 +28,18 @@
   box-sizing: border-box
   transition: width $ad.s
 
+  &.warn
+    background-color: $tc-warning
+
+  &.limit
+    background-color: $c-error
+
 .status
   horizontalize()
   div
     display: flex
+
+.progress-bar-values
+  display: flex
+  justify-content: space-between
+  margin-bottom: $cs.xs
