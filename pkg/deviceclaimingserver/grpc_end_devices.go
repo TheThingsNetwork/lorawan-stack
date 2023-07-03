@@ -99,7 +99,7 @@ func (edcs *endDeviceClaimingServer) Claim(
 		return nil, errClaimingNotSupported.WithAttributes("eui", joinEUI)
 	}
 
-	err := claimer.Claim(ctx, devEUI, joinEUI, claimAuthenticationCode)
+	err := claimer.Claim(ctx, joinEUI, devEUI, claimAuthenticationCode)
 	if err != nil {
 		return nil, err
 	}

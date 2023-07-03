@@ -58,14 +58,14 @@ const m = defineMessages({
     getUser,
     updateUser: attachPromise(updateUser),
     deleteUser: attachPromise(deleteUser),
-    navigateToList: () => replace(`/admin/user-management`),
+    navigateToList: () => replace(`/admin-panel/user-management`),
   },
 )
 @withRequest(({ userId, getUser }) =>
   getUser(userId, ['name', 'primary_email_address', 'state', 'admin', 'description']),
 )
-@withBreadcrumb('admin.user-management.edit', ({ userId }) => (
-  <Breadcrumb path={`/admin/user-management/${userId}`} content={sharedMessages.edit} />
+@withBreadcrumb('admin-panel.user-management.edit', ({ userId }) => (
+  <Breadcrumb path={`/admin-panel/user-management/${userId}`} content={sharedMessages.edit} />
 ))
 export default class UserManagementEdit extends Component {
   static propTypes = {
@@ -120,7 +120,7 @@ export default class UserManagementEdit extends Component {
       <Container>
         <PageTitle title={sharedMessages.userEdit} />
         <Row>
-          <Col lg={8} md={12}>
+          <Col>
             <UserDataForm
               update
               initialValues={user}

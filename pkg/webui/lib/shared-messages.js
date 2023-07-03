@@ -32,6 +32,7 @@ export default defineMessages({
   addressPlaceholder: 'host',
   addWebhook: 'Add webhook',
   admin: 'Admin',
+  adminPanel: 'Admin panel',
   all: 'All',
   allAdmin: 'All (Admin)',
   altitude: 'Altitude',

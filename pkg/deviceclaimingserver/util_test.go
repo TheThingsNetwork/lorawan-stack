@@ -24,6 +24,8 @@ import (
 // MockClaimer is a mock Claimer.
 type MockClaimer struct {
 	JoinEUI types.EUI64
+
+	ClaimFunc func(context.Context, types.EUI64, types.EUI64, string) error
 }
 
 // SupportsJoinEUI returns whether the Join Server supports this JoinEUI.
@@ -32,9 +34,10 @@ func (m MockClaimer) SupportsJoinEUI(joinEUI types.EUI64) bool {
 }
 
 // Claim claims an End Device.
-func (MockClaimer) Claim(_ context.Context, _, _ types.EUI64, _ string,
+func (m MockClaimer) Claim(
+	ctx context.Context, joinEUI, devEUI types.EUI64, claimAuthenticationCode string,
 ) error {
-	return nil
+	return m.ClaimFunc(ctx, joinEUI, devEUI, claimAuthenticationCode)
 }
 
 // GetClaimStatus returns the claim status an End Device.

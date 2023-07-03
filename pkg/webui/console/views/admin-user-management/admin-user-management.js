@@ -13,11 +13,10 @@
 // limitations under the License.
 
 import React, { Component } from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 
 import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
 
-import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+import PageTitle from '@ttn-lw/components/page-title'
 
 import UsersTable from '@console/containers/users-table'
 
@@ -26,14 +25,10 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 export default class UserManagement extends Component {
   render() {
     return (
-      <Container>
-        <Row>
-          <Col>
-            <IntlHelmet title={sharedMessages.userManagement} />
-            <UsersTable pageSize={PAGE_SIZES.REGULAR} />
-          </Col>
-        </Row>
-      </Container>
+      <>
+        <PageTitle title={sharedMessages.userManagement} className="panel-title mb-0" />
+        <UsersTable pageSize={PAGE_SIZES.REGULAR} />
+      </>
     )
   }
 }

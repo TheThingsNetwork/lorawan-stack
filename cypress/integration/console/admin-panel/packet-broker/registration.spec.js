@@ -36,10 +36,10 @@ describe('Packet Broker registration', () => {
 
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
 
-    cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker`)
+    cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/packet-broker`)
     cy.location('pathname').should('eq', `${Cypress.config('consoleRootPath')}/`)
 
-    cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker/networks/19`)
+    cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/packet-broker/networks/19`)
     cy.location('pathname').should('eq', `${Cypress.config('consoleRootPath')}/`)
   })
 
@@ -47,7 +47,7 @@ describe('Packet Broker registration', () => {
     cy.intercept('/api/v3/pba/info', { statusCode: 403 })
 
     cy.loginConsole({ user_id: 'admin', password: 'admin' })
-    cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker`)
+    cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/packet-broker`)
 
     cy.findByTestId('notification')
       .findByText(/not set up/)
@@ -58,11 +58,11 @@ describe('Packet Broker registration', () => {
   it('displays UI elements in place', () => {
     cy.intercept('/api/v3/pba/info', { fixture: 'console/packet-broker/info.json' })
     cy.loginConsole({ user_id: 'admin', password: 'admin' })
-    cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker`)
+    cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/packet-broker`)
 
     cy.findByText('Packet Broker', { selector: 'h1' }).should('be.visible')
     cy.findByText(/Packet Broker can be used to exchange traffic/).should('be.visible')
-    cy.findByText('Packet Broker', { selector: 'a' }).should('be.visible')
+    cy.findByText('Packet Broker documentation', { selector: 'a' }).should('be.visible')
     cy.findByText('Packet Broker website', { selector: 'a' }).should('be.visible')
     cy.findByText('Register network', { selector: 'span' }).should('be.visible')
     cy.findByTestId('switch')
@@ -87,7 +87,7 @@ describe('Packet Broker registration', () => {
     cy.intercept('/api/v3/pba/info', { fixture: 'console/packet-broker/info.json' })
 
     cy.loginConsole({ user_id: 'admin', password: 'admin' })
-    cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker`)
+    cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/packet-broker`)
 
     cy.findByText('Register network').click().next().findByTestId('switch').should('be.checked')
     cy.findByText('List network publicly')

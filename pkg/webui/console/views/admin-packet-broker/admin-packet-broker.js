@@ -143,8 +143,8 @@ const PacketBroker = ({ match }) => {
               content={sharedMessages.furtherResources}
               className={style.furtherResources}
             />
-            <Link.DocLink path="/the-things-stack/packet-broker/" secondary>
-              Packet Broker
+            <Link.DocLink path="/reference/packet-broker/" secondary>
+              Packet Broker documentation
             </Link.DocLink>
             {' | '}
             <Link.Anchor href="https://www.packetbroker.net" external secondary>

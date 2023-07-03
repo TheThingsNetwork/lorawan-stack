@@ -8690,8 +8690,8 @@ The Pba service allows clients to manage peering through Packet Broker.
 | `GetFormat` | `GET` | `/api/v3/qr-codes/end-devices/formats/{format_id}` |  |
 | `ListFormats` | `GET` | `/api/v3/qr-codes/end-devices/formats` |  |
 | `Generate` | `POST` | `/api/v3/qr-codes/end-devices` | `*` |
-| `Parse` | `POST` | `/api/v3/qr-code/end-devices/parse` | `*` |
-| `Parse` | `POST` | `/api/v3/qr-code/end-devices/{format_id}/parse` | `*` |
+| `Parse` | `POST` | `/api/v3/qr-codes/end-devices/parse` | `*` |
+| `Parse` | `POST` | `/api/v3/qr-codes/end-devices/{format_id}/parse` | `*` |
 
 ## <a name="lorawan-stack/api/regional.proto">File `lorawan-stack/api/regional.proto`</a>
 
