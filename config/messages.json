@@ -2717,15 +2717,6 @@
       "file": "registry.go"
     }
   },
-  "error:pkg/applicationserver/redis:end_device_euis_taken": {
-    "translations": {
-      "en": "an end device with JoinEUI `{join_eui}` and DevEUI `{dev_eui}` is already registered as `{device_id}` in application `{application_id}`"
-    },
-    "description": {
-      "package": "pkg/applicationserver/redis",
-      "file": "registry.go"
-    }
-  },
   "error:pkg/applicationserver/redis:invalid_fieldmask": {
     "translations": {
       "en": "invalid fieldmask"
@@ -6164,6 +6155,15 @@
       "file": "contact_info_registry.go"
     }
   },
+  "error:pkg/internal/registry:end_device_euis_taken": {
+    "translations": {
+      "en": "an end device with JoinEUI `{join_eui}` and DevEUI `{dev_eui}` is already registered as `{device_id}` in application `{application_id}`"
+    },
+    "description": {
+      "package": "pkg/internal/registry",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/interop:activation": {
     "translations": {
       "en": "activation disallowed"
@@ -6491,15 +6491,6 @@
   "error:pkg/joinserver/redis:already_provisioned": {
     "translations": {
       "en": "device already provisioned"
-    },
-    "description": {
-      "package": "pkg/joinserver/redis",
-      "file": "registry.go"
-    }
-  },
-  "error:pkg/joinserver/redis:end_device_euis_taken": {
-    "translations": {
-      "en": "an end device with JoinEUI `{join_eui}` and DevEUI `{dev_eui}` is already registered as `{device_id}` in application `{application_id}`"
     },
     "description": {
       "package": "pkg/joinserver/redis",
@@ -7206,15 +7197,6 @@
     "description": {
       "package": "pkg/networkserver/redis",
       "file": "redis.go"
-    }
-  },
-  "error:pkg/networkserver/redis:end_device_euis_taken": {
-    "translations": {
-      "en": "an end device with JoinEUI `{join_eui}` and DevEUI `{dev_eui}` is already registered as `{device_id}` in application `{application_id}`"
-    },
-    "description": {
-      "package": "pkg/networkserver/redis",
-      "file": "registry.go"
     }
   },
   "error:pkg/networkserver/redis:field": {

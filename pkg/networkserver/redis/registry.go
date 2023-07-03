@@ -22,6 +22,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/vmihailenco/msgpack/v5"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/internal/registry"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
@@ -37,11 +38,6 @@ var (
 	errInvalidFieldmask   = errors.DefineInvalidArgument("invalid_fieldmask", "invalid fieldmask")
 	errInvalidIdentifiers = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
 	errReadOnlyField      = errors.DefineInvalidArgument("read_only_field", "read-only field `{field}`")
-)
-
-var errEndDeviceEUIsTaken = errors.DefineAlreadyExists(
-	"end_device_euis_taken",
-	"an end device with JoinEUI `{join_eui}` and DevEUI `{dev_eui}` is already registered as `{device_id}` in application `{application_id}`", // nolint:lll
 )
 
 // DeviceSchemaVersion is the Network Server database schema version regarding the devices namespace.
@@ -783,7 +779,9 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 					return errInvalidIdentifiers.New()
 				}
 				if pb.Ids.JoinEui != nil && pb.Ids.DevEui != nil {
-					ek := r.euiKey(types.MustEUI64(pb.Ids.JoinEui).OrZero(), types.MustEUI64(pb.Ids.DevEui).OrZero())
+					joinEUI := types.MustEUI64(pb.Ids.JoinEui).OrZero()
+					devEUI := types.MustEUI64(pb.Ids.DevEui).OrZero()
+					ek := r.euiKey(joinEUI, devEUI)
 					if err := tx.Watch(ctx, ek).Err(); err != nil {
 						return err
 					}
@@ -794,16 +792,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 					} else if err != nil {
 						return err
 					} else {
-						storedUID, err := unique.ToDeviceID(storedUIDStr)
-						if err != nil {
-							return err
-						}
-						return errEndDeviceEUIsTaken.WithAttributes(
-							"join_eui", storedUID.GetJoinEui(),
-							"dev_eui", storedUID.GetDevEui(),
-							"device_id", storedUID.GetDeviceId(),
-							"application_id", storedUID.GetApplicationIds().GetApplicationId(),
-						)
+						return registry.UniqueEUIViolationErr(ctx, joinEUI, devEUI, storedUIDStr)
 					}
 				}
 			} else {
