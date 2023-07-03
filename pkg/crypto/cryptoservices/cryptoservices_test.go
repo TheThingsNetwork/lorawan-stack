@@ -21,7 +21,7 @@ import (
 	"net"
 	"testing"
 
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	. "go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoservices"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"

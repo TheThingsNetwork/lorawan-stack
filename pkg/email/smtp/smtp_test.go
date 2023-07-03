@@ -19,7 +19,7 @@ import (
 	"testing"
 
 	"github.com/emersion/go-smtp"
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"

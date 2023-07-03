@@ -19,7 +19,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"

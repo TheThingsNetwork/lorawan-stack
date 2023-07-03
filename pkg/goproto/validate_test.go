@@ -18,7 +18,7 @@ import (
 	"math"
 	"testing"
 
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/goproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/protobuf/types/known/structpb"

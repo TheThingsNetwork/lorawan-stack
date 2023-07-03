@@ -27,7 +27,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 	. "go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )

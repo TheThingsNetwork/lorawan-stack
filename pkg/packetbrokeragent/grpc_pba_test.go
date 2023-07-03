@@ -21,7 +21,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 	iampb "go.packetbroker.org/api/iam"
 	iampbv2 "go.packetbroker.org/api/iam/v2"
 	routingpb "go.packetbroker.org/api/routing"

@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package should wraps assertions in github.com/smartystreets/assertions and util/test/assertions.
+// Package should wraps assertions in github.com/smarty/assertions and util/test/assertions.
 package should
 
 import (
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 	testassertions "go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions"
 )
 

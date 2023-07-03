@@ -22,7 +22,7 @@ import (
 	nats_server "github.com/nats-io/nats-server/v2/server"
 	nats_test_server "github.com/nats-io/nats-server/v2/test"
 	nats_client "github.com/nats-io/nats.go"
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/provider"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"

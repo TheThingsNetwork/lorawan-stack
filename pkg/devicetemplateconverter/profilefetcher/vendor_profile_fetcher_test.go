@@ -18,7 +18,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 	mockdr "go.thethings.network/lorawan-stack/v3/pkg/devicerepository/mock"
 	. "go.thethings.network/lorawan-stack/v3/pkg/devicetemplateconverter/profilefetcher"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"

@@ -19,7 +19,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 	ttnpbv2 "go.thethings.network/lorawan-stack-legacy/v2/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"

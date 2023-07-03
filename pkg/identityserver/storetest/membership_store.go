@@ -18,7 +18,7 @@ import (
 	"sort"
 	. "testing"
 
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	is "go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"

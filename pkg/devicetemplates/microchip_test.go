@@ -18,7 +18,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 	. "go.thethings.network/lorawan-stack/v3/pkg/devicetemplates"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/provisioning"

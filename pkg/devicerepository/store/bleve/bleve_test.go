@@ -18,7 +18,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store/bleve"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"

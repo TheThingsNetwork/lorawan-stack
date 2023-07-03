@@ -20,7 +20,7 @@ import (
 	"testing"
 
 	"github.com/gorilla/csrf"
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	. "go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
