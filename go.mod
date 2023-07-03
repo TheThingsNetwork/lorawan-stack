@@ -16,7 +16,7 @@ require (
 	github.com/TheThingsIndustries/protoc-gen-go-flags v1.1.0
 	github.com/TheThingsIndustries/protoc-gen-go-json v1.5.1
 	github.com/TheThingsNetwork/go-cayenne-lib v1.1.0
-	github.com/aws/aws-sdk-go v1.44.274
+	github.com/aws/aws-sdk-go v1.44.294
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/blevesearch/bleve v1.0.14
 	github.com/bluele/gcache v0.0.2
