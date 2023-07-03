@@ -62,12 +62,22 @@ var (
 )
 
 var (
-	errNestedOrganizations       = errors.DefineInvalidArgument("nested_organizations", "organizations can not be nested")
-	errAdminsCreateOrganizations = errors.DefinePermissionDenied("admins_create_organizations", "organizations may only be created by admins")
-	errAdminsPurgeOrganizations  = errors.DefinePermissionDenied("admins_purge_organizations", "organizations may only be purged by admins")
+	errNestedOrganizations = errors.DefineInvalidArgument(
+		"nested_organizations", "organizations can not be nested",
+	)
+	errAdminsCreateOrganizations = errors.DefinePermissionDenied(
+		"admins_create_organizations",
+		"organizations may only be created by admins",
+	)
+	errAdminsPurgeOrganizations = errors.DefinePermissionDenied(
+		"admins_purge_organizations",
+		"organizations may only be purged by admins",
+	)
 )
 
-func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.CreateOrganizationRequest) (org *ttnpb.Organization, err error) {
+func (is *IdentityServer) createOrganization(
+	ctx context.Context, req *ttnpb.CreateOrganizationRequest,
+) (org *ttnpb.Organization, err error) {
 	if err = blocklist.Check(ctx, req.Organization.GetIds().GetOrganizationId()); err != nil {
 		return nil, err
 	}
@@ -84,7 +94,9 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 
 	if req.Organization.AdministrativeContact == nil {
 		req.Organization.AdministrativeContact = req.Collaborator
-	} else if err := validateCollaboratorEqualsContact(req.Collaborator, req.Organization.AdministrativeContact); err != nil {
+	} else if err := validateCollaboratorEqualsContact(
+		req.Collaborator, req.Organization.AdministrativeContact,
+	); err != nil {
 		return nil, err
 	}
 	if req.Organization.TechnicalContact == nil {
@@ -125,7 +137,10 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 	return org, nil
 }
 
-func (is *IdentityServer) getOrganization(ctx context.Context, req *ttnpb.GetOrganizationRequest) (org *ttnpb.Organization, err error) {
+func (is *IdentityServer) getOrganization(
+	ctx context.Context,
+	req *ttnpb.GetOrganizationRequest,
+) (org *ttnpb.Organization, err error) {
 	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
@@ -155,7 +170,10 @@ func (is *IdentityServer) getOrganization(ctx context.Context, req *ttnpb.GetOrg
 	return org, nil
 }
 
-func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.ListOrganizationsRequest) (orgs *ttnpb.Organizations, err error) {
+func (is *IdentityServer) listOrganizations(
+	ctx context.Context,
+	req *ttnpb.ListOrganizationsRequest,
+) (orgs *ttnpb.Organizations, err error) {
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask, getPaths, nil)
 
 	authInfo, err := is.authInfo(ctx)
@@ -202,7 +220,11 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 		if len(ids) == 0 {
 			return nil
 		}
-		callerMemberships, err = st.FindAccountMembershipChains(ctx, callerAccountID, "organization", idStrings(ids...)...)
+		callerMemberships, err = st.FindAccountMembershipChains(
+			ctx,
+			callerAccountID,
+			"organization",
+			idStrings(ids...)...)
 		if err != nil {
 			return err
 		}
@@ -232,8 +254,13 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 	return orgs, nil
 }
 
-func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.UpdateOrganizationRequest) (org *ttnpb.Organization, err error) {
-	if err = rights.RequireOrganization(ctx, req.Organization.GetIds(), ttnpb.Right_RIGHT_ORGANIZATION_SETTINGS_BASIC); err != nil {
+func (is *IdentityServer) updateOrganization(
+	ctx context.Context,
+	req *ttnpb.UpdateOrganizationRequest,
+) (org *ttnpb.Organization, err error) {
+	if err = rights.RequireOrganization(
+		ctx, req.Organization.GetIds(), ttnpb.Right_RIGHT_ORGANIZATION_SETTINGS_BASIC,
+	); err != nil {
 		return nil, err
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask, nil, getPaths)
@@ -257,10 +284,14 @@ func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.Upd
 		[]string{"administrative_contact", "technical_contact"},
 	)
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
-		if err := validateContactIsCollaborator(ctx, st, req.Organization.AdministrativeContact, req.Organization.GetEntityIdentifiers()); err != nil {
+		if err := validateContactIsCollaborator(
+			ctx, st, req.Organization.AdministrativeContact, req.Organization.GetEntityIdentifiers(),
+		); err != nil {
 			return err
 		}
-		if err := validateContactIsCollaborator(ctx, st, req.Organization.TechnicalContact, req.Organization.GetEntityIdentifiers()); err != nil {
+		if err := validateContactIsCollaborator(
+			ctx, st, req.Organization.TechnicalContact, req.Organization.GetEntityIdentifiers(),
+		); err != nil {
 			return err
 		}
 		org, err = st.UpdateOrganization(ctx, req.Organization, req.FieldMask.GetPaths())
@@ -279,11 +310,16 @@ func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.Upd
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateOrganization.NewWithIdentifiersAndData(ctx, req.Organization.GetIds(), req.FieldMask.GetPaths()))
+	events.Publish(
+		evtUpdateOrganization.NewWithIdentifiersAndData(ctx, req.Organization.GetIds(), req.FieldMask.GetPaths()),
+	)
 	return org, nil
 }
 
-func (is *IdentityServer) deleteOrganization(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*emptypb.Empty, error) {
+func (is *IdentityServer) deleteOrganization(
+	ctx context.Context,
+	ids *ttnpb.OrganizationIdentifiers,
+) (*emptypb.Empty, error) {
 	if err := rights.RequireOrganization(ctx, ids, ttnpb.Right_RIGHT_ORGANIZATION_DELETE); err != nil {
 		return nil, err
 	}
@@ -297,8 +333,13 @@ func (is *IdentityServer) deleteOrganization(ctx context.Context, ids *ttnpb.Org
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) restoreOrganization(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*emptypb.Empty, error) {
-	if err := rights.RequireOrganization(store.WithSoftDeleted(ctx, false), ids, ttnpb.Right_RIGHT_ORGANIZATION_DELETE); err != nil {
+func (is *IdentityServer) restoreOrganization(
+	ctx context.Context,
+	ids *ttnpb.OrganizationIdentifiers,
+) (*emptypb.Empty, error) {
+	if err := rights.RequireOrganization(
+		store.WithSoftDeleted(ctx, false), ids, ttnpb.Right_RIGHT_ORGANIZATION_DELETE,
+	); err != nil {
 		return nil, err
 	}
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
@@ -322,7 +363,10 @@ func (is *IdentityServer) restoreOrganization(ctx context.Context, ids *ttnpb.Or
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) purgeOrganization(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*emptypb.Empty, error) {
+func (is *IdentityServer) purgeOrganization(
+	ctx context.Context,
+	ids *ttnpb.OrganizationIdentifiers,
+) (*emptypb.Empty, error) {
 	if !is.IsAdmin(ctx) {
 		return nil, errAdminsPurgeOrganizations.New()
 	}
@@ -355,30 +399,50 @@ type organizationRegistry struct {
 	*IdentityServer
 }
 
-func (or *organizationRegistry) Create(ctx context.Context, req *ttnpb.CreateOrganizationRequest) (*ttnpb.Organization, error) {
+func (or *organizationRegistry) Create(
+	ctx context.Context,
+	req *ttnpb.CreateOrganizationRequest,
+) (*ttnpb.Organization, error) {
 	return or.createOrganization(ctx, req)
 }
 
-func (or *organizationRegistry) Get(ctx context.Context, req *ttnpb.GetOrganizationRequest) (*ttnpb.Organization, error) {
+func (or *organizationRegistry) Get(
+	ctx context.Context,
+	req *ttnpb.GetOrganizationRequest,
+) (*ttnpb.Organization, error) {
 	return or.getOrganization(ctx, req)
 }
 
-func (or *organizationRegistry) List(ctx context.Context, req *ttnpb.ListOrganizationsRequest) (*ttnpb.Organizations, error) {
+func (or *organizationRegistry) List(
+	ctx context.Context,
+	req *ttnpb.ListOrganizationsRequest,
+) (*ttnpb.Organizations, error) {
 	return or.listOrganizations(ctx, req)
 }
 
-func (or *organizationRegistry) Update(ctx context.Context, req *ttnpb.UpdateOrganizationRequest) (*ttnpb.Organization, error) {
+func (or *organizationRegistry) Update(
+	ctx context.Context,
+	req *ttnpb.UpdateOrganizationRequest,
+) (*ttnpb.Organization, error) {
 	return or.updateOrganization(ctx, req)
 }
 
-func (or *organizationRegistry) Delete(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*emptypb.Empty, error) {
+func (or *organizationRegistry) Delete(
+	ctx context.Context,
+	req *ttnpb.OrganizationIdentifiers,
+) (*emptypb.Empty, error) {
 	return or.deleteOrganization(ctx, req)
 }
 
-func (or *organizationRegistry) Restore(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*emptypb.Empty, error) {
+func (or *organizationRegistry) Restore(
+	ctx context.Context,
+	req *ttnpb.OrganizationIdentifiers,
+) (*emptypb.Empty, error) {
 	return or.restoreOrganization(ctx, req)
 }
 
-func (or *organizationRegistry) Purge(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*emptypb.Empty, error) {
+func (or *organizationRegistry) Purge(
+	ctx context.Context, req *ttnpb.OrganizationIdentifiers,
+) (*emptypb.Empty, error) {
 	return or.purgeOrganization(ctx, req)
 }
