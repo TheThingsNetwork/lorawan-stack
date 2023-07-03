@@ -72,6 +72,11 @@ func WithAudienceFromAddresses(addresses ...string) TokenOption {
 			if addr == "" {
 				continue
 			}
+			// If the address is a URL with a scheme, check if it's a gRPC dialer scheme and remove it.
+			// gRPC dialer schemes in the target address look like passthrough:///host:port.
+			if u, err := url.Parse(addr); err == nil && u.Scheme != "" && strings.HasPrefix(addr, u.Scheme+":///") {
+				addr = addr[len(u.Scheme)+4:]
+			}
 			if h, _, err := net.SplitHostPort(addr); err == nil {
 				addr = h
 			}
@@ -110,7 +115,7 @@ func TokenSource(ctx context.Context, clientID, clientSecret string, opts ...Tok
 	return config.TokenSource(ctx)
 }
 
-// TokenNetworkClaims defines a Packet Broker network identifier.
+// TokenNetworkClaim defines a Packet Broker network identifier.
 type TokenNetworkClaim struct {
 	NetID    uint32 `json:"nid"`
 	TenantID string `json:"tid"`

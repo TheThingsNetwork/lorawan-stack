@@ -39,6 +39,7 @@ For details about compatibility between different releases, see the **Commitment
 - HTTP API routes for parsing QR codes for the QR Generator service. We exercise our right to break compatibility with third party HTTP clients since this is a bug.
   - `/qr-code/end-devices/parse` is changed to `/qr-codes/end-devices/parse`.
   - `/qr-code/end-devices/{format_id}/parse` is changed to `/qr-codes/end-devices/{format_id}/parse`.
+- Fixed authenticating with Packet Broker when gRPC dialer schemes are used in the address.
 
 ## [3.26.1] - 2023-06-20
 
