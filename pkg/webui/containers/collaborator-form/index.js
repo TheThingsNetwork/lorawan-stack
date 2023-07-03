@@ -24,7 +24,7 @@ import toast from '@ttn-lw/components/toast'
 import ModalButton from '@ttn-lw/components/button/modal-button'
 import RightsGroup from '@ttn-lw/components/rights-group'
 
-import CollaboratorSelect from '@console/containers/collaborator-select'
+import AccountSelect from '@console/containers/account-select'
 import composeOption from '@console/containers/collaborator-select/util'
 
 import Yup from '@ttn-lw/lib/yup'
@@ -47,8 +47,8 @@ const validationSchema = Yup.object().shape({
     .shape({
       ids: Yup.object().when(['organization_ids'], {
         is: organizationIds => Boolean(organizationIds),
-        then: collaboratorOrganizationSchema,
-        otherwise: collaboratorUserSchema,
+        then: schema => schema.concat(collaboratorOrganizationSchema),
+        otherwise: schema => schema.concat(collaboratorUserSchema),
       }),
     })
     .required(sharedMessages.validateRequired)
@@ -151,18 +151,16 @@ const CollaboratorForm = props => {
   const initialValues = React.useMemo(() => {
     if (!collaborator) {
       return {
-        collaborator_id: '',
-        collaborator_type: 'user',
+        collaborator: '',
         rights: [...pseudoRights],
       }
     }
 
     return {
-      collaborator_id: collaboratorId,
-      collaborator_type: collaboratorType,
+      collaborator,
       rights: [...collaborator.rights],
     }
-  }, [collaborator, collaboratorId, collaboratorType, pseudoRights])
+  }, [collaborator, pseudoRights])
 
   let warning = null
   if (update) {
@@ -185,7 +183,7 @@ const CollaboratorForm = props => {
       validationSchema={validationSchema}
     >
       {warning}
-      <CollaboratorSelect
+      <AccountSelect
         name="collaborator"
         title={sharedMessages.collaborator}
         placeholder={m.collaboratorIdPlaceholder}
@@ -193,7 +191,6 @@ const CollaboratorForm = props => {
         autoFocus={!update}
         disabled={update}
         entity={entity}
-        entityId={entityId}
         encode={encodeCollaborator}
         decode={decodeCollaborator}
       />

@@ -116,7 +116,6 @@ const Suggest = ({ initialOptions, userInputCustomComponent, entity, entityId, .
       loadOptions={handleLoadingOptions}
       showOptionIcon
       openMenuOnFocus
-      isClearable
       className={styles.collaboratorSelect}
       customComponents={{ SingleValue, Menu: customMenu }}
       maxMenuHeight={300}
@@ -159,7 +158,12 @@ const CollaboratorSelect = ({ entity, entityId, ...rest }) => {
 
   return (
     <RequireRequest requestAction={getCollaboratorsList(entity.toLowerCase(), entityId)}>
-      <Suggest {...rest} initialOptions={collaboratorOptions} entity={entity} entityId={entityId} />
+      <Suggest
+        {...rest}
+        initialOptions={collaboratorOptions}
+        entity={entity.toLowerCase()}
+        entityId={entityId}
+      />
     </RequireRequest>
   )
 }

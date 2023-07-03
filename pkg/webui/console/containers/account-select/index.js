@@ -26,7 +26,7 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { searchAccounts } from '@ttn-lw/lib/store/actions/search-accounts'
 import { selectSearchResults } from '@ttn-lw/lib/store/selectors/search-accounts'
 
-import styles from './user-select.styl'
+import styles from './account-select.styl'
 
 const SingleValue = props => (
   <components.SingleValue {...props}>
@@ -49,18 +49,19 @@ const m = defineMessages({
   suggestions: 'Suggestions',
 })
 
-const Suggest = ({ ...rest }) => {
+const Suggest = ({ entity, ...rest }) => {
   const dispatch = useDispatch()
   const searchResults = useSelector(selectSearchResults)
   const searchResultsRef = useRef()
   searchResultsRef.current = searchResults
   const { formatMessage } = useIntl()
   const handleNoOptions = useCallback(() => formatMessage(m.noOptionsMessage), [formatMessage])
+  const onlyUsers = !(entity === 'organizations')
 
   const handleLoadingOptions = useCallback(
     async value => {
       if (value.length >= 1) {
-        await dispatch(attachPromise(searchAccounts(value)))
+        await dispatch(attachPromise(searchAccounts(value, onlyUsers)))
         const newOptions = searchResultsRef.current.map(account => ({
           value:
             'user_ids' in account
@@ -85,7 +86,7 @@ const Suggest = ({ ...rest }) => {
         return translatedOptions
       }
     },
-    [dispatch, searchResultsRef, formatMessage],
+    [dispatch, searchResultsRef, formatMessage, onlyUsers],
   )
 
   return (
@@ -95,14 +96,23 @@ const Suggest = ({ ...rest }) => {
       noOptionsMessage={handleNoOptions}
       loadOptions={handleLoadingOptions}
       autoFocus
+      showOptionIcon
       maxMenuHeight={300}
       customComponents={{ SingleValue }}
     />
   )
 }
 
-const UserSelect = ({ ...rest }) => (
-  <Suggest {...rest} showOptionIcon className={styles.userSelect} />
+Suggest.propTypes = {
+  entity: PropTypes.string.isRequired,
+}
+
+const AccountSelect = ({ entity, ...rest }) => (
+  <Suggest {...rest} className={styles.userSelect} entity={entity.toLowerCase()} />
 )
 
-export default UserSelect
+AccountSelect.propTypes = {
+  entity: PropTypes.string.isRequired,
+}
+
+export default AccountSelect

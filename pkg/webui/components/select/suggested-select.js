@@ -126,8 +126,10 @@ const SuggestedSelect = props => {
       onFocus={onFocus}
       onBlur={handleBlur}
       isDisabled={disabled}
+      isClearable
       value={inputValue}
       name={name}
+      showOptionIcon={showOptionIcon}
       components={{ Input, Option: customOption, ...customComponents }}
       aria-describedby={rest['aria-describedby']}
       placeholder={Boolean(placeholder) ? formatMessage(placeholder) : undefined}
