@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -97,7 +97,11 @@ const ApiKeysTable = props => {
 ApiKeysTable.propTypes = {
   baseDataSelector: PropTypes.func.isRequired,
   getItemsAction: PropTypes.func.isRequired,
-  pageSize: PropTypes.number.isRequired,
+  pageSize: PropTypes.number,
+}
+
+ApiKeysTable.defaultProps = {
+  pageSize: undefined,
 }
 
 export default ApiKeysTable

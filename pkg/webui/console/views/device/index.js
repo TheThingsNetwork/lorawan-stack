@@ -14,12 +14,12 @@
 
 import React, { useEffect, useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useParams } from 'react-router-dom'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { selectNsConfig } from '@ttn-lw/lib/selectors/env'
-import PropTypes from '@ttn-lw/lib/prop-types'
 
 import {
   mayReadApplicationDeviceKeys,
@@ -37,7 +37,7 @@ import { selectSelectedApplicationId } from '@console/store/selectors/applicatio
 import Device from './device'
 
 const DeviceContainer = props => {
-  const devId = props.match.params.devId
+  const { devId } = useParams()
   const appId = useSelector(selectSelectedApplicationId)
   const mayReadKeys = useSelector(state => checkFromState(mayReadApplicationDeviceKeys, state))
   const mayViewLink = useSelector(state => checkFromState(mayViewApplicationLink, state))
@@ -106,10 +106,6 @@ const DeviceContainer = props => {
       <Device {...props} />
     </RequireRequest>
   )
-}
-
-DeviceContainer.propTypes = {
-  match: PropTypes.match.isRequired,
 }
 
 export default DeviceContainer

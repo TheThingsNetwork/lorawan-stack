@@ -21,6 +21,9 @@
   },
   "eslintConfig": {
     "extends": "../../config/eslintrc.yaml",
+    "parserOptions": {
+      "requireConfigFile": false
+    },
     "settings": {
       "import/ignore": [
         "node_modules"
@@ -51,11 +54,8 @@
       "^.+\\.js$": "babel-jest"
     },
     "transformIgnorePatterns": [
-      "node_modules/(?!auto-bind)"
-    ],
-    "moduleNameMapper": {
-      "axios": "axios/dist/node/axios.cjs"
-    }
+      "node_modules/(?!(auto-bind|query-string|decode-uri-component))/"
+    ]
   },
   "prettier": "../../config/.prettierrc.js",
   "dependencies": {

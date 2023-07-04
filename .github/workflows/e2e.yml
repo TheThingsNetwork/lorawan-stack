@@ -159,6 +159,7 @@ jobs:
         id: get-failed-spec
         continue-on-error: true
         run: |
+          sed -i 's/\.\.\///g' .failed-specs-*.txt
           echo "failed-test=$(paste -d , .failed-specs-*.txt)" >> $GITHUB_OUTPUT
           echo "neg-failed-test=!$(paste -d ',!' .failed-specs-*.txt)" >> $GITHUB_OUTPUT
       - name: Unzip build artifacts
@@ -173,7 +174,7 @@ jobs:
         uses: cypress-io/github-action@v4
         if: steps.get-failed-spec.outputs.failed-test != ''
         with:
-          config-file: config/cypress.json
+          config-file: config/cypress.config.js
           config: baseUrl=https://localhost:8885
           record: true
           parallel: true
@@ -183,7 +184,7 @@ jobs:
       - name: Run frontend end-to-end tests
         uses: cypress-io/github-action@v4
         with:
-          config-file: config/cypress.json
+          config-file: config/cypress.config.js
           config: baseUrl=https://localhost:8885
           record: true
           parallel: true
@@ -191,7 +192,7 @@ jobs:
           group: main-${{ needs.determine-if-required.outputs.hash }}
           spec: |
             **/*
-            !cypress/integration/smoke/smoke.spec.js
+            !cypress/e2e/smoke/smoke.spec.js
             ${{ steps.get-failed-spec.outputs.neg-failed-test }}
       - name: Upload logs
         uses: actions/upload-artifact@v3
@@ -252,11 +253,11 @@ jobs:
       - name: Run end-to-end smoke tests (Firefox)
         uses: cypress-io/github-action@v4
         with:
-          config-file: config/cypress.json
+          config-file: config/cypress.config.js
           config: baseUrl=https://localhost:8885
           browser: firefox
           record: true
-          spec: cypress/integration/smoke/smoke.spec.js
+          spec: cypress/e2e/smoke/smoke.spec.js
       - name: Upload logs
         uses: actions/upload-artifact@v3
         if: failure()

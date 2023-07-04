@@ -1,4 +1,4 @@
-// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,11 +13,10 @@
 // limitations under the License.
 
 import React from 'react'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages, useIntl } from 'react-intl'
 import { Col, Row, Container } from 'react-grid-system'
-import { bindActionCreators } from 'redux'
-import { push } from 'connected-react-router'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import toast from '@ttn-lw/components/toast'
 import ModalButton from '@ttn-lw/components/button/modal-button'
@@ -28,7 +27,6 @@ import TagGroup from '@ttn-lw/components/tag/group'
 import DateTime from '@ttn-lw/lib/components/date-time'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
-import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { deleteAuthorization } from '@account/store/actions/authorizations'
@@ -45,25 +43,25 @@ const m = defineMessages({
     'Are you sure you want to unauthorize this client? The client will not be able to perform any actions on your behalf if the authorization is revoked. You can always choose to authorize the client again if wished.',
 })
 
-const AuthorizationSettings = props => {
-  const {
-    authorization: { client_ids, user_ids, rights, created_at, updated_at },
-    deleteAuthorization,
-    navigateToList,
-  } = props
+const AuthorizationSettings = () => {
+  const { clientId } = useParams()
+  const authorization = useSelector(state => selectSelectedAuthorization(state, clientId))
+  const { client_ids, user_ids, rights, created_at, updated_at } = authorization
   const { client_id } = client_ids
   const { user_id } = user_ids
   const intl = useIntl()
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const handleDeleteAuthorization = React.useCallback(async () => {
     try {
-      await deleteAuthorization()
+      await attachPromise(dispatch(deleteAuthorization(user_id, client_id)))
       toast({
         title: client_id,
         message: m.deleteSuccess,
         type: toast.types.SUCCESS,
       })
-      navigateToList()
+      navigate('/client-authorizations')
     } catch (err) {
       toast({
         title: client_id,
@@ -71,7 +69,7 @@ const AuthorizationSettings = props => {
         type: toast.types.ERROR,
       })
     }
-  }, [navigateToList, deleteAuthorization, client_id])
+  }, [dispatch, client_id, user_id, navigate])
 
   const tags = rights.map(r => {
     let rightLabel = intl.formatMessage({ id: `enum:${r}` })
@@ -135,43 +133,4 @@ const AuthorizationSettings = props => {
   )
 }
 
-AuthorizationSettings.propTypes = {
-  authorization: PropTypes.shape({
-    client_ids: PropTypes.shape({
-      client_id: PropTypes.string,
-    }),
-    user_ids: PropTypes.shape({
-      user_id: PropTypes.string,
-    }),
-    rights: PropTypes.rights,
-    created_at: PropTypes.string,
-    updated_at: PropTypes.string,
-  }).isRequired,
-  deleteAuthorization: PropTypes.func.isRequired,
-  navigateToList: PropTypes.func.isRequired,
-}
-
-export default connect(
-  (state, props) => ({
-    authorization: selectSelectedAuthorization(state, props.match.params.clientId),
-  }),
-  dispatch => ({
-    ...bindActionCreators(
-      {
-        deleteAuthorization: attachPromise(deleteAuthorization),
-      },
-      dispatch,
-    ),
-    navigateToList: () => dispatch(push('/client-authorizations')),
-  }),
-  (stateProps, dispatchProps, ownProps) => ({
-    ...stateProps,
-    ...dispatchProps,
-    ...ownProps,
-    deleteAuthorization: () =>
-      dispatchProps.deleteAuthorization(
-        stateProps.authorization.user_ids.user_id,
-        stateProps.authorization.client_ids.client_id,
-      ),
-  }),
-)(AuthorizationSettings)
+export default AuthorizationSettings

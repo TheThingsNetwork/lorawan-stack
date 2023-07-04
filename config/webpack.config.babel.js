@@ -292,7 +292,7 @@ export default {
         manifest: path.resolve(context, CACHE_DIR, 'dll.json'),
       }),
       new AddAssetHtmlPlugin({
-        filepath: path.resolve(context, PUBLIC_DIR, 'libs*bundle.js'),
+        glob: path.resolve(context, PUBLIC_DIR, 'libs*bundle.js'),
       }),
     ],
     production: [

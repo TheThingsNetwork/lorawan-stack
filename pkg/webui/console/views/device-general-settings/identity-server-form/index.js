@@ -30,7 +30,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
-import { mapFormValueToAttributes, mapAttributesToFormValue } from '@console/lib/attributes'
+import { encodeAttributes, decodeAttributes } from '@console/lib/attributes'
 import { parseLorawanMacVersion } from '@console/lib/device-utils'
 
 import { hasExternalJs, isDeviceOTAA } from '../utils'
@@ -86,7 +86,7 @@ const IdentityServerForm = React.memo(props => {
     const initialValues = {
       ...device,
       _external_js: hasExternalJs(device),
-      attributes: mapAttributesToFormValue(device.attributes),
+      attributes: device.attributes,
     }
 
     return validationSchema.cast(initialValues, { context: validationContext })
@@ -115,7 +115,7 @@ const IdentityServerForm = React.memo(props => {
   const onFormSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
       const castedValues = validationSchema.cast(values, { context: validationContext })
-      const attributes = mapFormValueToAttributes(values.attributes)
+      const { attributes } = values
 
       if (isEqual(initialValues.attributes || {}, attributes)) {
         delete castedValues.attributes
@@ -286,6 +286,8 @@ const IdentityServerForm = React.memo(props => {
         addMessage={sharedMessages.addAttributes}
         component={KeyValueMap}
         description={sharedMessages.attributeDescription}
+        encode={encodeAttributes}
+        decode={decodeAttributes}
       />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />

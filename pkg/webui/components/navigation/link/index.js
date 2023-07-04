@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import classnames from 'classnames'
 import { NavLink } from 'react-router-dom'
 
@@ -33,9 +33,11 @@ const NavigationLink = ({
 }) => (
   <NavLink
     to={path}
-    exact={exact}
-    className={classnames(className, style.link)}
-    activeClassName={activeClassName}
+    end={exact}
+    className={useCallback(
+      ({ isActive }) => classnames(className, style.link, { [activeClassName]: isActive }),
+      [className, activeClassName],
+    )}
     onClick={onClick}
     {...rest}
   >

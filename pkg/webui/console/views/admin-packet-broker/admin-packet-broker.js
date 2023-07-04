@@ -15,7 +15,7 @@
 import React, { useCallback, useState } from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 import { useSelector, useDispatch } from 'react-redux'
-import { Switch as RouteSwitch, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import classnames from 'classnames'
 
 import PacketBrokerLogo from '@assets/misc/packet-broker.svg'
@@ -31,12 +31,11 @@ import ErrorNotification from '@ttn-lw/components/error-notification'
 
 import Message from '@ttn-lw/lib/components/message'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
-import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
+import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 
 import SubViewErrorComponent from '@console/views/sub-view-error'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { isNotEnabledError } from '@console/lib/packet-broker/utils'
 
@@ -63,7 +62,7 @@ import m from './messages'
 
 import style from './admin-packet-broker.styl'
 
-const PacketBroker = ({ match }) => {
+const PacketBroker = () => {
   const [activeTab, setActiveTab] = useState('default-routing-policy')
   const [deregisterModalVisible, setDeregisterModalVisible] = useState(false)
   const registered = useSelector(selectRegistered)
@@ -74,7 +73,6 @@ const PacketBroker = ({ match }) => {
   const info = useSelector(selectInfo)
   const infoError = useSelector(selectInfoError)
   const dispatch = useDispatch()
-  const { url } = match
   const showError = Boolean(infoError) && !isNotEnabledError(infoError)
 
   const handleRegisterChange = useCallback(() => {
@@ -113,25 +111,27 @@ const PacketBroker = ({ match }) => {
     [dispatch, setUnlistModalVisible],
   )
 
-  const tabs = React.useMemo(
-    () => [
-      { title: m.defaultRoutingPolicy, link: url, name: 'default' },
-      {
-        title: m.defaultGatewayVisibility,
-        link: `${url}/default-gateway-visibility`,
-        name: 'default-gateway-visibility',
-      },
-      { title: sharedMessages.networks, link: `${url}/networks`, name: 'networks', exact: false },
-    ],
-    [url],
-  )
+  const tabs = [
+    { title: m.defaultRoutingPolicy, link: '/admin-panel/packet-broker', name: 'default' },
+    {
+      title: m.defaultGatewayVisibility,
+      link: '/admin-panel/packet-broker/default-gateway-visibility',
+      name: 'default-gateway-visibility',
+    },
+    {
+      title: sharedMessages.networks,
+      link: '/admin-panel/packet-broker/networks',
+      name: 'networks',
+      exact: false,
+    },
+  ]
 
   const boldMessage = { b: msg => <b>{msg}</b> }
 
   return (
     <Container>
       <Row>
-        <Col lg={8} md={12}>
+        <Col md={12}>
           <PageTitle title={sharedMessages.packetBroker} />
           <div className={style.introduction}>
             <Message content={m.packetBrokerInfoText} className={style.info} />
@@ -250,7 +250,7 @@ const PacketBroker = ({ match }) => {
         </Col>
         {registered && (
           <>
-            <Col lg={8} md={12}>
+            <Col md={12}>
               <Message content={m.networkVisibility} component="h3" className={style.subTitle} />
               <Row gutterWidth={48}>
                 <Col md={4}>
@@ -292,16 +292,15 @@ const PacketBroker = ({ match }) => {
                 ]}
                 errorRenderFunction={SubViewErrorComponent}
               >
-                <RouteSwitch>
-                  <Route path={url} exact component={DefaultRoutingPolicyView} />
+                <Routes>
+                  <Route index Component={DefaultRoutingPolicyView} />
                   <Route
-                    path={`${url}/default-gateway-visibility`}
-                    exact
-                    component={DefaultGatewayVisibilityView}
+                    path="default-gateway-visibility"
+                    Component={DefaultGatewayVisibilityView}
                   />
-                  <Route path={`${url}/networks`} exact component={NetworkRoutingPoliciesView} />
-                  <NotFoundRoute />
-                </RouteSwitch>
+                  <Route path="networks/*" Component={NetworkRoutingPoliciesView} />
+                  <Route path="*" component={GenericNotFound} />
+                </Routes>
               </RequireRequest>
             </Col>
           </>
@@ -309,10 +308,6 @@ const PacketBroker = ({ match }) => {
       </Row>
     </Container>
   )
-}
-
-PacketBroker.propTypes = {
-  match: PropTypes.match.isRequired,
 }
 
 export default PacketBroker

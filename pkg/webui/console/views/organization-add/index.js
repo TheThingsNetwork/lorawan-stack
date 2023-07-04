@@ -15,8 +15,7 @@
 import React, { useCallback } from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
-import { push } from 'connected-react-router'
-import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Link from '@ttn-lw/components/link'
@@ -37,12 +36,13 @@ const m = defineMessages({
 })
 
 const OrganizationAdd = () => {
-  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
   const handleSuccess = useCallback(
     orgId => {
-      dispatch(push(`/organizations/${orgId}`))
+      navigate(`/organizations/${orgId}`)
     },
-    [dispatch],
+    [navigate],
   )
 
   return (

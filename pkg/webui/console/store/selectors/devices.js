@@ -84,6 +84,15 @@ export const selectDeviceDerivedDownlinkFrameCount = (state, appId, devId) => {
 export const selectSelectedDeviceClaimable = state =>
   selectDeviceStore(state).selectedDeviceClaimable
 
+export const selectDevicesWithLastSeen = state => {
+  const devices = selectDevices(state)
+  const devicesWithLastSeen = devices.map(device => ({
+    ...device,
+    _lastSeen: selectDeviceLastSeen(state, device.application_ids, device.ids.device_id),
+  }))
+  return devicesWithLastSeen
+}
+
 // Devices.
 const selectDevsIds = createPaginationIdsSelectorByEntity(ENTITY)
 const selectDevsTotalCount = createPaginationTotalCountSelectorByEntity(ENTITY)

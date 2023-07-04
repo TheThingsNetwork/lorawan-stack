@@ -24,7 +24,7 @@ import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
 import PanelView from '@console/components/panel-view'
 
-import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+import Require from '@console/lib/components/require'
 
 import UserManagement from '@console/views/admin-user-management'
 import PacketBrokerRouter from '@console/views/admin-packet-broker'
@@ -51,23 +51,23 @@ const AdminPanel = () => {
   const showPacketBroker = useSelector(state => checkFromState(mayConfigurePacketBroker, state))
 
   return (
-    <>
+    <Require featureCheck={mayPerformAdminActions} otherwise={{ redirect: '/' }}>
       <Breadcrumbs />
       <IntlHelmet title={m.adminPanel} />
       <PanelView>
         <PanelView.Item
           title={m.networkInformation}
           icon="view_compact"
-          path="/network-information"
-          component={NetworkInformation}
+          path="network-information"
+          Component={NetworkInformation}
           exact
         />
         {showUserManagement && (
           <PanelView.Item
             title={m.userManagement}
             icon="user_management"
-            path="/user-management"
-            component={UserManagement}
+            path="user-management"
+            Component={UserManagement}
             condition={showUserManagement}
           />
         )}
@@ -75,14 +75,14 @@ const AdminPanel = () => {
           <PanelView.Item
             title={m.peeringSettings}
             icon="packet_broker"
-            path="/packet-broker"
-            component={PacketBrokerRouter}
+            path="packet-broker"
+            Component={PacketBrokerRouter}
             condition={showPacketBroker}
           />
         )}
       </PanelView>
-    </>
+    </Require>
   )
 }
 
-export default withFeatureRequirement(mayPerformAdminActions, { redirect: '/' })(AdminPanel)
+export default AdminPanel

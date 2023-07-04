@@ -14,6 +14,7 @@
 
 import React from 'react'
 import { Container, Row, Col } from 'react-grid-system'
+import { useParams } from 'react-router-dom'
 
 import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
 
@@ -22,7 +23,6 @@ import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import ApiKeysTable from '@console/containers/api-keys-table'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { getApiKeysList } from '@console/store/actions/api-keys'
 
@@ -33,9 +33,8 @@ import {
   selectApiKeysError,
 } from '@console/store/selectors/api-keys'
 
-const OrganizationApiKeysList = props => {
-  const { match } = props
-  const { orgId } = match.params
+const OrganizationApiKeysList = () => {
+  const { orgId } = useParams()
 
   const getApiKeys = React.useCallback(
     filters => getApiKeysList('organization', orgId, filters),
@@ -68,10 +67,6 @@ const OrganizationApiKeysList = props => {
       </Row>
     </Container>
   )
-}
-
-OrganizationApiKeysList.propTypes = {
-  match: PropTypes.match.isRequired,
 }
 
 export default OrganizationApiKeysList

@@ -16,6 +16,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { defineMessages, FormattedNumber } from 'react-intl'
 import { bindActionCreators } from 'redux'
+import { createSelector } from 'reselect'
 
 import Icon from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
@@ -46,10 +47,9 @@ import {
 
 import { selectUserIsAdmin } from '@console/store/selectors/logout'
 import {
-  selectApplications,
   selectApplicationsTotalCount,
   selectApplicationsFetching,
-  selectApplicationDeviceCount,
+  selectApplicationsWithDeviceCounts,
 } from '@console/store/selectors/applications'
 
 const m = defineMessages({
@@ -225,15 +225,11 @@ const ApplicationsTable = props => {
     return baseHeaders
   }, [handlePurge, handleRestore, tab])
 
-  const baseDataSelector = React.useCallback(state => {
-    const applications = selectApplications(state)
-
-    const decoratedApplications = []
-
-    for (const app of applications) {
-      decoratedApplications.push({
+  const selectDecoratedApplications = createSelector(
+    selectApplicationsWithDeviceCounts,
+    applications =>
+      applications.map(app => ({
         ...app,
-        _devices: selectApplicationDeviceCount(state, app.ids.application_id),
         status: {
           otherCluster: isOtherClusterApp(app),
           host:
@@ -242,16 +238,21 @@ const ApplicationsTable = props => {
         _meta: {
           clickable: !isOtherClusterApp(app),
         },
-      })
-    }
+      })),
+  )
 
-    return {
-      applications: decoratedApplications,
-      totalCount: selectApplicationsTotalCount(state),
-      fetching: selectApplicationsFetching(state),
-      mayAdd: checkFromState(mayCreateApplications, state),
-    }
-  }, [])
+  const baseDataSelector = createSelector(
+    selectDecoratedApplications,
+    selectApplicationsTotalCount,
+    selectApplicationsFetching,
+    state => checkFromState(mayCreateApplications, state),
+    (applications, totalCount, fetching, mayAdd) => ({
+      applications,
+      totalCount,
+      fetching,
+      mayAdd,
+    }),
+  )
 
   const getApplications = React.useCallback(filters => {
     const { tab, query } = filters

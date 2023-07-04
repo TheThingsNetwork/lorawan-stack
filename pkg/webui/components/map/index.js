@@ -12,9 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
-import { MapContainer, Marker, CircleMarker, Circle, TileLayer } from 'react-leaflet'
+import {
+  MapContainer,
+  Marker,
+  CircleMarker,
+  Circle,
+  TileLayer,
+  useMapEvent,
+  useMap,
+} from 'react-leaflet'
 import classnames from 'classnames'
 import Leaflet, { latLngBounds } from 'leaflet'
 import shadowImg from 'leaflet/dist/images/marker-shadow.png'
@@ -41,6 +49,62 @@ Leaflet.Icon.Default.mergeOptions({
 
 const defaultMinZoom = 7
 
+const MarkerRenderer = ({ marker }) => {
+  if (!marker) {
+    return null
+  }
+
+  const hasAccuracy = typeof marker.accuracy === 'number'
+  const children = (
+    <>
+      {typeof marker.accuracy === 'number' && (
+        <Circle
+          center={[marker.position.latitude, marker.position.longitude]}
+          radius={marker.accuracy}
+          weight={1}
+          fillOpacity={0.1}
+        />
+      )}
+      {marker.children}
+    </>
+  )
+  return hasAccuracy ? (
+    <CircleMarker
+      key={`marker-${marker.position.latitude}-${marker.position.longitude}`}
+      center={[marker.position.latitude, marker.position.longitude]}
+      radius={8}
+      children={children}
+      color="#ffffff"
+      fillColor={COLORS.C_ACTIVE_BLUE}
+      fillOpacity={1}
+    />
+  ) : (
+    <Marker
+      key={`marker-${marker.position.latitude}-${marker.position.longitude}`}
+      position={[marker.position.latitude, marker.position.longitude]}
+      children={children}
+    />
+  )
+}
+
+const Controller = ({ onClick, centerOnMarkers, markers, bounds }) => {
+  const map = useMap()
+
+  useMapEvent('click', onClick)
+  // Fix incomplete tile loading in some rare cases.
+  map.invalidateSize()
+  // Attach click handler.
+  if (centerOnMarkers && markers.length > 1) {
+    map.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 })
+  }
+  return markers.map(marker => (
+    <MarkerRenderer
+      key={`${marker.position.latitude}-${marker.position.longitude}`}
+      marker={marker}
+    />
+  ))
+}
+
 const LocationMap = props => {
   const {
     className,
@@ -49,15 +113,15 @@ const LocationMap = props => {
     widget,
     markers,
     leafletConfig,
-    onClick,
     centerOnMarkers,
+    ...rest
   } = props
-
-  const hasValidCoordinates = mapCenter instanceof Array && mapCenter.length === 2
 
   const bounds = latLngBounds(
     markers.map(marker => [marker.position.latitude, marker.position.longitude]),
   )
+
+  const hasValidCoordinates = mapCenter instanceof Array && mapCenter.length === 2
 
   let center = [0, 0]
 
@@ -66,56 +130,6 @@ const LocationMap = props => {
   } else if (hasValidCoordinates) {
     center = mapCenter
   }
-  const handleCreated = useCallback(
-    map => {
-      // Fix incomplete tile loading in some rare cases.
-      map.invalidateSize()
-      // Attach click handler.
-      map.on('click', onClick)
-      if (centerOnMarkers && markers.length > 1) {
-        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 })
-      }
-    },
-    [onClick, bounds, markers.length, centerOnMarkers],
-  )
-
-  const renderMarker = useCallback(marker => {
-    if (!marker) {
-      return null
-    }
-
-    const hasAccuracy = typeof marker.accuracy === 'number'
-    const children = (
-      <>
-        {typeof marker.accuracy === 'number' && (
-          <Circle
-            center={[marker.position.latitude, marker.position.longitude]}
-            radius={marker.accuracy}
-            weight={1}
-            fillOpacity={0.1}
-          />
-        )}
-        {marker.children}
-      </>
-    )
-    return hasAccuracy ? (
-      <CircleMarker
-        key={`marker-${marker.position.latitude}-${marker.position.longitude}`}
-        center={[marker.position.latitude, marker.position.longitude]}
-        radius={8}
-        children={children}
-        color="#ffffff"
-        fillColor={COLORS.C_ACTIVE_BLUE}
-        fillOpacity={1}
-      />
-    ) : (
-      <Marker
-        key={`marker-${marker.position.latitude}-${marker.position.longitude}`}
-        position={[marker.position.latitude, marker.position.longitude]}
-        children={children}
-      />
-    )
-  }, [])
 
   return (
     <div
@@ -128,7 +142,6 @@ const LocationMap = props => {
             [style.click]: clickable,
           })}
           minZoom={defaultMinZoom}
-          whenCreated={handleCreated}
           center={center}
           {...leafletConfig}
         >
@@ -137,11 +150,38 @@ const LocationMap = props => {
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             noWrap
           />
-          {markers.map(renderMarker)}
+          <Controller
+            bounds={bounds}
+            centerOnMarkers={centerOnMarkers}
+            markers={markers}
+            {...rest}
+          />
         </MapContainer>
       )}
     </div>
   )
+}
+
+LocationMap.defaultProps = {
+  centerOnMarkers: true,
+  leafletConfig: {},
+  className: undefined,
+  widget: false,
+  markers: [],
+  onClick: () => null,
+  mapCenter: undefined,
+  clickable: false,
+}
+
+MarkerRenderer.propTypes = {
+  marker: PropTypes.shape({
+    position: PropTypes.shape({
+      longitude: PropTypes.number,
+      latitude: PropTypes.number,
+    }),
+    accuracy: PropTypes.number,
+    children: PropTypes.node,
+  }).isRequired,
 }
 
 LocationMap.propTypes = {
@@ -157,29 +197,10 @@ LocationMap.propTypes = {
   }),
   mapCenter: PropTypes.arrayOf(PropTypes.number),
   // `markers` is an array of objects containing a specific properties.
-  markers: PropTypes.arrayOf(
-    // `position` is a object containing two properties latitude and longitude which are both numbers.
-    PropTypes.shape({
-      position: PropTypes.shape({
-        longitude: PropTypes.number,
-        latitude: PropTypes.number,
-      }),
-    }),
-  ),
+  markers: PropTypes.arrayOf(MarkerRenderer.propTypes.marker),
   onClick: PropTypes.func,
   // `widget` is a boolean used to add a class name to the map container div for styling.
   widget: PropTypes.bool,
-}
-
-LocationMap.defaultProps = {
-  centerOnMarkers: true,
-  leafletConfig: {},
-  className: undefined,
-  widget: false,
-  markers: [],
-  onClick: () => null,
-  mapCenter: undefined,
-  clickable: false,
 }
 
 export default LocationMap

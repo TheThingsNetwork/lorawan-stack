@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,35 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { Component } from 'react'
+import React from 'react'
 import { Container, Row, Col } from 'react-grid-system'
-
-import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
+import { useParams } from 'react-router-dom'
 
 import PageTitle from '@ttn-lw/components/page-title'
 
 import PubsubsTable from '@console/containers/pubsubs-table'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
 
-export default class ApplicationPubsubsList extends Component {
-  static propTypes = {
-    match: PropTypes.match.isRequired,
-  }
+const ApplicationPubsubsList = () => {
+  const { appId } = useParams()
 
-  render() {
-    const { appId } = this.props.match.params
-
-    return (
-      <Container>
-        <PageTitle title={sharedMessages.integrations} hideHeading />
-        <Row>
-          <Col>
-            <PubsubsTable pageSize={PAGE_SIZES.REGULAR} appId={appId} />
-          </Col>
-        </Row>
-      </Container>
-    )
-  }
+  return (
+    <Container>
+      <PageTitle title={sharedMessages.integrations} hideHeading />
+      <Row>
+        <Col>
+          <PubsubsTable appId={appId} />
+        </Col>
+      </Row>
+    </Container>
+  )
 }
+
+export default ApplicationPubsubsList

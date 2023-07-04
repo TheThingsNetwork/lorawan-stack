@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 import React, { useCallback, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Container, Col, Row } from 'react-grid-system'
+import { useParams } from 'react-router-dom'
 
 import DataSheet from '@ttn-lw/components/data-sheet'
 import PageTitle from '@ttn-lw/components/page-title'
@@ -33,7 +34,6 @@ import RoutingPolicyForm from '@console/components/routing-policy-form'
 
 import Require from '@console/lib/components/require'
 
-import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
@@ -58,11 +58,10 @@ import m from './messages'
 
 import style from './admin-packet-broker.styl'
 
-const NetworkRoutingPolicyViewInner = ({ match }) => {
+const NetworkRoutingPolicyViewInner = () => {
+  const { netId, tenantId } = useParams()
   const dispatch = useDispatch()
-  const netId = match.params.netId
   const displayNetId = parseInt(netId).toString(16).padStart(6, '0')
-  const tenantId = match.params.tenantId
   const combinedId = tenantId ? `${netId}/${tenantId}` : netId
   const displayId = tenantId ? `${displayNetId}/${tenantId}` : displayNetId
   const [formError, setFormError] = useState(undefined)
@@ -78,9 +77,7 @@ const NetworkRoutingPolicyViewInner = ({ match }) => {
     <>
       <Breadcrumb path={'/admin-panel/packet-broker/networks'} content={m.networks} />
       <Breadcrumb
-        path={`/admin-panel/packet-broker/networks/${match.params.netId}${
-          match.params.tenantId ? `/${match.params.tenantId}` : ''
-        }`}
+        path={`/admin/packet-broker/networks/${netId}${tenantId ? `/${tenantId}` : ''}`}
         content={network.name || displayId}
       />
     </>,
@@ -225,13 +222,8 @@ const NetworkRoutingPolicyViewInner = ({ match }) => {
   )
 }
 
-NetworkRoutingPolicyViewInner.propTypes = {
-  match: PropTypes.match.isRequired,
-}
-
-const NetworkRoutingPolicyView = props => {
-  const netId = props.match.params.netId
-  const tenantId = props.match.params.tenantId
+const NetworkRoutingPolicyView = () => {
+  const { netId, tenantId } = useParams()
   const combinedId = tenantId ? `${netId}/${tenantId}` : netId
   const registered = useSelector(selectRegistered)
 
@@ -243,14 +235,10 @@ const NetworkRoutingPolicyView = props => {
           getHomeNetworkDefaultRoutingPolicy(),
         ]}
       >
-        <NetworkRoutingPolicyViewInner {...props} />
+        <NetworkRoutingPolicyViewInner />
       </RequireRequest>
     </Require>
   )
-}
-
-NetworkRoutingPolicyView.propTypes = {
-  match: PropTypes.match.isRequired,
 }
 
 export default NetworkRoutingPolicyView

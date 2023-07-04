@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,35 +23,30 @@ import OAuthClientAuthorizations from '@account/views/oauth-client-authorization
 export default [
   {
     path: '/',
-    exact: true,
-    component: Overview,
+    Component: Overview,
   },
   {
     path: '/profile-settings',
-    exact: true,
-    component: ProfileSettings,
+    Component: ProfileSettings,
   },
   {
     path: '/code',
-    exact: true,
-    component: Code,
+    Component: Code,
   },
   {
     path: '/session-management',
-    exact: true,
-    component: SessionManagement,
+    Component: SessionManagement,
   },
   {
     path: '/validate',
-    exact: true,
-    component: ValidateWithAuth,
+    Component: ValidateWithAuth,
   },
   {
-    path: '/oauth-clients',
-    component: OAuthClients,
+    path: '/oauth-clients/*',
+    Component: OAuthClients,
   },
   {
-    path: '/client-authorizations',
-    component: OAuthClientAuthorizations,
+    path: '/client-authorizations/*',
+    Component: OAuthClientAuthorizations,
   },
 ]

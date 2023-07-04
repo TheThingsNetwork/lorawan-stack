@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,6 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+import { createSelector } from 'reselect'
 
 import { createPaginationIdsSelectorByEntity } from '@ttn-lw/lib/store/selectors/pagination'
 import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
@@ -42,11 +44,10 @@ export const selectOAuthClientsFetching = state => selectClientsFetching(state)
 export const selectOAuthClientsError = state => selectClientsError(state)
 
 // Rights.
-export const selectClientRights = state => {
-  const rights = selectClientsStore(state).rights
-
-  return [...rights.regular, ...rights.pseudo]
-}
+export const selectClientRights = createSelector(selectClientsStore, ({ rights }) => [
+  ...rights.regular,
+  ...rights.pseudo,
+])
 export const selectClientRegularRights = state => selectClientsStore(state).rights?.regular
 export const selectClientPseudoRights = state => selectClientsStore(state).rights?.pseudo
 export const selectClientRightsError = createErrorSelector(GET_CLIENT_RIGHTS_BASE)

@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,49 +13,48 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
+import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
+import ValidateRouteParam from '@ttn-lw/lib/components/validate-route-param'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
-import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 
 import Require from '@console/lib/components/require'
 
 import UserAdd from '@console/views/admin-user-management-add'
 import UserEdit from '@console/views/admin-user-management-edit'
-import InvitationSend from '@console/views/invitation-send'
+import InvitationSend from '@console/views/admin-user-management-invitation-send'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
 import { userPathId as userPathIdRegexp } from '@ttn-lw/lib/regexp'
 
 import { mayManageUsers } from '@console/lib/feature-checks'
 
 import UserManagement from './admin-user-management'
 
-const UserManagementRouter = ({ match }) => {
+const UserManagementRouter = () => {
   useBreadcrumbs(
-    'admin-panel.user-management',
-    <Breadcrumb path={'/admin-panel/user-management'} content={sharedMessages.userManagement} />,
+    'admin.user-management',
+    <Breadcrumb path="/admin/user-management" content={sharedMessages.userManagement} />,
   )
   return (
     <Require featureCheck={mayManageUsers} otherwise={{ redirect: '/' }}>
       <IntlHelmet title={sharedMessages.userManagement} />
-      <Switch>
-        <Route exact path={`${match.path}`} component={UserManagement} />
-        <Route path={`${match.path}/add`} component={UserAdd} />
-        <Route path={`${match.path}/invitations/add`} component={InvitationSend} />
-        <Route path={`${match.path}/:userId${userPathIdRegexp}`} component={UserEdit} sensitive />
-        <NotFoundRoute />
-      </Switch>
+      <Routes>
+        <Route index Component={UserManagement} />
+        <Route path="add" Component={UserAdd} />
+        <Route path="invitations/add" Component={InvitationSend} />
+        <Route
+          path=":userId/*"
+          element={<ValidateRouteParam check={{ userId: userPathIdRegexp }} Component={UserEdit} />}
+        />
+        <Route path="*" Component={GenericNotFound} />
+      </Routes>
     </Require>
   )
-}
-
-UserManagementRouter.propTypes = {
-  match: PropTypes.match.isRequired,
 }
 
 export default UserManagementRouter

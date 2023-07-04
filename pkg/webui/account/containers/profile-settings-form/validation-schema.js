@@ -20,12 +20,12 @@ import m from './messages'
 export default Yup.object().shape({
   _profile_picture_source: Yup.string()
     .oneOf(['gravatar', 'upload'])
-    .when(['$initialProfilePictureSource'], (ppSource, schema) => schema.default(ppSource)),
+    .when('$initialProfilePictureSource', ([ppSource], schema) => schema.default(ppSource)),
   profile_picture: Yup.object()
     .nullable()
     .when(
       ['_profile_picture_source', '$useGravatarConfig', '$disableUploadConfig'],
-      (ppSource, useGravatarConfig, uploadDisabled, schema) => {
+      ([ppSource, useGravatarConfig, uploadDisabled], schema) => {
         if (!useGravatarConfig && uploadDisabled) {
           return schema.strip()
         }

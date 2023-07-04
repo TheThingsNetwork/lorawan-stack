@@ -79,7 +79,7 @@ const validationSchema = Yup.object({
       .min(2, Yup.passValues(sharedMessages.validateTooShort))
       .max(36, Yup.passValues(sharedMessages.validateTooLong))
       .required(sharedMessages.validateRequired),
-  }).when(['supports_join', 'lorawan_version'], (supportsJoin, lorawanVersion, schema) => {
+  }).when(['supports_join', 'lorawan_version'], ([supportsJoin, lorawanVersion], schema) => {
     let newSchema = schema
     if (supportsJoin) {
       newSchema = newSchema.concat(
@@ -105,7 +105,7 @@ const validationSchema = Yup.object({
   }),
   root_keys: Yup.object().when(
     ['supports_join', '_claim', 'lorawan_version', '$mayEditKeys'],
-    (isOTAA, claim, lorawanVersion, mayEditKeys, schema) => {
+    ([isOTAA, claim, lorawanVersion, mayEditKeys], schema) => {
       if (mayEditKeys && isOTAA && claim === false) {
         let rootKeysSchema = appKeySchema
         if (parseLorawanMacVersion(lorawanVersion) >= 110) {
@@ -119,7 +119,7 @@ const validationSchema = Yup.object({
   ),
   session: Yup.object().when(
     ['supports_join', 'lorawan_version'],
-    (isOTAA, lorawanVersion, schema) => {
+    ([isOTAA, lorawanVersion], schema) => {
       if (!isOTAA) {
         let sessionKeysSchema = Yup.object().concat(sessionKeysSchemaBase)
         if (parseLorawanMacVersion(lorawanVersion) >= 110) {

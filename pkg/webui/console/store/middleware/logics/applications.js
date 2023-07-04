@@ -172,13 +172,13 @@ const getApplicationLinkLogic = createRequestLogic({
     } catch (error) {
       // Ignore 404 error. It means that the application is not linked, but the response can
       // still hold link data that we have to display to the user.
-      if (isNotFoundError(error) && typeof linkResult !== 'undefined') {
+      if (isNotFoundError(error)) {
         return { link: linkResult }
       }
 
       // Ignore 409 error. It means that the application link cannot be established, but
       // the response can still hold link data that we have to displat to the user.
-      if (isConflictError(error) && typeof linkResult !== 'undefined') {
+      if (isConflictError(error)) {
         return { link: linkResult }
       }
 

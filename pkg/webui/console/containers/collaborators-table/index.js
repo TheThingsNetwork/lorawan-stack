@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { connect } from 'react-redux'
+import { createSelector } from 'reselect'
+import { useSelector } from 'react-redux'
 
 import Tag from '@ttn-lw/components/tag'
 import TagGroup from '@ttn-lw/components/tag/group'
@@ -29,7 +30,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import getByPath from '@ttn-lw/lib/get-by-path'
 
-import { selectUserId } from '@console/store/selectors/logout'
+import { selectUserId } from '@account/store/selectors/user'
 
 import style from './collaborators-table.styl'
 
@@ -42,13 +43,14 @@ const m = defineMessages({
 const rowKeySelector = row => row._type
 
 const getCollaboratorPathPrefix = collaborator =>
-  `/${collaborator._type.startsWith('u') ? 'user' : 'organization'}/${getCollaboratorId(
+  `${collaborator._type.startsWith('u') ? 'user' : 'organization'}/${getCollaboratorId(
     collaborator,
   )}`
 
 const CollaboratorsTable = props => {
   const { baseDataSelector, ...restProps } = props
   const intl = useIntl()
+  const userId = useSelector(selectUserId)
   const headers = [
     {
       name: 'ids',
@@ -62,7 +64,7 @@ const CollaboratorsTable = props => {
         const icon = isUser ? 'user' : 'organization'
         let userLabel = collaboratorId
 
-        if (isUser && collaboratorId === props.currentUserId) {
+        if (isUser && collaboratorId === userId) {
           userLabel = (
             <span>
               {collaboratorId}{' '}
@@ -99,27 +101,24 @@ const CollaboratorsTable = props => {
     },
   ]
 
-  const decoratedBaseDataSelector = useCallback(
-    (state, props) => {
-      const base = baseDataSelector(state, props)
-
+  const decoratedBaseDataSelector = createSelector(baseDataSelector, base => {
+    const collaborators = base.collaborators.map(c => {
       // Decorate the base data with a unified id and type that we can sort on.
-      base.collaborators = base.collaborators.map(c => {
-        const _id =
-          getByPath(c, 'ids.user_ids.user_id') ||
-          getByPath(c, 'ids.organization_ids.organization_id')
+      const _id =
+        getByPath(c, 'ids.user_ids.user_id') || getByPath(c, 'ids.organization_ids.organization_id')
 
-        return {
-          ...c,
-          _id,
-          _type: Boolean(getByPath(c, 'ids.user_ids')) ? `u_${_id}` : `o_${_id}`,
-        }
-      })
+      return {
+        ...c,
+        _id,
+        _type: Boolean(getByPath(c, 'ids.user_ids')) ? `u_${_id}` : `o_${_id}`,
+      }
+    })
 
-      return base
-    },
-    [baseDataSelector],
-  )
+    return {
+      ...base,
+      collaborators,
+    }
+  })
 
   return (
     <FetchTable
@@ -139,9 +138,6 @@ const CollaboratorsTable = props => {
 
 CollaboratorsTable.propTypes = {
   baseDataSelector: PropTypes.func.isRequired,
-  currentUserId: PropTypes.string.isRequired,
 }
 
-export default connect(state => ({
-  currentUserId: selectUserId(state),
-}))(CollaboratorsTable)
+export default CollaboratorsTable

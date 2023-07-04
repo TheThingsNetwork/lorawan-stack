@@ -1,4 +1,4 @@
-// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,39 +13,37 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
-import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
+import ValidateRouteParam from '@ttn-lw/lib/components/validate-route-param'
+import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 
 import OAuthClient from '@account/views/oauth-client'
 import ClientsList from '@account/views/oauth-clients-list'
 import OAuthClientAdd from '@account/views/oauth-client-add'
 
-import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
 
-const OAuthClients = props => {
-  const { path } = props.match
-
+const OAuthClients = () => {
   useBreadcrumbs(
     'clients',
     <Breadcrumb path="/oauth-clients" content={sharedMessages.oauthClients} />,
   )
 
   return (
-    <Switch>
-      <Route exact path={`${path}`} component={ClientsList} />
-      <Route exact path={`${path}/add`} component={OAuthClientAdd} />
-      <Route path={`${path}/:clientId${pathIdRegexp}`} component={OAuthClient} />
-      <NotFoundRoute />
-    </Switch>
+    <Routes>
+      <Route index Component={ClientsList} />
+      <Route path="add" Component={OAuthClientAdd} />
+      <Route
+        path=":clientId/*"
+        element={<ValidateRouteParam check={{ clientId: pathIdRegexp }} Component={OAuthClient} />}
+      />
+      <Route path="*" element={<GenericNotFound />} />
+    </Routes>
   )
-}
-OAuthClients.propTypes = {
-  match: PropTypes.match.isRequired,
 }
 export default OAuthClients

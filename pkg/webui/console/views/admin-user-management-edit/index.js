@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,126 +12,117 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
+import React, { useCallback } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate, useParams } from 'react-router-dom'
 import { Container, Col, Row } from 'react-grid-system'
-import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
-import { replace } from 'connected-react-router'
 
 import toast from '@ttn-lw/components/toast'
 import PageTitle from '@ttn-lw/components/page-title'
-import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
-import withRequest from '@ttn-lw/lib/components/with-request'
+import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import UserDataForm from '@console/components/user-data-form'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
 import diff from '@ttn-lw/lib/diff'
 import { getUserId } from '@ttn-lw/lib/selectors/id'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { getUser, updateUser, deleteUser } from '@console/store/actions/users'
 
-import {
-  selectSelectedUser,
-  selectUserError,
-  selectUserFetching,
-} from '@console/store/selectors/users'
+import { selectSelectedUser } from '@console/store/selectors/users'
 
 const m = defineMessages({
   updateSuccess: 'User updated',
   deleteSuccess: 'User deleted',
 })
 
-@connect(
-  (state, props) => ({
-    userId: props.match.params.userId,
-    user: selectSelectedUser(state),
-    error: selectUserError(state),
-    fetching: selectUserFetching(state),
-  }),
-  {
-    getUser,
-    updateUser: attachPromise(updateUser),
-    deleteUser: attachPromise(deleteUser),
-    navigateToList: () => replace(`/admin-panel/user-management`),
-  },
-)
-@withRequest(({ userId, getUser }) =>
-  getUser(userId, ['name', 'primary_email_address', 'state', 'admin', 'description']),
-)
-@withBreadcrumb('admin-panel.user-management.edit', ({ userId }) => (
-  <Breadcrumb path={`/admin-panel/user-management/${userId}`} content={sharedMessages.edit} />
-))
-export default class UserManagementEdit extends Component {
-  static propTypes = {
-    deleteUser: PropTypes.func.isRequired,
-    navigateToList: PropTypes.func.isRequired,
-    updateUser: PropTypes.func.isRequired,
-    user: PropTypes.user.isRequired,
-    userId: PropTypes.string.isRequired,
-  }
+const UserManagementEditInner = () => {
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const { userId } = useParams()
+  const user = useSelector(selectSelectedUser)
 
-  @bind
-  onSubmit(values) {
-    const { userId, user, updateUser } = this.props
-    const patch = diff(user, values)
-    const submitPatch = Object.keys(patch).length !== 0 ? patch : user
+  const wrappedUpdateUser = attachPromise(updateUser)
+  const wrappedDeleteUser = attachPromise(deleteUser)
 
-    return updateUser(userId, submitPatch)
-  }
+  useBreadcrumbs(
+    'admin-panel.user-management.edit',
+    <Breadcrumb path={`./${userId}`} content={sharedMessages.edit} />,
+  )
 
-  onSubmitSuccess(response) {
+  const onSubmit = useCallback(
+    values => {
+      const patch = diff(user, values)
+      const submitPatch = Object.keys(patch).length !== 0 ? patch : user
+      return dispatch(wrappedUpdateUser(userId, submitPatch))
+    },
+    [user, userId, wrappedUpdateUser, dispatch],
+  )
+
+  const onSubmitSuccess = useCallback(response => {
     const userId = getUserId(response)
     toast({
       title: userId,
       message: m.updateSuccess,
       type: toast.types.SUCCESS,
     })
-  }
+  }, [])
 
-  @bind
-  onDelete(shouldPurge) {
-    const { userId, deleteUser } = this.props
+  const onDelete = useCallback(
+    shouldPurge => dispatch(wrappedDeleteUser(userId, { purge: shouldPurge })),
+    [userId, wrappedDeleteUser, dispatch],
+  )
 
-    return deleteUser(userId, { purge: shouldPurge })
-  }
-
-  @bind
-  onDeleteSuccess() {
-    const { userId, navigateToList } = this.props
-
+  const onDeleteSuccess = useCallback(() => {
     toast({
       title: userId,
       message: m.deleteSuccess,
       type: toast.types.SUCCESS,
     })
 
-    navigateToList()
-  }
+    navigate('../../')
+  }, [userId, navigate])
 
-  render() {
-    const { user } = this.props
-    return (
-      <Container>
-        <PageTitle title={sharedMessages.userEdit} />
-        <Row>
-          <Col>
-            <UserDataForm
-              update
-              initialValues={user}
-              onSubmit={this.onSubmit}
-              onSubmitSuccess={this.onSubmitSuccess}
-              onDelete={this.onDelete}
-              onDeleteSuccess={this.onDeleteSuccess}
-            />
-          </Col>
-        </Row>
-      </Container>
-    )
-  }
+  return (
+    <Container>
+      <PageTitle title={sharedMessages.userEdit} />
+      <Row>
+        <Col>
+          <UserDataForm
+            update
+            initialValues={user}
+            onSubmit={onSubmit}
+            onSubmitSuccess={onSubmitSuccess}
+            onDelete={onDelete}
+            onDeleteSuccess={onDeleteSuccess}
+          />
+        </Col>
+      </Row>
+    </Container>
+  )
 }
+
+const UserManagementEdit = () => {
+  const { userId } = useParams()
+
+  return (
+    <RequireRequest
+      requestAction={getUser(userId, [
+        'name',
+        'primary_email_address',
+        'state',
+        'admin',
+        'description',
+      ])}
+    >
+      <UserManagementEditInner />
+    </RequireRequest>
+  )
+}
+
+export default UserManagementEdit

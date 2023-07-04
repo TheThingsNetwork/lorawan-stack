@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import { Container, Row, Col } from 'react-grid-system'
-
-import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
+import { useParams } from 'react-router-dom'
+import { createSelector } from 'reselect'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
 import ApiKeysTable from '@console/containers/api-keys-table'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { getApiKeysList } from '@console/store/actions/api-keys'
 
@@ -30,27 +29,30 @@ import {
   selectApiKeys,
   selectApiKeysTotalCount,
   selectApiKeysFetching,
+  selectApiKeysError,
 } from '@console/store/selectors/api-keys'
 
-const ApplicationApiKeysList = props => {
-  const { match } = props
-  const { appId } = match.params
+const ApplicationApiKeysList = () => {
+  const { appId } = useParams()
 
   const getApiKeys = React.useCallback(
     filters => getApiKeysList('application', appId, filters),
     [appId],
   )
-  const baseDataSelector = React.useCallback(
-    state => {
-      const id = { id: appId }
 
-      return {
-        keys: selectApiKeys(state, id),
-        totalCount: selectApiKeysTotalCount(state, id),
-        fetching: selectApiKeysFetching(state),
-      }
-    },
-    [appId],
+  const baseDataSelectors = createSelector(
+    [selectApiKeys, selectApiKeysTotalCount, selectApiKeysFetching, selectApiKeysError],
+    (keys, totalCount, fetching, error) => ({
+      keys,
+      totalCount,
+      fetching,
+      error,
+    }),
+  )
+
+  const baseDataSelector = useCallback(
+    state => baseDataSelectors(state, appId),
+    [appId, baseDataSelectors],
   )
 
   return (
@@ -58,19 +60,11 @@ const ApplicationApiKeysList = props => {
       <Row>
         <IntlHelmet title={sharedMessages.apiKeys} />
         <Col>
-          <ApiKeysTable
-            pageSize={PAGE_SIZES.REGULAR}
-            baseDataSelector={baseDataSelector}
-            getItemsAction={getApiKeys}
-          />
+          <ApiKeysTable baseDataSelector={baseDataSelector} getItemsAction={getApiKeys} />
         </Col>
       </Row>
     </Container>
   )
-}
-
-ApplicationApiKeysList.propTypes = {
-  match: PropTypes.match.isRequired,
 }
 
 export default ApplicationApiKeysList

@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { push } from 'connected-react-router'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 import { Col, Row } from 'react-grid-system'
@@ -134,14 +133,7 @@ const docLinkValue = msg => (
     }
   },
   dispatch => ({
-    redirectToList: appId => dispatch(push(`/applications/${appId}/devices`)),
     convertTemplate: (format_id, data) => dispatch(attachPromise(convertTemplate(format_id, data))),
-  }),
-  (stateProps, dispatchProps, ownProps) => ({
-    ...stateProps,
-    ...dispatchProps,
-    ...ownProps,
-    redirectToList: () => dispatchProps.redirectToList(stateProps.appId),
   }),
 )
 export default class DeviceImporter extends Component {
@@ -153,7 +145,6 @@ export default class DeviceImporter extends Component {
     deviceRepoTemplate: PropTypes.deviceTemplate,
     jsConfig: PropTypes.stackComponent.isRequired,
     nsConfig: PropTypes.stackComponent.isRequired,
-    redirectToList: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
@@ -393,7 +384,7 @@ export default class DeviceImporter extends Component {
       aborted,
     } = this.state
     const hasErrored = status === 'error'
-    const { redirectToList } = this.props
+    const { appId } = this.props
     const operationMessage = step === 'conversion' ? m.converting : m.creating
     let statusMessage
     if (!aborted) {
@@ -516,12 +507,25 @@ export default class DeviceImporter extends Component {
         />
         <SubmitBar align="start">
           <ButtonGroup>
-            <Button
-              busy={status !== 'finished' && !hasErrored}
-              message={hasErrored ? m.retry : m.proceed}
-              onClick={hasErrored ? this.handleReset : redirectToList}
-              primary
-            />
+            {status === 'finished' && (
+              <>
+                {!hasErrored ? (
+                  <Button.Link
+                    busy={status !== 'finished' && !hasErrored}
+                    to={`/applications/${appId}/devices`}
+                    message={m.proceed}
+                    primary
+                  />
+                ) : (
+                  <Button
+                    busy={status !== 'finished' && !hasErrored}
+                    message={m.retry}
+                    onClick={this.handleReset}
+                    primary
+                  />
+                )}
+              </>
+            )}
             {status === 'processing' && step === 'creation' && (
               <Button danger message={m.abort} onClick={this.handleAbort} />
             )}

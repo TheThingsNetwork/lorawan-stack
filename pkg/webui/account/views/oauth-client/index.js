@@ -1,4 +1,4 @@
-// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,8 @@
 // limitations under the License.
 
 import React from 'react'
-import { connect } from 'react-redux'
-import { Switch, Route } from 'react-router-dom'
+import { shallowEqual, useSelector } from 'react-redux'
+import { Routes, Route, useParams } from 'react-router-dom'
 
 import applicationIcon from '@assets/misc/application.svg'
 
@@ -23,9 +23,9 @@ import SideNavigation from '@ttn-lw/components/navigation/side'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 
-import withRequest from '@ttn-lw/lib/components/with-request'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
-import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
+import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
+import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import OAuthClientOverview from '@account/views/oauth-client-overview'
 import OAuthClientGeneralSettings from '@account/views/oauth-client-general-settings'
@@ -33,29 +33,19 @@ import OAuthClientCollaboratorsList from '@account/views/oauth-client-collaborat
 import OAuthClientCollaboratorAdd from '@account/views/oauth-client-collaborator-add'
 
 import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
-import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { mayPerformAllClientActions } from '@account/lib/feature-checks'
 
 import { getClient, getClientRights } from '@account/store/actions/clients'
 
-import {
-  selectClientFetching,
-  selectClientById,
-  selectClientError,
-  selectClientRights,
-} from '@account/store/selectors/clients'
+import { selectClientById, selectClientRights } from '@account/store/selectors/clients'
 
-const OAuthClient = props => {
-  const {
-    clientId,
-    match: { url: matchedUrl, path },
-    oauthClient,
-    rights,
-    siteName,
-  } = props
-
+const OAuthClientInner = () => {
+  const { clientId } = useParams()
+  const rights = useSelector(selectClientRights, shallowEqual)
+  const oauthClient = useSelector(state => selectClientById(state, clientId))
+  const siteName = useSelector(selectApplicationSiteName)
   const name = oauthClient.name || clientId
 
   useBreadcrumbs(
@@ -72,79 +62,58 @@ const OAuthClient = props => {
           icon: applicationIcon,
           iconAlt: sharedMessages.client,
           title: name,
-          to: matchedUrl,
+          to: '',
         }}
       >
         {mayPerformAllClientActions.check(rights) && (
-          <SideNavigation.Item
-            title={sharedMessages.overview}
-            path={matchedUrl}
-            icon="overview"
-            exact
-          />
+          <SideNavigation.Item title={sharedMessages.overview} path="" icon="overview" exact />
         )}
         {mayPerformAllClientActions.check(rights) && (
           <SideNavigation.Item
             title={sharedMessages.collaborators}
-            path={`${matchedUrl}/collaborators`}
+            path="collaborators"
             icon="organization"
           />
         )}
         {mayPerformAllClientActions.check(rights) && (
           <SideNavigation.Item
             title={sharedMessages.generalSettings}
-            path={`${matchedUrl}/general-settings`}
+            path="general-settings"
             icon="general_settings"
           />
         )}
       </SideNavigation>
-      <Switch>
-        <Route exact path={`${path}`} component={OAuthClientOverview} />
-        <Route exact path={`${path}/collaborators`} component={OAuthClientCollaboratorsList} />
-        <Route exact path={`${path}/collaborators/add`} component={OAuthClientCollaboratorAdd} />
-        <Route exact path={`${path}/general-settings`} component={OAuthClientGeneralSettings} />
-        <NotFoundRoute />
-      </Switch>
+      <Routes>
+        <Route index Component={OAuthClientOverview} />
+        <Route path="collaborators" Component={OAuthClientCollaboratorsList} />
+        <Route path="collaborators/add" Component={OAuthClientCollaboratorAdd} />
+        <Route path="general-settings" Component={OAuthClientGeneralSettings} />
+        <Route path="*" element={<GenericNotFound />} />
+      </Routes>
     </React.Fragment>
   )
 }
 
-OAuthClient.propTypes = {
-  clientId: PropTypes.string.isRequired,
-  match: PropTypes.match.isRequired,
-  oauthClient: PropTypes.shape({
-    name: PropTypes.string,
-  }).isRequired,
-  rights: PropTypes.rights.isRequired,
-  siteName: PropTypes.string.isRequired,
+const OAuthClient = () => {
+  const { clientId } = useParams()
+  const selector = [
+    'name',
+    'description',
+    'state',
+    'state_description',
+    'redirect_uris',
+    'logout_redirect_uris',
+    'skip_authorization',
+    'endorsed',
+    'grants',
+    'rights',
+  ]
+
+  return (
+    <RequireRequest requestAction={[getClientRights(clientId), getClient(clientId, selector)]}>
+      <OAuthClientInner />
+    </RequireRequest>
+  )
 }
 
-export default connect(
-  (state, props) => ({
-    clientId: props.match.params.clientId,
-    rights: selectClientRights(state),
-    fetching: selectClientFetching(state),
-    oauthClient: selectClientById(state, props.match.params.clientId),
-    error: selectClientError(state),
-    siteName: selectApplicationSiteName(),
-  }),
-  dispatch => ({
-    loadData: id => {
-      dispatch(getClientRights(id))
-      dispatch(
-        getClient(id, [
-          'name',
-          'description',
-          'state',
-          'state_description',
-          'redirect_uris',
-          'logout_redirect_uris',
-          'skip_authorization',
-          'endorsed',
-          'grants',
-          'rights',
-        ]),
-      )
-    },
-  }),
-)(withRequest(({ clientId, loadData }) => loadData(clientId))(OAuthClient))
+export default OAuthClient

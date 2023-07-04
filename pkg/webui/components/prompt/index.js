@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,92 +13,51 @@
 // limitations under the License.
 
 import React from 'react'
-import { Prompt as RouterPrompt, useHistory } from 'react-router-dom'
+import { unstable_usePrompt } from 'react-router-dom'
 
 import PortalledModal from '@ttn-lw/components/modal/portalled'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-/*
- * `<Prompt />` is used to prompt the user before navigating from the current page. This is
- * helpful to avoid losing the state of the current page because of accidental misclick, for example,
- * for half-filled forms.
- */
 const Prompt = props => {
-  const { modal, children, when, shouldBlockNavigation, onApprove, onCancel } = props
+  const { modal, children, message, when } = props
+  const [showModal, setShowModal] = React.useState(false)
 
-  const history = useHistory()
-
-  const [state, setState] = React.useState({
-    showModal: false,
-    nextLocation: undefined,
-    confirmedLocationChange: false,
-  })
-  const { showModal, nextLocation, confirmedLocationChange } = state
-
-  const handleModalShow = React.useCallback(nextLocation => {
-    setState(prev => ({ ...prev, showModal: true, nextLocation }))
-  }, [])
-
-  const handleModalHide = React.useCallback(() => {
-    setState(prev => ({ ...prev, showModal: false }))
-  }, [])
+  // The usage of `unstable_usePrompt` might change as the library updates.
+  const continueNavigation = unstable_usePrompt(when, message)
 
   const handleModalComplete = React.useCallback(
     approved => {
-      setState(prev => ({ ...prev, confirmedLocationChange: approved }))
-      handleModalHide()
-    },
-    [handleModalHide],
-  )
-
-  const handlePromptTrigger = React.useCallback(
-    location => {
-      if (!confirmedLocationChange && shouldBlockNavigation(location)) {
-        handleModalShow(location)
-
-        return false
+      setShowModal(false)
+      if (approved) {
+        continueNavigation()
       }
-
-      return true
     },
-    [handleModalShow, shouldBlockNavigation, confirmedLocationChange],
+    [continueNavigation],
   )
 
   React.useEffect(() => {
-    if (confirmedLocationChange) {
-      onApprove(nextLocation, history)
-    } else {
-      onCancel(nextLocation, history)
+    if (when) {
+      setShowModal(true)
     }
-  }, [confirmedLocationChange, history, nextLocation, onApprove, onCancel])
+  }, [when])
 
   return (
-    <>
-      <RouterPrompt when={when} message={handlePromptTrigger} />
-      <PortalledModal visible={showModal} {...modal} approval onComplete={handleModalComplete}>
-        {children}
-      </PortalledModal>
-    </>
+    <PortalledModal visible={showModal} {...modal} approval onComplete={handleModalComplete}>
+      {children}
+    </PortalledModal>
   )
 }
 
 Prompt.propTypes = {
   children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
+  message: PropTypes.string.isRequired,
   modal: PropTypes.shape({ ...PortalledModal.Modal.propTypes }).isRequired,
-  onApprove: PropTypes.func,
-  onCancel: PropTypes.func,
-  shouldBlockNavigation: PropTypes.func,
   when: PropTypes.bool.isRequired,
 }
 
 Prompt.defaultProps = {
   children: undefined,
-  shouldBlockNavigation: () => true,
-  onApprove: (location, history) => {
-    history.push(location)
-  },
-  onCancel: () => null,
 }
 
 export default Prompt

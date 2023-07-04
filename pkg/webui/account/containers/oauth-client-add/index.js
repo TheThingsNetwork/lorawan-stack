@@ -1,4 +1,4 @@
-// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,8 @@
 // limitations under the License.
 
 import React, { useState, useCallback } from 'react'
-import { connect } from 'react-redux'
-import { push } from 'connected-react-router'
+import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
 
 import toast from '@ttn-lw/components/toast'
@@ -32,7 +32,10 @@ const m = defineMessages({
 })
 
 const ClientAdd = props => {
-  const { isAdmin, userId, rights, pseudoRights, navigateToOAuthClient, createOauthClient } = props
+  const { isAdmin, userId, rights, pseudoRights } = props
+
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const [error, setError] = useState()
   const handleSubmit = useCallback(
@@ -42,15 +45,19 @@ const ClientAdd = props => {
       setError(undefined)
 
       try {
-        await createOauthClient(
-          owner_id,
-          {
-            ...values,
-          },
-          userId === owner_id,
+        await dispatch(
+          attachPromise(
+            createClient(
+              owner_id,
+              {
+                ...values,
+              },
+              userId === owner_id,
+            ),
+          ),
         )
 
-        navigateToOAuthClient(ids.client_id)
+        navigate(`/oauth-clients/${ids.client_id}`)
         toast({
           title: ids.client_id,
           message: m.createSuccess,
@@ -66,7 +73,7 @@ const ClientAdd = props => {
         })
       }
     },
-    [userId, navigateToOAuthClient, createOauthClient],
+    [dispatch, userId, navigate],
   )
 
   return (
@@ -82,9 +89,7 @@ const ClientAdd = props => {
 }
 
 ClientAdd.propTypes = {
-  createOauthClient: PropTypes.func.isRequired,
   isAdmin: PropTypes.bool.isRequired,
-  navigateToOAuthClient: PropTypes.func.isRequired,
   pseudoRights: PropTypes.rights.isRequired,
   rights: PropTypes.rights,
   userId: PropTypes.string.isRequired,
@@ -94,8 +99,4 @@ ClientAdd.defaultProps = {
   rights: undefined,
 }
 
-export default connect(null, dispatch => ({
-  navigateToOAuthClient: clientId => dispatch(push(`/oauth-clients/${clientId}`)),
-  createOauthClient: (owner_id, client, userId) =>
-    dispatch(attachPromise(createClient(owner_id, client, userId))),
-}))(ClientAdd)
+export default ClientAdd

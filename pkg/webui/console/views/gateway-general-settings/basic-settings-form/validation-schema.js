@@ -21,6 +21,7 @@ import {
   attributeTooShortCheck,
   attributeKeyTooLongCheck,
   attributeValueTooLongCheck,
+  attributesCountCheck,
 } from '@console/lib/attributes'
 import { addressWithOptionalScheme as addressWithOptionalSchemeRegexp } from '@console/lib/regexp'
 
@@ -60,13 +61,14 @@ const validationSchema = Yup.object().shape({
   update_location_from_status: Yup.boolean().default(false),
   auto_update: Yup.boolean().default(false),
   disable_packet_broker_forwarding: Yup.boolean().default(false),
-  attributes: Yup.array()
-    .max(10, Yup.passValues(sharedMessages.attributesValidateTooMany))
+  attributes: Yup.object()
+    .nullable()
     .test(
-      'has no empty string values',
-      sharedMessages.attributesValidateRequired,
-      attributeValidCheck,
+      'has no more than 10 keys',
+      sharedMessages.attributesValidateTooMany,
+      attributesCountCheck,
     )
+    .test('has no null values', sharedMessages.attributesValidateRequired, attributeValidCheck)
     .test(
       'has key length longer than 2',
       sharedMessages.attributeKeyValidateTooShort,

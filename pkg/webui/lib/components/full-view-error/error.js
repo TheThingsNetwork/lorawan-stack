@@ -100,7 +100,7 @@ const FullViewErrorInner = ({ error, safe }) => {
   } else if (isOAuthCallback) {
     errorTitle = errorMessages.loginFailed
     errorMessage = errorMessages.loginFailedDescription
-    if (isOAuthClientRefusedError(error)) {
+    if (isOAuthClientRefusedError(error) || error.error === 'access_denied') {
       errorMessage = errorMessages.loginFailedAbortDescription
     } else if (isOAuthInvalidStateError(error)) {
       // Usually in case of state errors, the state has expired or otherwise

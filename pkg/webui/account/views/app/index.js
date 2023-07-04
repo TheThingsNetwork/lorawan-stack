@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
 
 import { useSelector, useDispatch } from 'react-redux'
 import React, { useEffect } from 'react'
-import { Switch, Route, Redirect } from 'react-router-dom'
-import { ConnectedRouter } from 'connected-react-router'
+import { Routes, Route, BrowserRouter } from 'react-router-dom'
 import { Helmet } from 'react-helmet'
 
 import { ToastContainer } from '@ttn-lw/components/toast'
@@ -49,9 +48,6 @@ const errorRender = error => <FullViewError error={error} header={<Header />} />
 const AccountApp = ({ history }) => {
   const user = useSelector(selectUser)
   const dispatch = useDispatch()
-  const {
-    location: { pathname },
-  } = history
 
   useEffect(() => {
     const handleConnectionStatusChange = ({ type }) => {
@@ -69,30 +65,29 @@ const AccountApp = ({ history }) => {
 
   if (pageData && pageData.error) {
     return (
-      <ConnectedRouter history={history}>
+      <BrowserRouter history={history} basename="/oauth">
         <FullViewError error={pageData.error} header={<Header />} />
-      </ConnectedRouter>
+      </BrowserRouter>
     )
   }
 
   return (
     <>
       <ToastContainer />
-      <ConnectedRouter history={history}>
+      <BrowserRouter history={history} basename="/oauth">
         <ErrorView errorRender={errorRender}>
           <React.Fragment>
             <Helmet
               titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
               defaultTitle={`${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
             />
-            <Switch>
-              <Redirect from="/:url*(/+)" to={pathname.slice(0, -1)} />
-              <Route path="/authorize" component={Authorize} />
-              <Route path="/" component={Boolean(user) ? Landing : Front} />
-            </Switch>
+            <Routes>
+              <Route path="/authorize/*" Component={Authorize} />
+              <Route path="*" Component={Boolean(user) ? Landing : Front} />
+            </Routes>
           </React.Fragment>
         </ErrorView>
-      </ConnectedRouter>
+      </BrowserRouter>
     </>
   )
 }

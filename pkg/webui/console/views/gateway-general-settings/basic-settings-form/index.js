@@ -28,7 +28,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
-import { mapAttributesToFormValue } from '@console/lib/attributes'
+import { encodeAttributes, decodeAttributes } from '@console/lib/attributes'
 
 import m from '../messages'
 
@@ -55,10 +55,7 @@ const BasicSettingsForm = React.memo(props => {
     gateway,
     gtwId,
     onSubmit,
-    onSubmitSuccess,
     onDelete,
-    onDeleteFailure,
-    onDeleteSuccess,
     mayDeleteGateway,
     mayEditSecrets,
     shouldConfirmDelete,
@@ -73,23 +70,14 @@ const BasicSettingsForm = React.memo(props => {
         setError(undefined)
 
         await onDelete(shouldPurge)
-        onDeleteSuccess()
       } catch (error) {
-        onDeleteFailure()
         setError(error)
       }
     },
-    [onDelete, onDeleteFailure, onDeleteSuccess],
+    [onDelete],
   )
 
-  const initialValues = React.useMemo(() => {
-    const initialValues = {
-      ...gateway,
-      attributes: mapAttributesToFormValue(gateway.attributes),
-    }
-
-    return validationSchema.cast(initialValues)
-  }, [gateway])
+  const initialValues = React.useMemo(() => validationSchema.cast(gateway), [gateway])
 
   const onFormSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
@@ -101,13 +89,12 @@ const BasicSettingsForm = React.memo(props => {
       try {
         await onSubmit(castedValues)
         resetForm({ values: castedValues })
-        onSubmitSuccess()
       } catch (err) {
         setSubmitting(false)
         setError(err)
       }
     },
-    [onSubmit, onSubmitSuccess],
+    [onSubmit],
   )
 
   return (
@@ -203,6 +190,8 @@ const BasicSettingsForm = React.memo(props => {
         component={KeyValueMap}
         description={sharedMessages.attributeDescription}
         tooltipId={tooltipIds.GATEWAY_ATTRIBUTES}
+        encode={encodeAttributes}
+        decode={decodeAttributes}
       />
       <Form.Field
         title={sharedMessages.automaticUpdates}
@@ -228,7 +217,7 @@ const BasicSettingsForm = React.memo(props => {
       />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
-        <Require featureCheck={mayDeleteGateway}>
+        <Require condition={mayDeleteGateway}>
           <DeleteModalButton
             entityId={gtwId}
             entityName={gateway.name}
@@ -246,14 +235,11 @@ const BasicSettingsForm = React.memo(props => {
 BasicSettingsForm.propTypes = {
   gateway: PropTypes.gateway.isRequired,
   gtwId: PropTypes.string.isRequired,
-  mayDeleteGateway: PropTypes.shape({}).isRequired,
+  mayDeleteGateway: PropTypes.bool.isRequired,
   mayEditSecrets: PropTypes.bool.isRequired,
   mayPurge: PropTypes.bool.isRequired,
   onDelete: PropTypes.func.isRequired,
-  onDeleteFailure: PropTypes.func.isRequired,
-  onDeleteSuccess: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  onSubmitSuccess: PropTypes.func.isRequired,
   shouldConfirmDelete: PropTypes.bool.isRequired,
 }
 

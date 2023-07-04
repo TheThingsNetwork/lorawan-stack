@@ -6,7 +6,7 @@ extends:
   - plugin:cypress/recommended
   - prettier
 
-parser: babel-eslint
+parser: '@babel/eslint-parser'
 
 plugins:
   - jsdoc
@@ -45,65 +45,65 @@ rules:
   import/order:
     - warn
     - groups:
-      - builtin
-      - external
-      - internal
-      - parent
-      - sibling
-      - index
+        - builtin
+        - external
+        - internal
+        - parent
+        - sibling
+        - index
       newlines-between: always
       pathGroups:
-      - pattern: "\\@{ttn-lw,console,account}/constants"
-        group: internal
-        position: after
-      - pattern: "\\@{console,account}/api"
-        group: internal
-        position: after
-      - pattern: "\\@ttn-lw/components/**"
-        group: internal
-        position: after
-      - pattern: "\\@ttn-lw/containers/**"
-        group: internal
-        position: after
-      - pattern: "\\@ttn-lw/lib/components/**"
-        group: internal
-        position: after
-      - pattern: "\\@{console,account}/components/**"
-        group: internal
-        position: after
-      - pattern: "\\@{console,account}/containers/**"
-        group: internal
-        position: after
-      - pattern: "\\@{console,account}/lib/components/**"
-        group: internal
-        position: after
-      - pattern: "\\@{console,account}/views/**"
-        group: internal
-        position: after
-      - pattern: "\\@ttn-lw/lib/**"
-        group: internal
-        position: after
-      - pattern: "\\@{console,account}/lib/**"
-        group: internal
-        position: after
-      - pattern: "\\@{console,account}/store/actions/**"
-        group: internal
-        position: after
-      - pattern: "\\@{console,account}/store/reducers/**"
-        group: internal
-        position: after
-      - pattern: "\\@{console,account}/store/selectors/**"
-        group: internal
-        position: after
-      - pattern: "\\@{console,account}/store/middleware/**"
-        group: internal
-        position: after
-      - pattern: "(\\@assets/**|\\@ttn-lw/styles/**)"
-        group: sibling
-        position: after
-      - pattern: "./*.styl"
-        group: sibling
-        position: after
+        - pattern: "\\@{ttn-lw,console,account}/constants"
+          group: internal
+          position: after
+        - pattern: "\\@{console,account}/api"
+          group: internal
+          position: after
+        - pattern: "\\@ttn-lw/components/**"
+          group: internal
+          position: after
+        - pattern: "\\@ttn-lw/containers/**"
+          group: internal
+          position: after
+        - pattern: "\\@ttn-lw/lib/components/**"
+          group: internal
+          position: after
+        - pattern: "\\@{console,account}/components/**"
+          group: internal
+          position: after
+        - pattern: "\\@{console,account}/containers/**"
+          group: internal
+          position: after
+        - pattern: "\\@{console,account}/lib/components/**"
+          group: internal
+          position: after
+        - pattern: "\\@{console,account}/views/**"
+          group: internal
+          position: after
+        - pattern: "\\@ttn-lw/lib/**"
+          group: internal
+          position: after
+        - pattern: "\\@{console,account}/lib/**"
+          group: internal
+          position: after
+        - pattern: "\\@{console,account}/store/actions/**"
+          group: internal
+          position: after
+        - pattern: "\\@{console,account}/store/reducers/**"
+          group: internal
+          position: after
+        - pattern: "\\@{console,account}/store/selectors/**"
+          group: internal
+          position: after
+        - pattern: "\\@{console,account}/store/middleware/**"
+          group: internal
+          position: after
+        - pattern: "(\\@assets/**|\\@ttn-lw/styles/**)"
+          group: sibling
+          position: after
+        - pattern: './*.styl'
+          group: sibling
+          position: after
 
   # Prevent superfluous path traversions in import statements.
   import/no-useless-path-segments:

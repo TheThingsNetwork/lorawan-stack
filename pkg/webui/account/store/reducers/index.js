@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import { combineReducers } from 'redux'
-import { connectRouter } from 'connected-react-router'
 
 import { getClientId, getCollaboratorId } from '@ttn-lw/lib/selectors/id'
 import init from '@ttn-lw/lib/store/reducers/init'
@@ -29,23 +28,21 @@ import session from './sessions'
 import clients from './clients'
 import authorizations from './authorizations'
 
-export default history =>
-  combineReducers({
-    init,
-    clients,
-    authorizations,
-    user,
-    session,
-    is,
-    ui: combineReducers({
-      fetching,
-      error,
-    }),
-    pagination: combineReducers({
-      clients: createNamedPaginationReducer('CLIENTS', getClientId),
-      collaborators: createNamedPaginationReducer('COLLABORATORS', getCollaboratorId),
-    }),
-    status,
-    router: connectRouter(history),
-    collaborators,
-  })
+export default combineReducers({
+  init,
+  clients,
+  authorizations,
+  user,
+  session,
+  is,
+  ui: combineReducers({
+    fetching,
+    error,
+  }),
+  pagination: combineReducers({
+    clients: createNamedPaginationReducer('CLIENTS', getClientId),
+    collaborators: createNamedPaginationReducer('COLLABORATORS', getCollaboratorId),
+  }),
+  status,
+  collaborators,
+})

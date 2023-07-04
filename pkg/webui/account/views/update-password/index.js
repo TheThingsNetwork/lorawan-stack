@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,11 +13,8 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { Redirect } from 'react-router-dom'
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
-import { push } from 'connected-react-router'
-import { useDispatch } from 'react-redux'
-import queryString from 'query-string'
 
 import Spinner from '@ttn-lw/components/spinner'
 
@@ -30,7 +27,6 @@ import style from '@account/views/front/front.styl'
 
 import useRequest from '@ttn-lw/lib/hooks/use-request'
 import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
-import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { getIsConfiguration } from '@account/store/actions/identity-server'
@@ -41,26 +37,31 @@ const m = defineMessages({
 
 const siteName = selectApplicationSiteName()
 
-const UpdatePassword = ({ location }) => {
+const UpdatePassword = () => {
   const [fetching, error] = useRequest(getIsConfiguration())
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
 
   if (Boolean(error)) {
     throw error
   }
 
-  const dispatch = useDispatch()
   const handleSubmitSuccess = useCallback(
     revokeSession => {
-      dispatch(
-        push('/login', { info: revokeSession ? m.sessionRevoked : sharedMessages.passwordChanged }),
-      )
+      navigate('/login', {
+        state: {
+          info: revokeSession ? m.sessionRevoked : sharedMessages.passwordChanged,
+        },
+      })
     },
-    [dispatch],
+    [navigate],
   )
 
-  const { user: userParam, current: currentParam } = queryString.parse(location.search)
+  const userParam = searchParams.get('user')
+  const currentParam = searchParams.get('current')
+
   if (!Boolean(userParam) || !Boolean(currentParam)) {
-    return <Redirect to={{ pathname: '/' }} />
+    return <Navigate to={{ pathname: '/' }} />
   }
 
   if (fetching) {
@@ -88,10 +89,6 @@ const UpdatePassword = ({ location }) => {
       />
     </div>
   )
-}
-
-UpdatePassword.propTypes = {
-  location: PropTypes.location.isRequired,
 }
 
 export default UpdatePassword

@@ -16,6 +16,7 @@ import React from 'react'
 import { connect, useDispatch } from 'react-redux'
 import { defineMessages, useIntl } from 'react-intl'
 import { bindActionCreators } from 'redux'
+import { createSelector } from 'reselect'
 
 import Icon from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
@@ -163,15 +164,20 @@ const CollaboratorsTable = props => {
     return baseHeaders
   }, [intl, currentUserId, deleteCollaborator])
 
-  const baseDataSelector = React.useCallback(
-    state => ({
-      collaborators: selectCollaborators(state, clientId),
-      totalCount: selectCollaboratorsTotalCount(state, clientId),
-      fetching: selectCollaboratorsFetching(state),
-      error: selectCollaboratorsError(state),
+  const baseDataSelector = createSelector(
+    [
+      selectCollaborators,
+      selectCollaboratorsTotalCount,
+      selectCollaboratorsFetching,
+      selectCollaboratorsError,
+    ],
+    (collaborators, totalCount, fetching, error) => ({
+      collaborators,
+      totalCount,
+      fetching,
+      error,
       mayLink: false,
     }),
-    [clientId],
   )
 
   const getItems = React.useCallback(

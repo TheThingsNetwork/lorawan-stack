@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,11 +13,9 @@
 // limitations under the License.
 
 import React, { useState, useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
-import { Redirect } from 'react-router-dom'
-import { push } from 'connected-react-router'
-import queryString from 'query-string'
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 
 import tts from '@account/api/tts'
 
@@ -37,7 +35,6 @@ import Yup from '@ttn-lw/lib/yup'
 import { selectApplicationSiteName, selectEnableUserRegistration } from '@ttn-lw/lib/selectors/env'
 import { userId as userIdRegexp } from '@ttn-lw/lib/regexp'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
 import createPasswordValidationSchema from '@ttn-lw/lib/create-password-validation-schema'
 import useRequest from '@ttn-lw/lib/hooks/use-request'
 
@@ -90,7 +87,9 @@ const getSuccessMessage = state => {
   }
 }
 
-const CreateAccount = ({ location }) => {
+const CreateAccount = () => {
+  const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
   const [fetching, isConfigError] = useRequest(getIsConfiguration())
   if (Boolean(isConfigError)) {
     throw isConfigError
@@ -98,31 +97,30 @@ const CreateAccount = ({ location }) => {
 
   const [error, setError] = useState(undefined)
   const passwordRequirements = useSelector(selectPasswordRequirements)
-  const dispatch = useDispatch()
 
   const handleSubmit = useCallback(
     async (values, { setSubmitting }) => {
       try {
         setError(undefined)
         const { user_id, ...rest } = values
-        const { invitation_token = '' } = queryString.parse(location.search)
+        const invitation_token = searchParams.get('invitation_token') || ''
         const result = await tts.Users.create({ ids: { user_id }, ...rest }, invitation_token)
 
-        dispatch(
-          push(`/login${location.search}`, {
+        navigate(`/login?${searchParams.toString()}`, {
+          state: {
             info: getSuccessMessage(result.state),
-          }),
-        )
+          },
+        })
       } catch (error) {
         setSubmitting(false)
         setError(error)
       }
     },
-    [dispatch, location.search],
+    [navigate, searchParams],
   )
 
   if (!enableUserRegistration) {
-    return <Redirect to={`/login${location.search}`} />
+    return <Navigate to={`/login?${searchParams.toString()}`} />
   }
 
   if (fetching) {
@@ -197,16 +195,16 @@ const CreateAccount = ({ location }) => {
               message={m.createAccount}
               className={style.submitButton}
             />
-            <Button.Link to={`/login${location.search}`} naked message={sharedMessages.login} />
+            <Button.Link
+              to={`/login?${searchParams.toString()}`}
+              naked
+              message={sharedMessages.login}
+            />
           </ButtonGroup>
         </Form>
       </div>
     </>
   )
-}
-
-CreateAccount.propTypes = {
-  location: PropTypes.location.isRequired,
 }
 
 export default CreateAccount

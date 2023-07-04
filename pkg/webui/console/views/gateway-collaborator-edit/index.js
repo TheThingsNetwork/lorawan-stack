@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,67 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import GatewayCollaboratorEdit from './gateway-collaborator-edit'
-import connect from './connect'
+import React from 'react'
+import { Container, Col, Row } from 'react-grid-system'
+import { useParams } from 'react-router-dom'
 
-const ConnectedGatewayCollaboratorEdit = connect(GatewayCollaboratorEdit)
+import { GATEWAY } from '@console/constants/entities'
 
-export { ConnectedGatewayCollaboratorEdit as default, GatewayCollaboratorEdit }
+import PageTitle from '@ttn-lw/components/page-title'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+
+import RequireRequest from '@ttn-lw/lib/components/require-request'
+
+import ConsoleCollaboratorsForm from '@console/containers/collaborators-form'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { getCollaborator, getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
+
+const GatewayCollaboratorEditInner = () => {
+  const { gtwId, collaboratorId, collaboratorType } = useParams()
+
+  useBreadcrumbs(
+    'gtws.single.collaborators.edit',
+    <Breadcrumb
+      path={`/gateways/${gtwId}/collaborators/${collaboratorType}/${collaboratorId}`}
+      content={sharedMessages.edit}
+    />,
+  )
+
+  return (
+    <Container>
+      <PageTitle title={sharedMessages.collaboratorEdit} values={{ collaboratorId }} />
+      <Row>
+        <Col lg={8} md={12}>
+          <ConsoleCollaboratorsForm
+            entity={GATEWAY}
+            entityId={gtwId}
+            collaboratorId={collaboratorId}
+            collaboratorType={collaboratorType}
+            update
+          />
+        </Col>
+      </Row>
+    </Container>
+  )
+}
+
+const GatewayCollaboratorEdit = () => {
+  const { gtwId, collaboratorId, collaboratorType } = useParams()
+
+  const isUser = collaboratorType === 'user'
+
+  return (
+    <RequireRequest
+      requestAction={[
+        getCollaborator('gateway', gtwId, collaboratorId, isUser),
+        getCollaboratorsList('gateway', gtwId),
+      ]}
+    >
+      <GatewayCollaboratorEditInner collaboratorType={collaboratorType} />
+    </RequireRequest>
+  )
+}
+
+export default GatewayCollaboratorEdit

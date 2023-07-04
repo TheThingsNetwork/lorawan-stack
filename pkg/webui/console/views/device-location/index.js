@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,23 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import { connect } from 'react-redux'
+import React, { useCallback } from 'react'
 import { Col, Row, Container } from 'react-grid-system'
-import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
+import { useSelector, useDispatch } from 'react-redux'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import Message from '@ttn-lw/lib/components/message'
 
 import LocationForm from '@console/components/location-form'
 
-import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import locationToMarkers from '@console/lib/location-to-markers'
 
@@ -44,76 +42,69 @@ const m = defineMessages({
   setDeviceLocation: 'Set end device location manually',
 })
 
-@connect(
-  state => ({
-    device: selectSelectedDevice(state),
-    appId: selectSelectedApplicationId(state),
-    devId: selectSelectedDeviceId(state),
-  }),
-  { updateDevice: attachPromise(updateDevice) },
-)
-@withBreadcrumb('device.single.location', props => {
-  const { devId, appId } = props
-  return (
+const DeviceGeneralSettings = () => {
+  const dispatch = useDispatch()
+  const appId = useSelector(selectSelectedApplicationId)
+  const devId = useSelector(selectSelectedDeviceId)
+  const device = useSelector(selectSelectedDevice)
+
+  useBreadcrumbs(
+    'device.single.location',
     <Breadcrumb
       path={`/applications/${appId}/devices/${devId}/location`}
       content={sharedMessages.location}
-    />
+    />,
   )
-})
-export default class DeviceGeneralSettings extends React.Component {
-  static propTypes = {
-    appId: PropTypes.string.isRequired,
-    devId: PropTypes.string.isRequired,
-    device: PropTypes.device.isRequired,
-    updateDevice: PropTypes.func.isRequired,
-  }
 
-  @bind
-  async handleSubmit(location) {
-    const { device, appId, devId, updateDevice } = this.props
+  const handleSubmit = useCallback(
+    async location => {
+      const { locations } = device
 
-    await updateDevice(appId, devId, { locations: { ...device.locations, user: location } })
-  }
+      await dispatch(
+        attachPromise(updateDevice(appId, devId, { locations: { ...locations, user: location } })),
+      )
+    },
+    [appId, devId, device, dispatch],
+  )
 
-  @bind
-  async handleDelete(deleteAll) {
-    const { device, devId, appId, updateDevice } = this.props
+  const handleDelete = useCallback(
+    async deleteAll => {
+      const { locations } = device
+      const { user, ...nonUserLocations } = locations || {}
 
-    const { user, ...nonUserLocations } = device.locations || {}
-    const newLocations = {
-      ...(!deleteAll ? nonUserLocations : undefined),
-    }
+      const newLocations = {
+        ...(!deleteAll ? nonUserLocations : undefined),
+      }
 
-    return updateDevice(appId, devId, { locations: newLocations })
-  }
+      return dispatch(attachPromise(updateDevice(appId, devId, { locations: newLocations })))
+    },
+    [appId, devId, device, dispatch],
+  )
 
-  render() {
-    const { device, devId } = this.props
+  const { user, ...nonUserLocations } = device.locations || {}
 
-    const { user, ...nonUserLocations } = device.locations || {}
-
-    return (
-      <Container>
-        <IntlHelmet title={sharedMessages.location} />
-        <Row>
-          <Col lg={8} md={12}>
-            <LocationForm
-              entityId={devId}
-              formTitle={m.setDeviceLocation}
-              initialValues={user}
-              additionalMarkers={locationToMarkers(nonUserLocations)}
-              onSubmit={this.handleSubmit}
-              onDelete={this.handleDelete}
-              centerOnMarkers
-            />
-          </Col>
-          <Col lg={4} md={12}>
-            <Message content={m.locationInfoTitle} component="h4" className="mb-0 mt-ls-xl" />
-            <Message content={m.locationInfo} component="p" />
-          </Col>
-        </Row>
-      </Container>
-    )
-  }
+  return (
+    <Container>
+      <IntlHelmet title={sharedMessages.location} />
+      <Row>
+        <Col lg={8} md={12}>
+          <LocationForm
+            entityId={devId}
+            formTitle={m.setDeviceLocation}
+            initialValues={user}
+            additionalMarkers={locationToMarkers(nonUserLocations)}
+            onSubmit={handleSubmit}
+            onDelete={handleDelete}
+            centerOnMarkers
+          />
+        </Col>
+        <Col lg={4} md={12}>
+          <Message content={m.locationInfoTitle} component="h4" className="mb-0 mt-ls-xl" />
+          <Message content={m.locationInfo} component="p" />
+        </Col>
+      </Row>
+    </Container>
+  )
 }
+
+export default DeviceGeneralSettings

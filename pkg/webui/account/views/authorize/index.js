@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import Query from 'query-string'
 import { defineMessages } from 'react-intl'
 import { useDispatch } from 'react-redux'
+import { useSearchParams } from 'react-router-dom'
 
 import Modal from '@ttn-lw/components/modal'
 import Icon from '@ttn-lw/components/icon'
@@ -28,7 +28,6 @@ import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import Logo from '@account/containers/logo'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
 import {
   selectCSRFToken,
   selectPageData,
@@ -56,7 +55,7 @@ const capitalize = string => string.charAt(0).toUpperCase() + string.slice(1)
 const pageData = selectPageData()
 const csrfToken = selectCSRFToken()
 
-const Authorize = ({ location }) => {
+const Authorize = () => {
   const dispatch = useDispatch()
   const handleLogout = useCallback(async () => {
     await dispatch(attachPromise(logout()))
@@ -64,13 +63,13 @@ const Authorize = ({ location }) => {
   }, [dispatch])
 
   const { client, user, error } = pageData
-  const { redirect_uri } = Query.parse(location.search)
+  const [searchParams] = useSearchParams()
 
   if (error) {
     return <ErrorMessage content={error} />
   }
 
-  const redirectUri = redirect_uri || client.redirect_uris[0]
+  const redirectUri = searchParams.get('redirect_uri') || client.redirect_uris[0]
   const clientName = client.name || capitalize(client.ids.client_id)
 
   const bottomLine = (
@@ -139,10 +138,6 @@ const Authorize = ({ location }) => {
       </Modal>
     </div>
   )
-}
-
-Authorize.propTypes = {
-  location: PropTypes.location.isRequired,
 }
 
 export default Authorize

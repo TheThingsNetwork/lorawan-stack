@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import Query from 'query-string'
-import { Redirect } from 'react-router-dom'
+import { Navigate, useSearchParams } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
 import { Container, Col, Row } from 'react-grid-system'
 
@@ -25,7 +24,6 @@ import PageTitle from '@ttn-lw/components/page-title'
 import Message from '@ttn-lw/lib/components/message'
 
 import { selectApplicationSiteTitle } from '@ttn-lw/lib/selectors/env'
-import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './code.styl'
 
@@ -37,11 +35,12 @@ const m = defineMessages({
 
 const siteTitle = selectApplicationSiteTitle()
 
-const Code = ({ location }) => {
-  const { query } = Query.parseUrl(location.search)
+const Code = () => {
+  const [searchParams] = useSearchParams()
+  const code = searchParams.get('code')
 
-  if (!query.code) {
-    return <Redirect to="/" />
+  if (!code) {
+    return <Navigate to="/" />
   }
 
   return (
@@ -55,7 +54,7 @@ const Code = ({ location }) => {
             className={style.codeDescription}
           />
           <SafeInspector
-            data={query.code}
+            data={code}
             initiallyVisible
             hideable={false}
             isBytes={false}
@@ -70,10 +69,6 @@ const Code = ({ location }) => {
       </Row>
     </Container>
   )
-}
-
-Code.propTypes = {
-  location: PropTypes.location.isRequired,
 }
 
 export default Code

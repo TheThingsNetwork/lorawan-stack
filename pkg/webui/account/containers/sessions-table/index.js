@@ -1,4 +1,4 @@
-// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import React from 'react'
-import { connect, useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
-import { bindActionCreators } from 'redux'
+import { createSelector } from 'reselect'
 
 import Button from '@ttn-lw/components/button'
 import toast from '@ttn-lw/components/toast'
@@ -25,7 +25,6 @@ import FetchTable from '@ttn-lw/containers/fetch-table'
 import Message from '@ttn-lw/lib/components/message'
 import DateTime from '@ttn-lw/lib/components/date-time'
 
-import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
@@ -50,21 +49,22 @@ const m = defineMessages({
 
 const getItemPathPrefix = item => `/${item.ids.client_id}`
 
-const UserSessionsTable = props => {
-  const { pageSize, user, handleDeleteSession, sessionId } = props
+const UserSessionsTable = () => {
+  const userId = useSelector(selectUserId)
+  const sessionId = useSelector(selectSessionId)
   const dispatch = useDispatch()
 
-  const getSessions = React.useCallback(filters => getUserSessionsList(user, filters), [user])
+  const getSessions = React.useCallback(filters => getUserSessionsList(userId, filters), [userId])
 
   const deleteSession = React.useCallback(
-    async session_id => {
+    async sessionId => {
       try {
-        await handleDeleteSession(session_id)
+        await dispatch(attachPromise(deleteUserSession(userId, sessionId)))
         toast({
           message: m.deleteSessionSuccess,
           type: toast.types.SUCCESS,
         })
-        dispatch(getUserSessionsList(user))
+        dispatch(getUserSessionsList(userId))
       } catch {
         toast({
           message: m.deleteSessionError,
@@ -72,12 +72,12 @@ const UserSessionsTable = props => {
         })
       }
     },
-    [user, handleDeleteSession, dispatch],
+    [dispatch, userId],
   )
 
-  const baseDataSelector = React.useCallback(
-    state => {
-      const sessions = selectUserSessions(state)
+  const baseDataSelector = createSelector(
+    [selectUserSessions, selectUserSessionsTotalCount, selectUserSessionsFetching],
+    (sessions, totalCount, fetching) => {
       const decoratedSessions = []
 
       if (sessions) {
@@ -94,13 +94,12 @@ const UserSessionsTable = props => {
 
       return {
         sessions: decoratedSessions,
-        totalCount: selectUserSessionsTotalCount(state),
-        fetching: selectUserSessionsFetching(state),
+        totalCount,
+        fetching,
         mayAdd: false,
         mayLink: false,
       }
     },
-    [sessionId],
   )
 
   const makeHeaders = React.useMemo(() => {
@@ -191,36 +190,8 @@ const UserSessionsTable = props => {
       baseDataSelector={baseDataSelector}
       tableTitle={<Message content={m.sessionsTableTitle} />}
       getItemPathPrefix={getItemPathPrefix}
-      pageSize={pageSize}
     />
   )
 }
 
-UserSessionsTable.propTypes = {
-  handleDeleteSession: PropTypes.func.isRequired,
-  pageSize: PropTypes.number.isRequired,
-  sessionId: PropTypes.string.isRequired,
-  user: PropTypes.string.isRequired,
-}
-
-export default connect(
-  state => ({
-    user: selectUserId(state),
-    sessionId: selectSessionId(state),
-  }),
-  dispatch => ({
-    ...bindActionCreators(
-      {
-        handleDeleteSession: attachPromise(deleteUserSession),
-      },
-      dispatch,
-    ),
-  }),
-  (stateProps, dispatchProps, ownProps) => ({
-    ...stateProps,
-    ...dispatchProps,
-    ...ownProps,
-    handleDeleteSession: deleteSessionId =>
-      dispatchProps.handleDeleteSession(stateProps.user, deleteSessionId),
-  }),
-)(UserSessionsTable)
+export default UserSessionsTable

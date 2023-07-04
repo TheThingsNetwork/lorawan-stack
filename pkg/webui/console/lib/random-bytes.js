@@ -15,7 +15,7 @@
 /**
  * Generates a random string of the given length.
  * @param {number} len - The length of the string to generate.
- * @param {string} [type='hex'] - The type of the string to generate.
+ * @param {string} type - The type of the string to generate.
  * @returns {string} The generated string.
  * @example
  * const randomString = randomBytes(16)

@@ -1,4 +1,4 @@
-// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import React from 'react'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages, useIntl } from 'react-intl'
-import { bindActionCreators } from 'redux'
+import { createSelector } from 'reselect'
 
 import toast from '@ttn-lw/components/toast'
 import Button from '@ttn-lw/components/button'
@@ -25,10 +25,8 @@ import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
 import Message from '@ttn-lw/lib/components/message'
-import withRequest from '@ttn-lw/lib/components/with-request'
 import DateTime from '@ttn-lw/lib/components/date-time'
 
-import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import capitalizeMessage from '@ttn-lw/lib/capitalize-message'
@@ -36,14 +34,8 @@ import capitalizeMessage from '@ttn-lw/lib/capitalize-message'
 import { checkFromState, mayPerformAllClientActions } from '@account/lib/feature-checks'
 
 import { deleteClient, restoreClient, getClientsList } from '@account/store/actions/clients'
-import { getUserRights } from '@account/store/actions/user'
 
-import {
-  selectUserIsAdmin,
-  selectUserId,
-  selectUserRightsFetching,
-  selectUserRights,
-} from '@account/store/selectors/user'
+import { selectUserIsAdmin } from '@account/store/selectors/user'
 import {
   selectOAuthClients,
   selectOAuthClientsTotalCount,
@@ -73,10 +65,12 @@ const tabs = [
   },
   { title: sharedMessages.deleted, name: DELETED_TAB },
 ]
+const mayAddSelector = state => checkFromState(mayPerformAllClientActions, state)
 
-const ClientsTable = props => {
-  const { isAdmin, restoreClient, purgeClient, ...rest } = props
+const ClientsTable = () => {
   const { formatMessage } = useIntl()
+  const dispatch = useDispatch()
+  const isAdmin = useSelector(selectUserIsAdmin)
 
   const [tab, setTab] = React.useState(OWNED_TAB)
   const isDeletedTab = tab === DELETED_TAB
@@ -84,7 +78,7 @@ const ClientsTable = props => {
   const handleRestore = React.useCallback(
     async id => {
       try {
-        await restoreClient(id)
+        await dispatch(attachPromise(restoreClient(id)))
         toast({
           title: id,
           message: m.restoreSuccess,
@@ -98,13 +92,13 @@ const ClientsTable = props => {
         })
       }
     },
-    [restoreClient],
+    [dispatch],
   )
 
   const handlePurge = React.useCallback(
     async id => {
       try {
-        await purgeClient(id)
+        await dispatch(attachPromise(deleteClient(id, { purge: true })))
         toast({
           title: id,
           message: m.purgeSuccess,
@@ -118,7 +112,7 @@ const ClientsTable = props => {
         })
       }
     },
-    [purgeClient],
+    [dispatch],
   )
 
   const headers = React.useMemo(() => {
@@ -187,14 +181,14 @@ const ClientsTable = props => {
     return baseHeaders
   }, [tab, handlePurge, handleRestore, formatMessage])
 
-  const baseDataSelector = React.useCallback(
-    state => ({
-      clients: selectOAuthClients(state),
-      totalCount: selectOAuthClientsTotalCount(state),
-      fetching: selectOAuthClientsFetching(state),
-      mayAdd: checkFromState(mayPerformAllClientActions, state),
+  const baseDataSelector = createSelector(
+    [selectOAuthClients, selectOAuthClientsTotalCount, selectOAuthClientsFetching, mayAddSelector],
+    (clients, totalCount, fetching, mayAdd) => ({
+      clients,
+      totalCount,
+      fetching,
+      mayAdd,
     }),
-    [],
   )
 
   const getItems = React.useCallback(filters => {
@@ -219,44 +213,8 @@ const ClientsTable = props => {
       searchable
       clickable={!isDeletedTab}
       tabs={isAdmin ? tabs : []}
-      {...rest}
     />
   )
 }
 
-ClientsTable.propTypes = {
-  isAdmin: PropTypes.bool.isRequired,
-  purgeClient: PropTypes.func.isRequired,
-  restoreClient: PropTypes.func.isRequired,
-}
-
-export default connect(
-  state => ({
-    isAdmin: selectUserIsAdmin(state),
-    userId: selectUserId(state),
-    fetching: selectUserRightsFetching(state),
-    rights: selectUserRights(state),
-  }),
-  dispatch => ({
-    ...bindActionCreators(
-      {
-        purgeClient: attachPromise(deleteClient),
-        restoreClient: attachPromise(restoreClient),
-      },
-      dispatch,
-    ),
-    getUsersRightsList: userId => dispatch(attachPromise(getUserRights(userId))),
-  }),
-  (stateProps, dispatchProps, ownProps) => ({
-    ...stateProps,
-    ...dispatchProps,
-    ...ownProps,
-    purgeClient: id => dispatchProps.purgeClient(id, { purge: true }),
-    restoreClient: id => dispatchProps.restoreClient(id),
-  }),
-)(
-  withRequest(
-    ({ getUsersRightsList, userId }) => getUsersRightsList(userId),
-    ({ fetching, rights }) => fetching || rights.length === 0,
-  )(ClientsTable),
-)
+export default ClientsTable

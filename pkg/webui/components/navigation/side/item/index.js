@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import classnames from 'classnames'
-import bind from 'autobind-decorator'
-import { withRouter } from 'react-router-dom'
 
 import Dropdown from '@ttn-lw/components/dropdown'
 import Icon from '@ttn-lw/components/icon'
@@ -30,49 +28,25 @@ import SideNavigationContext from '../context'
 
 import style from './item.styl'
 
-export class SideNavigationItem extends React.PureComponent {
-  static contextType = SideNavigationContext
-
-  static propTypes = {
-    children: PropTypes.node,
-    className: PropTypes.string,
-    depth: PropTypes.number,
-    /** A flag specifying whether the path of the linkable item should be matched exactly or not. */
-    exact: PropTypes.bool,
-    /** The name of the icon for the side navigation item. */
-    icon: PropTypes.string,
-    /** A flag specifying whether the side navigation item is active or not. */
-    isActive: PropTypes.bool,
-    location: PropTypes.location.isRequired,
-    /** The path of the linkable side navigation item. */
-    path: PropTypes.string,
-    /** The title of the side navigation item. */
-    title: PropTypes.message.isRequired,
+const handleItemClick = event => {
+  if (event && event.target) {
+    event.target.blur()
   }
+}
 
-  static defaultProps = {
-    className: undefined,
-    children: undefined,
-    exact: false,
-    icon: undefined,
-    isActive: false,
-    depth: 0,
-    path: undefined,
-  }
+const SideNavigationItem = props => {
+  const { className, children, title, depth, icon, path, exact, isActive } = props
+  const { isMinimized, onLeafItemClick } = useContext(SideNavigationContext)
+  const [isExpanded, setIsExpanded] = useState(false)
 
-  state = {
-    isExpanded: false,
-  }
-
-  handleExpandCollapsableItem() {
-    this.setState({ isExpanded: !this.state.isExpanded })
+  const handleExpandCollapsableItem = useCallback(() => {
+    setIsExpanded(isExpanded => !isExpanded)
     document.activeElement.blur()
-  }
+  }, [])
 
-  componentDidMount() {
+  useEffect(() => {
     // Make sure that the item corresponding to the currently open path is expanded
     // on initial render, if applicable
-    const { location, children } = this.props
     if (Boolean(children)) {
       const paths = React.Children.toArray(children).reduce(
         (paths, child) => [...paths, ...(Boolean(child) ? child.props.path : [])],
@@ -80,57 +54,71 @@ export class SideNavigationItem extends React.PureComponent {
       )
       for (const path of paths) {
         if (location.pathname.startsWith(path)) {
-          this.setState({ isExpanded: true })
+          setIsExpanded(true)
           return
         }
       }
     }
-  }
+  }, [children])
 
-  handleItemClick = event => {
-    if (event && event.target) {
-      event.target.blur()
-    }
-  }
+  return (
+    <li
+      className={classnames(className, style.item, {
+        [style.itemMinimized]: isMinimized,
+      })}
+    >
+      {Boolean(children) ? (
+        <CollapsableItem
+          title={title}
+          icon={icon}
+          onClick={handleExpandCollapsableItem}
+          depth={depth}
+          isActive={isActive}
+          isExpanded={isExpanded}
+          isMinimized={isMinimized}
+          children={children}
+          currentPathName={location.pathname}
+          onDropdownItemsClick={handleItemClick}
+        />
+      ) : (
+        <LinkItem
+          onClick={onLeafItemClick}
+          title={title}
+          icon={icon}
+          exact={exact}
+          path={path}
+          depth={depth}
+          onDropdownItemsClick={handleItemClick}
+        />
+      )}
+    </li>
+  )
+}
 
-  render() {
-    const { className, children, title, depth, icon, path, exact, isActive, location } = this.props
-    const { isExpanded } = this.state
-    const { isMinimized, onLeafItemClick } = this.context
+SideNavigationItem.propTypes = {
+  children: PropTypes.node,
+  className: PropTypes.string,
+  depth: PropTypes.number,
+  /** A flag specifying whether the path of the linkable item should be matched exactly or not. */
+  exact: PropTypes.bool,
+  /** The name of the icon for the side navigation item. */
+  icon: PropTypes.string,
+  /** A flag specifying whether the side navigation item is active or not. */
+  isActive: PropTypes.bool,
+  /** The path of the linkable side navigation item. */
+  path: PropTypes.string,
+  /** The title of the side navigation item. */
+  title: PropTypes.message.isRequired,
+}
 
-    return (
-      <li
-        className={classnames(className, style.item, {
-          [style.itemMinimized]: isMinimized,
-        })}
-      >
-        {Boolean(children) ? (
-          <CollapsableItem
-            title={title}
-            icon={icon}
-            onClick={this.handleExpandCollapsableItem}
-            depth={depth}
-            isActive={isActive}
-            isExpanded={isExpanded}
-            isMinimized={isMinimized}
-            children={children}
-            currentPathName={location.pathname}
-            onDropdownItemsClick={this.handleItemClick}
-          />
-        ) : (
-          <LinkItem
-            onClick={onLeafItemClick}
-            title={title}
-            icon={icon}
-            exact={exact}
-            path={path}
-            depth={depth}
-            onDropdownItemsClick={this.handleItemClick}
-          />
-        )}
-      </li>
-    )
-  }
+SideNavigationItem.defaultProps = {
+  className: undefined,
+  children: undefined,
+  exact: false,
+  icon: undefined,
+  isActive: false,
+  depth: 0,
+  path: undefined,
 }
 
 const CollapsableItem = ({
@@ -248,4 +236,4 @@ LinkItem.defaultProps = {
   onDropdownItemsClick: () => null,
 }
 
-export default withRouter(bind(SideNavigationItem))
+export default SideNavigationItem

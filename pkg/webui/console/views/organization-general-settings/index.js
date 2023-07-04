@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { Col, Row, Container } from 'react-grid-system'
 import { useDispatch, useSelector } from 'react-redux'
-import { push } from 'connected-react-router'
+import { useNavigate } from 'react-router-dom'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
@@ -49,6 +49,7 @@ const GeneralSettings = () => {
   const [error, setError] = useState()
   const [fetching, setFetching] = useState(true)
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const mayDeleteOrg = useSelector(state => checkFromState(mayDeleteOrganization, state))
   const mayViewApiKeys = useSelector(state =>
     checkFromState(mayViewOrEditOrganizationApiKeys, state),
@@ -85,7 +86,7 @@ const GeneralSettings = () => {
     setFetching(false)
   }, [dispatch, mayDeleteOrg, mayViewApiKeys, mayViewCollaborators, orgId])
 
-  const handleDeleteSuccess = useCallback(() => dispatch(push(`/organizations`)), [dispatch])
+  const handleDeleteSuccess = useCallback(() => navigate(`/organizations`), [navigate])
 
   if (fetching) {
     return (

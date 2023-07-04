@@ -65,7 +65,7 @@ const DefaultRoutingPolicyView = () => {
   )
 
   return (
-    <Col lg={8} md={12}>
+    <Col md={12}>
       <Message
         content={m.routingPolicyInformation}
         component="p"

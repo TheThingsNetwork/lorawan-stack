@@ -48,14 +48,9 @@ const validationSchema = Yup.object().shape({
     .min(3, Yup.passValues(sharedMessages.validateTooShort))
     .max(50, Yup.passValues(sharedMessages.validateTooLong)),
   description: Yup.string().max(150, Yup.passValues(sharedMessages.validateTooLong)),
-  attributes: Yup.array()
+  attributes: Yup.object()
     .nullable()
-    .max(10, Yup.passValues(sharedMessages.attributesValidateTooMany))
-    .test(
-      'has no empty string values',
-      sharedMessages.attributesValidateRequired,
-      attributeValidCheck,
-    )
+    .test('has no null values', sharedMessages.attributesValidateRequired, attributeValidCheck)
     .test(
       'has key length longer than 2',
       sharedMessages.attributeKeyValidateTooShort,

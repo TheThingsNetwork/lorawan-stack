@@ -12,9 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ApplicationWebhookAdd from './application-integrations-webhook-add'
-import connect from './connect'
+import React from 'react'
+import { Navigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
-const ConnectedApplicationWebhookAdd = connect(ApplicationWebhookAdd)
+import ApplicationWebhookAddForm from '@console/views/application-integrations-webhook-add-form'
 
-export { ConnectedApplicationWebhookAdd as default, ApplicationWebhookAdd }
+import { selectWebhookTemplates } from '@console/store/selectors/webhook-templates'
+
+const ApplicationWebhookAdd = () => {
+  const hasTemplates = useSelector(state => selectWebhookTemplates(state).length > 0)
+
+  // Forward to the template chooser, when templates have been configured.
+  if (hasTemplates) {
+    return <Navigate to="template" />
+  }
+
+  return <ApplicationWebhookAddForm />
+}
+
+export default ApplicationWebhookAdd

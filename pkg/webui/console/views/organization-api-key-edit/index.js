@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,55 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import connect from './connect'
-import OrganizationApiKeyEdit from './organization-api-key-edit'
+import React from 'react'
+import { Container, Col, Row } from 'react-grid-system'
+import { useParams } from 'react-router-dom'
 
-const ConnectedOrganizationApiKeyEdit = connect(OrganizationApiKeyEdit)
+import { ORGANIZATION } from '@console/constants/entities'
 
-export { ConnectedOrganizationApiKeyEdit as default, OrganizationApiKeyEdit }
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import PageTitle from '@ttn-lw/components/page-title'
+
+import RequireRequest from '@ttn-lw/lib/components/require-request'
+
+import { ApiKeyEditForm } from '@console/containers/api-key-form'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { getApiKey } from '@console/store/actions/api-keys'
+
+const OrganizationApiKeyEditInner = () => {
+  const { orgId, apiKeyId } = useParams()
+
+  useBreadcrumbs(
+    'orgs.single.api-keys.edit',
+    <Breadcrumb
+      path={`/organizations/${orgId}/api-keys/${apiKeyId}`}
+      content={sharedMessages.edit}
+    />,
+  )
+
+  return (
+    <Container>
+      <PageTitle title={sharedMessages.keyEdit} />
+      <Row>
+        <Col lg={8} md={12}>
+          <ApiKeyEditForm entity={ORGANIZATION} entityId={orgId} />
+        </Col>
+      </Row>
+    </Container>
+  )
+}
+
+const OrganizationApiKeyEdit = () => {
+  const { orgId, apiKeyId } = useParams()
+
+  return (
+    <RequireRequest requestAction={getApiKey('organization', orgId, apiKeyId)}>
+      <OrganizationApiKeyEditInner />
+    </RequireRequest>
+  )
+}
+
+export default OrganizationApiKeyEdit

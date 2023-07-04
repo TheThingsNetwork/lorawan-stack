@@ -1,4 +1,4 @@
-// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,37 +13,41 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
-import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
+import ValidateRouteParam from '@ttn-lw/lib/components/validate-route-param'
+import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 
 import AuthorizationsList from '@account/views/oauth-client-authorizations-list'
 import AuthorizationOverview from '@account/views/oauth-client-authorization-overview'
 
-import PropTypes from '@ttn-lw/lib/prop-types'
 import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-const OAuthClientAuthorizations = props => {
-  const { path } = props.match
-
+const OAuthClientAuthorizations = () => {
   useBreadcrumbs(
     'client-authorizations',
     <Breadcrumb path="/client-authorizations" content={sharedMessages.oauthClientAuthorizations} />,
   )
 
   return (
-    <Switch>
-      <Route exact path={`${path}`} component={AuthorizationsList} />
-      <Route path={`${path}/:clientId${pathIdRegexp}`} component={AuthorizationOverview} />
-      <NotFoundRoute />
-    </Switch>
+    <Routes>
+      <Route index Component={AuthorizationsList} />
+      <Route
+        path=":clientId/*"
+        element={
+          <ValidateRouteParam
+            check={{ clientId: pathIdRegexp }}
+            Component={AuthorizationOverview}
+          />
+        }
+      />
+      <Route path="*" element={<GenericNotFound />} />
+    </Routes>
   )
 }
-OAuthClientAuthorizations.propTypes = {
-  match: PropTypes.match.isRequired,
-}
+
 export default OAuthClientAuthorizations

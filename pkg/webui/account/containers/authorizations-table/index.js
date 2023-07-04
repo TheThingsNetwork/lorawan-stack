@@ -1,4 +1,4 @@
-// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,35 +13,35 @@
 // limitations under the License.
 
 import React from 'react'
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
+import { createSelector } from 'reselect'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
 import Message from '@ttn-lw/lib/components/message'
 import DateTime from '@ttn-lw/lib/components/date-time'
 
-import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { getAuthorizationsList } from '@account/store/actions/authorizations'
 
-import { selectUserId } from '@account/store/selectors/user'
 import {
   selectAuthorizations,
   selectAuthorizationsTotalCount,
   selectAuthorizationsFetching,
 } from '@account/store/selectors/authorizations'
+import { selectUserId } from '@account/store/selectors/user'
 
 const m = defineMessages({
   clientId: 'Client ID',
   tableTitle: 'OAuth client authorizations',
 })
 
-const getItemPathPrefix = item => `/${item.client_ids.client_id}`
+const getItemPathPrefix = item => `${item.client_ids.client_id}`
 
-const OAuthClientAuthorizationsTable = props => {
-  const { userId, ...rest } = props
+const OAuthClientAuthorizationsTable = () => {
+  const userId = useSelector(selectUserId)
 
   const headers = React.useMemo(() => {
     const baseHeaders = [
@@ -66,14 +66,14 @@ const OAuthClientAuthorizationsTable = props => {
     return baseHeaders
   }, [])
 
-  const baseDataSelector = React.useCallback(
-    state => ({
-      authorizations: selectAuthorizations(state),
-      totalCount: selectAuthorizationsTotalCount(state),
-      fetching: selectAuthorizationsFetching(state),
+  const baseDataSelector = createSelector(
+    [selectAuthorizations, selectAuthorizationsTotalCount, selectAuthorizationsFetching],
+    (authorizations, totalCount, fetching) => ({
+      authorizations,
+      totalCount,
+      fetching,
       mayAdd: false,
     }),
-    [],
   )
 
   const getItems = React.useCallback(filters => getAuthorizationsList(userId, filters), [userId])
@@ -88,15 +88,8 @@ const OAuthClientAuthorizationsTable = props => {
       getItemPathPrefix={getItemPathPrefix}
       tableTitle={<Message content={m.tableTitle} />}
       clickable
-      {...rest}
     />
   )
 }
 
-OAuthClientAuthorizationsTable.propTypes = {
-  userId: PropTypes.string.isRequired,
-}
-
-export default connect(state => ({
-  userId: selectUserId(state),
-}))(OAuthClientAuthorizationsTable)
+export default OAuthClientAuthorizationsTable

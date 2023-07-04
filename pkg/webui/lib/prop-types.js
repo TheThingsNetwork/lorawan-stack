@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@ import originalPropTypes from 'prop-types'
 
 import ONLINE_STATUS from '@ttn-lw/constants/online-status'
 import { components } from '@ttn-lw/constants/components'
+import { ORGANIZATION, USER, APPLICATION, GATEWAY, CLIENT } from '@console/constants/entities'
 
 const PropTypes = { ...originalPropTypes }
 
@@ -238,7 +239,9 @@ PropTypes.deviceTemplate = PropTypes.shape({
     lorawan_version: PropTypes.string.isRequired,
     lorawan_phy_version: PropTypes.string.isRequired,
   }),
-  field_mask: PropTypes.string.isRequired,
+  field_mask: PropTypes.shape({
+    paths: PropTypes.arrayOf(PropTypes.string),
+  }),
 })
 
 PropTypes.organization = PropTypes.shape({
@@ -344,5 +347,7 @@ PropTypes.routingPolicy = PropTypes.shape({
     mac_data: PropTypes.bool,
   }),
 })
+
+PropTypes.entity = PropTypes.oneOf([APPLICATION, GATEWAY, ORGANIZATION, USER, CLIENT])
 
 export default PropTypes

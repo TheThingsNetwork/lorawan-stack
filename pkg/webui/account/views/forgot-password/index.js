@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
 
 import React, { useCallback, useState } from 'react'
 import { defineMessages } from 'react-intl'
-import { push } from 'connected-react-router'
-import { useDispatch } from 'react-redux'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 
 import tts from '@account/api/tts'
 
@@ -34,7 +33,6 @@ import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { userId as userIdRegexp } from '@ttn-lw/lib/regexp'
 import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
-import PropTypes from '@ttn-lw/lib/prop-types'
 
 const m = defineMessages({
   forgotPassword: 'Forgot password',
@@ -57,8 +55,9 @@ const initialValues = { user_id: '' }
 
 const siteName = selectApplicationSiteName()
 
-const ForgotPassword = ({ location }) => {
-  const dispatch = useDispatch()
+const ForgotPassword = () => {
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [error, setError] = useState(undefined)
 
   const handleSubmit = useCallback(
@@ -66,17 +65,17 @@ const ForgotPassword = ({ location }) => {
       try {
         setError(undefined)
         await tts.Users.createTemporaryPassword(values.user_id)
-        dispatch(
-          push(`/login${location.search}`, {
+        navigate(`/login?${searchParams.toString()}`, {
+          state: {
             info: m.passwordRequested,
-          }),
-        )
+          },
+        })
       } catch (error) {
         setSubmitting(false)
         setError(error)
       }
     },
-    [dispatch, location],
+    [navigate, searchParams],
   )
 
   return (
@@ -104,15 +103,15 @@ const ForgotPassword = ({ location }) => {
         />
         <ButtonGroup>
           <Form.Submit component={SubmitButton} message={m.send} className={style.submitButton} />
-          <Button.Link naked message={sharedMessages.cancel} to={`/login${location.search}`} />
+          <Button.Link
+            naked
+            message={sharedMessages.cancel}
+            to={`/login?${searchParams.toString()}`}
+          />
         </ButtonGroup>
       </Form>
     </div>
   )
-}
-
-ForgotPassword.propTypes = {
-  location: PropTypes.location.isRequired,
 }
 
 export default ForgotPassword

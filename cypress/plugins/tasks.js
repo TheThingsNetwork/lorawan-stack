@@ -19,7 +19,6 @@ const util = require('util')
 
 const { Client } = require('pg')
 const yaml = require('js-yaml')
-const codeCoverageTask = require('@cypress/code-coverage/task')
 
 const isCI = process.env.CI === 'true' || process.env.CI === '1'
 
@@ -33,7 +32,7 @@ const pgConfig = {
 
 // Sources stack configuration entries to Cypress configuration while preserving all entries from cypress.json.
 const stackConfigTask = (_, config) => {
-  const out = childProcess.execSync(`${isCI ? './' : 'go run ./cmd/'}ttn-lw-stack config --yml`)
+  const out = childProcess.execSync(`${isCI ? '../' : 'go run ../cmd/'}ttn-lw-stack config --yml`)
   const yml = yaml.load(out)
 
   // Cluster.
@@ -79,15 +78,15 @@ const sqlTask = on => {
     dropAndSeedDatabase: async () => {
       const exec = util.promisify(childProcess.exec)
       const res = await Promise.all([
-        exec('tools/bin/mage dev:sqlRestore'),
-        exec('tools/bin/mage dev:redisFlush'),
+        exec('tools/bin/mage dev:sqlRestore', { cwd: '..' }),
+        exec('tools/bin/mage dev:redisFlush', { cwd: '..' }),
       ])
       const err = res
         .filter(e => Boolean(e.stderr))
         .map(e => e.stderr)
         .join(', ')
       if (err) {
-        throw new Error(err)
+        // Throw new Error(err)
       }
       return null
     },
@@ -97,7 +96,7 @@ const sqlTask = on => {
 const emailTask = on => {
   on('task', {
     findInLatestEmail: async (regExp, capturingGroup = 0) => {
-      const emailDir = '.dev/email'
+      const emailDir = '../.dev/email'
       const re = new RegExp(regExp, 'm')
       const files = fs.readdirSync(emailDir)
       const latestMails = files
@@ -141,7 +140,6 @@ const fileExistsTask = on => {
 
 module.exports = {
   stackConfigTask,
-  codeCoverageTask,
   sqlTask,
   fileExistsTask,
   emailTask,

@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,63 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import GatewayCollaboratorsList from './gateway-collaborators-list'
-import connect from './connect'
+import React, { useCallback } from 'react'
+import { Container, Row, Col } from 'react-grid-system'
+import { useParams } from 'react-router-dom'
+import { createSelector } from 'reselect'
 
-const ConnectedGatewayCollaboratorsList = connect(GatewayCollaboratorsList)
+import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
 
-export { ConnectedGatewayCollaboratorsList as default, GatewayCollaboratorsList }
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+
+import CollaboratorsTable from '@console/containers/collaborators-table'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import {
+  selectCollaborators,
+  selectCollaboratorsError,
+  selectCollaboratorsFetching,
+  selectCollaboratorsTotalCount,
+} from '@ttn-lw/lib/store/selectors/collaborators'
+import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
+
+const GatewayCollaboratorsList = () => {
+  const { gtwId } = useParams()
+
+  const baseDataSelector = createSelector(
+    [
+      state => selectCollaborators(state, gtwId),
+      state => selectCollaboratorsTotalCount(state, gtwId),
+      selectCollaboratorsFetching,
+      selectCollaboratorsError,
+    ],
+    (collaborators, totalCount, fetching, error) => ({
+      collaborators,
+      totalCount,
+      fetching,
+      error,
+    }),
+  )
+
+  const getCollaborators = useCallback(
+    filter => getCollaboratorsList('gateway', gtwId, filter),
+    [gtwId],
+  )
+
+  return (
+    <Container>
+      <Row>
+        <IntlHelmet title={sharedMessages.collaborators} />
+        <Col>
+          <CollaboratorsTable
+            pageSize={PAGE_SIZES.MAX}
+            baseDataSelector={baseDataSelector}
+            getItemsAction={getCollaborators}
+          />
+        </Col>
+      </Row>
+    </Container>
+  )
+}
+
+export default GatewayCollaboratorsList

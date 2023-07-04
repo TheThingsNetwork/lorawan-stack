@@ -78,7 +78,7 @@ func (js Js) runCypress(command string, args ...string) error {
 	mg.Deps(js.waitOn)
 	return js.runYarnCommand("cypress", append([]string{
 		command,
-		"--config-file", filepath.Join("config", "cypress.json"),
+		"--config-file", filepath.Join("config", "cypress.config.js"),
 		"--config", fmt.Sprintf("baseUrl=%s", js.frontendURL()),
 	},
 		args...)...)

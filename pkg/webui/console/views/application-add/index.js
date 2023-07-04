@@ -1,4 +1,4 @@
-// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,8 +15,7 @@
 import React, { useCallback } from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
-import { push } from 'connected-react-router'
-import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Link from '@ttn-lw/components/link'
@@ -40,12 +39,12 @@ const m = defineMessages({
 })
 
 const ApplicationAdd = () => {
-  const dispatch = useDispatch()
+  const navigate = useNavigate()
   const handleSuccess = useCallback(
     gtwId => {
-      dispatch(push(`/applications/${gtwId}`))
+      navigate(`/applications/${gtwId}`)
     },
-    [dispatch],
+    [navigate],
   )
 
   return (

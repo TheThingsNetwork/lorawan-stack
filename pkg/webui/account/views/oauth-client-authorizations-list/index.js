@@ -1,4 +1,4 @@
-// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
 import React from 'react'
 import { Row, Col, Container } from 'react-grid-system'
 
-import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
-
 import PageTitle from '@ttn-lw/components/page-title'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
@@ -31,7 +29,7 @@ const AuthorizationsList = () => (
       <IntlHelmet title={sharedMessages.oauthClientAuthorizations} />
       <Col>
         <PageTitle title={sharedMessages.oauthClientAuthorizations} hideHeading />
-        <OAuthClientAuthorizationsTable pageSize={PAGE_SIZES.REGULAR} />
+        <OAuthClientAuthorizationsTable />
       </Col>
     </Row>
   </Container>

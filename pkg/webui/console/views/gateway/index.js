@@ -12,21 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import { Switch, Route } from 'react-router-dom'
-import { connect } from 'react-redux'
+import React, { useCallback, useEffect } from 'react'
+import { Routes, Route, useParams } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
 
 import gatewayIcon from '@assets/misc/gateway.svg'
 
-import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 import SideNavigation from '@ttn-lw/components/navigation/side'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
-import withRequest from '@ttn-lw/lib/components/with-request'
-import withEnv from '@ttn-lw/lib/components/env'
-import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
+import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
+import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import GatewayCollaborators from '@console/views/gateway-collaborators'
 import GatewayLocation from '@console/views/gateway-location'
@@ -36,8 +35,8 @@ import GatewayApiKeys from '@console/views/gateway-api-keys'
 import GatewayOverview from '@console/views/gateway-overview'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
-import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
 
 import {
   mayViewGatewayInfo,
@@ -54,170 +53,114 @@ import {
   getGatewaysRightsList,
 } from '@console/store/actions/gateways'
 
-import {
-  selectGatewayFetching,
-  selectGatewayError,
-  selectSelectedGateway,
-  selectGatewayRights,
-  selectGatewayRightsFetching,
-  selectGatewayRightsError,
-} from '@console/store/selectors/gateways'
+import { selectSelectedGateway, selectGatewayRights } from '@console/store/selectors/gateways'
 
-@connect(
-  (state, props) => {
-    const gtwId = props.match.params.gtwId
-    const gateway = selectSelectedGateway(state)
+const Gateway = () => {
+  const { gtwId } = useParams()
+  const dispatch = useDispatch()
+  const initialFetch = useCallback(
+    async dispatch => {
+      const rights = await dispatch(attachPromise(getGatewaysRightsList(gtwId)))
 
-    return {
-      gtwId,
-      gateway,
-      error: selectGatewayError(state) || selectGatewayRightsError(state),
-      fetching: selectGatewayFetching(state) || selectGatewayRightsFetching(state),
-      rights: selectGatewayRights(state),
-    }
-  },
-  dispatch => ({
-    getRights: id => dispatch(attachPromise(getGatewaysRightsList(id))),
-    getGateway: (id, meta) => dispatch(getGateway(id, meta)),
-    stopStream: id => dispatch(stopGatewayEventsStream(id)),
-  }),
-)
-@withRequest(
-  async ({ gtwId, getRights, getGateway }) => {
-    const rights = await getRights(gtwId)
+      const selector = [
+        'name',
+        'description',
+        'enforce_duty_cycle',
+        'frequency_plan_ids',
+        'gateway_server_address',
+        'antennas',
+        'location_public',
+        'status_public',
+        'auto_update',
+        'schedule_downlink_late',
+        'update_location_from_status',
+        'update_channel',
+        'schedule_anytime_delay',
+        'attributes',
+        'require_authenticated_connection',
+        'disable_packet_broker_forwarding',
+      ]
 
-    const selector = [
-      'name',
-      'description',
-      'enforce_duty_cycle',
-      'frequency_plan_ids',
-      'gateway_server_address',
-      'antennas',
-      'location_public',
-      'status_public',
-      'auto_update',
-      'schedule_downlink_late',
-      'update_location_from_status',
-      'update_channel',
-      'schedule_anytime_delay',
-      'attributes',
-      'require_authenticated_connection',
-      'disable_packet_broker_forwarding',
-    ]
+      if (rights.includes('RIGHT_GATEWAY_READ_SECRETS')) {
+        selector.push('lbs_lns_secret')
+      }
 
-    if (rights.includes('RIGHT_GATEWAY_READ_SECRETS')) {
-      selector.push('lbs_lns_secret')
-    }
+      return dispatch(attachPromise(getGateway(gtwId, selector)))
+    },
+    [gtwId],
+  )
+  useEffect(() => () => dispatch(stopGatewayEventsStream(gtwId)), [gtwId, dispatch])
 
-    return getGateway(gtwId, selector)
-  },
-  ({ fetching, gateway }) => fetching || !Boolean(gateway),
-)
-@withBreadcrumb('gateways.single', props => {
-  const {
-    gtwId,
-    gateway: { name },
-  } = props
+  const gateway = useSelector(selectSelectedGateway)
+  const hasGateway = Boolean(gateway)
 
-  return <Breadcrumb path={`/gateways/${gtwId}`} content={name || gtwId} />
-})
-@withEnv
-export default class Gateway extends React.Component {
-  static propTypes = {
-    env: PropTypes.env,
-    gateway: PropTypes.gateway.isRequired,
-    gtwId: PropTypes.string.isRequired,
-    match: PropTypes.match.isRequired,
-    rights: PropTypes.rights.isRequired,
-    stopStream: PropTypes.func.isRequired,
-  }
-
-  static defaultProps = {
-    env: undefined,
-  }
-
-  componentWillUnmount() {
-    const { stopStream, gtwId } = this.props
-
-    stopStream(gtwId)
-  }
-
-  render() {
-    const {
-      match: { url: matchedUrl },
-      gateway,
-      gtwId,
-      env,
-      rights,
-      match,
-    } = this.props
-
-    return (
-      <React.Fragment>
-        <Breadcrumbs />
-        <IntlHelmet titleTemplate={`%s - ${gateway.name || gtwId} - ${env.siteName}`} />
-        <SideNavigation
-          header={{
-            icon: gatewayIcon,
-            iconAlt: sharedMessages.gateway,
-            title: gateway.name || gtwId,
-            to: matchedUrl,
-          }}
-        >
-          {mayViewGatewayInfo.check(rights) && (
-            <SideNavigation.Item
-              title={sharedMessages.overview}
-              path={matchedUrl}
-              icon="overview"
-              exact
-            />
-          )}
-          {mayViewGatewayEvents.check(rights) && (
-            <SideNavigation.Item
-              title={sharedMessages.liveData}
-              path={`${matchedUrl}/data`}
-              icon="data"
-            />
-          )}
-          {mayViewOrEditGatewayLocation.check(rights) && (
-            <SideNavigation.Item
-              title={sharedMessages.location}
-              path={`${matchedUrl}/location`}
-              icon="location"
-            />
-          )}
-          {mayViewOrEditGatewayCollaborators.check(rights) && (
-            <SideNavigation.Item
-              title={sharedMessages.collaborators}
-              path={`${matchedUrl}/collaborators`}
-              icon="organization"
-            />
-          )}
-          {mayViewOrEditGatewayApiKeys.check(rights) && (
-            <SideNavigation.Item
-              title={sharedMessages.apiKeys}
-              path={`${matchedUrl}/api-keys`}
-              icon="api_keys"
-            />
-          )}
-          {mayEditBasicGatewayInformation.check(rights) && (
-            <SideNavigation.Item
-              title={sharedMessages.generalSettings}
-              path={`${matchedUrl}/general-settings`}
-              icon="general_settings"
-            />
-          )}
-        </SideNavigation>
-        <Switch>
-          <Route exact path={`${match.path}`} component={GatewayOverview} />
-          <Route path={`${match.path}/api-keys`} component={GatewayApiKeys} />
-          <Route path={`${match.path}/collaborators`} component={GatewayCollaborators} />
-          <Route path={`${match.path}/location`} component={GatewayLocation} />
-          <Route path={`${match.path}/data`} component={GatewayData} />
-          <Route path={`${match.path}/general-settings`} component={GatewayGeneralSettings} />
-          <NotFoundRoute />
-        </Switch>
-      </React.Fragment>
-    )
-  }
+  return (
+    <RequireRequest requestAction={initialFetch}>{hasGateway && <GatewayInner />}</RequireRequest>
+  )
 }
+
+const GatewayInner = () => {
+  const { gtwId } = useParams()
+  const gateway = useSelector(selectSelectedGateway)
+  const rights = useSelector(selectGatewayRights)
+
+  const gatewayName = gateway?.name || gtwId
+
+  useBreadcrumbs(
+    'gateways.single',
+    <Breadcrumb path={`/gateways/${gtwId}`} content={gatewayName} />,
+  )
+
+  return (
+    <>
+      <Breadcrumbs />
+      <IntlHelmet titleTemplate={`%s - ${gatewayName} - ${selectApplicationSiteName()}`} />
+      <SideNavigation
+        header={{
+          icon: gatewayIcon,
+          iconAlt: sharedMessages.gateway,
+          title: gatewayName,
+          to: '',
+        }}
+      >
+        {mayViewGatewayInfo.check(rights) && (
+          <SideNavigation.Item title={sharedMessages.overview} path="" icon="overview" exact />
+        )}
+        {mayViewGatewayEvents.check(rights) && (
+          <SideNavigation.Item title={sharedMessages.liveData} path="data" icon="data" />
+        )}
+        {mayViewOrEditGatewayLocation.check(rights) && (
+          <SideNavigation.Item title={sharedMessages.location} path="location" icon="location" />
+        )}
+        {mayViewOrEditGatewayCollaborators.check(rights) && (
+          <SideNavigation.Item
+            title={sharedMessages.collaborators}
+            path="collaborators"
+            icon="organization"
+          />
+        )}
+        {mayViewOrEditGatewayApiKeys.check(rights) && (
+          <SideNavigation.Item title={sharedMessages.apiKeys} path="api-keys" icon="api_keys" />
+        )}
+        {mayEditBasicGatewayInformation.check(rights) && (
+          <SideNavigation.Item
+            title={sharedMessages.generalSettings}
+            path="general-settings"
+            icon="general_settings"
+          />
+        )}
+      </SideNavigation>
+      <Routes>
+        <Route index Component={GatewayOverview} />
+        <Route path="api-keys/*" Component={GatewayApiKeys} />
+        <Route path="collaborators/*" Component={GatewayCollaborators} />
+        <Route path="location" Component={GatewayLocation} />
+        <Route path="data" Component={GatewayData} />
+        <Route path="general-settings" Component={GatewayGeneralSettings} />
+        <Route path="*" element={GenericNotFound} />
+      </Routes>
+    </>
+  )
+}
+
+export default Gateway

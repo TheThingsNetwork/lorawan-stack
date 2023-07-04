@@ -14,16 +14,16 @@
 
 import React from 'react'
 import { Container, Row, Col } from 'react-grid-system'
+import { useParams } from 'react-router-dom'
 
 import PageTitle from '@ttn-lw/components/page-title'
 
 import WebhooksTable from '@console/containers/webhooks-table'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
 
-const ApplicationWebhooksList = props => {
-  const { appId } = props.match.params
+const ApplicationWebhooksList = () => {
+  const { appId } = useParams()
 
   return (
     <Container>
@@ -35,10 +35,6 @@ const ApplicationWebhooksList = props => {
       </Row>
     </Container>
   )
-}
-
-ApplicationWebhooksList.propTypes = {
-  match: PropTypes.match.isRequired,
 }
 
 export default ApplicationWebhooksList

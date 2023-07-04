@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import React from 'react'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
+import { createSelector } from 'reselect'
 
 import toast from '@ttn-lw/components/toast'
 import Button from '@ttn-lw/components/button'
@@ -29,9 +29,7 @@ import DateTime from '@ttn-lw/lib/components/date-time'
 import Message from '@ttn-lw/lib/components/message'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
-import { getOrganizationId } from '@ttn-lw/lib/selectors/id'
 
 import { checkFromState, mayCreateOrganizations } from '@console/lib/feature-checks'
 
@@ -43,10 +41,9 @@ import {
 
 import { selectUserIsAdmin } from '@console/store/selectors/logout'
 import {
-  selectOrganizations,
   selectOrganizationsTotalCount,
   selectOrganizationsFetching,
-  selectOrganizationCollaboratorCount,
+  selectOrganizationsWithCollaboratorCount,
 } from '@console/store/selectors/organizations'
 
 const m = defineMessages({
@@ -70,17 +67,18 @@ const tabs = [
   },
   { title: sharedMessages.deleted, name: DELETED_TAB },
 ]
+const mayAddSelector = state => checkFromState(mayCreateOrganizations, state)
 
-const OrganizationsTable = props => {
-  const { pageSize, isAdmin, purgeOrganization, restoreOrganization } = props
-
+const OrganizationsTable = () => {
+  const dispatch = useDispatch()
+  const isAdmin = useSelector(selectUserIsAdmin)
   const [tab, setTab] = React.useState(OWNED_TAB)
   const isDeletedTab = tab === DELETED_TAB
 
   const handleRestore = React.useCallback(
     async id => {
       try {
-        await restoreOrganization(id)
+        await dispatch(attachPromise(restoreOrganization(id)))
         toast({
           title: id,
           message: m.restoreSuccess,
@@ -94,13 +92,13 @@ const OrganizationsTable = props => {
         })
       }
     },
-    [restoreOrganization],
+    [dispatch],
   )
 
   const handlePurge = React.useCallback(
     async id => {
       try {
-        await purgeOrganization(id)
+        await dispatch(attachPromise(deleteOrganization(id, { purge: true })))
         toast({
           title: id,
           message: m.purgeSuccess,
@@ -114,7 +112,7 @@ const OrganizationsTable = props => {
         })
       }
     },
-    [purgeOrganization],
+    [dispatch],
   )
 
   const headers = React.useMemo(() => {
@@ -190,24 +188,18 @@ const OrganizationsTable = props => {
     return baseHeaders
   }, [handlePurge, handleRestore, isDeletedTab])
 
-  const baseDataSelector = React.useCallback(state => {
-    const organizations = selectOrganizations(state)
-    const decoratedOrganizations = []
-
-    for (const org of organizations) {
-      decoratedOrganizations.push({
-        ...org,
-        _collaboratorCount: selectOrganizationCollaboratorCount(state, getOrganizationId(org)),
-      })
-    }
-
-    return {
-      organizations: decoratedOrganizations,
-      totalCount: selectOrganizationsTotalCount(state),
-      fetching: selectOrganizationsFetching(state),
-      mayAdd: checkFromState(mayCreateOrganizations, state),
-    }
-  }, [])
+  const baseDataSelector = createSelector(
+    selectOrganizationsWithCollaboratorCount,
+    selectOrganizationsTotalCount,
+    selectOrganizationsFetching,
+    mayAddSelector,
+    (organizations, totalCount, fetching, mayAdd) => ({
+      organizations,
+      totalCount,
+      fetching,
+      mayAdd,
+    }),
+  )
 
   const getOrganizations = React.useCallback(filters => {
     const { tab, query } = filters
@@ -230,7 +222,6 @@ const OrganizationsTable = props => {
       tableTitle={<Message content={sharedMessages.organizations} />}
       getItemsAction={getOrganizations}
       baseDataSelector={baseDataSelector}
-      pageSize={pageSize}
       searchable
       clickable={!isDeletedTab}
       tabs={isAdmin ? tabs : []}
@@ -238,31 +229,4 @@ const OrganizationsTable = props => {
   )
 }
 
-OrganizationsTable.propTypes = {
-  isAdmin: PropTypes.bool.isRequired,
-  pageSize: PropTypes.number.isRequired,
-  purgeOrganization: PropTypes.func.isRequired,
-  restoreOrganization: PropTypes.func.isRequired,
-}
-
-export default connect(
-  state => ({
-    isAdmin: selectUserIsAdmin(state),
-  }),
-  dispatch => ({
-    ...bindActionCreators(
-      {
-        purgeOrganization: attachPromise(deleteOrganization),
-        restoreOrganization: attachPromise(restoreOrganization),
-      },
-      dispatch,
-    ),
-  }),
-  (stateProps, dispatchProps, ownProps) => ({
-    ...stateProps,
-    ...dispatchProps,
-    ...ownProps,
-    purgeOrganization: id => dispatchProps.purgeOrganization(id, { purge: true }),
-    restoreOrganization: id => dispatchProps.restoreOrganization(id),
-  }),
-)(OrganizationsTable)
+export default OrganizationsTable

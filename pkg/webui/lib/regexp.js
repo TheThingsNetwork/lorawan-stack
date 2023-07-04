@@ -17,5 +17,5 @@ export const hostname =
 export const url = /^\b((http|https):\/\/?)[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|\/?))$/
 export const id = /^[a-z0-9](?:[-]?[a-z0-9]){2,}$/
 export const userId = /^[a-z0-9](?:[-]?[a-z0-9]){1,}$/
-export const pathId = '([a-z0-9-]{3,})' // To be used within router paths.
-export const userPathId = '([a-z0-9-]{2,})' // To be used within router paths.
+export const pathId = /([a-z0-9-]{3,})/
+export const userPathId = /([a-z0-9-]{2,})/

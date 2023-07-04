@@ -15,8 +15,6 @@
 import React from 'react'
 import { Row, Col, Container } from 'react-grid-system'
 
-import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
-
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
 import ApplicationsTable from '@console/containers/applications-table'
@@ -28,7 +26,7 @@ const ApplicationsList = () => (
     <Row>
       <IntlHelmet title={sharedMessages.applications} />
       <Col>
-        <ApplicationsTable pageSize={PAGE_SIZES.REGULAR} />
+        <ApplicationsTable />
       </Col>
     </Row>
   </Container>

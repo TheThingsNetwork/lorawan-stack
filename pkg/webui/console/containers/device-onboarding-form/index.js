@@ -14,7 +14,7 @@
 
 import React, { useCallback, useState } from 'react'
 import { merge } from 'lodash'
-import { push } from 'connected-react-router'
+import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
 import Form, { useFormContext } from '@ttn-lw/components/form'
@@ -83,14 +83,15 @@ const DeviceOnboardingFormInner = () => {
 
 const DeviceOnboardingForm = () => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const mayEditKeys = useSelector(state => checkFromState(mayEditApplicationDeviceKeys, state))
   const appId = useSelector(state => selectSelectedApplicationId(state))
   const validationContext = React.useMemo(() => ({ mayEditKeys }), [mayEditKeys])
   const [error, setError] = useState(undefined)
 
   const navigateToDevice = useCallback(
-    (appId, deviceId) => dispatch(push(`/applications/${appId}/devices/${deviceId}`)),
-    [dispatch],
+    (appId, deviceId) => navigate(`/applications/${appId}/devices/${deviceId}`),
+    [navigate],
   )
 
   const handleSubmit = useCallback(

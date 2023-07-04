@@ -60,7 +60,9 @@ const deleteAccessTokenLogic = createRequestLogic({
   process: async ({ action }) => {
     const { userId, clientId, id } = action.payload
 
-    return await tts.Authorizations.deleteToken(userId, clientId, id)
+    await tts.Authorizations.deleteToken(userId, clientId, id)
+
+    return { id }
   },
 })
 

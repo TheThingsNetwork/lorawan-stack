@@ -94,9 +94,12 @@ class Tab extends React.PureComponent {
     }
 
     if (canRenderLink) {
-      props.exact = exact
+      props.end = exact
       props.to = link
-      props.activeClassName = style.tabItemActive
+      props.className = ({ isActive }) =>
+        classnames(tabItemClassNames, style.tabItem, {
+          [style.tabItemActive]: !disabled && isActive,
+        })
     } else {
       props.onClick = this.handleClick
     }

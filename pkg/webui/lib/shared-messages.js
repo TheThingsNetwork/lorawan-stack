@@ -93,7 +93,7 @@ export default defineMessages({
   collaboratorWarningAdmin:
     'This user is an administrator that will retain all rights to all entities regardless of collaborator status',
   collaboratorWarningAdminSelf:
-    'As an administrator, you aways retain all rights to all entities regardless of collaborator status',
+    'As an administrator, you always retain all rights to all entities regardless of collaborator status',
   collaboratorModalWarning: 'Are you sure you want to remove {collaboratorId} as a collaborator?',
   collaboratorModalWarningSelf:
     'Are you sure you want to remove yourself as a collaborator? Access to this entity will be lost until someone else adds you as a collaborator again.',
@@ -107,6 +107,8 @@ export default defineMessages({
   componentJs: 'Join Server',
   componentNs: 'Network Server',
   componentQrg: 'QR Code Generator',
+  componentDcs: 'Device Claiming Server',
+  componentGcs: 'Gateway Claiming Server',
   confirm: 'Confirm',
   confirmPassword: 'Confirm password',
   connected: 'Connected',

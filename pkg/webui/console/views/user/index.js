@@ -13,31 +13,26 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
-import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
+import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 
 import UserApiKeys from '@console/views/user-api-keys'
 
 import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
-import PropTypes from '@ttn-lw/lib/prop-types'
 
-const UserView = ({ match }) => (
+const UserView = () => (
   <>
     <Breadcrumbs />
     <IntlHelmet titleTemplate={`%s - User - ${selectApplicationSiteName()}`} />
-    <Switch>
-      <Route path={`${match.path}/api-keys`} component={UserApiKeys} />
-      <NotFoundRoute />
-    </Switch>
+    <Routes>
+      <Route path="api-keys/*" Component={UserApiKeys} />
+      <Route path="*" Component={GenericNotFound} />
+    </Routes>
   </>
 )
-
-UserView.propTypes = {
-  match: PropTypes.match.isRequired,
-}
 
 export default UserView
