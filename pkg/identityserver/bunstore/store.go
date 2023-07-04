@@ -46,6 +46,7 @@ func newDB(ctx context.Context, db *bun.DB) (*baseDB, error) {
 	if err != nil {
 		return nil, storeutil.WrapDriverError(err)
 	}
+	defer res.Close()
 	res.Next()
 	if err = res.Scan(&version); err != nil {
 		return nil, storeutil.WrapDriverError(err)
@@ -58,6 +59,7 @@ func newDB(ctx context.Context, db *bun.DB) (*baseDB, error) {
 	if err != nil {
 		return nil, storeutil.WrapDriverError(err)
 	}
+	defer res.Close()
 	res.Next()
 	if err = res.Scan(&serverVersion); err != nil {
 		return nil, storeutil.WrapDriverError(err)
