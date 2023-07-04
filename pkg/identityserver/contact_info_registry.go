@@ -42,6 +42,32 @@ var (
 	)
 )
 
+// validateContactInfoRestrictions fetches the auth info from the context and validates if the caller ID matches the
+// provided `ids` in the parameters. The usage of this function should be restricted to testing the administrative and
+// technical contacts in methods belonging to each entity registry.
+func (is *IdentityServer) validateContactInfoRestrictions(
+	ctx context.Context, ids ...*ttnpb.OrganizationOrUserIdentifiers,
+) error {
+	authInfo, err := is.authInfo(ctx)
+	if err != nil {
+		return err
+	}
+	callerID := authInfo.GetOrganizationOrUserIdentifiers()
+	if is.configFromContext(ctx).CollaboratorRights.SetOthersAsContacts || authInfo.IsAdmin {
+		return nil
+	}
+
+	for _, id := range ids {
+		if id == nil {
+			continue
+		}
+		if callerID.EntityType() != id.EntityType() || callerID.IDString() != id.IDString() {
+			return store.ErrContactInfoRestricted.New()
+		}
+	}
+	return nil
+}
+
 func validateCollaboratorEqualsContact(collaborator, contact *ttnpb.OrganizationOrUserIdentifiers) error {
 	if contact == nil {
 		return nil
