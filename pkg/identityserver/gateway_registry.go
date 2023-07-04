@@ -65,13 +65,29 @@ var (
 )
 
 var (
-	errAdminsCreateGateways    = errors.DefinePermissionDenied("admins_create_gateways", "gateways may only be created by admins, or in organizations")
-	errGatewayEUITaken         = errors.DefineAlreadyExists("gateway_eui_taken", "a gateway with EUI `{gateway_eui}` is already registered (by you or someone else) as `{gateway_id}`", "administrative_contact")
-	errAdminsPurgeGateways     = errors.DefinePermissionDenied("admins_purge_gateways", "gateways may only be purged by admins")
-	errClaimAuthenticationCode = errors.DefineInvalidArgument("claim_authentication_code", "invalid claim authentication code")
+	errAdminsCreateGateways = errors.DefinePermissionDenied(
+		"admins_create_gateways",
+		"gateways may only be created by admins, or in organizations",
+	)
+	errGatewayEUITaken = errors.DefineAlreadyExists(
+		"gateway_eui_taken",
+		"a gateway with EUI `{gateway_eui}` is already registered (by you or someone else) as `{gateway_id}`",
+		"administrative_contact",
+	)
+	errAdminsPurgeGateways = errors.DefinePermissionDenied(
+		"admins_purge_gateways",
+		"gateways may only be purged by admins",
+	)
+	errClaimAuthenticationCode = errors.DefineInvalidArgument(
+		"claim_authentication_code",
+		"invalid claim authentication code",
+	)
 )
 
-func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGatewayRequest) (gtw *ttnpb.Gateway, err error) {
+func (is *IdentityServer) createGateway( // nolint:gocyclo
+	ctx context.Context,
+	req *ttnpb.CreateGatewayRequest,
+) (gtw *ttnpb.Gateway, err error) {
 	reqGtw := req.GetGateway()
 	if err = blocklist.Check(ctx, reqGtw.GetIds().GetGatewayId()); err != nil {
 		return nil, err
@@ -91,7 +107,9 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 
 	if req.Gateway.AdministrativeContact == nil {
 		req.Gateway.AdministrativeContact = req.Collaborator
-	} else if err := validateCollaboratorEqualsContact(req.Collaborator, req.Gateway.AdministrativeContact); err != nil {
+	} else if err := validateCollaboratorEqualsContact(
+		req.Collaborator, req.Gateway.AdministrativeContact,
+	); err != nil {
 		return nil, err
 	}
 	if req.Gateway.TechnicalContact == nil {
@@ -199,7 +217,10 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 	return gtw, nil
 }
 
-func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayRequest) (gtw *ttnpb.Gateway, err error) {
+func (is *IdentityServer) getGateway( // nolint:gocyclo
+	ctx context.Context,
+	req *ttnpb.GetGatewayRequest,
+) (gtw *ttnpb.Gateway, err error) {
 	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
@@ -210,7 +231,12 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 			req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "frequency_plan_ids")
 		}
 	}
-	req.FieldMask = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask, getPaths, []string{"frequency_plan_id"})
+	req.FieldMask = cleanFieldMaskPaths(
+		ttnpb.GatewayFieldPathsNested,
+		req.FieldMask,
+		getPaths,
+		[]string{"frequency_plan_id"},
+	)
 
 	if err = rights.RequireGateway(ctx, req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_INFO); err != nil {
 		if !ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicGatewayFields...) {
@@ -259,7 +285,8 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 	if gtw.ClaimAuthenticationCode != nil && gtw.ClaimAuthenticationCode.Secret != nil {
 		value := gtw.ClaimAuthenticationCode.Secret.Value
 		if gtw.ClaimAuthenticationCode.Secret.KeyId != "" {
-			value, err = is.KeyService().Decrypt(ctx, gtw.ClaimAuthenticationCode.Secret.Value, gtw.ClaimAuthenticationCode.Secret.KeyId)
+			value, err = is.KeyService().
+				Decrypt(ctx, gtw.ClaimAuthenticationCode.Secret.Value, gtw.ClaimAuthenticationCode.Secret.KeyId)
 			if err != nil {
 				return nil, err
 			}
@@ -292,7 +319,10 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 	return gtw, nil
 }
 
-func (is *IdentityServer) getGatewayIdentifiersForEUI(ctx context.Context, req *ttnpb.GetGatewayIdentifiersForEUIRequest) (ids *ttnpb.GatewayIdentifiers, err error) {
+func (is *IdentityServer) getGatewayIdentifiersForEUI(
+	ctx context.Context,
+	req *ttnpb.GetGatewayIdentifiersForEUIRequest,
+) (ids *ttnpb.GatewayIdentifiers, err error) {
 	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
@@ -312,14 +342,22 @@ func (is *IdentityServer) getGatewayIdentifiersForEUI(ctx context.Context, req *
 	return ids, nil
 }
 
-func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatewaysRequest) (gtws *ttnpb.Gateways, err error) {
+func (is *IdentityServer) listGateways( // nolint:gocyclo
+	ctx context.Context,
+	req *ttnpb.ListGatewaysRequest,
+) (gtws *ttnpb.Gateways, err error) {
 	// Backwards compatibility for frequency_plan_id field.
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "frequency_plan_id") {
 		if !ttnpb.HasAnyField(req.FieldMask.GetPaths(), "frequency_plan_ids") {
 			req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "frequency_plan_ids")
 		}
 	}
-	req.FieldMask = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask, getPaths, []string{"frequency_plan_id"})
+	req.FieldMask = cleanFieldMaskPaths(
+		ttnpb.GatewayFieldPathsNested,
+		req.FieldMask,
+		getPaths,
+		[]string{"frequency_plan_id"},
+	)
 
 	authInfo, err := is.authInfo(ctx)
 	if err != nil {
@@ -407,7 +445,9 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 			} else if gtws.Gateways[i].LbsLnsSecret != nil {
 				value := gtws.Gateways[i].LbsLnsSecret.Value
 				if gtws.Gateways[i].LbsLnsSecret.KeyId != "" {
-					value, err = is.KeyService().Decrypt(ctx, gtws.Gateways[i].LbsLnsSecret.Value, gtws.Gateways[i].LbsLnsSecret.KeyId)
+					value, err = is.KeyService().Decrypt(
+						ctx, gtws.Gateways[i].LbsLnsSecret.Value, gtws.Gateways[i].LbsLnsSecret.KeyId,
+					)
 					if err != nil {
 						return nil, err
 					}
@@ -442,7 +482,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "claim_authentication_code") {
 			if !entityRights.IncludesAll(ttnpb.Right_RIGHT_GATEWAY_READ_SECRETS) {
 				gtws.Gateways[i].ClaimAuthenticationCode = nil
-			} else if gtws.Gateways[i].ClaimAuthenticationCode != nil && gtws.Gateways[i].ClaimAuthenticationCode.Secret != nil {
+			} else if authCode := gtws.Gateways[i].ClaimAuthenticationCode; authCode != nil && authCode.Secret != nil {
 				value := gtws.Gateways[i].ClaimAuthenticationCode.Secret.Value
 				if keyID := gtws.Gateways[i].ClaimAuthenticationCode.Secret.KeyId; keyID != "" {
 					value, err = is.KeyService().Decrypt(ctx, value, keyID)
@@ -461,7 +501,10 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 	return gtws, nil
 }
 
-func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (gtw *ttnpb.Gateway, err error) {
+func (is *IdentityServer) updateGateway( // nolint:gocyclo
+	ctx context.Context,
+	req *ttnpb.UpdateGatewayRequest,
+) (gtw *ttnpb.Gateway, err error) {
 	reqGtw := req.GetGateway()
 	if err = rights.RequireGateway(ctx, reqGtw.GetIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_BASIC); err != nil {
 		// Allow setting the location field or the attributes field with the RIGHT_GATEWAY_LINK right.
@@ -484,7 +527,12 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 		reqGtw.FrequencyPlanIds = []string{reqGtw.FrequencyPlanId}
 	}
 
-	req.FieldMask = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask, nil, append(getPaths, "frequency_plan_id"))
+	req.FieldMask = cleanFieldMaskPaths(
+		ttnpb.GatewayFieldPathsNested,
+		req.FieldMask,
+		nil,
+		append(getPaths, "frequency_plan_id"),
+	)
 	if len(req.FieldMask.GetPaths()) == 0 {
 		req.FieldMask = ttnpb.FieldMask(updatePaths...)
 	}
@@ -493,7 +541,10 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 			return nil, err
 		}
 	}
-	req.FieldMask.Paths = ttnpb.FlattenPaths(req.FieldMask.Paths, []string{"administrative_contact", "technical_contact"})
+	req.FieldMask.Paths = ttnpb.FlattenPaths(
+		req.FieldMask.Paths,
+		[]string{"administrative_contact", "technical_contact"},
+	)
 
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "lbs_lns_secret") {
 		if err := rights.RequireGateway(ctx, reqGtw.GetIds(), ttnpb.Right_RIGHT_GATEWAY_WRITE_SECRETS); err != nil {
@@ -565,10 +616,14 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 	}
 
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
-		if err := validateContactIsCollaborator(ctx, st, req.Gateway.AdministrativeContact, req.Gateway.GetEntityIdentifiers()); err != nil {
+		if err := validateContactIsCollaborator(
+			ctx, st, req.Gateway.AdministrativeContact, req.Gateway.GetEntityIdentifiers(),
+		); err != nil {
 			return err
 		}
-		if err := validateContactIsCollaborator(ctx, st, req.Gateway.TechnicalContact, req.Gateway.GetEntityIdentifiers()); err != nil {
+		if err := validateContactIsCollaborator(
+			ctx, st, req.Gateway.TechnicalContact, req.Gateway.GetEntityIdentifiers(),
+		); err != nil {
 			return err
 		}
 		gtw, err = st.UpdateGateway(ctx, reqGtw, req.FieldMask.GetPaths())
@@ -617,7 +672,9 @@ func (is *IdentityServer) deleteGateway(ctx context.Context, ids *ttnpb.GatewayI
 }
 
 func (is *IdentityServer) restoreGateway(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
-	if err := rights.RequireGateway(store.WithSoftDeleted(ctx, false), ids, ttnpb.Right_RIGHT_GATEWAY_DELETE); err != nil {
+	if err := rights.RequireGateway(
+		store.WithSoftDeleted(ctx, false), ids, ttnpb.Right_RIGHT_GATEWAY_DELETE,
+	); err != nil {
 		return nil, err
 	}
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
@@ -675,7 +732,8 @@ func validateClaimAuthenticationCode(authCode *ttnpb.GatewayClaimAuthenticationC
 	if authCode.Secret == nil {
 		return errClaimAuthenticationCode.New()
 	}
-	if validFrom, validTo := ttnpb.StdTime(authCode.ValidFrom), ttnpb.StdTime(authCode.ValidTo); validFrom != nil && validTo != nil {
+	validFrom, validTo := ttnpb.StdTime(authCode.ValidFrom), ttnpb.StdTime(authCode.ValidTo)
+	if validFrom != nil && validTo != nil {
 		if validTo.Before(*validFrom) {
 			return errClaimAuthenticationCode.New()
 		}
@@ -697,7 +755,10 @@ func (gr *gatewayRegistry) Get(ctx context.Context, req *ttnpb.GetGatewayRequest
 	return gr.getGateway(ctx, req)
 }
 
-func (gr *gatewayRegistry) GetIdentifiersForEUI(ctx context.Context, req *ttnpb.GetGatewayIdentifiersForEUIRequest) (*ttnpb.GatewayIdentifiers, error) {
+func (gr *gatewayRegistry) GetIdentifiersForEUI(
+	ctx context.Context,
+	req *ttnpb.GetGatewayIdentifiersForEUIRequest,
+) (*ttnpb.GatewayIdentifiers, error) {
 	return gr.getGatewayIdentifiersForEUI(ctx, req)
 }
 
