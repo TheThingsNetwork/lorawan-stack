@@ -832,10 +832,11 @@ var (
 	}
 	// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/999)
 	endDevicesProvisionCommand = &cobra.Command{
-		Use:   "provision",
-		Short: "Provision end devices using vendor-specific data",
+		Use:    "provision",
+		Short:  "Provision end devices using vendor-specific data (DEPRECATED)",
+		Hidden: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			logger.Warn("This command is deprecated. Please use `device template from-data` instead")
+			logger.Warn("This command is deprecated. Please use The Things Join Server instead")
 
 			appID := getApplicationID(cmd.Flags(), nil)
 			if appID == nil {
