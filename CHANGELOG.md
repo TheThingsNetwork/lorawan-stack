@@ -21,6 +21,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Removed
 
+- Command-line interface support for listing QR code formats and generating QR codes. This is considered the responsibility of a LoRaWAN Join Server.
+
 ### Fixed
 
 ### Security

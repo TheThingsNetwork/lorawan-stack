@@ -20,9 +20,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	stdio "io"
-	"mime"
 	"os"
-	"path"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -1138,162 +1136,24 @@ var (
 	endDevicesListQRCodeFormatsCommand = &cobra.Command{
 		Use:     "list-qr-formats",
 		Aliases: []string{"ls-qr-formats", "listqrformats", "lsqrformats", "lsqrfmts", "lsqrfmt", "qr-formats"},
-		Short:   "List QR code formats (EXPERIMENTAL)",
+		Short:   "List QR code formats (DEPRECATED)",
+		Hidden:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			qrg, err := api.Dial(ctx, config.QRCodeGeneratorGRPCAddress)
-			if err != nil {
-				return err
-			}
-
-			res, err := ttnpb.NewEndDeviceQRCodeGeneratorClient(qrg).ListFormats(ctx, ttnpb.Empty)
-			if err != nil {
-				return err
-			}
-
-			return io.Write(os.Stdout, config.OutputFormat, res)
+			return fmt.Errorf(
+				"this command is no longer supported. Join Servers are responsible for generating QR codes",
+			)
 		},
 	}
 	endDevicesGenerateQRCommand = &cobra.Command{
 		Use:     "generate-qr [application-id] [device-id]",
 		Aliases: []string{"genqr"},
-		Short:   "Generate an end device QR code (EXPERIMENTAL)",
-		Long: `Generate an end device QR code (EXPERIMENTAL)
-
-This command saves a QR code in PNG format in the given folder. The filename is
-the device ID.
-
-This command may take end device identifiers from stdin.`,
-		Example: `
-  To generate a QR code for a single end device:
-    $ ttn-lw-cli end-devices generate-qr app1 dev1
-
-  To generate a QR code for multiple end devices:
-    $ ttn-lw-cli end-devices list app1 \
-      | ttn-lw-cli end-devices generate-qr`,
-		RunE: asBulk(func(cmd *cobra.Command, args []string) error {
-			var ids *ttnpb.EndDeviceIdentifiers
-			if inputDecoder != nil {
-				var dev ttnpb.EndDevice
-				if err := inputDecoder.Decode(&dev); err != nil {
-					return err
-				}
-				if dev.GetIds().GetApplicationIds().GetApplicationId() == "" {
-					return errNoApplicationID.New()
-				}
-				if dev.Ids.DeviceId == "" {
-					return errNoEndDeviceID.New()
-				}
-				ids = dev.Ids
-			} else {
-				var err error
-				ids, err = getEndDeviceID(cmd.Flags(), args, true)
-				if err != nil {
-					return err
-				}
-			}
-
-			formatID, _ := cmd.Flags().GetString("format-id")
-
-			qrg, err := api.Dial(ctx, config.QRCodeGeneratorGRPCAddress)
-			if err != nil {
-				return err
-			}
-			client := ttnpb.NewEndDeviceQRCodeGeneratorClient(qrg)
-			format, err := client.GetFormat(ctx, &ttnpb.GetQRCodeFormatRequest{
-				FormatId: formatID,
-			})
-			if err != nil {
-				return err
-			}
-
-			isPaths, nsPaths, asPaths, jsPaths := splitEndDeviceGetPaths(format.FieldMask.GetPaths()...)
-			if len(nsPaths) > 0 {
-				isPaths = append(isPaths, "network_server_address")
-			}
-			if len(asPaths) > 0 {
-				isPaths = append(isPaths, "application_server_address")
-			}
-			if len(jsPaths) > 0 {
-				isPaths = append(isPaths, "join_server_address")
-			}
-
-			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
-			if err != nil {
-				return err
-			}
-			logger.WithField("paths", isPaths).Debug("Get end device from Identity Server")
-			device, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
-				EndDeviceIds: ids,
-				FieldMask:    ttnpb.FieldMask(isPaths...),
-			})
-			if err != nil {
-				return err
-			}
-
-			if device.ClaimAuthenticationCode.GetValue() != "" {
-				// ClaimAuthenticationCode is already retrieved from the IS. We can unset the related JS paths.
-				jsPaths = ttnpb.ExcludeFields(jsPaths, claimAuthenticationCodePaths...)
-			}
-
-			nsMismatch, asMismatch, jsMismatch := compareServerAddressesEndDevice(device, config)
-			if len(nsPaths) > 0 && nsMismatch {
-				return errAddressMismatchEndDevice.New()
-			}
-			if len(asPaths) > 0 && asMismatch {
-				return errAddressMismatchEndDevice.New()
-			}
-			if len(jsPaths) > 0 && jsMismatch {
-				return errAddressMismatchEndDevice.New()
-			}
-			dev, err := getEndDevice(device.Ids, nsPaths, asPaths, jsPaths, true)
-			if err != nil {
-				return err
-			}
-			if err := device.SetFields(dev, append(append(nsPaths, asPaths...), jsPaths...)...); err != nil {
-				return err
-			}
-
-			if device.ClaimAuthenticationCode.GetValue() == "" {
-				// Unset the field since qrcodegenerator.Generate does not support fieldmask
-				// and an empty field would result in a validation error.
-				device.ClaimAuthenticationCode = nil
-			}
-
-			size, _ := cmd.Flags().GetUint32("size")
-			res, err := client.Generate(ctx, &ttnpb.GenerateEndDeviceQRCodeRequest{
-				FormatId:  formatID,
-				EndDevice: device,
-				Image: &ttnpb.GenerateEndDeviceQRCodeRequest_Image{
-					ImageSize: size,
-				},
-			})
-			if err != nil {
-				return err
-			}
-
-			folder, _ := cmd.Flags().GetString("folder")
-			if folder == "" {
-				folder, err = os.Getwd()
-				if err != nil {
-					return err
-				}
-			}
-
-			var ext string
-			if exts, err := mime.ExtensionsByType(res.Image.Embedded.MimeType); err == nil && len(exts) > 0 {
-				ext = exts[0]
-			}
-			filename := path.Join(folder, device.Ids.DeviceId+ext)
-			if err := os.WriteFile(filename, res.Image.Embedded.Data, 0o644); err != nil { //nolint:gas
-				return err
-			}
-
-			logger.WithFields(log.Fields(
-				"value", res.Text,
-				"filename", filename,
-			)).Info("Generated QR code")
-			return nil
-		}),
+		Short:   "Generate an end device QR code (DEPRECATED)",
+		Hidden:  true,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return fmt.Errorf(
+				"this command is no longer supported. Join Servers are responsible for generating QR codes",
+			)
+		},
 	}
 	endDevicesExternalJSCommand = &cobra.Command{
 		Use:     "use-external-join-server [application-id] [device-id]",
