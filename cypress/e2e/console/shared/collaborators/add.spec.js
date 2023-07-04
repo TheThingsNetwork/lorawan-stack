@@ -155,15 +155,8 @@ describe('Collaborators', () => {
     })
 
     it('fails adding organization as a collaborator', () => {
-      cy.findByLabelText('Collaborator').selectOption(organizationId)
-      cy.findByLabelText('Grant all current and future rights').check()
-      cy.findByRole('button', { name: 'Add collaborator' }).click()
-
-      cy.findByTestId('error-notification')
-        .should('be.visible')
-        .findByText(/organizations can not be nested/i)
-        .should('be.visible')
-      cy.visit(`${Cypress.config('consoleRootPath')}/organizations/${testOrgId}/collaborators/add`)
+      cy.findByLabelText('Collaborator').type(organizationId)
+      cy.findByText('No matching user or organization was found')
     })
   })
 })
