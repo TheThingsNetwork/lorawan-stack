@@ -30,6 +30,8 @@ type AssociationRegistry interface {
 	SetAssociation(ctx context.Context, ids *ttnpb.ApplicationPackageAssociationIdentifiers, gets []string, f func(*ttnpb.ApplicationPackageAssociation) (*ttnpb.ApplicationPackageAssociation, []string, error)) (*ttnpb.ApplicationPackageAssociation, error)
 	// WithPagination adds the pagination information to the context.
 	WithPagination(ctx context.Context, limit, page uint32, total *int64) context.Context
+	// ClearAssociations removes all application package associations for a specific end device.
+	ClearAssociations(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) error
 }
 
 // DefaultAssociationRegistry is a registry for application package default associations.
@@ -42,6 +44,8 @@ type DefaultAssociationRegistry interface {
 	SetDefaultAssociation(ctx context.Context, ids *ttnpb.ApplicationPackageDefaultAssociationIdentifiers, gets []string, f func(*ttnpb.ApplicationPackageDefaultAssociation) (*ttnpb.ApplicationPackageDefaultAssociation, []string, error)) (*ttnpb.ApplicationPackageDefaultAssociation, error)
 	// WithPagination adds the pagination information to the context.
 	WithPagination(ctx context.Context, limit, page uint32, total *int64) context.Context
+	// ClearDefaultAssociations removes all application package default associations for a specific application.
+	ClearDefaultAssociations(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) error
 }
 
 // TransactionRegistry is a registry for application packages transactions.

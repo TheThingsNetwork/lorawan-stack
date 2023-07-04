@@ -15,11 +15,16 @@
 package loracloudgeolocationv3
 
 import (
+	"bytes"
+	"encoding/base64"
+	"encoding/gob"
 	"fmt"
 	"net/url"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v3/api"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
@@ -27,7 +32,29 @@ var (
 	errFieldNotFound = errors.DefineNotFound("field_not_found", "field `{field}` not found")
 	errInvalidType   = errors.DefineCorruption("invalid_type", "wrong type `{type}`")
 	errInvalidValue  = errors.DefineCorruption("invalid_value", "wrong value `{value}`")
+	errEncodingField = errors.DefineCorruption("encoding_field", "encoding field `{field}`")
+	errDecodingField = errors.DefineCorruption("decoding_field", "decoding field `{field}`")
 )
+
+// UplinkMetadata contains the uplink metadata stored by the package.
+type UplinkMetadata struct {
+	RxMetadata []*api.RxMetadata `json:"rx_metadata"`
+	ReceivedAt time.Time         `json:"received_at"`
+}
+
+// FromApplicationUplink cleans the ApplicationUplink to stored values for the UpLinkMetadata.
+func (u *UplinkMetadata) FromApplicationUplink(msg *ttnpb.ApplicationUplink) error {
+	u.ReceivedAt = msg.ReceivedAt.AsTime()
+
+	for _, md := range msg.RxMetadata {
+		rxmd := &api.RxMetadata{}
+		if err := rxmd.FromProto(md); err != nil {
+			return err
+		}
+		u.RxMetadata = append(u.RxMetadata, rxmd)
+	}
+	return nil
+}
 
 // QueryType enum defines the location query types of the package.
 type QueryType uint8
@@ -87,8 +114,6 @@ type Data struct {
 	// MultiFrame enables multi frame requests for TOARSSI queries.
 	MultiFrame bool
 	// MultiFrameWindowSize represents the number of historical frames to consider for the query.
-	// A window size of 0 automatically determines the number of frames based on the first byte
-	// of the uplink message.
 	MultiFrameWindowSize int
 	// MultiFrameWindowAge limits the maximum age of the historical frames considered for the query.
 	MultiFrameWindowAge time.Duration
@@ -96,6 +121,8 @@ type Data struct {
 	ServerURL *url.URL
 	// Token is the API token to be used when comunicating with the GLS server.
 	Token string
+	// RecentMetadata are the metadatas from the recent uplink messages received by the gateway.
+	RecentMetadata []*UplinkMetadata
 }
 
 const (
@@ -105,6 +132,7 @@ const (
 	multiFrameWindowAge  = "multi_frame_window_age"
 	serverURLField       = "server_url"
 	tokenField           = "token"
+	recentMDField        = "recent_metadata"
 )
 
 func toString(s string) *structpb.Value {
@@ -131,8 +159,28 @@ func toFloat64(f float64) *structpb.Value {
 	}
 }
 
+func toRecentMD(mds []*UplinkMetadata) (*structpb.Value, error) {
+	gobBytes := new(bytes.Buffer)
+	gobEncoder := gob.NewEncoder(gobBytes)
+	if err := gobEncoder.Encode(mds); err != nil {
+		return nil, errEncodingField.WithCause(err)
+	}
+
+	base64Bytes := new(bytes.Buffer)
+	base64Encoder := base64.NewEncoder(base64.RawStdEncoding, base64Bytes)
+	if _, err := base64Encoder.Write(gobBytes.Bytes()); err != nil {
+		return nil, errEncodingField.WithCause(err).WithAttributes("field", recentMDField)
+	}
+
+	if err := base64Encoder.Close(); err != nil {
+		return nil, errEncodingField.WithCause(err).WithAttributes("field", recentMDField)
+	}
+
+	return toString(base64Bytes.String()), nil
+}
+
 // Struct serializes the configuration to *structpb.Struct.
-func (d *Data) Struct() *structpb.Struct {
+func (d *Data) Struct() (*structpb.Struct, error) {
 	st := &structpb.Struct{
 		Fields: map[string]*structpb.Value{
 			queryField: d.Query.Value(),
@@ -151,7 +199,14 @@ func (d *Data) Struct() *structpb.Struct {
 	if d.MultiFrameWindowAge > 0 {
 		st.Fields[multiFrameWindowAge] = toFloat64(float64(d.MultiFrameWindowAge / time.Minute))
 	}
-	return st
+	if len(d.RecentMetadata) > 0 {
+		recentMD, err := toRecentMD(d.RecentMetadata)
+		if err != nil {
+			return nil, err
+		}
+		st.Fields[recentMDField] = recentMD
+	}
+	return st, nil
 }
 
 func stringFromValue(v *structpb.Value) (string, error) {
@@ -176,6 +231,27 @@ func float64FromValue(v *structpb.Value) (float64, error) {
 		return 0.0, errInvalidType.WithAttributes("type", fmt.Sprintf("%T", v.Kind))
 	}
 	return fv.NumberValue, nil
+}
+
+func recentMDFromValue(v *structpb.Value) ([]*UplinkMetadata, error) {
+	sv, ok := v.Kind.(*structpb.Value_StringValue)
+	if !ok {
+		return nil, errInvalidType.WithAttributes("type", fmt.Sprintf("%T", v.Kind))
+	}
+
+	base64Bytes := bytes.NewBufferString(sv.StringValue)
+	base64Decoder := base64.NewDecoder(base64.RawStdEncoding, base64Bytes)
+	gobBytes := new(bytes.Buffer)
+	if _, err := gobBytes.ReadFrom(base64Decoder); err != nil {
+		return nil, errDecodingField.WithCause(err).WithAttributes("field", recentMDField)
+	}
+
+	var mds []*UplinkMetadata
+	gobDecoder := gob.NewDecoder(gobBytes)
+	if err := gobDecoder.Decode(&mds); err != nil {
+		return nil, errDecodingField.WithCause(err).WithAttributes("field", recentMDField)
+	}
+	return mds, nil
 }
 
 // FromStruct deserializes the configuration from *structpb.Struct.
@@ -243,6 +319,16 @@ func (d *Data) FromStruct(st *structpb.Struct) error {
 				return err
 			}
 			d.ServerURL = u
+		}
+	}
+	{
+		value, ok := fields[recentMDField]
+		if ok {
+			uplinks, err := recentMDFromValue(value)
+			if err != nil {
+				return err
+			}
+			d.RecentMetadata = uplinks
 		}
 	}
 	return nil

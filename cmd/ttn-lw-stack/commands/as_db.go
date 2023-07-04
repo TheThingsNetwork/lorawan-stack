@@ -227,6 +227,39 @@ var (
 			return nil
 		},
 	}
+	asDBPurgeCommand = &cobra.Command{
+		Use:   "purge",
+		Short: "Purge unused Application Server data",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
+
+			logger.Info("Connecting to Redis database...")
+			cl := ttnredis.New(config.Redis.WithNamespace("as", "applicationups"))
+
+			logger.Info("Purging uplink registry data")
+
+			purged := 0
+			uidApplicationUpsKey := cl.Key("uid", "*")
+			pipeliner := cl.Pipeline()
+			err := ttnredis.RangeRedisKeys(ctx, cl, uidApplicationUpsKey, ttnredis.DefaultRangeCount,
+				func(k string) (bool, error) {
+					pipeliner.Del(ctx, k)
+					purged++
+					return true, nil
+				})
+			if err != nil {
+				logger.WithError(err).Error("Failed to purge uplink registry data")
+				return err
+			}
+			if _, err := pipeliner.Exec(ctx); err != nil {
+				logger.WithError(err).Error("Failed to purge uplink registry data")
+				return err
+			}
+
+			logger.WithField("records_purged_count", purged).Info("Purged uplink registry data")
+			return nil
+		},
+	}
 )
 
 func init() {
@@ -236,4 +269,5 @@ func init() {
 	asDBCleanupCommand.Flags().Bool("dry-run", false, "Dry run")
 	asDBCleanupCommand.Flags().Duration("pagination-delay", 100, "Delay between batch requests")
 	asDBCommand.AddCommand(asDBCleanupCommand)
+	asDBCommand.AddCommand(asDBPurgeCommand)
 }

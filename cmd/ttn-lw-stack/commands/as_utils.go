@@ -51,18 +51,16 @@ func NewPubSubCleaner(ctx context.Context, config *redis.Config) (*pubsub.Regist
 // NewPackagesCleaner returns a new instance of packages RegistryCleaner with a local set
 // of applications and devices.
 func NewPackagesCleaner(ctx context.Context, config *redis.Config) (*packages.RegistryCleaner, error) {
-	applicationPackagesRegistry := &packageredis.ApplicationPackagesRegistry{
-		Redis:   redis.New(config.WithNamespace("as", "io", "applicationpackages")),
-		LockTTL: defaultLockTTL,
-	}
-	if err := applicationPackagesRegistry.Init(ctx); err != nil {
+	applicationPackagesRegistry, err := packageredis.NewApplicationPackagesRegistry(
+		ctx, redis.New(config.WithNamespace("as", "io", "applicationpackages")), defaultLockTTL,
+	)
+	if err != nil {
 		return nil, shared.ErrInitializeApplicationServer.WithCause(err)
 	}
 	cleaner := &packages.RegistryCleaner{
 		ApplicationPackagesRegistry: applicationPackagesRegistry,
 	}
-	err := cleaner.RangeToLocalSet(ctx)
-	if err != nil {
+	if err := cleaner.RangeToLocalSet(ctx); err != nil {
 		return nil, err
 	}
 	return cleaner, nil
@@ -80,9 +78,6 @@ func NewASDeviceRegistryCleaner(ctx context.Context, config *redis.Config) (*as.
 	}
 	cleaner := &as.RegistryCleaner{
 		DevRegistry: deviceRegistry,
-		AppUpsRegistry: &asredis.ApplicationUplinkRegistry{
-			Redis: redis.New(config.WithNamespace("as", "applicationups")),
-		},
 	}
 	err := cleaner.RangeToLocalSet(ctx)
 	if err != nil {

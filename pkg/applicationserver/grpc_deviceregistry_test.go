@@ -23,6 +23,7 @@ import (
 
 	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver"
+	aiopkgredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
@@ -640,14 +641,14 @@ func TestDeviceRegistryDelete(t *testing.T) {
 		},
 	}
 	for _, tc := range []struct {
-		Name           string
-		ContextFunc    func(context.Context) context.Context
-		SetFunc        func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
-		UpClearFunc    func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) error
-		DeviceRequest  *ttnpb.EndDeviceIdentifiers
-		ErrorAssertion func(*testing.T, error) bool
-		SetCalls       uint64
-		UpClearCalls   uint64
+		Name            string
+		ContextFunc     func(context.Context) context.Context
+		SetFunc         func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) // nolint: lll
+		UpClearFunc     func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) error
+		DeviceRequest   *ttnpb.EndDeviceIdentifiers
+		ErrorAssertion  func(*testing.T, error) bool
+		SetCalls        uint64
+		AssocClearCalls uint64
 	}{
 		{
 			Name: "Permission denied",
@@ -684,7 +685,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 					}),
 				})
 			},
-			SetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) { // nolint: lll
 				test.MustTFromContext(ctx).Errorf("SetFunc must not be called")
 				return nil, errors.New("SetFunc must not be called")
 			},
@@ -726,9 +727,9 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				a.So(ids, should.Resemble, registeredDevice.Ids)
 				return nil
 			},
-			DeviceRequest: ttnpb.Clone(registeredDevice.Ids),
-			SetCalls:      1,
-			UpClearCalls:  1,
+			DeviceRequest:   ttnpb.Clone(registeredDevice.Ids),
+			SetCalls:        1,
+			AssocClearCalls: 1,
 		},
 
 		{
@@ -742,7 +743,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 					}),
 				})
 			},
-			SetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) { // nolint: lll
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 				a.So(ids, should.Resemble, registeredDevice.Ids)
@@ -758,32 +759,43 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				a.So(ids, should.Resemble, registeredDevice.Ids)
 				return nil
 			},
-			DeviceRequest: ttnpb.Clone(registeredDevice.Ids),
-			SetCalls:      1,
-			UpClearCalls:  1,
+			DeviceRequest:   ttnpb.Clone(registeredDevice.Ids),
+			SetCalls:        1,
+			AssocClearCalls: 1,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
 			var setCalls uint64
-			var upClearCalls uint64
+			var assocClearCalls uint64
+
+			pkgAssocMock := aiopkgredis.NewAssociationRegistryMock(
+				func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) error {
+					atomic.AddUint64(&assocClearCalls, 1)
+					return nil
+				}, nil, nil, nil, nil,
+			)
+			pkgDefAssocMock := aiopkgredis.NewDefaultAssociationRegistryMock(nil, nil, nil, nil, nil)
+			pkgTAssocMock := aiopkgredis.NewTransactionRegistryMock(nil)
+			pkgRegMock := aiopkgredis.NewAppPkgsRegistryWithMockedHandlers(
+				pkgAssocMock,
+				pkgDefAssocMock,
+				pkgTAssocMock,
+				nil, nil,
+			)
+			devRegMock := &MockDeviceRegistry{
+				SetFunc: func(ctx context.Context, deviceIds *ttnpb.EndDeviceIdentifiers, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) { // nolint: lll
+					atomic.AddUint64(&setCalls, 1)
+					return tc.SetFunc(ctx, deviceIds, paths, cb)
+				},
+			}
 
 			as := test.Must(applicationserver.New(componenttest.NewComponent(t, &component.Config{}),
 				&applicationserver.Config{
-					UplinkStorage: applicationserver.UplinkStorageConfig{
-						Registry: &MockApplicationUplinkRegistry{
-							ClearFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) error {
-								atomic.AddUint64(&upClearCalls, 1)
-								return tc.UpClearFunc(ctx, ids)
-							},
-						},
-					},
-					Devices: &MockDeviceRegistry{
-						SetFunc: func(ctx context.Context, deviceIds *ttnpb.EndDeviceIdentifiers, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-							atomic.AddUint64(&setCalls, 1)
-							return tc.SetFunc(ctx, deviceIds, paths, cb)
-						},
+					Devices: devRegMock,
+					Packages: applicationserver.ApplicationPackagesConfig{
+						Registry: pkgRegMock,
 					},
 					Downlinks: applicationserver.DownlinksConfig{
 						ConfirmationConfig: applicationserver.ConfirmationConfig{
@@ -810,7 +822,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 
 			_, err := ttnpb.NewAsEndDeviceRegistryClient(as.LoopbackConn()).Delete(ctx, req)
 			a.So(setCalls, should.Equal, tc.SetCalls)
-			a.So(upClearCalls, should.Equal, tc.UpClearCalls)
+			a.So(assocClearCalls, should.Equal, tc.AssocClearCalls)
 			if tc.ErrorAssertion != nil {
 				a.So(tc.ErrorAssertion(t, err), should.BeTrue)
 			} else {
