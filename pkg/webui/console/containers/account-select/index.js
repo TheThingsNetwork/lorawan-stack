@@ -56,7 +56,7 @@ const Suggest = ({ entity, ...rest }) => {
   searchResultsRef.current = searchResults
   const { formatMessage } = useIntl()
   const handleNoOptions = useCallback(() => formatMessage(m.noOptionsMessage), [formatMessage])
-  const onlyUsers = !(entity === 'organizations')
+  const onlyUsers = entity === 'organization'
 
   const handleLoadingOptions = useCallback(
     async value => {
