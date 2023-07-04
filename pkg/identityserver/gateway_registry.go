@@ -558,6 +558,12 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 		}
 	}
 
+	if err := is.validateContactInfoRestrictions(
+		ctx, req.Gateway.GetAdministrativeContact(), req.Gateway.GetTechnicalContact(),
+	); err != nil {
+		return nil, err
+	}
+
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		if err := validateContactIsCollaborator(ctx, st, req.Gateway.AdministrativeContact, req.Gateway.GetEntityIdentifiers()); err != nil {
 			return err
