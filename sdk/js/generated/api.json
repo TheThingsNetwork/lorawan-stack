@@ -11131,8 +11131,7 @@
                   "rules": [
                     {
                       "method": "DELETE",
-                      "pattern": "/edcs/claim/{application_ids.application_id}/devices/{device_id}",
-                      "body": "*"
+                      "pattern": "/edcs/claim/{application_ids.application_id}/devices/{device_id}"
                     }
                   ]
                 }
