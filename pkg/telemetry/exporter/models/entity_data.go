@@ -22,7 +22,6 @@ type AccountsCount struct {
 
 // UsersCount telemetry data about the amount of users, total and the amount on each type.
 type UsersCount struct {
-	Total    uint64 `json:"total"`
 	Standard uint64 `json:"standard"`
 	Admin    uint64 `json:"admin"`
 }
