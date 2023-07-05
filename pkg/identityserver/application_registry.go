@@ -273,7 +273,17 @@ func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.Upda
 			return nil, err
 		}
 	}
-	req.FieldMask.Paths = ttnpb.FlattenPaths(req.FieldMask.Paths, []string{"administrative_contact", "technical_contact"})
+
+	if err := is.validateContactInfoRestrictions(
+		ctx, req.Application.GetAdministrativeContact(), req.Application.GetTechnicalContact(),
+	); err != nil {
+		return nil, err
+	}
+
+	req.FieldMask.Paths = ttnpb.FlattenPaths(
+		req.FieldMask.Paths,
+		[]string{"administrative_contact", "technical_contact"},
+	)
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		if err := validateContactIsCollaborator(ctx, st, req.Application.AdministrativeContact, req.Application.GetEntityIdentifiers()); err != nil {
 			return err
