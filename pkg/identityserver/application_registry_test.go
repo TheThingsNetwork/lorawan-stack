@@ -239,7 +239,9 @@ func TestApplicationsCRUD(t *testing.T) {
 			a.So(err, should.BeNil)
 		})
 
-		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{nil, usr1.GetOrganizationOrUserIdentifiers()} {
+		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{
+			nil, usr1.GetOrganizationOrUserIdentifiers(),
+		} {
 			list, err := reg.List(ctx, &ttnpb.ListApplicationsRequest{
 				FieldMask:    ttnpb.FieldMask("name"),
 				Collaborator: collaborator,
