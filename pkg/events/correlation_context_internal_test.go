@@ -17,7 +17,7 @@ package events
 import (
 	"testing"
 
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 )
 
 func TestUniqueStrings(t *testing.T) {

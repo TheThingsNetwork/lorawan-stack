@@ -48,9 +48,6 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 		Workers:   1024,
 		Downlinks: web.DownlinksConfig{PublicAddress: shared.DefaultPublicURL + "/api/v3"},
 	},
-	UplinkStorage: applicationserver.UplinkStorageConfig{
-		Limit: 16,
-	},
 	EndDeviceMetadataStorage: applicationserver.EndDeviceMetadataStorageConfig{
 		Location: applicationserver.EndDeviceLocationStorageConfig{
 			Timeout: 5 * time.Second,

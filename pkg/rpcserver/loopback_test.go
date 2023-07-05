@@ -18,7 +18,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/rpctest"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"

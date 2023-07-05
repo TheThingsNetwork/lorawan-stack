@@ -18,8 +18,9 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v3/api"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
@@ -79,4 +80,25 @@ func uint32Ptr(u uint32) *uint32 {
 
 func uint64Ptr(u uint64) *uint64 {
 	return &u
+}
+
+func TestGatewayIDsConversion(t *testing.T) {
+	t.Parallel()
+	a := assertions.New(t)
+
+	expectedProto := &ttnpb.GatewayIdentifiers{
+		GatewayId: "test-gateway",
+	}
+	expectedData := &api.GatewayIDs{
+		GatewayID: "test-gateway",
+	}
+
+	actualData := &api.GatewayIDs{}
+	if err := actualData.FromProto(expectedProto); err != nil {
+		t.Fatalf("FromProto failed: %v", err)
+	}
+
+	actualProto := actualData.ToProto()
+	a.So(actualProto, assertions.ShouldResemble, expectedProto)
+	a.So(actualData, assertions.ShouldResemble, expectedData)
 }

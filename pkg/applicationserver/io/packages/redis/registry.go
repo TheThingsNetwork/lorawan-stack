@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package redis provides implementation of the application packages registry using Redis.
 package redis
 
 import (
@@ -23,6 +24,7 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
@@ -66,6 +68,22 @@ func applyDefaultAssociationFieldMask(dst, src *ttnpb.ApplicationPackageDefaultA
 type ApplicationPackagesRegistry struct {
 	Redis   *ttnredis.Client
 	LockTTL time.Duration
+}
+
+// NewApplicationPackagesRegistry creates, initializes and returns a new ApplicationPackagesRegistry.
+func NewApplicationPackagesRegistry(
+	ctx context.Context,
+	cl *ttnredis.Client,
+	lockTTL time.Duration,
+) (packages.Registry, error) {
+	reg := &ApplicationPackagesRegistry{
+		Redis:   cl,
+		LockTTL: lockTTL,
+	}
+	if err := reg.Init(ctx); err != nil {
+		return nil, err
+	}
+	return reg, nil
 }
 
 // Init initializes the ApplicationPackagesRegistry.
@@ -584,4 +602,49 @@ func (r ApplicationPackagesRegistry) Range(
 		}
 		return true, nil
 	})
+}
+
+func (r ApplicationPackagesRegistry) clearAssociations(ctx context.Context, id ttnpb.IDStringer) error {
+	uid := unique.ID(ctx, id)
+	uidKey := r.uidKey(uid)
+	lockerID, err := ttnredis.GenerateLockerID()
+	if err != nil {
+		return err
+	}
+
+	return ttnredis.LockedWatch(ctx, r.Redis, uidKey, lockerID, r.LockTTL, func(tx *redis.Tx) error {
+		// Retrieve the list of fPorts from the uidKey set.
+		fPorts, err := tx.SMembers(ctx, uidKey).Result()
+		if err != nil {
+			return err
+		}
+		// Build all the association keys.
+		keys := make([]string, 0, len(fPorts))
+		for _, fPort := range fPorts {
+			keys = append(keys, r.associationKey(uid, fPort))
+		}
+		keys = append(keys, uidKey)
+
+		if _, err := tx.TxPipelined(ctx, func(p redis.Pipeliner) error {
+			p.Del(ctx, keys...)
+			return nil
+		}); err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
+// ClearAssociations clears all the associations for an end device.
+func (r ApplicationPackagesRegistry) ClearAssociations(
+	ctx context.Context, ids *ttnpb.EndDeviceIdentifiers,
+) error {
+	return r.clearAssociations(ctx, ids)
+}
+
+// ClearDefaultAssociations clears all package associations for an application.
+func (r ApplicationPackagesRegistry) ClearDefaultAssociations(
+	ctx context.Context, ids *ttnpb.ApplicationIdentifiers,
+) error {
+	return r.clearAssociations(ctx, ids)
 }

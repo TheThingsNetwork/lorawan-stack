@@ -359,10 +359,6 @@ var startCommand = &cobra.Command{
 				return shared.ErrInitializeApplicationServer.WithCause(err)
 			}
 			config.AS.Devices = deviceRegistry
-			config.AS.UplinkStorage.Registry = &asredis.ApplicationUplinkRegistry{
-				Redis: redis.New(config.Redis.WithNamespace("as", "applicationups")),
-				Limit: config.AS.UplinkStorage.Limit,
-			}
 			config.AS.Distribution.Global.PubSub = &asdistribredis.PubSub{
 				Redis: redis.New(config.Cache.Redis.WithNamespace("as", "traffic")),
 			}
@@ -374,11 +370,12 @@ var startCommand = &cobra.Command{
 				return shared.ErrInitializeApplicationServer.WithCause(err)
 			}
 			config.AS.PubSub.Registry = pubsubRegistry
-			applicationPackagesRegistry := &asioapredis.ApplicationPackagesRegistry{
-				Redis:   redis.New(config.Redis.WithNamespace("as", "io", "applicationpackages")),
-				LockTTL: defaultLockTTL,
-			}
-			if err := applicationPackagesRegistry.Init(ctx); err != nil {
+			applicationPackagesRegistry, err := asioapredis.NewApplicationPackagesRegistry(
+				ctx,
+				redis.New(config.Redis.WithNamespace("as", "io", "applicationpackages")),
+				defaultLockTTL,
+			)
+			if err != nil {
 				return shared.ErrInitializeApplicationServer.WithCause(err)
 			}
 			config.AS.Packages.Registry = applicationPackagesRegistry

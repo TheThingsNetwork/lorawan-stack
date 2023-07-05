@@ -41,7 +41,5 @@ func OpenDB(ctx context.Context, databaseURI string) (*sql.DB, error) {
 		return nil, err
 	}
 	config.DefaultQueryExecMode = pgx.QueryExecModeSimpleProtocol
-	return stdlib.OpenDB(*config, stdlib.OptionResetSession(func(ctx context.Context, cn *pgx.Conn) error {
-		return checkConn(cn.PgConn().Conn())
-	})), nil
+	return stdlib.OpenDB(*config), nil
 }

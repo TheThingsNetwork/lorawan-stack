@@ -55,10 +55,7 @@ const m = defineMessages({
   multiFrameWindowSizeDescription: 'How many historical messages to send as part of the request.',
   multiFrameTimeWindow: 'Multiframe time window',
   multiFrameTimeWindowDescription: 'The maximum age of considered historical messages in minutes',
-  determineWindowSizeAutomatically: 'Determine window size automatically',
   enableMultiFrame: 'Enable multiframe',
-  automaticMultiFrameDescription:
-    'Determines the count of sent historical messages considered for geolocation based on the first byte of the payload',
 })
 
 const LORACLOUD_GLS_QUERY_LABELS = Object.freeze([
@@ -113,9 +110,6 @@ const validationSchema = Yup.object()
 
 const promisifiedSetAppPkgDefaultAssoc = attachPromise(setAppPkgDefaultAssoc)
 const promisifiedDeleteAppPkgDefaultAssoc = attachPromise(deleteAppPkgDefaultAssoc)
-
-const decodeDetermineMultiframeAutomatically = value => value === 0
-const encodeDetermineMultiframeAutomatically = value => (value ? 0 : 1)
 
 const defaultValues = {
   data: {
@@ -200,18 +194,6 @@ const LoRaCloudGLSForm = () => {
     [setMultiFrame, formRef],
   )
 
-  const [automaticMultiFrame, setAutomaticMultiFrame] = useState(
-    initialValues.data.multi_frame_window_size === 0 ||
-      initialValues.data.multi_frame_window_size === undefined,
-  )
-  const handleAutomaticWindowSizeChange = useCallback(
-    evt => {
-      const checked = evt.target.checked
-      setAutomaticMultiFrame(checked)
-    },
-    [setAutomaticMultiFrame],
-  )
-
   useEffect(() => {
     setQueryType(initialValues.data.query)
     setMultiFrame(initialValues.data.multi_frame)
@@ -261,27 +243,16 @@ const LoRaCloudGLSForm = () => {
           {multiFrame && (
             <>
               <Form.Field
-                component={Checkbox}
-                label={m.determineWindowSizeAutomatically}
-                description={m.automaticMultiFrameDescription}
-                onChange={handleAutomaticWindowSizeChange}
-                decode={decodeDetermineMultiframeAutomatically}
-                encode={encodeDetermineMultiframeAutomatically}
+                component={Input}
+                title={m.multiFrameWindowSize}
+                description={m.multiFrameWindowSizeDescription}
                 name="data.multi_frame_window_size"
+                type="number"
+                min={1}
+                max={16}
+                inputWidth="xs"
+                required
               />
-              {!automaticMultiFrame && (
-                <Form.Field
-                  component={Input}
-                  title={m.multiFrameWindowSize}
-                  description={m.multiFrameWindowSizeDescription}
-                  name="data.multi_frame_window_size"
-                  type="number"
-                  min={1}
-                  max={16}
-                  inputWidth="xs"
-                  required
-                />
-              )}
               <Form.Field
                 component={Input}
                 title={m.multiFrameTimeWindow}

@@ -2285,6 +2285,24 @@
       "file": "messages.go"
     }
   },
+  "error:pkg/applicationserver/io/packages/loragls/v3:decoding_field": {
+    "translations": {
+      "en": "decoding field `{field}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/loragls/v3",
+      "file": "data.go"
+    }
+  },
+  "error:pkg/applicationserver/io/packages/loragls/v3:encoding_field": {
+    "translations": {
+      "en": "encoding field `{field}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/loragls/v3",
+      "file": "data.go"
+    }
+  },
   "error:pkg/applicationserver/io/packages/loragls/v3:field_not_found": {
     "translations": {
       "en": "field `{field}` not found"

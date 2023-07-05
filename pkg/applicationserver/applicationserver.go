@@ -75,13 +75,13 @@ type ApplicationServer struct {
 
 	linkRegistry           LinkRegistry
 	deviceRegistry         DeviceRegistry
-	appUpsRegistry         ApplicationUplinkRegistry
 	locationRegistry       metadata.EndDeviceLocationRegistry
 	formatters             messageprocessors.MapPayloadProcessor
 	webhooks               ioweb.Webhooks
 	webhookTemplates       ioweb.TemplateStore
 	pubsub                 *pubsub.PubSub
 	appPackages            packages.Server
+	appPkgRegistry         packages.Registry
 	deviceLastSeenProvider lastseen.LastSeenProvider
 
 	clusterDistributor distribution.Distributor
@@ -153,7 +153,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		config:           conf,
 		linkRegistry:     conf.Links,
 		deviceRegistry:   wrapEndDeviceRegistryWithReplacedFields(conf.Devices, replacedEndDeviceFields...),
-		appUpsRegistry:   conf.UplinkStorage.Registry,
+		appPkgRegistry:   conf.Packages.Registry,
 		locationRegistry: conf.EndDeviceMetadataStorage.Location.Registry,
 		formatters:       make(messageprocessors.MapPayloadProcessor),
 		clusterDistributor: distribution.NewPubSubDistributor(
@@ -1072,38 +1072,6 @@ func (as *ApplicationServer) matchSession(ctx context.Context, ids *ttnpb.EndDev
 	return mask, nil
 }
 
-// storeUplink stores the provided *ttnpb.ApplicationUplink in the device uplink storage.
-// Only fields which are used by integrations are stored.
-// The fields which are stored are based on the following usages:
-// - io/packages/loragls/v3/package.go#multiFrameQuery
-// - io/packages/loragls/v3/api/objects.go#parseRxMetadata.
-func (as *ApplicationServer) storeUplink(
-	ctx context.Context,
-	ids *ttnpb.EndDeviceIdentifiers,
-	uplink *ttnpb.ApplicationUplink,
-) error {
-	cleanUplink := &ttnpb.ApplicationUplink{
-		RxMetadata: make([]*ttnpb.RxMetadata, 0, len(uplink.RxMetadata)),
-		ReceivedAt: uplink.ReceivedAt,
-	}
-	for _, md := range uplink.RxMetadata {
-		if md.GatewayIds == nil {
-			continue
-		}
-		cleanUplink.RxMetadata = append(cleanUplink.RxMetadata, &ttnpb.RxMetadata{
-			GatewayIds: &ttnpb.GatewayIdentifiers{
-				GatewayId: md.GatewayIds.GatewayId,
-			},
-			AntennaIndex:  md.AntennaIndex,
-			FineTimestamp: md.FineTimestamp,
-			Location:      md.Location,
-			Rssi:          md.Rssi,
-			Snr:           md.Snr,
-		})
-	}
-	return as.appUpsRegistry.Push(ctx, ids, cleanUplink)
-}
-
 // setActivated attempts to mark the end device as activated in the Entity Registry.
 // If the update succeeds, the end device will be updated in the Application Server end device registry
 // in order to avoid subsequent calls.
@@ -1218,9 +1186,6 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, info uplinkInfo) 
 			return err
 		}
 		if err := as.publishNormalizedUplink(ctx, info); err != nil {
-			return err
-		}
-		if err := as.storeUplink(ctx, info.ids, info.uplink); err != nil {
 			return err
 		}
 	} else if appSKey := dev.GetSession().GetKeys().GetAppSKey(); appSKey != nil {
@@ -1509,11 +1474,6 @@ func (as *ApplicationServer) GetMQTTConfig(ctx context.Context) (*config.MQTT, e
 		return nil, err
 	}
 	return &cfg.MQTT, nil
-}
-
-// RangeUplinks ranges the application uplinks and calls the callback function, until false is returned.
-func (as *ApplicationServer) RangeUplinks(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(ctx context.Context, up *ttnpb.ApplicationUplink) bool) error {
-	return as.appUpsRegistry.Range(ctx, ids, paths, f)
 }
 
 // GetEndDevice retrieves the end device associated with the provided identifiers from the end device registry.

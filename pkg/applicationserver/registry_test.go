@@ -20,7 +20,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -356,69 +356,4 @@ func TestLinkRegistry(t *testing.T) {
 			})
 		}
 	}
-}
-
-func TestApplicationUplinksRegistry(t *testing.T) {
-	namespace := [...]string{
-		"applicationserver_test",
-		"application_ups",
-	}
-	test.RunTest(t, test.TestConfig{
-		Func: func(ctx context.Context, a *assertions.Assertion) {
-			cl, flush := test.NewRedis(ctx, namespace[:]...)
-			defer flush()
-			defer cl.Close()
-			registry := &redis.ApplicationUplinkRegistry{
-				Redis: cl,
-				Limit: 16,
-			}
-
-			ids := &ttnpb.EndDeviceIdentifiers{
-				ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-				DeviceId:       "test-dev",
-			}
-
-			assertEmpty := func() {
-				err := registry.Range(ctx, ids, []string{}, func(ctx context.Context, up *ttnpb.ApplicationUplink) bool {
-					t.Fatal("list should be empty")
-					return false
-				})
-				a.So(err, should.BeNil)
-			}
-			assertEmpty()
-
-			push := func(start uint32, end uint32) {
-				for i := start; i < end; i++ {
-					err := registry.Push(ctx, ids, &ttnpb.ApplicationUplink{FCnt: i})
-					a.So(err, should.BeNil)
-				}
-			}
-			push(0, 16)
-
-			assertList := func(start uint32, end uint32) {
-				found := make(map[uint32]struct{})
-				err := registry.Range(ctx, ids, []string{
-					"f_cnt",
-				}, func(ctx context.Context, up *ttnpb.ApplicationUplink) bool {
-					a.So(up.FCnt, should.BeBetweenOrEqual, start, end-1)
-					if _, f := found[up.FCnt]; f {
-						t.Fatalf("Uplink already seen: %d", up.FCnt)
-					}
-					found[up.FCnt] = struct{}{}
-					return true
-				})
-				a.So(err, should.BeNil)
-				a.So(len(found), should.Equal, end-start)
-			}
-			assertList(0, 16)
-
-			push(32, 64)
-			// Since we allow at most 16 uplinks, only the last 16 are stored.
-			assertList(48, 64)
-
-			err := registry.Clear(ctx, ids)
-			a.So(err, should.BeNil)
-			assertEmpty()
-		},
-	})
 }

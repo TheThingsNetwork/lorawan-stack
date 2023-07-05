@@ -31,7 +31,7 @@ import (
 	nats_server "github.com/nats-io/nats-server/v2/server"
 	nats_test_server "github.com/nats-io/nats-server/v2/test"
 	nats_client "github.com/nats-io/nats.go"
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver"
 	distribredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/distribution/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
@@ -215,14 +215,6 @@ func TestApplicationServer(t *testing.T) {
 		t.Fatalf("Failed to set link in registry: %s", err)
 	}
 
-	applicationUpsRedisClient, applicationUpsFlush := test.NewRedis(ctx, "applicationserver_test", "applicationups")
-	defer applicationUpsFlush()
-	defer applicationUpsRedisClient.Close()
-	applicationUpsRegistry := &redis.ApplicationUplinkRegistry{
-		Redis: applicationUpsRedisClient,
-		Limit: 16,
-	}
-
 	webhooksRedisClient, webhooksFlush := test.NewRedis(ctx, "applicationserver_test", "webhooks")
 	defer webhooksFlush()
 	defer webhooksRedisClient.Close()
@@ -296,10 +288,6 @@ func TestApplicationServer(t *testing.T) {
 	config := &applicationserver.Config{
 		Devices: deviceRegistry,
 		Links:   linkRegistry,
-		UplinkStorage: applicationserver.UplinkStorageConfig{
-			Registry: applicationUpsRegistry,
-			Limit:    16,
-		},
 		MQTT: config.MQTT{
 			Listen: ":1883",
 		},
@@ -2399,14 +2387,6 @@ func TestSkipPayloadCrypto(t *testing.T) {
 		t.Fatalf("Failed to set link in registry: %s", err)
 	}
 
-	applicationUpsRedisClient, applicationUpsFlush := test.NewRedis(ctx, "applicationserver_test", "applicationups")
-	defer applicationUpsFlush()
-	defer applicationUpsRedisClient.Close()
-	applicationUpsRegistry := &redis.ApplicationUplinkRegistry{
-		Redis: applicationUpsRedisClient,
-		Limit: 16,
-	}
-
 	distribRedisClient, distribFlush := test.NewRedis(ctx, "applicationserver_test", "traffic")
 	defer distribFlush()
 	defer distribRedisClient.Close()
@@ -2434,10 +2414,6 @@ func TestSkipPayloadCrypto(t *testing.T) {
 	config := &applicationserver.Config{
 		Devices: deviceRegistry,
 		Links:   linkRegistry,
-		UplinkStorage: applicationserver.UplinkStorageConfig{
-			Registry: applicationUpsRegistry,
-			Limit:    16,
-		},
 		Distribution: applicationserver.DistributionConfig{
 			Global: applicationserver.GlobalDistributorConfig{
 				PubSub: distribPubSub,
@@ -2926,14 +2902,6 @@ func TestLocationFromPayload(t *testing.T) {
 	defer distribRedisClient.Close()
 	distribPubSub := distribredis.PubSub{Redis: distribRedisClient}
 
-	applicationUpsRedisClient, applicationUpsFlush := test.NewRedis(ctx, "applicationserver_test", "applicationups")
-	defer applicationUpsFlush()
-	defer applicationUpsRedisClient.Close()
-	applicationUpsRegistry := &redis.ApplicationUplinkRegistry{
-		Redis: applicationUpsRedisClient,
-		Limit: 16,
-	}
-
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
@@ -2951,10 +2919,6 @@ func TestLocationFromPayload(t *testing.T) {
 	config := &applicationserver.Config{
 		Devices: deviceRegistry,
 		Links:   linkRegistry,
-		UplinkStorage: applicationserver.UplinkStorageConfig{
-			Registry: applicationUpsRegistry,
-			Limit:    16,
-		},
 		Distribution: applicationserver.DistributionConfig{
 			Global: applicationserver.GlobalDistributorConfig{
 				PubSub: distribPubSub,
@@ -3126,14 +3090,6 @@ func TestUplinkNormalized(t *testing.T) {
 	defer distribRedisClient.Close()
 	distribPubSub := distribredis.PubSub{Redis: distribRedisClient}
 
-	applicationUpsRedisClient, applicationUpsFlush := test.NewRedis(ctx, "applicationserver_test", "applicationups")
-	defer applicationUpsFlush()
-	defer applicationUpsRedisClient.Close()
-	applicationUpsRegistry := &redis.ApplicationUplinkRegistry{
-		Redis: applicationUpsRedisClient,
-		Limit: 16,
-	}
-
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
@@ -3151,10 +3107,6 @@ func TestUplinkNormalized(t *testing.T) {
 	config := &applicationserver.Config{
 		Devices: deviceRegistry,
 		Links:   linkRegistry,
-		UplinkStorage: applicationserver.UplinkStorageConfig{
-			Registry: applicationUpsRegistry,
-			Limit:    16,
-		},
 		Distribution: applicationserver.DistributionConfig{
 			Global: applicationserver.GlobalDistributorConfig{
 				PubSub: distribPubSub,
@@ -3392,22 +3344,13 @@ func TestApplicationServerCleanup(t *testing.T) {
 		t.FailNow()
 	}
 
-	applicationUpsRedisClient, applicationUpsFlush := test.NewRedis(ctx, "applicationserver_test", "applicationups")
-	defer applicationUpsFlush()
-	defer applicationUpsRedisClient.Close()
-	applicationUpsRegistry := &redis.ApplicationUplinkRegistry{
-		Redis: applicationUpsRedisClient,
-		Limit: 16,
-	}
-
 	applicationPackagesRedisClient, applicationPackagesFlush := test.NewRedis(ctx, "applicationserver_test", "applicationpackages")
 	defer applicationPackagesFlush()
 	defer applicationPackagesRedisClient.Close()
-	applicationPackagesRegistry := &asioapredis.ApplicationPackagesRegistry{
-		Redis:   applicationPackagesRedisClient,
-		LockTTL: test.Delay << 10,
-	}
-	if err := applicationPackagesRegistry.Init(ctx); !a.So(err, should.BeNil) {
+	applicationPackagesRegistry, err := asioapredis.NewApplicationPackagesRegistry(
+		ctx, applicationPackagesRedisClient, test.Delay<<10,
+	)
+	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
@@ -3538,7 +3481,7 @@ func TestApplicationServerCleanup(t *testing.T) {
 	pubsubCleaner := &pubsub.RegistryCleaner{
 		PubSubRegistry: pubsubRegistry,
 	}
-	err := pubsubCleaner.RangeToLocalSet(ctx)
+	err = pubsubCleaner.RangeToLocalSet(ctx)
 	a.So(err, should.BeNil)
 	a.So(pubsubCleaner.LocalSet, should.HaveLength, 3)
 
@@ -3550,8 +3493,7 @@ func TestApplicationServerCleanup(t *testing.T) {
 	a.So(webhookCleaner.LocalSet, should.HaveLength, 3)
 
 	devCleaner := &applicationserver.RegistryCleaner{
-		DevRegistry:    deviceRegistry,
-		AppUpsRegistry: applicationUpsRegistry,
+		DevRegistry: deviceRegistry,
 	}
 	err = devCleaner.RangeToLocalSet(ctx)
 	a.So(err, should.BeNil)

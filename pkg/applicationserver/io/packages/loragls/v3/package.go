@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package loracloudgeolocationv3 enables LoRa Cloud Geolocation Services integration.
 package loracloudgeolocationv3
 
 import (
@@ -39,6 +40,9 @@ import (
 // PackageName defines the package name.
 const PackageName = "lora-cloud-geolocation-v3"
 
+// defaultMultiFrameWindowSize is the default number of frames to use for multi-frame queries.
+const defaultMultiFrameWindowSize = 16
+
 // GeolocationPackage is the LoRa Cloud Geolocation application package.
 type GeolocationPackage struct {
 	server   io.Server
@@ -52,9 +56,19 @@ var (
 )
 
 // HandleUp implements packages.ApplicationPackageHandler.
-func (p *GeolocationPackage) HandleUp(ctx context.Context, def *ttnpb.ApplicationPackageDefaultAssociation, assoc *ttnpb.ApplicationPackageAssociation, up *ttnpb.ApplicationUp) (err error) {
+func (p *GeolocationPackage) HandleUp(
+	ctx context.Context,
+	def *ttnpb.ApplicationPackageDefaultAssociation,
+	assoc *ttnpb.ApplicationPackageAssociation,
+	up *ttnpb.ApplicationUp,
+) (err error) {
 	ctx = log.NewContextWithField(ctx, "namespace", "applicationserver/io/packages/loragls/v1")
-	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIds, fmt.Sprintf("as:packages:loracloudglsv3:%s", events.NewCorrelationID()))...)
+	ctx = events.ContextWithCorrelationID(
+		ctx, append(
+			up.CorrelationIds,
+			fmt.Sprintf("as:packages:loracloudglsv3:%s", events.NewCorrelationID()),
+		)...,
+	)
 
 	if def == nil && assoc == nil {
 		return errNoAssociation.New()
@@ -73,6 +87,11 @@ func (p *GeolocationPackage) HandleUp(ctx context.Context, def *ttnpb.Applicatio
 
 	switch m := up.Up.(type) {
 	case *ttnpb.ApplicationUp_UplinkMessage:
+		pkgAssocIDs := assocIDs(def, assoc, up.EndDeviceIds)
+		if err := p.pushUplink(ctx, pkgAssocIDs, m.UplinkMessage, data); err != nil {
+			return err
+		}
+
 		return p.sendQuery(ctx, up.EndDeviceIds, m.UplinkMessage, data)
 	default:
 		return nil
@@ -87,6 +106,22 @@ func (p *GeolocationPackage) Package() *ttnpb.ApplicationPackage {
 	}
 }
 
+// assocIDs returns the identifiers of the given association. If the association is nil, new identifiers are created.
+func assocIDs(
+	def *ttnpb.ApplicationPackageDefaultAssociation,
+	assoc *ttnpb.ApplicationPackageAssociation,
+	ids *ttnpb.EndDeviceIdentifiers,
+) *ttnpb.ApplicationPackageAssociationIdentifiers {
+	assocIDs := assoc.GetIds()
+	if assocIDs == nil {
+		assocIDs = &ttnpb.ApplicationPackageAssociationIdentifiers{
+			EndDeviceIds: ids,
+			FPort:        def.Ids.FPort,
+		}
+	}
+	return assocIDs
+}
+
 // New instantiates the LoRa Cloud Geolocation package.
 func New(server io.Server, registry packages.Registry) packages.ApplicationPackageHandler {
 	return &GeolocationPackage{
@@ -96,7 +131,11 @@ func New(server io.Server, registry packages.Registry) packages.ApplicationPacka
 }
 
 func (p *GeolocationPackage) singleFrameQuery(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data, client *api.Client) (api.AbstractLocationSolverResponse, error) {
-	req := api.BuildSingleFrameRequest(ctx, up.RxMetadata)
+	mds, err := RxMDSliceFromProto(up.RxMetadata)
+	if err != nil {
+		return nil, err
+	}
+	req := api.BuildSingleFrameRequest(ctx, mds)
 	if len(req.Gateways) < 1 {
 		return nil, nil
 	}
@@ -129,37 +168,93 @@ func (p *GeolocationPackage) gnssQuery(ctx context.Context, ids *ttnpb.EndDevice
 	return resp.AbstractResponse(), nil
 }
 
-func minInt(a int, b int) int {
-	if a <= b {
-		return a
+// constrainedWindowSize returns the given window size if it is within the allowed range, or the default size otherwise.
+func constrainedWindowSize(size int) int {
+	if size > 0 && size < defaultMultiFrameWindowSize {
+		return size
 	}
-	return b
+	return defaultMultiFrameWindowSize
 }
 
-func (p *GeolocationPackage) multiFrameQuery(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data, client *api.Client) (api.AbstractLocationSolverResponse, error) {
-	count := data.MultiFrameWindowSize
-	if count == 0 && len(up.FrmPayload) > 0 {
-		count = int(up.FrmPayload[0])
-		count = minInt(count, 16)
-	}
-	if count == 0 {
-		return nil, nil
+// pushUplink updates the package data with the given uplink.
+func (p *GeolocationPackage) pushUplink(
+	ctx context.Context,
+	ids *ttnpb.ApplicationPackageAssociationIdentifiers,
+	up *ttnpb.ApplicationUplink,
+	data *Data,
+) error {
+	windowSize := constrainedWindowSize(data.MultiFrameWindowSize)
+
+	setter := func(assoc *ttnpb.ApplicationPackageAssociation) (*ttnpb.ApplicationPackageAssociation, []string, error) {
+		assocData := &Data{}
+		fieldMask := []string{"data"}
+
+		if assoc == nil {
+			if !data.MultiFrame {
+				return nil, nil, nil
+			}
+
+			assoc = &ttnpb.ApplicationPackageAssociation{
+				Ids:         ids,
+				PackageName: PackageName,
+			}
+			fieldMask = []string{"data", "ids", "package_name"}
+		} else {
+			if err := assocData.FromStruct(assoc.Data); err != nil {
+				return nil, nil, err
+			}
+		}
+
+		if data.MultiFrame {
+			if len(assocData.RecentMetadata) >= windowSize {
+				assocData.RecentMetadata = assocData.RecentMetadata[1:]
+			}
+
+			md := &UplinkMetadata{}
+			if err := md.FromApplicationUplink(up); err != nil {
+				return nil, nil, err
+			}
+			assocData.RecentMetadata = append(assocData.RecentMetadata, md)
+		} else {
+			assocData.RecentMetadata = nil
+		}
+		data.RecentMetadata = assocData.RecentMetadata
+
+		st, err := assocData.Struct()
+		if err != nil {
+			return nil, nil, err
+		}
+		assoc.Data = st
+
+		return assoc, fieldMask, nil
 	}
 
+	_, err := p.registry.SetAssociation(ctx, ids, []string{"data"}, setter)
+	return err
+}
+
+func (*GeolocationPackage) multiFrameQuery(
+	ctx context.Context,
+	_ *ttnpb.EndDeviceIdentifiers,
+	_ *ttnpb.ApplicationUplink,
+	data *Data,
+	client *api.Client,
+) (api.AbstractLocationSolverResponse, error) {
+	windowSize := constrainedWindowSize(data.MultiFrameWindowSize)
+
 	now := time.Now()
-	var mds [][]*ttnpb.RxMetadata
-	if err := p.server.RangeUplinks(ctx, ids, []string{"rx_metadata", "received_at"},
-		func(ctx context.Context, up *ttnpb.ApplicationUplink) bool {
-			if now.Sub(*ttnpb.StdTime(up.ReceivedAt)) > data.MultiFrameWindowAge {
-				return true
-			}
-			mds = append(mds, up.RxMetadata)
-			if len(mds) == count {
-				return false
-			}
-			return true
-		}); err != nil {
-		return nil, err
+	mds := make([][]*api.RxMetadata, 0, windowSize)
+
+	for _, md := range data.RecentMetadata {
+		if now.Sub(md.ReceivedAt) > data.MultiFrameWindowAge {
+			continue
+		}
+
+		mds = append(mds, md.RxMetadata)
+
+		if len(mds) >= windowSize {
+			break
+		}
 	}
 
 	req := api.BuildMultiFrameRequest(ctx, mds)
@@ -199,7 +294,11 @@ func (p *GeolocationPackage) wifiQuery(ctx context.Context, ids *ttnpb.EndDevice
 			SignalStrength: int64(accessPoint.RSSI),
 		})
 	}
-	req := api.BuildWiFiRequest(ctx, up.RxMetadata, accessPoints)
+	mds, err := RxMDSliceFromProto(up.RxMetadata)
+	if err != nil {
+		return nil, err
+	}
+	req := api.BuildWiFiRequest(ctx, mds, accessPoints)
 	if len(req.LoRaWAN) < 1 {
 		return nil, nil
 	}
@@ -302,7 +401,10 @@ func (p *GeolocationPackage) sendLocationSolved(ctx context.Context, ids *ttnpb.
 	})
 }
 
-func (p *GeolocationPackage) mergePackageData(def *ttnpb.ApplicationPackageDefaultAssociation, assoc *ttnpb.ApplicationPackageAssociation) (*Data, error) {
+func (*GeolocationPackage) mergePackageData(
+	def *ttnpb.ApplicationPackageDefaultAssociation,
+	assoc *ttnpb.ApplicationPackageAssociation,
+) (*Data, error) {
 	var defaultData, associationData Data
 	if def != nil {
 		if err := defaultData.FromStruct(def.Data); err != nil {
@@ -314,20 +416,28 @@ func (p *GeolocationPackage) mergePackageData(def *ttnpb.ApplicationPackageDefau
 			return nil, err
 		}
 	}
-	var merged Data
-	for _, data := range []*Data{
-		&defaultData,
-		&associationData,
-	} {
-		if data.Query != 0 {
-			merged.Query = data.Query
-		}
-		if data.ServerURL != nil {
-			merged.ServerURL = urlutil.CloneURL(data.ServerURL)
-		}
-		if data.Token != "" {
-			merged.Token = data.Token
-		}
+
+	merged := Data{
+		Query:                defaultData.Query,
+		MultiFrame:           defaultData.MultiFrame,
+		MultiFrameWindowSize: defaultData.MultiFrameWindowSize,
+		MultiFrameWindowAge:  defaultData.MultiFrameWindowAge,
+		ServerURL:            defaultData.ServerURL,
+		Token:                defaultData.Token,
+		RecentMetadata:       defaultData.RecentMetadata,
+	}
+
+	if associationData.Query != 0 {
+		merged.Query = associationData.Query
+	}
+	if associationData.ServerURL != nil {
+		merged.ServerURL = urlutil.CloneURL(associationData.ServerURL)
+	}
+	if associationData.Token != "" {
+		merged.Token = associationData.Token
+	}
+	if len(associationData.RecentMetadata) > 0 {
+		merged.RecentMetadata = associationData.RecentMetadata
 	}
 	if merged.ServerURL == nil {
 		merged.ServerURL = urlutil.CloneURL(api.DefaultServerURL)
@@ -346,4 +456,16 @@ func toStruct(i any) (*structpb.Struct, error) {
 		return nil, err
 	}
 	return st, nil
+}
+
+// RxMDSliceFromProto converts a slice of RxMetadata from a protobuf representation.
+func RxMDSliceFromProto(pb []*ttnpb.RxMetadata) ([]*api.RxMetadata, error) {
+	md := make([]*api.RxMetadata, len(pb))
+	for i, m := range pb {
+		md[i] = &api.RxMetadata{}
+		if err := md[i].FromProto(m); err != nil {
+			return nil, err
+		}
+	}
+	return md, nil
 }

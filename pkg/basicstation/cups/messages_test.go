@@ -19,7 +19,7 @@ import (
 	"crypto/x509"
 	"testing"
 
-	"github.com/smartystreets/assertions"
+	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/basicstation/cups"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )

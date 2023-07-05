@@ -24,9 +24,8 @@ import (
 
 // RegistryCleaner is a service responsible for cleanup of the device registry.
 type RegistryCleaner struct {
-	DevRegistry    DeviceRegistry
-	AppUpsRegistry ApplicationUplinkRegistry
-	LocalSet       map[string]struct{}
+	DevRegistry DeviceRegistry
+	LocalSet    map[string]struct{}
 }
 
 // RangeToLocalSet returns a set of devices that have data in the registry.
@@ -55,9 +54,6 @@ func (cleaner *RegistryCleaner) DeleteDeviceData(ctx context.Context, devSet []s
 			return nil, nil, nil
 		})
 		if err != nil {
-			return err
-		}
-		if err := cleaner.AppUpsRegistry.Clear(ctx, devIds); err != nil {
 			return err
 		}
 	}
