@@ -261,7 +261,9 @@ func TestClientsCRUD(t *testing.T) {
 			a.So(got.StateDescription, should.Equal, "")
 		}
 
-		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{nil, usr1.GetOrganizationOrUserIdentifiers()} {
+		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{
+			nil, usr1.GetOrganizationOrUserIdentifiers(),
+		} {
 			list, err := reg.List(ctx, &ttnpb.ListClientsRequest{
 				FieldMask:    ttnpb.FieldMask("name"),
 				Collaborator: collaborator,
