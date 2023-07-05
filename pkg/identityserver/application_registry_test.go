@@ -187,6 +187,58 @@ func TestApplicationsCRUD(t *testing.T) {
 			a.So(updated.Name, should.Equal, "Updated Name")
 		}
 
+		t.Run("Contact Info Restrictions", func(t *testing.T) { // nolint:paralleltest
+			a, ctx := test.New(t)
+
+			oldSetOtherAsContacts := is.config.CollaboratorRights.SetOthersAsContacts
+			t.Cleanup(func() { is.config.CollaboratorRights.SetOthersAsContacts = oldSetOtherAsContacts })
+			is.config.CollaboratorRights.SetOthersAsContacts = false
+
+			// Set usr-2 as collaborator to application.
+			aac := ttnpb.NewApplicationAccessClient(cc)
+			_, err := aac.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
+				ApplicationIds: created.GetIds(),
+				Collaborator: &ttnpb.Collaborator{
+					Ids:    usr2.GetOrganizationOrUserIdentifiers(),
+					Rights: []ttnpb.Right{ttnpb.Right_RIGHT_ALL},
+				},
+			}, creds)
+			a.So(err, should.BeNil)
+
+			// Attempt to set another collaborator as administrative contact.
+			_, err = reg.Update(ctx, &ttnpb.UpdateApplicationRequest{
+				Application: &ttnpb.Application{
+					Ids:                   created.GetIds(),
+					AdministrativeContact: usr2.GetOrganizationOrUserIdentifiers(),
+				},
+				FieldMask: ttnpb.FieldMask("administrative_contact"),
+			}, creds)
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+
+			// Admin can bypass contact info restrictions.
+			_, err = reg.Update(ctx, &ttnpb.UpdateApplicationRequest{
+				Application: &ttnpb.Application{
+					Ids:                   created.GetIds(),
+					AdministrativeContact: usr1.GetOrganizationOrUserIdentifiers(),
+				},
+				FieldMask: ttnpb.FieldMask("administrative_contact"),
+			}, adminCreds)
+			a.So(err, should.BeNil)
+
+			is.config.CollaboratorRights.SetOthersAsContacts = true
+
+			// Now usr-1 can set usr-2 as technical contact.
+			_, err = reg.Update(ctx, &ttnpb.UpdateApplicationRequest{
+				Application: &ttnpb.Application{
+					Ids:              created.GetIds(),
+					Name:             "Updated Name",
+					TechnicalContact: usr2.GetOrganizationOrUserIdentifiers(),
+				},
+				FieldMask: ttnpb.FieldMask("technical_contact"),
+			}, creds)
+			a.So(err, should.BeNil)
+		})
+
 		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{nil, usr1.GetOrganizationOrUserIdentifiers()} {
 			list, err := reg.List(ctx, &ttnpb.ListApplicationsRequest{
 				FieldMask:    ttnpb.FieldMask("name"),
