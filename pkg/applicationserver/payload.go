@@ -25,14 +25,31 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/goproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 var (
 	errNoPayload = errors.DefineInvalidArgument("no_payload", "no payload")
 	errNoFPort   = errors.DefineInvalidArgument("no_f_port", "no FPort")
 )
+
+func recordPayloadValueViolations(
+	ctx context.Context,
+	counter *metrics.ContextualCounterVec,
+	formatter ttnpb.PayloadFormatter,
+	decodedPayload *structpb.Struct,
+) {
+	violations := FindViolations(decodedPayload)
+	if len(violations) == 0 {
+		return
+	}
+	for _, violation := range violations {
+		counter.WithLabelValues(ctx, formatter.String(), violation.Context.String(), violation.Type.String()).Inc()
+	}
+}
 
 func (as *ApplicationServer) encodeDownlink(ctx context.Context, dev *ttnpb.EndDevice, downlink *ttnpb.ApplicationDownlink, defaultFormatters *ttnpb.MessagePayloadFormatters) error {
 	if downlink.FrmPayload == nil && downlink.DecodedPayload == nil {
@@ -160,6 +177,7 @@ func (as *ApplicationServer) decodeUplink(ctx context.Context, dev *ttnpb.EndDev
 	}
 	if len(uplink.DecodedPayloadWarnings) > 0 {
 		events.Publish(evtDecodeWarningDataUp.NewWithIdentifiersAndData(ctx, dev.Ids, uplink))
+		recordPayloadValueViolations(ctx, asMetrics.uplinkPayloadValueViolations, formatter, uplink.DecodedPayload)
 	}
 	if len(uplink.NormalizedPayloadWarnings) > 0 {
 		events.Publish(evtNormalizeWarningDataUp.NewWithIdentifiersAndData(ctx, dev.Ids, uplink))
@@ -219,6 +237,7 @@ func (as *ApplicationServer) decodeDownlink(ctx context.Context, dev *ttnpb.EndD
 	}
 	if len(downlink.DecodedPayloadWarnings) > 0 {
 		events.Publish(evtDecodeWarningDataDown.NewWithIdentifiersAndData(ctx, dev.Ids, downlink))
+		recordPayloadValueViolations(ctx, asMetrics.downlinkPayloadValueViolations, formatter, downlink.DecodedPayload)
 	}
 	return nil
 }
