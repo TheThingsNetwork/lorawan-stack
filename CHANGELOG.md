@@ -12,6 +12,8 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - The `as-db purge` command to purge unused data from the Application Server database.
+- RPCs and CLI command to delete a batch of end devices within an application.
+  - Check `ttn-lw-cli end-devices batch-delete` for more details.
 
 ### Changed
 

@@ -168,6 +168,75 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 		t.Fatalf("Error received: %v", err)
 	}
 	a.So(ret, should.BeNil)
+
+	// Batch Operations.
+	pb1 := ttnpb.Clone(pb)
+	pb1.Ids.DeviceId = "test-dev-1"
+	pb1.Ids.DevEui = types.EUI64{0x42, 0x43, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes()
+
+	pb2 := ttnpb.Clone(pb)
+	pb2.Ids.DeviceId = "test-dev-2"
+	pb2.Ids.DevEui = types.EUI64{0x42, 0x44, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes()
+
+	pb3 := ttnpb.Clone(pb)
+	pb3.Ids.DeviceId = "test-dev-3"
+	pb3.Ids.DevEui = types.EUI64{0x42, 0x45, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes()
+	pb3.PendingSession = nil
+
+	for _, dev := range []*ttnpb.EndDevice{pb1, pb2, pb3} {
+		ret, err = reg.Set(ctx, dev.Ids,
+			[]string{
+				"ids.application_ids",
+				"ids.dev_eui",
+				"ids.device_id",
+				"ids.join_eui",
+				"session",
+				"skip_payload_crypto_override",
+			},
+			func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+				if !a.So(stored, should.BeNil) {
+					t.Fatal("Registry is not empty")
+				}
+				return dev, []string{
+					"ids.application_ids",
+					"ids.dev_eui",
+					"ids.device_id",
+					"ids.join_eui",
+					"pending_session",
+					"session",
+					"skip_payload_crypto_override",
+				}, nil
+			},
+		)
+		if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
+			t.Fatalf("Failed to create device: %s", err)
+		}
+		ret, err = reg.Get(ctx, dev.Ids, ttnpb.EndDeviceFieldPathsTopLevel)
+		a.So(err, should.BeNil)
+		a.So(ret, should.HaveEmptyDiff, dev)
+	}
+
+	deleted, err := reg.BatchDelete(
+		ctx,
+		pb1.Ids.ApplicationIds, // All the devices share the application identifiers.
+		[]string{
+			pb1.Ids.DeviceId,
+			pb2.Ids.DeviceId,
+			pb3.Ids.DeviceId,
+		},
+	)
+	if !a.So(err, should.BeNil) || !a.So(deleted, should.HaveLength, 3) {
+		t.Fatalf("Failed to delete devices: %s", err)
+	}
+
+	// Make sure that the device is deleted.
+	for _, dev := range []*ttnpb.EndDevice{pb1, pb2, pb3} {
+		ret, err = reg.Get(ctx, dev.Ids, ttnpb.EndDeviceFieldPathsTopLevel)
+		if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
+			t.Fatalf("Error received: %v", err)
+		}
+		a.So(ret, should.BeNil)
+	}
 }
 
 func TestDeviceRegistry(t *testing.T) {

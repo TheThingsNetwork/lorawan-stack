@@ -126,7 +126,8 @@ type NetworkServer struct {
 	*component.Component
 	ctx context.Context
 
-	devices DeviceRegistry
+	devices      DeviceRegistry
+	batchDevices *nsEndDeviceBatchRegistry
 
 	netID           types.NetID
 	clusterID       string
@@ -271,6 +272,9 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		QueueSize:  int(conf.ApplicationUplinkQueue.FastBufferSize),
 		MaxWorkers: int(conf.ApplicationUplinkQueue.FastNumConsumers),
 	})
+	ns.batchDevices = &nsEndDeviceBatchRegistry{
+		NS: ns,
+	}
 	ctx = ns.Context()
 
 	if len(opts) == 0 {
@@ -291,6 +295,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 			"/ttn.lorawan.v3.GsNs",
 			"/ttn.lorawan.v3.AsNs",
 			"/ttn.lorawan.v3.NsEndDeviceRegistry",
+			"/ttn.lorawan.v3.NsEndDeviceBatchRegistry",
 			"/ttn.lorawan.v3.Ns",
 		} {
 			c.GRPC.RegisterUnaryHook(filter, hook.name, hook.middleware)
@@ -360,12 +365,14 @@ func (ns *NetworkServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterGsNsServer(s, ns)
 	ttnpb.RegisterAsNsServer(s, ns)
 	ttnpb.RegisterNsEndDeviceRegistryServer(s, ns)
+	ttnpb.RegisterNsEndDeviceBatchRegistryServer(s, ns.batchDevices)
 	ttnpb.RegisterNsServer(s, ns)
 }
 
 // RegisterHandlers registers gRPC handlers.
 func (ns *NetworkServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 	ttnpb.RegisterNsEndDeviceRegistryHandler(ns.Context(), s, conn)
+	ttnpb.RegisterNsEndDeviceBatchRegistryHandler(ns.Context(), s, conn) // nolint:errcheck
 	ttnpb.RegisterNsHandler(ns.Context(), s, conn)
 }
 

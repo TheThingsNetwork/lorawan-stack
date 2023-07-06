@@ -194,6 +194,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 			"/ttn.lorawan.v3.ClientRegistry",
 			"/ttn.lorawan.v3.ClientAccess",
 			"/ttn.lorawan.v3.EndDeviceRegistry",
+			"/ttn.lorawan.v3.EndDeviceBatchRegistry",
 			"/ttn.lorawan.v3.GatewayRegistry",
 			"/ttn.lorawan.v3.GatewayAccess",
 			"/ttn.lorawan.v3.OrganizationRegistry",
@@ -254,6 +255,7 @@ func (is *IdentityServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterOAuthAuthorizationRegistryServer(s, &oauthRegistry{IdentityServer: is})
 	ttnpb.RegisterContactInfoRegistryServer(s, &contactInfoRegistry{IdentityServer: is})
 	ttnpb.RegisterNotificationServiceServer(s, &notificationRegistry{IdentityServer: is})
+	ttnpb.RegisterEndDeviceBatchRegistryServer(s, &endDeviceBatchRegistry{IdentityServer: is})
 }
 
 // RegisterHandlers registers gRPC handlers.
@@ -278,6 +280,7 @@ func (is *IdentityServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Clien
 	ttnpb.RegisterOAuthAuthorizationRegistryHandler(is.Context(), s, conn)
 	ttnpb.RegisterContactInfoRegistryHandler(is.Context(), s, conn)
 	ttnpb.RegisterNotificationServiceHandler(is.Context(), s, conn)
+	ttnpb.RegisterEndDeviceBatchRegistryHandler(is.Context(), s, conn) // nolint:errcheck
 }
 
 // RegisterInterop registers the LoRaWAN Backend Interfaces interoperability services.

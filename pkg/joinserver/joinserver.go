@@ -65,6 +65,7 @@ type JoinServer struct {
 		asJs                          asJsServer
 		appJs                         appJsServer
 		jsDevices                     jsEndDeviceRegistryServer
+		jsBatchDevices                jsEndDeviceBatchRegistryServer
 		js                            jsServer
 		applicationActivationSettings applicationActivationSettingsRegistryServer
 	}
@@ -111,6 +112,9 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 		JS:       js,
 		kekLabel: conf.DeviceKEKLabel,
 	}
+	js.grpc.jsBatchDevices = jsEndDeviceBatchRegistryServer{
+		JS: js,
+	}
 	js.grpc.nsJs = nsJsServer{JS: js}
 	js.grpc.asJs = asJsServer{JS: js}
 	js.grpc.appJs = appJsServer{JS: js}
@@ -130,6 +134,7 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 			"/ttn.lorawan.v3.AppJs",
 			"/ttn.lorawan.v3.NsJs",
 			"/ttn.lorawan.v3.JsEndDeviceRegistry",
+			"/ttn.lorawan.v3.JsEndDeviceBatchRegistry",
 			"/ttn.lorawan.v3.Js",
 			"/ttn.lorawan.v3.ApplicationActivationSettingRegistry",
 		} {
@@ -156,6 +161,7 @@ func (js *JoinServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterAppJsServer(s, js.grpc.appJs)
 	ttnpb.RegisterNsJsServer(s, js.grpc.nsJs)
 	ttnpb.RegisterJsEndDeviceRegistryServer(s, js.grpc.jsDevices)
+	ttnpb.RegisterJsEndDeviceBatchRegistryServer(s, js.grpc.jsBatchDevices)
 	ttnpb.RegisterJsServer(s, js.grpc.js)
 	ttnpb.RegisterApplicationActivationSettingRegistryServer(s, js.grpc.applicationActivationSettings)
 }
@@ -164,6 +170,7 @@ func (js *JoinServer) RegisterServices(s *grpc.Server) {
 func (js *JoinServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 	ttnpb.RegisterJsHandler(js.Context(), s, conn)
 	ttnpb.RegisterJsEndDeviceRegistryHandler(js.Context(), s, conn)
+	ttnpb.RegisterJsEndDeviceBatchRegistryHandler(js.Context(), s, conn) // nolint:errcheck
 	ttnpb.RegisterApplicationActivationSettingRegistryHandler(js.Context(), s, conn)
 }
 

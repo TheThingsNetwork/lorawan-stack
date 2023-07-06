@@ -24,6 +24,9 @@
       "name": "AsEndDeviceRegistry"
     },
     {
+      "name": "AsEndDeviceBatchRegistry"
+    },
+    {
       "name": "ApplicationUpStorage"
     },
     {
@@ -61,6 +64,9 @@
     },
     {
       "name": "EndDeviceTemplateConverter"
+    },
+    {
+      "name": "EndDeviceBatchRegistry"
     },
     {
       "name": "Events"
@@ -111,6 +117,9 @@
       "name": "JsEndDeviceRegistry"
     },
     {
+      "name": "JsEndDeviceBatchRegistry"
+    },
+    {
       "name": "ApplicationActivationSettingRegistry"
     },
     {
@@ -127,6 +136,9 @@
     },
     {
       "name": "NsEndDeviceRegistry"
+    },
+    {
+      "name": "NsEndDeviceBatchRegistry"
     },
     {
       "name": "NotificationService"
@@ -981,6 +993,49 @@
         ],
         "tags": [
           "EndDeviceRegistry"
+        ]
+      }
+    },
+    "/applications/{application_ids.application_id}/devices/batch": {
+      "delete": {
+        "summary": "Delete a batch of end devices with the given IDs.",
+        "description": "This operation is atomic; either all devices are deleted or none.\nDevices not found are skipped and no error is returned.\nBefore calling this RPC, use the corresponding BatchDelete RPCs\nof NsEndDeviceRegistry, AsEndDeviceRegistry and\noptionally the JsEndDeviceRegistry to delete the end devices.\nIf the devices were claimed on a Join Server, use the BatchUnclaim RPC\nof the DeviceClaimingServer.\nThis is NOT done automatically.",
+        "operationId": "EndDeviceBatchRegistry_Delete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "device_ids",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "EndDeviceBatchRegistry"
         ]
       }
     },
@@ -1897,6 +1952,48 @@
         ],
         "tags": [
           "EndDeviceRegistry"
+        ]
+      }
+    },
+    "/as/applications/{application_ids.application_id}/devices/batch": {
+      "delete": {
+        "summary": "Delete a list of devices within the same application.\nThis operation is atomic; either all devices are deleted or none.\nDevices not found are skipped and no error is returned.",
+        "operationId": "AsEndDeviceBatchRegistry_Delete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "device_ids",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "AsEndDeviceBatchRegistry"
         ]
       }
     },
@@ -9717,6 +9814,48 @@
         ]
       }
     },
+    "/js/applications/{application_ids.application_id}/devices/batch": {
+      "delete": {
+        "summary": "Delete a list of devices within the same application.\nThis operation is atomic; either all devices are deleted or none.\nDevices not found are skipped and no error is returned.",
+        "operationId": "JsEndDeviceBatchRegistry_Delete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "device_ids",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "JsEndDeviceBatchRegistry"
+        ]
+      }
+    },
     "/js/applications/{application_ids.application_id}/devices/{device_id}": {
       "delete": {
         "summary": "Delete deletes the device that matches the given identifiers.\nIf there are multiple matches, an error will be returned.",
@@ -10708,6 +10847,48 @@
         },
         "tags": [
           "Js"
+        ]
+      }
+    },
+    "/ns/applications/{application_ids.application_id}/devices/batch": {
+      "delete": {
+        "summary": "Delete a list of devices within the same application.\nThis operation is atomic; either all devices are deleted or none.\nDevices not found are skipped and no error is returned.",
+        "operationId": "NsEndDeviceBatchRegistry_Delete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "device_ids",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "NsEndDeviceBatchRegistry"
         ]
       }
     },

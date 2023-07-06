@@ -548,3 +548,114 @@ var EndDeviceTemplateConverter_ServiceDesc = grpc.ServiceDesc{
 	},
 	Metadata: "lorawan-stack/api/end_device_services.proto",
 }
+
+const (
+	EndDeviceBatchRegistry_Delete_FullMethodName = "/ttn.lorawan.v3.EndDeviceBatchRegistry/Delete"
+)
+
+// EndDeviceBatchRegistryClient is the client API for EndDeviceBatchRegistry service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type EndDeviceBatchRegistryClient interface {
+	// Delete a batch of end devices with the given IDs.
+	//
+	// This operation is atomic; either all devices are deleted or none.
+	// Devices not found are skipped and no error is returned.
+	// Before calling this RPC, use the corresponding BatchDelete RPCs
+	// of NsEndDeviceRegistry, AsEndDeviceRegistry and
+	// optionally the JsEndDeviceRegistry to delete the end devices.
+	// If the devices were claimed on a Join Server, use the BatchUnclaim RPC
+	// of the DeviceClaimingServer.
+	// This is NOT done automatically.
+	Delete(ctx context.Context, in *BatchDeleteEndDevicesRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+}
+
+type endDeviceBatchRegistryClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewEndDeviceBatchRegistryClient(cc grpc.ClientConnInterface) EndDeviceBatchRegistryClient {
+	return &endDeviceBatchRegistryClient{cc}
+}
+
+func (c *endDeviceBatchRegistryClient) Delete(ctx context.Context, in *BatchDeleteEndDevicesRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, EndDeviceBatchRegistry_Delete_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// EndDeviceBatchRegistryServer is the server API for EndDeviceBatchRegistry service.
+// All implementations must embed UnimplementedEndDeviceBatchRegistryServer
+// for forward compatibility
+type EndDeviceBatchRegistryServer interface {
+	// Delete a batch of end devices with the given IDs.
+	//
+	// This operation is atomic; either all devices are deleted or none.
+	// Devices not found are skipped and no error is returned.
+	// Before calling this RPC, use the corresponding BatchDelete RPCs
+	// of NsEndDeviceRegistry, AsEndDeviceRegistry and
+	// optionally the JsEndDeviceRegistry to delete the end devices.
+	// If the devices were claimed on a Join Server, use the BatchUnclaim RPC
+	// of the DeviceClaimingServer.
+	// This is NOT done automatically.
+	Delete(context.Context, *BatchDeleteEndDevicesRequest) (*emptypb.Empty, error)
+	mustEmbedUnimplementedEndDeviceBatchRegistryServer()
+}
+
+// UnimplementedEndDeviceBatchRegistryServer must be embedded to have forward compatible implementations.
+type UnimplementedEndDeviceBatchRegistryServer struct {
+}
+
+func (UnimplementedEndDeviceBatchRegistryServer) Delete(context.Context, *BatchDeleteEndDevicesRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedEndDeviceBatchRegistryServer) mustEmbedUnimplementedEndDeviceBatchRegistryServer() {
+}
+
+// UnsafeEndDeviceBatchRegistryServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to EndDeviceBatchRegistryServer will
+// result in compilation errors.
+type UnsafeEndDeviceBatchRegistryServer interface {
+	mustEmbedUnimplementedEndDeviceBatchRegistryServer()
+}
+
+func RegisterEndDeviceBatchRegistryServer(s grpc.ServiceRegistrar, srv EndDeviceBatchRegistryServer) {
+	s.RegisterService(&EndDeviceBatchRegistry_ServiceDesc, srv)
+}
+
+func _EndDeviceBatchRegistry_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BatchDeleteEndDevicesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EndDeviceBatchRegistryServer).Delete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: EndDeviceBatchRegistry_Delete_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EndDeviceBatchRegistryServer).Delete(ctx, req.(*BatchDeleteEndDevicesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// EndDeviceBatchRegistry_ServiceDesc is the grpc.ServiceDesc for EndDeviceBatchRegistry service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var EndDeviceBatchRegistry_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "ttn.lorawan.v3.EndDeviceBatchRegistry",
+	HandlerType: (*EndDeviceBatchRegistryServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Delete",
+			Handler:    _EndDeviceBatchRegistry_Delete_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "lorawan-stack/api/end_device_services.proto",
+}

@@ -26,6 +26,8 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+const noOfDevices = 3
+
 func TestEndDevicesPermissionDenied(t *testing.T) {
 	p := &storetest.Population{}
 	usr1 := p.NewUser()
@@ -211,6 +213,88 @@ func TestEndDevicesPagination(t *testing.T) {
 		}, creds)
 		if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) {
 			a.So(list.EndDevices, should.BeEmpty)
+		}
+	}, withPrivateTestDatabase(p))
+}
+
+func TestEndDevicesBatchDelete(t *testing.T) {
+	t.Parallel()
+	a, ctx := test.New(t)
+	p := &storetest.Population{}
+	usr1 := p.NewUser()
+	app1 := p.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
+	devIDs := make([]string, 0, noOfDevices)
+	for i := 0; i < noOfDevices; i++ {
+		dev := p.NewEndDevice(app1.GetIds())
+		dev.Attributes = map[string]string{
+			"foo": "bar",
+		}
+		dev.Locations = map[string]*ttnpb.Location{
+			"foo": {
+				Latitude:  1,
+				Longitude: 2,
+				Altitude:  3,
+			},
+		}
+		devIDs = append(devIDs, dev.GetIds().DeviceId)
+	}
+	readKey, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ)
+	readCreds := rpcCreds(readKey)
+
+	writeKey, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE)
+	writeCreds := rpcCreds(writeKey)
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		reg := ttnpb.NewEndDeviceBatchRegistryClient(cc)
+
+		// ClusterAuth.
+		_, err := reg.Delete(ctx, &ttnpb.BatchDeleteEndDevicesRequest{
+			ApplicationIds: app1.GetIds(),
+			DeviceIds:      devIDs,
+		}, is.WithClusterAuth())
+		a.So(errors.IsPermissionDenied(err), should.BeTrue)
+
+		// Insufficient rights.
+		_, err = reg.Delete(ctx, &ttnpb.BatchDeleteEndDevicesRequest{
+			ApplicationIds: app1.GetIds(),
+			DeviceIds:      devIDs,
+		}, readCreds)
+		a.So(errors.IsPermissionDenied(err), should.BeTrue)
+
+		// Unknown application.
+		_, err = reg.Delete(ctx, &ttnpb.BatchDeleteEndDevicesRequest{
+			ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "unknown"},
+			DeviceIds:      devIDs,
+		}, writeCreds)
+		a.So(errors.IsPermissionDenied(err), should.BeTrue)
+
+		// Unknown device ignored.
+		_, err = reg.Delete(ctx, &ttnpb.BatchDeleteEndDevicesRequest{
+			ApplicationIds: app1.GetIds(),
+			DeviceIds: []string{
+				"unknown",
+			},
+		}, writeCreds)
+		a.So(err, should.BeNil)
+
+		// Valid Batch.
+		_, err = reg.Delete(ctx, &ttnpb.BatchDeleteEndDevicesRequest{
+			ApplicationIds: app1.GetIds(),
+			DeviceIds:      devIDs,
+		}, writeCreds)
+		a.So(err, should.BeNil)
+
+		// Read after delete.
+		edReg := ttnpb.NewEndDeviceRegistryClient(cc)
+		for _, devID := range devIDs {
+			got, err := edReg.Get(ctx, &ttnpb.GetEndDeviceRequest{
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
+					ApplicationIds: app1.GetIds(),
+					DeviceId:       devID,
+				},
+			}, readCreds)
+			a.So(got, should.BeNil)
+			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 	}, withPrivateTestDatabase(p))
 }
