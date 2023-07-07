@@ -424,6 +424,7 @@ class PayloadFormattersForm extends React.Component {
                   {this.formatter}
                   {/*
                       // TODO: Refactor to use data API and re-enable prompt.
+                      // https://github.com/TheThingsNetwork/lorawan-stack/issues/6384
                       // NOTE: Unfortunately react router v6 requires us to do further
                       // refactoring to use the data API to be able to use `usePrompt`
                       // again, which is required to make the Prompt component work.
