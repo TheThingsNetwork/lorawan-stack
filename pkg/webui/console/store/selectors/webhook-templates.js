@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,6 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+import { createSelector } from 'reselect'
 
 import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
 import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
@@ -32,12 +34,12 @@ export const selectWebhookTemplateById = (state, id) => {
 export const selectWebhookTemplateError = createErrorSelector(GET_WEBHOOK_TEMPLATE_BASE)
 export const selectWebhookTemplateFetching = createFetchingSelector(GET_WEBHOOK_TEMPLATE_BASE)
 
-export const selectWebhookTemplates = state => {
-  const { entities } = selectWebhookTemplatesStore(state)
+export const selectWebhookTemplates = createSelector([selectWebhookTemplatesStore], state => {
+  const { entities } = state
 
   if (!Boolean(entities)) return undefined
 
   return Object.keys(entities).map(key => entities[key])
-}
+})
 export const selectWebhookTemplatesError = createErrorSelector(LIST_WEBHOOK_TEMPLATES_BASE)
 export const selectWebhookTemplatesFetching = createFetchingSelector(LIST_WEBHOOK_TEMPLATES_BASE)
