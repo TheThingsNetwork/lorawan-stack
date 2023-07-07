@@ -3163,6 +3163,90 @@ func (dst *BatchDeleteEndDevicesRequest) SetFields(src *BatchDeleteEndDevicesReq
 	return nil
 }
 
+func (dst *BatchGetEndDevicesRequest) SetFields(src *BatchGetEndDevicesRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "application_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationIdentifiers
+				if (src == nil || src.ApplicationIds == nil) && dst.ApplicationIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.ApplicationIds
+				}
+				if dst.ApplicationIds != nil {
+					newDst = dst.ApplicationIds
+				} else {
+					newDst = &ApplicationIdentifiers{}
+					dst.ApplicationIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationIds = src.ApplicationIds
+				} else {
+					dst.ApplicationIds = nil
+				}
+			}
+		case "device_ids":
+			if len(subs) > 0 {
+				return fmt.Errorf("'device_ids' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DeviceIds = src.DeviceIds
+			} else {
+				dst.DeviceIds = nil
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				dst.FieldMask = nil
+			}
+		case "order":
+			if len(subs) > 0 {
+				return fmt.Errorf("'order' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Order = src.Order
+			} else {
+				var zero string
+				dst.Order = zero
+			}
+		case "limit":
+			if len(subs) > 0 {
+				return fmt.Errorf("'limit' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Limit = src.Limit
+			} else {
+				var zero uint32
+				dst.Limit = zero
+			}
+		case "page":
+			if len(subs) > 0 {
+				return fmt.Errorf("'page' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Page = src.Page
+			} else {
+				var zero uint32
+				dst.Page = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *MACParameters_Channel) SetFields(src *MACParameters_Channel, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {

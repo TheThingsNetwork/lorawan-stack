@@ -2712,6 +2712,18 @@
     }
   },
   "EndDeviceBatchRegistry": {
+    "Get": {
+      "file": "lorawan-stack/api/end_device_services.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/applications/{application_ids.application_id}/devices/batch",
+          "parameters": [
+            "application_ids.application_id"
+          ]
+        }
+      ]
+    },
     "Delete": {
       "file": "lorawan-stack/api/end_device_services.proto",
       "http": [

@@ -113,6 +113,16 @@ service EndDeviceTemplateConverter {
 // The EndDeviceBatchRegistry service, exposed by the Identity Server, is used to manage
 // end device registrations in batches.
 service EndDeviceBatchRegistry {
+  // Get a batch of end devices with the given identifiers, selecting the fields specified
+  // in the field mask.
+  // More or less fields may be returned, depending on the rights of the caller.
+  // Devices not found are skipped and no error is returned.
+  rpc Get(BatchGetEndDevicesRequest) returns (ttn.lorawan.v3.EndDevices) {
+    option (google.api.http) = {
+      get: "/applications/{application_ids.application_id}/devices/batch"
+    };
+  };
+
   // Delete a batch of end devices with the given IDs.
   //
   // This operation is atomic; either all devices are deleted or none.

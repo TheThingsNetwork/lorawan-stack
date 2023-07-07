@@ -4060,3 +4060,109 @@ func (x *EndDeviceTemplate) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 func (x *EndDeviceTemplate) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
+
+// MarshalProtoJSON marshals the BatchGetEndDevicesRequest message to JSON.
+func (x *BatchGetEndDevicesRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.ApplicationIds != nil || s.HasField("application_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("application_ids")
+		// NOTE: ApplicationIdentifiers does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.ApplicationIds)
+	}
+	if len(x.DeviceIds) > 0 || s.HasField("device_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("device_ids")
+		s.WriteStringArray(x.DeviceIds)
+	}
+	if x.FieldMask != nil || s.HasField("field_mask") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("field_mask")
+		if x.FieldMask == nil {
+			s.WriteNil()
+		} else {
+			golang.MarshalLegacyFieldMask(s, x.FieldMask)
+		}
+	}
+	if x.Order != "" || s.HasField("order") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("order")
+		s.WriteString(x.Order)
+	}
+	if x.Limit != 0 || s.HasField("limit") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("limit")
+		s.WriteUint32(x.Limit)
+	}
+	if x.Page != 0 || s.HasField("page") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("page")
+		s.WriteUint32(x.Page)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the BatchGetEndDevicesRequest to JSON.
+func (x *BatchGetEndDevicesRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the BatchGetEndDevicesRequest message from JSON.
+func (x *BatchGetEndDevicesRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "application_ids", "applicationIds":
+			s.AddField("application_ids")
+			if s.ReadNil() {
+				x.ApplicationIds = nil
+				return
+			}
+			// NOTE: ApplicationIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v ApplicationIdentifiers
+			golang.UnmarshalMessage(s, &v)
+			x.ApplicationIds = &v
+		case "device_ids", "deviceIds":
+			s.AddField("device_ids")
+			if s.ReadNil() {
+				x.DeviceIds = nil
+				return
+			}
+			x.DeviceIds = s.ReadStringArray()
+		case "field_mask", "fieldMask":
+			s.AddField("field_mask")
+			if s.ReadNil() {
+				x.FieldMask = nil
+				return
+			}
+			v := golang.UnmarshalFieldMask(s)
+			if s.Err() != nil {
+				return
+			}
+			x.FieldMask = v
+		case "order":
+			s.AddField("order")
+			x.Order = s.ReadString()
+		case "limit":
+			s.AddField("limit")
+			x.Limit = s.ReadUint32()
+		case "page":
+			s.AddField("page")
+			x.Page = s.ReadUint32()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the BatchGetEndDevicesRequest from JSON.
+func (x *BatchGetEndDevicesRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}

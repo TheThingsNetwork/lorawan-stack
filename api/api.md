@@ -224,6 +224,7 @@
   - [Message `ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode`](#ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode)
   - [Message `ADRSettings.StaticMode`](#ttn.lorawan.v3.ADRSettings.StaticMode)
   - [Message `BatchDeleteEndDevicesRequest`](#ttn.lorawan.v3.BatchDeleteEndDevicesRequest)
+  - [Message `BatchGetEndDevicesRequest`](#ttn.lorawan.v3.BatchGetEndDevicesRequest)
   - [Message `BatchUpdateEndDeviceLastSeenRequest`](#ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest)
   - [Message `BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate`](#ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate)
   - [Message `BoolValue`](#ttn.lorawan.v3.BoolValue)
@@ -3472,6 +3473,26 @@ Configuration options for static ADR.
 | `application_ids` | <p>`message.required`: `true`</p> |
 | `device_ids` | <p>`repeated.min_items`: `1`</p><p>`repeated.max_items`: `20`</p><p>`repeated.items.string.max_len`: `36`</p><p>`repeated.items.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 
+### <a name="ttn.lorawan.v3.BatchGetEndDevicesRequest">Message `BatchGetEndDevicesRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| `device_ids` | [`string`](#string) | repeated |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the end device fields that should be returned. This mask is applied on all the end devices in the result. See the API reference for which fields can be returned by the different services. |
+| `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
+| `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
+| `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `application_ids` | <p>`message.required`: `true`</p> |
+| `device_ids` | <p>`repeated.min_items`: `1`</p><p>`repeated.max_items`: `20`</p><p>`repeated.items.string.max_len`: `36`</p><p>`repeated.items.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `order` | <p>`string.in`: `[ device_id -device_id join_eui -join_eui dev_eui -dev_eui name -name description -description created_at -created_at last_seen_at -last_seen_at]`</p> |
+| `limit` | <p>`uint32.lte`: `20`</p> |
+
 ### <a name="ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest">Message `BatchUpdateEndDeviceLastSeenRequest`</a>
 
 | Field | Type | Label | Description |
@@ -4197,12 +4218,14 @@ end device registrations in batches.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
+| `Get` | [`BatchGetEndDevicesRequest`](#ttn.lorawan.v3.BatchGetEndDevicesRequest) | [`EndDevices`](#ttn.lorawan.v3.EndDevices) | Get a batch of end devices with the given identifiers, selecting the fields specified in the field mask. More or less fields may be returned, depending on the rights of the caller. Devices not found are skipped and no error is returned. |
 | `Delete` | [`BatchDeleteEndDevicesRequest`](#ttn.lorawan.v3.BatchDeleteEndDevicesRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete a batch of end devices with the given IDs. This operation is atomic; either all devices are deleted or none. Devices not found are skipped and no error is returned. Before calling this RPC, use the corresponding BatchDelete RPCs of NsEndDeviceRegistry, AsEndDeviceRegistry and optionally the JsEndDeviceRegistry to delete the end devices. If the devices were claimed on a Join Server, use the BatchUnclaim RPC of the DeviceClaimingServer. This is NOT done automatically. |
 
 #### HTTP bindings
 
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
+| `Get` | `GET` | `/api/v3/applications/{application_ids.application_id}/devices/batch` |  |
 | `Delete` | `DELETE` | `/api/v3/applications/{application_ids.application_id}/devices/batch` |  |
 
 ### <a name="ttn.lorawan.v3.EndDeviceRegistry">Service `EndDeviceRegistry`</a>

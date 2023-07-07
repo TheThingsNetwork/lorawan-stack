@@ -4147,6 +4147,187 @@ var _ interface {
 
 var _BatchDeleteEndDevicesRequest_DeviceIds_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
+// ValidateFields checks the field values on BatchGetEndDevicesRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *BatchGetEndDevicesRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = BatchGetEndDevicesRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "application_ids":
+
+			if m.GetApplicationIds() == nil {
+				return BatchGetEndDevicesRequestValidationError{
+					field:  "application_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return BatchGetEndDevicesRequestValidationError{
+						field:  "application_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "device_ids":
+
+			if l := len(m.GetDeviceIds()); l < 1 || l > 20 {
+				return BatchGetEndDevicesRequestValidationError{
+					field:  "device_ids",
+					reason: "value must contain between 1 and 20 items, inclusive",
+				}
+			}
+
+			for idx, item := range m.GetDeviceIds() {
+				_, _ = idx, item
+
+				if utf8.RuneCountInString(item) > 36 {
+					return BatchGetEndDevicesRequestValidationError{
+						field:  fmt.Sprintf("device_ids[%v]", idx),
+						reason: "value length must be at most 36 runes",
+					}
+				}
+
+				if !_BatchGetEndDevicesRequest_DeviceIds_Pattern.MatchString(item) {
+					return BatchGetEndDevicesRequestValidationError{
+						field:  fmt.Sprintf("device_ids[%v]", idx),
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
+			}
+
+		case "field_mask":
+
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return BatchGetEndDevicesRequestValidationError{
+						field:  "field_mask",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "order":
+
+			if _, ok := _BatchGetEndDevicesRequest_Order_InLookup[m.GetOrder()]; !ok {
+				return BatchGetEndDevicesRequestValidationError{
+					field:  "order",
+					reason: "value must be in list [ device_id -device_id join_eui -join_eui dev_eui -dev_eui name -name description -description created_at -created_at last_seen_at -last_seen_at]",
+				}
+			}
+
+		case "limit":
+
+			if m.GetLimit() > 20 {
+				return BatchGetEndDevicesRequestValidationError{
+					field:  "limit",
+					reason: "value must be less than or equal to 20",
+				}
+			}
+
+		case "page":
+			// no validation rules for Page
+		default:
+			return BatchGetEndDevicesRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// BatchGetEndDevicesRequestValidationError is the validation error returned by
+// BatchGetEndDevicesRequest.ValidateFields if the designated constraints
+// aren't met.
+type BatchGetEndDevicesRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BatchGetEndDevicesRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BatchGetEndDevicesRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BatchGetEndDevicesRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BatchGetEndDevicesRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BatchGetEndDevicesRequestValidationError) ErrorName() string {
+	return "BatchGetEndDevicesRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e BatchGetEndDevicesRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBatchGetEndDevicesRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BatchGetEndDevicesRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BatchGetEndDevicesRequestValidationError{}
+
+var _BatchGetEndDevicesRequest_DeviceIds_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+
+var _BatchGetEndDevicesRequest_Order_InLookup = map[string]struct{}{
+	"":              {},
+	"device_id":     {},
+	"-device_id":    {},
+	"join_eui":      {},
+	"-join_eui":     {},
+	"dev_eui":       {},
+	"-dev_eui":      {},
+	"name":          {},
+	"-name":         {},
+	"description":   {},
+	"-description":  {},
+	"created_at":    {},
+	"-created_at":   {},
+	"last_seen_at":  {},
+	"-last_seen_at": {},
+}
+
 // ValidateFields checks the field values on MACParameters_Channel with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
