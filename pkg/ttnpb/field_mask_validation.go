@@ -1080,6 +1080,15 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 			"gateway.claim_authentication_code.valid_from",
 			"gateway.claim_authentication_code.valid_to"),
 	},
+	"/ttn.lorawan.v3.EndDeviceBatchRegistry/Get": {
+		All: GatewayFieldPathsNested,
+		Allowed: omitFields(GatewayFieldPathsNested,
+			"gateway.claim_authentication_code.secret",
+			"gateway.claim_authentication_code.secret.key_id",
+			"gateway.claim_authentication_code.secret.value",
+			"gateway.claim_authentication_code.valid_from",
+			"gateway.claim_authentication_code.valid_to"),
+	},
 	"/ttn.lorawan.v3.GatewayRegistry/List": {
 		All: GatewayFieldPathsNested,
 		Allowed: omitFields(GatewayFieldPathsNested,

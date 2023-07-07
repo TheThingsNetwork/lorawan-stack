@@ -217,7 +217,7 @@ func TestEndDevicesPagination(t *testing.T) {
 	}, withPrivateTestDatabase(p))
 }
 
-func TestEndDevicesBatchDelete(t *testing.T) {
+func TestEndDevicesBatchOperations(t *testing.T) {
 	t.Parallel()
 	a, ctx := test.New(t)
 	p := &storetest.Population{}
@@ -262,6 +262,12 @@ func TestEndDevicesBatchDelete(t *testing.T) {
 		a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
 		// Unknown application.
+		_, err = reg.Get(ctx, &ttnpb.BatchGetEndDevicesRequest{
+			ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "unknown"},
+			DeviceIds:      devIDs,
+		}, writeCreds)
+		a.So(errors.IsPermissionDenied(err), should.BeTrue)
+
 		_, err = reg.Delete(ctx, &ttnpb.BatchDeleteEndDevicesRequest{
 			ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "unknown"},
 			DeviceIds:      devIDs,
@@ -269,6 +275,14 @@ func TestEndDevicesBatchDelete(t *testing.T) {
 		a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
 		// Unknown device ignored.
+		_, err = reg.Get(ctx, &ttnpb.BatchGetEndDevicesRequest{
+			ApplicationIds: app1.GetIds(),
+			DeviceIds: []string{
+				"unknown",
+			},
+		}, readCreds)
+		a.So(err, should.BeNil)
+
 		_, err = reg.Delete(ctx, &ttnpb.BatchDeleteEndDevicesRequest{
 			ApplicationIds: app1.GetIds(),
 			DeviceIds: []string{
@@ -277,7 +291,87 @@ func TestEndDevicesBatchDelete(t *testing.T) {
 		}, writeCreds)
 		a.So(err, should.BeNil)
 
+		// One unknown device.
+		devs, err := reg.Get(ctx, &ttnpb.BatchGetEndDevicesRequest{
+			ApplicationIds: app1.GetIds(),
+			DeviceIds: []string{
+				"unknown",
+				devIDs[0],
+			},
+		}, readCreds)
+		a.So(err, should.BeNil)
+		a.So(devs, should.NotBeNil)
+		a.So(devs.GetEndDevices(), should.HaveLength, 1)
+
 		// Valid Batch.
+		devs, err = reg.Get(ctx, &ttnpb.BatchGetEndDevicesRequest{
+			ApplicationIds: app1.GetIds(),
+			DeviceIds:      devIDs,
+		}, readCreds)
+		a.So(err, should.BeNil)
+		a.So(devs, should.NotBeNil)
+		a.So(devs.GetEndDevices(), should.HaveLength, noOfDevices)
+
+		// Test order and pagination.
+		devs, err = reg.Get(ctx, &ttnpb.BatchGetEndDevicesRequest{
+			ApplicationIds: app1.GetIds(),
+			DeviceIds:      devIDs,
+			Limit:          2,
+			Page:           1,
+		}, readCreds)
+		a.So(err, should.BeNil)
+		a.So(devs, should.NotBeNil)
+		a.So(devs.GetEndDevices(), should.HaveLength, 2)
+
+		devs, err = reg.Get(ctx, &ttnpb.BatchGetEndDevicesRequest{
+			ApplicationIds: app1.GetIds(),
+			DeviceIds:      devIDs,
+			Limit:          2,
+			Page:           2,
+		}, readCreds)
+		a.So(err, should.BeNil)
+		a.So(devs, should.NotBeNil)
+		a.So(devs.GetEndDevices(), should.HaveLength, 1)
+
+		devs, err = reg.Get(ctx, &ttnpb.BatchGetEndDevicesRequest{
+			ApplicationIds: app1.GetIds(),
+			DeviceIds:      devIDs,
+			Limit:          2,
+			Page:           2,
+		}, readCreds)
+		a.So(err, should.BeNil)
+		a.So(devs, should.NotBeNil)
+		a.So(devs.GetEndDevices(), should.HaveLength, 1)
+
+		devs, err = reg.Get(ctx, &ttnpb.BatchGetEndDevicesRequest{
+			ApplicationIds: app1.GetIds(),
+			DeviceIds:      devIDs,
+			Order:          "-device_id",
+		}, readCreds)
+		a.So(err, should.BeNil)
+		a.So(devs, should.NotBeNil)
+		a.So(devs.GetEndDevices(), should.HaveLength, 3)
+		a.So(devs.GetEndDevices()[0].Ids.DeviceId, should.Equal, devIDs[2])
+		a.So(devs.GetEndDevices()[1].Ids.DeviceId, should.Equal, devIDs[1])
+		a.So(devs.GetEndDevices()[2].Ids.DeviceId, should.Equal, devIDs[0])
+
+		// Test Fieldmask.
+		devs, err = reg.Get(ctx, &ttnpb.BatchGetEndDevicesRequest{
+			ApplicationIds: app1.GetIds(),
+			DeviceIds:      devIDs,
+			FieldMask: ttnpb.FieldMask(
+				"attributes",
+			),
+		}, readCreds)
+		a.So(err, should.BeNil)
+		a.So(devs, should.NotBeNil)
+		a.So(devs.GetEndDevices(), should.HaveLength, noOfDevices)
+		for _, dev := range devs.GetEndDevices() {
+			a.So(dev, should.NotBeNil)
+			a.So(len(dev.Attributes), should.Equal, 1)
+			a.So(dev.Attributes["foo"], should.Equal, "bar")
+		}
+
 		_, err = reg.Delete(ctx, &ttnpb.BatchDeleteEndDevicesRequest{
 			ApplicationIds: app1.GetIds(),
 			DeviceIds:      devIDs,
