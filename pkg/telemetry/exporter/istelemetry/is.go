@@ -138,19 +138,19 @@ func (it *isTelemetry) countActiveDevices(ctx context.Context) (resp models.Acti
 		num   *uint64
 	}{
 		{
-			query: it.DB.NewSelect().Model(&store.EndDevice{}).Where("activated_at IS NOT NULL"),
+			query: it.DB.NewSelect().Model(&store.EndDevice{}).Where("last_seen_at IS NOT NULL"),
 			num:   &resp.Total,
 		},
 		{
-			query: it.DB.NewSelect().Model(&store.EndDevice{}).Where("activated_at > NOW() - INTERVAL '1 DAY'"),
+			query: it.DB.NewSelect().Model(&store.EndDevice{}).Where("last_seen_at > NOW() - INTERVAL '1 DAY'"),
 			num:   &resp.LastDay,
 		},
 		{
-			query: it.DB.NewSelect().Model(&store.EndDevice{}).Where("activated_at > NOW() - INTERVAL '1 WEEK'"),
+			query: it.DB.NewSelect().Model(&store.EndDevice{}).Where("last_seen_at > NOW() - INTERVAL '1 WEEK'"),
 			num:   &resp.LastWeek,
 		},
 		{
-			query: it.DB.NewSelect().Model(&store.EndDevice{}).Where("activated_at > NOW() - INTERVAL '1 MONTH'"),
+			query: it.DB.NewSelect().Model(&store.EndDevice{}).Where("last_seen_at > NOW() - INTERVAL '1 MONTH'"),
 			num:   &resp.LastMonth,
 		},
 	} {
@@ -193,10 +193,6 @@ func (it *isTelemetry) countUserByTypes(ctx context.Context) (resp models.UsersC
 		query *bun.SelectQuery
 		num   *uint64
 	}{
-		{
-			query: it.DB.NewSelect().Model(&store.User{}),
-			num:   &resp.Total,
-		},
 		{
 			query: it.DB.NewSelect().Model(&store.User{}).Where("admin IS TRUE"),
 			num:   &resp.Admin,

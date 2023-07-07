@@ -23,6 +23,7 @@ import (
 	"net/url"
 	"strings"
 	"sync"
+	"unicode/utf8"
 
 	"github.com/gorilla/mux"
 	"github.com/jtacoma/uritemplates"
@@ -67,7 +68,9 @@ func createRequestErrorDetails(req *http.Request, res *http.Response) []proto.Me
 	if res != nil {
 		body, _ := stdio.ReadAll(stdio.LimitReader(res.Body, maxResponseSize))
 		m["status_code"] = res.StatusCode
-		m["body"] = string(body)
+		if utf8.Valid(body) {
+			m["body"] = string(body)
+		}
 	}
 	detail, err := goproto.Struct(m)
 	if err != nil {

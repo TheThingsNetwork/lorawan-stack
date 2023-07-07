@@ -1014,6 +1014,103 @@ var JsEndDeviceRegistry_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
+	JsEndDeviceBatchRegistry_Delete_FullMethodName = "/ttn.lorawan.v3.JsEndDeviceBatchRegistry/Delete"
+)
+
+// JsEndDeviceBatchRegistryClient is the client API for JsEndDeviceBatchRegistry service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type JsEndDeviceBatchRegistryClient interface {
+	// Delete a list of devices within the same application.
+	// This operation is atomic; either all devices are deleted or none.
+	// Devices not found are skipped and no error is returned.
+	Delete(ctx context.Context, in *BatchDeleteEndDevicesRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+}
+
+type jsEndDeviceBatchRegistryClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewJsEndDeviceBatchRegistryClient(cc grpc.ClientConnInterface) JsEndDeviceBatchRegistryClient {
+	return &jsEndDeviceBatchRegistryClient{cc}
+}
+
+func (c *jsEndDeviceBatchRegistryClient) Delete(ctx context.Context, in *BatchDeleteEndDevicesRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, JsEndDeviceBatchRegistry_Delete_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// JsEndDeviceBatchRegistryServer is the server API for JsEndDeviceBatchRegistry service.
+// All implementations must embed UnimplementedJsEndDeviceBatchRegistryServer
+// for forward compatibility
+type JsEndDeviceBatchRegistryServer interface {
+	// Delete a list of devices within the same application.
+	// This operation is atomic; either all devices are deleted or none.
+	// Devices not found are skipped and no error is returned.
+	Delete(context.Context, *BatchDeleteEndDevicesRequest) (*emptypb.Empty, error)
+	mustEmbedUnimplementedJsEndDeviceBatchRegistryServer()
+}
+
+// UnimplementedJsEndDeviceBatchRegistryServer must be embedded to have forward compatible implementations.
+type UnimplementedJsEndDeviceBatchRegistryServer struct {
+}
+
+func (UnimplementedJsEndDeviceBatchRegistryServer) Delete(context.Context, *BatchDeleteEndDevicesRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedJsEndDeviceBatchRegistryServer) mustEmbedUnimplementedJsEndDeviceBatchRegistryServer() {
+}
+
+// UnsafeJsEndDeviceBatchRegistryServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to JsEndDeviceBatchRegistryServer will
+// result in compilation errors.
+type UnsafeJsEndDeviceBatchRegistryServer interface {
+	mustEmbedUnimplementedJsEndDeviceBatchRegistryServer()
+}
+
+func RegisterJsEndDeviceBatchRegistryServer(s grpc.ServiceRegistrar, srv JsEndDeviceBatchRegistryServer) {
+	s.RegisterService(&JsEndDeviceBatchRegistry_ServiceDesc, srv)
+}
+
+func _JsEndDeviceBatchRegistry_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BatchDeleteEndDevicesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(JsEndDeviceBatchRegistryServer).Delete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: JsEndDeviceBatchRegistry_Delete_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(JsEndDeviceBatchRegistryServer).Delete(ctx, req.(*BatchDeleteEndDevicesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// JsEndDeviceBatchRegistry_ServiceDesc is the grpc.ServiceDesc for JsEndDeviceBatchRegistry service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var JsEndDeviceBatchRegistry_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "ttn.lorawan.v3.JsEndDeviceBatchRegistry",
+	HandlerType: (*JsEndDeviceBatchRegistryServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Delete",
+			Handler:    _JsEndDeviceBatchRegistry_Delete_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "lorawan-stack/api/joinserver.proto",
+}
+
+const (
 	ApplicationActivationSettingRegistry_Get_FullMethodName    = "/ttn.lorawan.v3.ApplicationActivationSettingRegistry/Get"
 	ApplicationActivationSettingRegistry_Set_FullMethodName    = "/ttn.lorawan.v3.ApplicationActivationSettingRegistry/Set"
 	ApplicationActivationSettingRegistry_Delete_FullMethodName = "/ttn.lorawan.v3.ApplicationActivationSettingRegistry/Delete"

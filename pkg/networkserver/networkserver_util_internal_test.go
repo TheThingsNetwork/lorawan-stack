@@ -2511,8 +2511,23 @@ var _ DeviceRegistry = MockDeviceRegistry{}
 
 // MockDeviceRegistry is a mock DeviceRegistry used for testing.
 type MockDeviceRegistry struct {
-	GetByIDFunc func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error)
-	SetByIDFunc func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)
+	GetByIDFunc func(
+		ctx context.Context,
+		appID *ttnpb.ApplicationIdentifiers,
+		devID string, paths []string,
+	) (*ttnpb.EndDevice, context.Context, error)
+	SetByIDFunc func(
+		ctx context.Context,
+		appID *ttnpb.ApplicationIdentifiers,
+		devID string,
+		paths []string,
+		f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error),
+	) (*ttnpb.EndDevice, context.Context, error)
+	BatchDeleteFunc func(
+		ctx context.Context,
+		appIDs *ttnpb.ApplicationIdentifiers,
+		deviceIDs []string,
+	) ([]*ttnpb.EndDeviceIdentifiers, error)
 }
 
 // GetByEUI panics.
@@ -2544,4 +2559,16 @@ func (m MockDeviceRegistry) RangeByUplinkMatches(context.Context, *ttnpb.UplinkM
 // Range panics.
 func (m MockDeviceRegistry) Range(ctx context.Context, paths []string, f func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
 	panic("Range must not be called")
+}
+
+// GetByID calls GetByIDFunc if set and panics otherwise.
+func (m MockDeviceRegistry) BatchDelete(
+	ctx context.Context,
+	appIDs *ttnpb.ApplicationIdentifiers,
+	deviceIDs []string,
+) ([]*ttnpb.EndDeviceIdentifiers, error) {
+	if m.BatchDeleteFunc == nil {
+		panic("BatchDeleteFunc called, but not set")
+	}
+	return m.BatchDeleteFunc(ctx, appIDs, deviceIDs)
 }

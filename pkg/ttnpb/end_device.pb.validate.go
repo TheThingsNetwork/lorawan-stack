@@ -4016,6 +4016,137 @@ var _ interface {
 
 var _ConvertEndDeviceTemplateRequest_FormatId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
+// ValidateFields checks the field values on BatchDeleteEndDevicesRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *BatchDeleteEndDevicesRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = BatchDeleteEndDevicesRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "application_ids":
+
+			if m.GetApplicationIds() == nil {
+				return BatchDeleteEndDevicesRequestValidationError{
+					field:  "application_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return BatchDeleteEndDevicesRequestValidationError{
+						field:  "application_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "device_ids":
+
+			if l := len(m.GetDeviceIds()); l < 1 || l > 20 {
+				return BatchDeleteEndDevicesRequestValidationError{
+					field:  "device_ids",
+					reason: "value must contain between 1 and 20 items, inclusive",
+				}
+			}
+
+			for idx, item := range m.GetDeviceIds() {
+				_, _ = idx, item
+
+				if utf8.RuneCountInString(item) > 36 {
+					return BatchDeleteEndDevicesRequestValidationError{
+						field:  fmt.Sprintf("device_ids[%v]", idx),
+						reason: "value length must be at most 36 runes",
+					}
+				}
+
+				if !_BatchDeleteEndDevicesRequest_DeviceIds_Pattern.MatchString(item) {
+					return BatchDeleteEndDevicesRequestValidationError{
+						field:  fmt.Sprintf("device_ids[%v]", idx),
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
+			}
+
+		default:
+			return BatchDeleteEndDevicesRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// BatchDeleteEndDevicesRequestValidationError is the validation error returned
+// by BatchDeleteEndDevicesRequest.ValidateFields if the designated
+// constraints aren't met.
+type BatchDeleteEndDevicesRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BatchDeleteEndDevicesRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BatchDeleteEndDevicesRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BatchDeleteEndDevicesRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BatchDeleteEndDevicesRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BatchDeleteEndDevicesRequestValidationError) ErrorName() string {
+	return "BatchDeleteEndDevicesRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e BatchDeleteEndDevicesRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBatchDeleteEndDevicesRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BatchDeleteEndDevicesRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BatchDeleteEndDevicesRequestValidationError{}
+
+var _BatchDeleteEndDevicesRequest_DeviceIds_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+
 // ValidateFields checks the field values on MACParameters_Channel with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.

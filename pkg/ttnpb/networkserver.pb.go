@@ -441,10 +441,22 @@ var file_lorawan_stack_api_networkserver_proto_rawDesc = []byte{
 	0x70, 0x70, 0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x73, 0x2e, 0x61,
 	0x70, 0x70, 0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x7d, 0x2f, 0x64,
 	0x65, 0x76, 0x69, 0x63, 0x65, 0x73, 0x2f, 0x7b, 0x64, 0x65, 0x76, 0x69, 0x63, 0x65, 0x5f, 0x69,
-	0x64, 0x7d, 0x42, 0x31, 0x5a, 0x2f, 0x67, 0x6f, 0x2e, 0x74, 0x68, 0x65, 0x74, 0x68, 0x69, 0x6e,
-	0x67, 0x73, 0x2e, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2f, 0x6c, 0x6f, 0x72, 0x61, 0x77,
-	0x61, 0x6e, 0x2d, 0x73, 0x74, 0x61, 0x63, 0x6b, 0x2f, 0x76, 0x33, 0x2f, 0x70, 0x6b, 0x67, 0x2f,
-	0x74, 0x74, 0x6e, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x64, 0x7d, 0x32, 0xb4, 0x01, 0x0a, 0x18, 0x4e, 0x73, 0x45, 0x6e, 0x64, 0x44, 0x65, 0x76, 0x69,
+	0x63, 0x65, 0x42, 0x61, 0x74, 0x63, 0x68, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x79, 0x12,
+	0x97, 0x01, 0x0a, 0x06, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x12, 0x2c, 0x2e, 0x74, 0x74, 0x6e,
+	0x2e, 0x6c, 0x6f, 0x72, 0x61, 0x77, 0x61, 0x6e, 0x2e, 0x76, 0x33, 0x2e, 0x42, 0x61, 0x74, 0x63,
+	0x68, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x45, 0x6e, 0x64, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65,
+	0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c,
+	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79,
+	0x22, 0x47, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x41, 0x2a, 0x3f, 0x2f, 0x6e, 0x73, 0x2f, 0x61, 0x70,
+	0x70, 0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2f, 0x7b, 0x61, 0x70, 0x70, 0x6c,
+	0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x73, 0x2e, 0x61, 0x70, 0x70, 0x6c,
+	0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x7d, 0x2f, 0x64, 0x65, 0x76, 0x69,
+	0x63, 0x65, 0x73, 0x2f, 0x62, 0x61, 0x74, 0x63, 0x68, 0x42, 0x31, 0x5a, 0x2f, 0x67, 0x6f, 0x2e,
+	0x74, 0x68, 0x65, 0x74, 0x68, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72,
+	0x6b, 0x2f, 0x6c, 0x6f, 0x72, 0x61, 0x77, 0x61, 0x6e, 0x2d, 0x73, 0x74, 0x61, 0x63, 0x6b, 0x2f,
+	0x76, 0x33, 0x2f, 0x70, 0x6b, 0x67, 0x2f, 0x74, 0x74, 0x6e, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -474,9 +486,10 @@ var file_lorawan_stack_api_networkserver_proto_goTypes = []interface{}{
 	(*GetEndDeviceRequest)(nil),             // 10: ttn.lorawan.v3.GetEndDeviceRequest
 	(*SetEndDeviceRequest)(nil),             // 11: ttn.lorawan.v3.SetEndDeviceRequest
 	(*ResetAndGetEndDeviceRequest)(nil),     // 12: ttn.lorawan.v3.ResetAndGetEndDeviceRequest
-	(*MACSettings)(nil),                     // 13: ttn.lorawan.v3.MACSettings
-	(*ApplicationDownlinks)(nil),            // 14: ttn.lorawan.v3.ApplicationDownlinks
-	(*EndDevice)(nil),                       // 15: ttn.lorawan.v3.EndDevice
+	(*BatchDeleteEndDevicesRequest)(nil),    // 13: ttn.lorawan.v3.BatchDeleteEndDevicesRequest
+	(*MACSettings)(nil),                     // 14: ttn.lorawan.v3.MACSettings
+	(*ApplicationDownlinks)(nil),            // 15: ttn.lorawan.v3.ApplicationDownlinks
+	(*EndDevice)(nil),                       // 16: ttn.lorawan.v3.EndDevice
 }
 var file_lorawan_stack_api_networkserver_proto_depIdxs = []int32{
 	4,  // 0: ttn.lorawan.v3.GetDefaultMACSettingsRequest.lorawan_phy_version:type_name -> ttn.lorawan.v3.PHYVersion
@@ -493,21 +506,23 @@ var file_lorawan_stack_api_networkserver_proto_depIdxs = []int32{
 	11, // 11: ttn.lorawan.v3.NsEndDeviceRegistry.Set:input_type -> ttn.lorawan.v3.SetEndDeviceRequest
 	12, // 12: ttn.lorawan.v3.NsEndDeviceRegistry.ResetFactoryDefaults:input_type -> ttn.lorawan.v3.ResetAndGetEndDeviceRequest
 	7,  // 13: ttn.lorawan.v3.NsEndDeviceRegistry.Delete:input_type -> ttn.lorawan.v3.EndDeviceIdentifiers
-	0,  // 14: ttn.lorawan.v3.Ns.GenerateDevAddr:output_type -> ttn.lorawan.v3.GenerateDevAddrResponse
-	13, // 15: ttn.lorawan.v3.Ns.GetDefaultMACSettings:output_type -> ttn.lorawan.v3.MACSettings
-	2,  // 16: ttn.lorawan.v3.Ns.GetNetID:output_type -> ttn.lorawan.v3.GetNetIDResponse
-	3,  // 17: ttn.lorawan.v3.Ns.GetDeviceAddressPrefixes:output_type -> ttn.lorawan.v3.GetDeviceAdressPrefixesResponse
-	5,  // 18: ttn.lorawan.v3.AsNs.DownlinkQueueReplace:output_type -> google.protobuf.Empty
-	5,  // 19: ttn.lorawan.v3.AsNs.DownlinkQueuePush:output_type -> google.protobuf.Empty
-	14, // 20: ttn.lorawan.v3.AsNs.DownlinkQueueList:output_type -> ttn.lorawan.v3.ApplicationDownlinks
-	5,  // 21: ttn.lorawan.v3.GsNs.HandleUplink:output_type -> google.protobuf.Empty
-	5,  // 22: ttn.lorawan.v3.GsNs.ReportTxAcknowledgment:output_type -> google.protobuf.Empty
-	15, // 23: ttn.lorawan.v3.NsEndDeviceRegistry.Get:output_type -> ttn.lorawan.v3.EndDevice
-	15, // 24: ttn.lorawan.v3.NsEndDeviceRegistry.Set:output_type -> ttn.lorawan.v3.EndDevice
-	15, // 25: ttn.lorawan.v3.NsEndDeviceRegistry.ResetFactoryDefaults:output_type -> ttn.lorawan.v3.EndDevice
-	5,  // 26: ttn.lorawan.v3.NsEndDeviceRegistry.Delete:output_type -> google.protobuf.Empty
-	14, // [14:27] is the sub-list for method output_type
-	1,  // [1:14] is the sub-list for method input_type
+	13, // 14: ttn.lorawan.v3.NsEndDeviceBatchRegistry.Delete:input_type -> ttn.lorawan.v3.BatchDeleteEndDevicesRequest
+	0,  // 15: ttn.lorawan.v3.Ns.GenerateDevAddr:output_type -> ttn.lorawan.v3.GenerateDevAddrResponse
+	14, // 16: ttn.lorawan.v3.Ns.GetDefaultMACSettings:output_type -> ttn.lorawan.v3.MACSettings
+	2,  // 17: ttn.lorawan.v3.Ns.GetNetID:output_type -> ttn.lorawan.v3.GetNetIDResponse
+	3,  // 18: ttn.lorawan.v3.Ns.GetDeviceAddressPrefixes:output_type -> ttn.lorawan.v3.GetDeviceAdressPrefixesResponse
+	5,  // 19: ttn.lorawan.v3.AsNs.DownlinkQueueReplace:output_type -> google.protobuf.Empty
+	5,  // 20: ttn.lorawan.v3.AsNs.DownlinkQueuePush:output_type -> google.protobuf.Empty
+	15, // 21: ttn.lorawan.v3.AsNs.DownlinkQueueList:output_type -> ttn.lorawan.v3.ApplicationDownlinks
+	5,  // 22: ttn.lorawan.v3.GsNs.HandleUplink:output_type -> google.protobuf.Empty
+	5,  // 23: ttn.lorawan.v3.GsNs.ReportTxAcknowledgment:output_type -> google.protobuf.Empty
+	16, // 24: ttn.lorawan.v3.NsEndDeviceRegistry.Get:output_type -> ttn.lorawan.v3.EndDevice
+	16, // 25: ttn.lorawan.v3.NsEndDeviceRegistry.Set:output_type -> ttn.lorawan.v3.EndDevice
+	16, // 26: ttn.lorawan.v3.NsEndDeviceRegistry.ResetFactoryDefaults:output_type -> ttn.lorawan.v3.EndDevice
+	5,  // 27: ttn.lorawan.v3.NsEndDeviceRegistry.Delete:output_type -> google.protobuf.Empty
+	5,  // 28: ttn.lorawan.v3.NsEndDeviceBatchRegistry.Delete:output_type -> google.protobuf.Empty
+	15, // [15:29] is the sub-list for method output_type
+	1,  // [1:15] is the sub-list for method input_type
 	1,  // [1:1] is the sub-list for extension type_name
 	1,  // [1:1] is the sub-list for extension extendee
 	0,  // [0:1] is the sub-list for field type_name
@@ -580,7 +595,7 @@ func file_lorawan_stack_api_networkserver_proto_init() {
 			NumEnums:      0,
 			NumMessages:   4,
 			NumExtensions: 0,
-			NumServices:   4,
+			NumServices:   5,
 		},
 		GoTypes:           file_lorawan_stack_api_networkserver_proto_goTypes,
 		DependencyIndexes: file_lorawan_stack_api_networkserver_proto_depIdxs,

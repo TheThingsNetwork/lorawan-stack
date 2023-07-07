@@ -704,3 +704,23 @@ func (dst *LoRaAllianceProfileIdentifiers) SetFields(src *LoRaAllianceProfileIde
 	}
 	return nil
 }
+
+func (dst *EndDeviceIdentifiersList) SetFields(src *EndDeviceIdentifiersList, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "end_device_ids":
+			if len(subs) > 0 {
+				return fmt.Errorf("'end_device_ids' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.EndDeviceIds = src.EndDeviceIds
+			} else {
+				dst.EndDeviceIds = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}

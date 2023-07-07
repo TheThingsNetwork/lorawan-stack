@@ -87,6 +87,11 @@ type EndDeviceStore interface {
 		ctx context.Context,
 		devsLastSeen []*ttnpb.BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate,
 	) error
+	BatchDeleteEndDevices(
+		ctx context.Context,
+		appIDs *ttnpb.ApplicationIdentifiers,
+		devIDs []string,
+	) ([]*ttnpb.EndDeviceIdentifiers, error)
 }
 
 // GatewayStore interface for storing Gateways.

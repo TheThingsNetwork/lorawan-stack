@@ -1538,10 +1538,22 @@ var file_lorawan_stack_api_applicationserver_proto_rawDesc = []byte{
 	0x70, 0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x73, 0x2e, 0x61, 0x70,
 	0x70, 0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x7d, 0x2f, 0x64, 0x65,
 	0x76, 0x69, 0x63, 0x65, 0x73, 0x2f, 0x7b, 0x64, 0x65, 0x76, 0x69, 0x63, 0x65, 0x5f, 0x69, 0x64,
-	0x7d, 0x42, 0x31, 0x5a, 0x2f, 0x67, 0x6f, 0x2e, 0x74, 0x68, 0x65, 0x74, 0x68, 0x69, 0x6e, 0x67,
-	0x73, 0x2e, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2f, 0x6c, 0x6f, 0x72, 0x61, 0x77, 0x61,
-	0x6e, 0x2d, 0x73, 0x74, 0x61, 0x63, 0x6b, 0x2f, 0x76, 0x33, 0x2f, 0x70, 0x6b, 0x67, 0x2f, 0x74,
-	0x74, 0x6e, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x7d, 0x32, 0xb4, 0x01, 0x0a, 0x18, 0x41, 0x73, 0x45, 0x6e, 0x64, 0x44, 0x65, 0x76, 0x69, 0x63,
+	0x65, 0x42, 0x61, 0x74, 0x63, 0x68, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x79, 0x12, 0x97,
+	0x01, 0x0a, 0x06, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x12, 0x2c, 0x2e, 0x74, 0x74, 0x6e, 0x2e,
+	0x6c, 0x6f, 0x72, 0x61, 0x77, 0x61, 0x6e, 0x2e, 0x76, 0x33, 0x2e, 0x42, 0x61, 0x74, 0x63, 0x68,
+	0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x45, 0x6e, 0x64, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65, 0x73,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x22,
+	0x47, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x41, 0x2a, 0x3f, 0x2f, 0x61, 0x73, 0x2f, 0x61, 0x70, 0x70,
+	0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2f, 0x7b, 0x61, 0x70, 0x70, 0x6c, 0x69,
+	0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x73, 0x2e, 0x61, 0x70, 0x70, 0x6c, 0x69,
+	0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x7d, 0x2f, 0x64, 0x65, 0x76, 0x69, 0x63,
+	0x65, 0x73, 0x2f, 0x62, 0x61, 0x74, 0x63, 0x68, 0x42, 0x31, 0x5a, 0x2f, 0x67, 0x6f, 0x2e, 0x74,
+	0x68, 0x65, 0x74, 0x68, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b,
+	0x2f, 0x6c, 0x6f, 0x72, 0x61, 0x77, 0x61, 0x6e, 0x2d, 0x73, 0x74, 0x61, 0x63, 0x6b, 0x2f, 0x76,
+	0x33, 0x2f, 0x70, 0x6b, 0x67, 0x2f, 0x74, 0x74, 0x6e, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1592,10 +1604,11 @@ var file_lorawan_stack_api_applicationserver_proto_goTypes = []interface{}{
 	(*DownlinkQueueRequest)(nil),                 // 30: ttn.lorawan.v3.DownlinkQueueRequest
 	(*GetEndDeviceRequest)(nil),                  // 31: ttn.lorawan.v3.GetEndDeviceRequest
 	(*SetEndDeviceRequest)(nil),                  // 32: ttn.lorawan.v3.SetEndDeviceRequest
-	(*emptypb.Empty)(nil),                        // 33: google.protobuf.Empty
-	(*ApplicationDownlinks)(nil),                 // 34: ttn.lorawan.v3.ApplicationDownlinks
-	(*MQTTConnectionInfo)(nil),                   // 35: ttn.lorawan.v3.MQTTConnectionInfo
-	(*EndDevice)(nil),                            // 36: ttn.lorawan.v3.EndDevice
+	(*BatchDeleteEndDevicesRequest)(nil),         // 33: ttn.lorawan.v3.BatchDeleteEndDevicesRequest
+	(*emptypb.Empty)(nil),                        // 34: google.protobuf.Empty
+	(*ApplicationDownlinks)(nil),                 // 35: ttn.lorawan.v3.ApplicationDownlinks
+	(*MQTTConnectionInfo)(nil),                   // 36: ttn.lorawan.v3.MQTTConnectionInfo
+	(*EndDevice)(nil),                            // 37: ttn.lorawan.v3.EndDevice
 }
 var file_lorawan_stack_api_applicationserver_proto_depIdxs = []int32{
 	18, // 0: ttn.lorawan.v3.ApplicationLink.default_formatters:type_name -> ttn.lorawan.v3.MessagePayloadFormatters
@@ -1649,26 +1662,28 @@ var file_lorawan_stack_api_applicationserver_proto_depIdxs = []int32{
 	31, // 48: ttn.lorawan.v3.AsEndDeviceRegistry.Get:input_type -> ttn.lorawan.v3.GetEndDeviceRequest
 	32, // 49: ttn.lorawan.v3.AsEndDeviceRegistry.Set:input_type -> ttn.lorawan.v3.SetEndDeviceRequest
 	24, // 50: ttn.lorawan.v3.AsEndDeviceRegistry.Delete:input_type -> ttn.lorawan.v3.EndDeviceIdentifiers
-	1,  // 51: ttn.lorawan.v3.As.GetLink:output_type -> ttn.lorawan.v3.ApplicationLink
-	1,  // 52: ttn.lorawan.v3.As.SetLink:output_type -> ttn.lorawan.v3.ApplicationLink
-	33, // 53: ttn.lorawan.v3.As.DeleteLink:output_type -> google.protobuf.Empty
-	4,  // 54: ttn.lorawan.v3.As.GetLinkStats:output_type -> ttn.lorawan.v3.ApplicationLinkStats
-	7,  // 55: ttn.lorawan.v3.As.GetConfiguration:output_type -> ttn.lorawan.v3.GetAsConfigurationResponse
-	33, // 56: ttn.lorawan.v3.NsAs.HandleUplink:output_type -> google.protobuf.Empty
-	23, // 57: ttn.lorawan.v3.AppAs.Subscribe:output_type -> ttn.lorawan.v3.ApplicationUp
-	33, // 58: ttn.lorawan.v3.AppAs.DownlinkQueuePush:output_type -> google.protobuf.Empty
-	33, // 59: ttn.lorawan.v3.AppAs.DownlinkQueueReplace:output_type -> google.protobuf.Empty
-	34, // 60: ttn.lorawan.v3.AppAs.DownlinkQueueList:output_type -> ttn.lorawan.v3.ApplicationDownlinks
-	35, // 61: ttn.lorawan.v3.AppAs.GetMQTTConnectionInfo:output_type -> ttn.lorawan.v3.MQTTConnectionInfo
-	33, // 62: ttn.lorawan.v3.AppAs.SimulateUplink:output_type -> google.protobuf.Empty
-	10, // 63: ttn.lorawan.v3.AppAs.EncodeDownlink:output_type -> ttn.lorawan.v3.EncodeDownlinkResponse
-	12, // 64: ttn.lorawan.v3.AppAs.DecodeUplink:output_type -> ttn.lorawan.v3.DecodeUplinkResponse
-	14, // 65: ttn.lorawan.v3.AppAs.DecodeDownlink:output_type -> ttn.lorawan.v3.DecodeDownlinkResponse
-	36, // 66: ttn.lorawan.v3.AsEndDeviceRegistry.Get:output_type -> ttn.lorawan.v3.EndDevice
-	36, // 67: ttn.lorawan.v3.AsEndDeviceRegistry.Set:output_type -> ttn.lorawan.v3.EndDevice
-	33, // 68: ttn.lorawan.v3.AsEndDeviceRegistry.Delete:output_type -> google.protobuf.Empty
-	51, // [51:69] is the sub-list for method output_type
-	33, // [33:51] is the sub-list for method input_type
+	33, // 51: ttn.lorawan.v3.AsEndDeviceBatchRegistry.Delete:input_type -> ttn.lorawan.v3.BatchDeleteEndDevicesRequest
+	1,  // 52: ttn.lorawan.v3.As.GetLink:output_type -> ttn.lorawan.v3.ApplicationLink
+	1,  // 53: ttn.lorawan.v3.As.SetLink:output_type -> ttn.lorawan.v3.ApplicationLink
+	34, // 54: ttn.lorawan.v3.As.DeleteLink:output_type -> google.protobuf.Empty
+	4,  // 55: ttn.lorawan.v3.As.GetLinkStats:output_type -> ttn.lorawan.v3.ApplicationLinkStats
+	7,  // 56: ttn.lorawan.v3.As.GetConfiguration:output_type -> ttn.lorawan.v3.GetAsConfigurationResponse
+	34, // 57: ttn.lorawan.v3.NsAs.HandleUplink:output_type -> google.protobuf.Empty
+	23, // 58: ttn.lorawan.v3.AppAs.Subscribe:output_type -> ttn.lorawan.v3.ApplicationUp
+	34, // 59: ttn.lorawan.v3.AppAs.DownlinkQueuePush:output_type -> google.protobuf.Empty
+	34, // 60: ttn.lorawan.v3.AppAs.DownlinkQueueReplace:output_type -> google.protobuf.Empty
+	35, // 61: ttn.lorawan.v3.AppAs.DownlinkQueueList:output_type -> ttn.lorawan.v3.ApplicationDownlinks
+	36, // 62: ttn.lorawan.v3.AppAs.GetMQTTConnectionInfo:output_type -> ttn.lorawan.v3.MQTTConnectionInfo
+	34, // 63: ttn.lorawan.v3.AppAs.SimulateUplink:output_type -> google.protobuf.Empty
+	10, // 64: ttn.lorawan.v3.AppAs.EncodeDownlink:output_type -> ttn.lorawan.v3.EncodeDownlinkResponse
+	12, // 65: ttn.lorawan.v3.AppAs.DecodeUplink:output_type -> ttn.lorawan.v3.DecodeUplinkResponse
+	14, // 66: ttn.lorawan.v3.AppAs.DecodeDownlink:output_type -> ttn.lorawan.v3.DecodeDownlinkResponse
+	37, // 67: ttn.lorawan.v3.AsEndDeviceRegistry.Get:output_type -> ttn.lorawan.v3.EndDevice
+	37, // 68: ttn.lorawan.v3.AsEndDeviceRegistry.Set:output_type -> ttn.lorawan.v3.EndDevice
+	34, // 69: ttn.lorawan.v3.AsEndDeviceRegistry.Delete:output_type -> google.protobuf.Empty
+	34, // 70: ttn.lorawan.v3.AsEndDeviceBatchRegistry.Delete:output_type -> google.protobuf.Empty
+	52, // [52:71] is the sub-list for method output_type
+	33, // [33:52] is the sub-list for method input_type
 	33, // [33:33] is the sub-list for extension type_name
 	33, // [33:33] is the sub-list for extension extendee
 	0,  // [0:33] is the sub-list for field type_name
@@ -1897,7 +1912,7 @@ func file_lorawan_stack_api_applicationserver_proto_init() {
 			NumEnums:      1,
 			NumMessages:   17,
 			NumExtensions: 0,
-			NumServices:   4,
+			NumServices:   5,
 		},
 		GoTypes:           file_lorawan_stack_api_applicationserver_proto_goTypes,
 		DependencyIndexes: file_lorawan_stack_api_applicationserver_proto_depIdxs,

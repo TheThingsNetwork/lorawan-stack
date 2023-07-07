@@ -920,26 +920,128 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 }
 
 // Range ranges over device uid keys in DeviceRegistry.
-func (r *DeviceRegistry) Range(ctx context.Context, paths []string, f func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
+func (r *DeviceRegistry) Range(
+	ctx context.Context,
+	paths []string,
+	f func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool,
+) error {
 	deviceEntityRegex, err := ttnredis.EntityRegex((r.uidKey(unique.GenericID(ctx, "*"))))
 	if err != nil {
 		return err
 	}
-	return ttnredis.RangeRedisKeys(ctx, r.Redis, r.uidKey(unique.GenericID(ctx, "*")), ttnredis.DefaultRangeCount, func(key string) (bool, error) {
-		if !deviceEntityRegex.MatchString(key) {
+	return ttnredis.RangeRedisKeys(
+		ctx,
+		r.Redis,
+		r.uidKey(unique.GenericID(ctx, "*")),
+		ttnredis.DefaultRangeCount,
+		func(key string) (bool, error) {
+			if !deviceEntityRegex.MatchString(key) {
+				return true, nil
+			}
+			dev := &ttnpb.EndDevice{}
+			if err := ttnredis.GetProto(ctx, r.Redis, key).ScanProto(dev); err != nil {
+				return false, err
+			}
+			dev, err := ttnpb.FilterGetEndDevice(dev, paths...)
+			if err != nil {
+				return false, err
+			}
+			if !f(ctx, dev.Ids, dev) {
+				return false, nil
+			}
 			return true, nil
-		}
-		dev := &ttnpb.EndDevice{}
-		if err := ttnredis.GetProto(ctx, r.Redis, key).ScanProto(dev); err != nil {
-			return false, err
-		}
-		dev, err := ttnpb.FilterGetEndDevice(dev, paths...)
+		})
+}
+
+// BatchDelete implements DeviceRegistry.
+// This function deletes all the devices in a single transaction.
+func (r *DeviceRegistry) BatchDelete(
+	ctx context.Context,
+	appIDs *ttnpb.ApplicationIdentifiers,
+	deviceIDs []string,
+) ([]*ttnpb.EndDeviceIdentifiers, error) {
+	var (
+		uidKeys = make([]string, 0, len(deviceIDs))
+		ret     = make([]*ttnpb.EndDeviceIdentifiers, 0)
+	)
+	for _, devID := range deviceIDs {
+		uidKeys = append(
+			uidKeys,
+			r.uidKey(
+				unique.ID(
+					ctx,
+					&ttnpb.EndDeviceIdentifiers{
+						ApplicationIds: appIDs,
+						DeviceId:       devID,
+					}),
+			),
+		)
+	}
+
+	// Delete the devices in a single transaction.
+	transaction := func(tx *redis.Tx) error {
+		// Read the devices to delete.
+		addrMapping := make(map[string][]string)
+		raw, err := tx.MGet(ctx, uidKeys...).Result()
 		if err != nil {
-			return false, err
+			return err
 		}
-		if !f(ctx, dev.Ids, dev) {
-			return false, nil
+		euiKeys := make([]string, 0, len(raw))
+		for _, raw := range raw {
+			switch val := raw.(type) {
+			case nil:
+				continue
+			case string:
+				dev := &ttnpb.EndDevice{}
+				if err := ttnredis.UnmarshalProto(val, dev); err != nil {
+					log.FromContext(ctx).WithError(err).Warn("Failed to decode stored end device")
+					continue
+				}
+				ret = append(ret, dev.Ids)
+				uid := unique.ID(ctx, dev.GetIds())
+				if dev.Ids.JoinEui != nil && dev.Ids.DevEui != nil {
+					euiKeys = append(euiKeys, r.euiKey(
+						types.MustEUI64(dev.GetIds().GetJoinEui()).OrZero(),
+						types.MustEUI64(dev.GetIds().GetDevEui()).OrZero(),
+					))
+				}
+				if dev.PendingSession != nil {
+					addrMapping[uid] = []string{
+						PendingAddrKey(r.addrKey(
+							types.MustDevAddr(dev.PendingSession.DevAddr).OrZero(),
+						)),
+					}
+				}
+				if dev.Session != nil {
+					addrMapping[uid] = append(addrMapping[uid], []string{
+						CurrentAddrKey(r.addrKey(
+							types.MustDevAddr(dev.Session.DevAddr).OrZero(),
+						)),
+					}...)
+				}
+			}
 		}
-		return true, nil
-	})
+		if err := tx.Watch(ctx, euiKeys...).Err(); err != nil {
+			return err
+		}
+		if _, err := tx.TxPipelined(ctx, func(p redis.Pipeliner) error {
+			p.Del(ctx, append(uidKeys, euiKeys...)...)
+			for uid, keys := range addrMapping {
+				for _, key := range keys {
+					removeAddrMapping(ctx, p, key, uid)
+				}
+			}
+			return nil
+		}); err != nil {
+			return err
+		}
+		return nil
+	}
+
+	defer trace.StartRegion(ctx, "batch delete end devices").End()
+	err := r.Redis.Watch(ctx, transaction, uidKeys...)
+	if err != nil {
+		return nil, ttnredis.ConvertError(err)
+	}
+	return ret, nil
 }

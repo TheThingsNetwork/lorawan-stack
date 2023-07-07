@@ -66,7 +66,7 @@ func ttnPath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return path.Join(configPath, "ttn-lorawan"), nil
+	return path.Join(configPath, "ttn-lw-cli"), nil
 }
 
 // cliStatePath returns the path to the file in which the CLI telemetry is stored.
@@ -75,7 +75,7 @@ func cliStatePath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return path.Join(p, "cli-telemetry-state.yml"), nil
+	return path.Join(p, "telemetry.yml"), nil
 }
 
 // getCLIState returns the telemetry state, if it doesn't exist it creates a file with default values for the state.

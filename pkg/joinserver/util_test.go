@@ -32,4 +32,7 @@ func (p *byteToSerialNumber) UniqueID(entry *structpb.Struct) (string, error) {
 
 func init() {
 	provisioning.Register("mock", &byteToSerialNumber{})
+	provisioning.Register("mock-provisioner-1", &byteToSerialNumber{})
+	provisioning.Register("mock-provisioner-2", &byteToSerialNumber{})
+	provisioning.Register("mock-provisioner-3", &byteToSerialNumber{})
 }

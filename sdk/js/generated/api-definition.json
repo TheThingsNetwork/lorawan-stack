@@ -529,6 +529,20 @@
       ]
     }
   },
+  "AsEndDeviceBatchRegistry": {
+    "Delete": {
+      "file": "lorawan-stack/api/applicationserver.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/as/applications/{application_ids.application_id}/devices/batch",
+          "parameters": [
+            "application_ids.application_id"
+          ]
+        }
+      ]
+    }
+  },
   "AsEndDeviceRegistry": {
     "Get": {
       "file": "lorawan-stack/api/applicationserver.proto",
@@ -2697,6 +2711,20 @@
       ]
     }
   },
+  "EndDeviceBatchRegistry": {
+    "Delete": {
+      "file": "lorawan-stack/api/end_device_services.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/applications/{application_ids.application_id}/devices/batch",
+          "parameters": [
+            "application_ids.application_id"
+          ]
+        }
+      ]
+    }
+  },
   "EndDeviceRegistry": {
     "Create": {
       "file": "lorawan-stack/api/end_device_services.proto",
@@ -3602,6 +3630,20 @@
       ]
     }
   },
+  "JsEndDeviceBatchRegistry": {
+    "Delete": {
+      "file": "lorawan-stack/api/joinserver.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/js/applications/{application_ids.application_id}/devices/batch",
+          "parameters": [
+            "application_ids.application_id"
+          ]
+        }
+      ]
+    }
+  },
   "JsEndDeviceRegistry": {
     "Get": {
       "file": "lorawan-stack/api/joinserver.proto",
@@ -3824,6 +3866,20 @@
           "method": "get",
           "pattern": "/ns/dev_addr_prefixes",
           "parameters": []
+        }
+      ]
+    }
+  },
+  "NsEndDeviceBatchRegistry": {
+    "Delete": {
+      "file": "lorawan-stack/api/networkserver.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/ns/applications/{application_ids.application_id}/devices/batch",
+          "parameters": [
+            "application_ids.application_id"
+          ]
         }
       ]
     }

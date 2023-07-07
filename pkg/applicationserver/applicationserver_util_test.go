@@ -29,7 +29,13 @@ var (
 // MockDeviceRegistry is a mock DeviceRegistry used for testing.
 type MockDeviceRegistry struct {
 	GetFunc func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error)
-	SetFunc func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
+	SetFunc func(
+		ctx context.Context,
+		ids *ttnpb.EndDeviceIdentifiers,
+		paths []string,
+		f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error),
+	) (*ttnpb.EndDevice, error)
+	BatchDeleteFunc func(context.Context, *ttnpb.ApplicationIdentifiers, []string) ([]*ttnpb.EndDeviceIdentifiers, error)
 }
 
 // Get calls GetFunc if set and panics otherwise.
@@ -82,4 +88,16 @@ func (m MockLinkRegistry) Set(ctx context.Context, ids *ttnpb.ApplicationIdentif
 		panic("Set called, but not set")
 	}
 	return m.SetFunc(ctx, ids, paths, f)
+}
+
+// BatchDelete calls BatchDeleteFunc if set and panics otherwise.
+func (r MockDeviceRegistry) BatchDelete(
+	ctx context.Context,
+	appIDs *ttnpb.ApplicationIdentifiers,
+	deviceIDs []string,
+) ([]*ttnpb.EndDeviceIdentifiers, error) {
+	if r.BatchDeleteFunc == nil {
+		panic("BatchDelete called, but not set")
+	}
+	return r.BatchDeleteFunc(ctx, appIDs, deviceIDs)
 }

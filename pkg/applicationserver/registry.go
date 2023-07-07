@@ -31,6 +31,12 @@ type DeviceRegistry interface {
 	Set(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
 	// Range ranges over the end devices and calls the callback function, until false is returned.
 	Range(ctx context.Context, paths []string, f func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error
+	// BatchDelete deletes a batch of end devices.
+	BatchDelete(
+		ctx context.Context,
+		appIDs *ttnpb.ApplicationIdentifiers,
+		deviceIDs []string,
+	) ([]*ttnpb.EndDeviceIdentifiers, error)
 }
 
 type replacedEndDeviceFieldRegistryWrapper struct {
@@ -77,6 +83,14 @@ func (w replacedEndDeviceFieldRegistryWrapper) Set(ctx context.Context, ids *ttn
 		d.GetTransform(dev)
 	}
 	return dev, nil
+}
+
+func (w replacedEndDeviceFieldRegistryWrapper) BatchDelete(
+	ctx context.Context,
+	appIDs *ttnpb.ApplicationIdentifiers,
+	deviceIDs []string,
+) ([]*ttnpb.EndDeviceIdentifiers, error) {
+	return w.registry.BatchDelete(ctx, appIDs, deviceIDs)
 }
 
 func (w replacedEndDeviceFieldRegistryWrapper) Range(ctx context.Context, paths []string, f func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
@@ -145,4 +159,6 @@ type ApplicationUplinkRegistry interface {
 	Push(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink) error
 	// Clear empties the uplink messages storage by the end device identifiers.
 	Clear(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) error
+	// BatchClear empties the uplink messages storage of multiple end devices.
+	BatchClear(ctx context.Context, devIDs []*ttnpb.EndDeviceIdentifiers) error
 }

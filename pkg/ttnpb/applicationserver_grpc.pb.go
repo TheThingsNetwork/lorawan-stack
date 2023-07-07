@@ -984,3 +984,100 @@ var AsEndDeviceRegistry_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "lorawan-stack/api/applicationserver.proto",
 }
+
+const (
+	AsEndDeviceBatchRegistry_Delete_FullMethodName = "/ttn.lorawan.v3.AsEndDeviceBatchRegistry/Delete"
+)
+
+// AsEndDeviceBatchRegistryClient is the client API for AsEndDeviceBatchRegistry service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type AsEndDeviceBatchRegistryClient interface {
+	// Delete a list of devices within the same application.
+	// This operation is atomic; either all devices are deleted or none.
+	// Devices not found are skipped and no error is returned.
+	Delete(ctx context.Context, in *BatchDeleteEndDevicesRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+}
+
+type asEndDeviceBatchRegistryClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewAsEndDeviceBatchRegistryClient(cc grpc.ClientConnInterface) AsEndDeviceBatchRegistryClient {
+	return &asEndDeviceBatchRegistryClient{cc}
+}
+
+func (c *asEndDeviceBatchRegistryClient) Delete(ctx context.Context, in *BatchDeleteEndDevicesRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, AsEndDeviceBatchRegistry_Delete_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// AsEndDeviceBatchRegistryServer is the server API for AsEndDeviceBatchRegistry service.
+// All implementations must embed UnimplementedAsEndDeviceBatchRegistryServer
+// for forward compatibility
+type AsEndDeviceBatchRegistryServer interface {
+	// Delete a list of devices within the same application.
+	// This operation is atomic; either all devices are deleted or none.
+	// Devices not found are skipped and no error is returned.
+	Delete(context.Context, *BatchDeleteEndDevicesRequest) (*emptypb.Empty, error)
+	mustEmbedUnimplementedAsEndDeviceBatchRegistryServer()
+}
+
+// UnimplementedAsEndDeviceBatchRegistryServer must be embedded to have forward compatible implementations.
+type UnimplementedAsEndDeviceBatchRegistryServer struct {
+}
+
+func (UnimplementedAsEndDeviceBatchRegistryServer) Delete(context.Context, *BatchDeleteEndDevicesRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedAsEndDeviceBatchRegistryServer) mustEmbedUnimplementedAsEndDeviceBatchRegistryServer() {
+}
+
+// UnsafeAsEndDeviceBatchRegistryServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to AsEndDeviceBatchRegistryServer will
+// result in compilation errors.
+type UnsafeAsEndDeviceBatchRegistryServer interface {
+	mustEmbedUnimplementedAsEndDeviceBatchRegistryServer()
+}
+
+func RegisterAsEndDeviceBatchRegistryServer(s grpc.ServiceRegistrar, srv AsEndDeviceBatchRegistryServer) {
+	s.RegisterService(&AsEndDeviceBatchRegistry_ServiceDesc, srv)
+}
+
+func _AsEndDeviceBatchRegistry_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BatchDeleteEndDevicesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AsEndDeviceBatchRegistryServer).Delete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AsEndDeviceBatchRegistry_Delete_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AsEndDeviceBatchRegistryServer).Delete(ctx, req.(*BatchDeleteEndDevicesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// AsEndDeviceBatchRegistry_ServiceDesc is the grpc.ServiceDesc for AsEndDeviceBatchRegistry service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var AsEndDeviceBatchRegistry_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "ttn.lorawan.v3.AsEndDeviceBatchRegistry",
+	HandlerType: (*AsEndDeviceBatchRegistryServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Delete",
+			Handler:    _AsEndDeviceBatchRegistry_Delete_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "lorawan-stack/api/applicationserver.proto",
+}

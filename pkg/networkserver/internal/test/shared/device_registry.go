@@ -134,7 +134,12 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 		t, a := test.MustNewTFromContext(ctx)
 		t.Helper()
 
-		stored, storedCtx, err := reg.GetByID(ctx, pb.Ids.ApplicationIds, pb.Ids.DeviceId, ttnpb.EndDeviceFieldPathsTopLevel)
+		stored, storedCtx, err := reg.GetByID(
+			ctx,
+			pb.Ids.ApplicationIds,
+			pb.Ids.DeviceId,
+			ttnpb.EndDeviceFieldPathsTopLevel,
+		)
 		if !test.AllTrue(
 			a.So(err, should.NotBeNil),
 			a.So(errors.IsNotFound(err), should.BeTrue),
@@ -272,25 +277,39 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 				},
 			},
 		},
-		MacState: MakeDefaultEU868MACState(ttnpb.Class_CLASS_A, ttnpb.MACVersion_MAC_V1_0_3, ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
+		MacState: MakeDefaultEU868MACState(
+			ttnpb.Class_CLASS_A,
+			ttnpb.MACVersion_MAC_V1_0_3,
+			ttnpb.PHYVersion_RP001_V1_0_3_REV_A,
+		),
 		PendingSession: &ttnpb.Session{
 			DevAddr: types.DevAddr{0x43, 0xff, 0xff, 0xff}.Bytes(),
 			Keys: &ttnpb.SessionKeys{
 				FNwkSIntKey: &ttnpb.KeyEnvelope{
-					EncryptedKey: []byte{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe},
-					KekLabel:     "kek-label",
+					EncryptedKey: []byte{
+						0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe,
+					},
+					KekLabel: "kek-label",
 				},
 				SNwkSIntKey: &ttnpb.KeyEnvelope{
-					EncryptedKey: []byte{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfd},
-					KekLabel:     "kek-label",
+					EncryptedKey: []byte{
+						0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfd,
+					},
+					KekLabel: "kek-label",
 				},
 				NwkSEncKey: &ttnpb.KeyEnvelope{
-					EncryptedKey: []byte{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfc},
-					KekLabel:     "kek-label",
+					EncryptedKey: []byte{
+						0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfc,
+					},
+					KekLabel: "kek-label",
 				},
 			},
 		},
-		PendingMacState: MakeDefaultEU868MACState(ttnpb.Class_CLASS_A, ttnpb.MACVersion_MAC_V1_1, ttnpb.PHYVersion_RP001_V1_1_REV_B),
+		PendingMacState: MakeDefaultEU868MACState(
+			ttnpb.Class_CLASS_A,
+			ttnpb.MACVersion_MAC_V1_1,
+			ttnpb.PHYVersion_RP001_V1_1_REV_B,
+		),
 	}
 	pbFields := []string{
 		"frequency_plan_id",
@@ -390,6 +409,54 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 
 	if !a.So(assertNoDevice(ctx, pbOther), should.BeTrue) {
 		t.Fatalf("Failed to assert registry emptiness after pbOther deletion")
+	}
+
+	// Batch Operations
+	pb1 := ttnpb.Clone(pb)
+	pb1.Ids.DeviceId = "test-dev-1"
+	pb1.Ids.DevEui = types.EUI64{0x42, 0x43, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes()
+
+	pb2 := ttnpb.Clone(pb)
+	pb2.Ids.DeviceId = "test-dev-2"
+	pb2.Ids.DevEui = types.EUI64{0x42, 0x44, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes()
+
+	pb3 := ttnpb.Clone(pb)
+	pb3.Ids.DeviceId = "test-dev-3"
+	pb3.Ids.DevEui = types.EUI64{0x42, 0x45, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes()
+	pb3.PendingSession = nil
+
+	// Create the devices
+	for _, pb := range []*ttnpb.EndDevice{pb1, pb2, pb3} {
+		assertCreateDevice(ctx, pb, pbFields...)
+	}
+
+	// Batch Delete
+	deleted, err := reg.BatchDelete(
+		ctx,
+		pb.Ids.ApplicationIds,
+		[]string{
+			pb1.Ids.DeviceId,
+			pb2.Ids.DeviceId,
+			pb3.Ids.DeviceId,
+			// This unknown device will be ignored.
+			"test-dev-4",
+		},
+	)
+	if !a.So(err, should.BeNil) {
+		t.Fatalf("BatchDelete failed with: %s", errors.Stack(err))
+	}
+	if !a.So(deleted, should.HaveLength, 3) {
+		t.Fatalf("BatchDelete returned wrong number of devices: %d", len(deleted))
+	}
+	if !a.So(deleted, should.Resemble, []*ttnpb.EndDeviceIdentifiers{pb1.Ids, pb2.Ids, pb3.Ids}) {
+		t.Fatalf("Unexpected response from BatchDelete: %s", deleted)
+	}
+
+	// Check that the devices are deleted
+	for _, pb := range []*ttnpb.EndDevice{pb1, pb2, pb3} {
+		if !a.So(assertNoDevice(ctx, pb), should.BeTrue) {
+			t.Fatalf("Registry not empty after BatchDelete")
+		}
 	}
 }
 
