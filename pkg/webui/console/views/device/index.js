@@ -20,6 +20,7 @@ import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { selectNsConfig } from '@ttn-lw/lib/selectors/env'
+import { combineDeviceIds } from '@ttn-lw/lib/selectors/id'
 
 import {
   mayReadApplicationDeviceKeys,
@@ -99,7 +100,10 @@ const DeviceContainer = props => {
     [appId, devId, deviceSelector, linkSelector, mayViewLink],
   )
 
-  useEffect(() => () => dispatch(stopDeviceEventsStream(devId)), [dispatch, devId])
+  useEffect(
+    () => () => dispatch(stopDeviceEventsStream(combineDeviceIds(appId, devId))),
+    [appId, devId, dispatch],
+  )
 
   return (
     <RequireRequest requestAction={loadDeviceData}>
