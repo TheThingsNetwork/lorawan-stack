@@ -15,6 +15,7 @@ For details about compatibility between different releases, see the **Commitment
 - RPCs and CLI command to delete a batch of end devices within an application.
   - Check `ttn-lw-cli end-devices batch-delete` for more details.
 - Add `UserInput` component to the Console to handle user id input fields by implementing an autosuggest.
+- The Identity Server configuration has a new optional restriction regarding adminstrative and technical contacts of entities. This limits the action of an user or organization to set these contacts only to themselves, it is disabled by default but it is possible to enable it by setting `is.collaborator-rights.set-others-as-contacts` as false.
 
 ### Changed
 
