@@ -93,6 +93,8 @@ const Suggest = ({ entity, ...rest }) => {
     <Field
       {...rest}
       component={Select.Suggested}
+      openMenuOnFocus={false}
+      openMenuOnClick={false}
       noOptionsMessage={handleNoOptions}
       loadOptions={handleLoadingOptions}
       autoFocus
