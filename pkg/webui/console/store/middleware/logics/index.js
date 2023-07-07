@@ -35,6 +35,7 @@ import deviceRepository from './device-repository'
 import packetBroker from './packet-broker'
 import networkServer from './network-server'
 import qrCodeGenerator from './qr-code-generator'
+import searchAccounts from './search-accounts'
 
 export default [
   ...status,
@@ -59,4 +60,5 @@ export default [
   ...collaborators,
   ...networkServer,
   ...qrCodeGenerator,
+  ...searchAccounts,
 ]

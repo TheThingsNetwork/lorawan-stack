@@ -106,9 +106,12 @@ const Button = forwardRef((props, ref) => {
         return
       }
 
-      onClick(evt)
+      // Passing a value to the onClick handler is useful for components that
+      // are rendered multiple times, e.g. in a list. The value can be used to
+      // identify the component that was clicked.
+      onClick(evt, value)
     },
-    [busy, disabled, onClick],
+    [busy, disabled, onClick, value],
   )
 
   const intl = useIntl()

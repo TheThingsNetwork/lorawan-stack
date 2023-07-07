@@ -32,6 +32,7 @@ import error from '@ttn-lw/lib/store/reducers/ui/error'
 import status from '@ttn-lw/lib/store/reducers/status'
 import init from '@ttn-lw/lib/store/reducers/init'
 import collaborators from '@ttn-lw/lib/store/reducers/collaborators'
+import searchAccounts from '@ttn-lw/lib/store/reducers/search-accounts'
 import { SHARED_NAME as COLLABORATORS_SHARED_NAME } from '@ttn-lw/lib/store/actions/collaborators'
 
 import { SHARED_NAME as API_KEYS_SHARED_NAME } from '@console/store/actions/api-keys'
@@ -119,4 +120,5 @@ export default combineReducers({
   deviceRepository,
   packetBroker,
   ns,
+  searchAccounts,
 })

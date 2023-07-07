@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,16 +13,15 @@
 // limitations under the License.
 
 import React, { useCallback, useState } from 'react'
-import ReactSelect, { components } from 'react-select'
+import { components } from 'react-select'
+import AsyncSelect from 'react-select/async'
 import { useIntl } from 'react-intl'
 import classnames from 'classnames'
+import { debounce } from 'lodash'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import Icon from '../icon'
-
-import SuggestedSelect from './suggested-select'
-import SuggestedMultiSelect from './multi-select'
 
 import style from './select.styl'
 
@@ -56,17 +55,12 @@ Input.propTypes = {
   }).isRequired,
 }
 
-// Map value to a plain string, instead of value object.
-// See: https://github.com/JedWatson/react-select/issues/2841
-const getValue = (opts, val) => opts.find(o => o.value === val)
-
-const Select = props => {
+const SuggestedSelect = props => {
   const {
     value,
     name,
     onBlur,
     onChange,
-    hasAutosuggest,
     loadOptions,
     className,
     options,
@@ -86,14 +80,14 @@ const Select = props => {
   const [inputValue, setInputValue] = useState(value)
 
   const handleChange = useCallback(
-    value => {
-      if (!('value' in props)) {
-        setInputValue(value?.value)
+    selectedValue => {
+      if (!Boolean(value)) {
+        setInputValue(selectedValue)
       }
 
-      onChange(value?.value, true)
+      onChange(selectedValue)
     },
-    [onChange, props],
+    [setInputValue, value, onChange],
   )
 
   const handleBlur = useCallback(
@@ -112,41 +106,38 @@ const Select = props => {
     [onBlur, name, inputValue],
   )
 
+  const debouncedFetch = debounce((query, callback) => {
+    loadOptions(query).then(result => callback(result))
+  }, 500)
+
   const cls = classnames(className, style.container, style[`input-width-${inputWidth}`], {
     [style.error]: error,
     [style.warning]: warning,
   })
 
-  const translatedOptions = options?.map(option => {
-    const { label, labelValues = {} } = option
-    if (typeof label === 'object' && label.id && label.defaultMessage) {
-      return { ...option, label: formatMessage(label, labelValues) }
-    }
-
-    return option
-  })
-
   return (
-    <ReactSelect
+    <AsyncSelect
+      {...rest}
+      loadOptions={debouncedFetch}
       className={cls}
       inputId={id}
       classNamePrefix="select"
-      value={getValue(translatedOptions, value) || null}
-      options={translatedOptions}
       onChange={handleChange}
-      onBlur={handleBlur}
       onFocus={onFocus}
+      onBlur={handleBlur}
       isDisabled={disabled}
+      isClearable
+      value={inputValue}
       name={name}
-      components={{ Input }}
+      showOptionIcon={showOptionIcon}
+      components={{ Input, Option: customOption, ...customComponents }}
       aria-describedby={rest['aria-describedby']}
       placeholder={Boolean(placeholder) ? formatMessage(placeholder) : undefined}
-      {...rest}
     />
   )
 }
 
-Select.propTypes = {
+SuggestedSelect.propTypes = {
   className: PropTypes.string,
   customComponents: PropTypes.shape({
     Option: PropTypes.func,
@@ -154,7 +145,6 @@ Select.propTypes = {
   }),
   disabled: PropTypes.bool,
   error: PropTypes.bool,
-  hasAutosuggest: PropTypes.bool,
   id: PropTypes.string,
   inputWidth: PropTypes.inputWidth,
   loadOptions: PropTypes.func,
@@ -171,11 +161,11 @@ Select.propTypes = {
   ),
   placeholder: PropTypes.message,
   showOptionIcon: PropTypes.bool,
-  value: PropTypes.oneOf([PropTypes.string, PropTypes.shape({})]),
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.shape({})]),
   warning: PropTypes.bool,
 }
 
-Select.defaultProps = {
+SuggestedSelect.defaultProps = {
   className: undefined,
   onChange: () => null,
   onBlur: () => null,
@@ -189,16 +179,9 @@ Select.defaultProps = {
   inputWidth: 'm',
   placeholder: undefined,
   menuPlacement: 'auto',
-  hasAutosuggest: false,
   loadOptions: () => null,
   showOptionIcon: false,
   customComponents: {},
 }
 
-Select.Suggested = SuggestedSelect
-Select.Suggested.displayName = 'Select.Suggested'
-
-Select.Multi = SuggestedMultiSelect
-Select.Multi.displayName = 'Select.Multi'
-
-export default Select
+export default SuggestedSelect
