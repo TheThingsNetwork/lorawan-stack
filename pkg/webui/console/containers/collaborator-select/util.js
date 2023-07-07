@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const composeOption = value => ({
+export const composeOption = value => ({
   value:
     'user_ids' in value?.ids
       ? value.ids?.user_ids.user_id
@@ -24,4 +24,19 @@ const composeOption = value => ({
   icon: 'user_ids' in value?.ids ? 'user' : 'organization',
 })
 
-export default composeOption
+export const composeContactOption = value => ({
+  value: 'user_ids' in value ? value.user_ids.user_id : value.organization_ids.organization_id,
+  label: 'user_ids' in value ? value.user_ids.user_id : value.organization_ids.organization_id,
+  icon: 'user_ids' in value ? 'user' : 'organization',
+})
+
+export const encodeContact = value =>
+  value
+    ? {
+        [`${value.icon}_ids`]: {
+          [`${value.icon}_id`]: value.value,
+        },
+      }
+    : null
+
+export const decodeContact = value => (value && value.ids ? composeContactOption(value) : null)

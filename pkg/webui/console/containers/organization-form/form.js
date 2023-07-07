@@ -19,7 +19,6 @@ import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
-import ContactFields from '@ttn-lw/components/contact-fields'
 import Notification from '@ttn-lw/components/notification'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -116,10 +115,6 @@ const OrganizationForm = props => {
           <Notification small warning content={m.contactWarning} />
           <div>
             <Message content={sharedMessages.adminContact} component="h4" className="mt-cs-xs" />
-            <ContactFields
-              name="administrative"
-              hasInitialValue={Boolean(initialValues._administrative_contact_id)}
-            />
             <Message
               content={m.adminContactDescription}
               component="p"
@@ -128,10 +123,6 @@ const OrganizationForm = props => {
           </div>
           <div>
             <Message content={sharedMessages.technicalContact} component="h4" />
-            <ContactFields
-              name="technical"
-              hasInitialValue={Boolean(initialValues._technical_contact_id)}
-            />
             <Message
               content={m.techContactDescription}
               component="p"

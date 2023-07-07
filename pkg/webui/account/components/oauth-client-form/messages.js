@@ -60,4 +60,5 @@ export default defineMessages({
     'Administrative contact information for this application. Typically used to indicate who to contact with administrative questions about the application.',
   techContactDescription:
     'Technical contact information for this application. Typically used to indicate who to contact with technical/security questions about the application.',
+  contactPlaceholder: 'Type to choose a contact',
 })

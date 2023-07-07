@@ -14,6 +14,7 @@
 
 import React, { useCallback } from 'react'
 import { useIntl } from 'react-intl'
+import { useSelector } from 'react-redux'
 
 import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
 import Checkbox from '@ttn-lw/components/checkbox'
@@ -25,13 +26,19 @@ import Select from '@ttn-lw/components/select'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import RightsGroup from '@ttn-lw/components/rights-group'
-import ContactFields from '@ttn-lw/components/contact-fields'
 
 import Message from '@ttn-lw/lib/components/message'
+
+import CollaboratorSelect from '@console/containers/collaborator-select'
+import { decodeContact, encodeContact } from '@console/containers/collaborator-select/util'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import capitalizeMessage from '@ttn-lw/lib/capitalize-message'
+
+import { checkFromState, mayEditBasicClientInformation } from '@account/lib/feature-checks'
+
+import { selectSelectedClientId } from '@account/store/selectors/clients'
 
 import { approvalStates, encodeGrants, decodeGrants } from './utils'
 import validationSchema from './validation-schema'
@@ -48,9 +55,13 @@ const OAuthClientForm = props => {
     initialValues: values,
     onSubmit,
     onDelete,
-    mayEditBasicInformation,
   } = props
   const { formatMessage } = useIntl()
+
+  const clientId = useSelector(selectSelectedClientId)
+  const mayEditBasicInformation = useSelector(state =>
+    checkFromState(mayEditBasicClientInformation, state),
+  )
 
   const approvalStateOptions = approvalStates.map(state => ({
     value: state,
@@ -165,10 +176,14 @@ const OAuthClientForm = props => {
           <Form.SubTitle title={sharedMessages.contactInformation} className="mb-cs-s" />
           <Notification small warning content={m.contactWarning} />
           <div>
-            <Message content={sharedMessages.adminContact} component="h4" className="mt-cs-xs" />
-            <ContactFields
-              name="administrative"
-              hasInitialValue={Boolean(initialValues._administrative_contact_id)}
+            <CollaboratorSelect
+              name="administrative_contact"
+              title={'Administrative contact'}
+              placeholder={m.contactPlaceholder}
+              entity={'client'}
+              entityId={clientId}
+              encode={encodeContact}
+              decode={decodeContact}
             />
             <Message
               content={m.adminContactDescription}
@@ -177,10 +192,14 @@ const OAuthClientForm = props => {
             />
           </div>
           <div>
-            <Message content={sharedMessages.technicalContact} component="h4" />
-            <ContactFields
-              name="technical"
-              hasInitialValue={Boolean(initialValues._technical_contact_id)}
+            <CollaboratorSelect
+              name="technical_contact"
+              title={'Technical contact'}
+              placeholder={m.contactPlaceholder}
+              entity={'client'}
+              entityId={clientId}
+              encode={encodeContact}
+              decode={decodeContact}
             />
             <Message
               content={m.techContactDescription}
@@ -248,7 +267,6 @@ OAuthClientForm.propTypes = {
     description: PropTypes.string,
   }),
   isAdmin: PropTypes.bool.isRequired,
-  mayEditBasicInformation: PropTypes.bool,
   onDelete: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   pseudoRights: PropTypes.rights.isRequired,
@@ -273,7 +291,6 @@ OAuthClientForm.defaultProps = {
     state_description: '',
   },
   update: false,
-  mayEditBasicInformation: false,
   rights: undefined,
   error: undefined,
   onDelete: () => null,

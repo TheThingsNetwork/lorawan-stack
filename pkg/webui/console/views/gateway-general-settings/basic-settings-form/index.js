@@ -21,13 +21,7 @@ import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import Checkbox from '@ttn-lw/components/checkbox'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
-import ContactFields from '@ttn-lw/components/contact-fields'
 import Notification from '@ttn-lw/components/notification'
-import {
-  composeContact,
-  getAdministrativeContact,
-  getTechnicalContact,
-} from '@ttn-lw/components/contact-fields/utils'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -95,24 +89,7 @@ const BasicSettingsForm = React.memo(props => {
         castedValues.lbs_lns_secret = null
       }
 
-      const {
-        _administrative_contact_id,
-        _administrative_contact_type,
-        _technical_contact_id,
-        _technical_contact_type,
-      } = castedValues
-
-      const administrative_contact =
-        _administrative_contact_id !== ''
-          ? composeContact(_administrative_contact_type, _administrative_contact_id)
-          : ''
-
-      const technical_contact =
-        _technical_contact_id !== ''
-          ? composeContact(_technical_contact_type, _technical_contact_id)
-          : ''
-
-      const update = { ...castedValues, technical_contact, administrative_contact }
+      const update = castedValues
       setError(undefined)
       try {
         await onSubmit(update)
@@ -247,10 +224,6 @@ const BasicSettingsForm = React.memo(props => {
       <Notification small warning content={m.contactWarning} />
       <div>
         <Message content={sharedMessages.adminContact} component="h4" className="mt-cs-xs" />
-        <ContactFields
-          name="administrative"
-          hasInitialValue={Boolean(initialValues._administrative_contact_id)}
-        />
         <Message
           content={m.adminContactDescription}
           component="p"
@@ -259,10 +232,6 @@ const BasicSettingsForm = React.memo(props => {
       </div>
       <div>
         <Message content={sharedMessages.technicalContact} component="h4" />
-        <ContactFields
-          name="technical"
-          hasInitialValue={Boolean(initialValues._technical_contact_id)}
-        />
         <Message
           content={m.techContactDescription}
           component="p"

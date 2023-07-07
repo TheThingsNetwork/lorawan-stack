@@ -53,16 +53,6 @@ const validationSchema = Yup.object().shape({
     return Yup.string()
   }),
   rights: Yup.array().min(1, sharedMessages.validateRights),
-  _administrative_contact_id: Yup.string().matches(
-    contactIdRegex,
-    Yup.passValues(sharedMessages.validateIdFormat),
-  ),
-  _administrative_contact_type: Yup.string(),
-  _technical_contact_id: Yup.string().matches(
-    contactIdRegex,
-    Yup.passValues(sharedMessages.validateIdFormat),
-  ),
-  _technical_contact_type: Yup.string(),
 })
 
 export default validationSchema

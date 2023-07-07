@@ -31,7 +31,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
 import { selectCollaborators } from '@ttn-lw/lib/store/selectors/collaborators'
 
-import composeOption from './util'
+import { composeOption } from './util'
 
 import styles from './collaborator-select.styl'
 
@@ -91,6 +91,7 @@ const Suggest = ({ initialOptions, userInputCustomComponent, entity, entityId, .
               : account.organization_ids?.organization_id,
           icon: 'user_ids' in account ? 'user' : 'organization',
         }))
+
         const translatedOptions = newOptions?.map(option => {
           const { label, labelValues = {} } = option
           if (typeof label === 'object' && label.id && label.defaultMessage) {
@@ -109,7 +110,6 @@ const Suggest = ({ initialOptions, userInputCustomComponent, entity, entityId, .
   return (
     <Field
       {...rest}
-      autoFocus
       defaultOptions={initialOptions}
       component={Select.Suggested}
       noOptionsMessage={handleNoOptions}

@@ -18,11 +18,6 @@ import { defineMessages } from 'react-intl'
 
 import toast from '@ttn-lw/components/toast'
 import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
-import {
-  composeContact,
-  getAdministrativeContact,
-  getTechnicalContact,
-} from '@ttn-lw/components/contact-fields/utils'
 
 import Require from '@console/lib/components/require'
 
@@ -83,44 +78,8 @@ const OrganizationUpdateForm = ({ onDeleteSuccess }) => {
       try {
         setError()
 
-        const {
-          _administrative_contact_id,
-          _administrative_contact_type,
-          _technical_contact_id,
-          _technical_contact_type,
-        } = updated
+        const changed = diff(organization, updated)
 
-        const administrative_contact =
-          _administrative_contact_id !== ''
-            ? composeContact(_administrative_contact_type, _administrative_contact_id)
-            : ''
-
-        const technical_contact =
-          _technical_contact_id !== ''
-            ? composeContact(_technical_contact_type, _technical_contact_id)
-            : ''
-
-        const changed = diff(
-          organization,
-          { ...updated, administrative_contact, technical_contact },
-          {
-            exclude: [
-              'created_at',
-              'updated_at',
-              '_administrative_contact_id',
-              '_administrative_contact_type',
-              '_technical_contact_id',
-              '_technical_contact_type',
-            ],
-          },
-        )
-
-        if (technical_contact === '') {
-          changed.technical_contact = null
-        }
-        if (administrative_contact === '') {
-          changed.administrative_contact = null
-        }
         await dispatch(attachPromise(updateOrganization(orgId, changed)))
 
         toast({
@@ -165,15 +124,9 @@ const OrganizationUpdateForm = ({ onDeleteSuccess }) => {
     </Require>
   )
 
-  // Add technical and administrative contact to the initial values.
-  const { administrative_contact, technical_contact, ...organizationValues } = organization
-  const technicalContact = getTechnicalContact(organization)
-  const administrativeContact = getAdministrativeContact(organization)
   const composedInitialValues = {
     ...initialValues,
-    ...technicalContact,
-    ...administrativeContact,
-    ...organizationValues,
+    ...organization,
   }
 
   return (

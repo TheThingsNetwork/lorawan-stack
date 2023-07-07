@@ -18,11 +18,6 @@ import { useNavigate } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
 
 import toast from '@ttn-lw/components/toast'
-import {
-  composeContact,
-  getAdministrativeContact,
-  getTechnicalContact,
-} from '@ttn-lw/components/contact-fields/utils'
 
 import ApplicationGeneralSettingsForm from '@console/components/application-general-settings-form'
 
@@ -96,14 +91,8 @@ const ApplicationGeneralSettingsContainer = ({ appId }) => {
   const alcsync =
     packageAssoc?.package_name === alcsyncPackageName ? { alcsync: true } : { alcsync: false }
 
-  // Add technical and administrative contact to the initial values.
-  const { administrative_contact, technical_contact, ...applicationValues } = application
-  const technicalContact = getTechnicalContact(application)
-  const administrativeContact = getAdministrativeContact(application)
   const initialValues = {
-    ...applicationValues,
-    ...technicalContact,
-    ...administrativeContact,
+    ...application,
     ...link,
     ...alcsync,
   }
@@ -131,35 +120,7 @@ const ApplicationGeneralSettingsContainer = ({ appId }) => {
     async (values, { resetForm, setSubmitting }) => {
       setError(undefined)
 
-      const {
-        _administrative_contact_id,
-        _administrative_contact_type,
-        _technical_contact_id,
-        _technical_contact_type,
-      } = values
-
-      const administrative_contact =
-        _administrative_contact_id !== ''
-          ? composeContact(_administrative_contact_type, _administrative_contact_id)
-          : ''
-
-      const technical_contact =
-        _technical_contact_id !== ''
-          ? composeContact(_technical_contact_type, _technical_contact_id)
-          : ''
-
-      const changed = diff(
-        application,
-        { ...values, administrative_contact, technical_contact },
-        {
-          exclude: [
-            '_administrative_contact_id',
-            '_administrative_contact_type',
-            '_technical_contact_id',
-            '_technical_contact_type',
-          ],
-        },
-      )
+      const changed = diff(application, values)
 
       // If there is a change in attributes, copy all attributes so they don't get
       // overwritten.
@@ -170,13 +131,6 @@ const ApplicationGeneralSettingsContainer = ({ appId }) => {
               attributes: values.attributes,
             }
           : changed
-
-      if (technical_contact === '') {
-        update.technical_contact = null
-      }
-      if (administrative_contact === '') {
-        update.administrative_contact = null
-      }
 
       const {
         ids: { application_id },

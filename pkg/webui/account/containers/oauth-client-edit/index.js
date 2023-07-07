@@ -13,24 +13,17 @@
 // limitations under the License.
 
 import React, { useState, useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
 
 import toast from '@ttn-lw/components/toast'
-import {
-  composeContact,
-  getAdministrativeContact,
-  getTechnicalContact,
-} from '@ttn-lw/components/contact-fields/utils'
 
 import OAuthClientForm from '@account/components/oauth-client-form'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import diff from '@ttn-lw/lib/diff'
-
-import { mayEditBasicClientInformation, checkFromState } from '@account/lib/feature-checks'
 
 import { deleteClient, updateClient } from '@account/store/actions/clients'
 
@@ -65,9 +58,6 @@ const checkChanged = (changed, values) => {
 const ClientAdd = props => {
   const { userId, isAdmin, rights, pseudoRights, initialValues } = props
 
-  const mayEditBasicInformation = useSelector(state =>
-    checkFromState(mayEditBasicClientInformation, state),
-  )
   const [error, setError] = useState()
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -83,45 +73,12 @@ const ClientAdd = props => {
       const { client_id } = values.ids
       setError(undefined)
 
-      const {
-        _administrative_contact_id,
-        _administrative_contact_type,
-        _technical_contact_id,
-        _technical_contact_type,
-      } = values
-
-      const administrative_contact =
-        _administrative_contact_id !== ''
-          ? composeContact(_administrative_contact_type, _administrative_contact_id)
-          : ''
-
-      const technical_contact =
-        _technical_contact_id !== ''
-          ? composeContact(_technical_contact_type, _technical_contact_id)
-          : ''
-
-      const changed = diff(
-        initialValues,
-        { ...values, administrative_contact, technical_contact },
-        {
-          exclude: [
-            '_administrative_contact_id',
-            '_administrative_contact_type',
-            '_technical_contact_id',
-            '_technical_contact_type',
-          ],
-        },
-      )
+      const changed = diff(initialValues, values)
 
       // If there is a change in `redirect_uris`, `logout_redirect_uris` or `grants`,
       // copy all values so they don't get overwritten.
       const update = checkChanged(changed, values)
-      if (technical_contact === '') {
-        changed.technical_contact = null
-      }
-      if (administrative_contact === '') {
-        changed.administrative_contact = null
-      }
+
       const { owner_id, ...newClient } = update
 
       try {
@@ -169,20 +126,10 @@ const ClientAdd = props => {
     [dispatch, navigate],
   )
 
-  // Add technical and administrative contact to the initial values.
-  const { administrative_contact, technical_contact, ...restInitialValues } = initialValues
-  const technicalContact = getTechnicalContact(initialValues)
-  const administrativeContact = getAdministrativeContact(initialValues)
-  const composedInitialValues = {
-    ...technicalContact,
-    ...administrativeContact,
-    ...restInitialValues,
-  }
-
   return (
     <OAuthClientForm
       update
-      initialValues={composedInitialValues}
+      initialValues={initialValues}
       onSubmit={handleSubmit}
       onDelete={handleDelete}
       navigateToOAuthClient={navigateToOAuthClient}
@@ -191,7 +138,6 @@ const ClientAdd = props => {
       isAdmin={isAdmin}
       rights={rights}
       pseudoRights={pseudoRights}
-      mayEditBasicInformation={mayEditBasicInformation}
     />
   )
 }
@@ -199,26 +145,6 @@ const ClientAdd = props => {
 ClientAdd.propTypes = {
   initialValues: PropTypes.shape({
     grants: PropTypes.arrayOf(PropTypes.string),
-    technical_contact: PropTypes.shape({
-      user_ids: PropTypes.shape({
-        user_id: PropTypes.string,
-      }),
-      organization_ids: PropTypes.shape({
-        organization_id: PropTypes.string,
-      }),
-    }),
-    administrative_contact: PropTypes.shape({
-      user_ids: PropTypes.shape({
-        user_id: PropTypes.string,
-      }),
-      organization_ids: PropTypes.shape({
-        organization_id: PropTypes.string,
-      }),
-    }),
-    _administrative_contact_id: PropTypes.string,
-    _administrative_contact_type: PropTypes.string,
-    _technical_contact_id: PropTypes.string,
-    _technical_contact_type: PropTypes.string,
   }).isRequired,
   isAdmin: PropTypes.bool.isRequired,
   pseudoRights: PropTypes.rights.isRequired,
