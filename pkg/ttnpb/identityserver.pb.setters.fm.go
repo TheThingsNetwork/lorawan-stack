@@ -375,6 +375,31 @@ func (dst *IsConfiguration) SetFields(src *IsConfiguration, paths ...string) err
 					dst.AdminRights = nil
 				}
 			}
+		case "collaborator_rights":
+			if len(subs) > 0 {
+				var newDst, newSrc *IsConfiguration_CollaboratorRights
+				if (src == nil || src.CollaboratorRights == nil) && dst.CollaboratorRights == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.CollaboratorRights
+				}
+				if dst.CollaboratorRights != nil {
+					newDst = dst.CollaboratorRights
+				} else {
+					newDst = &IsConfiguration_CollaboratorRights{}
+					dst.CollaboratorRights = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.CollaboratorRights = src.CollaboratorRights
+				} else {
+					dst.CollaboratorRights = nil
+				}
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -773,6 +798,26 @@ func (dst *IsConfiguration_AdminRights) SetFields(src *IsConfiguration_AdminRigh
 				dst.All = src.All
 			} else {
 				dst.All = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *IsConfiguration_CollaboratorRights) SetFields(src *IsConfiguration_CollaboratorRights, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "set_others_as_contacts":
+			if len(subs) > 0 {
+				return fmt.Errorf("'set_others_as_contacts' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SetOthersAsContacts = src.SetOthersAsContacts
+			} else {
+				dst.SetOthersAsContacts = nil
 			}
 
 		default:

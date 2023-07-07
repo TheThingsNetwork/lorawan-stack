@@ -124,4 +124,8 @@ var (
 		"application_dev_eui_limit_reached",
 		"application issued DevEUI limit ({dev_eui_limit}) reached",
 	)
+
+	ErrContactInfoRestricted = errors.DefinePermissionDenied(
+		"contact_info_restricted", "contact information can only reference the caller",
+	)
 )

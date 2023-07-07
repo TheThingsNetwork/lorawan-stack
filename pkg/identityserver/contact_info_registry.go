@@ -42,6 +42,32 @@ var (
 	)
 )
 
+// validateContactInfoRestrictions fetches the auth info from the context and validates if the caller ID matches the
+// provided `ids` in the parameters. The usage of this function should be restricted to testing the administrative and
+// technical contacts in methods belonging to each entity registry.
+func (is *IdentityServer) validateContactInfoRestrictions(
+	ctx context.Context, ids ...*ttnpb.OrganizationOrUserIdentifiers,
+) error {
+	authInfo, err := is.authInfo(ctx)
+	if err != nil {
+		return err
+	}
+	callerID := authInfo.GetOrganizationOrUserIdentifiers()
+	if is.configFromContext(ctx).CollaboratorRights.SetOthersAsContacts || authInfo.IsAdmin {
+		return nil
+	}
+
+	for _, id := range ids {
+		if id == nil {
+			continue
+		}
+		if callerID.EntityType() != id.EntityType() || callerID.IDString() != id.IDString() {
+			return store.ErrContactInfoRestricted.New()
+		}
+	}
+	return nil
+}
+
 func validateCollaboratorEqualsContact(collaborator, contact *ttnpb.OrganizationOrUserIdentifiers) error {
 	if contact == nil {
 		return nil
@@ -52,7 +78,12 @@ func validateCollaboratorEqualsContact(collaborator, contact *ttnpb.Organization
 	return nil
 }
 
-func validateContactIsCollaborator(ctx context.Context, st store.Store, contact *ttnpb.OrganizationOrUserIdentifiers, entity *ttnpb.EntityIdentifiers) error {
+func validateContactIsCollaborator(
+	ctx context.Context,
+	st store.Store,
+	contact *ttnpb.OrganizationOrUserIdentifiers,
+	entity *ttnpb.EntityIdentifiers,
+) error {
 	if contact == nil {
 		return nil
 	}
@@ -66,7 +97,10 @@ func validateContactIsCollaborator(ctx context.Context, st store.Store, contact 
 	return nil
 }
 
-func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids *ttnpb.EntityIdentifiers) (*ttnpb.ContactInfoValidation, error) {
+func (is *IdentityServer) requestContactInfoValidation(
+	ctx context.Context,
+	ids *ttnpb.EntityIdentifiers,
+) (*ttnpb.ContactInfoValidation, error) {
 	// NOTE: This does NOT check auth. Internal use only.
 	id, err := auth.GenerateID(ctx)
 	if err != nil {
@@ -139,10 +173,15 @@ func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids 
 			Token:             validation.Token,
 			TTL:               ttl,
 		}
-		go is.SendTemplateEmailToUsers(is.FromRequestContext(ctx), "validate", func(_ context.Context, data email.TemplateData) (email.TemplateData, error) {
-			validateData.TemplateData = data
-			return validateData, nil
-		}, &ttnpb.User{PrimaryEmailAddress: address})
+		go is.SendTemplateEmailToUsers( // nolint:errcheck
+			is.FromRequestContext(ctx),
+			"validate",
+			func(_ context.Context, data email.TemplateData) (email.TemplateData, error) {
+				validateData.TemplateData = data
+				return validateData, nil
+			},
+			&ttnpb.User{PrimaryEmailAddress: address},
+		)
 		pendingContactInfo = append(pendingContactInfo, validation.ContactInfo...)
 		validation.Token = "" // Unset tokens after sending emails
 	}
@@ -188,7 +227,10 @@ type contactInfoRegistry struct {
 
 var errNoContactInfoForEntity = errors.DefineInvalidArgument("no_contact_info", "no contact info for this entity type")
 
-func (cir *contactInfoRegistry) RequestValidation(ctx context.Context, ids *ttnpb.EntityIdentifiers) (*ttnpb.ContactInfoValidation, error) {
+func (cir *contactInfoRegistry) RequestValidation(
+	ctx context.Context,
+	ids *ttnpb.EntityIdentifiers,
+) (*ttnpb.ContactInfoValidation, error) {
 	var err error
 	switch id := ids.GetIds().(type) {
 	case *ttnpb.EntityIdentifiers_ApplicationIds:
@@ -210,6 +252,9 @@ func (cir *contactInfoRegistry) RequestValidation(ctx context.Context, ids *ttnp
 	return cir.requestContactInfoValidation(ctx, ids)
 }
 
-func (cir *contactInfoRegistry) Validate(ctx context.Context, req *ttnpb.ContactInfoValidation) (*emptypb.Empty, error) {
+func (cir *contactInfoRegistry) Validate(
+	ctx context.Context,
+	req *ttnpb.ContactInfoValidation,
+) (*emptypb.Empty, error) {
 	return cir.validateContactInfo(ctx, req)
 }

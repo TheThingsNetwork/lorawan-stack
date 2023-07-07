@@ -125,6 +125,11 @@ message IsConfiguration {
   reserved 10; reserved "application_limits";
   reserved 11; reserved "organization_limits";
   reserved 12; reserved "user_limits";
+
+  message CollaboratorRights {
+    google.protobuf.BoolValue set_others_as_contacts = 1;
+  }
+  CollaboratorRights collaborator_rights = 13;
 }
 
 message GetIsConfigurationResponse {

@@ -213,12 +213,66 @@ func TestOrganizationsCRUD(t *testing.T) {
 			a.So(updated.Name, should.Equal, "Updated Name")
 		}
 
-		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{nil, usr1.GetOrganizationOrUserIdentifiers()} {
+		t.Run("Contact Info Restrictions", func(t *testing.T) { // nolint:paralleltest
+			a, ctx := test.New(t)
+
+			oldSetOtherAsContacts := is.config.CollaboratorRights.SetOthersAsContacts
+			t.Cleanup(func() { is.config.CollaboratorRights.SetOthersAsContacts = oldSetOtherAsContacts })
+			is.config.CollaboratorRights.SetOthersAsContacts = false
+
+			// Set usr-2 as collaborator to client.
+			oac := ttnpb.NewOrganizationAccessClient(cc)
+			_, err := oac.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
+				OrganizationIds: created.GetIds(),
+				Collaborator: &ttnpb.Collaborator{
+					Ids:    usr2.GetOrganizationOrUserIdentifiers(),
+					Rights: []ttnpb.Right{ttnpb.Right_RIGHT_ALL},
+				},
+			}, creds)
+			a.So(err, should.BeNil)
+
+			// Attempt to set another collaborator as administrative contact.
+			_, err = reg.Update(ctx, &ttnpb.UpdateOrganizationRequest{
+				Organization: &ttnpb.Organization{
+					Ids:                   created.GetIds(),
+					AdministrativeContact: usr2.GetOrganizationOrUserIdentifiers(),
+				},
+				FieldMask: ttnpb.FieldMask("administrative_contact"),
+			}, creds)
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+
+			// Admin can bypass contact info restrictions.
+			_, err = reg.Update(ctx, &ttnpb.UpdateOrganizationRequest{
+				Organization: &ttnpb.Organization{
+					Ids:                   created.GetIds(),
+					AdministrativeContact: usr1.GetOrganizationOrUserIdentifiers(),
+				},
+				FieldMask: ttnpb.FieldMask("administrative_contact"),
+			}, adminCreds)
+			a.So(err, should.BeNil)
+
+			is.config.CollaboratorRights.SetOthersAsContacts = true
+
+			// Now usr-1 can set usr-2 as technical contact.
+			_, err = reg.Update(ctx, &ttnpb.UpdateOrganizationRequest{
+				Organization: &ttnpb.Organization{
+					Ids:              created.GetIds(),
+					TechnicalContact: usr2.GetOrganizationOrUserIdentifiers(),
+				},
+				FieldMask: ttnpb.FieldMask("technical_contact"),
+			}, creds)
+			a.So(err, should.BeNil)
+		})
+
+		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{
+			nil, usr1.GetOrganizationOrUserIdentifiers(),
+		} {
 			list, err := reg.List(ctx, &ttnpb.ListOrganizationsRequest{
 				FieldMask:    ttnpb.FieldMask("name"),
 				Collaborator: collaborator,
 			}, creds)
-			if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) && a.So(list.Organizations, should.HaveLength, 6) {
+			if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) &&
+				a.So(list.Organizations, should.HaveLength, 6) {
 				var found bool
 				for _, item := range list.Organizations {
 					if item.GetIds().GetOrganizationId() == created.GetIds().GetOrganizationId() {
