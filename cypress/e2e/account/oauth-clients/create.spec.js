@@ -72,7 +72,7 @@ describe('OAuth Client create', () => {
     )
   })
 
-  it('succeeds adding application', () => {
+  it('succeeds adding client', () => {
     cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
     cy.visit(`${Cypress.config('accountAppRootPath')}/oauth-clients/add`)
     cy.findByLabelText('OAuth client ID').type(clientId)

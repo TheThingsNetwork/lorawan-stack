@@ -54,16 +54,20 @@ const validationSchema = Yup.object().shape({
     return Yup.string()
   }),
   rights: Yup.array().min(1, sharedMessages.validateRights),
-  administrative_contact: Yup.object().when(['organization_ids'], {
-    is: organizationIds => Boolean(organizationIds),
-    then: schema => schema.concat(organizationSchema),
-    otherwise: schema => schema.concat(userSchema),
-  }),
-  technical_contact: Yup.object().when(['organization_ids'], {
-    is: organizationIds => Boolean(organizationIds),
-    then: schema => schema.concat(organizationSchema),
-    otherwise: schema => schema.concat(userSchema),
-  }),
+  administrative_contact: Yup.object()
+    .when(['organization_ids'], {
+      is: organizationIds => Boolean(organizationIds),
+      then: schema => schema.concat(organizationSchema),
+      otherwise: schema => schema.concat(userSchema),
+    })
+    .nullable(),
+  technical_contact: Yup.object()
+    .when(['organization_ids'], {
+      is: organizationIds => Boolean(organizationIds),
+      then: schema => schema.concat(organizationSchema),
+      otherwise: schema => schema.concat(userSchema),
+    })
+    .nullable(),
 })
 
 export default validationSchema

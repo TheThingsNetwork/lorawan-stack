@@ -15,6 +15,7 @@
 import React, { useCallback } from 'react'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
+import { isEmpty } from 'lodash'
 
 import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
 import Checkbox from '@ttn-lw/components/checkbox'
@@ -71,6 +72,18 @@ const OAuthClientForm = props => {
   const handleSubmit = useCallback(
     async (values, { resetForm, setSubmitting }) => {
       const castedValues = validationSchema.cast(values)
+
+      // If there are no contacts do not include them in the casted value.
+      if (
+        'administrative_contact' in castedValues &&
+        isEmpty(castedValues.administrative_contact)
+      ) {
+        delete castedValues.administrative_contact
+      }
+      if ('technical_contact' in castedValues && isEmpty(castedValues.technical_contact)) {
+        delete castedValues.technical_contact
+      }
+
       await onSubmit(castedValues, resetForm, setSubmitting)
     },
     [onSubmit],
