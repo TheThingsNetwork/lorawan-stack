@@ -166,8 +166,6 @@ OrganizationForm.propTypes = {
     }),
     name: PropTypes.string,
     description: PropTypes.string,
-    _administrative_contact_id: PropTypes.string,
-    _technical_contact_id: PropTypes.string,
   }),
   onSubmit: PropTypes.func.isRequired,
   submitBarItems: PropTypes.element,

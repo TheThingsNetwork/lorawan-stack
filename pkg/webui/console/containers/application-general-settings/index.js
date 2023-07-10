@@ -90,7 +90,6 @@ const ApplicationGeneralSettingsContainer = ({ appId }) => {
   const packageAssoc = useSelector(state => selectApplicationPackageDefaultAssociation(state, 202))
   const alcsync =
     packageAssoc?.package_name === alcsyncPackageName ? { alcsync: true } : { alcsync: false }
-
   const initialValues = {
     ...application,
     ...link,

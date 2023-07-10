@@ -109,6 +109,7 @@ const FormField = props => {
   // Generate streamlined `names` variable to handle both composite and simple fields.
   const names = useMemo(() => name.split(','), [name])
   const isCompositeField = names.length > 1
+
   // Extract field state.
   const errors = compact(at(formErrors, names))
   const touched = at(formTouched, names).some(Boolean)

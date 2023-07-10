@@ -232,8 +232,6 @@ ApplicationGeneralSettingsForm.propTypes = {
     attributes: PropTypes.shape({}),
     skip_payload_crypto: PropTypes.bool,
     alcsync: PropTypes.bool,
-    _administrative_contact_id: PropTypes.string,
-    _technical_contact_id: PropTypes.string,
   }).isRequired,
   mayDeleteApplication: PropTypes.shape({}).isRequired,
   mayPurge: PropTypes.bool.isRequired,
