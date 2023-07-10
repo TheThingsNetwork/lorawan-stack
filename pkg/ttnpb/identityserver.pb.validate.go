@@ -354,6 +354,18 @@ func (m *IsConfiguration) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "collaborator_rights":
+
+			if v, ok := interface{}(m.GetCollaboratorRights()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfigurationValidationError{
+						field:  "collaborator_rights",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return IsConfigurationValidationError{
 				field:  name,
@@ -1384,6 +1396,100 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = IsConfiguration_AdminRightsValidationError{}
+
+// ValidateFields checks the field values on IsConfiguration_CollaboratorRights
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *IsConfiguration_CollaboratorRights) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = IsConfiguration_CollaboratorRightsFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "set_others_as_contacts":
+
+			if v, ok := interface{}(m.GetSetOthersAsContacts()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfiguration_CollaboratorRightsValidationError{
+						field:  "set_others_as_contacts",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return IsConfiguration_CollaboratorRightsValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// IsConfiguration_CollaboratorRightsValidationError is the validation error
+// returned by IsConfiguration_CollaboratorRights.ValidateFields if the
+// designated constraints aren't met.
+type IsConfiguration_CollaboratorRightsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IsConfiguration_CollaboratorRightsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IsConfiguration_CollaboratorRightsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IsConfiguration_CollaboratorRightsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IsConfiguration_CollaboratorRightsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IsConfiguration_CollaboratorRightsValidationError) ErrorName() string {
+	return "IsConfiguration_CollaboratorRightsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e IsConfiguration_CollaboratorRightsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIsConfiguration_CollaboratorRights.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IsConfiguration_CollaboratorRightsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IsConfiguration_CollaboratorRightsValidationError{}
 
 // ValidateFields checks the field values on
 // IsConfiguration_UserRegistration_Invitation with the rules defined in the

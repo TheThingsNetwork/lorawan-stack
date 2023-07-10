@@ -24049,6 +24049,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "collaborator_rights",
+              "description": "",
+              "label": "",
+              "type": "CollaboratorRights",
+              "longType": "IsConfiguration.CollaboratorRights",
+              "fullType": "ttn.lorawan.v3.IsConfiguration.CollaboratorRights",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -24064,6 +24076,30 @@
           "fields": [
             {
               "name": "all",
+              "description": "",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "CollaboratorRights",
+          "longName": "IsConfiguration.CollaboratorRights",
+          "fullName": "ttn.lorawan.v3.IsConfiguration.CollaboratorRights",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "set_others_as_contacts",
               "description": "",
               "label": "",
               "type": "BoolValue",

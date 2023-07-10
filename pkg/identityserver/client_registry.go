@@ -317,6 +317,12 @@ func (is *IdentityServer) updateClient(
 		[]string{"administrative_contact", "technical_contact"},
 	)
 
+	if err := is.validateContactInfoRestrictions(
+		ctx, req.Client.GetAdministrativeContact(), req.Client.GetTechnicalContact(),
+	); err != nil {
+		return nil, err
+	}
+
 	if err = is.RequireAdminForFieldUpdate(ctx, req.GetFieldMask().GetPaths(), []string{
 		"state", "state_description", "skip_authorization", "endorsed", "grants",
 	}); err != nil {
@@ -331,10 +337,14 @@ func (is *IdentityServer) updateClient(
 	}
 
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
-		if err := validateContactIsCollaborator(ctx, st, req.Client.AdministrativeContact, req.Client.GetEntityIdentifiers()); err != nil {
+		if err := validateContactIsCollaborator(
+			ctx, st, req.Client.AdministrativeContact, req.Client.GetEntityIdentifiers(),
+		); err != nil {
 			return err
 		}
-		if err := validateContactIsCollaborator(ctx, st, req.Client.TechnicalContact, req.Client.GetEntityIdentifiers()); err != nil {
+		if err := validateContactIsCollaborator(
+			ctx, st, req.Client.TechnicalContact, req.Client.GetEntityIdentifiers(),
+		); err != nil {
 			return err
 		}
 		cli, err = st.UpdateClient(ctx, req.Client, req.FieldMask.GetPaths())
