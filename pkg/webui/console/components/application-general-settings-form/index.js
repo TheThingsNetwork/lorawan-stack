@@ -183,7 +183,7 @@ const ApplicationGeneralSettingsForm = ({
     <CollaboratorSelect
       name="administrative_contact"
       title={sharedMessages.adminContact}
-      placeholder={sharedMessages.contactPlaceholder}
+      placeholder={sharedMessages.contactFieldPlaceholder}
       entity="application"
       entityId={appId}
       encode={encodeContact}
@@ -197,7 +197,7 @@ const ApplicationGeneralSettingsForm = ({
     <CollaboratorSelect
       name="technical_contact"
       title={sharedMessages.technicalContact}
-      placeholder={sharedMessages.contactPlaceholder}
+      placeholder={sharedMessages.contactFieldPlaceholder}
       entity="application"
       entityId={appId}
       encode={encodeContact}

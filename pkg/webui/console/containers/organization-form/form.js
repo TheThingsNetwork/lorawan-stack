@@ -124,7 +124,7 @@ const OrganizationForm = props => {
           <CollaboratorSelect
             name="administrative_contact"
             title={sharedMessages.adminContact}
-            placeholder={sharedMessages.contactPlaceholder}
+            placeholder={sharedMessages.contactFieldPlaceholder}
             entity="organization"
             entityId={orgId}
             encode={encodeContact}
@@ -138,7 +138,7 @@ const OrganizationForm = props => {
           <CollaboratorSelect
             name="technical_contact"
             title={sharedMessages.technicalContact}
-            placeholder={sharedMessages.contactPlaceholder}
+            placeholder={sharedMessages.contactFieldPlaceholder}
             entity="organization"
             entityId={orgId}
             encode={encodeContact}

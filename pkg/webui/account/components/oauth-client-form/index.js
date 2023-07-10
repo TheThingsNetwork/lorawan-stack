@@ -178,7 +178,7 @@ const OAuthClientForm = props => {
           <CollaboratorSelect
             name="administrative_contact"
             title={sharedMessages.adminContact}
-            placeholder={sharedMessages.contactPlaceholder}
+            placeholder={sharedMessages.contactFieldPlaceholder}
             entity={'client'}
             entityId={clientId}
             encode={encodeContact}
@@ -192,7 +192,7 @@ const OAuthClientForm = props => {
           <CollaboratorSelect
             name="technical_contact"
             title={sharedMessages.technicalContact}
-            placeholder={sharedMessages.contactPlaceholder}
+            placeholder={sharedMessages.contactFieldPlaceholder}
             entity={'client'}
             entityId={clientId}
             encode={encodeContact}

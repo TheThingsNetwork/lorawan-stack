@@ -228,7 +228,7 @@ const BasicSettingsForm = React.memo(props => {
       <CollaboratorSelect
         name="administrative_contact"
         title={sharedMessages.adminContact}
-        placeholder={sharedMessages.contactPlaceholder}
+        placeholder={sharedMessages.contactFieldPlaceholder}
         entity={'gateway'}
         entityId={gtwId}
         encode={encodeContact}
@@ -242,7 +242,7 @@ const BasicSettingsForm = React.memo(props => {
       <CollaboratorSelect
         name="technical_contact"
         title={sharedMessages.technicalContact}
-        placeholder={sharedMessages.contactPlaceholder}
+        placeholder={sharedMessages.contactFieldPlaceholder}
         entity={'gateway'}
         entityId={gtwId}
         encode={encodeContact}
