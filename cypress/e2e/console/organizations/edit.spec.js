@@ -61,12 +61,9 @@ describe('Organization general settings', () => {
 
   it('fails adding non-collaborator contact information', () => {
     cy.findByText('Contact information').should('be.visible')
-    cy.findByLabelText('Administrative contact ID').clear().type(collabUserId)
-    cy.findByLabelText('Technical contact ID').clear().type(collabUserId)
-
-    cy.findByRole('button', { name: 'Save changes' }).click()
-
-    cy.findByTestId('toast-notification').should('not.exist')
+    cy.findByLabelText('Administrative contact').clear()
+    cy.findByLabelText('Administrative contact').type(collabUserId)
+    cy.findByText('No matching user or organization was found')
   })
 
   it('suceeds adding contact information', () => {
@@ -79,8 +76,8 @@ describe('Organization general settings', () => {
     )
 
     cy.findByText('Contact information').should('be.visible')
-    cy.findByLabelText('Administrative contact ID').clear().type(collabUserId)
-    cy.findByLabelText('Technical contact ID').clear().type(collabUserId)
+    cy.findByLabelText('Administrative contact').clear()
+    cy.findByLabelText('Administrative contact').selectOption(collabUserId)
 
     cy.findByRole('button', { name: 'Save changes' }).click()
 
