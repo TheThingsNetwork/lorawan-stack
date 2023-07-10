@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -162,6 +162,7 @@ const DevicesTableInner = () => {
           device.application_server_address ||
           device.network_server_address ||
           device.join_server_address,
+        _lastSeen: device.last_seen_at,
       },
       _meta: {
         clickable: !isOtherClusterDevice(device),
