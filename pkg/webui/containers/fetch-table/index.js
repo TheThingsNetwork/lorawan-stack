@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import getByPath from '@ttn-lw/lib/get-by-path'
 import useDebounce from '@ttn-lw/lib/hooks/use-debounce'
+import useQueryState from '@ttn-lw/lib/hooks/use-query-state'
 
 import style from './fetch-table.styl'
 
@@ -81,17 +82,18 @@ const FetchTable = props => {
   } = props
 
   const dispatch = useDispatch()
+  const defaultTab = tabs.length > 0 ? tabs[0].name : undefined
 
-  const [page, setPage] = useState(1)
-  const [tab, setTab] = useState(tabs.length > 0 ? tabs[0].name : undefined)
-  const [order, setOrder] = useState(defaultOrder)
-  const [query, setQuery] = useState('')
+  const [page, setPage] = useQueryState('page', 1, parseInt)
+  const [tab, setTab] = useQueryState('tab', defaultTab)
+  const [order, setOrder] = useQueryState('order', defaultOrder)
+  const [query, setQuery] = useQueryState('query', '')
   const debouncedQuery = useDebounce(
     query,
     350,
     useCallback(() => {
       setPage(1)
-    }, []),
+    }, [setPage]),
   )
 
   const [initialFetch, setInitialFetch] = useState(true)
@@ -119,45 +121,90 @@ const FetchTable = props => {
     filters.order = order
   }
 
-  const fetchItems = useCallback(async () => {
-    const f = { query: debouncedQuery || '', tab, order, page, limit: pageSize }
+  // Fetch items initially or whenever the filters change.
+  useEffect(() => {
+    const fetchItems = async () => {
+      const f = { query: debouncedQuery || '', page, limit: pageSize }
 
-    try {
-      if (f.query && searchItemsAction) {
-        await dispatch(attachPromise(searchItemsAction(f)))
+      // Validate tab.
+      if (tabs.find(t => t.name === tab)) {
+        f.tab = tab
+      } else {
+        f.tab = undefined
+        setTab(defaultTab)
       }
 
-      await dispatch(attachPromise(getItemsAction(f)))
-    } catch (error) {
-      setError(error)
+      // Validate order.
+      if (orderValidator(order)) {
+        f.order = order
+      } else {
+        f.order = defaultOrder
+        setOrder(defaultOrder)
+      }
+
+      try {
+        if (f.query && searchItemsAction) {
+          await dispatch(attachPromise(searchItemsAction(f)))
+        }
+
+        await dispatch(attachPromise(getItemsAction(f)))
+
+        if (initialFetch) {
+          setInitialFetch(false)
+        }
+      } catch (error) {
+        setError(error)
+      }
     }
-  }, [debouncedQuery, dispatch, getItemsAction, order, page, pageSize, searchItemsAction, tab])
+    fetchItems()
+  }, [
+    debouncedQuery,
+    defaultOrder,
+    defaultTab,
+    dispatch,
+    getItemsAction,
+    initialFetch,
+    order,
+    page,
+    pageSize,
+    searchItemsAction,
+    setOrder,
+    setTab,
+    tab,
+    tabs,
+  ])
 
-  useEffect(() => {
-    fetchItems(true)
-    setInitialFetch(false)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters.query, filters.tab, filters.order, filters.page])
+  const onPageChange = useCallback(
+    page => {
+      setPage(pageValidator(page))
+    },
+    [setPage],
+  )
 
-  const onPageChange = useCallback(page => {
-    setPage(pageValidator(page))
-  }, [])
+  const onQueryChange = useCallback(
+    query => {
+      setQuery(query)
+    },
+    [setQuery],
+  )
 
-  const onQueryChange = useCallback(query => {
-    setQuery(query)
-  }, [])
+  const onOrderChange = useCallback(
+    (order, orderBy) => {
+      const filterOrder = `${order === 'desc' ? '-' : ''}${orderBy}`
 
-  const onOrderChange = useCallback((order, orderBy) => {
-    const filterOrder = `${order === 'desc' ? '-' : ''}${orderBy}`
+      setOrder(filterOrder)
+    },
+    [setOrder],
+  )
 
-    setOrder(orderValidator(filterOrder))
-  }, [])
-
-  const onTabChange = useCallback(tab => {
-    setTab(tab)
-    setPage(1)
-    setQuery('')
-  }, [])
+  const onTabChange = useCallback(
+    tab => {
+      setTab(tab)
+      setPage(1)
+      setQuery('')
+    },
+    [setPage, setQuery, setTab],
+  )
 
   const rowHrefSelector = useCallback(
     item => {
@@ -182,6 +229,13 @@ const FetchTable = props => {
   const filtersCls = classnames(style.filters, {
     [style.topRule]: tabs.length > 0,
   })
+
+  // Go back to page 1 when no items are left on the current page.
+  useEffect(() => {
+    if (preparedItems.length === 0 && page > 1 && !initialFetch) {
+      setPage(1)
+    }
+  }, [initialFetch, page, preparedItems.length, setPage])
 
   return (
     <div data-test-id={`${entity}-table`}>
