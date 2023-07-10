@@ -36,7 +36,6 @@ import {
   selectNsConfig,
 } from '@ttn-lw/lib/selectors/env'
 
-import { hexToBase64 } from '@console/lib/bytes'
 import {
   mayEditApplicationDeviceKeys,
   mayReadApplicationDeviceKeys,
@@ -101,9 +100,7 @@ const DeviceGeneralSettings = () => {
     const {
       ids: { dev_eui: devEui, join_eui: joinEui },
     } = device
-    await dispatch(
-      attachPromise(unclaimDevice(appId, devId, hexToBase64(devEui), hexToBase64(joinEui))),
-    )
+    await dispatch(attachPromise(unclaimDevice(appId, devId, devEui, joinEui)))
   }, [appId, devId, device, dispatch])
 
   const handleUnclaimFailure = useCallback(async () => {
