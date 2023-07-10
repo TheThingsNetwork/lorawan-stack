@@ -30,10 +30,9 @@ const messages = defineMessages({
   contactWarning:
     'Note that if no contact is provided, it will default to the first collaborator of the gateway.',
   adminContactDescription:
-    'Administrative contact information for this application. Typically used to indicate who to contact with administrative questions about the application.',
+    'Administrative contact information for this gateway. Typically used to indicate who to contact with administrative questions about the gateway.',
   techContactDescription:
-    'Technical contact information for this application. Typically used to indicate who to contact with technical/security questions about the application.',
-  contactPlaceholder: 'Type to choose a contact',
+    'Technical contact information for this gateway. Typically used to indicate who to contact with technical/security questions about the gateway.',
 })
 
 export default messages

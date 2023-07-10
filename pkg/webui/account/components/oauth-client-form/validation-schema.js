@@ -12,19 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { organizationSchema, userSchema } from '@ttn-lw/containers/collaborator-select/util'
+
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import { userId as contactIdRegex } from '@ttn-lw/lib/regexp'
 
 import { approvalStates } from './utils'
-
-const organizationSchema = Yup.object().shape({
-  organization_id: Yup.string().matches(contactIdRegex, sharedMessages.validateAlphanum),
-})
-
-const userSchema = Yup.object().shape({
-  user_id: Yup.string().matches(contactIdRegex, sharedMessages.validateAlphanum),
-})
 
 const validationSchema = Yup.object().shape({
   owner_id: Yup.string().required(sharedMessages.validateRequired),

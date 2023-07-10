@@ -24,10 +24,15 @@ import KeyValueMap from '@ttn-lw/components/key-value-map'
 import Checkbox from '@ttn-lw/components/checkbox'
 import Notification from '@ttn-lw/components/notification'
 
-import Message from '@ttn-lw/lib/components/message'
+import CollaboratorSelect from '@ttn-lw/containers/collaborator-select'
+import {
+  decodeContact,
+  encodeContact,
+  organizationSchema,
+  userSchema,
+} from '@ttn-lw/containers/collaborator-select/util'
 
-import CollaboratorSelect from '@console/containers/collaborator-select'
-import { decodeContact, encodeContact } from '@console/containers/collaborator-select/util'
+import Message from '@ttn-lw/lib/components/message'
 
 import Require from '@console/lib/components/require'
 
@@ -35,7 +40,6 @@ import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
-import { userId as contactIdRegex } from '@ttn-lw/lib/regexp'
 
 import {
   attributeValidCheck,
@@ -54,15 +58,6 @@ const m = defineMessages({
     'Administrative contact information for this application. Typically used to indicate who to contact with administrative questions about the application.',
   techContactDescription:
     'Technical contact information for this application. Typically used to indicate who to contact with technical/security questions about the application.',
-  contactPlaceholder: 'Type to choose a contact',
-})
-
-const organizationSchema = Yup.object().shape({
-  organization_id: Yup.string().matches(contactIdRegex, sharedMessages.validateAlphanum),
-})
-
-const userSchema = Yup.object().shape({
-  user_id: Yup.string().matches(contactIdRegex, sharedMessages.validateAlphanum),
 })
 
 const validationSchema = Yup.object().shape({
@@ -187,8 +182,8 @@ const ApplicationGeneralSettingsForm = ({
     <Notification small warning content={m.contactWarning} />
     <CollaboratorSelect
       name="administrative_contact"
-      title={'Administrative contact'}
-      placeholder={m.contactPlaceholder}
+      title={sharedMessages.adminContact}
+      placeholder={sharedMessages.contactPlaceholder}
       entity="application"
       entityId={appId}
       encode={encodeContact}
@@ -201,8 +196,8 @@ const ApplicationGeneralSettingsForm = ({
     />
     <CollaboratorSelect
       name="technical_contact"
-      title={'Technical contact'}
-      placeholder={m.contactPlaceholder}
+      title={sharedMessages.technicalContact}
+      placeholder={sharedMessages.contactPlaceholder}
       entity="application"
       entityId={appId}
       encode={encodeContact}

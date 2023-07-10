@@ -23,10 +23,10 @@ import Checkbox from '@ttn-lw/components/checkbox'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
 import Notification from '@ttn-lw/components/notification'
 
-import Message from '@ttn-lw/lib/components/message'
+import CollaboratorSelect from '@ttn-lw/containers/collaborator-select'
+import { decodeContact, encodeContact } from '@ttn-lw/containers/collaborator-select/util'
 
-import CollaboratorSelect from '@console/containers/collaborator-select'
-import { decodeContact, encodeContact } from '@console/containers/collaborator-select/util'
+import Message from '@ttn-lw/lib/components/message'
 
 import Require from '@console/lib/components/require'
 
@@ -227,8 +227,8 @@ const BasicSettingsForm = React.memo(props => {
       <Notification small warning content={m.contactWarning} />
       <CollaboratorSelect
         name="administrative_contact"
-        title={'Administrative contact'}
-        placeholder={m.contactPlaceholder}
+        title={sharedMessages.adminContact}
+        placeholder={sharedMessages.contactPlaceholder}
         entity={'gateway'}
         entityId={gtwId}
         encode={encodeContact}
@@ -241,8 +241,8 @@ const BasicSettingsForm = React.memo(props => {
       />
       <CollaboratorSelect
         name="technical_contact"
-        title={'Technical contact'}
-        placeholder={m.contactPlaceholder}
+        title={sharedMessages.technicalContact}
+        placeholder={sharedMessages.contactPlaceholder}
         entity={'gateway'}
         entityId={gtwId}
         encode={encodeContact}

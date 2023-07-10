@@ -27,10 +27,10 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import RightsGroup from '@ttn-lw/components/rights-group'
 
-import Message from '@ttn-lw/lib/components/message'
+import CollaboratorSelect from '@ttn-lw/containers/collaborator-select'
+import { decodeContact, encodeContact } from '@ttn-lw/containers/collaborator-select/util'
 
-import CollaboratorSelect from '@console/containers/collaborator-select'
-import { decodeContact, encodeContact } from '@console/containers/collaborator-select/util'
+import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -177,8 +177,8 @@ const OAuthClientForm = props => {
           <Notification small warning content={m.contactWarning} />
           <CollaboratorSelect
             name="administrative_contact"
-            title={'Administrative contact'}
-            placeholder={m.contactPlaceholder}
+            title={sharedMessages.adminContact}
+            placeholder={sharedMessages.contactPlaceholder}
             entity={'client'}
             entityId={clientId}
             encode={encodeContact}
@@ -191,8 +191,8 @@ const OAuthClientForm = props => {
           />
           <CollaboratorSelect
             name="technical_contact"
-            title={'Technical contact'}
-            placeholder={m.contactPlaceholder}
+            title={sharedMessages.technicalContact}
+            placeholder={sharedMessages.contactPlaceholder}
             entity={'client'}
             entityId={clientId}
             encode={encodeContact}
