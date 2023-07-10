@@ -28,6 +28,17 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { id as organizationIdRegexp, userId as contactIdRegex } from '@ttn-lw/lib/regexp'
 
+import CollaboratorSelect from '../collaborator-select'
+import { decodeContact, encodeContact } from '../collaborator-select/util'
+
+const organizationSchema = Yup.object().shape({
+  organization_id: Yup.string().matches(contactIdRegex, sharedMessages.validateAlphanum),
+})
+
+const userSchema = Yup.object().shape({
+  user_id: Yup.string().matches(contactIdRegex, sharedMessages.validateAlphanum),
+})
+
 const validationSchema = Yup.object().shape({
   ids: Yup.object().shape({
     organization_id: Yup.string()
@@ -40,16 +51,16 @@ const validationSchema = Yup.object().shape({
     .min(2, Yup.passValues(sharedMessages.validateTooShort))
     .max(50, Yup.passValues(sharedMessages.validateTooLong)),
   description: Yup.string().max(2000, Yup.passValues(sharedMessages.validateTooLong)),
-  _administrative_contact_id: Yup.string().matches(
-    contactIdRegex,
-    Yup.passValues(sharedMessages.validateIdFormat),
-  ),
-  _administrative_contact_type: Yup.string(),
-  _technical_contact_id: Yup.string().matches(
-    contactIdRegex,
-    Yup.passValues(sharedMessages.validateIdFormat),
-  ),
-  _technical_contact_type: Yup.string(),
+  administrative_contact: Yup.object().when(['organization_ids'], {
+    is: organizationIds => Boolean(organizationIds),
+    then: schema => schema.concat(organizationSchema),
+    otherwise: schema => schema.concat(userSchema),
+  }),
+  technical_contact: Yup.object().when(['organization_ids'], {
+    is: organizationIds => Boolean(organizationIds),
+    then: schema => schema.concat(organizationSchema),
+    otherwise: schema => schema.concat(userSchema),
+  }),
 })
 
 const m = defineMessages({
@@ -64,6 +75,7 @@ const m = defineMessages({
     'Administrative contact information for this application. Typically used to indicate who to contact with administrative questions about the application.',
   techContactDescription:
     'Technical contact information for this application. Typically used to indicate who to contact with technical/security questions about the application.',
+  contactPlaceholder: 'Type to choose a contact',
 })
 
 const initialValues = {
@@ -76,7 +88,7 @@ const initialValues = {
 
 const OrganizationForm = props => {
   const { onSubmit, error, submitBarItems, initialValues, submitMessage, update } = props
-
+  const orgId = initialValues.ids?.organization_id
   const isUpdate = Boolean(initialValues.ids.organization_id)
 
   return (
@@ -113,22 +125,34 @@ const OrganizationForm = props => {
         <>
           <Form.SubTitle title={sharedMessages.contactInformation} className="mb-cs-s" />
           <Notification small warning content={m.contactWarning} />
-          <div>
-            <Message content={sharedMessages.adminContact} component="h4" className="mt-cs-xs" />
-            <Message
-              content={m.adminContactDescription}
-              component="p"
-              className="mt-cs-xs tc-subtle-gray"
-            />
-          </div>
-          <div>
-            <Message content={sharedMessages.technicalContact} component="h4" />
-            <Message
-              content={m.techContactDescription}
-              component="p"
-              className="mt-cs-xs tc-subtle-gray"
-            />
-          </div>
+          <CollaboratorSelect
+            name="administrative_contact"
+            title={'Administrative contact'}
+            placeholder={m.contactPlaceholder}
+            entity="organization"
+            entityId={orgId}
+            encode={encodeContact}
+            decode={decodeContact}
+          />
+          <Message
+            content={m.adminContactDescription}
+            component="p"
+            className="mt-cs-xs tc-subtle-gray"
+          />
+          <CollaboratorSelect
+            name="technical_contact"
+            title={'Technical contact'}
+            placeholder={m.contactPlaceholder}
+            entity="organization"
+            entityId={orgId}
+            encode={encodeContact}
+            decode={decodeContact}
+          />
+          <Message
+            content={m.techContactDescription}
+            component="p"
+            className="mt-cs-xs tc-subtle-gray"
+          />
         </>
       )}
       <SubmitBar>

@@ -25,6 +25,14 @@ import {
 } from '@console/lib/attributes'
 import { addressWithOptionalScheme as addressWithOptionalSchemeRegexp } from '@console/lib/regexp'
 
+const organizationSchema = Yup.object().shape({
+  organization_id: Yup.string().matches(contactIdRegex, sharedMessages.validateAlphanum),
+})
+
+const userSchema = Yup.object().shape({
+  user_id: Yup.string().matches(contactIdRegex, sharedMessages.validateAlphanum),
+})
+
 const validationSchema = Yup.object().shape({
   ids: Yup.object().shape({
     gateway_id: Yup.string()
@@ -84,16 +92,16 @@ const validationSchema = Yup.object().shape({
       sharedMessages.attributeValueValidateTooLong,
       attributeValueTooLongCheck,
     ),
-  _administrative_contact_id: Yup.string().matches(
-    contactIdRegex,
-    Yup.passValues(sharedMessages.validateIdFormat),
-  ),
-  _administrative_contact_type: Yup.string(),
-  _technical_contact_id: Yup.string().matches(
-    contactIdRegex,
-    Yup.passValues(sharedMessages.validateIdFormat),
-  ),
-  _technical_contact_type: Yup.string(),
+  administrative_contact: Yup.object().when(['organization_ids'], {
+    is: organizationIds => Boolean(organizationIds),
+    then: schema => schema.concat(organizationSchema),
+    otherwise: schema => schema.concat(userSchema),
+  }),
+  technical_contact: Yup.object().when(['organization_ids'], {
+    is: organizationIds => Boolean(organizationIds),
+    then: schema => schema.concat(organizationSchema),
+    otherwise: schema => schema.concat(userSchema),
+  }),
 })
 
 export default validationSchema

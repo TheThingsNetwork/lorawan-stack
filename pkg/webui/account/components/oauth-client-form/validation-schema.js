@@ -18,6 +18,14 @@ import { userId as contactIdRegex } from '@ttn-lw/lib/regexp'
 
 import { approvalStates } from './utils'
 
+const organizationSchema = Yup.object().shape({
+  organization_id: Yup.string().matches(contactIdRegex, sharedMessages.validateAlphanum),
+})
+
+const userSchema = Yup.object().shape({
+  user_id: Yup.string().matches(contactIdRegex, sharedMessages.validateAlphanum),
+})
+
 const validationSchema = Yup.object().shape({
   owner_id: Yup.string().required(sharedMessages.validateRequired),
   ids: Yup.object().shape({
@@ -53,6 +61,16 @@ const validationSchema = Yup.object().shape({
     return Yup.string()
   }),
   rights: Yup.array().min(1, sharedMessages.validateRights),
+  administrative_contact: Yup.object().when(['organization_ids'], {
+    is: organizationIds => Boolean(organizationIds),
+    then: schema => schema.concat(organizationSchema),
+    otherwise: schema => schema.concat(userSchema),
+  }),
+  technical_contact: Yup.object().when(['organization_ids'], {
+    is: organizationIds => Boolean(organizationIds),
+    then: schema => schema.concat(organizationSchema),
+    otherwise: schema => schema.concat(userSchema),
+  }),
 })
 
 export default validationSchema

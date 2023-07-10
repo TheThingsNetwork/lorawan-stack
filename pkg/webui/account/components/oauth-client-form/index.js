@@ -175,38 +175,34 @@ const OAuthClientForm = props => {
         <>
           <Form.SubTitle title={sharedMessages.contactInformation} className="mb-cs-s" />
           <Notification small warning content={m.contactWarning} />
-          <div>
-            <CollaboratorSelect
-              name="administrative_contact"
-              title={'Administrative contact'}
-              placeholder={m.contactPlaceholder}
-              entity={'client'}
-              entityId={clientId}
-              encode={encodeContact}
-              decode={decodeContact}
-            />
-            <Message
-              content={m.adminContactDescription}
-              component="p"
-              className="mt-cs-xs tc-subtle-gray"
-            />
-          </div>
-          <div>
-            <CollaboratorSelect
-              name="technical_contact"
-              title={'Technical contact'}
-              placeholder={m.contactPlaceholder}
-              entity={'client'}
-              entityId={clientId}
-              encode={encodeContact}
-              decode={decodeContact}
-            />
-            <Message
-              content={m.techContactDescription}
-              component="p"
-              className="mt-cs-xs tc-subtle-gray"
-            />
-          </div>
+          <CollaboratorSelect
+            name="administrative_contact"
+            title={'Administrative contact'}
+            placeholder={m.contactPlaceholder}
+            entity={'client'}
+            entityId={clientId}
+            encode={encodeContact}
+            decode={decodeContact}
+          />
+          <Message
+            content={m.adminContactDescription}
+            component="p"
+            className="mt-cs-xs tc-subtle-gray"
+          />
+          <CollaboratorSelect
+            name="technical_contact"
+            title={'Technical contact'}
+            placeholder={m.contactPlaceholder}
+            entity={'client'}
+            entityId={clientId}
+            encode={encodeContact}
+            decode={decodeContact}
+          />
+          <Message
+            content={m.techContactDescription}
+            component="p"
+            className="mt-cs-xs tc-subtle-gray"
+          />
         </>
       )}
       {((isAdmin && update) || !update) && (

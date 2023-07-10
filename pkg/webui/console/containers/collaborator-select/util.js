@@ -39,4 +39,4 @@ export const encodeContact = value =>
       }
     : null
 
-export const decodeContact = value => (value && value.ids ? composeContactOption(value) : null)
+export const decodeContact = value => (value ? composeContactOption(value) : null)

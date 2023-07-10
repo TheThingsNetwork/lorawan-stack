@@ -26,6 +26,9 @@ import Notification from '@ttn-lw/components/notification'
 
 import Message from '@ttn-lw/lib/components/message'
 
+import CollaboratorSelect from '@console/containers/collaborator-select'
+import { decodeContact, encodeContact } from '@console/containers/collaborator-select/util'
+
 import Require from '@console/lib/components/require'
 
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
@@ -51,6 +54,15 @@ const m = defineMessages({
     'Administrative contact information for this application. Typically used to indicate who to contact with administrative questions about the application.',
   techContactDescription:
     'Technical contact information for this application. Typically used to indicate who to contact with technical/security questions about the application.',
+  contactPlaceholder: 'Type to choose a contact',
+})
+
+const organizationSchema = Yup.object().shape({
+  organization_id: Yup.string().matches(contactIdRegex, sharedMessages.validateAlphanum),
+})
+
+const userSchema = Yup.object().shape({
+  user_id: Yup.string().matches(contactIdRegex, sharedMessages.validateAlphanum),
 })
 
 const validationSchema = Yup.object().shape({
@@ -78,16 +90,16 @@ const validationSchema = Yup.object().shape({
     ),
   skip_payload_crypto: Yup.boolean(),
   alcsync: Yup.boolean(),
-  _administrative_contact_id: Yup.string().matches(
-    contactIdRegex,
-    Yup.passValues(sharedMessages.validateIdFormat),
-  ),
-  _technical_contact_id: Yup.string(),
-  _administrative_contact_type: Yup.string().matches(
-    contactIdRegex,
-    Yup.passValues(sharedMessages.validateIdFormat),
-  ),
-  _technical_contact_type: Yup.string(),
+  administrative_contact: Yup.object().when(['organization_ids'], {
+    is: organizationIds => Boolean(organizationIds),
+    then: schema => schema.concat(organizationSchema),
+    otherwise: schema => schema.concat(userSchema),
+  }),
+  technical_contact: Yup.object().when(['organization_ids'], {
+    is: organizationIds => Boolean(organizationIds),
+    then: schema => schema.concat(organizationSchema),
+    otherwise: schema => schema.concat(userSchema),
+  }),
 })
 
 const encodeAttributes = formValue =>
@@ -173,22 +185,30 @@ const ApplicationGeneralSettingsForm = ({
     />
     <Form.SubTitle title={sharedMessages.contactInformation} className="mb-cs-s" />
     <Notification small warning content={m.contactWarning} />
-    <div>
-      <Message content={sharedMessages.adminContact} component="h4" className="mt-cs-xs" />
-      <Message
-        content={m.adminContactDescription}
-        component="p"
-        className="mt-cs-xs tc-subtle-gray"
-      />
-    </div>
-    <div>
-      <Message content={sharedMessages.technicalContact} component="h4" />
-      <Message
-        content={m.techContactDescription}
-        component="p"
-        className="mt-cs-xs tc-subtle-gray"
-      />
-    </div>
+    <CollaboratorSelect
+      name="administrative_contact"
+      title={'Administrative contact'}
+      placeholder={m.contactPlaceholder}
+      entity="application"
+      entityId={appId}
+      encode={encodeContact}
+      decode={decodeContact}
+    />
+    <Message
+      content={m.adminContactDescription}
+      component="p"
+      className="mt-cs-xs tc-subtle-gray"
+    />
+    <CollaboratorSelect
+      name="technical_contact"
+      title={'Technical contact'}
+      placeholder={m.contactPlaceholder}
+      entity="application"
+      entityId={appId}
+      encode={encodeContact}
+      decode={decodeContact}
+    />
+    <Message content={m.techContactDescription} component="p" className="mt-cs-xs tc-subtle-gray" />
     <SubmitBar>
       <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
       <Require featureCheck={mayDeleteApplication}>

@@ -25,6 +25,9 @@ import Notification from '@ttn-lw/components/notification'
 
 import Message from '@ttn-lw/lib/components/message'
 
+import CollaboratorSelect from '@console/containers/collaborator-select'
+import { decodeContact, encodeContact } from '@console/containers/collaborator-select/util'
+
 import Require from '@console/lib/components/require'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -222,22 +225,34 @@ const BasicSettingsForm = React.memo(props => {
       />
       <Form.SubTitle title={sharedMessages.contactInformation} className="mb-cs-s" />
       <Notification small warning content={m.contactWarning} />
-      <div>
-        <Message content={sharedMessages.adminContact} component="h4" className="mt-cs-xs" />
-        <Message
-          content={m.adminContactDescription}
-          component="p"
-          className="mt-cs-xs tc-subtle-gray"
-        />
-      </div>
-      <div>
-        <Message content={sharedMessages.technicalContact} component="h4" />
-        <Message
-          content={m.techContactDescription}
-          component="p"
-          className="mt-cs-xs tc-subtle-gray"
-        />
-      </div>
+      <CollaboratorSelect
+        name="administrative_contact"
+        title={'Administrative contact'}
+        placeholder={m.contactPlaceholder}
+        entity={'gateway'}
+        entityId={gtwId}
+        encode={encodeContact}
+        decode={decodeContact}
+      />
+      <Message
+        content={m.adminContactDescription}
+        component="p"
+        className="mt-cs-xs tc-subtle-gray"
+      />
+      <CollaboratorSelect
+        name="technical_contact"
+        title={'Technical contact'}
+        placeholder={m.contactPlaceholder}
+        entity={'gateway'}
+        entityId={gtwId}
+        encode={encodeContact}
+        decode={decodeContact}
+      />
+      <Message
+        content={m.techContactDescription}
+        component="p"
+        className="mt-cs-xs tc-subtle-gray"
+      />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
         <Require condition={mayDeleteGateway}>
