@@ -24,8 +24,9 @@ import toast from '@ttn-lw/components/toast'
 import ModalButton from '@ttn-lw/components/button/modal-button'
 import RightsGroup from '@ttn-lw/components/rights-group'
 
-import AccountSelect from '@console/containers/account-select'
 import { composeOption } from '@ttn-lw/containers/collaborator-select/util'
+
+import AccountSelect from '@console/containers/account-select'
 
 import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
