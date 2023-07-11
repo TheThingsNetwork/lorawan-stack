@@ -294,10 +294,10 @@ DeviceInfo.propTypes = {
 }
 
 const DeviceOverview = () => {
-  const appId = useSelector(selectSelectedApplicationId())
-  const device = useSelector(selectSelectedDevice())
-  const shouldRedirect = useSelector(isOtherClusterDevice(device))
-  const frequencyPlans = useSelector(selectNsFrequencyPlans())
+  const appId = useSelector(selectSelectedApplicationId)
+  const device = useSelector(selectSelectedDevice)
+  const shouldRedirect = useSelector(() => isOtherClusterDevice(device))
+  const frequencyPlans = useSelector(selectNsFrequencyPlans)
 
   const onExport = useCallback(async () => {
     const { ids, mac_settings, session, network_server_address } = device
