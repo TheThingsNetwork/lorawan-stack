@@ -128,32 +128,29 @@ const ApplicationMqtt = () => {
       },
     ]
   }
-
-  useEffect(() => {
-    if (apiKey) {
-      connectionData[1].items.push({
-        key: sharedMessages.password,
-        type: 'code',
-        value: apiKey.key,
-      })
-    } else {
-      connectionData[1].items.push({
-        key: sharedMessages.password,
-        value: (
-          <>
-            <Button
-              message={m.generateApiKey}
-              onClick={handleGeneratePasswordClick}
-              className="mr-cs-s"
-            />
-            <Link to={`/applications/${appId}/api-keys`} naked secondary>
-              <Message content={m.goToApiKeys} />
-            </Link>
-          </>
-        ),
-      })
-    }
-  }, [appId, connectionData, handleGeneratePasswordClick, apiKey])
+  if (apiKey) {
+    connectionData[1].items.push({
+      key: sharedMessages.password,
+      type: 'code',
+      value: apiKey.key,
+    })
+  } else {
+    connectionData[1].items.push({
+      key: sharedMessages.password,
+      value: (
+        <>
+          <Button
+            message={m.generateApiKey}
+            onClick={handleGeneratePasswordClick}
+            className="mr-cs-s"
+          />
+          <Link to={`/applications/${appId}/api-keys`} naked secondary>
+            <Message content={m.goToApiKeys} />
+          </Link>
+        </>
+      ),
+    })
+  }
 
   return (
     <RequireRequest requestAction={getMqttInfo(appId)}>
