@@ -14,7 +14,7 @@
 
 import React, { useCallback, useEffect, useState } from 'react'
 import { Container, Col, Row } from 'react-grid-system'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
 import PageTitle from '@ttn-lw/components/page-title'
@@ -64,6 +64,7 @@ const ApplicationMqtt = () => {
   const appId = useSelector(selectSelectedApplicationId)
   const connectionInfo = useSelector(selectMqttConnectionInfo)
   const [apiKey, setApiKey] = useState()
+  const dispatch = useDispatch()
 
   useBreadcrumbs(
     'apps.single.integrations.mqtt',
@@ -75,9 +76,9 @@ const ApplicationMqtt = () => {
       name: `mqtt-password-key-${Date.now()}`,
       rights: ['RIGHT_APPLICATION_TRAFFIC_READ', 'RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE'],
     }
-    const result = await attachPromise(createApplicationApiKey(appId, key))
-    setApiKey(result.payload)
-  }, [appId])
+    const result = await dispatch(attachPromise(createApplicationApiKey(appId, key)))
+    setApiKey(result)
+  }, [appId, dispatch])
 
   const connectionData = [
     { header: m.host, items: [] },
