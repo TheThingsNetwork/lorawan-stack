@@ -12,15 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Container, Col, Row } from 'react-grid-system'
-import { connect } from 'react-redux'
-import bind from 'autobind-decorator'
+import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import DataSheet from '@ttn-lw/components/data-sheet'
 import Button from '@ttn-lw/components/button'
 import Link from '@ttn-lw/components/link'
@@ -28,12 +27,11 @@ import Link from '@ttn-lw/components/link'
 import Message from '@ttn-lw/lib/components/message'
 import ErrorView from '@ttn-lw/lib/components/error-view'
 
-import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+import Require from '@console/lib/components/require'
 
 import SubViewError from '@console/views/sub-view-error'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
-import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { mayViewMqttConnectionInfo } from '@console/lib/feature-checks'
@@ -58,134 +56,113 @@ const m = defineMessages({
   connectionInfo: 'Connection information',
 })
 
-@connect(
-  state => ({
-    appId: selectSelectedApplicationId(state),
-  }),
-  {
-    createApiKey: (appId, key) => attachPromise(createApplicationApiKey(appId, key)),
-    getMqttConnectionInfo: id => attachPromise(getMqttInfo(id)),
-  },
-)
-@withFeatureRequirement(mayViewMqttConnectionInfo, {
-  redirect: ({ appId }) => `/applications/${appId}`,
-})
-@withBreadcrumb('apps.single.integrations.mqtt', props => {
-  const { appId } = props
+const ApplicationMqtt = () => {
+  const appId = useSelector(selectSelectedApplicationId)
+  const [connectionInfo, setConnectionInfo] = useState(undefined)
+  const [key, setKey] = useState()
 
-  return (
-    <Breadcrumb path={`/applications/${appId}/integrations/mqtt`} content={sharedMessages.mqtt} />
+  useBreadcrumbs(
+    'apps.single.integrations.mqtt',
+    <Breadcrumb path={`/applications/${appId}/integrations/mqtt`} content={sharedMessages.mqtt} />,
   )
-})
-export default class ApplicationMqtt extends React.Component {
-  static propTypes = {
-    appId: PropTypes.string.isRequired,
-    createApiKey: PropTypes.func.isRequired,
-    getMqttConnectionInfo: PropTypes.func.isRequired,
-  }
 
-  state = {
-    connectionInfo: undefined,
-  }
+  useEffect(() => {
+    const getConnectionInfo = async () => {
+      const connectionInfo = await attachPromise(getMqttInfo(appId))
+      setConnectionInfo(connectionInfo)
+    }
 
-  async componentDidMount() {
-    const { appId, getMqttConnectionInfo } = this.props
-    const connectionInfo = await getMqttConnectionInfo(appId)
+    getConnectionInfo()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
-    this.setState({ connectionInfo })
-  }
-
-  @bind
-  async handleGeneratePasswordClick() {
-    const { appId, createApiKey } = this.props
+  const handleGeneratePasswordClick = useCallback(async () => {
     const key = {
       name: `mqtt-password-key-${Date.now()}`,
       rights: ['RIGHT_APPLICATION_TRAFFIC_READ', 'RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE'],
     }
-    const result = await createApiKey(appId, key)
+    const result = await attachPromise(createApplicationApiKey(appId, key))
+    setKey(result)
+  }, [appId])
 
-    this.setState({
-      key: result,
+  const connectionData = [
+    { header: m.host, items: [] },
+    { header: m.connectionCredentials, items: [] },
+  ]
+  const fetchingMessage = <Message content={sharedMessages.fetching} />
+
+  if (connectionInfo) {
+    const { public_address, public_tls_address, username } = connectionInfo
+    connectionData[0].items = [
+      {
+        key: m.publicAddress,
+        type: 'code',
+        sensitive: false,
+        value: public_address,
+      },
+      {
+        key: m.publicTlsAddress,
+        type: 'code',
+        sensitive: false,
+        value: public_tls_address,
+      },
+    ]
+    connectionData[1].items = [
+      {
+        key: sharedMessages.username,
+        type: 'code',
+        sensitive: false,
+        value: username,
+      },
+    ]
+  } else {
+    connectionData[0].items = [
+      {
+        key: m.publicAddress,
+        value: fetchingMessage,
+      },
+      {
+        key: m.publicTlsAddress,
+        value: fetchingMessage,
+      },
+    ]
+    connectionData[1].items = [
+      {
+        key: sharedMessages.username,
+        value: fetchingMessage,
+      },
+    ]
+  }
+
+  if (key) {
+    connectionData[1].items.push({
+      key: sharedMessages.password,
+      type: 'code',
+      value: key.key,
+    })
+  } else {
+    connectionData[1].items.push({
+      key: sharedMessages.password,
+      value: (
+        <>
+          <Button
+            message={m.generateApiKey}
+            onClick={handleGeneratePasswordClick}
+            className="mr-cs-s"
+          />
+          <Link to={`/applications/${appId}/api-keys`} naked secondary>
+            <Message content={m.goToApiKeys} />
+          </Link>
+        </>
+      ),
     })
   }
 
-  render() {
-    const { appId } = this.props
-    const { connectionInfo, key } = this.state
-    const connectionData = [
-      { header: m.host, items: [] },
-      { header: m.connectionCredentials, items: [] },
-    ]
-    const fetchingMessage = <Message content={sharedMessages.fetching} />
-
-    if (connectionInfo) {
-      const { public_address, public_tls_address, username } = connectionInfo
-      connectionData[0].items = [
-        {
-          key: m.publicAddress,
-          type: 'code',
-          sensitive: false,
-          value: public_address,
-        },
-        {
-          key: m.publicTlsAddress,
-          type: 'code',
-          sensitive: false,
-          value: public_tls_address,
-        },
-      ]
-      connectionData[1].items = [
-        {
-          key: sharedMessages.username,
-          type: 'code',
-          sensitive: false,
-          value: username,
-        },
-      ]
-    } else {
-      connectionData[0].items = [
-        {
-          key: m.publicAddress,
-          value: fetchingMessage,
-        },
-        {
-          key: m.publicTlsAddress,
-          value: fetchingMessage,
-        },
-      ]
-      connectionData[1].items = [
-        {
-          key: sharedMessages.username,
-          value: fetchingMessage,
-        },
-      ]
-    }
-
-    if (key) {
-      connectionData[1].items.push({
-        key: sharedMessages.password,
-        type: 'code',
-        value: key.key,
-      })
-    } else {
-      connectionData[1].items.push({
-        key: sharedMessages.password,
-        value: (
-          <>
-            <Button
-              message={m.generateApiKey}
-              onClick={this.handleGeneratePasswordClick}
-              className="mr-cs-s"
-            />
-            <Link to={`/applications/${appId}/api-keys`} naked secondary>
-              <Message content={m.goToApiKeys} />
-            </Link>
-          </>
-        ),
-      })
-    }
-
-    return (
+  return (
+    <Require
+      featureCheck={mayViewMqttConnectionInfo}
+      otherwise={{ redirect: `/applications/${appId}` }}
+    >
       <ErrorView errorRender={SubViewError}>
         <Container>
           <PageTitle title={sharedMessages.mqtt} />
@@ -213,6 +190,8 @@ export default class ApplicationMqtt extends React.Component {
           </Row>
         </Container>
       </ErrorView>
-    )
-  }
+    </Require>
+  )
 }
+
+export default ApplicationMqtt
