@@ -34,6 +34,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- End device data stream not being closed when navigating away from end device pages, which could cause event streams stopping to work due to too many open connections.
+
 ### Security
 
 ## [3.26.2] - 2023-07-11
