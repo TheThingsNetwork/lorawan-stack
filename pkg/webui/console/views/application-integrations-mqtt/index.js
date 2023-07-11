@@ -26,6 +26,7 @@ import Link from '@ttn-lw/components/link'
 
 import Message from '@ttn-lw/lib/components/message'
 import ErrorView from '@ttn-lw/lib/components/error-view'
+import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import Require from '@console/lib/components/require'
 
@@ -39,7 +40,10 @@ import { mayViewMqttConnectionInfo } from '@console/lib/feature-checks'
 import { createApplicationApiKey } from '@console/store/actions/api-keys'
 import { getMqttInfo } from '@console/store/actions/applications'
 
-import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+import {
+  selectMqttConnectionInfo,
+  selectSelectedApplicationId,
+} from '@console/store/selectors/applications'
 
 const m = defineMessages({
   publicAddress: 'Public address',
@@ -58,23 +62,13 @@ const m = defineMessages({
 
 const ApplicationMqtt = () => {
   const appId = useSelector(selectSelectedApplicationId)
-  const [connectionInfo, setConnectionInfo] = useState(undefined)
-  const [key, setKey] = useState()
+  const connectionInfo = useSelector(selectMqttConnectionInfo)
+  const [apiKey, setApiKey] = useState()
 
   useBreadcrumbs(
     'apps.single.integrations.mqtt',
     <Breadcrumb path={`/applications/${appId}/integrations/mqtt`} content={sharedMessages.mqtt} />,
   )
-
-  useEffect(() => {
-    const getConnectionInfo = async () => {
-      const connectionInfo = await attachPromise(getMqttInfo(appId))
-      setConnectionInfo(connectionInfo)
-    }
-
-    getConnectionInfo()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   const handleGeneratePasswordClick = useCallback(async () => {
     const key = {
@@ -82,7 +76,7 @@ const ApplicationMqtt = () => {
       rights: ['RIGHT_APPLICATION_TRAFFIC_READ', 'RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE'],
     }
     const result = await attachPromise(createApplicationApiKey(appId, key))
-    setKey(result)
+    setApiKey(result.payload)
   }, [appId])
 
   const connectionData = [
@@ -134,63 +128,67 @@ const ApplicationMqtt = () => {
     ]
   }
 
-  if (key) {
-    connectionData[1].items.push({
-      key: sharedMessages.password,
-      type: 'code',
-      value: key.key,
-    })
-  } else {
-    connectionData[1].items.push({
-      key: sharedMessages.password,
-      value: (
-        <>
-          <Button
-            message={m.generateApiKey}
-            onClick={handleGeneratePasswordClick}
-            className="mr-cs-s"
-          />
-          <Link to={`/applications/${appId}/api-keys`} naked secondary>
-            <Message content={m.goToApiKeys} />
-          </Link>
-        </>
-      ),
-    })
-  }
+  useEffect(() => {
+    if (apiKey) {
+      connectionData[1].items.push({
+        key: sharedMessages.password,
+        type: 'code',
+        value: apiKey.key,
+      })
+    } else {
+      connectionData[1].items.push({
+        key: sharedMessages.password,
+        value: (
+          <>
+            <Button
+              message={m.generateApiKey}
+              onClick={handleGeneratePasswordClick}
+              className="mr-cs-s"
+            />
+            <Link to={`/applications/${appId}/api-keys`} naked secondary>
+              <Message content={m.goToApiKeys} />
+            </Link>
+          </>
+        ),
+      })
+    }
+  }, [appId, connectionData, handleGeneratePasswordClick, apiKey])
 
   return (
-    <Require
-      featureCheck={mayViewMqttConnectionInfo}
-      otherwise={{ redirect: `/applications/${appId}` }}
-    >
-      <ErrorView errorRender={SubViewError}>
-        <Container>
-          <PageTitle title={sharedMessages.mqtt} />
-          <Row>
-            <Col lg={8} md={12}>
-              <Message content={m.mqttInfoText} className="mt-0" />
-              <div>
-                <Message
-                  component="h4"
-                  content={sharedMessages.furtherResources}
-                  className="mb-cs-xxs"
-                />
-                <Link.DocLink path="/integrations/mqtt" secondary>
-                  <Message content={m.mqttServer} />
-                </Link.DocLink>
-                {' | '}
-                <Link.Anchor href="https://www.mqtt.org" external secondary>
-                  <Message content={m.officialMqttWebsite} />
-                </Link.Anchor>
-              </div>
-              <hr className="mb-ls-s" />
-              <Message content={m.connectionInfo} component="h3" />
-              <DataSheet data={connectionData} />
-            </Col>
-          </Row>
-        </Container>
-      </ErrorView>
-    </Require>
+    <RequireRequest requestAction={getMqttInfo(appId)}>
+      <Require
+        featureCheck={mayViewMqttConnectionInfo}
+        otherwise={{ redirect: `/applications/${appId}` }}
+      >
+        <ErrorView errorRender={SubViewError}>
+          <Container>
+            <PageTitle title={sharedMessages.mqtt} />
+            <Row>
+              <Col lg={8} md={12}>
+                <Message content={m.mqttInfoText} className="mt-0" />
+                <div>
+                  <Message
+                    component="h4"
+                    content={sharedMessages.furtherResources}
+                    className="mb-cs-xxs"
+                  />
+                  <Link.DocLink path="/integrations/mqtt" secondary>
+                    <Message content={m.mqttServer} />
+                  </Link.DocLink>
+                  {' | '}
+                  <Link.Anchor href="https://www.mqtt.org" external secondary>
+                    <Message content={m.officialMqttWebsite} />
+                  </Link.Anchor>
+                </div>
+                <hr className="mb-ls-s" />
+                <Message content={m.connectionInfo} component="h3" />
+                <DataSheet data={connectionData} />
+              </Col>
+            </Row>
+          </Container>
+        </ErrorView>
+      </Require>
+    </RequireRequest>
   )
 }
 
