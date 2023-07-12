@@ -955,14 +955,7 @@ message BatchGetEndDevicesRequest {
   // This mask is applied on all the end devices in the result.
   // See the API reference for which fields can be returned by the different services.
   google.protobuf.FieldMask field_mask = 3;
-  // Order the results by this field path (must be present in the field mask).
-  // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
-  string order = 4 [
-    (validate.rules).string = { in: ["", "device_id", "-device_id", "join_eui", "-join_eui", "dev_eui", "-dev_eui",
-      "name", "-name", "description", "-description", "created_at", "-created_at", "last_seen_at", "-last_seen_at"] }
-  ];
-  // Limit the number of results per page.
-  uint32 limit = 5 [(validate.rules).uint32.lte = 20];
-  // Page number for pagination. 0 is interpreted as 1.
-  uint32 page = 6;
+  reserved 4; reserved "order";
+  reserved 5; reserved "limit";
+  reserved 6; reserved "page";
 }

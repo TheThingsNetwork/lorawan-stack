@@ -4089,21 +4089,6 @@ func (x *BatchGetEndDevicesRequest) MarshalProtoJSON(s *jsonplugin.MarshalState)
 			golang.MarshalLegacyFieldMask(s, x.FieldMask)
 		}
 	}
-	if x.Order != "" || s.HasField("order") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("order")
-		s.WriteString(x.Order)
-	}
-	if x.Limit != 0 || s.HasField("limit") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("limit")
-		s.WriteUint32(x.Limit)
-	}
-	if x.Page != 0 || s.HasField("page") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("page")
-		s.WriteUint32(x.Page)
-	}
 	s.WriteObjectEnd()
 }
 
@@ -4149,15 +4134,6 @@ func (x *BatchGetEndDevicesRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalSt
 				return
 			}
 			x.FieldMask = v
-		case "order":
-			s.AddField("order")
-			x.Order = s.ReadString()
-		case "limit":
-			s.AddField("limit")
-			x.Limit = s.ReadUint32()
-		case "page":
-			s.AddField("page")
-			x.Page = s.ReadUint32()
 		}
 	})
 }

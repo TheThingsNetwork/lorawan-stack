@@ -4221,26 +4221,6 @@ func (m *BatchGetEndDevicesRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
-		case "order":
-
-			if _, ok := _BatchGetEndDevicesRequest_Order_InLookup[m.GetOrder()]; !ok {
-				return BatchGetEndDevicesRequestValidationError{
-					field:  "order",
-					reason: "value must be in list [ device_id -device_id join_eui -join_eui dev_eui -dev_eui name -name description -description created_at -created_at last_seen_at -last_seen_at]",
-				}
-			}
-
-		case "limit":
-
-			if m.GetLimit() > 20 {
-				return BatchGetEndDevicesRequestValidationError{
-					field:  "limit",
-					reason: "value must be less than or equal to 20",
-				}
-			}
-
-		case "page":
-			// no validation rules for Page
 		default:
 			return BatchGetEndDevicesRequestValidationError{
 				field:  name,
@@ -4309,24 +4289,6 @@ var _ interface {
 } = BatchGetEndDevicesRequestValidationError{}
 
 var _BatchGetEndDevicesRequest_DeviceIds_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
-
-var _BatchGetEndDevicesRequest_Order_InLookup = map[string]struct{}{
-	"":              {},
-	"device_id":     {},
-	"-device_id":    {},
-	"join_eui":      {},
-	"-join_eui":     {},
-	"dev_eui":       {},
-	"-dev_eui":      {},
-	"name":          {},
-	"-name":         {},
-	"description":   {},
-	"-description":  {},
-	"created_at":    {},
-	"-created_at":   {},
-	"last_seen_at":  {},
-	"-last_seen_at": {},
-}
 
 // ValidateFields checks the field values on MACParameters_Channel with the
 // rules defined in the proto definition for this message. If any rules are

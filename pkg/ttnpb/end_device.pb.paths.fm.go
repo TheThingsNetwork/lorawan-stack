@@ -3180,18 +3180,12 @@ var BatchGetEndDevicesRequestFieldPathsNested = []string{
 	"application_ids.application_id",
 	"device_ids",
 	"field_mask",
-	"limit",
-	"order",
-	"page",
 }
 
 var BatchGetEndDevicesRequestFieldPathsTopLevel = []string{
 	"application_ids",
 	"device_ids",
 	"field_mask",
-	"limit",
-	"order",
-	"page",
 }
 var MACParameters_ChannelFieldPathsNested = []string{
 	"downlink_frequency",

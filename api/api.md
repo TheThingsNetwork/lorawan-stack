@@ -3480,9 +3480,6 @@ Configuration options for static ADR.
 | `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
 | `device_ids` | [`string`](#string) | repeated |  |
 | `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the end device fields that should be returned. This mask is applied on all the end devices in the result. See the API reference for which fields can be returned by the different services. |
-| `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
-| `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
-| `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
 
 #### Field Rules
 
@@ -3490,8 +3487,6 @@ Configuration options for static ADR.
 | ----- | ----------- |
 | `application_ids` | <p>`message.required`: `true`</p> |
 | `device_ids` | <p>`repeated.min_items`: `1`</p><p>`repeated.max_items`: `20`</p><p>`repeated.items.string.max_len`: `36`</p><p>`repeated.items.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
-| `order` | <p>`string.in`: `[ device_id -device_id join_eui -join_eui dev_eui -dev_eui name -name description -description created_at -created_at last_seen_at -last_seen_at]`</p> |
-| `limit` | <p>`uint32.lte`: `20`</p> |
 
 ### <a name="ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest">Message `BatchUpdateEndDeviceLastSeenRequest`</a>
 
