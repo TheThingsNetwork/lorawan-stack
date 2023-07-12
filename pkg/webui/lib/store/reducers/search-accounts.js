@@ -15,7 +15,10 @@
 import { SEARCH_ACCOUNTS_SUCCESS } from '@ttn-lw/lib/store/actions/search-accounts'
 
 const defaultState = {
-  searchResults: [],
+  searchResults: {
+    account_ids: [],
+  },
+  totalCount: 0,
 }
 
 const searchAccounts = (state = defaultState, { type, payload }) => {
