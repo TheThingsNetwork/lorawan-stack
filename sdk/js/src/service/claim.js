@@ -14,6 +14,7 @@
 
 import autoBind from 'auto-bind'
 
+import Bytes from '../util/bytes'
 import Marshaler from '../util/marshaler'
 
 class DeviceClaim {
@@ -62,8 +63,8 @@ class DeviceClaim {
     }
 
     const response = await this._api.EndDeviceClaimingServer.Unclaim(params, {
-      dev_eui: devEui,
-      join_eui: joinEui,
+      dev_eui: Bytes.hexToBase64(devEui),
+      join_eui: Bytes.hexToBase64(joinEui),
     })
 
     return Marshaler.payloadSingleResponse(response)

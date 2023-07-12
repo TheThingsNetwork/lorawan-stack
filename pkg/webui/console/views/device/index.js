@@ -34,6 +34,7 @@ import { getNsFrequencyPlans } from '@console/store/actions/configuration'
 import { getInfoByJoinEUI } from '@console/store/actions/claim'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+import { selectSelectedDevice } from '@console/store/selectors/devices'
 
 import Device from './device'
 
@@ -105,9 +106,13 @@ const DeviceContainer = props => {
     [appId, devId, dispatch],
   )
 
+  // Check whether the device still exists after it has been possibly deleted.
+  const device = useSelector(selectSelectedDevice)
+  const hasDevice = Boolean(device)
+
   return (
     <RequireRequest requestAction={loadDeviceData}>
-      <Device {...props} />
+      {hasDevice && <Device {...props} />}
     </RequireRequest>
   )
 }
