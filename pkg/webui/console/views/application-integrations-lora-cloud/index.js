@@ -60,6 +60,9 @@ const m = defineMessages({
 })
 
 const LoRaCloud = () => {
+  const appId = useSelector(selectSelectedApplicationId)
+  const selector = ['data']
+
   useBreadcrumbs(
     'apps.single.integrations.lora-cloud',
     <Breadcrumb
@@ -67,8 +70,6 @@ const LoRaCloud = () => {
       content={sharedMessages.loraCloud}
     />,
   )
-  const appId = useSelector(selectSelectedApplicationId)
-  const selector = ['data']
 
   return (
     <Require
