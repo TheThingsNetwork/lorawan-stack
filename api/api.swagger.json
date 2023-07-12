@@ -997,6 +997,52 @@
       }
     },
     "/applications/{application_ids.application_id}/devices/batch": {
+      "get": {
+        "summary": "Get a batch of end devices with the given identifiers, selecting the fields specified\nin the field mask.\nMore or less fields may be returned, depending on the rights of the caller.\nDevices not found are skipped and no error is returned.",
+        "operationId": "EndDeviceBatchRegistry_Get",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3EndDevices"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "device_ids",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "field_mask",
+            "description": "The names of the end device fields that should be returned.\nThis mask is applied on all the end devices in the result.\nSee the API reference for which fields can be returned by the different services.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EndDeviceBatchRegistry"
+        ]
+      },
       "delete": {
         "summary": "Delete a batch of end devices with the given IDs.",
         "description": "This operation is atomic; either all devices are deleted or none.\nDevices not found are skipped and no error is returned.\nBefore calling this RPC, use the corresponding BatchDelete RPCs\nof NsEndDeviceRegistry, AsEndDeviceRegistry and\noptionally the JsEndDeviceRegistry to delete the end devices.\nIf the devices were claimed on a Join Server, use the BatchUnclaim RPC\nof the DeviceClaimingServer.\nThis is NOT done automatically.",

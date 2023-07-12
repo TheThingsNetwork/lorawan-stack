@@ -1131,8 +1131,9 @@ var (
 				return err
 			}
 			var (
-				appID  *ttnpb.ApplicationIdentifiers
-				devIDs = make([]*ttnpb.EndDeviceIdentifiers, 0)
+				appID     *ttnpb.ApplicationIdentifiers
+				devIDs    = make([]*ttnpb.EndDeviceIdentifiers, 0)
+				deviceIDs = make([]string, 0)
 			)
 			if inputDecoder != nil {
 				dec := struct {
@@ -1151,6 +1152,7 @@ var (
 						ApplicationIds: appID,
 						DeviceId:       devID,
 					})
+					deviceIDs = append(deviceIDs, devID)
 				}
 			} else if len(args) < 2 {
 				return errNoIDs.New()
@@ -1163,6 +1165,7 @@ var (
 						ApplicationIds: appID,
 						DeviceId:       arg,
 					})
+					deviceIDs = append(deviceIDs, arg)
 				}
 			}
 
@@ -1171,25 +1174,26 @@ var (
 				return err
 			}
 			del := make([]string, 0)
-			for _, devID := range devIDs {
-				dev, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
-					EndDeviceIds: devID,
-					FieldMask: ttnpb.FieldMask(
-						"ids",
-						"network_server_address",
-						"application_server_address",
-						"join_server_address",
-					),
-				})
-				if err != nil && !errors.IsNotFound(err) {
-					return err
-				}
+			devices, err := ttnpb.NewEndDeviceBatchRegistryClient(is).Get(ctx, &ttnpb.BatchGetEndDevicesRequest{
+				ApplicationIds: appID,
+				DeviceIds:      deviceIDs,
+				FieldMask: ttnpb.FieldMask(
+					"ids",
+					"network_server_address",
+					"application_server_address",
+					"join_server_address",
+				),
+			})
+			if err != nil {
+				return err
+			}
+			for _, dev := range devices.GetEndDevices() {
 				// Check if the device is in the configured cluster.
 				nsMismatch, asMismatch, jsMismatch := compareServerAddressesEndDevice(dev, config)
 				if nsMismatch || asMismatch || jsMismatch {
 					return errAddressMismatchEndDevice.New()
 				}
-				del = append(del, devID.DeviceId)
+				del = append(del, dev.GetIds().GetDeviceId())
 			}
 
 			// Batch Delete from JS.
