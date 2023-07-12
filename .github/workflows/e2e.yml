@@ -160,6 +160,7 @@ jobs:
         continue-on-error: true
         run: |
           sed -i 's/\.\.\///g' .failed-specs-*.txt
+          sed -i 's|/integration/|/e2e/|' .failed-specs-*.txt
           echo "failed-test=$(paste -d , .failed-specs-*.txt)" >> $GITHUB_OUTPUT
           echo "neg-failed-test=!$(paste -d ',!' .failed-specs-*.txt)" >> $GITHUB_OUTPUT
       - name: Unzip build artifacts
