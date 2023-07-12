@@ -312,49 +312,6 @@ func TestEndDevicesBatchOperations(t *testing.T) {
 		a.So(devs, should.NotBeNil)
 		a.So(devs.GetEndDevices(), should.HaveLength, noOfDevices)
 
-		// Test order and pagination.
-		devs, err = reg.Get(ctx, &ttnpb.BatchGetEndDevicesRequest{
-			ApplicationIds: app1.GetIds(),
-			DeviceIds:      devIDs,
-			Limit:          2,
-			Page:           1,
-		}, readCreds)
-		a.So(err, should.BeNil)
-		a.So(devs, should.NotBeNil)
-		a.So(devs.GetEndDevices(), should.HaveLength, 2)
-
-		devs, err = reg.Get(ctx, &ttnpb.BatchGetEndDevicesRequest{
-			ApplicationIds: app1.GetIds(),
-			DeviceIds:      devIDs,
-			Limit:          2,
-			Page:           2,
-		}, readCreds)
-		a.So(err, should.BeNil)
-		a.So(devs, should.NotBeNil)
-		a.So(devs.GetEndDevices(), should.HaveLength, 1)
-
-		devs, err = reg.Get(ctx, &ttnpb.BatchGetEndDevicesRequest{
-			ApplicationIds: app1.GetIds(),
-			DeviceIds:      devIDs,
-			Limit:          2,
-			Page:           2,
-		}, readCreds)
-		a.So(err, should.BeNil)
-		a.So(devs, should.NotBeNil)
-		a.So(devs.GetEndDevices(), should.HaveLength, 1)
-
-		devs, err = reg.Get(ctx, &ttnpb.BatchGetEndDevicesRequest{
-			ApplicationIds: app1.GetIds(),
-			DeviceIds:      devIDs,
-			Order:          "-device_id",
-		}, readCreds)
-		a.So(err, should.BeNil)
-		a.So(devs, should.NotBeNil)
-		a.So(devs.GetEndDevices(), should.HaveLength, 3)
-		a.So(devs.GetEndDevices()[0].Ids.DeviceId, should.Equal, devIDs[2])
-		a.So(devs.GetEndDevices()[1].Ids.DeviceId, should.Equal, devIDs[1])
-		a.So(devs.GetEndDevices()[2].Ids.DeviceId, should.Equal, devIDs[0])
-
 		// Test Fieldmask.
 		devs, err = reg.Get(ctx, &ttnpb.BatchGetEndDevicesRequest{
 			ApplicationIds: app1.GetIds(),

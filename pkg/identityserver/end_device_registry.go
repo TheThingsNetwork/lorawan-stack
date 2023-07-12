@@ -525,15 +525,6 @@ func (is *IdentityServer) batchGetEndDevices(
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.EndDeviceFieldPathsNested, req.FieldMask, getPaths, nil)
 
 	res := &ttnpb.EndDevices{}
-	ctx = store.WithOrder(ctx, req.Order)
-	var total uint64
-	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
-	defer func() {
-		if err == nil {
-			setTotalHeader(ctx, total)
-		}
-	}()
-
 	ids := make([]*ttnpb.EndDeviceIdentifiers, 0, len(req.DeviceIds))
 	for _, id := range req.DeviceIds {
 		ids = append(ids, &ttnpb.EndDeviceIdentifiers{
