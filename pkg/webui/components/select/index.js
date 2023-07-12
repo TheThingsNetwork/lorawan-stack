@@ -171,7 +171,7 @@ Select.propTypes = {
   ),
   placeholder: PropTypes.message,
   showOptionIcon: PropTypes.bool,
-  value: PropTypes.oneOf([PropTypes.string, PropTypes.shape({})]),
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.shape({})]),
   warning: PropTypes.bool,
 }
 

@@ -36,7 +36,7 @@ import {
   selectMqttProviderDisabled,
   selectNatsProviderDisabled,
 } from '@console/store/selectors/application-server'
-import { selectSelectedPubsub } from '@console/store/selectors/pubsubs'
+import { selectPubsubById, selectSelectedPubsub } from '@console/store/selectors/pubsubs'
 
 const pubsubEntitySelector = [
   'base_topic',
@@ -127,9 +127,13 @@ const EditPubsubInner = () => {
 const EditPubsub = () => {
   const { appId, pubsubId } = useParams()
 
+  // Check if the pubsub exists after it was possibly deleted.
+  const pubsub = useSelector(state => selectPubsubById(state, pubsubId))
+  const hasPubsub = Boolean(pubsub)
+
   return (
     <RequireRequest requestAction={getPubsub(appId, pubsubId, pubsubEntitySelector)}>
-      <EditPubsubInner />
+      {hasPubsub && <EditPubsubInner />}
     </RequireRequest>
   )
 }
