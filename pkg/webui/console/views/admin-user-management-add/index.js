@@ -40,7 +40,7 @@ const UserManagementAddInner = () => {
   const createUserAction = useCallback(values => dispatch(createUser(values)), [dispatch])
 
   const onSubmit = useCallback(values => createUserAction(values), [createUserAction])
-  const onSubmitSuccess = useCallback(() => navigate('/admin/user-management'), [navigate])
+  const onSubmitSuccess = useCallback(() => navigate('/admin-panel/user-management'), [navigate])
 
   return (
     <Container>
@@ -61,7 +61,7 @@ const UserManagementAddInner = () => {
 const UserManagementAdd = () => {
   useBreadcrumbs(
     'admin-panel.user-management.add',
-    <Breadcrumb path={`/admin/user-management/add`} content={sharedMessages.add} />,
+    <Breadcrumb path={`/admin-panel/user-management/add`} content={sharedMessages.add} />,
   )
 
   return (

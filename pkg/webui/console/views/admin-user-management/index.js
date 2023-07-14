@@ -37,8 +37,8 @@ import UserManagement from './admin-user-management'
 
 const UserManagementRouter = () => {
   useBreadcrumbs(
-    'admin.user-management',
-    <Breadcrumb path="/admin/user-management" content={sharedMessages.userManagement} />,
+    'admin-panel.user-management',
+    <Breadcrumb path="/admin-panel/user-management" content={sharedMessages.userManagement} />,
   )
   return (
     <Require featureCheck={mayManageUsers} otherwise={{ redirect: '/' }}>
