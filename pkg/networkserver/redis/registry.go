@@ -22,6 +22,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/vmihailenco/msgpack/v5"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/internal/registry"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
@@ -34,10 +35,9 @@ import (
 )
 
 var (
-	errInvalidFieldmask     = errors.DefineInvalidArgument("invalid_fieldmask", "invalid fieldmask")
-	errInvalidIdentifiers   = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
-	errDuplicateIdentifiers = errors.DefineAlreadyExists("duplicate_identifiers", "duplicate identifiers")
-	errReadOnlyField        = errors.DefineInvalidArgument("read_only_field", "read-only field `{field}`")
+	errInvalidFieldmask   = errors.DefineInvalidArgument("invalid_fieldmask", "invalid fieldmask")
+	errInvalidIdentifiers = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
+	errReadOnlyField      = errors.DefineInvalidArgument("read_only_field", "read-only field `{field}`")
 )
 
 // DeviceSchemaVersion is the Network Server database schema version regarding the devices namespace.
@@ -779,18 +779,21 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 					return errInvalidIdentifiers.New()
 				}
 				if pb.Ids.JoinEui != nil && pb.Ids.DevEui != nil {
-					ek := r.euiKey(types.MustEUI64(pb.Ids.JoinEui).OrZero(), types.MustEUI64(pb.Ids.DevEui).OrZero())
+					joinEUI := types.MustEUI64(pb.Ids.JoinEui).OrZero()
+					devEUI := types.MustEUI64(pb.Ids.DevEui).OrZero()
+					ek := r.euiKey(joinEUI, devEUI)
 					if err := tx.Watch(ctx, ek).Err(); err != nil {
 						return err
 					}
-					i, err := tx.Exists(ctx, ek).Result()
-					if err != nil {
+
+					storedUIDStr, err := tx.Get(ctx, ek).Result()
+					if errors.Is(err, redis.Nil) {
+						p.SetNX(ctx, ek, uid, 0)
+					} else if err != nil {
 						return err
+					} else {
+						return registry.UniqueEUIViolationErr(ctx, joinEUI, devEUI, storedUIDStr)
 					}
-					if i != 0 {
-						return errDuplicateIdentifiers.New()
-					}
-					p.Set(ctx, ek, uid, 0)
 				}
 			} else {
 				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.Ids.ApplicationIds.ApplicationId != stored.Ids.ApplicationIds.ApplicationId {
