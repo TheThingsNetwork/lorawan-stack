@@ -35,9 +35,6 @@ var (
 	errInvalidValue  = errors.DefineCorruption("invalid_value", "wrong value `{value}`")
 	errEncodingField = errors.DefineCorruption("encoding_field", "encoding field `{field}`")
 	errDecodingField = errors.DefineCorruption("decoding_field", "decoding field `{field}`")
-
-	// ErrEmptyData is a sentinel error that indicates that the data is empty.
-	ErrEmptyData = errors.DefineInvalidArgument("empty_data", "empty data")
 )
 
 // UplinkMetadata contains the uplink metadata stored by the package.
@@ -221,7 +218,7 @@ func (d *Data) Struct() (*structpb.Struct, error) {
 	}
 
 	if len(fields) == 0 {
-		return nil, ErrEmptyData.New()
+		return nil, nil // nolint: nilnil
 	}
 
 	return &structpb.Struct{

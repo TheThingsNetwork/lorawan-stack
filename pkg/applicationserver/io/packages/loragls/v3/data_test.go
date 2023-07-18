@@ -180,7 +180,7 @@ func TestPackageDataSerialization(t *testing.T) {
 		{
 			Name:          "DoesNotSerializezNilValues",
 			InputData:     &Data{},
-			ExpectedError: ErrEmptyData.New(),
+			ExpectedError: nil,
 			ExpectedData:  nil,
 		},
 		{
@@ -191,7 +191,7 @@ func TestPackageDataSerialization(t *testing.T) {
 				Token:          new(string),
 				RecentMetadata: []*UplinkMetadata{},
 			},
-			ExpectedError: ErrEmptyData.New(),
+			ExpectedError: nil,
 			ExpectedData:  nil,
 		},
 		{

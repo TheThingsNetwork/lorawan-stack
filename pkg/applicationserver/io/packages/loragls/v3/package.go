@@ -220,10 +220,7 @@ func (p *GeolocationPackage) pushUplink(
 		data.RecentMetadata = assocData.RecentMetadata
 
 		st, err := assocData.Struct()
-		if errors.Is(err, ErrEmptyData) {
-			return nil, nil, nil
-		}
-		if err != nil {
+		if st == nil || err != nil {
 			return nil, nil, err
 		}
 		assoc.Data = st
