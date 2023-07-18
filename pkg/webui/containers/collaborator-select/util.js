@@ -16,23 +16,14 @@ import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { userId as contactIdRegex } from '@ttn-lw/lib/regexp'
 
-export const composeOption = value => ({
-  value:
-    'user_ids' in value?.ids
-      ? value.ids?.user_ids.user_id
-      : value.ids?.organization_ids.organization_id,
-  label:
-    'user_ids' in value?.ids
-      ? value.ids?.user_ids.user_id
-      : value.ids?.organization_ids.organization_id,
-  icon: 'user_ids' in value?.ids ? 'user' : 'organization',
-})
-
-export const composeContactOption = value => ({
-  value: 'user_ids' in value ? value.user_ids.user_id : value.organization_ids.organization_id,
-  label: 'user_ids' in value ? value.user_ids.user_id : value.organization_ids.organization_id,
-  icon: 'user_ids' in value ? 'user' : 'organization',
-})
+export const composeOption = value => {
+  const data = value.ids || value
+  return {
+    value: 'user_ids' in data ? data.user_ids?.user_id : data.organization_ids?.organization_id,
+    label: 'user_ids' in data ? data.user_ids?.user_id : data.organization_ids?.organization_id,
+    icon: 'user_ids' in data ? 'user' : 'organization',
+  }
+}
 
 export const encodeContact = value =>
   value
@@ -43,7 +34,7 @@ export const encodeContact = value =>
       }
     : null
 
-export const decodeContact = value => (value ? composeContactOption(value) : null)
+export const decodeContact = value => (value ? composeOption(value) : null)
 
 export const organizationSchema = Yup.object().shape({
   organization_id: Yup.string().matches(contactIdRegex, sharedMessages.validateAlphanum),

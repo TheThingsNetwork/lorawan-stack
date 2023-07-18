@@ -37,7 +37,7 @@ import styles from './collaborator-select.styl'
 
 const customMenu = props => (
   <components.Menu {...props}>
-    <Message content={m.suggestions} className="ml-cs-s mt-cs-s mb-cs-s" component="h4" />
+    <Message content={m.suggestions} className="ml-cs-s mt-cs-xxs mb-cs-xxs" component="h4" />
     {props.children}
   </components.Menu>
 )
@@ -163,6 +163,7 @@ const CollaboratorSelect = ({ entity, entityId, ...rest }) => {
         initialOptions={collaboratorOptions}
         entity={entity.toLowerCase()}
         entityId={entityId}
+        disabled={collaboratorsList.length === 1}
       />
     </RequireRequest>
   )
