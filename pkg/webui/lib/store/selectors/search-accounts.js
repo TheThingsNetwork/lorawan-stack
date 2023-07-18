@@ -12,6 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const selectSearchResultsStore = state => state.searchAccounts || []
-export const selectSearchResults = state =>
-  selectSearchResultsStore(state).searchResults?.account_ids || []
+export const selectSearchResultsStore = state => state.searchAccounts
+export const selectSearchResults = state => selectSearchResultsStore(state).searchResults
+export const selectSearchResultAccountIds = state => selectSearchResults(state).account_ids

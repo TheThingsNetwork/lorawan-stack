@@ -24,7 +24,7 @@ import Icon from '@ttn-lw/components/icon'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { searchAccounts } from '@ttn-lw/lib/store/actions/search-accounts'
-import { selectSearchResults } from '@ttn-lw/lib/store/selectors/search-accounts'
+import { selectSearchResultAccountIds } from '@ttn-lw/lib/store/selectors/search-accounts'
 
 import styles from './account-select.styl'
 
@@ -51,7 +51,7 @@ const m = defineMessages({
 
 const Suggest = ({ entity, ...rest }) => {
   const dispatch = useDispatch()
-  const searchResults = useSelector(selectSearchResults)
+  const searchResults = useSelector(selectSearchResultAccountIds)
   const searchResultsRef = useRef()
   searchResultsRef.current = searchResults
   const { formatMessage } = useIntl()
