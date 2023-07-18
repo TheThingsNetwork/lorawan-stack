@@ -111,3 +111,5 @@ export const selectApplicationLinkSkipPayloadCrypto = state => {
 
   return link.skip_payload_crypto || false
 }
+
+export const selectMqttConnectionInfo = state => selectApplicationStore(state).mqtt
