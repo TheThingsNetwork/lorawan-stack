@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import bind from 'autobind-decorator'
-import { defineMessages, injectIntl } from 'react-intl'
+import React, { useCallback } from 'react'
+import { defineMessages, useIntl } from 'react-intl'
 
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
@@ -81,215 +80,216 @@ const baseValidationSchema = Yup.object().shape({
   description: Yup.string().max(2000, Yup.passValues(sharedMessages.validateTooLong)),
 })
 
-@injectIntl
-class UserForm extends React.Component {
-  constructor(props) {
-    super(props)
+const UserForm = ({
+  passedError,
+  passedInitialValues,
+  onDelete,
+  onDeleteFailure,
+  onDeleteSuccess,
+  onSubmit,
+  onSubmitFailure,
+  onSubmitSuccess,
+  passwordRequirements,
+  update,
+}) => {
+  const [stateError, setStateError] = React.useState('')
+  const validationSchema = update
+    ? baseValidationSchema
+    : baseValidationSchema.concat(createPasswordValidationSchema(passwordRequirements))
 
-    const { update, passwordRequirements } = props
-    this.validationSchema = update
-      ? baseValidationSchema
-      : baseValidationSchema.concat(createPasswordValidationSchema(passwordRequirements))
-    this.state = {
-      error: '',
-    }
-  }
+  const intl = useIntl()
 
-  static propTypes = {
-    error: PropTypes.error,
-    initialValues: PropTypes.shape({
-      ids: PropTypes.shape({
-        user_id: PropTypes.string.isRequired,
-      }).isRequired,
-      name: PropTypes.string,
-      description: PropTypes.string,
-    }),
-    intl: PropTypes.shape({
-      formatMessage: PropTypes.func.isRequired,
-    }).isRequired,
-    onDelete: PropTypes.func,
-    onDeleteFailure: PropTypes.func,
-    onDeleteSuccess: PropTypes.func,
-    onSubmit: PropTypes.func.isRequired,
-    onSubmitFailure: PropTypes.func,
-    onSubmitSuccess: PropTypes.func,
-    passwordRequirements: PropTypes.passwordRequirements,
-    update: PropTypes.bool,
-  }
+  const handleSubmit = useCallback(
+    async (vals, { resetForm, setSubmitting }) => {
+      const { _validate_email, ...values } = validationSchema.cast(vals)
 
-  static defaultProps = {
-    update: false,
-    error: '',
-    initialValues: {
-      ids: { user_id: '' },
-      name: '',
-      primary_email_address: '',
-      state: '',
-      description: '',
-      password: '',
-      confirmPassword: '',
+      if (_validate_email) {
+        values.primary_email_address_validated_at = new Date().toISOString()
+      }
+
+      setStateError('')
+      try {
+        const result = await onSubmit(values)
+        resetForm({ values: vals })
+        onSubmitSuccess(result)
+      } catch (error) {
+        setSubmitting(false)
+        setStateError(error)
+        onSubmitFailure(error)
+      }
     },
-    onSubmitFailure: () => null,
-    onSubmitSuccess: () => null,
-    onDelete: () => null,
-    onDeleteFailure: () => null,
-    onDeleteSuccess: () => null,
-    passwordRequirements: {},
+    [onSubmit, onSubmitSuccess, onSubmitFailure, validationSchema],
+  )
+
+  const handleDelete = useCallback(
+    async shouldPurge => {
+      try {
+        await onDelete(shouldPurge)
+        onDeleteSuccess()
+      } catch (error) {
+        setStateError(error)
+        onDeleteFailure()
+      }
+    },
+    [onDelete, onDeleteSuccess, onDeleteFailure],
+  )
+
+  const { formatMessage } = intl
+
+  const approvalStateOptions = approvalStates.map(state => ({
+    value: state,
+    label: capitalizeMessage(formatMessage({ id: `enum:${state}` })),
+  }))
+
+  const initialValues = {
+    admin: false,
+    ...passedInitialValues,
   }
 
-  @bind
-  async handleSubmit(vals, { resetForm, setSubmitting }) {
-    const { onSubmit, onSubmitSuccess, onSubmitFailure } = this.props
-    const { _validate_email, ...values } = this.validationSchema.cast(vals)
+  const { submitError } = stateError
 
-    if (_validate_email) {
-      values.primary_email_address_validated_at = new Date().toISOString()
-    }
+  const error = passedError || submitError
 
-    await this.setState({ error: '' })
-    try {
-      const result = await onSubmit(values)
-      resetForm({ values: vals })
-      onSubmitSuccess(result)
-    } catch (error) {
-      setSubmitting(false)
-      this.setState({ error })
-      onSubmitFailure(error)
-    }
-  }
-
-  @bind
-  async handleDelete(shouldPurge) {
-    const { onDelete, onDeleteSuccess, onDeleteFailure } = this.props
-    try {
-      await onDelete(shouldPurge)
-      onDeleteSuccess()
-    } catch (error) {
-      await this.setState({ error })
-      onDeleteFailure()
-    }
-  }
-
-  render() {
-    const {
-      update,
-      error: passedError,
-      initialValues: values,
-      intl: { formatMessage },
-    } = this.props
-
-    const approvalStateOptions = approvalStates.map(state => ({
-      value: state,
-      label: capitalizeMessage(formatMessage({ id: `enum:${state}` })),
-    }))
-
-    const initialValues = {
-      admin: false,
-      ...values,
-    }
-
-    const { error: submitError } = this.state
-
-    const error = passedError || submitError
-
-    return (
-      <Form
-        error={error}
-        onSubmit={this.handleSubmit}
-        initialValues={initialValues}
-        validationSchema={this.validationSchema}
-      >
+  return (
+    <Form
+      error={error}
+      onSubmit={handleSubmit}
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+    >
+      <Form.Field
+        title={sharedMessages.userId}
+        name="ids.user_id"
+        component={Input}
+        disabled={update}
+        autoFocus={!update}
+        required
+      />
+      <Form.Field
+        title={sharedMessages.name}
+        name="name"
+        placeholder={m.userNamePlaceholder}
+        component={Input}
+      />
+      <Form.Field
+        title={sharedMessages.description}
+        name="description"
+        type="textarea"
+        placeholder={m.userDescPlaceholder}
+        description={m.userDescDescription}
+        component={Input}
+      />
+      <Form.Field
+        title={sharedMessages.emailAddress}
+        name="primary_email_address"
+        placeholder={m.emailPlaceholder}
+        description={m.emailAddressDescription}
+        component={Input}
+        required
+      />
+      <Form.Field
+        title={sharedMessages.state}
+        name="state"
+        component={Select}
+        options={approvalStateOptions}
+        required
+      />
+      <Form.Field
+        name="_validate_email"
+        component={Checkbox}
+        label={m.emailAddressValidation}
+        description={m.emailAddressValidationDescription}
+      />
+      <Form.Field
+        name="admin"
+        component={Checkbox}
+        label={m.adminLabel}
+        description={m.adminDescription}
+      />
+      {!update && (
         <Form.Field
-          title={sharedMessages.userId}
-          name="ids.user_id"
+          title={sharedMessages.password}
           component={Input}
-          disabled={update}
-          autoFocus={!update}
+          name="password"
+          type="password"
+          autoComplete="new-password"
           required
         />
+      )}
+      {!update && (
         <Form.Field
-          title={sharedMessages.name}
-          name="name"
-          placeholder={m.userNamePlaceholder}
+          title={sharedMessages.confirmPassword}
           component={Input}
-        />
-        <Form.Field
-          title={sharedMessages.description}
-          name="description"
-          type="textarea"
-          placeholder={m.userDescPlaceholder}
-          description={m.userDescDescription}
-          component={Input}
-        />
-        <Form.Field
-          title={sharedMessages.emailAddress}
-          name="primary_email_address"
-          placeholder={m.emailPlaceholder}
-          description={m.emailAddressDescription}
-          component={Input}
+          name="confirmPassword"
+          type="password"
+          autoComplete="new-password"
           required
         />
-        <Form.Field
-          title={sharedMessages.state}
-          name="state"
-          component={Select}
-          options={approvalStateOptions}
-          required
+      )}
+      <SubmitBar>
+        <Form.Submit
+          message={update ? sharedMessages.saveChanges : sharedMessages.userAdd}
+          component={SubmitButton}
         />
-        <Form.Field
-          name="_validate_email"
-          component={Checkbox}
-          label={m.emailAddressValidation}
-          description={m.emailAddressValidationDescription}
-        />
-        <Form.Field
-          name="admin"
-          component={Checkbox}
-          label={m.adminLabel}
-          description={m.adminDescription}
-        />
-        {!update && (
-          <Form.Field
-            title={sharedMessages.password}
-            component={Input}
-            name="password"
-            type="password"
-            autoComplete="new-password"
-            required
+        {update && (
+          <DeleteModalButton
+            message={sharedMessages.userDelete}
+            entityId={initialValues.ids.user_id}
+            entityName={initialValues.name}
+            title={m.deleteTitle}
+            confirmMessage={m.deleteConfirmMessage}
+            defaultMessage={m.deleteWarning}
+            purgeMessage={m.purgeWarning}
+            onApprove={handleDelete}
+            shouldConfirm
+            mayPurge
           />
         )}
-        {!update && (
-          <Form.Field
-            title={sharedMessages.confirmPassword}
-            component={Input}
-            name="confirmPassword"
-            type="password"
-            autoComplete="new-password"
-            required
-          />
-        )}
-        <SubmitBar>
-          <Form.Submit
-            message={update ? sharedMessages.saveChanges : sharedMessages.userAdd}
-            component={SubmitButton}
-          />
-          {update && (
-            <DeleteModalButton
-              message={sharedMessages.userDelete}
-              entityId={initialValues.ids.user_id}
-              entityName={initialValues.name}
-              title={m.deleteTitle}
-              confirmMessage={m.deleteConfirmMessage}
-              defaultMessage={m.deleteWarning}
-              purgeMessage={m.purgeWarning}
-              onApprove={this.handleDelete}
-              shouldConfirm
-              mayPurge
-            />
-          )}
-        </SubmitBar>
-      </Form>
-    )
-  }
+      </SubmitBar>
+    </Form>
+  )
 }
+
+UserForm.propTypes = {
+  intl: PropTypes.shape({
+    formatMessage: PropTypes.func.isRequired,
+  }).isRequired,
+  onDelete: PropTypes.func,
+  onDeleteFailure: PropTypes.func,
+  onDeleteSuccess: PropTypes.func,
+  onSubmit: PropTypes.func.isRequired,
+  onSubmitFailure: PropTypes.func,
+  onSubmitSuccess: PropTypes.func,
+  passedError: PropTypes.error,
+  passedInitialValues: PropTypes.shape({
+    ids: PropTypes.shape({
+      user_id: PropTypes.string.isRequired,
+    }).isRequired,
+    name: PropTypes.string,
+    description: PropTypes.string,
+  }),
+  passwordRequirements: PropTypes.passwordRequirements,
+  update: PropTypes.bool,
+}
+
+UserForm.defaultProps = {
+  update: false,
+  passedError: '',
+  passedInitialValues: {
+    ids: { user_id: '' },
+    name: '',
+    primary_email_address: '',
+    state: '',
+    description: '',
+    password: '',
+    confirmPassword: '',
+  },
+  onSubmitFailure: () => null,
+  onSubmitSuccess: () => null,
+  onDelete: () => null,
+  onDeleteFailure: () => null,
+  onDeleteSuccess: () => null,
+  passwordRequirements: {},
+}
+
 export default UserForm
