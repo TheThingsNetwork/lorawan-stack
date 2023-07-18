@@ -15,6 +15,7 @@
 import React, { useCallback, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { isEmpty } from 'lodash'
+import { useParams } from 'react-router-dom'
 
 import PAYLOAD_FORMATTER_TYPES from '@console/constants/formatter-types'
 import tts from '@console/api/tts'
@@ -38,12 +39,8 @@ import { mayViewApplicationLink } from '@console/lib/feature-checks'
 import { updateDevice } from '@console/store/actions/devices'
 import { getRepositoryPayloadFormatters } from '@console/store/actions/device-repository'
 
+import { selectApplicationLink } from '@console/store/selectors/applications'
 import {
-  selectSelectedApplicationId,
-  selectApplicationLink,
-} from '@console/store/selectors/applications'
-import {
-  selectSelectedDeviceId,
   selectSelectedDeviceFormatters,
   selectSelectedDevice,
 } from '@console/store/selectors/devices'
@@ -52,8 +49,7 @@ import { selectDeviceRepoPayloadFromatters } from '@console/store/selectors/devi
 import m from './messages'
 
 const DevicePayloadFormatters = () => {
-  const appId = useSelector(selectSelectedApplicationId)
-  const devId = useSelector(selectSelectedDeviceId)
+  const { appId, devId } = useParams()
   const device = useSelector(selectSelectedDevice)
   const mayViewLink = useSelector(state => checkFromState(mayViewApplicationLink, state))
   const link = useSelector(selectApplicationLink)

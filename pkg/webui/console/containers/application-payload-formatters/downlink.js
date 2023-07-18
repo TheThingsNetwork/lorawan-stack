@@ -15,6 +15,7 @@
 import React, { useCallback, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
+import { useParams } from 'react-router-dom'
 
 import PAYLOAD_FORMATTER_TYPES from '@console/constants/formatter-types'
 
@@ -38,7 +39,6 @@ import { updateApplicationLink, updateApplicationLinkSuccess } from '@console/st
 import {
   selectApplicationLinkError,
   selectApplicationLinkFormatters,
-  selectSelectedApplicationId,
 } from '@console/store/selectors/applications'
 
 import style from './application-payload-formatters.styl'
@@ -52,7 +52,7 @@ const m = defineMessages({
 })
 
 const ApplicationPayloadFormatters = () => {
-  const appId = useSelector(selectSelectedApplicationId)
+  const { appId } = useParams()
   const formatters = useSelector(selectApplicationLinkFormatters) || {}
   const linkError = useSelector(selectApplicationLinkError)
   const mayViewLink = useSelector(state => checkFromState(mayViewApplicationLink, state))
