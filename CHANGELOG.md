@@ -23,6 +23,7 @@ For details about compatibility between different releases, see the **Commitment
 - The Application Server configuration has the `as.downlinks.confirmation.default-retry-attempts` and `as.downlinks.confirmation.max-retry-attempts` fields that configure the allowed number of retries for application downlinks. The default values are `8` for the `as.downlinks.confirmation.default-retry-attempts` and `32` for the `as.downlinks.confirmation.max-retry-attempts`.
 - The `as.downlinks.confirmation.default-retry-attempts` field is used for all application downlinks that were scheduled before this change and for every application downlink that does not have the `max_attempts` field set. On the other hand, the `as.downlinks.confirmation.max-retry-attempts` field ensures that the `max_attempts` field's upper bound is contained and does not exceed its value.
 - The number of historical frames considered for the multi-frame query window size in the LoRa Geolocation Services integration. The window size is now limited between 1 and 16 frames with 16 being the default value.
+- Packet Broker Agent now subscribes as Home Network to all DevAddr prefixes. This is to support NetID delegation where DevAddr blocks of other NetIDs should be routed to the cluster of a different NetID.
 
 ### Deprecated
 
