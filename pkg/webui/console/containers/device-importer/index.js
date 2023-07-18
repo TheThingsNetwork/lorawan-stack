@@ -15,6 +15,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { isObject } from 'lodash'
+import { useParams } from 'react-router-dom'
 
 import tts from '@console/api/tts'
 
@@ -27,7 +28,6 @@ import randomByteString from '@console/lib/random-bytes'
 
 import { convertTemplate } from '@console/store/actions/device-template-formats'
 
-import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 import { selectDeviceTemplate } from '@console/store/selectors/device-repository'
 
 import Form from './form'
@@ -37,7 +37,7 @@ import m from './messages'
 const conversionError = createFrontendError(m.conversionErrorTitle, m.conversionErrorMessage)
 
 const DeviceImporter = () => {
-  const appId = useSelector(selectSelectedApplicationId)
+  const { appId } = useParams()
   const deviceRepoTemplate = useSelector(selectDeviceTemplate)
   const asConfig = useSelector(selectAsConfig)
   const nsConfig = useSelector(selectNsConfig)
