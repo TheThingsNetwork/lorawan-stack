@@ -213,13 +213,17 @@ describe('Gateway general settings', () => {
 
   it('fails adding non-collaborator contact information', () => {
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+    const entity = 'gateways'
+    const userCollaborator = generateCollaborator(entity, 'user')
+    cy.createCollaborator(entity, gateway.ids.gateway_id, userCollaborator)
+
     cy.visit(
       `${Cypress.config('consoleRootPath')}/gateways/${gateway.ids.gateway_id}/general-settings`,
     )
 
     cy.findByText('Contact information').should('be.visible')
     cy.findByLabelText('Administrative contact').clear()
-    cy.findByLabelText('Administrative contact').type(collabUserId)
+    cy.findByLabelText('Administrative contact').type('test-non-collab-user')
     cy.findByText('No matching user or organization was found')
   })
 

@@ -87,11 +87,15 @@ describe('Application general settings', () => {
   })
 
   it('fails adding non-collaborator contact information', () => {
+    const entity = 'applications'
+    const userCollaborator = generateCollaborator(entity, 'user')
+    cy.createCollaborator(entity, applicationId, userCollaborator)
+
     cy.visit(`${Cypress.config('consoleRootPath')}/applications/${applicationId}/general-settings`)
 
     cy.findByText('Contact information').should('be.visible')
     cy.findByLabelText('Administrative contact').clear()
-    cy.findByLabelText('Administrative contact').type(collabUserId)
+    cy.findByLabelText('Administrative contact').type('test-non-collab-user')
     cy.findByText('No matching user or organization was found')
   })
 
