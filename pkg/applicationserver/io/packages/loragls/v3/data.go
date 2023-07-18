@@ -25,11 +25,12 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v3/api"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	urlutil "go.thethings.network/lorawan-stack/v3/pkg/util/url"
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
 var (
-	errFieldNotFound = errors.DefineNotFound("field_not_found", "field `{field}` not found")
+	errFieldRequired = errors.DefineNotFound("field_required", "field `{field}` is required")
 	errInvalidType   = errors.DefineCorruption("invalid_type", "wrong type `{type}`")
 	errInvalidValue  = errors.DefineCorruption("invalid_value", "wrong value `{value}`")
 	errEncodingField = errors.DefineCorruption("encoding_field", "encoding field `{field}`")
@@ -72,11 +73,7 @@ func (t QueryType) Value() *structpb.Value {
 	default:
 		panic("invalid query type")
 	}
-	return &structpb.Value{
-		Kind: &structpb.Value_StringValue{
-			StringValue: s,
-		},
-	}
+	return structpb.NewStringValue(s)
 }
 
 // FromValue sets the query type from a protobuf value.
@@ -110,17 +107,17 @@ const (
 // Data contains the package configuration.
 type Data struct {
 	// Query is the query type used by the package.
-	Query QueryType
+	Query *QueryType
 	// MultiFrame enables multi frame requests for TOARSSI queries.
-	MultiFrame bool
+	MultiFrame *bool
 	// MultiFrameWindowSize represents the number of historical frames to consider for the query.
-	MultiFrameWindowSize int
+	MultiFrameWindowSize *int
 	// MultiFrameWindowAge limits the maximum age of the historical frames considered for the query.
-	MultiFrameWindowAge time.Duration
+	MultiFrameWindowAge *time.Duration
 	// ServerURL represents the remote server to which the GLS queries are sent.
 	ServerURL *url.URL
 	// Token is the API token to be used when comunicating with the GLS server.
-	Token string
+	Token *string
 	// RecentMetadata are the metadatas from the recent uplink messages received by the gateway.
 	RecentMetadata []*UplinkMetadata
 }
@@ -134,30 +131,6 @@ const (
 	tokenField           = "token"
 	recentMDField        = "recent_metadata"
 )
-
-func toString(s string) *structpb.Value {
-	return &structpb.Value{
-		Kind: &structpb.Value_StringValue{
-			StringValue: s,
-		},
-	}
-}
-
-func toBool(b bool) *structpb.Value {
-	return &structpb.Value{
-		Kind: &structpb.Value_BoolValue{
-			BoolValue: b,
-		},
-	}
-}
-
-func toFloat64(f float64) *structpb.Value {
-	return &structpb.Value{
-		Kind: &structpb.Value_NumberValue{
-			NumberValue: f,
-		},
-	}
-}
 
 func toRecentMD(mds []*UplinkMetadata) (*structpb.Value, error) {
 	gobBytes := new(bytes.Buffer)
@@ -176,37 +149,81 @@ func toRecentMD(mds []*UplinkMetadata) (*structpb.Value, error) {
 		return nil, errEncodingField.WithCause(err).WithAttributes("field", recentMDField)
 	}
 
-	return toString(base64Bytes.String()), nil
+	return structpb.NewStringValue(base64Bytes.String()), nil
+}
+
+// GetMultiFrameWindowAge returns the value of the MultiFrameWindowAge field.
+func (d *Data) GetMultiFrameWindowAge() time.Duration {
+	if d.MultiFrameWindowAge == nil {
+		return 0
+	}
+	return *d.MultiFrameWindowAge
+}
+
+// GetMultiFrameWindowSize returns the value of the MultiFrameWindowSize field.
+func (d *Data) GetMultiFrameWindowSize() int {
+	if d.MultiFrameWindowSize == nil {
+		return 0
+	}
+	return *d.MultiFrameWindowSize
+}
+
+// GetMultiFrame returns the value of the MultiFrame field.
+func (d *Data) GetMultiFrame() bool {
+	if d.MultiFrame == nil {
+		return false
+	}
+	return *d.MultiFrame
 }
 
 // Struct serializes the configuration to *structpb.Struct.
 func (d *Data) Struct() (*structpb.Struct, error) {
-	st := &structpb.Struct{
-		Fields: map[string]*structpb.Value{
-			queryField: d.Query.Value(),
-			tokenField: toString(d.Token),
-		},
+	fields := map[string]*structpb.Value{}
+
+	if d.Token != nil && *d.Token != "" {
+		fields[tokenField] = structpb.NewStringValue(*d.Token)
 	}
-	if d.ServerURL != nil {
-		st.Fields[serverURLField] = toString(d.ServerURL.String())
+
+	if d.Query != nil {
+		fields[queryField] = d.Query.Value()
 	}
-	if d.MultiFrame {
-		st.Fields[multiFrameField] = toBool(d.MultiFrame)
+
+	if d.MultiFrame != nil {
+		fields[multiFrameField] = structpb.NewBoolValue(*d.MultiFrame)
 	}
-	if d.MultiFrameWindowSize > 0 {
-		st.Fields[multiFrameWindowSize] = toFloat64(float64(d.MultiFrameWindowSize))
+
+	if d.ServerURL != nil && d.ServerURL.String() != "" {
+		fields[serverURLField] = structpb.NewStringValue(d.ServerURL.String())
 	}
-	if d.MultiFrameWindowAge > 0 {
-		st.Fields[multiFrameWindowAge] = toFloat64(float64(d.MultiFrameWindowAge / time.Minute))
+
+	if d.MultiFrame != nil {
+		fields[multiFrameField] = structpb.NewBoolValue(*d.MultiFrame)
 	}
+
+	if d.MultiFrameWindowSize != nil {
+		fields[multiFrameWindowSize] = structpb.NewNumberValue(float64(*d.MultiFrameWindowSize))
+	}
+
+	if d.MultiFrameWindowAge != nil {
+		windowAge := d.MultiFrameWindowAge.Minutes()
+		fields[multiFrameWindowAge] = structpb.NewNumberValue(windowAge)
+	}
+
 	if len(d.RecentMetadata) > 0 {
 		recentMD, err := toRecentMD(d.RecentMetadata)
 		if err != nil {
 			return nil, err
 		}
-		st.Fields[recentMDField] = recentMD
+		fields[recentMDField] = recentMD
 	}
-	return st, nil
+
+	if len(fields) == 0 {
+		return nil, nil // nolint: nilnil
+	}
+
+	return &structpb.Struct{
+		Fields: fields,
+	}, nil
 }
 
 func stringFromValue(v *structpb.Value) (string, error) {
@@ -257,79 +274,112 @@ func recentMDFromValue(v *structpb.Value) ([]*UplinkMetadata, error) {
 // FromStruct deserializes the configuration from *structpb.Struct.
 func (d *Data) FromStruct(st *structpb.Struct) error {
 	fields := st.GetFields()
-	{
-		value, ok := fields[queryField]
-		if !ok {
-			return errFieldNotFound.WithAttributes("field", queryField)
-		}
-		if err := d.Query.FromValue(value); err != nil {
+	if value, ok := fields[queryField]; ok {
+		query := new(QueryType)
+		if err := query.FromValue(value); err != nil {
 			return err
 		}
+		d.Query = query
 	}
-	{
-		value, ok := fields[multiFrameField]
-		if ok {
-			multiFrame, err := boolFromValue(value)
-			if err != nil {
-				return err
-			}
-			d.MultiFrame = multiFrame
+	if value, ok := fields[multiFrameField]; ok {
+		multiFrame, err := boolFromValue(value)
+		if err != nil {
+			return err
 		}
+		d.MultiFrame = &multiFrame
 	}
-	{
-		value, ok := fields[multiFrameWindowSize]
-		if ok {
-			windowSize, err := float64FromValue(value)
-			if err != nil {
-				return err
-			}
-			d.MultiFrameWindowSize = int(windowSize)
+	if value, ok := fields[multiFrameWindowSize]; ok {
+		floatValue, err := float64FromValue(value)
+		if err != nil {
+			return err
 		}
+		windowSize := int(floatValue)
+		d.MultiFrameWindowSize = &windowSize
 	}
-	{
-		value, ok := fields[multiFrameWindowAge]
-		if ok {
-			windowAge, err := float64FromValue(value)
-			if err != nil {
-				return err
-			}
-			d.MultiFrameWindowAge = time.Duration(windowAge) * time.Minute
+	if value, ok := fields[multiFrameWindowAge]; ok {
+		windowAge, err := float64FromValue(value)
+		if err != nil {
+			return err
 		}
+		windowAgeDuration := time.Duration(windowAge) * time.Minute
+		d.MultiFrameWindowAge = &windowAgeDuration
 	}
-	{
-		value, ok := fields[tokenField]
-		if !ok {
-			return errFieldNotFound.WithAttributes("field", tokenField)
-		}
+	if value, ok := fields[tokenField]; ok {
 		token, err := stringFromValue(value)
 		if err != nil {
 			return err
 		}
-		d.Token = token
+		d.Token = &token
 	}
-	{
-		value, ok := fields[serverURLField]
-		if ok {
-			serverURL, err := stringFromValue(value)
-			if err != nil {
-				return err
-			}
-			u, err := url.Parse(serverURL)
-			if err != nil {
-				return err
-			}
-			d.ServerURL = u
+	if value, ok := fields[serverURLField]; ok {
+		serverURL, err := stringFromValue(value)
+		if err != nil {
+			return err
 		}
+		u, err := url.Parse(serverURL)
+		if err != nil {
+			return err
+		}
+		d.ServerURL = u
 	}
-	{
-		value, ok := fields[recentMDField]
-		if ok {
-			uplinks, err := recentMDFromValue(value)
-			if err != nil {
-				return err
-			}
-			d.RecentMetadata = uplinks
+	if value, ok := fields[recentMDField]; ok {
+		uplinks, err := recentMDFromValue(value)
+		if err != nil {
+			return err
 		}
+		d.RecentMetadata = uplinks
+	}
+	return nil
+}
+
+func mergeData(defaultData, associationData Data) *Data {
+	merged := Data{
+		Query:                defaultData.Query,
+		MultiFrame:           defaultData.MultiFrame,
+		MultiFrameWindowSize: defaultData.MultiFrameWindowSize,
+		MultiFrameWindowAge:  defaultData.MultiFrameWindowAge,
+		ServerURL:            defaultData.ServerURL,
+		Token:                defaultData.Token,
+		RecentMetadata:       defaultData.RecentMetadata,
+	}
+
+	if associationData.Query != nil {
+		merged.Query = associationData.Query
+	}
+	if associationData.MultiFrame != nil {
+		merged.MultiFrame = associationData.MultiFrame
+	}
+	if associationData.MultiFrameWindowSize != nil {
+		merged.MultiFrameWindowSize = associationData.MultiFrameWindowSize
+	}
+	if associationData.MultiFrameWindowAge != nil {
+		merged.MultiFrameWindowAge = associationData.MultiFrameWindowAge
+	}
+	if associationData.ServerURL != nil {
+		merged.ServerURL = urlutil.CloneURL(associationData.ServerURL)
+	}
+	if associationData.Token != nil {
+		merged.Token = associationData.Token
+	}
+	if len(associationData.RecentMetadata) > 0 {
+		merged.RecentMetadata = associationData.RecentMetadata
+	}
+	if merged.ServerURL == nil {
+		merged.ServerURL = urlutil.CloneURL(api.DefaultServerURL)
+	}
+	return &merged
+}
+
+// validateData validates the package configuration.
+func validateData(data *Data) error {
+	if data.Query == nil {
+		return errFieldRequired.WithAttributes("field", queryField)
+	}
+	if data.ServerURL == nil {
+		return errFieldRequired.WithAttributes("field", serverURLField)
+	}
+	if data.Token == nil {
+		return errFieldRequired.WithAttributes("field", tokenField)
 	}
 	return nil
 }
