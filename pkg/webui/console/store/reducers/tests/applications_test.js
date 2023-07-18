@@ -34,6 +34,7 @@ describe('Applications reducer', () => {
     derived: {},
     selectedApplication: null,
     applicationDeviceCounts: {},
+    mqtt: {},
   }
 
   it('returns the initial state', () => {
