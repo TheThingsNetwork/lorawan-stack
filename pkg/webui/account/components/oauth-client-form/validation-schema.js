@@ -60,14 +60,16 @@ const validationSchema = Yup.object().shape({
       then: schema => schema.concat(organizationSchema),
       otherwise: schema => schema.concat(userSchema),
     })
-    .nullable(),
+    .nullable()
+    .required(sharedMessages.validateRequired),
   technical_contact: Yup.object()
     .when(['organization_ids'], {
       is: organizationIds => Boolean(organizationIds),
       then: schema => schema.concat(organizationSchema),
       otherwise: schema => schema.concat(userSchema),
     })
-    .nullable(),
+    .nullable()
+    .required(sharedMessages.validateRequired),
 })
 
 export default validationSchema

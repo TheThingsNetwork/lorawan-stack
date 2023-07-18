@@ -187,7 +187,6 @@ const OAuthClientForm = props => {
       {update && mayEditBasicInformation && (
         <>
           <Form.SubTitle title={sharedMessages.contactInformation} className="mb-cs-s" />
-          <Notification small warning content={m.contactWarning} />
           <CollaboratorSelect
             name="administrative_contact"
             title={sharedMessages.adminContact}
@@ -196,6 +195,7 @@ const OAuthClientForm = props => {
             entityId={clientId}
             encode={encodeContact}
             decode={decodeContact}
+            required
           />
           <Message
             content={m.adminContactDescription}
@@ -210,6 +210,7 @@ const OAuthClientForm = props => {
             entityId={clientId}
             encode={encodeContact}
             decode={decodeContact}
+            required
           />
           <Message
             content={m.techContactDescription}

@@ -19,7 +19,6 @@ import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
-import Notification from '@ttn-lw/components/notification'
 
 import CollaboratorSelect from '@ttn-lw/containers/collaborator-select'
 import {
@@ -48,16 +47,20 @@ const validationSchema = Yup.object().shape({
     .min(2, Yup.passValues(sharedMessages.validateTooShort))
     .max(50, Yup.passValues(sharedMessages.validateTooLong)),
   description: Yup.string().max(2000, Yup.passValues(sharedMessages.validateTooLong)),
-  administrative_contact: Yup.object().when(['organization_ids'], {
-    is: organizationIds => Boolean(organizationIds),
-    then: schema => schema.concat(organizationSchema),
-    otherwise: schema => schema.concat(userSchema),
-  }),
-  technical_contact: Yup.object().when(['organization_ids'], {
-    is: organizationIds => Boolean(organizationIds),
-    then: schema => schema.concat(organizationSchema),
-    otherwise: schema => schema.concat(userSchema),
-  }),
+  administrative_contact: Yup.object()
+    .when(['organization_ids'], {
+      is: organizationIds => Boolean(organizationIds),
+      then: schema => schema.concat(organizationSchema),
+      otherwise: schema => schema.concat(userSchema),
+    })
+    .required(sharedMessages.validateRequired),
+  technical_contact: Yup.object()
+    .when(['organization_ids'], {
+      is: organizationIds => Boolean(organizationIds),
+      then: schema => schema.concat(organizationSchema),
+      otherwise: schema => schema.concat(userSchema),
+    })
+    .required(sharedMessages.validateRequired),
 })
 
 const m = defineMessages({
@@ -66,8 +69,6 @@ const m = defineMessages({
     'Optional organization description; can also be used to save notes about the organization',
   orgIdPlaceholder: 'my-new-organization',
   orgNamePlaceholder: 'My new organization',
-  contactWarning:
-    'Note that if no contact is provided, it will default to the first collaborator of the organization.',
   adminContactDescription:
     'Administrative contact information for this organization. Typically used to indicate who to contact with administrative questions about the organization.',
   techContactDescription:
@@ -120,7 +121,6 @@ const OrganizationForm = props => {
       {update && (
         <>
           <Form.SubTitle title={sharedMessages.contactInformation} className="mb-cs-s" />
-          <Notification small warning content={m.contactWarning} />
           <CollaboratorSelect
             name="administrative_contact"
             title={sharedMessages.adminContact}
@@ -129,6 +129,7 @@ const OrganizationForm = props => {
             entityId={orgId}
             encode={encodeContact}
             decode={decodeContact}
+            required
           />
           <Message
             content={m.adminContactDescription}
@@ -143,6 +144,7 @@ const OrganizationForm = props => {
             entityId={orgId}
             encode={encodeContact}
             decode={decodeContact}
+            required
           />
           <Message
             content={m.techContactDescription}

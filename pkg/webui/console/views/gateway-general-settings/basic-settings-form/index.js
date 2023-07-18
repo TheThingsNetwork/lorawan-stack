@@ -21,7 +21,6 @@ import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import Checkbox from '@ttn-lw/components/checkbox'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
-import Notification from '@ttn-lw/components/notification'
 
 import CollaboratorSelect from '@ttn-lw/containers/collaborator-select'
 import { decodeContact, encodeContact } from '@ttn-lw/containers/collaborator-select/util'
@@ -224,7 +223,6 @@ const BasicSettingsForm = React.memo(props => {
         tooltipId={tooltipIds.DISABLE_PACKET_BROKER_FORWARDING}
       />
       <Form.SubTitle title={sharedMessages.contactInformation} className="mb-cs-s" />
-      <Notification small warning content={m.contactWarning} />
       <CollaboratorSelect
         name="administrative_contact"
         title={sharedMessages.adminContact}
@@ -233,6 +231,7 @@ const BasicSettingsForm = React.memo(props => {
         entityId={gtwId}
         encode={encodeContact}
         decode={decodeContact}
+        required
       />
       <Message
         content={m.adminContactDescription}
@@ -247,6 +246,7 @@ const BasicSettingsForm = React.memo(props => {
         entityId={gtwId}
         encode={encodeContact}
         decode={decodeContact}
+        required
       />
       <Message
         content={m.techContactDescription}

@@ -22,7 +22,6 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
 import Checkbox from '@ttn-lw/components/checkbox'
-import Notification from '@ttn-lw/components/notification'
 
 import CollaboratorSelect from '@ttn-lw/containers/collaborator-select'
 import {
@@ -52,8 +51,6 @@ const m = defineMessages({
   basics: 'Basics',
   deleteApp: 'Delete application',
   useAlcsync: 'Use Application Layer Clock Synchronization',
-  contactWarning:
-    'Note that if no contact is provided, it will default to the first collaborator of the application.',
   adminContactDescription:
     'Administrative contact information for this application. Typically used to indicate who to contact with administrative questions about the application.',
   techContactDescription:
@@ -85,16 +82,20 @@ const validationSchema = Yup.object().shape({
     ),
   skip_payload_crypto: Yup.boolean(),
   alcsync: Yup.boolean(),
-  administrative_contact: Yup.object().when(['organization_ids'], {
-    is: organizationIds => Boolean(organizationIds),
-    then: schema => schema.concat(organizationSchema),
-    otherwise: schema => schema.concat(userSchema),
-  }),
-  technical_contact: Yup.object().when(['organization_ids'], {
-    is: organizationIds => Boolean(organizationIds),
-    then: schema => schema.concat(organizationSchema),
-    otherwise: schema => schema.concat(userSchema),
-  }),
+  administrative_contact: Yup.object()
+    .when(['organization_ids'], {
+      is: organizationIds => Boolean(organizationIds),
+      then: schema => schema.concat(organizationSchema),
+      otherwise: schema => schema.concat(userSchema),
+    })
+    .required(sharedMessages.validateRequired),
+  technical_contact: Yup.object()
+    .when(['organization_ids'], {
+      is: organizationIds => Boolean(organizationIds),
+      then: schema => schema.concat(organizationSchema),
+      otherwise: schema => schema.concat(userSchema),
+    })
+    .required(sharedMessages.validateRequired),
 })
 
 const encodeAttributes = formValue =>
@@ -179,7 +180,6 @@ const ApplicationGeneralSettingsForm = ({
       decode={decodeAttributes}
     />
     <Form.SubTitle title={sharedMessages.contactInformation} className="mb-cs-s" />
-    <Notification small warning content={m.contactWarning} />
     <CollaboratorSelect
       name="administrative_contact"
       title={sharedMessages.adminContact}
@@ -188,6 +188,7 @@ const ApplicationGeneralSettingsForm = ({
       entityId={appId}
       encode={encodeContact}
       decode={decodeContact}
+      required
     />
     <Message
       content={m.adminContactDescription}
@@ -202,6 +203,7 @@ const ApplicationGeneralSettingsForm = ({
       entityId={appId}
       encode={encodeContact}
       decode={decodeContact}
+      required
     />
     <Message content={m.techContactDescription} component="p" className="mt-cs-xs tc-subtle-gray" />
     <SubmitBar>

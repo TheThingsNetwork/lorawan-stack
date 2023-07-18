@@ -86,16 +86,20 @@ const validationSchema = Yup.object().shape({
       sharedMessages.attributeValueValidateTooLong,
       attributeValueTooLongCheck,
     ),
-  administrative_contact: Yup.object().when(['organization_ids'], {
-    is: organizationIds => Boolean(organizationIds),
-    then: schema => schema.concat(organizationSchema),
-    otherwise: schema => schema.concat(userSchema),
-  }),
-  technical_contact: Yup.object().when(['organization_ids'], {
-    is: organizationIds => Boolean(organizationIds),
-    then: schema => schema.concat(organizationSchema),
-    otherwise: schema => schema.concat(userSchema),
-  }),
+  administrative_contact: Yup.object()
+    .when(['organization_ids'], {
+      is: organizationIds => Boolean(organizationIds),
+      then: schema => schema.concat(organizationSchema),
+      otherwise: schema => schema.concat(userSchema),
+    })
+    .required(sharedMessages.validateRequired),
+  technical_contact: Yup.object()
+    .when(['organization_ids'], {
+      is: organizationIds => Boolean(organizationIds),
+      then: schema => schema.concat(organizationSchema),
+      otherwise: schema => schema.concat(userSchema),
+    })
+    .required(sharedMessages.validateRequired),
 })
 
 export default validationSchema
