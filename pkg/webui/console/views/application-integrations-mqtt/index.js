@@ -16,6 +16,7 @@ import React, { useCallback, useState } from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
+import { useParams } from 'react-router-dom'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -40,10 +41,7 @@ import { mayViewMqttConnectionInfo } from '@console/lib/feature-checks'
 import { createApplicationApiKey } from '@console/store/actions/api-keys'
 import { getMqttInfo } from '@console/store/actions/applications'
 
-import {
-  selectMqttConnectionInfo,
-  selectSelectedApplicationId,
-} from '@console/store/selectors/applications'
+import { selectMqttConnectionInfo } from '@console/store/selectors/applications'
 
 const m = defineMessages({
   publicAddress: 'Public address',
@@ -61,7 +59,7 @@ const m = defineMessages({
 })
 
 const ApplicationMqtt = () => {
-  const appId = useSelector(selectSelectedApplicationId)
+  const { appId } = useParams()
   const connectionInfo = useSelector(selectMqttConnectionInfo)
   const [apiKey, setApiKey] = useState()
   const dispatch = useDispatch()

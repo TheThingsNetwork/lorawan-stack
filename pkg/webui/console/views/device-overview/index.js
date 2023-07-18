@@ -203,7 +203,6 @@ const DeviceInfo = ({ frequencyPlans, device, onExport }) => {
   sheetData.push(activationInfoData)
 
   // Add session info, if available.
-
   const sessionInfoData = {
     header: pending_session && !actualSession ? m.pendingSessionInfo : m.sessionInfo,
     items: [],
