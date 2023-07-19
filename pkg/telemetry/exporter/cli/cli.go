@@ -173,7 +173,7 @@ func (ct *cliTask) Run(ctx context.Context) {
 		if statePath, err := cliStatePath(); err != nil {
 			logger.WithError(err).Debug("Failed to retrieve telemetry state file path")
 		} else {
-			// If no error fetching the state file path, update the LastSeen field.
+			// If no error fetching the state file path, update the last sent timestamp.
 			state.Write(statePath) //nolint:errcheck
 		}
 
