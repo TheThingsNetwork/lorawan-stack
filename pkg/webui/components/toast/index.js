@@ -22,7 +22,7 @@ import createToast from './toast'
 import './react-toastify.styl'
 import style from './toast.styl'
 
-const ToastContainer = ({ ...props }) => (
+const ToastContainer = props => (
   <Container toastClassName={style.toast} bodyClassName={style.body} {...props} />
 )
 

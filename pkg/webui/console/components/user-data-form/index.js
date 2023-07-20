@@ -92,7 +92,7 @@ const UserForm = ({
   passwordRequirements,
   update,
 }) => {
-  const [stateError, setStateError] = React.useState('')
+  const [stateError, setStateError] = React.useState(undefined)
   const validationSchema = update
     ? baseValidationSchema
     : baseValidationSchema.concat(createPasswordValidationSchema(passwordRequirements))
@@ -107,7 +107,7 @@ const UserForm = ({
         values.primary_email_address_validated_at = new Date().toISOString()
       }
 
-      setStateError('')
+      setStateError(undefined)
       try {
         const result = await onSubmit(values)
         resetForm({ values: vals })
