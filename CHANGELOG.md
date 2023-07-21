@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.27.0] - unreleased
+
+### Added
+
 - The `as-db purge` command to purge unused data from the Application Server database.
 - RPCs and CLI command to delete a batch of end devices within an application.
   - Check `ttn-lw-cli end-devices batch-delete` for more details.
@@ -36,8 +50,6 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - End device data stream not being closed when navigating away from end device pages, which could cause event streams stopping to work due to too many open connections.
-
-### Security
 
 ## [3.26.2] - 2023-07-11
 
@@ -2633,7 +2645,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.26.2...v3.26
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.27.0...v3.27
+[3.27.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.26.2...v3.27.0
 [3.26.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.26.1...v3.26.2
 [3.26.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.26.0...v3.26.1
 [3.26.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.25.2...v3.26.0
