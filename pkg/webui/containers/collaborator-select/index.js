@@ -20,6 +20,8 @@ import { components } from 'react-select'
 import Field from '@ttn-lw/components/form/field'
 import Select from '@ttn-lw/components/select'
 import Icon from '@ttn-lw/components/icon'
+import Button from '@ttn-lw/components/button'
+import { useFormContext } from '@ttn-lw/components/form'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 import Message from '@ttn-lw/lib/components/message'
@@ -63,9 +65,19 @@ const m = defineMessages({
   suggestions: 'Suggestions',
 })
 
-const Suggest = ({ initialOptions, userInputCustomComponent, entity, entityId, ...rest }) => {
+const Suggest = ({
+  userId,
+  name,
+  initialOptions,
+  userInputCustomComponent,
+  entity,
+  entityId,
+  isResctrictedUser,
+  ...rest
+}) => {
   const dispatch = useDispatch()
   const { formatMessage } = useIntl()
+  const { setFieldValue, values } = useFormContext()
   const searchResults = useSelector(selectSearchResults)
   const searchResultsRef = useRef()
   searchResultsRef.current = searchResults
@@ -107,19 +119,38 @@ const Suggest = ({ initialOptions, userInputCustomComponent, entity, entityId, .
     [dispatch, onlyUsers, searchResultsRef, collaboratorOf, formatMessage],
   )
 
+  const handleSetYourself = useCallback(
+    e => {
+      e.preventDefault()
+      setFieldValue(name, { user_ids: { user_id: userId } })
+    },
+    [setFieldValue, name, userId],
+  )
+
   return (
-    <Field
-      {...rest}
-      defaultOptions={initialOptions}
-      component={Select.Suggested}
-      noOptionsMessage={handleNoOptions}
-      loadOptions={handleLoadingOptions}
-      showOptionIcon
-      openMenuOnFocus
-      className={styles.collaboratorSelect}
-      customComponents={{ SingleValue, Menu: customMenu }}
-      maxMenuHeight={300}
-    />
+    <>
+      <Field
+        {...rest}
+        name={name}
+        defaultOptions={initialOptions}
+        component={Select.Suggested}
+        noOptionsMessage={handleNoOptions}
+        loadOptions={handleLoadingOptions}
+        showOptionIcon
+        openMenuOnFocus
+        className={styles.collaboratorSelect}
+        customComponents={{ SingleValue, Menu: customMenu }}
+        maxMenuHeight={300}
+        value={values[name] ? composeOption(values[name]) : null}
+      />
+      {isResctrictedUser && (
+        <Button
+          icon="user"
+          onClick={handleSetYourself}
+          message={`Set yourself as ${name.replace('_', ' ')}`}
+        />
+      )}
+    </>
   )
 }
 
@@ -133,6 +164,9 @@ Suggest.propTypes = {
       icon: PropTypes.string.isRequired,
     }),
   ),
+  isResctrictedUser: PropTypes.bool,
+  name: PropTypes.string.isRequired,
+  userId: PropTypes.string,
   userInputCustomComponent: PropTypes.shape({
     SingleValue: PropTypes.func,
   }),
@@ -141,9 +175,11 @@ Suggest.propTypes = {
 Suggest.defaultProps = {
   initialOptions: [],
   userInputCustomComponent: {},
+  isResctrictedUser: false,
+  userId: undefined,
 }
 
-const CollaboratorSelect = ({ entity, entityId, ...rest }) => {
+const CollaboratorSelect = ({ userId, name, entity, entityId, isResctrictedUser, ...rest }) => {
   const collaboratorsList = useSelector(selectCollaborators)
   const firstEightCollaborators = collaboratorsList
     .slice(0, 7)
@@ -160,10 +196,13 @@ const CollaboratorSelect = ({ entity, entityId, ...rest }) => {
     <RequireRequest requestAction={getCollaboratorsList(entity.toLowerCase(), entityId)}>
       <Suggest
         {...rest}
+        userId={userId}
+        name={name}
         initialOptions={collaboratorOptions}
         entity={entity.toLowerCase()}
         entityId={entityId}
-        disabled={collaboratorsList.length === 1}
+        disabled={isResctrictedUser || collaboratorsList.length === 1}
+        isResctrictedUser={isResctrictedUser}
       />
     </RequireRequest>
   )
@@ -172,11 +211,16 @@ const CollaboratorSelect = ({ entity, entityId, ...rest }) => {
 CollaboratorSelect.propTypes = {
   entity: PropTypes.string,
   entityId: PropTypes.string,
+  isResctrictedUser: PropTypes.bool,
+  name: PropTypes.string.isRequired,
+  userId: PropTypes.string,
 }
 
 CollaboratorSelect.defaultProps = {
   entity: undefined,
   entityId: undefined,
+  isResctrictedUser: false,
+  userId: undefined,
 }
 
 export default CollaboratorSelect

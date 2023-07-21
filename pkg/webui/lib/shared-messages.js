@@ -373,6 +373,8 @@ export default defineMessages({
   resetWarning: 'Reseting is insecure and makes your end device susceptible for replay attacks',
   restartStream: 'Restart stream',
   restore: 'Restore',
+  restrictedUser:
+    'You can only set yourself as a contact. If you would like another collaborator set as contact, please contact this collaborator to self-assign as contact.',
   resume: 'Resume',
   rights: 'Rights',
   rootKeys: 'Root keys',

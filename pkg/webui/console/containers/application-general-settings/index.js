@@ -50,6 +50,8 @@ import {
   selectApplicationLink,
   selectSelectedApplication,
 } from '@console/store/selectors/applications'
+import { selectIsConfiguration } from '@console/store/selectors/identity-server'
+import { selectUserId } from '@console/store/selectors/logout'
 
 const promisifiedSetAppPkgDefaultAssoc = attachPromise(setAppPkgDefaultAssoc)
 const promisifiedDeleteAppPkgDefaultAssoc = attachPromise(deleteAppPkgDefaultAssoc)
@@ -66,6 +68,7 @@ const ApplicationGeneralSettingsContainer = ({ appId }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [error, setError] = useState()
+  const userId = useSelector(selectUserId)
   const application = useSelector(selectSelectedApplication)
   const link = useSelector(selectApplicationLink)
   const apiKeysCount = useSelector(selectApiKeysTotalCount)
@@ -87,6 +90,9 @@ const ApplicationGeneralSettingsContainer = ({ appId }) => {
   const isPristine = !hasApiKeys && !hasAddedCollaborators && !hasIntegrations
   const shouldConfirmDelete =
     !isPristine || !mayViewCollaborators || !mayViewApiKeys || Boolean(error)
+  const isConfig = useSelector(selectIsConfiguration)
+  const isResctrictedUser =
+    isConfig && isConfig.collaborator_rights?.set_others_as_contacts === false
   const packageAssoc = useSelector(state => selectApplicationPackageDefaultAssociation(state, 202))
   const alcsync =
     packageAssoc?.package_name === alcsyncPackageName ? { alcsync: true } : { alcsync: false }
@@ -189,6 +195,8 @@ const ApplicationGeneralSettingsContainer = ({ appId }) => {
       applicationName={application.name}
       shouldConfirmDelete={shouldConfirmDelete}
       mayPurge={mayPurgeApp}
+      isResctrictedUser={isResctrictedUser}
+      userId={userId}
     />
   )
 }

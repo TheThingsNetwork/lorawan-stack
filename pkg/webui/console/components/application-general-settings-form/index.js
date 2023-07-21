@@ -22,6 +22,7 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
 import Checkbox from '@ttn-lw/components/checkbox'
+import Notification from '@ttn-lw/components/notification'
 
 import CollaboratorSelect from '@ttn-lw/containers/collaborator-select'
 import {
@@ -132,6 +133,8 @@ const ApplicationGeneralSettingsForm = ({
   handleDelete,
   shouldConfirmDelete,
   mayPurge,
+  isResctrictedUser,
+  userId,
 }) => (
   <Form
     error={error}
@@ -180,6 +183,7 @@ const ApplicationGeneralSettingsForm = ({
       decode={decodeAttributes}
     />
     <Form.SubTitle title={sharedMessages.contactInformation} className="mb-cs-s" />
+    {isResctrictedUser && <Notification info small content={sharedMessages.restrictedUser} />}
     <CollaboratorSelect
       name="administrative_contact"
       title={sharedMessages.adminContact}
@@ -189,6 +193,8 @@ const ApplicationGeneralSettingsForm = ({
       encode={encodeContact}
       decode={decodeContact}
       required
+      isResctrictedUser={isResctrictedUser}
+      userId={userId}
     />
     <Message
       content={m.adminContactDescription}
@@ -204,6 +210,8 @@ const ApplicationGeneralSettingsForm = ({
       encode={encodeContact}
       decode={decodeContact}
       required
+      isResctrictedUser={isResctrictedUser}
+      userId={userId}
     />
     <Message content={m.techContactDescription} component="p" className="mt-cs-xs tc-subtle-gray" />
     <SubmitBar>
@@ -235,15 +243,18 @@ ApplicationGeneralSettingsForm.propTypes = {
     skip_payload_crypto: PropTypes.bool,
     alcsync: PropTypes.bool,
   }).isRequired,
+  isResctrictedUser: PropTypes.bool,
   mayDeleteApplication: PropTypes.shape({}).isRequired,
   mayPurge: PropTypes.bool.isRequired,
   mayViewApplicationLink: PropTypes.bool.isRequired,
   shouldConfirmDelete: PropTypes.bool.isRequired,
+  userId: PropTypes.string.isRequired,
 }
 
 ApplicationGeneralSettingsForm.defaultProps = {
   applicationName: '',
   error: undefined,
+  isResctrictedUser: false,
 }
 
 export default ApplicationGeneralSettingsForm

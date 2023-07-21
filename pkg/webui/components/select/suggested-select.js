@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { components } from 'react-select'
 import AsyncSelect from 'react-select/async'
 import { useIntl } from 'react-intl'
@@ -78,6 +78,11 @@ const SuggestedSelect = props => {
 
   const { formatMessage } = useIntl()
   const [inputValue, setInputValue] = useState(value)
+
+  // React memoizes the initial state value and does not update it unless explicitly told to do so.
+  useEffect(() => {
+    setInputValue(value)
+  }, [value])
 
   const handleChange = useCallback(
     selectedValue => {

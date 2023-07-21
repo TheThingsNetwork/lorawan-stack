@@ -109,11 +109,31 @@ describe('Application general settings', () => {
     cy.findByText('Contact information').should('be.visible')
     cy.findByLabelText('Administrative contact').clear()
     cy.findByLabelText('Administrative contact').selectOption(collabUserId)
+    cy.findByLabelText('Technical contact').clear()
+    cy.findByLabelText('Technical contact').selectOption(collabUserId)
 
     cy.findByRole('button', { name: 'Save changes' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
     cy.findByTestId('toast-notification').findByText(`Application updated`).should('be.visible')
+  })
+
+  it('succeeds setting current user as contact', () => {
+    const entity = 'applications'
+    const userCollaborator = generateCollaborator(entity, 'user')
+    cy.createCollaborator(entity, applicationId, userCollaborator)
+    cy.intercept('GET', `/api/v3/is/configuration`, { fixture: 'restricted-user-config.json' })
+    cy.visit(`${Cypress.config('consoleRootPath')}/applications/${applicationId}/general-settings`)
+
+    cy.findByText('Contact information').should('be.visible')
+    cy.findByLabelText('Administrative contact').should('have.attr', 'disabled')
+    cy.findByRole('button', { name: /Set yourself as administrative contact/ }).click()
+    cy.findByLabelText('Administrative contact')
+      .parent()
+      .parent()
+      .within(() => {
+        cy.findByText(userId).first().should('be.visible')
+      })
   })
 
   it('succeeds deleting application', () => {
