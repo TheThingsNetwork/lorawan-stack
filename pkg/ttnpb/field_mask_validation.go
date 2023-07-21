@@ -642,6 +642,10 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 		All:     EndDeviceFieldPathsNested,
 		Allowed: isEndDeviceReadFieldPaths,
 	},
+	"/ttn.lorawan.v3.EndDeviceBatchRegistry/Get": {
+		All:     EndDeviceFieldPathsNested,
+		Allowed: isEndDeviceReadFieldPaths,
+	},
 	"/ttn.lorawan.v3.EndDeviceRegistry/List": {
 		All:     EndDeviceFieldPathsNested,
 		Allowed: isEndDeviceReadFieldPaths,

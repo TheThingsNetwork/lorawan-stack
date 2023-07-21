@@ -11131,8 +11131,7 @@
                   "rules": [
                     {
                       "method": "DELETE",
-                      "pattern": "/edcs/claim/{application_ids.application_id}/devices/{device_id}",
-                      "body": "*"
+                      "pattern": "/edcs/claim/{application_ids.application_id}/devices/{device_id}"
                     }
                   ]
                 }
@@ -14327,6 +14326,82 @@
                   }
                 ]
               }
+            }
+          ]
+        },
+        {
+          "name": "BatchGetEndDevicesRequest",
+          "longName": "BatchGetEndDevicesRequest",
+          "fullName": "ttn.lorawan.v3.BatchGetEndDevicesRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "application_ids",
+              "description": "",
+              "label": "",
+              "type": "ApplicationIdentifiers",
+              "longType": "ApplicationIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "device_ids",
+              "description": "",
+              "label": "repeated",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.min_items",
+                    "value": 1
+                  },
+                  {
+                    "name": "repeated.max_items",
+                    "value": 20
+                  },
+                  {
+                    "name": "repeated.items.string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "repeated.items.string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "field_mask",
+              "description": "The names of the end device fields that should be returned.\nThis mask is applied on all the end devices in the result.\nSee the API reference for which fields can be returned by the different services.",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -18489,6 +18564,28 @@
           "fullName": "ttn.lorawan.v3.EndDeviceBatchRegistry",
           "description": "The EndDeviceBatchRegistry service, exposed by the Identity Server, is used to manage\nend device registrations in batches.",
           "methods": [
+            {
+              "name": "Get",
+              "description": "Get a batch of end devices with the given identifiers, selecting the fields specified\nin the field mask.\nMore or less fields may be returned, depending on the rights of the caller.\nDevices not found are skipped and no error is returned.",
+              "requestType": "BatchGetEndDevicesRequest",
+              "requestLongType": "BatchGetEndDevicesRequest",
+              "requestFullType": "ttn.lorawan.v3.BatchGetEndDevicesRequest",
+              "requestStreaming": false,
+              "responseType": "EndDevices",
+              "responseLongType": "EndDevices",
+              "responseFullType": "ttn.lorawan.v3.EndDevices",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/applications/{application_ids.application_id}/devices/batch"
+                    }
+                  ]
+                }
+              }
+            },
             {
               "name": "Delete",
               "description": "Delete a batch of end devices with the given IDs.\n\nThis operation is atomic; either all devices are deleted or none.\nDevices not found are skipped and no error is returned.\nBefore calling this RPC, use the corresponding BatchDelete RPCs\nof NsEndDeviceRegistry, AsEndDeviceRegistry and\noptionally the JsEndDeviceRegistry to delete the end devices.\nIf the devices were claimed on a Join Server, use the BatchUnclaim RPC\nof the DeviceClaimingServer.\nThis is NOT done automatically.",

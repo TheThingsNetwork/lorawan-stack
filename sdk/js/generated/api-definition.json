@@ -2281,7 +2281,6 @@
         {
           "method": "delete",
           "pattern": "/edcs/claim/{application_ids.application_id}/devices/{device_id}",
-          "body": "*",
           "parameters": [
             "application_ids.application_id",
             "device_id"
@@ -2712,6 +2711,53 @@
     }
   },
   "EndDeviceBatchRegistry": {
+    "Get": {
+      "file": "lorawan-stack/api/end_device_services.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/applications/{application_ids.application_id}/devices/batch",
+          "parameters": [
+            "application_ids.application_id"
+          ]
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "activated_at",
+        "application_server_address",
+        "attributes",
+        "created_at",
+        "claim_authentication_code",
+        "claim_authentication_code.value",
+        "claim_authentication_code.valid_to",
+        "claim_authentication_code.valid_from",
+        "description",
+        "ids",
+        "ids.application_ids",
+        "ids.application_ids.application_id",
+        "ids.dev_eui",
+        "ids.device_id",
+        "ids.join_eui",
+        "join_server_address",
+        "locations",
+        "name",
+        "network_server_address",
+        "serial_number",
+        "service_profile_id",
+        "lora_alliance_profile_ids",
+        "lora_alliance_profile_ids.vendor_id",
+        "lora_alliance_profile_ids.vendor_profile_id",
+        "updated_at",
+        "version_ids",
+        "version_ids.band_id",
+        "version_ids.brand_id",
+        "version_ids.firmware_version",
+        "version_ids.hardware_version",
+        "version_ids.model_id",
+        "picture",
+        "last_seen_at"
+      ]
+    },
     "Delete": {
       "file": "lorawan-stack/api/end_device_services.proto",
       "http": [

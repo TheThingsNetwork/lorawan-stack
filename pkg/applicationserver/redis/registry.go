@@ -23,6 +23,7 @@ import (
 
 	"github.com/redis/go-redis/v9"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/internal/registry"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -32,10 +33,9 @@ import (
 )
 
 var (
-	errInvalidFieldmask     = errors.DefineInvalidArgument("invalid_fieldmask", "invalid fieldmask")
-	errInvalidIdentifiers   = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
-	errDuplicateIdentifiers = errors.DefineAlreadyExists("duplicate_identifiers", "duplicate identifiers")
-	errReadOnlyField        = errors.DefineInvalidArgument("read_only_field", "read-only field `{field}`")
+	errInvalidFieldmask   = errors.DefineInvalidArgument("invalid_fieldmask", "invalid fieldmask")
+	errInvalidIdentifiers = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
+	errReadOnlyField      = errors.DefineInvalidArgument("read_only_field", "read-only field `{field}`")
 )
 
 // SchemaVersion is the Application Server database schema version. Bump when a migration is required.
@@ -217,18 +217,21 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids *ttnpb.EndDeviceIdentifier
 
 			pipelined = func(p redis.Pipeliner) error {
 				if stored == nil && updated.Ids.JoinEui != nil && updated.Ids.DevEui != nil {
-					ek := r.euiKey(types.MustEUI64(updated.Ids.JoinEui).OrZero(), types.MustEUI64(updated.Ids.DevEui).OrZero())
+					joinEUI := types.MustEUI64(updated.Ids.JoinEui).OrZero()
+					devEUI := types.MustEUI64(updated.Ids.DevEui).OrZero()
+					ek := r.euiKey(joinEUI, devEUI)
 					if err := tx.Watch(ctx, ek).Err(); err != nil {
 						return err
 					}
-					i, err := tx.Exists(ctx, ek).Result()
-					if err != nil {
+
+					storedUIDStr, err := tx.Get(ctx, ek).Result()
+					if errors.Is(err, redis.Nil) {
+						p.SetNX(ctx, ek, uid, 0)
+					} else if err != nil {
 						return err
+					} else {
+						return registry.UniqueEUIViolationErr(ctx, joinEUI, devEUI, storedUIDStr)
 					}
-					if i != 0 {
-						return errDuplicateIdentifiers.New()
-					}
-					p.SetNX(ctx, ek, uid, 0)
 				}
 
 				if _, err := ttnredis.SetProto(ctx, p, uk, updated, 0); err != nil {

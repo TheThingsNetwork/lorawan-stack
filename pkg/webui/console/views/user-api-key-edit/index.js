@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import { getUsersRightsList } from '@console/store/actions/users'
 import { getApiKey } from '@console/store/actions/api-keys'
 
 import { selectUserId } from '@account/store/selectors/user'
+import { selectApiKeyById } from '@console/store/selectors/api-keys'
 
 const UserApiKeyEditInner = () => {
   const userId = useSelector(selectUserId)
@@ -58,11 +59,16 @@ const UserApiKeyEditInner = () => {
 const UserApiKeyEdit = () => {
   const userId = useSelector(selectUserId)
   const { apiKeyId } = useParams()
+
+  // Check if API key still exists after possibly being deleted.
+  const apiKey = useSelector(state => selectApiKeyById(state, apiKeyId))
+  const hasApiKey = Boolean(apiKey)
+
   return (
     <RequireRequest
       requestAction={[getUsersRightsList(userId), getApiKey('users', userId, apiKeyId)]}
     >
-      <UserApiKeyEditInner />
+      {hasApiKey && <UserApiKeyEditInner />}
     </RequireRequest>
   )
 }

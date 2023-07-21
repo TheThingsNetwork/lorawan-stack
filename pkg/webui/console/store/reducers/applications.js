@@ -26,6 +26,7 @@ import {
   UPDATE_APP_SUCCESS,
   DELETE_APP_SUCCESS,
   GET_APP_EVENT_MESSAGE_SUCCESS,
+  GET_MQTT_INFO_SUCCESS,
 } from '@console/store/actions/applications'
 
 const application = (state = {}, application) => ({
@@ -38,6 +39,7 @@ const defaultState = {
   derived: {},
   selectedApplication: null,
   applicationDeviceCounts: {},
+  mqtt: {},
 }
 
 const applications = (state = defaultState, { type, payload, event }) => {
@@ -120,6 +122,11 @@ const applications = (state = defaultState, { type, payload, event }) => {
         }
       }
       return state
+    case GET_MQTT_INFO_SUCCESS:
+      return {
+        ...state,
+        mqtt: payload,
+      }
     default:
       return state
   }

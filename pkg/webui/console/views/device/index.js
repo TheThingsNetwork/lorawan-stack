@@ -20,6 +20,7 @@ import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { selectNsConfig } from '@ttn-lw/lib/selectors/env'
+import { combineDeviceIds } from '@ttn-lw/lib/selectors/id'
 
 import {
   mayReadApplicationDeviceKeys,
@@ -33,6 +34,7 @@ import { getNsFrequencyPlans } from '@console/store/actions/configuration'
 import { getInfoByJoinEUI } from '@console/store/actions/claim'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+import { selectSelectedDevice } from '@console/store/selectors/devices'
 
 import Device from './device'
 
@@ -99,11 +101,18 @@ const DeviceContainer = props => {
     [appId, devId, deviceSelector, linkSelector, mayViewLink],
   )
 
-  useEffect(() => () => dispatch(stopDeviceEventsStream(devId)), [dispatch, devId])
+  useEffect(
+    () => () => dispatch(stopDeviceEventsStream(combineDeviceIds(appId, devId))),
+    [appId, devId, dispatch],
+  )
+
+  // Check whether the device still exists after it has been possibly deleted.
+  const device = useSelector(selectSelectedDevice)
+  const hasDevice = Boolean(device)
 
   return (
     <RequireRequest requestAction={loadDeviceData}>
-      <Device {...props} />
+      {hasDevice && <Device {...props} />}
     </RequireRequest>
   )
 }

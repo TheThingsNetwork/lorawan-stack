@@ -90,9 +90,11 @@ describe('Device un-claiming', () => {
       .its('request.url')
       .then(url => {
         const params = new URLSearchParams(new URL(url).search)
+        const hexToBase64 = hex =>
+          btoa(String.fromCharCode(...hex.match(/.{1,2}/g).map(byte => parseInt(byte, 16))))
 
-        expect(params.get('dev_eui')).to.equal(ns.end_device.ids.dev_eui)
-        expect(params.get('join_eui')).to.equal('0000000000000000')
+        expect(params.get('dev_eui')).to.equal(hexToBase64(ns.end_device.ids.dev_eui))
+        expect(params.get('join_eui')).to.equal(hexToBase64('0000000000000000'))
       })
 
     cy.findByTestId('error-notification').should('not.exist')

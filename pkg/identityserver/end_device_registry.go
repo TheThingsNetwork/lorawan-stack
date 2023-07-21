@@ -510,6 +510,47 @@ func (is *IdentityServer) batchDeleteEndDevice(
 	return ttnpb.Empty, nil
 }
 
+func (is *IdentityServer) batchGetEndDevices(
+	ctx context.Context,
+	req *ttnpb.BatchGetEndDevicesRequest,
+) (*ttnpb.EndDevices, error) {
+	err := rights.RequireApplication(ctx,
+		req.ApplicationIds,
+		ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	req.FieldMask = cleanFieldMaskPaths(ttnpb.EndDeviceFieldPathsNested, req.FieldMask, getPaths, nil)
+
+	res := &ttnpb.EndDevices{}
+	ids := make([]*ttnpb.EndDeviceIdentifiers, 0, len(req.DeviceIds))
+	for _, id := range req.DeviceIds {
+		ids = append(ids, &ttnpb.EndDeviceIdentifiers{
+			ApplicationIds: req.ApplicationIds,
+			DeviceId:       id,
+		})
+	}
+
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		res.EndDevices, err = st.FindEndDevices(ctx, ids, req.FieldMask.GetPaths())
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	for _, dev := range res.EndDevices {
+		if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.GetPaths()), "picture") {
+			is.setFullEndDevicePictureURL(ctx, dev)
+		}
+	}
+	return res, nil
+}
+
 func (dr *endDeviceRegistry) Create(ctx context.Context, req *ttnpb.CreateEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	return dr.createEndDevice(ctx, req)
 }
@@ -543,4 +584,11 @@ func (reg *endDeviceBatchRegistry) Delete(
 	req *ttnpb.BatchDeleteEndDevicesRequest,
 ) (*emptypb.Empty, error) {
 	return reg.batchDeleteEndDevice(ctx, req)
+}
+
+func (reg *endDeviceBatchRegistry) Get(
+	ctx context.Context,
+	req *ttnpb.BatchGetEndDevicesRequest,
+) (*ttnpb.EndDevices, error) {
+	return reg.batchGetEndDevices(ctx, req)
 }

@@ -16,6 +16,7 @@ package shared
 
 import (
 	"go.thethings.network/lorawan-stack/v3/pkg/packetbrokeragent"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // DefaultPacketBrokerAgentConfig is the default configuration for the Packet Broker Agent.
@@ -34,7 +35,8 @@ var DefaultPacketBrokerAgentConfig = packetbrokeragent.Config{
 		WorkerPool: packetbrokeragent.WorkerPoolConfig{
 			Limit: 4096,
 		},
-		IncludeHops: false,
+		IncludeHops:     false,
+		DevAddrPrefixes: []types.DevAddrPrefix{{}}, // Subscribe to all DevAddr prefixes.
 	},
 	Forwarder: packetbrokeragent.ForwarderConfig{
 		WorkerPool: packetbrokeragent.WorkerPoolConfig{

@@ -15,6 +15,7 @@
 import React from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 import { useParams } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 import { APPLICATION } from '@console/constants/entities'
 
@@ -27,6 +28,7 @@ import ConsoleCollaboratorsForm from '@console/containers/collaborators-form'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { getCollaborator, getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
+import { selectCollaboratorById } from '@ttn-lw/lib/store/selectors/collaborators'
 
 const ApplicationCollaboratorEditInner = () => {
   const { appId, collaboratorId } = useParams()
@@ -52,6 +54,10 @@ const ApplicationCollaboratorEditInner = () => {
 const ApplicationCollaboratorEdit = () => {
   const { appId, collaboratorId, collaboratorType } = useParams()
 
+  // Check if collaborator still exists after being possibly deleted.
+  const collaborator = useSelector(state => selectCollaboratorById(state, collaboratorId))
+  const hasCollaborator = Boolean(collaborator)
+
   if (collaboratorType !== 'user' && collaboratorType !== 'organization') {
     return <GenericNotFound />
   }
@@ -63,7 +69,7 @@ const ApplicationCollaboratorEdit = () => {
         getCollaboratorsList('application', appId),
       ]}
     >
-      <ApplicationCollaboratorEditInner />
+      {hasCollaborator && <ApplicationCollaboratorEditInner />}
     </RequireRequest>
   )
 }
