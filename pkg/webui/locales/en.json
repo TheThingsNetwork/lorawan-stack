@@ -1452,6 +1452,7 @@
   "lib.shared-messages.resetWarning": "Reseting is insecure and makes your end device susceptible for replay attacks",
   "lib.shared-messages.restartStream": "Restart stream",
   "lib.shared-messages.restore": "Restore",
+  "lib.shared-messages.restrictedUser": "You can only set yourself as a contact. If you would like another collaborator set as contact, please contact this collaborator to self-assign as contact.",
   "lib.shared-messages.resume": "Resume",
   "lib.shared-messages.rights": "Rights",
   "lib.shared-messages.rootKeys": "Root keys",
