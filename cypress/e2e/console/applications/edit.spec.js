@@ -99,7 +99,7 @@ describe('Application general settings', () => {
     cy.findByText('No matching user or organization was found')
   })
 
-  it('suceeds adding contact information', () => {
+  it('succeeds adding contact information', () => {
     const entity = 'applications'
     const userCollaborator = generateCollaborator(entity, 'user')
     cy.createCollaborator(entity, applicationId, userCollaborator)

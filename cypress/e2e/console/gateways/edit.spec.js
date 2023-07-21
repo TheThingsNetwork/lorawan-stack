@@ -227,7 +227,7 @@ describe('Gateway general settings', () => {
     cy.findByText('No matching user or organization was found')
   })
 
-  it('suceeds adding contact information', () => {
+  it('succeeds adding contact information', () => {
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
     const entity = 'gateways'
     const userCollaborator = generateCollaborator(entity, 'user')

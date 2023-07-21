@@ -28,7 +28,7 @@ import Message from '@ttn-lw/lib/components/message'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { searchAccounts } from '@ttn-lw/lib/store/actions/search-accounts'
-import { selectSearchResults } from '@ttn-lw/lib/store/selectors/search-accounts'
+import { selectSearchResultAccountIds } from '@ttn-lw/lib/store/selectors/search-accounts'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
 import { selectCollaborators } from '@ttn-lw/lib/store/selectors/collaborators'
@@ -78,7 +78,7 @@ const Suggest = ({
   const dispatch = useDispatch()
   const { formatMessage } = useIntl()
   const { setFieldValue, values } = useFormContext()
-  const searchResults = useSelector(selectSearchResults)
+  const searchResults = useSelector(selectSearchResultAccountIds)
   const searchResultsRef = useRef()
   searchResultsRef.current = searchResults
   const handleNoOptions = useCallback(() => formatMessage(m.noOptionsMessage), [formatMessage])
