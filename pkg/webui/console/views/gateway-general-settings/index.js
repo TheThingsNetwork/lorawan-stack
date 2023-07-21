@@ -46,6 +46,7 @@ import {
 
 import { updateGateway, deleteGateway } from '@console/store/actions/gateways'
 import { getApiKeysList } from '@console/store/actions/api-keys'
+import { getIsConfiguration } from '@console/store/actions/identity-server'
 
 import { selectApiKeysTotalCount } from '@console/store/selectors/api-keys'
 import { selectSelectedGateway, selectSelectedGatewayId } from '@console/store/selectors/gateways'
@@ -174,6 +175,7 @@ const GatewaySettings = () => {
         if (mayViewCollaborators) {
           await dispatch(attachPromise(getCollaboratorsList('gateway', gtwId)))
         }
+        getIsConfiguration()
       }
     },
     [mayDeleteGtw, mayViewApiKeys, mayViewCollaborators, gtwId],

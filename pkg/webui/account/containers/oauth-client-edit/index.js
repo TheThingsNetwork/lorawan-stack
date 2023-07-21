@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, { useState, useCallback } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
 
@@ -26,6 +26,8 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import diff from '@ttn-lw/lib/diff'
 
 import { deleteClient, updateClient } from '@account/store/actions/clients'
+
+import { selectIsConfiguration } from '@account/store/selectors/identity-server'
 
 const m = defineMessages({
   deleteSuccess: 'OAuth client deleted',
@@ -61,6 +63,9 @@ const ClientAdd = props => {
   const [error, setError] = useState()
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const isConfig = useSelector(selectIsConfiguration)
+  const isResctrictedUser =
+    isConfig && isConfig.collaborator_rights?.set_others_as_contacts === false
 
   const navigateToOAuthClient = useCallback(
     clientId => {
@@ -138,6 +143,7 @@ const ClientAdd = props => {
       isAdmin={isAdmin}
       rights={rights}
       pseudoRights={pseudoRights}
+      isResctrictedUser={isResctrictedUser}
     />
   )
 }

@@ -14,6 +14,7 @@
 
 import React from 'react'
 import { defineMessages } from 'react-intl'
+import { useSelector } from 'react-redux'
 
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
@@ -34,6 +35,9 @@ import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { id as organizationIdRegexp } from '@ttn-lw/lib/regexp'
+
+import { selectUserId } from '@console/store/selectors/logout'
+import { selectIsConfiguration } from '@console/store/selectors/identity-server'
 
 const validationSchema = Yup.object().shape({
   ids: Yup.object().shape({
@@ -87,6 +91,10 @@ const OrganizationForm = props => {
   const { onSubmit, error, submitBarItems, initialValues, submitMessage, update } = props
   const orgId = initialValues.ids?.organization_id
   const isUpdate = Boolean(initialValues.ids.organization_id)
+  const userId = useSelector(selectUserId)
+  const isConfig = useSelector(selectIsConfiguration)
+  const isResctrictedUser =
+    isConfig && isConfig.collaborator_rights?.set_others_as_contacts === false
 
   return (
     <Form
@@ -130,6 +138,8 @@ const OrganizationForm = props => {
             encode={encodeContact}
             decode={decodeContact}
             required
+            isResctrictedUser={isResctrictedUser}
+            userId={userId}
           />
           <Message
             content={m.adminContactDescription}
@@ -145,6 +155,8 @@ const OrganizationForm = props => {
             encode={encodeContact}
             decode={decodeContact}
             required
+            isResctrictedUser={isResctrictedUser}
+            userId={userId}
           />
           <Message
             content={m.techContactDescription}

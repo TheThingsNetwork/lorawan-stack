@@ -24,6 +24,7 @@ import Spinner from '@ttn-lw/components/spinner'
 
 import { FullViewErrorInner } from '@ttn-lw/lib/components/full-view-error'
 import Message from '@ttn-lw/lib/components/message'
+import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import OrganizationUpdateForm from '@console/containers/organization-form/update'
 
@@ -42,6 +43,7 @@ import {
 import { checkFromState } from '@account/lib/feature-checks'
 
 import { getApiKeysList } from '@console/store/actions/api-keys'
+import { getIsConfiguration } from '@console/store/actions/identity-server'
 
 import { selectSelectedOrganizationId } from '@console/store/selectors/organizations'
 
@@ -105,14 +107,16 @@ const GeneralSettings = () => {
       featureCheck={mayEditBasicOrganizationInformation}
       otherwise={{ redirect: `/organizations/${orgId}` }}
     >
-      <Container>
-        <PageTitle title={sharedMessages.generalSettings} />
-        <Row>
-          <Col lg={8} md={12}>
-            <OrganizationUpdateForm onDeleteSuccess={handleDeleteSuccess} />
-          </Col>
-        </Row>
-      </Container>
+      <RequireRequest requestAction={getIsConfiguration()}>
+        <Container>
+          <PageTitle title={sharedMessages.generalSettings} />
+          <Row>
+            <Col lg={8} md={12}>
+              <OrganizationUpdateForm onDeleteSuccess={handleDeleteSuccess} />
+            </Col>
+          </Row>
+        </Container>
+      </RequireRequest>
     </Require>
   )
 }

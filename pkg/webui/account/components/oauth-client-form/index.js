@@ -56,6 +56,7 @@ const OAuthClientForm = props => {
     initialValues: values,
     onSubmit,
     onDelete,
+    isResctrictedUser,
   } = props
   const { formatMessage } = useIntl()
 
@@ -196,6 +197,8 @@ const OAuthClientForm = props => {
             encode={encodeContact}
             decode={decodeContact}
             required
+            isResctrictedUser={isResctrictedUser}
+            userId={userId}
           />
           <Message
             content={m.adminContactDescription}
@@ -211,6 +214,8 @@ const OAuthClientForm = props => {
             encode={encodeContact}
             decode={decodeContact}
             required
+            isResctrictedUser={isResctrictedUser}
+            userId={userId}
           />
           <Message
             content={m.techContactDescription}
@@ -277,6 +282,7 @@ OAuthClientForm.propTypes = {
     description: PropTypes.string,
   }),
   isAdmin: PropTypes.bool.isRequired,
+  isResctrictedUser: PropTypes.bool.isRequired,
   onDelete: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   pseudoRights: PropTypes.rights.isRequired,

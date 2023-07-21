@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
+import { useSelector } from 'react-redux'
 
 import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
 import SubmitButton from '@ttn-lw/components/submit-button'
@@ -34,6 +35,9 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
 import { encodeAttributes, decodeAttributes } from '@console/lib/attributes'
+
+import { selectIsConfiguration } from '@console/store/selectors/identity-server'
+import { selectUserId } from '@console/store/selectors/logout'
 
 import m from '../messages'
 
@@ -67,6 +71,10 @@ const BasicSettingsForm = React.memo(props => {
     mayPurge,
   } = props
 
+  const userId = useSelector(selectUserId)
+  const isConfig = useSelector(selectIsConfiguration)
+  const isResctrictedUser =
+    isConfig && isConfig.collaborator_rights?.set_others_as_contacts === false
   const [error, setError] = React.useState(undefined)
 
   const onGatewayDelete = React.useCallback(
@@ -232,6 +240,8 @@ const BasicSettingsForm = React.memo(props => {
         encode={encodeContact}
         decode={decodeContact}
         required
+        isResctrictedUser={isResctrictedUser}
+        userId={userId}
       />
       <Message
         content={m.adminContactDescription}
@@ -247,6 +257,8 @@ const BasicSettingsForm = React.memo(props => {
         encode={encodeContact}
         decode={decodeContact}
         required
+        isResctrictedUser={isResctrictedUser}
+        userId={userId}
       />
       <Message
         content={m.techContactDescription}

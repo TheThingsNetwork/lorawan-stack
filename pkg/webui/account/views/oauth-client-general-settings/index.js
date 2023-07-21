@@ -25,6 +25,7 @@ import OAuthClientEdit from '@account/containers/oauth-client-edit'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { getUserRights } from '@account/store/actions/user'
+import { getIsConfiguration } from '@account/store/actions/identity-server'
 
 import {
   selectUserIsAdmin,
@@ -64,7 +65,7 @@ const OAuthClientGeneralSettings = () => {
   const userId = useSelector(selectUserId)
 
   return (
-    <RequireRequest requestAction={getUserRights(userId)}>
+    <RequireRequest requestAction={[getUserRights(userId), getIsConfiguration()]}>
       <OAuthClientGeneralSettingsInner />
     </RequireRequest>
   )

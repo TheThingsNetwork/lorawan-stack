@@ -89,6 +89,33 @@ describe('Organization general settings', () => {
     cy.findByTestId('toast-notification').findByText(`Organization updated`).should('be.visible')
   })
 
+  it('succeeds setting current user as contact', () => {
+    const entity = 'organizations'
+    const userCollaborator = generateCollaborator(entity, 'user')
+    cy.createCollaborator(entity, organizationId, userCollaborator)
+
+    cy.intercept('GET', `/api/v3/is/configuration`, { fixture: 'restricted-user-config.json' })
+    cy.visit(
+      `${Cypress.config('consoleRootPath')}/organizations/${organizationId}/general-settings`,
+    )
+
+    cy.findByText('Contact information').should('be.visible')
+    cy.findByLabelText('Administrative contact').should('have.attr', 'disabled')
+    cy.findByLabelText('Administrative contact')
+      .parent()
+      .parent()
+      .within(() => {
+        cy.findByText(collabUserId).should('be.visible')
+      })
+    cy.findByRole('button', { name: /Set yourself as administrative contact/ }).click()
+    cy.findByLabelText('Administrative contact')
+      .parent()
+      .parent()
+      .within(() => {
+        cy.findByText(user.ids.user_id).should('be.visible')
+      })
+  })
+
   it('succeeds deleting organization', () => {
     cy.findByRole('button', { name: /Delete organization/ }).click()
 
