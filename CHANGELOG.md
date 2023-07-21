@@ -29,14 +29,14 @@ For details about compatibility between different releases, see the **Commitment
 - RPCs and CLI command to delete a batch of end devices within an application.
   - Check `ttn-lw-cli end-devices batch-delete` for more details.
 - Add `UserInput` component to the Console to handle user id input fields by implementing an autosuggest.
-- The Identity Server configuration has a new optional restriction regarding adminstrative and technical contacts of entities. This limits the action of an user or organization to set these contacts only to themselves, it is disabled by default but it is possible to enable it by setting `is.collaborator-rights.set-others-as-contacts` as false.
+- The Identity Server configuration has a new optional restriction regarding administrative and technical contacts of entities. This limits the action of an user or organization to set these contacts only to themselves, it is disabled by default but it is possible to enable it by setting `is.collaborator-rights.set-others-as-contacts` as false.
 
 ### Changed
 
 - Instead of retrying application downlinks indefinitely, the Application Server now retries them for a configured number of times. Each `ApplicationDownlink` message contains the `attempt` and `max_attempts` fields to indicate the current and maximum number of attempts for a specific `application downlink`.
 - The Application Server configuration has the `as.downlinks.confirmation.default-retry-attempts` and `as.downlinks.confirmation.max-retry-attempts` fields that configure the allowed number of retries for application downlinks. The default values are `8` for the `as.downlinks.confirmation.default-retry-attempts` and `32` for the `as.downlinks.confirmation.max-retry-attempts`.
 - The `as.downlinks.confirmation.default-retry-attempts` field is used for all application downlinks that were scheduled before this change and for every application downlink that does not have the `max_attempts` field set. On the other hand, the `as.downlinks.confirmation.max-retry-attempts` field ensures that the `max_attempts` field's upper bound is contained and does not exceed its value.
-- The number of historical frames considered for the multi-frame query window size in the LoRa Geolocation Services integration. The window size is now limited between 1 and 16 frames with 16 being the default value.
+- The number of historical frames considered for the multi-frame query window size in the LoRaCloud Geolocation Services integration. The window size is now limited between 1 and 16 frames with 16 being the default value.
 - Packet Broker Agent now subscribes as Home Network to all DevAddr prefixes. This is to support NetID delegation where DevAddr blocks of other NetIDs should be routed to the cluster of a different NetID.
 
 ### Deprecated
