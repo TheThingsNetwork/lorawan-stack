@@ -50,7 +50,7 @@ var (
 	)
 	config = new(Config)
 
-	versionUpdate       chan pkgversion.Update
+	versionUpdate       chan *pkgversion.Update
 	versionCheckTimeout = time.Second
 
 	// Root command is the entrypoint of the program.
@@ -116,8 +116,9 @@ var (
 
 			ctx = log.NewContext(ctx, logger)
 
-			// check version in background
-			versionUpdate = make(chan pkgversion.Update)
+			// Start the version check in background.
+			// The result is waited in the post run.
+			versionUpdate = make(chan *pkgversion.Update)
 			if config.SkipVersionCheck {
 				close(versionUpdate)
 			} else {
@@ -127,7 +128,7 @@ var (
 					if err != nil {
 						log.FromContext(ctx).WithError(err).Warn("Failed to check version update")
 					} else if update != nil {
-						versionUpdate <- *update
+						versionUpdate <- update
 					} else {
 						log.FromContext(ctx).Debug("No new version available")
 					}
@@ -149,7 +150,7 @@ var (
 				logger.Warn("Version check timed out")
 			case versionUpdate, ok := <-versionUpdate:
 				if ok {
-					pkgversion.LogUpdate(ctx, &versionUpdate)
+					pkgversion.LogUpdate(ctx, versionUpdate)
 				}
 			}
 			return nil
