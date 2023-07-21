@@ -127,12 +127,18 @@ describe('Application general settings', () => {
 
     cy.findByText('Contact information').should('be.visible')
     cy.findByLabelText('Administrative contact').should('have.attr', 'disabled')
+    cy.findByLabelText('Administrative contact')
+      .parent()
+      .parent()
+      .within(() => {
+        cy.findByText(collabUserId).should('be.visible')
+      })
     cy.findByRole('button', { name: /Set yourself as administrative contact/ }).click()
     cy.findByLabelText('Administrative contact')
       .parent()
       .parent()
       .within(() => {
-        cy.findByText(userId).first().should('be.visible')
+        cy.findByText(userId).should('be.visible')
       })
   })
 

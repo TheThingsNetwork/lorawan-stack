@@ -91,29 +91,33 @@ const Suggest = ({
   const handleLoadingOptions = useCallback(
     async value => {
       if (Boolean(value)) {
-        await dispatch(attachPromise(searchAccounts(value, onlyUsers, collaboratorOf)))
-        const newOptions = searchResultsRef.current.map(account => ({
-          value:
-            'user_ids' in account
-              ? account.user_ids?.user_id
-              : account.organization_ids?.organization_id,
-          label:
-            'user_ids' in account
-              ? account.user_ids?.user_id
-              : account.organization_ids?.organization_id,
-          icon: 'user_ids' in account ? 'user' : 'organization',
-        }))
+        try {
+          await dispatch(attachPromise(searchAccounts(value, onlyUsers, collaboratorOf)))
+          const newOptions = searchResultsRef?.current?.map(account => ({
+            value:
+              'user_ids' in account
+                ? account.user_ids?.user_id
+                : account.organization_ids?.organization_id,
+            label:
+              'user_ids' in account
+                ? account.user_ids?.user_id
+                : account.organization_ids?.organization_id,
+            icon: 'user_ids' in account ? 'user' : 'organization',
+          }))
 
-        const translatedOptions = newOptions?.map(option => {
-          const { label, labelValues = {} } = option
-          if (typeof label === 'object' && label.id && label.defaultMessage) {
-            return { ...option, label: formatMessage(label, labelValues) }
-          }
+          const translatedOptions = newOptions?.map(option => {
+            const { label, labelValues = {} } = option
+            if (typeof label === 'object' && label.id && label.defaultMessage) {
+              return { ...option, label: formatMessage(label, labelValues) }
+            }
 
-          return option
-        })
+            return option
+          })
 
-        return translatedOptions
+          return translatedOptions
+        } catch (error) {
+          return []
+        }
       }
     },
     [dispatch, onlyUsers, searchResultsRef, collaboratorOf, formatMessage],
