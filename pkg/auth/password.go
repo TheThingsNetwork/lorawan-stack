@@ -92,7 +92,7 @@ func Validate(hashed, plain string) (bool, error) {
 	typ := parts[0]
 
 	for _, method := range hashValidators {
-		if strings.ToLower(typ) == strings.ToLower(method.Name()) {
+		if strings.EqualFold(typ, method.Name()) {
 			return method.Validate(hashed, plain)
 		}
 	}
