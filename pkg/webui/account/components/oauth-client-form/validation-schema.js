@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { organizationSchema, userSchema } from '@ttn-lw/containers/collaborator-select/util'
-
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import contactSchema from '@ttn-lw/lib/shared-schemas'
 
 import { approvalStates } from './utils'
 
@@ -54,22 +53,8 @@ const validationSchema = Yup.object().shape({
     return Yup.string()
   }),
   rights: Yup.array().min(1, sharedMessages.validateRights),
-  administrative_contact: Yup.object()
-    .when(['organization_ids'], {
-      is: organizationIds => Boolean(organizationIds),
-      then: schema => schema.concat(organizationSchema),
-      otherwise: schema => schema.concat(userSchema),
-    })
-    .nullable()
-    .required(sharedMessages.validateRequired),
-  technical_contact: Yup.object()
-    .when(['organization_ids'], {
-      is: organizationIds => Boolean(organizationIds),
-      then: schema => schema.concat(organizationSchema),
-      otherwise: schema => schema.concat(userSchema),
-    })
-    .nullable()
-    .required(sharedMessages.validateRequired),
 })
+
+validationSchema.concat(contactSchema)
 
 export default validationSchema

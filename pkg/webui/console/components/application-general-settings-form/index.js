@@ -25,17 +25,13 @@ import Checkbox from '@ttn-lw/components/checkbox'
 import Notification from '@ttn-lw/components/notification'
 
 import CollaboratorSelect from '@ttn-lw/containers/collaborator-select'
-import {
-  decodeContact,
-  encodeContact,
-  organizationSchema,
-  userSchema,
-} from '@ttn-lw/containers/collaborator-select/util'
+import { decodeContact, encodeContact } from '@ttn-lw/containers/collaborator-select/util'
 
 import Message from '@ttn-lw/lib/components/message'
 
 import Require from '@console/lib/components/require'
 
+import contactSchema from '@ttn-lw/lib/shared-schemas'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -83,21 +79,9 @@ const validationSchema = Yup.object().shape({
     ),
   skip_payload_crypto: Yup.boolean(),
   alcsync: Yup.boolean(),
-  administrative_contact: Yup.object()
-    .when(['organization_ids'], {
-      is: organizationIds => Boolean(organizationIds),
-      then: schema => schema.concat(organizationSchema),
-      otherwise: schema => schema.concat(userSchema),
-    })
-    .required(sharedMessages.validateRequired),
-  technical_contact: Yup.object()
-    .when(['organization_ids'], {
-      is: organizationIds => Boolean(organizationIds),
-      then: schema => schema.concat(organizationSchema),
-      otherwise: schema => schema.concat(userSchema),
-    })
-    .required(sharedMessages.validateRequired),
 })
+
+validationSchema.concat(contactSchema)
 
 const encodeAttributes = formValue =>
   (Array.isArray(formValue) &&

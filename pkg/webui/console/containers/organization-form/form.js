@@ -22,12 +22,7 @@ import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
 
 import CollaboratorSelect from '@ttn-lw/containers/collaborator-select'
-import {
-  decodeContact,
-  encodeContact,
-  organizationSchema,
-  userSchema,
-} from '@ttn-lw/containers/collaborator-select/util'
+import { decodeContact, encodeContact } from '@ttn-lw/containers/collaborator-select/util'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -35,6 +30,7 @@ import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { id as organizationIdRegexp } from '@ttn-lw/lib/regexp'
+import contactSchema from '@ttn-lw/lib/shared-schemas'
 
 import { selectUserId } from '@console/store/selectors/logout'
 import { selectIsConfiguration } from '@console/store/selectors/identity-server'
@@ -51,21 +47,9 @@ const validationSchema = Yup.object().shape({
     .min(2, Yup.passValues(sharedMessages.validateTooShort))
     .max(50, Yup.passValues(sharedMessages.validateTooLong)),
   description: Yup.string().max(2000, Yup.passValues(sharedMessages.validateTooLong)),
-  administrative_contact: Yup.object()
-    .when(['organization_ids'], {
-      is: organizationIds => Boolean(organizationIds),
-      then: schema => schema.concat(organizationSchema),
-      otherwise: schema => schema.concat(userSchema),
-    })
-    .required(sharedMessages.validateRequired),
-  technical_contact: Yup.object()
-    .when(['organization_ids'], {
-      is: organizationIds => Boolean(organizationIds),
-      then: schema => schema.concat(organizationSchema),
-      otherwise: schema => schema.concat(userSchema),
-    })
-    .required(sharedMessages.validateRequired),
 })
+
+validationSchema.concat(contactSchema)
 
 const m = defineMessages({
   orgDescPlaceholder: 'Description for my new organization',

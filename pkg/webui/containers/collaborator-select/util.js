@@ -12,10 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Yup from '@ttn-lw/lib/yup'
-import sharedMessages from '@ttn-lw/lib/shared-messages'
-import { userId as contactIdRegex } from '@ttn-lw/lib/regexp'
-
 export const composeOption = value => {
   const data = value.ids || value
   return {
@@ -35,11 +31,3 @@ export const encodeContact = value =>
     : null
 
 export const decodeContact = value => (value ? composeOption(value) : null)
-
-export const organizationSchema = Yup.object().shape({
-  organization_id: Yup.string().matches(contactIdRegex, sharedMessages.validateAlphanum),
-})
-
-export const userSchema = Yup.object().shape({
-  user_id: Yup.string().matches(contactIdRegex, sharedMessages.validateAlphanum),
-})
