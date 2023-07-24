@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Add support for `administrative_contact` and `technical_contact` in the Console
+
 ### Changed
 
 ### Deprecated
@@ -30,7 +32,8 @@ For details about compatibility between different releases, see the **Commitment
   - Check `ttn-lw-cli end-devices batch-delete` for more details.
 - Add `UserInput` component to the Console to handle user id input fields by implementing an autosuggest.
 - The Identity Server configuration has a new optional restriction regarding administrative and technical contacts of entities. This limits the action of an user or organization to set these contacts only to themselves, it is disabled by default but it is possible to enable it by setting `is.collaborator-rights.set-others-as-contacts` as false.
-- Add support for `administrative_contact` and `technical_contact` in the Console
+- The Identity Server configuration has a new optional restriction regarding adminstrative and technical contacts of entities. This limits the action of an user or organization to set these contacts only to themselves, it is disabled by default but it is possible to enable it by setting `is.collaborator-rights.set-others-as-contacts` as false.
+- The page, tab, search query and sort order is now kept as query parameter and will hence persist throughout navigation. Likewise it is now possible to link to specific table results.
 
 ### Changed
 
