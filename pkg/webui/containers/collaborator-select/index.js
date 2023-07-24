@@ -63,6 +63,7 @@ SingleValue.propTypes = {
 const m = defineMessages({
   noOptionsMessage: 'No matching user or organization was found',
   suggestions: 'Suggestions',
+  setYourself: 'Set yourself as {name}',
 })
 
 const Suggest = ({
@@ -151,7 +152,7 @@ const Suggest = ({
         <Button
           icon="user"
           onClick={handleSetYourself}
-          message={`Set yourself as ${name.replace('_', ' ')}`}
+          message={{ ...m.setYourself, values: { name: name.replace('_', ' ') } }}
         />
       )}
     </>

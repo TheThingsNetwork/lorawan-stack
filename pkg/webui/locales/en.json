@@ -954,6 +954,7 @@
   "containers.collaborator-form.index.collaboratorIdPlaceholder": "Type to choose a collaborator",
   "containers.collaborator-select.index.noOptionsMessage": "No matching user or organization was found",
   "containers.collaborator-select.index.suggestions": "Suggestions",
+  "containers.collaborator-select.index.setYourself": "Set yourself as {name}",
   "containers.fetch-table.index.errorMessage": "There was an error and the list of {entity, select, applications {applications} organizations {organizations} keys {API keys} collaborators {collaborators} devices {end devices} gateways {gateways} users {users} webhooks {webhooks} other {entities}} could not be displayed",
   "lib.components.date-time.relative.justNow": "just now",
   "lib.components.init.initializing": "Initializing…",

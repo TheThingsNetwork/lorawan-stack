@@ -175,8 +175,8 @@ const GatewaySettings = () => {
         if (mayViewCollaborators) {
           await dispatch(attachPromise(getCollaboratorsList('gateway', gtwId)))
         }
-        getIsConfiguration()
       }
+      dispatch(attachPromise(getIsConfiguration()))
     },
     [mayDeleteGtw, mayViewApiKeys, mayViewCollaborators, gtwId],
   )
