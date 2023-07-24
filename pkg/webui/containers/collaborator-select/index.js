@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages, useIntl } from 'react-intl'
 import { components } from 'react-select'
@@ -37,12 +37,18 @@ import { composeOption } from './util'
 
 import styles from './collaborator-select.styl'
 
-const customMenu = props => (
-  <components.Menu {...props}>
-    <Message content={m.suggestions} className="ml-cs-s mt-cs-xxs mb-cs-xxs" component="h4" />
-    {props.children}
-  </components.Menu>
-)
+const customMenu = props => {
+  const { showSuggestions } = props.selectProps
+
+  return (
+    <components.Menu {...props}>
+      {showSuggestions && (
+        <Message content={m.suggestions} className="ml-cs-s mt-cs-xxs mb-cs-xxs" component="h4" />
+      )}
+      {props.children}
+    </components.Menu>
+  )
+}
 
 const SingleValue = props => (
   <components.SingleValue {...props}>
@@ -79,7 +85,9 @@ const Suggest = ({
   const dispatch = useDispatch()
   const { formatMessage } = useIntl()
   const { setFieldValue, values } = useFormContext()
+  const collaboratorsList = useSelector(selectCollaborators)
   const searchResults = useSelector(selectSearchResultAccountIds)
+  const [showSuggestions, setShowSuggestions] = useState(collaboratorsList !== 0)
   const searchResultsRef = useRef()
   searchResultsRef.current = searchResults
   const handleNoOptions = useCallback(() => formatMessage(m.noOptionsMessage), [formatMessage])
@@ -94,6 +102,7 @@ const Suggest = ({
       if (Boolean(value)) {
         try {
           await dispatch(attachPromise(searchAccounts(value, onlyUsers, collaboratorOf)))
+          setShowSuggestions(searchResultsRef?.current?.length !== 0)
           const newOptions = searchResultsRef?.current?.map(account => ({
             value:
               'user_ids' in account
@@ -117,6 +126,7 @@ const Suggest = ({
 
           return translatedOptions
         } catch (error) {
+          setShowSuggestions(false)
           return []
         }
       }
@@ -147,6 +157,7 @@ const Suggest = ({
         customComponents={{ SingleValue, Menu: customMenu }}
         maxMenuHeight={300}
         value={values[name] ? composeOption(values[name]) : null}
+        showSuggestions={showSuggestions}
       />
       {isResctrictedUser && (
         <Button
