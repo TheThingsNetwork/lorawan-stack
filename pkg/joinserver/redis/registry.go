@@ -879,8 +879,13 @@ func (r *DeviceRegistry) BatchDelete(
 				}
 			}
 		}
-		if err := tx.Watch(ctx, keys...).Err(); err != nil {
-			return err
+		// If the provided end device identifiers are not registered, it is possible
+		// that the `keys` set will be empty. `WATCH` does not allow an empty set of
+		// keys to be provided, and as such must be manually skipped.
+		if len(keys) > 0 {
+			if err := tx.Watch(ctx, keys...).Err(); err != nil {
+				return err
+			}
 		}
 		if _, err := tx.TxPipelined(ctx, func(p redis.Pipeliner) error {
 			p.Del(ctx, append(uidKeys, keys...)...)
