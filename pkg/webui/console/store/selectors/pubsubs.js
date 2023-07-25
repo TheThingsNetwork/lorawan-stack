@@ -21,6 +21,7 @@ const selectPubsubStore = state => state.pubsubs
 
 // Pubsub.
 export const selectPubsubEntityStore = state => selectPubsubStore(state).entities
+export const selectPubsubById = (state, id) => selectPubsubEntityStore(state)[id]
 export const selectSelectedPubsubId = state => selectPubsubStore(state).selectedPubsub
 export const selectSelectedPubsub = state =>
   selectPubsubEntityStore(state)[selectSelectedPubsubId(state)]

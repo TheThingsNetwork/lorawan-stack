@@ -2303,9 +2303,9 @@
       "file": "data.go"
     }
   },
-  "error:pkg/applicationserver/io/packages/loragls/v3:field_not_found": {
+  "error:pkg/applicationserver/io/packages/loragls/v3:field_required": {
     "translations": {
-      "en": "field `{field}` not found"
+      "en": "field `{field}` is required"
     },
     "description": {
       "package": "pkg/applicationserver/io/packages/loragls/v3",

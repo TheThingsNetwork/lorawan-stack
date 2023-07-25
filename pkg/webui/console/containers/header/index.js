@@ -189,17 +189,11 @@ Header.propTypes = {
   handleSearchRequest: PropTypes.func,
   /** A flag identifying whether the header should display the search input. */
   searchable: PropTypes.bool,
-  /**
-   * The User object, retrieved from the API. If it is `undefined`, then the
-   * guest header is rendered.
-   */
-  user: PropTypes.user,
 }
 
 Header.defaultProps = {
   handleSearchRequest: () => null,
   searchable: false,
-  user: undefined,
 }
 
 export default Header

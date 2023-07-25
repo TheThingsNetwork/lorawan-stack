@@ -77,7 +77,7 @@ const NetworkRoutingPolicyViewInner = () => {
     <>
       <Breadcrumb path={'/admin-panel/packet-broker/networks'} content={m.networks} />
       <Breadcrumb
-        path={`/admin/packet-broker/networks/${netId}${tenantId ? `/${tenantId}` : ''}`}
+        path={`/admin-panel/packet-broker/networks/${netId}${tenantId ? `/${tenantId}` : ''}`}
         content={network.name || displayId}
       />
     </>,

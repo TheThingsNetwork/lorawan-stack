@@ -39,7 +39,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
-	telemetry_cli "go.thethings.network/lorawan-stack/v3/pkg/telemetry/exporter/cli"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/exporter/cli"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/io"
 	pkgversion "go.thethings.network/lorawan-stack/v3/pkg/version"
 	"golang.org/x/oauth2"
@@ -56,8 +56,11 @@ var (
 
 	inputDecoder io.Decoder
 
-	versionUpdate       chan pkgversion.Update
+	versionUpdate       chan *pkgversion.Update
 	versionCheckTimeout = time.Second
+
+	telemetrySubmission chan struct{}
+	telemetryTimeout    = time.Second
 
 	// Root command is the entrypoint of the program
 	Root = &cobra.Command{
@@ -80,20 +83,21 @@ var (
 			// clean up the API
 			api.CloseAll()
 
-			if config.Telemetry.Enable {
-				telemetry_cli.NewCLITelemetry(
-					telemetry_cli.WithCLITarget(config.Telemetry.Target),
-				).Run(ctx)
-			}
-
 			select {
 			case <-ctx.Done():
 			case <-time.After(versionCheckTimeout):
 				logger.Warn("Version check timed out")
 			case versionUpdate, ok := <-versionUpdate:
 				if ok {
-					pkgversion.LogUpdate(ctx, &versionUpdate)
+					pkgversion.LogUpdate(ctx, versionUpdate)
 				}
+			}
+
+			select {
+			case <-ctx.Done():
+			case <-time.After(telemetryTimeout):
+				logger.Warn("Telemetry submission timed out")
+			case <-telemetrySubmission:
 			}
 
 			err := util.SaveAuthCache(cache)
@@ -147,8 +151,9 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 
 		ctx = log.NewContext(ctx, logger)
 
-		// check version in background
-		versionUpdate = make(chan pkgversion.Update)
+		// Start the version check in background.
+		// The result is waited in the post run.
+		versionUpdate = make(chan *pkgversion.Update)
 		if config.SkipVersionCheck {
 			close(versionUpdate)
 		} else {
@@ -158,11 +163,25 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 				if err != nil {
 					log.FromContext(ctx).WithError(err).Warn("Failed to check version update")
 				} else if update != nil {
-					versionUpdate <- *update
+					versionUpdate <- update
 				} else {
 					log.FromContext(ctx).Debug("No new version available")
 				}
 			}(ctx)
+		}
+
+		// Start the telemetry submission in the background.
+		// The result is waited in the post run.
+		telemetrySubmission = make(chan struct{})
+		if config.Telemetry.Enable {
+			go func(ctx context.Context) {
+				defer close(telemetrySubmission)
+				cli.NewCLITelemetry(
+					cli.WithCLITarget(config.Telemetry.Target),
+				).Run(ctx)
+			}(ctx)
+		} else {
+			close(telemetrySubmission)
 		}
 
 		// Drop default HTTP port numbers from OAuth server address if present.

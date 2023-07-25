@@ -15,6 +15,7 @@
 import React from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 import { useParams } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 import { GATEWAY } from '@console/constants/entities'
 
@@ -28,6 +29,7 @@ import ConsoleCollaboratorsForm from '@console/containers/collaborators-form'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { getCollaborator, getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
+import { selectCollaboratorById } from '@ttn-lw/lib/store/selectors/collaborators'
 
 const GatewayCollaboratorEditInner = () => {
   const { gtwId, collaboratorId, collaboratorType } = useParams()
@@ -63,6 +65,10 @@ const GatewayCollaboratorEdit = () => {
 
   const isUser = collaboratorType === 'user'
 
+  // Check if collaborator still exists after being possibly deleted.
+  const collaborator = useSelector(state => selectCollaboratorById(state, collaboratorId))
+  const hasCollaborator = Boolean(collaborator)
+
   return (
     <RequireRequest
       requestAction={[
@@ -70,7 +76,7 @@ const GatewayCollaboratorEdit = () => {
         getCollaboratorsList('gateway', gtwId),
       ]}
     >
-      <GatewayCollaboratorEditInner collaboratorType={collaboratorType} />
+      {hasCollaborator && <GatewayCollaboratorEditInner collaboratorType={collaboratorType} />}
     </RequireRequest>
   )
 }

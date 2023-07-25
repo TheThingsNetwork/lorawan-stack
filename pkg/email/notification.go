@@ -131,7 +131,7 @@ func (d *notificationTemplateData) ConsoleURL() string {
 		url = fmt.Sprintf("%s/organizations/%s", url, ids.OrganizationIds.GetOrganizationId())
 	case *ttnpb.EntityIdentifiers_UserIds:
 		if d.Receiver().GetAdmin() {
-			url = fmt.Sprintf("%s/admin/user-management/%s", url, ids.UserIds.GetUserId())
+			url = fmt.Sprintf("%s/admin-panel/user-management/%s", url, ids.UserIds.GetUserId())
 		}
 	}
 	return url

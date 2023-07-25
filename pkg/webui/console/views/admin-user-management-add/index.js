@@ -28,7 +28,7 @@ import { getIsConfiguration } from '@console/store/actions/identity-server'
 const UserManagementAdd = () => {
   useBreadcrumbs(
     'admin-panel.user-management.add',
-    <Breadcrumb path={`/admin/user-management/add`} content={sharedMessages.add} />,
+    <Breadcrumb path={`/admin-panel/user-management/add`} content={sharedMessages.add} />,
   )
 
   return (

@@ -30,7 +30,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	urlutil "go.thethings.network/lorawan-stack/v3/pkg/util/url"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -80,7 +79,7 @@ func (p *GeolocationPackage) HandleUp(
 		}
 	}()
 
-	data, err := p.mergePackageData(def, assoc)
+	data, err := p.mergeAndValidatePackageData(def, assoc)
 	if err != nil {
 		return err
 	}
@@ -183,14 +182,14 @@ func (p *GeolocationPackage) pushUplink(
 	up *ttnpb.ApplicationUplink,
 	data *Data,
 ) error {
-	windowSize := constrainedWindowSize(data.MultiFrameWindowSize)
+	windowSize := constrainedWindowSize(data.GetMultiFrameWindowSize())
 
 	setter := func(assoc *ttnpb.ApplicationPackageAssociation) (*ttnpb.ApplicationPackageAssociation, []string, error) {
 		assocData := &Data{}
 		fieldMask := []string{"data"}
 
 		if assoc == nil {
-			if !data.MultiFrame {
+			if !data.GetMultiFrame() {
 				return nil, nil, nil
 			}
 
@@ -205,7 +204,7 @@ func (p *GeolocationPackage) pushUplink(
 			}
 		}
 
-		if data.MultiFrame {
+		if data.GetMultiFrame() {
 			if len(assocData.RecentMetadata) >= windowSize {
 				assocData.RecentMetadata = assocData.RecentMetadata[1:]
 			}
@@ -221,7 +220,7 @@ func (p *GeolocationPackage) pushUplink(
 		data.RecentMetadata = assocData.RecentMetadata
 
 		st, err := assocData.Struct()
-		if err != nil {
+		if st == nil || err != nil {
 			return nil, nil, err
 		}
 		assoc.Data = st
@@ -240,13 +239,13 @@ func (*GeolocationPackage) multiFrameQuery(
 	data *Data,
 	client *api.Client,
 ) (api.AbstractLocationSolverResponse, error) {
-	windowSize := constrainedWindowSize(data.MultiFrameWindowSize)
+	windowSize := constrainedWindowSize(data.GetMultiFrameWindowSize())
 
 	now := time.Now()
 	mds := make([][]*api.RxMetadata, 0, windowSize)
 
 	for _, md := range data.RecentMetadata {
-		if now.Sub(md.ReceivedAt) > data.MultiFrameWindowAge {
+		if now.Sub(md.ReceivedAt) > data.GetMultiFrameWindowAge() {
 			continue
 		}
 
@@ -311,9 +310,9 @@ func (p *GeolocationPackage) wifiQuery(ctx context.Context, ids *ttnpb.EndDevice
 
 func (p *GeolocationPackage) sendQuery(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data) error {
 	var runQuery func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.ApplicationUplink, *Data, *api.Client) (api.AbstractLocationSolverResponse, error)
-	switch data.Query {
+	switch *data.Query {
 	case QUERY_TOARSSI:
-		if data.MultiFrame {
+		if data.GetMultiFrame() {
 			runQuery = p.multiFrameQuery
 		} else {
 			runQuery = p.singleFrameQuery
@@ -330,7 +329,7 @@ func (p *GeolocationPackage) sendQuery(ctx context.Context, ids *ttnpb.EndDevice
 	if err != nil {
 		return err
 	}
-	client, err := api.New(httpClient, api.WithToken(data.Token), api.WithBaseURL(data.ServerURL))
+	client, err := api.New(httpClient, api.WithToken(*data.Token), api.WithBaseURL(data.ServerURL))
 	if err != nil {
 		return err
 	}
@@ -401,7 +400,7 @@ func (p *GeolocationPackage) sendLocationSolved(ctx context.Context, ids *ttnpb.
 	})
 }
 
-func (*GeolocationPackage) mergePackageData(
+func (*GeolocationPackage) mergeAndValidatePackageData(
 	def *ttnpb.ApplicationPackageDefaultAssociation,
 	assoc *ttnpb.ApplicationPackageAssociation,
 ) (*Data, error) {
@@ -417,32 +416,11 @@ func (*GeolocationPackage) mergePackageData(
 		}
 	}
 
-	merged := Data{
-		Query:                defaultData.Query,
-		MultiFrame:           defaultData.MultiFrame,
-		MultiFrameWindowSize: defaultData.MultiFrameWindowSize,
-		MultiFrameWindowAge:  defaultData.MultiFrameWindowAge,
-		ServerURL:            defaultData.ServerURL,
-		Token:                defaultData.Token,
-		RecentMetadata:       defaultData.RecentMetadata,
+	merged := mergeData(defaultData, associationData)
+	if err := validateData(merged); err != nil {
+		return nil, err
 	}
-
-	if associationData.Query != 0 {
-		merged.Query = associationData.Query
-	}
-	if associationData.ServerURL != nil {
-		merged.ServerURL = urlutil.CloneURL(associationData.ServerURL)
-	}
-	if associationData.Token != "" {
-		merged.Token = associationData.Token
-	}
-	if len(associationData.RecentMetadata) > 0 {
-		merged.RecentMetadata = associationData.RecentMetadata
-	}
-	if merged.ServerURL == nil {
-		merged.ServerURL = urlutil.CloneURL(api.DefaultServerURL)
-	}
-	return &merged, nil
+	return merged, nil
 }
 
 func toStruct(i any) (*structpb.Struct, error) {
