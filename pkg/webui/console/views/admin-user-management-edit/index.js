@@ -12,103 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate, useParams } from 'react-router-dom'
-import { Container, Col, Row } from 'react-grid-system'
-import { defineMessages } from 'react-intl'
+import React from 'react'
+import { useParams } from 'react-router-dom'
 
-import toast from '@ttn-lw/components/toast'
-import PageTitle from '@ttn-lw/components/page-title'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
-import UserDataForm from '@console/components/user-data-form'
+import UserDataFormEdit from '@console/containers/user-data-form/edit'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import diff from '@ttn-lw/lib/diff'
-import { getUserId } from '@ttn-lw/lib/selectors/id'
-import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
-import { getUser, updateUser, deleteUser } from '@console/store/actions/users'
+import { getUser } from '@console/store/actions/users'
 
-import { selectSelectedUser } from '@console/store/selectors/users'
-
-const m = defineMessages({
-  updateSuccess: 'User updated',
-  deleteSuccess: 'User deleted',
-})
-
-const UserManagementEditInner = () => {
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
+const UserManagementEdit = () => {
   const { userId } = useParams()
-  const user = useSelector(selectSelectedUser)
-
-  const wrappedUpdateUser = attachPromise(updateUser)
-  const wrappedDeleteUser = attachPromise(deleteUser)
 
   useBreadcrumbs(
     'admin-panel.user-management.edit',
     <Breadcrumb path={`./${userId}`} content={sharedMessages.edit} />,
   )
-
-  const onSubmit = useCallback(
-    values => {
-      const patch = diff(user, values)
-      const submitPatch = Object.keys(patch).length !== 0 ? patch : user
-      return dispatch(wrappedUpdateUser(userId, submitPatch))
-    },
-    [user, userId, wrappedUpdateUser, dispatch],
-  )
-
-  const onSubmitSuccess = useCallback(response => {
-    const userId = getUserId(response)
-    toast({
-      title: userId,
-      message: m.updateSuccess,
-      type: toast.types.SUCCESS,
-    })
-  }, [])
-
-  const onDelete = useCallback(
-    shouldPurge => dispatch(wrappedDeleteUser(userId, { purge: shouldPurge })),
-    [userId, wrappedDeleteUser, dispatch],
-  )
-
-  const onDeleteSuccess = useCallback(() => {
-    toast({
-      title: userId,
-      message: m.deleteSuccess,
-      type: toast.types.SUCCESS,
-    })
-
-    navigate('../../')
-  }, [userId, navigate])
-
-  return (
-    <Container>
-      <PageTitle title={sharedMessages.userEdit} />
-      <Row>
-        <Col>
-          <UserDataForm
-            update
-            initialValues={user}
-            onSubmit={onSubmit}
-            onSubmitSuccess={onSubmitSuccess}
-            onDelete={onDelete}
-            onDeleteSuccess={onDeleteSuccess}
-          />
-        </Col>
-      </Row>
-    </Container>
-  )
-}
-
-const UserManagementEdit = () => {
-  const { userId } = useParams()
 
   return (
     <RequireRequest
@@ -120,7 +44,7 @@ const UserManagementEdit = () => {
         'description',
       ])}
     >
-      <UserManagementEditInner />
+      <UserDataFormEdit />
     </RequireRequest>
   )
 }
