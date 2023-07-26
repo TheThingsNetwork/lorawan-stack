@@ -59,7 +59,7 @@ var (
 		events.WithPropagateToParent(),
 	)
 	evtBatchDeleteEndDevices = events.Define(
-		"is.end_device.batch.delete", "batch delete end devices",
+		"end_device.batch.delete", "batch delete end devices",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ),
 		events.WithDataType(&ttnpb.EndDeviceIdentifiersList{}),
 		events.WithAuthFromContext(),

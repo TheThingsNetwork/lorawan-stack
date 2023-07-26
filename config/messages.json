@@ -9620,6 +9620,15 @@
       "file": "client_registry.go"
     }
   },
+  "event:end_device.batch.delete": {
+    "translations": {
+      "en": "batch delete end devices"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "end_device_registry.go"
+    }
+  },
   "event:end_device.create": {
     "translations": {
       "en": "create end device"
@@ -9924,15 +9933,6 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "invitation_registry.go"
-    }
-  },
-  "event:is.end_device.batch.delete": {
-    "translations": {
-      "en": "batch delete end devices"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "end_device_registry.go"
     }
   },
   "event:js.end_device.batch.delete": {
