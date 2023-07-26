@@ -189,9 +189,11 @@ func (r *RxMetadata) FromProto(pb *ttnpb.RxMetadata) error {
 		return err
 	}
 
-	r.Location = &RxMDLocation{}
-	if err := r.Location.FromProto(pb.Location); err != nil {
-		return err
+	if pb.Location != nil {
+		r.Location = &RxMDLocation{}
+		if err := r.Location.FromProto(pb.Location); err != nil {
+			return err
+		}
 	}
 
 	r.AntennaIndex = pb.AntennaIndex
