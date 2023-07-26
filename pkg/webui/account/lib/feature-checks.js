@@ -28,4 +28,9 @@ export const mayPerformAllClientActions = {
   check: rights => rights.includes('RIGHT_CLIENT_ALL'),
 }
 
+export const mayEditBasicClientInformation = {
+  rightsSelector: selectUserRights,
+  check: rights => rights.includes('RIGHT_CLIENT_SETTINGS_BASIC'),
+}
+
 export const mayPurgeEntities = mayPerformAdminActions

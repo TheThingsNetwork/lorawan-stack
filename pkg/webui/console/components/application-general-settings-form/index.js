@@ -22,9 +22,16 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
 import Checkbox from '@ttn-lw/components/checkbox'
+import Notification from '@ttn-lw/components/notification'
+
+import CollaboratorSelect from '@ttn-lw/containers/collaborator-select'
+import { decodeContact, encodeContact } from '@ttn-lw/containers/collaborator-select/util'
+
+import Message from '@ttn-lw/lib/components/message'
 
 import Require from '@console/lib/components/require'
 
+import contactSchema from '@ttn-lw/lib/shared-schemas'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -41,6 +48,10 @@ const m = defineMessages({
   basics: 'Basics',
   deleteApp: 'Delete application',
   useAlcsync: 'Use Application Layer Clock Synchronization',
+  adminContactDescription:
+    'Administrative contact information for this application. Typically used to indicate who to contact with administrative questions about the application.',
+  techContactDescription:
+    'Technical contact information for this application. Typically used to indicate who to contact with technical/security questions about the application.',
 })
 
 const validationSchema = Yup.object().shape({
@@ -69,6 +80,8 @@ const validationSchema = Yup.object().shape({
   skip_payload_crypto: Yup.boolean(),
   alcsync: Yup.boolean(),
 })
+
+validationSchema.concat(contactSchema)
 
 const encodeAttributes = formValue =>
   (Array.isArray(formValue) &&
@@ -104,6 +117,8 @@ const ApplicationGeneralSettingsForm = ({
   handleDelete,
   shouldConfirmDelete,
   mayPurge,
+  isResctrictedUser,
+  userId,
 }) => (
   <Form
     error={error}
@@ -151,6 +166,38 @@ const ApplicationGeneralSettingsForm = ({
       encode={encodeAttributes}
       decode={decodeAttributes}
     />
+    <Form.SubTitle title={sharedMessages.contactInformation} className="mb-cs-s" />
+    {isResctrictedUser && <Notification info small content={sharedMessages.restrictedUser} />}
+    <CollaboratorSelect
+      name="administrative_contact"
+      title={sharedMessages.adminContact}
+      placeholder={sharedMessages.contactFieldPlaceholder}
+      entity="application"
+      entityId={appId}
+      encode={encodeContact}
+      decode={decodeContact}
+      required
+      isResctrictedUser={isResctrictedUser}
+      userId={userId}
+    />
+    <Message
+      content={m.adminContactDescription}
+      component="p"
+      className="mt-cs-xs tc-subtle-gray"
+    />
+    <CollaboratorSelect
+      name="technical_contact"
+      title={sharedMessages.technicalContact}
+      placeholder={sharedMessages.contactFieldPlaceholder}
+      entity="application"
+      entityId={appId}
+      encode={encodeContact}
+      decode={decodeContact}
+      required
+      isResctrictedUser={isResctrictedUser}
+      userId={userId}
+    />
+    <Message content={m.techContactDescription} component="p" className="mt-cs-xs tc-subtle-gray" />
     <SubmitBar>
       <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
       <Require featureCheck={mayDeleteApplication}>
@@ -180,15 +227,18 @@ ApplicationGeneralSettingsForm.propTypes = {
     skip_payload_crypto: PropTypes.bool,
     alcsync: PropTypes.bool,
   }).isRequired,
+  isResctrictedUser: PropTypes.bool,
   mayDeleteApplication: PropTypes.shape({}).isRequired,
   mayPurge: PropTypes.bool.isRequired,
   mayViewApplicationLink: PropTypes.bool.isRequired,
   shouldConfirmDelete: PropTypes.bool.isRequired,
+  userId: PropTypes.string.isRequired,
 }
 
 ApplicationGeneralSettingsForm.defaultProps = {
   applicationName: '',
   error: undefined,
+  isResctrictedUser: false,
 }
 
 export default ApplicationGeneralSettingsForm

@@ -14,6 +14,7 @@
 
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import contactSchema from '@ttn-lw/lib/shared-schemas'
 
 import { approvalStates } from './utils'
 
@@ -53,5 +54,7 @@ const validationSchema = Yup.object().shape({
   }),
   rights: Yup.array().min(1, sharedMessages.validateRights),
 })
+
+validationSchema.concat(contactSchema)
 
 export default validationSchema

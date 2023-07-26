@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useState } from 'react'
+import React, { useCallback } from 'react'
 import { components } from 'react-select'
 import AsyncSelect from 'react-select/async'
 import { useIntl } from 'react-intl'
@@ -22,6 +22,7 @@ import { debounce } from 'lodash'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import Icon from '../icon'
+import { useFormContext } from '../form'
 
 import style from './select.styl'
 
@@ -77,17 +78,13 @@ const SuggestedSelect = props => {
   } = props
 
   const { formatMessage } = useIntl()
-  const [inputValue, setInputValue] = useState(value)
+  const { values } = useFormContext()
 
   const handleChange = useCallback(
     selectedValue => {
-      if (!Boolean(value)) {
-        setInputValue(selectedValue)
-      }
-
       onChange(selectedValue)
     },
-    [setInputValue, value, onChange],
+    [onChange],
   )
 
   const handleBlur = useCallback(
@@ -96,14 +93,14 @@ const SuggestedSelect = props => {
       // Make sure the input name is always present in the event object.
       event.target.name = name
 
-      if (typeof inputValue !== 'undefined') {
+      if (typeof values[name] !== 'undefined') {
         // https://github.com/JedWatson/react-select/issues/3175
-        event.target.value = inputValue
+        event.target.value = values[name]
       }
 
       onBlur(event)
     },
-    [onBlur, name, inputValue],
+    [onBlur, name, values],
   )
 
   const debouncedFetch = debounce((query, callback) => {
@@ -127,7 +124,7 @@ const SuggestedSelect = props => {
       onBlur={handleBlur}
       isDisabled={disabled}
       isClearable
-      value={inputValue}
+      value={value}
       name={name}
       showOptionIcon={showOptionIcon}
       components={{ Input, Option: customOption, ...customComponents }}

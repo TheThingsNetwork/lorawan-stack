@@ -1,0 +1,43 @@
+{
+  "configuration": {
+    "user_registration": {
+      "invitation": {
+        "required": false,
+        "token_ttl": "604800s"
+      },
+      "contact_info_validation": {
+        "required": false
+      },
+      "admin_approval": {
+        "required": false
+      },
+      "password_requirements": {
+        "min_length": 8,
+        "max_length": 1000,
+        "min_uppercase": 1,
+        "min_digits": 1,
+        "min_special": 0
+      },
+      "enabled": true
+    },
+    "profile_picture": {
+      "disable_upload": false,
+      "use_gravatar": true
+    },
+    "end_device_picture": {
+      "disable_upload": false
+    },
+    "user_rights": {
+      "create_applications": true,
+      "create_clients": true,
+      "create_gateways": true,
+      "create_organizations": true
+    },
+    "admin_rights": {
+      "all": false
+    },
+    "collaborator_rights": {
+      "set_others_as_contacts": false
+    }
+  }
+}

@@ -21,6 +21,7 @@ import { createNamedPaginationReducer } from '@ttn-lw/lib/store/reducers/paginat
 import fetching from '@ttn-lw/lib/store/reducers/ui/fetching'
 import error from '@ttn-lw/lib/store/reducers/ui/error'
 import collaborators from '@ttn-lw/lib/store/reducers/collaborators'
+import searchAccounts from '@ttn-lw/lib/store/reducers/search-accounts'
 
 import user from './user'
 import is from './identity-server'
@@ -45,4 +46,5 @@ export default combineReducers({
   }),
   status,
   collaborators,
+  searchAccounts,
 })

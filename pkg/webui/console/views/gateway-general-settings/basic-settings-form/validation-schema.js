@@ -15,6 +15,7 @@
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { id as gatewayIdRegexp } from '@ttn-lw/lib/regexp'
+import contactSchema from '@ttn-lw/lib/shared-schemas'
 
 import {
   attributeValidCheck,
@@ -85,5 +86,7 @@ const validationSchema = Yup.object().shape({
       attributeValueTooLongCheck,
     ),
 })
+
+validationSchema.concat(contactSchema)
 
 export default validationSchema

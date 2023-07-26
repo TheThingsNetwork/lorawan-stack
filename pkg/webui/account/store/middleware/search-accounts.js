@@ -12,16 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const composeOption = value => ({
-  value:
-    'user_ids' in value?.ids
-      ? value.ids?.user_ids.user_id
-      : value.ids?.organization_ids.organization_id,
-  label:
-    'user_ids' in value?.ids
-      ? value.ids?.user_ids.user_id
-      : value.ids?.organization_ids.organization_id,
-  icon: 'user_ids' in value?.ids ? 'user' : 'organization',
-})
+import tts from '@account/api/tts'
 
-export default composeOption
+import createSearchAccountsLogics from '@ttn-lw/lib/store/middleware/search-accounts'
+
+export default createSearchAccountsLogics(tts)

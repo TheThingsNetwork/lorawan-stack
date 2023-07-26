@@ -14,6 +14,8 @@
 
 import React, { useCallback } from 'react'
 import { useIntl } from 'react-intl'
+import { useSelector } from 'react-redux'
+import { isEmpty } from 'lodash'
 
 import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
 import Checkbox from '@ttn-lw/components/checkbox'
@@ -26,9 +28,18 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import RightsGroup from '@ttn-lw/components/rights-group'
 
+import CollaboratorSelect from '@ttn-lw/containers/collaborator-select'
+import { decodeContact, encodeContact } from '@ttn-lw/containers/collaborator-select/util'
+
+import Message from '@ttn-lw/lib/components/message'
+
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import capitalizeMessage from '@ttn-lw/lib/capitalize-message'
+
+import { checkFromState, mayEditBasicClientInformation } from '@account/lib/feature-checks'
+
+import { selectSelectedClientId } from '@account/store/selectors/clients'
 
 import { approvalStates, encodeGrants, decodeGrants } from './utils'
 import validationSchema from './validation-schema'
@@ -45,8 +56,14 @@ const OAuthClientForm = props => {
     initialValues: values,
     onSubmit,
     onDelete,
+    isResctrictedUser,
   } = props
   const { formatMessage } = useIntl()
+
+  const clientId = useSelector(selectSelectedClientId)
+  const mayEditBasicInformation = useSelector(state =>
+    checkFromState(mayEditBasicClientInformation, state),
+  )
 
   const approvalStateOptions = approvalStates.map(state => ({
     value: state,
@@ -56,6 +73,18 @@ const OAuthClientForm = props => {
   const handleSubmit = useCallback(
     async (values, { resetForm, setSubmitting }) => {
       const castedValues = validationSchema.cast(values)
+
+      // If there are no contacts do not include them in the casted value.
+      if (
+        'administrative_contact' in castedValues &&
+        isEmpty(castedValues.administrative_contact)
+      ) {
+        delete castedValues.administrative_contact
+      }
+      if ('technical_contact' in castedValues && isEmpty(castedValues.technical_contact)) {
+        delete castedValues.technical_contact
+      }
+
       await onSubmit(castedValues, resetForm, setSubmitting)
     },
     [onSubmit],
@@ -156,6 +185,45 @@ const OAuthClientForm = props => {
           />
         </>
       )}
+      {update && mayEditBasicInformation && (
+        <>
+          <Form.SubTitle title={sharedMessages.contactInformation} className="mb-cs-s" />
+          <CollaboratorSelect
+            name="administrative_contact"
+            title={sharedMessages.adminContact}
+            placeholder={sharedMessages.contactFieldPlaceholder}
+            entity={'client'}
+            entityId={clientId}
+            encode={encodeContact}
+            decode={decodeContact}
+            required
+            isResctrictedUser={isResctrictedUser}
+            userId={userId}
+          />
+          <Message
+            content={m.adminContactDescription}
+            component="p"
+            className="mt-cs-xs tc-subtle-gray"
+          />
+          <CollaboratorSelect
+            name="technical_contact"
+            title={sharedMessages.technicalContact}
+            placeholder={sharedMessages.contactFieldPlaceholder}
+            entity={'client'}
+            entityId={clientId}
+            encode={encodeContact}
+            decode={decodeContact}
+            required
+            isResctrictedUser={isResctrictedUser}
+            userId={userId}
+          />
+          <Message
+            content={m.techContactDescription}
+            component="p"
+            className="mt-cs-xs tc-subtle-gray"
+          />
+        </>
+      )}
       {((isAdmin && update) || !update) && (
         <>
           <Form.SubTitle title={m.grantTypeAndRights} />
@@ -214,6 +282,7 @@ OAuthClientForm.propTypes = {
     description: PropTypes.string,
   }),
   isAdmin: PropTypes.bool.isRequired,
+  isResctrictedUser: PropTypes.bool.isRequired,
   onDelete: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   pseudoRights: PropTypes.rights.isRequired,

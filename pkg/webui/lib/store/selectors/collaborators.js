@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { createSelector } from 'reselect'
+
 import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
 import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
 import {
@@ -59,8 +61,10 @@ const createSelectCollaboratorsFetchingSelector = createFetchingSelector(
 )
 const createSelectCollaboratorsErrorSelector = createErrorSelector(GET_COLLABORATORS_LIST_BASE)
 
-export const selectCollaborators = state =>
-  createSelectCollaboratorsIdsSelector(state).map(id => selectCollaboratorById(state, id))
+export const selectCollaborators = createSelector(
+  [createSelectCollaboratorsIdsSelector, selectCollaboratorsEntitiesStore],
+  (collaboratorIds, collaborators) => collaboratorIds.map(id => collaborators[id]),
+)
 export const selectCollaboratorsTotalCount = state =>
   createSelectCollaboratorsTotalCountSelector(state)
 export const selectCollaboratorsFetching = state => createSelectCollaboratorsFetchingSelector(state)

@@ -88,7 +88,14 @@ class Organizations {
 
   // Update.
 
-  async updateById(id, patch, mask = Marshaler.fieldMaskFromPatch(patch)) {
+  async updateById(
+    id,
+    patch,
+    mask = Marshaler.fieldMaskFromPatch(
+      patch,
+      this._api.OrganizationRegistry.UpdateAllowedFieldMaskPaths,
+    ),
+  ) {
     const response = await this._api.OrganizationRegistry.Update(
       {
         routeParams: {

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
+import { useSelector } from 'react-redux'
 
 import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
 import SubmitButton from '@ttn-lw/components/submit-button'
@@ -22,6 +23,11 @@ import Input from '@ttn-lw/components/input'
 import Checkbox from '@ttn-lw/components/checkbox'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
 
+import CollaboratorSelect from '@ttn-lw/containers/collaborator-select'
+import { decodeContact, encodeContact } from '@ttn-lw/containers/collaborator-select/util'
+
+import Message from '@ttn-lw/lib/components/message'
+
 import Require from '@console/lib/components/require'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -29,6 +35,9 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
 import { encodeAttributes, decodeAttributes } from '@console/lib/attributes'
+
+import { selectIsConfiguration } from '@console/store/selectors/identity-server'
+import { selectUserId } from '@console/store/selectors/logout'
 
 import m from '../messages'
 
@@ -62,6 +71,10 @@ const BasicSettingsForm = React.memo(props => {
     mayPurge,
   } = props
 
+  const userId = useSelector(selectUserId)
+  const isConfig = useSelector(selectIsConfiguration)
+  const isResctrictedUser =
+    isConfig && isConfig.collaborator_rights?.set_others_as_contacts === false
   const [error, setError] = React.useState(undefined)
 
   const onGatewayDelete = React.useCallback(
@@ -85,9 +98,11 @@ const BasicSettingsForm = React.memo(props => {
       if (castedValues?.lbs_lns_secret?.value === '') {
         castedValues.lbs_lns_secret = null
       }
+
+      const update = castedValues
       setError(undefined)
       try {
-        await onSubmit(castedValues)
+        await onSubmit(update)
         resetForm({ values: castedValues })
       } catch (err) {
         setSubmitting(false)
@@ -214,6 +229,41 @@ const BasicSettingsForm = React.memo(props => {
         component={Checkbox}
         description={m.disablePacketBrokerForwarding}
         tooltipId={tooltipIds.DISABLE_PACKET_BROKER_FORWARDING}
+      />
+      <Form.SubTitle title={sharedMessages.contactInformation} className="mb-cs-s" />
+      <CollaboratorSelect
+        name="administrative_contact"
+        title={sharedMessages.adminContact}
+        placeholder={sharedMessages.contactFieldPlaceholder}
+        entity={'gateway'}
+        entityId={gtwId}
+        encode={encodeContact}
+        decode={decodeContact}
+        required
+        isResctrictedUser={isResctrictedUser}
+        userId={userId}
+      />
+      <Message
+        content={m.adminContactDescription}
+        component="p"
+        className="mt-cs-xs tc-subtle-gray"
+      />
+      <CollaboratorSelect
+        name="technical_contact"
+        title={sharedMessages.technicalContact}
+        placeholder={sharedMessages.contactFieldPlaceholder}
+        entity={'gateway'}
+        entityId={gtwId}
+        encode={encodeContact}
+        decode={decodeContact}
+        required
+        isResctrictedUser={isResctrictedUser}
+        userId={userId}
+      />
+      <Message
+        content={m.techContactDescription}
+        component="p"
+        className="mt-cs-xs tc-subtle-gray"
       />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />

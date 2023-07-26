@@ -78,7 +78,8 @@ const OrganizationUpdateForm = ({ onDeleteSuccess }) => {
       try {
         setError()
 
-        const changed = diff(organization, updated, { exclude: ['created_at', 'updated_at'] })
+        const changed = diff(organization, updated)
+
         await dispatch(attachPromise(updateOrganization(orgId, changed)))
 
         toast({
@@ -123,12 +124,18 @@ const OrganizationUpdateForm = ({ onDeleteSuccess }) => {
     </Require>
   )
 
+  const composedInitialValues = {
+    ...initialValues,
+    ...organization,
+  }
+
   return (
     <OrganizationForm
+      update
       onSubmit={handleUpdate}
       error={error}
       submitBarItems={deleteButton}
-      initialValues={{ ...initialValues, ...organization }}
+      initialValues={composedInitialValues}
       submitMessage={sharedMessages.saveChanges}
     />
   )
