@@ -15,7 +15,7 @@
 import React, { useCallback, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { isEmpty } from 'lodash'
-import { useParams } from 'react-router-dom'
+import { unstable_useBlocker, useParams } from 'react-router-dom'
 
 import PAYLOAD_FORMATTER_TYPES from '@console/constants/formatter-types'
 import tts from '@console/api/tts'
@@ -47,6 +47,8 @@ import {
 } from '@console/store/selectors/devices'
 import { selectDeviceRepoPayloadFromatters } from '@console/store/selectors/device-repository'
 
+import MoveAwayModal from '../move-away-modal/move-away-modal'
+
 import m from './messages'
 
 const DevicePayloadFormatters = () => {
@@ -62,7 +64,22 @@ const DevicePayloadFormatters = () => {
       ? formatters.down_formatter || PAYLOAD_FORMATTER_TYPES.NONE
       : PAYLOAD_FORMATTER_TYPES.DEFAULT,
   )
+  const [hasValue, setHasValue] = useState(false)
   const dispatch = useDispatch()
+  // Allow the submission navigation to the same route to go through
+  const shouldBlock = useCallback(
+    ({ currentLocation, nextLocation }) =>
+      hasValue && currentLocation.pathname !== nextLocation.pathname,
+    [hasValue],
+  )
+  const blocker = unstable_useBlocker(shouldBlock)
+
+  // Reset the blocker if the user cleans the form
+  React.useEffect(() => {
+    if (blocker.state === 'blocked' && !hasValue) {
+      blocker.reset()
+    }
+  }, [blocker, hasValue])
 
   useBreadcrumbs(
     'device.single.payload-formatters.uplink',
@@ -139,6 +156,7 @@ const DevicePayloadFormatters = () => {
 
   const onTypeChange = useCallback(type => {
     setType(type)
+    setHasValue(true)
   }, [])
 
   const defaultFormatters = link?.default_formatters || {}
@@ -163,6 +181,7 @@ const DevicePayloadFormatters = () => {
           : []
       }
     >
+      <MoveAwayModal blocker={blocker} />
       <IntlHelmet title={sharedMessages.payloadFormattersUplink} />
       {!mayViewLink && <Notification content={m.mayNotViewLink} small warning />}
       <PayloadFormattersForm
