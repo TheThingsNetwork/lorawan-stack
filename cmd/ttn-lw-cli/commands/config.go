@@ -35,10 +35,8 @@ var (
 		EnableMetadata: true,
 	}
 	defaultTelemetryConfig = telemetry.CLI{
-		// TODO: After (https://github.com/TheThingsNetwork/lorawan-stack/issues/6081) is no longer blocked.
-		// Enable the telemetry and define the target.
-		Enable: false,
-		Target: "",
+		Enable: true,
+		Target: "https://telemetry.thethingsstack.io/collect",
 	}
 )
 
