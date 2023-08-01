@@ -28,19 +28,15 @@ const reload = () => {
   window.location.reload()
 }
 
-class LogBackInModal extends React.Component {
-  render() {
-    return (
-      <Modal
-        approval={false}
-        buttonMessage={m.buttonMessage}
-        message={m.modalMessage}
-        title={m.modalTitle}
-        onComplete={reload}
-        approveButtonProps={{ icon: 'refresh' }}
-      />
-    )
-  }
-}
+const LogBackInModal = () => (
+  <Modal
+    approval={false}
+    buttonMessage={m.buttonMessage}
+    message={m.modalMessage}
+    title={m.modalTitle}
+    onComplete={reload}
+    approveButtonProps={{ icon: 'refresh' }}
+  />
+)
 
 export default LogBackInModal

@@ -12,51 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
-import { Container, Col, Row } from 'react-grid-system'
+import React from 'react'
 
-import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
-import UserDataForm from '@console/components/user-data-form'
+import UserDataFormAdd from '@console/containers/user-data-form/add'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { createUser } from '@console/store/actions/users'
 import { getIsConfiguration } from '@console/store/actions/identity-server'
-
-import { selectPasswordRequirements } from '@console/store/selectors/identity-server'
-
-const UserManagementAddInner = () => {
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-
-  const passwordRequirements = useSelector(selectPasswordRequirements)
-  const createUserAction = useCallback(values => dispatch(createUser(values)), [dispatch])
-
-  const onSubmit = useCallback(values => createUserAction(values), [createUserAction])
-  const onSubmitSuccess = useCallback(() => navigate('/admin-panel/user-management'), [navigate])
-
-  return (
-    <Container>
-      <PageTitle title={sharedMessages.userAdd} />
-      <Row>
-        <Col>
-          <UserDataForm
-            passwordRequirements={passwordRequirements}
-            onSubmit={onSubmit}
-            onSubmitSuccess={onSubmitSuccess}
-          />
-        </Col>
-      </Row>
-    </Container>
-  )
-}
 
 const UserManagementAdd = () => {
   useBreadcrumbs(
@@ -66,7 +33,7 @@ const UserManagementAdd = () => {
 
   return (
     <RequireRequest requestAction={getIsConfiguration()}>
-      <UserManagementAddInner />
+      <UserDataFormAdd />
     </RequireRequest>
   )
 }

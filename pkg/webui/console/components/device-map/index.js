@@ -20,24 +20,23 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import locationToMarkers from '@console/lib/location-to-markers'
 
-export default class DeviceMap extends React.Component {
-  static propTypes = {
-    device: PropTypes.device.isRequired,
-  }
+const DeviceMap = ({ device }) => {
+  const { device_id } = device.ids
+  const { application_id } = device.ids.application_ids
 
-  render() {
-    const { device } = this.props
-    const { device_id } = device.ids
-    const { application_id } = device.ids.application_ids
+  const markers = locationToMarkers(device.locations)
 
-    const markers = locationToMarkers(device.locations)
-
-    return (
-      <MapWidget
-        id="device-map-widget"
-        markers={markers}
-        path={`/applications/${application_id}/devices/${device_id}/location`}
-      />
-    )
-  }
+  return (
+    <MapWidget
+      id="device-map-widget"
+      markers={markers}
+      path={`/applications/${application_id}/devices/${device_id}/location`}
+    />
+  )
 }
+
+DeviceMap.propTypes = {
+  device: PropTypes.device.isRequired,
+}
+
+export default DeviceMap
