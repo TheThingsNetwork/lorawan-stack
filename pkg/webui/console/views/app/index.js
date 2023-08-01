@@ -126,11 +126,7 @@ const ConsoleRoot = () => {
   }, [handleConnectionStatusChange])
 
   if (pageData && pageData.error) {
-    return (
-      <RouterProvider router={router}>
-        <FullViewError error={pageData.error} header={<Header />} />
-      </RouterProvider>
-    )
+    return <FullViewError error={pageData.error} header={<Header />} />
   }
 
   return (
