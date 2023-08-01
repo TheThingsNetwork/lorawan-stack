@@ -49,10 +49,12 @@ type EndDeviceClaimingServerClient interface {
 	// Claims the end device on a Join Server by claim authentication code or QR code.
 	Claim(ctx context.Context, in *ClaimEndDeviceRequest, opts ...grpc.CallOption) (*EndDeviceIdentifiers, error)
 	// Unclaims the end device on a Join Server.
+	// EUIs provided in the request are ignored and the end device is looked up by the given identifiers.
 	Unclaim(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// Return whether claiming is available for a given JoinEUI.
 	GetInfoByJoinEUI(ctx context.Context, in *GetInfoByJoinEUIRequest, opts ...grpc.CallOption) (*GetInfoByJoinEUIResponse, error)
 	// Gets the claim status of an end device.
+	// EUIs provided in the request are ignored and the end device is looked up by the given identifiers.
 	GetClaimStatus(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*GetClaimStatusResponse, error)
 	// Authorize the End Device Claiming Server to claim devices registered in the given application. The application
 	// identifiers are the source application, where the devices are registered before they are claimed.
@@ -137,10 +139,12 @@ type EndDeviceClaimingServerServer interface {
 	// Claims the end device on a Join Server by claim authentication code or QR code.
 	Claim(context.Context, *ClaimEndDeviceRequest) (*EndDeviceIdentifiers, error)
 	// Unclaims the end device on a Join Server.
+	// EUIs provided in the request are ignored and the end device is looked up by the given identifiers.
 	Unclaim(context.Context, *EndDeviceIdentifiers) (*emptypb.Empty, error)
 	// Return whether claiming is available for a given JoinEUI.
 	GetInfoByJoinEUI(context.Context, *GetInfoByJoinEUIRequest) (*GetInfoByJoinEUIResponse, error)
 	// Gets the claim status of an end device.
+	// EUIs provided in the request are ignored and the end device is looked up by the given identifiers.
 	GetClaimStatus(context.Context, *EndDeviceIdentifiers) (*GetClaimStatusResponse, error)
 	// Authorize the End Device Claiming Server to claim devices registered in the given application. The application
 	// identifiers are the source application, where the devices are registered before they are claimed.

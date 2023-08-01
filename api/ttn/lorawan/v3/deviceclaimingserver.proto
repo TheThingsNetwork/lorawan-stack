@@ -196,6 +196,7 @@ service EndDeviceClaimingServer {
   }
 
   // Unclaims the end device on a Join Server.
+  // EUIs provided in the request are ignored and the end device is looked up by the given identifiers.
   rpc Unclaim(EndDeviceIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {delete: "/edcs/claim/{application_ids.application_id}/devices/{device_id}"};
   }
@@ -209,6 +210,7 @@ service EndDeviceClaimingServer {
   }
 
   // Gets the claim status of an end device.
+  // EUIs provided in the request are ignored and the end device is looked up by the given identifiers.
   rpc GetClaimStatus(EndDeviceIdentifiers) returns (GetClaimStatusResponse) {
     option (google.api.http) = {get: "/edcs/claim/{application_ids.application_id}/devices/{device_id}"};
   }

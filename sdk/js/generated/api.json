@@ -11193,7 +11193,7 @@
             },
             {
               "name": "Unclaim",
-              "description": "Unclaims the end device on a Join Server.",
+              "description": "Unclaims the end device on a Join Server.\nEUIs provided in the request are ignored and the end device is looked up by the given identifiers.",
               "requestType": "EndDeviceIdentifiers",
               "requestLongType": "EndDeviceIdentifiers",
               "requestFullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
@@ -11238,7 +11238,7 @@
             },
             {
               "name": "GetClaimStatus",
-              "description": "Gets the claim status of an end device.",
+              "description": "Gets the claim status of an end device.\nEUIs provided in the request are ignored and the end device is looked up by the given identifiers.",
               "requestType": "EndDeviceIdentifiers",
               "requestLongType": "EndDeviceIdentifiers",
               "requestFullType": "ttn.lorawan.v3.EndDeviceIdentifiers",

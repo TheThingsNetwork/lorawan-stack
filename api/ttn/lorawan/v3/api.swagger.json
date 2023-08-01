@@ -8027,7 +8027,7 @@
     },
     "/edcs/claim/{application_ids.application_id}/devices/{device_id}": {
       "get": {
-        "summary": "Gets the claim status of an end device.",
+        "summary": "Gets the claim status of an end device.\nEUIs provided in the request are ignored and the end device is looked up by the given identifiers.",
         "operationId": "EndDeviceClaimingServer_GetClaimStatus",
         "responses": {
           "200": {
@@ -8086,7 +8086,7 @@
         ]
       },
       "delete": {
-        "summary": "Unclaims the end device on a Join Server.",
+        "summary": "Unclaims the end device on a Join Server.\nEUIs provided in the request are ignored and the end device is looked up by the given identifiers.",
         "operationId": "EndDeviceClaimingServer_Unclaim",
         "responses": {
           "200": {
