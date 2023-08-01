@@ -179,6 +179,7 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 				cli.NewCLITelemetry(
 					cli.WithCLITarget(config.Telemetry.Target),
 				).Run(ctx)
+				telemetrySubmission <- struct{}{}
 			}(ctx)
 		} else {
 			close(telemetrySubmission)
