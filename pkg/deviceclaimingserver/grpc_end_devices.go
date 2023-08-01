@@ -29,7 +29,8 @@ var (
 	errParseQRCode          = errors.Define("parse_qr_code", "parse QR code failed")
 	errQRCodeData           = errors.DefineInvalidArgument("qr_code_data", "invalid QR code data")
 	errNoJoinEUI            = errors.DefineInvalidArgument("no_join_eui", "failed to extract JoinEUI from request")
-	errNoEUI                = errors.DefineInvalidArgument("no_eui", "DevEUI/JoinEUI not set for device")
+	errNoEUI                = errors.DefineFailedPrecondition("no_eui", "DevEUI/JoinEUI not set for device")
+	errDeviceNotFound       = errors.DefineNotFound("device_not_found", "device not found")
 	errMethodUnavailable    = errors.DefineUnimplemented("method_unavailable", "method unavailable")
 	errClaimingNotSupported = errors.DefineAborted(
 		"claiming_not_supported",
@@ -118,21 +119,28 @@ func (edcs *endDeviceClaimingServer) Unclaim(
 	ctx context.Context,
 	in *ttnpb.EndDeviceIdentifiers,
 ) (*emptypb.Empty, error) {
-	if in.DevEui == nil || in.JoinEui == nil {
-		return nil, errNoEUI.New()
-	}
-	if err := rights.RequireApplication(ctx, in.GetApplicationIds(),
-		ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
-	); err != nil {
+	devs, err := edcs.getEndDevices(
+		ctx,
+		in.GetApplicationIds(),
+		[]string{in.GetDeviceId()},
+		ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE)
+	if err != nil {
 		return nil, err
 	}
+	if len(devs.EndDevices) != 1 {
+		return nil, errDeviceNotFound.New()
+	}
+	ids := devs.EndDevices[0].GetIds()
+	if ids.JoinEui == nil || ids.DevEui == nil {
+		return nil, errNoEUI.New()
+	}
 
-	joinEUI := types.MustEUI64(in.JoinEui).OrZero()
+	joinEUI := types.MustEUI64(ids.JoinEui).OrZero()
 	claimer := edcs.DCS.endDeviceClaimingUpstream.JoinEUIClaimer(ctx, joinEUI)
 	if claimer == nil {
 		return nil, errClaimingNotSupported.WithAttributes("eui", joinEUI)
 	}
-	if err := claimer.Unclaim(ctx, in); err != nil {
+	if err := claimer.Unclaim(ctx, ids); err != nil {
 		return nil, err
 	}
 	return ttnpb.Empty, nil
@@ -156,18 +164,57 @@ func (edcs *endDeviceClaimingServer) GetClaimStatus(
 	ctx context.Context,
 	in *ttnpb.EndDeviceIdentifiers,
 ) (*ttnpb.GetClaimStatusResponse, error) {
-	if in.DevEui == nil || in.JoinEui == nil {
-		return nil, errNoEUI.New()
-	}
-	if err := rights.RequireApplication(ctx, in.GetApplicationIds(),
-		ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
-	); err != nil {
+	devs, err := edcs.getEndDevices(
+		ctx,
+		in.GetApplicationIds(),
+		[]string{in.GetDeviceId()},
+		ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE)
+	if err != nil {
 		return nil, err
 	}
-	joinEUI := types.MustEUI64(in.JoinEui).OrZero()
+	if len(devs.EndDevices) != 1 {
+		return nil, errDeviceNotFound.New()
+	}
+	ids := devs.EndDevices[0].GetIds()
+	if ids.JoinEui == nil || ids.DevEui == nil {
+		return nil, errNoEUI.New()
+	}
+	joinEUI := types.MustEUI64(ids.JoinEui).OrZero()
 	claimer := edcs.DCS.endDeviceClaimingUpstream.JoinEUIClaimer(ctx, joinEUI)
 	if claimer == nil {
 		return nil, errClaimingNotSupported.WithAttributes("eui", joinEUI)
 	}
-	return claimer.GetClaimStatus(ctx, in)
+	return claimer.GetClaimStatus(ctx, ids)
+}
+
+func (edcs *endDeviceClaimingServer) getEndDevices(
+	ctx context.Context,
+	appID *ttnpb.ApplicationIdentifiers,
+	deviceIDs []string,
+	requiredRights ...ttnpb.Right,
+) (*ttnpb.EndDevices, error) {
+	if err := rights.RequireApplication(
+		ctx,
+		appID,
+		requiredRights...,
+	); err != nil {
+		return nil, err
+	}
+	conn, err := edcs.DCS.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
+	if err != nil {
+		return nil, err
+	}
+	client, err := ttnpb.NewEndDeviceBatchRegistryClient(conn), nil
+	if err != nil {
+		return nil, err
+	}
+	callOpt, err := rpcmetadata.WithForwardedAuth(ctx, edcs.DCS.AllowInsecureForCredentials())
+	if err != nil {
+		return nil, err
+	}
+	return client.Get(ctx, &ttnpb.BatchGetEndDevicesRequest{
+		ApplicationIds: appID,
+		DeviceIds:      deviceIDs,
+		FieldMask:      ttnpb.FieldMask("ids"),
+	}, callOpt)
 }

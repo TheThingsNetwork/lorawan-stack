@@ -43,12 +43,14 @@ var (
 	registeredApplicationIDs = &ttnpb.ApplicationIdentifiers{
 		ApplicationId: "test-application",
 	}
-	registeredApplicationKey = "test-key"
-	registeredEndDeviceID    = "test-end-device"
-	registeredJoinEUI        = types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0C}
-	unRegisteredJoinEUI      = types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0D}
-	registeredDevEUI         = types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30}
-	authenticationCode       = "BEEF1234"
+	registeredApplicationKey     = "test-key"
+	registeredEndDeviceID        = "test-end-device"
+	deviceIDWithoutEUIs          = "test-device-without-euis"
+	deviceIDClaimingNotSupported = "test-device-without-claiming-support"
+	registeredJoinEUI            = types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0C}
+	unRegisteredJoinEUI          = types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0D}
+	registeredDevEUI             = types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30}
+	authenticationCode           = "BEEF1234"
 )
 
 func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.ClusterRole) {
@@ -138,6 +140,26 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 				DeviceId:       registeredEndDeviceID,
 				JoinEui:        registeredJoinEUI.Bytes(),
 				DevEui:         registeredDevEUI.Bytes(),
+			},
+		},
+	)
+	is.EndDeviceRegistry().Add(
+		ctx,
+		&ttnpb.EndDevice{
+			Ids: &ttnpb.EndDeviceIdentifiers{
+				ApplicationIds: registeredApplicationIDs,
+				DeviceId:       deviceIDClaimingNotSupported,
+				JoinEui:        unRegisteredJoinEUI.Bytes(),
+				DevEui:         registeredDevEUI.Bytes(),
+			},
+		},
+	)
+	is.EndDeviceRegistry().Add(
+		ctx,
+		&ttnpb.EndDevice{
+			Ids: &ttnpb.EndDeviceIdentifiers{
+				ApplicationIds: registeredApplicationIDs,
+				DeviceId:       deviceIDWithoutEUIs,
 			},
 		},
 	)
@@ -258,9 +280,9 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 	// GetClaimStatus.
 	status, err := edcsClient.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
 		ApplicationIds: registeredApplicationIDs,
-		DeviceId:       registeredEndDeviceID,
+		DeviceId:       deviceIDClaimingNotSupported,
 	}, authorizedCallOpt)
-	a.So(errors.IsInvalidArgument(err), should.BeTrue)
+	a.So(errors.IsAborted(err), should.BeTrue)
 	a.So(status, should.BeNil)
 
 	status, err = edcsClient.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
@@ -271,6 +293,22 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 	}, unAuthorizedCallOpt)
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 	a.So(status, should.BeNil)
+
+	status, err = edcsClient.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
+		ApplicationIds: registeredApplicationIDs,
+		DeviceId:       deviceIDWithoutEUIs,
+	}, authorizedCallOpt)
+	a.So(errors.IsFailedPrecondition(err), should.BeTrue)
+	a.So(status, should.BeNil)
+
+	status, err = edcsClient.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
+		ApplicationIds: registeredApplicationIDs,
+		DeviceId:       registeredEndDeviceID,
+		JoinEui:        unRegisteredJoinEUI.Bytes(), // EUIs in the request are ignored.
+		DevEui:         registeredDevEUI.Bytes(),
+	}, authorizedCallOpt)
+	a.So(err, should.BeNil)
+	a.So(status, should.NotBeNil)
 
 	status, err = edcsClient.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
 		ApplicationIds: registeredApplicationIDs,
@@ -281,12 +319,19 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(status, should.NotBeNil)
 
-	// Unclaim.
-	_, err = edcsClient.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
+	status, err = edcsClient.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
 		ApplicationIds: registeredApplicationIDs,
 		DeviceId:       registeredEndDeviceID,
 	}, authorizedCallOpt)
-	a.So(errors.IsInvalidArgument(err), should.BeTrue)
+	a.So(err, should.BeNil)
+	a.So(status, should.NotBeNil)
+
+	// Unclaim.
+	_, err = edcsClient.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
+		ApplicationIds: registeredApplicationIDs,
+		DeviceId:       deviceIDClaimingNotSupported,
+	}, authorizedCallOpt)
+	a.So(errors.IsAborted(err), should.BeTrue)
 
 	_, err = edcsClient.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
 		ApplicationIds: registeredApplicationIDs,
@@ -295,6 +340,28 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 		DevEui:         registeredDevEUI.Bytes(),
 	}, unAuthorizedCallOpt)
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
+
+	_, err = edcsClient.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
+		ApplicationIds: registeredApplicationIDs,
+		DeviceId:       deviceIDWithoutEUIs,
+	}, authorizedCallOpt)
+	a.So(errors.IsFailedPrecondition(err), should.BeTrue)
+
+	_, err = edcsClient.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
+		ApplicationIds: registeredApplicationIDs,
+		DeviceId:       registeredEndDeviceID,
+		JoinEui:        unRegisteredJoinEUI.Bytes(), // EUIs in the request are ignored.
+		DevEui:         registeredDevEUI.Bytes(),
+	}, authorizedCallOpt)
+	a.So(err, should.BeNil)
+	a.So(status, should.NotBeNil)
+
+	_, err = edcsClient.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
+		ApplicationIds: registeredApplicationIDs,
+		DeviceId:       registeredEndDeviceID,
+	}, authorizedCallOpt)
+	a.So(err, should.BeNil)
+	a.So(status, should.NotBeNil)
 
 	_, err = edcsClient.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
 		ApplicationIds: registeredApplicationIDs,
