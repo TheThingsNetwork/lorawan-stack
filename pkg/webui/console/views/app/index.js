@@ -14,14 +14,7 @@
 
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  Route,
-  Routes,
-  BrowserRouter,
-  Outlet,
-  createBrowserRouter,
-  RouterProvider,
-} from 'react-router-dom'
+import { Route, Routes, Outlet, createBrowserRouter, RouterProvider } from 'react-router-dom'
 import classnames from 'classnames'
 
 import { ToastContainer } from '@ttn-lw/components/toast'
@@ -134,9 +127,9 @@ const ConsoleRoot = () => {
 
   if (pageData && pageData.error) {
     return (
-      <BrowserRouter history={history} basename="/console">
+      <RouterProvider router={router}>
         <FullViewError error={pageData.error} header={<Header />} />
-      </BrowserRouter>
+      </RouterProvider>
     )
   }
 
@@ -147,11 +140,11 @@ const ConsoleRoot = () => {
       <Routes>
         <Route element={<Layout />}>
           <Route index Component={Overview} />
-          <Route path="/applications/*" Component={Applications} />
-          <Route path="/gateways/*" Component={Gateways} />
-          <Route path="/organizations/*" Component={Organizations} />
-          <Route path="/admin-panel/*" Component={AdminPanel} />
-          <Route path="/user/*" Component={User} />
+          <Route path="applications/*" Component={Applications} />
+          <Route path="gateways/*" Component={Gateways} />
+          <Route path="organizations/*" Component={Organizations} />
+          <Route path="admin-panel/*" Component={AdminPanel} />
+          <Route path="user/*" Component={User} />
           <Route path="*" Component={GenericNotFound} />
         </Route>
       </Routes>
@@ -160,7 +153,7 @@ const ConsoleRoot = () => {
 }
 
 const router = createBrowserRouter([{ path: '*', Component: ConsoleRoot }], {
-  basename: '/console/',
+  basename: '/console',
 })
 
 const ConsoleApp = () => <RouterProvider router={router} />
