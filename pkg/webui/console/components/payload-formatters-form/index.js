@@ -243,6 +243,9 @@ const PayloadFormattersForm = ({
   const formRef = useRef(null)
   const repositoryPayloadFormatters = repoFormatters?.formatter_parameter
 
+  // Using the unstable version of useBlocker because `useBlocker` and `usePrompt` were removes from react-router v6.
+  // Reference: https://github.com/remix-run/react-router/issues/8139#issuecomment-1396078490
+  // TODO: Refactor this once react-router reimplements these hooks.
   const shouldBlock = useCallback(
     ({ currentLocation, nextLocation }) => {
       const isDirty = Boolean(
