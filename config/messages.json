@@ -3698,6 +3698,15 @@
       "file": "grpc_end_devices.go"
     }
   },
+  "error:pkg/deviceclaimingserver:device_not_found": {
+    "translations": {
+      "en": "device not found"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_end_devices.go"
+    }
+  },
   "error:pkg/deviceclaimingserver:method_unavailable": {
     "translations": {
       "en": "method unavailable"
