@@ -54,3 +54,9 @@ func Jitter(d time.Duration, p float64) time.Duration {
 	v := time.Duration(Int63n(int64(df*p*2)) - int64(df*p))
 	return d + v
 }
+
+// CanJitter checks if the provided duration `d` can be used with the Jitter function with the provided
+// percentage p.
+func CanJitter(d time.Duration, p float64) bool {
+	return int64(float64(d)*p*2) > 0
+}

@@ -1037,7 +1037,7 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 
 		// Debounce the updates with jitter to spread event publishes and store updates over time.
 		// If the time since the last update is longer than the debounce time, the update happens immediately.
-		if wait := gs.config.UpdateConnectionStatsDebounceTime - time.Since(lastUpdate); wait > 0 {
+		if wait := gs.config.UpdateConnectionStatsDebounceTime - time.Since(lastUpdate); random.CanJitter(wait, debounceJitter) {
 			duration := random.Jitter(wait, debounceJitter)
 			select {
 			case <-ctx.Done():
@@ -1153,8 +1153,8 @@ func (gs *GatewayServer) handleLocationUpdates(ctx context.Context, conn connect
 				}
 			}
 
-			if duration := gs.config.UpdateGatewayLocationDebounceTime; duration > 0 {
-				duration := random.Jitter(duration, debounceJitter)
+			if wait := gs.config.UpdateGatewayLocationDebounceTime; random.CanJitter(wait, debounceJitter) {
+				duration := random.Jitter(wait, debounceJitter)
 				select {
 				case <-ctx.Done():
 					return

@@ -24,6 +24,8 @@ import (
 )
 
 func TestPseudoRandom(t *testing.T) {
+	t.Parallel()
+
 	a := assertions.New(t)
 	a.So(Bytes(10), assertions.ShouldHaveLength, 10)
 
@@ -52,6 +54,8 @@ func BenchmarkString(b *testing.B) {
 }
 
 func TestJitter(t *testing.T) {
+	t.Parallel()
+
 	a := assertions.New(t)
 	d := time.Duration(424242)
 	p := 0.1
@@ -60,5 +64,17 @@ func TestJitter(t *testing.T) {
 		t := Jitter(d, p)
 		df := float64(d)
 		a.So(t, should.BeBetweenOrEqual, df-df*p, df+df*p)
+	}
+}
+
+func TestCanJitter(t *testing.T) {
+	t.Parallel()
+
+	a := assertions.New(t)
+	p := 0.15
+	for d := time.Duration(0); d < 10; d++ {
+		// Values smaller or equal to 3 get clamped to zero, which cannot be
+		// used as a upper bound for the random number generator.
+		a.So(CanJitter(d, p), should.Equal, d > 3)
 	}
 }
