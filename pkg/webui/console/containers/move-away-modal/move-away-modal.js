@@ -20,11 +20,9 @@ import Modal from '@ttn-lw/components/modal'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 const m = defineMessages({
-  modalTitle: 'Are you sure you want to leave this page?',
+  modalTitle: 'Confirm navigation',
   modalMessage:
-    "You have unsaved changes. If you leave this page, you'll lose your progress. <br /> Click 'Stay on page' to stay on the page, or 'Discard changes' to leave the page.",
-  buttonMessage: 'Discard changes',
-  cancelButtonMessage: 'Stay on page',
+    'Are you sure you want to leave this page? Your current changes have not been saved yet.',
 })
 
 const MoveAwayModal = ({ blocker }) => {
@@ -41,8 +39,7 @@ const MoveAwayModal = ({ blocker }) => {
   return (
     blocker.state === 'blocked' && (
       <Modal
-        buttonMessage={m.buttonMessage}
-        cancelButtonMessage={m.cancelButtonMessage}
+        buttonMessage={m.modalTitle}
         message={m.modalMessage}
         title={m.modalTitle}
         onComplete={handleComplete}
