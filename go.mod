@@ -94,7 +94,7 @@ require (
 	go.packetbroker.org/api/v3 v3.13.0
 	go.thethings.network/lorawan-application-payload v0.0.0-20220125153912-1198ff1e403e
 	go.thethings.network/lorawan-stack-legacy/v2 v2.1.0
-	go.uber.org/automaxprocs v1.5.2
+	go.uber.org/automaxprocs v1.5.3
 	go.uber.org/zap v1.24.0
 	gocloud.dev v0.32.0
 	gocloud.dev/pubsub/natspubsub v0.32.0
