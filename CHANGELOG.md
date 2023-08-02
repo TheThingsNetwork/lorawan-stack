@@ -11,7 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
-- Add support for `administrative_contact` and `technical_contact` in the Console
+- Add support for `administrative_contact` and `technical_contact` in the Console.
+- Reimplement move away prompt in payload formatter views in the Console.
 
 ### Changed
 
