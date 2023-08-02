@@ -38,35 +38,58 @@ Empty.defaultProps = {
   message: undefined,
 }
 
-class Table extends React.Component {
-  static Head = ({ className, ...props }) => (
-    <div {...props} className={classnames(className, style.sectionHeader)} />
-  )
-  static Body = ({ className, empty, emptyMessage, ...props }) => {
-    if (empty) {
-      return <Empty message={emptyMessage} />
-    }
+const Head = ({ className, ...props }) => (
+  <div {...props} className={classnames(className, style.sectionHeader)} />
+)
 
-    return <div {...props} className={classnames(className, style.sectionBody)} role="rowgroup" />
-  }
-  static Footer = ({ className, ...props }) => (
-    <div {...props} className={classnames(className, style.sectionFooter)} />
-  )
-  static Row = Row
-  static HeadCell = HeadCell
-  static DataCell = DataCell
-  static SortButton = SortButton
+Head.propTypes = {
+  className: PropTypes.string,
+}
 
-  render() {
-    const { className, children, minWidth, ...rest } = this.props
-    const tableClassNames = classnames(className, style.table)
-    const minWidthProp = Boolean(minWidth) ? { style: { minWidth } } : {}
-    return (
-      <div role="table" className={tableClassNames} {...minWidthProp} {...rest}>
-        {children}
-      </div>
-    )
+Head.defaultProps = {
+  className: undefined,
+}
+
+const Body = ({ className, empty, emptyMessage, ...props }) => {
+  if (empty) {
+    return <Empty message={emptyMessage} />
   }
+
+  return <div {...props} className={classnames(className, style.sectionBody)} role="rowgroup" />
+}
+
+Body.propTypes = {
+  className: PropTypes.string,
+  empty: PropTypes.bool,
+  emptyMessage: PropTypes.message,
+}
+
+Body.defaultProps = {
+  className: undefined,
+  empty: false,
+  emptyMessage: undefined,
+}
+
+const Footer = ({ className, ...props }) => (
+  <div {...props} className={classnames(className, style.sectionFooter)} />
+)
+
+Footer.propTypes = {
+  className: PropTypes.string,
+}
+
+Footer.defaultProps = {
+  className: undefined,
+}
+
+const Table = ({ className, children, minWidth, ...rest }) => {
+  const tableClassNames = classnames(className, style.table)
+  const minWidthProp = Boolean(minWidth) ? { style: { minWidth } } : {}
+  return (
+    <div role="table" className={tableClassNames} {...minWidthProp} {...rest}>
+      {children}
+    </div>
+  )
 }
 
 Table.propTypes = {
@@ -80,5 +103,13 @@ Table.defaultProps = {
   children: undefined,
   minWidth: undefined,
 }
+
+Table.Row = Row
+Table.HeadCell = HeadCell
+Table.DataCell = DataCell
+Table.SortButton = SortButton
+Table.Head = Head
+Table.Body = Body
+Table.Footer = Footer
 
 export default Table
