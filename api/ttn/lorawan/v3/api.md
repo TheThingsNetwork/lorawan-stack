@@ -2931,7 +2931,7 @@ End devices that could not be unclaimed.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `Unclaim` | [`BatchUnclaimEndDevicesRequest`](#ttn.lorawan.v3.BatchUnclaimEndDevicesRequest) | [`BatchUnclaimEndDevicesResponse`](#ttn.lorawan.v3.BatchUnclaimEndDevicesResponse) | Unclaims multiple end devices on an external Join Server. All devices must have the same application ID and Join EUI. Check the response for devices that could not be unclaimed. |
+| `Unclaim` | [`BatchUnclaimEndDevicesRequest`](#ttn.lorawan.v3.BatchUnclaimEndDevicesRequest) | [`BatchUnclaimEndDevicesResponse`](#ttn.lorawan.v3.BatchUnclaimEndDevicesResponse) | Unclaims multiple end devices on an external Join Server. All devices must have the same application ID. Check the response for devices that could not be unclaimed. |
 
 #### HTTP bindings
 

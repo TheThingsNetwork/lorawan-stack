@@ -18,6 +18,7 @@ import (
 	"context"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -119,11 +120,12 @@ func (edcs *endDeviceClaimingServer) Unclaim(
 	ctx context.Context,
 	in *ttnpb.EndDeviceIdentifiers,
 ) (*emptypb.Empty, error) {
-	devs, err := edcs.getEndDevices(
+	devs, err := edcs.DCS.getEndDevices(
 		ctx,
 		in.GetApplicationIds(),
 		[]string{in.GetDeviceId()},
-		ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE)
+		ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -164,11 +166,12 @@ func (edcs *endDeviceClaimingServer) GetClaimStatus(
 	ctx context.Context,
 	in *ttnpb.EndDeviceIdentifiers,
 ) (*ttnpb.GetClaimStatusResponse, error) {
-	devs, err := edcs.getEndDevices(
+	devs, err := edcs.DCS.getEndDevices(
 		ctx,
 		in.GetApplicationIds(),
 		[]string{in.GetDeviceId()},
-		ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE)
+		ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -187,7 +190,7 @@ func (edcs *endDeviceClaimingServer) GetClaimStatus(
 	return claimer.GetClaimStatus(ctx, ids)
 }
 
-func (edcs *endDeviceClaimingServer) getEndDevices(
+func (dcs *DeviceClaimingServer) getEndDevices(
 	ctx context.Context,
 	appID *ttnpb.ApplicationIdentifiers,
 	deviceIDs []string,
@@ -200,7 +203,7 @@ func (edcs *endDeviceClaimingServer) getEndDevices(
 	); err != nil {
 		return nil, err
 	}
-	conn, err := edcs.DCS.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
+	conn, err := dcs.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -208,7 +211,7 @@ func (edcs *endDeviceClaimingServer) getEndDevices(
 	if err != nil {
 		return nil, err
 	}
-	callOpt, err := rpcmetadata.WithForwardedAuth(ctx, edcs.DCS.AllowInsecureForCredentials())
+	callOpt, err := rpcmetadata.WithForwardedAuth(ctx, dcs.AllowInsecureForCredentials())
 	if err != nil {
 		return nil, err
 	}
@@ -217,4 +220,63 @@ func (edcs *endDeviceClaimingServer) getEndDevices(
 		DeviceIds:      deviceIDs,
 		FieldMask:      ttnpb.FieldMask("ids"),
 	}, callOpt)
+}
+
+// endDeviceBatchClaimingServer is the front facing entity for gRPC requests.
+type endDeviceBatchClaimingServer struct {
+	ttnpb.UnimplementedEndDeviceBatchClaimingServerServer
+
+	DCS *DeviceClaimingServer
+}
+
+// Unclaim implements EndDeviceBatchClaimingServer.
+func (srv *endDeviceBatchClaimingServer) Unclaim(
+	ctx context.Context,
+	in *ttnpb.BatchUnclaimEndDevicesRequest,
+) (*ttnpb.BatchUnclaimEndDevicesResponse, error) {
+	ret := &ttnpb.BatchUnclaimEndDevicesResponse{
+		ApplicationIds: in.GetApplicationIds(),
+	}
+	devs, err := srv.DCS.getEndDevices(
+		ctx,
+		in.GetApplicationIds(),
+		in.GetDeviceIds(),
+		ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if len(devs.EndDevices) == 0 {
+		return ret, nil
+	}
+
+	// End Devices within an application can have different JoinEUIs.
+	// We group them by the JoinEUI and claim them in batches.
+	claimers := make(map[enddevices.EndDeviceClaimer][]*ttnpb.EndDeviceIdentifiers)
+	for _, dev := range devs.EndDevices {
+		ids := dev.GetIds()
+		if ids.JoinEui == nil || ids.DevEui == nil {
+			continue
+		}
+		joinEUI := types.MustEUI64(ids.JoinEui).OrZero()
+		claimer := srv.DCS.endDeviceClaimingUpstream.JoinEUIClaimer(ctx, joinEUI)
+		if claimer == nil {
+			continue
+		}
+		devIDs := claimers[claimer]
+		if devIDs == nil {
+			devIDs = make([]*ttnpb.EndDeviceIdentifiers, 0)
+		}
+		devIDs = append(devIDs, ids)
+		claimers[claimer] = devIDs
+	}
+	for claimer, devIDs := range claimers {
+		res, err := claimer.BatchUnclaim(ctx, devIDs)
+		if err != nil {
+			return nil, err
+		}
+		ret.Failed = append(ret.Failed, res.Failed...)
+	}
+
+	return ret, nil
 }

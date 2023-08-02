@@ -261,7 +261,7 @@ message BatchUnclaimEndDevicesResponse {
 
 service EndDeviceBatchClaimingServer {
   // Unclaims multiple end devices on an external Join Server.
-  // All devices must have the same application ID and Join EUI.
+  // All devices must have the same application ID.
   // Check the response for devices that could not be unclaimed.
   rpc Unclaim(BatchUnclaimEndDevicesRequest) returns (BatchUnclaimEndDevicesResponse) {
     option (google.api.http) = {

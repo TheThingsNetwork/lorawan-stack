@@ -8030,7 +8030,7 @@
     },
     "/edcs/claim/{application_ids.application_id}/devices/batch": {
       "delete": {
-        "summary": "Unclaims multiple end devices on an external Join Server.\nAll devices must have the same application ID and Join EUI.\nCheck the response for devices that could not be unclaimed.",
+        "summary": "Unclaims multiple end devices on an external Join Server.\nAll devices must have the same application ID.\nCheck the response for devices that could not be unclaimed.",
         "operationId": "EndDeviceBatchClaimingServer_Unclaim",
         "responses": {
           "200": {

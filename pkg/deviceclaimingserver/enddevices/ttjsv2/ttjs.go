@@ -322,6 +322,14 @@ func (c *TTJS) GetClaimStatus(
 	}
 }
 
+// BatchClaim implements EndDeviceClaimer.
+func (c *TTJS) BatchUnclaim(
+	ctx context.Context,
+	ids []*ttnpb.EndDeviceIdentifiers,
+) (*ttnpb.BatchUnclaimEndDevicesResponse, error) {
+	return nil, nil
+}
+
 // isSuccess returns true if the HTTP status code is 2xx.
 func isSuccess(statusCode int) bool {
 	return statusCode >= 200 && statusCode <= 299

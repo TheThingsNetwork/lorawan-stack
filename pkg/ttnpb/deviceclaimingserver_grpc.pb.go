@@ -350,7 +350,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type EndDeviceBatchClaimingServerClient interface {
 	// Unclaims multiple end devices on an external Join Server.
-	// All devices must have the same application ID and Join EUI.
+	// All devices must have the same application ID.
 	// Check the response for devices that could not be unclaimed.
 	Unclaim(ctx context.Context, in *BatchUnclaimEndDevicesRequest, opts ...grpc.CallOption) (*BatchUnclaimEndDevicesResponse, error)
 }
@@ -377,7 +377,7 @@ func (c *endDeviceBatchClaimingServerClient) Unclaim(ctx context.Context, in *Ba
 // for forward compatibility
 type EndDeviceBatchClaimingServerServer interface {
 	// Unclaims multiple end devices on an external Join Server.
-	// All devices must have the same application ID and Join EUI.
+	// All devices must have the same application ID.
 	// Check the response for devices that could not be unclaimed.
 	Unclaim(context.Context, *BatchUnclaimEndDevicesRequest) (*BatchUnclaimEndDevicesResponse, error)
 	mustEmbedUnimplementedEndDeviceBatchClaimingServerServer()

@@ -55,3 +55,11 @@ func (MockClaimer) Unclaim(_ context.Context,
 ) (err error) {
 	return nil
 }
+
+// Unclaim releases the claim on an End Device.
+func (MockClaimer) BatchUnclaim(
+	_ context.Context,
+	_ []*ttnpb.EndDeviceIdentifiers,
+) (*ttnpb.BatchUnclaimEndDevicesResponse, error) {
+	return &ttnpb.BatchUnclaimEndDevicesResponse{}, nil
+}

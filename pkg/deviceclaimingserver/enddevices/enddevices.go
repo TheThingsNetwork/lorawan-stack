@@ -43,6 +43,9 @@ type EndDeviceClaimer interface {
 	GetClaimStatus(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*ttnpb.GetClaimStatusResponse, error)
 	// Unclaim releases the claim on an End Device.
 	Unclaim(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (err error)
+
+	// BatchUnclaim release the claim on a batch of End Devices.
+	BatchUnclaim(ctx context.Context, ids []*ttnpb.EndDeviceIdentifiers) (*ttnpb.BatchUnclaimEndDevicesResponse, error)
 }
 
 // Component abstracts the underlying *component.Component.

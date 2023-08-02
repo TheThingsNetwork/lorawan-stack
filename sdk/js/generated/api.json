@@ -11306,7 +11306,7 @@
           "methods": [
             {
               "name": "Unclaim",
-              "description": "Unclaims multiple end devices on an external Join Server.\nAll devices must have the same application ID and Join EUI.\nCheck the response for devices that could not be unclaimed.",
+              "description": "Unclaims multiple end devices on an external Join Server.\nAll devices must have the same application ID.\nCheck the response for devices that could not be unclaimed.",
               "requestType": "BatchUnclaimEndDevicesRequest",
               "requestLongType": "BatchUnclaimEndDevicesRequest",
               "requestFullType": "ttn.lorawan.v3.BatchUnclaimEndDevicesRequest",
