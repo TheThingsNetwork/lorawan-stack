@@ -225,10 +225,9 @@ require (
 	go.packetbroker.org/api/v3 v3.13.0 // indirect
 	go.thethings.network/lorawan-application-payload v0.0.0-20220125153912-1198ff1e403e // indirect
 	go.thethings.network/lorawan-stack-legacy/v2 v2.1.0 // indirect
-	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/automaxprocs v1.5.3 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	go.uber.org/zap v1.24.0 // indirect
+	go.uber.org/zap v1.25.0 // indirect
 	gocloud.dev v0.33.0 // indirect
 	gocloud.dev/pubsub/natspubsub v0.33.0 // indirect
 	golang.org/x/crypto v0.11.0 // indirect
