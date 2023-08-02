@@ -73,6 +73,7 @@ describe('Collaborators', () => {
         'eq',
         `${Cypress.config('consoleRootPath')}/applications/${applicationId}/collaborators`,
       )
+      cy.findByText(collaboratorId).should('be.visible')
     })
 
     it('succeeds adding organization as a collaborator', () => {
@@ -85,6 +86,7 @@ describe('Collaborators', () => {
         'eq',
         `${Cypress.config('consoleRootPath')}/applications/${applicationId}/collaborators`,
       )
+      cy.findByText(organizationId).should('be.visible')
     })
   })
 
@@ -111,6 +113,7 @@ describe('Collaborators', () => {
         'eq',
         `${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/collaborators`,
       )
+      cy.findByText(collaboratorId).should('be.visible')
     })
 
     it('succeeds adding organization as a collaborator', () => {
@@ -124,6 +127,7 @@ describe('Collaborators', () => {
         'eq',
         `${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/collaborators`,
       )
+      cy.findByText(organizationId).should('be.visible')
     })
   })
 
@@ -152,6 +156,7 @@ describe('Collaborators', () => {
         'eq',
         `${Cypress.config('consoleRootPath')}/organizations/${testOrgId}/collaborators`,
       )
+      cy.findByText(collaboratorId).should('be.visible')
     })
 
     it('fails adding organization as a collaborator', () => {
