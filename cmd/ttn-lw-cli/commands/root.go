@@ -174,6 +174,9 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 		// The result is waited in the post run.
 		telemetrySubmission = make(chan struct{})
 		if config.Telemetry.Enable {
+			logger.
+				WithField("documentation_url", "https://www.thethingsindustries.com/docs/reference/telemetry/cli").
+				Info("Telemetry is enabled. Check the documentation for more information on what is collected and how to disable it") // nolint:lll
 			go func(ctx context.Context) {
 				defer close(telemetrySubmission)
 				cli.NewCLITelemetry(
