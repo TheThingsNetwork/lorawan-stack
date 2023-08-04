@@ -15,16 +15,17 @@
 import React from 'react'
 
 /**
- * `withComputedProps` is a HOC that can be used to pass-in props that are
+ * `useComputedProps` is a hook that can be used to pass-in props that are
  * derived from the other props of the components. This is useful to ensure that
  * expensive prop computations only need to be done once upon prop changes.
  *
  * @param {Function} computeProps - The function that returns the computed props.
- * @returns {Function} - An instance of the `computeProps` HOC.
+ * @param {object} props - The props that are used to compute the computed props.
+ * @returns {object} - The computed props.
  */
-export default computeProps => Component =>
-  class withComputedProps extends React.Component {
-    render() {
-      return <Component {...computeProps(this.props)} />
-    }
-  }
+const useComputedProps = (computeProps, props) => {
+  const computedProps = React.useMemo(() => computeProps(props), [computeProps, props])
+  return computedProps
+}
+
+export default useComputedProps
