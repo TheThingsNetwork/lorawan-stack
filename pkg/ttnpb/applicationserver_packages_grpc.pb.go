@@ -16,7 +16,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.22.2
-// source: lorawan-stack/api/applicationserver_packages.proto
+// source: ttn/lorawan/v3/applicationserver_packages.proto
 
 package ttnpb
 
@@ -435,5 +435,5 @@ var ApplicationPackageRegistry_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/applicationserver_packages.proto",
+	Metadata: "ttn/lorawan/v3/applicationserver_packages.proto",
 }

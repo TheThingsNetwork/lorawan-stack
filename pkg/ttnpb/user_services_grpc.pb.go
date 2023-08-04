@@ -16,7 +16,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.22.2
-// source: lorawan-stack/api/user_services.proto
+// source: ttn/lorawan/v3/user_services.proto
 
 package ttnpb
 
@@ -452,7 +452,7 @@ var UserRegistry_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/user_services.proto",
+	Metadata: "ttn/lorawan/v3/user_services.proto",
 }
 
 const (
@@ -747,7 +747,7 @@ var UserAccess_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/user_services.proto",
+	Metadata: "ttn/lorawan/v3/user_services.proto",
 }
 
 const (
@@ -918,7 +918,7 @@ var UserInvitationRegistry_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/user_services.proto",
+	Metadata: "ttn/lorawan/v3/user_services.proto",
 }
 
 const (
@@ -1049,5 +1049,5 @@ var UserSessionRegistry_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/user_services.proto",
+	Metadata: "ttn/lorawan/v3/user_services.proto",
 }

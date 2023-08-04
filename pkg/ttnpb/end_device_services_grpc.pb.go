@@ -16,7 +16,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.22.2
-// source: lorawan-stack/api/end_device_services.proto
+// source: ttn/lorawan/v3/end_device_services.proto
 
 package ttnpb
 
@@ -386,7 +386,7 @@ var EndDeviceRegistry_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/end_device_services.proto",
+	Metadata: "ttn/lorawan/v3/end_device_services.proto",
 }
 
 const (
@@ -546,7 +546,7 @@ var EndDeviceTemplateConverter_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "lorawan-stack/api/end_device_services.proto",
+	Metadata: "ttn/lorawan/v3/end_device_services.proto",
 }
 
 const (
@@ -702,5 +702,5 @@ var EndDeviceBatchRegistry_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/end_device_services.proto",
+	Metadata: "ttn/lorawan/v3/end_device_services.proto",
 }

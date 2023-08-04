@@ -16,7 +16,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.22.2
-// source: lorawan-stack/api/contact_info.proto
+// source: ttn/lorawan/v3/contact_info.proto
 
 package ttnpb
 
@@ -161,5 +161,5 @@ var ContactInfoRegistry_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/contact_info.proto",
+	Metadata: "ttn/lorawan/v3/contact_info.proto",
 }

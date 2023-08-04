@@ -1101,6 +1101,198 @@ var _ interface {
 	ErrorName() string
 } = AuthorizeGatewayRequestValidationError{}
 
+// ValidateFields checks the field values on GetInfoByGatewayEUIRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *GetInfoByGatewayEUIRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GetInfoByGatewayEUIRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "eui":
+
+			if len(m.GetEui()) > 0 {
+
+				if len(m.GetEui()) != 8 {
+					return GetInfoByGatewayEUIRequestValidationError{
+						field:  "eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
+		default:
+			return GetInfoByGatewayEUIRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// GetInfoByGatewayEUIRequestValidationError is the validation error returned
+// by GetInfoByGatewayEUIRequest.ValidateFields if the designated constraints
+// aren't met.
+type GetInfoByGatewayEUIRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetInfoByGatewayEUIRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetInfoByGatewayEUIRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetInfoByGatewayEUIRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetInfoByGatewayEUIRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetInfoByGatewayEUIRequestValidationError) ErrorName() string {
+	return "GetInfoByGatewayEUIRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetInfoByGatewayEUIRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetInfoByGatewayEUIRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetInfoByGatewayEUIRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetInfoByGatewayEUIRequestValidationError{}
+
+// ValidateFields checks the field values on GetInfoByGatewayEUIResponse with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *GetInfoByGatewayEUIResponse) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GetInfoByGatewayEUIResponseFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "eui":
+
+			if len(m.GetEui()) > 0 {
+
+				if len(m.GetEui()) != 8 {
+					return GetInfoByGatewayEUIResponseValidationError{
+						field:  "eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
+		case "supports_claiming":
+			// no validation rules for SupportsClaiming
+		default:
+			return GetInfoByGatewayEUIResponseValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// GetInfoByGatewayEUIResponseValidationError is the validation error returned
+// by GetInfoByGatewayEUIResponse.ValidateFields if the designated constraints
+// aren't met.
+type GetInfoByGatewayEUIResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetInfoByGatewayEUIResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetInfoByGatewayEUIResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetInfoByGatewayEUIResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetInfoByGatewayEUIResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetInfoByGatewayEUIResponseValidationError) ErrorName() string {
+	return "GetInfoByGatewayEUIResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetInfoByGatewayEUIResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetInfoByGatewayEUIResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetInfoByGatewayEUIResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetInfoByGatewayEUIResponseValidationError{}
+
 // ValidateFields checks the field values on
 // ClaimEndDeviceRequest_AuthenticatedIdentifiers with the rules defined in
 // the proto definition for this message. If any rules are violated, an error

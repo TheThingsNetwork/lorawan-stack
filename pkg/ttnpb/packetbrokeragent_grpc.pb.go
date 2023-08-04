@@ -16,7 +16,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.22.2
-// source: lorawan-stack/api/packetbrokeragent.proto
+// source: ttn/lorawan/v3/packetbrokeragent.proto
 
 package ttnpb
 
@@ -163,7 +163,7 @@ var GsPba_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/packetbrokeragent.proto",
+	Metadata: "ttn/lorawan/v3/packetbrokeragent.proto",
 }
 
 const (
@@ -257,7 +257,7 @@ var NsPba_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/packetbrokeragent.proto",
+	Metadata: "ttn/lorawan/v3/packetbrokeragent.proto",
 }
 
 const (
@@ -976,5 +976,5 @@ var Pba_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/packetbrokeragent.proto",
+	Metadata: "ttn/lorawan/v3/packetbrokeragent.proto",
 }

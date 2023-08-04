@@ -16,7 +16,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.22.2
-// source: lorawan-stack/api/gatewayserver.proto
+// source: ttn/lorawan/v3/gatewayserver.proto
 
 package ttnpb
 
@@ -272,7 +272,7 @@ var GtwGs_ServiceDesc = grpc.ServiceDesc{
 			ClientStreams: true,
 		},
 	},
-	Metadata: "lorawan-stack/api/gatewayserver.proto",
+	Metadata: "ttn/lorawan/v3/gatewayserver.proto",
 }
 
 const (
@@ -368,7 +368,7 @@ var NsGs_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/gatewayserver.proto",
+	Metadata: "ttn/lorawan/v3/gatewayserver.proto",
 }
 
 const (
@@ -507,5 +507,5 @@ var Gs_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/gatewayserver.proto",
+	Metadata: "ttn/lorawan/v3/gatewayserver.proto",
 }

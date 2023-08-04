@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-json v1.5.1
 // - protoc             v4.22.2
-// source: lorawan-stack/api/applicationserver_integrations_alcsync.proto
+// source: ttn/lorawan/v3/applicationserver_integrations_alcsync.proto
 
 package ttnpb
 
