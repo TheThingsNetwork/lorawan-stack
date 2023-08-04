@@ -30,11 +30,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { getWebhooksList } from '@console/store/actions/webhooks'
 
 import { selectWebhooksHealthStatusEnabled } from '@console/store/selectors/application-server'
-import {
-  selectWebhooks,
-  selectWebhooksTotalCount,
-  selectWebhooksFetching,
-} from '@console/store/selectors/webhooks'
+import { selectWebhooks, selectWebhooksTotalCount } from '@console/store/selectors/webhooks'
 
 import style from './webhooks-table.styl'
 
@@ -57,11 +53,10 @@ const WebhooksTable = () => {
   )
 
   const baseDataSelector = createSelector(
-    [selectWebhooks, selectWebhooksTotalCount, selectWebhooksFetching],
-    (webhooks, totalCount, fetching) => ({
+    [selectWebhooks, selectWebhooksTotalCount],
+    (webhooks, totalCount) => ({
       webhooks,
       totalCount,
-      fetching,
     }),
   )
 

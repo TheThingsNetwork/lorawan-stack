@@ -36,8 +36,6 @@ import { getCollaboratorsList, deleteCollaborator } from '@ttn-lw/lib/store/acti
 import {
   selectCollaborators,
   selectCollaboratorsTotalCount,
-  selectCollaboratorsFetching,
-  selectCollaboratorsError,
 } from '@ttn-lw/lib/store/selectors/collaborators'
 
 import { selectUserId } from '@account/store/selectors/user'
@@ -165,17 +163,10 @@ const CollaboratorsTable = props => {
   }, [intl, currentUserId, deleteCollaborator])
 
   const baseDataSelector = createSelector(
-    [
-      selectCollaborators,
-      selectCollaboratorsTotalCount,
-      selectCollaboratorsFetching,
-      selectCollaboratorsError,
-    ],
-    (collaborators, totalCount, fetching, error) => ({
+    [selectCollaborators, selectCollaboratorsTotalCount],
+    (collaborators, totalCount) => ({
       collaborators,
       totalCount,
-      fetching,
-      error,
       mayLink: false,
     }),
   )

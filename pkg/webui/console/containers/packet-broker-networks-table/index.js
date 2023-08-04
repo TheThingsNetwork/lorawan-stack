@@ -32,7 +32,6 @@ import { getPacketBrokerNetworksList } from '@console/store/actions/packet-broke
 import {
   selectPacketBrokerNetworks,
   selectPacketBrokerNetworksTotalCount,
-  selectPacketBrokerNetworksFetching,
   selectPacketBrokerForwarderPolicyById,
   selectPacketBrokerHomeNetworkPolicyById,
   selectPacketBrokerOwnCombinedId,
@@ -140,7 +139,6 @@ class PacketBrokerNetworksTable extends Component {
     return {
       networks: decoratedNetworks,
       totalCount: selectPacketBrokerNetworksTotalCount(state),
-      fetching: selectPacketBrokerNetworksFetching(state),
       mayAdd: false,
     }
   }

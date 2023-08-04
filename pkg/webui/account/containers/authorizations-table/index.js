@@ -29,7 +29,6 @@ import { getAuthorizationsList } from '@account/store/actions/authorizations'
 import {
   selectAuthorizations,
   selectAuthorizationsTotalCount,
-  selectAuthorizationsFetching,
 } from '@account/store/selectors/authorizations'
 import { selectUserId } from '@account/store/selectors/user'
 
@@ -67,11 +66,10 @@ const OAuthClientAuthorizationsTable = () => {
   }, [])
 
   const baseDataSelector = createSelector(
-    [selectAuthorizations, selectAuthorizationsTotalCount, selectAuthorizationsFetching],
-    (authorizations, totalCount, fetching) => ({
+    [selectAuthorizations, selectAuthorizationsTotalCount],
+    (authorizations, totalCount) => ({
       authorizations,
       totalCount,
-      fetching,
       mayAdd: false,
     }),
   )
