@@ -12,11 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
-import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
-
-import { GET_WEBHOOK_BASE, GET_WEBHOOKS_LIST_BASE } from '@console/store/actions/webhooks'
-
 const selectWebhookStore = state => state.webhooks
 
 // Webhook.
@@ -24,11 +19,7 @@ export const selectWebhookEntityStore = state => selectWebhookStore(state).entit
 export const selectSelectedWebhookId = state => selectWebhookStore(state).selectedWebhook
 export const selectSelectedWebhook = state =>
   selectWebhookEntityStore(state)[selectSelectedWebhookId(state)]
-export const selectWebhookError = createErrorSelector(GET_WEBHOOK_BASE)
-export const selectWebhookFetching = createFetchingSelector(GET_WEBHOOK_BASE)
 
 // Webhooks.
 export const selectWebhooks = state => Object.values(selectWebhookEntityStore(state))
 export const selectWebhooksTotalCount = state => selectWebhookStore(state).totalCount
-export const selectWebhooksFetching = createFetchingSelector(GET_WEBHOOKS_LIST_BASE)
-export const selectWebhooksError = createErrorSelector(GET_WEBHOOKS_LIST_BASE)

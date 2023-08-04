@@ -16,10 +16,6 @@ import {
   createPaginationIdsSelectorByEntity,
   createPaginationTotalCountSelectorByEntity,
 } from '@ttn-lw/lib/store/selectors/pagination'
-import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
-import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
-
-import { GET_API_KEY_BASE, GET_API_KEYS_LIST_BASE } from '@console/store/actions/api-keys'
 
 const ENTITY = 'apiKeys'
 
@@ -29,17 +25,11 @@ export const selectApiKeysEntitiesStore = state => selectApiKeysStore(state).ent
 export const selectApiKeyById = (state, id) => selectApiKeysEntitiesStore(state)[id]
 export const selectSelectedApiKeyId = state => selectApiKeysStore(state).selectedApiKey
 export const selectSelectedApiKey = state => selectApiKeyById(state, selectSelectedApiKeyId(state))
-export const selectApiKeyFetching = createFetchingSelector(GET_API_KEY_BASE)
-export const selectApiKeyError = createErrorSelector(GET_API_KEY_BASE)
 
 // Api keys.
 const createSelectApiKeysIdsSelector = createPaginationIdsSelectorByEntity(ENTITY)
 const createSelectApiKeysTotalCountSelector = createPaginationTotalCountSelectorByEntity(ENTITY)
-const createSelectApiKeysFetchingSelector = createFetchingSelector(GET_API_KEYS_LIST_BASE)
-const createSelectApiKeysErrorSelector = createErrorSelector(GET_API_KEYS_LIST_BASE)
 
 export const selectApiKeys = state =>
   createSelectApiKeysIdsSelector(state).map(id => selectApiKeyById(state, id))
 export const selectApiKeysTotalCount = state => createSelectApiKeysTotalCountSelector(state)
-export const selectApiKeysFetching = state => createSelectApiKeysFetchingSelector(state)
-export const selectApiKeysError = state => createSelectApiKeysErrorSelector(state)

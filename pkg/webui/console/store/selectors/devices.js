@@ -14,15 +14,11 @@
 
 import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
 import { combineDeviceIds, extractDeviceIdFromCombinedId } from '@ttn-lw/lib/selectors/id'
-import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
-import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
 import {
   createPaginationIdsSelectorByEntity,
   createPaginationTotalCountSelectorByEntity,
 } from '@ttn-lw/lib/store/selectors/pagination'
 import { selectAsConfig, selectJsConfig, selectNsConfig } from '@ttn-lw/lib/selectors/env'
-
-import { GET_DEV_BASE, GET_DEVICES_LIST_BASE } from '@console/store/actions/devices'
 
 import {
   createEventsSelector,
@@ -50,8 +46,6 @@ export const selectSelectedCombinedDeviceId = state => selectDeviceStore(state).
 export const selectSelectedDevice = state =>
   selectDeviceById(state, selectSelectedCombinedDeviceId(state))
 export const selectSelectedDeviceFormatters = state => selectSelectedDevice(state).formatters
-export const selectDeviceFetching = createFetchingSelector(GET_DEV_BASE)
-export const selectDeviceError = createErrorSelector(GET_DEV_BASE)
 export const isOtherClusterDevice = device => {
   const isOtherCluster =
     getHostnameFromUrl(selectAsConfig().base_url) !== device.application_server_address &&
@@ -96,13 +90,9 @@ export const selectDevicesWithLastSeen = state => {
 // Devices.
 const selectDevsIds = createPaginationIdsSelectorByEntity(ENTITY)
 const selectDevsTotalCount = createPaginationTotalCountSelectorByEntity(ENTITY)
-const selectDevsFetching = createFetchingSelector(GET_DEVICES_LIST_BASE)
-const selectDevsError = createErrorSelector(GET_DEVICES_LIST_BASE)
 
 export const selectDevices = state => selectDevsIds(state).map(id => selectDeviceById(state, id))
 export const selectDevicesTotalCount = state => selectDevsTotalCount(state)
-export const selectDevicesFetching = state => selectDevsFetching(state)
-export const selectDevicesError = state => selectDevsError(state)
 
 // Events.
 export const selectDeviceEvents = createEventsSelector(ENTITY)

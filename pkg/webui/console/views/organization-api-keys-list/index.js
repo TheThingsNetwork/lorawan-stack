@@ -26,12 +26,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { getApiKeysList } from '@console/store/actions/api-keys'
 
-import {
-  selectApiKeys,
-  selectApiKeysTotalCount,
-  selectApiKeysFetching,
-  selectApiKeysError,
-} from '@console/store/selectors/api-keys'
+import { selectApiKeys, selectApiKeysTotalCount } from '@console/store/selectors/api-keys'
 
 const OrganizationApiKeysList = () => {
   const { orgId } = useParams()
@@ -46,8 +41,6 @@ const OrganizationApiKeysList = () => {
       return {
         keys: selectApiKeys(state, id),
         totalCount: selectApiKeysTotalCount(state, id),
-        fetching: selectApiKeysFetching(state),
-        error: selectApiKeysError(state),
       }
     },
     [orgId],

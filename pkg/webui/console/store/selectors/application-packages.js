@@ -12,14 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
 import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
 
-import {
-  GET_APP_PKG_DEFAULT_ASSOC_BASE,
-  SET_APP_PKG_DEFAULT_ASSOC_BASE,
-  DELETE_APP_PKG_DEFAULT_ASSOC_BASE,
-} from '@console/store/actions/application-packages'
+import { GET_APP_PKG_DEFAULT_ASSOC_BASE } from '@console/store/actions/application-packages'
 
 const selectApplicationPackagesStore = state => state.applicationPackages
 
@@ -32,16 +27,3 @@ export const selectApplicationPackageDefaultAssociation = (state, fPort) =>
   selectApplicationPackageDefaultAssociations(state)[fPort]
 
 export const selectGetApplicationPackagesError = createErrorSelector(GET_APP_PKG_DEFAULT_ASSOC_BASE)
-export const selectGetApplicationPackagesFetching = createFetchingSelector(
-  GET_APP_PKG_DEFAULT_ASSOC_BASE,
-)
-export const selectSetApplicationPackagesError = createErrorSelector(SET_APP_PKG_DEFAULT_ASSOC_BASE)
-export const selectSetApplicationPackagesFetching = createFetchingSelector(
-  SET_APP_PKG_DEFAULT_ASSOC_BASE,
-)
-export const selectDeleteApplicationPackagesError = createErrorSelector(
-  DELETE_APP_PKG_DEFAULT_ASSOC_BASE,
-)
-export const selectDeleteApplicationPackagesFetching = createFetchingSelector(
-  DELETE_APP_PKG_DEFAULT_ASSOC_BASE,
-)
