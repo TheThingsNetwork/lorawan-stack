@@ -12,39 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
-import bind from 'autobind-decorator'
+import React, { useCallback } from 'react'
+import { useSelector } from 'react-redux'
 import { Navigate } from 'react-router-dom'
 
 import toast from '@ttn-lw/components/toast'
 
 import PropTypes from '../../../lib/prop-types'
 
-@connect((state, props) => {
-  const { featureCheck, condition } = props
-  const rights = featureCheck && featureCheck.rightsSelector(state)
-  return {
-    condition: condition || (Boolean(featureCheck) && featureCheck.check(rights)),
-  }
-})
-export default class Require extends Component {
-  static propTypes = {
-    children: PropTypes.node.isRequired,
-    condition: PropTypes.bool.isRequired,
-    otherwise: PropTypes.shape({
-      redirect: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
-      render: PropTypes.func,
-      message: PropTypes.message,
-    }),
-  }
-  static defaultProps = {
-    otherwise: undefined,
-  }
+const Require = ({ children, featureCheck, condition, otherwise }) => {
+  const rights = useSelector(state => featureCheck?.rightsSelector(state))
+  const newCondition = condition || (Boolean(featureCheck) && featureCheck.check(rights))
 
-  @bind
-  alternativeRender() {
-    const { otherwise } = this.props
+  const alternativeRender = useCallback(() => {
     if (typeof otherwise === 'object') {
       const { render, redirect, message } = otherwise
 
@@ -63,14 +43,26 @@ export default class Require extends Component {
     }
 
     return null
-  }
-  render() {
-    const { condition, children } = this.props
+  }, [otherwise])
 
-    if (!condition) {
-      return this.alternativeRender()
-    }
-
-    return children
+  if (!newCondition) {
+    return alternativeRender()
   }
+
+  return children
 }
+
+Require.propTypes = {
+  children: PropTypes.node.isRequired,
+  condition: PropTypes.bool.isRequired,
+  otherwise: PropTypes.shape({
+    redirect: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+    render: PropTypes.func,
+    message: PropTypes.message,
+  }),
+}
+Require.defaultProps = {
+  otherwise: undefined,
+}
+
+export default Require
