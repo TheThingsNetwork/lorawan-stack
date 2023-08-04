@@ -22,6 +22,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- OAuth clients created by an admin no longer trigger an email requesting approval from one of the tenant's admins.
+
 ### Security
 
 ## [3.27.0] - 2023-07-31
