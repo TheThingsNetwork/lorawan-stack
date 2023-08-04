@@ -34,7 +34,7 @@ const Entry = ({
   onRemoveButtonClick,
   onChange,
   onBlur,
-  inputElement,
+  inputElement: InputElement,
   indexAsKey,
   valuePlaceholder,
   keyPlaceholder,
@@ -81,8 +81,6 @@ const Entry = ({
     },
     [onBlur, name, value, _getKeyInputName, _getValueInputName],
   )
-
-  const { InputElement } = inputElement
 
   return (
     <div className={style.entriesRow}>

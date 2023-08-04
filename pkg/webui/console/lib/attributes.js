@@ -59,4 +59,6 @@ export const attributeKeyTooLongCheck = object =>
 export const attributeValueTooLongCheck = object =>
   object === undefined ||
   object === null ||
-  (object instanceof Object && Object.values(object).every(value => value.length <= 200))
+  (object instanceof Object &&
+    Object.values(object).some(value => value !== undefined) &&
+    Object.values(object).every(value => value.length <= 200))
