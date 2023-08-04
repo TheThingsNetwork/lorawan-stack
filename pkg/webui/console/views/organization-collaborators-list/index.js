@@ -33,7 +33,7 @@ import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
 const OrganizationCollaboratorsList = () => {
   const { orgId } = useParams()
   const getItemsAction = useCallback(
-    () => filters => getCollaboratorsList('organization', orgId, filters),
+    filters => getCollaboratorsList('organization', orgId, filters),
     [orgId],
   )
 

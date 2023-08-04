@@ -84,9 +84,6 @@ const FetchTable = props => {
 
   const dispatch = useDispatch()
   const defaultTab = tabs.length > 0 ? tabs[0].name : undefined
-
-  const [fetching, fetchingError] = useRequest(getItemsAction)
-  const [fetchingSearch] = useRequest(searchItemsAction)
   const [page, setPage] = useQueryState('page', 1, parseInt)
   const [tab, setTab] = useQueryState('tab', defaultTab)
   const [order, setOrder] = useQueryState('order', defaultOrder)
@@ -101,13 +98,14 @@ const FetchTable = props => {
 
   const [initialFetch, setInitialFetch] = useState(true)
   const base = useSelector(state => baseDataSelector(state, props))
-  const [error, setError] = useState(fetchingError)
   const items = base[props.entity] || []
   const totalCount = base.totalCount || 0
   const mayAdd = 'mayAdd' in base ? base.mayAdd : true
   const mayLink = 'mayLink' in base ? base.mayLink : true
 
   const filters = { query: debouncedQuery, tab, order, page }
+  const [fetching, fetchingError] = useRequest(getItemsAction(filters))
+  const [error, setError] = useState(fetchingError)
   let orderDirection, orderBy
   // Parse order string.
   if (typeof order === 'string') {
@@ -258,7 +256,6 @@ const FetchTable = props => {
               data-test-id="search-input"
               value={query}
               icon="search"
-              loading={fetchingSearch}
               onChange={onQueryChange}
               placeholder={searchPlaceholderMessage}
               className={style.searchBar}

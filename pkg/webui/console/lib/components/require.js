@@ -54,7 +54,6 @@ const Require = ({ children, featureCheck, condition, otherwise }) => {
 
 Require.propTypes = {
   children: PropTypes.node.isRequired,
-  condition: PropTypes.bool.isRequired,
   otherwise: PropTypes.shape({
     redirect: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
     render: PropTypes.func,
@@ -63,6 +62,7 @@ Require.propTypes = {
 }
 Require.defaultProps = {
   otherwise: undefined,
+  condition: false,
 }
 
 export default Require

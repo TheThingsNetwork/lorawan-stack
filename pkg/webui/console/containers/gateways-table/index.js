@@ -213,7 +213,7 @@ const GatewaysTable = () => {
     selectGateways,
     selectGatewaysTotalCount,
     mayAddSelector,
-    (gateways, totalCount, fetching, mayAdd) => ({
+    (gateways, totalCount, mayAdd) => ({
       gateways,
       totalCount,
       mayAdd,

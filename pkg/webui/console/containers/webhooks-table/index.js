@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { createSelector } from 'reselect'
 import { useParams } from 'react-router-dom'
@@ -45,11 +45,10 @@ const m = defineMessages({
 
 const WebhooksTable = () => {
   const { appId } = useParams()
-  const dispatch = useDispatch()
   const healthStatusEnabled = useSelector(selectWebhooksHealthStatusEnabled)
   const getWebhooksListCallback = useCallback(
-    () => dispatch(getWebhooksList(appId, ['template_ids', 'health_status'])),
-    [appId, dispatch],
+    () => getWebhooksList(appId, ['template_ids', 'health_status']),
+    [appId],
   )
 
   const baseDataSelector = createSelector(

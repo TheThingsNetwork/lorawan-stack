@@ -191,7 +191,7 @@ const OrganizationsTable = () => {
     selectOrganizationsWithCollaboratorCount,
     selectOrganizationsTotalCount,
     mayAddSelector,
-    (organizations, totalCount, fetching, mayAdd) => ({
+    (organizations, totalCount, mayAdd) => ({
       organizations,
       totalCount,
       mayAdd,
