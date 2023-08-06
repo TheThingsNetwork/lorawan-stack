@@ -42,6 +42,7 @@ const (
 	gofumpt      = "mvdan.cc/gofumpt@v0.4.0"
 	golangciLint = "github.com/golangci/golangci-lint/cmd/golangci-lint@v1.50.1"
 	goveralls    = "github.com/mattn/goveralls@v0.0.11"
+	bufCLI       = "github.com/bufbuild/buf/cmd/buf@v1.25.1"
 )
 
 func buildGoArgs(cmd string, args ...string) []string {

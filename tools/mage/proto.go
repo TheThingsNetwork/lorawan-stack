@@ -283,6 +283,16 @@ func (p Proto) All(ctx context.Context) {
 	mg.CtxDeps(ctx, Proto.Go, Proto.Swagger, Proto.Markdown, Proto.JsSDK)
 }
 
+// Fmt formats and simplifies all proto files.
+func (p Proto) Fmt(ctx context.Context) error {
+	return runGoTool(append([]string{bufCLI, "format", "-w"}, "api")...)
+}
+
+// Lint lints all proto files.
+func (p Proto) Lint(ctx context.Context) error {
+	return runGoTool(append([]string{bufCLI, "lint"}, "api")...)
+}
+
 // Clean removes generated protos.
 func (p Proto) Clean(ctx context.Context) {
 	mg.CtxDeps(ctx, Proto.GoClean, Proto.SwaggerClean, Proto.MarkdownClean, Proto.JsSDKClean)

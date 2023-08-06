@@ -27,5 +27,7 @@ jobs:
         run: tools/bin/mage dev:misspell
       - name: Format SQL files
         run: tools/bin/mage sql:fmt
+      - name: Format proto files
+        run: tools/bin/mage proto:fmt
       - name: Check for diff
         run: tools/bin/mage git:diff
