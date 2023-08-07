@@ -159,7 +159,7 @@ func (is *IdentityServer) createClient( //nolint:gocyclo
 		return nil, err
 	}
 	apikey := authInfo.GetApiKey().GetApiKey()
-	if cli.State == ttnpb.State_STATE_REQUESTED {
+	if !createdByAdmin && cli.State == ttnpb.State_STATE_REQUESTED {
 		go is.notifyAdminsInternal(ctx, &ttnpb.CreateNotificationRequest{
 			EntityIds:        req.GetClient().GetIds().GetEntityIdentifiers(),
 			NotificationType: "client_requested",
