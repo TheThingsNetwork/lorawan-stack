@@ -44,11 +44,15 @@ var (
 		Length: 64,
 	}
 	unsupportedJoinEUI = types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0D}
+	unsupportedDevEUI  = types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0xFF}
 	devEUI             = types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30}
 	validEndDeviceIds  = &ttnpb.EndDeviceIdentifiers{
 		DevEui:  devEUI.Bytes(),
 		JoinEui: types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0C}.Bytes(),
 	}
+	devEUI1 = types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x31}
+	devEUI2 = types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x32}
+	devEUI3 = types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x33}
 )
 
 func TestTTJS(t *testing.T) { //nolint:paralleltest
@@ -234,4 +238,169 @@ func TestTTJS(t *testing.T) { //nolint:paralleltest
 	a.So(retHomeNSID, should.Equal, homeNSID)
 	a.So(err, should.BeNil)
 	a.So(ret.VendorSpecific, should.BeNil)
+}
+
+func TestBatchOperations(t *testing.T) { //nolint:paralleltest
+	a, ctx := test.New(t)
+	lis, err := net.Listen("tcp", serverAddress)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	t.Cleanup(func() {
+		lis.Close()
+	})
+
+	ctx, cancel := context.WithCancel(ctx)
+	t.Cleanup(func() {
+		cancel()
+	})
+
+	c := componenttest.NewComponent(t, &component.Config{})
+
+	mockTTJS := mockTTJS{
+		joinEUIPrefixes: []types.EUI64Prefix{
+			supportedJoinEUIPrefix,
+		},
+		lis: lis,
+		clients: map[string]clientData{
+			client1ASID: {
+				cert: testdata.Client1Cert,
+			},
+			client2ASID: {
+				cert: testdata.Client2Cert,
+			},
+		},
+		provisonedDevices: map[types.EUI64]device{
+			devEUI1: {
+				claimAuthenticationCode: claimAuthenticationCode,
+			},
+			devEUI2: {
+				claimAuthenticationCode: claimAuthenticationCode,
+			},
+			devEUI3: {
+				claimAuthenticationCode: claimAuthenticationCode,
+			},
+		},
+	}
+
+	go mockTTJS.Start(ctx) //nolint:errcheck
+	fetcher := fetch.FromFilesystem("testdata")
+
+	client := ttjsv2.NewClient(c, fetcher, ttjsv2.Config{
+		NetID: test.DefaultNetID,
+		NSID:  &homeNSID,
+		ASID:  "localhost",
+		JoinEUIPrefixes: []types.EUI64Prefix{
+			supportedJoinEUIPrefix,
+		},
+		ConfigFile: ttjsv2.ConfigFile{
+			URL: fmt.Sprintf("https://%s", lis.Addr().String()),
+			TLS: ttjsv2.TLSConfig{
+				RootCA:      "rootCA.pem",
+				Source:      "file",
+				Certificate: "clientcert-1.pem",
+				Key:         "clientkey-1.pem",
+			},
+		},
+	})
+
+	client1 := ttjsv2.NewClient(c, fetcher, ttjsv2.Config{
+		NetID: test.DefaultNetID,
+		NSID:  &homeNSID,
+		ASID:  "localhost1",
+		JoinEUIPrefixes: []types.EUI64Prefix{
+			supportedJoinEUIPrefix,
+		},
+		ConfigFile: ttjsv2.ConfigFile{
+			URL: fmt.Sprintf("https://%s", lis.Addr().String()),
+			TLS: ttjsv2.TLSConfig{
+				RootCA:      "rootCA.pem",
+				Source:      "file",
+				Certificate: "clientcert-2.pem",
+				Key:         "clientkey-2.pem",
+			},
+		},
+	})
+
+	// Check JoinEUI support.
+	a.So(client.SupportsJoinEUI(unsupportedJoinEUI), should.BeFalse)
+	a.So(client.SupportsJoinEUI(supportedJoinEUI), should.BeTrue)
+
+	// Claim Devices.
+	for _, dev := range []types.EUI64{devEUI1, devEUI2, devEUI3} {
+		err = client.Claim(ctx, supportedJoinEUI, dev, claimAuthenticationCode)
+		a.So(err, should.BeNil)
+	}
+
+	// Check Claim Status.
+	for _, dev := range []types.EUI64{devEUI1, devEUI2, devEUI3} {
+		ret, err := client.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
+			DevEui:  dev.Bytes(),
+			JoinEui: supportedJoinEUI.Bytes(),
+		})
+		a.So(err, should.BeNil)
+		a.So(ret, should.NotBeNil)
+		a.So(ret.EndDeviceIds, should.Resemble, &ttnpb.EndDeviceIdentifiers{
+			DevEui:  dev.Bytes(),
+			JoinEui: supportedJoinEUI.Bytes(),
+		})
+		a.So(ret.HomeNetId, should.Resemble, test.DefaultNetID.Bytes())
+		var retHomeNSID types.EUI64
+		err = retHomeNSID.Unmarshal(ret.HomeNsId)
+		a.So(err, should.BeNil)
+		a.So(retHomeNSID, should.Equal, homeNSID)
+		a.So(ret.VendorSpecific, should.BeNil)
+	}
+
+	// Unclaim Devices.
+
+	// Different client.
+	ret, err := client1.BatchUnclaim(ctx, []*ttnpb.EndDeviceIdentifiers{
+		{
+			DevEui:  devEUI1.Bytes(),
+			JoinEui: supportedJoinEUI.Bytes(),
+		},
+		{
+			DevEui:  devEUI2.Bytes(),
+			JoinEui: supportedJoinEUI.Bytes(),
+		},
+		{
+			DevEui:  devEUI3.Bytes(),
+			JoinEui: supportedJoinEUI.Bytes(),
+		},
+	})
+	a.So(errors.IsInvalidArgument(err), should.BeTrue)
+	a.So(len(ret), should.Equal, 3)
+
+	// One Invalid device.
+	devIds := &ttnpb.EndDeviceIdentifiers{
+		DevEui:  unsupportedDevEUI.Bytes(),
+		JoinEui: supportedJoinEUI.Bytes(),
+	}
+	ret, err = client.BatchUnclaim(ctx, []*ttnpb.EndDeviceIdentifiers{
+		{
+			DevEui:  devEUI1.Bytes(),
+			JoinEui: supportedJoinEUI.Bytes(),
+		},
+		devIds,
+	})
+	a.So(errors.IsInvalidArgument(err), should.BeTrue)
+	a.So(len(ret), should.Equal, 1)
+	for eui := range ret {
+		a.So(eui, should.Resemble, unsupportedDevEUI)
+	}
+
+	// Valid batch.
+	ret, err = client.BatchUnclaim(ctx, []*ttnpb.EndDeviceIdentifiers{
+		{
+			DevEui:  devEUI2.Bytes(),
+			JoinEui: supportedJoinEUI.Bytes(),
+		},
+		{
+			DevEui:  devEUI3.Bytes(),
+			JoinEui: supportedJoinEUI.Bytes(),
+		},
+	})
+	a.So(err, should.BeNil)
+	a.So(len(ret), should.Equal, 0)
 }

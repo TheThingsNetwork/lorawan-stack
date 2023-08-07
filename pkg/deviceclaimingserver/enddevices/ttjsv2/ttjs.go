@@ -376,17 +376,20 @@ func (c *TTJS) BatchUnclaim(
 
 	switch resp.StatusCode {
 	case http.StatusBadRequest:
-		var resp any
+		var (
+			resp    EndDevicesErrors
+			message string
+		)
 		err = json.Unmarshal(respBody, &resp)
-		if err != nil {
-			logger.WithError(err).Warn("Failed to decode error message")
-		}
-
-		var message string
-		m, ok := resp.(EndDevicesErrors)
-		if ok {
-			for eui, r := range m {
-				ret[types.MustEUI64([]byte(eui)).OrZero()] = errUnclaimDevice.WithAttributes("message", r.Message)
+		if err == nil {
+			for euiText, r := range resp {
+				var eui types.EUI64
+				err := eui.UnmarshalText([]byte(euiText))
+				if err != nil {
+					logger.WithError(err).WithField("eui", euiText).Warn("Failed to decode EUI")
+					continue
+				}
+				ret[eui] = errUnclaimDevice.WithAttributes("message", r.Message)
 			}
 		} else {
 			var errResp ErrorResponse
