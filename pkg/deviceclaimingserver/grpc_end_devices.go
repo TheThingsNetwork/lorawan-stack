@@ -252,6 +252,8 @@ func (srv *endDeviceBatchClaimingServer) Unclaim(
 
 	// End Devices within an application can have different JoinEUIs.
 	// We group them by the JoinEUI and claim them in batches.
+	// We also keep track of EUIs to device IDs to report errors (if any).
+	devEUIToIDs := make(map[types.EUI64]*ttnpb.EndDeviceIdentifiers)
 	claimers := make(map[enddevices.EndDeviceClaimer][]*ttnpb.EndDeviceIdentifiers)
 	for _, dev := range devs.EndDevices {
 		ids := dev.GetIds()
@@ -260,7 +262,7 @@ func (srv *endDeviceBatchClaimingServer) Unclaim(
 		}
 		joinEUI := types.MustEUI64(ids.JoinEui).OrZero()
 		claimer := srv.DCS.endDeviceClaimingUpstream.JoinEUIClaimer(ctx, joinEUI)
-		if claimer == nil {
+		if claimer == nil { // Claiming not supported for this JoinEUI.
 			continue
 		}
 		devIDs := claimers[claimer]
@@ -269,13 +271,24 @@ func (srv *endDeviceBatchClaimingServer) Unclaim(
 		}
 		devIDs = append(devIDs, ids)
 		claimers[claimer] = devIDs
+		devEUIToIDs[types.EUI64(ids.DevEui)] = ids
 	}
+
+	// Claim in batches of Join EUIs (claimers).
 	for claimer, devIDs := range claimers {
 		res, err := claimer.BatchUnclaim(ctx, devIDs)
 		if err != nil {
-			return nil, err
+			if !errors.IsInvalidArgument(err) {
+				break // Batch-level failure, stop further claiming.
+			}
+			// Collect the per-device errors.
+			for eui, err := range res {
+				ret.Failed = append(ret.Failed, &ttnpb.BatchUnclaimEndDevicesResponse_Failed{
+					EndDeviceIds: devEUIToIDs[eui],
+					ErrorDetails: ttnpb.ErrorDetailsToProto(err),
+				})
+			}
 		}
-		ret.Failed = append(ret.Failed, res.Failed...)
 	}
 
 	return ret, nil

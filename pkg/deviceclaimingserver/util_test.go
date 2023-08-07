@@ -17,6 +17,7 @@ package deviceclaimingserver_test
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
@@ -60,6 +61,6 @@ func (MockClaimer) Unclaim(_ context.Context,
 func (MockClaimer) BatchUnclaim(
 	_ context.Context,
 	_ []*ttnpb.EndDeviceIdentifiers,
-) (*ttnpb.BatchUnclaimEndDevicesResponse, error) {
-	return &ttnpb.BatchUnclaimEndDevicesResponse{}, nil
+) (map[types.EUI64]errors.ErrorDetails, error) {
+	return make(map[types.EUI64]errors.ErrorDetails), nil
 }

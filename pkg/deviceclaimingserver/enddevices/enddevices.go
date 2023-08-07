@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices/ttjsv2"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -44,8 +45,14 @@ type EndDeviceClaimer interface {
 	// Unclaim releases the claim on an End Device.
 	Unclaim(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (err error)
 
-	// BatchUnclaim release the claim on a batch of End Devices.
-	BatchUnclaim(ctx context.Context, ids []*ttnpb.EndDeviceIdentifiers) (*ttnpb.BatchUnclaimEndDevicesResponse, error)
+	// BatchUnclaim releases the claim on a batch of end devices.
+	// All devices in a batch must have the same Join EUI.
+	// If the returned error is of type `InvalidArgument`,
+	// the returned error map will contain errors for individual devices.
+	BatchUnclaim(
+		ctx context.Context,
+		ids []*ttnpb.EndDeviceIdentifiers,
+	) (map[types.EUI64]errors.ErrorDetails, error)
 }
 
 // Component abstracts the underlying *component.Component.

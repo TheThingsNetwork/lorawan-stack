@@ -109,6 +109,7 @@ var (
 	errDeviceNotClaimed     = errors.DefineNotFound("device_not_claimed", "device with EUI `{dev_eui}` not claimed")
 	errDeviceAccessDenied   = errors.DefinePermissionDenied("device_access_denied", "access to device with `{dev_eui}` denied: device is already claimed or the owner token is invalid") //nolint:lll
 	errUnauthenticated      = errors.DefineUnauthenticated("unauthenticated", "unauthenticated")
+	errUnclaimDevice        = errors.Define("unclaim_device", "failed to unclaim device with EUI `{dev_eui}`", "message")
 )
 
 // Claim implements EndDeviceClaimer.
@@ -322,12 +323,87 @@ func (c *TTJS) GetClaimStatus(
 	}
 }
 
-// BatchClaim implements EndDeviceClaimer.
+// BatchUnclaim implements EndDeviceClaimer.
 func (c *TTJS) BatchUnclaim(
 	ctx context.Context,
 	ids []*ttnpb.EndDeviceIdentifiers,
-) (*ttnpb.BatchUnclaimEndDevicesResponse, error) {
-	return nil, nil
+) (map[types.EUI64]errors.ErrorDetails, error) {
+	ret := make(map[types.EUI64]errors.ErrorDetails)
+	if len(ids) == 0 {
+		return ret, nil
+	}
+	var euis string
+	// All devices will have the Join EUI for this call.
+	joinEUI := types.MustEUI64(ids[0].JoinEui).OrZero()
+	for _, ids := range ids {
+		devEUI := types.MustEUI64(ids.DevEui).OrZero()
+		if euis != "" {
+			euis += ","
+		}
+		euis += devEUI.String()
+	}
+
+	reqURL := fmt.Sprintf("%s/api/v2/devices/%s/claims", c.config.URL, euis)
+	logger := log.FromContext(ctx).WithFields(log.Fields(
+		"join_eui", joinEUI,
+		"url", reqURL,
+	))
+
+	logger.Debug("Unclaim end devices")
+	request, err := http.NewRequestWithContext(ctx, http.MethodDelete, reqURL, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	client, err := c.httpClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := client.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if isSuccess(resp.StatusCode) {
+		return ret, nil
+	}
+
+	switch resp.StatusCode {
+	case http.StatusBadRequest:
+		var resp any
+		err = json.Unmarshal(respBody, &resp)
+		if err != nil {
+			logger.WithError(err).Warn("Failed to decode error message")
+		}
+
+		var message string
+		m, ok := resp.(EndDevicesErrors)
+		if ok {
+			for eui, r := range m {
+				ret[types.MustEUI64([]byte(eui)).OrZero()] = errUnclaimDevice.WithAttributes("message", r.Message)
+			}
+		} else {
+			var errResp ErrorResponse
+			err = json.Unmarshal(respBody, &errResp)
+			if err != nil {
+				logger.WithError(err).Warn("Failed to decode error message")
+			} else {
+				logger.WithField("error", errResp.Message).Warn("Failed to unclaim end devices")
+			}
+			message = errResp.Message
+		}
+		return ret, errBadRequest.WithAttributes("message", message)
+	case http.StatusUnauthorized:
+		return nil, errUnauthenticated.New()
+	default:
+		return nil, errors.FromHTTPStatusCode(resp.StatusCode)
+	}
 }
 
 // isSuccess returns true if the HTTP status code is 2xx.
