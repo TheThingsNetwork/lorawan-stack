@@ -70,7 +70,7 @@ const Entry = ({
       const { relatedTarget } = event
       const nextTarget = relatedTarget || {}
 
-      if (nextTarget.name !== _getKeyInputName() && nextTarget.name !== _getValueInputName()) {
+      if (nextTarget.name !== _getKeyInputName && nextTarget.name !== _getValueInputName) {
         onBlur({
           target: {
             name,
