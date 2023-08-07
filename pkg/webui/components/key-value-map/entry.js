@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { defineMessages } from 'react-intl'
 import classnames from 'classnames'
 
@@ -40,9 +40,9 @@ const Entry = ({
   keyPlaceholder,
   additionalInputProps,
 }) => {
-  const _getKeyInputName = useCallback(() => `${name}[${index}].key`, [index, name])
+  const _getKeyInputName = useMemo(() => `${name}[${index}].key`, [index, name])
 
-  const _getValueInputName = useCallback(() => `${name}[${index}].value`, [index, name])
+  const _getValueInputName = useMemo(() => `${name}[${index}].value`, [index, name])
 
   const handleRemoveButtonClicked = useCallback(
     event => {
