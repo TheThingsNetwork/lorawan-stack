@@ -22,9 +22,8 @@ import Radio from '@ttn-lw/components/radio-button'
 
 import Message from '@ttn-lw/lib/components/message'
 
-import useComputedProps from '@ttn-lw/lib/hooks/use-computed-props'
-
-import { RIGHT_ALL } from '@console/lib/rights'
+import PropTypes from '@ttn-lw/lib/prop-types'
+import useDerivedRightProps from '@ttn-lw/lib/hooks/use-derived-rights-props'
 
 import style from './rights-group.styl'
 
@@ -41,73 +40,25 @@ const m = defineMessages({
     'This implicitly includes the rights to view application information, read application traffic and write downlinks',
 })
 
-const computeProps = props => {
-  const { value, pseudoRight: grantablePseudoRight, rights: grantableRights } = props
-
-  // Extract the pseudo right from own rights or granted rights.
-  let derivedPseudoRight = []
-  if (grantablePseudoRight && !Array.isArray(grantablePseudoRight)) {
-    derivedPseudoRight = [grantablePseudoRight]
-  } else if (grantablePseudoRight && Array.isArray(grantablePseudoRight)) {
-    derivedPseudoRight = grantablePseudoRight
-  } else {
-    derivedPseudoRight = value.filter(right => right !== RIGHT_ALL && right.endsWith('_ALL'))
-  }
-  // Filter out rights that the entity has but may not be granted by the user.
-  const outOfOwnScopeRights = !Boolean(grantablePseudoRight)
-    ? value.filter(right => !grantableRights.includes(right))
-    : []
-
-  // Extract all rights by combining granted and grantable rights.
-  const derivedRights = [...grantableRights, ...outOfOwnScopeRights].sort()
-
-  // Store whether out of scope pseudo rights are present.
-  const hasOutOfOwnScopePseudoRight =
-    outOfOwnScopeRights.filter(right => right.endsWith('_ALL')).length !== 0
-
-  // Store granted individual rights.
-  const grantedIndividualRights = value.filter(right => !derivedPseudoRight.includes(right))
-
-  // Store out of own scope individual rights.
-  const outOfOwnScopeIndividualRights = !Boolean(grantablePseudoRight)
-    ? grantedIndividualRights.filter(right => !grantableRights.includes(right))
-    : []
-
-  // Determine whether a pseudo right is granted.
-  const hasPseudoRightGranted =
-    value.includes(RIGHT_ALL) ||
-    derivedPseudoRight.some(derivedRight => value.includes(derivedRight))
-
-  // Determine the current grant type.
-  const grantType = hasPseudoRightGranted ? 'pseudo' : 'individual'
-
-  return {
-    outOfOwnScopeIndividualRights,
-    hasOutOfOwnScopePseudoRight,
-    derivedPseudoRight,
-    derivedRights,
-    hasPseudoRightGranted,
-    grantType,
-    ...props,
-  }
-}
-
-const RightsGroup = props => {
+const RightsGroup = ({
+  className,
+  disabled,
+  entityTypeMessage,
+  onBlur,
+  onChange,
+  pseudoRight,
+  rights,
+  value,
+}) => {
   const {
-    className,
+    outOfOwnScopeIndividualRights,
+    hasOutOfOwnScopePseudoRight,
     derivedPseudoRight,
     derivedRights,
-    disabled,
-    entityTypeMessage,
-    grantType,
-    hasOutOfOwnScopePseudoRight,
     hasPseudoRightGranted,
-    onBlur,
-    onChange,
-    outOfOwnScopeIndividualRights,
-    pseudoRight,
-    value,
-  } = useComputedProps(computeProps, props)
+    grantType,
+  } = useDerivedRightProps(value, pseudoRight, rights)
+
   const intl = useIntl()
   const { formatMessage } = intl
   const [individualRightValue, setIndividualRightValue] = React.useState([])
@@ -241,6 +192,36 @@ const RightsGroup = props => {
       </Checkbox.Group>
     </div>
   )
+}
+
+RightsGroup.propTypes = {
+  /** The class to be added to the container. */
+  className: PropTypes.string,
+  /** A flag indicating whether the whole component should be disabled. */
+  disabled: PropTypes.bool,
+  /**
+   * The message depicting the type of entity this component is setting the
+   * rights for.
+   */
+  entityTypeMessage: PropTypes.message.isRequired,
+  /** The Blur event hook. */
+  onBlur: PropTypes.func,
+  /** The Change event hook. */
+  onChange: PropTypes.func,
+  /** The pseudo right literal comprising all other rights. */
+  pseudoRight: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
+  /** The pseudo right derived from the current entity or user. */
+  rights: PropTypes.rights.isRequired,
+  /** The rights value. */
+  value: PropTypes.rights.isRequired,
+}
+
+RightsGroup.defaultProps = {
+  className: undefined,
+  disabled: false,
+  onBlur: () => null,
+  onChange: () => null,
+  pseudoRight: undefined,
 }
 
 export default RightsGroup
