@@ -86,9 +86,9 @@ const Entry = ({
     <div className={style.entriesRow}>
       {!indexAsKey && (
         <InputElement
-          data-test-id={_getKeyInputName()}
+          data-test-id={_getKeyInputName}
           className={style.input}
-          name={_getKeyInputName()}
+          name={_getKeyInputName}
           placeholder={keyPlaceholder}
           type="text"
           onChange={handleKeyChanged}
@@ -100,9 +100,9 @@ const Entry = ({
         />
       )}
       <InputElement
-        data-test-id={_getValueInputName()}
+        data-test-id={_getValueInputName}
         className={classnames(style.input, { [style.inputIndexAsKey]: indexAsKey })}
-        name={_getValueInputName()}
+        name={_getValueInputName}
         placeholder={valuePlaceholder}
         type="text"
         onChange={handleValueChanged}
