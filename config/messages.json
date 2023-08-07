@@ -3725,9 +3725,18 @@
       "file": "grpc_end_devices.go"
     }
   },
-  "error:pkg/deviceclaimingserver:no_eui": {
+  "error:pkg/deviceclaimingserver:no_devices_found": {
     "translations": {
-      "en": "DevEUI/JoinEUI not set for device"
+      "en": "no devices in batch found"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_end_devices.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver:no_euis": {
+    "translations": {
+      "en": "DevEUI/JoinEUI not set for device with identifiers `{ids}`"
     },
     "description": {
       "package": "pkg/deviceclaimingserver",

@@ -81,7 +81,10 @@ func (m *isEndDeviceBatchRegistry) Get(
 			ApplicationIds: req.ApplicationIds,
 			DeviceId:       id,
 		}))
-		if err != nil && !errors.IsNotFound(err) {
+		if err != nil {
+			if errors.IsNotFound(err) {
+				continue
+			}
 			return nil, err
 		}
 		devs = append(devs, dev)

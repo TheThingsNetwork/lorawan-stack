@@ -26,7 +26,11 @@ import (
 type MockClaimer struct {
 	JoinEUI types.EUI64
 
-	ClaimFunc func(context.Context, types.EUI64, types.EUI64, string) error
+	ClaimFunc        func(context.Context, types.EUI64, types.EUI64, string) error
+	BatchUnclaimFunc func(
+		context.Context,
+		[]*ttnpb.EndDeviceIdentifiers,
+	) (map[types.EUI64]errors.ErrorDetails, error)
 }
 
 // SupportsJoinEUI returns whether the Join Server supports this JoinEUI.
@@ -58,9 +62,9 @@ func (MockClaimer) Unclaim(_ context.Context,
 }
 
 // Unclaim releases the claim on an End Device.
-func (MockClaimer) BatchUnclaim(
-	_ context.Context,
-	_ []*ttnpb.EndDeviceIdentifiers,
+func (m MockClaimer) BatchUnclaim(
+	ctx context.Context,
+	ids []*ttnpb.EndDeviceIdentifiers,
 ) (map[types.EUI64]errors.ErrorDetails, error) {
-	return make(map[types.EUI64]errors.ErrorDetails), nil
+	return m.BatchUnclaimFunc(ctx, ids)
 }

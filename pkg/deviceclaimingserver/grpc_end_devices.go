@@ -27,16 +27,20 @@ import (
 )
 
 var (
-	errParseQRCode          = errors.Define("parse_qr_code", "parse QR code failed")
-	errQRCodeData           = errors.DefineInvalidArgument("qr_code_data", "invalid QR code data")
-	errNoJoinEUI            = errors.DefineInvalidArgument("no_join_eui", "failed to extract JoinEUI from request")
-	errNoEUI                = errors.DefineFailedPrecondition("no_eui", "DevEUI/JoinEUI not set for device")
+	errParseQRCode = errors.Define("parse_qr_code", "parse QR code failed")
+	errQRCodeData  = errors.DefineInvalidArgument("qr_code_data", "invalid QR code data")
+	errNoJoinEUI   = errors.DefineInvalidArgument("no_join_eui", "failed to extract JoinEUI from request")
+	errNoEUIs      = errors.DefineFailedPrecondition(
+		"no_euis",
+		"DevEUI/JoinEUI not set for device with identifiers `{ids}`",
+	)
 	errDeviceNotFound       = errors.DefineNotFound("device_not_found", "device not found")
 	errMethodUnavailable    = errors.DefineUnimplemented("method_unavailable", "method unavailable")
 	errClaimingNotSupported = errors.DefineAborted(
 		"claiming_not_supported",
 		"claiming not supported for JoinEUI `{eui}`",
 	)
+	errNoDevicesFound = errors.DefineInvalidArgument("no_devices_found", "no devices in batch found")
 )
 
 // endDeviceClaimingServer is the front facing entity for gRPC requests.
@@ -134,7 +138,7 @@ func (edcs *endDeviceClaimingServer) Unclaim(
 	}
 	ids := devs.EndDevices[0].GetIds()
 	if ids.JoinEui == nil || ids.DevEui == nil {
-		return nil, errNoEUI.New()
+		return nil, errNoEUIs.WithAttributes("ids", ids)
 	}
 
 	joinEUI := types.MustEUI64(ids.JoinEui).OrZero()
@@ -180,7 +184,7 @@ func (edcs *endDeviceClaimingServer) GetClaimStatus(
 	}
 	ids := devs.EndDevices[0].GetIds()
 	if ids.JoinEui == nil || ids.DevEui == nil {
-		return nil, errNoEUI.New()
+		return nil, errNoEUIs.WithAttributes("ids", ids)
 	}
 	joinEUI := types.MustEUI64(ids.JoinEui).OrZero()
 	claimer := edcs.DCS.endDeviceClaimingUpstream.JoinEUIClaimer(ctx, joinEUI)
@@ -247,7 +251,7 @@ func (srv *endDeviceBatchClaimingServer) Unclaim(
 		return nil, err
 	}
 	if len(devs.EndDevices) == 0 {
-		return ret, nil
+		return nil, errNoDevicesFound.New()
 	}
 
 	// End Devices within an application can have different JoinEUIs.
@@ -258,11 +262,23 @@ func (srv *endDeviceBatchClaimingServer) Unclaim(
 	for _, dev := range devs.EndDevices {
 		ids := dev.GetIds()
 		if ids.JoinEui == nil || ids.DevEui == nil {
+			ret.Failed = append(ret.Failed, &ttnpb.BatchUnclaimEndDevicesResponse_Failed{
+				EndDeviceIds: ids,
+				ErrorDetails: ttnpb.ErrorDetailsToProto(
+					errNoEUIs.WithAttributes("ids", ids),
+				),
+			})
 			continue
 		}
 		joinEUI := types.MustEUI64(ids.JoinEui).OrZero()
 		claimer := srv.DCS.endDeviceClaimingUpstream.JoinEUIClaimer(ctx, joinEUI)
-		if claimer == nil { // Claiming not supported for this JoinEUI.
+		if claimer == nil {
+			ret.Failed = append(ret.Failed, &ttnpb.BatchUnclaimEndDevicesResponse_Failed{
+				EndDeviceIds: ids,
+				ErrorDetails: ttnpb.ErrorDetailsToProto(
+					errClaimingNotSupported.WithAttributes("eui", joinEUI),
+				),
+			})
 			continue
 		}
 		devIDs := claimers[claimer]
@@ -279,7 +295,8 @@ func (srv *endDeviceBatchClaimingServer) Unclaim(
 		res, err := claimer.BatchUnclaim(ctx, devIDs)
 		if err != nil {
 			if !errors.IsInvalidArgument(err) {
-				break // Batch-level failure, stop further claiming.
+				// Batch-level failure, stop further claiming.
+				return nil, err
 			}
 			// Collect the per-device errors.
 			for eui, err := range res {
