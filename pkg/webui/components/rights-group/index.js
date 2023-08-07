@@ -57,8 +57,7 @@ const RightsGroup = ({
     derivedRights,
     hasPseudoRightGranted,
     grantType,
-  } = useDerivedRightProps(value, pseudoRight, rights)
-
+  } = useDerivedRightProps({ value, pseudoRight, rights })
   const intl = useIntl()
   const { formatMessage } = intl
   const [individualRightValue, setIndividualRightValue] = React.useState([])
