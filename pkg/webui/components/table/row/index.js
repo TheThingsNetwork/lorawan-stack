@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import classnames from 'classnames'
-import bind from 'autobind-decorator'
 
 import Link from '@ttn-lw/components/link'
 
@@ -22,69 +21,67 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './row.styl'
 
-class Row extends React.Component {
-  @bind
-  onClick(evt) {
-    const { id, onClick } = this.props
-
-    onClick(id, evt)
-  }
-
-  @bind
-  onKeyDown(evt) {
-    const { id, onClick } = this.props
-    if (evt.key === 'Enter') {
+const Row = ({
+  id,
+  onClick,
+  onMouseDown,
+  body,
+  clickable,
+  className,
+  children,
+  head,
+  footer,
+  linkTo,
+}) => {
+  const handleClick = useCallback(
+    evt => {
       onClick(id, evt)
-    }
-  }
+    },
+    [id, onClick],
+  )
 
-  @bind
-  onMouseDown(evt) {
-    const { id, onMouseDown } = this.props
+  const onKeyDown = useCallback(
+    evt => {
+      if (evt.key === 'Enter') {
+        onClick(id, evt)
+      }
+    },
+    [id, onClick],
+  )
 
-    onMouseDown(id, evt)
-  }
+  const handleMouseDown = useCallback(
+    evt => {
+      onMouseDown(id, evt)
+    },
+    [id, onMouseDown],
+  )
 
-  get clickListener() {
-    const { body, clickable } = this.props
+  const clickListener = body && clickable ? handleClick : undefined
 
-    if (body && clickable) {
-      return this.onClick
-    }
-  }
+  const tabIndex = body && clickable ? 0 : -1
 
-  get tabIndex() {
-    const { body, clickable } = this.props
+  const rowClassNames = classnames(className, style.row, {
+    [style.clickable]: body && clickable,
+    [style.rowHead]: head,
+    [style.rowBody]: body,
+    [style.rowFooter]: footer,
+  })
 
-    return body && clickable ? 0 : -1
-  }
+  const Row = linkTo && clickable ? Link : 'div'
 
-  render() {
-    const { className, children, clickable, head, body, footer, linkTo } = this.props
-
-    const rowClassNames = classnames(className, style.row, {
-      [style.clickable]: body && clickable,
-      [style.rowHead]: head,
-      [style.rowBody]: body,
-      [style.rowFooter]: footer,
-    })
-
-    const Row = linkTo && clickable ? Link : 'div'
-
-    return (
-      <Row
-        className={rowClassNames}
-        onKeyDown={this.onKeyDown}
-        onClick={this.clickListener}
-        onMouseDown={this.onMouseDown}
-        tabIndex={this.tabIndex.toString()}
-        to={linkTo}
-        role="row"
-      >
-        {children}
-      </Row>
-    )
-  }
+  return (
+    <Row
+      className={rowClassNames}
+      onKeyDown={onKeyDown}
+      onClick={clickListener}
+      onMouseDown={handleMouseDown}
+      tabIndex={tabIndex.toString()}
+      to={linkTo}
+      role="row"
+    >
+      {children}
+    </Row>
+  )
 }
 
 Row.propTypes = {
