@@ -22,7 +22,7 @@ var (
 	ErrCorruptedMACState = errors.DefineCorruption("corrupted_mac_state", "MAC state is corrupted")
 	ErrInvalidDataRate   = errors.DefineInvalidArgument("data_rate", "invalid data rate")
 	ErrInvalidPayload    = errors.DefineInvalidArgument("payload", "invalid payload")
-	ErrUnknownChannel    = errors.Define("unknown_chanel", "channel is unknown")
+	ErrUnknownChannel    = errors.Define("unknown_channel", "channel is unknown")
 
 	ErrNetworkDownlinkSlot  = errors.DefineCorruption("network_downlink_slot", "could not generate network initiated downlink slot")
 	ErrUplinkChannel        = errors.DefineCorruption("uplink_channel", "channel does not allow downlinks")

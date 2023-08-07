@@ -7145,7 +7145,7 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/networkserver/internal:unknown_chanel": {
+  "error:pkg/networkserver/internal:unknown_channel": {
     "translations": {
       "en": "channel is unknown"
     },

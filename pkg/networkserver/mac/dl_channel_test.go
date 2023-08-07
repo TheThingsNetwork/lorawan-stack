@@ -445,7 +445,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 			Error: ErrNoPayload,
 		},
 		{
-			Name: "frequency ack/chanel index ack/no request",
+			Name: "frequency ack/channel index ack/no request",
 			InputDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{},
