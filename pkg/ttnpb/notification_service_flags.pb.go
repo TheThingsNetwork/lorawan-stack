@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-flags v1.1.0
 // - protoc              v4.22.2
-// source: lorawan-stack/api/notification_service.proto
+// source: ttn/lorawan/v3/notification_service.proto
 
 package ttnpb
 

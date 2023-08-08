@@ -1,7 +1,7 @@
 {
   "files": [
     {
-      "name": "lorawan-stack/api/_api.proto",
+      "name": "ttn/lorawan/v3/_api.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -14,7 +14,7 @@
       "services": []
     },
     {
-      "name": "lorawan-stack/api/application.proto",
+      "name": "ttn/lorawan/v3/application.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -1121,7 +1121,7 @@
       "services": []
     },
     {
-      "name": "lorawan-stack/api/application_services.proto",
+      "name": "ttn/lorawan/v3/application_services.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -1529,7 +1529,7 @@
       ]
     },
     {
-      "name": "lorawan-stack/api/applicationserver.proto",
+      "name": "ttn/lorawan/v3/applicationserver.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -2814,7 +2814,7 @@
       ]
     },
     {
-      "name": "lorawan-stack/api/applicationserver_integrations_alcsync.proto",
+      "name": "ttn/lorawan/v3/applicationserver_integrations_alcsync.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": true,
@@ -3021,7 +3021,7 @@
       "services": []
     },
     {
-      "name": "lorawan-stack/api/applicationserver_integrations_storage.proto",
+      "name": "ttn/lorawan/v3/applicationserver_integrations_storage.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -3568,7 +3568,7 @@
       ]
     },
     {
-      "name": "lorawan-stack/api/applicationserver_packages.proto",
+      "name": "ttn/lorawan/v3/applicationserver_packages.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -4547,7 +4547,7 @@
       ]
     },
     {
-      "name": "lorawan-stack/api/applicationserver_pubsub.proto",
+      "name": "ttn/lorawan/v3/applicationserver_pubsub.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -5871,7 +5871,7 @@
       ]
     },
     {
-      "name": "lorawan-stack/api/applicationserver_web.proto",
+      "name": "ttn/lorawan/v3/applicationserver_web.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -7549,7 +7549,7 @@
       ]
     },
     {
-      "name": "lorawan-stack/api/client.proto",
+      "name": "ttn/lorawan/v3/client.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": true,
@@ -8446,7 +8446,7 @@
       "services": []
     },
     {
-      "name": "lorawan-stack/api/client_services.proto",
+      "name": "ttn/lorawan/v3/client_services.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -8742,7 +8742,7 @@
       ]
     },
     {
-      "name": "lorawan-stack/api/cluster.proto",
+      "name": "ttn/lorawan/v3/cluster.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -8852,7 +8852,7 @@
       "services": []
     },
     {
-      "name": "lorawan-stack/api/configuration_services.proto",
+      "name": "ttn/lorawan/v3/configuration_services.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -9929,7 +9929,7 @@
       ]
     },
     {
-      "name": "lorawan-stack/api/contact_info.proto",
+      "name": "ttn/lorawan/v3/contact_info.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": true,
@@ -10254,7 +10254,7 @@
       ]
     },
     {
-      "name": "lorawan-stack/api/deviceclaimingserver.proto",
+      "name": "ttn/lorawan/v3/deviceclaimingserver.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -11009,6 +11009,82 @@
           ]
         },
         {
+          "name": "GetInfoByGatewayEUIRequest",
+          "longName": "GetInfoByGatewayEUIRequest",
+          "fullName": "ttn.lorawan.v3.GetInfoByGatewayEUIRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "eui",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 8
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GetInfoByGatewayEUIResponse",
+          "longName": "GetInfoByGatewayEUIResponse",
+          "fullName": "ttn.lorawan.v3.GetInfoByGatewayEUIResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "eui",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 8
+                  }
+                ]
+              }
+            },
+            {
+              "name": "supports_claiming",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "GetInfoByJoinEUIRequest",
           "longName": "GetInfoByJoinEUIRequest",
           "fullName": "ttn.lorawan.v3.GetInfoByJoinEUIRequest",
@@ -11302,13 +11378,36 @@
                   ]
                 }
               }
+            },
+            {
+              "name": "GetInfoByGatewayEUI",
+              "description": "Return whether claiming is available for a given gateway EUI.",
+              "requestType": "GetInfoByGatewayEUIRequest",
+              "requestLongType": "GetInfoByGatewayEUIRequest",
+              "requestFullType": "ttn.lorawan.v3.GetInfoByGatewayEUIRequest",
+              "requestStreaming": false,
+              "responseType": "GetInfoByGatewayEUIResponse",
+              "responseLongType": "GetInfoByGatewayEUIResponse",
+              "responseFullType": "ttn.lorawan.v3.GetInfoByGatewayEUIResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/gcls/claim/info",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
             }
           ]
         }
       ]
     },
     {
-      "name": "lorawan-stack/api/devicerepository.proto",
+      "name": "ttn/lorawan/v3/devicerepository.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": true,
@@ -13840,7 +13939,7 @@
       ]
     },
     {
-      "name": "lorawan-stack/api/email_messages.proto",
+      "name": "ttn/lorawan/v3/email_messages.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -13890,7 +13989,7 @@
       "services": []
     },
     {
-      "name": "lorawan-stack/api/end_device.proto",
+      "name": "ttn/lorawan/v3/end_device.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": true,
@@ -18547,7 +18646,7 @@
       "services": []
     },
     {
-      "name": "lorawan-stack/api/end_device_services.proto",
+      "name": "ttn/lorawan/v3/end_device_services.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -18810,7 +18909,7 @@
       ]
     },
     {
-      "name": "lorawan-stack/api/enums.proto",
+      "name": "ttn/lorawan/v3/enums.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": true,
@@ -18958,7 +19057,7 @@
       "services": []
     },
     {
-      "name": "lorawan-stack/api/error.proto",
+      "name": "ttn/lorawan/v3/error.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -19080,7 +19179,7 @@
       "services": []
     },
     {
-      "name": "lorawan-stack/api/events.proto",
+      "name": "ttn/lorawan/v3/events.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -19524,7 +19623,7 @@
       ]
     },
     {
-      "name": "lorawan-stack/api/gateway.proto",
+      "name": "ttn/lorawan/v3/gateway.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": true,
@@ -22010,7 +22109,7 @@
       "services": []
     },
     {
-      "name": "lorawan-stack/api/gateway_configuration.proto",
+      "name": "ttn/lorawan/v3/gateway_configuration.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -22191,7 +22290,7 @@
       ]
     },
     {
-      "name": "lorawan-stack/api/gateway_services.proto",
+      "name": "ttn/lorawan/v3/gateway_services.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -22646,7 +22745,7 @@
       ]
     },
     {
-      "name": "lorawan-stack/api/gatewayserver.proto",
+      "name": "ttn/lorawan/v3/gatewayserver.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -23082,7 +23181,7 @@
       ]
     },
     {
-      "name": "lorawan-stack/api/identifiers.proto",
+      "name": "ttn/lorawan/v3/identifiers.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -23840,7 +23939,7 @@
       "services": []
     },
     {
-      "name": "lorawan-stack/api/identityserver.proto",
+      "name": "ttn/lorawan/v3/identityserver.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -24646,7 +24745,7 @@
       ]
     },
     {
-      "name": "lorawan-stack/api/join.proto",
+      "name": "ttn/lorawan/v3/join.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -24928,7 +25027,7 @@
       "services": []
     },
     {
-      "name": "lorawan-stack/api/joinserver.proto",
+      "name": "ttn/lorawan/v3/joinserver.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -26543,7 +26642,7 @@
       ]
     },
     {
-      "name": "lorawan-stack/api/keys.proto",
+      "name": "ttn/lorawan/v3/keys.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -26765,7 +26864,7 @@
       "services": []
     },
     {
-      "name": "lorawan-stack/api/lorawan.proto",
+      "name": "ttn/lorawan/v3/lorawan.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": true,
@@ -31901,7 +32000,7 @@
       "services": []
     },
     {
-      "name": "lorawan-stack/api/messages.proto",
+      "name": "ttn/lorawan/v3/messages.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": true,
@@ -33404,7 +33503,7 @@
           "name": "DownlinkMessage",
           "longName": "DownlinkMessage",
           "fullName": "ttn.lorawan.v3.DownlinkMessage",
-          "description": "Downlink message from the network to the end device",
+          "description": "Downlink message from the network to the end device\n\nMapping from UDP message:\n\nimme: -\ntmst: scheduled.timestamp\ntmms: scheduled.time\nfreq: scheduled.frequency\nrfch: (0)\npowe: scheduled.tx_power\nmodu: scheduled.modulation\ndatr: scheduled.data_rate_index (derived)\ncodr: scheduled.coding_rate\nfdev: (derived from bandwidth)\nipol: scheduled.invert_polarization\nprea: [scheduled.advanced]\nsize: (derived from len(raw_payload))\ndata: raw_payload\nncrc: [scheduled.advanced]",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": true,
@@ -33920,7 +34019,7 @@
           "name": "UplinkMessage",
           "longName": "UplinkMessage",
           "fullName": "ttn.lorawan.v3.UplinkMessage",
-          "description": "Uplink message from the end device to the network",
+          "description": "Uplink message from the end device to the network\n\nMapping from UDP message (other fields can be set in \"advanced\"):\n\n- time: rx_metadata.time\n- tmst: rx_metadata.timestamp\n- freq: settings.frequency\n- modu: settings.modulation\n- datr: settings.data_rate_index (and derived fields)\n- codr: settings.coding_rate\n- size: len(raw_payload)\n- data: raw_payload (and derived payload)\n- rsig: rx_metadata\n - ant: rx_metadata.antenna_index\n - chan: rx_metadata.channel_index\n - rssis: rx_metadata.rssi\n - lsnr: rx_metadata.snr",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
@@ -34064,7 +34163,7 @@
       "services": []
     },
     {
-      "name": "lorawan-stack/api/metadata.proto",
+      "name": "ttn/lorawan/v3/metadata.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": true,
@@ -34776,7 +34875,7 @@
       "services": []
     },
     {
-      "name": "lorawan-stack/api/mqtt.proto",
+      "name": "ttn/lorawan/v3/mqtt.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -34854,7 +34953,7 @@
       "services": []
     },
     {
-      "name": "lorawan-stack/api/networkserver.proto",
+      "name": "ttn/lorawan/v3/networkserver.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -35322,7 +35421,7 @@
       ]
     },
     {
-      "name": "lorawan-stack/api/notification_service.proto",
+      "name": "ttn/lorawan/v3/notification_service.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": true,
@@ -35982,7 +36081,7 @@
       ]
     },
     {
-      "name": "lorawan-stack/api/oauth.proto",
+      "name": "ttn/lorawan/v3/oauth.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -36740,7 +36839,7 @@
       "services": []
     },
     {
-      "name": "lorawan-stack/api/oauth_services.proto",
+      "name": "ttn/lorawan/v3/oauth_services.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -36850,7 +36949,7 @@
       ]
     },
     {
-      "name": "lorawan-stack/api/organization.proto",
+      "name": "ttn/lorawan/v3/organization.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -37853,7 +37952,7 @@
       "services": []
     },
     {
-      "name": "lorawan-stack/api/organization_services.proto",
+      "name": "ttn/lorawan/v3/organization_services.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -38226,7 +38325,7 @@
       ]
     },
     {
-      "name": "lorawan-stack/api/packetbrokeragent.proto",
+      "name": "ttn/lorawan/v3/packetbrokeragent.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -40137,7 +40236,7 @@
       ]
     },
     {
-      "name": "lorawan-stack/api/picture.proto",
+      "name": "ttn/lorawan/v3/picture.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -40283,7 +40382,7 @@
       "services": []
     },
     {
-      "name": "lorawan-stack/api/qrcodegenerator.proto",
+      "name": "ttn/lorawan/v3/qrcodegenerator.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -40809,7 +40908,7 @@
       ]
     },
     {
-      "name": "lorawan-stack/api/regional.proto",
+      "name": "ttn/lorawan/v3/regional.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -41099,7 +41198,7 @@
       "services": []
     },
     {
-      "name": "lorawan-stack/api/rights.proto",
+      "name": "ttn/lorawan/v3/rights.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": true,
@@ -41730,7 +41829,7 @@
       "services": []
     },
     {
-      "name": "lorawan-stack/api/search_services.proto",
+      "name": "ttn/lorawan/v3/search_services.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -43663,7 +43762,7 @@
       ]
     },
     {
-      "name": "lorawan-stack/api/secrets.proto",
+      "name": "ttn/lorawan/v3/secrets.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -43721,7 +43820,7 @@
       "services": []
     },
     {
-      "name": "lorawan-stack/api/simulate.proto",
+      "name": "ttn/lorawan/v3/simulate.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -44255,7 +44354,7 @@
       "services": []
     },
     {
-      "name": "lorawan-stack/api/user.proto",
+      "name": "ttn/lorawan/v3/user.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
@@ -45986,7 +46085,7 @@
       "services": []
     },
     {
-      "name": "lorawan-stack/api/user_services.proto",
+      "name": "ttn/lorawan/v3/user_services.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
       "hasEnums": false,

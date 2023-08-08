@@ -16,7 +16,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.22.2
-// source: lorawan-stack/api/networkserver.proto
+// source: ttn/lorawan/v3/networkserver.proto
 
 package ttnpb
 
@@ -235,7 +235,7 @@ var Ns_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/networkserver.proto",
+	Metadata: "ttn/lorawan/v3/networkserver.proto",
 }
 
 const (
@@ -411,7 +411,7 @@ var AsNs_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/networkserver.proto",
+	Metadata: "ttn/lorawan/v3/networkserver.proto",
 }
 
 const (
@@ -542,7 +542,7 @@ var GsNs_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/networkserver.proto",
+	Metadata: "ttn/lorawan/v3/networkserver.proto",
 }
 
 const (
@@ -755,7 +755,7 @@ var NsEndDeviceRegistry_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/networkserver.proto",
+	Metadata: "ttn/lorawan/v3/networkserver.proto",
 }
 
 const (
@@ -852,5 +852,5 @@ var NsEndDeviceBatchRegistry_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/networkserver.proto",
+	Metadata: "ttn/lorawan/v3/networkserver.proto",
 }

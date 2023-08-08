@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-flags v1.1.0
 // - protoc              v4.22.2
-// source: lorawan-stack/api/contact_info.proto
+// source: ttn/lorawan/v3/contact_info.proto
 
 package ttnpb
 

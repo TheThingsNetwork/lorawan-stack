@@ -16,7 +16,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.22.2
-// source: lorawan-stack/api/gateway_configuration.proto
+// source: ttn/lorawan/v3/gateway_configuration.proto
 
 package ttnpb
 
@@ -120,5 +120,5 @@ var GatewayConfigurationService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/gateway_configuration.proto",
+	Metadata: "ttn/lorawan/v3/gateway_configuration.proto",
 }

@@ -633,6 +633,56 @@ func (dst *AuthorizeGatewayRequest) SetFields(src *AuthorizeGatewayRequest, path
 	return nil
 }
 
+func (dst *GetInfoByGatewayEUIRequest) SetFields(src *GetInfoByGatewayEUIRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "eui":
+			if len(subs) > 0 {
+				return fmt.Errorf("'eui' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Eui = src.Eui
+			} else {
+				dst.Eui = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *GetInfoByGatewayEUIResponse) SetFields(src *GetInfoByGatewayEUIResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "eui":
+			if len(subs) > 0 {
+				return fmt.Errorf("'eui' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Eui = src.Eui
+			} else {
+				dst.Eui = nil
+			}
+		case "supports_claiming":
+			if len(subs) > 0 {
+				return fmt.Errorf("'supports_claiming' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SupportsClaiming = src.SupportsClaiming
+			} else {
+				var zero bool
+				dst.SupportsClaiming = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *ClaimEndDeviceRequest_AuthenticatedIdentifiers) SetFields(src *ClaimEndDeviceRequest_AuthenticatedIdentifiers, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {

@@ -129,6 +129,22 @@ var AuthorizeGatewayRequestFieldPathsTopLevel = []string{
 	"api_key",
 	"gateway_ids",
 }
+var GetInfoByGatewayEUIRequestFieldPathsNested = []string{
+	"eui",
+}
+
+var GetInfoByGatewayEUIRequestFieldPathsTopLevel = []string{
+	"eui",
+}
+var GetInfoByGatewayEUIResponseFieldPathsNested = []string{
+	"eui",
+	"supports_claiming",
+}
+
+var GetInfoByGatewayEUIResponseFieldPathsTopLevel = []string{
+	"eui",
+	"supports_claiming",
+}
 var ClaimEndDeviceRequest_AuthenticatedIdentifiersFieldPathsNested = []string{
 	"authentication_code",
 	"dev_eui",

@@ -16,7 +16,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.22.2
-// source: lorawan-stack/api/qrcodegenerator.proto
+// source: ttn/lorawan/v3/qrcodegenerator.proto
 
 package ttnpb
 
@@ -240,5 +240,5 @@ var EndDeviceQRCodeGenerator_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/qrcodegenerator.proto",
+	Metadata: "ttn/lorawan/v3/qrcodegenerator.proto",
 }

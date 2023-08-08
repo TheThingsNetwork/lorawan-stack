@@ -16,7 +16,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.22.2
-// source: lorawan-stack/api/joinserver.proto
+// source: ttn/lorawan/v3/joinserver.proto
 
 package ttnpb
 
@@ -161,7 +161,7 @@ var NsJs_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/joinserver.proto",
+	Metadata: "ttn/lorawan/v3/joinserver.proto",
 }
 
 const (
@@ -253,7 +253,7 @@ var AsJs_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/joinserver.proto",
+	Metadata: "ttn/lorawan/v3/joinserver.proto",
 }
 
 const (
@@ -345,7 +345,7 @@ var AppJs_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/joinserver.proto",
+	Metadata: "ttn/lorawan/v3/joinserver.proto",
 }
 
 const (
@@ -632,7 +632,7 @@ var NetworkCryptoService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/joinserver.proto",
+	Metadata: "ttn/lorawan/v3/joinserver.proto",
 }
 
 const (
@@ -764,7 +764,7 @@ var ApplicationCryptoService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/joinserver.proto",
+	Metadata: "ttn/lorawan/v3/joinserver.proto",
 }
 
 const (
@@ -1010,7 +1010,7 @@ var JsEndDeviceRegistry_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "lorawan-stack/api/joinserver.proto",
+	Metadata: "ttn/lorawan/v3/joinserver.proto",
 }
 
 const (
@@ -1107,7 +1107,7 @@ var JsEndDeviceBatchRegistry_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/joinserver.proto",
+	Metadata: "ttn/lorawan/v3/joinserver.proto",
 }
 
 const (
@@ -1278,7 +1278,7 @@ var ApplicationActivationSettingRegistry_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/joinserver.proto",
+	Metadata: "ttn/lorawan/v3/joinserver.proto",
 }
 
 const (
@@ -1409,5 +1409,5 @@ var Js_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/joinserver.proto",
+	Metadata: "ttn/lorawan/v3/joinserver.proto",
 }
