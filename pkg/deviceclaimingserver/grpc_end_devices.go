@@ -233,6 +233,25 @@ type endDeviceBatchClaimingServer struct {
 	DCS *DeviceClaimingServer
 }
 
+// GetInfoByJoinEUI implements EndDeviceClaimingServer.
+func (srv *endDeviceBatchClaimingServer) GetInfoByJoinEUIs(
+	ctx context.Context,
+	in *ttnpb.GetInfoByJoinEUIsRequest,
+) (*ttnpb.GetInfoByJoinEUIsResponse, error) {
+	ret := &ttnpb.GetInfoByJoinEUIsResponse{
+		Infos: make([]*ttnpb.GetInfoByJoinEUIResponse, 0, len(in.Requests)),
+	}
+	for _, req := range in.Requests {
+		joinEUI := types.MustEUI64(req.JoinEui).OrZero()
+		claimer := srv.DCS.endDeviceClaimingUpstream.JoinEUIClaimer(ctx, joinEUI)
+		ret.Infos = append(ret.Infos, &ttnpb.GetInfoByJoinEUIResponse{
+			JoinEui:          joinEUI.Bytes(),
+			SupportsClaiming: claimer != nil,
+		})
+	}
+	return ret, nil
+}
+
 // Unclaim implements EndDeviceBatchClaimingServer.
 func (srv *endDeviceBatchClaimingServer) Unclaim(
 	ctx context.Context,

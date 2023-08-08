@@ -91,7 +91,7 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 		c,
 		enddevices.Config{},
 		enddevices.WithClaimer("test", &MockClaimer{
-			JoinEUI: registeredJoinEUI,
+			JoinEUIs: []types.EUI64{registeredJoinEUI},
 			ClaimFunc: func(
 				ctx context.Context, joinEUI, devEUI types.EUI64, claimAuthenticationCode string,
 			) error {
@@ -373,7 +373,7 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 	a.So(err, should.BeNil)
 }
 
-func TestBatchOperations(t *testing.T) {
+func TestBatchOperations(t *testing.T) { //nolint:gocyclo
 	t.Parallel()
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
@@ -396,8 +396,12 @@ func TestBatchOperations(t *testing.T) {
 		},
 	})
 
+	registeredJoinEUI2 := types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0E}
 	mockClaimer := &MockClaimer{
-		JoinEUI: registeredJoinEUI,
+		JoinEUIs: []types.EUI64{
+			registeredJoinEUI,
+			registeredJoinEUI2,
+		},
 	}
 	mockUpstream, err := enddevices.NewUpstream(
 		ctx,
@@ -490,6 +494,48 @@ func TestBatchOperations(t *testing.T) {
 			Ids: devIDs4,
 		},
 	)
+
+	// Test GetInfoByJoinEUIs
+	res, err := edcsClient.GetInfoByJoinEUIs(ctx, &ttnpb.GetInfoByJoinEUIsRequest{
+		Requests: []*ttnpb.GetInfoByJoinEUIRequest{
+			{
+				JoinEui: []byte{0x01, 0x02}, // Invalid EUI.
+			},
+		},
+	})
+	a.So(errors.IsInvalidArgument(err), should.BeTrue)
+	a.So(res, should.BeNil)
+
+	res, err = edcsClient.GetInfoByJoinEUIs(ctx, &ttnpb.GetInfoByJoinEUIsRequest{
+		Requests: []*ttnpb.GetInfoByJoinEUIRequest{
+			{
+				JoinEui: registeredJoinEUI.Bytes(),
+			},
+			{
+				JoinEui: registeredJoinEUI2.Bytes(),
+			},
+			{
+				JoinEui: unRegisteredJoinEUI.Bytes(),
+			},
+		},
+	})
+	a.So(err, should.BeNil)
+	a.So(res, should.Resemble, &ttnpb.GetInfoByJoinEUIsResponse{
+		Infos: []*ttnpb.GetInfoByJoinEUIResponse{
+			{
+				JoinEui:          registeredJoinEUI.Bytes(),
+				SupportsClaiming: true,
+			},
+			{
+				JoinEui:          registeredJoinEUI2.Bytes(),
+				SupportsClaiming: true,
+			},
+			{
+				JoinEui:          unRegisteredJoinEUI.Bytes(),
+				SupportsClaiming: false,
+			},
+		},
+	})
 
 	// Test Unclaiming
 	for _, tc := range []struct { //nolint:paralleltest

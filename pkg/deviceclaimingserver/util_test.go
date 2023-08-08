@@ -24,7 +24,7 @@ import (
 
 // MockClaimer is a mock Claimer.
 type MockClaimer struct {
-	JoinEUI types.EUI64
+	JoinEUIs []types.EUI64
 
 	ClaimFunc        func(context.Context, types.EUI64, types.EUI64, string) error
 	BatchUnclaimFunc func(
@@ -35,7 +35,12 @@ type MockClaimer struct {
 
 // SupportsJoinEUI returns whether the Join Server supports this JoinEUI.
 func (m MockClaimer) SupportsJoinEUI(joinEUI types.EUI64) bool {
-	return m.JoinEUI.Equal(joinEUI)
+	for _, eui := range m.JoinEUIs {
+		if eui.Equal(joinEUI) {
+			return true
+		}
+	}
+	return false
 }
 
 // Claim claims an End Device.
