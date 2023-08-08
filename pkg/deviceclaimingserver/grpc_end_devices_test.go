@@ -373,7 +373,7 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 	a.So(err, should.BeNil)
 }
 
-func TestBatchOperations(t *testing.T) { //nolint:gocyclo
+func TestBatchOperations(t *testing.T) { // nolint:all
 	t.Parallel()
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
@@ -538,7 +538,7 @@ func TestBatchOperations(t *testing.T) { //nolint:gocyclo
 	})
 
 	// Test Unclaiming
-	for _, tc := range []struct { //nolint:paralleltest
+	for _, tc := range []struct { // nolint:paralleltest
 		Name             string
 		Req              *ttnpb.BatchUnclaimEndDevicesRequest
 		CallOpts         grpc.CallOption

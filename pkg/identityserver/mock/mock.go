@@ -106,6 +106,6 @@ func (m *MockDefinition) EntityAccess() *mockEntityAccess {
 	return m.entityAccess
 }
 
-func (m *MockDefinition) EndDeviceBatchRegistry() *isEndDeviceBatchRegistry {
+func (m *MockDefinition) EndDeviceBatchRegistry() *isEndDeviceBatchRegistry { //nolint:revive
 	return m.endDeviceBatchRegistry
 }

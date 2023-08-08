@@ -240,7 +240,7 @@ func TestTTJS(t *testing.T) { //nolint:paralleltest
 	a.So(ret.VendorSpecific, should.BeNil)
 }
 
-func TestBatchOperations(t *testing.T) { //nolint:paralleltest
+func TestBatchOperations(t *testing.T) { // nolint:paralleltest
 	a, ctx := test.New(t)
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
@@ -283,7 +283,7 @@ func TestBatchOperations(t *testing.T) { //nolint:paralleltest
 		},
 	}
 
-	go mockTTJS.Start(ctx) //nolint:errcheck
+	go mockTTJS.Start(ctx) // nolint:errcheck
 	fetcher := fetch.FromFilesystem("testdata")
 
 	client := ttjsv2.NewClient(c, fetcher, ttjsv2.Config{

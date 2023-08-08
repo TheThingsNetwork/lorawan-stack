@@ -11384,7 +11384,7 @@
             },
             {
               "name": "GetInfoByJoinEUIs",
-              "description": "Return whether claiming is available for a given list of Join EUIs.",
+              "description": "Return whether claiming is supported for each Join EUI in a given list.",
               "requestType": "GetInfoByJoinEUIsRequest",
               "requestLongType": "GetInfoByJoinEUIsRequest",
               "requestFullType": "ttn.lorawan.v3.GetInfoByJoinEUIsRequest",

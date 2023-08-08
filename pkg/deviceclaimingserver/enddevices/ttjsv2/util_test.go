@@ -188,7 +188,7 @@ func (srv *mockTTJS) handleClaim(w http.ResponseWriter, r *http.Request) { //nol
 	}
 }
 
-func (srv *mockTTJS) handleBatchClaims(w http.ResponseWriter, r *http.Request) { //nolint:gocyclo
+func (srv *mockTTJS) handleBatchClaims(w http.ResponseWriter, r *http.Request) { // nolint:gocyclo
 	var (
 		found bool
 		asID  string

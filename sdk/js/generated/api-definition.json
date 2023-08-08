@@ -2275,6 +2275,17 @@
           ]
         }
       ]
+    },
+    "GetInfoByJoinEUIs": {
+      "file": "lorawan-stack/api/deviceclaimingserver.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/edcs/claim/info/batch",
+          "body": "*",
+          "parameters": []
+        }
+      ]
     }
   },
   "EndDeviceClaimingServer": {
