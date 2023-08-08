@@ -497,6 +497,211 @@ var _ interface {
 	ErrorName() string
 } = GetInfoByJoinEUIResponseValidationError{}
 
+// ValidateFields checks the field values on GetInfoByJoinEUIsRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *GetInfoByJoinEUIsRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GetInfoByJoinEUIsRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "requests":
+
+			if len(m.GetRequests()) > 20 {
+				return GetInfoByJoinEUIsRequestValidationError{
+					field:  "requests",
+					reason: "value must contain no more than 20 item(s)",
+				}
+			}
+
+			for idx, item := range m.GetRequests() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return GetInfoByJoinEUIsRequestValidationError{
+							field:  fmt.Sprintf("requests[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		default:
+			return GetInfoByJoinEUIsRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// GetInfoByJoinEUIsRequestValidationError is the validation error returned by
+// GetInfoByJoinEUIsRequest.ValidateFields if the designated constraints
+// aren't met.
+type GetInfoByJoinEUIsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetInfoByJoinEUIsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetInfoByJoinEUIsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetInfoByJoinEUIsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetInfoByJoinEUIsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetInfoByJoinEUIsRequestValidationError) ErrorName() string {
+	return "GetInfoByJoinEUIsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetInfoByJoinEUIsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetInfoByJoinEUIsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetInfoByJoinEUIsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetInfoByJoinEUIsRequestValidationError{}
+
+// ValidateFields checks the field values on GetInfoByJoinEUIsResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *GetInfoByJoinEUIsResponse) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GetInfoByJoinEUIsResponseFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "infos":
+
+			for idx, item := range m.GetInfos() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return GetInfoByJoinEUIsResponseValidationError{
+							field:  fmt.Sprintf("infos[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		default:
+			return GetInfoByJoinEUIsResponseValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// GetInfoByJoinEUIsResponseValidationError is the validation error returned by
+// GetInfoByJoinEUIsResponse.ValidateFields if the designated constraints
+// aren't met.
+type GetInfoByJoinEUIsResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetInfoByJoinEUIsResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetInfoByJoinEUIsResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetInfoByJoinEUIsResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetInfoByJoinEUIsResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetInfoByJoinEUIsResponseValidationError) ErrorName() string {
+	return "GetInfoByJoinEUIsResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetInfoByJoinEUIsResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetInfoByJoinEUIsResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetInfoByJoinEUIsResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetInfoByJoinEUIsResponseValidationError{}
+
 // ValidateFields checks the field values on GetClaimStatusResponse with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.

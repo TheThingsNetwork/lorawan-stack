@@ -11295,6 +11295,62 @@
               "defaultValue": ""
             }
           ]
+        },
+        {
+          "name": "GetInfoByJoinEUIsRequest",
+          "longName": "GetInfoByJoinEUIsRequest",
+          "fullName": "ttn.lorawan.v3.GetInfoByJoinEUIsRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "requests",
+              "description": "",
+              "label": "repeated",
+              "type": "GetInfoByJoinEUIRequest",
+              "longType": "GetInfoByJoinEUIRequest",
+              "fullType": "ttn.lorawan.v3.GetInfoByJoinEUIRequest",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 20
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GetInfoByJoinEUIsResponse",
+          "longName": "GetInfoByJoinEUIsResponse",
+          "fullName": "ttn.lorawan.v3.GetInfoByJoinEUIsResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "infos",
+              "description": "",
+              "label": "repeated",
+              "type": "GetInfoByJoinEUIResponse",
+              "longType": "GetInfoByJoinEUIResponse",
+              "fullType": "ttn.lorawan.v3.GetInfoByJoinEUIResponse",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
         }
       ],
       "services": [
@@ -11321,6 +11377,29 @@
                     {
                       "method": "DELETE",
                       "pattern": "/edcs/claim/{application_ids.application_id}/devices/batch"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetInfoByJoinEUIs",
+              "description": "Return whether claiming is available for a given list of Join EUIs.",
+              "requestType": "GetInfoByJoinEUIsRequest",
+              "requestLongType": "GetInfoByJoinEUIsRequest",
+              "requestFullType": "ttn.lorawan.v3.GetInfoByJoinEUIsRequest",
+              "requestStreaming": false,
+              "responseType": "GetInfoByJoinEUIsResponse",
+              "responseLongType": "GetInfoByJoinEUIsResponse",
+              "responseFullType": "ttn.lorawan.v3.GetInfoByJoinEUIsResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/edcs/claim/info/batch",
+                      "body": "*"
                     }
                   ]
                 }

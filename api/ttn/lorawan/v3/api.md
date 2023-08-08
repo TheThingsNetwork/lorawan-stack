@@ -182,6 +182,8 @@
   - [Message `GetInfoByGatewayEUIResponse`](#ttn.lorawan.v3.GetInfoByGatewayEUIResponse)
   - [Message `GetInfoByJoinEUIRequest`](#ttn.lorawan.v3.GetInfoByJoinEUIRequest)
   - [Message `GetInfoByJoinEUIResponse`](#ttn.lorawan.v3.GetInfoByJoinEUIResponse)
+  - [Message `GetInfoByJoinEUIsRequest`](#ttn.lorawan.v3.GetInfoByJoinEUIsRequest)
+  - [Message `GetInfoByJoinEUIsResponse`](#ttn.lorawan.v3.GetInfoByJoinEUIsResponse)
   - [Service `EndDeviceBatchClaimingServer`](#ttn.lorawan.v3.EndDeviceBatchClaimingServer)
   - [Service `EndDeviceClaimingServer`](#ttn.lorawan.v3.EndDeviceClaimingServer)
   - [Service `GatewayClaimingServer`](#ttn.lorawan.v3.GatewayClaimingServer)
@@ -2927,17 +2929,37 @@ End devices that could not be unclaimed.
 | ----- | ----------- |
 | `join_eui` | <p>`bytes.len`: `8`</p> |
 
+### <a name="ttn.lorawan.v3.GetInfoByJoinEUIsRequest">Message `GetInfoByJoinEUIsRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `requests` | [`GetInfoByJoinEUIRequest`](#ttn.lorawan.v3.GetInfoByJoinEUIRequest) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `requests` | <p>`repeated.max_items`: `20`</p> |
+
+### <a name="ttn.lorawan.v3.GetInfoByJoinEUIsResponse">Message `GetInfoByJoinEUIsResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `infos` | [`GetInfoByJoinEUIResponse`](#ttn.lorawan.v3.GetInfoByJoinEUIResponse) | repeated |  |
+
 ### <a name="ttn.lorawan.v3.EndDeviceBatchClaimingServer">Service `EndDeviceBatchClaimingServer`</a>
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `Unclaim` | [`BatchUnclaimEndDevicesRequest`](#ttn.lorawan.v3.BatchUnclaimEndDevicesRequest) | [`BatchUnclaimEndDevicesResponse`](#ttn.lorawan.v3.BatchUnclaimEndDevicesResponse) | Unclaims multiple end devices on an external Join Server. All devices must have the same application ID. Check the response for devices that could not be unclaimed. |
+| `GetInfoByJoinEUIs` | [`GetInfoByJoinEUIsRequest`](#ttn.lorawan.v3.GetInfoByJoinEUIsRequest) | [`GetInfoByJoinEUIsResponse`](#ttn.lorawan.v3.GetInfoByJoinEUIsResponse) | Return whether claiming is supported for each Join EUI in a given list. |
 
 #### HTTP bindings
 
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
 | `Unclaim` | `DELETE` | `/api/v3/edcs/claim/{application_ids.application_id}/devices/batch` |  |
+| `GetInfoByJoinEUIs` | `POST` | `/api/v3/edcs/claim/info/batch` | `*` |
 
 ### <a name="ttn.lorawan.v3.EndDeviceClaimingServer">Service `EndDeviceClaimingServer`</a>
 

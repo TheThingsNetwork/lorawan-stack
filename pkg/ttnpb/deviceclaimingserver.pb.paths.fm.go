@@ -45,6 +45,20 @@ var GetInfoByJoinEUIResponseFieldPathsTopLevel = []string{
 	"join_eui",
 	"supports_claiming",
 }
+var GetInfoByJoinEUIsRequestFieldPathsNested = []string{
+	"requests",
+}
+
+var GetInfoByJoinEUIsRequestFieldPathsTopLevel = []string{
+	"requests",
+}
+var GetInfoByJoinEUIsResponseFieldPathsNested = []string{
+	"infos",
+}
+
+var GetInfoByJoinEUIsResponseFieldPathsTopLevel = []string{
+	"infos",
+}
 var GetClaimStatusResponseFieldPathsNested = []string{
 	"end_device_ids",
 	"end_device_ids.application_ids",

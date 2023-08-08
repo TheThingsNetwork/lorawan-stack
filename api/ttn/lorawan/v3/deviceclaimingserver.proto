@@ -143,6 +143,16 @@ message GetInfoByJoinEUIResponse {
   bool supports_claiming = 2;
 }
 
+message GetInfoByJoinEUIsRequest {
+  repeated GetInfoByJoinEUIRequest requests = 1  [
+    (validate.rules).repeated.max_items = 20
+  ];
+}
+
+message GetInfoByJoinEUIsResponse {
+  repeated GetInfoByJoinEUIResponse infos = 1;
+}
+
 message GetClaimStatusResponse {
   EndDeviceIdentifiers end_device_ids = 1 [(validate.rules).message.required = true];
   bytes home_net_id = 2 [
@@ -266,6 +276,14 @@ service EndDeviceBatchClaimingServer {
   rpc Unclaim(BatchUnclaimEndDevicesRequest) returns (BatchUnclaimEndDevicesResponse) {
     option (google.api.http) = {
       delete: "/edcs/claim/{application_ids.application_id}/devices/batch",
+    };
+  };
+
+  // Return whether claiming is supported for each Join EUI in a given list.
+  rpc GetInfoByJoinEUIs(GetInfoByJoinEUIsRequest) returns (GetInfoByJoinEUIsResponse) {
+    option (google.api.http) = {
+      post: "/edcs/claim/info/batch",
+      body: "*"
     };
   };
 }

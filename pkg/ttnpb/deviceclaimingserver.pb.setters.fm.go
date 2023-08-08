@@ -223,6 +223,46 @@ func (dst *GetInfoByJoinEUIResponse) SetFields(src *GetInfoByJoinEUIResponse, pa
 	return nil
 }
 
+func (dst *GetInfoByJoinEUIsRequest) SetFields(src *GetInfoByJoinEUIsRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "requests":
+			if len(subs) > 0 {
+				return fmt.Errorf("'requests' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Requests = src.Requests
+			} else {
+				dst.Requests = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *GetInfoByJoinEUIsResponse) SetFields(src *GetInfoByJoinEUIsResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "infos":
+			if len(subs) > 0 {
+				return fmt.Errorf("'infos' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Infos = src.Infos
+			} else {
+				dst.Infos = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *GetClaimStatusResponse) SetFields(src *GetClaimStatusResponse, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {

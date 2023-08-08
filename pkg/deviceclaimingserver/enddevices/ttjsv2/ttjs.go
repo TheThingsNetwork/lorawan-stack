@@ -333,7 +333,6 @@ func (c *TTJS) BatchUnclaim(
 		return ret, nil
 	}
 	var euis string
-	// All devices will have the Join EUI for this call.
 	joinEUI := types.MustEUI64(ids[0].JoinEui).OrZero()
 	for _, ids := range ids {
 		devEUI := types.MustEUI64(ids.DevEui).OrZero()
