@@ -107,9 +107,7 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids *ttnpb.GatewayIdentifi
 
 	gtw := conn.Gateway()
 	antennas := make([]*ttnpb.GatewayAntenna, len(gtw.Antennas))
-	for i, ant := range gtw.Antennas {
-		antennas[i] = ant
-	}
+	copy(antennas, gtw.Antennas)
 
 	pbIDs := &ttnpb.PacketBrokerGateway_GatewayIdentifiers{
 		GatewayId: ids.GatewayId,
@@ -118,26 +116,26 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids *ttnpb.GatewayIdentifi
 
 	req := &ttnpb.UpdatePacketBrokerGatewayRequest{
 		Gateway: &ttnpb.PacketBrokerGateway{
-			Ids:              pbIDs,
-			Antennas:         antennas,
-			FrequencyPlanIds: gtw.FrequencyPlanIds,
-			StatusPublic:     gtw.StatusPublic,
-			LocationPublic:   gtw.LocationPublic,
-			Online:           true,
-			RxRate: &wrapperspb.FloatValue{
-				Value: 0,
-			},
-			TxRate: &wrapperspb.FloatValue{
-				Value: 0,
-			},
+			Ids:                   pbIDs,
+			Antennas:              antennas,
+			FrequencyPlanIds:      gtw.FrequencyPlanIds,
+			StatusPublic:          gtw.StatusPublic,
+			LocationPublic:        gtw.LocationPublic,
+			AdministrativeContact: gtw.AdministrativeContact,
+			TechnicalContact:      gtw.TechnicalContact,
+			Online:                true,
+			RxRate:                &wrapperspb.FloatValue{Value: 0},
+			TxRate:                &wrapperspb.FloatValue{Value: 0},
 		},
 		FieldMask: ttnpb.FieldMask(
+			"administrative_contact",
 			"antennas",
 			"frequency_plan_ids",
 			"location_public",
 			"online",
 			"rx_rate",
 			"status_public",
+			"technical_contact",
 			"tx_rate",
 		),
 	}
