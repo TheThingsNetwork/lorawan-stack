@@ -36,6 +36,7 @@ import packetBroker from './packet-broker'
 import networkServer from './network-server'
 import qrCodeGenerator from './qr-code-generator'
 import searchAccounts from './search-accounts'
+import notifications from './notifications'
 
 export default [
   ...status,
@@ -61,4 +62,5 @@ export default [
   ...networkServer,
   ...qrCodeGenerator,
   ...searchAccounts,
+  ...notifications,
 ]
