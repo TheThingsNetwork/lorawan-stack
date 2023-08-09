@@ -42,6 +42,7 @@ import Gateways from '@console/views/gateways'
 import Organizations from '@console/views/organizations'
 import AdminPanel from '@console/views/admin-panel'
 import User from '@console/views/user'
+import Notifications from '@console/views/notifications'
 
 import { setStatusOnline } from '@ttn-lw/lib/store/actions/status'
 import { selectStatusStore } from '@ttn-lw/lib/store/selectors/status'
@@ -193,6 +194,7 @@ const ConsoleRoot = () => {
           <Route path="organizations/*" Component={Organizations} />
           <Route path="admin-panel/*" Component={AdminPanel} />
           <Route path="user/*" Component={User} />
+          <Route path="notifications" Component={Notifications} />
           <Route path="*" Component={GenericNotFound} />
         </Route>
       </Routes>
