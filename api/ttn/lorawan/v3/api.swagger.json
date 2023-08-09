@@ -8449,7 +8449,7 @@
     "/gateways/rights/batch": {
       "get": {
         "summary": "Assert that the caller has the required rights on all the requested gateways.\nThe check is successful if there are no errors.",
-        "operationId": "GatewayBatchAccess_AssertGatewayRights",
+        "operationId": "GatewayBatchAccess_AssertRights",
         "responses": {
           "200": {
             "description": "A successful response.",

@@ -5072,13 +5072,13 @@ API keys and collaborators of gateways.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `AssertGatewayRights` | [`AssertGatewayRightsRequest`](#ttn.lorawan.v3.AssertGatewayRightsRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Assert that the caller has the required rights on all the requested gateways. The check is successful if there are no errors. |
+| `AssertRights` | [`AssertGatewayRightsRequest`](#ttn.lorawan.v3.AssertGatewayRightsRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Assert that the caller has the required rights on all the requested gateways. The check is successful if there are no errors. |
 
 #### HTTP bindings
 
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
-| `AssertGatewayRights` | `GET` | `/api/v3/gateways/rights/batch` |  |
+| `AssertRights` | `GET` | `/api/v3/gateways/rights/batch` |  |
 
 ### <a name="ttn.lorawan.v3.GatewayConfigurator">Service `GatewayConfigurator`</a>
 

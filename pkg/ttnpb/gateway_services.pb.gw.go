@@ -1396,37 +1396,37 @@ func local_request_GatewayAccess_ListCollaborators_0(ctx context.Context, marsha
 }
 
 var (
-	filter_GatewayBatchAccess_AssertGatewayRights_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+	filter_GatewayBatchAccess_AssertRights_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 )
 
-func request_GatewayBatchAccess_AssertGatewayRights_0(ctx context.Context, marshaler runtime.Marshaler, client GatewayBatchAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_GatewayBatchAccess_AssertRights_0(ctx context.Context, marshaler runtime.Marshaler, client GatewayBatchAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq AssertGatewayRightsRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_GatewayBatchAccess_AssertGatewayRights_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_GatewayBatchAccess_AssertRights_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.AssertGatewayRights(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.AssertRights(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_GatewayBatchAccess_AssertGatewayRights_0(ctx context.Context, marshaler runtime.Marshaler, server GatewayBatchAccessServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_GatewayBatchAccess_AssertRights_0(ctx context.Context, marshaler runtime.Marshaler, server GatewayBatchAccessServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq AssertGatewayRightsRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_GatewayBatchAccess_AssertGatewayRights_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_GatewayBatchAccess_AssertRights_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := server.AssertGatewayRights(ctx, &protoReq)
+	msg, err := server.AssertRights(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -1930,7 +1930,7 @@ func RegisterGatewayAccessHandlerServer(ctx context.Context, mux *runtime.ServeM
 // Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterGatewayBatchAccessHandlerFromEndpoint instead.
 func RegisterGatewayBatchAccessHandlerServer(ctx context.Context, mux *runtime.ServeMux, server GatewayBatchAccessServer) error {
 
-	mux.Handle("GET", pattern_GatewayBatchAccess_AssertGatewayRights_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_GatewayBatchAccess_AssertRights_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -1938,12 +1938,12 @@ func RegisterGatewayBatchAccessHandlerServer(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.GatewayBatchAccess/AssertGatewayRights", runtime.WithHTTPPathPattern("/gateways/rights/batch"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.GatewayBatchAccess/AssertRights", runtime.WithHTTPPathPattern("/gateways/rights/batch"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_GatewayBatchAccess_AssertGatewayRights_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_GatewayBatchAccess_AssertRights_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
@@ -1951,7 +1951,7 @@ func RegisterGatewayBatchAccessHandlerServer(ctx context.Context, mux *runtime.S
 			return
 		}
 
-		forward_GatewayBatchAccess_AssertGatewayRights_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_GatewayBatchAccess_AssertRights_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2580,25 +2580,25 @@ func RegisterGatewayBatchAccessHandler(ctx context.Context, mux *runtime.ServeMu
 // "GatewayBatchAccessClient" to call the correct interceptors.
 func RegisterGatewayBatchAccessHandlerClient(ctx context.Context, mux *runtime.ServeMux, client GatewayBatchAccessClient) error {
 
-	mux.Handle("GET", pattern_GatewayBatchAccess_AssertGatewayRights_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_GatewayBatchAccess_AssertRights_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.GatewayBatchAccess/AssertGatewayRights", runtime.WithHTTPPathPattern("/gateways/rights/batch"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.GatewayBatchAccess/AssertRights", runtime.WithHTTPPathPattern("/gateways/rights/batch"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_GatewayBatchAccess_AssertGatewayRights_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_GatewayBatchAccess_AssertRights_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_GatewayBatchAccess_AssertGatewayRights_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_GatewayBatchAccess_AssertRights_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2606,9 +2606,9 @@ func RegisterGatewayBatchAccessHandlerClient(ctx context.Context, mux *runtime.S
 }
 
 var (
-	pattern_GatewayBatchAccess_AssertGatewayRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"gateways", "rights", "batch"}, ""))
+	pattern_GatewayBatchAccess_AssertRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"gateways", "rights", "batch"}, ""))
 )
 
 var (
-	forward_GatewayBatchAccess_AssertGatewayRights_0 = runtime.ForwardResponseMessage
+	forward_GatewayBatchAccess_AssertRights_0 = runtime.ForwardResponseMessage
 )

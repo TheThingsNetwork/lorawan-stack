@@ -22885,7 +22885,7 @@
           "description": "",
           "methods": [
             {
-              "name": "AssertGatewayRights",
+              "name": "AssertRights",
               "description": "Assert that the caller has the required rights on all the requested gateways.\nThe check is successful if there are no errors.",
               "requestType": "AssertGatewayRightsRequest",
               "requestLongType": "AssertGatewayRightsRequest",

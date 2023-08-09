@@ -917,7 +917,7 @@ var GatewayConfigurator_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	GatewayBatchAccess_AssertGatewayRights_FullMethodName = "/ttn.lorawan.v3.GatewayBatchAccess/AssertGatewayRights"
+	GatewayBatchAccess_AssertRights_FullMethodName = "/ttn.lorawan.v3.GatewayBatchAccess/AssertRights"
 )
 
 // GatewayBatchAccessClient is the client API for GatewayBatchAccess service.
@@ -926,7 +926,7 @@ const (
 type GatewayBatchAccessClient interface {
 	// Assert that the caller has the required rights on all the requested gateways.
 	// The check is successful if there are no errors.
-	AssertGatewayRights(ctx context.Context, in *AssertGatewayRightsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	AssertRights(ctx context.Context, in *AssertGatewayRightsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type gatewayBatchAccessClient struct {
@@ -937,9 +937,9 @@ func NewGatewayBatchAccessClient(cc grpc.ClientConnInterface) GatewayBatchAccess
 	return &gatewayBatchAccessClient{cc}
 }
 
-func (c *gatewayBatchAccessClient) AssertGatewayRights(ctx context.Context, in *AssertGatewayRightsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *gatewayBatchAccessClient) AssertRights(ctx context.Context, in *AssertGatewayRightsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, GatewayBatchAccess_AssertGatewayRights_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, GatewayBatchAccess_AssertRights_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -952,7 +952,7 @@ func (c *gatewayBatchAccessClient) AssertGatewayRights(ctx context.Context, in *
 type GatewayBatchAccessServer interface {
 	// Assert that the caller has the required rights on all the requested gateways.
 	// The check is successful if there are no errors.
-	AssertGatewayRights(context.Context, *AssertGatewayRightsRequest) (*emptypb.Empty, error)
+	AssertRights(context.Context, *AssertGatewayRightsRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedGatewayBatchAccessServer()
 }
 
@@ -960,8 +960,8 @@ type GatewayBatchAccessServer interface {
 type UnimplementedGatewayBatchAccessServer struct {
 }
 
-func (UnimplementedGatewayBatchAccessServer) AssertGatewayRights(context.Context, *AssertGatewayRightsRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AssertGatewayRights not implemented")
+func (UnimplementedGatewayBatchAccessServer) AssertRights(context.Context, *AssertGatewayRightsRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AssertRights not implemented")
 }
 func (UnimplementedGatewayBatchAccessServer) mustEmbedUnimplementedGatewayBatchAccessServer() {}
 
@@ -976,20 +976,20 @@ func RegisterGatewayBatchAccessServer(s grpc.ServiceRegistrar, srv GatewayBatchA
 	s.RegisterService(&GatewayBatchAccess_ServiceDesc, srv)
 }
 
-func _GatewayBatchAccess_AssertGatewayRights_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _GatewayBatchAccess_AssertRights_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AssertGatewayRightsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GatewayBatchAccessServer).AssertGatewayRights(ctx, in)
+		return srv.(GatewayBatchAccessServer).AssertRights(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: GatewayBatchAccess_AssertGatewayRights_FullMethodName,
+		FullMethod: GatewayBatchAccess_AssertRights_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GatewayBatchAccessServer).AssertGatewayRights(ctx, req.(*AssertGatewayRightsRequest))
+		return srv.(GatewayBatchAccessServer).AssertRights(ctx, req.(*AssertGatewayRightsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1002,8 +1002,8 @@ var GatewayBatchAccess_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*GatewayBatchAccessServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "AssertGatewayRights",
-			Handler:    _GatewayBatchAccess_AssertGatewayRights_Handler,
+			MethodName: "AssertRights",
+			Handler:    _GatewayBatchAccess_AssertRights_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

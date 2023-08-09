@@ -400,3 +400,46 @@ func (ga *gatewayAccess) SetCollaborator(ctx context.Context, req *ttnpb.SetGate
 func (ga *gatewayAccess) ListCollaborators(ctx context.Context, req *ttnpb.ListGatewayCollaboratorsRequest) (*ttnpb.Collaborators, error) {
 	return ga.listGatewayCollaborators(ctx, req)
 }
+
+type gatewayBatchAccess struct {
+	ttnpb.UnimplementedGatewayBatchAccessServer
+
+	*IdentityServer
+}
+
+var (
+	errNoRequiredGatewayRights = errors.DefineInvalidArgument(
+		"no_required_gateway_rights",
+		"no required gateway rights in request",
+	)
+	errNonGatewayRights = errors.DefineInvalidArgument(
+		"non_gateway_rights",
+		"non-gateway rights `{rights}` in request",
+	)
+)
+
+// AssertRights implements ttnpb.GatewayBatchAccessServer.
+func (gba *gatewayBatchAccess) AssertRights(ctx context.Context, req *ttnpb.AssertGatewayRightsRequest) (*emptypb.Empty, error) {
+	// Sanitize request.
+	required := req.RequiredRights.Unique()
+	if len(required.GetRights()) == 0 {
+		return nil, errNoRequiredGatewayRights.New()
+	}
+
+	// Check that the request is checking only gateway rights.
+	gatewayRights := ttnpb.AllGatewayRights.Intersect(ttnpb.RightsFrom(required.GetRights()...))
+	if len(gatewayRights.GetRights()) == 0 {
+		return nil, errNoRequiredGatewayRights.New()
+	}
+	otherRights := required.Sub(gatewayRights)
+	if len(otherRights.GetRights()) > 0 {
+		return nil, errNonGatewayRights.WithAttributes("rights", otherRights.GetRights())
+	}
+
+	err := gba.assertGatewayRights(ctx, req.GatewayIds, required)
+	if err != nil {
+		return nil, err
+	}
+
+	return ttnpb.Empty, nil
+}
