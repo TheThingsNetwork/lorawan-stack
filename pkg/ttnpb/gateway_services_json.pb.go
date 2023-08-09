@@ -76,3 +76,149 @@ func (x *PullGatewayConfigurationRequest) UnmarshalProtoJSON(s *jsonplugin.Unmar
 func (x *PullGatewayConfigurationRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
+
+// MarshalProtoJSON marshals the AssertGatewayRightsRequest message to JSON.
+func (x *AssertGatewayRightsRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.GatewayIds) > 0 || s.HasField("gateway_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("gateway_ids")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.GatewayIds {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("gateway_ids"))
+		}
+		s.WriteArrayEnd()
+	}
+	if x.RequiredRights != nil || s.HasField("required_rights") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("required_rights")
+		x.RequiredRights.MarshalProtoJSON(s.WithField("required_rights"))
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the AssertGatewayRightsRequest to JSON.
+func (x *AssertGatewayRightsRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the AssertGatewayRightsRequest message from JSON.
+func (x *AssertGatewayRightsRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "gateway_ids", "gatewayIds":
+			s.AddField("gateway_ids")
+			if s.ReadNil() {
+				x.GatewayIds = nil
+				return
+			}
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.GatewayIds = append(x.GatewayIds, nil)
+					return
+				}
+				v := &GatewayIdentifiers{}
+				v.UnmarshalProtoJSON(s.WithField("gateway_ids", false))
+				if s.Err() != nil {
+					return
+				}
+				x.GatewayIds = append(x.GatewayIds, v)
+			})
+		case "required_rights", "requiredRights":
+			if s.ReadNil() {
+				x.RequiredRights = nil
+				return
+			}
+			x.RequiredRights = &Rights{}
+			x.RequiredRights.UnmarshalProtoJSON(s.WithField("required_rights", true))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the AssertGatewayRightsRequest from JSON.
+func (x *AssertGatewayRightsRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the AssertGatewayRightsResponse message to JSON.
+func (x *AssertGatewayRightsResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.GatewayIds) > 0 || s.HasField("gateway_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("gateway_ids")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.GatewayIds {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("gateway_ids"))
+		}
+		s.WriteArrayEnd()
+	}
+	if x.HasRequiredRights || s.HasField("has_required_rights") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("has_required_rights")
+		s.WriteBool(x.HasRequiredRights)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the AssertGatewayRightsResponse to JSON.
+func (x *AssertGatewayRightsResponse) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the AssertGatewayRightsResponse message from JSON.
+func (x *AssertGatewayRightsResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "gateway_ids", "gatewayIds":
+			s.AddField("gateway_ids")
+			if s.ReadNil() {
+				x.GatewayIds = nil
+				return
+			}
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.GatewayIds = append(x.GatewayIds, nil)
+					return
+				}
+				v := &GatewayIdentifiers{}
+				v.UnmarshalProtoJSON(s.WithField("gateway_ids", false))
+				if s.Err() != nil {
+					return
+				}
+				x.GatewayIds = append(x.GatewayIds, v)
+			})
+		case "has_required_rights", "hasRequiredRights":
+			s.AddField("has_required_rights")
+			x.HasRequiredRights = s.ReadBool()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the AssertGatewayRightsResponse from JSON.
+func (x *AssertGatewayRightsResponse) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}

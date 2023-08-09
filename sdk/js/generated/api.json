@@ -22546,6 +22546,94 @@
       "extensions": [],
       "messages": [
         {
+          "name": "AssertGatewayRightsRequest",
+          "longName": "AssertGatewayRightsRequest",
+          "fullName": "ttn.lorawan.v3.AssertGatewayRightsRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_ids",
+              "description": "",
+              "label": "repeated",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 20
+                  }
+                ]
+              }
+            },
+            {
+              "name": "required_rights",
+              "description": "",
+              "label": "",
+              "type": "Rights",
+              "longType": "Rights",
+              "fullType": "ttn.lorawan.v3.Rights",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "AssertGatewayRightsResponse",
+          "longName": "AssertGatewayRightsResponse",
+          "fullName": "ttn.lorawan.v3.AssertGatewayRightsResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_ids",
+              "description": "",
+              "label": "repeated",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 20
+                  }
+                ]
+              }
+            },
+            {
+              "name": "has_required_rights",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "PullGatewayConfigurationRequest",
           "longName": "PullGatewayConfigurationRequest",
           "fullName": "ttn.lorawan.v3.PullGatewayConfigurationRequest",
@@ -22584,10 +22672,40 @@
       ],
       "services": [
         {
+          "name": "BatchAccess",
+          "longName": "BatchAccess",
+          "fullName": "ttn.lorawan.v3.BatchAccess",
+          "description": "TODO: Rework the naming",
+          "methods": [
+            {
+              "name": "AssertGatewayRights",
+              "description": "Assert that the caller has the required rights on all the gateways.",
+              "requestType": "AssertGatewayRightsRequest",
+              "requestLongType": "AssertGatewayRightsRequest",
+              "requestFullType": "ttn.lorawan.v3.AssertGatewayRightsRequest",
+              "requestStreaming": false,
+              "responseType": "AssertGatewayRightsResponse",
+              "responseLongType": "AssertGatewayRightsResponse",
+              "responseFullType": "ttn.lorawan.v3.AssertGatewayRightsResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/gateways/rights/batch"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
           "name": "GatewayAccess",
           "longName": "GatewayAccess",
           "fullName": "ttn.lorawan.v3.GatewayAccess",
-          "description": "The GatewayAcces service, exposed by the Identity Server, is used to manage\nAPI keys and collaborators of gateways.",
+          "description": "The GatewayAccess service, exposed by the Identity Server, is used to manage\nAPI keys and collaborators of gateways.",
           "methods": [
             {
               "name": "ListRights",

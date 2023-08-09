@@ -330,7 +330,10 @@
   - [Message `GetGatewayConfigurationResponse`](#ttn.lorawan.v3.GetGatewayConfigurationResponse)
   - [Service `GatewayConfigurationService`](#ttn.lorawan.v3.GatewayConfigurationService)
 - [File `ttn/lorawan/v3/gateway_services.proto`](#ttn/lorawan/v3/gateway_services.proto)
+  - [Message `AssertGatewayRightsRequest`](#ttn.lorawan.v3.AssertGatewayRightsRequest)
+  - [Message `AssertGatewayRightsResponse`](#ttn.lorawan.v3.AssertGatewayRightsResponse)
   - [Message `PullGatewayConfigurationRequest`](#ttn.lorawan.v3.PullGatewayConfigurationRequest)
+  - [Service `BatchAccess`](#ttn.lorawan.v3.BatchAccess)
   - [Service `GatewayAccess`](#ttn.lorawan.v3.GatewayAccess)
   - [Service `GatewayConfigurator`](#ttn.lorawan.v3.GatewayConfigurator)
   - [Service `GatewayRegistry`](#ttn.lorawan.v3.GatewayRegistry)
@@ -5000,6 +5003,32 @@ Identifies an end device model with version information.
 
 ## <a name="ttn/lorawan/v3/gateway_services.proto">File `ttn/lorawan/v3/gateway_services.proto`</a>
 
+### <a name="ttn.lorawan.v3.AssertGatewayRightsRequest">Message `AssertGatewayRightsRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | repeated |  |
+| `required_rights` | [`Rights`](#ttn.lorawan.v3.Rights) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `gateway_ids` | <p>`repeated.max_items`: `20`</p> |
+
+### <a name="ttn.lorawan.v3.AssertGatewayRightsResponse">Message `AssertGatewayRightsResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | repeated |  |
+| `has_required_rights` | [`bool`](#bool) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `gateway_ids` | <p>`repeated.max_items`: `20`</p> |
+
 ### <a name="ttn.lorawan.v3.PullGatewayConfigurationRequest">Message `PullGatewayConfigurationRequest`</a>
 
 | Field | Type | Label | Description |
@@ -5007,9 +5036,23 @@ Identifies an end device model with version information.
 | `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
 | `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
 
+### <a name="ttn.lorawan.v3.BatchAccess">Service `BatchAccess`</a>
+
+TODO: Rework the naming
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `AssertGatewayRights` | [`AssertGatewayRightsRequest`](#ttn.lorawan.v3.AssertGatewayRightsRequest) | [`AssertGatewayRightsResponse`](#ttn.lorawan.v3.AssertGatewayRightsResponse) | Assert that the caller has the required rights on all the gateways. |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `AssertGatewayRights` | `GET` | `/api/v3/gateways/rights/batch` |  |
+
 ### <a name="ttn.lorawan.v3.GatewayAccess">Service `GatewayAccess`</a>
 
-The GatewayAcces service, exposed by the Identity Server, is used to manage
+The GatewayAccess service, exposed by the Identity Server, is used to manage
 API keys and collaborators of gateways.
 
 | Method Name | Request Type | Response Type | Description |

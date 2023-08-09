@@ -915,3 +915,95 @@ var GatewayConfigurator_ServiceDesc = grpc.ServiceDesc{
 	},
 	Metadata: "ttn/lorawan/v3/gateway_services.proto",
 }
+
+const (
+	BatchAccess_AssertGatewayRights_FullMethodName = "/ttn.lorawan.v3.BatchAccess/AssertGatewayRights"
+)
+
+// BatchAccessClient is the client API for BatchAccess service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type BatchAccessClient interface {
+	// Assert that the caller has the required rights on all the gateways.
+	AssertGatewayRights(ctx context.Context, in *AssertGatewayRightsRequest, opts ...grpc.CallOption) (*AssertGatewayRightsResponse, error)
+}
+
+type batchAccessClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewBatchAccessClient(cc grpc.ClientConnInterface) BatchAccessClient {
+	return &batchAccessClient{cc}
+}
+
+func (c *batchAccessClient) AssertGatewayRights(ctx context.Context, in *AssertGatewayRightsRequest, opts ...grpc.CallOption) (*AssertGatewayRightsResponse, error) {
+	out := new(AssertGatewayRightsResponse)
+	err := c.cc.Invoke(ctx, BatchAccess_AssertGatewayRights_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// BatchAccessServer is the server API for BatchAccess service.
+// All implementations must embed UnimplementedBatchAccessServer
+// for forward compatibility
+type BatchAccessServer interface {
+	// Assert that the caller has the required rights on all the gateways.
+	AssertGatewayRights(context.Context, *AssertGatewayRightsRequest) (*AssertGatewayRightsResponse, error)
+	mustEmbedUnimplementedBatchAccessServer()
+}
+
+// UnimplementedBatchAccessServer must be embedded to have forward compatible implementations.
+type UnimplementedBatchAccessServer struct {
+}
+
+func (UnimplementedBatchAccessServer) AssertGatewayRights(context.Context, *AssertGatewayRightsRequest) (*AssertGatewayRightsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AssertGatewayRights not implemented")
+}
+func (UnimplementedBatchAccessServer) mustEmbedUnimplementedBatchAccessServer() {}
+
+// UnsafeBatchAccessServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to BatchAccessServer will
+// result in compilation errors.
+type UnsafeBatchAccessServer interface {
+	mustEmbedUnimplementedBatchAccessServer()
+}
+
+func RegisterBatchAccessServer(s grpc.ServiceRegistrar, srv BatchAccessServer) {
+	s.RegisterService(&BatchAccess_ServiceDesc, srv)
+}
+
+func _BatchAccess_AssertGatewayRights_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AssertGatewayRightsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BatchAccessServer).AssertGatewayRights(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BatchAccess_AssertGatewayRights_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BatchAccessServer).AssertGatewayRights(ctx, req.(*AssertGatewayRightsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// BatchAccess_ServiceDesc is the grpc.ServiceDesc for BatchAccess service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var BatchAccess_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "ttn.lorawan.v3.BatchAccess",
+	HandlerType: (*BatchAccessServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "AssertGatewayRights",
+			Handler:    _BatchAccess_AssertGatewayRights_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "ttn/lorawan/v3/gateway_services.proto",
+}
