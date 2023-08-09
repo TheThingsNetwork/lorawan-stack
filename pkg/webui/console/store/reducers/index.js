@@ -63,6 +63,7 @@ import as from './application-server'
 import deviceRepository from './device-repository'
 import packetBroker from './packet-broker'
 import ns from './network-server'
+import notifications from './notifications'
 
 export default combineReducers({
   user,
@@ -121,4 +122,5 @@ export default combineReducers({
   packetBroker,
   ns,
   searchAccounts,
+  notifications,
 })
