@@ -213,3 +213,97 @@ func (is *IdentityServer) UserRights(ctx context.Context, userIDs *ttnpb.UserIde
 	}
 	return entity.Union(universal), nil
 }
+
+var errInsufficientRights = errors.DefinePermissionDenied(
+	"inufficient_rights",
+	"inufficient rights",
+)
+
+func (is *IdentityServer) assertGatewayRights(
+	ctx context.Context,
+	gtwIDs []*ttnpb.GatewayIdentifiers,
+	requiredGatewayRights *ttnpb.Rights,
+) error {
+	authInfo, err := is.authInfo(ctx)
+	if err != nil {
+		return err
+	}
+
+	// If the caller is not an organization or user, there's nothing more to do.
+	ouID := authInfo.GetOrganizationOrUserIdentifiers()
+	if ouID == nil {
+		return errInsufficientRights.New()
+	}
+
+	// Check that the caller has the requested rights.
+	authInfoRights := ttnpb.RightsFrom(authInfo.GetRights()...)
+	if len(requiredGatewayRights.Intersect(authInfoRights).GetRights()) == 0 {
+		return errInsufficientRights.New()
+	}
+
+	entityIDs := make([]string, 0, len(gtwIDs))
+	for _, gtwID := range gtwIDs {
+		entityIDs = append(entityIDs, gtwID.GetEntityIdentifiers().IDString())
+	}
+
+	return is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		gtws, err := st.FindGateways(ctx, gtwIDs, []string{"ids", "status_public", "location_public"})
+		if err != nil {
+			return err
+		}
+		if len(gtws) != len(gtwIDs) {
+			// Some gateways were not found.
+			return errInsufficientRights.New()
+		}
+
+		if len(requiredGatewayRights.Sub(
+			ttnpb.RightsFrom(
+				ttnpb.Right_RIGHT_GATEWAY_STATUS_READ,
+			),
+		).GetRights()) == 0 {
+			// Only the public status is requested. Check that all the gateways in the batch allow this.
+			for _, gtw := range gtws {
+				if !gtw.StatusPublic {
+					return errInsufficientRights.New()
+				}
+			}
+			return nil
+		}
+
+		if len(requiredGatewayRights.Sub(
+			ttnpb.RightsFrom(
+				ttnpb.Right_RIGHT_GATEWAY_LOCATION_READ,
+			),
+		).GetRights()) == 0 {
+			// Only public location is requested. Check that all the gateways in the batch allow this.
+			for _, gtw := range gtws {
+				if !gtw.LocationPublic {
+					return errInsufficientRights.New()
+				}
+			}
+			return nil
+		}
+
+		membershipChains, err := st.FindAccountMembershipChains(
+			ctx,
+			ouID,
+			gtwIDs[0].EntityType(),
+			entityIDs...,
+		)
+		if err != nil {
+			return err
+		}
+		if len(membershipChains) != len(gtwIDs) {
+			// Some memberships were not found.
+			return errInsufficientRights.New()
+		}
+
+		for _, chain := range membershipChains {
+			// Check if each chain has the required rights on the particular gateway (entity).
+			if len(requiredGatewayRights.Intersect(chain.GetRights()).GetRights()) == 0 {
+				return errInsufficientRights.New()
+			}
+		}
+		return nil
+	})
+}
