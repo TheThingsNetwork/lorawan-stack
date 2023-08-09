@@ -22569,6 +22569,10 @@
               "options": {
                 "validate.rules": [
                   {
+                    "name": "repeated.min_items",
+                    "value": 1
+                  },
+                  {
                     "name": "repeated.max_items",
                     "value": 20
                   }
@@ -22585,7 +22589,15 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -22671,36 +22683,6 @@
         }
       ],
       "services": [
-        {
-          "name": "BatchAccess",
-          "longName": "BatchAccess",
-          "fullName": "ttn.lorawan.v3.BatchAccess",
-          "description": "TODO: Rework the naming",
-          "methods": [
-            {
-              "name": "AssertGatewayRights",
-              "description": "Assert that the caller has the required rights on all the gateways.",
-              "requestType": "AssertGatewayRightsRequest",
-              "requestLongType": "AssertGatewayRightsRequest",
-              "requestFullType": "ttn.lorawan.v3.AssertGatewayRightsRequest",
-              "requestStreaming": false,
-              "responseType": "AssertGatewayRightsResponse",
-              "responseLongType": "AssertGatewayRightsResponse",
-              "responseFullType": "ttn.lorawan.v3.AssertGatewayRightsResponse",
-              "responseStreaming": false,
-              "options": {
-                "google.api.http": {
-                  "rules": [
-                    {
-                      "method": "GET",
-                      "pattern": "/gateways/rights/batch"
-                    }
-                  ]
-                }
-              }
-            }
-          ]
-        },
         {
           "name": "GatewayAccess",
           "longName": "GatewayAccess",
@@ -22889,6 +22871,36 @@
                     {
                       "method": "GET",
                       "pattern": "/gateways/{gateway_ids.gateway_id}/collaborators"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "GatewayBatchAccess",
+          "longName": "GatewayBatchAccess",
+          "fullName": "ttn.lorawan.v3.GatewayBatchAccess",
+          "description": "",
+          "methods": [
+            {
+              "name": "AssertGatewayRights",
+              "description": "Assert that the caller has the required rights on all the requested gateways.\nThe check is successful if there are no errors.",
+              "requestType": "AssertGatewayRightsRequest",
+              "requestLongType": "AssertGatewayRightsRequest",
+              "requestFullType": "ttn.lorawan.v3.AssertGatewayRightsRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/gateways/rights/batch"
                     }
                   ]
                 }

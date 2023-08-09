@@ -166,8 +166,11 @@ service GatewayConfigurator {
 }
 
 message AssertGatewayRightsRequest {
-  repeated GatewayIdentifiers gateway_ids = 1 [(validate.rules).repeated.max_items = 20];
-  Rights required_rights = 2;
+  repeated GatewayIdentifiers gateway_ids = 1 [
+    (validate.rules).repeated.min_items = 1,
+    (validate.rules).repeated.max_items = 20
+  ];
+  Rights required_rights = 2 [(validate.rules).message.required = true];
 }
 
 message AssertGatewayRightsResponse {
@@ -175,10 +178,10 @@ message AssertGatewayRightsResponse {
   bool has_required_rights = 2;
 }
 
-//TODO: Rework the naming
-service BatchAccess {
-  // Assert that the caller has the required rights on all the gateways.
-  rpc AssertGatewayRights(AssertGatewayRightsRequest) returns (AssertGatewayRightsResponse) {
+service GatewayBatchAccess {
+  // Assert that the caller has the required rights on all the requested gateways.
+  // The check is successful if there are no errors.
+  rpc AssertGatewayRights(AssertGatewayRightsRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {get: "/gateways/rights/batch"};
   }
 }

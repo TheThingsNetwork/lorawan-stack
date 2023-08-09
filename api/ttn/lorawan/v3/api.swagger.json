@@ -87,7 +87,7 @@
       "name": "GatewayConfigurator"
     },
     {
-      "name": "BatchAccess"
+      "name": "GatewayBatchAccess"
     },
     {
       "name": "GtwGs"
@@ -8448,13 +8448,14 @@
     },
     "/gateways/rights/batch": {
       "get": {
-        "summary": "Assert that the caller has the required rights on all the gateways.",
-        "operationId": "BatchAccess_AssertGatewayRights",
+        "summary": "Assert that the caller has the required rights on all the requested gateways.\nThe check is successful if there are no errors.",
+        "operationId": "GatewayBatchAccess_AssertGatewayRights",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v3AssertGatewayRightsResponse"
+              "type": "object",
+              "properties": {}
             }
           },
           "default": {
@@ -8544,7 +8545,7 @@
           }
         ],
         "tags": [
-          "BatchAccess"
+          "GatewayBatchAccess"
         ]
       }
     },
@@ -20321,21 +20322,6 @@
         }
       },
       "description": "Application Server configuration."
-    },
-    "v3AssertGatewayRightsResponse": {
-      "type": "object",
-      "properties": {
-        "gateway_ids": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/lorawanv3GatewayIdentifiers"
-          }
-        },
-        "has_required_rights": {
-          "type": "boolean"
-        }
-      }
     },
     "v3AuthInfoResponse": {
       "type": "object",

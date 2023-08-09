@@ -155,10 +155,10 @@ func (m *AssertGatewayRightsRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "gateway_ids":
 
-			if len(m.GetGatewayIds()) > 20 {
+			if l := len(m.GetGatewayIds()); l < 1 || l > 20 {
 				return AssertGatewayRightsRequestValidationError{
 					field:  "gateway_ids",
-					reason: "value must contain no more than 20 item(s)",
+					reason: "value must contain between 1 and 20 items, inclusive",
 				}
 			}
 
@@ -178,6 +178,13 @@ func (m *AssertGatewayRightsRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "required_rights":
+
+			if m.GetRequiredRights() == nil {
+				return AssertGatewayRightsRequestValidationError{
+					field:  "required_rights",
+					reason: "value is required",
+				}
+			}
 
 			if v, ok := interface{}(m.GetRequiredRights()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {

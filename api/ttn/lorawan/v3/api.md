@@ -333,8 +333,8 @@
   - [Message `AssertGatewayRightsRequest`](#ttn.lorawan.v3.AssertGatewayRightsRequest)
   - [Message `AssertGatewayRightsResponse`](#ttn.lorawan.v3.AssertGatewayRightsResponse)
   - [Message `PullGatewayConfigurationRequest`](#ttn.lorawan.v3.PullGatewayConfigurationRequest)
-  - [Service `BatchAccess`](#ttn.lorawan.v3.BatchAccess)
   - [Service `GatewayAccess`](#ttn.lorawan.v3.GatewayAccess)
+  - [Service `GatewayBatchAccess`](#ttn.lorawan.v3.GatewayBatchAccess)
   - [Service `GatewayConfigurator`](#ttn.lorawan.v3.GatewayConfigurator)
   - [Service `GatewayRegistry`](#ttn.lorawan.v3.GatewayRegistry)
 - [File `ttn/lorawan/v3/gatewayserver.proto`](#ttn/lorawan/v3/gatewayserver.proto)
@@ -5014,7 +5014,8 @@ Identifies an end device model with version information.
 
 | Field | Validations |
 | ----- | ----------- |
-| `gateway_ids` | <p>`repeated.max_items`: `20`</p> |
+| `gateway_ids` | <p>`repeated.min_items`: `1`</p><p>`repeated.max_items`: `20`</p> |
+| `required_rights` | <p>`message.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.AssertGatewayRightsResponse">Message `AssertGatewayRightsResponse`</a>
 
@@ -5035,20 +5036,6 @@ Identifies an end device model with version information.
 | ----- | ---- | ----- | ----------- |
 | `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
 | `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
-
-### <a name="ttn.lorawan.v3.BatchAccess">Service `BatchAccess`</a>
-
-TODO: Rework the naming
-
-| Method Name | Request Type | Response Type | Description |
-| ----------- | ------------ | ------------- | ------------|
-| `AssertGatewayRights` | [`AssertGatewayRightsRequest`](#ttn.lorawan.v3.AssertGatewayRightsRequest) | [`AssertGatewayRightsResponse`](#ttn.lorawan.v3.AssertGatewayRightsResponse) | Assert that the caller has the required rights on all the gateways. |
-
-#### HTTP bindings
-
-| Method Name | Method | Pattern | Body |
-| ----------- | ------ | ------- | ---- |
-| `AssertGatewayRights` | `GET` | `/api/v3/gateways/rights/batch` |  |
 
 ### <a name="ttn.lorawan.v3.GatewayAccess">Service `GatewayAccess`</a>
 
@@ -5080,6 +5067,18 @@ API keys and collaborators of gateways.
 | `GetCollaborator` | `GET` | `/api/v3/gateways/{gateway_ids.gateway_id}/collaborator/organization/{collaborator.organization_ids.organization_id}` |  |
 | `SetCollaborator` | `PUT` | `/api/v3/gateways/{gateway_ids.gateway_id}/collaborators` | `*` |
 | `ListCollaborators` | `GET` | `/api/v3/gateways/{gateway_ids.gateway_id}/collaborators` |  |
+
+### <a name="ttn.lorawan.v3.GatewayBatchAccess">Service `GatewayBatchAccess`</a>
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `AssertGatewayRights` | [`AssertGatewayRightsRequest`](#ttn.lorawan.v3.AssertGatewayRightsRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Assert that the caller has the required rights on all the requested gateways. The check is successful if there are no errors. |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `AssertGatewayRights` | `GET` | `/api/v3/gateways/rights/batch` |  |
 
 ### <a name="ttn.lorawan.v3.GatewayConfigurator">Service `GatewayConfigurator`</a>
 
