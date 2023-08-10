@@ -14,6 +14,8 @@
 
 import tts from '@console/api/tts'
 
+import toast from '@ttn-lw/components/toast'
+
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
 import * as notifications from '@console/store/actions/notifications'
@@ -25,7 +27,16 @@ const getNotificationsLogic = createRequestLogic({
       payload: { parentType, parentId, params },
     } = action
     const { page, limit } = params
+    clearInterval()
     const result = await tts.Notifications.getAllNotifications(parentType, parentId, page, limit)
+    let totalCount
+    setInterval(async () => {
+      const newResult = await tts.Notifications.getAllNotifications(parentType, parentId, 1, limit)
+      if (newResult.totalCount > totalCount) {
+        toast({ message: 'You have new notifications', type: toast.types.INFO })
+      }
+      totalCount = newResult.totalCount
+    }, [300000]) // 5 minutes
 
     return { notifications: result.notifications, totalCount: result.totalCount }
   },
