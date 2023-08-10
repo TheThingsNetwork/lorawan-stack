@@ -22,10 +22,12 @@ const getNotificationsLogic = createRequestLogic({
   type: notifications.GET_NOTIFICATIONS,
   process: async ({ action }) => {
     const {
-      payload: { parentType, parentId },
+      payload: { parentType, parentId, params },
     } = action
+    const { page, limit } = params
+    const result = await tts.Notifications.getAllNotifications(parentType, parentId, page, limit)
 
-    return await tts.Notifications.getAllNotifications(parentType, parentId)
+    return { notifications: result.notifications, totalCount: result.totalCount }
   },
 })
 

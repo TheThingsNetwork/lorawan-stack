@@ -20,17 +20,29 @@ import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import NotificationsContainer from '@console/containers/notifications'
 
+import useQueryState from '@ttn-lw/lib/hooks/use-query-state'
+
 import { getNotifications } from '@console/store/actions/notifications'
 
 import { selectUserId } from '@console/store/selectors/logout'
 
 const NotificationsView = () => {
   const userId = useSelector(selectUserId)
+  const [page, setPage] = useQueryState('page', 1, parseInt)
 
   return (
-    <RequireRequest requestAction={getNotifications(userId)}>
+    <RequireRequest
+      requestAction={getNotifications(
+        userId,
+        ['NOTIFICATION_STATUS_UNSEEN', 'NOTIFICATION_STATUS_SEEN'],
+        {
+          limit: 8,
+          page,
+        },
+      )}
+    >
       <Container>
-        <NotificationsContainer />
+        <NotificationsContainer setPage={setPage} page={page} />
       </Container>
     </RequireRequest>
   )
