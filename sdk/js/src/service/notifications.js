@@ -22,12 +22,12 @@ class Notifications {
     autoBind(this)
   }
 
-  async getAllNotifications(recieverId, selector) {
+  async getAllNotifications(recieverId, selector, page, limit) {
     const result = await this._api.NotificationService.List(
       {
         routeParams: { 'receiver_ids.user_id': recieverId },
       },
-      { status: selector ?? [] },
+      { status: selector ?? [], limit, page },
     )
     return Marshaler.payloadListResponse('notifications', result)
   }
