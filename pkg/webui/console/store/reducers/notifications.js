@@ -20,43 +20,21 @@ const defaultState = {
     unseen: {},
     archived: {},
   },
+  totalCount: undefined,
 }
-
-const getUnseenNotifications = notifications =>
-  notifications.reduce((acc, not) => {
-    if (!('status' in not) || not.status === 'NOTIFICATION_STATUS_UNSEEN') {
-      acc[not.id] = not
-    }
-
-    return acc
-  }, {})
-
-const getNotifications = (notifications, status) =>
-  notifications.reduce((acc, not) => {
-    if (not.status === status) {
-      acc[not.id] = not
-    }
-
-    return acc
-  }, {})
 
 const notifications = (state = defaultState, { type, payload }) => {
   switch (type) {
     case GET_NOTIFICATIONS_SUCCESS:
       return {
-        ...state.notifications,
-        seen: {
-          ...state?.notifications?.seen,
-          ...getNotifications(payload.notifications, 'NOTIFICATION_STATUS_SEEN'),
+        ...state,
+        notifications: {
+          ...payload.notifications.reduce((acc, not) => {
+            acc[not.id] = not
+            return acc
+          }, {}),
         },
-        unseen: {
-          ...state?.notifications?.unseen,
-          ...getUnseenNotifications(payload.notifications),
-        },
-        archived: {
-          ...state?.notifications?.archived,
-          ...getNotifications(payload.notifications, 'NOTIFICATION_STATUS_ARCHIVED'),
-        },
+        totalCount: payload.totalCount,
       }
     default:
       return state

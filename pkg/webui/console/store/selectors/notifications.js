@@ -15,15 +15,20 @@
 import { createSelector } from 'reselect'
 
 export const selectNotificationsStore = state => state.notifications
-export const selectNotifications = createSelector([selectNotificationsStore], store => [
-  ...Object.values(store.unseen),
-  ...Object.values(store.seen),
-])
-export const selectUnseenNotifications = createSelector(
-  [selectNotificationsStore],
-  store => store.unseen,
+export const selectNotifications = createSelector([selectNotificationsStore], store =>
+  Object.values(store.notifications),
 )
+export const selectUnseenNotifications = createSelector([selectNotifications], store => {
+  const asArray = Object.entries(store)
+  const filtered = asArray.filter(
+    ([key, value]) => !('status' in value) || value.status === 'NOTIFICATION_STATUS_UNSEEN',
+  )
+  const asObject = Object.fromEntries(filtered)
+  return asObject
+})
+
+export const selectTotalNotificationsCount = state => selectNotificationsStore(state).totalCount
 export const selectTotalUnseenCount = createSelector(
-  [selectNotificationsStore],
-  store => Object.values(store.unseen).length,
+  [selectUnseenNotifications],
+  store => Object.values(store).length,
 )
