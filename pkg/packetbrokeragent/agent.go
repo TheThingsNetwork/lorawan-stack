@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package packetbrokeragent contains the implementation of the Packet Broker Agent component.
 package packetbrokeragent
 
 import (
@@ -326,6 +327,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		if err != nil {
 			return nil, err
 		}
+
 		a.grpc.gsPba = &gsPbaServer{
 			netID:               a.netID,
 			clusterID:           a.clusterID,
@@ -336,6 +338,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 			frequencyPlansStore: getFrequencyPlanStore,
 			upstreamCh:          a.upstreamCh,
 			mapperConn:          mapperConn,
+			entityRegistry:      newIS(c),
 		}
 	} else {
 		a.grpc.gsPba = &disabledServer{}
