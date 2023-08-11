@@ -40,7 +40,7 @@ import {
 
 import style from './notifications.styl'
 
-const pageSize = 8
+const pageSize = 6
 
 const DEFAULT_PAGE = 1
 
@@ -152,7 +152,7 @@ const NotificationsContainer = ({ setPage, page }) => {
             )
           })}
         </Col>
-        <Row justify="center" className={classNames(style.notificationFooter, 'm-0')}>
+        <Row className={style.notificationFooter}>
           <Pagination
             className={style.pagination}
             pageCount={Math.ceil(totalNotifications / pageSize) || 1}
@@ -161,6 +161,7 @@ const NotificationsContainer = ({ setPage, page }) => {
             pageRangeDisplayed={2}
             forcePage={page}
           />
+          <Message content="See archived messages" />
         </Row>
       </Col>
       <Col className={classNames(style.notificationContent, 'mt-cs-l', 'mb-cs-l', 'p-0')}>

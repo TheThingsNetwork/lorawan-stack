@@ -17,8 +17,11 @@ import { useSelector } from 'react-redux'
 import { Container } from 'react-grid-system'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
+import WithRootClass from '@ttn-lw/lib/components/with-root-class'
 
 import NotificationsContainer from '@console/containers/notifications'
+
+import style from '@console/views/app/app.styl'
 
 import useQueryState from '@ttn-lw/lib/hooks/use-query-state'
 
@@ -36,14 +39,16 @@ const NotificationsView = () => {
         userId,
         ['NOTIFICATION_STATUS_UNSEEN', 'NOTIFICATION_STATUS_SEEN'],
         {
-          limit: 8,
+          limit: 6,
           page,
         },
       )}
     >
-      <Container>
-        <NotificationsContainer setPage={setPage} page={page} />
-      </Container>
+      <WithRootClass className={style.stageBg} id="stage">
+        <Container>
+          <NotificationsContainer setPage={setPage} page={page} />
+        </Container>
+      </WithRootClass>
     </RequireRequest>
   )
 }
