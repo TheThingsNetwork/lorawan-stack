@@ -2277,7 +2277,7 @@
       ]
     },
     "GetInfoByJoinEUIs": {
-      "file": "lorawan-stack/api/deviceclaimingserver.proto",
+      "file": "ttn/lorawan/v3/deviceclaimingserver.proto",
       "http": [
         {
           "method": "post",

@@ -17273,18 +17273,6 @@
         }
       }
     },
-    "BatchUnclaimEndDevicesResponseFailed": {
-      "type": "object",
-      "properties": {
-        "end_device_ids": {
-          "$ref": "#/definitions/v3EndDeviceIdentifiers"
-        },
-        "error_details": {
-          "$ref": "#/definitions/v3ErrorDetails"
-        }
-      },
-      "description": "End devices that could not be unclaimed."
-    },
     "BatchUpdateEndDeviceLastSeenRequestEndDeviceLastSeenUpdate": {
       "type": "object",
       "properties": {
@@ -20417,11 +20405,11 @@
           "$ref": "#/definitions/v3ApplicationIdentifiers"
         },
         "failed": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/BatchUnclaimEndDevicesResponseFailed"
-          }
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v3ErrorDetails"
+          },
+          "description": "End devices that could not be unclaimed.\nThe key is the device ID."
         }
       }
     },

@@ -882,67 +882,6 @@ func (dst *GetClaimStatusResponse_VendorSpecific) SetFields(src *GetClaimStatusR
 	return nil
 }
 
-func (dst *BatchUnclaimEndDevicesResponse_Failed) SetFields(src *BatchUnclaimEndDevicesResponse_Failed, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
-		switch name {
-		case "end_device_ids":
-			if len(subs) > 0 {
-				var newDst, newSrc *EndDeviceIdentifiers
-				if (src == nil || src.EndDeviceIds == nil) && dst.EndDeviceIds == nil {
-					continue
-				}
-				if src != nil {
-					newSrc = src.EndDeviceIds
-				}
-				if dst.EndDeviceIds != nil {
-					newDst = dst.EndDeviceIds
-				} else {
-					newDst = &EndDeviceIdentifiers{}
-					dst.EndDeviceIds = newDst
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
-			} else {
-				if src != nil {
-					dst.EndDeviceIds = src.EndDeviceIds
-				} else {
-					dst.EndDeviceIds = nil
-				}
-			}
-		case "error_details":
-			if len(subs) > 0 {
-				var newDst, newSrc *ErrorDetails
-				if (src == nil || src.ErrorDetails == nil) && dst.ErrorDetails == nil {
-					continue
-				}
-				if src != nil {
-					newSrc = src.ErrorDetails
-				}
-				if dst.ErrorDetails != nil {
-					newDst = dst.ErrorDetails
-				} else {
-					newDst = &ErrorDetails{}
-					dst.ErrorDetails = newDst
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
-			} else {
-				if src != nil {
-					dst.ErrorDetails = src.ErrorDetails
-				} else {
-					dst.ErrorDetails = nil
-				}
-			}
-
-		default:
-			return fmt.Errorf("invalid field: '%s'", name)
-		}
-	}
-	return nil
-}
-
 func (dst *CUPSRedirection_ClientTLS) SetFields(src *CUPSRedirection_ClientTLS, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {

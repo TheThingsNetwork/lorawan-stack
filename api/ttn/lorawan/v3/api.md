@@ -169,7 +169,7 @@
   - [Message `AuthorizeGatewayRequest`](#ttn.lorawan.v3.AuthorizeGatewayRequest)
   - [Message `BatchUnclaimEndDevicesRequest`](#ttn.lorawan.v3.BatchUnclaimEndDevicesRequest)
   - [Message `BatchUnclaimEndDevicesResponse`](#ttn.lorawan.v3.BatchUnclaimEndDevicesResponse)
-  - [Message `BatchUnclaimEndDevicesResponse.Failed`](#ttn.lorawan.v3.BatchUnclaimEndDevicesResponse.Failed)
+  - [Message `BatchUnclaimEndDevicesResponse.FailedEntry`](#ttn.lorawan.v3.BatchUnclaimEndDevicesResponse.FailedEntry)
   - [Message `CUPSRedirection`](#ttn.lorawan.v3.CUPSRedirection)
   - [Message `CUPSRedirection.ClientTLS`](#ttn.lorawan.v3.CUPSRedirection.ClientTLS)
   - [Message `ClaimEndDeviceRequest`](#ttn.lorawan.v3.ClaimEndDeviceRequest)
@@ -2743,16 +2743,14 @@ in a future version of The Things Stack.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
-| `failed` | [`BatchUnclaimEndDevicesResponse.Failed`](#ttn.lorawan.v3.BatchUnclaimEndDevicesResponse.Failed) | repeated |  |
+| `failed` | [`BatchUnclaimEndDevicesResponse.FailedEntry`](#ttn.lorawan.v3.BatchUnclaimEndDevicesResponse.FailedEntry) | repeated | End devices that could not be unclaimed. The key is the device ID. |
 
-### <a name="ttn.lorawan.v3.BatchUnclaimEndDevicesResponse.Failed">Message `BatchUnclaimEndDevicesResponse.Failed`</a>
-
-End devices that could not be unclaimed.
+### <a name="ttn.lorawan.v3.BatchUnclaimEndDevicesResponse.FailedEntry">Message `BatchUnclaimEndDevicesResponse.FailedEntry`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
-| `error_details` | [`ErrorDetails`](#ttn.lorawan.v3.ErrorDetails) |  |  |
+| `key` | [`string`](#string) |  |  |
+| `value` | [`ErrorDetails`](#ttn.lorawan.v3.ErrorDetails) |  |  |
 
 ### <a name="ttn.lorawan.v3.CUPSRedirection">Message `CUPSRedirection`</a>
 

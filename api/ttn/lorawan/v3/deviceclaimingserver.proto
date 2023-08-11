@@ -262,11 +262,8 @@ message BatchUnclaimEndDevicesRequest {
 message BatchUnclaimEndDevicesResponse {
   ApplicationIdentifiers application_ids = 1 ;
   // End devices that could not be unclaimed.
-  message Failed {
-    EndDeviceIdentifiers end_device_ids = 1 ;
-    ErrorDetails error_details = 2;
-  }
-  repeated Failed failed = 2;
+  // The key is the device ID.
+  map <string, ErrorDetails> failed = 2;
 }
 
 service EndDeviceBatchClaimingServer {

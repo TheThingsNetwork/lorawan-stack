@@ -624,7 +624,7 @@ func TestBatchOperations(t *testing.T) { // nolint:all
 			},
 			ResponseAssertion: func(res *ttnpb.BatchUnclaimEndDevicesResponse) bool {
 				a.So(len(res.Failed), should.Equal, 1)
-				a.So(res.Failed[0].EndDeviceIds.GetDeviceId(), should.Resemble, devIDs4.DeviceId)
+				a.So(res.Failed["device-4-without-euis"], should.NotBeNil)
 				return true
 			},
 		},
@@ -698,7 +698,7 @@ func TestBatchOperations(t *testing.T) { // nolint:all
 			ResponseAssertion: func(res *ttnpb.BatchUnclaimEndDevicesResponse) bool {
 				a.So(res.ApplicationIds, should.Resemble, registeredApplicationIDs)
 				a.So(len(res.Failed), should.Equal, 1)
-				a.So(res.Failed[0].EndDeviceIds, should.Resemble, devIDs3)
+				a.So(res.Failed["device-3"], should.NotBeNil)
 				return true
 			},
 		},
@@ -738,7 +738,7 @@ func TestBatchOperations(t *testing.T) { // nolint:all
 			ResponseAssertion: func(res *ttnpb.BatchUnclaimEndDevicesResponse) bool {
 				a.So(res.ApplicationIds, should.Resemble, registeredApplicationIDs)
 				a.So(len(res.Failed), should.Equal, 1)
-				a.So(res.Failed[0].EndDeviceIds, should.Resemble, devIDs2)
+				a.So(res.Failed["device-2"], should.NotBeNil)
 				return true
 			},
 		},

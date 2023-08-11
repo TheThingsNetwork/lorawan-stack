@@ -109,7 +109,7 @@ var (
 	errDeviceNotClaimed     = errors.DefineNotFound("device_not_claimed", "device with EUI `{dev_eui}` not claimed")
 	errDeviceAccessDenied   = errors.DefinePermissionDenied("device_access_denied", "access to device with `{dev_eui}` denied: device is already claimed or the owner token is invalid") //nolint:lll
 	errUnauthenticated      = errors.DefineUnauthenticated("unauthenticated", "unauthenticated")
-	errUnclaimDevice        = errors.Define("unclaim_device", "failed to unclaim device with EUI `{dev_eui}`", "message")
+	errUnclaimDevice        = errors.Define("unclaim_device", "could not unclaim device with EUI `{dev_eui}`", "message")
 )
 
 // Claim implements EndDeviceClaimer.

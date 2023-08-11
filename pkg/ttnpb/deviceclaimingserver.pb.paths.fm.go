@@ -199,34 +199,6 @@ var GetClaimStatusResponse_VendorSpecificFieldPathsTopLevel = []string{
 	"data",
 	"organization_unique_identifier",
 }
-var BatchUnclaimEndDevicesResponse_FailedFieldPathsNested = []string{
-	"end_device_ids",
-	"end_device_ids.application_ids",
-	"end_device_ids.application_ids.application_id",
-	"end_device_ids.dev_addr",
-	"end_device_ids.dev_eui",
-	"end_device_ids.device_id",
-	"end_device_ids.join_eui",
-	"error_details",
-	"error_details.attributes",
-	"error_details.cause",
-	"error_details.cause.attributes",
-	"error_details.cause.correlation_id",
-	"error_details.cause.message_format",
-	"error_details.cause.name",
-	"error_details.cause.namespace",
-	"error_details.code",
-	"error_details.correlation_id",
-	"error_details.details",
-	"error_details.message_format",
-	"error_details.name",
-	"error_details.namespace",
-}
-
-var BatchUnclaimEndDevicesResponse_FailedFieldPathsTopLevel = []string{
-	"end_device_ids",
-	"error_details",
-}
 var CUPSRedirection_ClientTLSFieldPathsNested = []string{
 	"cert",
 	"key",
