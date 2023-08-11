@@ -1258,12 +1258,15 @@ var (
 
 			// Batch Unclaim using DCS.
 			if len(unclaim) > 0 {
-				_, err := dcsBatchClient.Unclaim(ctx, &ttnpb.BatchUnclaimEndDevicesRequest{
+				ret, err := dcsBatchClient.Unclaim(ctx, &ttnpb.BatchUnclaimEndDevicesRequest{
 					ApplicationIds: appID,
 					DeviceIds:      unclaim,
 				})
 				if err != nil {
 					return err
+				}
+				if len(ret.Failed) != 0 {
+					logger.Warnf("Could not unclaim %d devices: %v", len(ret.Failed), ret.Failed)
 				}
 			}
 
