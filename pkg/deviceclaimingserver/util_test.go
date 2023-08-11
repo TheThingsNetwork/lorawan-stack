@@ -17,7 +17,6 @@ package deviceclaimingserver_test
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
@@ -30,7 +29,7 @@ type MockClaimer struct {
 	BatchUnclaimFunc func(
 		context.Context,
 		[]*ttnpb.EndDeviceIdentifiers,
-	) (map[types.EUI64]errors.ErrorDetails, error)
+	) error
 }
 
 // SupportsJoinEUI returns whether the Join Server supports this JoinEUI.
@@ -70,6 +69,6 @@ func (MockClaimer) Unclaim(_ context.Context,
 func (m MockClaimer) BatchUnclaim(
 	ctx context.Context,
 	ids []*ttnpb.EndDeviceIdentifiers,
-) (map[types.EUI64]errors.ErrorDetails, error) {
+) error {
 	return m.BatchUnclaimFunc(ctx, ids)
 }

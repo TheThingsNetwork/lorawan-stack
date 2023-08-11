@@ -22,6 +22,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
+	claimerrors "go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices/ttjsv2"
 	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices/ttjsv2/testdata"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -355,7 +356,7 @@ func TestBatchOperations(t *testing.T) { // nolint:paralleltest
 	// Unclaim Devices.
 
 	// Different client.
-	ret, err := client1.BatchUnclaim(ctx, []*ttnpb.EndDeviceIdentifiers{
+	err = client1.BatchUnclaim(ctx, []*ttnpb.EndDeviceIdentifiers{
 		{
 			DevEui:  devEUI1.Bytes(),
 			JoinEui: supportedJoinEUI.Bytes(),
@@ -369,29 +370,32 @@ func TestBatchOperations(t *testing.T) { // nolint:paralleltest
 			JoinEui: supportedJoinEUI.Bytes(),
 		},
 	})
-	a.So(errors.IsInvalidArgument(err), should.BeTrue)
-	a.So(len(ret), should.Equal, 3)
+	a.So(err, should.NotBeNil)
+	errs := claimerrors.DeviceErrors{}
+	a.So(errors.As(err, &errs), should.BeTrue)
+	a.So(errs.Errors, should.HaveLength, 3)
 
 	// One Invalid device.
 	devIds := &ttnpb.EndDeviceIdentifiers{
 		DevEui:  unsupportedDevEUI.Bytes(),
 		JoinEui: supportedJoinEUI.Bytes(),
 	}
-	ret, err = client.BatchUnclaim(ctx, []*ttnpb.EndDeviceIdentifiers{
+	err = client.BatchUnclaim(ctx, []*ttnpb.EndDeviceIdentifiers{
 		{
 			DevEui:  devEUI1.Bytes(),
 			JoinEui: supportedJoinEUI.Bytes(),
 		},
 		devIds,
 	})
-	a.So(errors.IsInvalidArgument(err), should.BeTrue)
-	a.So(len(ret), should.Equal, 1)
-	for eui := range ret {
+	a.So(err, should.NotBeNil)
+	a.So(errors.As(err, &errs), should.BeTrue)
+	a.So(errs.Errors, should.HaveLength, 1)
+	for eui := range errs.Errors {
 		a.So(eui, should.Resemble, unsupportedDevEUI)
 	}
 
 	// Valid batch.
-	ret, err = client.BatchUnclaim(ctx, []*ttnpb.EndDeviceIdentifiers{
+	err = client.BatchUnclaim(ctx, []*ttnpb.EndDeviceIdentifiers{
 		{
 			DevEui:  devEUI2.Bytes(),
 			JoinEui: supportedJoinEUI.Bytes(),
@@ -402,5 +406,4 @@ func TestBatchOperations(t *testing.T) { // nolint:paralleltest
 		},
 	})
 	a.So(err, should.BeNil)
-	a.So(len(ret), should.Equal, 0)
 }

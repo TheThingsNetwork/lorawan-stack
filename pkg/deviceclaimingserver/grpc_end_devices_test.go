@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	. "go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices"
+	claimerrors "go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -545,7 +546,7 @@ func TestBatchOperations(t *testing.T) { // nolint:all
 		BatchUnclaimFunc func(
 			ctx context.Context,
 			ids []*ttnpb.EndDeviceIdentifiers,
-		) (map[types.EUI64]errors.ErrorDetails, error)
+		) error
 		ErrorAssertion    func(err error) bool
 		ResponseAssertion func(res *ttnpb.BatchUnclaimEndDevicesResponse) bool
 	}{
@@ -583,8 +584,8 @@ func TestBatchOperations(t *testing.T) { // nolint:all
 			BatchUnclaimFunc: func(
 				ctx context.Context,
 				ids []*ttnpb.EndDeviceIdentifiers,
-			) (map[types.EUI64]errors.ErrorDetails, error) {
-				return nil, errors.DefineCanceled("batch level error", "batch level error")
+			) error {
+				return errors.DefineCanceled("batch level error", "batch level error")
 			},
 			ErrorAssertion: errors.IsCanceled,
 			ResponseAssertion: func(res *ttnpb.BatchUnclaimEndDevicesResponse) bool {
@@ -601,7 +602,7 @@ func TestBatchOperations(t *testing.T) { // nolint:all
 			BatchUnclaimFunc: func(
 				ctx context.Context,
 				ids []*ttnpb.EndDeviceIdentifiers,
-			) (map[types.EUI64]errors.ErrorDetails, error) {
+			) error {
 				a.So(ids, should.HaveLength, 2)
 				for _, devIDs := range ids {
 					a.So(devIDs.ApplicationIds, should.Resemble, registeredApplicationIDs)
@@ -620,7 +621,7 @@ func TestBatchOperations(t *testing.T) { // nolint:all
 						t.Error("Unknown device EUI: ", devIDs.DevEui)
 					}
 				}
-				return make(map[types.EUI64]errors.ErrorDetails), nil
+				return nil
 			},
 			ResponseAssertion: func(res *ttnpb.BatchUnclaimEndDevicesResponse) bool {
 				a.So(len(res.Failed), should.Equal, 1)
@@ -638,7 +639,7 @@ func TestBatchOperations(t *testing.T) { // nolint:all
 			BatchUnclaimFunc: func(
 				ctx context.Context,
 				ids []*ttnpb.EndDeviceIdentifiers,
-			) (map[types.EUI64]errors.ErrorDetails, error) {
+			) error {
 				a.So(ids, should.HaveLength, 2)
 				for _, devIDs := range ids {
 					a.So(devIDs.ApplicationIds, should.Resemble, registeredApplicationIDs)
@@ -657,7 +658,7 @@ func TestBatchOperations(t *testing.T) { // nolint:all
 						t.Error("Unknown device EUI: ", devIDs.DevEui)
 					}
 				}
-				return make(map[types.EUI64]errors.ErrorDetails), nil
+				return nil
 			},
 			ResponseAssertion: func(res *ttnpb.BatchUnclaimEndDevicesResponse) bool {
 				a.So(len(res.Failed), should.Equal, 0)
@@ -674,7 +675,7 @@ func TestBatchOperations(t *testing.T) { // nolint:all
 			BatchUnclaimFunc: func(
 				ctx context.Context,
 				ids []*ttnpb.EndDeviceIdentifiers,
-			) (map[types.EUI64]errors.ErrorDetails, error) {
+			) error {
 				a.So(ids, should.HaveLength, 2)
 				for _, devIDs := range ids {
 					a.So(devIDs.ApplicationIds, should.Resemble, registeredApplicationIDs)
@@ -693,7 +694,7 @@ func TestBatchOperations(t *testing.T) { // nolint:all
 						t.Error("Unknown device EUI: ", devIDs.DevEui)
 					}
 				}
-				return make(map[types.EUI64]errors.ErrorDetails), nil
+				return nil
 			},
 			ResponseAssertion: func(res *ttnpb.BatchUnclaimEndDevicesResponse) bool {
 				a.So(res.ApplicationIds, should.Resemble, registeredApplicationIDs)
@@ -712,7 +713,7 @@ func TestBatchOperations(t *testing.T) { // nolint:all
 			BatchUnclaimFunc: func(
 				ctx context.Context,
 				ids []*ttnpb.EndDeviceIdentifiers,
-			) (map[types.EUI64]errors.ErrorDetails, error) {
+			) error {
 				a.So(ids, should.HaveLength, 2)
 				for _, devIDs := range ids {
 					a.So(devIDs.ApplicationIds, should.Resemble, registeredApplicationIDs)
@@ -731,9 +732,11 @@ func TestBatchOperations(t *testing.T) { // nolint:all
 						t.Error("Unknown device EUI: ", devIDs.DevEui)
 					}
 				}
-				return map[types.EUI64]errors.ErrorDetails{
-					types.MustEUI64(devIDs2.DevEui).OrZero(): errors.Define("unknown", "unknown"),
-				}, errors.DefineInvalidArgument("mock", "mock")
+				return claimerrors.DeviceErrors{
+					Errors: map[types.EUI64]errors.ErrorDetails{
+						types.MustEUI64(devIDs2.DevEui).OrZero(): errors.Define("unknown", "unknown"),
+					},
+				}
 			},
 			ResponseAssertion: func(res *ttnpb.BatchUnclaimEndDevicesResponse) bool {
 				a.So(res.ApplicationIds, should.Resemble, registeredApplicationIDs)
@@ -752,7 +755,7 @@ func TestBatchOperations(t *testing.T) { // nolint:all
 			BatchUnclaimFunc: func(
 				ctx context.Context,
 				ids []*ttnpb.EndDeviceIdentifiers,
-			) (map[types.EUI64]errors.ErrorDetails, error) {
+			) error {
 				a.So(ids, should.HaveLength, 2)
 				for _, devIDs := range ids {
 					a.So(devIDs.ApplicationIds, should.Resemble, registeredApplicationIDs)
@@ -771,7 +774,7 @@ func TestBatchOperations(t *testing.T) { // nolint:all
 						t.Error("Unknown device EUI: ", devIDs.DevEui)
 					}
 				}
-				return make(map[types.EUI64]errors.ErrorDetails), nil
+				return nil
 			},
 			ResponseAssertion: func(res *ttnpb.BatchUnclaimEndDevicesResponse) bool {
 				a.So(res.ApplicationIds, should.Resemble, registeredApplicationIDs)

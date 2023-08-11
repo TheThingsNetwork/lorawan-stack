@@ -19,6 +19,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices"
+	claimerrors "go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -306,18 +307,16 @@ func (srv *endDeviceBatchClaimingServer) Unclaim(
 
 	// Claim in batches of Join EUIs (claimers).
 	for claimer, devIDs := range claimers {
-		res, err := claimer.BatchUnclaim(ctx, devIDs)
+		err := claimer.BatchUnclaim(ctx, devIDs)
 		if err != nil {
-			if !errors.IsInvalidArgument(err) {
-				// Batch-level failure, stop further claiming.
+			var errs claimerrors.DeviceErrors
+			if !errors.As(err, &errs) {
 				return nil, err
 			}
-			// Collect the per-device errors.
-			for eui, err := range res {
+			for eui, err := range errs.Errors {
 				ret.Failed[devEUITodevID[eui]] = ttnpb.ErrorDetailsToProto(err)
 			}
 		}
 	}
-
 	return ret, nil
 }

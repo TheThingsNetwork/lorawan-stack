@@ -24,6 +24,7 @@ import (
 	"net/http"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
+	claimerrors "go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
@@ -110,6 +111,7 @@ var (
 	errDeviceAccessDenied   = errors.DefinePermissionDenied("device_access_denied", "access to device with `{dev_eui}` denied: device is already claimed or the owner token is invalid") //nolint:lll
 	errUnauthenticated      = errors.DefineUnauthenticated("unauthenticated", "unauthenticated")
 	errUnclaimDevice        = errors.Define("unclaim_device", "could not unclaim device with EUI `{dev_eui}`", "message")
+	errUnclaimDevices       = errors.Define("unclaim_devices", "could not unclaim devices")
 )
 
 // Claim implements EndDeviceClaimer.
@@ -327,10 +329,9 @@ func (c *TTJS) GetClaimStatus(
 func (c *TTJS) BatchUnclaim(
 	ctx context.Context,
 	ids []*ttnpb.EndDeviceIdentifiers,
-) (map[types.EUI64]errors.ErrorDetails, error) {
-	ret := make(map[types.EUI64]errors.ErrorDetails)
+) error {
 	if len(ids) == 0 {
-		return ret, nil
+		return errBadRequest.WithAttributes("message", "no devices in request")
 	}
 	var euis string
 	joinEUI := types.MustEUI64(ids[0].JoinEui).OrZero()
@@ -351,36 +352,48 @@ func (c *TTJS) BatchUnclaim(
 	logger.Debug("Unclaim end devices")
 	request, err := http.NewRequestWithContext(ctx, http.MethodDelete, reqURL, nil)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	client, err := c.httpClient(ctx)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	resp, err := client.Do(request)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer resp.Body.Close()
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	if isSuccess(resp.StatusCode) {
-		return ret, nil
+		return nil
 	}
 
 	switch resp.StatusCode {
 	case http.StatusBadRequest:
-		var (
-			resp    EndDevicesErrors
-			message string
-		)
+		var errMsg struct {
+			Message string `json:"message"`
+		}
+		err = json.Unmarshal(respBody, &errMsg)
+		if err != nil {
+			return errUnclaimDevices.WithCause(err)
+		}
+
+		if errMsg.Message != "" {
+			return errBadRequest.WithAttributes("message", errMsg.Message)
+		}
+
+		var resp EndDevicesErrors
 		err = json.Unmarshal(respBody, &resp)
 		if err == nil {
+			e := claimerrors.DeviceErrors{
+				Errors: make(map[types.EUI64]errors.ErrorDetails, len(resp)),
+			}
 			for euiText, r := range resp {
 				var eui types.EUI64
 				err := eui.UnmarshalText([]byte(euiText))
@@ -388,23 +401,15 @@ func (c *TTJS) BatchUnclaim(
 					logger.WithError(err).WithField("eui", euiText).Warn("Failed to decode EUI")
 					continue
 				}
-				ret[eui] = errUnclaimDevice.WithAttributes("message", r.Message)
+				e.Errors[eui] = errUnclaimDevice.WithAttributes("message", r.Message)
 			}
-		} else {
-			var errResp ErrorResponse
-			err = json.Unmarshal(respBody, &errResp)
-			if err != nil {
-				logger.WithError(err).Warn("Failed to decode error message")
-			} else {
-				logger.WithField("error", errResp.Message).Warn("Failed to unclaim end devices")
-			}
-			message = errResp.Message
+			return e
 		}
-		return ret, errBadRequest.WithAttributes("message", message)
+		return errUnclaimDevices.WithCause(err)
 	case http.StatusUnauthorized:
-		return nil, errUnauthenticated.New()
+		return errUnauthenticated.New()
 	default:
-		return nil, errors.FromHTTPStatusCode(resp.StatusCode)
+		return errors.FromHTTPStatusCode(resp.StatusCode)
 	}
 }
 

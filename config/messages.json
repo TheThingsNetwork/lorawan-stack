@@ -3707,6 +3707,15 @@
       "file": "ttjs.go"
     }
   },
+  "error:pkg/deviceclaimingserver/enddevices/ttjsv2:unclaim_devices": {
+    "translations": {
+      "en": "could not unclaim devices"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/enddevices/ttjsv2",
+      "file": "ttjs.go"
+    }
+  },
   "error:pkg/deviceclaimingserver:claiming_not_supported": {
     "translations": {
       "en": "claiming not supported for JoinEUI `{eui}`"
