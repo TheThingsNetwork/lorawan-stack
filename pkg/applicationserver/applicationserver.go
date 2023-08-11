@@ -754,16 +754,16 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids *ttnpb.End
 				}
 			}
 
-			registerReceiveDownlinks(ctx, ids, items)
+			registerReceiveDownlinks(ctx, dev.Ids, items)
 
 			mask, err := as.attemptDownlinkQueueOp(ctx, dev, link, peer, downlinkQueueOperation{
 				Items:     items,
 				Operation: op,
 				ResultFunc: func(decrypted, encrypted []*ttnpb.ApplicationDownlink, err error) {
 					if err != nil {
-						as.registerDropDownlinks(ctx, ids, decrypted, now, err)
+						as.registerDropDownlinks(ctx, dev.Ids, decrypted, now, err)
 					} else {
-						as.registerForwardDownlinks(ctx, ids, decrypted, encrypted, now)
+						as.registerForwardDownlinks(ctx, dev.Ids, decrypted, encrypted, now)
 					}
 				},
 			})
@@ -1005,7 +1005,7 @@ func (as *ApplicationServer) handleJoinAccept(
 			for _, msg := range joinAccept.InvalidatedDownlinks {
 				if err := as.decryptDownlink(ctx, dev, msg, previousSession); err != nil {
 					logger.WithError(err).Warn("Failed to decrypt downlink message; drop item")
-					registerDropDownlink(ctx, ids, msg, err)
+					registerDropDownlink(ctx, dev.Ids, msg, err)
 					continue
 				}
 				items = append(items, msg)
@@ -1023,7 +1023,7 @@ func (as *ApplicationServer) handleJoinAccept(
 				SkipSessionKeyIDs: [][]byte{items[0].SessionKeyId},
 				ResultFunc: func(decrypted, _ []*ttnpb.ApplicationDownlink, err error) {
 					if err != nil {
-						as.registerDropDownlinks(ctx, ids, decrypted, receivedAt, err)
+						as.registerDropDownlinks(ctx, dev.Ids, decrypted, receivedAt, err)
 					}
 				},
 			})
@@ -1334,7 +1334,7 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(
 			for _, msg := range invalid.Downlinks {
 				if err := as.decryptDownlink(ctx, dev, msg, nil); err != nil {
 					log.FromContext(ctx).WithError(err).Warn("Failed to decrypt downlink message; drop item")
-					registerDropDownlink(ctx, ids, msg, err)
+					registerDropDownlink(ctx, dev.Ids, msg, err)
 					continue
 				}
 				items = append(items, msg)
@@ -1348,7 +1348,7 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(
 				Operation: ttnpb.AsNsClient.DownlinkQueuePush,
 				ResultFunc: func(decrypted, _ []*ttnpb.ApplicationDownlink, err error) {
 					if err != nil {
-						as.registerDropDownlinks(ctx, ids, decrypted, receivedAt, err)
+						as.registerDropDownlinks(ctx, dev.Ids, decrypted, receivedAt, err)
 					}
 				},
 			})
@@ -1420,7 +1420,7 @@ func (as *ApplicationServer) handleDownlinkNack(
 			if msg.ConfirmedRetry.Attempt > maxRetries {
 				as.registerDropDownlinks(
 					ctx,
-					ids,
+					dev.Ids,
 					items,
 					receivedAt,
 					errMaxRetriesReached.WithAttributes("max_retries", maxRetries),
@@ -1433,7 +1433,7 @@ func (as *ApplicationServer) handleDownlinkNack(
 				Operation: ttnpb.AsNsClient.DownlinkQueuePush,
 				ResultFunc: func(decrypted, _ []*ttnpb.ApplicationDownlink, err error) {
 					if err != nil {
-						as.registerDropDownlinks(ctx, ids, decrypted, receivedAt, err)
+						as.registerDropDownlinks(ctx, dev.Ids, decrypted, receivedAt, err)
 					}
 				},
 			})
