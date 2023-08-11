@@ -54,8 +54,9 @@ func (srv *interopServer) HomeNSRequest(ctx context.Context, in *interop.HomeNSR
 	}
 
 	var (
-		conf  = srv.configFromContext(ctx)
-		hNSID *types.EUI64
+		conf   = srv.configFromContext(ctx)
+		hNetID = conf.Network.NetID
+		hNSID  = conf.Network.NSID
 	)
 
 	header, err := in.AnswerHeader()
@@ -73,7 +74,7 @@ func (srv *interopServer) HomeNSRequest(ctx context.Context, in *interop.HomeNSR
 			Result: interop.Result{
 				ResultCode: interop.ResultSuccess,
 			},
-			HNetID: interop.NetID(conf.Network.NetID),
+			HNetID: interop.NetID(hNetID),
 		},
 		TTIVSExtension: interop.TTIVSExtension{
 			HNSAddress: dev.NetworkServerAddress,

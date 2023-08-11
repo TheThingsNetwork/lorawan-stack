@@ -114,8 +114,9 @@ type Config struct {
 		InitCounter      int64                `name:"init-counter" description:"Initial counter value for the addresses to be issued (default 0)"`
 	} `name:"dev-eui-block" description:"IEEE MAC block used to issue DevEUIs to devices that are not yet programmed"`
 	Network struct {
-		NetID    ttntypes.NetID `name:"net-id" description:"NetID of this network"`
-		TenantID string         `name:"tenant-id" description:"Tenant ID in the host NetID"`
+		NetID    ttntypes.NetID  `name:"net-id" description:"NetID of this network"`
+		NSID     *ttntypes.EUI64 `name:"ns-id" description:"NSID of this network (EUI)"`
+		TenantID string          `name:"tenant-id" description:"Tenant ID"`
 	} `name:"network"`
 	TelemetryQueue telemetry.TaskQueue `name:"-"`
 }
