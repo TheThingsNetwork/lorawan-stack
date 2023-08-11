@@ -283,7 +283,7 @@ const PacketBroker = () => {
               </PortalledModal>
               <hr className={style.hRule} />
             </Col>
-            <Col md={12}>
+            <Col md={12} style={{ position: 'relative' }}>
               <Tabs tabs={tabs} active={activeTab} onTabChange={setActiveTab} divider />
               <RequireRequest
                 requestAction={[
@@ -291,6 +291,7 @@ const PacketBroker = () => {
                   getHomeNetworkDefaultGatewayVisibility(),
                 ]}
                 errorRenderFunction={SubViewErrorComponent}
+                spinnerProps={{ inline: true, center: true, className: 'mt-ls-s' }}
               >
                 <Routes>
                   <Route index Component={DefaultRoutingPolicyView} />
