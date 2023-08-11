@@ -725,6 +725,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids *ttnpb.End
 		ctx := events.ContextWithCorrelationID(ctx, item.CorrelationIds...)
 		item.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 	}
+	now := timestamppb.Now()
 	_, err = as.deviceRegistry.Set(ctx, ids,
 		[]string{
 			"formatters",
@@ -760,9 +761,9 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids *ttnpb.End
 				Operation: op,
 				ResultFunc: func(decrypted, encrypted []*ttnpb.ApplicationDownlink, err error) {
 					if err != nil {
-						as.registerDropDownlinks(ctx, ids, decrypted, err)
+						as.registerDropDownlinks(ctx, ids, decrypted, now, err)
 					} else {
-						as.registerForwardDownlinks(ctx, ids, decrypted, encrypted)
+						as.registerForwardDownlinks(ctx, ids, decrypted, encrypted, now)
 					}
 				},
 			})
@@ -895,13 +896,13 @@ func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.Application
 	}
 	switch p := up.Up.(type) {
 	case *ttnpb.ApplicationUp_JoinAccept:
-		return true, as.handleJoinAccept(ctx, up.EndDeviceIds, p.JoinAccept, link)
+		return true, as.handleJoinAccept(ctx, up.EndDeviceIds, up.ReceivedAt, p.JoinAccept, link)
 	case *ttnpb.ApplicationUp_UplinkMessage:
 		return true, as.handleUplink(ctx, uplinkInfo{up.EndDeviceIds, up.ReceivedAt, p.UplinkMessage, false, link})
 	case *ttnpb.ApplicationUp_UplinkNormalized:
 		return true, nil
 	case *ttnpb.ApplicationUp_DownlinkQueueInvalidated:
-		return as.handleDownlinkQueueInvalidated(ctx, up.EndDeviceIds, p.DownlinkQueueInvalidated, link)
+		return as.handleDownlinkQueueInvalidated(ctx, up.EndDeviceIds, up.ReceivedAt, p.DownlinkQueueInvalidated, link)
 	case *ttnpb.ApplicationUp_DownlinkSent:
 		return true, as.decryptDownlinkMessage(ctx, up.EndDeviceIds, p.DownlinkSent, link)
 	case *ttnpb.ApplicationUp_DownlinkFailed:
@@ -909,7 +910,7 @@ func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.Application
 	case *ttnpb.ApplicationUp_DownlinkAck:
 		return true, as.decryptDownlinkMessage(ctx, up.EndDeviceIds, p.DownlinkAck, link)
 	case *ttnpb.ApplicationUp_DownlinkNack:
-		return true, as.handleDownlinkNack(ctx, up.EndDeviceIds, p.DownlinkNack, link)
+		return true, as.handleDownlinkNack(ctx, up.EndDeviceIds, up.ReceivedAt, p.DownlinkNack, link)
 	case *ttnpb.ApplicationUp_LocationSolved:
 		return true, as.handleLocationSolved(ctx, up.EndDeviceIds, p.LocationSolved, link)
 	case *ttnpb.ApplicationUp_ServiceData:
@@ -933,7 +934,13 @@ var errFetchAppSKey = errors.Define("app_s_key", "failed to get AppSKey")
 // handleJoinAccept handles a join-accept message.
 // If the application or device is not configured to skip application crypto, the InvalidatedDownlinks and the AppSKey
 // in the given join-accept message is reset.
-func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, joinAccept *ttnpb.ApplicationJoinAccept, link *ttnpb.ApplicationLink) error {
+func (as *ApplicationServer) handleJoinAccept(
+	ctx context.Context,
+	ids *ttnpb.EndDeviceIdentifiers,
+	receivedAt *timestamppb.Timestamp,
+	joinAccept *ttnpb.ApplicationJoinAccept,
+	link *ttnpb.ApplicationLink,
+) error {
 	defer trace.StartRegion(ctx, "handle join accept").End()
 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
@@ -1016,7 +1023,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids *ttnpb.En
 				SkipSessionKeyIDs: [][]byte{items[0].SessionKeyId},
 				ResultFunc: func(decrypted, _ []*ttnpb.ApplicationDownlink, err error) {
 					if err != nil {
-						as.registerDropDownlinks(ctx, ids, decrypted, err)
+						as.registerDropDownlinks(ctx, ids, decrypted, receivedAt, err)
 					}
 				},
 			})
@@ -1280,7 +1287,13 @@ func (as *ApplicationServer) handleSimulatedUplink(ctx context.Context, info upl
 	return as.publishNormalizedUplink(ctx, info)
 }
 
-func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, invalid *ttnpb.ApplicationInvalidatedDownlinks, link *ttnpb.ApplicationLink) (pass bool, err error) {
+func (as *ApplicationServer) handleDownlinkQueueInvalidated(
+	ctx context.Context,
+	ids *ttnpb.EndDeviceIdentifiers,
+	receivedAt *timestamppb.Timestamp,
+	invalid *ttnpb.ApplicationInvalidatedDownlinks,
+	link *ttnpb.ApplicationLink,
+) (pass bool, err error) {
 	defer trace.StartRegion(ctx, "handle downlink queue invalidated").End()
 
 	peer, err := as.GetPeer(ctx, ttnpb.ClusterRole_NETWORK_SERVER, nil)
@@ -1335,7 +1348,7 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 				Operation: ttnpb.AsNsClient.DownlinkQueuePush,
 				ResultFunc: func(decrypted, _ []*ttnpb.ApplicationDownlink, err error) {
 					if err != nil {
-						as.registerDropDownlinks(ctx, ids, decrypted, err)
+						as.registerDropDownlinks(ctx, ids, decrypted, receivedAt, err)
 					}
 				},
 			})
@@ -1350,7 +1363,13 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 	return pass, err
 }
 
-func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, link *ttnpb.ApplicationLink) error {
+func (as *ApplicationServer) handleDownlinkNack(
+	ctx context.Context,
+	ids *ttnpb.EndDeviceIdentifiers,
+	receivedAt *timestamppb.Timestamp,
+	msg *ttnpb.ApplicationDownlink,
+	link *ttnpb.ApplicationLink,
+) error {
 	defer trace.StartRegion(ctx, "handle downlink nack").End()
 
 	peer, err := as.GetPeer(ctx, ttnpb.ClusterRole_NETWORK_SERVER, nil)
@@ -1400,7 +1419,10 @@ func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids *ttnpb.
 			}
 			if msg.ConfirmedRetry.Attempt > maxRetries {
 				as.registerDropDownlinks(
-					ctx, ids, items,
+					ctx,
+					ids,
+					items,
+					receivedAt,
 					errMaxRetriesReached.WithAttributes("max_retries", maxRetries),
 				)
 				return dev, nil, nil
@@ -1411,7 +1433,7 @@ func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids *ttnpb.
 				Operation: ttnpb.AsNsClient.DownlinkQueuePush,
 				ResultFunc: func(decrypted, _ []*ttnpb.ApplicationDownlink, err error) {
 					if err != nil {
-						as.registerDropDownlinks(ctx, ids, decrypted, err)
+						as.registerDropDownlinks(ctx, ids, decrypted, receivedAt, err)
 					}
 				},
 			})
