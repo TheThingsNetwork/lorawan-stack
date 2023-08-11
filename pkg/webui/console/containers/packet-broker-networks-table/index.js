@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,17 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { Component } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { defineMessages } from 'react-intl'
-
-import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
+import { createSelector } from 'reselect'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
 import RoutingPolicy from '@console/components/routing-policy'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
 import { getPacketBrokerNetworkId } from '@ttn-lw/lib/selectors/id'
 
 import { isValidPolicy } from '@console/lib/packet-broker/utils'
@@ -91,93 +89,92 @@ const tabs = [
   },
 ]
 
-class PacketBrokerNetworksTable extends Component {
-  static propTypes = {
-    pageSize: PropTypes.number,
-  }
-
-  static defaultProps = {
-    pageSize: PAGE_SIZES.REGULAR,
-  }
-
-  constructor(props) {
-    super(props)
-
-    this.getPacketBrokerNetworksList = params => {
+const PacketBrokerNetworksTable = () => {
+  const getPacketBrokerNetworks = useMemo(
+    () => params => {
       const { tab } = params
       const passedParams = { withRoutingPolicy: tab === NON_DEFAULT_POLICIES, ...params }
 
       return getPacketBrokerNetworksList(passedParams, undefined, { fetchPolicies: true })
-    }
-  }
+    },
+    [],
+  )
 
-  baseDataSelector(state) {
-    const decoratedNetworks = []
-    const ownCombinedId = selectPacketBrokerOwnCombinedId(state)
-    for (const network of selectPacketBrokerNetworks(state)) {
-      const combinedId = getPacketBrokerNetworkId(network)
-      if (combinedId === ownCombinedId) {
-        continue
+  const baseDataSelector = createSelector(
+    [
+      selectPacketBrokerOwnCombinedId,
+      selectPacketBrokerNetworks,
+      selectHomeNetworkDefaultRoutingPolicy,
+      selectPacketBrokerForwarderPolicyById,
+      selectPacketBrokerHomeNetworkPolicyById,
+      selectPacketBrokerNetworksTotalCount,
+      selectPacketBrokerNetworksFetching,
+    ],
+    (
+      ownCombinedId,
+      networks,
+      defaultHomeNetworkRoutingPolicy,
+      forwarderPolicy,
+      homeNetworkPolicy,
+      totalCount,
+      fetching,
+    ) => {
+      const decoratedNetworks = []
+      for (const network of networks) {
+        const combinedId = getPacketBrokerNetworkId(network)
+        if (combinedId === ownCombinedId) {
+          continue
+        }
+
+        const decoratedNetwork = { ...network }
+        decoratedNetwork._forwarderPolicy = forwarderPolicy || {
+          uplink: {},
+          downlink: {},
+        }
+        decoratedNetwork._homeNetworkPolicy = isValidPolicy(homeNetworkPolicy)
+          ? homeNetworkPolicy
+          : defaultHomeNetworkRoutingPolicy
+        decoratedNetworks.push(decoratedNetwork)
       }
 
-      const defaultHomeNetworkRoutingPolicy = selectHomeNetworkDefaultRoutingPolicy(
-        state,
-        combinedId,
-      )
-      const forwarderPolicy = selectPacketBrokerForwarderPolicyById(state, combinedId)
-      const homeNetworkPolicy = selectPacketBrokerHomeNetworkPolicyById(state, combinedId)
-      const decoratedNetwork = { ...network }
-      decoratedNetwork._forwarderPolicy = forwarderPolicy || {
-        uplink: {},
-        downlink: {},
+      return {
+        networks: decoratedNetworks,
+        totalCount,
+        fetching,
+        mayAdd: false,
       }
-      decoratedNetwork._homeNetworkPolicy = isValidPolicy(homeNetworkPolicy)
-        ? homeNetworkPolicy
-        : defaultHomeNetworkRoutingPolicy
-      decoratedNetworks.push(decoratedNetwork)
-    }
+    },
+  )
 
-    return {
-      networks: decoratedNetworks,
-      totalCount: selectPacketBrokerNetworksTotalCount(state),
-      fetching: selectPacketBrokerNetworksFetching(state),
-      mayAdd: false,
-    }
-  }
-
-  getItemPathPrefix(network) {
+  const getItemPathPrefix = useCallback(network => {
     const netId = network.id.net_id
     const tenantId = network.id.tenant_id
 
     if (tenantId) {
-      return `/${netId}/${tenantId}`
+      return `${netId}/${tenantId}`
     }
 
-    return `/${netId}`
-  }
+    return netId.toString()
+  }, [])
 
-  rowKeySelector({ id }) {
-    return `${id.net_id}${'tenant_id' in id ? `/${id.tenant_id}` : ''}`
-  }
+  const rowKeySelector = useCallback(
+    ({ id }) => `${id.net_id}${'tenant_id' in id ? `/${id.tenant_id}` : ''}`,
+    [],
+  )
 
-  render() {
-    const { pageSize } = this.props
-
-    return (
-      <FetchTable
-        entity="networks"
-        headers={headers}
-        getItemsAction={this.getPacketBrokerNetworksList}
-        getItemPathPrefix={this.getItemPathPrefix}
-        rowKeySelector={this.rowKeySelector}
-        baseDataSelector={this.baseDataSelector}
-        pageSize={pageSize}
-        tabs={tabs}
-        searchPlaceholderMessage={m.search}
-        searchable
-      />
-    )
-  }
+  return (
+    <FetchTable
+      entity="networks"
+      headers={headers}
+      getItemsAction={getPacketBrokerNetworks}
+      getItemPathPrefix={getItemPathPrefix}
+      rowKeySelector={rowKeySelector}
+      baseDataSelector={baseDataSelector}
+      tabs={tabs}
+      searchPlaceholderMessage={m.search}
+      searchable
+    />
+  )
 }
 
 export default PacketBrokerNetworksTable
