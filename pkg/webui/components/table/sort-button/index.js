@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import classnames from 'classnames'
-import bind from 'autobind-decorator'
 
 import Icon from '@ttn-lw/components/icon'
 
@@ -24,34 +23,27 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './sort-button.styl'
 
-class SortButton extends React.PureComponent {
-  @bind
-  onSort() {
-    const { name, onSort } = this.props
-
+const SortButton = ({ name, onSort, className, active, direction, title }) => {
+  const handleSort = useCallback(() => {
     onSort(name)
+  }, [name, onSort])
+
+  const buttonClassNames = classnames(className, style.button, {
+    [style.buttonActive]: active,
+    [style.buttonDesc]: active && direction === 'desc',
+  })
+
+  let icon = 'sort_order'
+  if (active && direction) {
+    icon += `_${direction}`
   }
 
-  render() {
-    const { className, active, direction, title } = this.props
-
-    const buttonClassNames = classnames(className, style.button, {
-      [style.buttonActive]: active,
-      [style.buttonDesc]: active && direction === 'desc',
-    })
-
-    let icon = 'sort_order'
-    if (active && direction) {
-      icon += `_${direction}`
-    }
-
-    return (
-      <button className={buttonClassNames} type="button" onClick={this.onSort}>
-        <Message content={title} />
-        <Icon className={style.icon} icon={icon} nudgeUp />
-      </button>
-    )
-  }
+  return (
+    <button className={buttonClassNames} type="button" onClick={handleSort}>
+      <Message content={title} />
+      <Icon className={style.icon} icon={icon} nudgeUp />
+    </button>
+  )
 }
 
 SortButton.propTypes = {

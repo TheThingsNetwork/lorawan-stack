@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-json v1.5.1
 // - protoc             v4.22.2
-// source: lorawan-stack/api/deviceclaimingserver.proto
+// source: ttn/lorawan/v3/deviceclaimingserver.proto
 
 package ttnpb
 
@@ -541,5 +541,97 @@ func (x *AuthorizeGatewayRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalStat
 
 // UnmarshalJSON unmarshals the AuthorizeGatewayRequest from JSON.
 func (x *AuthorizeGatewayRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the GetInfoByGatewayEUIRequest message to JSON.
+func (x *GetInfoByGatewayEUIRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.Eui) > 0 || s.HasField("eui") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("eui")
+		types.MarshalHEXBytes(s.WithField("eui"), x.Eui)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the GetInfoByGatewayEUIRequest to JSON.
+func (x *GetInfoByGatewayEUIRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the GetInfoByGatewayEUIRequest message from JSON.
+func (x *GetInfoByGatewayEUIRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "eui":
+			s.AddField("eui")
+			x.Eui = types.Unmarshal8Bytes(s.WithField("eui", false))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the GetInfoByGatewayEUIRequest from JSON.
+func (x *GetInfoByGatewayEUIRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the GetInfoByGatewayEUIResponse message to JSON.
+func (x *GetInfoByGatewayEUIResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.Eui) > 0 || s.HasField("eui") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("eui")
+		types.MarshalHEXBytes(s.WithField("eui"), x.Eui)
+	}
+	if x.SupportsClaiming || s.HasField("supports_claiming") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("supports_claiming")
+		s.WriteBool(x.SupportsClaiming)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the GetInfoByGatewayEUIResponse to JSON.
+func (x *GetInfoByGatewayEUIResponse) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the GetInfoByGatewayEUIResponse message from JSON.
+func (x *GetInfoByGatewayEUIResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "eui":
+			s.AddField("eui")
+			x.Eui = types.Unmarshal8Bytes(s.WithField("eui", false))
+		case "supports_claiming", "supportsClaiming":
+			s.AddField("supports_claiming")
+			x.SupportsClaiming = s.ReadBool()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the GetInfoByGatewayEUIResponse from JSON.
+func (x *GetInfoByGatewayEUIResponse) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

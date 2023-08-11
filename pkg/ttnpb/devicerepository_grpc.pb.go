@@ -16,7 +16,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.22.2
-// source: lorawan-stack/api/devicerepository.proto
+// source: ttn/lorawan/v3/devicerepository.proto
 
 package ttnpb
 
@@ -378,5 +378,5 @@ var DeviceRepository_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/devicerepository.proto",
+	Metadata: "ttn/lorawan/v3/devicerepository.proto",
 }

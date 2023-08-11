@@ -68,7 +68,7 @@ func makeProtoc(image string) (func(...string) error, *protocContext, error) {
 			"-w", mountWD,
 			image,
 			fmt.Sprintf("-I%s/api/third_party", mountWD),
-			fmt.Sprintf("-I%s", filepath.Dir(wd)),
+			fmt.Sprintf("-I%s/api", mountWD),
 		), &protocContext{
 			WorkingDirectory: mountWD,
 			UID:              usr.Uid,
@@ -88,7 +88,7 @@ func (p Proto) golang(context.Context) error {
 	return withProtoc(goProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
 			fmt.Sprintf("--go_out=:%s", protocOut),
-			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
+			fmt.Sprintf("%s/api/ttn/lorawan/v3/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
 			return fmt.Errorf("failed to generate protos: %w", err)
 		}
@@ -100,7 +100,7 @@ func (p Proto) golangGrpc(context.Context) error {
 	return withProtoc(goGrpcProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
 			fmt.Sprintf("--go-grpc_out=:%s", protocOut),
-			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
+			fmt.Sprintf("%s/api/ttn/lorawan/v3/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
 			return fmt.Errorf("failed to generate protos: %w", err)
 		}
@@ -115,7 +115,7 @@ func (p Proto) json(context.Context) error {
 			"--go-json_opt=std=true",
 			"--go-json_opt=legacy_fieldmask_marshaling=true",
 			fmt.Sprintf("--go-json_out=%s", protocOut),
-			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
+			fmt.Sprintf("%s/api/ttn/lorawan/v3/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
 			return fmt.Errorf("failed to generate protos: %w", err)
 		}
@@ -129,7 +129,7 @@ func (p Proto) flags(context.Context) error {
 			"--go-flags_opt=lang=go",
 			"--go-flags_opt=customtype.getter-suffix=FromFlag",
 			fmt.Sprintf("--go-flags_out=%s", protocOut),
-			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
+			fmt.Sprintf("%s/api/ttn/lorawan/v3/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
 			return fmt.Errorf("failed to generate protos: %w", err)
 		}
@@ -141,7 +141,7 @@ func (p Proto) fieldMask(context.Context) error {
 	return withProtoc(fieldMaskProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
 			fmt.Sprintf("--fieldmask_out=lang=go:%s", protocOut),
-			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
+			fmt.Sprintf("%s/api/ttn/lorawan/v3/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
 			return fmt.Errorf("failed to generate protos: %w", err)
 		}
@@ -153,7 +153,7 @@ func (p Proto) grpcGateway(context.Context) error {
 	return withProtoc(grpcGatewayProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
 			fmt.Sprintf("--grpc-gateway_out=:%s", protocOut),
-			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
+			fmt.Sprintf("%s/api/ttn/lorawan/v3/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
 			return fmt.Errorf("failed to generate protos: %w", err)
 		}
@@ -193,8 +193,8 @@ func (p Proto) GoClean(context.Context) error {
 // Swagger generates Swagger protos.
 func (p Proto) Swagger(context.Context) error {
 	ok, err := target.Glob(
-		filepath.Join("api", "api.swagger.json"),
-		filepath.Join("api", "*.proto"),
+		filepath.Join("api", "ttn", "lorawan", "v3", "api.swagger.json"),
+		filepath.Join("api", "ttn", "lorawan", "v3", "*.proto"),
 	)
 	if err != nil {
 		return targetError(err)
@@ -205,8 +205,8 @@ func (p Proto) Swagger(context.Context) error {
 	return withProtoc(openAPIv2ProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
 			"--openapiv2_opt=json_names_for_fields=false",
-			fmt.Sprintf("--openapiv2_out=allow_merge,merge_file_name=api:%s/api", pCtx.WorkingDirectory),
-			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
+			fmt.Sprintf("--openapiv2_out=allow_merge,merge_file_name=api:%s/api/ttn/lorawan/v3", pCtx.WorkingDirectory),
+			fmt.Sprintf("%s/api/ttn/lorawan/v3/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
 			return fmt.Errorf("failed to generate protos: %w", err)
 		}
@@ -216,14 +216,14 @@ func (p Proto) Swagger(context.Context) error {
 
 // SwaggerClean removes generated Swagger protos.
 func (p Proto) SwaggerClean(context.Context) error {
-	return sh.Rm(filepath.Join("api", "api.swagger.json"))
+	return sh.Rm(filepath.Join("api", "ttn", "lorawan", "v3", "api.swagger.json"))
 }
 
 // Markdown generates Markdown protos.
 func (p Proto) Markdown(context.Context) error {
 	ok, err := target.Glob(
-		filepath.Join("api", "api.md"),
-		filepath.Join("api", "*.proto"),
+		filepath.Join("api", "ttn", "lorawan", "v3", "api.md"),
+		filepath.Join("api", "ttn", "lorawan", "v3", "*.proto"),
 	)
 	if err != nil {
 		return targetError(err)
@@ -233,8 +233,11 @@ func (p Proto) Markdown(context.Context) error {
 	}
 	return withProtoc(docProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
-			fmt.Sprintf("--doc_opt=%s/api/api.md.tmpl,api.md --doc_out=%s/api", pCtx.WorkingDirectory, pCtx.WorkingDirectory),
-			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
+			fmt.Sprintf(
+				"--doc_opt=%s/api/api.md.tmpl,api.md --doc_out=%s/api/ttn/lorawan/v3",
+				pCtx.WorkingDirectory, pCtx.WorkingDirectory,
+			),
+			fmt.Sprintf("%s/api/ttn/lorawan/v3/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
 			return fmt.Errorf("failed to generate protos: %w", err)
 		}
@@ -244,14 +247,14 @@ func (p Proto) Markdown(context.Context) error {
 
 // MarkdownClean removes generated Markdown protos.
 func (p Proto) MarkdownClean(context.Context) error {
-	return sh.Rm(filepath.Join("api", "api.md"))
+	return sh.Rm(filepath.Join("api", "ttn", "lorawan", "v3", "api.md"))
 }
 
 // JsSDK generates javascript SDK protos.
 func (p Proto) JsSDK(context.Context) error {
 	ok, err := target.Glob(
 		filepath.Join("sdk", "js", "generated", "api.json"),
-		filepath.Join("api", "*.proto"),
+		filepath.Join("api", "ttn", "lorawan", "v3", "*.proto"),
 	)
 	if err != nil {
 		return targetError(err)
@@ -262,7 +265,7 @@ func (p Proto) JsSDK(context.Context) error {
 	return withProtoc(docProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
 			fmt.Sprintf("--doc_opt=json,api.json --doc_out=%s/v3/sdk/js/generated", pCtx.WorkingDirectory),
-			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
+			fmt.Sprintf("%s/api/ttn/lorawan/v3/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
 			return fmt.Errorf("failed to generate protos: %w", err)
 		}
@@ -278,6 +281,16 @@ func (p Proto) JsSDKClean(context.Context) error {
 // All generates protos.
 func (p Proto) All(ctx context.Context) {
 	mg.CtxDeps(ctx, Proto.Go, Proto.Swagger, Proto.Markdown, Proto.JsSDK)
+}
+
+// Fmt formats and simplifies all proto files.
+func (p Proto) Fmt(ctx context.Context) error {
+	return runGoTool(append([]string{bufCLI, "format", "-w"}, "api")...)
+}
+
+// Lint lints all proto files.
+func (p Proto) Lint(ctx context.Context) error {
+	return runGoTool(append([]string{bufCLI, "lint"}, "api")...)
 }
 
 // Clean removes generated protos.

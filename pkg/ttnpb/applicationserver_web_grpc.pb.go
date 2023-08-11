@@ -16,7 +16,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.22.2
-// source: lorawan-stack/api/applicationserver_web.proto
+// source: ttn/lorawan/v3/applicationserver_web.proto
 
 package ttnpb
 
@@ -343,5 +343,5 @@ var ApplicationWebhookRegistry_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/applicationserver_web.proto",
+	Metadata: "ttn/lorawan/v3/applicationserver_web.proto",
 }

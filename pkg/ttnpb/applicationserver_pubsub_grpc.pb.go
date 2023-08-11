@@ -16,7 +16,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.22.2
-// source: lorawan-stack/api/applicationserver_pubsub.proto
+// source: ttn/lorawan/v3/applicationserver_pubsub.proto
 
 package ttnpb
 
@@ -269,5 +269,5 @@ var ApplicationPubSubRegistry_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/applicationserver_pubsub.proto",
+	Metadata: "ttn/lorawan/v3/applicationserver_pubsub.proto",
 }

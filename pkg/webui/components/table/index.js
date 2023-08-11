@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import bind from 'autobind-decorator'
+import React, { useCallback } from 'react'
 import classnames from 'classnames'
 
 import Overlay from '@ttn-lw/components/overlay'
@@ -26,152 +25,154 @@ import Table from './table'
 
 import style from './tabular.styl'
 
-class Tabular extends React.Component {
-  @bind
-  onPageChange(page) {
-    this.props.onPageChange(page)
-  }
+const Tabular = ({
+  onPageChange,
+  order,
+  orderBy,
+  pageSize,
+  page,
+  handlesPagination,
+  paginated,
+  className,
+  loading,
+  small,
+  onRowClick,
+  totalCount,
+  data,
+  headers,
+  rowKeySelector,
+  rowHrefSelector,
+  emptyMessage,
+  clickable,
+  disableSorting,
+  onSortRequest,
+}) => {
+  const handlePageChange = useCallback(
+    page => {
+      onPageChange(page)
+    },
+    [onPageChange],
+  )
 
-  @bind
-  onSortRequest(newOrderBy) {
-    const { order, orderBy } = this.props
-    const sameColumn = orderBy === newOrderBy
+  const handleSortRequest = useCallback(
+    newOrderBy => {
+      const sameColumn = orderBy === newOrderBy
 
-    if (sameColumn && order === 'asc') {
-      this.props.onSortRequest('desc', orderBy)
+      if (sameColumn && order === 'asc') {
+        onSortRequest('desc', orderBy)
 
-      return
-    }
+        return
+      }
 
-    this.props.onSortRequest('asc', newOrderBy)
-  }
+      onSortRequest('asc', newOrderBy)
+    },
+    [orderBy, order, onSortRequest],
+  )
 
-  @bind
-  handlePagination(items) {
-    const { pageSize, page, handlesPagination, paginated } = this.props
+  const handlePagination = useCallback(
+    items => {
+      if (paginated && handlesPagination) {
+        const from = pageSize * (page - 1)
+        const to = pageSize * page
 
-    if (paginated && handlesPagination) {
-      const from = pageSize * (page - 1)
-      const to = pageSize * page
+        return items.slice(from, to)
+      }
 
-      return items.slice(from, to)
-    }
+      return items
+    },
+    [handlesPagination, page, paginated, pageSize],
+  )
 
-    return items
-  }
-
-  render() {
-    const {
-      className,
-      loading,
-      small,
-      onRowClick,
-      page,
-      order,
-      orderBy,
-      totalCount,
-      pageSize,
-      paginated,
-      data,
-      headers,
-      rowKeySelector,
-      rowHrefSelector,
-      emptyMessage,
-      clickable,
-      disableSorting,
-    } = this.props
-
-    const columns = (
-      <Table.Row head>
-        {headers.map((header, key) => (
-          <Table.HeadCell
-            key={key}
-            align={header.align}
-            content={header.sortable && !disableSorting ? undefined : header.displayName}
-            name={header.name}
-            width={header.width}
-          >
-            {header.sortable && !disableSorting ? (
-              <Table.SortButton
-                title={header.displayName}
-                direction={order}
-                name={
-                  typeof header.sortKey === 'function'
-                    ? header.sortKey(header)
-                    : header.sortKey || header.name
-                }
-                active={header.sortKey ? orderBy === header.sortKey : orderBy === header.name}
-                onSort={this.onSortRequest}
-              />
-            ) : null}
-          </Table.HeadCell>
-        ))}
-      </Table.Row>
-    )
-
-    const minWidth = `${headers.length * 10}rem`
-    const defaultRowKeySelector = row => {
-      const key = headers[0].getValue ? headers[0].getValue(row) : getByPath(row, headers[0].name)
-      return typeof key === 'string' || typeof key === 'number' ? key : JSON.stringify(key)
-    }
-    const appliedRowKeySelector = rowKeySelector ? rowKeySelector : defaultRowKeySelector
-    const paginatedData = this.handlePagination(data)
-    const rows = paginatedData.map((row, rowIndex) => {
-      // If the whole table is disabled each row should be as well.
-      const rowClickable = !clickable ? false : row._meta?.clickable ?? clickable
-
-      return (
-        <Table.Row
-          key={appliedRowKeySelector(row)}
-          id={rowIndex}
-          onClick={onRowClick}
-          clickable={rowClickable}
-          linkTo={rowHrefSelector ? rowHrefSelector(row) : undefined}
-          body
+  const columns = (
+    <Table.Row head>
+      {headers.map((header, key) => (
+        <Table.HeadCell
+          key={key}
+          align={header.align}
+          content={header.sortable && !disableSorting ? undefined : header.displayName}
+          name={header.name}
+          width={header.width}
         >
-          {headers.map((header, index) => {
-            const value = headers[index].getValue
-              ? headers[index].getValue(row)
-              : getByPath(row, headers[index].name)
-            return (
-              <Table.DataCell key={index} align={header.align} small={small}>
-                {headers[index].render ? headers[index].render(value) : value}
-              </Table.DataCell>
-            )
-          })}
-        </Table.Row>
-      )
-    })
+          {header.sortable && !disableSorting ? (
+            <Table.SortButton
+              title={header.displayName}
+              direction={order}
+              name={
+                typeof header.sortKey === 'function'
+                  ? header.sortKey(header)
+                  : header.sortKey || header.name
+              }
+              active={header.sortKey ? orderBy === header.sortKey : orderBy === header.name}
+              onSort={handleSortRequest}
+            />
+          ) : null}
+        </Table.HeadCell>
+      ))}
+    </Table.Row>
+  )
 
-    const pagination = paginated ? (
-      <Table.Row footer>
-        <Table.DataCell className={style.paginationCell} small={small}>
-          <Pagination
-            className={style.pagination}
-            pageCount={Math.ceil(totalCount / pageSize) || 1}
-            onPageChange={this.onPageChange}
-            disableInitialCallback
-            pageRangeDisplayed={2}
-            forcePage={page}
-          />
-        </Table.DataCell>
-      </Table.Row>
-    ) : null
+  const minWidth = `${headers.length * 10}rem`
+  const defaultRowKeySelector = row => {
+    const key = headers[0].getValue ? headers[0].getValue(row) : getByPath(row, headers[0].name)
+    return typeof key === 'string' || typeof key === 'number' ? key : JSON.stringify(key)
+  }
+  const appliedRowKeySelector = rowKeySelector ? rowKeySelector : defaultRowKeySelector
+  const paginatedData = handlePagination(data)
+  const rows = paginatedData.map((row, rowIndex) => {
+    // If the whole table is disabled each row should be as well.
+    const rowClickable = !clickable ? false : row._meta?.clickable ?? clickable
 
     return (
-      <div className={classnames(style.container, className)}>
-        <Overlay visible={loading} loading={loading}>
-          <Table minWidth={minWidth}>
-            <Table.Head>{columns}</Table.Head>
-            <Table.Body empty={rows.length === 0} emptyMessage={emptyMessage}>
-              {rows}
-            </Table.Body>
-          </Table>
-          <Table.Footer>{pagination}</Table.Footer>
-        </Overlay>
-      </div>
+      <Table.Row
+        key={appliedRowKeySelector(row)}
+        id={rowIndex}
+        onClick={onRowClick}
+        clickable={rowClickable}
+        linkTo={rowHrefSelector ? rowHrefSelector(row) : undefined}
+        body
+      >
+        {headers.map((header, index) => {
+          const value = headers[index].getValue
+            ? headers[index].getValue(row)
+            : getByPath(row, headers[index].name)
+          return (
+            <Table.DataCell key={index} align={header.align} small={small}>
+              {headers[index].render ? headers[index].render(value) : value}
+            </Table.DataCell>
+          )
+        })}
+      </Table.Row>
     )
-  }
+  })
+
+  const pagination = paginated ? (
+    <Table.Row footer>
+      <Table.DataCell className={style.paginationCell} small={small}>
+        <Pagination
+          className={style.pagination}
+          pageCount={Math.ceil(totalCount / pageSize) || 1}
+          onPageChange={handlePageChange}
+          disableInitialCallback
+          pageRangeDisplayed={2}
+          forcePage={page}
+        />
+      </Table.DataCell>
+    </Table.Row>
+  ) : null
+
+  return (
+    <div className={classnames(style.container, className)}>
+      <Overlay visible={loading} loading={loading}>
+        <Table minWidth={minWidth}>
+          <Table.Head>{columns}</Table.Head>
+          <Table.Body empty={rows.length === 0} emptyMessage={emptyMessage}>
+            {rows}
+          </Table.Body>
+        </Table>
+        <Table.Footer>{pagination}</Table.Footer>
+      </Overlay>
+    </div>
+  )
 }
 
 Tabular.propTypes = {

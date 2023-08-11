@@ -14,7 +14,7 @@
 
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Route, Routes, BrowserRouter } from 'react-router-dom'
+import { Route, Routes, Outlet, createBrowserRouter, RouterProvider } from 'react-router-dom'
 import classnames from 'classnames'
 
 import { ToastContainer } from '@ttn-lw/components/toast'
@@ -59,16 +59,54 @@ import style from './app.styl'
 
 const errorRender = error => <FullViewError error={error} header={<Header />} />
 
-const ConsoleApp = () => {
+const Layout = () => {
   const user = useSelector(selectUser)
   const fetching = useSelector(selectUserFetching)
   const error = useSelector(selectUserError)
   const rights = useSelector(selectUserRights)
   const isAdmin = useSelector(selectUserIsAdmin)
-  const status = useSelector(selectStatusStore)
   const siteTitle = selectApplicationSiteTitle()
-  const pageData = selectPageData()
   const siteName = selectApplicationSiteName()
+
+  return (
+    <>
+      <ScrollToTop />
+      <ErrorView errorRender={errorRender}>
+        <div className={style.app}>
+          <IntlHelmet
+            titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
+            defaultTitle={siteName}
+          />
+          <div id="modal-container" />
+          <Header />
+          <main className={style.main}>
+            <WithAuth
+              user={user}
+              fetching={fetching}
+              error={error}
+              errorComponent={FullViewErrorInner}
+              rights={rights}
+              isAdmin={isAdmin}
+            >
+              <div className={classnames('breadcrumbs', style.mobileBreadcrumbs)} />
+              <div id="sidebar" className={sidebarStyle.container} />
+              <div className={style.content}>
+                <div className={classnames('breadcrumbs', style.desktopBreadcrumbs)} />
+                <div className={style.stage} id="stage">
+                  <Outlet />
+                </div>
+              </div>
+            </WithAuth>
+          </main>
+          <Footer className={style.footer} />
+        </div>
+      </ErrorView>
+    </>
+  )
+}
+const ConsoleRoot = () => {
+  const status = useSelector(selectStatusStore)
+  const pageData = selectPageData()
   const dispatch = useDispatch()
 
   const handleConnectionStatusChange = useCallback(
@@ -88,60 +126,32 @@ const ConsoleApp = () => {
   }, [handleConnectionStatusChange])
 
   if (pageData && pageData.error) {
-    return (
-      <BrowserRouter history={history} basename="/console">
-        <FullViewError error={pageData.error} header={<Header />} />
-      </BrowserRouter>
-    )
+    return <FullViewError error={pageData.error} header={<Header />} />
   }
 
   return (
     <React.Fragment>
       {status.isLoginRequired && <LogBackInModal />}
       <ToastContainer />
-      <BrowserRouter history={history} basename="/console">
-        <ScrollToTop />
-        <ErrorView errorRender={errorRender}>
-          <div className={style.app}>
-            <IntlHelmet
-              titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
-              defaultTitle={siteName}
-            />
-            <div id="modal-container" />
-            <Header />
-            <main className={style.main}>
-              <WithAuth
-                user={user}
-                fetching={fetching}
-                error={error}
-                errorComponent={FullViewErrorInner}
-                rights={rights}
-                isAdmin={isAdmin}
-              >
-                <div className={classnames('breadcrumbs', style.mobileBreadcrumbs)} />
-                <div id="sidebar" className={sidebarStyle.container} />
-                <div className={style.content}>
-                  <div className={classnames('breadcrumbs', style.desktopBreadcrumbs)} />
-                  <div className={style.stage} id="stage">
-                    <Routes>
-                      <Route index Component={Overview} />
-                      <Route path="/applications/*" Component={Applications} />
-                      <Route path="/gateways/*" Component={Gateways} />
-                      <Route path="/organizations/*" Component={Organizations} />
-                      <Route path="/admin-panel/*" Component={AdminPanel} />
-                      <Route path="/user/*" Component={User} />
-                      <Route path="*" Component={GenericNotFound} />
-                    </Routes>
-                  </div>
-                </div>
-              </WithAuth>
-            </main>
-            <Footer className={style.footer} />
-          </div>
-        </ErrorView>
-      </BrowserRouter>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route index Component={Overview} />
+          <Route path="applications/*" Component={Applications} />
+          <Route path="gateways/*" Component={Gateways} />
+          <Route path="organizations/*" Component={Organizations} />
+          <Route path="admin-panel/*" Component={AdminPanel} />
+          <Route path="user/*" Component={User} />
+          <Route path="*" Component={GenericNotFound} />
+        </Route>
+      </Routes>
     </React.Fragment>
   )
 }
+
+const router = createBrowserRouter([{ path: '*', Component: ConsoleRoot }], {
+  basename: '/console',
+})
+
+const ConsoleApp = () => <RouterProvider router={router} />
 
 export default ConsoleApp

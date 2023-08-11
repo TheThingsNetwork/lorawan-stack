@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-json v1.5.1
 // - protoc             v4.22.2
-// source: lorawan-stack/api/enums.proto
+// source: ttn/lorawan/v3/enums.proto
 
 package ttnpb
 

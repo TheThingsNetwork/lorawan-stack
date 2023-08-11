@@ -16,7 +16,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.22.2
-// source: lorawan-stack/api/notification_service.proto
+// source: ttn/lorawan/v3/notification_service.proto
 
 package ttnpb
 
@@ -204,5 +204,5 @@ var NotificationService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/notification_service.proto",
+	Metadata: "ttn/lorawan/v3/notification_service.proto",
 }

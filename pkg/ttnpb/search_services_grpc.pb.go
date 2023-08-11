@@ -16,7 +16,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.22.2
-// source: lorawan-stack/api/search_services.proto
+// source: ttn/lorawan/v3/search_services.proto
 
 package ttnpb
 
@@ -326,7 +326,7 @@ var EntityRegistrySearch_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/search_services.proto",
+	Metadata: "ttn/lorawan/v3/search_services.proto",
 }
 
 const (
@@ -419,5 +419,5 @@ var EndDeviceRegistrySearch_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/search_services.proto",
+	Metadata: "ttn/lorawan/v3/search_services.proto",
 }

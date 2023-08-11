@@ -1,0 +1,153 @@
+version: v1
+name: buf.build/thethingsnetwork/lorawan-stack
+deps:
+  - buf.build/grpc-ecosystem/grpc-gateway
+  - buf.build/googleapis/googleapis
+  - buf.build/envoyproxy/protoc-gen-validate
+  - buf.build/thethingsindustries/protoc-gen-go-flags
+  - buf.build/thethingsindustries/protoc-gen-go-json
+build:
+  excludes:
+    - third_party
+breaking:
+  use:
+    - FILE
+lint:
+  use:
+    - DEFAULT
+  # generated with: $ buf lint --error-format=config-ignore-yaml
+  ignore_only:
+    ENUM_NO_ALLOW_ALIAS:
+      - ttn/lorawan/v3/lorawan.proto
+    ENUM_VALUE_PREFIX:
+      - ttn/lorawan/v3/applicationserver.proto
+      - ttn/lorawan/v3/applicationserver_integrations_alcsync.proto
+      - ttn/lorawan/v3/applicationserver_pubsub.proto
+      - ttn/lorawan/v3/client.proto
+      - ttn/lorawan/v3/end_device.proto
+      - ttn/lorawan/v3/enums.proto
+      - ttn/lorawan/v3/gateway.proto
+      - ttn/lorawan/v3/lorawan.proto
+      - ttn/lorawan/v3/messages.proto
+      - ttn/lorawan/v3/metadata.proto
+      - ttn/lorawan/v3/rights.proto
+    ENUM_VALUE_UPPER_SNAKE_CASE:
+      - ttn/lorawan/v3/rights.proto
+    ENUM_ZERO_VALUE_SUFFIX:
+      - ttn/lorawan/v3/applicationserver.proto
+      - ttn/lorawan/v3/applicationserver_integrations_alcsync.proto
+      - ttn/lorawan/v3/applicationserver_pubsub.proto
+      - ttn/lorawan/v3/client.proto
+      - ttn/lorawan/v3/contact_info.proto
+      - ttn/lorawan/v3/devicerepository.proto
+      - ttn/lorawan/v3/end_device.proto
+      - ttn/lorawan/v3/enums.proto
+      - ttn/lorawan/v3/gateway.proto
+      - ttn/lorawan/v3/lorawan.proto
+      - ttn/lorawan/v3/messages.proto
+      - ttn/lorawan/v3/metadata.proto
+      - ttn/lorawan/v3/notification_service.proto
+      - ttn/lorawan/v3/rights.proto
+    FIELD_LOWER_SNAKE_CASE:
+      - ttn/lorawan/v3/applicationserver_integrations_alcsync.proto
+    FILE_LOWER_SNAKE_CASE:
+      - ttn/lorawan/v3/_api.proto
+    ONEOF_LOWER_SNAKE_CASE:
+      - ttn/lorawan/v3/lorawan.proto
+    RPC_REQUEST_RESPONSE_UNIQUE:
+      - ttn/lorawan/v3/application_services.proto
+      - ttn/lorawan/v3/applicationserver.proto
+      - ttn/lorawan/v3/applicationserver_integrations_storage.proto
+      - ttn/lorawan/v3/applicationserver_packages.proto
+      - ttn/lorawan/v3/applicationserver_pubsub.proto
+      - ttn/lorawan/v3/applicationserver_web.proto
+      - ttn/lorawan/v3/client_services.proto
+      - ttn/lorawan/v3/contact_info.proto
+      - ttn/lorawan/v3/deviceclaimingserver.proto
+      - ttn/lorawan/v3/devicerepository.proto
+      - ttn/lorawan/v3/end_device_services.proto
+      - ttn/lorawan/v3/gateway_services.proto
+      - ttn/lorawan/v3/gatewayserver.proto
+      - ttn/lorawan/v3/identityserver.proto
+      - ttn/lorawan/v3/joinserver.proto
+      - ttn/lorawan/v3/networkserver.proto
+      - ttn/lorawan/v3/notification_service.proto
+      - ttn/lorawan/v3/oauth_services.proto
+      - ttn/lorawan/v3/organization_services.proto
+      - ttn/lorawan/v3/packetbrokeragent.proto
+      - ttn/lorawan/v3/qrcodegenerator.proto
+      - ttn/lorawan/v3/search_services.proto
+      - ttn/lorawan/v3/user_services.proto
+    RPC_REQUEST_STANDARD_NAME:
+      - ttn/lorawan/v3/application_services.proto
+      - ttn/lorawan/v3/applicationserver.proto
+      - ttn/lorawan/v3/applicationserver_packages.proto
+      - ttn/lorawan/v3/applicationserver_pubsub.proto
+      - ttn/lorawan/v3/applicationserver_web.proto
+      - ttn/lorawan/v3/client_services.proto
+      - ttn/lorawan/v3/contact_info.proto
+      - ttn/lorawan/v3/deviceclaimingserver.proto
+      - ttn/lorawan/v3/devicerepository.proto
+      - ttn/lorawan/v3/end_device_services.proto
+      - ttn/lorawan/v3/events.proto
+      - ttn/lorawan/v3/gateway_services.proto
+      - ttn/lorawan/v3/gatewayserver.proto
+      - ttn/lorawan/v3/identityserver.proto
+      - ttn/lorawan/v3/joinserver.proto
+      - ttn/lorawan/v3/networkserver.proto
+      - ttn/lorawan/v3/notification_service.proto
+      - ttn/lorawan/v3/oauth_services.proto
+      - ttn/lorawan/v3/organization_services.proto
+      - ttn/lorawan/v3/packetbrokeragent.proto
+      - ttn/lorawan/v3/qrcodegenerator.proto
+      - ttn/lorawan/v3/user_services.proto
+    RPC_RESPONSE_STANDARD_NAME:
+      - ttn/lorawan/v3/application_services.proto
+      - ttn/lorawan/v3/applicationserver.proto
+      - ttn/lorawan/v3/applicationserver_integrations_storage.proto
+      - ttn/lorawan/v3/applicationserver_packages.proto
+      - ttn/lorawan/v3/applicationserver_pubsub.proto
+      - ttn/lorawan/v3/applicationserver_web.proto
+      - ttn/lorawan/v3/client_services.proto
+      - ttn/lorawan/v3/contact_info.proto
+      - ttn/lorawan/v3/deviceclaimingserver.proto
+      - ttn/lorawan/v3/devicerepository.proto
+      - ttn/lorawan/v3/end_device_services.proto
+      - ttn/lorawan/v3/events.proto
+      - ttn/lorawan/v3/gateway_services.proto
+      - ttn/lorawan/v3/gatewayserver.proto
+      - ttn/lorawan/v3/identityserver.proto
+      - ttn/lorawan/v3/joinserver.proto
+      - ttn/lorawan/v3/networkserver.proto
+      - ttn/lorawan/v3/notification_service.proto
+      - ttn/lorawan/v3/oauth_services.proto
+      - ttn/lorawan/v3/organization_services.proto
+      - ttn/lorawan/v3/packetbrokeragent.proto
+      - ttn/lorawan/v3/qrcodegenerator.proto
+      - ttn/lorawan/v3/search_services.proto
+      - ttn/lorawan/v3/user_services.proto
+    SERVICE_SUFFIX:
+      - ttn/lorawan/v3/application_services.proto
+      - ttn/lorawan/v3/applicationserver.proto
+      - ttn/lorawan/v3/applicationserver_integrations_storage.proto
+      - ttn/lorawan/v3/applicationserver_packages.proto
+      - ttn/lorawan/v3/applicationserver_pubsub.proto
+      - ttn/lorawan/v3/applicationserver_web.proto
+      - ttn/lorawan/v3/client_services.proto
+      - ttn/lorawan/v3/configuration_services.proto
+      - ttn/lorawan/v3/contact_info.proto
+      - ttn/lorawan/v3/deviceclaimingserver.proto
+      - ttn/lorawan/v3/devicerepository.proto
+      - ttn/lorawan/v3/end_device_services.proto
+      - ttn/lorawan/v3/events.proto
+      - ttn/lorawan/v3/gateway_services.proto
+      - ttn/lorawan/v3/gatewayserver.proto
+      - ttn/lorawan/v3/identityserver.proto
+      - ttn/lorawan/v3/joinserver.proto
+      - ttn/lorawan/v3/networkserver.proto
+      - ttn/lorawan/v3/oauth_services.proto
+      - ttn/lorawan/v3/organization_services.proto
+      - ttn/lorawan/v3/packetbrokeragent.proto
+      - ttn/lorawan/v3/qrcodegenerator.proto
+      - ttn/lorawan/v3/search_services.proto
+      - ttn/lorawan/v3/user_services.proto

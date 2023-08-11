@@ -16,7 +16,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.22.2
-// source: lorawan-stack/api/applicationserver_integrations_storage.proto
+// source: ttn/lorawan/v3/applicationserver_integrations_storage.proto
 
 package ttnpb
 
@@ -188,5 +188,5 @@ var ApplicationUpStorage_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "lorawan-stack/api/applicationserver_integrations_storage.proto",
+	Metadata: "ttn/lorawan/v3/applicationserver_integrations_storage.proto",
 }

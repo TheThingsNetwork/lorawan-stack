@@ -68,6 +68,14 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Ban
 			).
 			WithCause(internal.ErrUnknownChannel)
 	}
+	if len(currentParameters.Channels) > int(phy.MaxUplinkChannels) {
+		return linkADRReqParameters{}, false, internal.ErrCorruptedMACState.
+			WithAttributes(
+				"current_channels_len", len(currentParameters.Channels),
+				"phy_max_uplink_channels", phy.MaxUplinkChannels,
+			).
+			WithCause(internal.ErrUnknownChannel)
+	}
 
 	currentChs := make([]bool, phy.MaxUplinkChannels)
 	for i, ch := range currentParameters.Channels {
