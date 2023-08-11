@@ -324,6 +324,147 @@ func (x *GetClaimStatusResponse) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the BatchUnclaimEndDevicesResponse_Failed message to JSON.
+func (x *BatchUnclaimEndDevicesResponse_Failed) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.EndDeviceIds != nil || s.HasField("end_device_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("end_device_ids")
+		x.EndDeviceIds.MarshalProtoJSON(s.WithField("end_device_ids"))
+	}
+	if x.ErrorDetails != nil || s.HasField("error_details") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("error_details")
+		// NOTE: ErrorDetails does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.ErrorDetails)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the BatchUnclaimEndDevicesResponse_Failed to JSON.
+func (x *BatchUnclaimEndDevicesResponse_Failed) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the BatchUnclaimEndDevicesResponse_Failed message from JSON.
+func (x *BatchUnclaimEndDevicesResponse_Failed) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "end_device_ids", "endDeviceIds":
+			if s.ReadNil() {
+				x.EndDeviceIds = nil
+				return
+			}
+			x.EndDeviceIds = &EndDeviceIdentifiers{}
+			x.EndDeviceIds.UnmarshalProtoJSON(s.WithField("end_device_ids", true))
+		case "error_details", "errorDetails":
+			s.AddField("error_details")
+			if s.ReadNil() {
+				x.ErrorDetails = nil
+				return
+			}
+			// NOTE: ErrorDetails does not seem to implement UnmarshalProtoJSON.
+			var v ErrorDetails
+			golang.UnmarshalMessage(s, &v)
+			x.ErrorDetails = &v
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the BatchUnclaimEndDevicesResponse_Failed from JSON.
+func (x *BatchUnclaimEndDevicesResponse_Failed) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the BatchUnclaimEndDevicesResponse message to JSON.
+func (x *BatchUnclaimEndDevicesResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.ApplicationIds != nil || s.HasField("application_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("application_ids")
+		// NOTE: ApplicationIdentifiers does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.ApplicationIds)
+	}
+	if len(x.Failed) > 0 || s.HasField("failed") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("failed")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.Failed {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("failed"))
+		}
+		s.WriteArrayEnd()
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the BatchUnclaimEndDevicesResponse to JSON.
+func (x *BatchUnclaimEndDevicesResponse) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the BatchUnclaimEndDevicesResponse message from JSON.
+func (x *BatchUnclaimEndDevicesResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "application_ids", "applicationIds":
+			s.AddField("application_ids")
+			if s.ReadNil() {
+				x.ApplicationIds = nil
+				return
+			}
+			// NOTE: ApplicationIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v ApplicationIdentifiers
+			golang.UnmarshalMessage(s, &v)
+			x.ApplicationIds = &v
+		case "failed":
+			s.AddField("failed")
+			if s.ReadNil() {
+				x.Failed = nil
+				return
+			}
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.Failed = append(x.Failed, nil)
+					return
+				}
+				v := &BatchUnclaimEndDevicesResponse_Failed{}
+				v.UnmarshalProtoJSON(s.WithField("failed", false))
+				if s.Err() != nil {
+					return
+				}
+				x.Failed = append(x.Failed, v)
+			})
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the BatchUnclaimEndDevicesResponse from JSON.
+func (x *BatchUnclaimEndDevicesResponse) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the ClaimGatewayRequest_AuthenticatedIdentifiers message to JSON.
 func (x *ClaimGatewayRequest_AuthenticatedIdentifiers) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {

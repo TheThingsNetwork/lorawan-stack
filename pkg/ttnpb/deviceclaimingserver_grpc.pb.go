@@ -342,6 +342,103 @@ var EndDeviceClaimingServer_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
+	EndDeviceBatchClaimingServer_Unclaim_FullMethodName = "/ttn.lorawan.v3.EndDeviceBatchClaimingServer/Unclaim"
+)
+
+// EndDeviceBatchClaimingServerClient is the client API for EndDeviceBatchClaimingServer service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type EndDeviceBatchClaimingServerClient interface {
+	// Unclaims multiple end devices on an external Join Server.
+	// All devices must have the same application ID and Join EUI.
+	// Check the response for devices that could not be unclaimed.
+	Unclaim(ctx context.Context, in *BatchUnclaimEndDevicesRequest, opts ...grpc.CallOption) (*BatchUnclaimEndDevicesResponse, error)
+}
+
+type endDeviceBatchClaimingServerClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewEndDeviceBatchClaimingServerClient(cc grpc.ClientConnInterface) EndDeviceBatchClaimingServerClient {
+	return &endDeviceBatchClaimingServerClient{cc}
+}
+
+func (c *endDeviceBatchClaimingServerClient) Unclaim(ctx context.Context, in *BatchUnclaimEndDevicesRequest, opts ...grpc.CallOption) (*BatchUnclaimEndDevicesResponse, error) {
+	out := new(BatchUnclaimEndDevicesResponse)
+	err := c.cc.Invoke(ctx, EndDeviceBatchClaimingServer_Unclaim_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// EndDeviceBatchClaimingServerServer is the server API for EndDeviceBatchClaimingServer service.
+// All implementations must embed UnimplementedEndDeviceBatchClaimingServerServer
+// for forward compatibility
+type EndDeviceBatchClaimingServerServer interface {
+	// Unclaims multiple end devices on an external Join Server.
+	// All devices must have the same application ID and Join EUI.
+	// Check the response for devices that could not be unclaimed.
+	Unclaim(context.Context, *BatchUnclaimEndDevicesRequest) (*BatchUnclaimEndDevicesResponse, error)
+	mustEmbedUnimplementedEndDeviceBatchClaimingServerServer()
+}
+
+// UnimplementedEndDeviceBatchClaimingServerServer must be embedded to have forward compatible implementations.
+type UnimplementedEndDeviceBatchClaimingServerServer struct {
+}
+
+func (UnimplementedEndDeviceBatchClaimingServerServer) Unclaim(context.Context, *BatchUnclaimEndDevicesRequest) (*BatchUnclaimEndDevicesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Unclaim not implemented")
+}
+func (UnimplementedEndDeviceBatchClaimingServerServer) mustEmbedUnimplementedEndDeviceBatchClaimingServerServer() {
+}
+
+// UnsafeEndDeviceBatchClaimingServerServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to EndDeviceBatchClaimingServerServer will
+// result in compilation errors.
+type UnsafeEndDeviceBatchClaimingServerServer interface {
+	mustEmbedUnimplementedEndDeviceBatchClaimingServerServer()
+}
+
+func RegisterEndDeviceBatchClaimingServerServer(s grpc.ServiceRegistrar, srv EndDeviceBatchClaimingServerServer) {
+	s.RegisterService(&EndDeviceBatchClaimingServer_ServiceDesc, srv)
+}
+
+func _EndDeviceBatchClaimingServer_Unclaim_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BatchUnclaimEndDevicesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EndDeviceBatchClaimingServerServer).Unclaim(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: EndDeviceBatchClaimingServer_Unclaim_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EndDeviceBatchClaimingServerServer).Unclaim(ctx, req.(*BatchUnclaimEndDevicesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// EndDeviceBatchClaimingServer_ServiceDesc is the grpc.ServiceDesc for EndDeviceBatchClaimingServer service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var EndDeviceBatchClaimingServer_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "ttn.lorawan.v3.EndDeviceBatchClaimingServer",
+	HandlerType: (*EndDeviceBatchClaimingServerServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Unclaim",
+			Handler:    _EndDeviceBatchClaimingServer_Unclaim_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "ttn/lorawan/v3/deviceclaimingserver.proto",
+}
+
+const (
 	GatewayClaimingServer_Claim_FullMethodName               = "/ttn.lorawan.v3.GatewayClaimingServer/Claim"
 	GatewayClaimingServer_AuthorizeGateway_FullMethodName    = "/ttn.lorawan.v3.GatewayClaimingServer/AuthorizeGateway"
 	GatewayClaimingServer_UnauthorizeGateway_FullMethodName  = "/ttn.lorawan.v3.GatewayClaimingServer/UnauthorizeGateway"

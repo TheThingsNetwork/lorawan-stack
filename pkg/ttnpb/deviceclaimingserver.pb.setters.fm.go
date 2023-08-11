@@ -302,6 +302,96 @@ func (dst *GetClaimStatusResponse) SetFields(src *GetClaimStatusResponse, paths 
 	return nil
 }
 
+func (dst *BatchUnclaimEndDevicesRequest) SetFields(src *BatchUnclaimEndDevicesRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "application_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationIdentifiers
+				if (src == nil || src.ApplicationIds == nil) && dst.ApplicationIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.ApplicationIds
+				}
+				if dst.ApplicationIds != nil {
+					newDst = dst.ApplicationIds
+				} else {
+					newDst = &ApplicationIdentifiers{}
+					dst.ApplicationIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationIds = src.ApplicationIds
+				} else {
+					dst.ApplicationIds = nil
+				}
+			}
+		case "device_ids":
+			if len(subs) > 0 {
+				return fmt.Errorf("'device_ids' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DeviceIds = src.DeviceIds
+			} else {
+				dst.DeviceIds = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *BatchUnclaimEndDevicesResponse) SetFields(src *BatchUnclaimEndDevicesResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "application_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationIdentifiers
+				if (src == nil || src.ApplicationIds == nil) && dst.ApplicationIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.ApplicationIds
+				}
+				if dst.ApplicationIds != nil {
+					newDst = dst.ApplicationIds
+				} else {
+					newDst = &ApplicationIdentifiers{}
+					dst.ApplicationIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationIds = src.ApplicationIds
+				} else {
+					dst.ApplicationIds = nil
+				}
+			}
+		case "failed":
+			if len(subs) > 0 {
+				return fmt.Errorf("'failed' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Failed = src.Failed
+			} else {
+				dst.Failed = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *CUPSRedirection) SetFields(src *CUPSRedirection, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
@@ -743,6 +833,67 @@ func (dst *GetClaimStatusResponse_VendorSpecific) SetFields(src *GetClaimStatusR
 				dst.Data = src.Data
 			} else {
 				dst.Data = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *BatchUnclaimEndDevicesResponse_Failed) SetFields(src *BatchUnclaimEndDevicesResponse_Failed, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "end_device_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *EndDeviceIdentifiers
+				if (src == nil || src.EndDeviceIds == nil) && dst.EndDeviceIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.EndDeviceIds
+				}
+				if dst.EndDeviceIds != nil {
+					newDst = dst.EndDeviceIds
+				} else {
+					newDst = &EndDeviceIdentifiers{}
+					dst.EndDeviceIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EndDeviceIds = src.EndDeviceIds
+				} else {
+					dst.EndDeviceIds = nil
+				}
+			}
+		case "error_details":
+			if len(subs) > 0 {
+				var newDst, newSrc *ErrorDetails
+				if (src == nil || src.ErrorDetails == nil) && dst.ErrorDetails == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.ErrorDetails
+				}
+				if dst.ErrorDetails != nil {
+					newDst = dst.ErrorDetails
+				} else {
+					newDst = &ErrorDetails{}
+					dst.ErrorDetails = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ErrorDetails = src.ErrorDetails
+				} else {
+					dst.ErrorDetails = nil
+				}
 			}
 
 		default:

@@ -21,6 +21,7 @@ import "google/protobuf/empty.proto";
 import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "thethings/json/annotations.proto";
+import "ttn/lorawan/v3/error.proto";
 import "ttn/lorawan/v3/identifiers.proto";
 import "validate/validate.proto";
 
@@ -235,6 +236,38 @@ service EndDeviceClaimingServer {
   rpc UnauthorizeApplication(ApplicationIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {delete: "/edcs/applications/{application_id}/authorize"};
   }
+}
+
+message BatchUnclaimEndDevicesRequest {
+  ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
+  repeated string device_ids = 2 [
+    (validate.rules).repeated = {
+      min_items: 1,
+      max_items: 20,
+      items: { string: { pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36 } }
+    }
+  ];
+}
+
+message BatchUnclaimEndDevicesResponse {
+  ApplicationIdentifiers application_ids = 1 ;
+  // End devices that could not be unclaimed.
+  message Failed {
+    EndDeviceIdentifiers end_device_ids = 1 ;
+    ErrorDetails error_details = 2;
+  }
+  repeated Failed failed = 2;
+}
+
+service EndDeviceBatchClaimingServer {
+  // Unclaims multiple end devices on an external Join Server.
+  // All devices must have the same application ID and Join EUI.
+  // Check the response for devices that could not be unclaimed.
+  rpc Unclaim(BatchUnclaimEndDevicesRequest) returns (BatchUnclaimEndDevicesResponse) {
+    option (google.api.http) = {
+      delete: "/edcs/claim/{application_ids.application_id}/devices/batch",
+    };
+  };
 }
 
 message CUPSRedirection {

@@ -167,6 +167,9 @@
 - [File `ttn/lorawan/v3/deviceclaimingserver.proto`](#ttn/lorawan/v3/deviceclaimingserver.proto)
   - [Message `AuthorizeApplicationRequest`](#ttn.lorawan.v3.AuthorizeApplicationRequest)
   - [Message `AuthorizeGatewayRequest`](#ttn.lorawan.v3.AuthorizeGatewayRequest)
+  - [Message `BatchUnclaimEndDevicesRequest`](#ttn.lorawan.v3.BatchUnclaimEndDevicesRequest)
+  - [Message `BatchUnclaimEndDevicesResponse`](#ttn.lorawan.v3.BatchUnclaimEndDevicesResponse)
+  - [Message `BatchUnclaimEndDevicesResponse.Failed`](#ttn.lorawan.v3.BatchUnclaimEndDevicesResponse.Failed)
   - [Message `CUPSRedirection`](#ttn.lorawan.v3.CUPSRedirection)
   - [Message `CUPSRedirection.ClientTLS`](#ttn.lorawan.v3.CUPSRedirection.ClientTLS)
   - [Message `ClaimEndDeviceRequest`](#ttn.lorawan.v3.ClaimEndDeviceRequest)
@@ -179,6 +182,7 @@
   - [Message `GetInfoByGatewayEUIResponse`](#ttn.lorawan.v3.GetInfoByGatewayEUIResponse)
   - [Message `GetInfoByJoinEUIRequest`](#ttn.lorawan.v3.GetInfoByJoinEUIRequest)
   - [Message `GetInfoByJoinEUIResponse`](#ttn.lorawan.v3.GetInfoByJoinEUIResponse)
+  - [Service `EndDeviceBatchClaimingServer`](#ttn.lorawan.v3.EndDeviceBatchClaimingServer)
   - [Service `EndDeviceClaimingServer`](#ttn.lorawan.v3.EndDeviceClaimingServer)
   - [Service `GatewayClaimingServer`](#ttn.lorawan.v3.GatewayClaimingServer)
 - [File `ttn/lorawan/v3/devicerepository.proto`](#ttn/lorawan/v3/devicerepository.proto)
@@ -2718,6 +2722,36 @@ in a future version of The Things Stack.
 | `gateway_ids` | <p>`message.required`: `true`</p> |
 | `api_key` | <p>`string.min_len`: `1`</p> |
 
+### <a name="ttn.lorawan.v3.BatchUnclaimEndDevicesRequest">Message `BatchUnclaimEndDevicesRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| `device_ids` | [`string`](#string) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `application_ids` | <p>`message.required`: `true`</p> |
+| `device_ids` | <p>`repeated.min_items`: `1`</p><p>`repeated.max_items`: `20`</p><p>`repeated.items.string.max_len`: `36`</p><p>`repeated.items.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+
+### <a name="ttn.lorawan.v3.BatchUnclaimEndDevicesResponse">Message `BatchUnclaimEndDevicesResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| `failed` | [`BatchUnclaimEndDevicesResponse.Failed`](#ttn.lorawan.v3.BatchUnclaimEndDevicesResponse.Failed) | repeated |  |
+
+### <a name="ttn.lorawan.v3.BatchUnclaimEndDevicesResponse.Failed">Message `BatchUnclaimEndDevicesResponse.Failed`</a>
+
+End devices that could not be unclaimed.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
+| `error_details` | [`ErrorDetails`](#ttn.lorawan.v3.ErrorDetails) |  |  |
+
 ### <a name="ttn.lorawan.v3.CUPSRedirection">Message `CUPSRedirection`</a>
 
 | Field | Type | Label | Description |
@@ -2892,6 +2926,18 @@ in a future version of The Things Stack.
 | Field | Validations |
 | ----- | ----------- |
 | `join_eui` | <p>`bytes.len`: `8`</p> |
+
+### <a name="ttn.lorawan.v3.EndDeviceBatchClaimingServer">Service `EndDeviceBatchClaimingServer`</a>
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `Unclaim` | [`BatchUnclaimEndDevicesRequest`](#ttn.lorawan.v3.BatchUnclaimEndDevicesRequest) | [`BatchUnclaimEndDevicesResponse`](#ttn.lorawan.v3.BatchUnclaimEndDevicesResponse) | Unclaims multiple end devices on an external Join Server. All devices must have the same application ID and Join EUI. Check the response for devices that could not be unclaimed. |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `Unclaim` | `DELETE` | `/api/v3/edcs/claim/{application_ids.application_id}/devices/batch` |  |
 
 ### <a name="ttn.lorawan.v3.EndDeviceClaimingServer">Service `EndDeviceClaimingServer`</a>
 

@@ -54,6 +54,9 @@
       "name": "EndDeviceClaimingServer"
     },
     {
+      "name": "EndDeviceBatchClaimingServer"
+    },
+    {
       "name": "GatewayClaimingServer"
     },
     {
@@ -8022,6 +8025,47 @@
         ],
         "tags": [
           "EndDeviceClaimingServer"
+        ]
+      }
+    },
+    "/edcs/claim/{application_ids.application_id}/devices/batch": {
+      "delete": {
+        "summary": "Unclaims multiple end devices on an external Join Server.\nAll devices must have the same application ID and Join EUI.\nCheck the response for devices that could not be unclaimed.",
+        "operationId": "EndDeviceBatchClaimingServer_Unclaim",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3BatchUnclaimEndDevicesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "device_ids",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "EndDeviceBatchClaimingServer"
         ]
       }
     },
@@ -17196,6 +17240,18 @@
         }
       }
     },
+    "BatchUnclaimEndDevicesResponseFailed": {
+      "type": "object",
+      "properties": {
+        "end_device_ids": {
+          "$ref": "#/definitions/v3EndDeviceIdentifiers"
+        },
+        "error_details": {
+          "$ref": "#/definitions/v3ErrorDetails"
+        }
+      },
+      "description": "End devices that could not be unclaimed."
+    },
     "BatchUpdateEndDeviceLastSeenRequestEndDeviceLastSeenUpdate": {
       "type": "object",
       "properties": {
@@ -20318,6 +20374,21 @@
             "$ref": "#/definitions/v3GatewayConnectionStats"
           },
           "description": "The map key is the gateway identifier."
+        }
+      }
+    },
+    "v3BatchUnclaimEndDevicesResponse": {
+      "type": "object",
+      "properties": {
+        "application_ids": {
+          "$ref": "#/definitions/v3ApplicationIdentifiers"
+        },
+        "failed": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/BatchUnclaimEndDevicesResponseFailed"
+          }
         }
       }
     },

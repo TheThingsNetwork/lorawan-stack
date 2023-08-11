@@ -2263,6 +2263,20 @@
       ]
     }
   },
+  "EndDeviceBatchClaimingServer": {
+    "Unclaim": {
+      "file": "ttn/lorawan/v3/deviceclaimingserver.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/edcs/claim/{application_ids.application_id}/devices/batch",
+          "parameters": [
+            "application_ids.application_id"
+          ]
+        }
+      ]
+    }
+  },
   "EndDeviceClaimingServer": {
     "Claim": {
       "file": "ttn/lorawan/v3/deviceclaimingserver.proto",
