@@ -23,7 +23,8 @@ import Radio from '@ttn-lw/components/radio-button'
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
-import useDerivedRightProps from '@ttn-lw/lib/hooks/use-derived-rights-props'
+
+import useDerivedRightProps from './use-derived-rights-props'
 
 import style from './rights-group.styl'
 

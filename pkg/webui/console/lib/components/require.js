@@ -22,7 +22,7 @@ import PropTypes from '../../../lib/prop-types'
 
 const Require = ({ children, featureCheck, condition, otherwise }) => {
   const rights = useSelector(state => featureCheck?.rightsSelector(state))
-  const newCondition = condition || (Boolean(featureCheck) && featureCheck.check(rights))
+  const combinedCondition = condition || (Boolean(featureCheck) && featureCheck.check(rights))
 
   const alternativeRender = useCallback(() => {
     if (typeof otherwise === 'object') {
@@ -45,7 +45,7 @@ const Require = ({ children, featureCheck, condition, otherwise }) => {
     return null
   }, [otherwise])
 
-  if (!newCondition) {
+  if (!combinedCondition) {
     return alternativeRender()
   }
 
