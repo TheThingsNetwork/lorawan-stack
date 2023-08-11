@@ -23488,6 +23488,12 @@
           "example": "000013",
           "description": "LoRa Alliance NetID."
         },
+        "ns_id": {
+          "type": "string",
+          "format": "string",
+          "example": "70B3D57ED000ABCD",
+          "description": "LoRaWAN NSID (EUI-64) that uniquely identifies the Network Server instance."
+        },
         "tenant_id": {
           "type": "string",
           "description": "Optional tenant identifier for multi-tenant deployments."

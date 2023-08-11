@@ -5231,6 +5231,7 @@ Identifies a Network Server.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `net_id` | [`bytes`](#bytes) |  | LoRa Alliance NetID. |
+| `ns_id` | [`bytes`](#bytes) |  | LoRaWAN NSID (EUI-64) that uniquely identifies the Network Server instance. |
 | `tenant_id` | [`string`](#string) |  | Optional tenant identifier for multi-tenant deployments. |
 | `cluster_id` | [`string`](#string) |  | Cluster identifier of the Network Server. |
 | `cluster_address` | [`string`](#string) |  | Cluster address of the Network Server. |
@@ -5241,6 +5242,7 @@ Identifies a Network Server.
 | Field | Validations |
 | ----- | ----------- |
 | `net_id` | <p>`bytes.len`: `3`</p> |
+| `ns_id` | <p>`bytes.len`: `8`</p> |
 | `tenant_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`</p> |
 | `cluster_id` | <p>`string.max_len`: `64`</p> |
 | `cluster_address` | <p>`string.max_len`: `256`</p> |
