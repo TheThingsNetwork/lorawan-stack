@@ -427,8 +427,11 @@ func (ns *NetworkServer) handleUplinkSubmission(ctx context.Context, ups []*ttnp
 func (ns *NetworkServer) networkIdentifiers(ctx context.Context) *ttnpb.NetworkIdentifiers {
 	clusterID := ns.clusterID
 	networkIDs := &ttnpb.NetworkIdentifiers{
-		NetId:     ns.netID.Bytes(),
+		NetId:     ns.netID(ctx).Bytes(),
 		ClusterId: clusterID,
+	}
+	if nsID := ns.nsID(ctx); nsID != nil {
+		networkIDs.NsId = nsID.Bytes()
 	}
 	return networkIDs
 }
