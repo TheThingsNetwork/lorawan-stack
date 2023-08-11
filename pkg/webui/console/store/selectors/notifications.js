@@ -24,6 +24,7 @@ export const selectUnseenNotifications = createSelector([selectNotifications], s
     ([key, value]) => !('status' in value) || value.status === 'NOTIFICATION_STATUS_UNSEEN',
   )
   const asObject = Object.fromEntries(filtered)
+
   return asObject
 })
 
