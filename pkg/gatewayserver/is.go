@@ -44,6 +44,30 @@ func NewIS(c Cluster) *IS {
 	}
 }
 
+// AssertGatewayBatchRights implements EntityRegistry.
+func (is IS) AssertGatewayBatchRights(ctx context.Context, ids []*ttnpb.GatewayIdentifiers, required ...ttnpb.Right) error {
+	ctx, err := getAuthenticatedContext(ctx)
+	if err != nil {
+		return err
+	}
+
+	client, err := is.newGatewayBatchAccessClient(ctx)
+	if err != nil {
+		return err
+	}
+	callOpt, err := rpcmetadata.WithForwardedAuth(ctx, is.AllowInsecureForCredentials())
+	if err != nil {
+		return err
+	}
+	_, err = client.AssertRights(ctx, &ttnpb.AssertGatewayRightsRequest{
+		GatewayIds: ids,
+		Required: &ttnpb.Rights{
+			Rights: required,
+		},
+	}, callOpt)
+	return err
+}
+
 // AssertGatewayRights implements EntityRegistry.
 func (is IS) AssertGatewayRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers, required ...ttnpb.Right) error {
 	ctx, err := getAuthenticatedContext(ctx)
@@ -155,6 +179,14 @@ func (is IS) newRegistryClient(ctx context.Context, ids *ttnpb.GatewayIdentifier
 		return nil, err
 	}
 	return ttnpb.NewGatewayRegistryClient(cc), nil
+}
+
+func (is IS) newGatewayBatchAccessClient(ctx context.Context) (ttnpb.GatewayBatchAccessClient, error) {
+	cc, err := is.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
+	if err != nil {
+		return nil, err
+	}
+	return ttnpb.NewGatewayBatchAccessClient(cc), nil
 }
 
 func getAuthenticatedContext(ctx context.Context) (context.Context, error) {

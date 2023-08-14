@@ -2055,9 +2055,8 @@ func TestUpdateVersionInfo(t *testing.T) { //nolint:paralleltest
 	time.Sleep(timeout)
 }
 
-func TestBatchGetStatus(t *testing.T) {
+func TestBatchGetStatus(t *testing.T) { // nolint:paralleltest
 	a, ctx := test.New(t)
-	t.Parallel()
 
 	for _, tc := range []struct { //nolint:paralleltest
 		Name      string
@@ -2220,6 +2219,21 @@ func TestBatchGetStatus(t *testing.T) {
 			mockGtw2 := mockis.DefaultGateway(gtwIDs2, true, true)
 			is.GatewayRegistry().Add(ctx, gtwIDs2, registeredGatewayKey, mockGtw2, testRights...)
 			time.Sleep(timeout) // Wait for setup to be completed.
+
+			// Invalid batch
+			res, err = statsClient.BatchGetGatewayConnectionStats(
+				statsCtx,
+				&ttnpb.BatchGetGatewayConnectionStatsRequest{
+					GatewayIds: []*ttnpb.GatewayIdentifiers{
+						gtwIDs1,
+						{
+							GatewayId: "unknown",
+						},
+					},
+				},
+			)
+			a.So(err, should.NotBeNil)
+			a.So(res, should.BeNil)
 
 			// Get Stats before connection.
 			res, err = statsClient.BatchGetGatewayConnectionStats(statsCtx, request)
